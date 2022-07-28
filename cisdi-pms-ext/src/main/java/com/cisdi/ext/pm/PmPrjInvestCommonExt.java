@@ -1,0 +1,37 @@
+package com.cisdi.ext.pm;
+
+import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.shared.interaction.EntityRecord;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class PmPrjInvestCommonExt {
+    /**
+     * 令被联动的属性在保存前可改，从而后端可以接收前端传入的值。
+     */
+    public void setLinkedAttEditableBeforeSave() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            setLinkedAttEditableBeforeSave(entityRecord);
+        }
+    }
+
+    private void setLinkedAttEditableBeforeSave(EntityRecord entityRecord) {
+        StringBuilder sbErr = new StringBuilder();
+        if (entityRecord.extraEditableAttCodeList == null) {
+            entityRecord.extraEditableAttCodeList = new ArrayList<>();
+        }
+        entityRecord.extraEditableAttCodeList.add("PRJ_CODE");
+        entityRecord.extraEditableAttCodeList.add("PM_CUSTOMER_ID");
+        entityRecord.extraEditableAttCodeList.add("PRJ_MANAGE_MODE_ID");
+        entityRecord.extraEditableAttCodeList.add("BASE_LOCATION_ID");
+        entityRecord.extraEditableAttCodeList.add("FLOOR_AREA");
+        entityRecord.extraEditableAttCodeList.add("PROJECT_TYPE_ID");
+        entityRecord.extraEditableAttCodeList.add("CON_SCALE_TYPE_ID");
+        entityRecord.extraEditableAttCodeList.add("CON_SCALE_UOM_ID");
+        entityRecord.extraEditableAttCodeList.add("CON_SCALE_QTY");
+        entityRecord.extraEditableAttCodeList.add("CON_SCALE_QTY2");
+        entityRecord.extraEditableAttCodeList.add("PRJ_SITUATION");
+    }
+}
