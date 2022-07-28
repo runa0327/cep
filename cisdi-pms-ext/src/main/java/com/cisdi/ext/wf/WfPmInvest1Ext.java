@@ -14,7 +14,7 @@ public class WfPmInvest1Ext {
     public void setComments() {
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         String procInstId = ExtJarHelper.procInstId.get();
-
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         String csCommId = entityRecord.csCommId;
         Object pm_prj_id = entityRecord.valueMap.get("PM_PRJ_ID");
@@ -43,6 +43,6 @@ public class WfPmInvest1Ext {
             }
         }
 
-        jdbcTemplate.update("update PM_PRJ_INVEST1 t set t.DESIGN_COMMENT=?,t.COST_COMMENT=?,t.EARLY_COMMENT=? where t.id=?", designComment, costComment, earlyChiefComment, csCommId);
+        jdbcTemplate.update("update " + entCode + " t set t.DESIGN_COMMENT=?,t.COST_COMMENT=?,t.EARLY_COMMENT=? where t.id=?", designComment, costComment, earlyChiefComment, csCommId);
     }
 }
