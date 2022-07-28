@@ -1,4 +1,4 @@
-package com.cisdi.ext.wf;
+package com.cisdi.ext.invest;
 
 import com.cisdi.ext.util.AmtUtil;
 import com.cisdi.ext.util.DoubleUtil;
@@ -10,7 +10,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import java.util.List;
 import java.util.Map;
 
-public class WfAmtExt {
+public class InvestAmtExt {
     public void check() {
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
@@ -19,7 +19,12 @@ public class WfAmtExt {
     }
 
     public void check(EntityRecord entityRecord) {
+
         Map<String, Object> valueMap = entityRecord.valueMap;
+
+        if (valueMap.get("PRJ_TOTAL_INVEST") == null) {
+            return;
+        }
 
         StringBuilder sbErr = new StringBuilder();
 
@@ -47,8 +52,9 @@ public class WfAmtExt {
         Double construct_period_interest = JdbcMapUtil.getDouble(valueMap, "CONSTRUCT_PERIOD_INTEREST");
         AmtUtil.checkAmt(sbErr, construct_period_interest, "建设期利息");
 
-        if (DoubleUtil.add(project_amt, project_other_amt, prepare_amt, construct_period_interest) > prj_total_invest) {
-            sbErr.append("工程费用+工程其他费用+预备费+建设期利息>总投资！");
+        Double sum = DoubleUtil.add(project_amt, project_other_amt, prepare_amt, construct_period_interest);
+        if (sum > prj_total_invest) {
+            sbErr.append("工程费用+工程其他费用+预备费+建设期利息之和（" + sum + "）>总投资（" + prj_total_invest + "）！");
         }
 
         if (DoubleUtil.add(construct_amt, equip_amt) > project_amt) {
