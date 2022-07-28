@@ -1,0 +1,48 @@
+package com.cisdi.ext.wf;
+
+import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.shared.interaction.EntityRecord;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 估算。
+ */
+public class WfPmInvest1Ext {
+    public void setComments() {
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        String procInstId = ExtJarHelper.procInstId.get();
+
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId;
+        Object pm_prj_id = entityRecord.valueMap.get("PM_PRJ_ID");
+
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select u.id u_id,u.code u_code,u.name u_name,tk.user_comment from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id", procInstId);
+
+        Map<String, Object> map = jdbcTemplate.queryForMap("select p.project_early_user_id,p.project_design_user_id,p.project_cost_user_id from pm_prj p where p.id=?", pm_prj_id);
+        String project_design_user_id = map.get("project_design_user_id").toString();
+        String project_cost_user_id = map.get("project_cost_user_id").toString();
+
+        String early_chief_user_id = jdbcTemplate.queryForMap("select ru.ad_user_id from ad_role r join ad_role_user ru on r.id=ru.ad_role_id and r.code='early_chief'").get("ad_user_id").toString();
+
+        String designComment = null;
+        String costComment = null;
+        String earlyChiefComment = null;
+
+        for (Map<String, Object> row : list) {
+            if (row.get("u_id").toString().equals(project_design_user_id)) {
+                designComment = row.get("user_comment") == null ? null : row.get("user_comment").toString();
+            }
+            if (row.get("u_id").toString().equals(project_cost_user_id)) {
+                costComment = row.get("user_comment") == null ? null : row.get("user_comment").toString();
+            }
+            if (row.get("u_id").toString().equals(early_chief_user_id)) {
+                earlyChiefComment = row.get("user_comment") == null ? null : row.get("user_comment").toString();
+            }
+        }
+
+        jdbcTemplate.update("update PM_PRJ_INVEST1 t set t.DESIGN_COMMENT=?,t.COST_COMMENT=?,t.EARLY_COMMENT=? where t.id=?", designComment, costComment, earlyChiefComment, csCommId);
+    }
+}

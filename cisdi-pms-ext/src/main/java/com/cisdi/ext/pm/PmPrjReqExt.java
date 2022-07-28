@@ -1,5 +1,6 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.util.AmtUtil;
 import com.cisdi.ext.util.DoubleUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.BaseException;
@@ -44,29 +45,29 @@ public class PmPrjReqExt {
             }
         }
 
-        Double prj_total_invest0 = JdbcMapUtil.getDouble(valueMap, "PRJ_TOTAL_INVEST0");
-        checkAmt(sbErr, prj_total_invest0, "匡算总投资");
+        Double prj_total_invest = JdbcMapUtil.getDouble(valueMap, "PRJ_TOTAL_INVEST");
+        AmtUtil.checkAmt(sbErr, prj_total_invest, "总投资");
 
         Double project_amt = JdbcMapUtil.getDouble(valueMap, "PROJECT_AMT");
-        checkAmt(sbErr, project_amt, "工程费用");
+        AmtUtil.checkAmt(sbErr, project_amt, "工程费用");
 
         Double construct_amt = JdbcMapUtil.getDouble(valueMap, "CONSTRUCT_AMT");
-        checkAmt(sbErr, construct_amt, "建安工程费");
+        AmtUtil.checkAmt(sbErr, construct_amt, "建安工程费");
 
         Double equip_amt = JdbcMapUtil.getDouble(valueMap, "EQUIP_AMT");
-        checkAmt(sbErr, equip_amt, "设备采购费");
+        AmtUtil.checkAmt(sbErr, equip_amt, "设备采购费");
 
         Double project_other_amt = JdbcMapUtil.getDouble(valueMap, "PROJECT_OTHER_AMT");
-        checkAmt(sbErr, project_other_amt, "工程其他费用");
+        AmtUtil.checkAmt(sbErr, project_other_amt, "工程其他费用");
 
         Double land_amt = JdbcMapUtil.getDouble(valueMap, "LAND_AMT");
-        checkAmt(sbErr, land_amt, "土地征拆费用");
+        AmtUtil.checkAmt(sbErr, land_amt, "土地征拆费用");
 
         Double prepare_amt = JdbcMapUtil.getDouble(valueMap, "PREPARE_AMT");
-        checkAmt(sbErr, prepare_amt, "预备费");
+        AmtUtil.checkAmt(sbErr, prepare_amt, "预备费");
 
-        if (DoubleUtil.add(project_amt, project_other_amt, prepare_amt) > prj_total_invest0) {
-            sbErr.append("工程费用+工程其他费用+预备费>匡算总投资！");
+        if (DoubleUtil.add(project_amt, project_other_amt, prepare_amt) > prj_total_invest) {
+            sbErr.append("工程费用+工程其他费用+预备费>总投资！");
         }
 
         if (DoubleUtil.add(construct_amt, equip_amt) > project_amt) {
@@ -82,13 +83,6 @@ public class PmPrjReqExt {
         }
     }
 
-    private void checkAmt(StringBuilder sbErr, Double amt, String amtName) {
-        if (amt == null) {
-            sbErr.append(amtName + "不能为空！");
-        } else if (amt < 0) {
-            sbErr.append(amtName + "不能小于0！");
-        }
-    }
 
     public void createPrj() {
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
@@ -103,7 +97,7 @@ public class PmPrjReqExt {
         String csCommId = entityRecord.csCommId;
 
         String newId = ExtJarHelper.insertData("PM_PRJ");
-        int update = jdbcTemplate.update("update PM_PRJ t join pm_prj_req r on t.id=? and r.id=? set t.PM_PRJ_REQ_ID=r.id,t.code=r.code,t.name=r.name,t.PM_CUSTOMER_ID=r.PM_CUSTOMER_ID,t.PRJ_MANAGE_MODE_ID=r.PRJ_MANAGE_MODE_ID,t.BASE_LOCATION_ID=r.BASE_LOCATION_ID,t.FLOOR_AREA=r.FLOOR_AREA,t.PROJECT_TYPE_ID=r.PROJECT_TYPE_ID,t.CON_SCALE_TYPE_ID=r.CON_SCALE_TYPE_ID,t.CON_SCALE_QTY=r.CON_SCALE_QTY,t.CON_SCALE_QTY2=r.CON_SCALE_QTY2,t.CON_SCALE_UOM_ID=r.CON_SCALE_UOM_ID,t.PRJ_SITUATION=r.PRJ_SITUATION,t.PRJ_TOTAL_INVEST0=r.PRJ_TOTAL_INVEST0,t.INVESTMENT_SOURCE_ID=r.INVESTMENT_SOURCE_ID,t.PROJECT_AMT=r.PROJECT_AMT,t.CONSTRUCT_AMT=r.CONSTRUCT_AMT,t.EQUIP_AMT=r.EQUIP_AMT,t.PROJECT_OTHER_AMT=r.PROJECT_OTHER_AMT,t.LAND_AMT=r.LAND_AMT,t.PREPARE_AMT=r.PREPARE_AMT,t.PROJECT_EARLY_USER_ID=r.PROJECT_EARLY_USER_ID,t.PROJECT_DESIGN_USER_ID=r.PROJECT_DESIGN_USER_ID,t.PROJECT_COST_USER_ID=r.PROJECT_COST_USER_ID", newId, csCommId);
+        int update = jdbcTemplate.update("update PM_PRJ t join pm_prj_req r on t.id=? and r.id=? set t.PM_PRJ_REQ_ID=r.id,t.code=r.code,t.name=r.name,t.PM_CUSTOMER_ID=r.PM_CUSTOMER_ID,t.PRJ_MANAGE_MODE_ID=r.PRJ_MANAGE_MODE_ID,t.BASE_LOCATION_ID=r.BASE_LOCATION_ID,t.FLOOR_AREA=r.FLOOR_AREA,t.PROJECT_TYPE_ID=r.PROJECT_TYPE_ID,t.CON_SCALE_TYPE_ID=r.CON_SCALE_TYPE_ID,t.CON_SCALE_QTY=r.CON_SCALE_QTY,t.CON_SCALE_QTY2=r.CON_SCALE_QTY2,t.CON_SCALE_UOM_ID=r.CON_SCALE_UOM_ID,t.PRJ_SITUATION=r.PRJ_SITUATION,t.PRJ_TOTAL_INVEST0=r.PRJ_TOTAL_INVEST,t.INVESTMENT_SOURCE_ID=r.INVESTMENT_SOURCE_ID,t.PROJECT_AMT=r.PROJECT_AMT,t.CONSTRUCT_AMT=r.CONSTRUCT_AMT,t.EQUIP_AMT=r.EQUIP_AMT,t.PROJECT_OTHER_AMT=r.PROJECT_OTHER_AMT,t.LAND_AMT=r.LAND_AMT,t.PREPARE_AMT=r.PREPARE_AMT,t.PROJECT_EARLY_USER_ID=r.PROJECT_EARLY_USER_ID,t.PROJECT_DESIGN_USER_ID=r.PROJECT_DESIGN_USER_ID,t.PROJECT_COST_USER_ID=r.PROJECT_COST_USER_ID", newId, csCommId);
         log.info("已更新：{}", update);
     }
 }
