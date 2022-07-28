@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/cisdi-pms-ext/cisdi-pms-ext.iml" filepath="$PROJECT_DIR$/cisdi-pms-ext/cisdi-pms-ext.iml" />
       <module fileurl="file://$PROJECT_DIR$/cisdi-pms-service.iml" filepath="$PROJECT_DIR$/cisdi-pms-service.iml" />
-      <module fileurl="file://$PROJECT_DIR$/cisdi-pms-data-transfer/data-transfer.iml" filepath="$PROJECT_DIR$/cisdi-pms-data-transfer/data-transfer.iml" />
     </modules>
   </component>
 </project>

@@ -2,19 +2,15 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="cisdi-pms-ext" />
-        <module name="data-transfer" />
+        <module name="cisdi-pms-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="cisdi-pms-ext" target="8" />
-      <module name="cisdi-pms-service" target="1.8" />
-      <module name="data-transfer" target="8" />
+      <module name="cisdi-pms-service" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>
