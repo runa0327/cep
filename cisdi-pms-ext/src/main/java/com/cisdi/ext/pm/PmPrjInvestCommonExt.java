@@ -23,7 +23,7 @@ public class PmPrjInvestCommonExt {
             entityRecord.extraEditableAttCodeList = new ArrayList<>();
         }
         entityRecord.extraEditableAttCodeList.add("PRJ_CODE");
-        entityRecord.extraEditableAttCodeList.add("PM_CUSTOMER_ID");
+        entityRecord.extraEditableAttCodeList.add("CUSTOMER_UNIT");
         entityRecord.extraEditableAttCodeList.add("PRJ_MANAGE_MODE_ID");
         entityRecord.extraEditableAttCodeList.add("BASE_LOCATION_ID");
         entityRecord.extraEditableAttCodeList.add("FLOOR_AREA");
