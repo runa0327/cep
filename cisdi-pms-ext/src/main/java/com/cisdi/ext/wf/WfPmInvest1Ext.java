@@ -21,9 +21,9 @@ public class WfPmInvest1Ext {
 
         List<Map<String, Object>> list = jdbcTemplate.queryForList("select u.id u_id,u.code u_code,u.name u_name,tk.user_comment from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id", procInstId);
 
-        Map<String, Object> map = jdbcTemplate.queryForMap("select p.project_early_user_id,p.project_design_user_id,p.project_cost_user_id from pm_prj p where p.id=?", pm_prj_id);
-        String project_design_user_id = map.get("project_design_user_id").toString();
-        String project_cost_user_id = map.get("project_cost_user_id").toString();
+        Map<String, Object> map = jdbcTemplate.queryForMap("select p.PRJ_EARLY_USER_ID,p.PRJ_DESIGN_USER_ID,p.PRJ_COST_USER_ID from pm_prj p where p.id=?", pm_prj_id);
+        String PRJ_DESIGN_USER_ID = map.get("PRJ_DESIGN_USER_ID").toString();
+        String PRJ_COST_USER_ID = map.get("PRJ_COST_USER_ID").toString();
 
         String early_chief_user_id = jdbcTemplate.queryForMap("select ru.ad_user_id from ad_role r join ad_role_user ru on r.id=ru.ad_role_id and r.code='early_chief'").get("ad_user_id").toString();
 
@@ -32,10 +32,10 @@ public class WfPmInvest1Ext {
         String earlyChiefComment = null;
 
         for (Map<String, Object> row : list) {
-            if (row.get("u_id").toString().equals(project_design_user_id)) {
+            if (row.get("u_id").toString().equals(PRJ_DESIGN_USER_ID)) {
                 designComment = row.get("user_comment") == null ? null : row.get("user_comment").toString();
             }
-            if (row.get("u_id").toString().equals(project_cost_user_id)) {
+            if (row.get("u_id").toString().equals(PRJ_COST_USER_ID)) {
                 costComment = row.get("user_comment") == null ? null : row.get("user_comment").toString();
             }
             if (row.get("u_id").toString().equals(early_chief_user_id)) {

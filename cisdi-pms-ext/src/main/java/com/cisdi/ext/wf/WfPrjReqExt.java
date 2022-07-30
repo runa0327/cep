@@ -12,21 +12,21 @@ public class WfPrjReqExt {
     public void parsePrjEarlyUserIdByPrjReq() {
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
-            parseUserIdByPrjReq(entityRecord, "PROJECT_EARLY_USER_ID", "前期岗");
+            parseUserIdByPrjReq(entityRecord, "PRJ_EARLY_USER_ID", "前期岗");
         }
     }
 
     public void parsePrjDesignUserIdByPrjReq() {
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
-            parseUserIdByPrjReq(entityRecord, "PROJECT_DESIGN_USER_ID", "设计岗");
+            parseUserIdByPrjReq(entityRecord, "PRJ_DESIGN_USER_ID", "设计岗");
         }
     }
 
     public void parsePrjCostUserIdByPrjReq() {
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
-            parseUserIdByPrjReq(entityRecord, "PROJECT_COST_USER_ID", "成本岗");
+            parseUserIdByPrjReq(entityRecord, "PRJ_COST_USER_ID", "成本岗");
         }
     }
 
