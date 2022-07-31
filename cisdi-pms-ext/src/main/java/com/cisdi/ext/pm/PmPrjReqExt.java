@@ -7,6 +7,7 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -97,18 +98,51 @@ public class PmPrjReqExt {
 
         String csCommId = entityRecord.csCommId;
 
-        {
-            Map<String, Object> pm_prj_req = Crud.from("pm_prj_req")
-                    .where().eq("ID", csCommId)
-                    .select().specifyCols().execForMap();
+        // 获取立项申请：
+        Map<String, Object> pm_prj_req = Crud.from("pm_prj_req")
+                .where().eq("ID", csCommId)
+                .select().specifyCols().execForMap();
 
-            String newId = Crud.from("PM_PRJ").insertData();
-            Integer exec = Crud.from("PM_PRJ").where().eq("ID", newId).update().set("PM_PRJ_REQ_ID", pm_prj_req.get("id")).set("code", pm_prj_req.get("code")).set("name", pm_prj_req.get("name")).set("CUSTOMER_UNIT", pm_prj_req.get("CUSTOMER_UNIT")).set("PRJ_MANAGE_MODE_ID", pm_prj_req.get("PRJ_MANAGE_MODE_ID")).set("BASE_LOCATION_ID", pm_prj_req.get("BASE_LOCATION_ID")).set("FLOOR_AREA", pm_prj_req.get("FLOOR_AREA")).set("PROJECT_TYPE_ID", pm_prj_req.get("PROJECT_TYPE_ID")).set("CON_SCALE_TYPE_ID", pm_prj_req.get("CON_SCALE_TYPE_ID")).set("CON_SCALE_QTY", pm_prj_req.get("CON_SCALE_QTY")).set("CON_SCALE_QTY2", pm_prj_req.get("CON_SCALE_QTY2")).set("CON_SCALE_UOM_ID", pm_prj_req.get("CON_SCALE_UOM_ID")).set("PRJ_SITUATION", pm_prj_req.get("PRJ_SITUATION")).set("INVESTMENT_SOURCE_ID", pm_prj_req.get("INVESTMENT_SOURCE_ID")).set("PRJ_EARLY_USER_ID", pm_prj_req.get("PRJ_EARLY_USER_ID")).set("PRJ_DESIGN_USER_ID", pm_prj_req.get("PRJ_DESIGN_USER_ID")).set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID")).exec();
-            log.info("已更新：{}", exec);
+        // 新建项目：
+        String newPrjId = Crud.from("PM_PRJ").insertData();
+        Integer exec = Crud.from("PM_PRJ").where().eq("ID", newPrjId).update().set("PM_PRJ_REQ_ID", pm_prj_req.get("id")).set("code", pm_prj_req.get("code")).set("name", pm_prj_req.get("name")).set("CUSTOMER_UNIT", pm_prj_req.get("CUSTOMER_UNIT")).set("PRJ_MANAGE_MODE_ID", pm_prj_req.get("PRJ_MANAGE_MODE_ID")).set("BASE_LOCATION_ID", pm_prj_req.get("BASE_LOCATION_ID")).set("FLOOR_AREA", pm_prj_req.get("FLOOR_AREA")).set("PROJECT_TYPE_ID", pm_prj_req.get("PROJECT_TYPE_ID")).set("CON_SCALE_TYPE_ID", pm_prj_req.get("CON_SCALE_TYPE_ID")).set("CON_SCALE_QTY", pm_prj_req.get("CON_SCALE_QTY")).set("CON_SCALE_QTY2", pm_prj_req.get("CON_SCALE_QTY2")).set("CON_SCALE_UOM_ID", pm_prj_req.get("CON_SCALE_UOM_ID")).set("PRJ_SITUATION", pm_prj_req.get("PRJ_SITUATION")).set("INVESTMENT_SOURCE_ID", pm_prj_req.get("INVESTMENT_SOURCE_ID")).set("PRJ_EARLY_USER_ID", pm_prj_req.get("PRJ_EARLY_USER_ID")).set("PRJ_DESIGN_USER_ID", pm_prj_req.get("PRJ_DESIGN_USER_ID")).set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID")).exec();
+        log.info("已更新：{}", exec);
 
-            Integer exec1 = Crud.from("pm_prj_req").where().eq("ID", csCommId).update().set("pm_prj_id", newId).exec();
-            log.info("已更新：{}", exec1);
+        // 将项目ID设置到立项申请上：
+        Integer exec1 = Crud.from("pm_prj_req").where().eq("ID", csCommId).update().set("pm_prj_id", newPrjId).exec();
+        log.info("已更新：{}", exec1);
 
+        // 立项匡算的集合值：
+        Map<String, Object> grSetValueInvest0 = Crud.from("GR_SET_VALUE").where().eq("CODE", "invest0").select().execForMap();
+
+        // 新建项目投资测算：
+        String newInvestEtsId = Crud.from("PM_INVEST_EST").insertData();
+        Integer exec2 = Crud.from("PM_INVEST_EST").where().eq("ID", newInvestEtsId).update().set("IS_TEMPLATE", 0).set("PM_PRJ_ID", newPrjId).set("INVEST_EST_TYPE_ID", grSetValueInvest0.get("ID")).set("PRJ_TOTAL_INVEST", pm_prj_req.get("PRJ_TOTAL_INVEST")).exec();
+        log.info("已更新：{}", exec2);
+
+        // 新建项目投资测算明细：
+        createInvestEstDtl(pm_prj_req, newInvestEtsId, "PRJ_TOTAL_INVEST");
+        createInvestEstDtl(pm_prj_req, newInvestEtsId, "PROJECT_AMT");
+        createInvestEstDtl(pm_prj_req, newInvestEtsId, "CONSTRUCT_AMT");
+        createInvestEstDtl(pm_prj_req, newInvestEtsId, "EQUIP_AMT");
+        createInvestEstDtl(pm_prj_req, newInvestEtsId, "PROJECT_OTHER_AMT");
+        createInvestEstDtl(pm_prj_req, newInvestEtsId, "LAND_AMT");
+        createInvestEstDtl(pm_prj_req, newInvestEtsId, "PREPARE_AMT");
+    }
+
+    private void createInvestEstDtl(Map<String, Object> pm_prj_req, String newInvestEtsId, String colName) {
+        // 获取金额：
+        Object amt = pm_prj_req.get(colName);
+
+        // 获取费用类型ID：
+        Object expTypeId = Crud.from("PM_EXP_TYPE").where().eq("code", colName).select().specifyCols("ID").execForValue();
+        if (SharedUtil.isEmptyObject(expTypeId)) {
+            throw new BaseException("没有" + colName + "对应的费用类型！");
         }
+
+        // 新建项目投资测算明细：
+        String newInvestEstDtlId = Crud.from("PM_INVEST_EST_DTL").insertData();
+        Integer exec3 = Crud.from("PM_INVEST_EST_DTL").where().eq("ID", newInvestEstDtlId).update().set("PM_EXP_TYPE_ID", expTypeId).set("AMT", amt).set("PM_INVEST_EST_ID", newInvestEtsId).exec();
+        log.info("已更新：{}", exec3);
     }
 }
