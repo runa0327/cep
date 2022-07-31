@@ -8,7 +8,6 @@ import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -83,11 +82,6 @@ public class WfExt {
                 }
 
                 if (entityCode.equals("PM_PRJ_INVEST1") || entityCode.equals("PM_PRJ_INVEST2") || entityCode.equals("PM_PRJ_INVEST3")) {
-                    if (entityCode.equals("PM_PRJ_INVEST1") || entityCode.equals("PM_PRJ_INVEST2") || entityCode.equals("PM_PRJ_INVEST3")) {
-                        int update1 = jdbcTemplate.update("update PM_COST_EST_DTL t set t.status=? where t." + entityCode + "_id=?", newStatus, csCommId);
-                        log.info("已更新：{}", update1);
-                    }
-
                     if ("APING".equals(newStatus)) {
                         int update1 = jdbcTemplate.update("update wf_process_instance pi join wf_process p on pi.WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi.ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
                         log.info("已更新：{}", update1);
@@ -98,7 +92,6 @@ public class WfExt {
             }
         }
     }
-
 
 
 }

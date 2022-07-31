@@ -183,7 +183,7 @@ public class AttLinkExt {
 
             return attLinkResult;
         } else {
-            throw new BaseException("属性联动的参数的attCode不是PM_PRJ_REQ_ID或PROJECT_TYPE_ID！");
+            throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
     }
 }
