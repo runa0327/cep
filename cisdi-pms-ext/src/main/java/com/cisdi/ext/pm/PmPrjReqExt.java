@@ -3,6 +3,7 @@ package com.cisdi.ext.pm;
 import com.cisdi.ext.util.AmtUtil;
 import com.cisdi.ext.util.DoubleUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -96,8 +97,18 @@ public class PmPrjReqExt {
 
         String csCommId = entityRecord.csCommId;
 
-        String newId = ExtJarHelper.insertData("PM_PRJ");
-        int update = jdbcTemplate.update("update PM_PRJ t join pm_prj_req r on t.id=? and r.id=? set t.PM_PRJ_REQ_ID=r.id,t.code=r.code,t.name=r.name,t.CUSTOMER_UNIT=r.CUSTOMER_UNIT,t.PRJ_MANAGE_MODE_ID=r.PRJ_MANAGE_MODE_ID,t.BASE_LOCATION_ID=r.BASE_LOCATION_ID,t.FLOOR_AREA=r.FLOOR_AREA,t.PROJECT_TYPE_ID=r.PROJECT_TYPE_ID,t.CON_SCALE_TYPE_ID=r.CON_SCALE_TYPE_ID,t.CON_SCALE_QTY=r.CON_SCALE_QTY,t.CON_SCALE_QTY2=r.CON_SCALE_QTY2,t.CON_SCALE_UOM_ID=r.CON_SCALE_UOM_ID,t.PRJ_SITUATION=r.PRJ_SITUATION,t.INVESTMENT_SOURCE_ID=r.INVESTMENT_SOURCE_ID,t.PRJ_EARLY_USER_ID=r.PRJ_EARLY_USER_ID,t.PRJ_DESIGN_USER_ID=r.PRJ_DESIGN_USER_ID,t.PRJ_COST_USER_ID=r.PRJ_COST_USER_ID,r.pm_prj_id=?", newId, csCommId, newId);
-        log.info("已更新：{}", update);
+        {
+            Map<String, Object> pm_prj_req = Crud.from("pm_prj_req")
+                    .where().eq("ID", csCommId)
+                    .select().specifyCols().execForMap();
+
+            String newId = Crud.from("PM_PRJ").insertData();
+            Integer exec = Crud.from("PM_PRJ").where().eq("ID", newId).update().set("PM_PRJ_REQ_ID", pm_prj_req.get("id")).set("code", pm_prj_req.get("code")).set("name", pm_prj_req.get("name")).set("CUSTOMER_UNIT", pm_prj_req.get("CUSTOMER_UNIT")).set("PRJ_MANAGE_MODE_ID", pm_prj_req.get("PRJ_MANAGE_MODE_ID")).set("BASE_LOCATION_ID", pm_prj_req.get("BASE_LOCATION_ID")).set("FLOOR_AREA", pm_prj_req.get("FLOOR_AREA")).set("PROJECT_TYPE_ID", pm_prj_req.get("PROJECT_TYPE_ID")).set("CON_SCALE_TYPE_ID", pm_prj_req.get("CON_SCALE_TYPE_ID")).set("CON_SCALE_QTY", pm_prj_req.get("CON_SCALE_QTY")).set("CON_SCALE_QTY2", pm_prj_req.get("CON_SCALE_QTY2")).set("CON_SCALE_UOM_ID", pm_prj_req.get("CON_SCALE_UOM_ID")).set("PRJ_SITUATION", pm_prj_req.get("PRJ_SITUATION")).set("INVESTMENT_SOURCE_ID", pm_prj_req.get("INVESTMENT_SOURCE_ID")).set("PRJ_EARLY_USER_ID", pm_prj_req.get("PRJ_EARLY_USER_ID")).set("PRJ_DESIGN_USER_ID", pm_prj_req.get("PRJ_DESIGN_USER_ID")).set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID")).exec();
+            log.info("已更新：{}", exec);
+
+            Integer exec1 = Crud.from("pm_prj_req").where().eq("ID", csCommId).update().set("pm_prj_id", newId).exec();
+            log.info("已更新：{}", exec1);
+
+        }
     }
 }
