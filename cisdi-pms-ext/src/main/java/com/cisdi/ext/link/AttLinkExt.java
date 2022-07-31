@@ -15,97 +15,6 @@ import java.util.Map;
 
 public class AttLinkExt {
 
-    private AttLinkResult projectLink(String PM_PRJ_REQ_ID) {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from pm_prj_req t where t.id=? and t.status='AP' LIMIT 1", PM_PRJ_REQ_ID);
-
-        List<Map<String, Object>> list1 = jdbcTemplate.queryForList("select * from pm_prj_invest1 t where t.PM_PRJ_REQ_ID=? and t.status='AP' LIMIT 1", PM_PRJ_REQ_ID);
-
-        List<Map<String, Object>> list2 = jdbcTemplate.queryForList("select * from pm_prj_invest2 t where t.PM_PRJ_REQ_ID=? and t.status='AP' LIMIT 1", PM_PRJ_REQ_ID);
-
-        List<Map<String, Object>> list3 = jdbcTemplate.queryForList("select * from pm_prj_invest3 t where t.PM_PRJ_REQ_ID=? and t.status='AP' LIMIT 1", PM_PRJ_REQ_ID);
-
-        AttLinkResult projectLinkResult = new AttLinkResult();
-        projectLinkResult.attMap = new HashMap<>();
-
-        // 遍历4组数据，相同的属性以后面的为准：
-        extracted(jdbcTemplate, list, projectLinkResult);
-        extracted(jdbcTemplate, list1, projectLinkResult);
-        extracted(jdbcTemplate, list2, projectLinkResult);
-        extracted(jdbcTemplate, list3, projectLinkResult);
-
-        projectLinkResult.attMap.remove("LK_WF_INST_ID");
-        projectLinkResult.attMap.remove("VER");
-        projectLinkResult.attMap.remove("IS_PRESET");
-        projectLinkResult.attMap.remove("STATUS");
-        projectLinkResult.attMap.remove("ID");
-        projectLinkResult.attMap.remove("REMARK");
-        projectLinkResult.attMap.remove("LAST_MODI_USER_ID");
-        projectLinkResult.attMap.remove("LAST_MODI_DT");
-        projectLinkResult.attMap.remove("NAME");
-        projectLinkResult.attMap.remove("CODE");
-        projectLinkResult.attMap.remove("CRT_DT");
-        projectLinkResult.attMap.remove("CRT_USER_ID");
-        projectLinkResult.attMap.remove("TS");
-
-        projectLinkResult.attMap.remove("CRT_DEPT_ID");
-
-        return projectLinkResult;
-    }
-
-    private void extracted(JdbcTemplate jdbcTemplate, List<Map<String, Object>> list, AttLinkResult projectLinkResult) {
-        if (!SharedUtil.isEmptyList(list)) {
-            Map row = list.get(0);
-            for (Object keyObject : row.keySet()) {
-                String key = keyObject.toString();
-                String value = JdbcMapUtil.getString(row, key);
-
-                TypeValueText typeValueText = new TypeValueText();
-                typeValueText.value = value;
-                // 将text默认和id相同：
-                typeValueText.text = value;
-
-                // 若为引用，且值非空，再将text改为被引用的记录的name：
-                List<Map<String, Object>> ll = jdbcTemplate.queryForList("select e.code refed_table_name,st.AD_ATT_TYPE_ID from ad_att a,AD_ATT_SUB_TYPE st,ad_single_ent_view sev,ad_ent e where a.code=? and a.REFED_SEV_ID=sev.id and sev.AD_ENT_ID=e.id and a.AD_ATT_SUB_TYPE_ID=st.id", key);
-                if (!SharedUtil.isEmptyList(ll)) {
-                    Map<String, Object> rr = ll.get(0);
-                    String refed_table_name = JdbcMapUtil.getString(rr, "refed_table_name");
-                    String AD_ATT_TYPE_ID = JdbcMapUtil.getString(rr, "AD_ATT_TYPE_ID");
-
-                    typeValueText.type = AttDataTypeE.valueOf(AD_ATT_TYPE_ID);
-
-                    if (!SharedUtil.isEmptyObject(value)) {
-                        List<Map<String, Object>> refedList = jdbcTemplate.queryForList("select * from " + refed_table_name + " t where t.id=?", value);
-                        if (!SharedUtil.isEmptyList(refedList)) {
-                            Map<String, Object> refedRow = refedList.get(0);
-                            typeValueText.text = JdbcMapUtil.getString(refedRow, "name");
-                        }
-                    }
-                } else {
-                    String AD_ATT_TYPE_ID = jdbcTemplate.queryForMap("select st.AD_ATT_TYPE_ID from ad_att a,AD_ATT_SUB_TYPE st where a.code=? and a.AD_ATT_SUB_TYPE_ID=st.id", key).get("AD_ATT_TYPE_ID").toString();
-
-                    typeValueText.type = AttDataTypeE.valueOf(AD_ATT_TYPE_ID);
-
-                    if ("BOOLEAN".equals(AD_ATT_TYPE_ID)) {
-                        typeValueText.text = (SharedUtil.isEmptyString(typeValueText.text) ? null : ("1".equals(typeValueText.text) ? "是" : "否"));
-                    }
-                }
-
-                if (typeValueText.type == AttDataTypeE.DATETIME) {
-                    if (!SharedUtil.isEmptyString(typeValueText.value)) {
-                        typeValueText.value = typeValueText.value.replaceAll("T", " ");
-                        typeValueText.text = typeValueText.text.replaceAll("T", " ");
-                    }
-                }
-
-                if (typeValueText.type != AttDataTypeE.FILE_GROUP) {
-                    projectLinkResult.attMap.put(key, typeValueText);
-                }
-            }
-        }
-    }
-
     public void attLink() {
         // 获取输入：
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
@@ -127,9 +36,7 @@ public class AttLinkExt {
 
         String attCode = param.attCode;
         String attValue = param.attValue;
-        if ("PM_PRJ_REQ_ID".equals(attCode)) {
-            return projectLink(attValue);
-        } else if ("PROJECT_TYPE_ID".equals(attCode)) {
+        if ("PROJECT_TYPE_ID".equals(attCode)) {
             AttLinkResult attLinkResult = new AttLinkResult();
             attLinkResult.attMap = new HashMap<>();
 
