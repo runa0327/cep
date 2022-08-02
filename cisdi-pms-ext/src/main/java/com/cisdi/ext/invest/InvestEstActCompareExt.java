@@ -29,6 +29,20 @@ public class InvestEstActCompareExt {
         // 遍历费用类型树，自底向上，将为金额全为0的节点剔除：
 
         // 返回结果，如：
+        InvestEstActCompareRow row = mockResult();
+        // row.children添加子行：
+        // 最终，返回：
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(row), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+        ExtJarHelper.returnValue.set(row);
+    }
+
+    /**
+     * 模拟结果。
+     *
+     * @return
+     */
+    private InvestEstActCompareRow mockResult() {
         InvestEstActCompareRow row = new InvestEstActCompareRow();
         row.expTypeId = "99799190825099546";
         row.expTypeCode = "PRJ_TOTAL_INVEST";
@@ -42,9 +56,69 @@ public class InvestEstActCompareExt {
         row.invest3AmtSum = 300.12d;
         row.actAmtSum = 400.12d;
         row.children = new ArrayList<>();
-        // row.children添加子行：
-        // 最终，返回：
-        ExtJarHelper.returnValue.set(row);
+        {
+            InvestEstActCompareRow r = new InvestEstActCompareRow();
+            r.expTypeId = "99799190825099546";
+            r.expTypeCode = "PRJ_TOTAL_INVEST";
+            r.expTypeName = "总投资";
+            r.invest1Amt = 100.12d;
+            r.invest2Amt = 200.12d;
+            r.invest3Amt = 300.12d;
+            r.actAmt = 400.12d;
+            r.invest1AmtSum = 100.12d;
+            r.invest2AmtSum = 200.12d;
+            r.invest3AmtSum = 300.12d;
+            r.actAmtSum = 400.12d;
+            r.children = new ArrayList<>();
+            {
+
+
+                InvestEstActCompareRow r2 = new InvestEstActCompareRow();
+                r.children.add(r2);
+                r2.expTypeId = "99799190825099547";
+                r2.expTypeCode = "PROJECT_AMT";
+                r2.expTypeName = "工程费用";
+                r2.invest1Amt = 100.12d;
+                r2.invest2Amt = 200.12d;
+                r2.invest3Amt = 300.12d;
+                r2.actAmt = 400.12d;
+                r2.invest1AmtSum = 100.12d;
+                r2.invest2AmtSum = 200.12d;
+                r2.invest3AmtSum = 300.12d;
+                r2.actAmtSum = 400.12d;
+                r2.children = new ArrayList<>();
+                {
+                    InvestEstActCompareRow r21 = new InvestEstActCompareRow();
+                    r2.children.add(r21);
+                    r21.expTypeId = "99799190825099548";
+                    r21.expTypeCode = "CONSTRUCT_AMT";
+                    r21.expTypeName = "建安费";
+                    r21.invest1Amt = 100.12d;
+                    r21.invest2Amt = 200.12d;
+                    r21.invest3Amt = 300.12d;
+                    r21.actAmt = 400.12d;
+                    r21.invest1AmtSum = 100.12d;
+                    r21.invest2AmtSum = 200.12d;
+                    r21.invest3AmtSum = 300.12d;
+                    r21.actAmtSum = 400.12d;
+                }
+
+                InvestEstActCompareRow r3 = new InvestEstActCompareRow();
+                r.children.add(r3);
+                r3.expTypeId = "99799190825099552";
+                r3.expTypeCode = "PREPARE_AMT";
+                r3.expTypeName = "预备费";
+                r3.invest1Amt = 100.12d;
+                r3.invest2Amt = 200.12d;
+                r3.invest3Amt = 300.12d;
+                r3.actAmt = 400.12d;
+                r3.invest1AmtSum = 100.12d;
+                r3.invest2AmtSum = 200.12d;
+                r3.invest3AmtSum = 300.12d;
+                r3.actAmtSum = 400.12d;
+            }
+        }
+        return row;
     }
 
     public static class InvestEstActCompareParam {
