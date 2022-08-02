@@ -49,11 +49,13 @@ public class InvestEstActCompareExt {
         row.invest1Amt = 100.12d;
         row.invest2Amt = 200.12d;
         row.invest3Amt = 300.12d;
-        row.actAmt = 400.12d;
         row.invest1AmtSum = 100.12d;
         row.invest2AmtSum = 200.12d;
         row.invest3AmtSum = 300.12d;
-        row.actAmtSum = 400.12d;
+        row.complAmt = 400.12d;
+        row.complAmtSum = 500.12d;
+        row.payAmt = 600.12d;
+        row.payAmtSum = 700.12d;
         row.children = new ArrayList<>();
         {
 
@@ -66,11 +68,13 @@ public class InvestEstActCompareExt {
             r2.invest1Amt = 100.12d;
             r2.invest2Amt = 200.12d;
             r2.invest3Amt = 300.12d;
-            r2.actAmt = 400.12d;
             r2.invest1AmtSum = 100.12d;
             r2.invest2AmtSum = 200.12d;
             r2.invest3AmtSum = 300.12d;
-            r2.actAmtSum = 400.12d;
+            r2.complAmt = 400.12d;
+            r2.complAmtSum = 500.12d;
+            r2.payAmt = 600.12d;
+            r2.payAmtSum = 700.12d;
             r2.children = new ArrayList<>();
             {
                 InvestEstActCompareRow r21 = new InvestEstActCompareRow();
@@ -81,11 +85,13 @@ public class InvestEstActCompareExt {
                 r21.invest1Amt = 100.12d;
                 r21.invest2Amt = 200.12d;
                 r21.invest3Amt = 300.12d;
-                r21.actAmt = 400.12d;
                 r21.invest1AmtSum = 100.12d;
                 r21.invest2AmtSum = 200.12d;
                 r21.invest3AmtSum = 300.12d;
-                r21.actAmtSum = 400.12d;
+                r21.complAmt = 400.12d;
+                r21.complAmtSum = 500.12d;
+                r21.payAmt = 600.12d;
+                r21.payAmtSum = 700.12d;
             }
 
             InvestEstActCompareRow r3 = new InvestEstActCompareRow();
@@ -96,11 +102,13 @@ public class InvestEstActCompareExt {
             r3.invest1Amt = 100.12d;
             r3.invest2Amt = 200.12d;
             r3.invest3Amt = 300.12d;
-            r3.actAmt = 400.12d;
             r3.invest1AmtSum = 100.12d;
             r3.invest2AmtSum = 200.12d;
             r3.invest3AmtSum = 300.12d;
-            r3.actAmtSum = 400.12d;
+            r3.complAmt = 400.12d;
+            r3.complAmtSum = 500.12d;
+            r3.payAmt = 600.12d;
+            r3.payAmtSum = 700.12d;
         }
         return row;
     }
@@ -138,10 +146,6 @@ public class InvestEstActCompareExt {
          */
         public Double invest3Amt;
         /**
-         * 实际金额。
-         */
-        public Double actAmt;
-        /**
          * 可研估算金额。
          */
         public Double invest1AmtSum;
@@ -154,9 +158,21 @@ public class InvestEstActCompareExt {
          */
         public Double invest3AmtSum;
         /**
-         * 实际金额。
+         * 完成金额。
          */
-        public Double actAmtSum;
+        public Double complAmt;
+        /**
+         * 支付金额。
+         */
+        public Double payAmt;
+        /**
+         * 完成金额（累计）。
+         */
+        public Double complAmtSum;
+        /**
+         * 支付金额（累计）。
+         */
+        public Double payAmtSum;
         /**
          * 子行。递归。
          */
