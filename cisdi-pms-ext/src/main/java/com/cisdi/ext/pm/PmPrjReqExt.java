@@ -4,6 +4,7 @@ import com.cisdi.ext.util.AmtUtil;
 import com.cisdi.ext.util.DoubleUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Update;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -144,5 +145,29 @@ public class PmPrjReqExt {
         String newInvestEstDtlId = Crud.from("PM_INVEST_EST_DTL").insertData();
         Integer exec3 = Crud.from("PM_INVEST_EST_DTL").where().eq("ID", newInvestEstDtlId).update().set("PM_EXP_TYPE_ID", expTypeId).set("AMT", amt).set("PM_INVEST_EST_ID", newInvestEtsId).exec();
         log.info("已更新：{}", exec3);
+    }
+
+    /**
+     * 建设年限写入项目信息表
+     */
+    public void updatePrj() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            updatePrjYearLimit(entityRecord);
+        }
+    }
+
+    private void updatePrjYearLimit(EntityRecord entityRecord) {
+
+        //获取项目id
+        String projectId = entityRecord.valueMap.get("PM_PRJ_ID").toString();
+
+        //获取建筑年限
+        String year = entityRecord.valueMap.get("BUILD_YEAR_LIMIT").toString();
+
+        // 修改项目建筑年限信息：
+        Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("CONSTRUCT_DAYS", year).set("BUILD_YEAR_LIMIT",year).exec();
+        log.info("已更新：{}", exec);
+
     }
 }
