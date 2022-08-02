@@ -107,15 +107,15 @@ public class WfExt {
 
     private List<String> getTableList() {
         List<String> list = new ArrayList<>();
-        list.add(0,"PM_PRJ_INVEST1"); //可研估算
-        list.add(1,"PM_PRJ_INVEST2"); //初设概算
-        list.add(2,"PM_PRJ_INVEST3"); //预算财评
-        list.add(3,"PM_STABLE_EVAL"); //社会稳定性评价
-        list.add(4,"PM_ENERGY_EVAL"); //固定资产投资节能评价
-        list.add(5,"PM_WATER_PLAN"); //水保方案
-        list.add(6,"PM_ENVIRONMENT_EVAL"); //环评
-        list.add(7,"PO_ORDER_REQ"); //采购合同签订申请
-        list.add(8,"PO_PUBLIC_BID_REQ"); //采购公开招标申请
+        list.add("PM_PRJ_INVEST1"); //可研估算
+        list.add("PM_PRJ_INVEST2"); //初设概算
+        list.add("PM_PRJ_INVEST3"); //预算财评
+        list.add("PM_STABLE_EVAL"); //社会稳定性评价
+        list.add("PM_ENERGY_EVAL"); //固定资产投资节能评价
+        list.add("PM_WATER_PLAN"); //水保方案
+        list.add("PM_ENVIRONMENT_EVAL"); //环评
+        list.add("PO_ORDER_REQ"); //采购合同签订申请
+        list.add("PO_PUBLIC_BID_REQ"); //采购公开招标申请
         return list;
     }
 
