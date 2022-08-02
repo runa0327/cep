@@ -162,11 +162,11 @@ public class PmPrjReqExt {
         //获取项目id
         String projectId = entityRecord.valueMap.get("PM_PRJ_ID").toString();
 
-        //获取建筑年限
-        String year = entityRecord.valueMap.get("BUILD_YEAR_LIMIT").toString();
+        //获取建设年限
+        String year = entityRecord.valueMap.get("BUILD_YEARS").toString();
 
-        // 修改项目建筑年限信息：
-        Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("CONSTRUCT_DAYS", year).set("BUILD_YEAR_LIMIT",year).exec();
+        // 修改项目建设年限信息：
+        Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("BUILD_YEARS",year).exec();
         log.info("已更新：{}", exec);
 
     }
