@@ -7,7 +7,9 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -81,16 +83,40 @@ public class WfExt {
                     }
                 }
 
-                if (entityCode.equals("PM_PRJ_INVEST1") || entityCode.equals("PM_PRJ_INVEST2") || entityCode.equals("PM_PRJ_INVEST3")) {
-                    if ("APING".equals(newStatus)) {
-                        int update1 = jdbcTemplate.update("update wf_process_instance pi join wf_process p on pi.WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi.ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
-                        log.info("已更新：{}", update1);
+                List<String> tableList = getTableList();
+                if (!CollectionUtils.isEmpty(tableList)){
+                    if (tableList.contains(entityCode)){
+                        if ("APING".equals(newStatus)) {
+                            int update1 = jdbcTemplate.update("update wf_process_instance pi join wf_process p on pi.WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi.ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                            log.info("已更新：{}", update1);
+                        }
                     }
                 }
+
+//                if (entityCode.equals("PM_PRJ_INVEST1") || entityCode.equals("PM_PRJ_INVEST2") || entityCode.equals("PM_PRJ_INVEST3")) {
+//                    if ("APING".equals(newStatus)) {
+//                        int update1 = jdbcTemplate.update("update wf_process_instance pi join wf_process p on pi.WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi.ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+//                        log.info("已更新：{}", update1);
+//                    }
+//                }
 
 
             }
         }
+    }
+
+    private List<String> getTableList() {
+        List<String> list = new ArrayList<>();
+        list.add(0,"PM_PRJ_INVEST1"); //可研估算
+        list.add(1,"PM_PRJ_INVEST2"); //初设概算
+        list.add(2,"PM_PRJ_INVEST3"); //预算财评
+        list.add(3,"PM_STABLE_EVAL"); //社会稳定性评价
+        list.add(4,"PM_ENERGY_EVAL"); //固定资产投资节能评价
+        list.add(5,"PM_WATER_PLAN"); //水保方案
+        list.add(6,"PM_ENVIRONMENT_EVAL"); //环评
+        list.add(7,"PO_ORDER_REQ"); //采购合同签订申请
+        list.add(8,"PO_PUBLIC_BID_REQ"); //采购公开招标申请
+        return list;
     }
 
 
