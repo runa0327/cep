@@ -73,7 +73,13 @@ public class AttLinkExt {
             AttLinkResult attLinkResult = new AttLinkResult();
             attLinkResult.attMap = new HashMap<>();
 
-            List<Map<String, Object>> list = jdbcTemplate.queryForList("select t.code prj_code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name,l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,st.id st_id,st.name st_name,su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS from pm_prj t join PM_PARTY c on t.id=? and t.CUSTOMER_UNIT=c.id join gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID join gr_set_value l on t.BASE_LOCATION_ID=l.id join gr_set_value pt on t.PROJECT_TYPE_ID=pt.id join gr_set_value st on t.CON_SCALE_TYPE_ID=st.id join gr_set_value su on t.CON_SCALE_UOM_ID=su.id", attValue);
+            //项目基础信息
+            List<Map<String, Object>> list = jdbcTemplate
+                    .queryForList("select t.code prj_code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
+                            "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,st.id st_id,st.name st_name," +
+                            "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
+                            "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID " +
+                            "from pm_prj t join PM_PARTY c on t.id=? and t.CUSTOMER_UNIT=c.id join gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID join gr_set_value l on t.BASE_LOCATION_ID=l.id join gr_set_value pt on t.PROJECT_TYPE_ID=pt.id join gr_set_value st on t.CON_SCALE_TYPE_ID=st.id join gr_set_value su on t.CON_SCALE_UOM_ID=su.id", attValue);
 
             if (list.size() == 0) {
                 throw new BaseException("项目的相关属性不完整！");
@@ -188,10 +194,47 @@ public class AttLinkExt {
 
                 attLinkResult.attMap.put("PRJ_SITUATION", typeValueText);
             }
+            //批复文号
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
+                typeValueText.text = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
+
+                attLinkResult.attMap.put("PRJ_REPLY_NO", typeValueText);
+            }
+            //批复日期
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.DATE;
+                typeValueText.value = JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
+                typeValueText.text = JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
+
+                attLinkResult.attMap.put("PRJ_REPLY_DATE", typeValueText);
+            }
+            //批复材料
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.FILE_GROUP;
+                typeValueText.value = JdbcMapUtil.getString(row, "PRJ_REPLY_FILE");
+                typeValueText.text = JdbcMapUtil.getString(row, "PRJ_REPLY_FILE");
+
+                attLinkResult.attMap.put("PRJ_REPLY_FILE", typeValueText);
+            }
+            //资金来源
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
+                typeValueText.text = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
+
+                attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", typeValueText);
+            }
 
             return attLinkResult;
         } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
     }
+
 }

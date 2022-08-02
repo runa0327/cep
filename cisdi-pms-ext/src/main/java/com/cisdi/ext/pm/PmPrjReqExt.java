@@ -191,10 +191,12 @@ public class PmPrjReqExt {
         String replyNo = entityRecord.valueMap.get("PRJ_REPLY_NO").toString();
         //批复材料
         String replyFile = entityRecord.valueMap.get("REPLY_FILE").toString();
+        //资金来源
+        String investmentSourceId = entityRecord.valueMap.get("INVESTMENT_SOURCE_ID").toString();
 
         // 修改项目建设年限信息：
         Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("PRJ_REPLY_DATE",replyDate)
-                .set("PRJ_REPLY_NO",replyNo).set("PRJ_REPLY_FILE",replyFile).exec();
+                .set("PRJ_REPLY_NO",replyNo).set("PRJ_REPLY_FILE",replyFile).set("INVESTMENT_SOURCE_ID",investmentSourceId).exec();
         log.info("已更新：{}", exec);
     }
 
