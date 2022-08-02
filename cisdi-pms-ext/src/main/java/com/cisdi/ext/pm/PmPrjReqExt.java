@@ -168,6 +168,34 @@ public class PmPrjReqExt {
         // 修改项目建设年限信息：
         Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("BUILD_YEARS",year).exec();
         log.info("已更新：{}", exec);
-
     }
+
+    /**
+     * 立项批复信息写入项目表
+     */
+    public void updatePrjReply() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            updatePrjReply(entityRecord);
+        }
+    }
+
+    private void updatePrjReply(EntityRecord entityRecord) {
+
+        //获取项目id
+        String projectId = entityRecord.valueMap.get("PM_PRJ_ID").toString();
+
+        //批复日期
+        String replyDate = entityRecord.valueMap.get("PRJ_REPLY_DATE").toString();
+        //批复文号
+        String replyNo = entityRecord.valueMap.get("PRJ_REPLY_NO").toString();
+        //批复材料
+        String replyFile = entityRecord.valueMap.get("REPLY_FILE").toString();
+
+        // 修改项目建设年限信息：
+        Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("PRJ_REPLY_DATE",replyDate)
+                .set("PRJ_REPLY_NO",replyNo).set("PRJ_REPLY_FILE",replyFile).exec();
+        log.info("已更新：{}", exec);
+    }
+
 }
