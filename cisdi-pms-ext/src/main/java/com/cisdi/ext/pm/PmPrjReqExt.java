@@ -4,7 +4,6 @@ import com.cisdi.ext.util.AmtUtil;
 import com.cisdi.ext.util.DoubleUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
-import com.qygly.ext.jar.helper.sql.Update;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -198,6 +197,24 @@ public class PmPrjReqExt {
         Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("PRJ_REPLY_DATE",replyDate)
                 .set("PRJ_REPLY_NO",replyNo).set("PRJ_REPLY_FILE",replyFile).set("INVESTMENT_SOURCE_ID",investmentSourceId).exec();
         log.info("已更新：{}", exec);
+    }
+
+    /**
+     * 采购公开招标-回显采购方式及招标控制价
+     */
+    public void updateBid(){
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        String procInstId = ExtJarHelper.procInstId.get();
+
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId;
+        //采购方式
+        String buyType = entityRecord.valueMap.get("APPROVE_PURCHASE_TYPE").toString();
+        //招标控制价
+        String price = entityRecord.valueMap.get("APPROVE_BID_CTL_PRICE").toString();
+
+
+        jdbcTemplate.update("update PO_PUBLIC_BID_REQ t set t.APPROVE_PURCHASE_TYPE_ECHO = ?,t.BID_CTL_PRICE_LAUNCH_ECHO=? where t.id=?", buyType,price, csCommId);
     }
 
 }
