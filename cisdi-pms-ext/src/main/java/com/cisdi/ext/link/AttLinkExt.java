@@ -8,6 +8,7 @@ import com.qygly.shared.interaction.TypeValueText;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
@@ -103,22 +104,22 @@ public class AttLinkExt {
                     "WHERE a.PM_PRJ_ID = ? " +
                     "ORDER BY b.CRT_DT desc LIMIT 1 ) b ORDER BY id desc", attValue,attValue);
 
-            if (list.size() == 0) {
+            if (CollectionUtils.isEmpty(list)) {
                 throw new BaseException("项目的相关属性不完整！");
             }
 
             Map row = list.get(0);
-
-            String date0 = list2.get(0).get("END_DATETIME").toString();
-            String date1 = list2.get(1).get("END_DATETIME").toString();
-            if ("0".equals(date0) || "0".equals(date1)){
-                if ("0".equals(date0)){
-                    attLinkResult = getResult(list2.get(1));
-                } else {
-                    attLinkResult = getResult(list2.get(0));
+            if (!CollectionUtils.isEmpty(list2)){
+                String date0 = list2.get(0).get("END_DATETIME").toString();
+                String date1 = list2.get(1).get("END_DATETIME").toString();
+                if ("0".equals(date0) || "0".equals(date1)){
+                    if ("0".equals(date0)){
+                        attLinkResult = getResult(list2.get(1));
+                    } else {
+                        attLinkResult = getResult(list2.get(0));
+                    }
                 }
             }
-
 
 
             {
@@ -291,9 +292,8 @@ public class AttLinkExt {
 
                 attLinkResult.attMap.put("EVALUATION_APPROVE_FUND", typeValueText);
             }
-
             return attLinkResult;
-        } else if ("PMS_RELEASE_WAY_ID".equals(attCode) || "GUARANTEE_LETTER_TYPE_ID".equals(attCode) || "CONTRACT_CATEGORY".equals(attCode)) {
+        } else if ("PMS_RELEASE_WAY_ID".equals(attCode) || "GUARANTEE_LETTER_TYPE_ID".equals(attCode) || "CONTRACT_CATEGORY_ID".equals(attCode)) {
             // 1.PMS_RELEASE_WAY_ID 招标类别下拉框
             // 2.GUARANTEE_LETTER_TYPE_ID 保函类别下拉框
             // 3.PMS_RELEASE_WAY_ID 项目类别下拉框
