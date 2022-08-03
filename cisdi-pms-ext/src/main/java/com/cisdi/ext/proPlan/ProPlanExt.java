@@ -14,7 +14,7 @@ public class ProPlanExt {
     }
 
     private void calcPlanTotalDays(EntityRecord entityRecord) {
-        // 若无节点，则将计划的PLAN_TOTAL_DAYS设为0，返回：
+        // 若无节点，则将计划的START_DAY设为0、PLAN_TOTAL_DAYS设为0，返回：
 
         // 若有节点：
 
