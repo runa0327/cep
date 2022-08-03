@@ -14,4 +14,15 @@ public class DoubleUtil {
         }
         return sum.doubleValue();
     }
+
+    public static Double multiply(Double d1, Double d2) {
+        if (d1 == null || d2 == null) {
+            return 0d;
+        }
+
+        BigDecimal b1 = new BigDecimal(d1);
+        BigDecimal b2 = new BigDecimal(d2);
+        BigDecimal multiply = b1.multiply(b2);
+        return multiply.doubleValue();
+    }
 }
