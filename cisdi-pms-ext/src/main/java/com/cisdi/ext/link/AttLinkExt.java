@@ -8,6 +8,7 @@ import com.qygly.shared.interaction.TypeValueText;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -89,11 +90,36 @@ public class AttLinkExt {
                             "join gr_set_value st on t.CON_SCALE_TYPE_ID=st.id " +
                             "join gr_set_value su on t.CON_SCALE_UOM_ID=su.id", attValue);
 
+            //查询项目可研/初概流程完成情况
+            List<Map<String, Object>> list2 = jdbcTemplate.queryForList("SELECT * FROM (SELECT " +
+                    "ifnull(b.END_DATETIME,0) as END_DATETIME, a.PRJ_TOTAL_INVEST, a.PROJECT_AMT, a.PROJECT_OTHER_AMT, a.PREPARE_AMT, a.CONSTRUCT_PERIOD_INTEREST, '1' as id " +
+                    "FROM PM_PRJ_INVEST1 a " +
+                    "LEFT JOIN wf_process_instance b on b.id = a.LK_WF_INST_ID " +
+                    "WHERE a.PM_PRJ_ID = ? " +
+                    "ORDER BY b.CRT_DT desc LIMIT 1) a union all select * FROM( " +
+                    "SELECT ifnull(b.END_DATETIME,0) as END_DATETIME, a.PRJ_TOTAL_INVEST, a.PROJECT_AMT, a.PROJECT_OTHER_AMT, a.PREPARE_AMT, a.CONSTRUCT_PERIOD_INTEREST, '2' as id " +
+                    "FROM PM_PRJ_INVEST2 a " +
+                    "LEFT JOIN wf_process_instance b on b.id = a.LK_WF_INST_ID " +
+                    "WHERE a.PM_PRJ_ID = ? " +
+                    "ORDER BY b.CRT_DT desc LIMIT 1 ) b ORDER BY id desc", attValue,attValue);
+
             if (list.size() == 0) {
                 throw new BaseException("项目的相关属性不完整！");
             }
 
             Map row = list.get(0);
+
+            String date0 = list2.get(0).get("END_DATETIME").toString();
+            String date1 = list2.get(1).get("END_DATETIME").toString();
+            if ("0".equals(date0) || "0".equals(date1)){
+                if ("0".equals(date0)){
+                    attLinkResult = getResult(list2.get(1));
+                } else {
+                    attLinkResult = getResult(list2.get(0));
+                }
+            }
+
+
 
             {
                 TypeValueText typeValueText = new TypeValueText();
@@ -295,5 +321,59 @@ public class AttLinkExt {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
     }
+
+    //获取资金信息
+    private AttLinkResult getResult(Map<String, Object> stringObjectMap) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        attLinkResult.attMap = new HashMap<>();
+        //总投资
+        {
+            TypeValueText typeValueText = new TypeValueText();
+            typeValueText.type = AttDataTypeE.DOUBLE;
+            typeValueText.value = JdbcMapUtil.getString(stringObjectMap,"PRJ_TOTAL_INVEST");
+            typeValueText.text = JdbcMapUtil.getString(stringObjectMap,"PRJ_TOTAL_INVEST");
+
+            attLinkResult.attMap.put("PRJ_TOTAL_INVEST", typeValueText);
+        }
+        //工程费用
+        {
+            TypeValueText typeValueText = new TypeValueText();
+            typeValueText.type = AttDataTypeE.DOUBLE;
+            typeValueText.value = JdbcMapUtil.getString(stringObjectMap,"PROJECT_AMT");
+            typeValueText.text = JdbcMapUtil.getString(stringObjectMap,"PROJECT_AMT");
+
+            attLinkResult.attMap.put("PROJECT_AMT", typeValueText);
+        }
+        //工程建设其他费用
+        {
+            TypeValueText typeValueText = new TypeValueText();
+            typeValueText.type = AttDataTypeE.DOUBLE;
+            typeValueText.value = JdbcMapUtil.getString(stringObjectMap,"PROJECT_OTHER_AMT");
+            typeValueText.text = JdbcMapUtil.getString(stringObjectMap,"PROJECT_OTHER_AMT");
+
+            attLinkResult.attMap.put("PROJECT_OTHER_AMT", typeValueText);
+        }
+        //预备费
+        {
+            TypeValueText typeValueText = new TypeValueText();
+            typeValueText.type = AttDataTypeE.DOUBLE;
+            typeValueText.value = JdbcMapUtil.getString(stringObjectMap,"PREPARE_AMT");
+            typeValueText.text = JdbcMapUtil.getString(stringObjectMap,"PREPARE_AMT");
+
+            attLinkResult.attMap.put("PREPARE_AMT", typeValueText);
+        }
+        //利息
+        {
+            TypeValueText typeValueText = new TypeValueText();
+            typeValueText.type = AttDataTypeE.DOUBLE;
+            typeValueText.value = JdbcMapUtil.getString(stringObjectMap,"CONSTRUCT_PERIOD_INTEREST");
+            typeValueText.text = JdbcMapUtil.getString(stringObjectMap,"CONSTRUCT_PERIOD_INTEREST");
+
+            attLinkResult.attMap.put("CONSTRUCT_PERIOD_INTEREST", typeValueText);
+        }
+        return attLinkResult;
+    }
+
+
 
 }
