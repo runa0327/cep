@@ -217,4 +217,18 @@ public class PmPrjReqExt {
         jdbcTemplate.update("update PO_PUBLIC_BID_REQ t set t.APPROVE_PURCHASE_TYPE_ECHO = ?,t.BID_CTL_PRICE_LAUNCH_ECHO=? where t.id=?", buyType,price, csCommId);
     }
 
+    /**
+     * 采购公开招标-更新招标复检
+     */
+    public void updateBidFile(){
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //该条记录id
+        String csCommId = entityRecord.csCommId;
+        //文件id
+        String fileId = entityRecord.valueMap.get("BID_FILE_GROUP_ID").toString();
+        jdbcTemplate.update("update PO_PUBLIC_BID_REQ set BID_ISSUE_FILE_GROUP_ID = ? where id = ?",fileId,csCommId);
+
+    }
+
 }
