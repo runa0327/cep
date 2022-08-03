@@ -2,10 +2,15 @@ package com.cisdi.ext.invest;
 
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.shared.interaction.EntityRecord;
+import io.netty.util.internal.ObjectUtil;
+import lombok.Data;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 投资测算与实际的对比。
@@ -16,24 +21,112 @@ public class InvestEstActCompareExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
         InvestEstActCompareParam param = JsonUtil.fromJson(json, InvestEstActCompareParam.class);
-
-        // 获取费用类型树：
+        String pmPrjId = param.pmPrjId;
+        //查询费用类型
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from PM_EXP_TYPE");
+        List<InvestEstActCompareRow> investEstActCompareRowList = list.stream().map(p -> {
+            InvestEstActCompareRow row = new InvestEstActCompareRow();
+            row.expTypeId = String.valueOf(p.get("ID"));
+            row.pid = String.valueOf(p.get("PM_EXP_TYPE_PID") == null ? "0" : p.get("PM_EXP_TYPE_PID"));
+            row.expTypeCode = String.valueOf(p.get("CODE"));
+            row.expTypeName = String.valueOf(p.get("NAME"));
+            row.invest1Amt = 0d;
+            row.invest2Amt = 0d;
+            row.invest3Amt = 0d;
+            row.invest1AmtSum = 0d;
+            row.invest2AmtSum = 0d;
+            row.invest3AmtSum = 0d;
+            row.complAmt = 0d;
+            row.complAmtSum = 0d;
+            row.payAmt = 0d;
+            row.payAmtSum = 0d;
+            return row;
+        }).collect(Collectors.toList());
 
         // 获取可研估算、初设概算、预算财评：
+        List<Map<String, Object>> investEstList = jdbcTemplate.queryForList("select t.*,a.INVEST_EST_TYPE_ID as INVEST_EST_TYPE_ID,gsv.`NAME`  as INVEST_EST_TYPE\n" +
+                "from PM_INVEST_EST_DTL t \n" +
+                "left join PM_INVEST_EST a on t.PM_INVEST_EST_ID = a.id \n" +
+                "left join gr_set_value gsv on gsv.id = a.INVEST_EST_TYPE_ID\n" +
+                "left join gr_set gr on gr.id = gsv.GR_SET_ID and gr.`CODE`='invest_est_type'\n" +
+                "where a.PM_PRJ_ID=?;", pmPrjId);
 
-        // 获取采购合同付款情况与采购合同明细进展：
 
-        // 遍历费用类型树，获取各项金额（invest1Amt、invest2Amt、invest3Amt、actAmt）：
+        //按投资测算类型分组
+        Map<String, List<Map<String, Object>>> typeMap = investEstList.stream().collect(Collectors.groupingBy(x -> x.get("INVEST_EST_TYPE").toString()));
+        for (InvestEstActCompareRow investEstActCompareRow : investEstActCompareRowList) {
+            for (String key : typeMap.keySet()) {
+                List<Map<String, Object>> mapData = typeMap.get(key);
+                switch (key) {
+                    case "可研估算":
+                        Optional<Map<String, Object>> optionalInvestEstActCompareRow = mapData.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(investEstActCompareRow.expTypeId)).findAny();
+                        optionalInvestEstActCompareRow.ifPresent(stringObjectMap -> investEstActCompareRow.invest1Amt = Double.parseDouble(String.valueOf(stringObjectMap.get("AMT"))));
+                        break;
+                    case "初设概算":
+                        Optional<Map<String, Object>> optionalMap = mapData.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(investEstActCompareRow.expTypeId)).findAny();
+                        optionalMap.ifPresent(stringObjectMap -> investEstActCompareRow.invest2Amt = Double.parseDouble(String.valueOf(stringObjectMap.get("AMT"))));
+                        break;
+                    case "详设预算":
+                        Optional<Map<String, Object>> optional = mapData.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(investEstActCompareRow.expTypeId)).findAny();
+                        optional.ifPresent(stringObjectMap -> investEstActCompareRow.invest3Amt = Double.parseDouble(String.valueOf(stringObjectMap.get("AMT"))));
+                        break;
+                }
+            }
+        }
 
-        // 先不做：
-        // 遍历费用类型树，自底向上，将为金额全为0的节点剔除：
+        //获取合同明细进度
+        List<Map<String, Object>> orderProList = jdbcTemplate.queryForList("select pod.*,sum(podp.COMPL_TOTAL_AMT) as COMPL_TOTAL_AMT from PO_ORDER_DTL pod \n" +
+                "left join po_order po on po.id = pod.PO_ORDER_ID\n" +
+                "left join PO_ORDER_DTL_PRO podp on  podp.PO_ORDER_DTL_ID = pod.id\n" +
+                "where po.PM_PRJ_ID=? group by pod.id\n", pmPrjId);
+
+        //获取合同明细付款情况
+        List<Map<String, Object>> orderPayList = jdbcTemplate.queryForList("select pod.*,sum(pop.PAY_AMT) as PAY_AMT from PO_ORDER_DTL pod \n" +
+                "left join po_order po on po.id = pod.PO_ORDER_ID\n" +
+                "left join PO_ORDER_PAYMENT pop on  pop.PO_ORDER_DTL_ID = pod.id\n" +
+                "where po.PM_PRJ_ID=? group by pod.id", pmPrjId);
+
+        investEstActCompareRowList.forEach(item -> {
+            Optional<Map<String, Object>> optional = orderProList.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(item.expTypeId)).findAny();
+            optional.ifPresent(stringObjectMap -> item.complAmt = Double.parseDouble(String.valueOf(stringObjectMap.get("COMPL_TOTAL_AMT"))));
+
+            Optional<Map<String, Object>> optionalMap = orderPayList.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(item.expTypeId)).findAny();
+            optionalMap.ifPresent(stringObjectMap -> item.payAmt = Double.parseDouble(String.valueOf(stringObjectMap.get("PAY_AMT"))));
+        });
+
+        //构建树结构
+        List<InvestEstActCompareRow> rowTree = investEstActCompareRowList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
+            List<InvestEstActCompareRow> child = getChildNode(m, investEstActCompareRowList);
+            m.children = child;
+            m.invest1AmtSum = child.stream().mapToDouble(InvestEstActCompareRow -> InvestEstActCompareRow.invest1Amt).sum();
+            m.invest2AmtSum = child.stream().mapToDouble(InvestEstActCompareRow -> InvestEstActCompareRow.invest2Amt).sum();
+            m.invest3AmtSum = child.stream().mapToDouble(InvestEstActCompareRow -> InvestEstActCompareRow.invest3Amt).sum();
+        }).collect(Collectors.toList());
 
         // 返回结果，如：
-        InvestEstActCompareRow row = mockResult();
+        InvestEstActCompareRow row = rowTree.get(0);
         // row.children添加子行：
         // 最终，返回：
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(row), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
+    }
+
+    /**
+     * 递归子节点
+     *
+     * @param root        当前单个实体
+     * @param allListTree 表中的所有实体集合
+     * @return
+     */
+    private List<InvestEstActCompareRow> getChildNode(InvestEstActCompareRow root, List<InvestEstActCompareRow> allListTree) {
+        return allListTree.stream().filter((treeEntity) -> treeEntity.pid.equals(root.expTypeId)).peek((treeEntity) ->{
+            List<InvestEstActCompareRow> child = getChildNode(treeEntity, allListTree);
+            treeEntity.children = child;
+            treeEntity.invest1AmtSum = child.stream().mapToDouble(InvestEstActCompareRow -> InvestEstActCompareRow.invest1Amt).sum();
+            treeEntity.invest2AmtSum = child.stream().mapToDouble(InvestEstActCompareRow -> InvestEstActCompareRow.invest2Amt).sum();
+            treeEntity.invest3AmtSum = child.stream().mapToDouble(InvestEstActCompareRow -> InvestEstActCompareRow.invest3Amt).sum();
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -126,6 +219,10 @@ public class InvestEstActCompareExt {
          */
         public String expTypeId;
         /**
+         * 父ID
+         */
+        public String pid;
+        /**
          * 费用类型代码。
          */
         public String expTypeCode;
@@ -178,4 +275,5 @@ public class InvestEstActCompareExt {
          */
         public List<InvestEstActCompareRow> children;
     }
+
 }
