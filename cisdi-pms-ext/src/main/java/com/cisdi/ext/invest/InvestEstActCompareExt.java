@@ -78,13 +78,13 @@ public class InvestEstActCompareExt {
         }
 
         //获取合同明细进度
-        List<Map<String, Object>> orderProList = jdbcTemplate.queryForList("select pod.*,sum(podp.COMPL_TOTAL_AMT) as COMPL_TOTAL_AMT from PO_ORDER_DTL pod \n" +
+        List<Map<String, Object>> orderProList = jdbcTemplate.queryForList("select pod.*,ifnull(sum(podp.COMPL_TOTAL_AMT),0) as COMPL_TOTAL_AMT from PO_ORDER_DTL pod \n" +
                 "left join po_order po on po.id = pod.PO_ORDER_ID\n" +
                 "left join PO_ORDER_DTL_PRO podp on  podp.PO_ORDER_DTL_ID = pod.id\n" +
                 "where po.PM_PRJ_ID=? group by pod.id\n", pmPrjId);
 
         //获取合同明细付款情况
-        List<Map<String, Object>> orderPayList = jdbcTemplate.queryForList("select pod.*,sum(pop.PAY_AMT) as PAY_AMT from PO_ORDER_DTL pod \n" +
+        List<Map<String, Object>> orderPayList = jdbcTemplate.queryForList("select pod.*,ifnull(sum(pop.PAY_AMT),0) as PAY_AMT from PO_ORDER_DTL pod \n" +
                 "left join po_order po on po.id = pod.PO_ORDER_ID\n" +
                 "left join PO_ORDER_PAYMENT pop on  pop.PO_ORDER_DTL_ID = pod.id\n" +
                 "where po.PM_PRJ_ID=? group by pod.id", pmPrjId);
@@ -104,6 +104,8 @@ public class InvestEstActCompareExt {
             m.invest1AmtSum = sumAmt(child,"invest1Amt");
             m.invest2AmtSum = sumAmt(child,"invest2Amt");
             m.invest3AmtSum = sumAmt(child,"invest3Amt");
+            m.complAmtSum = sumAmt(child,"complAmt");
+            m.payAmtSum = sumAmt(child,"payAmt");
         }).collect(Collectors.toList());
 
         // 返回结果，如：
@@ -129,6 +131,12 @@ public class InvestEstActCompareExt {
                     case "invest3Amt":
                         var = datum.invest3Amt;
                         break;
+                    case "complAmt":
+                        var = datum.complAmt;
+                        break;
+                    case "payAmt":
+                        var = datum.payAmt;
+                        break;
                 }
                 res = DoubleUtil.add(res,var);
             }
@@ -150,6 +158,8 @@ public class InvestEstActCompareExt {
             treeEntity.invest1AmtSum = sumAmt(child,"invest1Amt");
             treeEntity.invest2AmtSum = sumAmt(child,"invest2Amt");
             treeEntity.invest3AmtSum = sumAmt(child,"invest3Amt");
+            treeEntity.complAmtSum = sumAmt(child,"complAmt");
+            treeEntity.payAmtSum = sumAmt(child,"payAmt");
         }).collect(Collectors.toList());
     }
 
