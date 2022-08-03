@@ -267,7 +267,31 @@ public class AttLinkExt {
             }
 
             return attLinkResult;
-        } else {
+        } else if ("PMS_RELEASE_WAY_ID".equals(attCode)) {
+            AttLinkResult attLinkResult = new AttLinkResult();
+            attLinkResult.attMap = new HashMap<>();
+
+            List<Map<String, Object>> list = jdbcTemplate.queryForList("SELECT t.id, t.name FROM gr_set_value t WHERE t.id = ?", attValue);
+
+            if (SharedUtil.isEmptyList(list)) {
+                throw new BaseException("未设置相应项目类型的联动！");
+            } else if (list.size() > 1) {
+                throw new BaseException("重复设置相应项目类型的联动！");
+            }
+
+            Map row = list.get(0);
+
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.REF_SINGLE;
+                typeValueText.value = JdbcMapUtil.getString(row, "id");
+                typeValueText.text = JdbcMapUtil.getString(row, "name");
+
+                attLinkResult.attMap.put("PMS_RELEASE_WAY_ID", typeValueText);
+            }
+
+            return attLinkResult;
+        }else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
     }
