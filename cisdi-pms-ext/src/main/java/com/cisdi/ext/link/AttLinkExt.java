@@ -293,7 +293,10 @@ public class AttLinkExt {
             }
 
             return attLinkResult;
-        } else if ("PMS_RELEASE_WAY_ID".equals(attCode)) {
+        } else if ("PMS_RELEASE_WAY_ID".equals(attCode) || "GUARANTEE_LETTER_TYPE_ID".equals(attCode) || "CONTRACT_CATEGORY".equals(attCode)) {
+            // 1.PMS_RELEASE_WAY_ID 招标类别下拉框
+            // 2.GUARANTEE_LETTER_TYPE_ID 保函类别下拉框
+            // 3.PMS_RELEASE_WAY_ID 项目类别下拉框
             AttLinkResult attLinkResult = new AttLinkResult();
             attLinkResult.attMap = new HashMap<>();
 
@@ -313,11 +316,11 @@ public class AttLinkExt {
                 typeValueText.value = JdbcMapUtil.getString(row, "id");
                 typeValueText.text = JdbcMapUtil.getString(row, "name");
 
-                attLinkResult.attMap.put("PMS_RELEASE_WAY_ID", typeValueText);
+                attLinkResult.attMap.put(attCode, typeValueText);
             }
 
             return attLinkResult;
-        }else {
+        } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
     }
