@@ -1,11 +1,13 @@
 package com.cisdi.ext.invest;
 
+import com.cisdi.ext.util.DoubleUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.interaction.EntityRecord;
 import io.netty.util.internal.ObjectUtil;
 import lombok.Data;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -45,7 +47,7 @@ public class InvestEstActCompareExt {
         }).collect(Collectors.toList());
 
         // 获取可研估算、初设概算、预算财评：
-        List<Map<String, Object>> investEstList = jdbcTemplate.queryForList("select t.*,a.INVEST_EST_TYPE_ID as INVEST_EST_TYPE_ID,gsv.`NAME`  as INVEST_EST_TYPE\n" +
+        List<Map<String, Object>> investEstList = jdbcTemplate.queryForList("select t.*,a.INVEST_EST_TYPE_ID as INVEST_EST_TYPE_ID,gsv.`code`  as INVEST_EST_TYPE\n" +
                 "from PM_INVEST_EST_DTL t \n" +
                 "left join PM_INVEST_EST a on t.PM_INVEST_EST_ID = a.id \n" +
                 "left join gr_set_value gsv on gsv.id = a.INVEST_EST_TYPE_ID\n" +
@@ -59,15 +61,15 @@ public class InvestEstActCompareExt {
             for (String key : typeMap.keySet()) {
                 List<Map<String, Object>> mapData = typeMap.get(key);
                 switch (key) {
-                    case "可研估算":
+                    case "invest1":
                         Optional<Map<String, Object>> optionalInvestEstActCompareRow = mapData.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(investEstActCompareRow.expTypeId)).findAny();
                         optionalInvestEstActCompareRow.ifPresent(stringObjectMap -> investEstActCompareRow.invest1Amt = Double.parseDouble(String.valueOf(stringObjectMap.get("AMT"))));
                         break;
-                    case "初设概算":
+                    case "invest2":
                         Optional<Map<String, Object>> optionalMap = mapData.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(investEstActCompareRow.expTypeId)).findAny();
                         optionalMap.ifPresent(stringObjectMap -> investEstActCompareRow.invest2Amt = Double.parseDouble(String.valueOf(stringObjectMap.get("AMT"))));
                         break;
-                    case "详设预算":
+                    case "invest3":
                         Optional<Map<String, Object>> optional = mapData.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(investEstActCompareRow.expTypeId)).findAny();
                         optional.ifPresent(stringObjectMap -> investEstActCompareRow.invest3Amt = Double.parseDouble(String.valueOf(stringObjectMap.get("AMT"))));
                         break;
@@ -99,9 +101,9 @@ public class InvestEstActCompareExt {
         List<InvestEstActCompareRow> rowTree = investEstActCompareRowList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
             List<InvestEstActCompareRow> child = getChildNode(m, investEstActCompareRowList);
             m.children = child;
-            m.invest1AmtSum = child.stream().mapToDouble(InvestEstActCompareRow -> InvestEstActCompareRow.invest1Amt).sum();
-            m.invest2AmtSum = child.stream().mapToDouble(InvestEstActCompareRow -> InvestEstActCompareRow.invest2Amt).sum();
-            m.invest3AmtSum = child.stream().mapToDouble(InvestEstActCompareRow -> InvestEstActCompareRow.invest3Amt).sum();
+            m.invest1AmtSum = sumAmt(child,"invest1Amt");
+            m.invest2AmtSum = sumAmt(child,"invest2Amt");
+            m.invest3AmtSum = sumAmt(child,"invest3Amt");
         }).collect(Collectors.toList());
 
         // 返回结果，如：
@@ -112,6 +114,28 @@ public class InvestEstActCompareExt {
         ExtJarHelper.returnValue.set(outputMap);
     }
 
+    private double sumAmt(List<InvestEstActCompareRow> data, String column) {
+        double res = 0d;
+        if (data != null && data.size() > 0) {
+            for (InvestEstActCompareRow datum : data) {
+                double var = 0d;
+                switch (column) {
+                    case "invest1Amt":
+                        var = datum.invest1Amt;
+                        break;
+                    case "invest2Amt":
+                        var = datum.invest2Amt;
+                        break;
+                    case "invest3Amt":
+                        var = datum.invest3Amt;
+                        break;
+                }
+                res = DoubleUtil.add(res,var);
+            }
+        }
+        return res;
+    }
+
     /**
      * 递归子节点
      *
@@ -120,12 +144,12 @@ public class InvestEstActCompareExt {
      * @return
      */
     private List<InvestEstActCompareRow> getChildNode(InvestEstActCompareRow root, List<InvestEstActCompareRow> allListTree) {
-        return allListTree.stream().filter((treeEntity) -> treeEntity.pid.equals(root.expTypeId)).peek((treeEntity) ->{
+        return allListTree.stream().filter((treeEntity) -> treeEntity.pid.equals(root.expTypeId)).peek((treeEntity) -> {
             List<InvestEstActCompareRow> child = getChildNode(treeEntity, allListTree);
             treeEntity.children = child;
-            treeEntity.invest1AmtSum = child.stream().mapToDouble(InvestEstActCompareRow -> InvestEstActCompareRow.invest1Amt).sum();
-            treeEntity.invest2AmtSum = child.stream().mapToDouble(InvestEstActCompareRow -> InvestEstActCompareRow.invest2Amt).sum();
-            treeEntity.invest3AmtSum = child.stream().mapToDouble(InvestEstActCompareRow -> InvestEstActCompareRow.invest3Amt).sum();
+            treeEntity.invest1AmtSum = sumAmt(child,"invest1Amt");
+            treeEntity.invest2AmtSum = sumAmt(child,"invest2Amt");
+            treeEntity.invest3AmtSum = sumAmt(child,"invest3Amt");
         }).collect(Collectors.toList());
     }
 
