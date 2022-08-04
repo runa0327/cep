@@ -197,7 +197,7 @@ public class ProPlanExt {
 
         planInfo.nodeInfoList = tree;
         // 最终，返回：
-        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(tree), Map.class);
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(planInfo), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
 
