@@ -3,14 +3,10 @@ package com.cisdi.ext.proPlan;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
-import io.netty.util.internal.ObjectUtil;
+import com.qygly.shared.interaction.IdCodeName;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ProPlanExt {
@@ -75,8 +71,8 @@ public class ProPlanExt {
         //操作数据库，更新数据,更新项目进度
         jdbcTemplate.update("update PM_PRO_PLAN set START_DAY=?,PLAN_TOTAL_DAYS=? where id=?", minStartDay, maxPlanDay, csCommId);
         //操作数据库，更新数据,更新项目进度节点
-        nodeList.forEach(item->{
-            jdbcTemplate.update("update PM_PRO_PLAN_NODE set START_DAY=?,PLAN_TOTAL_DAYS=? where id=?",item.get("START_DAY"),item.get("PLAN_TOTAL_DAYS"),item.get("ID"));
+        nodeList.forEach(item -> {
+            jdbcTemplate.update("update PM_PRO_PLAN_NODE set START_DAY=?,PLAN_TOTAL_DAYS=? where id=?", item.get("START_DAY"), item.get("PLAN_TOTAL_DAYS"), item.get("ID"));
         });
 
     }
@@ -115,5 +111,80 @@ public class ProPlanExt {
             root.put("PLAN_TOTAL_DAYS", useDay);
         }
         return root;
+    }
+
+    public void getPrjOverviewNodeList() {
+        // 输入：PrjOverviewNodeListParam
+        // 输出：List<PrjProPlanNodeInfo>
+    }
+
+    public void getPrjProPlanNetwork() {
+        // 输入：GettPrjProPlanNetworkParam
+        // 输出：PrjProPlanInfo，内含nodeInfoList属性，再含children属性（递归）
+    }
+
+    /**
+     * 项目预览中的节点列表的参数。
+     */
+    public static class GetPrjOverviewNodeListParam {
+        public String pmPrjId;
+    }
+
+    public static class GettPrjProPlanNetworkParam {
+        public String pmPrjId;
+    }
+
+    /**
+     * 项目进度计划信息。
+     */
+    public static class PrjProPlanInfo {
+        public String id;
+        public String code;
+        public String name;
+        public String remark;
+        public Date planStartDate;
+        public Date planComplDate;
+        public Integer planTotalDays;
+        public Integer planCarryDays;
+        public Double planCurrentProPercent;
+        public Date actualStartDate;
+        public Date actualComplDate;
+        public Integer actualTotalDays;
+        public Integer actualCarryDays;
+        public Double actualCurrentProPercent;
+        public IdCodeName progressStatus;
+        public IdCodeName progressRiskType;
+        public String progressRiskRemark;
+
+        public List<PrjProPlanNodeInfo> nodeInfoList;
+    }
+
+    /**
+     * 项目进度计划节点信息。
+     */
+    public static class PrjProPlanNodeInfo {
+        public String id;
+        public String pid;
+        public String code;
+        public String name;
+        public String remark;
+        public Date planStartDate;
+        public Date planComplDate;
+        public Integer planTotalDays;
+        public Integer planCarryDays;
+        public Double planCurrentProPercent;
+        public Date actualStartDate;
+        public Date actualComplDate;
+        public Integer actualTotalDays;
+        public Integer actualCarryDays;
+        public Double actualCurrentProPercent;
+        public IdCodeName progressStatus;
+        public IdCodeName progressRiskType;
+        public String progressRiskRemark;
+
+        public IdCodeName chiefDept;
+        public IdCodeName chiefUser;
+
+        public List<PrjProPlanNodeInfo> children;
     }
 }
