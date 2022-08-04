@@ -110,15 +110,25 @@ public class AttLinkExt {
 
             Map row = list.get(0);
             if (!CollectionUtils.isEmpty(list2)){
-                String date0 = list2.get(0).get("END_DATETIME").toString();
-                String date1 = list2.get(1).get("END_DATETIME").toString();
-                if ("0".equals(date0) || "0".equals(date1)){
-                    if ("0".equals(date0)){
-                        attLinkResult = getResult(list2.get(1));
-                    } else {
+                String date0 = "";
+                String date1 = "";
+                if (list2.size() == 2){
+                    date0 = list2.get(0).get("END_DATETIME").toString();
+                    date1 = list2.get(1).get("END_DATETIME").toString();
+                    if ("0".equals(date0) || "0".equals(date1)){
+                        if ("0".equals(date0)){
+                            attLinkResult = getResult(list2.get(1));
+                        } else {
+                            attLinkResult = getResult(list2.get(0));
+                        }
+                    }
+                } else {
+                    date0 = list2.get(0).get("END_DATETIME").toString();
+                    if (!"0".equals(date0)){
                         attLinkResult = getResult(list2.get(0));
                     }
                 }
+
             }
 
 
