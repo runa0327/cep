@@ -231,4 +231,41 @@ public class PmPrjReqExt {
 
     }
 
+    /**
+     * 采购公开招标-更新需求发起人
+     */
+    public void updatePromoter(){
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //该条记录id
+        String csCommId = entityRecord.csCommId;
+        //需求发起人
+        String promoterName = jdbcTemplate.queryForMap("SELECT u.name FROM ad_user u left join po_public_bid_req b on u.id = " +
+                "b.CRT_USER_ID where b.id = ?", csCommId).get("name").toString();
+        //更新需求发起人
+        jdbcTemplate.update("update PO_PUBLIC_BID_REQ set DEMAND_PROMOTER = ? where id = ?",promoterName,csCommId);
+    }
+
+    /**
+     * 采购公开招标-更新中标信息
+     */
+    public void updateWinUnit(){
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //该条记录id
+        String csCommId = entityRecord.csCommId;
+        //需要更新的信息
+        String winBidUnitTxt = entityRecord.valueMap.get("WIN_BID_UNIT_TXT").toString();
+        String tenderOffer = entityRecord.valueMap.get("TENDER_OFFER").toString();
+        String contactName = entityRecord.valueMap.get("CONTACT_NAME").toString();
+        String contactMobileWin = entityRecord.valueMap.get("CONTACT_MOBILE_WIN").toString();
+        String idcardWin = entityRecord.valueMap.get("CONTACT_IDCARD_WIN").toString();
+        //更新
+        jdbcTemplate.update("update PO_PUBLIC_BID_REQ set WIN_BID_UNIT_RECORD = ?," +
+                "TENDER_OFFER_RECORD = ?," +
+                "CONTACT_NAME_RECORD =?," +
+                "CONTACT_MOBILE_RECORD =?," +
+                "CONTACT_IDCARD_RECORD =? where id = ?",winBidUnitTxt,tenderOffer,contactName,contactMobileWin,idcardWin,csCommId);
+    }
 }
+

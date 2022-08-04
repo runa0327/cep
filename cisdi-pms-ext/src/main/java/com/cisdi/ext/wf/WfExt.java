@@ -1,6 +1,8 @@
 package com.cisdi.ext.wf;
 
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
@@ -11,6 +13,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.prefs.BackingStoreException;
 
 @Slf4j
 public class WfExt {
@@ -119,5 +123,38 @@ public class WfExt {
         return list;
     }
 
+
+    /**
+     * 获取流程启动用户的部门的负责人。
+     */
+    public void getDeptChief(){
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            getDeptChief(entityRecord);
+        }
+    }
+
+    private void getDeptChief(EntityRecord entityRecord) {
+        String csCommId = entityRecord.csCommId;
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+
+        String procInstId = ExtJarHelper.procInstId.get();
+
+        Object START_USER_ID = Crud.from("wf_process_instance").where().eq("id", procInstId).select().specifyCols("START_USER_ID").execForValue();
+
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select d.chief_user_id from hr_dept_user du join hr_dept d on du.HR_DEPT_ID=d.id and du.AD_USER_ID=?", START_USER_ID);
+        if(SharedUtil.isEmptyObject(list)){
+            throw new BaseException("启动用户没有对应的部门负责人！");
+        }else if(list.size()>1){
+            throw new BaseException("启动用户不能对应"+list.size()+"个部门负责人！");
+        }
+
+        String chief_user_id = list.get(0).get("chief_user_id").toString();
+
+        ArrayList<Object> userIdList = new ArrayList<>(1);
+        userIdList.add(chief_user_id);
+        ExtJarHelper.returnValue.set(userIdList);
+
+    }
 
 }

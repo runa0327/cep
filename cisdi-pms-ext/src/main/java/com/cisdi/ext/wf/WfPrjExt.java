@@ -46,4 +46,22 @@ public class WfPrjExt {
         userIdList.add(user_id);
         ExtJarHelper.returnValue.set(userIdList);
     }
+
+    public void parseAgentUserIdByBid(){
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            parseUserIdByBid(entityRecord);
+        }
+    }
+
+    private void parseUserIdByBid(EntityRecord entityRecord) {
+        String csCommId = entityRecord.csCommId;
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        String user_id = jdbcTemplate.queryForMap("select BID_USER_ID from po_public_bid_req where id=?", csCommId).get(
+                "BID_USER_ID").toString();
+        ArrayList<Object> userIdList = new ArrayList<>(1);
+        userIdList.add(user_id);
+        ExtJarHelper.returnValue.set(userIdList);
+
+    }
 }
