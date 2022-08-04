@@ -1,5 +1,7 @@
 package com.cisdi.ext.proPlan;
 
+import com.cisdi.ext.util.DateTimeUtil;
+import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
@@ -113,14 +115,103 @@ public class ProPlanExt {
         return root;
     }
 
+    /**
+     * 获取项目首页-项目进度数据
+     */
     public void getPrjOverviewNodeList() {
         // 输入：PrjOverviewNodeListParam
         // 输出：List<PrjProPlanNodeInfo>
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        ProPlanExt.GetPrjOverviewNodeListParam param = JsonUtil.fromJson(json, ProPlanExt.GetPrjOverviewNodeListParam.class);
+        String pmPrjId = param.pmPrjId;
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        List<Map<String, Object>> nodeList = jdbcTemplate.queryForList("select pppn.* from PM_PRO_PLAN_NODE pppn \n" +
+                "left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID\n" +
+                "where SHOW_IN_PRJ_OVERVIEW = '1' and ppp.PM_PRJ_ID='' ", pmPrjId);
+        List<Map<String, Object>> allList = jdbcTemplate.queryForList("select pppn.* from PM_PRO_PLAN_NODE pppn \n" +
+                "left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID\n" +
+                "where ppp.PM_PRJ_ID='' ", pmPrjId);
+
+        //组装排序
+        allList.forEach(item -> {
+            List<Map<String, Object>> childrenList = getChildrenSeq(item, allList);
+            childrenList.forEach(v->{
+                v.put("SEQ_NO", item.get("SEQ_NO") + String.valueOf(v.get("SEQ_NO")));
+            });
+        });
+        nodeList.forEach(item->{
+            Optional<Map<String,Object>> optional = allList.stream().filter(p->Objects.equals(item.get("ID"),p.get("ID"))).findAny();
+            optional.ifPresent(stringObjectMap -> item.put("SEQ_NO", stringObjectMap.get("SEQ_NO")));
+        });
+        //根据SEQ_NO排序
+        List<Map<String, Object>> res = nodeList.stream().sorted(Comparator.comparing(p->String.valueOf(p.get("SEQ_NO")))).collect(Collectors.toList());
+        //map转换成实体集合
+        List<PrjProPlanNodeInfo> nodeInfoList = res.stream().map(p-> this.convertPlanInfoNode(p,jdbcTemplate)).collect(Collectors.toList());
+        // 最终，返回：
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(nodeInfoList), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
     }
 
+    /**
+     * 递归处理子节点的排序
+     * @param root
+     * @param allData
+     * @return
+     */
+    private List<Map<String, Object>> getChildrenSeq(Map<String, Object> root, List<Map<String, Object>> allData) {
+        return allData.stream().filter(p -> Objects.equals(root.get("ID"), p.get("PM_PRO_PLAN_NODE_PID")))
+                .map(m -> {
+                    List<Map<String, Object>> child = getChildren(m, allData);
+                    child.forEach(v->{
+                        v.put("SEQ_NO", m.get("SEQ_NO") + String.valueOf(v.get("SEQ_NO")));
+                    });
+                    return m;
+                }).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取项目进展树结构数据
+     */
     public void getPrjProPlanNetwork() {
         // 输入：GettPrjProPlanNetworkParam
         // 输出：PrjProPlanInfo，内含nodeInfoList属性，再含children属性（递归）
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        ProPlanExt.GetPrjProPlanNetworkParam param = JsonUtil.fromJson(json, ProPlanExt.GetPrjProPlanNetworkParam.class);
+        String pmPrjId = param.pmPrjId;
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+
+        Map<String, Object> proMap = jdbcTemplate.queryForMap("select * from PM_PRO_PLAN where PM_PRJ_ID=?", pmPrjId);
+        PrjProPlanInfo planInfo = this.covertPlanInfo(proMap, jdbcTemplate);
+
+        List<Map<String, Object>> allList = jdbcTemplate.queryForList("select pppn.* from PM_PRO_PLAN_NODE pppn \n" +
+                "left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID\n" +
+                "where ppp.PM_PRJ_ID=? ", pmPrjId);
+        //结果转换
+        List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(p, jdbcTemplate)).collect(Collectors.toList());
+        //构建树结构
+        List<PrjProPlanNodeInfo> tree = infoList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
+            m.children = getChildNode(m, infoList);
+        }).collect(Collectors.toList());
+
+        planInfo.nodeInfoList = tree;
+        // 最终，返回：
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(tree), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+    }
+
+    /**
+     * 递归子节点
+     *
+     * @param root        当前单个实体
+     * @param allListTree 表中的所有实体集合
+     * @return
+     */
+    private List<PrjProPlanNodeInfo> getChildNode(PrjProPlanNodeInfo root, List<PrjProPlanNodeInfo> allListTree) {
+        return allListTree.stream().filter((treeEntity) -> treeEntity.pid.equals(root.id)).peek((treeEntity) -> {
+            treeEntity.children = getChildNode(treeEntity, allListTree);
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -130,8 +221,90 @@ public class ProPlanExt {
         public String pmPrjId;
     }
 
-    public static class GettPrjProPlanNetworkParam {
+    public static class GetPrjProPlanNetworkParam {
         public String pmPrjId;
+    }
+
+    /**
+     * Map转换成PrjProPlanInfo
+     *
+     * @param dataMap
+     * @param jdbcTemplate
+     * @return
+     */
+    private PrjProPlanInfo covertPlanInfo(Map<String, Object> dataMap, JdbcTemplate jdbcTemplate) {
+        PrjProPlanInfo planInfo = new PrjProPlanInfo();
+        planInfo.id = String.valueOf(dataMap.get("ID"));
+        planInfo.code = String.valueOf(dataMap.get("CODE"));
+        planInfo.name = String.valueOf(dataMap.get("NAME"));
+        planInfo.remark = String.valueOf(dataMap.get("REMARK"));
+        planInfo.planStartDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("PLAN_START_DATE")));
+        planInfo.planComplDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("PLAN_COMPL_DATE")));
+        planInfo.planTotalDays = Integer.parseInt(String.valueOf(dataMap.get("PLAN_TOTAL_DAYS")));
+        planInfo.planCarryDays = Integer.parseInt(String.valueOf(dataMap.get("PLAN_CARRY_DAYS")));
+        planInfo.planCurrentProPercent = Double.parseDouble(String.valueOf(dataMap.get("PLAN_CURRENT_PRO_PERCENT")));
+        planInfo.actualStartDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("ACTUAL_START_DATE")));
+        planInfo.actualComplDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("ACTUAL_COMPL_DATE")));
+        planInfo.actualTotalDays = Integer.parseInt(String.valueOf(dataMap.get("ACTUAL_TOTAL_DAYS")));
+        planInfo.actualCarryDays = Integer.parseInt(String.valueOf(dataMap.get("ACTUAL_CARRY_DAYS")));
+        planInfo.actualCurrentProPercent = Double.parseDouble(String.valueOf(dataMap.get("ACTUAL_CURRENT_PRO_PERCENT")));
+        String sql = "select * from gr_set_value where id=?";
+        Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_STATUS_ID")));
+        planInfo.progressStatus.id = String.valueOf(statusObj.get("ID"));
+        planInfo.progressStatus.code = String.valueOf(statusObj.get("CODE"));
+        planInfo.progressStatus.name = String.valueOf(statusObj.get("NAME"));
+        Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_RISK_TYPE_ID")));
+        planInfo.progressRiskType.id = String.valueOf(riskObj.get("ID"));
+        planInfo.progressRiskType.code = String.valueOf(riskObj.get("CODE"));
+        planInfo.progressRiskType.name = String.valueOf(riskObj.get("NAME"));
+        planInfo.progressRiskRemark = String.valueOf(dataMap.get("PROGRESS_RISK_REMARK"));
+        return planInfo;
+    }
+
+    /**
+     * Map转换成PrjProPlanNodeInfo
+     *
+     * @param dataMap
+     * @param jdbcTemplate
+     * @return
+     */
+    private PrjProPlanNodeInfo convertPlanInfoNode(Map<String, Object> dataMap, JdbcTemplate jdbcTemplate) {
+        PrjProPlanNodeInfo nodeInfo = new PrjProPlanNodeInfo();
+        nodeInfo.id = String.valueOf(dataMap.get("ID"));
+        nodeInfo.pid = String.valueOf(dataMap.get("PM_PRO_PLAN_NODE_PID") == null ? "0" : dataMap.get("PM_PRO_PLAN_NODE_PID"));
+        nodeInfo.code = String.valueOf(dataMap.get("CODE"));
+        nodeInfo.name = String.valueOf(dataMap.get("NAME"));
+        nodeInfo.remark = String.valueOf(dataMap.get("REMARK"));
+        nodeInfo.planStartDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("PLAN_START_DATE")));
+        nodeInfo.planComplDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("PLAN_COMPL_DATE")));
+        nodeInfo.planTotalDays = Integer.parseInt(String.valueOf(dataMap.get("PLAN_TOTAL_DAYS")));
+        nodeInfo.planCarryDays = Integer.parseInt(String.valueOf(dataMap.get("PLAN_CARRY_DAYS")));
+        nodeInfo.planCurrentProPercent = Double.parseDouble(String.valueOf(dataMap.get("PLAN_CURRENT_PRO_PERCENT")));
+        nodeInfo.actualStartDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("ACTUAL_START_DATE")));
+        nodeInfo.actualComplDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("ACTUAL_COMPL_DATE")));
+        nodeInfo.actualTotalDays = Integer.parseInt(String.valueOf(dataMap.get("ACTUAL_TOTAL_DAYS")));
+        nodeInfo.actualCarryDays = Integer.parseInt(String.valueOf(dataMap.get("ACTUAL_CARRY_DAYS")));
+        nodeInfo.actualCurrentProPercent = Double.parseDouble(String.valueOf(dataMap.get("ACTUAL_CURRENT_PRO_PERCENT")));
+        String sql = "select * from gr_set_value where id=?";
+        Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_STATUS_ID")));
+        nodeInfo.progressStatus.id = String.valueOf(statusObj.get("ID"));
+        nodeInfo.progressStatus.code = String.valueOf(statusObj.get("CODE"));
+        nodeInfo.progressStatus.name = String.valueOf(statusObj.get("NAME"));
+        Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_RISK_TYPE_ID")));
+        nodeInfo.progressRiskType.id = String.valueOf(riskObj.get("ID"));
+        nodeInfo.progressRiskType.code = String.valueOf(riskObj.get("CODE"));
+        nodeInfo.progressRiskType.name = String.valueOf(riskObj.get("NAME"));
+        nodeInfo.progressRiskRemark = String.valueOf(dataMap.get("PROGRESS_RISK_REMARK"));
+
+        Map<String, Object> deptObj = jdbcTemplate.queryForMap("select * from hr_dept where id =?", String.valueOf(dataMap.get("CHIEF_DEPT_ID")));
+        nodeInfo.chiefDept.id = String.valueOf(deptObj.get("ID"));
+        nodeInfo.chiefDept.code = String.valueOf(deptObj.get("CODE"));
+        nodeInfo.chiefDept.name = String.valueOf(deptObj.get("NAME"));
+        Map<String, Object> userObj = jdbcTemplate.queryForMap("select * from ad_user where id =?", String.valueOf(dataMap.get("CHIEF_USER_ID")));
+        nodeInfo.chiefUser.id = String.valueOf(userObj.get("ID"));
+        nodeInfo.chiefUser.code = String.valueOf(userObj.get("CODE"));
+        nodeInfo.chiefUser.name = String.valueOf(userObj.get("NAME"));
+        return nodeInfo;
     }
 
     /**
@@ -181,8 +354,9 @@ public class ProPlanExt {
         public IdCodeName progressStatus;
         public IdCodeName progressRiskType;
         public String progressRiskRemark;
-
+        //ad_user
         public IdCodeName chiefDept;
+        //hr_dept
         public IdCodeName chiefUser;
 
         public List<PrjProPlanNodeInfo> children;
