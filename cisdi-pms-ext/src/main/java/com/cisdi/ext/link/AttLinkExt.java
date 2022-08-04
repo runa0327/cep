@@ -330,7 +330,141 @@ public class AttLinkExt {
             }
 
             return attLinkResult;
-        } else {
+        } else if("BIDDING_NAME_ID".equals(attCode)){
+            AttLinkResult attLinkResult = new AttLinkResult();
+            attLinkResult.attMap = new HashMap<>();
+            //根据id查询招投标信息
+            List<Map<String,Object>> list = jdbcTemplate.queryForList("SELECT a.PMS_RELEASE_WAY_ID,a.BID_CTL_PRICE_LAUNCH,a.APPROVE_PURCHASE_TYPE,a.WIN_BID_UNIT_TXT,a.TENDER_OFFER,a.CONTACT_MOBILE_WIN,a.CONTACT_NAME_RECORD,a.BID_USER_ID,a.STATUS,a.BID_UNIT, ifnull((SELECT END_DATETIME FROM wf_process_instance WHERE id = a.LK_WF_INST_ID ),0) as END_DATETIME, a.SERVICE_DAYS FROM po_public_bid_req a WHERE id = ?",attValue);
+            if (CollectionUtils.isEmpty(list)){
+                throw new BaseException("采购流程相关属性不完善！");
+            }
+            Map row = list.get(0);
+            //招采类型
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"PMS_RELEASE_WAY_ID");
+                typeValueText.text = JdbcMapUtil.getString(row,"PMS_RELEASE_WAY_ID");
+
+                attLinkResult.attMap.put("PMS_RELEASE_WAY_ID", typeValueText);
+            }
+            //招标控制价
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.DOUBLE;
+                typeValueText.value = JdbcMapUtil.getString(row,"BID_CTL_PRICE_LAUNCH");
+                typeValueText.text = JdbcMapUtil.getString(row,"BID_CTL_PRICE_LAUNCH");
+
+                attLinkResult.attMap.put("BID_CTL_PRICE_LAUNCH", typeValueText);
+            }
+            //采购方式
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"APPROVE_PURCHASE_TYPE");
+                typeValueText.text = JdbcMapUtil.getString(row,"APPROVE_PURCHASE_TYPE");
+
+                attLinkResult.attMap.put("PURCHASE_TYPE", typeValueText);
+            }
+            //中标单位
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"WIN_BID_UNIT_TXT");
+                typeValueText.text = JdbcMapUtil.getString(row,"WIN_BID_UNIT_TXT");
+
+                attLinkResult.attMap.put("AUTHOR_UNIT", typeValueText);
+            }
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"WIN_BID_UNIT_TXT");
+                typeValueText.text = JdbcMapUtil.getString(row,"WIN_BID_UNIT_TXT");
+
+                attLinkResult.attMap.put("WIN_BID_UNIT", typeValueText);
+            }
+            //中标单位报价
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"TENDER_OFFER");
+                typeValueText.text = JdbcMapUtil.getString(row,"TENDER_OFFER");
+
+                attLinkResult.attMap.put("ENTRUSTING_UNIT", typeValueText);
+            }
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"TENDER_OFFER");
+                typeValueText.text = JdbcMapUtil.getString(row,"TENDER_OFFER");
+
+                attLinkResult.attMap.put("WINNING_BIDS_AMOUNT", typeValueText);
+            }
+            //进场时间
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.DATE;
+                typeValueText.value = JdbcMapUtil.getString(row,"END_DATETIME");
+                typeValueText.text = JdbcMapUtil.getString(row,"END_DATETIME");
+
+                attLinkResult.attMap.put("IN_DATE", typeValueText);
+            }
+            //招标单位
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"BID_UNIT");
+                typeValueText.text = JdbcMapUtil.getString(row,"BID_UNIT");
+
+                attLinkResult.attMap.put("ENTRUSTING_UNIT", typeValueText);
+            }
+            //审批状态
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"STATUS");
+                typeValueText.text = JdbcMapUtil.getString(row,"STATUS");
+
+                attLinkResult.attMap.put("APPROVAL_STATUS", typeValueText);
+            }
+            //经办人
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"BID_USER_ID");
+                typeValueText.text = JdbcMapUtil.getString(row,"BID_USER_ID");
+
+                attLinkResult.attMap.put("PROCURE_USER_ID", typeValueText);
+            }
+            //对方联系人
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"CONTACT_NAME_RECORD");
+                typeValueText.text = JdbcMapUtil.getString(row,"CONTACT_NAME_RECORD");
+
+                attLinkResult.attMap.put("OTHER_RESPONSOR", typeValueText);
+            }
+            //对方联系方式
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"CONTACT_MOBILE_WIN");
+                typeValueText.text = JdbcMapUtil.getString(row,"CONTACT_MOBILE_WIN");
+
+                attLinkResult.attMap.put("OTHER_CONTACT_PHONE", typeValueText);
+            }
+            //服务周期
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"SERVICE_DAYS");
+                typeValueText.text = JdbcMapUtil.getString(row,"SERVICE_DAYS");
+
+                attLinkResult.attMap.put("SERVICE_DAYS", typeValueText);
+            }
+            return attLinkResult;
+        }else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
     }
