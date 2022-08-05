@@ -385,7 +385,7 @@ public class AttLinkExt {
                 typeValueText.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
                 typeValueText.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
 
-                attLinkResult.attMap.put("WIN_BID_UNIT", typeValueText);
+                attLinkResult.attMap.put("WIN_BID_UNIT_TXT", typeValueText);
             }
             //中标单位报价
             {

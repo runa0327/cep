@@ -11,7 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.prefs.BackingStoreException;
@@ -84,7 +86,24 @@ public class WfExt {
                             int update1 = jdbcTemplate.update("update PM_PRJ_REQ t set t.prj_code=?,t.code=? where t.id=?", new_prj_code, new_prj_code, csCommId);
                             log.info("已更新：{}", update1);
                         }
+
                     }
+                }
+
+                //合同签订批准后生成合同编号
+                if ("PO_ORDER_REQ".equals(entityCode) || "PO_ORDER_REQ".equals(entityCode)){
+                    if ("AP".equals(newStatus)) {
+                        //查询当前已审批通过的招标合同数量
+                        List<Map<String,Object>> map = jdbcTemplate.queryForList("select count(*) as num from PO_ORDER_REQ where status = 'AP' ");
+                        Date date = new Date();
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String year = sdf.format(date).substring(0,7).replace("-","");
+                        //合同编码规则
+                        int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
+                        String code = "gc-" + year + "-" + num;
+                        int update2 = jdbcTemplate.update("update PO_ORDER_REQ set CONTRACT_CODE = ?  where id = ?",code,csCommId);
+                    }
+
                 }
 
                 List<String> tableList = getTableList();
@@ -123,6 +142,8 @@ public class WfExt {
         list.add("PM_ENVIRONMENT_EVAL"); //环评
         list.add("PO_ORDER_REQ"); //采购合同签订申请
         list.add("PO_PUBLIC_BID_REQ"); //采购公开招标申请
+        list.add("PM_CONSTRUCT_PERMIT_REQ"); //施工许可
+        list.add("PM_PRJ_PLANNING_PERMIT_REQ"); //工程规划许可
         return list;
     }
 
