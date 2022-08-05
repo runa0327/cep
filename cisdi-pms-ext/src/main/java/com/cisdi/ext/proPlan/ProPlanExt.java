@@ -1,6 +1,5 @@
 package com.cisdi.ext.proPlan;
 
-import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.BaseException;
@@ -8,7 +7,10 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.IdCodeName;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ProPlanExt {
@@ -126,35 +128,57 @@ public class ProPlanExt {
         ProPlanExt.GetPrjOverviewNodeListParam param = JsonUtil.fromJson(json, ProPlanExt.GetPrjOverviewNodeListParam.class);
         String pmPrjId = param.pmPrjId;
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> nodeList = jdbcTemplate.queryForList("select pppn.* from PM_PRO_PLAN_NODE pppn \n" +
-                "left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID\n" +
-                "where SHOW_IN_PRJ_OVERVIEW = '1' and ppp.PM_PRJ_ID='' ", pmPrjId);
-        List<Map<String, Object>> allList = jdbcTemplate.queryForList("select pppn.* from PM_PRO_PLAN_NODE pppn \n" +
-                "left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID\n" +
-                "where ppp.PM_PRJ_ID='' ", pmPrjId);
 
-        //组装排序
-        allList.forEach(item -> {
-            List<Map<String, Object>> childrenList = getChildrenSeq(item, allList);
-            childrenList.forEach(v->{
-                v.put("SEQ_NO", item.get("SEQ_NO") + String.valueOf(v.get("SEQ_NO")));
-            });
-        });
-        nodeList.forEach(item->{
-            Optional<Map<String,Object>> optional = allList.stream().filter(p->Objects.equals(item.get("ID"),p.get("ID"))).findAny();
-            optional.ifPresent(stringObjectMap -> item.put("SEQ_NO", stringObjectMap.get("SEQ_NO")));
-        });
-        //根据SEQ_NO排序
-        List<Map<String, Object>> res = nodeList.stream().sorted(Comparator.comparing(p->String.valueOf(p.get("SEQ_NO")))).collect(Collectors.toList());
-        //map转换成实体集合
-        List<PrjProPlanNodeInfo> nodeInfoList = res.stream().map(p-> this.convertPlanInfoNode(p,jdbcTemplate)).collect(Collectors.toList());
-        // 最终，返回：
-        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(nodeInfoList), Map.class);
-        ExtJarHelper.returnValue.set(outputMap);
+        List<PrjProPlanNodeInfo> nodeInfoList = new ArrayList<>();
+
+        List<Map<String, Object>> allList = jdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
+                "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
+                "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO \n" +
+                "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where ppp.PM_PRJ_ID=?", pmPrjId);
+
+        //结果转换
+        List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(p, jdbcTemplate)).collect(Collectors.toList());
+        //构建树结构
+        List<PrjProPlanNodeInfo> tree = infoList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
+            m.children = getChildNode(m, infoList);
+        }).collect(Collectors.toList());
+        List<PrjProPlanNodeInfo> list = new ArrayList<>();
+        for (PrjProPlanNodeInfo nodeInfo : tree) {
+            if (nodeInfo.children != null) {
+                List<PrjProPlanNodeInfo> children = nodeInfo.children;
+                convertChildrenToTileList(children, list);
+            }
+            list.add(nodeInfo);
+        }
+
+        nodeInfoList = list.stream().filter(p -> Objects.equals("1", p.showInPrjOverview)).collect(Collectors.toList());
+        PrjProPlanInfo info = new PrjProPlanInfo();
+        info.nodeInfoList= nodeInfoList;
+        if (nodeInfoList.size() == 0) {
+            ExtJarHelper.returnValue.set(null);
+        } else {
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(info), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    private void convertChildrenToTileList(List<PrjProPlanNodeInfo> source, List<PrjProPlanNodeInfo> outList) {
+        if (outList == null) {
+            outList = new ArrayList<>();
+        }
+        for (PrjProPlanNodeInfo nodeInfo : source) {
+            if (nodeInfo.children != null) {
+                List<PrjProPlanNodeInfo> children = nodeInfo.children;
+                convertChildrenToTileList(children, outList);
+            }
+            outList.add(nodeInfo);
+        }
+
     }
 
     /**
      * 递归处理子节点的排序
+     *
      * @param root
      * @param allData
      * @return
@@ -163,9 +187,6 @@ public class ProPlanExt {
         return allData.stream().filter(p -> Objects.equals(root.get("ID"), p.get("PM_PRO_PLAN_NODE_PID")))
                 .map(m -> {
                     List<Map<String, Object>> child = getChildren(m, allData);
-                    child.forEach(v->{
-                        v.put("SEQ_NO", m.get("SEQ_NO") + String.valueOf(v.get("SEQ_NO")));
-                    });
                     return m;
                 }).collect(Collectors.toList());
     }
@@ -185,9 +206,10 @@ public class ProPlanExt {
         Map<String, Object> proMap = jdbcTemplate.queryForMap("select * from PM_PRO_PLAN where PM_PRJ_ID=?", pmPrjId);
         PrjProPlanInfo planInfo = this.covertPlanInfo(proMap, jdbcTemplate);
 
-        List<Map<String, Object>> allList = jdbcTemplate.queryForList("select pppn.* from PM_PRO_PLAN_NODE pppn \n" +
-                "left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID\n" +
-                "where ppp.PM_PRJ_ID=? ", pmPrjId);
+        List<Map<String, Object>> allList = jdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
+                "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
+                "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO \n" +
+                "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where ppp.PM_PRJ_ID=?", pmPrjId);
         //结果转换
         List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(p, jdbcTemplate)).collect(Collectors.toList());
         //构建树结构
@@ -238,25 +260,34 @@ public class ProPlanExt {
         planInfo.code = String.valueOf(dataMap.get("CODE"));
         planInfo.name = String.valueOf(dataMap.get("NAME"));
         planInfo.remark = String.valueOf(dataMap.get("REMARK"));
-        planInfo.planStartDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("PLAN_START_DATE")));
-        planInfo.planComplDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("PLAN_COMPL_DATE")));
+        planInfo.planStartDate = String.valueOf(dataMap.get("PLAN_START_DATE"));
+        planInfo.planComplDate = String.valueOf(dataMap.get("PLAN_COMPL_DATE"));
         planInfo.planTotalDays = Integer.parseInt(String.valueOf(dataMap.get("PLAN_TOTAL_DAYS")));
         planInfo.planCarryDays = Integer.parseInt(String.valueOf(dataMap.get("PLAN_CARRY_DAYS")));
         planInfo.planCurrentProPercent = Double.parseDouble(String.valueOf(dataMap.get("PLAN_CURRENT_PRO_PERCENT")));
-        planInfo.actualStartDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("ACTUAL_START_DATE")));
-        planInfo.actualComplDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("ACTUAL_COMPL_DATE")));
+        planInfo.actualStartDate = String.valueOf(dataMap.get("ACTUAL_START_DATE"));
+        planInfo.actualComplDate = String.valueOf(dataMap.get("ACTUAL_COMPL_DATE"));
         planInfo.actualTotalDays = Integer.parseInt(String.valueOf(dataMap.get("ACTUAL_TOTAL_DAYS")));
         planInfo.actualCarryDays = Integer.parseInt(String.valueOf(dataMap.get("ACTUAL_CARRY_DAYS")));
         planInfo.actualCurrentProPercent = Double.parseDouble(String.valueOf(dataMap.get("ACTUAL_CURRENT_PRO_PERCENT")));
         String sql = "select * from gr_set_value where id=?";
-        Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_STATUS_ID")));
-        planInfo.progressStatus.id = String.valueOf(statusObj.get("ID"));
-        planInfo.progressStatus.code = String.valueOf(statusObj.get("CODE"));
-        planInfo.progressStatus.name = String.valueOf(statusObj.get("NAME"));
-        Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_RISK_TYPE_ID")));
-        planInfo.progressRiskType.id = String.valueOf(riskObj.get("ID"));
-        planInfo.progressRiskType.code = String.valueOf(riskObj.get("CODE"));
-        planInfo.progressRiskType.name = String.valueOf(riskObj.get("NAME"));
+        if (!Objects.isNull(dataMap.get("PROGRESS_STATUS_ID"))) {
+            Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_STATUS_ID")));
+            IdCodeName idCodeName = new IdCodeName();
+            idCodeName.id = String.valueOf(statusObj.get("ID"));
+            idCodeName.code = String.valueOf(statusObj.get("CODE"));
+            idCodeName.name = String.valueOf(statusObj.get("NAME"));
+            planInfo.progressStatus = idCodeName;
+        }
+        if (!Objects.isNull(dataMap.get("PROGRESS_RISK_TYPE_ID"))) {
+            Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_RISK_TYPE_ID")));
+            IdCodeName idCodeName = new IdCodeName();
+            idCodeName.id = String.valueOf(riskObj.get("ID"));
+            idCodeName.code = String.valueOf(riskObj.get("CODE"));
+            idCodeName.name = String.valueOf(riskObj.get("NAME"));
+            planInfo.progressRiskType = idCodeName;
+        }
+
         planInfo.progressRiskRemark = String.valueOf(dataMap.get("PROGRESS_RISK_REMARK"));
         return planInfo;
     }
@@ -271,39 +302,56 @@ public class ProPlanExt {
     private PrjProPlanNodeInfo convertPlanInfoNode(Map<String, Object> dataMap, JdbcTemplate jdbcTemplate) {
         PrjProPlanNodeInfo nodeInfo = new PrjProPlanNodeInfo();
         nodeInfo.id = String.valueOf(dataMap.get("ID"));
-        nodeInfo.pid = String.valueOf(dataMap.get("PM_PRO_PLAN_NODE_PID") == null ? "0" : dataMap.get("PM_PRO_PLAN_NODE_PID"));
+        nodeInfo.pid = String.valueOf(dataMap.get("PM_PRO_PLAN_NODE_PID"));
         nodeInfo.code = String.valueOf(dataMap.get("CODE"));
         nodeInfo.name = String.valueOf(dataMap.get("NAME"));
         nodeInfo.remark = String.valueOf(dataMap.get("REMARK"));
-        nodeInfo.planStartDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("PLAN_START_DATE")));
-        nodeInfo.planComplDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("PLAN_COMPL_DATE")));
+        nodeInfo.planStartDate = String.valueOf(dataMap.get("PLAN_START_DATE"));
+        nodeInfo.planComplDate = String.valueOf(dataMap.get("PLAN_COMPL_DATE"));
         nodeInfo.planTotalDays = Integer.parseInt(String.valueOf(dataMap.get("PLAN_TOTAL_DAYS")));
         nodeInfo.planCarryDays = Integer.parseInt(String.valueOf(dataMap.get("PLAN_CARRY_DAYS")));
         nodeInfo.planCurrentProPercent = Double.parseDouble(String.valueOf(dataMap.get("PLAN_CURRENT_PRO_PERCENT")));
-        nodeInfo.actualStartDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("ACTUAL_START_DATE")));
-        nodeInfo.actualComplDate = DateTimeUtil.stringToDate(String.valueOf(dataMap.get("ACTUAL_COMPL_DATE")));
+        nodeInfo.actualStartDate = String.valueOf(dataMap.get("ACTUAL_START_DATE"));
+        nodeInfo.actualComplDate = String.valueOf(dataMap.get("ACTUAL_COMPL_DATE"));
         nodeInfo.actualTotalDays = Integer.parseInt(String.valueOf(dataMap.get("ACTUAL_TOTAL_DAYS")));
         nodeInfo.actualCarryDays = Integer.parseInt(String.valueOf(dataMap.get("ACTUAL_CARRY_DAYS")));
         nodeInfo.actualCurrentProPercent = Double.parseDouble(String.valueOf(dataMap.get("ACTUAL_CURRENT_PRO_PERCENT")));
         String sql = "select * from gr_set_value where id=?";
-        Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_STATUS_ID")));
-        nodeInfo.progressStatus.id = String.valueOf(statusObj.get("ID"));
-        nodeInfo.progressStatus.code = String.valueOf(statusObj.get("CODE"));
-        nodeInfo.progressStatus.name = String.valueOf(statusObj.get("NAME"));
-        Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_RISK_TYPE_ID")));
-        nodeInfo.progressRiskType.id = String.valueOf(riskObj.get("ID"));
-        nodeInfo.progressRiskType.code = String.valueOf(riskObj.get("CODE"));
-        nodeInfo.progressRiskType.name = String.valueOf(riskObj.get("NAME"));
+        if (!Objects.isNull(dataMap.get("PROGRESS_STATUS_ID"))) {
+            Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_STATUS_ID")));
+            IdCodeName idCodeName = new IdCodeName();
+            idCodeName.id = String.valueOf(statusObj.get("ID"));
+            idCodeName.code = String.valueOf(statusObj.get("CODE"));
+            idCodeName.name = String.valueOf(statusObj.get("NAME"));
+            nodeInfo.progressStatus = idCodeName;
+        }
+        if (!Objects.isNull(dataMap.get("PROGRESS_RISK_TYPE_ID"))) {
+            Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_RISK_TYPE_ID")));
+            IdCodeName idCodeName = new IdCodeName();
+            idCodeName.id = String.valueOf(riskObj.get("ID"));
+            idCodeName.code = String.valueOf(riskObj.get("CODE"));
+            idCodeName.name = String.valueOf(riskObj.get("NAME"));
+            nodeInfo.progressRiskType = idCodeName;
+        }
         nodeInfo.progressRiskRemark = String.valueOf(dataMap.get("PROGRESS_RISK_REMARK"));
+        if (!Objects.isNull(dataMap.get("CHIEF_DEPT_ID"))) {
+            Map<String, Object> deptObj = jdbcTemplate.queryForMap("select * from hr_dept where id =?", String.valueOf(dataMap.get("CHIEF_DEPT_ID")));
+            IdCodeName idCodeName = new IdCodeName();
+            idCodeName.id = String.valueOf(deptObj.get("ID"));
+            idCodeName.code = String.valueOf(deptObj.get("CODE"));
+            idCodeName.name = String.valueOf(deptObj.get("NAME"));
+            nodeInfo.chiefDept = idCodeName;
+        }
 
-        Map<String, Object> deptObj = jdbcTemplate.queryForMap("select * from hr_dept where id =?", String.valueOf(dataMap.get("CHIEF_DEPT_ID")));
-        nodeInfo.chiefDept.id = String.valueOf(deptObj.get("ID"));
-        nodeInfo.chiefDept.code = String.valueOf(deptObj.get("CODE"));
-        nodeInfo.chiefDept.name = String.valueOf(deptObj.get("NAME"));
-        Map<String, Object> userObj = jdbcTemplate.queryForMap("select * from ad_user where id =?", String.valueOf(dataMap.get("CHIEF_USER_ID")));
-        nodeInfo.chiefUser.id = String.valueOf(userObj.get("ID"));
-        nodeInfo.chiefUser.code = String.valueOf(userObj.get("CODE"));
-        nodeInfo.chiefUser.name = String.valueOf(userObj.get("NAME"));
+        if (!Objects.isNull(dataMap.get("CHIEF_USER_ID"))) {
+            Map<String, Object> userObj = jdbcTemplate.queryForMap("select * from ad_user where id =?", String.valueOf(dataMap.get("CHIEF_USER_ID")));
+            IdCodeName idCodeName = new IdCodeName();
+            idCodeName.id = String.valueOf(userObj.get("ID"));
+            idCodeName.code = String.valueOf(userObj.get("CODE"));
+            idCodeName.name = String.valueOf(userObj.get("NAME"));
+            nodeInfo.chiefUser = idCodeName;
+        }
+        nodeInfo.showInPrjOverview = String.valueOf(dataMap.get("SHOW_IN_PRJ_OVERVIEW"));
         return nodeInfo;
     }
 
@@ -358,6 +406,8 @@ public class ProPlanExt {
         public IdCodeName chiefDept;
         //hr_dept
         public IdCodeName chiefUser;
+        //SHOW_IN_PRJ_OVERVIEW
+        public String showInPrjOverview;
 
         public List<PrjProPlanNodeInfo> children;
     }
