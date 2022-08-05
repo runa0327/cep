@@ -129,8 +129,6 @@ public class ProPlanExt {
         String pmPrjId = param.pmPrjId;
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
 
-        List<PrjProPlanNodeInfo> nodeInfoList = new ArrayList<>();
-
         List<Map<String, Object>> allList = jdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
                 "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
                 "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO \n" +
@@ -151,7 +149,7 @@ public class ProPlanExt {
             list.add(nodeInfo);
         }
 
-        nodeInfoList = list.stream().filter(p -> Objects.equals("1", p.showInPrjOverview)).collect(Collectors.toList());
+        List<PrjProPlanNodeInfo> nodeInfoList = list.stream().filter(p -> Objects.equals("1", p.showInPrjOverview)).collect(Collectors.toList());
         PrjProPlanInfo info = new PrjProPlanInfo();
         info.nodeInfoList= nodeInfoList;
         if (nodeInfoList.size() == 0) {
@@ -162,6 +160,11 @@ public class ProPlanExt {
         }
     }
 
+    /**
+     * 树转换
+     * @param source
+     * @param outList
+     */
     private void convertChildrenToTileList(List<PrjProPlanNodeInfo> source, List<PrjProPlanNodeInfo> outList) {
         if (outList == null) {
             outList = new ArrayList<>();
@@ -174,21 +177,6 @@ public class ProPlanExt {
             outList.add(nodeInfo);
         }
 
-    }
-
-    /**
-     * 递归处理子节点的排序
-     *
-     * @param root
-     * @param allData
-     * @return
-     */
-    private List<Map<String, Object>> getChildrenSeq(Map<String, Object> root, List<Map<String, Object>> allData) {
-        return allData.stream().filter(p -> Objects.equals(root.get("ID"), p.get("PM_PRO_PLAN_NODE_PID")))
-                .map(m -> {
-                    List<Map<String, Object>> child = getChildren(m, allData);
-                    return m;
-                }).collect(Collectors.toList());
     }
 
     /**
@@ -359,22 +347,73 @@ public class ProPlanExt {
      * 项目进度计划信息。
      */
     public static class PrjProPlanInfo {
+        /**
+         * 主键ID
+         */
         public String id;
+        /**
+         * code
+         */
         public String code;
+        /**
+         * 名称
+         */
         public String name;
+        /**
+         * 备注
+         */
         public String remark;
+        /**
+         * 预计开始日期
+         */
         public String planStartDate;
+        /**
+         * 预计完成日期
+         */
         public String planComplDate;
+        /**
+         * 预计总天数
+         */
         public Integer planTotalDays;
+        /**
+         * 预计已开展天数
+         */
         public Integer planCarryDays;
+        /**
+         * 预计当前进度百分比
+         */
         public Double planCurrentProPercent;
+        /**
+         * 实际开始日期
+         */
         public String actualStartDate;
+        /**
+         * 实际完成日期
+         */
         public String actualComplDate;
+        /**
+         * 实际总天数
+         */
         public Integer actualTotalDays;
+        /**
+         * 实际已开展天数
+         */
         public Integer actualCarryDays;
+        /**
+         * 实际当前进度百分比
+         */
         public Double actualCurrentProPercent;
+        /**
+         * 进度状态
+         */
         public IdCodeName progressStatus;
+        /**
+         * 进度风险类型
+         */
         public IdCodeName progressRiskType;
+        /**
+         * 进度风险说明
+         */
         public String progressRiskRemark;
 
         public List<PrjProPlanNodeInfo> nodeInfoList;
@@ -384,31 +423,96 @@ public class ProPlanExt {
      * 项目进度计划节点信息。
      */
     public static class PrjProPlanNodeInfo {
+        /**
+         * 主键ID
+         */
         public String id;
+        /**
+         * 父ID
+         */
         public String pid;
+        /**
+         * code
+         */
         public String code;
+        /**
+         * 进度节点名称
+         */
         public String name;
+        /**
+         * 备注
+         */
         public String remark;
+        /**
+         * 预计开始日期
+         */
         public String planStartDate;
+        /**
+         * 预计完成日期
+         */
         public String planComplDate;
+        /**
+         * 预计总天数
+         */
         public Integer planTotalDays;
+        /**
+         * 预计已开展天数
+         */
         public Integer planCarryDays;
+        /**
+         * 预计当前进度百分比
+         */
         public Double planCurrentProPercent;
+        /**
+         * 实际开始日期
+         */
         public String actualStartDate;
+        /**
+         * 实际完成日期
+         */
         public String actualComplDate;
+        /**
+         * 实际总天数
+         */
         public Integer actualTotalDays;
+        /**
+         * 实际已开展天数
+         */
         public Integer actualCarryDays;
+        /**
+         * 实际当前进度百分比
+         */
         public Double actualCurrentProPercent;
+        /**
+         * 进度状态
+         */
         public IdCodeName progressStatus;
+        /**
+         * 进度风险类型
+         */
         public IdCodeName progressRiskType;
+        /**
+         * 进度风险说明
+         */
         public String progressRiskRemark;
+        /**
+         * 责任部门
+         */
         //ad_user
         public IdCodeName chiefDept;
-        //hr_dept
+        /**
+         * 责任人
+         */
+        //
         public IdCodeName chiefUser;
+        /**
+         * 是否显示首页
+         */
         //SHOW_IN_PRJ_OVERVIEW
         public String showInPrjOverview;
-
+        /**
+         * 子节点
+         */
         public List<PrjProPlanNodeInfo> children;
     }
 }
