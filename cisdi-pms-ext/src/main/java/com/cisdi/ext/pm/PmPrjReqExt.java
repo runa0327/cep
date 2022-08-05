@@ -2,6 +2,7 @@ package com.cisdi.ext.pm;
 
 import com.cisdi.ext.util.AmtUtil;
 import com.cisdi.ext.util.DoubleUtil;
+import com.cisdi.ext.util.WfPmInvestUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
@@ -116,18 +117,19 @@ public class PmPrjReqExt {
         Map<String, Object> grSetValueInvest0 = Crud.from("GR_SET_VALUE").where().eq("CODE", "invest0").select().execForMap();
 
         // 新建项目投资测算：
-        String newInvestEtsId = Crud.from("PM_INVEST_EST").insertData();
-        Integer exec2 = Crud.from("PM_INVEST_EST").where().eq("ID", newInvestEtsId).update().set("IS_TEMPLATE", 0).set("PM_PRJ_ID", newPrjId).set("INVEST_EST_TYPE_ID", grSetValueInvest0.get("ID")).set("PRJ_TOTAL_INVEST", pm_prj_req.get("PRJ_TOTAL_INVEST")).exec();
-        log.info("已更新：{}", exec2);
-
-        // 新建项目投资测算明细：
-        createInvestEstDtl(pm_prj_req, newInvestEtsId, "PRJ_TOTAL_INVEST");
-        createInvestEstDtl(pm_prj_req, newInvestEtsId, "PROJECT_AMT");
-        createInvestEstDtl(pm_prj_req, newInvestEtsId, "CONSTRUCT_AMT");
-        createInvestEstDtl(pm_prj_req, newInvestEtsId, "EQUIP_AMT");
-        createInvestEstDtl(pm_prj_req, newInvestEtsId, "PROJECT_OTHER_AMT");
-        createInvestEstDtl(pm_prj_req, newInvestEtsId, "LAND_AMT");
-        createInvestEstDtl(pm_prj_req, newInvestEtsId, "PREPARE_AMT");
+//        String newInvestEtsId = Crud.from("PM_INVEST_EST").insertData();
+//        Integer exec2 = Crud.from("PM_INVEST_EST").where().eq("ID", newInvestEtsId).update().set("IS_TEMPLATE", 0).set("PM_PRJ_ID", newPrjId).set("INVEST_EST_TYPE_ID", grSetValueInvest0.get("ID")).set("PRJ_TOTAL_INVEST", pm_prj_req.get("PRJ_TOTAL_INVEST")).exec();
+//        log.info("已更新：{}", exec2);
+//
+//        // 新建项目投资测算明细：
+//        createInvestEstDtl(pm_prj_req, newInvestEtsId, "PRJ_TOTAL_INVEST");
+//        createInvestEstDtl(pm_prj_req, newInvestEtsId, "PROJECT_AMT");
+//        createInvestEstDtl(pm_prj_req, newInvestEtsId, "CONSTRUCT_AMT");
+//        createInvestEstDtl(pm_prj_req, newInvestEtsId, "EQUIP_AMT");
+//        createInvestEstDtl(pm_prj_req, newInvestEtsId, "PROJECT_OTHER_AMT");
+//        createInvestEstDtl(pm_prj_req, newInvestEtsId, "LAND_AMT");
+//        createInvestEstDtl(pm_prj_req, newInvestEtsId, "PREPARE_AMT");
+        WfPmInvestUtil.calculateData(csCommId,"PM_PRJ_REQ",newPrjId);
     }
 
     private void createInvestEstDtl(Map<String, Object> pm_prj_req, String newInvestEtsId, String colName) {
