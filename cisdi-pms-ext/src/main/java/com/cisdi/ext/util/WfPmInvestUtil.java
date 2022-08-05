@@ -67,25 +67,31 @@ public class WfPmInvestUtil {
 
             List<Map<String, Object>> list = jdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,LK_WF_INST_ID,CODE,NAME,REMARK,SEQ_NO,ifnull(PM_EXP_TYPE_PID,0) as PM_EXP_TYPE_PID,CALC_BY_PAYMENT,CALC_BY_PROGRESS from PM_EXP_TYPE");
 
-            List<pmInvestEstDtl> dtlList = new ArrayList<>();
-            //通过构建树新增数据
-            list.stream().filter(p -> Objects.equals("0", p.get("PM_EXP_TYPE_PID"))).peek(m -> {
+            list.forEach(item->{
                 String id = Crud.from("PM_INVEST_EST_DTL").insertData();
-                pmInvestEstDtl dtl = new pmInvestEstDtl();
-                dtl.id = id;
-                dtl.pid = null;
-                dtl.amt = String.valueOf(dataMap.get(String.valueOf(m.get("CODE"))));
-                dtl.InvestEstId = newInvestEtsId;
-                dtl.expTypeId = String.valueOf(m.get("ID"));
-                dtl.code = String.valueOf(m.get("CODE"));
-                dtlList.add(dtl);
-                m.put("parentID", id);
-                getChildren(m, list, dataMap, newInvestEtsId, dtlList);
-            }).collect(Collectors.toList());
-            dtlList.forEach(item -> {
-                Crud.from("PM_INVEST_EST_DTL").where().eq("ID", item.id).update().set("AMT", item.amt).set("PM_INVEST_EST_ID", item.InvestEstId)
-                        .set("PM_EXP_TYPE_ID", item.expTypeId).set("PM_INVEST_EST_DTL_PID", item.pid).exec();
+                Crud.from("PM_INVEST_EST_DTL").where().eq("ID", id).update().set("AMT", String.valueOf(dataMap.get(String.valueOf(item.get("CODE"))))).set("PM_INVEST_EST_ID", newInvestEtsId)
+                        .set("PM_EXP_TYPE_ID", item.get("ID")).set("PM_INVEST_EST_DTL_PID", null).exec();
             });
+
+//            List<pmInvestEstDtl> dtlList = new ArrayList<>();
+//            //通过构建树新增数据
+//            list.stream().filter(p -> Objects.equals("0", p.get("PM_EXP_TYPE_PID"))).peek(m -> {
+//                String id = Crud.from("PM_INVEST_EST_DTL").insertData();
+//                pmInvestEstDtl dtl = new pmInvestEstDtl();
+//                dtl.id = id;
+//                dtl.pid = null;
+//                dtl.amt = String.valueOf(dataMap.get(String.valueOf(m.get("CODE"))));
+//                dtl.InvestEstId = newInvestEtsId;
+//                dtl.expTypeId = String.valueOf(m.get("ID"));
+//                dtl.code = String.valueOf(m.get("CODE"));
+//                dtlList.add(dtl);
+//                m.put("parentID", id);
+//                getChildren(m, list, dataMap, newInvestEtsId, dtlList);
+//            }).collect(Collectors.toList());
+//            dtlList.forEach(item -> {
+//                Crud.from("PM_INVEST_EST_DTL").where().eq("ID", item.id).update().set("AMT", item.amt).set("PM_INVEST_EST_ID", item.InvestEstId)
+//                        .set("PM_EXP_TYPE_ID", item.expTypeId).set("PM_INVEST_EST_DTL_PID", item.pid).exec();
+//            });
         }
     }
 
