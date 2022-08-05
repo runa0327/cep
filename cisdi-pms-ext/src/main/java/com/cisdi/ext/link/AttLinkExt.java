@@ -381,13 +381,7 @@ public class AttLinkExt {
                 typeValueText.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
 
                 attLinkResult.attMap.put("AUTHOR_UNIT", typeValueText);
-            }
-            {
-                TypeValueText typeValueText = new TypeValueText();
-                typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
-                typeValueText.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
-
+                attLinkResult.attMap.put("AUTHOR_UNIT_TEXT", typeValueText);
                 attLinkResult.attMap.put("WIN_BID_UNIT_TXT", typeValueText);
             }
             //中标单位报价
@@ -398,13 +392,6 @@ public class AttLinkExt {
                 typeValueText.text = JdbcMapUtil.getString(row, "TENDER_OFFER");
 
                 attLinkResult.attMap.put("ENTRUSTING_UNIT", typeValueText);
-            }
-            {
-                TypeValueText typeValueText = new TypeValueText();
-                typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row, "TENDER_OFFER");
-                typeValueText.text = JdbcMapUtil.getString(row, "TENDER_OFFER");
-
                 attLinkResult.attMap.put("WINNING_BIDS_AMOUNT", typeValueText);
             }
             //进场时间
@@ -424,6 +411,7 @@ public class AttLinkExt {
                 typeValueText.text = JdbcMapUtil.getString(row, "BID_UNIT");
 
                 attLinkResult.attMap.put("ENTRUSTING_UNIT", typeValueText);
+                attLinkResult.attMap.put("ENTRUSTING_UNIT_TEXT", typeValueText);
             }
             //审批状态
             {
