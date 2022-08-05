@@ -95,46 +95,49 @@ public class AttLinkExt {
                             "join gr_set_value st on t.CON_SCALE_TYPE_ID=st.id " +
                             "join gr_set_value su on t.CON_SCALE_UOM_ID=su.id", attValue);
 
-            //查询项目可研/初概流程完成情况
-            List<Map<String, Object>> list2 = jdbcTemplate.queryForList("SELECT * FROM (SELECT " +
-                    "ifnull(b.END_DATETIME,0) as END_DATETIME, a.PRJ_TOTAL_INVEST, a.PROJECT_AMT, a.PROJECT_OTHER_AMT, a.PREPARE_AMT, a.CONSTRUCT_PERIOD_INTEREST, '1' as id " +
-                    "FROM PM_PRJ_INVEST1 a " +
-                    "LEFT JOIN wf_process_instance b on b.id = a.LK_WF_INST_ID " +
-                    "WHERE a.PM_PRJ_ID = ? " +
-                    "ORDER BY b.CRT_DT desc LIMIT 1) a union all select * FROM( " +
-                    "SELECT ifnull(b.END_DATETIME,0) as END_DATETIME, a.PRJ_TOTAL_INVEST, a.PROJECT_AMT, a.PROJECT_OTHER_AMT, a.PREPARE_AMT, a.CONSTRUCT_PERIOD_INTEREST, '2' as id " +
-                    "FROM PM_PRJ_INVEST2 a " +
-                    "LEFT JOIN wf_process_instance b on b.id = a.LK_WF_INST_ID " +
-                    "WHERE a.PM_PRJ_ID = ? " +
-                    "ORDER BY b.CRT_DT desc LIMIT 1 ) b ORDER BY id desc", attValue, attValue);
 
             if (CollectionUtils.isEmpty(list)) {
                 throw new BaseException("项目的相关属性不完整！");
             }
 
             Map row = list.get(0);
-            if (!CollectionUtils.isEmpty(list2)) {
-                String date0 = "";
-                String date1 = "";
-                if (list2.size() == 2) {
-                    date0 = list2.get(0).get("END_DATETIME").toString();
-                    date1 = list2.get(1).get("END_DATETIME").toString();
-                    if ("0".equals(date0) || "0".equals(date1)) {
-                        if ("0".equals(date0)) {
-                            attLinkResult = getResult(list2.get(1));
-                        } else {
+
+            if ("PO_PUBLIC_BID_REQ".equals(entCode) || "PO_ORDER_REQ".equals(entCode)){
+                //查询项目可研/初概流程完成情况
+                List<Map<String, Object>> list2 = jdbcTemplate.queryForList("SELECT * FROM (SELECT " +
+                        "ifnull(b.END_DATETIME,0) as END_DATETIME, a.PRJ_TOTAL_INVEST, a.PROJECT_AMT, a.PROJECT_OTHER_AMT, a.PREPARE_AMT, a.CONSTRUCT_PERIOD_INTEREST, '1' as id " +
+                        "FROM PM_PRJ_INVEST1 a " +
+                        "LEFT JOIN wf_process_instance b on b.id = a.LK_WF_INST_ID " +
+                        "WHERE a.PM_PRJ_ID = ? " +
+                        "ORDER BY b.CRT_DT desc LIMIT 1) a union all select * FROM( " +
+                        "SELECT ifnull(b.END_DATETIME,0) as END_DATETIME, a.PRJ_TOTAL_INVEST, a.PROJECT_AMT, a.PROJECT_OTHER_AMT, a.PREPARE_AMT, a.CONSTRUCT_PERIOD_INTEREST, '2' as id " +
+                        "FROM PM_PRJ_INVEST2 a " +
+                        "LEFT JOIN wf_process_instance b on b.id = a.LK_WF_INST_ID " +
+                        "WHERE a.PM_PRJ_ID = ? " +
+                        "ORDER BY b.CRT_DT desc LIMIT 1 ) b ORDER BY id desc", attValue, attValue);
+
+                if (!CollectionUtils.isEmpty(list2)) {
+                    String date0 = "";
+                    String date1 = "";
+                    if (list2.size() == 2) {
+                        date0 = list2.get(0).get("END_DATETIME").toString();
+                        date1 = list2.get(1).get("END_DATETIME").toString();
+                        if ("0".equals(date0) || "0".equals(date1)) {
+                            if ("0".equals(date0)) {
+                                attLinkResult = getResult(list2.get(1));
+                            } else {
+                                attLinkResult = getResult(list2.get(0));
+                            }
+                        }
+                    } else {
+                        date0 = list2.get(0).get("END_DATETIME").toString();
+                        if (!"0".equals(date0)) {
                             attLinkResult = getResult(list2.get(0));
                         }
                     }
-                } else {
-                    date0 = list2.get(0).get("END_DATETIME").toString();
-                    if (!"0".equals(date0)) {
-                        attLinkResult = getResult(list2.get(0));
-                    }
+
                 }
-
             }
-
 
             {
                 TypeValueText typeValueText = new TypeValueText();
