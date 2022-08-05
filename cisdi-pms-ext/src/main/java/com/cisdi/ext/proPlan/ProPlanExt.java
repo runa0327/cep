@@ -5,6 +5,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.IdCodeName;
+import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
@@ -151,7 +152,7 @@ public class ProPlanExt {
 
         List<PrjProPlanNodeInfo> nodeInfoList = list.stream().filter(p -> Objects.equals("1", p.showInPrjOverview)).collect(Collectors.toList());
         PrjProPlanInfo info = new PrjProPlanInfo();
-        info.nodeInfoList= nodeInfoList;
+        info.nodeInfoList = nodeInfoList;
         if (nodeInfoList.size() == 0) {
             ExtJarHelper.returnValue.set(null);
         } else {
@@ -162,6 +163,7 @@ public class ProPlanExt {
 
     /**
      * 树转换
+     *
      * @param source
      * @param outList
      */
@@ -191,15 +193,15 @@ public class ProPlanExt {
         String pmPrjId = param.pmPrjId;
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         PrjProPlanInfo planInfo = new PrjProPlanInfo();
-        Map<String, Object> proMap=null;
+        Map<String, Object> proMap = null;
         try {
             proMap = jdbcTemplate.queryForMap("select * from PM_PRO_PLAN where PM_PRJ_ID=?", pmPrjId);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new BaseException("无数据！");
         }
 
-        if(proMap != null){
-             planInfo = this.covertPlanInfo(proMap, jdbcTemplate);
+        if (proMap != null) {
+            planInfo = this.covertPlanInfo(proMap, jdbcTemplate);
 
             List<Map<String, Object>> allList = jdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
                     "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
@@ -253,22 +255,22 @@ public class ProPlanExt {
     private PrjProPlanInfo covertPlanInfo(Map<String, Object> dataMap, JdbcTemplate jdbcTemplate) {
         PrjProPlanInfo planInfo = new PrjProPlanInfo();
         planInfo.id = String.valueOf(dataMap.get("ID"));
-        planInfo.code = String.valueOf(dataMap.get("CODE"));
-        planInfo.name = String.valueOf(dataMap.get("NAME"));
-        planInfo.remark = String.valueOf(dataMap.get("REMARK"));
-        planInfo.planStartDate = String.valueOf(dataMap.get("PLAN_START_DATE"));
-        planInfo.planComplDate = String.valueOf(dataMap.get("PLAN_COMPL_DATE"));
-        planInfo.planTotalDays = Integer.parseInt(String.valueOf(dataMap.get("PLAN_TOTAL_DAYS")));
-        planInfo.planCarryDays = Integer.parseInt(String.valueOf(dataMap.get("PLAN_CARRY_DAYS")));
-        planInfo.planCurrentProPercent = Double.parseDouble(String.valueOf(dataMap.get("PLAN_CURRENT_PRO_PERCENT")));
-        planInfo.actualStartDate = String.valueOf(dataMap.get("ACTUAL_START_DATE"));
-        planInfo.actualComplDate = String.valueOf(dataMap.get("ACTUAL_COMPL_DATE"));
-        planInfo.actualTotalDays = Integer.parseInt(String.valueOf(dataMap.get("ACTUAL_TOTAL_DAYS")));
-        planInfo.actualCarryDays = Integer.parseInt(String.valueOf(dataMap.get("ACTUAL_CARRY_DAYS")));
-        planInfo.actualCurrentProPercent = Double.parseDouble(String.valueOf(dataMap.get("ACTUAL_CURRENT_PRO_PERCENT")));
+        planInfo.code = JdbcMapUtil.getString(dataMap, "CODE");
+        planInfo.name = JdbcMapUtil.getString(dataMap, "NAME");
+        planInfo.remark = JdbcMapUtil.getString(dataMap, "REMARK");
+        planInfo.planStartDate = JdbcMapUtil.getString(dataMap, "PLAN_START_DATE");
+        planInfo.planComplDate = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
+        planInfo.planTotalDays = JdbcMapUtil.getInt(dataMap, ("PLAN_TOTAL_DAYS"));
+        planInfo.planCarryDays = JdbcMapUtil.getInt(dataMap, "PLAN_CARRY_DAYS");
+        planInfo.planCurrentProPercent = JdbcMapUtil.getDouble(dataMap, "PLAN_CURRENT_PRO_PERCENT");
+        planInfo.actualStartDate = JdbcMapUtil.getString(dataMap, "ACTUAL_START_DATE");
+        planInfo.actualComplDate = JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE");
+        planInfo.actualTotalDays = JdbcMapUtil.getInt(dataMap, "ACTUAL_TOTAL_DAYS");
+        planInfo.actualCarryDays = JdbcMapUtil.getInt(dataMap, "ACTUAL_CARRY_DAYS");
+        planInfo.actualCurrentProPercent = JdbcMapUtil.getDouble(dataMap, "ACTUAL_CURRENT_PRO_PERCENT");
         String sql = "select * from gr_set_value where id=?";
         if (!Objects.isNull(dataMap.get("PROGRESS_STATUS_ID"))) {
-            Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_STATUS_ID")));
+            Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(dataMap, "PROGRESS_STATUS_ID"));
             IdCodeName idCodeName = new IdCodeName();
             idCodeName.id = String.valueOf(statusObj.get("ID"));
             idCodeName.code = String.valueOf(statusObj.get("CODE"));
@@ -276,7 +278,7 @@ public class ProPlanExt {
             planInfo.progressStatus = idCodeName;
         }
         if (!Objects.isNull(dataMap.get("PROGRESS_RISK_TYPE_ID"))) {
-            Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_RISK_TYPE_ID")));
+            Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_TYPE_ID"));
             IdCodeName idCodeName = new IdCodeName();
             idCodeName.id = String.valueOf(riskObj.get("ID"));
             idCodeName.code = String.valueOf(riskObj.get("CODE"));
@@ -284,7 +286,7 @@ public class ProPlanExt {
             planInfo.progressRiskType = idCodeName;
         }
 
-        planInfo.progressRiskRemark = String.valueOf(dataMap.get("PROGRESS_RISK_REMARK"));
+        planInfo.progressRiskRemark = JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_REMARK");
         return planInfo;
     }
 
@@ -297,24 +299,24 @@ public class ProPlanExt {
      */
     private PrjProPlanNodeInfo convertPlanInfoNode(Map<String, Object> dataMap, JdbcTemplate jdbcTemplate) {
         PrjProPlanNodeInfo nodeInfo = new PrjProPlanNodeInfo();
-        nodeInfo.id = String.valueOf(dataMap.get("ID"));
-        nodeInfo.pid = String.valueOf(dataMap.get("PM_PRO_PLAN_NODE_PID"));
-        nodeInfo.code = String.valueOf(dataMap.get("CODE"));
-        nodeInfo.name = String.valueOf(dataMap.get("NAME"));
-        nodeInfo.remark = String.valueOf(dataMap.get("REMARK"));
-        nodeInfo.planStartDate = String.valueOf(dataMap.get("PLAN_START_DATE"));
-        nodeInfo.planComplDate = String.valueOf(dataMap.get("PLAN_COMPL_DATE"));
-        nodeInfo.planTotalDays = Integer.parseInt(String.valueOf(dataMap.get("PLAN_TOTAL_DAYS")));
-        nodeInfo.planCarryDays = Integer.parseInt(String.valueOf(dataMap.get("PLAN_CARRY_DAYS")));
-        nodeInfo.planCurrentProPercent = Double.parseDouble(String.valueOf(dataMap.get("PLAN_CURRENT_PRO_PERCENT")));
-        nodeInfo.actualStartDate = String.valueOf(dataMap.get("ACTUAL_START_DATE"));
-        nodeInfo.actualComplDate = String.valueOf(dataMap.get("ACTUAL_COMPL_DATE"));
-        nodeInfo.actualTotalDays = Integer.parseInt(String.valueOf(dataMap.get("ACTUAL_TOTAL_DAYS")));
-        nodeInfo.actualCarryDays = Integer.parseInt(String.valueOf(dataMap.get("ACTUAL_CARRY_DAYS")));
-        nodeInfo.actualCurrentProPercent = Double.parseDouble(String.valueOf(dataMap.get("ACTUAL_CURRENT_PRO_PERCENT")));
+        nodeInfo.id = JdbcMapUtil.getString(dataMap, "ID");
+        nodeInfo.pid = JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_NODE_PID");
+        nodeInfo.code = JdbcMapUtil.getString(dataMap, "CODE");
+        nodeInfo.name = JdbcMapUtil.getString(dataMap, "NAME");
+        nodeInfo.remark = JdbcMapUtil.getString(dataMap, "REMARK");
+        nodeInfo.planStartDate = JdbcMapUtil.getString(dataMap, "PLAN_START_DATE");
+        nodeInfo.planComplDate = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
+        nodeInfo.planTotalDays = JdbcMapUtil.getInt(dataMap, "PLAN_TOTAL_DAYS");
+        nodeInfo.planCarryDays = JdbcMapUtil.getInt(dataMap, "PLAN_CARRY_DAYS");
+        nodeInfo.planCurrentProPercent = JdbcMapUtil.getDouble(dataMap, "PLAN_CURRENT_PRO_PERCENT");
+        nodeInfo.actualStartDate = JdbcMapUtil.getString(dataMap, "ACTUAL_START_DATE");
+        nodeInfo.actualComplDate = JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE");
+        nodeInfo.actualTotalDays = JdbcMapUtil.getInt(dataMap, "ACTUAL_TOTAL_DAYS");
+        nodeInfo.actualCarryDays = JdbcMapUtil.getInt(dataMap, "ACTUAL_CARRY_DAYS");
+        nodeInfo.actualCurrentProPercent = JdbcMapUtil.getDouble(dataMap, "ACTUAL_CURRENT_PRO_PERCENT");
         String sql = "select * from gr_set_value where id=?";
         if (!Objects.isNull(dataMap.get("PROGRESS_STATUS_ID"))) {
-            Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_STATUS_ID")));
+            Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(dataMap, "PROGRESS_STATUS_ID"));
             IdCodeName idCodeName = new IdCodeName();
             idCodeName.id = String.valueOf(statusObj.get("ID"));
             idCodeName.code = String.valueOf(statusObj.get("CODE"));
@@ -322,16 +324,16 @@ public class ProPlanExt {
             nodeInfo.progressStatus = idCodeName;
         }
         if (!Objects.isNull(dataMap.get("PROGRESS_RISK_TYPE_ID"))) {
-            Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, String.valueOf(dataMap.get("PROGRESS_RISK_TYPE_ID")));
+            Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_TYPE_ID"));
             IdCodeName idCodeName = new IdCodeName();
             idCodeName.id = String.valueOf(riskObj.get("ID"));
             idCodeName.code = String.valueOf(riskObj.get("CODE"));
             idCodeName.name = String.valueOf(riskObj.get("NAME"));
             nodeInfo.progressRiskType = idCodeName;
         }
-        nodeInfo.progressRiskRemark = String.valueOf(dataMap.get("PROGRESS_RISK_REMARK"));
+        nodeInfo.progressRiskRemark = JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_REMARK");
         if (!Objects.isNull(dataMap.get("CHIEF_DEPT_ID"))) {
-            Map<String, Object> deptObj = jdbcTemplate.queryForMap("select * from hr_dept where id =?", String.valueOf(dataMap.get("CHIEF_DEPT_ID")));
+            Map<String, Object> deptObj = jdbcTemplate.queryForMap("select * from hr_dept where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_DEPT_ID"));
             IdCodeName idCodeName = new IdCodeName();
             idCodeName.id = String.valueOf(deptObj.get("ID"));
             idCodeName.code = String.valueOf(deptObj.get("CODE"));
@@ -340,14 +342,14 @@ public class ProPlanExt {
         }
 
         if (!Objects.isNull(dataMap.get("CHIEF_USER_ID"))) {
-            Map<String, Object> userObj = jdbcTemplate.queryForMap("select * from ad_user where id =?", String.valueOf(dataMap.get("CHIEF_USER_ID")));
+            Map<String, Object> userObj = jdbcTemplate.queryForMap("select * from ad_user where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_USER_ID"));
             IdCodeName idCodeName = new IdCodeName();
             idCodeName.id = String.valueOf(userObj.get("ID"));
             idCodeName.code = String.valueOf(userObj.get("CODE"));
             idCodeName.name = String.valueOf(userObj.get("NAME"));
             nodeInfo.chiefUser = idCodeName;
         }
-        nodeInfo.showInPrjOverview = String.valueOf(dataMap.get("SHOW_IN_PRJ_OVERVIEW"));
+        nodeInfo.showInPrjOverview = JdbcMapUtil.getString(dataMap, "SHOW_IN_PRJ_OVERVIEW");
         return nodeInfo;
     }
 
