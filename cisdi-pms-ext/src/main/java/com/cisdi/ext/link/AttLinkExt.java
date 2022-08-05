@@ -9,7 +9,6 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +37,11 @@ public class AttLinkExt {
 
         String attCode = param.attCode;
         String attValue = param.attValue;
+        String sevId = param.sevId;
+
+        // 获取实体代码（表名）：
+        String entCode = jdbcTemplate.queryForMap("select e.code ent_code from ad_single_ent_view sev join ad_ent e on sev.AD_ENT_ID = e.ID and sev.id=?", sevId).get("ent_code").toString();
+
         if ("PROJECT_TYPE_ID".equals(attCode)) {
             AttLinkResult attLinkResult = new AttLinkResult();
             attLinkResult.attMap = new HashMap<>();
@@ -102,21 +106,21 @@ public class AttLinkExt {
                     "FROM PM_PRJ_INVEST2 a " +
                     "LEFT JOIN wf_process_instance b on b.id = a.LK_WF_INST_ID " +
                     "WHERE a.PM_PRJ_ID = ? " +
-                    "ORDER BY b.CRT_DT desc LIMIT 1 ) b ORDER BY id desc", attValue,attValue);
+                    "ORDER BY b.CRT_DT desc LIMIT 1 ) b ORDER BY id desc", attValue, attValue);
 
             if (CollectionUtils.isEmpty(list)) {
                 throw new BaseException("项目的相关属性不完整！");
             }
 
             Map row = list.get(0);
-            if (!CollectionUtils.isEmpty(list2)){
+            if (!CollectionUtils.isEmpty(list2)) {
                 String date0 = "";
                 String date1 = "";
-                if (list2.size() == 2){
+                if (list2.size() == 2) {
                     date0 = list2.get(0).get("END_DATETIME").toString();
                     date1 = list2.get(1).get("END_DATETIME").toString();
-                    if ("0".equals(date0) || "0".equals(date1)){
-                        if ("0".equals(date0)){
+                    if ("0".equals(date0) || "0".equals(date1)) {
+                        if ("0".equals(date0)) {
                             attLinkResult = getResult(list2.get(1));
                         } else {
                             attLinkResult = getResult(list2.get(0));
@@ -124,7 +128,7 @@ public class AttLinkExt {
                     }
                 } else {
                     date0 = list2.get(0).get("END_DATETIME").toString();
-                    if (!"0".equals(date0)){
+                    if (!"0".equals(date0)) {
                         attLinkResult = getResult(list2.get(0));
                     }
                 }
@@ -330,12 +334,12 @@ public class AttLinkExt {
             }
 
             return attLinkResult;
-        } else if("BIDDING_NAME_ID".equals(attCode)){
+        } else if ("BIDDING_NAME_ID".equals(attCode)) {
             AttLinkResult attLinkResult = new AttLinkResult();
             attLinkResult.attMap = new HashMap<>();
             //根据id查询招投标信息
-            List<Map<String,Object>> list = jdbcTemplate.queryForList("SELECT a.PMS_RELEASE_WAY_ID,a.BID_CTL_PRICE_LAUNCH,a.APPROVE_PURCHASE_TYPE,a.WIN_BID_UNIT_TXT,a.TENDER_OFFER,a.CONTACT_MOBILE_WIN,a.CONTACT_NAME_RECORD,a.BID_USER_ID,a.STATUS,a.BID_UNIT, ifnull((SELECT END_DATETIME FROM wf_process_instance WHERE id = a.LK_WF_INST_ID ),0) as END_DATETIME, a.SERVICE_DAYS FROM po_public_bid_req a WHERE id = ?",attValue);
-            if (CollectionUtils.isEmpty(list)){
+            List<Map<String, Object>> list = jdbcTemplate.queryForList("SELECT a.PMS_RELEASE_WAY_ID,a.BID_CTL_PRICE_LAUNCH,a.APPROVE_PURCHASE_TYPE,a.WIN_BID_UNIT_TXT,a.TENDER_OFFER,a.CONTACT_MOBILE_WIN,a.CONTACT_NAME_RECORD,a.BID_USER_ID,a.STATUS,a.BID_UNIT, ifnull((SELECT END_DATETIME FROM wf_process_instance WHERE id = a.LK_WF_INST_ID ),0) as END_DATETIME, a.SERVICE_DAYS FROM po_public_bid_req a WHERE id = ?", attValue);
+            if (CollectionUtils.isEmpty(list)) {
                 throw new BaseException("采购流程相关属性不完善！");
             }
             Map row = list.get(0);
@@ -343,8 +347,8 @@ public class AttLinkExt {
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"PMS_RELEASE_WAY_ID");
-                typeValueText.text = JdbcMapUtil.getString(row,"PMS_RELEASE_WAY_ID");
+                typeValueText.value = JdbcMapUtil.getString(row, "PMS_RELEASE_WAY_ID");
+                typeValueText.text = JdbcMapUtil.getString(row, "PMS_RELEASE_WAY_ID");
 
                 attLinkResult.attMap.put("PMS_RELEASE_WAY_ID", typeValueText);
             }
@@ -352,8 +356,8 @@ public class AttLinkExt {
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.DOUBLE;
-                typeValueText.value = JdbcMapUtil.getString(row,"BID_CTL_PRICE_LAUNCH");
-                typeValueText.text = JdbcMapUtil.getString(row,"BID_CTL_PRICE_LAUNCH");
+                typeValueText.value = JdbcMapUtil.getString(row, "BID_CTL_PRICE_LAUNCH");
+                typeValueText.text = JdbcMapUtil.getString(row, "BID_CTL_PRICE_LAUNCH");
 
                 attLinkResult.attMap.put("BID_CTL_PRICE_LAUNCH", typeValueText);
             }
@@ -361,8 +365,8 @@ public class AttLinkExt {
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"APPROVE_PURCHASE_TYPE");
-                typeValueText.text = JdbcMapUtil.getString(row,"APPROVE_PURCHASE_TYPE");
+                typeValueText.value = JdbcMapUtil.getString(row, "APPROVE_PURCHASE_TYPE");
+                typeValueText.text = JdbcMapUtil.getString(row, "APPROVE_PURCHASE_TYPE");
 
                 attLinkResult.attMap.put("PURCHASE_TYPE", typeValueText);
             }
@@ -370,16 +374,16 @@ public class AttLinkExt {
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"WIN_BID_UNIT_TXT");
-                typeValueText.text = JdbcMapUtil.getString(row,"WIN_BID_UNIT_TXT");
+                typeValueText.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
+                typeValueText.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
 
                 attLinkResult.attMap.put("AUTHOR_UNIT", typeValueText);
             }
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"WIN_BID_UNIT_TXT");
-                typeValueText.text = JdbcMapUtil.getString(row,"WIN_BID_UNIT_TXT");
+                typeValueText.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
+                typeValueText.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
 
                 attLinkResult.attMap.put("WIN_BID_UNIT", typeValueText);
             }
@@ -387,16 +391,16 @@ public class AttLinkExt {
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"TENDER_OFFER");
-                typeValueText.text = JdbcMapUtil.getString(row,"TENDER_OFFER");
+                typeValueText.value = JdbcMapUtil.getString(row, "TENDER_OFFER");
+                typeValueText.text = JdbcMapUtil.getString(row, "TENDER_OFFER");
 
                 attLinkResult.attMap.put("ENTRUSTING_UNIT", typeValueText);
             }
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"TENDER_OFFER");
-                typeValueText.text = JdbcMapUtil.getString(row,"TENDER_OFFER");
+                typeValueText.value = JdbcMapUtil.getString(row, "TENDER_OFFER");
+                typeValueText.text = JdbcMapUtil.getString(row, "TENDER_OFFER");
 
                 attLinkResult.attMap.put("WINNING_BIDS_AMOUNT", typeValueText);
             }
@@ -404,8 +408,8 @@ public class AttLinkExt {
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.DATE;
-                typeValueText.value = JdbcMapUtil.getString(row,"END_DATETIME");
-                typeValueText.text = JdbcMapUtil.getString(row,"END_DATETIME");
+                typeValueText.value = JdbcMapUtil.getString(row, "END_DATETIME");
+                typeValueText.text = JdbcMapUtil.getString(row, "END_DATETIME");
 
                 attLinkResult.attMap.put("IN_DATE", typeValueText);
             }
@@ -413,8 +417,8 @@ public class AttLinkExt {
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"BID_UNIT");
-                typeValueText.text = JdbcMapUtil.getString(row,"BID_UNIT");
+                typeValueText.value = JdbcMapUtil.getString(row, "BID_UNIT");
+                typeValueText.text = JdbcMapUtil.getString(row, "BID_UNIT");
 
                 attLinkResult.attMap.put("ENTRUSTING_UNIT", typeValueText);
             }
@@ -422,8 +426,8 @@ public class AttLinkExt {
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"STATUS");
-                typeValueText.text = JdbcMapUtil.getString(row,"STATUS");
+                typeValueText.value = JdbcMapUtil.getString(row, "STATUS");
+                typeValueText.text = JdbcMapUtil.getString(row, "STATUS");
 
                 attLinkResult.attMap.put("APPROVAL_STATUS", typeValueText);
             }
@@ -431,8 +435,8 @@ public class AttLinkExt {
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"BID_USER_ID");
-                typeValueText.text = JdbcMapUtil.getString(row,"BID_USER_ID");
+                typeValueText.value = JdbcMapUtil.getString(row, "BID_USER_ID");
+                typeValueText.text = JdbcMapUtil.getString(row, "BID_USER_ID");
 
                 attLinkResult.attMap.put("PROCURE_USER_ID", typeValueText);
             }
@@ -440,8 +444,8 @@ public class AttLinkExt {
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"CONTACT_NAME_RECORD");
-                typeValueText.text = JdbcMapUtil.getString(row,"CONTACT_NAME_RECORD");
+                typeValueText.value = JdbcMapUtil.getString(row, "CONTACT_NAME_RECORD");
+                typeValueText.text = JdbcMapUtil.getString(row, "CONTACT_NAME_RECORD");
 
                 attLinkResult.attMap.put("OTHER_RESPONSOR", typeValueText);
             }
@@ -449,8 +453,8 @@ public class AttLinkExt {
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"CONTACT_MOBILE_WIN");
-                typeValueText.text = JdbcMapUtil.getString(row,"CONTACT_MOBILE_WIN");
+                typeValueText.value = JdbcMapUtil.getString(row, "CONTACT_MOBILE_WIN");
+                typeValueText.text = JdbcMapUtil.getString(row, "CONTACT_MOBILE_WIN");
 
                 attLinkResult.attMap.put("OTHER_CONTACT_PHONE", typeValueText);
             }
@@ -458,13 +462,13 @@ public class AttLinkExt {
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"SERVICE_DAYS");
-                typeValueText.text = JdbcMapUtil.getString(row,"SERVICE_DAYS");
+                typeValueText.value = JdbcMapUtil.getString(row, "SERVICE_DAYS");
+                typeValueText.text = JdbcMapUtil.getString(row, "SERVICE_DAYS");
 
                 attLinkResult.attMap.put("SERVICE_DAYS", typeValueText);
             }
             return attLinkResult;
-        }else {
+        } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
     }
@@ -477,8 +481,8 @@ public class AttLinkExt {
         {
             TypeValueText typeValueText = new TypeValueText();
             typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(stringObjectMap,"PRJ_TOTAL_INVEST");
-            typeValueText.text = JdbcMapUtil.getString(stringObjectMap,"PRJ_TOTAL_INVEST");
+            typeValueText.value = JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST");
+            typeValueText.text = JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST");
 
             attLinkResult.attMap.put("PRJ_TOTAL_INVEST", typeValueText);
         }
@@ -486,8 +490,8 @@ public class AttLinkExt {
         {
             TypeValueText typeValueText = new TypeValueText();
             typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(stringObjectMap,"PROJECT_AMT");
-            typeValueText.text = JdbcMapUtil.getString(stringObjectMap,"PROJECT_AMT");
+            typeValueText.value = JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT");
+            typeValueText.text = JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT");
 
             attLinkResult.attMap.put("PROJECT_AMT", typeValueText);
         }
@@ -495,8 +499,8 @@ public class AttLinkExt {
         {
             TypeValueText typeValueText = new TypeValueText();
             typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(stringObjectMap,"PROJECT_OTHER_AMT");
-            typeValueText.text = JdbcMapUtil.getString(stringObjectMap,"PROJECT_OTHER_AMT");
+            typeValueText.value = JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT");
+            typeValueText.text = JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT");
 
             attLinkResult.attMap.put("PROJECT_OTHER_AMT", typeValueText);
         }
@@ -504,8 +508,8 @@ public class AttLinkExt {
         {
             TypeValueText typeValueText = new TypeValueText();
             typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(stringObjectMap,"PREPARE_AMT");
-            typeValueText.text = JdbcMapUtil.getString(stringObjectMap,"PREPARE_AMT");
+            typeValueText.value = JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT");
+            typeValueText.text = JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT");
 
             attLinkResult.attMap.put("PREPARE_AMT", typeValueText);
         }
@@ -513,14 +517,13 @@ public class AttLinkExt {
         {
             TypeValueText typeValueText = new TypeValueText();
             typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(stringObjectMap,"CONSTRUCT_PERIOD_INTEREST");
-            typeValueText.text = JdbcMapUtil.getString(stringObjectMap,"CONSTRUCT_PERIOD_INTEREST");
+            typeValueText.value = JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST");
+            typeValueText.text = JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST");
 
             attLinkResult.attMap.put("CONSTRUCT_PERIOD_INTEREST", typeValueText);
         }
         return attLinkResult;
     }
-
 
 
 }
