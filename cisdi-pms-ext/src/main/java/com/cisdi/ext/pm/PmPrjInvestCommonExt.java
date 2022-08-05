@@ -33,5 +33,13 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("CON_SCALE_QTY");
         entityRecord.extraEditableAttCodeList.add("CON_SCALE_QTY2");
         entityRecord.extraEditableAttCodeList.add("PRJ_SITUATION");
+        entityRecord.extraEditableAttCodeList.add("APPROVAL_STATUS");
+        entityRecord.extraEditableAttCodeList.add("ENTRUSTING_UNIT_TEXT");
+        entityRecord.extraEditableAttCodeList.add("PROCURE_USER_ID");
+        entityRecord.extraEditableAttCodeList.add("AUTHOR_UNIT_TEXT");
+        entityRecord.extraEditableAttCodeList.add("OTHER_RESPONSOR");
+        entityRecord.extraEditableAttCodeList.add("IN_DATE");
+        entityRecord.extraEditableAttCodeList.add("SERVICE_DAYS");
+        entityRecord.extraEditableAttCodeList.add("OTHER_CONTACT_PHONE");
     }
 }
