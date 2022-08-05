@@ -46,4 +46,12 @@ public class WfPmInvest3Ext {
 
         jdbcTemplate.update("update PM_PRJ_INVEST3 t set t.COST_SECOND_REVIEW_COMMENT=? where t.id=?", designComment, csCommId);
     }
+
+
+    /**
+     * 插入或更新投资估算。
+     */
+    public void insertOrUpdateInvestEst() {
+
+    }
 }

@@ -45,4 +45,11 @@ public class WfPmInvest1Ext {
 
         jdbcTemplate.update("update " + entCode + " t set t.DESIGN_COMMENT=?,t.COST_COMMENT=?,t.EARLY_COMMENT=? where t.id=?", designComment, costComment, earlyChiefComment, csCommId);
     }
+
+    /**
+     * 插入或更新投资估算。
+     */
+    public void insertOrUpdateInvestEst() {
+
+    }
 }
