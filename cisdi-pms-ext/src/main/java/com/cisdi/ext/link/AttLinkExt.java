@@ -310,7 +310,7 @@ public class AttLinkExt {
                 attLinkResult.attMap.put("EVALUATION_APPROVE_FUND", typeValueText);
             }
             return attLinkResult;
-        } else if ("PMS_RELEASE_WAY_ID".equals(attCode) || "GUARANTEE_LETTER_TYPE_ID".equals(attCode) || "CONTRACT_CATEGORY_ID".equals(attCode)) {
+        } else if ("PMS_RELEASE_WAY_ID".equals(attCode) || "GUARANTEE_LETTER_TYPE_ID".equals(attCode) || "CONTRACT_CATEGORY_ID".equals(attCode) || "PRJ_MANAGE_MODE_ID".equals(attCode)) {
             // 1.PMS_RELEASE_WAY_ID 招标类别下拉框
             // 2.GUARANTEE_LETTER_TYPE_ID 保函类别下拉框
             // 3.PMS_RELEASE_WAY_ID 项目类别下拉框
