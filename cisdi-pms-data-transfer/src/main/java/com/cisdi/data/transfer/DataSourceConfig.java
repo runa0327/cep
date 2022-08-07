@@ -53,4 +53,18 @@ public class DataSourceConfig {
         return new JdbcTemplate(dataSource);
     }
 
+    @Bean(name = "prodDataSource")
+    @Qualifier("prodDataSource")
+    @Primary
+    @ConfigurationProperties(prefix = "spring.datasource.prod")
+    public DataSource prodDataSource() {
+        DataSource dataSource = DataSourceBuilder.create().build();
+        return dataSource;
+    }
+
+    @Bean(name = "prodJdbcTemplate")
+    public JdbcTemplate prodJdbcTemplate(@Qualifier("prodDataSource") DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
+    }
+
 }
