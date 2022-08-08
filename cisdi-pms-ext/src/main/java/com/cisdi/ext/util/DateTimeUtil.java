@@ -7,7 +7,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  *
@@ -170,6 +172,20 @@ public class DateTimeUtil {
     public static Date localDateTimeToDate(LocalDateTime localDateTime) {
         Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
         return date;
+    }
+
+    /**
+     * 日期加N天
+     *
+     * @param paramDate
+     * @param days
+     * @return
+     */
+    public static Date addDays(Date paramDate, int days) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(paramDate);
+        c.add(Calendar.DAY_OF_MONTH, days);
+        return c.getTime();
     }
 
 }
