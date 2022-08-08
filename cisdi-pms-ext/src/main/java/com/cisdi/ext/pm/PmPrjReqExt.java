@@ -48,6 +48,7 @@ public class PmPrjReqExt {
             }
         }
 
+
         Double prj_total_invest = JdbcMapUtil.getDouble(valueMap, "PRJ_TOTAL_INVEST");
         AmtUtil.checkAmt(sbErr, prj_total_invest, "总投资");
 
@@ -283,6 +284,43 @@ public class PmPrjReqExt {
         double bidCtlPriceLaunch = Double.parseDouble(entityRecord.valueMap.get("BID_CTL_PRICE_LAUNCH").toString());
         if (Double.compare(bidCtlPriceLaunchEcho,bidCtlPriceLaunch) == 1){
             throw new BaseException("控制价不应大于原控制价");
+        }
+    }
+
+    /**
+     * 项目类型数量填写控制
+     */
+    public void validateProjectTypeBeforeSave() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            validateProjectTypeBeforeSave(entityRecord);
+        }
+    }
+
+    private void validateProjectTypeBeforeSave(EntityRecord entityRecord) {
+        StringBuilder sbErr = new StringBuilder();
+        if (entityRecord.extraEditableAttCodeList == null) {
+            entityRecord.extraEditableAttCodeList = new ArrayList<>();
+        }
+        entityRecord.extraEditableAttCodeList.add("CON_SCALE_TYPE_ID");
+        entityRecord.extraEditableAttCodeList.add("CON_SCALE_UOM_ID");
+
+
+        Map<String, Object> valueMap = entityRecord.valueMap;
+        String con_scale_type_id = JdbcMapUtil.getString(valueMap, "CON_SCALE_TYPE_ID");
+        Double con_scale_qty2 = JdbcMapUtil.getDouble(valueMap, "CON_SCALE_QTY2");
+        boolean need2 = "99799190825087119".equals(con_scale_type_id);
+        if (need2) {
+            if (con_scale_qty2 == null || con_scale_qty2 <= 0d) {
+                sbErr.append("建设规模数量2请填写正确宽度！");
+            }
+        } else {
+            if (con_scale_qty2 != null && con_scale_qty2 != 0d) {
+                sbErr.append("建设规模数量2请不要填写！");
+            }
+        }
+        if (sbErr.length() > 0){
+            throw new BaseException(sbErr.toString());
         }
     }
 }
