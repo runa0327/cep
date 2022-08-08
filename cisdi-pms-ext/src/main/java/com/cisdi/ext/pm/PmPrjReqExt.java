@@ -269,5 +269,21 @@ public class PmPrjReqExt {
                 "CONTACT_MOBILE_RECORD =?," +
                 "CONTACT_IDCARD_RECORD =? where id = ?",winBidUnitTxt,tenderOffer,contactName,contactMobileWin,idcardWin,csCommId);
     }
+
+    /**
+     * 采购公开招标
+     * 改动后的回显招标控制价不能大于原招标控制价
+     */
+    public void compareCtlPrice(){
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //拿到两个控制价
+        double bidCtlPriceLaunchEcho =
+                Double.parseDouble(entityRecord.valueMap.get("BID_CTL_PRICE_LAUNCH_ECHO").toString());
+        double bidCtlPriceLaunch = Double.parseDouble(entityRecord.valueMap.get("BID_CTL_PRICE_LAUNCH").toString());
+        if (Double.compare(bidCtlPriceLaunchEcho,bidCtlPriceLaunch) == 1){
+            throw new BaseException("控制价不应大于原控制价");
+        }
+    }
 }
 
