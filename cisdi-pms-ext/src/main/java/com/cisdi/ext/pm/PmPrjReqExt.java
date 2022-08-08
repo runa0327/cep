@@ -107,7 +107,15 @@ public class PmPrjReqExt {
 
         // 新建项目：
         String newPrjId = Crud.from("PM_PRJ").insertData();
-        Integer exec = Crud.from("PM_PRJ").where().eq("ID", newPrjId).update().set("PM_PRJ_REQ_ID", pm_prj_req.get("id")).set("code", pm_prj_req.get("code")).set("name", pm_prj_req.get("name")).set("CUSTOMER_UNIT", pm_prj_req.get("CUSTOMER_UNIT")).set("PRJ_MANAGE_MODE_ID", pm_prj_req.get("PRJ_MANAGE_MODE_ID")).set("BASE_LOCATION_ID", pm_prj_req.get("BASE_LOCATION_ID")).set("FLOOR_AREA", pm_prj_req.get("FLOOR_AREA")).set("PROJECT_TYPE_ID", pm_prj_req.get("PROJECT_TYPE_ID")).set("CON_SCALE_TYPE_ID", pm_prj_req.get("CON_SCALE_TYPE_ID")).set("CON_SCALE_QTY", pm_prj_req.get("CON_SCALE_QTY")).set("CON_SCALE_QTY2", pm_prj_req.get("CON_SCALE_QTY2")).set("CON_SCALE_UOM_ID", pm_prj_req.get("CON_SCALE_UOM_ID")).set("PRJ_SITUATION", pm_prj_req.get("PRJ_SITUATION")).set("INVESTMENT_SOURCE_ID", pm_prj_req.get("INVESTMENT_SOURCE_ID")).set("PRJ_EARLY_USER_ID", pm_prj_req.get("PRJ_EARLY_USER_ID")).set("PRJ_DESIGN_USER_ID", pm_prj_req.get("PRJ_DESIGN_USER_ID")).set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID")).exec();
+        Integer exec = Crud.from("PM_PRJ").where().eq("ID", newPrjId).update().set("PM_PRJ_REQ_ID", pm_prj_req.get(
+                "id")).set("code", pm_prj_req.get("code")).set("name", pm_prj_req.get("name")).set("CUSTOMER_UNIT",
+                pm_prj_req.get("CUSTOMER_UNIT")).set("PRJ_MANAGE_MODE_ID", pm_prj_req.get("PRJ_MANAGE_MODE_ID")).set(
+                        "BASE_LOCATION_ID", pm_prj_req.get("BASE_LOCATION_ID")).set("FLOOR_AREA", pm_prj_req.get(
+                                "FLOOR_AREA")).set("PROJECT_TYPE_ID", pm_prj_req.get("PROJECT_TYPE_ID")).set(
+                                        "CON_SCALE_TYPE_ID", pm_prj_req.get("CON_SCALE_TYPE_ID")).set("CON_SCALE_QTY"
+                , pm_prj_req.get("CON_SCALE_QTY")).set("CON_SCALE_QTY2", pm_prj_req.get("CON_SCALE_QTY2")).set(
+                        "CON_SCALE_UOM_ID", pm_prj_req.get("CON_SCALE_UOM_ID")).set("PRJ_SITUATION", pm_prj_req.get(
+                                "PRJ_SITUATION")).set("INVESTMENT_SOURCE_ID", pm_prj_req.get("INVESTMENT_SOURCE_ID")).set("PRJ_EARLY_USER_ID", pm_prj_req.get("PRJ_EARLY_USER_ID")).set("PRJ_DESIGN_USER_ID", pm_prj_req.get("PRJ_DESIGN_USER_ID")).set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID")).exec();
         log.info("已更新：{}", exec);
 
         // 将项目ID设置到立项申请上：
@@ -115,11 +123,14 @@ public class PmPrjReqExt {
         log.info("已更新：{}", exec1);
 
         // 立项匡算的集合值：
-        Map<String, Object> grSetValueInvest0 = Crud.from("GR_SET_VALUE").where().eq("CODE", "invest0").select().execForMap();
+        Map<String, Object> grSetValueInvest0 =
+                Crud.from("GR_SET_VALUE").where().eq("CODE", "invest0").select().execForMap();
 
         // 新建项目投资测算：
 //        String newInvestEtsId = Crud.from("PM_INVEST_EST").insertData();
-//        Integer exec2 = Crud.from("PM_INVEST_EST").where().eq("ID", newInvestEtsId).update().set("IS_TEMPLATE", 0).set("PM_PRJ_ID", newPrjId).set("INVEST_EST_TYPE_ID", grSetValueInvest0.get("ID")).set("PRJ_TOTAL_INVEST", pm_prj_req.get("PRJ_TOTAL_INVEST")).exec();
+//        Integer exec2 = Crud.from("PM_INVEST_EST").where().eq("ID", newInvestEtsId).update().set("IS_TEMPLATE", 0)
+//        .set("PM_PRJ_ID", newPrjId).set("INVEST_EST_TYPE_ID", grSetValueInvest0.get("ID")).set("PRJ_TOTAL_INVEST",
+//        pm_prj_req.get("PRJ_TOTAL_INVEST")).exec();
 //        log.info("已更新：{}", exec2);
 //
 //        // 新建项目投资测算明细：
@@ -130,7 +141,7 @@ public class PmPrjReqExt {
 //        createInvestEstDtl(pm_prj_req, newInvestEtsId, "PROJECT_OTHER_AMT");
 //        createInvestEstDtl(pm_prj_req, newInvestEtsId, "LAND_AMT");
 //        createInvestEstDtl(pm_prj_req, newInvestEtsId, "PREPARE_AMT");
-        WfPmInvestUtil.calculateData(csCommId,"PM_PRJ_REQ",newPrjId);
+        WfPmInvestUtil.calculateData(csCommId, "PM_PRJ_REQ", newPrjId);
     }
 
     private void createInvestEstDtl(Map<String, Object> pm_prj_req, String newInvestEtsId, String colName) {
@@ -138,14 +149,16 @@ public class PmPrjReqExt {
         Object amt = pm_prj_req.get(colName);
 
         // 获取费用类型ID：
-        Object expTypeId = Crud.from("PM_EXP_TYPE").where().eq("code", colName).select().specifyCols("ID").execForValue();
+        Object expTypeId =
+                Crud.from("PM_EXP_TYPE").where().eq("code", colName).select().specifyCols("ID").execForValue();
         if (SharedUtil.isEmptyObject(expTypeId)) {
             throw new BaseException("没有" + colName + "对应的费用类型！");
         }
 
         // 新建项目投资测算明细：
         String newInvestEstDtlId = Crud.from("PM_INVEST_EST_DTL").insertData();
-        Integer exec3 = Crud.from("PM_INVEST_EST_DTL").where().eq("ID", newInvestEstDtlId).update().set("PM_EXP_TYPE_ID", expTypeId).set("AMT", amt).set("PM_INVEST_EST_ID", newInvestEtsId).exec();
+        Integer exec3 = Crud.from("PM_INVEST_EST_DTL").where().eq("ID", newInvestEstDtlId).update().set(
+                "PM_EXP_TYPE_ID", expTypeId).set("AMT", amt).set("PM_INVEST_EST_ID", newInvestEtsId).exec();
         log.info("已更新：{}", exec3);
     }
 
@@ -168,7 +181,7 @@ public class PmPrjReqExt {
         String year = entityRecord.valueMap.get("BUILD_YEARS").toString();
 
         // 修改项目建设年限信息：
-        Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("BUILD_YEARS",year).exec();
+        Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("BUILD_YEARS", year).exec();
         log.info("已更新：{}", exec);
     }
 
@@ -197,15 +210,16 @@ public class PmPrjReqExt {
         String investmentSourceId = entityRecord.valueMap.get("INVESTMENT_SOURCE_ID").toString();
 
         // 修改项目建设年限信息：
-        Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("PRJ_REPLY_DATE",replyDate)
-                .set("PRJ_REPLY_NO",replyNo).set("PRJ_REPLY_FILE",replyFile).set("INVESTMENT_SOURCE_ID",investmentSourceId).exec();
+        Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("PRJ_REPLY_DATE", replyDate)
+                .set("PRJ_REPLY_NO", replyNo).set("PRJ_REPLY_FILE", replyFile).set("INVESTMENT_SOURCE_ID",
+                        investmentSourceId).exec();
         log.info("已更新：{}", exec);
     }
 
     /**
      * 采购公开招标-回显采购方式及招标控制价
      */
-    public void updateBid(){
+    public void updateBid() {
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         String procInstId = ExtJarHelper.procInstId.get();
 
@@ -217,42 +231,44 @@ public class PmPrjReqExt {
         String price = entityRecord.valueMap.get("APPROVE_BID_CTL_PRICE").toString();
 
 
-        jdbcTemplate.update("update PO_PUBLIC_BID_REQ t set t.APPROVE_PURCHASE_TYPE_ECHO = ?,t.BID_CTL_PRICE_LAUNCH_ECHO=? where t.id=?", buyType,price, csCommId);
+        jdbcTemplate.update("update PO_PUBLIC_BID_REQ t set t.APPROVE_PURCHASE_TYPE_ECHO = ?,t" +
+                ".BID_CTL_PRICE_LAUNCH_ECHO=? where t.id=?", buyType, price, csCommId);
     }
 
     /**
      * 采购公开招标-更新招标复检
      */
-    public void updateBidFile(){
+    public void updateBidFile() {
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //该条记录id
         String csCommId = entityRecord.csCommId;
         //文件id
         String fileId = entityRecord.valueMap.get("BID_FILE_GROUP_ID").toString();
-        jdbcTemplate.update("update PO_PUBLIC_BID_REQ set BID_ISSUE_FILE_GROUP_ID = ? where id = ?",fileId,csCommId);
+        jdbcTemplate.update("update PO_PUBLIC_BID_REQ set BID_ISSUE_FILE_GROUP_ID = ? where id = ?", fileId, csCommId);
 
     }
 
     /**
      * 采购公开招标-更新需求发起人
      */
-    public void updatePromoter(){
+    public void updatePromoter() {
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //该条记录id
         String csCommId = entityRecord.csCommId;
         //需求发起人
-        String promoterName = jdbcTemplate.queryForMap("SELECT u.name FROM ad_user u left join po_public_bid_req b on u.id = " +
+        String promoterName = jdbcTemplate.queryForMap("SELECT u.name FROM ad_user u left join po_public_bid_req b on" +
+                " u.id = " +
                 "b.CRT_USER_ID where b.id = ?", csCommId).get("name").toString();
         //更新需求发起人
-        jdbcTemplate.update("update PO_PUBLIC_BID_REQ set DEMAND_PROMOTER = ? where id = ?",promoterName,csCommId);
+        jdbcTemplate.update("update PO_PUBLIC_BID_REQ set DEMAND_PROMOTER = ? where id = ?", promoterName, csCommId);
     }
 
     /**
      * 采购公开招标-更新中标信息
      */
-    public void updateWinUnit(){
+    public void updateWinUnit() {
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //该条记录id
@@ -268,22 +284,29 @@ public class PmPrjReqExt {
                 "TENDER_OFFER_RECORD = ?," +
                 "CONTACT_NAME_RECORD =?," +
                 "CONTACT_MOBILE_RECORD =?," +
-                "CONTACT_IDCARD_RECORD =? where id = ?",winBidUnitTxt,tenderOffer,contactName,contactMobileWin,idcardWin,csCommId);
+                "CONTACT_IDCARD_RECORD =? where id = ?", winBidUnitTxt, tenderOffer, contactName, contactMobileWin,
+                idcardWin, csCommId);
     }
 
     /**
      * 采购公开招标
      * 改动后的回显招标控制价不能大于原招标控制价
      */
-    public void compareCtlPrice(){
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+    public void compareCtlPrice() {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        if (entityRecord.extraEditableAttCodeList == null) {
+            entityRecord.extraEditableAttCodeList = new ArrayList<>();
+        }
+        entityRecord.extraEditableAttCodeList.add("BID_CTL_PRICE_LAUNCH_ECHO");
+        Map<String, Object> valueMap = entityRecord.valueMap;
+
         //拿到两个控制价
-        double bidCtlPriceLaunchEcho =
-                Double.parseDouble(entityRecord.valueMap.get("BID_CTL_PRICE_LAUNCH_ECHO").toString());
-        double bidCtlPriceLaunch = Double.parseDouble(entityRecord.valueMap.get("BID_CTL_PRICE_LAUNCH").toString());
-        if (Double.compare(bidCtlPriceLaunchEcho,bidCtlPriceLaunch) == 1){
-            throw new BaseException("控制价不应大于原控制价");
+        Double bidCtlPriceLaunchEcho = JdbcMapUtil.getDouble(valueMap, "BID_CTL_PRICE_LAUNCH_ECHO");
+        Double bidCtlPriceLaunch = JdbcMapUtil.getDouble(valueMap, "BID_CTL_PRICE_LAUNCH");
+
+        if (bidCtlPriceLaunch != null && bidCtlPriceLaunchEcho != null && Double.compare(bidCtlPriceLaunchEcho,
+                bidCtlPriceLaunch) == 1) {
+            throw new BaseException("招标控制价不应大于核定招标控制价");
         }
     }
 
