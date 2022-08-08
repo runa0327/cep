@@ -12,6 +12,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -188,7 +189,19 @@ public class PmPrjReqExt {
     private void updatePrjReply(EntityRecord entityRecord) {
 
         //获取项目id
-        String projectId = entityRecord.valueMap.get("PM_PRJ_ID").toString();
+//        String projectId = entityRecord.valueMap.get("PM_PRJ_ID").toString();
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        if (projectId == null || projectId.length() == 0){
+            JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+            //流程id
+            String csCommId = entityRecord.csCommId;
+            List<Map<String,Object>> map1 = jdbcTemplate.queryForList("SELECT id FROM pm_prj WHERE PM_PRJ_REQ_ID = ? ORDER BY CRT_DT desc limit 1",csCommId);
+            if (CollectionUtils.isEmpty(map1)){
+                throw new BaseException("项目未创建完成无法进行批复信息同步");
+            } else {
+                projectId = map1.get(0).get("id").toString();
+            }
+        }
 
         //批复日期
         String replyDate = entityRecord.valueMap.get("PRJ_REPLY_DATE").toString();
