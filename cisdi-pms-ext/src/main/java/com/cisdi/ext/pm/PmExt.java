@@ -2,7 +2,7 @@ package com.cisdi.ext.pm;
 
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
-import com.qygly.ext.jar.helper.orm.model.TestStu;
+//import com.qygly.ext.jar.helper.orm.model.TestStu;
 import com.qygly.shared.interaction.EntityRecord;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,11 +22,11 @@ public class PmExt {
     }
 
     private void clonePmPrj(EntityRecord entityRecord) {
-        TestStu testStu = new TestStu();
-        testStu.setId("abc").setName("小王").setHeight(1.68d).setBirthDate(new Date()).setAttachmentFile("gogogogo");
-
-        String s = JsonUtil.toJson(testStu);
-        log.info(s);
+//        TestStu testStu = new TestStu();
+//        testStu.setId("abc").setName("小王").setHeight(1.68d).setBirthDate(new Date()).setAttachmentFile("gogogogo");
+//
+//        String s = JsonUtil.toJson(testStu);
+//        log.info(s);
 //        String csCommId = entityRecord.csCommId;
 //        PmPrj oldPmPrj = PmPrj.selectById(csCommId, Arrays.asList("ID","name","VER"), null);
 //        PmPrj newPmPrj = PmPrj.insertData();

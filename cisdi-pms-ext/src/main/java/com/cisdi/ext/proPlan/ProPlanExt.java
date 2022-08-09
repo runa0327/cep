@@ -214,7 +214,7 @@ public class ProPlanExt {
                 // 最终，返回：
                 Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(planInfo), Map.class);
                 ExtJarHelper.returnValue.set(outputMap);
-            }else{
+            } else {
                 ExtJarHelper.returnValue.set(null);
             }
         } catch (Exception e) {
@@ -259,6 +259,7 @@ public class ProPlanExt {
         planInfo.code = JdbcMapUtil.getString(dataMap, "CODE");
         planInfo.name = JdbcMapUtil.getString(dataMap, "NAME");
         planInfo.remark = JdbcMapUtil.getString(dataMap, "REMARK");
+        planInfo.startDay = JdbcMapUtil.getString(dataMap, "START_DAY");
         planInfo.planStartDate = JdbcMapUtil.getString(dataMap, "PLAN_START_DATE");
         planInfo.planComplDate = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
         planInfo.planTotalDays = JdbcMapUtil.getInt(dataMap, ("PLAN_TOTAL_DAYS"));
@@ -305,6 +306,7 @@ public class ProPlanExt {
         nodeInfo.code = JdbcMapUtil.getString(dataMap, "CODE");
         nodeInfo.name = JdbcMapUtil.getString(dataMap, "NAME");
         nodeInfo.remark = JdbcMapUtil.getString(dataMap, "REMARK");
+        nodeInfo.startDay = JdbcMapUtil.getString(dataMap, "START_DAY");
         nodeInfo.planStartDate = JdbcMapUtil.getString(dataMap, "PLAN_START_DATE");
         nodeInfo.planComplDate = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
         nodeInfo.planTotalDays = JdbcMapUtil.getInt(dataMap, "PLAN_TOTAL_DAYS");
@@ -374,6 +376,11 @@ public class ProPlanExt {
          * 备注
          */
         public String remark;
+
+        /**
+         * 第几天开始
+         */
+        public String startDay;
         /**
          * 预计开始日期
          */
@@ -454,6 +461,10 @@ public class ProPlanExt {
          * 备注
          */
         public String remark;
+        /**
+         * 第几天开始
+         */
+        public String startDay;
         /**
          * 预计开始日期
          */
