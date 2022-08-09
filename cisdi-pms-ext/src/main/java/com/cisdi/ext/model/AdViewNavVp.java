@@ -460,7 +460,7 @@ public class AdViewNavVp {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id);
+        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
     }
 
     /**
