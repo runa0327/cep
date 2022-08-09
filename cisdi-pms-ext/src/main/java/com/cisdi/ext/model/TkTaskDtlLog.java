@@ -1,6 +1,7 @@
 package com.cisdi.ext.model;
 
 import com.qygly.ext.jar.helper.orm.ModelHelper;
+import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
 
@@ -525,7 +526,7 @@ public class TkTaskDtlLog {
     // <editor-fold>
 
     /**
-     * 根据ID更新数据。ID自身不会更新。
+     * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param includeCols 更新时包含的列，空为包含所有。
      * @param excludeCols 更新时排除的列，空为不排除。
@@ -593,7 +594,7 @@ public class TkTaskDtlLog {
     }
 
     /**
-     * 根据ID更新数据。若要更新ID自身，可在keyValueMap里为ID设置新值。
+     * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param id          ID。
      * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
@@ -606,7 +607,7 @@ public class TkTaskDtlLog {
     }
 
     /**
-     * 根据ID列表更新数据。若要更新ID自身，可在keyValueMap里为ID设置新值。
+     * 根据ID列表更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param ids         ID列表。
      * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
@@ -619,7 +620,7 @@ public class TkTaskDtlLog {
     }
 
     /**
-     * 根据Where条件更新数据。若要更新ID自身，可在keyValueMap里为ID设置新值。
+     * 根据Where条件更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param where       Where条件。
      * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
@@ -670,7 +671,7 @@ public class TkTaskDtlLog {
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
     public static void copyCols(TkTaskDtlLog fromModel, TkTaskDtlLog toModel, List<String> includeCols, List<String> excludeCols) {
-        ModelHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
+        OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
     // </editor-fold>

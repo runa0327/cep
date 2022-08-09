@@ -1,6 +1,5 @@
 package com.cisdi.pms.mq;
 
-import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.wf.callback.CallbackAtt;
 import com.qygly.shared.wf.callback.CallbackInfo;
 import lombok.extern.slf4j.Slf4j;
