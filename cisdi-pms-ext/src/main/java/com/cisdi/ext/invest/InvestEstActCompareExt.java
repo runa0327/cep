@@ -264,30 +264,43 @@ public class InvestEstActCompareExt {
          * 费用类型名称。
          */
         public String expTypeName;
+
+        /**
+         * 立项匡算金额。
+         */
+        public Double invest0Amt;
+        /**
+         * 立项匡算金额。
+         */
+        public Double invest0AmtSum;
+
         /**
          * 可研估算金额。
          */
         public Double invest1Amt;
         /**
+         * 可研估算金额。
+         */
+        public Double invest1AmtSum;
+
+        /**
          * 初设概算金额。
          */
         public Double invest2Amt;
+        /**
+         * 初设概算金额。
+         */
+        public Double invest2AmtSum;
+
         /**
          * 预算财评金额。
          */
         public Double invest3Amt;
         /**
-         * 可研估算金额。
-         */
-        public Double invest1AmtSum;
-        /**
-         * 初设概算金额。
-         */
-        public Double invest2AmtSum;
-        /**
          * 预算财评金额。
          */
         public Double invest3AmtSum;
+
         /**
          * 完成金额。
          */
