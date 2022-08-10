@@ -8,6 +8,7 @@
     <artifactId>cisdi-pms-service</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+
     <modules>
         <module>cisdi-pms-data-transfer</module>
         <module>cisdi-pms-ext</module>
@@ -21,32 +22,13 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>1.8</java.version>
         <!--依赖：-->
-        <qygly.version>3.0-SNAPSHOT</qygly.version>
+<!--        <qygly.version>1.0.0</qygly.version>-->
         <spring-boot.version>2.6.3</spring-boot.version>
         <spring-cloud.version>2021.0.1</spring-cloud.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-
-            <dependency>
-                <groupId>com.qygly</groupId>
-                <artifactId>qygly-shared</artifactId>
-                <version>${qygly.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.qygly</groupId>
-                <artifactId>qygly-ext-jar-helper</artifactId>
-                <version>${qygly.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.qygly</groupId>
-                <artifactId>qygly-ext-rest-helper</artifactId>
-                <version>${qygly.version}</version>
-            </dependency>
-
             <dependency>
                 <!-- Import dependency management from Spring Boot -->
                 <groupId>org.springframework.boot</groupId>
@@ -72,12 +54,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>com.qygly</groupId>
-            <artifactId>qygly-shared</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -116,6 +92,24 @@
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.1.1.RELEASE</version>
+                <configuration>
+                    <includeSystemScope>true</includeSystemScope>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
