@@ -188,4 +188,13 @@ public class DateTimeUtil {
         return c.getTime();
     }
 
+    /**
+     * 计算两个日期相差天数
+     * @param maxDate
+     * @param end
+     * @return
+     */
+    public static int getTwoTimeDays(Date maxDate, Date end) {
+        return Math.abs((int) ((maxDate.getTime() - end.getTime()) / (1000 * 3600 * 24)));
+    }
 }

@@ -8,10 +8,7 @@ import com.qygly.shared.interaction.IdCodeName;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ProPlanExt {
@@ -207,7 +204,7 @@ public class ProPlanExt {
                 List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(p, jdbcTemplate)).collect(Collectors.toList());
                 //构建树结构
                 List<PrjProPlanNodeInfo> tree = infoList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
-                    m.children = getChildNode(m, infoList);
+                    m.children = getChildNode(m, infoList).stream().sorted(Comparator.comparing(p->p.seqNo)).collect(Collectors.toList());
                 }).collect(Collectors.toList());
 
                 planInfo.nodeInfoList = tree;
@@ -231,7 +228,7 @@ public class ProPlanExt {
      */
     private List<PrjProPlanNodeInfo> getChildNode(PrjProPlanNodeInfo root, List<PrjProPlanNodeInfo> allListTree) {
         return allListTree.stream().filter((treeEntity) -> treeEntity.pid.equals(root.id)).peek((treeEntity) -> {
-            treeEntity.children = getChildNode(treeEntity, allListTree);
+            treeEntity.children = getChildNode(treeEntity, allListTree).stream().sorted(Comparator.comparing(p->p.seqNo)).collect(Collectors.toList());
         }).collect(Collectors.toList());
     }
 
