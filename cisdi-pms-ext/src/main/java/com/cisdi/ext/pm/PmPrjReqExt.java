@@ -377,13 +377,10 @@ public class PmPrjReqExt {
             if (!Objects.isNull(proMap)) {
                 //先创建项目的进度计划
                 String newPlanId = Crud.from("PM_PRO_PLAN").insertData();
-                //立项批复时间 + 30
-                Date replyDate = DateTimeUtil.addDays(DateTimeUtil.stringToDate(String.valueOf(proMap.get("PRJ_REPLY_DATE"))), 30);
 
-                //新增内容
-                Crud.from("PM_PRO_PLAN").where().eq("ID", newPlanId).update().set("IS_TEMPLATE", 0).set("PM_PRJ_ID", projectId).set("PLAN_START_DATE", replyDate).set("PLAN_TOTAL_DAYS", proMap.get("PLAN_TOTAL_DAYS"))
-                        .set("PLAN_COMPL_DATE", DateTimeUtil.addDays(replyDate, Integer.parseInt(String.valueOf(proMap.get("PLAN_TOTAL_DAYS") == null ? "0" : proMap.get("PLAN_TOTAL_DAYS"))))).set("PROGRESS_STATUS_ID", proMap.get("PROGRESS_STATUS_ID"))
-                        .set("PROGRESS_RISK_TYPE_ID", proMap.get("PROGRESS_RISK_TYPE_ID")).set("START_DAY", proMap.get("START_DAY")).exec();
+                Crud.from("PM_PRO_PLAN").where().eq("ID", newPlanId).update().set("IS_TEMPLATE", 0).set("PM_PRJ_ID", projectId).set("PLAN_TOTAL_DAYS", proMap.get("PLAN_TOTAL_DAYS"))
+                        .set("PROGRESS_STATUS_ID", proMap.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", proMap.get("PROGRESS_RISK_TYPE_ID")).set("START_DAY", proMap.get("START_DAY")).exec();
+
 
                 //查询项目进度计划节点模板
                 List<Map<String, Object>> planNodeList = jdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT," +
@@ -396,12 +393,12 @@ public class PmPrjReqExt {
                     planNodeList.stream().filter(p -> Objects.equals("0", p.get("PM_PRO_PLAN_NODE_PID"))).peek(m -> {
                         String id = Crud.from("PM_PRO_PLAN_NODE").insertData();
 
-                        Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId).set("PLAN_START_DATE", replyDate).set("PLAN_COMPL_DATE", DateTimeUtil.addDays(replyDate, Integer.parseInt(String.valueOf(m.get("PLAN_TOTAL_DAYS")))))
+                        Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId)
                                 .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                                 .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                                 .set("LINKED_WF_PROCESS_ID",m.get("LINKED_WF_PROCESS_ID")).set("LINKED_WF_NODE_ID",m.get("LINKED_WF_NODE_ID")).exec();
 
-                        getChildrenNode(m, planNodeList, id, newPlanId, replyDate);
+                        getChildrenNode(m, planNodeList, id, newPlanId);
                     }).collect(Collectors.toList());
                 }
             }
@@ -410,15 +407,15 @@ public class PmPrjReqExt {
         }
     }
 
-    private List<Map<String, Object>> getChildrenNode(Map<String, Object> root, List<Map<String, Object>> allData, String pId, String newPlanId, Date replyDate) {
+    private List<Map<String, Object>> getChildrenNode(Map<String, Object> root, List<Map<String, Object>> allData, String pId, String newPlanId) {
         return allData.stream().filter(p -> Objects.equals(p.get("PM_PRO_PLAN_NODE_PID"), root.get("ID"))).peek(m -> {
             String id = Crud.from("PM_PRO_PLAN_NODE").insertData();
-            Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId).set("PLAN_START_DATE", replyDate)
-                    .set("PLAN_COMPL_DATE", DateTimeUtil.addDays(replyDate, Integer.parseInt(String.valueOf(m.get("PLAN_TOTAL_DAYS"))))).set("PM_PRO_PLAN_NODE_PID", pId)
+            Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId)
+                    .set("PM_PRO_PLAN_NODE_PID", pId)
                     .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                     .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                     .set("LINKED_WF_PROCESS_ID",m.get("LINKED_WF_PROCESS_ID")).set("LINKED_WF_NODE_ID",m.get("LINKED_WF_NODE_ID")).exec();
-            getChildrenNode(m, allData, id, newPlanId, replyDate);
+            getChildrenNode(m, allData, id, newPlanId);
         }).collect(Collectors.toList());
     }
 
