@@ -13,15 +13,14 @@ import java.util.*;
 
 public class PrjPlanUtil {
 
-    public void prjPlanCreate(){
-        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
-        String projectId = entityRecordList.get(0).valueMap.get("PM_PRJ_ID").toString();
-        Date date = DateTimeUtil.stringToDate(entityRecordList.get(0).valueMap.get("PLAN_START_DATE").toString());
+    public void prjPlanCreate(String projectId,Date date){
+//        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+//        String projectId = entityRecordList.get(0).valueMap.get("PM_PRJ_ID").toString();
+//        Date date = DateTimeUtil.stringToDate(entityRecordList.get(0).valueMap.get("PLAN_START_DATE").toString());
         //date为空，取项目预计开始日期
         if (date == null){
            Object date1 = Crud.from("pm_pro_plan").where().eq("PM_PRJ_ID",projectId).select().specifyCols("PLAN_START_DATE").execForValue();
            if (date1 == null ){
-               System.out.println("没有任务日期");
                return;
            }
            date = DateTimeUtil.stringToDate(date1.toString());
@@ -54,10 +53,7 @@ public class PrjPlanUtil {
             }
             String end = tmp.get("PLAN_COMPL_DATE").toString();
             String parentId = tmp.get("PM_PRO_PLAN_NODE_PID").toString();
-            String name = tmp.get("NAME").toString();
-            String id = tmp.get("id").toString();
             int day = Integer.valueOf(tmp.get("PLAN_TOTAL_DAYS").toString());
-            Date startTime = DateTimeUtil.stringToDate(start);
             Date endTime = DateTimeUtil.stringToDate(end);
             Date afterTime = DateTimeUtil.addDays(DateTimeUtil.stringToDate(start), (day-1));
             if (endTime.compareTo(afterTime) != 0){
@@ -113,12 +109,6 @@ public class PrjPlanUtil {
                         }
                     }
                     break tp;
-
-                    //查询所有父级id是parentId的数据，并比较得出最大日期
-//                    Date endTime = DateTimeUtil.stringToDate(tmp.get("PLAN_COMPL_DATE").toString());
-//                    if (endTime.compareTo(afterTime) == -1){
-//
-//                    }
                 }
             }
         }
