@@ -9,6 +9,13 @@ spring:
     default-property-inclusion: non_null
   application:
     name: cisdi-pms-job
+  datasource:
+    username: qygly
+    password: Qygly@123456
+    # 注意更改ip和db：
+    url: jdbc:mysql://121.5.65.165:3306/test?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    #    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
   cloud:
     loadbalancer:
       ribbon:
