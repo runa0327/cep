@@ -463,18 +463,9 @@ public class AttLinkExt {
             AttLinkResult attLinkResult = new AttLinkResult();
             attLinkResult.attMap = new HashMap<>();
             //根据id查询招投标信息
-            List<Map<String, Object>> list = jdbcTemplate.queryForList("select " +
-                    "CONTRACT_CODE, " +
-                    "CONTRACT_CATEGORY_ID, " +
-                    "CONTRACT_NAME, " +
-                    "(select " +
-                    "COUNT(if(status = 'AP',1,null)) " +
-                    "from " +
-                    "po_order_req) seq " +
-                    "from " +
-                    "po_order_req " +
-                    "where " +
-                    "id = ?", attValue);
+            List<Map<String, Object>> list = jdbcTemplate.queryForList("select CONTRACT_CODE, CONTRACT_CATEGORY_ID, CONTRACT_NAME, " +
+                    "(select COUNT(if(status = 'AP',1,null)) from po_order_req) seq, CONTRACT_PRICE " +
+                    "from po_order_req where id = ?", attValue);
 
             if (CollectionUtils.isEmpty(list)) {
                 throw new BaseException("合同签订相关属性不完善！");
@@ -494,6 +485,16 @@ public class AttLinkExt {
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
                 typeValueText.value = JdbcMapUtil.getString(row,"CONTRACT_NAME") + "补充协议" +JdbcMapUtil.getString(row,"seq");
                 attLinkResult.attMap.put("CONTRACT_CODE",typeValueText);
+            }
+            //合同总金额
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"CONTRACT_PRICE");
+                typeValueText.text = JdbcMapUtil.getString(row,"CONTRACT_PRICE");
+
+                attLinkResult.attMap.put("CONTRACT_PRICE",typeValueText);
+                attLinkResult.attMap.put("CONTRACT_AMOUNT",typeValueText);
             }
 
             return attLinkResult;
