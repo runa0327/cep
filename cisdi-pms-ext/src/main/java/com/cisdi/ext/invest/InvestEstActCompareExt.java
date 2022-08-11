@@ -3,7 +3,9 @@ package com.cisdi.ext.invest;
 import com.cisdi.ext.util.DoubleUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
 import io.netty.util.internal.ObjectUtil;
 import lombok.Data;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -61,18 +63,24 @@ public class InvestEstActCompareExt {
             for (String key : typeMap.keySet()) {
                 List<Map<String, Object>> mapData = typeMap.get(key);
                 switch (key) {
+                    case "invest0":
+                        Optional<Map<String, Object>> mapOptional = mapData.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(investEstActCompareRow.expTypeId)).findAny();
+                        mapOptional.ifPresent(stringObjectMap -> investEstActCompareRow.invest0Amt = JdbcMapUtil.getDouble(stringObjectMap,"AMT"));
+                        break;
                     case "invest1":
                         Optional<Map<String, Object>> optionalInvestEstActCompareRow = mapData.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(investEstActCompareRow.expTypeId)).findAny();
-                        optionalInvestEstActCompareRow.ifPresent(stringObjectMap -> investEstActCompareRow.invest1Amt = Double.parseDouble(String.valueOf(stringObjectMap.get("AMT"))));
+                        optionalInvestEstActCompareRow.ifPresent(stringObjectMap -> investEstActCompareRow.invest1Amt = JdbcMapUtil.getDouble(stringObjectMap,"AMT"));
                         break;
                     case "invest2":
                         Optional<Map<String, Object>> optionalMap = mapData.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(investEstActCompareRow.expTypeId)).findAny();
-                        optionalMap.ifPresent(stringObjectMap -> investEstActCompareRow.invest2Amt = Double.parseDouble(String.valueOf(stringObjectMap.get("AMT"))));
+                        optionalMap.ifPresent(stringObjectMap -> investEstActCompareRow.invest2Amt = JdbcMapUtil.getDouble(stringObjectMap,"AMT"));
                         break;
                     case "invest3":
                         Optional<Map<String, Object>> optional = mapData.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(investEstActCompareRow.expTypeId)).findAny();
-                        optional.ifPresent(stringObjectMap -> investEstActCompareRow.invest3Amt = Double.parseDouble(String.valueOf(stringObjectMap.get("AMT"))));
+                        optional.ifPresent(stringObjectMap -> investEstActCompareRow.invest3Amt = JdbcMapUtil.getDouble(stringObjectMap,"AMT"));
                         break;
+                    default:
+                        throw new BaseException("数据错误！");
                 }
             }
         }
@@ -101,11 +109,12 @@ public class InvestEstActCompareExt {
         List<InvestEstActCompareRow> rowTree = investEstActCompareRowList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
             List<InvestEstActCompareRow> child = getChildNode(m, investEstActCompareRowList);
             m.children = child;
-            m.invest1AmtSum = sumAmt(child,"invest1Amt");
-            m.invest2AmtSum = sumAmt(child,"invest2Amt");
-            m.invest3AmtSum = sumAmt(child,"invest3Amt");
-            m.complAmtSum = sumAmt(child,"complAmt");
-            m.payAmtSum = sumAmt(child,"payAmt");
+            m.invest0AmtSum = sumAmt(child, "invest0Amt");
+            m.invest1AmtSum = sumAmt(child, "invest1Amt");
+            m.invest2AmtSum = sumAmt(child, "invest2Amt");
+            m.invest3AmtSum = sumAmt(child, "invest3Amt");
+            m.complAmtSum = sumAmt(child, "complAmt");
+            m.payAmtSum = sumAmt(child, "payAmt");
         }).collect(Collectors.toList());
 
         // 返回结果，如：
@@ -122,6 +131,9 @@ public class InvestEstActCompareExt {
             for (InvestEstActCompareRow datum : data) {
                 double var = 0d;
                 switch (column) {
+                    case "invest0Amt":
+                        var = datum.invest0Amt;
+                        break;
                     case "invest1Amt":
                         var = datum.invest1Amt;
                         break;
@@ -137,8 +149,10 @@ public class InvestEstActCompareExt {
                     case "payAmt":
                         var = datum.payAmt;
                         break;
+                    default:
+                        throw new BaseException("数据错误！");
                 }
-                res = DoubleUtil.add(res,var);
+                res = DoubleUtil.add(res, var);
             }
         }
         return res;
@@ -155,89 +169,13 @@ public class InvestEstActCompareExt {
         return allListTree.stream().filter((treeEntity) -> treeEntity.pid.equals(root.expTypeId)).peek((treeEntity) -> {
             List<InvestEstActCompareRow> child = getChildNode(treeEntity, allListTree);
             treeEntity.children = child;
-            treeEntity.invest1AmtSum = sumAmt(child,"invest1Amt");
-            treeEntity.invest2AmtSum = sumAmt(child,"invest2Amt");
-            treeEntity.invest3AmtSum = sumAmt(child,"invest3Amt");
-            treeEntity.complAmtSum = sumAmt(child,"complAmt");
-            treeEntity.payAmtSum = sumAmt(child,"payAmt");
+            treeEntity.invest0AmtSum = sumAmt(child, "invest0Amt");
+            treeEntity.invest1AmtSum = sumAmt(child, "invest1Amt");
+            treeEntity.invest2AmtSum = sumAmt(child, "invest2Amt");
+            treeEntity.invest3AmtSum = sumAmt(child, "invest3Amt");
+            treeEntity.complAmtSum = sumAmt(child, "complAmt");
+            treeEntity.payAmtSum = sumAmt(child, "payAmt");
         }).collect(Collectors.toList());
-    }
-
-    /**
-     * 模拟结果。
-     *
-     * @return
-     */
-    private InvestEstActCompareRow mockResult() {
-        InvestEstActCompareRow row = new InvestEstActCompareRow();
-        row.expTypeId = "99799190825099546";
-        row.expTypeCode = "PRJ_TOTAL_INVEST";
-        row.expTypeName = "总投资";
-        row.invest1Amt = 100.12d;
-        row.invest2Amt = 200.12d;
-        row.invest3Amt = 300.12d;
-        row.invest1AmtSum = 100.12d;
-        row.invest2AmtSum = 200.12d;
-        row.invest3AmtSum = 300.12d;
-        row.complAmt = 400.12d;
-        row.complAmtSum = 500.12d;
-        row.payAmt = 600.12d;
-        row.payAmtSum = 700.12d;
-        row.children = new ArrayList<>();
-        {
-
-
-            InvestEstActCompareRow r2 = new InvestEstActCompareRow();
-            row.children.add(r2);
-            r2.expTypeId = "99799190825099547";
-            r2.expTypeCode = "PROJECT_AMT";
-            r2.expTypeName = "工程费用";
-            r2.invest1Amt = 100.12d;
-            r2.invest2Amt = 200.12d;
-            r2.invest3Amt = 300.12d;
-            r2.invest1AmtSum = 100.12d;
-            r2.invest2AmtSum = 200.12d;
-            r2.invest3AmtSum = 300.12d;
-            r2.complAmt = 400.12d;
-            r2.complAmtSum = 500.12d;
-            r2.payAmt = 600.12d;
-            r2.payAmtSum = 700.12d;
-            r2.children = new ArrayList<>();
-            {
-                InvestEstActCompareRow r21 = new InvestEstActCompareRow();
-                r2.children.add(r21);
-                r21.expTypeId = "99799190825099548";
-                r21.expTypeCode = "CONSTRUCT_AMT";
-                r21.expTypeName = "建安费";
-                r21.invest1Amt = 100.12d;
-                r21.invest2Amt = 200.12d;
-                r21.invest3Amt = 300.12d;
-                r21.invest1AmtSum = 100.12d;
-                r21.invest2AmtSum = 200.12d;
-                r21.invest3AmtSum = 300.12d;
-                r21.complAmt = 400.12d;
-                r21.complAmtSum = 500.12d;
-                r21.payAmt = 600.12d;
-                r21.payAmtSum = 700.12d;
-            }
-
-            InvestEstActCompareRow r3 = new InvestEstActCompareRow();
-            row.children.add(r3);
-            r3.expTypeId = "99799190825099552";
-            r3.expTypeCode = "PREPARE_AMT";
-            r3.expTypeName = "预备费";
-            r3.invest1Amt = 100.12d;
-            r3.invest2Amt = 200.12d;
-            r3.invest3Amt = 300.12d;
-            r3.invest1AmtSum = 100.12d;
-            r3.invest2AmtSum = 200.12d;
-            r3.invest3AmtSum = 300.12d;
-            r3.complAmt = 400.12d;
-            r3.complAmtSum = 500.12d;
-            r3.payAmt = 600.12d;
-            r3.payAmtSum = 700.12d;
-        }
-        return row;
     }
 
     public static class InvestEstActCompareParam {
