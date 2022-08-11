@@ -12,6 +12,8 @@ import org.springframework.data.redis.connection.ConnectionUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
+import java.text.DecimalFormat;
+import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -112,9 +114,11 @@ public class WfExt {
                         String year = sdf.format(date).substring(0, 7).replace("-", "");
                         //合同编码规则
                         int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
-                        String code = "gc-" + year + "-" + num;
+                        Format formatCount = new DecimalFormat("0000");
+                        String formatNum = formatCount.format(num);
+                        String code = "gc-" + year + "-" + formatNum;
 
-                        String name = entityRecord.valueMap.get("CONTRACT_NAME").toString();
+                        String name = entityRecord.valueMap.get("CONTRACT_NAME").toString() + "补充协议" + formatNum;
                         int update2 = jdbcTemplate.update("update PO_ORDER_REQ set CONTRACT_CODE = ? ,set NAME = ? where id = ?",
                                 code, name, csCommId);
                     }

@@ -483,7 +483,7 @@ public class AttLinkExt {
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"CONTRACT_NAME") + "补充协议" +JdbcMapUtil.getString(row,"seq");
+                typeValueText.value = JdbcMapUtil.getString(row,"NAME");
                 attLinkResult.attMap.put("CONTRACT_CODE",typeValueText);
             }
             //合同总金额
