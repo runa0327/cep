@@ -1,0 +1,50 @@
+server:
+  port: 11115
+
+spring:
+  # 设置时区，以北京时间显示报错信息的时间（等）：
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null
+  application:
+    name: cisdi-pms-job
+  cloud:
+    loadbalancer:
+      ribbon:
+        # Ribbon处于维护模式，不要启用：
+        enabled: false
+    nacos:
+      discovery:
+        server-addr: 121.5.62.215:8848
+        # 指明本机IP注册到nacos：
+        # ip: 119.84.70.230
+
+# 自动登录qygly平台的设置：
+qygly:
+  ext-rest-helper:
+    # 启用FeignClient：
+    enable-feign-client: true
+    # 启用FeignClient的配置：
+    enable-feign-client-config: true
+    # 启用登录保持：
+    enable-login-keeper: true
+
+    # 设置登录保持的相关信息：
+    login-keeper:
+      userCode: admin
+      userMobile:
+      userEmail:
+      # 经RSA公钥加密后的用户密码：
+      # 密码123456、验证码7890对应的密码：
+      userPsd: Cyybrrs7bGko/drYdJtrkr6QtDdEuCw3Yqhr27h3yk1u9wjcuvyFr9IRYSuIQSFNX9DC71Ek6EJEIif+RMvTq4szxZ/Orj97Rk3bDBqFH1QTN9aRQxpzVRYLtfTo3UbUsMx4jbGeymHjUli+qTC5nlqQALYuGaUTNxjd9p+CkZQ=
+      valiCodeReqKey: ABCDEFGHIJKLMNOPQRSTUVWXYZ123456
+      valiCode: 7890
+      orgCode: test
+      keeperIntervalSeconds: 5
+    feign-client:
+      name:
+        qygly-login: qygly-all
+        qygly-dict: qygly-all
+        qygly-data: qygly-all
+        qygly-file: qygly-all
