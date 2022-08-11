@@ -102,6 +102,7 @@ public class WfExt {
                     }
                 }
 
+                //审批流审批通过
                 if ("AP".equals(newStatus)) {
                     //合同签订批准后生成合同编号
                     if ("PO_ORDER_REQ".equals(entityCode) || "po_order_req".equals(entityCode)) {
@@ -122,6 +123,19 @@ public class WfExt {
                         int update2 = jdbcTemplate.update("update PO_ORDER_REQ set CONTRACT_CODE = ? ,set NAME = ? where id = ?",
                                 code, name, csCommId);
                     }
+                    //新增保函审批通过时存入保函名称
+                    if ("PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entityCode)){
+                        //获取到流程名称
+                        String sql1 = "select a.NAME from wf_process_instance a left join PO_GUARANTEE_LETTER_REQUIRE_REQ b on a.id = b.LK_WF_INST_ID where b.id = ?";
+                        List<Map<String,Object>> list = jdbcTemplate.queryForList(sql1,csCommId);
+                        if (CollectionUtils.isEmpty(list)){
+                            throw new BaseException("流程标题不能为空");
+                        }
+                        String name = list.get(0).get("NAME").toString();
+                        String sql2 = "update PO_GUARANTEE_LETTER_REQUIRE_REQ set NAME = ? where id = ?";
+                        int update2 = jdbcTemplate.update(sql2,name,csCommId);
+                    }
+
                 }
 
                 List<String> tableList = getTableList();
