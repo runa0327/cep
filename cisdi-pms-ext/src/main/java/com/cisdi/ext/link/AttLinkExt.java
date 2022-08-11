@@ -459,6 +459,44 @@ public class AttLinkExt {
                 attLinkResult.attMap.put("SERVICE_DAYS", typeValueText);
             }
             return attLinkResult;
+        }else if ("CONTRACT_ID".equals(attCode)){
+            AttLinkResult attLinkResult = new AttLinkResult();
+            attLinkResult.attMap = new HashMap<>();
+            //根据id查询招投标信息
+            List<Map<String, Object>> list = jdbcTemplate.queryForList("select " +
+                    "CONTRACT_CODE, " +
+                    "CONTRACT_CATEGORY_ID, " +
+                    "CONTRACT_NAME, " +
+                    "(select " +
+                    "COUNT(if(status = 'AP',1,null)) " +
+                    "from " +
+                    "po_order_req) seq " +
+                    "from " +
+                    "po_order_req " +
+                    "where " +
+                    "id = ?", attValue);
+
+            if (CollectionUtils.isEmpty(list)) {
+                throw new BaseException("合同签订相关属性不完善！");
+            }
+            Map row = list.get(0);
+            //合同编号
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"CONTRACT_CODE");
+                attLinkResult.attMap.put("CONTRACT_CODE",typeValueText);
+            }
+
+            //合同名称带序号
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"CONTRACT_NAME") + "补充协议" +JdbcMapUtil.getString(row,"seq");
+                attLinkResult.attMap.put("CONTRACT_CODE",typeValueText);
+            }
+
+            return attLinkResult;
         } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }

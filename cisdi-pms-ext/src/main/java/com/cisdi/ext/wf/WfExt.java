@@ -100,9 +100,10 @@ public class WfExt {
                     }
                 }
 
-                //合同签订批准后生成合同编号
-                if ("PO_ORDER_REQ".equals(entityCode) || "PO_ORDER_REQ".equals(entityCode)) {
-                    if ("AP".equals(newStatus)) {
+                if ("AP".equals(newStatus)) {
+                    //合同签订批准后生成合同编号
+                    if ("PO_ORDER_REQ".equals(entityCode) || "po_order_req".equals(entityCode)) {
+
                         //查询当前已审批通过的招标合同数量
                         List<Map<String, Object>> map = jdbcTemplate.queryForList("select count(*) as num from " +
                                 "PO_ORDER_REQ where status = 'AP' ");
@@ -112,10 +113,11 @@ public class WfExt {
                         //合同编码规则
                         int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
                         String code = "gc-" + year + "-" + num;
-                        int update2 = jdbcTemplate.update("update PO_ORDER_REQ set CONTRACT_CODE = ?  where id = ?",
-                                code, csCommId);
-                    }
 
+                        String name = entityRecord.valueMap.get("CONTRACT_NAME").toString();
+                        int update2 = jdbcTemplate.update("update PO_ORDER_REQ set CONTRACT_CODE = ? ,set NAME = ? where id = ?",
+                                code, name, csCommId);
+                    }
                 }
 
                 List<String> tableList = getTableList();
