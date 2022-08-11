@@ -13,6 +13,7 @@
         <module>cisdi-pms-data-transfer</module>
         <module>cisdi-pms-ext</module>
         <module>cisdi-pms-mq</module>
+        <module>cisdi-pms-job</module>
     </modules>
 
     <properties>
