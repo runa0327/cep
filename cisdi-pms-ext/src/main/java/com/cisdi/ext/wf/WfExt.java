@@ -164,6 +164,16 @@ public class WfExt {
         list.add("PO_PUBLIC_BID_REQ"); //采购公开招标申请
         list.add("PM_CONSTRUCT_PERMIT_REQ"); //施工许可
         list.add("PM_PRJ_PLANNING_PERMIT_REQ"); //工程规划许可
+        list.add("PO_GUARANTEE_LETTER_REQUIRE_REQ"); //新增保函申请
+        list.add("PO_GUARANTEE_LETTER_RETURN_REQ"); //保函退还申请
+        list.add("PO_ORDER_SUPPLEMENT_REQ"); //采购合同补充协议申请
+        list.add("PO_ORDER_TERMINATE_REQ"); //采购合同终止申请
+        list.add("PO_ORDER_CHANGE_REQ"); //采购合同变更申请
+        list.add("PM_PRJ_PARTY_REQ"); //五方责任主体维护申请
+        list.add("PM_SUPERVISE_PLAN_REQ"); //监理规划及细则申请
+        list.add("PM_PRJ_KICK_OFF_REQ"); //工程开工申请
+        list.add("PM_FUND_REQUIRE_PLAN_REQ"); //资金需求计划申请
+        list.add("PO_ORDER_PAYMENT_REQ"); //采购合同付款申请
         return list;
     }
 
