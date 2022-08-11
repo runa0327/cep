@@ -44,9 +44,9 @@ public class ProPlanJob {
         InvokeActParam invokeActParam = new InvokeActParam();
         invokeActParam.sevId = "99799190825098168";
         invokeActParam.actId = "99799190825089165";
+        invokeActParam.isPreChk = false;
         invokeActParam.idList = Lists.newArrayList(JdbcMapUtil.getString(map, "ID"));
         invokeActParam.verList = Lists.newArrayList(JdbcMapUtil.getInt(map, "VER"));
-        invokeActParam.isPreChk = false;
         RespBody<InvokeActResult> respBody = dataFeignClient.invokeAct(invokeActParam);
         if (respBody.succ) {
             log.info("成功！");
