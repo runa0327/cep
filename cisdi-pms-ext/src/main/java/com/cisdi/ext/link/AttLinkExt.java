@@ -498,7 +498,103 @@ public class AttLinkExt {
             }
 
             return attLinkResult;
-        } else {
+        } else if ("GUARANTEE_ID".equals(attCode)){ //获取保函名称
+            AttLinkResult attLinkResult = new AttLinkResult();
+            attLinkResult.attMap = new HashMap<>();
+
+            //查询保函相关信息
+            String sql = "select SUPPLIER,BENEFICIARY,GUARANTEE_LETTER_TYPE_ID,GUARANTEE_MECHANISM,GUARANTEE_CODE,GUARANTEE_AMT,GUARANTEE_START_DATE,GUARANTEE_END_DATE,GUARANTEE_FILE from PO_GUARANTEE_LETTER_REQUIRE_REQ where id = ?";
+            List<Map<String,Object>> list = jdbcTemplate.queryForList(sql,attValue);
+            if (CollectionUtils.isEmpty(list)){
+                throw new BaseException("保函没有相关信息，请先完善");
+            }
+            Map row = list.get(0);
+
+            //供应商
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"SUPPLIER");
+                typeValueText.text = JdbcMapUtil.getString(row,"SUPPLIER");
+
+                attLinkResult.attMap.put("SUPPLIER",typeValueText);
+            }
+            //受益人
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"BENEFICIARY");
+                typeValueText.text = JdbcMapUtil.getString(row,"BENEFICIARY");
+
+                attLinkResult.attMap.put("BENEFICIARY",typeValueText);
+            }
+            //保函类型
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"GUARANTEE_LETTER_TYPE_ID");
+                typeValueText.text = JdbcMapUtil.getString(row,"GUARANTEE_LETTER_TYPE_ID");
+
+                attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_ID",typeValueText);
+            }
+            //保函开立机构
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"GUARANTEE_MECHANISM");
+                typeValueText.text = JdbcMapUtil.getString(row,"GUARANTEE_MECHANISM");
+
+                attLinkResult.attMap.put("GUARANTEE_MECHANISM",typeValueText);
+            }
+            //保函编号
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"GUARANTEE_CODE");
+                typeValueText.text = JdbcMapUtil.getString(row,"GUARANTEE_CODE");
+
+                attLinkResult.attMap.put("GUARANTEE_CODE",typeValueText);
+            }
+            //担保金额
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.DOUBLE;
+                typeValueText.value = JdbcMapUtil.getString(row,"GUARANTEE_AMT");
+                typeValueText.text = JdbcMapUtil.getString(row,"GUARANTEE_AMT");
+
+                attLinkResult.attMap.put("GUARANTEE_AMT",typeValueText);
+            }
+            //保函开立日期
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.DATE;
+                typeValueText.value = JdbcMapUtil.getString(row,"GUARANTEE_START_DATE");
+                typeValueText.text = JdbcMapUtil.getString(row,"GUARANTEE_START_DATE");
+
+                attLinkResult.attMap.put("GUARANTEE_START_DATE",typeValueText);
+            }
+            //保函到期日期
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.DATE;
+                typeValueText.value = JdbcMapUtil.getString(row,"GUARANTEE_END_DATE");
+                typeValueText.text = JdbcMapUtil.getString(row,"GUARANTEE_END_DATE");
+
+                attLinkResult.attMap.put("GUARANTEE_END_DATE",typeValueText);
+            }
+            //正式保函材料
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"GUARANTEE_FILE");
+                typeValueText.text = JdbcMapUtil.getString(row,"GUARANTEE_FILE");
+
+                attLinkResult.attMap.put("GUARANTEE_FILE",typeValueText);
+            }
+
+            return attLinkResult;
+
+        }else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
     }
