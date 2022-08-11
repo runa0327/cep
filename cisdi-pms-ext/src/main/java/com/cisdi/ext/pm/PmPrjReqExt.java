@@ -106,14 +106,14 @@ public class PmPrjReqExt {
                 .where().eq("ID", csCommId)
                 .select().specifyCols().execForMap();
 
-        //批复日期
-        String replyDate = entityRecord.valueMap.get("PRJ_REPLY_DATE").toString();
-        //批复文号
-        String replyNo = entityRecord.valueMap.get("PRJ_REPLY_NO").toString();
-        //批复材料
-        String replyFile = entityRecord.valueMap.get("REPLY_FILE").toString();
-        //资金来源
-        String investmentSourceId = entityRecord.valueMap.get("INVESTMENT_SOURCE_ID").toString();
+//        //批复日期
+//        String replyDate = entityRecord.valueMap.get("PRJ_REPLY_DATE").toString();
+//        //批复文号
+//        String replyNo = entityRecord.valueMap.get("PRJ_REPLY_NO").toString();
+//        //批复材料
+//        String replyFile = entityRecord.valueMap.get("REPLY_FILE").toString();
+//        //资金来源
+//        String investmentSourceId = entityRecord.valueMap.get("INVESTMENT_SOURCE_ID").toString();
 
 
         // 新建项目：
@@ -128,8 +128,10 @@ public class PmPrjReqExt {
                         "CON_SCALE_UOM_ID", pm_prj_req.get("CON_SCALE_UOM_ID")).set("PRJ_SITUATION", pm_prj_req.get(
                                 "PRJ_SITUATION")).set("INVESTMENT_SOURCE_ID", pm_prj_req.get("INVESTMENT_SOURCE_ID"))
                 .set("PRJ_EARLY_USER_ID", pm_prj_req.get("PRJ_EARLY_USER_ID")).set("PRJ_DESIGN_USER_ID", pm_prj_req.get("PRJ_DESIGN_USER_ID"))
-                .set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID")).set("PRJ_REPLY_DATE", replyDate)
-                .set("PRJ_REPLY_NO", replyNo).set("PRJ_REPLY_FILE", replyFile).set("INVESTMENT_SOURCE_ID",investmentSourceId).exec();
+                .set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID"))
+//                .set("PRJ_REPLY_DATE", replyDate)
+//                .set("PRJ_REPLY_NO", replyNo).set("PRJ_REPLY_FILE", replyFile).set("INVESTMENT_SOURCE_ID",investmentSourceId)
+                .exec();
         log.info("已更新：{}", exec);
 
         // 将项目ID设置到立项申请上：

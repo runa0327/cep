@@ -57,7 +57,11 @@ public class MqProcessor {
                 String nodeInstId = String.valueOf(currentNodeInstMap.get("node_inst_id"));
                 //修改进度计划节点状态和实际完成时间
                 for (Map<String, Object> item : planNodeList) {
-                    jdbcTemplate.update("update PM_PRO_PLAN_NODE set ACTUAL_COMPL_DATE=?,PROGRESS_STATUS_ID=?,LINKED_WF_PROCESS_INSTANCE_ID=?,LINKED_WF_NODE_INSTANCE_ID=? where ID=?",
+                    jdbcTemplate.update("update PM_PRO_PLAN_NODE set ACTUAL_COMPL_DATE=?," +
+                                    "PROGRESS_STATUS_ID=?," +
+                                    "LINKED_WF_PROCESS_INSTANCE_ID=?," +
+                                    "LINKED_WF_NODE_INSTANCE_ID=? " +
+                                    "where ID=?",
                             new Date(), proStatus, procInstId, nodeInstId, item.get("ID"));
                 }
             }
