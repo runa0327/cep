@@ -26,6 +26,16 @@ spring:
         server-addr: 121.5.62.215:8848
         # 指明本机IP注册到nacos：
         # ip: 119.84.70.230
+    #线程池
+  task:
+    execution:
+      pool:
+        max-size: 20
+        core-size: 8
+        keep-alive: 60
+        queue-capacity: 2048
+        thread-name-prefix: springThreadPool
+        waitForTasksToCompleteOnShutdown: true
 
 # 自动登录qygly平台的设置：
 qygly:
