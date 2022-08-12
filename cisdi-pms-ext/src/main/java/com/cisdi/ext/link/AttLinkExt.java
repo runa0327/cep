@@ -5,14 +5,14 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.interaction.TypeValueText;
+import com.qygly.shared.util.BooleanUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class AttLinkExt {
 
@@ -138,6 +138,39 @@ public class AttLinkExt {
 
                 }
             }
+            List<String> contractTables = Arrays.asList("PO_ORDER_SUPPLEMENT_REQ", "PO_ORDER_CHANGE_REQ",
+                    "PO_ORDER_TERMINATE_REQ");
+            if (contractTables.contains(entCode)){
+                List<Map<String, Object>> orderLists = jdbcTemplate.queryForList("SELECT * FROM (SELECT " +
+                        "ifnull(b.END_DATETIME,0) as END_DATETIME, a.PRJ_TOTAL_INVEST, a.PROJECT_AMT, a.PROJECT_OTHER_AMT, a.PREPARE_AMT, a.CONSTRUCT_PERIOD_INTEREST, '1' as id " +
+                        "FROM PM_PRJ_INVEST1 a " +
+                        "LEFT JOIN wf_process_instance b on b.id = a.LK_WF_INST_ID " +
+                        "WHERE a.PM_PRJ_ID = ? " +
+                        "ORDER BY b.CRT_DT desc LIMIT 1) a union all select * FROM( " +
+                        "SELECT ifnull(b.END_DATETIME,0) as END_DATETIME, a.PRJ_TOTAL_INVEST, a.PROJECT_AMT, a.PROJECT_OTHER_AMT, a.PREPARE_AMT, a.CONSTRUCT_PERIOD_INTEREST, '2' as id " +
+                        "FROM PM_PRJ_INVEST2 a " +
+                        "LEFT JOIN wf_process_instance b on b.id = a.LK_WF_INST_ID " +
+                        "WHERE a.PM_PRJ_ID = ? " +
+                        "ORDER BY b.CRT_DT desc LIMIT 1 ) b UNION ALL SELECT * FROM (SELECT " +
+                        "ifnull( b.END_DATETIME, 0 ) AS END_DATETIME,a.PRJ_TOTAL_INVEST,a.PROJECT_AMT,a.PROJECT_OTHER_AMT,a.PREPARE_AMT,a.CONSTRUCT_PERIOD_INTEREST,'3' AS id " +
+                        "FROM PM_PRJ_INVEST3 a " +
+                        "LEFT JOIN wf_process_instance b ON b.id = a.LK_WF_INST_ID " +
+                        "WHERE a.PM_PRJ_ID = ? " +
+                        "ORDER BY b.CRT_DT DESC LIMIT 1 ) c " +
+                        "ORDER BY id desc", attValue, attValue, attValue);
+
+                if (!CollectionUtils.isEmpty(orderLists)){
+                    //取最大的id
+                    List<Map<String, Object>> newOrderList = orderLists.stream().sorted(Comparator.comparing(x -> x.get("id").toString())).collect(Collectors.toList());
+                    for (int i = newOrderList.size()-1; i >=0; i--) {
+                        if (!"0".equals(newOrderList.get(i).get("END_DATETIME"))){
+                            attLinkResult = getResult(newOrderList.get(i));
+                            break;
+                        }
+                    }
+                }
+            }
+
 
             if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)){ //工程开工报审
                 String sql = "select PRJ_TOTAL_INVEST,PROJECT_AMT from PM_PRJ_INVEST2 where PM_PRJ_ID = ? and STATUS = 'AP' order by CRT_DT desc limit 1";
@@ -491,8 +524,9 @@ public class AttLinkExt {
             AttLinkResult attLinkResult = new AttLinkResult();
             attLinkResult.attMap = new HashMap<>();
             //根据id查询招投标信息
-            List<Map<String, Object>> list = jdbcTemplate.queryForList("select CONTRACT_CODE, CONTRACT_CATEGORY_ID, CONTRACT_NAME, " +
-                    "(select COUNT(if(status = 'AP',1,null)) from po_order_req) seq, CONTRACT_PRICE " +
+            List<Map<String, Object>> list = jdbcTemplate.queryForList("select CONTRACT_CODE, CONTRACT_CATEGORY_ID, CONTRACT_NAME, CONTRACT_PRICE, " +
+                    "BIDDING_NAME_ID,PMS_RELEASE_WAY_ID,BID_CTL_PRICE_LAUNCH,PURCHASE_TYPE,WIN_BID_UNIT_TXT,WINNING_BIDS_AMOUNT,PLAN_TOTAL_DAYS,"+
+                    "IS_REFER_GUARANTEE,GUARANTEE_LETTER_TYPE_ID,OPPO_SITE_LINK_MAN,OPPO_SITE_CONTACT,IS_TEMPLATE "+
                     "from po_order_req where id = ?", attValue);
 
             if (CollectionUtils.isEmpty(list)) {
@@ -504,25 +538,164 @@ public class AttLinkExt {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
                 typeValueText.value = JdbcMapUtil.getString(row,"CONTRACT_CODE");
+                typeValueText.text = JdbcMapUtil.getString(row,"CONTRACT_CODE");
                 attLinkResult.attMap.put("CONTRACT_CODE",typeValueText);
+            }
+            //合同类型
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"CONTRACT_CATEGORY_ID");
+                typeValueText.text = JdbcMapUtil.getString(row,"CONTRACT_CATEGORY_ID");
+                attLinkResult.attMap.put("CONTRACT_CATEGORY_ID",typeValueText);
+            }
+            //关联招采
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"BIDDING_NAME_ID");
+                typeValueText.text = JdbcMapUtil.getString(row,"BIDDING_NAME_ID");
+                attLinkResult.attMap.put("BIDDING_NAME_ID",typeValueText);
+            }
+            //招标类别
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"PMS_RELEASE_WAY_ID");
+                typeValueText.text = JdbcMapUtil.getString(row,"PMS_RELEASE_WAY_ID");
+                attLinkResult.attMap.put("PMS_RELEASE_WAY_ID",typeValueText);
+            }
+            //招标控制价
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"BID_CTL_PRICE_LAUNCH");
+                typeValueText.text = JdbcMapUtil.getString(row,"BID_CTL_PRICE_LAUNCH");
+                attLinkResult.attMap.put("BID_CTL_PRICE_LAUNCH",typeValueText);
+            }
+            //采购方式
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"PURCHASE_TYPE");
+                typeValueText.text = JdbcMapUtil.getString(row,"PURCHASE_TYPE");
+                attLinkResult.attMap.put("PURCHASE_TYPE",typeValueText);
+            }
+            //中标单位
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"WIN_BID_UNIT_TXT");
+                typeValueText.text = JdbcMapUtil.getString(row,"WIN_BID_UNIT_TXT");
+                attLinkResult.attMap.put("WIN_BID_UNIT_TXT",typeValueText);
+            }
+            //中标价
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"WINNING_BIDS_AMOUNT");
+                typeValueText.text = JdbcMapUtil.getString(row,"WINNING_BIDS_AMOUNT");
+                attLinkResult.attMap.put("WINNING_BIDS_AMOUNT",typeValueText);
+            }
+            //合同工期
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.INTEGER;
+                typeValueText.value = JdbcMapUtil.getString(row,"PLAN_TOTAL_DAYS");
+                typeValueText.text = JdbcMapUtil.getString(row,"PLAN_TOTAL_DAYS");
+                attLinkResult.attMap.put("CONTRACT_DAYS",typeValueText);
+            }
+            //是否涉及保函
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.BOOLEAN;
+//                typeValueText.value = JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE")==null?null:JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE").toString();
+                typeValueText.value = JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE").toString();
+                typeValueText.text = BooleanUtil.toText(JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE"));
+                attLinkResult.attMap.put("IS_REFER_GUARANTEE",typeValueText);
+            }
+            //保函类型
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"GUARANTEE_LETTER_TYPE_ID");
+                typeValueText.text = JdbcMapUtil.getString(row,"GUARANTEE_LETTER_TYPE_ID");
+                attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_ID",typeValueText);
+            }
+            //相对方联系人
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"OPPO_SITE_LINK_MAN");
+                typeValueText.text = JdbcMapUtil.getString(row,"OPPO_SITE_LINK_MAN");
+                attLinkResult.attMap.put("OPPO_SITE_LINK_MAN",typeValueText);
+            }
+            //相对电话
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"OPPO_SITE_CONTACT");
+                typeValueText.text = JdbcMapUtil.getString(row,"OPPO_SITE_CONTACT");
+                attLinkResult.attMap.put("OPPO_SITE_CONTACT",typeValueText);
+            }
+            //是否标准模板
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.BOOLEAN;
+//                typeValueText.value = JdbcMapUtil.getBoolean(row,"IS_TEMPLATE")==null?null:JdbcMapUtil.getBoolean(row,"IS_TEMPLATE").toString();
+                typeValueText.value = JdbcMapUtil.getBoolean(row,"IS_TEMPLATE").toString();
+                typeValueText.text = BooleanUtil.toText(JdbcMapUtil.getBoolean(row,"IS_TEMPLATE"));
+                attLinkResult.attMap.put("IS_STANDARD_CONTRACT_TEMPLATE",typeValueText);
             }
 
             //合同名称带序号
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"NAME");
-                attLinkResult.attMap.put("CONTRACT_CODE",typeValueText);
+                typeValueText.value = JdbcMapUtil.getString(row,"CONTRACT_NAME");
+                typeValueText.text = JdbcMapUtil.getString(row,"CONTRACT_NAME");
+                attLinkResult.attMap.put("CONTRACT_NAME",typeValueText);
             }
+
             //合同总金额
             {
                 TypeValueText typeValueText = new TypeValueText();
-                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.type = AttDataTypeE.DOUBLE;
                 typeValueText.value = JdbcMapUtil.getString(row,"CONTRACT_PRICE");
                 typeValueText.text = JdbcMapUtil.getString(row,"CONTRACT_PRICE");
 
                 attLinkResult.attMap.put("CONTRACT_PRICE",typeValueText);
                 attLinkResult.attMap.put("CONTRACT_AMOUNT",typeValueText);
+            }
+
+            return attLinkResult;
+        }else if (("RELATION_CONTRACT_ID").equals(attCode)){
+            AttLinkResult attLinkResult = new AttLinkResult();
+            attLinkResult.attMap = new HashMap<>();
+            //根据id查询招投标信息
+            List<Map<String, Object>> list = jdbcTemplate.queryForList("select CONTRACT_CODE, NAME " +
+                    "from po_order_req where id = ?", attValue);
+
+            if (CollectionUtils.isEmpty(list)) {
+                throw new BaseException("合同相关属性不完善！");
+            }
+            Map row = list.get(0);
+
+            //合同编号
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"CONTRACT_CODE");
+                typeValueText.text = JdbcMapUtil.getString(row,"CONTRACT_CODE");
+                attLinkResult.attMap.put("CONTRACT_CODE",typeValueText);
+            }
+            //合同名称
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"CONTRACT_NAME");
+                typeValueText.text = JdbcMapUtil.getString(row,"CONTRACT_NAME");
+                attLinkResult.attMap.put("CONTRACT_NAME",typeValueText);
             }
 
             return attLinkResult;

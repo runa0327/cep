@@ -104,6 +104,7 @@ public class WfExt {
 
                 //审批流审批通过
                 if ("AP".equals(newStatus)) {
+                    Format formatCount = new DecimalFormat("0000");
                     //合同签订批准后生成合同编号
                     if ("PO_ORDER_REQ".equals(entityCode) || "po_order_req".equals(entityCode)) {
 
@@ -115,13 +116,29 @@ public class WfExt {
                         String year = sdf.format(date).substring(0, 7).replace("-", "");
                         //合同编码规则
                         int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
-                        Format formatCount = new DecimalFormat("0000");
+
                         String formatNum = formatCount.format(num);
                         String code = "gc-" + year + "-" + formatNum;
-
-                        String name = entityRecord.valueMap.get("CONTRACT_NAME").toString() + "补充协议" + formatNum;
-                        int update2 = jdbcTemplate.update("update PO_ORDER_REQ set CONTRACT_CODE = ? ,set NAME = ? where id = ?",
+                        String name = entityRecord.valueMap.get("CONTRACT_NAME").toString();
+                        int update2 = jdbcTemplate.update("update PO_ORDER_REQ set CONTRACT_CODE = ? , NAME = ? where id = ?",
                                 code, name, csCommId);
+                    }
+                    //补充合同批准后生成合同编号
+                    if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode)){
+                        //查询当前审批通过的补充合同数量和该合同的name
+                        List<Map<String, Object>> map = jdbcTemplate.queryForList("select count(*) as num from " +
+                                "PO_ORDER_REQ where status = 'AP' ");
+                        int num = Integer.valueOf(map.get(0).get("num").toString())+1;
+                        String formatNum = formatCount.format(num);
+
+                        String relationContractId = entityRecord.valueMap.get("RELATION_CONTRACT_ID").toString();
+                        List<Map<String, Object>> nameMap = jdbcTemplate.queryForList("SELECT CONTRACT_NAME FROM " +
+                                "po_order_req where id = ?", relationContractId);
+                        String name = nameMap.get(0).get("CONTRACT_NAME").toString();
+                        String contractName = name + "补充协议" +formatNum;
+                        //写入到补充合同表
+                        int update1 = jdbcTemplate.update("update PO_ORDER_SUPPLEMENT_REQ set CONTRACT_NAME = ?  " +
+                                "where id = ? ", contractName ,csCommId);
                     }
                     //新增保函审批通过时存入保函名称
                     if ("PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entityCode)){
