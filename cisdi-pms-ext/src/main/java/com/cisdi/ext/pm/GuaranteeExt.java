@@ -100,11 +100,12 @@ public class GuaranteeExt {
         String now = DateTimeUtil.dateToString(date);
         //当前登录人
         String userId = ExtJarHelper.loginInfo.get().userName;
-        //审批意见
+
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         String csCommId = entityRecord.csCommId;
         //流程id
         String procInstId = ExtJarHelper.procInstId.get();
+        //审批意见
         List<Map<String, Object>> list = jdbcTemplate.queryForList("select u.id u_id,u.code u_code,u.name u_name,tk.user_comment from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id", procInstId);
         String comment = "";
         if (!CollectionUtils.isEmpty(list)){
