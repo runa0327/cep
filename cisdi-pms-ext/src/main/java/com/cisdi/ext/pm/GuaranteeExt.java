@@ -86,4 +86,83 @@ public class GuaranteeExt {
         }
     }
 
+    /**
+     * 保函退还申请审批 审批先后顺序 第一次审批
+     */
+    public void checkFirst() {
+        String newStatus = "first";
+        checkFirst(newStatus);
+    }
+
+    public void checkFirst(String status){
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        Date date = new Date();
+        String now = DateTimeUtil.dateToString(date);
+        //当前登录人
+        String userId = ExtJarHelper.loginInfo.get().userName;
+        //审批意见
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId;
+        //流程id
+        String procInstId = ExtJarHelper.procInstId.get();
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select u.id u_id,u.code u_code,u.name u_name,tk.user_comment from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id", procInstId);
+        String comment = "";
+        if (!CollectionUtils.isEmpty(list)){
+            comment = list.get(0).get("user_comment") == null ? null : list.get(0).get("user_comment").toString();
+        }
+        if ("first".equals(status)){
+            Integer exec = Crud.from("PO_GUARANTEE_LETTER_RETURN_REQ").where().eq("ID", csCommId).update()
+                    .set("DEPT_APPROVAL_USER", userId).set("DEPT_APPROVAL_DATE",now).set("DEPT_APPROVAL_COMMENT",comment).exec();
+            log.info("已更新：{}", exec);
+        } else if ("second".equals(status)){
+            Integer exec = Crud.from("PO_GUARANTEE_LETTER_RETURN_REQ").where().eq("ID", csCommId).update()
+                    .set("FINANCE_APPROVAL_USER_ONE", userId).set("FINANCE_APPROVAL_DATE_ONE",now).set("FINANCE_APPROVAL_COMMENT_ONE",comment).exec();
+            log.info("已更新：{}", exec);
+        } else if ("third".equals(status)){
+            Integer exec = Crud.from("PO_GUARANTEE_LETTER_RETURN_REQ").where().eq("ID", csCommId).update()
+                    .set("FINANCE_APPROVAL_USER_TWO", userId).set("FINANCE_APPROVAL_DATE_TWO",now).set("FINANCE_APPROVAL_COMMENT_TWO",comment).exec();
+            log.info("已更新：{}", exec);
+        } else if ("fourth".equals(status)){
+            Integer exec = Crud.from("PO_GUARANTEE_LETTER_RETURN_REQ").where().eq("ID", csCommId).update()
+                    .set("FINANCE_APPROVAL_USER_THREE", userId).set("FINANCE_APPROVAL_DATE_THREE",now).set("FINANCE_APPROVAL_COMMENT_THREE",comment).exec();
+            log.info("已更新：{}", exec);
+        } else if ("fifth".equals(status)){
+            Integer exec = Crud.from("PO_GUARANTEE_LETTER_RETURN_REQ").where().eq("ID", csCommId).update()
+                    .set("FINANCE_LEADER_USER", userId).set("FINANCE_APPROVAL_LEADER_DATE",now).set("FINANCE_APPROVAL_LEADER_COMMENT",comment).exec();
+            log.info("已更新：{}", exec);
+        }
+    }
+
+    /**
+     * 保函退还申请审批 审批先后顺序 第二次审批
+     */
+    public void checkSecond() {
+        String newStatus = "second";
+        checkFirst(newStatus);
+    }
+
+    /**
+     * 保函退还申请审批 审批先后顺序 第三次审批
+     */
+    public void checkThird() {
+        String newStatus = "third";
+        checkFirst(newStatus);
+    }
+
+    /**
+     * 保函退还申请审批 审批先后顺序 第四次审批
+     */
+    public void checkFourth() {
+        String newStatus = "fourth";
+        checkFirst(newStatus);
+    }
+
+    /**
+     * 保函退还申请审批 审批先后顺序 第五次审批
+     */
+    public void checkFifth() {
+        String newStatus = "fifth";
+        checkFirst(newStatus);
+    }
+
 }

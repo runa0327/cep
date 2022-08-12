@@ -582,15 +582,6 @@ public class AttLinkExt {
 
                 attLinkResult.attMap.put("GUARANTEE_END_DATE",typeValueText);
             }
-            //正式保函材料
-            {
-                TypeValueText typeValueText = new TypeValueText();
-                typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"GUARANTEE_FILE");
-                typeValueText.text = JdbcMapUtil.getString(row,"GUARANTEE_FILE");
-
-                attLinkResult.attMap.put("GUARANTEE_FILE",typeValueText);
-            }
 
             return attLinkResult;
 
