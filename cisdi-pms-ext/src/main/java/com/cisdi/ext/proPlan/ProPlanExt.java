@@ -1,7 +1,11 @@
 package com.cisdi.ext.proPlan;
 
+import com.cisdi.ext.model.GrSetValue;
+import com.cisdi.ext.model.PmProPlan;
+import com.cisdi.ext.model.PmProPlanNode;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.IdCodeName;
@@ -19,6 +23,11 @@ public class ProPlanExt {
         }
     }
 
+    /**
+     * 进度计划模板计算天数
+     *
+     * @param entityRecord
+     */
     private void calcPlanTotalDays(EntityRecord entityRecord) {
         StringBuilder sbErr = new StringBuilder();
         if (entityRecord.extraEditableAttCodeList == null) {
@@ -204,7 +213,7 @@ public class ProPlanExt {
                 List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(p, jdbcTemplate)).collect(Collectors.toList());
                 //构建树结构
                 List<PrjProPlanNodeInfo> tree = infoList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
-                    m.children = getChildNode(m, infoList).stream().sorted(Comparator.comparing(p->p.seqNo)).collect(Collectors.toList());
+                    m.children = getChildNode(m, infoList).stream().sorted(Comparator.comparing(p -> p.seqNo)).collect(Collectors.toList());
                 }).collect(Collectors.toList());
 
                 planInfo.nodeInfoList = tree;
@@ -228,7 +237,7 @@ public class ProPlanExt {
      */
     private List<PrjProPlanNodeInfo> getChildNode(PrjProPlanNodeInfo root, List<PrjProPlanNodeInfo> allListTree) {
         return allListTree.stream().filter((treeEntity) -> treeEntity.pid.equals(root.id)).peek((treeEntity) -> {
-            treeEntity.children = getChildNode(treeEntity, allListTree).stream().sorted(Comparator.comparing(p->p.seqNo)).collect(Collectors.toList());
+            treeEntity.children = getChildNode(treeEntity, allListTree).stream().sorted(Comparator.comparing(p -> p.seqNo)).collect(Collectors.toList());
         }).collect(Collectors.toList());
     }
 
@@ -353,8 +362,103 @@ public class ProPlanExt {
         nodeInfo.seqNo = JdbcMapUtil.getString(dataMap, "SEQ_NO");
         nodeInfo.level = JdbcMapUtil.getString(dataMap, "LEVEL");
         nodeInfo.chiefDeptId = JdbcMapUtil.getString(dataMap, "CHIEF_DEPT_ID");
+        nodeInfo.ver = JdbcMapUtil.getString(dataMap, "VER");
         return nodeInfo;
     }
+
+
+    /**
+     * 汇总进度计划状态
+     */
+    public void collectProgressStatus() {
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            String csCommId = entityRecord.csCommId;
+            //查询所有的进度计划节点
+            List<Map<String, Object>> nodeList = jdbcTemplate.queryForList("select pppn.ID,pppn.VER," +
+                    "pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID," +
+                    "pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE," +
+                    "pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,pppn.PLAN_TOTAL_DAYS," +
+                    "pppn.PLAN_CARRY_DAYS,pppn.ACTUAL_CARRY_DAYS,pppn.ACTUAL_TOTAL_DAYS,pppn.PLAN_CURRENT_PRO_PERCENT," +
+                    "pppn.ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID," +
+                    "pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW," +
+                    "pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID," +
+                    "pppn.START_DAY,pppn.SEQ_NO,pppn.CPMS_UUID,pppn.CPMS_ID,pppn.LEVEL,pppn.LINKED_WF_PROCESS_ID," +
+                    "pppn.LINKED_WF_NODE_ID,pppn.LINKED_WF_PROCESS_INSTANCE_ID,pppn.LINKED_WF_NODE_INSTANCE_ID," +
+                    "gsv.`CODE` as PROGRESS_STATUS_CODE from pm_pro_plan_node pppn \n" +
+                    "left join pm_pro_plan ppp on pppn.PM_PRO_PLAN_ID = ppp.ID\n" +
+                    "left join gr_set_value gsv on gsv.id = pppn.PROGRESS_STATUS_ID\n" +
+                    "left join gr_set gr on gr.id = gsv.GR_SET_ID\n" +
+                    "where gr.`CODE`='PROGRESS_STATUS' and ppp.PM_PRJ_ID=?", csCommId);
+
+            if (nodeList.size() > 0) {
+                nodeList.stream().filter(p -> Objects.equals("0", p.get("PM_PRO_PLAN_NODE_PID"))).peek(m -> {
+                    List<Map<String, Object>> children = getChildrenNodeForCollectProgressStatus(m, nodeList, jdbcTemplate);
+                    if (children.size() > 0) {
+                        int count = children.size();
+                        String proStatus = "0";
+                        List<Map<String, Object>> finishList = children.stream().filter(p -> Objects.equals("2", p.get("PROGRESS_STATUS_CODE"))).collect(Collectors.toList());
+                        if (count == finishList.size()) {
+                            //父级改为已完成
+                            proStatus = "2";
+                        } else {
+                            List<Map<String, Object>> UnBeginList = children.stream().filter(p -> Objects.equals("0", p.get("PROGRESS_STATUS_CODE"))).collect(Collectors.toList());
+                            if (count != UnBeginList.size()) {
+                                //父级改为进行中
+                                proStatus = "1";
+                            }
+                        }
+                        List<Map<String, Object>> grSetValueList = jdbcTemplate.queryForList("select gsv.* from gr_set_value gsv " +
+                                "left join gr_set gs on gs.id = gsv.gr_set_id where gs.`code`='PROGRESS_STATUS' and gsv.`code`=?", proStatus);
+                        String proStatusID = "";
+                        if (grSetValueList.size() > 0) {
+                            proStatusID = String.valueOf(grSetValueList.get(0).get("ID"));
+                        }
+                        jdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=? where id=?", proStatusID, m.get("ID"));
+                    }
+                }).collect(Collectors.toList());
+
+            }
+        }
+    }
+
+    /**
+     * 递归修改父节点的状态
+     *
+     * @param root
+     * @param allData
+     * @param jdbcTemplate
+     * @return
+     */
+    private List<Map<String, Object>> getChildrenNodeForCollectProgressStatus(Map<String, Object> root, List<Map<String, Object>> allData, JdbcTemplate jdbcTemplate) {
+        return allData.stream().filter(p -> Objects.equals(root.get("ID"), p.get("PM_PRO_PLAN_NODE_PID"))).peek(m -> {
+            List<Map<String, Object>> children = getChildrenNodeForCollectProgressStatus(m, allData, jdbcTemplate);
+            if (children.size() > 0) {
+                int count = children.size();
+                String proStatus = "0";
+                List<Map<String, Object>> finishList = children.stream().filter(p -> Objects.equals("2", p.get("PROGRESS_STATUS_CODE"))).collect(Collectors.toList());
+                if (count == finishList.size()) {
+                    //父级改为已完成
+                    proStatus = "2";
+                } else {
+                    List<Map<String, Object>> UnBeginList = children.stream().filter(p -> Objects.equals("0", p.get("PROGRESS_STATUS_CODE"))).collect(Collectors.toList());
+                    if (count != UnBeginList.size()) {
+                        //父级改为进行中
+                        proStatus = "1";
+                    }
+                }
+                List<Map<String, Object>> grSetValueList = jdbcTemplate.queryForList("select gsv.* from gr_set_value gsv " +
+                        "left join gr_set gs on gs.id = gsv.gr_set_id where gs.`code`='PROGRESS_STATUS' and gsv.`code`=?", proStatus);
+                String proStatusID = "";
+                if (grSetValueList.size() > 0) {
+                    proStatusID = String.valueOf(grSetValueList.get(0).get("ID"));
+                }
+                jdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=? where id=?", proStatusID, m.get("ID"));
+            }
+        }).collect(Collectors.toList());
+    }
+
 
     /**
      * 项目进度计划信息。
@@ -536,6 +640,8 @@ public class ProPlanExt {
         public String seqNo;
         public String level;
         public String chiefDeptId;
+
+        public String ver;
 
         /**
          * 子节点
