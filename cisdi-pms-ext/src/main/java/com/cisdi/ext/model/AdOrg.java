@@ -526,6 +526,17 @@ public class AdOrg {
     // <editor-fold>
 
     /**
+     * 根据ID插入数据。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param includeCols 更新时包含的列，空为包含所有。
+     * @param excludeCols 更新时排除的列，空为不排除。
+     * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
+     */
+    public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
+        modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+    }
+
+    /**
      * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param includeCols 更新时包含的列，空为包含所有。
@@ -547,6 +558,15 @@ public class AdOrg {
 
     // 静态方法：
     // <editor-fold>
+
+    /**
+     * 获取新的数据（未插入）。
+     *
+     * @return
+     */
+    public static AdOrg newData() {
+        return modelHelper.newData();
+    }
 
     /**
      * 插入数据。

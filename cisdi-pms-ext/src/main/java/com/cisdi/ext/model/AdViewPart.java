@@ -169,6 +169,14 @@ public class AdViewPart {
          * 视图。
          */
         public static final String AD_VIEW_ID = "AD_VIEW_ID";
+        /**
+         * 作为父属性时的序号。
+         */
+        public static final String SEQ_NO_AS_PARENT_ATT = "SEQ_NO_AS_PARENT_ATT";
+        /**
+         * 隐藏分组标题。
+         */
+        public static final String HIDE_GRP_TITLE = "HIDE_GRP_TITLE";
     }
 
     // </editor-fold>
@@ -856,10 +864,61 @@ public class AdViewPart {
         return this;
     }
 
+    /**
+     * 作为父属性时的序号。
+     */
+    public Double seqNoAsParentAtt;
+
+    /**
+     * 获取：作为父属性时的序号。
+     */
+    public Double getSeqNoAsParentAtt() {
+        return this.seqNoAsParentAtt;
+    }
+
+    /**
+     * 设置：作为父属性时的序号。
+     */
+    public AdViewPart setSeqNoAsParentAtt(Double seqNoAsParentAtt) {
+        this.seqNoAsParentAtt = seqNoAsParentAtt;
+        return this;
+    }
+
+    /**
+     * 隐藏分组标题。
+     */
+    public Boolean hideGrpTitle;
+
+    /**
+     * 获取：隐藏分组标题。
+     */
+    public Boolean getHideGrpTitle() {
+        return this.hideGrpTitle;
+    }
+
+    /**
+     * 设置：隐藏分组标题。
+     */
+    public AdViewPart setHideGrpTitle(Boolean hideGrpTitle) {
+        this.hideGrpTitle = hideGrpTitle;
+        return this;
+    }
+
     // </editor-fold>
 
     // 实例方法：
     // <editor-fold>
+
+    /**
+     * 根据ID插入数据。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param includeCols 更新时包含的列，空为包含所有。
+     * @param excludeCols 更新时排除的列，空为不排除。
+     * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
+     */
+    public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
+        modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+    }
 
     /**
      * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
@@ -883,6 +942,15 @@ public class AdViewPart {
 
     // 静态方法：
     // <editor-fold>
+
+    /**
+     * 获取新的数据（未插入）。
+     *
+     * @return
+     */
+    public static AdViewPart newData() {
+        return modelHelper.newData();
+    }
 
     /**
      * 插入数据。

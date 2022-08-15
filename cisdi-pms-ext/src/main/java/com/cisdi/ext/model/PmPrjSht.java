@@ -70,13 +70,25 @@ public class PmPrjSht {
          */
         public static final String REMARK = "REMARK";
         /**
+         * 项目。
+         */
+        public static final String PM_PRJ_ID = "PM_PRJ_ID";
+        /**
          * 锁定流程实例。
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
+         * 合同。
+         */
+        public static final String CONTRACT_ID = "CONTRACT_ID";
+        /**
          * 记录状态。
          */
         public static final String STATUS = "STATUS";
+        /**
+         * 批复文号。
+         */
+        public static final String REPLY_NO = "REPLY_NO";
         /**
          * 创建用户。
          */
@@ -86,9 +98,45 @@ public class PmPrjSht {
          */
         public static final String CRT_DEPT_ID = "CRT_DEPT_ID";
         /**
+         * 项目介绍。
+         */
+        public static final String PRJ_INTRODUCE = "PRJ_INTRODUCE";
+        /**
+         * 资金来源。
+         */
+        public static final String PM_FUND_SOURCE_ID = "PM_FUND_SOURCE_ID";
+        /**
          * 创建日期时间。
          */
         public static final String CRT_DT = "CRT_DT";
+        /**
+         * 业主单位。
+         */
+        public static final String CUSTOMER_UNIT = "CUSTOMER_UNIT";
+        /**
+         * 项目类型。
+         */
+        public static final String PROJECT_TYPE_ID = "PROJECT_TYPE_ID";
+        /**
+         * 总投资（万）。
+         */
+        public static final String PRJ_TOTAL_INVEST = "PRJ_TOTAL_INVEST";
+        /**
+         * 工程费用（万）。
+         */
+        public static final String PROJECT_AMT = "PROJECT_AMT";
+        /**
+         * 工程其他费用（万）。
+         */
+        public static final String PROJECT_OTHER_AMT = "PROJECT_OTHER_AMT";
+        /**
+         * 预备费（万）。
+         */
+        public static final String PREPARE_AMT = "PREPARE_AMT";
+        /**
+         * 建设期利息。
+         */
+        public static final String CONSTRUCT_PERIOD_INTEREST = "CONSTRUCT_PERIOD_INTEREST";
     }
 
     // </editor-fold>
@@ -277,6 +325,26 @@ public class PmPrjSht {
     }
 
     /**
+     * 项目。
+     */
+    public String pmPrjId;
+
+    /**
+     * 获取：项目。
+     */
+    public String getPmPrjId() {
+        return this.pmPrjId;
+    }
+
+    /**
+     * 设置：项目。
+     */
+    public PmPrjSht setPmPrjId(String pmPrjId) {
+        this.pmPrjId = pmPrjId;
+        return this;
+    }
+
+    /**
      * 锁定流程实例。
      */
     public String lkWfInstId;
@@ -297,6 +365,26 @@ public class PmPrjSht {
     }
 
     /**
+     * 合同。
+     */
+    public String contractId;
+
+    /**
+     * 获取：合同。
+     */
+    public String getContractId() {
+        return this.contractId;
+    }
+
+    /**
+     * 设置：合同。
+     */
+    public PmPrjSht setContractId(String contractId) {
+        this.contractId = contractId;
+        return this;
+    }
+
+    /**
      * 记录状态。
      */
     public String status;
@@ -313,6 +401,26 @@ public class PmPrjSht {
      */
     public PmPrjSht setStatus(String status) {
         this.status = status;
+        return this;
+    }
+
+    /**
+     * 批复文号。
+     */
+    public String replyNo;
+
+    /**
+     * 获取：批复文号。
+     */
+    public String getReplyNo() {
+        return this.replyNo;
+    }
+
+    /**
+     * 设置：批复文号。
+     */
+    public PmPrjSht setReplyNo(String replyNo) {
+        this.replyNo = replyNo;
         return this;
     }
 
@@ -357,6 +465,46 @@ public class PmPrjSht {
     }
 
     /**
+     * 项目介绍。
+     */
+    public String prjIntroduce;
+
+    /**
+     * 获取：项目介绍。
+     */
+    public String getPrjIntroduce() {
+        return this.prjIntroduce;
+    }
+
+    /**
+     * 设置：项目介绍。
+     */
+    public PmPrjSht setPrjIntroduce(String prjIntroduce) {
+        this.prjIntroduce = prjIntroduce;
+        return this;
+    }
+
+    /**
+     * 资金来源。
+     */
+    public String pmFundSourceId;
+
+    /**
+     * 获取：资金来源。
+     */
+    public String getPmFundSourceId() {
+        return this.pmFundSourceId;
+    }
+
+    /**
+     * 设置：资金来源。
+     */
+    public PmPrjSht setPmFundSourceId(String pmFundSourceId) {
+        this.pmFundSourceId = pmFundSourceId;
+        return this;
+    }
+
+    /**
      * 创建日期时间。
      */
     public LocalDateTime crtDt;
@@ -376,10 +524,161 @@ public class PmPrjSht {
         return this;
     }
 
+    /**
+     * 业主单位。
+     */
+    public String customerUnit;
+
+    /**
+     * 获取：业主单位。
+     */
+    public String getCustomerUnit() {
+        return this.customerUnit;
+    }
+
+    /**
+     * 设置：业主单位。
+     */
+    public PmPrjSht setCustomerUnit(String customerUnit) {
+        this.customerUnit = customerUnit;
+        return this;
+    }
+
+    /**
+     * 项目类型。
+     */
+    public String projectTypeId;
+
+    /**
+     * 获取：项目类型。
+     */
+    public String getProjectTypeId() {
+        return this.projectTypeId;
+    }
+
+    /**
+     * 设置：项目类型。
+     */
+    public PmPrjSht setProjectTypeId(String projectTypeId) {
+        this.projectTypeId = projectTypeId;
+        return this;
+    }
+
+    /**
+     * 总投资（万）。
+     */
+    public Double prjTotalInvest;
+
+    /**
+     * 获取：总投资（万）。
+     */
+    public Double getPrjTotalInvest() {
+        return this.prjTotalInvest;
+    }
+
+    /**
+     * 设置：总投资（万）。
+     */
+    public PmPrjSht setPrjTotalInvest(Double prjTotalInvest) {
+        this.prjTotalInvest = prjTotalInvest;
+        return this;
+    }
+
+    /**
+     * 工程费用（万）。
+     */
+    public Double projectAmt;
+
+    /**
+     * 获取：工程费用（万）。
+     */
+    public Double getProjectAmt() {
+        return this.projectAmt;
+    }
+
+    /**
+     * 设置：工程费用（万）。
+     */
+    public PmPrjSht setProjectAmt(Double projectAmt) {
+        this.projectAmt = projectAmt;
+        return this;
+    }
+
+    /**
+     * 工程其他费用（万）。
+     */
+    public Double projectOtherAmt;
+
+    /**
+     * 获取：工程其他费用（万）。
+     */
+    public Double getProjectOtherAmt() {
+        return this.projectOtherAmt;
+    }
+
+    /**
+     * 设置：工程其他费用（万）。
+     */
+    public PmPrjSht setProjectOtherAmt(Double projectOtherAmt) {
+        this.projectOtherAmt = projectOtherAmt;
+        return this;
+    }
+
+    /**
+     * 预备费（万）。
+     */
+    public Double prepareAmt;
+
+    /**
+     * 获取：预备费（万）。
+     */
+    public Double getPrepareAmt() {
+        return this.prepareAmt;
+    }
+
+    /**
+     * 设置：预备费（万）。
+     */
+    public PmPrjSht setPrepareAmt(Double prepareAmt) {
+        this.prepareAmt = prepareAmt;
+        return this;
+    }
+
+    /**
+     * 建设期利息。
+     */
+    public Double constructPeriodInterest;
+
+    /**
+     * 获取：建设期利息。
+     */
+    public Double getConstructPeriodInterest() {
+        return this.constructPeriodInterest;
+    }
+
+    /**
+     * 设置：建设期利息。
+     */
+    public PmPrjSht setConstructPeriodInterest(Double constructPeriodInterest) {
+        this.constructPeriodInterest = constructPeriodInterest;
+        return this;
+    }
+
     // </editor-fold>
 
     // 实例方法：
     // <editor-fold>
+
+    /**
+     * 根据ID插入数据。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param includeCols 更新时包含的列，空为包含所有。
+     * @param excludeCols 更新时排除的列，空为不排除。
+     * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
+     */
+    public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
+        modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+    }
 
     /**
      * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
@@ -403,6 +702,15 @@ public class PmPrjSht {
 
     // 静态方法：
     // <editor-fold>
+
+    /**
+     * 获取新的数据（未插入）。
+     *
+     * @return
+     */
+    public static PmPrjSht newData() {
+        return modelHelper.newData();
+    }
 
     /**
      * 插入数据。
