@@ -608,11 +608,16 @@ public class AttLinkExt {
             //是否涉及保函
             {
                 TypeValueText typeValueText = new TypeValueText();
-                typeValueText.type = AttDataTypeE.BOOLEAN;
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
 //                typeValueText.value = JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE")==null?null:JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE").toString();
-                typeValueText.value = JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE").toString();
-                typeValueText.text = BooleanUtil.toText(JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE"));
-                attLinkResult.attMap.put("IS_REFER_GUARANTEE",typeValueText);
+                String code = JdbcMapUtil.getString(row, "IS_REFER_GUARANTEE");
+                Map<String, Object> idMap = jdbcTemplate.queryForMap("SELECT v.id id FROM gr_set_value v left " +
+                                "join gr_set k on v.GR_SET_ID = k.id where k.`CODE` = 'is_refer_guarantee' and v.`CODE` = ?",
+                        code);
+                typeValueText.value = idMap.get("id").toString();
+                typeValueText.text = idMap.get("id").toString();
+//                typeValueText.text = BooleanUtil.toText(JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE"));
+                attLinkResult.attMap.put("IS_REFER_GUARANTEE_ID",typeValueText);
             }
             //保函类型
             {
@@ -641,11 +646,15 @@ public class AttLinkExt {
             //是否标准模板
             {
                 TypeValueText typeValueText = new TypeValueText();
-                typeValueText.type = AttDataTypeE.BOOLEAN;
+                typeValueText.type = AttDataTypeE.REF_SINGLE;
 //                typeValueText.value = JdbcMapUtil.getBoolean(row,"IS_TEMPLATE")==null?null:JdbcMapUtil.getBoolean(row,"IS_TEMPLATE").toString();
-                typeValueText.value = JdbcMapUtil.getBoolean(row,"IS_TEMPLATE").toString();
-                typeValueText.text = BooleanUtil.toText(JdbcMapUtil.getBoolean(row,"IS_TEMPLATE"));
-                attLinkResult.attMap.put("IS_STANDARD_CONTRACT_TEMPLATE",typeValueText);
+                String code = JdbcMapUtil.getString(row, "IS_TEMPLATE");
+                Map<String, Object> idMap = jdbcTemplate.queryForMap("SELECT v.id id FROM gr_set_value v left " +
+                        "join gr_set k on v.GR_SET_ID = k.id where k.`CODE` = 'is_standard_contract_template' and v.`CODE` = ?",
+                        code);
+                typeValueText.value = idMap.get("id").toString();
+                typeValueText.text = idMap.get("id").toString();
+                attLinkResult.attMap.put("IS_STANDARD_CONTRACT_TEMPLATE_ID",typeValueText);
             }
 
             //合同名称带序号

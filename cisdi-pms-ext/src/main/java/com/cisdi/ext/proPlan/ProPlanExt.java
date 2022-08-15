@@ -3,7 +3,9 @@ package com.cisdi.ext.proPlan;
 import com.cisdi.ext.model.GrSetValue;
 import com.cisdi.ext.model.PmProPlan;
 import com.cisdi.ext.model.PmProPlanNode;
+import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.PrjPlanUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
@@ -295,6 +297,8 @@ public class ProPlanExt {
         }
 
         planInfo.progressRiskRemark = JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_REMARK");
+        planInfo.projectId = JdbcMapUtil.getString(dataMap, "PM_PRJ_ID");
+        planInfo.ver = JdbcMapUtil.getString(dataMap, "VER");
         return planInfo;
     }
 
@@ -461,6 +465,20 @@ public class ProPlanExt {
 
 
     /**
+     * 刷新进度接话节点时间
+     */
+    public void refreshProPlanTime() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        String projectId = entityRecordList.get(0).valueMap.get("PM_PRJ_ID").toString();
+        Date date = null;
+        if (entityRecordList.get(0).valueMap.get("PLAN_START_DATE") != null) {
+            date = DateTimeUtil.stringToDate(entityRecordList.get(0).valueMap.get("PLAN_START_DATE").toString());
+        }
+        PrjPlanUtil.refreshProPlanTime(projectId, date);
+    }
+
+
+    /**
      * 项目进度计划信息。
      */
     public static class PrjProPlanInfo {
@@ -537,6 +555,10 @@ public class ProPlanExt {
          * 进度风险说明
          */
         public String progressRiskRemark;
+
+        public String projectId;
+
+        public String ver;
 
         public List<PrjProPlanNodeInfo> nodeInfoList;
     }

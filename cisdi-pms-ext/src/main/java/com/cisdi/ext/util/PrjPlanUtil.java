@@ -13,10 +13,8 @@ import java.util.*;
 
 public class PrjPlanUtil {
 
-    public void prjPlanCreate(String projectId,Date date){
-//        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
-//        String projectId = entityRecordList.get(0).valueMap.get("PM_PRJ_ID").toString();
-//        Date date = DateTimeUtil.stringToDate(entityRecordList.get(0).valueMap.get("PLAN_START_DATE").toString());
+    public static void refreshProPlanTime(String projectId,Date date){
+
         //date为空，取项目预计开始日期
         if (date == null){
            Object date1 = Crud.from("pm_pro_plan").where().eq("PM_PRJ_ID",projectId).select().specifyCols("PLAN_START_DATE").execForValue();
@@ -81,7 +79,7 @@ public class PrjPlanUtil {
     }
 
     //遍历得到所有需要变更的数据
-    private List<Map<String, Object>> getUpdateSql(List<Map<String, Object>> map, String parentId, Date afterTime) {
+    private static List<Map<String, Object>> getUpdateSql(List<Map<String, Object>> map, String parentId, Date afterTime) {
         List<Map<String, Object>> list = new ArrayList<>();
         if (!SharedUtil.isEmptyString(parentId)){
             tp: for (Map<String, Object> tmp : map) {
@@ -116,7 +114,7 @@ public class PrjPlanUtil {
     }
 
     //得到子级最大预计总天数
-    private int getMaxDate(String id, List<Map<String, Object>> map) {
+    private static int getMaxDate(String id, List<Map<String, Object>> map) {
         int maxDate = 0;
         List<Integer> dates = new ArrayList<>();
         for (Map<String, Object> tmp : map) {
