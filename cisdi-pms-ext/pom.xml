@@ -37,6 +37,11 @@
             <scope>system</scope>
             <systemPath>${pom.basedir}/../lib/qygly-shared-3.0-SNAPSHOT.jar</systemPath>
         </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
     </dependencies>
 
     <!--无需打包为spring-boot程序运行，只要打成普通的jar包传到平台并刷新，即可。-->
