@@ -297,6 +297,8 @@ public class ProPlanExt {
         }
 
         planInfo.progressRiskRemark = JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_REMARK");
+        planInfo.projectId = JdbcMapUtil.getString(dataMap, "PM_PRJ_ID");
+        planInfo.ver = JdbcMapUtil.getString(dataMap, "VER");
         return planInfo;
     }
 
@@ -553,6 +555,10 @@ public class ProPlanExt {
          * 进度风险说明
          */
         public String progressRiskRemark;
+
+        public String projectId;
+
+        public String ver;
 
         public List<PrjProPlanNodeInfo> nodeInfoList;
     }
