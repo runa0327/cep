@@ -2,7 +2,7 @@ package com.cisdi.pms.job.proPlan;
 
 import com.cisdi.pms.job.utils.ListUtils;
 import com.qygly.ext.rest.helper.feign.client.DataFeignClient;
-import com.qygly.ext.rest.helper.login.keeper.LoginInfoManager;
+import com.qygly.ext.rest.helper.keeper.LoginInfoManager;
 import com.qygly.param.data.InvokeActParam;
 import com.qygly.shared.RespBody;
 import com.qygly.shared.interaction.InvokeActResult;
