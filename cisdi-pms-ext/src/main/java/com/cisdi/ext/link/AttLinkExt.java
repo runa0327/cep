@@ -796,9 +796,35 @@ public class AttLinkExt {
             return attLinkResult;
 
         } else if ("AMOUT_PM_PRJ_ID".equals(attCode)){ //资金需求项目名称(AMOUT_PM_PRJ_ID),引用（单值）
+            AttLinkResult attLinkResult = new AttLinkResult();
+            attLinkResult.attMap = new HashMap<>();
+
+            //项目基础信息
+            List<Map<String, Object>> list = jdbcTemplate
+                    .queryForList("select t.code prj_code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
+                            "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,st.id st_id,st.name st_name," +
+                            "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
+                            "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID, " +
+                            "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS', " +
+                            "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD', " +
+                            "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget' " +
+                            "from pm_prj t join PM_PARTY c on t.id=? and t.CUSTOMER_UNIT=c.id " +
+                            "join gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
+                            "join gr_set_value l on t.BASE_LOCATION_ID=l.id " +
+                            "join gr_set_value pt on t.PROJECT_TYPE_ID=pt.id " +
+                            "join gr_set_value st on t.CON_SCALE_TYPE_ID=st.id " +
+                            "join gr_set_value su on t.CON_SCALE_UOM_ID=su.id", attValue);
+
+
+            if (CollectionUtils.isEmpty(list)) {
+                throw new BaseException("项目的相关属性不完整！");
+            }
+
+            Map row = list.get(0);
             if ("PO_ORDER_PAYMENT_REQ".equals(entCode)){ //采购合同付款申请
                 return null;
             } else if ("PM_FUND_REQUIRE_PLAN_REQ".equals(entCode)){ //资金需求计划申请
+
                 return null;
             } else {
                 return null;
