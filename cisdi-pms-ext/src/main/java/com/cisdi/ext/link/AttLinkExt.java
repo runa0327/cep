@@ -795,6 +795,15 @@ public class AttLinkExt {
 
             return attLinkResult;
 
+        } else if ("AMOUT_PM_PRJ_ID".equals(attCode)){ //资金需求项目名称(AMOUT_PM_PRJ_ID),引用（单值）
+            if ("PO_ORDER_PAYMENT_REQ".equals(entCode)){ //采购合同付款申请
+                return null;
+            } else if ("PM_FUND_REQUIRE_PLAN_REQ".equals(entCode)){ //资金需求计划申请
+                return null;
+            } else {
+                return null;
+            }
+
         }else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
