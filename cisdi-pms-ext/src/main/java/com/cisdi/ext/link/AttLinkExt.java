@@ -807,7 +807,61 @@ public class AttLinkExt {
 
             Map row = list.get(0);
             if ("PO_ORDER_PAYMENT_REQ".equals(entCode)){ //采购合同付款申请
-                return null;
+                //查询付款申请历史信息
+                String sql = "SELECT COLLECTION_DEPT_TWO,BANK_OF_DEPOSIT,ACCOUNT_NO,RECEIPT,SPECIAL_BANK_OF_DEPOSIT,SPECIAL_ACCOUNT_NO FROM PO_ORDER_PAYMENT_REQ WHERE AMOUT_PM_PRJ_ID = ? ORDER BY CRT_DT asc limit 1";
+                List<Map<String,Object>> map1 = jdbcTemplate.queryForList(sql,attValue);
+                if (!CollectionUtils.isEmpty(map1)){
+                    Map row2 = map1.get(0);
+                    //收款单位
+                    {
+                        TypeValueText typeValueText = new TypeValueText();
+                        typeValueText.type = AttDataTypeE.DATE;
+                        typeValueText.value = JdbcMapUtil.getString(row2,"COLLECTION_DEPT_TWO");
+                        typeValueText.text = JdbcMapUtil.getString(row2,"COLLECTION_DEPT_TWO");
+                        attLinkResult.attMap.put("COLLECTION_DEPT_TWO",typeValueText);
+                    }
+                    //开户行
+                    {
+                        TypeValueText typeValueText = new TypeValueText();
+                        typeValueText.type = AttDataTypeE.DATE;
+                        typeValueText.value = JdbcMapUtil.getString(row2,"BANK_OF_DEPOSIT");
+                        typeValueText.text = JdbcMapUtil.getString(row2,"BANK_OF_DEPOSIT");
+                        attLinkResult.attMap.put("BANK_OF_DEPOSIT",typeValueText);
+                    }
+                    //账号
+                    {
+                        TypeValueText typeValueText = new TypeValueText();
+                        typeValueText.type = AttDataTypeE.DATE;
+                        typeValueText.value = JdbcMapUtil.getString(row2,"ACCOUNT_NO");
+                        typeValueText.text = JdbcMapUtil.getString(row2,"ACCOUNT_NO");
+                        attLinkResult.attMap.put("ACCOUNT_NO",typeValueText);
+                    }
+                    //农民工工资专用账号收款单位
+                    {
+                        TypeValueText typeValueText = new TypeValueText();
+                        typeValueText.type = AttDataTypeE.DATE;
+                        typeValueText.value = JdbcMapUtil.getString(row2,"RECEIPT");
+                        typeValueText.text = JdbcMapUtil.getString(row2,"RECEIPT");
+                        attLinkResult.attMap.put("RECEIPT",typeValueText);
+                    }
+                    //专户开户行
+                    {
+                        TypeValueText typeValueText = new TypeValueText();
+                        typeValueText.type = AttDataTypeE.DATE;
+                        typeValueText.value = JdbcMapUtil.getString(row2,"SPECIAL_BANK_OF_DEPOSIT");
+                        typeValueText.text = JdbcMapUtil.getString(row2,"SPECIAL_BANK_OF_DEPOSIT");
+                        attLinkResult.attMap.put("SPECIAL_BANK_OF_DEPOSIT",typeValueText);
+                    }
+                    //专户账号
+                    {
+                        TypeValueText typeValueText = new TypeValueText();
+                        typeValueText.type = AttDataTypeE.DATE;
+                        typeValueText.value = JdbcMapUtil.getString(row2,"SPECIAL_ACCOUNT_NO");
+                        typeValueText.text = JdbcMapUtil.getString(row2,"SPECIAL_ACCOUNT_NO");
+                        attLinkResult.attMap.put("SPECIAL_ACCOUNT_NO",typeValueText);
+                    }
+                }
+                return attLinkResult;
             } else if ("PM_FUND_REQUIRE_PLAN_REQ".equals(entCode)){ //资金需求计划申请
 
                 return null;

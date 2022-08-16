@@ -159,8 +159,15 @@ public class WfExt {
                 if (!CollectionUtils.isEmpty(tableList)) {
                     if (tableList.contains(entityCode)) {
                         if ("APING".equals(newStatus)) {
-                            int update1 = jdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
-                                    ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi.ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                            int update1 = 0;
+                            if ("PO_ORDER_PAYMENT_REQ".equals(entityCode) || "PM_FUND_REQUIRE_PLAN_REQ".equals(entityCode)){ //资金需求计划和付款申请项目名称使用的另外的字段
+                                update1 = jdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
+                                        ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi.ENTITY_RECORD_ID=t.id join pm_prj prj on t.AMOUT_PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                            } else {
+                                update1 = jdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
+                                        ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi.ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                            }
+
                             if ("po_public_bid_req".equals(entityCode) || "PO_PUBLIC_BID_REQ".equals(entityCode)) {
                                 //采购招标流程
                                 int update2 = jdbcTemplate.update("update po_public_bid_req set name = (select * from" +
