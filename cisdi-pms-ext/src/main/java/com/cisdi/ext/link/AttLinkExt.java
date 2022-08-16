@@ -42,9 +42,9 @@ public class AttLinkExt {
         // 获取实体代码（表名）：
         String entCode = jdbcTemplate.queryForMap("select e.code ent_code from ad_single_ent_view sev join ad_ent e on sev.AD_ENT_ID = e.ID and sev.id=?", sevId).get("ent_code").toString();
 
+        AttLinkResult attLinkResult = new AttLinkResult();
+        attLinkResult.attMap = new HashMap<>();
         if ("PROJECT_TYPE_ID".equals(attCode)) {
-            AttLinkResult attLinkResult = new AttLinkResult();
-            attLinkResult.attMap = new HashMap<>();
 
             List<Map<String, Object>> list = jdbcTemplate.queryForList("select v0.id project_type_id,v0.name project_type_name,v1.id CON_SCALE_TYPE_ID,v1.name CON_SCALE_TYPE_NAME,v2.id CON_SCALE_UOM_ID,v2.name CON_SCALE_UOM_NAME from pm_prj_type_link t join gr_set_value v0 on t.PROJECT_TYPE_ID=v0.id join gr_set_value v1 on t.CON_SCALE_TYPE_ID=v1.id join gr_set_value v2 on t.CON_SCALE_UOM_ID=v2.id where t.PROJECT_TYPE_ID=?", attValue);
 
@@ -76,8 +76,6 @@ public class AttLinkExt {
 
             return attLinkResult;
         } else if ("PM_PRJ_ID".equals(attCode)) {
-            AttLinkResult attLinkResult = new AttLinkResult();
-            attLinkResult.attMap = new HashMap<>();
 
             //项目基础信息
             List<Map<String, Object>> list = jdbcTemplate
@@ -375,8 +373,6 @@ public class AttLinkExt {
             // 1.PMS_RELEASE_WAY_ID 招标类别下拉框
             // 2.GUARANTEE_LETTER_TYPE_ID 保函类别下拉框
             // 3.PMS_RELEASE_WAY_ID 项目类别下拉框
-            AttLinkResult attLinkResult = new AttLinkResult();
-            attLinkResult.attMap = new HashMap<>();
 
             List<Map<String, Object>> list = jdbcTemplate.queryForList("SELECT t.id, t.name FROM gr_set_value t WHERE t.id = ?", attValue);
 
@@ -399,8 +395,6 @@ public class AttLinkExt {
 
             return attLinkResult;
         } else if ("BIDDING_NAME_ID".equals(attCode)) {
-            AttLinkResult attLinkResult = new AttLinkResult();
-            attLinkResult.attMap = new HashMap<>();
             //根据id查询招投标信息
             List<Map<String, Object>> list = jdbcTemplate.queryForList("SELECT a.PMS_RELEASE_WAY_ID,a.BID_CTL_PRICE_LAUNCH,a.APPROVE_PURCHASE_TYPE,a.WIN_BID_UNIT_TXT,a.TENDER_OFFER,a.CONTACT_MOBILE_WIN,a.CONTACT_NAME_RECORD,a.BID_USER_ID,a.STATUS,a.BID_UNIT, ifnull((SELECT END_DATETIME FROM wf_process_instance WHERE id = a.LK_WF_INST_ID ),0) as END_DATETIME, a.SERVICE_DAYS FROM po_public_bid_req a WHERE id = ?", attValue);
             if (CollectionUtils.isEmpty(list)) {
@@ -521,8 +515,6 @@ public class AttLinkExt {
             }
             return attLinkResult;
         }else if ("CONTRACT_ID".equals(attCode)){
-            AttLinkResult attLinkResult = new AttLinkResult();
-            attLinkResult.attMap = new HashMap<>();
             //根据id查询招投标信息
             List<Map<String, Object>> list = jdbcTemplate.queryForList("select CONTRACT_CODE, CONTRACT_CATEGORY_ID, CONTRACT_NAME, CONTRACT_PRICE, " +
                     "BIDDING_NAME_ID,PMS_RELEASE_WAY_ID,BID_CTL_PRICE_LAUNCH,PURCHASE_TYPE,WIN_BID_UNIT_TXT,WINNING_BIDS_AMOUNT,PLAN_TOTAL_DAYS,"+
@@ -679,8 +671,6 @@ public class AttLinkExt {
 
             return attLinkResult;
         }else if (("RELATION_CONTRACT_ID").equals(attCode)){
-            AttLinkResult attLinkResult = new AttLinkResult();
-            attLinkResult.attMap = new HashMap<>();
             //根据id查询招投标信息
             List<Map<String, Object>> list = jdbcTemplate.queryForList("select CONTRACT_CODE, NAME " +
                     "from po_order_req where id = ?", attValue);
@@ -709,8 +699,6 @@ public class AttLinkExt {
 
             return attLinkResult;
         } else if ("GUARANTEE_ID".equals(attCode)){ //获取保函名称
-            AttLinkResult attLinkResult = new AttLinkResult();
-            attLinkResult.attMap = new HashMap<>();
 
             //查询保函相关信息
             String sql = "select SUPPLIER,BENEFICIARY,GUARANTEE_LETTER_TYPE_ID,GUARANTEE_MECHANISM,GUARANTEE_CODE,GUARANTEE_AMT,GUARANTEE_START_DATE,GUARANTEE_END_DATE,GUARANTEE_FILE from PO_GUARANTEE_LETTER_REQUIRE_REQ where id = ?";
@@ -796,9 +784,6 @@ public class AttLinkExt {
             return attLinkResult;
 
         } else if ("AMOUT_PM_PRJ_ID".equals(attCode)){ //资金需求项目名称(AMOUT_PM_PRJ_ID),引用（单值）
-            AttLinkResult attLinkResult = new AttLinkResult();
-            attLinkResult.attMap = new HashMap<>();
-
             //项目基础信息
             List<Map<String, Object>> list = jdbcTemplate
                     .queryForList("select t.code prj_code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
