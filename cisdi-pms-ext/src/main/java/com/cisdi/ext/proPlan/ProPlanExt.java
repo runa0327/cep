@@ -1,13 +1,9 @@
 package com.cisdi.ext.proPlan;
 
-import com.cisdi.ext.model.GrSetValue;
-import com.cisdi.ext.model.PmProPlan;
-import com.cisdi.ext.model.PmProPlanNode;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.PrjPlanUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
-import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.IdCodeName;
@@ -215,7 +211,7 @@ public class ProPlanExt {
                 List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(p, jdbcTemplate)).collect(Collectors.toList());
                 //构建树结构
                 List<PrjProPlanNodeInfo> tree = infoList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
-                    m.children = getChildNode(m, infoList).stream().sorted(Comparator.comparing(p -> p.seqNo)).collect(Collectors.toList());
+                    m.children = getChildNode(m, infoList).stream().sorted(Comparator.comparing(p -> p.seqNo,Comparator.nullsFirst(String::compareTo))).collect(Collectors.toList());
                 }).collect(Collectors.toList());
 
                 planInfo.nodeInfoList = tree;
@@ -239,7 +235,7 @@ public class ProPlanExt {
      */
     private List<PrjProPlanNodeInfo> getChildNode(PrjProPlanNodeInfo root, List<PrjProPlanNodeInfo> allListTree) {
         return allListTree.stream().filter((treeEntity) -> treeEntity.pid.equals(root.id)).peek((treeEntity) -> {
-            treeEntity.children = getChildNode(treeEntity, allListTree).stream().sorted(Comparator.comparing(p -> p.seqNo)).collect(Collectors.toList());
+            treeEntity.children = getChildNode(treeEntity, allListTree).stream().sorted(Comparator.comparing(p -> p.seqNo,Comparator.nullsFirst(String::compareTo))).collect(Collectors.toList());
         }).collect(Collectors.toList());
     }
 
