@@ -872,6 +872,104 @@ public class AttLinkExt {
             } else if ("PM_FUND_REQUIRE_PLAN_REQ".equals(entCode)){ //资金需求计划申请
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
 
+                //回显项目信息
+                //项目编号
+                {
+                    TypeValueText typeValueText = new TypeValueText();
+                    typeValueText.type =AttDataTypeE.TEXT_LONG;
+                    typeValueText.value =JdbcMapUtil.getString(row,"prj_code");
+                    typeValueText.text =JdbcMapUtil.getString(row,"prj_code");
+                    attLinkResult.attMap.put("PRJ_CODE",typeValueText);
+                }
+                //项目批复文号
+                {
+                    TypeValueText typeValueText = new TypeValueText();
+                    typeValueText.type = AttDataTypeE.TEXT_LONG;
+                    typeValueText.value = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
+                    typeValueText.text = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
+                    attLinkResult.attMap.put("PRJ_REPLY_NO", typeValueText);
+                }
+                //项目介绍
+                {
+                    TypeValueText typeValueText = new TypeValueText();
+                    typeValueText.type = AttDataTypeE.TEXT_LONG;
+                    typeValueText.value = JdbcMapUtil.getString(row, "PRJ_SITUATION");
+                    typeValueText.text = JdbcMapUtil.getString(row, "PRJ_SITUATION");
+                    attLinkResult.attMap.put("PRJ_SITUATION", typeValueText);
+                }
+                //资金来源
+                {
+                    TypeValueText typeValueText = new TypeValueText();
+                    typeValueText.type = AttDataTypeE.TEXT_LONG;
+                    typeValueText.value = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
+                    typeValueText.text = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
+                    attLinkResult.attMap.put("PM_FUND_SOURCE_ID", typeValueText);
+                    attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", typeValueText);
+                }
+                //业主单位
+                {
+                    TypeValueText typeValueText = new TypeValueText();
+                    typeValueText.type = AttDataTypeE.REF_SINGLE;
+                    typeValueText.value = JdbcMapUtil.getString(row, "customer_id");
+                    typeValueText.text = JdbcMapUtil.getString(row, "customer_name");
+                    attLinkResult.attMap.put("CUSTOMER_UNIT", typeValueText);
+                }
+                //项目类型
+                {
+                    TypeValueText typeValueText = new TypeValueText();
+                    typeValueText.type = AttDataTypeE.REF_SINGLE;
+                    typeValueText.value = JdbcMapUtil.getString(row, "pt_id");
+                    typeValueText.text = JdbcMapUtil.getString(row, "pt_name");
+                    attLinkResult.attMap.put("PROJECT_TYPE_ID", typeValueText);
+                }
+                //查询关联合同信息
+                List<Map<String, Object>> contractMaps = jdbcTemplate.queryForList("select o.WIN_BID_UNIT_TXT,o" +
+                        ".CONTRACT_PRICE,a.PRJ_TOTAL_INVEST estimate,b.PRJ_TOTAL_INVEST budget from PO_ORDER_REQ " +
+                        "o left join PM_PRJ_INVEST2 a on a.PM_PRJ_ID =o.PM_PRJ_ID left join PM_PRJ_INVEST3 b on b" +
+                        ".PM_PRJ_ID = o.PM_PRJ_ID where o.PM_PRJ_ID = ? and o.`STATUS` = 'AP' order by o.CRT_DT " +
+                        "limit 1", attValue);
+                if (!CollectionUtils.isEmpty(contractMaps)){
+                    Map<String, Object> contractRow = contractMaps.get(0);
+                    //签订单位
+                    {
+                        TypeValueText typeValueText = new TypeValueText();
+                        typeValueText.type = AttDataTypeE.TEXT_LONG;
+                        typeValueText.value = JdbcMapUtil.getString(contractRow, "WIN_BID_UNIT_TXT");
+                        typeValueText.text = JdbcMapUtil.getString(contractRow, "WIN_BID_UNIT_TXT");
+                        attLinkResult.attMap.put("ENTRUSTING_UNIT", typeValueText);
+                        attLinkResult.attMap.put("WIN_BID_UNIT_TXT", typeValueText);
+                    }
+                    //合同金额
+                    {
+                        TypeValueText typeValueText = new TypeValueText();
+                        typeValueText.type = AttDataTypeE.TEXT_LONG;
+                        typeValueText.value = JdbcMapUtil.getString(contractRow, "CONTRACT_PRICE");
+                        typeValueText.text = JdbcMapUtil.getString(contractRow, "CONTRACT_PRICE");
+                        attLinkResult.attMap.put("CONTRACT_PRICE", typeValueText);
+                    }
+                    //合同已支付金额
+
+                    //支付比例
+
+                    //概算金额
+                    {
+                        TypeValueText typeValueText = new TypeValueText();
+                        typeValueText.type = AttDataTypeE.TEXT_LONG;
+                        typeValueText.value = JdbcMapUtil.getString(contractRow, "estimate");
+                        typeValueText.text = JdbcMapUtil.getString(contractRow, "estimate");
+                        attLinkResult.attMap.put("ESTIMATED_AMOUNT", typeValueText);
+                    }
+                    //预算金额
+                    {
+                        TypeValueText typeValueText = new TypeValueText();
+                        typeValueText.type = AttDataTypeE.TEXT_LONG;
+                        typeValueText.value = JdbcMapUtil.getString(contractRow, "budget");
+                        typeValueText.text = JdbcMapUtil.getString(contractRow, "budget");
+                        attLinkResult.attMap.put("FINANCIAL_AMOUNT", typeValueText);
+                    }
+                    //结算金额
+                }
+
                 //该项目之前有无资金需求计划
                 List<Map<String, Object>> reqMaps = jdbcTemplate.queryForList("select r.YEAR,r.IS_BUDGET_ID,r.PROJECT_NATURE_ID," +
                         "r.BASE_LOCATION_ID,r.AGENT_BUILD_UNIT_RESPONSE,r.AGENT_BUILD_UNIT_RESPONSE_PHONE,r.DEMOLITION_COMPLETED," +
@@ -883,7 +981,7 @@ public class AttLinkExt {
                         ".`STATUS` = 'AP'", attValue);
                 if (!CollectionUtils.isEmpty(reqMaps)){
                     Map<String, Object> reqRow = reqMaps.get(0);
-                    if (!CollectionUtils.isEmpty(reqMaps)){//不是第一次填，回显所有
+                    if (!CollectionUtils.isEmpty(reqMaps)){//该项目有过资金需求计划，回显表单数据
                         Set<String> keys = reqRow.keySet();
                         for (String key : keys) {
                             {
@@ -894,75 +992,9 @@ public class AttLinkExt {
                                 attLinkResult.attMap.put(key, typeValueText);
                             }
                         }
-                        //是否市财政预算政府投资计划项目
-//                    {
-//                        TypeValueText typeValueText = new TypeValueText();
-//                        typeValueText.type = AttDataTypeE.TEXT_LONG;
-//                        typeValueText.value = JdbcMapUtil.getString(reqRow, "IS_BUDGET");
-//                        typeValueText.text = JdbcMapUtil.getString(reqRow, "IS_BUDGET");
-//                        attLinkResult.attMap.put("IS_BUDGET", typeValueText);
-//                    }
-                        //项目性质
-//                    {
-//                        TypeValueText typeValueText = new TypeValueText();
-//                        typeValueText.type = AttDataTypeE.TEXT_LONG;
-//                        typeValueText.value = JdbcMapUtil.getString(reqRow, "PROJECT_NATURE_ID");
-//                        typeValueText.text = JdbcMapUtil.getString(reqRow, "PROJECT_NATURE_ID");
-//                        attLinkResult.attMap.put("PROJECT_NATURE_ID", typeValueText);
-//                    }
-                        //
                     }
-                } else {//未填写 回显部分
-                    //回显项目信息
-                    //项目编号
-                    {
-                        TypeValueText typeValueText = new TypeValueText();
-                        typeValueText.type =AttDataTypeE.TEXT_LONG;
-                        typeValueText.value =JdbcMapUtil.getString(row,"prj_code");
-                        typeValueText.text =JdbcMapUtil.getString(row,"prj_code");
-                        attLinkResult.attMap.put("PRJ_CODE",typeValueText);
-                    }
-                    //项目批复文号
-                    {
-                        TypeValueText typeValueText = new TypeValueText();
-                        typeValueText.type = AttDataTypeE.TEXT_LONG;
-                        typeValueText.value = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
-                        typeValueText.text = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
-                        attLinkResult.attMap.put("PRJ_REPLY_NO", typeValueText);
-                    }
-                    //项目介绍
-                    {
-                        TypeValueText typeValueText = new TypeValueText();
-                        typeValueText.type = AttDataTypeE.TEXT_LONG;
-                        typeValueText.value = JdbcMapUtil.getString(row, "PRJ_SITUATION");
-                        typeValueText.text = JdbcMapUtil.getString(row, "PRJ_SITUATION");
-                        attLinkResult.attMap.put("PRJ_SITUATION", typeValueText);
-                    }
-                    //资金来源
-                    {
-                        TypeValueText typeValueText = new TypeValueText();
-                        typeValueText.type = AttDataTypeE.TEXT_LONG;
-                        typeValueText.value = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
-                        typeValueText.text = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
-                        attLinkResult.attMap.put("PM_FUND_SOURCE_ID", typeValueText);
-                        attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", typeValueText);
-                    }
-                    //业主单位
-                    {
-                        TypeValueText typeValueText = new TypeValueText();
-                        typeValueText.type = AttDataTypeE.REF_SINGLE;
-                        typeValueText.value = JdbcMapUtil.getString(row, "customer_id");
-                        typeValueText.text = JdbcMapUtil.getString(row, "customer_name");
-                        attLinkResult.attMap.put("CUSTOMER_UNIT", typeValueText);
-                    }
-                    //项目类型
-                    {
-                        TypeValueText typeValueText = new TypeValueText();
-                        typeValueText.type = AttDataTypeE.REF_SINGLE;
-                        typeValueText.value = JdbcMapUtil.getString(row, "pt_id");
-                        typeValueText.text = JdbcMapUtil.getString(row, "pt_name");
-                        attLinkResult.attMap.put("PROJECT_TYPE_ID", typeValueText);
-                    }
+                } else {//未填写 根据项目回显
+
                     //立项年度
                     {
                         TypeValueText typeValueText = new TypeValueText();
@@ -1003,14 +1035,41 @@ public class AttLinkExt {
                             attLinkResult.attMap.put("AGENT_BUILD_UNIT_RESPONSE_PHONE", typeValueText);
                         }
                     }
-
+                    //征地拆迁完成情况
+                    {
+                        TypeValueText typeValueText = new TypeValueText();
+                        typeValueText.type = AttDataTypeE.TEXT_SHORT;
+                        typeValueText.value = null;
+                        typeValueText.text = null;
+                        attLinkResult.attMap.put("DEMOLITION_COMPLETED", typeValueText);
+                    }
+                    //预计开工时间
+                    {
+                        TypeValueText typeValueText = new TypeValueText();
+                        typeValueText.type = AttDataTypeE.TEXT_SHORT;
+                        typeValueText.value = null;
+                        typeValueText.text = null;
+                        attLinkResult.attMap.put("PLAN_START_DATE", typeValueText);
+                    }
+                    //预计完工时间
+                    {
+                        TypeValueText typeValueText = new TypeValueText();
+                        typeValueText.type = AttDataTypeE.TEXT_SHORT;
+                        typeValueText.value = null;
+                        typeValueText.text = null;
+                        attLinkResult.attMap.put("PLAN_COMPL_DATE", typeValueText);
+                    }
+                    //实际开工时间
+                    {
+                        TypeValueText typeValueText = new TypeValueText();
+                        typeValueText.type = AttDataTypeE.TEXT_SHORT;
+                        typeValueText.value = null;
+                        typeValueText.text = null;
+                        attLinkResult.attMap.put("ACTUAL_START_DATE", typeValueText);
+                    }
                     //查询节点名称
                     List<Map<String, Object>> nodeMaps = jdbcTemplate.queryForList("select n.name,n.PROGRESS_STATUS_ID from PM_PRO_PLAN_NODE n" +
                             " left join PM_PRO_PLAN p on n.PM_PRO_PLAN_ID = p.id where p.PM_PRJ_ID = ?", attValue);
-//                    List<String> matchNames= Arrays.asList("立项批复", "可研批复", "用地规划许可证", "环评", "用地预审", "节能+水保+林地使用调整",
-//                            "初步设计概算批复", "预算财政评审", "工程量清单、EPC、施工");
-//                    nodeMaps.stream()
-//                            .filter(nodeMap -> matchNames.contains(nodeMap.get("name"))).collect();
 
                     //默认未涉及
                     initNUll(attLinkResult);
@@ -1110,53 +1169,6 @@ public class AttLinkExt {
 
                     }
 
-                    //查询关联合同信息
-                    List<Map<String, Object>> contractMaps = jdbcTemplate.queryForList("select o.WIN_BID_UNIT_TXT,o" +
-                            ".CONTRACT_PRICE,a.PRJ_TOTAL_INVEST estimate,b.PRJ_TOTAL_INVEST budget from PO_ORDER_REQ " +
-                            "o left join PM_PRJ_INVEST2 a on a.PM_PRJ_ID =o.PM_PRJ_ID left join PM_PRJ_INVEST3 b on b" +
-                            ".PM_PRJ_ID = o.PM_PRJ_ID where o.PM_PRJ_ID = ? and o.`STATUS` = 'AP' order by o.CRT_DT " +
-                            "limit 1", attValue);
-                    if (!CollectionUtils.isEmpty(contractMaps)){
-                        Map<String, Object> contractRow = contractMaps.get(0);
-                        //签订单位
-                        {
-                            TypeValueText typeValueText = new TypeValueText();
-                            typeValueText.type = AttDataTypeE.TEXT_LONG;
-                            typeValueText.value = JdbcMapUtil.getString(contractRow, "WIN_BID_UNIT_TXT");
-                            typeValueText.text = JdbcMapUtil.getString(contractRow, "WIN_BID_UNIT_TXT");
-                            attLinkResult.attMap.put("ENTRUSTING_UNIT", typeValueText);
-                            attLinkResult.attMap.put("WIN_BID_UNIT_TXT", typeValueText);
-                        }
-                        //合同金额
-                        {
-                            TypeValueText typeValueText = new TypeValueText();
-                            typeValueText.type = AttDataTypeE.TEXT_LONG;
-                            typeValueText.value = JdbcMapUtil.getString(contractRow, "CONTRACT_PRICE");
-                            typeValueText.text = JdbcMapUtil.getString(contractRow, "CONTRACT_PRICE");
-                            attLinkResult.attMap.put("CONTRACT_PRICE", typeValueText);
-                        }
-                        //合同已支付金额
-
-                        //支付比例
-
-                        //概算金额
-                        {
-                            TypeValueText typeValueText = new TypeValueText();
-                            typeValueText.type = AttDataTypeE.TEXT_LONG;
-                            typeValueText.value = JdbcMapUtil.getString(contractRow, "estimate");
-                            typeValueText.text = JdbcMapUtil.getString(contractRow, "estimate");
-                            attLinkResult.attMap.put("ESTIMATED_AMOUNT", typeValueText);
-                        }
-                        //预算金额
-                        {
-                            TypeValueText typeValueText = new TypeValueText();
-                            typeValueText.type = AttDataTypeE.TEXT_LONG;
-                            typeValueText.value = JdbcMapUtil.getString(contractRow, "budget");
-                            typeValueText.text = JdbcMapUtil.getString(contractRow, "budget");
-                            attLinkResult.attMap.put("FINANCIAL_AMOUNT", typeValueText);
-                        }
-                        //结算金额
-                    }
 
 
                 }
