@@ -35,9 +35,11 @@ public class InvestEstActCompareExt {
             row.pid = String.valueOf(p.get("PM_EXP_TYPE_PID") == null ? "0" : p.get("PM_EXP_TYPE_PID"));
             row.expTypeCode = String.valueOf(p.get("CODE"));
             row.expTypeName = String.valueOf(p.get("NAME"));
+            row.invest0Amt = 0d;
             row.invest1Amt = 0d;
             row.invest2Amt = 0d;
             row.invest3Amt = 0d;
+            row.invest0AmtSum = 0d;
             row.invest1AmtSum = 0d;
             row.invest2AmtSum = 0d;
             row.invest3AmtSum = 0d;
