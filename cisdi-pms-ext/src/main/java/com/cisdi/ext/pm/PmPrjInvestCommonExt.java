@@ -41,6 +41,9 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("IN_DATE");
         entityRecord.extraEditableAttCodeList.add("SERVICE_DAYS");
         entityRecord.extraEditableAttCodeList.add("OTHER_CONTACT_PHONE");
+        entityRecord.extraEditableAttCodeList.add("GUARANTEE_AMT");
+        entityRecord.extraEditableAttCodeList.add("GUARANTEE_NAME");
+        entityRecord.extraEditableAttCodeList.add("GUARANTEE_END_DATE");
         entityRecord.extraEditableAttCodeList.add("WIN_BID_UNIT_TXT");
         entityRecord.extraEditableAttCodeList.add("CONTRACT_PRICE");
         entityRecord.extraEditableAttCodeList.add("ESTIMATED_AMOUNT");
