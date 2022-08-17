@@ -808,7 +808,7 @@ public class AttLinkExt {
             Map row = list.get(0);
             if ("PO_ORDER_PAYMENT_REQ".equals(entCode)){ //采购合同付款申请
                 //查询付款申请历史信息
-                String sql = "SELECT COLLECTION_DEPT_TWO,BANK_OF_DEPOSIT,ACCOUNT_NO,RECEIPT,SPECIAL_BANK_OF_DEPOSIT,SPECIAL_ACCOUNT_NO FROM PO_ORDER_PAYMENT_REQ WHERE AMOUT_PM_PRJ_ID = ? ORDER BY CRT_DT asc limit 1";
+                String sql = "SELECT COLLECTION_DEPT_TWO,BANK_OF_DEPOSIT,ACCOUNT_NO,RECEIPT,SPECIAL_BANK_OF_DEPOSIT,SPECIAL_ACCOUNT_NO FROM PO_ORDER_PAYMENT_REQ WHERE AMOUT_PM_PRJ_ID = ? AND STATUS = 'AP' ORDER BY CRT_DT DESC limit 1";
                 List<Map<String,Object>> map1 = jdbcTemplate.queryForList(sql,attValue);
                 if (!CollectionUtils.isEmpty(map1)){
                     Map row2 = map1.get(0);

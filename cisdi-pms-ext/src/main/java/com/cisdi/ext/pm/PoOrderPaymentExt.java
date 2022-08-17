@@ -6,6 +6,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -40,8 +41,8 @@ public class PoOrderPaymentExt {
         String payBasisId = entityRecord.valueMap.get("PAY_BASIS_ID").toString();
         if ("99902212142031993".equals(payBasisId)){
             //获取附件信息
-            String fileId = entityRecord.valueMap.get("ATT_FILE_GROUP_ID").toString();
-            if (SharedUtil.isEmptyString(fileId)){
+            String fileId = JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID");
+            if (SharedUtil.isEmptyString(fileId) || "0".equals(fileId)){
                 throw new BaseException("付款依据选择“其他付款”时，请上传对应附件信息！");
             }
         }
