@@ -1069,14 +1069,25 @@ public class AttLinkExt {
                     }
                     //查询节点名称
                     List<Map<String, Object>> nodeMaps = jdbcTemplate.queryForList("select n.name,n.PROGRESS_STATUS_ID from PM_PRO_PLAN_NODE n" +
-                            " left join PM_PRO_PLAN p on n.PM_PRO_PLAN_ID = p.id where p.PM_PRJ_ID = ?", attValue);
+                            " left join PM_PRO_PLAN p on n.PM_PRO_PLAN_ID = p.id where p.PM_PRJ_ID = ? and n.level = '3'", attValue);
+                    if (CollectionUtils.isEmpty(nodeMaps)){
+                        throw new BaseException("项目没有对应的三级节点！");
+                    }
 
                     //默认未涉及
                     initNUll(attLinkResult);
-
+                    //匹配字段
+                    List<String> createMatch = Arrays.asList("立项", "立项批复");
+                    List<String> feasibility = Arrays.asList("可研", "可研批复");
+                    List<String> landUsePlan = Arrays.asList("用地规划", "用地规划许可证");
+                    List<String> eia = Arrays.asList("环评审批完成情况", "环评");
+                    List<String> advanceExam = Arrays.asList("用地预审");
+                    List<String> save = Arrays.asList("节能", "水保", "林地使用调整");
+                    List<String> prj = Arrays.asList("(施工)工程量清单", "工程量清单", "EPC", "施工", "工程量清单");
                     for (Map<String, Object> nodeMap : nodeMaps) {
                         String name = nodeMap.get("name").toString();
-                        if ("立项批复".equals(name)){
+                        if(judgeMatch(createMatch,name)){
+//                        if ("立项批复".equals(name)){
                             //立项完成情况
                             {
                                 TypeValueText typeValueText = new TypeValueText();
@@ -1086,7 +1097,8 @@ public class AttLinkExt {
                                 attLinkResult.attMap.put("CREATE_PROJECT_COMPLETED", typeValueText);
                             }
                         }else
-                        if ("可研批复".equals(name)){
+                        if(judgeMatch(feasibility,name)){
+//                            if ("可研批复".equals(name)){
                             //可研完成情况
                             {
                                 TypeValueText typeValueText = new TypeValueText();
@@ -1096,7 +1108,8 @@ public class AttLinkExt {
                                 attLinkResult.attMap.put("FEASIBILITY_COMPLETED", typeValueText);
                             }
                         }else
-                        if ("用地规划许可证".equals(name)){
+                        if(judgeMatch(landUsePlan,name)){
+//                            if ("用地规划许可证".equals(name)){
                             //规划选址完成情况
                             {
                                 TypeValueText typeValueText = new TypeValueText();
@@ -1106,7 +1119,8 @@ public class AttLinkExt {
                                 attLinkResult.attMap.put("SELECT_SITE_COMPLETED", typeValueText);
                             }
                         }else
-                        if ("环评".equals(name)){
+                        if(judgeMatch(eia,name)){
+//                        if ("环评".equals(name)){
                             //环评完成情况
                             {
                                 TypeValueText typeValueText = new TypeValueText();
@@ -1116,7 +1130,8 @@ public class AttLinkExt {
                                 attLinkResult.attMap.put("EIA_COMPLETED", typeValueText);
                             }
                         }else
-                        if ("用地预审".equals(name)){
+                        if(judgeMatch(advanceExam,name)){
+//                        if ("用地预审".equals(name)){
                             //用地预审
                             {
                                 TypeValueText typeValueText = new TypeValueText();
@@ -1126,7 +1141,8 @@ public class AttLinkExt {
                                 attLinkResult.attMap.put("USE_LAND_COMPLETED", typeValueText);
                             }
                         }else
-                        if ("节能+水保+林地使用调整".equals(name)){
+                        if(judgeMatch(save,name)){
+//                        if ("节能+水保+林地使用调整".equals(name)){
                             //用地预审
                             {
                                 TypeValueText typeValueText = new TypeValueText();
@@ -1156,7 +1172,8 @@ public class AttLinkExt {
                                 attLinkResult.attMap.put("BUDGET_REVIEW_COMPLETED", typeValueText);
                             }
                         }else
-                        if ("工程量清单、EPC、施工".equals(name)){
+                        if (judgeMatch(prj,name)){
+//                        if ("工程量清单、EPC、施工".equals(name)){
                             //预算评审完成情况
                             {
                                 TypeValueText typeValueText = new TypeValueText();
@@ -1252,5 +1269,13 @@ public class AttLinkExt {
         return attLinkResult;
     }
 
+    public boolean judgeMatch(List<String> words,String name){
+        for (String word : words) {
+            if (name.contains(word)){
+                return true;
+            }
+        }
+        return false;
+    }
 
 }
