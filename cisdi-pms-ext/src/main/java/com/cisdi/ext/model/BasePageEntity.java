@@ -1,0 +1,36 @@
+package com.cisdi.ext.model;
+
+import lombok.Data;
+
+public class BasePageEntity {
+    //页码
+    public Integer pageIndex;
+    //每页条数
+    public Integer pageSize;
+    //总条数
+    public Integer total;
+
+    public Integer getPageIndex() {
+        return pageIndex;
+    }
+
+    public void setPageIndex(Integer pageIndex) {
+        this.pageIndex = pageIndex;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public Integer getTotal() {
+        return total;
+    }
+
+    public void setTotal(Integer total) {
+        this.total = total;
+    }
+}
