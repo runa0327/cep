@@ -11,7 +11,6 @@ import com.qygly.shared.util.SharedUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,9 +64,9 @@ public class PoOrderExtApi {
                 poOrderView.agent = JdbcMapUtil.getString(p,"AGENT");
                 poOrderView.agentPhone = JdbcMapUtil.getString(p,"AGENT_PHONE");
                 poOrderView.contractAmount = JdbcMapUtil.getString(p,"CONTRACT_AMOUNT");
-                poOrderView.fileAttachmentUrl = JdbcMapUtil.getString(p,"FILE_ATTACHMENT_URL");
                 poOrderView.statusName = JdbcMapUtil.getString(p,"statusName");
                 poOrderView.remark = JdbcMapUtil.getString(p,"REMARK");
+                poOrderView.fileId = JdbcMapUtil.getString(p,"FILE_ATTACHMENT_URL");
                 return poOrderView;
             }).collect(Collectors.toList());
             map1.put("result",inputList);
@@ -75,7 +74,6 @@ public class PoOrderExtApi {
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(map1), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
-
     }
 
     //采购合同明细
@@ -135,7 +133,7 @@ public class PoOrderExtApi {
                 poOrderDtlView.payType = JdbcMapUtil.getString(p,"PAY_TYPE");
                 poOrderDtlView.amt = JdbcMapUtil.getString(p,"AMT");
                 poOrderDtlView.workContent = JdbcMapUtil.getString(p,"WORK_CONTENT");
-                poOrderDtlView.fileAttachmentUrl = JdbcMapUtil.getString(p,"FILE_ATTACHMENT_URL");
+                poOrderDtlView.fileId = JdbcMapUtil.getString(p,"FILE_ATTACHMENT_URL");
                 poOrderDtlView.remark = JdbcMapUtil.getString(p,"REMARK");
                 return poOrderDtlView;
             }).collect(Collectors.toList());
@@ -210,8 +208,8 @@ public class PoOrderExtApi {
                 poOrderDtlProView.complTotalAmt = JdbcMapUtil.getString(p,"COMPL_TOTAL_AMT");
                 poOrderDtlProView.complDate = JdbcMapUtil.getString(p,"COMPL_DATE");
                 poOrderDtlProView.workContent = JdbcMapUtil.getString(p,"WORK_CONTENT");
-                poOrderDtlProView.fileAttachmentUrl = JdbcMapUtil.getString(p,"FILE_ATTACHMENT_URL");
                 poOrderDtlProView.remark = JdbcMapUtil.getString(p,"REMARK");
+                poOrderDtlProView.fileId = JdbcMapUtil.getString(p,"FILE_ATTACHMENT_URL");
                 return poOrderDtlProView;
 
             }).collect(Collectors.toList());

@@ -2,6 +2,8 @@ package com.cisdi.ext.model.view;
 
 import com.cisdi.ext.model.BasePageEntity;
 
+import java.util.List;
+
 /**
  * 采购合同明细
  */
@@ -26,7 +28,8 @@ public class PoOrderDtlView  extends BasePageEntity {
     //工作内容
     public String workContent;
     //文件附件
-    public String fileAttachmentUrl;
+    public String fileId;
+    public List<BaseFileView> fileList;
     //备注
     public String remark;
 
@@ -102,11 +105,27 @@ public class PoOrderDtlView  extends BasePageEntity {
         this.workContent = workContent;
     }
 
-    public String getFileAttachmentUrl() {
-        return fileAttachmentUrl;
+    public String getFileId() {
+        return fileId;
     }
 
-    public void setFileAttachmentUrl(String fileAttachmentUrl) {
-        this.fileAttachmentUrl = fileAttachmentUrl;
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
+    }
+
+    public List<BaseFileView> getFileList() {
+        return fileList;
+    }
+
+    public void setFileList(List<BaseFileView> fileList) {
+        this.fileList = fileList;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

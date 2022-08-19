@@ -2,6 +2,8 @@ package com.cisdi.ext.model.view;
 
 import com.cisdi.ext.model.BasePageEntity;
 
+import java.util.List;
+
 /**
  * 采购合同
  */
@@ -27,7 +29,8 @@ public class PoOrderView extends BasePageEntity {
     //状态
     public String status;
     //附件信息
-    public String fileAttachmentUrl;
+    public String fileId;
+    public List<BaseFileView> fileList;
     //状态名称
     public String statusName;
     //备注
@@ -113,19 +116,35 @@ public class PoOrderView extends BasePageEntity {
         this.status = status;
     }
 
-    public String getFileAttachmentUrl() {
-        return fileAttachmentUrl;
-    }
-
-    public void setFileAttachmentUrl(String fileAttachmentUrl) {
-        this.fileAttachmentUrl = fileAttachmentUrl;
-    }
-
     public String getStatusName() {
         return statusName;
     }
 
     public void setStatusName(String statusName) {
         this.statusName = statusName;
+    }
+
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
+    }
+
+    public List<BaseFileView> getFileList() {
+        return fileList;
+    }
+
+    public void setFileList(List<BaseFileView> fileList) {
+        this.fileList = fileList;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }
