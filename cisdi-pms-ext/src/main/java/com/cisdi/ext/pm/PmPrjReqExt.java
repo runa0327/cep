@@ -128,7 +128,7 @@ public class PmPrjReqExt {
                         "CON_SCALE_UOM_ID", pm_prj_req.get("CON_SCALE_UOM_ID")).set("PRJ_SITUATION", pm_prj_req.get(
                                 "PRJ_SITUATION")).set("INVESTMENT_SOURCE_ID", pm_prj_req.get("INVESTMENT_SOURCE_ID"))
                 .set("PRJ_EARLY_USER_ID", pm_prj_req.get("PRJ_EARLY_USER_ID")).set("PRJ_DESIGN_USER_ID", pm_prj_req.get("PRJ_DESIGN_USER_ID"))
-                .set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID"))
+                .set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID")).set("PRJ_CODE",pm_prj_req.get("PRJ_CODE"))
 //                .set("PRJ_REPLY_DATE", replyDate)
 //                .set("PRJ_REPLY_NO", replyNo).set("PRJ_REPLY_FILE", replyFile).set("INVESTMENT_SOURCE_ID",investmentSourceId)
                 .exec();
