@@ -1,7 +1,6 @@
 package com.cisdi.ext.model.view;
 
 import com.cisdi.ext.model.BasePageEntity;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class BaseFileView extends BasePageEntity {
     //id

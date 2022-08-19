@@ -673,8 +673,7 @@ public class AttLinkExt {
             return attLinkResult;
         }else if (("RELATION_CONTRACT_ID").equals(attCode)){
             //根据id查询招投标信息
-            List<Map<String, Object>> list = jdbcTemplate.queryForList("select CONTRACT_CODE, NAME " +
-                    "from po_order_req where id = ?", attValue);
+            List<Map<String, Object>> list = jdbcTemplate.queryForList("select CONTRACT_CODE, NAME from po_order_req where id = ?", attValue);
 
             if (CollectionUtils.isEmpty(list)) {
                 throw new BaseException("合同相关属性不完善！");
@@ -693,8 +692,8 @@ public class AttLinkExt {
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = JdbcMapUtil.getString(row,"CONTRACT_NAME");
-                typeValueText.text = JdbcMapUtil.getString(row,"CONTRACT_NAME");
+                typeValueText.value = JdbcMapUtil.getString(row,"NAME");
+                typeValueText.text = JdbcMapUtil.getString(row,"NAME");
                 attLinkResult.attMap.put("CONTRACT_NAME",typeValueText);
             }
 
