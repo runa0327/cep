@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 public class FundDemandPlan {
@@ -45,11 +46,9 @@ public class FundDemandPlan {
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         List<Map<String, Object>> resultList = jdbcTemplate.queryForList(baseSql.toString());
 
-        HashMap<String, Object> total = new HashMap<>();
-        total.put("total", resultList.size());
-        resultList.add(total);
         HashMap<String, Object> result = new HashMap<>();
         result.put("resultList", resultList);
+        result.put("total", resultList.size());
 
         Map outputMap = JsonUtil.fromJson(JSONObject.toJSONString(result), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
@@ -57,25 +56,47 @@ public class FundDemandPlan {
 
 
     //获取项目名称下拉框
-    public void getPrjDrop(){
+    public void getPrjDrop() {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
-        String prjName = inputMap.get("prjName").toString();
+        String prjName = Objects.isNull(inputMap.get("prjName")) ? null : inputMap.get("prjName").toString();
 
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         StringBuffer baseSql = new StringBuffer();
         baseSql.append("select name,id from pm_prj where STATUS = 'AP' ");
-        if (!Strings.isNullOrEmpty(prjName)){
-            baseSql.append("and name like '%"+prjName+"%' ");
+        if (!Strings.isNullOrEmpty(prjName)) {
+            baseSql.append("and name like '%" + prjName + "%' ");
         }
         baseSql.append("order by CRT_DT desc ");
 
         List<Map<String, Object>> projects = jdbcTemplate.queryForList(baseSql.toString());
 
         HashMap<String, Object> result = new HashMap<>();
-        result.put("projects",projects);
+        result.put("projects", projects);
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
 
+    }
+
+    //详情
+    public void getFundDemandDetail() {
+        Map<String, Object> idMap = ExtJarHelper.extApiParamMap.get();
+        String id = idMap.get("id").toString();
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+
+        Map<String, Object> listInfo = jdbcTemplate.queryForMap("select r.id, r.NAME planName, p.NAME prjName," +
+                "d.NAME deptName,r.CRT_DT createTime,r" +
+                ".REMARK remark from pm_fund_req_plan r left join pm_prj p on r.PM_PRJ_ID = p.ID " +
+                "left join hr_dept d on r.HR_DEPT_ID = d.ID where r.id=? ", id);
+        List<Map<String, Object>> detailList = jdbcTemplate.queryForList("select d.REQ_TIME reqTime,d.REQ_AMT reqAmt,v.name" +
+                " from pm_fund_req_plan_detail d " +
+                "left join gr_set_value v on v.id = d.FUND_REQ_TYPE_ID left join gr_set s on s.id = v.GR_SET_ID and s" +
+                ".CODE = 'psm_money_type' where d.PM_FUND_REQ_PLAN_ID = ?", id);
+        HashMap<Object, Object> result = new HashMap<>();
+        result.put("listInfo",listInfo);
+        result.put("detailList",detailList);
+
+        Map outputMap = JsonUtil.fromJson(JSONObject.toJSONString(result), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
     }
 
     public static class Input extends BasePageEntity {
