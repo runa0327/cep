@@ -1,5 +1,6 @@
 package com.cisdi.ext.wf;
 
+import com.cisdi.ext.model.PmFundReqPlan;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
@@ -12,6 +13,7 @@ import org.springframework.data.redis.connection.ConnectionUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -153,6 +155,30 @@ public class WfExt {
                         int update2 = jdbcTemplate.update(sql2,name,csCommId);
                     }
 
+                }
+
+                //资金需求计划申请完成同步数据
+                if ("PM_FUND_REQUIRE_PLAN_REQ".equals(entityCode)){
+                    PmFundReqPlan pmFundReqPlan = PmFundReqPlan.insertData();
+                    String id = pmFundReqPlan.id;
+                    String pmFundRequirePlanReqId = entityRecord.csCommId;
+                    Map<String, Object> valueMap = entityRecord.valueMap;
+                    //项目id
+                    String prjId = valueMap.get("AMOUT_PM_PRJ_ID").toString();
+                    //发起部门id
+                    String hrDeptId = valueMap.get("CRT_DEPT_ID").toString();
+                    //计划需求总金额 待修改
+                    //        String totalAmt = valueMap.get("").toString();
+                    BigDecimal totalAmt = new BigDecimal(10);
+                    //提出时间
+                    String applyTime = valueMap.get("CRT_DT").toString();
+                    //备注
+                    String remark = valueMap.get("REMARK").toString();
+                    //计划名称 待修改
+                    String name = "计划名称待修改";
+
+                    String sql = "update pm_fund_req_plan set NAME = ?,PM_PRJ_ID = ?,HR_DEPT_ID = ?,TOTAL_AMT = ?,APPLY_TIME = ?,PM_FUND_REQUIRE_PLAN_REQ_ID = ?,REMARK = ? where id = ?";
+                    jdbcTemplate.update(sql,name,prjId,hrDeptId,totalAmt,applyTime,pmFundRequirePlanReqId,remark,id);
                 }
 
                 List<String> tableList = getTableList();
