@@ -218,6 +218,7 @@ public class WfExt {
         list.add("PM_PRJ_KICK_OFF_REQ"); //工程开工申请
         list.add("PM_FUND_REQUIRE_PLAN_REQ"); //资金需求计划申请
         list.add("PO_ORDER_PAYMENT_REQ"); //采购合同付款申请
+        list.add("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD"); //技术交底与图纸会审记录
         return list;
     }
 

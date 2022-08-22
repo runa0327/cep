@@ -49,5 +49,10 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("ESTIMATED_AMOUNT");
         entityRecord.extraEditableAttCodeList.add("FINANCIAL_AMOUNT");
         entityRecord.extraEditableAttCodeList.add("TGT_AMT");
+        entityRecord.extraEditableAttCodeList.add("PRJ_TOTAL_INVEST"); //总投资
+        entityRecord.extraEditableAttCodeList.add("PROJECT_AMT"); //工程费
+        entityRecord.extraEditableAttCodeList.add("PROJECT_OTHER_AMT"); //工厂建设其他费
+        entityRecord.extraEditableAttCodeList.add("PREPARE_AMT"); //预备费
+        entityRecord.extraEditableAttCodeList.add("CONSTRUCT_PERIOD_INTEREST"); //建设期利息
     }
 }
