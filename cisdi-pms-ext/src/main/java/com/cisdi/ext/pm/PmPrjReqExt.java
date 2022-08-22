@@ -1,9 +1,7 @@
 package com.cisdi.ext.pm;
 
-import com.cisdi.ext.util.AmtUtil;
-import com.cisdi.ext.util.DateTimeUtil;
-import com.cisdi.ext.util.DoubleUtil;
-import com.cisdi.ext.util.WfPmInvestUtil;
+import com.cisdi.ext.model.PmPrjReq;
+import com.cisdi.ext.util.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
@@ -13,6 +11,7 @@ import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -121,14 +120,14 @@ public class PmPrjReqExt {
         Integer exec = Crud.from("PM_PRJ").where().eq("ID", newPrjId).update().set("PM_PRJ_REQ_ID", pm_prj_req.get(
                 "id")).set("code", pm_prj_req.get("code")).set("name", pm_prj_req.get("name")).set("CUSTOMER_UNIT",
                 pm_prj_req.get("CUSTOMER_UNIT")).set("PRJ_MANAGE_MODE_ID", pm_prj_req.get("PRJ_MANAGE_MODE_ID")).set(
-                        "BASE_LOCATION_ID", pm_prj_req.get("BASE_LOCATION_ID")).set("FLOOR_AREA", pm_prj_req.get(
-                                "FLOOR_AREA")).set("PROJECT_TYPE_ID", pm_prj_req.get("PROJECT_TYPE_ID")).set(
-                                        "CON_SCALE_TYPE_ID", pm_prj_req.get("CON_SCALE_TYPE_ID")).set("CON_SCALE_QTY"
+                "BASE_LOCATION_ID", pm_prj_req.get("BASE_LOCATION_ID")).set("FLOOR_AREA", pm_prj_req.get(
+                "FLOOR_AREA")).set("PROJECT_TYPE_ID", pm_prj_req.get("PROJECT_TYPE_ID")).set(
+                "CON_SCALE_TYPE_ID", pm_prj_req.get("CON_SCALE_TYPE_ID")).set("CON_SCALE_QTY"
                 , pm_prj_req.get("CON_SCALE_QTY")).set("CON_SCALE_QTY2", pm_prj_req.get("CON_SCALE_QTY2")).set(
-                        "CON_SCALE_UOM_ID", pm_prj_req.get("CON_SCALE_UOM_ID")).set("PRJ_SITUATION", pm_prj_req.get(
-                                "PRJ_SITUATION")).set("INVESTMENT_SOURCE_ID", pm_prj_req.get("INVESTMENT_SOURCE_ID"))
+                "CON_SCALE_UOM_ID", pm_prj_req.get("CON_SCALE_UOM_ID")).set("PRJ_SITUATION", pm_prj_req.get(
+                "PRJ_SITUATION")).set("INVESTMENT_SOURCE_ID", pm_prj_req.get("INVESTMENT_SOURCE_ID"))
                 .set("PRJ_EARLY_USER_ID", pm_prj_req.get("PRJ_EARLY_USER_ID")).set("PRJ_DESIGN_USER_ID", pm_prj_req.get("PRJ_DESIGN_USER_ID"))
-                .set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID")).set("PRJ_CODE",pm_prj_req.get("PRJ_CODE"))
+                .set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID")).set("PRJ_CODE", pm_prj_req.get("PRJ_CODE"))
 //                .set("PRJ_REPLY_DATE", replyDate)
 //                .set("PRJ_REPLY_NO", replyNo).set("PRJ_REPLY_FILE", replyFile).set("INVESTMENT_SOURCE_ID",investmentSourceId)
                 .exec();
@@ -147,6 +146,9 @@ public class PmPrjReqExt {
 
         //新增项目进度计划网络图
         createPlan(newPrjId);
+
+        //创建项目文件夹
+        createFolder(newPrjId);
 
     }
 
@@ -205,13 +207,13 @@ public class PmPrjReqExt {
 
         //获取项目id
 //        String projectId = entityRecord.valueMap.get("PM_PRJ_ID").toString();
-        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
-        if (projectId == null || projectId.length() == 0){
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap, "PM_PRJ_ID");
+        if (projectId == null || projectId.length() == 0) {
             JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
             //流程id
             String csCommId = entityRecord.csCommId;
-            List<Map<String,Object>> map1 = jdbcTemplate.queryForList("SELECT id FROM pm_prj WHERE PM_PRJ_REQ_ID = ? ORDER BY CRT_DT desc limit 1",csCommId);
-            if (CollectionUtils.isEmpty(map1)){
+            List<Map<String, Object>> map1 = jdbcTemplate.queryForList("SELECT id FROM pm_prj WHERE PM_PRJ_REQ_ID = ? ORDER BY CRT_DT desc limit 1", csCommId);
+            if (CollectionUtils.isEmpty(map1)) {
                 throw new BaseException("项目未创建完成无法进行批复信息同步");
             } else {
                 projectId = map1.get(0).get("id").toString();
@@ -229,7 +231,7 @@ public class PmPrjReqExt {
 
         // 修改项目建设年限信息：
         Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("PRJ_REPLY_DATE", replyDate)
-                .set("PRJ_REPLY_NO", replyNo).set("PRJ_REPLY_FILE", replyFile).set("INVESTMENT_SOURCE_ID",investmentSourceId).exec();
+                .set("PRJ_REPLY_NO", replyNo).set("PRJ_REPLY_FILE", replyFile).set("INVESTMENT_SOURCE_ID", investmentSourceId).exec();
         log.info("已更新：{}", exec);
     }
 
@@ -298,10 +300,10 @@ public class PmPrjReqExt {
         String idcardWin = entityRecord.valueMap.get("CONTACT_IDCARD_WIN").toString();
         //更新
         jdbcTemplate.update("update PO_PUBLIC_BID_REQ set WIN_BID_UNIT_RECORD = ?," +
-                "TENDER_OFFER_RECORD = ?," +
-                "CONTACT_NAME_RECORD =?," +
-                "CONTACT_MOBILE_RECORD =?," +
-                "CONTACT_IDCARD_RECORD =? where id = ?", winBidUnitTxt, tenderOffer, contactName, contactMobileWin,
+                        "TENDER_OFFER_RECORD = ?," +
+                        "CONTACT_NAME_RECORD =?," +
+                        "CONTACT_MOBILE_RECORD =?," +
+                        "CONTACT_IDCARD_RECORD =? where id = ?", winBidUnitTxt, tenderOffer, contactName, contactMobileWin,
                 idcardWin, csCommId);
     }
 
@@ -359,7 +361,7 @@ public class PmPrjReqExt {
                 sbErr.append("建设规模数量2请不要填写！");
             }
         }
-        if (sbErr.length() > 0){
+        if (sbErr.length() > 0) {
             throw new BaseException(sbErr.toString());
         }
     }
@@ -398,7 +400,7 @@ public class PmPrjReqExt {
                         Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId)
                                 .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                                 .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
-                                .set("LINKED_WF_PROCESS_ID",m.get("LINKED_WF_PROCESS_ID")).set("LINKED_WF_NODE_ID",m.get("LINKED_WF_NODE_ID")).exec();
+                                .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_WF_NODE_ID", m.get("LINKED_WF_NODE_ID")).exec();
 
                         getChildrenNode(m, planNodeList, id, newPlanId);
                     }).collect(Collectors.toList());
@@ -416,9 +418,74 @@ public class PmPrjReqExt {
                     .set("PM_PRO_PLAN_NODE_PID", pId)
                     .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                     .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
-                    .set("LINKED_WF_PROCESS_ID",m.get("LINKED_WF_PROCESS_ID")).set("LINKED_WF_NODE_ID",m.get("LINKED_WF_NODE_ID")).exec();
+                    .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_WF_NODE_ID", m.get("LINKED_WF_NODE_ID")).exec();
             getChildrenNode(m, allData, id, newPlanId);
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 新增项目资料文件夹层级
+     */
+    private void createFolder(String projectId) {
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select `CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID from PF_FOLDER where IS_TEMPLATE ='1';");
+        //新增项目文件夹目录
+        list.stream().peek(m -> {
+            String id = Crud.from("PF_FOLDER").insertData();
+            Crud.from("PF_FOLDER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId).set("NAME", m.get("NAME"))
+                    .set("SEQ_NO", m.get("SEQ_NO")).set("CODE", m.get("CODE")).set("IS_TEMPLATE","0").exec();
+        }).collect(Collectors.toList());
+
+        try {
+            //立项申请信息
+            Map<String, Object> proReq = jdbcTemplate.queryForMap("select * from pm_prj_req where id = (select PM_PRJ_REQ_ID from pm_prj where id=?)", projectId);
+            //立项申请顶级文件夹
+            Map<String, Object> folderTem = jdbcTemplate.queryForMap("select * from pf_folder where IS_TEMPLATE='0' and `CODE`='APPROVE_PROJECT' and PM_PRJ_ID=?",projectId);
+
+            //项目申请材料
+            String reqFile = JdbcMapUtil.getString(proReq, "PRJ_REQ_FILE");
+            String id = Crud.from("PF_FOLDER").insertData();
+            Crud.from("PF_FOLDER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId).set("NAME", "立项申请材料").set("SEQ_NO", 1).set("CODE", "APPLY_FILE").set("PF_FOLDER_PID", folderTem.get("ID")).set("IS_TEMPLATE","0").exec();
+            if (!StringUtils.isEmpty(reqFile)) {
+                for (String s : reqFile.split(",")) {
+                    String fileId = Crud.from("PF_FILE").insertData();
+                    Crud.from("PF_FILE").where().eq("ID", fileId).update().set("FL_FILE_ID", s).set("PF_FOLDER_ID", id).exec();
+                }
+            }
+
+            //盖章立项申请书
+            String applyBook = JdbcMapUtil.getString(proReq, "STAMPED_PRJ_REQ_FILE");
+            String bookId = Crud.from("PF_FOLDER").insertData();
+            Crud.from("PF_FOLDER").where().eq("ID", bookId).update().set("PM_PRJ_ID", projectId).set("NAME", "盖章立项申请书").set("SEQ_NO", 2).set("CODE", "STAMPED_PRJ_REQ").set("PF_FOLDER_PID", folderTem.get("ID")).set("IS_TEMPLATE","0").exec();
+            if (!StringUtils.isEmpty(applyBook)) {
+                for (String s : applyBook.split(",")) {
+                    String fileId = Crud.from("PF_FILE").insertData();
+                    Crud.from("PF_FILE").where().eq("ID", fileId).update().set("FL_FILE_ID", s).set("PF_FOLDER_ID", bookId).exec();
+                }
+            }
+
+            //批复文件
+            String reply = JdbcMapUtil.getString(proReq, "REPLY_FILE");
+            String replyId = Crud.from("PF_FOLDER").insertData();
+            Crud.from("PF_FOLDER").where().eq("ID", replyId).update().set("PM_PRJ_ID", projectId).set("NAME", "批复文件").set("SEQ_NO", 3).set("CODE", "REPLY_FILE").set("PF_FOLDER_PID", folderTem.get("ID")).set("IS_TEMPLATE","0").exec();
+            if (!StringUtils.isEmpty(reply)) {
+                for (String s : reply.split(",")) {
+                    String fileId = Crud.from("PF_FILE").insertData();
+                    Crud.from("PF_FILE").where().eq("ID", fileId).update().set("FL_FILE_ID", s).set("PF_FOLDER_ID", replyId).exec();
+                }
+            }
+        } catch (Exception e) {
+            throw new BaseException(e.getMessage());
+        }
+
+
+    }
+
+
+    public void createProjectFolder() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String projectId = String.valueOf(map.get("pmPrjId"));
+        this.createFolder(projectId);
     }
 
 }
