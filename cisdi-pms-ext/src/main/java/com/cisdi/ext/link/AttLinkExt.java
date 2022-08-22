@@ -827,6 +827,7 @@ public class AttLinkExt {
                 typeValueText.value = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
                 typeValueText.text = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
                 attLinkResult.attMap.put("PRJ_REPLY_NO", typeValueText);
+                attLinkResult.attMap.put("REPLY_NO", typeValueText);
             }
             //项目介绍
             {
