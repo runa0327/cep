@@ -36,6 +36,9 @@ public class FundSource {
         if (!Strings.isNullOrEmpty(input.startDate) && !Strings.isNullOrEmpty(input.endDate)) {
             baseSql.append("and s.IMPL_DATE BETWEEN '" + input.startDate + "' and '" + input.endDate + "' ");
         }
+        //总条数sql
+        String totalSql = baseSql.toString();
+
         baseSql.append("order by s.IMPL_DATE desc ");
 
         Integer start = input.pageSize * (input.pageIndex - 1);
@@ -45,11 +48,11 @@ public class FundSource {
         log.info(baseSql.toString());
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         List<Map<String, Object>> resultList = jdbcTemplate.queryForList(baseSql.toString());
-
+        List<Map<String, Object>> totalList = jdbcTemplate.queryForList(baseSql.toString());
 
         HashMap<String, Object> result = new HashMap<>();
         result.put("resultList", resultList);
-        result.put("total", resultList.size());
+        result.put("total", totalList.size());
 
         Map outputMap = JsonUtil.fromJson(JSONObject.toJSONString(result), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
