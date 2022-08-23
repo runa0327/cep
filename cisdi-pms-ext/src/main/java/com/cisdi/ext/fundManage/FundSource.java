@@ -6,6 +6,7 @@ import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.sun.org.apache.regexp.internal.RE;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -81,6 +82,34 @@ public class FundSource {
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
 
+    }
+
+    //资金落实详情
+    public void getFundSourceDetail() {
+        Map<String, Object> idMap = ExtJarHelper.extApiParamMap.get();
+        String id = idMap.get("id").toString();
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        Map<String, Object> infoMap = jdbcTemplate.queryForMap("select s.id, s.NAME name,s.IMPL_AMT implAmt,v" +
+                ".NAME fundSourceTypeName,s.IMPL_DATE " +
+                "date,s.REMARK remark from pm_fund_source s left join gr_set_value v on v.ID = s.FUND_SOURCE_TYPE_ID " +
+                "left join gr_set t on t.ID = v.GR_SET_ID and t.CODE = 'source_type' where s.id = ?", id);
+
+        List<Map<String, Object>> sourceList = jdbcTemplate.queryForList("SELECT s.id,p.NAME prjName,sum( a" +
+                ".APPORTION_AMT ) apportionAmt,max(temp.payAmt) payAmt " +
+                "FROM pm_fund_source s " +
+                "LEFT JOIN pm_fund_apportion a ON a.PM_FUND_SOURCE_ID = s.id " +
+                "LEFT JOIN pm_prj p ON p.id = a.PM_PRJ_ID " +
+                "left join (SELECT p.id,sum( y.PAY_AMT ) payAmt " +
+                "FROM pm_fund_source s " +
+                "LEFT JOIN pm_fund_pay y ON y.PM_FUND_SOURCE_ID = s.ID " +
+                "left join pm_prj p on p.id = y.PM_PRJ_ID " +
+                "GROUP BY p.id)temp on temp.id = p.id " +
+                "WHERE s.id = ? GROUP BY p.id", id);
+        HashMap<Object, Object> result = new HashMap<>();
+        result.put("sourceList", sourceList);
+        result.put("infoMap", infoMap);
+        Map outputMap = JsonUtil.fromJson(JSONObject.toJSONString(result), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
     }
 
     public static class Input extends BasePageEntity {

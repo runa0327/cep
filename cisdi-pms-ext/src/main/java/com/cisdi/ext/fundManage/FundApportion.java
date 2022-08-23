@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 public class FundApportion {
@@ -22,8 +23,10 @@ public class FundApportion {
 
         StringBuffer baseSql = new StringBuffer();
         //a.FUND_SOURCE_AMT fundSourceAmt,
-        baseSql.append("select s.name fundSourceName,p.name prjName,a.FUND_SOURCE_AMT fundSourceAmt,a.APPORTION_AMT apportionAmt,a.APPORTION_DATE " +
-                "apportionDate,a.remark from pm_fund_apportion a left join pm_fund_source s on s.id = a.PM_FUND_SOURCE_ID left" +
+        baseSql.append("select a.id,s.name fundSourceName,p.name prjName,a.FUND_SOURCE_AMT fundSourceAmt,a" +
+                ".APPORTION_AMT apportionAmt,a.APPORTION_DATE " +
+                "apportionDate,a.remark from pm_fund_apportion a left join pm_fund_source s on s.id = a" +
+                ".PM_FUND_SOURCE_ID left" +
                 " join pm_prj p on p.id = a.PM_PRJ_ID where 1=1 ");
         if (!Strings.isNullOrEmpty(input.fundSourceId)) {
             baseSql.append("and s.id = '" + input.fundSourceId + "' ");
@@ -49,6 +52,47 @@ public class FundApportion {
         result.put("total", totalList.size());
 
         Map outputMap = JsonUtil.fromJson(JSONObject.toJSONString(result), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+    }
+
+    //获取资金来源名称下拉搜索框
+    public void getSourceNameDrop() {
+        Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
+
+        String sourceName = Objects.isNull(inputMap.get("sourceName")) ? null :
+                inputMap.get("sourceName").toString();
+
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        StringBuffer baseSql = new StringBuffer();
+        baseSql.append("select s.name,s.id from pm_fund_source s where 1=1 ");
+        if (!Strings.isNullOrEmpty(sourceName)) {
+            baseSql.append("and s.name like '%" + sourceName + "%' ");
+        }
+        baseSql.append("order by s.name desc ");
+        log.info(baseSql.toString());
+        List<Map<String, Object>> sources = jdbcTemplate.queryForList(baseSql.toString());
+
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("sources", sources);
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+
+    }
+
+    //资金落实详情
+    public void getFundApportionDetail() {
+        Map<String, Object> idMap = ExtJarHelper.extApiParamMap.get();
+        String id = idMap.get("id").toString();
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+
+        Map<String, Object> detailMap = jdbcTemplate.queryForMap("select s.name fundSourceName,s.IMPL_DATE imptDate,p.name prjName,v.NAME " +
+                "sourceTypeName,a.FUND_SOURCE_AMT fundSourceAmt,a.APPORTION_AMT apportionAmt,a.APPORTION_DATE  " +
+                "apportionDate,a.remark from pm_fund_apportion a left join pm_fund_source s on s.id = a" +
+                ".PM_FUND_SOURCE_ID left join pm_prj p on p.id = a.PM_PRJ_ID left join gr_set_value v on v.id = s" +
+                ".FUND_SOURCE_TYPE_ID left join gr_set t on t.id = v.GR_SET_ID and t.code = 'source_type' where 1=1 " +
+                "and a.id = ?", id);
+
+        Map outputMap = JsonUtil.fromJson(JSONObject.toJSONString(detailMap), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
 
