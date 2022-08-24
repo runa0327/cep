@@ -100,9 +100,16 @@ public class FundPay {
         List<Map<String, Object>> apportionList = jdbcTemplate.queryForList("select a.APPORTION_AMT apportionAmt,a" +
                 ".APPORTION_DATE apportionDate,a.remark from pm_fund_apportion a where a.PM_FUND_SOURCE_ID = ?" +
                 " and a.PM_PRJ_ID = ?", sourceId, prjId);
+
+        List<Map<String, Object>> payList = jdbcTemplate.queryForList("select y.PAY_AMT payAmt,y.CRT_DT payDate,y" +
+                ".FUND_TYPE fundTpe,y.PAY_REMARK payRemark,y.PAYEE_UNIT payeeUnit,y.remark from pm_fund_pay y left " +
+                "join pm_fund_source s on s.id = y.PM_FUND_SOURCE_ID where y.PM_FUND_SOURCE_ID = ? " +
+                "and y.PM_PRJ_ID = ?", sourceId, prjId);
+
         HashMap<Object, Object> result = new HashMap<>();
         result.put("infoMap", infoMap);
         result.put("apportionList", apportionList);
+        result.put("payList", payList);
         Map outputMap = JsonUtil.fromJson(JSONObject.toJSONString(result), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
