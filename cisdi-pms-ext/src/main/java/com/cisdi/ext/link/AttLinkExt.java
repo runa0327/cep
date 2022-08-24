@@ -83,7 +83,7 @@ public class AttLinkExt {
                     .queryForList("select t.code prj_code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
                             "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,st.id st_id,st.name st_name," +
                             "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
-                            "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID, " +
+                            "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.BUILDING_AREA, " +
                             "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS', " +
                             "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD', " +
                             "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget' " +
@@ -206,6 +206,14 @@ public class AttLinkExt {
                 typeValueText.text = JdbcMapUtil.getString(row, "prj_code");
 
                 attLinkResult.attMap.put("PRJ_CODE", typeValueText);
+            }
+            //建筑面积
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.DOUBLE;
+                typeValueText.value = JdbcMapUtil.getString(row,"BUILDING_AREA");
+                typeValueText.text = JdbcMapUtil.getString(row,"BUILDING_AREA");
+                attLinkResult.attMap.put("BUILDING_AREA",typeValueText);
             }
 
             {

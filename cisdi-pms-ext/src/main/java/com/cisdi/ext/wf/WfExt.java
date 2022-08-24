@@ -245,6 +245,10 @@ public class WfExt {
         list.add("PM_FUND_REQUIRE_PLAN_REQ"); //资金需求计划申请
         list.add("PO_ORDER_PAYMENT_REQ"); //采购合同付款申请
         list.add("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD"); //技术交底与图纸会审记录
+        list.add("PM_CONCEPTUAL_SCHEME_DESIGN"); //概念方案设计管理
+        list.add("PM_CONSTRUCTION_DRAWING_DESIGN"); //施工图设计管理
+        list.add("PM_DESIGN_ASSIGNMENT"); //方案设计管理
+        list.add("PM_DESIGN_ASSIGNMENT_BOOK"); //方案设计书
         return list;
     }
 
