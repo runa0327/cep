@@ -186,7 +186,8 @@ public class WfExt {
                     if (tableList.contains(entityCode)) {
                         if ("APING".equals(newStatus)) {
                             int update1 = 0;
-                            if ("PO_ORDER_PAYMENT_REQ".equals(entityCode) || "PM_FUND_REQUIRE_PLAN_REQ".equals(entityCode)){ //资金需求计划和付款申请项目名称使用的另外的字段
+                            if ("PO_ORDER_PAYMENT_REQ".equals(entityCode) || "PM_FUND_REQUIRE_PLAN_REQ".equals(entityCode) || "PM_DESIGN_ASSIGNMENT_BOOK".equals(entityCode)){
+                                //资金需求计划和付款申请项目\设计任务书名称使用的另外的字段
                                 update1 = jdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
                                         ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi.ENTITY_RECORD_ID=t.id join pm_prj prj on t.AMOUT_PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
                             } else {
@@ -248,7 +249,7 @@ public class WfExt {
         list.add("PM_CONCEPTUAL_SCHEME_DESIGN"); //概念方案设计管理
         list.add("PM_CONSTRUCTION_DRAWING_DESIGN"); //施工图设计管理
         list.add("PM_DESIGN_ASSIGNMENT"); //方案设计管理
-        list.add("PM_DESIGN_ASSIGNMENT_BOOK"); //方案设计书
+        list.add("PM_DESIGN_ASSIGNMENT_BOOK"); //设计任务书
         return list;
     }
 

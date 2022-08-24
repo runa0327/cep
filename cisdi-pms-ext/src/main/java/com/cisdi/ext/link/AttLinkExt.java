@@ -1198,7 +1198,8 @@ public class AttLinkExt {
                 //dlttodo
                 return attLinkResult;
 
-            } else if ("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD".equals(entCode)) { //技术交底与图纸会审记录
+            } else if ("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD".equals(entCode) || "PM_DESIGN_ASSIGNMENT_BOOK".equals(entCode)) {
+                // SKILL_DISCLOSURE_PAPER_RECHECK_RECORD 技术交底与图纸会审记录 PM_DESIGN_ASSIGNMENT_BOOK 设计任务书
                 //查询预算财评信息
                 String sql1 = "SELECT PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST3 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
                 List<Map<String,Object>> map = jdbcTemplate.queryForList(sql1,attValue);
@@ -1263,7 +1264,7 @@ public class AttLinkExt {
                 }
                 return attLinkResult;
             } else {
-                return null;
+                return attLinkResult;
             }
 
         } else if ("STATUS".equals(attCode)){
