@@ -2,6 +2,7 @@ server:
   port: 11115
 
 spring:
+  test: sayHello
   # 设置时区，以北京时间显示报错信息的时间（等）：
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -36,6 +37,10 @@ spring:
         queue-capacity: 2048
         thread-name-prefix: springThreadPool
         waitForTasksToCompleteOnShutdown: true
+
+      # 定时任务1小时执行一次：
+  scheduled:
+    fixedDelayString: 3600000
 
 # 自动登录qygly平台的设置：
 qygly:

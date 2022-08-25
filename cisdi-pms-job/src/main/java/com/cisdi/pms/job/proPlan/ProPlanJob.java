@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Component
-@EnableScheduling
 @Slf4j
 public class ProPlanJob {
 
@@ -36,11 +34,8 @@ public class ProPlanJob {
     @Resource(name = "taskExecutor")
     private ThreadPoolTaskExecutor taskExecutor;
 
-    @Scheduled(
-            //一小时执行一次
-            fixedDelay = 60 * 1000L
-    )
 
+//    @Scheduled(fixedDelayString = "${spring.scheduled.fixedDelayString}")
     @Async("taskExecutor")
     public void invokeRefreshProNodeStatus() {
         // 未自动登录前不要执行：
