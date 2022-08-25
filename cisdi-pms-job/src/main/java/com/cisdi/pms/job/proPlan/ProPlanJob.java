@@ -35,7 +35,7 @@ public class ProPlanJob {
     private ThreadPoolTaskExecutor taskExecutor;
 
 
-//    @Scheduled(fixedDelayString = "${spring.scheduled.fixedDelayString}")
+    @Scheduled(fixedDelayString = "${spring.scheduled.fixedDelayString}")
     @Async("taskExecutor")
     public void invokeRefreshProNodeStatus() {
         // 未自动登录前不要执行：
