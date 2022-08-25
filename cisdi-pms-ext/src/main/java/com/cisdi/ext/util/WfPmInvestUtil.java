@@ -68,7 +68,7 @@ public class WfPmInvestUtil {
 
             List<pmInvestEstDtl> dtlList = new ArrayList<>();
             //通过构建树新增数据
-            list.stream().filter(p -> Objects.equals("0", p.get("PM_EXP_TYPE_PID"))).peek(m -> {
+            list.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("PM_EXP_TYPE_PID")))).peek(m -> {
                 String id = Crud.from("PM_INVEST_EST_DTL").insertData();
                 pmInvestEstDtl dtl = new pmInvestEstDtl();
                 dtl.id = id;
@@ -87,7 +87,7 @@ public class WfPmInvestUtil {
                         .set("PM_EXP_TYPE_ID", item.expTypeId).set("PM_INVEST_EST_DTL_PID", item.pid).set("SEQ_NO", item.seq).exec();
             });
             Object obj = 0;
-            Optional<pmInvestEstDtl> optional = dtlList.stream().filter(p -> Objects.equals("PRJ_TOTAL_INVEST", p.code)).findAny();
+            Optional<pmInvestEstDtl> optional = dtlList.stream().filter(p -> Objects.equals("PRJ_TOTAL_INVEST", String.valueOf(p.code))).findAny();
             if (optional.isPresent()) {
                 obj = optional.get().amt;
             }
@@ -97,7 +97,7 @@ public class WfPmInvestUtil {
     }
 
     private static List<Map<String, Object>> getChildren(Map<String, Object> root, List<Map<String, Object>> allData, Map<String, Object> dataMap, String newInvestEtsId, List<pmInvestEstDtl> dtlList, String pId) {
-        return allData.stream().filter(p -> Objects.equals(p.get("PM_EXP_TYPE_PID"), root.get("ID"))).peek(m -> {
+        return allData.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_PID")), String.valueOf(root.get("ID")))).peek(m -> {
             String id = Crud.from("PM_INVEST_EST_DTL").insertData();
             pmInvestEstDtl dtl = new pmInvestEstDtl();
             dtl.id = id;

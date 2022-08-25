@@ -394,7 +394,7 @@ public class PmPrjReqExt {
                         "PROGRESS_STATUS_ID,PROGRESS_RISK_TYPE_ID,CHIEF_DEPT_ID,CHIEF_USER_ID,START_DAY,SEQ_NO,CPMS_UUID,CPMS_ID,`LEVEL`,LINKED_WF_PROCESS_ID,LINKED_WF_NODE_ID " +
                         "from PM_PRO_PLAN_NODE where PM_PRO_PLAN_ID=?", proMap.get("ID"));
                 if (planNodeList.size() > 0) {
-                    planNodeList.stream().filter(p -> Objects.equals("0", p.get("PM_PRO_PLAN_NODE_PID"))).peek(m -> {
+                    planNodeList.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")))).peek(m -> {
                         String id = Crud.from("PM_PRO_PLAN_NODE").insertData();
 
                         Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId)
@@ -412,7 +412,7 @@ public class PmPrjReqExt {
     }
 
     private List<Map<String, Object>> getChildrenNode(Map<String, Object> root, List<Map<String, Object>> allData, String pId, String newPlanId) {
-        return allData.stream().filter(p -> Objects.equals(p.get("PM_PRO_PLAN_NODE_PID"), root.get("ID"))).peek(m -> {
+        return allData.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")), String.valueOf(root.get("ID")))).peek(m -> {
             String id = Crud.from("PM_PRO_PLAN_NODE").insertData();
             Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId)
                     .set("PM_PRO_PLAN_NODE_PID", pId)

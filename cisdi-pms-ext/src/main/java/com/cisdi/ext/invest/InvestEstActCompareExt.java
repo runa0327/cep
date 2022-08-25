@@ -66,19 +66,19 @@ public class InvestEstActCompareExt {
                 List<Map<String, Object>> mapData = typeMap.get(key);
                 switch (key) {
                     case "invest0":
-                        Optional<Map<String, Object>> mapOptional = mapData.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(investEstActCompareRow.expTypeId)).findAny();
+                        Optional<Map<String, Object>> mapOptional = mapData.stream().filter(p ->  Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")),String.valueOf(investEstActCompareRow.expTypeId))).findAny();
                         mapOptional.ifPresent(stringObjectMap -> investEstActCompareRow.invest0Amt = JdbcMapUtil.getDouble(stringObjectMap,"AMT"));
                         break;
                     case "invest1":
-                        Optional<Map<String, Object>> optionalInvestEstActCompareRow = mapData.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(investEstActCompareRow.expTypeId)).findAny();
+                        Optional<Map<String, Object>> optionalInvestEstActCompareRow = mapData.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")),String.valueOf(investEstActCompareRow.expTypeId))).findAny();
                         optionalInvestEstActCompareRow.ifPresent(stringObjectMap -> investEstActCompareRow.invest1Amt = JdbcMapUtil.getDouble(stringObjectMap,"AMT"));
                         break;
                     case "invest2":
-                        Optional<Map<String, Object>> optionalMap = mapData.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(investEstActCompareRow.expTypeId)).findAny();
+                        Optional<Map<String, Object>> optionalMap = mapData.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")),String.valueOf(investEstActCompareRow.expTypeId))).findAny();
                         optionalMap.ifPresent(stringObjectMap -> investEstActCompareRow.invest2Amt = JdbcMapUtil.getDouble(stringObjectMap,"AMT"));
                         break;
                     case "invest3":
-                        Optional<Map<String, Object>> optional = mapData.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(investEstActCompareRow.expTypeId)).findAny();
+                        Optional<Map<String, Object>> optional = mapData.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")),String.valueOf(investEstActCompareRow.expTypeId))).findAny();
                         optional.ifPresent(stringObjectMap -> investEstActCompareRow.invest3Amt = JdbcMapUtil.getDouble(stringObjectMap,"AMT"));
                         break;
                     default:
@@ -100,10 +100,10 @@ public class InvestEstActCompareExt {
                 "where po.PM_PRJ_ID=? group by pod.id", pmPrjId);
 
         investEstActCompareRowList.forEach(item -> {
-            Optional<Map<String, Object>> optional = orderProList.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(item.expTypeId)).findAny();
+            Optional<Map<String, Object>> optional = orderProList.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")),String.valueOf(item.expTypeId))).findAny();
             optional.ifPresent(stringObjectMap -> item.complAmt = Double.parseDouble(String.valueOf(stringObjectMap.get("COMPL_TOTAL_AMT"))));
 
-            Optional<Map<String, Object>> optionalMap = orderPayList.stream().filter(p -> p.get("PM_EXP_TYPE_ID").equals(item.expTypeId)).findAny();
+            Optional<Map<String, Object>> optionalMap = orderPayList.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")),String.valueOf(item.expTypeId))).findAny();
             optionalMap.ifPresent(stringObjectMap -> item.payAmt = Double.parseDouble(String.valueOf(stringObjectMap.get("PAY_AMT"))));
         });
 
