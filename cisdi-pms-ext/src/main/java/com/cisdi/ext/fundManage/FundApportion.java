@@ -22,7 +22,7 @@ public class FundApportion {
         Input input = JsonUtil.fromJson(inputJson, Input.class);
 
         StringBuffer baseSql = new StringBuffer();
-        //a.FUND_SOURCE_AMT fundSourceAmt,
+
         baseSql.append("select a.id,s.name fundSourceName,p.name prjName,a.FUND_SOURCE_AMT fundSourceAmt,a" +
                 ".APPORTION_AMT apportionAmt,a.APPORTION_DATE " +
                 "apportionDate,a.remark from pm_fund_apportion a left join pm_fund_source s on s.id = a" +
