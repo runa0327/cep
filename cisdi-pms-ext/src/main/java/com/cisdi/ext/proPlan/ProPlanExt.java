@@ -393,7 +393,7 @@ public class ProPlanExt {
                     "where gr.`CODE`='PROGRESS_STATUS' and ppp.PM_PRJ_ID=?", csCommId);
 
             if (nodeList.size() > 0) {
-                nodeList.stream().filter(p -> Objects.equals("0", p.get("PM_PRO_PLAN_NODE_PID"))).peek(m -> {
+                nodeList.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")))).peek(m -> {
                     List<Map<String, Object>> children = getChildrenNodeForCollectProgressStatus(m, nodeList, jdbcTemplate);
                     if (children.size() > 0) {
                         int count = children.size();
@@ -432,7 +432,7 @@ public class ProPlanExt {
      * @return
      */
     private List<Map<String, Object>> getChildrenNodeForCollectProgressStatus(Map<String, Object> root, List<Map<String, Object>> allData, JdbcTemplate jdbcTemplate) {
-        return allData.stream().filter(p -> Objects.equals(root.get("ID"), p.get("PM_PRO_PLAN_NODE_PID"))).peek(m -> {
+        return allData.stream().filter(p -> Objects.equals(String.valueOf(root.get("ID")), String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")))).peek(m -> {
             List<Map<String, Object>> children = getChildrenNodeForCollectProgressStatus(m, allData, jdbcTemplate);
             if (children.size() > 0) {
                 int count = children.size();
