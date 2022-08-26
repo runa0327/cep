@@ -101,76 +101,6 @@ public class AttLinkExt {
 
             Map row = list.get(0);
 
-            if ("PO_PUBLIC_BID_REQ".equals(entCode) || "PO_ORDER_REQ".equals(entCode)){
-                //查询项目可研/初概流程完成情况
-                List<Map<String, Object>> list2 = jdbcTemplate.queryForList("SELECT * FROM (SELECT " +
-                        "ifnull(b.END_DATETIME,0) as END_DATETIME, a.PRJ_TOTAL_INVEST, a.PROJECT_AMT, a.PROJECT_OTHER_AMT, a.PREPARE_AMT, a.CONSTRUCT_PERIOD_INTEREST, '1' as id " +
-                        "FROM PM_PRJ_INVEST1 a " +
-                        "LEFT JOIN wf_process_instance b on b.id = a.LK_WF_INST_ID " +
-                        "WHERE a.PM_PRJ_ID = ? " +
-                        "ORDER BY b.CRT_DT desc LIMIT 1) a union all select * FROM( " +
-                        "SELECT ifnull(b.END_DATETIME,0) as END_DATETIME, a.PRJ_TOTAL_INVEST, a.PROJECT_AMT, a.PROJECT_OTHER_AMT, a.PREPARE_AMT, a.CONSTRUCT_PERIOD_INTEREST, '2' as id " +
-                        "FROM PM_PRJ_INVEST2 a " +
-                        "LEFT JOIN wf_process_instance b on b.id = a.LK_WF_INST_ID " +
-                        "WHERE a.PM_PRJ_ID = ? " +
-                        "ORDER BY b.CRT_DT desc LIMIT 1 ) b ORDER BY id desc", attValue, attValue);
-
-                if (!CollectionUtils.isEmpty(list2)) {
-                    String date0 = "";
-                    String date1 = "";
-                    if (list2.size() == 2) {
-                        date0 = list2.get(0).get("END_DATETIME").toString();
-                        date1 = list2.get(1).get("END_DATETIME").toString();
-                        if ("0".equals(date0) || "0".equals(date1)) {
-                            if ("0".equals(date0)) {
-                                attLinkResult = getResult(list2.get(1));
-                            } else {
-                                attLinkResult = getResult(list2.get(0));
-                            }
-                        }
-                    } else {
-                        date0 = list2.get(0).get("END_DATETIME").toString();
-                        if (!"0".equals(date0)) {
-                            attLinkResult = getResult(list2.get(0));
-                        }
-                    }
-
-                }
-            }
-            List<String> contractTables = Arrays.asList("PO_ORDER_SUPPLEMENT_REQ", "PO_ORDER_CHANGE_REQ",
-                    "PO_ORDER_TERMINATE_REQ");
-            if (contractTables.contains(entCode)){
-                List<Map<String, Object>> orderLists = jdbcTemplate.queryForList("SELECT * FROM (SELECT " +
-                        "ifnull(b.END_DATETIME,0) as END_DATETIME, a.PRJ_TOTAL_INVEST, a.PROJECT_AMT, a.PROJECT_OTHER_AMT, a.PREPARE_AMT, a.CONSTRUCT_PERIOD_INTEREST, '1' as id " +
-                        "FROM PM_PRJ_INVEST1 a " +
-                        "LEFT JOIN wf_process_instance b on b.id = a.LK_WF_INST_ID " +
-                        "WHERE a.PM_PRJ_ID = ? " +
-                        "ORDER BY b.CRT_DT desc LIMIT 1) a union all select * FROM( " +
-                        "SELECT ifnull(b.END_DATETIME,0) as END_DATETIME, a.PRJ_TOTAL_INVEST, a.PROJECT_AMT, a.PROJECT_OTHER_AMT, a.PREPARE_AMT, a.CONSTRUCT_PERIOD_INTEREST, '2' as id " +
-                        "FROM PM_PRJ_INVEST2 a " +
-                        "LEFT JOIN wf_process_instance b on b.id = a.LK_WF_INST_ID " +
-                        "WHERE a.PM_PRJ_ID = ? " +
-                        "ORDER BY b.CRT_DT desc LIMIT 1 ) b UNION ALL SELECT * FROM (SELECT " +
-                        "ifnull( b.END_DATETIME, 0 ) AS END_DATETIME,a.PRJ_TOTAL_INVEST,a.PROJECT_AMT,a.PROJECT_OTHER_AMT,a.PREPARE_AMT,a.CONSTRUCT_PERIOD_INTEREST,'3' AS id " +
-                        "FROM PM_PRJ_INVEST3 a " +
-                        "LEFT JOIN wf_process_instance b ON b.id = a.LK_WF_INST_ID " +
-                        "WHERE a.PM_PRJ_ID = ? " +
-                        "ORDER BY b.CRT_DT DESC LIMIT 1 ) c " +
-                        "ORDER BY id desc", attValue, attValue, attValue);
-
-                if (!CollectionUtils.isEmpty(orderLists)){
-                    //取最大的id
-                    List<Map<String, Object>> newOrderList = orderLists.stream().sorted(Comparator.comparing(x -> x.get("id").toString())).collect(Collectors.toList());
-                    for (int i = newOrderList.size()-1; i >=0; i--) {
-                        if (!"0".equals(newOrderList.get(i).get("END_DATETIME"))){
-                            attLinkResult = getResult(newOrderList.get(i));
-                            break;
-                        }
-                    }
-                }
-            }
-
-
             if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)){ //工程开工报审
                 String sql = "select PRJ_TOTAL_INVEST,PROJECT_AMT from PM_PRJ_INVEST2 where PM_PRJ_ID = ? and STATUS = 'AP' order by CRT_DT desc limit 1";
                 List<Map<String,Object>> map = jdbcTemplate.queryForList(sql,attValue);
@@ -196,9 +126,9 @@ public class AttLinkExt {
 
                     attLinkResult.attMap.put("PROJECT_AMT", typeValueText);
                 }
-
             }
 
+            //项目编号
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_SHORT;
@@ -215,7 +145,7 @@ public class AttLinkExt {
                 typeValueText.text = JdbcMapUtil.getString(row,"BUILDING_AREA");
                 attLinkResult.attMap.put("BUILDING_AREA",typeValueText);
             }
-
+            //业主单位
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.REF_SINGLE;
@@ -224,7 +154,7 @@ public class AttLinkExt {
 
                 attLinkResult.attMap.put("CUSTOMER_UNIT", typeValueText);
             }
-
+            //项目管理模式
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.REF_SINGLE;
@@ -233,7 +163,7 @@ public class AttLinkExt {
 
                 attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID", typeValueText);
             }
-
+            //建设地点
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.REF_SINGLE;
@@ -242,7 +172,7 @@ public class AttLinkExt {
 
                 attLinkResult.attMap.put("BASE_LOCATION_ID", typeValueText);
             }
-
+            //占地面积
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.DOUBLE;
@@ -251,7 +181,7 @@ public class AttLinkExt {
 
                 attLinkResult.attMap.put("FLOOR_AREA", typeValueText);
             }
-
+            //项目类型
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.REF_SINGLE;
@@ -260,7 +190,7 @@ public class AttLinkExt {
 
                 attLinkResult.attMap.put("PROJECT_TYPE_ID", typeValueText);
             }
-
+            //建设规模类型
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.REF_SINGLE;
@@ -269,7 +199,7 @@ public class AttLinkExt {
 
                 attLinkResult.attMap.put("CON_SCALE_TYPE_ID", typeValueText);
             }
-
+            //建设规模单位
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.REF_SINGLE;
@@ -278,7 +208,7 @@ public class AttLinkExt {
 
                 attLinkResult.attMap.put("CON_SCALE_UOM_ID", typeValueText);
             }
-
+            //建设规模数量
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.DOUBLE;
@@ -287,8 +217,7 @@ public class AttLinkExt {
 
                 attLinkResult.attMap.put("CON_SCALE_QTY", typeValueText);
             }
-
-
+            //建设规模数量2
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.DOUBLE;
@@ -297,7 +226,7 @@ public class AttLinkExt {
 
                 attLinkResult.attMap.put("CON_SCALE_QTY2", typeValueText);
             }
-
+            //建设年限
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
@@ -305,7 +234,7 @@ public class AttLinkExt {
                 typeValueText.text = JdbcMapUtil.getString(row, "BUILD_YEARS");
                 attLinkResult.attMap.put("BUILD_YEARS", typeValueText);
             }
-
+            //项目概况
             {
                 TypeValueText typeValueText = new TypeValueText();
                 typeValueText.type = AttDataTypeE.TEXT_LONG;
@@ -349,6 +278,7 @@ public class AttLinkExt {
                 typeValueText.text = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
 
                 attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", typeValueText);
+                attLinkResult.attMap.put("PM_FUND_SOURCE_ID", typeValueText);
             }
             //可研批复资金
             {
@@ -377,6 +307,15 @@ public class AttLinkExt {
 
                 attLinkResult.attMap.put("EVALUATION_APPROVE_FUND", typeValueText);
             }
+
+            //资金信息回显。优先级 可研估算<初设概算<预算财评
+            List<String> amtList = getAmtList();
+            if (amtList.contains(entCode)){
+                //查询预算财评信息
+                Map resultRow = getAmtMap(attValue);
+                attLinkResult = getResult(resultRow,attLinkResult);
+            }
+
             return attLinkResult;
         } else if ("PMS_RELEASE_WAY_ID".equals(attCode) || "GUARANTEE_LETTER_TYPE_ID".equals(attCode) || "CONTRACT_CATEGORY_ID".equals(attCode) || "PRJ_MANAGE_MODE_ID".equals(attCode)) {
             // 1.PMS_RELEASE_WAY_ID 招标类别下拉框
@@ -870,8 +809,6 @@ public class AttLinkExt {
                 typeValueText.text = JdbcMapUtil.getString(row, "pt_name");
                 attLinkResult.attMap.put("PROJECT_TYPE_ID", typeValueText);
             }
-
-
             if ("PO_ORDER_PAYMENT_REQ".equals(entCode)){ //采购合同付款申请
                 //查询付款申请历史信息
                 String sql = "SELECT COLLECTION_DEPT_TWO,BANK_OF_DEPOSIT,ACCOUNT_NO,RECEIPT,SPECIAL_BANK_OF_DEPOSIT,SPECIAL_ACCOUNT_NO FROM PO_ORDER_PAYMENT_REQ WHERE AMOUT_PM_PRJ_ID = ? AND STATUS = 'AP' ORDER BY CRT_DT DESC limit 1";
@@ -1200,68 +1137,8 @@ public class AttLinkExt {
 
             } else if ("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD".equals(entCode) || "PM_DESIGN_ASSIGNMENT_BOOK".equals(entCode)) {
                 // SKILL_DISCLOSURE_PAPER_RECHECK_RECORD 技术交底与图纸会审记录 PM_DESIGN_ASSIGNMENT_BOOK 设计任务书
-                //查询预算财评信息
-                String sql1 = "SELECT PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST3 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
-                List<Map<String,Object>> map = jdbcTemplate.queryForList(sql1,attValue);
-                List<Map<String,Object>> map1 = new ArrayList<>();
-                List<Map<String,Object>> map2 = new ArrayList<>();
-                Map resultRow = new HashMap();
-                if (CollectionUtils.isEmpty(map)){
-                    //初设概算信息
-                    String sql2 = "SELECT PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST2 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
-                    map1 = jdbcTemplate.queryForList(sql2,attValue);
-                    if (CollectionUtils.isEmpty(map1)){
-                        String sql3 = "SELECT PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST1 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
-                        map2 = jdbcTemplate.queryForList(sql3,attValue);
-                        if (!CollectionUtils.isEmpty(map2)){
-                            resultRow = map2.get(0);
-                        }
-                    } else {
-                        resultRow = map1.get(0);
-                    }
-                } else {
-                    resultRow = map.get(0);
-                }
-                //总投资
-                {
-                    TypeValueText typeValueText = new TypeValueText();
-                    typeValueText.type = AttDataTypeE.DOUBLE;
-                    typeValueText.value = JdbcMapUtil.getString(resultRow, "PRJ_TOTAL_INVEST");
-                    typeValueText.text = JdbcMapUtil.getString(resultRow, "PRJ_TOTAL_INVEST");
-                    attLinkResult.attMap.put("PRJ_TOTAL_INVEST", typeValueText);
-                }
-                //工程费
-                {
-                    TypeValueText typeValueText = new TypeValueText();
-                    typeValueText.type = AttDataTypeE.DOUBLE;
-                    typeValueText.value = JdbcMapUtil.getString(resultRow, "PROJECT_AMT");
-                    typeValueText.text = JdbcMapUtil.getString(resultRow, "PROJECT_AMT");
-                    attLinkResult.attMap.put("PROJECT_AMT", typeValueText);
-                }
-                //工程建设其他费
-                {
-                    TypeValueText typeValueText = new TypeValueText();
-                    typeValueText.type = AttDataTypeE.DOUBLE;
-                    typeValueText.value = JdbcMapUtil.getString(resultRow, "PROJECT_OTHER_AMT");
-                    typeValueText.text = JdbcMapUtil.getString(resultRow, "PROJECT_OTHER_AMT");
-                    attLinkResult.attMap.put("PROJECT_OTHER_AMT", typeValueText);
-                }
-                //预备费
-                {
-                    TypeValueText typeValueText = new TypeValueText();
-                    typeValueText.type = AttDataTypeE.DOUBLE;
-                    typeValueText.value = JdbcMapUtil.getString(resultRow, "PREPARE_AMT");
-                    typeValueText.text = JdbcMapUtil.getString(resultRow, "PREPARE_AMT");
-                    attLinkResult.attMap.put("PREPARE_AMT", typeValueText);
-                }
-                //建设期利息
-                {
-                    TypeValueText typeValueText = new TypeValueText();
-                    typeValueText.type = AttDataTypeE.DOUBLE;
-                    typeValueText.value = JdbcMapUtil.getString(resultRow, "CONSTRUCT_PERIOD_INTEREST");
-                    typeValueText.text = JdbcMapUtil.getString(resultRow, "CONSTRUCT_PERIOD_INTEREST");
-                    attLinkResult.attMap.put("CONSTRUCT_PERIOD_INTEREST", typeValueText);
-                }
+                Map resultRow = getAmtMap(attValue);
+                attLinkResult = getResult(resultRow,attLinkResult);
                 return attLinkResult;
             } else {
                 return attLinkResult;
@@ -1291,9 +1168,9 @@ public class AttLinkExt {
     }
 
     //获取资金信息
-    private AttLinkResult getResult(Map<String, Object> stringObjectMap) {
-        AttLinkResult attLinkResult = new AttLinkResult();
-        attLinkResult.attMap = new HashMap<>();
+    private AttLinkResult getResult(Map<String, Object> stringObjectMap,AttLinkResult attLinkResult) {
+//        AttLinkResult attLinkResult = new AttLinkResult();
+//        attLinkResult.attMap = new HashMap<>();
         //总投资
         {
             TypeValueText typeValueText = new TypeValueText();
@@ -1351,4 +1228,43 @@ public class AttLinkExt {
         return false;
     }
 
+    //资金信息回显，按照优先级 可研估算<初设概算<预算财评 的流程
+    public List<String> getAmtList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_SUPERVISE_PLAN_REQ"); //监理规划及细则申请
+        list.add("PM_PRJ_PARTY_REQ"); //五方责任主体维护申请
+        list.add("PO_ORDER_TERMINATE_REQ"); //采购合同终止申请
+        list.add("PO_ORDER_CHANGE_REQ"); //采购合同变更申请
+        list.add("PO_ORDER_SUPPLEMENT_REQ"); //采购合同补充协议申请
+        list.add("PO_ORDER_REQ"); //采购合同签订申请
+        list.add("PO_PUBLIC_BID_REQ"); //采购公开招标申请
+        return list;
+    }
+
+    //查询可研估算<初设概算<预算财评优先级最高的数据
+    private Map getAmtMap(String attValue) {
+        Map resultRow = new HashMap();
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        String sql1 = "SELECT PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST3 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+        List<Map<String,Object>> map = jdbcTemplate.queryForList(sql1,attValue);
+        List<Map<String,Object>> map1 = new ArrayList<>();
+        List<Map<String,Object>> map2 = new ArrayList<>();
+        if (CollectionUtils.isEmpty(map)){
+            //初设概算信息
+            String sql2 = "SELECT PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST2 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+            map1 = jdbcTemplate.queryForList(sql2,attValue);
+            if (CollectionUtils.isEmpty(map1)){
+                String sql3 = "SELECT PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST1 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+                map2 = jdbcTemplate.queryForList(sql3,attValue);
+                if (!CollectionUtils.isEmpty(map2)){
+                    resultRow = map2.get(0);
+                }
+            } else {
+                resultRow = map1.get(0);
+            }
+        } else {
+            resultRow = map.get(0);
+        }
+        return resultRow;
+    }
 }
