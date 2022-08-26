@@ -199,7 +199,7 @@ public class ProPlanExt {
         PrjProPlanInfo planInfo = new PrjProPlanInfo();
         Map<String, Object> proMap = null;
         try {
-            proMap = jdbcTemplate.queryForMap("select * from PM_PRO_PLAN where PM_PRJ_ID=?", pmPrjId);
+            proMap = jdbcTemplate.queryForMap("select pr.*,pj.name as PROJECT_NAME from PM_PRO_PLAN pr left join pm_prj pj on pr.PM_PRJ_ID = pj.id where PM_PRJ_ID=?", pmPrjId);
             if (proMap != null) {
                 planInfo = this.covertPlanInfo(proMap, jdbcTemplate);
 
@@ -295,6 +295,7 @@ public class ProPlanExt {
         planInfo.progressRiskRemark = JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_REMARK");
         planInfo.projectId = JdbcMapUtil.getString(dataMap, "PM_PRJ_ID");
         planInfo.ver = JdbcMapUtil.getString(dataMap, "VER");
+        planInfo.projectName = JdbcMapUtil.getString(dataMap, "PROJECT_NAME");
         return planInfo;
     }
 
@@ -555,6 +556,11 @@ public class ProPlanExt {
         public String projectId;
 
         public String ver;
+
+        /**
+         * 项目名称
+         */
+        public String projectName;
 
         public List<PrjProPlanNodeInfo> nodeInfoList;
     }
