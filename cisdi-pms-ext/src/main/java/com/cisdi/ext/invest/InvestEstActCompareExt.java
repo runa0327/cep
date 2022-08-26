@@ -51,7 +51,7 @@ public class InvestEstActCompareExt {
         }).collect(Collectors.toList());
 
         // 获取可研估算、初设概算、预算财评：
-        List<Map<String, Object>> investEstList = jdbcTemplate.queryForList("select t.*,a.INVEST_EST_TYPE_ID as INVEST_EST_TYPE_ID,gsv.`code`  as INVEST_EST_TYPE\n" +
+        List<Map<String, Object>> investEstList = jdbcTemplate.queryForList("select t.ID, t.VER, t.TS, t.IS_PRESET, t.CRT_DT, t.CRT_USER_ID, t.LAST_MODI_DT, t.LAST_MODI_USER_ID, t.STATUS, t.LK_WF_INST_ID, t.CODE, t.NAME, t.REMARK, ifnull(t.AMT,0) as AMT, t.PM_INVEST_EST_ID, t.PM_EXP_TYPE_ID, t.CPMS_UUID, t.CPMS_ID, t.PM_INVEST_EST_DTL_PID, t.SEQ_NO,a.INVEST_EST_TYPE_ID as INVEST_EST_TYPE_ID,gsv.`code`  as INVEST_EST_TYPE\n" +
                 "from PM_INVEST_EST_DTL t \n" +
                 "left join PM_INVEST_EST a on t.PM_INVEST_EST_ID = a.id \n" +
                 "left join gr_set_value gsv on gsv.id = a.INVEST_EST_TYPE_ID\n" +
