@@ -52,7 +52,7 @@ public class WfPmInvestUtil {
         if (investEstList.size() > 0) {
             investEstList.forEach(item -> {
                 String pmExpType = String.valueOf(item.get("PM_EXP_TYPE"));
-                jdbcTemplate.update("update PM_INVEST_EST_DTL set AMT=? where id=?", dataMap.get(pmExpType), item.get("ID"));
+                jdbcTemplate.update("update PM_INVEST_EST_DTL set AMT=?,LAST_MODI_DT=? where id=?", dataMap.get(pmExpType), new Date(), item.get("ID"));
             });
         } else {
             //新增项目投资测算
