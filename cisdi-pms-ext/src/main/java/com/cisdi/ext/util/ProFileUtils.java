@@ -9,10 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -60,8 +57,18 @@ public class ProFileUtils {
     public static void insertProFile(String projectId, String fileIds, FileCodeEnum codeEnum) {
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         try {
-            Map<String, Object> map = jdbcTemplate.queryForMap("select * from pf_folder where PM_PRJ_ID=? and `CODE`=?", projectId, codeEnum.getCode());
-            String fid = String.valueOf(map.get("ID"));
+            String fid = "";
+            List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from pf_folder where PM_PRJ_ID=?", projectId);
+            if (CollectionUtils.isEmpty(list)) {
+                ProFileUtils.createFolder(projectId);
+                Map<String, Object> map = jdbcTemplate.queryForMap("select * from pf_folder where PM_PRJ_ID=? and `CODE`=?", projectId, codeEnum.getCode());
+                fid = String.valueOf(map.get("ID"));
+            } else {
+                Optional<Map<String, Object>> obj = list.stream().filter(p -> Objects.equals(codeEnum.getCode(), String.valueOf(p.get("CODE")))).findAny();
+                if (obj.isPresent()) {
+                    fid = String.valueOf(obj.get().get("ID"));
+                }
+            }
             List<String> fileIDs = Arrays.asList(fileIds.split(","));
             for (String fileId : fileIDs) {
                 String id = Crud.from("PF_FILE").insertData();
