@@ -4,10 +4,8 @@ import com.cisdi.ext.enums.FileCodeEnum;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
-import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,7 +15,7 @@ import java.util.stream.Collectors;
  * @projectName cisdi-pms-service
  * @title PrFileUtils
  * @package com.cisdi.ext.util
- * @description
+ * @description 文件通用方法类
  * @date 2022/8/25
  */
 public class ProFileUtils {
