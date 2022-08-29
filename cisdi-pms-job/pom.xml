@@ -24,7 +24,13 @@
             <scope>system</scope>
             <systemPath>${pom.basedir}/../lib/qygly-shared-3.0-SNAPSHOT.jar</systemPath>
         </dependency>
-
+        <dependency>
+            <groupId>com.qygly</groupId>
+            <artifactId>qygly-param</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/../lib/qygly-param-3.0-SNAPSHOT.jar</systemPath>
+        </dependency>
         <dependency>
             <groupId>com.qygly</groupId>
             <artifactId>qygly-ext-rest-helper</artifactId>
