@@ -1,7 +1,10 @@
 package com.cisdi.ext.pm;
 
-import com.cisdi.ext.model.PmPrjReq;
-import com.cisdi.ext.util.*;
+import com.cisdi.ext.enums.FileCodeEnum;
+import com.cisdi.ext.util.AmtUtil;
+import com.cisdi.ext.util.DoubleUtil;
+import com.cisdi.ext.util.ProFileUtils;
+import com.cisdi.ext.util.WfPmInvestUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
@@ -11,9 +14,11 @@ import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -105,16 +110,6 @@ public class PmPrjReqExt {
                 .where().eq("ID", csCommId)
                 .select().specifyCols().execForMap();
 
-//        //批复日期
-//        String replyDate = entityRecord.valueMap.get("PRJ_REPLY_DATE").toString();
-//        //批复文号
-//        String replyNo = entityRecord.valueMap.get("PRJ_REPLY_NO").toString();
-//        //批复材料
-//        String replyFile = entityRecord.valueMap.get("REPLY_FILE").toString();
-//        //资金来源
-//        String investmentSourceId = entityRecord.valueMap.get("INVESTMENT_SOURCE_ID").toString();
-
-
         // 新建项目：
         String newPrjId = Crud.from("PM_PRJ").insertData();
         Integer exec = Crud.from("PM_PRJ").where().eq("ID", newPrjId).update().set("PM_PRJ_REQ_ID", pm_prj_req.get(
@@ -129,7 +124,6 @@ public class PmPrjReqExt {
                 .set("PRJ_EARLY_USER_ID", pm_prj_req.get("PRJ_EARLY_USER_ID")).set("PRJ_DESIGN_USER_ID", pm_prj_req.get("PRJ_DESIGN_USER_ID"))
                 .set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID")).set("PRJ_CODE", pm_prj_req.get("PRJ_CODE"))
                 .set("BUILDING_AREA", pm_prj_req.get("CON_SCALE_QTY"))
-//                .set("PRJ_REPLY_NO", replyNo).set("PRJ_REPLY_FILE", replyFile).set("INVESTMENT_SOURCE_ID",investmentSourceId)
                 .exec();
         log.info("已更新：{}", exec);
 
@@ -148,8 +142,19 @@ public class PmPrjReqExt {
         createPlan(newPrjId);
 
         //创建项目文件夹
-        createFolder(newPrjId);
+        ProFileUtils.createFolder(newPrjId);
 
+        //立项申请文件归档
+        //项目申请材料
+        String reqFile = JdbcMapUtil.getString(pm_prj_req, "PRJ_REQ_FILE");
+        ProFileUtils.insertProFile(newPrjId, reqFile, FileCodeEnum.PRJ_REQ_FILE);
+        //盖章立项申请书
+        String applyBook = JdbcMapUtil.getString(pm_prj_req, "STAMPED_PRJ_REQ_FILE");
+        ProFileUtils.insertProFile(newPrjId, applyBook, FileCodeEnum.STAMPED_PRJ_REQ_FILE);
+
+        //批复文件
+        String reply = JdbcMapUtil.getString(pm_prj_req, "REPLY_FILE");
+        ProFileUtils.insertProFile(newPrjId, reply, FileCodeEnum.REPLY_FILE);
     }
 
     private void createInvestEstDtl(Map<String, Object> pm_prj_req, String newInvestEtsId, String colName) {
@@ -423,69 +428,11 @@ public class PmPrjReqExt {
         }).collect(Collectors.toList());
     }
 
-    /**
-     * 新增项目资料文件夹层级
-     */
-    private void createFolder(String projectId) {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select `CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID from PF_FOLDER where IS_TEMPLATE ='1';");
-        //新增项目文件夹目录
-        list.stream().peek(m -> {
-            String id = Crud.from("PF_FOLDER").insertData();
-            Crud.from("PF_FOLDER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId).set("NAME", m.get("NAME"))
-                    .set("SEQ_NO", m.get("SEQ_NO")).set("CODE", m.get("CODE")).set("IS_TEMPLATE","0").exec();
-        }).collect(Collectors.toList());
-
-        try {
-            //立项申请信息
-            Map<String, Object> proReq = jdbcTemplate.queryForMap("select * from pm_prj_req where id = (select PM_PRJ_REQ_ID from pm_prj where id=?)", projectId);
-            //立项申请顶级文件夹
-            Map<String, Object> folderTem = jdbcTemplate.queryForMap("select * from pf_folder where IS_TEMPLATE='0' and `CODE`='APPROVE_PROJECT' and PM_PRJ_ID=?",projectId);
-
-            //项目申请材料
-            String reqFile = JdbcMapUtil.getString(proReq, "PRJ_REQ_FILE");
-            String id = Crud.from("PF_FOLDER").insertData();
-            Crud.from("PF_FOLDER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId).set("NAME", "立项申请材料").set("SEQ_NO", 1).set("CODE", "APPLY_FILE").set("PF_FOLDER_PID", folderTem.get("ID")).set("IS_TEMPLATE","0").exec();
-            if (!StringUtils.isEmpty(reqFile)) {
-                for (String s : reqFile.split(",")) {
-                    String fileId = Crud.from("PF_FILE").insertData();
-                    Crud.from("PF_FILE").where().eq("ID", fileId).update().set("FL_FILE_ID", s).set("PF_FOLDER_ID", id).exec();
-                }
-            }
-
-            //盖章立项申请书
-            String applyBook = JdbcMapUtil.getString(proReq, "STAMPED_PRJ_REQ_FILE");
-            String bookId = Crud.from("PF_FOLDER").insertData();
-            Crud.from("PF_FOLDER").where().eq("ID", bookId).update().set("PM_PRJ_ID", projectId).set("NAME", "盖章立项申请书").set("SEQ_NO", 2).set("CODE", "STAMPED_PRJ_REQ").set("PF_FOLDER_PID", folderTem.get("ID")).set("IS_TEMPLATE","0").exec();
-            if (!StringUtils.isEmpty(applyBook)) {
-                for (String s : applyBook.split(",")) {
-                    String fileId = Crud.from("PF_FILE").insertData();
-                    Crud.from("PF_FILE").where().eq("ID", fileId).update().set("FL_FILE_ID", s).set("PF_FOLDER_ID", bookId).exec();
-                }
-            }
-
-            //批复文件
-            String reply = JdbcMapUtil.getString(proReq, "REPLY_FILE");
-            String replyId = Crud.from("PF_FOLDER").insertData();
-            Crud.from("PF_FOLDER").where().eq("ID", replyId).update().set("PM_PRJ_ID", projectId).set("NAME", "批复文件").set("SEQ_NO", 3).set("CODE", "REPLY_FILE").set("PF_FOLDER_PID", folderTem.get("ID")).set("IS_TEMPLATE","0").exec();
-            if (!StringUtils.isEmpty(reply)) {
-                for (String s : reply.split(",")) {
-                    String fileId = Crud.from("PF_FILE").insertData();
-                    Crud.from("PF_FILE").where().eq("ID", fileId).update().set("FL_FILE_ID", s).set("PF_FOLDER_ID", replyId).exec();
-                }
-            }
-        } catch (Exception e) {
-            throw new BaseException(e.getMessage());
-        }
-
-
-    }
-
 
     public void createProjectFolder() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String projectId = String.valueOf(map.get("pmPrjId"));
-        this.createFolder(projectId);
+        ProFileUtils.createFolder(projectId);
     }
 
 }
