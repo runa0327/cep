@@ -1,11 +1,13 @@
 package com.cisdi.ext.util;
 
 import com.cisdi.ext.enums.FileCodeEnum;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -68,6 +70,9 @@ public class ProFileUtils {
      * @param codeEnum
      */
     public static void insertProFile(String projectId, String fileIds, FileCodeEnum codeEnum) {
+        if (Strings.isNullOrEmpty(fileIds)){
+            return;
+        }
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         try {
             String fid = "";
