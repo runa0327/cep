@@ -4,10 +4,8 @@ import com.cisdi.ext.enums.FileCodeEnum;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
-import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,7 +15,7 @@ import java.util.stream.Collectors;
  * @projectName cisdi-pms-service
  * @title PrFileUtils
  * @package com.cisdi.ext.util
- * @description
+ * @description 文件通用方法类
  * @date 2022/8/25
  */
 public class ProFileUtils {
@@ -27,22 +25,37 @@ public class ProFileUtils {
      */
     public static void createFolder(String projectId) {
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        //查询已经有的文件夹
+        List<Map<String, Object>> folderList = jdbcTemplate.queryForList("select * from PF_FOLDER where  PM_PRJ_ID=?", projectId);
+
         List<Map<String, Object>> list = jdbcTemplate.queryForList("select `CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID from PF_FOLDER where IS_TEMPLATE ='1';");
         //新增项目文件夹目录
         list.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("PF_FOLDER_PID")))).peek(m -> {
-            String id = Crud.from("PF_FOLDER").insertData();
-            Crud.from("PF_FOLDER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId).set("NAME", m.get("NAME"))
-                    .set("SEQ_NO", m.get("SEQ_NO")).set("CODE", m.get("CODE")).set("IS_TEMPLATE", "0").exec();
-            createSonFolder(m, list, id, projectId);
+            String id = "";
+            Optional<Map<String, Object>> optional = folderList.stream().filter(o -> Objects.equals(String.valueOf(m.get("CODE")), String.valueOf(o.get("CODE")))).findAny();
+            if (optional.isPresent()) {
+                id = String.valueOf(optional.get().get("ID"));
+            } else {
+                id = Crud.from("PF_FOLDER").insertData();
+                Crud.from("PF_FOLDER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId).set("NAME", m.get("NAME"))
+                        .set("SEQ_NO", m.get("SEQ_NO")).set("CODE", m.get("CODE")).set("IS_TEMPLATE", "0").exec();
+            }
+            createSonFolder(m, list, id, projectId, folderList);
         }).collect(Collectors.toList());
     }
 
-    public static List<Map<String, Object>> createSonFolder(Map<String, Object> root, List<Map<String, Object>> allData, String pid, String projectId) {
+    public static List<Map<String, Object>> createSonFolder(Map<String, Object> root, List<Map<String, Object>> allData, String pid, String projectId, List<Map<String, Object>> folderList) {
         return allData.stream().filter(p -> Objects.equals(String.valueOf(root.get("ID")), String.valueOf(p.get("PF_FOLDER_PID")))).peek(m -> {
-            String id = Crud.from("PF_FOLDER").insertData();
-            Crud.from("PF_FOLDER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId).set("NAME", m.get("NAME"))
-                    .set("SEQ_NO", m.get("SEQ_NO")).set("CODE", m.get("CODE")).set("IS_TEMPLATE", "0").set("PF_FOLDER_PID", pid).exec();
-            createSonFolder(m, allData, id, projectId);
+            String id = "";
+            Optional<Map<String, Object>> optional = folderList.stream().filter(o -> Objects.equals(String.valueOf(m.get("CODE")), String.valueOf(o.get("CODE")))).findAny();
+            if (optional.isPresent()) {
+                id = String.valueOf(optional.get().get("ID"));
+            } else {
+                id = Crud.from("PF_FOLDER").insertData();
+                Crud.from("PF_FOLDER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId).set("NAME", m.get("NAME"))
+                        .set("SEQ_NO", m.get("SEQ_NO")).set("CODE", m.get("CODE")).set("IS_TEMPLATE", "0").set("PF_FOLDER_PID", pid).exec();
+            }
+            createSonFolder(m, allData, id, projectId, folderList);
         }).collect(Collectors.toList());
     }
 
@@ -59,7 +72,8 @@ public class ProFileUtils {
         try {
             String fid = "";
             List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from pf_folder where PM_PRJ_ID=?", projectId);
-            if (CollectionUtils.isEmpty(list)) {
+            List<Map<String, Object>> folderList = jdbcTemplate.queryForList("select `CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID from PF_FOLDER where IS_TEMPLATE ='1';");
+            if (CollectionUtils.isEmpty(list) || folderList.size() != list.size()) {
                 ProFileUtils.createFolder(projectId);
                 Map<String, Object> map = jdbcTemplate.queryForMap("select * from pf_folder where PM_PRJ_ID=? and `CODE`=?", projectId, codeEnum.getCode());
                 fid = String.valueOf(map.get("ID"));
