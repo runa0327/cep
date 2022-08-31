@@ -54,8 +54,7 @@ public class MapDataTransferController {
                             "DICT_VALUE,FILL_OPACITY,CPMS_ID,TS,CRT_DT,LAST_MODI_DT) " +
                             "values ((select UUID_SHORT()),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,(now()),(now()),(now()))";
                     //替换项目id
-                    List<Map<String, Object>> prjIdList = testJdbcTemplate.queryForList("select id from pm_prj where" +
-                            " CPMS_UUID = ?", mapInfo.get("project_id"));
+                    List<Map<String, Object>> prjIdList = testJdbcTemplate.queryForList("select id from pm_prj where CPMS_UUID = ?", mapInfo.get("project_id"));
 
                     String prjId = CollectionUtils.isEmpty(prjIdList) ? null : JdbcMapUtil.getString(prjIdList.get(0),"id");
                     //插入mapinfo
