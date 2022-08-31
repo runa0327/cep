@@ -620,7 +620,7 @@ public class AttLinkExt {
             return attLinkResult;
         }else if (("RELATION_CONTRACT_ID").equals(attCode)){
             //根据id查询招投标信息
-            List<Map<String, Object>> list = jdbcTemplate.queryForList("select CONTRACT_CODE, NAME from po_order_req where id = ?", attValue);
+            List<Map<String, Object>> list = jdbcTemplate.queryForList("select CONTRACT_CODE,NAME,WIN_BID_UNIT_TXT,CONTRACT_PRICE from po_order_req where id = ?", attValue);
 
             if (CollectionUtils.isEmpty(list)) {
                 throw new BaseException("合同相关属性不完善！");
@@ -642,6 +642,22 @@ public class AttLinkExt {
                 typeValueText.value = JdbcMapUtil.getString(row,"NAME");
                 typeValueText.text = JdbcMapUtil.getString(row,"NAME");
                 attLinkResult.attMap.put("CONTRACT_NAME",typeValueText);
+            }
+            //中标单位
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"WIN_BID_UNIT_TXT");
+                typeValueText.text = JdbcMapUtil.getString(row,"WIN_BID_UNIT_TXT");
+                attLinkResult.attMap.put("WIN_BID_UNIT_TXT",typeValueText);
+            }
+            //合同总金额
+            {
+                TypeValueText typeValueText = new TypeValueText();
+                typeValueText.type = AttDataTypeE.TEXT_LONG;
+                typeValueText.value = JdbcMapUtil.getString(row,"CONTRACT_PRICE");
+                typeValueText.text = JdbcMapUtil.getString(row,"CONTRACT_PRICE");
+                attLinkResult.attMap.put("CONTRACT_PRICE",typeValueText);
             }
 
             return attLinkResult;
@@ -876,23 +892,6 @@ public class AttLinkExt {
                         "limit 1", attValue);
                 if (!CollectionUtils.isEmpty(contractMaps)){
                     Map<String, Object> contractRow = contractMaps.get(0);
-                    //签订单位
-                    {
-                        TypeValueText typeValueText = new TypeValueText();
-                        typeValueText.type = AttDataTypeE.TEXT_LONG;
-                        typeValueText.value = JdbcMapUtil.getString(contractRow, "WIN_BID_UNIT_TXT");
-                        typeValueText.text = JdbcMapUtil.getString(contractRow, "WIN_BID_UNIT_TXT");
-                        attLinkResult.attMap.put("ENTRUSTING_UNIT", typeValueText);
-                        attLinkResult.attMap.put("WIN_BID_UNIT_TXT", typeValueText);
-                    }
-                    //合同金额
-                    {
-                        TypeValueText typeValueText = new TypeValueText();
-                        typeValueText.type = AttDataTypeE.TEXT_LONG;
-                        typeValueText.value = JdbcMapUtil.getString(contractRow, "CONTRACT_PRICE");
-                        typeValueText.text = JdbcMapUtil.getString(contractRow, "CONTRACT_PRICE");
-                        attLinkResult.attMap.put("CONTRACT_PRICE", typeValueText);
-                    }
                     //合同已支付金额
 
                     //支付比例
