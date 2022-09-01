@@ -27,4 +27,6 @@ public class PoOrder {
     private String OPPO_SITE;
     private String OPPO_SITE_LINK_MAN;
     private String PM_PRJ_ID;
+    private String CPMS_ID;
+    private String CPMS_UUID;
 }

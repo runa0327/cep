@@ -1,29 +1,19 @@
 package com.cisdi.data.transfer;
 
 import com.cisdi.data.domain.PoOrder;
-import com.cisdi.data.util.ListUtils;
-import com.qygly.ext.jar.helper.debug.event.AsyncConfig;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +35,10 @@ public class TransferContractController {
 
     @GetMapping(value = "/transferContract")
     public void TransferContract(){
+
+        //删除数据
+        testJdbcTemplate.update("delete from po_order where CPMS_UUID is not null");
+
         //查询项目合同信息
         String sql1 = "SELECT id,contract_id, project_id,contract_name, indicators_id, counterparty,sign_date, tender_way,shal_review_price, goods_evaluation_price,ifnull(change_price,contract_price) as contract_price, " +
                 "agent,agent_phone, other, other_phone, del_flag, remakes,version " +
@@ -74,6 +68,8 @@ public class TransferContractController {
                                     poOrder.setOPPO_SITE_LINK_MAN((JdbcMapUtil.getString(tmp, "other") == null) ? "" : JdbcMapUtil.getString(tmp, "other"));
                                     poOrder.setOPPO_SITE_CONTACT((JdbcMapUtil.getString(tmp, "other_phone") == null) ? "" : JdbcMapUtil.getString(tmp, "other_phone"));
                                     poOrder.setPM_PRJ_ID(JdbcMapUtil.getString(tp, "id"));
+                                    poOrder.setCPMS_ID(JdbcMapUtil.getString(tmp,"id"));
+                                    poOrder.setCPMS_UUID(mapInfoLists);
 
                                     //查询老系统文件信息
                                     String sql3 = "select file_id from project_relevance where relevance_id = '"+JdbcMapUtil.getString(tmp,"contract_id")+"'";
@@ -92,9 +88,10 @@ public class TransferContractController {
                                     }
 
                                     String insertSql = "insert into po_order (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,CONTRACT_AMOUNT,AGENT," +
-                                            "AGENT_PHONE,OPPO_SITE_CONTACT,FILE_ATTACHMENT_URL,OPPO_SITE_LINK_MAN,PM_PRJ_ID) values((select UUID_SHORT()),?,now(),now(),?,now(),?,?,?,?,?,?,?,?,?)";
+                                            "AGENT_PHONE,OPPO_SITE_CONTACT,FILE_ATTACHMENT_URL,OPPO_SITE_LINK_MAN,PM_PRJ_ID,CPMS_UUID,CPMS_ID) values((select UUID_SHORT()),?,now(),now(),?,now(),?,?,?,?,?,?,?,?,?,?,?)";
                                     testJdbcTemplate.update(insertSql,poOrder.getVer(),poOrder.getCRT_USER_ID(),poOrder.getLAST_MODI_USER_ID(),poOrder.getSTATUS(),poOrder.getCONTRACT_AMOUNT(),
-                                            poOrder.getAGENT(),poOrder.getAGENT_PHONE(),poOrder.getOPPO_SITE_CONTACT(),poOrder.getFILE_ATTACHMENT_URL(),poOrder.getOPPO_SITE_LINK_MAN(),poOrder.getPM_PRJ_ID());
+                                            poOrder.getAGENT(),poOrder.getAGENT_PHONE(),poOrder.getOPPO_SITE_CONTACT(),poOrder.getFILE_ATTACHMENT_URL(),poOrder.getOPPO_SITE_LINK_MAN(),poOrder.getPM_PRJ_ID(),
+                                            poOrder.getCPMS_UUID(),poOrder.getCPMS_ID());
                                 }
 
                             });
