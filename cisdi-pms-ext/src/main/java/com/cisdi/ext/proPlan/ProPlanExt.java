@@ -10,8 +10,11 @@ import com.qygly.shared.interaction.IdCodeName;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.io.Console;
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ProPlanExt {
     public void calcPlanTotalDays() {
@@ -211,7 +214,7 @@ public class ProPlanExt {
                 List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(p, jdbcTemplate)).collect(Collectors.toList());
                 //构建树结构
                 List<PrjProPlanNodeInfo> tree = infoList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
-                    m.children = getChildNode(m, infoList).stream().sorted(Comparator.comparing(p -> p.seqNo,Comparator.nullsFirst(String::compareTo))).collect(Collectors.toList());
+                    m.children = getChildNode(m, infoList).stream().sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo))).collect(Collectors.toList());
                 }).collect(Collectors.toList());
 
                 planInfo.nodeInfoList = tree;
@@ -235,7 +238,7 @@ public class ProPlanExt {
      */
     private List<PrjProPlanNodeInfo> getChildNode(PrjProPlanNodeInfo root, List<PrjProPlanNodeInfo> allListTree) {
         return allListTree.stream().filter((treeEntity) -> treeEntity.pid.equals(root.id)).peek((treeEntity) -> {
-            treeEntity.children = getChildNode(treeEntity, allListTree).stream().sorted(Comparator.comparing(p -> p.seqNo,Comparator.nullsFirst(String::compareTo))).collect(Collectors.toList());
+            treeEntity.children = getChildNode(treeEntity, allListTree).stream().sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo))).collect(Collectors.toList());
         }).collect(Collectors.toList());
     }
 
@@ -671,5 +674,391 @@ public class ProPlanExt {
          * 子节点
          */
         public List<PrjProPlanNodeInfo> children;
+    }
+
+    /**
+     * 项目进度对比表
+     */
+    public void proContrast() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();
+        String json = JsonUtil.toJson(map);
+        ProPlanExt.GetPrjProPlanNetworkParam param = JsonUtil.fromJson(json, ProPlanExt.GetPrjProPlanNetworkParam.class);
+        String pmPrjId = param.pmPrjId;
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        Map<String, Object> proMap = jdbcTemplate.queryForMap("select pr.*,pj.name as PROJECT_NAME from PM_PRO_PLAN pr left join pm_prj pj on pr.PM_PRJ_ID = pj.id where PM_PRJ_ID=?", pmPrjId);
+        ProContrast contrast;
+        if (proMap != null) {
+            contrast = this.convertProContrast(proMap, jdbcTemplate);
+
+            List<Map<String, Object>> allList = jdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
+                    "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
+                    "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO,pppn.`LEVEL` \n" +
+                    "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where ppp.PM_PRJ_ID=?", pmPrjId);
+
+            List<ProContrastNode> infoList = allList.stream().map(p -> this.convertProContrastNode(p, jdbcTemplate)).collect(Collectors.toList());
+            //构建树
+            List<ProContrastNode> treeList = infoList.stream().filter(p -> Objects.equals("0", String.valueOf(p.pid))).peek(m -> {
+                m.children = getContrastChildren(m, infoList);
+            }).collect(Collectors.toList());
+            contrast.info = treeList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(contrast), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        } else {
+            ExtJarHelper.returnValue.set(null);
+        }
+    }
+
+    private List<ProContrastNode> getContrastChildren(ProContrastNode parent, List<ProContrastNode> allData) {
+        return allData.stream().filter(p -> Objects.equals(parent.id, p.pid)).peek(m -> {
+            m.children = getContrastChildren(m, allData);
+        }).collect(Collectors.toList());
+    }
+
+    private ProContrastNode convertProContrastNode(Map<String, Object> data, JdbcTemplate jdbcTemplate) {
+        ProContrastNode node = new ProContrastNode();
+        node.id = JdbcMapUtil.getString(data, "ID");
+        node.pid = JdbcMapUtil.getString(data, "PM_PRO_PLAN_NODE_PID");
+        node.name = JdbcMapUtil.getString(data, "NAME");
+        if (!Objects.isNull(data.get("CHIEF_DEPT_ID"))) {
+            Map<String, Object> deptObj = jdbcTemplate.queryForMap("select * from hr_dept where id =?", JdbcMapUtil.getString(data, "CHIEF_DEPT_ID"));
+            node.dept = String.valueOf(deptObj.get("NAME"));
+        }
+        if (!Objects.isNull(data.get("CHIEF_USER_ID"))) {
+            Map<String, Object> userObj = jdbcTemplate.queryForMap("select * from ad_user where id =?", JdbcMapUtil.getString(data, "CHIEF_USER_ID"));
+            node.user = String.valueOf(userObj.get("NAME"));
+        }
+        String sql = "select * from gr_set_value where id=?";
+        if (!Objects.isNull(data.get("PROGRESS_STATUS_ID"))) {
+            Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(data, "PROGRESS_STATUS_ID"));
+            node.proStatus = String.valueOf(statusObj.get("NAME"));
+        }
+        if (!Objects.isNull(data.get("PROGRESS_RISK_TYPE_ID"))) {
+            Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(data, "PROGRESS_RISK_TYPE_ID"));
+            node.riskStatus = String.valueOf(riskObj.get("NAME"));
+        }
+        node.proRiskRemark = JdbcMapUtil.getString(data, "PROGRESS_RISK_REMARK");
+
+        node.planStartDate = JdbcMapUtil.getString(data, "PLAN_START_DATE");
+        node.actualStartDate = JdbcMapUtil.getString(data, "ACTUAL_START_DATE");
+        if (Objects.nonNull(data.get("PLAN_START_DATE"))) {
+            Date actual = new Date();
+            if (Objects.nonNull(data.get("ACTUAL_START_DATE"))) {
+                actual = DateTimeUtil.stringToDate(String.valueOf(data.get("ACTUAL_START_DATE")));
+            }
+            try {
+                node.beginOffset = DateTimeUtil.daysBetween(DateTimeUtil.stringToDate(String.valueOf(data.get("PLAN_START_DATE"))), actual);
+            } catch (Exception e) {
+                node.beginOffset = null;
+            }
+
+        }
+
+
+        node.planComplDate = JdbcMapUtil.getString(data, "PLAN_COMPL_DATE");
+        node.actualComplDate = JdbcMapUtil.getString(data, "ACTUAL_COMPL_DATE");
+        if (Objects.nonNull(data.get("PLAN_COMPL_DATE"))) {
+            Date actual = new Date();
+            if (Objects.nonNull(data.get("ACTUAL_START_DATE"))) {
+                actual = DateTimeUtil.stringToDate(String.valueOf(data.get("ACTUAL_COMPL_DATE")));
+            }
+            try {
+                node.endOffset = DateTimeUtil.daysBetween(DateTimeUtil.stringToDate(String.valueOf(data.get("PLAN_COMPL_DATE"))), actual);
+            } catch (Exception e) {
+                node.endOffset = null;
+            }
+
+        }
+
+
+        node.planTotalDays = JdbcMapUtil.getInt(data, "PLAN_TOTAL_DAYS");
+        node.actualTotalDays = JdbcMapUtil.getInt(data, "ACTUAL_TOTAL_DAYS");
+        if (Objects.nonNull(data.get("PLAN_TOTAL_DAYS"))) {
+            int actualTotalDays = 0;
+            if (Objects.nonNull(data.get("ACTUAL_TOTAL_DAYS"))) {
+                actualTotalDays = JdbcMapUtil.getInt(data, "ACTUAL_TOTAL_DAYS");
+            }
+            node.daysOffset = node.planTotalDays - actualTotalDays;
+        }
+
+
+        node.planCurrentProPercent = JdbcMapUtil.getDouble(data, "PLAN_CURRENT_PRO_PERCENT");
+        node.actualCurrentProPercent = JdbcMapUtil.getDouble(data, "ACTUAL_CURRENT_PRO_PERCENT");
+        if (Objects.nonNull(data.get("PLAN_CURRENT_PRO_PERCENT"))) {
+            double actualCurrentProPercent = 0d;
+            if (Objects.nonNull(data.get("ACTUAL_CURRENT_PRO_PERCENT"))) {
+                actualCurrentProPercent = JdbcMapUtil.getDouble(data, "ACTUAL_CURRENT_PRO_PERCENT");
+            }
+            node.percentOffset = String.valueOf(actualCurrentProPercent - node.planCurrentProPercent);
+        }
+
+        return node;
+    }
+
+    private ProContrast convertProContrast(Map<String, Object> data, JdbcTemplate jdbcTemplate) {
+        ProContrast contrast = new ProContrast();
+        contrast.id = JdbcMapUtil.getString(data, "ID");
+        contrast.projectId = JdbcMapUtil.getString(data, "PM_PRJ_ID");
+        contrast.projectName = JdbcMapUtil.getString(data, "PROJECT_NAME");
+        if (!Objects.isNull(data.get("CHIEF_DEPT_ID"))) {
+            Map<String, Object> deptObj = jdbcTemplate.queryForMap("select * from hr_dept where id =?", JdbcMapUtil.getString(data, "CHIEF_DEPT_ID"));
+            contrast.dept = String.valueOf(deptObj.get("NAME"));
+        }
+        if (!Objects.isNull(data.get("CHIEF_USER_ID"))) {
+            Map<String, Object> userObj = jdbcTemplate.queryForMap("select * from ad_user where id =?", JdbcMapUtil.getString(data, "CHIEF_USER_ID"));
+            contrast.user = String.valueOf(userObj.get("NAME"));
+        }
+        String sql = "select * from gr_set_value where id=?";
+        if (!Objects.isNull(data.get("PROGRESS_STATUS_ID"))) {
+            Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(data, "PROGRESS_STATUS_ID"));
+            contrast.proStatus = String.valueOf(statusObj.get("NAME"));
+        }
+        if (!Objects.isNull(data.get("PROGRESS_RISK_TYPE_ID"))) {
+            Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(data, "PROGRESS_RISK_TYPE_ID"));
+            contrast.riskStatus = String.valueOf(riskObj.get("NAME"));
+        }
+        contrast.proRiskRemark = JdbcMapUtil.getString(data, "PROGRESS_RISK_REMARK");
+
+        contrast.planStartDate = JdbcMapUtil.getString(data, "PLAN_START_DATE");
+        contrast.actualStartDate = JdbcMapUtil.getString(data, "ACTUAL_START_DATE");
+        if (Objects.nonNull(data.get("PLAN_START_DATE"))) {
+            Date actual = new Date();
+            if (Objects.nonNull(data.get("ACTUAL_START_DATE"))) {
+                actual = DateTimeUtil.stringToDate(String.valueOf(data.get("ACTUAL_START_DATE")));
+            }
+            try {
+                contrast.beginOffset = DateTimeUtil.daysBetween(DateTimeUtil.stringToDate(String.valueOf(data.get("PLAN_START_DATE"))), actual);
+            } catch (Exception e) {
+                contrast.beginOffset = null;
+            }
+        }
+
+        contrast.planComplDate = JdbcMapUtil.getString(data, "PLAN_COMPL_DATE");
+        contrast.actualComplDate = JdbcMapUtil.getString(data, "ACTUAL_COMPL_DATE");
+        if (Objects.nonNull(data.get("PLAN_COMPL_DATE"))) {
+            Date actual = new Date();
+            if (Objects.nonNull(data.get("ACTUAL_START_DATE"))) {
+                actual = DateTimeUtil.stringToDate(String.valueOf(data.get("ACTUAL_COMPL_DATE")));
+            }
+            try {
+                contrast.endOffset = DateTimeUtil.daysBetween(DateTimeUtil.stringToDate(String.valueOf(data.get("PLAN_COMPL_DATE"))), actual);
+            } catch (Exception e) {
+                contrast.endOffset = null;
+            }
+        }
+
+        contrast.planTotalDays = JdbcMapUtil.getInt(data, "PLAN_TOTAL_DAYS");
+        contrast.actualTotalDays = JdbcMapUtil.getInt(data, "ACTUAL_TOTAL_DAYS");
+        if (Objects.nonNull(data.get("PLAN_TOTAL_DAYS"))) {
+            int actualTotalDays = 0;
+            if (Objects.nonNull(data.get("ACTUAL_TOTAL_DAYS"))) {
+                actualTotalDays = JdbcMapUtil.getInt(data, "ACTUAL_TOTAL_DAYS");
+            }
+            contrast.daysOffset = contrast.planTotalDays - actualTotalDays;
+        }
+
+
+        contrast.planCurrentProPercent = JdbcMapUtil.getDouble(data, "PLAN_CURRENT_PRO_PERCENT");
+        contrast.actualCurrentProPercent = JdbcMapUtil.getDouble(data, "ACTUAL_CURRENT_PRO_PERCENT");
+        if (Objects.nonNull(data.get("PLAN_CURRENT_PRO_PERCENT"))) {
+            double actualCurrentProPercent = 0d;
+            if (Objects.nonNull(data.get("ACTUAL_CURRENT_PRO_PERCENT"))) {
+                actualCurrentProPercent = JdbcMapUtil.getDouble(data, "ACTUAL_CURRENT_PRO_PERCENT");
+            }
+            contrast.percentOffset = String.valueOf(actualCurrentProPercent - contrast.planCurrentProPercent);
+        }
+        return contrast;
+    }
+
+    public static class ProContrastNode {
+
+        /**
+         * ID
+         */
+        public String id;
+
+        /**
+         * 父ID
+         */
+        public String pid;
+
+        /**
+         * 节点名称
+         */
+        public String name;
+
+        /**
+         * 责任部门
+         */
+        public String dept;
+
+        /**
+         * 责任人
+         */
+        public String user;
+
+        /**
+         * 进度状态
+         */
+        public String proStatus;
+
+        /**
+         * 风险状态
+         */
+        public String riskStatus;
+
+        /**
+         * 进度风险说明
+         */
+        public String proRiskRemark;
+
+        /**
+         * 预计开始日期
+         */
+        public String planStartDate;
+        /**
+         * 实际开始日期
+         */
+        public String actualStartDate;
+        /**
+         * 开始日期偏差
+         */
+        public Integer beginOffset;
+        /**
+         * 预计完成日期
+         */
+        public String planComplDate;
+        /**
+         * 实际完成日期
+         */
+        public String actualComplDate;
+
+        /**
+         * 完成日期偏差
+         */
+        public Integer endOffset;
+
+        /**
+         * 预计总天数
+         */
+        public Integer planTotalDays;
+        /**
+         * 实际总天数
+         */
+        public Integer actualTotalDays;
+        /**
+         * 总天数偏差
+         */
+        public Integer daysOffset;
+
+        /**
+         * 预计当前进度百分比
+         */
+        public Double planCurrentProPercent;
+        /**
+         * 实际当前进度百分比
+         */
+        public Double actualCurrentProPercent;
+
+        /**
+         * 进度偏差
+         */
+        public String percentOffset;
+
+        /**
+         * 子集
+         */
+        public List<ProContrastNode> children;
+
+    }
+
+    public static class ProContrast {
+        public String id;
+        /**
+         * 项目ID
+         */
+        public String projectId;
+        /**
+         * 项目名称
+         */
+        public String projectName;
+        /**
+         * 责任部门
+         */
+        public String dept;
+
+        /**
+         * 责任人
+         */
+        public String user;
+
+        /**
+         * 进度状态
+         */
+        public String proStatus;
+
+        /**
+         * 风险状态
+         */
+        public String riskStatus;
+
+        /**
+         * 进度风险说明
+         */
+        public String proRiskRemark;
+
+        /**
+         * 预计开始日期
+         */
+        public String planStartDate;
+        /**
+         * 实际开始日期
+         */
+        public String actualStartDate;
+        /**
+         * 开始日期偏差
+         */
+        public Integer beginOffset;
+        /**
+         * 预计完成日期
+         */
+        public String planComplDate;
+        /**
+         * 实际完成日期
+         */
+        public String actualComplDate;
+
+        /**
+         * 完成日期偏差
+         */
+        public Integer endOffset;
+
+        /**
+         * 预计总天数
+         */
+        public Integer planTotalDays;
+        /**
+         * 实际总天数
+         */
+        public Integer actualTotalDays;
+        /**
+         * 总天数偏差
+         */
+        public Integer daysOffset;
+
+        /**
+         * 预计当前进度百分比
+         */
+        public Double planCurrentProPercent;
+        /**
+         * 实际当前进度百分比
+         */
+        public Double actualCurrentProPercent;
+
+        /**
+         * 进度偏差
+         */
+        public String percentOffset;
+
+        public List<ProContrastNode> info;
     }
 }
