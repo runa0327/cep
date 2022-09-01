@@ -2,6 +2,7 @@ package com.cisdi.ext.model.view;
 
 import com.cisdi.ext.model.BasePageEntity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public class PoOrderView extends BasePageEntity {
     //经办人电话
     public String agentPhone;
     //合同金额
-    public String contractAmount;
+    public BigDecimal contractAmount;
     //状态
     public String status;
     //附件信息
@@ -98,14 +99,6 @@ public class PoOrderView extends BasePageEntity {
 
     public void setAgentPhone(String agentPhone) {
         this.agentPhone = agentPhone;
-    }
-
-    public String getContractAmount() {
-        return contractAmount;
-    }
-
-    public void setContractAmount(String contractAmount) {
-        this.contractAmount = contractAmount;
     }
 
     public String getStatus() {

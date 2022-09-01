@@ -11,6 +11,7 @@ import com.qygly.shared.util.SharedUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,13 +38,19 @@ public class PoOrderExtApi {
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         StringBuilder sb = new StringBuilder();
         StringBuilder sb2 = new StringBuilder();
-        String sql = "SELECT a.id, a.PM_PRJ_ID, b.`NAME` as projectName, c.`NAME` as statusName, a.OPPO_SITE, a.OPPO_SITE_LINK_MAN, a.OPPO_SITE_CONTACT,a.AGENT, a.AGENT_PHONE, a.CONTRACT_AMOUNT, a.FILE_ATTACHMENT_URL,a.REMARK FROM PO_ORDER a LEFT JOIN pm_prj b on a.PM_PRJ_ID = b.ID LEFT JOIN ad_status c on a.`STATUS` = c.id where 1 = 1 and a.PM_PRJ_ID = ? ";
+        String sql = "SELECT a.id, a.PM_PRJ_ID, b.`NAME` as projectName, c.`NAME` as statusName, a.OPPO_SITE, a.OPPO_SITE_LINK_MAN, a.OPPO_SITE_CONTACT,a.AGENT, a.AGENT_PHONE, a.CONTRACT_AMOUNT, a.FILE_ATTACHMENT_URL,a.REMARK FROM PO_ORDER a LEFT JOIN pm_prj b on a.PM_PRJ_ID = b.ID LEFT JOIN ad_status c on a.`STATUS` = c.id where 1 = 1 and a.PM_PRJ_ID = ?";
         String sql2 = "SELECT count(*) as num FROM PO_ORDER a LEFT JOIN pm_prj b on a.PM_PRJ_ID = b.ID LEFT JOIN ad_status c on a.`STATUS` = c.id where 1 = 1 and a.PM_PRJ_ID = ? ";
         sb.append(sql);
         sb2.append(sql2);
+        //合同名称
         if (!SharedUtil.isEmptyString(param.projectName)){
             sb.append(" and b.Name like ('%"+param.projectName+"%') ");
             sb2.append(" and b.Name like ('%"+param.projectName+"%') ");
+        }
+        //合同总价
+        if (param.contractAmount != null){
+            sb.append(" and a.CONTRACT_AMOUNT like ('%"+param.contractAmount+"%') ");
+            sb2.append(" and a.CONTRACT_AMOUNT like ('%"+param.contractAmount+"%') ");
         }
         sb.append("order BY a.CRT_DT DESC ").append(limit);
         sb2.append("order BY a.CRT_DT DESC");
@@ -63,10 +70,10 @@ public class PoOrderExtApi {
                 poOrderView.oppoSiteContact = JdbcMapUtil.getString(p,"OPPO_SITE_CONTACT");
                 poOrderView.agent = JdbcMapUtil.getString(p,"AGENT");
                 poOrderView.agentPhone = JdbcMapUtil.getString(p,"AGENT_PHONE");
-                poOrderView.contractAmount = JdbcMapUtil.getString(p,"CONTRACT_AMOUNT");
+                poOrderView.contractAmount = new BigDecimal(JdbcMapUtil.getString(p,"CONTRACT_AMOUNT"));
                 poOrderView.statusName = JdbcMapUtil.getString(p,"statusName");
                 poOrderView.remark = JdbcMapUtil.getString(p,"REMARK");
-                poOrderView.fileId = JdbcMapUtil.getString(p,"FILE_ATTACHMENT_URL");
+                poOrderView.fileId = SharedUtil.isEmptyString(JdbcMapUtil.getString(p,"FILE_ATTACHMENT_URL")) ? "":JdbcMapUtil.getString(p,"FILE_ATTACHMENT_URL");
                 return poOrderView;
             }).collect(Collectors.toList());
             map1.put("result",inputList);

@@ -25,7 +25,7 @@ public class PmProjectKickOffReqExt {
         if (COMPL_PLAN_DATE.compareTo(PLAN_DATE) < 0){
             throw new BaseException("完工时间不能小于开工时间！");
         }
-        int cha = DateTimeUtil.getTwoTimeDays(COMPL_PLAN_DATE,PLAN_DATE);
+        int cha = DateTimeUtil.getTwoTimeDays(COMPL_PLAN_DATE,PLAN_DATE) + 1;
         Integer update = jdbcTemplate.update("update PM_PRJ_KICK_OFF_REQ set SERVICE_DAYS = ? where id = ?",cha,csCommId);
     }
 }

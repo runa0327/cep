@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -70,9 +71,26 @@ public class TransferContractController {
                                     poOrder.setCONTRACT_AMOUNT(JdbcMapUtil.getString(tmp, "contract_price"));
                                     poOrder.setAGENT((JdbcMapUtil.getString(tmp, "agent") == null) ? "" : JdbcMapUtil.getString(tmp, "agent"));
                                     poOrder.setAGENT_PHONE((JdbcMapUtil.getString(tmp, "agent_phone") == null) ? "" : JdbcMapUtil.getString(tmp, "agent_phone"));
-                                    poOrder.setOPPO_SITE_CONTACT((JdbcMapUtil.getString(tmp, "other") == null) ? "" : JdbcMapUtil.getString(tmp, "other"));
-                                    poOrder.setOPPO_SITE_LINK_MAN((JdbcMapUtil.getString(tmp, "other_phone") == null) ? "" : JdbcMapUtil.getString(tmp, "other_phone"));
+                                    poOrder.setOPPO_SITE_LINK_MAN((JdbcMapUtil.getString(tmp, "other") == null) ? "" : JdbcMapUtil.getString(tmp, "other"));
+                                    poOrder.setOPPO_SITE_CONTACT((JdbcMapUtil.getString(tmp, "other_phone") == null) ? "" : JdbcMapUtil.getString(tmp, "other_phone"));
                                     poOrder.setPM_PRJ_ID(JdbcMapUtil.getString(tp, "id"));
+
+                                    //查询老系统文件信息
+                                    String sql3 = "select file_id from project_relevance where relevance_id = '"+JdbcMapUtil.getString(tmp,"contract_id")+"'";
+                                    List<Map<String,Object>> map3 = cpmsJdbcTemplate.queryForList(sql3);
+                                    if (!CollectionUtils.isEmpty(map3)){
+                                        String fileStr = String.join(",",map3.stream().map(p->JdbcMapUtil.getString(p,"file_id")).filter(x->!" ".equals(x) && !"".equals(x)).collect(Collectors.toList()));
+                                        if (!SharedUtil.isEmptyString(fileStr)){
+                                            fileStr = fileStr.replace(",","','");
+                                            String sql4 = "select FL_FILE_ID from pf_file where CPMS_UUID in ('"+fileStr+"')";
+                                            List<Map<String,Object>> list4 = testJdbcTemplate.queryForList(sql4);
+                                            if (!CollectionUtils.isEmpty(list4)){
+                                                fileStr = String.join(",",list4.stream().map(x->JdbcMapUtil.getString(x,"FL_FILE_ID")).collect(Collectors.toList()));
+                                                poOrder.setFILE_ATTACHMENT_URL(fileStr);
+                                            }
+                                        }
+                                    }
+
                                     String insertSql = "insert into po_order (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,CONTRACT_AMOUNT,AGENT," +
                                             "AGENT_PHONE,OPPO_SITE_CONTACT,FILE_ATTACHMENT_URL,OPPO_SITE_LINK_MAN,PM_PRJ_ID) values((select UUID_SHORT()),?,now(),now(),?,now(),?,?,?,?,?,?,?,?,?)";
                                     testJdbcTemplate.update(insertSql,poOrder.getVer(),poOrder.getCRT_USER_ID(),poOrder.getLAST_MODI_USER_ID(),poOrder.getSTATUS(),poOrder.getCONTRACT_AMOUNT(),
@@ -80,19 +98,6 @@ public class TransferContractController {
                                 }
 
                             });
-
-
-                            //查询老系统文件信息
-//                                        String sql3 = "select file_id from project_relevance where relevance_id = '"+JdbcMapUtil.getString(tmp,"contract_id")+"'";
-//                                        List<Map<String,Object>> map3 = cpmsJdbcTemplate.queryForList(sql3);
-//                                        if (!CollectionUtils.isEmpty(map3)){
-//                                            String fileStr = String.join(",",map3.stream().map(p->JdbcMapUtil.getString(p,"file_id")).filter(x->!" ".equals(x) && !"".equals(x)).collect(Collectors.toList()));
-//                                            if (!SharedUtil.isEmptyString(fileStr)){
-//                                                poOrder.setFILE_ATTACHMENT_URL(fileStr);
-//                                            }
-//                                        }
-
-
                         }
                     });
                 });

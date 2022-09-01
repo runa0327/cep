@@ -189,7 +189,7 @@ public class DateTimeUtil {
     }
 
     /**
-     * 计算两个日期相差天数
+     * 计算两个日期相差天数 日期格式 yyyy-MM-dd  格式带时分秒计算天数可能会不准
      * @param maxDate
      * @param end
      * @return
