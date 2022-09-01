@@ -5,7 +5,6 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.interaction.TypeValueText;
-import com.qygly.shared.util.BooleanUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,7 +12,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class AttLinkExt {
 
@@ -1144,6 +1142,7 @@ public class AttLinkExt {
             }
 
         } else if ("STATUS".equals(attCode)){
+//            if ("attValue")
             return null;
         }else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");

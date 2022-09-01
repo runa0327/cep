@@ -175,7 +175,8 @@ public class WfExt {
                         if (tableList.contains(entityCode)) {
                             //流程名称按规定创建
                             int update1 = 0;
-                            if ("PO_ORDER_PAYMENT_REQ".equals(entityCode) || "PM_FUND_REQUIRE_PLAN_REQ".equals(entityCode) || "PM_DESIGN_ASSIGNMENT_BOOK".equals(entityCode)){
+                            List<String> amtPrjList = getAmtPrjList();
+                            if (amtPrjList.contains(entityCode)){
                                 //资金需求计划和付款申请项目\设计任务书名称使用的另外的字段
                                 update1 = jdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
                                         ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi.ENTITY_RECORD_ID=t.id join pm_prj prj on t.AMOUT_PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
@@ -416,5 +417,15 @@ public class WfExt {
         }
         String fileIds = JdbcMapUtil.getString(fileIdMap, "fileIds");
         return fileIds;
+    }
+
+
+    private List<String> getAmtPrjList() {
+        List<String> list = new ArrayList<>();
+        list.add("PO_ORDER_PAYMENT_REQ"); //采购合同付款申请
+        list.add("PM_FUND_REQUIRE_PLAN_REQ"); //资金需求计划申请
+        list.add("PM_DESIGN_ASSIGNMENT_BOOK"); //设计任务书
+        list.add("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD"); //技术交底与图纸会审记录
+        return list;
     }
 }
