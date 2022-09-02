@@ -30,7 +30,7 @@ public class ProFileUtils {
         //查询已经有的文件夹
         List<Map<String, Object>> folderList = jdbcTemplate.queryForList("select * from PF_FOLDER where  PM_PRJ_ID=?", projectId);
 
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select `CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID from PF_FOLDER where IS_TEMPLATE ='1';");
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select ID,`CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID from PF_FOLDER where IS_TEMPLATE ='1';");
         //新增项目文件夹目录
         list.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("PF_FOLDER_PID")))).peek(m -> {
             String id = "";

@@ -67,9 +67,9 @@ public class ProFileExt {
         //查询文件夹及其文件
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         // TODO 加过滤查询条件
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select id,name,'' as upload_user,file_size as size,'' as upload_time ,''as url,'1' as type,PF_FOLDER_PID as pid,'' as ext ,file_count from PF_FOLDER where PF_FOLDER_PID = ? \n" +
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select id,name,'' as upload_user,round(file_size,2) as size,'' as upload_time ,''as url,'1' as type,PF_FOLDER_PID as pid,'' as ext ,file_count from PF_FOLDER where PF_FOLDER_PID = ? \n" +
                 "union all \n" +
-                "select fl.id as id,fl.`NAME`as name,pf.CHIEF_USER_ID as upload_user,SIZE_KB as size,UPLOAD_DTTM as upload_time,FILE_ATTACHMENT_URL as url ,'2' as type,'' as pid ,ext,0 as file_count \n" +
+                "select fl.id as id,fl.`NAME`as name,pf.CHIEF_USER_ID as upload_user,round(SIZE_KB,2) as size,UPLOAD_DTTM as upload_time,FILE_ATTACHMENT_URL as url ,'2' as type,'' as pid ,ext,0 as file_count \n" +
                 "from FL_FILE fl \n" +
                 "left join PF_FILE PF on fl.id = pf.FL_FILE_ID \n" +
                 "where pf.PF_FOLDER_ID = ?", folderId, folderId);
@@ -163,7 +163,7 @@ public class ProFileExt {
                 //取出文件
                 List<Map<String, Object>> files = fileList.stream().filter(t -> ids.contains(t.get("PF_FOLDER_ID"))).collect(Collectors.toList());
                 BigDecimal totalSize = files.stream().map(n -> new BigDecimal(String.valueOf(n.get("SIZE_KB")))).reduce(BigDecimal.ZERO, BigDecimal::add);
-                Crud.from("pf_folder").where().eq("ID", m.get("ID")).update().set("FILE_COUNT", children.size()).set("FILE_SIZE", totalSize).exec();
+                Crud.from("pf_folder").where().eq("ID", m.get("ID")).update().set("FILE_COUNT", files.size()).set("FILE_SIZE", totalSize).exec();
             }).collect(Collectors.toList());
         }
     }
@@ -177,7 +177,7 @@ public class ProFileExt {
             //取出文件
             List<Map<String, Object>> files = fileData.stream().filter(t -> ids.contains(t.get("PF_FOLDER_ID"))).collect(Collectors.toList());
             BigDecimal totalSize = files.stream().map(n -> new BigDecimal(String.valueOf(n.get("SIZE_KB")))).reduce(BigDecimal.ZERO, BigDecimal::add);
-            Crud.from("pf_folder").where().eq("ID", m.get("ID")).update().set("FILE_COUNT", children.size()).set("FILE_SIZE", totalSize).exec();
+            Crud.from("pf_folder").where().eq("ID", m.get("ID")).update().set("FILE_COUNT", files.size()).set("FILE_SIZE", totalSize).exec();
         }).collect(Collectors.toList());
     }
 }
