@@ -81,12 +81,12 @@ public class AttLinkExt {
         Map row = list.get(0);
 
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.REF_SINGLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "id");
-            typeValueText.text = JdbcMapUtil.getString(row, "name");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.REF_SINGLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "id");
+            linkedAtt.text = JdbcMapUtil.getString(row, "name");
 
-            attLinkResult.attMap.put(attCode, typeValueText);
+            attLinkResult.attMap.put(attCode, linkedAtt);
         }
 
         return attLinkResult;
@@ -118,53 +118,53 @@ public class AttLinkExt {
         // 回显项目信息
         // 项目编号
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "prj_code");
-            typeValueText.text = JdbcMapUtil.getString(row, "prj_code");
-            attLinkResult.attMap.put("PRJ_CODE", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "prj_code");
+            linkedAtt.text = JdbcMapUtil.getString(row, "prj_code");
+            attLinkResult.attMap.put("PRJ_CODE", linkedAtt);
         }
         // 项目批复文号
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
-            typeValueText.text = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
-            attLinkResult.attMap.put("PRJ_REPLY_NO", typeValueText);
-            attLinkResult.attMap.put("REPLY_NO", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
+            linkedAtt.text = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
+            attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
+            attLinkResult.attMap.put("REPLY_NO", linkedAtt);
         }
         // 项目介绍
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "PRJ_SITUATION");
-            typeValueText.text = JdbcMapUtil.getString(row, "PRJ_SITUATION");
-            attLinkResult.attMap.put("PRJ_SITUATION", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "PRJ_SITUATION");
+            linkedAtt.text = JdbcMapUtil.getString(row, "PRJ_SITUATION");
+            attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt);
         }
         // 资金来源
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
-            typeValueText.text = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
-            attLinkResult.attMap.put("PM_FUND_SOURCE_ID", typeValueText);
-            attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
+            linkedAtt.text = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
+            attLinkResult.attMap.put("PM_FUND_SOURCE_ID", linkedAtt);
+            attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
         }
         // 业主单位
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.REF_SINGLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "customer_id");
-            typeValueText.text = JdbcMapUtil.getString(row, "customer_name");
-            attLinkResult.attMap.put("CUSTOMER_UNIT", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.REF_SINGLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "customer_id");
+            linkedAtt.text = JdbcMapUtil.getString(row, "customer_name");
+            attLinkResult.attMap.put("CUSTOMER_UNIT", linkedAtt);
         }
         // 项目类型
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.REF_SINGLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "pt_id");
-            typeValueText.text = JdbcMapUtil.getString(row, "pt_name");
-            attLinkResult.attMap.put("PROJECT_TYPE_ID", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.REF_SINGLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "pt_id");
+            linkedAtt.text = JdbcMapUtil.getString(row, "pt_name");
+            attLinkResult.attMap.put("PROJECT_TYPE_ID", linkedAtt);
         }
         if ("PO_ORDER_PAYMENT_REQ".equals(entCode)) { // 采购合同付款申请
             // 查询付款申请历史信息
@@ -174,51 +174,51 @@ public class AttLinkExt {
                 Map row2 = map1.get(0);
                 // 收款单位
                 {
-                    LinkedAtt typeValueText = new LinkedAtt();
-                    typeValueText.type = AttDataTypeE.DATE;
-                    typeValueText.value = JdbcMapUtil.getString(row2, "COLLECTION_DEPT_TWO");
-                    typeValueText.text = JdbcMapUtil.getString(row2, "COLLECTION_DEPT_TWO");
-                    attLinkResult.attMap.put("COLLECTION_DEPT_TWO", typeValueText);
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = JdbcMapUtil.getString(row2, "COLLECTION_DEPT_TWO");
+                    linkedAtt.text = JdbcMapUtil.getString(row2, "COLLECTION_DEPT_TWO");
+                    attLinkResult.attMap.put("COLLECTION_DEPT_TWO", linkedAtt);
                 }
                 // 开户行
                 {
-                    LinkedAtt typeValueText = new LinkedAtt();
-                    typeValueText.type = AttDataTypeE.DATE;
-                    typeValueText.value = JdbcMapUtil.getString(row2, "BANK_OF_DEPOSIT");
-                    typeValueText.text = JdbcMapUtil.getString(row2, "BANK_OF_DEPOSIT");
-                    attLinkResult.attMap.put("BANK_OF_DEPOSIT", typeValueText);
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = JdbcMapUtil.getString(row2, "BANK_OF_DEPOSIT");
+                    linkedAtt.text = JdbcMapUtil.getString(row2, "BANK_OF_DEPOSIT");
+                    attLinkResult.attMap.put("BANK_OF_DEPOSIT", linkedAtt);
                 }
                 // 账号
                 {
-                    LinkedAtt typeValueText = new LinkedAtt();
-                    typeValueText.type = AttDataTypeE.DATE;
-                    typeValueText.value = JdbcMapUtil.getString(row2, "ACCOUNT_NO");
-                    typeValueText.text = JdbcMapUtil.getString(row2, "ACCOUNT_NO");
-                    attLinkResult.attMap.put("ACCOUNT_NO", typeValueText);
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = JdbcMapUtil.getString(row2, "ACCOUNT_NO");
+                    linkedAtt.text = JdbcMapUtil.getString(row2, "ACCOUNT_NO");
+                    attLinkResult.attMap.put("ACCOUNT_NO", linkedAtt);
                 }
                 // 农民工工资专用账号收款单位
                 {
-                    LinkedAtt typeValueText = new LinkedAtt();
-                    typeValueText.type = AttDataTypeE.DATE;
-                    typeValueText.value = JdbcMapUtil.getString(row2, "RECEIPT");
-                    typeValueText.text = JdbcMapUtil.getString(row2, "RECEIPT");
-                    attLinkResult.attMap.put("RECEIPT", typeValueText);
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = JdbcMapUtil.getString(row2, "RECEIPT");
+                    linkedAtt.text = JdbcMapUtil.getString(row2, "RECEIPT");
+                    attLinkResult.attMap.put("RECEIPT", linkedAtt);
                 }
                 // 专户开户行
                 {
-                    LinkedAtt typeValueText = new LinkedAtt();
-                    typeValueText.type = AttDataTypeE.DATE;
-                    typeValueText.value = JdbcMapUtil.getString(row2, "SPECIAL_BANK_OF_DEPOSIT");
-                    typeValueText.text = JdbcMapUtil.getString(row2, "SPECIAL_BANK_OF_DEPOSIT");
-                    attLinkResult.attMap.put("SPECIAL_BANK_OF_DEPOSIT", typeValueText);
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = JdbcMapUtil.getString(row2, "SPECIAL_BANK_OF_DEPOSIT");
+                    linkedAtt.text = JdbcMapUtil.getString(row2, "SPECIAL_BANK_OF_DEPOSIT");
+                    attLinkResult.attMap.put("SPECIAL_BANK_OF_DEPOSIT", linkedAtt);
                 }
                 // 专户账号
                 {
-                    LinkedAtt typeValueText = new LinkedAtt();
-                    typeValueText.type = AttDataTypeE.DATE;
-                    typeValueText.value = JdbcMapUtil.getString(row2, "SPECIAL_ACCOUNT_NO");
-                    typeValueText.text = JdbcMapUtil.getString(row2, "SPECIAL_ACCOUNT_NO");
-                    attLinkResult.attMap.put("SPECIAL_ACCOUNT_NO", typeValueText);
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = JdbcMapUtil.getString(row2, "SPECIAL_ACCOUNT_NO");
+                    linkedAtt.text = JdbcMapUtil.getString(row2, "SPECIAL_ACCOUNT_NO");
+                    attLinkResult.attMap.put("SPECIAL_ACCOUNT_NO", linkedAtt);
                 }
             }
             return attLinkResult;
@@ -239,19 +239,19 @@ public class AttLinkExt {
 
                 // 概算金额
                 {
-                    LinkedAtt typeValueText = new LinkedAtt();
-                    typeValueText.type = AttDataTypeE.TEXT_LONG;
-                    typeValueText.value = JdbcMapUtil.getString(contractRow, "estimate");
-                    typeValueText.text = JdbcMapUtil.getString(contractRow, "estimate");
-                    attLinkResult.attMap.put("ESTIMATED_AMOUNT", typeValueText);
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(contractRow, "estimate");
+                    linkedAtt.text = JdbcMapUtil.getString(contractRow, "estimate");
+                    attLinkResult.attMap.put("ESTIMATED_AMOUNT", linkedAtt);
                 }
                 // 预算金额
                 {
-                    LinkedAtt typeValueText = new LinkedAtt();
-                    typeValueText.type = AttDataTypeE.TEXT_LONG;
-                    typeValueText.value = JdbcMapUtil.getString(contractRow, "budget");
-                    typeValueText.text = JdbcMapUtil.getString(contractRow, "budget");
-                    attLinkResult.attMap.put("FINANCIAL_AMOUNT", typeValueText);
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(contractRow, "budget");
+                    linkedAtt.text = JdbcMapUtil.getString(contractRow, "budget");
+                    attLinkResult.attMap.put("FINANCIAL_AMOUNT", linkedAtt);
                 }
                 // 结算金额
             }
@@ -271,11 +271,11 @@ public class AttLinkExt {
                     Set<String> keys = reqRow.keySet();
                     for (String key : keys) {
                         {
-                            LinkedAtt typeValueText = new LinkedAtt();
-                            typeValueText.type = AttDataTypeE.TEXT_LONG;
-                            typeValueText.value = JdbcMapUtil.getString(reqRow, key);
-                            typeValueText.text = JdbcMapUtil.getString(reqRow, key);
-                            attLinkResult.attMap.put(key, typeValueText);
+                            LinkedAtt linkedAtt = new LinkedAtt();
+                            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                            linkedAtt.value = JdbcMapUtil.getString(reqRow, key);
+                            linkedAtt.text = JdbcMapUtil.getString(reqRow, key);
+                            attLinkResult.attMap.put(key, linkedAtt);
                         }
                     }
                 }
@@ -283,20 +283,20 @@ public class AttLinkExt {
 
                 // 立项年度
                 {
-                    LinkedAtt typeValueText = new LinkedAtt();
-                    typeValueText.type = AttDataTypeE.DATE;
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
                     String year = simpleDateFormat.format(JdbcMapUtil.getDate(row, "PRJ_REPLY_DATE"));
-                    typeValueText.value = year;
-                    typeValueText.text = year;
-                    attLinkResult.attMap.put("YEAR", typeValueText);
+                    linkedAtt.value = year;
+                    linkedAtt.text = year;
+                    attLinkResult.attMap.put("YEAR", linkedAtt);
                 }
                 // 建设地点
                 {
-                    LinkedAtt typeValueText = new LinkedAtt();
-                    typeValueText.type = AttDataTypeE.REF_SINGLE;
-                    typeValueText.value = JdbcMapUtil.getString(row, "l_id");
-                    typeValueText.text = JdbcMapUtil.getString(row, "l_name");
-                    attLinkResult.attMap.put("BASE_LOCATION_ID", typeValueText);
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.REF_SINGLE;
+                    linkedAtt.value = JdbcMapUtil.getString(row, "l_id");
+                    linkedAtt.text = JdbcMapUtil.getString(row, "l_name");
+                    attLinkResult.attMap.put("BASE_LOCATION_ID", linkedAtt);
                 }
                 // 查询五方
                 List<Map<String, Object>> partyMaps = jdbcTemplate.queryForList("SELECT r.BUILD_UNIT_RESPONSE,r" +
@@ -306,52 +306,52 @@ public class AttLinkExt {
                     Map<String, Object> partyRow = partyMaps.get(0);
                     // 项目负责人
                     {
-                        LinkedAtt typeValueText = new LinkedAtt();
-                        typeValueText.type = AttDataTypeE.TEXT_SHORT;
-                        typeValueText.value = JdbcMapUtil.getString(partyRow, "BUILD_UNIT_RESPONSE");
-                        typeValueText.text = JdbcMapUtil.getString(partyRow, "BUILD_UNIT_RESPONSE");
-                        attLinkResult.attMap.put("AGENT_BUILD_UNIT_RESPONSE", typeValueText);
+                        LinkedAtt linkedAtt = new LinkedAtt();
+                        linkedAtt.type = AttDataTypeE.TEXT_SHORT;
+                        linkedAtt.value = JdbcMapUtil.getString(partyRow, "BUILD_UNIT_RESPONSE");
+                        linkedAtt.text = JdbcMapUtil.getString(partyRow, "BUILD_UNIT_RESPONSE");
+                        attLinkResult.attMap.put("AGENT_BUILD_UNIT_RESPONSE", linkedAtt);
                     }
                     // 负责人联系电话
                     {
-                        LinkedAtt typeValueText = new LinkedAtt();
-                        typeValueText.type = AttDataTypeE.TEXT_SHORT;
-                        typeValueText.value = JdbcMapUtil.getString(partyRow, "AGENT_PHONE");
-                        typeValueText.text = JdbcMapUtil.getString(partyRow, "AGENT_PHONE");
-                        attLinkResult.attMap.put("AGENT_BUILD_UNIT_RESPONSE_PHONE", typeValueText);
+                        LinkedAtt linkedAtt = new LinkedAtt();
+                        linkedAtt.type = AttDataTypeE.TEXT_SHORT;
+                        linkedAtt.value = JdbcMapUtil.getString(partyRow, "AGENT_PHONE");
+                        linkedAtt.text = JdbcMapUtil.getString(partyRow, "AGENT_PHONE");
+                        attLinkResult.attMap.put("AGENT_BUILD_UNIT_RESPONSE_PHONE", linkedAtt);
                     }
                 }
                 // 征地拆迁完成情况
                 {
-                    LinkedAtt typeValueText = new LinkedAtt();
-                    typeValueText.type = AttDataTypeE.TEXT_SHORT;
-                    typeValueText.value = null;
-                    typeValueText.text = null;
-                    attLinkResult.attMap.put("DEMOLITION_COMPLETED", typeValueText);
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_SHORT;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    attLinkResult.attMap.put("DEMOLITION_COMPLETED", linkedAtt);
                 }
                 // 预计开工时间
                 {
-                    LinkedAtt typeValueText = new LinkedAtt();
-                    typeValueText.type = AttDataTypeE.TEXT_SHORT;
-                    typeValueText.value = null;
-                    typeValueText.text = null;
-                    attLinkResult.attMap.put("PLAN_START_DATE", typeValueText);
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_SHORT;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    attLinkResult.attMap.put("PLAN_START_DATE", linkedAtt);
                 }
                 // 预计完工时间
                 {
-                    LinkedAtt typeValueText = new LinkedAtt();
-                    typeValueText.type = AttDataTypeE.TEXT_SHORT;
-                    typeValueText.value = null;
-                    typeValueText.text = null;
-                    attLinkResult.attMap.put("PLAN_COMPL_DATE", typeValueText);
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_SHORT;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    attLinkResult.attMap.put("PLAN_COMPL_DATE", linkedAtt);
                 }
                 // 实际开工时间
                 {
-                    LinkedAtt typeValueText = new LinkedAtt();
-                    typeValueText.type = AttDataTypeE.TEXT_SHORT;
-                    typeValueText.value = null;
-                    typeValueText.text = null;
-                    attLinkResult.attMap.put("ACTUAL_START_DATE", typeValueText);
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_SHORT;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    attLinkResult.attMap.put("ACTUAL_START_DATE", linkedAtt);
                 }
                 // 查询节点名称
                 List<Map<String, Object>> nodeMaps = jdbcTemplate.queryForList("select n.name,n.PROGRESS_STATUS_ID from PM_PRO_PLAN_NODE n" +
@@ -376,89 +376,89 @@ public class AttLinkExt {
 //                        if ("立项批复".equals(name)){
                         // 立项完成情况
                         {
-                            LinkedAtt typeValueText = new LinkedAtt();
-                            typeValueText.type = AttDataTypeE.TEXT_LONG;
-                            typeValueText.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            typeValueText.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            attLinkResult.attMap.put("CREATE_PROJECT_COMPLETED", typeValueText);
+                            LinkedAtt linkedAtt = new LinkedAtt();
+                            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            attLinkResult.attMap.put("CREATE_PROJECT_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(feasibility, name)) {
 //                            if ("可研批复".equals(name)){
                         // 可研完成情况
                         {
-                            LinkedAtt typeValueText = new LinkedAtt();
-                            typeValueText.type = AttDataTypeE.TEXT_LONG;
-                            typeValueText.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            typeValueText.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            attLinkResult.attMap.put("FEASIBILITY_COMPLETED", typeValueText);
+                            LinkedAtt linkedAtt = new LinkedAtt();
+                            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            attLinkResult.attMap.put("FEASIBILITY_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(landUsePlan, name)) {
 //                            if ("用地规划许可证".equals(name)){
                         // 规划选址完成情况
                         {
-                            LinkedAtt typeValueText = new LinkedAtt();
-                            typeValueText.type = AttDataTypeE.TEXT_LONG;
-                            typeValueText.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            typeValueText.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            attLinkResult.attMap.put("SELECT_SITE_COMPLETED", typeValueText);
+                            LinkedAtt linkedAtt = new LinkedAtt();
+                            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            attLinkResult.attMap.put("SELECT_SITE_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(eia, name)) {
 //                        if ("环评".equals(name)){
                         // 环评完成情况
                         {
-                            LinkedAtt typeValueText = new LinkedAtt();
-                            typeValueText.type = AttDataTypeE.TEXT_LONG;
-                            typeValueText.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            typeValueText.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            attLinkResult.attMap.put("EIA_COMPLETED", typeValueText);
+                            LinkedAtt linkedAtt = new LinkedAtt();
+                            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            attLinkResult.attMap.put("EIA_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(advanceExam, name)) {
 //                        if ("用地预审".equals(name)){
                         // 用地预审
                         {
-                            LinkedAtt typeValueText = new LinkedAtt();
-                            typeValueText.type = AttDataTypeE.TEXT_LONG;
-                            typeValueText.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            typeValueText.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            attLinkResult.attMap.put("USE_LAND_COMPLETED", typeValueText);
+                            LinkedAtt linkedAtt = new LinkedAtt();
+                            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            attLinkResult.attMap.put("USE_LAND_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(save, name)) {
 //                        if ("节能+水保+林地使用调整".equals(name)){
                         // 用地预审
                         {
-                            LinkedAtt typeValueText = new LinkedAtt();
-                            typeValueText.type = AttDataTypeE.TEXT_LONG;
-                            typeValueText.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            typeValueText.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            attLinkResult.attMap.put("WOODLAND_WATER_SOIL_COMPLETED", typeValueText);
+                            LinkedAtt linkedAtt = new LinkedAtt();
+                            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            attLinkResult.attMap.put("WOODLAND_WATER_SOIL_COMPLETED", linkedAtt);
                         }
                     } else if ("初步设计概算批复".equals(name)) {
                         // 概算完成情况
                         {
-                            LinkedAtt typeValueText = new LinkedAtt();
-                            typeValueText.type = AttDataTypeE.TEXT_LONG;
-                            typeValueText.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            typeValueText.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            attLinkResult.attMap.put("ESTIMATE_COMPLETED", typeValueText);
+                            LinkedAtt linkedAtt = new LinkedAtt();
+                            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            attLinkResult.attMap.put("ESTIMATE_COMPLETED", linkedAtt);
                         }
                     } else if ("预算财政评审".equals(name)) {
                         // 预算评审完成情况
                         {
-                            LinkedAtt typeValueText = new LinkedAtt();
-                            typeValueText.type = AttDataTypeE.TEXT_LONG;
-                            typeValueText.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            typeValueText.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            attLinkResult.attMap.put("BUDGET_REVIEW_COMPLETED", typeValueText);
+                            LinkedAtt linkedAtt = new LinkedAtt();
+                            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            attLinkResult.attMap.put("BUDGET_REVIEW_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(prj, name)) {
 //                        if ("工程量清单、EPC、施工".equals(name)){
                         // 预算评审完成情况
                         {
-                            LinkedAtt typeValueText = new LinkedAtt();
-                            typeValueText.type = AttDataTypeE.TEXT_LONG;
-                            typeValueText.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            typeValueText.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            attLinkResult.attMap.put("CONSTRUCT_BID_COMPLETED", typeValueText);
+                            LinkedAtt linkedAtt = new LinkedAtt();
+                            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            attLinkResult.attMap.put("CONSTRUCT_BID_COMPLETED", linkedAtt);
                         }
                     }
 
@@ -492,83 +492,83 @@ public class AttLinkExt {
 
         // 保函名称
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "NAME");
-            typeValueText.text = JdbcMapUtil.getString(row, "NAME");
-            attLinkResult.attMap.put("GUARANTEE_NAME", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "NAME");
+            linkedAtt.text = JdbcMapUtil.getString(row, "NAME");
+            attLinkResult.attMap.put("GUARANTEE_NAME", linkedAtt);
         }
         // 供应商
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "SUPPLIER");
-            typeValueText.text = JdbcMapUtil.getString(row, "SUPPLIER");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "SUPPLIER");
+            linkedAtt.text = JdbcMapUtil.getString(row, "SUPPLIER");
 
-            attLinkResult.attMap.put("SUPPLIER", typeValueText);
+            attLinkResult.attMap.put("SUPPLIER", linkedAtt);
         }
         // 受益人
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "BENEFICIARY");
-            typeValueText.text = JdbcMapUtil.getString(row, "BENEFICIARY");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "BENEFICIARY");
+            linkedAtt.text = JdbcMapUtil.getString(row, "BENEFICIARY");
 
-            attLinkResult.attMap.put("BENEFICIARY", typeValueText);
+            attLinkResult.attMap.put("BENEFICIARY", linkedAtt);
         }
         // 保函类型
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_ID");
-            typeValueText.text = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_ID");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_ID");
+            linkedAtt.text = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_ID");
 
-            attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_ID", typeValueText);
+            attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_ID", linkedAtt);
         }
         // 保函开立机构
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "GUARANTEE_MECHANISM");
-            typeValueText.text = JdbcMapUtil.getString(row, "GUARANTEE_MECHANISM");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "GUARANTEE_MECHANISM");
+            linkedAtt.text = JdbcMapUtil.getString(row, "GUARANTEE_MECHANISM");
 
-            attLinkResult.attMap.put("GUARANTEE_MECHANISM", typeValueText);
+            attLinkResult.attMap.put("GUARANTEE_MECHANISM", linkedAtt);
         }
         // 保函编号
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "GUARANTEE_CODE");
-            typeValueText.text = JdbcMapUtil.getString(row, "GUARANTEE_CODE");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "GUARANTEE_CODE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "GUARANTEE_CODE");
 
-            attLinkResult.attMap.put("GUARANTEE_CODE", typeValueText);
+            attLinkResult.attMap.put("GUARANTEE_CODE", linkedAtt);
         }
         // 担保金额
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "GUARANTEE_AMT");
-            typeValueText.text = JdbcMapUtil.getString(row, "GUARANTEE_AMT");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "GUARANTEE_AMT");
+            linkedAtt.text = JdbcMapUtil.getString(row, "GUARANTEE_AMT");
 
-            attLinkResult.attMap.put("GUARANTEE_AMT", typeValueText);
+            attLinkResult.attMap.put("GUARANTEE_AMT", linkedAtt);
         }
         // 保函开立日期
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DATE;
-            typeValueText.value = JdbcMapUtil.getString(row, "GUARANTEE_START_DATE");
-            typeValueText.text = JdbcMapUtil.getString(row, "GUARANTEE_START_DATE");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DATE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "GUARANTEE_START_DATE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "GUARANTEE_START_DATE");
 
-            attLinkResult.attMap.put("GUARANTEE_START_DATE", typeValueText);
+            attLinkResult.attMap.put("GUARANTEE_START_DATE", linkedAtt);
         }
         // 保函到期日期
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DATE;
-            typeValueText.value = JdbcMapUtil.getString(row, "GUARANTEE_END_DATE");
-            typeValueText.text = JdbcMapUtil.getString(row, "GUARANTEE_END_DATE");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DATE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "GUARANTEE_END_DATE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "GUARANTEE_END_DATE");
 
-            attLinkResult.attMap.put("GUARANTEE_END_DATE", typeValueText);
+            attLinkResult.attMap.put("GUARANTEE_END_DATE", linkedAtt);
         }
 
         return attLinkResult;
@@ -587,35 +587,35 @@ public class AttLinkExt {
 
         // 合同编号
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "CONTRACT_CODE");
-            typeValueText.text = JdbcMapUtil.getString(row, "CONTRACT_CODE");
-            attLinkResult.attMap.put("CONTRACT_CODE", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CONTRACT_CODE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CONTRACT_CODE");
+            attLinkResult.attMap.put("CONTRACT_CODE", linkedAtt);
         }
         // 合同名称
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "NAME");
-            typeValueText.text = JdbcMapUtil.getString(row, "NAME");
-            attLinkResult.attMap.put("CONTRACT_NAME", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "NAME");
+            linkedAtt.text = JdbcMapUtil.getString(row, "NAME");
+            attLinkResult.attMap.put("CONTRACT_NAME", linkedAtt);
         }
         // 中标单位
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
-            typeValueText.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
-            attLinkResult.attMap.put("WIN_BID_UNIT_TXT", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
+            linkedAtt.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
+            attLinkResult.attMap.put("WIN_BID_UNIT_TXT", linkedAtt);
         }
         // 合同总金额
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
-            typeValueText.text = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
-            attLinkResult.attMap.put("CONTRACT_PRICE", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
+            attLinkResult.attMap.put("CONTRACT_PRICE", linkedAtt);
         }
 
         return attLinkResult;
@@ -636,146 +636,146 @@ public class AttLinkExt {
         Map row = list.get(0);
         // 合同编号
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "CONTRACT_CODE");
-            typeValueText.text = JdbcMapUtil.getString(row, "CONTRACT_CODE");
-            attLinkResult.attMap.put("CONTRACT_CODE", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CONTRACT_CODE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CONTRACT_CODE");
+            attLinkResult.attMap.put("CONTRACT_CODE", linkedAtt);
         }
         // 合同类型
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "CONTRACT_CATEGORY_ID");
-            typeValueText.text = JdbcMapUtil.getString(row, "CONTRACT_CATEGORY_ID");
-            attLinkResult.attMap.put("CONTRACT_CATEGORY_ID", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CONTRACT_CATEGORY_ID");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CONTRACT_CATEGORY_ID");
+            attLinkResult.attMap.put("CONTRACT_CATEGORY_ID", linkedAtt);
         }
         // 关联招采
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "BIDDING_NAME_ID");
-            typeValueText.text = JdbcMapUtil.getString(row, "BIDDING_NAME_ID");
-            attLinkResult.attMap.put("BIDDING_NAME_ID", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "BIDDING_NAME_ID");
+            linkedAtt.text = JdbcMapUtil.getString(row, "BIDDING_NAME_ID");
+            attLinkResult.attMap.put("BIDDING_NAME_ID", linkedAtt);
         }
         // 招标类别
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "PMS_RELEASE_WAY_ID");
-            typeValueText.text = JdbcMapUtil.getString(row, "PMS_RELEASE_WAY_ID");
-            attLinkResult.attMap.put("PMS_RELEASE_WAY_ID", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "PMS_RELEASE_WAY_ID");
+            linkedAtt.text = JdbcMapUtil.getString(row, "PMS_RELEASE_WAY_ID");
+            attLinkResult.attMap.put("PMS_RELEASE_WAY_ID", linkedAtt);
         }
         // 招标控制价
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "BID_CTL_PRICE_LAUNCH");
-            typeValueText.text = JdbcMapUtil.getString(row, "BID_CTL_PRICE_LAUNCH");
-            attLinkResult.attMap.put("BID_CTL_PRICE_LAUNCH", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "BID_CTL_PRICE_LAUNCH");
+            linkedAtt.text = JdbcMapUtil.getString(row, "BID_CTL_PRICE_LAUNCH");
+            attLinkResult.attMap.put("BID_CTL_PRICE_LAUNCH", linkedAtt);
         }
         // 采购方式
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "PURCHASE_TYPE");
-            typeValueText.text = JdbcMapUtil.getString(row, "PURCHASE_TYPE");
-            attLinkResult.attMap.put("PURCHASE_TYPE", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "PURCHASE_TYPE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "PURCHASE_TYPE");
+            attLinkResult.attMap.put("PURCHASE_TYPE", linkedAtt);
         }
         // 中标单位
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
-            typeValueText.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
-            attLinkResult.attMap.put("WIN_BID_UNIT_TXT", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
+            linkedAtt.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
+            attLinkResult.attMap.put("WIN_BID_UNIT_TXT", linkedAtt);
         }
         // 中标价
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "WINNING_BIDS_AMOUNT");
-            typeValueText.text = JdbcMapUtil.getString(row, "WINNING_BIDS_AMOUNT");
-            attLinkResult.attMap.put("WINNING_BIDS_AMOUNT", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "WINNING_BIDS_AMOUNT");
+            linkedAtt.text = JdbcMapUtil.getString(row, "WINNING_BIDS_AMOUNT");
+            attLinkResult.attMap.put("WINNING_BIDS_AMOUNT", linkedAtt);
         }
         // 合同工期
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.INTEGER;
-            typeValueText.value = JdbcMapUtil.getString(row, "PLAN_TOTAL_DAYS");
-            typeValueText.text = JdbcMapUtil.getString(row, "PLAN_TOTAL_DAYS");
-            attLinkResult.attMap.put("CONTRACT_DAYS", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.INTEGER;
+            linkedAtt.value = JdbcMapUtil.getString(row, "PLAN_TOTAL_DAYS");
+            linkedAtt.text = JdbcMapUtil.getString(row, "PLAN_TOTAL_DAYS");
+            attLinkResult.attMap.put("CONTRACT_DAYS", linkedAtt);
         }
         // 是否涉及保函
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-//                typeValueText.value = JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE")==null?null:JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE").toString();
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+//                linkedAtt.value = JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE")==null?null:JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE").toString();
             String code = JdbcMapUtil.getString(row, "IS_REFER_GUARANTEE");
             Map<String, Object> idMap = jdbcTemplate.queryForMap("SELECT v.id id FROM gr_set_value v left " +
                             "join gr_set k on v.GR_SET_ID = k.id where k.`CODE` = 'is_refer_guarantee' and v.`CODE` = ?",
                     code);
-            typeValueText.value = idMap.get("id").toString();
-            typeValueText.text = idMap.get("id").toString();
-//                typeValueText.text = BooleanUtil.toText(JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE"));
-            attLinkResult.attMap.put("IS_REFER_GUARANTEE_ID", typeValueText);
+            linkedAtt.value = idMap.get("id").toString();
+            linkedAtt.text = idMap.get("id").toString();
+//                linkedAtt.text = BooleanUtil.toText(JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE"));
+            attLinkResult.attMap.put("IS_REFER_GUARANTEE_ID", linkedAtt);
         }
         // 保函类型
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_ID");
-            typeValueText.text = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_ID");
-            attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_ID", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_ID");
+            linkedAtt.text = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_ID");
+            attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_ID", linkedAtt);
         }
         // 相对方联系人
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "OPPO_SITE_LINK_MAN");
-            typeValueText.text = JdbcMapUtil.getString(row, "OPPO_SITE_LINK_MAN");
-            attLinkResult.attMap.put("OPPO_SITE_LINK_MAN", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "OPPO_SITE_LINK_MAN");
+            linkedAtt.text = JdbcMapUtil.getString(row, "OPPO_SITE_LINK_MAN");
+            attLinkResult.attMap.put("OPPO_SITE_LINK_MAN", linkedAtt);
         }
         // 相对电话
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "OPPO_SITE_CONTACT");
-            typeValueText.text = JdbcMapUtil.getString(row, "OPPO_SITE_CONTACT");
-            attLinkResult.attMap.put("OPPO_SITE_CONTACT", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "OPPO_SITE_CONTACT");
+            linkedAtt.text = JdbcMapUtil.getString(row, "OPPO_SITE_CONTACT");
+            attLinkResult.attMap.put("OPPO_SITE_CONTACT", linkedAtt);
         }
         // 是否标准模板
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.REF_SINGLE;
-//                typeValueText.value = JdbcMapUtil.getBoolean(row,"IS_TEMPLATE")==null?null:JdbcMapUtil.getBoolean(row,"IS_TEMPLATE").toString();
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.REF_SINGLE;
+//                linkedAtt.value = JdbcMapUtil.getBoolean(row,"IS_TEMPLATE")==null?null:JdbcMapUtil.getBoolean(row,"IS_TEMPLATE").toString();
             String code = JdbcMapUtil.getString(row, "IS_TEMPLATE");
             Map<String, Object> idMap = jdbcTemplate.queryForMap("SELECT v.id id FROM gr_set_value v left " +
                             "join gr_set k on v.GR_SET_ID = k.id where k.`CODE` = 'is_standard_contract_template' and v.`CODE` = ?",
                     code);
-            typeValueText.value = idMap.get("id").toString();
-            typeValueText.text = idMap.get("id").toString();
-            attLinkResult.attMap.put("IS_STANDARD_CONTRACT_TEMPLATE_ID", typeValueText);
+            linkedAtt.value = idMap.get("id").toString();
+            linkedAtt.text = idMap.get("id").toString();
+            attLinkResult.attMap.put("IS_STANDARD_CONTRACT_TEMPLATE_ID", linkedAtt);
         }
 
         // 合同名称带序号
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "CONTRACT_NAME");
-            typeValueText.text = JdbcMapUtil.getString(row, "CONTRACT_NAME");
-            attLinkResult.attMap.put("CONTRACT_NAME", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CONTRACT_NAME");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CONTRACT_NAME");
+            attLinkResult.attMap.put("CONTRACT_NAME", linkedAtt);
         }
 
         // 合同总金额
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
-            typeValueText.text = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
 
-            attLinkResult.attMap.put("CONTRACT_PRICE", typeValueText);
-            attLinkResult.attMap.put("CONTRACT_AMOUNT", typeValueText);
+            attLinkResult.attMap.put("CONTRACT_PRICE", linkedAtt);
+            attLinkResult.attMap.put("CONTRACT_AMOUNT", linkedAtt);
         }
 
         return attLinkResult;
@@ -792,115 +792,115 @@ public class AttLinkExt {
         Map row = list.get(0);
         // 招采类型
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "PMS_RELEASE_WAY_ID");
-            typeValueText.text = JdbcMapUtil.getString(row, "PMS_RELEASE_WAY_ID");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "PMS_RELEASE_WAY_ID");
+            linkedAtt.text = JdbcMapUtil.getString(row, "PMS_RELEASE_WAY_ID");
 
-            attLinkResult.attMap.put("PMS_RELEASE_WAY_ID", typeValueText);
+            attLinkResult.attMap.put("PMS_RELEASE_WAY_ID", linkedAtt);
         }
         // 招标控制价
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "BID_CTL_PRICE_LAUNCH");
-            typeValueText.text = JdbcMapUtil.getString(row, "BID_CTL_PRICE_LAUNCH");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "BID_CTL_PRICE_LAUNCH");
+            linkedAtt.text = JdbcMapUtil.getString(row, "BID_CTL_PRICE_LAUNCH");
 
-            attLinkResult.attMap.put("BID_CTL_PRICE_LAUNCH", typeValueText);
+            attLinkResult.attMap.put("BID_CTL_PRICE_LAUNCH", linkedAtt);
         }
         // 采购方式
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "APPROVE_PURCHASE_TYPE");
-            typeValueText.text = JdbcMapUtil.getString(row, "APPROVE_PURCHASE_TYPE");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "APPROVE_PURCHASE_TYPE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "APPROVE_PURCHASE_TYPE");
 
-            attLinkResult.attMap.put("PURCHASE_TYPE", typeValueText);
+            attLinkResult.attMap.put("PURCHASE_TYPE", linkedAtt);
         }
         // 中标单位
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
-            typeValueText.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
+            linkedAtt.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
 
-            attLinkResult.attMap.put("AUTHOR_UNIT", typeValueText);
-            attLinkResult.attMap.put("AUTHOR_UNIT_TEXT", typeValueText);
-            attLinkResult.attMap.put("WIN_BID_UNIT_TXT", typeValueText);
+            attLinkResult.attMap.put("AUTHOR_UNIT", linkedAtt);
+            attLinkResult.attMap.put("AUTHOR_UNIT_TEXT", linkedAtt);
+            attLinkResult.attMap.put("WIN_BID_UNIT_TXT", linkedAtt);
         }
         // 中标单位报价
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "TENDER_OFFER");
-            typeValueText.text = JdbcMapUtil.getString(row, "TENDER_OFFER");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "TENDER_OFFER");
+            linkedAtt.text = JdbcMapUtil.getString(row, "TENDER_OFFER");
 
-            attLinkResult.attMap.put("ENTRUSTING_UNIT", typeValueText);
-            attLinkResult.attMap.put("WINNING_BIDS_AMOUNT", typeValueText);
+            attLinkResult.attMap.put("ENTRUSTING_UNIT", linkedAtt);
+            attLinkResult.attMap.put("WINNING_BIDS_AMOUNT", linkedAtt);
         }
         // 进场时间
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DATE;
-            typeValueText.value = JdbcMapUtil.getString(row, "END_DATETIME");
-            typeValueText.text = JdbcMapUtil.getString(row, "END_DATETIME");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DATE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "END_DATETIME");
+            linkedAtt.text = JdbcMapUtil.getString(row, "END_DATETIME");
 
-            attLinkResult.attMap.put("IN_DATE", typeValueText);
+            attLinkResult.attMap.put("IN_DATE", linkedAtt);
         }
         // 招标单位
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "BID_UNIT");
-            typeValueText.text = JdbcMapUtil.getString(row, "BID_UNIT");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "BID_UNIT");
+            linkedAtt.text = JdbcMapUtil.getString(row, "BID_UNIT");
 
-            attLinkResult.attMap.put("ENTRUSTING_UNIT", typeValueText);
-            attLinkResult.attMap.put("ENTRUSTING_UNIT_TEXT", typeValueText);
+            attLinkResult.attMap.put("ENTRUSTING_UNIT", linkedAtt);
+            attLinkResult.attMap.put("ENTRUSTING_UNIT_TEXT", linkedAtt);
         }
         // 审批状态
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "STATUS");
-            typeValueText.text = JdbcMapUtil.getString(row, "STATUS");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "STATUS");
+            linkedAtt.text = JdbcMapUtil.getString(row, "STATUS");
 
-            attLinkResult.attMap.put("APPROVAL_STATUS", typeValueText);
+            attLinkResult.attMap.put("APPROVAL_STATUS", linkedAtt);
         }
         // 经办人
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "BID_USER_ID");
-            typeValueText.text = JdbcMapUtil.getString(row, "BID_USER_ID");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "BID_USER_ID");
+            linkedAtt.text = JdbcMapUtil.getString(row, "BID_USER_ID");
 
-            attLinkResult.attMap.put("PROCURE_USER_ID", typeValueText);
+            attLinkResult.attMap.put("PROCURE_USER_ID", linkedAtt);
         }
         // 对方联系人
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "CONTACT_NAME_RECORD");
-            typeValueText.text = JdbcMapUtil.getString(row, "CONTACT_NAME_RECORD");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CONTACT_NAME_RECORD");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CONTACT_NAME_RECORD");
 
-            attLinkResult.attMap.put("OTHER_RESPONSOR", typeValueText);
+            attLinkResult.attMap.put("OTHER_RESPONSOR", linkedAtt);
         }
         // 对方联系方式
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "CONTACT_MOBILE_WIN");
-            typeValueText.text = JdbcMapUtil.getString(row, "CONTACT_MOBILE_WIN");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CONTACT_MOBILE_WIN");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CONTACT_MOBILE_WIN");
 
-            attLinkResult.attMap.put("OTHER_CONTACT_PHONE", typeValueText);
+            attLinkResult.attMap.put("OTHER_CONTACT_PHONE", linkedAtt);
         }
         // 服务周期
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "SERVICE_DAYS");
-            typeValueText.text = JdbcMapUtil.getString(row, "SERVICE_DAYS");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "SERVICE_DAYS");
+            linkedAtt.text = JdbcMapUtil.getString(row, "SERVICE_DAYS");
 
-            attLinkResult.attMap.put("SERVICE_DAYS", typeValueText);
+            attLinkResult.attMap.put("SERVICE_DAYS", linkedAtt);
         }
         return attLinkResult;
     }
@@ -919,21 +919,21 @@ public class AttLinkExt {
         Map row = list.get(0);
 
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.REF_SINGLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "CON_SCALE_TYPE_ID");
-            typeValueText.text = JdbcMapUtil.getString(row, "CON_SCALE_TYPE_NAME");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.REF_SINGLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_TYPE_ID");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CON_SCALE_TYPE_NAME");
 
-            attLinkResult.attMap.put("CON_SCALE_TYPE_ID", typeValueText);
+            attLinkResult.attMap.put("CON_SCALE_TYPE_ID", linkedAtt);
         }
 
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.REF_SINGLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "CON_SCALE_UOM_ID");
-            typeValueText.text = JdbcMapUtil.getString(row, "CON_SCALE_UOM_NAME");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.REF_SINGLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_UOM_ID");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CON_SCALE_UOM_NAME");
 
-            attLinkResult.attMap.put("CON_SCALE_UOM_ID", typeValueText);
+            attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt);
         }
 
         return attLinkResult;
@@ -974,202 +974,202 @@ public class AttLinkExt {
             Map row2 = map.get(0);
             // 总投资
             {
-                LinkedAtt typeValueText = new LinkedAtt();
-                typeValueText.type = AttDataTypeE.DOUBLE;
-                typeValueText.value = JdbcMapUtil.getString(row2, "PRJ_TOTAL_INVEST");
-                typeValueText.text = JdbcMapUtil.getString(row2, "PRJ_TOTAL_INVEST");
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.DOUBLE;
+                linkedAtt.value = JdbcMapUtil.getString(row2, "PRJ_TOTAL_INVEST");
+                linkedAtt.text = JdbcMapUtil.getString(row2, "PRJ_TOTAL_INVEST");
 
-                attLinkResult.attMap.put("PRJ_TOTAL_INVEST", typeValueText);
+                attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
             }
             // 工程费用
             {
-                LinkedAtt typeValueText = new LinkedAtt();
-                typeValueText.type = AttDataTypeE.DOUBLE;
-                typeValueText.value = JdbcMapUtil.getString(row2, "PROJECT_AMT");
-                typeValueText.text = JdbcMapUtil.getString(row2, "PROJECT_AMT");
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.DOUBLE;
+                linkedAtt.value = JdbcMapUtil.getString(row2, "PROJECT_AMT");
+                linkedAtt.text = JdbcMapUtil.getString(row2, "PROJECT_AMT");
 
-                attLinkResult.attMap.put("PROJECT_AMT", typeValueText);
+                attLinkResult.attMap.put("PROJECT_AMT", linkedAtt);
             }
         }
 
         // 项目编号
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_SHORT;
-            typeValueText.value = JdbcMapUtil.getString(row, "prj_code");
-            typeValueText.text = JdbcMapUtil.getString(row, "prj_code");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_SHORT;
+            linkedAtt.value = JdbcMapUtil.getString(row, "prj_code");
+            linkedAtt.text = JdbcMapUtil.getString(row, "prj_code");
 
-            attLinkResult.attMap.put("PRJ_CODE", typeValueText);
+            attLinkResult.attMap.put("PRJ_CODE", linkedAtt);
         }
         // 建筑面积
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "BUILDING_AREA");
-            typeValueText.text = JdbcMapUtil.getString(row, "BUILDING_AREA");
-            attLinkResult.attMap.put("BUILDING_AREA", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "BUILDING_AREA");
+            linkedAtt.text = JdbcMapUtil.getString(row, "BUILDING_AREA");
+            attLinkResult.attMap.put("BUILDING_AREA", linkedAtt);
         }
         // 业主单位
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.REF_SINGLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "customer_id");
-            typeValueText.text = JdbcMapUtil.getString(row, "customer_name");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.REF_SINGLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "customer_id");
+            linkedAtt.text = JdbcMapUtil.getString(row, "customer_name");
 
-            attLinkResult.attMap.put("CUSTOMER_UNIT", typeValueText);
+            attLinkResult.attMap.put("CUSTOMER_UNIT", linkedAtt);
         }
         // 项目管理模式
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.REF_SINGLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "m_id");
-            typeValueText.text = JdbcMapUtil.getString(row, "m_name");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.REF_SINGLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "m_id");
+            linkedAtt.text = JdbcMapUtil.getString(row, "m_name");
 
-            attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID", typeValueText);
+            attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID", linkedAtt);
         }
         // 建设地点
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.REF_SINGLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "l_id");
-            typeValueText.text = JdbcMapUtil.getString(row, "l_name");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.REF_SINGLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "l_id");
+            linkedAtt.text = JdbcMapUtil.getString(row, "l_name");
 
-            attLinkResult.attMap.put("BASE_LOCATION_ID", typeValueText);
+            attLinkResult.attMap.put("BASE_LOCATION_ID", linkedAtt);
         }
         // 占地面积
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "FLOOR_AREA");
-            typeValueText.text = JdbcMapUtil.getString(row, "FLOOR_AREA");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "FLOOR_AREA");
+            linkedAtt.text = JdbcMapUtil.getString(row, "FLOOR_AREA");
 
-            attLinkResult.attMap.put("FLOOR_AREA", typeValueText);
+            attLinkResult.attMap.put("FLOOR_AREA", linkedAtt);
         }
         // 项目类型
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.REF_SINGLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "pt_id");
-            typeValueText.text = JdbcMapUtil.getString(row, "pt_name");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.REF_SINGLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "pt_id");
+            linkedAtt.text = JdbcMapUtil.getString(row, "pt_name");
 
-            attLinkResult.attMap.put("PROJECT_TYPE_ID", typeValueText);
+            attLinkResult.attMap.put("PROJECT_TYPE_ID", linkedAtt);
         }
         // 建设规模类型
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.REF_SINGLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "st_id");
-            typeValueText.text = JdbcMapUtil.getString(row, "st_name");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.REF_SINGLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "st_id");
+            linkedAtt.text = JdbcMapUtil.getString(row, "st_name");
 
-            attLinkResult.attMap.put("CON_SCALE_TYPE_ID", typeValueText);
+            attLinkResult.attMap.put("CON_SCALE_TYPE_ID", linkedAtt);
         }
         // 建设规模单位
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.REF_SINGLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "su_id");
-            typeValueText.text = JdbcMapUtil.getString(row, "su_name");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.REF_SINGLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "su_id");
+            linkedAtt.text = JdbcMapUtil.getString(row, "su_name");
 
-            attLinkResult.attMap.put("CON_SCALE_UOM_ID", typeValueText);
+            attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt);
         }
         // 建设规模数量
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "CON_SCALE_QTY");
-            typeValueText.text = JdbcMapUtil.getString(row, "CON_SCALE_QTY");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_QTY");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CON_SCALE_QTY");
 
-            attLinkResult.attMap.put("CON_SCALE_QTY", typeValueText);
+            attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
         }
         // 建设规模数量2
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
-            typeValueText.text = JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
 
-            attLinkResult.attMap.put("CON_SCALE_QTY2", typeValueText);
+            attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
         }
         // 建设年限
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "BUILD_YEARS");
-            typeValueText.text = JdbcMapUtil.getString(row, "BUILD_YEARS");
-            attLinkResult.attMap.put("BUILD_YEARS", typeValueText);
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "BUILD_YEARS");
+            linkedAtt.text = JdbcMapUtil.getString(row, "BUILD_YEARS");
+            attLinkResult.attMap.put("BUILD_YEARS", linkedAtt);
         }
         // 项目概况
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "PRJ_SITUATION");
-            typeValueText.text = JdbcMapUtil.getString(row, "PRJ_SITUATION");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "PRJ_SITUATION");
+            linkedAtt.text = JdbcMapUtil.getString(row, "PRJ_SITUATION");
 
-            attLinkResult.attMap.put("PRJ_SITUATION", typeValueText);
+            attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt);
         }
         // 批复文号
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
-            typeValueText.text = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
+            linkedAtt.text = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
 
-            attLinkResult.attMap.put("PRJ_REPLY_NO", typeValueText);
+            attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
         }
         // 批复日期
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DATE;
-            typeValueText.value = JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
-            typeValueText.text = JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DATE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
 
-            attLinkResult.attMap.put("PRJ_REPLY_DATE", typeValueText);
+            attLinkResult.attMap.put("PRJ_REPLY_DATE", linkedAtt);
         }
         // 批复材料
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.FILE_GROUP;
-            typeValueText.value = JdbcMapUtil.getString(row, "PRJ_REPLY_FILE");
-            typeValueText.text = JdbcMapUtil.getString(row, "PRJ_REPLY_FILE");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.FILE_GROUP;
+            linkedAtt.value = JdbcMapUtil.getString(row, "PRJ_REPLY_FILE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "PRJ_REPLY_FILE");
 
-            attLinkResult.attMap.put("PRJ_REPLY_FILE", typeValueText);
+            attLinkResult.attMap.put("PRJ_REPLY_FILE", linkedAtt);
         }
         // 资金来源
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
-            typeValueText.text = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
+            linkedAtt.text = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
 
-            attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", typeValueText);
-            attLinkResult.attMap.put("PM_FUND_SOURCE_ID", typeValueText);
+            attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
+            attLinkResult.attMap.put("PM_FUND_SOURCE_ID", linkedAtt);
         }
         // 可研批复资金
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "FS");
-            typeValueText.text = JdbcMapUtil.getString(row, "FS");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "FS");
+            linkedAtt.text = JdbcMapUtil.getString(row, "FS");
 
-            attLinkResult.attMap.put("FEASIBILITY_APPROVE_FUND", typeValueText);
+            attLinkResult.attMap.put("FEASIBILITY_APPROVE_FUND", linkedAtt);
         }
         // 初概批复资金
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "PD");
-            typeValueText.text = JdbcMapUtil.getString(row, "PD");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "PD");
+            linkedAtt.text = JdbcMapUtil.getString(row, "PD");
 
-            attLinkResult.attMap.put("ESTIMATE_APPROVE_FUND", typeValueText);
+            attLinkResult.attMap.put("ESTIMATE_APPROVE_FUND", linkedAtt);
         }
         // 财评批复资金
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(row, "budget");
-            typeValueText.text = JdbcMapUtil.getString(row, "budget");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "budget");
+            linkedAtt.text = JdbcMapUtil.getString(row, "budget");
 
-            attLinkResult.attMap.put("EVALUATION_APPROVE_FUND", typeValueText);
+            attLinkResult.attMap.put("EVALUATION_APPROVE_FUND", linkedAtt);
         }
 
         // 资金信息回显。优先级 可研估算<初设概算<预算财评
@@ -1197,196 +1197,196 @@ public class AttLinkExt {
         AttLinkResult attLinkResult = new AttLinkResult();
 
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
             if ("AP".equals(attValue)) {
-                typeValueText.value = "已批准";
-                typeValueText.text = "已批准";
+                linkedAtt.value = "已批准";
+                linkedAtt.text = "已批准";
             } else if ("APING".equals(attValue)) {
-                typeValueText.value = "审批中";
-                typeValueText.text = "审批中";
+                linkedAtt.value = "审批中";
+                linkedAtt.text = "审批中";
             } else if ("DN".equals(attValue)) {
-                typeValueText.value = "已拒绝";
-                typeValueText.text = "已拒绝";
+                linkedAtt.value = "已拒绝";
+                linkedAtt.text = "已拒绝";
             } else if ("DR".equals(attValue)) {
-                typeValueText.value = "草稿";
-                typeValueText.text = "草稿";
+                linkedAtt.value = "草稿";
+                linkedAtt.text = "草稿";
             } else if ("VD".equals(attValue)) {
-                typeValueText.value = "已作废";
-                typeValueText.text = "已作废";
+                linkedAtt.value = "已作废";
+                linkedAtt.text = "已作废";
             } else if ("VDING".equals(attValue)) {
-                typeValueText.value = "作废中";
-                typeValueText.text = "作废中";
+                linkedAtt.value = "作废中";
+                linkedAtt.text = "作废中";
             }
-            attLinkResult.attMap.put("NAME", typeValueText);
+            attLinkResult.attMap.put("NAME", linkedAtt);
         }
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
             if ("AP".equals(attValue)) {
-                typeValueText.value = "已批准备注";
-                typeValueText.text = "已批准备注";
+                linkedAtt.value = "已批准备注";
+                linkedAtt.text = "已批准备注";
             } else if ("APING".equals(attValue)) {
-                typeValueText.value = "审批中备注";
-                typeValueText.text = "审批中备注";
+                linkedAtt.value = "审批中备注";
+                linkedAtt.text = "审批中备注";
             } else if ("DN".equals(attValue)) {
-                typeValueText.value = "已拒绝备注";
-                typeValueText.text = "已拒绝备注";
+                linkedAtt.value = "已拒绝备注";
+                linkedAtt.text = "已拒绝备注";
             } else if ("DR".equals(attValue)) {
-                typeValueText.value = "草稿备注";
-                typeValueText.text = "草稿备注";
+                linkedAtt.value = "草稿备注";
+                linkedAtt.text = "草稿备注";
             } else if ("VD".equals(attValue)) {
-                typeValueText.value = "已作废备注";
-                typeValueText.text = "已作废备注";
+                linkedAtt.value = "已作废备注";
+                linkedAtt.text = "已作废备注";
             } else if ("VDING".equals(attValue)) {
-                typeValueText.value = "作废中备注";
-                typeValueText.text = "作废中备注";
+                linkedAtt.value = "作废中备注";
+                linkedAtt.text = "作废中备注";
             }
-            attLinkResult.attMap.put("REMARK", typeValueText);
+            attLinkResult.attMap.put("REMARK", linkedAtt);
         }
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.INTEGER;
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.INTEGER;
             if ("AP".equals(attValue)) {
-                typeValueText.value = "1";
-                typeValueText.text = "1";
+                linkedAtt.value = "1";
+                linkedAtt.text = "1";
             } else if ("APING".equals(attValue)) {
-                typeValueText.value = "2";
-                typeValueText.text = "2";
+                linkedAtt.value = "2";
+                linkedAtt.text = "2";
             } else if ("DN".equals(attValue)) {
-                typeValueText.value = "3";
-                typeValueText.text = "3";
+                linkedAtt.value = "3";
+                linkedAtt.text = "3";
             } else if ("DR".equals(attValue)) {
-                typeValueText.value = "4";
-                typeValueText.text = "4";
+                linkedAtt.value = "4";
+                linkedAtt.text = "4";
             } else if ("VD".equals(attValue)) {
-                typeValueText.value = "5";
-                typeValueText.text = "5";
+                linkedAtt.value = "5";
+                linkedAtt.text = "5";
             } else if ("VDING".equals(attValue)) {
-                typeValueText.value = "6";
-                typeValueText.text = "6";
+                linkedAtt.value = "6";
+                linkedAtt.text = "6";
             }
-            attLinkResult.attMap.put("CALC_TIMES", typeValueText);
+            attLinkResult.attMap.put("CALC_TIMES", linkedAtt);
         }
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
             if ("AP".equals(attValue)) {
-                typeValueText.value = "1.10";
-                typeValueText.text = "1.10";
+                linkedAtt.value = "1.10";
+                linkedAtt.text = "1.10";
             } else if ("APING".equals(attValue)) {
-                typeValueText.value = "2.10";
-                typeValueText.text = "2.10";
+                linkedAtt.value = "2.10";
+                linkedAtt.text = "2.10";
             } else if ("DN".equals(attValue)) {
-                typeValueText.value = "3.10";
-                typeValueText.text = "3.10";
+                linkedAtt.value = "3.10";
+                linkedAtt.text = "3.10";
             } else if ("DR".equals(attValue)) {
-                typeValueText.value = "4.10";
-                typeValueText.text = "4.10";
+                linkedAtt.value = "4.10";
+                linkedAtt.text = "4.10";
             } else if ("VD".equals(attValue)) {
-                typeValueText.value = "5.10";
-                typeValueText.text = "5.10";
+                linkedAtt.value = "5.10";
+                linkedAtt.text = "5.10";
             } else if ("VDING".equals(attValue)) {
-                typeValueText.value = "6.10";
-                typeValueText.text = "6.10";
+                linkedAtt.value = "6.10";
+                linkedAtt.text = "6.10";
             }
-            attLinkResult.attMap.put("SIGN_AMT", typeValueText);
+            attLinkResult.attMap.put("SIGN_AMT", linkedAtt);
         }
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DATE;
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DATE;
             if ("AP".equals(attValue)) {
-                typeValueText.value = "2022-01-01";
-                typeValueText.text = "2022-01-01";
+                linkedAtt.value = "2022-01-01";
+                linkedAtt.text = "2022-01-01";
             } else if ("APING".equals(attValue)) {
-                typeValueText.value = "2022-01-02";
-                typeValueText.text = "2022-01-02";
+                linkedAtt.value = "2022-01-02";
+                linkedAtt.text = "2022-01-02";
             } else if ("DN".equals(attValue)) {
-                typeValueText.value = "2022-01-03";
-                typeValueText.text = "2022-01-03";
+                linkedAtt.value = "2022-01-03";
+                linkedAtt.text = "2022-01-03";
             } else if ("DR".equals(attValue)) {
-                typeValueText.value = "2022-01-04";
-                typeValueText.text = "2022-01-04";
+                linkedAtt.value = "2022-01-04";
+                linkedAtt.text = "2022-01-04";
             } else if ("VD".equals(attValue)) {
-                typeValueText.value = "2022-01-05";
-                typeValueText.text = "2022-01-05";
+                linkedAtt.value = "2022-01-05";
+                linkedAtt.text = "2022-01-05";
             } else if ("VDING".equals(attValue)) {
-                typeValueText.value = "2022-01-06";
-                typeValueText.text = "2022-01-06";
+                linkedAtt.value = "2022-01-06";
+                linkedAtt.text = "2022-01-06";
             }
-            attLinkResult.attMap.put("SIGN_DATE", typeValueText);
+            attLinkResult.attMap.put("SIGN_DATE", linkedAtt);
         }
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TIME;
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TIME;
             if ("AP".equals(attValue)) {
-                typeValueText.value = "10:10:10";
-                typeValueText.text = "10:10:10";
+                linkedAtt.value = "10:10:10";
+                linkedAtt.text = "10:10:10";
             } else if ("APING".equals(attValue)) {
-                typeValueText.value = "11:11:11";
-                typeValueText.text = "11:11:11";
+                linkedAtt.value = "11:11:11";
+                linkedAtt.text = "11:11:11";
             } else if ("DN".equals(attValue)) {
-                typeValueText.value = "12:12:12";
-                typeValueText.text = "12:12:12";
+                linkedAtt.value = "12:12:12";
+                linkedAtt.text = "12:12:12";
             } else if ("DR".equals(attValue)) {
-                typeValueText.value = "13:13:13";
-                typeValueText.text = "13:13:13";
+                linkedAtt.value = "13:13:13";
+                linkedAtt.text = "13:13:13";
             } else if ("VD".equals(attValue)) {
-                typeValueText.value = "14:14:14";
-                typeValueText.text = "14:14:14";
+                linkedAtt.value = "14:14:14";
+                linkedAtt.text = "14:14:14";
             } else if ("VDING".equals(attValue)) {
-                typeValueText.value = "15:15:15";
-                typeValueText.text = "15:15:15";
+                linkedAtt.value = "15:15:15";
+                linkedAtt.text = "15:15:15";
             }
-            attLinkResult.attMap.put("TEST_TIME", typeValueText);
+            attLinkResult.attMap.put("TEST_TIME", linkedAtt);
         }
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DATETIME;
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DATETIME;
             if ("AP".equals(attValue)) {
-                typeValueText.value = "2022-01-01 10:10:10";
-                typeValueText.text = "2022-01-0110:10:10";
+                linkedAtt.value = "2022-01-01 10:10:10";
+                linkedAtt.text = "2022-01-0110:10:10";
             } else if ("APING".equals(attValue)) {
-                typeValueText.value = "2022-01-02 11:11:11";
-                typeValueText.text = "2022-01-02 11:11:11";
+                linkedAtt.value = "2022-01-02 11:11:11";
+                linkedAtt.text = "2022-01-02 11:11:11";
             } else if ("DN".equals(attValue)) {
-                typeValueText.value = "2022-01-03 12:12:12";
-                typeValueText.text = "2022-01-03 12:12:12";
+                linkedAtt.value = "2022-01-03 12:12:12";
+                linkedAtt.text = "2022-01-03 12:12:12";
             } else if ("DR".equals(attValue)) {
-                typeValueText.value = "2022-01-04 13:13:13";
-                typeValueText.text = "2022-01-04 13:13:13";
+                linkedAtt.value = "2022-01-04 13:13:13";
+                linkedAtt.text = "2022-01-04 13:13:13";
             } else if ("VD".equals(attValue)) {
-                typeValueText.value = "2022-01-05 14:14:14";
-                typeValueText.text = "2022-01-05 14:14:14";
+                linkedAtt.value = "2022-01-05 14:14:14";
+                linkedAtt.text = "2022-01-05 14:14:14";
             } else if ("VDING".equals(attValue)) {
-                typeValueText.value = "2022-01-06 15:15:15";
-                typeValueText.text = "2022-01-06 15:15:15";
+                linkedAtt.value = "2022-01-06 15:15:15";
+                linkedAtt.text = "2022-01-06 15:15:15";
             }
-            attLinkResult.attMap.put("CALC_DTTM", typeValueText);
+            attLinkResult.attMap.put("CALC_DTTM", linkedAtt);
         }
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.BOOLEAN;
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.BOOLEAN;
             if ("AP".equals(attValue)) {
-                typeValueText.value = "true";
-                typeValueText.text = "true";
+                linkedAtt.value = "true";
+                linkedAtt.text = "true";
             } else if ("APING".equals(attValue)) {
-                typeValueText.value = "false";
-                typeValueText.text = "false";
+                linkedAtt.value = "false";
+                linkedAtt.text = "false";
             } else if ("DN".equals(attValue)) {
-                typeValueText.value = "true";
-                typeValueText.text = "true";
+                linkedAtt.value = "true";
+                linkedAtt.text = "true";
             } else if ("DR".equals(attValue)) {
-                typeValueText.value = "false";
-                typeValueText.text = "false";
+                linkedAtt.value = "false";
+                linkedAtt.text = "false";
             } else if ("VD".equals(attValue)) {
-                typeValueText.value = "true";
-                typeValueText.text = "true";
+                linkedAtt.value = "true";
+                linkedAtt.text = "true";
             } else if ("VDING".equals(attValue)) {
-                typeValueText.value = "false";
-                typeValueText.text = "false";
+                linkedAtt.value = "false";
+                linkedAtt.text = "false";
             }
-            attLinkResult.attMap.put("CALC_SUCC", typeValueText);
+            attLinkResult.attMap.put("CALC_SUCC", linkedAtt);
         }
         return attLinkResult;
     }
@@ -1397,12 +1397,12 @@ public class AttLinkExt {
         boolean ap = "AP".equals(attValue);
 
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.TEXT_LONG;
-            typeValueText.value = "状态" + (ap ? "“已批准”" : "”非已批准“") + "联动后的备注";
-            typeValueText.text = "状态" + (ap ? "“已批准”" : "”非已批准“") + "联动后的备注";
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = "状态" + (ap ? "“已批准”" : "”非已批准“") + "联动后的备注";
+            linkedAtt.text = "状态" + (ap ? "“已批准”" : "”非已批准“") + "联动后的备注";
 
-            attLinkResult.attMap.put("REMARK", typeValueText);
+            attLinkResult.attMap.put("REMARK", linkedAtt);
         }
         attLinkResult.childClear.put("99626673179203336", ap);// 测试学生
         attLinkResult.childClear.put("99902212142028104", !ap);// 测试老师
@@ -1431,11 +1431,11 @@ public class AttLinkExt {
                 "ESTIMATE_COMPLETED", "BUDGET_REVIEW_COMPLETED", "CONSTRUCT_BID_COMPLETED");
         for (String field : fields) {
             {
-                LinkedAtt typeValueText = new LinkedAtt();
-                typeValueText.type = AttDataTypeE.TEXT_LONG;
-                typeValueText.value = "99902212142036278";
-                typeValueText.text = "99902212142036278";
-                attLinkResult.attMap.put(field, typeValueText);
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = "99902212142036278";
+                linkedAtt.text = "99902212142036278";
+                attLinkResult.attMap.put(field, linkedAtt);
             }
         }
     }
@@ -1446,48 +1446,48 @@ public class AttLinkExt {
 //        attLinkResult.attMap = new HashMap<>();
         // 总投资
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST");
-            typeValueText.text = JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST");
+            linkedAtt.text = JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST");
 
-            attLinkResult.attMap.put("PRJ_TOTAL_INVEST", typeValueText);
+            attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
         }
         // 工程费用
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT");
-            typeValueText.text = JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT");
+            linkedAtt.text = JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT");
 
-            attLinkResult.attMap.put("PROJECT_AMT", typeValueText);
+            attLinkResult.attMap.put("PROJECT_AMT", linkedAtt);
         }
         // 工程建设其他费用
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT");
-            typeValueText.text = JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT");
+            linkedAtt.text = JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT");
 
-            attLinkResult.attMap.put("PROJECT_OTHER_AMT", typeValueText);
+            attLinkResult.attMap.put("PROJECT_OTHER_AMT", linkedAtt);
         }
         // 预备费
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT");
-            typeValueText.text = JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT");
+            linkedAtt.text = JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT");
 
-            attLinkResult.attMap.put("PREPARE_AMT", typeValueText);
+            attLinkResult.attMap.put("PREPARE_AMT", linkedAtt);
         }
         // 利息
         {
-            LinkedAtt typeValueText = new LinkedAtt();
-            typeValueText.type = AttDataTypeE.DOUBLE;
-            typeValueText.value = JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST");
-            typeValueText.text = JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST");
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST");
+            linkedAtt.text = JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST");
 
-            attLinkResult.attMap.put("CONSTRUCT_PERIOD_INTEREST", typeValueText);
+            attLinkResult.attMap.put("CONSTRUCT_PERIOD_INTEREST", linkedAtt);
         }
         return attLinkResult;
     }
