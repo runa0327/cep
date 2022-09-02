@@ -60,6 +60,7 @@ public enum FileCodeEnum {
     ATT_FILE_GROUP("ATT_FILE_GROUP", "合同附件", "1"),
     SUBJECT_FILE("SUBJECT_FILE", "主体材料", "2"),
     GUARANTEE_RESULT_FILE("GUARANTEE_RESULT_FILE", "保函结果材料", "3"),
+    CONTRACT_HISTORY("CONTRACT_HISTORY", "合同历史", "4"),
 
     //采购合同补充协议申请
     PO_ORDER_SUPPLEMENT_REQ("PO_ORDER_SUPPLEMENT_REQ","采购合同补充协议申请","5"),

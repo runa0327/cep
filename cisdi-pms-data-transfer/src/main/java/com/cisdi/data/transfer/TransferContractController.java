@@ -2,6 +2,8 @@ package com.cisdi.data.transfer;
 
 import com.cisdi.data.domain.PoOrder;
 import com.cisdi.data.domain.PoPublicBid;
+import com.cisdi.data.util.ProFileUtils;
+import com.google.common.base.Strings;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -86,6 +88,10 @@ public class TransferContractController {
                                     testJdbcTemplate.update(insertSql,poOrder.getVer(),poOrder.getCRT_USER_ID(),poOrder.getLAST_MODI_USER_ID(),poOrder.getSTATUS(),poOrder.getCONTRACT_AMOUNT(),
                                             poOrder.getAGENT(),poOrder.getAGENT_PHONE(),poOrder.getOPPO_SITE_CONTACT(),poOrder.getFILE_ATTACHMENT_URL(),poOrder.getOPPO_SITE_LINK_MAN(),poOrder.getPM_PRJ_ID(),
                                             poOrder.getCPMS_UUID(),poOrder.getCPMS_ID());
+
+                                    //文件归档
+                                    relateFile(fileStr,JdbcMapUtil.getString(tp, "id"),"CONTRACT_HISTORY");
+                                    log.info("end");
                                 }
 
                             });
@@ -93,6 +99,19 @@ public class TransferContractController {
                     });
                 });
 
+            }
+        }
+    }
+
+    private void relateFile(String fileStr, String projectId, String code) {
+        if (!Strings.isNullOrEmpty(fileStr)){
+            ProFileUtils.createFolder(projectId,testJdbcTemplate);
+            Map<String, Object> folderIdMap = testJdbcTemplate.queryForMap("select id from pf_folder where PM_PRJ_ID = ? and code = ?", projectId, code);
+            String folderId = folderIdMap.get("id").toString();
+            String[] fileIds = fileStr.split(",");
+            for (String fileId : fileIds) {
+                testJdbcTemplate.update("update pf_file set PF_FOLDER_ID = ? where FL_FILE_ID = ?", folderId, fileId);
+                log.info("同步关联一条文件");
             }
         }
     }
@@ -210,6 +229,9 @@ public class TransferContractController {
                                 int num = testJdbcTemplate.update(sql7,poPublicBid.getNAME(),poPublicBid.getPM_PRJ_ID(),poPublicBid.getBID_CTL_PRICE_LAUNCH(),poPublicBid.getAPPROVE_PMS_RELEASE_WAY_ID(),
                                         poPublicBid.getAPPROVE_PURCHASE_TYPE(),poPublicBid.getBID_USER_ID(),poPublicBid.getBID_AGENCY(),poPublicBid.getBID_FILE_GROUP_ID(),poPublicBid.getTENDER_OFFER(),
                                         poPublicBid.getCPMS_UUID(),poPublicBid.getCPMS_ID(),poPublicBid.getBID_OPEN_DATE());
+
+                                //文件归档
+                                relateFile(fileStr,JdbcMapUtil.getString(project, "id"),"CONTRACT_HISTORY");
                                 log.info("执行"+num+"成功");
                             }
                         }
