@@ -47,7 +47,7 @@ public class AttLinkExt {
         } else if ("PMS_RELEASE_WAY_ID".equals(attCode) || "GUARANTEE_LETTER_TYPE_ID".equals(attCode) || "CONTRACT_CATEGORY_ID".equals(attCode) || "PRJ_MANAGE_MODE_ID".equals(attCode)) {
             return linkForMany(jdbcTemplate, attCode, attValue);
         } else if ("BIDDING_NAME_ID".equals(attCode)) {
-            return inkForBIDDING_NAME_ID(jdbcTemplate, attValue);
+            return linkForBIDDING_NAME_ID(jdbcTemplate, attValue);
         } else if ("CONTRACT_ID".equals(attCode)) {
             return linkForCONTRACT_ID(jdbcTemplate, attValue);
         } else if (("RELATION_CONTRACT_ID").equals(attCode)) {
@@ -781,7 +781,7 @@ public class AttLinkExt {
         return attLinkResult;
     }
 
-    private AttLinkResult inkForBIDDING_NAME_ID(JdbcTemplate jdbcTemplate, String attValue) {
+    private AttLinkResult linkForBIDDING_NAME_ID(JdbcTemplate jdbcTemplate, String attValue) {
         AttLinkResult attLinkResult = new AttLinkResult();
 
         // 根据id查询招投标信息
@@ -1186,8 +1186,12 @@ public class AttLinkExt {
     private AttLinkResult linkForSTATUS(String attValue, String sevId) {
         AttLinkResult attLinkResult = null;
         if ("99626673179203336".equals(sevId)) {
+            // 实体视图ID=99626673179203336,当前触发联动的实体视图是”测试学生“：
+
             attLinkResult = linkForSTATUSofTestStu(attValue);
         } else if ("99626673179203381".equals(sevId)) {
+            // 实体视图ID=99626673179203381,当前触发联动的实体视图是”测试老师“：
+
             attLinkResult = linkForSTATUSofTestClass(attValue);
         }
         return attLinkResult;
