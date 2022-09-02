@@ -163,7 +163,7 @@ public class ProFileExt {
                 //取出文件
                 List<Map<String, Object>> files = fileList.stream().filter(t -> ids.contains(t.get("PF_FOLDER_ID"))).collect(Collectors.toList());
                 BigDecimal totalSize = files.stream().map(n -> new BigDecimal(String.valueOf(n.get("SIZE_KB")))).reduce(BigDecimal.ZERO, BigDecimal::add);
-                Crud.from("pf_folder").where().eq("ID", m.get("ID")).update().set("FILE_COUNT", children.size()).set("FILE_SIZE", totalSize).exec();
+                Crud.from("pf_folder").where().eq("ID", m.get("ID")).update().set("FILE_COUNT", files.size()).set("FILE_SIZE", totalSize).exec();
             }).collect(Collectors.toList());
         }
     }
@@ -177,7 +177,7 @@ public class ProFileExt {
             //取出文件
             List<Map<String, Object>> files = fileData.stream().filter(t -> ids.contains(t.get("PF_FOLDER_ID"))).collect(Collectors.toList());
             BigDecimal totalSize = files.stream().map(n -> new BigDecimal(String.valueOf(n.get("SIZE_KB")))).reduce(BigDecimal.ZERO, BigDecimal::add);
-            Crud.from("pf_folder").where().eq("ID", m.get("ID")).update().set("FILE_COUNT", children.size()).set("FILE_SIZE", totalSize).exec();
+            Crud.from("pf_folder").where().eq("ID", m.get("ID")).update().set("FILE_COUNT", files.size()).set("FILE_SIZE", totalSize).exec();
         }).collect(Collectors.toList());
     }
 }
