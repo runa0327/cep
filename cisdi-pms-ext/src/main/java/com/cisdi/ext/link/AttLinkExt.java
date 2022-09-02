@@ -1422,13 +1422,13 @@ public class AttLinkExt {
 
             attLinkResult.attMap.put("NAME", linkedAtt);
         }
-        attLinkResult.childClear.put("99626673179203336", ap);// 测试学生
-        attLinkResult.childClear.put("99902212142028104", !ap);// 测试老师
+        attLinkResult.childClear.put("99626673179203460", ap);// 测试学生的视图部分ID，不是实体视图ID
+        attLinkResult.childClear.put("99902212142028120", !ap);// 测试老师的视图部分ID，不是实体视图ID
 
-        attLinkResult.childCreatable.put("99626673179203336", ap);// 测试学生
-        attLinkResult.childCreatable.put("99902212142028104", !ap);// 测试老师
+        attLinkResult.childCreatable.put("99626673179203460", ap);// 测试学生的视图部分ID，不是实体视图ID
+        attLinkResult.childCreatable.put("99902212142028120", !ap);// 测试老师的视图部分ID，不是实体视图ID
 
-        attLinkResult.childData.put("99626673179203336", null);// 测试学生
+        attLinkResult.childData.put("99626673179203460", null);// 测试学生的视图部分ID，不是实体视图ID
 
         List<LinkedRecord> linkedRecordList = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
@@ -1438,7 +1438,7 @@ public class AttLinkExt {
 
             linkedRecordList.add(linkedRecord);
         }
-        attLinkResult.childData.put("99902212142028104", linkedRecordList);// 测试老师
+        attLinkResult.childData.put("99902212142028120", linkedRecordList);// 测试老师的视图部分ID，不是实体视图ID
 
         return attLinkResult;
     }
