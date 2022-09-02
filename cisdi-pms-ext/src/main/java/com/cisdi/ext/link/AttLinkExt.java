@@ -1402,7 +1402,21 @@ public class AttLinkExt {
             linkedAtt.value = "状态" + (ap ? "“已批准”" : "”非已批准“") + "联动后的备注";
             linkedAtt.text = "状态" + (ap ? "“已批准”" : "”非已批准“") + "联动后的备注";
 
+            linkedAtt.changeToName = "状态" + (ap ? "“已批准”" : "”非已批准“") + "联动后的备注";
+            linkedAtt.changeToShown = ap;
+            linkedAtt.changeToEditable = ap;
+            linkedAtt.changeToMandatory = ap;
+
             attLinkResult.attMap.put("REMARK", linkedAtt);
+        }
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_SHORT;
+            long l = System.currentTimeMillis();
+            linkedAtt.value = "名称" + l;
+            linkedAtt.text = "名称" + l;
+
+            attLinkResult.attMap.put("NAME", linkedAtt);
         }
         attLinkResult.childClear.put("99626673179203336", ap);// 测试学生
         attLinkResult.childClear.put("99902212142028104", !ap);// 测试老师
@@ -1415,7 +1429,8 @@ public class AttLinkExt {
         List<LinkedRecord> linkedRecordList = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
             LinkedRecord linkedRecord = new LinkedRecord();
-            linkedRecord.valueMap.put("NAME", "老师" + i);
+            linkedRecord.valueMap.put("NAME", "老师" + (i + 1));
+            linkedRecord.textMap.put("NAME", "老师" + (i + 1));
 
             linkedRecordList.add(linkedRecord);
         }
