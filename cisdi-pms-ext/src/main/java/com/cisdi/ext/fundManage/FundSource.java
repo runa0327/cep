@@ -5,6 +5,7 @@ import com.cisdi.ext.model.BasePageEntity;
 import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -47,7 +48,7 @@ public class FundSource {
         log.info(baseSql.toString());
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         List<Map<String, Object>> resultList = jdbcTemplate.queryForList(baseSql.toString());
-        List<Map<String, Object>> totalList = jdbcTemplate.queryForList(baseSql.toString());
+        List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
 
         HashMap<String, Object> result = new HashMap<>();
         result.put("resultList", resultList);
@@ -88,8 +89,8 @@ public class FundSource {
         String id = idMap.get("id").toString();
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         Map<String, Object> infoMap = jdbcTemplate.queryForMap("select s.id, s.NAME name,s.IMPL_AMT implAmt,v" +
-                ".NAME fundSourceTypeName,s.IMPL_DATE " +
-                "date,s.REMARK remark from pm_fund_source s left join gr_set_value v on v.ID = s.FUND_SOURCE_TYPE_ID " +
+                ".NAME fundSourceTypeName,s.IMPL_DATE date,s.ATT_FILE_GROUP_ID fileIds,s.REMARK remark from pm_fund_source s left join gr_set_value" +
+                " v on v.ID = s.FUND_SOURCE_TYPE_ID " +
                 "left join gr_set t on t.ID = v.GR_SET_ID and t.CODE = 'source_type' where s.id = ?", id);
 
         List<Map<String, Object>> sourceList = jdbcTemplate.queryForList("SELECT s.id,p.NAME prjName,sum( a" +
@@ -103,6 +104,8 @@ public class FundSource {
                 "left join pm_prj p on p.id = y.PM_PRJ_ID " +
                 "GROUP BY p.id)temp on temp.id = p.id " +
                 "WHERE s.id = ? GROUP BY p.id", id);
+        List<Map<String, Object>> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(infoMap, "fileIds"), jdbcTemplate);
+        infoMap.put("fileList", fileList);
         HashMap<Object, Object> result = new HashMap<>();
         result.put("sourceList", sourceList);
         result.put("infoMap", infoMap);

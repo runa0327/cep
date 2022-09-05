@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -215,9 +216,11 @@ public class FundDataTransferController {
                 .filter(item -> !Objects.isNull(item.get("file_id")))
                 .map(item -> item.get("file_id").toString())
                 .collect(Collectors.toList());
-        String oldFileString = String.join(",", oldFileIds);
-        return testJdbcTemplate.queryForObject("select GROUP_CONCAT(FL_FILE_ID) from pf_file where CPMS_UUID in (?)",
-                String.class, oldFileString);
+        NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(testJdbcTemplate.getDataSource());
+        Map<String, Object> queryParams = new HashMap<>();//创建入参map
+        queryParams.put("ids",oldFileIds);
+        String sql = "select GROUP_CONCAT(FL_FILE_ID) from pf_file where CPMS_UUID in (:ids)";
+        return jdbcTemplate.queryForObject(sql,queryParams,String.class);
     }
 
     /**
