@@ -19,10 +19,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class WfExt {
@@ -175,6 +172,12 @@ public class WfExt {
 
                 //审批流程创建
                 if ("APING".equals(newStatus)) {
+
+                    //一些额外校验
+                    if ("PO_PUBLIC_BID_REQ".equals(entityCode)){ //招标校验
+                        checkBidReq(entityRecord,csCommId);
+                    }
+
                     List<String> tableList = getTableList();
                     if (!CollectionUtils.isEmpty(tableList)) {
                         if (tableList.contains(entityCode)) {
@@ -209,6 +212,34 @@ public class WfExt {
                 }
             }
         }
+    }
+
+    //公开招标流程校验
+    private void checkBidReq(EntityRecord entityRecord,String csCommId) {
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        //根据id查询是否有明细信息
+        List<Map<String,Object>> list1 = jdbcTemplate.queryForList("select TOTAL_AMT from pm_cost_detail where BIDDING_NAME_ID = ?",csCommId);
+        if (CollectionUtils.isEmpty(list1)){
+            throw new BaseException("费用明细不能为空，请填写费用明细！");
+        }
+        //招标控制价
+        BigDecimal price = new BigDecimal(entityRecord.valueMap.get("BID_CTL_PRICE_LAUNCH").toString());
+
+        BigDecimal priceDetail = bigDecimalSum(list1);
+        if (priceDetail.compareTo(price) != 0){
+            throw new BaseException("费用明细总金额数和招标总控价不等，请核查");
+        }
+
+    }
+
+    //list内求和
+    private BigDecimal bigDecimalSum(List<Map<String,Object>> list) {
+        BigDecimal sum = new BigDecimal(0);
+        for (Map<String, Object> tmp : list) {
+            String date = tmp.get("TOTAL_AMT").toString();
+            sum = sum.add(new BigDecimal(date));
+        }
+        return sum;
     }
 
     //流程审批通过后需要更新Name字段的
