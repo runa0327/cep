@@ -68,7 +68,7 @@ public class WfExt {
             for (EntityRecord entityRecord : entityRecordList) {
                 String csCommId = entityRecord.csCommId;
                 Map<String, Object> valueMap = entityRecord.valueMap;
-                int update = jdbcTemplate.update("update " + entityCode + " t set t.status = ? where t.id=?",newStatus, csCommId);
+                int update = jdbcTemplate.update("update " + entityCode + " t set t.status = ? where t.id=?", newStatus, csCommId);
                 log.info("已更新：{}", update);
 
                 //审批流审批通过
@@ -76,16 +76,18 @@ public class WfExt {
                     Format formatCount = new DecimalFormat("0000");
 
                     //立项申请生成项目编号
-                    if ("PM_PRJ_REQ".equals(entityCode)){
+                    if ("PM_PRJ_REQ".equals(entityCode)) {
                         Object prj_code = jdbcTemplate.queryForMap("select t.PRJ_CODE from PM_PRJ_REQ t where t.id=?", csCommId).get("PRJ_CODE");
 
                         // 若无项目编号：
                         if (SharedUtil.isEmptyObject(prj_code)) {
                             // 获取新的项目编号：
-                            Object new_prj_code = jdbcTemplate.queryForMap("select concat('XM','-',lpad((select count(*) from pm_prj_req t),4,0),'-',replace(current_date,'-','')) prj_code").get("prj_code");
+                            Object new_prj_code = jdbcTemplate.queryForMap("select concat('XM','-',lpad((select count(*) from pm_prj_req t),4,0)," +
+                                    "'-',replace(current_date,'-','')) prj_code").get("prj_code");
 
                             // 设置项目编号、代码：
-                            int update1 = jdbcTemplate.update("update PM_PRJ_REQ t set t.prj_code=?,t.code=? where t.id=?", new_prj_code, new_prj_code, csCommId);
+                            int update1 = jdbcTemplate.update("update PM_PRJ_REQ t set t.prj_code=?,t.code=? where t.id=?", new_prj_code,
+                                    new_prj_code, csCommId);
                             log.info("已更新：{}", update1);
                         }
                     }
@@ -109,43 +111,44 @@ public class WfExt {
                                 code, name, csCommId);
                     }
                     //补充合同批准后生成合同编号
-                    if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode)){
+                    if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode)) {
                         //查询当前审批通过的补充合同数量和该合同的name
                         List<Map<String, Object>> map = jdbcTemplate.queryForList("select count(*) as num from " +
                                 "PO_ORDER_REQ where status = 'AP' ");
-                        int num = Integer.valueOf(map.get(0).get("num").toString())+1;
+                        int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
                         String formatNum = formatCount.format(num);
 
                         String relationContractId = valueMap.get("RELATION_CONTRACT_ID").toString();
                         List<Map<String, Object>> nameMap = jdbcTemplate.queryForList("SELECT CONTRACT_NAME FROM " +
                                 "po_order_req where id = ?", relationContractId);
                         String name = nameMap.get(0).get("CONTRACT_NAME").toString();
-                        String contractName = name + "补充协议" +formatNum;
+                        String contractName = name + "补充协议" + formatNum;
                         //写入到补充合同表
                         int update1 = jdbcTemplate.update("update PO_ORDER_SUPPLEMENT_REQ set CONTRACT_NAME = ?  " +
-                                "where id = ? ", contractName ,csCommId);
+                                "where id = ? ", contractName, csCommId);
                     }
 
                     // 通用方法。流程审批完后将流程名称写入该流程表名称字段
                     List<String> nameList = getTableList();
-                    if (nameList.contains(entityCode)){
-                        if("PM_PRJ_REQ".equals(entityCode)){
-                            int update1 = jdbcTemplate.update("update PM_PRJ_REQ t set t.name=t.PRJ_NAME where t.id=?",csCommId);
+                    if (nameList.contains(entityCode)) {
+                        if ("PM_PRJ_REQ".equals(entityCode)) {
+                            int update1 = jdbcTemplate.update("update PM_PRJ_REQ t set t.name=t.PRJ_NAME where t.id=?", csCommId);
                         } else {
-                            String sql1 = "select a.NAME from wf_process_instance a left join "+entityCode+" b on a.id = b.LK_WF_INST_ID where b.id = ?";
-                            List<Map<String,Object>> list = jdbcTemplate.queryForList(sql1,csCommId);
-                            if (CollectionUtils.isEmpty(list)){
+                            String sql1 = "select a.NAME from wf_process_instance a left join " + entityCode + " b on a.id = b.LK_WF_INST_ID where " +
+                                    "b.id = ?";
+                            List<Map<String, Object>> list = jdbcTemplate.queryForList(sql1, csCommId);
+                            if (CollectionUtils.isEmpty(list)) {
                                 throw new BaseException("流程标题不能为空");
                             }
                             String name = list.get(0).get("NAME").toString();
-                            String sql2 = "update "+entityCode+" set NAME = ? where id = ?";
-                            int update2 = jdbcTemplate.update(sql2,name,csCommId);
+                            String sql2 = "update " + entityCode + " set NAME = ? where id = ?";
+                            int update2 = jdbcTemplate.update(sql2, name, csCommId);
                         }
 
                     }
 
                     //资金需求计划申请完成同步数据
-                    if ("PM_FUND_REQUIRE_PLAN_REQ".equals(entityCode)){
+                    if ("PM_FUND_REQUIRE_PLAN_REQ".equals(entityCode)) {
                         PmFundReqPlan pmFundReqPlan = PmFundReqPlan.insertData();
                         String id = pmFundReqPlan.id;
                         String pmFundRequirePlanReqId = entityRecord.csCommId;
@@ -161,10 +164,12 @@ public class WfExt {
                         //备注
                         String remark = valueMap.get("REMARK").toString();
                         //计划名称 待修改
-                        String name = "计划名称待修改";
+                        String name = jdbcTemplate.queryForObject("select name from pm_prj where AMOUT_PM_PRJ_ID = ?", String.class, valueMap.get(
+                                "AMOUT_PM_PRJ_ID")) + "资金需求计划";
 
-                        String sql = "update pm_fund_req_plan set NAME = ?,PM_PRJ_ID = ?,HR_DEPT_ID = ?,TOTAL_AMT = ?,APPLY_TIME = ?,PM_FUND_REQUIRE_PLAN_REQ_ID = ?,REMARK = ? where id = ?";
-                        jdbcTemplate.update(sql,name,prjId,hrDeptId,totalAmt,applyTime,pmFundRequirePlanReqId,remark,id);
+                        String sql = "update pm_fund_req_plan set NAME = ?,PM_PRJ_ID = ?,HR_DEPT_ID = ?,TOTAL_AMT = ?,APPLY_TIME = ?," +
+                                "PM_FUND_REQUIRE_PLAN_REQ_ID = ?,REMARK = ? where id = ?";
+                        jdbcTemplate.update(sql, name, prjId, hrDeptId, totalAmt, applyTime, pmFundRequirePlanReqId, remark, id);
                     }
                 }
 
@@ -176,23 +181,27 @@ public class WfExt {
                             //流程名称按规定创建
                             int update1 = 0;
                             List<String> amtPrjList = getAmtPrjList();
-                            if (amtPrjList.contains(entityCode)){
+                            if (amtPrjList.contains(entityCode)) {
                                 //资金需求计划和付款申请项目\设计任务书名称使用的另外的字段
                                 update1 = jdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
-                                        ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi.ENTITY_RECORD_ID=t.id join pm_prj prj on t.AMOUT_PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                                        ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
+                                        ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.AMOUT_PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name," +
+                                        "'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
                             } else {
                                 update1 = jdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
-                                        ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi.ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                                        ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
+                                        ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', " +
+                                        "prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
                             }
                             log.info("已更新：{}", update1);
 
                             //发起人是否存在部门信息校验
                             try {
                                 String hrDeptId = valueMap.get("CRT_DEPT_ID").toString();
-                                if (SharedUtil.isEmptyString(hrDeptId) || "0".equals(hrDeptId)){
+                                if (SharedUtil.isEmptyString(hrDeptId) || "0".equals(hrDeptId)) {
                                     throw new BaseException("对不起，您尚未有部门信息，不允许进行流程提交");
                                 }
-                            } catch (Exception e){
+                            } catch (Exception e) {
                                 throw new BaseException("对不起，您尚未有部门信息，不允许进行流程提交");
                             }
                         }
@@ -216,9 +225,9 @@ public class WfExt {
         //水保
         if ("PM_WATER_PLAN".equals(entityCode)) {
 
-            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
-            String conservationApplyFileIds = JdbcMapUtil.getString(valueMap,"CONSERVATION_APPLY_FILE");
-            String conservationReplyFileIds = JdbcMapUtil.getString(valueMap,"CONSERVATION_REPLY_FILE");
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String conservationApplyFileIds = JdbcMapUtil.getString(valueMap, "CONSERVATION_APPLY_FILE");
+            String conservationReplyFileIds = JdbcMapUtil.getString(valueMap, "CONSERVATION_REPLY_FILE");
             //水保申请材料
             ProFileUtils.insertProFile(prjId, conservationApplyFileIds,
                     FileCodeEnum.WATER_SOIL_CONSERVATION_APPLICATION_MATERIAL);
@@ -231,42 +240,42 @@ public class WfExt {
 
         //施工规划许可
         if ("PM_PRJ_PLANNING_PERMIT_REQ".equals(entityCode)) {
-            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
             //方案设计核查申请材料
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"EIA_REQ_FILE"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "EIA_REQ_FILE"),
                     FileCodeEnum.SCHEME_DESIGN_VERIFICATION_APPLICATION_MATERIALS);
             //方案设计评审搞
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"REVIEW_REPORT_FILE"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "REVIEW_REPORT_FILE"),
                     FileCodeEnum.SCHEME_DESIGN_REVIEW_OFFICE);
             //方案设计专家意见
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"REVIEW_DRAFT_FILE"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "REVIEW_DRAFT_FILE"),
                     FileCodeEnum.SCHEME_DESIGN_EXPERT_OPINIONS);
             //方案设计修编稿
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"REVISION_FILE"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "REVISION_FILE"),
                     FileCodeEnum.SCHEME_DESIGN_REVISED_DRAFT);
             //方案检查ppt文件
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"PLAN_CHECK_PPT_FILE_GROUP_ID"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "PLAN_CHECK_PPT_FILE_GROUP_ID"),
                     FileCodeEnum.SCHEME_CHECK_PPT_FILE);
             //管理局预审会市委会意见
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"ADMIN_COMMITTEE_OPINON_FILE_GROUP_ID"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "ADMIN_COMMITTEE_OPINON_FILE_GROUP_ID"),
                     FileCodeEnum.ADMINISTRATION_REVIEW_MEETING_COMMITTEE_OPINIONS);
             //规委会预审会市委会意见
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"PLAN_COMMITTEE_OPINON_FILE_GROUP_ID"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "PLAN_COMMITTEE_OPINON_FILE_GROUP_ID"),
                     FileCodeEnum.PLANNING_COMMITTEE_REVIEW_MEETING_OPINIONS);
             //分管副市长预审会市委会意见
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"DEPUTY_MAYOR_COMMITTEE_OPINON_FILE_GROUP_ID"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "DEPUTY_MAYOR_COMMITTEE_OPINON_FILE_GROUP_ID"),
                     FileCodeEnum.DEPUTY_MAYOR_REVIEW_MEETING_OPINIONS);
             //分管副市长和市长预审会市委会意见
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"MAYOR_COMMITTEE_OPINON_FILE_GROUP_ID"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "MAYOR_COMMITTEE_OPINON_FILE_GROUP_ID"),
                     FileCodeEnum.MAYOR_REVIEW_MEETING_OPINIONS);
             //市规委会意见
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"COMMITTEE_OPINON_FILE_GROUP_ID"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "COMMITTEE_OPINON_FILE_GROUP_ID"),
                     FileCodeEnum.MUNICIPAL_PLANNING_COMMISSION_OPINIONS);
             //工程规划许可申请材料
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"PRJ_PLAN_REQ_FILE"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "PRJ_PLAN_REQ_FILE"),
                     FileCodeEnum.PROJECT_PLANNING_PERMIT_APPLICATION_MATERIALS);
             //工程规划许可证
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"PRJ_PLAN_REQ_PERMIT_FILE_GROUP_ID"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "PRJ_PLAN_REQ_PERMIT_FILE_GROUP_ID"),
                     FileCodeEnum.PROJECT_PLANNING_LICENCE);
             //工程规划许可流程附件
             ProFileUtils.insertProFile(prjId, getProcessFileByProcInstId(procInstId),
@@ -276,35 +285,35 @@ public class WfExt {
 
         //采购公开招标
         if ("PO_PUBLIC_BID_REQ".equals(entityCode)) {
-            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
             //招标需求附件
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"BID_DEMAND_FILE_GROUP_ID"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "BID_DEMAND_FILE_GROUP_ID"),
                     FileCodeEnum.BID_DEMAND_FILE_GROUP);
             //领导审批附件
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"LEADER_APPROVE_FILE_GROUP_ID"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "LEADER_APPROVE_FILE_GROUP_ID"),
                     FileCodeEnum.LEADER_APPROVE_FILE_GROUP);
             //招标文件
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"BID_FILE_GROUP_ID"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "BID_FILE_GROUP_ID"),
                     FileCodeEnum.BID_FILE_GROUP);
             //发标招标文件
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"BID_ISSUE_FILE_GROUP_ID"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "BID_ISSUE_FILE_GROUP_ID"),
                     FileCodeEnum.BID_ISSUE_FILE_GROUP);
             //标后附件
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"BID_AFTER_FILE_GROUP_ID"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "BID_AFTER_FILE_GROUP_ID"),
                     FileCodeEnum.BID_AFTER_FILE_GROUP);
             //中标通知书
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"BID_WIN_NOTICE_FILE_GROUP_ID"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "BID_WIN_NOTICE_FILE_GROUP_ID"),
                     FileCodeEnum.BID_WIN_NOTICE_FILE_GROUP);
             //采购公开招标流程附件
-            ProFileUtils.insertProFile(prjId,getProcessFileByProcInstId(procInstId),FileCodeEnum.PURCHASE_TENDER_PROCESS_ATTACHMENT);
+            ProFileUtils.insertProFile(prjId, getProcessFileByProcInstId(procInstId), FileCodeEnum.PURCHASE_TENDER_PROCESS_ATTACHMENT);
         }
 
         //开工申请
         if ("PM_PRJ_KICK_OFF_REQ".equals(entityCode)) {
-            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
 
             //开工申请附件
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID"),
                     FileCodeEnum.COMMENCEMENT_APPLICATION_ATTACHMENT);
             //开工申请流程附件
             ProFileUtils.insertProFile(prjId, getProcessFileByProcInstId(procInstId),
@@ -313,29 +322,29 @@ public class WfExt {
 
         //采购合同补充协议申请
         if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode)) {
-            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
             //补充协议附件
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.SUPPLEMENTARY_AGREEMENT_ATTACHMENT);
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID"), FileCodeEnum.SUPPLEMENTARY_AGREEMENT_ATTACHMENT);
             //采购合同补充协议申请流程附件
-            ProFileUtils.insertProFile(prjId,getProcessFileByProcInstId(procInstId),FileCodeEnum.PO_ORDER_SUPPLEMENT_REQ_PROCESS_ATTACHMENT);
+            ProFileUtils.insertProFile(prjId, getProcessFileByProcInstId(procInstId), FileCodeEnum.PO_ORDER_SUPPLEMENT_REQ_PROCESS_ATTACHMENT);
         }
 
         //采购合同变更申请
-        if ("PO_ORDER_CHANGE_REQ".equals(entityCode)){
-            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+        if ("PO_ORDER_CHANGE_REQ".equals(entityCode)) {
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
             //变更附件
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.CHANGE_ATTACHMENTS);
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID"), FileCodeEnum.CHANGE_ATTACHMENTS);
             //采购合同变更申请流程附件
-            ProFileUtils.insertProFile(prjId,getProcessFileByProcInstId(procInstId),FileCodeEnum.PO_ORDER_CHANGE_REQ_PROCESS_ATTACHMENT);
+            ProFileUtils.insertProFile(prjId, getProcessFileByProcInstId(procInstId), FileCodeEnum.PO_ORDER_CHANGE_REQ_PROCESS_ATTACHMENT);
         }
 
         //采购合同终止申请
-        if ("PO_ORDER_TERMINATE_REQ".equals(entityCode)){
+        if ("PO_ORDER_TERMINATE_REQ".equals(entityCode)) {
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
             //合同终止附件
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.CONTRACT_TERMINATION_APPENDIX);
+            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID"), FileCodeEnum.CONTRACT_TERMINATION_APPENDIX);
             //合同终止申请流程附件
-            ProFileUtils.insertProFile(prjId,getProcessFileByProcInstId(procInstId),FileCodeEnum.CONTRACT_TERMINATION_REQ_PROCESS_ATTACHMENT);
+            ProFileUtils.insertProFile(prjId, getProcessFileByProcInstId(procInstId), FileCodeEnum.CONTRACT_TERMINATION_REQ_PROCESS_ATTACHMENT);
         }
     }
 

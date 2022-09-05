@@ -5,12 +5,14 @@ import com.cisdi.ext.model.BasePageEntity;
 import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class FundPay {
@@ -60,10 +62,13 @@ public class FundPay {
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         Map<String, Object> infoMap = jdbcTemplate.queryForMap("select s.id sourceId,s.name fundSourceName,s.IMPL_AMT" +
                 " imptAmt,sum(a.APPORTION_AMT) apportionAmt,sum(y.PAY_AMT) payAmt,v.name sourceTypeName,s.IMPL_DATE " +
-                "date,s.remark from pm_fund_source s left join pm_fund_pay y on s.id = y.PM_FUND_SOURCE_ID left join " +
+                "date,s.remark,s.ATT_FILE_GROUP_ID fileIds from pm_fund_source s left join pm_fund_pay y on s.id = y.PM_FUND_SOURCE_ID left join " +
                 "pm_fund_apportion a on a.PM_FUND_SOURCE_ID = s.id left join gr_set_value v on v.id = s" +
                 ".FUND_SOURCE_TYPE_ID left join gr_set t on t.id = v.GR_SET_ID and t.code = 'source_type' where s" +
                 ".id=?", id);
+        String fileIds = JdbcMapUtil.getString(infoMap, "fileIds");
+        List<Map<String, Object>> fileList = FileCommon.getFileResp(fileIds, jdbcTemplate);
+        infoMap.put("fileList", fileList);
 
         List<Map<String, Object>> payList = jdbcTemplate.queryForList("select s.id sourceId,p.id prjId,p.name " +
                 "prjName,sum(a.APPORTION_AMT) apportionAmt,y.PAY_AMT payAmt " +
@@ -98,13 +103,26 @@ public class FundPay {
                 "WHERE s.id = ? GROUP BY p.id having p.id = ?", sourceId, prjId);
 
         List<Map<String, Object>> apportionList = jdbcTemplate.queryForList("select a.APPORTION_AMT apportionAmt,a" +
-                ".APPORTION_DATE apportionDate,a.remark from pm_fund_apportion a where a.PM_FUND_SOURCE_ID = ?" +
+                ".APPORTION_DATE apportionDate,a.remark ,a.ATT_FILE_GROUP_ID fileIds from pm_fund_apportion a where a.PM_FUND_SOURCE_ID = ?" +
                 " and a.PM_PRJ_ID = ?", sourceId, prjId);
+        //分配文件
+        apportionList.forEach(apportion -> {
+            String fileIdStr = JdbcMapUtil.getString(apportion, "fileIds");
+            List<Map<String, Object>> fileList = FileCommon.getFileResp(fileIdStr, jdbcTemplate);
+            apportion.put("fileList", fileList);
+        });
 
         List<Map<String, Object>> payList = jdbcTemplate.queryForList("select y.PAY_AMT payAmt,y.CRT_DT payDate,y" +
-                ".FUND_TYPE fundTpe,y.PAY_REMARK payRemark,y.PAYEE_UNIT payeeUnit,y.remark from pm_fund_pay y left " +
+                ".FUND_TYPE fundType,y.PAY_REMARK payRemark,y.PAYEE_UNIT payeeUnit,y.remark,y.ATT_FILE_GROUP_ID fileIds from pm_fund_pay y left " +
                 "join pm_fund_source s on s.id = y.PM_FUND_SOURCE_ID where y.PM_FUND_SOURCE_ID = ? " +
                 "and y.PM_PRJ_ID = ?", sourceId, prjId);
+
+        //支付文件
+        payList.forEach(pay -> {
+            String fileIdStr = JdbcMapUtil.getString(pay, "fileIds");
+            List<Map<String, Object>> fileList = FileCommon.getFileResp(fileIdStr, jdbcTemplate);
+            pay.put("fileList", fileList);
+        });
 
         HashMap<Object, Object> result = new HashMap<>();
         result.put("infoMap", infoMap);

@@ -5,14 +5,12 @@ import com.cisdi.ext.model.BasePageEntity;
 import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 public class FundDemandPlan {
@@ -47,9 +45,21 @@ public class FundDemandPlan {
         log.info(baseSql.toString());
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         List<Map<String, Object>> resultList = jdbcTemplate.queryForList(baseSql.toString());
-        List<Map<String, Object>> totalList = jdbcTemplate.queryForList(baseSql.toString());
+        ArrayList<Demand> demandList = new ArrayList<>();
+        resultList.forEach(result -> {
+            Demand demand = new Demand();
+            demand.id = JdbcMapUtil.getString(result,"id");
+            demand.planName = JdbcMapUtil.getString(result,"planName");
+            demand.prjName = JdbcMapUtil.getString(result,"planName");
+            demand.deptName = JdbcMapUtil.getString(result,"deptName");
+            demand.createTime = JdbcMapUtil.getString(result,"createTime");
+            demand.remark = JdbcMapUtil.getString(result,"remark");
+            demandList.add(demand);
+        });
+
+        List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
         HashMap<String, Object> result = new HashMap<>();
-        result.put("resultList", resultList);
+        result.put("resultList", demandList);
         result.put("total", totalList.size());
 
         Map outputMap = JsonUtil.fromJson(JSONObject.toJSONString(result), Map.class);
@@ -85,7 +95,7 @@ public class FundDemandPlan {
         String id = idMap.get("id").toString();
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
 
-        Map<String, Object> listInfo = jdbcTemplate.queryForMap("select r.id, r.NAME planName, p.NAME prjName," +
+        Map<String, Object> listInfo = jdbcTemplate.queryForMap("select r.id, r.NAME planName, p.NAME prjName, TOTAL_AMT totalAmt," +
                 "d.NAME deptName,r.CRT_DT createTime,r" +
                 ".REMARK remark from pm_fund_req_plan r left join pm_prj p on r.PM_PRJ_ID = p.ID " +
                 "left join hr_dept d on r.HR_DEPT_ID = d.ID where r.id=? ", id);
@@ -121,7 +131,14 @@ public class FundDemandPlan {
          * 结束日期
          */
         public String endDate;
+    }
 
-
+    public static class Demand{
+        public String id;
+        public String planName;
+        public String prjName;
+        public String deptName;
+        public String createTime;
+        public String remark;
     }
 }
