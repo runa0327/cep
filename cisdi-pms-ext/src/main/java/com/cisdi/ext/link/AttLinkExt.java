@@ -10,6 +10,7 @@ import com.qygly.shared.util.SharedUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -783,37 +784,71 @@ public class AttLinkExt {
         if ("99902212142033284".equals(sevId)){
             List<LinkedRecord> linkedRecordList = new ArrayList<>();
             //查询明细信息
-            String sql = "select COST_TYPE_TREE_ID,FEE_DETAIL,TOTAL_AMT,AMT from PM_ORDER_COST_DETAIL where CONTRACT_ID = ? order by id asc";
+            String sql = "select COST_TYPE_TREE_ID,FEE_DETAIL,TOTAL_AMT,AMT from pm_order_cost_detail where CONTRACT_ID = ? order by id asc";
             List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql,attValue);
-            //查询项目付款信息
-            String sql2 = "select STAGE_PAY_AMT,CONTRACT_PRICE from PM_PAY_COST_DETAIL";
-            if (!CollectionUtils.isEmpty(list)){
-                for (Map<String, Object> tmp : list) {
+            if (!CollectionUtils.isEmpty(list1)){
+                for (Map<String, Object> tmp : list1) {
                     LinkedRecord linkedRecord = new LinkedRecord();
 
                     //费用类型
-                    linkedRecord.valueMap.put("COST_TYPE_TREE_ID",tmp.get("COST_TYPE_TREE_ID").toString());
-                    linkedRecord.textMap.put("COST_TYPE_TREE_ID",tmp.get("COST_TYPE_TREE_ID").toString());
+                    String payType = tmp.get("COST_TYPE_TREE_ID").toString();
+                    linkedRecord.valueMap.put("COST_TYPE_TREE_ID",payType);
+                    linkedRecord.textMap.put("COST_TYPE_TREE_ID",payType);
                     //费用明细
-                    linkedRecord.valueMap.put("FEE_DETAIL",tmp.get("FEE_DETAIL"));
+                    linkedRecord.valueMap.put("FEE_DETAIL",tmp.get("FEE_DETAIL").toString());
                     linkedRecord.textMap.put("FEE_DETAIL",tmp.get("FEE_DETAIL").toString());
                     //费用金额
-                    linkedRecord.valueMap.put("TOTAL_AMT",tmp.get("TOTAL_AMT"));
-                    linkedRecord.textMap.put("TOTAL_AMT",tmp.get("TOTAL_AMT").toString());
+                    BigDecimal TOTAL_AMT = new BigDecimal(tmp.get("TOTAL_AMT").toString());
+                    linkedRecord.valueMap.put("TOTAL_AMT",String.valueOf(TOTAL_AMT));
+                    linkedRecord.textMap.put("TOTAL_AMT",String.valueOf(TOTAL_AMT));
                     //合同金额
-                    linkedRecord.valueMap.put("AMT",tmp.get("AMT"));
+                    linkedRecord.valueMap.put("AMT",tmp.get("AMT").toString());
                     linkedRecord.textMap.put("AMT",tmp.get("AMT").toString());
-                    //
+
+                    //查询明细付款信息
+                    String sql2 = "SELECT a.PAY_AMT_TWO FROM PM_PAY_COST_DETAIL a left join PO_ORDER_PAYMENT_REQ b on a.PARENT_ID = b.id WHERE a.CONTRACT_ID = ? AND a.COST_TYPE_TREE_ID = ? AND b.STATUS = 'AP'";
+                    List<Map<String,Object>> list2 = jdbcTemplate.queryForList(sql2,attValue,payType);
+                    if (CollectionUtils.isEmpty(list2)){
+                        //已付金额
+                        linkedRecord.valueMap.put("PAY_AMT_TWO","0");
+                        linkedRecord.textMap.put("PAY_AMT_TWO","0");
+                        //可付金额
+                        linkedRecord.valueMap.put("REQ_AMT",tmp.get("AMT").toString());
+                        linkedRecord.textMap.put("REQ_AMT",tmp.get("AMT").toString());
+                    } else {
+                        //已付金额
+                        BigDecimal priceDetail = bigDecimalSum(list2);
+                        linkedRecord.valueMap.put("PAY_AMT_TWO",String.valueOf(priceDetail));
+                        linkedRecord.textMap.put("PAY_AMT_TWO",String.valueOf(priceDetail));
+                        //可付金额
+                        BigDecimal REQ_AMT = new BigDecimal(tmp.get("AMT").toString());
+                        BigDecimal cha = TOTAL_AMT.subtract(REQ_AMT);
+                        linkedRecord.valueMap.put("REQ_AMT",String.valueOf(cha));
+                        linkedRecord.textMap.put("REQ_AMT",String.valueOf(cha));
+                    }
+                    //本期支付
+                    linkedRecord.valueMap.put("PAY_AMT_ONE","0");
+                    linkedRecord.textMap.put("PAY_AMT_ONE","0");
 
                     linkedRecordList.add(linkedRecord);
                 }
             }
-            attLinkResult.childData.put("99902212142297809",linkedRecordList);
-            attLinkResult.childCreatable.put("99902212142297809",false);
-            attLinkResult.childClear.put("99902212142297809",true);
+            attLinkResult.childData.put("99902212142297823",linkedRecordList);
+            attLinkResult.childCreatable.put("99902212142297823",false);
+            attLinkResult.childClear.put("99902212142297823",true);
         }
 
         return attLinkResult;
+    }
+
+    //list内求和
+    private BigDecimal bigDecimalSum(List<Map<String, Object>> list) {
+        BigDecimal sum = new BigDecimal(0);
+        for (Map<String, Object> tmp : list) {
+            String date = tmp.get("PAY_AMT_TWO").toString();
+            sum = sum.add(new BigDecimal(date));
+        }
+        return sum;
     }
 
     private AttLinkResult linkForBIDDING_NAME_ID(JdbcTemplate jdbcTemplate, String attValue, String sevId) {
