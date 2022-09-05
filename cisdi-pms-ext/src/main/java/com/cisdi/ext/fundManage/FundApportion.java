@@ -2,6 +2,7 @@ package com.cisdi.ext.fundManage;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.BasePageEntity;
+import com.cisdi.ext.model.view.FundSourceNameDrop;
 import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -27,8 +28,7 @@ public class FundApportion {
         baseSql.append("select a.id,s.name fundSourceName,p.name prjName,a.FUND_SOURCE_AMT fundSourceAmt,a" +
                 ".APPORTION_AMT apportionAmt,a.APPORTION_DATE " +
                 "apportionDate,a.remark from pm_fund_apportion a left join pm_fund_source s on s.id = a" +
-                ".PM_FUND_SOURCE_ID left" +
-                " join pm_prj p on p.id = a.PM_PRJ_ID where 1=1 ");
+                ".PM_FUND_SOURCE_ID left join pm_prj p on p.id = a.PM_PRJ_ID where 1=1 ");
         if (!Strings.isNullOrEmpty(input.fundSourceId)) {
             baseSql.append("and s.id = '" + input.fundSourceId + "' ");
         }
@@ -47,11 +47,23 @@ public class FundApportion {
         log.info(baseSql.toString());
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         List<Map<String, Object>> resultList = jdbcTemplate.queryForList(baseSql.toString());
+        List<ApportionResp> apportionRespList = new ArrayList<>();
+        for (Map<String, Object> result : resultList) {
+            ApportionResp apportionResp = new ApportionResp();
+            apportionResp.id = JdbcMapUtil.getString(result,"id");
+            apportionResp.fundSourceName = JdbcMapUtil.getString(result,"fundSourceName");
+            apportionResp.prjName = JdbcMapUtil.getString(result,"prjName");
+            apportionResp.fundSourceAmt = JdbcMapUtil.getDouble(result,"fundSourceAmt");
+            apportionResp.apportionAmt = JdbcMapUtil.getDouble(result,"apportionAmt");
+            apportionResp.apportionDate = JdbcMapUtil.getString(result,"apportionDate");
+            apportionResp.remark = JdbcMapUtil.getString(result,"remark");
+            apportionRespList.add(apportionResp);
+        }
         List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
         HashMap<String, Object> result = new HashMap<>();
-        result.put("resultList", resultList);
+        result.put("resultList", apportionRespList);
         result.put("total", totalList.size());
-
+        
         Map outputMap = JsonUtil.fromJson(JSONObject.toJSONString(result), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
@@ -72,9 +84,15 @@ public class FundApportion {
         baseSql.append("order by s.name desc ");
         log.info(baseSql.toString());
         List<Map<String, Object>> sources = jdbcTemplate.queryForList(baseSql.toString());
-
+        List<FundSourceNameDrop> fundSourceNameDropList = new ArrayList<>();
+        for (Map<String, Object> source : sources) {
+            FundSourceNameDrop fundSourceNameDrop = new FundSourceNameDrop();
+            fundSourceNameDrop.id = JdbcMapUtil.getString(source,"id");
+            fundSourceNameDrop.name = JdbcMapUtil.getString(source,"name");
+            fundSourceNameDropList.add(fundSourceNameDrop);
+        }
         HashMap<String, Object> result = new HashMap<>();
-        result.put("sources", sources);
+        result.put("sources", fundSourceNameDropList);
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
 
@@ -138,6 +156,15 @@ public class FundApportion {
          */
         public String endDate;
 
+    }
 
+    public static class ApportionResp{
+        public String id;
+        public String fundSourceName;
+        public String prjName;
+        public Double fundSourceAmt;
+        public Double apportionAmt;
+        public String apportionDate;
+        public String remark;
     }
 }

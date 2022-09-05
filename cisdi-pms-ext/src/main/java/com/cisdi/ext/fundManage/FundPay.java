@@ -2,6 +2,7 @@ package com.cisdi.ext.fundManage;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.BasePageEntity;
+import com.cisdi.ext.model.view.ImplementFund;
 import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -9,6 +10,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,9 +48,22 @@ public class FundPay {
         log.info(baseSql.toString());
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         List<Map<String, Object>> resultList = jdbcTemplate.queryForList(baseSql.toString());
+        List<FundPayResp> fundPayRespList = new ArrayList<>();
+        for (Map<String, Object> result : resultList) {
+            FundPayResp fundPayResp = new FundPayResp();
+            fundPayResp.sourceId = JdbcMapUtil.getString(result,"sourceId");
+            fundPayResp.fundSourceName = JdbcMapUtil.getString(result,"fundSourceName");
+            fundPayResp.imptAmt = JdbcMapUtil.getDouble(result,"imptAmt");
+            fundPayResp.apportionAmt = JdbcMapUtil.getDouble(result,"apportionAmt");
+            fundPayResp.payAmt = JdbcMapUtil.getDouble(result,"payAmt");
+            fundPayResp.sourceTypeName = JdbcMapUtil.getString(result,"sourceTypeName");
+            fundPayResp.date = JdbcMapUtil.getString(result,"date");
+            fundPayResp.remark = JdbcMapUtil.getString(result,"remark");
+            fundPayRespList.add(fundPayResp);
+        }
         List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
         HashMap<String, Object> result = new HashMap<>();
-        result.put("resultList", resultList);
+        result.put("resultList", fundPayRespList);
         result.put("total", totalList.size());
 
         Map outputMap = JsonUtil.fromJson(JSONObject.toJSONString(result), Map.class);
@@ -77,8 +92,18 @@ public class FundPay {
                 "left join pm_prj p on p.id = a.PM_PRJ_ID " +
                 "left join pm_fund_pay y on y.PM_FUND_SOURCE_ID = s.ID and p.id = y.PM_PRJ_ID " +
                 "where s.id = ? group by y.id,p.id", id);
+        List<ImplementFund> implementFunds = new ArrayList<>();
+        for (Map<String, Object> pay : payList) {
+            ImplementFund implementFund = new ImplementFund();
+            implementFund.sourceId = JdbcMapUtil.getString(pay,"sourceId");
+            implementFund.prjId = JdbcMapUtil.getString(pay,"prjId");
+            implementFund.prjName = JdbcMapUtil.getString(pay,"prjName");
+            implementFund.apportionAmt = JdbcMapUtil.getDouble(pay,"apportionAmt");
+            implementFund.payAmt = JdbcMapUtil.getDouble(pay,"payAmt");
+            implementFunds.add(implementFund);
+        }
         HashMap<Object, Object> result = new HashMap<>();
-        result.put("payList", payList);
+        result.put("payList", implementFunds);
         result.put("infoMap", infoMap);
         Map outputMap = JsonUtil.fromJson(JSONObject.toJSONString(result), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
@@ -113,8 +138,8 @@ public class FundPay {
         });
 
         List<Map<String, Object>> payList = jdbcTemplate.queryForList("select y.PAY_AMT payAmt,y.CRT_DT payDate,y" +
-                ".FUND_TYPE fundType,y.PAY_REMARK payRemark,y.PAYEE_UNIT payeeUnit,y.remark,y.ATT_FILE_GROUP_ID fileIds from pm_fund_pay y left " +
-                "join pm_fund_source s on s.id = y.PM_FUND_SOURCE_ID where y.PM_FUND_SOURCE_ID = ? " +
+                ".FUND_TYPE fundType,y.PAY_REMARK payRemark,t.name payeeUnit,y.remark,y.ATT_FILE_GROUP_ID fileIds from pm_fund_pay y left " +
+                "join pm_fund_source s on s.id = y.PM_FUND_SOURCE_ID left join pm_party t on t.id = y.PAYEE_UNIT where y.PM_FUND_SOURCE_ID = ? " +
                 "and y.PM_PRJ_ID = ?", sourceId, prjId);
 
         //支付文件
@@ -147,7 +172,16 @@ public class FundPay {
          * 结束日期
          */
         public String endDate;
+    }
 
-
+    public static class FundPayResp {
+        public String sourceId;
+        public String fundSourceName;
+        public Double imptAmt;
+        public Double apportionAmt;
+        public Double payAmt;
+        public String sourceTypeName;
+        public String date;
+        public String remark;
     }
 }

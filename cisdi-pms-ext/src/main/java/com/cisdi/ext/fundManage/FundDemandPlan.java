@@ -2,6 +2,7 @@ package com.cisdi.ext.fundManage;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.BasePageEntity;
+import com.cisdi.ext.model.view.CommonDrop;
 import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -50,7 +51,7 @@ public class FundDemandPlan {
             Demand demand = new Demand();
             demand.id = JdbcMapUtil.getString(result,"id");
             demand.planName = JdbcMapUtil.getString(result,"planName");
-            demand.prjName = JdbcMapUtil.getString(result,"planName");
+            demand.prjName = JdbcMapUtil.getString(result,"prjName");
             demand.deptName = JdbcMapUtil.getString(result,"deptName");
             demand.createTime = JdbcMapUtil.getString(result,"createTime");
             demand.remark = JdbcMapUtil.getString(result,"remark");
@@ -81,9 +82,15 @@ public class FundDemandPlan {
         baseSql.append("order by CRT_DT desc ");
 
         List<Map<String, Object>> projects = jdbcTemplate.queryForList(baseSql.toString());
-
+        List<CommonDrop> commonDrops = new ArrayList<>();
+        for (Map<String, Object> project : projects) {
+            CommonDrop projectDrop = new CommonDrop();
+            projectDrop.id = JdbcMapUtil.getString(project,"id");
+            projectDrop.name = JdbcMapUtil.getString(project,"name");
+            commonDrops.add(projectDrop);
+        }
         HashMap<String, Object> result = new HashMap<>();
-        result.put("projects", projects);
+        result.put("projects", commonDrops);
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
 
@@ -97,12 +104,14 @@ public class FundDemandPlan {
 
         Map<String, Object> listInfo = jdbcTemplate.queryForMap("select r.id, r.NAME planName, p.NAME prjName, TOTAL_AMT totalAmt," +
                 "d.NAME deptName,r.CRT_DT createTime,r" +
-                ".REMARK remark from pm_fund_req_plan r left join pm_prj p on r.PM_PRJ_ID = p.ID " +
+                ".REMARK remark,r.ATT_FILE_GROUP_ID fileIds from pm_fund_req_plan r left join pm_prj p on r.PM_PRJ_ID = p.ID " +
                 "left join hr_dept d on r.HR_DEPT_ID = d.ID where r.id=? ", id);
         List<Map<String, Object>> detailList = jdbcTemplate.queryForList("select d.REQ_TIME reqTime,d.REQ_AMT reqAmt,v.name" +
                 " from pm_fund_req_plan_detail d " +
                 "left join gr_set_value v on v.id = d.FUND_REQ_TYPE_ID left join gr_set s on s.id = v.GR_SET_ID and s" +
                 ".CODE = 'psm_money_type' where d.PM_FUND_REQ_PLAN_ID = ?", id);
+        List<Map<String, Object>> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(listInfo, "fileIds"), jdbcTemplate);
+        listInfo.put("fileList",fileList);
         HashMap<Object, Object> result = new HashMap<>();
         result.put("listInfo",listInfo);
         result.put("detailList",detailList);
