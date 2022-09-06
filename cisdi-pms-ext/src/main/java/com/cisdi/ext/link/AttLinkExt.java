@@ -806,7 +806,7 @@ public class AttLinkExt {
                     linkedRecord.textMap.put("AMT",tmp.get("AMT").toString());
 
                     //查询明细付款信息
-                    String sql2 = "SELECT a.PAY_AMT_TWO FROM PM_PAY_COST_DETAIL a left join PO_ORDER_PAYMENT_REQ b on a.PARENT_ID = b.id WHERE a.CONTRACT_ID = ? AND a.COST_TYPE_TREE_ID = ? AND b.STATUS = 'AP'";
+                    String sql2 = "SELECT a.PAY_AMT_TWO,a.PAY_AMT_ONE FROM PM_PAY_COST_DETAIL a left join PO_ORDER_PAYMENT_REQ b on a.PARENT_ID = b.id WHERE a.CONTRACT_ID = ? AND a.COST_TYPE_TREE_ID = ? AND b.STATUS = 'AP' order by a.CRT_DT asc";
                     List<Map<String,Object>> list2 = jdbcTemplate.queryForList(sql2,attValue,payType);
                     if (CollectionUtils.isEmpty(list2)){
                         //已付金额
@@ -822,7 +822,7 @@ public class AttLinkExt {
                         linkedRecord.textMap.put("PAY_AMT_TWO",String.valueOf(priceDetail));
                         //可付金额
                         BigDecimal REQ_AMT = new BigDecimal(tmp.get("AMT").toString());
-                        BigDecimal cha = TOTAL_AMT.subtract(REQ_AMT);
+                        BigDecimal cha = REQ_AMT.subtract(priceDetail);
                         linkedRecord.valueMap.put("REQ_AMT",String.valueOf(cha));
                         linkedRecord.textMap.put("REQ_AMT",String.valueOf(cha));
                     }
@@ -844,9 +844,14 @@ public class AttLinkExt {
     //list内求和
     private BigDecimal bigDecimalSum(List<Map<String, Object>> list) {
         BigDecimal sum = new BigDecimal(0);
-        for (Map<String, Object> tmp : list) {
-            String date = tmp.get("PAY_AMT_TWO").toString();
-            sum = sum.add(new BigDecimal(date));
+        for (int i = 0; i < list.size(); i++) {
+            if (i == 0){
+                String date = list.get(0).get("PAY_AMT_ONE").toString();
+                sum = sum.add(new BigDecimal(date));
+            } else {
+                String date = list.get(i).get("PAY_AMT_TWO").toString();
+                sum = sum.add(new BigDecimal(date));
+            }
         }
         return sum;
     }
