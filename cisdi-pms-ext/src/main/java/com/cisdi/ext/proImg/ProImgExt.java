@@ -3,10 +3,10 @@ package com.cisdi.ext.proImg;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.util.JdbcMapUtil;
-import com.sun.javafx.logging.PulseLogger;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,15 +37,20 @@ public class ProImgExt {
         List<ProImgType> typeList = list.stream().map(this::convertProImgType).collect(Collectors.toList());
         List<ImageType> res = typeList.stream().map(p -> {
             ImageType type = new ImageType();
-            type.imgType = p;
+            type.id = p.id;
+            type.name = p.name;
+            type.seqNo = p.seqNo;
+            type.pid = p.pid;
             type.list = getImageData(p.id, jdbcTemplate);
             return type;
         }).collect(Collectors.toList());
 
         if (CollectionUtils.isEmpty(res)) {
-            ExtJarHelper.returnValue.set(null);
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
-            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(res), Map.class);
+            OutSide outSide = new OutSide();
+            outSide.typeList = res;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
     }
@@ -79,7 +84,7 @@ public class ProImgExt {
             m.children = getChildren(m, typeList);
         }).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(treeList)) {
-            ExtJarHelper.returnValue.set(null);
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
             OutSide outSide = new OutSide();
             outSide.list = treeList;
@@ -106,7 +111,7 @@ public class ProImgExt {
                 "where PM_IMG_PRO_TYPE_ID=?", typeId);
         List<ProImg> proImgList = list.stream().map(this::covertProImg).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(proImgList)) {
-            ExtJarHelper.returnValue.set(null);
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
             OutSide outSide = new OutSide();
             outSide.proImgList = proImgList;
@@ -203,10 +208,16 @@ public class ProImgExt {
     public static class OutSide {
         public List<ProImgType> list;
         public List<ProImg> proImgList;
+
+        public List<ImageType> typeList;
     }
 
     public static class ImageType {
-        public ProImgType imgType;
+        public String id;
+        public String pid;
+        public String name;
+        public String seqNo;
+
         public List<ProImg> list;
     }
 }

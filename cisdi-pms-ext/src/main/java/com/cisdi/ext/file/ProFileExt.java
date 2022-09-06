@@ -5,10 +5,12 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -65,15 +67,35 @@ public class ProFileExt {
         String json = JsonUtil.toJson(map);
         FileReqParam param = JsonUtil.fromJson(json, FileReqParam.class);
         String folderId = param.pfFolderId;
+        String name = param.name;
+        String uploadUser = param.uploadUser;
+        String beginTime = param.beginTime;
+        String endTime = param.endTime;
+        int pageSize = param.pageSize;
+        int pageIndex = param.pageIndex;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from ( " + "select id,name,'' as upload_user,round(file_size,2) as size,'' as upload_time ,''as url,'1' as type,PF_FOLDER_PID as pid,'' as ext ,file_count from PF_FOLDER where PF_FOLDER_PID =   ").append(folderId).append(" union all  ").append("select fl.id as id,fl.`NAME`as name,us.`NAME` as upload_user,round(SIZE_KB,2) as size,UPLOAD_DTTM as upload_time,FILE_ATTACHMENT_URL as url ,'2' as type,'' as pid ,ext,0 as file_count from FL_FILE fl left join PF_FILE PF on fl.id = pf.FL_FILE_ID  ").append("left join  ad_user us on pf.CHIEF_USER_ID = us.id where pf.PF_FOLDER_ID = ").append(folderId).append(") a where 1=1 ");
+
+        if (Strings.isNotEmpty(name)) {
+            sb.append("and name like %").append(name).append("%");
+        }
+        if (Strings.isNotEmpty(uploadUser)) {
+            sb.append(" and upload_user like %").append(uploadUser).append("%");
+        }
+        if (Strings.isNotEmpty(beginTime) && Strings.isNotEmpty(endTime)) {
+            sb.append(" and upload_time between ").append(beginTime).append(" and ").append(endTime);
+        }
+        String totalSql = sb.toString();
+
+        int start = pageSize * (pageIndex - 1);
+        sb.append("limit ").append(start).append(",").append(pageSize);
+
         //查询文件夹及其文件
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        // TODO 加过滤查询条件
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select id,name,'' as upload_user,round(file_size,2) as size,'' as upload_time ,''as url,'1' as type,PF_FOLDER_PID as pid,'' as ext ,file_count from PF_FOLDER where PF_FOLDER_PID = ? \n" +
-                "union all \n" +
-                "select fl.id as id,fl.`NAME`as name,pf.CHIEF_USER_ID as upload_user,round(SIZE_KB,2) as size,UPLOAD_DTTM as upload_time,FILE_ATTACHMENT_URL as url ,'2' as type,'' as pid ,ext,0 as file_count \n" +
-                "from FL_FILE fl \n" +
-                "left join PF_FILE PF on fl.id = pf.FL_FILE_ID \n" +
-                "where pf.PF_FOLDER_ID = ?", folderId, folderId);
+
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
+
         List<FileInfo> fileInfoList = list.stream().map(p -> {
             FileInfo fileInfo = new FileInfo();
             fileInfo.id = JdbcMapUtil.getString(p, "ID");
@@ -89,13 +111,16 @@ public class ProFileExt {
             return fileInfo;
         }).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(fileInfoList)) {
-            ExtJarHelper.returnValue.set(null);
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
+            List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
             outSide outSide = new outSide();
             outSide.fileInfoList = fileInfoList;
+            outSide.total = totalList.size();
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
+
     }
 
 
@@ -105,12 +130,40 @@ public class ProFileExt {
 
     public static class FileReqParam {
         public String pfFolderId;
+
+        /**
+         * 文件名
+         */
+        public String name;
+
+        /**
+         * 上传人
+         */
+        public String uploadUser;
+
+        /**
+         * 开始时间
+         */
+        public String beginTime;
+
+        /**
+         * 结束时间
+         */
+        public String endTime;
+
+        public Integer pageSize;
+
+        public Integer pageIndex;
+
+
     }
 
     public static class outSide {
         public List<FolderInfo> folderInfoList;
 
         public List<FileInfo> fileInfoList;
+
+        public Integer total;
     }
 
     /**
