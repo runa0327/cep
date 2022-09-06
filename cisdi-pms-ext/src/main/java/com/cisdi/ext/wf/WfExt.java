@@ -130,7 +130,10 @@ public class WfExt {
                     if (nameList.contains(entityCode)) {
                         if ("PM_PRJ_REQ".equals(entityCode)) {
                             int update1 = jdbcTemplate.update("update PM_PRJ_REQ t set t.name=t.PRJ_NAME where t.id=?", csCommId);
-                        } else {
+                        } else if("PO_ORDER_REQ".equals(entityCode)){
+                            String name = entityRecord.valueMap.get("CONTRACT_NAME").toString();
+                            int update1 = jdbcTemplate.update("update PM_PRJ_REQ t set t.name=? where t.id=?", name,csCommId);
+                        }else {
                             String sql1 = "select a.NAME from wf_process_instance a left join " + entityCode + " b on a.id = b.LK_WF_INST_ID where " +
                                     "b.id = ?";
                             List<Map<String, Object>> list = jdbcTemplate.queryForList(sql1, csCommId);

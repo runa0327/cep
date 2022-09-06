@@ -3,11 +3,13 @@ package com.cisdi.ext.pm;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -96,5 +98,35 @@ public class PoOrderReqExt {
                     .set("APPROVAL_USER_FIVE", userId).set("APPROVAL_DATE_FIVE",now).set("USER_COMMENT",comment).exec();
             log.info("已更新：{}", exec);
         }
+    }
+
+    /**
+     * 流程发起之时，合同总金额和明细校验
+     */
+    public void checkAmt(){
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //主表单合同总金额
+        String sumAmt = entityRecord.valueMap.get("CONTRACT_PRICE").toString();
+        //查询明细表合同总金额
+        String sql = "select AMT from PM_ORDER_COST_DETAIL where CONTRACT_ID = ?";
+        List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql,entityRecord.csCommId);
+        if (CollectionUtils.isEmpty(list1)){
+            throw new BaseException("费用明细不能为空！");
+        }
+        BigDecimal account = getSumAmt(list1);
+        if (account.compareTo(new BigDecimal(sumAmt)) != 0){
+            throw new BaseException("费用明细内合同金额总和与合同总金额不同，请核查！");
+        }
+    }
+
+    //汇总求和
+    private BigDecimal getSumAmt(List<Map<String, Object>> list) {
+        BigDecimal sum = new BigDecimal(0);
+        for (Map<String, Object> tmp : list) {
+            String value = tmp.get("AMT").toString();
+            sum = sum.add(new BigDecimal(value));
+        }
+        return sum;
     }
 }

@@ -72,7 +72,7 @@ public class PoOrderPaymentReq {
         /**
          * 资金需求计划。
          */
-        public static final String RELATION_AMOUT_PRJ_ID = "RELATION_AMOUT_PRJ_ID";
+        public static final String RELATION_AMOUT_PLAN_REQ_ID = "RELATION_AMOUT_PLAN_REQ_ID";
         /**
          * 锁定流程实例。
          */
