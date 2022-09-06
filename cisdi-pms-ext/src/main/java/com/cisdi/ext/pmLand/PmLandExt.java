@@ -161,7 +161,7 @@ public class PmLandExt {
         int pageSize = param.pageSize;
         int pageIndex = param.pageIndex;
         StringBuilder sb = new StringBuilder();
-        sb.append("select ID,CODE,NAME,REMARK,PM_PRJ_ID,PAY_TIME,PAY_AMT,ATT_FILE_GROUP_ID from PM_LAND_ACQUISITION_PAY where 1=1 ");
+        sb.append("select P.ID,P.CODE,P.NAME,P.REMARK,PM_PRJ_ID,pp.`NAME` as PROJECT_NAME,PAY_TIME,PAY_AMT,ATT_FILE_GROUP_ID from PM_LAND_ACQUISITION_PAY P left join pm_prj pp on P.PM_PRJ_ID = pp.id where 1=1 ");
         if (Strings.isNotEmpty(projectId)) {
             sb.append(" and PM_PRJ_ID = ").append(projectId);
         }
@@ -176,8 +176,8 @@ public class PmLandExt {
         List<PmLandPay> payList = list.stream().map(p -> {
             PmLandPay pay = new PmLandPay();
             pay.id = JdbcMapUtil.getString(p, "ID");
-            pay.projectId = JdbcMapUtil.getString(p, "ID");
-            pay.projectName = JdbcMapUtil.getString(p, "ID");
+            pay.projectId = JdbcMapUtil.getString(p, "PM_PRJ_ID");
+            pay.projectName = JdbcMapUtil.getString(p, "PROJECT_NAME");
             pay.payAmt = JdbcMapUtil.getString(p, "PAY_AMT");
             pay.payTime = JdbcMapUtil.getString(p, "PAY_TIME");
             pay.attFileGroupId = JdbcMapUtil.getString(p, "ATT_FILE_GROUP_ID");
@@ -205,11 +205,11 @@ public class PmLandExt {
         String payId = param.payId;
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         try {
-            Map<String, Object> stringObjectMap = jdbcTemplate.queryForMap("select ID,CODE,NAME,REMARK,PM_PRJ_ID,PAY_TIME,PAY_AMT,ATT_FILE_GROUP_ID from PM_LAND_ACQUISITION_PAY where id=?", payId);
+            Map<String, Object> stringObjectMap = jdbcTemplate.queryForMap("select P.ID,P.CODE,P.NAME,P.REMARK,PM_PRJ_ID,pp.`NAME` as PROJECT_NAME,PAY_TIME,PAY_AMT,ATT_FILE_GROUP_ID from PM_LAND_ACQUISITION_PAY P left join pm_prj pp on P.PM_PRJ_ID = pp.id where P.id=?", payId);
             PmLandPay pay = new PmLandPay();
             pay.id = JdbcMapUtil.getString(stringObjectMap, "ID");
             pay.projectId = JdbcMapUtil.getString(stringObjectMap, "ID");
-            pay.projectName = JdbcMapUtil.getString(stringObjectMap, "ID");
+            pay.projectName = JdbcMapUtil.getString(stringObjectMap, "PROJECT_NAME");
             pay.payAmt = JdbcMapUtil.getString(stringObjectMap, "PAY_AMT");
             pay.payTime = JdbcMapUtil.getString(stringObjectMap, "PAY_TIME");
             pay.attFileGroupId = JdbcMapUtil.getString(stringObjectMap, "ATT_FILE_GROUP_ID");
