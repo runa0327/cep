@@ -3,7 +3,9 @@ package com.cisdi.ext.fundManage;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.BasePageEntity;
 import com.cisdi.ext.model.view.CommonDrop;
+import com.cisdi.ext.model.view.File;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -53,7 +55,7 @@ public class FundDemandPlan {
             demand.planName = JdbcMapUtil.getString(result,"planName");
             demand.prjName = JdbcMapUtil.getString(result,"prjName");
             demand.deptName = JdbcMapUtil.getString(result,"deptName");
-            demand.createTime = JdbcMapUtil.getString(result,"createTime");
+            demand.createTime = StringUtil.withOutT(JdbcMapUtil.getString(result,"createTime"));
             demand.remark = JdbcMapUtil.getString(result,"remark");
             demandList.add(demand);
         });
@@ -110,9 +112,13 @@ public class FundDemandPlan {
                 " from pm_fund_req_plan_detail d " +
                 "left join gr_set_value v on v.id = d.FUND_REQ_TYPE_ID left join gr_set s on s.id = v.GR_SET_ID and s" +
                 ".CODE = 'psm_money_type' where d.PM_FUND_REQ_PLAN_ID = ?", id);
-        List<Map<String, Object>> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(listInfo, "fileIds"), jdbcTemplate);
+        List<File> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(listInfo, "fileIds"), jdbcTemplate);
         listInfo.put("fileList",fileList);
         HashMap<Object, Object> result = new HashMap<>();
+        //处理时间
+        String createTime = JdbcMapUtil.getString(listInfo, "createTime");
+        listInfo.put("createTime", StringUtil.withOutT(createTime));
+
         result.put("listInfo",listInfo);
         result.put("detailList",detailList);
 

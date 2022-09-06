@@ -2,6 +2,7 @@ package com.cisdi.ext.fundManage;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.BasePageEntity;
+import com.cisdi.ext.model.view.File;
 import com.cisdi.ext.model.view.ImplementFund;
 import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
@@ -128,7 +129,7 @@ public class FundSource {
             implementFund.payAmt = JdbcMapUtil.getDouble(source,"payAmt");
             implementFundList.add(implementFund);
         }
-        List<Map<String, Object>> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(infoMap, "fileIds"), jdbcTemplate);
+        List<File> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(infoMap, "fileIds"), jdbcTemplate);
         infoMap.put("fileList", fileList);
         HashMap<Object, Object> result = new HashMap<>();
         result.put("sourceList", implementFundList);

@@ -2,8 +2,10 @@ package com.cisdi.ext.fundManage;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.BasePageEntity;
+import com.cisdi.ext.model.view.File;
 import com.cisdi.ext.model.view.ImplementFund;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -14,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class FundPay {
@@ -82,7 +83,7 @@ public class FundPay {
                 ".FUND_SOURCE_TYPE_ID left join gr_set t on t.id = v.GR_SET_ID and t.code = 'source_type' where s" +
                 ".id=?", id);
         String fileIds = JdbcMapUtil.getString(infoMap, "fileIds");
-        List<Map<String, Object>> fileList = FileCommon.getFileResp(fileIds, jdbcTemplate);
+        List<File> fileList = FileCommon.getFileResp(fileIds, jdbcTemplate);
         infoMap.put("fileList", fileList);
 
         List<Map<String, Object>> payList = jdbcTemplate.queryForList("select s.id sourceId,p.id prjId,p.name " +
@@ -133,7 +134,7 @@ public class FundPay {
         //分配文件
         apportionList.forEach(apportion -> {
             String fileIdStr = JdbcMapUtil.getString(apportion, "fileIds");
-            List<Map<String, Object>> fileList = FileCommon.getFileResp(fileIdStr, jdbcTemplate);
+            List<File> fileList = FileCommon.getFileResp(fileIdStr, jdbcTemplate);
             apportion.put("fileList", fileList);
         });
 
@@ -144,8 +145,11 @@ public class FundPay {
 
         //支付文件
         payList.forEach(pay -> {
+            //时间
+            pay.put("payDate", StringUtil.withOutT(JdbcMapUtil.getString(pay,"payDate")));
+            //文件
             String fileIdStr = JdbcMapUtil.getString(pay, "fileIds");
-            List<Map<String, Object>> fileList = FileCommon.getFileResp(fileIdStr, jdbcTemplate);
+            List<File> fileList = FileCommon.getFileResp(fileIdStr, jdbcTemplate);
             pay.put("fileList", fileList);
         });
 

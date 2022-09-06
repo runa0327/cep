@@ -1,14 +1,18 @@
 package com.cisdi.ext.api;
 
+import com.cisdi.ext.fundManage.FileCommon;
+import com.cisdi.ext.model.BasePageEntity;
+import com.cisdi.ext.model.view.CommonDrop;
+import com.cisdi.ext.model.view.File;
 import com.cisdi.ext.proImg.ProImgExt;
 import com.cisdi.ext.util.JsonUtil;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -27,14 +31,61 @@ public class PoPublicBidExtApi {
     public void getPublicBidList() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
-        RequestParam param = JsonUtil.fromJson(json, RequestParam.class);
-        String pmPrjId = param.pmPrjId;
+        Input input = JsonUtil.fromJson(json, Input.class);
+        String projectId = input.projectId;
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("", pmPrjId);
+        String baseSql = "select ID,NAME,PM_PRJ_ID,PRJ_CODE,PRJ_REPLY_NO,PRJ_SITUATION,INVESTMENT_SOURCE_ID,CUSTOMER_UNIT,PMS_RELEASE_WAY_ID," +
+                "FEASIBILITY_APPROVE_FUND,ESTIMATE_APPROVE_FUND,EVALUATION_APPROVE_FUND,BID_UNIT,BID_BASIS,BID_CTL_PRICE_LAUNCH,SERVICE_DAYS," +
+                "BID_DEMAND_FILE_GROUP_ID,REMARK,APPROVE_PMS_RELEASE_WAY_ID,APPROVE_PURCHASE_TYPE,APPROVE_BID_CTL_PRICE,APPROVE_PURCHASE_TYPE_ECHO," +
+                "LEADER_APPROVE_COMMENT,LEADER_APPROVE_FILE_GROUP_ID,BID_CTL_PRICE_LAUNCH_ECHO,BID_USER_ID,BID_AGENCY,DEMAND_PROMOTER," +
+                "BID_FILE_GROUP_ID,REGISTRATION_DATE,BID_OPEN_DATE,WIN_BID_UNIT_TXT,TENDER_OFFER from po_public_bid where PM_PRJ_ID = ? ";
+        //筛选条件
+        if (!Strings.isNullOrEmpty(input.tenderName)){//招标名称模糊查询
+            baseSql +=  "and NAME like '%" + input.tenderName + "%' ";
+        }
+        if (!Strings.isNullOrEmpty(input.startDate) && !Strings.isNullOrEmpty(input.endDate)) {//开标日期
+            baseSql += "and BID_OPEN_DATE BETWEEN '" + input.startDate + "' and '" + input.endDate + "' ";
+        }
+        if (!Strings.isNullOrEmpty(input.tenderWayId)){//招标方式
+            baseSql += "and APPROVE_PURCHASE_TYPE = '" + input.tenderWayId + "' ";
+        }
+        if (!Strings.isNullOrEmpty(input.tenderReleaseWayId)){//招标类型
+            baseSql += "and APPROVE_PMS_RELEASE_WAY_ID = '" + input.tenderReleaseWayId + "' ";
+        }
+
+        //分页
+        Integer start = input.pageSize * (input.pageIndex - 1);
+        baseSql += "limit " + start + "," + input.pageSize;
+
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(baseSql, projectId);
         List<ProjectTender> resList = list.stream().map(this::convertProjectTender).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(resList)) {
             ExtJarHelper.returnValue.set(null);
         } else {
+            for (ProjectTender projectTender : resList) {
+                //招采类型
+                projectTender.pmsReleaseWay = findInDict("pms_tender_type", projectTender.pmsReleaseWayId, jdbcTemplate);
+                //招标类型
+                projectTender.approveReleaseWay = findInDict("pms_release_way", projectTender.approvePmsReleaseWayId, jdbcTemplate);
+                //招标方式
+                projectTender.approvePurchaseTypeName = findInDict("pms_tender_way",projectTender.approvePurchaseType,jdbcTemplate);
+                //经办部门
+                if (!Strings.isNullOrEmpty(projectTender.bidUserId)){
+                    Map<String, Object> deptUserMap = jdbcTemplate.queryForMap("select u.name handleUserName,d.name handleDeptName from ad_user u " +
+                            "left join hr_dept_user t on t.ad_user_id = u.id " +
+                            "left join hr_dept d on d.id = t.hr_dept_id " +
+                            "where u.id = ?", projectTender.bidUserId);
+                    projectTender.handleDeptName = JdbcMapUtil.getString(deptUserMap,"handleDeptName");
+                    projectTender.handleUserName = JdbcMapUtil.getString(deptUserMap,"handleUserName");
+                }
+                //项目
+                if (!Strings.isNullOrEmpty(projectTender.projectId)){
+                    Map<String, Object> projectMap = jdbcTemplate.queryForMap("select name from pm_prj where id = ?",
+                            projectTender.projectId);
+                    projectTender.projectName = JdbcMapUtil.getString(projectMap,"name");
+                }
+
+            }
             ProjectObj obj = new ProjectObj();
             obj.list = resList;
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(obj), Map.class);
@@ -42,7 +93,44 @@ public class PoPublicBidExtApi {
         }
 
     }
+    /**
+     * 招标类型下拉
+     */
+    public void getReleaseWayDrop(){
+        Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
+        String wayName = JdbcMapUtil.getString(inputMap, "wayName");
+        String code = JdbcMapUtil.getString(inputMap, "code");
 
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        List<CommonDrop> commonDrops = getCommonDropList(wayName, jdbcTemplate,code);
+
+        WayDrops drops = new WayDrops();
+        drops.commonDropList = commonDrops;
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(drops), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+    }
+
+    private List<CommonDrop> getCommonDropList(String searchName, JdbcTemplate jdbcTemplate,String code) {
+        StringBuffer baseSql = new StringBuffer();
+        baseSql.append("select v.name,v.id from gr_set_value v left join gr_set s on s.id = v.gr_set_id where s.code = '").append(code).append("' ");
+        if (!Strings.isNullOrEmpty(searchName)) {
+            baseSql.append("and v.name like '%").append(searchName).append("%' ");
+        }
+
+        List<Map<String, Object>> ways = jdbcTemplate.queryForList(baseSql.toString());
+        List<CommonDrop> commonDrops = new ArrayList<>();
+        for (Map<String, Object> way : ways) {
+            CommonDrop wayDrop = new CommonDrop();
+            wayDrop.id = JdbcMapUtil.getString(way,"id");
+            wayDrop.name = JdbcMapUtil.getString(way,"name");
+            commonDrops.add(wayDrop);
+        }
+        return commonDrops;
+    }
+
+    /**
+     *
+     */
 
     /**
      * 招标详情接口
@@ -54,9 +142,21 @@ public class PoPublicBidExtApi {
         String id = param.id;
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         try {
-            Map<String, Object> stringObjectMap = jdbcTemplate.queryForMap("", id);
-            ProjectTender tender = this.convertProjectTender(stringObjectMap);
-            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(tender), Map.class);
+            String baseSql = "select ID,NAME,PM_PRJ_ID,PRJ_CODE,PRJ_REPLY_NO,PRJ_SITUATION,INVESTMENT_SOURCE_ID,CUSTOMER_UNIT,PMS_RELEASE_WAY_ID," +
+                    "FEASIBILITY_APPROVE_FUND,ESTIMATE_APPROVE_FUND,EVALUATION_APPROVE_FUND,BID_UNIT,BID_BASIS,BID_CTL_PRICE_LAUNCH,SERVICE_DAYS," +
+                    "BID_DEMAND_FILE_GROUP_ID,REMARK,APPROVE_PMS_RELEASE_WAY_ID,APPROVE_PURCHASE_TYPE,APPROVE_BID_CTL_PRICE,APPROVE_PURCHASE_TYPE_ECHO," +
+                    "LEADER_APPROVE_COMMENT,LEADER_APPROVE_FILE_GROUP_ID,BID_CTL_PRICE_LAUNCH_ECHO,BID_USER_ID,BID_AGENCY,DEMAND_PROMOTER," +
+                    "BID_FILE_GROUP_ID,REGISTRATION_DATE,BID_OPEN_DATE,WIN_BID_UNIT_TXT,TENDER_OFFER from po_public_bid where ID = ? ";
+            Map<String, Object> stringObjectMap = jdbcTemplate.queryForMap(baseSql, id);
+            ProjectTender projectTender = convertProjectTender(stringObjectMap);
+            //招标需求附件
+            projectTender.bidDemandFileGroup = FileCommon.getFileResp(projectTender.bidDemandFileGroupId,jdbcTemplate);
+            //招标文件
+            projectTender.bidFileGroup = FileCommon.getFileResp(projectTender.bidFileGroupId,jdbcTemplate);
+            //领导审批附件
+            projectTender.leaderApproveFileGroup = FileCommon.getFileResp(projectTender.leaderApproveFileGroupId,jdbcTemplate);
+//            ProjectTender tender = this.convertProjectTender(stringObjectMap);
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(projectTender), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         } catch (Exception e) {
             ExtJarHelper.returnValue.set(null);
@@ -77,7 +177,6 @@ public class PoPublicBidExtApi {
         tender.prjSituation = JdbcMapUtil.getString(data, "PRJ_SITUATION");
         tender.investSourceId = JdbcMapUtil.getString(data, "INVESTMENT_SOURCE_ID");
         tender.customerUnit = JdbcMapUtil.getString(data, "CUSTOMER_UNIT");
-        tender.pmsReleaseWayId = JdbcMapUtil.getString(data, "PMS_RELEASE_WAY_ID");
         tender.feasibilityApproveFund = JdbcMapUtil.getString(data, "FEASIBILITY_APPROVE_FUND");
         tender.estimateApproveFund = JdbcMapUtil.getString(data, "ESTIMATE_APPROVE_FUND");
         tender.evaluationApproveFund = JdbcMapUtil.getString(data, "EVALUATION_APPROVE_FUND");
@@ -92,19 +191,29 @@ public class PoPublicBidExtApi {
         tender.approveBidCtlPrice = JdbcMapUtil.getString(data, "APPROVE_BID_CTL_PRICE");
         tender.approvePurchaseTypeEcho = JdbcMapUtil.getString(data, "APPROVE_PURCHASE_TYPE_ECHO");
         tender.leaderApproveComment = JdbcMapUtil.getString(data, "LEADER_APPROVE_COMMENT");
-
         tender.leaderApproveFileGroupId = JdbcMapUtil.getString(data, "LEADER_APPROVE_FILE_GROUP_ID");
 
         tender.bidCtlPriceLaunchEcho = JdbcMapUtil.getString(data, "BID_CTL_PRICE_LAUNCH_ECHO");
         tender.bidUserId = JdbcMapUtil.getString(data, "BID_USER_ID");
         tender.bidAgency = JdbcMapUtil.getString(data, "BID_AGENCY");
+        tender.winBidUnitTxt = JdbcMapUtil.getString(data, "WIN_BID_UNIT_TXT");
         tender.demandPromoter = JdbcMapUtil.getString(data, "DEMAND_PROMOTER");
 
         tender.bidFileGroupId = JdbcMapUtil.getString(data, "BID_FILE_GROUP_ID");
 
         tender.registrationDate = JdbcMapUtil.getString(data, "REGISTRATION_DATE");
         tender.bidOpenDate = JdbcMapUtil.getString(data, "BID_OPEN_DATE");
+        tender.tenderOffer = JdbcMapUtil.getString(data,"TENDER_OFFER");
         return tender;
+    }
+
+    public String findInDict(String code, String id, JdbcTemplate jdbcTemplate) {
+        if (Strings.isNullOrEmpty(id)) {
+            return null;
+        }
+        String name = jdbcTemplate.queryForObject("select v.name from gr_set_value v left join gr_set s on s.id = v.gr_set_id where s.code = ? and v" +
+                        ".id = ?",String.class, code, id);
+        return name;
     }
 
     public static class RequestParam {
@@ -113,9 +222,12 @@ public class PoPublicBidExtApi {
     }
 
     public static class ProjectTender {
+        //招标id
         public String id;
+        //招标名称
         public String name;
         public String projectId;
+        //项目名
         public String projectName;
         public String projectCode;
         public String replyNo;
@@ -123,6 +235,8 @@ public class PoPublicBidExtApi {
         public String investSourceId;
         public String customerUnit;
         public String pmsReleaseWayId;
+        //招采类型
+        public String pmsReleaseWay;
 
         public String feasibilityApproveFund;
         public String estimateApproveFund;
@@ -135,6 +249,7 @@ public class PoPublicBidExtApi {
          * 招标需求附件
          */
         public String bidDemandFileGroupId;
+        public List<File> bidDemandFileGroup;
 
         public String remark;
 
@@ -144,7 +259,9 @@ public class PoPublicBidExtApi {
          * 招标方式
          */
         public String approvePurchaseType;
-
+        //招标方式名称
+        public String approvePurchaseTypeName;
+        //核定招标控制价（限价）
         public String approveBidCtlPrice;
 
         public String approvePurchaseTypeEcho;
@@ -158,23 +275,62 @@ public class PoPublicBidExtApi {
          * 领导审批附件
          */
         public String leaderApproveFileGroupId;
+        public List<File> leaderApproveFileGroup;
 
         public String bidCtlPriceLaunchEcho;
 
         public String bidUserId;
 
+        //招标代理单位
         public String bidAgency;
-
+        //中标单位
+        public String winBidUnitTxt;
         public String demandPromoter;
 
         public String bidFileGroupId;
+        //招标文件
+        public List<File> bidFileGroup;
 
+        //报名时间
         public String registrationDate;
 
+        //开标日期
         public String bidOpenDate;
+
+        //中标价
+        public String tenderOffer;
+
+        //经办部门
+        public String handleDeptName;
+
+        //经办人
+        public String handleUserName;
+
+        //招标类型
+        public String approveReleaseWay;
     }
 
     public static class ProjectObj {
         public List<ProjectTender> list;
+    }
+
+    public static class WayDrops{
+        public List<CommonDrop> commonDropList;
+    }
+
+    //入参
+    public static class Input extends BasePageEntity{
+        //项目id
+        public String projectId;
+        //招标名称
+        public String tenderName;
+        //开标开始日期
+        public String startDate;
+        //开标结束日期
+        public String endDate;
+        //招标方式id
+        public String tenderWayId;
+        //招标类别id
+        public String tenderReleaseWayId;
     }
 }
