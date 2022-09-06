@@ -970,9 +970,12 @@ public class AttLinkExt {
         // 经办人
         {
             LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.INTEGER;
-            linkedAtt.value = JdbcMapUtil.getString(row, "BID_USER_ID");
-            linkedAtt.text = JdbcMapUtil.getString(row, "BID_USER_ID");
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            String id = JdbcMapUtil.getString(row, "BID_USER_ID");
+            //根据id查询人员名称
+            String name = jdbcTemplate.queryForList("select name from ad_user where id = ?",id).get(0).get("name").toString();
+            linkedAtt.text = name;
+            linkedAtt.value = id;
 
             attLinkResult.attMap.put("PROCURE_USER_ID", linkedAtt);
         }
