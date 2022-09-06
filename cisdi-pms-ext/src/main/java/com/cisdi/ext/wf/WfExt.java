@@ -411,6 +411,7 @@ public class WfExt {
         list.add("PM_CONSTRUCTION_DRAWING_DESIGN"); //施工图设计管理
         list.add("PM_DESIGN_ASSIGNMENT"); //方案设计管理
         list.add("PM_DESIGN_ASSIGNMENT_BOOK"); //设计任务书
+        list.add("PM_FARMING_PROCEDURES"); //农转用手续办理
         return list;
     }
 

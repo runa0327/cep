@@ -4,7 +4,6 @@ import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.att.AttDataTypeE;
-import com.qygly.shared.interaction.TypeValueText;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -832,12 +831,11 @@ public class AttLinkExt {
 
                     linkedRecordList.add(linkedRecord);
                 }
+                attLinkResult.childData.put("99902212142514118",linkedRecordList);
             }
-            attLinkResult.childData.put("99902212142514118",linkedRecordList);
             attLinkResult.childCreatable.put("99902212142514118",false);
             attLinkResult.childClear.put("99902212142514118",true);
         }
-
         return attLinkResult;
     }
 
@@ -880,8 +878,8 @@ public class AttLinkExt {
 
                     linkedRecordList.add(linkedRecord);
                 }
+                attLinkResult.childData.put("99902212142513357",linkedRecordList);
             }
-            attLinkResult.childData.put("99902212142513357",linkedRecordList);
             attLinkResult.childCreatable.put("99902212142513357",false);
             attLinkResult.childClear.put("99902212142513357",true);
 
@@ -972,7 +970,7 @@ public class AttLinkExt {
         // 经办人
         {
             LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.type = AttDataTypeE.INTEGER;
             linkedAtt.value = JdbcMapUtil.getString(row, "BID_USER_ID");
             linkedAtt.text = JdbcMapUtil.getString(row, "BID_USER_ID");
 
