@@ -1,6 +1,5 @@
 package com.cisdi.ext.file;
 
-import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -10,7 +9,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,7 +33,7 @@ public class ProFileExt {
         ReqParam param = JsonUtil.fromJson(json, ReqParam.class);
         String projectId = param.pmPrjId;
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select ID,`CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,PF_FOLDER_PID from pf_folder where PF_FOLDER_PID is null and IS_TEMPLATE = '0' and  PM_PRJ_ID=? order by SEQ_NO", projectId);
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select ID,`CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,PF_FOLDER_PID,'1' as `TYPE` from pf_folder where PF_FOLDER_PID is null and IS_TEMPLATE = '0' and  PM_PRJ_ID=? order by SEQ_NO", projectId);
         List<FolderInfo> folderList = list.stream().map(p -> {
             FolderInfo f = new FolderInfo();
             f.id = JdbcMapUtil.getString(p, "ID");
@@ -43,6 +41,9 @@ public class ProFileExt {
             f.pmPrjId = JdbcMapUtil.getString(p, "PM_PRJ_ID");
             f.pid = JdbcMapUtil.getString(p, "PF_FOLDER_PID") == null ? "0" : JdbcMapUtil.getString(p, "PF_FOLDER_PID");
             f.seqNo = JdbcMapUtil.getString(p, "SEQ_NO");
+            f.fileCount = JdbcMapUtil.getString(p, "FILE_COUNT");
+            f.fileSize = JdbcMapUtil.getString(p, "FILE_SIZE");
+            f.type = JdbcMapUtil.getString(p, "TYPE");
             return f;
         }).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(folderList)) {
@@ -121,6 +122,9 @@ public class ProFileExt {
         public String pmPrjId;
         public String pid;
         public String seqNo;
+        public String type;
+        public String fileCount;
+        public String fileSize;
     }
 
     /**
@@ -148,11 +152,11 @@ public class ProFileExt {
 
             //查询文件夹
             List<Map<String, Object>> folderList = jdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,LK_WF_INST_ID,CODE,NAME,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID,IS_TEMPLATE,FILE_SIZE,FILE_COUNT " +
-                    "from pf_folder where PM_PRJ_ID=?",csCommId);
+                    "from pf_folder where PM_PRJ_ID=?", csCommId);
             //查询所有文件
             List<Map<String, Object>> fileList = jdbcTemplate.queryForList("select fl.ID,fl.CODE,fl.NAME,fl.REMARK,fl.VER,fl.FL_PATH_ID,fl.EXT,fl.LK_WF_INST_ID,fl.STATUS,fl.CRT_DT,fl.CRT_USER_ID,fl.LAST_MODI_DT,fl.LAST_MODI_USER_ID,ifnull(SIZE_KB,0) as SIZE_KB,fl.IS_PRESET,fl.FILE_INLINE_URL," +
                     "fl.FILE_ATTACHMENT_URL,fl.TS,UPLOAD_DTTM,fl.PHYSICAL_LOCATION,fl.DSP_NAME,DSP_SIZE,pff.PF_FOLDER_ID as PF_FOLDER_ID from fl_file fl left join pf_file pff on fl.id = pff.FL_FILE_ID " +
-                    "left join pf_folder pfr on pff.PF_FOLDER_ID = pfr.id where  pfr.PM_PRJ_ID=?",csCommId);
+                    "left join pf_folder pfr on pff.PF_FOLDER_ID = pfr.id where  pfr.PM_PRJ_ID=?", csCommId);
 
 
             folderList.stream().filter(p -> Objects.equals("0", p.get("PF_FOLDER_PID"))).peek(m -> {
