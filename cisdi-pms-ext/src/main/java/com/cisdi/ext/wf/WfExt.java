@@ -412,6 +412,7 @@ public class WfExt {
         list.add("PM_DESIGN_ASSIGNMENT"); //方案设计管理
         list.add("PM_DESIGN_ASSIGNMENT_BOOK"); //设计任务书
         list.add("PM_FARMING_PROCEDURES"); //农转用手续办理
+        list.add("PM_WOODLAND_PROCEDURES"); //林地调整办理手续
         return list;
     }
 
