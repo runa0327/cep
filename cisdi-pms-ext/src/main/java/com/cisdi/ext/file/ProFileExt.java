@@ -32,7 +32,7 @@ public class ProFileExt {
     public void getFolder() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
-        ReqParam param = JsonUtil.fromJson(json, ReqParam.class);
+        FileReqParam param = JsonUtil.fromJson(json, FileReqParam.class);
         String projectId = param.pmPrjId;
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         List<Map<String, Object>> list = jdbcTemplate.queryForList("select ID,`CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,PF_FOLDER_PID,'1' as `TYPE` from pf_folder where PF_FOLDER_PID is null and IS_TEMPLATE = '0' and  PM_PRJ_ID=? order by SEQ_NO", projectId);
@@ -78,10 +78,10 @@ public class ProFileExt {
         sb.append("select * from ( " + "select id,name,'' as upload_user,round(file_size,2) as size,'' as upload_time ,''as url,'1' as type,PF_FOLDER_PID as pid,'' as ext ,file_count from PF_FOLDER where PF_FOLDER_PID =   ").append(folderId).append(" union all  ").append("select fl.id as id,fl.`NAME`as name,us.`NAME` as upload_user,round(SIZE_KB,2) as size,UPLOAD_DTTM as upload_time,FILE_ATTACHMENT_URL as url ,'2' as type,'' as pid ,ext,0 as file_count from FL_FILE fl left join PF_FILE PF on fl.id = pf.FL_FILE_ID  ").append("left join  ad_user us on pf.CHIEF_USER_ID = us.id where pf.PF_FOLDER_ID = ").append(folderId).append(") a where 1=1 ");
 
         if (Strings.isNotEmpty(name)) {
-            sb.append("and name like %").append(name).append("%");
+            sb.append("and name like '%").append(name).append("%'");
         }
         if (Strings.isNotEmpty(uploadUser)) {
-            sb.append(" and upload_user like %").append(uploadUser).append("%");
+            sb.append(" and upload_user like '%").append(uploadUser).append("%'");
         }
         if (Strings.isNotEmpty(beginTime) && Strings.isNotEmpty(endTime)) {
             sb.append(" and upload_time between ").append(beginTime).append(" and ").append(endTime);
@@ -89,7 +89,7 @@ public class ProFileExt {
         String totalSql = sb.toString();
 
         int start = pageSize * (pageIndex - 1);
-        sb.append("limit ").append(start).append(",").append(pageSize);
+        sb.append(" limit ").append(start).append(",").append(pageSize);
 
         //查询文件夹及其文件
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
@@ -124,11 +124,95 @@ public class ProFileExt {
     }
 
 
-    public static class ReqParam {
-        public String pmPrjId;
+    /**
+     * 文档网盘
+     */
+    public void documentNetwork() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        FileReqParam param = JsonUtil.fromJson(json, FileReqParam.class);
+        String projectId = param.pmPrjId;
+        String pfFolderId = param.pfFolderId;
+        String name = param.name;
+        String uploadUser = param.uploadUser;
+        String beginTime = param.beginTime;
+        String endTime = param.endTime;
+        int pageSize = param.pageSize;
+        int pageIndex = param.pageIndex;
+
+        StringBuilder sbFolder = new StringBuilder();
+        sbFolder.append("select id,name,'' as upload_user,round(file_size,2) as size,'' as upload_time ,''as url,'1' as type,PF_FOLDER_PID as pid,'' as ext ,file_count,ID as folder_id from PF_FOLDER where  PM_PRJ_ID= " + projectId);
+
+        StringBuilder sbFile = new StringBuilder();
+        sbFile.append("select fl.id as id,fl.`NAME`as name,us.`NAME` as upload_user,round(SIZE_KB,2) as size,UPLOAD_DTTM as upload_time,FILE_ATTACHMENT_URL as url ,'2' as type,'' as pid ,ext,0 as file_count,fo.id as  folder_id from FL_FILE fl " +
+                "left join PF_FILE PF on fl.id = pf.FL_FILE_ID " +
+                "left join pf_folder fo on fo.id = pf.PF_FOLDER_ID " +
+                "left join  ad_user us on pf.CHIEF_USER_ID = us.id where fo.PM_PRJ_ID= " + projectId);
+
+        if (Strings.isNotEmpty(pfFolderId)) {
+            sbFolder.append(" and PF_FOLDER_PID=" + pfFolderId);
+            sbFile.append(" and pf.PF_FOLDER_ID = " + pfFolderId);
+        } else {
+            if (Strings.isEmpty(name) && Strings.isEmpty(uploadUser) && Strings.isEmpty(beginTime) && Strings.isEmpty(endTime)) {
+                sbFolder.append(" and PF_FOLDER_PID is null");
+                sbFile.append(" and fo.PF_FOLDER_PID is null");
+            }
+
+        }
+        if (Strings.isNotEmpty(name)) {
+            sbFolder.append(" and name like '%").append(name).append("%'");
+            sbFile.append(" and fl.name like '%").append(name).append("%'");
+        }
+        if (Strings.isNotEmpty(uploadUser)) {
+            sbFile.append(" and us.name like '%").append(name).append("%'");
+        }
+        if (Strings.isNotEmpty(beginTime) && Strings.isNotEmpty(endTime)) {
+            sbFile.append(" and UPLOAD_DTTM between ").append(beginTime).append(" and ").append(endTime);
+        }
+
+        String totalSql = String.valueOf(sbFolder.append(" union all ").append(sbFile));
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from (");
+        sb.append(sbFolder);
+        sb.append(") a where 1=1");
+        int start = pageSize * (pageIndex - 1);
+        sb.append(" limit ").append(start).append(",").append(pageSize);
+
+        //查询文件夹及其文件
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
+
+        List<FileInfo> fileInfoList = list.stream().map(p -> {
+            FileInfo fileInfo = new FileInfo();
+            fileInfo.id = JdbcMapUtil.getString(p, "ID");
+            fileInfo.pid = JdbcMapUtil.getString(p, "pid");
+            fileInfo.name = JdbcMapUtil.getString(p, "name");
+            fileInfo.uploadUser = JdbcMapUtil.getString(p, "upload_user");
+            fileInfo.uploadTime = JdbcMapUtil.getString(p, "upload_time");
+            fileInfo.size = JdbcMapUtil.getString(p, "size");
+            fileInfo.url = JdbcMapUtil.getString(p, "url");
+            fileInfo.type = JdbcMapUtil.getString(p, "type");
+            fileInfo.ext = JdbcMapUtil.getString(p, "ext");
+            fileInfo.fileCount = JdbcMapUtil.getString(p, "file_count");
+            return fileInfo;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(fileInfoList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
+            outSide outSide = new outSide();
+            outSide.fileInfoList = fileInfoList;
+            outSide.total = totalList.size();
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
     }
 
+
     public static class FileReqParam {
+        public String pmPrjId;
         public String pfFolderId;
 
         /**

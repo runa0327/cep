@@ -1,6 +1,7 @@
 package com.cisdi.data.transfer;
 
 import com.cisdi.data.util.ListUtils;
+import com.cisdi.data.util.MapDataUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.debug.event.AsyncConfig;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -56,12 +57,12 @@ public class MapDataTransferController {
                     //替换项目id
                     List<Map<String, Object>> prjIdList = testJdbcTemplate.queryForList("select id from pm_prj where CPMS_UUID = ?", mapInfo.get("project_id"));
 
-                    String prjId = CollectionUtils.isEmpty(prjIdList) ? null : JdbcMapUtil.getString(prjIdList.get(0),"id");
+                    String prjId = CollectionUtils.isEmpty(prjIdList) ? null : JdbcMapUtil.getString(prjIdList.get(0), "id");
                     //插入mapinfo
-                    testJdbcTemplate.update(mapInfoSql,mapInfo.get("code"),mapInfo.get("remakes"),mapInfo.get("map_id"),mapInfo.get("mid_type"),
-                            mapInfo.get("inner_type"),mapInfo.get("stroke_opacity"),prjId,mapInfo.get("project_name"),mapInfo.get("stroke_width"),
-                            mapInfo.get("fill"),mapInfo.get("stroke"),mapInfo.get("area"),mapInfo.get("plot_ratio"),mapInfo.get("land_note"),
-                            mapInfo.get("dict_value"),mapInfo.get("fill_opacity"),mapInfo.get("id"));
+                    testJdbcTemplate.update(mapInfoSql, mapInfo.get("code"), mapInfo.get("remakes"), mapInfo.get("map_id"), mapInfo.get("mid_type"),
+                            mapInfo.get("inner_type"), mapInfo.get("stroke_opacity"), prjId, mapInfo.get("project_name"), mapInfo.get("stroke_width"),
+                            mapInfo.get("fill"), mapInfo.get("stroke"), mapInfo.get("area"), mapInfo.get("plot_ratio"), mapInfo.get("land_note"),
+                            mapInfo.get("dict_value"), mapInfo.get("fill_opacity"), mapInfo.get("id"));
                     log.info("成功同步一条地图信息数据");
                     //返回id
                     Map<String, Object> idMap = testJdbcTemplate.queryForMap("select id from map_info where CPMS_UUID = ?", mapInfo.get("map_id"));
@@ -83,6 +84,15 @@ public class MapDataTransferController {
             });
         }));
 
+        return "success";
+    }
+
+    @GetMapping("initMap")
+    public String initMap() {
+        //删除原导入数据
+        testJdbcTemplate.update("delete from map_longitude_latitude");
+        testJdbcTemplate.update("delete from map_info");
+        MapDataUtils.getMapData(testJdbcTemplate);
         return "success";
     }
 }

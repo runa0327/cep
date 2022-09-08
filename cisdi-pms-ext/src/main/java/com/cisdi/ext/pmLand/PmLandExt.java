@@ -1,6 +1,7 @@
 package com.cisdi.ext.pmLand;
 
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
@@ -36,11 +37,11 @@ public class PmLandExt {
         StringBuilder sb = new StringBuilder();
         sb.append("select ID,CODE,NAME,REMARK,DEMOLITION_COST,DEMOLITION_PROGRESS,ATT_FILE_GROUP_ID from PM_LAND_ACQUISITION_RECORD where 1=1 ");
         if (Strings.isNotEmpty(name)) {
-            sb.append(" and `NAME` like %").append(name).append("%");
+            sb.append(" and `NAME` like '%").append(name).append("%'");
         }
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
-        sb.append("limit ").append(start).append(",").append(pageSize);
+        sb.append(" limit ").append(start).append(",").append(pageSize);
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
         List<PmLandRecord> records = list.stream().map(this::convertPmLandRecord).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(records)) {
@@ -79,6 +80,9 @@ public class PmLandExt {
                     fileData.fileName = JdbcMapUtil.getString(p, "NAME");
                     fileData.url = JdbcMapUtil.getString(p, "FILE_INLINE_URL");
                     fileData.durl = JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
+                    fileData.size = JdbcMapUtil.getString(p, "DSP_SIZE");
+                    fileData.uploadDate = StringUtil.withOutT(JdbcMapUtil.getString(p, "UPLOAD_DTTM"));
+                    fileData.fName = JdbcMapUtil.getString(p, "DSP_NAME");
                     return fileData;
                 }).collect(Collectors.toList());
                 record.fileDataList = fileDataList;
@@ -170,7 +174,7 @@ public class PmLandExt {
         }
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
-        sb.append("limit ").append(start).append(",").append(pageSize);
+        sb.append(" limit ").append(start).append(",").append(pageSize);
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
         List<PmLandPay> payList = list.stream().map(p -> {
@@ -179,7 +183,7 @@ public class PmLandExt {
             pay.projectId = JdbcMapUtil.getString(p, "PM_PRJ_ID");
             pay.projectName = JdbcMapUtil.getString(p, "PROJECT_NAME");
             pay.payAmt = JdbcMapUtil.getString(p, "PAY_AMT");
-            pay.payTime = JdbcMapUtil.getString(p, "PAY_TIME");
+            pay.payTime = StringUtil.withOutT(JdbcMapUtil.getString(p, "PAY_TIME"));
             pay.attFileGroupId = JdbcMapUtil.getString(p, "ATT_FILE_GROUP_ID");
             return pay;
         }).collect(Collectors.toList());
@@ -211,7 +215,7 @@ public class PmLandExt {
             pay.projectId = JdbcMapUtil.getString(stringObjectMap, "ID");
             pay.projectName = JdbcMapUtil.getString(stringObjectMap, "PROJECT_NAME");
             pay.payAmt = JdbcMapUtil.getString(stringObjectMap, "PAY_AMT");
-            pay.payTime = JdbcMapUtil.getString(stringObjectMap, "PAY_TIME");
+            pay.payTime = StringUtil.withOutT(JdbcMapUtil.getString(stringObjectMap, "PAY_TIME"));
             pay.attFileGroupId = JdbcMapUtil.getString(stringObjectMap, "ATT_FILE_GROUP_ID");
             if (Strings.isNotEmpty(pay.attFileGroupId)) {
                 NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(Objects.requireNonNull(jdbcTemplate.getDataSource()));
@@ -225,6 +229,9 @@ public class PmLandExt {
                     fileData.fileName = JdbcMapUtil.getString(p, "NAME");
                     fileData.url = JdbcMapUtil.getString(p, "FILE_INLINE_URL");
                     fileData.durl = JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
+                    fileData.size = JdbcMapUtil.getString(p, "DSP_SIZE");
+                    fileData.uploadDate = StringUtil.withOutT(JdbcMapUtil.getString(p, "UPLOAD_DTTM"));
+                    fileData.fName = JdbcMapUtil.getString(p, "DSP_NAME");
                     return fileData;
                 }).collect(Collectors.toList());
                 pay.fileDataList = fileDataList;
@@ -285,6 +292,12 @@ public class PmLandExt {
         public String fileName;
         public String url;
         public String durl;
+
+        public String size;
+
+        public String uploadDate;
+
+        public String fName;
     }
 
     /**
