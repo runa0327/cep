@@ -8,9 +8,9 @@ import com.qygly.shared.util.SharedUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * 林地调整手续办理扩展
+ * 耕作层剥离 扩展
  */
-public class PmWoodlandProceduresExt {
+public class PmTopsoilStrippingReqExt {
 
     //选择否办理，需要上传附件
     public void checkFile(){

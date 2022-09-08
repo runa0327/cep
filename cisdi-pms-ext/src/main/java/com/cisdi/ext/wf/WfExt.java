@@ -415,6 +415,8 @@ public class WfExt {
         list.add("PM_WOODLAND_PROCEDURES"); //林地调整办理手续
         list.add("PM_LAND_USE_REQ"); //用地规划许可
         list.add("PM_LAND_EXAMINE_REQ"); //征地调查
+        list.add("PM_LAND_CERTIFICATE"); //土地证办理
+        list.add("PM_TOPSOIL_STRIPPING_REQ"); //耕作层剥离
         return list;
     }
 
