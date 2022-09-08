@@ -417,6 +417,7 @@ public class WfExt {
         list.add("PM_LAND_EXAMINE_REQ"); //征地调查
         list.add("PM_LAND_CERTIFICATE"); //土地证办理
         list.add("PM_TOPSOIL_STRIPPING_REQ"); //耕作层剥离
+        list.add("PM_LAND_ALLOCATION_REQ"); //土地划拨
         return list;
     }
 
