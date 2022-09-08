@@ -1,6 +1,7 @@
 package com.cisdi.ext.fundManage;
 
 import com.cisdi.ext.model.view.File;
+import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,7 +33,7 @@ public class FileCommon {
             file.id = JdbcMapUtil.getString(fileMap,"id");
             file.name = JdbcMapUtil.getString(fileMap,"name");
             file.size = JdbcMapUtil.getString(fileMap,"size");
-            file.uploadTime = JdbcMapUtil.getString(fileMap,"uploadTime");
+            file.uploadTime = StringUtil.withOutT(JdbcMapUtil.getString(fileMap,"uploadTime"));
             file.viewUrl = JdbcMapUtil.getString(fileMap,"viewUrl");
             file.downUrl = JdbcMapUtil.getString(fileMap,"downUrl");
             files.add(file);
