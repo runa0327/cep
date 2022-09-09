@@ -418,6 +418,11 @@ public class WfExt {
         list.add("PM_LAND_CERTIFICATE"); //土地证办理
         list.add("PM_TOPSOIL_STRIPPING_REQ"); //耕作层剥离
         list.add("PM_LAND_ALLOCATION_REQ"); //土地划拨
+        list.add("PM_TENDER_VERIFICATION"); //招核标准
+        list.add("PM_DEFENSE_PLAN_REQ"); //人防规划报建
+        list.add("PM_DEFENSE_BUILD_REQ"); //人防施工报建
+        list.add("PM_TERMITE_CONTROL_REQ"); //白蚁防治
+        list.add("PM_NATIONAL_BUILD_REQ"); //国安报建
         return list;
     }
 
