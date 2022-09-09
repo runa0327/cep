@@ -1,24 +1,28 @@
 package com.cisdi.ext.projectAreaMap;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.cisdi.ext.demo.CrudExt;
 import com.cisdi.ext.model.BasePageEntity;
 import com.cisdi.ext.model.MapInfo;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.MapDataUtils;
+import com.cisdi.ext.util.Util;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.util.CollectionUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -26,110 +30,77 @@ import java.util.stream.Collectors;
  */
 public class AreaMapPreview {
     public void getMapPreviewList() {
-        String res = MapDataUtils.getInitMapData();
-        Map outputMap = JsonUtil.fromJson(res, Map.class);
+        //查询数据库地块信息
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        List<Map<String, Object>> mapInfos = jdbcTemplate.queryForList("select i.MAP_ID mapId,i.mid_type midType,i.inner_type innerType,i" +
+                ".STROKE_OPACITY strokeOpacity,i.PRJ_IDS projectId,i.STROKE_WIDTH strokeWidth,v.code fill,i.stroke,i" +
+                ".FILL_OPACITY fillOpacity,i.code,i.area,i.PLOT_RATIO plotRatio,i.land_note landNote," +
+                "(select GROUP_CONCAT(name) from pm_prj where FIND_IN_SET(id,i.PRJ_IDS)) projectName from map_info i " +
+                "left join gr_set_value v on v.id = i.fill left join gr_set s on s.id = v.gr_set_id and s.code = 'land_map_color' ");
+        String data = MapDataUtils.getInitMapData();
+        JSONObject object = JSONObject.parseObject(data);
+        JSONArray array = object.getJSONArray("features");
+        if (!CollectionUtils.isEmpty(mapInfos)) {
+            JSONArray newArray = new JSONArray();
+            for (Object o : array) {
+                JSONObject onj = JSON.parseObject(o.toString());
+                String mapId = onj.getString("mapId");
+                JSONObject jsonObject = new JSONObject();
+                Optional<Map<String, Object>> optional = mapInfos.stream().filter(mapInfo -> mapInfo.get("mapId").equals(mapId)).findAny();
+                if (optional.isPresent()) {
+                    Map<String, Object> mapInfo = optional.get();
+                    jsonObject.put("midType", mapInfo.get("midType"));
+                    jsonObject.put("innerType", mapInfo.get("innerType"));
+                    jsonObject.put("strokeOpacity", mapInfo.get("strokeOpacity"));
+                    jsonObject.put("projectId", mapInfo.get("projectId"));
+                    jsonObject.put("strokeWidth", mapInfo.get("strokeWidth"));
+                    jsonObject.put("fill", mapInfo.get("fill"));
+                    jsonObject.put("stroke", mapInfo.get("stroke"));
+                    jsonObject.put("fillOpacity", mapInfo.get("fillOpacity"));
+                    jsonObject.put("code", mapInfo.get("code"));
+                    jsonObject.put("area", mapInfo.get("area"));
+                    jsonObject.put("plotRatio", mapInfo.get("plotRatio"));
+                    jsonObject.put("landNote", mapInfo.get("landNote"));
+                    jsonObject.put("projectName", mapInfo.get("projectName"));
+                }
+//                jsonObject.put("fill","#ffff7f");
+                onj.put("properties", jsonObject);
+                newArray.add(onj);
+            }
+            object.put("features", newArray);
+        }
+
+
+        Map outputMap = JsonUtil.fromJson(object.toJSONString(), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
 
-//    public void getMapPreviewList() {
-//
-//        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-//
-//        StringBuffer baseSql = new StringBuffer();
-//        baseSql.append("select i.id mapId,i.mid_type midType,i.inner_type innerType,l.longitude,l.latitude,i" +
-//                ".STROKE_OPACITY strokeOpacity,i.PM_PRJ_ID projectId,i.PRJ_NAME projectName,i.STROKE_WIDTH " +
-//                "strokeWidth,i.fill,i.stroke,i.FILL_OPACITY fillOpacity,i.code,i.area,i.PLOT_RATIO plotRatio,i" +
-//                ".land_note landNote,i.dict_value dictValue from map_info i left join map_longitude_latitude l on l" +
-//                ".map_id = i.id ");
-//        //[数据1，数据2]
-//        List<Map<String, Object>> mapList = jdbcTemplate.queryForList(baseSql.toString());
-//
-//        //[123:[数据1，数据2]，23:[数据1，数据2]] 根据地块id分组
-//        Map<String, List<Map<String, Object>>> groupMap = mapList.stream()
-//                .filter(item -> item.get("mapId") != null)
-//                .collect(Collectors.groupingBy(stringObjectMap -> stringObjectMap.get("mapId").toString()));
-//
-//        MapResult mapResult = new MapResult();
-//        mapResult.features = new ArrayList<>();
-//        groupMap.forEach((mapId, otherDataList) -> {
-//            Map<String, Object> mapInfo = otherDataList.get(0);
-//
-//            Feature feature = new Feature();
-//            //feature第一个属性
-//            feature.mapId = mapId;
-//            //feature第二个属性
-//            feature.type = JdbcMapUtil.getString(mapInfo, "midType");
-//            //feature第三个属性
-//            Properties properties = new Properties();
-//            feature.properties = properties;
-//            properties.strokeOpacity = JdbcMapUtil.getString(mapInfo, "strokeOpacity");
-//            properties.projectId = JdbcMapUtil.getString(mapInfo, "projectId");
-//            properties.projectName = JdbcMapUtil.getString(mapInfo, "projectName");
-//            properties.strokeWidth = JdbcMapUtil.getString(mapInfo, "strokeWidth");
-//            properties.fill = JdbcMapUtil.getString(mapInfo, "fill");
-//            properties.stroke = JdbcMapUtil.getString(mapInfo, "stroke");
-//            properties.fillOpacity = JdbcMapUtil.getString(mapInfo, "fillOpacity");
-//            properties.code = JdbcMapUtil.getString(mapInfo, "code");
-//            properties.area = JdbcMapUtil.getString(mapInfo, "area");
-//            properties.plotRatio = JdbcMapUtil.getString(mapInfo, "plotRatio");
-//            properties.landNote = JdbcMapUtil.getString(mapInfo, "landNote");
-//            properties.dictValue = JdbcMapUtil.getInt(mapInfo, "dictValue");
-//
-//            //feature第四个属性
-//            Geometry geometry = new Geometry();
-//            feature.geometry = geometry;
-//
-//            //geometry第一个属性
-//            List<List<List<Double>>> coordinates = new ArrayList<>();
-//            List<List<Double>> secondList = new ArrayList<>();
-//            for (Map<String, Object> otherData : otherDataList) {
-//
-//                List<Double> coordinate = new ArrayList<>();
-//                if (otherData.get("longitude") != null) {
-//                    coordinate.add(0, Double.parseDouble(otherData.get("longitude").toString()));
-//                }
-//                if (otherData.get("latitude") != null) {
-//                    coordinate.add(1, Double.parseDouble(otherData.get("latitude").toString()));
-//                }
-//                secondList.add(coordinate);
-//            }
-//            coordinates.add(secondList);
-//            geometry.coordinates = coordinates;
-//
-//            //geometry第二个属性
-//            geometry.type = JdbcMapUtil.getString(mapInfo, "innerType");
-//            mapResult.features.add(feature);
-//        });
-//        mapResult.type = "FeatureCollection";
-//
-//
-//        Map outputMap = JsonUtil.fromJson(JSONObject.toJSONString(mapResult), Map.class);
-//        ExtJarHelper.returnValue.set(outputMap);
-//    }
-
+    //地块详情
     public void getMapDetail() {
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         String mapId = params.get("mapId").toString();
-
+        if (!exist(mapId)) {
+            ExtJarHelper.returnValue.set(null);
+            return;
+        }
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        Map<String, Object> mapInfoMap = jdbcTemplate.queryForMap("select i.id mapId,i.mid_type midType,i.inner_type innerType," +
-                "i.STROKE_OPACITY strokeOpacity,i.PM_PRJ_ID projectId,i.PRJ_NAME projectName,i.STROKE_WIDTH strokeWidth,i.fill,i.stroke" +
-                ",i.FILL_OPACITY fillOpacity,i.code,i.area,i.PLOT_RATIO plotRatio,i.land_note landNote,i.dict_value dictValue " +
-                "from map_info i where i.id = ?", mapId);
+        Map<String, Object> mapInfoMap = jdbcTemplate.queryForMap("select i.id,i.map_id,i.mid_type midType,i.inner_type innerType," +
+                "i.STROKE_OPACITY strokeOpacity,i.PRJ_IDS projectId,i.STROKE_WIDTH strokeWidth,i.fill,i.stroke" +
+                ",i.FILL_OPACITY fillOpacity,i.code,i.area,i.PLOT_RATIO plotRatio,i.land_note landNote " +
+                "from map_info i where i.map_id = ?", mapId);
         RespMap respMap = new RespMap();
-        respMap.Id = JdbcMapUtil.getString(mapInfoMap, "mapId");
+        respMap.Id = JdbcMapUtil.getString(mapInfoMap, "Id");
+        respMap.mapId = JdbcMapUtil.getString(mapInfoMap, "mapId");
         respMap.geometry = new Geometry();
         respMap.geometry.type = JdbcMapUtil.getString(mapInfoMap, "innerType");
         respMap.type = JdbcMapUtil.getString(mapInfoMap, "midType");
         respMap.properties = new Properties();
         respMap.properties.area = JdbcMapUtil.getString(mapInfoMap, "area");
         respMap.properties.code = JdbcMapUtil.getString(mapInfoMap, "code");
-        respMap.properties.dictValue = JdbcMapUtil.getInt(mapInfoMap, "dictValue");
         respMap.properties.fill = JdbcMapUtil.getString(mapInfoMap, "fill");
         respMap.properties.landNote = JdbcMapUtil.getString(mapInfoMap, "landNote");
         respMap.properties.plotRatio = JdbcMapUtil.getString(mapInfoMap, "plotRatio");
         respMap.properties.projectId = JdbcMapUtil.getString(mapInfoMap, "projectId");
-        respMap.properties.projectName = JdbcMapUtil.getString(mapInfoMap, "projectName");
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(respMap), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
 
@@ -139,14 +110,52 @@ public class AreaMapPreview {
     public void updateMap() {
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        //项目id或填充颜色为空时，正常更新单个地块
-        updateSingleMap();
-        if (params.get("projectId") != null && params.get("fill") != null) {
-            //项目id和填充颜色同时修改时，将项目id的地块修改为当前颜色
-            jdbcTemplate.update("update map_info set fill = ? where PM_PRJ_ID = ?", params.get("fill").toString(),
-                    params.get("projectId").toString());
+        NamedParameterJdbcTemplate namedJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
+        String mapId = JdbcMapUtil.getString(params, "mapId");
+        if (exist(mapId)) {//数据库有该地块基础信息
+            //项目id或填充颜色为空时，正常更新单个地块
+            updateSingleMap();
+            if (params.get("projectId") != null && params.get("fill") != null) {
+                //项目id和填充颜色同时修改时，将项目id的地块修改为当前颜色
+                List<String> projectIds = Arrays.asList(params.get("projectId").toString());
+                HashMap<String, Object> queryParams = new HashMap<>();
+                queryParams.put("projectIds", projectIds);
+                queryParams.put("fill", params.get("fill").toString());
+                namedJdbcTemplate.update("update map_info set fill = (:fill) where PRJ_IDS in (:projectIds)", queryParams);
+            }
+        } else {//数据库没有该地块信息 插入一条再修改
+            String id = Util.insertData(jdbcTemplate, "map_info");
+            Crud.from("map_info").where().eq("ID", id).update().set("MAP_ID", mapId).exec();
+            updateSingleMap();
         }
+    }
 
+    //地块项目信息
+    public void getProjectInfo() {
+        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
+        String projectIds = JdbcMapUtil.getString(params, "projectIds");
+        List<String> projectIdList = Arrays.asList(projectIds.split(","));
+        HashMap<String, Object> queryParams = new HashMap<>();
+        queryParams.put("projectIdList", projectIdList);
+
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        NamedParameterJdbcTemplate namedJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
+        String baseSql = "select pj.id,pj.name,IFNULL(v.name,'未启动') statusName from pm_prj pj left join pm_pro_plan pp on pp.PM_PRJ_ID = pj.id " +
+                "left join gr_set_value v on v.id = pp.PROGRESS_STATUS_ID left join gr_set s on s.id = v.gr_set_id and s.code = 'PROGRESS_STATUS' " +
+                "where pj.id in (:projectIdList) ";
+        List<Map<String, Object>> projectInfoList = namedJdbcTemplate.queryForList(baseSql,queryParams);
+        ArrayList<ProjectInfo> projectInfos = new ArrayList<>();
+        for (Map<String, Object> projectInfoMap : projectInfoList) {
+            ProjectInfo projectInfo = new ProjectInfo();
+            projectInfo.prjId = JdbcMapUtil.getString(projectInfoMap,"id");
+            projectInfo.prjName = JdbcMapUtil.getString(projectInfoMap,"name");
+            projectInfo.statusName = JdbcMapUtil.getString(projectInfoMap,"statusName");
+            projectInfos.add(projectInfo);
+        }
+        HashMap<String, Object> projectInfoResp = new HashMap<>();
+        projectInfoResp.put("projectInfos",projectInfos);
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(projectInfoResp), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
     }
 
     private void updateSingleMap() {
@@ -154,7 +163,6 @@ public class AreaMapPreview {
         Object mapId = params.get("mapId");
         Object strokeOpacity = params.get("strokeOpacity");
         Object projectId = params.get("projectId");
-        Object projectName = params.get("projectName");
         Object strokeWidth = params.get("strokeWidth");
         Object fill = params.get("fill");
         Object stroke = params.get("stroke");
@@ -171,10 +179,7 @@ public class AreaMapPreview {
             baseSql.append("STROKE_OPACITY = " + strokeOpacity + ",");
         }
         if (projectId != null) {
-            baseSql.append("PM_PRJ_ID = '" + projectId + "',");
-        }
-        if (projectName != null) {
-            baseSql.append("PRJ_NAME = '" + projectName + "',");
+            baseSql.append("PRJ_IDS = '" + projectId + "',");
         }
         if (strokeWidth != null) {
             baseSql.append("STROKE_WIDTH = " + strokeWidth + ",");
@@ -205,7 +210,7 @@ public class AreaMapPreview {
         }
 
         baseSql.deleteCharAt(baseSql.lastIndexOf(","));
-        baseSql.append(" where id = '" + mapId.toString() + "'");
+        baseSql.append(" where map_id = '" + mapId.toString() + "'");
 
         JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
         int update = jdbcTemplate.update(baseSql.toString());
@@ -213,6 +218,14 @@ public class AreaMapPreview {
             throw new BaseException("地图信息更新失败");
         }
     }
+
+    //判断数据库是否已经有该地块信息 true 有 false 没有
+    public boolean exist(String mapId) {
+        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        Map<String, Object> numMap = jdbcTemplate.queryForMap("select count(*) num from map_info where map_id = ?", mapId);
+        return JdbcMapUtil.getInt(numMap, "num") > 0 ? true : false;
+    }
+
 
     public static class MapResult {
         public String type;
@@ -238,6 +251,7 @@ public class AreaMapPreview {
 
         public Properties properties;
 
+        public String mapId;
     }
 
     public static class Geometry {
@@ -264,9 +278,16 @@ public class AreaMapPreview {
 
     }
 
+    public static class ProjectInfo {
+        public String prjId;
+        public String prjName;
+        //进度状态
+        public String statusName;
+    }
+
     public static void main(String[] args) {
-        String str="0.10000";
-        String res = str.replaceAll("(0)+$","");
+        String str = "0.10000";
+        String res = str.replaceAll("(0)+$", "");
         System.out.println(res);
     }
 }

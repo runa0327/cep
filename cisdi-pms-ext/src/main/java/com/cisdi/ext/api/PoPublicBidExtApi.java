@@ -115,7 +115,7 @@ public class PoPublicBidExtApi {
 
     private List<CommonDrop> getCommonDropList(String searchName, JdbcTemplate jdbcTemplate, String code) {
         StringBuffer baseSql = new StringBuffer();
-        baseSql.append("select v.name,v.id from gr_set_value v left join gr_set s on s.id = v.gr_set_id where s.code = '").append(code).append("' ");
+        baseSql.append("select v.name,v.id,v.code from gr_set_value v left join gr_set s on s.id = v.gr_set_id where s.code = '").append(code).append("' ");
         if (!Strings.isNullOrEmpty(searchName)) {
             baseSql.append("and v.name like '%").append(searchName).append("%' ");
         }
@@ -126,6 +126,7 @@ public class PoPublicBidExtApi {
             CommonDrop wayDrop = new CommonDrop();
             wayDrop.id = JdbcMapUtil.getString(way, "id");
             wayDrop.name = JdbcMapUtil.getString(way, "name");
+            wayDrop.code = JdbcMapUtil.getString(way, "code");
             commonDrops.add(wayDrop);
         }
         return commonDrops;
