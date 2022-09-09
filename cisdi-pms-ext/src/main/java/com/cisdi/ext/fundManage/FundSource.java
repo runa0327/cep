@@ -118,7 +118,7 @@ public class FundSource {
                 "LEFT JOIN pm_fund_pay y ON y.PM_FUND_SOURCE_ID = s.ID " +
                 "left join pm_prj p on p.id = y.PM_PRJ_ID " +
                 "GROUP BY p.id)temp on temp.id = p.id " +
-                "WHERE s.id = ? GROUP BY p.id", id);
+                "WHERE s.id = ? and p.id is not null GROUP BY p.id", id);
         List<ImplementFund> implementFundList = new ArrayList<>();
         for (Map<String, Object> source : sourceList) {
             ImplementFund implementFund = new ImplementFund();
