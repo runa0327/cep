@@ -2,14 +2,14 @@ spring:
   application:
     name: cpms-qygly-data-transfer
   datasource:
-#    cpms:
-#      username: root
-#      password: 123456
-#      # 注意更改ip和db：
-#      # 注意多数据源不要用url，而要用jdbc-url：
-#      jdbc-url: jdbc:mysql://139.159.138.11:3306/cisdi-pms-out?useSSL=false&serverTimezone=Asia/Shanghai
-#      #      type: com.alibaba.druid.pool.DruidDataSource
-#      driver-class-name: com.mysql.cj.jdbc.Driver
+    #    cpms:
+    #      username: root
+    #      password: 123456
+    #      # 注意更改ip和db：
+    #      # 注意多数据源不要用url，而要用jdbc-url：
+    #      jdbc-url: jdbc:mysql://139.159.138.11:3306/cisdi-pms-out?useSSL=false&serverTimezone=Asia/Shanghai
+    #      #      type: com.alibaba.druid.pool.DruidDataSource
+    #      driver-class-name: com.mysql.cj.jdbc.Driver
     cpms:
       username: qygly
       password: Qygly@123456

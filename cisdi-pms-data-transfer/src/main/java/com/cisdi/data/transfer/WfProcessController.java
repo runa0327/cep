@@ -56,7 +56,7 @@ public class WfProcessController {
             }
         } catch (Exception e) {
             // e.printStackTrace();
-            throw new BaseException("获取资源文件map/echartsData.js异常！",e);
+            throw new BaseException("获取资源文件map/echartsData.js异常！", e);
         } finally {
             if (scanner != null) {
                 scanner.close();

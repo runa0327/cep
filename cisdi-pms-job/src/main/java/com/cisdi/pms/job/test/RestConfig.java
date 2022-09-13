@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class RestConfig {
 
     @Bean
-    public String testRest(){
+    public String testRest() {
         return "sayYes";
     }
 }

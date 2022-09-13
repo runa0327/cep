@@ -3,11 +3,10 @@ package com.cisdi.ext.util;
 import com.cisdi.ext.enums.FileCodeEnum;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,12 +25,12 @@ public class ProFileUtils {
      * 新增项目资料文件夹层级
      */
     public static void createFolder(String projectId) {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        //查询已经有的文件夹
-        List<Map<String, Object>> folderList = jdbcTemplate.queryForList("select * from PF_FOLDER where  PM_PRJ_ID=?", projectId);
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        // 查询已经有的文件夹
+        List<Map<String, Object>> folderList = myJdbcTemplate.queryForList("select * from PF_FOLDER where  PM_PRJ_ID=?", projectId);
 
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select ID,`CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID from PF_FOLDER where IS_TEMPLATE ='1';");
-        //新增项目文件夹目录
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ID,`CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID from PF_FOLDER where IS_TEMPLATE ='1';");
+        // 新增项目文件夹目录
         list.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("PF_FOLDER_PID")))).peek(m -> {
             String id = "";
             Optional<Map<String, Object>> optional = folderList.stream().filter(o -> Objects.equals(String.valueOf(m.get("CODE")), String.valueOf(o.get("CODE")))).findAny();
@@ -70,17 +69,17 @@ public class ProFileUtils {
      * @param codeEnum
      */
     public static void insertProFile(String projectId, String fileIds, FileCodeEnum codeEnum) {
-        if (Strings.isNullOrEmpty(fileIds)){
+        if (Strings.isNullOrEmpty(fileIds)) {
             return;
         }
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         try {
             String fid = "";
-            List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from pf_folder where PM_PRJ_ID=?", projectId);
-            List<Map<String, Object>> folderList = jdbcTemplate.queryForList("select `CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID from PF_FOLDER where IS_TEMPLATE ='1';");
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pf_folder where PM_PRJ_ID=?", projectId);
+            List<Map<String, Object>> folderList = myJdbcTemplate.queryForList("select `CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID from PF_FOLDER where IS_TEMPLATE ='1';");
             if (CollectionUtils.isEmpty(list) || folderList.size() != list.size()) {
                 ProFileUtils.createFolder(projectId);
-                Map<String, Object> map = jdbcTemplate.queryForMap("select * from pf_folder where PM_PRJ_ID=? and `CODE`=?", projectId, codeEnum.getCode());
+                Map<String, Object> map = myJdbcTemplate.queryForMap("select * from pf_folder where PM_PRJ_ID=? and `CODE`=?", projectId, codeEnum.getCode());
                 fid = String.valueOf(map.get("ID"));
             } else {
                 Optional<Map<String, Object>> obj = list.stream().filter(p -> Objects.equals(codeEnum.getCode(), String.valueOf(p.get("CODE")))).findAny();

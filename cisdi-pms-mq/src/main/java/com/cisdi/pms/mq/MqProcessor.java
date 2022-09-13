@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -36,11 +38,11 @@ public class MqProcessor {
 
 
         try {
-            //查询项目ID
+            // 查询项目ID
             Map<String, Object> dataMap = jdbcTemplate.queryForMap("select * from " + entCode + " where id=?", entityRecordId);
             String projectId = String.valueOf(dataMap.get("PM_PRJ_ID"));
 
-            //查询流程相关的进度计划节点
+            // 查询流程相关的进度计划节点
             List<Map<String, Object>> planNodeList = jdbcTemplate.queryForList("select pppn.* from pm_pro_plan_node pppn \n" +
                     "left join pm_pro_plan ppp on pppn.PM_PRO_PLAN_ID = ppp.id\n" +
                     "left join wf_node wn on pppn.LINKED_WF_NODE_ID = wn.id and pppn.LINKED_WF_PROCESS_ID = wn.WF_PROCESS_ID\n" +
@@ -55,7 +57,7 @@ public class MqProcessor {
                 }
                 String procInstId = String.valueOf(procInstMap.get("ID"));
                 String nodeInstId = String.valueOf(currentNodeInstMap.get("node_inst_id"));
-                //修改进度计划节点状态和实际完成时间
+                // 修改进度计划节点状态和实际完成时间
                 for (Map<String, Object> item : planNodeList) {
                     jdbcTemplate.update("update PM_PRO_PLAN_NODE set ACTUAL_COMPL_DATE=?," +
                                     "PROGRESS_STATUS_ID=?," +

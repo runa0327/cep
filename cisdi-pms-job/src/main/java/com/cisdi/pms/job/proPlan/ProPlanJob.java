@@ -43,7 +43,7 @@ public class ProPlanJob {
             return;
         }
 
-        //没50条开启线程执行
+        // 没50条开启线程执行
         List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from pm_prj where `STATUS`='AP'");
         List<List<Map<String, Object>>> dataList = ListUtils.split(list, 50);
         AtomicInteger index = new AtomicInteger(0);

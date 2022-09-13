@@ -1,26 +1,25 @@
 package com.cisdi.ext.demo;
 
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.ext.ExtBrowserWindowToOpen;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
 public class ActExt {
     public void act1() {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
             String csCommId = entityRecord.csCommId;
-            int update = jdbcTemplate.update("update PM_PRJ_INVEST3 t set t.PRJ_SITUATION  = ? where t.id=?", UUID.randomUUID().toString(), csCommId);
+            int update = myJdbcTemplate.update("update PM_PRJ_INVEST3 t set t.PRJ_SITUATION  = ? where t.id=?", UUID.randomUUID().toString(), csCommId);
             log.info("已更新：{}", update);
         }
 

@@ -2,8 +2,8 @@ package com.cisdi.ext.proImg;
 
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
@@ -31,8 +31,8 @@ public class ProImgExt {
         String json = JsonUtil.toJson(map);
         RequestParam param = JsonUtil.fromJson(json, RequestParam.class);
         String projectId = param.pmPrjId;
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select ID,CODE,NAME,REMARK,PM_PRJ_ID,CPMS_UUID,SEQ_NO,CPMS_ID," +
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ID,CODE,NAME,REMARK,PM_PRJ_ID,CPMS_UUID,SEQ_NO,CPMS_ID," +
                 "ifnull(PM_IMG_PRO_TYPE_PID,0) PM_IMG_PRO_TYPE_PID from PM_IMG_PRO_TYPE where PM_PRJ_ID=?", projectId);
         List<ProImgType> typeList = list.stream().map(this::convertProImgType).collect(Collectors.toList());
         List<ImageType> res = typeList.stream().map(p -> {
@@ -41,7 +41,7 @@ public class ProImgExt {
             type.name = p.name;
             type.seqNo = p.seqNo;
             type.pid = p.pid;
-            type.list = getImageData(p.id, jdbcTemplate);
+            type.list = getImageData(p.id, myJdbcTemplate);
             return type;
         }).collect(Collectors.toList());
 
@@ -55,8 +55,8 @@ public class ProImgExt {
         }
     }
 
-    private List<ProImg> getImageData(String typeId, JdbcTemplate jdbcTemplate) {
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select pip.ID,pip.CODE,pip.NAME,pip.REMARK,PHOTO_DATE,pip.PM_PRJ_ID,PM_IMG_PRO_TYPE_ID,VISUAL_PROGRESS,CPMS_UUID,CPMS_ID,\n" +
+    private List<ProImg> getImageData(String typeId, MyJdbcTemplate myJdbcTemplate) {
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pip.ID,pip.CODE,pip.NAME,pip.REMARK,PHOTO_DATE,pip.PM_PRJ_ID,PM_IMG_PRO_TYPE_ID,VISUAL_PROGRESS,CPMS_UUID,CPMS_ID,\n" +
                 "fl.id as c_img_id,fl.FILE_INLINE_URL as c_img_url,fe.id as p_img_id,fe.FILE_INLINE_URL as p_img_url\n" +
                 "from PM_IMG_PRO pip \n" +
                 "left join fl_file fl on pip.COVER_IMAGE = fl.id\n" +
@@ -74,8 +74,8 @@ public class ProImgExt {
         String json = JsonUtil.toJson(map);
         RequestParam param = JsonUtil.fromJson(json, RequestParam.class);
         String projectId = param.pmPrjId;
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select ID,CODE,NAME,REMARK,PM_PRJ_ID,CPMS_UUID,SEQ_NO,CPMS_ID," +
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ID,CODE,NAME,REMARK,PM_PRJ_ID,CPMS_UUID,SEQ_NO,CPMS_ID," +
                 "ifnull(PM_IMG_PRO_TYPE_PID,0) PM_IMG_PRO_TYPE_PID from PM_IMG_PRO_TYPE where PM_PRJ_ID=?", projectId);
 
         List<ProImgType> typeList = list.stream().map(this::convertProImgType).collect(Collectors.toList());
@@ -102,8 +102,8 @@ public class ProImgExt {
         String json = JsonUtil.toJson(map);
         RequestParam param = JsonUtil.fromJson(json, RequestParam.class);
         String typeId = param.typeId;
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select pip.ID,pip.CODE,pip.NAME,pip.REMARK,PHOTO_DATE,pip.PM_PRJ_ID,PM_IMG_PRO_TYPE_ID,VISUAL_PROGRESS,CPMS_UUID,CPMS_ID,\n" +
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pip.ID,pip.CODE,pip.NAME,pip.REMARK,PHOTO_DATE,pip.PM_PRJ_ID,PM_IMG_PRO_TYPE_ID,VISUAL_PROGRESS,CPMS_UUID,CPMS_ID,\n" +
                 "fl.id as c_img_id,fl.FILE_INLINE_URL as c_img_url,fe.id as p_img_id,fe.FILE_INLINE_URL as p_img_url\n" +
                 "from PM_IMG_PRO pip \n" +
                 "left join fl_file fl on pip.COVER_IMAGE = fl.id\n" +

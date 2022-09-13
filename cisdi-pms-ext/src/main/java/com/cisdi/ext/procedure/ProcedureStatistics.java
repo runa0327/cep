@@ -5,9 +5,9 @@ import com.cisdi.ext.model.BasePageEntity;
 import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class ProcedureStatistics {
 
     public void getProcedureStatisticsList() {
-        //获取参数
+        // 获取参数
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         String inputJson = JsonUtil.toJson(inputMap);
         Input input = JsonUtil.fromJson(inputJson, Input.class);
@@ -30,10 +30,10 @@ public class ProcedureStatistics {
         Integer pageIndex = input.getPageIndex();
         Integer pageSize = input.getPageSize();
 
-        //获取数据
-        //表头
+        // 获取数据
+        // 表头
         List<Map<String, Object>> headList = getFixedNodeName();
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
         StringBuffer baseSql = new StringBuffer("select pj.id projectId,pj.NAME projectName,");
         for (Map<String, Object> head : headList) {
@@ -44,7 +44,7 @@ public class ProcedureStatistics {
                             "'%Y-%m-%d')),concat('完成时间：',pn.ACTUAL_COMPL_DATE)),'')) '")
                     .append(nodeName).append("',");
         }
-        //删除最后一个逗号
+        // 删除最后一个逗号
         baseSql.deleteCharAt(baseSql.length() - 1);
         baseSql.append(" from pm_pro_plan pp \n" +
                 "left join pm_prj pj on pj.id = pp.PM_PRJ_ID \n" +
@@ -55,15 +55,15 @@ public class ProcedureStatistics {
         }
         baseSql.append("group by pj.id ");
 
-        //分页
+        // 分页
         Integer start = pageSize * (pageIndex - 1);
         baseSql.append("limit " + start + "," + pageSize);
 
         log.info(baseSql.toString());
-        //查询
-        List<Map<String, Object>> contentList = jdbcTemplate.queryForList(baseSql.toString());
+        // 查询
+        List<Map<String, Object>> contentList = myJdbcTemplate.queryForList(baseSql.toString());
 
-        //响应组装
+        // 响应组装
         HashMap<String, Object> row0Name = new HashMap<>();
         row0Name.put("name", "项目/任务节点");
         headList.add(0, row0Name);
@@ -73,22 +73,22 @@ public class ProcedureStatistics {
         result.put("total", contentList.size());
         result.put("headList", headList);
 
-        //响应
+        // 响应
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
 
     }
 
     public List<Map<String, Object>> getFixedNodeName() {
-        //查询表头并排序
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        //所有表头
-        List<Map<String, Object>> headers = jdbcTemplate.queryForList("select distinct pn.NAME nodeName, pn" +
+        // 查询表头并排序
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        // 所有表头
+        List<Map<String, Object>> headers = myJdbcTemplate.queryForList("select distinct pn.NAME nodeName, pn" +
                 ".SCHEDULE_NAME nodeNameId from " +
                 "pm_pro_plan_node pn where pn.SHOW_IN_EARLY_PROC = 1 and pn.SCHEDULE_NAME is not null  and pn.level =" +
                 " '3'");
-        //所有可显示在前期手续的节点
-//        List<Map<String, Object>> allVisualNode = jdbcTemplate.queryForList("select distinct PM_PRO_PLAN_NODE_PID,
+        // 所有可显示在前期手续的节点
+//        List<Map<String, Object>> allVisualNode = myJdbcTemplate.queryForList("select distinct PM_PRO_PLAN_NODE_PID,
 //        ID,NAME," +
 //                "SCHEDULE_NAME,LEVEL,SEQ_NO from pm_pro_plan_node where SHOW_IN_EARLY_PROC = 1 and SCHEDULE_NAME is
 //                " +
@@ -97,8 +97,8 @@ public class ProcedureStatistics {
         return headers;
     }
 
-    //app前期手续列表
-    public void getProjectStatistic(){
+    // app前期手续列表
+    public void getProjectStatistic() {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         String inputJson = JsonUtil.toJson(inputMap);
         Input input = JsonUtil.fromJson(inputJson, Input.class);
@@ -115,27 +115,27 @@ public class ProcedureStatistics {
                 "where pn.LEVEL = 3 and pj.id is not null " +
                 "group by pj.id " +
                 "order by pj.CRT_DT desc ";
-        //查询总数sql
+        // 查询总数sql
         String totalSql = baseSql;
-        //分页
+        // 分页
         Integer start = input.pageSize * (input.pageIndex - 1);
         baseSql += ("limit " + start + "," + input.pageSize);
 
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> statisticList = jdbcTemplate.queryForList(baseSql);
-        List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> statisticList = myJdbcTemplate.queryForList(baseSql);
+        List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
 
-        //封装实体
+        // 封装实体
         ArrayList<ProjectStatistic> projectStatistics = new ArrayList<>();
         for (Map<String, Object> statisticMap : statisticList) {
             ProjectStatistic projectStatistic = new ProjectStatistic();
-            projectStatistic.projectId = JdbcMapUtil.getString(statisticMap,"projectId");
-            projectStatistic.projectName = JdbcMapUtil.getString(statisticMap,"projectName");
-            projectStatistic.notStarted = JdbcMapUtil.getInt(statisticMap,"notStarted");
-            projectStatistic.inProgress = JdbcMapUtil.getInt(statisticMap,"inProgress");
-            projectStatistic.finished = JdbcMapUtil.getInt(statisticMap,"finished");
-            projectStatistic.onPause = JdbcMapUtil.getInt(statisticMap,"onPause");
-            projectStatistic.notInvolved = JdbcMapUtil.getInt(statisticMap,"notInvolved");
+            projectStatistic.projectId = JdbcMapUtil.getString(statisticMap, "projectId");
+            projectStatistic.projectName = JdbcMapUtil.getString(statisticMap, "projectName");
+            projectStatistic.notStarted = JdbcMapUtil.getInt(statisticMap, "notStarted");
+            projectStatistic.inProgress = JdbcMapUtil.getInt(statisticMap, "inProgress");
+            projectStatistic.finished = JdbcMapUtil.getInt(statisticMap, "finished");
+            projectStatistic.onPause = JdbcMapUtil.getInt(statisticMap, "onPause");
+            projectStatistic.notInvolved = JdbcMapUtil.getInt(statisticMap, "notInvolved");
             projectStatistics.add(projectStatistic);
         }
         StatisticList statistics = new StatisticList();
@@ -145,8 +145,8 @@ public class ProcedureStatistics {
         ExtJarHelper.returnValue.set(outputMap);
     }
 
-    //app前期手续详情
-    public void getStatisticDetail(){
+    // app前期手续详情
+    public void getStatisticDetail() {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         String projectId = JdbcMapUtil.getString(inputMap, "projectId");
         String baseSql = "select pj.id projectId,pj.NAME projectName,pn.name nodeName,v.name processStatus " +
@@ -155,22 +155,22 @@ public class ProcedureStatistics {
                 "left join gr_set_value v on v.id = pn.PROGRESS_STATUS_ID " +
                 "left join gr_set s on s.id = v.GR_SET_ID and s.code = 'PROGRESS_STATUS' " +
                 "where pn.LEVEL = 3 and pj.id is not null and pj.id = ?";
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> nodeStatus = jdbcTemplate.queryForList(baseSql, projectId);
-        //构造详情返回对象
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> nodeStatus = myJdbcTemplate.queryForList(baseSql, projectId);
+        // 构造详情返回对象
         NodeStatusDetailResp detailResp = new NodeStatusDetailResp();
-        //项目id
+        // 项目id
         detailResp.projectId = projectId;
-        //项目名
-        if (!CollectionUtils.isEmpty(nodeStatus)){
-            detailResp.projectName = JdbcMapUtil.getString(nodeStatus.get(0),"projectName");
+        // 项目名
+        if (!CollectionUtils.isEmpty(nodeStatus)) {
+            detailResp.projectName = JdbcMapUtil.getString(nodeStatus.get(0), "projectName");
         }
-        //节点任务状态列表
+        // 节点任务状态列表
         ArrayList<PrjNodeStatus> prjNodeStatusList = new ArrayList<>();
         for (Map<String, Object> status : nodeStatus) {
             PrjNodeStatus prjNodeStatus = new PrjNodeStatus();
-            prjNodeStatus.nodeName = JdbcMapUtil.getString(status,"nodeName");
-            prjNodeStatus.processStatus = JdbcMapUtil.getString(status,"processStatus");
+            prjNodeStatus.nodeName = JdbcMapUtil.getString(status, "nodeName");
+            prjNodeStatus.processStatus = JdbcMapUtil.getString(status, "processStatus");
             prjNodeStatusList.add(prjNodeStatus);
         }
         detailResp.prjNodeStatuses = prjNodeStatusList;
@@ -192,37 +192,40 @@ public class ProcedureStatistics {
     }
 
     public static class ProjectStatistic {
-        //项目id
+        // 项目id
         public String projectId;
-        //项目名
+        // 项目名
         public String projectName;
-        //未开始
+        // 未开始
         public Integer notStarted;
-        //进行中
+        // 进行中
         public Integer inProgress;
-        //已完成
+        // 已完成
         public Integer finished;
-        //暂停中
+        // 暂停中
         public Integer onPause;
-        //未涉及
+        // 未涉及
         public Integer notInvolved;
 
     }
+
     public static class PrjNodeStatus {
-        //节点任务名称
+        // 节点任务名称
         public String nodeName;
-        //完成状态
+        // 完成状态
         public String processStatus;
     }
+
     public static class NodeStatusDetailResp {
-        //项目id
+        // 项目id
         public String projectId;
-        //项目名
+        // 项目名
         public String projectName;
-        //节点状态列表
+        // 节点状态列表
         public List<PrjNodeStatus> prjNodeStatuses;
     }
-    public static class StatisticList{
+
+    public static class StatisticList {
         public List<ProjectStatistic> projectStatistics;
         public Integer total;
     }

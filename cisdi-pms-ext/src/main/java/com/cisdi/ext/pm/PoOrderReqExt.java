@@ -2,11 +2,11 @@ package com.cisdi.ext.pm;
 
 import com.cisdi.ext.util.DateTimeUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -61,41 +61,41 @@ public class PoOrderReqExt {
     }
 
     private void checkFirst(String status) {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Date date = new Date();
         String now = DateTimeUtil.dateToString(date);
-        //当前登录人
+        // 当前登录人
         String userId = ExtJarHelper.loginInfo.get().userName;
 
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         String csCommId = entityRecord.csCommId;
-        //流程id
+        // 流程id
         String procInstId = ExtJarHelper.procInstId.get();
-        //审批意见
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select u.id u_id,u.code u_code,u.name u_name,tk.user_comment from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id", procInstId);
+        // 审批意见
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select u.id u_id,u.code u_code,u.name u_name,tk.user_comment from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id", procInstId);
         String comment = "";
-        if (!CollectionUtils.isEmpty(list)){
+        if (!CollectionUtils.isEmpty(list)) {
             comment = list.get(0).get("user_comment") == null ? null : list.get(0).get("user_comment").toString();
         }
-        if ("first".equals(status)){
+        if ("first".equals(status)) {
             Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
-                    .set("APPROVAL_USER_ONE", userId).set("APPROVAL_DATE_ONE",now).set("APPROVAL_MESSAGE",comment).exec();
+                    .set("APPROVAL_USER_ONE", userId).set("APPROVAL_DATE_ONE", now).set("APPROVAL_MESSAGE", comment).exec();
             log.info("已更新：{}", exec);
-        } else if ("second".equals(status)){
+        } else if ("second".equals(status)) {
             Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
-                    .set("APPROVAL_USER_TWO", userId).set("APPROVAL_DATE_TWO",now).set("EARLY_COMMENT",comment).exec();
+                    .set("APPROVAL_USER_TWO", userId).set("APPROVAL_DATE_TWO", now).set("EARLY_COMMENT", comment).exec();
             log.info("已更新：{}", exec);
-        } else if ("third".equals(status)){
+        } else if ("third".equals(status)) {
             Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
-                    .set("APPROVAL_USER_THREE", userId).set("APPROVAL_DATE_THREE",now).set("DESIGN_COMMENT",comment).exec();
+                    .set("APPROVAL_USER_THREE", userId).set("APPROVAL_DATE_THREE", now).set("DESIGN_COMMENT", comment).exec();
             log.info("已更新：{}", exec);
-        } else if ("fourth".equals(status)){
+        } else if ("fourth".equals(status)) {
             Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
-                    .set("APPROVAL_USER_FOUR", userId).set("APPROVAL_DATE_FOUR",now).set("APPROVAL_COMMENT_ONE",comment).exec();
+                    .set("APPROVAL_USER_FOUR", userId).set("APPROVAL_DATE_FOUR", now).set("APPROVAL_COMMENT_ONE", comment).exec();
             log.info("已更新：{}", exec);
-        } else if ("fifth".equals(status)){
+        } else if ("fifth".equals(status)) {
             Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
-                    .set("APPROVAL_USER_FIVE", userId).set("APPROVAL_DATE_FIVE",now).set("USER_COMMENT",comment).exec();
+                    .set("APPROVAL_USER_FIVE", userId).set("APPROVAL_DATE_FIVE", now).set("USER_COMMENT", comment).exec();
             log.info("已更新：{}", exec);
         }
     }
@@ -103,24 +103,24 @@ public class PoOrderReqExt {
     /**
      * 流程发起之时，合同总金额和明细校验
      */
-    public void checkAmt(){
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+    public void checkAmt() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        //主表单合同总金额
+        // 主表单合同总金额
         String sumAmt = entityRecord.valueMap.get("CONTRACT_PRICE").toString();
-        //查询明细表合同总金额
+        // 查询明细表合同总金额
         String sql = "select AMT from PM_ORDER_COST_DETAIL where CONTRACT_ID = ?";
-        List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql,entityRecord.csCommId);
-        if (CollectionUtils.isEmpty(list1)){
+        List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql, entityRecord.csCommId);
+        if (CollectionUtils.isEmpty(list1)) {
             throw new BaseException("费用明细不能为空！");
         }
         BigDecimal account = getSumAmt(list1);
-        if (account.compareTo(new BigDecimal(sumAmt)) != 0){
+        if (account.compareTo(new BigDecimal(sumAmt)) != 0) {
             throw new BaseException("费用明细内合同金额总和与合同总金额不同，请核查！");
         }
     }
 
-    //汇总求和
+    // 汇总求和
     private BigDecimal getSumAmt(List<Map<String, Object>> list) {
         BigDecimal sum = new BigDecimal(0);
         for (Map<String, Object> tmp : list) {

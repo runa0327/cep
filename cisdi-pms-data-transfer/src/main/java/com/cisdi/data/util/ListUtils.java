@@ -11,6 +11,7 @@ public class ListUtils {
 
     /**
      * 集合按长度分组
+     *
      * @param list 集合
      * @param size 分割大小，100则为每100条数据为一组
      * @param <T>
@@ -37,7 +38,7 @@ public class ListUtils {
                 subList = null;
             }
         }
-        //补充最后一页
+        // 补充最后一页
         if (subList != null) {
             result.add(subList);
         }
@@ -46,8 +47,9 @@ public class ListUtils {
 
     /**
      * 集合按长度分组
+     *
      * @param list 集合
-     * @param size  分割大小，100则为每100条数据为一组
+     * @param size 分割大小，100则为每100条数据为一组
      * @return <T>
      */
     public static <T> List<List<T>> split(List<T> list, int size) {

@@ -3,17 +3,14 @@ package com.cisdi.ext.invest;
 import com.cisdi.ext.util.DoubleUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
-import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
-import io.netty.util.internal.ObjectUtil;
-import lombok.Data;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -26,9 +23,9 @@ public class InvestEstActCompareExt {
         String json = JsonUtil.toJson(map);
         InvestEstActCompareParam param = JsonUtil.fromJson(json, InvestEstActCompareParam.class);
         String pmPrjId = param.pmPrjId;
-        //查询费用类型
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from PM_EXP_TYPE");
+        // 查询费用类型
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_EXP_TYPE");
         List<InvestEstActCompareRow> investEstActCompareRowList = list.stream().map(p -> {
             InvestEstActCompareRow row = new InvestEstActCompareRow();
             row.expTypeId = String.valueOf(p.get("ID"));
@@ -51,7 +48,7 @@ public class InvestEstActCompareExt {
         }).collect(Collectors.toList());
 
         // 获取可研估算、初设概算、预算财评：
-        List<Map<String, Object>> investEstList = jdbcTemplate.queryForList("select t.ID, t.VER, t.TS, t.IS_PRESET, t.CRT_DT, t.CRT_USER_ID, t.LAST_MODI_DT, t.LAST_MODI_USER_ID, t.STATUS, t.LK_WF_INST_ID, t.CODE, t.NAME, t.REMARK, ifnull(t.AMT,0) as AMT, t.PM_INVEST_EST_ID, t.PM_EXP_TYPE_ID, t.CPMS_UUID, t.CPMS_ID, t.PM_INVEST_EST_DTL_PID, t.SEQ_NO,a.INVEST_EST_TYPE_ID as INVEST_EST_TYPE_ID,gsv.`code`  as INVEST_EST_TYPE\n" +
+        List<Map<String, Object>> investEstList = myJdbcTemplate.queryForList("select t.ID, t.VER, t.TS, t.IS_PRESET, t.CRT_DT, t.CRT_USER_ID, t.LAST_MODI_DT, t.LAST_MODI_USER_ID, t.STATUS, t.LK_WF_INST_ID, t.CODE, t.NAME, t.REMARK, ifnull(t.AMT,0) as AMT, t.PM_INVEST_EST_ID, t.PM_EXP_TYPE_ID, t.CPMS_UUID, t.CPMS_ID, t.PM_INVEST_EST_DTL_PID, t.SEQ_NO,a.INVEST_EST_TYPE_ID as INVEST_EST_TYPE_ID,gsv.`code`  as INVEST_EST_TYPE\n" +
                 "from PM_INVEST_EST_DTL t \n" +
                 "left join PM_INVEST_EST a on t.PM_INVEST_EST_ID = a.id \n" +
                 "left join gr_set_value gsv on gsv.id = a.INVEST_EST_TYPE_ID\n" +
@@ -59,27 +56,27 @@ public class InvestEstActCompareExt {
                 "where a.PM_PRJ_ID=?;", pmPrjId);
 
 
-        //按投资测算类型分组
+        // 按投资测算类型分组
         Map<String, List<Map<String, Object>>> typeMap = investEstList.stream().collect(Collectors.groupingBy(x -> x.get("INVEST_EST_TYPE").toString()));
         for (InvestEstActCompareRow investEstActCompareRow : investEstActCompareRowList) {
             for (String key : typeMap.keySet()) {
                 List<Map<String, Object>> mapData = typeMap.get(key);
                 switch (key) {
                     case "invest0":
-                        Optional<Map<String, Object>> mapOptional = mapData.stream().filter(p ->  Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")),String.valueOf(investEstActCompareRow.expTypeId))).findAny();
-                        mapOptional.ifPresent(stringObjectMap -> investEstActCompareRow.invest0Amt = JdbcMapUtil.getDouble(stringObjectMap,"AMT"));
+                        Optional<Map<String, Object>> mapOptional = mapData.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")), String.valueOf(investEstActCompareRow.expTypeId))).findAny();
+                        mapOptional.ifPresent(stringObjectMap -> investEstActCompareRow.invest0Amt = JdbcMapUtil.getDouble(stringObjectMap, "AMT"));
                         break;
                     case "invest1":
-                        Optional<Map<String, Object>> optionalInvestEstActCompareRow = mapData.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")),String.valueOf(investEstActCompareRow.expTypeId))).findAny();
-                        optionalInvestEstActCompareRow.ifPresent(stringObjectMap -> investEstActCompareRow.invest1Amt = JdbcMapUtil.getDouble(stringObjectMap,"AMT"));
+                        Optional<Map<String, Object>> optionalInvestEstActCompareRow = mapData.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")), String.valueOf(investEstActCompareRow.expTypeId))).findAny();
+                        optionalInvestEstActCompareRow.ifPresent(stringObjectMap -> investEstActCompareRow.invest1Amt = JdbcMapUtil.getDouble(stringObjectMap, "AMT"));
                         break;
                     case "invest2":
-                        Optional<Map<String, Object>> optionalMap = mapData.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")),String.valueOf(investEstActCompareRow.expTypeId))).findAny();
-                        optionalMap.ifPresent(stringObjectMap -> investEstActCompareRow.invest2Amt = JdbcMapUtil.getDouble(stringObjectMap,"AMT"));
+                        Optional<Map<String, Object>> optionalMap = mapData.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")), String.valueOf(investEstActCompareRow.expTypeId))).findAny();
+                        optionalMap.ifPresent(stringObjectMap -> investEstActCompareRow.invest2Amt = JdbcMapUtil.getDouble(stringObjectMap, "AMT"));
                         break;
                     case "invest3":
-                        Optional<Map<String, Object>> optional = mapData.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")),String.valueOf(investEstActCompareRow.expTypeId))).findAny();
-                        optional.ifPresent(stringObjectMap -> investEstActCompareRow.invest3Amt = JdbcMapUtil.getDouble(stringObjectMap,"AMT"));
+                        Optional<Map<String, Object>> optional = mapData.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")), String.valueOf(investEstActCompareRow.expTypeId))).findAny();
+                        optional.ifPresent(stringObjectMap -> investEstActCompareRow.invest3Amt = JdbcMapUtil.getDouble(stringObjectMap, "AMT"));
                         break;
                     default:
                         throw new BaseException("数据错误！");
@@ -87,27 +84,27 @@ public class InvestEstActCompareExt {
             }
         }
 
-        //获取合同明细进度
-        List<Map<String, Object>> orderProList = jdbcTemplate.queryForList("select pod.*,ifnull(sum(podp.COMPL_TOTAL_AMT),0) as COMPL_TOTAL_AMT from PO_ORDER_DTL pod \n" +
+        // 获取合同明细进度
+        List<Map<String, Object>> orderProList = myJdbcTemplate.queryForList("select pod.*,ifnull(sum(podp.COMPL_TOTAL_AMT),0) as COMPL_TOTAL_AMT from PO_ORDER_DTL pod \n" +
                 "left join po_order po on po.id = pod.PO_ORDER_ID\n" +
                 "left join PO_ORDER_DTL_PRO podp on  podp.PO_ORDER_DTL_ID = pod.id\n" +
                 "where po.PM_PRJ_ID=? group by pod.id\n", pmPrjId);
 
-        //获取合同明细付款情况
-        List<Map<String, Object>> orderPayList = jdbcTemplate.queryForList("select pod.*,ifnull(sum(pop.PAY_AMT),0) as PAY_AMT from PO_ORDER_DTL pod \n" +
+        // 获取合同明细付款情况
+        List<Map<String, Object>> orderPayList = myJdbcTemplate.queryForList("select pod.*,ifnull(sum(pop.PAY_AMT),0) as PAY_AMT from PO_ORDER_DTL pod \n" +
                 "left join po_order po on po.id = pod.PO_ORDER_ID\n" +
                 "left join PO_ORDER_PAYMENT pop on  pop.PO_ORDER_DTL_ID = pod.id\n" +
                 "where po.PM_PRJ_ID=? group by pod.id", pmPrjId);
 
         investEstActCompareRowList.forEach(item -> {
-            Optional<Map<String, Object>> optional = orderProList.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")),String.valueOf(item.expTypeId))).findAny();
+            Optional<Map<String, Object>> optional = orderProList.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")), String.valueOf(item.expTypeId))).findAny();
             optional.ifPresent(stringObjectMap -> item.complAmt = Double.parseDouble(String.valueOf(stringObjectMap.get("COMPL_TOTAL_AMT"))));
 
-            Optional<Map<String, Object>> optionalMap = orderPayList.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")),String.valueOf(item.expTypeId))).findAny();
+            Optional<Map<String, Object>> optionalMap = orderPayList.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_EXP_TYPE_ID")), String.valueOf(item.expTypeId))).findAny();
             optionalMap.ifPresent(stringObjectMap -> item.payAmt = Double.parseDouble(String.valueOf(stringObjectMap.get("PAY_AMT"))));
         });
 
-        //构建树结构
+        // 构建树结构
         List<InvestEstActCompareRow> rowTree = investEstActCompareRowList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
             List<InvestEstActCompareRow> child = getChildNode(m, investEstActCompareRowList);
             m.children = child;

@@ -3,9 +3,9 @@ package com.cisdi.ext.pmLand;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
@@ -33,7 +33,7 @@ public class PmLandExt {
         int pageSize = param.pageSize;
         int pageIndex = param.pageIndex;
 
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuilder sb = new StringBuilder();
         sb.append("select ID,CODE,NAME,REMARK,DEMOLITION_COST,DEMOLITION_PROGRESS,ATT_FILE_GROUP_ID from PM_LAND_ACQUISITION_RECORD where 1=1 ");
         if (Strings.isNotEmpty(name)) {
@@ -42,12 +42,12 @@ public class PmLandExt {
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
-        List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
         List<PmLandRecord> records = list.stream().map(this::convertPmLandRecord).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(records)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
-            List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
+            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
             OutSide outSide = new OutSide();
             outSide.total = totalList.size();
             outSide.list = records;
@@ -64,12 +64,12 @@ public class PmLandExt {
         String json = JsonUtil.toJson(map);
         RequestParam param = JsonUtil.fromJson(json, RequestParam.class);
         String recordId = param.recordId;
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         try {
-            Map<String, Object> stringObjectMap = jdbcTemplate.queryForMap("select ID,CODE,NAME,REMARK,DEMOLITION_COST,DEMOLITION_PROGRESS,ATT_FILE_GROUP_ID from PM_LAND_ACQUISITION_RECORD where id=?", recordId);
+            Map<String, Object> stringObjectMap = myJdbcTemplate.queryForMap("select ID,CODE,NAME,REMARK,DEMOLITION_COST,DEMOLITION_PROGRESS,ATT_FILE_GROUP_ID from PM_LAND_ACQUISITION_RECORD where id=?", recordId);
             PmLandRecord record = this.convertPmLandRecord(stringObjectMap);
             if (Strings.isNotEmpty(record.attFileGroupId)) {
-                NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(Objects.requireNonNull(jdbcTemplate.getDataSource()));
+                NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(Objects.requireNonNull(myJdbcTemplate.getDataSource()));
                 String sql = "select * from fl_file where id in (:ids)";
                 Map<String, Object> dataParam = new HashMap<>();
                 dataParam.put("ids", Arrays.asList(record.attFileGroupId.split(",")));
@@ -102,8 +102,8 @@ public class PmLandExt {
         String json = JsonUtil.toJson(map);
         RequestParam param = JsonUtil.fromJson(json, RequestParam.class);
         String recordId = param.recordId;
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select ID,CODE,NAME,REMARK,POSITION_X,POSITION_Y,CPMS_UUID,PM_LAND_ACQUISITION_RECORD_ID,CPMS_ID from PM_LAND_ACQUISITION_INFO where PM_LAND_ACQUISITION_RECORD_ID=?", recordId);
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ID,CODE,NAME,REMARK,POSITION_X,POSITION_Y,CPMS_UUID,PM_LAND_ACQUISITION_RECORD_ID,CPMS_ID from PM_LAND_ACQUISITION_INFO where PM_LAND_ACQUISITION_RECORD_ID=?", recordId);
         List<PmLandInfo> landInfoList = list.stream().map(p -> {
             PmLandInfo info = new PmLandInfo();
             info.id = JdbcMapUtil.getString(p, "ID");
@@ -129,8 +129,8 @@ public class PmLandExt {
         String json = JsonUtil.toJson(map);
         RequestParam param = JsonUtil.fromJson(json, RequestParam.class);
         String infoId = param.infoId;
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select ID,CODE,NAME,REMARK,CPMS_UUID,CPMS_ID,PROCESS_DATE,PROCESS_REMARK,PM_LAND_ACQUISITION_INFO_ID,AUTHOR_UNIT,OTHER_RESPONSOR from PM_LAND_ACQUISITION_PROGRESS where PM_LAND_ACQUISITION_INFO_ID=?", infoId);
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ID,CODE,NAME,REMARK,CPMS_UUID,CPMS_ID,PROCESS_DATE,PROCESS_REMARK,PM_LAND_ACQUISITION_INFO_ID,AUTHOR_UNIT,OTHER_RESPONSOR from PM_LAND_ACQUISITION_PROGRESS where PM_LAND_ACQUISITION_INFO_ID=?", infoId);
         List<PmLandPro> landProList = list.stream().map(p -> {
             PmLandPro landPro = new PmLandPro();
             landPro.id = JdbcMapUtil.getString(p, "ID");
@@ -175,8 +175,8 @@ public class PmLandExt {
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
         List<PmLandPay> payList = list.stream().map(p -> {
             PmLandPay pay = new PmLandPay();
             pay.id = JdbcMapUtil.getString(p, "ID");
@@ -190,7 +190,7 @@ public class PmLandExt {
         if (CollectionUtils.isEmpty(payList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
-            List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
+            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
             OutSide outSide = new OutSide();
             outSide.total = totalList.size();
             outSide.payList = payList;
@@ -207,9 +207,9 @@ public class PmLandExt {
         String json = JsonUtil.toJson(map);
         RequestParam param = JsonUtil.fromJson(json, RequestParam.class);
         String payId = param.payId;
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         try {
-            Map<String, Object> stringObjectMap = jdbcTemplate.queryForMap("select P.ID,P.CODE,P.NAME,P.REMARK,PM_PRJ_ID,pp.`NAME` as PROJECT_NAME,PAY_TIME,PAY_AMT,ATT_FILE_GROUP_ID from PM_LAND_ACQUISITION_PAY P left join pm_prj pp on P.PM_PRJ_ID = pp.id where P.id=?", payId);
+            Map<String, Object> stringObjectMap = myJdbcTemplate.queryForMap("select P.ID,P.CODE,P.NAME,P.REMARK,PM_PRJ_ID,pp.`NAME` as PROJECT_NAME,PAY_TIME,PAY_AMT,ATT_FILE_GROUP_ID from PM_LAND_ACQUISITION_PAY P left join pm_prj pp on P.PM_PRJ_ID = pp.id where P.id=?", payId);
             PmLandPay pay = new PmLandPay();
             pay.id = JdbcMapUtil.getString(stringObjectMap, "ID");
             pay.projectId = JdbcMapUtil.getString(stringObjectMap, "ID");
@@ -218,7 +218,7 @@ public class PmLandExt {
             pay.payTime = StringUtil.withOutT(JdbcMapUtil.getString(stringObjectMap, "PAY_TIME"));
             pay.attFileGroupId = JdbcMapUtil.getString(stringObjectMap, "ATT_FILE_GROUP_ID");
             if (Strings.isNotEmpty(pay.attFileGroupId)) {
-                NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(Objects.requireNonNull(jdbcTemplate.getDataSource()));
+                NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(Objects.requireNonNull(myJdbcTemplate.getDataSource()));
                 String sql = "select * from fl_file where id in (:ids)";
                 Map<String, Object> dataParam = new HashMap<>();
                 dataParam.put("ids", Arrays.asList(pay.attFileGroupId.split(",")));

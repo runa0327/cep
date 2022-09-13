@@ -2,11 +2,11 @@ package com.cisdi.ext.link;
 
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -32,31 +32,31 @@ public class AttLinkExt {
     }
 
     private AttLinkResult attLink(AttLinkParam param) {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
         String attCode = param.attCode;
         String attValue = param.attValue;
         String sevId = param.sevId;
 
         // 获取实体代码（表名）：
-        String entCode = jdbcTemplate.queryForMap("select e.code ent_code from ad_single_ent_view sev join ad_ent e on sev.AD_ENT_ID = e.ID and sev.id=?", sevId).get("ent_code").toString();
+        String entCode = myJdbcTemplate.queryForMap("select e.code ent_code from ad_single_ent_view sev join ad_ent e on sev.AD_ENT_ID = e.ID and sev.id=?", sevId).get("ent_code").toString();
 
         if ("PROJECT_TYPE_ID".equals(attCode)) {
-            return linkForPROJECT_TYPE_ID(jdbcTemplate, attValue);
+            return linkForPROJECT_TYPE_ID(myJdbcTemplate, attValue);
         } else if ("PM_PRJ_ID".equals(attCode)) {
-            return linkForPM_PRJ_ID(jdbcTemplate, attValue, entCode);
+            return linkForPM_PRJ_ID(myJdbcTemplate, attValue, entCode);
         } else if ("PMS_RELEASE_WAY_ID".equals(attCode) || "GUARANTEE_LETTER_TYPE_ID".equals(attCode) || "CONTRACT_CATEGORY_ID".equals(attCode) || "PRJ_MANAGE_MODE_ID".equals(attCode)) {
-            return linkForMany(jdbcTemplate, attCode, attValue);
+            return linkForMany(myJdbcTemplate, attCode, attValue);
         } else if ("BIDDING_NAME_ID".equals(attCode)) {
-            return linkForBIDDING_NAME_ID(jdbcTemplate, attValue,sevId);
+            return linkForBIDDING_NAME_ID(myJdbcTemplate, attValue, sevId);
         } else if ("CONTRACT_ID".equals(attCode)) {
-            return linkForCONTRACT_ID(jdbcTemplate, attValue,sevId);
+            return linkForCONTRACT_ID(myJdbcTemplate, attValue, sevId);
         } else if (("RELATION_CONTRACT_ID").equals(attCode)) {
-            return linkForRELATION_CONTRACT_ID(jdbcTemplate, attValue);
+            return linkForRELATION_CONTRACT_ID(myJdbcTemplate, attValue);
         } else if ("GUARANTEE_ID".equals(attCode)) {
-            return linkForGUARANTEE_ID(jdbcTemplate, attValue);
+            return linkForGUARANTEE_ID(myJdbcTemplate, attValue);
         } else if ("AMOUT_PM_PRJ_ID".equals(attCode)) {
-            return linkForAMOUT_PM_PRJ_ID(jdbcTemplate, attValue, entCode);
+            return linkForAMOUT_PM_PRJ_ID(myJdbcTemplate, attValue, entCode);
         } else if ("STATUS".equals(attCode)) {
             return linkForSTATUS(attValue, sevId);
         } else {
@@ -64,14 +64,14 @@ public class AttLinkExt {
         }
     }
 
-    private AttLinkResult linkForMany(JdbcTemplate jdbcTemplate, String attCode, String attValue) {
+    private AttLinkResult linkForMany(MyJdbcTemplate myJdbcTemplate, String attCode, String attValue) {
         AttLinkResult attLinkResult = new AttLinkResult();
 
         // 1.PMS_RELEASE_WAY_ID 招标类别下拉框
         // 2.GUARANTEE_LETTER_TYPE_ID 保函类别下拉框
         // 3.PMS_RELEASE_WAY_ID 项目类别下拉框
 
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("SELECT t.id, t.name FROM gr_set_value t WHERE t.id = ?", attValue);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("SELECT t.id, t.name FROM gr_set_value t WHERE t.id = ?", attValue);
 
         if (SharedUtil.isEmptyList(list)) {
             throw new BaseException("未设置相应项目类型的联动！");
@@ -93,12 +93,12 @@ public class AttLinkExt {
         return attLinkResult;
     }
 
-    private AttLinkResult linkForAMOUT_PM_PRJ_ID(JdbcTemplate jdbcTemplate, String attValue, String entCode) {
+    private AttLinkResult linkForAMOUT_PM_PRJ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
 
         // 资金需求项目名称(AMOUT_PM_PRJ_ID),引用（单值）
         // 项目基础信息
-        List<Map<String, Object>> list = jdbcTemplate
+        List<Map<String, Object>> list = myJdbcTemplate
                 .queryForList("select t.code prj_code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
                         "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,st.id st_id,st.name st_name," +
                         "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
@@ -170,7 +170,7 @@ public class AttLinkExt {
         if ("PO_ORDER_PAYMENT_REQ".equals(entCode)) { // 采购合同付款申请
             // 查询付款申请历史信息
             String sql = "SELECT COLLECTION_DEPT_TWO,BANK_OF_DEPOSIT,ACCOUNT_NO,RECEIPT,SPECIAL_BANK_OF_DEPOSIT,SPECIAL_ACCOUNT_NO FROM PO_ORDER_PAYMENT_REQ WHERE AMOUT_PM_PRJ_ID = ? AND STATUS = 'AP' ORDER BY CRT_DT DESC limit 1";
-            List<Map<String, Object>> map1 = jdbcTemplate.queryForList(sql, attValue);
+            List<Map<String, Object>> map1 = myJdbcTemplate.queryForList(sql, attValue);
             if (!CollectionUtils.isEmpty(map1)) {
                 Map row2 = map1.get(0);
                 // 收款单位
@@ -227,7 +227,7 @@ public class AttLinkExt {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
 
             // 查询关联合同信息
-            List<Map<String, Object>> contractMaps = jdbcTemplate.queryForList("select o.WIN_BID_UNIT_TXT,o" +
+            List<Map<String, Object>> contractMaps = myJdbcTemplate.queryForList("select o.WIN_BID_UNIT_TXT,o" +
                     ".CONTRACT_PRICE,a.PRJ_TOTAL_INVEST estimate,b.PRJ_TOTAL_INVEST budget from PO_ORDER_REQ " +
                     "o left join PM_PRJ_INVEST2 a on a.PM_PRJ_ID =o.PM_PRJ_ID left join PM_PRJ_INVEST3 b on b" +
                     ".PM_PRJ_ID = o.PM_PRJ_ID where o.PM_PRJ_ID = ? and o.`STATUS` = 'AP' order by o.CRT_DT " +
@@ -258,7 +258,7 @@ public class AttLinkExt {
             }
 
             // 该项目之前有无资金需求计划
-            List<Map<String, Object>> reqMaps = jdbcTemplate.queryForList("select r.YEAR,r.IS_BUDGET_ID,r.PROJECT_NATURE_ID," +
+            List<Map<String, Object>> reqMaps = myJdbcTemplate.queryForList("select r.YEAR,r.IS_BUDGET_ID,r.PROJECT_NATURE_ID," +
                     "r.BASE_LOCATION_ID,r.AGENT_BUILD_UNIT_RESPONSE,r.AGENT_BUILD_UNIT_RESPONSE_PHONE,r.DEMOLITION_COMPLETED," +
                     "r.PLAN_START_DATE,r.PLAN_COMPL_DATE,r.ACTUAL_START_DATE,r.CREATE_PROJECT_COMPLETED,r.FEASIBILITY_COMPLETED," +
                     "r.SELECT_SITE_COMPLETED,r.USE_LAND_COMPLETED,r.EIA_COMPLETED,r.WOODLAND_WATER_SOIL_COMPLETED,r.ESTIMATE_COMPLETED," +
@@ -300,7 +300,7 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("BASE_LOCATION_ID", linkedAtt);
                 }
                 // 查询五方
-                List<Map<String, Object>> partyMaps = jdbcTemplate.queryForList("SELECT r.BUILD_UNIT_RESPONSE,r" +
+                List<Map<String, Object>> partyMaps = myJdbcTemplate.queryForList("SELECT r.BUILD_UNIT_RESPONSE,r" +
                         ".AGENT_PHONE FROM PM_PRJ_PARTY_REQ r left join pm_prj p on p.id = r.PM_PRJ_ID where p.id = ?" +
                         " and r.`STATUS` = 'AP' ORDER BY r.CRT_DT desc LIMIT 1", attValue);
                 if (!CollectionUtils.isEmpty(partyMaps)) {
@@ -355,7 +355,7 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("ACTUAL_START_DATE", linkedAtt);
                 }
                 // 查询节点名称
-                List<Map<String, Object>> nodeMaps = jdbcTemplate.queryForList("select n.name,n.PROGRESS_STATUS_ID from PM_PRO_PLAN_NODE n" +
+                List<Map<String, Object>> nodeMaps = myJdbcTemplate.queryForList("select n.name,n.PROGRESS_STATUS_ID from PM_PRO_PLAN_NODE n" +
                         " left join PM_PRO_PLAN p on n.PM_PRO_PLAN_ID = p.id where p.PM_PRJ_ID = ? and n.level = '3'", attValue);
                 if (CollectionUtils.isEmpty(nodeMaps)) {
                     throw new BaseException("项目没有对应的三级节点！");
@@ -478,14 +478,14 @@ public class AttLinkExt {
         }
     }
 
-    private AttLinkResult linkForGUARANTEE_ID(JdbcTemplate jdbcTemplate, String attValue) {
+    private AttLinkResult linkForGUARANTEE_ID(MyJdbcTemplate myJdbcTemplate, String attValue) {
         AttLinkResult attLinkResult = new AttLinkResult();
 
         // 获取保函名称
 
         // 查询保函相关信息
         String sql = "select NAME,SUPPLIER,BENEFICIARY,GUARANTEE_LETTER_TYPE_ID,GUARANTEE_MECHANISM,GUARANTEE_CODE,GUARANTEE_AMT,GUARANTEE_START_DATE,GUARANTEE_END_DATE,GUARANTEE_FILE from PO_GUARANTEE_LETTER_REQUIRE_REQ where id = ?";
-        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, attValue);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, attValue);
         if (CollectionUtils.isEmpty(list)) {
             throw new BaseException("保函没有相关信息，请先完善");
         }
@@ -575,11 +575,11 @@ public class AttLinkExt {
         return attLinkResult;
     }
 
-    private AttLinkResult linkForRELATION_CONTRACT_ID(JdbcTemplate jdbcTemplate, String attValue) {
+    private AttLinkResult linkForRELATION_CONTRACT_ID(MyJdbcTemplate myJdbcTemplate, String attValue) {
         AttLinkResult attLinkResult = new AttLinkResult();
 
         // 根据id查询招投标信息
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select CONTRACT_CODE,NAME,WIN_BID_UNIT_TXT,CONTRACT_PRICE from po_order_req where id = ?", attValue);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTRACT_CODE,NAME,WIN_BID_UNIT_TXT,CONTRACT_PRICE from po_order_req where id = ?", attValue);
 
         if (CollectionUtils.isEmpty(list)) {
             throw new BaseException("合同相关属性不完善！");
@@ -622,11 +622,11 @@ public class AttLinkExt {
         return attLinkResult;
     }
 
-    private AttLinkResult linkForCONTRACT_ID(JdbcTemplate jdbcTemplate, String attValue,String sevId) {
+    private AttLinkResult linkForCONTRACT_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
 
         // 根据id查询招投标信息
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select CONTRACT_CODE, CONTRACT_CATEGORY_ID, CONTRACT_NAME, CONTRACT_PRICE, " +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTRACT_CODE, CONTRACT_CATEGORY_ID, CONTRACT_NAME, CONTRACT_PRICE, " +
                 "BIDDING_NAME_ID,PMS_RELEASE_WAY_ID,BID_CTL_PRICE_LAUNCH,PURCHASE_TYPE,WIN_BID_UNIT_TXT,WINNING_BIDS_AMOUNT,PLAN_TOTAL_DAYS," +
                 "IS_REFER_GUARANTEE,GUARANTEE_LETTER_TYPE_ID,OPPO_SITE_LINK_MAN,OPPO_SITE_CONTACT,IS_TEMPLATE " +
                 "from po_order_req where id = ?", attValue);
@@ -713,7 +713,7 @@ public class AttLinkExt {
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
 //                linkedAtt.value = JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE")==null?null:JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE").toString();
             String code = JdbcMapUtil.getString(row, "IS_REFER_GUARANTEE");
-            Map<String, Object> idMap = jdbcTemplate.queryForMap("SELECT v.id id FROM gr_set_value v left " +
+            Map<String, Object> idMap = myJdbcTemplate.queryForMap("SELECT v.id id FROM gr_set_value v left " +
                             "join gr_set k on v.GR_SET_ID = k.id where k.`CODE` = 'is_refer_guarantee' and v.`CODE` = ?",
                     code);
             linkedAtt.value = idMap.get("id").toString();
@@ -751,7 +751,7 @@ public class AttLinkExt {
             linkedAtt.type = AttDataTypeE.REF_SINGLE;
 //                linkedAtt.value = JdbcMapUtil.getBoolean(row,"IS_TEMPLATE")==null?null:JdbcMapUtil.getBoolean(row,"IS_TEMPLATE").toString();
             String code = JdbcMapUtil.getString(row, "IS_TEMPLATE");
-            Map<String, Object> idMap = jdbcTemplate.queryForMap("SELECT v.id id FROM gr_set_value v left " +
+            Map<String, Object> idMap = myJdbcTemplate.queryForMap("SELECT v.id id FROM gr_set_value v left " +
                             "join gr_set k on v.GR_SET_ID = k.id where k.`CODE` = 'is_standard_contract_template' and v.`CODE` = ?",
                     code);
             linkedAtt.value = idMap.get("id").toString();
@@ -779,71 +779,71 @@ public class AttLinkExt {
             attLinkResult.attMap.put("CONTRACT_AMOUNT", linkedAtt);
         }
 
-        //明细信息
-        if ("99902212142033284".equals(sevId)){
+        // 明细信息
+        if ("99902212142033284".equals(sevId)) {
             List<LinkedRecord> linkedRecordList = new ArrayList<>();
-            //查询明细信息
+            // 查询明细信息
             String sql = "select COST_TYPE_TREE_ID,FEE_DETAIL,TOTAL_AMT,AMT from pm_order_cost_detail where CONTRACT_ID = ? order by id asc";
-            List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql,attValue);
-            if (!CollectionUtils.isEmpty(list1)){
+            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql, attValue);
+            if (!CollectionUtils.isEmpty(list1)) {
                 for (Map<String, Object> tmp : list1) {
                     LinkedRecord linkedRecord = new LinkedRecord();
 
-                    //费用类型
+                    // 费用类型
                     String payType = tmp.get("COST_TYPE_TREE_ID").toString();
-                    linkedRecord.valueMap.put("COST_TYPE_TREE_ID",payType);
-                    linkedRecord.textMap.put("COST_TYPE_TREE_ID",payType);
-                    //费用明细
-                    linkedRecord.valueMap.put("FEE_DETAIL",tmp.get("FEE_DETAIL").toString());
-                    linkedRecord.textMap.put("FEE_DETAIL",tmp.get("FEE_DETAIL").toString());
-                    //费用金额
+                    linkedRecord.valueMap.put("COST_TYPE_TREE_ID", payType);
+                    linkedRecord.textMap.put("COST_TYPE_TREE_ID", payType);
+                    // 费用明细
+                    linkedRecord.valueMap.put("FEE_DETAIL", tmp.get("FEE_DETAIL").toString());
+                    linkedRecord.textMap.put("FEE_DETAIL", tmp.get("FEE_DETAIL").toString());
+                    // 费用金额
                     BigDecimal TOTAL_AMT = new BigDecimal(tmp.get("TOTAL_AMT").toString());
-                    linkedRecord.valueMap.put("TOTAL_AMT",String.valueOf(TOTAL_AMT));
-                    linkedRecord.textMap.put("TOTAL_AMT",String.valueOf(TOTAL_AMT));
-                    //合同金额
-                    linkedRecord.valueMap.put("AMT",tmp.get("AMT").toString());
-                    linkedRecord.textMap.put("AMT",tmp.get("AMT").toString());
+                    linkedRecord.valueMap.put("TOTAL_AMT", String.valueOf(TOTAL_AMT));
+                    linkedRecord.textMap.put("TOTAL_AMT", String.valueOf(TOTAL_AMT));
+                    // 合同金额
+                    linkedRecord.valueMap.put("AMT", tmp.get("AMT").toString());
+                    linkedRecord.textMap.put("AMT", tmp.get("AMT").toString());
 
-                    //查询明细付款信息
+                    // 查询明细付款信息
                     String sql2 = "SELECT a.PAY_AMT_TWO,a.PAY_AMT_ONE FROM PM_PAY_COST_DETAIL a left join PO_ORDER_PAYMENT_REQ b on a.PARENT_ID = b.id WHERE a.CONTRACT_ID = ? AND a.COST_TYPE_TREE_ID = ? AND b.STATUS = 'AP' order by a.CRT_DT asc";
-                    List<Map<String,Object>> list2 = jdbcTemplate.queryForList(sql2,attValue,payType);
-                    if (CollectionUtils.isEmpty(list2)){
-                        //已付金额
-                        linkedRecord.valueMap.put("PAY_AMT_TWO","0");
-                        linkedRecord.textMap.put("PAY_AMT_TWO","0");
-                        //可付金额
-                        linkedRecord.valueMap.put("REQ_AMT",tmp.get("AMT").toString());
-                        linkedRecord.textMap.put("REQ_AMT",tmp.get("AMT").toString());
+                    List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(sql2, attValue, payType);
+                    if (CollectionUtils.isEmpty(list2)) {
+                        // 已付金额
+                        linkedRecord.valueMap.put("PAY_AMT_TWO", "0");
+                        linkedRecord.textMap.put("PAY_AMT_TWO", "0");
+                        // 可付金额
+                        linkedRecord.valueMap.put("REQ_AMT", tmp.get("AMT").toString());
+                        linkedRecord.textMap.put("REQ_AMT", tmp.get("AMT").toString());
                     } else {
-                        //已付金额
+                        // 已付金额
                         BigDecimal priceDetail = bigDecimalSum(list2);
-                        linkedRecord.valueMap.put("PAY_AMT_TWO",String.valueOf(priceDetail));
-                        linkedRecord.textMap.put("PAY_AMT_TWO",String.valueOf(priceDetail));
-                        //可付金额
+                        linkedRecord.valueMap.put("PAY_AMT_TWO", String.valueOf(priceDetail));
+                        linkedRecord.textMap.put("PAY_AMT_TWO", String.valueOf(priceDetail));
+                        // 可付金额
                         BigDecimal REQ_AMT = new BigDecimal(tmp.get("AMT").toString());
                         BigDecimal cha = REQ_AMT.subtract(priceDetail);
-                        linkedRecord.valueMap.put("REQ_AMT",String.valueOf(cha));
-                        linkedRecord.textMap.put("REQ_AMT",String.valueOf(cha));
+                        linkedRecord.valueMap.put("REQ_AMT", String.valueOf(cha));
+                        linkedRecord.textMap.put("REQ_AMT", String.valueOf(cha));
                     }
-                    //本期支付
-                    linkedRecord.valueMap.put("PAY_AMT_ONE","0");
-                    linkedRecord.textMap.put("PAY_AMT_ONE","0");
+                    // 本期支付
+                    linkedRecord.valueMap.put("PAY_AMT_ONE", "0");
+                    linkedRecord.textMap.put("PAY_AMT_ONE", "0");
 
                     linkedRecordList.add(linkedRecord);
                 }
-                attLinkResult.childData.put("99902212142514118",linkedRecordList);
+                attLinkResult.childData.put("99902212142514118", linkedRecordList);
             }
-            attLinkResult.childCreatable.put("99902212142514118",false);
-            attLinkResult.childClear.put("99902212142514118",true);
+            attLinkResult.childCreatable.put("99902212142514118", false);
+            attLinkResult.childClear.put("99902212142514118", true);
         }
         return attLinkResult;
     }
 
-    //list内求和
+    // list内求和
     private BigDecimal bigDecimalSum(List<Map<String, Object>> list) {
         BigDecimal sum = new BigDecimal(0);
         for (int i = 0; i < list.size(); i++) {
-            if (i == 0){
+            if (i == 0) {
                 String date = list.get(0).get("PAY_AMT_ONE").toString();
                 sum = sum.add(new BigDecimal(date));
             } else {
@@ -854,39 +854,39 @@ public class AttLinkExt {
         return sum;
     }
 
-    private AttLinkResult linkForBIDDING_NAME_ID(JdbcTemplate jdbcTemplate, String attValue, String sevId) {
+    private AttLinkResult linkForBIDDING_NAME_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        //合同签订的费用明细实体视图
-        if ("99799190825103187".equals(sevId)){
+        // 合同签订的费用明细实体视图
+        if ("99799190825103187".equals(sevId)) {
             List<LinkedRecord> linkedRecordList = new ArrayList<>();
-            //查询明细信息
+            // 查询明细信息
             String sql = "select COST_TYPE_TREE_ID,FEE_DETAIL,TOTAL_AMT from pm_cost_detail where BIDDING_NAME_ID = ? order by id asc";
-            List<Map<String,Object>> list = jdbcTemplate.queryForList(sql,attValue);
-            if (!CollectionUtils.isEmpty(list)){
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, attValue);
+            if (!CollectionUtils.isEmpty(list)) {
                 for (Map<String, Object> tmp : list) {
                     LinkedRecord linkedRecord = new LinkedRecord();
 
-                    //费用类型
-                    linkedRecord.valueMap.put("COST_TYPE_TREE_ID",tmp.get("COST_TYPE_TREE_ID").toString());
-                    linkedRecord.textMap.put("COST_TYPE_TREE_ID",tmp.get("COST_TYPE_TREE_ID").toString());
-                    //费用明细
-                    linkedRecord.valueMap.put("FEE_DETAIL",tmp.get("FEE_DETAIL"));
-                    linkedRecord.textMap.put("FEE_DETAIL",tmp.get("FEE_DETAIL").toString());
-                    //费用金额
-                    linkedRecord.valueMap.put("TOTAL_AMT",tmp.get("TOTAL_AMT"));
-                    linkedRecord.textMap.put("TOTAL_AMT",tmp.get("TOTAL_AMT").toString());
+                    // 费用类型
+                    linkedRecord.valueMap.put("COST_TYPE_TREE_ID", tmp.get("COST_TYPE_TREE_ID").toString());
+                    linkedRecord.textMap.put("COST_TYPE_TREE_ID", tmp.get("COST_TYPE_TREE_ID").toString());
+                    // 费用明细
+                    linkedRecord.valueMap.put("FEE_DETAIL", tmp.get("FEE_DETAIL"));
+                    linkedRecord.textMap.put("FEE_DETAIL", tmp.get("FEE_DETAIL").toString());
+                    // 费用金额
+                    linkedRecord.valueMap.put("TOTAL_AMT", tmp.get("TOTAL_AMT"));
+                    linkedRecord.textMap.put("TOTAL_AMT", tmp.get("TOTAL_AMT").toString());
 
                     linkedRecordList.add(linkedRecord);
                 }
-                attLinkResult.childData.put("99902212142513357",linkedRecordList);
+                attLinkResult.childData.put("99902212142513357", linkedRecordList);
             }
-            attLinkResult.childCreatable.put("99902212142513357",false);
-            attLinkResult.childClear.put("99902212142513357",true);
+            attLinkResult.childCreatable.put("99902212142513357", false);
+            attLinkResult.childClear.put("99902212142513357", true);
 
         }
 
         // 根据id查询招投标信息
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("SELECT a.PMS_RELEASE_WAY_ID,a.BID_CTL_PRICE_LAUNCH,a.APPROVE_PURCHASE_TYPE,a.WIN_BID_UNIT_TXT,a.TENDER_OFFER,a.CONTACT_MOBILE_WIN,a.CONTACT_NAME_RECORD,a.BID_USER_ID,a.STATUS,a.BID_UNIT, ifnull((SELECT END_DATETIME FROM wf_process_instance WHERE id = a.LK_WF_INST_ID ),0) as END_DATETIME, a.SERVICE_DAYS FROM po_public_bid_req a WHERE id = ?", attValue);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("SELECT a.PMS_RELEASE_WAY_ID,a.BID_CTL_PRICE_LAUNCH,a.APPROVE_PURCHASE_TYPE,a.WIN_BID_UNIT_TXT,a.TENDER_OFFER,a.CONTACT_MOBILE_WIN,a.CONTACT_NAME_RECORD,a.BID_USER_ID,a.STATUS,a.BID_UNIT, ifnull((SELECT END_DATETIME FROM wf_process_instance WHERE id = a.LK_WF_INST_ID ),0) as END_DATETIME, a.SERVICE_DAYS FROM po_public_bid_req a WHERE id = ?", attValue);
         if (CollectionUtils.isEmpty(list)) {
             throw new BaseException("采购流程相关属性不完善！");
         }
@@ -972,8 +972,8 @@ public class AttLinkExt {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
             String id = JdbcMapUtil.getString(row, "BID_USER_ID");
-            //根据id查询人员名称
-            String name = jdbcTemplate.queryForList("select name from ad_user where id = ?",id).get(0).get("name").toString();
+            // 根据id查询人员名称
+            String name = myJdbcTemplate.queryForList("select name from ad_user where id = ?", id).get(0).get("name").toString();
             linkedAtt.text = name;
             linkedAtt.value = id;
 
@@ -1009,10 +1009,10 @@ public class AttLinkExt {
         return attLinkResult;
     }
 
-    private AttLinkResult linkForPROJECT_TYPE_ID(JdbcTemplate jdbcTemplate, String attValue) {
+    private AttLinkResult linkForPROJECT_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue) {
         AttLinkResult attLinkResult = new AttLinkResult();
 
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select v0.id project_type_id,v0.name project_type_name,v1.id CON_SCALE_TYPE_ID,v1.name CON_SCALE_TYPE_NAME,v2.id CON_SCALE_UOM_ID,v2.name CON_SCALE_UOM_NAME from pm_prj_type_link t join gr_set_value v0 on t.PROJECT_TYPE_ID=v0.id join gr_set_value v1 on t.CON_SCALE_TYPE_ID=v1.id join gr_set_value v2 on t.CON_SCALE_UOM_ID=v2.id where t.PROJECT_TYPE_ID=?", attValue);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select v0.id project_type_id,v0.name project_type_name,v1.id CON_SCALE_TYPE_ID,v1.name CON_SCALE_TYPE_NAME,v2.id CON_SCALE_UOM_ID,v2.name CON_SCALE_UOM_NAME from pm_prj_type_link t join gr_set_value v0 on t.PROJECT_TYPE_ID=v0.id join gr_set_value v1 on t.CON_SCALE_TYPE_ID=v1.id join gr_set_value v2 on t.CON_SCALE_UOM_ID=v2.id where t.PROJECT_TYPE_ID=?", attValue);
 
         if (SharedUtil.isEmptyList(list)) {
             throw new BaseException("未设置相应项目类型的联动！");
@@ -1043,11 +1043,11 @@ public class AttLinkExt {
         return attLinkResult;
     }
 
-    private AttLinkResult linkForPM_PRJ_ID(JdbcTemplate jdbcTemplate, String attValue, String entCode) {
+    private AttLinkResult linkForPM_PRJ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
 
         // 项目基础信息
-        List<Map<String, Object>> list = jdbcTemplate
+        List<Map<String, Object>> list = myJdbcTemplate
                 .queryForList("select t.code prj_code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
                         "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,st.id st_id,st.name st_name," +
                         "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
@@ -1071,7 +1071,7 @@ public class AttLinkExt {
 
         if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)) { // 工程开工报审
             String sql = "select PRJ_TOTAL_INVEST,PROJECT_AMT from PM_PRJ_INVEST2 where PM_PRJ_ID = ? and STATUS = 'AP' order by CRT_DT desc limit 1";
-            List<Map<String, Object>> map = jdbcTemplate.queryForList(sql, attValue);
+            List<Map<String, Object>> map = myJdbcTemplate.queryForList(sql, attValue);
             if (CollectionUtils.isEmpty(map)) {
                 throw new BaseException("该项目的总投资、工程费用信息不完善！");
             }
@@ -1640,18 +1640,18 @@ public class AttLinkExt {
     // 查询可研估算<初设概算<预算财评优先级最高的数据
     private Map getAmtMap(String attValue) {
         Map resultRow = new HashMap();
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String sql1 = "SELECT PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST3 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
-        List<Map<String, Object>> map = jdbcTemplate.queryForList(sql1, attValue);
+        List<Map<String, Object>> map = myJdbcTemplate.queryForList(sql1, attValue);
         List<Map<String, Object>> map1 = new ArrayList<>();
         List<Map<String, Object>> map2 = new ArrayList<>();
         if (CollectionUtils.isEmpty(map)) {
             // 初设概算信息
             String sql2 = "SELECT PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST2 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
-            map1 = jdbcTemplate.queryForList(sql2, attValue);
+            map1 = myJdbcTemplate.queryForList(sql2, attValue);
             if (CollectionUtils.isEmpty(map1)) {
                 String sql3 = "SELECT PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST1 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
-                map2 = jdbcTemplate.queryForList(sql3, attValue);
+                map2 = myJdbcTemplate.queryForList(sql3, attValue);
                 if (!CollectionUtils.isEmpty(map2)) {
                     resultRow = map2.get(0);
                 }

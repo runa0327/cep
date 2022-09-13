@@ -8,17 +8,16 @@ import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
 public class FundDemandPlan {
 
-    //资金需求计划列表
+    // 资金需求计划列表
     public void getFundDemandPlan() {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         String inputJson = JsonUtil.toJson(inputMap);
@@ -37,7 +36,7 @@ public class FundDemandPlan {
         if (!Strings.isNullOrEmpty(input.startDate) && !Strings.isNullOrEmpty(input.endDate)) {
             baseSql.append("and r.CRT_DT BETWEEN '" + input.startDate + "' and '" + input.endDate + "' ");
         }
-        //总条数sql
+        // 总条数sql
         String totalSql = baseSql.toString();
         baseSql.append("order by r.CRT_DT desc ");
 
@@ -46,21 +45,21 @@ public class FundDemandPlan {
 
 
         log.info(baseSql.toString());
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> resultList = jdbcTemplate.queryForList(baseSql.toString());
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList(baseSql.toString());
         ArrayList<Demand> demandList = new ArrayList<>();
         resultList.forEach(result -> {
             Demand demand = new Demand();
-            demand.id = JdbcMapUtil.getString(result,"id");
-            demand.planName = JdbcMapUtil.getString(result,"planName");
-            demand.prjName = JdbcMapUtil.getString(result,"prjName");
-            demand.deptName = JdbcMapUtil.getString(result,"deptName");
-            demand.createTime = StringUtil.withOutT(JdbcMapUtil.getString(result,"createTime"));
-            demand.remark = JdbcMapUtil.getString(result,"remark");
+            demand.id = JdbcMapUtil.getString(result, "id");
+            demand.planName = JdbcMapUtil.getString(result, "planName");
+            demand.prjName = JdbcMapUtil.getString(result, "prjName");
+            demand.deptName = JdbcMapUtil.getString(result, "deptName");
+            demand.createTime = StringUtil.withOutT(JdbcMapUtil.getString(result, "createTime"));
+            demand.remark = JdbcMapUtil.getString(result, "remark");
             demandList.add(demand);
         });
 
-        List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
+        List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
         HashMap<String, Object> result = new HashMap<>();
         result.put("resultList", demandList);
         result.put("total", totalList.size());
@@ -70,12 +69,12 @@ public class FundDemandPlan {
     }
 
 
-    //获取项目名称下拉框
+    // 获取项目名称下拉框
     public void getPrjDrop() {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         String prjName = Objects.isNull(inputMap.get("prjName")) ? null : inputMap.get("prjName").toString();
 
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuffer baseSql = new StringBuffer();
         baseSql.append("select name,id from pm_prj where STATUS = 'AP' ");
         if (!Strings.isNullOrEmpty(prjName)) {
@@ -83,12 +82,12 @@ public class FundDemandPlan {
         }
         baseSql.append("order by CRT_DT desc ");
 
-        List<Map<String, Object>> projects = jdbcTemplate.queryForList(baseSql.toString());
+        List<Map<String, Object>> projects = myJdbcTemplate.queryForList(baseSql.toString());
         List<CommonDrop> commonDrops = new ArrayList<>();
         for (Map<String, Object> project : projects) {
             CommonDrop projectDrop = new CommonDrop();
-            projectDrop.id = JdbcMapUtil.getString(project,"id");
-            projectDrop.name = JdbcMapUtil.getString(project,"name");
+            projectDrop.id = JdbcMapUtil.getString(project, "id");
+            projectDrop.name = JdbcMapUtil.getString(project, "name");
             commonDrops.add(projectDrop);
         }
         HashMap<String, Object> result = new HashMap<>();
@@ -98,29 +97,29 @@ public class FundDemandPlan {
 
     }
 
-    //详情
+    // 详情
     public void getFundDemandDetail() {
         Map<String, Object> idMap = ExtJarHelper.extApiParamMap.get();
         String id = idMap.get("id").toString();
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
-        Map<String, Object> listInfo = jdbcTemplate.queryForMap("select r.id, r.NAME planName, p.NAME prjName, TOTAL_AMT totalAmt," +
+        Map<String, Object> listInfo = myJdbcTemplate.queryForMap("select r.id, r.NAME planName, p.NAME prjName, TOTAL_AMT totalAmt," +
                 "d.NAME deptName,r.CRT_DT createTime,r" +
                 ".REMARK remark,r.ATT_FILE_GROUP_ID fileIds from pm_fund_req_plan r left join pm_prj p on r.PM_PRJ_ID = p.ID " +
                 "left join hr_dept d on r.HR_DEPT_ID = d.ID where r.id=? ", id);
-        List<Map<String, Object>> detailList = jdbcTemplate.queryForList("select d.REQ_TIME reqTime,d.REQ_AMT reqAmt,v.name" +
+        List<Map<String, Object>> detailList = myJdbcTemplate.queryForList("select d.REQ_TIME reqTime,d.REQ_AMT reqAmt,v.name" +
                 " from pm_fund_req_plan_detail d " +
                 "left join gr_set_value v on v.id = d.FUND_REQ_TYPE_ID left join gr_set s on s.id = v.GR_SET_ID and s" +
                 ".CODE = 'psm_money_type' where d.PM_FUND_REQ_PLAN_ID = ?", id);
-        List<File> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(listInfo, "fileIds"), jdbcTemplate);
-        listInfo.put("fileList",fileList);
+        List<File> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(listInfo, "fileIds"), myJdbcTemplate);
+        listInfo.put("fileList", fileList);
         HashMap<Object, Object> result = new HashMap<>();
-        //处理时间
+        // 处理时间
         String createTime = JdbcMapUtil.getString(listInfo, "createTime");
         listInfo.put("createTime", StringUtil.withOutT(createTime));
 
-        result.put("listInfo",listInfo);
-        result.put("detailList",detailList);
+        result.put("listInfo", listInfo);
+        result.put("detailList", detailList);
 
         Map outputMap = JsonUtil.fromJson(JSONObject.toJSONString(result), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
@@ -148,7 +147,7 @@ public class FundDemandPlan {
         public String endDate;
     }
 
-    public static class Demand{
+    public static class Demand {
         public String id;
         public String planName;
         public String prjName;

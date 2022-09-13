@@ -39,7 +39,7 @@ public class ProInvestController {
      */
     @GetMapping("transferData")
     public String transferData() {
-        //清除原有数据
+        // 清除原有数据
         testJdbcTemplate.update("delete from PM_INVEST_EST_DTL where CPMS_ID is not null");
 
         List<Map<String, Object>> projectList = testJdbcTemplate.queryForList("select * from PM_PRJ where `STATUS` = 'ap'");
@@ -55,18 +55,18 @@ public class ProInvestController {
                 continue;
             }
             testJdbcTemplate.update("delete from PM_INVEST_EST where PM_PRJ_ID=?", pmPrjId);
-            //投资测算类型
+            // 投资测算类型
             List<Map<String, Object>> typeList = testJdbcTemplate.queryForList("select gsv.* from gr_set_value gsv left join gr_set gs on gsv.GR_SET_ID = gs.ID where gs.`CODE` ='invest_est_type'");
             for (Map<String, Object> stringObjectMap : typeList) {
                 String investId = Util.insertData(testJdbcTemplate, "PM_INVEST_EST");
                 testJdbcTemplate.update("update PM_INVEST_EST set IS_TEMPLATE='0',PM_PRJ_ID=?,INVEST_EST_TYPE_ID=?,CPMS_ID=?,CPMS_UUID=? where id=?", pmPrjId, stringObjectMap.get("ID"), key, key, investId);
                 String code = String.valueOf(stringObjectMap.get("CODE"));
                 String str = String.valueOf(Integer.parseInt(code.substring(code.length() - 1)) + 1);
-                //测算明细
+                // 测算明细
                 List<Map<String, Object>> detList = objMap.get(key);
-                //CPMS系统中的项目预算数据
+                // CPMS系统中的项目预算数据
                 List<Map<String, Object>> budgetList = detList.stream().filter(m -> Objects.equals(str, m.get("budget_type"))).collect(Collectors.toList());
-                //查询费用类型
+                // 查询费用类型
                 List<Map<String, Object>> expTypeList = testJdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,LK_WF_INST_ID,CODE,NAME,REMARK,SEQ_NO,ifnull(PM_EXP_TYPE_PID,0) as PM_EXP_TYPE_PID,CALC_BY_PAYMENT,CALC_BY_PROGRESS from PM_EXP_TYPE");
                 AtomicInteger index = new AtomicInteger(1);
                 budgetList.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("parent_id")))).peek(m -> {

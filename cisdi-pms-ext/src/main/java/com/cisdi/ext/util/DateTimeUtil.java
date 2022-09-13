@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  *
@@ -190,6 +189,7 @@ public class DateTimeUtil {
 
     /**
      * 计算两个日期相差天数 日期格式 yyyy-MM-dd  格式带时分秒计算天数可能会不准
+     *
      * @param maxDate
      * @param end
      * @return
@@ -222,7 +222,6 @@ public class DateTimeUtil {
 
     /**
      * 　　 *字符串的日期格式的计算
-     *
      */
     public static int daysBetween(String smdate, String bdate) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -237,7 +236,7 @@ public class DateTimeUtil {
     }
 
 
-    public static void main(String[] args) throws ParseException{
+    public static void main(String[] args) throws ParseException {
         int asd = DateTimeUtil.getTwoTimeDays(DateTimeUtil.stringToDate("2022-09-01"), DateTimeUtil.stringToDate("2022-09-10"));
         System.out.println(asd);
     }

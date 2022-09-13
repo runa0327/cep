@@ -2,11 +2,11 @@ package com.cisdi.ext.file;
 
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -34,8 +34,8 @@ public class ProFileExt {
         String json = JsonUtil.toJson(map);
         FileReqParam param = JsonUtil.fromJson(json, FileReqParam.class);
         String projectId = param.pmPrjId;
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select ID,`CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,PF_FOLDER_PID,'1' as `TYPE` from pf_folder where PF_FOLDER_PID is null and IS_TEMPLATE = '0' and  PM_PRJ_ID=? order by SEQ_NO", projectId);
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ID,`CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,PF_FOLDER_PID,'1' as `TYPE` from pf_folder where PF_FOLDER_PID is null and IS_TEMPLATE = '0' and  PM_PRJ_ID=? order by SEQ_NO", projectId);
         List<FolderInfo> folderList = list.stream().map(p -> {
             FolderInfo f = new FolderInfo();
             f.id = JdbcMapUtil.getString(p, "ID");
@@ -91,10 +91,10 @@ public class ProFileExt {
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
 
-        //查询文件夹及其文件
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        // 查询文件夹及其文件
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
-        List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
 
         List<FileInfo> fileInfoList = list.stream().map(p -> {
             FileInfo fileInfo = new FileInfo();
@@ -113,7 +113,7 @@ public class ProFileExt {
         if (CollectionUtils.isEmpty(fileInfoList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
-            List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
+            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
             outSide outSide = new outSide();
             outSide.fileInfoList = fileInfoList;
             outSide.total = totalList.size();
@@ -179,10 +179,10 @@ public class ProFileExt {
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
 
-        //查询文件夹及其文件
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        // 查询文件夹及其文件
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
-        List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
 
         List<FileInfo> fileInfoList = list.stream().map(p -> {
             FileInfo fileInfo = new FileInfo();
@@ -201,7 +201,7 @@ public class ProFileExt {
         if (CollectionUtils.isEmpty(fileInfoList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
-            List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
+            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
             outSide outSide = new outSide();
             outSide.fileInfoList = fileInfoList;
             outSide.total = totalList.size();
@@ -282,26 +282,26 @@ public class ProFileExt {
     }
 
     public void collectProFileSize() {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
             String csCommId = entityRecord.csCommId;
 
-            //查询文件夹
-            List<Map<String, Object>> folderList = jdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,LK_WF_INST_ID,CODE,NAME,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID,IS_TEMPLATE,FILE_SIZE,FILE_COUNT " +
+            // 查询文件夹
+            List<Map<String, Object>> folderList = myJdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,LK_WF_INST_ID,CODE,NAME,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID,IS_TEMPLATE,FILE_SIZE,FILE_COUNT " +
                     "from pf_folder where PM_PRJ_ID=?", csCommId);
-            //查询所有文件
-            List<Map<String, Object>> fileList = jdbcTemplate.queryForList("select fl.ID,fl.CODE,fl.NAME,fl.REMARK,fl.VER,fl.FL_PATH_ID,fl.EXT,fl.LK_WF_INST_ID,fl.STATUS,fl.CRT_DT,fl.CRT_USER_ID,fl.LAST_MODI_DT,fl.LAST_MODI_USER_ID,ifnull(SIZE_KB,0) as SIZE_KB,fl.IS_PRESET,fl.FILE_INLINE_URL," +
+            // 查询所有文件
+            List<Map<String, Object>> fileList = myJdbcTemplate.queryForList("select fl.ID,fl.CODE,fl.NAME,fl.REMARK,fl.VER,fl.FL_PATH_ID,fl.EXT,fl.LK_WF_INST_ID,fl.STATUS,fl.CRT_DT,fl.CRT_USER_ID,fl.LAST_MODI_DT,fl.LAST_MODI_USER_ID,ifnull(SIZE_KB,0) as SIZE_KB,fl.IS_PRESET,fl.FILE_INLINE_URL," +
                     "fl.FILE_ATTACHMENT_URL,fl.TS,UPLOAD_DTTM,fl.PHYSICAL_LOCATION,fl.DSP_NAME,DSP_SIZE,pff.PF_FOLDER_ID as PF_FOLDER_ID from fl_file fl left join pf_file pff on fl.id = pff.FL_FILE_ID " +
                     "left join pf_folder pfr on pff.PF_FOLDER_ID = pfr.id where  pfr.PM_PRJ_ID=?", csCommId);
 
 
             folderList.stream().filter(p -> Objects.equals("0", p.get("PF_FOLDER_PID"))).peek(m -> {
                 List<Map<String, Object>> children = getChildren(m, folderList, fileList);
-                //获取子级的ID集合
+                // 获取子级的ID集合
                 List<Object> ids = children.stream().map(q -> q.get("ID")).collect(Collectors.toList());
                 ids.add(m.get("ID"));
-                //取出文件
+                // 取出文件
                 List<Map<String, Object>> files = fileList.stream().filter(t -> ids.contains(t.get("PF_FOLDER_ID"))).collect(Collectors.toList());
                 BigDecimal totalSize = files.stream().map(n -> new BigDecimal(String.valueOf(n.get("SIZE_KB")))).reduce(BigDecimal.ZERO, BigDecimal::add);
                 Crud.from("pf_folder").where().eq("ID", m.get("ID")).update().set("FILE_COUNT", files.size()).set("FILE_SIZE", totalSize).exec();
@@ -312,10 +312,10 @@ public class ProFileExt {
     private List<Map<String, Object>> getChildren(Map<String, Object> root, List<Map<String, Object>> allData, List<Map<String, Object>> fileData) {
         return allData.stream().filter(p -> Objects.equals(String.valueOf(root.get("ID")), String.valueOf(p.get("PF_FOLDER_PID")))).peek(m -> {
             List<Map<String, Object>> children = getChildren(m, allData, fileData);
-            //获取子级的ID集合
+            // 获取子级的ID集合
             List<Object> ids = children.stream().map(q -> q.get("ID")).collect(Collectors.toList());
             ids.add(m.get("ID"));
-            //取出文件
+            // 取出文件
             List<Map<String, Object>> files = fileData.stream().filter(t -> ids.contains(t.get("PF_FOLDER_ID"))).collect(Collectors.toList());
             BigDecimal totalSize = files.stream().map(n -> new BigDecimal(String.valueOf(n.get("SIZE_KB")))).reduce(BigDecimal.ZERO, BigDecimal::add);
             Crud.from("pf_folder").where().eq("ID", m.get("ID")).update().set("FILE_COUNT", files.size()).set("FILE_SIZE", totalSize).exec();

@@ -2,7 +2,6 @@ package com.cisdi.data.transfer;
 
 import com.cisdi.data.util.ListUtils;
 import com.qygly.ext.jar.helper.debug.event.AsyncConfig;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -42,7 +41,7 @@ public class FileTransferController {
     public String transferData() {
         AsyncConfig config = new AsyncConfig();
         Executor executor = config.getAsyncExecutor();
-        //先清除原有的数据
+        // 先清除原有的数据
         List<Map<String, Object>> list = testJdbcTemplate.queryForList("select * from PF_FILE where CPMS_ID is not null");
         List<String> ids = list.stream().map(p -> String.valueOf(p.get("FL_FILE_ID"))).collect(Collectors.toList());
         testJdbcTemplate.update("delete from PF_FILE where CPMS_ID is not null");
@@ -56,14 +55,14 @@ public class FileTransferController {
         });
 
 
-        //同步文件表数据
+        // 同步文件表数据
         List<Map<String, Object>> projectFileList = cpmsJdbcTemplate.queryForList("select * from project_file where del_flag = '0'");
 
         List<List<Map<String, Object>>> dataList = ListUtils.split(projectFileList, 1000);
         dataList.forEach(obj -> {
             executor.execute(() -> {
                 obj.forEach(item -> {
-                    //同步文件数据
+                    // 同步文件数据
                     String code = null;
                     if (Objects.nonNull(item.get("file_name"))) {
                         code = String.valueOf(item.get("file_name")).split("/")[3].split("\\.")[0];
@@ -81,7 +80,7 @@ public class FileTransferController {
                     testJdbcTemplate.update("update FL_FILE set `CODE`=?,`NAME`=?,EXT=?,DSP_NAME=?,SIZE_KB=?,DSP_SIZE=?,FILE_INLINE_URL=?,FILE_ATTACHMENT_URL=?,UPLOAD_DTTM=?,PHYSICAL_LOCATION=?,FL_PATH_ID=? WHERE ID=?",
                             code, item.get("original_name111"), item.get("file_suffix"), item.get("original_name"), sizeKb, item.get("file_size"), fileInlineUrl, fileAttachmentUrl,
                             item.get("upload_time"), physicalLocation, "99902212142322558", id);
-                    //同步PF_FILE
+                    // 同步PF_FILE
                     String pfId = Util.insertData(testJdbcTemplate, "PF_FILE");
                     testJdbcTemplate.update("update PF_FILE set FL_FILE_ID=?,CPMS_ID=?,CPMS_UUID=? where id=?", id, item.get("id"), item.get("file_id"), pfId);
                 });

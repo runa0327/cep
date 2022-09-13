@@ -37,7 +37,7 @@ public class PmImgProController {
     @GetMapping("transferData")
     public String transferData() {
         //------------形象进度分类BEGIN----------------------
-        //首先清除已经同步过的数据
+        // 首先清除已经同步过的数据
         testJdbcTemplate.update("delete from PM_IMG_PRO where CPMS_ID is not null");
         testJdbcTemplate.update("delete from PM_IMG_PRO_TYPE where CPMS_ID is not null");
         List<Map<String, Object>> typeList = cpmsJdbcTemplate.queryForList("select id,type_id,type_name,ifnull(parent_id,'0') as parent_id,project_id,del_flag,create_by,create_time,update_by,update_time,version,remark from see_scene_type where del_flag = '0'");
@@ -57,9 +57,9 @@ public class PmImgProController {
 
         //------------形象进度BEGIN----------------------
         List<Map<String, Object>> phoneList = cpmsJdbcTemplate.queryForList("select * from see_scene_photo where del_flag = '0'");
-        //同步文件后--根据关联查询出文件ID
+        // 同步文件后--根据关联查询出文件ID
         List<Map<String, Object>> fileList = testJdbcTemplate.queryForList("select fl.*,CPMS_ID,CPMS_UUID from pf_file pf left join fl_file fl on pf.FL_FILE_ID = fl.ID where pf.`STATUS`='ap'");
-        //形象进度分类
+        // 形象进度分类
         List<Map<String, Object>> typeLists = testJdbcTemplate.queryForList("select * from PM_IMG_PRO_TYPE where `STATUS` = 'ap'");
 
         phoneList.forEach(item -> {
@@ -74,7 +74,7 @@ public class PmImgProController {
                 projectId = String.valueOf(optional.get().get("PM_PRJ_ID"));
                 projectId = "null".equals(projectId) ? null : projectId;
             }
-            //处理文件，取到ID值
+            // 处理文件，取到ID值
             Optional<Map<String, Object>> fileOptional = fileList.stream().filter(n -> Objects.equals(String.valueOf(n.get("CPMS_UUID")), String.valueOf(item.get("small_file_id")))).findAny();
             if (fileOptional.isPresent()) {
                 coverImage = String.valueOf(fileOptional.get().get("ID"));

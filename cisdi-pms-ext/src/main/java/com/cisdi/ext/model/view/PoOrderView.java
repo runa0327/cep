@@ -9,32 +9,32 @@ import java.util.List;
  * 采购合同
  */
 public class PoOrderView extends BasePageEntity {
-    //id
+    // id
     public String id;
-    //项目id
+    // 项目id
     public String projectId;
-    //项目名称
+    // 项目名称
     public String projectName;
-    //相对方
+    // 相对方
     public String oppoSite;
-    //相对人
+    // 相对人
     public String oppoSiteLinkMan;
-    //相对方联系方式
+    // 相对方联系方式
     public String oppoSiteContact;
-    //经办人
+    // 经办人
     public String agent;
-    //经办人电话
+    // 经办人电话
     public String agentPhone;
-    //合同金额
+    // 合同金额
     public BigDecimal contractAmount;
-    //状态
+    // 状态
     public String status;
-    //附件信息
+    // 附件信息
     public String fileId;
     public List<BaseFileView> fileList;
-    //状态名称
+    // 状态名称
     public String statusName;
-    //备注
+    // 备注
     public String remark;
 
     public String getId() {

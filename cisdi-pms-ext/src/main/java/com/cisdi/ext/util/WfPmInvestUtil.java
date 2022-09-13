@@ -1,9 +1,9 @@
 package com.cisdi.ext.util;
 
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class WfPmInvestUtil {
 
     public static void calculateData(String csCommId, String entCode, String pmPrjId) {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String tableName = "";
         String code = "";
         switch (entCode) {
@@ -38,11 +38,11 @@ public class WfPmInvestUtil {
         if (StringUtils.isEmpty(tableName)) {
             return;
         }
-        //PM_PRJ_INVEST1  查询可研估算
-        Map<String, Object> dataMap = jdbcTemplate.queryForMap("select * from " + tableName + "  where ID= ?", csCommId);
+        // PM_PRJ_INVEST1  查询可研估算
+        Map<String, Object> dataMap = myJdbcTemplate.queryForMap("select * from " + tableName + "  where ID= ?", csCommId);
 
-        //查询项目投资测算明细
-        List<Map<String, Object>> investEstList = jdbcTemplate.queryForList("select t.*,pet.code as PM_EXP_TYPE from PM_INVEST_EST_DTL t\n" +
+        // 查询项目投资测算明细
+        List<Map<String, Object>> investEstList = myJdbcTemplate.queryForList("select t.*,pet.code as PM_EXP_TYPE from PM_INVEST_EST_DTL t\n" +
                 "left join PM_INVEST_EST a on t.PM_INVEST_EST_ID = a.id \n" +
                 "left join PM_EXP_TYPE pet on pet.id = t.PM_EXP_TYPE_ID\n" +
                 "left join gr_set_value gsv on gsv.id = a.INVEST_EST_TYPE_ID\n" +
@@ -52,22 +52,22 @@ public class WfPmInvestUtil {
         if (investEstList.size() > 0) {
             investEstList.forEach(item -> {
                 String pmExpType = String.valueOf(item.get("PM_EXP_TYPE"));
-                jdbcTemplate.update("update PM_INVEST_EST_DTL set AMT=?,LAST_MODI_DT=? where id=?", dataMap.get(pmExpType), new Date(), item.get("ID"));
+                myJdbcTemplate.update("update PM_INVEST_EST_DTL set AMT=?,LAST_MODI_DT=? where id=?", dataMap.get(pmExpType), new Date(), item.get("ID"));
             });
         } else {
-            //新增项目投资测算
-            //查询项目测算类型
-            Map<String, Object> investEstType = jdbcTemplate.queryForMap("select gsv.* from  gr_set_value gsv left join gr_set gr on gr.id = gsv.GR_SET_ID where  gr.`CODE`='invest_est_type' and gsv.code=?", code);
+            // 新增项目投资测算
+            // 查询项目测算类型
+            Map<String, Object> investEstType = myJdbcTemplate.queryForMap("select gsv.* from  gr_set_value gsv left join gr_set gr on gr.id = gsv.GR_SET_ID where  gr.`CODE`='invest_est_type' and gsv.code=?", code);
             String investEstTypeId = String.valueOf(investEstType.get("ID"));
 
             String newInvestEtsId = Crud.from("PM_INVEST_EST").insertData();
 
-            //新增测算明细
+            // 新增测算明细
 
-            List<Map<String, Object>> list = jdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,LK_WF_INST_ID,CODE,NAME,REMARK,SEQ_NO,ifnull(PM_EXP_TYPE_PID,0) as PM_EXP_TYPE_PID,CALC_BY_PAYMENT,CALC_BY_PROGRESS from PM_EXP_TYPE");
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,LK_WF_INST_ID,CODE,NAME,REMARK,SEQ_NO,ifnull(PM_EXP_TYPE_PID,0) as PM_EXP_TYPE_PID,CALC_BY_PAYMENT,CALC_BY_PROGRESS from PM_EXP_TYPE");
 
             List<pmInvestEstDtl> dtlList = new ArrayList<>();
-            //通过构建树新增数据
+            // 通过构建树新增数据
             list.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("PM_EXP_TYPE_PID")))).peek(m -> {
                 String id = Crud.from("PM_INVEST_EST_DTL").insertData();
                 pmInvestEstDtl dtl = new pmInvestEstDtl();

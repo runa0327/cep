@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 读取地图初始化数据
@@ -71,7 +70,7 @@ public class MapDataUtils {
         });
     }
 
-    public static String getInitMapData(){
+    public static String getInitMapData() {
         Scanner scanner = null;
         StringBuilder buffer = new StringBuilder();
         try {

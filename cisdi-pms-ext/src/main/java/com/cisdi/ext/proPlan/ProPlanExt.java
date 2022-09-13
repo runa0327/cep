@@ -4,17 +4,14 @@ import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.PrjPlanUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.IdCodeName;
 import com.qygly.shared.util.JdbcMapUtil;
-import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.io.Console;
-import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ProPlanExt {
     public void calcPlanTotalDays() {
@@ -35,17 +32,17 @@ public class ProPlanExt {
             entityRecord.extraEditableAttCodeList = new ArrayList<>();
         }
         String csCommId = entityRecord.csCommId;
-        //最小开始天数
+        // 最小开始天数
         int minStartDay = 0;
-        //最大计划天
+        // 最大计划天
         int maxPlanDay = 0;
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
-        //查询项目进度计划模板
-//        Map<String, Object> proMap = jdbcTemplate.queryForMap("select * from PM_PRO_PLAN where id=?", csCommId);
+        // 查询项目进度计划模板
+//        Map<String, Object> proMap = myJdbcTemplate.queryForMap("select * from PM_PRO_PLAN where id=?", csCommId);
 
-        //查询进度节点明细
-        List<Map<String, Object>> nodeList = jdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT," +
+        // 查询进度节点明细
+        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT," +
                 "LAST_MODI_USER_ID,STATUS,LK_WF_INST_ID,CODE,NAME,REMARK,ACTUAL_START_DATE,PROGRESS_RISK_REMARK,PM_PRO_PLAN_ID,PLAN_START_DATE," +
                 "ifnull(PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,PLAN_CARRY_DAYS,ACTUAL_CARRY_DAYS,ACTUAL_TOTAL_DAYS,PLAN_CURRENT_PRO_PERCENT," +
                 "ACTUAL_CURRENT_PRO_PERCENT,ifnull(PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,PLAN_COMPL_DATE,ACTUAL_COMPL_DATE,SHOW_IN_EARLY_PROC,SHOW_IN_PRJ_OVERVIEW," +
@@ -75,16 +72,16 @@ public class ProPlanExt {
                 }
 
             });
-            //处理进度计划
+            // 处理进度计划
             List<Map<String, Object>> firstNodeList = nodeList.stream().filter(p -> Objects.equals("0", p.get("PM_PRO_PLAN_NODE_PID"))).collect(Collectors.toList());
             minStartDay = firstNodeList.stream().mapToInt(p -> Integer.parseInt(String.valueOf(p.get("START_DAY")))).min().orElse(0);
             maxPlanDay = firstNodeList.stream().mapToInt(p -> Integer.parseInt(String.valueOf(p.get("PLAN_TOTAL_DAYS")))).max().orElse(0);
         }
-        //操作数据库，更新数据,更新项目进度
-        jdbcTemplate.update("update PM_PRO_PLAN set START_DAY=?,PLAN_TOTAL_DAYS=? where id=?", minStartDay, maxPlanDay, csCommId);
-        //操作数据库，更新数据,更新项目进度节点
+        // 操作数据库，更新数据,更新项目进度
+        myJdbcTemplate.update("update PM_PRO_PLAN set START_DAY=?,PLAN_TOTAL_DAYS=? where id=?", minStartDay, maxPlanDay, csCommId);
+        // 操作数据库，更新数据,更新项目进度节点
         nodeList.forEach(item -> {
-            jdbcTemplate.update("update PM_PRO_PLAN_NODE set START_DAY=?,PLAN_TOTAL_DAYS=? where id=?", item.get("START_DAY"), item.get("PLAN_TOTAL_DAYS"), item.get("ID"));
+            myJdbcTemplate.update("update PM_PRO_PLAN_NODE set START_DAY=?,PLAN_TOTAL_DAYS=? where id=?", item.get("START_DAY"), item.get("PLAN_TOTAL_DAYS"), item.get("ID"));
         });
 
     }
@@ -114,9 +111,9 @@ public class ProPlanExt {
      */
     private Map<String, Object> getParentData(Map<String, Object> root, List<Map<String, Object>> child) {
         if (child != null && child.size() > 0) {
-            //获取开始天
+            // 获取开始天
             int minDay = child.stream().mapToInt(p -> Integer.parseInt(String.valueOf(p.get("START_DAY")))).min().orElse(0);
-            //获取最大的用时
+            // 获取最大的用时
             int maxUseDay = child.stream().mapToInt(p -> Integer.parseInt(String.valueOf(p.get("START_DAY"))) + Integer.parseInt(String.valueOf(p.get("PLAN_TOTAL_DAYS"))) - 1).max().orElse(0);
             int useDay = maxUseDay - minDay + 1;
             root.put("START_DAY", minDay);
@@ -135,16 +132,16 @@ public class ProPlanExt {
         String json = JsonUtil.toJson(map);
         ProPlanExt.GetPrjOverviewNodeListParam param = JsonUtil.fromJson(json, ProPlanExt.GetPrjOverviewNodeListParam.class);
         String pmPrjId = param.pmPrjId;
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
-        List<Map<String, Object>> allList = jdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
+        List<Map<String, Object>> allList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
                 "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
                 "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO \n" +
                 "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where ppp.PM_PRJ_ID=?", pmPrjId);
 
-        //结果转换
-        List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(p, jdbcTemplate)).collect(Collectors.toList());
-        //构建树结构
+        // 结果转换
+        List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(p, myJdbcTemplate)).collect(Collectors.toList());
+        // 构建树结构
         List<PrjProPlanNodeInfo> tree = infoList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
             m.children = getChildNode(m, infoList);
         }).collect(Collectors.toList());
@@ -198,21 +195,21 @@ public class ProPlanExt {
         String json = JsonUtil.toJson(map);
         ProPlanExt.GetPrjProPlanNetworkParam param = JsonUtil.fromJson(json, ProPlanExt.GetPrjProPlanNetworkParam.class);
         String pmPrjId = param.pmPrjId;
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         PrjProPlanInfo planInfo = new PrjProPlanInfo();
         Map<String, Object> proMap = null;
         try {
-            proMap = jdbcTemplate.queryForMap("select pr.*,pj.name as PROJECT_NAME from PM_PRO_PLAN pr left join pm_prj pj on pr.PM_PRJ_ID = pj.id where PM_PRJ_ID=?", pmPrjId);
+            proMap = myJdbcTemplate.queryForMap("select pr.*,pj.name as PROJECT_NAME from PM_PRO_PLAN pr left join pm_prj pj on pr.PM_PRJ_ID = pj.id where PM_PRJ_ID=?", pmPrjId);
             if (proMap != null) {
-                planInfo = this.covertPlanInfo(proMap, jdbcTemplate);
+                planInfo = this.covertPlanInfo(proMap, myJdbcTemplate);
 
-                List<Map<String, Object>> allList = jdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
+                List<Map<String, Object>> allList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
                         "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
                         "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO,pppn.`LEVEL` \n" +
                         "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where ppp.PM_PRJ_ID=?", pmPrjId);
-                //结果转换
-                List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(p, jdbcTemplate)).collect(Collectors.toList());
-                //构建树结构
+                // 结果转换
+                List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(p, myJdbcTemplate)).collect(Collectors.toList());
+                // 构建树结构
                 List<PrjProPlanNodeInfo> tree = infoList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
                     m.children = getChildNode(m, infoList).stream().sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo))).collect(Collectors.toList());
                 }).collect(Collectors.toList());
@@ -257,10 +254,10 @@ public class ProPlanExt {
      * Map转换成PrjProPlanInfo
      *
      * @param dataMap
-     * @param jdbcTemplate
+     * @param myJdbcTemplate
      * @return
      */
-    private PrjProPlanInfo covertPlanInfo(Map<String, Object> dataMap, JdbcTemplate jdbcTemplate) {
+    private PrjProPlanInfo covertPlanInfo(Map<String, Object> dataMap, MyJdbcTemplate myJdbcTemplate) {
         PrjProPlanInfo planInfo = new PrjProPlanInfo();
         planInfo.id = String.valueOf(dataMap.get("ID"));
         planInfo.code = JdbcMapUtil.getString(dataMap, "CODE");
@@ -279,7 +276,7 @@ public class ProPlanExt {
         planInfo.actualCurrentProPercent = JdbcMapUtil.getDouble(dataMap, "ACTUAL_CURRENT_PRO_PERCENT");
         String sql = "select * from gr_set_value where id=?";
         if (!Objects.isNull(dataMap.get("PROGRESS_STATUS_ID"))) {
-            Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(dataMap, "PROGRESS_STATUS_ID"));
+            Map<String, Object> statusObj = myJdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(dataMap, "PROGRESS_STATUS_ID"));
             IdCodeName idCodeName = new IdCodeName();
             idCodeName.id = String.valueOf(statusObj.get("ID"));
             idCodeName.code = String.valueOf(statusObj.get("CODE"));
@@ -287,7 +284,7 @@ public class ProPlanExt {
             planInfo.progressStatus = idCodeName;
         }
         if (!Objects.isNull(dataMap.get("PROGRESS_RISK_TYPE_ID"))) {
-            Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_TYPE_ID"));
+            Map<String, Object> riskObj = myJdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_TYPE_ID"));
             IdCodeName idCodeName = new IdCodeName();
             idCodeName.id = String.valueOf(riskObj.get("ID"));
             idCodeName.code = String.valueOf(riskObj.get("CODE"));
@@ -306,10 +303,10 @@ public class ProPlanExt {
      * Map转换成PrjProPlanNodeInfo
      *
      * @param dataMap
-     * @param jdbcTemplate
+     * @param myJdbcTemplate
      * @return
      */
-    private PrjProPlanNodeInfo convertPlanInfoNode(Map<String, Object> dataMap, JdbcTemplate jdbcTemplate) {
+    private PrjProPlanNodeInfo convertPlanInfoNode(Map<String, Object> dataMap, MyJdbcTemplate myJdbcTemplate) {
         PrjProPlanNodeInfo nodeInfo = new PrjProPlanNodeInfo();
         nodeInfo.id = JdbcMapUtil.getString(dataMap, "ID");
         nodeInfo.pid = JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_NODE_PID");
@@ -329,7 +326,7 @@ public class ProPlanExt {
         nodeInfo.actualCurrentProPercent = JdbcMapUtil.getDouble(dataMap, "ACTUAL_CURRENT_PRO_PERCENT");
         String sql = "select * from gr_set_value where id=?";
         if (!Objects.isNull(dataMap.get("PROGRESS_STATUS_ID"))) {
-            Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(dataMap, "PROGRESS_STATUS_ID"));
+            Map<String, Object> statusObj = myJdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(dataMap, "PROGRESS_STATUS_ID"));
             IdCodeName idCodeName = new IdCodeName();
             idCodeName.id = String.valueOf(statusObj.get("ID"));
             idCodeName.code = String.valueOf(statusObj.get("CODE"));
@@ -337,7 +334,7 @@ public class ProPlanExt {
             nodeInfo.progressStatus = idCodeName;
         }
         if (!Objects.isNull(dataMap.get("PROGRESS_RISK_TYPE_ID"))) {
-            Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_TYPE_ID"));
+            Map<String, Object> riskObj = myJdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_TYPE_ID"));
             IdCodeName idCodeName = new IdCodeName();
             idCodeName.id = String.valueOf(riskObj.get("ID"));
             idCodeName.code = String.valueOf(riskObj.get("CODE"));
@@ -346,7 +343,7 @@ public class ProPlanExt {
         }
         nodeInfo.progressRiskRemark = JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_REMARK");
         if (!Objects.isNull(dataMap.get("CHIEF_DEPT_ID"))) {
-            Map<String, Object> deptObj = jdbcTemplate.queryForMap("select * from hr_dept where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_DEPT_ID"));
+            Map<String, Object> deptObj = myJdbcTemplate.queryForMap("select * from hr_dept where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_DEPT_ID"));
             IdCodeName idCodeName = new IdCodeName();
             idCodeName.id = String.valueOf(deptObj.get("ID"));
             idCodeName.code = String.valueOf(deptObj.get("CODE"));
@@ -355,7 +352,7 @@ public class ProPlanExt {
         }
 
         if (!Objects.isNull(dataMap.get("CHIEF_USER_ID"))) {
-            Map<String, Object> userObj = jdbcTemplate.queryForMap("select * from ad_user where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_USER_ID"));
+            Map<String, Object> userObj = myJdbcTemplate.queryForMap("select * from ad_user where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_USER_ID"));
             IdCodeName idCodeName = new IdCodeName();
             idCodeName.id = String.valueOf(userObj.get("ID"));
             idCodeName.code = String.valueOf(userObj.get("CODE"));
@@ -375,12 +372,12 @@ public class ProPlanExt {
      * 汇总进度计划状态
      */
     public void collectProgressStatus() {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
             String csCommId = entityRecord.csCommId;
-            //查询所有的进度计划节点
-            List<Map<String, Object>> nodeList = jdbcTemplate.queryForList("select pppn.ID,pppn.VER," +
+            // 查询所有的进度计划节点
+            List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER," +
                     "pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID," +
                     "pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE," +
                     "pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,pppn.PLAN_TOTAL_DAYS," +
@@ -398,28 +395,28 @@ public class ProPlanExt {
 
             if (nodeList.size() > 0) {
                 nodeList.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")))).peek(m -> {
-                    List<Map<String, Object>> children = getChildrenNodeForCollectProgressStatus(m, nodeList, jdbcTemplate);
+                    List<Map<String, Object>> children = getChildrenNodeForCollectProgressStatus(m, nodeList, myJdbcTemplate);
                     if (children.size() > 0) {
                         int count = children.size();
                         String proStatus = "0";
                         List<Map<String, Object>> finishList = children.stream().filter(p -> Objects.equals("2", p.get("PROGRESS_STATUS_CODE"))).collect(Collectors.toList());
                         if (count == finishList.size()) {
-                            //父级改为已完成
+                            // 父级改为已完成
                             proStatus = "2";
                         } else {
                             List<Map<String, Object>> UnBeginList = children.stream().filter(p -> Objects.equals("0", p.get("PROGRESS_STATUS_CODE"))).collect(Collectors.toList());
                             if (count != UnBeginList.size()) {
-                                //父级改为进行中
+                                // 父级改为进行中
                                 proStatus = "1";
                             }
                         }
-                        List<Map<String, Object>> grSetValueList = jdbcTemplate.queryForList("select gsv.* from gr_set_value gsv " +
+                        List<Map<String, Object>> grSetValueList = myJdbcTemplate.queryForList("select gsv.* from gr_set_value gsv " +
                                 "left join gr_set gs on gs.id = gsv.gr_set_id where gs.`code`='PROGRESS_STATUS' and gsv.`code`=?", proStatus);
                         String proStatusID = "";
                         if (grSetValueList.size() > 0) {
                             proStatusID = String.valueOf(grSetValueList.get(0).get("ID"));
                         }
-                        jdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=? where id=?", proStatusID, m.get("ID"));
+                        myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=? where id=?", proStatusID, m.get("ID"));
                     }
                 }).collect(Collectors.toList());
 
@@ -432,33 +429,33 @@ public class ProPlanExt {
      *
      * @param root
      * @param allData
-     * @param jdbcTemplate
+     * @param myJdbcTemplate
      * @return
      */
-    private List<Map<String, Object>> getChildrenNodeForCollectProgressStatus(Map<String, Object> root, List<Map<String, Object>> allData, JdbcTemplate jdbcTemplate) {
+    private List<Map<String, Object>> getChildrenNodeForCollectProgressStatus(Map<String, Object> root, List<Map<String, Object>> allData, MyJdbcTemplate myJdbcTemplate) {
         return allData.stream().filter(p -> Objects.equals(String.valueOf(root.get("ID")), String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")))).peek(m -> {
-            List<Map<String, Object>> children = getChildrenNodeForCollectProgressStatus(m, allData, jdbcTemplate);
+            List<Map<String, Object>> children = getChildrenNodeForCollectProgressStatus(m, allData, myJdbcTemplate);
             if (children.size() > 0) {
                 int count = children.size();
                 String proStatus = "0";
                 List<Map<String, Object>> finishList = children.stream().filter(p -> Objects.equals("2", p.get("PROGRESS_STATUS_CODE"))).collect(Collectors.toList());
                 if (count == finishList.size()) {
-                    //父级改为已完成
+                    // 父级改为已完成
                     proStatus = "2";
                 } else {
                     List<Map<String, Object>> UnBeginList = children.stream().filter(p -> Objects.equals("0", p.get("PROGRESS_STATUS_CODE"))).collect(Collectors.toList());
                     if (count != UnBeginList.size()) {
-                        //父级改为进行中
+                        // 父级改为进行中
                         proStatus = "1";
                     }
                 }
-                List<Map<String, Object>> grSetValueList = jdbcTemplate.queryForList("select gsv.* from gr_set_value gsv " +
+                List<Map<String, Object>> grSetValueList = myJdbcTemplate.queryForList("select gsv.* from gr_set_value gsv " +
                         "left join gr_set gs on gs.id = gsv.gr_set_id where gs.`code`='PROGRESS_STATUS' and gsv.`code`=?", proStatus);
                 String proStatusID = "";
                 if (grSetValueList.size() > 0) {
                     proStatusID = String.valueOf(grSetValueList.get(0).get("ID"));
                 }
-                jdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=? where id=?", proStatusID, m.get("ID"));
+                myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=? where id=?", proStatusID, m.get("ID"));
             }
         }).collect(Collectors.toList());
     }
@@ -651,7 +648,7 @@ public class ProPlanExt {
         /**
          * 责任部门
          */
-        //ad_user
+        // ad_user
         public IdCodeName chiefDept;
         /**
          * 责任人
@@ -661,7 +658,7 @@ public class ProPlanExt {
         /**
          * 是否显示首页
          */
-        //SHOW_IN_PRJ_OVERVIEW
+        // SHOW_IN_PRJ_OVERVIEW
         public String showInPrjOverview;
 
         public String seqNo;
@@ -684,19 +681,19 @@ public class ProPlanExt {
         String json = JsonUtil.toJson(map);
         ProPlanExt.GetPrjProPlanNetworkParam param = JsonUtil.fromJson(json, ProPlanExt.GetPrjProPlanNetworkParam.class);
         String pmPrjId = param.pmPrjId;
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        Map<String, Object> proMap = jdbcTemplate.queryForMap("select pr.*,pj.name as PROJECT_NAME from PM_PRO_PLAN pr left join pm_prj pj on pr.PM_PRJ_ID = pj.id where PM_PRJ_ID=?", pmPrjId);
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> proMap = myJdbcTemplate.queryForMap("select pr.*,pj.name as PROJECT_NAME from PM_PRO_PLAN pr left join pm_prj pj on pr.PM_PRJ_ID = pj.id where PM_PRJ_ID=?", pmPrjId);
         ProContrast contrast;
         if (proMap != null) {
-            contrast = this.convertProContrast(proMap, jdbcTemplate);
+            contrast = this.convertProContrast(proMap, myJdbcTemplate);
 
-            List<Map<String, Object>> allList = jdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
+            List<Map<String, Object>> allList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
                     "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
                     "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO,pppn.`LEVEL` \n" +
                     "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where ppp.PM_PRJ_ID=?", pmPrjId);
 
-            List<ProContrastNode> infoList = allList.stream().map(p -> this.convertProContrastNode(p, jdbcTemplate)).collect(Collectors.toList());
-            //构建树
+            List<ProContrastNode> infoList = allList.stream().map(p -> this.convertProContrastNode(p, myJdbcTemplate)).collect(Collectors.toList());
+            // 构建树
             List<ProContrastNode> treeList = infoList.stream().filter(p -> Objects.equals("0", String.valueOf(p.pid))).peek(m -> {
                 m.children = getContrastChildren(m, infoList);
             }).collect(Collectors.toList());
@@ -714,26 +711,26 @@ public class ProPlanExt {
         }).collect(Collectors.toList());
     }
 
-    private ProContrastNode convertProContrastNode(Map<String, Object> data, JdbcTemplate jdbcTemplate) {
+    private ProContrastNode convertProContrastNode(Map<String, Object> data, MyJdbcTemplate myJdbcTemplate) {
         ProContrastNode node = new ProContrastNode();
         node.id = JdbcMapUtil.getString(data, "ID");
         node.pid = JdbcMapUtil.getString(data, "PM_PRO_PLAN_NODE_PID");
         node.name = JdbcMapUtil.getString(data, "NAME");
         if (!Objects.isNull(data.get("CHIEF_DEPT_ID"))) {
-            Map<String, Object> deptObj = jdbcTemplate.queryForMap("select * from hr_dept where id =?", JdbcMapUtil.getString(data, "CHIEF_DEPT_ID"));
+            Map<String, Object> deptObj = myJdbcTemplate.queryForMap("select * from hr_dept where id =?", JdbcMapUtil.getString(data, "CHIEF_DEPT_ID"));
             node.dept = String.valueOf(deptObj.get("NAME"));
         }
         if (!Objects.isNull(data.get("CHIEF_USER_ID"))) {
-            Map<String, Object> userObj = jdbcTemplate.queryForMap("select * from ad_user where id =?", JdbcMapUtil.getString(data, "CHIEF_USER_ID"));
+            Map<String, Object> userObj = myJdbcTemplate.queryForMap("select * from ad_user where id =?", JdbcMapUtil.getString(data, "CHIEF_USER_ID"));
             node.user = String.valueOf(userObj.get("NAME"));
         }
         String sql = "select * from gr_set_value where id=?";
         if (!Objects.isNull(data.get("PROGRESS_STATUS_ID"))) {
-            Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(data, "PROGRESS_STATUS_ID"));
+            Map<String, Object> statusObj = myJdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(data, "PROGRESS_STATUS_ID"));
             node.proStatus = String.valueOf(statusObj.get("NAME"));
         }
         if (!Objects.isNull(data.get("PROGRESS_RISK_TYPE_ID"))) {
-            Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(data, "PROGRESS_RISK_TYPE_ID"));
+            Map<String, Object> riskObj = myJdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(data, "PROGRESS_RISK_TYPE_ID"));
             node.riskStatus = String.valueOf(riskObj.get("NAME"));
         }
         node.proRiskRemark = JdbcMapUtil.getString(data, "PROGRESS_RISK_REMARK");
@@ -794,26 +791,26 @@ public class ProPlanExt {
         return node;
     }
 
-    private ProContrast convertProContrast(Map<String, Object> data, JdbcTemplate jdbcTemplate) {
+    private ProContrast convertProContrast(Map<String, Object> data, MyJdbcTemplate myJdbcTemplate) {
         ProContrast contrast = new ProContrast();
         contrast.id = JdbcMapUtil.getString(data, "ID");
         contrast.projectId = JdbcMapUtil.getString(data, "PM_PRJ_ID");
         contrast.projectName = JdbcMapUtil.getString(data, "PROJECT_NAME");
         if (!Objects.isNull(data.get("CHIEF_DEPT_ID"))) {
-            Map<String, Object> deptObj = jdbcTemplate.queryForMap("select * from hr_dept where id =?", JdbcMapUtil.getString(data, "CHIEF_DEPT_ID"));
+            Map<String, Object> deptObj = myJdbcTemplate.queryForMap("select * from hr_dept where id =?", JdbcMapUtil.getString(data, "CHIEF_DEPT_ID"));
             contrast.dept = String.valueOf(deptObj.get("NAME"));
         }
         if (!Objects.isNull(data.get("CHIEF_USER_ID"))) {
-            Map<String, Object> userObj = jdbcTemplate.queryForMap("select * from ad_user where id =?", JdbcMapUtil.getString(data, "CHIEF_USER_ID"));
+            Map<String, Object> userObj = myJdbcTemplate.queryForMap("select * from ad_user where id =?", JdbcMapUtil.getString(data, "CHIEF_USER_ID"));
             contrast.user = String.valueOf(userObj.get("NAME"));
         }
         String sql = "select * from gr_set_value where id=?";
         if (!Objects.isNull(data.get("PROGRESS_STATUS_ID"))) {
-            Map<String, Object> statusObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(data, "PROGRESS_STATUS_ID"));
+            Map<String, Object> statusObj = myJdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(data, "PROGRESS_STATUS_ID"));
             contrast.proStatus = String.valueOf(statusObj.get("NAME"));
         }
         if (!Objects.isNull(data.get("PROGRESS_RISK_TYPE_ID"))) {
-            Map<String, Object> riskObj = jdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(data, "PROGRESS_RISK_TYPE_ID"));
+            Map<String, Object> riskObj = myJdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(data, "PROGRESS_RISK_TYPE_ID"));
             contrast.riskStatus = String.valueOf(riskObj.get("NAME"));
         }
         contrast.proRiskRemark = JdbcMapUtil.getString(data, "PROGRESS_RISK_REMARK");

@@ -2,7 +2,6 @@ package com.cisdi.data.transfer;
 
 import com.cisdi.data.util.ListUtils;
 import com.cisdi.data.util.MapDataUtils;
-import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.debug.event.AsyncConfig;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -35,10 +34,10 @@ public class MapDataTransferController {
 
     @GetMapping("transferMap")
     public String transferMap() {
-        //删除原导入数据
+        // 删除原导入数据
         testJdbcTemplate.update("delete from map_longitude_latitude where CPMS_ID IS NOT NULL");
         testJdbcTemplate.update("delete from map_info where CPMS_ID IS NOT NULL");
-        //查询cpms库
+        // 查询cpms库
         List<Map<String, Object>> mapInfoList = cpmsJdbcTemplate.queryForList("select * from map_info where del_flag = '0'");
 
         List<List<Map<String, Object>>> mapInfoLists = ListUtils.split(mapInfoList, 100);
@@ -54,20 +53,20 @@ public class MapDataTransferController {
                             "STROKE_OPACITY,PM_PRJ_ID,PRJ_NAME,STROKE_WIDTH,FILL,STROKE,AREA,PLOT_RATIO,LAND_NOTE," +
                             "DICT_VALUE,FILL_OPACITY,CPMS_ID,TS,CRT_DT,LAST_MODI_DT) " +
                             "values ((select UUID_SHORT()),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,(now()),(now()),(now()))";
-                    //替换项目id
+                    // 替换项目id
                     List<Map<String, Object>> prjIdList = testJdbcTemplate.queryForList("select id from pm_prj where CPMS_UUID = ?", mapInfo.get("project_id"));
 
                     String prjId = CollectionUtils.isEmpty(prjIdList) ? null : JdbcMapUtil.getString(prjIdList.get(0), "id");
-                    //插入mapinfo
+                    // 插入mapinfo
                     testJdbcTemplate.update(mapInfoSql, mapInfo.get("code"), mapInfo.get("remakes"), mapInfo.get("map_id"), mapInfo.get("mid_type"),
                             mapInfo.get("inner_type"), mapInfo.get("stroke_opacity"), prjId, mapInfo.get("project_name"), mapInfo.get("stroke_width"),
                             mapInfo.get("fill"), mapInfo.get("stroke"), mapInfo.get("area"), mapInfo.get("plot_ratio"), mapInfo.get("land_note"),
                             mapInfo.get("dict_value"), mapInfo.get("fill_opacity"), mapInfo.get("id"));
                     log.info("成功同步一条地图信息数据");
-                    //返回id
+                    // 返回id
                     Map<String, Object> idMap = testJdbcTemplate.queryForMap("select id from map_info where CPMS_UUID = ?", mapInfo.get("map_id"));
                     String id = JdbcMapUtil.getString(idMap, "id");
-                    //插入坐标表
+                    // 插入坐标表
                     List<Map<String, Object>> coordinates = cpmsJdbcTemplate.queryForList("select * from " +
                             "map_longitude_latitude where del_flag = '0' and map_id = ?", mapInfo.get("map_id"));
                     for (Map<String, Object> coordinate : coordinates) {
@@ -89,7 +88,7 @@ public class MapDataTransferController {
 
     @GetMapping("initMap")
     public String initMap() {
-        //删除原导入数据
+        // 删除原导入数据
         testJdbcTemplate.update("delete from map_longitude_latitude");
         testJdbcTemplate.update("delete from map_info");
         MapDataUtils.getMapData(testJdbcTemplate);

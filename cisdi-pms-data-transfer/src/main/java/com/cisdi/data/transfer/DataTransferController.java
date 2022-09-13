@@ -141,7 +141,7 @@ public class DataTransferController {
                         Object setValueId = getSetValueId(cpmsDictType, obj);
                         argList.add(setValueId);
                     } else if (!SharedUtil.isEmptyString(refedQyglyTable)) {
-                        Object refedId = getRefedId(refedQyglyTable,obj);
+                        Object refedId = getRefedId(refedQyglyTable, obj);
                         argList.add(refedId);
                     } else {
                         argList.add(obj);

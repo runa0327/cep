@@ -41,7 +41,7 @@ public class TestStuExt {
         AsyncConfig config = new AsyncConfig();
         Executor executor = config.getAsyncExecutor();
         for (int i = 0; i < 10; i++) {
-            executor.execute(()->{
+            executor.execute(() -> {
                 System.out.println("12312");
             });
         }

@@ -4,12 +4,12 @@ import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.model.TestStu;
 import com.google.common.collect.Lists;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.interaction.EntityRecord;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +40,7 @@ public class PmExt {
         newTestStu.setName(newTestStu.getName() + "-新");
         newTestStu.updateById(null, null, true);
 
-        OrmHelper.copyCols(newTestStu,newPmPrj,Lists.newArrayList("CODE","NAME"),null);
+        OrmHelper.copyCols(newTestStu, newPmPrj, Lists.newArrayList("CODE", "NAME"), null);
 
         PmPrj pmPrj = PmPrj.insertData();
         pmPrj.setCode("123").setName("456").setBuildYears(50d).updateById(Lists.newArrayList(PmPrj.Cols.CODE, PmPrj.Cols.NAME), Lists.newArrayList(PmPrj.Cols.CODE), true);
@@ -76,8 +76,8 @@ public class PmExt {
         PmPrj.updateById("5", kvHashMap, null, null);
 
         Integer i5 = Crud.from(PmPrj.ENT_CODE).where().eq(PmPrj.Cols.ID, "5").update().set(PmPrj.Cols.ID, "6").exec();
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        jdbcTemplate.update("UPDATE PM_PRJ T SET T.ID=?,T.NAME=?,T.CODE=? WHERE T.ID=?", "6", "5");
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        myJdbcTemplate.update("UPDATE PM_PRJ T SET T.ID=?,T.NAME=?,T.CODE=? WHERE T.ID=?", "6", "5");
 
 
     }

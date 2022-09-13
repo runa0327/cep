@@ -20,12 +20,12 @@ public class testController {
 //    }
 
     @GetMapping("#{'${spring.test}'}")
-    public String sayHello(){
+    public String sayHello() {
         return "Hello";
     }
 
     @GetMapping("#{@testRest}")
-    public String sayYes(){
+    public String sayYes() {
         return "Yes-----------------";
     }
 }

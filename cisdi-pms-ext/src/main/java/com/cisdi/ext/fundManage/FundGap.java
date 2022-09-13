@@ -5,18 +5,18 @@ import com.cisdi.ext.model.BasePageEntity;
 import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//资金缺口
+// 资金缺口
 @Slf4j
 public class FundGap {
 
-    //资金来源支付列表
+    // 资金来源支付列表
     public void getFundGapList() {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         String inputJson = JsonUtil.toJson(inputMap);
@@ -59,13 +59,13 @@ public class FundGap {
                         "left join pm_fund_apportion a on a.PM_PRJ_ID = p.id " +
                         "left join pm_fund_source s on s.id = a.PM_FUND_SOURCE_ID where 1=1 "
         );
-        if (!Strings.isNullOrEmpty(input.prjId)){
+        if (!Strings.isNullOrEmpty(input.prjId)) {
             baseSql.append("and p.id = '" + input.prjId + "' ");
         }
-        if (!Strings.isNullOrEmpty(input.manageUnitId)){
+        if (!Strings.isNullOrEmpty(input.manageUnitId)) {
             baseSql.append("and p.PRJ_MANAGE_MODE_ID = '" + input.manageUnitId + "' ");
         }
-        if (!Strings.isNullOrEmpty(input.prjPhaseId)){
+        if (!Strings.isNullOrEmpty(input.prjPhaseId)) {
             baseSql.append("and p.PROJECT_PHASE_ID = '" + input.prjPhaseId + "' ");
         }
         if (!Strings.isNullOrEmpty(input.beginStartDay) && !Strings.isNullOrEmpty(input.beginEndDay)) {
@@ -79,7 +79,7 @@ public class FundGap {
         }
 
         baseSql.append("group by p.id ");
-        //除开翻页查询获取总条数
+        // 除开翻页查询获取总条数
         String totalSql = baseSql.toString();
         baseSql.append("order by p.CRT_DT desc ");
 
@@ -87,9 +87,9 @@ public class FundGap {
         baseSql.append("limit " + start + "," + input.pageSize);
 
         log.info(baseSql.toString());
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> resultList = jdbcTemplate.queryForList(baseSql.toString());
-        List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList(baseSql.toString());
+        List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
         HashMap<String, Object> result = new HashMap<>();
         result.put("resultList", resultList);
         result.put("total", totalList.size());
@@ -97,7 +97,8 @@ public class FundGap {
         Map outputMap = JsonUtil.fromJson(JSONObject.toJSONString(result), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
-    public static class Input extends BasePageEntity{
+
+    public static class Input extends BasePageEntity {
         /**
          * 项目id
          */

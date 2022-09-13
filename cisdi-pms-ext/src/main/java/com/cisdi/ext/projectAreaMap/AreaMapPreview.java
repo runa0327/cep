@@ -3,36 +3,26 @@ package com.cisdi.ext.projectAreaMap;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.cisdi.ext.demo.CrudExt;
-import com.cisdi.ext.model.BasePageEntity;
-import com.cisdi.ext.model.MapInfo;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.MapDataUtils;
-import com.cisdi.ext.util.Util;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
-import lombok.Data;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 区位图预览
  */
 public class AreaMapPreview {
     public void getMapPreviewList() {
-        //查询数据库地块信息
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        List<Map<String, Object>> mapInfos = jdbcTemplate.queryForList("select i.MAP_ID mapId,i.mid_type midType,i.inner_type innerType,i" +
+        // 查询数据库地块信息
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> mapInfos = myJdbcTemplate.queryForList("select i.MAP_ID mapId,i.mid_type midType,i.inner_type innerType,i" +
                 ".STROKE_OPACITY strokeOpacity,i.PRJ_IDS projectId,i.STROKE_WIDTH strokeWidth,v.code fill,i.stroke,i" +
                 ".FILL_OPACITY fillOpacity,i.code,i.area,i.PLOT_RATIO plotRatio,i.land_note landNote," +
                 "(select GROUP_CONCAT(name) from pm_prj where FIND_IN_SET(id,i.PRJ_IDS)) projectName from map_info i " +
@@ -75,7 +65,7 @@ public class AreaMapPreview {
         ExtJarHelper.returnValue.set(outputMap);
     }
 
-    //地块详情
+    // 地块详情
     public void getMapDetail() {
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         String mapId = params.get("mapId").toString();
@@ -83,8 +73,8 @@ public class AreaMapPreview {
             ExtJarHelper.returnValue.set(null);
             return;
         }
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        Map<String, Object> mapInfoMap = jdbcTemplate.queryForMap("select i.id,i.map_id,i.mid_type midType,i.inner_type innerType," +
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> mapInfoMap = myJdbcTemplate.queryForMap("select i.id,i.map_id,i.mid_type midType,i.inner_type innerType," +
                 "i.STROKE_OPACITY strokeOpacity,i.PRJ_IDS projectId,i.STROKE_WIDTH strokeWidth,i.fill,i.stroke" +
                 ",i.FILL_OPACITY fillOpacity,i.code,i.area,i.PLOT_RATIO plotRatio,i.land_note landNote " +
                 "from map_info i where i.map_id = ?", mapId);
@@ -106,31 +96,31 @@ public class AreaMapPreview {
 
     }
 
-    //修改地图信息
+    // 修改地图信息
     public void updateMap() {
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        NamedParameterJdbcTemplate namedJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        NamedParameterJdbcTemplate namedJdbcTemplate = new NamedParameterJdbcTemplate(myJdbcTemplate.getDataSource());
         String mapId = JdbcMapUtil.getString(params, "mapId");
-        if (exist(mapId)) {//数据库有该地块基础信息
-            //项目id或填充颜色为空时，正常更新单个地块
+        if (exist(mapId)) {// 数据库有该地块基础信息
+            // 项目id或填充颜色为空时，正常更新单个地块
             updateSingleMap();
             if (params.get("projectId") != null && params.get("fill") != null) {
-                //项目id和填充颜色同时修改时，将项目id的地块修改为当前颜色
+                // 项目id和填充颜色同时修改时，将项目id的地块修改为当前颜色
                 List<String> projectIds = Arrays.asList(params.get("projectId").toString());
                 HashMap<String, Object> queryParams = new HashMap<>();
                 queryParams.put("projectIds", projectIds);
                 queryParams.put("fill", params.get("fill").toString());
                 namedJdbcTemplate.update("update map_info set fill = (:fill) where PRJ_IDS in (:projectIds)", queryParams);
             }
-        } else {//数据库没有该地块信息 插入一条再修改
-            String id = Util.insertData(jdbcTemplate, "map_info");
+        } else {// 数据库没有该地块信息 插入一条再修改
+            String id = ExtJarHelper.insertData("map_info");
             Crud.from("map_info").where().eq("ID", id).update().set("MAP_ID", mapId).exec();
             updateSingleMap();
         }
     }
 
-    //地块项目信息
+    // 地块项目信息
     public void getProjectInfo() {
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         String projectIds = JdbcMapUtil.getString(params, "projectIds");
@@ -138,22 +128,22 @@ public class AreaMapPreview {
         HashMap<String, Object> queryParams = new HashMap<>();
         queryParams.put("projectIdList", projectIdList);
 
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        NamedParameterJdbcTemplate namedJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        NamedParameterJdbcTemplate namedJdbcTemplate = new NamedParameterJdbcTemplate(myJdbcTemplate.getDataSource());
         String baseSql = "select pj.id,pj.name,IFNULL(v.name,'未启动') statusName from pm_prj pj left join pm_pro_plan pp on pp.PM_PRJ_ID = pj.id " +
                 "left join gr_set_value v on v.id = pp.PROGRESS_STATUS_ID left join gr_set s on s.id = v.gr_set_id and s.code = 'PROGRESS_STATUS' " +
                 "where pj.id in (:projectIdList) ";
-        List<Map<String, Object>> projectInfoList = namedJdbcTemplate.queryForList(baseSql,queryParams);
+        List<Map<String, Object>> projectInfoList = namedJdbcTemplate.queryForList(baseSql, queryParams);
         ArrayList<ProjectInfo> projectInfos = new ArrayList<>();
         for (Map<String, Object> projectInfoMap : projectInfoList) {
             ProjectInfo projectInfo = new ProjectInfo();
-            projectInfo.prjId = JdbcMapUtil.getString(projectInfoMap,"id");
-            projectInfo.prjName = JdbcMapUtil.getString(projectInfoMap,"name");
-            projectInfo.statusName = JdbcMapUtil.getString(projectInfoMap,"statusName");
+            projectInfo.prjId = JdbcMapUtil.getString(projectInfoMap, "id");
+            projectInfo.prjName = JdbcMapUtil.getString(projectInfoMap, "name");
+            projectInfo.statusName = JdbcMapUtil.getString(projectInfoMap, "statusName");
             projectInfos.add(projectInfo);
         }
         HashMap<String, Object> projectInfoResp = new HashMap<>();
-        projectInfoResp.put("projectInfos",projectInfos);
+        projectInfoResp.put("projectInfos", projectInfos);
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(projectInfoResp), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
@@ -212,17 +202,17 @@ public class AreaMapPreview {
         baseSql.deleteCharAt(baseSql.lastIndexOf(","));
         baseSql.append(" where map_id = '" + mapId.toString() + "'");
 
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        int update = jdbcTemplate.update(baseSql.toString());
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        int update = myJdbcTemplate.update(baseSql.toString());
         if (update < 1) {
             throw new BaseException("地图信息更新失败");
         }
     }
 
-    //判断数据库是否已经有该地块信息 true 有 false 没有
+    // 判断数据库是否已经有该地块信息 true 有 false 没有
     public boolean exist(String mapId) {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-        Map<String, Object> numMap = jdbcTemplate.queryForMap("select count(*) num from map_info where map_id = ?", mapId);
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> numMap = myJdbcTemplate.queryForMap("select count(*) num from map_info where map_id = ?", mapId);
         return JdbcMapUtil.getInt(numMap, "num") > 0 ? true : false;
     }
 
@@ -281,7 +271,7 @@ public class AreaMapPreview {
     public static class ProjectInfo {
         public String prjId;
         public String prjName;
-        //进度状态
+        // 进度状态
         public String statusName;
     }
 

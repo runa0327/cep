@@ -21,6 +21,6 @@ public class WfPmInvest2Ext {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         String csCommId = entityRecord.csCommId;
         String pmPrjId = String.valueOf(entityRecord.valueMap.get("PM_PRJ_ID"));
-        WfPmInvestUtil.calculateData(csCommId,entCode, pmPrjId);
+        WfPmInvestUtil.calculateData(csCommId, entCode, pmPrjId);
     }
 }

@@ -1,9 +1,9 @@
 package com.cisdi.ext.wf;
 
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +32,11 @@ public class WfPrjReqExt {
 
     private void parseUserIdByPrjReq(EntityRecord entityRecord, String colName, String dspName) {
         String csCommId = entityRecord.csCommId;
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
         String user_id = null;
         try {
-            user_id = jdbcTemplate.queryForMap("select t." + colName + " USER_ID from pm_prj_req t where t.id=?", csCommId).get("USER_ID").toString();
+            user_id = myJdbcTemplate.queryForMap("select t." + colName + " USER_ID from pm_prj_req t where t.id=?", csCommId).get("USER_ID").toString();
         } catch (Exception ex) {
             throw new BaseException("项目没有设置对应的" + dspName + "用户！");
         }

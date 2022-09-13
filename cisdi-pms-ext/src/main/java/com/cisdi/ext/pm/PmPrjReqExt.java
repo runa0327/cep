@@ -6,13 +6,13 @@ import com.cisdi.ext.util.DoubleUtil;
 import com.cisdi.ext.util.ProFileUtils;
 import com.cisdi.ext.util.WfPmInvestUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -101,7 +101,7 @@ public class PmPrjReqExt {
     }
 
     private void createPrj(EntityRecord entityRecord) {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
         String csCommId = entityRecord.csCommId;
 
@@ -113,14 +113,14 @@ public class PmPrjReqExt {
         // 新建项目：
         String newPrjId = Crud.from("PM_PRJ").insertData();
         Integer exec = Crud.from("PM_PRJ").where().eq("ID", newPrjId).update().set("PM_PRJ_REQ_ID", pm_prj_req.get(
-                "id")).set("code", pm_prj_req.get("code")).set("name", pm_prj_req.get("name")).set("CUSTOMER_UNIT",
-                pm_prj_req.get("CUSTOMER_UNIT")).set("PRJ_MANAGE_MODE_ID", pm_prj_req.get("PRJ_MANAGE_MODE_ID")).set(
-                "BASE_LOCATION_ID", pm_prj_req.get("BASE_LOCATION_ID")).set("FLOOR_AREA", pm_prj_req.get(
-                "FLOOR_AREA")).set("PROJECT_TYPE_ID", pm_prj_req.get("PROJECT_TYPE_ID")).set(
-                "CON_SCALE_TYPE_ID", pm_prj_req.get("CON_SCALE_TYPE_ID")).set("CON_SCALE_QTY"
-                , pm_prj_req.get("CON_SCALE_QTY")).set("CON_SCALE_QTY2", pm_prj_req.get("CON_SCALE_QTY2")).set(
-                "CON_SCALE_UOM_ID", pm_prj_req.get("CON_SCALE_UOM_ID")).set("PRJ_SITUATION", pm_prj_req.get(
-                "PRJ_SITUATION")).set("INVESTMENT_SOURCE_ID", pm_prj_req.get("INVESTMENT_SOURCE_ID"))
+                        "id")).set("code", pm_prj_req.get("code")).set("name", pm_prj_req.get("name")).set("CUSTOMER_UNIT",
+                        pm_prj_req.get("CUSTOMER_UNIT")).set("PRJ_MANAGE_MODE_ID", pm_prj_req.get("PRJ_MANAGE_MODE_ID")).set(
+                        "BASE_LOCATION_ID", pm_prj_req.get("BASE_LOCATION_ID")).set("FLOOR_AREA", pm_prj_req.get(
+                        "FLOOR_AREA")).set("PROJECT_TYPE_ID", pm_prj_req.get("PROJECT_TYPE_ID")).set(
+                        "CON_SCALE_TYPE_ID", pm_prj_req.get("CON_SCALE_TYPE_ID")).set("CON_SCALE_QTY"
+                        , pm_prj_req.get("CON_SCALE_QTY")).set("CON_SCALE_QTY2", pm_prj_req.get("CON_SCALE_QTY2")).set(
+                        "CON_SCALE_UOM_ID", pm_prj_req.get("CON_SCALE_UOM_ID")).set("PRJ_SITUATION", pm_prj_req.get(
+                        "PRJ_SITUATION")).set("INVESTMENT_SOURCE_ID", pm_prj_req.get("INVESTMENT_SOURCE_ID"))
                 .set("PRJ_EARLY_USER_ID", pm_prj_req.get("PRJ_EARLY_USER_ID")).set("PRJ_DESIGN_USER_ID", pm_prj_req.get("PRJ_DESIGN_USER_ID"))
                 .set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID")).set("PRJ_CODE", pm_prj_req.get("PRJ_CODE"))
                 .set("BUILDING_AREA", pm_prj_req.get("CON_SCALE_QTY"))
@@ -138,21 +138,21 @@ public class PmPrjReqExt {
         // 新建项目投资测算：
         WfPmInvestUtil.calculateData(csCommId, "PM_PRJ_REQ", newPrjId);
 
-        //新增项目进度计划网络图
+        // 新增项目进度计划网络图
         createPlan(newPrjId);
 
-        //创建项目文件夹
+        // 创建项目文件夹
         ProFileUtils.createFolder(newPrjId);
 
-        //立项申请文件归档
-        //项目申请材料
+        // 立项申请文件归档
+        // 项目申请材料
         String reqFile = JdbcMapUtil.getString(pm_prj_req, "PRJ_REQ_FILE");
         ProFileUtils.insertProFile(newPrjId, reqFile, FileCodeEnum.PRJ_REQ_FILE);
-        //盖章立项申请书
+        // 盖章立项申请书
         String applyBook = JdbcMapUtil.getString(pm_prj_req, "STAMPED_PRJ_REQ_FILE");
         ProFileUtils.insertProFile(newPrjId, applyBook, FileCodeEnum.STAMPED_PRJ_REQ_FILE);
 
-        //批复文件
+        // 批复文件
         String reply = JdbcMapUtil.getString(pm_prj_req, "REPLY_FILE");
         ProFileUtils.insertProFile(newPrjId, reply, FileCodeEnum.REPLY_FILE);
     }
@@ -187,10 +187,10 @@ public class PmPrjReqExt {
 
     private void updatePrjYearLimit(EntityRecord entityRecord) {
 
-        //获取项目id
+        // 获取项目id
         String projectId = entityRecord.valueMap.get("PM_PRJ_ID").toString();
 
-        //获取建设年限
+        // 获取建设年限
         String year = entityRecord.valueMap.get("BUILD_YEARS").toString();
 
         // 修改项目建设年限信息：
@@ -210,14 +210,14 @@ public class PmPrjReqExt {
 
     private void updatePrjReply(EntityRecord entityRecord) {
 
-        //获取项目id
+        // 获取项目id
 //        String projectId = entityRecord.valueMap.get("PM_PRJ_ID").toString();
         String projectId = JdbcMapUtil.getString(entityRecord.valueMap, "PM_PRJ_ID");
         if (projectId == null || projectId.length() == 0) {
-            JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
-            //流程id
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+            // 流程id
             String csCommId = entityRecord.csCommId;
-            List<Map<String, Object>> map1 = jdbcTemplate.queryForList("SELECT id FROM pm_prj WHERE PM_PRJ_REQ_ID = ? ORDER BY CRT_DT desc limit 1", csCommId);
+            List<Map<String, Object>> map1 = myJdbcTemplate.queryForList("SELECT id FROM pm_prj WHERE PM_PRJ_REQ_ID = ? ORDER BY CRT_DT desc limit 1", csCommId);
             if (CollectionUtils.isEmpty(map1)) {
                 throw new BaseException("项目未创建完成无法进行批复信息同步");
             } else {
@@ -225,13 +225,13 @@ public class PmPrjReqExt {
             }
         }
 
-        //批复日期
+        // 批复日期
         String replyDate = entityRecord.valueMap.get("PRJ_REPLY_DATE").toString();
-        //批复文号
+        // 批复文号
         String replyNo = entityRecord.valueMap.get("PRJ_REPLY_NO").toString();
-        //批复材料
+        // 批复材料
         String replyFile = entityRecord.valueMap.get("REPLY_FILE").toString();
-        //资金来源
+        // 资金来源
         String investmentSourceId = entityRecord.valueMap.get("INVESTMENT_SOURCE_ID").toString();
 
         // 修改项目建设年限信息：
@@ -244,18 +244,18 @@ public class PmPrjReqExt {
      * 采购公开招标-回显采购方式及招标控制价
      */
     public void updateBid() {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String procInstId = ExtJarHelper.procInstId.get();
 
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         String csCommId = entityRecord.csCommId;
-        //采购方式
+        // 采购方式
         String buyType = entityRecord.valueMap.get("APPROVE_PURCHASE_TYPE").toString();
-        //招标控制价
+        // 招标控制价
         String price = entityRecord.valueMap.get("APPROVE_BID_CTL_PRICE").toString();
 
 
-        jdbcTemplate.update("update PO_PUBLIC_BID_REQ t set t.APPROVE_PURCHASE_TYPE_ECHO = ?,t" +
+        myJdbcTemplate.update("update PO_PUBLIC_BID_REQ t set t.APPROVE_PURCHASE_TYPE_ECHO = ?,t" +
                 ".BID_CTL_PRICE_LAUNCH_ECHO=? where t.id=?", buyType, price, csCommId);
     }
 
@@ -263,13 +263,13 @@ public class PmPrjReqExt {
      * 采购公开招标-更新招标复检
      */
     public void updateBidFile() {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        //该条记录id
+        // 该条记录id
         String csCommId = entityRecord.csCommId;
-        //文件id
+        // 文件id
         String fileId = entityRecord.valueMap.get("BID_FILE_GROUP_ID").toString();
-        jdbcTemplate.update("update PO_PUBLIC_BID_REQ set BID_ISSUE_FILE_GROUP_ID = ? where id = ?", fileId, csCommId);
+        myJdbcTemplate.update("update PO_PUBLIC_BID_REQ set BID_ISSUE_FILE_GROUP_ID = ? where id = ?", fileId, csCommId);
 
     }
 
@@ -277,34 +277,34 @@ public class PmPrjReqExt {
      * 采购公开招标-更新需求发起人
      */
     public void updatePromoter() {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        //该条记录id
+        // 该条记录id
         String csCommId = entityRecord.csCommId;
-        //需求发起人
-        String promoterName = jdbcTemplate.queryForMap("SELECT u.name FROM ad_user u left join po_public_bid_req b on" +
+        // 需求发起人
+        String promoterName = myJdbcTemplate.queryForMap("SELECT u.name FROM ad_user u left join po_public_bid_req b on" +
                 " u.id = " +
                 "b.CRT_USER_ID where b.id = ?", csCommId).get("name").toString();
-        //更新需求发起人
-        jdbcTemplate.update("update PO_PUBLIC_BID_REQ set DEMAND_PROMOTER = ? where id = ?", promoterName, csCommId);
+        // 更新需求发起人
+        myJdbcTemplate.update("update PO_PUBLIC_BID_REQ set DEMAND_PROMOTER = ? where id = ?", promoterName, csCommId);
     }
 
     /**
      * 采购公开招标-更新中标信息
      */
     public void updateWinUnit() {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        //该条记录id
+        // 该条记录id
         String csCommId = entityRecord.csCommId;
-        //需要更新的信息
+        // 需要更新的信息
         String winBidUnitTxt = entityRecord.valueMap.get("WIN_BID_UNIT_TXT").toString();
         String tenderOffer = entityRecord.valueMap.get("TENDER_OFFER").toString();
         String contactName = entityRecord.valueMap.get("CONTACT_NAME").toString();
         String contactMobileWin = entityRecord.valueMap.get("CONTACT_MOBILE_WIN").toString();
         String idcardWin = entityRecord.valueMap.get("CONTACT_IDCARD_WIN").toString();
-        //更新
-        jdbcTemplate.update("update PO_PUBLIC_BID_REQ set WIN_BID_UNIT_RECORD = ?," +
+        // 更新
+        myJdbcTemplate.update("update PO_PUBLIC_BID_REQ set WIN_BID_UNIT_RECORD = ?," +
                         "TENDER_OFFER_RECORD = ?," +
                         "CONTACT_NAME_RECORD =?," +
                         "CONTACT_MOBILE_RECORD =?," +
@@ -324,7 +324,7 @@ public class PmPrjReqExt {
         entityRecord.extraEditableAttCodeList.add("BID_CTL_PRICE_LAUNCH_ECHO");
         Map<String, Object> valueMap = entityRecord.valueMap;
 
-        //拿到两个控制价
+        // 拿到两个控制价
         Double bidCtlPriceLaunchEcho = JdbcMapUtil.getDouble(valueMap, "BID_CTL_PRICE_LAUNCH_ECHO");
         Double bidCtlPriceLaunch = JdbcMapUtil.getDouble(valueMap, "BID_CTL_PRICE_LAUNCH");
 
@@ -377,22 +377,22 @@ public class PmPrjReqExt {
      * @param projectId
      */
     private void createPlan(String projectId) {
-        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         try {
-            //根据项目类型查询项目进度计划模板
-            Map<String, Object> proMap = jdbcTemplate.queryForMap("select ppp.*,PRJ_REPLY_DATE from PM_PRO_PLAN ppp \n" +
+            // 根据项目类型查询项目进度计划模板
+            Map<String, Object> proMap = myJdbcTemplate.queryForMap("select ppp.*,PRJ_REPLY_DATE from PM_PRO_PLAN ppp \n" +
                     "left join pm_prj pp on ppp.TEMPLATE_FOR_PROJECT_TYPE_ID = pp.PROJECT_TYPE_ID\n" +
                     "where ppp.`STATUS`='AP' and ppp.IS_TEMPLATE='1' and pp.id=?", projectId);
             if (!Objects.isNull(proMap)) {
-                //先创建项目的进度计划
+                // 先创建项目的进度计划
                 String newPlanId = Crud.from("PM_PRO_PLAN").insertData();
 
                 Crud.from("PM_PRO_PLAN").where().eq("ID", newPlanId).update().set("IS_TEMPLATE", 0).set("PM_PRJ_ID", projectId).set("PLAN_TOTAL_DAYS", proMap.get("PLAN_TOTAL_DAYS"))
                         .set("PROGRESS_STATUS_ID", proMap.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", proMap.get("PROGRESS_RISK_TYPE_ID")).set("START_DAY", proMap.get("START_DAY")).exec();
 
 
-                //查询项目进度计划节点模板
-                List<Map<String, Object>> planNodeList = jdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT," +
+                // 查询项目进度计划节点模板
+                List<Map<String, Object>> planNodeList = myJdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT," +
                         "LAST_MODI_USER_ID,STATUS,LK_WF_INST_ID,CODE,NAME,REMARK,ACTUAL_START_DATE,PROGRESS_RISK_REMARK,PM_PRO_PLAN_ID,PLAN_START_DATE," +
                         "PLAN_TOTAL_DAYS,PLAN_CARRY_DAYS,ACTUAL_CARRY_DAYS,ACTUAL_TOTAL_DAYS,PLAN_CURRENT_PRO_PERCENT,ACTUAL_CURRENT_PRO_PERCENT," +
                         "ifnull(PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,PLAN_COMPL_DATE,ACTUAL_COMPL_DATE,SHOW_IN_EARLY_PROC,SHOW_IN_PRJ_OVERVIEW," +
