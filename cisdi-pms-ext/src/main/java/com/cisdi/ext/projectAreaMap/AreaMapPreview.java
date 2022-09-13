@@ -107,11 +107,12 @@ public class AreaMapPreview {
             updateSingleMap();
             if (params.get("projectId") != null && params.get("fill") != null) {
                 // 项目id和填充颜色同时修改时，将项目id的地块修改为当前颜色
-                List<String> projectIds = Arrays.asList(params.get("projectId").toString());
-                HashMap<String, Object> queryParams = new HashMap<>();
-                queryParams.put("projectIds", projectIds);
-                queryParams.put("fill", params.get("fill").toString());
-                myNamedParameterJdbcTemplate.update("update map_info set fill = (:fill) where PRJ_IDS in (:projectIds)", queryParams);
+//                List<String> projectIds = Arrays.asList(params.get("projectId").toString());
+//                HashMap<String, Object> queryParams = new HashMap<>();
+//                queryParams.put("projectIds", projectIds);
+//                queryParams.put("fill", params.get("fill").toString());
+//                myNamedParameterJdbcTemplate.update("update map_info set fill = (:fill) where find_in_set((:projectIds),PRJ_IDS)", queryParams);
+                myJdbcTemplate.update("update map_info set fill = ? where find_in_set(?,PRJ_IDS)",params.get("fill"),params.get("projectId"));
             }
         } else {// 数据库没有该地块信息 插入一条再修改
             String id = ExtJarHelper.insertData("map_info");
