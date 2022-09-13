@@ -113,13 +113,13 @@ public class FundApportion {
         List<File> fileList = FileCommon.getFileResp(fileIdStr, myJdbcTemplate);
 //        List<Map<String, Object>> fileList = FileCommon.getFileResp1(fileIdStr);
 
-//        NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(myJdbcTemplate.getDataSource());
+//         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
 //        Map<String, Object> queryParams = new HashMap<>();//创建入参map
 //        List<String> ids = Arrays.asList(fileIdStr.split(","));
 //        queryParams.put("ids", ids);
 //        String sql = "select DSP_NAME name,DSP_SIZE size,UPLOAD_DTTM uploadTime,FILE_INLINE_URL viewUrl,FILE_ATTACHMENT_URL downUrl from fl_file " +
 //                "where id in (:ids)";
-//        List<Map<String, Object>> fileList = namedParameterJdbcTemplate.queryForList(sql, queryParams);
+//        List<Map<String, Object>> fileList = myNamedParameterJdbcTemplate.queryForList(sql, queryParams);
 //        //文件
 //        String fileIdStr = JdbcMapUtil.getString(detailMap, "fileIds");
 //        List<String> ids = Arrays.asList(fileIdStr);

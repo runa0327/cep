@@ -167,7 +167,7 @@ public class WfExt {
                         // 备注
                         String remark = valueMap.get("REMARK").toString();
                         // 计划名称 待修改
-                        String name = myJdbcTemplate.queryForMap("select name from pm_prj where AMOUT_PM_PRJ_ID = ?",  valueMap.get(
+                        String name = myJdbcTemplate.queryForMap("select name from pm_prj where AMOUT_PM_PRJ_ID = ?", valueMap.get(
                                 "AMOUT_PM_PRJ_ID")).get("name").toString() + "资金需求计划";
 
                         String sql = "update pm_fund_req_plan set NAME = ?,PM_PRJ_ID = ?,HR_DEPT_ID = ?,TOTAL_AMT = ?,APPLY_TIME = ?," +

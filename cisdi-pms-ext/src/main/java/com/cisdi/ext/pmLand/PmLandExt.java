@@ -4,9 +4,9 @@ import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -69,11 +69,11 @@ public class PmLandExt {
             Map<String, Object> stringObjectMap = myJdbcTemplate.queryForMap("select ID,CODE,NAME,REMARK,DEMOLITION_COST,DEMOLITION_PROGRESS,ATT_FILE_GROUP_ID from PM_LAND_ACQUISITION_RECORD where id=?", recordId);
             PmLandRecord record = this.convertPmLandRecord(stringObjectMap);
             if (Strings.isNotEmpty(record.attFileGroupId)) {
-                NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(Objects.requireNonNull(myJdbcTemplate.getDataSource()));
+                MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
                 String sql = "select * from fl_file where id in (:ids)";
                 Map<String, Object> dataParam = new HashMap<>();
                 dataParam.put("ids", Arrays.asList(record.attFileGroupId.split(",")));
-                List<Map<String, Object>> list = namedParameterJdbcTemplate.queryForList(sql, dataParam);
+                List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sql, dataParam);
                 List<FileData> fileDataList = list.stream().map(p -> {
                     FileData fileData = new FileData();
                     fileData.id = JdbcMapUtil.getString(p, "ID");
@@ -218,11 +218,11 @@ public class PmLandExt {
             pay.payTime = StringUtil.withOutT(JdbcMapUtil.getString(stringObjectMap, "PAY_TIME"));
             pay.attFileGroupId = JdbcMapUtil.getString(stringObjectMap, "ATT_FILE_GROUP_ID");
             if (Strings.isNotEmpty(pay.attFileGroupId)) {
-                NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(Objects.requireNonNull(myJdbcTemplate.getDataSource()));
+                MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
                 String sql = "select * from fl_file where id in (:ids)";
                 Map<String, Object> dataParam = new HashMap<>();
                 dataParam.put("ids", Arrays.asList(pay.attFileGroupId.split(",")));
-                List<Map<String, Object>> list = namedParameterJdbcTemplate.queryForList(sql, dataParam);
+                List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sql, dataParam);
                 List<FileData> fileDataList = list.stream().map(p -> {
                     FileData fileData = new FileData();
                     fileData.id = JdbcMapUtil.getString(p, "ID");

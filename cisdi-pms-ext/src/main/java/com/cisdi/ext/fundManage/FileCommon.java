@@ -3,9 +3,10 @@ package com.cisdi.ext.fundManage;
 import com.cisdi.ext.model.view.File;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
+import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.util.*;
 
@@ -19,13 +20,13 @@ public class FileCommon {
         if (Strings.isNullOrEmpty(fileIdStr)) {
             return null;
         }
-        NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(myJdbcTemplate.getDataSource());
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         Map<String, Object> queryParams = new HashMap<>();// 创建入参map
         List<String> ids = Arrays.asList(fileIdStr.split(","));
         queryParams.put("ids", ids);
         String sql = "select id,DSP_NAME name,DSP_SIZE size,UPLOAD_DTTM uploadTime,FILE_INLINE_URL viewUrl,FILE_ATTACHMENT_URL downUrl from fl_file " +
                 "where id in (:ids)";
-        List<Map<String, Object>> fileList = namedParameterJdbcTemplate.queryForList(sql, queryParams);
+        List<Map<String, Object>> fileList = myNamedParameterJdbcTemplate.queryForList(sql, queryParams);
         List<File> files = new ArrayList<>();
         for (Map<String, Object> fileMap : fileList) {
             File file = new File();

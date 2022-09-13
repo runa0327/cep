@@ -7,10 +7,10 @@ import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.MapDataUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -100,7 +100,7 @@ public class AreaMapPreview {
     public void updateMap() {
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        NamedParameterJdbcTemplate namedJdbcTemplate = new NamedParameterJdbcTemplate(myJdbcTemplate.getDataSource());
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         String mapId = JdbcMapUtil.getString(params, "mapId");
         if (exist(mapId)) {// 数据库有该地块基础信息
             // 项目id或填充颜色为空时，正常更新单个地块
@@ -111,7 +111,7 @@ public class AreaMapPreview {
                 HashMap<String, Object> queryParams = new HashMap<>();
                 queryParams.put("projectIds", projectIds);
                 queryParams.put("fill", params.get("fill").toString());
-                namedJdbcTemplate.update("update map_info set fill = (:fill) where PRJ_IDS in (:projectIds)", queryParams);
+                myNamedParameterJdbcTemplate.update("update map_info set fill = (:fill) where PRJ_IDS in (:projectIds)", queryParams);
             }
         } else {// 数据库没有该地块信息 插入一条再修改
             String id = ExtJarHelper.insertData("map_info");
@@ -129,11 +129,11 @@ public class AreaMapPreview {
         queryParams.put("projectIdList", projectIdList);
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        NamedParameterJdbcTemplate namedJdbcTemplate = new NamedParameterJdbcTemplate(myJdbcTemplate.getDataSource());
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         String baseSql = "select pj.id,pj.name,IFNULL(v.name,'未启动') statusName from pm_prj pj left join pm_pro_plan pp on pp.PM_PRJ_ID = pj.id " +
                 "left join gr_set_value v on v.id = pp.PROGRESS_STATUS_ID left join gr_set s on s.id = v.gr_set_id and s.code = 'PROGRESS_STATUS' " +
                 "where pj.id in (:projectIdList) ";
-        List<Map<String, Object>> projectInfoList = namedJdbcTemplate.queryForList(baseSql, queryParams);
+        List<Map<String, Object>> projectInfoList = myNamedParameterJdbcTemplate.queryForList(baseSql, queryParams);
         ArrayList<ProjectInfo> projectInfos = new ArrayList<>();
         for (Map<String, Object> projectInfoMap : projectInfoList) {
             ProjectInfo projectInfo = new ProjectInfo();
