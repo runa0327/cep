@@ -1,8 +1,6 @@
 package com.cisdi.ext.link;
 
-import com.qygly.param.BaseParam;
-
-public class AttLinkParam extends BaseParam {
+public class AttLinkParam {
     public String sevId;
     public String id;
     public String attCode;
