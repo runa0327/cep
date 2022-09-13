@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.BasePageEntity;
 import com.cisdi.ext.model.view.File;
 import com.cisdi.ext.model.view.ImplementFund;
+import com.cisdi.ext.util.EntityUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
@@ -86,21 +87,16 @@ public class FundPay {
         List<File> fileList = FileCommon.getFileResp(fileIds, myJdbcTemplate);
         infoMap.put("fileList", fileList);
 
-        List<Map<String, Object>> payList = myJdbcTemplate.queryForList("select s.id sourceId,p.id prjId,p.name " +
-                "prjName,sum(a.APPORTION_AMT) apportionAmt,y.PAY_AMT payAmt " +
+        List<Map<String, Object>> payList = myJdbcTemplate.queryForList("select s.id source_Id,p.id prj_Id,p.name " +
+                "prj_Name,sum(a.APPORTION_AMT) apportion_Amt,y.PAY_AMT pay_Amt " +
                 "from pm_fund_source s " +
                 "left join pm_fund_apportion a on a.PM_FUND_SOURCE_ID = s.id " +
                 "left join pm_prj p on p.id = a.PM_PRJ_ID " +
                 "left join pm_fund_pay y on y.PM_FUND_SOURCE_ID = s.ID and p.id = y.PM_PRJ_ID " +
-                "where s.id = ? group by y.id,p.id", id);
+                "where s.id = ? and p.id is not null group by y.id,p.id", id);
         List<ImplementFund> implementFunds = new ArrayList<>();
         for (Map<String, Object> pay : payList) {
-            ImplementFund implementFund = new ImplementFund();
-            implementFund.sourceId = JdbcMapUtil.getString(pay, "sourceId");
-            implementFund.prjId = JdbcMapUtil.getString(pay, "prjId");
-            implementFund.prjName = JdbcMapUtil.getString(pay, "prjName");
-            implementFund.apportionAmt = JdbcMapUtil.getDouble(pay, "apportionAmt");
-            implementFund.payAmt = JdbcMapUtil.getDouble(pay, "payAmt");
+            ImplementFund implementFund = EntityUtil.mapToEntity(ImplementFund.class, pay);
             implementFunds.add(implementFund);
         }
         HashMap<Object, Object> result = new HashMap<>();
