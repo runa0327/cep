@@ -240,4 +240,20 @@ public class DateTimeUtil {
         int asd = DateTimeUtil.getTwoTimeDays(DateTimeUtil.stringToDate("2022-09-01"), DateTimeUtil.stringToDate("2022-09-10"));
         System.out.println(asd);
     }
+
+    /** 计算两个时间字符串（yyyy-MM-dd)之间时间差 **/
+    public static int getTwoTimeStringDays(String end, String start) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date smdate = sdf.parse(sdf.format(end));
+        Date bdate = sdf.parse(sdf.format(start));
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(smdate);
+        long time1 = cal.getTimeInMillis();
+        cal.setTime(bdate);
+        long time2 = cal.getTimeInMillis();
+        long between_days = (time2 - time1) / (1000 * 3600 * 24);
+
+        return Integer.parseInt(String.valueOf(between_days));
+    }
+
 }
