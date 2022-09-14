@@ -1504,6 +1504,16 @@ public class AttLinkExt {
 
         boolean ap = "AP".equals(attValue);
 
+        // 附件：
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.FILE_GROUP;
+            linkedAtt.value = "99952822476358787,99952822476358788";
+            linkedAtt.text = "/qygly-gateway/qygly-file/viewImage?fileId=99952822476358787,/qygly-gateway/qygly-file/viewImage?fileId=99952822476358788";
+
+            attLinkResult.attMap.put("ATT_FILE_GROUP_ID", linkedAtt);
+        }
+
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
