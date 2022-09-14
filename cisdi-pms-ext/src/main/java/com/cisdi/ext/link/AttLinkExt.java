@@ -262,24 +262,34 @@ public class AttLinkExt {
                     "r.BASE_LOCATION_ID,r.AGENT_BUILD_UNIT_RESPONSE,r.AGENT_BUILD_UNIT_RESPONSE_PHONE,r.DEMOLITION_COMPLETED," +
                     "r.PLAN_START_DATE,r.PLAN_COMPL_DATE,r.ACTUAL_START_DATE,r.CREATE_PROJECT_COMPLETED,r.FEASIBILITY_COMPLETED," +
                     "r.SELECT_SITE_COMPLETED,r.USE_LAND_COMPLETED,r.EIA_COMPLETED,r.WOODLAND_WATER_SOIL_COMPLETED,r.ESTIMATE_COMPLETED," +
-                    "r.REPLY_FILE,r.BUDGET_REVIEW_COMPLETED,r.CONSERVATION_REPLY_FILE,r.CONSTRUCT_BID_COMPLETED,r.BID_WIN_NOTICE_FILE_GROUP_ID" +
-                    " from PM_FUND_REQUIRE_PLAN_REQ " +
-                    "r left join pm_prj p on r.AMOUT_PM_PRJ_ID = p.id where p.id = ? and r" +
-                    ".`STATUS` = 'AP'", attValue);
+                    "r.REPLY_FILE,r.BUDGET_REVIEW_COMPLETED,r.CONSERVATION_REPLY_FILE,r.CONSTRUCT_BID_COMPLETED,r.BID_WIN_NOTICE_FILE_GROUP_ID " +
+                    " from PM_FUND_REQUIRE_PLAN_REQ r " +
+                    "left join pm_prj p on r.AMOUT_PM_PRJ_ID = p.id " +
+                    "where p.id = ? and r.`STATUS` = 'AP'", attValue);
             if (!CollectionUtils.isEmpty(reqMaps)) {
                 Map<String, Object> reqRow = reqMaps.get(0);
                 if (!CollectionUtils.isEmpty(reqMaps)) {// 该项目有过资金需求计划，回显表单数据
+                    List<String> keyList = getKeyList();
                     Set<String> keys = reqRow.keySet();
                     for (String key : keys) {
+                        String id = JdbcMapUtil.getString(reqRow, key);
+                        String name = id;
+                        if (keyList.contains(key)) {//是否财政预算
+                            String sqlName = "select name from gr_set_value where id = ?";
+                            List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(sqlName, id);
+                            name = JdbcMapUtil.getString(nameMap.get(0), "name");
+                        }
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
                             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                            linkedAtt.value = JdbcMapUtil.getString(reqRow, key);
-                            linkedAtt.text = JdbcMapUtil.getString(reqRow, key);
+                            linkedAtt.value = id;
+                            linkedAtt.text = name;
                             attLinkResult.attMap.put(key, linkedAtt);
                         }
                     }
                 }
+
+                //可研完成情况
             } else {// 未填写 根据项目回显
 
                 // 立项年度
@@ -1240,10 +1250,14 @@ public class AttLinkExt {
         }
         // 资金来源
         {
+            String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
+            String sqlName = "select name from gr_set_value where id = ?";
+            List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(sqlName, id);
+            String name = JdbcMapUtil.getString(nameMap.get(0), "name");
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
-            linkedAtt.text = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
+            linkedAtt.value = id;
+            linkedAtt.text = name;
 
             attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
             attLinkResult.attMap.put("PM_FUND_SOURCE_ID", linkedAtt);
@@ -1672,5 +1686,21 @@ public class AttLinkExt {
             resultRow = map.get(0);
         }
         return resultRow;
+    }
+
+    //属性联动中需要单独查询额外字典名称的key
+    public List<String> getKeyList() {
+        List<String> keyList = new ArrayList<>();
+        keyList.add("IS_BUDGET_ID");  //是否市财政预算政府投资计划项目
+        keyList.add("FEASIBILITY_COMPLETED");  //可研完成情况
+        keyList.add("CREATE_PROJECT_COMPLETED"); //立项完成情况
+        keyList.add("SELECT_SITE_COMPLETED"); //规划选址完成情况
+        keyList.add("USE_LAND_COMPLETED"); // 用地预审完成情况
+        keyList.add("EIA_COMPLETED"); // 环评审批完成情况
+        keyList.add("WOODLAND_WATER_SOIL_COMPLETED"); // 林地、水土保持、节能完成情况
+        keyList.add("ESTIMATE_COMPLETED"); //概算完成情况
+        keyList.add("BUDGET_REVIEW_COMPLETED"); //预算评审完成情况
+        keyList.add("CONSTRUCT_BID_COMPLETED"); //施工招标备案完成情况
+        return keyList;
     }
 }

@@ -4,7 +4,10 @@ import com.cisdi.ext.util.DateTimeUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
@@ -164,6 +167,27 @@ public class GuaranteeExt {
     public void checkFifth() {
         String newStatus = "fifth";
         checkFirst(newStatus);
+    }
+
+    /**
+     * 保函退还申请 发起时数据校验
+     */
+    public void checkData(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //退还原因  99902212142025881 = 到期申请退还，之后续保;  99902212142025882 = 达到退保条件，申请退保; 99902212142025883 = 其他
+        String reason = JdbcMapUtil.getString(entityRecord.valueMap,"REASON");
+        //原因说明
+        String remark = JdbcMapUtil.getString(entityRecord.valueMap,"REASON_EXPLAIN");
+        if ("99902212142025881".equals(reason)){
+            if (!SharedUtil.isEmptyString(remark)){
+                throw new BaseException("退还原因选择‘到期申请退还，之后续保’，请勿再继续填写原因说明！");
+            }
+        } else {
+            if (SharedUtil.isEmptyString(remark)){
+                throw new BaseException("请填写原因说明！");
+            }
+        }
     }
 
 }

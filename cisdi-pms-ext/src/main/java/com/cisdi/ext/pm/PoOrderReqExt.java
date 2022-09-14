@@ -6,7 +6,10 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -101,13 +104,11 @@ public class PoOrderReqExt {
     }
 
     /**
-     * 流程发起之时，合同总金额和明细校验
+     * 流程发起之时，相关数据校验
      */
-    public void checkAmt() {
+    public void checkData() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        // 主表单合同总金额
-        String sumAmt = entityRecord.valueMap.get("CONTRACT_PRICE").toString();
         // 查询明细表合同总金额
         String sql = "select AMT from PM_ORDER_COST_DETAIL where CONTRACT_ID = ?";
         List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql, entityRecord.csCommId);
@@ -115,8 +116,23 @@ public class PoOrderReqExt {
             throw new BaseException("费用明细不能为空！");
         }
         BigDecimal account = getSumAmt(list1);
-        if (account.compareTo(new BigDecimal(sumAmt)) != 0) {
-            throw new BaseException("费用明细内合同金额总和与合同总金额不同，请核查！");
+        //更新合同表合同总金额数
+        String sql2 = "update PO_ORDER_REQ set CONTRACT_PRICE = ? where id = ?";
+        myJdbcTemplate.update(sql2,account,entityRecord.csCommId);
+
+        //是否涉及保函
+        String baoHan = JdbcMapUtil.getString(entityRecord.valueMap,"IS_REFER_GUARANTEE");
+        //保函类型
+        String baoHanType = JdbcMapUtil.getString(entityRecord.valueMap,"GUARANTEE_LETTER_TYPE_ID");
+        if ("true".equals(baoHan)){
+            if (SharedUtil.isEmptyString(baoHanType)){
+                throw new BaseException("保函类型不能为空！");
+            }
+        }
+        if ("false".equals(baoHan)){
+            if (!SharedUtil.isEmptyString(baoHanType)){
+                throw new BaseException("未涉及保函，请勿勾选保函类型！");
+            }
         }
     }
 
