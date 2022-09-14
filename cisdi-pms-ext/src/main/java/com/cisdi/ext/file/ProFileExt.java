@@ -141,17 +141,17 @@ public class ProFileExt {
         int pageIndex = param.pageIndex;
 
         StringBuilder sbFolder = new StringBuilder();
-        sbFolder.append("select id,name,'' as upload_user,round(file_size,2) as size,'' as upload_time ,''as url,'1' as type,PF_FOLDER_PID as pid,'' as ext ,file_count,ID as folder_id from PF_FOLDER where  PM_PRJ_ID= " + projectId);
+        sbFolder.append("select id,name,'' as upload_user,round(file_size,2) as size,'' as upload_time ,''as url,'1' as type,PF_FOLDER_PID as pid,'' as ext ,file_count,ID as folder_id from PF_FOLDER where  PM_PRJ_ID= '" + projectId + "'");
 
         StringBuilder sbFile = new StringBuilder();
         sbFile.append("select fl.id as id,fl.`NAME`as name,us.`NAME` as upload_user,round(SIZE_KB,2) as size,UPLOAD_DTTM as upload_time,FILE_ATTACHMENT_URL as url ,'2' as type,'' as pid ,ext,0 as file_count,fo.id as  folder_id from FL_FILE fl " +
                 "left join PF_FILE PF on fl.id = pf.FL_FILE_ID " +
                 "left join pf_folder fo on fo.id = pf.PF_FOLDER_ID " +
-                "left join  ad_user us on pf.CHIEF_USER_ID = us.id where fo.PM_PRJ_ID= " + projectId);
+                "left join  ad_user us on pf.CHIEF_USER_ID = us.id where fo.PM_PRJ_ID= '" + projectId + "'");
 
         if (Strings.isNotEmpty(pfFolderId)) {
-            sbFolder.append(" and PF_FOLDER_PID=" + pfFolderId);
-            sbFile.append(" and pf.PF_FOLDER_ID = " + pfFolderId);
+            sbFolder.append(" and PF_FOLDER_PID='" + pfFolderId + "'");
+            sbFile.append(" and pf.PF_FOLDER_ID = '" + pfFolderId + "'");
         } else {
             if (Strings.isEmpty(name) && Strings.isEmpty(uploadUser) && Strings.isEmpty(beginTime) && Strings.isEmpty(endTime)) {
                 sbFolder.append(" and PF_FOLDER_PID is null");
