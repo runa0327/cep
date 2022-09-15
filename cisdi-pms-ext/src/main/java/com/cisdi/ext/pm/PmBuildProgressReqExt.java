@@ -19,10 +19,10 @@ public class PmBuildProgressReqExt {
         //计划开工日期
         String start = JdbcMapUtil.getString(entityRecord.valueMap,"PLAN_START_DATE");
         //计划完工日期
-        String end = JdbcMapUtil.getString(entityRecord.valueMap,"END_DATETIME");
+        String end = JdbcMapUtil.getString(entityRecord.valueMap,"COMPL_PLAN_DATE");
         int cha = 0;
         try {
-            cha = DateTimeUtil.getTwoTimeStringDays(end,start);
+            cha = DateTimeUtil.getTwoTimeStringDays(end,start) + 1;
         } catch (ParseException e) {
             e.printStackTrace();
         }
