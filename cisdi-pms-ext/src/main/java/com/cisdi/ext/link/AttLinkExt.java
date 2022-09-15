@@ -1659,6 +1659,7 @@ public class AttLinkExt {
         list.add("PO_ORDER_REQ"); // 采购合同签订申请
         list.add("PO_PUBLIC_BID_REQ"); // 采购公开招标申请
         list.add("PM_BUILD_ORGAN_PLAN_REQ"); // 施工组织设计及施工方案
+        list.add("PM_WORK_LIST_REQ"); // 工作联系单
         return list;
     }
 

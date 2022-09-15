@@ -431,6 +431,7 @@ public class WfExt {
         list.add("MATERIAL_EQUIPMENT_BRAND_APPROVAL"); // 工程材料设备及品牌报审
         list.add("PM_BUILD_ORGAN_PLAN_REQ"); // 施工组织设计及施工方案
         list.add("PM_BUILD_PROGRESS_REQ"); // 施工进度计划
+        list.add("PM_WORK_LIST_REQ"); // 工作联系单
         return list;
     }
 
