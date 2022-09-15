@@ -1,12 +1,12 @@
 package com.cisdi.ext.link;
 
+import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.att.AttDataTypeE;
-import com.qygly.shared.fl.FileInfo;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
@@ -1591,7 +1591,7 @@ public class AttLinkExt {
             linkedAtt.fileInfoList = new ArrayList<>(list.size());
 
             for (Map<String, Object> row : list) {
-                FileInfo fileInfo = new FileInfo();
+                LinkedAttFileInfo fileInfo = new LinkedAttFileInfo();
                 linkedAtt.fileInfoList.add(fileInfo);
 
                 fileInfo.attachmentUrl = JdbcMapUtil.getString(row, "FILE_ATTACHMENT_URL");
@@ -1605,7 +1605,7 @@ public class AttLinkExt {
                 fileInfo.inlineUrl = JdbcMapUtil.getString(row, "FILE_INLINE_URL");
                 fileInfo.name = JdbcMapUtil.getString(row, "NAME");
                 fileInfo.sizeKiloByte = JdbcMapUtil.getDouble(row, "SIZE_KB");
-                fileInfo.uploadDttm = JdbcMapUtil.getDate(row, "UPLOAD_DTTM");
+                fileInfo.uploadDttm = DateTimeUtil.dttmToString(JdbcMapUtil.getObject(row, "UPLOAD_DTTM"));
             }
         }
     }

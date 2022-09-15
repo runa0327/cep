@@ -30,7 +30,7 @@ public class LinkedAtt extends BaseOfBase {
     public String text;
 
     @JsonView({F.class, B.class})
-    public List<FileInfo> fileInfoList;
+    public List<LinkedAttFileInfo> fileInfoList;
 
     /**
      * 改变为名称。空不改变。
