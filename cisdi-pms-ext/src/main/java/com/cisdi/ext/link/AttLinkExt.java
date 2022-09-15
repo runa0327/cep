@@ -1581,6 +1581,10 @@ public class AttLinkExt {
      * @param linkedAtt
      */
     private void getFileInfoList(LinkedAtt linkedAtt) {
+        if (SharedUtil.isEmptyObject(linkedAtt.value)) {
+            return;
+        }
+
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         String[] idArr = linkedAtt.value.toString().split(",");
         List<String> idList = Arrays.asList(idArr);
