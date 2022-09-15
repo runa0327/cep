@@ -5,6 +5,9 @@ import com.qygly.shared.BaseOfBase;
 import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.end.B;
 import com.qygly.shared.end.F;
+import com.qygly.shared.fl.FileInfo;
+
+import java.util.List;
 
 public class LinkedAtt extends BaseOfBase {
 
@@ -25,6 +28,9 @@ public class LinkedAtt extends BaseOfBase {
      */
     @JsonView({F.class, B.class})
     public String text;
+
+    @JsonView({F.class, B.class})
+    public List<FileInfo> fileInfoList;
 
     /**
      * 改变为名称。空不改变。

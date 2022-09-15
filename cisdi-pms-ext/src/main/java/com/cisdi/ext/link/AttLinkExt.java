@@ -3,8 +3,10 @@ package com.cisdi.ext.link;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.att.AttDataTypeE;
+import com.qygly.shared.fl.FileInfo;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
@@ -274,7 +276,7 @@ public class AttLinkExt {
                     for (String key : keys) {
                         String id = JdbcMapUtil.getString(reqRow, key);
                         String name = id;
-                        if (keyList.contains(key)) {//是否财政预算
+                        if (keyList.contains(key)) {// 是否财政预算
                             String sqlName = "select name from gr_set_value where id = ?";
                             List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(sqlName, id);
                             name = JdbcMapUtil.getString(nameMap.get(0), "name");
@@ -289,7 +291,7 @@ public class AttLinkExt {
                     }
                 }
 
-                //可研完成情况
+                // 可研完成情况
             } else {// 未填写 根据项目回显
 
                 // 立项年度
@@ -1525,6 +1527,8 @@ public class AttLinkExt {
             linkedAtt.value = "99952822476358787,99952822476358788";
             linkedAtt.text = "/qygly-gateway/qygly-file/viewImage?fileId=99952822476358787,/qygly-gateway/qygly-file/viewImage?fileId=99952822476358788";
 
+            getFileInfoList(linkedAtt);
+
             attLinkResult.attMap.put("ATT_FILE_GROUP_ID", linkedAtt);
         }
 
@@ -1569,6 +1573,41 @@ public class AttLinkExt {
         attLinkResult.childData.put("99902212142028120", linkedRecordList);// 测试老师的视图部分ID，不是实体视图ID
 
         return attLinkResult;
+    }
+
+    /**
+     * 为联动的属性获取文件信息列表。
+     *
+     * @param linkedAtt
+     */
+    private void getFileInfoList(LinkedAtt linkedAtt) {
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+        String[] idArr = linkedAtt.value.toString().split(",");
+        List<String> idList = Arrays.asList(idArr);
+        Map<String, Object> map = new HashMap<>();
+        map.put("ids", idList);
+        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList("select t.*, crt_user.code crt_user_code, crt_user.name crt_user_name from fl_file t left join ad_user crt_user on t.crt_user_id = crt_user.id where t.id in (:ids)", map);
+        if (list.size() > 0) {
+            linkedAtt.fileInfoList = new ArrayList<>(list.size());
+
+            for (Map<String, Object> row : list) {
+                FileInfo fileInfo = new FileInfo();
+                linkedAtt.fileInfoList.add(fileInfo);
+
+                fileInfo.attachmentUrl = JdbcMapUtil.getString(row, "FILE_ATTACHMENT_URL");
+                fileInfo.code = JdbcMapUtil.getString(row, "CODE");
+                fileInfo.crtUserCode = JdbcMapUtil.getString(row, "CRT_USER_CODE");
+                fileInfo.crtUserName = JdbcMapUtil.getString(row, "CRT_USER_NAME");
+                fileInfo.dspName = JdbcMapUtil.getString(row, "DSP_NAME");
+                fileInfo.dspSize = JdbcMapUtil.getString(row, "DSP_SIZE");
+                fileInfo.ext = JdbcMapUtil.getString(row, "EXT");
+                fileInfo.id = JdbcMapUtil.getString(row, "ID");
+                fileInfo.inlineUrl = JdbcMapUtil.getString(row, "FILE_INLINE_URL");
+                fileInfo.name = JdbcMapUtil.getString(row, "NAME");
+                fileInfo.sizeKiloByte = JdbcMapUtil.getDouble(row, "SIZE_KB");
+                fileInfo.uploadDttm = JdbcMapUtil.getDate(row, "UPLOAD_DTTM");
+            }
+        }
     }
 
     // 默认未涉及
@@ -1688,19 +1727,19 @@ public class AttLinkExt {
         return resultRow;
     }
 
-    //属性联动中需要单独查询额外字典名称的key
+    // 属性联动中需要单独查询额外字典名称的key
     public List<String> getKeyList() {
         List<String> keyList = new ArrayList<>();
-        keyList.add("IS_BUDGET_ID");  //是否市财政预算政府投资计划项目
-        keyList.add("FEASIBILITY_COMPLETED");  //可研完成情况
-        keyList.add("CREATE_PROJECT_COMPLETED"); //立项完成情况
-        keyList.add("SELECT_SITE_COMPLETED"); //规划选址完成情况
+        keyList.add("IS_BUDGET_ID");  // 是否市财政预算政府投资计划项目
+        keyList.add("FEASIBILITY_COMPLETED");  // 可研完成情况
+        keyList.add("CREATE_PROJECT_COMPLETED"); // 立项完成情况
+        keyList.add("SELECT_SITE_COMPLETED"); // 规划选址完成情况
         keyList.add("USE_LAND_COMPLETED"); // 用地预审完成情况
         keyList.add("EIA_COMPLETED"); // 环评审批完成情况
         keyList.add("WOODLAND_WATER_SOIL_COMPLETED"); // 林地、水土保持、节能完成情况
-        keyList.add("ESTIMATE_COMPLETED"); //概算完成情况
-        keyList.add("BUDGET_REVIEW_COMPLETED"); //预算评审完成情况
-        keyList.add("CONSTRUCT_BID_COMPLETED"); //施工招标备案完成情况
+        keyList.add("ESTIMATE_COMPLETED"); // 概算完成情况
+        keyList.add("BUDGET_REVIEW_COMPLETED"); // 预算评审完成情况
+        keyList.add("CONSTRUCT_BID_COMPLETED"); // 施工招标备案完成情况
         return keyList;
     }
 }
