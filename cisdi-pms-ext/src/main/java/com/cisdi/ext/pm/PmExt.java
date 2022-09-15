@@ -2,6 +2,7 @@ package com.cisdi.ext.pm;
 
 import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.model.TestStu;
+import com.cisdi.ext.util.JsonUtil;
 import com.google.common.collect.Lists;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -9,10 +10,16 @@ import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class PmExt {
@@ -79,6 +86,83 @@ public class PmExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         myJdbcTemplate.update("UPDATE PM_PRJ T SET T.ID=?,T.NAME=?,T.CODE=? WHERE T.ID=?", "6", "5");
 
+
+    }
+
+    /**
+     * 项目入库
+     */
+    public void prjInStorage() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        RequestParam param = JsonUtil.fromJson(json, RequestParam.class);
+        String name = param.name;
+        int pageSize = param.pageSize;
+        int pageIndex = param.pageIndex;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        StringBuilder sb = new StringBuilder();
+        sb.append("select CODE,NAME,REMARK,PRJ_MANAGE_MODE_ID,BASE_LOCATION_ID,FLOOR_AREA,PROJECT_TYPE_ID,CON_SCALE_TYPE_ID,CON_SCALE_QTY,CON_SCALE_UOM_ID,PRJ_SITUATION,INVESTMENT_SOURCE_ID,PM_PRJ_REQ_ID,CON_SCALE_QTY2,CUSTOMER_UNIT,PRJ_REPLY_DATE,PRJ_REPLY_NO,PRJ_REPLY_FILE,PRJ_EARLY_USER_ID,PRJ_DESIGN_USER_ID,PRJ_COST_USER_ID,BASE_EPC_ID,IN_PROVINCE_REP,IN_COUNTRY_REP,PROJECT_PHASE_ID,TRANSITION_PHASE_ID,PRJ_IMG,BUILD_YEARS,BUILDER_UNIT,SURVEYOR_UNIT,DESIGNER_UNIT,CONSTRUCTOR_UNIT,SUPERVISOR_UNIT,CHECKER_UNIT,CONSULTER_UNIT,CPMS_UUID,CPMS_ID,CPMS_CONSTRUCTION_SITE,PRJ_CODE,BUILDING_AREA from pm_prj where 1=1 ");
+        if (Strings.isNotEmpty(name)) {
+            sb.append(" and `NAME` like '%").append(name).append("%'");
+        }
+        String totalSql = sb.toString();
+        int start = pageSize * (pageIndex - 1);
+        sb.append(" limit ").append(start).append(",").append(pageSize);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
+        List<Project> records = list.stream().map(this::convertProject).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(records)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
+            OutSide outSide = new OutSide();
+            outSide.total = totalList.size();
+            outSide.list = records;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+
+    private Project convertProject(Map<String, Object> data) {
+        Project project = new Project();
+        project.id = JdbcMapUtil.getString(data, "ID");
+        project.name = JdbcMapUtil.getString(data, "NAME");
+        project.customerUnit = JdbcMapUtil.getString(data, "CUSTOMER_UNIT");
+        project.type = JdbcMapUtil.getString(data, "PROJECT_TYPE");
+        project.baseLocation = JdbcMapUtil.getString(data, "BASE_LOCATION");
+//        project.total= JdbcMapUtil.getString(data,"");
+        project.total = "0";
+        project.inProvinceRep = JdbcMapUtil.getString(data, "IN_PROVINCE_REP");
+        project.inCountryRep = JdbcMapUtil.getString(data, "IN_COUNTRY_REP");
+
+        return project;
+    }
+
+    private static class Project {
+        public String id;
+        public String name;
+        //业主单位
+        public String customerUnit;
+        public String type;
+        //建设地点
+        public String baseLocation;
+        public String total;
+        //是否入省库
+        public String inProvinceRep;
+        //是否入国库
+        public String inCountryRep;
+    }
+
+    public static class OutSide {
+        public Integer total;
+
+        public List<Project> list;
+    }
+
+    private static class RequestParam {
+        public Integer pageSize;
+        public Integer pageIndex;
+        public String name;
 
     }
 }

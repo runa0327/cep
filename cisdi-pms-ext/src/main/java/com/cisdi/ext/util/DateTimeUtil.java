@@ -244,8 +244,8 @@ public class DateTimeUtil {
     /** 计算两个时间字符串（yyyy-MM-dd)之间时间差 **/
     public static int getTwoTimeStringDays(String end, String start) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date smdate = sdf.parse(sdf.format(end));
-        Date bdate = sdf.parse(sdf.format(start));
+        Date smdate = sdf.parse(end);
+        Date bdate = sdf.parse(start);
         Calendar cal = Calendar.getInstance();
         cal.setTime(smdate);
         long time1 = cal.getTimeInMillis();
