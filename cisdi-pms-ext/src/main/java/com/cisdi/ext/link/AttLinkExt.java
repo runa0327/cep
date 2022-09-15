@@ -1581,7 +1581,7 @@ public class AttLinkExt {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.FILE_GROUP;
             linkedAtt.value = "99952822476358787,99952822476358788";
-            linkedAtt.text = "/qygly-gateway/qygly-file/viewImage?fileId=99952822476358787,/qygly-gateway/qygly-file/viewImage?fileId=99952822476358788";
+//            linkedAtt.text = "/qygly-gateway/qygly-file/viewImage?fileId=99952822476358787,/qygly-gateway/qygly-file/viewImage?fileId=99952822476358788";
 
             getFileInfoList(linkedAtt);
 
@@ -1647,13 +1647,12 @@ public class AttLinkExt {
         Map<String, Object> map = new HashMap<>();
         map.put("ids", idList);
         List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList("select t.*, crt_user.code crt_user_code, crt_user.name crt_user_name from fl_file t left join ad_user crt_user on t.crt_user_id = crt_user.id where t.id in (:ids)", map);
-        if (list.size() > 0) {
+        if (!CollectionUtils.isEmpty(list)) {
             linkedAtt.fileInfoList = new ArrayList<>(list.size());
-
+            StringBuilder sb = new StringBuilder();
             for (Map<String, Object> row : list) {
                 LinkedAttFileInfo fileInfo = new LinkedAttFileInfo();
                 linkedAtt.fileInfoList.add(fileInfo);
-
                 fileInfo.attachmentUrl = JdbcMapUtil.getString(row, "FILE_ATTACHMENT_URL");
                 fileInfo.code = JdbcMapUtil.getString(row, "CODE");
                 fileInfo.crtUserCode = JdbcMapUtil.getString(row, "CRT_USER_CODE");
@@ -1662,11 +1661,14 @@ public class AttLinkExt {
                 fileInfo.dspSize = JdbcMapUtil.getString(row, "DSP_SIZE");
                 fileInfo.ext = JdbcMapUtil.getString(row, "EXT");
                 fileInfo.id = JdbcMapUtil.getString(row, "ID");
-                fileInfo.inlineUrl = JdbcMapUtil.getString(row, "FILE_INLINE_URL");
+                String url = JdbcMapUtil.getString(row, "FILE_INLINE_URL");
+                fileInfo.inlineUrl = url;
                 fileInfo.name = JdbcMapUtil.getString(row, "NAME");
                 fileInfo.sizeKiloByte = JdbcMapUtil.getDouble(row, "SIZE_KB");
                 fileInfo.uploadDttm = DateTimeUtil.dttmToString(JdbcMapUtil.getObject(row, "UPLOAD_DTTM"));
+                sb.append(url).append(",");
             }
+            linkedAtt.text = sb.substring(0,sb.length()-1);
         }
     }
 
