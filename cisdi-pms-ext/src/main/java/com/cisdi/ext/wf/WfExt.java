@@ -429,6 +429,8 @@ public class WfExt {
         list.add("PM_MATERIAL_EXIT"); // 材料退场
         list.add("MATERIAL_EQUIPMENT_ENTER_CHECK"); // 工程材料设备进场验收
         list.add("MATERIAL_EQUIPMENT_BRAND_APPROVAL"); // 工程材料设备及品牌报审
+        list.add("PM_BUILD_ORGAN_PLAN_REQ"); // 施工组织设计及施工方案
+        list.add("PM_BUILD_PROGRESS_REQ"); // 施工进度计划
         return list;
     }
 
