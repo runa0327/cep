@@ -2,7 +2,6 @@ package com.cisdi.ext.link;
 
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
-import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
@@ -62,9 +61,56 @@ public class AttLinkExt {
             return linkForAMOUT_PM_PRJ_ID(myJdbcTemplate, attValue, entCode);
         } else if ("STATUS".equals(attCode)) {
             return linkForSTATUS(attValue, sevId);
-        } else {
+        } else if ("RELATION_AMOUT_PLAN_REQ_ID".equals(attCode)){ //资金需求计划联动属性
+            return linkForRELATION_AMOUT_PLAN_REQ_ID(myJdbcTemplate, attValue, entCode);
+        } else if ("PAY_BASIS_ID".equals(attCode)){ //付款依据属性联动
+            return linkPAY_BASIS_ID(myJdbcTemplate, attValue, entCode,sevId);
+        }else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
+    }
+
+    //付款依据属性联动
+    private AttLinkResult linkPAY_BASIS_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode,String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        if ("PO_ORDER_PAYMENT_REQ".equals(entCode)) { //付款申请
+            // 明细信息
+            if ("99902212142033284".equals(sevId)) {
+                // 付款依据 99902212142031993 = 其他付款 99902212142031992=合同付款
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    attLinkResult.attMap.put("CONTRACT_ID", linkedAtt);
+                }
+                //清除明细表信息
+                attLinkResult.childClear.put("99902212142514118", true);
+                attLinkResult.childCreatable.put("99902212142514118", true);
+            }
+        }
+        return attLinkResult;
+    }
+
+    //资金需求计划联动属性
+    private AttLinkResult linkForRELATION_AMOUT_PLAN_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        if ("PO_ORDER_PAYMENT_REQ".equals(entCode)){ //付款申请
+            //查询项目信息
+            String sql1 = "SELECT a.AMOUT_PM_PRJ_ID,b.name FROM PM_FUND_REQUIRE_PLAN_REQ a LEFT JOIN pm_prj b on a.AMOUT_PM_PRJ_ID = b.id WHERE a.id = ?";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,attValue);
+            if (!CollectionUtils.isEmpty(list1)){
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"AMOUT_PM_PRJ_ID");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"name");
+                    attLinkResult.attMap.put("AMOUT_PM_PRJ_ID", linkedAtt);
+                }
+            }
+
+        }
+        return attLinkResult;
     }
 
     private AttLinkResult linkForMany(MyJdbcTemplate myJdbcTemplate, String attCode, String attValue) {
