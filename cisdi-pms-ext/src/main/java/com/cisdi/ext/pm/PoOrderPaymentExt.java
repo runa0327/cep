@@ -74,8 +74,6 @@ public class PoOrderPaymentExt {
         //预付款和进度款都为空，默认为查询进度款
         if (SharedUtil.isEmptyString(yuFu) && SharedUtil.isEmptyString(qiShu)){
             throw new BaseException("预付款和进度款必须选择一个");
-//            String sql3 = "select count(*) as num from PO_ORDER_PAYMENT_REQ where CONTRACT_ID = ? and status = 'AP'";
-//            List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sql3,contractId);
         }
 
 
@@ -97,9 +95,27 @@ public class PoOrderPaymentExt {
         BigDecimal FINANCIAL_PERCENT = new BigDecimal(0);
         BigDecimal SETTLEMENT_PERCENT = new BigDecimal(0);
 
+        //查询明细信息
+        String sql3 = "select PAY_AMT_ONE from PM_PAY_COST_DETAIL where PARENT_ID = ?";
+        List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sql3,csCommId);
+        if (CollectionUtils.isEmpty(list3)){
+            throw new BaseException("费用明细信息不能为空");
+        }
+        BigDecimal account = getSumAmt(list3);
+
         // 信息更新付款申请表
-        String updateSql = "update PO_ORDER_PAYMENT_REQ set DEPT_NAME = ?,LAST_SUM_PAY=?,NOW_SUM_PAY=?,CONTRACT_PERCENT=?,ESTIMATE_PERCENT=?,FINANCIAL_PERCENT=?,SETTLEMENT_PERCENT=? where id = ?";
-        int num = myJdbcTemplate.update(updateSql, deptName, lastAmount, maxAmount, contractPre, ESTIMATE_PERCENT, FINANCIAL_PERCENT, SETTLEMENT_PERCENT, csCommId);
+        String updateSql = "update PO_ORDER_PAYMENT_REQ set DEPT_NAME = ?,LAST_SUM_PAY=?,NOW_SUM_PAY=?,CONTRACT_PERCENT=?,ESTIMATE_PERCENT=?,FINANCIAL_PERCENT=?,SETTLEMENT_PERCENT=?,PAY_AMT=? where id = ?";
+        int num = myJdbcTemplate.update(updateSql, deptName, lastAmount, maxAmount, contractPre, ESTIMATE_PERCENT, FINANCIAL_PERCENT, SETTLEMENT_PERCENT, account,csCommId);
+    }
+
+    // 汇总求和
+    private BigDecimal getSumAmt(List<Map<String, Object>> list) {
+        BigDecimal sum = new BigDecimal(0);
+        for (Map<String, Object> tmp : list) {
+            String value = tmp.get("PAY_AMT_ONE").toString();
+            sum = sum.add(new BigDecimal(value));
+        }
+        return sum;
     }
 
     /**

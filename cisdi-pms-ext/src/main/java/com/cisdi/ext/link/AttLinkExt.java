@@ -584,7 +584,7 @@ public class AttLinkExt {
         // 获取保函名称
 
         // 查询保函相关信息
-        String sql = "select NAME,SUPPLIER,BENEFICIARY,GUARANTEE_LETTER_TYPE_ID,GUARANTEE_MECHANISM,GUARANTEE_CODE,GUARANTEE_AMT,GUARANTEE_START_DATE,GUARANTEE_END_DATE,GUARANTEE_FILE from PO_GUARANTEE_LETTER_REQUIRE_REQ where id = ?";
+        String sql = "select NAME,SUPPLIER,BENEFICIARY,GUARANTEE_LETTER_TYPE_ID,GUARANTEE_MECHANISM,GUARANTEE_CODE,GUARANTEE_AMT,GUARANTEE_START_DATE,GUARANTEE_END_DATE,GUARANTEE_FILE,GUARANTEE_FILE from PO_GUARANTEE_LETTER_REQUIRE_REQ where id = ?";
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, attValue);
         if (CollectionUtils.isEmpty(list)) {
             throw new BaseException("保函没有相关信息，请先完善");
@@ -671,6 +671,15 @@ public class AttLinkExt {
 
             attLinkResult.attMap.put("GUARANTEE_END_DATE", linkedAtt);
         }
+        //保函附件
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.FILE_GROUP;
+            linkedAtt.value = JdbcMapUtil.getString(row,"GUARANTEE_FILE");
+            getFileInfoList(linkedAtt);
+            attLinkResult.attMap.put("GUARANTEE_RESULT_FILE", linkedAtt);
+        }
+
 
         return attLinkResult;
     }
