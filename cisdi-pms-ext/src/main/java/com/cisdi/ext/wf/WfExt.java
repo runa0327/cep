@@ -442,6 +442,7 @@ public class WfExt {
         list.add("APPROVAL_INSPECTION"); // 报审、报验
         list.add("PM_CONTROL_FLOOD_REQ"); // 防洪评价
         list.add("PM_TRAFFIC_SAFETY_REQ"); // 交通安全评价
+        list.add("APPROVAL_WITH_SEAL"); // 用章审批
         return list;
     }
 
