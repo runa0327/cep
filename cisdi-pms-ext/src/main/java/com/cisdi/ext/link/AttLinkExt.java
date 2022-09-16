@@ -55,7 +55,7 @@ public class AttLinkExt {
         } else if ("CONTRACT_ID".equals(attCode)) {
             return linkForCONTRACT_ID(myJdbcTemplate, attValue, sevId);
         } else if (("RELATION_CONTRACT_ID").equals(attCode)) {
-            return linkForRELATION_CONTRACT_ID(myJdbcTemplate, attValue,sevId);
+            return linkForRELATION_CONTRACT_ID(myJdbcTemplate, attValue,sevId,entCode);
         } else if ("GUARANTEE_ID".equals(attCode)) {
             return linkForGUARANTEE_ID(myJdbcTemplate, attValue);
         } else if ("AMOUT_PM_PRJ_ID".equals(attCode)) {
@@ -484,27 +484,42 @@ public class AttLinkExt {
                 }
             }
 
-            //文件信息回显
+            //概算批复文件信息回显
             String sql1 = "select REPLY_FILE from PM_PRJ_INVEST2 where PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,attValue);
             if (!CollectionUtils.isEmpty(list1)){
-                String fileId = JdbcMapUtil.getString(list1.get(0),"REPLY_FILE");
-                String file = StringUtil.codeToSplit(fileId);
-                String sql2 = "select GROUP_CONCAT(FILE_INLINE_URL) as file from fl_file where id in ('"+file+"')";
-                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2);
-                if (!CollectionUtils.isEmpty(list2)){
-                    {
-                        LinkedAtt linkedAtt = new LinkedAtt();
-                        linkedAtt.type = AttDataTypeE.FILE_GROUP;
-                        linkedAtt.value = fileId;
-                        linkedAtt.text = JdbcMapUtil.getString(list2.get(0), "file");
-
-                        attLinkResult.attMap.put("REPLY_FILE", linkedAtt);
-                    }
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.FILE_GROUP;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"REPLY_FILE");
+                    getFileInfoList(linkedAtt);
+                    attLinkResult.attMap.put("REPLY_FILE", linkedAtt);
                 }
-
             }
-
+            //预算批复文件信息回显
+            String sql2 = "select FINANCIAL_REVIEW_FILE from PM_PRJ_INVEST3 where PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,attValue);
+            if (!CollectionUtils.isEmpty(list1)){
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.FILE_GROUP;
+                    linkedAtt.value = JdbcMapUtil.getString(list2.get(0),"FINANCIAL_REVIEW_FILE");
+                    getFileInfoList(linkedAtt);
+                    attLinkResult.attMap.put("CONSERVATION_REPLY_FILE", linkedAtt);
+                }
+            }
+            //施工中标通知书（招采里的中标通知书）
+            String sql3 = "SELECT GROUP_CONCAT(BID_WIN_NOTICE_FILE_GROUP_ID) AS FILE from PO_PUBLIC_BID_REQ WHERE PM_PRJ_ID = ? AND PMS_RELEASE_WAY_ID in ('99799190825080728','99799190825080731') and status = 'AP'";
+            List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sql3,attValue);
+            if (!CollectionUtils.isEmpty(list3)){
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.FILE_GROUP;
+                    linkedAtt.value = JdbcMapUtil.getString(list3.get(0),"FILE");
+                    getFileInfoList(linkedAtt);
+                    attLinkResult.attMap.put("BID_WIN_NOTICE_FILE_GROUP_ID", linkedAtt);
+                }
+            }
             return attLinkResult;
 
         } else if ("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD".equals(entCode) || "PM_DESIGN_ASSIGNMENT_BOOK".equals(entCode)) {
@@ -614,7 +629,7 @@ public class AttLinkExt {
         return attLinkResult;
     }
 
-    private AttLinkResult linkForRELATION_CONTRACT_ID(MyJdbcTemplate myJdbcTemplate, String attValue,String sevId) {
+    private AttLinkResult linkForRELATION_CONTRACT_ID(MyJdbcTemplate myJdbcTemplate, String attValue,String sevId, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
 
         //查询明细表信息
@@ -639,15 +654,15 @@ public class AttLinkExt {
 
                     linkedRecordList.add(linkedRecord);
                 }
-                attLinkResult.childData.put("99952822476362485", linkedRecordList);
+                attLinkResult.childData.put("99952822476362402", linkedRecordList);
             }
-            attLinkResult.childCreatable.put("99952822476362485", false);
-            attLinkResult.childClear.put("99952822476362485", true);
+            attLinkResult.childCreatable.put("99952822476362402", false);
+            attLinkResult.childClear.put("99952822476362402", true);
         }
 
 
         // 根据id查询招投标信息
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTRACT_CODE,NAME,WIN_BID_UNIT_TXT,CONTRACT_PRICE from po_order_req where id = ?", attValue);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTRACT_CODE,NAME,WIN_BID_UNIT_TXT,CONTRACT_PRICE,ATT_FILE_GROUP_ID from po_order_req where id = ?", attValue);
 
         if (CollectionUtils.isEmpty(list)) {
             throw new BaseException("合同相关属性不完善！");
@@ -685,6 +700,17 @@ public class AttLinkExt {
             linkedAtt.value = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
             linkedAtt.text = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
             attLinkResult.attMap.put("CONTRACT_PRICE", linkedAtt);
+        }
+
+        //资金需求申请合同附件回显
+        if ("PM_FUND_REQUIRE_PLAN_REQ".equals(entCode)){
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.FILE_GROUP;
+                linkedAtt.value = JdbcMapUtil.getString(list.get(0),"ATT_FILE_GROUP_ID");
+                getFileInfoList(linkedAtt);
+                attLinkResult.attMap.put("BID_AFTER_FILE_GROUP_ID", linkedAtt);
+            }
         }
 
         return attLinkResult;

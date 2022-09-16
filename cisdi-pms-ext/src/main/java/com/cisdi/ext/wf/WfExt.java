@@ -440,6 +440,7 @@ public class WfExt {
         list.add("EXPENSE_CLAIM_APPROVAL"); // 费用索赔报审表
         list.add("PROJECT_CLAIM_NOTICE"); // 工程索赔通知书
         list.add("APPROVAL_INSPECTION"); // 报审、报验
+        list.add("PM_CONTROL_FLOOD_REQ"); // 防洪评价
         return list;
     }
 
