@@ -1762,6 +1762,10 @@ public class AttLinkExt {
         list.add("PO_PUBLIC_BID_REQ"); // 采购公开招标申请
         list.add("PM_BUILD_ORGAN_PLAN_REQ"); // 施工组织设计及施工方案
         list.add("PM_WORK_LIST_REQ"); // 工作联系单
+        list.add("COMPLETION_PRE_ACCEPTANCE"); // 竣工预验收
+        list.add("EXPENSE_CLAIM_APPROVAL"); // 费用索赔报审表
+        list.add("PROJECT_CLAIM_NOTICE"); // 工程索赔通知书
+        list.add("APPROVAL_INSPECTION"); // 报审、报验
         return list;
     }
 
