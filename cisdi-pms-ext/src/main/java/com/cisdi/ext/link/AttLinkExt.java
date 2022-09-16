@@ -2,6 +2,7 @@ package com.cisdi.ext.link;
 
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
@@ -54,7 +55,7 @@ public class AttLinkExt {
         } else if ("CONTRACT_ID".equals(attCode)) {
             return linkForCONTRACT_ID(myJdbcTemplate, attValue, sevId);
         } else if (("RELATION_CONTRACT_ID").equals(attCode)) {
-            return linkForRELATION_CONTRACT_ID(myJdbcTemplate, attValue);
+            return linkForRELATION_CONTRACT_ID(myJdbcTemplate, attValue,sevId,entCode);
         } else if ("GUARANTEE_ID".equals(attCode)) {
             return linkForGUARANTEE_ID(myJdbcTemplate, attValue);
         } else if ("AMOUT_PM_PRJ_ID".equals(attCode)) {
@@ -298,7 +299,8 @@ public class AttLinkExt {
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
                     linkedAtt.type = AttDataTypeE.DATE;
-                    String year = simpleDateFormat.format(JdbcMapUtil.getDate(row, "PRJ_REPLY_DATE"));
+//                    String year = simpleDateFormat.format(JdbcMapUtil.getDate(row, "PRJ_REPLY_DATE"));
+                    String year = JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
                     linkedAtt.value = year;
                     linkedAtt.text = year;
                     attLinkResult.attMap.put("YEAR", linkedAtt);
@@ -385,14 +387,18 @@ public class AttLinkExt {
                 List<String> prj = Arrays.asList("(施工)工程量清单", "工程量清单", "EPC", "施工", "工程量清单");
                 for (Map<String, Object> nodeMap : nodeMaps) {
                     String name = nodeMap.get("name").toString();
+                    String id = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                    String sqlName = "select name from gr_set_value where id = ?";
+                    List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(sqlName, id);
+                    String valueName = JdbcMapUtil.getString(nameMap.get(0), "name");
                     if (judgeMatch(createMatch, name)) {
 //                        if ("立项批复".equals(name)){
                         // 立项完成情况
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
                             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.value = id;
+                            linkedAtt.text = valueName;
                             attLinkResult.attMap.put("CREATE_PROJECT_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(feasibility, name)) {
@@ -401,8 +407,8 @@ public class AttLinkExt {
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
                             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.value = id;
+                            linkedAtt.text = valueName;
                             attLinkResult.attMap.put("FEASIBILITY_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(landUsePlan, name)) {
@@ -411,8 +417,8 @@ public class AttLinkExt {
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
                             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.value = id;
+                            linkedAtt.text = valueName;
                             attLinkResult.attMap.put("SELECT_SITE_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(eia, name)) {
@@ -421,8 +427,8 @@ public class AttLinkExt {
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
                             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.value = id;
+                            linkedAtt.text = valueName;
                             attLinkResult.attMap.put("EIA_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(advanceExam, name)) {
@@ -431,8 +437,8 @@ public class AttLinkExt {
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
                             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.value = id;
+                            linkedAtt.text = valueName;
                             attLinkResult.attMap.put("USE_LAND_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(save, name)) {
@@ -441,8 +447,8 @@ public class AttLinkExt {
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
                             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.value = id;
+                            linkedAtt.text = valueName;
                             attLinkResult.attMap.put("WOODLAND_WATER_SOIL_COMPLETED", linkedAtt);
                         }
                     } else if ("初步设计概算批复".equals(name)) {
@@ -450,8 +456,8 @@ public class AttLinkExt {
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
                             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.value = id;
+                            linkedAtt.text = valueName;
                             attLinkResult.attMap.put("ESTIMATE_COMPLETED", linkedAtt);
                         }
                     } else if ("预算财政评审".equals(name)) {
@@ -459,8 +465,8 @@ public class AttLinkExt {
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
                             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.value = id;
+                            linkedAtt.text = valueName;
                             attLinkResult.attMap.put("BUDGET_REVIEW_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(prj, name)) {
@@ -469,15 +475,51 @@ public class AttLinkExt {
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
                             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                            linkedAtt.value = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
-                            linkedAtt.text = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                            linkedAtt.value = id;
+                            linkedAtt.text = valueName;
                             attLinkResult.attMap.put("CONSTRUCT_BID_COMPLETED", linkedAtt);
                         }
                     }
 
                 }
             }
-            // dlttodo
+
+            //概算批复文件信息回显
+            String sql1 = "select REPLY_FILE from PM_PRJ_INVEST2 where PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,attValue);
+            if (!CollectionUtils.isEmpty(list1)){
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.FILE_GROUP;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"REPLY_FILE");
+                    getFileInfoList(linkedAtt);
+                    attLinkResult.attMap.put("REPLY_FILE", linkedAtt);
+                }
+            }
+            //预算批复文件信息回显
+            String sql2 = "select FINANCIAL_REVIEW_FILE from PM_PRJ_INVEST3 where PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,attValue);
+            if (!CollectionUtils.isEmpty(list1)){
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.FILE_GROUP;
+                    linkedAtt.value = JdbcMapUtil.getString(list2.get(0),"FINANCIAL_REVIEW_FILE");
+                    getFileInfoList(linkedAtt);
+                    attLinkResult.attMap.put("CONSERVATION_REPLY_FILE", linkedAtt);
+                }
+            }
+            //施工中标通知书（招采里的中标通知书）
+            String sql3 = "SELECT GROUP_CONCAT(BID_WIN_NOTICE_FILE_GROUP_ID) AS FILE from PO_PUBLIC_BID_REQ WHERE PM_PRJ_ID = ? AND PMS_RELEASE_WAY_ID in ('99799190825080728','99799190825080731') and status = 'AP'";
+            List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sql3,attValue);
+            if (!CollectionUtils.isEmpty(list3)){
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.FILE_GROUP;
+                    linkedAtt.value = JdbcMapUtil.getString(list3.get(0),"FILE");
+                    getFileInfoList(linkedAtt);
+                    attLinkResult.attMap.put("BID_WIN_NOTICE_FILE_GROUP_ID", linkedAtt);
+                }
+            }
             return attLinkResult;
 
         } else if ("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD".equals(entCode) || "PM_DESIGN_ASSIGNMENT_BOOK".equals(entCode)) {
@@ -587,11 +629,40 @@ public class AttLinkExt {
         return attLinkResult;
     }
 
-    private AttLinkResult linkForRELATION_CONTRACT_ID(MyJdbcTemplate myJdbcTemplate, String attValue) {
+    private AttLinkResult linkForRELATION_CONTRACT_ID(MyJdbcTemplate myJdbcTemplate, String attValue,String sevId, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
 
+        //查询明细表信息
+        if ("99902212142028526".equals(sevId)){ //资金需求计划申请-发起 实体视图id
+            List<LinkedRecord> linkedRecordList = new ArrayList<>();
+            // 查询明细信息
+            String sql = "select COST_TYPE_TREE_ID,FEE_DETAIL,AMT from PM_ORDER_COST_DETAIL where CONTRACT_ID = ? order by id asc";
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, attValue);
+            if (!CollectionUtils.isEmpty(list)) {
+                for (Map<String, Object> tmp : list) {
+                    LinkedRecord linkedRecord = new LinkedRecord();
+
+                    // 费用类型
+                    linkedRecord.valueMap.put("COST_TYPE_TREE_ID", tmp.get("COST_TYPE_TREE_ID").toString());
+                    linkedRecord.textMap.put("COST_TYPE_TREE_ID", tmp.get("COST_TYPE_TREE_ID").toString());
+                    // 费用明细
+                    linkedRecord.valueMap.put("FEE_DETAIL", tmp.get("FEE_DETAIL"));
+                    linkedRecord.textMap.put("FEE_DETAIL", tmp.get("FEE_DETAIL").toString());
+                    // 费用金额
+                    linkedRecord.valueMap.put("AMT", tmp.get("AMT"));
+                    linkedRecord.textMap.put("AMT", tmp.get("AMT").toString());
+
+                    linkedRecordList.add(linkedRecord);
+                }
+                attLinkResult.childData.put("99952822476362402", linkedRecordList);
+            }
+            attLinkResult.childCreatable.put("99952822476362402", false);
+            attLinkResult.childClear.put("99952822476362402", true);
+        }
+
+
         // 根据id查询招投标信息
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTRACT_CODE,NAME,WIN_BID_UNIT_TXT,CONTRACT_PRICE from po_order_req where id = ?", attValue);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTRACT_CODE,NAME,WIN_BID_UNIT_TXT,CONTRACT_PRICE,ATT_FILE_GROUP_ID from po_order_req where id = ?", attValue);
 
         if (CollectionUtils.isEmpty(list)) {
             throw new BaseException("合同相关属性不完善！");
@@ -629,6 +700,17 @@ public class AttLinkExt {
             linkedAtt.value = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
             linkedAtt.text = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
             attLinkResult.attMap.put("CONTRACT_PRICE", linkedAtt);
+        }
+
+        //资金需求申请合同附件回显
+        if ("PM_FUND_REQUIRE_PLAN_REQ".equals(entCode)){
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.FILE_GROUP;
+                linkedAtt.value = JdbcMapUtil.getString(list.get(0),"ATT_FILE_GROUP_ID");
+                getFileInfoList(linkedAtt);
+                attLinkResult.attMap.put("BID_AFTER_FILE_GROUP_ID", linkedAtt);
+            }
         }
 
         return attLinkResult;
@@ -1525,7 +1607,7 @@ public class AttLinkExt {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.FILE_GROUP;
             linkedAtt.value = "99952822476358787,99952822476358788";
-            linkedAtt.text = "/qygly-gateway/qygly-file/viewImage?fileId=99952822476358787,/qygly-gateway/qygly-file/viewImage?fileId=99952822476358788";
+//            linkedAtt.text = "/qygly-gateway/qygly-file/viewImage?fileId=99952822476358787,/qygly-gateway/qygly-file/viewImage?fileId=99952822476358788";
 
             getFileInfoList(linkedAtt);
 
@@ -1591,13 +1673,12 @@ public class AttLinkExt {
         Map<String, Object> map = new HashMap<>();
         map.put("ids", idList);
         List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList("select t.*, crt_user.code crt_user_code, crt_user.name crt_user_name from fl_file t left join ad_user crt_user on t.crt_user_id = crt_user.id where t.id in (:ids)", map);
-        if (list.size() > 0) {
+        if (!CollectionUtils.isEmpty(list)) {
             linkedAtt.fileInfoList = new ArrayList<>(list.size());
-
+            StringBuilder sb = new StringBuilder();
             for (Map<String, Object> row : list) {
                 LinkedAttFileInfo fileInfo = new LinkedAttFileInfo();
                 linkedAtt.fileInfoList.add(fileInfo);
-
                 fileInfo.attachmentUrl = JdbcMapUtil.getString(row, "FILE_ATTACHMENT_URL");
                 fileInfo.code = JdbcMapUtil.getString(row, "CODE");
                 fileInfo.crtUserCode = JdbcMapUtil.getString(row, "CRT_USER_CODE");
@@ -1606,11 +1687,14 @@ public class AttLinkExt {
                 fileInfo.dspSize = JdbcMapUtil.getString(row, "DSP_SIZE");
                 fileInfo.ext = JdbcMapUtil.getString(row, "EXT");
                 fileInfo.id = JdbcMapUtil.getString(row, "ID");
-                fileInfo.inlineUrl = JdbcMapUtil.getString(row, "FILE_INLINE_URL");
+                String url = JdbcMapUtil.getString(row, "FILE_INLINE_URL");
+                fileInfo.inlineUrl = url;
                 fileInfo.name = JdbcMapUtil.getString(row, "NAME");
                 fileInfo.sizeKiloByte = JdbcMapUtil.getDouble(row, "SIZE_KB");
                 fileInfo.uploadDttm = DateTimeUtil.dttmToString(JdbcMapUtil.getObject(row, "UPLOAD_DTTM"));
+                sb.append(url).append(",");
             }
+            linkedAtt.text = sb.substring(0,sb.length()-1);
         }
     }
 
@@ -1624,7 +1708,8 @@ public class AttLinkExt {
                 LinkedAtt linkedAtt = new LinkedAtt();
                 linkedAtt.type = AttDataTypeE.TEXT_LONG;
                 linkedAtt.value = "99902212142036278";
-                linkedAtt.text = "99902212142036278";
+                linkedAtt.text = "未涉及";
+//                linkedAtt.text = "99902212142036278";
                 attLinkResult.attMap.put(field, linkedAtt);
             }
         }
@@ -1703,6 +1788,10 @@ public class AttLinkExt {
         list.add("PO_PUBLIC_BID_REQ"); // 采购公开招标申请
         list.add("PM_BUILD_ORGAN_PLAN_REQ"); // 施工组织设计及施工方案
         list.add("PM_WORK_LIST_REQ"); // 工作联系单
+        list.add("COMPLETION_PRE_ACCEPTANCE"); // 竣工预验收
+        list.add("EXPENSE_CLAIM_APPROVAL"); // 费用索赔报审表
+        list.add("PROJECT_CLAIM_NOTICE"); // 工程索赔通知书
+        list.add("APPROVAL_INSPECTION"); // 报审、报验
         return list;
     }
 

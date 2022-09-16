@@ -37,6 +37,8 @@ public class PoOrderPaymentExt {
         String procInstId = ExtJarHelper.procInstId.get();
         // 项目id
         String projectId = entityRecord.valueMap.get("AMOUT_PM_PRJ_ID").toString();
+        //合同id
+        String contractId = entityRecord.valueMap.get("CONTRACT_ID").toString();
         // 获取付款依据
         String payBasisId = entityRecord.valueMap.get("PAY_BASIS_ID").toString();
         if ("99902212142031993".equals(payBasisId)) {
@@ -61,6 +63,21 @@ public class PoOrderPaymentExt {
         if (!CollectionUtils.isEmpty(list2)) {
             lastAmount = new BigDecimal(list2.get(0).get("amount").toString());
         }
+
+        //预付款
+        String yuFu = JdbcMapUtil.getString(entityRecord.valueMap,"BUDGET_AMT");
+        //当前期数
+        String qiShu = JdbcMapUtil.getString(entityRecord.valueMap,"NOW_STAGE_ID");
+        if (!SharedUtil.isEmptyString(yuFu) && !SharedUtil.isEmptyString(qiShu)){
+            throw new BaseException("预付款和进度款只能选择一个");
+        }
+        //预付款和进度款都为空，默认为查询进度款
+        if (SharedUtil.isEmptyString(yuFu) && SharedUtil.isEmptyString(qiShu)){
+            throw new BaseException("预付款和进度款必须选择一个");
+//            String sql3 = "select count(*) as num from PO_ORDER_PAYMENT_REQ where CONTRACT_ID = ? and status = 'AP'";
+//            List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sql3,contractId);
+        }
+
 
         // 本期支付金额
         String nowAmount = entityRecord.valueMap.get("STAGE_PAY_AMT").toString();

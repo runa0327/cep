@@ -432,6 +432,16 @@ public class WfExt {
         list.add("PM_BUILD_ORGAN_PLAN_REQ"); // 施工组织设计及施工方案
         list.add("PM_BUILD_PROGRESS_REQ"); // 施工进度计划
         list.add("PM_WORK_LIST_REQ"); // 工作联系单
+        list.add("CONTRACT_BRAND_CHANGE_APPLICATION"); // 合同品牌变更申请
+        list.add("SCIENTIFIC_MATERIAL_CHECK"); // 科研材料设备进场验收
+        list.add("PROJECT_QUALITY_INSPECTION"); // 工程质量检查
+        list.add("QUALITY_RECORD"); // 质量交底记录
+        list.add("COMPLETION_PRE_ACCEPTANCE"); // 竣工预验收
+        list.add("EXPENSE_CLAIM_APPROVAL"); // 费用索赔报审表
+        list.add("PROJECT_CLAIM_NOTICE"); // 工程索赔通知书
+        list.add("APPROVAL_INSPECTION"); // 报审、报验
+        list.add("PM_CONTROL_FLOOD_REQ"); // 防洪评价
+        list.add("PM_TRAFFIC_SAFETY_REQ"); // 交通安全评价
         return list;
     }
 
