@@ -21,7 +21,8 @@ import java.util.concurrent.Executor;
 public class TestStuExt {
     public void test() {
         if ("1".equals("1")) {
-            f1();
+            return;
+            // f1();
         }
 
         // TestStu testStu = TestStu.newData();
