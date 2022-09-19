@@ -345,7 +345,7 @@ public class WfExt {
             ProFileUtils.insertProFile(prjId, getProcessFileByProcInstId(procInstId), FileCodeEnum.PURCHASE_TENDER_PROCESS_ATTACHMENT);
         }
 
-        // 开工申请
+        // 工程开工报审
         if ("PM_PRJ_KICK_OFF_REQ".equals(entityCode)) {
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
 
@@ -382,6 +382,53 @@ public class WfExt {
             ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID"), FileCodeEnum.CONTRACT_TERMINATION_APPENDIX);
             // 合同终止申请流程附件
             ProFileUtils.insertProFile(prjId, getProcessFileByProcInstId(procInstId), FileCodeEnum.CONTRACT_TERMINATION_REQ_PROCESS_ATTACHMENT);
+        }
+
+        //初设概算
+        if ("PM_PRJ_INVEST2".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //概算申报材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"BUDGETESTIMATEDECLARATION_FILE"),FileCodeEnum.BUDGETESTIMATEDECLARATION_FILE);
+            //初概报告评审稿
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REVIEW_REPORT_FILE"),FileCodeEnum.GS_REVIEW_REPORT_FILE);
+            //初概报告专家意见
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"EXPERT_FILE"),FileCodeEnum.GS_EXPERT_FILE);
+            //初概报告修编稿
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REVISION_FILE"),FileCodeEnum.GS_REVISION_FILE);
+            //概算批复
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REPLY_FILE"),FileCodeEnum.GS_REPLY_FILE);
+        }
+
+        //设计任务书
+        if ("PM_DESIGN_ASSIGNMENT_BOOK".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "AMOUT_PM_PRJ_ID");
+            //附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.DESIGN_SPECIFICATION_ATTACHMENT);
+            //审批附件1
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.DESIGN_SPECIFICATION_ATTACHMENT_ONE);
+            //审批附件2
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_TWO"),FileCodeEnum.DESIGN_SPECIFICATION_ATTACHMENT_TWO);
+            //审批附件3
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_THREE"),FileCodeEnum.DESIGN_SPECIFICATION_ATTACHMENT_THREE);
+        }
+
+        //方案设计管理
+        if ("PM_DESIGN_ASSIGNMENT".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            //效果图
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"DESIGN_SKETCH_FILE_ONE"),FileCodeEnum.SCHEMATIC_DESIGN_MANAGEMENT_RENDERING);
+            //概念方案设计成果
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.DESIGN_MANAGEMENT_CONCEPTUAL_SCHEME_DESIGN_RESULT);
+        }
+
+        //施工图设计管理
+        if ("PM_CONSTRUCTION_DRAWING_DESIGN".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            //效果图
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"DESIGN_SKETCH_FILE_ONE"),FileCodeEnum.CONSTRUCTION_DRAWING_DESIGN_MANAGEMENT_RENDERING);
+            //概念方案设计成果
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.CONSTRUCTION_DRAWING_CONCEPTUAL_DESIGN_RESULT);
+
         }
     }
 
