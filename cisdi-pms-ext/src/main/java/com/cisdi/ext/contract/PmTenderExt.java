@@ -7,10 +7,12 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +30,7 @@ public class PmTenderExt {
         String csCommId = entityRecord.csCommId;
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         try {
+            //同步主表
             Map<String, Object> dataMap = myJdbcTemplate.queryForMap("select * from PO_PUBLIC_BID_REQ where ID=?", csCommId);
             String id = Crud.from("PO_PUBLIC_BID").insertData();
             Crud.from("PO_PUBLIC_BID").where().eq("ID", id).update()
@@ -81,6 +84,38 @@ public class PmTenderExt {
                     .set("CONTACT_IDCARD_RECORD", JdbcMapUtil.getString(dataMap, "CONTACT_IDCARD_RECORD"))
                     .set("BID_WIN_NOTICE_FILE_GROUP_ID ", JdbcMapUtil.getString(dataMap, "BID_WIN_NOTICE_FILE_GROUP_ID"))
                     .exec();
+
+            //查询同步费用明细数据
+            String sql2 = "select COST_TYPE_TREE_ID,FEE_DETAIL,TOTAL_AMT from PM_COST_DETAIL where BIDDING_NAME_ID = ?";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,csCommId);
+            if (!CollectionUtils.isEmpty(list2)){
+                for (Map<String, Object> tmp : list2) {
+                    String id2 = Crud.from("PM_COST_DETAIL_DATA").insertData();
+                    Crud.from("PM_COST_DETAIL_DATA").where().eq("ID",id2).update()
+                            .set("COST_TYPE_TREE_ID",JdbcMapUtil.getString(tmp,"COST_TYPE_TREE_ID"))
+                            .set("FEE_DETAIL",JdbcMapUtil.getString(tmp,"FEE_DETAIL"))
+                            .set("TOTAL_AMT",JdbcMapUtil.getString(tmp,"TOTAL_AMT"))
+                            .set("PO_PUBLIC_BID_ID",id)
+                            .exec();
+                }
+
+            }
+            //查询同步投标信息
+            String sql3 = "select BID_UNIT,TENDER_OFFER,CONTACT_MOBILE,CONTACT_NAME,CONTACT_IDCARD_RECORD from PM_BID_DETAIL where BIDDING_NAME_ID = ?";
+            List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sql3,csCommId);
+            if (!CollectionUtils.isEmpty(list3)){
+                for (Map<String, Object> tmp : list3) {
+                    String id3 = Crud.from("PM_BID_DETAIL_DATA").insertData();
+                    Crud.from("PM_BID_DETAIL_DATA").where().eq("ID",id3).update()
+                            .set("BID_UNIT",JdbcMapUtil.getString(tmp,"BID_UNIT"))
+                            .set("TENDER_OFFER",JdbcMapUtil.getString(tmp,"TENDER_OFFER"))
+                            .set("CONTACT_MOBILE",JdbcMapUtil.getString(tmp,"CONTACT_MOBILE"))
+                            .set("CONTACT_NAME",JdbcMapUtil.getString(tmp,"CONTACT_NAME"))
+                            .set("CONTACT_IDCARD_RECORD",JdbcMapUtil.getString(tmp,"CONTACT_IDCARD_RECORD"))
+                            .set("PO_PUBLIC_BID_ID",id)
+                            .exec();
+                }
+            }
         } catch (Exception e) {
             throw new BaseException("查询招标申请数据异常！", e);
         }
