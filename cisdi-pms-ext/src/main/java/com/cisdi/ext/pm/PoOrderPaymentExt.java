@@ -101,7 +101,7 @@ public class PoOrderPaymentExt {
         if (CollectionUtils.isEmpty(list3)){
             throw new BaseException("费用明细信息不能为空");
         }
-        BigDecimal account = getSumAmt(list3);
+        BigDecimal account = getSumAmt(list3,"PAY_AMT_ONE");
 
         // 信息更新付款申请表
         String updateSql = "update PO_ORDER_PAYMENT_REQ set DEPT_NAME = ?,LAST_SUM_PAY=?,NOW_SUM_PAY=?,CONTRACT_PERCENT=?,ESTIMATE_PERCENT=?,FINANCIAL_PERCENT=?,SETTLEMENT_PERCENT=?,PAY_AMT=? where id = ?";
@@ -109,10 +109,10 @@ public class PoOrderPaymentExt {
     }
 
     // 汇总求和
-    private BigDecimal getSumAmt(List<Map<String, Object>> list) {
+    private BigDecimal getSumAmt(List<Map<String, Object>> list,String str) {
         BigDecimal sum = new BigDecimal(0);
         for (Map<String, Object> tmp : list) {
-            String value = tmp.get("PAY_AMT_ONE").toString();
+            String value = tmp.get(str).toString();
             sum = sum.add(new BigDecimal(value));
         }
         return sum;
@@ -220,5 +220,44 @@ public class PoOrderPaymentExt {
                     .set("CHAIRMAN", userId).set("CHAIRMAN_DATE", now).set("CHAIRMAN_MESSAGE", comment).exec();
             log.info("已更新：{}", exec);
         }
+    }
+
+    /**
+     * 采购合同付款申请-审批通过-同步汇总更新付款明细信息
+     */
+    public void syncPayDetail(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        // 流程id
+        String csCommId = entityRecord.csCommId;
+        // 当前登录人
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        // 流程id
+        String procInstId = ExtJarHelper.procInstId.get();
+        // 项目id
+        String projectId = entityRecord.valueMap.get("AMOUT_PM_PRJ_ID").toString();
+        //合同id
+        String contractId = entityRecord.valueMap.get("CONTRACT_ID").toString();
+        //本期付款金额
+        String payAmt = entityRecord.valueMap.get("PAY_AMT").toString();
+        //合同金额
+        String contractAmt = entityRecord.valueMap.get("CONTRACT_PRICE").toString();
+
+        //本期以前已支付金额
+        //查询明细信息
+        String sql3 = "select PAY_AMT_ONE,PAY_AMT_TWO from PM_PAY_COST_DETAIL where PARENT_ID = ?";
+        List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sql3,csCommId);
+        if (CollectionUtils.isEmpty(list3)){
+            throw new BaseException("费用明细信息不能为空");
+        }
+        BigDecimal account = getSumAmt(list3,"PAY_AMT_TWO");
+        //截止本期已支付金额
+        BigDecimal payAmtNow = account.add(new BigDecimal(payAmt));
+
+        //写入付款情况数据表
+        String id = Crud.from("PO_ORDER_PAYMENT").insertData();
+        Crud.from("PO_ORDER_PAYMENT").where().eq("id",id).update()
+                .set("PO_ORDER_ID",contractId)
+                .exec();
     }
 }
