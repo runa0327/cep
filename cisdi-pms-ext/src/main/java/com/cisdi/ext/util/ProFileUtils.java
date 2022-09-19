@@ -77,16 +77,17 @@ public class ProFileUtils {
             String fid = "";
             List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pf_folder where PM_PRJ_ID=?", projectId);
             List<Map<String, Object>> folderList = myJdbcTemplate.queryForList("select `CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID from PF_FOLDER where IS_TEMPLATE ='1';");
-            if (CollectionUtils.isEmpty(list) || folderList.size() != list.size()) {
-                ProFileUtils.createFolder(projectId);
-                Map<String, Object> map = myJdbcTemplate.queryForMap("select * from pf_folder where PM_PRJ_ID=? and `CODE`=?", projectId, codeEnum.getCode());
-                fid = String.valueOf(map.get("ID"));
-            } else {
+            if(!CollectionUtils.isEmpty(list) && folderList.size() == list.size()){
                 Optional<Map<String, Object>> obj = list.stream().filter(p -> Objects.equals(codeEnum.getCode(), String.valueOf(p.get("CODE")))).findAny();
                 if (obj.isPresent()) {
                     fid = String.valueOf(obj.get().get("ID"));
                 }
+            }else{
+                ProFileUtils.createFolder(projectId);
+                Map<String, Object> map = myJdbcTemplate.queryForMap("select * from pf_folder where PM_PRJ_ID=? and `CODE`=?", projectId, codeEnum.getCode());
+                fid = String.valueOf(map.get("ID"));
             }
+
             List<String> fileIDs = Arrays.asList(fileIds.split(","));
             for (String fileId : fileIDs) {
                 String id = Crud.from("PF_FILE").insertData();
