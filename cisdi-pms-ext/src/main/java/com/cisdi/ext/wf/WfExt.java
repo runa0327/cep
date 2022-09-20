@@ -428,7 +428,178 @@ public class WfExt {
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"DESIGN_SKETCH_FILE_ONE"),FileCodeEnum.CONSTRUCTION_DRAWING_DESIGN_MANAGEMENT_RENDERING);
             //概念方案设计成果
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.CONSTRUCTION_DRAWING_CONCEPTUAL_DESIGN_RESULT);
+        }
 
+        //可研估算
+        if("FEASIBLE_ESTIMATE".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            //可研申请材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"PM_PRJ_FILE"),FileCodeEnum.PM_PRJ_FILE);
+            //修编稿文件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KY_REVISION_FILE"),FileCodeEnum.KY_REVISION_FILE);
+            //评审报告文件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KY_REVIEW_DRAFT_FILE"),FileCodeEnum.KY_REVIEW_DRAFT_FILE);
+            //评审稿文件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KY_REVIEW_REPORT_FILE"),FileCodeEnum.KY_REVIEW_REPORT_FILE);
+            //专家意见文件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KY_EXPERT_FILE"),FileCodeEnum.KY_EXPERT_FILE);
+            //可研批复文件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"FEASIBLE_REPLY_FILE"),FileCodeEnum.FEASIBLE_REPLY_FILE);
+        }
+
+        //施工许可
+        if ("PM_CONSTRUCT_PERMIT_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            //基坑及土石方工程申请
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"PRJ_REQ_FILE"),FileCodeEnum.FOUNDATION_PIT_EARTHWORK_APPLICATION);
+            //主体工程申请
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KEEP_RECORD_FILE"),FileCodeEnum.MAIN_WORKS_APPLICATION);
+            //基坑及土石方工程施工许可函
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"EARTHWORK_FILE"),FileCodeEnum.EARTHWORK_FILE);
+            //主体工程施工许可证
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"SUBJECT_FILE"),FileCodeEnum.SUBJECT_FILE);
+        }
+
+        //社会稳定性评价
+        if ("PM_STABLE_EVAL".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            //社会稳定性风险评估报告
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KEEP_RECORD_FILE"),FileCodeEnum.SOCIAL_STABILITY_RISK_ASSESSMENT_REPORT);
+        }
+
+        //固定资产投资节能评价
+        if ("PM_ENERGY_EVAL".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //固定资产投资节能评估报告
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KEEP_RECORD_FILE"),FileCodeEnum.FIXED_ASSETS_INVESTMENT_SAVING_REPORT);
+            //节能报告评审稿
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REVIEW_REPORT_FILE"),FileCodeEnum.ENERGY_SAVING_REPORT_REVIEW_DRAFT);
+            //节能报告专家意见
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"EXPERT_FILE"),FileCodeEnum.ENERGY_SAVING_REPORT_EXPERT_OPINION);
+            //环评批复文件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REPLY_FILE"),FileCodeEnum.EIA_APPROVAL_DOCUMENT);
+        }
+
+        //环评
+        if ("PM_ENVIRONMENT_EVAL".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //环评申请材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"EIA_REQ_FILE"),FileCodeEnum.EIA_APPLICATION_MATERIAL);
+            //环评报告评审稿
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REVIEW_REPORT_FILE"),FileCodeEnum.EIA_REPORT_REVIEW_DRAFT);
+            //环评报告专家意见
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"EXPERT_FILE"),FileCodeEnum.EIA_REPORT_EXPERT_OPINION);
+            //环评报告修编稿
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REVISION_FILE"),FileCodeEnum.REVISION_OF_EIA_REPORT);
+            //环评批复文件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"CONSERVATION_REPLY_FILE"),FileCodeEnum.EIA_APPROVAL_FILE);
+        }
+
+        //农转用手续办理
+        if ("PM_FARMING_PROCEDURES".equals(entityCode)) {
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //农转用手续附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.AGRICULTURAL_CONVERSION_PROCEDURES_ANNEX);
+            //勘测定界材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"SUBJECT_FILE"),FileCodeEnum.SURVEY_DELIMITATION_MATERIALS);
+            //农转用批复文件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.AGRICULTURAL_CONVERSION_APPROVAL_DOCUMENT);
+        }
+
+        //林地调整办理手续
+        if ("PM_WOODLAND_PROCEDURES".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //林地办理审核附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.FOREST_LAND_HANDLING_AUDIT_ATTACHMENT);
+            //勘测定界报告
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"SUBJECT_FILE"),FileCodeEnum.SURVEY_DELIMITATION_REPORT);
+            //林地使用可行性报告评审前
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.FOREST_LAND_FEASIBILITY_PRE_REPORT);
+            //林地使用可行性报告专家意见
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_TWO"),FileCodeEnum.FOREST_FEASIBILITY_EXPERT_OPINIONS);
+            //林地使用可行性报告
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_THREE"),FileCodeEnum.FOREST_LAND_USE_FEASIBILITY_REPORT);
+            //林地使用同意书
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_FOUR"),FileCodeEnum.FOREST_LAND_USE_CONSENT);
+        }
+
+        //用地规划许可
+        if ("PM_LAND_USE_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //红线核查意见书
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_FOUR"),FileCodeEnum.RED_LINE_VERIFICATION_OPINIONS);
+            //用地勘测定界材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.LAND_USE_SURVEY_AND_DELIMITATION_MATERIALS);
+            //征地调查报告
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_TWO"),FileCodeEnum.LAND_ACQUISITION_INVESTIGATION_REPORT);
+            //用地规划许可证
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_THREE"),FileCodeEnum.LAND_USE_PLANNING_PERMIT);
+        }
+
+        //招标核准
+        if ("PM_TENDER_VERIFICATION".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //招标核准申请附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.BIDDING_APPROVAL_APPLICATION_ATTACHMENT);
+            //招标核准批复附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_TWO"),FileCodeEnum.APPROVAL_OF_BIDDING_APPENDIX);
+        }
+
+        //征地调查
+        if ("PM_LAND_EXAMINE_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //调查文件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.INVESTIGATION_DOCUMENTS);
+            //核定界限材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_TWO"),FileCodeEnum.APPROVED_BOUNDARY_MATERIALS);
+            //组卷材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_THREE"),FileCodeEnum.COILING_MATERIALS);
+            //征地调查批复材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_FOUR"),FileCodeEnum.LAND_ACQUISITION_INVESTIGATION_APPROVAL_MATERIALS);
+        }
+
+        //土地证办理
+        if ("PM_LAND_CERTIFICATE".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //土地划拨决定书
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.LAND_ALLOCATION_DECISION);
+            //土地证
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.LAND_CERTIFICATE);
+        }
+
+        //人防规划报建
+        if ("PM_DEFENSE_PLAN_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //人防规划核准申请附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.CIVIL_AIR_DEFENSE_PLANNING_APPLICATION);
+            //人防组卷材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_TWO"),FileCodeEnum.CIVIL_AIR_DEFENSE_ROLL_FORMING_MATERIALS);
+            //人防规划批复材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_THREE"),FileCodeEnum.CIVIL_AIR_DEFENSE_PLANNING_APPROVAL_MATERIALS);
+        }
+
+        //人防施工报建
+        if ("PM_DEFENSE_BUILD_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //人防施工报建资料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.CIVIL_AIR_DEFENSE_CONSTRUCTION_APPLICATION_DATA);
+            //人防施工踏勘意见书
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.OPINIONS_ON_CIVIL_AIR_DEFENSE_CONSTRUCTION_SURVEY);
+            //人防施工资料修编版
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_TWO"),FileCodeEnum.CIVIL_AIR_DEFENSE_CONSTRUCTION_DATA_REVISION);
+            //人防施工申请资料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_THREE"),FileCodeEnum.CIVIL_AIR_DEFENSE_CONSTRUCT_APP_MATERIAL);
+            //人防施工报建备案
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KEEP_RECORD_FILE"),FileCodeEnum.CIVIL_AIR_DEFENSE_CONSTRUCT_APP_FILING);
+        }
+
+        //国安批复文件
+        if ("PM_NATIONAL_BUILD_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //国安报建方案
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.NATIONAL_SECURITY_APPLICATION_PLAN);
+            //国安批复文件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.NATIONAL_SECURITY_APPROVAL_DOCUMENT);
         }
     }
 
