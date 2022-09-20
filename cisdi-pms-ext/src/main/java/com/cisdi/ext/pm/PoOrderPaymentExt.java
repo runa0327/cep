@@ -254,10 +254,12 @@ public class PoOrderPaymentExt {
         //截止本期已支付金额
         BigDecimal payAmtNow = account.add(new BigDecimal(payAmt));
 
+        //剩余可支付
+        BigDecimal amt = new BigDecimal(contractAmt).subtract(payAmtNow);
+
         //写入付款情况数据表
-        String id = Crud.from("PO_ORDER_PAYMENT").insertData();
-        Crud.from("PO_ORDER_PAYMENT").where().eq("id",id).update()
-                .set("PO_ORDER_ID",contractId)
-                .exec();
+        String sql = "insert into PO_ORDER_PAYMENT (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,CONTRACT_ID,PAY_AMT,PAY_DATE,AMT,STAGE_PAY_AMT_TWO,PM_PRJ_ID)" +
+                "values((select UUID_SHORT()),'1',now(),now(),?,now(),?,'AP',?,?,now(),?,?,?)";
+        myJdbcTemplate.update(sql,userId,userId,contractId,payAmt,amt,payAmtNow,projectId);
     }
 }
