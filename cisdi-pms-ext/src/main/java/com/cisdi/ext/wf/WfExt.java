@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class WfExt {
@@ -601,6 +602,194 @@ public class WfExt {
             //国安批复文件
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.NATIONAL_SECURITY_APPROVAL_DOCUMENT);
         }
+
+        //白蚁防治
+        if ("PM_TERMITE_CONTROL_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //白蚁防治方案
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.TERMITE_CONTROL_PLAN);
+            //白蚁防治方案备案
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.TERMITE_CONTROL_PLAN_FILING);
+            //白蚁防治实施附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_TWO"),FileCodeEnum.TERMITE_CONTROL_IMPLEMENT_ATTACHMENT);
+            //白蚁防治验收附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_THREE"),FileCodeEnum.TERMITE_CONTROL_ACCEPTANCE_ATTACHMENT);
+        }
+
+        //耕作层剥离
+        if ("PM_TOPSOIL_STRIPPING_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //耕作层剥离审核附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.TOPSOIL_STRIP_REVIEW_ATTACHMENT);
+            //耕作层剥离方案编制成果
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.TOPSOIL_STRIP_PLAN_PREPARATION_RESULTS);
+            //耕作层剥离实施评审稿
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_TWO"),FileCodeEnum.TOPSOIL_STRIP_IMPLEMENT_REVIEW_DRAFT);
+            //耕作层剥离专家意见
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_THREE"),FileCodeEnum.TOPSOIL_STRIPPING_EXPERT_OPINION);
+            //耕作层剥离备案
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_FOUR"),FileCodeEnum.FARMING_LAYER_STRIPPING_FILING);
+            //耕作层剥离验收
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_FIVE"),FileCodeEnum.TOPSOIL_STRIPPING_ACCEPTANCE);
+        }
+
+        //五方责任主体及终身质量承诺书
+//        if ("PM_PARTY_QUALITY_PROMISE_REQ".equals(entityCode)){
+//            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+//            List<String> fileStringList = getProcessFileGroupByNode(procInstId);
+//            //建设单位承诺书
+//            ProFileUtils.insertProFile(prjId,fileStringList.get(0),FileCodeEnum.EMPLOYER_COMMITMENT_LETTER);
+//        }
+
+        //监理规划及细则申请
+        if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //监理规划附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.SUPERVISION_PLANNING_ANNEX);
+        }
+
+        //技术交底与图纸会审记录
+        if ("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"AMOUT_PM_PRJ_ID");
+            //图纸会审附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.DRAWING_JOINT_REVIEW_ATTACHMENT);
+        }
+
+        //施工进度计划
+        if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //施工进度计划附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.CONSTRUCTION_SCHEDULE_ATTACHMENT);
+        }
+
+        //施工组织设计及施工方案
+        if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //施工组织设计附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.CONSTRUCTION_ORGANIZATION_DESIGN_ATTACHMENT);
+        }
+
+        //工作联系单
+        if ("PM_WORK_LIST_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //工作联系单附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.WORK_CONTACT_LIST_ATTACHMENT);
+        }
+
+        //报审报验
+        if ("APPROVAL_INSPECTION".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //报审报验附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.APPROVAL_INSPECTION_ATTACHMENT);
+        }
+
+        //工程索赔通知书
+        if ("PROJECT_CLAIM_NOTICE".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //工程索赔通知书附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.PROJECT_CLAIM_NOTICE_ATTACHMENTS);
+        }
+
+        //费用索赔报审表
+        if ("EXPENSE_CLAIM_APPROVAL".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //费用索赔报审表附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.EXPENSE_CLAIM_APPROVAL_FORM);
+        }
+
+        //竣工预验收
+        if ("COMPLETION_PRE_ACCEPTANCE".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //竣工预验收附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.COMPLETION_PRE_ACCEPTANCE_ATTACHMENT);
+        }
+
+        //质量交底记录
+        if ("QUALITY_RECORD".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //质量交底记录附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.QUALITY_RECORD_ATTACHMENT);
+        }
+
+        //工程质量检查
+        if ("PROJECT_QUALITY_INSPECTION".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //工程质量检查材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.PROJECT_QUALITY_INSPECTION_MATERIALS);
+        }
+
+        //科研材料设备进场验收
+        if ("SCIENTIFIC_MATERIAL_CHECK".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //科研材料设备进场验收材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.SCIENTIFIC_MATERIAL_CHECK_ATTACHMENT);
+        }
+
+        //合同品牌变更申请
+        if ("CONTRACT_BRAND_CHANGE_APPLICATION".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //合同品牌变更申请附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.CONTRACT_BRAND_CHANGE_APPLICATION_ATTACHMENT);
+        }
+
+        //工程材料设备及品牌报审
+        if ("MATERIAL_EQUIPMENT_BRAND_APPROVAL".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //工程材料设备及品牌报审附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.MATERIAL_EQUIPMENT_BRAND_APPROVAL_ATTACHMENT);
+        }
+
+        //工程材料设备进场验收
+        if ("MATERIAL_EQUIPMENT_ENTER_CHECK".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //工程材料设备进场验收附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.MATERIAL_EQUIPMENT_ENTER_CHECK_ATTACHMENT);
+        }
+
+        //材料退场
+        if ("PM_MATERIAL_EXIT".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //材料退场附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.PM_MATERIAL_EXIT_ATTACHMENT);
+        }
+
+        //预算财评
+        if ("BUDGET_MONEY_RATING".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //财评申报材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"BUDGETESTIMATEDECLARATION_FILE"),FileCodeEnum.APPLICATION_MATERIALS);
+            //施工图预算送审稿
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"WORK_DRAWING_TO_REVIEW_FILE"),FileCodeEnum.WORK_DRAWING_TO_REVIEW_FILE);
+            //预算审核结论书
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"BUDGET_REVIEW_CONCLUSION_FILE"),FileCodeEnum.BUDGET_REVIEW_CONCLUSION_FILE);
+            //财评批复
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"FINANCIAL_REVIEW_FILE"),FileCodeEnum.FINANCIAL_REVIEW_FILE);
+        }
+
+        //合同签订
+//        if ("BUDGET_MONEY_RATING".equals(entityCode)){
+//            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+//            List<Map<String, Object>> fileIdMaps = getProcessFileGroupByNode(procInstId);
+//            //合同附件
+//            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.ATT_FILE_GROUP);
+//            fileIdMaps.forEach(fileIdMap -> {
+//                if ("99799190825103911".equals(JdbcMapUtil.getString(fileIdMap,"id"))){//
+//
+//                }
+//            });
+//
+//        }
+        //工程付款申请
+        if ("BUDGET_MONEY_RATING".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"AMOUT_PM_PRJ_ID");
+            //工程付款保函内容
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.PROJECT_PAYMENT_APPLICATION);
+            //工程付款内容
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"SUBJECT_FILE"),FileCodeEnum.PROJECT_PAYMENT_CONTENT_ATTACHMENT);
+            //工程付款保函内容
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"GUARANTEE_RESULT_FILE"),FileCodeEnum.PROJECT_PAYMENT_GUARANTEE_CONTENTS);
+
+        }
     }
 
     private List<String> getTableList() {
@@ -700,6 +889,11 @@ public class WfExt {
 
     }
 
+    /**
+     * 根据流程实例id获取文件id组
+     * @param procInstId 流程实例id
+     * @return
+     */
     private String getProcessFileByProcInstId(String procInstId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> fileIdMap = myJdbcTemplate.queryForMap("select GROUP_CONCAT(t.USER_ATTACHMENT) " +
@@ -712,6 +906,23 @@ public class WfExt {
         return fileIds;
     }
 
+    /**
+     * 根据流程实例id 返回根据节点分组的附件id字符串组 根据节点顺序排序后
+     * @param procInstId 流程实例id
+     * @return
+     */
+    private List<Map<String, Object>> getProcessFileGroupByNode(String procInstId){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> fileIdsList = myJdbcTemplate.queryForList("select n.name,n.id,GROUP_CONCAT(t.USER_ATTACHMENT) fileIds " +
+                "from wf_node_instance ni " +
+                "left join wf_task t on ni.id=t.wf_node_instance_id " +
+                "left join wf_node n on n.id = ni.WF_NODE_ID " +
+                "where ni.wf_process_instance_id=? " +
+                "GROUP BY n.id " +
+                "order by n.name ", procInstId);
+//        List<String> fileIds = fileIdsList.stream().map(fileIdsMap -> JdbcMapUtil.getString(fileIdsMap,"fileIds")).collect(Collectors.toList());
+        return fileIdsList;
+    }
 
     private List<String> getAmtPrjList() {
         List<String> list = new ArrayList<>();
