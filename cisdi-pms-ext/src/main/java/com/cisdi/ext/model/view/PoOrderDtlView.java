@@ -23,8 +23,10 @@ public class PoOrderDtlView extends BasePageEntity {
     public String pmExpTypeCode;
     // 结算方式
     public String payType;
-    // 金额
+    // 合同金额
     public String amt;
+    //金额
+    public String totalAmt;
     // 工作内容
     public String workContent;
     // 文件附件
@@ -32,6 +34,8 @@ public class PoOrderDtlView extends BasePageEntity {
     public List<BaseFileView> fileList;
     // 备注
     public String remark;
+    //费用明细
+    public String feeDetail;
 
     public String getId() {
         return id;

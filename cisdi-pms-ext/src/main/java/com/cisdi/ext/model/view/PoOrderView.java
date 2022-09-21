@@ -15,6 +15,8 @@ public class PoOrderView extends BasePageEntity {
     public String projectId;
     // 项目名称
     public String projectName;
+    //合同名称
+    public String contractName;
     // 相对方
     public String oppoSite;
     // 相对人

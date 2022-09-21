@@ -58,7 +58,7 @@ public class PmContractExt {
     }
 
     /**
-     * 新增合同明显信息
+     * 新增合同明细信息
      *
      * @param id
      * @param detailList
@@ -69,12 +69,15 @@ public class PmContractExt {
             Crud.from("PO_ORDER_DTL").where().eq("ID", did).update()
                     .set("NAME", JdbcMapUtil.getString(item, "NAME"))
                     .set("REMARK", JdbcMapUtil.getString(item, "REMARK"))
-                    .set("PM_EXP_TYPE_ID", JdbcMapUtil.getString(item, "COST_TYPE_TREE_ID"))
+                    .set("COST_TYPE_TREE_ID", JdbcMapUtil.getString(item, "COST_TYPE_TREE_ID"))
                     .set("PAY_TYPE", JdbcMapUtil.getString(item, ""))
                     .set("FILE_ATTACHMENT_URL", JdbcMapUtil.getString(item, ""))
-                    .set("AMT", JdbcMapUtil.getString(item, "TOTAL_AMT"))
-                    .set("PO_ORDER_ID", JdbcMapUtil.getString(item, id))
+                    .set("TOTAL_AMT", JdbcMapUtil.getString(item, "TOTAL_AMT"))
+                    .set("AMT", JdbcMapUtil.getString(item, "AMT"))
+                    .set("CONTRACT_ID", JdbcMapUtil.getString(item, "CONTRACT_ID"))
                     .set("WORK_CONTENT", JdbcMapUtil.getString(item, ""))
+                    .set("FEE_DETAIL", JdbcMapUtil.getString(item, "FEE_DETAIL"))
+                    .set("PO_ORDER_ID", id)
                     .exec();
         });
     }

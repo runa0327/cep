@@ -38,7 +38,7 @@ public class PoOrderExtApi {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuilder sb = new StringBuilder();
         StringBuilder sb2 = new StringBuilder();
-        String sql = "SELECT a.id, a.PM_PRJ_ID, b.`NAME` as projectName, c.`NAME` as statusName, a.OPPO_SITE, a.OPPO_SITE_LINK_MAN, a.OPPO_SITE_CONTACT,a.AGENT, a.AGENT_PHONE, a.CONTRACT_AMOUNT, a.FILE_ATTACHMENT_URL,a.REMARK FROM PO_ORDER a LEFT JOIN pm_prj b on a.PM_PRJ_ID = b.ID LEFT JOIN ad_status c on a.`STATUS` = c.id where 1 = 1 and a.PM_PRJ_ID = ?";
+        String sql = "SELECT a.id, a.PM_PRJ_ID, b.`NAME` as projectName, a.name as contractName,c.`NAME` as statusName, a.OPPO_SITE, a.OPPO_SITE_LINK_MAN, a.OPPO_SITE_CONTACT,a.AGENT, a.AGENT_PHONE, a.CONTRACT_AMOUNT, a.FILE_ATTACHMENT_URL,a.REMARK FROM PO_ORDER a LEFT JOIN pm_prj b on a.PM_PRJ_ID = b.ID LEFT JOIN ad_status c on a.`STATUS` = c.id where 1 = 1 and a.PM_PRJ_ID = ?";
         String sql2 = "SELECT count(*) as num FROM PO_ORDER a LEFT JOIN pm_prj b on a.PM_PRJ_ID = b.ID LEFT JOIN ad_status c on a.`STATUS` = c.id where 1 = 1 and a.PM_PRJ_ID = ? ";
         sb.append(sql);
         sb2.append(sql2);
@@ -46,6 +46,10 @@ public class PoOrderExtApi {
         if (!SharedUtil.isEmptyString(param.projectName)) {
             sb.append(" and b.Name like ('%" + param.projectName + "%') ");
             sb2.append(" and b.Name like ('%" + param.projectName + "%') ");
+        }
+        if (!SharedUtil.isEmptyString(param.contractName)) {
+            sb.append(" and a.Name like ('%" + param.contractName + "%') ");
+            sb2.append(" and a.Name like ('%" + param.contractName + "%') ");
         }
         // 合同总价
         if (param.contractAmount != null) {
@@ -65,6 +69,7 @@ public class PoOrderExtApi {
                 poOrderView.id = p.get("id").toString();
                 poOrderView.projectId = p.get("PM_PRJ_ID").toString();
                 poOrderView.projectName = JdbcMapUtil.getString(p, "projectName");
+                poOrderView.contractName = JdbcMapUtil.getString(p, "contractName");
                 poOrderView.oppoSite = JdbcMapUtil.getString(p, "OPPO_SITE");
                 poOrderView.oppoSiteLinkMan = JdbcMapUtil.getString(p, "OPPO_SITE_LINK_MAN");
                 poOrderView.oppoSiteContact = JdbcMapUtil.getString(p, "OPPO_SITE_CONTACT");
@@ -102,14 +107,14 @@ public class PoOrderExtApi {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuilder sb = new StringBuilder();
         StringBuilder sb2 = new StringBuilder();
-        String sql1 = "SELECT a.id,a.PO_ORDER_ID,b.NAME,a.PM_EXP_TYPE_ID,c.CODE as feeCode,c.NAME as feeName,a.PAY_TYPE,a.AMT,a.WORK_CONTENT,a.FILE_ATTACHMENT_URL,a.REMARK " +
-                "FROM po_order_dtl a LEFT JOIN po_order b on a.PO_ORDER_ID = b.id LEFT JOIN PM_EXP_TYPE c on a.PM_EXP_TYPE_ID = c.id WHERE 1=1 and a.PO_ORDER_ID = ? ";
-        String sql2 = "SELECT count(*) as num FROM po_order_dtl a LEFT JOIN po_order b on a.PO_ORDER_ID = b.id LEFT JOIN PM_EXP_TYPE c on a.PM_EXP_TYPE_ID = c.id WHERE 1=1 and a.PO_ORDER_ID = ? ";
+        String sql1 = "SELECT a.TOTAL_AMT,a.FEE_DETAIL,a.id,a.CONTRACT_ID,b.NAME,a.COST_TYPE_TREE_ID,c.CODE as feeCode,c.NAME as feeName,a.PAY_TYPE,a.AMT,a.WORK_CONTENT,a.FILE_ATTACHMENT_URL,a.REMARK " +
+                "FROM po_order_dtl a LEFT JOIN po_order b on a.CONTRACT_ID = b.id LEFT JOIN gr_set_value c on a.COST_TYPE_TREE_ID = c.id WHERE 1=1 and a.PO_ORDER_ID = ? ";
+        String sql2 = "SELECT count(*) as num FROM po_order_dtl a LEFT JOIN po_order b on a.CONTRACT_ID = b.id LEFT JOIN gr_set_value c on a.COST_TYPE_TREE_ID = c.id WHERE 1=1 and a.PO_ORDER_ID = ? ";
         sb.append(sql1);
         sb2.append(sql2);
         if (!SharedUtil.isEmptyString(param.pmExpTypeId)) {
-            sb.append(" and a.PM_EXP_TYPE_ID = '" + param.pmExpTypeId + "' ");
-            sb2.append(" and a.PM_EXP_TYPE_ID = '" + param.pmExpTypeId + "' ");
+            sb.append(" and a.COST_TYPE_TREE_ID = '" + param.pmExpTypeId + "' ");
+            sb2.append(" and a.COST_TYPE_TREE_ID = '" + param.pmExpTypeId + "' ");
         }
         if (!SharedUtil.isEmptyString(param.payType)) {
             sb.append(" and a.pay_type like ('%").append(param.payType).append("%') ");
@@ -132,16 +137,18 @@ public class PoOrderExtApi {
             List<PoOrderDtlView> view = list.stream().map(p -> {
                 PoOrderDtlView poOrderDtlView = new PoOrderDtlView();
                 poOrderDtlView.id = JdbcMapUtil.getString(p, "id");
-                poOrderDtlView.poOrderId = p.get("PO_ORDER_ID").toString();
+                poOrderDtlView.poOrderId = p.get("CONTRACT_ID").toString();
                 poOrderDtlView.poOrderName = JdbcMapUtil.getString(p, "NAME");
-                poOrderDtlView.pmExpTypeId = p.get("PM_EXP_TYPE_ID").toString();
+                poOrderDtlView.pmExpTypeId = p.get("COST_TYPE_TREE_ID").toString();
                 poOrderDtlView.pmExpTypeName = JdbcMapUtil.getString(p, "feeName");
                 poOrderDtlView.pmExpTypeCode = JdbcMapUtil.getString(p, "feeCode");
                 poOrderDtlView.payType = JdbcMapUtil.getString(p, "PAY_TYPE");
                 poOrderDtlView.amt = JdbcMapUtil.getString(p, "AMT");
+                poOrderDtlView.totalAmt = JdbcMapUtil.getString(p, "TOTAL_AMT");
                 poOrderDtlView.workContent = JdbcMapUtil.getString(p, "WORK_CONTENT");
                 poOrderDtlView.fileId = JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
                 poOrderDtlView.remark = JdbcMapUtil.getString(p, "REMARK");
+                poOrderDtlView.feeDetail = JdbcMapUtil.getString(p, "FEE_DETAIL");
                 return poOrderDtlView;
             }).collect(Collectors.toList());
             ret.put("result", view);
