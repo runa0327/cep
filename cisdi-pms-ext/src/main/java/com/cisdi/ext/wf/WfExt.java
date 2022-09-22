@@ -40,7 +40,7 @@ public class WfExt {
     public void changeStatusToAp() {
         String newStatus = "AP";
         changeStatus(newStatus);
-        saveFile();
+//        saveFile();
     }
 
     public void changeStatusToDn() {
