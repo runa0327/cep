@@ -1212,8 +1212,11 @@ public class AttLinkExt {
                         "join gr_set_value su on t.CON_SCALE_UOM_ID=su.id", attValue);
 
 
-        if (CollectionUtils.isEmpty(list)) {
-            throw new BaseException("项目的相关属性不完整！");
+//        if (CollectionUtils.isEmpty(list)) {
+//            throw new BaseException("项目的相关属性不完整！");
+//        }
+        if (CollectionUtils.isEmpty(list)){
+            return attLinkResult;
         }
 
         Map row = list.get(0);
