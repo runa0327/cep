@@ -78,19 +78,26 @@ public class ProFileUtils {
             List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pf_folder where PM_PRJ_ID=?", projectId);
             List<Map<String, Object>> folderList = myJdbcTemplate.queryForList("select `CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID from PF_FOLDER where IS_TEMPLATE ='1';");
             if(!CollectionUtils.isEmpty(list) && folderList.size() == list.size()){
-                Optional<Map<String, Object>> obj = list.stream().filter(p -> Objects.equals(codeEnum.getCode(), String.valueOf(p.get("CODE")))).findAny();
+                Optional<Map<String, Object>> obj = list.stream().filter(p -> Objects.equals(codeEnum.toString(), String.valueOf(p.get("CODE")))).findAny();
                 if (obj.isPresent()) {
+                    System.out.println("obj--"+obj);
                     fid = String.valueOf(obj.get().get("ID"));
                 }
             }else{
+                System.out.println("进入了else");
                 ProFileUtils.createFolder(projectId);
-                Map<String, Object> map = myJdbcTemplate.queryForMap("select * from pf_folder where PM_PRJ_ID=? and `CODE`=?", projectId, codeEnum.getCode());
+                Map<String, Object> map = myJdbcTemplate.queryForMap("select * from pf_folder where PM_PRJ_ID=? and `CODE`=?", projectId, codeEnum.toString());
+                System.out.println("projectId--"+projectId);
+                System.out.println("codeEnum++"+codeEnum.toString());
                 fid = String.valueOf(map.get("ID"));
             }
 
             List<String> fileIDs = Arrays.asList(fileIds.split(","));
             for (String fileId : fileIDs) {
                 String id = Crud.from("PF_FILE").insertData();
+                System.out.println("fileId--"+fileId);
+                System.out.println("id--"+id);
+                System.out.println("fid--"+fid);
                 Crud.from("PF_FILE").where().eq("ID", id).update().set("FL_FILE_ID", fileId).set("PF_FOLDER_ID", fid).exec();
             }
         } catch (Exception e) {

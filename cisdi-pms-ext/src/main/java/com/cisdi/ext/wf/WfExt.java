@@ -40,7 +40,7 @@ public class WfExt {
     public void changeStatusToAp() {
         String newStatus = "AP";
         changeStatus(newStatus);
-//        saveFile();
+        saveFile();
     }
 
     public void changeStatusToDn() {
@@ -788,7 +788,32 @@ public class WfExt {
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"SUBJECT_FILE"),FileCodeEnum.PROJECT_PAYMENT_CONTENT_ATTACHMENT);
             //工程付款保函内容
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"GUARANTEE_RESULT_FILE"),FileCodeEnum.PROJECT_PAYMENT_GUARANTEE_CONTENTS);
+        }
 
+        //资金需求计划申请
+        if("PM_FUND_REQUIRE_PLAN_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "AMOUT_PM_PRJ_ID");
+            //资金需求计划批复文件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REPLY_FILE"),FileCodeEnum.CAPITAL_DEMAND_PLAN_APPROVAL_DOCUMENT);
+            //预算评审批复文件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"CONSERVATION_REPLY_FILE"),FileCodeEnum.BUDGET_REVIEW_APPROVAL_DOCUMENT);
+            //施工中标通知书
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"BID_WIN_NOTICE_FILE_GROUP_ID"),FileCodeEnum.CONSTRUCTION_ACCEPTANCE_LETTER);
+            //开工令附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.COMMENCEMENT_ORDER_ATTACHMENT);
+            //正式合同附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"BID_AFTER_FILE_GROUP_ID"),FileCodeEnum.FORMAL_CONTRACT_ANNEX);
+        }
+
+        //新增保函申请
+        if ("PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //保函正式合同
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.GUARANTEE_FORMAL_CONTRACT);
+            //正式保函
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"GUARANTEE_FILE"),FileCodeEnum.FORMAL_GUARANTEE);
+            //保函结果
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"GUARANTEE_RESULT_FILE"),FileCodeEnum.GUARANTEE_RESULT);
         }
     }
 
