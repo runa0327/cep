@@ -850,6 +850,7 @@ public class WfExt {
         list.add("PM_CONTROL_FLOOD_REQ"); // 防洪评价
         list.add("PM_TRAFFIC_SAFETY_REQ"); // 交通安全评价
         list.add("APPROVAL_WITH_SEAL"); // 用章审批
+        list.add("PM_DESIGN_CHANGE_REQ"); // 设计变更
         return list;
     }
 
