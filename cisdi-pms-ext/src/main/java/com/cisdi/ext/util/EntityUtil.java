@@ -6,13 +6,13 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import lombok.Data;
 import org.springframework.util.CollectionUtils;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class EntityUtil {
     //结果集转实体
@@ -21,11 +21,17 @@ public class EntityUtil {
         try {
             Set<String> fields = resultMap.keySet();
             T instance = cla.getDeclaredConstructor().newInstance();
+            //类字段
+            Field[] declaredFields = cla.getDeclaredFields();
+            List<String> fieldNames = Arrays.stream(declaredFields).map(declaredField -> declaredField.getName()).collect(Collectors.toList());
             for (String field : fields) {
 
                 String camelField = StrUtil.toCamelCase(field.toLowerCase());
+                if (!fieldNames.contains(camelField)){//如果数据库字段在类中没有则跳过
+                    continue;
+                }
                 //方法拼接
-                String methodName = "set" + camelField.substring(0,1).toUpperCase() + camelField.substring(1);
+                String methodName = "set" + camelField.substring(0, 1).toUpperCase() + camelField.substring(1);
                 String propertyTypeName = cla.getDeclaredField(camelField).getType().getName();
 
                 if ("java.lang.String".equals(propertyTypeName)){

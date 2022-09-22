@@ -815,6 +815,50 @@ public class WfExt {
             //保函结果
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"GUARANTEE_RESULT_FILE"),FileCodeEnum.GUARANTEE_RESULT);
         }
+
+        //保函退还申请
+        if ("PO_GUARANTEE_LETTER_RETURN_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //保函退还附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"GUARANTEE_FILE"),FileCodeEnum.GUARANTEE_RETURN_LETTER_ANNEX);
+        }
+
+        //用章审批
+        if ("APPROVAL_WITH_SEAL".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //用章审批附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.APPROVAL_WITH_SEAL_ATTACHMENT);
+        }
+
+        //防洪评价
+        if ("PM_CONTROL_FLOOD_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //防洪方案材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.FLOOD_CONTROL_PLAN_MATERIALS);
+            //防洪批复文件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_TWO"),FileCodeEnum.FLOOD_CONTROL_APPROVAL_DOCUMENTS);
+        }
+
+        //交通安全评价
+        if ("PM_TRAFFIC_SAFETY_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //交通安全方案材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.TRAFFIC_SAFETY_PLAN_MATERIALS);
+            //交通安全方案备案
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_TWO"),FileCodeEnum.TRAFFIC_SAFETY_PLAN_FILING);
+        }
+
+        //土地划拨
+        if ("PM_LAND_ALLOCATION_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //土地划拨调查报告
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.LAND_ALLOCATION_SURVEY_REPORT);
+            //土地划拨决定书申请材料
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_TWO"),FileCodeEnum.LAND_ALLOCATION_DECISION_APPLICATION_MATERIALS);
+            //土地划拨决定书批复
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_THREE"),FileCodeEnum.LAND_ALLOCATION_DECISION_REPLY);
+        }
+
     }
 
     private List<String> getTableList() {

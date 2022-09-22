@@ -2,12 +2,16 @@ package com.cisdi.ext.api;
 
 import com.cisdi.ext.model.view.PoOrderPaymentView;
 import com.cisdi.ext.model.view.PoOrderView;
+import com.cisdi.ext.util.EntityUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.SharedUtil;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,19 +37,44 @@ public class PoOrderPaymentExtApi {
         String limit = "limit " + start + "," + param.pageSize;
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        StringBuilder sb = new StringBuilder();
-        StringBuilder sb2 = new StringBuilder();
-
-        String sql1 = "SELECT a.ID,a.CONTRACT_ID,b.NAME as contractName,a.PM_PRJ_ID,a.STAGE_PAY_AMT_TWO,a.AMT,a.PAY_DATE,a.PAY_AMT,a.PO_ORDER_DTL_PRO_ID,a.PO_ORDER_DTL_ID,a.NAME,a.CODE,a.STATUS " +
-                "FROM po_order_payment a left join po_order b on a.CONTRACT_ID = b.id WHERE a.PM_PRJ_ID = ? ";
-        String sql2 = "select count(*) from FROM po_order_payment WHERE PM_PRJ_ID = ? ";
-
+        StringBuilder baseSql = new StringBuilder();
+        baseSql.append("SELECT a.ID,a.CONTRACT_ID,b.NAME contract_name,a.PM_PRJ_ID project_id,a.STAGE_PAY_AMT_TWO,a.AMT,a.PAY_DATE,a.PAY_AMT,a" +
+                ".PO_ORDER_DTL_PRO_ID,a.PO_ORDER_DTL_ID ,p.name project_name " +
+                "FROM po_order_payment a left join po_order b on a.CONTRACT_ID = b.CONTRACT_APP_ID  " +
+                "left join pm_prj p on p.id = a.PM_PRJ_ID " +
+                "WHERE a.PM_PRJ_ID = '" + param.projectId + "' ");
+        //其他筛选条件
         if (!SharedUtil.isEmptyString(param.contractName)){
-
+            baseSql.append("and b.NAME like '%" + param.contractName + "%' ");
+        }
+        if (!SharedUtil.isEmptyString(param.startDate) && !SharedUtil.isEmptyString(param.endDate)){
+            baseSql.append("and a.pay_date BETWEEN '" + param.startDate + "' and '" + param.endDate + "' ");
+        }
+        if (!SharedUtil.isEmptyString(param.minPayAmt)){
+            baseSql.append("and a.PAY_AMT >= " + param.minPayAmt + " ");
+        }
+        if (!SharedUtil.isEmptyString(param.maxPayAmt)){
+            baseSql.append("and a.PAY_AMT <= " + param.maxPayAmt + " ");
         }
 
-        sb.append(sql1);
-        sb2.append(sql2);
+        String totalSql = baseSql.toString();
+        //排序分页
+        baseSql.append("order by a.PAY_DATE desc ");
+        baseSql.append(limit);
+
+        List<Map<String, Object>> payMaps = myJdbcTemplate.queryForList(baseSql.toString());
+        List<Map<String, Object>> totalMaps = myJdbcTemplate.queryForList(totalSql);
+        ArrayList<PoOrderPaymentView> paymentViews = new ArrayList<>();
+        for (Map<String, Object> payMap : payMaps) {
+            PoOrderPaymentView paymentView = EntityUtil.mapToEntity(PoOrderPaymentView.class,payMap);
+            paymentViews.add(paymentView);
+        }
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("paymentViews",paymentViews);
+        result.put("total",totalMaps.size());
+
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
     }
 
 }

@@ -54,6 +54,7 @@ public class PmContractExt {
                 .set("OPPO_SITE", JdbcMapUtil.getString(data, ""))
                 .set("OPPO_SITE_LINK_MAN", JdbcMapUtil.getString(data, "OPPO_SITE_LINK_MAN"))
                 .set("PM_PRJ_ID", JdbcMapUtil.getString(data, "PM_PRJ_ID"))
+                .set("CONTRACT_APP_ID",JdbcMapUtil.getString(data,"ID"))
                 .exec();
     }
 
