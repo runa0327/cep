@@ -134,6 +134,13 @@ public class PoOrderReqExt {
                 throw new BaseException("未涉及保函，请勿勾选保函类型！");
             }
         }
+
+        //是否填写联系人
+        List<Map<String, Object>> contactList = myJdbcTemplate.queryForList("SELECT OPPO_SITE_LINK_MAN, OPPO_SITE_CONTACT " +
+                "FROM CONTRACT_SIGNING_CONTACT where CONTRACT_ID = ?", entityRecord.csCommId);
+        if (CollectionUtils.isEmpty(contactList)){
+            throw new BaseException("联系人不能为空！");
+        }
     }
 
     // 汇总求和
