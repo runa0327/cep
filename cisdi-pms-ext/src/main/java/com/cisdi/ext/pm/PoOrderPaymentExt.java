@@ -57,7 +57,7 @@ public class PoOrderPaymentExt {
         String deptName = list1.get(0).get("NAME").toString();
 
         // 查询 至上期累计付款金额
-        String sql2 = "SELECT IFNULL(SUM(STAGE_PAY_AMT),0) as amount FROM PO_ORDER_PAYMENT_REQ WHERE AMOUT_PM_PRJ_ID = ? and status = 'AP'";
+        String sql2 = "SELECT IFNULL(SUM(STAGE_PAY_AMT_TWO),0) as amount FROM PO_ORDER_PAYMENT_REQ WHERE AMOUT_PM_PRJ_ID = ? and status = 'AP'";
         List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(sql2, projectId);
         BigDecimal lastAmount = new BigDecimal(0);
         if (!CollectionUtils.isEmpty(list2)) {
@@ -78,7 +78,7 @@ public class PoOrderPaymentExt {
 
 
         // 本期支付金额
-        String nowAmount = entityRecord.valueMap.get("STAGE_PAY_AMT").toString();
+        String nowAmount = entityRecord.valueMap.get("STAGE_PAY_AMT_TWO").toString();
         Double amount = Double.valueOf(nowAmount);
         if (SharedUtil.isEmptyString(nowAmount) || amount <= 0) {
             throw new BaseException("本期支付金额不能为空且必须大于0");

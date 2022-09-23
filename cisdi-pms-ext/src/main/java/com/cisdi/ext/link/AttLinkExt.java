@@ -108,6 +108,60 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("AMOUT_PM_PRJ_ID", linkedAtt);
                 }
             }
+            //查询付款信息开户行等信息
+            String sql2 = "SELECT COLLECTION_DEPT_TWO,BANK_OF_DEPOSIT,ACCOUNT_NO,RECEIPT,SPECIAL_BANK_OF_DEPOSIT,SPECIAL_ACCOUNT_NO FROM PO_ORDER_PAYMENT_REQ WHERE RELATION_AMOUT_PLAN_REQ_ID = ? AND STATUS = 'AP' ORDER BY CRT_DT DESC limit 1";
+            List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(sql2, attValue);
+            if (!CollectionUtils.isEmpty(list2)) {
+                Map row2 = list2.get(0);
+                // 收款单位
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = JdbcMapUtil.getString(row2, "COLLECTION_DEPT_TWO");
+                    linkedAtt.text = JdbcMapUtil.getString(row2, "COLLECTION_DEPT_TWO");
+                    attLinkResult.attMap.put("COLLECTION_DEPT_TWO", linkedAtt);
+                }
+                // 开户行
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = JdbcMapUtil.getString(row2, "BANK_OF_DEPOSIT");
+                    linkedAtt.text = JdbcMapUtil.getString(row2, "BANK_OF_DEPOSIT");
+                    attLinkResult.attMap.put("BANK_OF_DEPOSIT", linkedAtt);
+                }
+                // 账号
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = JdbcMapUtil.getString(row2, "ACCOUNT_NO");
+                    linkedAtt.text = JdbcMapUtil.getString(row2, "ACCOUNT_NO");
+                    attLinkResult.attMap.put("ACCOUNT_NO", linkedAtt);
+                }
+                // 农民工工资专用账号收款单位
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = JdbcMapUtil.getString(row2, "RECEIPT");
+                    linkedAtt.text = JdbcMapUtil.getString(row2, "RECEIPT");
+                    attLinkResult.attMap.put("RECEIPT", linkedAtt);
+                }
+                // 专户开户行
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = JdbcMapUtil.getString(row2, "SPECIAL_BANK_OF_DEPOSIT");
+                    linkedAtt.text = JdbcMapUtil.getString(row2, "SPECIAL_BANK_OF_DEPOSIT");
+                    attLinkResult.attMap.put("SPECIAL_BANK_OF_DEPOSIT", linkedAtt);
+                }
+                // 专户账号
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = JdbcMapUtil.getString(row2, "SPECIAL_ACCOUNT_NO");
+                    linkedAtt.text = JdbcMapUtil.getString(row2, "SPECIAL_ACCOUNT_NO");
+                    attLinkResult.attMap.put("SPECIAL_ACCOUNT_NO", linkedAtt);
+                }
+            }
 
         }
         return attLinkResult;
@@ -777,7 +831,7 @@ public class AttLinkExt {
         // 根据id查询招投标信息
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTRACT_CODE, CONTRACT_CATEGORY_ID, CONTRACT_NAME, CONTRACT_PRICE, " +
                 "BIDDING_NAME_ID,PMS_RELEASE_WAY_ID,BID_CTL_PRICE_LAUNCH,PURCHASE_TYPE,WIN_BID_UNIT_TXT,WINNING_BIDS_AMOUNT,PLAN_TOTAL_DAYS," +
-                "IS_REFER_GUARANTEE,GUARANTEE_LETTER_TYPE_ID,OPPO_SITE_LINK_MAN,OPPO_SITE_CONTACT,IS_TEMPLATE " +
+                "IS_REFER_GUARANTEE,GUARANTEE_LETTER_TYPE_ID,IS_TEMPLATE " +
                 "from po_order_req where id = ?", attValue);
 
         if (CollectionUtils.isEmpty(list)) {
@@ -879,21 +933,21 @@ public class AttLinkExt {
             attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_ID", linkedAtt);
         }
         // 相对方联系人
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row, "OPPO_SITE_LINK_MAN");
-            linkedAtt.text = JdbcMapUtil.getString(row, "OPPO_SITE_LINK_MAN");
-            attLinkResult.attMap.put("OPPO_SITE_LINK_MAN", linkedAtt);
-        }
+//        {
+//            LinkedAtt linkedAtt = new LinkedAtt();
+//            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+//            linkedAtt.value = JdbcMapUtil.getString(row, "OPPO_SITE_LINK_MAN");
+//            linkedAtt.text = JdbcMapUtil.getString(row, "OPPO_SITE_LINK_MAN");
+//            attLinkResult.attMap.put("OPPO_SITE_LINK_MAN", linkedAtt);
+//        }
         // 相对电话
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row, "OPPO_SITE_CONTACT");
-            linkedAtt.text = JdbcMapUtil.getString(row, "OPPO_SITE_CONTACT");
-            attLinkResult.attMap.put("OPPO_SITE_CONTACT", linkedAtt);
-        }
+//        {
+//            LinkedAtt linkedAtt = new LinkedAtt();
+//            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+//            linkedAtt.value = JdbcMapUtil.getString(row, "OPPO_SITE_CONTACT");
+//            linkedAtt.text = JdbcMapUtil.getString(row, "OPPO_SITE_CONTACT");
+//            attLinkResult.attMap.put("OPPO_SITE_CONTACT", linkedAtt);
+//        }
         // 是否标准模板
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -1122,7 +1176,11 @@ public class AttLinkExt {
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
             String id = JdbcMapUtil.getString(row, "BID_USER_ID");
             // 根据id查询人员名称
-            String name = myJdbcTemplate.queryForList("select name from ad_user where id = ?", id).get(0).get("name").toString();
+            String name = "";
+            List<Map<String,Object>> map = myJdbcTemplate.queryForList("select name from ad_user where id = ?", id);
+            if (!CollectionUtils.isEmpty(map)){
+                name = JdbcMapUtil.getString(map.get(0),"name");
+            }
             linkedAtt.text = name;
             linkedAtt.value = id;
 
@@ -1670,6 +1728,17 @@ public class AttLinkExt {
             getFileInfoList(linkedAtt);
 
             attLinkResult.attMap.put("ATT_FILE_GROUP_ID", linkedAtt);
+        }
+        // 附件：
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.FILE_GROUP;
+            linkedAtt.value = "99952822476358787,99952822476358788";
+//            linkedAtt.text = "/qygly-gateway/qygly-file/viewImage?fileId=99952822476358787,/qygly-gateway/qygly-file/viewImage?fileId=99952822476358788";
+
+            getFileInfoList(linkedAtt);
+
+            attLinkResult.attMap.put("APPROVE_FILE_ID_TWO", linkedAtt);
         }
 
         {

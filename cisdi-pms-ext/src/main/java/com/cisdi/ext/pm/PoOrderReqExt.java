@@ -123,7 +123,7 @@ public class PoOrderReqExt {
         //是否涉及保函
         String baoHan = JdbcMapUtil.getString(entityRecord.valueMap,"IS_REFER_GUARANTEE");
         //保函类型
-        String baoHanType = JdbcMapUtil.getString(entityRecord.valueMap,"GUARANTEE_LETTER_TYPE_ID");
+        String baoHanType = JdbcMapUtil.getString(entityRecord.valueMap,"GUARANTEE_LETTER_TYPE_IDS");
         if ("true".equals(baoHan)){
             if (SharedUtil.isEmptyString(baoHanType)){
                 throw new BaseException("保函类型不能为空！");
@@ -137,7 +137,7 @@ public class PoOrderReqExt {
 
         //是否填写联系人
         List<Map<String, Object>> contactList = myJdbcTemplate.queryForList("SELECT OPPO_SITE_LINK_MAN, OPPO_SITE_CONTACT " +
-                "FROM CONTRACT_SIGNING_CONTACT where CONTRACT_ID = ?", entityRecord.csCommId);
+                "FROM CONTRACT_SIGNING_CONTACT where PARENT_ID = ?", entityRecord.csCommId);
         if (CollectionUtils.isEmpty(contactList)){
             throw new BaseException("联系人不能为空！");
         }
