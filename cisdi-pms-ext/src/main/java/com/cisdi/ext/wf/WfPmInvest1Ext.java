@@ -1,6 +1,7 @@
 package com.cisdi.ext.wf;
 
 import com.cisdi.ext.util.WfPmInvestUtil;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.interaction.EntityRecord;
@@ -26,11 +27,8 @@ public class WfPmInvest1Ext {
         String PRJ_DESIGN_USER_ID = map.get("PRJ_DESIGN_USER_ID").toString();
         String PRJ_COST_USER_ID = map.get("PRJ_COST_USER_ID").toString();
 
-        String early_chief_user_id = myJdbcTemplate.queryForMap("select ru.ad_user_id from ad_role r join ad_role_user ru on r.id=ru.ad_role_id and r.code='early_chief'").get("ad_user_id").toString();
-
         String designComment = null;
         String costComment = null;
-        String earlyChiefComment = null;
 
         for (Map<String, Object> row : list) {
             if (row.get("u_id").toString().equals(PRJ_DESIGN_USER_ID)) {
@@ -39,14 +37,30 @@ public class WfPmInvest1Ext {
             if (row.get("u_id").toString().equals(PRJ_COST_USER_ID)) {
                 costComment = row.get("user_comment") == null ? null : row.get("user_comment").toString();
             }
+        }
+
+        myJdbcTemplate.update("update " + entCode + " t set t.DESIGN_COMMENT=?,t.COST_COMMENT=? where t.id=?", designComment, costComment, csCommId);
+    }
+
+    //前期部领导意见
+    public void setEarlyComment(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String procInstId = ExtJarHelper.procInstId.get();
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId;
+
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select u.id u_id,u.code u_code,u.name u_name,tk.user_comment from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id", procInstId);
+        String early_chief_user_id = myJdbcTemplate.queryForMap("select ru.ad_user_id from ad_role r join ad_role_user ru on r.id=ru.ad_role_id and r.code='early_chief'").get("ad_user_id").toString();
+        String earlyChiefComment = null;
+
+        for (Map<String, Object> row : list) {
             if (row.get("u_id").toString().equals(early_chief_user_id)) {
                 earlyChiefComment = row.get("user_comment") == null ? null : row.get("user_comment").toString();
             }
         }
-
-        myJdbcTemplate.update("update " + entCode + " t set t.DESIGN_COMMENT=?,t.COST_COMMENT=?,t.EARLY_COMMENT=? where t.id=?", designComment, costComment, earlyChiefComment, csCommId);
+        myJdbcTemplate.update("update " + entCode + " t set t.EARLY_COMMENT=? where t.id=?", earlyChiefComment, csCommId);
     }
-
     /**
      * 插入或更新投资估算。
      */
