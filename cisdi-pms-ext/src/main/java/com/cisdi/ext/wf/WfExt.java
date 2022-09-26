@@ -190,21 +190,27 @@ public class WfExt {
                         if (tableList.contains(entityCode)) {
                             // 流程名称按规定创建
                             int update1 = 0;
-                            List<String> amtPrjList = getAmtPrjList();
-                            if (amtPrjList.contains(entityCode)) {
-                                // 资金需求计划和付款申请项目\设计任务书名称使用的另外的字段
-                                update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
-                                        ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
-                                        ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.AMOUT_PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name," +
-                                        "'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+
+                            //判断该流程是否有项目信息
+                            List<String> noProjectList = getNoProjectList();
+                            if (noProjectList.contains(entityCode)){
+                                return;
                             } else {
-                                update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
-                                        ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
-                                        ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', " +
-                                        "prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                                List<String> amtPrjList = getAmtPrjList();
+                                if (amtPrjList.contains(entityCode)) {
+                                    // 资金需求计划和付款申请项目\设计任务书名称使用的另外的字段
+                                    update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
+                                            ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
+                                            ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.AMOUT_PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name," +
+                                            "'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                                } else {
+                                    update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
+                                            ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
+                                            ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', " +
+                                            "prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                                }
                             }
                             log.info("已更新：{}", update1);
-
                             // 发起人是否存在部门信息校验
                             try {
                                 String hrDeptId = valueMap.get("CRT_DEPT_ID").toString();
@@ -920,6 +926,7 @@ public class WfExt {
         list.add("PM_TRAFFIC_SAFETY_REQ"); // 交通安全评价
         list.add("APPROVAL_WITH_SEAL"); // 用章审批
         list.add("PM_DESIGN_CHANGE_REQ"); // 设计变更
+        list.add("PM_SEND_APPROVAL_REQ"); // 发文呈批表
         return list;
     }
 
@@ -1000,6 +1007,13 @@ public class WfExt {
         list.add("PM_FUND_REQUIRE_PLAN_REQ"); // 资金需求计划申请
         list.add("PM_DESIGN_ASSIGNMENT_BOOK"); // 设计任务书
         list.add("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD"); // 技术交底与图纸会审记录
+        return list;
+    }
+
+    /** 没有项目的流程 **/
+    private List<String> getNoProjectList(){
+        List<String> list = new ArrayList<>();
+        list.add("PM_SEND_APPROVAL_REQ"); // 发文呈批表
         return list;
     }
 }
