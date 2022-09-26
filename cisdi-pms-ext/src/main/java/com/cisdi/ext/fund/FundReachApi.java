@@ -135,6 +135,7 @@ public class FundReachApi {
         }
         //TODO 数据补全
         jdbcTemplate.update("", id);
+        ExtJarHelper.returnValue.set(Collections.emptyMap());
     }
 
     /**
