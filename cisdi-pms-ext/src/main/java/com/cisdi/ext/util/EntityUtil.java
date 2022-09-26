@@ -3,6 +3,7 @@ package com.cisdi.ext.util;
 import cn.hutool.core.util.StrUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
 import org.springframework.util.CollectionUtils;
 
@@ -74,7 +75,7 @@ public class EntityUtil {
     public static BigDecimal getBigDecimal(Map<String,Object> map,String key){
         Object object = getObject(map,key);
         String temp = null;
-        temp = object == null ? null : object.toString();
+        temp = object == null ? "0" : object.toString();
         return new BigDecimal(temp);
     }
 
