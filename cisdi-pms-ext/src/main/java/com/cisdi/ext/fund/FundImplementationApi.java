@@ -1,4 +1,4 @@
-package com.cisdi.ext.newFundManage;
+package com.cisdi.ext.fund;
 
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;

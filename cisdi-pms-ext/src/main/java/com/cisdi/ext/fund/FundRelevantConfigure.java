@@ -1,7 +1,8 @@
-package com.cisdi.ext.newFundManage;
+package com.cisdi.ext.fund;
 
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 
 import java.util.Map;
@@ -21,8 +22,9 @@ public class FundRelevantConfigure {
 //        }
     }
     //检查是否有名称重复
-//    public boolean checkDuplicate(String){
-//
+//    public boolean checkDuplicate(String name){
+//        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+//        myJdbcTemplate.queryForList("")
 //    }
 
 
