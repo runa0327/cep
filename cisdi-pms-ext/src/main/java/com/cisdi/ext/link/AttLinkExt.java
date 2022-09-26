@@ -219,6 +219,7 @@ public class AttLinkExt {
             throw new BaseException("项目的相关属性不完整！");
         }
         Map row = list.get(0);
+
         // 回显项目信息
         // 项目编号
         {
@@ -228,12 +229,14 @@ public class AttLinkExt {
             linkedAtt.text = JdbcMapUtil.getString(row, "prj_code");
             attLinkResult.attMap.put("PRJ_CODE", linkedAtt);
         }
+
         // 项目批复文号
+        Map resultRow = getReplyNo(attValue);
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
-            linkedAtt.text = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
+            linkedAtt.value = JdbcMapUtil.getString(resultRow, "REPLY_NO");
+            linkedAtt.text = JdbcMapUtil.getString(resultRow, "REPLY_NO");
             attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
             attLinkResult.attMap.put("REPLY_NO", linkedAtt);
         }
@@ -624,8 +627,8 @@ public class AttLinkExt {
 
         } else if ("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD".equals(entCode) || "PM_DESIGN_ASSIGNMENT_BOOK".equals(entCode)) {
             // SKILL_DISCLOSURE_PAPER_RECHECK_RECORD 技术交底与图纸会审记录 PM_DESIGN_ASSIGNMENT_BOOK 设计任务书
-            Map resultRow = getAmtMap(attValue);
-            attLinkResult = getResult(resultRow, attLinkResult);
+            Map resultRow1 = getAmtMap(attValue);
+            attLinkResult = getResult(resultRow1, attLinkResult);
             return attLinkResult;
         } else {
             return attLinkResult;
@@ -1502,13 +1505,15 @@ public class AttLinkExt {
             attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt);
         }
         // 批复文号
+        Map resultRow = getReplyNo(attValue);
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
-            linkedAtt.text = JdbcMapUtil.getString(row, "PRJ_REPLY_NO");
+            linkedAtt.value = JdbcMapUtil.getString(resultRow, "REPLY_NO");
+            linkedAtt.text = JdbcMapUtil.getString(resultRow, "REPLY_NO");
 
             attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
+            attLinkResult.attMap.put("REPLY_NO", linkedAtt);
         }
         // 批复日期
         {
@@ -1574,8 +1579,8 @@ public class AttLinkExt {
         List<String> amtList = getAmtList();
         if (amtList.contains(entCode)) {
             // 查询预算财评信息
-            Map resultRow = getAmtMap(attValue);
-            attLinkResult = getResult(resultRow, attLinkResult);
+            Map resultRow1 = getAmtMap(attValue);
+            attLinkResult = getResult(resultRow1, attLinkResult);
         }
 
         return attLinkResult;
@@ -1971,6 +1976,17 @@ public class AttLinkExt {
 
             attLinkResult.attMap.put("CONSTRUCT_PERIOD_INTEREST", linkedAtt);
         }
+        //批复文号
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(stringObjectMap, "REPLY_NO");
+            linkedAtt.text = JdbcMapUtil.getString(stringObjectMap, "REPLY_NO");
+
+            attLinkResult.attMap.put("REPLY_NO", linkedAtt);
+            attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
+        }
+
         return attLinkResult;
     }
 
@@ -2006,16 +2022,16 @@ public class AttLinkExt {
     private Map getAmtMap(String attValue) {
         Map resultRow = new HashMap();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql1 = "SELECT PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST3 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+        String sql1 = "SELECT REPLY_NO,PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST3 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
         List<Map<String, Object>> map = myJdbcTemplate.queryForList(sql1, attValue);
         List<Map<String, Object>> map1 = new ArrayList<>();
         List<Map<String, Object>> map2 = new ArrayList<>();
         if (CollectionUtils.isEmpty(map)) {
             // 初设概算信息
-            String sql2 = "SELECT PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST2 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+            String sql2 = "SELECT REPLY_NO,PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST2 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
             map1 = myJdbcTemplate.queryForList(sql2, attValue);
             if (CollectionUtils.isEmpty(map1)) {
-                String sql3 = "SELECT PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST1 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+                String sql3 = "SELECT REPLY_NO,PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST1 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
                 map2 = myJdbcTemplate.queryForList(sql3, attValue);
                 if (!CollectionUtils.isEmpty(map2)) {
                     resultRow = map2.get(0);
@@ -2028,6 +2044,34 @@ public class AttLinkExt {
         }
         return resultRow;
     }
+
+    // 查询可研估算<初设概算<预算财评优先级最高的数据  查询文号
+    private Map getReplyNo(String attValue) {
+        Map resultRow = new HashMap();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql1 = "SELECT REPLY_NO FROM PM_PRJ_INVEST3 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+        List<Map<String, Object>> map = myJdbcTemplate.queryForList(sql1, attValue);
+        List<Map<String, Object>> map1 = new ArrayList<>();
+        List<Map<String, Object>> map2 = new ArrayList<>();
+        if (CollectionUtils.isEmpty(map)) {
+            // 初设概算信息
+            String sql2 = "SELECT REPLY_NO FROM PM_PRJ_INVEST2 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+            map1 = myJdbcTemplate.queryForList(sql2, attValue);
+            if (CollectionUtils.isEmpty(map1)) {
+                String sql3 = "SELECT REPLY_NO FROM PM_PRJ_INVEST1 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+                map2 = myJdbcTemplate.queryForList(sql3, attValue);
+                if (!CollectionUtils.isEmpty(map2)) {
+                    resultRow = map2.get(0);
+                }
+            } else {
+                resultRow = map1.get(0);
+            }
+        } else {
+            resultRow = map.get(0);
+        }
+        return resultRow;
+    }
+
 
     // 属性联动中需要单独查询额外字典名称的key
     public List<String> getKeyList() {
