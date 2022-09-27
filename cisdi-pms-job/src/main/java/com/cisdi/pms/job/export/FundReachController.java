@@ -34,6 +34,11 @@ public class FundReachController extends BaseController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /**
+     * 资金落实导出
+     * @param fundReachRequest
+     * @param response
+     */
     @SneakyThrows(IOException.class)
     @GetMapping("export")
     public void reachExcel(FundReachRequest fundReachRequest, HttpServletResponse response) {
