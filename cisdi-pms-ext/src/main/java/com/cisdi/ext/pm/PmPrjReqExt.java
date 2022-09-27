@@ -45,11 +45,11 @@ public class PmPrjReqExt {
         boolean need2 = "99799190825087119".equals(con_scale_type_id);
         if (need2) {
             if (con_scale_qty2 == null || con_scale_qty2 <= 0d) {
-                sbErr.append("建设规模数量2请填写正确宽度！");
+                sbErr.append("请填写正确宽度！");
             }
         } else {
             if (con_scale_qty2 != null && con_scale_qty2 != 0d) {
-                sbErr.append("建设规模数量2请不要填写！");
+                sbErr.append("请不要填写 宽 值！");
             }
         }
 

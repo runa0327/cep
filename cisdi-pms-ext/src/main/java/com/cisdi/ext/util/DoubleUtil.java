@@ -15,6 +15,7 @@ public class DoubleUtil {
                 aDouble = 0d;
             }
             sum = sum.add(new BigDecimal(aDouble));
+            sum = sum.setScale(2,BigDecimal.ROUND_HALF_UP);
         }
         return sum.doubleValue();
     }

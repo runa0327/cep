@@ -1312,6 +1312,7 @@ public class AttLinkExt {
 
         Map row = list.get(0);
 
+        //建设规模类型
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.REF_SINGLE;
@@ -1320,14 +1321,66 @@ public class AttLinkExt {
 
             attLinkResult.attMap.put("CON_SCALE_TYPE_ID", linkedAtt);
         }
-
+        //建设规模单位
+        String id = JdbcMapUtil.getString(row, "CON_SCALE_UOM_ID");
+        String name = JdbcMapUtil.getString(row, "CON_SCALE_UOM_NAME");
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_UOM_ID");
-            linkedAtt.text = JdbcMapUtil.getString(row, "CON_SCALE_UOM_NAME");
-
+            linkedAtt.value = id;
+            linkedAtt.text = name;
             attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt);
+        }
+
+        Boolean area = true; //面积
+        Boolean length = true; //长
+        Boolean width = true; //宽
+        Boolean other = true; //其他
+
+        String name1 = JdbcMapUtil.getString(row, "CON_SCALE_TYPE_NAME");
+        if (name1.contains("面积")){
+            length = false;
+            width = false;
+            other = false;
+        } else if (name1.contains("长宽")){
+            area = false;
+            other = false;
+        } else {
+            area = false;
+            length = false;
+            width = false;
+        }
+        //面积
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = area;
+            linkedAtt.changeToMandatory = true;
+            attLinkResult.attMap.put("QTY_ONE", linkedAtt);
+        }
+        //长
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = length;
+            linkedAtt.changeToMandatory = true;
+            attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
+        }
+        //宽
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = width;
+            linkedAtt.changeToMandatory = true;
+            attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
+        }
+        //其他
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = other;
+            linkedAtt.changeToMandatory = false;
+            attLinkResult.attMap.put("QTY_TWO", linkedAtt);
         }
 
         return attLinkResult;
