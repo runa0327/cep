@@ -49,24 +49,29 @@ public class FundReachController extends BaseController {
         String endTime = fundReachRequest.getEndTime();
 
         StringBuilder sb = new StringBuilder();
-        //TODO 查询优化
-        sb.append("select PM_PRJ_ID,FUND_SOURCE_TEXT,FUND_REACH_CATEGORY,IFNULL(REACH_AMOUNT,0) AS REACH_AMOUNT,PAYEE,RECEIPT_ACCOUNT,REACH_DATE,ATT_FILE_GROUP_ID from fund_reach where 1=1 ");
+        sb.append("select r.ID,p.name projectName,r.FUND_SOURCE_TEXT sourceName,r.FUND_REACH_CATEGORY reachCategory,IFNULL(REACH_AMOUNT,0) amt," +
+                "REACH_DATE reachDate,t1.name firstTypeName,t2.name secondTypeName " +
+                "from fund_reach r left join pm_prj p on p.id = r.PM_PRJ_ID " +
+                "left join fund_implementation i on i.FUND_SOURCE_TEXT = r.FUND_SOURCE_TEXT " +
+                "left join fund_type t1 on t1.id = i.FUND_CATEGORY_FIRST " +
+                "left join fund_type t2 on t2.id = i.FUND_CATEGORY_SECOND " +
+                "where 1=1 ");
         if (Strings.isNotEmpty(sourceName)) {
-            sb.append(" and FUND_SOURCE_TEXT like '%").append(sourceName).append("%'");
+            sb.append(" and r.FUND_SOURCE_TEXT like '%").append(sourceName).append("%'");
         }
         if (Strings.isNotEmpty(projectId)) {
-            sb.append(" and PM_PRJ_ID =").append(projectId);
+            sb.append(" and r.PM_PRJ_ID = '").append(projectId).append("'");
         }
         if (Strings.isNotEmpty(beginTime) && Strings.isNotEmpty(endTime)) {
-            sb.append(" and REACH_DATE between ").append(beginTime).append(" and ").append(endTime);
+            sb.append(" and r.REACH_DATE between '").append(beginTime).append("' and '").append(endTime).append("'");
         }
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
         List<FundReachExportModel> resList = list.stream().map(this::dataConvert).collect(Collectors.toList());
-        super.setExcelRespProp(response, "资金到位明显");
+        super.setExcelRespProp(response, "资金到位明细");
         EasyExcel.write(response.getOutputStream())
                 .head(FundReachExportModel.class)
                 .excelType(ExcelTypeEnum.XLSX)
-                .sheet("资金到位明显")
+                .sheet("资金到位明细")
                 .doWrite(resList);
     }
 

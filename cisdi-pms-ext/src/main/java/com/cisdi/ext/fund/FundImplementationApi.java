@@ -1,6 +1,8 @@
 package com.cisdi.ext.fund;
 
+import com.cisdi.ext.fundManage.FileCommon;
 import com.cisdi.ext.model.BasePageEntity;
+import com.cisdi.ext.model.view.File;
 import com.cisdi.ext.util.EntityUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
@@ -22,34 +24,34 @@ import java.util.Map;
  */
 public class FundImplementationApi {
     //新增资金落实
-    public void addFundImplementation(){
+    public void addFundImplementation() {
         Map<String, Object> ImpMap = ExtJarHelper.extApiParamMap.get();
         FundImplementation fundImplementation = JsonUtil.fromJson(JsonUtil.toJson(ImpMap), FundImplementation.class);
         String id = fundImplementation.id;
-        if (Strings.isNullOrEmpty(id)){
-            if (checkDuplicate(fundImplementation.fundSourceText)){//新增时资金来源不能重复
+        if (Strings.isNullOrEmpty(id)) {
+            if (checkDuplicate(fundImplementation.fundSourceText)) {//新增时资金来源不能重复
                 throw new BaseException("资金来源重复！");
             }
             //插入落实表
             id = Crud.from("fund_implementation").insertData();
         }
         //更新落实表
-        Crud.from("fund_implementation").where().eq("ID",id).update().set("REMARK",fundImplementation.remark)
-                .set("FUND_SOURCE_TEXT",fundImplementation.fundSourceText).set("FUND_CATEGORY_FIRST",fundImplementation.fundCategoryFirst)
+        Crud.from("fund_implementation").where().eq("ID", id).update().set("REMARK", fundImplementation.remark)
+                .set("FUND_SOURCE_TEXT", fundImplementation.fundSourceText).set("FUND_CATEGORY_FIRST", fundImplementation.fundCategoryFirst)
                 .set("FUND_CATEGORY_SECOND", fundImplementation.fundCategorySecond).set("DECLARED_AMOUNT", fundImplementation.declaredAmount)
                 .set("APPROVAL_TIME", fundImplementation.approvalTime).set("ATT_FILE_GROUP_ID", fundImplementation.attFileGroupId).exec();
         //删除明细
-        Crud.from("fund_implementation_detail").where().eq("FUND_IMP_ID",id).delete().exec();
+        Crud.from("fund_implementation_detail").where().eq("FUND_IMP_ID", id).delete().exec();
         //插入明细表
         for (FundImplementationDetail detail : fundImplementation.details) {
             String detailLid = Crud.from("fund_implementation_detail").insertData();
-            Crud.from("fund_implementation_detail").where().eq("ID",detailLid).update().set("FUND_IMP_ID",id)
-                    .set("PM_PRJ_ID", detail.pmPrjId).set("APPROVED_AMOUNT",detail.approvedAmount).exec();
+            Crud.from("fund_implementation_detail").where().eq("ID", detailLid).update().set("FUND_IMP_ID", id)
+                    .set("PM_PRJ_ID", detail.pmPrjId).set("APPROVED_AMOUNT", detail.approvedAmount).exec();
         }
     }
 
     //资金落实列表
-    public void fundImpList(){
+    public void fundImpList() {
         Map<String, Object> fundImpMap = ExtJarHelper.extApiParamMap.get();
         FundImpReq fundImpReq = JsonUtil.fromJson(JsonUtil.toJson(fundImpMap), FundImpReq.class);
         StringBuffer baseSql = new StringBuffer("select i.id,t1.name FUND_CATEGORY_FIRST,t2.name FUND_CATEGORY_SECOND,i.FUND_SOURCE_TEXT,i" +
@@ -82,7 +84,7 @@ public class FundImplementationApi {
         List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
         ArrayList<FundImpResp> fundImpRespList = new ArrayList<>();
         for (Map<String, Object> impMap : impList) {
-            FundImpResp fundImpResp = EntityUtil.mapToEntity(FundImpResp.class,impMap);
+            FundImpResp fundImpResp = EntityUtil.mapToEntity(FundImpResp.class, impMap);
             fundImpRespList.add(fundImpResp);
         }
         ListResult listResult = new ListResult();
@@ -94,11 +96,47 @@ public class FundImplementationApi {
     }
 
     //删除
-    public void delImp(){
+    public void delImp() {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         FundImpReq fundImpReq = JsonUtil.fromJson(JsonUtil.toJson(inputMap), FundImpReq.class);
-        Crud.from("fund_implementation_detail").where().eq("FUND_IMP_ID",fundImpReq.id).delete().exec();
-        Crud.from("fund_implementation").where().eq("id",fundImpReq.id).delete().exec();
+        Crud.from("fund_implementation_detail").where().eq("FUND_IMP_ID", fundImpReq.id).delete().exec();
+        Crud.from("fund_implementation").where().eq("id", fundImpReq.id).delete().exec();
+    }
+
+    //详情
+    public void ImpDetail() {
+        Map<String, Object> idMap = ExtJarHelper.extApiParamMap.get();
+        String id = JdbcMapUtil.getString(idMap, "id");
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql = "SELECT i.ID,i.REMARK,i.FUND_SOURCE_TEXT,t1.name FUND_CATEGORY_FIRST,t2.name FUND_CATEGORY_SECOND,i.DECLARED_AMOUNT,i" +
+                ".APPROVAL_TIME,i.ATT_FILE_GROUP_ID,sum(d.APPROVED_AMOUNT) SUM_APPROVED_AMOUNT " +
+                "FROM fund_implementation i " +
+                "left join fund_type t1 on t1.id = i.FUND_CATEGORY_FIRST " +
+                "left join fund_type t2 on t2.id = i.FUND_CATEGORY_SECOND " +
+                "left join fund_implementation_detail d on d.FUND_IMP_ID = i.id " +
+                "WHERE i.id = ? " +
+                "GROUP BY i.id";
+        Map<String, Object> impMap = myJdbcTemplate.queryForMap(sql, id);
+        //文件
+        List<File> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(impMap, "ATT_FILE_GROUP_ID"), myJdbcTemplate);
+        //落实明细
+        String detailSql = "select d.id,p.name prj_name,d.APPROVED_AMOUNT " +
+                "from fund_implementation_detail d left join pm_prj p on p.id = d.PM_PRJ_ID " +
+                "where d.FUND_IMP_ID = ?";
+        List<Map<String, Object>> detailMapList = myJdbcTemplate.queryForList(detailSql, id);
+        //封装
+        ArrayList<FundImplementationDetail> detailList = new ArrayList<>();
+        for (Map<String, Object> detailMap : detailMapList) {
+            FundImplementationDetail detail = EntityUtil.mapToEntity(FundImplementationDetail.class, detailMap);
+            detailList.add(detail);
+        }
+        ImpDetail impDetail = EntityUtil.mapToEntity(ImpDetail.class, impMap);
+        impDetail.detailList = detailList;
+        impDetail.fileList = fileList;
+
+        //返回
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(impDetail), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
     }
 
     //查重
@@ -106,13 +144,11 @@ public class FundImplementationApi {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String sql = "SELECT count(*) count FROM fund_implementation where FUND_SOURCE_TEXT = ?";
         Map<String, Object> countMap = myJdbcTemplate.queryForMap(sql, name);
-        if (JdbcMapUtil.getInt(countMap,"count") == 0){
+        if (JdbcMapUtil.getInt(countMap, "count") == 0) {
             return false;
         }
         return true;
     }
-
-
 
 
     public static class FundImplementation {
@@ -136,6 +172,7 @@ public class FundImplementationApi {
         public List<FundImplementationDetail> details;
     }
 
+    @Data
     public static class FundImplementationDetail {
         //id
         public String id;
@@ -143,6 +180,8 @@ public class FundImplementationApi {
         public String pmPrjId;
         //批复金额
         public BigDecimal approvedAmount;
+        //项目名
+        public String prjName;
     }
 
     public static class FundImpReq extends BasePageEntity {
@@ -179,5 +218,29 @@ public class FundImplementationApi {
     public static class ListResult {
         public Integer total;
         public List<FundImpResp> fundImpRespList;
+    }
+
+    @Data
+    public static class ImpDetail {
+        //id
+        public String id;
+        //资金来源
+        public String fundSourceText;
+        //资金类别一级
+        public String fundCategoryFirst;
+        //资金类别二级
+        public String fundCategorySecond;
+        //申报金额
+        public BigDecimal declaredAmount;
+        //批复金额
+        public BigDecimal sumApprovedAmount;
+        //批复时间
+        public String approvalTime;
+        //备注
+        public String remark;
+        //落实明细
+        public List<FundImplementationDetail> detailList;
+        //文件
+        public List<File> fileList;
     }
 }
