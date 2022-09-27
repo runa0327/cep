@@ -54,7 +54,7 @@ public class FundReachController extends BaseController {
         if (Strings.isNotEmpty(beginTime) && Strings.isNotEmpty(endTime)) {
             sb.append(" and REACH_DATE between ").append(beginTime).append(" and ").append(endTime);
         }
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("");
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
         List<FundReachExportModel> resList = list.stream().map(this::dataConvert).collect(Collectors.toList());
         super.setExcelRespProp(response, "资金到位明显");
         EasyExcel.write(response.getOutputStream())
