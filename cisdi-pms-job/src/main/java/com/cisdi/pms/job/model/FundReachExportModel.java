@@ -1,6 +1,7 @@
 package com.cisdi.pms.job.model;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import lombok.Data;
 
 /**
@@ -15,6 +16,7 @@ import lombok.Data;
 public class FundReachExportModel {
 
     @ExcelProperty("资金大类")
+    @ColumnWidth(value = 100)
     private String categoryName;
 
     @ExcelProperty("资金来源")

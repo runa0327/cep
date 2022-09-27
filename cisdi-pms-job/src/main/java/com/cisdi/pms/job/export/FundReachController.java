@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * @projectName cisdi-pms-service
  * @title FundReachController
  * @package com.cisdi.pms.excel
- * @description
+ * @description 资金到位导出
  * @date 2022/9/27
  */
 @RestController
@@ -35,7 +35,8 @@ public class FundReachController extends BaseController {
     private JdbcTemplate jdbcTemplate;
 
     /**
-     * 资金落实导出
+     * 资金到位导出
+     *
      * @param fundReachRequest
      * @param response
      */
@@ -75,4 +76,34 @@ public class FundReachController extends BaseController {
         return model;
     }
 
+    /**
+     * 测试excel 导出
+     *
+     * @param request
+     * @param response
+     */
+    @SneakyThrows(IOException.class)
+    @GetMapping("exportTest")
+    public void exportTest(FundReachRequest request, HttpServletResponse response) {
+        String sourceName = request.getSourceName();
+        List<FundReachExportModel> resList = new ArrayList<>();
+        FundReachExportModel model = new FundReachExportModel();
+        model.setCategoryName("大类XXX");
+        model.setSourceName("2019财政拨款");
+        resList.add(model);
+
+        FundReachExportModel model1 = new FundReachExportModel();
+        model1.setCategoryName("大类XXX111");
+        model1.setSourceName("2020财政拨款");
+        resList.add(model1);
+
+
+        super.setExcelRespProp(response, "资金到位明显");
+        EasyExcel.write(response.getOutputStream())
+                .head(FundReachExportModel.class)
+                .excelType(ExcelTypeEnum.XLSX)
+                .sheet("资金到位明显")
+                .doWrite(resList);
+
+    }
 }
