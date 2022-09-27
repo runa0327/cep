@@ -123,7 +123,7 @@ public class PmPrjReqExt {
                         "PRJ_SITUATION")).set("INVESTMENT_SOURCE_ID", pm_prj_req.get("INVESTMENT_SOURCE_ID"))
                 .set("PRJ_EARLY_USER_ID", pm_prj_req.get("PRJ_EARLY_USER_ID")).set("PRJ_DESIGN_USER_ID", pm_prj_req.get("PRJ_DESIGN_USER_ID"))
                 .set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID")).set("PRJ_CODE", pm_prj_req.get("PRJ_CODE"))
-                .set("BUILDING_AREA", pm_prj_req.get("CON_SCALE_QTY"))
+                .set("BUILDING_AREA", pm_prj_req.get("CON_SCALE_QTY")).set("QTY_ONE",pm_prj_req.get("QTY_ONE")).set("QTY_TWO",pm_prj_req.get("QTY_TWO"))
                 .exec();
         log.info("已更新：{}", exec);
 

@@ -208,7 +208,8 @@ public class AttLinkExt {
                         "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.PRJ_CODE, " +
                         "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS', " +
                         "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD', " +
-                        "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget' " +
+                        "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget', " +
+                        "t.QTY_ONE,t.QTY_TWO " +
                         "from pm_prj t join PM_PARTY c on t.id=? and t.CUSTOMER_UNIT=c.id " +
                         "join gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
                         "join gr_set_value l on t.BASE_LOCATION_ID=l.id " +
@@ -1332,29 +1333,39 @@ public class AttLinkExt {
             attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt);
         }
 
-        Boolean area = true; //面积
-        Boolean length = true; //长
-        Boolean width = true; //宽
-        Boolean other = true; //其他
+        Boolean areashow = true; //面积显示
+        Boolean lengthShow = true; //长显示
+        Boolean widthShow = true; //宽显示
+        Boolean otherShow = true; //其他显示
+
+        Boolean areaEdit = true; //面积可改
+        Boolean lengthEdit = true; //长可改
+        Boolean widthEdit = true; //宽可改
+        Boolean otherEdit = true; //其他可改
+
+        Boolean areaMustEdit = true; //面积必填
+        Boolean lengthMustEdit = true; //长必填
+        Boolean widthMustEdit = true; //宽必填
+        Boolean otherMustEdit = true; //其他必填
 
         String name1 = JdbcMapUtil.getString(row, "CON_SCALE_TYPE_NAME");
         if (name1.contains("面积")){
-            length = false;
-            width = false;
-            other = false;
+            lengthShow = false;
+            widthShow = false;
+            otherShow = false;
         } else if (name1.contains("长宽")){
-            area = false;
-            other = false;
+            areashow = false;
+            otherShow = false;
         } else {
-            area = false;
-            length = false;
-            width = false;
+            areashow = false;
+            lengthShow = false;
+            widthShow = false;
         }
         //面积
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.changeToShown = area;
+            linkedAtt.changeToShown = areashow;
             linkedAtt.changeToMandatory = true;
             attLinkResult.attMap.put("QTY_ONE", linkedAtt);
         }
@@ -1362,7 +1373,7 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.changeToShown = length;
+            linkedAtt.changeToShown = lengthShow;
             linkedAtt.changeToMandatory = true;
             attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
         }
@@ -1370,7 +1381,7 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.changeToShown = width;
+            linkedAtt.changeToShown = widthShow;
             linkedAtt.changeToMandatory = true;
             attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
         }
@@ -1378,7 +1389,7 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.changeToShown = other;
+            linkedAtt.changeToShown = otherShow;
             linkedAtt.changeToMandatory = false;
             attLinkResult.attMap.put("QTY_TWO", linkedAtt);
         }
@@ -1397,7 +1408,8 @@ public class AttLinkExt {
                         "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.BUILDING_AREA, " +
                         "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS', " +
                         "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD', " +
-                        "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget' " +
+                        "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget', " +
+                        "t.QTY_ONE,t.QTY_TWO " +
                         "from pm_prj t join PM_PARTY c on t.id=? and t.CUSTOMER_UNIT=c.id " +
                         "join gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
                         "join gr_set_value l on t.BASE_LOCATION_ID=l.id " +
@@ -1522,7 +1534,7 @@ public class AttLinkExt {
 
             attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt);
         }
-        // 建设规模数量
+        // 长
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
@@ -1531,7 +1543,25 @@ public class AttLinkExt {
 
             attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
         }
-        // 建设规模数量2
+        // 面积
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "QTY_ONE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "QTY_ONE");
+
+            attLinkResult.attMap.put("QTY_ONE", linkedAtt);
+        }
+        // 其他
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "QTY_TWO");
+            linkedAtt.text = JdbcMapUtil.getString(row, "QTY_TWO");
+
+            attLinkResult.attMap.put("QTY_TWO", linkedAtt);
+        }
+        // 宽
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
