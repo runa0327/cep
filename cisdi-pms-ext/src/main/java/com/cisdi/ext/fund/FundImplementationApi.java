@@ -120,7 +120,7 @@ public class FundImplementationApi {
         //文件
         List<File> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(impMap, "ATT_FILE_GROUP_ID"), myJdbcTemplate);
         //落实明细
-        String detailSql = "select d.id,p.name prj_name,d.APPROVED_AMOUNT " +
+        String detailSql = "select d.id,d.PM_PRJ_ID,p.name prj_name,d.APPROVED_AMOUNT " +
                 "from fund_implementation_detail d left join pm_prj p on p.id = d.PM_PRJ_ID " +
                 "where d.FUND_IMP_ID = ?";
         List<Map<String, Object>> detailMapList = myJdbcTemplate.queryForList(detailSql, id);
