@@ -932,6 +932,8 @@ public class WfExt {
         list.add("APPROVAL_WITH_SEAL"); // 用章审批
         list.add("PM_DESIGN_CHANGE_REQ"); // 设计变更
         list.add("PM_SEND_APPROVAL_REQ"); // 发文呈批表
+        list.add("PM_SUPERVISE_NOTICE_REQ"); // 监理通知单
+        list.add("PM_SUPERVISE_NOTICE_REPLY_REQ"); // 监理通知回复单
         return list;
     }
 
