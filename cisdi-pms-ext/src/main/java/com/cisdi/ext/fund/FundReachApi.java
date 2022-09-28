@@ -93,12 +93,18 @@ public class FundReachApi {
         String id = param.id;
         MyJdbcTemplate jdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         try {
-            String sql = "select r.ID,p.name projectName,r.FUND_SOURCE_TEXT sourceName,r.FUND_REACH_CATEGORY reachCategory,IFNULL(r.REACH_AMOUNT,0)" +
-                    " amt,r.PAYEE payee,b1.name bank,b2.name account,r.REACH_DATE reachDate,r.remark,r.ATT_FILE_GROUP_ID fileIds,temp.sumAmt " +
+            String sql = "select r.ID,p.name projectName,p.id prjId,r.FUND_SOURCE_TEXT sourceName,r.FUND_REACH_CATEGORY reachCategory,IFNULL(r.REACH_AMOUNT,0)" +
+                    " amt,r.PAYEE payee,b1.name bank,b1.id bankId,b2.name account,b2.id accountId,r.REACH_DATE reachDate,r.remark,r.ATT_FILE_GROUP_ID fileIds,temp.sumAmt,t1" +
+                    ".name firstTypeName,t2.name secondTypeName,temp.count,i.APPROVAL_TIME " +
                     "from fund_reach r left join pm_prj p on p.id = r.PM_PRJ_ID " +
                     "left join receiving_bank b1 on b1.id = r.RECEIVING_BANK_ID " +
                     "left join receiving_bank b2 on b2.id = r.RECEIPT_ACCOUNT " +
-                    "left join (select FUND_SOURCE_TEXT,PM_PRJ_ID,sum(IFNULL(REACH_AMOUNT,0)) sumAmt from fund_reach group by FUND_SOURCE_TEXT,PM_PRJ_ID ) temp on temp.FUND_SOURCE_TEXT = r.FUND_SOURCE_TEXT and temp.PM_PRJ_ID = r.PM_PRJ_ID " +
+                    "left join fund_implementation i on i.FUND_SOURCE_TEXT = r.FUND_SOURCE_TEXT " +
+                    "left join fund_type t1 on t1.id = i.FUND_CATEGORY_FIRST " +
+                    "left join fund_type t2 on t2.id = i.FUND_CATEGORY_SECOND " +
+                    "left join (select FUND_SOURCE_TEXT,PM_PRJ_ID,FUND_REACH_CATEGORY,sum(IFNULL(REACH_AMOUNT,0)) sumAmt,count(*) count from " +
+                    "fund_reach group by FUND_SOURCE_TEXT,PM_PRJ_ID,FUND_REACH_CATEGORY ) temp on temp.FUND_SOURCE_TEXT = r.FUND_SOURCE_TEXT and " +
+                    "temp.PM_PRJ_ID = r.PM_PRJ_ID and temp.FUND_REACH_CATEGORY = r.FUND_REACH_CATEGORY " +
                     "where r.id = ?";
             Map<String, Object> stringObjectMap = jdbcTemplate.queryForMap(sql, id);
             FundReach reach = this.convertFundReach(stringObjectMap, "2");
@@ -176,7 +182,7 @@ public class FundReachApi {
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuffer baseSql = new StringBuffer();
-        baseSql.append("select d.PM_PRJ_ID id,p.name from fund_implementation_detail d left join pm_prj p on p.id = d.PM_PRJ_ID where 1=1 ");
+        baseSql.append("select d.PM_PRJ_ID id,p.name from fund_implementation_detail d left join pm_prj p on p.id = d.PM_PRJ_ID where 1=1 and d.PM_PRJ_ID is not null ");
         if (!com.google.common.base.Strings.isNullOrEmpty(prjName)) {
             baseSql.append("and p.name like '%" + prjName + "%' ");
         }
@@ -207,12 +213,16 @@ public class FundReachApi {
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuffer baseSql = new StringBuffer();
-        baseSql.append("select i.FUND_SOURCE_TEXT name from fund_implementation i left join fund_implementation_detail d on d.FUND_IMP_ID = i.id where d.PM_PRJ_ID = ? ");
-        if (!com.google.common.base.Strings.isNullOrEmpty(name)) {
+        baseSql.append("select i.FUND_SOURCE_TEXT name from fund_implementation i left join fund_implementation_detail d on d.FUND_IMP_ID = i.id where 1=1 ");
+        if (Strings.isNotEmpty(prjId)) {
+            baseSql.append("and d.PM_PRJ_ID = '" + prjId + "' ");
+        }
+        if (Strings.isNotEmpty(name)) {
             baseSql.append("and i.FUND_SOURCE_TEXT like '%" + name + "%' ");
         }
+        baseSql.append("group by i.FUND_SOURCE_TEXT ");
 
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList(baseSql.toString(),prjId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(baseSql.toString());
         List<CommonDrop> commonDrops = new ArrayList<>();
         for (Map<String, Object> map : list) {
             CommonDrop projectDrop = new CommonDrop();
@@ -252,11 +262,16 @@ public class FundReachApi {
         fundReach.amt = JdbcMapUtil.getString(data, "amt");
         fundReach.reachDate = JdbcMapUtil.getString(data, "reachDate");
         if (Objects.equals("2", mark)) {
+            fundReach.prjId = JdbcMapUtil.getString(data,"prjId");
+            fundReach.bankId = JdbcMapUtil.getString(data, "bankId");
+            fundReach.accountId = JdbcMapUtil.getString(data, "accountId");
             fundReach.payee = JdbcMapUtil.getString(data,"payee");
             fundReach.bank = JdbcMapUtil.getString(data,"bank");
             fundReach.account = JdbcMapUtil.getString(data,"account");
             fundReach.remark = JdbcMapUtil.getString(data, "remark");
             fundReach.sumAmt = JdbcMapUtil.getString(data, "sumAmt");
+            fundReach.count = JdbcMapUtil.getInt(data,"count");
+            fundReach.approvalTime = JdbcMapUtil.getString(data,"APPROVAL_TIME");
             List<File> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(data,"fileIds"), myJdbcTemplate);
             fundReach.fileList = fileList;
         }
@@ -322,6 +337,7 @@ public class FundReachApi {
         public String id;
         public String firstTypeName;
         public String secondTypeName;
+        public String prjId;
         public String projectName;
         public String sourceName;
         public String reachCategory;
@@ -331,12 +347,18 @@ public class FundReachApi {
         public String payee;
         //收款银行
         public String bank;
+        public String bankId;
         //收款账户
         public String account;
+        public String accountId;
         //备注
         public String remark;
         //累计到位金额
         public String sumAmt;
+        //到位次数
+        public Integer count;
+        //批复时间
+        public String approvalTime;
         //文件集合
         public List<File> fileList;
     }

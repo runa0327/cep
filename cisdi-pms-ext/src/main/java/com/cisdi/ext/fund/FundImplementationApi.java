@@ -108,7 +108,7 @@ public class FundImplementationApi {
         Map<String, Object> idMap = ExtJarHelper.extApiParamMap.get();
         String id = JdbcMapUtil.getString(idMap, "id");
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql = "SELECT i.ID,i.REMARK,i.FUND_SOURCE_TEXT,t1.name FUND_CATEGORY_FIRST,t2.name FUND_CATEGORY_SECOND,i.DECLARED_AMOUNT,i" +
+        String sql = "SELECT i.ID,i.REMARK,i.FUND_SOURCE_TEXT,i.FUND_CATEGORY_FIRST FUND_CATEGORY_FIRST_ID,t1.name FUND_CATEGORY_FIRST,i.FUND_CATEGORY_SECOND FUND_CATEGORY_SECOND_ID,t2.name FUND_CATEGORY_SECOND,i.DECLARED_AMOUNT,i" +
                 ".APPROVAL_TIME,i.ATT_FILE_GROUP_ID,sum(d.APPROVED_AMOUNT) SUM_APPROVED_AMOUNT " +
                 "FROM fund_implementation i " +
                 "left join fund_type t1 on t1.id = i.FUND_CATEGORY_FIRST " +
@@ -228,8 +228,10 @@ public class FundImplementationApi {
         public String fundSourceText;
         //资金类别一级
         public String fundCategoryFirst;
+        public String fundCategoryFirstId;
         //资金类别二级
         public String fundCategorySecond;
+        public String fundCategorySecondId;
         //申报金额
         public BigDecimal declaredAmount;
         //批复金额

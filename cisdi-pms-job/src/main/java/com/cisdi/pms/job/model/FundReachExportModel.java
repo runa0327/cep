@@ -16,7 +16,7 @@ import lombok.Data;
 public class FundReachExportModel {
 
     @ExcelProperty("资金大类")
-    @ColumnWidth(value = 100)
+    @ColumnWidth(value = 40)
     private String categoryName;
 
     @ExcelProperty("资金来源")

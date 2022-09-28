@@ -24,8 +24,8 @@ public class FileCommon {
         Map<String, Object> queryParams = new HashMap<>();// 创建入参map
         List<String> ids = Arrays.asList(fileIdStr.split(","));
         queryParams.put("ids", ids);
-        String sql = "select id,DSP_NAME name,DSP_SIZE size,UPLOAD_DTTM uploadTime,FILE_INLINE_URL viewUrl,FILE_ATTACHMENT_URL downUrl from fl_file " +
-                "where id in (:ids)";
+        String sql = "select f.id,f.DSP_NAME name,f.DSP_SIZE size,f.UPLOAD_DTTM uploadTime,f.FILE_INLINE_URL viewUrl,f.FILE_ATTACHMENT_URL downUrl,u.name username from fl_file f " +
+                "left join ad_user u on u.id = f.CRT_USER_ID where f.id in (:ids)";
         List<Map<String, Object>> fileList = myNamedParameterJdbcTemplate.queryForList(sql, queryParams);
         List<File> files = new ArrayList<>();
         for (Map<String, Object> fileMap : fileList) {
@@ -36,6 +36,7 @@ public class FileCommon {
             file.uploadTime = StringUtil.withOutT(JdbcMapUtil.getString(fileMap, "uploadTime"));
             file.viewUrl = JdbcMapUtil.getString(fileMap, "viewUrl");
             file.downUrl = JdbcMapUtil.getString(fileMap, "downUrl");
+            file.username =JdbcMapUtil.getString(fileMap,"username");
             files.add(file);
         }
         return files;

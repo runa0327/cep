@@ -4,6 +4,7 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.cisdi.pms.job.model.FundReachExportModel;
 import com.cisdi.pms.job.model.request.FundReachRequest;
+import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,11 +51,15 @@ public class FundReachController extends BaseController {
 
         StringBuilder sb = new StringBuilder();
         sb.append("select r.ID,p.name projectName,r.FUND_SOURCE_TEXT sourceName,r.FUND_REACH_CATEGORY reachCategory,IFNULL(REACH_AMOUNT,0) amt," +
-                "REACH_DATE reachDate,t1.name firstTypeName,t2.name secondTypeName " +
+                "REACH_DATE reachDate,t1.name firstTypeName,r.payee,b1.name bank,b2.name account,r.remark,temp.count,temp.sumAmt " +
                 "from fund_reach r left join pm_prj p on p.id = r.PM_PRJ_ID " +
                 "left join fund_implementation i on i.FUND_SOURCE_TEXT = r.FUND_SOURCE_TEXT " +
                 "left join fund_type t1 on t1.id = i.FUND_CATEGORY_FIRST " +
-                "left join fund_type t2 on t2.id = i.FUND_CATEGORY_SECOND " +
+                "left join receiving_bank b1 on b1.id = r.RECEIVING_BANK_ID " +
+                "left join receiving_bank b2 on b2.id = r.RECEIPT_ACCOUNT " +
+                "left join (SELECT count(*) count,sum( REACH_AMOUNT ) sumAmt,FUND_SOURCE_TEXT,PM_PRJ_ID,FUND_REACH_CATEGORY FROM fund_reach group " +
+                "by FUND_SOURCE_TEXT,PM_PRJ_ID,FUND_REACH_CATEGORY) temp on temp.FUND_SOURCE_TEXT = r.FUND_SOURCE_TEXT and temp.PM_PRJ_ID = r" +
+                ".PM_PRJ_ID and temp.FUND_REACH_CATEGORY = r.FUND_REACH_CATEGORY " +
                 "where 1=1 ");
         if (Strings.isNotEmpty(sourceName)) {
             sb.append(" and r.FUND_SOURCE_TEXT like '%").append(sourceName).append("%'");
@@ -78,6 +83,18 @@ public class FundReachController extends BaseController {
 
     private FundReachExportModel dataConvert(Map<String, Object> data) {
         FundReachExportModel model = new FundReachExportModel();
+        model.setCategoryName(JdbcMapUtil.getString(data,"firstTypeName"));
+        model.setSourceName(JdbcMapUtil.getString(data,"sourceName"));
+        model.setProjectName(JdbcMapUtil.getString(data,"projectName"));
+        model.setCount(JdbcMapUtil.getString(data,"count"));
+        model.setTypeName(JdbcMapUtil.getString(data,"reachCategory"));
+        model.setDwAmt(String.valueOf(Double.parseDouble(JdbcMapUtil.getString(data,"amt"))));
+        model.setTotalDwAmt(String.valueOf(Double.parseDouble(JdbcMapUtil.getString(data,"sumAmt"))));
+        model.setDwDate(JdbcMapUtil.getString(data,"reachDate"));
+        model.setUnit(JdbcMapUtil.getString(data,"payee"));
+        model.setBank(JdbcMapUtil.getString(data,"bank"));
+        model.setRemark(JdbcMapUtil.getString(data,"remark"));
+        model.setAccount(JdbcMapUtil.getString(data,"account"));
         return model;
     }
 
