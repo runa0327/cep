@@ -56,7 +56,7 @@ public class FundStatisticalApi {
 //                "from FUND_IMPLEMENTATION fi left join FUND_IMPLEMENTATION_DETAIL fid on fi.id = fid.FUND_IMP_ID " +
 //                "left join fund_reach fr on fi.FUND_SOURCE_TEXT = fr.FUND_SOURCE_TEXT " +
 //                "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST  where 1=1");
-        sb.append("select fi.id,ft.name as categoryName,ft1.name as categoryNameSecond,fi.FUND_SOURCE_TEXT as sourceName, ifnull(fi" +
+        sb.append("select fi.id,ft.name as categoryName,ft.id categoryNameId,ft1.name as categoryNameSecond,ft1.id categoryNameSecondId,fi.FUND_SOURCE_TEXT as sourceName, ifnull(fi" +
                 ".DECLARED_AMOUNT,0) as declaredAmount, ifnull(temp1.sumApp,0) as approvedAmount, fi.APPROVAL_TIME as approvedDate, \n" +
                 "ifnull(temp.sumAmt,0) as cumulativeInPaceAmt, \n" +
                 "ifnull(temp2.sumZqAmt,0) as cumulativeInPaceAmtZq, \n" +
@@ -114,7 +114,9 @@ public class FundStatisticalApi {
     private DataListObject convertData(Map<String, Object> data) {
         DataListObject obj = new DataListObject();
         obj.categoryName = JdbcMapUtil.getString(data, "categoryName");
+        obj.categoryNameId = JdbcMapUtil.getString(data, "categoryNameId");
         obj.secondCategoryName = JdbcMapUtil.getString(data,"categoryNameSecond");
+        obj.secondCategoryNameId = JdbcMapUtil.getString(data,"categoryNameSecondId");
         obj.sourceName = JdbcMapUtil.getString(data, "sourceName");
         obj.declaredAmount = JdbcMapUtil.getString(data, "declaredAmount");
         obj.approvedAmount = JdbcMapUtil.getString(data, "approvedAmount");
@@ -137,8 +139,10 @@ public class FundStatisticalApi {
     public static class DataListObject {
         //资金大类
         public String categoryName;
+        public String categoryNameId;
         //资金大类二级
         public String secondCategoryName;
+        public String secondCategoryNameId;
         //资金来源
         public String sourceName;
         //申报金额

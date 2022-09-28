@@ -48,6 +48,8 @@ public class FundReachApi {
         String endTime = param.endTime;
         int pageSize = param.pageSize;
         int pageIndex = param.pageIndex;
+        String categoryNameId = param.categoryNameId;
+        String secondCategoryNameId = param.secondCategoryNameId;
 
         StringBuilder sb = new StringBuilder();
 
@@ -67,7 +69,12 @@ public class FundReachApi {
         if (Strings.isNotEmpty(beginTime) && Strings.isNotEmpty(endTime)) {
             sb.append(" and r.REACH_DATE between '").append(beginTime).append("' and '").append(endTime).append("'");
         }
-
+        if (!com.google.common.base.Strings.isNullOrEmpty(categoryNameId)) {
+            sb.append("and t1.id = '").append(categoryNameId).append("' ");
+        }
+        if (!com.google.common.base.Strings.isNullOrEmpty(secondCategoryNameId)) {
+            sb.append("and t2.id = '").append(secondCategoryNameId).append("' ");
+        }
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
@@ -295,6 +302,10 @@ public class FundReachApi {
         public String beginTime;
 
         public String endTime;
+        //资金类别一级id
+        public String categoryNameId;
+        //资金类别二级id
+        public String secondCategoryNameId;
 
         /**
          * 到位类型

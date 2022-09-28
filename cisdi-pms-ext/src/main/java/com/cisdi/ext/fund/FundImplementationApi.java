@@ -70,6 +70,12 @@ public class FundImplementationApi {
         if (!Strings.isNullOrEmpty(fundImpReq.beginTime) && !Strings.isNullOrEmpty(fundImpReq.endTime)) {
             baseSql.append("and i.APPROVAL_TIME BETWEEN '" + fundImpReq.beginTime + "' and '" + fundImpReq.endTime + "' ");
         }
+        if (!Strings.isNullOrEmpty(fundImpReq.categoryNameId)) {
+            baseSql.append("and t1.id = '").append(fundImpReq.categoryNameId).append("' ");
+        }
+        if (!Strings.isNullOrEmpty(fundImpReq.secondCategoryNameId)) {
+            baseSql.append("and t2.id = '").append(fundImpReq.secondCategoryNameId).append("' ");
+        }
         baseSql.append("GROUP BY i.id ");
         // 总条数sql
         String totalSql = baseSql.toString();
@@ -195,6 +201,11 @@ public class FundImplementationApi {
         public String beginTime;
         //结束批复时间
         public String endTime;
+        //资金类别一级id
+        public String categoryNameId;
+        //资金类别二级id
+        public String secondCategoryNameId;
+
     }
 
     @Data
