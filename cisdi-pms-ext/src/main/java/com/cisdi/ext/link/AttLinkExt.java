@@ -67,9 +67,45 @@ public class AttLinkExt {
             return linkPAY_BASIS_ID(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("YES_NO_THREE".equals(attCode)){ // 是否判断
             return linkYES_NO_THREE(myJdbcTemplate, attValue, entCode,sevId);
+        } else if ("YES_NO_TWO".equals(attCode)){ // 有无判断
+            return linkYES_NO_TWO(myJdbcTemplate, attValue, entCode,sevId);
         } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
+    }
+
+    // 有 无  属性联动
+    private AttLinkResult linkYES_NO_TWO(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        if ("PM_FARMING_PROCEDURES".equals(entCode)){ // 农转用手续办理
+            // 99902212142514832 = 有， 99902212142514833 = 没有
+            if ("99902212142514833".equals(attValue)){
+                // 预估有指标时间
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToShown = true;
+                    linkedAtt.changeToMandatory = true;
+                    linkedAtt.changeToEditable = true;
+                    attLinkResult.attMap.put("DATE_ONE", linkedAtt);
+                }
+            } else {
+                // 预估有指标时间
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToShown = true;
+                    linkedAtt.changeToMandatory = false;
+                    linkedAtt.changeToEditable = true;
+                    attLinkResult.attMap.put("DATE_ONE", linkedAtt);
+                }
+            }
+        }
+        return attLinkResult;
     }
 
     // 是 否  属性联动
