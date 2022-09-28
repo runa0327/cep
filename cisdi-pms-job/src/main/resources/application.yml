@@ -14,7 +14,10 @@ spring:
     username: qygly
     password: Qygly@123456
     # 注意更改ip和db：
+    # 测试：
     url: jdbc:mysql://121.5.65.165:3306/test?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    # 正式：
+    # url: jdbc:mysql://124.222.58.152:3306/prod?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
     #    type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
   cloud:
