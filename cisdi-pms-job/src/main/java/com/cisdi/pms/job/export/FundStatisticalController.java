@@ -50,13 +50,13 @@ public class FundStatisticalController extends BaseController {
         String endDate = fundStatisticalRequest.endDate;
 
         StringBuilder sb = new StringBuilder();
-        sb.append("select fi.id,ft.name as categoryName, fi.FUND_SOURCE_TEXT as sourceName, ifnull(fi.DECLARED_AMOUNT,0) as declaredAmount, " +
-                "ifnull(temp1.sumApp,0) as approvedAmount, " +
+        sb.append("select fi.id,ft.name as categoryName, fi.FUND_SOURCE_TEXT as sourceName, ifnull(fi.DECLARED_AMOUNT,0)/10000 as declaredAmount, " +
+                "ifnull(temp1.sumApp,0)/10000 as approvedAmount, " +
                 "fi.APPROVAL_TIME as approvedDate, " +
-                "ifnull(temp.sumAmt,0) as cumulativeInPaceAmt, " +
-                "'' as cumulativePayAmt,  0 as syAmt, " +
-                "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0)) as unInPlaceAmt," +
-                "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0)) as totalSyAmt,0 as totalPayRate,fi.REMARK as remark " +
+                "ifnull(temp.sumAmt,0)/10000 as cumulativeInPaceAmt, " +
+                "0 as cumulativePayAmt,  0 as syAmt, " +
+                "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0))/10000 as unInPlaceAmt," +
+                "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0))/10000 as totalSyAmt,0 as totalPayRate,fi.REMARK as remark " +
                 "from FUND_IMPLEMENTATION fi " +
                 "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST " +
                 "left join (select sum(REACH_AMOUNT) sumAmt,FUND_SOURCE_TEXT from fund_reach group by FUND_SOURCE_TEXT) temp on temp" +
@@ -77,7 +77,7 @@ public class FundStatisticalController extends BaseController {
         List<FundStatisticalExportModel> resList = list.stream().map(this::convertData).collect(Collectors.toList());
         super.setExcelRespProp(response, "资金批复，到位，支付总表");
         EasyExcel.write(response.getOutputStream())
-                .head(FundReachExportModel.class)
+                .head(FundStatisticalExportModel.class)
                 .excelType(ExcelTypeEnum.XLSX)
                 .sheet("资金批复，到位，支付总表")
                 .doWrite(resList);
@@ -93,14 +93,14 @@ public class FundStatisticalController extends BaseController {
         FundStatisticalExportModel obj = new FundStatisticalExportModel();
         obj.categoryName = JdbcMapUtil.getString(data, "categoryName");
         obj.sourceName = JdbcMapUtil.getString(data, "sourceName");
-        obj.declaredAmount = JdbcMapUtil.getString(data, "declaredAmount");
-        obj.approvedAmount = JdbcMapUtil.getString(data, "approvedAmount");
+        obj.declaredAmount = JdbcMapUtil.getDouble(data, "declaredAmount");
+        obj.approvedAmount = JdbcMapUtil.getDouble(data, "approvedAmount");
         obj.approvedDate = JdbcMapUtil.getString(data, "approvedDate");
-        obj.cumulativeInPaceAmt = JdbcMapUtil.getString(data, "cumulativeInPaceAmt");
-        obj.cumulativePayAmt = JdbcMapUtil.getString(data, "cumulativePayAmt");
-        obj.syAmt = JdbcMapUtil.getString(data, "syAmt");
-        obj.unInPlaceAmt = JdbcMapUtil.getString(data, "unInPlaceAmt");
-        obj.totalSyAmt = JdbcMapUtil.getString(data, "totalSyAmt");
+        obj.cumulativeInPaceAmt = JdbcMapUtil.getDouble(data, "cumulativeInPaceAmt");
+        obj.cumulativePayAmt = JdbcMapUtil.getDouble(data, "cumulativePayAmt");
+        obj.syAmt = JdbcMapUtil.getDouble(data, "syAmt");
+        obj.unInPlaceAmt = JdbcMapUtil.getDouble(data, "unInPlaceAmt");
+        obj.totalSyAmt = JdbcMapUtil.getDouble(data, "totalSyAmt");
         obj.totalPayRate = JdbcMapUtil.getString(data, "totalPayRate");
         obj.remark = JdbcMapUtil.getString(data, "remark");
         return obj;
