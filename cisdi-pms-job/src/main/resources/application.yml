@@ -1,5 +1,7 @@
 server:
   port: 11115
+  servlet:
+    context-path: /cisdi-pms-job
 
 spring:
   test: sayHello
