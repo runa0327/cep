@@ -65,9 +65,45 @@ public class AttLinkExt {
             return linkForRELATION_AMOUT_PLAN_REQ_ID(myJdbcTemplate, attValue, entCode);
         } else if ("PAY_BASIS_ID".equals(attCode)){ //付款依据属性联动
             return linkPAY_BASIS_ID(myJdbcTemplate, attValue, entCode,sevId);
-        }else {
+        } else if ("YES_NO_THREE".equals(attCode)){ // 是否判断
+            return linkYES_NO_THREE(myJdbcTemplate, attValue, entCode,sevId);
+        } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
+    }
+
+    // 是 否  属性联动
+    private AttLinkResult linkYES_NO_THREE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        if ("PM_SEND_APPROVAL_REQ".equals(entCode)){ //发文呈批
+            // 99799190825080669 = 是， 99799190825080670 = 否
+            if ("99799190825080669".equals(attValue)){  //隐藏 是否呈董事长审批
+                // 是否呈董事长审批
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    linkedAtt.changeToShown = false;
+                    linkedAtt.changeToMandatory = false;
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("YES_NO_FOUR", linkedAtt);
+                }
+            } else {
+                // 是否呈董事长审批
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    linkedAtt.changeToShown = true;
+                    linkedAtt.changeToMandatory = true;
+                    linkedAtt.changeToEditable = true;
+                    attLinkResult.attMap.put("YES_NO_FOUR", linkedAtt);
+                }
+            }
+        }
+        return attLinkResult;
     }
 
     //付款依据属性联动
