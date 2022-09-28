@@ -1353,20 +1353,30 @@ public class AttLinkExt {
             lengthShow = false;
             widthShow = false;
             otherShow = false;
+            lengthMustEdit = false;
+            widthMustEdit = false;
+            otherMustEdit = false;
         } else if (name1.contains("长宽")){
             areashow = false;
             otherShow = false;
+            areaMustEdit = false;
+            otherMustEdit = false;
         } else {
             areashow = false;
             lengthShow = false;
             widthShow = false;
+            areaMustEdit = false;
+            lengthMustEdit = false;
+            widthMustEdit = false;
         }
         //面积
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
             linkedAtt.changeToShown = areashow;
-            linkedAtt.changeToMandatory = true;
+            linkedAtt.changeToMandatory = areaMustEdit;
+            linkedAtt.text = null;
+            linkedAtt.value = null;
             attLinkResult.attMap.put("QTY_ONE", linkedAtt);
         }
         //长
@@ -1374,7 +1384,9 @@ public class AttLinkExt {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
             linkedAtt.changeToShown = lengthShow;
-            linkedAtt.changeToMandatory = true;
+            linkedAtt.changeToMandatory = lengthMustEdit;
+            linkedAtt.text = null;
+            linkedAtt.value = null;
             attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
         }
         //宽
@@ -1382,7 +1394,9 @@ public class AttLinkExt {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
             linkedAtt.changeToShown = widthShow;
-            linkedAtt.changeToMandatory = true;
+            linkedAtt.changeToMandatory = widthMustEdit;
+            linkedAtt.text = null;
+            linkedAtt.value = null;
             attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
         }
         //其他
@@ -1390,7 +1404,9 @@ public class AttLinkExt {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
             linkedAtt.changeToShown = otherShow;
-            linkedAtt.changeToMandatory = false;
+            linkedAtt.changeToMandatory = otherMustEdit;
+            linkedAtt.text = null;
+            linkedAtt.value = null;
             attLinkResult.attMap.put("QTY_TWO", linkedAtt);
         }
 
@@ -1534,42 +1550,85 @@ public class AttLinkExt {
 
             attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt);
         }
-        // 长
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_QTY");
-            linkedAtt.text = JdbcMapUtil.getString(row, "CON_SCALE_QTY");
 
-            attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
+        Boolean areashow = true; //面积显示
+        Boolean lengthShow = true; //长显示
+        Boolean widthShow = true; //宽显示
+        Boolean otherShow = true; //其他显示
+
+        Boolean areaEdit = true; //面积可改
+        Boolean lengthEdit = true; //长可改
+        Boolean widthEdit = true; //宽可改
+        Boolean otherEdit = true; //其他可改
+
+        Boolean areaMustEdit = true; //面积必填
+        Boolean lengthMustEdit = true; //长必填
+        Boolean widthMustEdit = true; //宽必填
+        Boolean otherMustEdit = true; //其他必填
+
+        String name1 = JdbcMapUtil.getString(row, "st_name");
+        if (name1.contains("面积")){
+            lengthShow = false;
+            widthShow = false;
+            otherShow = false;
+            lengthMustEdit = false;
+            widthMustEdit = false;
+            otherMustEdit = false;
+        } else if (name1.contains("长宽")){
+            areashow = false;
+            otherShow = false;
+            areaMustEdit = false;
+            otherMustEdit = false;
+        } else {
+            areashow = false;
+            lengthShow = false;
+            widthShow = false;
+            areaMustEdit = false;
+            lengthMustEdit = false;
+            widthMustEdit = false;
         }
-        // 面积
+        //面积
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = JdbcMapUtil.getString(row, "QTY_ONE");
+            linkedAtt.changeToShown = areashow;
+            linkedAtt.changeToMandatory = areaMustEdit;
             linkedAtt.text = JdbcMapUtil.getString(row, "QTY_ONE");
-
+            linkedAtt.value = JdbcMapUtil.getString(row, "QTY_ONE");
             attLinkResult.attMap.put("QTY_ONE", linkedAtt);
         }
-        // 其他
+        //长
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = JdbcMapUtil.getString(row, "QTY_TWO");
-            linkedAtt.text = JdbcMapUtil.getString(row, "QTY_TWO");
-
-            attLinkResult.attMap.put("QTY_TWO", linkedAtt);
+            linkedAtt.changeToShown = lengthShow;
+            linkedAtt.changeToMandatory = lengthMustEdit;
+            linkedAtt.text = JdbcMapUtil.getString(row, "CON_SCALE_QTY");
+            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_QTY");
+            attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
         }
-        // 宽
+        //宽
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
+            linkedAtt.changeToShown = widthShow;
+            linkedAtt.changeToMandatory = widthMustEdit;
             linkedAtt.text = JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
-
+            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
             attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
         }
+        //其他
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = otherShow;
+            linkedAtt.changeToMandatory = otherMustEdit;
+            linkedAtt.text = JdbcMapUtil.getString(row, "QTY_TWO");
+            linkedAtt.value = JdbcMapUtil.getString(row, "QTY_TWO");
+            attLinkResult.attMap.put("QTY_TWO", linkedAtt);
+        }
+
+
         // 建设年限
         {
             LinkedAtt linkedAtt = new LinkedAtt();
