@@ -50,19 +50,26 @@ public class FundStatisticalController extends BaseController {
         String endDate = fundStatisticalRequest.endDate;
 
         StringBuilder sb = new StringBuilder();
-        sb.append("select fi.id,ft.name as categoryName, fi.FUND_SOURCE_TEXT as sourceName, ifnull(fi.DECLARED_AMOUNT,0)/10000 as declaredAmount, " +
-                "ifnull(temp1.sumApp,0)/10000 as approvedAmount, " +
-                "fi.APPROVAL_TIME as approvedDate, " +
-                "ifnull(temp.sumAmt,0)/10000 as cumulativeInPaceAmt, " +
-                "0 as cumulativePayAmt,  0 as syAmt, " +
-                "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0))/10000 as unInPlaceAmt," +
-                "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0))/10000 as totalSyAmt,0 as totalPayRate,fi.REMARK as remark " +
-                "from FUND_IMPLEMENTATION fi " +
-                "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST " +
+        sb.append("select fi.id,ft.name as categoryName,ft1.name as categoryNameSecond, fi.FUND_SOURCE_TEXT as sourceName, ifnull(fi" +
+                ".DECLARED_AMOUNT,0)/10000 as declaredAmount, ifnull(temp1.sumApp,0)/10000 as approvedAmount, \n" +
+                "fi.APPROVAL_TIME as approvedDate, \n" +
+                "ifnull(temp.sumAmt,0)/10000 as cumulativeInPaceAmt, \n" +
+                "ifnull(temp2.sumZqAmt,0)/10000 as cumulativeInPaceAmtZq, \n" +
+                "ifnull(temp3.sumJsAmt,0)/10000 as cumulativeInPaceAmtJs, \n" +
+                "0 as cumulativePayAmt,(ifnull(temp.sumAmt,0) - 0)/10000 as syAmt,\n" +
+                "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0))/10000 as unInPlaceAmt,\n" +
+                "(ifnull(temp1.sumApp,0) - 0)/10000 as totalSyAmt,0 as totalPayRate,fi.REMARK as remark \n" +
+                "from FUND_IMPLEMENTATION fi \n" +
+                "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST \n" +
+                "left join FUND_TYPE ft1 on ft1.id = fi.FUND_CATEGORY_SECOND \n" +
                 "left join (select sum(REACH_AMOUNT) sumAmt,FUND_SOURCE_TEXT from fund_reach group by FUND_SOURCE_TEXT) temp on temp" +
-                ".FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT " +
+                ".FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT\n" +
+                "left join (select sum(REACH_AMOUNT) sumZqAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '征迁资金' group by " +
+                "FUND_SOURCE_TEXT) temp2 on temp2.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
+                "left join (select sum(REACH_AMOUNT) sumJsAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '建设资金' group by " +
+                "FUND_SOURCE_TEXT) temp3 on temp3.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
                 "left join (select sum(APPROVED_AMOUNT) sumApp,FUND_IMP_ID from fund_implementation_detail group by FUND_IMP_ID) temp1 on temp1" +
-                ".FUND_IMP_ID = fi.id where 1=1");
+                ".FUND_IMP_ID = fi.id");
         if (Strings.isNotEmpty(fundCategoryId)) {
             sb.append(" and fi.FUND_CATEGORY_FIRST = '").append(fundCategoryId).append("'");
         }
@@ -92,11 +99,14 @@ public class FundStatisticalController extends BaseController {
     private FundStatisticalExportModel convertData(Map<String, Object> data) {
         FundStatisticalExportModel obj = new FundStatisticalExportModel();
         obj.categoryName = JdbcMapUtil.getString(data, "categoryName");
+        obj.categoryNameSecond = JdbcMapUtil.getString(data, "categoryNameSecond");
         obj.sourceName = JdbcMapUtil.getString(data, "sourceName");
         obj.declaredAmount = JdbcMapUtil.getDouble(data, "declaredAmount");
         obj.approvedAmount = JdbcMapUtil.getDouble(data, "approvedAmount");
         obj.approvedDate = JdbcMapUtil.getString(data, "approvedDate");
         obj.cumulativeInPaceAmt = JdbcMapUtil.getDouble(data, "cumulativeInPaceAmt");
+        obj.cumulativeInPaceAmtZq = JdbcMapUtil.getDouble(data, "cumulativeInPaceAmtZq");
+        obj.cumulativeInPaceAmtJs = JdbcMapUtil.getDouble(data, "cumulativeInPaceAmtJs");
         obj.cumulativePayAmt = JdbcMapUtil.getDouble(data, "cumulativePayAmt");
         obj.syAmt = JdbcMapUtil.getDouble(data, "syAmt");
         obj.unInPlaceAmt = JdbcMapUtil.getDouble(data, "unInPlaceAmt");

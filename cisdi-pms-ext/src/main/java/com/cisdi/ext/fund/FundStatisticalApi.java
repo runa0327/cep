@@ -56,19 +56,26 @@ public class FundStatisticalApi {
 //                "from FUND_IMPLEMENTATION fi left join FUND_IMPLEMENTATION_DETAIL fid on fi.id = fid.FUND_IMP_ID " +
 //                "left join fund_reach fr on fi.FUND_SOURCE_TEXT = fr.FUND_SOURCE_TEXT " +
 //                "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST  where 1=1");
-        sb.append("select fi.id,ft.name as categoryName, fi.FUND_SOURCE_TEXT as sourceName, ifnull(fi.DECLARED_AMOUNT,0) as declaredAmount, " +
-                "ifnull(temp1.sumApp,0) as approvedAmount, " +
-                "fi.APPROVAL_TIME as approvedDate, " +
-                "ifnull(temp.sumAmt,0) as cumulativeInPaceAmt, " +
-                "0 as cumulativePayAmt,  0 as syAmt, " +
-                "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0)) as unInPlaceAmt," +
-                "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0)) as totalSyAmt,0 as totalPayRate,fi.REMARK as remark " +
-                "from FUND_IMPLEMENTATION fi " +
-                "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST " +
+        sb.append("select fi.id,ft.name as categoryName,ft1.name as categoryNameSecond,fi.FUND_SOURCE_TEXT as sourceName, ifnull(fi" +
+                ".DECLARED_AMOUNT,0) as declaredAmount, ifnull(temp1.sumApp,0) as approvedAmount, fi.APPROVAL_TIME as approvedDate, \n" +
+                "ifnull(temp.sumAmt,0) as cumulativeInPaceAmt, \n" +
+                "ifnull(temp2.sumZqAmt,0) as cumulativeInPaceAmtZq, \n" +
+                "ifnull(temp3.sumJsAmt,0) as cumulativeInPaceAmtJs, \n" +
+                "0 as cumulativePayAmt,  0 as syAmt, \n" +
+                "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0)) as unInPlaceAmt,\n" +
+                "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0)) as totalSyAmt,0 as totalPayRate,fi.REMARK as remark \n" +
+                "from FUND_IMPLEMENTATION fi \n" +
+                "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST \n" +
+                "left join FUND_TYPE ft1 on ft1.id = fi.FUND_CATEGORY_SECOND \n" +
                 "left join (select sum(REACH_AMOUNT) sumAmt,FUND_SOURCE_TEXT from fund_reach group by FUND_SOURCE_TEXT) temp on temp" +
-                ".FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT " +
+                ".FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
+                "left join (select sum(REACH_AMOUNT) sumZqAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '征迁资金' group by " +
+                "FUND_SOURCE_TEXT) temp2 on temp2.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
+                "left join (select sum(REACH_AMOUNT) sumJsAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '建设资金' group by " +
+                "FUND_SOURCE_TEXT) temp3 on temp3.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
                 "left join (select sum(APPROVED_AMOUNT) sumApp,FUND_IMP_ID from fund_implementation_detail group by FUND_IMP_ID) temp1 on temp1" +
-                ".FUND_IMP_ID = fi.id where 1=1");
+                ".FUND_IMP_ID = fi.id \n" +
+                "where 1=1");
         if (Strings.isNotEmpty(fundCategoryId)) {
             sb.append(" and fi.FUND_CATEGORY_FIRST = '").append(fundCategoryId).append("'");
         }
@@ -107,11 +114,14 @@ public class FundStatisticalApi {
     private DataListObject convertData(Map<String, Object> data) {
         DataListObject obj = new DataListObject();
         obj.categoryName = JdbcMapUtil.getString(data, "categoryName");
+        obj.secondCategoryName = JdbcMapUtil.getString(data,"categoryNameSecond");
         obj.sourceName = JdbcMapUtil.getString(data, "sourceName");
         obj.declaredAmount = JdbcMapUtil.getString(data, "declaredAmount");
         obj.approvedAmount = JdbcMapUtil.getString(data, "approvedAmount");
         obj.approvedDate = JdbcMapUtil.getString(data, "approvedDate");
         obj.cumulativeInPaceAmt = JdbcMapUtil.getString(data, "cumulativeInPaceAmt");
+        obj.cumulativeInPaceAmtZq = JdbcMapUtil.getString(data, "cumulativeInPaceAmtZq");
+        obj.cumulativeInPaceAmtJs = JdbcMapUtil.getString(data, "cumulativeInPaceAmtJs");
         obj.cumulativePayAmt = JdbcMapUtil.getString(data, "cumulativePayAmt");
         obj.syAmt = JdbcMapUtil.getString(data, "syAmt");
         obj.unInPlaceAmt = JdbcMapUtil.getString(data, "unInPlaceAmt");
@@ -127,6 +137,8 @@ public class FundStatisticalApi {
     public static class DataListObject {
         //资金大类
         public String categoryName;
+        //资金大类二级
+        public String secondCategoryName;
         //资金来源
         public String sourceName;
         //申报金额
@@ -137,6 +149,10 @@ public class FundStatisticalApi {
         public String approvedDate;
         //累计到位资金
         public String cumulativeInPaceAmt;
+        //累计征迁到位资金
+        public String cumulativeInPaceAmtZq;
+        //累计建设到位资金
+        public String cumulativeInPaceAmtJs;
         //累计支付资金
         public String cumulativePayAmt;
         //到位剩余资金

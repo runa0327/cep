@@ -16,9 +16,13 @@ import lombok.Data;
 @Data
 public class FundStatisticalExportModel {
 
-    @ExcelProperty("资金大类")
+    @ExcelProperty("资金大类一级")
     @ColumnWidth(30)
     public String categoryName;
+
+    @ExcelProperty("资金大类二级")
+    @ColumnWidth(30)
+    public String categoryNameSecond;
 
     @ExcelProperty("资金来源")
     @ColumnWidth(30)
@@ -42,6 +46,16 @@ public class FundStatisticalExportModel {
     @ColumnWidth(30)
     @ContentStyle(dataFormat = 2)
     public Double cumulativeInPaceAmt;
+    //累计征迁到位资金
+    @ExcelProperty("累计征迁到位资金（万元）")
+    @ColumnWidth(30)
+    @ContentStyle(dataFormat = 2)
+    public Double cumulativeInPaceAmtZq;
+    //累计建设到位资金
+    @ExcelProperty("累计建设到位资金（万元）")
+    @ColumnWidth(30)
+    @ContentStyle(dataFormat = 2)
+    public Double cumulativeInPaceAmtJs;
     //累计支付资金
     @ExcelProperty("累计支付资金（万元）")
     @ColumnWidth(30)
