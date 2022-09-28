@@ -25,7 +25,7 @@ public class FundStatisticalApi {
     /**
      * 列表查询
      */
-    public void list() {
+    public void fundList() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
         RequestParam param = JsonUtil.fromJson(json, RequestParam.class);
@@ -41,31 +41,44 @@ public class FundStatisticalApi {
 
         MyJdbcTemplate jdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuilder sb = new StringBuilder();
-        sb.append("select ft.name as categoryName, " +
-                "fi.FUND_SOURCE_TEXT as sourceName, " +
-                "ifnull(fi.DECLARED_AMOUNT,0) as declaredAmount, " +
-                "ifnull(fid.APPROVED_AMOUNT,0) as approvedAmount, " +
+//        sb.append("select ft.name as categoryName, " +
+//                "fi.FUND_SOURCE_TEXT as sourceName, " +
+//                "ifnull(fi.DECLARED_AMOUNT,0) as declaredAmount, " +
+//                "ifnull(fid.APPROVED_AMOUNT,0) as approvedAmount, " +
+//                "fi.APPROVAL_TIME as approvedDate, " +
+//                "ifnull(sum(fr.REACH_AMOUNT),0) as cumulativeInPaceAmt, " +
+//                "'' as cumulativePayAmt,  " +
+//                "0 as syAmt,  " + //累计到位减去累计支付
+//                "(ifnull(fid.APPROVED_AMOUNT,0) - ifnull(sum(fr.REACH_AMOUNT),0)) as unInPlaceAmt, " +  //批复金额减去累计到位
+//                "0 as totalSyAmt,  " + //批复减去累计支付
+//                "0 as totalPayRate,  " + //累计支付除以批复金额
+//                "ft.REMARK as remark " +
+//                "from FUND_IMPLEMENTATION fi left join FUND_IMPLEMENTATION_DETAIL fid on fi.id = fid.FUND_IMP_ID " +
+//                "left join fund_reach fr on fi.FUND_SOURCE_TEXT = fr.FUND_SOURCE_TEXT " +
+//                "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST  where 1=1");
+        sb.append("select fi.id,ft.name as categoryName, fi.FUND_SOURCE_TEXT as sourceName, ifnull(fi.DECLARED_AMOUNT,0) as declaredAmount, " +
+                "ifnull(temp1.sumApp,0) as approvedAmount, " +
                 "fi.APPROVAL_TIME as approvedDate, " +
-                "ifnull(sum(fr.REACH_AMOUNT),0) as cumulativeInPaceAmt, " +
-                "'' as cumulativePayAmt,  " +
-                "0 as syAmt,  " + //累计到位减去累计支付
-                "(ifnull(fid.APPROVED_AMOUNT,0) - ifnull(sum(fr.REACH_AMOUNT),0)) as unInPlaceAmt, " +  //批复金额减去累计到位
-                "0 as totalSyAmt,  " + //批复减去累计支付
-                "0 as totalPayRate,  " + //累计支付除以批复金额
-                "ft.REMARK as remark " +
-                "from FUND_IMPLEMENTATION fi left join FUND_IMPLEMENTATION_DETAIL fid on fi.id = fid.FUND_IMP_ID " +
-                "left join fund_reach fr on fi.FUND_SOURCE_TEXT = fr.FUND_SOURCE_TEXT " +
-                "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST  where 1=1");
+                "ifnull(temp.sumAmt,0) as cumulativeInPaceAmt, " +
+                "'' as cumulativePayAmt,  0 as syAmt, " +
+                "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0)) as unInPlaceAmt," +
+                "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0)) as totalSyAmt,0 as totalPayRate,fi.REMARK as remark " +
+                "from FUND_IMPLEMENTATION fi " +
+                "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST " +
+                "left join (select sum(REACH_AMOUNT) sumAmt,FUND_SOURCE_TEXT from fund_reach group by FUND_SOURCE_TEXT) temp on temp" +
+                ".FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT " +
+                "left join (select sum(APPROVED_AMOUNT) sumApp,FUND_IMP_ID from fund_implementation_detail group by FUND_IMP_ID) temp1 on temp1" +
+                ".FUND_IMP_ID = fi.id where 1=1");
         if (Strings.isNotEmpty(fundCategoryId)) {
-            sb.append(" and fi.FUND_CATEGORY_FIRST = ").append(fundCategoryId);
+            sb.append(" and fi.FUND_CATEGORY_FIRST = '").append(fundCategoryId).append("'");
         }
         if (Strings.isNotEmpty(sourceName)) {
             sb.append(" and fi.FUND_SOURCE_TEXT like '%").append(sourceName).append("%'");
         }
         if (Strings.isNotEmpty(beginDate) && Strings.isNotEmpty(endDate)) {
-            sb.append(" and fi.APPROVAL_TIME between ").append(beginDate).append(" and ").append(endDate);
+            sb.append(" and fi.APPROVAL_TIME between '").append(beginDate).append("' and '").append(endDate).append("'");
         }
-        sb.append(" group by ft.`NAME`");
+//        sb.append(" group by ft.`NAME`");
 
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);

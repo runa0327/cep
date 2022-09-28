@@ -194,6 +194,11 @@ public class WfExt {
                             //判断该流程是否有项目信息
                             List<String> noProjectList = getNoProjectList();
                             if (noProjectList.contains(entityCode)){
+                                update1 = myJdbcTemplate.update("UPDATE wf_process_instance pi " +
+                                        "JOIN wf_process p ON pi.WF_PROCESS_ID = p.id " +
+                                        "JOIN ad_user u ON pi.START_USER_ID = u.id " +
+                                        "JOIN PM_SEND_APPROVAL_REQ t ON pi.ENTITY_RECORD_ID = t.id " +
+                                        "SET pi.NAME = concat(p.NAME,'-',u.NAME,'-',pi.START_DATETIME) WHERE t.id = ?",csCommId);
                                 return;
                             } else {
                                 List<String> amtPrjList = getAmtPrjList();
@@ -438,7 +443,7 @@ public class WfExt {
         }
 
         //可研估算
-        if("FEASIBLE_ESTIMATE".equals(entityCode)){
+        if("PM_PRJ_INVEST1".equals(entityCode)){
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
             //可研申请材料
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"PM_PRJ_FILE"),FileCodeEnum.PM_PRJ_FILE);

@@ -6,6 +6,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -74,7 +75,9 @@ public class FundRelevantConfigure {
                 .filter(item -> JdbcMapUtil.getString(item, "parentId").equals(JdbcMapUtil.getString(parent, "id")))
                 .peek(child -> getChild(data,child))
                 .collect(Collectors.toList());
-        parent.put("childList",childList);
+        if (!CollectionUtils.isEmpty(childList)){
+            parent.put("childList",childList);
+        }
     }
 
     //递归删除所有的后代

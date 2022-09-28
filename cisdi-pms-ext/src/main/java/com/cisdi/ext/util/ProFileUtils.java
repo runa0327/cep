@@ -80,11 +80,11 @@ public class ProFileUtils {
             if(!CollectionUtils.isEmpty(list) && folderList.size() == list.size()){
                 Optional<Map<String, Object>> obj = list.stream().filter(p -> Objects.equals(codeEnum.toString(), String.valueOf(p.get("CODE")))).findAny();
                 if (obj.isPresent()) {
-                    System.out.println("obj--"+obj);
+//                    System.out.println("obj--"+obj);
                     fid = String.valueOf(obj.get().get("ID"));
                 }
             }else{
-                System.out.println("进入了else");
+//                System.out.println("进入了else");
                 ProFileUtils.createFolder(projectId);
                 Map<String, Object> map = myJdbcTemplate.queryForMap("select * from pf_folder where PM_PRJ_ID=? and `CODE`=?", projectId, codeEnum.toString());
                 System.out.println("projectId--"+projectId);
@@ -95,9 +95,9 @@ public class ProFileUtils {
             List<String> fileIDs = Arrays.asList(fileIds.split(","));
             for (String fileId : fileIDs) {
                 String id = Crud.from("PF_FILE").insertData();
-                System.out.println("fileId--"+fileId);
-                System.out.println("id--"+id);
-                System.out.println("fid--"+fid);
+//                System.out.println("fileId--"+fileId);
+//                System.out.println("id--"+id);
+//                System.out.println("fid--"+fid);
                 Crud.from("PF_FILE").where().eq("ID", id).update().set("FL_FILE_ID", fileId).set("PF_FOLDER_ID", fid).exec();
             }
         } catch (Exception e) {

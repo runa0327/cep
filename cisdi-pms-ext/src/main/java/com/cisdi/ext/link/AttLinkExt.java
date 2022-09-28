@@ -65,9 +65,81 @@ public class AttLinkExt {
             return linkForRELATION_AMOUT_PLAN_REQ_ID(myJdbcTemplate, attValue, entCode);
         } else if ("PAY_BASIS_ID".equals(attCode)){ //付款依据属性联动
             return linkPAY_BASIS_ID(myJdbcTemplate, attValue, entCode,sevId);
-        }else {
+        } else if ("YES_NO_THREE".equals(attCode)){ // 是否判断
+            return linkYES_NO_THREE(myJdbcTemplate, attValue, entCode,sevId);
+        } else if ("YES_NO_TWO".equals(attCode)){ // 有无判断
+            return linkYES_NO_TWO(myJdbcTemplate, attValue, entCode,sevId);
+        } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
+    }
+
+    // 有 无  属性联动
+    private AttLinkResult linkYES_NO_TWO(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        if ("PM_FARMING_PROCEDURES".equals(entCode)){ // 农转用手续办理
+            // 99902212142514832 = 有， 99902212142514833 = 没有
+            if ("99902212142514833".equals(attValue)){
+                // 预估有指标时间
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToShown = true;
+                    linkedAtt.changeToMandatory = true;
+                    linkedAtt.changeToEditable = true;
+                    attLinkResult.attMap.put("DATE_ONE", linkedAtt);
+                }
+            } else {
+                // 预估有指标时间
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DATE;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToShown = true;
+                    linkedAtt.changeToMandatory = false;
+                    linkedAtt.changeToEditable = true;
+                    attLinkResult.attMap.put("DATE_ONE", linkedAtt);
+                }
+            }
+        }
+        return attLinkResult;
+    }
+
+    // 是 否  属性联动
+    private AttLinkResult linkYES_NO_THREE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        if ("PM_SEND_APPROVAL_REQ".equals(entCode)){ //发文呈批
+            // 99799190825080669 = 是， 99799190825080670 = 否
+            if ("99799190825080669".equals(attValue)){  //隐藏 是否呈董事长审批
+                // 是否呈董事长审批
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    linkedAtt.changeToShown = false;
+                    linkedAtt.changeToMandatory = false;
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("YES_NO_FOUR", linkedAtt);
+                }
+            } else {
+                // 是否呈董事长审批
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    linkedAtt.changeToShown = true;
+                    linkedAtt.changeToMandatory = true;
+                    linkedAtt.changeToEditable = true;
+                    attLinkResult.attMap.put("YES_NO_FOUR", linkedAtt);
+                }
+            }
+        }
+        return attLinkResult;
     }
 
     //付款依据属性联动
@@ -208,7 +280,8 @@ public class AttLinkExt {
                         "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.PRJ_CODE, " +
                         "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS', " +
                         "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD', " +
-                        "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget' " +
+                        "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget', " +
+                        "t.QTY_ONE,t.QTY_TWO " +
                         "from pm_prj t join PM_PARTY c on t.id=? and t.CUSTOMER_UNIT=c.id " +
                         "join gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
                         "join gr_set_value l on t.BASE_LOCATION_ID=l.id " +
@@ -1312,6 +1385,7 @@ public class AttLinkExt {
 
         Map row = list.get(0);
 
+        //建设规模类型
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.REF_SINGLE;
@@ -1320,14 +1394,92 @@ public class AttLinkExt {
 
             attLinkResult.attMap.put("CON_SCALE_TYPE_ID", linkedAtt);
         }
-
+        //建设规模单位
+        String id = JdbcMapUtil.getString(row, "CON_SCALE_UOM_ID");
+        String name = JdbcMapUtil.getString(row, "CON_SCALE_UOM_NAME");
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_UOM_ID");
-            linkedAtt.text = JdbcMapUtil.getString(row, "CON_SCALE_UOM_NAME");
-
+            linkedAtt.value = id;
+            linkedAtt.text = name;
             attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt);
+        }
+
+        Boolean areashow = true; //面积显示
+        Boolean lengthShow = true; //长显示
+        Boolean widthShow = true; //宽显示
+        Boolean otherShow = true; //其他显示
+
+        Boolean areaEdit = true; //面积可改
+        Boolean lengthEdit = true; //长可改
+        Boolean widthEdit = true; //宽可改
+        Boolean otherEdit = true; //其他可改
+
+        Boolean areaMustEdit = true; //面积必填
+        Boolean lengthMustEdit = true; //长必填
+        Boolean widthMustEdit = true; //宽必填
+        Boolean otherMustEdit = true; //其他必填
+
+        String name1 = JdbcMapUtil.getString(row, "CON_SCALE_TYPE_NAME");
+        if (name1.contains("面积")){
+            lengthShow = false;
+            widthShow = false;
+            otherShow = false;
+            lengthMustEdit = false;
+            widthMustEdit = false;
+            otherMustEdit = false;
+        } else if (name1.contains("长宽")){
+            areashow = false;
+            otherShow = false;
+            areaMustEdit = false;
+            otherMustEdit = false;
+        } else {
+            areashow = false;
+            lengthShow = false;
+            widthShow = false;
+            areaMustEdit = false;
+            lengthMustEdit = false;
+            widthMustEdit = false;
+        }
+        //面积
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = areashow;
+            linkedAtt.changeToMandatory = areaMustEdit;
+            linkedAtt.text = null;
+            linkedAtt.value = null;
+            attLinkResult.attMap.put("QTY_ONE", linkedAtt);
+        }
+        //长
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = lengthShow;
+            linkedAtt.changeToMandatory = lengthMustEdit;
+            linkedAtt.text = null;
+            linkedAtt.value = null;
+            attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
+        }
+        //宽
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = widthShow;
+            linkedAtt.changeToMandatory = widthMustEdit;
+            linkedAtt.text = null;
+            linkedAtt.value = null;
+            attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
+        }
+        //其他
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = otherShow;
+            linkedAtt.changeToMandatory = otherMustEdit;
+            linkedAtt.text = null;
+            linkedAtt.value = null;
+            attLinkResult.attMap.put("QTY_TWO", linkedAtt);
         }
 
         return attLinkResult;
@@ -1344,7 +1496,8 @@ public class AttLinkExt {
                         "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.BUILDING_AREA, " +
                         "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS', " +
                         "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD', " +
-                        "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget' " +
+                        "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget', " +
+                        "t.QTY_ONE,t.QTY_TWO " +
                         "from pm_prj t join PM_PARTY c on t.id=? and t.CUSTOMER_UNIT=c.id " +
                         "join gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
                         "join gr_set_value l on t.BASE_LOCATION_ID=l.id " +
@@ -1469,24 +1622,85 @@ public class AttLinkExt {
 
             attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt);
         }
-        // 建设规模数量
+
+        Boolean areashow = true; //面积显示
+        Boolean lengthShow = true; //长显示
+        Boolean widthShow = true; //宽显示
+        Boolean otherShow = true; //其他显示
+
+        Boolean areaEdit = true; //面积可改
+        Boolean lengthEdit = true; //长可改
+        Boolean widthEdit = true; //宽可改
+        Boolean otherEdit = true; //其他可改
+
+        Boolean areaMustEdit = true; //面积必填
+        Boolean lengthMustEdit = true; //长必填
+        Boolean widthMustEdit = true; //宽必填
+        Boolean otherMustEdit = true; //其他必填
+
+        String name1 = JdbcMapUtil.getString(row, "st_name");
+        if (name1.contains("面积")){
+            lengthShow = false;
+            widthShow = false;
+            otherShow = false;
+            lengthMustEdit = false;
+            widthMustEdit = false;
+            otherMustEdit = false;
+        } else if (name1.contains("长宽")){
+            areashow = false;
+            otherShow = false;
+            areaMustEdit = false;
+            otherMustEdit = false;
+        } else {
+            areashow = false;
+            lengthShow = false;
+            widthShow = false;
+            areaMustEdit = false;
+            lengthMustEdit = false;
+            widthMustEdit = false;
+        }
+        //面积
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_QTY");
+            linkedAtt.changeToShown = areashow;
+            linkedAtt.changeToMandatory = areaMustEdit;
+            linkedAtt.text = JdbcMapUtil.getString(row, "QTY_ONE");
+            linkedAtt.value = JdbcMapUtil.getString(row, "QTY_ONE");
+            attLinkResult.attMap.put("QTY_ONE", linkedAtt);
+        }
+        //长
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = lengthShow;
+            linkedAtt.changeToMandatory = lengthMustEdit;
             linkedAtt.text = JdbcMapUtil.getString(row, "CON_SCALE_QTY");
-
+            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_QTY");
             attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
         }
-        // 建设规模数量2
+        //宽
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
+            linkedAtt.changeToShown = widthShow;
+            linkedAtt.changeToMandatory = widthMustEdit;
             linkedAtt.text = JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
-
+            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
             attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
         }
+        //其他
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = otherShow;
+            linkedAtt.changeToMandatory = otherMustEdit;
+            linkedAtt.text = JdbcMapUtil.getString(row, "QTY_TWO");
+            linkedAtt.value = JdbcMapUtil.getString(row, "QTY_TWO");
+            attLinkResult.attMap.put("QTY_TWO", linkedAtt);
+        }
+
+
         // 建设年限
         {
             LinkedAtt linkedAtt = new LinkedAtt();

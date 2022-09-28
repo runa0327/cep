@@ -13,4 +13,6 @@ public class File {
     public String viewUrl;
     // 下载地址
     public String downUrl;
+    //上传人
+    public String username;
 }
