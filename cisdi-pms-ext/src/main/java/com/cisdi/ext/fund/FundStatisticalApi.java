@@ -60,7 +60,7 @@ public class FundStatisticalApi {
                 "ifnull(temp1.sumApp,0) as approvedAmount, " +
                 "fi.APPROVAL_TIME as approvedDate, " +
                 "ifnull(temp.sumAmt,0) as cumulativeInPaceAmt, " +
-                "'' as cumulativePayAmt,  0 as syAmt, " +
+                "0 as cumulativePayAmt,  0 as syAmt, " +
                 "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0)) as unInPlaceAmt," +
                 "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0)) as totalSyAmt,0 as totalPayRate,fi.REMARK as remark " +
                 "from FUND_IMPLEMENTATION fi " +
