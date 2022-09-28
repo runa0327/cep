@@ -8,13 +8,15 @@ public class DoubleUtil {
             return 0d;
         }
 
+        for (int i = 0; i < doubles.length; i++) {
+            if (doubles[i] == null) {
+                doubles[i] = 0d;
+            }
+        }
+
         BigDecimal sum = new BigDecimal(doubles[0]);
         for (int i = 1; i < doubles.length; i++) {
-            Double aDouble = doubles[i];
-            if (aDouble == null) {
-                aDouble = 0d;
-            }
-            sum = sum.add(new BigDecimal(aDouble));
+            sum = sum.add(new BigDecimal(doubles[i]));
         }
         return sum.doubleValue();
     }
