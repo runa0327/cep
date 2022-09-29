@@ -80,7 +80,7 @@ public class FundImplementationApi {
         // 总条数sql
         String totalSql = baseSql.toString();
 
-        baseSql.append("order by i.APPROVAL_TIME desc ");
+        baseSql.append("order by i.CRT_DT desc ");
 
         Integer start = fundImpReq.pageSize * (fundImpReq.pageIndex - 1);
         baseSql.append("limit " + start + "," + fundImpReq.pageSize);

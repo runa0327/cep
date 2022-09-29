@@ -70,6 +70,7 @@ public class FundReachController extends BaseController {
         if (Strings.isNotEmpty(beginTime) && Strings.isNotEmpty(endTime)) {
             sb.append(" and r.REACH_DATE between '").append(beginTime).append("' and '").append(endTime).append("'");
         }
+        sb.append(" order by r.CRT_DT desc ");
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
         List<FundReachExportModel> resList = list.stream().map(this::dataConvert).collect(Collectors.toList());
         super.setExcelRespProp(response, "资金到位明细");

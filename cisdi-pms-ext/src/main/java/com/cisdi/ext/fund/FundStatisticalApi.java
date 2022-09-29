@@ -87,6 +87,7 @@ public class FundStatisticalApi {
         }
 //        sb.append(" group by ft.`NAME`");
 
+        sb.append(" order by fi.CRT_DT desc ");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);

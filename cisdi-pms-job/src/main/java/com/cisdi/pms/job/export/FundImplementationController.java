@@ -58,7 +58,7 @@ public class FundImplementationController extends BaseController {
         if (!Strings.isNullOrEmpty(beginTime) && !Strings.isNullOrEmpty(endTime)) {
             baseSql.append("and i.APPROVAL_TIME BETWEEN '" + beginTime + "' and '" + endTime + "' ");
         }
-        baseSql.append("order by i.APPROVAL_TIME desc ");
+        baseSql.append("order by i.CRT_DT desc ");
         List<Map<String, Object>> impList = jdbcTemplate.queryForList(baseSql.toString());
         List<FundImplementationExportModel> resList = impList.stream().map(this::dataCovert).collect(Collectors.toList());
         super.setExcelRespProp(response,"资金批复明细表");

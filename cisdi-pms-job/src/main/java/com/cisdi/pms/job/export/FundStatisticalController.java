@@ -79,7 +79,7 @@ public class FundStatisticalController extends BaseController {
         if (Strings.isNotEmpty(beginDate) && Strings.isNotEmpty(endDate)) {
             sb.append(" and fi.APPROVAL_TIME between '").append(beginDate).append("' and '").append(endDate).append("'");
         }
-
+        sb.append(" order by fi.CRT_DT desc ");
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
         List<FundStatisticalExportModel> resList = list.stream().map(this::convertData).collect(Collectors.toList());
         super.setExcelRespProp(response, "资金批复，到位，支付总表");
