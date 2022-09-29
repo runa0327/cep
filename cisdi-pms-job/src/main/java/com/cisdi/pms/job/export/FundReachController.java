@@ -120,11 +120,11 @@ public class FundReachController extends BaseController {
         resList.add(model1);
 
 
-        super.setExcelRespProp(response, "资金到位明显");
+        super.setExcelRespProp(response, "资金到位明细");
         EasyExcel.write(response.getOutputStream())
                 .head(FundReachExportModel.class)
                 .excelType(ExcelTypeEnum.XLSX)
-                .sheet("资金到位明显")
+                .sheet("资金到位明细")
                 .doWrite(resList);
 
     }
