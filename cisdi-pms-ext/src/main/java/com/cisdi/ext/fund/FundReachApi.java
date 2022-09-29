@@ -75,6 +75,8 @@ public class FundReachApi {
         if (!com.google.common.base.Strings.isNullOrEmpty(secondCategoryNameId)) {
             sb.append("and t2.id = '").append(secondCategoryNameId).append("' ");
         }
+
+        sb.append("order by r.CRT_DT desc ");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
@@ -102,7 +104,7 @@ public class FundReachApi {
         try {
             String sql = "select r.ID,p.name projectName,p.id prjId,r.FUND_SOURCE_TEXT sourceName,r.FUND_REACH_CATEGORY reachCategory,IFNULL(r.REACH_AMOUNT,0)" +
                     " amt,r.PAYEE payee,b1.name bank,b1.id bankId,b2.name account,b2.id accountId,r.REACH_DATE reachDate,r.remark,r.ATT_FILE_GROUP_ID fileIds,temp.sumAmt,t1" +
-                    ".name firstTypeName,t2.name secondTypeName,temp.count,i.APPROVAL_TIME " +
+                    ".name firstTypeName,t2.name secondTypeName,temp.count,i.APPROVAL_TIME,r.REACH_TIMES " +
                     "from fund_reach r left join pm_prj p on p.id = r.PM_PRJ_ID " +
                     "left join receiving_bank b1 on b1.id = r.RECEIVING_BANK_ID " +
                     "left join receiving_bank b2 on b2.id = r.RECEIPT_ACCOUNT " +
@@ -133,7 +135,7 @@ public class FundReachApi {
         String type = param.type;
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
-        String recordSql = "select ID,payee from fund_reach where FUND_SOURCE_TEXT = ? and PM_PRJ_ID = ? and FUND_REACH_CATEGORY = ? order by CRT_DT desc";
+        String recordSql = "select id,payee,REACH_TIMES reachTimes from fund_reach where FUND_SOURCE_TEXT = ? and PM_PRJ_ID = ? and FUND_REACH_CATEGORY = ? order by CRT_DT desc";
         String detailSql = "select t1.name firstTypeName,t2.name secondTypeName,i.APPROVAL_TIME approvalTime " +
                 "from fund_implementation i " +
                 "left join fund_type t1 on t1.id = i.FUND_CATEGORY_FIRST " +
@@ -166,7 +168,8 @@ public class FundReachApi {
         Crud.from("FUND_REACH").where().eq("ID",id).update()
                 .set("PM_PRJ_ID",input.projectId).set("FUND_SOURCE_TEXT",input.sourceName).set("FUND_REACH_CATEGORY",input.type)
                 .set("REACH_AMOUNT",input.amt).set("PAYEE",input.unit).set("RECEIPT_ACCOUNT",input.account).set("REACH_DATE",input.reachDate)
-                .set("ATT_FILE_GROUP_ID", input.fileIds).set("RECEIVING_BANK_ID",input.bank).set("REMARK",input.remark).exec();
+                .set("ATT_FILE_GROUP_ID", input.fileIds).set("RECEIVING_BANK_ID",input.bank).set("REMARK",input.remark)
+                .set("REACH_TIMES",input.reachTimes).exec();
     }
 
     /**
@@ -279,6 +282,7 @@ public class FundReachApi {
             fundReach.sumAmt = JdbcMapUtil.getString(data, "sumAmt");
             fundReach.count = JdbcMapUtil.getInt(data,"count");
             fundReach.approvalTime = JdbcMapUtil.getString(data,"APPROVAL_TIME");
+            fundReach.reachTimes = JdbcMapUtil.getInt(data,"REACH_TIMES");
             List<File> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(data,"fileIds"), myJdbcTemplate);
             fundReach.fileList = fileList;
         }
@@ -337,6 +341,8 @@ public class FundReachApi {
         public String reachDate;
         //备注
         public String remark;
+        //到位次数
+        public Integer reachTimes;
         //文件
         public String fileIds;
     }
@@ -366,12 +372,14 @@ public class FundReachApi {
         public String remark;
         //累计到位金额
         public String sumAmt;
-        //到位次数
+        //到位次数（废弃）
         public Integer count;
         //批复时间
         public String approvalTime;
         //文件集合
         public List<File> fileList;
+        //到位次数
+        public Integer reachTimes;
     }
 
     /**
