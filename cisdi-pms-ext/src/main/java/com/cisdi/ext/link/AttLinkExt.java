@@ -892,7 +892,7 @@ public class AttLinkExt {
         //查询招采
         if("99902212142022303".equals(sevId)){//补充协议发起 实体视图id
             // 根据id查询招投标信息
-            List<Map<String, Object>> bidList = myJdbcTemplate.queryForList("SELECT a.name,a.PMS_RELEASE_WAY_ID,a.BID_CTL_PRICE_LAUNCH,a.APPROVE_PURCHASE_TYPE,a.WIN_BID_UNIT_TXT,a.TENDER_OFFER,a.CONTACT_MOBILE_WIN,a.CONTACT_NAME_RECORD,a.BID_USER_ID,a.STATUS,a.BID_UNIT, ifnull((SELECT END_DATETIME FROM wf_process_instance WHERE id = a.LK_WF_INST_ID ),0) as END_DATETIME, a.SERVICE_DAYS FROM po_public_bid_req a WHERE id = ?", JdbcMapUtil.getString(row,"BIDDING_NAME_ID"));
+            List<Map<String, Object>> bidList = myJdbcTemplate.queryForList("SELECT a.id,a.name,a.PMS_RELEASE_WAY_ID,a.BID_CTL_PRICE_LAUNCH,a.APPROVE_PURCHASE_TYPE,a.WIN_BID_UNIT_TXT,a.TENDER_OFFER,a.CONTACT_MOBILE_WIN,a.CONTACT_NAME_RECORD,a.BID_USER_ID,a.STATUS,a.BID_UNIT, ifnull((SELECT END_DATETIME FROM wf_process_instance WHERE id = a.LK_WF_INST_ID ),0) as END_DATETIME, a.SERVICE_DAYS FROM po_public_bid_req a WHERE id = ?", JdbcMapUtil.getString(row,"BIDDING_NAME_ID"));
             if (CollectionUtils.isEmpty(bidList)) {
                 throw new BaseException("采购流程相关属性不完善！");
             }
@@ -901,7 +901,7 @@ public class AttLinkExt {
             {
                 LinkedAtt linkedAtt = new LinkedAtt();
                 linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = JdbcMapUtil.getString(bidRow, "name");
+                linkedAtt.value = JdbcMapUtil.getString(bidRow, "id");
                 linkedAtt.text = JdbcMapUtil.getString(bidRow, "name");
 
                 attLinkResult.attMap.put("BIDDING_NAME_ID", linkedAtt);
@@ -987,7 +987,7 @@ public class AttLinkExt {
         // 根据id查询招投标信息
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTRACT_CODE, CONTRACT_CATEGORY_ID, CONTRACT_NAME, CONTRACT_PRICE, " +
                 "BIDDING_NAME_ID,PMS_RELEASE_WAY_ID,BID_CTL_PRICE_LAUNCH,PURCHASE_TYPE,WIN_BID_UNIT_TXT,WINNING_BIDS_AMOUNT,PLAN_TOTAL_DAYS," +
-                "IS_REFER_GUARANTEE,GUARANTEE_LETTER_TYPE_ID,IS_TEMPLATE " +
+                "IS_REFER_GUARANTEE,GUARANTEE_LETTER_TYPE_IDS,IS_TEMPLATE " +
                 "from po_order_req where id = ?", attValue);
 
         if (CollectionUtils.isEmpty(list)) {
@@ -1084,9 +1084,10 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_ID");
-            linkedAtt.text = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_ID");
+            linkedAtt.value = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_IDS");
+            linkedAtt.text = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_IDS");
             attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_ID", linkedAtt);
+            attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_IDS", linkedAtt);
         }
         // 相对方联系人
 //        {
