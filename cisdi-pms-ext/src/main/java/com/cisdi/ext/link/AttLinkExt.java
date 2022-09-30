@@ -69,9 +69,45 @@ public class AttLinkExt {
             return linkYES_NO_THREE(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("YES_NO_TWO".equals(attCode)){ // 有无判断
             return linkYES_NO_TWO(myJdbcTemplate, attValue, entCode,sevId);
+        } else if ("IS_REFER_GUARANTEE_ID".equals(attCode)){ // 是否涉及保函
+            return linkIS_REFER_GUARANTEE_ID(myJdbcTemplate, attValue, entCode,sevId);
         } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
+    }
+
+    //是否涉及保函 属性联动
+    private AttLinkResult linkIS_REFER_GUARANTEE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        // 99902212142031851 = 是 ，99902212142031855 = 否
+        Boolean changeToShown = true;
+        Boolean changeToMandatory = true;
+        Boolean changeToEditable = true;
+
+        List<String> baohanList = getBaoHanList();
+        if (baohanList.contains(entCode)){
+            if ("99902212142031855".equals(attValue)){ //隐藏保函类型
+                changeToShown = false;
+                changeToMandatory = false;
+                changeToEditable = false;
+            } else { //显示保函类型
+                changeToShown = true;
+                changeToMandatory = true;
+                changeToEditable = true;
+            }
+            //保函类型
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToShown = changeToShown;
+                linkedAtt.changeToMandatory = changeToMandatory;
+                linkedAtt.changeToEditable = changeToEditable;
+                attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_IDS", linkedAtt);
+            }
+        }
+        return attLinkResult;
     }
 
     // 有 无  属性联动
@@ -1227,14 +1263,14 @@ public class AttLinkExt {
                     LinkedRecord linkedRecord = new LinkedRecord();
 
                     // 费用类型
-                    linkedRecord.valueMap.put("COST_TYPE_TREE_ID", tmp.get("COST_TYPE_TREE_ID").toString());
-                    linkedRecord.textMap.put("COST_TYPE_TREE_ID", tmp.get("COST_TYPE_TREE_ID").toString());
+                    linkedRecord.valueMap.put("COST_TYPE_TREE_ID", JdbcMapUtil.getString(tmp,"COST_TYPE_TREE_ID"));
+                    linkedRecord.textMap.put("COST_TYPE_TREE_ID", JdbcMapUtil.getString(tmp,"COST_TYPE_TREE_ID"));
                     // 费用明细
-                    linkedRecord.valueMap.put("FEE_DETAIL", tmp.get("FEE_DETAIL"));
-                    linkedRecord.textMap.put("FEE_DETAIL", tmp.get("FEE_DETAIL").toString());
+                    linkedRecord.valueMap.put("FEE_DETAIL", JdbcMapUtil.getString(tmp,"FEE_DETAIL"));
+                    linkedRecord.textMap.put("FEE_DETAIL", JdbcMapUtil.getString(tmp,"FEE_DETAIL"));
                     // 费用金额
-                    linkedRecord.valueMap.put("TOTAL_AMT", tmp.get("TOTAL_AMT"));
-                    linkedRecord.textMap.put("TOTAL_AMT", tmp.get("TOTAL_AMT").toString());
+                    linkedRecord.valueMap.put("TOTAL_AMT", JdbcMapUtil.getString(tmp,"TOTAL_AMT"));
+                    linkedRecord.textMap.put("TOTAL_AMT", JdbcMapUtil.getString(tmp,"TOTAL_AMT"));
 
                     linkedRecordList.add(linkedRecord);
                 }
@@ -2302,5 +2338,15 @@ public class AttLinkExt {
         keyList.add("BUDGET_REVIEW_COMPLETED"); // 预算评审完成情况
         keyList.add("CONSTRUCT_BID_COMPLETED"); // 施工招标备案完成情况
         return keyList;
+    }
+
+    //属性联动中包含类型联动隐藏的list
+    public List<String> getBaoHanList() {
+        List<String> baoHanList = new ArrayList<>();
+        baoHanList.add("PO_ORDER_REQ"); //合同签订
+        baoHanList.add("PO_ORDER_TERMINATE_REQ"); //采购合同终止申请
+        baoHanList.add("PO_ORDER_CHANGE_REQ"); //采购合同变更申请
+        baoHanList.add("PO_ORDER_SUPPLEMENT_REQ"); //采购合同补充协议申请
+        return baoHanList;
     }
 }
