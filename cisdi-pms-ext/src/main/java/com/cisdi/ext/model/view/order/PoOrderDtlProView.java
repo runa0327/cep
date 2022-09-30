@@ -1,6 +1,7 @@
-package com.cisdi.ext.model.view;
+package com.cisdi.ext.model.view.order;
 
 import com.cisdi.ext.model.BasePageEntity;
+import com.cisdi.ext.model.view.BaseFileView;
 
 import java.util.List;
 

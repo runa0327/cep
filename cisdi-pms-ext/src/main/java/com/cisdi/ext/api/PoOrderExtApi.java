@@ -1,8 +1,9 @@
 package com.cisdi.ext.api;
 
-import com.cisdi.ext.model.view.PoOrderDtlProView;
-import com.cisdi.ext.model.view.PoOrderDtlView;
-import com.cisdi.ext.model.view.PoOrderView;
+import com.cisdi.ext.model.view.order.PoOrderContactsView;
+import com.cisdi.ext.model.view.order.PoOrderDtlProView;
+import com.cisdi.ext.model.view.order.PoOrderDtlView;
+import com.cisdi.ext.model.view.order.PoOrderView;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -38,7 +39,7 @@ public class PoOrderExtApi {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuilder sb = new StringBuilder();
         StringBuilder sb2 = new StringBuilder();
-        String sql = "SELECT a.id, a.PM_PRJ_ID, b.`NAME` as projectName, a.name as contractName,c.`NAME` as statusName, a.OPPO_SITE, a.OPPO_SITE_LINK_MAN, a.OPPO_SITE_CONTACT,a.AGENT, a.AGENT_PHONE, a.CONTRACT_AMOUNT, a.FILE_ATTACHMENT_URL,a.REMARK FROM PO_ORDER a LEFT JOIN pm_prj b on a.PM_PRJ_ID = b.ID LEFT JOIN ad_status c on a.`STATUS` = c.id where 1 = 1 and a.PM_PRJ_ID = ?";
+        String sql = "SELECT a.ORDER_PROCESS_TYPE,a.id, a.PM_PRJ_ID, b.`NAME` as projectName, a.name as contractName,c.`NAME` as statusName, a.OPPO_SITE, a.OPPO_SITE_LINK_MAN, a.OPPO_SITE_CONTACT,a.AGENT, a.AGENT_PHONE, a.CONTRACT_AMOUNT, a.FILE_ATTACHMENT_URL,a.REMARK FROM PO_ORDER a LEFT JOIN pm_prj b on a.PM_PRJ_ID = b.ID LEFT JOIN ad_status c on a.`STATUS` = c.id where 1 = 1 and a.PM_PRJ_ID = ?";
         String sql2 = "SELECT count(*) as num FROM PO_ORDER a LEFT JOIN pm_prj b on a.PM_PRJ_ID = b.ID LEFT JOIN ad_status c on a.`STATUS` = c.id where 1 = 1 and a.PM_PRJ_ID = ? ";
         sb.append(sql);
         sb2.append(sql2);
@@ -55,6 +56,11 @@ public class PoOrderExtApi {
         if (param.contractAmount != null) {
             sb.append(" and a.CONTRACT_AMOUNT like ('%" + param.contractAmount + "%') ");
             sb2.append(" and a.CONTRACT_AMOUNT like ('%" + param.contractAmount + "%') ");
+        }
+        // 来源
+        if (!SharedUtil.isEmptyString(param.orderProcessType)){
+            sb.append(" and a.order_process_type like ('%" + param.orderProcessType + "%') ");
+            sb2.append(" and a.ORDER_PROCESS_TYPE like ('%" + param.orderProcessType + "%') ");
         }
         sb.append("order BY a.CRT_DT DESC ").append(limit);
         sb2.append("order BY a.CRT_DT DESC");
@@ -78,6 +84,7 @@ public class PoOrderExtApi {
                 poOrderView.contractAmount = new BigDecimal(JdbcMapUtil.getString(p, "CONTRACT_AMOUNT"));
                 poOrderView.statusName = JdbcMapUtil.getString(p, "statusName");
                 poOrderView.remark = JdbcMapUtil.getString(p, "REMARK");
+                poOrderView.orderProcessType = JdbcMapUtil.getString(p, "ORDER_PROCESS_TYPE");
                 poOrderView.fileId = SharedUtil.isEmptyString(JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL")) ? "" : JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
                 return poOrderView;
             }).collect(Collectors.toList());
@@ -158,7 +165,6 @@ public class PoOrderExtApi {
         } else {
             ExtJarHelper.returnValue.set(null);
         }
-
     }
 
     // 采购合同明细工作进度
@@ -226,6 +232,51 @@ public class PoOrderExtApi {
                 poOrderDtlProView.fileId = JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
                 return poOrderDtlProView;
 
+            }).collect(Collectors.toList());
+            ret.put("result", view);
+            ret.put("total", Integer.valueOf(list2.get(0).get("num").toString()));
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(ret), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        } else {
+            ExtJarHelper.returnValue.set(null);
+        }
+    }
+
+    // 采购合同联系人明细
+    public void getContractsDetail() {
+        // 获取输入：
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        PoOrderContactsView param = JsonUtil.fromJson(json, PoOrderContactsView.class);
+        if (SharedUtil.isEmptyString(param.parentId)) {
+            throw new BaseException("接口调用失败，采购合同id不能为空");
+        }
+        if (param.pageIndex == 0 || param.pageSize == 0) {
+            throw new BaseException("分页参数不能必须大于0");
+        }
+        // 起始条数
+        int start = (param.pageIndex - 1) * param.pageSize;
+        String limit = "limit " + start + "," + param.pageSize;
+
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        StringBuilder sb = new StringBuilder();
+        StringBuilder sb2 = new StringBuilder();
+        String sql1 = "select id,OPPO_SITE_LINK_MAN,OPPO_SITE_CONTACT from PO_ORDER_CONTACTS where PARENT_ID = ? ";
+        String sql2 = "select count(*) as num from PO_ORDER_CONTACTS where PARENT_ID = ? ";
+        sb.append(sql1);
+        sb2.append(sql2);
+        sb.append("order BY OPPO_SITE_LINK_MAN asc ").append(limit);
+        sb2.append("order BY OPPO_SITE_LINK_MAN asc");
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString(), param.parentId);
+        List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(sb2.toString(), param.parentId);
+        Map<String, Object> ret = new HashMap<>();
+        if (!CollectionUtils.isEmpty(list)) {
+            List<PoOrderContactsView> view = list.stream().map(p -> {
+                PoOrderContactsView poOrderDtlView = new PoOrderContactsView();
+                poOrderDtlView.id = JdbcMapUtil.getString(p, "id");
+                poOrderDtlView.oppoSiteLinkMan = p.get("OPPO_SITE_LINK_MAN").toString();
+                poOrderDtlView.oppoSiteContact = JdbcMapUtil.getString(p, "OPPO_SITE_CONTACT");
+                return poOrderDtlView;
             }).collect(Collectors.toList());
             ret.put("result", view);
             ret.put("total", Integer.valueOf(list2.get(0).get("num").toString()));

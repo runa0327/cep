@@ -1,5 +1,6 @@
 package com.cisdi.ext.contract;
 
+import com.cisdi.ext.util.DateTimeUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -8,6 +9,7 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -92,12 +94,14 @@ public class PmContractExt {
 
     /** 相对方联系人插入 **/
     private void insertContacts(String id, List<Map<String, Object>> list2) {
+        String now = DateTimeUtil.dttmToString(new Date());
         list2.forEach(item -> {
             String did = Crud.from("PO_ORDER_CONTACTS").insertData();
             Crud.from("PO_ORDER_CONTACTS").where().eq("ID", did).update()
                     .set("OPPO_SITE_LINK_MAN", JdbcMapUtil.getString(item, "OPPO_SITE_LINK_MAN"))
                     .set("OPPO_SITE_CONTACT", JdbcMapUtil.getString(item, "OPPO_SITE_CONTACT"))
                     .set("PARENT_ID", id)
+                    .set("CRT_DT",now)
                     .exec();
         });
     }
