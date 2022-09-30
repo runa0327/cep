@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class WfExt {
@@ -40,7 +39,6 @@ public class WfExt {
     public void changeStatusToAp() {
         String newStatus = "AP";
         changeStatus(newStatus);
-        saveFile();
     }
 
     public void changeStatusToDn() {
@@ -58,6 +56,9 @@ public class WfExt {
         changeStatus(newStatus);
     }
 
+    public void syncFile(){
+        saveFile();
+    }
     private void changeStatus(String newStatus) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         SevInfo sevInfo = ExtJarHelper.sevInfo.get();
@@ -448,15 +449,15 @@ public class WfExt {
             //可研申请材料
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"PM_PRJ_FILE"),FileCodeEnum.PM_PRJ_FILE);
             //修编稿文件
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KY_REVISION_FILE"),FileCodeEnum.KY_REVISION_FILE);
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REVISION_FILE"),FileCodeEnum.KY_REVISION_FILE);
             //评审报告文件
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KY_REVIEW_DRAFT_FILE"),FileCodeEnum.KY_REVIEW_DRAFT_FILE);
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REVIEW_DRAFT_FILE"),FileCodeEnum.KY_REVIEW_DRAFT_FILE);
             //评审稿文件
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KY_REVIEW_REPORT_FILE"),FileCodeEnum.KY_REVIEW_REPORT_FILE);
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REVIEW_REPORT_FILE"),FileCodeEnum.KY_REVIEW_REPORT_FILE);
             //专家意见文件
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KY_EXPERT_FILE"),FileCodeEnum.KY_EXPERT_FILE);
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"EXPERT_FILE"),FileCodeEnum.KY_EXPERT_FILE);
             //可研批复文件
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"FEASIBLE_REPLY_FILE"),FileCodeEnum.FEASIBLE_REPLY_FILE);
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REPLY_FILE"),FileCodeEnum.FEASIBLE_REPLY_FILE);
         }
 
         //施工许可
