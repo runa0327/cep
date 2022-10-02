@@ -26,6 +26,7 @@ public class ProFileUtils {
      */
     public static void createFolder(String projectId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String userId = ExtJarHelper.loginInfo.get().userId;
         // 查询已经有的文件夹
         List<Map<String, Object>> folderList = myJdbcTemplate.queryForList("select * from PF_FOLDER where  PM_PRJ_ID=?", projectId);
 
@@ -38,8 +39,14 @@ public class ProFileUtils {
                 id = String.valueOf(optional.get().get("ID"));
             } else {
                 id = Crud.from("PF_FOLDER").insertData();
-                Crud.from("PF_FOLDER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId).set("NAME", m.get("NAME"))
-                        .set("SEQ_NO", m.get("SEQ_NO")).set("CODE", m.get("CODE")).set("IS_TEMPLATE", "0").exec();
+                Crud.from("PF_FOLDER").where().eq("ID", id).update()
+                        .set("PM_PRJ_ID", projectId)
+                        .set("NAME", m.get("NAME"))
+                        .set("SEQ_NO", m.get("SEQ_NO"))
+                        .set("CODE", m.get("CODE"))
+                        .set("IS_TEMPLATE", "0")
+                        .set("CHIEF_USER_ID",userId)
+                        .exec();
             }
             createSonFolder(m, list, id, projectId, folderList);
         }).collect(Collectors.toList());
@@ -91,9 +98,18 @@ public class ProFileUtils {
             }
 
             List<String> fileIDs = Arrays.asList(fileIds.split(","));
+            String userId = ExtJarHelper.loginInfo.get().userId;
             for (String fileId : fileIDs) {
-                String id = Crud.from("PF_FILE").insertData();
-                Crud.from("PF_FILE").where().eq("ID", id).update().set("FL_FILE_ID", fileId).set("PF_FOLDER_ID", fid).exec();
+//                String id = Crud.from("PF_FILE").insertData();
+                String sql = "insert into PF_FILE (id,FL_FILE_ID,PF_FOLDER_ID,CHIEF_USER_ID) values((select UUID_SHORT()),'"+fileId+"','"+fid+"','"+userId+"')";
+                System.out.println(sql);
+                myJdbcTemplate.update(sql);
+//                myJdbcTemplate.update(sql,fileId,fid,userId);
+//                Crud.from("PF_FILE").where().eq("ID", id).update()
+//                        .set("FL_FILE_ID", fileId)
+//                        .set("PF_FOLDER_ID", fid)
+//                        .set("CHIEF_USER_ID",userId)
+//                        .exec();
             }
         } catch (Exception e) {
             throw new BaseException(e.getMessage());
