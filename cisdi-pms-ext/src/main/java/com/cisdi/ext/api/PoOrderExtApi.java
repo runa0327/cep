@@ -81,7 +81,7 @@ public class PoOrderExtApi {
                 poOrderView.oppoSiteContact = JdbcMapUtil.getString(p, "OPPO_SITE_CONTACT");
                 poOrderView.agent = JdbcMapUtil.getString(p, "AGENT");
                 poOrderView.agentPhone = JdbcMapUtil.getString(p, "AGENT_PHONE");
-                poOrderView.contractAmount = new BigDecimal(JdbcMapUtil.getString(p, "CONTRACT_AMOUNT"));
+                poOrderView.contractAmount = SharedUtil.isEmptyString(JdbcMapUtil.getString(p, "CONTRACT_AMOUNT")) ? new BigDecimal("0") : new BigDecimal(JdbcMapUtil.getString(p, "CONTRACT_AMOUNT"));
                 poOrderView.statusName = JdbcMapUtil.getString(p, "statusName");
                 poOrderView.remark = JdbcMapUtil.getString(p, "REMARK");
                 poOrderView.orderProcessType = JdbcMapUtil.getString(p, "ORDER_PROCESS_TYPE");
