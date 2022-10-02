@@ -142,12 +142,12 @@ public class PmPrjReqExt {
         createPlan(newPrjId);
 
         // 创建项目文件夹
-        ProFileUtils.createFolder(newPrjId);
+//        ProFileUtils.createFolder(newPrjId);
 
         // 立项申请文件归档
         // 项目申请材料
-        String reqFile = JdbcMapUtil.getString(pm_prj_req, "PRJ_REQ_FILE");
-        ProFileUtils.insertProFile(newPrjId, reqFile, FileCodeEnum.PRJ_REQ_FILE);
+//        String reqFile = JdbcMapUtil.getString(pm_prj_req, "PRJ_REQ_FILE");
+//        ProFileUtils.insertProFile(newPrjId, reqFile, FileCodeEnum.PRJ_REQ_FILE);
 
     }
 
