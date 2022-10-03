@@ -142,7 +142,7 @@ public class PoOrderSupplementReqExt {
         Crud.from("PO_ORDER").where().eq("ID", id).update()
                 .set("NAME", JdbcMapUtil.getString(data, "CONTRACT_NAME"))
                 .set("REMARK", JdbcMapUtil.getString(data, "REMARK"))
-//                .set("CONTRACT_AMOUNT", JdbcMapUtil.getString(data, "CONTRACT_PRICE"))
+                .set("CONTRACT_AMOUNT", JdbcMapUtil.getString(data, "CONTRACT_AMOUNT"))
                 .set("AGENT", JdbcMapUtil.getString(data, ""))
                 .set("AGENT_PHONE", JdbcMapUtil.getString(data, ""))
 //                .set("OPPO_SITE_CONTACT", JdbcMapUtil.getString(data, "OPPO_SITE_CONTACT"))

@@ -1023,7 +1023,7 @@ public class AttLinkExt {
         // 根据id查询招投标信息
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTRACT_CODE, CONTRACT_CATEGORY_ID, CONTRACT_NAME, CONTRACT_PRICE, " +
                 "BIDDING_NAME_ID,PMS_RELEASE_WAY_ID,BID_CTL_PRICE_LAUNCH,PURCHASE_TYPE,WIN_BID_UNIT_TXT,WINNING_BIDS_AMOUNT,PLAN_TOTAL_DAYS," +
-                "IS_REFER_GUARANTEE,GUARANTEE_LETTER_TYPE_IDS,IS_TEMPLATE " +
+                "IS_REFER_GUARANTEE_ID,GUARANTEE_LETTER_TYPE_IDS,IS_TEMPLATE " +
                 "from po_order_req where id = ?", attValue);
 
         if (CollectionUtils.isEmpty(list)) {
@@ -1107,9 +1107,9 @@ public class AttLinkExt {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
 //                linkedAtt.value = JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE")==null?null:JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE").toString();
-            String code = JdbcMapUtil.getString(row, "IS_REFER_GUARANTEE");
+            String code = JdbcMapUtil.getString(row, "IS_REFER_GUARANTEE_ID");
             Map<String, Object> idMap = myJdbcTemplate.queryForMap("SELECT v.id id FROM gr_set_value v left " +
-                            "join gr_set k on v.GR_SET_ID = k.id where k.`CODE` = 'is_refer_guarantee' and v.`CODE` = ?",
+                            "join gr_set k on v.GR_SET_ID = k.id where k.`CODE` = 'is_refer_guarantee' and v.`id` = ?",
                     code);
             linkedAtt.value = idMap.get("id").toString();
             linkedAtt.text = idMap.get("id").toString();
