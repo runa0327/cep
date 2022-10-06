@@ -1232,6 +1232,39 @@ public class AttLinkExt {
             attLinkResult.childCreatable.put("99902212142514118", false);
             attLinkResult.childClear.put("99902212142514118", true);
         }
+
+        //需要带出相对方联系人明细的实体试图
+        List<String> contactDetailList = getContactDetailList();
+        //需要带出联系人明细的实体试图(只读)
+        List<String> contactListRead = getContactListRead();
+        //联系人明细信息
+        if (contactDetailList.contains(sevId)) {
+            String viewId = "";
+            if ("99902212142025475".equals(sevId)){
+                viewId = "99952822476384659"; //合同终止联系人明细试图部门id
+            }
+            //查询明细信息
+            String sql2 = "select * from CONTRACT_SIGNING_CONTACT where PARENT_ID = ?";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,attValue);
+            List<LinkedRecord> linkedRecordList = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(list2)){
+                for (Map<String, Object> tmp : list2) {
+                    LinkedRecord linkedRecord = new LinkedRecord();
+                    //相对方联系人
+                    String CONTRACT_SIGNING_CONTACT = tmp.get("OPPO_SITE_LINK_MAN").toString();
+                    linkedRecord.valueMap.put("OPPO_SITE_LINK_MAN", CONTRACT_SIGNING_CONTACT);
+                    linkedRecord.textMap.put("OPPO_SITE_LINK_MAN", CONTRACT_SIGNING_CONTACT);
+                    //相对方联系方式
+                    String OPPO_SITE_CONTACT = tmp.get("OPPO_SITE_CONTACT").toString();
+                    linkedRecord.valueMap.put("OPPO_SITE_CONTACT", OPPO_SITE_CONTACT);
+                    linkedRecord.textMap.put("OPPO_SITE_CONTACT", OPPO_SITE_CONTACT);
+                    linkedRecordList.add(linkedRecord);
+                }
+                attLinkResult.childData.put(viewId, linkedRecordList);
+            }
+            attLinkResult.childCreatable.put(viewId, false);
+            attLinkResult.childClear.put(viewId, true);
+        }
         return attLinkResult;
     }
 
@@ -2355,5 +2388,19 @@ public class AttLinkExt {
         List<String> editGuarantee = new ArrayList<>();
         editGuarantee.add("PO_ORDER_TERMINATE_REQ"); //采购合同终止申请
         return editGuarantee;
+    }
+
+    // 相对方联系人 只读
+    public List<String> getContactListRead() {
+        List<String> list = new ArrayList<>();
+        list.add("99902212142025475"); // 采购合同终止申请--填写项目信息及合同变更信息
+        return list;
+    }
+
+    // 需要带出相对方联系人明细的实体试图
+    public List<String> getContactDetailList() {
+        List<String> list = new ArrayList<>();
+        list.add("99902212142025475"); // 采购合同终止申请--填写项目信息及合同变更信息
+        return list;
     }
 }
