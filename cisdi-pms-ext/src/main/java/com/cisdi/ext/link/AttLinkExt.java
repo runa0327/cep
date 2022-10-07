@@ -65,15 +65,42 @@ public class AttLinkExt {
             return linkForRELATION_AMOUT_PLAN_REQ_ID(myJdbcTemplate, attValue, entCode);
         } else if ("PAY_BASIS_ID".equals(attCode)){ //付款依据属性联动
             return linkPAY_BASIS_ID(myJdbcTemplate, attValue, entCode,sevId);
+        } else if ("YES_NO_ONE".equals(attCode)){ // 是否判断
+            return linkYES_NO_ONE(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("YES_NO_THREE".equals(attCode)){ // 是否判断
             return linkYES_NO_THREE(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("YES_NO_TWO".equals(attCode)){ // 有无判断
             return linkYES_NO_TWO(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("IS_REFER_GUARANTEE_ID".equals(attCode)){ // 是否涉及保函
             return linkIS_REFER_GUARANTEE_ID(myJdbcTemplate, attValue, entCode,sevId);
+        } else if ("REASON".equals(attCode)){ // 退还原因
+            return linkREASON(myJdbcTemplate, attValue, entCode,sevId);
         } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
+    }
+
+    //退还原因属性联动
+    private AttLinkResult linkREASON(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        // 99902212142025881 = 到期申请退还，之后续保,99902212142025882=达到退保条件，申请退保,99902212142025883=其他
+        Boolean changeToMandatory = true;
+        Boolean changeToEditable = true;
+        if ("99902212142025881".equals(attValue)){
+            changeToMandatory = false;
+            changeToEditable = false;
+        }
+        //原因说明
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            linkedAtt.changeToMandatory = changeToMandatory;
+            linkedAtt.changeToEditable = changeToEditable;
+            attLinkResult.attMap.put("REASON_EXPLAIN", linkedAtt);
+        }
+        return attLinkResult;
     }
 
     //是否涉及保函 属性联动
@@ -139,6 +166,34 @@ public class AttLinkExt {
                     linkedAtt.changeToEditable = true;
                     attLinkResult.attMap.put("DATE_ONE", linkedAtt);
                 }
+            }
+        }
+        return attLinkResult;
+    }
+
+    // 是否属性联动
+    private AttLinkResult linkYES_NO_ONE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        Boolean changeToShown = true;
+        Boolean changeToMandatory = true;
+        Boolean changeToEditable = true;
+        if ("PM_FARMING_PROCEDURES".equals(entCode)){ //农转用手续办理
+            // 99799190825080669 = 是， 99799190825080670 = 否
+            if (!"99799190825080670".equals(attValue)) {  // 是否需要办理选是，文件不做判断
+                changeToShown = true;
+                changeToMandatory = false;
+                changeToEditable = false;
+            }
+            // 附件
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = "";
+                linkedAtt.text = "";
+                linkedAtt.changeToShown = changeToShown;
+                linkedAtt.changeToMandatory = changeToMandatory;
+                linkedAtt.changeToEditable = changeToEditable;
+                attLinkResult.attMap.put("ATT_FILE_GROUP_ID", linkedAtt);
             }
         }
         return attLinkResult;

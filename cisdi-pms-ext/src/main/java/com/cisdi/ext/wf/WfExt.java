@@ -130,6 +130,15 @@ public class WfExt {
                                 "where id = ? ", contractName, csCommId);
                     }
 
+                    //一些特殊流程发起后即结束。流程名称处理
+                    List<String> endProcessList = getEndProcessList();
+                    if (endProcessList.contains(entityCode)){
+                        int update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
+                                ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
+                                ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', " +
+                                "prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                    }
+
                     // 通用方法。流程审批完后将流程名称写入该流程表名称字段
                     List<String> nameList = getTableList();
                     if (nameList.contains(entityCode)) {
@@ -1023,6 +1032,13 @@ public class WfExt {
     private List<String> getNoProjectList(){
         List<String> list = new ArrayList<>();
         list.add("PM_SEND_APPROVAL_REQ"); // 发文呈批表
+        return list;
+    }
+
+    //一些特殊流程，发起后即结束流程。
+    public List<String> getEndProcessList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_FARMING_PROCEDURES"); //农转用手续办理
         return list;
     }
 }
