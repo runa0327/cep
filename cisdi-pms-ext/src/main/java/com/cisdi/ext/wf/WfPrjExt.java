@@ -2,11 +2,14 @@ package com.cisdi.ext.wf;
 
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class WfPrjExt {
     public void parsePrjEarlyUserIdByPrj() {
@@ -64,4 +67,46 @@ public class WfPrjExt {
         ExtJarHelper.returnValue.set(userIdList);
 
     }
+
+    //招标文件经办人
+    public void pmBidApprovalReqByBid() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            String csCommId = entityRecord.csCommId;
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+            String user_id = myJdbcTemplate.queryForMap("select AD_USER_ID from PM_BID_APPROVAL_REQ where id=?", csCommId).get(
+                    "AD_USER_ID").toString();
+            ArrayList<Object> userIdList = new ArrayList<>(1);
+            userIdList.add(user_id);
+            ExtJarHelper.returnValue.set(userIdList);
+        }
+    }
+
+    //招标文件经办人所在部门负责人
+    public void getBidFileDeptUser() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            String csCommId = entityRecord.csCommId;
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+
+            String procInstId = ExtJarHelper.procInstId.get();
+            String START_USER_ID = myJdbcTemplate.queryForMap("select AD_USER_ID from PM_BID_APPROVAL_REQ where id=?", csCommId).get(
+                    "AD_USER_ID").toString();
+
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select d.chief_user_id from hr_dept_user du join " +
+                    "hr_dept d on du.HR_DEPT_ID=d.id and du.AD_USER_ID=?", START_USER_ID);
+            if (CollectionUtils.isEmpty(list) || list.get(0).get("chief_user_id") == null) {
+                throw new BaseException("该经办人没有对应的部门负责人！");
+            } else if (list.size() > 1) {
+                throw new BaseException("该经办人不能对应" + list.size() + "个部门负责人！");
+            }
+
+            String chief_user_id = list.get(0).get("chief_user_id").toString();
+
+            ArrayList<Object> userIdList = new ArrayList<>(1);
+            userIdList.add(chief_user_id);
+            ExtJarHelper.returnValue.set(userIdList);
+        }
+    }
+
 }

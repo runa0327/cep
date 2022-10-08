@@ -54,5 +54,8 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("PROJECT_OTHER_AMT"); // 工厂建设其他费
         entityRecord.extraEditableAttCodeList.add("PREPARE_AMT"); // 预备费
         entityRecord.extraEditableAttCodeList.add("CONSTRUCT_PERIOD_INTEREST"); // 建设期利息
+        entityRecord.extraEditableAttCodeList.add("INVESTMENT_SOURCE_ID"); // 资金来源
+        entityRecord.extraEditableAttCodeList.add("REPLY_NO_WR"); // 启动依据文号
+        entityRecord.extraEditableAttCodeList.add("FILE_ID_THREE"); // 采购启动依据文件
     }
 }

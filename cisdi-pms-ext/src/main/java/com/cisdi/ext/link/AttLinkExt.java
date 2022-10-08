@@ -75,9 +75,104 @@ public class AttLinkExt {
             return linkIS_REFER_GUARANTEE_ID(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("REASON".equals(attCode)){ // 退还原因
             return linkREASON(myJdbcTemplate, attValue, entCode,sevId);
+        } else if ("BUY_TYPE_ID".equals(attCode)){ // 招采方式
+            return linkBUY_TYPE_ID(myJdbcTemplate, attValue, entCode,sevId);
+        } else if ("BUY_START_BASIS_ID".equals(attCode)){ // 采购启动依据属性联动
+            return linkBUY_START_BASIS_ID(myJdbcTemplate, attValue, entCode,sevId);
         } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
+    }
+
+    //采购启动依据属性联动
+    private AttLinkResult linkBUY_START_BASIS_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        if ("PM_BUY_DEMAND_REQ".equals(entCode)){ //采购需求审批
+            //99952822476385260=会议纪要，99952822476385261=其他
+            Boolean changeToEditable = false; //是否可改
+            Boolean changeToMandatory = false; //是否必填
+            String value = "";
+            String text = "";
+            String projectId = "";
+            if ("99952822476385260".equals(attValue) || "99952822476385261".equals(attValue)){
+                changeToEditable = true;
+                changeToMandatory = true;
+                value = null;
+                text = null;
+                //采购启动依据文件
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToMandatory = true;
+                    linkedAtt.changeToEditable = true;
+                    attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
+                }
+            } else {
+                // 99952822476385257 = 立项，99952822476385258=可研，99952822476385259=初概
+                String sql = "";
+                String fileValue = "";
+                if ("99952822476385257".equals(attValue)){
+                    sql = "select CONSTRUCTION_PROJECT_CODE as REPLY_NO_WR,REPLY_FILE as file from pm_prj_req WHERE name = (select name from pm_prj WHERE id = ?) and `STATUS` = 'ap' order by CRT_DT desc limit 1";
+                } else if ("99952822476385258".equals(attValue)){
+                    sql = "select REPLY_NO_WR,REPLY_FILE as file from PM_PRJ_INVEST1 WHERE pm_prj_id = ? and status = 'ap' order by CRT_DT desc limit 1";
+                } else if ("99952822476385259".equals(attValue)){
+                    sql = "select REPLY_NO_WR,REPLY_FILE as file from PM_PRJ_INVEST2 WHERE pm_prj_id = ? and status = 'ap' order by CRT_DT desc limit 1";
+                }
+                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql,projectId);
+                if (!CollectionUtils.isEmpty(list2)){
+                    value = JdbcMapUtil.getString(list2.get(0),"REPLY_NO_WR");
+                    text = value;
+                    fileValue = JdbcMapUtil.getString(list2.get(0),"file");
+                } else {
+                    fileValue = null;
+                }
+                //采购启动依据文件
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.text = fileValue;
+                    getFileInfoList(linkedAtt);
+                    linkedAtt.changeToMandatory = false;
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
+                }
+            }
+            //启动依据文号
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = value;
+                linkedAtt.text = text;
+                linkedAtt.changeToMandatory = changeToMandatory;
+                linkedAtt.changeToEditable = changeToEditable;
+                attLinkResult.attMap.put("REPLY_NO_WR", linkedAtt);
+            }
+        }
+        return attLinkResult;
+    }
+
+    //招采方式 属性联动
+    private AttLinkResult linkBUY_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        // 99952822476385221=公开招标,99952822476385222=竞争性磋商,99952822476385223=竞争性谈判
+        if ("PM_BID_APPROVAL_REQ".equals(entCode)){ //招标文件审批
+            Boolean changeToMandatory = false; //必填
+            if ("99952822476385221".equals(attValue) || "99952822476385222".equals(attValue) || "99952822476385223".equals(attValue)){
+                changeToMandatory = true;
+            }
+            //BID_AGENCY
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToMandatory = changeToMandatory;
+                attLinkResult.attMap.put("BID_AGENCY", linkedAtt);
+            }
+        }
+        return attLinkResult;
     }
 
     //退还原因属性联动
@@ -399,8 +494,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(resultRow, "REPLY_NO");
-            linkedAtt.text = JdbcMapUtil.getString(resultRow, "REPLY_NO");
+            linkedAtt.value = JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
+            linkedAtt.text = JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
             attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
             attLinkResult.attMap.put("REPLY_NO", linkedAtt);
         }
@@ -1848,8 +1943,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(resultRow, "REPLY_NO");
-            linkedAtt.text = JdbcMapUtil.getString(resultRow, "REPLY_NO");
+            linkedAtt.value = JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
+            linkedAtt.text = JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
 
             attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
             attLinkResult.attMap.put("REPLY_NO", linkedAtt);
@@ -2388,16 +2483,16 @@ public class AttLinkExt {
     private Map getReplyNo(String attValue) {
         Map resultRow = new HashMap();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql1 = "SELECT REPLY_NO FROM PM_PRJ_INVEST3 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+        String sql1 = "SELECT REPLY_NO_WR FROM PM_PRJ_INVEST3 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
         List<Map<String, Object>> map = myJdbcTemplate.queryForList(sql1, attValue);
         List<Map<String, Object>> map1 = new ArrayList<>();
         List<Map<String, Object>> map2 = new ArrayList<>();
         if (CollectionUtils.isEmpty(map)) {
             // 初设概算信息
-            String sql2 = "SELECT REPLY_NO FROM PM_PRJ_INVEST2 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+            String sql2 = "SELECT REPLY_NO_WR FROM PM_PRJ_INVEST2 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
             map1 = myJdbcTemplate.queryForList(sql2, attValue);
             if (CollectionUtils.isEmpty(map1)) {
-                String sql3 = "SELECT REPLY_NO FROM PM_PRJ_INVEST1 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+                String sql3 = "SELECT REPLY_NO_WR FROM PM_PRJ_INVEST1 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
                 map2 = myJdbcTemplate.queryForList(sql3, attValue);
                 if (!CollectionUtils.isEmpty(map2)) {
                     resultRow = map2.get(0);

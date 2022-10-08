@@ -945,6 +945,11 @@ public class WfExt {
         list.add("PM_SUPERVISE_NOTICE_REQ"); // 监理通知单
         list.add("PM_SUPERVISE_NOTICE_REPLY_REQ"); // 监理通知回复单
         list.add("PM_START_ORDER_REQ"); // 开工令
+        list.add("PM_BUY_DEMAND_REQ"); // 采购需求审批
+        list.add("PM_BID_APPROVAL_REQ"); // 招标文件审批
+        list.add("PM_FILE_CHAPTER_REQ"); // 标前资料用印审批
+        list.add("PM_USE_CHAPTER_REQ"); // 中选单位及标后用印审批
+        list.add("PM_BID_KEEP_FILE_REQ"); // 招采项目备案及归档
         return list;
     }
 
