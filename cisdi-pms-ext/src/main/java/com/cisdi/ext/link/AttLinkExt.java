@@ -261,8 +261,8 @@ public class AttLinkExt {
             Boolean changeToMandatory = false; //是否必填
             String value = "";
             String text = "";
-//            String projectId = param.valueMap.get("PM_PRJ_ID").toString();
-            String projectId = "";
+            String projectId = param.valueMap.get("PM_PRJ_ID").toString();
+//            String projectId = "";
             if ("99952822476385260".equals(attValue) || "99952822476385261".equals(attValue)){
                 changeToEditable = true;
                 changeToMandatory = true;
@@ -274,7 +274,7 @@ public class AttLinkExt {
                     linkedAtt.type = AttDataTypeE.TEXT_LONG;
                     linkedAtt.value = null;
                     linkedAtt.text = null;
-                    linkedAtt.changeToMandatory = true;
+                    linkedAtt.changeToMandatory = false;
                     linkedAtt.changeToEditable = true;
                     attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
                 }
@@ -300,7 +300,7 @@ public class AttLinkExt {
                 //采购启动依据文件
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.type = AttDataTypeE.FILE_GROUP;
                     linkedAtt.value = fileValue;
                     getFileInfoList(linkedAtt);
                     linkedAtt.changeToMandatory = false;
