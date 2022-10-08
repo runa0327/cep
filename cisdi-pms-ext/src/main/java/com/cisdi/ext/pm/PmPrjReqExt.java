@@ -148,13 +148,7 @@ public class PmPrjReqExt {
         // 项目申请材料
         String reqFile = JdbcMapUtil.getString(pm_prj_req, "PRJ_REQ_FILE");
         ProFileUtils.insertProFile(newPrjId, reqFile, FileCodeEnum.PRJ_REQ_FILE);
-        // 盖章立项申请书
-        String applyBook = JdbcMapUtil.getString(pm_prj_req, "STAMPED_PRJ_REQ_FILE");
-        ProFileUtils.insertProFile(newPrjId, applyBook, FileCodeEnum.STAMPED_PRJ_REQ_FILE);
 
-        // 批复文件
-        String reply = JdbcMapUtil.getString(pm_prj_req, "REPLY_FILE");
-        ProFileUtils.insertProFile(newPrjId, reply, FileCodeEnum.REPLY_FILE);
     }
 
     private void createInvestEstDtl(Map<String, Object> pm_prj_req, String newInvestEtsId, String colName) {
@@ -233,11 +227,25 @@ public class PmPrjReqExt {
         String replyFile = entityRecord.valueMap.get("REPLY_FILE").toString();
         // 资金来源
         String investmentSourceId = entityRecord.valueMap.get("INVESTMENT_SOURCE_ID").toString();
+        //前期岗
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        //工程项目编号
+        String code = entityRecord.valueMap.get("CONSTRUCTION_PROJECT_CODE").toString();
 
         // 修改项目建设年限信息：
         Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("PRJ_REPLY_DATE", replyDate)
-                .set("PRJ_REPLY_NO", replyNo).set("PRJ_REPLY_FILE", replyFile).set("INVESTMENT_SOURCE_ID", investmentSourceId).exec();
+                .set("PRJ_REPLY_NO", replyNo).set("PRJ_REPLY_FILE", replyFile).set("INVESTMENT_SOURCE_ID", investmentSourceId)
+                .set("PRJ_EARLY_USER_ID",userId).set("PRJ_CODE",code).exec();
         log.info("已更新：{}", exec);
+
+        //同步立项后续文件
+        // 盖章立项申请书
+        String applyBook = JdbcMapUtil.getString(entityRecord.valueMap, "STAMPED_PRJ_REQ_FILE");
+        ProFileUtils.insertProFile(projectId, applyBook, FileCodeEnum.STAMPED_PRJ_REQ_FILE);
+
+        // 批复文件
+        String reply = JdbcMapUtil.getString(entityRecord.valueMap, "REPLY_FILE");
+        ProFileUtils.insertProFile(projectId, reply, FileCodeEnum.REPLY_FILE);
     }
 
     /**

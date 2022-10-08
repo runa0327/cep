@@ -52,7 +52,7 @@ public class AttLinkExt {
         } else if ("BIDDING_NAME_ID".equals(attCode)) {
             return linkForBIDDING_NAME_ID(myJdbcTemplate, attValue, sevId);
         } else if ("CONTRACT_ID".equals(attCode)) {
-            return linkForCONTRACT_ID(myJdbcTemplate, attValue, sevId);
+            return linkForCONTRACT_ID(myJdbcTemplate, attValue, sevId,entCode);
         } else if (("RELATION_CONTRACT_ID").equals(attCode)) {
             return linkForRELATION_CONTRACT_ID(myJdbcTemplate, attValue,sevId,entCode);
         } else if ("GUARANTEE_ID".equals(attCode)) {
@@ -65,13 +65,76 @@ public class AttLinkExt {
             return linkForRELATION_AMOUT_PLAN_REQ_ID(myJdbcTemplate, attValue, entCode);
         } else if ("PAY_BASIS_ID".equals(attCode)){ //付款依据属性联动
             return linkPAY_BASIS_ID(myJdbcTemplate, attValue, entCode,sevId);
+        } else if ("YES_NO_ONE".equals(attCode)){ // 是否判断
+            return linkYES_NO_ONE(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("YES_NO_THREE".equals(attCode)){ // 是否判断
             return linkYES_NO_THREE(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("YES_NO_TWO".equals(attCode)){ // 有无判断
             return linkYES_NO_TWO(myJdbcTemplate, attValue, entCode,sevId);
+        } else if ("IS_REFER_GUARANTEE_ID".equals(attCode)){ // 是否涉及保函
+            return linkIS_REFER_GUARANTEE_ID(myJdbcTemplate, attValue, entCode,sevId);
+        } else if ("REASON".equals(attCode)){ // 退还原因
+            return linkREASON(myJdbcTemplate, attValue, entCode,sevId);
         } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
+    }
+
+    //退还原因属性联动
+    private AttLinkResult linkREASON(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        // 99902212142025881 = 到期申请退还，之后续保,99902212142025882=达到退保条件，申请退保,99902212142025883=其他
+        Boolean changeToMandatory = true;
+        Boolean changeToEditable = true;
+        if ("99902212142025881".equals(attValue)){
+            changeToMandatory = false;
+            changeToEditable = false;
+        }
+        //原因说明
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            linkedAtt.changeToMandatory = changeToMandatory;
+            linkedAtt.changeToEditable = changeToEditable;
+            attLinkResult.attMap.put("REASON_EXPLAIN", linkedAtt);
+        }
+        return attLinkResult;
+    }
+
+    //是否涉及保函 属性联动
+    private AttLinkResult linkIS_REFER_GUARANTEE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        // 99902212142031851 = 是 ，99902212142031855 = 否
+        Boolean changeToShown = true;
+        Boolean changeToMandatory = true;
+        Boolean changeToEditable = true;
+
+        List<String> baohanList = getBaoHanList();
+        if (baohanList.contains(entCode)){
+            if ("99902212142031855".equals(attValue)){ //隐藏保函类型
+                changeToShown = false;
+                changeToMandatory = false;
+                changeToEditable = false;
+            } else { //显示保函类型
+                changeToShown = true;
+                changeToMandatory = true;
+                changeToEditable = true;
+            }
+            //保函类型
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToShown = changeToShown;
+                linkedAtt.changeToMandatory = changeToMandatory;
+                linkedAtt.changeToEditable = changeToEditable;
+                attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_IDS", linkedAtt);
+            }
+        }
+        return attLinkResult;
     }
 
     // 有 无  属性联动
@@ -103,6 +166,34 @@ public class AttLinkExt {
                     linkedAtt.changeToEditable = true;
                     attLinkResult.attMap.put("DATE_ONE", linkedAtt);
                 }
+            }
+        }
+        return attLinkResult;
+    }
+
+    // 是否属性联动
+    private AttLinkResult linkYES_NO_ONE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        Boolean changeToShown = true;
+        Boolean changeToMandatory = true;
+        Boolean changeToEditable = true;
+        if ("PM_FARMING_PROCEDURES".equals(entCode)){ //农转用手续办理
+            // 99799190825080669 = 是， 99799190825080670 = 否
+            if (!"99799190825080670".equals(attValue)) {  // 是否需要办理选是，文件不做判断
+                changeToShown = true;
+                changeToMandatory = false;
+                changeToEditable = false;
+            }
+            // 附件
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = "";
+                linkedAtt.text = "";
+                linkedAtt.changeToShown = changeToShown;
+                linkedAtt.changeToMandatory = changeToMandatory;
+                linkedAtt.changeToEditable = changeToEditable;
+                attLinkResult.attMap.put("ATT_FILE_GROUP_ID", linkedAtt);
             }
         }
         return attLinkResult;
@@ -274,7 +365,7 @@ public class AttLinkExt {
         // 资金需求项目名称(AMOUT_PM_PRJ_ID),引用（单值）
         // 项目基础信息
         List<Map<String, Object>> list = myJdbcTemplate
-                .queryForList("select t.code prj_code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
+                .queryForList("select t.PRJ_CODE as prj_code,t.code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
                         "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,st.id st_id,st.name st_name," +
                         "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
                         "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.PRJ_CODE, " +
@@ -981,13 +1072,13 @@ public class AttLinkExt {
         return attLinkResult;
     }
 
-    private AttLinkResult linkForCONTRACT_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String sevId) {
+    private AttLinkResult linkForCONTRACT_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String sevId,String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
 
         // 根据id查询招投标信息
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTRACT_CODE, CONTRACT_CATEGORY_ID, CONTRACT_NAME, CONTRACT_PRICE, " +
                 "BIDDING_NAME_ID,PMS_RELEASE_WAY_ID,BID_CTL_PRICE_LAUNCH,PURCHASE_TYPE,WIN_BID_UNIT_TXT,WINNING_BIDS_AMOUNT,PLAN_TOTAL_DAYS," +
-                "IS_REFER_GUARANTEE,GUARANTEE_LETTER_TYPE_IDS,IS_TEMPLATE " +
+                "IS_REFER_GUARANTEE_ID,GUARANTEE_LETTER_TYPE_IDS,IS_TEMPLATE " +
                 "from po_order_req where id = ?", attValue);
 
         if (CollectionUtils.isEmpty(list)) {
@@ -1066,18 +1157,32 @@ public class AttLinkExt {
             linkedAtt.text = JdbcMapUtil.getString(row, "PLAN_TOTAL_DAYS");
             attLinkResult.attMap.put("CONTRACT_DAYS", linkedAtt);
         }
+
+        //保函逻辑可改
+        List<String> editGuarantee = getEditGuarantee();
+        Boolean editIsBaoHan = true;  //是否涉及保函可改
+        Boolean editHaoHanType = true; //保函类型可改
+        Boolean editIsBaoHanMust = true; //是否涉及保函必填
+        Boolean editHaoHanTypeMust = true; //保函类型必填
+        if (editGuarantee.contains(entCode)){
+            editIsBaoHan = false;
+            editHaoHanType = false;
+            editIsBaoHanMust = false;
+            editHaoHanTypeMust = false;
+        }
+
         // 是否涉及保函
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-//                linkedAtt.value = JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE")==null?null:JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE").toString();
-            String code = JdbcMapUtil.getString(row, "IS_REFER_GUARANTEE");
-            Map<String, Object> idMap = myJdbcTemplate.queryForMap("SELECT v.id id FROM gr_set_value v left " +
-                            "join gr_set k on v.GR_SET_ID = k.id where k.`CODE` = 'is_refer_guarantee' and v.`CODE` = ?",
-                    code);
-            linkedAtt.value = idMap.get("id").toString();
-            linkedAtt.text = idMap.get("id").toString();
-//                linkedAtt.text = BooleanUtil.toText(JdbcMapUtil.getBoolean(row,"IS_REFER_GUARANTEE"));
+            String code = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "IS_REFER_GUARANTEE_ID")) ? "0":JdbcMapUtil.getString(row, "IS_REFER_GUARANTEE_ID");
+            List<Map<String, Object>> idMap = myJdbcTemplate.queryForList("SELECT v.id id FROM gr_set_value v left join gr_set k on v.GR_SET_ID = k.id where k.`CODE` = 'is_refer_guarantee' and v.`id` = ?", code);
+            if (!CollectionUtils.isEmpty(idMap)){
+                linkedAtt.value = JdbcMapUtil.getString(idMap.get(0),"id");
+                linkedAtt.text = JdbcMapUtil.getString(idMap.get(0),"id");
+                linkedAtt.changeToEditable = editIsBaoHan;
+                linkedAtt.changeToMandatory = editIsBaoHanMust;
+            }
             attLinkResult.attMap.put("IS_REFER_GUARANTEE_ID", linkedAtt);
         }
         // 保函类型
@@ -1086,25 +1191,11 @@ public class AttLinkExt {
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
             linkedAtt.value = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_IDS");
             linkedAtt.text = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_IDS");
+            linkedAtt.changeToEditable = editHaoHanType;
+            linkedAtt.changeToMandatory = editHaoHanTypeMust;
             attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_ID", linkedAtt);
             attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_IDS", linkedAtt);
         }
-        // 相对方联系人
-//        {
-//            LinkedAtt linkedAtt = new LinkedAtt();
-//            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-//            linkedAtt.value = JdbcMapUtil.getString(row, "OPPO_SITE_LINK_MAN");
-//            linkedAtt.text = JdbcMapUtil.getString(row, "OPPO_SITE_LINK_MAN");
-//            attLinkResult.attMap.put("OPPO_SITE_LINK_MAN", linkedAtt);
-//        }
-        // 相对电话
-//        {
-//            LinkedAtt linkedAtt = new LinkedAtt();
-//            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-//            linkedAtt.value = JdbcMapUtil.getString(row, "OPPO_SITE_CONTACT");
-//            linkedAtt.text = JdbcMapUtil.getString(row, "OPPO_SITE_CONTACT");
-//            attLinkResult.attMap.put("OPPO_SITE_CONTACT", linkedAtt);
-//        }
         // 是否标准模板
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -1196,6 +1287,39 @@ public class AttLinkExt {
             attLinkResult.childCreatable.put("99902212142514118", false);
             attLinkResult.childClear.put("99902212142514118", true);
         }
+
+        //需要带出相对方联系人明细的实体试图
+        List<String> contactDetailList = getContactDetailList();
+        //需要带出联系人明细的实体试图(只读)
+        List<String> contactListRead = getContactListRead();
+        //联系人明细信息
+        if (contactDetailList.contains(sevId)) {
+            String viewId = "";
+            if ("99902212142025475".equals(sevId)){
+                viewId = "99952822476384659"; //合同终止联系人明细试图部门id
+            }
+            //查询明细信息
+            String sql2 = "select * from CONTRACT_SIGNING_CONTACT where PARENT_ID = ?";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,attValue);
+            List<LinkedRecord> linkedRecordList = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(list2)){
+                for (Map<String, Object> tmp : list2) {
+                    LinkedRecord linkedRecord = new LinkedRecord();
+                    //相对方联系人
+                    String CONTRACT_SIGNING_CONTACT = tmp.get("OPPO_SITE_LINK_MAN").toString();
+                    linkedRecord.valueMap.put("OPPO_SITE_LINK_MAN", CONTRACT_SIGNING_CONTACT);
+                    linkedRecord.textMap.put("OPPO_SITE_LINK_MAN", CONTRACT_SIGNING_CONTACT);
+                    //相对方联系方式
+                    String OPPO_SITE_CONTACT = tmp.get("OPPO_SITE_CONTACT").toString();
+                    linkedRecord.valueMap.put("OPPO_SITE_CONTACT", OPPO_SITE_CONTACT);
+                    linkedRecord.textMap.put("OPPO_SITE_CONTACT", OPPO_SITE_CONTACT);
+                    linkedRecordList.add(linkedRecord);
+                }
+                attLinkResult.childData.put(viewId, linkedRecordList);
+            }
+            attLinkResult.childCreatable.put(viewId, false);
+            attLinkResult.childClear.put(viewId, true);
+        }
         return attLinkResult;
     }
 
@@ -1227,14 +1351,14 @@ public class AttLinkExt {
                     LinkedRecord linkedRecord = new LinkedRecord();
 
                     // 费用类型
-                    linkedRecord.valueMap.put("COST_TYPE_TREE_ID", tmp.get("COST_TYPE_TREE_ID").toString());
-                    linkedRecord.textMap.put("COST_TYPE_TREE_ID", tmp.get("COST_TYPE_TREE_ID").toString());
+                    linkedRecord.valueMap.put("COST_TYPE_TREE_ID", JdbcMapUtil.getString(tmp,"COST_TYPE_TREE_ID"));
+                    linkedRecord.textMap.put("COST_TYPE_TREE_ID", JdbcMapUtil.getString(tmp,"COST_TYPE_TREE_ID"));
                     // 费用明细
-                    linkedRecord.valueMap.put("FEE_DETAIL", tmp.get("FEE_DETAIL"));
-                    linkedRecord.textMap.put("FEE_DETAIL", tmp.get("FEE_DETAIL").toString());
+                    linkedRecord.valueMap.put("FEE_DETAIL", JdbcMapUtil.getString(tmp,"FEE_DETAIL"));
+                    linkedRecord.textMap.put("FEE_DETAIL", JdbcMapUtil.getString(tmp,"FEE_DETAIL"));
                     // 费用金额
-                    linkedRecord.valueMap.put("TOTAL_AMT", tmp.get("TOTAL_AMT"));
-                    linkedRecord.textMap.put("TOTAL_AMT", tmp.get("TOTAL_AMT").toString());
+                    linkedRecord.valueMap.put("TOTAL_AMT", JdbcMapUtil.getString(tmp,"TOTAL_AMT"));
+                    linkedRecord.textMap.put("TOTAL_AMT", JdbcMapUtil.getString(tmp,"TOTAL_AMT"));
 
                     linkedRecordList.add(linkedRecord);
                 }
@@ -1491,7 +1615,7 @@ public class AttLinkExt {
 
         // 项目基础信息
         List<Map<String, Object>> list = myJdbcTemplate
-                .queryForList("select t.code prj_code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
+                .queryForList("select t.PRJ_CODE as prj_code,t.code code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
                         "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,st.id st_id,st.name st_name," +
                         "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
                         "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.BUILDING_AREA, " +
@@ -2302,5 +2426,36 @@ public class AttLinkExt {
         keyList.add("BUDGET_REVIEW_COMPLETED"); // 预算评审完成情况
         keyList.add("CONSTRUCT_BID_COMPLETED"); // 施工招标备案完成情况
         return keyList;
+    }
+
+    //属性联动中包含类型联动隐藏的list
+    public List<String> getBaoHanList() {
+        List<String> baoHanList = new ArrayList<>();
+        baoHanList.add("PO_ORDER_REQ"); //合同签订
+        baoHanList.add("PO_ORDER_TERMINATE_REQ"); //采购合同终止申请
+        baoHanList.add("PO_ORDER_CHANGE_REQ"); //采购合同变更申请
+        baoHanList.add("PO_ORDER_SUPPLEMENT_REQ"); //采购合同补充协议申请
+        return baoHanList;
+    }
+
+    //合同关联信息里，保函可改的流程
+    public List<String> getEditGuarantee() {
+        List<String> editGuarantee = new ArrayList<>();
+        editGuarantee.add("PO_ORDER_TERMINATE_REQ"); //采购合同终止申请
+        return editGuarantee;
+    }
+
+    // 相对方联系人 只读
+    public List<String> getContactListRead() {
+        List<String> list = new ArrayList<>();
+        list.add("99902212142025475"); // 采购合同终止申请--填写项目信息及合同变更信息
+        return list;
+    }
+
+    // 需要带出相对方联系人明细的实体试图
+    public List<String> getContactDetailList() {
+        List<String> list = new ArrayList<>();
+        list.add("99902212142025475"); // 采购合同终止申请--填写项目信息及合同变更信息
+        return list;
     }
 }

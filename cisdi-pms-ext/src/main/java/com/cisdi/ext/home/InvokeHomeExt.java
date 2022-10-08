@@ -21,11 +21,12 @@ public class InvokeHomeExt {
                 "where p.status = 'AP'\n" +
                 "group by v.id");
         int total = projectPhaseList.stream().mapToInt(item -> Integer.parseInt(item.get("num").toString())).sum();
-        HashMap<String, Object> totals = new HashMap<>();
-        totals.put("项目总数", total);
-        projectPhaseList.add(totals);
+//        HashMap<String, Object> totals = new HashMap<>();
+//        totals.put("项目总数", total);
+//        projectPhaseList.add(totals);
         HashMap<String, Object> result = new HashMap<>();
         result.put("statistics", projectPhaseList);
+        result.put("total",total);
         // 返回输出：
         // 转换为Map再设置到返回值；若直接将对象设置到返回值，调试时（通过MQ返回给平台）可能无法解析出相应的类：
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
@@ -42,10 +43,12 @@ public class InvokeHomeExt {
                 "group by v.id");
         int total = projectPhaseList.stream().mapToInt(item -> Integer.parseInt(item.get("num").toString())).sum();
         HashMap<String, Object> totals = new HashMap<>();
-        totals.put("项目总数", total);
-        projectPhaseList.add(totals);
+//        totals.put("项目总数", total);
+//        projectPhaseList.add(totals);
         HashMap<String, Object> result = new HashMap<>();
         result.put("statistics", projectPhaseList);
+        result.put("total",total);
+
         // 返回输出：
         // 转换为Map再设置到返回值；若直接将对象设置到返回值，调试时（通过MQ返回给平台）可能无法解析出相应的类：
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);

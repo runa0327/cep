@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class WfExt {
@@ -40,7 +39,6 @@ public class WfExt {
     public void changeStatusToAp() {
         String newStatus = "AP";
         changeStatus(newStatus);
-        saveFile();
     }
 
     public void changeStatusToDn() {
@@ -58,6 +56,9 @@ public class WfExt {
         changeStatus(newStatus);
     }
 
+    public void syncFile(){
+        saveFile();
+    }
     private void changeStatus(String newStatus) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         SevInfo sevInfo = ExtJarHelper.sevInfo.get();
@@ -127,6 +128,15 @@ public class WfExt {
                         // 写入到补充合同表
                         int update1 = myJdbcTemplate.update("update PO_ORDER_SUPPLEMENT_REQ set CONTRACT_NAME = ?  " +
                                 "where id = ? ", contractName, csCommId);
+                    }
+
+                    //一些特殊流程发起后即结束。流程名称处理
+                    List<String> endProcessList = getEndProcessList();
+                    if (endProcessList.contains(entityCode)){
+                        int update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
+                                ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
+                                ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', " +
+                                "prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
                     }
 
                     // 通用方法。流程审批完后将流程名称写入该流程表名称字段
@@ -448,15 +458,15 @@ public class WfExt {
             //可研申请材料
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"PM_PRJ_FILE"),FileCodeEnum.PM_PRJ_FILE);
             //修编稿文件
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KY_REVISION_FILE"),FileCodeEnum.KY_REVISION_FILE);
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REVISION_FILE"),FileCodeEnum.KY_REVISION_FILE);
             //评审报告文件
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KY_REVIEW_DRAFT_FILE"),FileCodeEnum.KY_REVIEW_DRAFT_FILE);
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REVIEW_DRAFT_FILE"),FileCodeEnum.KY_REVIEW_DRAFT_FILE);
             //评审稿文件
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KY_REVIEW_REPORT_FILE"),FileCodeEnum.KY_REVIEW_REPORT_FILE);
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REVIEW_REPORT_FILE"),FileCodeEnum.KY_REVIEW_REPORT_FILE);
             //专家意见文件
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"KY_EXPERT_FILE"),FileCodeEnum.KY_EXPERT_FILE);
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"EXPERT_FILE"),FileCodeEnum.KY_EXPERT_FILE);
             //可研批复文件
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"FEASIBLE_REPLY_FILE"),FileCodeEnum.FEASIBLE_REPLY_FILE);
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"REPLY_FILE"),FileCodeEnum.FEASIBLE_REPLY_FILE);
         }
 
         //施工许可
@@ -934,6 +944,7 @@ public class WfExt {
         list.add("PM_SEND_APPROVAL_REQ"); // 发文呈批表
         list.add("PM_SUPERVISE_NOTICE_REQ"); // 监理通知单
         list.add("PM_SUPERVISE_NOTICE_REPLY_REQ"); // 监理通知回复单
+        list.add("PM_START_ORDER_REQ"); // 开工令
         return list;
     }
 
@@ -1021,6 +1032,13 @@ public class WfExt {
     private List<String> getNoProjectList(){
         List<String> list = new ArrayList<>();
         list.add("PM_SEND_APPROVAL_REQ"); // 发文呈批表
+        return list;
+    }
+
+    //一些特殊流程，发起后即结束流程。
+    public List<String> getEndProcessList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_FARMING_PROCEDURES"); //农转用手续办理
         return list;
     }
 }

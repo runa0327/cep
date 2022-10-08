@@ -4,7 +4,9 @@ import com.cisdi.ext.util.DateTimeUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
@@ -97,5 +99,59 @@ public class PoOrderTerminateReqExt {
                     .set("APPROVAL_USER_FIVE", userId).set("APPROVAL_DATE_FIVE", now).set("LEADER_APPROVE_COMMENT", comment).exec();
             log.info("已更新：{}", exec);
         }
+    }
+
+    //合同终止数据写入
+    public void createContractExtra() {
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        try {
+            Map<String, Object> contractDataMap = myJdbcTemplate.queryForMap("select * from PO_ORDER_TERMINATE_REQ where ID=?", csCommId);
+            String id = Crud.from("PO_ORDER").insertData();
+            insertContract(id, contractDataMap,entityRecord);
+            //查询联系人明细
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList("select OPPO_SITE_LINK_MAN,OPPO_SITE_CONTACT from CONTRACT_END_CONTACT where PARENT_ID = ?",csCommId);
+            if (!CollectionUtils.isEmpty(list2)){
+                insertContacts(id,list2);
+            }
+        } catch (Exception e) {
+            throw new BaseException("查询合同申请数据异常！", e);
+        }
+    }
+
+    //联系人明细信息
+    private void insertContacts(String id, List<Map<String, Object>> list2) {
+        String now = DateTimeUtil.dttmToString(new Date());
+        list2.forEach(item -> {
+            String did = Crud.from("PO_ORDER_CONTACTS").insertData();
+            Crud.from("PO_ORDER_CONTACTS").where().eq("ID", did).update()
+                    .set("OPPO_SITE_LINK_MAN", JdbcMapUtil.getString(item, "OPPO_SITE_LINK_MAN"))
+                    .set("OPPO_SITE_CONTACT", JdbcMapUtil.getString(item, "OPPO_SITE_CONTACT"))
+                    .set("PARENT_ID", id)
+                    .set("CRT_DT",now)
+                    .exec();
+        });
+    }
+
+    private void insertContractDet(String id, List<Map<String, Object>> detailList) {
+    }
+
+    private void insertContract(String id, Map<String, Object> data,EntityRecord entityRecord) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //查询合同名称
+        Map<String,Object> map = myJdbcTemplate.queryForMap("select name from PO_ORDER_REQ where id = ?",entityRecord.valueMap.get("CONTRACT_ID").toString());
+        String name = map.get("name").toString();
+        Crud.from("PO_ORDER").where().eq("ID", id).update()
+                .set("NAME", name)
+                .set("REMARK", JdbcMapUtil.getString(data, "REMARK"))
+                .set("CONTRACT_AMOUNT", JdbcMapUtil.getString(data, "CONTRACT_AMOUNT"))
+                .set("AGENT", JdbcMapUtil.getString(data, ""))
+                .set("AGENT_PHONE", JdbcMapUtil.getString(data, ""))
+                .set("FILE_ATTACHMENT_URL", JdbcMapUtil.getString(data, "ATT_FILE_GROUP_ID"))
+                .set("PM_PRJ_ID", JdbcMapUtil.getString(data, "PM_PRJ_ID"))
+                .set("CONTRACT_APP_ID",JdbcMapUtil.getString(data,"ID"))
+                .set("ORDER_PROCESS_TYPE","合同终止")
+                .exec();
     }
 }

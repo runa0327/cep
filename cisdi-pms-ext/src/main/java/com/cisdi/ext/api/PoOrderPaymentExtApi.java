@@ -1,7 +1,6 @@
 package com.cisdi.ext.api;
 
-import com.cisdi.ext.model.view.PoOrderPaymentView;
-import com.cisdi.ext.model.view.PoOrderView;
+import com.cisdi.ext.model.view.order.PoOrderPaymentView;
 import com.cisdi.ext.util.EntityUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;

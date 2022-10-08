@@ -1,6 +1,7 @@
-package com.cisdi.ext.model.view;
+package com.cisdi.ext.model.view.order;
 
 import com.cisdi.ext.model.BasePageEntity;
+import com.cisdi.ext.model.view.BaseFileView;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -38,6 +39,8 @@ public class PoOrderView extends BasePageEntity {
     public String statusName;
     // 备注
     public String remark;
+    //来源
+    public String orderProcessType;
 
     public String getId() {
         return id;
