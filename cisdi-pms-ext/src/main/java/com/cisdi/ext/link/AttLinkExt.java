@@ -82,9 +82,97 @@ public class AttLinkExt {
             return linkBUY_START_BASIS_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("PM_USE_CHAPTER_REQ_ID".equals(attCode)){ // 中标单位及标后用章属性联动
             return linkPM_USE_CHAPTER_REQ_ID(myJdbcTemplate, attValue, entCode,sevId,param);
+        } else if ("TYPE_ONE_ID".equals(attCode)){ // 关联流程或上传依据 属性联动
+            return linkTYPE_ONE_ID(myJdbcTemplate, attValue, entCode,sevId);
+        } else if ("PM_BUY_DEMAND_REQ_ID".equals(attCode)){ // 关联采购需求审批表 属性联动
+            return linkPM_BUY_DEMAND_REQ_ID(myJdbcTemplate, attValue, entCode,sevId);
         } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
+    }
+
+    private AttLinkResult linkPM_BUY_DEMAND_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        List<Map<String, Object>> bidFileCheck = myJdbcTemplate.queryForList("select a.name,a.id,a.status,s.name statusName " +
+                "from PM_BID_APPROVAL_REQ a " +
+                "left join ad_status s on s.id = a.status " +
+                "where a.PM_BUY_DEMAND_REQ_ID = ? " +
+                "order by a.CRT_DT desc " +
+                "limit 1", attValue);
+        if (CollectionUtils.isEmpty(bidFileCheck)){
+            return null;
+        }
+        Map<String, Object> bidFileCheckMap = bidFileCheck.get(0);
+        //关联招标文件审批 PM_BID_APPROVAL_REQ_ID
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(bidFileCheckMap,"id");
+            linkedAtt.text = JdbcMapUtil.getString(bidFileCheckMap, "name");
+            attLinkResult.attMap.put("PM_BID_APPROVAL_REQ_ID",linkedAtt);
+        }
+
+        //关联招标文件审批状态 STATUS_ONE
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(bidFileCheckMap,"status");
+            linkedAtt.text = JdbcMapUtil.getString(bidFileCheckMap, "statusName");
+            attLinkResult.attMap.put("STATUS_ONE",linkedAtt);
+        }
+        return attLinkResult;
+    }
+
+    private AttLinkResult linkTYPE_ONE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        if ("PM_USE_CHAPTER_REQ".equals(entCode)){//中选单位及标后用印审批
+            //99952822476386421 关联流程, 99952822476386422 上传依据
+            if ("99952822476386421".equals(attValue)){
+                //PM_BUY_DEMAND_REQ_ID 关联采购需求审批表
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToMandatory = true;
+                    linkedAtt.changeToEditable = true;
+                    attLinkResult.attMap.put("PM_BUY_DEMAND_REQ_ID", linkedAtt);
+                }
+
+                //FILE_ID_ONE 其他依据
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = null;
+                    linkedAtt.changeToMandatory = false;
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt);
+                }
+            }
+            if ("99952822476386422".equals(attValue)){
+                //PM_BUY_DEMAND_REQ_ID 关联采购需求审批表
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToMandatory = false;
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("PM_BUY_DEMAND_REQ_ID", linkedAtt);
+                }
+
+                //FILE_ID_ONE 其他依据
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = null;
+                    linkedAtt.changeToMandatory = true;
+                    linkedAtt.changeToEditable = true;
+                    attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt);
+                }
+            }
+        }
+        return attLinkResult;
     }
 
     //中标单位及标后用章属性联动
@@ -186,7 +274,7 @@ public class AttLinkExt {
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
                     linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.text = fileValue;
+                    linkedAtt.value = fileValue;
                     getFileInfoList(linkedAtt);
                     linkedAtt.changeToMandatory = false;
                     linkedAtt.changeToEditable = false;
