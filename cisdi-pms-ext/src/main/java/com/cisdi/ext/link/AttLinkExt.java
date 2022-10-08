@@ -274,8 +274,9 @@ public class AttLinkExt {
                     linkedAtt.type = AttDataTypeE.TEXT_LONG;
                     linkedAtt.value = null;
                     linkedAtt.text = null;
-                    linkedAtt.changeToMandatory = false;
+                    linkedAtt.changeToMandatory = true;
                     linkedAtt.changeToEditable = true;
+                    linkedAtt.fileInfoList = null;
                     attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
                 }
             } else {
