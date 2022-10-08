@@ -74,8 +74,7 @@ public class WfPrjExt {
         for (EntityRecord entityRecord : entityRecordList) {
             String csCommId = entityRecord.csCommId;
             MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-            String user_id = myJdbcTemplate.queryForMap("select AD_USER_ID from PM_BID_APPROVAL_REQ where id=?", csCommId).get(
-                    "AD_USER_ID").toString();
+            String user_id = myJdbcTemplate.queryForMap("select AD_USER_ID from PM_BID_APPROVAL_REQ where id=?", csCommId).get("AD_USER_ID").toString();
             ArrayList<Object> userIdList = new ArrayList<>(1);
             userIdList.add(user_id);
             ExtJarHelper.returnValue.set(userIdList);

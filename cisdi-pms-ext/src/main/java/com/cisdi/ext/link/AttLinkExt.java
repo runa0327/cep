@@ -2,6 +2,7 @@ package com.cisdi.ext.link;
 
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
@@ -78,14 +79,66 @@ public class AttLinkExt {
         } else if ("BUY_TYPE_ID".equals(attCode)){ // 招采方式
             return linkBUY_TYPE_ID(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("BUY_START_BASIS_ID".equals(attCode)){ // 采购启动依据属性联动
-            return linkBUY_START_BASIS_ID(myJdbcTemplate, attValue, entCode,sevId);
+            return linkBUY_START_BASIS_ID(myJdbcTemplate, attValue, entCode,sevId,param);
+        } else if ("PM_USE_CHAPTER_REQ_ID".equals(attCode)){ // 中标单位及标后用章属性联动
+            return linkPM_USE_CHAPTER_REQ_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
     }
 
+    //中标单位及标后用章属性联动
+    private AttLinkResult linkPM_USE_CHAPTER_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        if ("PM_BID_KEEP_FILE_REQ".equals(entCode)){ //招采项目备案及归档
+            String sql = "select BASE_SUPPLIER_ONE_IDS,AMT_ONE,CONTACTS_ONE,CONTACT_MOBILE_ONE from PM_USE_CHAPTER_REQ where id = ?";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql,attValue);
+            if (!CollectionUtils.isEmpty(list1)){
+                //中标单位名称
+                String ids = JdbcMapUtil.getString(list1.get(0),"BASE_SUPPLIER_ONE_IDS");
+                String id = StringUtil.codeToSplit(ids);
+                String sql2 = "select GROUP_CONCAT(name) as name from BASE_SUPPLIER where id in ('"+id+"')";
+                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2);
+                String name = JdbcMapUtil.getString(list2.get(0),"name");
+                //中标单位名称
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = ids;
+                    linkedAtt.text = name;
+                    attLinkResult.attMap.put("BASE_SUPPLIER_ONE_IDS", linkedAtt);
+                }
+                //投标报价(元)
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DOUBLE;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"AMT_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"AMT_ONE");
+                    attLinkResult.attMap.put("AMT_ONE", linkedAtt);
+                }
+                //联系人姓名
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"CONTACTS_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"CONTACTS_ONE");
+                    attLinkResult.attMap.put("CONTACTS_ONE", linkedAtt);
+                }
+                //联系人电话
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"CONTACT_MOBILE_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"CONTACT_MOBILE_ONE");
+                    attLinkResult.attMap.put("CONTACT_MOBILE_ONE", linkedAtt);
+                }
+            }
+        }
+        return attLinkResult;
+    }
+
     //采购启动依据属性联动
-    private AttLinkResult linkBUY_START_BASIS_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+    private AttLinkResult linkBUY_START_BASIS_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId,AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
         if ("PM_BUY_DEMAND_REQ".equals(entCode)){ //采购需求审批
             //99952822476385260=会议纪要，99952822476385261=其他
@@ -93,6 +146,7 @@ public class AttLinkExt {
             Boolean changeToMandatory = false; //是否必填
             String value = "";
             String text = "";
+//            String projectId = param.valueMap.get("PM_PRJ_ID").toString();
             String projectId = "";
             if ("99952822476385260".equals(attValue) || "99952822476385261".equals(attValue)){
                 changeToEditable = true;
@@ -1280,17 +1334,22 @@ public class AttLinkExt {
             }
             attLinkResult.attMap.put("IS_REFER_GUARANTEE_ID", linkedAtt);
         }
-        // 保函类型
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_IDS");
-            linkedAtt.text = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_IDS");
-            linkedAtt.changeToEditable = editHaoHanType;
-            linkedAtt.changeToMandatory = editHaoHanTypeMust;
-            attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_ID", linkedAtt);
-            attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_IDS", linkedAtt);
+        //关联合同不需要自动带出保函类型的流程
+        List<String> notAutoBaoHan = getNotAutoBaoHan();
+        if (!notAutoBaoHan.contains(entCode)){
+            // 保函类型
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_IDS");
+                linkedAtt.text = JdbcMapUtil.getString(row, "GUARANTEE_LETTER_TYPE_IDS");
+                linkedAtt.changeToEditable = editHaoHanType;
+                linkedAtt.changeToMandatory = editHaoHanTypeMust;
+                attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_ID", linkedAtt);
+                attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_IDS", linkedAtt);
+            }
         }
+
         // 是否标准模板
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -2551,6 +2610,13 @@ public class AttLinkExt {
     public List<String> getContactDetailList() {
         List<String> list = new ArrayList<>();
         list.add("99902212142025475"); // 采购合同终止申请--填写项目信息及合同变更信息
+        return list;
+    }
+
+    //关联合同，不需要自动带出保函类型的流程
+    public List<String> getNotAutoBaoHan() {
+        List<String> list = new ArrayList<>();
+        list.add("PO_GUARANTEE_LETTER_REQUIRE_REQ"); //新增保函
         return list;
     }
 }

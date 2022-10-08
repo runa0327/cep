@@ -1037,6 +1037,8 @@ public class WfExt {
     private List<String> getNoProjectList(){
         List<String> list = new ArrayList<>();
         list.add("PM_SEND_APPROVAL_REQ"); // 发文呈批表
+        list.add("PM_BID_KEEP_FILE_REQ"); // 招采项目备案及归档
+        list.add("PM_USE_CHAPTER_REQ"); // 中选单位及标后用印审批
         return list;
     }
 
