@@ -45,7 +45,7 @@ public class ProFileUtils {
                         .set("SEQ_NO", m.get("SEQ_NO"))
                         .set("CODE", m.get("CODE"))
                         .set("IS_TEMPLATE", "0")
-                        .set("CHIEF_USER_ID",userId)
+//                        .set("CHIEF_USER_ID",userId)
                         .exec();
             }
             createSonFolder(m, list, id, projectId, folderList);
