@@ -350,6 +350,23 @@ public enum FileCodeEnum {
     LAND_ALLOCATION_DECISION_APPLICATION_MATERIALS("APPROVE_FILE_ID_TWO","土地划拨决定书申请材料","2"),
     LAND_ALLOCATION_DECISION_REPLY("APPROVE_FILE_ID_THREE","土地划拨决定书批复","3"),
 
+    //标前资料用印审批
+    PM_FILE_CHAPTER_REQ("PM_FILE_CHAPTER_REQ","标前资料用印审批","44"),
+    PM_FILE_CHAPTER_REQ_FILE_ID_ONE("FILE_ID_ONE","招标文件","1"),
+    PM_FILE_CHAPTER_REQ_FILE_ID_TWO("FILE_ID_TWO","标前资料","2"),
+
+
+    //招标文件审批
+    PM_BID_APPROVAL_REQ("PM_BID_APPROVAL_REQ", "招标文件审批", "45"),
+    PM_BID_APPROVAL_REQ_FILE_ID_ONE("PM_BID_APPROVAL_REQ_FILE_ID_ONE", "招标文件", "1"),
+    PM_BID_APPROVAL_REQ_FILE_ID_TWO("PM_BID_APPROVAL_REQ_FILE_ID_TWO", "招标文件终稿", "2"),
+
+    //采购需求审批
+    PM_BUY_DEMAND_REQ("PM_BUY_DEMAND_REQ", "采购需求审批", "46"),
+    PM_BUY_DEMAND_REQ_FILE_ID_ONE("PM_BUY_DEMAND_REQ_FILE_ID_ONE", "采购需求说明书", "1"),
+    PM_BUY_DEMAND_REQ_FILE_ID_TWO("PM_BUY_DEMAND_REQ_FILE_ID_TWO", "采购预算表", "2"),
+    PM_BUY_DEMAND_REQ_FILE_ID_THREE("PM_BUY_DEMAND_REQ_FILE_ID_THREE", "采购启动依据文件", "3"),
+
     ;
     private final String code;
 

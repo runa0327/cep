@@ -98,7 +98,7 @@ public class ProFileUtils {
             List<String> fileIDs = Arrays.asList(fileIds.split(","));
             String userId = ExtJarHelper.loginInfo.get().userId;
             for (String fileId : fileIDs) {
-                String sql = "insert into PF_FILE (id,FL_FILE_ID,PF_FOLDER_ID,CHIEF_USER_ID) values((select UUID_SHORT()),'"+fileId+"','"+fid+"','"+userId+"')";
+                String sql = "insert into PF_FILE (id,FL_FILE_ID,PF_FOLDER_ID) values((select UUID_SHORT()),'"+fileId+"','"+fid+"')";
                 myJdbcTemplate.update(sql);
             }
         } catch (Exception e) {

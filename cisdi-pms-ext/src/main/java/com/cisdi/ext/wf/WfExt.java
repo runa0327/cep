@@ -280,6 +280,41 @@ public class WfExt {
         Map<String, Object> valueMap = entityRecord.valueMap;
         String procInstId = ExtJarHelper.procInstId.get();
 
+        //采购需求审批
+        if ("PM_BUY_DEMAND_REQ".equals(entityCode)) {
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
+            String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
+            String FILE_ID_THREE = JdbcMapUtil.getString(valueMap, "FILE_ID_THREE");
+            // 采购需求说明书
+            ProFileUtils.insertProFile(prjId, FILE_ID_ONE,FileCodeEnum.PM_BUY_DEMAND_REQ_FILE_ID_ONE);
+            // 采购预算表
+            ProFileUtils.insertProFile(prjId, FILE_ID_TWO, FileCodeEnum.PM_BUY_DEMAND_REQ_FILE_ID_TWO);
+            // 采购启动依据文件
+            ProFileUtils.insertProFile(prjId, FILE_ID_THREE, FileCodeEnum.PM_BUY_DEMAND_REQ_FILE_ID_THREE);
+        }
+
+        //招标文件审批
+        if ("PM_BID_APPROVAL_REQ".equals(entityCode)) {
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
+            String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
+            // 招标文件
+            ProFileUtils.insertProFile(prjId, FILE_ID_ONE,FileCodeEnum.PM_BID_APPROVAL_REQ_FILE_ID_ONE);
+            // 招标文件终稿
+            ProFileUtils.insertProFile(prjId, FILE_ID_TWO, FileCodeEnum.PM_BID_APPROVAL_REQ_FILE_ID_TWO);
+        }
+
+        // 标前资料用印审批
+        if ("PM_FILE_CHAPTER_REQ".equals(entityCode)) {
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE"); //招标文件
+            String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO"); //标前资料
+            // 招标文件
+            ProFileUtils.insertProFile(prjId, FILE_ID_ONE,FileCodeEnum.PM_FILE_CHAPTER_REQ_FILE_ID_ONE);
+            // 标前资料
+            ProFileUtils.insertProFile(prjId, FILE_ID_TWO, FileCodeEnum.PM_FILE_CHAPTER_REQ_FILE_ID_TWO);
+        }
 
         // 水保
         if ("PM_WATER_PLAN".equals(entityCode)) {
