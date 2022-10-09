@@ -12,6 +12,9 @@ public class WfPmInvest2Ext {
         new WfPmInvest1Ext().setComments();
     }
 
+    public void setEarlyComment() {
+        new WfPmInvest1Ext().setEarlyComment();
+    }
 
     /**
      * 插入或更新投资估算。
