@@ -147,6 +147,8 @@ public class WfExt {
                         } else if ("PO_ORDER_REQ".equals(entityCode)) {
                             String name = entityRecord.valueMap.get("CONTRACT_NAME").toString();
                             int update1 = myJdbcTemplate.update("update PM_PRJ_REQ t set t.name=? where t.id=?", name, csCommId);
+                        } else if ("PM_PRJ_STOP_ORDER_REQ".equals(entityCode)){
+                            int update1 = myJdbcTemplate.update("update PM_PRJ_STOP_ORDER_REQ t set t.name=t.REMARK_TWO where t.id=?", csCommId);
                         } else {
                             String sql1 = "select a.NAME from wf_process_instance a left join " + entityCode + " b on a.id = b.LK_WF_INST_ID where " +
                                     "b.id = ?";

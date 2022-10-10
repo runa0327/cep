@@ -2656,16 +2656,16 @@ public class AttLinkExt {
     private Map getAmtMap(String attValue) {
         Map resultRow = new HashMap();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql1 = "SELECT REPLY_NO,PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST3 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+        String sql1 = "SELECT REPLY_NO_WR,PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST3 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
         List<Map<String, Object>> map = myJdbcTemplate.queryForList(sql1, attValue);
         List<Map<String, Object>> map1 = new ArrayList<>();
         List<Map<String, Object>> map2 = new ArrayList<>();
         if (CollectionUtils.isEmpty(map)) {
             // 初设概算信息
-            String sql2 = "SELECT REPLY_NO,PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST2 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+            String sql2 = "SELECT REPLY_NO_WR,PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST2 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
             map1 = myJdbcTemplate.queryForList(sql2, attValue);
             if (CollectionUtils.isEmpty(map1)) {
-                String sql3 = "SELECT REPLY_NO,PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST1 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+                String sql3 = "SELECT REPLY_NO_WR,PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,PROJECT_OTHER_AMT,PREPARE_AMT,CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST1 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
                 map2 = myJdbcTemplate.queryForList(sql3, attValue);
                 if (!CollectionUtils.isEmpty(map2)) {
                     resultRow = map2.get(0);
