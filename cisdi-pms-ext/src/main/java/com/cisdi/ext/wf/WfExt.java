@@ -282,6 +282,14 @@ public class WfExt {
         Map<String, Object> valueMap = entityRecord.valueMap;
         String procInstId = ExtJarHelper.procInstId.get();
 
+        //工程复工令
+        if ("PM_PRJ_RESTART_ORDER_REQ".equals(entityCode)) {
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
+            // 附件
+            ProFileUtils.insertProFile(prjId, FILE_ID_ONE,FileCodeEnum.PM_PRJ_RESTART_ORDER_REQ_FILE_ID_ONE);
+        }
+
         //工程暂停令
         if ("PM_PRJ_STOP_ORDER_REQ".equals(entityCode)) {
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
@@ -1014,6 +1022,7 @@ public class WfExt {
         list.add("PM_PRJ_STOP_ORDER_REQ"); // 工程暂停令
         list.add("COMPLETION_ACCEPTANCE_COMMENTS"); // 竣工联合验收意见
         list.add("SUBCONTRACTOR_QUALIFICATION_REPORT"); // 分包单位资质报审
+        list.add("PM_PRJ_RESTART_ORDER_REQ"); // 工程复工令
         return list;
     }
 
