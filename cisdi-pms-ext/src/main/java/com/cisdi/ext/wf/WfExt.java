@@ -925,6 +925,22 @@ public class WfExt {
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_THREE"),FileCodeEnum.LAND_ALLOCATION_DECISION_REPLY);
         }
 
+        //竣工联合验收意见
+        if ("COMPLETION_ACCEPTANCE_COMMENTS".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //资料准备附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.ACCEPTANCE_PREPARE_ATTACHMENTS);
+            //备案申报附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_TWO"),FileCodeEnum.COMPLETION_ACCEPTANCE_FILING_ATTACHMENT);
+            //备案批复附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_THREE"),FileCodeEnum.FILING_APPROVAL_ATTACHMENT);
+            //资料组卷附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_FOUR"),FileCodeEnum.DATA_VOLUME_ATTACHMENT);
+            //联合意见申报
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_FIVE"),FileCodeEnum.JOINT_OPINION_DECLARATION_ATTACHMENT);
+            //联合验收批复
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_SIX"),FileCodeEnum.JOINT_ACCEPTANCE_APPROVAL_ATTACHMENT);
+        }
     }
 
     private List<String> getTableList() {
@@ -997,6 +1013,7 @@ public class WfExt {
         list.add("PM_BID_KEEP_FILE_REQ"); // 招采项目备案及归档
         list.add("PM_PRJ_STOP_ORDER_REQ"); // 工程暂停令
         list.add("COMPLETION_ACCEPTANCE_COMMENTS"); // 竣工联合验收意见
+        list.add("SUBCONTRACTOR_QUALIFICATION_REPORT"); // 分包单位资质报审
         return list;
     }
 
