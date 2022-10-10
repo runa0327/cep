@@ -367,6 +367,10 @@ public enum FileCodeEnum {
     PM_BUY_DEMAND_REQ_FILE_ID_TWO("PM_BUY_DEMAND_REQ_FILE_ID_TWO", "采购预算表", "2"),
     PM_BUY_DEMAND_REQ_FILE_ID_THREE("PM_BUY_DEMAND_REQ_FILE_ID_THREE", "采购启动依据文件", "3"),
 
+    //工程暂停令
+    PM_PRJ_STOP_ORDER_REQ("PM_PRJ_STOP_ORDER_REQ", "工程暂停令", "47"),
+    PM_PRJ_STOP_ORDER_REQ_FILE_ID_ONE("PM_PRJ_STOP_ORDER_REQ_FILE_ID_ONE", "附件", "1"),
+
     ;
     private final String code;
 

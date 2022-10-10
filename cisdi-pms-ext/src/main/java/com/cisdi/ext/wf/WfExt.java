@@ -280,6 +280,14 @@ public class WfExt {
         Map<String, Object> valueMap = entityRecord.valueMap;
         String procInstId = ExtJarHelper.procInstId.get();
 
+        //工程暂停令
+        if ("PM_PRJ_STOP_ORDER_REQ".equals(entityCode)) {
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
+            // 附件
+            ProFileUtils.insertProFile(prjId, FILE_ID_ONE,FileCodeEnum.PM_PRJ_STOP_ORDER_REQ_FILE_ID_ONE);
+        }
+
         //采购需求审批
         if ("PM_BUY_DEMAND_REQ".equals(entityCode)) {
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
@@ -985,6 +993,8 @@ public class WfExt {
         list.add("PM_FILE_CHAPTER_REQ"); // 标前资料用印审批
         list.add("PM_USE_CHAPTER_REQ"); // 中选单位及标后用印审批
         list.add("PM_BID_KEEP_FILE_REQ"); // 招采项目备案及归档
+        list.add("PM_PRJ_STOP_ORDER_REQ"); // 工程暂停令
+        list.add("COMPLETION_ACCEPTANCE_COMMENTS"); // 竣工联合验收意见
         return list;
     }
 

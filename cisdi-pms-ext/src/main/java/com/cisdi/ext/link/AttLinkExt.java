@@ -2136,6 +2136,7 @@ public class AttLinkExt {
             linkedAtt.text = JdbcMapUtil.getString(row, "PRJ_SITUATION");
 
             attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt);
+            attLinkResult.attMap.put("PRJ_INTRODUCE", linkedAtt);
         }
         // 批复文号
         Map resultRow = getReplyNo(attValue);
