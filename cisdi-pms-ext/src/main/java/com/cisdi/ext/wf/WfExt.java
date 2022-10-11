@@ -282,6 +282,30 @@ public class WfExt {
         Map<String, Object> valueMap = entityRecord.valueMap;
         String procInstId = ExtJarHelper.procInstId.get();
 
+        //施工通知单
+        if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String ATT_FILE_GROUP_ID = JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID");
+            // 附件
+            ProFileUtils.insertProFile(prjId, ATT_FILE_GROUP_ID,FileCodeEnum.PM_SUPERVISE_NOTICE_REQ_ATT_FILE_GROUP_ID);
+        }
+
+        //施工通知回复单
+        if ("PM_SUPERVISE_NOTICE_REPLY_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String ATT_FILE_GROUP_ID = JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID");
+            // 附件
+            ProFileUtils.insertProFile(prjId, ATT_FILE_GROUP_ID,FileCodeEnum.PM_SUPERVISE_NOTICE_REPLY_REQ_ATT_FILE_GROUP_ID);
+        }
+
+        //施工进度计划
+        if ("PM_BUILD_PROGRESS_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String ATT_FILE_GROUP_ID = JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID");
+            // 附件
+            ProFileUtils.insertProFile(prjId, ATT_FILE_GROUP_ID,FileCodeEnum.CONSTRUCTION_SCHEDULE_ATTACHMENT);
+        }
+
         //设计变更
         if ("PM_DESIGN_CHANGE_REQ".equals(entityCode)){
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
