@@ -282,6 +282,32 @@ public class WfExt {
         Map<String, Object> valueMap = entityRecord.valueMap;
         String procInstId = ExtJarHelper.procInstId.get();
 
+        //概念方案设计管理
+        if ("PM_CONCEPTUAL_SCHEME_DESIGN".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String DESIGN_SKETCH_FILE_ONE = JdbcMapUtil.getString(valueMap, "DESIGN_SKETCH_FILE_ONE");
+            String APPROVE_FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "APPROVE_FILE_ID_ONE");
+            String DESIGN_SKETCH_FILE_TWO = JdbcMapUtil.getString(valueMap, "DESIGN_SKETCH_FILE_TWO");
+            String APPROVE_FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "APPROVE_FILE_ID_TWO");
+            String DESIGN_SKETCH_FILE_THREE = JdbcMapUtil.getString(valueMap, "DESIGN_SKETCH_FILE_THREE");
+            String APPROVE_FILE_ID_THREE = JdbcMapUtil.getString(valueMap, "APPROVE_FILE_ID_THREE");
+            String APPROVE_FILE_ID_FOUR = JdbcMapUtil.getString(valueMap, "APPROVE_FILE_ID_FOUR");
+            // 效果图1
+            ProFileUtils.insertProFile(prjId, DESIGN_SKETCH_FILE_ONE,FileCodeEnum.CONCEPTUAL_RENDERING_ONE);
+            //概念方案设计任务书1
+            ProFileUtils.insertProFile(prjId, APPROVE_FILE_ID_ONE,FileCodeEnum.CONCEPTUAL_SCHEME_DESIGN_SPECIFICATION_ONE);
+            //效果图2
+            ProFileUtils.insertProFile(prjId, DESIGN_SKETCH_FILE_TWO,FileCodeEnum.CONCEPTUAL_RENDERING_TWO);
+            //概念方案设计任务书2
+            ProFileUtils.insertProFile(prjId, APPROVE_FILE_ID_TWO,FileCodeEnum.CONCEPTUAL_SCHEME_DESIGN_SPECIFICATION_TWO);
+            //效果图3
+            ProFileUtils.insertProFile(prjId, DESIGN_SKETCH_FILE_THREE,FileCodeEnum.CONCEPTUAL_RENDERING_THREE);
+            //概念方案设计任务书3
+            ProFileUtils.insertProFile(prjId, APPROVE_FILE_ID_THREE,FileCodeEnum.CONCEPTUAL_SCHEME_DESIGN_SPECIFICATION_THREE);
+            //概念方案设计成果
+            ProFileUtils.insertProFile(prjId, APPROVE_FILE_ID_FOUR,FileCodeEnum.CONCEPTUAL_SCHEME_DESIGN_RESULT_FILE);
+        }
+
         //工程复工报审表
         if ("PM_PRJ_RESTART_TRIAL_REQ".equals(entityCode)) {
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
