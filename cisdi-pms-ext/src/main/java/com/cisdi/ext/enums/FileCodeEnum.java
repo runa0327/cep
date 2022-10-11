@@ -392,6 +392,10 @@ public enum FileCodeEnum {
     PM_PRJ_RESTART_TRIAL_REQ("PM_PRJ_RESTART_TRIAL_REQ","工程复工报审表","51"),
     PM_PRJ_RESTART_TRIAL_REQ_FILE_ID_ONE("PM_PRJ_RESTART_TRIAL_REQ_FILE_ID_ONE","附件","1"),
 
+    //设计变更
+    PM_DESIGN_CHANGE_REQ("PM_DESIGN_CHANGE_REQ","设计变更","52"),
+    PM_DESIGN_CHANGE_REQ_ATT_FILE_GROUP_ID("PM_DESIGN_CHANGE_REQ_ATT_FILE_GROUP_ID","附件","1"),
+
     ;
     private final String code;
 

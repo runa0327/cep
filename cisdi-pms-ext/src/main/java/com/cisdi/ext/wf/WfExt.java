@@ -282,6 +282,14 @@ public class WfExt {
         Map<String, Object> valueMap = entityRecord.valueMap;
         String procInstId = ExtJarHelper.procInstId.get();
 
+        //设计变更
+        if ("PM_DESIGN_CHANGE_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String ATT_FILE_GROUP_ID = JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID");
+            // 附件
+            ProFileUtils.insertProFile(prjId, ATT_FILE_GROUP_ID,FileCodeEnum.PM_DESIGN_CHANGE_REQ_ATT_FILE_GROUP_ID);
+        }
+
         //概念方案设计管理
         if ("PM_CONCEPTUAL_SCHEME_DESIGN".equals(entityCode)){
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");

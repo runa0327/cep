@@ -65,16 +65,16 @@ public class PoOrderPaymentExt {
         }
 
         //预付款
-        String yuFu = JdbcMapUtil.getString(entityRecord.valueMap,"BUDGET_AMT");
+//        String yuFu = JdbcMapUtil.getString(entityRecord.valueMap,"BUDGET_AMT");
         //当前期数
-        String qiShu = JdbcMapUtil.getString(entityRecord.valueMap,"NOW_STAGE_ID");
-        if (!SharedUtil.isEmptyString(yuFu) && !SharedUtil.isEmptyString(qiShu)){
-            throw new BaseException("预付款和进度款只能选择一个");
-        }
+//        String qiShu = JdbcMapUtil.getString(entityRecord.valueMap,"NOW_STAGE_ID");
+//        if (!SharedUtil.isEmptyString(yuFu) && !SharedUtil.isEmptyString(qiShu)){
+//            throw new BaseException("预付款和进度款只能选择一个");
+//        }
         //预付款和进度款都为空，默认为查询进度款
-        if (SharedUtil.isEmptyString(yuFu) && SharedUtil.isEmptyString(qiShu)){
-            throw new BaseException("预付款和进度款必须选择一个");
-        }
+//        if (SharedUtil.isEmptyString(yuFu) && SharedUtil.isEmptyString(qiShu)){
+//            throw new BaseException("预付款和进度款必须选择一个");
+//        }
 
 
         // 本期支付金额
