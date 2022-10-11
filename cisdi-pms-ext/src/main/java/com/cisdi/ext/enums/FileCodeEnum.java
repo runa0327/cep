@@ -387,6 +387,11 @@ public enum FileCodeEnum {
     //分包单位资质报审
     SUBCONTRACTOR_QUALIFICATION_REPORT("SUBCONTRACTOR_QUALIFICATION_REPORT","分包单位资质报审","50"),
     QUALIFICATION_REPORT_ATTACHMENT("CONTRACT_FILE_GROUP_ID","资质报审附件","1"),
+
+    //工程复工报审表
+    PM_PRJ_RESTART_TRIAL_REQ("PM_PRJ_RESTART_TRIAL_REQ","工程复工报审表","51"),
+    PM_PRJ_RESTART_TRIAL_REQ_FILE_ID_ONE("PM_PRJ_RESTART_TRIAL_REQ_FILE_ID_ONE","附件","1"),
+
     ;
     private final String code;
 
