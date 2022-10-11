@@ -949,6 +949,13 @@ public class WfExt {
             //联合验收批复
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_SIX"),FileCodeEnum.JOINT_ACCEPTANCE_APPROVAL_ATTACHMENT);
         }
+
+        //分包单位资质报审
+        if ("SUBCONTRACTOR_QUALIFICATION_REPORT".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            //资质报审附件
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"CONTRACT_FILE_GROUP_ID"),FileCodeEnum.QUALIFICATION_REPORT_ATTACHMENT);
+        }
     }
 
     private List<String> getTableList() {
