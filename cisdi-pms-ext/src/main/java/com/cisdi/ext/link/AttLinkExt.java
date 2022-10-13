@@ -3,6 +3,7 @@ package com.cisdi.ext.link;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
@@ -285,8 +286,10 @@ public class AttLinkExt {
             Boolean changeToMandatory = false; //是否必填
             String value = "";
             String text = "";
-            String projectId = param.valueMap.get("PM_PRJ_ID").toString();
-//            String projectId = "";
+            String projectId = JdbcMapUtil.getString(param.valueMap, "PM_PRJ_ID");
+            if (Strings.isNullOrEmpty(projectId)){
+                throw new BaseException("请先选择项目！");
+            }
             if ("99952822476385260".equals(attValue) || "99952822476385261".equals(attValue)){
                 changeToEditable = true;
                 changeToMandatory = true;

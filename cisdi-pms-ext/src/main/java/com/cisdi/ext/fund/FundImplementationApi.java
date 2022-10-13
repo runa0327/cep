@@ -9,7 +9,6 @@ import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
-import com.qygly.ext.jar.helper.sql.Update;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
@@ -41,11 +40,11 @@ public class FundImplementationApi {
                 .set("FUND_CATEGORY_SECOND", fundImplementation.fundCategorySecond).set("DECLARED_AMOUNT", fundImplementation.declaredAmount)
                 .set("APPROVAL_TIME", fundImplementation.approvalTime).set("ATT_FILE_GROUP_ID", fundImplementation.attFileGroupId).exec();
         //删除明细
-        Crud.from("fund_implementation_detail").where().eq("FUND_IMP_ID", id).delete().exec();
+        Crud.from("fund_implementation_detail").where().eq("FUND_IMPLEMENTATION_ID", id).delete().exec();
         //插入明细表
         for (FundImplementationDetail detail : fundImplementation.details) {
             String detailLid = Crud.from("fund_implementation_detail").insertData();
-            Crud.from("fund_implementation_detail").where().eq("ID", detailLid).update().set("FUND_IMP_ID", id)
+            Crud.from("fund_implementation_detail").where().eq("ID", detailLid).update().set("FUND_IMPLEMENTATION_ID", id)
                     .set("PM_PRJ_ID", detail.pmPrjId).set("APPROVED_AMOUNT", detail.approvedAmount).exec();
         }
     }
@@ -59,7 +58,7 @@ public class FundImplementationApi {
                 "from fund_implementation i " +
                 "left join fund_type t1 on t1.id = i.FUND_CATEGORY_FIRST " +
                 "left join fund_type t2 on t2.id = i.FUND_CATEGORY_SECOND " +
-                "left join fund_implementation_detail d on d.FUND_IMP_ID = i.id " +
+                "left join fund_implementation_detail d on d.FUND_IMPLEMENTATION_ID = i.id " +
                 "where 1 = 1 ");
         if (!Strings.isNullOrEmpty(fundImpReq.fundSource)) {
             baseSql.append("and i.FUND_SOURCE_TEXT like '%" + fundImpReq.fundSource + "%' ");
@@ -105,7 +104,7 @@ public class FundImplementationApi {
     public void delImp() {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         FundImpReq fundImpReq = JsonUtil.fromJson(JsonUtil.toJson(inputMap), FundImpReq.class);
-        Crud.from("fund_implementation_detail").where().eq("FUND_IMP_ID", fundImpReq.id).delete().exec();
+        Crud.from("fund_implementation_detail").where().eq("FUND_IMPLEMENTATION_ID", fundImpReq.id).delete().exec();
         Crud.from("fund_implementation").where().eq("id", fundImpReq.id).delete().exec();
     }
 
@@ -119,7 +118,7 @@ public class FundImplementationApi {
                 "FROM fund_implementation i " +
                 "left join fund_type t1 on t1.id = i.FUND_CATEGORY_FIRST " +
                 "left join fund_type t2 on t2.id = i.FUND_CATEGORY_SECOND " +
-                "left join fund_implementation_detail d on d.FUND_IMP_ID = i.id " +
+                "left join fund_implementation_detail d on d.FUND_IMPLEMENTATION_ID = i.id " +
                 "WHERE i.id = ? " +
                 "GROUP BY i.id";
         Map<String, Object> impMap = myJdbcTemplate.queryForMap(sql, id);
@@ -128,7 +127,7 @@ public class FundImplementationApi {
         //落实明细
         String detailSql = "select d.id,d.PM_PRJ_ID,p.name prj_name,d.APPROVED_AMOUNT " +
                 "from fund_implementation_detail d left join pm_prj p on p.id = d.PM_PRJ_ID " +
-                "where d.FUND_IMP_ID = ?";
+                "where d.FUND_IMPLEMENTATION_ID = ?";
         List<Map<String, Object>> detailMapList = myJdbcTemplate.queryForList(detailSql, id);
         //封装
         ArrayList<FundImplementationDetail> detailList = new ArrayList<>();
