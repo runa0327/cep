@@ -24,7 +24,7 @@ import java.util.Map;
 public class PoOrderReqExt {
 
     /**
-     * 采购合同签订扩展-按照先后顺序审批-第一次审批
+     * 采购合同签订扩展-财务审批
      */
     public void checkFirst() {
         String status = "first";
@@ -32,7 +32,7 @@ public class PoOrderReqExt {
     }
 
     /**
-     * 采购合同签订扩展 审批先后顺序 第二次审批
+     * 采购合同签订扩展-法务审批
      */
     public void checkSecond() {
         String status = "second";
@@ -75,18 +75,20 @@ public class PoOrderReqExt {
         // 流程id
         String procInstId = ExtJarHelper.procInstId.get();
         // 审批意见
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select u.id u_id,u.code u_code,u.name u_name,tk.user_comment from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id", procInstId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select tk.USER_ATTACHMENT,u.id u_id,u.code u_code,u.name u_name,tk.user_comment from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id", procInstId);
         String comment = "";
+        String file = "";
         if (!CollectionUtils.isEmpty(list)) {
             comment = list.get(0).get("user_comment") == null ? null : list.get(0).get("user_comment").toString();
+            file = list.get(0).get("USER_ATTACHMENT") == null ? null : list.get(0).get("USER_ATTACHMENT").toString();
         }
         if ("first".equals(status)) {
             Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
-                    .set("APPROVAL_USER_ONE", userId).set("APPROVAL_DATE_ONE", now).set("APPROVAL_MESSAGE", comment).exec();
+                    .set("APPROVAL_USER_ONE", userId).set("APPROVAL_DATE_ONE", now).set("APPROVAL_MESSAGE", comment).set("FILE_ID_TWO",file).exec();
             log.info("已更新：{}", exec);
         } else if ("second".equals(status)) {
             Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
-                    .set("APPROVAL_USER_TWO", userId).set("APPROVAL_DATE_TWO", now).set("EARLY_COMMENT", comment).exec();
+                    .set("APPROVAL_USER_TWO", userId).set("APPROVAL_DATE_TWO", now).set("EARLY_COMMENT", comment).set("FILE_ID_THREE",file).exec();
             log.info("已更新：{}", exec);
         } else if ("third".equals(status)) {
             Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()

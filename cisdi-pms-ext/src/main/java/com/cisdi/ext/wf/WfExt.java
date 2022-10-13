@@ -282,6 +282,24 @@ public class WfExt {
         Map<String, Object> valueMap = entityRecord.valueMap;
         String procInstId = ExtJarHelper.procInstId.get();
 
+        //合同签订
+        if ("PO_ORDER_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String ATT_FILE_GROUP_ID = JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID");
+            String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
+            String FILE_ID_THREE = JdbcMapUtil.getString(valueMap, "FILE_ID_THREE");
+            String FILE_ID_FOUR = JdbcMapUtil.getString(valueMap, "FILE_ID_FOUR");
+            String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
+            String FILE_ID_FIVE = JdbcMapUtil.getString(valueMap, "FILE_ID_FIVE");
+            // 附件
+            ProFileUtils.insertProFile(prjId, ATT_FILE_GROUP_ID,FileCodeEnum.PO_ORDER_REQ_ATT_FILE_GROUP_ID);
+            ProFileUtils.insertProFile(prjId, FILE_ID_TWO,FileCodeEnum.PO_ORDER_REQ_FILE_ID_TWO);
+            ProFileUtils.insertProFile(prjId, FILE_ID_THREE,FileCodeEnum.PO_ORDER_REQ_FILE_ID_THREE);
+            ProFileUtils.insertProFile(prjId, FILE_ID_FOUR,FileCodeEnum.PO_ORDER_REQ_FILE_ID_FOUR);
+            ProFileUtils.insertProFile(prjId, FILE_ID_ONE,FileCodeEnum.PO_ORDER_REQ_FILE_ID_ONE);
+            ProFileUtils.insertProFile(prjId, FILE_ID_FIVE,FileCodeEnum.PO_ORDER_REQ_FILE_ID_FIVE);
+        }
+
         //施工通知单
         if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
@@ -1120,8 +1138,7 @@ public class WfExt {
         Object START_USER_ID = Crud.from("wf_process_instance").where().eq("id", procInstId).select().specifyCols(
                 "START_USER_ID").execForValue();
 
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select d.chief_user_id from hr_dept_user du join " +
-                "hr_dept d on du.HR_DEPT_ID=d.id and du.AD_USER_ID=?", START_USER_ID);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select d.chief_user_id from hr_dept_user du join hr_dept d on du.HR_DEPT_ID=d.id and du.AD_USER_ID=?", START_USER_ID);
         if (CollectionUtils.isEmpty(list) || list.get(0).get("chief_user_id") == null) {
             throw new BaseException("启动用户没有对应的部门负责人！");
         } else if (list.size() > 1) {
