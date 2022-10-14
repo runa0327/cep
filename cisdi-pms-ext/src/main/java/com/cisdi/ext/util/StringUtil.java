@@ -1,10 +1,14 @@
 package com.cisdi.ext.util;
 
 import com.google.common.base.Strings;
+import com.qygly.shared.util.SharedUtil;
 
 public class StringUtil {
 
     public static String codeToSplit(String str) {
+        if (SharedUtil.isEmptyString(str)){
+            return null;
+        }
         int index = str.indexOf(",");
         if (index != -1) {
             str = str.replace(",", "','");
