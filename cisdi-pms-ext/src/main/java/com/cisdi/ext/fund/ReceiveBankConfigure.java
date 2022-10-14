@@ -24,31 +24,33 @@ public class ReceiveBankConfigure {
         Map<String, Object> bankMap = ExtJarHelper.extApiParamMap.get();
         Bank bank = JsonUtil.fromJson(JsonUtil.toJson(bankMap), Bank.class);
 
-        if (checkDuplicate(bank.name, bank.parentId)) {
+        if (checkDuplicate(bank.name, bank.parentId,bank.bankType)) {
             throw new BaseException("配置名称重复！");
         }
         String id = Crud.from("RECEIVING_BANK").insertData();
         if (Strings.isNullOrEmpty(bank.parentId)){
             bank.parentId = null;
         }
-        Crud.from("RECEIVING_BANK").where().eq("ID", id).update().set("RECEIVING_BANK_PID", bank.parentId).set("NAME", bank.name).set("level",
-                bank.level).exec();
+        Crud.from("RECEIVING_BANK").where().eq("ID", id).update().set("RECEIVING_BANK_PID", bank.parentId).set("NAME", bank.name)
+                .set("level", bank.level).set("BANK_TYPE",bank.bankType).exec();
     }
 
     //银行配置列表
     public void bankList() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> bankMap = ExtJarHelper.extApiParamMap.get();
         String sql = "select id,RECEIVING_BANK_PID parentId,if(level = 1,name,'') unitName,if(level = 2,name,'') bankName,if(level = 3,name,'') " +
-                "account,level from receiving_bank rb";
-        List<Map<String, Object>> bankMaps = myJdbcTemplate.queryForList(sql);
+                "account,level,bank_type bankType from receiving_bank rb where BANK_TYPE = ?";
+        List<Map<String, Object>> bankMaps = myJdbcTemplate.queryForList(sql,JdbcMapUtil.getInt(bankMap, "bankType"));
         List<BankResp> bankResps = bankMaps.stream().map(item -> {
             BankResp bankResp = new BankResp();
             bankResp.id = JdbcMapUtil.getString(item, "id");
             bankResp.pid = JdbcMapUtil.getString(item, "parentId");
             bankResp.level = JdbcMapUtil.getString(item, "level");
-            bankResp.UnitName = JdbcMapUtil.getString(item, "unitName");
+            bankResp.unitName = JdbcMapUtil.getString(item, "unitName");
             bankResp.bankName = JdbcMapUtil.getString(item, "bankName");
             bankResp.account = JdbcMapUtil.getString(item, "account");
+            bankResp.bankType = JdbcMapUtil.getInt(item, "bankType");
 //            String level = JdbcMapUtil.getString(item, "level");
 //            bankResp.level = level;
 //            String name = JdbcMapUtil.getString(item, "name");
@@ -86,6 +88,9 @@ public class ReceiveBankConfigure {
     public void editBank() {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         Bank bank = JsonUtil.fromJson(JsonUtil.toJson(inputMap), Bank.class);
+        if (checkDuplicate(bank.name, bank.parentId,bank.bankType)) {
+            throw new BaseException("配置名称重复！");
+        }
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String sql = "update receiving_bank set name = ? where id = ?";
         myJdbcTemplate.update(sql, bank.name, bank.id);
@@ -114,10 +119,17 @@ public class ReceiveBankConfigure {
 
 
     //检查是否有名称重复 false没有重复、true重复
-    public boolean checkDuplicate(String name, String pid) {
+    public boolean checkDuplicate(String name, String pid,Integer bankType) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql = "SELECT count(*) count FROM receiving_bank where name = ? and RECEIVING_BANK_PID = ?";
-        Map<String, Object> countMap = myJdbcTemplate.queryForMap(sql, name, pid);
+        String sql = "";
+        Map<String, Object> countMap;
+        if (Strings.isNullOrEmpty(pid)){
+            sql = "SELECT count(*) count FROM receiving_bank where name = ? and RECEIVING_BANK_PID is null and BANK_TYPE = ?";
+            countMap = myJdbcTemplate.queryForMap(sql, name, bankType);
+        }else {
+            sql = "SELECT count(*) count FROM receiving_bank where name = ? and RECEIVING_BANK_PID = ? and BANK_TYPE = ?";
+            countMap = myJdbcTemplate.queryForMap(sql, name, pid, bankType);
+        }
         if (JdbcMapUtil.getInt(countMap, "count") == 0) {
             return false;
         }
@@ -139,6 +151,8 @@ public class ReceiveBankConfigure {
     public static class Bank {
         //id
         public String id;
+        //银行配置类别 1 征拆资金收款单位配置 2工程资金收款单位配置
+        public Integer bankType;
         //父id
         public String parentId;
         //名称
@@ -150,11 +164,19 @@ public class ReceiveBankConfigure {
     public static class BankResp {
         //id
         public String id;
+        //银行配置类别 1 征拆资金收款单位配置 2工程资金收款单位配置
+        public Integer bankType;
+        //父id
         public String pid;
-        public String UnitName;
+        //单位名称
+        public String unitName;
+        //银行名称
         public String bankName;
+        //账户名称
         public String account;
+        //层级
         public String level;
+        //子级
         public List<BankResp> children;
     }
 }

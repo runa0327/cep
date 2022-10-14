@@ -92,9 +92,129 @@ public class AttLinkExt {
             return linkPAY_TYPE_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("PM_BID_KEEP_FILE_REQ_ID".equals(attCode)){ // 招采项目备案及归档 属性联动
             return linkPM_BID_KEEP_FILE_REQ_ID(myJdbcTemplate, attValue, entCode,sevId,param);
-        } else {
+        } else if ("FUND_IMPLEMENTATION_V_ID".equals(attCode)){ // 关联资金来源 属性联动
+            return linkFUND_IMPLEMENTATION_V_ID(myJdbcTemplate, attValue, entCode,sevId,param);
+        }else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
+
+    }
+
+    private AttLinkResult linkFUND_IMPLEMENTATION_V_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        if ("FUND_SPECIAL".equals(entCode)){
+            String fundSource = JdbcMapUtil.getString(param.valueMap, "FUND_IMPLEMENTATION_V_ID");//资金来源
+            Map<String, Object> fundSourceMap = myJdbcTemplate.queryForMap("select fi.FUND_SOURCE_TEXT name from fund_implementation fi left join" +
+                    " fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id where fid.id = ?", fundSource);
+            String fundSourceName = JdbcMapUtil.getString(fundSourceMap, "name");
+            String prjId = JdbcMapUtil.getString(param.valueMap, "PM_PRJ_ID");//项目id
+            //数据联动主页面sql
+            String baseSql = "select fi.id fundImpId,fi.FUND_SOURCE_TEXT,fid.PM_PRJ_ID,IFNULL(temp1.appAmt,0) appAmt,IFNULL(temp2.cumReachAmt,0) " +
+                    "cumReachAmt,IFNULL(temp3.cumPayAmt,0) cumPayAmt,IFNULL(temp1.app_amt,0)-IFNULL(temp2.cumReachAmt,0) notReachAmt,pa.name " +
+              "customerUnit,sv.name manageMode,IFNULL(temp4.cumBuildReachAmt,0) cumBuildReachAmt,IFNULL(temp5.cumAcqReachAmt,0) cumAcqReachAmt\n" +
+                    "from fund_implementation fi left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
+                    "left join (select sum(IFNULL(fid.APPROVED_AMOUNT,0)) app_amt,fid.PM_PRJ_ID,fi.FUND_SOURCE_TEXT from fund_implementation_detail" +
+                     " fid left join fund_implementation fi on fi.id = fid.FUND_IMPLEMENTATION_ID group by fid.PM_PRJ_ID,fi.FUND_SOURCE_TEXT) temp1" +
+                      " on temp1.PM_PRJ_ID = fid.PM_PRJ_ID and temp1.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT\n" +
+                    "left join (select sum(IFNULL(fr.REACH_AMOUNT,0)) cumReachAmt,fr.FUND_SOURCE_TEXT from fund_reach fr group by fr" +
+                    ".FUND_SOURCE_TEXT,fr.pm_prj_id\n" +
+                    ") temp2 on temp2.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT\n" +
+                    "left join (select sum(IFNULL(fs.PAID_AMT,0)) cumPayAmt,fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID from fund_special fs group by " +
+                    "fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp3 on temp3.FUND_IMPLEMENTATION_V_ID = fi.FUND_SOURCE_TEXT and temp3.PM_PRJ_ID =" +
+                    " fid.PM_PRJ_ID\n" +
+                    "left join pm_prj pr on pr.id = fid.PM_PRJ_ID\n" +
+                    "left join PM_PARTY pa on pa.id = pr.CUSTOMER_UNIT\n" +
+                    "left join gr_set_value sv on sv.id = pr.PRJ_MANAGE_MODE_ID\n" +
+                    "left join gr_set se on se.id = sv.GR_SET_ID and se.code = 'management_unit'\n" +
+                    "left join (select sum(IFNULL(fr.REACH_AMOUNT,0)) cumBuildReachAmt,fr.FUND_SOURCE_TEXT from fund_reach fr where fr" +
+                    ".FUND_REACH_CATEGORY = '99952822476371282' group by fr.FUND_SOURCE_TEXT,fr.pm_prj_id\n" +
+                    ") temp4 on temp4.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT\n" +
+                    "left join (select sum(IFNULL(fr.REACH_AMOUNT,0)) cumAcqReachAmt,fr.FUND_SOURCE_TEXT from fund_reach fr where fr" +
+                    ".FUND_REACH_CATEGORY = '99952822476371281' group by fr.FUND_SOURCE_TEXT,fr.pm_prj_id\n" +
+                    ") temp5 on temp5.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT where fi.FUND_SOURCE_TEXT = ? and fid.PM_PRJ_ID = ? ";
+            //基础统计回显
+            List<Map<String, Object>> priStatistic = myJdbcTemplate.queryForList(baseSql, fundSourceName, prjId);
+
+
+            if (!CollectionUtils.isEmpty(priStatistic)){
+                Map<String, Object> priStatisticMap = priStatistic.get(0);
+                //批复金额(APPROVED_AMOUNT),双精度浮点
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DOUBLE;
+                    linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"appAmt");
+                    linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"appAmt");
+                    attLinkResult.attMap.put("APPROVED_AMOUNT",linkedAtt);
+                }
+
+                //累计到位金额(CUM_REACH_AMT),双精度浮点
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DOUBLE;
+                    linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"cumReachAmt");
+                    linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"cumReachAmt");
+                    attLinkResult.attMap.put("CUM_REACH_AMT",linkedAtt);
+                }
+
+                //累计支付金额(CUM_PAY_AMT),双精度浮点
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DOUBLE;
+                    linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"cumPayAmt");
+                    linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"cumPayAmt");
+                    attLinkResult.attMap.put("CUM_PAY_AMT",linkedAtt);
+                }
+
+                //未到位资金(NOT_REACH_AMT),双精度浮点
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DOUBLE;
+                    linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"notReachAmt");
+                    linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"notReachAmt");
+                    attLinkResult.attMap.put("NOT_REACH_AMT",linkedAtt);
+                }
+
+                //业主单位(CUSTOMER_UNIT),引用（单值）
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"customerUnit");
+                    linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"customerUnit");
+                    attLinkResult.attMap.put("CUSTOMER_UNIT",linkedAtt);
+                }
+
+                //项目管理模式(PRJ_MANAGE_MODE_ID),引用（单值）(代管单位)
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"manageMode");
+                    linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"manageMode");
+                    attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID",linkedAtt);
+                }
+
+                //累计到位建设资金(CUM_BUILD_REACH_AMT),双精度浮点
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DOUBLE;
+                    linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"cumBuildReachAmt");
+                    linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"cumBuildReachAmt");
+                    attLinkResult.attMap.put("CUM_BUILD_REACH_AMT",linkedAtt);
+                }
+
+                //累计到位征拆资金(CUM_ACQ_REACH_AMT),双精度浮点
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DOUBLE;
+                    linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"cumAcqReachAmt");
+                    linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"cumAcqReachAmt");
+                    attLinkResult.attMap.put("CUM_ACQ_REACH_AMT",linkedAtt);
+                }
+
+                //支付明细码(FUND_PAY_CODE),文本（短）
+
+            }
+        }
+        return null;
     }
 
     //招采项目备案及归档 属性联动

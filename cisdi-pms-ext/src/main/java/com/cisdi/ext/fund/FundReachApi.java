@@ -53,12 +53,14 @@ public class FundReachApi {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("select r.ID,p.name projectName,r.FUND_SOURCE_TEXT sourceName,r.FUND_REACH_CATEGORY reachCategory,IFNULL(REACH_AMOUNT,0) amt," +
+        sb.append("select r.ID,p.name projectName,r.FUND_SOURCE_TEXT sourceName,sv.name reachCategory,IFNULL(REACH_AMOUNT,0) amt," +
                 "REACH_DATE reachDate,t1.name firstTypeName,t2.name secondTypeName " +
                 "from fund_reach r left join pm_prj p on p.id = r.PM_PRJ_ID " +
                 "left join fund_implementation i on i.FUND_SOURCE_TEXT = r.FUND_SOURCE_TEXT " +
                 "left join fund_type t1 on t1.id = i.FUND_CATEGORY_FIRST " +
                 "left join fund_type t2 on t2.id = i.FUND_CATEGORY_SECOND " +
+                "left join gr_set_value sv on sv.id = r.FUND_REACH_CATEGORY " +
+                "left join gr_set se on se.id = sv.GR_SET_ID and se.code = 'fund_reach_category' " +
                 "where 1=1 ");
         if (Strings.isNotEmpty(sourceName)) {
             sb.append(" and r.FUND_SOURCE_TEXT like '%").append(sourceName).append("%'");
@@ -102,18 +104,21 @@ public class FundReachApi {
         String id = param.id;
         MyJdbcTemplate jdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         try {
-            String sql = "select r.ID,p.name projectName,p.id prjId,r.FUND_SOURCE_TEXT sourceName,r.FUND_REACH_CATEGORY reachCategory,IFNULL(r.REACH_AMOUNT,0)" +
-                    " amt,r.PAYEE payee,b1.name bank,b1.id bankId,b2.name account,b2.id accountId,r.REACH_DATE reachDate,r.remark,r.ATT_FILE_GROUP_ID fileIds,temp.sumAmt,t1" +
+            String sql = "select r.ID,p.name projectName,p.id prjId,r.FUND_SOURCE_TEXT sourceName,sv.name reachCategory,sv.id reachCategoryId,IFNULL(r.REACH_AMOUNT,0)" +
+                    " amt,b3.id payeeId,b3.name payee,b1.name bank,b1.id bankId,b2.name account,b2.id accountId,r.REACH_DATE reachDate,r.remark,r.ATT_FILE_GROUP_ID fileIds,temp.sumAmt,t1" +
                     ".name firstTypeName,t2.name secondTypeName,temp.count,i.APPROVAL_TIME,r.REACH_TIMES " +
                     "from fund_reach r left join pm_prj p on p.id = r.PM_PRJ_ID " +
                     "left join receiving_bank b1 on b1.id = r.RECEIVING_BANK_ID " +
                     "left join receiving_bank b2 on b2.id = r.RECEIPT_ACCOUNT " +
+                    "left join receiving_bank b3 on b3.id = r.PAYEE " +
                     "left join fund_implementation i on i.FUND_SOURCE_TEXT = r.FUND_SOURCE_TEXT " +
                     "left join fund_type t1 on t1.id = i.FUND_CATEGORY_FIRST " +
                     "left join fund_type t2 on t2.id = i.FUND_CATEGORY_SECOND " +
                     "left join (select FUND_SOURCE_TEXT,PM_PRJ_ID,FUND_REACH_CATEGORY,sum(IFNULL(REACH_AMOUNT,0)) sumAmt,count(*) count from " +
                     "fund_reach group by FUND_SOURCE_TEXT,PM_PRJ_ID,FUND_REACH_CATEGORY ) temp on temp.FUND_SOURCE_TEXT = r.FUND_SOURCE_TEXT and " +
                     "temp.PM_PRJ_ID = r.PM_PRJ_ID and temp.FUND_REACH_CATEGORY = r.FUND_REACH_CATEGORY " +
+                    "left join gr_set_value sv on sv.id = r.FUND_REACH_CATEGORY " +
+                    "left join gr_set se on se.id = sv.GR_SET_ID and se.code = 'fund_reach_category' " +
                     "where r.id = ?";
             Map<String, Object> stringObjectMap = jdbcTemplate.queryForMap(sql, id);
             FundReach reach = this.convertFundReach(stringObjectMap, "2");
@@ -269,12 +274,14 @@ public class FundReachApi {
         fundReach.projectName = JdbcMapUtil.getString(data, "projectName");
         fundReach.sourceName = JdbcMapUtil.getString(data, "sourceName");
         fundReach.reachCategory = JdbcMapUtil.getString(data, "reachCategory");
+        fundReach.reachCategoryId = JdbcMapUtil.getString(data, "reachCategoryId");
         fundReach.amt = JdbcMapUtil.getString(data, "amt");
         fundReach.reachDate = JdbcMapUtil.getString(data, "reachDate");
         if (Objects.equals("2", mark)) {
             fundReach.prjId = JdbcMapUtil.getString(data,"prjId");
             fundReach.bankId = JdbcMapUtil.getString(data, "bankId");
             fundReach.accountId = JdbcMapUtil.getString(data, "accountId");
+            fundReach.payeeId = JdbcMapUtil.getString(data,"payeeId");
             fundReach.payee = JdbcMapUtil.getString(data,"payee");
             fundReach.bank = JdbcMapUtil.getString(data,"bank");
             fundReach.account = JdbcMapUtil.getString(data,"account");
@@ -358,10 +365,12 @@ public class FundReachApi {
         public String projectName;
         public String sourceName;
         public String reachCategory;
+        public String reachCategoryId;
         public String amt;
         public String reachDate;
         //收款单位
         public String payee;
+        public String payeeId;
         //收款银行
         public String bank;
         public String bankId;
@@ -380,6 +389,7 @@ public class FundReachApi {
         public List<File> fileList;
         //到位次数
         public Integer reachTimes;
+
     }
 
     /**
