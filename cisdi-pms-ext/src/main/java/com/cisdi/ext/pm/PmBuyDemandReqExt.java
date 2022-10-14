@@ -4,10 +4,12 @@ import com.cisdi.ext.util.DateTimeUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +52,22 @@ public class PmBuyDemandReqExt {
         check(status);
     }
 
+    /**
+     * 采购需求审批扩展-发起时数据校验
+     */
+    public void checkStart() {
+        String status = "start";
+        check(status);
+    }
+
+    /**
+     * 采购需求审批扩展-发起时数据校验
+     */
+    public void checkDetail() {
+        String status = "detail";
+        check(status);
+    }
+
     private void check(String status) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Date date = new Date();
@@ -67,7 +85,21 @@ public class PmBuyDemandReqExt {
         if (!CollectionUtils.isEmpty(list)) {
             comment = list.get(0).get("user_comment") == null ? null : list.get(0).get("user_comment").toString();
         }
-        if ("first".equals(status)) {
+        if ("start".equals(status)){
+            //获取预算金额下限 预算金额上线限
+            BigDecimal min = new BigDecimal(entityRecord.valueMap.get("PAY_AMT_ONE").toString());
+            BigDecimal max = new BigDecimal(entityRecord.valueMap.get("PAY_AMT_TWO").toString());
+            if (min.compareTo(max) == 1){
+                throw new BaseException("预算金额下限不能超过预算金额上限");
+            }
+        } else if("detail".equals(status)){
+            //查询明细信息
+            String sql1 = "select * from PM_BUY_DEMAND_DETAIL_REQ where PARENT_ID = ?";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,csCommId);
+            if (CollectionUtils.isEmpty(list1)){
+                throw new BaseException("费用明细信息不能为空！");
+            }
+        } else if ("first".equals(status)) {
             Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
                     .set("APPROVAL_COMMENT_ONE", comment).exec();
             log.info("已更新：{}", exec);

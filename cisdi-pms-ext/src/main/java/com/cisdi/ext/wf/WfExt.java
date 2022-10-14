@@ -209,7 +209,7 @@ public class WfExt {
                                 update1 = myJdbcTemplate.update("UPDATE wf_process_instance pi " +
                                         "JOIN wf_process p ON pi.WF_PROCESS_ID = p.id " +
                                         "JOIN ad_user u ON pi.START_USER_ID = u.id " +
-                                        "JOIN PM_SEND_APPROVAL_REQ t ON pi.ENTITY_RECORD_ID = t.id " +
+                                        "JOIN "+entityCode+" t ON pi.ENTITY_RECORD_ID = t.id " +
                                         "SET pi.NAME = concat(p.NAME,'-',u.NAME,'-',pi.START_DATETIME) WHERE t.id = ?",csCommId);
                                 return;
                             } else {
