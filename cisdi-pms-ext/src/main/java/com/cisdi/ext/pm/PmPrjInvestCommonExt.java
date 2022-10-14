@@ -57,5 +57,10 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("INVESTMENT_SOURCE_ID"); // 资金来源
         entityRecord.extraEditableAttCodeList.add("REPLY_NO_WR"); // 启动依据文号
         entityRecord.extraEditableAttCodeList.add("FILE_ID_THREE"); // 采购启动依据文件
+        entityRecord.extraEditableAttCodeList.add("BUY_TYPE_ID"); // 招标类别
+        entityRecord.extraEditableAttCodeList.add("BID_CTL_PRICE_LAUNCH"); // 招标控制价
+        entityRecord.extraEditableAttCodeList.add("BUY_MATTER_ID"); // 采购方式
+        entityRecord.extraEditableAttCodeList.add("WIN_BID_UNIT_TXT"); // 中标单位
+        entityRecord.extraEditableAttCodeList.add("WINNING_BIDS_AMOUNT"); // 中标价
     }
 }
