@@ -222,7 +222,7 @@ public class AttLinkExt {
         AttLinkResult attLinkResult = new AttLinkResult();
         if ("PO_ORDER_REQ".equals(entCode)){ //合同签订
             //查询招采项目备案及归档信息
-            String sql1 = "select PM_PRJ_ID,PAY_AMT_TWO,BUY_TYPE_ID,BASE_SUPPLIER_ONE_IDS,AMT_ONE,BUY_MATTER_ID from PM_BID_KEEP_FILE_REQ where id = ?";
+            String sql1 = "select PM_PRJ_ID,PAY_AMT_TWO,BUY_TYPE_ID,WIN_BID_UNIT_ONE,AMT_ONE,BUY_MATTER_ID from PM_BID_KEEP_FILE_REQ where id = ?";
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,attValue);
             if (!CollectionUtils.isEmpty(list1)){
                 //招标类别
@@ -267,20 +267,9 @@ public class AttLinkExt {
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
                     linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    String ids = JdbcMapUtil.getString(list1.get(0),"BASE_SUPPLIER_ONE_IDS");
-                    String id = StringUtil.codeToSplit(ids);
-                    StringBuffer sb = new StringBuffer("");
-                    String sql2 = "select name from BASE_SUPPLIER where id in ('"+id+"')";
-                    List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2);
-                    if (!CollectionUtils.isEmpty(list2)){
-                        for (Map<String, Object> tmp : list2) {
-                            sb.append(JdbcMapUtil.getString(tmp,"name")).append("，");
-                        }
-                    }
-                    sb.substring(0,sb.length()-1);
-                    linkedAtt.value = sb.toString();
-                    linkedAtt.text = ids;
-                    attLinkResult.attMap.put("WIN_BID_UNIT_TXT",linkedAtt);
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"WIN_BID_UNIT_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"WIN_BID_UNIT_ONE");
+                    attLinkResult.attMap.put("WIN_BID_UNIT_ONE",linkedAtt);
                 }
                 //中标价
                 {
@@ -514,22 +503,16 @@ public class AttLinkExt {
     private AttLinkResult linkPM_USE_CHAPTER_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
         if ("PM_BID_KEEP_FILE_REQ".equals(entCode)){ //招采项目备案及归档
-            String sql = "select PM_PRJ_ID,BASE_SUPPLIER_ONE_IDS,AMT_ONE,CONTACTS_ONE,CONTACT_MOBILE_ONE,PAY_AMT_TWO,BUY_TYPE_ID from PM_USE_CHAPTER_REQ where id = ?";
+            String sql = "select PM_PRJ_ID,WIN_BID_UNIT_ONE,AMT_ONE,CONTACTS_ONE,CONTACT_MOBILE_ONE,PAY_AMT_TWO,BUY_TYPE_ID from PM_USE_CHAPTER_REQ where id = ?";
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql,attValue);
             if (!CollectionUtils.isEmpty(list1)){
-                //中标单位名称
-                String ids = JdbcMapUtil.getString(list1.get(0),"BASE_SUPPLIER_ONE_IDS");
-                String id = StringUtil.codeToSplit(ids);
-                String sql2 = "select GROUP_CONCAT(name) as name from BASE_SUPPLIER where id in ('"+id+"')";
-                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2);
-                String name = JdbcMapUtil.getString(list2.get(0),"name");
                 //中标单位名称
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
                     linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = ids;
-                    linkedAtt.text = name;
-                    attLinkResult.attMap.put("BASE_SUPPLIER_ONE_IDS", linkedAtt);
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"WIN_BID_UNIT_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"WIN_BID_UNIT_ONE");
+                    attLinkResult.attMap.put("WIN_BID_UNIT_ONE", linkedAtt);
                 }
                 //投标报价(元)
                 {

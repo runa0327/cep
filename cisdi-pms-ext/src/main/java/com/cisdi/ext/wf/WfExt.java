@@ -282,6 +282,28 @@ public class WfExt {
         Map<String, Object> valueMap = entityRecord.valueMap;
         String procInstId = ExtJarHelper.procInstId.get();
 
+        //招采项目备案及归档
+        if ("PM_BID_KEEP_FILE_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
+            String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
+            // 中标通知书
+            ProFileUtils.insertProFile(prjId, FILE_ID_ONE,FileCodeEnum.PM_BID_KEEP_FILE_REQ_FILE_ID_ONE);
+            // 备案回执
+            ProFileUtils.insertProFile(prjId, FILE_ID_TWO,FileCodeEnum.PM_BID_KEEP_FILE_REQ_FILE_ID_TWO);
+        }
+
+        //中选单位及标后用印审批
+        if ("PM_USE_CHAPTER_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
+            String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
+            // 其他依据
+            ProFileUtils.insertProFile(prjId, FILE_ID_ONE,FileCodeEnum.PM_USE_CHAPTER_REQ_FILE_ID_ONE);
+            //附件
+            ProFileUtils.insertProFile(prjId, FILE_ID_TWO,FileCodeEnum.PM_USE_CHAPTER_REQ_FILE_ID_TWO);
+        }
+
         //合同签订
         if ("PO_ORDER_REQ".equals(entityCode)){
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
