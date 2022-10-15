@@ -857,6 +857,7 @@ public class AttLinkExt {
             Boolean caiNaChangeToShown =  true; //采纳说明显示
             Boolean caiNaFileChangeToShown =  true; //采纳附件显示
             Boolean heTongChangeToShown =  true; //合同送审稿显示
+            Boolean falvChangeToShown = true; // 法律审核附件显示
             if ("99799190825080669".equals(attValue)){
                 faWuChangeToShown =  false;
                 caiWuChangeToShown =  false;
@@ -864,6 +865,16 @@ public class AttLinkExt {
                 caiNaChangeToShown =  false;
                 caiNaFileChangeToShown =  false;
                 heTongChangeToShown =  false;
+                falvChangeToShown = false;
+            }
+            // 财务部门修订稿
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = "";
+                linkedAtt.text = "";
+                linkedAtt.changeToShown = falvChangeToShown;
+                attLinkResult.attMap.put("FILE_ID_SIX", linkedAtt);
             }
             // 财务部门修订稿
             {
@@ -1062,7 +1073,7 @@ public class AttLinkExt {
                         "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS', " +
                         "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD', " +
                         "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget', " +
-                        "t.QTY_ONE,t.QTY_TWO " +
+                        "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE " +
                         "from pm_prj t join PM_PARTY c on t.id=? and t.CUSTOMER_UNIT=c.id " +
                         "join gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
                         "join gr_set_value l on t.BASE_LOCATION_ID=l.id " +
@@ -2243,30 +2254,48 @@ public class AttLinkExt {
         Boolean lengthShow = true; //长显示
         Boolean widthShow = true; //宽显示
         Boolean otherShow = true; //其他显示
+        Boolean seaShow = true; //海域面积显示
 
         Boolean areaEdit = true; //面积可改
         Boolean lengthEdit = true; //长可改
         Boolean widthEdit = true; //宽可改
         Boolean otherEdit = true; //其他可改
+        Boolean seaEdit = true; //海域面积可改
 
         Boolean areaMustEdit = true; //面积必填
         Boolean lengthMustEdit = true; //长必填
         Boolean widthMustEdit = true; //宽必填
         Boolean otherMustEdit = true; //其他必填
+        Boolean seaMustEdit = true; //海域面积必填
 
         String name1 = JdbcMapUtil.getString(row, "CON_SCALE_TYPE_NAME");
         if (name1.contains("面积")){
-            lengthShow = false;
-            widthShow = false;
-            otherShow = false;
-            lengthMustEdit = false;
-            widthMustEdit = false;
-            otherMustEdit = false;
+            if (name1.contains("海域")){
+                lengthShow = false;
+                widthShow = false;
+                otherShow = false;
+                areashow = false;
+                lengthMustEdit = false;
+                widthMustEdit = false;
+                otherMustEdit = false;
+                areaMustEdit = false;
+            } else if (name1.contains("建筑")){
+                lengthShow = false;
+                widthShow = false;
+                otherShow = false;
+                seaShow = false;
+                lengthMustEdit = false;
+                widthMustEdit = false;
+                otherMustEdit = false;
+                seaMustEdit = false;
+            }
         } else if (name1.contains("长宽")){
             areashow = false;
             otherShow = false;
             areaMustEdit = false;
             otherMustEdit = false;
+            seaShow = false;
+            seaMustEdit = false;
         } else {
             areashow = false;
             lengthShow = false;
@@ -2274,6 +2303,8 @@ public class AttLinkExt {
             areaMustEdit = false;
             lengthMustEdit = false;
             widthMustEdit = false;
+            seaShow = false;
+            seaMustEdit = false;
         }
         //面积
         {
@@ -2315,6 +2346,16 @@ public class AttLinkExt {
             linkedAtt.value = null;
             attLinkResult.attMap.put("QTY_TWO", linkedAtt);
         }
+        //海域面积
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = seaShow;
+            linkedAtt.changeToMandatory = seaMustEdit;
+            linkedAtt.text = null;
+            linkedAtt.value = null;
+            attLinkResult.attMap.put("QTY_THREE", linkedAtt);
+        }
 
         return attLinkResult;
     }
@@ -2331,7 +2372,7 @@ public class AttLinkExt {
                         "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS', " +
                         "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD', " +
                         "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget', " +
-                        "t.QTY_ONE,t.QTY_TWO " +
+                        "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE " +
                         "from pm_prj t join PM_PARTY c on t.id=? and t.CUSTOMER_UNIT=c.id " +
                         "join gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
                         "join gr_set_value l on t.BASE_LOCATION_ID=l.id " +
@@ -2461,30 +2502,49 @@ public class AttLinkExt {
         Boolean lengthShow = true; //长显示
         Boolean widthShow = true; //宽显示
         Boolean otherShow = true; //其他显示
+        Boolean seaShow = true; //海域面积显示
 
         Boolean areaEdit = true; //面积可改
         Boolean lengthEdit = true; //长可改
         Boolean widthEdit = true; //宽可改
         Boolean otherEdit = true; //其他可改
+        Boolean seaEdit = true; //海域面积可改
 
         Boolean areaMustEdit = true; //面积必填
         Boolean lengthMustEdit = true; //长必填
         Boolean widthMustEdit = true; //宽必填
         Boolean otherMustEdit = true; //其他必填
+        Boolean seaMustEdit = true; //海域面积必填
 
         String name1 = JdbcMapUtil.getString(row, "st_name");
         if (name1.contains("面积")){
-            lengthShow = false;
-            widthShow = false;
-            otherShow = false;
-            lengthMustEdit = false;
-            widthMustEdit = false;
-            otherMustEdit = false;
+            if (name1.contains("海域")){
+                lengthShow = false;
+                widthShow = false;
+                otherShow = false;
+                lengthMustEdit = false;
+                widthMustEdit = false;
+                otherMustEdit = false;
+                areashow = false;
+                areaMustEdit = false;
+            } else if (name1.contains("建筑面积")){
+                lengthShow = false;
+                widthShow = false;
+                otherShow = false;
+                lengthMustEdit = false;
+                widthMustEdit = false;
+                otherMustEdit = false;
+                seaShow = false;
+                seaMustEdit = false;
+            }
+
         } else if (name1.contains("长宽")){
             areashow = false;
             otherShow = false;
             areaMustEdit = false;
             otherMustEdit = false;
+            seaShow = false;
+            seaMustEdit = false;
         } else {
             areashow = false;
             lengthShow = false;
@@ -2492,6 +2552,8 @@ public class AttLinkExt {
             areaMustEdit = false;
             lengthMustEdit = false;
             widthMustEdit = false;
+            seaShow = false;
+            seaMustEdit = false;
         }
         //面积
         {
@@ -2502,6 +2564,16 @@ public class AttLinkExt {
             linkedAtt.text = JdbcMapUtil.getString(row, "QTY_ONE");
             linkedAtt.value = JdbcMapUtil.getString(row, "QTY_ONE");
             attLinkResult.attMap.put("QTY_ONE", linkedAtt);
+        }
+        //海域面积
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = seaShow;
+            linkedAtt.changeToMandatory = seaMustEdit;
+            linkedAtt.text = JdbcMapUtil.getString(row, "QTY_THREE");
+            linkedAtt.value = JdbcMapUtil.getString(row, "QTY_THREE");
+            attLinkResult.attMap.put("QTY_THREE", linkedAtt);
         }
         //长
         {
@@ -2588,7 +2660,10 @@ public class AttLinkExt {
             String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
             String sqlName = "select name from gr_set_value where id = ?";
             List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(sqlName, id);
-            String name = JdbcMapUtil.getString(nameMap.get(0), "name");
+            String name = "";
+            if (!CollectionUtils.isEmpty(nameMap)){
+                name = JdbcMapUtil.getString(nameMap.get(0), "name");
+            }
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
             linkedAtt.value = id;

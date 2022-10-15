@@ -40,7 +40,7 @@ public class PoOrderReqExt {
     }
 
     /**
-     * 采购合同签订扩展 审批先后顺序 第三次审批
+     * 采购合同签订扩展-法律审批
      */
     public void checkThird() {
         String status = "third";
@@ -91,12 +91,15 @@ public class PoOrderReqExt {
                     .set("APPROVAL_USER_TWO", userId).set("APPROVAL_DATE_TWO", now).set("EARLY_COMMENT", comment).set("FILE_ID_THREE",file).exec();
             log.info("已更新：{}", exec);
         } else if ("third".equals(status)) {
+            if (SharedUtil.isEmptyString(file)){
+                throw new BaseException("审核附件不能为空");
+            }
             Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
                     .set("APPROVAL_USER_THREE", userId).set("APPROVAL_DATE_THREE", now).set("DESIGN_COMMENT", comment).exec();
             log.info("已更新：{}", exec);
         } else if ("fourth".equals(status)) {
             Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
-                    .set("APPROVAL_USER_FOUR", userId).set("APPROVAL_DATE_FOUR", now).set("APPROVAL_COMMENT_ONE", comment).exec();
+                    .set("APPROVAL_USER_FOUR", userId).set("APPROVAL_DATE_FOUR", now).set("APPROVAL_COMMENT_ONE", comment).set("FILE_ID_SIX",file).exec();
             log.info("已更新：{}", exec);
         } else if ("fifth".equals(status)) {
             Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
