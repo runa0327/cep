@@ -5,11 +5,14 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class WfPrjExt {
     public void parsePrjEarlyUserIdByPrj() {
@@ -107,5 +110,79 @@ public class WfPrjExt {
             ExtJarHelper.returnValue.set(userIdList);
         }
     }
+
+    //合同签订-自动获取角色-法务审批
+    public void getFaWu() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            String csCommId = entityRecord.csCommId;
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+
+            String sql1 = "";
+
+            String procInstId = ExtJarHelper.procInstId.get();
+            String companyId = entityRecord.valueMap.get("CUSTOMER_UNIT_ONE").toString();
+            if ("99902212142008832".equals(companyId)){ //三亚崖州湾科技城投资控股有限公司
+                sql1 = "select AD_USER_ID from ad_role_user a WHERE a.AD_ROLE_ID = '99952822476412304' ";
+            } else {
+                sql1 = "select AD_USER_ID from ad_role_user a WHERE a.AD_ROLE_ID = '99952822476412302' ";
+            }
+
+            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1);
+            if (CollectionUtils.isEmpty(list1)){
+                throw new BaseException("下一节点“合同签订-法务审核”暂未配置代办人员！");
+            }
+            List<String> userList = list1.stream().map(p->JdbcMapUtil.getString(p,"AD_USER_ID")).collect(Collectors.toList());
+
+            ArrayList<Object> userIdList = new ArrayList<>(1);
+            userIdList.addAll(userList);
+            ExtJarHelper.returnValue.set(userIdList);
+        }
+    }
+
+    //合同签订-自动获取角色-财务审批
+    public void getCaiWu() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            String csCommId = entityRecord.csCommId;
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+
+            String sql1 = "";
+            String sql2 = "";
+
+            String procInstId = ExtJarHelper.procInstId.get();
+            String companyId = entityRecord.valueMap.get("CUSTOMER_UNIT_ONE").toString();
+            if ("99902212142008832".equals(companyId)){ //三亚崖州湾科技城投资控股有限公司
+                sql1 = "select AD_USER_ID from ad_role_user a WHERE a.AD_ROLE_ID = '99952822476412310' ";
+            } else if ("99952822476380406".equals(companyId) || "99952822476380407".equals(companyId)){ //海南城发建设工程有限公司 海南城发实业集团有限公司
+                sql1 = "select AD_USER_ID from ad_role_user a WHERE a.AD_ROLE_ID = '99952822476412312' ";
+            } else if ("99902212142008831".equals(companyId)){ //三亚崖州湾科技城开发建设有限公司
+                sql1 = "select AD_USER_ID from ad_role_user a WHERE a.AD_ROLE_ID = '99952822476412306' ";
+                sql2 = "select AD_USER_ID from ad_role_user a WHERE a.AD_ROLE_ID = '99952822476412308' ";
+            }
+
+            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1);
+            List<Map<String, Object>> list2 = new ArrayList<>();
+            if (!SharedUtil.isEmptyString(sql2)){
+                list2 = myJdbcTemplate.queryForList(sql2);
+            }
+            if (CollectionUtils.isEmpty(list1)){
+                throw new BaseException("下一节点“合同签订-财务审核”暂未配置代办人员！");
+            }
+            List<String> userList = list1.stream().map(p->JdbcMapUtil.getString(p,"AD_USER_ID")).collect(Collectors.toList());
+            List<String> userList2 = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(list2)){
+                userList2 = list2.stream().map(p->JdbcMapUtil.getString(p,"AD_USER_ID")).collect(Collectors.toList());
+            }
+
+            ArrayList<Object> userIdList = new ArrayList<>(2);
+            userIdList.addAll(userList);
+            if (!CollectionUtils.isEmpty(userList2)){
+                userIdList.addAll(userList2);
+            }
+            ExtJarHelper.returnValue.set(userIdList);
+        }
+    }
+
 
 }
