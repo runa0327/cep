@@ -95,11 +95,11 @@ public class PoOrderReqExt {
                 throw new BaseException("审核附件不能为空");
             }
             Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
-                    .set("APPROVAL_USER_THREE", userId).set("APPROVAL_DATE_THREE", now).set("DESIGN_COMMENT", comment).exec();
+                    .set("APPROVAL_USER_THREE", userId).set("APPROVAL_DATE_THREE", now).set("DESIGN_COMMENT", comment).set("FILE_ID_SIX",file).exec();
             log.info("已更新：{}", exec);
         } else if ("fourth".equals(status)) {
             Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
-                    .set("APPROVAL_USER_FOUR", userId).set("APPROVAL_DATE_FOUR", now).set("APPROVAL_COMMENT_ONE", comment).set("FILE_ID_SIX",file).exec();
+                    .set("APPROVAL_USER_FOUR", userId).set("APPROVAL_DATE_FOUR", now).set("APPROVAL_COMMENT_ONE", comment).exec();
             log.info("已更新：{}", exec);
         } else if ("fifth".equals(status)) {
             Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
