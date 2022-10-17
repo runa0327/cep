@@ -15,6 +15,7 @@ import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -100,20 +101,25 @@ public class AttLinkExt {
 
     }
 
+
     private AttLinkResult linkFUND_IMPLEMENTATION_V_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
+        //专项资金支付选择资金来源后联动
         if ("FUND_SPECIAL".equals(entCode)){
-            String fundSource = JdbcMapUtil.getString(param.valueMap, "FUND_IMPLEMENTATION_V_ID");//资金来源
+            String fundSource = attValue;//资金来源
             Map<String, Object> fundSourceMap = myJdbcTemplate.queryForMap("select fi.FUND_SOURCE_TEXT name from fund_implementation fi left join" +
                     " fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id where fid.id = ?", fundSource);
             String fundSourceName = JdbcMapUtil.getString(fundSourceMap, "name");
             String prjId = JdbcMapUtil.getString(param.valueMap, "PM_PRJ_ID");//项目id
+            if (Strings.isNullOrEmpty(prjId)){
+                throw new BaseException("请先选择项目");
+            }
             //数据联动主页面sql
             String baseSql = "select fi.id fundImpId,fi.FUND_SOURCE_TEXT,fid.PM_PRJ_ID,IFNULL(temp1.appAmt,0) appAmt,IFNULL(temp2.cumReachAmt,0) " +
-                    "cumReachAmt,IFNULL(temp3.cumPayAmt,0) cumPayAmt,IFNULL(temp1.app_amt,0)-IFNULL(temp2.cumReachAmt,0) notReachAmt,pa.name " +
-              "customerUnit,sv.name manageMode,IFNULL(temp4.cumBuildReachAmt,0) cumBuildReachAmt,IFNULL(temp5.cumAcqReachAmt,0) cumAcqReachAmt\n" +
+                    "cumReachAmt,IFNULL(temp3.cumPayAmt,0) cumPayAmt,IFNULL(temp1.appAmt,0)-IFNULL(temp2.cumReachAmt,0) notReachAmt,pa.name " +
+              "customerUnitName,pa.id customerUnitId,sv.name manageModeName,sv.id manageModeId,IFNULL(temp4.cumBuildReachAmt,0) cumBuildReachAmt,IFNULL(temp5.cumAcqReachAmt,0) cumAcqReachAmt\n" +
                     "from fund_implementation fi left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
-                    "left join (select sum(IFNULL(fid.APPROVED_AMOUNT,0)) app_amt,fid.PM_PRJ_ID,fi.FUND_SOURCE_TEXT from fund_implementation_detail" +
+                    "left join (select sum(IFNULL(fid.APPROVED_AMOUNT,0)) appAmt,fid.PM_PRJ_ID,fi.FUND_SOURCE_TEXT from fund_implementation_detail" +
                      " fid left join fund_implementation fi on fi.id = fid.FUND_IMPLEMENTATION_ID group by fid.PM_PRJ_ID,fi.FUND_SOURCE_TEXT) temp1" +
                       " on temp1.PM_PRJ_ID = fid.PM_PRJ_ID and temp1.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT\n" +
                     "left join (select sum(IFNULL(fr.REACH_AMOUNT,0)) cumReachAmt,fr.FUND_SOURCE_TEXT from fund_reach fr group by fr" +
@@ -178,8 +184,8 @@ public class AttLinkExt {
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
                     linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"customerUnit");
-                    linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"customerUnit");
+                    linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"customerUnitId");
+                    linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"customerUnitName");
                     attLinkResult.attMap.put("CUSTOMER_UNIT",linkedAtt);
                 }
 
@@ -187,8 +193,8 @@ public class AttLinkExt {
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
                     linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"manageMode");
-                    linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"manageMode");
+                    linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"manageModeId");
+                    linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"manageModeName");
                     attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID",linkedAtt);
                 }
 
@@ -211,10 +217,35 @@ public class AttLinkExt {
                 }
 
                 //支付明细码(FUND_PAY_CODE),文本（短）
+                //查询相同项目、资金来源、相同日期专项资金支付条数
+                Map<String, Object> countToday = myJdbcTemplate.queryForMap("select count(*) countToday from fund_special where CRT_DT > DATE(NOW()) and " +
+                        "PM_PRJ_ID = ? and FUND_IMPLEMENTATION_V_ID = ?", prjId, fundSource);
+                DecimalFormat df = new DecimalFormat("0000");
+                String suffixNum = df.format(JdbcMapUtil.getInt(countToday, "countToday") + 1);
+                SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
+                String fundPayCode = "zf" + sdf.format(new Date()) + suffixNum;
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = fundPayCode;
+                    linkedAtt.text = fundPayCode;
+                    attLinkResult.attMap.put("FUND_PAY_CODE",linkedAtt);
+                }
 
+                //期数
+                //查询相同项目、资金来源专项资金支付条数
+                Map<String, Object> countMap = myJdbcTemplate.queryForMap("select count(*) count from fund_special where PM_PRJ_ID = ? and " +
+                        "FUND_IMPLEMENTATION_V_ID = ?", prjId, fundSource);
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.INTEGER;
+                    linkedAtt.value = JdbcMapUtil.getInt(countMap,"count");
+                    linkedAtt.text = JdbcMapUtil.getString(countMap,"count");
+                    attLinkResult.attMap.put("NPER",linkedAtt);
+                }
             }
         }
-        return null;
+        return attLinkResult;
     }
 
     //招采项目备案及归档 属性联动

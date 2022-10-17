@@ -50,13 +50,15 @@ public class FundReachController extends BaseController {
         String endTime = fundReachRequest.getEndTime();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("select r.ID,p.name projectName,r.FUND_SOURCE_TEXT sourceName,r.FUND_REACH_CATEGORY reachCategory,IFNULL(REACH_AMOUNT,0) amt," +
+        sb.append("select r.ID,p.name projectName,r.FUND_SOURCE_TEXT sourceName,sv.name reachCategory,IFNULL(REACH_AMOUNT,0) amt," +
                 "REACH_DATE reachDate,t1.name firstTypeName,r.payee,b1.name bank,b2.name account,r.remark,temp.count,temp.sumAmt " +
                 "from fund_reach r left join pm_prj p on p.id = r.PM_PRJ_ID " +
                 "left join fund_implementation i on i.FUND_SOURCE_TEXT = r.FUND_SOURCE_TEXT " +
                 "left join fund_type t1 on t1.id = i.FUND_CATEGORY_FIRST " +
                 "left join receiving_bank b1 on b1.id = r.RECEIVING_BANK_ID " +
                 "left join receiving_bank b2 on b2.id = r.RECEIPT_ACCOUNT " +
+                "left join gr_set_value sv on sv.id = r.FUND_REACH_CATEGORY " +
+                "left join gr_set se on se.id = sv.GR_SET_ID and se.code = 'fund_reach_category' " +
                 "left join (SELECT count(*) count,sum( REACH_AMOUNT ) sumAmt,FUND_SOURCE_TEXT,PM_PRJ_ID,FUND_REACH_CATEGORY FROM fund_reach group " +
                 "by FUND_SOURCE_TEXT,PM_PRJ_ID,FUND_REACH_CATEGORY) temp on temp.FUND_SOURCE_TEXT = r.FUND_SOURCE_TEXT and temp.PM_PRJ_ID = r" +
                 ".PM_PRJ_ID and temp.FUND_REACH_CATEGORY = r.FUND_REACH_CATEGORY " +
