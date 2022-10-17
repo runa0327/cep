@@ -184,5 +184,31 @@ public class WfPrjExt {
         }
     }
 
+    //采购需求审批-采购岗角色
+    public void getPurchaseUser() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            String csCommId = entityRecord.csCommId;
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+            String user_id = myJdbcTemplate.queryForMap("select AD_USER_TWO_ID from PM_BUY_DEMAND_REQ where id=?", csCommId).get("AD_USER_TWO_ID").toString();
+            ArrayList<Object> userIdList = new ArrayList<>(1);
+            userIdList.add(user_id);
+            ExtJarHelper.returnValue.set(userIdList);
+        }
+    }
+
+    //采购需求审批-成本岗角色
+    public void getCostUser() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            String csCommId = entityRecord.csCommId;
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+            String user_id = myJdbcTemplate.queryForMap("select AD_USER_THREE_ID from PM_BUY_DEMAND_REQ where id=?", csCommId).get("AD_USER_THREE_ID").toString();
+            ArrayList<Object> userIdList = new ArrayList<>(1);
+            userIdList.add(user_id);
+            ExtJarHelper.returnValue.set(userIdList);
+        }
+    }
+
 
 }
