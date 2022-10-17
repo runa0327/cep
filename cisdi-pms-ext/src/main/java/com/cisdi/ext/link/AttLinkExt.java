@@ -342,7 +342,7 @@ public class AttLinkExt {
 
     private AttLinkResult linkPM_BUY_DEMAND_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        if ("PM_USE_CHAPTER_REQ".equals(entCode)){
+        if ("PM_USE_CHAPTER_REQ".equals(entCode)){ //中选单位及标后用印审批
             List<Map<String, Object>> bidFileCheck = myJdbcTemplate.queryForList("select a.name,a.id,a.status,s.name statusName,a.NAME_ONE tenderName " +
                     "from PM_BID_APPROVAL_REQ a " +
                     "left join ad_status s on s.id = a.status " +
@@ -441,6 +441,28 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("STATUS_TWO",linkedAtt);
                 }
             }
+        } else if ("PM_BID_APPROVAL_REQ".equals(entCode) || "PM_FILE_CHAPTER_REQ".equals(entCode)){ //招标文件审批 标前资料用印审批
+            String sql1 = "select BUY_TYPE_ID from PM_BUY_DEMAND_REQ where id = ?";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,attValue);
+            String id = "";
+            String name = "";
+            if (!CollectionUtils.isEmpty(list1)){
+                id = JdbcMapUtil.getString(list1.get(0),"BUY_TYPE_ID");
+                String sql2 = "select name from gr_set_value where id = ?";
+                List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(sql2, id);
+                if (!CollectionUtils.isEmpty(nameMap)){
+                    name = JdbcMapUtil.getString(nameMap.get(0), "name");
+                }
+            }
+            // 招采方式
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.DOUBLE;
+                linkedAtt.value = id;
+                linkedAtt.text = name;
+                attLinkResult.attMap.put("BUY_TYPE_ID", linkedAtt);
+            }
+            return attLinkResult;
         }
 
 
@@ -503,7 +525,7 @@ public class AttLinkExt {
     private AttLinkResult linkPM_USE_CHAPTER_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
         if ("PM_BID_KEEP_FILE_REQ".equals(entCode)){ //招采项目备案及归档
-            String sql = "select PM_PRJ_ID,WIN_BID_UNIT_ONE,AMT_ONE,CONTACTS_ONE,CONTACT_MOBILE_ONE,PAY_AMT_TWO,BUY_TYPE_ID from PM_USE_CHAPTER_REQ where id = ?";
+            String sql = "select BUY_MATTER_ID,PM_PRJ_ID,WIN_BID_UNIT_ONE,AMT_ONE,CONTACTS_ONE,CONTACT_MOBILE_ONE,PAY_AMT_TWO,BUY_TYPE_ID from PM_USE_CHAPTER_REQ where id = ?";
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql,attValue);
             if (!CollectionUtils.isEmpty(list1)){
                 //中标单位名称
@@ -554,13 +576,77 @@ public class AttLinkExt {
                     linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"BUY_TYPE_ID");
                     attLinkResult.attMap.put("BUY_TYPE_ID", linkedAtt);
                 }
-                //项目名称
+                //采购事项名称
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
                     linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"PM_PRJ_ID");
-                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"PM_PRJ_ID");
-                    attLinkResult.attMap.put("PM_PRJ_ID", linkedAtt);
+                    String id = JdbcMapUtil.getString(list1.get(0),"BUY_MATTER_ID");;
+                    String name = "";
+                    String sql2 = "select name from gr_set_value where id = ?";
+                    List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,id);
+                    if (!CollectionUtils.isEmpty(list2)){
+                        name = JdbcMapUtil.getString(list2.get(0),"name");
+                    }
+                    linkedAtt.value = id;
+                    linkedAtt.text = name;
+                    attLinkResult.attMap.put("BUY_MATTER_ID", linkedAtt);
+                }
+            } else {
+                //中标单位名称
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    attLinkResult.attMap.put("WIN_BID_UNIT_ONE", linkedAtt);
+                }
+                //投标报价(元)
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DOUBLE;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    attLinkResult.attMap.put("AMT_ONE", linkedAtt);
+                }
+                //联系人姓名
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    attLinkResult.attMap.put("CONTACTS_ONE", linkedAtt);
+                }
+                //联系人电话
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    attLinkResult.attMap.put("CONTACT_MOBILE_ONE", linkedAtt);
+                }
+                //招标控制价
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DOUBLE;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    attLinkResult.attMap.put("PAY_AMT_TWO", linkedAtt);
+                }
+                //采购方式
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    attLinkResult.attMap.put("BUY_TYPE_ID", linkedAtt);
+                }
+                //采购事项名称
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    attLinkResult.attMap.put("BUY_MATTER_ID", linkedAtt);
                 }
             }
         }
