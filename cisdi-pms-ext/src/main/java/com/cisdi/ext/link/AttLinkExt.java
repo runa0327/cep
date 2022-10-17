@@ -2937,6 +2937,27 @@ public class AttLinkExt {
             attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
             attLinkResult.attMap.put("PM_FUND_SOURCE_ID", linkedAtt);
         }
+        if("PM_BUY_DEMAND_REQ".equals(entCode)){ // 采购需求审批
+            // 99799190825080705 = 企业自筹
+            String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
+            String val = "";
+            String txt = "";
+            if ("99799190825080705".equals(id)){
+                val = "99799190825080670";
+                txt = "否";
+            } else {
+                val = "99799190825080669";
+                txt = "是";
+            }
+            //是否政府投资项目
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = val;
+                linkedAtt.text = txt;
+                attLinkResult.attMap.put("YES_NO_ONE", linkedAtt);
+            }
+        }
         // 可研批复资金
         {
             LinkedAtt linkedAtt = new LinkedAtt();
