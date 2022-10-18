@@ -95,12 +95,145 @@ public class AttLinkExt {
             return linkPM_BID_KEEP_FILE_REQ_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("FUND_IMPLEMENTATION_V_ID".equals(attCode)){ // 关联资金来源 属性联动
             return linkFUND_IMPLEMENTATION_V_ID(myJdbcTemplate, attValue, entCode,sevId,param);
+        } else if ("FUND_PAY_CODE_V_ID".equals(attCode)){ // 关联支付明细码 属性联动
+            return linkFUND_PAY_CODE_V_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("PM_BID_APPROVAL_REQ_ID".equals(attCode)){ // 招标文件审批 属性联动
             return linkPM_BID_APPROVAL_REQ_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
 
+    }
+
+    private AttLinkResult linkFUND_PAY_CODE_V_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        //资金支付明细表选择关联支付明细码后联动
+        if ("FUND_NEWLY_INCREASED_DETAIL".equals(entCode)){
+            String echoSql = "select pr.name prjName,fs.PM_PRJ_ID prjId,fi.FUND_SOURCE_TEXT sourceName,fid.id sourceId,fi.FUND_CATEGORY_FIRST categoryFirstId,ft1" +
+                    ".name categoryFirstName,fi.FUND_CATEGORY_SECOND categorySecondId,ft2.name categorySecondName,fs.CUSTOMER_UNIT customerUnitId,pa.name " +
+              "customerUnitName,pr.PRJ_MANAGE_MODE_ID prjModeId,sv3.name prjModeName,fs.FUND_REACH_CATEGORY fundCategoryId,sv1.name fundCategoryName,sv2.name costCategoryName,op.COST_CATEGORY_ID " +
+                    "costCategoryId,fs.nper,fs.PAID_AMT paidAmt,fs.PAY_UNIT payUnitId,rb1.name payUnitName,fs.RECEIPT_BANK receiptBankId,rb2.name " +
+                    "receiptBankName,fs.RECEIPT_ACCOUNT receiptAccountId,rb3.name receiptAccountName\n" +
+                    "from fund_special fs \n" +
+                    "left join (select fid.ID,fi.FUND_SOURCE_TEXT name,fid.PM_PRJ_ID from fund_implementation fi left join " +
+                     "fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id) sourceTemp on sourceTemp.id = fs" +
+                    ".FUND_IMPLEMENTATION_V_ID\n" +
+                    "left join fund_implementation fi on fi.FUND_SOURCE_TEXT = sourceTemp.name\n" +
+                    "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
+                    "left join pm_prj pr on pr.id = fs.PM_PRJ_ID\n" +
+                    "left join fund_type ft1 on ft1.id = fi.FUND_CATEGORY_FIRST\n" +
+                    "left join fund_type ft2 on ft2.id = fi.FUND_CATEGORY_SECOND\n" +
+                    "left join PM_PARTY pa on pa.id = fs.CUSTOMER_UNIT\n" +
+                    "left join gr_set_value sv1 on sv1.id = fs.FUND_REACH_CATEGORY\n" +
+                    "left join gr_set se1 on se1.id = sv1.GR_SET_ID and sv1.code = 'fund_reach_category'\n" +
+                    "left join PO_ORDER_PAYMENT_REQ op on op.AMOUT_PM_PRJ_ID = fs.PM_PRJ_ID\n" +
+                    "left join gr_set_value sv2 on sv2.id = op.COST_CATEGORY_ID\n" +
+                    "left join gr_set se2 on se2.id = sv2.GR_SET_ID and se2.code = 'cost_category'\n" +
+                    "left join receiving_bank rb1 on rb1.id = fs.PAY_UNIT\n" +
+                    "left join receiving_bank rb2 on rb2.id = fs.RECEIPT_BANK\n" +
+                    "left join gr_set_value sv3 on sv3.id = pr.PRJ_MANAGE_MODE_ID\n" +
+                    "left join gr_set se3 on se3.id = sv3.GR_SET_ID and se3.code = 'management_unit'\n" +
+                    "left join receiving_bank rb3 on rb3.id = fs.RECEIPT_ACCOUNT\n" +
+                    "where fs.FUND_PAY_CODE = ?";
+            List<Map<String, Object>> echoList = myJdbcTemplate.queryForList(echoSql, attValue);
+            if (!CollectionUtils.isEmpty(echoList)){
+                Map<String, Object> echoMap = echoList.get(0);
+                //项目
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(echoMap,"prjId");
+                    linkedAtt.text = JdbcMapUtil.getString(echoMap,"prjName");
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("PM_PRJ_ID",linkedAtt);
+                }
+
+                //资金来源
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(echoMap,"sourceId");
+                    linkedAtt.text = JdbcMapUtil.getString(echoMap,"sourceName");
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("FUND_IMPLEMENTATION_V_ID",linkedAtt);
+                }
+
+                //资金类别（一级）
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(echoMap,"categoryFirstId");
+                    linkedAtt.text = JdbcMapUtil.getString(echoMap,"categoryFirstName");
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("FUND_CATEGORY_FIRST",linkedAtt);
+                }
+
+                //资金类别（二级）
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(echoMap,"categorySecondId");
+                    linkedAtt.text = JdbcMapUtil.getString(echoMap,"categorySecondName");
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("FUND_CATEGORY_SECOND",linkedAtt);
+                }
+
+                //业主单位
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(echoMap,"customerUnitId");
+                    linkedAtt.text = JdbcMapUtil.getString(echoMap,"customerUnitName");
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("CUSTOMER_UNIT",linkedAtt);
+                }
+
+                //代管单位
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(echoMap,"prjModeId");
+                    linkedAtt.text = JdbcMapUtil.getString(echoMap,"prjModeName");
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID",linkedAtt);
+                }
+
+
+                //支付信息表(子表)
+                String viewId = "99952822476415265";
+                ArrayList<LinkedRecord> linkedRecordList = new ArrayList<>();
+                LinkedRecord linkedRecord = new LinkedRecord();
+                //资金类别
+                linkedRecord.valueMap.put("FUND_REACH_CATEGORY",JdbcMapUtil.getString(echoMap,"fundCategoryId"));
+                linkedRecord.textMap.put("FUND_REACH_CATEGORY",JdbcMapUtil.getString(echoMap,"fundCategoryName"));
+                //费用大类
+                linkedRecord.valueMap.put("COST_CATEGORY_ID",JdbcMapUtil.getString(echoMap,"costCategoryId"));
+                linkedRecord.textMap.put("COST_CATEGORY_ID",JdbcMapUtil.getString(echoMap,"costCategoryName"));
+                //期数
+                linkedRecord.valueMap.put("NPER",JdbcMapUtil.getInt(echoMap,"nper"));
+                linkedRecord.textMap.put("NPER",JdbcMapUtil.getString(echoMap,"nper"));
+                //支付金额
+                linkedRecord.valueMap.put("PAY_AMT",JdbcMapUtil.getDouble(echoMap,"paidAmt"));
+                linkedRecord.textMap.put("PAY_AMT",JdbcMapUtil.getString(echoMap,"paidAmt"));
+                //付款单位
+                linkedRecord.valueMap.put("PAY_UNIT",JdbcMapUtil.getString(echoMap,"payUnitId"));
+                linkedRecord.textMap.put("PAY_UNIT",JdbcMapUtil.getString(echoMap,"payUnitName"));
+                //支付银行
+                linkedRecord.valueMap.put("RECEIPT_BANK",JdbcMapUtil.getString(echoMap,"receiptBankId"));
+                linkedRecord.textMap.put("RECEIPT_BANK",JdbcMapUtil.getString(echoMap,"receiptBankName"));
+                //支付账户
+                linkedRecord.valueMap.put("RECEIPT_ACCOUNT",JdbcMapUtil.getString(echoMap,"receiptAccountId"));
+                linkedRecord.textMap.put("RECEIPT_ACCOUNT",JdbcMapUtil.getString(echoMap,"receiptAccountName"));
+                linkedRecordList.add(linkedRecord);
+                attLinkResult.childData.put(viewId,linkedRecordList);
+                attLinkResult.childCreatable.put(viewId, true);
+                attLinkResult.childClear.put(viewId, true);
+            }
+
+
+        }
+
+        return attLinkResult;
     }
 
     //招标文件审批 属性联动
@@ -153,7 +286,7 @@ public class AttLinkExt {
     private AttLinkResult linkFUND_IMPLEMENTATION_V_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
         //专项资金支付选择资金来源后联动
-        if ("FUND_SPECIAL".equals(entCode)){
+        if ("FUND_SPECIAL".equals(entCode) || "FUND_NEWLY_INCREASED_DETAIL".equals(entCode)){
             String fundSource = attValue;//资金来源
             Map<String, Object> fundSourceMap = myJdbcTemplate.queryForMap("select fi.FUND_SOURCE_TEXT name from fund_implementation fi left join" +
                     " fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id where fid.id = ?", fundSource);
@@ -265,9 +398,8 @@ public class AttLinkExt {
                 }
 
                 //支付明细码(FUND_PAY_CODE),文本（短）
-                //查询相同项目、资金来源、相同日期专项资金支付条数
-                Map<String, Object> countToday = myJdbcTemplate.queryForMap("select count(*) countToday from fund_special where CRT_DT > DATE(NOW()) and " +
-                        "PM_PRJ_ID = ? and FUND_IMPLEMENTATION_V_ID = ?", prjId, fundSource);
+                //查询相同日期专项资金支付条数
+                Map<String, Object> countToday = myJdbcTemplate.queryForMap("select count(*) countToday from fund_special where CRT_DT > DATE(NOW())");
                 DecimalFormat df = new DecimalFormat("0000");
                 String suffixNum = df.format(JdbcMapUtil.getInt(countToday, "countToday") + 1);
                 SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
@@ -282,15 +414,61 @@ public class AttLinkExt {
 
                 //期数
                 //查询相同项目、资金来源专项资金支付条数
-                Map<String, Object> countMap = myJdbcTemplate.queryForMap("select count(*) count from fund_special where PM_PRJ_ID = ? and " +
-                        "FUND_IMPLEMENTATION_V_ID = ?", prjId, fundSource);
+                int count = 0;
+                Map<String, Object> specialCountMap = myJdbcTemplate.queryForMap("select ifnull(max(NPER),0) count from fund_special where PM_PRJ_ID = ? and FUND_IMPLEMENTATION_V_ID = ?", prjId, fundSource);
+                Map<String, Object> payCountMap = myJdbcTemplate.queryForMap("select ifnull(max(i.NPER),0) count from FUND_PAY_INFO i left join " +
+                        "FUND_NEWLY_INCREASED_DETAIL f on f.id = i.FUND_NEWLY_INCREASED_DETAIL_ID where f.PM_PRJ_ID = ? and f.FUND_IMPLEMENTATION_V_ID = ?",prjId,fundSource);
+                count = JdbcMapUtil.getInt(specialCountMap,"count") > JdbcMapUtil.getInt(payCountMap,"count") ? JdbcMapUtil.getInt(specialCountMap,"count") : JdbcMapUtil.getInt(payCountMap,"count");
+
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
                     linkedAtt.type = AttDataTypeE.INTEGER;
-                    linkedAtt.value = JdbcMapUtil.getInt(countMap,"count");
-                    linkedAtt.text = JdbcMapUtil.getString(countMap,"count");
+                    linkedAtt.value = count + 1;
+                    linkedAtt.text = String.valueOf(count + 1);
                     attLinkResult.attMap.put("NPER",linkedAtt);
                 }
+
+                if ("FUND_NEWLY_INCREASED_DETAIL".equals(entCode)){//支付资金信息表
+                    String fundCategorySql = "select fi.FUND_CATEGORY_FIRST categoryFirstId,ft1.name categoryFirstName,fi.FUND_CATEGORY_SECOND " +
+                            "categorySecondId,ft2.name categorySecondName \n" +
+                            "from fund_implementation fi \n" +
+                            "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
+                            "left join fund_type ft1 on ft1.id = fi.FUND_CATEGORY_FIRST\n" +
+                            "left join fund_type ft2 on ft2.id = fi.FUND_CATEGORY_SECOND\n" +
+                            "where fi.FUND_SOURCE_TEXT = ? and fid.PM_PRJ_ID = ?";
+                    List<Map<String, Object>> categoryList = myJdbcTemplate.queryForList(fundCategorySql, fundSourceName, prjId);
+                    if (!CollectionUtils.isEmpty(categoryList)){
+                        //资金大类一级
+                        {
+                            LinkedAtt linkedAtt = new LinkedAtt();
+                            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                            linkedAtt.value = JdbcMapUtil.getString(categoryList.get(0),"categoryFirstId");
+                            linkedAtt.text = JdbcMapUtil.getString(categoryList.get(0),"categoryFirstName");
+                            attLinkResult.attMap.put("FUND_CATEGORY_FIRST",linkedAtt);
+                        }
+
+                        //资金大类二级
+                        {
+                            LinkedAtt linkedAtt = new LinkedAtt();
+                            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                            linkedAtt.value = JdbcMapUtil.getString(categoryList.get(0),"categorySecondId");
+                            linkedAtt.text = JdbcMapUtil.getString(categoryList.get(0),"categorySecondName");
+                            attLinkResult.attMap.put("FUND_CATEGORY_SECOND",linkedAtt);
+                        }
+
+                    }
+                }
+                //支付信息（子表）
+                String viewId = "99952822476415265";
+                ArrayList<LinkedRecord> linkedRecordList = new ArrayList<>();
+                LinkedRecord linkedRecord = new LinkedRecord();
+                //资金类别
+                linkedRecord.valueMap.put("NPER",count);
+                linkedRecord.textMap.put("NPER",String.valueOf(count));
+                linkedRecordList.add(linkedRecord);
+                attLinkResult.childData.put(viewId,linkedRecordList);
+                attLinkResult.childCreatable.put(viewId, true);
+                attLinkResult.childClear.put(viewId, true);
             }
         }
         return attLinkResult;
