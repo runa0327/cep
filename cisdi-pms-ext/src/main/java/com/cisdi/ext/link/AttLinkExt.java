@@ -1338,8 +1338,7 @@ public class AttLinkExt {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
 
             // 查询关联合同信息
-            List<Map<String, Object>> contractMaps = myJdbcTemplate.queryForList("select o.WIN_BID_UNIT_TXT,o" +
-                    ".CONTRACT_PRICE,a.PRJ_TOTAL_INVEST estimate,b.PRJ_TOTAL_INVEST budget from PO_ORDER_REQ " +
+            List<Map<String, Object>> contractMaps = myJdbcTemplate.queryForList("select o.CONTRACT_PRICE,a.PRJ_TOTAL_INVEST estimate,b.PRJ_TOTAL_INVEST budget from PO_ORDER_REQ " +
                     "o left join PM_PRJ_INVEST2 a on a.PM_PRJ_ID =o.PM_PRJ_ID left join PM_PRJ_INVEST3 b on b" +
                     ".PM_PRJ_ID = o.PM_PRJ_ID where o.PM_PRJ_ID = ? and o.`STATUS` = 'AP' order by o.CRT_DT " +
                     "limit 1", attValue);
@@ -1789,7 +1788,7 @@ public class AttLinkExt {
 
         // 根据id查询招投标信息
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select WINNING_BIDS_AMOUNT,BUY_TYPE_ID,BID_CTL_PRICE_LAUNCH,BUY_MATTER_ID,PM_BID_KEEP_FILE_REQ_ID," +
-                "CONTRACT_NAME,PM_BID_KEEP_FILE_REQ_ID,CONTRACT_CODE,NAME,WIN_BID_UNIT_TXT,CONTRACT_PRICE,ATT_FILE_GROUP_ID from po_order_req where id = ?", attValue);
+                "CONTRACT_NAME,PM_BID_KEEP_FILE_REQ_ID,CONTRACT_CODE,NAME,WIN_BID_UNIT_ONE,CONTRACT_PRICE,ATT_FILE_GROUP_ID from po_order_req where id = ?", attValue);
 
         if (CollectionUtils.isEmpty(list)) {
             throw new BaseException("合同相关属性不完善！");
@@ -1816,9 +1815,9 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
-            linkedAtt.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
-            attLinkResult.attMap.put("WIN_BID_UNIT_TXT", linkedAtt);
+            linkedAtt.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_ONE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_ONE");
+            attLinkResult.attMap.put("WIN_BID_UNIT_ONE", linkedAtt);
         }
         // 合同总金额
         {
@@ -2524,270 +2523,46 @@ public class AttLinkExt {
 //            throw new BaseException("项目的相关属性不完整！");
 //        }
         if (CollectionUtils.isEmpty(list)){
-            // 项目编号
+
             {
                 LinkedAtt linkedAtt = new LinkedAtt();
                 linkedAtt.type = AttDataTypeE.TEXT_SHORT;
                 linkedAtt.value = "";
                 linkedAtt.text = "";
 
-                attLinkResult.attMap.put("PRJ_CODE", linkedAtt);
-            }
-            // 建筑面积
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                attLinkResult.attMap.put("BUILDING_AREA", linkedAtt);
-            }
-            // 业主单位
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.REF_SINGLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("CUSTOMER_UNIT", linkedAtt);
-            }
-            // 项目管理模式
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.REF_SINGLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID", linkedAtt);
-            }
-            // 建设地点
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.REF_SINGLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("BASE_LOCATION_ID", linkedAtt);
-            }
-            // 占地面积
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("FLOOR_AREA", linkedAtt);
-            }
-            // 项目类型
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.REF_SINGLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("PROJECT_TYPE_ID", linkedAtt);
-            }
-            // 建设规模类型
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.REF_SINGLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("CON_SCALE_TYPE_ID", linkedAtt);
-            }
-            // 建设规模单位
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.REF_SINGLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt);
-            }
-
-            //面积
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.text = "";
-                linkedAtt.value = "";
-                attLinkResult.attMap.put("QTY_ONE", linkedAtt);
-            }
-            //海域面积
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.text = "";
-                linkedAtt.value = "";
-                attLinkResult.attMap.put("QTY_THREE", linkedAtt);
-            }
-            //长
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.text = "";
-                linkedAtt.value = "";
-                attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
-            }
-            //宽
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.text = "";
-                linkedAtt.value = "";
-                attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
-            }
-            //其他
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.text = "";
-                linkedAtt.value = "";
-                attLinkResult.attMap.put("QTY_TWO", linkedAtt);
-            }
-
-            // 建设年限
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                attLinkResult.attMap.put("BUILD_YEARS", linkedAtt);
-            }
-            // 项目概况
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt);
-                attLinkResult.attMap.put("PRJ_INTRODUCE", linkedAtt);
-            }
-            // 批复文号
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
-                attLinkResult.attMap.put("REPLY_NO", linkedAtt);
-            }
-            // 批复日期
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DATE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("PRJ_REPLY_DATE", linkedAtt);
-            }
-            // 批复材料
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.FILE_GROUP;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("PRJ_REPLY_FILE", linkedAtt);
-            }
-            // 资金来源
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
-                attLinkResult.attMap.put("PM_FUND_SOURCE_ID", linkedAtt);
-            }
-            // 可研批复资金
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("FEASIBILITY_APPROVE_FUND", linkedAtt);
-            }
-            // 初概批复资金
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("ESTIMATE_APPROVE_FUND", linkedAtt);
-            }
-            // 财评批复资金
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("EVALUATION_APPROVE_FUND", linkedAtt);
-            }
-
-            // 资金信息回显。优先级 可研估算<初设概算<预算财评
-            List<String> amtList = getAmtList();
-            if (amtList.contains(entCode)) {
-                // 总投资
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.DOUBLE;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-
-                    attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
-                }
-                // 工程费用
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.DOUBLE;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-
-                    attLinkResult.attMap.put("PROJECT_AMT", linkedAtt);
-                }
-                // 工程建设其他费用
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.DOUBLE;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-
-                    attLinkResult.attMap.put("PROJECT_OTHER_AMT", linkedAtt);
-                }
-                // 预备费
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.DOUBLE;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-
-                    attLinkResult.attMap.put("PREPARE_AMT", linkedAtt);
-                }
-                // 利息
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.DOUBLE;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-
-                    attLinkResult.attMap.put("CONSTRUCT_PERIOD_INTEREST", linkedAtt);
-                }
-                //批复文号
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.DOUBLE;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-
-                    attLinkResult.attMap.put("REPLY_NO", linkedAtt);
-                    attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
-                }
+                attLinkResult.attMap.put("PRJ_CODE", linkedAtt); // 项目编号
+                attLinkResult.attMap.put("BUILDING_AREA", linkedAtt); // 建筑面积
+                attLinkResult.attMap.put("CUSTOMER_UNIT", linkedAtt); // 业主单位
+                attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID", linkedAtt); // 项目管理模式
+                attLinkResult.attMap.put("BASE_LOCATION_ID", linkedAtt); // 建设地点
+                attLinkResult.attMap.put("FLOOR_AREA", linkedAtt); // 占地面积
+                attLinkResult.attMap.put("PROJECT_TYPE_ID", linkedAtt); // 项目类型
+                attLinkResult.attMap.put("CON_SCALE_TYPE_ID", linkedAtt); // 建设规模类型
+                attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt); // 建设规模单位
+                attLinkResult.attMap.put("QTY_ONE", linkedAtt); // 建筑面积
+                attLinkResult.attMap.put("QTY_THREE", linkedAtt); // 海域面积
+                attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt); // 长
+                attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt); // 宽
+                attLinkResult.attMap.put("QTY_TWO", linkedAtt); // 其他
+                attLinkResult.attMap.put("BUILD_YEARS", linkedAtt); // 建设年限
+                attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt); // 项目概况
+                attLinkResult.attMap.put("PRJ_INTRODUCE", linkedAtt); // 项目介绍
+                attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt); // 批复文号
+                attLinkResult.attMap.put("REPLY_NO", linkedAtt); // 批复文号
+                attLinkResult.attMap.put("PRJ_REPLY_DATE", linkedAtt); // 批复日期
+                attLinkResult.attMap.put("PRJ_REPLY_FILE", linkedAtt); // 批复材料
+                attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt); // 资金来源
+                attLinkResult.attMap.put("PM_FUND_SOURCE_ID", linkedAtt); // 资金来源
+                attLinkResult.attMap.put("FEASIBILITY_APPROVE_FUND", linkedAtt); // 可研批复资金
+                attLinkResult.attMap.put("ESTIMATE_APPROVE_FUND", linkedAtt); // 初概批复资金
+                attLinkResult.attMap.put("EVALUATION_APPROVE_FUND", linkedAtt); // 财评批复资金
+                attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt); // 总投资
+                attLinkResult.attMap.put("PROJECT_AMT", linkedAtt); // 工程费用
+                attLinkResult.attMap.put("PROJECT_OTHER_AMT", linkedAtt); // 工程建设其他费用
+                attLinkResult.attMap.put("PREPARE_AMT", linkedAtt); // 预备费
+                attLinkResult.attMap.put("CONSTRUCT_PERIOD_INTEREST", linkedAtt); // 利息
+                attLinkResult.attMap.put("REPLY_NO", linkedAtt); // 批复文号
+                attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt); // 批复文号
             }
             return attLinkResult;
         }
