@@ -386,7 +386,8 @@ public class AttLinkExt {
                     "where a.PM_BUY_DEMAND_REQ_ID = ? " +
                     "order by a.CRT_DT desc " +
                     "limit 1", attValue);
-            List<Map<String, Object>> prjList = myJdbcTemplate.queryForList("select p.name,d.PM_PRJ_ID,d.BUY_TYPE_ID,d.PAY_AMT_TWO,d.BUY_MATTER_ID " +
+            List<Map<String, Object>> prjList = myJdbcTemplate.queryForList("select d.status,(select name from ad_status where id = d.status) as statusName," +
+                    "p.name,d.PM_PRJ_ID,d.BUY_TYPE_ID,d.PAY_AMT_TWO,d.BUY_MATTER_ID " +
                     "from PM_BUY_DEMAND_REQ d left join pm_prj p on p.id = d.PM_PRJ_ID " +
                     "where d.id = ?", attValue);
             if (!CollectionUtils.isEmpty(prjList)){
@@ -422,15 +423,23 @@ public class AttLinkExt {
                     linkedAtt.text = JdbcMapUtil.getString(prjList.get(0),"BUY_MATTER_ID");
                     attLinkResult.attMap.put("BUY_MATTER_ID",linkedAtt);
                 }
+                //审批状态
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(prjList.get(0),"status");
+                    linkedAtt.text = JdbcMapUtil.getString(prjList.get(0),"statusName");
+                    attLinkResult.attMap.put("STATUS_THREE",linkedAtt);
+                }
             }
             if (!CollectionUtils.isEmpty(bidFileCheck)){
                 Map<String, Object> bidFileCheckMap = bidFileCheck.get(0);
-                //关联招标文件审批 PM_BID_APPROVAL_REQ_ID
+                //关联招标文件审批
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
                     linkedAtt.type = AttDataTypeE.TEXT_LONG;
                     linkedAtt.value = JdbcMapUtil.getString(bidFileCheckMap,"id");
-                    linkedAtt.text = JdbcMapUtil.getString(bidFileCheckMap, "name");
+                    linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(bidFileCheckMap, "name")) ? " ":JdbcMapUtil.getString(bidFileCheckMap, "name");
                     attLinkResult.attMap.put("PM_BID_APPROVAL_REQ_ID",linkedAtt);
                 }
 
