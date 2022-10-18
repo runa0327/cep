@@ -3,7 +3,6 @@ package com.cisdi.pms.job.proWeekly;
 import com.cisdi.pms.job.enums.WeeklyEnum;
 import com.cisdi.pms.job.utils.Util;
 import com.cisdi.pms.job.utils.WeeklyUtils;
-import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
