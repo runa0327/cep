@@ -95,10 +95,58 @@ public class AttLinkExt {
             return linkPM_BID_KEEP_FILE_REQ_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("FUND_IMPLEMENTATION_V_ID".equals(attCode)){ // 关联资金来源 属性联动
             return linkFUND_IMPLEMENTATION_V_ID(myJdbcTemplate, attValue, entCode,sevId,param);
-        }else {
+        } else if ("PM_BID_APPROVAL_REQ_ID".equals(attCode)){ // 招标文件审批 属性联动
+            return linkPM_BID_APPROVAL_REQ_ID(myJdbcTemplate, attValue, entCode,sevId,param);
+        } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
 
+    }
+
+    //招标文件审批 属性联动
+    private AttLinkResult linkPM_BID_APPROVAL_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        if ("PM_USE_CHAPTER_REQ".equals(entCode)){ //中选单位及标后用印审批
+            String sql1 = "select a.id,a.name,a.NAME_ONE,a.status,(select name from ad_status where id=a.status) as statusName from PM_BID_APPROVAL_REQ a where id = ?";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,attValue);
+            if (CollectionUtils.isEmpty(list1)){ //全为空
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    attLinkResult.attMap.put("APPROVED_AMOUNT",linkedAtt);
+                    attLinkResult.attMap.put("STATUS_ONE",linkedAtt);
+                    attLinkResult.attMap.put("NAME_ONE",linkedAtt);
+                }
+            } else {
+                // 关联招标文件审批
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"id");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"name");
+                    attLinkResult.attMap.put("APPROVED_AMOUNT",linkedAtt);
+                }
+                // 审批状态
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"status");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"statusName");
+                    attLinkResult.attMap.put("STATUS_ONE",linkedAtt);
+                }
+                // 投标名称
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"NAME_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"NAME_ONE");
+                    attLinkResult.attMap.put("NAME_ONE",linkedAtt);
+                }
+            }
+        }
+        return attLinkResult;
     }
 
 
@@ -374,12 +422,6 @@ public class AttLinkExt {
     private AttLinkResult linkPM_BUY_DEMAND_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
         if ("PM_USE_CHAPTER_REQ".equals(entCode)){ //中选单位及标后用印审批
-            List<Map<String, Object>> bidFileCheck = myJdbcTemplate.queryForList("select a.name,a.id,a.status,s.name statusName,a.NAME_ONE tenderName " +
-                    "from PM_BID_APPROVAL_REQ a " +
-                    "left join ad_status s on s.id = a.status " +
-                    "where a.PM_BUY_DEMAND_REQ_ID = ? " +
-                    "order by a.CRT_DT desc " +
-                    "limit 1", attValue);
             List<Map<String, Object>> preBidCheck = myJdbcTemplate.queryForList("select a.name,a.id,a.status,s.name statusName " +
                     "from pm_file_chapter_req a " +
                     "left join ad_status s on s.id = a.status " +
@@ -430,35 +472,6 @@ public class AttLinkExt {
                     linkedAtt.value = JdbcMapUtil.getString(prjList.get(0),"status");
                     linkedAtt.text = JdbcMapUtil.getString(prjList.get(0),"statusName");
                     attLinkResult.attMap.put("STATUS_THREE",linkedAtt);
-                }
-            }
-            if (!CollectionUtils.isEmpty(bidFileCheck)){
-                Map<String, Object> bidFileCheckMap = bidFileCheck.get(0);
-                //关联招标文件审批
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(bidFileCheckMap,"id");
-                    linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(bidFileCheckMap, "name")) ? " ":JdbcMapUtil.getString(bidFileCheckMap, "name");
-                    attLinkResult.attMap.put("PM_BID_APPROVAL_REQ_ID",linkedAtt);
-                }
-
-                //关联招标文件审批状态 STATUS_ONE
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(bidFileCheckMap,"tenderName");
-                    linkedAtt.text = JdbcMapUtil.getString(bidFileCheckMap, "tenderName");
-                    attLinkResult.attMap.put("NAME_ONE",linkedAtt);
-                }
-
-                //招标（投标）名称
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(bidFileCheckMap,"status");
-                    linkedAtt.text = JdbcMapUtil.getString(bidFileCheckMap, "statusName");
-                    attLinkResult.attMap.put("STATUS_ONE",linkedAtt);
                 }
             }
             if (!CollectionUtils.isEmpty(preBidCheck)){
