@@ -61,11 +61,12 @@ public class ProWeeklyJob {
                 Map<String, String> dateMap = WeeklyUtils.weekBeginningAndEnding(WeeklyUtils.addDays(new Date(), 3));
                 jdbcTemplate.update("update REPORT set PM_PRJ_ID=? ,REPOERT_TYPE_ID=?,TIME_FROM=?,TIME_TERMINATION=?,FILING_STATUS='0' where ID=?",
                         item.get("PM_PRJ_ID"),item.get("REPOERT_TYPE_ID"),dateMap.get("begin"),dateMap.get("end"),reportId);
-            } else if (WeeklyEnum.montly_report.getCode().equals(reportType)) {
-                //月报
-            } else if (WeeklyEnum.quarterly_report.getCode().equals(reportType)) {
-                //季报
             }
+//            else if (WeeklyEnum.montly_report.getCode().equals(reportType)) {
+//                //月报
+//            } else if (WeeklyEnum.quarterly_report.getCode().equals(reportType)) {
+//                //季报
+//            }
 
         });
     }
