@@ -3,8 +3,7 @@ package com.cisdi.pms.job.proWeekly;
 import com.cisdi.pms.job.enums.WeeklyEnum;
 import com.cisdi.pms.job.utils.Util;
 import com.cisdi.pms.job.utils.WeeklyUtils;
-import com.qygly.ext.jar.helper.sql.Crud;
-import com.qygly.ext.rest.helper.keeper.LoginInfoManager;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,7 +16,6 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author 尹涛 * @version V1.0.0
@@ -34,9 +32,9 @@ public class ProWeeklyJob {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+
     @Resource(name = "taskExecutor")
     private ThreadPoolTaskExecutor taskExecutor;
-
 
     /**
      * 定时产生周报(每周五执行)
@@ -56,11 +54,11 @@ public class ProWeeklyJob {
         list.forEach(item -> {
             String reportType = String.valueOf(item.get("REPORT_TYPE_ID"));
             if (WeeklyEnum.weekly_report.getCode().equals(reportType)) {
-                //周报 REPORT
+                // 周报 REPORT
                 String reportId = Util.insertData(jdbcTemplate, "REPORT");
                 Map<String, String> dateMap = WeeklyUtils.weekBeginningAndEnding(WeeklyUtils.addDays(new Date(), 3));
                 jdbcTemplate.update("update REPORT set PM_PRJ_ID=? ,REPOERT_TYPE_ID=?,TIME_FROM=?,TIME_TERMINATION=?,FILING_STATUS='0' where ID=?",
-                        item.get("PM_PRJ_ID"),item.get("REPOERT_TYPE_ID"),dateMap.get("begin"),dateMap.get("end"),reportId);
+                        item.get("PM_PRJ_ID"), item.get("REPOERT_TYPE_ID"), dateMap.get("begin"), dateMap.get("end"), reportId);
             }
 //            else if (WeeklyEnum.montly_report.getCode().equals(reportType)) {
 //                //月报
