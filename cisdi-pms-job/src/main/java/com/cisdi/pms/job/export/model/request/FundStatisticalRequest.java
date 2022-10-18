@@ -1,4 +1,4 @@
-package com.cisdi.pms.job.model.request;
+package com.cisdi.pms.job.export.model.request;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import lombok.Data;
  * @author 尹涛 * @version V1.0.0
  * @projectName cisdi-pms-service
  * @title FundStatisticalRequest
- * @package com.cisdi.pms.job.model.request
+ * @package com.cisdi.pms.job.export.model.request
  * @description
  * @date 2022/9/27
  */

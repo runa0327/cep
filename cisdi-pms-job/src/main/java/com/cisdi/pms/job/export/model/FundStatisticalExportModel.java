@@ -1,4 +1,4 @@
-package com.cisdi.pms.job.model;
+package com.cisdi.pms.job.export.model;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
@@ -9,7 +9,7 @@ import lombok.Data;
  * @author 尹涛 * @version V1.0.0
  * @projectName cisdi-pms-service
  * @title FundStatisticalExportModel
- * @package com.cisdi.pms.job.model
+ * @package com.cisdi.pms.job.export.model
  * @description
  * @date 2022/9/27
  */

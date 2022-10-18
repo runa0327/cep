@@ -1,4 +1,4 @@
-package com.cisdi.pms.job.model.request;
+package com.cisdi.pms.job.export.model.request;
 
 import lombok.Data;
 
