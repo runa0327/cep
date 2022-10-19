@@ -56,9 +56,11 @@ public class FundStatisticalController extends BaseController {
                 "ifnull(temp.sumAmt,0)/10000 as cumulativeInPaceAmt, \n" +
                 "ifnull(temp2.sumZqAmt,0)/10000 as cumulativeInPaceAmtZq, \n" +
                 "ifnull(temp3.sumJsAmt,0)/10000 as cumulativeInPaceAmtJs, \n" +
-                "0 as cumulativePayAmt,(ifnull(temp.sumAmt,0) - 0)/10000 as syAmt,\n" +
+                "ifnull(temp4.cumPayAmt,0)/10000 as cumulativePayAmt,  (ifnull(temp1.sumApp,0) - ifnull(temp4.cumPayAmt,0))/10000 as syAmt, \n" +
                 "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0))/10000 as unInPlaceAmt,\n" +
-                "(ifnull(temp1.sumApp,0) - 0)/10000 as totalSyAmt,0 as totalPayRate,fi.REMARK as remark \n" +
+                "(ifnull(temp1.sumApp,0) - ifnull(temp4.cumPayAmt,0))/10000 as totalSyAmt,\n" +
+                "CONCAT((CAST(ROUND((ifnull(temp4.cumPayAmt,0)/ifnull(temp1.sumApp,0))*100,0) as char)),'%') as totalPayRate,\n" +
+                "fi.REMARK as remark \n" +
                 "from FUND_IMPLEMENTATION fi \n" +
                 "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST \n" +
                 "left join FUND_TYPE ft1 on ft1.id = fi.FUND_CATEGORY_SECOND \n" +
@@ -69,7 +71,11 @@ public class FundStatisticalController extends BaseController {
                 "left join (select sum(REACH_AMOUNT) sumJsAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '99952822476371282' group by " +
                 "FUND_SOURCE_TEXT) temp3 on temp3.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
                 "left join (select sum(APPROVED_AMOUNT) sumApp,FUND_IMP_ID from fund_implementation_detail group by FUND_IMP_ID) temp1 on temp1" +
-                ".FUND_IMP_ID = fi.id where 1=1");
+                ".FUND_IMP_ID = fi.id " +
+                "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
+                "left join (select sum(IFNULL(fs.PAID_AMT,0)) cumPayAmt,fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID from fund_special fs group by fs" +
+                ".FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp4 on temp4.FUND_IMPLEMENTATION_V_ID = fid.id and temp4.PM_PRJ_ID = fid.PM_PRJ_ID\n" +
+                "where 1=1");
         if (Strings.isNotEmpty(fundCategoryId)) {
             sb.append(" and fi.FUND_CATEGORY_FIRST = '").append(fundCategoryId).append("'");
         }
@@ -111,9 +117,11 @@ public class FundStatisticalController extends BaseController {
                 "ifnull(temp.sumAmt,0)/10000 as cumulativeInPaceAmt, \n" +
                 "ifnull(temp2.sumZqAmt,0)/10000 as cumulativeInPaceAmtZq, \n" +
                 "ifnull(temp3.sumJsAmt,0)/10000 as cumulativeInPaceAmtJs, \n" +
-                "0 as cumulativePayAmt,(ifnull(temp.sumAmt,0) - 0)/10000 as syAmt,\n" +
+                "ifnull(temp4.cumPayAmt,0)/10000 as cumulativePayAmt,  (ifnull(temp1.sumApp,0) - ifnull(temp4.cumPayAmt,0))/10000 as syAmt, \n" +
                 "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0))/10000 as unInPlaceAmt,\n" +
-                "(ifnull(temp1.sumApp,0) - 0)/10000 as totalSyAmt,0 as totalPayRate,fi.REMARK as remark \n" +
+                "(ifnull(temp1.sumApp,0) - ifnull(temp4.cumPayAmt,0))/10000 as totalSyAmt,\n" +
+                "CONCAT((CAST(ROUND((ifnull(temp4.cumPayAmt,0)/ifnull(temp1.sumApp,0))*100,0) as char)),'%') as totalPayRate,\n" +
+                "fi.REMARK as remark \n" +
                 "from FUND_IMPLEMENTATION fi \n" +
                 "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST \n" +
                 "left join FUND_TYPE ft1 on ft1.id = fi.FUND_CATEGORY_SECOND \n" +
@@ -127,6 +135,8 @@ public class FundStatisticalController extends BaseController {
                 ".FUND_IMP_ID = fi.id" +
                 "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
                 "left join pm_prj pr on pr.id = fid.PM_PRJ_ID \n" +
+                "left join (select sum(IFNULL(fs.PAID_AMT,0)) cumPayAmt,fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID from fund_special fs group by fs" +
+                ".FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp4 on temp4.FUND_IMPLEMENTATION_V_ID = fid.id and temp4.PM_PRJ_ID = fid.PM_PRJ_ID\n" +
                 "where 1=1");
         if (Strings.isNotEmpty(fundCategoryId)) {
             sb.append(" and fi.FUND_CATEGORY_FIRST = '").append(fundCategoryId).append("'");

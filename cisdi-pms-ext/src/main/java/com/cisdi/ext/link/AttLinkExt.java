@@ -317,7 +317,7 @@ public class AttLinkExt {
                     ".FUND_SOURCE_TEXT,fr.pm_prj_id\n" +
                     ") temp2 on temp2.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT\n" +
                     "left join (select sum(IFNULL(fs.PAID_AMT,0)) cumPayAmt,fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID from fund_special fs group by " +
-                    "fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp3 on temp3.FUND_IMPLEMENTATION_V_ID = fi.FUND_SOURCE_TEXT and temp3.PM_PRJ_ID =" +
+                    "fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp3 on temp3.FUND_IMPLEMENTATION_V_ID = fid.id and temp3.PM_PRJ_ID =" +
                     " fid.PM_PRJ_ID\n" +
                     "left join pm_prj pr on pr.id = fid.PM_PRJ_ID\n" +
                     "left join PM_PARTY pa on pa.id = pr.CUSTOMER_UNIT\n" +
