@@ -541,10 +541,12 @@ public class WfExt {
         // 采购合同补充协议申请
         if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode)) {
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String FILE_ID_FIVE = JdbcMapUtil.getString(valueMap, "FILE_ID_FIVE");
+            String ATT_FILE_GROUP_ID = JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID");
+            // 合同原稿
+            ProFileUtils.insertProFile(prjId, FILE_ID_FIVE,FileCodeEnum.PO_ORDER_SUPPLEMENT_REQ_FILE_ID_FIVE);
             // 补充协议附件
-            ProFileUtils.insertProFile(prjId, JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID"), FileCodeEnum.SUPPLEMENTARY_AGREEMENT_ATTACHMENT);
-            // 采购合同补充协议申请流程附件
-            ProFileUtils.insertProFile(prjId, getProcessFileByProcInstId(procInstId), FileCodeEnum.PO_ORDER_SUPPLEMENT_REQ_PROCESS_ATTACHMENT);
+            ProFileUtils.insertProFile(prjId, ATT_FILE_GROUP_ID,FileCodeEnum.PO_ORDER_SUPPLEMENT_REQ_ATT_FILE_GROUP_ID);
         }
 
         // 采购合同变更申请
