@@ -103,14 +103,32 @@ public class WeeklyUtils {
         return c.getTime();
     }
 
+    /**
+     * 获取当前时间在一年中是第几周
+     *
+     * @param paramDate
+     * @return
+     */
+    public static int getWeekCount(Date paramDate) {
+        Calendar calendar = Calendar.getInstance();
+        //设置星期一为一周开始的第一天
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        //获得当前的时间戳
+        calendar.setTime(paramDate);
+        //获得当前日期属于今年的第几周
+        return calendar.get(Calendar.WEEK_OF_YEAR);
+    }
+
     public static void main(String[] args) throws ParseException {
-//        String asd = "2022-10-1";
-//        SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
-//        Date date = sd.parse(asd);
+        String asd = "2021-12-01";
+        SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = sd.parse(asd);
 //        Map<String, String> res = WeeklyUtils.weekBeginningAndEnding(date);
 //        System.out.println(res);
 
-        Date res = WeeklyUtils.addDays(new Date(),2);
+//        Date res = WeeklyUtils.addDays(new Date(), 2);
+
+        int res = WeeklyUtils.getWeekCount(date);
         System.out.println(res);
     }
 

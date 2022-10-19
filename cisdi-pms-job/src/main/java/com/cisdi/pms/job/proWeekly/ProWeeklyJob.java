@@ -10,11 +10,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * @author 尹涛 * @version V1.0.0
@@ -38,34 +40,53 @@ public class ProWeeklyJob {
     /**
      * 定时产生周报(每周五执行)
      */
-//    @Scheduled(fixedDelayString = "${spring.scheduled.fixedDelayString}")
-//    @Scheduled(cron = "* * * * * 5 ")
-    @Scheduled(cron = "* * * * * 2,5 ")
+//    @Scheduled(cron = "0 */1 * * * ?")//-- 每分钟执行一次
+    @Scheduled(cron = "0 0 1 ? * L") //每周星期六凌晨1点实行一次
     @Async("taskExecutor")
     public void invokeCreateWeekly() {
         // 查询周报规则
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select PROJECT_TYPE_ID,PM_PARTY_ROLE_ID,REPOERT_TYPE_ID,PROJECT_PHASE_ID,PM_PRJ_ID, " +
-                "gsv.code as REPORT_TYPE_ID from REPORT_RULES pr\n" +
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select REPOERT_TYPE_ID,PM_PRJ_ID,REPORT_USER,REPORT_TYPE_ID, \n" +
+                "gsv.code as REPORT_TYPE from REPORT_RULES pr\n" +
                 "left join gr_set_value gsv on pr.REPORT_TYPE_ID = gsv.id\n" +
                 "left join gr_set gs on gs.id = gsv.GR_SET_ID and gs.code='REPORT_TYPE'\n" +
-                " where pr.`STATUS`='ap'");
+                "where pr.`STATUS`='ap'");
 
-        list.forEach(item -> {
-            String reportType = String.valueOf(item.get("REPORT_TYPE_ID"));
+
+        List<Map<String, Object>> statusList = jdbcTemplate.queryForList("select gsv.* from gr_set_value gsv\n" +
+                "left join gr_set gs on gs.id = gsv.GR_SET_ID \n" +
+                "where  gs.code='REPORT_TYPE'");
+        String status = null;
+        Optional<Map<String, Object>> stringObjectMap = statusList.stream().filter(p -> "NOT_FILING".equals(String.valueOf(p.get("code")))).findAny();
+        if (stringObjectMap.isPresent()) {
+            status = String.valueOf(stringObjectMap.get().get("ID"));
+        }
+
+        int currentYear = LocalDate.now().getYear();
+        Map<String, String> dateMap = WeeklyUtils.weekBeginningAndEnding(WeeklyUtils.addDays(new Date(), 3));
+        //今天是第几周
+        int currentWeek = WeeklyUtils.getWeekCount(new Date());
+        for (int i = 0; i < list.size(); i++) {
+            Map<String, Object> item = list.get(i);
+            String reportType = String.valueOf(item.get("REPORT_TYPE"));
             if (WeeklyEnum.weekly_report.getCode().equals(reportType)) {
-                // 周报 REPORT
-                String reportId = Util.insertData(jdbcTemplate, "REPORT");
-                Map<String, String> dateMap = WeeklyUtils.weekBeginningAndEnding(WeeklyUtils.addDays(new Date(), 3));
-                jdbcTemplate.update("update REPORT set PM_PRJ_ID=? ,REPOERT_TYPE_ID=?,TIME_FROM=?,TIME_TERMINATION=?,FILING_STATUS='0' where ID=?",
-                        item.get("PM_PRJ_ID"), item.get("REPOERT_TYPE_ID"), dateMap.get("begin"), dateMap.get("end"), reportId);
+                //判断是否已经产生了周报
+                List<Map<String, Object>> reportList = jdbcTemplate.queryForList("select * from report where PM_PRJ_ID=? and `year`=? and WEEKS=? and REPOERT_TYPE_ID=?", item.get("PM_PRJ_ID"), currentYear, currentWeek + 1, item.get("REPOERT_TYPE_ID"));
+                if (CollectionUtils.isEmpty(reportList)) {
+                    // 周报 REPORT
+                    String reportId = Util.insertData(jdbcTemplate, "REPORT");
+                    jdbcTemplate.update("update REPORT set PM_PRJ_ID=? ,REPOERT_TYPE_ID=?,TIME_FROM=?,TIME_TERMINATION=?,FILING_STATUS=?,`year`=?,WEEKS=? where ID=?",
+                            item.get("PM_PRJ_ID"), item.get("REPOERT_TYPE_ID"), dateMap.get("begin"), dateMap.get("end"), status, currentYear, currentWeek + 1, reportId);
+                    String[] users = String.valueOf(item.get("REPORT_USER")).split(",");
+                    for (String user : users) {
+                        Map<String, Object> userData = jdbcTemplate.queryForMap("select * from ad_user where id =?", user);
+                        String id = Util.insertData(jdbcTemplate, "REPORT_REMINDER_RECORD");
+                        jdbcTemplate.update("update REPORT_REMINDER_RECORD REPORT_ID=?,AD_USER_ID=?,MOBILE=?,REMINDER_TIME=?,REMINDER_CONTENT=? where id =?", reportId, user, userData.get("MOBILE"), new Date(), "", id);
+                    }
+                }
             }
-//            else if (WeeklyEnum.montly_report.getCode().equals(reportType)) {
-//                //月报
-//            } else if (WeeklyEnum.quarterly_report.getCode().equals(reportType)) {
-//                //季报
-//            }
+        }
 
-        });
     }
+
 
 }
