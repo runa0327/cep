@@ -7,9 +7,11 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -170,6 +172,40 @@ public class PoOrderSupplementReqExt {
                 .set("CONTRACT_APP_ID",JdbcMapUtil.getString(data,"ID"))
                 .set("ORDER_PROCESS_TYPE","合同补充协议")
                 .exec();
+    }
+
+    /**
+     * 流程发起之时，相关数据校验
+     */
+    public void checkData() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        // 查询明细表合同总金额
+        String sql = "select AMT from PM_ORDER__EXTRA_COST_DETAIL where PO_ORDER_SUPPLEMENT_REQ_ID = ?";
+        List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql, entityRecord.csCommId);
+        if (CollectionUtils.isEmpty(list1)) {
+            throw new BaseException("费用明细不能为空！");
+        }
+        BigDecimal account = getSumAmt(list1);
+        //更新合同表合同总金额数
+        String sql2 = "update PO_ORDER_SUPPLEMENT_REQ set CONTRACT_PRICE = ? where id = ?";
+        myJdbcTemplate.update(sql2,account,entityRecord.csCommId);
+
+        //是否填写联系人
+        List<Map<String, Object>> contactList = myJdbcTemplate.queryForList("SELECT * FROM CONTRACT_SUPPLEMENT_CONTACT where PO_ORDER_SUPPLEMENT_REQ_ID = ?", entityRecord.csCommId);
+        if (CollectionUtils.isEmpty(contactList)){
+            throw new BaseException("联系人不能为空！");
+        }
+    }
+
+    // 汇总求和
+    private BigDecimal getSumAmt(List<Map<String, Object>> list) {
+        BigDecimal sum = new BigDecimal(0);
+        for (Map<String, Object> tmp : list) {
+            String value = tmp.get("AMT").toString();
+            sum = sum.add(new BigDecimal(value));
+        }
+        return sum;
     }
 
 }

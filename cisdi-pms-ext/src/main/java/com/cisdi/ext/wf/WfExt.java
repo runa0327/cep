@@ -541,12 +541,27 @@ public class WfExt {
         // 采购合同补充协议申请
         if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode)) {
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
-            String FILE_ID_FIVE = JdbcMapUtil.getString(valueMap, "FILE_ID_FIVE");
+            String FILE_ID_SEVEN = JdbcMapUtil.getString(valueMap, "FILE_ID_SEVEN");
+            String FILE_ID_SIX = JdbcMapUtil.getString(valueMap, "FILE_ID_SIX");
+            String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
+            String FILE_ID_THREE = JdbcMapUtil.getString(valueMap, "FILE_ID_THREE");
+            String FILE_ID_FOUR = JdbcMapUtil.getString(valueMap, "FILE_ID_FOUR");
             String ATT_FILE_GROUP_ID = JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID");
+            String FILE_ID_FIVE = JdbcMapUtil.getString(valueMap, "FILE_ID_FIVE");
             // 合同原稿
-            ProFileUtils.insertProFile(prjId, FILE_ID_FIVE,FileCodeEnum.PO_ORDER_SUPPLEMENT_REQ_FILE_ID_FIVE);
+            ProFileUtils.insertProFile(prjId, FILE_ID_SEVEN,FileCodeEnum.PO_ORDER_SUPPLEMENT_REQ_FILE_ID_SEVEN);
+            // 法律审核附件
+            ProFileUtils.insertProFile(prjId, FILE_ID_SIX,FileCodeEnum.PO_ORDER_SUPPLEMENT_REQ_FILE_ID_SIX);
+            // 财务部门修订稿
+            ProFileUtils.insertProFile(prjId, FILE_ID_TWO,FileCodeEnum.PO_ORDER_SUPPLEMENT_REQ_FILE_ID_TWO);
+            // 法务部门修订稿
+            ProFileUtils.insertProFile(prjId, FILE_ID_THREE,FileCodeEnum.PO_ORDER_SUPPLEMENT_REQ_FILE_ID_THREE);
+            // 采纳意见附件
+            ProFileUtils.insertProFile(prjId, FILE_ID_FOUR,FileCodeEnum.PO_ORDER_SUPPLEMENT_REQ_FILE_ID_FOUR);
             // 补充协议附件
             ProFileUtils.insertProFile(prjId, ATT_FILE_GROUP_ID,FileCodeEnum.PO_ORDER_SUPPLEMENT_REQ_ATT_FILE_GROUP_ID);
+            // 附件
+            ProFileUtils.insertProFile(prjId, FILE_ID_FIVE,FileCodeEnum.PO_ORDER_SUPPLEMENT_REQ_FILE_ID_FIVE);
         }
 
         // 采购合同变更申请

@@ -1104,7 +1104,7 @@ public class AttLinkExt {
                 linkedAtt.changeToEditable = changeToEditable;
                 attLinkResult.attMap.put("ATT_FILE_GROUP_ID", linkedAtt);
             }
-        } else if ("PO_ORDER_REQ".equals(entCode)){ //采购合同签订申请
+        } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 采购合同补充协议申请
             // 99799190825080669 = 是，99799190825080670=否
             Boolean replyChangeToMandatory = true; //审核意见采纳说明必填
             Boolean fileChangeToMandatory = true; //审核意见附件必填
@@ -1176,7 +1176,7 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("YES_NO_FOUR", linkedAtt);
                 }
             }
-        } else if ("PO_ORDER_REQ".equals(entCode)){ //采购合同签订申请
+        } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 采购合同补充协议申请
             // 99799190825080669 = 是， 99799190825080670 = 否
             Boolean faWuChangeToShown =  true; //法务部门修订稿显示
             Boolean caiWuChangeToShown =  true; //财务部门修订稿显示
@@ -2183,7 +2183,7 @@ public class AttLinkExt {
             linkedAtt.type = AttDataTypeE.FILE_GROUP;
             linkedAtt.value = JdbcMapUtil.getString(row,"FILE_ID_FIVE");
             getFileInfoList(linkedAtt);
-            attLinkResult.attMap.put("FILE_ID_FIVE",linkedAtt);
+            attLinkResult.attMap.put("FILE_ID_SEVEN",linkedAtt);
         }
         //资金需求申请合同附件回显
         if ("PM_FUND_REQUIRE_PLAN_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){
