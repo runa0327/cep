@@ -109,10 +109,10 @@ public class PoOrderSupplementReqExt {
             Map<String, Object> contractDataMap = myJdbcTemplate.queryForMap("select * from PO_ORDER_SUPPLEMENT_REQ where ID=?", csCommId);
             String id = Crud.from("PO_ORDER").insertData();
             insertContract(id, contractDataMap);
-//            List<Map<String, Object>> detailList = myJdbcTemplate.queryForList("select * from PM_ORDER_COST_DETAIL where CONTRACT_ID=?", csCommId);
-//            insertContractDet(id, detailList);
-            //查询联系人明细
-            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList("select OPPO_SITE_LINK_MAN,OPPO_SITE_CONTACT from CONTRACT_SUPPLEMENT_CONTACT where PARENT_ID = ?",csCommId);
+            List<Map<String, Object>> detailList = myJdbcTemplate.queryForList("select * from PM_ORDER__EXTRA_COST_DETAIL where PO_ORDER_SUPPLEMENT_REQ_ID=?", csCommId);
+            insertContractDet(id, detailList);
+            //查询联系人明细1
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList("select WIN_BID_UNIT_ONE,OPPO_SITE_LINK_MAN,OPPO_SITE_CONTACT from CONTRACT_SUPPLEMENT_CONTACT where PARENT_ID = ?",csCommId);
             if (!CollectionUtils.isEmpty(list2)){
                 insertContacts(id,list2);
             }
@@ -131,11 +131,28 @@ public class PoOrderSupplementReqExt {
                     .set("OPPO_SITE_CONTACT", JdbcMapUtil.getString(item, "OPPO_SITE_CONTACT"))
                     .set("PARENT_ID", id)
                     .set("CRT_DT",now)
+                    .set("WIN_BID_UNIT_ONE",JdbcMapUtil.getString(item,"WIN_BID_UNIT_ONE"))
                     .exec();
         });
     }
 
     private void insertContractDet(String id, List<Map<String, Object>> detailList) {
+        detailList.forEach(item -> {
+            String did = Crud.from("PO_ORDER_DTL").insertData();
+            Crud.from("PO_ORDER_DTL").where().eq("ID", did).update()
+                    .set("NAME", JdbcMapUtil.getString(item, "NAME"))
+                    .set("REMARK", JdbcMapUtil.getString(item, "REMARK"))
+                    .set("COST_TYPE_TREE_ID", JdbcMapUtil.getString(item, "COST_TYPE_TREE_ID"))
+                    .set("PAY_TYPE", JdbcMapUtil.getString(item, ""))
+                    .set("FILE_ATTACHMENT_URL", JdbcMapUtil.getString(item, ""))
+                    .set("TOTAL_AMT", JdbcMapUtil.getString(item, "TOTAL_AMT"))
+                    .set("AMT", JdbcMapUtil.getString(item, "AMT"))
+                    .set("CONTRACT_ID", JdbcMapUtil.getString(item, "CONTRACT_ID"))
+                    .set("WORK_CONTENT", JdbcMapUtil.getString(item, ""))
+                    .set("FEE_DETAIL", JdbcMapUtil.getString(item, "FEE_DETAIL"))
+                    .set("PO_ORDER_ID", id)
+                    .exec();
+        });
     }
 
     private void insertContract(String id, Map<String, Object> data) {
