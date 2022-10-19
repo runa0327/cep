@@ -457,18 +457,19 @@ public class AttLinkExt {
                         }
 
                     }
+                    //支付信息（子表）
+                    String viewId = "99952822476415265";
+                    ArrayList<LinkedRecord> linkedRecordList = new ArrayList<>();
+                    LinkedRecord linkedRecord = new LinkedRecord();
+                    //资金类别
+                    linkedRecord.valueMap.put("NPER",count + 1);
+                    linkedRecord.textMap.put("NPER",String.valueOf(count + 1));
+                    linkedRecordList.add(linkedRecord);
+                    attLinkResult.childData.put(viewId,linkedRecordList);
+                    attLinkResult.childCreatable.put(viewId, true);
+                    attLinkResult.childClear.put(viewId, true);
                 }
-                //支付信息（子表）
-                String viewId = "99952822476415265";
-                ArrayList<LinkedRecord> linkedRecordList = new ArrayList<>();
-                LinkedRecord linkedRecord = new LinkedRecord();
-                //资金类别
-                linkedRecord.valueMap.put("NPER",count);
-                linkedRecord.textMap.put("NPER",String.valueOf(count));
-                linkedRecordList.add(linkedRecord);
-                attLinkResult.childData.put(viewId,linkedRecordList);
-                attLinkResult.childCreatable.put(viewId, true);
-                attLinkResult.childClear.put(viewId, true);
+
             }
         }
         return attLinkResult;
