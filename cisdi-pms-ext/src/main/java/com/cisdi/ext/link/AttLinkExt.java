@@ -198,6 +198,16 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID",linkedAtt);
                 }
 
+                //期数
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(echoMap,"nper");
+                    linkedAtt.text = JdbcMapUtil.getString(echoMap,"nper");
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("NPER",linkedAtt);
+                }
+
 
                 //支付信息表(子表)
                 String viewId = "99952822476415265";
@@ -210,8 +220,8 @@ public class AttLinkExt {
                 linkedRecord.valueMap.put("COST_CATEGORY_ID",JdbcMapUtil.getString(echoMap,"costCategoryId"));
                 linkedRecord.textMap.put("COST_CATEGORY_ID",JdbcMapUtil.getString(echoMap,"costCategoryName"));
                 //期数
-                linkedRecord.valueMap.put("NPER",JdbcMapUtil.getInt(echoMap,"nper"));
-                linkedRecord.textMap.put("NPER",JdbcMapUtil.getString(echoMap,"nper"));
+//                linkedRecord.valueMap.put("NPER",JdbcMapUtil.getInt(echoMap,"nper"));
+//                linkedRecord.textMap.put("NPER",JdbcMapUtil.getString(echoMap,"nper"));
                 //支付金额
                 linkedRecord.valueMap.put("PAY_AMT",JdbcMapUtil.getDouble(echoMap,"paidAmt"));
                 linkedRecord.textMap.put("PAY_AMT",JdbcMapUtil.getString(echoMap,"paidAmt"));
@@ -416,8 +426,7 @@ public class AttLinkExt {
                 //查询相同项目、资金来源专项资金支付条数
                 int count = 0;
                 Map<String, Object> specialCountMap = myJdbcTemplate.queryForMap("select ifnull(max(NPER),0) count from fund_special where PM_PRJ_ID = ? and FUND_IMPLEMENTATION_V_ID = ?", prjId, fundSource);
-                Map<String, Object> payCountMap = myJdbcTemplate.queryForMap("select ifnull(max(i.NPER),0) count from FUND_PAY_INFO i left join " +
-                        "FUND_NEWLY_INCREASED_DETAIL f on f.id = i.FUND_NEWLY_INCREASED_DETAIL_ID where f.PM_PRJ_ID = ? and f.FUND_IMPLEMENTATION_V_ID = ?",prjId,fundSource);
+                Map<String, Object> payCountMap = myJdbcTemplate.queryForMap("select ifnull(max(NPER),0) count from fund_newly_increased_detail where PM_PRJ_ID = ? and FUND_IMPLEMENTATION_V_ID = ?",prjId,fundSource);
                 count = JdbcMapUtil.getInt(specialCountMap,"count") > JdbcMapUtil.getInt(payCountMap,"count") ? JdbcMapUtil.getInt(specialCountMap,"count") : JdbcMapUtil.getInt(payCountMap,"count");
 
                 {
@@ -458,16 +467,16 @@ public class AttLinkExt {
 
                     }
                     //支付信息（子表）
-                    String viewId = "99952822476415265";
-                    ArrayList<LinkedRecord> linkedRecordList = new ArrayList<>();
-                    LinkedRecord linkedRecord = new LinkedRecord();
-                    //资金类别
-                    linkedRecord.valueMap.put("NPER",count + 1);
-                    linkedRecord.textMap.put("NPER",String.valueOf(count + 1));
-                    linkedRecordList.add(linkedRecord);
-                    attLinkResult.childData.put(viewId,linkedRecordList);
-                    attLinkResult.childCreatable.put(viewId, true);
-                    attLinkResult.childClear.put(viewId, true);
+//                    String viewId = "99952822476415265";
+//                    ArrayList<LinkedRecord> linkedRecordList = new ArrayList<>();
+//                    LinkedRecord linkedRecord = new LinkedRecord();
+//                    //资金类别
+//                    linkedRecord.valueMap.put("NPER",count + 1);
+//                    linkedRecord.textMap.put("NPER",String.valueOf(count + 1));
+//                    linkedRecordList.add(linkedRecord);
+//                    attLinkResult.childData.put(viewId,linkedRecordList);
+//                    attLinkResult.childCreatable.put(viewId, true);
+//                    attLinkResult.childClear.put(viewId, true);
                 }
 
             }
