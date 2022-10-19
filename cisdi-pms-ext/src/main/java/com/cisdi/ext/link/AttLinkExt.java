@@ -1978,7 +1978,7 @@ public class AttLinkExt {
 
         // 根据id查询招投标信息
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select YES_NO_THREE,GUARANTEE_LETTER_TYPE_IDS,IS_REFER_GUARANTEE_ID,PLAN_TOTAL_DAYS," +
-                "CONTRACT_AMOUNT,CONTRACT_CATEGORY_ONE_ID,FILE_ID_FIVE,WIN_BID_UNIT_ONE,AMT_ONE,WINNING_BIDS_AMOUNT,BUY_TYPE_ID,BID_CTL_PRICE_LAUNCH,BUY_MATTER_ID," +
+                "CONTRACT_CATEGORY_ONE_ID,FILE_ID_FIVE,WIN_BID_UNIT_ONE,AMT_ONE,WINNING_BIDS_AMOUNT,BUY_TYPE_ID,BID_CTL_PRICE_LAUNCH,BUY_MATTER_ID," +
                 "PM_BID_KEEP_FILE_REQ_ID,CONTRACT_NAME,PM_BID_KEEP_FILE_REQ_ID,CONTRACT_CODE,NAME,WIN_BID_UNIT_ONE," +
                 "CONTRACT_PRICE,ATT_FILE_GROUP_ID from po_order_req where id = ?", attValue);
 
@@ -2134,14 +2134,15 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            String id = StringUtil.codeToSplit(JdbcMapUtil.getString(row,"GUARANTEE_LETTER_TYPE_IDS"));
+            String ids = JdbcMapUtil.getString(row,"GUARANTEE_LETTER_TYPE_IDS");
+            String id = StringUtil.codeToSplit(ids);
             String name = "";
-            String sql2 = "select group_concat(name) as name from gr_set_value where id in ('?')";
-            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,baoHanId);
+            String sql2 = "select group_concat(name) as name from gr_set_value where id in ('"+id+"')";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2);
             if (!CollectionUtils.isEmpty(list2)){
                 name = JdbcMapUtil.getString(list2.get(0),"name");
             }
-            linkedAtt.value = id;
+            linkedAtt.value = ids;
             linkedAtt.text = name;
             attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_IDS",linkedAtt);
         }
