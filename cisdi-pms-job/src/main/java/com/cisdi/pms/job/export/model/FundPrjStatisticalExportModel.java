@@ -1,4 +1,4 @@
-package com.cisdi.pms.job.model;
+package com.cisdi.pms.job.export.model;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
@@ -9,12 +9,12 @@ import lombok.Data;
  * @author 尹涛 * @version V1.0.0
  * @projectName cisdi-pms-service
  * @title FundStatisticalExportModel
- * @package com.cisdi.pms.job.model
+ * @package com.cisdi.pms.job.export.model
  * @description
  * @date 2022/9/27
  */
 @Data
-public class FundStatisticalExportModel {
+public class FundPrjStatisticalExportModel {
 
     @ExcelProperty("资金大类一级")
     @ColumnWidth(30)
@@ -27,6 +27,10 @@ public class FundStatisticalExportModel {
     @ExcelProperty("资金来源")
     @ColumnWidth(30)
     public String sourceName;
+
+    @ExcelProperty("项目名称")
+    @ColumnWidth(30)
+    public String prjName;
 
     @ExcelProperty("申报金额（万元）")
     @ColumnWidth(30)

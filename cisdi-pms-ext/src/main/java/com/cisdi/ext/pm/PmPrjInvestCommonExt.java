@@ -62,5 +62,8 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("BUY_MATTER_ID"); // 采购方式
         entityRecord.extraEditableAttCodeList.add("WIN_BID_UNIT_TXT"); // 中标单位
         entityRecord.extraEditableAttCodeList.add("WINNING_BIDS_AMOUNT"); // 中标价
+        entityRecord.extraEditableAttCodeList.add("STATUS_THREE"); // 审批状态
+        entityRecord.extraEditableAttCodeList.add("STATUS_ONE"); // 审批状态
+        entityRecord.extraEditableAttCodeList.add("PM_FILE_CHAPTER_REQ_ID"); // 关联标前资料用印审批
     }
 }

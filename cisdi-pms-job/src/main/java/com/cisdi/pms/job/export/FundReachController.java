@@ -2,8 +2,8 @@ package com.cisdi.pms.job.export;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.support.ExcelTypeEnum;
-import com.cisdi.pms.job.model.FundReachExportModel;
-import com.cisdi.pms.job.model.request.FundReachRequest;
+import com.cisdi.pms.job.export.model.FundReachExportModel;
+import com.cisdi.pms.job.export.model.request.FundReachRequest;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;

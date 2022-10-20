@@ -7,9 +7,11 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -109,10 +111,10 @@ public class PoOrderSupplementReqExt {
             Map<String, Object> contractDataMap = myJdbcTemplate.queryForMap("select * from PO_ORDER_SUPPLEMENT_REQ where ID=?", csCommId);
             String id = Crud.from("PO_ORDER").insertData();
             insertContract(id, contractDataMap);
-//            List<Map<String, Object>> detailList = myJdbcTemplate.queryForList("select * from PM_ORDER_COST_DETAIL where CONTRACT_ID=?", csCommId);
-//            insertContractDet(id, detailList);
-            //查询联系人明细
-            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList("select OPPO_SITE_LINK_MAN,OPPO_SITE_CONTACT from CONTRACT_SUPPLEMENT_CONTACT where PARENT_ID = ?",csCommId);
+            List<Map<String, Object>> detailList = myJdbcTemplate.queryForList("select * from PM_ORDER__EXTRA_COST_DETAIL where PO_ORDER_SUPPLEMENT_REQ_ID=?", csCommId);
+            insertContractDet(id, detailList);
+            //查询联系人明细1
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList("select WIN_BID_UNIT_ONE,OPPO_SITE_LINK_MAN,OPPO_SITE_CONTACT from CONTRACT_SUPPLEMENT_CONTACT where PARENT_ID = ?",csCommId);
             if (!CollectionUtils.isEmpty(list2)){
                 insertContacts(id,list2);
             }
@@ -131,11 +133,28 @@ public class PoOrderSupplementReqExt {
                     .set("OPPO_SITE_CONTACT", JdbcMapUtil.getString(item, "OPPO_SITE_CONTACT"))
                     .set("PARENT_ID", id)
                     .set("CRT_DT",now)
+                    .set("WIN_BID_UNIT_ONE",JdbcMapUtil.getString(item,"WIN_BID_UNIT_ONE"))
                     .exec();
         });
     }
 
     private void insertContractDet(String id, List<Map<String, Object>> detailList) {
+        detailList.forEach(item -> {
+            String did = Crud.from("PO_ORDER_DTL").insertData();
+            Crud.from("PO_ORDER_DTL").where().eq("ID", did).update()
+                    .set("NAME", JdbcMapUtil.getString(item, "NAME"))
+                    .set("REMARK", JdbcMapUtil.getString(item, "REMARK"))
+                    .set("COST_TYPE_TREE_ID", JdbcMapUtil.getString(item, "COST_TYPE_TREE_ID"))
+                    .set("PAY_TYPE", JdbcMapUtil.getString(item, ""))
+                    .set("FILE_ATTACHMENT_URL", JdbcMapUtil.getString(item, ""))
+                    .set("TOTAL_AMT", JdbcMapUtil.getString(item, "TOTAL_AMT"))
+                    .set("AMT", JdbcMapUtil.getString(item, "AMT"))
+                    .set("CONTRACT_ID", JdbcMapUtil.getString(item, "CONTRACT_ID"))
+                    .set("WORK_CONTENT", JdbcMapUtil.getString(item, ""))
+                    .set("FEE_DETAIL", JdbcMapUtil.getString(item, "FEE_DETAIL"))
+                    .set("PO_ORDER_ID", id)
+                    .exec();
+        });
     }
 
     private void insertContract(String id, Map<String, Object> data) {
@@ -153,6 +172,40 @@ public class PoOrderSupplementReqExt {
                 .set("CONTRACT_APP_ID",JdbcMapUtil.getString(data,"ID"))
                 .set("ORDER_PROCESS_TYPE","合同补充协议")
                 .exec();
+    }
+
+    /**
+     * 流程发起之时，相关数据校验
+     */
+    public void checkData() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        // 查询明细表合同总金额
+        String sql = "select AMT from PM_ORDER__EXTRA_COST_DETAIL where PO_ORDER_SUPPLEMENT_REQ_ID = ?";
+        List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql, entityRecord.csCommId);
+        if (CollectionUtils.isEmpty(list1)) {
+            throw new BaseException("费用明细不能为空！");
+        }
+        BigDecimal account = getSumAmt(list1);
+        //更新合同表合同总金额数
+        String sql2 = "update PO_ORDER_SUPPLEMENT_REQ set CONTRACT_PRICE = ? where id = ?";
+        myJdbcTemplate.update(sql2,account,entityRecord.csCommId);
+
+        //是否填写联系人
+        List<Map<String, Object>> contactList = myJdbcTemplate.queryForList("SELECT * FROM CONTRACT_SUPPLEMENT_CONTACT where PO_ORDER_SUPPLEMENT_REQ_ID = ?", entityRecord.csCommId);
+        if (CollectionUtils.isEmpty(contactList)){
+            throw new BaseException("联系人不能为空！");
+        }
+    }
+
+    // 汇总求和
+    private BigDecimal getSumAmt(List<Map<String, Object>> list) {
+        BigDecimal sum = new BigDecimal(0);
+        for (Map<String, Object> tmp : list) {
+            String value = tmp.get("AMT").toString();
+            sum = sum.add(new BigDecimal(value));
+        }
+        return sum;
     }
 
 }

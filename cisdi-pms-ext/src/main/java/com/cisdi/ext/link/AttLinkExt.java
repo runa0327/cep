@@ -95,17 +95,208 @@ public class AttLinkExt {
             return linkPM_BID_KEEP_FILE_REQ_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("FUND_IMPLEMENTATION_V_ID".equals(attCode)){ // 关联资金来源 属性联动
             return linkFUND_IMPLEMENTATION_V_ID(myJdbcTemplate, attValue, entCode,sevId,param);
-        }else {
+        } else if ("FUND_PAY_CODE_V_ID".equals(attCode)){ // 关联支付明细码 属性联动
+            return linkFUND_PAY_CODE_V_ID(myJdbcTemplate, attValue, entCode,sevId,param);
+        } else if ("PM_BID_APPROVAL_REQ_ID".equals(attCode)){ // 招标文件审批 属性联动
+            return linkPM_BID_APPROVAL_REQ_ID(myJdbcTemplate, attValue, entCode,sevId,param);
+        } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
 
+    }
+
+    private AttLinkResult linkFUND_PAY_CODE_V_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        //资金支付明细表选择关联支付明细码后联动
+        if ("FUND_NEWLY_INCREASED_DETAIL".equals(entCode)){
+            String echoSql = "select pr.name prjName,fs.PM_PRJ_ID prjId,fi.FUND_SOURCE_TEXT sourceName,fid.id sourceId,fi.FUND_CATEGORY_FIRST categoryFirstId,ft1" +
+                    ".name categoryFirstName,fi.FUND_CATEGORY_SECOND categorySecondId,ft2.name categorySecondName,fs.CUSTOMER_UNIT customerUnitId,pa.name " +
+              "customerUnitName,pr.PRJ_MANAGE_MODE_ID prjModeId,sv3.name prjModeName,fs.FUND_REACH_CATEGORY fundCategoryId,sv1.name fundCategoryName,sv2.name costCategoryName,op.COST_CATEGORY_ID " +
+                    "costCategoryId,fs.nper,fs.PAID_AMT paidAmt,fs.PAY_UNIT payUnitId,rb1.name payUnitName,fs.RECEIPT_BANK receiptBankId,rb2.name " +
+                    "receiptBankName,fs.RECEIPT_ACCOUNT receiptAccountId,rb3.name receiptAccountName\n" +
+                    "from fund_special fs \n" +
+                    "left join (select fid.ID,fi.FUND_SOURCE_TEXT name,fid.PM_PRJ_ID from fund_implementation fi left join " +
+                     "fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id) sourceTemp on sourceTemp.id = fs" +
+                    ".FUND_IMPLEMENTATION_V_ID\n" +
+                    "left join fund_implementation fi on fi.FUND_SOURCE_TEXT = sourceTemp.name\n" +
+                    "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
+                    "left join pm_prj pr on pr.id = fs.PM_PRJ_ID\n" +
+                    "left join fund_type ft1 on ft1.id = fi.FUND_CATEGORY_FIRST\n" +
+                    "left join fund_type ft2 on ft2.id = fi.FUND_CATEGORY_SECOND\n" +
+                    "left join PM_PARTY pa on pa.id = fs.CUSTOMER_UNIT\n" +
+                    "left join gr_set_value sv1 on sv1.id = fs.FUND_REACH_CATEGORY\n" +
+                    "left join gr_set se1 on se1.id = sv1.GR_SET_ID and sv1.code = 'fund_reach_category'\n" +
+                    "left join PO_ORDER_PAYMENT_REQ op on op.AMOUT_PM_PRJ_ID = fs.PM_PRJ_ID\n" +
+                    "left join gr_set_value sv2 on sv2.id = op.COST_CATEGORY_ID\n" +
+                    "left join gr_set se2 on se2.id = sv2.GR_SET_ID and se2.code = 'cost_category'\n" +
+                    "left join receiving_bank rb1 on rb1.id = fs.PAY_UNIT\n" +
+                    "left join receiving_bank rb2 on rb2.id = fs.RECEIPT_BANK\n" +
+                    "left join gr_set_value sv3 on sv3.id = pr.PRJ_MANAGE_MODE_ID\n" +
+                    "left join gr_set se3 on se3.id = sv3.GR_SET_ID and se3.code = 'management_unit'\n" +
+                    "left join receiving_bank rb3 on rb3.id = fs.RECEIPT_ACCOUNT\n" +
+                    "where fs.FUND_PAY_CODE = ?";
+            List<Map<String, Object>> echoList = myJdbcTemplate.queryForList(echoSql, attValue);
+            if (!CollectionUtils.isEmpty(echoList)){
+                Map<String, Object> echoMap = echoList.get(0);
+                //项目
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(echoMap,"prjId");
+                    linkedAtt.text = JdbcMapUtil.getString(echoMap,"prjName");
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("PM_PRJ_ID",linkedAtt);
+                }
+
+                //资金来源
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(echoMap,"sourceId");
+                    linkedAtt.text = JdbcMapUtil.getString(echoMap,"sourceName");
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("FUND_IMPLEMENTATION_V_ID",linkedAtt);
+                }
+
+                //资金类别（一级）
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(echoMap,"categoryFirstId");
+                    linkedAtt.text = JdbcMapUtil.getString(echoMap,"categoryFirstName");
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("FUND_CATEGORY_FIRST",linkedAtt);
+                }
+
+                //资金类别（二级）
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(echoMap,"categorySecondId");
+                    linkedAtt.text = JdbcMapUtil.getString(echoMap,"categorySecondName");
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("FUND_CATEGORY_SECOND",linkedAtt);
+                }
+
+                //业主单位
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(echoMap,"customerUnitId");
+                    linkedAtt.text = JdbcMapUtil.getString(echoMap,"customerUnitName");
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("CUSTOMER_UNIT",linkedAtt);
+                }
+
+                //代管单位
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(echoMap,"prjModeId");
+                    linkedAtt.text = JdbcMapUtil.getString(echoMap,"prjModeName");
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID",linkedAtt);
+                }
+
+                //期数
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(echoMap,"nper");
+                    linkedAtt.text = JdbcMapUtil.getString(echoMap,"nper");
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("NPER",linkedAtt);
+                }
+
+
+                //支付信息表(子表)
+                String viewId = "99952822476415265";
+                ArrayList<LinkedRecord> linkedRecordList = new ArrayList<>();
+                LinkedRecord linkedRecord = new LinkedRecord();
+                //资金类别
+                linkedRecord.valueMap.put("FUND_REACH_CATEGORY",JdbcMapUtil.getString(echoMap,"fundCategoryId"));
+                linkedRecord.textMap.put("FUND_REACH_CATEGORY",JdbcMapUtil.getString(echoMap,"fundCategoryName"));
+                //费用大类
+                linkedRecord.valueMap.put("COST_CATEGORY_ID",JdbcMapUtil.getString(echoMap,"costCategoryId"));
+                linkedRecord.textMap.put("COST_CATEGORY_ID",JdbcMapUtil.getString(echoMap,"costCategoryName"));
+                //期数
+//                linkedRecord.valueMap.put("NPER",JdbcMapUtil.getInt(echoMap,"nper"));
+//                linkedRecord.textMap.put("NPER",JdbcMapUtil.getString(echoMap,"nper"));
+                //支付金额
+                linkedRecord.valueMap.put("PAY_AMT",JdbcMapUtil.getDouble(echoMap,"paidAmt"));
+                linkedRecord.textMap.put("PAY_AMT",JdbcMapUtil.getString(echoMap,"paidAmt"));
+                //付款单位
+                linkedRecord.valueMap.put("PAY_UNIT",JdbcMapUtil.getString(echoMap,"payUnitId"));
+                linkedRecord.textMap.put("PAY_UNIT",JdbcMapUtil.getString(echoMap,"payUnitName"));
+                //支付银行
+                linkedRecord.valueMap.put("RECEIPT_BANK",JdbcMapUtil.getString(echoMap,"receiptBankId"));
+                linkedRecord.textMap.put("RECEIPT_BANK",JdbcMapUtil.getString(echoMap,"receiptBankName"));
+                //支付账户
+                linkedRecord.valueMap.put("RECEIPT_ACCOUNT",JdbcMapUtil.getString(echoMap,"receiptAccountId"));
+                linkedRecord.textMap.put("RECEIPT_ACCOUNT",JdbcMapUtil.getString(echoMap,"receiptAccountName"));
+                linkedRecordList.add(linkedRecord);
+                attLinkResult.childData.put(viewId,linkedRecordList);
+                attLinkResult.childCreatable.put(viewId, true);
+                attLinkResult.childClear.put(viewId, true);
+            }
+
+
+        }
+
+        return attLinkResult;
+    }
+
+    //招标文件审批 属性联动
+    private AttLinkResult linkPM_BID_APPROVAL_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        if ("PM_USE_CHAPTER_REQ".equals(entCode)){ //中选单位及标后用印审批
+            String sql1 = "select a.id,a.name,a.NAME_ONE,a.status,(select name from ad_status where id=a.status) as statusName from PM_BID_APPROVAL_REQ a where id = ?";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,attValue);
+            if (CollectionUtils.isEmpty(list1)){ //全为空
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    attLinkResult.attMap.put("APPROVED_AMOUNT",linkedAtt);
+                    attLinkResult.attMap.put("STATUS_ONE",linkedAtt);
+                    attLinkResult.attMap.put("NAME_ONE",linkedAtt);
+                }
+            } else {
+                // 关联招标文件审批
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"id");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"name");
+                    attLinkResult.attMap.put("APPROVED_AMOUNT",linkedAtt);
+                }
+                // 审批状态
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"status");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"statusName");
+                    attLinkResult.attMap.put("STATUS_ONE",linkedAtt);
+                }
+                // 投标名称
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"NAME_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"NAME_ONE");
+                    attLinkResult.attMap.put("NAME_ONE",linkedAtt);
+                }
+            }
+        }
+        return attLinkResult;
     }
 
 
     private AttLinkResult linkFUND_IMPLEMENTATION_V_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
         //专项资金支付选择资金来源后联动
-        if ("FUND_SPECIAL".equals(entCode)){
+        if ("FUND_SPECIAL".equals(entCode) || "FUND_NEWLY_INCREASED_DETAIL".equals(entCode)){
             String fundSource = attValue;//资金来源
             Map<String, Object> fundSourceMap = myJdbcTemplate.queryForMap("select fi.FUND_SOURCE_TEXT name from fund_implementation fi left join" +
                     " fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id where fid.id = ?", fundSource);
@@ -126,7 +317,7 @@ public class AttLinkExt {
                     ".FUND_SOURCE_TEXT,fr.pm_prj_id\n" +
                     ") temp2 on temp2.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT\n" +
                     "left join (select sum(IFNULL(fs.PAID_AMT,0)) cumPayAmt,fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID from fund_special fs group by " +
-                    "fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp3 on temp3.FUND_IMPLEMENTATION_V_ID = fi.FUND_SOURCE_TEXT and temp3.PM_PRJ_ID =" +
+                    "fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp3 on temp3.FUND_IMPLEMENTATION_V_ID = fid.id and temp3.PM_PRJ_ID =" +
                     " fid.PM_PRJ_ID\n" +
                     "left join pm_prj pr on pr.id = fid.PM_PRJ_ID\n" +
                     "left join PM_PARTY pa on pa.id = pr.CUSTOMER_UNIT\n" +
@@ -217,9 +408,8 @@ public class AttLinkExt {
                 }
 
                 //支付明细码(FUND_PAY_CODE),文本（短）
-                //查询相同项目、资金来源、相同日期专项资金支付条数
-                Map<String, Object> countToday = myJdbcTemplate.queryForMap("select count(*) countToday from fund_special where CRT_DT > DATE(NOW()) and " +
-                        "PM_PRJ_ID = ? and FUND_IMPLEMENTATION_V_ID = ?", prjId, fundSource);
+                //查询相同日期专项资金支付条数
+                Map<String, Object> countToday = myJdbcTemplate.queryForMap("select count(*) countToday from fund_special where CRT_DT > DATE(NOW())");
                 DecimalFormat df = new DecimalFormat("0000");
                 String suffixNum = df.format(JdbcMapUtil.getInt(countToday, "countToday") + 1);
                 SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
@@ -234,15 +424,61 @@ public class AttLinkExt {
 
                 //期数
                 //查询相同项目、资金来源专项资金支付条数
-                Map<String, Object> countMap = myJdbcTemplate.queryForMap("select count(*) count from fund_special where PM_PRJ_ID = ? and " +
-                        "FUND_IMPLEMENTATION_V_ID = ?", prjId, fundSource);
+                int count = 0;
+                Map<String, Object> specialCountMap = myJdbcTemplate.queryForMap("select ifnull(max(NPER),0) count from fund_special where PM_PRJ_ID = ? and FUND_IMPLEMENTATION_V_ID = ?", prjId, fundSource);
+                Map<String, Object> payCountMap = myJdbcTemplate.queryForMap("select ifnull(max(NPER),0) count from fund_newly_increased_detail where PM_PRJ_ID = ? and FUND_IMPLEMENTATION_V_ID = ?",prjId,fundSource);
+                count = JdbcMapUtil.getInt(specialCountMap,"count") > JdbcMapUtil.getInt(payCountMap,"count") ? JdbcMapUtil.getInt(specialCountMap,"count") : JdbcMapUtil.getInt(payCountMap,"count");
+
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
                     linkedAtt.type = AttDataTypeE.INTEGER;
-                    linkedAtt.value = JdbcMapUtil.getInt(countMap,"count");
-                    linkedAtt.text = JdbcMapUtil.getString(countMap,"count");
+                    linkedAtt.value = count + 1;
+                    linkedAtt.text = String.valueOf(count + 1);
                     attLinkResult.attMap.put("NPER",linkedAtt);
                 }
+
+                if ("FUND_NEWLY_INCREASED_DETAIL".equals(entCode)){//支付资金信息表
+                    String fundCategorySql = "select fi.FUND_CATEGORY_FIRST categoryFirstId,ft1.name categoryFirstName,fi.FUND_CATEGORY_SECOND " +
+                            "categorySecondId,ft2.name categorySecondName \n" +
+                            "from fund_implementation fi \n" +
+                            "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
+                            "left join fund_type ft1 on ft1.id = fi.FUND_CATEGORY_FIRST\n" +
+                            "left join fund_type ft2 on ft2.id = fi.FUND_CATEGORY_SECOND\n" +
+                            "where fi.FUND_SOURCE_TEXT = ? and fid.PM_PRJ_ID = ?";
+                    List<Map<String, Object>> categoryList = myJdbcTemplate.queryForList(fundCategorySql, fundSourceName, prjId);
+                    if (!CollectionUtils.isEmpty(categoryList)){
+                        //资金大类一级
+                        {
+                            LinkedAtt linkedAtt = new LinkedAtt();
+                            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                            linkedAtt.value = JdbcMapUtil.getString(categoryList.get(0),"categoryFirstId");
+                            linkedAtt.text = JdbcMapUtil.getString(categoryList.get(0),"categoryFirstName");
+                            attLinkResult.attMap.put("FUND_CATEGORY_FIRST",linkedAtt);
+                        }
+
+                        //资金大类二级
+                        {
+                            LinkedAtt linkedAtt = new LinkedAtt();
+                            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                            linkedAtt.value = JdbcMapUtil.getString(categoryList.get(0),"categorySecondId");
+                            linkedAtt.text = JdbcMapUtil.getString(categoryList.get(0),"categorySecondName");
+                            attLinkResult.attMap.put("FUND_CATEGORY_SECOND",linkedAtt);
+                        }
+
+                    }
+                    //支付信息（子表）
+//                    String viewId = "99952822476415265";
+//                    ArrayList<LinkedRecord> linkedRecordList = new ArrayList<>();
+//                    LinkedRecord linkedRecord = new LinkedRecord();
+//                    //资金类别
+//                    linkedRecord.valueMap.put("NPER",count + 1);
+//                    linkedRecord.textMap.put("NPER",String.valueOf(count + 1));
+//                    linkedRecordList.add(linkedRecord);
+//                    attLinkResult.childData.put(viewId,linkedRecordList);
+//                    attLinkResult.childCreatable.put(viewId, true);
+//                    attLinkResult.childClear.put(viewId, true);
+                }
+
             }
         }
         return attLinkResult;
@@ -374,19 +610,14 @@ public class AttLinkExt {
     private AttLinkResult linkPM_BUY_DEMAND_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
         if ("PM_USE_CHAPTER_REQ".equals(entCode)){ //中选单位及标后用印审批
-            List<Map<String, Object>> bidFileCheck = myJdbcTemplate.queryForList("select a.name,a.id,a.status,s.name statusName,a.NAME_ONE tenderName " +
-                    "from PM_BID_APPROVAL_REQ a " +
-                    "left join ad_status s on s.id = a.status " +
-                    "where a.PM_BUY_DEMAND_REQ_ID = ? " +
-                    "order by a.CRT_DT desc " +
-                    "limit 1", attValue);
             List<Map<String, Object>> preBidCheck = myJdbcTemplate.queryForList("select a.name,a.id,a.status,s.name statusName " +
                     "from pm_file_chapter_req a " +
                     "left join ad_status s on s.id = a.status " +
                     "where a.PM_BUY_DEMAND_REQ_ID = ? " +
                     "order by a.CRT_DT desc " +
                     "limit 1", attValue);
-            List<Map<String, Object>> prjList = myJdbcTemplate.queryForList("select p.name,d.PM_PRJ_ID,d.BUY_TYPE_ID,d.PAY_AMT_TWO,d.BUY_MATTER_ID " +
+            List<Map<String, Object>> prjList = myJdbcTemplate.queryForList("select d.status,(select name from ad_status where id = d.status) as statusName," +
+                    "p.name,d.PM_PRJ_ID,d.BUY_TYPE_ID,d.PAY_AMT_TWO,d.BUY_MATTER_ID " +
                     "from PM_BUY_DEMAND_REQ d left join pm_prj p on p.id = d.PM_PRJ_ID " +
                     "where d.id = ?", attValue);
             if (!CollectionUtils.isEmpty(prjList)){
@@ -422,34 +653,13 @@ public class AttLinkExt {
                     linkedAtt.text = JdbcMapUtil.getString(prjList.get(0),"BUY_MATTER_ID");
                     attLinkResult.attMap.put("BUY_MATTER_ID",linkedAtt);
                 }
-            }
-            if (!CollectionUtils.isEmpty(bidFileCheck)){
-                Map<String, Object> bidFileCheckMap = bidFileCheck.get(0);
-                //关联招标文件审批 PM_BID_APPROVAL_REQ_ID
+                //审批状态
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
                     linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(bidFileCheckMap,"id");
-                    linkedAtt.text = JdbcMapUtil.getString(bidFileCheckMap, "name");
-                    attLinkResult.attMap.put("PM_BID_APPROVAL_REQ_ID",linkedAtt);
-                }
-
-                //关联招标文件审批状态 STATUS_ONE
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(bidFileCheckMap,"tenderName");
-                    linkedAtt.text = JdbcMapUtil.getString(bidFileCheckMap, "tenderName");
-                    attLinkResult.attMap.put("NAME_ONE",linkedAtt);
-                }
-
-                //招标（投标）名称
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(bidFileCheckMap,"status");
-                    linkedAtt.text = JdbcMapUtil.getString(bidFileCheckMap, "statusName");
-                    attLinkResult.attMap.put("STATUS_ONE",linkedAtt);
+                    linkedAtt.value = JdbcMapUtil.getString(prjList.get(0),"status");
+                    linkedAtt.text = JdbcMapUtil.getString(prjList.get(0),"statusName");
+                    attLinkResult.attMap.put("STATUS_THREE",linkedAtt);
                 }
             }
             if (!CollectionUtils.isEmpty(preBidCheck)){
@@ -894,7 +1104,7 @@ public class AttLinkExt {
                 linkedAtt.changeToEditable = changeToEditable;
                 attLinkResult.attMap.put("ATT_FILE_GROUP_ID", linkedAtt);
             }
-        } else if ("PO_ORDER_REQ".equals(entCode)){ //采购合同签订申请
+        } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 采购合同补充协议申请
             // 99799190825080669 = 是，99799190825080670=否
             Boolean replyChangeToMandatory = true; //审核意见采纳说明必填
             Boolean fileChangeToMandatory = true; //审核意见附件必填
@@ -966,7 +1176,7 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("YES_NO_FOUR", linkedAtt);
                 }
             }
-        } else if ("PO_ORDER_REQ".equals(entCode)){ //采购合同签订申请
+        } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 采购合同补充协议申请
             // 99799190825080669 = 是， 99799190825080670 = 否
             Boolean faWuChangeToShown =  true; //法务部门修订稿显示
             Boolean caiWuChangeToShown =  true; //财务部门修订稿显示
@@ -1316,8 +1526,7 @@ public class AttLinkExt {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
 
             // 查询关联合同信息
-            List<Map<String, Object>> contractMaps = myJdbcTemplate.queryForList("select o.WIN_BID_UNIT_TXT,o" +
-                    ".CONTRACT_PRICE,a.PRJ_TOTAL_INVEST estimate,b.PRJ_TOTAL_INVEST budget from PO_ORDER_REQ " +
+            List<Map<String, Object>> contractMaps = myJdbcTemplate.queryForList("select o.CONTRACT_PRICE,a.PRJ_TOTAL_INVEST estimate,b.PRJ_TOTAL_INVEST budget from PO_ORDER_REQ " +
                     "o left join PM_PRJ_INVEST2 a on a.PM_PRJ_ID =o.PM_PRJ_ID left join PM_PRJ_INVEST3 b on b" +
                     ".PM_PRJ_ID = o.PM_PRJ_ID where o.PM_PRJ_ID = ? and o.`STATUS` = 'AP' order by o.CRT_DT " +
                     "limit 1", attValue);
@@ -1731,10 +1940,12 @@ public class AttLinkExt {
         //99902212142022303采购合同补充协议申请-填写项目信息及关联合同信息;99902212142028526资金需求计划申请-发起 实体视图id
         if ("99902212142028526".equals(sevId) || "99902212142022303".equals(sevId)){
             String viewId = "";
+            Boolean createTable = false;
             if ("99902212142028526".equals(sevId)){
                 viewId = "99952822476362402";
             } else if ("99902212142022303".equals(sevId)){
                 viewId = "99952822476410750";
+                createTable = true;
             }
             List<LinkedRecord> linkedRecordList = new ArrayList<>();
             // 查询明细信息
@@ -1761,19 +1972,36 @@ public class AttLinkExt {
                 }
                 attLinkResult.childData.put(viewId, linkedRecordList);
             }
-            attLinkResult.childCreatable.put(viewId, false);
+            attLinkResult.childCreatable.put(viewId, createTable);
             attLinkResult.childClear.put(viewId, true);
         }
 
         // 根据id查询招投标信息
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select WINNING_BIDS_AMOUNT,BUY_TYPE_ID,BID_CTL_PRICE_LAUNCH,BUY_MATTER_ID,PM_BID_KEEP_FILE_REQ_ID," +
-                "CONTRACT_NAME,PM_BID_KEEP_FILE_REQ_ID,CONTRACT_CODE,NAME,WIN_BID_UNIT_TXT,CONTRACT_PRICE,ATT_FILE_GROUP_ID from po_order_req where id = ?", attValue);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTACT_MOBILE_ONE,CONTACTS_ONE,YES_NO_THREE,GUARANTEE_LETTER_TYPE_IDS,IS_REFER_GUARANTEE_ID,PLAN_TOTAL_DAYS," +
+                "CONTRACT_CATEGORY_ONE_ID,FILE_ID_FIVE,WIN_BID_UNIT_ONE,AMT_ONE,WINNING_BIDS_AMOUNT,BUY_TYPE_ID,BID_CTL_PRICE_LAUNCH,BUY_MATTER_ID," +
+                "PM_BID_KEEP_FILE_REQ_ID,CONTRACT_NAME,PM_BID_KEEP_FILE_REQ_ID,CONTRACT_CODE,NAME,WIN_BID_UNIT_ONE,CUSTOMER_UNIT_ONE," +
+                "CONTRACT_PRICE,ATT_FILE_GROUP_ID from po_order_req where id = ?", attValue);
 
         if (CollectionUtils.isEmpty(list)) {
             throw new BaseException("合同相关属性不完善！");
         }
         Map row = list.get(0);
 
+        // 签订公司
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            String id = JdbcMapUtil.getString(row, "CUSTOMER_UNIT_ONE");
+            String name = "";
+            String sql1 = "select name from PM_PARTY where id = ?";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,id);
+            if (!CollectionUtils.isEmpty(list1)){
+                name = JdbcMapUtil.getString(list1.get(0),"name");
+            }
+            linkedAtt.value = id;
+            linkedAtt.text = name;
+            attLinkResult.attMap.put("CUSTOMER_UNIT_ONE", linkedAtt);
+        }
         // 合同编号
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -1794,9 +2022,9 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
-            linkedAtt.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_TXT");
-            attLinkResult.attMap.put("WIN_BID_UNIT_TXT", linkedAtt);
+            linkedAtt.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_ONE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_ONE");
+            attLinkResult.attMap.put("WIN_BID_UNIT_ONE", linkedAtt);
         }
         // 合同总金额
         {
@@ -1805,6 +2033,14 @@ public class AttLinkExt {
             linkedAtt.value = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
             linkedAtt.text = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
             attLinkResult.attMap.put("CONTRACT_PRICE", linkedAtt);
+        }
+        // 首付款比列
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = JdbcMapUtil.getString(row, "AMT_ONE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "AMT_ONE");
+            attLinkResult.attMap.put("AMT_ONE", linkedAtt);
         }
         //关联招采流程
         {
@@ -1820,6 +2056,21 @@ public class AttLinkExt {
             linkedAtt.value = id;
             linkedAtt.text = name;
             attLinkResult.attMap.put("PM_BID_KEEP_FILE_REQ_ID", linkedAtt);
+        }
+        // 合同类型
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            String id = JdbcMapUtil.getString(row, "CONTRACT_CATEGORY_ONE_ID");
+            String name = "";
+            String sql2 = "select name from gr_set_value where id = ?";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,id);
+            if (!CollectionUtils.isEmpty(list2)){
+                name = JdbcMapUtil.getString(list2.get(0),"name");
+            }
+            linkedAtt.value = id;
+            linkedAtt.text = name;
+            attLinkResult.attMap.put("CONTRACT_CATEGORY_ONE_ID", linkedAtt);
         }
         // 招标类别
         {
@@ -1859,27 +2110,6 @@ public class AttLinkExt {
             linkedAtt.text = name;
             attLinkResult.attMap.put("BUY_MATTER_ID",linkedAtt);
         }
-//        //中标单位
-//        {
-//            LinkedAtt linkedAtt = new LinkedAtt();
-//            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-//            String ids = JdbcMapUtil.getString(row,"BASE_SUPPLIER_ONE_IDS");
-//            StringBuffer sb = new StringBuffer("");
-//            if (!SharedUtil.isEmptyString(ids)){
-//                String id = StringUtil.codeToSplit(ids);
-//                String sql2 = "select name from BASE_SUPPLIER where id in ('"+id+"')";
-//                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2);
-//                if (!CollectionUtils.isEmpty(list2)){
-//                    for (Map<String, Object> tmp : list2) {
-//                        sb.append(JdbcMapUtil.getString(tmp,"name")).append("，");
-//                    }
-//                    sb.substring(0,sb.length()-1);
-//                }
-//            }
-//            linkedAtt.value = sb.toString();
-//            linkedAtt.text = ids;
-//            attLinkResult.attMap.put("WIN_BID_UNIT_TXT",linkedAtt);
-//        }
         //中标价
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -1887,6 +2117,89 @@ public class AttLinkExt {
             linkedAtt.value = JdbcMapUtil.getString(row,"WINNING_BIDS_AMOUNT");
             linkedAtt.text = JdbcMapUtil.getString(row,"WINNING_BIDS_AMOUNT");
             attLinkResult.attMap.put("WINNING_BIDS_AMOUNT",linkedAtt);
+        }
+        //合同工期
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row,"PLAN_TOTAL_DAYS");
+            linkedAtt.text = JdbcMapUtil.getString(row,"PLAN_TOTAL_DAYS");
+            attLinkResult.attMap.put("PLAN_TOTAL_DAYS",linkedAtt);
+        }
+        //是否涉及保函 99902212142031851=是；99902212142031855=否
+        String baoHanId = JdbcMapUtil.getString(row,"IS_REFER_GUARANTEE_ID");
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            String name = "";
+            String sql2 = "select name from gr_set_value where id = ?";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,baoHanId);
+            if (!CollectionUtils.isEmpty(list2)){
+                name = JdbcMapUtil.getString(list2.get(0),"name");
+            }
+            linkedAtt.value = baoHanId;
+            linkedAtt.text = name;
+            attLinkResult.attMap.put("IS_REFER_GUARANTEE_ID",linkedAtt);
+        }
+        // 保函类型
+        Boolean isShow = false;
+        if ("99902212142031851".equals(baoHanId)){
+            isShow = true;
+        }
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            String ids = JdbcMapUtil.getString(row,"GUARANTEE_LETTER_TYPE_IDS");
+            String id = StringUtil.codeToSplit(ids);
+            String name = "";
+            String sql2 = "select group_concat(name) as name from gr_set_value where id in ('"+id+"')";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2);
+            if (!CollectionUtils.isEmpty(list2)){
+                name = JdbcMapUtil.getString(list2.get(0),"name");
+            }
+            linkedAtt.value = ids;
+            linkedAtt.text = name;
+            attLinkResult.attMap.put("GUARANTEE_LETTER_TYPE_IDS",linkedAtt);
+        }
+        //是否标准模板
+
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            String id = JdbcMapUtil.getString(row,"YES_NO_THREE");
+            String name = "";
+            String sql2 = "select name from gr_set_value where id = ?";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,id);
+            if (!CollectionUtils.isEmpty(list2)){
+                name = JdbcMapUtil.getString(list2.get(0),"name");
+            }
+            linkedAtt.value = id;
+            linkedAtt.text = name;
+            attLinkResult.attMap.put("YES_NO_THREE",linkedAtt);
+        }
+        // 合同签订联系人
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CONTACTS_ONE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CONTACTS_ONE");
+            attLinkResult.attMap.put("CONTACTS_ONE", linkedAtt);
+        }
+        // 联系电话
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CONTACT_MOBILE_ONE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CONTACT_MOBILE_ONE");
+            attLinkResult.attMap.put("CONTACT_MOBILE_ONE", linkedAtt);
+        }
+        //合同原稿（正式合同附件）
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.FILE_GROUP;
+            linkedAtt.value = JdbcMapUtil.getString(row,"FILE_ID_FIVE");
+            getFileInfoList(linkedAtt);
+            attLinkResult.attMap.put("FILE_ID_SEVEN",linkedAtt);
         }
         //资金需求申请合同附件回显
         if ("PM_FUND_REQUIRE_PLAN_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){
@@ -1898,6 +2211,38 @@ public class AttLinkExt {
                 getFileInfoList(linkedAtt);
                 attLinkResult.attMap.put("CONTRACT_FILE_GROUP_ID", linkedAtt);
             }
+        }
+        //查询联系人明细表信息
+        //99902212142022303采购合同补充协议申请-填写项目信息及关联合同信息
+        if ("99902212142022303".equals(sevId)){
+            String viewId = "";
+            if ("99902212142022303".equals(sevId)){
+                viewId = "99952822476378742";
+            }
+            List<LinkedRecord> linkedRecordList = new ArrayList<>();
+            // 查询明细信息
+            String sql1 = "select WIN_BID_UNIT_ONE,OPPO_SITE_LINK_MAN,OPPO_SITE_CONTACT from CONTRACT_SIGNING_CONTACT where PARENT_ID = ?";
+            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1, attValue);
+            if (!CollectionUtils.isEmpty(list1)) {
+                for (Map<String, Object> tmp : list1) {
+                    LinkedRecord linkedRecord = new LinkedRecord();
+
+                    // 相对方公司
+                    linkedRecord.valueMap.put("WIN_BID_UNIT_ONE", JdbcMapUtil.getString(tmp,"WIN_BID_UNIT_ONE"));
+                    linkedRecord.textMap.put("WIN_BID_UNIT_ONE", JdbcMapUtil.getString(tmp,"WIN_BID_UNIT_ONE"));
+                    // 相对方联系人
+                    linkedRecord.valueMap.put("OPPO_SITE_LINK_MAN", JdbcMapUtil.getString(tmp,"OPPO_SITE_LINK_MAN"));
+                    linkedRecord.textMap.put("OPPO_SITE_LINK_MAN", JdbcMapUtil.getString(tmp,"OPPO_SITE_LINK_MAN"));
+                    // 相对方联系方式
+                    linkedRecord.valueMap.put("OPPO_SITE_CONTACT", JdbcMapUtil.getString(tmp,"OPPO_SITE_CONTACT"));
+                    linkedRecord.textMap.put("OPPO_SITE_CONTACT", JdbcMapUtil.getString(tmp,"OPPO_SITE_CONTACT"));
+
+                    linkedRecordList.add(linkedRecord);
+                }
+                attLinkResult.childData.put(viewId, linkedRecordList);
+            }
+            attLinkResult.childCreatable.put(viewId, true);
+            attLinkResult.childClear.put(viewId, true);
         }
 
         return attLinkResult;
@@ -2502,270 +2847,46 @@ public class AttLinkExt {
 //            throw new BaseException("项目的相关属性不完整！");
 //        }
         if (CollectionUtils.isEmpty(list)){
-            // 项目编号
+
             {
                 LinkedAtt linkedAtt = new LinkedAtt();
                 linkedAtt.type = AttDataTypeE.TEXT_SHORT;
                 linkedAtt.value = "";
                 linkedAtt.text = "";
 
-                attLinkResult.attMap.put("PRJ_CODE", linkedAtt);
-            }
-            // 建筑面积
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                attLinkResult.attMap.put("BUILDING_AREA", linkedAtt);
-            }
-            // 业主单位
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.REF_SINGLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("CUSTOMER_UNIT", linkedAtt);
-            }
-            // 项目管理模式
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.REF_SINGLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID", linkedAtt);
-            }
-            // 建设地点
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.REF_SINGLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("BASE_LOCATION_ID", linkedAtt);
-            }
-            // 占地面积
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("FLOOR_AREA", linkedAtt);
-            }
-            // 项目类型
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.REF_SINGLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("PROJECT_TYPE_ID", linkedAtt);
-            }
-            // 建设规模类型
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.REF_SINGLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("CON_SCALE_TYPE_ID", linkedAtt);
-            }
-            // 建设规模单位
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.REF_SINGLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt);
-            }
-
-            //面积
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.text = "";
-                linkedAtt.value = "";
-                attLinkResult.attMap.put("QTY_ONE", linkedAtt);
-            }
-            //海域面积
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.text = "";
-                linkedAtt.value = "";
-                attLinkResult.attMap.put("QTY_THREE", linkedAtt);
-            }
-            //长
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.text = "";
-                linkedAtt.value = "";
-                attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
-            }
-            //宽
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.text = "";
-                linkedAtt.value = "";
-                attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
-            }
-            //其他
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.text = "";
-                linkedAtt.value = "";
-                attLinkResult.attMap.put("QTY_TWO", linkedAtt);
-            }
-
-            // 建设年限
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                attLinkResult.attMap.put("BUILD_YEARS", linkedAtt);
-            }
-            // 项目概况
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt);
-                attLinkResult.attMap.put("PRJ_INTRODUCE", linkedAtt);
-            }
-            // 批复文号
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
-                attLinkResult.attMap.put("REPLY_NO", linkedAtt);
-            }
-            // 批复日期
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DATE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("PRJ_REPLY_DATE", linkedAtt);
-            }
-            // 批复材料
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.FILE_GROUP;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("PRJ_REPLY_FILE", linkedAtt);
-            }
-            // 资金来源
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
-                attLinkResult.attMap.put("PM_FUND_SOURCE_ID", linkedAtt);
-            }
-            // 可研批复资金
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("FEASIBILITY_APPROVE_FUND", linkedAtt);
-            }
-            // 初概批复资金
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("ESTIMATE_APPROVE_FUND", linkedAtt);
-            }
-            // 财评批复资金
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-
-                attLinkResult.attMap.put("EVALUATION_APPROVE_FUND", linkedAtt);
-            }
-
-            // 资金信息回显。优先级 可研估算<初设概算<预算财评
-            List<String> amtList = getAmtList();
-            if (amtList.contains(entCode)) {
-                // 总投资
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.DOUBLE;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-
-                    attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
-                }
-                // 工程费用
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.DOUBLE;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-
-                    attLinkResult.attMap.put("PROJECT_AMT", linkedAtt);
-                }
-                // 工程建设其他费用
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.DOUBLE;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-
-                    attLinkResult.attMap.put("PROJECT_OTHER_AMT", linkedAtt);
-                }
-                // 预备费
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.DOUBLE;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-
-                    attLinkResult.attMap.put("PREPARE_AMT", linkedAtt);
-                }
-                // 利息
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.DOUBLE;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-
-                    attLinkResult.attMap.put("CONSTRUCT_PERIOD_INTEREST", linkedAtt);
-                }
-                //批复文号
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.DOUBLE;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-
-                    attLinkResult.attMap.put("REPLY_NO", linkedAtt);
-                    attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
-                }
+                attLinkResult.attMap.put("PRJ_CODE", linkedAtt); // 项目编号
+                attLinkResult.attMap.put("BUILDING_AREA", linkedAtt); // 建筑面积
+                attLinkResult.attMap.put("CUSTOMER_UNIT", linkedAtt); // 业主单位
+                attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID", linkedAtt); // 项目管理模式
+                attLinkResult.attMap.put("BASE_LOCATION_ID", linkedAtt); // 建设地点
+                attLinkResult.attMap.put("FLOOR_AREA", linkedAtt); // 占地面积
+                attLinkResult.attMap.put("PROJECT_TYPE_ID", linkedAtt); // 项目类型
+                attLinkResult.attMap.put("CON_SCALE_TYPE_ID", linkedAtt); // 建设规模类型
+                attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt); // 建设规模单位
+                attLinkResult.attMap.put("QTY_ONE", linkedAtt); // 建筑面积
+                attLinkResult.attMap.put("QTY_THREE", linkedAtt); // 海域面积
+                attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt); // 长
+                attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt); // 宽
+                attLinkResult.attMap.put("QTY_TWO", linkedAtt); // 其他
+                attLinkResult.attMap.put("BUILD_YEARS", linkedAtt); // 建设年限
+                attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt); // 项目概况
+                attLinkResult.attMap.put("PRJ_INTRODUCE", linkedAtt); // 项目介绍
+                attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt); // 批复文号
+                attLinkResult.attMap.put("REPLY_NO", linkedAtt); // 批复文号
+                attLinkResult.attMap.put("PRJ_REPLY_DATE", linkedAtt); // 批复日期
+                attLinkResult.attMap.put("PRJ_REPLY_FILE", linkedAtt); // 批复材料
+                attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt); // 资金来源
+                attLinkResult.attMap.put("PM_FUND_SOURCE_ID", linkedAtt); // 资金来源
+                attLinkResult.attMap.put("FEASIBILITY_APPROVE_FUND", linkedAtt); // 可研批复资金
+                attLinkResult.attMap.put("ESTIMATE_APPROVE_FUND", linkedAtt); // 初概批复资金
+                attLinkResult.attMap.put("EVALUATION_APPROVE_FUND", linkedAtt); // 财评批复资金
+                attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt); // 总投资
+                attLinkResult.attMap.put("PROJECT_AMT", linkedAtt); // 工程费用
+                attLinkResult.attMap.put("PROJECT_OTHER_AMT", linkedAtt); // 工程建设其他费用
+                attLinkResult.attMap.put("PREPARE_AMT", linkedAtt); // 预备费
+                attLinkResult.attMap.put("CONSTRUCT_PERIOD_INTEREST", linkedAtt); // 利息
+                attLinkResult.attMap.put("REPLY_NO", linkedAtt); // 批复文号
+                attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt); // 批复文号
             }
             return attLinkResult;
         }

@@ -1,11 +1,9 @@
-package com.cisdi.pms.job.model;
+package com.cisdi.pms.job.export.model;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.alibaba.excel.annotation.write.style.ContentStyle;
 import lombok.Data;
-
-import java.math.BigDecimal;
 
 /**
  * 资金批复（落实）导出模板

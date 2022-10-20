@@ -2,9 +2,9 @@ package com.cisdi.pms.job.export;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.support.ExcelTypeEnum;
-import com.cisdi.pms.job.model.FundReachExportModel;
-import com.cisdi.pms.job.model.FundStatisticalExportModel;
-import com.cisdi.pms.job.model.request.FundStatisticalRequest;
+import com.cisdi.pms.job.export.model.FundPrjStatisticalExportModel;
+import com.cisdi.pms.job.export.model.FundStatisticalExportModel;
+import com.cisdi.pms.job.export.model.request.FundStatisticalRequest;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
@@ -56,9 +56,11 @@ public class FundStatisticalController extends BaseController {
                 "ifnull(temp.sumAmt,0)/10000 as cumulativeInPaceAmt, \n" +
                 "ifnull(temp2.sumZqAmt,0)/10000 as cumulativeInPaceAmtZq, \n" +
                 "ifnull(temp3.sumJsAmt,0)/10000 as cumulativeInPaceAmtJs, \n" +
-                "0 as cumulativePayAmt,(ifnull(temp.sumAmt,0) - 0)/10000 as syAmt,\n" +
+                "ifnull(temp4.cumPayAmt,0)/10000 as cumulativePayAmt,  (ifnull(temp1.sumApp,0) - ifnull(temp4.cumPayAmt,0))/10000 as syAmt, \n" +
                 "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0))/10000 as unInPlaceAmt,\n" +
-                "(ifnull(temp1.sumApp,0) - 0)/10000 as totalSyAmt,0 as totalPayRate,fi.REMARK as remark \n" +
+                "(ifnull(temp1.sumApp,0) - ifnull(temp4.cumPayAmt,0))/10000 as totalSyAmt,\n" +
+                "CONCAT((CAST(ROUND((ifnull(temp4.cumPayAmt,0)/ifnull(temp1.sumApp,0))*100,0) as char)),'%') as totalPayRate,\n" +
+                "fi.REMARK as remark \n" +
                 "from FUND_IMPLEMENTATION fi \n" +
                 "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST \n" +
                 "left join FUND_TYPE ft1 on ft1.id = fi.FUND_CATEGORY_SECOND \n" +
@@ -69,7 +71,11 @@ public class FundStatisticalController extends BaseController {
                 "left join (select sum(REACH_AMOUNT) sumJsAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '99952822476371282' group by " +
                 "FUND_SOURCE_TEXT) temp3 on temp3.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
                 "left join (select sum(APPROVED_AMOUNT) sumApp,FUND_IMP_ID from fund_implementation_detail group by FUND_IMP_ID) temp1 on temp1" +
-                ".FUND_IMP_ID = fi.id");
+                ".FUND_IMP_ID = fi.id " +
+                "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
+                "left join (select sum(IFNULL(fs.PAID_AMT,0)) cumPayAmt,fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID from fund_special fs group by fs" +
+                ".FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp4 on temp4.FUND_IMPLEMENTATION_V_ID = fid.id and temp4.PM_PRJ_ID = fid.PM_PRJ_ID\n" +
+                "where 1=1");
         if (Strings.isNotEmpty(fundCategoryId)) {
             sb.append(" and fi.FUND_CATEGORY_FIRST = '").append(fundCategoryId).append("'");
         }
@@ -91,6 +97,69 @@ public class FundStatisticalController extends BaseController {
     }
 
     /**
+     * 资金批复，到位，支付总表包含项目导出
+     */
+    @SneakyThrows(IOException.class)
+    @GetMapping("exportPrj")
+    public void exportPrj(FundStatisticalRequest fundStatisticalRequest, HttpServletResponse response) {
+        //资金大类
+        String fundCategoryId = fundStatisticalRequest.fundCategoryId;
+        //资金来源
+        String sourceName = fundStatisticalRequest.sourceName;
+        //批复日期
+        String beginDate = fundStatisticalRequest.beginDate;
+        String endDate = fundStatisticalRequest.endDate;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("select fi.id,ft.name as categoryName,ft1.name as categoryNameSecond, fi.FUND_SOURCE_TEXT as sourceName," +
+                "pr.name prjName, ifnull(fi.DECLARED_AMOUNT,0)/10000 as declaredAmount, ifnull(temp1.sumApp,0)/10000 as approvedAmount, \n" +
+                "fi.APPROVAL_TIME as approvedDate, \n" +
+                "ifnull(temp.sumAmt,0)/10000 as cumulativeInPaceAmt, \n" +
+                "ifnull(temp2.sumZqAmt,0)/10000 as cumulativeInPaceAmtZq, \n" +
+                "ifnull(temp3.sumJsAmt,0)/10000 as cumulativeInPaceAmtJs, \n" +
+                "ifnull(temp4.cumPayAmt,0)/10000 as cumulativePayAmt,  (ifnull(temp1.sumApp,0) - ifnull(temp4.cumPayAmt,0))/10000 as syAmt, \n" +
+                "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0))/10000 as unInPlaceAmt,\n" +
+                "(ifnull(temp1.sumApp,0) - ifnull(temp4.cumPayAmt,0))/10000 as totalSyAmt,\n" +
+                "CONCAT((CAST(ROUND((ifnull(temp4.cumPayAmt,0)/ifnull(temp1.sumApp,0))*100,0) as char)),'%') as totalPayRate,\n" +
+                "fi.REMARK as remark \n" +
+                "from FUND_IMPLEMENTATION fi \n" +
+                "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST \n" +
+                "left join FUND_TYPE ft1 on ft1.id = fi.FUND_CATEGORY_SECOND \n" +
+                "left join (select sum(REACH_AMOUNT) sumAmt,FUND_SOURCE_TEXT from fund_reach group by FUND_SOURCE_TEXT) temp on temp" +
+                ".FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT\n" +
+                "left join (select sum(REACH_AMOUNT) sumZqAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '99952822476371281' group by " +
+                "FUND_SOURCE_TEXT) temp2 on temp2.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
+                "left join (select sum(REACH_AMOUNT) sumJsAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '99952822476371282' group by " +
+                "FUND_SOURCE_TEXT) temp3 on temp3.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
+                "left join (select sum(APPROVED_AMOUNT) sumApp,FUND_IMP_ID from fund_implementation_detail group by FUND_IMP_ID) temp1 on temp1" +
+                ".FUND_IMP_ID = fi.id" +
+                "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
+                "left join pm_prj pr on pr.id = fid.PM_PRJ_ID \n" +
+                "left join (select sum(IFNULL(fs.PAID_AMT,0)) cumPayAmt,fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID from fund_special fs group by fs" +
+                ".FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp4 on temp4.FUND_IMPLEMENTATION_V_ID = fid.id and temp4.PM_PRJ_ID = fid.PM_PRJ_ID\n" +
+                "where 1=1");
+        if (Strings.isNotEmpty(fundCategoryId)) {
+            sb.append(" and fi.FUND_CATEGORY_FIRST = '").append(fundCategoryId).append("'");
+        }
+        if (Strings.isNotEmpty(sourceName)) {
+            sb.append(" and fi.FUND_SOURCE_TEXT like '%").append(sourceName).append("%'");
+        }
+        if (Strings.isNotEmpty(beginDate) && Strings.isNotEmpty(endDate)) {
+            sb.append(" and fi.APPROVAL_TIME between '").append(beginDate).append("' and '").append(endDate).append("'");
+        }
+        sb.append(" order by fi.CRT_DT desc ");
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
+        List<FundPrjStatisticalExportModel> resList = list.stream().map(this::convertPrjData).collect(Collectors.toList());
+        super.setExcelRespProp(response, "资金批复，到位，支付总表");
+        EasyExcel.write(response.getOutputStream())
+                .head(FundStatisticalExportModel.class)
+                .excelType(ExcelTypeEnum.XLSX)
+                .sheet("资金批复，到位，支付总表")
+                .doWrite(resList);
+    }
+
+
+    /**
      * 数据转换
      *
      * @param data
@@ -101,6 +170,33 @@ public class FundStatisticalController extends BaseController {
         obj.categoryName = JdbcMapUtil.getString(data, "categoryName");
         obj.categoryNameSecond = JdbcMapUtil.getString(data, "categoryNameSecond");
         obj.sourceName = JdbcMapUtil.getString(data, "sourceName");
+        obj.declaredAmount = JdbcMapUtil.getDouble(data, "declaredAmount");
+        obj.approvedAmount = JdbcMapUtil.getDouble(data, "approvedAmount");
+        obj.approvedDate = JdbcMapUtil.getString(data, "approvedDate");
+        obj.cumulativeInPaceAmt = JdbcMapUtil.getDouble(data, "cumulativeInPaceAmt");
+        obj.cumulativeInPaceAmtZq = JdbcMapUtil.getDouble(data, "cumulativeInPaceAmtZq");
+        obj.cumulativeInPaceAmtJs = JdbcMapUtil.getDouble(data, "cumulativeInPaceAmtJs");
+        obj.cumulativePayAmt = JdbcMapUtil.getDouble(data, "cumulativePayAmt");
+        obj.syAmt = JdbcMapUtil.getDouble(data, "syAmt");
+        obj.unInPlaceAmt = JdbcMapUtil.getDouble(data, "unInPlaceAmt");
+        obj.totalSyAmt = JdbcMapUtil.getDouble(data, "totalSyAmt");
+        obj.totalPayRate = JdbcMapUtil.getString(data, "totalPayRate");
+        obj.remark = JdbcMapUtil.getString(data, "remark");
+        return obj;
+    }
+
+    /**
+     * 数据转换
+     *
+     * @param data
+     * @return
+     */
+    private FundPrjStatisticalExportModel convertPrjData(Map<String, Object> data) {
+        FundPrjStatisticalExportModel obj = new FundPrjStatisticalExportModel();
+        obj.categoryName = JdbcMapUtil.getString(data, "categoryName");
+        obj.categoryNameSecond = JdbcMapUtil.getString(data, "categoryNameSecond");
+        obj.sourceName = JdbcMapUtil.getString(data, "sourceName");
+        obj.prjName = JdbcMapUtil.getString(data, "prjName");
         obj.declaredAmount = JdbcMapUtil.getDouble(data, "declaredAmount");
         obj.approvedAmount = JdbcMapUtil.getDouble(data, "approvedAmount");
         obj.approvedDate = JdbcMapUtil.getString(data, "approvedDate");

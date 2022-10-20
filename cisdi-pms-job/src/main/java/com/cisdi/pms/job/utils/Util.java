@@ -1,6 +1,5 @@
-package com.cisdi.data.transfer;
+package com.cisdi.pms.job.utils;
 
-import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
