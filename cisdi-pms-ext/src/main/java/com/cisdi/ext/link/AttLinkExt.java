@@ -1977,7 +1977,7 @@ public class AttLinkExt {
         }
 
         // 根据id查询招投标信息
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select YES_NO_THREE,GUARANTEE_LETTER_TYPE_IDS,IS_REFER_GUARANTEE_ID,PLAN_TOTAL_DAYS," +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTACT_MOBILE_ONE,CONTACTS_ONE,YES_NO_THREE,GUARANTEE_LETTER_TYPE_IDS,IS_REFER_GUARANTEE_ID,PLAN_TOTAL_DAYS," +
                 "CONTRACT_CATEGORY_ONE_ID,FILE_ID_FIVE,WIN_BID_UNIT_ONE,AMT_ONE,WINNING_BIDS_AMOUNT,BUY_TYPE_ID,BID_CTL_PRICE_LAUNCH,BUY_MATTER_ID," +
                 "PM_BID_KEEP_FILE_REQ_ID,CONTRACT_NAME,PM_BID_KEEP_FILE_REQ_ID,CONTRACT_CODE,NAME,WIN_BID_UNIT_ONE,CUSTOMER_UNIT_ONE," +
                 "CONTRACT_PRICE,ATT_FILE_GROUP_ID from po_order_req where id = ?", attValue);
@@ -2176,6 +2176,22 @@ public class AttLinkExt {
             linkedAtt.value = id;
             linkedAtt.text = name;
             attLinkResult.attMap.put("YES_NO_THREE",linkedAtt);
+        }
+        // 合同签订联系人
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CONTACTS_ONE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CONTACTS_ONE");
+            attLinkResult.attMap.put("CONTACTS_ONE", linkedAtt);
+        }
+        // 联系电话
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = JdbcMapUtil.getString(row, "CONTACT_MOBILE_ONE");
+            linkedAtt.text = JdbcMapUtil.getString(row, "CONTACT_MOBILE_ONE");
+            attLinkResult.attMap.put("CONTACT_MOBILE_ONE", linkedAtt);
         }
         //合同原稿（正式合同附件）
         {
