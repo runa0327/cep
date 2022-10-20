@@ -3884,6 +3884,7 @@ public class AttLinkExt {
     public List<String> getBeiAnList() {
         List<String> list = new ArrayList<>();
         list.add("PM_PRJ_INVEST1"); //可研估算
+        list.add("PM_PRJ_INVEST2"); //初设概算
         return list;
     }
 }
