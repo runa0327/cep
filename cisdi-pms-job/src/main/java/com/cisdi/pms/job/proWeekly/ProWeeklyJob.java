@@ -41,7 +41,7 @@ public class ProWeeklyJob {
      * 定时产生周报(每周五执行)
      */
 //    @Scheduled(cron = "0 */1 * * * ?")//-- 每分钟执行一次
-    @Scheduled(cron = "0 0 1 ? * L") //每周星期六凌晨1点实行一次
+//    @Scheduled(cron = "0 0 1 ? * L") //每周星期六凌晨1点实行一次
     @Async("taskExecutor")
     public void invokeCreateWeekly() {
         // 查询周报规则
