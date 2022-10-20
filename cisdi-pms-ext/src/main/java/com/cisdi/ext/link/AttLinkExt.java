@@ -332,6 +332,21 @@ public class AttLinkExt {
             //基础统计回显
             List<Map<String, Object>> priStatistic = myJdbcTemplate.queryForList(baseSql, fundSourceName, prjId);
 
+            //查询银行到位余额
+//            String bankReachSql = "select reachTemp.bankName,reachTemp.FUND_SOURCE_TEXT soureName,appTemp.appAmt - reachTemp.reachAmt reachBalance " +
+//                    "from (select rb.name bankName,re.FUND_SOURCE_TEXT,sum(re.REACH_AMOUNT) reachAmt,re.PM_PRJ_ID\n" +
+//                    "from fund_reach re\n" +
+//                    "left join fund_implementation fi on re.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT\n" +
+//                    "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id and fid.PM_PRJ_ID = re.PM_PRJ_ID\n" +
+//                    "left join receiving_bank rb on rb.id = re.RECEIVING_BANK_ID\n" +
+//                    "group by re.RECEIVING_BANK_ID,re.FUND_SOURCE_TEXT,re.PM_PRJ_ID) reachTemp\n" +
+//                    "left join (select fi.FUND_SOURCE_TEXT,fid.PM_PRJ_ID,sum(fid.APPROVED_AMOUNT) appAmt\n" +
+//                    "\tfrom fund_implementation fi\n" +
+//                    "\tleft join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
+//                    "\tgroup by fi.FUND_SOURCE_TEXT,fid.PM_PRJ_ID\n" +
+//                    ") appTemp on appTemp.FUND_SOURCE_TEXT = reachTemp.FUND_SOURCE_TEXT and appTemp.PM_PRJ_ID = reachTemp.PM_PRJ_ID\n" +
+//                    "where reachTemp.FUND_SOURCE_TEXT = ? and reachTemp.PM_PRJ_ID = ?";
+//            myJdbcTemplate.queryForList(bankReachSql,fundSourceName,prjId);
 
             if (!CollectionUtils.isEmpty(priStatistic)){
                 Map<String, Object> priStatisticMap = priStatistic.get(0);
@@ -405,6 +420,15 @@ public class AttLinkExt {
                     linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"cumAcqReachAmt");
                     linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"cumAcqReachAmt");
                     attLinkResult.attMap.put("CUM_ACQ_REACH_AMT",linkedAtt);
+                }
+
+                //剩余到位资金(NOT_REACH_AMT),双精度浮点
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DOUBLE;
+                    linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"notReachAmt");
+                    linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"notReachAmt");
+                    attLinkResult.attMap.put("SUR_REACH_AMT",linkedAtt);
                 }
 
                 //支付明细码(FUND_PAY_CODE),文本（短）
