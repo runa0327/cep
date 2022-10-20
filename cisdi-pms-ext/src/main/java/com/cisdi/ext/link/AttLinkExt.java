@@ -511,7 +511,64 @@ public class AttLinkExt {
     //招采项目备案及归档 属性联动
     private AttLinkResult linkPM_BID_KEEP_FILE_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        if ("PO_ORDER_REQ".equals(entCode)){ //合同签订
+        //选择备案信息属性联系的流程
+        List<String> needBeiAn = getBeiAnList();
+        if (needBeiAn.contains(entCode)){
+            String sql1 = "select a.CUSTOMER_UNIT_ONE,(select name from pm_party where id = a.CUSTOMER_UNIT_ONE) as customerName," +
+                    "(select name from ad_status where id = a.status) as statusName,a.status,a.CRT_USER_ID,CONTACTS_ONE,CONTACT_MOBILE_ONE," +
+                    "(select name from ad_user where id = a.CRT_USER_ID) as userName,WIN_BID_UNIT_ONE from PM_BID_KEEP_FILE_REQ a where a.id = ?";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,attValue);
+            if (!CollectionUtils.isEmpty(list1)){
+                //审批状态
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"status");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"statusName");
+                    attLinkResult.attMap.put("STATUS_ONE",linkedAtt);
+                }
+                //委托单位
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"CUSTOMER_UNIT_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"customerName");
+                    attLinkResult.attMap.put("CUSTOMER_UNIT_ONE",linkedAtt);
+                }
+                //采购经办人
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"CRT_USER_ID");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"userName");
+                    attLinkResult.attMap.put("PROCURE_USER_ID",linkedAtt);
+                }
+                //中标单位
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"WIN_BID_UNIT_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"WIN_BID_UNIT_ONE");
+                    attLinkResult.attMap.put("WIN_BID_UNIT_ONE",linkedAtt);
+                }
+                //中标单位联系人
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"CONTACTS_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"CONTACTS_ONE");
+                    attLinkResult.attMap.put("CONTACTS_ONE",linkedAtt);
+                }
+                //中标单位联系方式
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"CONTACT_MOBILE_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"CONTACT_MOBILE_ONE");
+                    attLinkResult.attMap.put("CONTACT_MOBILE_ONE",linkedAtt);
+                }
+            }
+        } else if ("PO_ORDER_REQ".equals(entCode)){ //合同签订
             //查询招采项目备案及归档信息
             String sql1 = "select PM_PRJ_ID,PAY_AMT_TWO,BUY_TYPE_ID,WIN_BID_UNIT_ONE,AMT_ONE,BUY_MATTER_ID from PM_BID_KEEP_FILE_REQ where id = ?";
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,attValue);
@@ -947,9 +1004,9 @@ public class AttLinkExt {
                 //采购启动依据文件
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = null;
-                    linkedAtt.text = null;
+                    linkedAtt.type = AttDataTypeE.FILE_GROUP;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
                     linkedAtt.changeToMandatory = true;
                     linkedAtt.changeToEditable = true;
                     linkedAtt.fileInfoList = null;
@@ -2856,6 +2913,22 @@ public class AttLinkExt {
 
     private AttLinkResult linkForPM_PRJ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
+        //项目联动清除数据
+        if ("PM_BID_KEEP_FILE_REQ".equals(entCode)){
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.DOUBLE;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                attLinkResult.attMap.put("PM_USE_CHAPTER_REQ_ID", linkedAtt);
+                attLinkResult.attMap.put("BUY_MATTER_ID", linkedAtt);
+                attLinkResult.attMap.put("WIN_BID_UNIT_ONE", linkedAtt);
+                attLinkResult.attMap.put("AMT_ONE", linkedAtt);
+                attLinkResult.attMap.put("CONTACTS_ONE", linkedAtt);
+                attLinkResult.attMap.put("CONTACT_MOBILE_ONE", linkedAtt);
+            }
+            return attLinkResult;
+        }
 
         // 项目基础信息
         List<Map<String, Object>> list = myJdbcTemplate
@@ -3805,6 +3878,12 @@ public class AttLinkExt {
     public List<String> getNotAutoBaoHan() {
         List<String> list = new ArrayList<>();
         list.add("PO_GUARANTEE_LETTER_REQUIRE_REQ"); //新增保函
+        return list;
+    }
+
+    public List<String> getBeiAnList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_PRJ_INVEST1"); //可研估算
         return list;
     }
 }
