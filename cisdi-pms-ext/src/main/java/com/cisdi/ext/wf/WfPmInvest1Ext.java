@@ -5,6 +5,8 @@ import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -32,10 +34,10 @@ public class WfPmInvest1Ext {
 
         for (Map<String, Object> row : list) {
             if (row.get("u_id").toString().equals(PRJ_DESIGN_USER_ID)) {
-                designComment = row.get("user_comment") == null ? null : row.get("user_comment").toString();
+                designComment = SharedUtil.isEmptyString(JdbcMapUtil.getString(row,"user_comment")) ? "同意" : row.get("user_comment").toString();
             }
             if (row.get("u_id").toString().equals(PRJ_COST_USER_ID)) {
-                costComment = row.get("user_comment") == null ? null : row.get("user_comment").toString();
+                costComment = SharedUtil.isEmptyString(JdbcMapUtil.getString(row,"user_comment")) ? "同意" : row.get("user_comment").toString();
             }
         }
 
@@ -56,7 +58,7 @@ public class WfPmInvest1Ext {
 
         for (Map<String, Object> row : list) {
             if (row.get("u_id").toString().equals(early_chief_user_id)) {
-                earlyChiefComment = row.get("user_comment") == null ? null : row.get("user_comment").toString();
+                earlyChiefComment = SharedUtil.isEmptyString(JdbcMapUtil.getString(row,"user_comment")) ? "同意" : row.get("user_comment").toString();
             }
         }
         myJdbcTemplate.update("update " + entCode + " t set t.EARLY_COMMENT=? where t.id=?", earlyChiefComment, csCommId);

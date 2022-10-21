@@ -218,50 +218,12 @@ public class WfExt {
                                 return;
                             } else {
                                 List<String> amtPrjList = getAmtPrjList();
-                                // 特殊流程
-                                List<String> specialList = getSpecialList();
                                 if (amtPrjList.contains(entityCode)) {
                                     // 资金需求计划和付款申请项目\设计任务书名称使用的另外的字段
                                     update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
                                             ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
                                             ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.AMOUT_PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name," +
                                             "'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
-                                } else if (specialList.contains(entityCode)) {
-                                    String name = "",projectName = "", userName = "", nowDate = "", processName = "", otherName = "";
-                                    StringBuffer sb = new StringBuffer();
-                                    String sql = "";
-                                    String sql2 = "SELECT (select name from pm_prj where id = a.PM_PRJ_ID) as projectName," +
-                                            "(select name from ad_user where id = a.CRT_USER_ID) as userName," +
-                                            "(select NOW()) as nowDate,c.name as processName FROM "+entityCode+" a " +
-                                            "LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id LEFT JOIN wf_process c on b.WF_PROCESS_ID = c.id WHERE a.id = ?";
-                                    List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,csCommId);
-                                    if (!CollectionUtils.isEmpty(list2)){
-                                        projectName = JdbcMapUtil.getString(list2.get(0),"projectName");
-                                        userName = JdbcMapUtil.getString(list2.get(0),"userName");
-                                        nowDate = JdbcMapUtil.getString(list2.get(0),"nowDate");
-                                        processName = JdbcMapUtil.getString(list2.get(0),"processName");
-                                    }
-                                    if ("PM_BUY_DEMAND_REQ".equals(entityCode)){ //采购需求审批
-                                        sql = "select b.name from PM_BUY_DEMAND_REQ a left join gr_set_value b on a.BUY_MATTER_ID = b.id where a.id = ?";
-                                        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
-                                        if (!CollectionUtils.isEmpty(list)){
-                                            otherName = JdbcMapUtil.getString(list.get(0),"name");
-                                        }
-                                    } else if ("PO_ORDER_REQ".equals(entityCode)){ //合同签订
-                                        sql = "select CONTRACT_NAME from PO_ORDER_REQ where id = ?";
-                                        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
-                                        if (!CollectionUtils.isEmpty(list)){
-                                            otherName = JdbcMapUtil.getString(list.get(0),"CONTRACT_NAME");
-                                        }
-                                    } else {
-                                        sql = "select NAME_ONE from "+entityCode+" where id = ?";
-                                        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
-                                        if (!CollectionUtils.isEmpty(list)){
-                                            otherName = JdbcMapUtil.getString(list.get(0),"NAME_ONE");
-                                        }
-                                    }
-                                    name = processName + "-" +otherName + "-" +projectName + "-" + userName + "-" + nowDate;
-                                    update1 = myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", name,csCommId);
                                 } else {
                                     update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
                                             ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
@@ -270,6 +232,47 @@ public class WfExt {
                                 }
                             }
                             log.info("已更新：{}", update1);
+
+                            // 特殊流程 更新流程内name字段
+                            List<String> specialList = getSpecialList();
+                            if (specialList.contains(entityCode)) {
+                                String name = "",projectName = "", userName = "", nowDate = "", processName = "", otherName = "";
+                                StringBuffer sb = new StringBuffer();
+                                String sql = "";
+                                String sql2 = "SELECT (select name from pm_prj where id = a.PM_PRJ_ID) as projectName," +
+                                        "(select name from ad_user where id = a.CRT_USER_ID) as userName," +
+                                        "(select NOW()) as nowDate,c.name as processName FROM "+entityCode+" a " +
+                                        "LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id LEFT JOIN wf_process c on b.WF_PROCESS_ID = c.id WHERE a.id = ?";
+                                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,csCommId);
+                                if (!CollectionUtils.isEmpty(list2)){
+                                    projectName = JdbcMapUtil.getString(list2.get(0),"projectName");
+                                    userName = JdbcMapUtil.getString(list2.get(0),"userName");
+                                    nowDate = JdbcMapUtil.getString(list2.get(0),"nowDate");
+                                    processName = JdbcMapUtil.getString(list2.get(0),"processName");
+                                }
+                                if ("PM_BUY_DEMAND_REQ".equals(entityCode)){ //采购需求审批
+                                    sql = "select b.name from PM_BUY_DEMAND_REQ a left join gr_set_value b on a.BUY_MATTER_ID = b.id where a.id = ?";
+                                    List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
+                                    if (!CollectionUtils.isEmpty(list)){
+                                        otherName = JdbcMapUtil.getString(list.get(0),"name");
+                                    }
+                                } else if ("PO_ORDER_REQ".equals(entityCode)){ //合同签订
+                                    sql = "select CONTRACT_NAME from PO_ORDER_REQ where id = ?";
+                                    List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
+                                    if (!CollectionUtils.isEmpty(list)){
+                                        otherName = JdbcMapUtil.getString(list.get(0),"CONTRACT_NAME");
+                                    }
+                                } else {
+                                    sql = "select NAME_ONE from "+entityCode+" where id = ?";
+                                    List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
+                                    if (!CollectionUtils.isEmpty(list)){
+                                        otherName = JdbcMapUtil.getString(list.get(0),"NAME_ONE");
+                                    }
+                                }
+                                name = processName + "-" +otherName + "-" +projectName + "-" + userName + "-" + nowDate;
+                                update1 = myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", name,csCommId);
+                            }
+
                             // 发起人是否存在部门信息校验
                             try {
                                 String hrDeptId = valueMap.get("CRT_DEPT_ID").toString();

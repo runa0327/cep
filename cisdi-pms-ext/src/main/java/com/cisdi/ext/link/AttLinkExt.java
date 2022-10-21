@@ -332,6 +332,21 @@ public class AttLinkExt {
             //基础统计回显
             List<Map<String, Object>> priStatistic = myJdbcTemplate.queryForList(baseSql, fundSourceName, prjId);
 
+            //查询银行到位余额
+//            String bankReachSql = "select reachTemp.bankName,reachTemp.FUND_SOURCE_TEXT soureName,appTemp.appAmt - reachTemp.reachAmt reachBalance " +
+//                    "from (select rb.name bankName,re.FUND_SOURCE_TEXT,sum(re.REACH_AMOUNT) reachAmt,re.PM_PRJ_ID\n" +
+//                    "from fund_reach re\n" +
+//                    "left join fund_implementation fi on re.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT\n" +
+//                    "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id and fid.PM_PRJ_ID = re.PM_PRJ_ID\n" +
+//                    "left join receiving_bank rb on rb.id = re.RECEIVING_BANK_ID\n" +
+//                    "group by re.RECEIVING_BANK_ID,re.FUND_SOURCE_TEXT,re.PM_PRJ_ID) reachTemp\n" +
+//                    "left join (select fi.FUND_SOURCE_TEXT,fid.PM_PRJ_ID,sum(fid.APPROVED_AMOUNT) appAmt\n" +
+//                    "\tfrom fund_implementation fi\n" +
+//                    "\tleft join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
+//                    "\tgroup by fi.FUND_SOURCE_TEXT,fid.PM_PRJ_ID\n" +
+//                    ") appTemp on appTemp.FUND_SOURCE_TEXT = reachTemp.FUND_SOURCE_TEXT and appTemp.PM_PRJ_ID = reachTemp.PM_PRJ_ID\n" +
+//                    "where reachTemp.FUND_SOURCE_TEXT = ? and reachTemp.PM_PRJ_ID = ?";
+//            myJdbcTemplate.queryForList(bankReachSql,fundSourceName,prjId);
 
             if (!CollectionUtils.isEmpty(priStatistic)){
                 Map<String, Object> priStatisticMap = priStatistic.get(0);
@@ -405,6 +420,15 @@ public class AttLinkExt {
                     linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"cumAcqReachAmt");
                     linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"cumAcqReachAmt");
                     attLinkResult.attMap.put("CUM_ACQ_REACH_AMT",linkedAtt);
+                }
+
+                //剩余到位资金(NOT_REACH_AMT),双精度浮点
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DOUBLE;
+                    linkedAtt.value = JdbcMapUtil.getString(priStatisticMap,"notReachAmt");
+                    linkedAtt.text = JdbcMapUtil.getString(priStatisticMap,"notReachAmt");
+                    attLinkResult.attMap.put("SUR_REACH_AMT",linkedAtt);
                 }
 
                 //支付明细码(FUND_PAY_CODE),文本（短）
@@ -487,7 +511,64 @@ public class AttLinkExt {
     //招采项目备案及归档 属性联动
     private AttLinkResult linkPM_BID_KEEP_FILE_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        if ("PO_ORDER_REQ".equals(entCode)){ //合同签订
+        //选择备案信息属性联系的流程
+        List<String> needBeiAn = getBeiAnList();
+        if (needBeiAn.contains(entCode)){
+            String sql1 = "select a.CUSTOMER_UNIT_ONE,(select name from pm_party where id = a.CUSTOMER_UNIT_ONE) as customerName," +
+                    "(select name from ad_status where id = a.status) as statusName,a.status,a.CRT_USER_ID,CONTACTS_ONE,CONTACT_MOBILE_ONE," +
+                    "(select name from ad_user where id = a.CRT_USER_ID) as userName,WIN_BID_UNIT_ONE from PM_BID_KEEP_FILE_REQ a where a.id = ?";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,attValue);
+            if (!CollectionUtils.isEmpty(list1)){
+                //审批状态
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"status");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"statusName");
+                    attLinkResult.attMap.put("STATUS_ONE",linkedAtt);
+                }
+                //委托单位
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"CUSTOMER_UNIT_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"customerName");
+                    attLinkResult.attMap.put("CUSTOMER_UNIT_ONE",linkedAtt);
+                }
+                //采购经办人
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"CRT_USER_ID");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"userName");
+                    attLinkResult.attMap.put("PROCURE_USER_ID",linkedAtt);
+                }
+                //中标单位
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"WIN_BID_UNIT_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"WIN_BID_UNIT_ONE");
+                    attLinkResult.attMap.put("WIN_BID_UNIT_ONE",linkedAtt);
+                }
+                //中标单位联系人
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"CONTACTS_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"CONTACTS_ONE");
+                    attLinkResult.attMap.put("CONTACTS_ONE",linkedAtt);
+                }
+                //中标单位联系方式
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"CONTACT_MOBILE_ONE");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"CONTACT_MOBILE_ONE");
+                    attLinkResult.attMap.put("CONTACT_MOBILE_ONE",linkedAtt);
+                }
+            }
+        } else if ("PO_ORDER_REQ".equals(entCode)){ //合同签订
             //查询招采项目备案及归档信息
             String sql1 = "select PM_PRJ_ID,PAY_AMT_TWO,BUY_TYPE_ID,WIN_BID_UNIT_ONE,AMT_ONE,BUY_MATTER_ID from PM_BID_KEEP_FILE_REQ where id = ?";
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,attValue);
@@ -923,9 +1004,9 @@ public class AttLinkExt {
                 //采购启动依据文件
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = null;
-                    linkedAtt.text = null;
+                    linkedAtt.type = AttDataTypeE.FILE_GROUP;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
                     linkedAtt.changeToMandatory = true;
                     linkedAtt.changeToEditable = true;
                     linkedAtt.fileInfoList = null;
@@ -2832,6 +2913,22 @@ public class AttLinkExt {
 
     private AttLinkResult linkForPM_PRJ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
+        //项目联动清除数据
+        if ("PM_BID_KEEP_FILE_REQ".equals(entCode)){
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.DOUBLE;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                attLinkResult.attMap.put("PM_USE_CHAPTER_REQ_ID", linkedAtt);
+                attLinkResult.attMap.put("BUY_MATTER_ID", linkedAtt);
+                attLinkResult.attMap.put("WIN_BID_UNIT_ONE", linkedAtt);
+                attLinkResult.attMap.put("AMT_ONE", linkedAtt);
+                attLinkResult.attMap.put("CONTACTS_ONE", linkedAtt);
+                attLinkResult.attMap.put("CONTACT_MOBILE_ONE", linkedAtt);
+            }
+            return attLinkResult;
+        }
 
         // 项目基础信息
         List<Map<String, Object>> list = myJdbcTemplate
@@ -2859,8 +2956,8 @@ public class AttLinkExt {
             {
                 LinkedAtt linkedAtt = new LinkedAtt();
                 linkedAtt.type = AttDataTypeE.TEXT_SHORT;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
+                linkedAtt.value = null;
+                linkedAtt.text = null;
 
                 attLinkResult.attMap.put("PRJ_CODE", linkedAtt); // 项目编号
                 attLinkResult.attMap.put("BUILDING_AREA", linkedAtt); // 建筑面积
@@ -2932,8 +3029,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_SHORT;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "prj_code")) ? "":JdbcMapUtil.getString(row, "prj_code");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "prj_code")) ? "":JdbcMapUtil.getString(row, "prj_code");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "prj_code")) ? null:JdbcMapUtil.getString(row, "prj_code");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "prj_code")) ? null:JdbcMapUtil.getString(row, "prj_code");
 
             attLinkResult.attMap.put("PRJ_CODE", linkedAtt);
         }
@@ -2941,16 +3038,16 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILDING_AREA")) ? "":JdbcMapUtil.getString(row, "BUILDING_AREA");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILDING_AREA")) ? "":JdbcMapUtil.getString(row, "BUILDING_AREA");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILDING_AREA")) ? null:JdbcMapUtil.getString(row, "BUILDING_AREA");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILDING_AREA")) ? null:JdbcMapUtil.getString(row, "BUILDING_AREA");
             attLinkResult.attMap.put("BUILDING_AREA", linkedAtt);
         }
         // 业主单位
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "customer_id")) ? "":JdbcMapUtil.getString(row, "customer_id");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "customer_name")) ? "":JdbcMapUtil.getString(row, "customer_name");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "customer_id")) ? null:JdbcMapUtil.getString(row, "customer_id");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "customer_name")) ? null:JdbcMapUtil.getString(row, "customer_name");
 
             attLinkResult.attMap.put("CUSTOMER_UNIT", linkedAtt);
         }
@@ -2958,8 +3055,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "m_id")) ? "":JdbcMapUtil.getString(row, "m_id");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "m_name")) ? "":JdbcMapUtil.getString(row, "m_name");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "m_id")) ? null:JdbcMapUtil.getString(row, "m_id");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "m_name")) ? null:JdbcMapUtil.getString(row, "m_name");
 
             attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID", linkedAtt);
         }
@@ -2967,8 +3064,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "l_id")) ? "":JdbcMapUtil.getString(row, "l_id");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "l_name")) ? "":JdbcMapUtil.getString(row, "l_name");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "l_id")) ? null:JdbcMapUtil.getString(row, "l_id");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "l_name")) ? null:JdbcMapUtil.getString(row, "l_name");
 
             attLinkResult.attMap.put("BASE_LOCATION_ID", linkedAtt);
         }
@@ -2976,8 +3073,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? "":JdbcMapUtil.getString(row, "FLOOR_AREA");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? "":JdbcMapUtil.getString(row, "FLOOR_AREA");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:JdbcMapUtil.getString(row, "FLOOR_AREA");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:JdbcMapUtil.getString(row, "FLOOR_AREA");
 
             attLinkResult.attMap.put("FLOOR_AREA", linkedAtt);
         }
@@ -2985,8 +3082,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "pt_id")) ? "":JdbcMapUtil.getString(row, "pt_id");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "pt_name")) ? "":JdbcMapUtil.getString(row, "pt_name");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "pt_id")) ? null:JdbcMapUtil.getString(row, "pt_id");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "pt_name")) ? null:JdbcMapUtil.getString(row, "pt_name");
 
             attLinkResult.attMap.put("PROJECT_TYPE_ID", linkedAtt);
         }
@@ -2994,8 +3091,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "st_id")) ? "":JdbcMapUtil.getString(row, "st_id");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "st_name")) ? "":JdbcMapUtil.getString(row, "st_name");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "st_id")) ? null:JdbcMapUtil.getString(row, "st_id");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "st_name")) ? null:JdbcMapUtil.getString(row, "st_name");
 
             attLinkResult.attMap.put("CON_SCALE_TYPE_ID", linkedAtt);
         }
@@ -3003,8 +3100,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "su_id")) ? "":JdbcMapUtil.getString(row, "su_id");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "su_name")) ? "":JdbcMapUtil.getString(row, "su_name");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "su_id")) ? null:JdbcMapUtil.getString(row, "su_id");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "su_name")) ? null:JdbcMapUtil.getString(row, "su_name");
 
             attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt);
         }
@@ -3072,8 +3169,8 @@ public class AttLinkExt {
             linkedAtt.type = AttDataTypeE.DOUBLE;
             linkedAtt.changeToShown = areashow;
             linkedAtt.changeToMandatory = areaMustEdit;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? "":JdbcMapUtil.getString(row, "QTY_ONE");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? "":JdbcMapUtil.getString(row, "QTY_ONE");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:JdbcMapUtil.getString(row, "QTY_ONE");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:JdbcMapUtil.getString(row, "QTY_ONE");
             attLinkResult.attMap.put("QTY_ONE", linkedAtt);
         }
         //海域面积
@@ -3082,8 +3179,8 @@ public class AttLinkExt {
             linkedAtt.type = AttDataTypeE.DOUBLE;
             linkedAtt.changeToShown = seaShow;
             linkedAtt.changeToMandatory = seaMustEdit;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? "":JdbcMapUtil.getString(row, "QTY_THREE");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? "":JdbcMapUtil.getString(row, "QTY_THREE");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:JdbcMapUtil.getString(row, "QTY_THREE");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:JdbcMapUtil.getString(row, "QTY_THREE");
             attLinkResult.attMap.put("QTY_THREE", linkedAtt);
         }
         //长
@@ -3092,8 +3189,8 @@ public class AttLinkExt {
             linkedAtt.type = AttDataTypeE.DOUBLE;
             linkedAtt.changeToShown = lengthShow;
             linkedAtt.changeToMandatory = lengthMustEdit;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? "":JdbcMapUtil.getString(row, "CON_SCALE_QTY");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? "":JdbcMapUtil.getString(row, "CON_SCALE_QTY");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY");
             attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
         }
         //宽
@@ -3102,8 +3199,8 @@ public class AttLinkExt {
             linkedAtt.type = AttDataTypeE.DOUBLE;
             linkedAtt.changeToShown = widthShow;
             linkedAtt.changeToMandatory = widthMustEdit;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? "":JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? "":JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
             attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
         }
         //其他
@@ -3112,8 +3209,8 @@ public class AttLinkExt {
             linkedAtt.type = AttDataTypeE.DOUBLE;
             linkedAtt.changeToShown = otherShow;
             linkedAtt.changeToMandatory = otherMustEdit;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? "":JdbcMapUtil.getString(row, "QTY_TWO");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? "":JdbcMapUtil.getString(row, "QTY_TWO");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
             attLinkResult.attMap.put("QTY_TWO", linkedAtt);
         }
 
@@ -3122,16 +3219,16 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILD_YEARS")) ? "":JdbcMapUtil.getString(row, "BUILD_YEARS");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILD_YEARS")) ? "":JdbcMapUtil.getString(row, "BUILD_YEARS");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILD_YEARS")) ? null:JdbcMapUtil.getString(row, "BUILD_YEARS");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILD_YEARS")) ? null:JdbcMapUtil.getString(row, "BUILD_YEARS");
             attLinkResult.attMap.put("BUILD_YEARS", linkedAtt);
         }
         // 项目概况
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_SITUATION")) ? "":JdbcMapUtil.getString(row, "PRJ_SITUATION");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_SITUATION")) ? "":JdbcMapUtil.getString(row, "PRJ_SITUATION");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_SITUATION")) ? null:JdbcMapUtil.getString(row, "PRJ_SITUATION");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_SITUATION")) ? null:JdbcMapUtil.getString(row, "PRJ_SITUATION");
 
             attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt);
             attLinkResult.attMap.put("PRJ_INTRODUCE", linkedAtt);
@@ -3142,8 +3239,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "REPLY_NO_WR")) ? "":JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "REPLY_NO_WR")) ? "":JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "REPLY_NO_WR")) ? null:JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "REPLY_NO_WR")) ? null:JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
 
             attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
             attLinkResult.attMap.put("REPLY_NO", linkedAtt);
@@ -3152,8 +3249,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DATE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_DATE")) ? "":JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_DATE")) ? "":JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_DATE")) ? null:JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_DATE")) ? null:JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
 
             attLinkResult.attMap.put("PRJ_REPLY_DATE", linkedAtt);
         }
@@ -3161,8 +3258,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.FILE_GROUP;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_FILE")) ? "":JdbcMapUtil.getString(row, "PRJ_REPLY_FILE");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_FILE")) ? "":JdbcMapUtil.getString(row, "PRJ_REPLY_FILE");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_FILE")) ? null:JdbcMapUtil.getString(row, "PRJ_REPLY_FILE");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_FILE")) ? null:JdbcMapUtil.getString(row, "PRJ_REPLY_FILE");
 
             attLinkResult.attMap.put("PRJ_REPLY_FILE", linkedAtt);
         }
@@ -3208,8 +3305,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FS")) ? "":JdbcMapUtil.getString(row, "FS");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FS")) ? "":JdbcMapUtil.getString(row, "FS");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FS")) ? null:JdbcMapUtil.getString(row, "FS");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FS")) ? null:JdbcMapUtil.getString(row, "FS");
 
             attLinkResult.attMap.put("FEASIBILITY_APPROVE_FUND", linkedAtt);
         }
@@ -3217,8 +3314,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PD")) ? "":JdbcMapUtil.getString(row, "PD");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PD")) ? "":JdbcMapUtil.getString(row, "PD");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PD")) ? null:JdbcMapUtil.getString(row, "PD");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PD")) ? null:JdbcMapUtil.getString(row, "PD");
 
             attLinkResult.attMap.put("ESTIMATE_APPROVE_FUND", linkedAtt);
         }
@@ -3226,8 +3323,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "budget")) ? "":JdbcMapUtil.getString(row, "budget");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "budget")) ? "":JdbcMapUtil.getString(row, "budget");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "budget")) ? null:JdbcMapUtil.getString(row, "budget");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "budget")) ? null:JdbcMapUtil.getString(row, "budget");
 
             attLinkResult.attMap.put("EVALUATION_APPROVE_FUND", linkedAtt);
         }
@@ -3592,8 +3689,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST")) ? "":JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST")) ? "":JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST")) ? null:JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST")) ? null:JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST");
 
             attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
         }
@@ -3601,8 +3698,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT")) ? "":JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT")) ? "":JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT")) ? null:JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT")) ? null:JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT");
 
             attLinkResult.attMap.put("PROJECT_AMT", linkedAtt);
         }
@@ -3610,8 +3707,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT")) ? "":JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT")) ? "":JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT")) ? null:JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT")) ? null:JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT");
 
             attLinkResult.attMap.put("PROJECT_OTHER_AMT", linkedAtt);
         }
@@ -3619,8 +3716,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT")) ? "":JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT")) ? "":JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT")) ? null:JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT")) ? null:JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT");
 
             attLinkResult.attMap.put("PREPARE_AMT", linkedAtt);
         }
@@ -3628,8 +3725,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST")) ? "":JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST")) ? "":JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST")) ? null:JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST")) ? null:JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST");
 
             attLinkResult.attMap.put("CONSTRUCT_PERIOD_INTEREST", linkedAtt);
         }
@@ -3637,8 +3734,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "REPLY_NO_WR")) ? "":JdbcMapUtil.getString(stringObjectMap, "REPLY_NO_WR");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "REPLY_NO_WR")) ? "":JdbcMapUtil.getString(stringObjectMap, "REPLY_NO_WR");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "REPLY_NO_WR")) ? null:JdbcMapUtil.getString(stringObjectMap, "REPLY_NO_WR");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(stringObjectMap, "REPLY_NO_WR")) ? null:JdbcMapUtil.getString(stringObjectMap, "REPLY_NO_WR");
 
             attLinkResult.attMap.put("REPLY_NO", linkedAtt);
             attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
@@ -3781,6 +3878,16 @@ public class AttLinkExt {
     public List<String> getNotAutoBaoHan() {
         List<String> list = new ArrayList<>();
         list.add("PO_GUARANTEE_LETTER_REQUIRE_REQ"); //新增保函
+        return list;
+    }
+
+    // 引用到招采备案的流程
+    public List<String> getBeiAnList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_PRJ_INVEST1"); //可研估算
+        list.add("PM_PRJ_INVEST2"); //初设概算
+        list.add("PM_FARMING_PROCEDURES"); //农转用手续办理
+        list.add("PM_WOODLAND_PROCEDURES"); //林地调整办理手续
         return list;
     }
 }
