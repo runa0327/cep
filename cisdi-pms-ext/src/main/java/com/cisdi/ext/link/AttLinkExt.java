@@ -3881,10 +3881,13 @@ public class AttLinkExt {
         return list;
     }
 
+    // 引用到招采备案的流程
     public List<String> getBeiAnList() {
         List<String> list = new ArrayList<>();
         list.add("PM_PRJ_INVEST1"); //可研估算
         list.add("PM_PRJ_INVEST2"); //初设概算
+        list.add("PM_FARMING_PROCEDURES"); //农转用手续办理
+        list.add("PM_WOODLAND_PROCEDURES"); //林地调整办理手续
         return list;
     }
 }
