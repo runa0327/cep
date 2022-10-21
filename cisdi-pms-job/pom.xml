@@ -79,6 +79,13 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
 
+        <!--短信sdk-->
+        <dependency>
+            <groupId>lib</groupId>
+            <artifactId>api-gw-sdk-java</artifactId>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../lib/api-gw-sdk-java-V3.5.1.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>
