@@ -3894,6 +3894,11 @@ public class AttLinkExt {
         list.add("PM_ENVIRONMENT_EVAL"); //环评
         list.add("PM_WATER_PLAN"); //水保
         list.add("PM_STABLE_EVAL"); //社会稳定性评价
+        list.add("PM_ENERGY_EVAL"); //固定资产投资节能评价
+        list.add("PM_TRAFFIC_SAFETY_REQ"); //交通安全评价
+        list.add("PM_CONTROL_FLOOD_REQ"); //防洪评价
+        list.add("PM_TERMITE_CONTROL_REQ"); //白蚁防治
+        list.add("PM_TOPSOIL_STRIPPING_REQ"); //耕作层剥离
         return list;
     }
 }
