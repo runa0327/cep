@@ -99,10 +99,35 @@ public class AttLinkExt {
             return linkFUND_PAY_CODE_V_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("PM_BID_APPROVAL_REQ_ID".equals(attCode)){ // 招标文件审批 属性联动
             return linkPM_BID_APPROVAL_REQ_ID(myJdbcTemplate, attValue, entCode,sevId,param);
-        } else {
+        } else if ("CUSTOMER_UNIT_ONE".equals(attCode)){ // 签订公司 属性联动
+            return linkCUSTOMER_UNIT_ONE(myJdbcTemplate, attValue, entCode,sevId,param);
+        }  else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
 
+    }
+
+    // 签订公司 属性联动
+    private AttLinkResult linkCUSTOMER_UNIT_ONE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        //根据公司找到部门
+        String sql1 = "select a.id,a.name from hr_dept a LEFT JOIN hr_dept_user b on a.id = b.HR_DEPT_ID where b.AD_USER_ID = ? and a.CUSTOMER_UNIT = ? order by b.SYS_TRUE desc limit 1";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId,attValue);
+        String name = "", id = "";
+        if (!CollectionUtils.isEmpty(list1)){
+            id = JdbcMapUtil.getString(list1.get(0),"id");
+            name = JdbcMapUtil.getString(list1.get(0),"name");
+        }
+        //部门
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = id;
+            linkedAtt.text = name;
+            attLinkResult.attMap.put("HR_DEPT_ID",linkedAtt);
+        }
+        return attLinkResult;
     }
 
     private AttLinkResult linkFUND_PAY_CODE_V_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
