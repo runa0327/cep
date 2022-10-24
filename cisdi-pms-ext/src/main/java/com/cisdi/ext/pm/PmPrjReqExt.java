@@ -57,35 +57,37 @@ public class PmPrjReqExt {
         Double prj_total_invest = JdbcMapUtil.getDouble(valueMap, "PRJ_TOTAL_INVEST");
         AmtUtil.checkAmt(sbErr, prj_total_invest, "总投资");
 
-        Double project_amt = JdbcMapUtil.getDouble(valueMap, "PROJECT_AMT");
-        AmtUtil.checkAmt(sbErr, project_amt, "工程费用");
+//        Double project_amt = JdbcMapUtil.getDouble(valueMap, "PROJECT_AMT");
+//        AmtUtil.checkAmt(sbErr, project_amt, "工程费用");
 
         Double construct_amt = JdbcMapUtil.getDouble(valueMap, "CONSTRUCT_AMT");
-        AmtUtil.checkAmt(sbErr, construct_amt, "建安工程费");
+//        AmtUtil.checkAmt(sbErr, construct_amt, "建安工程费");
 
         Double equip_amt = JdbcMapUtil.getDouble(valueMap, "EQUIP_AMT");
-        AmtUtil.checkAmt(sbErr, equip_amt, "设备采购费");
+//        AmtUtil.checkAmt(sbErr, equip_amt, "设备采购费");
 
         Double project_other_amt = JdbcMapUtil.getDouble(valueMap, "PROJECT_OTHER_AMT");
-        AmtUtil.checkAmt(sbErr, project_other_amt, "工程其他费用");
+//        AmtUtil.checkAmt(sbErr, project_other_amt, "工程其他费用");
 
         Double land_amt = JdbcMapUtil.getDouble(valueMap, "LAND_AMT");
-        AmtUtil.checkAmt(sbErr, land_amt, "土地征拆费用");
+//        AmtUtil.checkAmt(sbErr, land_amt, "土地征拆费用");
 
         Double prepare_amt = JdbcMapUtil.getDouble(valueMap, "PREPARE_AMT");
-        AmtUtil.checkAmt(sbErr, prepare_amt, "预备费");
+//        AmtUtil.checkAmt(sbErr, prepare_amt, "预备费");
 
-        if (DoubleUtil.add(project_amt, project_other_amt, prepare_amt) > prj_total_invest) {
-            sbErr.append("工程费用+工程其他费用+预备费>总投资！");
+//        if (DoubleUtil.add(project_amt, project_other_amt, prepare_amt) > prj_total_invest) {
+        if (DoubleUtil.add(construct_amt,project_other_amt, prepare_amt) > prj_total_invest) {
+            sbErr.append("建安工程费+工程其他费用+预备费>总投资！");
         }
 
-        if (DoubleUtil.add(construct_amt, equip_amt) > project_amt) {
-            sbErr.append("建安工程费+设备采购费>工程费用！");
-        }
-
-        if (DoubleUtil.add(land_amt) > project_other_amt) {
-            sbErr.append("土地征拆费用>工程其他费用！");
-        }
+        //新逻辑 除总投资外都是非必填
+//        if (DoubleUtil.add(construct_amt, equip_amt) > project_amt) {
+//            sbErr.append("建安工程费+设备采购费>工程费用！");
+//        }
+//
+//        if (DoubleUtil.add(land_amt) > project_other_amt) {
+//            sbErr.append("土地征拆费用>工程其他费用！");
+//        }
 
         if (sbErr.length() > 0) {
             throw new BaseException(sbErr.toString());
@@ -444,5 +446,20 @@ public class PmPrjReqExt {
         ProFileUtils.createFolder(projectId);
     }
 
+    /** 立项申请-发起时数据校验 **/
+    public void checkCreateDate(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //项目名称
+        String projectName = entityRecord.valueMap.get("PRJ_NAME").toString();
+        //流程id
+        String id = entityRecord.csCommId;
+        //查询名称是否存在
+        String sql1 = "select name from PM_PRJ_REQ where PRJ_NAME = ? and id != ?";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectName,id);
+        if (!CollectionUtils.isEmpty(list1)){
+            throw new BaseException("项目名称不能重复，请重新输入项目名称！");
+        }
+    }
 }
 

@@ -209,6 +209,8 @@ public class WfExt {
 
                             //判断该流程是否有项目信息
                             List<String> noProjectList = getNoProjectList();
+                            // 特殊流程 更新流程内name字段
+                            List<String> specialList = getSpecialList();
                             if (noProjectList.contains(entityCode)){
                                 update1 = myJdbcTemplate.update("UPDATE wf_process_instance pi " +
                                         "JOIN wf_process p ON pi.WF_PROCESS_ID = p.id " +
@@ -216,38 +218,18 @@ public class WfExt {
                                         "JOIN "+entityCode+" t ON pi.ENTITY_RECORD_ID = t.id " +
                                         "SET pi.NAME = concat(p.NAME,'-',u.NAME,'-',pi.START_DATETIME) WHERE t.id = ?",csCommId);
                                 return;
-                            } else {
-                                List<String> amtPrjList = getAmtPrjList();
-                                if (amtPrjList.contains(entityCode)) {
-                                    // 资金需求计划和付款申请项目\设计任务书名称使用的另外的字段
-                                    update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
-                                            ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
-                                            ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.AMOUT_PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name," +
-                                            "'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
-                                } else {
-                                    update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
-                                            ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
-                                            ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', " +
-                                            "prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
-                                }
-                            }
-                            log.info("已更新：{}", update1);
-
-                            // 特殊流程 更新流程内name字段
-                            List<String> specialList = getSpecialList();
-                            if (specialList.contains(entityCode)) {
+                            } else if (specialList.contains(entityCode)) {
                                 String name = "",projectName = "", userName = "", nowDate = "", processName = "", otherName = "";
                                 StringBuffer sb = new StringBuffer();
                                 String sql = "";
                                 String sql2 = "SELECT (select name from pm_prj where id = a.PM_PRJ_ID) as projectName," +
                                         "(select name from ad_user where id = a.CRT_USER_ID) as userName," +
-                                        "(select NOW()) as nowDate,c.name as processName FROM "+entityCode+" a " +
+                                        "c.name as processName FROM "+entityCode+" a " +
                                         "LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id LEFT JOIN wf_process c on b.WF_PROCESS_ID = c.id WHERE a.id = ?";
                                 List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,csCommId);
                                 if (!CollectionUtils.isEmpty(list2)){
                                     projectName = JdbcMapUtil.getString(list2.get(0),"projectName");
                                     userName = JdbcMapUtil.getString(list2.get(0),"userName");
-                                    nowDate = JdbcMapUtil.getString(list2.get(0),"nowDate");
                                     processName = JdbcMapUtil.getString(list2.get(0),"processName");
                                 }
                                 if ("PM_BUY_DEMAND_REQ".equals(entityCode)){ //采购需求审批
@@ -269,9 +251,29 @@ public class WfExt {
                                         otherName = JdbcMapUtil.getString(list.get(0),"NAME_ONE");
                                     }
                                 }
+                                if (!SharedUtil.isEmptyString(processName) && !SharedUtil.isEmptyString(otherName) && !SharedUtil.isEmptyString(userName) && !SharedUtil.isEmptyString(projectName)){
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                    nowDate = sdf.format(new Date());
+                                }
                                 name = processName + "-" +otherName + "-" +projectName + "-" + userName + "-" + nowDate;
                                 update1 = myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", name,csCommId);
+                                update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id and t.id = ? set pi.name = ? where t.id",csCommId,name);
+                            }else {
+                                List<String> amtPrjList = getAmtPrjList();
+                                if (amtPrjList.contains(entityCode)) {
+                                    // 资金需求计划和付款申请项目\设计任务书名称使用的另外的字段
+                                    update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
+                                            ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
+                                            ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.AMOUT_PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name," +
+                                            "'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                                } else {
+                                    update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
+                                            ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
+                                            ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', " +
+                                            "prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                                }
                             }
+                            log.info("已更新：{}", update1);
 
                             // 发起人是否存在部门信息校验
                             try {
