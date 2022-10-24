@@ -46,10 +46,8 @@ public class SendSmsJob {
         try {
             if (lock > 0) {
                 result.forEach(remindLog -> {
-                    log.info("000000");
                     // 发送短信
                     this.sendSms(remindLog);
-                    log.info("111111");
                     // 记录日志
                     this.insertRemindLog(remindLog);
 
@@ -76,7 +74,7 @@ public class SendSmsJob {
     /**
      * 提醒真正用户。
      */
-    @Value("${cisdi-pms-job.remind-real-user:false}")
+    @Value("${cisdi-pms-job.remind-real-user}")
     private Boolean remindRealUser;
 
     private void sendSms(RemindLog remindLog) {
@@ -85,7 +83,7 @@ public class SendSmsJob {
         String templateId = "TODO".equals(remindLog.getTaskType()) ? "1581177" : "1581180";
 
         ArrayList<String> param = new ArrayList<>();
-        param.add(Boolean.TRUE.equals(remindRealUser)?remindLog.getUserPhone():"13312345678");
+        param.add(Boolean.TRUE.equals(remindRealUser)?remindLog.getUserPhone():"15023436971");
         param.add(remindLog.getTaskName());
         //封装参数
         byte[] parmas = new SendSmsParamsUtils().getOneParam(param , templateId);
