@@ -244,6 +244,8 @@ public class WfExt {
                                     if (!CollectionUtils.isEmpty(list)){
                                         otherName = JdbcMapUtil.getString(list.get(0),"CONTRACT_NAME");
                                     }
+                                } else if ("PM_PRJ_REQ".equals(entityCode)){
+                                    projectName = myJdbcTemplate.queryForList("select PRJ_NAME from PM_PRJ_REQ where id = ?",csCommId).get(0).get("PRJ_NAME").toString();
                                 } else {
                                     sql = "select NAME_ONE from "+entityCode+" where id = ?";
                                     List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
@@ -251,11 +253,24 @@ public class WfExt {
                                         otherName = JdbcMapUtil.getString(list.get(0),"NAME_ONE");
                                     }
                                 }
-                                if (!SharedUtil.isEmptyString(processName) && !SharedUtil.isEmptyString(otherName) && !SharedUtil.isEmptyString(userName) && !SharedUtil.isEmptyString(projectName)){
-                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                    nowDate = sdf.format(new Date());
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                nowDate = sdf.format(new Date());
+                                if (!SharedUtil.isEmptyString(processName)){
+                                    sb = sb.append(processName);
                                 }
-                                name = processName + "-" +otherName + "-" +projectName + "-" + userName + "-" + nowDate;
+                                if (!SharedUtil.isEmptyString(otherName)){
+                                    sb = sb.append("-").append(otherName);
+                                }
+                                if (!SharedUtil.isEmptyString(projectName)){
+                                    sb = sb.append("-").append(projectName);
+                                }
+                                if (!SharedUtil.isEmptyString(userName)){
+                                    sb = sb.append("-").append(userName);
+                                }
+                                if (!SharedUtil.isEmptyString(nowDate)){
+                                    sb = sb.append("-").append(nowDate);
+                                }
+                                name = sb.toString();
                                 update1 = myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", name,csCommId);
                                 update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id and t.id = ? set pi.name = ? where t.id",csCommId,name);
                             }else {
@@ -1306,6 +1321,7 @@ public class WfExt {
         list.add("PM_BID_APPROVAL_REQ"); //招标文件审批
         list.add("PM_USE_CHAPTER_REQ"); //中选单位及标后用印申请
         list.add("PO_ORDER_REQ"); //合同签订
+        list.add("PM_PRJ_REQ"); // 立项申请
         return list;
     }
 }
