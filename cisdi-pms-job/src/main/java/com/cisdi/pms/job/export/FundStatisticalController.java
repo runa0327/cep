@@ -150,11 +150,11 @@ public class FundStatisticalController extends BaseController {
         sb.append(" order by fi.CRT_DT desc ");
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
         List<FundPrjStatisticalExportModel> resList = list.stream().map(this::convertPrjData).collect(Collectors.toList());
-        super.setExcelRespProp(response, "资金批复，到位，支付总表");
+        super.setExcelRespProp(response, "资金到位，支付总表");
         EasyExcel.write(response.getOutputStream())
-                .head(FundStatisticalExportModel.class)
+                .head(FundPrjStatisticalExportModel.class)
                 .excelType(ExcelTypeEnum.XLSX)
-                .sheet("资金批复，到位，支付总表")
+                .sheet("资金到位，支付总表")
                 .doWrite(resList);
     }
 
