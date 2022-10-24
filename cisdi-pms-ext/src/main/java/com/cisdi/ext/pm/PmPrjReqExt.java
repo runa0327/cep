@@ -57,35 +57,37 @@ public class PmPrjReqExt {
         Double prj_total_invest = JdbcMapUtil.getDouble(valueMap, "PRJ_TOTAL_INVEST");
         AmtUtil.checkAmt(sbErr, prj_total_invest, "总投资");
 
-        Double project_amt = JdbcMapUtil.getDouble(valueMap, "PROJECT_AMT");
-        AmtUtil.checkAmt(sbErr, project_amt, "工程费用");
+//        Double project_amt = JdbcMapUtil.getDouble(valueMap, "PROJECT_AMT");
+//        AmtUtil.checkAmt(sbErr, project_amt, "工程费用");
 
         Double construct_amt = JdbcMapUtil.getDouble(valueMap, "CONSTRUCT_AMT");
-        AmtUtil.checkAmt(sbErr, construct_amt, "建安工程费");
+//        AmtUtil.checkAmt(sbErr, construct_amt, "建安工程费");
 
         Double equip_amt = JdbcMapUtil.getDouble(valueMap, "EQUIP_AMT");
-        AmtUtil.checkAmt(sbErr, equip_amt, "设备采购费");
+//        AmtUtil.checkAmt(sbErr, equip_amt, "设备采购费");
 
         Double project_other_amt = JdbcMapUtil.getDouble(valueMap, "PROJECT_OTHER_AMT");
-        AmtUtil.checkAmt(sbErr, project_other_amt, "工程其他费用");
+//        AmtUtil.checkAmt(sbErr, project_other_amt, "工程其他费用");
 
         Double land_amt = JdbcMapUtil.getDouble(valueMap, "LAND_AMT");
-        AmtUtil.checkAmt(sbErr, land_amt, "土地征拆费用");
+//        AmtUtil.checkAmt(sbErr, land_amt, "土地征拆费用");
 
         Double prepare_amt = JdbcMapUtil.getDouble(valueMap, "PREPARE_AMT");
-        AmtUtil.checkAmt(sbErr, prepare_amt, "预备费");
+//        AmtUtil.checkAmt(sbErr, prepare_amt, "预备费");
 
-        if (DoubleUtil.add(project_amt, project_other_amt, prepare_amt) > prj_total_invest) {
-            sbErr.append("工程费用+工程其他费用+预备费>总投资！");
+//        if (DoubleUtil.add(project_amt, project_other_amt, prepare_amt) > prj_total_invest) {
+        if (DoubleUtil.add(construct_amt,project_other_amt, prepare_amt) > prj_total_invest) {
+            sbErr.append("建安工程费+工程其他费用+预备费>总投资！");
         }
 
-        if (DoubleUtil.add(construct_amt, equip_amt) > project_amt) {
-            sbErr.append("建安工程费+设备采购费>工程费用！");
-        }
-
-        if (DoubleUtil.add(land_amt) > project_other_amt) {
-            sbErr.append("土地征拆费用>工程其他费用！");
-        }
+        //新逻辑 除总投资外都是非必填
+//        if (DoubleUtil.add(construct_amt, equip_amt) > project_amt) {
+//            sbErr.append("建安工程费+设备采购费>工程费用！");
+//        }
+//
+//        if (DoubleUtil.add(land_amt) > project_other_amt) {
+//            sbErr.append("土地征拆费用>工程其他费用！");
+//        }
 
         if (sbErr.length() > 0) {
             throw new BaseException(sbErr.toString());
