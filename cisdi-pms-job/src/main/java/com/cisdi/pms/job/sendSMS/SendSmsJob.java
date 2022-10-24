@@ -6,6 +6,7 @@ import com.cisdi.pms.job.utils.SendSmsUtils;
 import com.qygly.ext.rest.helper.feign.client.DataFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -72,13 +73,19 @@ public class SendSmsJob {
         }
     }
 
+    /**
+     * 提醒真正用户。
+     */
+    @Value("${cisdi-pms-job.remind-real-user:false}")
+    private Boolean remindRealUser;
+
     private void sendSms(RemindLog remindLog) {
         //[工程项目信息协同系统]您好：流程待办“{1}”已到您处，请尽快处理。---1581177
         //[工程项目信息协同系统]您好：流程通知“{1}”已到您处，请知晓即可。---1581180
         String templateId = "TODO".equals(remindLog.getTaskType()) ? "1581177" : "1581180";
 
         ArrayList<String> param = new ArrayList<>();
-        param.add(remindLog.getUserPhone());
+        param.add(Boolean.TRUE.equals(remindRealUser)?remindLog.getUserPhone():"13312345678");
         param.add(remindLog.getTaskName());
         //封装参数
         byte[] parmas = new SendSmsParamsUtils().getOneParam(param , templateId);

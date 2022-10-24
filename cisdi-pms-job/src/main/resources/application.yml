@@ -75,3 +75,7 @@ qygly:
         qygly-dict: qygly-all
         qygly-data: qygly-all
         qygly-file: qygly-all
+
+cisdi-pms-job:
+  # 发送给真实用户：
+  remind-real-user: false
