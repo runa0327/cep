@@ -32,25 +32,7 @@ public class SendSmsJob {
     @Autowired
     DataFeignClient dataFeignClient;
 
-    //测试
     @Scheduled(fixedDelayString = "5000")
-    public void AAAA(){
-
-        System.out.println("短信发送一次");
-
-        ArrayList<String> param = new ArrayList<>();
-        param.add("15023436971");
-        param.add("测试短信");
-
-        byte[] parmas = new SendSmsParamsUtils().getOneParam(param);
-
-
-        SendSmsUtils apiResponse = new SendSmsUtils();
-        apiResponse.sendMessage(parmas);
-        System.out.println("短信发送完毕");
-    }
-
-    //@Scheduled(fixedDelayString = "5000")
     //@Scheduled(fixedDelayString = "${spring.scheduled.fixedDelayString}")
     public void sendSMS() {
         //锁表  防止多台服务器同时修改
@@ -63,23 +45,10 @@ public class SendSmsJob {
         try {
             if (lock > 0) {
                 result.forEach(remindLog -> {
-                    //项目ID(senderSystem):9a6bdcde547a43aeaaef3da577f9d0bc
-                    //授权码(authCode):95b7aa968ff7427cb3f7071f22df1ddb
-
+                    log.info("000000");
                     // 发送短信
-                    //System.out.println("数据输出" + remindLog.toString());
-                    Map<String,String> param = new HashMap<>();
-                    param.put("authCode","95b7aa968ff7427cb3f7071f22df1ddb");
-                    param.put("msgType","2");
-                    param.put("receiverUser","15023436971");
-                    param.put("content","1111111111111!!!!!!!!");
-                    param.put("senderSystem","9a6bdcde547a43aeaaef3da577f9d0bc");
-                    //param.put("","");
-                    //param.put("","");
-                    //param.put("","");
-                    //param.put("","");
-                    //param.put("","");
-
+                    this.sendSms(remindLog);
+                    log.info("111111");
                     // 记录日志
                     this.insertRemindLog(remindLog);
 
@@ -103,6 +72,22 @@ public class SendSmsJob {
         }
     }
 
+    private void sendSms(RemindLog remindLog) {
+        //[工程项目信息协同系统]您好：流程待办“{1}”已到您处，请尽快处理。---1581177
+        //[工程项目信息协同系统]您好：流程通知“{1}”已到您处，请知晓即可。---1581180
+        String templateId = "TODO".equals(remindLog.getTaskType()) ? "1581177" : "1581180";
+
+        ArrayList<String> param = new ArrayList<>();
+        param.add(remindLog.getUserPhone());
+        param.add(remindLog.getTaskName());
+        //封装参数
+        byte[] parmas = new SendSmsParamsUtils().getOneParam(param , templateId);
+
+        //发送短信
+        SendSmsUtils apiResponse = new SendSmsUtils();
+        apiResponse.sendMessage(parmas);
+    }
+
     /**
      * 插入提醒日志。
      *
@@ -110,8 +95,9 @@ public class SendSmsJob {
      */
     private void insertRemindLog(RemindLog remindLog) {
         // 提醒文本
-        String part = "TODO".equals(remindLog.getTaskType()) ? "请尽快处理" : "请知晓即可";
-        String remindText = remindLog.getUserName() + "，您好：流程实例“ " + remindLog.getTaskName() + "”已到您处，" + part + "。注：请登录“工程项目信息协同系统”。";
+        String partO = "TODO".equals(remindLog.getTaskType()) ? "流程待办" : "流程通知";
+        String partT = "TODO".equals(remindLog.getTaskType()) ? "请尽快处理" : "请知晓即可";
+        String remindText = "[工程项目信息协同系统]您好：" + partO + remindLog.getTaskName() + "”已到您处，" + partT;
 
         // 查询实体id
         String selectEntId = "select ID from ad_ent where CODE = ?";

@@ -24,16 +24,19 @@ public class SendSmsUtils extends BaseApp {
         this.gmAppSecret = "4FBA8DD6BCF9D7C85145E9695102FA53278E09649880FBEC104F5CBADC26D3D9";
 
         // 核心层ip
-        this.host = "10.100.7.89";
+        //this.host = "10.100.7.89";
+        //测试
+        this.host = "218.77.206.34";
+
         //核心层上下文
         this.contextPath ="";
 
         // 核心层暴露的http端口
-        this.httpPort = 4989;
+        this.httpPort = 24989;
 
 
         // 核心层暴露的https端口
-        this.httpsPort = 443;
+        this.httpsPort = 2443;
 
         // sdk生成时选择的环境 RELEASE=线上  TEST=测试 PRE=预生产
         this.stage = "RELEASE";
@@ -93,7 +96,9 @@ public class SendSmsUtils extends BaseApp {
      * Version:202203171547104284
      */
     public ApiResponse sendMessage(byte[] body) {
-        ApiRequest apiRequest = new ApiRequest(HttpConstant.SCHEME_HTTP, Method.POST, "/mrsr/rest/message/send", SdkConstant.AUTH_TYPE_DEFAULT, "c6db8bcad66e492d82236a671bf14d2f");
+        ApiRequest apiRequest = new ApiRequest(HttpConstant.SCHEME_HTTP, Method.POST,
+                                            "/mrsr/rest/message/send", SdkConstant.AUTH_TYPE_DEFAULT,
+                                            "c6db8bcad66e492d82236a671bf14d2f");
         apiRequest.setBody(body);
 
         return syncInvoke(apiRequest);

@@ -2,6 +2,8 @@ package com.cisdi.pms.job.utils;
 
 import com.google.common.base.Joiner;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,12 +29,17 @@ public class SendSmsParamsUtils {
 	 * @param parmsList
 	 * @return
 	 */
-	public byte[] getOneParam(List<String> parmsList) {
+	public byte[] getOneParam(List<String> parmsList,String templateId) {
 		//参数拼接，相当buffer循环拼接
-		String paramsStr = Joiner.on("!@#$%^&*").join(parmsList);
-		String reqmsg="{\"authCode\":\"95b7aa968ff7427cb3f7071f22df1ddb\",\"msgType\":\"2\",\"receiverUser\":\"+8615023436971\",\"content\":\"{\\\"templateId\\\":1365335,\\\"params\\\":\\\""+paramsStr+"\\\",\\\"1510977537772093440\\\"}\",\"senderSystem\":\"9a6bdcde547a43aeaaef3da577f9d0bc\"}";
-		byte[] bytes1 = reqmsg.getBytes();
-		return bytes1;
+		String reqmsg="{" +
+				"\"authCode\":\"95b7aa968ff7427cb3f7071f22df1ddb\"," +
+				"\"msgType\":\"6\"," +
+				"\"receiverUser\":\"+86" + parmsList.get(0) + "\"," +
+				"\"content\":\"{\\\"templateId\\\":" + templateId + "," +
+				"\\\"params\\\":\\\""+parmsList.get(1)+"\\\"}\"," +
+				"\"senderSystem\":\"9a6bdcde547a43aeaaef3da577f9d0bc\"}";
+		byte[] bytes = reqmsg.getBytes();
+		return bytes;
 	}
 
 
