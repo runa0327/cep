@@ -115,7 +115,7 @@ public class PmPrjReqExt {
         // 新建项目：
         String newPrjId = Crud.from("PM_PRJ").insertData();
         Integer exec = Crud.from("PM_PRJ").where().eq("ID", newPrjId).update().set("PM_PRJ_REQ_ID", pm_prj_req.get(
-                        "id")).set("code", pm_prj_req.get("code")).set("name", pm_prj_req.get("name")).set("CUSTOMER_UNIT",
+                        "id")).set("code", pm_prj_req.get("code")).set("name", pm_prj_req.get("PRJ_NAME")).set("CUSTOMER_UNIT",
                         pm_prj_req.get("CUSTOMER_UNIT")).set("PRJ_MANAGE_MODE_ID", pm_prj_req.get("PRJ_MANAGE_MODE_ID")).set(
                         "BASE_LOCATION_ID", pm_prj_req.get("BASE_LOCATION_ID")).set("FLOOR_AREA", pm_prj_req.get(
                         "FLOOR_AREA")).set("PROJECT_TYPE_ID", pm_prj_req.get("PROJECT_TYPE_ID")).set(
