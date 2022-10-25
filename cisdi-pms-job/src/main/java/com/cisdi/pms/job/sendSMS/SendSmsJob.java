@@ -100,7 +100,7 @@ public class SendSmsJob {
      */
     private void insertRemindLog(RemindLog remindLog) {
         // 提醒文本
-        String partO = "TODO".equals(remindLog.getTaskType()) ? "流程待办" : "流程通知";
+        String partO = "TODO".equals(remindLog.getTaskType()) ? "流程待办；" : "流程通知；";
         String partT = "TODO".equals(remindLog.getTaskType()) ? "请尽快处理" : "请知晓即可";
         String remindText = "[工程项目信息协同系统]您好：" + partO + remindLog.getTaskName() + "”已到您处，" + partT;
 
