@@ -468,7 +468,7 @@ public class PmPrjReqExt {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //项目id
         String projectId = entityRecord.csCommId;
-        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select count(*) from pm_pro_plan where PM_PRJ_ID = ?",projectId);
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan where PM_PRJ_ID = ?",projectId);
         if (CollectionUtils.isEmpty(list)){
             createPlan(projectId);
         }
