@@ -461,5 +461,17 @@ public class PmPrjReqExt {
             throw new BaseException("项目名称不能重复，请重新输入项目名称！");
         }
     }
+
+    /** 立项结束没有生产项目进展图的项目 生成项目进展图 **/
+    public void createProcess(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //项目id
+        String projectId = entityRecord.csCommId;
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan where PM_PRJ_ID = ?",projectId);
+        if (CollectionUtils.isEmpty(list)){
+            createPlan(projectId);
+        }
+    }
 }
 

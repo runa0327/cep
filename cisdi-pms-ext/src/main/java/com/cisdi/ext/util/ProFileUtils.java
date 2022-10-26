@@ -1,5 +1,9 @@
 package com.cisdi.ext.util;
 
+import com.artofsolving.jodconverter.DocumentConverter;
+import com.artofsolving.jodconverter.openoffice.connection.OpenOfficeConnection;
+import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConnection;
+import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConverter;
 import com.cisdi.ext.enums.FileCodeEnum;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -8,6 +12,8 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import org.springframework.util.CollectionUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -96,7 +102,6 @@ public class ProFileUtils {
             }
 
             List<String> fileIDs = Arrays.asList(fileIds.split(","));
-            String userId = ExtJarHelper.loginInfo.get().userId;
             for (String fileId : fileIDs) {
                 String sql = "insert into PF_FILE (id,FL_FILE_ID,PF_FOLDER_ID) values((select UUID_SHORT()),'"+fileId+"','"+fid+"')";
                 myJdbcTemplate.update(sql);
@@ -104,7 +109,25 @@ public class ProFileUtils {
         } catch (Exception e) {
             throw new BaseException(e.getMessage());
         }
+    }
 
+    /**
+     * word转pdf 返回文件大小
+     */
+    public static float testExt(String input, String output) throws IOException {
 
+        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
+        connection.connect();
+
+        File inputFile = new File(input);
+        File outputFile = new File(output);
+
+        DocumentConverter converter = new OpenOfficeDocumentConverter(connection);
+        converter.convert(inputFile, outputFile);
+        File file = new File(output);
+        if (!file.exists() || !file.isFile()){
+            throw new BaseException("'"+output+"'该文件不存在");
+        }
+        return file.length();
     }
 }
