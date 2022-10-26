@@ -211,14 +211,7 @@ public class WfExt {
                             List<String> noProjectList = getNoProjectList();
                             // 特殊流程 更新流程内name字段
                             List<String> specialList = getSpecialList();
-                            if (noProjectList.contains(entityCode)){
-                                update1 = myJdbcTemplate.update("UPDATE wf_process_instance pi " +
-                                        "JOIN wf_process p ON pi.WF_PROCESS_ID = p.id " +
-                                        "JOIN ad_user u ON pi.START_USER_ID = u.id " +
-                                        "JOIN "+entityCode+" t ON pi.ENTITY_RECORD_ID = t.id " +
-                                        "SET pi.NAME = concat(p.NAME,'-',u.NAME,'-',pi.START_DATETIME) WHERE t.id = ?",csCommId);
-                                return;
-                            } else if (specialList.contains(entityCode)) {
+                            if (specialList.contains(entityCode)) {
                                 String name = "",projectName = "", userName = "", nowDate = "", processName = "", otherName = "";
                                 StringBuffer sb = new StringBuffer();
                                 String sql = "";
@@ -273,7 +266,15 @@ public class WfExt {
                                 name = sb.toString();
                                 update1 = myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", name,csCommId);
                                 update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id and t.id = ? set pi.name = ? where t.id",csCommId,name);
-                            }else {
+                                return;
+                            } else if (noProjectList.contains(entityCode)){
+                                update1 = myJdbcTemplate.update("UPDATE wf_process_instance pi " +
+                                        "JOIN wf_process p ON pi.WF_PROCESS_ID = p.id " +
+                                        "JOIN ad_user u ON pi.START_USER_ID = u.id " +
+                                        "JOIN "+entityCode+" t ON pi.ENTITY_RECORD_ID = t.id " +
+                                        "SET pi.NAME = concat(p.NAME,'-',u.NAME,'-',pi.START_DATETIME) WHERE t.id = ?",csCommId);
+                                return;
+                            } else {
                                 List<String> amtPrjList = getAmtPrjList();
                                 if (amtPrjList.contains(entityCode)) {
                                     // 资金需求计划和付款申请项目\设计任务书名称使用的另外的字段
