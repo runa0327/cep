@@ -10,6 +10,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.att.AttDataTypeE;
+import com.qygly.shared.end.B;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
@@ -3094,15 +3095,6 @@ public class AttLinkExt {
 
             attLinkResult.attMap.put("BASE_LOCATION_ID", linkedAtt);
         }
-        // 占地面积
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:JdbcMapUtil.getString(row, "FLOOR_AREA");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:JdbcMapUtil.getString(row, "FLOOR_AREA");
-
-            attLinkResult.attMap.put("FLOOR_AREA", linkedAtt);
-        }
         // 项目类型
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -3148,6 +3140,7 @@ public class AttLinkExt {
         Boolean widthMustEdit = true; //宽必填
         Boolean otherMustEdit = true; //其他必填
         Boolean seaMustEdit = true; //海域面积必填
+        Boolean floorAreaMustEdit = true; //占地面积必填
 
         String name1 = JdbcMapUtil.getString(row, "st_name");
         if (name1.contains("面积")){
@@ -3179,6 +3172,9 @@ public class AttLinkExt {
             seaShow = false;
             seaMustEdit = false;
         } else {
+            if (name1.contains("市政管线")){
+                floorAreaMustEdit = false;
+            }
             areashow = false;
             lengthShow = false;
             widthShow = false;
@@ -3187,6 +3183,15 @@ public class AttLinkExt {
             widthMustEdit = false;
             seaShow = false;
             seaMustEdit = false;
+        }
+        // 占地面积
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:JdbcMapUtil.getString(row, "FLOOR_AREA");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:JdbcMapUtil.getString(row, "FLOOR_AREA");
+            linkedAtt.changeToMandatory = floorAreaMustEdit;
+            attLinkResult.attMap.put("FLOOR_AREA", linkedAtt);
         }
         //面积
         {
