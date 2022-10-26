@@ -25,30 +25,30 @@ public class TestExt {
 //    private DocumentConverter converter;
 
 
-    public void testExt() throws IOException {
-        File inputFile = new File(inputx);
-        File outputFile = new File(output);
-        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
-        DocumentConverter converter = new OpenOfficeDocumentConverter(connection);
-        converter.convert(inputFile,outputFile);
-
-    }
-
 //    public void testExt() throws IOException {
-//
-//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
-//        connection.connect();
-//
-//        File inputFile = new File(input);
+//        File inputFile = new File(inputx);
 //        File outputFile = new File(output);
-//
+//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
 //        DocumentConverter converter = new OpenOfficeDocumentConverter(connection);
-//        converter.convert(inputFile, outputFile);
-//
-//        //添加水印
-//        addFooterAndWater("无痕水印",output,outputWaterMark);
+//        converter.convert(inputFile,outputFile);
 //
 //    }
+
+    public void testExt() throws IOException {
+
+        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
+        connection.connect();
+
+        File inputFile = new File(input);
+        File outputFile = new File(output);
+
+        DocumentConverter converter = new OpenOfficeDocumentConverter(connection);
+        converter.convert(inputFile, outputFile);
+
+        //添加水印
+        addFooterAndWater("无痕水印",output,outputWaterMark);
+
+    }
 
     private void addFooterAndWater(String str, String output, String outputWaterMark) {
         try {
