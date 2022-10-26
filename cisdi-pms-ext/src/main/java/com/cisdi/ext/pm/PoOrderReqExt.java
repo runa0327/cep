@@ -171,6 +171,8 @@ public class PoOrderReqExt {
         String waterMark = "工程项目协调系统-" + ExtJarHelper.loginInfo.get().userName;
         //用户id
         String userId = ExtJarHelper.loginInfo.get().userId;
+        //流程id
+        String csId = entityRecord.csCommId;
         //获取文件id
         String fileId = JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID");
         if (SharedUtil.isEmptyString(fileId)){
@@ -200,7 +202,7 @@ public class PoOrderReqExt {
         //文件大小
         float fileSize = 0l;
         try {
-            newAddress = "C:\\Users\\Administrator\\Desktop\\Demo\\"+newId+".pdf";
+//            newAddress = "C:\\Users\\Administrator\\Desktop\\Demo\\"+newId+".pdf";
             fileSize = ProFileUtils.testExt(address,newAddress);
         } catch (IOException e) {
             e.printStackTrace();
@@ -212,6 +214,9 @@ public class PoOrderReqExt {
         //当前时间
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String now = sdf.format(new Date());
+
+        //将生成的pdf写入该流程
+        Crud.from("PO_ORDER_REQ").where().eq("id",csId).update().set("FIRST_INSPECTION_REPORT_FILE",newAddress).exec();
 
         Crud.from("fl_file").where().eq("id",newId).update()
                 .set("CODE",newId).set("NAME",fileName).set("VER","1").set("FL_PATH_ID","99250247095872690").set("EXT","pdf")
