@@ -125,4 +125,26 @@ public class PmBuyDemandReqExt {
             log.info("已更新：{}", exec);
         }
     }
+
+    /** 采购需求审批-审批通过项目信息写入项目库 **/
+    public void endDataHandle(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //项目来源类型  99952822476441375=非立项
+        String projectType = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_SOURCE_TYPE_ID");
+        if ("99952822476441375".equals(projectType)){
+            //创建人
+            String userId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_USER_ID");
+            //项目名称
+            String projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
+
+            String sql1 = "select * from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectName,projectType);
+            if (!CollectionUtils.isEmpty(list1)){
+                throw new BaseException("非立项项目下,'"+projectName+" '项目已存在！");
+            }
+            String sql2 = "insert into pm_prj(id,CRT_USER_ID,STATUS,NAME,PROJECT_SOURCE_TYPE_ID) values((select uuid_short()),?,'AP',?,?)";
+            int update = myJdbcTemplate.update(sql2,userId,projectName,projectType);
+        }
+    }
 }

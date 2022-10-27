@@ -470,6 +470,15 @@ public class WfExt {
         //采购需求审批
         if ("PM_BUY_DEMAND_REQ".equals(entityCode)) {
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            if(SharedUtil.isEmptyString(prjId)){
+                MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+                String name = JdbcMapUtil.getString(valueMap,"PROJECT_NAME_WR");
+                String PROJECT_SOURCE_TYPE_ID = JdbcMapUtil.getString(valueMap,"PROJECT_SOURCE_TYPE_ID");
+                prjId = myJdbcTemplate.queryForList("select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?",name,PROJECT_SOURCE_TYPE_ID).get(0).get("id").toString();
+                if (SharedUtil.isEmptyString(prjId)){
+                    return;
+                }
+            }
             String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
             String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
             String FILE_ID_THREE = JdbcMapUtil.getString(valueMap, "FILE_ID_THREE");
