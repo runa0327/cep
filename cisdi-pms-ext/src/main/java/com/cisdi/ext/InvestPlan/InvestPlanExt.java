@@ -51,15 +51,20 @@ public class InvestPlanExt {
             String oldSql = "select PM_PRJ_ID,YEAR,ifnull(AMT,0) as AMT from PM_INVESTMENT_YEAR_PLAN where PM_PRJ_ID= " + plan.projectId + " and year < " + plan.year;
             List<Map<String, Object>> oldList = myJdbcTemplate.queryForList(oldSql);
             List<InvestYearPlan> oldPlan = oldList.stream().map(this::convertData).collect(Collectors.toList());
-            plan.beforeYearTotal = oldPlan.stream().map(p -> p.totalPlanOutputValue).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal beforeYearTotal = oldPlan.stream().map(p -> new BigDecimal(p.totalPlanOutputValue)).reduce(BigDecimal.ZERO, BigDecimal::add);
+            plan.beforeYearTotal = String.valueOf(beforeYearTotal);
             //本年完成产值--查询纳统数据
             String ntSql = "  select PM_PRJ_ID, `year`, `month`,ifnull((architectural_engineering_fee + installation_engineering_fee + equipment_purchase_fee + other_fee),0) as fee " +
                     "        from PM_STATISTICS_FEE " +
                     "        where PM_PRJ_ID = ? and year = ? ";
             List<Map<String, Object>> ntList = myJdbcTemplate.queryForList(ntSql, plan.projectId, plan.year);
             BigDecimal totalActualOutputValue = ntList.stream().map(m -> new BigDecimal(JdbcMapUtil.getString(m, "fee"))).reduce(BigDecimal.ZERO, BigDecimal::add);
-            plan.totalActualOutputValue = totalActualOutputValue;
-            plan.percentageComplete = totalActualOutputValue.divide(plan.totalPlanOutputValue);
+            plan.totalActualOutputValue = totalActualOutputValue.toString();
+            if (Double.valueOf(plan.totalActualOutputValue) == 0){
+                plan.percentageComplete = "0";
+            }else {
+                plan.percentageComplete = String.valueOf(totalActualOutputValue.divide(new BigDecimal(plan.totalPlanOutputValue)));
+            }
         }
 
         if (CollectionUtils.isEmpty(planList)) {
@@ -97,7 +102,7 @@ public class InvestPlanExt {
         }
         //处理年度投资计划
         Crud.from("PM_INVESTMENT_YEAR_PLAN").where().eq("ID", id).update()
-                .set("PM_PRJ_ID", id).set("YEAR", investYearPlanInput.year).set("AMT", investYearPlanInput.amt).exec();
+                .set("PM_PRJ_ID", investYearPlanInput.projectId).set("YEAR", investYearPlanInput.year).set("AMT", investYearPlanInput.amt).exec();
 
     }
 
@@ -137,9 +142,9 @@ public class InvestPlanExt {
     private InvestYearPlan convertData(Map<String, Object> data) {
         InvestYearPlan plan = new InvestYearPlan();
         plan.id = JdbcMapUtil.getString(data, "ID");
-        plan.projectId = JdbcMapUtil.getString(data, "ID");
-        plan.year = JdbcMapUtil.getString(data, "ID");
-        plan.totalPlanOutputValue = new BigDecimal(JdbcMapUtil.getString(data, "AMT"));
+        plan.projectId = JdbcMapUtil.getString(data, "PM_PRJ_ID");
+        plan.year = JdbcMapUtil.getString(data, "YEAR");
+        plan.totalPlanOutputValue = JdbcMapUtil.getString(data, "AMT");
         return plan;
     }
 
@@ -148,7 +153,6 @@ public class InvestPlanExt {
         public String projectId;
         public String year;
         public BigDecimal amt;
-        public String remark;
         public List<InvestMonthPlanInput> investMonthPlanList;
 
     }
@@ -165,21 +169,21 @@ public class InvestPlanExt {
         /**
          * 之前年度合计
          */
-        public BigDecimal beforeYearTotal;
+        public String beforeYearTotal;
         /**
          * 本年度计划
          */
-        private BigDecimal totalPlanOutputValue;
+        private String totalPlanOutputValue;
 
         /**
          * 实际产值总值
          */
-        private BigDecimal totalActualOutputValue;
+        private String totalActualOutputValue;
 
         /**
          * 完成率
          */
-        private BigDecimal percentageComplete;
+        private String percentageComplete;
     }
 
     private static class RequestParam {
