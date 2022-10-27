@@ -1111,7 +1111,7 @@ public class AttLinkExt {
     private AttLinkResult linkBUY_START_BASIS_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId,AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
         if ("PM_BUY_DEMAND_REQ".equals(entCode)){ //采购需求审批
-            //99952822476385260=会议纪要，99952822476385261=其他
+            //99952822476385260=会议纪要，99952822476385261=其他,99952822476441472=启动函
             Boolean changeToEditable = false; //是否可改
             Boolean changeToMandatory = false; //是否必填
             String value = "";
@@ -1137,9 +1137,9 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
                 }
             }
-            if ("99952822476385260".equals(attValue) || "99952822476385261".equals(attValue)){
+            if ("99952822476385260".equals(attValue) || "99952822476385261".equals(attValue) || "99952822476441472".equals(attValue)){
                 changeToEditable = true;
-                changeToMandatory = true;
+                changeToMandatory = false;
                 value = null;
                 text = null;
                 //采购启动依据文件
@@ -1148,7 +1148,7 @@ public class AttLinkExt {
                     linkedAtt.type = AttDataTypeE.FILE_GROUP;
                     linkedAtt.value = "";
                     linkedAtt.text = "";
-                    linkedAtt.changeToMandatory = true;
+                    linkedAtt.changeToMandatory = false;
                     linkedAtt.changeToEditable = true;
                     linkedAtt.fileInfoList = null;
                     attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
