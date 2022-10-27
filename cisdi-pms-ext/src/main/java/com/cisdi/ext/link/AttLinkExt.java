@@ -102,8 +102,106 @@ public class AttLinkExt {
             return linkPM_BID_APPROVAL_REQ_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("CUSTOMER_UNIT_ONE".equals(attCode)){ // 签订公司 属性联动
             return linkCUSTOMER_UNIT_ONE(myJdbcTemplate, attValue, entCode,sevId,param);
+        } else if ("PROJECT_SOURCE_TYPE_ID".equals(attCode)){ // 项目来源 属性联动
+            return linkPROJECT_SOURCE_TYPE_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         }  else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
+        }
+
+    }
+
+    // 项目来源 属性联动
+    private AttLinkResult linkPROJECT_SOURCE_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        //99952822476441374=立项，99952822476441375=非立项
+        if ("PM_BUY_DEMAND_REQ".equals(entCode)){
+            Boolean prjListChangeToShown = false; //下拉项目默认隐藏
+            Boolean prjNameChangeToShown = false; //手写项目默认隐藏
+
+            Boolean prjListChangeToMandatory = false; //下拉项目默认非必填
+            Boolean prjNameChangeToMandatory = false; //手写项目默认非必填
+
+            Boolean prjListChangeToEditable = false; //下拉项目默认不可改
+            Boolean prjNameChangeToEditable = false; //手写项目默认不可改
+            Boolean isZFChangeToEditable = false; //是否政府投资默认不可改
+            Boolean amtSourceChangeToEditable = false; //资金来源默认不可改
+
+            if (!"99952822476441374".equals(attValue)) {
+                prjNameChangeToShown = true;
+                prjNameChangeToMandatory = true;
+                prjNameChangeToEditable = true;
+                isZFChangeToEditable = true;
+                amtSourceChangeToEditable = true;
+            } else {
+                prjListChangeToShown = true;
+                prjListChangeToMandatory = true;
+                prjListChangeToEditable = true;
+            }
+
+            //下拉项目列表
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToMandatory = prjListChangeToMandatory;
+                linkedAtt.changeToShown = prjListChangeToShown;
+                linkedAtt.changeToEditable = prjListChangeToEditable;
+                attLinkResult.attMap.put("PM_PRJ_ID",linkedAtt);
+            }
+            //项目名称
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToMandatory = prjNameChangeToMandatory;
+                linkedAtt.changeToShown = prjNameChangeToShown;
+                linkedAtt.changeToEditable = prjNameChangeToEditable;
+                attLinkResult.attMap.put("PROJECT_NAME_WR",linkedAtt);
+            }
+            //是否政府投资项目
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToEditable = isZFChangeToEditable;
+                attLinkResult.attMap.put("YES_NO_ONE",linkedAtt);
+            }
+            //资金来源
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToEditable = amtSourceChangeToEditable;
+                attLinkResult.attMap.put("INVESTMENT_SOURCE_ID",linkedAtt);
+            }
+            //清空数据
+            //采购启动依据
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToEditable = true;
+                attLinkResult.attMap.put("BUY_START_BASIS_ID",linkedAtt);
+                attLinkResult.attMap.put("REPLY_NO_WR",linkedAtt);
+            }
+            //采购启动依据文件
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.FILE_GROUP;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToEditable = true;
+                linkedAtt.fileInfoList = null;
+                attLinkResult.attMap.put("FILE_ID_THREE",linkedAtt);
+            }
+            return attLinkResult;
+        } else {
+            return attLinkResult;
         }
 
     }
@@ -1019,8 +1117,25 @@ public class AttLinkExt {
             String value = "";
             String text = "";
             String projectId = JdbcMapUtil.getString(param.valueMap, "PM_PRJ_ID");
-            if (Strings.isNullOrEmpty(projectId)){
-                throw new BaseException("请先选择项目！");
+            String projectIdWr = JdbcMapUtil.getString(param.valueMap, "PROJECT_NAME_WR");
+            String typeId = JdbcMapUtil.getString(param.valueMap,"PROJECT_SOURCE_TYPE_ID"); //99952822476441375=非立项
+            if (Strings.isNullOrEmpty(projectId) && SharedUtil.isEmptyString(projectIdWr)){
+                throw new BaseException("项目信息不能为空！");
+            }
+            if ("99952822476441375".equals(typeId)){
+                changeToMandatory = false;
+                changeToEditable = true;
+                //采购启动依据文件
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.FILE_GROUP;
+                    linkedAtt.value = "";
+                    linkedAtt.text = "";
+                    linkedAtt.changeToMandatory = false;
+                    linkedAtt.changeToEditable = true;
+                    linkedAtt.fileInfoList = null;
+                    attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
+                }
             }
             if ("99952822476385260".equals(attValue) || "99952822476385261".equals(attValue)){
                 changeToEditable = true;
@@ -1039,7 +1154,7 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
                 }
             } else {
-                // 99952822476385257 = 立项，99952822476385258=可研，99952822476385259=初概
+                // 99952822476385257 = 立项，99952822476385258=可研，99952822476385259=初概,99952822476441471=预算财评
                 String sql = "";
                 String fileValue = "";
                 if ("99952822476385257".equals(attValue)){
@@ -1048,6 +1163,8 @@ public class AttLinkExt {
                     sql = "select REPLY_NO_WR,REPLY_FILE as file from PM_PRJ_INVEST1 WHERE pm_prj_id = ? and status = 'ap' order by CRT_DT desc limit 1";
                 } else if ("99952822476385259".equals(attValue)){
                     sql = "select REPLY_NO_WR,REPLY_FILE as file from PM_PRJ_INVEST2 WHERE pm_prj_id = ? and status = 'ap' order by CRT_DT desc limit 1";
+                } else if ("99952822476441471".equals(attValue)){
+                    sql = "select REPLY_NO_WR,FINANCIAL_REVIEW_FILE as file from PM_PRJ_INVEST3 WHERE pm_prj_id = ? and status = 'ap' order by CRT_DT desc limit 1";
                 }
                 List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql,projectId);
                 if (!CollectionUtils.isEmpty(list2)){
