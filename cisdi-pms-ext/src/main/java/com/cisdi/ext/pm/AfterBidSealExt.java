@@ -54,7 +54,6 @@ public class AfterBidSealExt {
                 }
 
             }
-//            comment = list.get(0).get("user_comment") == null ? null : list.get(0).get("user_comment").toString();
         }
         if ("first".equals(status)) {
             Integer exec = Crud.from("PM_USE_CHAPTER_REQ").where().eq("ID", csCommId).update()

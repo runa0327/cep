@@ -187,9 +187,15 @@ public class PoOrderPaymentExt {
         String procInstId = ExtJarHelper.procInstId.get();
         // 审批意见
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select u.id u_id,u.code u_code,u.name u_name,tk.user_comment from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id", procInstId);
-        String comment = "";
+        StringBuffer comment = new StringBuffer();
         if (!CollectionUtils.isEmpty(list)) {
-            comment = list.get(0).get("user_comment") == null ? null : list.get(0).get("user_comment").toString();
+            for (Map<String, Object> tmp : list) {
+                String txt = JdbcMapUtil.getString(tmp,"user_comment");
+                if (!SharedUtil.isEmptyString(txt)){
+                    comment = comment.append(JdbcMapUtil.getString(tmp,"u_name")).append("： ").append(txt).append("; ");
+                }
+
+            }
         }
         if ("first".equals(status)) {
             Integer exec = Crud.from("PO_ORDER_PAYMENT_REQ").where().eq("ID", csCommId).update()
