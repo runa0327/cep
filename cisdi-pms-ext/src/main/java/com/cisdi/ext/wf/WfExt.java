@@ -474,10 +474,16 @@ public class WfExt {
                 MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
                 String name = JdbcMapUtil.getString(valueMap,"PROJECT_NAME_WR");
                 String PROJECT_SOURCE_TYPE_ID = JdbcMapUtil.getString(valueMap,"PROJECT_SOURCE_TYPE_ID");
-                prjId = myJdbcTemplate.queryForList("select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?",name,PROJECT_SOURCE_TYPE_ID).get(0).get("id").toString();
-                if (SharedUtil.isEmptyString(prjId)){
+                List<Map<String,Object>> list = myJdbcTemplate.queryForList("select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?",name,PROJECT_SOURCE_TYPE_ID);
+                if (CollectionUtils.isEmpty(list)){
                     return;
+                } else {
+                    prjId = JdbcMapUtil.getString(list.get(0),"id");
                 }
+//                prjId = myJdbcTemplate.queryForList("select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?",name,PROJECT_SOURCE_TYPE_ID).get(0).get("id").toString();
+//                if (SharedUtil.isEmptyString(prjId)){
+//                    return;
+//                }
             }
             String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
             String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
