@@ -2,6 +2,7 @@ package com.cisdi.ext.pm;
 
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
@@ -44,6 +45,32 @@ public class ProcessRoleExt {
             userIdList.addAll(userList);
             ExtJarHelper.returnValue.set(userIdList);
         }
+    }
 
+    /** 获取该流程发起人所在部门的分管领导 **/
+    public void getChargeLeader(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //流程id
+        String procId = ExtJarHelper.procId.get();
+        //本次流程实例id
+        String csCommId = entityRecord.csCommId;
+        String sql1 = "select name,code from ad_ent where name = (select name from wf_process where id = ? ) and PARENT_ENT_ID = '99799190825077752'";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,procId);
+        if (!CollectionUtils.isEmpty(list1)){
+            String ad_ent = JdbcMapUtil.getString(list1.get(0),"code");
+            //根据流程查询发起人的分管领导
+            String sql2 = "SELECT AD_USER_ID FROM hr_dept WHERE id = (select CRT_DEPT_ID from "+ad_ent+" where id = ?)";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,csCommId);
+            if (CollectionUtils.isEmpty(list2)){
+                throw new BaseException("该部门暂未配置分管领导，请联系管理员或相关人员维护");
+            } else {
+                String user = list2.get(0).get("AD_USER_ID").toString();
+                ArrayList<Object> userIdList = new ArrayList<>();
+                userIdList.add(user);
+                ExtJarHelper.returnValue.set(userIdList);
+
+            }
+        }
     }
 }
