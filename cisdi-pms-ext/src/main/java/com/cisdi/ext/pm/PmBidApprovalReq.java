@@ -10,6 +10,7 @@ import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,32 @@ public class PmBidApprovalReq {
             Integer exec = Crud.from("PM_BID_APPROVAL_REQ").where().eq("ID", csCommId).update()
                     .set("APPROVAL_COMMENT_TWO", comment).exec();
             log.info("已更新：{}", exec);
+        }
+    }
+
+    /** 获取成本岗角色 **/
+    public void getCostUser() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            String csCommId = entityRecord.csCommId;
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+            String user_id = myJdbcTemplate.queryForMap("select AD_USER_THREE_ID from PM_BID_APPROVAL_REQ where id=?", csCommId).get("AD_USER_THREE_ID").toString();
+            ArrayList<Object> userIdList = new ArrayList<>(1);
+            userIdList.add(user_id);
+            ExtJarHelper.returnValue.set(userIdList);
+        }
+    }
+
+    /** 获取合约部角色 **/
+    public void getContractUser() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            String csCommId = entityRecord.csCommId;
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+            String user_id = myJdbcTemplate.queryForMap("select AD_USER_FOUR_ID from PM_BID_APPROVAL_REQ where id=?", csCommId).get("AD_USER_FOUR_ID").toString();
+            ArrayList<Object> userIdList = new ArrayList<>(1);
+            userIdList.add(user_id);
+            ExtJarHelper.returnValue.set(userIdList);
         }
     }
 }
