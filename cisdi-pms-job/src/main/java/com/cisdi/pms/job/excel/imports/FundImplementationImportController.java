@@ -29,10 +29,10 @@ public class FundImplementationImportController {
         // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
         // 这里每次会读取100条数据 然后返回过来 直接调用使用数据就行
         EasyExcel.read(file.getInputStream(), FundImplementationExportModel.class, new PageReadListener<FundImplementationExportModel>(dataList -> {
-//            for (DemoData demoData : dataList) {
-//                // 这里就是你处理代码保存的逻辑了
-//                log.info("读取到一条数据{}", JSON.toJSONString(demoData));
-//            }
+            for (FundImplementationExportModel model : dataList) {
+                // 这里就是你处理代码保存的逻辑了
+
+            }
         })).sheet().doRead();
 
         return "";
