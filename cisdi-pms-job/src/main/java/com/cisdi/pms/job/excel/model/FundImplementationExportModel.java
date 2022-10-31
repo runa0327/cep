@@ -1,4 +1,4 @@
-package com.cisdi.pms.job.export.model;
+package com.cisdi.pms.job.excel.model;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
