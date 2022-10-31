@@ -15,6 +15,26 @@ import lombok.Data;
 @Data
 public class FundPaymentImportModel {
 
+    @ExcelProperty("收款账户")
+    @ColumnWidth(value = 30)
+    private String receiveAccount;
+
+    @ExcelProperty("收款银行")
+    @ColumnWidth(value = 30)
+    private String receiveBank;
+
+    @ExcelProperty("到位资金类别")
+    @ColumnWidth(value = 30)
+    private String fundReachCategory;
+
+    @ExcelProperty("业主单位")
+    @ColumnWidth(value = 30)
+    private String customerUnit;
+
+    @ExcelProperty("项目名称")
+    @ColumnWidth(value = 30)
+    private String pmPrjId;
+
     @ExcelProperty("费用大类")
     @ColumnWidth(value = 30)
     private String costCategoryId;
