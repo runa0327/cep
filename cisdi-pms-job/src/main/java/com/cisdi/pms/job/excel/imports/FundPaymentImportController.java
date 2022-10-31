@@ -48,24 +48,14 @@ public class FundPaymentImportController {
 
     private void importData(FundPaymentImportModel modelList) {
 
-        //String sql = "insert fund_newly_increased_detail into ID=UUID_SHORT(), VER= '1', TS=NOW(), CRT_DT=NOW(), CRT_USER_ID= ?, LAST_MODI_DT= NOW(), LAST_MODI_USER_ID= ?, STATUS= 'AP', REMARK=?, ACCOUNT_SET=?, PM_PRJ_ID=? , CUSTOMER_UNIT=? , VOUCHER_NUM=?, NPER=?  ";
-        String sql = "insert fund_newly_increased_detail into " +
-                "ID=UUID_SHORT(), " +
-                "VER= '1', " +
-                "TS=NOW(), " +
-                "CRT_DT=NOW(), " +
-                "CRT_USER_ID= ?, " +
-                "LAST_MODI_DT= NOW(), " +
-                "LAST_MODI_USER_ID= ?, " +
-                "STATUS= 'AP', " +
-                "REMARK=?, " +
-                "ACCOUNT_SET=?, " +
-                "PM_PRJ_ID=? , " +
-                "CUSTOMER_UNIT=? , " +
-                "VOUCHER_NUM=?, " +
-                "NPER=?  ";
+        String sql = "insert into fund_newly_increased_detail(ID , VER, TS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, STATUS, REMARK, ACCOUNT_SET, PM_PRJ_ID, CUSTOMER_UNIT, VOUCHER_NUM, NPER) values (UUID_SHORT(), '1',NOW(),NOW(),?,NOW(),?,'AP',?,?,? ,? ,?,?)";
+        //String sql = "insert into fund_newly_increased_detail" +
+        //        "(ID , VER, TS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, STATUS," +
+        //        "REMARK, ACCOUNT_SET, PM_PRJ_ID, CUSTOMER_UNIT, VOUCHER_NUM, NPER) " +
+        //        "values " +
+        //        "(UUID_SHORT(), '1',NOW(),NOW(),?,NOW(),?,'AP',?,?,? ,? ,?,?)";
 
-        jdbcTemplate.update("", modelList);
+        jdbcTemplate.update(sql, "CRT_USER_ID","LAST_MODI_USER_ID","REMARK","ACCOUNT_SET","PM_PRJ_ID","CUSTOMER_UNIT","VOUCHER_NUM","NPER");
 
 
     }
