@@ -239,6 +239,8 @@ public class WfExt {
                                     }
                                 } else if ("PM_PRJ_REQ".equals(entityCode)){
                                     projectName = myJdbcTemplate.queryForList("select PRJ_NAME from PM_PRJ_REQ where id = ?",csCommId).get(0).get("PRJ_NAME").toString();
+                                } else if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
+                                    otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
                                 } else {
                                     sql = "select NAME_ONE from "+entityCode+" where id = ?";
                                     List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
@@ -1338,6 +1340,7 @@ public class WfExt {
         list.add("PM_USE_CHAPTER_REQ"); //中选单位及标后用印申请
         list.add("PO_ORDER_REQ"); //合同签订
         list.add("PM_PRJ_REQ"); // 立项申请
+        list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
         return list;
     }
 }
