@@ -35,7 +35,7 @@ public class PoPublicBidExtApi {
         Input input = JsonUtil.fromJson(json, Input.class);
         String projectId = input.projectId;
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String baseSql = "select ID,NAME,PM_PRJ_ID,PRJ_CODE,PRJ_REPLY_NO,PRJ_SITUATION,INVESTMENT_SOURCE_ID,CUSTOMER_UNIT,PMS_RELEASE_WAY_ID," +
+        String baseSql = "select ID,NAME,PM_PRJ_ID,PRJ_CODE,PRJ_REPLY_NO,PRJ_SITUATION,INVESTMENT_SOURCE_ID,CUSTOMER_UNIT,BUY_TYPE_ID," +
                 "FEASIBILITY_APPROVE_FUND,ESTIMATE_APPROVE_FUND,EVALUATION_APPROVE_FUND,BID_UNIT,BID_BASIS,BID_CTL_PRICE_LAUNCH,SERVICE_DAYS," +
                 "BID_DEMAND_FILE_GROUP_ID,REMARK,APPROVE_PMS_RELEASE_WAY_ID,APPROVE_PURCHASE_TYPE,APPROVE_BID_CTL_PRICE,APPROVE_PURCHASE_TYPE_ECHO," +
                 "LEADER_APPROVE_COMMENT,LEADER_APPROVE_FILE_GROUP_ID,BID_CTL_PRICE_LAUNCH_ECHO,BID_USER_ID,BID_AGENCY,DEMAND_PROMOTER," +
@@ -70,7 +70,7 @@ public class PoPublicBidExtApi {
                 // 招标类型
                 projectTender.approveReleaseWay = findInDict("pms_release_way", projectTender.approvePmsReleaseWayId, myJdbcTemplate);
                 // 招标方式
-                projectTender.approvePurchaseTypeName = findInDict("pms_tender_way", projectTender.approvePurchaseType, myJdbcTemplate);
+                projectTender.approvePurchaseTypeName = findInDict("BUY_TYPE_ID", projectTender.approvePurchaseType, myJdbcTemplate);
                 // 经办部门
                 if (!Strings.isNullOrEmpty(projectTender.bidUserId)) {
                     Map<String, Object> deptUserMap = myJdbcTemplate.queryForMap("select u.name handleUserName,d.name handleDeptName from ad_user u " +
@@ -147,7 +147,7 @@ public class PoPublicBidExtApi {
         String id = param.id;
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         try {
-            String baseSql = "select ID,NAME,PM_PRJ_ID,PRJ_CODE,PRJ_REPLY_NO,PRJ_SITUATION,INVESTMENT_SOURCE_ID,CUSTOMER_UNIT,PMS_RELEASE_WAY_ID," +
+            String baseSql = "select ID,NAME,PM_PRJ_ID,PRJ_CODE,PRJ_REPLY_NO,PRJ_SITUATION,INVESTMENT_SOURCE_ID,CUSTOMER_UNIT,BUY_TYPE_ID," +
                     "FEASIBILITY_APPROVE_FUND,ESTIMATE_APPROVE_FUND,EVALUATION_APPROVE_FUND,BID_UNIT,BID_BASIS,BID_CTL_PRICE_LAUNCH,SERVICE_DAYS," +
                     "BID_DEMAND_FILE_GROUP_ID,REMARK,APPROVE_PMS_RELEASE_WAY_ID,APPROVE_PURCHASE_TYPE,APPROVE_BID_CTL_PRICE," +
                     "APPROVE_PURCHASE_TYPE_ECHO," +
@@ -249,8 +249,13 @@ public class PoPublicBidExtApi {
         if (Strings.isNullOrEmpty(id)) {
             return null;
         }
-        String name = myJdbcTemplate.queryForMap("select v.name from gr_set_value v left join gr_set s on s.id = v.gr_set_id where s.code = ? and " +
-                "v.id = ?", code, id).get("name").toString();
+        String name = "";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select v.name from gr_set_value v left join gr_set s on s.id = v.gr_set_id where s.code = ? and v.id = ?", code, id);
+        if (!CollectionUtils.isEmpty(list)){
+            name = JdbcMapUtil.getString(list.get(0),"name");
+        }
+//        JdbcMapUtil.getString(myJdbcTemplate.queryForMap("select v.name from gr_set_value v left join gr_set s on s.id = v.gr_set_id where s.code = ? and " +
+//                "v.id = ?", code, id),"name");
         return name;
     }
 

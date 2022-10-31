@@ -374,7 +374,7 @@ public class AttLinkExt {
     private AttLinkResult linkPM_BID_APPROVAL_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
         if ("PM_USE_CHAPTER_REQ".equals(entCode)){ //中选单位及标后用印审批
-            String sql1 = "select a.id,a.name,a.NAME_ONE,a.status,(select name from ad_status where id=a.status) as statusName from PM_BID_APPROVAL_REQ a where id = ?";
+            String sql1 = "select a.BID_AGENCY,a.id,a.name,a.NAME_ONE,a.status,(select name from ad_status where id=a.status) as statusName from PM_BID_APPROVAL_REQ a where id = ?";
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,attValue);
             if (CollectionUtils.isEmpty(list1)){ //全为空
                 {
@@ -410,6 +410,14 @@ public class AttLinkExt {
                     linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"NAME_ONE");
                     linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"NAME_ONE");
                     attLinkResult.attMap.put("NAME_ONE",linkedAtt);
+                }
+                //招标代理商
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = JdbcMapUtil.getString(list1.get(0),"BID_AGENCY");
+                    linkedAtt.text = JdbcMapUtil.getString(list1.get(0),"BID_AGENCY");
+                    attLinkResult.attMap.put("BID_AGENCY",linkedAtt);
                 }
             }
         }
