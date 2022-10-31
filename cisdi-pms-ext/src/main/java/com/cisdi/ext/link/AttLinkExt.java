@@ -1849,7 +1849,9 @@ public class AttLinkExt {
                         if (keyList.contains(key)) {// 是否财政预算
                             String sqlName = "select name from gr_set_value where id = ?";
                             List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(sqlName, id);
-                            name = JdbcMapUtil.getString(nameMap.get(0), "name");
+                            if (!CollectionUtils.isEmpty(nameMap)){
+                                name = JdbcMapUtil.getString(nameMap.get(0), "name");
+                            }
                         }
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
