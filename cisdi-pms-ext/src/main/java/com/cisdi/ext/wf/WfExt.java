@@ -241,6 +241,8 @@ public class WfExt {
                                     projectName = myJdbcTemplate.queryForList("select PRJ_NAME from PM_PRJ_REQ where id = ?",csCommId).get(0).get("PRJ_NAME").toString();
                                 } else if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
                                     otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
+                                } else if ("QUALITY_RECORD".equals(entityCode)){
+                                    otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
                                 } else {
                                     sql = "select NAME_ONE from "+entityCode+" where id = ?";
                                     List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
@@ -1341,6 +1343,7 @@ public class WfExt {
         list.add("PO_ORDER_REQ"); //合同签订
         list.add("PM_PRJ_REQ"); // 立项申请
         list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
+        list.add("QUALITY_RECORD"); // 质量交底记录
         return list;
     }
 }
