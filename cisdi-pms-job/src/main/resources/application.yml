@@ -79,3 +79,5 @@ qygly:
 cisdi-pms-job:
   # 发送给真实用户：
   remind-real-user: false
+  # true：开启   false：关闭
+  sms-switch: false

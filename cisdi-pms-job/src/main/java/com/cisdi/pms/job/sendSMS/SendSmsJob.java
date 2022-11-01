@@ -33,9 +33,17 @@ public class SendSmsJob {
     @Autowired
     DataFeignClient dataFeignClient;
 
+    @Value("${cisdi-pms-job.sms-switch}")
+    boolean smsSwitch;
+
     @Scheduled(fixedDelayString = "60000")
     // @Scheduled(fixedDelayString = "${spring.scheduled.fixedDelayString}")
     public void sendSMS() {
+        //开关短信功能
+        if (!smsSwitch){
+            return;
+        }
+
         //锁表  防止多台服务器同时修改
         String lockSql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code='WF_TASK_REMIND_LOCK' and (t.LOCK_EXT_DTTM_ATT01_VAL is null or t.LOCK_EXT_DTTM_ATT01_VAL <= SUBDATE(NOW(),INTERVAL -10 minute))";
         int lock = jdbcTemplate.update(lockSql);

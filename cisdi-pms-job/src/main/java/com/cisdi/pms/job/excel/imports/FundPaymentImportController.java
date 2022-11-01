@@ -40,7 +40,7 @@ public class FundPaymentImportController {
         try {
             reads.stream().forEach(read -> this.importData(read));
         } catch (Exception e) {
-            return "导入失败";
+            e.printStackTrace();
         }
 
         return "导入成功";
@@ -51,20 +51,29 @@ public class FundPaymentImportController {
         //查询项目名称
         List<Map<String, Object>> proId = jdbcTemplate.queryForList("select id from pm_prj where name = ?", modelList.getPmPrjId());
 
+        //查询付款单位
+        List<Map<String, Object>> payId = jdbcTemplate.queryForList("select id from receiving_bank where name = ?", modelList.getPayUnit());
+
+        //没有付款单位
+        if(payId.size() <= 0){
+            return;
+        }
+
         //资金支付明细
         String fundNewlyIncreasedDetailId = Util.insertData(jdbcTemplate, "fund_newly_increased_detail");
-        jdbcTemplate.update(
-                "update fund_newly_increased_detail set CRT_USER_ID=?,LAST_MODI_USER_ID=?,REMARK=?,ACCOUNT_SET=?,PM_PRJ_ID=?,CUSTOMER_UNIT=?,VOUCHER_NUM=?,NPER=? where ID=?",
-                "CRT_USER_ID", "LAST_MODI_USER_ID", modelList.getRemarke(), modelList.getAccountSet(), proId.get(0).get("id"), modelList.getCustomerUnit(), modelList.getVoucherNum(), modelList.getNper(),
-                fundNewlyIncreasedDetailId);
-
 
         //资金支付信息明细
         String fundPayInfoId = Util.insertData(jdbcTemplate, "fund_pay_info");
+
         jdbcTemplate.update(
-                "update fund_pay_info set CRT_USER_ID = ?,LAST_MODI_USER_ID = ?,FUND_REACH_CATEGORY = ?,COST_CATEGORY_ID = ?,FEE_DETAIL = ? ,PAY_AMT = ?,PAY_UNIT = ?,RECEIPT_BANK = ?,RECEIPT_ACCOUNT = ?,PAYEE = ?,RECEIVE_BANK = ?,RECEIVE_ACCOUNT = ?,FUND_NEWLY_INCREASED_DETAIL_ID=?",
-                "CRT_USER_ID", "LAST_MODI_USER_ID", modelList.getFundReachCategory(), modelList.getCostCategoryId(), modelList.getFeeDetail(), modelList.getPayAmt(), modelList.getPayUnit(), modelList.getReceiptBank(), modelList.getReceiptAccount(), modelList.getPayee(), modelList.getReceiveBank(), modelList.getReceiveAccount(), fundNewlyIncreasedDetailId,
+                "update fund_pay_info set FUND_REACH_CATEGORY = ?,COST_CATEGORY_ID = ?,FEE_DETAIL = ? ,PAY_AMT = ?,PAY_UNIT = ?,RECEIPT_BANK = ?,RECEIPT_ACCOUNT = ?,PAYEE = ?,RECEIVE_BANK = ?,RECEIVE_ACCOUNT = ?,FUND_NEWLY_INCREASED_DETAIL_ID=? where ID = ?",
+                modelList.getFundReachCategory(), "99902212142032084", modelList.getFeeDetail(), modelList.getPayAmt().replace(",",""), payId.get(0).get("id"), modelList.getReceiptBank(), modelList.getReceiptAccount(), modelList.getPayee(), modelList.getReceiveBank(), modelList.getReceiveAccount(), fundNewlyIncreasedDetailId,
                 fundPayInfoId);
+
+        jdbcTemplate.update(
+                "update fund_newly_increased_detail set REMARK=?,ACCOUNT_SET=?,PM_PRJ_ID=?,CUSTOMER_UNIT=?,VOUCHER_NUM=? where ID=?",
+                modelList.getRemarke(), modelList.getAccountSet(), proId.get(0).get("id"), modelList.getCustomerUnit(), modelList.getVoucherNum(),
+                fundNewlyIncreasedDetailId);
 
     }
 
