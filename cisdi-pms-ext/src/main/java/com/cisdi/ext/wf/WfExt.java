@@ -243,6 +243,8 @@ public class WfExt {
                                     otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
                                 } else if ("QUALITY_RECORD".equals(entityCode)){
                                     otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
+                                } else if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
+                                    otherName = JdbcMapUtil.getString(valueMap,"CODE_ONE");
                                 } else {
                                     sql = "select NAME_ONE from "+entityCode+" where id = ?";
                                     List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
@@ -268,7 +270,12 @@ public class WfExt {
                                     sb = sb.append("-").append(nowDate);
                                 }
                                 name = sb.toString();
-                                update1 = myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", name,csCommId);
+                                if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
+                                    update1 = myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", otherName,csCommId);
+                                } else {
+                                    update1 = myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", name,csCommId);
+                                }
+
                                 update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id and t.id = ? set pi.name = ? where t.id",csCommId,name);
                                 return;
                             } else if (noProjectList.contains(entityCode)){
@@ -1344,6 +1351,7 @@ public class WfExt {
         list.add("PM_PRJ_REQ"); // 立项申请
         list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
         list.add("QUALITY_RECORD"); // 质量交底记录
+        list.add("PM_SUPERVISE_NOTICE_REQ"); // 监理通知单
         return list;
     }
 }
