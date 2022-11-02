@@ -3215,28 +3215,31 @@ public class AttLinkExt {
         if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)) { // 工程开工报审
             String sql = "select PRJ_TOTAL_INVEST,PROJECT_AMT from PM_PRJ_INVEST2 where PM_PRJ_ID = ? and STATUS = 'AP' order by CRT_DT desc limit 1";
             List<Map<String, Object>> map = myJdbcTemplate.queryForList(sql, attValue);
-            if (CollectionUtils.isEmpty(map)) {
-                throw new BaseException("该项目的总投资、工程费用信息不完善！");
-            }
-            Map row2 = map.get(0);
-            // 总投资
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.value = JdbcMapUtil.getString(row2, "PRJ_TOTAL_INVEST");
-                linkedAtt.text = JdbcMapUtil.getString(row2, "PRJ_TOTAL_INVEST");
+//            if (CollectionUtils.isEmpty(map)) {
+//                throw new BaseException("该项目的总投资、工程费用信息不完善！");
+//            }
+            if (!CollectionUtils.isEmpty(map)) {
+                Map row2 = map.get(0);
+                // 总投资
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DOUBLE;
+                    linkedAtt.value = JdbcMapUtil.getString(row2, "PRJ_TOTAL_INVEST");
+                    linkedAtt.text = JdbcMapUtil.getString(row2, "PRJ_TOTAL_INVEST");
 
-                attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
-            }
-            // 工程费用
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.value = JdbcMapUtil.getString(row2, "PROJECT_AMT");
-                linkedAtt.text = JdbcMapUtil.getString(row2, "PROJECT_AMT");
+                    attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
+                }
+                // 工程费用
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.DOUBLE;
+                    linkedAtt.value = JdbcMapUtil.getString(row2, "PROJECT_AMT");
+                    linkedAtt.text = JdbcMapUtil.getString(row2, "PROJECT_AMT");
 
-                attLinkResult.attMap.put("PROJECT_AMT", linkedAtt);
+                    attLinkResult.attMap.put("PROJECT_AMT", linkedAtt);
+                }
             }
+
         }
 
         // 项目编号
