@@ -36,7 +36,8 @@ public class FundImplementationImportController {
 
     @SneakyThrows(IOException.class)
     @PostMapping(value = "/import")
-    public String importData(MultipartFile file) {
+    public Map<String, Object> importData(MultipartFile file) {
+        Map<String, Object> result = new HashMap<>();
         List<String> res = new ArrayList<>();
         List<FundImplementationExportModel> dataList = EasyExcelUtil.read(file.getInputStream(), FundImplementationExportModel.class);
         Map<String, List<FundImplementationExportModel>> data = dataList.stream().collect(Collectors.groupingBy(FundImplementationExportModel::getSourceName));
@@ -45,9 +46,13 @@ public class FundImplementationImportController {
             res = this.importData(data.get(key));
         }
         if (CollectionUtils.isEmpty(res)) {
-            return "导入成功！";
+            result.put("code", 200);
+            result.put("message", "导入成功！");
+            return result;
         } else {
-            return "导入失败！" + res.stream().collect(Collectors.joining(",")) + "不存在！";
+            result.put("code", 500);
+            result.put("message", "项目名称为:" + String.join(",", res) + "不存在，未导入！");
+            return result;
         }
     }
 

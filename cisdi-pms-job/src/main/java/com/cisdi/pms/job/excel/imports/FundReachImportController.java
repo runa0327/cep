@@ -61,7 +61,7 @@ public class FundReachImportController {
             return result;
         } else {
             result.put("code", 500);
-            result.put("message", "导入失败！" + res.stream().collect(Collectors.joining(",")) + "不存在！");
+            result.put("message", "项目名称为:" + String.join(",", res) + "不存在，未导入！");
             return result;
         }
     }
