@@ -71,7 +71,7 @@ public class FundImplementationImportController {
         String id = Util.insertData(jdbcTemplate, "fund_implementation");
 
         jdbcTemplate.update("update fund_implementation set FUND_SOURCE_TEXT=?,FUND_CATEGORY_FIRST=?,DECLARED_AMOUNT=?,APPROVAL_TIME=? where ID=?",
-                modelList.get(0).getCategoryName(), typeId, 0, modelList.get(0).getApprovalTime(), id);
+                modelList.get(0).getSourceName(), typeId, 0, modelList.get(0).getApprovalTime(), id);
 
         List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from pm_prj where status='AP'");
         for (FundImplementationExportModel model : modelList) {
