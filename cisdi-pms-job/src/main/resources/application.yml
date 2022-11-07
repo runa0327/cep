@@ -36,8 +36,8 @@ spring:
   task:
     execution:
       pool:
-        max-size: 20
-        core-size: 8
+        max-size: 32
+        core-size: 16
         keep-alive: 60
         queue-capacity: 2048
         thread-name-prefix: springThreadPool

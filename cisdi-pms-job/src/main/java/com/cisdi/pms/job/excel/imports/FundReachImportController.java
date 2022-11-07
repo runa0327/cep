@@ -87,7 +87,10 @@ public class FundReachImportController {
         if ("建设资金".equals(typeName)) {
             typeName = "工程资金";
         }
-        List<Map<String, Object>> fundReachTypeList = jdbcTemplate.queryForList("select id from gr_set_value where name = ?", typeName);
+        if ("征拆资金".equals(typeName)) {
+            typeName = "征迁资金";
+        }
+        List<Map<String, Object>> fundReachTypeList = jdbcTemplate.queryForList("select va.id from gr_set_value va left join gr_set se on se.id = va.GR_SET_ID where va.name = ?", typeName);
         String fundReachType = this.getStringFromList(fundReachTypeList, "id");
         //收款单位
         List<Map<String, Object>> unitList = jdbcTemplate.queryForList("select id from receiving_bank where level = 1 and name = ?", reachData.getUnit());
@@ -117,7 +120,7 @@ public class FundReachImportController {
 
         //更新插入的到位空数据
         jdbcTemplate.update("update FUND_REACH set FUND_SOURCE_TEXT = ?,PM_PRJ_ID = ?,REACH_TIMES = ?,FUND_REACH_CATEGORY = ?,REACH_AMOUNT = ?,REACH_DATE = ?,PAYEE = ?,RECEIVING_BANK_ID = ?,RECEIPT_ACCOUNT = ?,REMARK = ? where id = ?",
-                reachData.getSourceName(), prjId, reachData.getCount(), typeName, reachData.getDwAmt(), reachData.getDwDate(), payee, bank, account, reachData.getRemark(), id);
+                reachData.getSourceName(), prjId, reachData.getCount(), fundReachType, reachData.getDwAmt(), reachData.getDwDate(), payee, bank, account, reachData.getRemark(), id);
         return res;
     }
 

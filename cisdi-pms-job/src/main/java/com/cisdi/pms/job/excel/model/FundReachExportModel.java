@@ -32,7 +32,7 @@ public class FundReachExportModel {
     @ColumnWidth(value = 30)
     private String count;
 
-    @ExcelProperty("本次资金到位类别")
+    @ExcelProperty("本次到位资金类别")
     @ColumnWidth(value = 30)
     private String typeName;
 

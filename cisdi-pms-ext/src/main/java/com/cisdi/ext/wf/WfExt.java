@@ -470,6 +470,14 @@ public class WfExt {
             ProFileUtils.insertProFile(prjId, FILE_ID_ONE,FileCodeEnum.PM_PRJ_RESTART_ORDER_REQ_FILE_ID_ONE);
         }
 
+        //工程开工令
+        if ("PM_START_ORDER_REQ".equals(entityCode)) {
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
+            // 附件
+            ProFileUtils.insertProFile(prjId, FILE_ID_ONE,FileCodeEnum.PM_START_ORDER_REQ_FILE_ID_ONE);
+        }
+
         //工程暂停令
         if ("PM_PRJ_STOP_ORDER_REQ".equals(entityCode)) {
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
