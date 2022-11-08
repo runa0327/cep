@@ -49,7 +49,7 @@ public class AttLinkExt {
         String entCode = myJdbcTemplate.queryForMap("select e.code ent_code from ad_single_ent_view sev join ad_ent e on sev.AD_ENT_ID = e.ID and sev.id=?", sevId).get("ent_code").toString();
 
         if ("PROJECT_TYPE_ID".equals(attCode)) {
-            return linkForPROJECT_TYPE_ID(myJdbcTemplate, attValue);
+            return linkForPROJECT_TYPE_ID(myJdbcTemplate, attValue,entCode);
         } else if ("PM_PRJ_ID".equals(attCode)) {
             return linkForPM_PRJ_ID(myJdbcTemplate, attValue, entCode);
         } else if ("PMS_RELEASE_WAY_ID".equals(attCode) || "GUARANTEE_LETTER_TYPE_ID".equals(attCode) || "CONTRACT_CATEGORY_ID".equals(attCode) || "PRJ_MANAGE_MODE_ID".equals(attCode)) {
@@ -2982,7 +2982,7 @@ public class AttLinkExt {
         return attLinkResult;
     }
 
-    private AttLinkResult linkForPROJECT_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue) {
+    private AttLinkResult linkForPROJECT_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue,String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
 
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select v0.id project_type_id,v0.name project_type_name,v1.id CON_SCALE_TYPE_ID,v1.name CON_SCALE_TYPE_NAME,v2.id CON_SCALE_UOM_ID,v2.name CON_SCALE_UOM_NAME from pm_prj_type_link t join gr_set_value v0 on t.PROJECT_TYPE_ID=v0.id join gr_set_value v1 on t.CON_SCALE_TYPE_ID=v1.id join gr_set_value v2 on t.CON_SCALE_UOM_ID=v2.id where t.PROJECT_TYPE_ID=?", attValue);
@@ -3021,11 +3021,11 @@ public class AttLinkExt {
         Boolean otherShow = true; //其他显示
         Boolean seaShow = true; //海域面积显示
 
-        Boolean areaEdit = true; //面积可改
-        Boolean lengthEdit = true; //长可改
-        Boolean widthEdit = true; //宽可改
-        Boolean otherEdit = true; //其他可改
-        Boolean seaEdit = true; //海域面积可改
+        Boolean areaEdit = false; //面积不可改
+        Boolean lengthEdit = false; //长不可改
+        Boolean widthEdit = false; //宽不可改
+        Boolean otherEdit = false; //其他不可改
+        Boolean seaEdit = false; //海域面积不可改
 
         Boolean areaMustEdit = true; //面积必填
         Boolean lengthMustEdit = true; //长必填
@@ -3071,6 +3071,24 @@ public class AttLinkExt {
             seaShow = false;
             seaMustEdit = false;
         }
+
+        //判断项目类型数据是否需要可改
+        List<String> editPrjTypeList = getEditPrjTypeList();
+        if (editPrjTypeList.contains(entCode)){
+            if (name1.contains("面积")){
+                if (name1.contains("海域")){
+                    seaEdit = true;
+                } else if (name1.contains("建筑")){
+                    areaEdit = true;
+                }
+            } else if (name1.contains("长宽")){
+                lengthEdit = true;
+                widthEdit = true;
+            } else {
+                otherEdit = true;
+            }
+        }
+
         //面积
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -3079,6 +3097,7 @@ public class AttLinkExt {
             linkedAtt.changeToMandatory = areaMustEdit;
             linkedAtt.text = null;
             linkedAtt.value = null;
+            linkedAtt.changeToEditable = areaEdit;
             attLinkResult.attMap.put("QTY_ONE", linkedAtt);
         }
         //长
@@ -3089,6 +3108,7 @@ public class AttLinkExt {
             linkedAtt.changeToMandatory = lengthMustEdit;
             linkedAtt.text = null;
             linkedAtt.value = null;
+            linkedAtt.changeToEditable = lengthEdit;
             attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
         }
         //宽
@@ -3099,6 +3119,7 @@ public class AttLinkExt {
             linkedAtt.changeToMandatory = widthMustEdit;
             linkedAtt.text = null;
             linkedAtt.value = null;
+            linkedAtt.changeToEditable = widthEdit;
             attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
         }
         //其他
@@ -3109,6 +3130,7 @@ public class AttLinkExt {
             linkedAtt.changeToMandatory = otherMustEdit;
             linkedAtt.text = null;
             linkedAtt.value = null;
+            linkedAtt.changeToEditable = otherEdit;
             attLinkResult.attMap.put("QTY_TWO", linkedAtt);
         }
         //海域面积
@@ -3119,6 +3141,7 @@ public class AttLinkExt {
             linkedAtt.changeToMandatory = seaMustEdit;
             linkedAtt.text = null;
             linkedAtt.value = null;
+            linkedAtt.changeToEditable = seaEdit;
             attLinkResult.attMap.put("QTY_THREE", linkedAtt);
         }
 
@@ -4120,6 +4143,14 @@ public class AttLinkExt {
         list.add("PM_CONTROL_FLOOD_REQ"); //防洪评价
         list.add("PM_TERMITE_CONTROL_REQ"); //白蚁防治
         list.add("PM_TOPSOIL_STRIPPING_REQ"); //耕作层剥离
+        return list;
+    }
+
+    // 项目类型属性联动，需要修改属性联动值
+    public List<String> getEditPrjTypeList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_PRJ_INVEST1"); //可研报告审批
+        list.add("PM_PRJ_INVEST2"); //初设概算审批
         return list;
     }
 }
