@@ -928,12 +928,23 @@ public class WfExt {
         }
 
         //五方责任主体及终身质量承诺书
-//        if ("PM_PARTY_QUALITY_PROMISE_REQ".equals(entityCode)){
-//            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
-//            List<String> fileStringList = getProcessFileGroupByNode(procInstId);
-//            //建设单位承诺书
-//            ProFileUtils.insertProFile(prjId,fileStringList.get(0),FileCodeEnum.EMPLOYER_COMMITMENT_LETTER);
-//        }
+        if ("PM_PRJ_PARTY_REQ".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            //建设单位承诺书
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.EMPLOYER_COMMITMENT_LETTER);
+            //代建单位承诺书
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_ONE"),FileCodeEnum.AGENT_COMMITMENT_LETTER);
+            //勘察单位承诺书
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_TWO"),FileCodeEnum.INVESTIGATION_COMMITMENT_LETTER);
+            //设计单位承诺书
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_THREE"),FileCodeEnum.DESIGNER_COMMITMENT_LETTER);
+            //设计单位承诺书
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_FOUR"),FileCodeEnum.PRJ_CONTRACTOR_COMMITMENT_LETTER);
+            //施工总承包单位承诺书
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_FIVE"),FileCodeEnum.CONSTRUCTION_CONTRACTOR_COMMITMENT_LETTER);
+            //监理单位承诺书
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"APPROVE_FILE_ID_SIX"),FileCodeEnum.SUPERVISOR_COMMITMENT_LETTER);
+        }
 
         //监理规划及细则申请
         if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
