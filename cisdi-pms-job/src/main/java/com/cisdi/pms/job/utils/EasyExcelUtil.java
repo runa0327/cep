@@ -5,12 +5,21 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.qygly.shared.BaseException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,6 +86,66 @@ public class EasyExcelUtil {
         String fileName = URLEncoder.encode(sheetName, "UTF-8").replaceAll("\\+", "%20");
         response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
         EasyExcel.write(response.getOutputStream(), clazz).head(clazz).sheet(sheetName).doWrite(list);
+    }
+
+    public static File parseFile(MultipartFile excelPath) {
+        try {
+            File file = new File(FilenameUtils.EXTENSION_SEPARATOR+ FilenameUtils.getExtension(excelPath.getOriginalFilename()));
+            FileUtils.copyInputStreamToFile(excelPath.getInputStream(),file);
+            return file;
+        } catch (Exception e) {
+            log.error(e.toString());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    //获取单元格内容
+    public static String getCellValueAsString(Cell cell) {
+        String result = "";
+        Object val = null;
+        if (cell != null && !"".equals(cell) && !" ".equals(cell)) {
+            // 判断当前Cell的Type
+            if (cell.getCellType() == CellType.NUMERIC || cell.getCellType() == CellType.FORMULA)
+            {
+                val = cell.getNumericCellValue();
+                if (DateUtil.isCellDateFormatted(cell))
+                {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    val = sdf.format(val);
+//                    val = DateUtil.getJavaDate((Double) val); // POI Excel 日期格式转换
+                }
+                else
+                {
+                    if ((Double) val % 1 != 0)
+                    {
+                        val = new BigDecimal(val.toString());
+                    }
+                    else
+                    {
+                        val = new DecimalFormat("0").format(val);
+                    }
+                }
+            }
+            else if (cell.getCellType() == CellType.STRING)
+            {
+                val = cell.getStringCellValue();
+            }
+            else if (cell.getCellType() == CellType.BOOLEAN)
+            {
+                val = cell.getBooleanCellValue();
+            }
+            else if (cell.getCellType() == CellType.ERROR)
+            {
+                val = cell.getErrorCellValue();
+            } else {
+                val = "";
+            }
+            result = val.toString();
+        } else {
+            result = "";
+        }
+        return result;
     }
 }
 
