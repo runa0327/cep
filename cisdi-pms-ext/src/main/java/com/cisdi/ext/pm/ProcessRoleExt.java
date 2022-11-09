@@ -7,9 +7,11 @@ import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,7 +34,7 @@ public class ProcessRoleExt {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //流程id
         String csCommId = entityRecord.csCommId;
-        
+
         //查询所有经办人
         //需要查询的表
         String table = "";
@@ -72,10 +74,223 @@ public class ProcessRoleExt {
             ArrayList<Object> userIdList = new ArrayList<>();
             userIdList.add(user);
             ExtJarHelper.returnValue.set(userIdList);
-
         }
-
     }
 
+    /** 获取项目配置的监理单位负责人 **/
+    public void getSupervisor(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //获取项目id
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        if (SharedUtil.isEmptyString(projectId)){
+            projectId = JdbcMapUtil.getString(entityRecord.valueMap,"AMOUT_PM_PRJ_ID");
+        }
+        if (SharedUtil.isEmptyString(projectId)){
+            throw new BaseException("没有项目信息，无法找到对应监理人员");
+        }
+        //根据项目id查询该项目监理人员
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '99952822476391096'";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
+        if (CollectionUtils.isEmpty(list1)){
+            throw new BaseException("该项目没有配置监理单位人员，请联系管理员或相关负责人处理！");
+        }
+        List<String> userList = Arrays.asList(JdbcMapUtil.getString(list1.get(0),"USER_IDS").split(","));
+        ArrayList<Object> userIdList = new ArrayList<>();
+        userIdList.addAll(userList);
+        ExtJarHelper.returnValue.set(userIdList);
+    }
+
+    /** 获取项目配置的施工单位负责人 **/
+    public void getBuilder(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //获取项目id
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        if (SharedUtil.isEmptyString(projectId)){
+            projectId = JdbcMapUtil.getString(entityRecord.valueMap,"AMOUT_PM_PRJ_ID");
+        }
+        if (SharedUtil.isEmptyString(projectId)){
+            throw new BaseException("没有项目信息，无法找到对应监理人员");
+        }
+        //根据项目id查询该项目监理人员
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '99952822476391092' ";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
+        if (CollectionUtils.isEmpty(list1)){
+            throw new BaseException("该项目没有配置施工单位人员，请联系管理员或相关负责人处理！");
+        }
+        List<String> userList = Arrays.asList(JdbcMapUtil.getString(list1.get(0),"USER_IDS").split(","));
+        ArrayList<Object> userIdList = new ArrayList<>();
+        userIdList.addAll(userList);
+        ExtJarHelper.returnValue.set(userIdList);
+    }
+
+    /** 获取项目配置的勘察单位负责人 **/
+    public void getReconnaissance(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //获取项目id
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        if (SharedUtil.isEmptyString(projectId)){
+            projectId = JdbcMapUtil.getString(entityRecord.valueMap,"AMOUT_PM_PRJ_ID");
+        }
+        if (SharedUtil.isEmptyString(projectId)){
+            throw new BaseException("没有项目信息，无法找到对应监理人员");
+        }
+        //根据项目id查询该项目勘察单位人员
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '99952822476391030' ";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
+        if (CollectionUtils.isEmpty(list1)){
+            throw new BaseException("该项目没有配置勘察单位人员，请联系管理员或相关负责人处理！");
+        }
+        List<String> userList = Arrays.asList(JdbcMapUtil.getString(list1.get(0),"USER_IDS").split(","));
+        ArrayList<Object> userIdList = new ArrayList<>();
+        userIdList.addAll(userList);
+        ExtJarHelper.returnValue.set(userIdList);
+    }
+
+    /** 获取项目配置的建设单位负责人 **/
+    public void getConstruction(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //获取项目id
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        if (SharedUtil.isEmptyString(projectId)){
+            projectId = JdbcMapUtil.getString(entityRecord.valueMap,"AMOUT_PM_PRJ_ID");
+        }
+        if (SharedUtil.isEmptyString(projectId)){
+            throw new BaseException("没有项目信息，无法找到对应监理人员");
+        }
+        //根据项目id查询该项目建设单位人员
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '99952822476391031' ";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
+        if (CollectionUtils.isEmpty(list1)){
+            throw new BaseException("该项目没有配置建设单位人员，请联系管理员或相关负责人处理！");
+        }
+        List<String> userList = Arrays.asList(JdbcMapUtil.getString(list1.get(0),"USER_IDS").split(","));
+        ArrayList<Object> userIdList = new ArrayList<>();
+        userIdList.addAll(userList);
+        ExtJarHelper.returnValue.set(userIdList);
+    }
+
+    /** 获取项目配置的设计单位负责人 **/
+    public void getDesigner(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //获取项目id
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        if (SharedUtil.isEmptyString(projectId)){
+            projectId = JdbcMapUtil.getString(entityRecord.valueMap,"AMOUT_PM_PRJ_ID");
+        }
+        if (SharedUtil.isEmptyString(projectId)){
+            throw new BaseException("没有项目信息，无法找到对应监理人员");
+        }
+        //根据项目id查询该项目设计单位人员
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '99952822476391091' ";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
+        if (CollectionUtils.isEmpty(list1)){
+            throw new BaseException("该项目没有配置设计单位人员，请联系管理员或相关负责人处理！");
+        }
+        List<String> userList = Arrays.asList(JdbcMapUtil.getString(list1.get(0),"USER_IDS").split(","));
+        ArrayList<Object> userIdList = new ArrayList<>();
+        userIdList.addAll(userList);
+        ExtJarHelper.returnValue.set(userIdList);
+    }
+
+    /** 获取项目配置的检测单位负责人 **/
+    public void getExamine(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //获取项目id
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        if (SharedUtil.isEmptyString(projectId)){
+            projectId = JdbcMapUtil.getString(entityRecord.valueMap,"AMOUT_PM_PRJ_ID");
+        }
+        if (SharedUtil.isEmptyString(projectId)){
+            throw new BaseException("没有项目信息，无法找到对应监理人员");
+        }
+        //根据项目id查询该项目检测单位人员
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '99952822476391142' ";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
+        if (CollectionUtils.isEmpty(list1)){
+            throw new BaseException("该项目没有配置检测单位人员，请联系管理员或相关负责人处理！");
+        }
+        List<String> userList = Arrays.asList(JdbcMapUtil.getString(list1.get(0),"USER_IDS").split(","));
+        ArrayList<Object> userIdList = new ArrayList<>();
+        userIdList.addAll(userList);
+        ExtJarHelper.returnValue.set(userIdList);
+    }
+
+    /** 获取项目配置的代建单位负责人 **/
+    public void getGeneration(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //获取项目id
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        if (SharedUtil.isEmptyString(projectId)){
+            projectId = JdbcMapUtil.getString(entityRecord.valueMap,"AMOUT_PM_PRJ_ID");
+        }
+        if (SharedUtil.isEmptyString(projectId)){
+            throw new BaseException("没有项目信息，无法找到对应监理人员");
+        }
+        //根据项目id查询该项目代建单位人员
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '100031468512032482' ";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
+        if (CollectionUtils.isEmpty(list1)){
+            throw new BaseException("该项目没有配置代建单位人员，请联系管理员或相关负责人处理！");
+        }
+        List<String> userList = Arrays.asList(JdbcMapUtil.getString(list1.get(0),"USER_IDS").split(","));
+        ArrayList<Object> userIdList = new ArrayList<>();
+        userIdList.addAll(userList);
+        ExtJarHelper.returnValue.set(userIdList);
+    }
+
+    /** 获取项目配置的工程总承包负责人 **/
+    public void getEngineeringContracting(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //获取项目id
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        if (SharedUtil.isEmptyString(projectId)){
+            projectId = JdbcMapUtil.getString(entityRecord.valueMap,"AMOUT_PM_PRJ_ID");
+        }
+        if (SharedUtil.isEmptyString(projectId)){
+            throw new BaseException("没有项目信息，无法找到对应监理人员");
+        }
+        //根据项目id查询该项目代建单位人员
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '100031468512032483' ";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
+        if (CollectionUtils.isEmpty(list1)){
+            throw new BaseException("该项目没有配置工程总承包单位人员，请联系管理员或相关负责人处理！");
+        }
+        List<String> userList = Arrays.asList(JdbcMapUtil.getString(list1.get(0),"USER_IDS").split(","));
+        ArrayList<Object> userIdList = new ArrayList<>();
+        userIdList.addAll(userList);
+        ExtJarHelper.returnValue.set(userIdList);
+    }
+
+    /** 获取项目配置的施工总承包负责人 **/
+    public void getBuildContracting(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //获取项目id
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        if (SharedUtil.isEmptyString(projectId)){
+            projectId = JdbcMapUtil.getString(entityRecord.valueMap,"AMOUT_PM_PRJ_ID");
+        }
+        if (SharedUtil.isEmptyString(projectId)){
+            throw new BaseException("没有项目信息，无法找到对应监理人员");
+        }
+        //根据项目id查询该项目代建单位人员
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '100031468512032486' ";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
+        if (CollectionUtils.isEmpty(list1)){
+            throw new BaseException("该项目没有配置施工总承包单位人员，请联系管理员或相关负责人处理！");
+        }
+        List<String> userList = Arrays.asList(JdbcMapUtil.getString(list1.get(0),"USER_IDS").split(","));
+        ArrayList<Object> userIdList = new ArrayList<>();
+        userIdList.addAll(userList);
+        ExtJarHelper.returnValue.set(userIdList);
+    }
 
 }
