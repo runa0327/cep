@@ -47,14 +47,22 @@ public class FundSpecialImportController {
                 if (unitOptional.isPresent()) {
                     unit = String.valueOf(unitOptional.get().get("ID"));
                 }
+                String fundImplementationId = null;
+                List<Map<String, Object>> detilList = jdbcTemplate.queryForList("select fid.* from FUND_IMPLEMENTATION_DETAIL fid \n" +
+                        "left join FUND_IMPLEMENTATION fi on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
+                        "where fid.PM_PRJ_ID =? and fi.FUND_SOURCE_TEXT = ?", optional.get().get("ID"), fundSpecialModel.getSourceName());
+                if (!CollectionUtils.isEmpty(detilList)) {
+                    fundImplementationId = String.valueOf(detilList.get(0).get("ID"));
+                }
+
                 String id = Util.insertData(jdbcTemplate, "FUND_SPECIAL");
                 jdbcTemplate.update("update FUND_SPECIAL set PM_PRJ_ID=?,APPROVED_AMOUNT=?,CUM_REACH_AMT=?,CUM_PAY_AMT=?,NOT_REACH_AMT=?,CUM_BUILD_REACH_AMT=?," +
                                 "CUM_ACQ_REACH_AMT=?,SUR_REACH_AMT=?,FUND_REACH_CATEGORY=?,NPER=?,COST_NAME=?,PAY_UNIT=?,RECEIPT_BANK=?,RECEIPT_ACCOUNT=?,PAY_DATE=?," +
-                                "PAYABLE_AMT=?,PAID_AMT=?,UNPAD_AMT=?,PAYEE=?,GUARANTEE_STATES=?,APPROVAL_STATUS=? where ID=?",
+                                "PAYABLE_AMT=?,PAID_AMT=?,UNPAD_AMT=?,PAYEE=?,GUARANTEE_STATES=?,APPROVAL_STATUS=?,FUND_IMPLEMENTATION_V_ID=? where ID=?",
                         optional.get().get("ID"), fundSpecialModel.getApprovedAmount(), fundSpecialModel.getLjdwAmt(), fundSpecialModel.getPayAmt(), fundSpecialModel.getWdwAmt(),
                         fundSpecialModel.getJsAmt(), fundSpecialModel.getZcAmt(), fundSpecialModel.getSyAmt(), null, fundSpecialModel.getPeriods(), fundSpecialModel.getFeeName(),
                         unit, fundSpecialModel.getPayBank(), fundSpecialModel.getPayAccount(), fundSpecialModel.getPayDate(), fundSpecialModel.getYfAmt(),
-                        fundSpecialModel.getHasPayAmt(), 0, fundSpecialModel.getSkUnit(), fundSpecialModel.getBhqk(), fundSpecialModel.getStatus(), id);
+                        fundSpecialModel.getHasPayAmt(), 0, fundSpecialModel.getSkUnit(), fundSpecialModel.getBhqk(), fundSpecialModel.getStatus(), fundImplementationId, id);
 
             } else {
                 res.add(fundSpecialModel.getProjectName());
