@@ -41,21 +41,7 @@ public class FundStatisticalApi {
 
         MyJdbcTemplate jdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuilder sb = new StringBuilder();
-//        sb.append("select ft.name as categoryName, " +
-//                "fi.FUND_SOURCE_TEXT as sourceName, " +
-//                "ifnull(fi.DECLARED_AMOUNT,0) as declaredAmount, " +
-//                "ifnull(fid.APPROVED_AMOUNT,0) as approvedAmount, " +
-//                "fi.APPROVAL_TIME as approvedDate, " +
-//                "ifnull(sum(fr.REACH_AMOUNT),0) as cumulativeInPaceAmt, " +
-//                "'' as cumulativePayAmt,  " +
-//                "0 as syAmt,  " + //累计到位减去累计支付
-//                "(ifnull(fid.APPROVED_AMOUNT,0) - ifnull(sum(fr.REACH_AMOUNT),0)) as unInPlaceAmt, " +  //批复金额减去累计到位
-//                "0 as totalSyAmt,  " + //批复减去累计支付
-//                "0 as totalPayRate,  " + //累计支付除以批复金额
-//                "ft.REMARK as remark " +
-//                "from FUND_IMPLEMENTATION fi left join FUND_IMPLEMENTATION_DETAIL fid on fi.id = fid.FUND_IMP_ID " +
-//                "left join fund_reach fr on fi.FUND_SOURCE_TEXT = fr.FUND_SOURCE_TEXT " +
-//                "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST  where 1=1");
+
         sb.append("select fi.id,ft.name as categoryName,ft.id categoryNameId,ft1.name as categoryNameSecond,ft1.id categoryNameSecondId,fi.FUND_SOURCE_TEXT as sourceName, ifnull(fi" +
                 ".DECLARED_AMOUNT,0) as declaredAmount, ifnull(temp1.sumApp,0) as approvedAmount, fi.APPROVAL_TIME as approvedDate, \n" +
                 "ifnull(temp.sumAmt,0) as cumulativeInPaceAmt, \n" +
@@ -75,8 +61,8 @@ public class FundStatisticalApi {
                 "FUND_SOURCE_TEXT) temp2 on temp2.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
                 "left join (select sum(REACH_AMOUNT) sumJsAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '99952822476371282' group by " +
                 "FUND_SOURCE_TEXT) temp3 on temp3.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
-                "left join (select sum(APPROVED_AMOUNT) sumApp,FUND_IMP_ID from fund_implementation_detail group by FUND_IMP_ID) temp1 on temp1" +
-                ".FUND_IMP_ID = fi.id \n" +
+                "left join (select sum(APPROVED_AMOUNT) sumApp,FUND_IMPLEMENTATION_ID from fund_implementation_detail group by FUND_IMPLEMENTATION_ID) temp1 on temp1" +
+                ".FUND_IMPLEMENTATION_ID = fi.id \n" +
                 "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
                 "left join (select sum(IFNULL(fs.PAID_AMT,0)) cumPayAmt,fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID from fund_special fs group by fs" +
                 ".FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp4 on temp4.FUND_IMPLEMENTATION_V_ID = fid.id and temp4.PM_PRJ_ID = fid.PM_PRJ_ID\n" +
@@ -151,8 +137,8 @@ public class FundStatisticalApi {
                 "left join (select sum(REACH_AMOUNT) sumJsAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '99952822476371282' " +
                 "group by \n" +
                 "FUND_SOURCE_TEXT) temp3 on temp3.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
-                "left join (select sum(APPROVED_AMOUNT) sumApp,FUND_IMP_ID from fund_implementation_detail group by FUND_IMP_ID) temp1 on temp1\n" +
-                ".FUND_IMP_ID = fi.id\n" +
+                "left join (select sum(APPROVED_AMOUNT) sumApp,FUND_IMPLEMENTATION_ID from fund_implementation_detail group by FUND_IMPLEMENTATION_ID) temp1 on temp1\n" +
+                ".FUND_IMPLEMENTATION_ID = fi.id\n" +
                 "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
                 "left join pm_prj pr on pr.id = fid.PM_PRJ_ID \n" +
                 "left join (select sum(IFNULL(fs.PAID_AMT,0)) cumPayAmt,fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID from fund_special fs group by fs" +

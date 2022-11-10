@@ -36,7 +36,8 @@ public class FundImplementationImportController {
 
     @SneakyThrows(IOException.class)
     @PostMapping(value = "/import")
-    public String importData(MultipartFile file) {
+    public Map<String, Object> importData(MultipartFile file) {
+        Map<String, Object> result = new HashMap<>();
         List<String> res = new ArrayList<>();
         List<FundImplementationExportModel> dataList = EasyExcelUtil.read(file.getInputStream(), FundImplementationExportModel.class);
         Map<String, List<FundImplementationExportModel>> data = dataList.stream().collect(Collectors.groupingBy(FundImplementationExportModel::getSourceName));
@@ -45,9 +46,13 @@ public class FundImplementationImportController {
             res = this.importData(data.get(key));
         }
         if (CollectionUtils.isEmpty(res)) {
-            return "导入成功！";
+            result.put("code", 200);
+            result.put("message", "导入成功！");
+            return result;
         } else {
-            return "导入失败！" + res.stream().collect(Collectors.joining(",")) + "不存在！";
+            result.put("code", 500);
+            result.put("message", "项目名称为:" + String.join(",", res) + "不存在，未导入！");
+            return result;
         }
     }
 
@@ -66,7 +71,7 @@ public class FundImplementationImportController {
         String id = Util.insertData(jdbcTemplate, "fund_implementation");
 
         jdbcTemplate.update("update fund_implementation set FUND_SOURCE_TEXT=?,FUND_CATEGORY_FIRST=?,DECLARED_AMOUNT=?,APPROVAL_TIME=? where ID=?",
-                modelList.get(0).getCategoryName(), typeId, 0, modelList.get(0).getApprovalTime(), id);
+                modelList.get(0).getSourceName(), typeId, 0, modelList.get(0).getApprovalTime(), id);
 
         List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from pm_prj where status='AP'");
         for (FundImplementationExportModel model : modelList) {

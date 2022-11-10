@@ -228,7 +228,7 @@ public class FundReachApi {
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuffer baseSql = new StringBuffer();
-        baseSql.append("select i.FUND_SOURCE_TEXT name from fund_implementation i left join fund_implementation_detail d on d.FUND_IMP_ID = i.id where 1=1 ");
+        baseSql.append("select i.FUND_SOURCE_TEXT name from fund_implementation i left join fund_implementation_detail d on d.fund_implementation_id = i.id where 1=1 ");
         if (Strings.isNotEmpty(prjId)) {
             baseSql.append("and d.PM_PRJ_ID = '" + prjId + "' ");
         }

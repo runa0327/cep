@@ -44,7 +44,7 @@ public class FundImplementationController extends BaseController {
                 "from fund_implementation i " +
                 "left join fund_type t1 on t1.id = i.FUND_CATEGORY_FIRST " +
                 "left join fund_type t2 on t2.id = i.FUND_CATEGORY_SECOND " +
-                "left join fund_implementation_detail d on d.FUND_IMP_ID = i.id " +
+                "left join fund_implementation_detail d on d.FUND_IMPLEMENTATION_ID = i.id " +
                 "left join pm_prj p on p.id = d.PM_PRJ_ID " +
                 "where 1 = 1 ");
         if (!Strings.isNullOrEmpty(sourceName)) {

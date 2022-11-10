@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = {"com.qygly.ext.rest.helper"})
 @Slf4j
-@EnableScheduling
+//@EnableScheduling
 @SpringBootApplication
 public class AppJob {
     public AppJob() {
