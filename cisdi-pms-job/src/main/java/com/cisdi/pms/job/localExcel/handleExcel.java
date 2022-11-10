@@ -1,7 +1,6 @@
 package com.cisdi.pms.job.localExcel;
 
 import com.cisdi.pms.job.utils.Util;
-import com.qygly.shared.end.F;
 import lombok.SneakyThrows;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -12,12 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -46,12 +44,46 @@ public class handleExcel {
 
     private final static Logger logger = LoggerFactory.getLogger(handleExcel.class);
 
-    @PostMapping("/doExcel")
-    public void doExcel(String url) throws Exception {
-
-        url = "G://测试.xlsx";
+    @GetMapping("/doExcel")
+    public void doExcel(@RequestParam("url") String url) throws Exception {
 
         logger.info("立项申请文件读取...");
+
+        boolean b = this.printFiles(new File(url));
+
+        String result = b == true ? "立项申请文件成功" : "立项申请文件失败";
+
+        logger.info(result);
+
+    }
+
+    public boolean printFiles(File dir) {
+        boolean directory = dir.isDirectory();
+        boolean aaaa = dir.isFile();
+        if (dir.exists() && dir.isDirectory()) {
+            File next[] = dir.listFiles();
+            File file = next[0];
+            String path = next[0].getPath();
+            for (int i = 0; i < next.length; i++) {
+                try {
+                    //获取当前文件的绝对路径
+                    String url = next[0].getPath();
+                    //保存文件
+                    this.saveFile(url);
+                    //递归
+                    if (next[i].isDirectory()) {
+                        printFiles(next[i]);
+                    }
+                    return true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
+    }
+
+    private void saveFile(String url) throws IOException {
         //获取到文件
         FileInputStream fileInputStream = new FileInputStream(url);
 
@@ -80,15 +112,18 @@ public class handleExcel {
         }
 
         //数据封装
-        LinkedHashMap<String, Object> map = extracted(mapTemp, new File(url));
+        LinkedHashMap<String, Object> map = null;
+        try {
+            map = extracted(mapTemp, new File(url));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         //保存
         String pmPrjReqId = Util.insertData(jdbcTemplate, "pm_prj_req");
         jdbcTemplate.update("update pm_prj_req set PRJ_NAME=?,CUSTOMER_UNIT=?,PRJ_MANAGE_MODE_ID=?,BASE_LOCATION_ID=?,PROJECT_TYPE_ID=?,CON_SCALE_TYPE_ID=?,CON_SCALE_QTY=?,FLOOR_AREA=?,QTY_ONE=?,QTY_THREE=?,CON_SCALE_QTY2=?,QTY_TWO=?,CON_SCALE_UOM_ID=?,PRJ_SITUATION=?,INVESTMENT_SOURCE_ID=?,PRJ_TOTAL_INVEST=?,PROJECT_AMT=?,CONSTRUCT_AMT=?,EQUIP_AMT=?,PROJECT_OTHER_AMT=?,LAND_AMT=?,EQUIP_AMT=?,PRJ_REQ_FILE=?,PRJ_REQ_REMARK=?,COMPL_PLAN_DATE=?,COMPL_DATE=?,AUTHOR=?,STAMPED_PRJ_REQ_FILE=?,PRJ_REPLY_PLAN_DATE=?,PRJ_REPLY_DATE=?,PRJ_REPLY_NO=?,CONSTRUCTION_PROJECT_CODE=?,REPLY_FILE=?,PRJ_DESIGN_USER_ID=?,PRJ_COST_USER_ID=? where ID=?",
                 map.get("PRJ_NAME"), map.get("CUSTOMER_UNIT"), map.get("PRJ_MANAGE_MODE_ID"), map.get("BASE_LOCATION_ID"), map.get("PROJECT_TYPE_ID"), map.get("CON_SCALE_TYPE_ID"), map.get("CON_SCALE_QTY"), map.get("FLOOR_AREA"), map.get("QTY_ONE"), map.get("QTY_THREE"), map.get("CON_SCALE_QTY2"), map.get("QTY_TWO"), map.get("CON_SCALE_UOM_ID"), map.get("PRJ_SITUATION"), map.get("INVESTMENT_SOURCE_ID"), map.get("PRJ_TOTAL_INVEST"), map.get("PROJECT_AMT"), map.get("CONSTRUCT_AMT"), map.get("EQUIP_AMT"), map.get("PROJECT_OTHER_AMT"), map.get("LAND_AMT"), map.get("EQUIP_AMT"), map.get("PRJ_REQ_FILE"), map.get("PRJ_REQ_REMARK"), map.get("COMPL_PLAN_DATE"), map.get("COMPL_DATE"), map.get("AUTHOR"), map.get("STAMPED_PRJ_REQ_FILE"), map.get("PRJ_REPLY_PLAN_DATE"), map.get("PRJ_REPLY_DATE"), map.get("PRJ_REPLY_NO"), map.get("CONSTRUCTION_PROJECT_CODE"), map.get("REPLY_FILE"), map.get("PRJ_DESIGN_USER_ID"), map.get("PRJ_COST_USER_I"),
                 pmPrjReqId);
-
-        logger.info("立项申请文件保存成功");
     }
 
     private LinkedHashMap<String, Object> extracted(Map<String, Object> map, File file) throws ParseException {
@@ -359,26 +394,26 @@ public class handleExcel {
     @SneakyThrows
     private void fileSave(String result, File file) {
         String str = result.substring(result.lastIndexOf("/") + 1);
-        String[] split = StringUtils.split(str,".");
+        String[] split = StringUtils.split(str, ".");
         String fileName = split[0];
         String fileType = split[1];
 
         //获取文件大小
-        long length = (file.length())/1024;
+        long length = (file.length()) / 1024;
         //获取当前时间
         String parse = getTime();
 
         //保存文件记录
         String pmPrjReqId = Util.insertData(jdbcTemplate, "fl_file");
         jdbcTemplate.update("update fl_file set CODE=?,NAME=?,FL_PATH_ID=?,EXT=?,CRT_USER_ID=?,LAST_MODI_USER_ID=?,SIZE_KB=?,UPLOAD_DTTM=?,PHYSICAL_LOCATION=?,DSP_NAME=?,DSP_SIZE=? where ID=?",
-                pmPrjReqId, fileName, "99250247095872688", fileType, "99250247095871681", "99250247095871681", length, parse , "/data/qygly/file/test/FileStore/" + str, fileName, length,
+                pmPrjReqId, fileName, "99250247095872688", fileType, "99250247095871681", "99250247095871681", length, parse, "/data/qygly/file/test/FileStore/" + str, fileName, length,
                 pmPrjReqId);
 
     }
 
     private String getTime() {
         Date date = new Date();
-        SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
         String parse = dateFormat.format(date);
         return parse;
     }

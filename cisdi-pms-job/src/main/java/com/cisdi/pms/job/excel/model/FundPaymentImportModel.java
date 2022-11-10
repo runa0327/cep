@@ -15,13 +15,13 @@ import lombok.Data;
 @Data
 public class FundPaymentImportModel {
 
-    @ExcelProperty("收款账户")
+    @ExcelProperty("资金大类")
     @ColumnWidth(value = 30)
-    private String receiveAccount;
+    private String fundCategoryFirst;
 
-    @ExcelProperty("收款银行")
+    @ExcelProperty("资金来源")
     @ColumnWidth(value = 30)
-    private String receiveBank;
+    private String fundImplementationVId;
 
     @ExcelProperty("到位资金类别")
     @ColumnWidth(value = 30)

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,10 @@ public class FundPaymentImportController {
         // 这里每次会读取100条数据 然后返回过来 直接调用使用数据就行
         List<FundPaymentImportModel> reads = EasyExcelUtil.read(file.getInputStream(), FundPaymentImportModel.class);
         try {
-            reads.stream().forEach(read -> this.importData(read));
+            //reads.stream().forEach(read -> this.importData(read));
+            for (FundPaymentImportModel read : reads) {
+                this.importData(read);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -55,10 +59,26 @@ public class FundPaymentImportController {
         List<Map<String, Object>> payId = jdbcTemplate.queryForList("select id from receiving_bank where name = ?", modelList.getPayUnit());
 
         //费用大类
-        List<Map<String, Object>> costId = jdbcTemplate.queryForList("select ID from GR_SET_VALUE where NAME=?", modelList.getReceiveAccount());
+        List<Map<String, Object>> costId = jdbcTemplate.queryForList("select ID from GR_SET_VALUE where NAME=?", modelList.getReceiptAccount());
+
+        if (costId.size() <= 0) {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("ID", null);
+            costId.add(0, map);
+        }
 
         //没有付款单位
-        if(payId.size() <= 0 || proId.size() <= 0){
+        if (payId.size() <= 0 || proId.size() <= 0) {
+            return;
+        }
+
+        //资金来源id
+        List<Map<String, Object>> sourceFundId = jdbcTemplate.queryForList("select fid.ID from fund_implementation fi left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id where fid.PM_PRJ_ID=?", proId.get(0).get("ID"));
+
+        //资金大类
+        List<Map<String, Object>> sourceTypeId = jdbcTemplate.queryForList("SELECT ID FROM FUND_TYPE T WHERE T.FUND_TYPE_PID IS NULL and NAME=?", modelList.getFundCategoryFirst());
+
+        if (sourceFundId.size() <= 0 || sourceTypeId.size() <= 0) {
             return;
         }
 
@@ -70,12 +90,12 @@ public class FundPaymentImportController {
 
         jdbcTemplate.update(
                 "update fund_pay_info set FUND_REACH_CATEGORY = ?,COST_CATEGORY_ID = ?,FEE_DETAIL = ? ,PAY_AMT = ?,PAY_UNIT = ?,RECEIPT_BANK = ?,RECEIPT_ACCOUNT = ?,PAYEE = ?,RECEIVE_BANK = ?,RECEIVE_ACCOUNT = ?,FUND_NEWLY_INCREASED_DETAIL_ID=? where ID = ?",
-                modelList.getFundReachCategory(), costId.get(0).get("ID"), modelList.getFeeDetail(), modelList.getPayAmt().replace(",",""), payId.get(0).get("id"), modelList.getReceiptBank(), modelList.getReceiptAccount(), modelList.getPayee(), modelList.getReceiveBank(), modelList.getReceiveAccount(), fundNewlyIncreasedDetailId,
+                modelList.getFundReachCategory(), costId.get(0).get("ID"), modelList.getFeeDetail(), modelList.getPayAmt().replace(",", ""), payId.get(0).get("id"), modelList.getReceiptBank(), modelList.getReceiptAccount(), modelList.getPayee(), modelList.getReceiptBank(), modelList.getReceiptAccount(), fundNewlyIncreasedDetailId,
                 fundPayInfoId);
 
         jdbcTemplate.update(
                 "update fund_newly_increased_detail set REMARK=?,ACCOUNT_SET=?,PM_PRJ_ID=?,CUSTOMER_UNIT=?,VOUCHER_NUM=?,FUND_IMPLEMENTATION_V_ID=?,FUND_CATEGORY_FIRST=? where ID=?",
-                modelList.getRemarke(), modelList.getAccountSet(), proId.get(0).get("id"), modelList.getCustomerUnit(), modelList.getVoucherNum(),"FUND_IMPLEMENTATION_V_ID","FUND_CATEGORY_FIRST",
+                modelList.getRemarke(), modelList.getAccountSet(), proId.get(0).get("id"), modelList.getCustomerUnit(), modelList.getVoucherNum(), sourceFundId.get(0).get("ID").toString(), sourceTypeId.get(0).get("ID"),
                 fundNewlyIncreasedDetailId);
 
     }
