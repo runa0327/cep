@@ -54,6 +54,9 @@ public class FundPaymentImportController {
         //查询付款单位
         List<Map<String, Object>> payId = jdbcTemplate.queryForList("select id from receiving_bank where name = ?", modelList.getPayUnit());
 
+        //费用大类
+        List<Map<String, Object>> costId = jdbcTemplate.queryForList("select ID from GR_SET_VALUE where NAME=?", modelList.getReceiveAccount());
+
         //没有付款单位
         if(payId.size() <= 0 || proId.size() <= 0){
             return;
@@ -67,12 +70,12 @@ public class FundPaymentImportController {
 
         jdbcTemplate.update(
                 "update fund_pay_info set FUND_REACH_CATEGORY = ?,COST_CATEGORY_ID = ?,FEE_DETAIL = ? ,PAY_AMT = ?,PAY_UNIT = ?,RECEIPT_BANK = ?,RECEIPT_ACCOUNT = ?,PAYEE = ?,RECEIVE_BANK = ?,RECEIVE_ACCOUNT = ?,FUND_NEWLY_INCREASED_DETAIL_ID=? where ID = ?",
-                modelList.getFundReachCategory(), "99902212142032084", modelList.getFeeDetail(), modelList.getPayAmt().replace(",",""), payId.get(0).get("id"), modelList.getReceiptBank(), modelList.getReceiptAccount(), modelList.getPayee(), modelList.getReceiveBank(), modelList.getReceiveAccount(), fundNewlyIncreasedDetailId,
+                modelList.getFundReachCategory(), costId.get(0).get("ID"), modelList.getFeeDetail(), modelList.getPayAmt().replace(",",""), payId.get(0).get("id"), modelList.getReceiptBank(), modelList.getReceiptAccount(), modelList.getPayee(), modelList.getReceiveBank(), modelList.getReceiveAccount(), fundNewlyIncreasedDetailId,
                 fundPayInfoId);
 
         jdbcTemplate.update(
-                "update fund_newly_increased_detail set REMARK=?,ACCOUNT_SET=?,PM_PRJ_ID=?,CUSTOMER_UNIT=?,VOUCHER_NUM=? where ID=?",
-                modelList.getRemarke(), modelList.getAccountSet(), proId.get(0).get("id"), modelList.getCustomerUnit(), modelList.getVoucherNum(),
+                "update fund_newly_increased_detail set REMARK=?,ACCOUNT_SET=?,PM_PRJ_ID=?,CUSTOMER_UNIT=?,VOUCHER_NUM=?,FUND_IMPLEMENTATION_V_ID=?,FUND_CATEGORY_FIRST=? where ID=?",
+                modelList.getRemarke(), modelList.getAccountSet(), proId.get(0).get("id"), modelList.getCustomerUnit(), modelList.getVoucherNum(),"FUND_IMPLEMENTATION_V_ID","FUND_CATEGORY_FIRST",
                 fundNewlyIncreasedDetailId);
 
     }
