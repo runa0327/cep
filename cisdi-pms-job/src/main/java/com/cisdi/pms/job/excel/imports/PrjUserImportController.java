@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,8 @@ public class PrjUserImportController {
     private JdbcTemplate jdbcTemplate;
 
     @PostMapping(value = "/importPrjUser")
-    public void importPrjUser(MultipartFile file){
+    public Map<String, Object> importPrjUser(MultipartFile file){
+        Map<String, Object> map = new HashMap<>();
         File excelFile = EasyExcelUtil.parseFile(file);
         if(excelFile == null || !excelFile.exists()){
             throw new RuntimeException("要解析的Excel文件不存在!");
@@ -46,6 +48,8 @@ public class PrjUserImportController {
         }
 
         String msg = importExcel(excelFile);
+        map.put("success",msg);
+        return map;
     }
 
     private String importExcel(File excelFile) {
@@ -73,10 +77,11 @@ public class PrjUserImportController {
             int rowEnd = hssfSheet.getLastRowNum();//总行数
 
             List<BasePrjPartyUser> importList = new ArrayList<>();
-            for (int i = 0; i < rowStart; i++) {
+            for (int i = 1; i <= rowEnd; i++) {
                 Row row = hssfSheet.getRow(i);
 
-                BasePrjPartyUser basePrjPartyUser = new BasePrjPartyUser();
+                BasePrjPartyUser basePrjPartyUser1 = new BasePrjPartyUser();
+                BasePrjPartyUser basePrjPartyUser2 = new BasePrjPartyUser();
 
                 //项目名称
                 String projectName = EasyExcelUtil.getCellValueAsString(row.getCell(1));
@@ -84,7 +89,8 @@ public class PrjUserImportController {
                 for (Map<String, Object> tmp : projectList) {
                     String name = JdbcMapUtil.getString(tmp,"name");
                     if (projectName.equals(name)){
-                        basePrjPartyUser.setPmPrjId(JdbcMapUtil.getString(tmp,"id"));
+                        basePrjPartyUser1.setPmPrjId(JdbcMapUtil.getString(tmp,"id"));
+                        basePrjPartyUser2.setPmPrjId(JdbcMapUtil.getString(tmp,"id"));
                     } else {
                         num1++;
                     }
@@ -94,15 +100,17 @@ public class PrjUserImportController {
                 }
 
                 //施工单位联系人
-                int num2 = 0;
+
                 String buildUser1 = EasyExcelUtil.getCellValueAsString(row.getCell(7));
                 StringBuffer userSB = new StringBuffer();
                 List<String> user = StringUtils.splitByCode(buildUser1,",");
                 for (String s : user) {
+                    int num2 = 0;
                     for (Map<String, Object> tmp : userList) {
                         String name = JdbcMapUtil.getString(tmp,"code");
                         if (s.equals(name)){
                             userSB = userSB.append(JdbcMapUtil.getString(tmp,"id")).append(",");
+                            break;
                         } else {
                             num2++;
                         }
@@ -111,46 +119,76 @@ public class PrjUserImportController {
                         errBuffer = errBuffer.append("没有找到 ’"+s+"' 的人员");
                     }
                 }
-                basePrjPartyUser.setPmPartyRoleId("99952822476391092");
-                basePrjPartyUser.setUserId(userSB.substring(0,userSB.length()-1));
-                importList.add(basePrjPartyUser);
+
+                if (userSB.length() > 0){
+                    basePrjPartyUser1.setPmPartyRoleId("99952822476391092");
+                    String buildUser = userSB.substring(0,userSB.length()-1);
+                    basePrjPartyUser1.setUserId(buildUser);
+                    importList.add(basePrjPartyUser1);
+                }
+
+
 
                 //监理单位联系人
-                int num3 = 0;
                 String buildUser2 = EasyExcelUtil.getCellValueAsString(row.getCell(10));
                 StringBuffer userSB2 = new StringBuffer();
                 List<String> user2 = StringUtils.splitByCode(buildUser2,",");
                 for (String s : user2) {
+                    int num3 = 0;
                     for (Map<String, Object> tmp : userList) {
                         String name = JdbcMapUtil.getString(tmp,"code");
                         if (s.equals(name)){
-                            userSB = userSB.append(JdbcMapUtil.getString(tmp,"id")).append(",");
+                            userSB2 = userSB2.append(JdbcMapUtil.getString(tmp,"id")).append(",");
+                            break;
                         } else {
-                            num2++;
+                            num3++;
                         }
                     }
-                    if (num2 == userList.size()){
+                    if (num3 == userList.size()){
                         errBuffer = errBuffer.append("没有找到 ’"+s+"' 的人员");
                     }
                 }
-                basePrjPartyUser.setPmPartyRoleId("99952822476391096");
-                basePrjPartyUser.setUserId(userSB2.substring(0,userSB2.length()-1));
-                importList.add(basePrjPartyUser);
+                if (userSB2.length()>0){
+                    basePrjPartyUser2.setPmPartyRoleId("99952822476391096");
+                    String reviewUser = userSB2.substring(0,userSB2.length()-1);
+                    basePrjPartyUser2.setUserId(reviewUser);
+                    importList.add(basePrjPartyUser2);
+                }
+
 
             }
 
             if (errBuffer.length() > 0){
                 return errBuffer.toString();
             } else {
-                for (BasePrjPartyUser tmp : importList) {
-                    String sql = "insert into BASE_PRJ_PARTY_USER (id,PM_PRJ_ID,PM_PARTY_ROLE_ID,USER_IDS,status) values ((select uuid_short()),?,?,?,'AP')";
-                    jdbcTemplate.update(sql,tmp.getPmPrjId(),tmp.getPmPartyRoleId(),tmp.getUserId());
+                if (!CollectionUtils.isEmpty(importList)){
+                    int success = 0;
+                    for (BasePrjPartyUser tmp : importList) {
+                        int num = 0;
+                        String sql = "";
+                        String prj = tmp.getPmPrjId();
+                        String roleId = tmp.getPmPartyRoleId();
+                        String userId = tmp.getUserId();
+                        //查询该项目该类型角色是否已存在
+                        String sql3 = "select * from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = ?";
+                        List<Map<String,Object>> list3 = jdbcTemplate.queryForList(sql3,prj,roleId);
+                        if (CollectionUtils.isEmpty(list3)){
+                            sql = "insert into BASE_PRJ_PARTY_USER (id,VER,PM_PRJ_ID,PM_PARTY_ROLE_ID,USER_IDS,status) values ((select uuid_short()),'1',?,?,?,'AP')";
+                            num = jdbcTemplate.update(sql,prj,roleId,userId);
+                        } else {
+                            sql = "update BASE_PRJ_PARTY_USER set USER_IDS = ? where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = ?";
+                            num = jdbcTemplate.update(sql,userId,prj,roleId);
+                        }
+
+                        success = success + num;
+                    }
+                    msg = "成功："+success+" 条数据";
                 }
+
             }
 
-
         } catch (Exception e){
-
+            e.printStackTrace();
         }
         return msg;
     }
