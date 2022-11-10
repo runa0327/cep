@@ -17,9 +17,11 @@ spring:
     listener:
       simple:
         # 单个队列的并发消费者的最小数量：
-        concurrency: 3
+        concurrency: 5
         # 单个队列的并发消费者的最大数量：
         max-concurrency: 10
 
 server:
   port: 11117
+
+mq-queue: qygly-wf-callback-queue-test

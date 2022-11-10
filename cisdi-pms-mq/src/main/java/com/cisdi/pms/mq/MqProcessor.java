@@ -24,6 +24,12 @@ public class MqProcessor {
         String db = jdbcTemplate.queryForMap("select database() db").get("db").toString();
         log.info(db);
 
+        // 回调信息的组织信息的代码：
+        String orgCode = callbackInfo.orgInfo.code;
+        if(!db.equalsIgnoreCase(orgCode)){
+            return;
+        }
+
         // 放入map，便于查找：
         CallbackAttMap map = new CallbackAttMap();
         for (CallbackAtt callbackAtt : callbackInfo.attList) {

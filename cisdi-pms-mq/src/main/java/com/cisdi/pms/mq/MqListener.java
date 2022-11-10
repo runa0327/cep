@@ -16,7 +16,7 @@ public class MqListener {
     @Resource
     MqProcessor processor;
 
-    @RabbitListener(queues = "qygly-wf-callback-queue")
+    @RabbitListener(queues = "${mq-queue}")
     public void receiver0(CallbackInfo callbackInfo) throws ParseException {
         processor.process(callbackInfo);
     }
