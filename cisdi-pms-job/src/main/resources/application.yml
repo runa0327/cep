@@ -81,3 +81,24 @@ cisdi-pms-job:
   remind-real-user: false
   # true：开启   false：关闭
   sms-switch: false
+
+
+flylog:
+  log_sent_mode: thrift
+  flume_agent: 10.100.7.219:4143
+  platform: gcxmxtxxxt
+  application: web
+  flume_batch_size: 1
+  sink_batch_size: 1
+  enabled: true
+  ignore:
+    static:
+      res: css,html,js,jpg,png,bmp,faicon,gif,ico,woff,otf,svg,ttf,woff2,eot,json
+  flume_data_path: E:/iflytek/dir/web
+
+
+logging:
+#  config: classpath:/log4j-info.xml
+  level:
+    root: info
+    com.itcodai.course03.dao: trace

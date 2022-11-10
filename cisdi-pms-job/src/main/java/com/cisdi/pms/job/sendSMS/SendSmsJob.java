@@ -5,6 +5,8 @@ import com.cisdi.pms.job.utils.SendSmsParamsUtils;
 import com.cisdi.pms.job.utils.SendSmsUtils;
 import com.qygly.ext.rest.helper.feign.client.DataFeignClient;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,7 +14,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,6 +28,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SendSmsJob {
 
+    private static final Logger logger = LoggerFactory.getLogger(SendSmsJob.class);
+
     @Autowired
     JdbcTemplate jdbcTemplate;
 
@@ -36,8 +39,8 @@ public class SendSmsJob {
     @Value("${cisdi-pms-job.sms-switch}")
     boolean smsSwitch;
 
-    @Scheduled(fixedDelayString = "60000")
-    // @Scheduled(fixedDelayString = "${spring.scheduled.fixedDelayString}")
+    //@Scheduled(fixedDelayString = "5000")
+    //@Scheduled(fixedDelayString = "60000")
     public void sendSMS() {
         //开关短信功能
         if (!smsSwitch){
@@ -56,6 +59,8 @@ public class SendSmsJob {
                 result.forEach(remindLog -> {
                     // 发送短信
                     this.sendSms(remindLog);
+
+                    logger.info("日志发送，接收人：{}",remindLog.getUserId());
                     // 记录日志
                     this.insertRemindLog(remindLog);
 

@@ -55,7 +55,7 @@ public class FundPaymentImportController {
         List<Map<String, Object>> payId = jdbcTemplate.queryForList("select id from receiving_bank where name = ?", modelList.getPayUnit());
 
         //没有付款单位
-        if(payId.size() <= 0){
+        if(payId.size() <= 0 || proId.size() <= 0){
             return;
         }
 
