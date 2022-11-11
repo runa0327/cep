@@ -2537,7 +2537,7 @@ public class AttLinkExt {
         AttLinkResult attLinkResult = new AttLinkResult();
 
         // 根据id查询招投标信息
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTRACT_CODE, CONTRACT_CATEGORY_ONE_ID, CONTRACT_NAME, CONTRACT_PRICE, " +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CUSTOMER_UNIT_ONE,CONTRACT_CODE, CONTRACT_CATEGORY_ONE_ID, CONTRACT_NAME, CONTRACT_PRICE, " +
                 "PM_BID_KEEP_FILE_REQ_ID,BID_CTL_PRICE_LAUNCH,WINNING_BIDS_AMOUNT,PLAN_TOTAL_DAYS," +
                 "IS_REFER_GUARANTEE_ID,GUARANTEE_LETTER_TYPE_IDS,YES_NO_THREE,BUY_TYPE_ID,WIN_BID_UNIT_ONE " +
                 "from po_order_req where id = ?", attValue);
@@ -2568,6 +2568,21 @@ public class AttLinkExt {
             linkedAtt.value = id;
             linkedAtt.text = name;
             attLinkResult.attMap.put("CONTRACT_CATEGORY_ONE_ID", linkedAtt);
+        }
+        //合同签订公司
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            String id = JdbcMapUtil.getString(row, "CUSTOMER_UNIT_ONE");
+            String name = "";
+            String sql2 = "select name from gr_set_value where id = ?";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,id);
+            if (!CollectionUtils.isEmpty(list2)){
+                name = JdbcMapUtil.getString(list2.get(0),"name");
+            }
+            linkedAtt.value = id;
+            linkedAtt.text = name;
+            attLinkResult.attMap.put("CUSTOMER_UNIT_ONE", linkedAtt);
         }
         // 关联招采
         {

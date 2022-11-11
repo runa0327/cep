@@ -130,7 +130,7 @@ public class WfPrjExt {
 
             List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1);
             if (CollectionUtils.isEmpty(list1)){
-                throw new BaseException("下一节点“合同签订-法务审核”暂未配置代办人员！");
+                throw new BaseException("下一节点“法务审核”暂未配置代办人员！");
             }
             List<String> userList = list1.stream().map(p->JdbcMapUtil.getString(p,"AD_USER_ID")).collect(Collectors.toList());
 
@@ -167,7 +167,7 @@ public class WfPrjExt {
                 list2 = myJdbcTemplate.queryForList(sql2);
             }
             if (CollectionUtils.isEmpty(list1)){
-                throw new BaseException("下一节点“合同签订-财务审核”暂未配置代办人员！");
+                throw new BaseException("下一节点“财务审核”暂未配置代办人员！");
             }
             List<String> userList = list1.stream().map(p->JdbcMapUtil.getString(p,"AD_USER_ID")).collect(Collectors.toList());
             List<String> userList2 = new ArrayList<>();
