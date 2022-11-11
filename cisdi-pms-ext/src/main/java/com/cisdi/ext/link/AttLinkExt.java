@@ -53,7 +53,7 @@ public class AttLinkExt {
         } else if ("PM_PRJ_ID".equals(attCode)) {
             return linkForPM_PRJ_ID(myJdbcTemplate, attValue, entCode);
         } else if ("PMS_RELEASE_WAY_ID".equals(attCode) || "GUARANTEE_LETTER_TYPE_ID".equals(attCode) || "CONTRACT_CATEGORY_ID".equals(attCode) || "PRJ_MANAGE_MODE_ID".equals(attCode)) {
-            return linkForMany(myJdbcTemplate, attCode, attValue);
+            return linkForMany(myJdbcTemplate, attCode, attValue, entCode);
         } else if ("BIDDING_NAME_ID".equals(attCode)) {
             return linkForBIDDING_NAME_ID(myJdbcTemplate, attValue, sevId);
         } else if ("CONTRACT_ID".equals(attCode)) {
@@ -1640,7 +1640,7 @@ public class AttLinkExt {
         return attLinkResult;
     }
 
-    private AttLinkResult linkForMany(MyJdbcTemplate myJdbcTemplate, String attCode, String attValue) {
+    private AttLinkResult linkForMany(MyJdbcTemplate myJdbcTemplate, String attCode, String attValue,String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
 
         // 1.PMS_RELEASE_WAY_ID 招标类别下拉框
@@ -1664,6 +1664,26 @@ public class AttLinkExt {
             linkedAtt.text = JdbcMapUtil.getString(row, "name");
 
             attLinkResult.attMap.put(attCode, linkedAtt);
+        }
+
+
+        if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode)){
+            String name = JdbcMapUtil.getString(list.get(0),"name");
+            Boolean changeToMandatory = false;
+            Boolean changeToEditable = false;
+            if (name.contains("其他")){
+                changeToMandatory = true;
+                changeToEditable = true;
+            }
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToMandatory = changeToMandatory;
+                linkedAtt.changeToEditable = changeToEditable;
+                attLinkResult.attMap.put("REMARK_ONE", linkedAtt);
+            }
         }
 
         return attLinkResult;
@@ -3036,11 +3056,11 @@ public class AttLinkExt {
         Boolean otherShow = true; //其他显示
         Boolean seaShow = true; //海域面积显示
 
-        Boolean areaEdit = false; //面积不可改
-        Boolean lengthEdit = false; //长不可改
-        Boolean widthEdit = false; //宽不可改
-        Boolean otherEdit = false; //其他不可改
-        Boolean seaEdit = false; //海域面积不可改
+        Boolean areaEdit = true; //面积不可改
+        Boolean lengthEdit = true; //长不可改
+        Boolean widthEdit = true; //宽不可改
+        Boolean otherEdit = true; //其他不可改
+        Boolean seaEdit = true; //海域面积不可改
 
         Boolean areaMustEdit = true; //面积必填
         Boolean lengthMustEdit = true; //长必填

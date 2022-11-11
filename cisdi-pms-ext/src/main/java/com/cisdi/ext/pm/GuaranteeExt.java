@@ -1,5 +1,6 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.util.ConvertUtils;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -181,19 +182,29 @@ public class GuaranteeExt {
     public void checkData(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        //退还原因  99902212142025881 = 到期申请退还，之后续保;  99902212142025882 = 达到退保条件，申请退保; 99902212142025883 = 其他
-        String reason = JdbcMapUtil.getString(entityRecord.valueMap,"REASON");
-        //原因说明
-        String remark = JdbcMapUtil.getString(entityRecord.valueMap,"REASON_EXPLAIN");
-        if ("99902212142025881".equals(reason)){
-            if (!SharedUtil.isEmptyString(remark)){
-                throw new BaseException("退还原因选择‘到期申请退还，之后续保’，请勿再继续填写原因说明！");
+        //流程id
+        String id = entityRecord.csCommId;
+        //获取金额
+        Double amt1 = JdbcMapUtil.getDouble(entityRecord.valueMap,"GUARANTEE_AMT");
+        String amt = String.valueOf(amt1);
+        int index = amt.indexOf(".");
+        String num1 = "";
+        String num2 = "";
+        String res = "";
+        StringBuffer sb = new StringBuffer();
+        if (index == -1){ //整数
+            sb.append(ConvertUtils.convertChina(Integer.valueOf(amt))).append("元整");
+        } else { //小数
+            num1 = amt.substring(0,index);
+            num2 = amt.substring(index+1,amt.length());
+            if (num2.length() > 2){
+                throw new BaseException("金额只能到分");
             }
-        } else {
-            if (SharedUtil.isEmptyString(remark)){
-                throw new BaseException("请填写原因说明！");
-            }
+            sb.append(ConvertUtils.convertChina(Integer.valueOf(num1))).append("元");
+            sb.append(ConvertUtils.convertFen(num2));
         }
+        String sql = "update PO_GUARANTEE_LETTER_RETURN_OA_REQ set REMARK_TWO = ? where id = ?";
+        int num = myJdbcTemplate.update(sql,sb.toString(),id);
     }
 
 }
