@@ -3516,17 +3516,17 @@ public class AttLinkExt {
             attLinkResult.attMap.put("PRJ_INTRODUCE", linkedAtt);
         }
         // 批复文号
-        Map resultRow = getReplyNo(attValue);
-        String value = JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");;
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "REPLY_NO_WR")) ? null:JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "REPLY_NO_WR")) ? null:JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
-
-            attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
-            attLinkResult.attMap.put("REPLY_NO", linkedAtt);
-        }
+//        Map resultRow = getReplyNo(attValue);
+//        String value = JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");;
+//        {
+//            LinkedAtt linkedAtt = new LinkedAtt();
+//            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+//            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "REPLY_NO_WR")) ? null:JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
+//            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "REPLY_NO_WR")) ? null:JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
+//
+//            attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
+//            attLinkResult.attMap.put("REPLY_NO", linkedAtt);
+//        }
         // 批复日期
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -4051,6 +4051,7 @@ public class AttLinkExt {
         list.add("EXPENSE_CLAIM_APPROVAL"); // 费用索赔报审表
         list.add("PROJECT_CLAIM_NOTICE"); // 工程索赔通知书
         list.add("APPROVAL_INSPECTION"); // 报审、报验
+        list.add("PM_BUILD_PROGRESS_REQ"); // 施工进度计划
         return list;
     }
 
