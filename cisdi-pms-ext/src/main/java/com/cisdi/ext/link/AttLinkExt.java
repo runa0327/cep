@@ -1694,21 +1694,21 @@ public class AttLinkExt {
 
         // 资金需求项目名称(AMOUT_PM_PRJ_ID),引用（单值）
         // 项目基础信息
-        List<Map<String, Object>> list = myJdbcTemplate
-                .queryForList("select t.PRJ_CODE as prj_code,t.code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
-                        "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,st.id st_id,st.name st_name," +
-                        "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
-                        "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.PRJ_CODE, " +
-                        "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS', " +
-                        "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD', " +
-                        "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget', " +
-                        "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE " +
-                        "from pm_prj t join PM_PARTY c on t.id=? and t.CUSTOMER_UNIT=c.id " +
-                        "join gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
-                        "join gr_set_value l on t.BASE_LOCATION_ID=l.id " +
-                        "join gr_set_value pt on t.PROJECT_TYPE_ID=pt.id " +
-                        "join gr_set_value st on t.CON_SCALE_TYPE_ID=st.id " +
-                        "join gr_set_value su on t.CON_SCALE_UOM_ID=su.id", attValue);
+        String sql1 = "select t.PRJ_CODE as prj_code,t.code code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
+                "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,st.id st_id,st.name st_name," +
+                "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
+                "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.BUILDING_AREA, " +
+                "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS'," +
+                "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD'," +
+                "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget'," +
+                "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE " +
+                "from pm_prj t join PM_PARTY c on t.CUSTOMER_UNIT=c.id " +
+                "LEFT JOIN gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
+                "LEFT JOIN gr_set_value l on t.BASE_LOCATION_ID=l.id " +
+                "LEFT JOIN gr_set_value pt on t.PROJECT_TYPE_ID=pt.id " +
+                "LEFT JOIN gr_set_value st on t.CON_SCALE_TYPE_ID=st.id " +
+                "LEFT JOIN gr_set_value su on t.CON_SCALE_UOM_ID=su.id where t.id=? ";
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql1, attValue);
         if (CollectionUtils.isEmpty(list)) {
 //            throw new BaseException("项目的相关属性不完整！");
             return attLinkResult;
@@ -3203,21 +3203,21 @@ public class AttLinkExt {
         }
 
         // 项目基础信息
-        List<Map<String, Object>> list = myJdbcTemplate
-                .queryForList("select t.PRJ_CODE as prj_code,t.code code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
-                        "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,st.id st_id,st.name st_name," +
-                        "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
-                        "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.BUILDING_AREA, " +
-                        "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS', " +
-                        "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD', " +
-                        "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget', " +
-                        "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE " +
-                        "from pm_prj t join PM_PARTY c on t.id=? and t.CUSTOMER_UNIT=c.id " +
-                        "join gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
-                        "join gr_set_value l on t.BASE_LOCATION_ID=l.id " +
-                        "join gr_set_value pt on t.PROJECT_TYPE_ID=pt.id " +
-                        "join gr_set_value st on t.CON_SCALE_TYPE_ID=st.id " +
-                        "join gr_set_value su on t.CON_SCALE_UOM_ID=su.id", attValue);
+        String sql1 = "select t.PRJ_CODE as prj_code,t.code code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
+                "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,st.id st_id,st.name st_name," +
+                "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
+                "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.BUILDING_AREA, " +
+                "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS'," +
+                "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD'," +
+                "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget'," +
+                "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE " +
+                "from pm_prj t join PM_PARTY c on t.CUSTOMER_UNIT=c.id " +
+                "LEFT JOIN gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
+                "LEFT JOIN gr_set_value l on t.BASE_LOCATION_ID=l.id " +
+                "LEFT JOIN gr_set_value pt on t.PROJECT_TYPE_ID=pt.id " +
+                "LEFT JOIN gr_set_value st on t.CON_SCALE_TYPE_ID=st.id " +
+                "LEFT JOIN gr_set_value su on t.CON_SCALE_UOM_ID=su.id where t.id=? ";
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql1, attValue);
 
 
 //        if (CollectionUtils.isEmpty(list)) {
@@ -3392,47 +3392,50 @@ public class AttLinkExt {
         Boolean floorAreaMustEdit = true; //占地面积必填
 
         String name1 = JdbcMapUtil.getString(row, "st_name");
-        if (name1.contains("面积")){
-            if (name1.contains("海域")){
-                lengthShow = false;
-                widthShow = false;
-                otherShow = false;
-                lengthMustEdit = false;
-                widthMustEdit = false;
-                otherMustEdit = false;
+        if (!SharedUtil.isEmptyString(name1)){
+            if (name1.contains("面积")){
+                if (name1.contains("海域")){
+                    lengthShow = false;
+                    widthShow = false;
+                    otherShow = false;
+                    lengthMustEdit = false;
+                    widthMustEdit = false;
+                    otherMustEdit = false;
+                    areashow = false;
+                    areaMustEdit = false;
+                } else if (name1.contains("建筑面积")){
+                    lengthShow = false;
+                    widthShow = false;
+                    otherShow = false;
+                    lengthMustEdit = false;
+                    widthMustEdit = false;
+                    otherMustEdit = false;
+                    seaShow = false;
+                    seaMustEdit = false;
+                }
+
+            } else if (name1.contains("长宽")){
                 areashow = false;
-                areaMustEdit = false;
-            } else if (name1.contains("建筑面积")){
-                lengthShow = false;
-                widthShow = false;
                 otherShow = false;
-                lengthMustEdit = false;
-                widthMustEdit = false;
+                areaMustEdit = false;
                 otherMustEdit = false;
                 seaShow = false;
                 seaMustEdit = false;
+            } else {
+                if (name1.contains("市政管线")){
+                    floorAreaMustEdit = false;
+                }
+                areashow = false;
+                lengthShow = false;
+                widthShow = false;
+                areaMustEdit = false;
+                lengthMustEdit = false;
+                widthMustEdit = false;
+                seaShow = false;
+                seaMustEdit = false;
             }
-
-        } else if (name1.contains("长宽")){
-            areashow = false;
-            otherShow = false;
-            areaMustEdit = false;
-            otherMustEdit = false;
-            seaShow = false;
-            seaMustEdit = false;
-        } else {
-            if (name1.contains("市政管线")){
-                floorAreaMustEdit = false;
-            }
-            areashow = false;
-            lengthShow = false;
-            widthShow = false;
-            areaMustEdit = false;
-            lengthMustEdit = false;
-            widthMustEdit = false;
-            seaShow = false;
-            seaMustEdit = false;
         }
+
         // 占地面积
         {
             LinkedAtt linkedAtt = new LinkedAtt();
