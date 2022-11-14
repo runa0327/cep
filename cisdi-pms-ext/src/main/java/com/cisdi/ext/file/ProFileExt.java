@@ -147,7 +147,7 @@ public class ProFileExt {
         sbFile.append("select fl.id as id,fl.`NAME`as name,us.`NAME` as upload_user,round(SIZE_KB,2) as size,UPLOAD_DTTM as upload_time,FILE_ATTACHMENT_URL as url ,'2' as type,'' as pid ,ext,0 as file_count,fo.id as  folder_id from FL_FILE fl " +
                 "left join PF_FILE PF on fl.id = pf.FL_FILE_ID " +
                 "left join pf_folder fo on fo.id = pf.PF_FOLDER_ID " +
-                "left join  ad_user us on pf.CHIEF_USER_ID = us.id where fo.PM_PRJ_ID= '" + projectId + "'");
+                "left join  ad_user us on fl.CRT_USER_ID = us.id where fo.PM_PRJ_ID= '" + projectId + "'");
 
         if (Strings.isNotEmpty(pfFolderId)) {
             sbFolder.append(" and PF_FOLDER_PID='" + pfFolderId + "'");
@@ -191,7 +191,16 @@ public class ProFileExt {
             fileInfo.name = JdbcMapUtil.getString(p, "name");
             fileInfo.uploadUser = JdbcMapUtil.getString(p, "upload_user");
             fileInfo.uploadTime = JdbcMapUtil.getString(p, "upload_time");
-            fileInfo.size = JdbcMapUtil.getString(p, "size");
+            Integer originSize = JdbcMapUtil.getInt(p, "size");//换算前大小kb
+            if (originSize == null){
+                fileInfo.size = "0Kb";
+            } else if (originSize < 1024) {
+                fileInfo.size = originSize + "Kb";
+            } else if (originSize >= 1024 && originSize <1024 * 1024) {
+                fileInfo.size = new BigDecimal(originSize).divide(new BigDecimal(1024),2,BigDecimal.ROUND_HALF_UP) + "M";
+            } else {
+                fileInfo.size = new BigDecimal(originSize).divide(new BigDecimal(1024 * 1024),2,BigDecimal.ROUND_HALF_UP) + "G";
+            }
             fileInfo.url = JdbcMapUtil.getString(p, "url");
             fileInfo.type = JdbcMapUtil.getString(p, "type");
             fileInfo.ext = JdbcMapUtil.getString(p, "ext");
