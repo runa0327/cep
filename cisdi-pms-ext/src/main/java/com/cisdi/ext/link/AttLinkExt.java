@@ -1694,7 +1694,7 @@ public class AttLinkExt {
 
         // 资金需求项目名称(AMOUT_PM_PRJ_ID),引用（单值）
         // 项目基础信息
-        String sql1 = "select t.PRJ_CODE as prj_code,t.code code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
+        String sql0 = "select t.PRJ_CODE as prj_code,t.code code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
                 "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,st.id st_id,st.name st_name," +
                 "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
                 "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.BUILDING_AREA, " +
@@ -1708,7 +1708,7 @@ public class AttLinkExt {
                 "LEFT JOIN gr_set_value pt on t.PROJECT_TYPE_ID=pt.id " +
                 "LEFT JOIN gr_set_value st on t.CON_SCALE_TYPE_ID=st.id " +
                 "LEFT JOIN gr_set_value su on t.CON_SCALE_UOM_ID=su.id where t.id=? ";
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql1, attValue);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql0, attValue);
         if (CollectionUtils.isEmpty(list)) {
 //            throw new BaseException("项目的相关属性不完整！");
             return attLinkResult;
