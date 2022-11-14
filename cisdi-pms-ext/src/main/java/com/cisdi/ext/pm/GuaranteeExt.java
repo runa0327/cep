@@ -1,5 +1,6 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.util.AmtUtil;
 import com.cisdi.ext.util.ConvertUtils;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -185,26 +186,10 @@ public class GuaranteeExt {
         //流程id
         String id = entityRecord.csCommId;
         //获取金额
-        Double amt1 = JdbcMapUtil.getDouble(entityRecord.valueMap,"GUARANTEE_AMT");
-        String amt = String.valueOf(amt1);
-        int index = amt.indexOf(".");
-        String num1 = "";
-        String num2 = "";
-        String res = "";
-        StringBuffer sb = new StringBuffer();
-        if (index == -1){ //整数
-            sb.append(ConvertUtils.convertChina(Integer.valueOf(amt))).append("元整");
-        } else { //小数
-            num1 = amt.substring(0,index);
-            num2 = amt.substring(index+1,amt.length());
-            if (num2.length() > 2){
-                throw new BaseException("金额只能到分");
-            }
-            sb.append(ConvertUtils.convertChina(Integer.valueOf(num1))).append("元");
-            sb.append(ConvertUtils.convertFen(num2));
-        }
+        String amt = JdbcMapUtil.getString(entityRecord.valueMap,"AMT_WR_ONE");
+        String amtChina = AmtUtil.number2CNMontrayUnit(new BigDecimal(amt));
         String sql = "update PO_GUARANTEE_LETTER_RETURN_OA_REQ set REMARK_TWO = ? where id = ?";
-        int num = myJdbcTemplate.update(sql,sb.toString(),id);
+        int num = myJdbcTemplate.update(sql,amtChina,id);
     }
 
 }
