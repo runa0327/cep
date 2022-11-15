@@ -104,10 +104,69 @@ public class AttLinkExt {
             return linkCUSTOMER_UNIT_ONE(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("PROJECT_SOURCE_TYPE_ID".equals(attCode)){ // 项目来源 属性联动
             return linkPROJECT_SOURCE_TYPE_ID(myJdbcTemplate, attValue, entCode,sevId,param);
-        }  else {
+        }else if ("ORDER_DEMAND_TYPE".equals(attCode)){ //合同需求类型
+            return linkORDER_DEMAND_TYPE(myJdbcTemplate,attValue,entCode);
+        } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
 
+    }
+
+    private AttLinkResult linkORDER_DEMAND_TYPE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        if ("PO_ORDER_CHANGE_REQ".equals(entCode)){//合同变更（合同需求审批） 选择合同签订时，隐藏合同名称、变更类型项
+            if ("100031468512033570".equals(attValue)){//选择合同签订
+                //合同名称
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToMandatory = false;
+                    linkedAtt.changeToShown = false;
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("CONTRACT_ID",linkedAtt);
+                }
+
+                //变更类型
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToMandatory = false;
+                    linkedAtt.changeToShown = false;
+                    linkedAtt.changeToEditable = false;
+                    attLinkResult.attMap.put("ORDER_CHANGE_TYPE",linkedAtt);
+                }
+            }
+            if ("100031468512033571".equals(attValue)){ //选择合同变更
+                //合同名称
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToMandatory = true;
+                    linkedAtt.changeToShown = true;
+                    linkedAtt.changeToEditable = true;
+                    attLinkResult.attMap.put("CONTRACT_ID",linkedAtt);
+                }
+
+                //变更类型
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToMandatory = true;
+                    linkedAtt.changeToShown = true;
+                    linkedAtt.changeToEditable = true;
+                    attLinkResult.attMap.put("ORDER_CHANGE_TYPE",linkedAtt);
+                }
+            }
+        }
+        return attLinkResult;
     }
 
     // 项目来源 属性联动
