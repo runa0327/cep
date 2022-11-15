@@ -3,6 +3,7 @@ package com.cisdi.pms.job.excel.imports;
 import com.cisdi.pms.job.excel.model.FundSpecialModel;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
 import com.cisdi.pms.job.utils.Util;
+import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -56,13 +59,15 @@ public class FundSpecialImportController {
                 }
 
                 String id = Util.insertData(jdbcTemplate, "FUND_SPECIAL");
+                //支付码
+                String payCode = this.getPayCode(fundSpecialModel.getPayDate());
                 jdbcTemplate.update("update FUND_SPECIAL set PM_PRJ_ID=?,APPROVED_AMOUNT=?,CUM_REACH_AMT=?,CUM_PAY_AMT=?,NOT_REACH_AMT=?,CUM_BUILD_REACH_AMT=?," +
                                 "CUM_ACQ_REACH_AMT=?,SUR_REACH_AMT=?,FUND_REACH_CATEGORY=?,NPER=?,COST_NAME=?,PAY_UNIT=?,RECEIPT_BANK=?,RECEIPT_ACCOUNT=?,PAY_DATE=?," +
-                                "PAYABLE_AMT=?,PAID_AMT=?,UNPAD_AMT=?,PAYEE=?,GUARANTEE_STATES=?,APPROVAL_STATUS=?,FUND_IMPLEMENTATION_V_ID=? where ID=?",
+                                "PAYABLE_AMT=?,PAID_AMT=?,UNPAD_AMT=?,PAYEE=?,GUARANTEE_STATES=?,APPROVAL_STATUS=?,FUND_IMPLEMENTATION_V_ID=?,FUND_PAY_CODE=? where ID=?",
                         optional.get().get("ID"), fundSpecialModel.getApprovedAmount(), fundSpecialModel.getLjdwAmt(), fundSpecialModel.getPayAmt(), fundSpecialModel.getWdwAmt(),
                         fundSpecialModel.getJsAmt(), fundSpecialModel.getZcAmt(), fundSpecialModel.getSyAmt(), null, fundSpecialModel.getPeriods(), fundSpecialModel.getFeeName(),
                         unit, fundSpecialModel.getPayBank(), fundSpecialModel.getPayAccount(), fundSpecialModel.getPayDate(), fundSpecialModel.getYfAmt(),
-                        fundSpecialModel.getHasPayAmt(), 0, fundSpecialModel.getSkUnit(), fundSpecialModel.getBhqk(), fundSpecialModel.getStatus(), fundImplementationId, id);
+                        fundSpecialModel.getHasPayAmt(), 0, fundSpecialModel.getSkUnit(), fundSpecialModel.getBhqk(), fundSpecialModel.getStatus(), fundImplementationId, payCode, id);
 
             } else {
                 res.add(fundSpecialModel.getProjectName());
@@ -77,5 +82,20 @@ public class FundSpecialImportController {
             result.put("message", "项目名称为:" + String.join(",", res) + "不存在，未导入！");
             return result;
         }
+    }
+
+    private String getPayCode(Date payDate){
+        //支付明细码(FUND_PAY_CODE),文本（短）
+        //查询相同日期专项资金支付条数
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(payDate);
+        calendar.add(Calendar.DATE,1);
+        Date endDate = calendar.getTime();
+        Map<String, Object> countToday = jdbcTemplate.queryForMap("select count(*) countToday from fund_special where PAY_DATE >= ? and PAY_DATE < ?",payDate,endDate);
+        DecimalFormat df = new DecimalFormat("0000");
+        String suffixNum = df.format(JdbcMapUtil.getInt(countToday, "countToday") + 1);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String fundPayCode = "zf" + sdf.format(payDate) + suffixNum;
+        return fundPayCode;
     }
 }
