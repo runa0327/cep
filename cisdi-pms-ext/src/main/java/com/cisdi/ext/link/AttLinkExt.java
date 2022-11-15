@@ -283,7 +283,7 @@ public class AttLinkExt {
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
             linkedAtt.value = id;
             linkedAtt.text = name;
-            attLinkResult.attMap.put("HR_DEPT_ID",linkedAtt);
+            attLinkResult.attMap.put("HR_DEPT_LIST_ID",linkedAtt);
         }
         return attLinkResult;
     }
