@@ -130,6 +130,7 @@ public class AttLinkExt {
             Boolean EARTHWORK_APPLY_USERChangeToEditable = false; //申请人,默认不可改
             Boolean PRJ_REQ_FILEChangeToEditable = false; //申请材料,默认不可改
             Boolean REMARKChangeToEditable = false; //备注,默认不可改
+            Boolean PRJ_REQ_FILEChangeToMandatory = false; //申请材料,默认非必填
             //主体工程施工许可申请 组
             Boolean SUBJECT_APPLY_DATEChangeToShown = true; //申请时间,默认不显示
             Boolean SUBJECT_PLAN_COMPL_DATEChangeToShown = true; //计划完成日期,默认不显示
@@ -141,6 +142,7 @@ public class AttLinkExt {
             Boolean SUBJECT_APPLY_USERChangeToEditable = false; //申请人,默认不可改
             Boolean KEEP_RECORD_FILEChangeToEditable = false; //申请材料,默认不可改
             Boolean ACT_REMARKChangeToEditable = false; //备注,默认不可改
+            Boolean KEEP_RECORD_FILEChangeToMandatory = false; //申请材料,默认非必填
             if ("100031468512110542".equals(attValue)){
                 SUBJECT_APPLY_DATEChangeToShown = true;
                 SUBJECT_PLAN_COMPL_DATEChangeToShown = true;
@@ -152,6 +154,7 @@ public class AttLinkExt {
                 SUBJECT_APPLY_USERChangeToEditable = true;
                 KEEP_RECORD_FILEChangeToEditable = true;
                 ACT_REMARKChangeToEditable = true;
+                KEEP_RECORD_FILEChangeToMandatory = true;
             } else if ("100031468512110543".equals(attValue)){
                 EARTHWORK_APPLY_DATEChangeToShown = true;
                 COMPL_PLAN_DATE_APPLYChangeToShown = true;
@@ -163,6 +166,7 @@ public class AttLinkExt {
                 EARTHWORK_APPLY_USERChangeToEditable = true;
                 PRJ_REQ_FILEChangeToEditable = true;
                 REMARKChangeToEditable = true;
+                PRJ_REQ_FILEChangeToMandatory = true;
 
             }
             //申请时间
@@ -204,6 +208,7 @@ public class AttLinkExt {
                 linkedAtt.text = null;
                 linkedAtt.changeToShown = PRJ_REQ_FILEChangeToShown;
                 linkedAtt.changeToEditable = PRJ_REQ_FILEChangeToEditable;
+                linkedAtt.changeToMandatory = PRJ_REQ_FILEChangeToMandatory;
                 attLinkResult.attMap.put("PRJ_REQ_FILE",linkedAtt);
             }
             //备注
@@ -234,6 +239,7 @@ public class AttLinkExt {
                 linkedAtt.text = null;
                 linkedAtt.changeToShown = KEEP_RECORD_FILEChangeToShown;
                 linkedAtt.changeToEditable = KEEP_RECORD_FILEChangeToEditable;
+                linkedAtt.changeToMandatory = KEEP_RECORD_FILEChangeToMandatory;
                 attLinkResult.attMap.put("KEEP_RECORD_FILE",linkedAtt);
             }
             //申请人
