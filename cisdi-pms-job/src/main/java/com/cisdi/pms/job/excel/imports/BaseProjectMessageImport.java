@@ -114,20 +114,13 @@ public class BaseProjectMessageImport {
                 PmPrjInvest1Model pmPrjInvest1Model = new PmPrjInvest1Model();
                 PmPrjInvest2Model pmPrjInvest2Model = new PmPrjInvest2Model();
 
-                //项目实际名称
-                String trueName = EasyExcelUtil.getCellValueAsString(row.getCell(3));
-                if (!SharedUtil.isEmptyString(trueName)){
-                    pmPrjModel.setNAME(trueName);
-                }
-
                 //项目名称
                 String prjId = "";
                 String projectName = EasyExcelUtil.getCellValueAsString(row.getCell(1)).trim();
                 int num1 = 0;
                 for (Map<String, Object> tmp : projectList) {
                     String name = JdbcMapUtil.getString(tmp,"name");
-                    System.out.println(name);
-                    if (projectName.equals(name) || trueName.equals(name)){
+                    if (projectName.equals(name)){
                         prjId = JdbcMapUtil.getString(tmp,"id");
                         pmPrjModel.setId(prjId);
                         pmPrjModel.setNAME(name);
@@ -141,11 +134,7 @@ public class BaseProjectMessageImport {
                 }
                 if (SharedUtil.isEmptyString(prjId)){
                     prjId = Util.insertData(jdbcTemplate,"pm_prj");
-                    if (!SharedUtil.isEmptyString(trueName)){
-                        pmPrjModel.setNAME(trueName);
-                    } else {
-                        pmPrjModel.setNAME(projectName);
-                    }
+                    pmPrjModel.setNAME(projectName);
                     pmPrjModel.setId(prjId);
                     num4++;
                 }
@@ -162,7 +151,7 @@ public class BaseProjectMessageImport {
                 }
 
                 //业主单位
-                String unitName = EasyExcelUtil.getCellValueAsString(row.getCell(4));
+                String unitName = EasyExcelUtil.getCellValueAsString(row.getCell(3));
                 if (!SharedUtil.isEmptyString(unitName)){
                     for (Map<String, Object> tmp : partyList) {
                         if (unitName.equals(JdbcMapUtil.getString(tmp,"name"))){
@@ -173,7 +162,7 @@ public class BaseProjectMessageImport {
                 }
 
                 //项目管理模式
-                String prjMan = EasyExcelUtil.getCellValueAsString(row.getCell(5));
+                String prjMan = EasyExcelUtil.getCellValueAsString(row.getCell(4));
                 if (!SharedUtil.isEmptyString(unitName)){
                     for (Map<String, Object> tmp : prjManList) {
                         if (prjMan.equals(JdbcMapUtil.getString(tmp,"name"))){
@@ -184,7 +173,7 @@ public class BaseProjectMessageImport {
                 }
 
                 //建设地点
-                String local = EasyExcelUtil.getCellValueAsString(row.getCell(6));
+                String local = EasyExcelUtil.getCellValueAsString(row.getCell(5));
                 if (!SharedUtil.isEmptyString(unitName)){
                     for (Map<String, Object> tmp : localList) {
                         if (local.equals(JdbcMapUtil.getString(tmp,"name"))){
@@ -195,13 +184,13 @@ public class BaseProjectMessageImport {
                 }
 
                 //占地面积
-                String FLOOR_AREA = EasyExcelUtil.getCellValueAsString(row.getCell(7));
+                String FLOOR_AREA = EasyExcelUtil.getCellValueAsString(row.getCell(6));
                 if (!SharedUtil.isEmptyString(FLOOR_AREA)){
                     pmPrjModel.setFLOOR_AREA(FLOOR_AREA);
                 }
 
                 //项目类型
-                String prjType = EasyExcelUtil.getCellValueAsString(row.getCell(8));
+                String prjType = EasyExcelUtil.getCellValueAsString(row.getCell(7));
                 if (!SharedUtil.isEmptyString(prjType)){
                     for (Map<String, Object> tmp : prjTypeList) {
                         if (prjType.equals(JdbcMapUtil.getString(tmp,"name"))){
@@ -212,7 +201,7 @@ public class BaseProjectMessageImport {
                 }
 
                 //建设规模类型
-                String build = EasyExcelUtil.getCellValueAsString(row.getCell(9));
+                String build = EasyExcelUtil.getCellValueAsString(row.getCell(8));
                 if (!SharedUtil.isEmptyString(build)){
                     for (Map<String, Object> tmp : buildTypeList) {
                         if (build.equals(JdbcMapUtil.getString(tmp,"name"))){
@@ -223,37 +212,37 @@ public class BaseProjectMessageImport {
                 }
 
                 //长
-                String CON_SCALE_QTY = EasyExcelUtil.getCellValueAsString(row.getCell(10));
+                String CON_SCALE_QTY = EasyExcelUtil.getCellValueAsString(row.getCell(9));
                 if (!SharedUtil.isEmptyString(CON_SCALE_QTY)){
                     pmPrjModel.setCON_SCALE_QTY(CON_SCALE_QTY);
                 }
 
                 //宽
-                String CON_SCALE_QTY2 = EasyExcelUtil.getCellValueAsString(row.getCell(11));
+                String CON_SCALE_QTY2 = EasyExcelUtil.getCellValueAsString(row.getCell(10));
                 if (!SharedUtil.isEmptyString(CON_SCALE_QTY2)){
                     pmPrjModel.setCON_SCALE_QTY2(CON_SCALE_QTY2);
                 }
 
                 //建筑面积
-                String QTY_ONE = EasyExcelUtil.getCellValueAsString(row.getCell(12));
+                String QTY_ONE = EasyExcelUtil.getCellValueAsString(row.getCell(11));
                 if (!SharedUtil.isEmptyString(QTY_ONE)){
                     pmPrjModel.setQTY_ONE(QTY_ONE);
                 }
 
                 //海域面积
-                String QTY_THREE = EasyExcelUtil.getCellValueAsString(row.getCell(13));
+                String QTY_THREE = EasyExcelUtil.getCellValueAsString(row.getCell(12));
                 if (!SharedUtil.isEmptyString(QTY_THREE)){
                     pmPrjModel.setQTY_THREE(QTY_THREE);
                 }
 
                 //其他
-                String QTY_TWO = EasyExcelUtil.getCellValueAsString(row.getCell(14));
+                String QTY_TWO = EasyExcelUtil.getCellValueAsString(row.getCell(13));
                 if (!SharedUtil.isEmptyString(QTY_TWO)){
                     pmPrjModel.setQTY_TWO(QTY_TWO);
                 }
 
                 //建设规模单位
-                String buildUnit = EasyExcelUtil.getCellValueAsString(row.getCell(15));
+                String buildUnit = EasyExcelUtil.getCellValueAsString(row.getCell(14));
                 if (!SharedUtil.isEmptyString(buildUnit)){
                     for (Map<String, Object> tmp : buildUnitList) {
                         if (buildUnit.equals(JdbcMapUtil.getString(tmp,"name"))){
@@ -264,25 +253,25 @@ public class BaseProjectMessageImport {
                 }
 
                 //建设年限
-                String BUILD_YEARS = EasyExcelUtil.getCellValueAsString(row.getCell(16));
+                String BUILD_YEARS = EasyExcelUtil.getCellValueAsString(row.getCell(15));
                 if (!SharedUtil.isEmptyString(BUILD_YEARS)){
                     pmPrjModel.setBUILD_YEARS(BUILD_YEARS);
                 }
 
                 //项目介绍
-                String PRJ_SITUATION = EasyExcelUtil.getCellValueAsString(row.getCell(17));
+                String PRJ_SITUATION = EasyExcelUtil.getCellValueAsString(row.getCell(16));
                 if (!SharedUtil.isEmptyString(PRJ_SITUATION)){
                     pmPrjModel.setPRJ_SITUATION(PRJ_SITUATION);
                 }
 
                 //项目代码
-                String PRJ_CODE = EasyExcelUtil.getCellValueAsString(row.getCell(18));
+                String PRJ_CODE = EasyExcelUtil.getCellValueAsString(row.getCell(17));
                 if (!SharedUtil.isEmptyString(PRJ_CODE)){
                     pmPrjModel.setPRJ_CODE(PRJ_CODE);
                 }
 
                 //资金来源
-                String source = EasyExcelUtil.getCellValueAsString(row.getCell(21));
+                String source = EasyExcelUtil.getCellValueAsString(row.getCell(20));
                 if (!SharedUtil.isEmptyString(source)){
                     for (Map<String, Object> tmp : sourceList) {
                         if (source.equals(JdbcMapUtil.getString(tmp,"name"))){
@@ -295,26 +284,26 @@ public class BaseProjectMessageImport {
                 prjList.add(pmPrjModel);
 
                 //批复类型
-                String replyType = EasyExcelUtil.getCellValueAsString(row.getCell(19));
+                String replyType = EasyExcelUtil.getCellValueAsString(row.getCell(18));
                 if (!SharedUtil.isEmptyString(replyType)){
                     //批复文号
-                    String REPLY_NO_WR = EasyExcelUtil.getCellValueAsString(row.getCell(20));
+                    String REPLY_NO_WR = EasyExcelUtil.getCellValueAsString(row.getCell(19));
                     //总投资
-                    String PRJ_TOTAL_INVEST = EasyExcelUtil.getCellValueAsString(row.getCell(22));
+                    String PRJ_TOTAL_INVEST = EasyExcelUtil.getCellValueAsString(row.getCell(21));
                     //工程费用
-                    String PROJECT_AMT = EasyExcelUtil.getCellValueAsString(row.getCell(23));
+                    String PROJECT_AMT = EasyExcelUtil.getCellValueAsString(row.getCell(22));
                     //建安工程费
-                    String CONSTRUCT_AMT = EasyExcelUtil.getCellValueAsString(row.getCell(24));
+                    String CONSTRUCT_AMT = EasyExcelUtil.getCellValueAsString(row.getCell(23));
                     //设备费
-                    String EQUIP_AMT = EasyExcelUtil.getCellValueAsString(row.getCell(25));
+                    String EQUIP_AMT = EasyExcelUtil.getCellValueAsString(row.getCell(24));
                     //工程其他费用
-                    String PROJECT_OTHER_AMT = EasyExcelUtil.getCellValueAsString(row.getCell(26));
+                    String PROJECT_OTHER_AMT = EasyExcelUtil.getCellValueAsString(row.getCell(25));
                     //土地拆迁费
-                    String LAND_AMT = EasyExcelUtil.getCellValueAsString(row.getCell(27));
+                    String LAND_AMT = EasyExcelUtil.getCellValueAsString(row.getCell(26));
                     //预备费
-                    String PREPARE_AMT = EasyExcelUtil.getCellValueAsString(row.getCell(28));
+                    String PREPARE_AMT = EasyExcelUtil.getCellValueAsString(row.getCell(27));
                     //建设期利息
-                    String CONSTRUCT_PERIOD_INTEREST = EasyExcelUtil.getCellValueAsString(row.getCell(29));
+                    String CONSTRUCT_PERIOD_INTEREST = EasyExcelUtil.getCellValueAsString(row.getCell(28));
 
                     BigDecimal amt1 = getAmt(PRJ_TOTAL_INVEST);//总投资
                     BigDecimal amt2 = getAmt(PROJECT_AMT);//工程费用
@@ -361,7 +350,7 @@ public class BaseProjectMessageImport {
                 for (PmPrjModel tmp : prjList) {
                     String updateSql1 = "update pm_prj set LAST_MODI_DT = now(),VER = '99',NAME = ?,CUSTOMER_UNIT=?,PRJ_MANAGE_MODE_ID=?,BASE_LOCATION_ID=?,FLOOR_AREA=?,PROJECT_TYPE_ID=?," +
                             "CON_SCALE_TYPE_ID=?,CON_SCALE_QTY=?,QTY_ONE=?,QTY_TWO=?,QTY_THREE=?,CON_SCALE_QTY2=?,CON_SCALE_UOM_ID=?,BUILD_YEARS=?,PRJ_SITUATION=?,INVESTMENT_SOURCE_ID=?," +
-                            "PROJECT_PHASE_ID=?,PRJ_CODE=? where id = ?";
+                            "PROJECT_PHASE_ID=?,PRJ_CODE=?,PROJECT_SOURCE_TYPE_ID='99952822476441374' where id = ?";
                     int update1 = jdbcTemplate.update(updateSql1,tmp.getNAME(),tmp.getCUSTOMER_UNIT(),tmp.getPRJ_MANAGE_MODE_ID(),tmp.getBASE_LOCATION_ID(),tmp.getFLOOR_AREA(),tmp.getPROJECT_TYPE_ID(),
                             tmp.getCON_SCALE_TYPE_ID(),tmp.getCON_SCALE_QTY(),tmp.getQTY_ONE(),tmp.getQTY_TWO(),tmp.getQTY_THREE(),tmp.getCON_SCALE_QTY2(),tmp.getCON_SCALE_UOM_ID(),tmp.getBUILD_YEARS(),
                             tmp.getPRJ_SITUATION(),tmp.getINVESTMENT_SOURCE_ID(),tmp.getPROJECT_PHASE_ID(),tmp.getPRJ_CODE(),tmp.getId());
@@ -399,6 +388,7 @@ public class BaseProjectMessageImport {
         BigDecimal amt = new BigDecimal(0);
         BigDecimal wan = new BigDecimal(10000);
         if (!SharedUtil.isEmptyString(str)){
+            str = str.replace(" ","");
             amt = new BigDecimal(str).multiply(wan);
         }
         return amt;
