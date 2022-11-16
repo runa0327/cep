@@ -1,13 +1,9 @@
 package com.cisdi.pms.job.excel.imports;
 
-import ch.qos.logback.core.joran.conditional.IfAction;
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.read.listener.PageReadListener;
 import com.cisdi.pms.job.excel.model.FundReachExportModel;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
 import com.cisdi.pms.job.utils.Util;
 import com.google.common.base.Strings;
-import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author 尹涛 * @version V1.0.0
@@ -48,8 +41,8 @@ public class FundReachImportController {
         List<String> res = new ArrayList<>();
         List<Map<String, Object>> prjList = jdbcTemplate.queryForList("select id,name from pm_prj where status = 'AP'");
 
-        for (FundReachExportModel reachData : reachList) {
-            List<String> singleRes = this.insertReach(reachData, prjList);
+        for (int i = reachList.size() - 1; i >= 0; i--){//保证列表显示顺序和表格顺序一致
+            List<String> singleRes = this.insertReach(reachList.get(i), prjList);
             if (!CollectionUtils.isEmpty(singleRes)) {
                 res.addAll(singleRes);
             }
