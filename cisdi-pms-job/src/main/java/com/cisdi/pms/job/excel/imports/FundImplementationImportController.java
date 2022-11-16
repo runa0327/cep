@@ -1,11 +1,8 @@
 package com.cisdi.pms.job.excel.imports;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.read.listener.PageReadListener;
 import com.cisdi.pms.job.excel.model.FundImplementationExportModel;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
 import com.cisdi.pms.job.utils.Util;
-import com.qygly.shared.BaseException;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -41,19 +38,31 @@ public class FundImplementationImportController {
         List<String> res = new ArrayList<>();
         List<FundImplementationExportModel> dataList = EasyExcelUtil.read(file.getInputStream(), FundImplementationExportModel.class);
         Map<String, List<FundImplementationExportModel>> data = dataList.stream().collect(Collectors.groupingBy(FundImplementationExportModel::getSourceName));
-        for (String key : data.keySet()) {
+
+        //检查和已有资金来源是否重复，并去重
+        Map<String, Set<String>> duplicateMap = this.checkDuplicate(data.keySet());
+        Set<String> duplicatedSources = duplicateMap.get("duplicatedSources");
+
+        for (String key : duplicateMap.get("keySet")) {
             // 这里就是你处理代码保存的逻辑了
             res = this.importData(data.get(key));
         }
-        if (CollectionUtils.isEmpty(res)) {
+
+        if (CollectionUtils.isEmpty(res) && CollectionUtils.isEmpty(duplicatedSources)) {
             result.put("code", 200);
             result.put("message", "导入成功！");
-            return result;
         } else {
             result.put("code", 500);
-            result.put("message", "项目名称为:" + String.join(",", res) + "不存在，未导入！");
-            return result;
+            String message = "";
+            if (!CollectionUtils.isEmpty(res)){
+                message += "项目名称为:" + String.join(",", res) + "不存在，未导入！";
+            }
+            if (!CollectionUtils.isEmpty(duplicatedSources)){
+                message += "资金来源为:" + String.join(",", duplicatedSources) + "不存在，未导入！";
+            }
+            result.put("message", message);
         }
+        return result;
     }
 
 
@@ -85,5 +94,25 @@ public class FundImplementationImportController {
             }
         }
         return res;
+    }
+
+
+    /**
+     * 检查和已有资金来源是否重复，并去重
+     * @param keySet 待导入的资金来源名称
+     */
+    private Map<String,Set<String>> checkDuplicate(Set<String> keySet){
+        Map<String,Set<String>> result = new HashMap<>();
+        List<Map<String, Object>> existedSource = jdbcTemplate.queryForList("select FUND_SOURCE_TEXT from fund_implementation");
+        if (!CollectionUtils.isEmpty(keySet) && !CollectionUtils.isEmpty(existedSource)){
+            Set<String> duplicatedSources = existedSource.stream()
+                    .map(sourceMap -> String.valueOf(sourceMap.get("FUND_SOURCE_TEXT")))
+                    .filter(sourceName -> keySet.contains(sourceName))
+                    .collect(Collectors.toSet());
+            keySet.removeAll(duplicatedSources);
+            result.put("keySet",keySet);
+            result.put("duplicatedSources",duplicatedSources);
+        }
+        return result;
     }
 }
