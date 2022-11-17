@@ -6,7 +6,7 @@ public class PmPartyView extends BasePageEntity {
 
     //id
     public String id;
-    public String PM_PARTY_ID;
+    public String pmPartyId;
 
     //名称
     public String partyName;

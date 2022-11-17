@@ -6,11 +6,11 @@ public class BaseProjectUserView extends BasePageEntity {
 
     //id
     public String id;
-    public String USER_IDS;
+    public String userIds;
 
     //名称
     public String userName;
 
     //项目id
-    public String PM_PRJ_ID;
+    public String projectId;
 }

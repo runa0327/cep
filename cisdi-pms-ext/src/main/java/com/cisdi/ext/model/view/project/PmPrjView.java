@@ -6,7 +6,7 @@ public class PmPrjView extends BasePageEntity {
 
     //id
     public String id;
-    public String PM_PRJ_ID;
+    public String projectId;
     //名称
     public String projectName;
 }

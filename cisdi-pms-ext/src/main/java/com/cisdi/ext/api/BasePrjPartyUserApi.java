@@ -1,5 +1,6 @@
 package com.cisdi.ext.api;
 
+import com.cisdi.ext.model.view.base.BaseUserView;
 import com.cisdi.ext.model.view.base.GrSetValueView;
 import com.cisdi.ext.model.view.base.PmPartyView;
 import com.cisdi.ext.model.view.order.PoOrderPaymentView;
@@ -103,9 +104,9 @@ public class BasePrjPartyUserApi {
             baseSql1.append(" and c.name like ('%" + param.partyName + "%')");
             baseSql2.append(" and c.name like ('%" + param.partyName + "%')");
         }
-        if (!SharedUtil.isEmptyString(param.PM_PARTY_ROLE_ID)){
-            baseSql1.append(" and d.id =" + param.PM_PARTY_ROLE_ID+"'");
-            baseSql2.append(" and d.id =" + param.PM_PARTY_ROLE_ID+"'");
+        if (!SharedUtil.isEmptyString(param.pmPartyRoleId)){
+            baseSql1.append(" and d.id =" + param.pmPartyRoleId+"'");
+            baseSql2.append(" and d.id =" + param.pmPartyRoleId+"'");
         }
         if (!SharedUtil.isEmptyString(param.userId)){
             baseSql1.append(" and find_in_set('"+param.userId+"',a.USER_IDS) ");
@@ -121,11 +122,12 @@ public class BasePrjPartyUserApi {
         } else {
             List<BasePrjPartyUserView> inputList = list.stream().map(p->{
                 BasePrjPartyUserView basePrjPartyUserView = new BasePrjPartyUserView();
-                basePrjPartyUserView.PM_PRJ_ID = JdbcMapUtil.getString(p,"PM_PRJ_ID");
+                basePrjPartyUserView.id = JdbcMapUtil.getString(p,"id");
+                basePrjPartyUserView.projectId = JdbcMapUtil.getString(p,"PM_PRJ_ID");
                 basePrjPartyUserView.projectName = JdbcMapUtil.getString(p,"projectName");
-                basePrjPartyUserView.PM_PARTY_ROLE_ID = JdbcMapUtil.getString(p,"PM_PARTY_ROLE_ID");
+                basePrjPartyUserView.pmPartyRoleId = JdbcMapUtil.getString(p,"PM_PARTY_ROLE_ID");
                 basePrjPartyUserView.partyRoleName = JdbcMapUtil.getString(p,"partyRoleName");
-                basePrjPartyUserView.PM_PARTY_ID = JdbcMapUtil.getString(p,"PM_PARTY_ID");
+                basePrjPartyUserView.pmPartyId = JdbcMapUtil.getString(p,"PM_PARTY_ID");
                 basePrjPartyUserView.partyName = JdbcMapUtil.getString(p,"partyName");
                 String userIds = JdbcMapUtil.getString(p,"USER_IDS");
                 if (!SharedUtil.isEmptyString(userIds)){
@@ -137,7 +139,7 @@ public class BasePrjPartyUserApi {
                 if (!CollectionUtils.isEmpty(userList)){
                     userName = JdbcMapUtil.getString(userList.get(0),"name");
                 }
-                basePrjPartyUserView.USER_IDS = userIds;
+                basePrjPartyUserView.userIds = userIds;
                 basePrjPartyUserView.userName = userName;
                 return basePrjPartyUserView;
             }).collect(Collectors.toList());
@@ -182,7 +184,7 @@ public class BasePrjPartyUserApi {
         } else {
             List<PmPrjView> inputList = list.stream().map(p->{
                 PmPrjView pmPrjView = new PmPrjView();
-                pmPrjView.PM_PRJ_ID = JdbcMapUtil.getString(p,"id");
+                pmPrjView.projectId = JdbcMapUtil.getString(p,"id");
                 pmPrjView.projectName = JdbcMapUtil.getString(p,"name");
                 return pmPrjView;
             }).collect(Collectors.toList());
@@ -227,7 +229,7 @@ public class BasePrjPartyUserApi {
         } else {
             List<PmPartyView> inputList = list.stream().map(p->{
                 PmPartyView pmPrjView = new PmPartyView();
-                pmPrjView.PM_PARTY_ID = JdbcMapUtil.getString(p,"id");
+                pmPrjView.pmPartyId = JdbcMapUtil.getString(p,"id");
                 pmPrjView.partyName = JdbcMapUtil.getString(p,"name");
                 return pmPrjView;
             }).collect(Collectors.toList());
@@ -247,7 +249,7 @@ public class BasePrjPartyUserApi {
         if (param.pageIndex == 0 || param.pageSize == 0) {
             throw new BaseException("分页参数不能必须大于0");
         }
-        if (SharedUtil.isEmptyString(param.PM_PRJ_ID)){
+        if (SharedUtil.isEmptyString(param.projectId)){
             throw new BaseException("请先选择项目！");
         }
         // 起始条数
@@ -255,7 +257,7 @@ public class BasePrjPartyUserApi {
         String limit = "limit " + start + "," + param.pageSize;
 //        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String sql = "select group_concat(USER_IDS) as user from pm_dept where PM_PRJ_ID = ?";
-        List<Map<String,Object>> userList = myJdbcTemplate.queryForList(sql,param.PM_PRJ_ID);
+        List<Map<String,Object>> userList = myJdbcTemplate.queryForList(sql,param.projectId);
         if (CollectionUtils.isEmpty(userList)){
             throw new BaseException("该项目暂未配置权限人员，请先进行人员项目权限配置！");
         }
@@ -286,7 +288,7 @@ public class BasePrjPartyUserApi {
         } else {
             List<BaseProjectUserView> inputList = list.stream().map(p->{
                 BaseProjectUserView baseProjectUserView = new BaseProjectUserView();
-                baseProjectUserView.USER_IDS = JdbcMapUtil.getString(p,"id");
+                baseProjectUserView.userIds = JdbcMapUtil.getString(p,"id");
                 baseProjectUserView.userName = JdbcMapUtil.getString(p,"name");
                 return baseProjectUserView;
             }).collect(Collectors.toList());
@@ -310,9 +312,9 @@ public class BasePrjPartyUserApi {
             id = Crud.from("base_prj_party_user").insertData();
         }
         Crud.from("base_prj_party_user").where().eq("id",id).update()
-                .set("STATUS","AP").set("PM_PRJ_ID",param.PM_PRJ_ID)
-                .set("PM_PARTY_ID",param.PM_PARTY_ID).set("PM_PARTY_ROLE_ID",param.PM_PARTY_ROLE_ID)
-                .set("USER_IDS",param.USER_IDS)
+                .set("STATUS","AP").set("PM_PRJ_ID",param.projectId)
+                .set("PM_PARTY_ID",param.pmPartyId).set("PM_PARTY_ROLE_ID",param.pmPartyRoleId)
+                .set("USER_IDS",param.userIds)
                 .exec();
     }
 
@@ -342,23 +344,30 @@ public class BasePrjPartyUserApi {
         } else {
             List<BasePrjPartyUserView> inputList = list.stream().map(p->{
                 BasePrjPartyUserView basePrjPartyUserView = new BasePrjPartyUserView();
-                basePrjPartyUserView.PM_PRJ_ID = JdbcMapUtil.getString(p,"PM_PRJ_ID");
+                basePrjPartyUserView.id = JdbcMapUtil.getString(p,"id");
+                basePrjPartyUserView.projectId = JdbcMapUtil.getString(p,"PM_PRJ_ID");
                 basePrjPartyUserView.projectName = JdbcMapUtil.getString(p,"projectName");
-                basePrjPartyUserView.PM_PARTY_ROLE_ID = JdbcMapUtil.getString(p,"PM_PARTY_ROLE_ID");
+                basePrjPartyUserView.pmPartyRoleId = JdbcMapUtil.getString(p,"PM_PARTY_ROLE_ID");
                 basePrjPartyUserView.partyRoleName = JdbcMapUtil.getString(p,"partyRoleName");
-                basePrjPartyUserView.PM_PARTY_ID = JdbcMapUtil.getString(p,"PM_PARTY_ID");
+                basePrjPartyUserView.pmPartyId = JdbcMapUtil.getString(p,"PM_PARTY_ID");
                 basePrjPartyUserView.partyName = SharedUtil.isEmptyString(JdbcMapUtil.getString(p,"partyName")) ? "":JdbcMapUtil.getString(p,"partyName");
                 String userIds = JdbcMapUtil.getString(p,"USER_IDS");
                 if (!SharedUtil.isEmptyString(userIds)){
                     userIds = userIds.replace(",","','");
                 }
                 String userName = "";
-                String sql = "select GROUP_CONCAT(name) as name from ad_user where id in ('"+userIds+"')";
+                String sql = "select name,id from ad_user where id in ('"+userIds+"')";
                 List<Map<String,Object>> userList = myJdbcTemplate.queryForList(sql);
                 if (!CollectionUtils.isEmpty(userList)){
-                    userName = JdbcMapUtil.getString(userList.get(0),"name");
+                    List<BaseUserView> user = userList.stream().map(q->{
+                        BaseUserView baseUserView = new BaseUserView();
+                        baseUserView.id = JdbcMapUtil.getString(q,"id");
+                        baseUserView.userName = JdbcMapUtil.getString(q,"name");
+                        return baseUserView;
+                    }).collect(Collectors.toList());
+                    basePrjPartyUserView.userList = user;
                 }
-                basePrjPartyUserView.USER_IDS = userIds;
+                basePrjPartyUserView.userIds = userIds;
                 basePrjPartyUserView.userName = userName;
                 return basePrjPartyUserView;
             }).collect(Collectors.toList());
@@ -368,4 +377,19 @@ public class BasePrjPartyUserApi {
         }
     }
 
+    /**
+     * 删除数据
+     */
+    public void delete() {
+        // 获取输入：
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        BasePrjPartyUserView param = JsonUtil.fromJson(json, BasePrjPartyUserView.class);
+        String id = param.id;
+        if (SharedUtil.isEmptyString(param.id)) {
+            throw new BaseException("请选择一条记录！");
+        }
+        id = id.replace(",","','");
+        int update = myJdbcTemplate.update("update base_prj_party_user set status = 'VD' where id in ('"+id+"')");
+    }
 }
