@@ -27,9 +27,9 @@ import java.util.stream.Collectors;
  */
 public class BasePrjPartyUserApi {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-//    MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+//    @Autowired
+//    private JdbcTemplate jdbcTemplate;
+    MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
     //单位下拉框
     public void getPartyRole(){
@@ -42,7 +42,7 @@ public class BasePrjPartyUserApi {
         if (!SharedUtil.isEmptyString(param.name)){
             sb.append(" and name like '%" + param.name + "%' ");
         }
-        List<Map<String,Object>> list = jdbcTemplate.queryForList(sb.toString());
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sb.toString());
         if (CollectionUtils.isEmpty(list)){
             ExtJarHelper.returnValue.set(null);
         } else {
@@ -127,11 +127,15 @@ public class BasePrjPartyUserApi {
                 basePrjPartyUserView.partyRoleName = JdbcMapUtil.getString(p,"partyRoleName");
                 basePrjPartyUserView.PM_PARTY_ID = JdbcMapUtil.getString(p,"PM_PARTY_ID");
                 basePrjPartyUserView.partyName = JdbcMapUtil.getString(p,"partyName");
-                String userIds = JdbcMapUtil.getString(p,"USER_IDS").replace(",","','");
+                String userIds = JdbcMapUtil.getString(p,"USER_IDS");
+                if (!SharedUtil.isEmptyString(userIds)){
+                    userIds = userIds.replace(",","','");
+                }
                 String userName = "";
-                List<Map<String,Object>> userList = myJdbcTemplate.queryForList("select GROUP_CONCAT(name) as name from ad_user where id in (?)",userIds);
+                String sql = "select GROUP_CONCAT(name) as name from ad_user where id in ('"+userIds+"')";
+                List<Map<String,Object>> userList = myJdbcTemplate.queryForList(sql);
                 if (!CollectionUtils.isEmpty(userList)){
-                    userName = userList.get(0).get("name").toString();
+                    userName = JdbcMapUtil.getString(userList.get(0),"name");
                 }
                 basePrjPartyUserView.USER_IDS = userIds;
                 basePrjPartyUserView.userName = userName;
@@ -168,8 +172,8 @@ public class BasePrjPartyUserApi {
             baseSql1.append(" and name like ('%" + param.projectName + "%')");
             baseSql2.append(" and name like ('%" + param.projectName + "%')");
         }
-        baseSql1.append("order BY a.CRT_DT DESC ").append(limit);
-        baseSql2.append("order BY a.CRT_DT DESC");
+        baseSql1.append(" order BY CRT_DT DESC ").append(limit);
+        baseSql2.append(" order BY CRT_DT DESC");
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(baseSql1.toString());
         List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(baseSql2.toString());
         Map<String, Object> map1 = new HashMap<>();
@@ -213,8 +217,8 @@ public class BasePrjPartyUserApi {
             baseSql1.append(" and name like ('%" + param.partyName + "%')");
             baseSql2.append(" and name like ('%" + param.partyName + "%')");
         }
-        baseSql1.append("order BY a.CRT_DT DESC ").append(limit);
-        baseSql2.append("order BY a.CRT_DT DESC");
+        baseSql1.append("order BY CRT_DT DESC ").append(limit);
+        baseSql2.append("order BY CRT_DT DESC");
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(baseSql1.toString());
         List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(baseSql2.toString());
         Map<String, Object> map1 = new HashMap<>();
@@ -249,28 +253,33 @@ public class BasePrjPartyUserApi {
         // 起始条数
         int start = (param.pageIndex - 1) * param.pageSize;
         String limit = "limit " + start + "," + param.pageSize;
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+//        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String sql = "select group_concat(USER_IDS) as user from pm_dept where PM_PRJ_ID = ?";
-        List<Map<String,Object>> userList = jdbcTemplate.queryForList(sql,param.PM_PRJ_ID);
+        List<Map<String,Object>> userList = myJdbcTemplate.queryForList(sql,param.PM_PRJ_ID);
         if (CollectionUtils.isEmpty(userList)){
             throw new BaseException("该项目暂未配置权限人员，请先进行人员项目权限配置！");
         }
-        String userId = JdbcMapUtil.getString(userList.get(0),"user").replace(",","','");
+        String userId = JdbcMapUtil.getString(userList.get(0),"user");
+        if (!SharedUtil.isEmptyString(userId)){
+            userId = userId.replace(",","','");
+        } else {
+            throw new BaseException("该项目暂未配置权限人员，请先进行人员项目权限配置！");
+        }
         StringBuilder baseSql1 = new StringBuilder();
         StringBuilder baseSql2 = new StringBuilder();
-        String sql1 = "SELECT id,name FROM ad_user where status = 'ap' and id in (?) ";
-        String sql2 = "SELECT count(*) as num FROM ad_user where status = 'ap' and id in (?) ";
+        String sql1 = "SELECT id,name FROM ad_user where status = 'ap' and id in ('"+userId+"') ";
+        String sql2 = "SELECT count(*) as num FROM ad_user where status = 'ap' and id in ('"+userId+"') ";
         baseSql1.append(sql1);
         baseSql2.append(sql2);
         //筛选条件
         if (!SharedUtil.isEmptyString(param.userName)){
-            baseSql1.append(" and name like ('%" + param.userName + "%')");
-            baseSql2.append(" and name like ('%" + param.userName + "%')");
+            baseSql1.append(" and name like ('%" + param.userName + "%') ");
+            baseSql2.append(" and name like ('%" + param.userName + "%') ");
         }
-        baseSql1.append("order BY a.CRT_DT DESC ").append(limit);
-        baseSql2.append("order BY a.CRT_DT DESC");
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList(baseSql1.toString(),userId);
-        List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(baseSql2.toString(),userId);
+        baseSql1.append("order BY CRT_DT DESC ").append(limit);
+        baseSql2.append("order BY CRT_DT DESC");
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(baseSql1.toString());
+        List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(baseSql2.toString());
         Map<String, Object> map1 = new HashMap<>();
         if (CollectionUtils.isEmpty(list)) {
             ExtJarHelper.returnValue.set(null);
@@ -338,12 +347,16 @@ public class BasePrjPartyUserApi {
                 basePrjPartyUserView.PM_PARTY_ROLE_ID = JdbcMapUtil.getString(p,"PM_PARTY_ROLE_ID");
                 basePrjPartyUserView.partyRoleName = JdbcMapUtil.getString(p,"partyRoleName");
                 basePrjPartyUserView.PM_PARTY_ID = JdbcMapUtil.getString(p,"PM_PARTY_ID");
-                basePrjPartyUserView.partyName = JdbcMapUtil.getString(p,"partyName");
-                String userIds = JdbcMapUtil.getString(p,"USER_IDS").replace(",","','");
+                basePrjPartyUserView.partyName = SharedUtil.isEmptyString(JdbcMapUtil.getString(p,"partyName")) ? "":JdbcMapUtil.getString(p,"partyName");
+                String userIds = JdbcMapUtil.getString(p,"USER_IDS");
+                if (!SharedUtil.isEmptyString(userIds)){
+                    userIds = userIds.replace(",","','");
+                }
                 String userName = "";
-                List<Map<String,Object>> userList = myJdbcTemplate.queryForList("select GROUP_CONCAT(name) as name from ad_user where id in (?)",userIds);
+                String sql = "select GROUP_CONCAT(name) as name from ad_user where id in ('"+userIds+"')";
+                List<Map<String,Object>> userList = myJdbcTemplate.queryForList(sql);
                 if (!CollectionUtils.isEmpty(userList)){
-                    userName = userList.get(0).get("name").toString();
+                    userName = JdbcMapUtil.getString(userList.get(0),"name");
                 }
                 basePrjPartyUserView.USER_IDS = userIds;
                 basePrjPartyUserView.userName = userName;
