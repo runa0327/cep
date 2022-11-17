@@ -3,7 +3,6 @@ package com.cisdi.ext.api;
 import com.cisdi.ext.model.view.base.BaseUserView;
 import com.cisdi.ext.model.view.base.GrSetValueView;
 import com.cisdi.ext.model.view.base.PmPartyView;
-import com.cisdi.ext.model.view.order.PoOrderPaymentView;
 import com.cisdi.ext.model.view.project.BasePrjPartyUserView;
 import com.cisdi.ext.model.view.project.BaseProjectUserView;
 import com.cisdi.ext.model.view.project.PmPrjView;
@@ -14,8 +13,6 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
@@ -28,13 +25,10 @@ import java.util.stream.Collectors;
  */
 public class BasePrjPartyUserApi {
 
-//    @Autowired
-//    private JdbcTemplate jdbcTemplate;
-    MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-
     //单位下拉框
     public void getPartyRole(){
         // 获取输入：
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
         GrSetValueView param = JsonUtil.fromJson(json, GrSetValueView.class);
@@ -243,6 +237,7 @@ public class BasePrjPartyUserApi {
     //人员列表页
     public void getUserList(){
         // 获取输入：
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
         BaseProjectUserView param = JsonUtil.fromJson(json, BaseProjectUserView.class);
@@ -382,6 +377,7 @@ public class BasePrjPartyUserApi {
      */
     public void delete() {
         // 获取输入：
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
         BasePrjPartyUserView param = JsonUtil.fromJson(json, BasePrjPartyUserView.class);
