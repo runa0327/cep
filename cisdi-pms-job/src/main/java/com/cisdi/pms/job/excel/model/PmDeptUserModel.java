@@ -14,6 +14,9 @@ import lombok.Data;
 @Data
 public class PmDeptUserModel {
 
+    @ExcelProperty("项目名称")
+    private String projectName;
+
     @ExcelProperty("部门名称")
     private String deptName;
 

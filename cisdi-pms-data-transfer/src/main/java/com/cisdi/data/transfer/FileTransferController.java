@@ -33,8 +33,9 @@ public class FileTransferController {
     JdbcTemplate cpmsJdbcTemplate;
 
     @Autowired
-    @Qualifier("testJdbcTemplate")
-    JdbcTemplate testJdbcTemplate;
+//    @Qualifier("testJdbcTemplate")
+    @Qualifier("prodJdbcTemplate")
+    JdbcTemplate jdbcTemplate;
 
 
     @GetMapping("transferData")
@@ -42,14 +43,14 @@ public class FileTransferController {
         AsyncConfig config = new AsyncConfig();
         Executor executor = config.getAsyncExecutor();
         // 先清除原有的数据
-        List<Map<String, Object>> list = testJdbcTemplate.queryForList("select * from PF_FILE where CPMS_ID is not null");
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from PF_FILE where CPMS_ID is not null");
         List<String> ids = list.stream().map(p -> String.valueOf(p.get("FL_FILE_ID"))).collect(Collectors.toList());
-        testJdbcTemplate.update("delete from PF_FILE where CPMS_ID is not null");
+        jdbcTemplate.update("delete from PF_FILE where CPMS_ID is not null");
         List<List<String>> idsList = ListUtils.split(ids, 2000);
         idsList.forEach(obj -> {
             executor.execute(() -> {
                 obj.forEach(item -> {
-                    testJdbcTemplate.update("delete from FL_FILE where ID =?", item);
+                    jdbcTemplate.update("delete from FL_FILE where ID =?", item);
                 });
             });
         });
@@ -73,16 +74,16 @@ public class FileTransferController {
                         String data = fileSize.split("M")[0];
                         sizeKb = new BigDecimal(data).multiply(new BigDecimal("1024"));
                     }
-                    String id = Util.insertData(testJdbcTemplate, "FL_FILE");
+                    String id = Util.insertData(jdbcTemplate, "FL_FILE");
                     String fileInlineUrl = "http://qygly.com/qygly-gateway/qygly-file/viewImage?fileId=" + id;
                     String fileAttachmentUrl = "http://qygly.com/qygly-gateway/qygly-file/downloadCommonFile?fileId=" + id;
                     String physicalLocation = "/data/qygly/file/yzw" + String.valueOf(item.get("file_path"));
-                    testJdbcTemplate.update("update FL_FILE set `CODE`=?,`NAME`=?,EXT=?,DSP_NAME=?,SIZE_KB=?,DSP_SIZE=?,FILE_INLINE_URL=?,FILE_ATTACHMENT_URL=?,UPLOAD_DTTM=?,PHYSICAL_LOCATION=?,FL_PATH_ID=? WHERE ID=?",
+                    jdbcTemplate.update("update FL_FILE set `CODE`=?,`NAME`=?,EXT=?,DSP_NAME=?,SIZE_KB=?,DSP_SIZE=?,FILE_INLINE_URL=?,FILE_ATTACHMENT_URL=?,UPLOAD_DTTM=?,PHYSICAL_LOCATION=?,FL_PATH_ID=? WHERE ID=?",
                             code, item.get("original_name111"), item.get("file_suffix"), item.get("original_name"), sizeKb, item.get("file_size"), fileInlineUrl, fileAttachmentUrl,
                             item.get("upload_time"), physicalLocation, "99902212142322558", id);
                     // 同步PF_FILE
-                    String pfId = Util.insertData(testJdbcTemplate, "PF_FILE");
-                    testJdbcTemplate.update("update PF_FILE set FL_FILE_ID=?,CPMS_ID=?,CPMS_UUID=? where id=?", id, item.get("id"), item.get("file_id"), pfId);
+                    String pfId = Util.insertData(jdbcTemplate, "PF_FILE");
+                    jdbcTemplate.update("update PF_FILE set FL_FILE_ID=?,CPMS_ID=?,CPMS_UUID=? where id=?", id, item.get("id"), item.get("file_id"), pfId);
                 });
             });
         });
