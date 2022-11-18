@@ -3,7 +3,6 @@ package com.cisdi.ext.api;
 import com.cisdi.ext.model.view.base.BaseUserView;
 import com.cisdi.ext.model.view.base.GrSetValueView;
 import com.cisdi.ext.model.view.base.PmPartyView;
-import com.cisdi.ext.model.view.order.PoOrderPaymentView;
 import com.cisdi.ext.model.view.project.BasePrjPartyUserView;
 import com.cisdi.ext.model.view.project.BaseProjectUserView;
 import com.cisdi.ext.model.view.project.PmPrjView;
@@ -14,8 +13,6 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
@@ -28,13 +25,10 @@ import java.util.stream.Collectors;
  */
 public class BasePrjPartyUserApi {
 
-//    @Autowired
-//    private JdbcTemplate jdbcTemplate;
-    MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-
     //单位下拉框
     public void getPartyRole(){
         // 获取输入：
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
         GrSetValueView param = JsonUtil.fromJson(json, GrSetValueView.class);
@@ -105,15 +99,15 @@ public class BasePrjPartyUserApi {
             baseSql2.append(" and c.name like ('%" + param.partyName + "%')");
         }
         if (!SharedUtil.isEmptyString(param.pmPartyRoleId)){
-            baseSql1.append(" and d.id =" + param.pmPartyRoleId+"'");
-            baseSql2.append(" and d.id =" + param.pmPartyRoleId+"'");
+            baseSql1.append(" and d.id = '" + param.pmPartyRoleId+"'");
+            baseSql2.append(" and d.id = '" + param.pmPartyRoleId+"'");
         }
         if (!SharedUtil.isEmptyString(param.userId)){
             baseSql1.append(" and find_in_set('"+param.userId+"',a.USER_IDS) ");
             baseSql2.append(" and find_in_set('"+param.userId+"',a.USER_IDS) ");
         }
-        baseSql1.append("order BY a.CRT_DT DESC ").append(limit);
-        baseSql2.append("order BY a.CRT_DT DESC");
+        baseSql1.append(" order BY a.CRT_DT DESC ").append(limit);
+        baseSql2.append(" order BY a.CRT_DT DESC");
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(baseSql1.toString());
         List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(baseSql2.toString());
         Map<String, Object> map1 = new HashMap<>();
@@ -219,8 +213,8 @@ public class BasePrjPartyUserApi {
             baseSql1.append(" and name like ('%" + param.partyName + "%')");
             baseSql2.append(" and name like ('%" + param.partyName + "%')");
         }
-        baseSql1.append("order BY CRT_DT DESC ").append(limit);
-        baseSql2.append("order BY CRT_DT DESC");
+        baseSql1.append(" order BY CRT_DT DESC ").append(limit);
+        baseSql2.append(" order BY CRT_DT DESC");
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(baseSql1.toString());
         List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(baseSql2.toString());
         Map<String, Object> map1 = new HashMap<>();
@@ -243,6 +237,7 @@ public class BasePrjPartyUserApi {
     //人员列表页
     public void getUserList(){
         // 获取输入：
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
         BaseProjectUserView param = JsonUtil.fromJson(json, BaseProjectUserView.class);
@@ -278,8 +273,8 @@ public class BasePrjPartyUserApi {
             baseSql1.append(" and name like ('%" + param.userName + "%') ");
             baseSql2.append(" and name like ('%" + param.userName + "%') ");
         }
-        baseSql1.append("order BY CRT_DT DESC ").append(limit);
-        baseSql2.append("order BY CRT_DT DESC");
+        baseSql1.append(" order BY CRT_DT DESC ").append(limit);
+        baseSql2.append(" order BY CRT_DT DESC");
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(baseSql1.toString());
         List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(baseSql2.toString());
         Map<String, Object> map1 = new HashMap<>();
@@ -382,6 +377,7 @@ public class BasePrjPartyUserApi {
      */
     public void delete() {
         // 获取输入：
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
         BasePrjPartyUserView param = JsonUtil.fromJson(json, BasePrjPartyUserView.class);

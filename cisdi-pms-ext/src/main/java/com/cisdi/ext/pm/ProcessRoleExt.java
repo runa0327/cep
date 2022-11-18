@@ -8,12 +8,10 @@ import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -49,6 +47,60 @@ public class ProcessRoleExt {
             userIdList.addAll(userList);
             ExtJarHelper.returnValue.set(userIdList);
         }
+    }
+
+    /**
+     * 根据发起人获取项目部门负责人
+     */
+    public void getPrjDeptLeader(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+
+        //实体
+        String entityCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        //流程实例id
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId;
+
+        //获取项目id
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        if (SharedUtil.isEmptyString(projectId)){
+            projectId = JdbcMapUtil.getString(entityRecord.valueMap,"AMOUT_PM_PRJ_ID");
+        }
+        if (Strings.isEmpty(projectId)){
+            throw new BaseException("没有项目信息！");
+        }
+
+        List<Map<String, Object>> roleNameListMap = myJdbcTemplate.queryForList("select r.name\n" +
+                "from "+entityCode+" t \n" +
+                "left join ad_role_user ru on ru.AD_USER_ID = t.CRT_USER_ID\n" +
+                "left join ad_role r on r.id = ru.AD_ROLE_ID\n" +
+                "where t.id = ?", csCommId);
+        List<Object> roleNames = roleNameListMap.stream().map(item -> String.valueOf(item.get("name"))).collect(Collectors.toList());
+        //根据角色名称匹配合作方角色
+        List<Map<String, Object>> partyRoleList = myJdbcTemplate.queryForList("select va.id,va.name from gr_set_value va where va.GR_SET_ID = '99952822476391029'");
+        Map<String, Object> partyRoles = new HashMap<>();
+        for (Map<String, Object> partyRoleMap : partyRoleList) {
+            partyRoles.put(String.valueOf(partyRoleMap.get("name")),String.valueOf(partyRoleMap.get("id")));
+        }
+        String partyRoleId = "";
+        //设计管理部
+//        if ("设计管理部员工".equals(roleName)){
+        if (roleNames.contains("设计管理部员工")){
+            partyRoleId = String.valueOf(partyRoles.get("设计岗"));
+        }
+        //工程管理部
+//        if ("工程管理部人员".equals(roleName)){
+        if (roleNames.contains("工程管理部人员")){
+            partyRoleId = String.valueOf(partyRoles.get("工程岗"));
+        }
+        //项目部门负责人
+        List<Map<String, Object>> userString = myJdbcTemplate.queryForList("select USER_IDS from base_prj_party_user where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = ?",projectId,partyRoleId);
+        if (CollectionUtils.isEmpty(userString)){
+            throw new BaseException("没有发起人对应的审批人员！");
+        }
+        String userIdString = String.valueOf(userString.get(0).get("USER_IDS"));
+        List<String> userIds = Arrays.asList(userIdString.split(","));
+        ExtJarHelper.returnValue.set(userIds);
     }
 
     /** 获取该流程发起人所在部门的分管领导 **/
