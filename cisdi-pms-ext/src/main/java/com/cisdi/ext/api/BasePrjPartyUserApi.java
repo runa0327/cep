@@ -99,8 +99,8 @@ public class BasePrjPartyUserApi {
             baseSql2.append(" and c.name like ('%" + param.partyName + "%')");
         }
         if (!SharedUtil.isEmptyString(param.pmPartyRoleId)){
-            baseSql1.append(" and d.id =" + param.pmPartyRoleId+"'");
-            baseSql2.append(" and d.id =" + param.pmPartyRoleId+"'");
+            baseSql1.append(" and d.id = '" + param.pmPartyRoleId+"'");
+            baseSql2.append(" and d.id = '" + param.pmPartyRoleId+"'");
         }
         if (!SharedUtil.isEmptyString(param.userId)){
             baseSql1.append(" and find_in_set('"+param.userId+"',a.USER_IDS) ");
