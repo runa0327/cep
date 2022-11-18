@@ -22,4 +22,18 @@ public class StringUtils {
         }
 
     }
+
+    /**
+     * 字符串替换
+     * @param str
+     * @param s
+     * @return s
+     */
+    public static String replaceCode(String str, String s) {
+        str = str.trim().replace(" ","");
+        if (",".equals(s)) {
+            str = str.replace("，",",");
+        }
+        return str;
+    }
 }
