@@ -106,8 +106,8 @@ public class BasePrjPartyUserApi {
             baseSql1.append(" and find_in_set('"+param.userId+"',a.USER_IDS) ");
             baseSql2.append(" and find_in_set('"+param.userId+"',a.USER_IDS) ");
         }
-        baseSql1.append("order BY a.CRT_DT DESC ").append(limit);
-        baseSql2.append("order BY a.CRT_DT DESC");
+        baseSql1.append(" order BY a.CRT_DT DESC ").append(limit);
+        baseSql2.append(" order BY a.CRT_DT DESC");
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(baseSql1.toString());
         List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(baseSql2.toString());
         Map<String, Object> map1 = new HashMap<>();
@@ -213,8 +213,8 @@ public class BasePrjPartyUserApi {
             baseSql1.append(" and name like ('%" + param.partyName + "%')");
             baseSql2.append(" and name like ('%" + param.partyName + "%')");
         }
-        baseSql1.append("order BY CRT_DT DESC ").append(limit);
-        baseSql2.append("order BY CRT_DT DESC");
+        baseSql1.append(" order BY CRT_DT DESC ").append(limit);
+        baseSql2.append(" order BY CRT_DT DESC");
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(baseSql1.toString());
         List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(baseSql2.toString());
         Map<String, Object> map1 = new HashMap<>();
@@ -273,8 +273,8 @@ public class BasePrjPartyUserApi {
             baseSql1.append(" and name like ('%" + param.userName + "%') ");
             baseSql2.append(" and name like ('%" + param.userName + "%') ");
         }
-        baseSql1.append("order BY CRT_DT DESC ").append(limit);
-        baseSql2.append("order BY CRT_DT DESC");
+        baseSql1.append(" order BY CRT_DT DESC ").append(limit);
+        baseSql2.append(" order BY CRT_DT DESC");
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(baseSql1.toString());
         List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(baseSql2.toString());
         Map<String, Object> map1 = new HashMap<>();
