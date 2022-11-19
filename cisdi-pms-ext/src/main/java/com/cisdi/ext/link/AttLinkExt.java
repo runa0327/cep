@@ -3608,12 +3608,12 @@ public class AttLinkExt {
         Boolean otherEdit = true; //其他可改
         Boolean seaEdit = true; //海域面积可改
 
-        Boolean areaMustEdit = true; //面积必填
-        Boolean lengthMustEdit = true; //长必填
-        Boolean widthMustEdit = true; //宽必填
-        Boolean otherMustEdit = true; //其他必填
-        Boolean seaMustEdit = true; //海域面积必填
-        Boolean floorAreaMustEdit = true; //占地面积必填
+        Boolean areaMustEdit = false; //面积必填
+        Boolean lengthMustEdit = false; //长必填
+        Boolean widthMustEdit = false; //宽必填
+        Boolean otherMustEdit = false; //其他必填
+        Boolean seaMustEdit = false; //海域面积必填
+        Boolean floorAreaMustEdit = false; //占地面积必填
 
         String name1 = JdbcMapUtil.getString(row, "st_name");
         if (!SharedUtil.isEmptyString(name1)){

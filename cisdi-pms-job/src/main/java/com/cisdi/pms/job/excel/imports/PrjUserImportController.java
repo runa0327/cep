@@ -139,7 +139,7 @@ public class PrjUserImportController {
                     users = StringUtils.replaceCode(users,",");
                     String[] userArr = users.split(",");
                     //查询人员信息
-                    String sql2 = "select USER_IDS from pm_dept where status = 'ap' and PM_PRJ_ID = ? ";
+                    String sql2 = "select group_concat(USER_IDS) as USER_IDS from pm_dept where status = 'ap' and PM_PRJ_ID = ? ";
                     List<Map<String,Object>> userList = jdbcTemplate.queryForList(sql2,projectId);
                     if (CollectionUtils.isEmpty(userList)){
                         errBuffer.append("项目： "+projectName+" 没有配置人员信息; ");
