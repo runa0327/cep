@@ -26,8 +26,8 @@ public class InitController {
     JdbcTemplate testJdbcTemplate;
 
     @Autowired
-    @Qualifier("seedJdbcTemplate")
-    JdbcTemplate seedJdbcTemplate;
+    @Qualifier("mainJdbcTemplate")
+    JdbcTemplate mainJdbcTemplate;
 
 
     @GetMapping("helloCpms")
@@ -48,21 +48,21 @@ public class InitController {
         }
     }
 
-    @GetMapping("helloSeed")
-    public void helloSeed() {
-        JdbcTemplate jdbcTemplate = seedJdbcTemplate;
+    @GetMapping("helloMain")
+    public void helloMain() {
+        JdbcTemplate jdbcTemplate = mainJdbcTemplate;
         List<Map<String, Object>> list = jdbcTemplate.queryForList("select database()");
         for (Map<String, Object> map : list) {
             log.info(map.toString());
         }
     }
 
-    @GetMapping("tranferUserToSeed")
-    public String tranferUserToSeed() {
+    @GetMapping("tranferUserToMain")
+    public String tranferUserToMain() {
         List<Map<String, Object>> list = cpmsJdbcTemplate.queryForList("select t.user_id,t.user_name,t.nick_name,t.phonenumber from sys_user t where t.user_name!='admin'");
         for (Map<String, Object> row : list) {
-            String userId = Util.insertData(seedJdbcTemplate, "AD_USER");
-            seedJdbcTemplate.update("update ad_user t set t.code=?,t.name=?,t.mobile=?,t.SRC=?,t.SRC_RECORD_ID=?,t.SYNC_DTTM=now() where t.id=?",
+            String userId = Util.insertData(mainJdbcTemplate, "AD_USER");
+            mainJdbcTemplate.update("update ad_user t set t.code=?,t.name=?,t.mobile=?,t.SRC=?,t.SRC_RECORD_ID=?,t.SYNC_DTTM=now() where t.id=?",
                     row.get("user_name"),
                     row.get("nick_name"),
                     row.get("phonenumber"),
@@ -76,16 +76,16 @@ public class InitController {
 
     @GetMapping("tranferUserToTest")
     public String tranferUserToTest() {
-        List<Map<String, Object>> seedUserList = seedJdbcTemplate.queryForList("select * from ad_user t where t.SRC=?", CPMS);
-        for (Map<String, Object> seedUser : seedUserList) {
+        List<Map<String, Object>> mainUserList = mainJdbcTemplate.queryForList("select * from ad_user t where t.SRC=?", CPMS);
+        for (Map<String, Object> mainUser : mainUserList) {
             String userId = Util.insertData(testJdbcTemplate, "AD_USER");
             testJdbcTemplate.update("update ad_user t set t.code=?,t.name=?,t.mobile=?,t.SRC=?,t.SRC_RECORD_ID=?,t.SYNC_DTTM=now(),t.id=? where t.id=?",
-                    seedUser.get("code"),
-                    seedUser.get("name"),
-                    seedUser.get("mobile"),
+                    mainUser.get("code"),
+                    mainUser.get("name"),
+                    mainUser.get("mobile"),
                     CPMS,
-                    seedUser.get("SRC_RECORD_ID"),
-                    seedUser.get("id"),
+                    mainUser.get("SRC_RECORD_ID"),
+                    mainUser.get("id"),
                     userId);
         }
         return "完成！";
@@ -93,11 +93,11 @@ public class InitController {
 
     @GetMapping("allowUserToTest")
     public String allowUserToTest() {
-        List<Map<String, Object>> seedUserList = seedJdbcTemplate.queryForList("select * from ad_user t where t.SRC=?", CPMS);
-        for (Map<String, Object> seedUser : seedUserList) {
-            String newId = Util.insertData(seedJdbcTemplate, "ad_user_org");
-            seedJdbcTemplate.update("update ad_user_org t set t.ad_user_id=?,t.ad_org_id='test',t.IS_DEFAULT=1 where t.id=?",
-                    seedUser.get("id"),
+        List<Map<String, Object>> mainUserList = mainJdbcTemplate.queryForList("select * from ad_user t where t.SRC=?", CPMS);
+        for (Map<String, Object> mainUser : mainUserList) {
+            String newId = Util.insertData(mainJdbcTemplate, "ad_user_org");
+            mainJdbcTemplate.update("update ad_user_org t set t.ad_user_id=?,t.ad_org_id='test',t.IS_DEFAULT=1 where t.id=?",
+                    mainUser.get("id"),
                     newId);
         }
         return "完成！";

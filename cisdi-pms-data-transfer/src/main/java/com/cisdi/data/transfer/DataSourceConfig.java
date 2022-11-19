@@ -39,17 +39,17 @@ public class DataSourceConfig {
         return new JdbcTemplate(dataSource);
     }
 
-    @Bean(name = "seedDataSource")
-    @Qualifier("seedDataSource")
+    @Bean(name = "mainDataSource")
+    @Qualifier("mainDataSource")
     @Primary
-    @ConfigurationProperties(prefix = "spring.datasource.seed")
-    public DataSource seedDataSource() {
+    @ConfigurationProperties(prefix = "spring.datasource.main")
+    public DataSource mainDataSource() {
         DataSource dataSource = DataSourceBuilder.create().build();
         return dataSource;
     }
 
-    @Bean(name = "seedJdbcTemplate")
-    public JdbcTemplate seedJdbcTemplate(@Qualifier("seedDataSource") DataSource dataSource) {
+    @Bean(name = "mainJdbcTemplate")
+    public JdbcTemplate mainJdbcTemplate(@Qualifier("mainDataSource") DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
 
