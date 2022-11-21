@@ -117,7 +117,7 @@ public class AttLinkExt {
     // 施工许可类型 属性联动
     private AttLinkResult linkBUILD_PERMIT_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        //100031468512110542=主体工程施工许可申请,100031468512110543=基坑及土石方工程施工许可申请
+        //100031468512110542=主体工程施工许可申请,100031468512110543=基坑及土石方工程施工许可申请,100055742827987277=主体工程施工许可申请+基坑及土石方工程施工许可申请
         if ("PM_CONSTRUCT_PERMIT_REQ".equals(entCode)){ //施工许可
             // 基坑及土石方工程施工许可申请 组
             Boolean EARTHWORK_APPLY_DATEChangeToShown = true; //申请时间,默认不显示
@@ -168,6 +168,29 @@ public class AttLinkExt {
                 REMARKChangeToEditable = true;
                 PRJ_REQ_FILEChangeToMandatory = true;
 
+            } else if ("100055742827987277".equals(attValue)){
+                SUBJECT_APPLY_DATEChangeToShown = true;
+                SUBJECT_PLAN_COMPL_DATEChangeToShown = true;
+                SUBJECT_APPLY_USERChangeToShown = true;
+                KEEP_RECORD_FILEChangeToShown = true;
+                ACT_REMARKChangeToShown = true;
+                SUBJECT_APPLY_DATEChangeToEditable = true;
+                SUBJECT_PLAN_COMPL_DATEChangeToEditable = true;
+                SUBJECT_APPLY_USERChangeToEditable = true;
+                KEEP_RECORD_FILEChangeToEditable = true;
+                ACT_REMARKChangeToEditable = true;
+                KEEP_RECORD_FILEChangeToMandatory = true;
+                EARTHWORK_APPLY_DATEChangeToShown = true;
+                COMPL_PLAN_DATE_APPLYChangeToShown = true;
+                EARTHWORK_APPLY_USERChangeToShown = true;
+                PRJ_REQ_FILEChangeToShown = true;
+                REMARKChangeToShown = true;
+                EARTHWORK_APPLY_DATEChangeToEditable = true;
+                COMPL_PLAN_DATE_APPLYChangeToEditable = true;
+                EARTHWORK_APPLY_USERChangeToEditable = true;
+                PRJ_REQ_FILEChangeToEditable = true;
+                REMARKChangeToEditable = true;
+                PRJ_REQ_FILEChangeToMandatory = true;
             }
             //申请时间
             {
