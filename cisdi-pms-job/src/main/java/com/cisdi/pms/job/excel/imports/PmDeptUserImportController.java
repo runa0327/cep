@@ -39,12 +39,16 @@ public class PmDeptUserImportController {
     public Map<String, Object> importData(MultipartFile file) {
         Map<String, Object> result = new HashMap<>();
         List<String> res = new ArrayList<>();
+        List<String> projectNames = new ArrayList<>();
+        List<String> userNames = new ArrayList<>();
+        List<String> deptNames = new ArrayList<>();
         List<PmDeptUserModel> dataList = EasyExcelUtil.read(file.getInputStream(), PmDeptUserModel.class);
         Map<String, List<PmDeptUserModel>> pmMapData = dataList.stream().collect(Collectors.groupingBy(PmDeptUserModel::getProjectName));
         List<Map<String, Object>> projectList = jdbcTemplate.queryForList("select * from PM_PRJ where `status` = 'ap'");
         for (String pk : pmMapData.keySet()) {
             Optional<Map<String, Object>> pjOptional = projectList.stream().filter(q -> Objects.equals(pk, JdbcMapUtil.getString(q, "NAME"))).findAny();
             if (pjOptional.isPresent()) {
+                String projectId = String.valueOf(pjOptional.get().get("ID"));
                 List<PmDeptUserModel> ownerData = pmMapData.get(pk);
                 Map<String, List<PmDeptUserModel>> mapData = ownerData.stream().collect(Collectors.groupingBy(PmDeptUserModel::getDeptName));
                 List<Map<String, Object>> deptList = jdbcTemplate.queryForList("select * from hr_dept where `status` = 'ap'");
@@ -57,22 +61,37 @@ public class PmDeptUserImportController {
                         for (PmDeptUserModel pmDeptUserModel : userModelList) {
                             Optional<Map<String, Object>> userOptional = userList.stream().filter(m -> Objects.equals(pmDeptUserModel.getUserName(), JdbcMapUtil.getString(m, "NAME"))).findAny();
                             if (userOptional.isPresent()) {
-                                userIds.add(String.valueOf(userOptional.get().get("ID")));
+                                String userId = String.valueOf(userOptional.get().get("ID"));
+                                String asql = "select * from PM_DEPT where PM_PRJ_ID=? and HR_DEPT_ID=? and  find_in_set('" + userId + "',USER_IDS)";
+                                List<Map<String, Object>> list = jdbcTemplate.queryForList(asql, projectId, optional.get().get("ID"));
+                                if (CollectionUtils.isEmpty(list)) {
+                                    userIds.add(userId);
+                                }
                             } else {
-                                res.add("用户名称为：" + pmDeptUserModel.getUserName());
+                                userNames.add(pmDeptUserModel.getUserName());
                             }
                         }
-                        String projectId = String.valueOf(pjOptional.get().get("ID"));
                         String id = Util.insertData(jdbcTemplate, "PM_DEPT");
                         jdbcTemplate.update("update PM_DEPT set PM_PRJ_ID=? ,HR_DEPT_ID=?,USER_IDS=? where id=?", projectId, optional.get().get("ID"), String.join(",", userIds), id);
                     } else {
-                        res.add("部门名称为：" + key);
+                        deptNames.add(key);
                     }
                 }
             } else {
-                res.add("项目名称为：" + pk);
+                projectNames.add(pk);
             }
+        }
 
+        if (!CollectionUtils.isEmpty(projectNames)) {
+            res.add("项目名称为:" + String.join(",", projectNames) + "不存在！");
+        }
+
+        if (!CollectionUtils.isEmpty(deptNames)) {
+            res.add("部门名称为:" + String.join(",", deptNames) + "不存在！");
+        }
+
+        if (!CollectionUtils.isEmpty(userNames)) {
+            res.add("用户名称为:" + String.join(",", userNames) + "不存在！");
         }
 
 
