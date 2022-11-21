@@ -57,15 +57,15 @@ public class PmDeptUserImportController {
                 List<Map<String, Object>> userList = jdbcTemplate.queryForList("select * from ad_user where `status` = 'ap'");
                 for (String key : mapData.keySet()) {
                     List<Map<String, Object>> oldeList = jdbcTemplate.queryForList("select * from PM_DEPT where PM_PRJ_ID=? and HR_DEPT_ID=?", projectId, key);
-                    String pmDeptId = "";
-                    if (CollectionUtils.isEmpty(oldeList)) {
-                        pmDeptId = Util.insertData(jdbcTemplate, "PM_DEPT");
-                    } else {
-                        pmDeptId = String.valueOf(oldeList.get(0).get("ID"));
-                    }
-
                     Optional<Map<String, Object>> optional = deptList.stream().filter(p -> Objects.equals(key, JdbcMapUtil.getString(p, "NAME"))).findAny();
                     if (optional.isPresent()) {
+
+                        String pmDeptId = "";
+                        if (CollectionUtils.isEmpty(oldeList)) {
+                            pmDeptId = Util.insertData(jdbcTemplate, "PM_DEPT");
+                        } else {
+                            pmDeptId = String.valueOf(oldeList.get(0).get("ID"));
+                        }
                         List<PmDeptUserModel> userModelList = mapData.get(key);
                         List<String> userIds = new ArrayList<>();
                         for (PmDeptUserModel pmDeptUserModel : userModelList) {
