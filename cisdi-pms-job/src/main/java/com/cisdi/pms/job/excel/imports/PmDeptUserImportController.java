@@ -82,7 +82,8 @@ public class PmDeptUserImportController {
                                 userNames.add(pmDeptUserModel.getUserName());
                             }
                         }
-                        jdbcTemplate.update("update PM_DEPT set PM_PRJ_ID=? ,HR_DEPT_ID=?,USER_IDS=? where id=?", projectId, optional.get().get("ID"), String.join(",", userIds), pmDeptId);
+                        List<String> ids = userIds.stream().distinct().collect(Collectors.toList());
+                        jdbcTemplate.update("update PM_DEPT set PM_PRJ_ID=? ,HR_DEPT_ID=?,USER_IDS=? where id=?", projectId, optional.get().get("ID"), String.join(",", ids), pmDeptId);
                     } else {
                         deptNames.add(key);
                     }
