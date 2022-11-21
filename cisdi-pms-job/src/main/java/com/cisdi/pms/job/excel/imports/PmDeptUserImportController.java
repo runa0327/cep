@@ -99,12 +99,12 @@ public class PmDeptUserImportController {
         }
 
         if (!CollectionUtils.isEmpty(deptNames)) {
-            List<String> deptNameList = projectNames.stream().distinct().collect(Collectors.toList());
+            List<String> deptNameList = deptNames.stream().distinct().collect(Collectors.toList());
             res.add("部门名称为:" + String.join(",", deptNameList) + "不存在！");
         }
 
         if (!CollectionUtils.isEmpty(userNames)) {
-            List<String> userNameList = projectNames.stream().distinct().collect(Collectors.toList());
+            List<String> userNameList = userNames.stream().distinct().collect(Collectors.toList());
             res.add("用户名称为:" + String.join(",", userNameList) + "不存在！");
         }
 
