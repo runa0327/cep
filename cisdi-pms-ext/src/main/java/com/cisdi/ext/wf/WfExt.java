@@ -153,6 +153,12 @@ public class WfExt {
                             int update1 = myJdbcTemplate.update("update PM_PRJ_REQ t set t.name=? where t.id=?", name, csCommId);
                         } else if ("PM_PRJ_STOP_ORDER_REQ".equals(entityCode)){
                             int update1 = myJdbcTemplate.update("update PM_PRJ_STOP_ORDER_REQ t set t.name=t.REMARK_TWO where t.id=?", csCommId);
+                        } else if ("PM_BID_KEEP_FILE_REQ".equals(entityCode)){
+                            String sql = "update wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id LEFT JOIN pm_bid_keep_file_req c on a.id = c.LK_WF_INST_ID " +
+                                    "LEFT JOIN pm_prj d on c.PM_PRJ_ID = d.id LEFT JOIN ad_user e on c.CRT_USER_ID = e.id " +
+                                    "set a.name = concat(b.name,'-',d.name,'-',e.name,'-',now()) where c.id = ?";
+                            int update1 = myJdbcTemplate.update(sql, csCommId);
+                            update1 = myJdbcTemplate.update("update pm_bid_keep_file_req a LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id set a.name = b.name where a.id = ?",csCommId);
                         } else {
                             String sql1 = "select a.NAME from wf_process_instance a left join " + entityCode + " b on a.id = b.LK_WF_INST_ID where " +
                                     "b.id = ?";
@@ -1348,7 +1354,7 @@ public class WfExt {
     private List<String> getNoProjectList(){
         List<String> list = new ArrayList<>();
         list.add("PM_SEND_APPROVAL_REQ"); // 发文呈批表
-        list.add("PM_BID_KEEP_FILE_REQ"); // 招采项目备案及归档
+//        list.add("PM_BID_KEEP_FILE_REQ"); // 招采项目备案及归档
         list.add("PM_USE_CHAPTER_REQ"); // 中选单位及标后用印审批
         return list;
     }
