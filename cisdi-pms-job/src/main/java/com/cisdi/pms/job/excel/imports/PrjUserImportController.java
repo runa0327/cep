@@ -14,6 +14,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,10 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 项目人员信息导入
@@ -58,7 +57,8 @@ public class PrjUserImportController {
     }
 
     /** 项目成员配置 新模板 **/
-    private String importExcelNew(File excelFile) {
+    @Transactional(rollbackFor = Exception.class)
+    public String importExcelNew(File excelFile) {
         //查询项目信息
         String sql1 = "select id,name from pm_prj where status = 'ap' order by name asc";
         List<Map<String,Object>> projectList = jdbcTemplate.queryForList(sql1);
@@ -90,7 +90,7 @@ public class PrjUserImportController {
                 basePrjPartyUser.setVer("99");
 
                 //项目名称
-                String projectName = EasyExcelUtil.getCellValueAsString(row.getCell(1));
+                String projectName = EasyExcelUtil.getCellValueAsString(row.getCell(1)).trim();
                 String projectId = "";
                 int num1 = 0;
                 for (Map<String, Object> tmp : projectList) {
@@ -107,7 +107,9 @@ public class PrjUserImportController {
                 }
                 if (SharedUtil.isEmptyString(projectId)){
                     projectId = Util.insertData(jdbcTemplate,"pm_prj");
-                    basePrjPartyUser.setId(projectId);
+                    String updateSql = "update pm_prj set ver = '99',CRT_DT = now(),CRT_USER_ID='99250247095871681',STATUS='AP',name = ?,PROJECT_SOURCE_TYPE_ID='99952822476441374' where id = ?";
+                    int s = jdbcTemplate.update(updateSql,projectName,projectId);
+                    basePrjPartyUser.setPmPrjId(projectId);
                 }
 
                 //业主单位
@@ -134,41 +136,62 @@ public class PrjUserImportController {
 
                 //人员
                 String users = EasyExcelUtil.getCellValueAsString(row.getCell(4));
+//                System.out.println(users);
+//                if ("温剑".equals(users)){
+//                    System.out.println(projectName);
+//                }
                 StringBuilder sb = new StringBuilder();
                 if (!SharedUtil.isEmptyString(users)){
                     users = StringUtils.replaceCode(users,",");
                     String[] userArr = users.split(",");
                     //查询人员信息
-                    String sql2 = "select group_concat(USER_IDS) as USER_IDS from pm_dept where status = 'ap' and PM_PRJ_ID = ? ";
+                    String sql2 = "select USER_IDS from pm_dept where status = 'ap' and PM_PRJ_ID = ? ";
                     List<Map<String,Object>> userList = jdbcTemplate.queryForList(sql2,projectId);
                     if (CollectionUtils.isEmpty(userList)){
                         errBuffer.append("项目： "+projectName+" 没有配置人员信息; ");
                     } else {
-                        String userIds = JdbcMapUtil.getString(userList.get(0),"USER_IDS");
-                        userIds = userIds.replace(",","','");
-                        String sql5 = "select id,name from ad_user where id in ('"+userIds+"')";
-                        List<Map<String,Object>> list5 = jdbcTemplate.queryForList(sql5);
-                        if (!CollectionUtils.isEmpty(list5)){
-                            for (String s : userArr) {
-                                int errNum = 0;
-                                for (Map<String, Object> tmp : list5) {
-                                    String name = JdbcMapUtil.getString(tmp,"name");
-                                    if (s.equals(name)){
-                                        sb.append(JdbcMapUtil.getString(tmp,"id")).append(",");
-                                        break;
-                                    } else {
-                                        errNum++;
-                                    }
-                                }
-                                if (errNum == list5.size()){
-                                    errBuffer.append("在项目： "+projectName+" 中没有配置人员： "+s+" ,该人员导入失败; ");
-                                }
+                        StringBuilder sbb = new StringBuilder();
+                        for (Map<String, Object> tmp : userList) {
+                            String userIds = JdbcMapUtil.getString(tmp,"USER_IDS");
+                            if (!SharedUtil.isEmptyString(userIds)){
+                                sbb.append(userIds).append(",");
                             }
                         }
-                        if (sb.length()>0){
-                            users = sb.substring(0,sb.length()-1);
-                            basePrjPartyUser.setUserId(users);
+                        String newUserIds = "";
+                        if (sbb.length() > 0){
+                            String userIds = sbb.substring(0,sbb.length()-1).toString();
+                            List<String> userList1 = Arrays.asList(userIds.split(","));
+                            userList1 = userList1.stream().distinct().collect(Collectors.toList());
+                            newUserIds = String.join(",",userList1);
                         }
+                        if (!SharedUtil.isEmptyString(newUserIds)){
+                            newUserIds = newUserIds.replace(",","','");
+                            String sql5 = "select distinct id,name from ad_user where id in ('"+newUserIds+"')";
+                            List<Map<String,Object>> list5 = jdbcTemplate.queryForList(sql5);
+                            if (!CollectionUtils.isEmpty(list5)){
+                                for (String s : userArr) {
+                                    s = s.trim();
+                                    int errNum = 0;
+                                    for (Map<String, Object> tmp : list5) {
+                                        String name = JdbcMapUtil.getString(tmp,"name");
+                                        if (s.equals(name)){
+                                            sb.append(JdbcMapUtil.getString(tmp,"id")).append(",");
+                                            break;
+                                        } else {
+                                            errNum++;
+                                        }
+                                    }
+                                    if (errNum == list5.size()){
+                                        errBuffer.append("在项目： "+projectName+" 中没有配置人员： "+s+" ,该人员导入失败; ");
+                                    }
+                                }
+                            }
+                            if (sb.length()>0){
+                                users = sb.substring(0,sb.length()-1);
+                                basePrjPartyUser.setUserId(users);
+                            }
+                        }
+
                     }
                 }
 
