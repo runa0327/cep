@@ -56,27 +56,28 @@ public class PmDeptUserImportController {
                 List<Map<String, Object>> deptList = jdbcTemplate.queryForList("select * from hr_dept where `status` = 'ap'");
                 List<Map<String, Object>> userList = jdbcTemplate.queryForList("select * from ad_user where `status` = 'ap'");
                 for (String key : mapData.keySet()) {
-                    List<Map<String, Object>> oldeList = jdbcTemplate.queryForList("select * from PM_DEPT where PM_PRJ_ID=? and HR_DEPT_ID=?", projectId, key);
                     Optional<Map<String, Object>> optional = deptList.stream().filter(p -> Objects.equals(key, JdbcMapUtil.getString(p, "NAME"))).findAny();
                     if (optional.isPresent()) {
-
+                        String deptId = String.valueOf(optional.get().get("ID"));
+                        List<Map<String, Object>> oldeList = jdbcTemplate.queryForList("select * from PM_DEPT where PM_PRJ_ID=? and HR_DEPT_ID=?", projectId, deptId);
                         String pmDeptId = "";
+                        String oldUserIds = "";
                         if (CollectionUtils.isEmpty(oldeList)) {
                             pmDeptId = Util.insertData(jdbcTemplate, "PM_DEPT");
                         } else {
                             pmDeptId = String.valueOf(oldeList.get(0).get("ID"));
+                            oldUserIds = String.valueOf(oldeList.get(0).get("USER_IDS"));
                         }
+
                         List<PmDeptUserModel> userModelList = mapData.get(key);
                         List<String> userIds = new ArrayList<>();
+                        if (!StringUtils.isEmpty(oldUserIds)) {
+                            userIds = Arrays.asList(oldUserIds.split(","));
+                        }
                         for (PmDeptUserModel pmDeptUserModel : userModelList) {
                             Optional<Map<String, Object>> userOptional = userList.stream().filter(m -> Objects.equals(pmDeptUserModel.getUserName(), JdbcMapUtil.getString(m, "NAME"))).findAny();
                             if (userOptional.isPresent()) {
-                                String userId = String.valueOf(userOptional.get().get("ID"));
-                                String asql = "select * from PM_DEPT where PM_PRJ_ID=? and HR_DEPT_ID=? and  find_in_set('" + userId + "',USER_IDS)";
-                                List<Map<String, Object>> list = jdbcTemplate.queryForList(asql, projectId, optional.get().get("ID"));
-                                if (CollectionUtils.isEmpty(list)) {
-                                    userIds.add(userId);
-                                }
+                                userIds.add(String.valueOf(userOptional.get().get("ID")));
                             } else {
                                 userNames.add(pmDeptUserModel.getUserName());
                             }
