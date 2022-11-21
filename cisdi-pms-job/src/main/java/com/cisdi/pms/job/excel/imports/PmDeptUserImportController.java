@@ -72,7 +72,7 @@ public class PmDeptUserImportController {
                         List<PmDeptUserModel> userModelList = mapData.get(key);
                         List<String> userIds = new ArrayList<>();
                         if (!StringUtils.isEmpty(oldUserIds)) {
-                            userIds = Arrays.asList(oldUserIds.split(","));
+                            userIds.addAll(Arrays.asList(oldUserIds.split(",")));
                         }
                         for (PmDeptUserModel pmDeptUserModel : userModelList) {
                             Optional<Map<String, Object>> userOptional = userList.stream().filter(m -> Objects.equals(pmDeptUserModel.getUserName(), JdbcMapUtil.getString(m, "NAME"))).findAny();
