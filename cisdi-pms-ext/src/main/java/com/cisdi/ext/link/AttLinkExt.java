@@ -122,7 +122,7 @@ public class AttLinkExt {
     private AttLinkResult linkGUARANTEE_DATE_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
         // 100058954591131329 = 其他，100058954591131328=系统
-        if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode)){
+        if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode) || "PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
             Boolean DATE_TYPE_WRWRChangeToEditable = false; //手填保函到日期，默认不可改
             Boolean DATE_TYPE_WRWRChangeToMandatory = false; //手填保函到日期，默认非必填
             Boolean GUARANTEE_END_DATEWRChangeToEditable = false; //选择保函到日期，默认不可改
@@ -162,7 +162,7 @@ public class AttLinkExt {
     private AttLinkResult linkGUARANTEE_COST_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
         // 100058954591131275 = 其他
-        if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode)){
+        if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode) || "PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
             Boolean costTypeWRChangeToEditable = false; //手填费用类型，默认不可改
             Boolean costTypeWRChangeToMandatory = false; //手填费用类型，默认非必填
             if ("100058954591131275".equals(attValue)){
@@ -383,7 +383,7 @@ public class AttLinkExt {
                     linkedAtt.changeToMandatory = false;
                     linkedAtt.changeToShown = false;
                     linkedAtt.changeToEditable = false;
-                    attLinkResult.attMap.put("CONTRACT_ID",linkedAtt);
+                    attLinkResult.attMap.put("CONTRACT_NAME",linkedAtt);
                 }
 
                 //变更类型
@@ -408,7 +408,7 @@ public class AttLinkExt {
                     linkedAtt.changeToMandatory = true;
                     linkedAtt.changeToShown = true;
                     linkedAtt.changeToEditable = true;
-                    attLinkResult.attMap.put("CONTRACT_ID",linkedAtt);
+                    attLinkResult.attMap.put("CONTRACT_NAME",linkedAtt);
                 }
 
                 //变更类型
@@ -2085,7 +2085,7 @@ public class AttLinkExt {
         }
 
 
-        if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode)){
+        if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode) || "PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
             String name = JdbcMapUtil.getString(list.get(0),"name");
             Boolean changeToMandatory = false;
             Boolean changeToEditable = false;

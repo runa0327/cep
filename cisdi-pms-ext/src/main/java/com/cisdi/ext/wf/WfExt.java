@@ -115,16 +115,23 @@ public class WfExt {
                     // 补充合同批准后生成合同编号
                     if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode)) {
                         // 查询当前审批通过的补充合同数量和该合同的name
-                        List<Map<String, Object>> map = myJdbcTemplate.queryForList("select count(*) as num from " +
-                                "PO_ORDER_REQ where status = 'AP' ");
-                        int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
-                        String formatNum = formatCount.format(num);
+//                        List<Map<String, Object>> map = myJdbcTemplate.queryForList("select count(*) as num from " +
+//                                "PO_ORDER_REQ where status = 'AP' ");
+//                        int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
+//                        String formatNum = formatCount.format(num);
 
-                        String relationContractId = valueMap.get("RELATION_CONTRACT_ID").toString();
-                        List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList("SELECT CONTRACT_NAME FROM " +
-                                "po_order_req where id = ?", relationContractId);
-                        String name = nameMap.get(0).get("CONTRACT_NAME").toString();
-                        String contractName = name + "补充协议" + formatNum;
+                        String relationContractId = JdbcMapUtil.getString(valueMap,"RELATION_CONTRACT_ID");
+                        String name = "";
+                        String contractName = "";
+                        if (!SharedUtil.isEmptyString(relationContractId)){
+                            List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList("SELECT CONTRACT_NAME FROM po_order_req where id = ?", relationContractId);
+                            if (!CollectionUtils.isEmpty(nameMap)){
+                                name = JdbcMapUtil.getString(nameMap.get(0),"CONTRACT_NAME");
+//                                contractName = name + "补充协议" + formatNum;
+                                contractName = name + "补充协议";
+                            }
+                        }
+
                         // 写入到补充合同表
                         int update1 = myJdbcTemplate.update("update PO_ORDER_SUPPLEMENT_REQ set CONTRACT_NAME = ?  " +
                                 "where id = ? ", contractName, csCommId);
