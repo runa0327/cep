@@ -129,12 +129,13 @@ public class WfExt {
                                 name = JdbcMapUtil.getString(nameMap.get(0),"CONTRACT_NAME");
 //                                contractName = name + "补充协议" + formatNum;
                                 contractName = name + "补充协议";
+                                // 写入到补充合同表
+                                int update1 = myJdbcTemplate.update("update PO_ORDER_SUPPLEMENT_REQ set CONTRACT_NAME = ?  " +
+                                        "where id = ? ", contractName, csCommId);
                             }
                         }
 
-                        // 写入到补充合同表
-                        int update1 = myJdbcTemplate.update("update PO_ORDER_SUPPLEMENT_REQ set CONTRACT_NAME = ?  " +
-                                "where id = ? ", contractName, csCommId);
+
                     }
 
                     //一些特殊流程发起后即结束。流程名称处理
