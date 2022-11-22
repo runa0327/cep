@@ -3040,8 +3040,8 @@ public class AttLinkExt {
                         linkedRecord.textMap.put("REQ_AMT", String.valueOf(cha));
                     }
                     // 本期支付
-                    linkedRecord.valueMap.put("PAY_AMT_ONE", "0");
-                    linkedRecord.textMap.put("PAY_AMT_ONE", "0");
+//                    linkedRecord.valueMap.put("PAY_AMT_ONE", "0");
+//                    linkedRecord.textMap.put("PAY_AMT_ONE", "0");
 
                     linkedRecordList.add(linkedRecord);
                 }
