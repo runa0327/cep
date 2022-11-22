@@ -360,8 +360,9 @@ public class AttLinkExt {
     // 项目来源 属性联动
     private AttLinkResult linkPROJECT_SOURCE_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
+        List<String> entityCodes = Arrays.asList("PM_BID_APPROVAL_REQ", "PM_FILE_CHAPTER_REQ","PM_USE_CHAPTER_REQ","PM_BID_KEEP_FILE_REQ","PO_GUARANTEE_LETTER_RETURN_OA_REQ");
         //99952822476441374=立项，99952822476441375=非立项
-        if ("PM_BUY_DEMAND_REQ".equals(entCode)){
+        if ("PM_BUY_DEMAND_REQ".equals(entCode)) {
             Boolean prjListChangeToShown = false; //下拉项目默认隐藏
             Boolean prjNameChangeToShown = false; //手写项目默认隐藏
 
@@ -394,7 +395,7 @@ public class AttLinkExt {
                 linkedAtt.changeToMandatory = prjListChangeToMandatory;
                 linkedAtt.changeToShown = prjListChangeToShown;
                 linkedAtt.changeToEditable = prjListChangeToEditable;
-                attLinkResult.attMap.put("PM_PRJ_ID",linkedAtt);
+                attLinkResult.attMap.put("PM_PRJ_ID", linkedAtt);
             }
             //项目名称
             {
@@ -405,7 +406,7 @@ public class AttLinkExt {
                 linkedAtt.changeToMandatory = prjNameChangeToMandatory;
                 linkedAtt.changeToShown = prjNameChangeToShown;
                 linkedAtt.changeToEditable = prjNameChangeToEditable;
-                attLinkResult.attMap.put("PROJECT_NAME_WR",linkedAtt);
+                attLinkResult.attMap.put("PROJECT_NAME_WR", linkedAtt);
             }
             //是否政府投资项目
             {
@@ -414,7 +415,7 @@ public class AttLinkExt {
                 linkedAtt.value = null;
                 linkedAtt.text = null;
                 linkedAtt.changeToEditable = isZFChangeToEditable;
-                attLinkResult.attMap.put("YES_NO_ONE",linkedAtt);
+                attLinkResult.attMap.put("YES_NO_ONE", linkedAtt);
             }
             //资金来源
             {
@@ -423,7 +424,7 @@ public class AttLinkExt {
                 linkedAtt.value = null;
                 linkedAtt.text = null;
                 linkedAtt.changeToEditable = amtSourceChangeToEditable;
-                attLinkResult.attMap.put("INVESTMENT_SOURCE_ID",linkedAtt);
+                attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
             }
             //清空数据
             //采购启动依据
@@ -433,8 +434,8 @@ public class AttLinkExt {
                 linkedAtt.value = null;
                 linkedAtt.text = null;
                 linkedAtt.changeToEditable = true;
-                attLinkResult.attMap.put("BUY_START_BASIS_ID",linkedAtt);
-                attLinkResult.attMap.put("REPLY_NO_WR",linkedAtt);
+                attLinkResult.attMap.put("BUY_START_BASIS_ID", linkedAtt);
+                attLinkResult.attMap.put("REPLY_NO_WR", linkedAtt);
             }
             //采购启动依据文件
             {
@@ -444,9 +445,52 @@ public class AttLinkExt {
                 linkedAtt.text = null;
                 linkedAtt.changeToEditable = true;
                 linkedAtt.fileInfoList = null;
-                attLinkResult.attMap.put("FILE_ID_THREE",linkedAtt);
+                attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
             }
             return attLinkResult;
+        } else if (entityCodes.contains(entCode)){
+            Boolean prjListChangeToShown = false; //下拉项目默认隐藏
+            Boolean prjNameChangeToShown = false; //手写项目默认隐藏
+
+            Boolean prjListChangeToMandatory = false; //下拉项目默认非必填
+            Boolean prjNameChangeToMandatory = false; //手写项目默认非必填
+
+            Boolean prjListChangeToEditable = false; //下拉项目默认不可改
+            Boolean prjNameChangeToEditable = false; //手写项目默认不可改
+            {
+                if (!"99952822476441374".equals(attValue)) {
+                    prjNameChangeToShown = true;
+                    prjNameChangeToMandatory = true;
+                    prjNameChangeToEditable = true;
+                } else {
+                    prjListChangeToShown = true;
+                    prjListChangeToMandatory = true;
+                    prjListChangeToEditable = true;
+                }
+                //下拉项目列表
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToMandatory = prjListChangeToMandatory;
+                    linkedAtt.changeToShown = prjListChangeToShown;
+                    linkedAtt.changeToEditable = prjListChangeToEditable;
+                    attLinkResult.attMap.put("PM_PRJ_ID", linkedAtt);
+                }
+                //项目名称
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToMandatory = prjNameChangeToMandatory;
+                    linkedAtt.changeToShown = prjNameChangeToShown;
+                    linkedAtt.changeToEditable = prjNameChangeToEditable;
+                    attLinkResult.attMap.put("PROJECT_NAME_WR", linkedAtt);
+                }
+                return attLinkResult;
+            }
         } else {
             return attLinkResult;
         }
