@@ -58,7 +58,7 @@ public class FundImplementationImportController {
                 message += "项目名称为:" + String.join(",", res) + "不存在，未导入！";
             }
             if (!CollectionUtils.isEmpty(duplicatedSources)){
-                message += "资金来源为:" + String.join(",", duplicatedSources) + "不存在，未导入！";
+                message += "资金来源为:" + String.join(",", duplicatedSources) + "重复，未导入！";
             }
             result.put("message", message);
         }
