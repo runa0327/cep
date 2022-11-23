@@ -40,7 +40,7 @@ public class SendSmsJob {
     boolean smsSwitch;
 
     //@Scheduled(fixedDelayString = "5000")
-    //@Scheduled(fixedDelayString = "60000")
+    @Scheduled(fixedDelayString = "60000")
     public void sendSMS() {
         //开关短信功能
         if (!smsSwitch){
