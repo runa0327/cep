@@ -52,6 +52,7 @@ public class PrjUserImportController {
 
 //        String msg = importExcel(excelFile);
         String msg = importExcelNew(excelFile);
+        map.put("code",200);
         map.put("success",msg);
         return map;
     }
