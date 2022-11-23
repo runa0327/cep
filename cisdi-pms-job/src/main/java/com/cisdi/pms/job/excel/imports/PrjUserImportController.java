@@ -52,6 +52,7 @@ public class PrjUserImportController {
 
 //        String msg = importExcel(excelFile);
         String msg = importExcelNew(excelFile);
+        map.put("code",200);
         map.put("success",msg);
         return map;
     }
@@ -109,6 +110,7 @@ public class PrjUserImportController {
                     projectId = Util.insertData(jdbcTemplate,"pm_prj");
                     String updateSql = "update pm_prj set ver = '99',CRT_DT = now(),CRT_USER_ID='99250247095871681',STATUS='AP',name = ?,PROJECT_SOURCE_TYPE_ID='99952822476441374' where id = ?";
                     int s = jdbcTemplate.update(updateSql,projectName,projectId);
+                    projectList = jdbcTemplate.queryForList(sql1);
                     basePrjPartyUser.setPmPrjId(projectId);
                 }
 

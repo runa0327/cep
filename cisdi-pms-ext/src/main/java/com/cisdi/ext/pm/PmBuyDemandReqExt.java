@@ -132,6 +132,8 @@ public class PmBuyDemandReqExt {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //项目来源类型  99952822476441375=非立项
         String projectType = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_SOURCE_TYPE_ID");
+        //部门
+        String deptId = JdbcMapUtil.getString(entityRecord.valueMap, "CRT_DEPT_ID");
         if ("99952822476441375".equals(projectType)){
             //创建人
             String userId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_USER_ID");
@@ -143,8 +145,14 @@ public class PmBuyDemandReqExt {
             if (!CollectionUtils.isEmpty(list1)){
                 throw new BaseException("非立项项目下,'"+projectName+" '项目已存在！");
             }
-            String sql2 = "insert into pm_prj(id,CRT_USER_ID,STATUS,NAME,PROJECT_SOURCE_TYPE_ID) values((select uuid_short()),?,'AP',?,?)";
-            int update = myJdbcTemplate.update(sql2,userId,projectName,projectType);
+            String prjId = Crud.from("pm_prj").insertData();
+            myJdbcTemplate.update("update pm_prj set CRT_USER_ID = ?,STATUS = ?,NAME = ?,PROJECT_SOURCE_TYPE_ID = ? where id = ?",userId,"AP",projectName,projectType,prjId);
+//            String sql2 = "insert into pm_prj(id,CRT_USER_ID,STATUS,NAME,PROJECT_SOURCE_TYPE_ID) values((select uuid_short()),?,'AP',?,?)";
+//            int update = myJdbcTemplate.update(sql2,userId,projectName,projectType);
+            String pmDeptId = Crud.from("pm_dept").insertData();
+            myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?",prjId,deptId,userId,1,pmDeptId);
+//            String sql3 = "insert into pm_dept(id,PM_PRJ_ID,HR_DEPT_ID,USER_IDS,ver) values((select uuid_short()),?,?,?,?)";
+//            myJdbcTemplate.update(sql3,prjId,deptId,userId,1);
         }
     }
 }

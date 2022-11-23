@@ -115,19 +115,27 @@ public class WfExt {
                     // 补充合同批准后生成合同编号
                     if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode)) {
                         // 查询当前审批通过的补充合同数量和该合同的name
-                        List<Map<String, Object>> map = myJdbcTemplate.queryForList("select count(*) as num from " +
-                                "PO_ORDER_REQ where status = 'AP' ");
-                        int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
-                        String formatNum = formatCount.format(num);
+//                        List<Map<String, Object>> map = myJdbcTemplate.queryForList("select count(*) as num from " +
+//                                "PO_ORDER_REQ where status = 'AP' ");
+//                        int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
+//                        String formatNum = formatCount.format(num);
 
-                        String relationContractId = valueMap.get("RELATION_CONTRACT_ID").toString();
-                        List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList("SELECT CONTRACT_NAME FROM " +
-                                "po_order_req where id = ?", relationContractId);
-                        String name = nameMap.get(0).get("CONTRACT_NAME").toString();
-                        String contractName = name + "补充协议" + formatNum;
-                        // 写入到补充合同表
-                        int update1 = myJdbcTemplate.update("update PO_ORDER_SUPPLEMENT_REQ set CONTRACT_NAME = ?  " +
-                                "where id = ? ", contractName, csCommId);
+                        String relationContractId = JdbcMapUtil.getString(valueMap,"RELATION_CONTRACT_ID");
+                        String name = "";
+                        String contractName = "";
+                        if (!SharedUtil.isEmptyString(relationContractId)){
+                            List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList("SELECT CONTRACT_NAME FROM po_order_req where id = ?", relationContractId);
+                            if (!CollectionUtils.isEmpty(nameMap)){
+                                name = JdbcMapUtil.getString(nameMap.get(0),"CONTRACT_NAME");
+//                                contractName = name + "补充协议" + formatNum;
+                                contractName = name + "补充协议";
+                                // 写入到补充合同表
+                                int update1 = myJdbcTemplate.update("update PO_ORDER_SUPPLEMENT_REQ set CONTRACT_NAME = ?  " +
+                                        "where id = ? ", contractName, csCommId);
+                            }
+                        }
+
+
                     }
 
                     //一些特殊流程发起后即结束。流程名称处理
@@ -365,6 +373,9 @@ public class WfExt {
         //招采项目备案及归档
         if ("PM_BID_KEEP_FILE_REQ".equals(entityCode)){
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            if(SharedUtil.isEmptyString(prjId)){
+                prjId = this.getWritePrjId(valueMap);
+            }
             String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
             String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
             // 中标通知书
@@ -376,6 +387,9 @@ public class WfExt {
         //中选单位及标后用印审批
         if ("PM_USE_CHAPTER_REQ".equals(entityCode)){
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            if(SharedUtil.isEmptyString(prjId)){
+                prjId = this.getWritePrjId(valueMap);
+            }
             String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
             String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
             // 其他依据
@@ -496,15 +510,16 @@ public class WfExt {
         if ("PM_BUY_DEMAND_REQ".equals(entityCode)) {
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
             if(SharedUtil.isEmptyString(prjId)){
-                MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-                String name = JdbcMapUtil.getString(valueMap,"PROJECT_NAME_WR");
-                String PROJECT_SOURCE_TYPE_ID = JdbcMapUtil.getString(valueMap,"PROJECT_SOURCE_TYPE_ID");
-                List<Map<String,Object>> list = myJdbcTemplate.queryForList("select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?",name,PROJECT_SOURCE_TYPE_ID);
-                if (CollectionUtils.isEmpty(list)){
-                    return;
-                } else {
-                    prjId = JdbcMapUtil.getString(list.get(0),"id");
-                }
+//                MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+//                String name = JdbcMapUtil.getString(valueMap,"PROJECT_NAME_WR");
+//                String PROJECT_SOURCE_TYPE_ID = JdbcMapUtil.getString(valueMap,"PROJECT_SOURCE_TYPE_ID");
+//                List<Map<String,Object>> list = myJdbcTemplate.queryForList("select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?",name,PROJECT_SOURCE_TYPE_ID);
+//                if (CollectionUtils.isEmpty(list)){
+//                    return;
+//                } else {
+//                    prjId = JdbcMapUtil.getString(list.get(0),"id");
+
+                prjId = this.getWritePrjId(valueMap);
 //                prjId = myJdbcTemplate.queryForList("select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?",name,PROJECT_SOURCE_TYPE_ID).get(0).get("id").toString();
 //                if (SharedUtil.isEmptyString(prjId)){
 //                    return;
@@ -524,6 +539,9 @@ public class WfExt {
         //招标文件审批
         if ("PM_BID_APPROVAL_REQ".equals(entityCode)) {
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            if(SharedUtil.isEmptyString(prjId)){
+                prjId = this.getWritePrjId(valueMap);
+            }
             String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
             String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
             // 招标文件
@@ -535,6 +553,9 @@ public class WfExt {
         // 标前资料用印审批
         if ("PM_FILE_CHAPTER_REQ".equals(entityCode)) {
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            if(SharedUtil.isEmptyString(prjId)){
+                prjId = this.getWritePrjId(valueMap);
+            }
             String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE"); //招标文件
             String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO"); //标前资料
             // 招标文件
@@ -1128,8 +1149,11 @@ public class WfExt {
         }
 
         //保函退还申请
-        if ("PO_GUARANTEE_LETTER_RETURN_REQ".equals(entityCode)){
+        if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entityCode)){
             String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+            if(SharedUtil.isEmptyString(prjId)){
+                prjId = this.getWritePrjId(valueMap);
+            }
             //保函退还附件
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"GUARANTEE_FILE"),FileCodeEnum.GUARANTEE_RETURN_LETTER_ANNEX);
         }
@@ -1279,6 +1303,19 @@ public class WfExt {
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
             getDeptChief(entityRecord);
+        }
+    }
+
+    //获取填写项目的id
+    private String getWritePrjId(Map<String, Object> valueMap){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String name = JdbcMapUtil.getString(valueMap,"PROJECT_NAME_WR");
+        String PROJECT_SOURCE_TYPE_ID = JdbcMapUtil.getString(valueMap,"PROJECT_SOURCE_TYPE_ID");
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?",name,PROJECT_SOURCE_TYPE_ID);
+        if (CollectionUtils.isEmpty(list)){
+            return null;
+        } else {
+            return JdbcMapUtil.getString(list.get(0),"id");
         }
     }
 

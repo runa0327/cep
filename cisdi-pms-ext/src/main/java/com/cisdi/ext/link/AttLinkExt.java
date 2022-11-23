@@ -108,10 +108,80 @@ public class AttLinkExt {
             return linkORDER_DEMAND_TYPE(myJdbcTemplate,attValue,entCode);
         } else if ("BUILD_PERMIT_TYPE_ID".equals(attCode)){ //施工许可类型
             return linkBUILD_PERMIT_TYPE_ID(myJdbcTemplate,attValue,entCode);
-        }  else {
+        } else if ("GUARANTEE_COST_TYPE_ID".equals(attCode)){ //保函-费用类型
+            return linkGUARANTEE_COST_TYPE_ID(myJdbcTemplate,attValue,entCode);
+        } else if ("GUARANTEE_DATE_TYPE_ID".equals(attCode)){ //保函-到期类型
+            return linkGUARANTEE_DATE_TYPE_ID(myJdbcTemplate,attValue,entCode);
+        } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
 
+    }
+
+    // 保函-到期类型 属性联动
+    private AttLinkResult linkGUARANTEE_DATE_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        // 100058954591131329 = 其他，100058954591131328=系统
+        if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode) || "PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
+            Boolean DATE_TYPE_WRWRChangeToEditable = false; //手填保函到日期，默认不可改
+            Boolean DATE_TYPE_WRWRChangeToMandatory = false; //手填保函到日期，默认非必填
+            Boolean GUARANTEE_END_DATEWRChangeToEditable = false; //选择保函到日期，默认不可改
+            Boolean GUARANTEE_END_DATEWRChangeToMandatory = false; //选择保函到日期，默认非必填
+            if ("100058954591131328".equals(attValue)){
+                GUARANTEE_END_DATEWRChangeToEditable = true;
+                GUARANTEE_END_DATEWRChangeToMandatory = true;
+            } else {
+                DATE_TYPE_WRWRChangeToEditable = true;
+                DATE_TYPE_WRWRChangeToMandatory = true;
+            }
+            //请填写保函到期日期
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToEditable = DATE_TYPE_WRWRChangeToEditable;
+                linkedAtt.changeToMandatory = DATE_TYPE_WRWRChangeToMandatory;
+                attLinkResult.attMap.put("DATE_TYPE_WR",linkedAtt);
+            }
+            //保函到期日
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToEditable = GUARANTEE_END_DATEWRChangeToEditable;
+                linkedAtt.changeToMandatory = GUARANTEE_END_DATEWRChangeToMandatory;
+                attLinkResult.attMap.put("GUARANTEE_END_DATE",linkedAtt);
+            }
+        }
+        return attLinkResult;
+    }
+
+    // 保函-费用类型 属性联动
+    private AttLinkResult linkGUARANTEE_COST_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        // 100058954591131275 = 其他
+        if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode) || "PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
+            Boolean costTypeWRChangeToEditable = false; //手填费用类型，默认不可改
+            Boolean costTypeWRChangeToMandatory = false; //手填费用类型，默认非必填
+            if ("100058954591131275".equals(attValue)){
+                costTypeWRChangeToEditable = true;
+                costTypeWRChangeToMandatory = true;
+            }
+            //手填费用类型
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToEditable = costTypeWRChangeToEditable;
+                linkedAtt.changeToMandatory = costTypeWRChangeToMandatory;
+                attLinkResult.attMap.put("COST_TYPE_WR",linkedAtt);
+            }
+        }
+
+        return attLinkResult;
     }
 
     // 施工许可类型 属性联动
@@ -313,7 +383,7 @@ public class AttLinkExt {
                     linkedAtt.changeToMandatory = false;
                     linkedAtt.changeToShown = false;
                     linkedAtt.changeToEditable = false;
-                    attLinkResult.attMap.put("CONTRACT_ID",linkedAtt);
+                    attLinkResult.attMap.put("CONTRACT_NAME",linkedAtt);
                 }
 
                 //变更类型
@@ -338,7 +408,7 @@ public class AttLinkExt {
                     linkedAtt.changeToMandatory = true;
                     linkedAtt.changeToShown = true;
                     linkedAtt.changeToEditable = true;
-                    attLinkResult.attMap.put("CONTRACT_ID",linkedAtt);
+                    attLinkResult.attMap.put("CONTRACT_NAME",linkedAtt);
                 }
 
                 //变更类型
@@ -360,8 +430,9 @@ public class AttLinkExt {
     // 项目来源 属性联动
     private AttLinkResult linkPROJECT_SOURCE_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
+        List<String> entityCodes = Arrays.asList("PM_BID_APPROVAL_REQ", "PM_FILE_CHAPTER_REQ","PM_USE_CHAPTER_REQ","PM_BID_KEEP_FILE_REQ","PO_GUARANTEE_LETTER_RETURN_OA_REQ");
         //99952822476441374=立项，99952822476441375=非立项
-        if ("PM_BUY_DEMAND_REQ".equals(entCode)){
+        if ("PM_BUY_DEMAND_REQ".equals(entCode)) {
             Boolean prjListChangeToShown = false; //下拉项目默认隐藏
             Boolean prjNameChangeToShown = false; //手写项目默认隐藏
 
@@ -394,7 +465,7 @@ public class AttLinkExt {
                 linkedAtt.changeToMandatory = prjListChangeToMandatory;
                 linkedAtt.changeToShown = prjListChangeToShown;
                 linkedAtt.changeToEditable = prjListChangeToEditable;
-                attLinkResult.attMap.put("PM_PRJ_ID",linkedAtt);
+                attLinkResult.attMap.put("PM_PRJ_ID", linkedAtt);
             }
             //项目名称
             {
@@ -405,7 +476,7 @@ public class AttLinkExt {
                 linkedAtt.changeToMandatory = prjNameChangeToMandatory;
                 linkedAtt.changeToShown = prjNameChangeToShown;
                 linkedAtt.changeToEditable = prjNameChangeToEditable;
-                attLinkResult.attMap.put("PROJECT_NAME_WR",linkedAtt);
+                attLinkResult.attMap.put("PROJECT_NAME_WR", linkedAtt);
             }
             //是否政府投资项目
             {
@@ -414,7 +485,7 @@ public class AttLinkExt {
                 linkedAtt.value = null;
                 linkedAtt.text = null;
                 linkedAtt.changeToEditable = isZFChangeToEditable;
-                attLinkResult.attMap.put("YES_NO_ONE",linkedAtt);
+                attLinkResult.attMap.put("YES_NO_ONE", linkedAtt);
             }
             //资金来源
             {
@@ -423,7 +494,7 @@ public class AttLinkExt {
                 linkedAtt.value = null;
                 linkedAtt.text = null;
                 linkedAtt.changeToEditable = amtSourceChangeToEditable;
-                attLinkResult.attMap.put("INVESTMENT_SOURCE_ID",linkedAtt);
+                attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
             }
             //清空数据
             //采购启动依据
@@ -433,8 +504,8 @@ public class AttLinkExt {
                 linkedAtt.value = null;
                 linkedAtt.text = null;
                 linkedAtt.changeToEditable = true;
-                attLinkResult.attMap.put("BUY_START_BASIS_ID",linkedAtt);
-                attLinkResult.attMap.put("REPLY_NO_WR",linkedAtt);
+                attLinkResult.attMap.put("BUY_START_BASIS_ID", linkedAtt);
+                attLinkResult.attMap.put("REPLY_NO_WR", linkedAtt);
             }
             //采购启动依据文件
             {
@@ -444,9 +515,109 @@ public class AttLinkExt {
                 linkedAtt.text = null;
                 linkedAtt.changeToEditable = true;
                 linkedAtt.fileInfoList = null;
-                attLinkResult.attMap.put("FILE_ID_THREE",linkedAtt);
+                attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
             }
             return attLinkResult;
+        } else if ("PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
+            //99952822476441374=系统，99952822476441375=非系统
+            Boolean CONTRACT_NAMEChangeToShown = false; //手填合同名称默认不隐藏
+            Boolean CONTRACT_IDChangeToShown = false; //选择合同名称默认不隐藏
+
+            Boolean CONTRACT_NAMEChangeToMandatory = false; //手填合同名称默认非必填
+            Boolean CONTRACT_IDChangeToMandatory = false; //选择合同名称默认非必填
+
+            Boolean CONTRACT_NAMEChangeToEditable = false; //手填合同名称默认不可改
+            Boolean CONTRACT_IDChangeToEditable = false; //选择合同名称默认不可改
+
+            Boolean CONTRACT_AMOUNTChangeToEditable = false; //合同金额默认不可改
+            Boolean CONTRACT_AMOUNTChangeToMandatory = false; //合同金额默认非必填
+
+            if ("99952822476441375".equals(attValue)){
+                CONTRACT_NAMEChangeToShown = true;
+                CONTRACT_NAMEChangeToMandatory = true;
+                CONTRACT_NAMEChangeToEditable = true;
+                CONTRACT_AMOUNTChangeToEditable = true;
+                CONTRACT_AMOUNTChangeToMandatory = true;
+            } else {
+                CONTRACT_IDChangeToShown = true;
+                CONTRACT_IDChangeToMandatory = true;
+                CONTRACT_IDChangeToEditable = true;
+            }
+            //合同名称
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToMandatory = CONTRACT_NAMEChangeToMandatory;
+                linkedAtt.changeToShown = CONTRACT_NAMEChangeToShown;
+                linkedAtt.changeToEditable = CONTRACT_NAMEChangeToEditable;
+                attLinkResult.attMap.put("CONTRACT_NAME", linkedAtt);
+            }
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToMandatory = CONTRACT_IDChangeToMandatory;
+                linkedAtt.changeToShown = CONTRACT_IDChangeToShown;
+                linkedAtt.changeToEditable = CONTRACT_IDChangeToEditable;
+                attLinkResult.attMap.put("CONTRACT_ID", linkedAtt);
+            }
+            //合同金额
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToMandatory = CONTRACT_AMOUNTChangeToMandatory;
+                linkedAtt.changeToEditable = CONTRACT_AMOUNTChangeToEditable;
+                attLinkResult.attMap.put("CONTRACT_AMOUNT", linkedAtt);
+            }
+            return attLinkResult;
+        } else if (entityCodes.contains(entCode)){
+            Boolean prjListChangeToShown = false; //下拉项目默认隐藏
+            Boolean prjNameChangeToShown = false; //手写项目默认隐藏
+
+            Boolean prjListChangeToMandatory = false; //下拉项目默认非必填
+            Boolean prjNameChangeToMandatory = false; //手写项目默认非必填
+
+            Boolean prjListChangeToEditable = false; //下拉项目默认不可改
+            Boolean prjNameChangeToEditable = false; //手写项目默认不可改
+            {
+                if (!"99952822476441374".equals(attValue)) {
+                    prjNameChangeToShown = true;
+                    prjNameChangeToMandatory = true;
+                    prjNameChangeToEditable = true;
+                } else {
+                    prjListChangeToShown = true;
+                    prjListChangeToMandatory = true;
+                    prjListChangeToEditable = true;
+                }
+                //下拉项目列表
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToMandatory = prjListChangeToMandatory;
+                    linkedAtt.changeToShown = prjListChangeToShown;
+                    linkedAtt.changeToEditable = prjListChangeToEditable;
+                    attLinkResult.attMap.put("PM_PRJ_ID", linkedAtt);
+                }
+                //项目名称
+                {
+                    LinkedAtt linkedAtt = new LinkedAtt();
+                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                    linkedAtt.value = null;
+                    linkedAtt.text = null;
+                    linkedAtt.changeToMandatory = prjNameChangeToMandatory;
+                    linkedAtt.changeToShown = prjNameChangeToShown;
+                    linkedAtt.changeToEditable = prjNameChangeToEditable;
+                    attLinkResult.attMap.put("PROJECT_NAME_WR", linkedAtt);
+                }
+                return attLinkResult;
+            }
         } else {
             return attLinkResult;
         }
@@ -1914,7 +2085,7 @@ public class AttLinkExt {
         }
 
 
-        if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode)){
+        if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode) || "PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
             String name = JdbcMapUtil.getString(list.get(0),"name");
             Boolean changeToMandatory = false;
             Boolean changeToEditable = false;
