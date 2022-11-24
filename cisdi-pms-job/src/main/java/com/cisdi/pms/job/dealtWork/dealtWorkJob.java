@@ -56,8 +56,8 @@ public class dealtWorkJob {
     /**
      * 添加待办事项
      */
-    @Scheduled(fixedDelayString = "5000")
-    //@Scheduled(fixedDelayString = "30000")
+    //@Scheduled(fixedDelayString = "5000")
+    @Scheduled(fixedDelayString = "30000")
     public void handleDealt() {
 
         if (!dealtSwitch) return;
@@ -99,10 +99,11 @@ public class dealtWorkJob {
     /**
      * 待办事项变更已读
      */
-    //@Scheduled(fixedDelayString = "30000")
+    //@Scheduled(fixedDelayString = "5000")
+    @Scheduled(fixedDelayString = "30000")
     public void dealtTask() {
 
-        if (dealtSwitch) return;
+        if (!dealtSwitch) return;
 
         //锁表  防止多台服务器同时修改
         String lockSql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code='DEALT_INFO_LOCK' and (t.LOCK_EXT_DTTM_ATT01_VAL is null or t.LOCK_EXT_DTTM_ATT01_VAL <= SUBDATE(NOW(),INTERVAL -10 minute))";
@@ -155,19 +156,24 @@ public class dealtWorkJob {
         for (Map<String, Object> map : list) {
             parames += ("," + map.get("AD_USER_ID"));
         }
-        parames.substring(1);
+        parames = parames.substring(1);
 
         //获取本地存储的待办事项信息
-        String dealtInfoSql = "select appId , userId , msgId from dealt_info where ad_user_id in (?)";
+        String dealtInfoSql = "select APP_ID , USER_ID , MSG_ID from dealt_info where AD_USER_ID in (?)";
         List<Map<String, Object>> listInfo = jdbcTemplate.queryForList(dealtInfoSql, parames);
+
+        if (CollectionUtils.isEmpty(listInfo)){
+            logger.info("不存在用户id，AD_USER_ID:{}",parames);
+            throw new RuntimeException("本地数据不存在");
+        }
 
         //变更已读
         listInfo.stream().forEach(lis -> {
-            dealtRead(lis.get("appId").toString(), lis.get("userId").toString(), lis.get("msgId").toString());
+            dealtRead(lis.get("APP_ID").toString(), lis.get("USER_ID").toString(), lis.get("MSG_ID").toString());
 
             //2.操作本地表，删除本地表数据
-            String updateLocalSql = "update dealt_info set appId='' ,msgId='' ,title='' ,appName='' ,content='' ,callBackUrl='' where user_id = ?";
-            jdbcTemplate.update(updateLocalSql, lis.get("userId").toString());
+            String updateLocalSql = "update dealt_info set APP_ID='' ,MSG_ID='' ,DEALT_TITLE='' ,APP_NAME='' ,CONTENT='' ,CALL_BACK_URL='' where USER_ID = ?";
+            jdbcTemplate.update(updateLocalSql, lis.get("USER_ID").toString());
 
         });
     }
@@ -191,18 +197,20 @@ public class dealtWorkJob {
      */
     private void saveUserId(String userId, String phone, String adUserId) {
         //判断当前用户id是否已经存储在本地表中
-        String selectSql = "select user_id from dealt_info";
+        String selectSql = "select USER_ID from dealt_info";
         List<String> list = jdbcTemplate.queryForList(selectSql, String.class);
-        List<String> userIds = list.stream().filter(lis -> lis.equals(userId)).collect(Collectors.toList());
-        //如果当前用户id已存在，则不保存
-        if (!CollectionUtils.isEmpty(userIds)) {
-            return;
+        if (!CollectionUtils.isEmpty(list) && !list.contains(null)){
+            List<String> userIds = list.stream().filter(lis -> lis.equals(userId)).collect(Collectors.toList());
+            //如果当前用户id已存在，则不保存
+            if (!CollectionUtils.isEmpty(userIds) && !CollectionUtils.isEmpty(list)) {
+                return;
+            }
         }
 
         String id = Util.insertData(jdbcTemplate, "dealt_info");
 
         //将所有的用户id保存包本地表中
-        String saveSql = "UPDATE dealt_info set user_id=?,phone=?,ad_user_id=? where id=?";
+        String saveSql = "UPDATE dealt_info set USER_ID=?,PHONE=?,AD_USER_ID=? where ID=?";
         jdbcTemplate.update(saveSql, userId, phone, adUserId, id);
     }
 
@@ -258,20 +266,26 @@ public class dealtWorkJob {
         String content = "[工程项目信息协同系统]您好：流程待办" + "“" + maps.get(0).get("NAME") + "”已到您处，请尽快处理";
 
         //此处还需要本地加一张待办表，将代办信息保存,后续修改为已读时需要
-        String insetSql = "update dealtinfo set msg_id=?, user_id=?, title=?,appName=?,content=?,callbackUrl=? where ad_user_id = ?";
-        jdbcTemplate.update(insetSql, map.get("ID"), map.get("AD_USER_ID"), maps.get(0).get("NAME"), appName, content, callbackUrl
+        String insetSql = "update dealt_info set MSG_ID=?, DEALT_TITLE=?,APP_NAME=?,CONTENT=?,CALL_BACK_URL=? where AD_USER_ID = ?";
+        int update = jdbcTemplate.update(insetSql, map.get("ID"), maps.get(0).get("NAME"), appName, content, callbackUrl
                 , map.get("AD_USER_ID"));
 
+        //当修改本地表失败，则证明当前用户并未存储本地表
+        if (update <= 0){
+            logger.info("不存在用户id，AD_USER_ID:{}",map.get("AD_USER_ID"));
+            throw new RuntimeException("该用户不存在");
+        }
+
         //获取平台方的用户id
-        String userIdSql = "select user_id from dealt_info where ad_user_id = ?";
-        String userId = jdbcTemplate.queryForObject(userIdSql, String.class, map.get("AD_USER_ID"));
-        if (ObjectUtils.isEmpty(userId)) {
+        String userIdSql = "select USER_ID from dealt_info where AD_USER_ID = ?";
+        List<String> list = jdbcTemplate.queryForList(userIdSql, String.class, map.get("AD_USER_ID"));
+        if (CollectionUtils.isEmpty(list)) {
             return null;
         }
 
         Map<String, Object> requestParams = new HashMap<>();
         //用户id
-        requestParams.put("userId", userId);
+        requestParams.put("userId", list.get(0));
         //消息id
         requestParams.put("msgId", map.get("ID"));
         //标题
