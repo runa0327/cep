@@ -92,8 +92,7 @@ public class WfPrjExt {
             MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
             String procInstId = ExtJarHelper.procInstId.get();
-            String START_USER_ID = myJdbcTemplate.queryForMap("select AD_USER_ID from PM_BID_APPROVAL_REQ where id=?", csCommId).get(
-                    "AD_USER_ID").toString();
+            String START_USER_ID = myJdbcTemplate.queryForMap("select AD_USER_ID from PM_BID_APPROVAL_REQ where id=?", csCommId).get("AD_USER_ID").toString();
 
             List<Map<String, Object>> list = myJdbcTemplate.queryForList("select d.chief_user_id from hr_dept_user du join " +
                     "hr_dept d on du.HR_DEPT_ID=d.id and du.AD_USER_ID=?", START_USER_ID);
