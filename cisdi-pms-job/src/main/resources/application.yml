@@ -113,4 +113,4 @@ dealt_work_job:
 #  ture： 真实电话   false： 测试电话
   phone_switch: false
 #  待办事项开关   true：开  false：关
-  dealt_switch: false
+  dealt_switch: true

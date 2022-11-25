@@ -57,7 +57,7 @@ public class dealtWorkJob {
      * 添加待办事项
      */
     //@Scheduled(fixedDelayString = "5000")
-    @Scheduled(fixedDelayString = "30000")
+    //@Scheduled(fixedDelayString = "30000")
     public void handleDealt() {
 
         if (!dealtSwitch) return;
@@ -69,7 +69,7 @@ public class dealtWorkJob {
         try {
             if (lock > 0) {
                 //对比ad_user / user_dealt_infos 两张表   如果有不同的数据则新增数据，如果没有，则直接跳过
-                savaUserId();
+                //savaUserId();
 
                 //根据wf_task表查询  所有的任务状态  TODO需要添加待办事项
                 List<Map<String, Object>> info = queryTaskStatus("0", "TODO");
@@ -99,8 +99,8 @@ public class dealtWorkJob {
     /**
      * 待办事项变更已读
      */
-    //@Scheduled(fixedDelayString = "5000")
-    @Scheduled(fixedDelayString = "30000")
+    @Scheduled(fixedDelayString = "5000")
+    //@Scheduled(fixedDelayString = "30000")
     public void dealtTask() {
 
         if (!dealtSwitch) return;
@@ -151,10 +151,13 @@ public class dealtWorkJob {
      */
     private void updateRead() {
         //根据wf_task表查询  所有的任务状态  TODO需要添加待办事项  AD_USER_ID
-        List<Map<String, Object>> list = queryTaskStatus("1", "NOTI");
+        List<Map<String, Object>> list = queryTaskStatus("1", "TODO");
         String parames = "";
-        for (Map<String, Object> map : list) {
-            parames += ("," + map.get("AD_USER_ID"));
+        List<String> adUserIds = list.stream()
+                .map(map -> map.get("AD_USER_ID").toString())
+                .distinct().collect(Collectors.toList());
+        for (String adUserId : adUserIds) {
+            parames += ("," + adUserId);
         }
         parames = parames.substring(1);
 
@@ -184,7 +187,7 @@ public class dealtWorkJob {
      * @return
      */
     private List<Map<String, Object>> queryTaskStatus(String isClose, String wfTaskTypeId) {
-        String taskStatusSql = "select ID,AD_USER_ID,WF_PROCESS_INSTANCE_ID from wf_task where IS_CLOSED = ? and WF_TASK_TYPE_ID = ?";
+        String taskStatusSql = "select ID,AD_USER_ID,WF_PROCESS_INSTANCE_ID from wf_task where IS_CLOSED = ? and WF_TASK_TYPE_ID = ? and AD_USER_ID = '99799190825078662'";
         List<Map<String, Object>> list = jdbcTemplate.queryForList(taskStatusSql, isClose, wfTaskTypeId);
         return list;
     }
@@ -248,7 +251,7 @@ public class dealtWorkJob {
         //设置请求头
         Map<String, String> headers = getHeaders();
 
-        ResponseEntity<Map> result = RestTemplateUtils.put(url, headers, requestParams, Map.class);
+        ResponseEntity<Map> result = RestTemplateUtils.post(url, headers, requestParams, Map.class);
     }
 
     /**
@@ -257,7 +260,7 @@ public class dealtWorkJob {
      * @param map msgId(ID) | WF_PROCESS_INSTANCE_ID | AD_USER_ID
      * @return
      */
-    private Map addDealt(Map<String, Object> map) {
+    private void addDealt(Map<String, Object> map) {
         //title 在流程实例标题,wf_process_instance表的name列 查询PROCESS_INSTANCE_NAME
         String sql = "select NAME from wf_process_instance where ID = ?";
         List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, map.get("WF_PROCESS_INSTANCE_ID"));
@@ -280,7 +283,8 @@ public class dealtWorkJob {
         String userIdSql = "select USER_ID from dealt_info where AD_USER_ID = ?";
         List<String> list = jdbcTemplate.queryForList(userIdSql, String.class, map.get("AD_USER_ID"));
         if (CollectionUtils.isEmpty(list)) {
-            return null;
+            logger.info("不存在用户id，AD_USER_ID:{}",map.get("AD_USER_ID"));
+            throw new RuntimeException("该用户不存在");
         }
 
         Map<String, Object> requestParams = new HashMap<>();
@@ -303,9 +307,15 @@ public class dealtWorkJob {
         //url https://portal.test.yzbays.cn/api/v1/remind
         String url = requestPath + "/api/v1/remind";
 
+        //此处会返回平台id（APP_ID）需要保存
         ResponseEntity<Map> result = RestTemplateUtils.put(url, headers, requestParams, Map.class);
+        Map<String,Object> data = (Map<String, Object>) result.getBody().get("data");
 
-        return result.getBody();
+        //保存APP_ID
+        String idSql = "update dealt_info set APP_ID=? where AD_USER_ID = ?";
+        jdbcTemplate.update(idSql, data.get("id")
+                , map.get("AD_USER_ID"));
+
     }
 
 
