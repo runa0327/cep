@@ -430,9 +430,9 @@ public class AttLinkExt {
     // 项目来源 属性联动
     private AttLinkResult linkPROJECT_SOURCE_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        List<String> entityCodes = Arrays.asList("PM_BID_APPROVAL_REQ", "PM_FILE_CHAPTER_REQ","PM_USE_CHAPTER_REQ","PM_BID_KEEP_FILE_REQ","PO_GUARANTEE_LETTER_RETURN_OA_REQ");
+        List<String> entityCodes = getWRProject();
         //99952822476441374=立项，99952822476441375=非立项
-        if ("PM_BUY_DEMAND_REQ".equals(entCode)) {
+        if ("PM_BUY_DEMAND_REQ".equals(entCode)) { //采购需求审批
             Boolean prjListChangeToShown = false; //下拉项目默认隐藏
             Boolean prjNameChangeToShown = false; //手写项目默认隐藏
 
@@ -518,7 +518,7 @@ public class AttLinkExt {
                 attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
             }
             return attLinkResult;
-        } else if ("PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
+        } else if ("PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){ //新增保函申请
             //99952822476441374=系统，99952822476441375=非系统
             Boolean CONTRACT_NAMEChangeToShown = false; //手填合同名称默认不隐藏
             Boolean CONTRACT_IDChangeToShown = false; //选择合同名称默认不隐藏
@@ -4608,6 +4608,19 @@ public class AttLinkExt {
         List<String> list = new ArrayList<>();
         list.add("PM_PRJ_INVEST1"); //可研报告审批
         list.add("PM_PRJ_INVEST2"); //初设概算审批
+        return list;
+    }
+
+    // 项目来源属性联动 需要选择系统/非系统项目
+    public List<String> getWRProject() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_BID_APPROVAL_REQ"); //招标文件审批
+        list.add("PM_FILE_CHAPTER_REQ"); //标前资料用印审批
+        list.add("PM_USE_CHAPTER_REQ"); //中选单位及标后用印审批
+        list.add("PM_BID_KEEP_FILE_REQ"); //招采项目备案及归档
+        list.add("PO_GUARANTEE_LETTER_RETURN_OA_REQ"); //保函退还申请(OA)
+        list.add("PO_ORDER_REQ"); //采购合同签订
+
         return list;
     }
 }
