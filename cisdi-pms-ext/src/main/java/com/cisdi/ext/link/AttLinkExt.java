@@ -1897,11 +1897,11 @@ public class AttLinkExt {
             // 99799190825080669 = 是，99799190825080670=否
             Boolean replyChangeToMandatory = true; //审核意见采纳说明必填
             Boolean fileChangeToMandatory = true; //审核意见附件必填
-            Boolean heTongFileChangeToMandatory = true; //合同送审稿必填
+//            Boolean heTongFileChangeToMandatory = true; //合同送审稿必填
             if ("99799190825080669".equals(attValue)){
                 replyChangeToMandatory = false;
                 fileChangeToMandatory = false;
-                heTongFileChangeToMandatory = false;
+//                heTongFileChangeToMandatory = false;
             }
             // 审核意见采纳说明
             {
@@ -1922,14 +1922,14 @@ public class AttLinkExt {
                 attLinkResult.attMap.put("FILE_ID_FOUR", linkedAtt);
             }
             // 审核意见采纳说明
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                linkedAtt.changeToMandatory = heTongFileChangeToMandatory;
-                attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt);
-            }
+//            {
+//                LinkedAtt linkedAtt = new LinkedAtt();
+//                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+//                linkedAtt.value = "";
+//                linkedAtt.text = "";
+//                linkedAtt.changeToMandatory = heTongFileChangeToMandatory;
+//                attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt);
+//            }
 
         }
         return attLinkResult;
