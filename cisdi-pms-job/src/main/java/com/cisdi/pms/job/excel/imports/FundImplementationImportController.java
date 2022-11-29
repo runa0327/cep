@@ -42,10 +42,12 @@ public class FundImplementationImportController {
         //检查和已有资金来源是否重复，并去重
         Map<String, Set<String>> duplicateMap = this.checkDuplicate(data.keySet());
         Set<String> duplicatedSources = duplicateMap.get("duplicatedSources");
-
-        for (String key : duplicateMap.get("keySet")) {
-            // 这里就是你处理代码保存的逻辑了
-            res = this.importData(data.get(key));
+        Set<String> keySet = duplicateMap.get("keySet");
+        if (!CollectionUtils.isEmpty(keySet)){
+            for (String key : keySet) {
+                // 这里就是你处理代码保存的逻辑了
+                res = this.importData(data.get(key));
+            }
         }
 
         if (CollectionUtils.isEmpty(res) && CollectionUtils.isEmpty(duplicatedSources)) {
@@ -110,9 +112,9 @@ public class FundImplementationImportController {
                     .filter(sourceName -> keySet.contains(sourceName))
                     .collect(Collectors.toSet());
             keySet.removeAll(duplicatedSources);
-            result.put("keySet",keySet);
             result.put("duplicatedSources",duplicatedSources);
         }
+        result.put("keySet",keySet);
         return result;
     }
 }

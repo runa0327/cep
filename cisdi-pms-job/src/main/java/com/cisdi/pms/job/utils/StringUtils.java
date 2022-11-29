@@ -1,7 +1,9 @@
 package com.cisdi.pms.job.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StringUtils {
 
@@ -35,5 +37,24 @@ public class StringUtils {
             str = str.replace("，",",");
         }
         return str;
+    }
+
+    /**
+     * 将cookies字符串转map
+     */
+    public static Map<String,String> cookieToMap(String value) {
+        Map<String, String> map = new HashMap<String, String>();
+        value = value.replace(" ", "");
+        if (value.contains(";")) {
+            String values[] = value.split(";");
+            for (String val : values) {
+                String vals[] = val.split("=");
+                map.put(vals[0], vals[1]);
+            }
+        } else {
+            String values[] = value.split("=");
+            map.put(values[0], values[1]);
+        }
+        return map;
     }
 }

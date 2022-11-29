@@ -109,8 +109,7 @@ public class WfExt {
                         String formatNum = formatCount.format(num);
                         String code = "gc-" + year + "-" + formatNum;
                         String name = valueMap.get("CONTRACT_NAME").toString();
-                        int update2 = myJdbcTemplate.update("update PO_ORDER_REQ set CONTRACT_CODE = ? , NAME = ? where id = ?",
-                                code, name, csCommId);
+                        int update2 = myJdbcTemplate.update("update PO_ORDER_REQ set CONTRACT_CODE = ? , NAME = ? where id = ?",code, name, csCommId);
                     }
                     // 补充合同批准后生成合同编号
                     if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode)) {
@@ -250,6 +249,9 @@ public class WfExt {
                                     List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
                                     if (!CollectionUtils.isEmpty(list)){
                                         otherName = JdbcMapUtil.getString(list.get(0),"CONTRACT_NAME");
+                                    }
+                                    if (SharedUtil.isEmptyString(projectName)){
+                                        projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
                                     }
                                 } else if ("PM_PRJ_REQ".equals(entityCode)){
                                     projectName = myJdbcTemplate.queryForList("select PRJ_NAME from PM_PRJ_REQ where id = ?",csCommId).get(0).get("PRJ_NAME").toString();
@@ -401,6 +403,9 @@ public class WfExt {
         //合同签订
         if ("PO_ORDER_REQ".equals(entityCode)){
             String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            if (SharedUtil.isEmptyString(prjId)){
+                prjId = this.getWritePrjId(valueMap);
+            }
             String ATT_FILE_GROUP_ID = JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID");
             String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
             String FILE_ID_THREE = JdbcMapUtil.getString(valueMap, "FILE_ID_THREE");

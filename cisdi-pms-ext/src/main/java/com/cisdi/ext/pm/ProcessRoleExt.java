@@ -513,4 +513,16 @@ public class ProcessRoleExt {
         ExtJarHelper.returnValue.set(userIdList);
     }
 
+    /** 获取流程发起选择的分管领导 多选 **/
+    public void getChooseChargeLeaders(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //获取分管领导
+        String users = JdbcMapUtil.getString(entityRecord.valueMap,"CHARGE_USER_IDS");
+        List<String> userList = Arrays.asList(users.split(","));
+        ArrayList<Object> userIdList = new ArrayList<>();
+        userIdList.addAll(userList);
+        ExtJarHelper.returnValue.set(userIdList);
+    }
+
 }
