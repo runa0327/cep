@@ -60,8 +60,10 @@ public class PmPrjController extends BaseController {
         //进度阶段
         String transitionPhaseId = request.getTransitionPhaseId();
         //计划开工时间
-        String startDate = request.getStartDate();
-        String endDate = request.getEndDate();
+//        String startDate = request.getStartDate();
+//        String endDate = request.getEndDate();
+        //计划开工年份
+        String year = request.getYear();
 
         //获取财务人员和管理员id
         List<Map<String, Object>> financialUsersList = jdbcTemplate.queryForList("select u.id userId\n" +
@@ -90,8 +92,11 @@ public class PmPrjController extends BaseController {
         if (Strings.isNotEmpty(transitionPhaseId)){
             baseSql.append(" and t.TRANSITION_PHASE_ID = '"+transitionPhaseId+"'");
         }
-        if (Strings.isNotEmpty(startDate) && Strings.isNotEmpty(endDate)){
-            baseSql.append(" and IFNULL(tmp2.ACTUAL_START_DATE,tmp2.PLAN_START_DATE) between '"+startDate+"' and '"+endDate+"'");
+//        if (Strings.isNotEmpty(startDate) && Strings.isNotEmpty(endDate)){
+//            baseSql.append(" and IFNULL(tmp2.ACTUAL_START_DATE,tmp2.PLAN_START_DATE) between '"+startDate+"' and '"+endDate+"'");
+//        }
+        if (Strings.isNotEmpty(year)){
+            baseSql.append(" and YEAR(IFNULL(tmp2.ACTUAL_START_DATE,tmp2.PLAN_START_DATE)) = " + year);
         }
         baseSql.append(" order by T.CRT_DT DESC");
 
