@@ -118,15 +118,21 @@ public class PoOrderReqExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         // 查询明细表合同总金额
-        String sql = "select AMT from PM_ORDER_COST_DETAIL where CONTRACT_ID = ?";
+        String sql = "select * from PM_ORDER_COST_DETAIL where CONTRACT_ID = ?";
         List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql, entityRecord.csCommId);
         if (CollectionUtils.isEmpty(list1)) {
             throw new BaseException("费用明细不能为空！");
         }
-        BigDecimal account = getSumAmt(list1);
+//        BigDecimal account = getSumAmt(list1);
+        //含税总金额
+        BigDecimal amtShui = getSumAmtBy(list1,"AMT_ONE");
+        //不含税总金额
+        BigDecimal amtNoShui = getSumAmtBy(list1,"AMT_TWO");
+        //税率
+        BigDecimal shuiLv = getShuiLv(list1,"AMT_THREE");
         //更新合同表合同总金额数
-        String sql2 = "update PO_ORDER_REQ set CONTRACT_PRICE = ? where id = ?";
-        myJdbcTemplate.update(sql2,account,entityRecord.csCommId);
+        String sql2 = "update PO_ORDER_REQ set AMT_TWO = ?,AMT_THREE=?,AMT_FOUR=? where id = ?";
+        myJdbcTemplate.update(sql2,amtShui,amtNoShui,shuiLv,entityRecord.csCommId);
 
         //是否涉及保函
         String baoHan = JdbcMapUtil.getString(entityRecord.valueMap,"IS_REFER_GUARANTEE");
@@ -149,6 +155,29 @@ public class PoOrderReqExt {
         if (CollectionUtils.isEmpty(contactList)){
             throw new BaseException("联系人不能为空！");
         }
+    }
+
+    //获取税率
+    private BigDecimal getShuiLv(List<Map<String, Object>> list, String str) {
+        BigDecimal sum = new BigDecimal(0);
+        tp: for (Map<String, Object> tmp : list) {
+            String value =JdbcMapUtil.getString(tmp,str);
+            if (!SharedUtil.isEmptyString(value)){
+                sum = new BigDecimal(value);
+                break tp;
+            }
+        }
+        return sum;
+    }
+
+    // 根据字段求和
+    private BigDecimal getSumAmtBy(List<Map<String, Object>> list, String str) {
+        BigDecimal sum = new BigDecimal(0);
+        for (Map<String, Object> tmp : list) {
+            String value =JdbcMapUtil.getString(tmp,str);
+            sum = sum.add(new BigDecimal(value));
+        }
+        return sum;
     }
 
     // 汇总求和
@@ -192,17 +221,18 @@ public class PoOrderReqExt {
         //输出地址
         String newAddress = "";
         //文件存放地址
-        String address = list1.get(0).get("PHYSICAL_LOCATION").toString();
+//        String address = list1.get(0).get("PHYSICAL_LOCATION").toString();
+        String address = "C:\\Users\\Administrator\\Desktop\\Demo\\demo.doc";
         if (!"doc".equals(fileType) && !"docx".equals(fileType)){
             throw new BaseException("合同附件格式为文档");
         }
-        String addressFront = address.substring(0,address.lastIndexOf("/"));
+//        String addressFront = address.substring(0,address.lastIndexOf("/"));
         System.out.println("address:"+address);
-        newAddress = addressFront+newId+".pdf";
+//        newAddress = addressFront+newId+".pdf";
         //文件大小
         float fileSize = 0l;
         try {
-//            newAddress = "C:\\Users\\Administrator\\Desktop\\Demo\\"+newId+".pdf";
+            newAddress = "C:\\Users\\Administrator\\Desktop\\Demo\\demo.pdf";
             fileSize = ProFileUtils.testExt(address,newAddress);
         } catch (IOException e) {
             e.printStackTrace();
@@ -216,7 +246,8 @@ public class PoOrderReqExt {
         String now = sdf.format(new Date());
 
         //将生成的pdf写入该流程
-        Crud.from("PO_ORDER_REQ").where().eq("id",csId).update().set("FIRST_INSPECTION_REPORT_FILE",newAddress).exec();
+//        Crud.from("PO_ORDER_REQ").where().eq("id",csId).update().set("FIRST_INSPECTION_REPORT_FILE",newAddress).exec();
+        Crud.from("TEST_CLASS").where().eq("id",csId).update().set("FILE_ID_ONE",newId).exec();
 
         Crud.from("fl_file").where().eq("id",newId).update()
                 .set("CODE",newId).set("NAME",fileName).set("VER","1").set("FL_PATH_ID","99250247095872690").set("EXT","pdf")

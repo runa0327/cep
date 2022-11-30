@@ -187,6 +187,7 @@ public class PoOrderSupplementReqExt {
             throw new BaseException("费用明细不能为空！");
         }
 //        BigDecimal account = getSumAmt(list1);
+
         //含税总金额
         BigDecimal amtShui = getSumAmtBy(list1,"AMT_ONE");
         //不含税总金额
