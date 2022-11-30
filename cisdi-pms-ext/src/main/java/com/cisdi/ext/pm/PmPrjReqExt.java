@@ -53,41 +53,28 @@ public class PmPrjReqExt {
             }
         }
 
-
-        Double prj_total_invest = JdbcMapUtil.getDouble(valueMap, "PRJ_TOTAL_INVEST");
+        String prj_total_investStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "PRJ_TOTAL_INVEST")) ? "0":JdbcMapUtil.getString(valueMap, "PRJ_TOTAL_INVEST");
+        Double prj_total_invest = Double.parseDouble(prj_total_investStr);
         AmtUtil.checkAmt(sbErr, prj_total_invest, "总投资");
 
-//        Double project_amt = JdbcMapUtil.getDouble(valueMap, "PROJECT_AMT");
-//        AmtUtil.checkAmt(sbErr, project_amt, "工程费用");
+        String CONSTRUCT_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "CONSTRUCT_AMT")) ? "0":JdbcMapUtil.getString(valueMap, "CONSTRUCT_AMT");
+        Double construct_amt = Double.parseDouble(CONSTRUCT_AMTStr);
 
-        Double construct_amt = JdbcMapUtil.getDouble(valueMap, "CONSTRUCT_AMT");
-//        AmtUtil.checkAmt(sbErr, construct_amt, "建安工程费");
+        String EQUIP_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "EQUIP_AMT")) ? "0":JdbcMapUtil.getString(valueMap, "EQUIP_AMT");
+        Double equip_amt = Double.parseDouble(EQUIP_AMTStr);
 
-        Double equip_amt = JdbcMapUtil.getDouble(valueMap, "EQUIP_AMT");
-//        AmtUtil.checkAmt(sbErr, equip_amt, "设备采购费");
+        String PROJECT_OTHER_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "PROJECT_OTHER_AMT")) ? "0":JdbcMapUtil.getString(valueMap, "PROJECT_OTHER_AMT");
+        Double project_other_amt = Double.parseDouble(PROJECT_OTHER_AMTStr);
 
-        Double project_other_amt = JdbcMapUtil.getDouble(valueMap, "PROJECT_OTHER_AMT");
-//        AmtUtil.checkAmt(sbErr, project_other_amt, "工程其他费用");
+        String LAND_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "LAND_AMT")) ? "0":JdbcMapUtil.getString(valueMap, "LAND_AMT");
+        Double land_amt = Double.parseDouble(LAND_AMTStr);
 
-        Double land_amt = JdbcMapUtil.getDouble(valueMap, "LAND_AMT");
-//        AmtUtil.checkAmt(sbErr, land_amt, "土地征拆费用");
+        String PREPARE_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "PREPARE_AMT")) ? "0":JdbcMapUtil.getString(valueMap, "PREPARE_AMT");
+        Double prepare_amt = Double.parseDouble(PREPARE_AMTStr);
 
-        Double prepare_amt = JdbcMapUtil.getDouble(valueMap, "PREPARE_AMT");
-//        AmtUtil.checkAmt(sbErr, prepare_amt, "预备费");
-
-//        if (DoubleUtil.add(project_amt, project_other_amt, prepare_amt) > prj_total_invest) {
-        if (DoubleUtil.add(construct_amt,project_other_amt, prepare_amt) > prj_total_invest) {
-            sbErr.append("建安工程费+工程其他费用+预备费>总投资！");
+        if (DoubleUtil.add(construct_amt,project_other_amt, prepare_amt,equip_amt,land_amt) > prj_total_invest) {
+            sbErr.append("建安工程费+工程其他费用+预备费+设备采购费+土地征拆费用>总投资！");
         }
-
-        //新逻辑 除总投资外都是非必填
-//        if (DoubleUtil.add(construct_amt, equip_amt) > project_amt) {
-//            sbErr.append("建安工程费+设备采购费>工程费用！");
-//        }
-//
-//        if (DoubleUtil.add(land_amt) > project_other_amt) {
-//            sbErr.append("土地征拆费用>工程其他费用！");
-//        }
 
         if (sbErr.length() > 0) {
             throw new BaseException(sbErr.toString());
