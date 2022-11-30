@@ -575,7 +575,7 @@ public class AttLinkExt {
                 attLinkResult.attMap.put("CONTRACT_AMOUNT", linkedAtt);
             }
             return attLinkResult;
-        } else if ("PO_ORDER_REQ".equals(entCode)){ //采购合同签订申请
+        } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 补充协议
             //99952822476441374=系统，99952822476441375=非系统
             attLinkResult = autoLinkProject(attValue);
             attLinkResult = autoLinkPrjDetail(attLinkResult,attValue);
@@ -4750,7 +4750,6 @@ public class AttLinkExt {
         list.add("PM_USE_CHAPTER_REQ"); //中选单位及标后用印审批
         list.add("PM_BID_KEEP_FILE_REQ"); //招采项目备案及归档
         list.add("PO_GUARANTEE_LETTER_RETURN_OA_REQ"); //保函退还申请(OA)
-        list.add("PO_ORDER_REQ"); //采购合同签订
 
         return list;
     }
