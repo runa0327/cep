@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -52,7 +53,12 @@ public class SendSmsJob {
         int lock = jdbcTemplate.update(lockSql);
 
         // 查询  处于当前阶段的任务  且  为被关闭的任务
-        List<RemindLog> result = this.querySmsInfo();
+        List<RemindLog> collect = this.querySmsInfo();
+
+        // //13976720905   吴坤苗  此用户许需要发送短信
+        List<RemindLog> result = collect.stream()
+                .filter(remindLog -> !remindLog.getUserPhone().equals("13976720905"))
+                .collect(Collectors.toList());
 
         try {
             if (lock > 0) {
