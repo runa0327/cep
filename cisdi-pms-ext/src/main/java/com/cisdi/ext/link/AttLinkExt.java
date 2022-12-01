@@ -575,7 +575,7 @@ public class AttLinkExt {
                 attLinkResult.attMap.put("CONTRACT_AMOUNT", linkedAtt);
             }
             return attLinkResult;
-        } else if ("PO_ORDER_REQ".equals(entCode)){ //采购合同签订申请
+        } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 补充协议
             //99952822476441374=系统，99952822476441375=非系统
             attLinkResult = autoLinkProject(attValue);
             attLinkResult = autoLinkPrjDetail(attLinkResult,attValue);
@@ -1897,11 +1897,11 @@ public class AttLinkExt {
             // 99799190825080669 = 是，99799190825080670=否
             Boolean replyChangeToMandatory = true; //审核意见采纳说明必填
             Boolean fileChangeToMandatory = true; //审核意见附件必填
-            Boolean heTongFileChangeToMandatory = true; //合同送审稿必填
+//            Boolean heTongFileChangeToMandatory = true; //合同送审稿必填
             if ("99799190825080669".equals(attValue)){
                 replyChangeToMandatory = false;
                 fileChangeToMandatory = false;
-                heTongFileChangeToMandatory = false;
+//                heTongFileChangeToMandatory = false;
             }
             // 审核意见采纳说明
             {
@@ -1922,14 +1922,14 @@ public class AttLinkExt {
                 attLinkResult.attMap.put("FILE_ID_FOUR", linkedAtt);
             }
             // 审核意见采纳说明
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                linkedAtt.changeToMandatory = heTongFileChangeToMandatory;
-                attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt);
-            }
+//            {
+//                LinkedAtt linkedAtt = new LinkedAtt();
+//                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+//                linkedAtt.value = "";
+//                linkedAtt.text = "";
+//                linkedAtt.changeToMandatory = heTongFileChangeToMandatory;
+//                attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt);
+//            }
 
         }
         return attLinkResult;
@@ -4750,7 +4750,6 @@ public class AttLinkExt {
         list.add("PM_USE_CHAPTER_REQ"); //中选单位及标后用印审批
         list.add("PM_BID_KEEP_FILE_REQ"); //招采项目备案及归档
         list.add("PO_GUARANTEE_LETTER_RETURN_OA_REQ"); //保函退还申请(OA)
-        list.add("PO_ORDER_REQ"); //采购合同签订
 
         return list;
     }
