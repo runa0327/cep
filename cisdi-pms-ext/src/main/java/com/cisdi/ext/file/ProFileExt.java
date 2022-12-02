@@ -144,7 +144,7 @@ public class ProFileExt {
         sbFolder.append("select id,name,'' as upload_user,round(file_size,2) as size,'' as upload_time ,''as url,'1' as type,PF_FOLDER_PID as pid,'' as ext ,file_count,ID as folder_id from PF_FOLDER where  PM_PRJ_ID= '" + projectId + "'");
 
         StringBuilder sbFile = new StringBuilder();
-        sbFile.append("select fl.id as id,fl.`NAME`as name,us.`NAME` as upload_user,round(SIZE_KB,2) as size,UPLOAD_DTTM as upload_time,FILE_ATTACHMENT_URL as url ,'2' as type,'' as pid ,ext,0 as file_count,fo.id as  folder_id from FL_FILE fl " +
+        sbFile.append("select fl.id as id,fl.DSP_NAME as name,us.`NAME` as upload_user,round(SIZE_KB,2) as size,UPLOAD_DTTM as upload_time,FILE_ATTACHMENT_URL as url ,'2' as type,'' as pid ,ext,0 as file_count,fo.id as  folder_id from FL_FILE fl " +
                 "left join PF_FILE PF on fl.id = pf.FL_FILE_ID " +
                 "left join pf_folder fo on fo.id = pf.PF_FOLDER_ID " +
                 "left join  ad_user us on fl.CRT_USER_ID = us.id where fo.PM_PRJ_ID= '" + projectId + "'");
