@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,9 +32,15 @@ public class FundImplementationImportController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @GetMapping("test")
+    public String sayHello() {
+        return "Hello！资金批复导入";
+    }
+
     @SneakyThrows(IOException.class)
     @PostMapping(value = "/import")
     public Map<String, Object> importData(MultipartFile file) {
+        System.out.println("进入导入，导入开始！");
         Map<String, Object> result = new HashMap<>();
         List<String> res = new ArrayList<>();
         List<FundImplementationExportModel> dataList = EasyExcelUtil.read(file.getInputStream(), FundImplementationExportModel.class);

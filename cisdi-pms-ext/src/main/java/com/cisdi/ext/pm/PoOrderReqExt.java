@@ -175,6 +175,9 @@ public class PoOrderReqExt {
         BigDecimal sum = new BigDecimal(0);
         for (Map<String, Object> tmp : list) {
             String value =JdbcMapUtil.getString(tmp,str);
+            if (SharedUtil.isEmptyString(value)){
+                value = "0";
+            }
             sum = sum.add(new BigDecimal(value));
         }
         return sum;
@@ -254,5 +257,35 @@ public class PoOrderReqExt {
                 .set("STATUS","AP").set("CRT_DT",now).set("CRT_USER_ID",userId).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
                 .set("SIZE_KB",fileSize).set("TS",now).set("UPLOAD_DTTM",now).set("PHYSICAL_LOCATION",newAddress).set("DSP_NAME",showName+"K")
                 .set("DSP_SIZE",fileSize).exec();
+    }
+
+    // 合同签订原本费用明细更新到新税率上
+    public void updatePayData(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //查询所有合同主表数据
+        String sql1 = "select id from PO_ORDER_REQ order by TS asc";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1);
+        if (!CollectionUtils.isEmpty(list1)){
+            for (Map<String, Object> tmp1 : list1) {
+                String orderId = JdbcMapUtil.getString(tmp1,"id");
+                //根据合同id去费用明细表查询数据
+                String sql2 = "select * from PM_ORDER_COST_DETAIL where CONTRACT_ID = ? and status = 'ap'";
+                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,orderId);
+                if (!CollectionUtils.isEmpty(list2)){
+                    for (Map<String, Object> tmp : list2) {
+                        int update = myJdbcTemplate.update("update pm_order_cost_detail set AMT_ONE=AMT WHERE id = ?",JdbcMapUtil.getString(tmp,"id"));
+                    }
+                    //含税总金额
+                    BigDecimal amtShui = getSumAmtBy(list2,"AMT_ONE");
+                    //不含税总金额
+//                BigDecimal amtNoShui = getSumAmtBy(list2,"AMT_TWO");
+                    //税率
+//                BigDecimal shuiLv = getShuiLv(list2,"AMT_THREE");
+                    //更新合同表合同总金额数
+                    String sql3 = "update PO_ORDER_REQ set AMT_TWO = ? where id = ?";
+                    myJdbcTemplate.update(sql3,amtShui,orderId);
+                }
+            }
+        }
     }
 }

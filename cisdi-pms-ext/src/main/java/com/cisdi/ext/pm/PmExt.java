@@ -165,4 +165,15 @@ public class PmExt {
         public String name;
 
     }
+
+    /**
+     * 修改项目封面图
+     */
+    public void modifyPmImg() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String projectId = String.valueOf(map.get("projectId"));
+        String imgId = String.valueOf(map.get("imgId"));
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        myJdbcTemplate.update("update pm_prj set PRJ_IMG=? where id=?", imgId, projectId);
+    }
 }

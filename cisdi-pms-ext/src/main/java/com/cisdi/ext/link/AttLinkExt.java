@@ -2014,8 +2014,8 @@ public class AttLinkExt {
             {
                 LinkedAtt linkedAtt = new LinkedAtt();
                 linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
+                linkedAtt.value = null;
+                linkedAtt.text = null;
                 linkedAtt.changeToShown = isCaiNaChangeToShown;
                 attLinkResult.attMap.put("YES_NO_ONE", linkedAtt);
             }

@@ -525,4 +525,14 @@ public class ProcessRoleExt {
         ExtJarHelper.returnValue.set(userIdList);
     }
 
+    /**
+     * 获取采购经办人
+     */
+    public void getPurchaseAgent(){
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String purchaseUser = JdbcMapUtil.getString(entityRecord.valueMap, "AD_USER_TWO_ID");
+        ArrayList<Object> purchaseUserList = new ArrayList<>();
+        purchaseUserList.add(purchaseUser);
+        ExtJarHelper.returnValue.set(purchaseUserList);
+    }
 }

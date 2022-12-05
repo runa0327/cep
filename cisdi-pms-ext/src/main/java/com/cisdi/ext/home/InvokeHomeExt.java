@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class InvokeHomeExt {
 
-    // 项目阶段分部
+    // 项目状态统计
     public void proStatusStatistics() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> projectPhaseList = myJdbcTemplate.queryForList("select count(p.id) num,IFNULL(v.name," +
@@ -33,14 +33,17 @@ public class InvokeHomeExt {
         ExtJarHelper.returnValue.set(outputMap);
     }
 
+    /**
+     * 项目阶段统计
+     */
     public void proStageStatistics() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> projectPhaseList = myJdbcTemplate.queryForList("select count(p.id) num,IFNULL(v.name," +
-                "'其他') transitionPhase\n" +
-                "from pm_prj p left join gr_set_value v on v.id = p.TRANSITION_PHASE_ID left join gr_set s on s.CODE " +
-                "= 'transition_phase'\n" +
-                "where p.status = 'AP'\n" +
-                "group by v.id");
+        List<Map<String, Object>> projectPhaseList = myJdbcTemplate.queryForList("select count(p.id) num,IFNULL(v.name, \n" +
+                "'其他') transitionPhase \n" +
+                "from pm_prj p left join gr_set_value v on v.id = p.PROJECT_TYPE_ID left join gr_set s on s.CODE \n" +
+                "= 'project_type' \n" +
+                "where p.status = 'AP' and p.PROJECT_TYPE_ID is not null\n" +
+                "group by v.id order by v.SEQ_NO;");
         int total = projectPhaseList.stream().mapToInt(item -> Integer.parseInt(item.get("num").toString())).sum();
         HashMap<String, Object> totals = new HashMap<>();
 //        totals.put("项目总数", total);
