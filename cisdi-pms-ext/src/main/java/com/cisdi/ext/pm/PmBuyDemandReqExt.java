@@ -73,12 +73,30 @@ public class PmBuyDemandReqExt {
         check(status);
     }
 
+    /**
+     * 采购需求审批扩展-采购岗、成本岗审批
+     */
+    public void buyDemandCostCheck() {
+        String status = "buyDemandCostCheck";
+        check(status);
+    }
+
+    /**
+     * 采购需求审批扩展-业务主管审批
+     */
+    public void leaderCheck() {
+        String status = "leaderCheck";
+        check(status);
+    }
+
     private void check(String status) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Date date = new Date();
         String now = DateTimeUtil.dateToString(date);
-        // 当前登录人
-        String userId = ExtJarHelper.loginInfo.get().userName;
+        // 当前登录人id
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        //当前操作人名称
+        String userName = ExtJarHelper.loginInfo.get().userName;
 
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         String csCommId = entityRecord.csCommId;
@@ -91,12 +109,47 @@ public class PmBuyDemandReqExt {
             for (Map<String, Object> tmp : list) {
                 String txt = JdbcMapUtil.getString(tmp,"user_comment");
                 if (!SharedUtil.isEmptyString(txt)){
-                    comment = comment.append(JdbcMapUtil.getString(tmp,"u_name")).append("： ").append(txt).append("; ");
+                    comment = comment.append(JdbcMapUtil.getString(tmp,"u_name")).append("： ").append(txt).append("; \n");
                 }
 
             }
         }
-        if ("start".equals(status)){
+        if ("buyDemandCostCheck".equals(status)){ //成本岗采购岗审批
+            // 审批意见
+            String sql2 = "select tk.USER_COMMENT,tk.USER_ATTACHMENT " +
+                    "from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id" +
+                    " where u.id = ?";
+            List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(sql2, procInstId,userId);
+            String commentStr = "";
+            if (!CollectionUtils.isEmpty(list2)) {
+                commentStr = list2.get(0).get("user_comment") == null ? null : list2.get(0).get("user_comment").toString();
+            }
+            if (!SharedUtil.isEmptyString(commentStr)){
+                commentStr = userName + ": "+commentStr;
+            }
+            //查询用户所在岗位 99799190825079016=成本岗；99799190825079033=采购岗
+            String sql1 = "select hr_dept_id FROM hr_dept_user WHERE AD_USER_ID = ? and hr_dept_id in ('99799190825079016','99799190825079033')";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId);
+            if (!CollectionUtils.isEmpty(list1)){
+                String deptId = JdbcMapUtil.getString(list1.get(0),"hr_dept_id");
+                if ("99799190825079016".equals(deptId)){
+                    Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
+                            .set("TEXT_REMARK_TWO", commentStr).exec();
+                    log.info("已更新：{}", exec);
+                } else {
+                    Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
+                            .set("TEXT_REMARK_THREE", commentStr).exec();
+                    log.info("已更新：{}", exec);
+                }
+            } else {
+                throw new BaseException("对不起，所在岗位不正确，请联系管理员处理！");
+            }
+
+        } else if ("leaderCheck".equals(status)){
+            Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
+                    .set("TEXT_REMARK_ONE", comment).exec();
+            log.info("已更新：{}", exec);
+        } else if ("start".equals(status)){
             //获取预算金额下限 预算金额上线限
             BigDecimal min = new BigDecimal(entityRecord.valueMap.get("PAY_AMT_ONE").toString());
             BigDecimal max = new BigDecimal(entityRecord.valueMap.get("PAY_AMT_TWO").toString());
