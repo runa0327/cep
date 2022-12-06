@@ -4,6 +4,7 @@ import com.artofsolving.jodconverter.DocumentConverter;
 import com.artofsolving.jodconverter.openoffice.connection.OpenOfficeConnection;
 import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConnection;
 import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConverter;
+import com.artofsolving.jodconverter.openoffice.converter.StreamOpenOfficeDocumentConverter;
 import com.cisdi.ext.enums.FileCodeEnum;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -114,20 +115,27 @@ public class ProFileUtils {
     /**
      * word转pdf 返回文件大小
      */
-    public static float testExt(String input, String output) throws IOException {
+    public static Map testExt(String input, String output) throws IOException {
 
         OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
+//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("124.222.60.191",8100);
         connection.connect();
 
         File inputFile = new File(input);
         File outputFile = new File(output);
 
-        DocumentConverter converter = new OpenOfficeDocumentConverter(connection);
+//        DocumentConverter converter = new OpenOfficeDocumentConverter(connection);
+        StreamOpenOfficeDocumentConverter converter = new StreamOpenOfficeDocumentConverter(connection);
         converter.convert(inputFile, outputFile);
         File file = new File(output);
         if (!file.exists() || !file.isFile()){
             throw new BaseException("'"+output+"'该文件不存在");
         }
-        return file.length();
+        float length = file.length();
+        String fileName = file.getName();
+        Map map = new HashMap();
+        map.put("size",length);
+        map.put("name",fileName);
+        return map;
     }
 }
