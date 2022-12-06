@@ -438,6 +438,7 @@ public class AttLinkExt {
 
             Boolean prjListChangeToMandatory = false; //下拉项目默认非必填
             Boolean prjNameChangeToMandatory = false; //手写项目默认非必填
+            Boolean isZFChangeToMandatory = true; //政府投资默认必填
 
             Boolean prjListChangeToEditable = false; //下拉项目默认不可改
             Boolean prjNameChangeToEditable = false; //手写项目默认不可改
@@ -485,6 +486,7 @@ public class AttLinkExt {
                 linkedAtt.value = null;
                 linkedAtt.text = null;
                 linkedAtt.changeToEditable = isZFChangeToEditable;
+                linkedAtt.changeToMandatory = isZFChangeToMandatory;
                 attLinkResult.attMap.put("YES_NO_ONE", linkedAtt);
             }
             //资金来源
