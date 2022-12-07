@@ -224,12 +224,21 @@ public class PmBuyDemandReqExt {
         String now = sdf.format(new Date());
         //获取流程发起人
 //        String createBy = JdbcMapUtil.getString(valueMap,"CRT_USER_ID");
-        String sql4 = "SELECT START_USER_ID FROM wf_process_instance WHERE id = (select LK_WF_INST_ID FROM pm_buy_demand_req WHERE id = ?)";
-        List<Map<String,Object>> list4 = myJdbcTemplate.queryForList(sql4,buyId);
-        String startBy = list4.get(0).get("START_USER_ID").toString();
+//        String sql4 = "SELECT START_USER_ID FROM wf_process_instance WHERE id = (select LK_WF_INST_ID FROM pm_buy_demand_req WHERE id = ?)";
+//        List<Map<String,Object>> list4 = myJdbcTemplate.queryForList(sql4,buyId);
+//        String startBy = list4.get(0).get("START_USER_ID").toString();
+        String startBy = JdbcMapUtil.getString(entityRecord.valueMap,"AD_USER_TWO_ID");
         String sql3 = "select name from ad_user where id = ?";
         List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sql3,startBy);
         String userName = list3.get(0).get("name").toString();
+        //获取所属部门
+        String CRT_DEPT_ID = "";
+        String deptSql = "SELECT HR_DEPT_ID FROM hr_dept_user WHERE ad_user_id = ? and sys_true = 1 and status = 'AP'";
+        List<Map<String,Object>> deptList = myJdbcTemplate.queryForList(deptSql,startBy);
+        if (!CollectionUtils.isEmpty(deptList)){
+           CRT_DEPT_ID = JdbcMapUtil.getString(deptList.get(0),"HR_DEPT_ID") ;
+        }
+//        String CRT_DEPT_ID = JdbcMapUtil.getString(valueMap,"CRT_DEPT_ID");
         //获取项目来源
         String PROJECT_SOURCE_TYPE_ID = JdbcMapUtil.getString(valueMap,"PROJECT_SOURCE_TYPE_ID");
         //获取项目名称
@@ -253,8 +262,6 @@ public class PmBuyDemandReqExt {
         String processName = "招标文件审批-"+projectName+"-"+userName+"-"+now;
         //定义审批状态
         String status = "DR";
-        //获取所属部门
-        String CRT_DEPT_ID = JdbcMapUtil.getString(valueMap,"CRT_DEPT_ID");
         //定义招标流程id
         String processId = "99952822476386063";
         //获取招标文件审批流程id
@@ -334,7 +341,7 @@ public class PmBuyDemandReqExt {
                 .set("VER","1").set("TS",now).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",startBy).set("NAME",processName)
                 .set("PM_PRJ_ID",projectId).set("LK_WF_INST_ID",processInstanceId).set("PM_BUY_DEMAND_REQ_ID",buyId)
                 .set("STATUS",status).set("CRT_USER_ID",startBy).set("CRT_DEPT_ID",CRT_DEPT_ID).set("CRT_DT",now)
-                .set("AD_USER_ID",startBy)
+                .set("AD_USER_ID",startBy).set("PROJECT_SOURCE_TYPE_ID",PROJECT_SOURCE_TYPE_ID)
                 .exec();
 
     }
