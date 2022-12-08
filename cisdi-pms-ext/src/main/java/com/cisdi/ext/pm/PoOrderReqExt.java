@@ -15,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -294,6 +295,17 @@ public class PoOrderReqExt {
         List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql, entityRecord.csCommId);
         if (CollectionUtils.isEmpty(list1)) {
             throw new BaseException("费用明细不能为空！");
+        }
+        for (Map<String, Object> tmp : list1) {
+            String detailId = JdbcMapUtil.getString(tmp,"id");
+            //含税金额
+            BigDecimal shuiAmt = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_ONE"));
+            //税率
+            BigDecimal shuiLv = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_THREE")).divide(new BigDecimal(100));
+            //含税金额
+            BigDecimal noShuiAmt = shuiAmt.divide(shuiLv.add(new BigDecimal(1)),2, RoundingMode.HALF_UP);
+            Integer integer = myJdbcTemplate.update("update PM_ORDER_COST_DETAIL set AMT_TWO=? where id = ?",noShuiAmt,detailId);
+            tmp.put("AMT_TWO",noShuiAmt);
         }
 //        BigDecimal account = getSumAmt(list1);
         //含税总金额
