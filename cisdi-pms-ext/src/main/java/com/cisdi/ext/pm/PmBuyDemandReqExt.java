@@ -133,6 +133,8 @@ public class PmBuyDemandReqExt {
             if (!CollectionUtils.isEmpty(list1)){
                 String deptId = JdbcMapUtil.getString(list1.get(0),"hr_dept_id");
                 if ("99799190825079016".equals(deptId)){
+                    //验证成本岗是否填写明细表
+                    this.checkDetail();
                     Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
                             .set("TEXT_REMARK_TWO", commentStr).exec();
                     log.info("已更新：{}", exec);
