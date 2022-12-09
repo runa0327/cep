@@ -243,6 +243,7 @@ public class WfExt {
                                     if (!CollectionUtils.isEmpty(list)){
                                         otherName = JdbcMapUtil.getString(list.get(0),"name");
                                     }
+                                    name = concatProcessName("-",processName,projectName,otherName,userName,nowDate);
                                 } else if ("PO_ORDER_REQ".equals(entityCode)){ //合同签订
                                     sql = "select CONTRACT_NAME from PO_ORDER_REQ where id = ?";
                                     List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
@@ -253,27 +254,24 @@ public class WfExt {
                                         projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
                                     }
                                     name = concatProcessName("-",processName,projectName,otherName,userName,nowDate);
-                                    System.out.println("标题："+name);
-//                                    update1 = myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", name,csCommId);
-                                    update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id and t.id = ? set pi.name = ? where t.id",csCommId,name);
-                                    return;
-                                } else if ("PM_PRJ_REQ".equals(entityCode)){
-                                    projectName = myJdbcTemplate.queryForList("select PRJ_NAME from PM_PRJ_REQ where id = ?",csCommId).get(0).get("PRJ_NAME").toString();
-                                } else if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
-                                    otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
-                                } else if ("QUALITY_RECORD".equals(entityCode)){
-                                    otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
-                                } else if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
-                                    otherName = JdbcMapUtil.getString(valueMap,"CODE_ONE");
                                 } else {
-                                    sql = "select NAME_ONE from "+entityCode+" where id = ?";
-                                    List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
-                                    if (!CollectionUtils.isEmpty(list)){
-                                        otherName = JdbcMapUtil.getString(list.get(0),"NAME_ONE");
+                                    if ("PM_PRJ_REQ".equals(entityCode)){
+                                        projectName = myJdbcTemplate.queryForList("select PRJ_NAME from PM_PRJ_REQ where id = ?",csCommId).get(0).get("PRJ_NAME").toString();
+                                    } else if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
+                                        otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
+                                    } else if ("QUALITY_RECORD".equals(entityCode)){
+                                        otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
+                                    } else if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
+                                        otherName = JdbcMapUtil.getString(valueMap,"CODE_ONE");
+                                    } else {
+                                        sql = "select NAME_ONE from "+entityCode+" where id = ?";
+                                        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
+                                        if (!CollectionUtils.isEmpty(list)){
+                                            otherName = JdbcMapUtil.getString(list.get(0),"NAME_ONE");
+                                        }
                                     }
+                                    name = concatProcessName("-",processName,otherName,projectName,userName,nowDate);
                                 }
-                                name = concatProcessName("-",processName,otherName,projectName,userName,nowDate);
-                                System.out.println("标题："+name);
                                 if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
                                     update1 = myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", otherName,csCommId);
                                 } else {
