@@ -19,10 +19,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class WfExt {
@@ -225,8 +222,10 @@ public class WfExt {
                             // 特殊流程 更新流程内name字段
                             List<String> specialList = getSpecialList();
                             if (specialList.contains(entityCode)) {
-                                String name = "",projectName = "", userName = "", nowDate = "", processName = "", otherName = "";
-                                StringBuffer sb = new StringBuffer();
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                String nowDate = sdf.format(new Date());
+                                String name = "",projectName = "", userName = "", processName = "", otherName = "";
+                                StringBuilder sb = new StringBuilder();
                                 String sql = "";
                                 String sql2 = "SELECT (select name from pm_prj where id = a.PM_PRJ_ID) as projectName," +
                                         "(select name from ad_user where id = a.CRT_USER_ID) as userName," +
@@ -244,6 +243,7 @@ public class WfExt {
                                     if (!CollectionUtils.isEmpty(list)){
                                         otherName = JdbcMapUtil.getString(list.get(0),"name");
                                     }
+                                    name = concatProcessName("-",processName,projectName,otherName,userName,nowDate);
                                 } else if ("PO_ORDER_REQ".equals(entityCode)){ //合同签订
                                     sql = "select CONTRACT_NAME from PO_ORDER_REQ where id = ?";
                                     List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
@@ -253,45 +253,30 @@ public class WfExt {
                                     if (SharedUtil.isEmptyString(projectName)){
                                         projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
                                     }
-                                } else if ("PM_PRJ_REQ".equals(entityCode)){
-                                    projectName = myJdbcTemplate.queryForList("select PRJ_NAME from PM_PRJ_REQ where id = ?",csCommId).get(0).get("PRJ_NAME").toString();
-                                } else if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
-                                    otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
-                                } else if ("QUALITY_RECORD".equals(entityCode)){
-                                    otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
-                                } else if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
-                                    otherName = JdbcMapUtil.getString(valueMap,"CODE_ONE");
+                                    name = concatProcessName("-",processName,projectName,otherName,userName,nowDate);
                                 } else {
-                                    sql = "select NAME_ONE from "+entityCode+" where id = ?";
-                                    List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
-                                    if (!CollectionUtils.isEmpty(list)){
-                                        otherName = JdbcMapUtil.getString(list.get(0),"NAME_ONE");
+                                    if ("PM_PRJ_REQ".equals(entityCode)){
+                                        projectName = myJdbcTemplate.queryForList("select PRJ_NAME from PM_PRJ_REQ where id = ?",csCommId).get(0).get("PRJ_NAME").toString();
+                                    } else if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
+                                        otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
+                                    } else if ("QUALITY_RECORD".equals(entityCode)){
+                                        otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
+                                    } else if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
+                                        otherName = JdbcMapUtil.getString(valueMap,"CODE_ONE");
+                                    } else {
+                                        sql = "select NAME_ONE from "+entityCode+" where id = ?";
+                                        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
+                                        if (!CollectionUtils.isEmpty(list)){
+                                            otherName = JdbcMapUtil.getString(list.get(0),"NAME_ONE");
+                                        }
                                     }
+                                    name = concatProcessName("-",processName,otherName,projectName,userName,nowDate);
                                 }
-                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                nowDate = sdf.format(new Date());
-                                if (!SharedUtil.isEmptyString(processName)){
-                                    sb = sb.append(processName);
-                                }
-                                if (!SharedUtil.isEmptyString(otherName)){
-                                    sb = sb.append("-").append(otherName);
-                                }
-                                if (!SharedUtil.isEmptyString(projectName)){
-                                    sb = sb.append("-").append(projectName);
-                                }
-                                if (!SharedUtil.isEmptyString(userName)){
-                                    sb = sb.append("-").append(userName);
-                                }
-                                if (!SharedUtil.isEmptyString(nowDate)){
-                                    sb = sb.append("-").append(nowDate);
-                                }
-                                name = sb.toString();
                                 if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
                                     update1 = myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", otherName,csCommId);
                                 } else {
                                     update1 = myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", name,csCommId);
                                 }
-
                                 update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id and t.id = ? set pi.name = ? where t.id",csCommId,name);
                                 return;
                             } else if (noProjectList.contains(entityCode)){
@@ -332,6 +317,13 @@ public class WfExt {
                 }
             }
         }
+    }
+
+    // 根据长度自动拼接规则
+    private String concatProcessName(String start,String...values) {
+        StringJoiner sb = new StringJoiner(start);
+        Arrays.stream(values).filter(p->!SharedUtil.isEmptyString(p)).forEach(p->sb.add(p));
+        return sb.toString();
     }
 
     // 公开招标流程校验
