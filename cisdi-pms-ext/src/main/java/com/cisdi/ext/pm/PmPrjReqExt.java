@@ -41,7 +41,7 @@ public class PmPrjReqExt {
 
         Map<String, Object> valueMap = entityRecord.valueMap;
         String con_scale_type_id = JdbcMapUtil.getString(valueMap, "CON_SCALE_TYPE_ID");
-        Double con_scale_qty2 = JdbcMapUtil.getDouble(valueMap, "CON_SCALE_QTY2");
+        Double con_scale_qty2 = Double.parseDouble(JdbcMapUtil.getString(valueMap, "CON_SCALE_QTY2"));
         boolean need2 = "99799190825087119".equals(con_scale_type_id);
         if (need2) {
             if (con_scale_qty2 == null || con_scale_qty2 <= 0d) {
@@ -323,8 +323,8 @@ public class PmPrjReqExt {
         Map<String, Object> valueMap = entityRecord.valueMap;
 
         // 拿到两个控制价
-        Double bidCtlPriceLaunchEcho = JdbcMapUtil.getDouble(valueMap, "BID_CTL_PRICE_LAUNCH_ECHO");
-        Double bidCtlPriceLaunch = JdbcMapUtil.getDouble(valueMap, "BID_CTL_PRICE_LAUNCH");
+        Double bidCtlPriceLaunchEcho = Double.parseDouble(JdbcMapUtil.getString(valueMap, "BID_CTL_PRICE_LAUNCH_ECHO"));
+        Double bidCtlPriceLaunch = Double.parseDouble(JdbcMapUtil.getString(valueMap, "BID_CTL_PRICE_LAUNCH"));
 
         if (bidCtlPriceLaunch != null && bidCtlPriceLaunchEcho != null && Double.compare(bidCtlPriceLaunchEcho,
                 bidCtlPriceLaunch) == 1) {
@@ -353,7 +353,7 @@ public class PmPrjReqExt {
 
         Map<String, Object> valueMap = entityRecord.valueMap;
         String con_scale_type_id = JdbcMapUtil.getString(valueMap, "CON_SCALE_TYPE_ID");
-        Double con_scale_qty2 = JdbcMapUtil.getDouble(valueMap, "CON_SCALE_QTY2");
+        Double con_scale_qty2 = Double.parseDouble(JdbcMapUtil.getString(valueMap, "CON_SCALE_QTY2"));
         boolean need2 = "99799190825087119".equals(con_scale_type_id);
         if (need2) {
             if (con_scale_qty2 == null || con_scale_qty2 <= 0d) {

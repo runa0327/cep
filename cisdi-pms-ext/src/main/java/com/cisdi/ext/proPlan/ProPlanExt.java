@@ -268,12 +268,12 @@ public class ProPlanExt {
         planInfo.planComplDate = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
         planInfo.planTotalDays = JdbcMapUtil.getInt(dataMap, ("PLAN_TOTAL_DAYS"));
         planInfo.planCarryDays = JdbcMapUtil.getInt(dataMap, "PLAN_CARRY_DAYS");
-        planInfo.planCurrentProPercent = JdbcMapUtil.getDouble(dataMap, "PLAN_CURRENT_PRO_PERCENT");
+        planInfo.planCurrentProPercent = Double.parseDouble(JdbcMapUtil.getString(dataMap, "PLAN_CURRENT_PRO_PERCENT"));
         planInfo.actualStartDate = JdbcMapUtil.getString(dataMap, "ACTUAL_START_DATE");
         planInfo.actualComplDate = JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE");
         planInfo.actualTotalDays = JdbcMapUtil.getInt(dataMap, "ACTUAL_TOTAL_DAYS");
         planInfo.actualCarryDays = JdbcMapUtil.getInt(dataMap, "ACTUAL_CARRY_DAYS");
-        planInfo.actualCurrentProPercent = JdbcMapUtil.getDouble(dataMap, "ACTUAL_CURRENT_PRO_PERCENT");
+        planInfo.actualCurrentProPercent = Double.parseDouble(JdbcMapUtil.getString(dataMap, "ACTUAL_CURRENT_PRO_PERCENT"));
         String sql = "select * from gr_set_value where id=?";
         if (!Objects.isNull(dataMap.get("PROGRESS_STATUS_ID"))) {
             Map<String, Object> statusObj = myJdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(dataMap, "PROGRESS_STATUS_ID"));
@@ -318,12 +318,12 @@ public class ProPlanExt {
         nodeInfo.planComplDate = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
         nodeInfo.planTotalDays = JdbcMapUtil.getInt(dataMap, "PLAN_TOTAL_DAYS");
         nodeInfo.planCarryDays = JdbcMapUtil.getInt(dataMap, "PLAN_CARRY_DAYS");
-        nodeInfo.planCurrentProPercent = JdbcMapUtil.getDouble(dataMap, "PLAN_CURRENT_PRO_PERCENT");
+        nodeInfo.planCurrentProPercent = Double.parseDouble(JdbcMapUtil.getString(dataMap, "PLAN_CURRENT_PRO_PERCENT"));
         nodeInfo.actualStartDate = JdbcMapUtil.getString(dataMap, "ACTUAL_START_DATE");
         nodeInfo.actualComplDate = JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE");
         nodeInfo.actualTotalDays = JdbcMapUtil.getInt(dataMap, "ACTUAL_TOTAL_DAYS");
         nodeInfo.actualCarryDays = JdbcMapUtil.getInt(dataMap, "ACTUAL_CARRY_DAYS");
-        nodeInfo.actualCurrentProPercent = JdbcMapUtil.getDouble(dataMap, "ACTUAL_CURRENT_PRO_PERCENT");
+        nodeInfo.actualCurrentProPercent = Double.parseDouble(JdbcMapUtil.getString(dataMap, "ACTUAL_CURRENT_PRO_PERCENT"));
         String sql = "select * from gr_set_value where id=?";
         if (!Objects.isNull(dataMap.get("PROGRESS_STATUS_ID"))) {
             Map<String, Object> statusObj = myJdbcTemplate.queryForMap(sql, JdbcMapUtil.getString(dataMap, "PROGRESS_STATUS_ID"));
@@ -778,12 +778,12 @@ public class ProPlanExt {
         }
 
 
-        node.planCurrentProPercent = JdbcMapUtil.getDouble(data, "PLAN_CURRENT_PRO_PERCENT");
-        node.actualCurrentProPercent = JdbcMapUtil.getDouble(data, "ACTUAL_CURRENT_PRO_PERCENT");
+        node.planCurrentProPercent = Double.parseDouble(JdbcMapUtil.getString(data, "PLAN_CURRENT_PRO_PERCENT"));
+        node.actualCurrentProPercent = Double.parseDouble(JdbcMapUtil.getString(data, "ACTUAL_CURRENT_PRO_PERCENT"));
         if (Objects.nonNull(data.get("PLAN_CURRENT_PRO_PERCENT"))) {
             double actualCurrentProPercent = 0d;
             if (Objects.nonNull(data.get("ACTUAL_CURRENT_PRO_PERCENT"))) {
-                actualCurrentProPercent = JdbcMapUtil.getDouble(data, "ACTUAL_CURRENT_PRO_PERCENT");
+                actualCurrentProPercent = Double.parseDouble(JdbcMapUtil.getString(data, "ACTUAL_CURRENT_PRO_PERCENT"));
             }
             node.percentOffset = String.valueOf(actualCurrentProPercent - node.planCurrentProPercent);
         }
@@ -854,12 +854,12 @@ public class ProPlanExt {
         }
 
 
-        contrast.planCurrentProPercent = JdbcMapUtil.getDouble(data, "PLAN_CURRENT_PRO_PERCENT");
-        contrast.actualCurrentProPercent = JdbcMapUtil.getDouble(data, "ACTUAL_CURRENT_PRO_PERCENT");
+        contrast.planCurrentProPercent = Double.parseDouble(JdbcMapUtil.getString(data, "PLAN_CURRENT_PRO_PERCENT"));
+        contrast.actualCurrentProPercent = Double.parseDouble(JdbcMapUtil.getString(data, "ACTUAL_CURRENT_PRO_PERCENT"));
         if (Objects.nonNull(data.get("PLAN_CURRENT_PRO_PERCENT"))) {
             double actualCurrentProPercent = 0d;
             if (Objects.nonNull(data.get("ACTUAL_CURRENT_PRO_PERCENT"))) {
-                actualCurrentProPercent = JdbcMapUtil.getDouble(data, "ACTUAL_CURRENT_PRO_PERCENT");
+                actualCurrentProPercent = Double.parseDouble(JdbcMapUtil.getString(data, "ACTUAL_CURRENT_PRO_PERCENT"));
             }
             contrast.percentOffset = String.valueOf(actualCurrentProPercent - contrast.planCurrentProPercent);
         }
