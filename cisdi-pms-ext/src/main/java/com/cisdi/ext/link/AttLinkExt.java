@@ -10,7 +10,6 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.att.AttDataTypeE;
-import com.qygly.shared.end.B;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
@@ -898,7 +897,7 @@ public class AttLinkExt {
 //                linkedRecord.valueMap.put("NPER",JdbcMapUtil.getInt(echoMap,"nper"));
 //                linkedRecord.textMap.put("NPER",JdbcMapUtil.getString(echoMap,"nper"));
                 //支付金额
-                linkedRecord.valueMap.put("PAY_AMT",JdbcMapUtil.getDouble(echoMap,"paidAmt"));
+                linkedRecord.valueMap.put("PAY_AMT",JdbcMapUtil.getString(echoMap,"paidAmt"));
                 linkedRecord.textMap.put("PAY_AMT",JdbcMapUtil.getString(echoMap,"paidAmt"));
                 //付款单位
                 linkedRecord.valueMap.put("PAY_UNIT",JdbcMapUtil.getString(echoMap,"payUnitId"));
@@ -4489,7 +4488,7 @@ public class AttLinkExt {
                 String url = JdbcMapUtil.getString(row, "FILE_INLINE_URL");
                 fileInfo.inlineUrl = url;
                 fileInfo.name = JdbcMapUtil.getString(row, "NAME");
-                fileInfo.sizeKiloByte = JdbcMapUtil.getDouble(row, "SIZE_KB");
+                fileInfo.sizeKiloByte = Double.parseDouble(JdbcMapUtil.getString(row, "SIZE_KB"));
                 fileInfo.uploadDttm = DateTimeUtil.dttmToString(JdbcMapUtil.getObject(row, "UPLOAD_DTTM"));
                 sb.append(url).append(",");
             }
