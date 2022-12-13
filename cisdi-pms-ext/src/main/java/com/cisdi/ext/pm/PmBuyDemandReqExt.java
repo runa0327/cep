@@ -184,6 +184,28 @@ public class PmBuyDemandReqExt {
         }
     }
 
+    /** 发起时校验非系统项目是否重复 **/
+    public void checkPrjDuplicate(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //项目来源类型  99952822476441375=非立项
+        String projectTypeId = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_SOURCE_TYPE_ID");
+        List<Map<String, Object>> projectTypeList = myJdbcTemplate.queryForList("select * from gr_set_value where id = ?", projectTypeId);
+        if (CollectionUtils.isEmpty(projectTypeList)){
+            return;
+        }
+        String projectTypeName = JdbcMapUtil.getString(projectTypeList.get(0), "NAME");
+        if ("非系统".equals(projectTypeName)){
+            //项目名称
+            String projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
+            String sql1 = "select * from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?";
+            List<Map<String,Object>> existPrj = myJdbcTemplate.queryForList(sql1,projectName,projectTypeId);
+            if (!CollectionUtils.isEmpty(existPrj)){
+                throw new BaseException("非立项项目下,'"+projectName+" '项目已存在！");
+            }
+        }
+    }
+
     /** 采购需求审批-审批通过项目信息写入项目库 **/
     public void endDataHandle(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
