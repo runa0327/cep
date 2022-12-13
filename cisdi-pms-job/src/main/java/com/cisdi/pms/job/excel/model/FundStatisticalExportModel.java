@@ -5,6 +5,8 @@ import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.alibaba.excel.annotation.write.style.ContentStyle;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * @author 尹涛 * @version V1.0.0
  * @projectName cisdi-pms-service
@@ -31,12 +33,12 @@ public class FundStatisticalExportModel {
     @ExcelProperty("申报金额（万元）")
     @ColumnWidth(30)
     @ContentStyle(dataFormat = 2)
-    public Double declaredAmount;
+    public BigDecimal declaredAmount;
     //批复金额
     @ExcelProperty("批复金额（万元）")
     @ColumnWidth(30)
     @ContentStyle(dataFormat = 2)
-    public Double approvedAmount;
+    public BigDecimal approvedAmount;
     //批复日期
     @ExcelProperty("批复日期")
     @ColumnWidth(30)
@@ -45,37 +47,37 @@ public class FundStatisticalExportModel {
     @ExcelProperty("累计到位资金（万元）")
     @ColumnWidth(30)
     @ContentStyle(dataFormat = 2)
-    public Double cumulativeInPaceAmt;
+    public BigDecimal cumulativeInPaceAmt;
     //累计征迁到位资金
     @ExcelProperty("累计征迁到位资金（万元）")
     @ColumnWidth(30)
     @ContentStyle(dataFormat = 2)
-    public Double cumulativeInPaceAmtZq;
+    public BigDecimal cumulativeInPaceAmtZq;
     //累计建设到位资金
     @ExcelProperty("累计建设到位资金（万元）")
     @ColumnWidth(30)
     @ContentStyle(dataFormat = 2)
-    public Double cumulativeInPaceAmtJs;
+    public BigDecimal cumulativeInPaceAmtJs;
     //累计支付资金
     @ExcelProperty("累计支付资金（万元）")
     @ColumnWidth(30)
     @ContentStyle(dataFormat = 2)
-    public Double cumulativePayAmt;
+    public BigDecimal cumulativePayAmt;
     //到位剩余资金
     @ExcelProperty("到位剩余资金（万元）")
     @ColumnWidth(30)
     @ContentStyle(dataFormat = 2)
-    public Double syAmt;
+    public BigDecimal syAmt;
     //未到位资金
     @ExcelProperty("未到位资金（万元）")
     @ColumnWidth(30)
     @ContentStyle(dataFormat = 2)
-    public Double unInPlaceAmt;
+    public BigDecimal unInPlaceAmt;
     //总剩余资金
     @ExcelProperty("总剩余资金（万元）")
     @ColumnWidth(30)
     @ContentStyle(dataFormat = 2)
-    public Double totalSyAmt;
+    public BigDecimal totalSyAmt;
     //累计支付率
     @ExcelProperty("累计支付率")
     @ColumnWidth(30)

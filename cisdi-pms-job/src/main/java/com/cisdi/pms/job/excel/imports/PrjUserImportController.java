@@ -72,7 +72,7 @@ public class PrjUserImportController {
         List<Map<String,Object>> partyList = jdbcTemplate.queryForList(sql3);
 
         //查询单位
-        String sql4 = "select id,name from gr_set_value where GR_SET_ID = '99952822476391029'";
+        String sql4 = "select id,name from gr_set_value where GR_SET_ID = '0099952822476391029'";
         List<Map<String,Object>> localList = jdbcTemplate.queryForList(sql4);
 
         String msg = "";
@@ -108,7 +108,7 @@ public class PrjUserImportController {
                 }
                 if (SharedUtil.isEmptyString(projectId)){
                     projectId = Util.insertData(jdbcTemplate,"pm_prj");
-                    String updateSql = "update pm_prj set ver = '99',CRT_DT = now(),CRT_USER_ID='99250247095871681',STATUS='AP',name = ?,PROJECT_SOURCE_TYPE_ID='99952822476441374' where id = ?";
+                    String updateSql = "update pm_prj set ver = '99',CRT_DT = now(),CRT_USER_ID='0099250247095871681',STATUS='AP',name = ?,PROJECT_SOURCE_TYPE_ID='0099952822476441374' where id = ?";
                     int s = jdbcTemplate.update(updateSql,projectName,projectId);
                     projectList = jdbcTemplate.queryForList(sql1);
                     basePrjPartyUser.setPmPrjId(projectId);
@@ -339,7 +339,7 @@ public class PrjUserImportController {
                 }
 
                 if (userSB.length() > 0){
-                    basePrjPartyUser1.setPmPartyRoleId("99952822476391092");
+                    basePrjPartyUser1.setPmPartyRoleId("0099952822476391092");
                     String buildUser = userSB.substring(0,userSB.length()-1);
                     basePrjPartyUser1.setUserId(buildUser);
                     importList.add(basePrjPartyUser1);
@@ -367,7 +367,7 @@ public class PrjUserImportController {
                     }
                 }
                 if (userSB2.length()>0){
-                    basePrjPartyUser2.setPmPartyRoleId("99952822476391096");
+                    basePrjPartyUser2.setPmPartyRoleId("0099952822476391096");
                     String reviewUser = userSB2.substring(0,userSB2.length()-1);
                     basePrjPartyUser2.setUserId(reviewUser);
                     importList.add(basePrjPartyUser2);
