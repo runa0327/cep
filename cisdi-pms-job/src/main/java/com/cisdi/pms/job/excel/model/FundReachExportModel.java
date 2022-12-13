@@ -5,6 +5,8 @@ import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.alibaba.excel.annotation.write.style.ContentStyle;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * @author 尹涛 * @version V1.0.0
  * @projectName cisdi-pms-service
@@ -39,12 +41,12 @@ public class FundReachExportModel {
     @ExcelProperty("本次到位金额")
     @ColumnWidth(value = 30)
     @ContentStyle(dataFormat = 2)
-    private Double dwAmt;
+    private BigDecimal dwAmt;
 
     @ExcelProperty("累计到位金额")
     @ColumnWidth(value = 30)
     @ContentStyle(dataFormat = 2)
-    private Double totalDwAmt;
+    private BigDecimal totalDwAmt;
 
     @ExcelProperty("到位日期")
     @ColumnWidth(value = 30)

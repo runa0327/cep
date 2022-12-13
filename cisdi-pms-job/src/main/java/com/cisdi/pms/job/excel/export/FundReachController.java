@@ -91,8 +91,8 @@ public class FundReachController extends BaseController {
         model.setProjectName(JdbcMapUtil.getString(data,"projectName"));
         model.setCount(JdbcMapUtil.getString(data,"count"));
         model.setTypeName(JdbcMapUtil.getString(data,"reachCategory"));
-        model.setDwAmt(JdbcMapUtil.getDouble(data,"amt"));
-        model.setTotalDwAmt(JdbcMapUtil.getDouble(data,"sumAmt"));
+        model.setDwAmt(JdbcMapUtil.getBigDecimal(data,"amt"));
+        model.setTotalDwAmt(JdbcMapUtil.getBigDecimal(data,"sumAmt"));
         model.setDwDate(JdbcMapUtil.getString(data,"reachDate"));
         model.setUnit(JdbcMapUtil.getString(data,"payee"));
         model.setBank(JdbcMapUtil.getString(data,"bank"));
