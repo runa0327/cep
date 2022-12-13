@@ -194,8 +194,8 @@ public class PmBuyDemandReqExt {
         if (CollectionUtils.isEmpty(projectTypeList)){
             return;
         }
-        String projectTypeName = JdbcMapUtil.getString(projectTypeList.get(0), "NAME");
-        if ("非系统".equals(projectTypeName)){
+        String projectTypeName = JdbcMapUtil.getString(projectTypeList.get(0), "code");
+        if ("non_system".equals(projectTypeName)){
             //项目名称
             String projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
             String sql1 = "select * from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?";
