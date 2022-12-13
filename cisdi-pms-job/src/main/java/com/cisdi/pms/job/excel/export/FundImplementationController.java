@@ -73,7 +73,7 @@ public class FundImplementationController extends BaseController {
         model.setCategoryName(JdbcMapUtil.getString(data,"FUND_CATEGORY_FIRST"));
         model.setSourceName(JdbcMapUtil.getString(data,"FUND_SOURCE_TEXT"));
         model.setProjectName(JdbcMapUtil.getString(data,"project_name"));
-        model.setApprovedAmount(JdbcMapUtil.getDouble(data,"APPROVED_AMOUNT"));
+        model.setApprovedAmount(Double.parseDouble(JdbcMapUtil.getString(data,"APPROVED_AMOUNT")));
         model.setApprovalTime(JdbcMapUtil.getString(data,"APPROVAL_TIME"));
         model.setRemark(JdbcMapUtil.getString(data,"remark"));
         return model;
