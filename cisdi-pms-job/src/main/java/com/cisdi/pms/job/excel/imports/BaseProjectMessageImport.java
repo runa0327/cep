@@ -1,5 +1,6 @@
 package com.cisdi.pms.job.excel.imports;
 
+import cn.hutool.core.util.IdUtil;
 import com.cisdi.pms.job.excel.model.PmPrjInvest1Model;
 import com.cisdi.pms.job.excel.model.PmPrjInvest2Model;
 import com.cisdi.pms.job.excel.model.PmPrjModel;
@@ -361,8 +362,8 @@ public class BaseProjectMessageImport {
             if (!CollectionUtils.isEmpty(keYanList)){
                 for (PmPrjInvest1Model tmp : keYanList) {
                     String insertSql = "insert into PM_PRJ_INVEST1 (id,CRT_DT,ver,status,PM_PRJ_ID,REPLY_NO_WR,PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,EQUIP_AMT,PROJECT_OTHER_AMT,LAND_AMT,PREPARE_AMT," +
-                            "CONSTRUCT_PERIOD_INTEREST) values ((select uuid_short()),now(),'99','AP',?,?,?,?,?,?,?,?,?,?)";
-                    int update1 = jdbcTemplate.update(insertSql,tmp.getPM_PRJ_ID(),tmp.getREPLY_NO_WR(),tmp.getPRJ_TOTAL_INVEST(),tmp.getPROJECT_AMT(),tmp.getCONSTRUCT_AMT(),tmp.getEQUIP_AMT(),
+                            "CONSTRUCT_PERIOD_INTEREST) values (?,now(),'99','AP',?,?,?,?,?,?,?,?,?,?)";
+                    int update1 = jdbcTemplate.update(insertSql,IdUtil.getSnowflakeNextIdStr(),tmp.getPM_PRJ_ID(),tmp.getREPLY_NO_WR(),tmp.getPRJ_TOTAL_INVEST(),tmp.getPROJECT_AMT(),tmp.getCONSTRUCT_AMT(),tmp.getEQUIP_AMT(),
                             tmp.getPROJECT_OTHER_AMT(),tmp.getLAND_AMT(),tmp.getPREPARE_AMT(),tmp.getCONSTRUCT_PERIOD_INTEREST());
                     num2 = num2 + update1;
                 }
@@ -370,8 +371,8 @@ public class BaseProjectMessageImport {
             if (!CollectionUtils.isEmpty(chuGaiList)){
                 for (PmPrjInvest2Model tmp : chuGaiList) {
                     String insertSql = "insert into PM_PRJ_INVEST2 (id,CRT_DT,ver,status,PM_PRJ_ID,REPLY_NO_WR,PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,EQUIP_AMT,PROJECT_OTHER_AMT,LAND_AMT,PREPARE_AMT," +
-                            "CONSTRUCT_PERIOD_INTEREST) values ((select uuid_short()),now(),'99','AP',?,?,?,?,?,?,?,?,?,?)";
-                    int update1 = jdbcTemplate.update(insertSql,tmp.getPM_PRJ_ID(),tmp.getREPLY_NO_WR(),tmp.getPRJ_TOTAL_INVEST(),tmp.getPROJECT_AMT(),tmp.getCONSTRUCT_AMT(),tmp.getEQUIP_AMT(),
+                            "CONSTRUCT_PERIOD_INTEREST) values (?,now(),'99','AP',?,?,?,?,?,?,?,?,?,?)";
+                    int update1 = jdbcTemplate.update(insertSql,IdUtil.getSnowflakeNextIdStr(),tmp.getPM_PRJ_ID(),tmp.getREPLY_NO_WR(),tmp.getPRJ_TOTAL_INVEST(),tmp.getPROJECT_AMT(),tmp.getCONSTRUCT_AMT(),tmp.getEQUIP_AMT(),
                             tmp.getPROJECT_OTHER_AMT(),tmp.getLAND_AMT(),tmp.getPREPARE_AMT(),tmp.getCONSTRUCT_PERIOD_INTEREST());
                     num3 = num3 + update1;
                 }
