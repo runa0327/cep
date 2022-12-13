@@ -1,6 +1,7 @@
 package com.cisdi.ext.pm;
 
 
+import cn.hutool.core.util.IdUtil;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -41,7 +42,7 @@ public class PoOrderPaymentExt {
         String contractId = entityRecord.valueMap.get("CONTRACT_ID").toString();
         // 获取付款依据
         String payBasisId = entityRecord.valueMap.get("PAY_BASIS_ID").toString();
-        if ("99902212142031993".equals(payBasisId)) {
+        if ("0099902212142031993".equals(payBasisId)) {
             // 获取附件信息
             String fileId = JdbcMapUtil.getString(entityRecord.valueMap, "ATT_FILE_GROUP_ID");
             if (SharedUtil.isEmptyString(fileId) || "0".equals(fileId)) {
@@ -265,7 +266,7 @@ public class PoOrderPaymentExt {
 
         //写入付款情况数据表
         String sql = "insert into PO_ORDER_PAYMENT (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,CONTRACT_ID,PAY_AMT,PAY_DATE,AMT,STAGE_PAY_AMT_TWO,PM_PRJ_ID)" +
-                "values((select UUID_SHORT()),'1',now(),now(),?,now(),?,'AP',?,?,now(),?,?,?)";
-        myJdbcTemplate.update(sql,userId,userId,contractId,payAmt,amt,payAmtNow,projectId);
+                "values(?,'1',now(),now(),?,now(),?,'AP',?,?,now(),?,?,?)";
+        myJdbcTemplate.update(sql,IdUtil.getSnowflakeNextIdStr(),userId,userId,contractId,payAmt,amt,payAmtNow,projectId);
     }
 }

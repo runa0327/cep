@@ -127,7 +127,7 @@ public class EntityUtil {
     public void classTest(){
         MyJdbcTemplate jdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> testMap = jdbcTemplate.queryForMap("select REMARK,VER,ID,TS,APPLY_TIME,TOTAL_AMT from pm_fund_req_plan where id = " +
-                "'99902212142086245'");
+                "'0099902212142086245'");
         Class<?> ver = testMap.get("VER").getClass();
         Class<?> REMARK = testMap.get("REMARK").getClass();
         Class<?> id = testMap.get("ID").getClass();
@@ -147,7 +147,7 @@ public class EntityUtil {
 //        pm_fund_req_plan
 //        JdbcTemplate jdbcTemplate = ExtJarHelper.jdbcTemplate.get();
 //        Map<String, Object> testMap = jdbcTemplate.queryForMap("select TS,APPLY_TIME,TOTAL_AMT from pm_fund_req_plan where id = " +
-//                "'99902212142086245'");
+//                "'0099902212142086245'");
 //        Map<String, Object> testMap = new HashMap<>();
 //        testMap.put("ID","1001");
 //        testMap.put("AGE",1);

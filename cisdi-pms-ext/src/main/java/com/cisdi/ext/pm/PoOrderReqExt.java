@@ -166,7 +166,7 @@ public class PoOrderReqExt {
             String processFinanceComment = JdbcMapUtil.getString(entityRecord.valueMap,"TEXT_REMARK_FOUR"); //财务意见
             String processFinanceFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_TWO"); //财务修订稿
             //查询该人员角色信息
-            String sql1 = "select b.id,b.name from ad_role_user a left join ad_role b on a.AD_ROLE_ID = b.id where a.AD_USER_ID = ? and b.id in ('100070673610711083','99902212142039415')";
+            String sql1 = "select b.id,b.name from ad_role_user a left join ad_role b on a.AD_ROLE_ID = b.id where a.AD_USER_ID = ? and b.id in ('0100070673610711083','0099902212142039415')";
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId);
             if (!CollectionUtils.isEmpty(list1)){
                 //判断是否是当轮拒绝回来的、撤销回来的
@@ -192,10 +192,10 @@ public class PoOrderReqExt {
                     processFinanceComment = "";
                     processFinanceFile = "";
                 }
-                // 99902212142039415 = 法务部门;100070673610711083=财务部
+                // 0099902212142039415 = 法务部门;0100070673610711083=财务部
                 String id = JdbcMapUtil.getString(list1.get(0),"id");
 
-                if ("99902212142039415".equals(id)){ //法务
+                if ("0099902212142039415".equals(id)){ //法务
                     sbComment = autoComment(comment,processLegalComment,userName);
                     sbFile = autoFile(file,processLegalFile);
                     if (!SharedUtil.isEmptyString(sbComment) || !SharedUtil.isEmptyString(sbFile)){
@@ -211,7 +211,7 @@ public class PoOrderReqExt {
                         log.info("已更新：{}", exec);
                     }
                 }
-                if ("100070673610711083".equals(id)){
+                if ("0100070673610711083".equals(id)){
                     sbComment = autoComment(comment,processFinanceComment,userName);
                     sbFile = autoFile(file,processFinanceFile);
                     if (!SharedUtil.isEmptyString(sbComment) || !SharedUtil.isEmptyString(sbFile)){
@@ -440,7 +440,7 @@ public class PoOrderReqExt {
         Crud.from("TEST_CLASS").where().eq("id",csId).update().set("FILE_ID_ONE",newId).exec();
 
         Crud.from("fl_file").where().eq("id",newId).update()
-                .set("CODE",newId).set("NAME",fileName).set("VER","1").set("FL_PATH_ID","99250247095872690").set("EXT","pdf")
+                .set("CODE",newId).set("NAME",fileName).set("VER","1").set("FL_PATH_ID","0099250247095872690").set("EXT","pdf")
                 .set("STATUS","AP").set("CRT_DT",now).set("CRT_USER_ID",userId).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
                 .set("SIZE_KB",fileSize).set("TS",now).set("UPLOAD_DTTM",now).set("PHYSICAL_LOCATION",newAddress).set("DSP_NAME",showName)
                 .set("DSP_SIZE",fileSize).exec();

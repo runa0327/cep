@@ -16,9 +16,9 @@ public class PmWoodlandProceduresExt {
     public void checkFile() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        // 获取是否需要办理字段  是：99799190825080669   否：99799190825080670
+        // 获取是否需要办理字段  是：0099799190825080669   否：0099799190825080670
         String value = entityRecord.valueMap.get("YES_NO_ONE").toString();
-        if ("99799190825080670".equals(value)) {
+        if ("0099799190825080670".equals(value)) {
             // 查询文件信息
             String file = JdbcMapUtil.getString(entityRecord.valueMap, "ATT_FILE_GROUP_ID");
             if (SharedUtil.isEmptyString(file)) {

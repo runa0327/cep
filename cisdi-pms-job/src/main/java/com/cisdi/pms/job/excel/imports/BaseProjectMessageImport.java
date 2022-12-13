@@ -1,5 +1,6 @@
 package com.cisdi.pms.job.excel.imports;
 
+import cn.hutool.core.util.IdUtil;
 import com.cisdi.pms.job.excel.model.PmPrjInvest1Model;
 import com.cisdi.pms.job.excel.model.PmPrjInvest2Model;
 import com.cisdi.pms.job.excel.model.PmPrjModel;
@@ -69,31 +70,31 @@ public class BaseProjectMessageImport {
         List<Map<String,Object>> partyList = jdbcTemplate.queryForList(sql2);
 
         //查询项目管理模式
-        String sql3 = "select * from gr_set_value where GR_SET_ID = '99799190825080621'";
+        String sql3 = "select * from gr_set_value where GR_SET_ID = '0099799190825080621'";
         List<Map<String,Object>> prjManList = jdbcTemplate.queryForList(sql3);
 
         //建设地点
-        String sql4 = "select * from gr_set_value where GR_SET_ID = '99799190825080637'";
+        String sql4 = "select * from gr_set_value where GR_SET_ID = '0099799190825080637'";
         List<Map<String,Object>> localList = jdbcTemplate.queryForList(sql4);
 
         //项目类型
-        String sql5 = "select * from gr_set_value where GR_SET_ID = '99799190825080620'";
+        String sql5 = "select * from gr_set_value where GR_SET_ID = '0099799190825080620'";
         List<Map<String,Object>> prjTypeList = jdbcTemplate.queryForList(sql5);
 
         //建设规模类型
-        String sql6 = "select * from gr_set_value where GR_SET_ID = '99799190825087113'";
+        String sql6 = "select * from gr_set_value where GR_SET_ID = '0099799190825087113'";
         List<Map<String,Object>> buildTypeList = jdbcTemplate.queryForList(sql6);
 
         //建设规模单位
-        String sql7 = "select * from gr_set_value where GR_SET_ID = '99799190825087115'";
+        String sql7 = "select * from gr_set_value where GR_SET_ID = '0099799190825087115'";
         List<Map<String,Object>> buildUnitList = jdbcTemplate.queryForList(sql7);
 
         //投资来源
-        String sql8 = "select * from gr_set_value where GR_SET_ID = '99799190825080625'";
+        String sql8 = "select * from gr_set_value where GR_SET_ID = '0099799190825080625'";
         List<Map<String,Object>> sourceList = jdbcTemplate.queryForList(sql8);
 
         //项目状态
-        String sql9 = "select * from gr_set_value where GR_SET_ID = '99799190825080626'";
+        String sql9 = "select * from gr_set_value where GR_SET_ID = '0099799190825080626'";
         List<Map<String,Object>> prjStatusList = jdbcTemplate.queryForList(sql9);
 
         String msg = "";
@@ -351,7 +352,7 @@ public class BaseProjectMessageImport {
                 for (PmPrjModel tmp : prjList) {
                     String updateSql1 = "update pm_prj set LAST_MODI_DT = now(),VER = '99',NAME = ?,CUSTOMER_UNIT=?,PRJ_MANAGE_MODE_ID=?,BASE_LOCATION_ID=?,FLOOR_AREA=?,PROJECT_TYPE_ID=?," +
                             "CON_SCALE_TYPE_ID=?,CON_SCALE_QTY=?,QTY_ONE=?,QTY_TWO=?,QTY_THREE=?,CON_SCALE_QTY2=?,CON_SCALE_UOM_ID=?,BUILD_YEARS=?,PRJ_SITUATION=?,INVESTMENT_SOURCE_ID=?," +
-                            "PROJECT_PHASE_ID=?,PRJ_CODE=?,PROJECT_SOURCE_TYPE_ID='99952822476441374' where id = ?";
+                            "PROJECT_PHASE_ID=?,PRJ_CODE=?,PROJECT_SOURCE_TYPE_ID='0099952822476441374' where id = ?";
                     int update1 = jdbcTemplate.update(updateSql1,tmp.getNAME(),tmp.getCUSTOMER_UNIT(),tmp.getPRJ_MANAGE_MODE_ID(),tmp.getBASE_LOCATION_ID(),tmp.getFLOOR_AREA(),tmp.getPROJECT_TYPE_ID(),
                             tmp.getCON_SCALE_TYPE_ID(),tmp.getCON_SCALE_QTY(),tmp.getQTY_ONE(),tmp.getQTY_TWO(),tmp.getQTY_THREE(),tmp.getCON_SCALE_QTY2(),tmp.getCON_SCALE_UOM_ID(),tmp.getBUILD_YEARS(),
                             tmp.getPRJ_SITUATION(),tmp.getINVESTMENT_SOURCE_ID(),tmp.getPROJECT_PHASE_ID(),tmp.getPRJ_CODE(),tmp.getId());
@@ -361,8 +362,8 @@ public class BaseProjectMessageImport {
             if (!CollectionUtils.isEmpty(keYanList)){
                 for (PmPrjInvest1Model tmp : keYanList) {
                     String insertSql = "insert into PM_PRJ_INVEST1 (id,CRT_DT,ver,status,PM_PRJ_ID,REPLY_NO_WR,PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,EQUIP_AMT,PROJECT_OTHER_AMT,LAND_AMT,PREPARE_AMT," +
-                            "CONSTRUCT_PERIOD_INTEREST) values ((select uuid_short()),now(),'99','AP',?,?,?,?,?,?,?,?,?,?)";
-                    int update1 = jdbcTemplate.update(insertSql,tmp.getPM_PRJ_ID(),tmp.getREPLY_NO_WR(),tmp.getPRJ_TOTAL_INVEST(),tmp.getPROJECT_AMT(),tmp.getCONSTRUCT_AMT(),tmp.getEQUIP_AMT(),
+                            "CONSTRUCT_PERIOD_INTEREST) values (?,now(),'99','AP',?,?,?,?,?,?,?,?,?,?)";
+                    int update1 = jdbcTemplate.update(insertSql,IdUtil.getSnowflakeNextIdStr(),tmp.getPM_PRJ_ID(),tmp.getREPLY_NO_WR(),tmp.getPRJ_TOTAL_INVEST(),tmp.getPROJECT_AMT(),tmp.getCONSTRUCT_AMT(),tmp.getEQUIP_AMT(),
                             tmp.getPROJECT_OTHER_AMT(),tmp.getLAND_AMT(),tmp.getPREPARE_AMT(),tmp.getCONSTRUCT_PERIOD_INTEREST());
                     num2 = num2 + update1;
                 }
@@ -370,8 +371,8 @@ public class BaseProjectMessageImport {
             if (!CollectionUtils.isEmpty(chuGaiList)){
                 for (PmPrjInvest2Model tmp : chuGaiList) {
                     String insertSql = "insert into PM_PRJ_INVEST2 (id,CRT_DT,ver,status,PM_PRJ_ID,REPLY_NO_WR,PRJ_TOTAL_INVEST,PROJECT_AMT,CONSTRUCT_AMT,EQUIP_AMT,PROJECT_OTHER_AMT,LAND_AMT,PREPARE_AMT," +
-                            "CONSTRUCT_PERIOD_INTEREST) values ((select uuid_short()),now(),'99','AP',?,?,?,?,?,?,?,?,?,?)";
-                    int update1 = jdbcTemplate.update(insertSql,tmp.getPM_PRJ_ID(),tmp.getREPLY_NO_WR(),tmp.getPRJ_TOTAL_INVEST(),tmp.getPROJECT_AMT(),tmp.getCONSTRUCT_AMT(),tmp.getEQUIP_AMT(),
+                            "CONSTRUCT_PERIOD_INTEREST) values (?,now(),'99','AP',?,?,?,?,?,?,?,?,?,?)";
+                    int update1 = jdbcTemplate.update(insertSql,IdUtil.getSnowflakeNextIdStr(),tmp.getPM_PRJ_ID(),tmp.getREPLY_NO_WR(),tmp.getPRJ_TOTAL_INVEST(),tmp.getPROJECT_AMT(),tmp.getCONSTRUCT_AMT(),tmp.getEQUIP_AMT(),
                             tmp.getPROJECT_OTHER_AMT(),tmp.getLAND_AMT(),tmp.getPREPARE_AMT(),tmp.getCONSTRUCT_PERIOD_INTEREST());
                     num3 = num3 + update1;
                 }

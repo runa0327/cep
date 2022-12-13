@@ -104,7 +104,7 @@ public class ProFileUtils {
 
             List<String> fileIDs = Arrays.asList(fileIds.split(","));
             for (String fileId : fileIDs) {
-                String sql = "insert into PF_FILE (id,FL_FILE_ID,PF_FOLDER_ID) values((select UUID_SHORT()),'"+fileId+"','"+fid+"')";
+                String sql = "insert into PF_FILE (id,FL_FILE_ID,PF_FOLDER_ID) values(@newId,'"+fileId+"','"+fid+"')";
                 myJdbcTemplate.update(sql);
             }
         } catch (Exception e) {
@@ -117,8 +117,8 @@ public class ProFileUtils {
      */
     public static Map testExt(String input, String output) throws IOException {
 
-        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
-//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("124.222.60.191",8100);
+//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
+        OpenOfficeConnection connection = new SocketOpenOfficeConnection("124.222.60.191",8100);
         connection.connect();
 
         File inputFile = new File(input);

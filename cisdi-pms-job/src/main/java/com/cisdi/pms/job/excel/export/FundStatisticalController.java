@@ -66,9 +66,9 @@ public class FundStatisticalController extends BaseController {
                 "left join FUND_TYPE ft1 on ft1.id = fi.FUND_CATEGORY_SECOND \n" +
                 "left join (select sum(REACH_AMOUNT) sumAmt,FUND_SOURCE_TEXT from fund_reach group by FUND_SOURCE_TEXT) temp on temp" +
                 ".FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT\n" +
-                "left join (select sum(REACH_AMOUNT) sumZqAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '99952822476371281' group by " +
+                "left join (select sum(REACH_AMOUNT) sumZqAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '0099952822476371281' group by " +
                 "FUND_SOURCE_TEXT) temp2 on temp2.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
-                "left join (select sum(REACH_AMOUNT) sumJsAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '99952822476371282' group by " +
+                "left join (select sum(REACH_AMOUNT) sumJsAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '0099952822476371282' group by " +
                 "FUND_SOURCE_TEXT) temp3 on temp3.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
                 "left join (select sum(APPROVED_AMOUNT) sumApp,FUND_IMPLEMENTATION_ID from fund_implementation_detail group by FUND_IMPLEMENTATION_ID) temp1 on temp1" +
                 ".FUND_IMPLEMENTATION_ID = fi.id " +
@@ -127,9 +127,9 @@ public class FundStatisticalController extends BaseController {
                 "left join FUND_TYPE ft1 on ft1.id = fi.FUND_CATEGORY_SECOND \n" +
                 "left join (select sum(REACH_AMOUNT) sumAmt,FUND_SOURCE_TEXT from fund_reach group by FUND_SOURCE_TEXT) temp on temp" +
                 ".FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT\n" +
-                "left join (select sum(REACH_AMOUNT) sumZqAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '99952822476371281' group by " +
+                "left join (select sum(REACH_AMOUNT) sumZqAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '0099952822476371281' group by " +
                 "FUND_SOURCE_TEXT) temp2 on temp2.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
-                "left join (select sum(REACH_AMOUNT) sumJsAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '99952822476371282' group by " +
+                "left join (select sum(REACH_AMOUNT) sumJsAmt,FUND_SOURCE_TEXT from fund_reach where FUND_REACH_CATEGORY = '0099952822476371282' group by " +
                 "FUND_SOURCE_TEXT) temp3 on temp3.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
                 "left join (select sum(APPROVED_AMOUNT) sumApp,FUND_IMPLEMENTATION_ID from fund_implementation_detail group by FUND_IMPLEMENTATION_ID) temp1 on temp1" +
                 ".FUND_IMPLEMENTATION_ID = fi.id" +
@@ -170,16 +170,16 @@ public class FundStatisticalController extends BaseController {
         obj.categoryName = JdbcMapUtil.getString(data, "categoryName");
         obj.categoryNameSecond = JdbcMapUtil.getString(data, "categoryNameSecond");
         obj.sourceName = JdbcMapUtil.getString(data, "sourceName");
-        obj.declaredAmount = JdbcMapUtil.getDouble(data, "declaredAmount");
-        obj.approvedAmount = JdbcMapUtil.getDouble(data, "approvedAmount");
+        obj.declaredAmount = JdbcMapUtil.getBigDecimal(data, "declaredAmount");
+        obj.approvedAmount = JdbcMapUtil.getBigDecimal(data, "approvedAmount");
         obj.approvedDate = JdbcMapUtil.getString(data, "approvedDate");
-        obj.cumulativeInPaceAmt = JdbcMapUtil.getDouble(data, "cumulativeInPaceAmt");
-        obj.cumulativeInPaceAmtZq = JdbcMapUtil.getDouble(data, "cumulativeInPaceAmtZq");
-        obj.cumulativeInPaceAmtJs = JdbcMapUtil.getDouble(data, "cumulativeInPaceAmtJs");
-        obj.cumulativePayAmt = JdbcMapUtil.getDouble(data, "cumulativePayAmt");
-        obj.syAmt = JdbcMapUtil.getDouble(data, "syAmt");
-        obj.unInPlaceAmt = JdbcMapUtil.getDouble(data, "unInPlaceAmt");
-        obj.totalSyAmt = JdbcMapUtil.getDouble(data, "totalSyAmt");
+        obj.cumulativeInPaceAmt = JdbcMapUtil.getBigDecimal(data, "cumulativeInPaceAmt");
+        obj.cumulativeInPaceAmtZq = JdbcMapUtil.getBigDecimal(data, "cumulativeInPaceAmtZq");
+        obj.cumulativeInPaceAmtJs = JdbcMapUtil.getBigDecimal(data, "cumulativeInPaceAmtJs");
+        obj.cumulativePayAmt = JdbcMapUtil.getBigDecimal(data, "cumulativePayAmt");
+        obj.syAmt = JdbcMapUtil.getBigDecimal(data, "syAmt");
+        obj.unInPlaceAmt = JdbcMapUtil.getBigDecimal(data, "unInPlaceAmt");
+        obj.totalSyAmt = JdbcMapUtil.getBigDecimal(data, "totalSyAmt");
         obj.totalPayRate = JdbcMapUtil.getString(data, "totalPayRate");
         obj.remark = JdbcMapUtil.getString(data, "remark");
         return obj;
@@ -197,16 +197,16 @@ public class FundStatisticalController extends BaseController {
         obj.categoryNameSecond = JdbcMapUtil.getString(data, "categoryNameSecond");
         obj.sourceName = JdbcMapUtil.getString(data, "sourceName");
         obj.prjName = JdbcMapUtil.getString(data, "prjName");
-        obj.declaredAmount = JdbcMapUtil.getDouble(data, "declaredAmount");
-        obj.approvedAmount = JdbcMapUtil.getDouble(data, "approvedAmount");
+        obj.declaredAmount = JdbcMapUtil.getBigDecimal(data, "declaredAmount");
+        obj.approvedAmount = JdbcMapUtil.getBigDecimal(data, "approvedAmount");
         obj.approvedDate = JdbcMapUtil.getString(data, "approvedDate");
-        obj.cumulativeInPaceAmt = JdbcMapUtil.getDouble(data, "cumulativeInPaceAmt");
-        obj.cumulativeInPaceAmtZq = JdbcMapUtil.getDouble(data, "cumulativeInPaceAmtZq");
-        obj.cumulativeInPaceAmtJs = JdbcMapUtil.getDouble(data, "cumulativeInPaceAmtJs");
-        obj.cumulativePayAmt = JdbcMapUtil.getDouble(data, "cumulativePayAmt");
-        obj.syAmt = JdbcMapUtil.getDouble(data, "syAmt");
-        obj.unInPlaceAmt = JdbcMapUtil.getDouble(data, "unInPlaceAmt");
-        obj.totalSyAmt = JdbcMapUtil.getDouble(data, "totalSyAmt");
+        obj.cumulativeInPaceAmt = JdbcMapUtil.getBigDecimal(data, "cumulativeInPaceAmt");
+        obj.cumulativeInPaceAmtZq = JdbcMapUtil.getBigDecimal(data, "cumulativeInPaceAmtZq");
+        obj.cumulativeInPaceAmtJs = JdbcMapUtil.getBigDecimal(data, "cumulativeInPaceAmtJs");
+        obj.cumulativePayAmt = JdbcMapUtil.getBigDecimal(data, "cumulativePayAmt");
+        obj.syAmt = JdbcMapUtil.getBigDecimal(data, "syAmt");
+        obj.unInPlaceAmt = JdbcMapUtil.getBigDecimal(data, "unInPlaceAmt");
+        obj.totalSyAmt = JdbcMapUtil.getBigDecimal(data, "totalSyAmt");
         obj.totalPayRate = JdbcMapUtil.getString(data, "totalPayRate");
         obj.remark = JdbcMapUtil.getString(data, "remark");
         return obj;

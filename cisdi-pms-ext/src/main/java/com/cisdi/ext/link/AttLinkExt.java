@@ -10,7 +10,6 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.att.AttDataTypeE;
-import com.qygly.shared.end.B;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
@@ -121,13 +120,14 @@ public class AttLinkExt {
     // 保函-到期类型 属性联动
     private AttLinkResult linkGUARANTEE_DATE_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        // 100058954591131329 = 其他，100058954591131328=系统
+        String code = getGrSetCode(myJdbcTemplate,attValue);
+        // 其他(other)，系统(system)
         if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode) || "PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
             Boolean DATE_TYPE_WRWRChangeToEditable = false; //手填保函到日期，默认不可改
             Boolean DATE_TYPE_WRWRChangeToMandatory = false; //手填保函到日期，默认非必填
             Boolean GUARANTEE_END_DATEWRChangeToEditable = false; //选择保函到日期，默认不可改
             Boolean GUARANTEE_END_DATEWRChangeToMandatory = false; //选择保函到日期，默认非必填
-            if ("100058954591131328".equals(attValue)){
+            if ("system".equals(code)){
                 GUARANTEE_END_DATEWRChangeToEditable = true;
                 GUARANTEE_END_DATEWRChangeToMandatory = true;
             } else {
@@ -161,11 +161,12 @@ public class AttLinkExt {
     // 保函-费用类型 属性联动
     private AttLinkResult linkGUARANTEE_COST_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        // 100058954591131275 = 其他
+        String code = getGrSetCode(myJdbcTemplate,attValue);
+        // 其他(other)
         if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode) || "PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
             Boolean costTypeWRChangeToEditable = false; //手填费用类型，默认不可改
             Boolean costTypeWRChangeToMandatory = false; //手填费用类型，默认非必填
-            if ("100058954591131275".equals(attValue)){
+            if ("other".equals(code)){
                 costTypeWRChangeToEditable = true;
                 costTypeWRChangeToMandatory = true;
             }
@@ -187,7 +188,8 @@ public class AttLinkExt {
     // 施工许可类型 属性联动
     private AttLinkResult linkBUILD_PERMIT_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        //100031468512110542=主体工程施工许可申请,100031468512110543=基坑及土石方工程施工许可申请,100055742827987277=主体工程施工许可申请+基坑及土石方工程施工许可申请
+        String code = getGrSetCode(myJdbcTemplate,attValue);
+        //主体工程施工许可申请(subject),基坑及土石方工程施工许可申请(earthwork),主体工程施工许可申请+基坑及土石方工程施工许可申请(subject_earthwork)
         if ("PM_CONSTRUCT_PERMIT_REQ".equals(entCode)){ //施工许可
             // 基坑及土石方工程施工许可申请 组
             Boolean EARTHWORK_APPLY_DATEChangeToShown = true; //申请时间,默认不显示
@@ -213,7 +215,7 @@ public class AttLinkExt {
             Boolean KEEP_RECORD_FILEChangeToEditable = false; //申请材料,默认不可改
             Boolean ACT_REMARKChangeToEditable = false; //备注,默认不可改
             Boolean KEEP_RECORD_FILEChangeToMandatory = false; //申请材料,默认非必填
-            if ("100031468512110542".equals(attValue)){
+            if ("subject".equals(code)){
                 SUBJECT_APPLY_DATEChangeToShown = true;
                 SUBJECT_PLAN_COMPL_DATEChangeToShown = true;
                 SUBJECT_APPLY_USERChangeToShown = true;
@@ -225,7 +227,7 @@ public class AttLinkExt {
                 KEEP_RECORD_FILEChangeToEditable = true;
                 ACT_REMARKChangeToEditable = true;
                 KEEP_RECORD_FILEChangeToMandatory = true;
-            } else if ("100031468512110543".equals(attValue)){
+            } else if ("earthwork".equals(code)){
                 EARTHWORK_APPLY_DATEChangeToShown = true;
                 COMPL_PLAN_DATE_APPLYChangeToShown = true;
                 EARTHWORK_APPLY_USERChangeToShown = true;
@@ -238,7 +240,7 @@ public class AttLinkExt {
                 REMARKChangeToEditable = true;
                 PRJ_REQ_FILEChangeToMandatory = true;
 
-            } else if ("100055742827987277".equals(attValue)){
+            } else if ("subject_earthwork".equals(code)){
                 SUBJECT_APPLY_DATEChangeToShown = true;
                 SUBJECT_PLAN_COMPL_DATEChangeToShown = true;
                 SUBJECT_APPLY_USERChangeToShown = true;
@@ -372,8 +374,10 @@ public class AttLinkExt {
 
     private AttLinkResult linkORDER_DEMAND_TYPE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
+        String code = getGrSetCode(myJdbcTemplate,attValue);
+        // contract_signing=合同签订;contract_change=合同变更
         if ("PO_ORDER_CHANGE_REQ".equals(entCode)){//合同变更（合同需求审批） 选择合同签订时，隐藏合同名称、变更类型项
-            if ("100031468512033570".equals(attValue)){//选择合同签订
+            if ("contract_signing".equals(code)){//选择合同签订
                 //合同名称
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
@@ -398,7 +402,7 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("ORDER_CHANGE_TYPE",linkedAtt);
                 }
             }
-            if ("100031468512033571".equals(attValue)){ //选择合同变更
+            if ("contract_change".equals(code)){ //选择合同变更
                 //合同名称
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
@@ -430,8 +434,9 @@ public class AttLinkExt {
     // 项目来源 属性联动
     private AttLinkResult linkPROJECT_SOURCE_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
+        String code = getGrSetCode(myJdbcTemplate,attValue);
         List<String> entityCodes = getWRProject();
-        //99952822476441374=立项，99952822476441375=非立项
+        //系统(system)，非系统(non_system)
         if ("PM_BUY_DEMAND_REQ".equals(entCode)) { //采购需求审批
             Boolean prjListChangeToShown = false; //下拉项目默认隐藏
             Boolean prjNameChangeToShown = false; //手写项目默认隐藏
@@ -445,7 +450,7 @@ public class AttLinkExt {
             Boolean isZFChangeToEditable = false; //是否政府投资默认不可改
             Boolean amtSourceChangeToEditable = false; //资金来源默认不可改
 
-            if (!"99952822476441374".equals(attValue)) {
+            if (!"system".equals(code)) {
                 prjNameChangeToShown = true;
                 prjNameChangeToMandatory = true;
                 prjNameChangeToEditable = true;
@@ -521,7 +526,7 @@ public class AttLinkExt {
             }
             return attLinkResult;
         } else if ("PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){ //新增保函申请
-            //99952822476441374=系统，99952822476441375=非系统
+            //系统(system)，非系统(non_system)
             Boolean CONTRACT_NAMEChangeToShown = false; //手填合同名称默认不隐藏
             Boolean CONTRACT_IDChangeToShown = false; //选择合同名称默认不隐藏
 
@@ -534,7 +539,7 @@ public class AttLinkExt {
             Boolean CONTRACT_AMOUNTChangeToEditable = false; //合同金额默认不可改
             Boolean CONTRACT_AMOUNTChangeToMandatory = false; //合同金额默认非必填
 
-            if ("99952822476441375".equals(attValue)){
+            if ("non_system".equals(code)){
                 CONTRACT_NAMEChangeToShown = true;
                 CONTRACT_NAMEChangeToMandatory = true;
                 CONTRACT_NAMEChangeToEditable = true;
@@ -578,12 +583,12 @@ public class AttLinkExt {
             }
             return attLinkResult;
         } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 补充协议
-            //99952822476441374=系统，99952822476441375=非系统
-            attLinkResult = autoLinkProject(attValue);
-            attLinkResult = autoLinkPrjDetail(attLinkResult,attValue);
+            //系统(system)，非系统(non_system)
+            attLinkResult = autoLinkProject(attValue,code);
+            attLinkResult = autoLinkPrjDetail(attLinkResult,attValue,code);
             return attLinkResult;
         } else if (entityCodes.contains(entCode)){
-            attLinkResult = autoLinkProject(attValue);
+            attLinkResult = autoLinkProject(attValue,code);
             return attLinkResult;
         } else {
             return attLinkResult;
@@ -592,9 +597,8 @@ public class AttLinkExt {
     }
 
     // 项目来源属性联动 控制项目基础信息显示
-    private AttLinkResult autoLinkPrjDetail(AttLinkResult attLinkResult, String attValue) {
-        //99952822476441374=系统，99952822476441375=非系统
-
+    private AttLinkResult autoLinkPrjDetail(AttLinkResult attLinkResult, String attValue, String code) {
+        //系统(system)，非系统(non_system)
         Boolean REPLY_NOChangeToEditable = false; //项目批复文号，默认不可改
         Boolean PROJECT_TYPE_IDChangeToEditable = false; //项目类型，默认不可改
         Boolean PRJ_SITUATIONChangeToEditable = false; //项目介绍，默认不可改
@@ -605,7 +609,7 @@ public class AttLinkExt {
         Boolean PROJECT_OTHER_AMTChangeToEditable = false; //工程建设其他费用，默认不可改
         Boolean PREPARE_AMTChangeToEditable = false; //预备费，默认不可改
         Boolean CONSTRUCT_PERIOD_INTERESTChangeToEditable = false; //建设期利息，默认不可改
-        if ("99952822476441375".equals(attValue)){
+        if ("non_system".equals(code)){
             REPLY_NOChangeToEditable = true;
             PROJECT_TYPE_IDChangeToEditable = true;
             PRJ_SITUATIONChangeToEditable = true;
@@ -711,8 +715,8 @@ public class AttLinkExt {
     }
 
     // 项目来源属性联动选择判断
-    private AttLinkResult autoLinkProject(String attValue) {
-        //99952822476441374=系统，99952822476441375=非系统
+    private AttLinkResult autoLinkProject(String attValue, String code) {
+        //系统(system)，非系统(non_system)
         AttLinkResult attLinkResult = new AttLinkResult();
         Boolean prjListChangeToShown = false; //下拉项目默认隐藏
         Boolean prjNameChangeToShown = false; //手写项目默认隐藏
@@ -723,7 +727,7 @@ public class AttLinkExt {
         Boolean prjListChangeToEditable = false; //下拉项目默认不可改
         Boolean prjNameChangeToEditable = false; //手写项目默认不可改
 
-        if (!"99952822476441374".equals(attValue)) {
+        if (!"system".equals(code)) {
             prjNameChangeToShown = true;
             prjNameChangeToMandatory = true;
             prjNameChangeToEditable = true;
@@ -885,7 +889,7 @@ public class AttLinkExt {
 
 
                 //支付信息表(子表)
-                String viewId = "99952822476415265";
+                String viewId = "0099952822476415265";
                 ArrayList<LinkedRecord> linkedRecordList = new ArrayList<>();
                 LinkedRecord linkedRecord = new LinkedRecord();
                 //资金类别
@@ -898,7 +902,7 @@ public class AttLinkExt {
 //                linkedRecord.valueMap.put("NPER",JdbcMapUtil.getInt(echoMap,"nper"));
 //                linkedRecord.textMap.put("NPER",JdbcMapUtil.getString(echoMap,"nper"));
                 //支付金额
-                linkedRecord.valueMap.put("PAY_AMT",JdbcMapUtil.getDouble(echoMap,"paidAmt"));
+                linkedRecord.valueMap.put("PAY_AMT",JdbcMapUtil.getString(echoMap,"paidAmt"));
                 linkedRecord.textMap.put("PAY_AMT",JdbcMapUtil.getString(echoMap,"paidAmt"));
                 //付款单位
                 linkedRecord.valueMap.put("PAY_UNIT",JdbcMapUtil.getString(echoMap,"payUnitId"));
@@ -1007,10 +1011,10 @@ public class AttLinkExt {
                     "left join gr_set_value sv on sv.id = pr.PRJ_MANAGE_MODE_ID\n" +
                     "left join gr_set se on se.id = sv.GR_SET_ID and se.code = 'management_unit'\n" +
                     "left join (select sum(IFNULL(fr.REACH_AMOUNT,0)) cumBuildReachAmt,fr.FUND_SOURCE_TEXT from fund_reach fr where fr" +
-                    ".FUND_REACH_CATEGORY = '99952822476371282' group by fr.FUND_SOURCE_TEXT,fr.pm_prj_id\n" +
+                    ".FUND_REACH_CATEGORY = '0099952822476371282' group by fr.FUND_SOURCE_TEXT,fr.pm_prj_id\n" +
                     ") temp4 on temp4.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT\n" +
                     "left join (select sum(IFNULL(fr.REACH_AMOUNT,0)) cumAcqReachAmt,fr.FUND_SOURCE_TEXT from fund_reach fr where fr" +
-                    ".FUND_REACH_CATEGORY = '99952822476371281' group by fr.FUND_SOURCE_TEXT,fr.pm_prj_id\n" +
+                    ".FUND_REACH_CATEGORY = '0099952822476371281' group by fr.FUND_SOURCE_TEXT,fr.pm_prj_id\n" +
                     ") temp5 on temp5.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT where fi.FUND_SOURCE_TEXT = ? and fid.PM_PRJ_ID = ? ";
             //基础统计回显
             List<Map<String, Object>> priStatistic = myJdbcTemplate.queryForList(baseSql, fundSourceName, prjId);
@@ -1174,7 +1178,7 @@ public class AttLinkExt {
 
                     }
                     //支付信息（子表）
-//                    String viewId = "99952822476415265";
+//                    String viewId = "0099952822476415265";
 //                    ArrayList<LinkedRecord> linkedRecordList = new ArrayList<>();
 //                    LinkedRecord linkedRecord = new LinkedRecord();
 //                    //资金类别
@@ -1318,9 +1322,10 @@ public class AttLinkExt {
     //付款类型属性联动
     private AttLinkResult linkPAY_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId,AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        //99952822476390858=预付款,99952822476390859=进度款
+        String code = getGrSetCode(myJdbcTemplate,attValue);
+        //预付款(advance_charge),进度款(progress_payment)
         if ("PO_ORDER_PAYMENT_REQ".equals(entCode)){
-            if ("99952822476390858".equals(attValue)){
+            if ("advance_charge".equals(code)){
                 //进度款隐藏
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
@@ -1476,9 +1481,10 @@ public class AttLinkExt {
 
     private AttLinkResult linkTYPE_ONE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
+        String code = getGrSetCode(myJdbcTemplate,attValue);
         if ("PM_USE_CHAPTER_REQ".equals(entCode)){//中选单位及标后用印审批
-            //99952822476386421 关联流程, 99952822476386422 上传依据
-            if ("99952822476386421".equals(attValue)){
+            // 关联流程(relation_process),  上传依据(upload_basis)
+            if ("relation_process".equals(code)){
                 //PM_BUY_DEMAND_REQ_ID 关联采购需求审批表
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
@@ -1500,7 +1506,7 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt);
                 }
             }
-            if ("99952822476386422".equals(attValue)){
+            if ("upload_basis".equals(code)){
                 //PM_BUY_DEMAND_REQ_ID 关联采购需求审批表
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
@@ -1669,19 +1675,21 @@ public class AttLinkExt {
     //采购启动依据属性联动
     private AttLinkResult linkBUY_START_BASIS_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId,AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
+        String code = getGrSetCode(myJdbcTemplate,attValue);
         if ("PM_BUY_DEMAND_REQ".equals(entCode)){ //采购需求审批
-            //99952822476385260=会议纪要，99952822476385261=其他,99952822476441472=启动函
+            //会议纪要(meeting_minutes)，其他(other),启动函(start_up_letter)
             Boolean changeToEditable = false; //是否可改
             Boolean changeToMandatory = false; //是否必填
             String value = "";
             String text = "";
             String projectId = JdbcMapUtil.getString(param.valueMap, "PM_PRJ_ID");
             String projectIdWr = JdbcMapUtil.getString(param.valueMap, "PROJECT_NAME_WR");
-            String typeId = JdbcMapUtil.getString(param.valueMap,"PROJECT_SOURCE_TYPE_ID"); //99952822476441375=非立项
+            String typeId = JdbcMapUtil.getString(param.valueMap,"PROJECT_SOURCE_TYPE_ID"); //0099952822476441375=非立项
+            String typeCode = getGrSetCode(myJdbcTemplate,typeId);
             if (Strings.isNullOrEmpty(projectId) && SharedUtil.isEmptyString(projectIdWr)){
                 throw new BaseException("项目信息不能为空！");
             }
-            if ("99952822476441375".equals(typeId)){
+            if ("non_system".equals(typeCode)){
                 changeToMandatory = false;
                 changeToEditable = true;
                 //采购启动依据文件
@@ -1696,7 +1704,7 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
                 }
             }
-            if ("99952822476385260".equals(attValue) || "99952822476385261".equals(attValue) || "99952822476441472".equals(attValue)){
+            if ("meeting_minutes".equals(code) || "other".equals(code) || "start_up_letter".equals(code)){
                 changeToEditable = true;
                 changeToMandatory = false;
                 value = null;
@@ -1713,16 +1721,16 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
                 }
             } else {
-                // 99952822476385257 = 立项，99952822476385258=可研，99952822476385259=初概,99952822476441471=预算财评
+                // 立项(project_initiation)，可研(feasibility_study)，初概(preliminary_outline),预算财评(budget_financial_evaluation)
                 String sql = "";
                 String fileValue = "";
-                if ("99952822476385257".equals(attValue)){
+                if ("project_initiation".equals(code)){
                     sql = "select CONSTRUCTION_PROJECT_CODE as REPLY_NO_WR,REPLY_FILE as file from pm_prj_req WHERE PRJ_NAME = (select name from pm_prj WHERE id = ?) and `STATUS` = 'ap' order by CRT_DT desc limit 1";
-                } else if ("99952822476385258".equals(attValue)){
+                } else if ("feasibility_study".equals(code)){
                     sql = "select REPLY_NO_WR,REPLY_FILE as file from PM_PRJ_INVEST1 WHERE pm_prj_id = ? and status = 'ap' order by CRT_DT desc limit 1";
-                } else if ("99952822476385259".equals(attValue)){
+                } else if ("preliminary_outline".equals(code)){
                     sql = "select REPLY_NO_WR,REPLY_FILE as file from PM_PRJ_INVEST2 WHERE pm_prj_id = ? and status = 'ap' order by CRT_DT desc limit 1";
-                } else if ("99952822476441471".equals(attValue)){
+                } else if ("budget_financial_evaluation".equals(code)){
                     sql = "select REPLY_NO_WR,FINANCIAL_REVIEW_FILE as file from PM_PRJ_INVEST3 WHERE pm_prj_id = ? and status = 'ap' order by CRT_DT desc limit 1";
                 }
                 List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql,projectId);
@@ -1739,8 +1747,6 @@ public class AttLinkExt {
                     linkedAtt.type = AttDataTypeE.FILE_GROUP;
                     linkedAtt.value = fileValue;
                     getFileInfoList(linkedAtt);
-//                    linkedAtt.changeToMandatory = false;
-//                    linkedAtt.changeToEditable = false;
                     attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
                 }
             }
@@ -1761,10 +1767,11 @@ public class AttLinkExt {
     //招采方式 属性联动
     private AttLinkResult linkBUY_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        // 99952822476385221=公开招标,99952822476385222=竞争性磋商,99952822476385223=竞争性谈判
+        String code = getGrSetCode(myJdbcTemplate,attValue);
+        // 公开招标(open_bidding),竞争性磋商(competitive_consultations),竞争性谈判(competitive_negotiation)
         if ("PM_BID_APPROVAL_REQ".equals(entCode)){ //招标文件审批
             Boolean changeToMandatory = false; //必填
-            if ("99952822476385221".equals(attValue) || "99952822476385222".equals(attValue) || "99952822476385223".equals(attValue)){
+            if ("open_bidding".equals(code) || "competitive_consultations".equals(code) || "competitive_negotiation".equals(code)){
                 changeToMandatory = true;
             }
             //BID_AGENCY
@@ -1783,10 +1790,11 @@ public class AttLinkExt {
     //退还原因属性联动
     private AttLinkResult linkREASON(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        // 99902212142025881 = 到期申请退还，之后续保,99902212142025882=达到退保条件，申请退保,99902212142025883=其他
+        String code = getGrSetCode(myJdbcTemplate,attValue);
+        // 到期申请退还，之后续保(expire_return),达到退保条件，申请退保(surrender_return),其他(other)
         Boolean changeToMandatory = true;
         Boolean changeToEditable = true;
-        if ("99902212142025881".equals(attValue)){
+        if ("expire_return".equals(code)){
             changeToMandatory = false;
             changeToEditable = false;
         }
@@ -1806,14 +1814,15 @@ public class AttLinkExt {
     //是否涉及保函 属性联动
     private AttLinkResult linkIS_REFER_GUARANTEE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        // 99902212142031851 = 是 ，99902212142031855 = 否
+        String code = getGrSetCode(myJdbcTemplate,attValue);
+        // 是(yes) ，否(no)
         Boolean changeToShown = true;
         Boolean changeToMandatory = true;
         Boolean changeToEditable = true;
 
         List<String> baohanList = getBaoHanList();
         if (baohanList.contains(entCode)){
-            if ("99902212142031855".equals(attValue)){ //隐藏保函类型
+            if ("no".equals(code)){ //隐藏保函类型
                 changeToShown = false;
                 changeToMandatory = false;
                 changeToEditable = false;
@@ -1840,9 +1849,10 @@ public class AttLinkExt {
     // 有 无  属性联动
     private AttLinkResult linkYES_NO_TWO(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
+        String code = getGrSetCode(myJdbcTemplate,attValue);
         if ("PM_FARMING_PROCEDURES".equals(entCode)){ // 农转用手续办理
-            // 99902212142514832 = 有， 99902212142514833 = 没有
-            if ("99902212142514833".equals(attValue)){
+            // 有(have)， 没有(none)
+            if ("none".equals(attValue)){
                 // 预估有指标时间
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
@@ -1874,12 +1884,13 @@ public class AttLinkExt {
     // 是否属性联动
     private AttLinkResult linkYES_NO_ONE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
+        String code = getGrSetCode(myJdbcTemplate,attValue);
         Boolean changeToShown = true;
         Boolean changeToMandatory = true;
         Boolean changeToEditable = true;
         if ("PM_FARMING_PROCEDURES".equals(entCode) || "PM_WOODLAND_PROCEDURES".equals(entCode)){ //农转用手续办理 林地调整办理手续
-            // 99799190825080669 = 是， 99799190825080670 = 否
-            if (!"99799190825080670".equals(attValue)) {  // 是否需要办理选是，文件不做判断
+            // 是(Y)， 否(N)
+            if (!"N".equals(code)) {  // 是否需要办理选是，文件不做判断
                 changeToShown = true;
                 changeToMandatory = false;
                 changeToEditable = false;
@@ -1896,14 +1907,12 @@ public class AttLinkExt {
                 attLinkResult.attMap.put("ATT_FILE_GROUP_ID", linkedAtt);
             }
         } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 采购合同补充协议申请
-            // 99799190825080669 = 是，99799190825080670=否
+            // 是(Y)， 否(N)
             Boolean replyChangeToMandatory = true; //审核意见采纳说明必填
             Boolean fileChangeToMandatory = true; //审核意见附件必填
-//            Boolean heTongFileChangeToMandatory = true; //合同送审稿必填
-            if ("99799190825080669".equals(attValue)){
+            if ("Y".equals(code)){
                 replyChangeToMandatory = false;
                 fileChangeToMandatory = false;
-//                heTongFileChangeToMandatory = false;
             }
             // 审核意见采纳说明
             {
@@ -1923,15 +1932,6 @@ public class AttLinkExt {
                 linkedAtt.changeToMandatory = fileChangeToMandatory;
                 attLinkResult.attMap.put("FILE_ID_FOUR", linkedAtt);
             }
-            // 审核意见采纳说明
-//            {
-//                LinkedAtt linkedAtt = new LinkedAtt();
-//                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-//                linkedAtt.value = "";
-//                linkedAtt.text = "";
-//                linkedAtt.changeToMandatory = heTongFileChangeToMandatory;
-//                attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt);
-//            }
 
         }
         return attLinkResult;
@@ -1940,9 +1940,10 @@ public class AttLinkExt {
     // 是 否  属性联动
     private AttLinkResult linkYES_NO_THREE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
+        String code = getGrSetCode(myJdbcTemplate,attValue);
         if ("PM_SEND_APPROVAL_REQ".equals(entCode)){ //发文呈批
-            // 99799190825080669 = 是， 99799190825080670 = 否
-            if ("99799190825080669".equals(attValue)){  //隐藏 是否呈董事长审批
+            // 是(Y)， 否(N)
+            if ("Y".equals(code)){  //隐藏 是否呈董事长审批
                 // 是否呈董事长审批
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
@@ -1968,7 +1969,7 @@ public class AttLinkExt {
                 }
             }
         } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 采购合同补充协议申请
-            // 99799190825080669 = 是， 99799190825080670 = 否
+            // 是(Y)， 否(N)
             Boolean faWuChangeToShown =  true; //法务部门修订稿显示
             Boolean caiWuChangeToShown =  true; //财务部门修订稿显示
             Boolean isCaiNaChangeToShown =  true; //审核意见是否完全采纳显示
@@ -1976,7 +1977,7 @@ public class AttLinkExt {
             Boolean caiNaFileChangeToShown =  true; //采纳附件显示
             Boolean heTongChangeToShown =  true; //合同送审稿显示
             Boolean falvChangeToShown = true; // 法律审核附件显示
-            if ("99799190825080669".equals(attValue)){
+            if ("Y".equals(code)){
                 faWuChangeToShown =  false;
                 caiWuChangeToShown =  false;
                 isCaiNaChangeToShown =  false;
@@ -2055,14 +2056,15 @@ public class AttLinkExt {
     //付款依据属性联动
     private AttLinkResult linkPAY_BASIS_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode,String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
+        String code = getGrSetCode(myJdbcTemplate,attValue);
         if ("PO_ORDER_PAYMENT_REQ".equals(entCode)) { //付款申请
-            // 付款依据 99902212142031993 = 其他付款 99902212142031992=合同付款
+            // 其他付款(other_payment) 合同付款(contract_payment)
             Boolean fileMustChangeToMandatory = false; // 附件默认非必填
             Boolean contractChangeToMandatory = false; //关联合同默认非必填
             Boolean fileChangeToShown = true; //附件默认显示
             Boolean contractChangeToShown = true; //关联合同默认显示
             Boolean contractAmtChangeToShown = true; //合同金额默认显示
-            if ("99902212142031993".equals(attValue)){ //必填附件
+            if ("other_payment".equals(code)){ //必填附件
                 fileMustChangeToMandatory = true;
                 contractChangeToShown = false;
                 contractAmtChangeToShown = false;
@@ -2100,7 +2102,7 @@ public class AttLinkExt {
                 attLinkResult.attMap.put("CONTRACT_PRICE", linkedAtt);
             }
             // 明细信息
-            if ("99902212142033284".equals(sevId)) {
+            if ("0099902212142033284".equals(sevId)) { //采购合同付款申请-发起（实体视图）
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
                     linkedAtt.type = AttDataTypeE.TEXT_LONG;
@@ -2109,8 +2111,8 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("CONTRACT_ID", linkedAtt);
                 }
                 //清除明细表信息
-                attLinkResult.childClear.put("99902212142514118", true);
-                attLinkResult.childCreatable.put("99902212142514118", true);
+                attLinkResult.childClear.put("0099902212142514118", true);  //付款申请明细-发起
+                attLinkResult.childCreatable.put("0099902212142514118", true); //付款申请明细-发起
             }
         }
         return attLinkResult;
@@ -2449,7 +2451,6 @@ public class AttLinkExt {
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
                     linkedAtt.type = AttDataTypeE.DATE;
-//                    String year = simpleDateFormat.format(JdbcMapUtil.getDate(row, "PRJ_REPLY_DATE"));
                     String year = JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
                     linkedAtt.value = year;
                     linkedAtt.text = year;
@@ -2542,7 +2543,6 @@ public class AttLinkExt {
                     List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(sqlName, id);
                     String valueName = JdbcMapUtil.getString(nameMap.get(0), "name");
                     if (judgeMatch(createMatch, name)) {
-//                        if ("立项批复".equals(name)){
                         // 立项完成情况
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
@@ -2552,7 +2552,6 @@ public class AttLinkExt {
                             attLinkResult.attMap.put("CREATE_PROJECT_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(feasibility, name)) {
-//                            if ("可研批复".equals(name)){
                         // 可研完成情况
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
@@ -2562,7 +2561,6 @@ public class AttLinkExt {
                             attLinkResult.attMap.put("FEASIBILITY_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(landUsePlan, name)) {
-//                            if ("用地规划许可证".equals(name)){
                         // 规划选址完成情况
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
@@ -2572,7 +2570,6 @@ public class AttLinkExt {
                             attLinkResult.attMap.put("SELECT_SITE_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(eia, name)) {
-//                        if ("环评".equals(name)){
                         // 环评完成情况
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
@@ -2582,7 +2579,6 @@ public class AttLinkExt {
                             attLinkResult.attMap.put("EIA_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(advanceExam, name)) {
-//                        if ("用地预审".equals(name)){
                         // 用地预审
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
@@ -2592,7 +2588,6 @@ public class AttLinkExt {
                             attLinkResult.attMap.put("USE_LAND_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(save, name)) {
-//                        if ("节能+水保+林地使用调整".equals(name)){
                         // 用地预审
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
@@ -2620,7 +2615,6 @@ public class AttLinkExt {
                             attLinkResult.attMap.put("BUDGET_REVIEW_COMPLETED", linkedAtt);
                         }
                     } else if (judgeMatch(prj, name)) {
-//                        if ("工程量清单、EPC、施工".equals(name)){
                         // 预算评审完成情况
                         {
                             LinkedAtt linkedAtt = new LinkedAtt();
@@ -2659,7 +2653,7 @@ public class AttLinkExt {
                 }
             }
             //施工中标通知书（招采里的中标通知书）
-            String sql3 = "SELECT GROUP_CONCAT(BID_WIN_NOTICE_FILE_GROUP_ID) AS FILE from PO_PUBLIC_BID_REQ WHERE PM_PRJ_ID = ? AND PMS_RELEASE_WAY_ID in ('99799190825080728','99799190825080731') and status = 'AP'";
+            String sql3 = "SELECT GROUP_CONCAT(BID_WIN_NOTICE_FILE_GROUP_ID) AS FILE from PO_PUBLIC_BID_REQ WHERE PM_PRJ_ID = ? AND PMS_RELEASE_WAY_ID in ('0099799190825080728','0099799190825080731') and status = 'AP'";
             List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sql3,attValue);
             if (!CollectionUtils.isEmpty(list3)){
                 {
@@ -2793,14 +2787,14 @@ public class AttLinkExt {
         AttLinkResult attLinkResult = new AttLinkResult();
 
         //查询明细表信息
-        //99902212142022303采购合同补充协议申请-填写项目信息及关联合同信息;99902212142028526资金需求计划申请-发起 实体视图id
-        if ("99902212142028526".equals(sevId) || "99902212142022303".equals(sevId)){
+        //00099902212142022303采购合同补充协议申请-填写项目信息及关联合同信息;00099902212142028526资金需求计划申请-发起 实体视图id
+        if ("0099902212142028526".equals(sevId) || "0099902212142022303".equals(sevId)){
             String viewId = "";
             Boolean createTable = false;
-            if ("99902212142028526".equals(sevId)){
-                viewId = "99952822476362402";
-            } else if ("99902212142022303".equals(sevId)){
-                viewId = "99952822476410750";
+            if ("0099902212142028526".equals(sevId)){
+                viewId = "0099952822476362402";
+            } else if ("0099902212142022303".equals(sevId)){
+                viewId = "0099952822476410750";
                 createTable = true;
             }
             List<LinkedRecord> linkedRecordList = new ArrayList<>();
@@ -2982,7 +2976,7 @@ public class AttLinkExt {
             linkedAtt.text = JdbcMapUtil.getString(row,"PLAN_TOTAL_DAYS");
             attLinkResult.attMap.put("PLAN_TOTAL_DAYS",linkedAtt);
         }
-        //是否涉及保函 99902212142031851=是；99902212142031855=否
+        //是否涉及保函 0099902212142031851=是；0099902212142031855=否
         String baoHanId = JdbcMapUtil.getString(row,"IS_REFER_GUARANTEE_ID");
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -2999,7 +2993,7 @@ public class AttLinkExt {
         }
         // 保函类型
         Boolean isShow = false;
-        if ("99902212142031851".equals(baoHanId)){
+        if ("0099902212142031851".equals(baoHanId)){
             isShow = true;
         }
         {
@@ -3070,10 +3064,10 @@ public class AttLinkExt {
         }
         //查询联系人明细表信息
         //99902212142022303采购合同补充协议申请-填写项目信息及关联合同信息
-        if ("99902212142022303".equals(sevId)){
+        if ("0099902212142022303".equals(sevId)){
             String viewId = "";
-            if ("99902212142022303".equals(sevId)){
-                viewId = "99952822476378742";
+            if ("0099902212142022303".equals(sevId)){
+                viewId = "0099952822476378742";
             }
             List<LinkedRecord> linkedRecordList = new ArrayList<>();
             // 查询明细信息
@@ -3298,7 +3292,7 @@ public class AttLinkExt {
         }
 
         // 明细信息
-        if ("99902212142033284".equals(sevId)) {
+        if ("0099902212142033284".equals(sevId)) {
             List<LinkedRecord> linkedRecordList = new ArrayList<>();
             // 查询明细信息
             String sql = "select COST_TYPE_TREE_ID,FEE_DETAIL,TOTAL_AMT,AMT from pm_order_cost_detail where CONTRACT_ID = ? order by id asc";
@@ -3349,10 +3343,10 @@ public class AttLinkExt {
 
                     linkedRecordList.add(linkedRecord);
                 }
-                attLinkResult.childData.put("99902212142514118", linkedRecordList);
+                attLinkResult.childData.put("0099902212142514118", linkedRecordList);
             }
-            attLinkResult.childCreatable.put("99902212142514118", false);
-            attLinkResult.childClear.put("99902212142514118", true);
+            attLinkResult.childCreatable.put("0099902212142514118", false);
+            attLinkResult.childClear.put("0099902212142514118", true);
         }
 
         //需要带出相对方联系人明细的实体试图
@@ -3362,8 +3356,8 @@ public class AttLinkExt {
         //联系人明细信息
         if (contactDetailList.contains(sevId)) {
             String viewId = "";
-            if ("99902212142025475".equals(sevId)){
-                viewId = "99952822476384659"; //合同终止联系人明细试图部门id
+            if ("0099902212142025475".equals(sevId)){
+                viewId = "0099952822476384659"; //合同终止联系人明细试图部门id
             }
             //查询明细信息
             String sql2 = "select * from CONTRACT_SIGNING_CONTACT where PARENT_ID = ?";
@@ -3412,7 +3406,7 @@ public class AttLinkExt {
     private AttLinkResult linkForBIDDING_NAME_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
         // 合同签订的费用明细实体视图
-        if ("99799190825103187".equals(sevId)) {
+        if ("0099799190825103187".equals(sevId)) {
             List<LinkedRecord> linkedRecordList = new ArrayList<>();
             // 查询明细信息
             String sql = "select COST_TYPE_TREE_ID,FEE_DETAIL,TOTAL_AMT from pm_cost_detail where BIDDING_NAME_ID = ? order by id asc";
@@ -3433,10 +3427,10 @@ public class AttLinkExt {
 
                     linkedRecordList.add(linkedRecord);
                 }
-                attLinkResult.childData.put("99902212142513357", linkedRecordList);
+                attLinkResult.childData.put("0099902212142513357", linkedRecordList);
             }
-            attLinkResult.childCreatable.put("99902212142513357", false);
-            attLinkResult.childClear.put("99902212142513357", true);
+            attLinkResult.childCreatable.put("0099902212142513357", false);
+            attLinkResult.childClear.put("0099902212142513357", true);
 
         }
 
@@ -4114,15 +4108,15 @@ public class AttLinkExt {
             attLinkResult.attMap.put("PM_FUND_SOURCE_ID", linkedAtt);
         }
         if("PM_BUY_DEMAND_REQ".equals(entCode)){ // 采购需求审批
-            // 99799190825080705 = 企业自筹
+            // 0099799190825080705 = 企业自筹
             String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
             String val = "";
             String txt = "";
-            if ("99799190825080705".equals(id)){
-                val = "99799190825080670";
+            if ("0099799190825080705".equals(id)){
+                val = "0099799190825080670";
                 txt = "否";
             } else {
-                val = "99799190825080669";
+                val = "0099799190825080669";
                 txt = "是";
             }
             //是否政府投资项目
@@ -4175,12 +4169,12 @@ public class AttLinkExt {
 
     private AttLinkResult linkForSTATUS(String attValue, String sevId) {
         AttLinkResult attLinkResult = null;
-        if ("99626673179203336".equals(sevId)) {
-            // 实体视图ID=99626673179203336,当前触发联动的实体视图是”测试学生“：
+        if ("0099626673179203336".equals(sevId)) {
+            // 实体视图ID=0099626673179203336,当前触发联动的实体视图是”测试学生“：
 
             attLinkResult = linkForSTATUSofTestStu(attValue);
-        } else if ("99626673179203381".equals(sevId)) {
-            // 实体视图ID=99626673179203381,当前触发联动的实体视图是”测试老师“：
+        } else if ("0099626673179203381".equals(sevId)) {
+            // 实体视图ID=0099626673179203381,当前触发联动的实体视图是”测试老师“：
 
             attLinkResult = linkForSTATUSofTestClass(attValue);
         }
@@ -4394,8 +4388,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.FILE_GROUP;
-            linkedAtt.value = "99952822476358787,99952822476358788";
-//            linkedAtt.text = "/qygly-gateway/qygly-file/viewImage?fileId=99952822476358787,/qygly-gateway/qygly-file/viewImage?fileId=99952822476358788";
+            linkedAtt.value = "0099952822476358787,0099952822476358788";
+//            linkedAtt.text = "/qygly-gateway/qygly-file/viewImage?fileId=0099952822476358787,/qygly-gateway/qygly-file/viewImage?fileId=0099952822476358788";
 
             getFileInfoList(linkedAtt);
 
@@ -4405,8 +4399,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.FILE_GROUP;
-            linkedAtt.value = "99952822476358787,99952822476358788";
-//            linkedAtt.text = "/qygly-gateway/qygly-file/viewImage?fileId=99952822476358787,/qygly-gateway/qygly-file/viewImage?fileId=99952822476358788";
+            linkedAtt.value = "0099952822476358787,0099952822476358788";
+//            linkedAtt.text = "/qygly-gateway/qygly-file/viewImage?fileId=0099952822476358787,/qygly-gateway/qygly-file/viewImage?fileId=0099952822476358788";
 
             getFileInfoList(linkedAtt);
 
@@ -4435,13 +4429,13 @@ public class AttLinkExt {
 
             attLinkResult.attMap.put("NAME", linkedAtt);
         }
-        attLinkResult.childClear.put("99626673179203460", ap);// 测试学生的视图部分ID，不是实体视图ID
-        attLinkResult.childClear.put("99902212142028120", !ap);// 测试老师的视图部分ID，不是实体视图ID
+        attLinkResult.childClear.put("0099626673179203460", ap);// 测试学生的视图部分ID，不是实体视图ID
+        attLinkResult.childClear.put("0099902212142028120", !ap);// 测试老师的视图部分ID，不是实体视图ID
 
-        attLinkResult.childCreatable.put("99626673179203460", ap);// 测试学生的视图部分ID，不是实体视图ID
-        attLinkResult.childCreatable.put("99902212142028120", !ap);// 测试老师的视图部分ID，不是实体视图ID
+        attLinkResult.childCreatable.put("0099626673179203460", ap);// 测试学生的视图部分ID，不是实体视图ID
+        attLinkResult.childCreatable.put("0099902212142028120", !ap);// 测试老师的视图部分ID，不是实体视图ID
 
-        attLinkResult.childData.put("99626673179203460", null);// 测试学生的视图部分ID，不是实体视图ID
+        attLinkResult.childData.put("0099626673179203460", null);// 测试学生的视图部分ID，不是实体视图ID
 
         List<LinkedRecord> linkedRecordList = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
@@ -4451,7 +4445,7 @@ public class AttLinkExt {
 
             linkedRecordList.add(linkedRecord);
         }
-        attLinkResult.childData.put("99902212142028120", linkedRecordList);// 测试老师的视图部分ID，不是实体视图ID
+        attLinkResult.childData.put("0099902212142028120", linkedRecordList);// 测试老师的视图部分ID，不是实体视图ID
 
         return attLinkResult;
     }
@@ -4489,7 +4483,7 @@ public class AttLinkExt {
                 String url = JdbcMapUtil.getString(row, "FILE_INLINE_URL");
                 fileInfo.inlineUrl = url;
                 fileInfo.name = JdbcMapUtil.getString(row, "NAME");
-                fileInfo.sizeKiloByte = JdbcMapUtil.getDouble(row, "SIZE_KB");
+                fileInfo.sizeKiloByte = Double.parseDouble(JdbcMapUtil.getString(row, "SIZE_KB"));
                 fileInfo.uploadDttm = DateTimeUtil.dttmToString(JdbcMapUtil.getObject(row, "UPLOAD_DTTM"));
                 sb.append(url).append(",");
             }
@@ -4506,9 +4500,9 @@ public class AttLinkExt {
             {
                 LinkedAtt linkedAtt = new LinkedAtt();
                 linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "99902212142036278";
+                linkedAtt.value = "0099902212142036278";
                 linkedAtt.text = "未涉及";
-//                linkedAtt.text = "99902212142036278";
+//                linkedAtt.text = "0099902212142036278";
                 attLinkResult.attMap.put(field, linkedAtt);
             }
         }
@@ -4660,6 +4654,19 @@ public class AttLinkExt {
         return resultRow;
     }
 
+    // 根据属性联动值查询集合值编码
+    private String getGrSetCode(MyJdbcTemplate myJdbcTemplate, String attValue) {
+        String code = "";
+        String sql = "select code from gr_set_value  WHERE id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,attValue);
+        if (!CollectionUtils.isEmpty(list)){
+            code = JdbcMapUtil.getString(list.get(0),"code");
+        } else {
+            throw new BaseException("该选项未匹配到对应编码，请联系管理员处理！");
+        }
+        return code;
+    }
+
 
     // 属性联动中需要单独查询额外字典名称的key
     public List<String> getKeyList() {
@@ -4697,14 +4704,14 @@ public class AttLinkExt {
     // 相对方联系人 只读
     public List<String> getContactListRead() {
         List<String> list = new ArrayList<>();
-        list.add("99902212142025475"); // 采购合同终止申请--填写项目信息及合同变更信息
+        list.add("0099902212142025475"); // 采购合同终止申请--填写项目信息及合同变更信息
         return list;
     }
 
     // 需要带出相对方联系人明细的实体试图
     public List<String> getContactDetailList() {
         List<String> list = new ArrayList<>();
-        list.add("99902212142025475"); // 采购合同终止申请--填写项目信息及合同变更信息
+        list.add("0099902212142025475"); // 采购合同终止申请--填写项目信息及合同变更信息
         return list;
     }
 

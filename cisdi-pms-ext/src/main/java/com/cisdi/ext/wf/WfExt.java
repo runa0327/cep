@@ -1095,19 +1095,6 @@ public class WfExt {
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"FINANCIAL_REVIEW_FILE"),FileCodeEnum.FINANCIAL_REVIEW_FILE);
         }
 
-        //合同签订
-//        if ("BUDGET_MONEY_RATING".equals(entityCode)){
-//            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
-//            List<Map<String, Object>> fileIdMaps = getProcessFileGroupByNode(procInstId);
-//            //合同附件
-//            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.ATT_FILE_GROUP);
-//            fileIdMaps.forEach(fileIdMap -> {
-//                if ("99799190825103911".equals(JdbcMapUtil.getString(fileIdMap,"id"))){//
-//
-//                }
-//            });
-//
-//        }
         //工程付款申请
         if ("BUDGET_MONEY_RATING".equals(entityCode)){
             String prjId = JdbcMapUtil.getString(valueMap,"AMOUT_PM_PRJ_ID");

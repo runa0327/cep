@@ -127,12 +127,12 @@ public class PmBuyDemandReqExt {
             if (!SharedUtil.isEmptyString(commentStr)){
                 commentStr = userName + ": "+commentStr;
             }
-            //查询用户所在岗位 99799190825079016=成本岗；99799190825079033=采购岗
-            String sql1 = "select hr_dept_id FROM hr_dept_user WHERE AD_USER_ID = ? and hr_dept_id in ('99799190825079016','99799190825079033')";
+            //查询用户所在岗位 0099799190825079016=成本岗；0099799190825079033=采购岗
+            String sql1 = "select hr_dept_id FROM hr_dept_user WHERE AD_USER_ID = ? and hr_dept_id in ('0099799190825079016','0099799190825079033')";
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId);
             if (!CollectionUtils.isEmpty(list1)){
                 String deptId = JdbcMapUtil.getString(list1.get(0),"hr_dept_id");
-                if ("99799190825079016".equals(deptId)){
+                if ("0099799190825079016".equals(deptId)){
                     //验证成本岗是否填写明细表
                     this.checkDetail();
                     Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
@@ -188,11 +188,11 @@ public class PmBuyDemandReqExt {
     public void endDataHandle(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        //项目来源类型  99952822476441375=非立项
+        //项目来源类型  0099952822476441375=非立项
         String projectType = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_SOURCE_TYPE_ID");
         //部门
         String deptId = JdbcMapUtil.getString(entityRecord.valueMap, "CRT_DEPT_ID");
-        if ("99952822476441375".equals(projectType)){
+        if ("0099952822476441375".equals(projectType)){
             //创建人
             String userId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_USER_ID");
             //项目名称
@@ -205,12 +205,8 @@ public class PmBuyDemandReqExt {
             }
             String prjId = Crud.from("pm_prj").insertData();
             myJdbcTemplate.update("update pm_prj set CRT_USER_ID = ?,STATUS = ?,NAME = ?,PROJECT_SOURCE_TYPE_ID = ? where id = ?",userId,"AP",projectName,projectType,prjId);
-//            String sql2 = "insert into pm_prj(id,CRT_USER_ID,STATUS,NAME,PROJECT_SOURCE_TYPE_ID) values((select uuid_short()),?,'AP',?,?)";
-//            int update = myJdbcTemplate.update(sql2,userId,projectName,projectType);
             String pmDeptId = Crud.from("pm_dept").insertData();
             myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?",prjId,deptId,userId,1,pmDeptId);
-//            String sql3 = "insert into pm_dept(id,PM_PRJ_ID,HR_DEPT_ID,USER_IDS,ver) values((select uuid_short()),?,?,?,?)";
-//            myJdbcTemplate.update(sql3,prjId,deptId,userId,1);
         }
     }
 
@@ -248,7 +244,7 @@ public class PmBuyDemandReqExt {
         //获取项目信息
         String projectId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
         if (SharedUtil.isEmptyString(projectId)){
-            String sql1 = "select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID='99952822476441375'";
+            String sql1 = "select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID='0099952822476441375'";
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectName);
             if (CollectionUtils.isEmpty(list1)){
                 throw new BaseException("没有找到名为'"+projectName+"'的项目，请联系管理员处理");
@@ -265,7 +261,7 @@ public class PmBuyDemandReqExt {
         //定义审批状态
         String status = "DR";
         //定义招标流程id
-        String processId = "99952822476386063";
+        String processId = "0099952822476386063";
         //获取招标文件审批流程id
         String sql5 = "select * from wf_process where id = '"+processId+"'";
         List<Map<String,Object>> list5 = myJdbcTemplate.queryForList(sql5);
@@ -278,7 +274,7 @@ public class PmBuyDemandReqExt {
             }
         }
         //定义招标文件审批实体id
-        String entId = "99952822476385846";
+        String entId = "0099952822476385846";
         //获取招标文件审批实体
         String sql6 = "select * from ad_ent where id = '"+entId+"'";
         List<Map<String,Object>> list6 = myJdbcTemplate.queryForList(sql6);

@@ -33,9 +33,10 @@ public class BasePrjPartyUserApi {
         String json = JsonUtil.toJson(map);
         GrSetValueView param = JsonUtil.fromJson(json, GrSetValueView.class);
         StringBuilder sb = new StringBuilder();
-        sb.append("select id,name from gr_set_value where GR_SET_ID = '99952822476391029'");
+//        sb.append("select id,name from gr_set_value where GR_SET_ID = '0099952822476391029'");
+        sb.append("SELECT a.id,a.name from gr_set_value a LEFT JOIN gr_set b on a.GR_SET_ID = b.id WHERE b.code = 'partner_role' and a.status = 'ap' and b.STATUS = 'ap' ");
         if (!SharedUtil.isEmptyString(param.name)){
-            sb.append(" and name like '%" + param.name + "%' ");
+            sb.append(" and a.name like '%" + param.name + "%' ");
         }
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sb.toString());
         if (CollectionUtils.isEmpty(list)){

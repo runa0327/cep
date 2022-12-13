@@ -71,7 +71,7 @@ public class dealtWorkJob {
                 //savaUserId();
 
                 //根据wf_task表查询  所有的任务状态  TODO需要添加待办事项
-                String sql = "SELECT w.ID,w.AD_USER_ID,w.WF_PROCESS_INSTANCE_ID from wf_task w WHERE  w.IS_CLOSED = ? and w.WF_TASK_TYPE_ID = ? and w.AD_USER_ID = '100031468511690944'AND NOT EXISTS (SELECT MSG_ID FROM dealt_task_info d WHERE w.ID = d.MSG_ID)";
+                String sql = "SELECT w.ID,w.AD_USER_ID,w.WF_PROCESS_INSTANCE_ID from wf_task w WHERE  w.IS_CLOSED = ? and w.WF_TASK_TYPE_ID = ? and w.AD_USER_ID = '0100031468511690944'AND NOT EXISTS (SELECT MSG_ID FROM dealt_task_info d WHERE w.ID = d.MSG_ID)";
                 List<Map<String, Object>> info = jdbcTemplate.queryForList(sql, "0", "TODO");
 
                 //添加待办事项
@@ -186,7 +186,7 @@ public class dealtWorkJob {
      * @return
      */
     private List<Map<String, Object>> queryTaskStatus(String isClose, String wfTaskTypeId) {
-        String taskStatusSql = "select ID,AD_USER_ID,WF_PROCESS_INSTANCE_ID from wf_task where IS_CLOSED = ? and WF_TASK_TYPE_ID = ? and AD_USER_ID = '100031468511690944'";
+        String taskStatusSql = "select ID,AD_USER_ID,WF_PROCESS_INSTANCE_ID from wf_task where IS_CLOSED = ? and WF_TASK_TYPE_ID = ? and AD_USER_ID = '0100031468511690944'";
         List<Map<String, Object>> list = jdbcTemplate.queryForList(taskStatusSql, isClose, wfTaskTypeId);
         return list;
     }

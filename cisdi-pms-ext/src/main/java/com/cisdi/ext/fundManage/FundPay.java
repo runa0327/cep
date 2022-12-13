@@ -55,9 +55,9 @@ public class FundPay {
             FundPayResp fundPayResp = new FundPayResp();
             fundPayResp.sourceId = JdbcMapUtil.getString(result, "sourceId");
             fundPayResp.fundSourceName = JdbcMapUtil.getString(result, "fundSourceName");
-            fundPayResp.imptAmt = JdbcMapUtil.getDouble(result, "imptAmt");
-            fundPayResp.apportionAmt = JdbcMapUtil.getDouble(result, "apportionAmt");
-            fundPayResp.payAmt = JdbcMapUtil.getDouble(result, "payAmt");
+            fundPayResp.imptAmt = Double.parseDouble(JdbcMapUtil.getString(result, "imptAmt"));
+            fundPayResp.apportionAmt = Double.parseDouble(JdbcMapUtil.getString(result, "apportionAmt"));
+            fundPayResp.payAmt = Double.parseDouble(JdbcMapUtil.getString(result, "payAmt"));
             fundPayResp.sourceTypeName = JdbcMapUtil.getString(result, "sourceTypeName");
             fundPayResp.date = JdbcMapUtil.getString(result, "date");
             fundPayResp.remark = JdbcMapUtil.getString(result, "remark");

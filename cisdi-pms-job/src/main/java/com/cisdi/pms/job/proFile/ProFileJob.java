@@ -61,8 +61,8 @@ public class ProFileJob {
             List<Integer> vers = item.stream().map(m -> Integer.parseInt(JdbcMapUtil.getString(m, "VER"))).collect(Collectors.toList());
             taskExecutor.execute(() -> {
                 InvokeActParam invokeActParam = new InvokeActParam();
-                invokeActParam.sevId = "99799190825090826";
-                invokeActParam.actId = "99902212142088375";
+                invokeActParam.sevId = "0099799190825090826";
+                invokeActParam.actId = "0099902212142088375";
                 invokeActParam.isPreChk = false;
                 invokeActParam.idList = ids;
                 invokeActParam.verList = vers;

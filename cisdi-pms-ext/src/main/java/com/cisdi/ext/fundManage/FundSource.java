@@ -51,7 +51,7 @@ public class FundSource {
             FundSourceResp fundSourceResp = new FundSourceResp();
             fundSourceResp.id = JdbcMapUtil.getString(result, "id");
             fundSourceResp.name = JdbcMapUtil.getString(result, "name");
-            fundSourceResp.implAmt = JdbcMapUtil.getDouble(result, "implAmt");
+            fundSourceResp.implAmt = Double.parseDouble(JdbcMapUtil.getString(result, "implAmt"));
             fundSourceResp.fundSourceTypeName = JdbcMapUtil.getString(result, "fundSourceTypeName");
             fundSourceResp.date = JdbcMapUtil.getString(result, "date");
             fundSourceResp.remark = JdbcMapUtil.getString(result, "remark");
@@ -125,8 +125,8 @@ public class FundSource {
             implementFund.sourceId = JdbcMapUtil.getString(source, "id");
             implementFund.prjId = JdbcMapUtil.getString(source, "prjId");
             implementFund.prjName = JdbcMapUtil.getString(source, "prjName");
-            implementFund.apportionAmt = JdbcMapUtil.getDouble(source, "apportionAmt");
-            implementFund.payAmt = JdbcMapUtil.getDouble(source, "payAmt");
+            implementFund.apportionAmt = Double.parseDouble(JdbcMapUtil.getString(source, "apportionAmt"));
+            implementFund.payAmt = Double.parseDouble(JdbcMapUtil.getString(source, "payAmt"));
             implementFundList.add(implementFund);
         }
         List<File> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(infoMap, "fileIds"), myJdbcTemplate);

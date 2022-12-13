@@ -51,8 +51,8 @@ public class FundApportion {
             apportionResp.id = JdbcMapUtil.getString(result, "id");
             apportionResp.fundSourceName = JdbcMapUtil.getString(result, "fundSourceName");
             apportionResp.prjName = JdbcMapUtil.getString(result, "prjName");
-            apportionResp.fundSourceAmt = JdbcMapUtil.getDouble(result, "fundSourceAmt");
-            apportionResp.apportionAmt = JdbcMapUtil.getDouble(result, "apportionAmt");
+            apportionResp.fundSourceAmt = Double.parseDouble(JdbcMapUtil.getString(result, "fundSourceAmt"));
+            apportionResp.apportionAmt = Double.parseDouble(JdbcMapUtil.getString(result, "apportionAmt"));
             apportionResp.apportionDate = JdbcMapUtil.getString(result, "apportionDate");
             apportionResp.remark = JdbcMapUtil.getString(result, "remark");
             apportionRespList.add(apportionResp);

@@ -1,5 +1,6 @@
 package com.cisdi.pms.job.excel.imports;
 
+import cn.hutool.core.util.IdUtil;
 import com.cisdi.pms.job.excel.model.BasePrjPartyUser;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
 import com.cisdi.pms.job.utils.StringUtils;
@@ -72,7 +73,7 @@ public class PrjUserImportController {
         List<Map<String,Object>> partyList = jdbcTemplate.queryForList(sql3);
 
         //查询单位
-        String sql4 = "select id,name from gr_set_value where GR_SET_ID = '99952822476391029'";
+        String sql4 = "select id,name from gr_set_value where GR_SET_ID = '0099952822476391029'";
         List<Map<String,Object>> localList = jdbcTemplate.queryForList(sql4);
 
         String msg = "";
@@ -108,7 +109,7 @@ public class PrjUserImportController {
                 }
                 if (SharedUtil.isEmptyString(projectId)){
                     projectId = Util.insertData(jdbcTemplate,"pm_prj");
-                    String updateSql = "update pm_prj set ver = '99',CRT_DT = now(),CRT_USER_ID='99250247095871681',STATUS='AP',name = ?,PROJECT_SOURCE_TYPE_ID='99952822476441374' where id = ?";
+                    String updateSql = "update pm_prj set ver = '99',CRT_DT = now(),CRT_USER_ID='0099250247095871681',STATUS='AP',name = ?,PROJECT_SOURCE_TYPE_ID='0099952822476441374' where id = ?";
                     int s = jdbcTemplate.update(updateSql,projectName,projectId);
                     projectList = jdbcTemplate.queryForList(sql1);
                     basePrjPartyUser.setPmPrjId(projectId);
@@ -257,8 +258,8 @@ public class PrjUserImportController {
             String sql3 = "select * from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = ?";
             List<Map<String,Object>> list3 = jdbcTemplate.queryForList(sql3,prj,roleId);
             if (CollectionUtils.isEmpty(list3)){
-                sql = "insert into BASE_PRJ_PARTY_USER (id,VER,CRT_DT,PM_PRJ_ID,PM_PARTY_ROLE_ID,USER_IDS,status) values ((select uuid_short()),'99',now(),?,?,?,'AP')";
-                num1 = jdbcTemplate.update(sql,prj,roleId,userId);
+                sql = "insert into BASE_PRJ_PARTY_USER (id,VER,CRT_DT,PM_PRJ_ID,PM_PARTY_ROLE_ID,USER_IDS,status) values (?,'99',now(),?,?,?,'AP')";
+                num1 = jdbcTemplate.update(sql,IdUtil.getSnowflakeNextIdStr(),prj,roleId,userId);
             } else {
                 sql = "update BASE_PRJ_PARTY_USER set USER_IDS = ?,ver = '99',CRT_DT=now() where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = ?";
                 num1 = jdbcTemplate.update(sql,userId,prj,roleId);
@@ -339,7 +340,7 @@ public class PrjUserImportController {
                 }
 
                 if (userSB.length() > 0){
-                    basePrjPartyUser1.setPmPartyRoleId("99952822476391092");
+                    basePrjPartyUser1.setPmPartyRoleId("0099952822476391092");
                     String buildUser = userSB.substring(0,userSB.length()-1);
                     basePrjPartyUser1.setUserId(buildUser);
                     importList.add(basePrjPartyUser1);
@@ -367,7 +368,7 @@ public class PrjUserImportController {
                     }
                 }
                 if (userSB2.length()>0){
-                    basePrjPartyUser2.setPmPartyRoleId("99952822476391096");
+                    basePrjPartyUser2.setPmPartyRoleId("0099952822476391096");
                     String reviewUser = userSB2.substring(0,userSB2.length()-1);
                     basePrjPartyUser2.setUserId(reviewUser);
                     importList.add(basePrjPartyUser2);
@@ -391,8 +392,8 @@ public class PrjUserImportController {
                         String sql3 = "select * from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = ?";
                         List<Map<String,Object>> list3 = jdbcTemplate.queryForList(sql3,prj,roleId);
                         if (CollectionUtils.isEmpty(list3)){
-                            sql = "insert into BASE_PRJ_PARTY_USER (id,VER,PM_PRJ_ID,PM_PARTY_ROLE_ID,USER_IDS,status) values ((select uuid_short()),'1',?,?,?,'AP')";
-                            num = jdbcTemplate.update(sql,prj,roleId,userId);
+                            sql = "insert into BASE_PRJ_PARTY_USER (id,VER,PM_PRJ_ID,PM_PARTY_ROLE_ID,USER_IDS,status) values (?,'1',?,?,?,'AP')";
+                            num = jdbcTemplate.update(sql,IdUtil.getSnowflakeNextIdStr(),prj,roleId,userId);
                         } else {
                             sql = "update BASE_PRJ_PARTY_USER set USER_IDS = ? where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = ?";
                             num = jdbcTemplate.update(sql,userId,prj,roleId);

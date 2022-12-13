@@ -406,7 +406,7 @@ public class handleExcel {
         //保存文件记录
         String pmPrjReqId = Util.insertData(jdbcTemplate, "fl_file");
         jdbcTemplate.update("update fl_file set CODE=?,NAME=?,FL_PATH_ID=?,EXT=?,CRT_USER_ID=?,LAST_MODI_USER_ID=?,SIZE_KB=?,UPLOAD_DTTM=?,PHYSICAL_LOCATION=?,DSP_NAME=?,DSP_SIZE=? where ID=?",
-                pmPrjReqId, fileName, "99250247095872688", fileType, "99250247095871681", "99250247095871681", length, parse, "/data/qygly/file/test/FileStore/" + str, fileName, length,
+                pmPrjReqId, fileName, "0099250247095872688", fileType, "0099250247095871681", "0099250247095871681", length, parse, "/data/qygly/file/test/FileStore/" + str, fileName, length,
                 pmPrjReqId);
 
     }
