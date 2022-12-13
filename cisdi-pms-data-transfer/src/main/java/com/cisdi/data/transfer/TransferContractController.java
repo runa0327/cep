@@ -1,5 +1,6 @@
 package com.cisdi.data.transfer;
 
+import cn.hutool.core.util.IdUtil;
 import com.cisdi.data.domain.PoOrder;
 import com.cisdi.data.domain.PoPublicBid;
 import com.cisdi.data.util.ProFileUtils;
@@ -66,8 +67,8 @@ public class TransferContractController {
                                 if (mapInfoLists.equals(JdbcMapUtil.getString(tmp, "project_id"))) {
                                     PoOrder poOrder = new PoOrder();
                                     poOrder.setVer("1");
-                                    poOrder.setCRT_USER_ID("99250247095871681");
-                                    poOrder.setLAST_MODI_USER_ID("99250247095871681");
+                                    poOrder.setCRT_USER_ID("0099250247095871681");
+                                    poOrder.setLAST_MODI_USER_ID("0099250247095871681");
                                     poOrder.setSTATUS("AP");
                                     poOrder.setCONTRACT_AMOUNT(JdbcMapUtil.getString(tmp, "contract_price"));
                                     poOrder.setAGENT((JdbcMapUtil.getString(tmp, "agent") == null) ? "" : JdbcMapUtil.getString(tmp, "agent"));
@@ -85,9 +86,10 @@ public class TransferContractController {
                                         poOrder.setFILE_ATTACHMENT_URL(fileStr);
                                     }
 
+                                    String id1 = IdUtil.getSnowflakeNextIdStr();
                                     String insertSql = "insert into po_order (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,CONTRACT_AMOUNT,AGENT," +
-                                            "AGENT_PHONE,OPPO_SITE_CONTACT,FILE_ATTACHMENT_URL,OPPO_SITE_LINK_MAN,PM_PRJ_ID,CPMS_UUID,CPMS_ID) values((select UUID_SHORT()),?,now(),now(),?,now(),?,?,?,?,?,?,?,?,?,?,?)";
-                                    testJdbcTemplate.update(insertSql, poOrder.getVer(), poOrder.getCRT_USER_ID(), poOrder.getLAST_MODI_USER_ID(), poOrder.getSTATUS(), poOrder.getCONTRACT_AMOUNT(),
+                                            "AGENT_PHONE,OPPO_SITE_CONTACT,FILE_ATTACHMENT_URL,OPPO_SITE_LINK_MAN,PM_PRJ_ID,CPMS_UUID,CPMS_ID) values(?,?,now(),now(),?,now(),?,?,?,?,?,?,?,?,?,?,?)";
+                                    testJdbcTemplate.update(insertSql, id1, poOrder.getVer(), poOrder.getCRT_USER_ID(), poOrder.getLAST_MODI_USER_ID(), poOrder.getSTATUS(), poOrder.getCONTRACT_AMOUNT(),
                                             poOrder.getAGENT(), poOrder.getAGENT_PHONE(), poOrder.getOPPO_SITE_CONTACT(), poOrder.getFILE_ATTACHMENT_URL(), poOrder.getOPPO_SITE_LINK_MAN(), poOrder.getPM_PRJ_ID(),
                                             poOrder.getCPMS_UUID(), poOrder.getCPMS_ID());
 
@@ -227,10 +229,11 @@ public class TransferContractController {
                                 }
 
                                 // 插入
+                                String id2 = IdUtil.getSnowflakeNextIdStr();
                                 String sql7 = "insert into PO_PUBLIC_BID(id,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,NAME,PM_PRJ_ID,BID_CTL_PRICE_LAUNCH," +
                                         "APPROVE_PMS_RELEASE_WAY_ID,APPROVE_PURCHASE_TYPE,BID_USER_ID,BID_AGENCY,BID_FILE_GROUP_ID,TENDER_OFFER,CPMS_UUID,CPMS_ID,BID_OPEN_DATE) values(" +
-                                        "(select UUID_SHORT()),now(),'99250247095871681',now(),'99250247095871681','AP',?,?,?,?,?,?,?,?,?,?,?,?)";
-                                int num = testJdbcTemplate.update(sql7, poPublicBid.getNAME(), poPublicBid.getPM_PRJ_ID(), poPublicBid.getBID_CTL_PRICE_LAUNCH(), poPublicBid.getAPPROVE_PMS_RELEASE_WAY_ID(),
+                                        "?,now(),'0099250247095871681',now(),'0099250247095871681','AP',?,?,?,?,?,?,?,?,?,?,?,?)";
+                                int num = testJdbcTemplate.update(sql7, id2, poPublicBid.getNAME(), poPublicBid.getPM_PRJ_ID(), poPublicBid.getBID_CTL_PRICE_LAUNCH(), poPublicBid.getAPPROVE_PMS_RELEASE_WAY_ID(),
                                         poPublicBid.getAPPROVE_PURCHASE_TYPE(), poPublicBid.getBID_USER_ID(), poPublicBid.getBID_AGENCY(), poPublicBid.getBID_FILE_GROUP_ID(), poPublicBid.getTENDER_OFFER(),
                                         poPublicBid.getCPMS_UUID(), poPublicBid.getCPMS_ID(), poPublicBid.getBID_OPEN_DATE());
 

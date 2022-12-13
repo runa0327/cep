@@ -107,7 +107,7 @@ public class FileTransferController {
 
                         jdbcTemplate.update("update FL_FILE set `CODE`=?,`NAME`=?,EXT=?,DSP_NAME=?,SIZE_KB=?,DSP_SIZE=?,FILE_INLINE_URL=?,FILE_ATTACHMENT_URL=?,UPLOAD_DTTM=?,PHYSICAL_LOCATION=?,FL_PATH_ID=? WHERE ID=?",
                                 code, name, item.get("file_suffix"), item.get("original_name"), sizeKb, item.get("file_size"), fileInlineUrl, fileAttachmentUrl,
-                                item.get("upload_time"), physicalLocation, "99902212142322558", id);
+                                item.get("upload_time"), physicalLocation, "0099902212142322558", id);
 
 
                         String qyyProjectId = String.valueOf(projectOptional.get().get("ID"));

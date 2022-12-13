@@ -1,5 +1,6 @@
 package com.cisdi.data.transfer;
 
+import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.data.util.ListUtils;
@@ -56,16 +57,17 @@ public class MapDataTransferController {
             asyncExecutor.execute(() -> {
                 log.info("同步地图信息---------------当前进程第" + index.getAndIncrement() + "个");
                 for (Map<String, Object> mapInfo : mapInfos) {
+                    String mainId = IdUtil.getSnowflakeNextIdStr();
                     String mapInfoSql = "insert into map_info (ID,CODE,REMARK,CPMS_UUID,MID_TYPE,INNER_TYPE," +
                             "STROKE_OPACITY,PM_PRJ_ID,PRJ_NAME,STROKE_WIDTH,FILL,STROKE,AREA,PLOT_RATIO,LAND_NOTE," +
                             "DICT_VALUE,FILL_OPACITY,CPMS_ID,TS,CRT_DT,LAST_MODI_DT) " +
-                            "values ((select UUID_SHORT()),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,(now()),(now()),(now()))";
+                            "values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,(now()),(now()),(now()))";
                     // 替换项目id
                     List<Map<String, Object>> prjIdList = testJdbcTemplate.queryForList("select id from pm_prj where CPMS_UUID = ?", mapInfo.get("project_id"));
 
                     String prjId = CollectionUtils.isEmpty(prjIdList) ? null : JdbcMapUtil.getString(prjIdList.get(0), "id");
                     // 插入mapinfo
-                    testJdbcTemplate.update(mapInfoSql, mapInfo.get("code"), mapInfo.get("remakes"), mapInfo.get("map_id"), mapInfo.get("mid_type"),
+                    testJdbcTemplate.update(mapInfoSql, mainId,mapInfo.get("code"), mapInfo.get("remakes"), mapInfo.get("map_id"), mapInfo.get("mid_type"),
                             mapInfo.get("inner_type"), mapInfo.get("stroke_opacity"), prjId, mapInfo.get("project_name"), mapInfo.get("stroke_width"),
                             mapInfo.get("fill"), mapInfo.get("stroke"), mapInfo.get("area"), mapInfo.get("plot_ratio"), mapInfo.get("land_note"),
                             mapInfo.get("dict_value"), mapInfo.get("fill_opacity"), mapInfo.get("id"));
@@ -77,10 +79,11 @@ public class MapDataTransferController {
                     List<Map<String, Object>> coordinates = cpmsJdbcTemplate.queryForList("select * from " +
                             "map_longitude_latitude where del_flag = '0' and map_id = ?", mapInfo.get("map_id"));
                     for (Map<String, Object> coordinate : coordinates) {
+                        String mainIds = IdUtil.getSnowflakeNextIdStr();
                         String coordinateSql = "insert into map_longitude_latitude (ID,MAP_ID, LONGITUDE," +
                                 "LATITUDE,CPMS_UUID,CPMS_ID,NUMBER,TS,CRT_DT,LAST_MODI_DT) " +
-                                "values ((select UUID_SHORT()),?,?,?,?,?,?,(now()),(now()),(now()))";
-                        testJdbcTemplate.update(coordinateSql, id, coordinate.get("longitude"),
+                                "values (?,?,?,?,?,?,?,(now()),(now()),(now()))";
+                        testJdbcTemplate.update(coordinateSql, mainIds,id, coordinate.get("longitude"),
                                 coordinate.get("latitude"), coordinate.get("longitude_latitude_id"), coordinate.get("id")
                                 , coordinate.get("number"));
                         log.info("成功同步一条坐标数据");

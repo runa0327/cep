@@ -34,7 +34,7 @@ public class WfProcessController {
             testJdbcTemplate.update("update wf_node n set n.WF_PROCESS_ID=?,n.name='发起',n.NODE_TYPE='START_EVENT' where n.id=?", process.get("ID"), wfNodeId);
 
             String wfNodeRoleId = Util.insertData(testJdbcTemplate, "wf_node_role");
-            testJdbcTemplate.update("update wf_node_role t set t.WF_NODE_ID=?,t.AD_ROLE_ID='99250247095870406' where t.id=?", wfNodeId, wfNodeRoleId);
+            testJdbcTemplate.update("update wf_node_role t set t.WF_NODE_ID=?,t.AD_ROLE_ID='0099250247095870406' where t.id=?", wfNodeId, wfNodeRoleId);
         }
     }
 
