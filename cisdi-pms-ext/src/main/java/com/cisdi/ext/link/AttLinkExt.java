@@ -1684,7 +1684,7 @@ public class AttLinkExt {
             String text = "";
             String projectId = JdbcMapUtil.getString(param.valueMap, "PM_PRJ_ID");
             String projectIdWr = JdbcMapUtil.getString(param.valueMap, "PROJECT_NAME_WR");
-            String typeId = JdbcMapUtil.getString(param.valueMap,"PROJECT_SOURCE_TYPE_ID"); //99952822476441375=非立项
+            String typeId = JdbcMapUtil.getString(param.valueMap,"PROJECT_SOURCE_TYPE_ID"); //0099952822476441375=非立项
             String typeCode = getGrSetCode(myJdbcTemplate,typeId);
             if (Strings.isNullOrEmpty(projectId) && SharedUtil.isEmptyString(projectIdWr)){
                 throw new BaseException("项目信息不能为空！");

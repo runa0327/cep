@@ -41,7 +41,7 @@ public class PoOrderPaymentExt {
         String contractId = entityRecord.valueMap.get("CONTRACT_ID").toString();
         // 获取付款依据
         String payBasisId = entityRecord.valueMap.get("PAY_BASIS_ID").toString();
-        if ("99902212142031993".equals(payBasisId)) {
+        if ("0099902212142031993".equals(payBasisId)) {
             // 获取附件信息
             String fileId = JdbcMapUtil.getString(entityRecord.valueMap, "ATT_FILE_GROUP_ID");
             if (SharedUtil.isEmptyString(fileId) || "0".equals(fileId)) {
