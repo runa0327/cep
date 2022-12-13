@@ -77,7 +77,7 @@ public class ProcessRoleExt {
                 "where t.id = ?", csCommId);
         List<Object> roleNames = roleNameListMap.stream().map(item -> String.valueOf(item.get("name"))).collect(Collectors.toList());
         //根据角色名称匹配合作方角色
-        List<Map<String, Object>> partyRoleList = myJdbcTemplate.queryForList("select va.id,va.name from gr_set_value va where va.GR_SET_ID = '99952822476391029'");
+        List<Map<String, Object>> partyRoleList = myJdbcTemplate.queryForList("select va.id,va.name from gr_set_value va where va.GR_SET_ID = '0099952822476391029'");
         Map<String, Object> partyRoles = new HashMap<>();
         for (Map<String, Object> partyRoleMap : partyRoleList) {
             partyRoles.put(String.valueOf(partyRoleMap.get("name")),String.valueOf(partyRoleMap.get("id")));
@@ -142,7 +142,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应监理人员");
         }
         //根据项目id查询该项目监理人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '99952822476391096'";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0099952822476391096'";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置监理单位人员，请联系管理员或相关负责人处理！");
@@ -166,7 +166,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应监理人员");
         }
         //根据项目id查询该项目监理人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '99952822476391092' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0099952822476391092' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置施工单位人员，请联系管理员或相关负责人处理！");
@@ -190,7 +190,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应监理人员");
         }
         //根据项目id查询该项目勘察单位人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '99952822476391030' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0099952822476391030' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置勘察单位人员，请联系管理员或相关负责人处理！");
@@ -214,7 +214,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应监理人员");
         }
         //根据项目id查询该项目建设单位人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '99952822476391031' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0099952822476391031' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置建设单位人员，请联系管理员或相关负责人处理！");
@@ -238,7 +238,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应监理人员");
         }
         //根据项目id查询该项目设计单位人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '99952822476391091' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0099952822476391091' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置设计单位人员，请联系管理员或相关负责人处理！");
@@ -262,7 +262,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应监理人员");
         }
         //根据项目id查询该项目检测单位人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '99952822476391142' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0099952822476391142' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置检测单位人员，请联系管理员或相关负责人处理！");
@@ -286,7 +286,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应监理人员");
         }
         //根据项目id查询该项目代建单位人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '100031468512032482' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0100031468512032482' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置代建单位人员，请联系管理员或相关负责人处理！");
@@ -310,7 +310,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应监理人员");
         }
         //根据项目id查询该项目代建单位人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '100031468512032483' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0100031468512032483' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置工程总承包单位人员，请联系管理员或相关负责人处理！");
@@ -334,7 +334,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应监理人员");
         }
         //根据项目id查询该项目代建单位人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '100031468512032486' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0100031468512032486' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置施工总承包单位人员，请联系管理员或相关负责人处理！");
@@ -358,7 +358,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应前期岗人员");
         }
         //根据项目id查询该项目代建单位人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '100031468512101497' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0100031468512101497' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置前期岗人员，请联系管理员或相关负责人处理！");
@@ -382,7 +382,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应成本岗人员");
         }
         //根据项目id查询该项目代建单位人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '100031468512101512' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0100031468512101512' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置成本岗人员，请联系管理员或相关负责人处理！");
@@ -406,7 +406,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应设计岗人员");
         }
         //根据项目id查询该项目代建单位人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '100031468512101520' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0100031468512101520' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置设计岗人员，请联系管理员或相关负责人处理！");
@@ -430,7 +430,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应采购岗人员");
         }
         //根据项目id查询该项目代建单位人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '100031468512101532' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0100031468512101532' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置采购岗人员，请联系管理员或相关负责人处理！");
@@ -454,7 +454,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应工程岗人员");
         }
         //根据项目id查询该项目代建单位人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '100031468512101541' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0100031468512101541' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置工程岗人员，请联系管理员或相关负责人处理！");
@@ -478,7 +478,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应财务岗人员");
         }
         //根据项目id查询该项目代建单位人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '100031468512101556' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0100031468512101556' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置财务岗人员，请联系管理员或相关负责人处理！");
@@ -502,7 +502,7 @@ public class ProcessRoleExt {
             throw new BaseException("没有项目信息，无法找到对应法务岗人员");
         }
         //根据项目id查询该项目代建单位人员
-        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '100031468512101563' ";
+        String sql1 = "select USER_IDS from BASE_PRJ_PARTY_USER where PM_PRJ_ID = ? and PM_PARTY_ROLE_ID = '0100031468512101563' ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
         if (CollectionUtils.isEmpty(list1)){
             throw new BaseException("该项目没有配置法务岗人员，请联系管理员或相关负责人处理！");
