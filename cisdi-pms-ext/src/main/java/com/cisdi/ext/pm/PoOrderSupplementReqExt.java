@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -186,7 +187,17 @@ public class PoOrderSupplementReqExt {
         if (CollectionUtils.isEmpty(list1)) {
             throw new BaseException("费用明细不能为空！");
         }
-//        BigDecimal account = getSumAmt(list1);
+        for (Map<String, Object> tmp : list1) {
+            String detailId = JdbcMapUtil.getString(tmp,"id");
+            //含税金额
+            BigDecimal shuiAmt = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_ONE"));
+            //税率
+            BigDecimal shuiLv = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_THREE")).divide(new BigDecimal(100));
+            //含税金额
+            BigDecimal noShuiAmt = shuiAmt.divide(shuiLv.add(new BigDecimal(1)),2, RoundingMode.HALF_UP);
+            Integer integer = myJdbcTemplate.update("update PM_ORDER__EXTRA_COST_DETAIL set AMT_TWO=? where id = ?",noShuiAmt,detailId);
+            tmp.put("AMT_TWO",noShuiAmt);
+        }
 
         //含税总金额
         BigDecimal amtShui = getSumAmtBy(list1,"AMT_ONE");
@@ -238,4 +249,152 @@ public class PoOrderSupplementReqExt {
         return sum;
     }
 
+    /**
+     * 补充协议扩展-律师审核
+     */
+    public void supplementLawyerCheck(){
+        String status = "lawyerCheck";
+        showComment(status);
+    }
+
+    /**
+     * 补充协议扩展-法务财务审核
+     */
+    public void orderLegalFinanceCheck(){
+        String status = "orderLegalFinanceCheck";
+        showComment(status);
+    }
+
+    /**
+     * 审批意见、附件回显
+     * @param status
+     */
+    private void showComment(String status) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Date date = new Date();
+        String now = DateTimeUtil.dateToString(date);
+
+        //获取当前节点实例id
+        String nodeId = ExtJarHelper.nodeInstId.get();
+
+        // 当前登录人
+        String userName = ExtJarHelper.loginInfo.get().userName;
+
+        // 当前登录人id
+        String userId = ExtJarHelper.loginInfo.get().userId;
+
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId;
+        // 流程id
+        String procInstId = ExtJarHelper.procInstId.get();
+        // 审批意见
+        String sql = "select tk.USER_COMMENT,tk.USER_ATTACHMENT " +
+                "from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id" +
+                " where u.id = ?";
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, procInstId,userId);
+        String comment = "";
+        String file = "";
+        if (!CollectionUtils.isEmpty(list)) {
+            comment = SharedUtil.isEmptyString(JdbcMapUtil.getString(list.get(0),"user_comment"))  ? "同意" : JdbcMapUtil.getString(list.get(0),"user_comment");
+            file = list.get(0).get("USER_ATTACHMENT") == null ? null : list.get(0).get("USER_ATTACHMENT").toString();
+        }
+        String sbComment = "";
+        String sbFile = "";
+        StringBuilder upSql = new StringBuilder();
+        if ("lawyerCheck".equals(status)){ //律师审核
+            //流程中的审批意见附件
+            String processFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_SIX");
+            //判断是否是当轮拒绝回来的、撤销回来的
+            String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ?";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeId,userId);
+            if (!CollectionUtils.isEmpty(list2)){
+                String num = JdbcMapUtil.getString(list2.get(0),"num");
+                if (SharedUtil.isEmptyString(num) || "0".equals(num)){
+                    Integer exec = Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("ID", csCommId).update()
+                            .set("FILE_ID_SIX",null).exec();
+                    processFile = "";
+                }
+            } else {
+                Integer exec = Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("ID", csCommId).update()
+                        .set("FILE_ID_SIX",null).exec();
+                processFile = "";
+            }
+            sbFile = autoFile(file,processFile);
+            if (!SharedUtil.isEmptyString(sbFile)){
+                upSql.append("update PO_ORDER_SUPPLEMENT_REQ set ");
+                if (!SharedUtil.isEmptyString(sbFile)){
+                    upSql.append(" FILE_ID_SIX = '"+sbFile+"', ");
+                }
+                upSql.append(" LAST_MODI_DT = now() where id = ?");
+                Integer exec = myJdbcTemplate.update(upSql.toString(),csCommId);
+                log.info("已更新：{}", exec);
+            }
+        }  else if ("orderLegalFinanceCheck".equals(status)) { //法务财务审批
+            //流程中的审批意见
+            String processLegalFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_THREE"); //法务修订稿
+            String processFinanceFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_TWO"); //财务修订稿
+            //查询该人员角色信息
+            String sql1 = "select b.id,b.name from ad_role_user a left join ad_role b on a.AD_ROLE_ID = b.id where a.AD_USER_ID = ? and b.id in ('0100070673610711083','0099902212142039415')";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId);
+            if (!CollectionUtils.isEmpty(list1)){
+                //判断是否是当轮拒绝回来的、撤销回来的
+                String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ?";
+                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeId,userId);
+                if (!CollectionUtils.isEmpty(list2)){
+                    String num = JdbcMapUtil.getString(list2.get(0),"num");
+                    if (SharedUtil.isEmptyString(num) || "0".equals(num)){
+                        Integer exec = Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("ID", csCommId).update()
+                                .set("FILE_ID_THREE",null).set("FILE_ID_TWO",null).exec();
+                        processLegalFile = "";
+                        processFinanceFile = "";
+                    }
+                } else {
+                    Integer exec = Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("ID", csCommId).update()
+                            .set("FILE_ID_THREE",null).set("FILE_ID_TWO",null).exec();
+                    processLegalFile = "";
+                    processFinanceFile = "";
+                }
+                // 0099902212142039415 = 法务部门;0100070673610711083=财务部
+                String id = JdbcMapUtil.getString(list1.get(0),"id");
+
+                if ("0099902212142039415".equals(id)){ //法务
+                    sbFile = autoFile(file,processLegalFile);
+                    if (!SharedUtil.isEmptyString(sbComment) || !SharedUtil.isEmptyString(sbFile)){
+                        upSql.append("update PO_ORDER_SUPPLEMENT_REQ set ");
+                        if (!SharedUtil.isEmptyString(sbFile)){
+                            upSql.append(" FILE_ID_THREE = '"+sbFile+"', ");
+                        }
+                        upSql.append(" LAST_MODI_DT = now() where id = ?");
+                        Integer exec = myJdbcTemplate.update(upSql.toString(),csCommId);
+                        log.info("已更新：{}", exec);
+                    }
+                }
+                if ("0100070673610711083".equals(id)){
+                    sbFile = autoFile(file,processFinanceFile);
+                    if (!SharedUtil.isEmptyString(sbComment) || !SharedUtil.isEmptyString(sbFile)){
+                        upSql.append("update PO_ORDER_SUPPLEMENT_REQ set ");
+                        if (!SharedUtil.isEmptyString(sbFile)){
+                            upSql.append(" FILE_ID_TWO = '"+sbFile+"', ");
+                        }
+                        upSql.append(" LAST_MODI_DT = now() where id = ?");
+                        Integer exec = myJdbcTemplate.update(upSql.toString(),csCommId);
+                        log.info("已更新：{}", exec);
+                    }
+                }
+            }
+        }
+    }
+
+    // 审核意见附件自动拼接
+    private String autoFile(String newFile, String oldFile) {
+        StringBuilder sbFile = new StringBuilder();
+        if (!SharedUtil.isEmptyString(newFile)){
+            if (!SharedUtil.isEmptyString(oldFile)){
+                sbFile.append(oldFile).append(",").append(newFile);
+            } else {
+                sbFile.append(newFile);
+            }
+        }
+        return sbFile.toString();
+    }
 }
