@@ -42,7 +42,7 @@ public class InvokeHomeExt {
                 "'其他') transitionPhase \n" +
                 "from pm_prj p left join gr_set_value v on v.id = p.PROJECT_TYPE_ID left join gr_set s on s.CODE \n" +
                 "= 'project_type' \n" +
-                "where p.status = 'AP' and p.PROJECT_TYPE_ID is not null\n" +
+                "where p.status = 'AP' \n" +
                 "group by v.id order by v.SEQ_NO;");
         int total = projectPhaseList.stream().mapToInt(item -> Integer.parseInt(item.get("num").toString())).sum();
         HashMap<String, Object> totals = new HashMap<>();
