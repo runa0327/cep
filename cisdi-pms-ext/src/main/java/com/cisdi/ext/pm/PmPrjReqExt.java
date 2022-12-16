@@ -40,18 +40,6 @@ public class PmPrjReqExt {
 
 
         Map<String, Object> valueMap = entityRecord.valueMap;
-        String con_scale_type_id = JdbcMapUtil.getString(valueMap, "CON_SCALE_TYPE_ID");
-        Double con_scale_qty2 = Double.parseDouble(JdbcMapUtil.getString(valueMap, "CON_SCALE_QTY2"));
-        boolean need2 = "0099799190825087119".equals(con_scale_type_id);
-        if (need2) {
-            if (con_scale_qty2 == null || con_scale_qty2 <= 0d) {
-                sbErr.append("请填写正确宽度！");
-            }
-        } else {
-            if (con_scale_qty2 != null && con_scale_qty2 != 0d) {
-                sbErr.append("请不要填写 宽 值！");
-            }
-        }
 
         String prj_total_investStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "PRJ_TOTAL_INVEST")) ? "0":JdbcMapUtil.getString(valueMap, "PRJ_TOTAL_INVEST");
         Double prj_total_invest = Double.parseDouble(prj_total_investStr);
@@ -175,7 +163,7 @@ public class PmPrjReqExt {
         String projectId = entityRecord.valueMap.get("PM_PRJ_ID").toString();
 
         // 获取建设年限
-        String year = entityRecord.valueMap.get("BUILD_YEARS").toString();
+        String year = JdbcMapUtil.getString(entityRecord.valueMap,"BUILD_YEARS");
 
         // 修改项目建设年限信息：
         Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("BUILD_YEARS", year).exec();

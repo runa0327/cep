@@ -16,6 +16,7 @@ import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * 采购合同补充协议申请-扩展
@@ -304,7 +305,7 @@ public class PoOrderSupplementReqExt {
         if ("lawyerCheck".equals(status)){ //律师审核
             //流程中的审批意见附件
             String processFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_SIX");
-            //判断是否是当轮拒绝回来的、撤销回来的
+            //判断是否是当轮拒绝回来的、撤销回来的（是否是第一个进入该节点审批的人）
             String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ?";
             List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeId,userId);
             if (!CollectionUtils.isEmpty(list2)){
