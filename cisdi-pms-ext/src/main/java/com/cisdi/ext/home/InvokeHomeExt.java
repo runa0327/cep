@@ -38,12 +38,14 @@ public class InvokeHomeExt {
      */
     public void proStageStatistics() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> projectPhaseList = myJdbcTemplate.queryForList("select count(p.id) num,IFNULL(v.name, \n" +
-                "'其他') transitionPhase \n" +
-                "from pm_prj p left join gr_set_value v on v.id = p.PROJECT_TYPE_ID left join gr_set s on s.CODE \n" +
-                "= 'project_type' \n" +
-                "where p.status = 'AP' \n" +
-                "group by v.id order by v.SEQ_NO;");
+        List<Map<String, Object>> projectPhaseList = myJdbcTemplate.queryForList("select sum(a.num) as num ,a.transitionPhase as transitionPhase from \n" +
+                "( \n" +
+                " select count(p.id) num,IFNULL(v.name, '其他') transitionPhase \n" +
+                " from pm_prj p \n" +
+                " left join gr_set_value v on v.id = p.PROJECT_TYPE_ID left join gr_set s on s.CODE = 'project_type' \n" +
+                " where p.status = 'AP' \n" +
+                " group by v.id order by v.SEQ_NO \n" +
+                ") a group by a.transitionPhase");
         int total = projectPhaseList.stream().mapToInt(item -> Integer.parseInt(item.get("num").toString())).sum();
         HashMap<String, Object> totals = new HashMap<>();
 //        totals.put("项目总数", total);
