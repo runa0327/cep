@@ -14,6 +14,7 @@
         <module>cisdi-pms-ext</module>
         <module>cisdi-pms-mq</module>
         <module>cisdi-pms-job</module>
+        <module>cisdi-pms-third-party-login</module>
     </modules>
 
     <properties>

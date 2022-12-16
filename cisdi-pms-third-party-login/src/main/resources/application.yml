@@ -1,0 +1,116 @@
+server:
+  port: 11136
+  servlet:
+    context-path: /cisdi-pms-third-party-login
+
+spring:
+  # 设置时区，以北京时间显示报错信息的时间（等）：
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null
+  application:
+    name: cisdi-pms-third-party-login
+  datasource:
+    username: qygly
+    password: Qygly@123456
+    # 注意更改ip和db：
+    # 测试：
+    url: jdbc:mysql://121.5.65.165:3306/test?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    # 正式：
+    # url: jdbc:mysql://124.222.58.152:3306/prod?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    #    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    loadbalancer:
+      ribbon:
+        # Ribbon处于维护模式，不要启用：
+        enabled: false
+    nacos:
+      discovery:
+        server-addr: 121.5.62.215:8848
+        # 指明本机IP注册到nacos：
+        # ip: 119.84.70.230
+
+# 自动登录qygly平台的设置：
+qygly:
+  ext-rest-helper:
+    # 启用FeignClient：
+    enable-feign-client: true
+    # 启用FeignClient的配置：
+    enable-feign-client-config: true
+    # 启用登录保持：
+    enable-login-keeper: true
+
+    # 设置登录保持的相关信息：
+    login-keeper:
+      userCode: admin
+      userMobile:
+      userEmail:
+      # 经RSA公钥加密后的用户密码：
+      # 密码123456、验证码7890对应的密码：
+      userPsd: Cyybrrs7bGko/drYdJtrkr6QtDdEuCw3Yqhr27h3yk1u9wjcuvyFr9IRYSuIQSFNX9DC71Ek6EJEIif+RMvTq4szxZ/Orj97Rk3bDBqFH1QTN9aRQxpzVRYLtfTo3UbUsMx4jbGeymHjUli+qTC5nlqQALYuGaUTNxjd9p+CkZQ=
+      valiCodeReqKey: ABCDEFGHIJKLMNOPQRSTUVWXYZ123456
+      valiCode: 7890
+      orgCode: test
+      keeperIntervalSeconds: 5
+    feign-client:
+      name:
+        qygly-login: qygly-all
+        qygly-dict: qygly-all
+        qygly-data: qygly-all
+        qygly-file: qygly-all
+
+flylog:
+  log_sent_mode: thrift
+  flume_agent: 10.100.7.219:4143
+  platform: gcxmxtxxxt
+  application: web
+  flume_batch_size: 1
+  sink_batch_size: 1
+  enabled: true
+  ignore:
+    static:
+      res: css,html,js,jpg,png,bmp,faicon,gif,ico,woff,otf,svg,ttf,woff2,eot,json
+  flume_data_path: E:/iflytek/dir/web
+
+
+logging:
+  #  config: classpath:/log4j-info.xml
+  level:
+    root: info
+    com.itcodai.course03.dao: trace
+
+# forest设置
+forest:
+  backend: httpclient
+  ## 日志总开关，打开/关闭Forest请求/响应日志（默认为 true）
+  log-enabled: true
+  ## 打开/关闭Forest请求日志（默认为 true）
+  log-request: true
+  ## 打开/关闭Forest响应状态日志（默认为 true）
+  log-response-status: true
+  ## 打开/关闭Forest响应内容日志（默认为 false）
+  log-response-content: true
+
+# 崖州湾统一登录认证平台配置
+yzbays:
+#  正式环境
+#  appId: 63622b9f2ae3ddbc4ebe2422
+#  appSecret: 2410a73f40869c27ab5af73e683bb5ff
+#  redirectUri: http://cpms.yazhou-bay.com:9099/pc/unifiedLogin
+#  domainName: https://xxxt.yzbays.com
+#  appClientId: yzb-xxxtxt
+#  appClientSecret: 48fce96b-1a97-4c40-bc8e-50c25b8396eb
+#  appTestDomainName: https://api.test.yzbays.com
+#  appProdDomainName: https://api.prod.yzbays.com
+
+#  测试环境
+  appId: 61efaced4141ed89deeecbdb
+  appSecret: db725e831f0acfccc13aade1d473e9dd
+  redirectUri: http://139.159.138.11:9090/pc/unifiedLogin
+  domainName: https://epms.yzbays.cn
+  appClientId: yzb-gcxxxt
+  appClientSecret: d44cc4fe-74ae-4f1e-a828-1b72042cfd36
+  appTestDomainName: https://api.test.yzbays.com
+  appProdDomainName: https://api.prod.yzbays.com
