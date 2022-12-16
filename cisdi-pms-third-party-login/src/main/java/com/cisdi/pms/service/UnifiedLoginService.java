@@ -63,10 +63,10 @@ public class UnifiedLoginService {
                                     //查询工程项目中的用户
                                     List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from ad_user where `CODE`=?", phoneNumber);
                                     if (CollectionUtils.isEmpty(list)) {
-                                        throw new BaseException("账户不存在，请联系管理员处理！");
+                                        throw new BaseException("账户不存在，请联系:周洲全（15002349596）处理！");
                                     } else {
                                         if (list.size() > 1) {
-                                            throw new BaseException("手机号为：" + phoneNumber + "存在多个，请联系管理员处理！");
+                                            throw new BaseException("手机号为：" + phoneNumber + "存在多个，请联系:周洲全（15002349596）处理！");
                                         } else {
                                             Map<String, Object> userData = list.get(0);
                                             info.thirdPartyUserId = JdbcMapUtil.getString(userData, "ID");
@@ -75,7 +75,7 @@ public class UnifiedLoginService {
                                         }
                                     }
                                 } else {
-                                    throw new BaseException("当前用户未绑定手机号码，无法进行身份确认！");
+                                    throw new BaseException("当前用户未绑定手机号码，无法进行身份确认！请联系:周洲全（15002349596）处理！");
                                 }
                             })
                             .onError((result, request, response) -> {
@@ -127,10 +127,10 @@ public class UnifiedLoginService {
                                             //查询工程项目中的用户
                                             List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from ad_user where `CODE`=?", phoneNumber);
                                             if (CollectionUtils.isEmpty(list)) {
-                                                throw new BaseException("账户不存在，请联系管理员处理！");
+                                                throw new BaseException("账户不存在，请联系:周洲全（15002349596）处理！");
                                             } else {
                                                 if (list.size() > 1) {
-                                                    throw new BaseException("手机号为：" + phoneNumber + "存在多个，请联系管理员处理！");
+                                                    throw new BaseException("手机号为：" + phoneNumber + "存在多个，请联系:周洲全（15002349596）处理！");
                                                 } else {
                                                     Map<String, Object> mapData = list.get(0);
                                                     info.thirdPartyUserId = JdbcMapUtil.getString(mapData, "ID");
@@ -139,7 +139,7 @@ public class UnifiedLoginService {
                                                 }
                                             }
                                         } else {
-                                            throw new BaseException("当前用户未绑定手机号码，无法进行身份确认！");
+                                            throw new BaseException("当前用户未绑定手机号码，无法进行身份确认！请联系:周洲全（15002349596）处理！");
                                         }
                                     } else {
                                         String userResultMsg = userJsonObject.getString("msg");
