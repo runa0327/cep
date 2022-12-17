@@ -111,10 +111,33 @@ public class AttLinkExt {
             return linkGUARANTEE_COST_TYPE_ID(myJdbcTemplate,attValue,entCode);
         } else if ("GUARANTEE_DATE_TYPE_ID".equals(attCode)){ //保函-到期类型
             return linkGUARANTEE_DATE_TYPE_ID(myJdbcTemplate,attValue,entCode);
+        } else if ("PO_ORDER_REQ_IDS".equals(attCode)){ //合同选择，多选
+            return linkPO_ORDER_REQ_IDS(myJdbcTemplate, attValue, sevId,entCode);
         } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
 
+    }
+
+    // 合同签订选择 多选 属性联动
+    private AttLinkResult linkPO_ORDER_REQ_IDS(MyJdbcTemplate myJdbcTemplate, String attValue, String sevId, String entCode) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        int len = attValue.split(",").length;
+        if (len == 1){
+           return linkForCONTRACT_ID(myJdbcTemplate, attValue, sevId,entCode);
+        } else {
+            //合同金额可改
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.DOUBLE;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToEditable = true;
+                linkedAtt.changeToMandatory = true;
+                attLinkResult.attMap.put("CONTRACT_AMOUNT",linkedAtt);
+            }
+        }
+        return attLinkResult;
     }
 
     // 保函-到期类型 属性联动
@@ -529,12 +552,15 @@ public class AttLinkExt {
             //系统(system)，非系统(non_system)
             Boolean CONTRACT_NAMEChangeToShown = false; //手填合同名称默认不隐藏
             Boolean CONTRACT_IDChangeToShown = false; //选择合同名称默认不隐藏
+            Boolean PO_ORDER_REQ_IDSChangeToShown = false; //选择合同名称默认不隐藏
 
             Boolean CONTRACT_NAMEChangeToMandatory = false; //手填合同名称默认非必填
             Boolean CONTRACT_IDChangeToMandatory = false; //选择合同名称默认非必填
+            Boolean PO_ORDER_REQ_IDSChangeToMandatory = false; //选择合同名称默认非必填
 
             Boolean CONTRACT_NAMEChangeToEditable = false; //手填合同名称默认不可改
             Boolean CONTRACT_IDChangeToEditable = false; //选择合同名称默认不可改
+            Boolean PO_ORDER_REQ_IDSChangeToEditable = false; //选择合同名称默认不可改
 
             Boolean CONTRACT_AMOUNTChangeToEditable = false; //合同金额默认不可改
             Boolean CONTRACT_AMOUNTChangeToMandatory = false; //合同金额默认非必填
@@ -547,8 +573,11 @@ public class AttLinkExt {
                 CONTRACT_AMOUNTChangeToMandatory = true;
             } else {
                 CONTRACT_IDChangeToShown = true;
+                PO_ORDER_REQ_IDSChangeToShown = true;
                 CONTRACT_IDChangeToMandatory = true;
+                PO_ORDER_REQ_IDSChangeToMandatory = true;
                 CONTRACT_IDChangeToEditable = true;
+                PO_ORDER_REQ_IDSChangeToEditable = true;
             }
             //合同名称
             {
@@ -567,9 +596,20 @@ public class AttLinkExt {
                 linkedAtt.value = null;
                 linkedAtt.text = null;
                 linkedAtt.changeToMandatory = CONTRACT_IDChangeToMandatory;
-                linkedAtt.changeToShown = CONTRACT_IDChangeToShown;
+//                linkedAtt.changeToShown = CONTRACT_IDChangeToShown;
+                linkedAtt.changeToShown = false;
                 linkedAtt.changeToEditable = CONTRACT_IDChangeToEditable;
                 attLinkResult.attMap.put("CONTRACT_ID", linkedAtt);
+            }
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToMandatory = PO_ORDER_REQ_IDSChangeToMandatory;
+                linkedAtt.changeToShown = PO_ORDER_REQ_IDSChangeToShown;
+                linkedAtt.changeToEditable = PO_ORDER_REQ_IDSChangeToEditable;
+                attLinkResult.attMap.put("PO_ORDER_REQ_IDS", linkedAtt);
             }
             //合同金额
             {
@@ -577,8 +617,10 @@ public class AttLinkExt {
                 linkedAtt.type = AttDataTypeE.TEXT_LONG;
                 linkedAtt.value = null;
                 linkedAtt.text = null;
-                linkedAtt.changeToMandatory = CONTRACT_AMOUNTChangeToMandatory;
-                linkedAtt.changeToEditable = CONTRACT_AMOUNTChangeToEditable;
+                linkedAtt.changeToMandatory = true;
+//                linkedAtt.changeToMandatory = CONTRACT_AMOUNTChangeToMandatory;
+                linkedAtt.changeToEditable = true;
+//                linkedAtt.changeToEditable = CONTRACT_AMOUNTChangeToEditable;
                 attLinkResult.attMap.put("CONTRACT_AMOUNT", linkedAtt);
             }
             return attLinkResult;
