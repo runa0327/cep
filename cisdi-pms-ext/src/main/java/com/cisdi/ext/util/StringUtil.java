@@ -24,4 +24,17 @@ public class StringUtil {
         String result = dateStr.replaceAll("T", " ");
         return result;
     }
+
+    /**
+     * 替换字符串中的某些符号
+     * @param oldStr 原字符串
+     * @param code 替换字符
+     * @return
+     */
+    public static String codeToUseSql(String oldStr, String code) {
+        if ("、".equals(code)){
+            oldStr = oldStr.replace("、","','");
+        }
+        return oldStr;
+    }
 }

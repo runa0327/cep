@@ -198,11 +198,19 @@ public class PmBuyDemandReqExt {
         if ("non_system".equals(projectTypeName)){
             //项目名称
             String projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
-            String sql1 = "select * from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?";
-            List<Map<String,Object>> existPrj = myJdbcTemplate.queryForList(sql1,projectName,projectTypeId);
-            if (!CollectionUtils.isEmpty(existPrj)){
-                throw new BaseException("非立项项目下,'"+projectName+" '项目已存在！");
+            String[] prjNameArr = projectName.split(",");
+            StringBuilder sb = new StringBuilder();
+            for (String tmp : prjNameArr) {
+                String sql1 = "select * from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?";
+                List<Map<String,Object>> existPrj = myJdbcTemplate.queryForList(sql1,tmp,projectTypeId);
+                if (!CollectionUtils.isEmpty(existPrj)){
+                    sb.append("非立项项目下,'"+tmp+" '项目已存在！").append("\n");
+                }
             }
+            if (sb.length() > 0){
+                throw new BaseException(sb.toString());
+            }
+
         }
     }
 
@@ -219,20 +227,32 @@ public class PmBuyDemandReqExt {
             String userId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_USER_ID");
             //项目名称
             String projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
+            String[] prjNameArr = projectName.split("、");
+            for (String tmp : prjNameArr) {
+                String sql1 = "select * from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?";
+                List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,tmp,projectType);
+                if (CollectionUtils.isEmpty(list1)){
+                    String prjId = Crud.from("pm_prj").insertData();
+                    myJdbcTemplate.update("update pm_prj set CRT_USER_ID = ?,STATUS = ?,NAME = ?,PROJECT_SOURCE_TYPE_ID = ? where id = ?",userId,"AP",tmp,projectType,prjId);
+                    String pmDeptId = Crud.from("pm_dept").insertData();
+                    myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?",prjId,deptId,userId,1,pmDeptId);
+                } else {
+                    String prjId = JdbcMapUtil.getString(list1.get(0),"id");
+                    String sql2 = "select * from pm_dept where PM_PRJ_ID=? and HR_DEPT_ID=? and status='ap'";
+                    List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,prjId,deptId);
+                    if (CollectionUtils.isEmpty(list2)){
+                        String pmDeptId = Crud.from("pm_dept").insertData();
+                        myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?",prjId,deptId,userId,1,pmDeptId);
+                    } else {
+                        String userIds = JdbcMapUtil.getString(list2.get(0),"USER_IDS");
+                        if (!userIds.contains(userId)){
+                            userIds = userIds+","+userId;
+                            myJdbcTemplate.update("update pm_dept set USER_IDS = ? where id = ?",userIds,JdbcMapUtil.getString(list2.get(0),"id"));
+                        }
+                    }
+                }
 
-            String sql1 = "select * from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?";
-            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectName,projectType);
-            if (!CollectionUtils.isEmpty(list1)){
-                throw new BaseException("非立项项目下,'"+projectName+" '项目已存在！");
             }
-            String prjId = Crud.from("pm_prj").insertData();
-            myJdbcTemplate.update("update pm_prj set CRT_USER_ID = ?,STATUS = ?,NAME = ?,PROJECT_SOURCE_TYPE_ID = ? where id = ?",userId,"AP",projectName,projectType,prjId);
-//            String sql2 = "insert into pm_prj(id,CRT_USER_ID,STATUS,NAME,PROJECT_SOURCE_TYPE_ID) values((select uuid_short()),?,'AP',?,?)";
-//            int update = myJdbcTemplate.update(sql2,userId,projectName,projectType);
-            String pmDeptId = Crud.from("pm_dept").insertData();
-            myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?",prjId,deptId,userId,1,pmDeptId);
-//            String sql3 = "insert into pm_dept(id,PM_PRJ_ID,HR_DEPT_ID,USER_IDS,ver) values((select uuid_short()),?,?,?,?)";
-//            myJdbcTemplate.update(sql3,prjId,deptId,userId,1);
         }
     }
 

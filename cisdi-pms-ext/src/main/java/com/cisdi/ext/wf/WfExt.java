@@ -3,6 +3,7 @@ package com.cisdi.ext.wf;
 import com.cisdi.ext.enums.FileCodeEnum;
 import com.cisdi.ext.model.PmFundReqPlan;
 import com.cisdi.ext.util.ProFileUtils;
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -111,10 +112,6 @@ public class WfExt {
                     // 补充合同批准后生成合同编号
                     if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode)) {
                         // 查询当前审批通过的补充合同数量和该合同的name
-//                        List<Map<String, Object>> map = myJdbcTemplate.queryForList("select count(*) as num from " +
-//                                "PO_ORDER_REQ where status = 'AP' ");
-//                        int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
-//                        String formatNum = formatCount.format(num);
 
                         String relationContractId = JdbcMapUtil.getString(valueMap,"RELATION_CONTRACT_ID");
                         String name = "";
@@ -288,6 +285,7 @@ public class WfExt {
                                 return;
                             } else {
                                 List<String> amtPrjList = getAmtPrjList();
+                                List<String> morePrj = getMorePrjList();
                                 if (amtPrjList.contains(entityCode)) {
                                     // 资金需求计划和付款申请项目\设计任务书名称使用的另外的字段
                                     update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
@@ -295,10 +293,17 @@ public class WfExt {
                                             ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.AMOUT_PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name," +
                                             "'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
                                 } else {
-                                    update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
-                                            ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
-                                            ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-', " +
-                                            "prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                                    if (morePrj.contains(entityCode)){
+                                        String projectName = getProjectName(myJdbcTemplate,entityRecord);
+                                        update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
+                                                ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
+                                                ".ENTITY_RECORD_ID=t.id and t.id=? set pi.name=concat( p.name,'-','"+projectName+"' ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                                    } else {
+                                        update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
+                                                ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
+                                                ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-',prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
+                                    }
+
                                 }
                             }
                             log.info("已更新：{}", update1);
@@ -317,6 +322,59 @@ public class WfExt {
                 }
             }
         }
+    }
+
+    // 获取发起流程时的项目名称
+    private String getProjectName(MyJdbcTemplate myJdbcTemplate, EntityRecord entityRecord) {
+        String projectName = "";
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        if (SharedUtil.isEmptyString(projectId)){
+            projectId = JdbcMapUtil.getString(entityRecord.valueMap,"AMOUT_PM_PRJ_ID");
+            if (SharedUtil.isEmptyString(projectId)){
+                projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
+            }
+        }
+        if (SharedUtil.isEmptyString(projectId)){
+            projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
+        } else {
+            projectId = projectId.replace(",","','");
+            String sql = "select GROUP_CONCAT(name SEPARATOR '-') as name from pm_prj where id in ('"+projectId+"')";
+            List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+            if (!CollectionUtils.isEmpty(list)){
+                projectName = JdbcMapUtil.getString(list.get(0),"name");
+            } else {
+                throw new BaseException("没有找到对应项目，请联系管理员处理");
+            }
+        }
+        return projectName;
+    }
+
+    // 获取项目id
+    private String getProjectId(Map<String, Object> valueMap) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String projectId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+        if (SharedUtil.isEmptyString(projectId)){
+            projectId = JdbcMapUtil.getString(valueMap,"AMOUT_PM_PRJ_ID");
+            if (SharedUtil.isEmptyString(projectId)){
+                projectId = JdbcMapUtil.getString(valueMap,"PM_PRJ_IDS");
+                if (SharedUtil.isEmptyString(projectId)){
+                    String projectName = JdbcMapUtil.getString(valueMap,"PROJECT_NAME_WR");
+                    if (!SharedUtil.isEmptyString(projectName)){
+                        projectName = StringUtil.codeToUseSql(projectName,"、");
+                        String sql = "select GROUP_CONCAT(id) as id from pm_prj where name in ('"+projectName+"')";
+                        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+                        if (!CollectionUtils.isEmpty(list)){
+                            projectId = JdbcMapUtil.getString(list.get(0),"id");
+                        } else {
+                            throw new BaseException("没有找到对应项目，请联系管理员处理！");
+                        }
+                    } else {
+                        throw new BaseException("项目名称不能为空，请核查项目名称信息或联系管理员处理！");
+                    }
+                }
+            }
+        }
+        return projectId;
     }
 
     // 根据长度自动拼接规则
@@ -1095,19 +1153,6 @@ public class WfExt {
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"FINANCIAL_REVIEW_FILE"),FileCodeEnum.FINANCIAL_REVIEW_FILE);
         }
 
-        //合同签订
-//        if ("BUDGET_MONEY_RATING".equals(entityCode)){
-//            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
-//            List<Map<String, Object>> fileIdMaps = getProcessFileGroupByNode(procInstId);
-//            //合同附件
-//            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.ATT_FILE_GROUP);
-//            fileIdMaps.forEach(fileIdMap -> {
-//                if ("99799190825103911".equals(JdbcMapUtil.getString(fileIdMap,"id"))){//
-//
-//                }
-//            });
-//
-//        }
         //工程付款申请
         if ("BUDGET_MONEY_RATING".equals(entityCode)){
             String prjId = JdbcMapUtil.getString(valueMap,"AMOUT_PM_PRJ_ID");
@@ -1136,13 +1181,18 @@ public class WfExt {
 
         //新增保函申请
         if ("PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entityCode)){
-            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
-            //保函正式合同
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.GUARANTEE_FORMAL_CONTRACT);
-            //正式保函
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"GUARANTEE_FILE"),FileCodeEnum.FORMAL_GUARANTEE);
-            //保函结果
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"GUARANTEE_RESULT_FILE"),FileCodeEnum.GUARANTEE_RESULT);
+            String projectId = getProjectId(valueMap);
+            String[] arr = projectId.split(",");
+            for (String tmp : arr) {
+                //保函正式合同
+                ProFileUtils.insertProFile(tmp,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.GUARANTEE_FORMAL_CONTRACT);
+                //正式保函
+                ProFileUtils.insertProFile(tmp,JdbcMapUtil.getString(valueMap,"GUARANTEE_FILE"),FileCodeEnum.FORMAL_GUARANTEE);
+                //保函结果
+                ProFileUtils.insertProFile(tmp,JdbcMapUtil.getString(valueMap,"GUARANTEE_RESULT_FILE"),FileCodeEnum.GUARANTEE_RESULT);
+            }
+//            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+
         }
 
         //保函退还申请
@@ -1388,8 +1438,6 @@ public class WfExt {
     private List<String> getNoProjectList(){
         List<String> list = new ArrayList<>();
         list.add("PM_SEND_APPROVAL_REQ"); // 发文呈批表
-//        list.add("PM_BID_KEEP_FILE_REQ"); // 招采项目备案及归档
-        list.add("PM_USE_CHAPTER_REQ"); // 中选单位及标后用印审批
         return list;
     }
 
@@ -1411,6 +1459,14 @@ public class WfExt {
         list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
         list.add("QUALITY_RECORD"); // 质量交底记录
         list.add("PM_SUPERVISE_NOTICE_REQ"); // 监理通知单
+        return list;
+    }
+
+    // 特殊流程，项目会多选
+    public List<String> getMorePrjList() {
+        List<String> list = new ArrayList<>();
+        list.add("PO_GUARANTEE_LETTER_REQUIRE_REQ"); //新增保函
+        list.add("PO_GUARANTEE_LETTER_RETURN_OA_REQ"); //保函退还申请(OA)
         return list;
     }
 }
