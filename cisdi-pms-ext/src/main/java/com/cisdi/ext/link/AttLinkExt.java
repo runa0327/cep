@@ -1758,7 +1758,7 @@ public class AttLinkExt {
                 String sql = "";
                 String fileValue = "";
                 if ("99952822476385257".equals(attValue)){
-                    sql = "select CONSTRUCTION_PROJECT_CODE as REPLY_NO_WR,REPLY_FILE as file from pm_prj_req WHERE PRJ_NAME = (select name from pm_prj WHERE id = ?) and `STATUS` = 'ap' order by CRT_DT desc limit 1";
+                    sql = "select PRJ_REPLY_NO as REPLY_NO_WR,REPLY_FILE as file from pm_prj_req WHERE PRJ_NAME = (select name from pm_prj WHERE id = ?) and `STATUS` = 'ap' order by CRT_DT desc limit 1";
                 } else if ("99952822476385258".equals(attValue)){
                     sql = "select REPLY_NO_WR,REPLY_FILE as file from PM_PRJ_INVEST1 WHERE pm_prj_id = ? and status = 'ap' order by CRT_DT desc limit 1";
                 } else if ("99952822476385259".equals(attValue)){
