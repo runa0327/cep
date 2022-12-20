@@ -160,4 +160,57 @@ public class PoOrderChangeReqExt {
                 .set("name",name)
                 .exec();
     }
+
+    /**
+     * 合同需求审批-法务财务拒绝
+     */
+    public void legalFinanceRefuse(){
+        String status = "legalFinanceRefuse";
+        flowAct(status);
+    }
+    /**
+     * 合同需求审批-法务拒绝
+     */
+    public void legalRefuse(){
+        String status = "legalRefuse";
+        flowAct(status);
+    }
+    /**
+     * 合同需求审批-财务拒绝
+     */
+    public void financeRefuse(){
+        String status = "financeRefuse";
+        flowAct(status);
+    }
+    /**
+     * 合同需求审批-律师拒绝
+     */
+    public void lawyerRefuse(){
+        String status = "lawyerRefuse";
+        flowAct(status);
+    }
+
+
+    private void flowAct(String status) {
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId;
+        if ("legalFinanceRefuse".equals(status)) {
+            Integer exec = Crud.from("PO_ORDER_CHANGE_REQ").where().eq("ID", csCommId).update()
+                    .set("APPROVAL_COMMENT_TWO", null).set("FILE_ID_THREE", null)
+                    .set("APPROVAL_COMMENT_THREE", null).set("FILE_ID_FOUR",null).exec();
+            log.info("已更新：{}", exec);
+        } else if ("legalRefuse".equals(status)){
+            Integer exec = Crud.from("PO_ORDER_CHANGE_REQ").where().eq("ID", csCommId).update()
+                    .set("APPROVAL_COMMENT_TWO", null).set("FILE_ID_THREE", null).exec();
+            log.info("已更新：{}", exec);
+        } else if ("financeRefuse".equals(status)){
+            Integer exec = Crud.from("PO_ORDER_CHANGE_REQ").where().eq("ID", csCommId).update()
+                    .set("APPROVAL_COMMENT_THREE", null).set("FILE_ID_FOUR",null).exec();
+            log.info("已更新：{}", exec);
+        } else if ("lawyerRefuse".equals(status)){
+            Integer exec = Crud.from("PO_ORDER_CHANGE_REQ").where().eq("ID", csCommId).update()
+                    .set("APPROVAL_COMMENT_ONE", null).set("FILE_ID_TWO",null).exec();
+            log.info("已更新：{}", exec);
+        }
+    }
 }
