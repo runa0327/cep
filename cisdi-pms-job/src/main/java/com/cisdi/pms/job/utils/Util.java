@@ -1,5 +1,6 @@
 package com.cisdi.pms.job.utils;
 
+import cn.hutool.core.util.IdUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,6 +16,7 @@ public class Util {
             throw new BaseException("实体" + entCode + "对应的NEW_ID_SQL不能为空！");
         } else {
             String new_id_sql = map.get("NEW_ID_SQL").toString();
+            new_id_sql = new_id_sql.replaceAll("(?i)@NEWID", wrapString(IdUtil.getSnowflakeNextIdStr(), true));
             if (SharedUtil.isEmptyObject(map.get("INSERT_DATA_SQL"))) {
                 throw new BaseException("实体" + entCode + "对应的INSERT_DATA_SQL不能为空！");
             } else {
@@ -30,7 +32,7 @@ public class Util {
                 if (SharedUtil.isEmptyString(newIdStr)) {
                     throw new BaseException("实体" + entCode + "新的ID不能为空！");
                 } else {
-                    jdbcTemplate.update(insert_data_sql, new Object[]{newIdStr});
+                    jdbcTemplate.update(insert_data_sql, newIdStr);
                     return newIdStr;
                 }
             }
@@ -38,13 +40,21 @@ public class Util {
     }
 
     private static Map<String, Object> getEntSql(JdbcTemplate jdbcTemplate, String entCode) {
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select t.NEW_ID_SQL,t.INSERT_DATA_SQL,t.NEW_DATA_SQL from ad_ent_sql t where t.code=?", new Object[]{entCode});
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select t.NEW_ID_SQL,t.INSERT_DATA_SQL,t.NEW_DATA_SQL from ad_ent_sql t where t.code=?", entCode);
         if (list.size() > 1) {
             throw new BaseException("实体" + entCode + "不能对应多条AD_ENT_SQL的记录！");
         } else if (list.size() == 0) {
             throw new BaseException("实体" + entCode + "没有对应的AD_ENT_SQL的记录！");
         } else {
-            return (Map) list.get(0);
+            return list.get(0);
+        }
+    }
+
+    private static String wrapString(String s, boolean escape) {
+        if (s == null) {
+            return "null";
+        } else {
+            return escape ? "'" + s.replaceAll("'", "''") + "'" : s;
         }
     }
 }
