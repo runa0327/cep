@@ -67,5 +67,8 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("PM_FILE_CHAPTER_REQ_ID"); // 关联标前资料用印审批
         entityRecord.extraEditableAttCodeList.add("PM_PRJ_ID"); // 项目id
         entityRecord.extraEditableAttCodeList.add("PROJECT_NAME_WR"); // 项目名称
+        entityRecord.extraEditableAttCodeList.add("CONTRACT_NAME"); // 合同名称
+        entityRecord.extraEditableAttCodeList.add("CONTRACT_ID"); // 合同名称
+        entityRecord.extraEditableAttCodeList.add("PO_ORDER_REQ_IDS"); // 合同名称
     }
 }
