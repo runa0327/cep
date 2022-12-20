@@ -84,7 +84,8 @@ public class PoContractReqExt {
         String procInstId = ExtJarHelper.procInstId.get();
         // 审批意见
         String sql = "select tk.USER_COMMENT,tk.USER_ATTACHMENT " +
-                "from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id" +
+                "from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id and tk.status='ap' " +
+                "join ad_user u on tk.ad_user_id=u.id" +
                 " where u.id = ?";
         List<Map<String, Object>> commentFileList = myJdbcTemplate.queryForList(sql, procInstId,userId);
 
