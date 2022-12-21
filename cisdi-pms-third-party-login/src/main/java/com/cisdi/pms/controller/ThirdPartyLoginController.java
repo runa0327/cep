@@ -47,12 +47,12 @@ public class ThirdPartyLoginController {
         String loginType = requestBody.loginType;
         ThirdPartyLoginCodeValidationRespBody responseBody = new ThirdPartyLoginCodeValidationRespBody();
         responseBody.succ = false;
-        if ("YZW".equals(loginThirdParty)) {
+        if ("YZW".equalsIgnoreCase(loginThirdParty)) {
             ThirdPartyUserInfo thirdPartyUserInfo = new ThirdPartyUserInfo();
             thirdPartyUserInfo.thirdParty = loginThirdParty;
-            if ("PC".equals(loginType)) {
+            if ("PC".equalsIgnoreCase(loginType)) {
                 thirdPartyUserInfo = loginService.UnifiedLogin(loginCode);
-            } else if ("APP".equals(loginType)) {
+            } else if ("APP".equalsIgnoreCase(loginType)) {
                 thirdPartyUserInfo = loginService.UnifiedAppLogin(loginCode, loginExtraInfo);
             }
             if (thirdPartyUserInfo != null) {
