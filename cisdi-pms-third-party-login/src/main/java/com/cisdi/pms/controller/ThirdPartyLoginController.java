@@ -43,6 +43,7 @@ public class ThirdPartyLoginController {
         responseBody.succ = false;
         if ("YZW".equals(loginThirdParty)) {
             ThirdPartyUserInfo thirdPartyUserInfo = new ThirdPartyUserInfo();
+            thirdPartyUserInfo.thirdParty = loginThirdParty;
             if ("PC".equals(loginType)) {
                 thirdPartyUserInfo = loginService.UnifiedLogin(loginCode);
             } else if ("APP".equals(loginType)) {

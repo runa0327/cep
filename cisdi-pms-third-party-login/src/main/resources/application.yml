@@ -96,21 +96,21 @@ forest:
 # 崖州湾统一登录认证平台配置
 yzbays:
 #  正式环境
-#  appId: 63622b9f2ae3ddbc4ebe2422
-#  appSecret: 2410a73f40869c27ab5af73e683bb5ff
-#  redirectUri: http://cpms.yazhou-bay.com:9099/pc/unifiedLogin
-#  domainName: https://xxxt.yzbays.com
-#  appClientId: yzb-xxxtxt
-#  appClientSecret: 48fce96b-1a97-4c40-bc8e-50c25b8396eb
-#  appTestDomainName: https://api.test.yzbays.com
-#  appProdDomainName: https://api.prod.yzbays.com
-
-#  测试环境
-  appId: 61efaced4141ed89deeecbdb
-  appSecret: db725e831f0acfccc13aade1d473e9dd
-  redirectUri: http://139.159.138.11:9090/pc/unifiedLogin
-  domainName: https://epms.yzbays.cn
-  appClientId: yzb-gcxxxt
-  appClientSecret: d44cc4fe-74ae-4f1e-a828-1b72042cfd36
+  appId: 63622b9f2ae3ddbc4ebe2422
+  appSecret: 2410a73f40869c27ab5af73e683bb5ff
+  redirectUri: http://cpms.yazhou-bay.com:9099/pc/unifiedLogin
+  domainName: https://xxxt.yzbays.com
+  appClientId: yzb-xxxtxt
+  appClientSecret: 48fce96b-1a97-4c40-bc8e-50c25b8396eb
   appTestDomainName: https://api.test.yzbays.com
   appProdDomainName: https://api.prod.yzbays.com
+
+#  测试环境
+#  appId: 61efaced4141ed89deeecbdb
+#  appSecret: db725e831f0acfccc13aade1d473e9dd
+#  redirectUri: http://139.159.138.11:9090/pc/unifiedLogin
+#  domainName: https://epms.yzbays.cn
+#  appClientId: yzb-gcxxxt
+#  appClientSecret: d44cc4fe-74ae-4f1e-a828-1b72042cfd36
+#  appTestDomainName: https://api.test.yzbays.com
+#  appProdDomainName: https://api.prod.yzbays.com

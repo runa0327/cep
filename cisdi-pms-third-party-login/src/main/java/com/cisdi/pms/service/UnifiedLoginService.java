@@ -30,9 +30,6 @@ public class UnifiedLoginService {
     @Resource
     private UnifiedLoginConfig unifiedLoginConfig;
 
-    @Autowired
-    private JdbcTemplate myJdbcTemplate;
-
 
     /**
      * 统一身份认证登录
@@ -60,20 +57,7 @@ public class UnifiedLoginService {
                                 // 通过手机号匹配当前系统用户
                                 String phoneNumber = userJsonObject.getString("phone_number");
                                 if (StringUtils.isNotBlank(phoneNumber)) {
-                                    //查询工程项目中的用户
-                                    List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from ad_user where `CODE`=?", phoneNumber);
-                                    if (CollectionUtils.isEmpty(list)) {
-                                        throw new BaseException("账户不存在，请联系:周洲全（15002349596）处理！");
-                                    } else {
-                                        if (list.size() > 1) {
-                                            throw new BaseException("手机号为：" + phoneNumber + "存在多个，请联系:周洲全（15002349596）处理！");
-                                        } else {
-                                            Map<String, Object> userData = list.get(0);
-                                            info.thirdPartyUserId = JdbcMapUtil.getString(userData, "ID");
-                                            info.thirdPartyUserCode = phoneNumber;
-                                            info.thirdPartyUserNickName = JdbcMapUtil.getString(userData, "NAME");
-                                        }
-                                    }
+                                    info.thirdPartyUserCode = phoneNumber;
                                 } else {
                                     throw new BaseException("当前用户未绑定手机号码，无法进行身份确认！请联系:周洲全（15002349596）处理！");
                                 }
@@ -124,20 +108,7 @@ public class UnifiedLoginService {
                                         // 通过手机号匹配当前系统用户
                                         String phoneNumber = userData.getString("phone");
                                         if (StringUtils.isNotBlank(phoneNumber)) {
-                                            //查询工程项目中的用户
-                                            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from ad_user where `CODE`=?", phoneNumber);
-                                            if (CollectionUtils.isEmpty(list)) {
-                                                throw new BaseException("账户不存在，请联系:周洲全（15002349596）处理！");
-                                            } else {
-                                                if (list.size() > 1) {
-                                                    throw new BaseException("手机号为：" + phoneNumber + "存在多个，请联系:周洲全（15002349596）处理！");
-                                                } else {
-                                                    Map<String, Object> mapData = list.get(0);
-                                                    info.thirdPartyUserId = JdbcMapUtil.getString(mapData, "ID");
-                                                    info.thirdPartyUserCode = phoneNumber;
-                                                    info.thirdPartyUserNickName = JdbcMapUtil.getString(mapData, "NAME");
-                                                }
-                                            }
+                                            info.thirdPartyUserCode = phoneNumber;
                                         } else {
                                             throw new BaseException("当前用户未绑定手机号码，无法进行身份确认！请联系:周洲全（15002349596）处理！");
                                         }
