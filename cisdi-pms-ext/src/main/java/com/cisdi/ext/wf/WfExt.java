@@ -240,6 +240,9 @@ public class WfExt {
                                     if (!CollectionUtils.isEmpty(list)){
                                         otherName = JdbcMapUtil.getString(list.get(0),"name");
                                     }
+                                    if (SharedUtil.isEmptyString(projectName)){
+                                        projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
+                                    }
                                     name = concatProcessName("-",processName,projectName,otherName,userName,nowDate);
                                 } else if ("PO_ORDER_REQ".equals(entityCode)){ //合同签订
                                     sql = "select CONTRACT_NAME from PO_ORDER_REQ where id = ?";
