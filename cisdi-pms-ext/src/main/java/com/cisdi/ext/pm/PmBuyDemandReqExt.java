@@ -15,9 +15,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 采购需求审批 扩展
@@ -227,8 +225,14 @@ public class PmBuyDemandReqExt {
             String userId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_USER_ID");
             //项目名称
             String projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
-            String[] prjNameArr = projectName.split("、");
-            for (String tmp : prjNameArr) {
+            List<String> prjNameList = new ArrayList<>();
+            int index = projectName.indexOf("、");
+            if (index == -1){
+                prjNameList.add(projectName);
+            } else {
+                prjNameList = Arrays.asList(projectName.split("、"));
+            }
+            for (String tmp : prjNameList) {
                 String sql1 = "select * from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?";
                 List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,tmp,projectType);
                 if (CollectionUtils.isEmpty(list1)){
