@@ -4,6 +4,7 @@ import com.cisdi.ext.enums.FileCodeEnum;
 import com.cisdi.ext.model.PmFundReqPlan;
 import com.cisdi.ext.util.ProFileUtils;
 import com.cisdi.ext.util.StringUtil;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -160,6 +161,19 @@ public class WfExt {
                                     "set a.name = concat(b.name,'-',d.name,'-',e.name,'-',now()) where c.id = ?";
                             int update1 = myJdbcTemplate.update(sql, csCommId);
                             update1 = myJdbcTemplate.update("update pm_bid_keep_file_req a LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id set a.name = b.name where a.id = ?",csCommId);
+                        } else if ("BID_PROCESS_MANAGE".equals(entityCode)){
+                            String sysPrjSql = "update wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id LEFT JOIN BID_PROCESS_MANAGE c on a.id = c.LK_WF_INST_ID " +
+                                    "LEFT JOIN pm_prj d on c.PM_PRJ_ID = d.id LEFT JOIN ad_user e on c.CRT_USER_ID = e.id " +
+                                    "set a.name = concat(b.name,'-',d.name,'-',e.name,'-',now()) where c.id = ?";
+                            String notSysPrjSql = "update wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id LEFT JOIN BID_PROCESS_MANAGE c on a.id = c.LK_WF_INST_ID " +
+                                    "LEFT JOIN ad_user e on c.CRT_USER_ID = e.id " +
+                                    "set a.name = concat(b.name,'-',?,'-',e.name,'-',now()) where c.id = ?";
+                            String notSysPrj = JdbcMapUtil.getString(entityRecord.valueMap, "PROJECT_NAME_WR");
+                            if (Strings.isNullOrEmpty(notSysPrj)){
+                                myJdbcTemplate.update(sysPrjSql,csCommId);
+                            }else {
+                                myJdbcTemplate.update(notSysPrjSql,notSysPrj,csCommId);
+                            }
                         } else {
                             String sql1 = "select a.NAME from wf_process_instance a left join " + entityCode + " b on a.id = b.LK_WF_INST_ID where " +
                                     "b.id = ?";
@@ -1342,6 +1356,7 @@ public class WfExt {
         list.add("SUBCONTRACTOR_QUALIFICATION_REPORT"); // 分包单位资质报审
         list.add("PM_PRJ_RESTART_ORDER_REQ"); // 工程复工令
         list.add("PM_PRJ_RESTART_TRIAL_REQ"); // 工程复工报审表
+        list.add("BID_PROCESS_MANAGE"); // 招标过程管理
         return list;
     }
 
