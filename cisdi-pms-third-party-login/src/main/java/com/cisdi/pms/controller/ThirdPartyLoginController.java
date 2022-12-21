@@ -37,6 +37,9 @@ public class ThirdPartyLoginController {
     public ThirdPartyLoginCodeValidationRespBody validate(@RequestBody ThirdPartyLoginCodeValidationReqBody requestBody) {
 
         log.info("请求：" + JSON.toJSONString(requestBody));
+        // if ("1".equalsIgnoreCase("1")) {
+        //     return null;
+        // }
 
         if (requestBody == null) {
             throw new BaseException("参数为空！");
@@ -47,18 +50,20 @@ public class ThirdPartyLoginController {
         String loginType = requestBody.loginType;
         ThirdPartyLoginCodeValidationRespBody responseBody = new ThirdPartyLoginCodeValidationRespBody();
         responseBody.succ = false;
-        if ("YZW".equals(loginThirdParty)) {
+        if ("YZW".equalsIgnoreCase(loginThirdParty)) {
             ThirdPartyUserInfo thirdPartyUserInfo = new ThirdPartyUserInfo();
             thirdPartyUserInfo.thirdParty = loginThirdParty;
-            if ("PC".equals(loginType)) {
+            if ("PC".equalsIgnoreCase(loginType)) {
                 thirdPartyUserInfo = loginService.UnifiedLogin(loginCode);
-            } else if ("APP".equals(loginType)) {
+            } else if ("APP".equalsIgnoreCase(loginType)) {
                 thirdPartyUserInfo = loginService.UnifiedAppLogin(loginCode, loginExtraInfo);
             }
             if (thirdPartyUserInfo != null) {
                 responseBody.succ = true;
                 responseBody.data = thirdPartyUserInfo;
             }
+        } else {
+            throw new BaseException(BaseException.EXP_MSG_Unkown_Enum + loginThirdParty);
         }
 
         log.info("响应：" + JSON.toJSONString(responseBody));
