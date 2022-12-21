@@ -1,10 +1,12 @@
 package com.cisdi.pms.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.cisdi.pms.service.UnifiedLoginService;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.ThirdPartyUserInfo;
 import com.qygly.shared.interaction.external.ThirdPartyLoginCodeValidationReqBody;
 import com.qygly.shared.interaction.external.ThirdPartyLoginCodeValidationRespBody;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2022/12/16
  */
 @RestController
+@Slf4j
 public class ThirdPartyLoginController {
     @Autowired
     private UnifiedLoginService loginService;
@@ -32,6 +35,9 @@ public class ThirdPartyLoginController {
      */
     @PostMapping("validateCode")
     public ThirdPartyLoginCodeValidationRespBody validate(@RequestBody ThirdPartyLoginCodeValidationReqBody requestBody) {
+
+        log.info("请求：" + JSON.toJSONString(requestBody));
+
         if (requestBody == null) {
             throw new BaseException("参数为空！");
         }
@@ -54,11 +60,14 @@ public class ThirdPartyLoginController {
                 responseBody.data = thirdPartyUserInfo;
             }
         }
+
+        log.info("响应：" + JSON.toJSONString(responseBody));
+
         return responseBody;
     }
 
     @GetMapping("test")
-    public String test(){
+    public String test() {
         return "测试！";
     }
 }
