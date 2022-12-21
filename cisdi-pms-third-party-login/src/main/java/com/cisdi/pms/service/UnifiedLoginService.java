@@ -85,7 +85,7 @@ public class UnifiedLoginService {
     public ThirdPartyUserInfo UnifiedAppLogin(String code, String userId) {
         ThirdPartyUserInfo info = new ThirdPartyUserInfo();
         // 获取token
-        Forest.post(unifiedLoginConfig.getAppProdDomainName() + "/ext/api/getToken")
+        Forest.post(unifiedLoginConfig.getAppDomainName() + "/ext/api/getToken")
                 .setConnectTimeout(10000)
                 .addBody("clientId", unifiedLoginConfig.getAppClientId())
                 .addBody("clientSecret", unifiedLoginConfig.getAppClientSecret())
@@ -96,7 +96,7 @@ public class UnifiedLoginService {
                     if (StringUtils.isNotBlank(resultCode) && "200".equals(resultCode)) {
                         String accessToken = tokenJsonObject.getJSONObject("data").getString("accessToken");
                         // 使用access_token换取用户信息
-                        Forest.post(unifiedLoginConfig.getAppProdDomainName() + "/ext/enterprise/user/info/get")
+                        Forest.post(unifiedLoginConfig.getAppDomainName() + "/ext/enterprise/user/info/get")
                                 .setConnectTimeout(5000)
                                 .addHeader("x-yzb-token", accessToken)
                                 .addQuery("userId", userId)

@@ -53,8 +53,7 @@ yzbays:
   domainName: https://xxxt.yzbays.com
   appClientId: yzb-xxxtxt
   appClientSecret: 48fce96b-1a97-4c40-bc8e-50c25b8396eb
-  appTestDomainName: https://api.test.yzbays.com
-  appProdDomainName: https://api.prod.yzbays.com
+  appDomainName: https://api.prod.yzbays.com
 
 #  测试环境
 #  appId: 61efaced4141ed89deeecbdb
@@ -63,5 +62,4 @@ yzbays:
 #  domainName: https://epms.yzbays.cn
 #  appClientId: yzb-gcxxxt
 #  appClientSecret: d44cc4fe-74ae-4f1e-a828-1b72042cfd36
-#  appTestDomainName: https://api.test.yzbays.com
-#  appProdDomainName: https://api.prod.yzbays.com
+#  appDomainName: https://api.test.yzbays.com

@@ -11,29 +11,40 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "yzbays")
 public class UnifiedLoginConfig {
 
-    /** 分配应用App ID */
+    /**
+     * 分配应用App ID
+     */
     private String appId;
 
-    /** 分配应用App Secret */
+    /**
+     * 分配应用App Secret
+     */
     private String appSecret;
 
-    /** 用户登录/登出回调地址 */
+    /**
+     * 用户登录/登出回调地址
+     */
     private String redirectUri;
 
-    /** 分配应用业务域名 */
+    /**
+     * 分配应用业务域名
+     */
     private String domainName;
 
-    /** APP应用ID */
+    /**
+     * APP应用ID
+     */
     private String appClientId;
 
-    /** APP应用secret */
+    /**
+     * APP应用secret
+     */
     private String appClientSecret;
 
-    /** APP测试环境域名 */
-    private String appTestDomainName;
-
-    /** APP生产环境域名 */
-    private String appProdDomainName;
+    /**
+     * APP环境域名
+     */
+    private String appDomainName;
 
     public String getAppId() {
         return appId;
@@ -83,19 +94,12 @@ public class UnifiedLoginConfig {
         this.appClientSecret = appClientSecret;
     }
 
-    public String getAppTestDomainName() {
-        return appTestDomainName;
+    public String getAppDomainName() {
+        return appDomainName;
     }
 
-    public void setAppTestDomainName(String appTestDomainName) {
-        this.appTestDomainName = appTestDomainName;
+    public void setAppDomainName(String appDomainName) {
+        this.appDomainName = appDomainName;
     }
 
-    public String getAppProdDomainName() {
-        return appProdDomainName;
-    }
-
-    public void setAppProdDomainName(String appProdDomainName) {
-        this.appProdDomainName = appProdDomainName;
-    }
 }
