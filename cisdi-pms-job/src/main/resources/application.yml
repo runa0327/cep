@@ -108,7 +108,7 @@ dealt_work_job:
     path: https://portal.test.yzbays.cn
   response:
     hearder_parame: A2VvMvqa9+swnBswZ/ZB+Vj2TiqCzv3ouY1/xymoAgU=
-  callback_url: http://cpms.yazhou-bay.com:9099/
+  callback_url: http://139.159.138.11:9090/pc/unifiedLogin?redirect=/pc/process&activeName=2
   app_name: "工程项目信息协同系统"
 #  ture： 真实电话   false： 测试电话
   phone_switch: false
