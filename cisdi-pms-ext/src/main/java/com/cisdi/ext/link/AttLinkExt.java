@@ -4802,6 +4802,7 @@ public class AttLinkExt {
         list.add("PM_BID_KEEP_FILE_REQ"); //招采项目备案及归档
         list.add("PO_GUARANTEE_LETTER_RETURN_OA_REQ"); //保函退还申请(OA)
         list.add("BID_PROCESS_MANAGE"); //招标过程管理
+        list.add("PO_ORDER_CHANGE_REQ"); //合同需求审批
         return list;
     }
 }
