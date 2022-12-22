@@ -624,7 +624,7 @@ public class AttLinkExt {
                 attLinkResult.attMap.put("CONTRACT_AMOUNT", linkedAtt);
             }
             return attLinkResult;
-        } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 补充协议
+        } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "PO_ORDER_CHANGE_REQ".equals(entCode)){ //采购合同签订申请 补充协议
             //系统(system)，非系统(non_system)
             attLinkResult = autoLinkProject(attValue,code);
             attLinkResult = autoLinkPrjDetail(attLinkResult,attValue,code);

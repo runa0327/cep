@@ -293,6 +293,19 @@ public class WfExt {
                                 }
                                 update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id and t.id = ? set pi.name = ? where t.id",csCommId,name);
                                 return;
+                            } else if ("PO_ORDER_CHANGE_REQ".equals(entityCode)){
+                                String sysPrjSql = "update wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id LEFT JOIN PO_ORDER_CHANGE_REQ c on a.id = c.LK_WF_INST_ID " +
+                                        "LEFT JOIN pm_prj d on c.PM_PRJ_ID = d.id LEFT JOIN ad_user e on c.CRT_USER_ID = e.id " +
+                                        "set a.name = concat(b.name,'-',d.name,'-',e.name,'-',now()) where c.id = ?";
+                                String notSysPrjSql = "update wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id LEFT JOIN PO_ORDER_CHANGE_REQ c on a.id = c.LK_WF_INST_ID " +
+                                        "LEFT JOIN ad_user e on c.CRT_USER_ID = e.id " +
+                                        "set a.name = concat(b.name,'-',?,'-',e.name,'-',now()) where c.id = ?";
+                                String notSysPrj = JdbcMapUtil.getString(entityRecord.valueMap, "PROJECT_NAME_WR");
+                                if (Strings.isNullOrEmpty(notSysPrj)){
+                                    myJdbcTemplate.update(sysPrjSql,csCommId);
+                                }else {
+                                    myJdbcTemplate.update(notSysPrjSql,notSysPrj,csCommId);
+                                }
                             } else if (noProjectList.contains(entityCode)){
                                 update1 = myJdbcTemplate.update("UPDATE wf_process_instance pi " +
                                         "JOIN wf_process p ON pi.WF_PROCESS_ID = p.id " +
