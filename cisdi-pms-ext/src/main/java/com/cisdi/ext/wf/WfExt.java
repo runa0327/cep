@@ -2,6 +2,7 @@ package com.cisdi.ext.wf;
 
 import com.cisdi.ext.enums.FileCodeEnum;
 import com.cisdi.ext.model.PmFundReqPlan;
+import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.util.ProFileUtils;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
@@ -1391,7 +1392,7 @@ public class WfExt {
         String PROJECT_SOURCE_TYPE_ID = JdbcMapUtil.getString(valueMap,"PROJECT_SOURCE_TYPE_ID");
         List<Map<String,Object>> list = myJdbcTemplate.queryForList("select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?",name,PROJECT_SOURCE_TYPE_ID);
         if (CollectionUtils.isEmpty(list)){
-            return null;
+            return PmPrjReqExt.getPrjId(valueMap);
         } else {
             return JdbcMapUtil.getString(list.get(0),"id");
         }
