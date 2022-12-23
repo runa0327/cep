@@ -393,4 +393,45 @@ public class PmBuyDemandReqExt {
                 .exec();
 
     }
+
+    /**
+     * 采购需求审批-历史数据-流程实例名称更新
+     */
+    public void updateHistoryName(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql = "select * from PM_BUY_DEMAND_REQ where PROJECT_SOURCE_TYPE_ID = '0099952822476441375' and CRT_DT <= '2022-12-21 21:00:00' and name is not null";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        if (!CollectionUtils.isEmpty(list)){
+            for (Map<String, Object> tmp : list) {
+                //获取id
+                String id = JdbcMapUtil.getString(tmp,"id");
+                //获取项目类型
+                String prjType = JdbcMapUtil.getString(tmp,"PROJECT_SOURCE_TYPE_ID");
+                if ("0099952822476441375".equals(prjType)){
+                    //获取流程标题
+                    String name = JdbcMapUtil.getString(tmp,"name");
+                    //获取项目名称
+                    String prjName = JdbcMapUtil.getString(tmp,"PROJECT_NAME_WR");
+                    String name1 = "采购需求审批-";
+                    //获取采购事项
+                    String name3 = JdbcMapUtil.getString(tmp,"BUY_MATTER_ID");
+                    String sql2 = "select name from gr_set_value where id = ?";
+                    List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,name3);
+                    name3 = list2.get(0).get("name").toString();
+                    //根据id查询发起人、发起时间
+                    String sql3 = "select a.START_DATETIME,c.name from wf_process_instance a left JOIN pm_buy_demand_req b on a.id = b.LK_WF_INST_ID left join ad_user c on a.START_USER_ID = c.id where b.id = ?";
+                    List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sql3,id);
+                    String name4 = list3.get(0).get("name").toString();
+                    String name5 = list3.get(0).get("START_DATETIME").toString().replace("T"," ");
+                    String trueName = name1 + prjName + "-" + name3 + "-" + name4 + "-" + name5;
+                    //更新名称
+                    int update1 = myJdbcTemplate.update("update PM_BUY_DEMAND_REQ set name = ? where id = ?",trueName,id);
+                    //更新流程实例名称
+                    //获取流程实例id
+                    String processInstanceId = JdbcMapUtil.getString(tmp,"LK_WF_INST_ID");
+                    int update2 = myJdbcTemplate.update("update wf_process_instance set name = ? where id = ?",trueName,processInstanceId);
+                }
+            }
+        }
+    }
 }
