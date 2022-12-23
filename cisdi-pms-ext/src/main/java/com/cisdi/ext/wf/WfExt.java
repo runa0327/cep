@@ -389,19 +389,7 @@ public class WfExt {
             if (SharedUtil.isEmptyString(projectId)){
                 projectId = JdbcMapUtil.getString(valueMap,"PM_PRJ_IDS");
                 if (SharedUtil.isEmptyString(projectId)){
-                    String projectName = JdbcMapUtil.getString(valueMap,"PROJECT_NAME_WR");
-                    if (!SharedUtil.isEmptyString(projectName)){
-                        projectName = StringUtil.codeToUseSql(projectName,"、");
-                        String sql = "select GROUP_CONCAT(id) as id from pm_prj where name in ('"+projectName+"')";
-                        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
-                        if (!CollectionUtils.isEmpty(list)){
-                            projectId = JdbcMapUtil.getString(list.get(0),"id");
-                        } else {
-                            throw new BaseException("没有找到对应项目，请联系管理员处理！");
-                        }
-                    } else {
-                        throw new BaseException("项目名称不能为空，请核查项目名称信息或联系管理员处理！");
-                    }
+                    projectId = PmPrjReqExt.getPrjIdNew(valueMap);
                 }
             }
         }
@@ -483,23 +471,24 @@ public class WfExt {
 
         //合同签订
         if ("PO_ORDER_REQ".equals(entityCode)){
-            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
-            if (SharedUtil.isEmptyString(prjId)){
-                prjId = this.getWritePrjId(valueMap);
+            String projectId = getProjectId(valueMap);
+            String[] arr = projectId.split(",");
+            for (String tmp : arr) {
+                String ATT_FILE_GROUP_ID = JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID");
+                String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
+                String FILE_ID_THREE = JdbcMapUtil.getString(valueMap, "FILE_ID_THREE");
+                String FILE_ID_FOUR = JdbcMapUtil.getString(valueMap, "FILE_ID_FOUR");
+                String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
+                String FILE_ID_FIVE = JdbcMapUtil.getString(valueMap, "FILE_ID_FIVE");
+                // 附件
+                ProFileUtils.insertProFile(tmp, ATT_FILE_GROUP_ID,FileCodeEnum.PO_ORDER_REQ_ATT_FILE_GROUP_ID);
+                ProFileUtils.insertProFile(tmp, FILE_ID_TWO,FileCodeEnum.PO_ORDER_REQ_FILE_ID_TWO);
+                ProFileUtils.insertProFile(tmp, FILE_ID_THREE,FileCodeEnum.PO_ORDER_REQ_FILE_ID_THREE);
+                ProFileUtils.insertProFile(tmp, FILE_ID_FOUR,FileCodeEnum.PO_ORDER_REQ_FILE_ID_FOUR);
+                ProFileUtils.insertProFile(tmp, FILE_ID_ONE,FileCodeEnum.PO_ORDER_REQ_FILE_ID_ONE);
+                ProFileUtils.insertProFile(tmp, FILE_ID_FIVE,FileCodeEnum.PO_ORDER_REQ_FILE_ID_FIVE);
             }
-            String ATT_FILE_GROUP_ID = JdbcMapUtil.getString(valueMap, "ATT_FILE_GROUP_ID");
-            String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
-            String FILE_ID_THREE = JdbcMapUtil.getString(valueMap, "FILE_ID_THREE");
-            String FILE_ID_FOUR = JdbcMapUtil.getString(valueMap, "FILE_ID_FOUR");
-            String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
-            String FILE_ID_FIVE = JdbcMapUtil.getString(valueMap, "FILE_ID_FIVE");
-            // 附件
-            ProFileUtils.insertProFile(prjId, ATT_FILE_GROUP_ID,FileCodeEnum.PO_ORDER_REQ_ATT_FILE_GROUP_ID);
-            ProFileUtils.insertProFile(prjId, FILE_ID_TWO,FileCodeEnum.PO_ORDER_REQ_FILE_ID_TWO);
-            ProFileUtils.insertProFile(prjId, FILE_ID_THREE,FileCodeEnum.PO_ORDER_REQ_FILE_ID_THREE);
-            ProFileUtils.insertProFile(prjId, FILE_ID_FOUR,FileCodeEnum.PO_ORDER_REQ_FILE_ID_FOUR);
-            ProFileUtils.insertProFile(prjId, FILE_ID_ONE,FileCodeEnum.PO_ORDER_REQ_FILE_ID_ONE);
-            ProFileUtils.insertProFile(prjId, FILE_ID_FIVE,FileCodeEnum.PO_ORDER_REQ_FILE_ID_FIVE);
+
         }
 
         //施工通知单
@@ -594,32 +583,24 @@ public class WfExt {
 
         //采购需求审批
         if ("PM_BUY_DEMAND_REQ".equals(entityCode)) {
-            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
-            if(SharedUtil.isEmptyString(prjId)){
-//                MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-//                String name = JdbcMapUtil.getString(valueMap,"PROJECT_NAME_WR");
-//                String PROJECT_SOURCE_TYPE_ID = JdbcMapUtil.getString(valueMap,"PROJECT_SOURCE_TYPE_ID");
-//                List<Map<String,Object>> list = myJdbcTemplate.queryForList("select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?",name,PROJECT_SOURCE_TYPE_ID);
-//                if (CollectionUtils.isEmpty(list)){
-//                    return;
-//                } else {
-//                    prjId = JdbcMapUtil.getString(list.get(0),"id");
-
-                prjId = this.getWritePrjId(valueMap);
-//                prjId = myJdbcTemplate.queryForList("select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?",name,PROJECT_SOURCE_TYPE_ID).get(0).get("id").toString();
-//                if (SharedUtil.isEmptyString(prjId)){
-//                    return;
-//                }
+            String projectId = getProjectId(valueMap);
+            String[] arr = projectId.split(",");
+            for (String prjId : arr) {
+                String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
+                String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
+                String FILE_ID_THREE = JdbcMapUtil.getString(valueMap, "FILE_ID_THREE");
+                // 采购需求说明书
+                ProFileUtils.insertProFile(prjId, FILE_ID_ONE,FileCodeEnum.PM_BUY_DEMAND_REQ_FILE_ID_ONE);
+                // 采购预算表
+                ProFileUtils.insertProFile(prjId, FILE_ID_TWO, FileCodeEnum.PM_BUY_DEMAND_REQ_FILE_ID_TWO);
+                // 采购启动依据文件
+                ProFileUtils.insertProFile(prjId, FILE_ID_THREE, FileCodeEnum.PM_BUY_DEMAND_REQ_FILE_ID_THREE);
             }
-            String FILE_ID_ONE = JdbcMapUtil.getString(valueMap, "FILE_ID_ONE");
-            String FILE_ID_TWO = JdbcMapUtil.getString(valueMap, "FILE_ID_TWO");
-            String FILE_ID_THREE = JdbcMapUtil.getString(valueMap, "FILE_ID_THREE");
-            // 采购需求说明书
-            ProFileUtils.insertProFile(prjId, FILE_ID_ONE,FileCodeEnum.PM_BUY_DEMAND_REQ_FILE_ID_ONE);
-            // 采购预算表
-            ProFileUtils.insertProFile(prjId, FILE_ID_TWO, FileCodeEnum.PM_BUY_DEMAND_REQ_FILE_ID_TWO);
-            // 采购启动依据文件
-            ProFileUtils.insertProFile(prjId, FILE_ID_THREE, FileCodeEnum.PM_BUY_DEMAND_REQ_FILE_ID_THREE);
+//            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+//            if(SharedUtil.isEmptyString(prjId)){
+//                prjId = this.getWritePrjId(valueMap);
+//            }
+
         }
 
         //招标文件审批
@@ -1228,12 +1209,16 @@ public class WfExt {
 
         //保函退还申请
         if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entityCode)){
-            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
-            if(SharedUtil.isEmptyString(prjId)){
-                prjId = this.getWritePrjId(valueMap);
+            String projectId = getProjectId(valueMap);
+            String[] arr = projectId.split(",");
+            for (String prjId : arr) {
+                //保函退还附件
+                ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"GUARANTEE_FILE"),FileCodeEnum.GUARANTEE_RETURN_LETTER_ANNEX);
             }
-            //保函退还附件
-            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"GUARANTEE_FILE"),FileCodeEnum.GUARANTEE_RETURN_LETTER_ANNEX);
+//            String prjId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+//            if(SharedUtil.isEmptyString(prjId)){
+//                prjId = this.getWritePrjId(valueMap);
+//            }
         }
 
         //用章审批
