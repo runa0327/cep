@@ -15,14 +15,12 @@ import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class PmPrjReqExt {
+
     public void validateBeforeSave() {
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
@@ -447,6 +445,54 @@ public class PmPrjReqExt {
         if (CollectionUtils.isEmpty(list)){
             createPlan(projectId);
         }
+    }
+
+    public static String getPrjId(Map<String, Object> valueMap) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //项目来源类型  0099952822476441375=非立项
+        String projectType = JdbcMapUtil.getString(valueMap,"PROJECT_SOURCE_TYPE_ID");
+        //部门
+        String deptId = JdbcMapUtil.getString(valueMap, "CRT_DEPT_ID");
+        String prjId = "";
+        if ("0099952822476441375".equals(projectType)){
+            //创建人
+            String userId = JdbcMapUtil.getString(valueMap,"CRT_USER_ID");
+            //项目名称
+            String projectName = JdbcMapUtil.getString(valueMap,"PROJECT_NAME_WR");
+            List<String> prjNameList = new ArrayList<>();
+            int index = projectName.indexOf("、");
+            if (index == -1){
+                prjNameList.add(projectName);
+            } else {
+                prjNameList = Arrays.asList(projectName.split("、"));
+            }
+            for (String tmp : prjNameList) {
+                String sql1 = "select * from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?";
+                List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,tmp,projectType);
+                if (CollectionUtils.isEmpty(list1)){
+                    prjId = Crud.from("pm_prj").insertData();
+                    myJdbcTemplate.update("update pm_prj set CRT_USER_ID = ?,STATUS = ?,NAME = ?,PROJECT_SOURCE_TYPE_ID = ? where id = ?",userId,"AP",tmp,projectType,prjId);
+                    String pmDeptId = Crud.from("pm_dept").insertData();
+                    myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?",prjId,deptId,userId,1,pmDeptId);
+                } else {
+                    prjId = JdbcMapUtil.getString(list1.get(0),"id");
+                    String sql2 = "select * from pm_dept where PM_PRJ_ID=? and HR_DEPT_ID=? and status='ap'";
+                    List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,prjId,deptId);
+                    if (CollectionUtils.isEmpty(list2)){
+                        String pmDeptId = Crud.from("pm_dept").insertData();
+                        myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?",prjId,deptId,userId,1,pmDeptId);
+                    } else {
+                        String userIds = JdbcMapUtil.getString(list2.get(0),"USER_IDS");
+                        if (!userIds.contains(userId)){
+                            userIds = userIds+","+userId;
+                            myJdbcTemplate.update("update pm_dept set USER_IDS = ? where id = ?",userIds,JdbcMapUtil.getString(list2.get(0),"id"));
+                        }
+                    }
+                }
+
+            }
+        }
+        return prjId;
     }
 }
 
