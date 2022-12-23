@@ -1,10 +1,7 @@
 package com.cisdi.ext.pm;
 
 import com.cisdi.ext.enums.FileCodeEnum;
-import com.cisdi.ext.util.AmtUtil;
-import com.cisdi.ext.util.DoubleUtil;
-import com.cisdi.ext.util.ProFileUtils;
-import com.cisdi.ext.util.WfPmInvestUtil;
+import com.cisdi.ext.util.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -459,12 +456,13 @@ public class PmPrjReqExt {
             String userId = JdbcMapUtil.getString(valueMap,"CRT_USER_ID");
             //项目名称
             String projectName = JdbcMapUtil.getString(valueMap,"PROJECT_NAME_WR");
+            projectName = StringUtil.chineseCodeToEnCode(projectName,",");
             List<String> prjNameList = new ArrayList<>();
-            int index = projectName.indexOf("、");
+            int index = projectName.indexOf(",");
             if (index == -1){
                 prjNameList.add(projectName);
             } else {
-                prjNameList = Arrays.asList(projectName.split("、"));
+                prjNameList = Arrays.asList(projectName.split(","));
             }
             for (String tmp : prjNameList) {
                 String sql1 = "select * from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?";
@@ -489,7 +487,6 @@ public class PmPrjReqExt {
                         }
                     }
                 }
-
             }
         }
         return prjId;

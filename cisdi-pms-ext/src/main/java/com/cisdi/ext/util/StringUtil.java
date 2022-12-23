@@ -37,4 +37,20 @@ public class StringUtil {
         }
         return oldStr;
     }
+
+    /**
+     * 中文标点符号转英文符号
+     * @param str 原始字符串
+     * @param code 需要转换成的标点
+     * @return
+     */
+    public static String chineseCodeToEnCode(String str, String code) {
+        if (",".equals(code)){
+            int index = str.indexOf("，");
+            if (index != -1){
+                str = str.replace("，",",");
+            }
+        }
+        return str;
+    }
 }

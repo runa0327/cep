@@ -2,6 +2,7 @@ package com.cisdi.ext.pm;
 
 import cn.hutool.core.util.IdUtil;
 import com.cisdi.ext.util.DateTimeUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -225,12 +226,13 @@ public class PmBuyDemandReqExt {
             String userId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_USER_ID");
             //项目名称
             String projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
+            projectName = StringUtil.chineseCodeToEnCode(projectName,",");
             List<String> prjNameList = new ArrayList<>();
-            int index = projectName.indexOf("、");
+            int index = projectName.indexOf(",");
             if (index == -1){
                 prjNameList.add(projectName);
             } else {
-                prjNameList = Arrays.asList(projectName.split("、"));
+                prjNameList = Arrays.asList(projectName.split(","));
             }
             for (String tmp : prjNameList) {
                 String sql1 = "select * from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?";
