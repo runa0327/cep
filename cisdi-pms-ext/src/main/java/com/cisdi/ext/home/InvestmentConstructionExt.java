@@ -26,7 +26,7 @@ public class InvestmentConstructionExt {
      */
     public void statisticalData() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRJ where status='ap'");
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRJ where status='ap' and PROJECT_SOURCE_TYPE_ID='0099952822476441374' ");
         Map<String, List<Map<String, Object>>> mapData = list.stream().collect(Collectors.groupingBy(p -> Optional.ofNullable(JdbcMapUtil.getString(p, "PROJECT_PHASE_ID")).orElse("0")));
         List<StatisticalData> resData = new ArrayList<>();
 
