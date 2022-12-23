@@ -26,7 +26,10 @@ public class InvestmentConstructionExt {
      */
     public void statisticalData() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRJ where status='ap'");
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRJ where status='ap' and PROJECT_SOURCE_TYPE_ID='0099952822476441374' and " +
+                " IF(? in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1," +
+                " id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET(?, USER_IDS ))) ", userId,userId);
         Map<String, List<Map<String, Object>>> mapData = list.stream().collect(Collectors.groupingBy(p -> Optional.ofNullable(JdbcMapUtil.getString(p, "PROJECT_PHASE_ID")).orElse("0")));
         List<StatisticalData> resData = new ArrayList<>();
 
