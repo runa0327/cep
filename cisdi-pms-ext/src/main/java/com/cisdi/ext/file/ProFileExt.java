@@ -191,15 +191,15 @@ public class ProFileExt {
             fileInfo.name = JdbcMapUtil.getString(p, "name");
             fileInfo.uploadUser = JdbcMapUtil.getString(p, "upload_user");
             fileInfo.uploadTime = JdbcMapUtil.getString(p, "upload_time");
-            Integer originSize = JdbcMapUtil.getInt(p, "size");//换算前大小kb
+            BigDecimal originSize = JdbcMapUtil.getBigDecimal(p, "size");//换算前大小kb
             if (originSize == null){
                 fileInfo.size = "0Kb";
-            } else if (originSize < 1024) {
+            } else if (originSize.compareTo(new BigDecimal(1024)) < 0) {
                 fileInfo.size = originSize + "Kb";
-            } else if (originSize >= 1024 && originSize <1024 * 1024) {
-                fileInfo.size = new BigDecimal(originSize).divide(new BigDecimal(1024),2,BigDecimal.ROUND_HALF_UP) + "M";
+            } else if (originSize.compareTo(new BigDecimal(1024)) >= 0 && originSize.compareTo(new BigDecimal(1024 * 1024)) < 0) {
+                fileInfo.size = originSize.divide(new BigDecimal(1024),2,BigDecimal.ROUND_HALF_UP) + "M";
             } else {
-                fileInfo.size = new BigDecimal(originSize).divide(new BigDecimal(1024 * 1024),2,BigDecimal.ROUND_HALF_UP) + "G";
+                fileInfo.size = originSize.divide(new BigDecimal(1024 * 1024),2,BigDecimal.ROUND_HALF_UP) + "G";
             }
             fileInfo.url = JdbcMapUtil.getString(p, "url");
             fileInfo.type = JdbcMapUtil.getString(p, "type");
