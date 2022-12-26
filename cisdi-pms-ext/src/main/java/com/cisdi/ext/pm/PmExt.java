@@ -58,21 +58,21 @@ public class PmExt {
         keyValueHashMap.put(PmPrj.Cols.NAME, "456");
         keyValueHashMap.put(PmPrj.Cols.BUILD_YEARS, 50d);
 
-        int i = PmPrj.updateById(pmPrj.id, keyValueHashMap, null, null);
-        int i2 = PmPrj.updateByIds(Lists.newArrayList(pmPrj.id, "id2"), keyValueHashMap, null, null);
+        int i = PmPrj.updateById(pmPrj.getId(), keyValueHashMap, null, null);
+        int i2 = PmPrj.updateByIds(Lists.newArrayList(pmPrj.getId(), "id2"), keyValueHashMap, null, null);
         Where where = new Where();
-        where.eq(PmPrj.Cols.ID, pmPrj.id).contain(PmPrj.Cols.NAME, "5").or().in(PmPrj.Cols.CODE, "a", "b", "c").begin().sql("exists select 1 from xxxx x where x.pm_Prj_id=t.id").or().eq(PmPrj.Cols.NAME, "3").end();
+        where.eq(PmPrj.Cols.ID, pmPrj.getId()).contain(PmPrj.Cols.NAME, "5").or().in(PmPrj.Cols.CODE, "a", "b", "c").begin().sql("exists select 1 from xxxx x where x.pm_Prj_id=t.id").or().eq(PmPrj.Cols.NAME, "3").end();
         PmPrj.updateByWhere(where, keyValueHashMap, null, null);
 
         pmPrj.deleteById();
 
-        int i3 = PmPrj.deleteById(pmPrj.id);
-        int i4 = PmPrj.deleteByIds(Lists.newArrayList(pmPrj.id, "id2"));
+        int i3 = PmPrj.deleteById(pmPrj.getId());
+        int i4 = PmPrj.deleteByIds(Lists.newArrayList(pmPrj.getId(), "id2"));
         Where where1 = new Where();
         PmPrj.deleteByWhere(where1);
 
         PmPrj pmPrj1 = PmPrj.selectById("id1", null, null);
-        List<PmPrj> list = PmPrj.selectByIds(Lists.newArrayList(pmPrj.id, "id2"), null, null);
+        List<PmPrj> list = PmPrj.selectByIds(Lists.newArrayList(pmPrj.getId(), "id2"), null, null);
         Where where2 = new Where();
         List<PmPrj> pmPrjs = PmPrj.selectByWhere(where2, null, Lists.newArrayList(PmPrj.Cols.CODE));
 
