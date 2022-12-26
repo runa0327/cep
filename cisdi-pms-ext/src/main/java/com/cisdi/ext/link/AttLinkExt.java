@@ -743,6 +743,7 @@ public class AttLinkExt {
             linkedAtt.text = null;
             linkedAtt.changeToEditable = REPLY_NOChangeToEditable;
             attLinkResult.attMap.put("REPLY_NO", linkedAtt);
+            attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
         }
         //项目类型
         {
