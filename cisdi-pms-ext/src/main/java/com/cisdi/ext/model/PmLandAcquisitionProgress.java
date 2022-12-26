@@ -4,9 +4,11 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +21,18 @@ public class PmLandAcquisitionProgress {
      * 模型助手。
      */
     private static final ModelHelper<PmLandAcquisitionProgress> modelHelper = new ModelHelper<>("PM_LAND_ACQUISITION_PROGRESS", new PmLandAcquisitionProgress());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -85,33 +99,33 @@ public class PmLandAcquisitionProgress {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 编制单位。
-         */
-        public static final String AUTHOR_UNIT = "AUTHOR_UNIT";
-        /**
-         * 进度日期。
-         */
-        public static final String PROCESS_DATE = "PROCESS_DATE";
-        /**
-         * 进展说明。
-         */
-        public static final String PROCESS_REMARK = "PROCESS_REMARK";
-        /**
          * 对方负责人。
          */
         public static final String OTHER_RESPONSOR = "OTHER_RESPONSOR";
-        /**
-         * CPMS的UUID。
-         */
-        public static final String CPMS_UUID = "CPMS_UUID";
         /**
          * CPMS的ID。
          */
         public static final String CPMS_ID = "CPMS_ID";
         /**
+         * 编制单位。
+         */
+        public static final String AUTHOR_UNIT = "AUTHOR_UNIT";
+        /**
+         * 进展说明。
+         */
+        public static final String PROCESS_REMARK = "PROCESS_REMARK";
+        /**
+         * 进度日期。
+         */
+        public static final String PROCESS_DATE = "PROCESS_DATE";
+        /**
          * 拆迁信息。
          */
         public static final String PM_LAND_ACQUISITION_INFO_ID = "PM_LAND_ACQUISITION_INFO_ID";
+        /**
+         * CPMS的UUID。
+         */
+        public static final String CPMS_UUID = "CPMS_UUID";
     }
 
     // </editor-fold>
@@ -122,7 +136,7 @@ public class PmLandAcquisitionProgress {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -135,14 +149,30 @@ public class PmLandAcquisitionProgress {
      * 设置：ID。
      */
     public PmLandAcquisitionProgress setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -155,14 +185,30 @@ public class PmLandAcquisitionProgress {
      * 设置：版本。
      */
     public PmLandAcquisitionProgress setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -175,14 +221,30 @@ public class PmLandAcquisitionProgress {
      * 设置：时间戳。
      */
     public PmLandAcquisitionProgress setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -195,14 +257,30 @@ public class PmLandAcquisitionProgress {
      * 设置：是否预设。
      */
     public PmLandAcquisitionProgress setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -215,14 +293,30 @@ public class PmLandAcquisitionProgress {
      * 设置：创建日期时间。
      */
     public PmLandAcquisitionProgress setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -235,14 +329,30 @@ public class PmLandAcquisitionProgress {
      * 设置：创建用户。
      */
     public PmLandAcquisitionProgress setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -255,14 +365,30 @@ public class PmLandAcquisitionProgress {
      * 设置：最后修改日期时间。
      */
     public PmLandAcquisitionProgress setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -275,14 +401,30 @@ public class PmLandAcquisitionProgress {
      * 设置：最后修改用户。
      */
     public PmLandAcquisitionProgress setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -295,14 +437,30 @@ public class PmLandAcquisitionProgress {
      * 设置：记录状态。
      */
     public PmLandAcquisitionProgress setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -315,14 +473,30 @@ public class PmLandAcquisitionProgress {
      * 设置：锁定流程实例。
      */
     public PmLandAcquisitionProgress setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -335,14 +509,30 @@ public class PmLandAcquisitionProgress {
      * 设置：代码。
      */
     public PmLandAcquisitionProgress setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -355,14 +545,30 @@ public class PmLandAcquisitionProgress {
      * 设置：名称。
      */
     public PmLandAcquisitionProgress setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -375,74 +581,30 @@ public class PmLandAcquisitionProgress {
      * 设置：备注。
      */
     public PmLandAcquisitionProgress setRemark(String remark) {
-        this.remark = remark;
-        return this;
-    }
-
-    /**
-     * 编制单位。
-     */
-    public String authorUnit;
-
-    /**
-     * 获取：编制单位。
-     */
-    public String getAuthorUnit() {
-        return this.authorUnit;
-    }
-
-    /**
-     * 设置：编制单位。
-     */
-    public PmLandAcquisitionProgress setAuthorUnit(String authorUnit) {
-        this.authorUnit = authorUnit;
-        return this;
-    }
-
-    /**
-     * 进度日期。
-     */
-    public LocalDate processDate;
-
-    /**
-     * 获取：进度日期。
-     */
-    public LocalDate getProcessDate() {
-        return this.processDate;
-    }
-
-    /**
-     * 设置：进度日期。
-     */
-    public PmLandAcquisitionProgress setProcessDate(LocalDate processDate) {
-        this.processDate = processDate;
-        return this;
-    }
-
-    /**
-     * 进展说明。
-     */
-    public String processRemark;
-
-    /**
-     * 获取：进展说明。
-     */
-    public String getProcessRemark() {
-        return this.processRemark;
-    }
-
-    /**
-     * 设置：进展说明。
-     */
-    public PmLandAcquisitionProgress setProcessRemark(String processRemark) {
-        this.processRemark = processRemark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 对方负责人。
      */
-    public String otherResponsor;
+    private String otherResponsor;
 
     /**
      * 获取：对方负责人。
@@ -455,34 +617,30 @@ public class PmLandAcquisitionProgress {
      * 设置：对方负责人。
      */
     public PmLandAcquisitionProgress setOtherResponsor(String otherResponsor) {
-        this.otherResponsor = otherResponsor;
-        return this;
-    }
-
-    /**
-     * CPMS的UUID。
-     */
-    public String cpmsUuid;
-
-    /**
-     * 获取：CPMS的UUID。
-     */
-    public String getCpmsUuid() {
-        return this.cpmsUuid;
-    }
-
-    /**
-     * 设置：CPMS的UUID。
-     */
-    public PmLandAcquisitionProgress setCpmsUuid(String cpmsUuid) {
-        this.cpmsUuid = cpmsUuid;
+        if (this.otherResponsor == null && otherResponsor == null) {
+            // 均为null，不做处理。
+        } else if (this.otherResponsor != null && otherResponsor != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.otherResponsor.compareTo(otherResponsor) != 0) {
+                this.otherResponsor = otherResponsor;
+                if (!this.toUpdateCols.contains("OTHER_RESPONSOR")) {
+                    this.toUpdateCols.add("OTHER_RESPONSOR");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.otherResponsor = otherResponsor;
+            if (!this.toUpdateCols.contains("OTHER_RESPONSOR")) {
+                this.toUpdateCols.add("OTHER_RESPONSOR");
+            }
+        }
         return this;
     }
 
     /**
      * CPMS的ID。
      */
-    public String cpmsId;
+    private String cpmsId;
 
     /**
      * 获取：CPMS的ID。
@@ -495,14 +653,138 @@ public class PmLandAcquisitionProgress {
      * 设置：CPMS的ID。
      */
     public PmLandAcquisitionProgress setCpmsId(String cpmsId) {
-        this.cpmsId = cpmsId;
+        if (this.cpmsId == null && cpmsId == null) {
+            // 均为null，不做处理。
+        } else if (this.cpmsId != null && cpmsId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cpmsId.compareTo(cpmsId) != 0) {
+                this.cpmsId = cpmsId;
+                if (!this.toUpdateCols.contains("CPMS_ID")) {
+                    this.toUpdateCols.add("CPMS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cpmsId = cpmsId;
+            if (!this.toUpdateCols.contains("CPMS_ID")) {
+                this.toUpdateCols.add("CPMS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 编制单位。
+     */
+    private String authorUnit;
+
+    /**
+     * 获取：编制单位。
+     */
+    public String getAuthorUnit() {
+        return this.authorUnit;
+    }
+
+    /**
+     * 设置：编制单位。
+     */
+    public PmLandAcquisitionProgress setAuthorUnit(String authorUnit) {
+        if (this.authorUnit == null && authorUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.authorUnit != null && authorUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.authorUnit.compareTo(authorUnit) != 0) {
+                this.authorUnit = authorUnit;
+                if (!this.toUpdateCols.contains("AUTHOR_UNIT")) {
+                    this.toUpdateCols.add("AUTHOR_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.authorUnit = authorUnit;
+            if (!this.toUpdateCols.contains("AUTHOR_UNIT")) {
+                this.toUpdateCols.add("AUTHOR_UNIT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 进展说明。
+     */
+    private String processRemark;
+
+    /**
+     * 获取：进展说明。
+     */
+    public String getProcessRemark() {
+        return this.processRemark;
+    }
+
+    /**
+     * 设置：进展说明。
+     */
+    public PmLandAcquisitionProgress setProcessRemark(String processRemark) {
+        if (this.processRemark == null && processRemark == null) {
+            // 均为null，不做处理。
+        } else if (this.processRemark != null && processRemark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.processRemark.compareTo(processRemark) != 0) {
+                this.processRemark = processRemark;
+                if (!this.toUpdateCols.contains("PROCESS_REMARK")) {
+                    this.toUpdateCols.add("PROCESS_REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.processRemark = processRemark;
+            if (!this.toUpdateCols.contains("PROCESS_REMARK")) {
+                this.toUpdateCols.add("PROCESS_REMARK");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 进度日期。
+     */
+    private LocalDate processDate;
+
+    /**
+     * 获取：进度日期。
+     */
+    public LocalDate getProcessDate() {
+        return this.processDate;
+    }
+
+    /**
+     * 设置：进度日期。
+     */
+    public PmLandAcquisitionProgress setProcessDate(LocalDate processDate) {
+        if (this.processDate == null && processDate == null) {
+            // 均为null，不做处理。
+        } else if (this.processDate != null && processDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.processDate.compareTo(processDate) != 0) {
+                this.processDate = processDate;
+                if (!this.toUpdateCols.contains("PROCESS_DATE")) {
+                    this.toUpdateCols.add("PROCESS_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.processDate = processDate;
+            if (!this.toUpdateCols.contains("PROCESS_DATE")) {
+                this.toUpdateCols.add("PROCESS_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 拆迁信息。
      */
-    public String pmLandAcquisitionInfoId;
+    private String pmLandAcquisitionInfoId;
 
     /**
      * 获取：拆迁信息。
@@ -515,7 +797,59 @@ public class PmLandAcquisitionProgress {
      * 设置：拆迁信息。
      */
     public PmLandAcquisitionProgress setPmLandAcquisitionInfoId(String pmLandAcquisitionInfoId) {
-        this.pmLandAcquisitionInfoId = pmLandAcquisitionInfoId;
+        if (this.pmLandAcquisitionInfoId == null && pmLandAcquisitionInfoId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmLandAcquisitionInfoId != null && pmLandAcquisitionInfoId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmLandAcquisitionInfoId.compareTo(pmLandAcquisitionInfoId) != 0) {
+                this.pmLandAcquisitionInfoId = pmLandAcquisitionInfoId;
+                if (!this.toUpdateCols.contains("PM_LAND_ACQUISITION_INFO_ID")) {
+                    this.toUpdateCols.add("PM_LAND_ACQUISITION_INFO_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmLandAcquisitionInfoId = pmLandAcquisitionInfoId;
+            if (!this.toUpdateCols.contains("PM_LAND_ACQUISITION_INFO_ID")) {
+                this.toUpdateCols.add("PM_LAND_ACQUISITION_INFO_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * CPMS的UUID。
+     */
+    private String cpmsUuid;
+
+    /**
+     * 获取：CPMS的UUID。
+     */
+    public String getCpmsUuid() {
+        return this.cpmsUuid;
+    }
+
+    /**
+     * 设置：CPMS的UUID。
+     */
+    public PmLandAcquisitionProgress setCpmsUuid(String cpmsUuid) {
+        if (this.cpmsUuid == null && cpmsUuid == null) {
+            // 均为null，不做处理。
+        } else if (this.cpmsUuid != null && cpmsUuid != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cpmsUuid.compareTo(cpmsUuid) != 0) {
+                this.cpmsUuid = cpmsUuid;
+                if (!this.toUpdateCols.contains("CPMS_UUID")) {
+                    this.toUpdateCols.add("CPMS_UUID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cpmsUuid = cpmsUuid;
+            if (!this.toUpdateCols.contains("CPMS_UUID")) {
+                this.toUpdateCols.add("CPMS_UUID");
+            }
+        }
         return this;
     }
 
@@ -533,6 +867,7 @@ public class PmLandAcquisitionProgress {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -543,7 +878,17 @@ public class PmLandAcquisitionProgress {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -564,7 +909,8 @@ public class PmLandAcquisitionProgress {
      * @return
      */
     public static PmLandAcquisitionProgress newData() {
-        return modelHelper.newData();
+        PmLandAcquisitionProgress obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -573,7 +919,8 @@ public class PmLandAcquisitionProgress {
      * @return
      */
     public static PmLandAcquisitionProgress insertData() {
-        return modelHelper.insertData();
+        PmLandAcquisitionProgress obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -585,7 +932,8 @@ public class PmLandAcquisitionProgress {
      * @return 获取到的对象，若无则为null。
      */
     public static PmLandAcquisitionProgress selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        PmLandAcquisitionProgress obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -597,7 +945,8 @@ public class PmLandAcquisitionProgress {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PmLandAcquisitionProgress> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<PmLandAcquisitionProgress> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -609,7 +958,8 @@ public class PmLandAcquisitionProgress {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PmLandAcquisitionProgress> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<PmLandAcquisitionProgress> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

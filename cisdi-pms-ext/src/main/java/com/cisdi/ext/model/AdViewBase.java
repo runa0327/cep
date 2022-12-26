@@ -4,7 +4,9 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +19,18 @@ public class AdViewBase {
      * 模型助手。
      */
     private static final ModelHelper<AdViewBase> modelHelper = new ModelHelper<>("AD_VIEW_BASE", new AdViewBase());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -44,7 +58,7 @@ public class AdViewBase {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -57,7 +71,23 @@ public class AdViewBase {
      * 设置：ID。
      */
     public AdViewBase setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
@@ -75,6 +105,7 @@ public class AdViewBase {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -85,7 +116,17 @@ public class AdViewBase {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -106,7 +147,8 @@ public class AdViewBase {
      * @return
      */
     public static AdViewBase newData() {
-        return modelHelper.newData();
+        AdViewBase obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -115,7 +157,8 @@ public class AdViewBase {
      * @return
      */
     public static AdViewBase insertData() {
-        return modelHelper.insertData();
+        AdViewBase obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -127,7 +170,8 @@ public class AdViewBase {
      * @return 获取到的对象，若无则为null。
      */
     public static AdViewBase selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        AdViewBase obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -139,7 +183,8 @@ public class AdViewBase {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdViewBase> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<AdViewBase> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -151,7 +196,8 @@ public class AdViewBase {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdViewBase> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<AdViewBase> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

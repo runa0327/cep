@@ -4,7 +4,9 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,11 +20,23 @@ public class AdDbTableViewV {
      */
     private static final ModelHelper<AdDbTableViewV> modelHelper = new ModelHelper<>("AD_DB_TABLE_VIEW_V", new AdDbTableViewV());
 
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
+
     // 实体常量：
     // <editor-fold>
 
     public static final String ENT_CODE = "AD_DB_TABLE_VIEW_V";
-    public static final EntityTypeE ENTITY_TYPE = EntityTypeE.VIEW;
+    public static final EntityTypeE ENTITY_TYPE = EntityTypeE.SUB_QUERY;
 
     // </editor-fold>
 
@@ -52,7 +66,7 @@ public class AdDbTableViewV {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -65,14 +79,30 @@ public class AdDbTableViewV {
      * 设置：ID。
      */
     public AdDbTableViewV setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 实体代码。
      */
-    public String entCode;
+    private String entCode;
 
     /**
      * 获取：实体代码。
@@ -85,14 +115,30 @@ public class AdDbTableViewV {
      * 设置：实体代码。
      */
     public AdDbTableViewV setEntCode(String entCode) {
-        this.entCode = entCode;
+        if (this.entCode == null && entCode == null) {
+            // 均为null，不做处理。
+        } else if (this.entCode != null && entCode != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.entCode.compareTo(entCode) != 0) {
+                this.entCode = entCode;
+                if (!this.toUpdateCols.contains("ENT_CODE")) {
+                    this.toUpdateCols.add("ENT_CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.entCode = entCode;
+            if (!this.toUpdateCols.contains("ENT_CODE")) {
+                this.toUpdateCols.add("ENT_CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 实体类型名称。
      */
-    public String entTypeName;
+    private String entTypeName;
 
     /**
      * 获取：实体类型名称。
@@ -105,7 +151,23 @@ public class AdDbTableViewV {
      * 设置：实体类型名称。
      */
     public AdDbTableViewV setEntTypeName(String entTypeName) {
-        this.entTypeName = entTypeName;
+        if (this.entTypeName == null && entTypeName == null) {
+            // 均为null，不做处理。
+        } else if (this.entTypeName != null && entTypeName != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.entTypeName.compareTo(entTypeName) != 0) {
+                this.entTypeName = entTypeName;
+                if (!this.toUpdateCols.contains("ENT_TYPE_NAME")) {
+                    this.toUpdateCols.add("ENT_TYPE_NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.entTypeName = entTypeName;
+            if (!this.toUpdateCols.contains("ENT_TYPE_NAME")) {
+                this.toUpdateCols.add("ENT_TYPE_NAME");
+            }
+        }
         return this;
     }
 
@@ -123,6 +185,7 @@ public class AdDbTableViewV {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -133,7 +196,17 @@ public class AdDbTableViewV {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -154,7 +227,8 @@ public class AdDbTableViewV {
      * @return
      */
     public static AdDbTableViewV newData() {
-        return modelHelper.newData();
+        AdDbTableViewV obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -163,7 +237,8 @@ public class AdDbTableViewV {
      * @return
      */
     public static AdDbTableViewV insertData() {
-        return modelHelper.insertData();
+        AdDbTableViewV obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -175,7 +250,8 @@ public class AdDbTableViewV {
      * @return 获取到的对象，若无则为null。
      */
     public static AdDbTableViewV selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        AdDbTableViewV obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -187,7 +263,8 @@ public class AdDbTableViewV {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdDbTableViewV> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<AdDbTableViewV> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -199,7 +276,8 @@ public class AdDbTableViewV {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdDbTableViewV> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<AdDbTableViewV> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

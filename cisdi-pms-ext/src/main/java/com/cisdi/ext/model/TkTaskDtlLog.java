@@ -4,8 +4,11 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +21,18 @@ public class TkTaskDtlLog {
      * 模型助手。
      */
     private static final ModelHelper<TkTaskDtlLog> modelHelper = new ModelHelper<>("TK_TASK_DTL_LOG", new TkTaskDtlLog());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -121,7 +136,7 @@ public class TkTaskDtlLog {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -134,14 +149,30 @@ public class TkTaskDtlLog {
      * 设置：ID。
      */
     public TkTaskDtlLog setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -154,14 +185,30 @@ public class TkTaskDtlLog {
      * 设置：版本。
      */
     public TkTaskDtlLog setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -174,14 +221,30 @@ public class TkTaskDtlLog {
      * 设置：时间戳。
      */
     public TkTaskDtlLog setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -194,14 +257,30 @@ public class TkTaskDtlLog {
      * 设置：是否预设。
      */
     public TkTaskDtlLog setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -214,14 +293,30 @@ public class TkTaskDtlLog {
      * 设置：创建日期时间。
      */
     public TkTaskDtlLog setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -234,14 +329,30 @@ public class TkTaskDtlLog {
      * 设置：创建用户。
      */
     public TkTaskDtlLog setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -254,14 +365,30 @@ public class TkTaskDtlLog {
      * 设置：最后修改日期时间。
      */
     public TkTaskDtlLog setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -274,14 +401,30 @@ public class TkTaskDtlLog {
      * 设置：最后修改用户。
      */
     public TkTaskDtlLog setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -294,14 +437,30 @@ public class TkTaskDtlLog {
      * 设置：记录状态。
      */
     public TkTaskDtlLog setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -314,14 +473,30 @@ public class TkTaskDtlLog {
      * 设置：锁定流程实例。
      */
     public TkTaskDtlLog setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -334,14 +509,30 @@ public class TkTaskDtlLog {
      * 设置：代码。
      */
     public TkTaskDtlLog setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -354,14 +545,30 @@ public class TkTaskDtlLog {
      * 设置：名称。
      */
     public TkTaskDtlLog setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -374,14 +581,30 @@ public class TkTaskDtlLog {
      * 设置：备注。
      */
     public TkTaskDtlLog setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 任务明细。
      */
-    public String tkTaskDtlId;
+    private String tkTaskDtlId;
 
     /**
      * 获取：任务明细。
@@ -394,34 +617,66 @@ public class TkTaskDtlLog {
      * 设置：任务明细。
      */
     public TkTaskDtlLog setTkTaskDtlId(String tkTaskDtlId) {
-        this.tkTaskDtlId = tkTaskDtlId;
+        if (this.tkTaskDtlId == null && tkTaskDtlId == null) {
+            // 均为null，不做处理。
+        } else if (this.tkTaskDtlId != null && tkTaskDtlId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.tkTaskDtlId.compareTo(tkTaskDtlId) != 0) {
+                this.tkTaskDtlId = tkTaskDtlId;
+                if (!this.toUpdateCols.contains("TK_TASK_DTL_ID")) {
+                    this.toUpdateCols.add("TK_TASK_DTL_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.tkTaskDtlId = tkTaskDtlId;
+            if (!this.toUpdateCols.contains("TK_TASK_DTL_ID")) {
+                this.toUpdateCols.add("TK_TASK_DTL_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 序号。
      */
-    public Double seqNo;
+    private BigDecimal seqNo;
 
     /**
      * 获取：序号。
      */
-    public Double getSeqNo() {
+    public BigDecimal getSeqNo() {
         return this.seqNo;
     }
 
     /**
      * 设置：序号。
      */
-    public TkTaskDtlLog setSeqNo(Double seqNo) {
-        this.seqNo = seqNo;
+    public TkTaskDtlLog setSeqNo(BigDecimal seqNo) {
+        if (this.seqNo == null && seqNo == null) {
+            // 均为null，不做处理。
+        } else if (this.seqNo != null && seqNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.seqNo.compareTo(seqNo) != 0) {
+                this.seqNo = seqNo;
+                if (!this.toUpdateCols.contains("SEQ_NO")) {
+                    this.toUpdateCols.add("SEQ_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.seqNo = seqNo;
+            if (!this.toUpdateCols.contains("SEQ_NO")) {
+                this.toUpdateCols.add("SEQ_NO");
+            }
+        }
         return this;
     }
 
     /**
      * 开始日期时间。
      */
-    public LocalDateTime startDatetime;
+    private LocalDateTime startDatetime;
 
     /**
      * 获取：开始日期时间。
@@ -434,14 +689,30 @@ public class TkTaskDtlLog {
      * 设置：开始日期时间。
      */
     public TkTaskDtlLog setStartDatetime(LocalDateTime startDatetime) {
-        this.startDatetime = startDatetime;
+        if (this.startDatetime == null && startDatetime == null) {
+            // 均为null，不做处理。
+        } else if (this.startDatetime != null && startDatetime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.startDatetime.compareTo(startDatetime) != 0) {
+                this.startDatetime = startDatetime;
+                if (!this.toUpdateCols.contains("START_DATETIME")) {
+                    this.toUpdateCols.add("START_DATETIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.startDatetime = startDatetime;
+            if (!this.toUpdateCols.contains("START_DATETIME")) {
+                this.toUpdateCols.add("START_DATETIME");
+            }
+        }
         return this;
     }
 
     /**
      * 结束日期时间。
      */
-    public LocalDateTime endDatetime;
+    private LocalDateTime endDatetime;
 
     /**
      * 获取：结束日期时间。
@@ -454,14 +725,30 @@ public class TkTaskDtlLog {
      * 设置：结束日期时间。
      */
     public TkTaskDtlLog setEndDatetime(LocalDateTime endDatetime) {
-        this.endDatetime = endDatetime;
+        if (this.endDatetime == null && endDatetime == null) {
+            // 均为null，不做处理。
+        } else if (this.endDatetime != null && endDatetime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.endDatetime.compareTo(endDatetime) != 0) {
+                this.endDatetime = endDatetime;
+                if (!this.toUpdateCols.contains("END_DATETIME")) {
+                    this.toUpdateCols.add("END_DATETIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.endDatetime = endDatetime;
+            if (!this.toUpdateCols.contains("END_DATETIME")) {
+                this.toUpdateCols.add("END_DATETIME");
+            }
+        }
         return this;
     }
 
     /**
      * 任务明细运行状态。
      */
-    public String taskDtlRunStatusId;
+    private String taskDtlRunStatusId;
 
     /**
      * 获取：任务明细运行状态。
@@ -474,14 +761,30 @@ public class TkTaskDtlLog {
      * 设置：任务明细运行状态。
      */
     public TkTaskDtlLog setTaskDtlRunStatusId(String taskDtlRunStatusId) {
-        this.taskDtlRunStatusId = taskDtlRunStatusId;
+        if (this.taskDtlRunStatusId == null && taskDtlRunStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.taskDtlRunStatusId != null && taskDtlRunStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.taskDtlRunStatusId.compareTo(taskDtlRunStatusId) != 0) {
+                this.taskDtlRunStatusId = taskDtlRunStatusId;
+                if (!this.toUpdateCols.contains("TASK_DTL_RUN_STATUS_ID")) {
+                    this.toUpdateCols.add("TASK_DTL_RUN_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.taskDtlRunStatusId = taskDtlRunStatusId;
+            if (!this.toUpdateCols.contains("TASK_DTL_RUN_STATUS_ID")) {
+                this.toUpdateCols.add("TASK_DTL_RUN_STATUS_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 报错信息。
      */
-    public String errMsg;
+    private String errMsg;
 
     /**
      * 获取：报错信息。
@@ -494,14 +797,30 @@ public class TkTaskDtlLog {
      * 设置：报错信息。
      */
     public TkTaskDtlLog setErrMsg(String errMsg) {
-        this.errMsg = errMsg;
+        if (this.errMsg == null && errMsg == null) {
+            // 均为null，不做处理。
+        } else if (this.errMsg != null && errMsg != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.errMsg.compareTo(errMsg) != 0) {
+                this.errMsg = errMsg;
+                if (!this.toUpdateCols.contains("ERR_MSG")) {
+                    this.toUpdateCols.add("ERR_MSG");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.errMsg = errMsg;
+            if (!this.toUpdateCols.contains("ERR_MSG")) {
+                this.toUpdateCols.add("ERR_MSG");
+            }
+        }
         return this;
     }
 
     /**
      * 任务日志。
      */
-    public String tkTaskLogId;
+    private String tkTaskLogId;
 
     /**
      * 获取：任务日志。
@@ -514,7 +833,23 @@ public class TkTaskDtlLog {
      * 设置：任务日志。
      */
     public TkTaskDtlLog setTkTaskLogId(String tkTaskLogId) {
-        this.tkTaskLogId = tkTaskLogId;
+        if (this.tkTaskLogId == null && tkTaskLogId == null) {
+            // 均为null，不做处理。
+        } else if (this.tkTaskLogId != null && tkTaskLogId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.tkTaskLogId.compareTo(tkTaskLogId) != 0) {
+                this.tkTaskLogId = tkTaskLogId;
+                if (!this.toUpdateCols.contains("TK_TASK_LOG_ID")) {
+                    this.toUpdateCols.add("TK_TASK_LOG_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.tkTaskLogId = tkTaskLogId;
+            if (!this.toUpdateCols.contains("TK_TASK_LOG_ID")) {
+                this.toUpdateCols.add("TK_TASK_LOG_ID");
+            }
+        }
         return this;
     }
 
@@ -532,6 +867,7 @@ public class TkTaskDtlLog {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -542,7 +878,17 @@ public class TkTaskDtlLog {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -563,7 +909,8 @@ public class TkTaskDtlLog {
      * @return
      */
     public static TkTaskDtlLog newData() {
-        return modelHelper.newData();
+        TkTaskDtlLog obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -572,7 +919,8 @@ public class TkTaskDtlLog {
      * @return
      */
     public static TkTaskDtlLog insertData() {
-        return modelHelper.insertData();
+        TkTaskDtlLog obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -584,7 +932,8 @@ public class TkTaskDtlLog {
      * @return 获取到的对象，若无则为null。
      */
     public static TkTaskDtlLog selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        TkTaskDtlLog obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -596,7 +945,8 @@ public class TkTaskDtlLog {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<TkTaskDtlLog> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<TkTaskDtlLog> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -608,7 +958,8 @@ public class TkTaskDtlLog {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<TkTaskDtlLog> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<TkTaskDtlLog> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

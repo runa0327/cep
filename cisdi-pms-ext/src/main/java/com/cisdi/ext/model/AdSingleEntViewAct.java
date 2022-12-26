@@ -4,8 +4,11 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +21,18 @@ public class AdSingleEntViewAct {
      * 模型助手。
      */
     private static final ModelHelper<AdSingleEntViewAct> modelHelper = new ModelHelper<>("AD_SINGLE_ENT_VIEW_ACT", new AdSingleEntViewAct());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -177,7 +192,7 @@ public class AdSingleEntViewAct {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -190,14 +205,30 @@ public class AdSingleEntViewAct {
      * 设置：ID。
      */
     public AdSingleEntViewAct setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -210,14 +241,30 @@ public class AdSingleEntViewAct {
      * 设置：版本。
      */
     public AdSingleEntViewAct setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -230,14 +277,30 @@ public class AdSingleEntViewAct {
      * 设置：时间戳。
      */
     public AdSingleEntViewAct setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -250,14 +313,30 @@ public class AdSingleEntViewAct {
      * 设置：是否预设。
      */
     public AdSingleEntViewAct setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -270,14 +349,30 @@ public class AdSingleEntViewAct {
      * 设置：创建日期时间。
      */
     public AdSingleEntViewAct setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -290,14 +385,30 @@ public class AdSingleEntViewAct {
      * 设置：创建用户。
      */
     public AdSingleEntViewAct setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -310,14 +421,30 @@ public class AdSingleEntViewAct {
      * 设置：最后修改日期时间。
      */
     public AdSingleEntViewAct setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -330,14 +457,30 @@ public class AdSingleEntViewAct {
      * 设置：最后修改用户。
      */
     public AdSingleEntViewAct setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -350,14 +493,30 @@ public class AdSingleEntViewAct {
      * 设置：记录状态。
      */
     public AdSingleEntViewAct setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -370,14 +529,30 @@ public class AdSingleEntViewAct {
      * 设置：锁定流程实例。
      */
     public AdSingleEntViewAct setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -390,14 +565,30 @@ public class AdSingleEntViewAct {
      * 设置：代码。
      */
     public AdSingleEntViewAct setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -410,14 +601,30 @@ public class AdSingleEntViewAct {
      * 设置：名称。
      */
     public AdSingleEntViewAct setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -430,14 +637,30 @@ public class AdSingleEntViewAct {
      * 设置：备注。
      */
     public AdSingleEntViewAct setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 实体视图。
      */
-    public String adSingleEntViewId;
+    private String adSingleEntViewId;
 
     /**
      * 获取：实体视图。
@@ -450,14 +673,30 @@ public class AdSingleEntViewAct {
      * 设置：实体视图。
      */
     public AdSingleEntViewAct setAdSingleEntViewId(String adSingleEntViewId) {
-        this.adSingleEntViewId = adSingleEntViewId;
+        if (this.adSingleEntViewId == null && adSingleEntViewId == null) {
+            // 均为null，不做处理。
+        } else if (this.adSingleEntViewId != null && adSingleEntViewId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adSingleEntViewId.compareTo(adSingleEntViewId) != 0) {
+                this.adSingleEntViewId = adSingleEntViewId;
+                if (!this.toUpdateCols.contains("AD_SINGLE_ENT_VIEW_ID")) {
+                    this.toUpdateCols.add("AD_SINGLE_ENT_VIEW_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adSingleEntViewId = adSingleEntViewId;
+            if (!this.toUpdateCols.contains("AD_SINGLE_ENT_VIEW_ID")) {
+                this.toUpdateCols.add("AD_SINGLE_ENT_VIEW_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 操作。
      */
-    public String adActId;
+    private String adActId;
 
     /**
      * 获取：操作。
@@ -470,14 +709,30 @@ public class AdSingleEntViewAct {
      * 设置：操作。
      */
     public AdSingleEntViewAct setAdActId(String adActId) {
-        this.adActId = adActId;
+        if (this.adActId == null && adActId == null) {
+            // 均为null，不做处理。
+        } else if (this.adActId != null && adActId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adActId.compareTo(adActId) != 0) {
+                this.adActId = adActId;
+                if (!this.toUpdateCols.contains("AD_ACT_ID")) {
+                    this.toUpdateCols.add("AD_ACT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adActId = adActId;
+            if (!this.toUpdateCols.contains("AD_ACT_ID")) {
+                this.toUpdateCols.add("AD_ACT_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 实体操作关系。
      */
-    public String entActRelation;
+    private String entActRelation;
 
     /**
      * 获取：实体操作关系。
@@ -490,34 +745,66 @@ public class AdSingleEntViewAct {
      * 设置：实体操作关系。
      */
     public AdSingleEntViewAct setEntActRelation(String entActRelation) {
-        this.entActRelation = entActRelation;
+        if (this.entActRelation == null && entActRelation == null) {
+            // 均为null，不做处理。
+        } else if (this.entActRelation != null && entActRelation != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.entActRelation.compareTo(entActRelation) != 0) {
+                this.entActRelation = entActRelation;
+                if (!this.toUpdateCols.contains("ENT_ACT_RELATION")) {
+                    this.toUpdateCols.add("ENT_ACT_RELATION");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.entActRelation = entActRelation;
+            if (!this.toUpdateCols.contains("ENT_ACT_RELATION")) {
+                this.toUpdateCols.add("ENT_ACT_RELATION");
+            }
+        }
         return this;
     }
 
     /**
      * 操作序号。
      */
-    public Double actSeqNo;
+    private BigDecimal actSeqNo;
 
     /**
      * 获取：操作序号。
      */
-    public Double getActSeqNo() {
+    public BigDecimal getActSeqNo() {
         return this.actSeqNo;
     }
 
     /**
      * 设置：操作序号。
      */
-    public AdSingleEntViewAct setActSeqNo(Double actSeqNo) {
-        this.actSeqNo = actSeqNo;
+    public AdSingleEntViewAct setActSeqNo(BigDecimal actSeqNo) {
+        if (this.actSeqNo == null && actSeqNo == null) {
+            // 均为null，不做处理。
+        } else if (this.actSeqNo != null && actSeqNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actSeqNo.compareTo(actSeqNo) != 0) {
+                this.actSeqNo = actSeqNo;
+                if (!this.toUpdateCols.contains("ACT_SEQ_NO")) {
+                    this.toUpdateCols.add("ACT_SEQ_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actSeqNo = actSeqNo;
+            if (!this.toUpdateCols.contains("ACT_SEQ_NO")) {
+                this.toUpdateCols.add("ACT_SEQ_NO");
+            }
+        }
         return this;
     }
 
     /**
      * 操作名称。
      */
-    public String actName;
+    private String actName;
 
     /**
      * 获取：操作名称。
@@ -530,14 +817,30 @@ public class AdSingleEntViewAct {
      * 设置：操作名称。
      */
     public AdSingleEntViewAct setActName(String actName) {
-        this.actName = actName;
+        if (this.actName == null && actName == null) {
+            // 均为null，不做处理。
+        } else if (this.actName != null && actName != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actName.compareTo(actName) != 0) {
+                this.actName = actName;
+                if (!this.toUpdateCols.contains("ACT_NAME")) {
+                    this.toUpdateCols.add("ACT_NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actName = actName;
+            if (!this.toUpdateCols.contains("ACT_NAME")) {
+                this.toUpdateCols.add("ACT_NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 操作备注。
      */
-    public String actRemark;
+    private String actRemark;
 
     /**
      * 获取：操作备注。
@@ -550,14 +853,30 @@ public class AdSingleEntViewAct {
      * 设置：操作备注。
      */
     public AdSingleEntViewAct setActRemark(String actRemark) {
-        this.actRemark = actRemark;
+        if (this.actRemark == null && actRemark == null) {
+            // 均为null，不做处理。
+        } else if (this.actRemark != null && actRemark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actRemark.compareTo(actRemark) != 0) {
+                this.actRemark = actRemark;
+                if (!this.toUpdateCols.contains("ACT_REMARK")) {
+                    this.toUpdateCols.add("ACT_REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actRemark = actRemark;
+            if (!this.toUpdateCols.contains("ACT_REMARK")) {
+                this.toUpdateCols.add("ACT_REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 操作热键。
      */
-    public String actHotkey;
+    private String actHotkey;
 
     /**
      * 获取：操作热键。
@@ -570,14 +889,30 @@ public class AdSingleEntViewAct {
      * 设置：操作热键。
      */
     public AdSingleEntViewAct setActHotkey(String actHotkey) {
-        this.actHotkey = actHotkey;
+        if (this.actHotkey == null && actHotkey == null) {
+            // 均为null，不做处理。
+        } else if (this.actHotkey != null && actHotkey != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actHotkey.compareTo(actHotkey) != 0) {
+                this.actHotkey = actHotkey;
+                if (!this.toUpdateCols.contains("ACT_HOTKEY")) {
+                    this.toUpdateCols.add("ACT_HOTKEY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actHotkey = actHotkey;
+            if (!this.toUpdateCols.contains("ACT_HOTKEY")) {
+                this.toUpdateCols.add("ACT_HOTKEY");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定记录。
      */
-    public Boolean lockRec;
+    private Boolean lockRec;
 
     /**
      * 获取：锁定记录。
@@ -590,14 +925,30 @@ public class AdSingleEntViewAct {
      * 设置：锁定记录。
      */
     public AdSingleEntViewAct setLockRec(Boolean lockRec) {
-        this.lockRec = lockRec;
+        if (this.lockRec == null && lockRec == null) {
+            // 均为null，不做处理。
+        } else if (this.lockRec != null && lockRec != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lockRec.compareTo(lockRec) != 0) {
+                this.lockRec = lockRec;
+                if (!this.toUpdateCols.contains("LOCK_REC")) {
+                    this.toUpdateCols.add("LOCK_REC");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lockRec = lockRec;
+            if (!this.toUpdateCols.contains("LOCK_REC")) {
+                this.toUpdateCols.add("LOCK_REC");
+            }
+        }
         return this;
     }
 
     /**
      * 预检测扩展点。
      */
-    public String preChkExtPointId;
+    private String preChkExtPointId;
 
     /**
      * 获取：预检测扩展点。
@@ -610,14 +961,30 @@ public class AdSingleEntViewAct {
      * 设置：预检测扩展点。
      */
     public AdSingleEntViewAct setPreChkExtPointId(String preChkExtPointId) {
-        this.preChkExtPointId = preChkExtPointId;
+        if (this.preChkExtPointId == null && preChkExtPointId == null) {
+            // 均为null，不做处理。
+        } else if (this.preChkExtPointId != null && preChkExtPointId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.preChkExtPointId.compareTo(preChkExtPointId) != 0) {
+                this.preChkExtPointId = preChkExtPointId;
+                if (!this.toUpdateCols.contains("PRE_CHK_EXT_POINT_ID")) {
+                    this.toUpdateCols.add("PRE_CHK_EXT_POINT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.preChkExtPointId = preChkExtPointId;
+            if (!this.toUpdateCols.contains("PRE_CHK_EXT_POINT_ID")) {
+                this.toUpdateCols.add("PRE_CHK_EXT_POINT_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 操作时扩展点。
      */
-    public String onActExtPointId;
+    private String onActExtPointId;
 
     /**
      * 获取：操作时扩展点。
@@ -630,14 +997,30 @@ public class AdSingleEntViewAct {
      * 设置：操作时扩展点。
      */
     public AdSingleEntViewAct setOnActExtPointId(String onActExtPointId) {
-        this.onActExtPointId = onActExtPointId;
+        if (this.onActExtPointId == null && onActExtPointId == null) {
+            // 均为null，不做处理。
+        } else if (this.onActExtPointId != null && onActExtPointId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.onActExtPointId.compareTo(onActExtPointId) != 0) {
+                this.onActExtPointId = onActExtPointId;
+                if (!this.toUpdateCols.contains("ON_ACT_EXT_POINT_ID")) {
+                    this.toUpdateCols.add("ON_ACT_EXT_POINT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.onActExtPointId = onActExtPointId;
+            if (!this.toUpdateCols.contains("ON_ACT_EXT_POINT_ID")) {
+                this.toUpdateCols.add("ON_ACT_EXT_POINT_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 操作与所选相关。
      */
-    public Boolean actIsSelectAware;
+    private Boolean actIsSelectAware;
 
     /**
      * 获取：操作与所选相关。
@@ -650,14 +1033,30 @@ public class AdSingleEntViewAct {
      * 设置：操作与所选相关。
      */
     public AdSingleEntViewAct setActIsSelectAware(Boolean actIsSelectAware) {
-        this.actIsSelectAware = actIsSelectAware;
+        if (this.actIsSelectAware == null && actIsSelectAware == null) {
+            // 均为null，不做处理。
+        } else if (this.actIsSelectAware != null && actIsSelectAware != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actIsSelectAware.compareTo(actIsSelectAware) != 0) {
+                this.actIsSelectAware = actIsSelectAware;
+                if (!this.toUpdateCols.contains("ACT_IS_SELECT_AWARE")) {
+                    this.toUpdateCols.add("ACT_IS_SELECT_AWARE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actIsSelectAware = actIsSelectAware;
+            if (!this.toUpdateCols.contains("ACT_IS_SELECT_AWARE")) {
+                this.toUpdateCols.add("ACT_IS_SELECT_AWARE");
+            }
+        }
         return this;
     }
 
     /**
      * 操作可执行逻辑。
      */
-    public String actExecutableLogic;
+    private String actExecutableLogic;
 
     /**
      * 获取：操作可执行逻辑。
@@ -670,14 +1069,30 @@ public class AdSingleEntViewAct {
      * 设置：操作可执行逻辑。
      */
     public AdSingleEntViewAct setActExecutableLogic(String actExecutableLogic) {
-        this.actExecutableLogic = actExecutableLogic;
+        if (this.actExecutableLogic == null && actExecutableLogic == null) {
+            // 均为null，不做处理。
+        } else if (this.actExecutableLogic != null && actExecutableLogic != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actExecutableLogic.compareTo(actExecutableLogic) != 0) {
+                this.actExecutableLogic = actExecutableLogic;
+                if (!this.toUpdateCols.contains("ACT_EXECUTABLE_LOGIC")) {
+                    this.toUpdateCols.add("ACT_EXECUTABLE_LOGIC");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actExecutableLogic = actExecutableLogic;
+            if (!this.toUpdateCols.contains("ACT_EXECUTABLE_LOGIC")) {
+                this.toUpdateCols.add("ACT_EXECUTABLE_LOGIC");
+            }
+        }
         return this;
     }
 
     /**
      * 操作选择模式。
      */
-    public String adActSelectModeId;
+    private String adActSelectModeId;
 
     /**
      * 获取：操作选择模式。
@@ -690,14 +1105,30 @@ public class AdSingleEntViewAct {
      * 设置：操作选择模式。
      */
     public AdSingleEntViewAct setAdActSelectModeId(String adActSelectModeId) {
-        this.adActSelectModeId = adActSelectModeId;
+        if (this.adActSelectModeId == null && adActSelectModeId == null) {
+            // 均为null，不做处理。
+        } else if (this.adActSelectModeId != null && adActSelectModeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adActSelectModeId.compareTo(adActSelectModeId) != 0) {
+                this.adActSelectModeId = adActSelectModeId;
+                if (!this.toUpdateCols.contains("AD_ACT_SELECT_MODE_ID")) {
+                    this.toUpdateCols.add("AD_ACT_SELECT_MODE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adActSelectModeId = adActSelectModeId;
+            if (!this.toUpdateCols.contains("AD_ACT_SELECT_MODE_ID")) {
+                this.toUpdateCols.add("AD_ACT_SELECT_MODE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 操作确认模式。
      */
-    public String adActConfirmModeId;
+    private String adActConfirmModeId;
 
     /**
      * 获取：操作确认模式。
@@ -710,14 +1141,30 @@ public class AdSingleEntViewAct {
      * 设置：操作确认模式。
      */
     public AdSingleEntViewAct setAdActConfirmModeId(String adActConfirmModeId) {
-        this.adActConfirmModeId = adActConfirmModeId;
+        if (this.adActConfirmModeId == null && adActConfirmModeId == null) {
+            // 均为null，不做处理。
+        } else if (this.adActConfirmModeId != null && adActConfirmModeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adActConfirmModeId.compareTo(adActConfirmModeId) != 0) {
+                this.adActConfirmModeId = adActConfirmModeId;
+                if (!this.toUpdateCols.contains("AD_ACT_CONFIRM_MODE_ID")) {
+                    this.toUpdateCols.add("AD_ACT_CONFIRM_MODE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adActConfirmModeId = adActConfirmModeId;
+            if (!this.toUpdateCols.contains("AD_ACT_CONFIRM_MODE_ID")) {
+                this.toUpdateCols.add("AD_ACT_CONFIRM_MODE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 操作确认消息。
      */
-    public String adActConfirmMsg;
+    private String adActConfirmMsg;
 
     /**
      * 获取：操作确认消息。
@@ -730,14 +1177,30 @@ public class AdSingleEntViewAct {
      * 设置：操作确认消息。
      */
     public AdSingleEntViewAct setAdActConfirmMsg(String adActConfirmMsg) {
-        this.adActConfirmMsg = adActConfirmMsg;
+        if (this.adActConfirmMsg == null && adActConfirmMsg == null) {
+            // 均为null，不做处理。
+        } else if (this.adActConfirmMsg != null && adActConfirmMsg != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adActConfirmMsg.compareTo(adActConfirmMsg) != 0) {
+                this.adActConfirmMsg = adActConfirmMsg;
+                if (!this.toUpdateCols.contains("AD_ACT_CONFIRM_MSG")) {
+                    this.toUpdateCols.add("AD_ACT_CONFIRM_MSG");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adActConfirmMsg = adActConfirmMsg;
+            if (!this.toUpdateCols.contains("AD_ACT_CONFIRM_MSG")) {
+                this.toUpdateCols.add("AD_ACT_CONFIRM_MSG");
+            }
+        }
         return this;
     }
 
     /**
      * 明细显示。
      */
-    public Boolean shownInDtlWindow;
+    private Boolean shownInDtlWindow;
 
     /**
      * 获取：明细显示。
@@ -750,14 +1213,30 @@ public class AdSingleEntViewAct {
      * 设置：明细显示。
      */
     public AdSingleEntViewAct setShownInDtlWindow(Boolean shownInDtlWindow) {
-        this.shownInDtlWindow = shownInDtlWindow;
+        if (this.shownInDtlWindow == null && shownInDtlWindow == null) {
+            // 均为null，不做处理。
+        } else if (this.shownInDtlWindow != null && shownInDtlWindow != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.shownInDtlWindow.compareTo(shownInDtlWindow) != 0) {
+                this.shownInDtlWindow = shownInDtlWindow;
+                if (!this.toUpdateCols.contains("SHOWN_IN_DTL_WINDOW")) {
+                    this.toUpdateCols.add("SHOWN_IN_DTL_WINDOW");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.shownInDtlWindow = shownInDtlWindow;
+            if (!this.toUpdateCols.contains("SHOWN_IN_DTL_WINDOW")) {
+                this.toUpdateCols.add("SHOWN_IN_DTL_WINDOW");
+            }
+        }
         return this;
     }
 
     /**
      * 弹出的过滤器实体视图。
      */
-    public String popupFilterSevId;
+    private String popupFilterSevId;
 
     /**
      * 获取：弹出的过滤器实体视图。
@@ -770,14 +1249,30 @@ public class AdSingleEntViewAct {
      * 设置：弹出的过滤器实体视图。
      */
     public AdSingleEntViewAct setPopupFilterSevId(String popupFilterSevId) {
-        this.popupFilterSevId = popupFilterSevId;
+        if (this.popupFilterSevId == null && popupFilterSevId == null) {
+            // 均为null，不做处理。
+        } else if (this.popupFilterSevId != null && popupFilterSevId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.popupFilterSevId.compareTo(popupFilterSevId) != 0) {
+                this.popupFilterSevId = popupFilterSevId;
+                if (!this.toUpdateCols.contains("POPUP_FILTER_SEV_ID")) {
+                    this.toUpdateCols.add("POPUP_FILTER_SEV_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.popupFilterSevId = popupFilterSevId;
+            if (!this.toUpdateCols.contains("POPUP_FILTER_SEV_ID")) {
+                this.toUpdateCols.add("POPUP_FILTER_SEV_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 弹出宽度。
      */
-    public String popupWidth;
+    private String popupWidth;
 
     /**
      * 获取：弹出宽度。
@@ -790,14 +1285,30 @@ public class AdSingleEntViewAct {
      * 设置：弹出宽度。
      */
     public AdSingleEntViewAct setPopupWidth(String popupWidth) {
-        this.popupWidth = popupWidth;
+        if (this.popupWidth == null && popupWidth == null) {
+            // 均为null，不做处理。
+        } else if (this.popupWidth != null && popupWidth != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.popupWidth.compareTo(popupWidth) != 0) {
+                this.popupWidth = popupWidth;
+                if (!this.toUpdateCols.contains("POPUP_WIDTH")) {
+                    this.toUpdateCols.add("POPUP_WIDTH");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.popupWidth = popupWidth;
+            if (!this.toUpdateCols.contains("POPUP_WIDTH")) {
+                this.toUpdateCols.add("POPUP_WIDTH");
+            }
+        }
         return this;
     }
 
     /**
      * 弹出高度。
      */
-    public String popupHeight;
+    private String popupHeight;
 
     /**
      * 获取：弹出高度。
@@ -810,14 +1321,30 @@ public class AdSingleEntViewAct {
      * 设置：弹出高度。
      */
     public AdSingleEntViewAct setPopupHeight(String popupHeight) {
-        this.popupHeight = popupHeight;
+        if (this.popupHeight == null && popupHeight == null) {
+            // 均为null，不做处理。
+        } else if (this.popupHeight != null && popupHeight != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.popupHeight.compareTo(popupHeight) != 0) {
+                this.popupHeight = popupHeight;
+                if (!this.toUpdateCols.contains("POPUP_HEIGHT")) {
+                    this.toUpdateCols.add("POPUP_HEIGHT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.popupHeight = popupHeight;
+            if (!this.toUpdateCols.contains("POPUP_HEIGHT")) {
+                this.toUpdateCols.add("POPUP_HEIGHT");
+            }
+        }
         return this;
     }
 
     /**
      * 弹出显示直到成功。
      */
-    public Boolean popupShowTillSucc;
+    private Boolean popupShowTillSucc;
 
     /**
      * 获取：弹出显示直到成功。
@@ -830,14 +1357,30 @@ public class AdSingleEntViewAct {
      * 设置：弹出显示直到成功。
      */
     public AdSingleEntViewAct setPopupShowTillSucc(Boolean popupShowTillSucc) {
-        this.popupShowTillSucc = popupShowTillSucc;
+        if (this.popupShowTillSucc == null && popupShowTillSucc == null) {
+            // 均为null，不做处理。
+        } else if (this.popupShowTillSucc != null && popupShowTillSucc != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.popupShowTillSucc.compareTo(popupShowTillSucc) != 0) {
+                this.popupShowTillSucc = popupShowTillSucc;
+                if (!this.toUpdateCols.contains("POPUP_SHOW_TILL_SUCC")) {
+                    this.toUpdateCols.add("POPUP_SHOW_TILL_SUCC");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.popupShowTillSucc = popupShowTillSucc;
+            if (!this.toUpdateCols.contains("POPUP_SHOW_TILL_SUCC")) {
+                this.toUpdateCols.add("POPUP_SHOW_TILL_SUCC");
+            }
+        }
         return this;
     }
 
     /**
      * 权限级别。
      */
-    public Integer authLvl;
+    private Integer authLvl;
 
     /**
      * 获取：权限级别。
@@ -850,7 +1393,23 @@ public class AdSingleEntViewAct {
      * 设置：权限级别。
      */
     public AdSingleEntViewAct setAuthLvl(Integer authLvl) {
-        this.authLvl = authLvl;
+        if (this.authLvl == null && authLvl == null) {
+            // 均为null，不做处理。
+        } else if (this.authLvl != null && authLvl != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.authLvl.compareTo(authLvl) != 0) {
+                this.authLvl = authLvl;
+                if (!this.toUpdateCols.contains("AUTH_LVL")) {
+                    this.toUpdateCols.add("AUTH_LVL");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.authLvl = authLvl;
+            if (!this.toUpdateCols.contains("AUTH_LVL")) {
+                this.toUpdateCols.add("AUTH_LVL");
+            }
+        }
         return this;
     }
 
@@ -868,6 +1427,7 @@ public class AdSingleEntViewAct {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -878,7 +1438,17 @@ public class AdSingleEntViewAct {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -899,7 +1469,8 @@ public class AdSingleEntViewAct {
      * @return
      */
     public static AdSingleEntViewAct newData() {
-        return modelHelper.newData();
+        AdSingleEntViewAct obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -908,7 +1479,8 @@ public class AdSingleEntViewAct {
      * @return
      */
     public static AdSingleEntViewAct insertData() {
-        return modelHelper.insertData();
+        AdSingleEntViewAct obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -920,7 +1492,8 @@ public class AdSingleEntViewAct {
      * @return 获取到的对象，若无则为null。
      */
     public static AdSingleEntViewAct selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        AdSingleEntViewAct obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -932,7 +1505,8 @@ public class AdSingleEntViewAct {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdSingleEntViewAct> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<AdSingleEntViewAct> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -944,7 +1518,8 @@ public class AdSingleEntViewAct {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdSingleEntViewAct> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<AdSingleEntViewAct> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

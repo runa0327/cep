@@ -4,8 +4,11 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +21,18 @@ public class WfFlow {
      * 模型助手。
      */
     private static final ModelHelper<WfFlow> modelHelper = new ModelHelper<>("WF_FLOW", new WfFlow());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -137,7 +152,7 @@ public class WfFlow {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -150,14 +165,30 @@ public class WfFlow {
      * 设置：ID。
      */
     public WfFlow setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -170,14 +201,30 @@ public class WfFlow {
      * 设置：版本。
      */
     public WfFlow setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -190,14 +237,30 @@ public class WfFlow {
      * 设置：时间戳。
      */
     public WfFlow setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -210,14 +273,30 @@ public class WfFlow {
      * 设置：是否预设。
      */
     public WfFlow setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -230,14 +309,30 @@ public class WfFlow {
      * 设置：创建日期时间。
      */
     public WfFlow setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -250,14 +345,30 @@ public class WfFlow {
      * 设置：创建用户。
      */
     public WfFlow setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -270,14 +381,30 @@ public class WfFlow {
      * 设置：最后修改日期时间。
      */
     public WfFlow setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -290,14 +417,30 @@ public class WfFlow {
      * 设置：最后修改用户。
      */
     public WfFlow setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -310,14 +453,30 @@ public class WfFlow {
      * 设置：记录状态。
      */
     public WfFlow setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -330,14 +489,30 @@ public class WfFlow {
      * 设置：锁定流程实例。
      */
     public WfFlow setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -350,14 +525,30 @@ public class WfFlow {
      * 设置：代码。
      */
     public WfFlow setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -370,14 +561,30 @@ public class WfFlow {
      * 设置：名称。
      */
     public WfFlow setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -390,14 +597,30 @@ public class WfFlow {
      * 设置：备注。
      */
     public WfFlow setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 从节点。
      */
-    public String fromNodeId;
+    private String fromNodeId;
 
     /**
      * 获取：从节点。
@@ -410,14 +633,30 @@ public class WfFlow {
      * 设置：从节点。
      */
     public WfFlow setFromNodeId(String fromNodeId) {
-        this.fromNodeId = fromNodeId;
+        if (this.fromNodeId == null && fromNodeId == null) {
+            // 均为null，不做处理。
+        } else if (this.fromNodeId != null && fromNodeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.fromNodeId.compareTo(fromNodeId) != 0) {
+                this.fromNodeId = fromNodeId;
+                if (!this.toUpdateCols.contains("FROM_NODE_ID")) {
+                    this.toUpdateCols.add("FROM_NODE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.fromNodeId = fromNodeId;
+            if (!this.toUpdateCols.contains("FROM_NODE_ID")) {
+                this.toUpdateCols.add("FROM_NODE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 到节点。
      */
-    public String toNodeId;
+    private String toNodeId;
 
     /**
      * 获取：到节点。
@@ -430,14 +669,30 @@ public class WfFlow {
      * 设置：到节点。
      */
     public WfFlow setToNodeId(String toNodeId) {
-        this.toNodeId = toNodeId;
+        if (this.toNodeId == null && toNodeId == null) {
+            // 均为null，不做处理。
+        } else if (this.toNodeId != null && toNodeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.toNodeId.compareTo(toNodeId) != 0) {
+                this.toNodeId = toNodeId;
+                if (!this.toUpdateCols.contains("TO_NODE_ID")) {
+                    this.toUpdateCols.add("TO_NODE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.toNodeId = toNodeId;
+            if (!this.toUpdateCols.contains("TO_NODE_ID")) {
+                this.toUpdateCols.add("TO_NODE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 有效逻辑。
      */
-    public String validLogic;
+    private String validLogic;
 
     /**
      * 获取：有效逻辑。
@@ -450,14 +705,30 @@ public class WfFlow {
      * 设置：有效逻辑。
      */
     public WfFlow setValidLogic(String validLogic) {
-        this.validLogic = validLogic;
+        if (this.validLogic == null && validLogic == null) {
+            // 均为null，不做处理。
+        } else if (this.validLogic != null && validLogic != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.validLogic.compareTo(validLogic) != 0) {
+                this.validLogic = validLogic;
+                if (!this.toUpdateCols.contains("VALID_LOGIC")) {
+                    this.toUpdateCols.add("VALID_LOGIC");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.validLogic = validLogic;
+            if (!this.toUpdateCols.contains("VALID_LOGIC")) {
+                this.toUpdateCols.add("VALID_LOGIC");
+            }
+        }
         return this;
     }
 
     /**
      * 操作。
      */
-    public String adActId;
+    private String adActId;
 
     /**
      * 获取：操作。
@@ -470,14 +741,30 @@ public class WfFlow {
      * 设置：操作。
      */
     public WfFlow setAdActId(String adActId) {
-        this.adActId = adActId;
+        if (this.adActId == null && adActId == null) {
+            // 均为null，不做处理。
+        } else if (this.adActId != null && adActId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adActId.compareTo(adActId) != 0) {
+                this.adActId = adActId;
+                if (!this.toUpdateCols.contains("AD_ACT_ID")) {
+                    this.toUpdateCols.add("AD_ACT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adActId = adActId;
+            if (!this.toUpdateCols.contains("AD_ACT_ID")) {
+                this.toUpdateCols.add("AD_ACT_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 操作生效数量逻辑。
      */
-    public String actEffectiveCountLogic;
+    private String actEffectiveCountLogic;
 
     /**
      * 获取：操作生效数量逻辑。
@@ -490,34 +777,66 @@ public class WfFlow {
      * 设置：操作生效数量逻辑。
      */
     public WfFlow setActEffectiveCountLogic(String actEffectiveCountLogic) {
-        this.actEffectiveCountLogic = actEffectiveCountLogic;
+        if (this.actEffectiveCountLogic == null && actEffectiveCountLogic == null) {
+            // 均为null，不做处理。
+        } else if (this.actEffectiveCountLogic != null && actEffectiveCountLogic != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actEffectiveCountLogic.compareTo(actEffectiveCountLogic) != 0) {
+                this.actEffectiveCountLogic = actEffectiveCountLogic;
+                if (!this.toUpdateCols.contains("ACT_EFFECTIVE_COUNT_LOGIC")) {
+                    this.toUpdateCols.add("ACT_EFFECTIVE_COUNT_LOGIC");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actEffectiveCountLogic = actEffectiveCountLogic;
+            if (!this.toUpdateCols.contains("ACT_EFFECTIVE_COUNT_LOGIC")) {
+                this.toUpdateCols.add("ACT_EFFECTIVE_COUNT_LOGIC");
+            }
+        }
         return this;
     }
 
     /**
      * 序号。
      */
-    public Double seqNo;
+    private BigDecimal seqNo;
 
     /**
      * 获取：序号。
      */
-    public Double getSeqNo() {
+    public BigDecimal getSeqNo() {
         return this.seqNo;
     }
 
     /**
      * 设置：序号。
      */
-    public WfFlow setSeqNo(Double seqNo) {
-        this.seqNo = seqNo;
+    public WfFlow setSeqNo(BigDecimal seqNo) {
+        if (this.seqNo == null && seqNo == null) {
+            // 均为null，不做处理。
+        } else if (this.seqNo != null && seqNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.seqNo.compareTo(seqNo) != 0) {
+                this.seqNo = seqNo;
+                if (!this.toUpdateCols.contains("SEQ_NO")) {
+                    this.toUpdateCols.add("SEQ_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.seqNo = seqNo;
+            if (!this.toUpdateCols.contains("SEQ_NO")) {
+                this.toUpdateCols.add("SEQ_NO");
+            }
+        }
         return this;
     }
 
     /**
      * 是否隐藏。
      */
-    public Boolean isHidden;
+    private Boolean isHidden;
 
     /**
      * 获取：是否隐藏。
@@ -530,14 +849,30 @@ public class WfFlow {
      * 设置：是否隐藏。
      */
     public WfFlow setIsHidden(Boolean isHidden) {
-        this.isHidden = isHidden;
+        if (this.isHidden == null && isHidden == null) {
+            // 均为null，不做处理。
+        } else if (this.isHidden != null && isHidden != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isHidden.compareTo(isHidden) != 0) {
+                this.isHidden = isHidden;
+                if (!this.toUpdateCols.contains("IS_HIDDEN")) {
+                    this.toUpdateCols.add("IS_HIDDEN");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isHidden = isHidden;
+            if (!this.toUpdateCols.contains("IS_HIDDEN")) {
+                this.toUpdateCols.add("IS_HIDDEN");
+            }
+        }
         return this;
     }
 
     /**
      * 超时计算方法。
      */
-    public String wfTimeoutCalcMethodId;
+    private String wfTimeoutCalcMethodId;
 
     /**
      * 获取：超时计算方法。
@@ -550,34 +885,66 @@ public class WfFlow {
      * 设置：超时计算方法。
      */
     public WfFlow setWfTimeoutCalcMethodId(String wfTimeoutCalcMethodId) {
-        this.wfTimeoutCalcMethodId = wfTimeoutCalcMethodId;
+        if (this.wfTimeoutCalcMethodId == null && wfTimeoutCalcMethodId == null) {
+            // 均为null，不做处理。
+        } else if (this.wfTimeoutCalcMethodId != null && wfTimeoutCalcMethodId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.wfTimeoutCalcMethodId.compareTo(wfTimeoutCalcMethodId) != 0) {
+                this.wfTimeoutCalcMethodId = wfTimeoutCalcMethodId;
+                if (!this.toUpdateCols.contains("WF_TIMEOUT_CALC_METHOD_ID")) {
+                    this.toUpdateCols.add("WF_TIMEOUT_CALC_METHOD_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.wfTimeoutCalcMethodId = wfTimeoutCalcMethodId;
+            if (!this.toUpdateCols.contains("WF_TIMEOUT_CALC_METHOD_ID")) {
+                this.toUpdateCols.add("WF_TIMEOUT_CALC_METHOD_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 超时分钟数。
      */
-    public Double timeoutMinutes;
+    private BigDecimal timeoutMinutes;
 
     /**
      * 获取：超时分钟数。
      */
-    public Double getTimeoutMinutes() {
+    public BigDecimal getTimeoutMinutes() {
         return this.timeoutMinutes;
     }
 
     /**
      * 设置：超时分钟数。
      */
-    public WfFlow setTimeoutMinutes(Double timeoutMinutes) {
-        this.timeoutMinutes = timeoutMinutes;
+    public WfFlow setTimeoutMinutes(BigDecimal timeoutMinutes) {
+        if (this.timeoutMinutes == null && timeoutMinutes == null) {
+            // 均为null，不做处理。
+        } else if (this.timeoutMinutes != null && timeoutMinutes != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.timeoutMinutes.compareTo(timeoutMinutes) != 0) {
+                this.timeoutMinutes = timeoutMinutes;
+                if (!this.toUpdateCols.contains("TIMEOUT_MINUTES")) {
+                    this.toUpdateCols.add("TIMEOUT_MINUTES");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.timeoutMinutes = timeoutMinutes;
+            if (!this.toUpdateCols.contains("TIMEOUT_MINUTES")) {
+                this.toUpdateCols.add("TIMEOUT_MINUTES");
+            }
+        }
         return this;
     }
 
     /**
      * 图标宽度。
      */
-    public String iconWidth;
+    private String iconWidth;
 
     /**
      * 获取：图标宽度。
@@ -590,14 +957,30 @@ public class WfFlow {
      * 设置：图标宽度。
      */
     public WfFlow setIconWidth(String iconWidth) {
-        this.iconWidth = iconWidth;
+        if (this.iconWidth == null && iconWidth == null) {
+            // 均为null，不做处理。
+        } else if (this.iconWidth != null && iconWidth != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.iconWidth.compareTo(iconWidth) != 0) {
+                this.iconWidth = iconWidth;
+                if (!this.toUpdateCols.contains("ICON_WIDTH")) {
+                    this.toUpdateCols.add("ICON_WIDTH");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.iconWidth = iconWidth;
+            if (!this.toUpdateCols.contains("ICON_WIDTH")) {
+                this.toUpdateCols.add("ICON_WIDTH");
+            }
+        }
         return this;
     }
 
     /**
      * 图标高度。
      */
-    public String iconHeight;
+    private String iconHeight;
 
     /**
      * 获取：图标高度。
@@ -610,7 +993,23 @@ public class WfFlow {
      * 设置：图标高度。
      */
     public WfFlow setIconHeight(String iconHeight) {
-        this.iconHeight = iconHeight;
+        if (this.iconHeight == null && iconHeight == null) {
+            // 均为null，不做处理。
+        } else if (this.iconHeight != null && iconHeight != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.iconHeight.compareTo(iconHeight) != 0) {
+                this.iconHeight = iconHeight;
+                if (!this.toUpdateCols.contains("ICON_HEIGHT")) {
+                    this.toUpdateCols.add("ICON_HEIGHT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.iconHeight = iconHeight;
+            if (!this.toUpdateCols.contains("ICON_HEIGHT")) {
+                this.toUpdateCols.add("ICON_HEIGHT");
+            }
+        }
         return this;
     }
 
@@ -628,6 +1027,7 @@ public class WfFlow {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -638,7 +1038,17 @@ public class WfFlow {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -659,7 +1069,8 @@ public class WfFlow {
      * @return
      */
     public static WfFlow newData() {
-        return modelHelper.newData();
+        WfFlow obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -668,7 +1079,8 @@ public class WfFlow {
      * @return
      */
     public static WfFlow insertData() {
-        return modelHelper.insertData();
+        WfFlow obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -680,7 +1092,8 @@ public class WfFlow {
      * @return 获取到的对象，若无则为null。
      */
     public static WfFlow selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        WfFlow obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -692,7 +1105,8 @@ public class WfFlow {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<WfFlow> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<WfFlow> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -704,7 +1118,8 @@ public class WfFlow {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<WfFlow> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<WfFlow> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

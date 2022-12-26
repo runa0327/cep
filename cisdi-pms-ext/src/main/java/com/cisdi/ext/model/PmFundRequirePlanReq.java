@@ -4,9 +4,12 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +22,18 @@ public class PmFundRequirePlanReq {
      * 模型助手。
      */
     private static final ModelHelper<PmFundRequirePlanReq> modelHelper = new ModelHelper<>("PM_FUND_REQUIRE_PLAN_REQ", new PmFundRequirePlanReq());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -65,41 +80,41 @@ public class PmFundRequirePlanReq {
          */
         public static final String NAME = "NAME";
         /**
-         * 资金需求项目名称。
-         */
-        public static final String AMOUT_PM_PRJ_ID = "AMOUT_PM_PRJ_ID";
-        /**
          * 锁定流程实例。
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
-         * 项目编号。
+         * 资金需求项目名称。
          */
-        public static final String PRJ_CODE = "PRJ_CODE";
+        public static final String AMOUT_PM_PRJ_ID = "AMOUT_PM_PRJ_ID";
         /**
          * 记录状态。
          */
         public static final String STATUS = "STATUS";
         /**
-         * 立项批复文号。
+         * 项目编号。
          */
-        public static final String PRJ_REPLY_NO = "PRJ_REPLY_NO";
+        public static final String PRJ_CODE = "PRJ_CODE";
         /**
          * 创建用户。
          */
         public static final String CRT_USER_ID = "CRT_USER_ID";
         /**
-         * 项目概况。
+         * 立项批复文号。
          */
-        public static final String PRJ_SITUATION = "PRJ_SITUATION";
+        public static final String PRJ_REPLY_NO = "PRJ_REPLY_NO";
         /**
          * 创建部门。
          */
         public static final String CRT_DEPT_ID = "CRT_DEPT_ID";
         /**
-         * 资金来源。
+         * 项目概况。
          */
-        public static final String PM_FUND_SOURCE_ID = "PM_FUND_SOURCE_ID";
+        public static final String PRJ_SITUATION = "PRJ_SITUATION";
+        /**
+         * 投资来源。
+         */
+        public static final String INVESTMENT_SOURCE_ID = "INVESTMENT_SOURCE_ID";
         /**
          * 创建日期时间。
          */
@@ -119,7 +134,7 @@ public class PmFundRequirePlanReq {
         /**
          * 是否市财政预算政府投资计划项目。
          */
-        public static final String IS_BUDGET = "IS_BUDGET";
+        public static final String IS_BUDGET_ID = "IS_BUDGET_ID";
         /**
          * 项目性质。
          */
@@ -173,6 +188,10 @@ public class PmFundRequirePlanReq {
          */
         public static final String EIA_COMPLETED = "EIA_COMPLETED";
         /**
+         * 林地、水土保持、节能完成情况。
+         */
+        public static final String WOODLAND_WATER_SOIL_COMPLETED = "WOODLAND_WATER_SOIL_COMPLETED";
+        /**
          * 概算完成情况。
          */
         public static final String ESTIMATE_COMPLETED = "ESTIMATE_COMPLETED";
@@ -189,15 +208,27 @@ public class PmFundRequirePlanReq {
          */
         public static final String CONSERVATION_REPLY_FILE = "CONSERVATION_REPLY_FILE";
         /**
+         * 施工招标备案完成情况。
+         */
+        public static final String CONSTRUCT_BID_COMPLETED = "CONSTRUCT_BID_COMPLETED";
+        /**
+         * 中标通知书。
+         */
+        public static final String BID_WIN_NOTICE_FILE_GROUP_ID = "BID_WIN_NOTICE_FILE_GROUP_ID";
+        /**
+         * 附件。
+         */
+        public static final String ATT_FILE_GROUP_ID = "ATT_FILE_GROUP_ID";
+        /**
          * 关联合同。
          */
         public static final String RELATION_CONTRACT_ID = "RELATION_CONTRACT_ID";
         /**
-         * 委托单位。
+         * 中标单位1。
          */
-        public static final String ENTRUSTING_UNIT = "ENTRUSTING_UNIT";
+        public static final String WIN_BID_UNIT_ONE = "WIN_BID_UNIT_ONE";
         /**
-         * 合同金额。
+         * 合同金额（万）。
          */
         public static final String CONTRACT_PRICE = "CONTRACT_PRICE";
         /**
@@ -225,6 +256,10 @@ public class PmFundRequirePlanReq {
          */
         public static final String CONTRACT_CATEGORY_ID = "CONTRACT_CATEGORY_ID";
         /**
+         * 需求金额汇总。
+         */
+        public static final String DEMAND_AMT_SUM = "DEMAND_AMT_SUM";
+        /**
          * 标后附件。
          */
         public static final String BID_AFTER_FILE_GROUP_ID = "BID_AFTER_FILE_GROUP_ID";
@@ -232,6 +267,18 @@ public class PmFundRequirePlanReq {
          * 备注。
          */
         public static final String REMARK = "REMARK";
+        /**
+         * 部门意见发表日期。
+         */
+        public static final String DEPT_COMMENT_PUBLISH_DATE = "DEPT_COMMENT_PUBLISH_DATE";
+        /**
+         * 部门意见发表人。
+         */
+        public static final String DEPT_COMMENT_PUBLISH_USER = "DEPT_COMMENT_PUBLISH_USER";
+        /**
+         * 部门意见。
+         */
+        public static final String DEPT_MESSAGE = "DEPT_MESSAGE";
         /**
          * 财务意见发表日期。
          */
@@ -266,7 +313,7 @@ public class PmFundRequirePlanReq {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -279,14 +326,30 @@ public class PmFundRequirePlanReq {
      * 设置：ID。
      */
     public PmFundRequirePlanReq setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -299,14 +362,30 @@ public class PmFundRequirePlanReq {
      * 设置：版本。
      */
     public PmFundRequirePlanReq setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -319,14 +398,30 @@ public class PmFundRequirePlanReq {
      * 设置：时间戳。
      */
     public PmFundRequirePlanReq setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -339,14 +434,30 @@ public class PmFundRequirePlanReq {
      * 设置：是否预设。
      */
     public PmFundRequirePlanReq setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -359,14 +470,30 @@ public class PmFundRequirePlanReq {
      * 设置：最后修改日期时间。
      */
     public PmFundRequirePlanReq setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -379,14 +506,30 @@ public class PmFundRequirePlanReq {
      * 设置：最后修改用户。
      */
     public PmFundRequirePlanReq setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -399,14 +542,30 @@ public class PmFundRequirePlanReq {
      * 设置：代码。
      */
     public PmFundRequirePlanReq setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -419,34 +578,30 @@ public class PmFundRequirePlanReq {
      * 设置：名称。
      */
     public PmFundRequirePlanReq setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    /**
-     * 资金需求项目名称。
-     */
-    public String amoutPmPrjId;
-
-    /**
-     * 获取：资金需求项目名称。
-     */
-    public String getAmoutPmPrjId() {
-        return this.amoutPmPrjId;
-    }
-
-    /**
-     * 设置：资金需求项目名称。
-     */
-    public PmFundRequirePlanReq setAmoutPmPrjId(String amoutPmPrjId) {
-        this.amoutPmPrjId = amoutPmPrjId;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -459,34 +614,66 @@ public class PmFundRequirePlanReq {
      * 设置：锁定流程实例。
      */
     public PmFundRequirePlanReq setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 项目编号。
+     * 资金需求项目名称。
      */
-    public String prjCode;
+    private String amoutPmPrjId;
 
     /**
-     * 获取：项目编号。
+     * 获取：资金需求项目名称。
      */
-    public String getPrjCode() {
-        return this.prjCode;
+    public String getAmoutPmPrjId() {
+        return this.amoutPmPrjId;
     }
 
     /**
-     * 设置：项目编号。
+     * 设置：资金需求项目名称。
      */
-    public PmFundRequirePlanReq setPrjCode(String prjCode) {
-        this.prjCode = prjCode;
+    public PmFundRequirePlanReq setAmoutPmPrjId(String amoutPmPrjId) {
+        if (this.amoutPmPrjId == null && amoutPmPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.amoutPmPrjId != null && amoutPmPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.amoutPmPrjId.compareTo(amoutPmPrjId) != 0) {
+                this.amoutPmPrjId = amoutPmPrjId;
+                if (!this.toUpdateCols.contains("AMOUT_PM_PRJ_ID")) {
+                    this.toUpdateCols.add("AMOUT_PM_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.amoutPmPrjId = amoutPmPrjId;
+            if (!this.toUpdateCols.contains("AMOUT_PM_PRJ_ID")) {
+                this.toUpdateCols.add("AMOUT_PM_PRJ_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -499,34 +686,66 @@ public class PmFundRequirePlanReq {
      * 设置：记录状态。
      */
     public PmFundRequirePlanReq setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
-     * 立项批复文号。
+     * 项目编号。
      */
-    public String prjReplyNo;
+    private String prjCode;
 
     /**
-     * 获取：立项批复文号。
+     * 获取：项目编号。
      */
-    public String getPrjReplyNo() {
-        return this.prjReplyNo;
+    public String getPrjCode() {
+        return this.prjCode;
     }
 
     /**
-     * 设置：立项批复文号。
+     * 设置：项目编号。
      */
-    public PmFundRequirePlanReq setPrjReplyNo(String prjReplyNo) {
-        this.prjReplyNo = prjReplyNo;
+    public PmFundRequirePlanReq setPrjCode(String prjCode) {
+        if (this.prjCode == null && prjCode == null) {
+            // 均为null，不做处理。
+        } else if (this.prjCode != null && prjCode != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjCode.compareTo(prjCode) != 0) {
+                this.prjCode = prjCode;
+                if (!this.toUpdateCols.contains("PRJ_CODE")) {
+                    this.toUpdateCols.add("PRJ_CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjCode = prjCode;
+            if (!this.toUpdateCols.contains("PRJ_CODE")) {
+                this.toUpdateCols.add("PRJ_CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -539,34 +758,66 @@ public class PmFundRequirePlanReq {
      * 设置：创建用户。
      */
     public PmFundRequirePlanReq setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 项目概况。
+     * 立项批复文号。
      */
-    public String prjSituation;
+    private String prjReplyNo;
 
     /**
-     * 获取：项目概况。
+     * 获取：立项批复文号。
      */
-    public String getPrjSituation() {
-        return this.prjSituation;
+    public String getPrjReplyNo() {
+        return this.prjReplyNo;
     }
 
     /**
-     * 设置：项目概况。
+     * 设置：立项批复文号。
      */
-    public PmFundRequirePlanReq setPrjSituation(String prjSituation) {
-        this.prjSituation = prjSituation;
+    public PmFundRequirePlanReq setPrjReplyNo(String prjReplyNo) {
+        if (this.prjReplyNo == null && prjReplyNo == null) {
+            // 均为null，不做处理。
+        } else if (this.prjReplyNo != null && prjReplyNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjReplyNo.compareTo(prjReplyNo) != 0) {
+                this.prjReplyNo = prjReplyNo;
+                if (!this.toUpdateCols.contains("PRJ_REPLY_NO")) {
+                    this.toUpdateCols.add("PRJ_REPLY_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjReplyNo = prjReplyNo;
+            if (!this.toUpdateCols.contains("PRJ_REPLY_NO")) {
+                this.toUpdateCols.add("PRJ_REPLY_NO");
+            }
+        }
         return this;
     }
 
     /**
      * 创建部门。
      */
-    public String crtDeptId;
+    private String crtDeptId;
 
     /**
      * 获取：创建部门。
@@ -579,34 +830,102 @@ public class PmFundRequirePlanReq {
      * 设置：创建部门。
      */
     public PmFundRequirePlanReq setCrtDeptId(String crtDeptId) {
-        this.crtDeptId = crtDeptId;
+        if (this.crtDeptId == null && crtDeptId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDeptId != null && crtDeptId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDeptId.compareTo(crtDeptId) != 0) {
+                this.crtDeptId = crtDeptId;
+                if (!this.toUpdateCols.contains("CRT_DEPT_ID")) {
+                    this.toUpdateCols.add("CRT_DEPT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDeptId = crtDeptId;
+            if (!this.toUpdateCols.contains("CRT_DEPT_ID")) {
+                this.toUpdateCols.add("CRT_DEPT_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 资金来源。
+     * 项目概况。
      */
-    public String pmFundSourceId;
+    private String prjSituation;
 
     /**
-     * 获取：资金来源。
+     * 获取：项目概况。
      */
-    public String getPmFundSourceId() {
-        return this.pmFundSourceId;
+    public String getPrjSituation() {
+        return this.prjSituation;
     }
 
     /**
-     * 设置：资金来源。
+     * 设置：项目概况。
      */
-    public PmFundRequirePlanReq setPmFundSourceId(String pmFundSourceId) {
-        this.pmFundSourceId = pmFundSourceId;
+    public PmFundRequirePlanReq setPrjSituation(String prjSituation) {
+        if (this.prjSituation == null && prjSituation == null) {
+            // 均为null，不做处理。
+        } else if (this.prjSituation != null && prjSituation != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjSituation.compareTo(prjSituation) != 0) {
+                this.prjSituation = prjSituation;
+                if (!this.toUpdateCols.contains("PRJ_SITUATION")) {
+                    this.toUpdateCols.add("PRJ_SITUATION");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjSituation = prjSituation;
+            if (!this.toUpdateCols.contains("PRJ_SITUATION")) {
+                this.toUpdateCols.add("PRJ_SITUATION");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 投资来源。
+     */
+    private String investmentSourceId;
+
+    /**
+     * 获取：投资来源。
+     */
+    public String getInvestmentSourceId() {
+        return this.investmentSourceId;
+    }
+
+    /**
+     * 设置：投资来源。
+     */
+    public PmFundRequirePlanReq setInvestmentSourceId(String investmentSourceId) {
+        if (this.investmentSourceId == null && investmentSourceId == null) {
+            // 均为null，不做处理。
+        } else if (this.investmentSourceId != null && investmentSourceId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.investmentSourceId.compareTo(investmentSourceId) != 0) {
+                this.investmentSourceId = investmentSourceId;
+                if (!this.toUpdateCols.contains("INVESTMENT_SOURCE_ID")) {
+                    this.toUpdateCols.add("INVESTMENT_SOURCE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.investmentSourceId = investmentSourceId;
+            if (!this.toUpdateCols.contains("INVESTMENT_SOURCE_ID")) {
+                this.toUpdateCols.add("INVESTMENT_SOURCE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -619,14 +938,30 @@ public class PmFundRequirePlanReq {
      * 设置：创建日期时间。
      */
     public PmFundRequirePlanReq setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 业主单位。
      */
-    public String customerUnit;
+    private String customerUnit;
 
     /**
      * 获取：业主单位。
@@ -639,14 +974,30 @@ public class PmFundRequirePlanReq {
      * 设置：业主单位。
      */
     public PmFundRequirePlanReq setCustomerUnit(String customerUnit) {
-        this.customerUnit = customerUnit;
+        if (this.customerUnit == null && customerUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.customerUnit != null && customerUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.customerUnit.compareTo(customerUnit) != 0) {
+                this.customerUnit = customerUnit;
+                if (!this.toUpdateCols.contains("CUSTOMER_UNIT")) {
+                    this.toUpdateCols.add("CUSTOMER_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.customerUnit = customerUnit;
+            if (!this.toUpdateCols.contains("CUSTOMER_UNIT")) {
+                this.toUpdateCols.add("CUSTOMER_UNIT");
+            }
+        }
         return this;
     }
 
     /**
      * 项目类型。
      */
-    public String projectTypeId;
+    private String projectTypeId;
 
     /**
      * 获取：项目类型。
@@ -659,14 +1010,30 @@ public class PmFundRequirePlanReq {
      * 设置：项目类型。
      */
     public PmFundRequirePlanReq setProjectTypeId(String projectTypeId) {
-        this.projectTypeId = projectTypeId;
+        if (this.projectTypeId == null && projectTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.projectTypeId != null && projectTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectTypeId.compareTo(projectTypeId) != 0) {
+                this.projectTypeId = projectTypeId;
+                if (!this.toUpdateCols.contains("PROJECT_TYPE_ID")) {
+                    this.toUpdateCols.add("PROJECT_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectTypeId = projectTypeId;
+            if (!this.toUpdateCols.contains("PROJECT_TYPE_ID")) {
+                this.toUpdateCols.add("PROJECT_TYPE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 所属年份。
      */
-    public String year;
+    private String year;
 
     /**
      * 获取：所属年份。
@@ -679,34 +1046,66 @@ public class PmFundRequirePlanReq {
      * 设置：所属年份。
      */
     public PmFundRequirePlanReq setYear(String year) {
-        this.year = year;
+        if (this.year == null && year == null) {
+            // 均为null，不做处理。
+        } else if (this.year != null && year != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.year.compareTo(year) != 0) {
+                this.year = year;
+                if (!this.toUpdateCols.contains("YEAR")) {
+                    this.toUpdateCols.add("YEAR");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.year = year;
+            if (!this.toUpdateCols.contains("YEAR")) {
+                this.toUpdateCols.add("YEAR");
+            }
+        }
         return this;
     }
 
     /**
      * 是否市财政预算政府投资计划项目。
      */
-    public Boolean isBudget;
+    private String isBudgetId;
 
     /**
      * 获取：是否市财政预算政府投资计划项目。
      */
-    public Boolean getIsBudget() {
-        return this.isBudget;
+    public String getIsBudgetId() {
+        return this.isBudgetId;
     }
 
     /**
      * 设置：是否市财政预算政府投资计划项目。
      */
-    public PmFundRequirePlanReq setIsBudget(Boolean isBudget) {
-        this.isBudget = isBudget;
+    public PmFundRequirePlanReq setIsBudgetId(String isBudgetId) {
+        if (this.isBudgetId == null && isBudgetId == null) {
+            // 均为null，不做处理。
+        } else if (this.isBudgetId != null && isBudgetId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isBudgetId.compareTo(isBudgetId) != 0) {
+                this.isBudgetId = isBudgetId;
+                if (!this.toUpdateCols.contains("IS_BUDGET_ID")) {
+                    this.toUpdateCols.add("IS_BUDGET_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isBudgetId = isBudgetId;
+            if (!this.toUpdateCols.contains("IS_BUDGET_ID")) {
+                this.toUpdateCols.add("IS_BUDGET_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 项目性质。
      */
-    public String projectNatureId;
+    private String projectNatureId;
 
     /**
      * 获取：项目性质。
@@ -719,14 +1118,30 @@ public class PmFundRequirePlanReq {
      * 设置：项目性质。
      */
     public PmFundRequirePlanReq setProjectNatureId(String projectNatureId) {
-        this.projectNatureId = projectNatureId;
+        if (this.projectNatureId == null && projectNatureId == null) {
+            // 均为null，不做处理。
+        } else if (this.projectNatureId != null && projectNatureId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectNatureId.compareTo(projectNatureId) != 0) {
+                this.projectNatureId = projectNatureId;
+                if (!this.toUpdateCols.contains("PROJECT_NATURE_ID")) {
+                    this.toUpdateCols.add("PROJECT_NATURE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectNatureId = projectNatureId;
+            if (!this.toUpdateCols.contains("PROJECT_NATURE_ID")) {
+                this.toUpdateCols.add("PROJECT_NATURE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 建设地点。
      */
-    public String baseLocationId;
+    private String baseLocationId;
 
     /**
      * 获取：建设地点。
@@ -739,14 +1154,30 @@ public class PmFundRequirePlanReq {
      * 设置：建设地点。
      */
     public PmFundRequirePlanReq setBaseLocationId(String baseLocationId) {
-        this.baseLocationId = baseLocationId;
+        if (this.baseLocationId == null && baseLocationId == null) {
+            // 均为null，不做处理。
+        } else if (this.baseLocationId != null && baseLocationId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.baseLocationId.compareTo(baseLocationId) != 0) {
+                this.baseLocationId = baseLocationId;
+                if (!this.toUpdateCols.contains("BASE_LOCATION_ID")) {
+                    this.toUpdateCols.add("BASE_LOCATION_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.baseLocationId = baseLocationId;
+            if (!this.toUpdateCols.contains("BASE_LOCATION_ID")) {
+                this.toUpdateCols.add("BASE_LOCATION_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代建单位项目负责人。
      */
-    public String agentBuildUnitResponse;
+    private String agentBuildUnitResponse;
 
     /**
      * 获取：代建单位项目负责人。
@@ -759,14 +1190,30 @@ public class PmFundRequirePlanReq {
      * 设置：代建单位项目负责人。
      */
     public PmFundRequirePlanReq setAgentBuildUnitResponse(String agentBuildUnitResponse) {
-        this.agentBuildUnitResponse = agentBuildUnitResponse;
+        if (this.agentBuildUnitResponse == null && agentBuildUnitResponse == null) {
+            // 均为null，不做处理。
+        } else if (this.agentBuildUnitResponse != null && agentBuildUnitResponse != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.agentBuildUnitResponse.compareTo(agentBuildUnitResponse) != 0) {
+                this.agentBuildUnitResponse = agentBuildUnitResponse;
+                if (!this.toUpdateCols.contains("AGENT_BUILD_UNIT_RESPONSE")) {
+                    this.toUpdateCols.add("AGENT_BUILD_UNIT_RESPONSE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.agentBuildUnitResponse = agentBuildUnitResponse;
+            if (!this.toUpdateCols.contains("AGENT_BUILD_UNIT_RESPONSE")) {
+                this.toUpdateCols.add("AGENT_BUILD_UNIT_RESPONSE");
+            }
+        }
         return this;
     }
 
     /**
      * 代建单位项目负责人电话。
      */
-    public String agentBuildUnitResponsePhone;
+    private String agentBuildUnitResponsePhone;
 
     /**
      * 获取：代建单位项目负责人电话。
@@ -779,14 +1226,30 @@ public class PmFundRequirePlanReq {
      * 设置：代建单位项目负责人电话。
      */
     public PmFundRequirePlanReq setAgentBuildUnitResponsePhone(String agentBuildUnitResponsePhone) {
-        this.agentBuildUnitResponsePhone = agentBuildUnitResponsePhone;
+        if (this.agentBuildUnitResponsePhone == null && agentBuildUnitResponsePhone == null) {
+            // 均为null，不做处理。
+        } else if (this.agentBuildUnitResponsePhone != null && agentBuildUnitResponsePhone != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.agentBuildUnitResponsePhone.compareTo(agentBuildUnitResponsePhone) != 0) {
+                this.agentBuildUnitResponsePhone = agentBuildUnitResponsePhone;
+                if (!this.toUpdateCols.contains("AGENT_BUILD_UNIT_RESPONSE_PHONE")) {
+                    this.toUpdateCols.add("AGENT_BUILD_UNIT_RESPONSE_PHONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.agentBuildUnitResponsePhone = agentBuildUnitResponsePhone;
+            if (!this.toUpdateCols.contains("AGENT_BUILD_UNIT_RESPONSE_PHONE")) {
+                this.toUpdateCols.add("AGENT_BUILD_UNIT_RESPONSE_PHONE");
+            }
+        }
         return this;
     }
 
     /**
      * 征地拆迁工作完成情况。
      */
-    public String demolitionCompleted;
+    private String demolitionCompleted;
 
     /**
      * 获取：征地拆迁工作完成情况。
@@ -799,14 +1262,30 @@ public class PmFundRequirePlanReq {
      * 设置：征地拆迁工作完成情况。
      */
     public PmFundRequirePlanReq setDemolitionCompleted(String demolitionCompleted) {
-        this.demolitionCompleted = demolitionCompleted;
+        if (this.demolitionCompleted == null && demolitionCompleted == null) {
+            // 均为null，不做处理。
+        } else if (this.demolitionCompleted != null && demolitionCompleted != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.demolitionCompleted.compareTo(demolitionCompleted) != 0) {
+                this.demolitionCompleted = demolitionCompleted;
+                if (!this.toUpdateCols.contains("DEMOLITION_COMPLETED")) {
+                    this.toUpdateCols.add("DEMOLITION_COMPLETED");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.demolitionCompleted = demolitionCompleted;
+            if (!this.toUpdateCols.contains("DEMOLITION_COMPLETED")) {
+                this.toUpdateCols.add("DEMOLITION_COMPLETED");
+            }
+        }
         return this;
     }
 
     /**
      * 预计开始日期。
      */
-    public LocalDate planStartDate;
+    private LocalDate planStartDate;
 
     /**
      * 获取：预计开始日期。
@@ -819,14 +1298,30 @@ public class PmFundRequirePlanReq {
      * 设置：预计开始日期。
      */
     public PmFundRequirePlanReq setPlanStartDate(LocalDate planStartDate) {
-        this.planStartDate = planStartDate;
+        if (this.planStartDate == null && planStartDate == null) {
+            // 均为null，不做处理。
+        } else if (this.planStartDate != null && planStartDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planStartDate.compareTo(planStartDate) != 0) {
+                this.planStartDate = planStartDate;
+                if (!this.toUpdateCols.contains("PLAN_START_DATE")) {
+                    this.toUpdateCols.add("PLAN_START_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planStartDate = planStartDate;
+            if (!this.toUpdateCols.contains("PLAN_START_DATE")) {
+                this.toUpdateCols.add("PLAN_START_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 预计完成日期。
      */
-    public LocalDate planComplDate;
+    private LocalDate planComplDate;
 
     /**
      * 获取：预计完成日期。
@@ -839,14 +1334,30 @@ public class PmFundRequirePlanReq {
      * 设置：预计完成日期。
      */
     public PmFundRequirePlanReq setPlanComplDate(LocalDate planComplDate) {
-        this.planComplDate = planComplDate;
+        if (this.planComplDate == null && planComplDate == null) {
+            // 均为null，不做处理。
+        } else if (this.planComplDate != null && planComplDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planComplDate.compareTo(planComplDate) != 0) {
+                this.planComplDate = planComplDate;
+                if (!this.toUpdateCols.contains("PLAN_COMPL_DATE")) {
+                    this.toUpdateCols.add("PLAN_COMPL_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planComplDate = planComplDate;
+            if (!this.toUpdateCols.contains("PLAN_COMPL_DATE")) {
+                this.toUpdateCols.add("PLAN_COMPL_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 实际开始日期。
      */
-    public LocalDate actualStartDate;
+    private LocalDate actualStartDate;
 
     /**
      * 获取：实际开始日期。
@@ -859,14 +1370,30 @@ public class PmFundRequirePlanReq {
      * 设置：实际开始日期。
      */
     public PmFundRequirePlanReq setActualStartDate(LocalDate actualStartDate) {
-        this.actualStartDate = actualStartDate;
+        if (this.actualStartDate == null && actualStartDate == null) {
+            // 均为null，不做处理。
+        } else if (this.actualStartDate != null && actualStartDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actualStartDate.compareTo(actualStartDate) != 0) {
+                this.actualStartDate = actualStartDate;
+                if (!this.toUpdateCols.contains("ACTUAL_START_DATE")) {
+                    this.toUpdateCols.add("ACTUAL_START_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actualStartDate = actualStartDate;
+            if (!this.toUpdateCols.contains("ACTUAL_START_DATE")) {
+                this.toUpdateCols.add("ACTUAL_START_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 立项完成情况。
      */
-    public String createProjectCompleted;
+    private String createProjectCompleted;
 
     /**
      * 获取：立项完成情况。
@@ -879,14 +1406,30 @@ public class PmFundRequirePlanReq {
      * 设置：立项完成情况。
      */
     public PmFundRequirePlanReq setCreateProjectCompleted(String createProjectCompleted) {
-        this.createProjectCompleted = createProjectCompleted;
+        if (this.createProjectCompleted == null && createProjectCompleted == null) {
+            // 均为null，不做处理。
+        } else if (this.createProjectCompleted != null && createProjectCompleted != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.createProjectCompleted.compareTo(createProjectCompleted) != 0) {
+                this.createProjectCompleted = createProjectCompleted;
+                if (!this.toUpdateCols.contains("CREATE_PROJECT_COMPLETED")) {
+                    this.toUpdateCols.add("CREATE_PROJECT_COMPLETED");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.createProjectCompleted = createProjectCompleted;
+            if (!this.toUpdateCols.contains("CREATE_PROJECT_COMPLETED")) {
+                this.toUpdateCols.add("CREATE_PROJECT_COMPLETED");
+            }
+        }
         return this;
     }
 
     /**
      * 可研完成情况。
      */
-    public String feasibilityCompleted;
+    private String feasibilityCompleted;
 
     /**
      * 获取：可研完成情况。
@@ -899,14 +1442,30 @@ public class PmFundRequirePlanReq {
      * 设置：可研完成情况。
      */
     public PmFundRequirePlanReq setFeasibilityCompleted(String feasibilityCompleted) {
-        this.feasibilityCompleted = feasibilityCompleted;
+        if (this.feasibilityCompleted == null && feasibilityCompleted == null) {
+            // 均为null，不做处理。
+        } else if (this.feasibilityCompleted != null && feasibilityCompleted != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.feasibilityCompleted.compareTo(feasibilityCompleted) != 0) {
+                this.feasibilityCompleted = feasibilityCompleted;
+                if (!this.toUpdateCols.contains("FEASIBILITY_COMPLETED")) {
+                    this.toUpdateCols.add("FEASIBILITY_COMPLETED");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.feasibilityCompleted = feasibilityCompleted;
+            if (!this.toUpdateCols.contains("FEASIBILITY_COMPLETED")) {
+                this.toUpdateCols.add("FEASIBILITY_COMPLETED");
+            }
+        }
         return this;
     }
 
     /**
      * 规划选址完成情况。
      */
-    public String selectSiteCompleted;
+    private String selectSiteCompleted;
 
     /**
      * 获取：规划选址完成情况。
@@ -919,14 +1478,30 @@ public class PmFundRequirePlanReq {
      * 设置：规划选址完成情况。
      */
     public PmFundRequirePlanReq setSelectSiteCompleted(String selectSiteCompleted) {
-        this.selectSiteCompleted = selectSiteCompleted;
+        if (this.selectSiteCompleted == null && selectSiteCompleted == null) {
+            // 均为null，不做处理。
+        } else if (this.selectSiteCompleted != null && selectSiteCompleted != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.selectSiteCompleted.compareTo(selectSiteCompleted) != 0) {
+                this.selectSiteCompleted = selectSiteCompleted;
+                if (!this.toUpdateCols.contains("SELECT_SITE_COMPLETED")) {
+                    this.toUpdateCols.add("SELECT_SITE_COMPLETED");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.selectSiteCompleted = selectSiteCompleted;
+            if (!this.toUpdateCols.contains("SELECT_SITE_COMPLETED")) {
+                this.toUpdateCols.add("SELECT_SITE_COMPLETED");
+            }
+        }
         return this;
     }
 
     /**
      * 用地预审完成情况。
      */
-    public String useLandCompleted;
+    private String useLandCompleted;
 
     /**
      * 获取：用地预审完成情况。
@@ -939,14 +1514,30 @@ public class PmFundRequirePlanReq {
      * 设置：用地预审完成情况。
      */
     public PmFundRequirePlanReq setUseLandCompleted(String useLandCompleted) {
-        this.useLandCompleted = useLandCompleted;
+        if (this.useLandCompleted == null && useLandCompleted == null) {
+            // 均为null，不做处理。
+        } else if (this.useLandCompleted != null && useLandCompleted != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.useLandCompleted.compareTo(useLandCompleted) != 0) {
+                this.useLandCompleted = useLandCompleted;
+                if (!this.toUpdateCols.contains("USE_LAND_COMPLETED")) {
+                    this.toUpdateCols.add("USE_LAND_COMPLETED");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.useLandCompleted = useLandCompleted;
+            if (!this.toUpdateCols.contains("USE_LAND_COMPLETED")) {
+                this.toUpdateCols.add("USE_LAND_COMPLETED");
+            }
+        }
         return this;
     }
 
     /**
      * 环评审批完成情况。
      */
-    public String eiaCompleted;
+    private String eiaCompleted;
 
     /**
      * 获取：环评审批完成情况。
@@ -959,14 +1550,66 @@ public class PmFundRequirePlanReq {
      * 设置：环评审批完成情况。
      */
     public PmFundRequirePlanReq setEiaCompleted(String eiaCompleted) {
-        this.eiaCompleted = eiaCompleted;
+        if (this.eiaCompleted == null && eiaCompleted == null) {
+            // 均为null，不做处理。
+        } else if (this.eiaCompleted != null && eiaCompleted != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.eiaCompleted.compareTo(eiaCompleted) != 0) {
+                this.eiaCompleted = eiaCompleted;
+                if (!this.toUpdateCols.contains("EIA_COMPLETED")) {
+                    this.toUpdateCols.add("EIA_COMPLETED");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.eiaCompleted = eiaCompleted;
+            if (!this.toUpdateCols.contains("EIA_COMPLETED")) {
+                this.toUpdateCols.add("EIA_COMPLETED");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 林地、水土保持、节能完成情况。
+     */
+    private String woodlandWaterSoilCompleted;
+
+    /**
+     * 获取：林地、水土保持、节能完成情况。
+     */
+    public String getWoodlandWaterSoilCompleted() {
+        return this.woodlandWaterSoilCompleted;
+    }
+
+    /**
+     * 设置：林地、水土保持、节能完成情况。
+     */
+    public PmFundRequirePlanReq setWoodlandWaterSoilCompleted(String woodlandWaterSoilCompleted) {
+        if (this.woodlandWaterSoilCompleted == null && woodlandWaterSoilCompleted == null) {
+            // 均为null，不做处理。
+        } else if (this.woodlandWaterSoilCompleted != null && woodlandWaterSoilCompleted != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.woodlandWaterSoilCompleted.compareTo(woodlandWaterSoilCompleted) != 0) {
+                this.woodlandWaterSoilCompleted = woodlandWaterSoilCompleted;
+                if (!this.toUpdateCols.contains("WOODLAND_WATER_SOIL_COMPLETED")) {
+                    this.toUpdateCols.add("WOODLAND_WATER_SOIL_COMPLETED");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.woodlandWaterSoilCompleted = woodlandWaterSoilCompleted;
+            if (!this.toUpdateCols.contains("WOODLAND_WATER_SOIL_COMPLETED")) {
+                this.toUpdateCols.add("WOODLAND_WATER_SOIL_COMPLETED");
+            }
+        }
         return this;
     }
 
     /**
      * 概算完成情况。
      */
-    public String estimateCompleted;
+    private String estimateCompleted;
 
     /**
      * 获取：概算完成情况。
@@ -979,14 +1622,30 @@ public class PmFundRequirePlanReq {
      * 设置：概算完成情况。
      */
     public PmFundRequirePlanReq setEstimateCompleted(String estimateCompleted) {
-        this.estimateCompleted = estimateCompleted;
+        if (this.estimateCompleted == null && estimateCompleted == null) {
+            // 均为null，不做处理。
+        } else if (this.estimateCompleted != null && estimateCompleted != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.estimateCompleted.compareTo(estimateCompleted) != 0) {
+                this.estimateCompleted = estimateCompleted;
+                if (!this.toUpdateCols.contains("ESTIMATE_COMPLETED")) {
+                    this.toUpdateCols.add("ESTIMATE_COMPLETED");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.estimateCompleted = estimateCompleted;
+            if (!this.toUpdateCols.contains("ESTIMATE_COMPLETED")) {
+                this.toUpdateCols.add("ESTIMATE_COMPLETED");
+            }
+        }
         return this;
     }
 
     /**
      * 批复文件。
      */
-    public String replyFile;
+    private String replyFile;
 
     /**
      * 获取：批复文件。
@@ -999,14 +1658,30 @@ public class PmFundRequirePlanReq {
      * 设置：批复文件。
      */
     public PmFundRequirePlanReq setReplyFile(String replyFile) {
-        this.replyFile = replyFile;
+        if (this.replyFile == null && replyFile == null) {
+            // 均为null，不做处理。
+        } else if (this.replyFile != null && replyFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.replyFile.compareTo(replyFile) != 0) {
+                this.replyFile = replyFile;
+                if (!this.toUpdateCols.contains("REPLY_FILE")) {
+                    this.toUpdateCols.add("REPLY_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.replyFile = replyFile;
+            if (!this.toUpdateCols.contains("REPLY_FILE")) {
+                this.toUpdateCols.add("REPLY_FILE");
+            }
+        }
         return this;
     }
 
     /**
      * 预算评审完成情况。
      */
-    public String budgetReviewCompleted;
+    private String budgetReviewCompleted;
 
     /**
      * 获取：预算评审完成情况。
@@ -1019,14 +1694,30 @@ public class PmFundRequirePlanReq {
      * 设置：预算评审完成情况。
      */
     public PmFundRequirePlanReq setBudgetReviewCompleted(String budgetReviewCompleted) {
-        this.budgetReviewCompleted = budgetReviewCompleted;
+        if (this.budgetReviewCompleted == null && budgetReviewCompleted == null) {
+            // 均为null，不做处理。
+        } else if (this.budgetReviewCompleted != null && budgetReviewCompleted != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.budgetReviewCompleted.compareTo(budgetReviewCompleted) != 0) {
+                this.budgetReviewCompleted = budgetReviewCompleted;
+                if (!this.toUpdateCols.contains("BUDGET_REVIEW_COMPLETED")) {
+                    this.toUpdateCols.add("BUDGET_REVIEW_COMPLETED");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.budgetReviewCompleted = budgetReviewCompleted;
+            if (!this.toUpdateCols.contains("BUDGET_REVIEW_COMPLETED")) {
+                this.toUpdateCols.add("BUDGET_REVIEW_COMPLETED");
+            }
+        }
         return this;
     }
 
     /**
      * 环评批复文件。
      */
-    public String conservationReplyFile;
+    private String conservationReplyFile;
 
     /**
      * 获取：环评批复文件。
@@ -1039,14 +1730,138 @@ public class PmFundRequirePlanReq {
      * 设置：环评批复文件。
      */
     public PmFundRequirePlanReq setConservationReplyFile(String conservationReplyFile) {
-        this.conservationReplyFile = conservationReplyFile;
+        if (this.conservationReplyFile == null && conservationReplyFile == null) {
+            // 均为null，不做处理。
+        } else if (this.conservationReplyFile != null && conservationReplyFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.conservationReplyFile.compareTo(conservationReplyFile) != 0) {
+                this.conservationReplyFile = conservationReplyFile;
+                if (!this.toUpdateCols.contains("CONSERVATION_REPLY_FILE")) {
+                    this.toUpdateCols.add("CONSERVATION_REPLY_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.conservationReplyFile = conservationReplyFile;
+            if (!this.toUpdateCols.contains("CONSERVATION_REPLY_FILE")) {
+                this.toUpdateCols.add("CONSERVATION_REPLY_FILE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 施工招标备案完成情况。
+     */
+    private String constructBidCompleted;
+
+    /**
+     * 获取：施工招标备案完成情况。
+     */
+    public String getConstructBidCompleted() {
+        return this.constructBidCompleted;
+    }
+
+    /**
+     * 设置：施工招标备案完成情况。
+     */
+    public PmFundRequirePlanReq setConstructBidCompleted(String constructBidCompleted) {
+        if (this.constructBidCompleted == null && constructBidCompleted == null) {
+            // 均为null，不做处理。
+        } else if (this.constructBidCompleted != null && constructBidCompleted != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.constructBidCompleted.compareTo(constructBidCompleted) != 0) {
+                this.constructBidCompleted = constructBidCompleted;
+                if (!this.toUpdateCols.contains("CONSTRUCT_BID_COMPLETED")) {
+                    this.toUpdateCols.add("CONSTRUCT_BID_COMPLETED");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.constructBidCompleted = constructBidCompleted;
+            if (!this.toUpdateCols.contains("CONSTRUCT_BID_COMPLETED")) {
+                this.toUpdateCols.add("CONSTRUCT_BID_COMPLETED");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 中标通知书。
+     */
+    private String bidWinNoticeFileGroupId;
+
+    /**
+     * 获取：中标通知书。
+     */
+    public String getBidWinNoticeFileGroupId() {
+        return this.bidWinNoticeFileGroupId;
+    }
+
+    /**
+     * 设置：中标通知书。
+     */
+    public PmFundRequirePlanReq setBidWinNoticeFileGroupId(String bidWinNoticeFileGroupId) {
+        if (this.bidWinNoticeFileGroupId == null && bidWinNoticeFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.bidWinNoticeFileGroupId != null && bidWinNoticeFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidWinNoticeFileGroupId.compareTo(bidWinNoticeFileGroupId) != 0) {
+                this.bidWinNoticeFileGroupId = bidWinNoticeFileGroupId;
+                if (!this.toUpdateCols.contains("BID_WIN_NOTICE_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("BID_WIN_NOTICE_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidWinNoticeFileGroupId = bidWinNoticeFileGroupId;
+            if (!this.toUpdateCols.contains("BID_WIN_NOTICE_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("BID_WIN_NOTICE_FILE_GROUP_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 附件。
+     */
+    private String attFileGroupId;
+
+    /**
+     * 获取：附件。
+     */
+    public String getAttFileGroupId() {
+        return this.attFileGroupId;
+    }
+
+    /**
+     * 设置：附件。
+     */
+    public PmFundRequirePlanReq setAttFileGroupId(String attFileGroupId) {
+        if (this.attFileGroupId == null && attFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.attFileGroupId != null && attFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.attFileGroupId.compareTo(attFileGroupId) != 0) {
+                this.attFileGroupId = attFileGroupId;
+                if (!this.toUpdateCols.contains("ATT_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("ATT_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.attFileGroupId = attFileGroupId;
+            if (!this.toUpdateCols.contains("ATT_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("ATT_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 关联合同。
      */
-    public String relationContractId;
+    private String relationContractId;
 
     /**
      * 获取：关联合同。
@@ -1059,154 +1874,282 @@ public class PmFundRequirePlanReq {
      * 设置：关联合同。
      */
     public PmFundRequirePlanReq setRelationContractId(String relationContractId) {
-        this.relationContractId = relationContractId;
+        if (this.relationContractId == null && relationContractId == null) {
+            // 均为null，不做处理。
+        } else if (this.relationContractId != null && relationContractId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.relationContractId.compareTo(relationContractId) != 0) {
+                this.relationContractId = relationContractId;
+                if (!this.toUpdateCols.contains("RELATION_CONTRACT_ID")) {
+                    this.toUpdateCols.add("RELATION_CONTRACT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.relationContractId = relationContractId;
+            if (!this.toUpdateCols.contains("RELATION_CONTRACT_ID")) {
+                this.toUpdateCols.add("RELATION_CONTRACT_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 委托单位。
+     * 中标单位1。
      */
-    public String entrustingUnit;
+    private String winBidUnitOne;
 
     /**
-     * 获取：委托单位。
+     * 获取：中标单位1。
      */
-    public String getEntrustingUnit() {
-        return this.entrustingUnit;
+    public String getWinBidUnitOne() {
+        return this.winBidUnitOne;
     }
 
     /**
-     * 设置：委托单位。
+     * 设置：中标单位1。
      */
-    public PmFundRequirePlanReq setEntrustingUnit(String entrustingUnit) {
-        this.entrustingUnit = entrustingUnit;
+    public PmFundRequirePlanReq setWinBidUnitOne(String winBidUnitOne) {
+        if (this.winBidUnitOne == null && winBidUnitOne == null) {
+            // 均为null，不做处理。
+        } else if (this.winBidUnitOne != null && winBidUnitOne != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.winBidUnitOne.compareTo(winBidUnitOne) != 0) {
+                this.winBidUnitOne = winBidUnitOne;
+                if (!this.toUpdateCols.contains("WIN_BID_UNIT_ONE")) {
+                    this.toUpdateCols.add("WIN_BID_UNIT_ONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.winBidUnitOne = winBidUnitOne;
+            if (!this.toUpdateCols.contains("WIN_BID_UNIT_ONE")) {
+                this.toUpdateCols.add("WIN_BID_UNIT_ONE");
+            }
+        }
         return this;
     }
 
     /**
-     * 合同金额。
+     * 合同金额（万）。
      */
-    public String contractPrice;
+    private BigDecimal contractPrice;
 
     /**
-     * 获取：合同金额。
+     * 获取：合同金额（万）。
      */
-    public String getContractPrice() {
+    public BigDecimal getContractPrice() {
         return this.contractPrice;
     }
 
     /**
-     * 设置：合同金额。
+     * 设置：合同金额（万）。
      */
-    public PmFundRequirePlanReq setContractPrice(String contractPrice) {
-        this.contractPrice = contractPrice;
+    public PmFundRequirePlanReq setContractPrice(BigDecimal contractPrice) {
+        if (this.contractPrice == null && contractPrice == null) {
+            // 均为null，不做处理。
+        } else if (this.contractPrice != null && contractPrice != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contractPrice.compareTo(contractPrice) != 0) {
+                this.contractPrice = contractPrice;
+                if (!this.toUpdateCols.contains("CONTRACT_PRICE")) {
+                    this.toUpdateCols.add("CONTRACT_PRICE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contractPrice = contractPrice;
+            if (!this.toUpdateCols.contains("CONTRACT_PRICE")) {
+                this.toUpdateCols.add("CONTRACT_PRICE");
+            }
+        }
         return this;
     }
 
     /**
      * 支付金额。
      */
-    public Double payAmt;
+    private BigDecimal payAmt;
 
     /**
      * 获取：支付金额。
      */
-    public Double getPayAmt() {
+    public BigDecimal getPayAmt() {
         return this.payAmt;
     }
 
     /**
      * 设置：支付金额。
      */
-    public PmFundRequirePlanReq setPayAmt(Double payAmt) {
-        this.payAmt = payAmt;
+    public PmFundRequirePlanReq setPayAmt(BigDecimal payAmt) {
+        if (this.payAmt == null && payAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.payAmt != null && payAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.payAmt.compareTo(payAmt) != 0) {
+                this.payAmt = payAmt;
+                if (!this.toUpdateCols.contains("PAY_AMT")) {
+                    this.toUpdateCols.add("PAY_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.payAmt = payAmt;
+            if (!this.toUpdateCols.contains("PAY_AMT")) {
+                this.toUpdateCols.add("PAY_AMT");
+            }
+        }
         return this;
     }
 
     /**
      * 预付款比例。
      */
-    public String advanceChargePercent;
+    private BigDecimal advanceChargePercent;
 
     /**
      * 获取：预付款比例。
      */
-    public String getAdvanceChargePercent() {
+    public BigDecimal getAdvanceChargePercent() {
         return this.advanceChargePercent;
     }
 
     /**
      * 设置：预付款比例。
      */
-    public PmFundRequirePlanReq setAdvanceChargePercent(String advanceChargePercent) {
-        this.advanceChargePercent = advanceChargePercent;
+    public PmFundRequirePlanReq setAdvanceChargePercent(BigDecimal advanceChargePercent) {
+        if (this.advanceChargePercent == null && advanceChargePercent == null) {
+            // 均为null，不做处理。
+        } else if (this.advanceChargePercent != null && advanceChargePercent != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.advanceChargePercent.compareTo(advanceChargePercent) != 0) {
+                this.advanceChargePercent = advanceChargePercent;
+                if (!this.toUpdateCols.contains("ADVANCE_CHARGE_PERCENT")) {
+                    this.toUpdateCols.add("ADVANCE_CHARGE_PERCENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.advanceChargePercent = advanceChargePercent;
+            if (!this.toUpdateCols.contains("ADVANCE_CHARGE_PERCENT")) {
+                this.toUpdateCols.add("ADVANCE_CHARGE_PERCENT");
+            }
+        }
         return this;
     }
 
     /**
      * 概评金额。
      */
-    public Double estimatedAmount;
+    private BigDecimal estimatedAmount;
 
     /**
      * 获取：概评金额。
      */
-    public Double getEstimatedAmount() {
+    public BigDecimal getEstimatedAmount() {
         return this.estimatedAmount;
     }
 
     /**
      * 设置：概评金额。
      */
-    public PmFundRequirePlanReq setEstimatedAmount(Double estimatedAmount) {
-        this.estimatedAmount = estimatedAmount;
+    public PmFundRequirePlanReq setEstimatedAmount(BigDecimal estimatedAmount) {
+        if (this.estimatedAmount == null && estimatedAmount == null) {
+            // 均为null，不做处理。
+        } else if (this.estimatedAmount != null && estimatedAmount != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.estimatedAmount.compareTo(estimatedAmount) != 0) {
+                this.estimatedAmount = estimatedAmount;
+                if (!this.toUpdateCols.contains("ESTIMATED_AMOUNT")) {
+                    this.toUpdateCols.add("ESTIMATED_AMOUNT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.estimatedAmount = estimatedAmount;
+            if (!this.toUpdateCols.contains("ESTIMATED_AMOUNT")) {
+                this.toUpdateCols.add("ESTIMATED_AMOUNT");
+            }
+        }
         return this;
     }
 
     /**
      * 财评金额。
      */
-    public Double financialAmount;
+    private BigDecimal financialAmount;
 
     /**
      * 获取：财评金额。
      */
-    public Double getFinancialAmount() {
+    public BigDecimal getFinancialAmount() {
         return this.financialAmount;
     }
 
     /**
      * 设置：财评金额。
      */
-    public PmFundRequirePlanReq setFinancialAmount(Double financialAmount) {
-        this.financialAmount = financialAmount;
+    public PmFundRequirePlanReq setFinancialAmount(BigDecimal financialAmount) {
+        if (this.financialAmount == null && financialAmount == null) {
+            // 均为null，不做处理。
+        } else if (this.financialAmount != null && financialAmount != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.financialAmount.compareTo(financialAmount) != 0) {
+                this.financialAmount = financialAmount;
+                if (!this.toUpdateCols.contains("FINANCIAL_AMOUNT")) {
+                    this.toUpdateCols.add("FINANCIAL_AMOUNT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.financialAmount = financialAmount;
+            if (!this.toUpdateCols.contains("FINANCIAL_AMOUNT")) {
+                this.toUpdateCols.add("FINANCIAL_AMOUNT");
+            }
+        }
         return this;
     }
 
     /**
      * 指标金额。
      */
-    public Double tgtAmt;
+    private BigDecimal tgtAmt;
 
     /**
      * 获取：指标金额。
      */
-    public Double getTgtAmt() {
+    public BigDecimal getTgtAmt() {
         return this.tgtAmt;
     }
 
     /**
      * 设置：指标金额。
      */
-    public PmFundRequirePlanReq setTgtAmt(Double tgtAmt) {
-        this.tgtAmt = tgtAmt;
+    public PmFundRequirePlanReq setTgtAmt(BigDecimal tgtAmt) {
+        if (this.tgtAmt == null && tgtAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.tgtAmt != null && tgtAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.tgtAmt.compareTo(tgtAmt) != 0) {
+                this.tgtAmt = tgtAmt;
+                if (!this.toUpdateCols.contains("TGT_AMT")) {
+                    this.toUpdateCols.add("TGT_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.tgtAmt = tgtAmt;
+            if (!this.toUpdateCols.contains("TGT_AMT")) {
+                this.toUpdateCols.add("TGT_AMT");
+            }
+        }
         return this;
     }
 
     /**
      * 合同类型。
      */
-    public String contractCategoryId;
+    private String contractCategoryId;
 
     /**
      * 获取：合同类型。
@@ -1219,14 +2162,66 @@ public class PmFundRequirePlanReq {
      * 设置：合同类型。
      */
     public PmFundRequirePlanReq setContractCategoryId(String contractCategoryId) {
-        this.contractCategoryId = contractCategoryId;
+        if (this.contractCategoryId == null && contractCategoryId == null) {
+            // 均为null，不做处理。
+        } else if (this.contractCategoryId != null && contractCategoryId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contractCategoryId.compareTo(contractCategoryId) != 0) {
+                this.contractCategoryId = contractCategoryId;
+                if (!this.toUpdateCols.contains("CONTRACT_CATEGORY_ID")) {
+                    this.toUpdateCols.add("CONTRACT_CATEGORY_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contractCategoryId = contractCategoryId;
+            if (!this.toUpdateCols.contains("CONTRACT_CATEGORY_ID")) {
+                this.toUpdateCols.add("CONTRACT_CATEGORY_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 需求金额汇总。
+     */
+    private BigDecimal demandAmtSum;
+
+    /**
+     * 获取：需求金额汇总。
+     */
+    public BigDecimal getDemandAmtSum() {
+        return this.demandAmtSum;
+    }
+
+    /**
+     * 设置：需求金额汇总。
+     */
+    public PmFundRequirePlanReq setDemandAmtSum(BigDecimal demandAmtSum) {
+        if (this.demandAmtSum == null && demandAmtSum == null) {
+            // 均为null，不做处理。
+        } else if (this.demandAmtSum != null && demandAmtSum != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.demandAmtSum.compareTo(demandAmtSum) != 0) {
+                this.demandAmtSum = demandAmtSum;
+                if (!this.toUpdateCols.contains("DEMAND_AMT_SUM")) {
+                    this.toUpdateCols.add("DEMAND_AMT_SUM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.demandAmtSum = demandAmtSum;
+            if (!this.toUpdateCols.contains("DEMAND_AMT_SUM")) {
+                this.toUpdateCols.add("DEMAND_AMT_SUM");
+            }
+        }
         return this;
     }
 
     /**
      * 标后附件。
      */
-    public String bidAfterFileGroupId;
+    private String bidAfterFileGroupId;
 
     /**
      * 获取：标后附件。
@@ -1239,14 +2234,30 @@ public class PmFundRequirePlanReq {
      * 设置：标后附件。
      */
     public PmFundRequirePlanReq setBidAfterFileGroupId(String bidAfterFileGroupId) {
-        this.bidAfterFileGroupId = bidAfterFileGroupId;
+        if (this.bidAfterFileGroupId == null && bidAfterFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.bidAfterFileGroupId != null && bidAfterFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidAfterFileGroupId.compareTo(bidAfterFileGroupId) != 0) {
+                this.bidAfterFileGroupId = bidAfterFileGroupId;
+                if (!this.toUpdateCols.contains("BID_AFTER_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("BID_AFTER_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidAfterFileGroupId = bidAfterFileGroupId;
+            if (!this.toUpdateCols.contains("BID_AFTER_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("BID_AFTER_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -1259,14 +2270,138 @@ public class PmFundRequirePlanReq {
      * 设置：备注。
      */
     public PmFundRequirePlanReq setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 部门意见发表日期。
+     */
+    private LocalDate deptCommentPublishDate;
+
+    /**
+     * 获取：部门意见发表日期。
+     */
+    public LocalDate getDeptCommentPublishDate() {
+        return this.deptCommentPublishDate;
+    }
+
+    /**
+     * 设置：部门意见发表日期。
+     */
+    public PmFundRequirePlanReq setDeptCommentPublishDate(LocalDate deptCommentPublishDate) {
+        if (this.deptCommentPublishDate == null && deptCommentPublishDate == null) {
+            // 均为null，不做处理。
+        } else if (this.deptCommentPublishDate != null && deptCommentPublishDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.deptCommentPublishDate.compareTo(deptCommentPublishDate) != 0) {
+                this.deptCommentPublishDate = deptCommentPublishDate;
+                if (!this.toUpdateCols.contains("DEPT_COMMENT_PUBLISH_DATE")) {
+                    this.toUpdateCols.add("DEPT_COMMENT_PUBLISH_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.deptCommentPublishDate = deptCommentPublishDate;
+            if (!this.toUpdateCols.contains("DEPT_COMMENT_PUBLISH_DATE")) {
+                this.toUpdateCols.add("DEPT_COMMENT_PUBLISH_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 部门意见发表人。
+     */
+    private String deptCommentPublishUser;
+
+    /**
+     * 获取：部门意见发表人。
+     */
+    public String getDeptCommentPublishUser() {
+        return this.deptCommentPublishUser;
+    }
+
+    /**
+     * 设置：部门意见发表人。
+     */
+    public PmFundRequirePlanReq setDeptCommentPublishUser(String deptCommentPublishUser) {
+        if (this.deptCommentPublishUser == null && deptCommentPublishUser == null) {
+            // 均为null，不做处理。
+        } else if (this.deptCommentPublishUser != null && deptCommentPublishUser != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.deptCommentPublishUser.compareTo(deptCommentPublishUser) != 0) {
+                this.deptCommentPublishUser = deptCommentPublishUser;
+                if (!this.toUpdateCols.contains("DEPT_COMMENT_PUBLISH_USER")) {
+                    this.toUpdateCols.add("DEPT_COMMENT_PUBLISH_USER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.deptCommentPublishUser = deptCommentPublishUser;
+            if (!this.toUpdateCols.contains("DEPT_COMMENT_PUBLISH_USER")) {
+                this.toUpdateCols.add("DEPT_COMMENT_PUBLISH_USER");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 部门意见。
+     */
+    private String deptMessage;
+
+    /**
+     * 获取：部门意见。
+     */
+    public String getDeptMessage() {
+        return this.deptMessage;
+    }
+
+    /**
+     * 设置：部门意见。
+     */
+    public PmFundRequirePlanReq setDeptMessage(String deptMessage) {
+        if (this.deptMessage == null && deptMessage == null) {
+            // 均为null，不做处理。
+        } else if (this.deptMessage != null && deptMessage != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.deptMessage.compareTo(deptMessage) != 0) {
+                this.deptMessage = deptMessage;
+                if (!this.toUpdateCols.contains("DEPT_MESSAGE")) {
+                    this.toUpdateCols.add("DEPT_MESSAGE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.deptMessage = deptMessage;
+            if (!this.toUpdateCols.contains("DEPT_MESSAGE")) {
+                this.toUpdateCols.add("DEPT_MESSAGE");
+            }
+        }
         return this;
     }
 
     /**
      * 财务意见发表日期。
      */
-    public LocalDate financePublishDate;
+    private LocalDate financePublishDate;
 
     /**
      * 获取：财务意见发表日期。
@@ -1279,14 +2414,30 @@ public class PmFundRequirePlanReq {
      * 设置：财务意见发表日期。
      */
     public PmFundRequirePlanReq setFinancePublishDate(LocalDate financePublishDate) {
-        this.financePublishDate = financePublishDate;
+        if (this.financePublishDate == null && financePublishDate == null) {
+            // 均为null，不做处理。
+        } else if (this.financePublishDate != null && financePublishDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.financePublishDate.compareTo(financePublishDate) != 0) {
+                this.financePublishDate = financePublishDate;
+                if (!this.toUpdateCols.contains("FINANCE_PUBLISH_DATE")) {
+                    this.toUpdateCols.add("FINANCE_PUBLISH_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.financePublishDate = financePublishDate;
+            if (!this.toUpdateCols.contains("FINANCE_PUBLISH_DATE")) {
+                this.toUpdateCols.add("FINANCE_PUBLISH_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 财务意见发表人。
      */
-    public String financePublishUser;
+    private String financePublishUser;
 
     /**
      * 获取：财务意见发表人。
@@ -1299,14 +2450,30 @@ public class PmFundRequirePlanReq {
      * 设置：财务意见发表人。
      */
     public PmFundRequirePlanReq setFinancePublishUser(String financePublishUser) {
-        this.financePublishUser = financePublishUser;
+        if (this.financePublishUser == null && financePublishUser == null) {
+            // 均为null，不做处理。
+        } else if (this.financePublishUser != null && financePublishUser != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.financePublishUser.compareTo(financePublishUser) != 0) {
+                this.financePublishUser = financePublishUser;
+                if (!this.toUpdateCols.contains("FINANCE_PUBLISH_USER")) {
+                    this.toUpdateCols.add("FINANCE_PUBLISH_USER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.financePublishUser = financePublishUser;
+            if (!this.toUpdateCols.contains("FINANCE_PUBLISH_USER")) {
+                this.toUpdateCols.add("FINANCE_PUBLISH_USER");
+            }
+        }
         return this;
     }
 
     /**
      * 财务意见。
      */
-    public String financeMessage;
+    private String financeMessage;
 
     /**
      * 获取：财务意见。
@@ -1319,14 +2486,30 @@ public class PmFundRequirePlanReq {
      * 设置：财务意见。
      */
     public PmFundRequirePlanReq setFinanceMessage(String financeMessage) {
-        this.financeMessage = financeMessage;
+        if (this.financeMessage == null && financeMessage == null) {
+            // 均为null，不做处理。
+        } else if (this.financeMessage != null && financeMessage != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.financeMessage.compareTo(financeMessage) != 0) {
+                this.financeMessage = financeMessage;
+                if (!this.toUpdateCols.contains("FINANCE_MESSAGE")) {
+                    this.toUpdateCols.add("FINANCE_MESSAGE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.financeMessage = financeMessage;
+            if (!this.toUpdateCols.contains("FINANCE_MESSAGE")) {
+                this.toUpdateCols.add("FINANCE_MESSAGE");
+            }
+        }
         return this;
     }
 
     /**
      * 意见发表日期。
      */
-    public LocalDate commentPublishDate;
+    private LocalDate commentPublishDate;
 
     /**
      * 获取：意见发表日期。
@@ -1339,14 +2522,30 @@ public class PmFundRequirePlanReq {
      * 设置：意见发表日期。
      */
     public PmFundRequirePlanReq setCommentPublishDate(LocalDate commentPublishDate) {
-        this.commentPublishDate = commentPublishDate;
+        if (this.commentPublishDate == null && commentPublishDate == null) {
+            // 均为null，不做处理。
+        } else if (this.commentPublishDate != null && commentPublishDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.commentPublishDate.compareTo(commentPublishDate) != 0) {
+                this.commentPublishDate = commentPublishDate;
+                if (!this.toUpdateCols.contains("COMMENT_PUBLISH_DATE")) {
+                    this.toUpdateCols.add("COMMENT_PUBLISH_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.commentPublishDate = commentPublishDate;
+            if (!this.toUpdateCols.contains("COMMENT_PUBLISH_DATE")) {
+                this.toUpdateCols.add("COMMENT_PUBLISH_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 意见发表人。
      */
-    public String commentPublishUser;
+    private String commentPublishUser;
 
     /**
      * 获取：意见发表人。
@@ -1359,14 +2558,30 @@ public class PmFundRequirePlanReq {
      * 设置：意见发表人。
      */
     public PmFundRequirePlanReq setCommentPublishUser(String commentPublishUser) {
-        this.commentPublishUser = commentPublishUser;
+        if (this.commentPublishUser == null && commentPublishUser == null) {
+            // 均为null，不做处理。
+        } else if (this.commentPublishUser != null && commentPublishUser != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.commentPublishUser.compareTo(commentPublishUser) != 0) {
+                this.commentPublishUser = commentPublishUser;
+                if (!this.toUpdateCols.contains("COMMENT_PUBLISH_USER")) {
+                    this.toUpdateCols.add("COMMENT_PUBLISH_USER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.commentPublishUser = commentPublishUser;
+            if (!this.toUpdateCols.contains("COMMENT_PUBLISH_USER")) {
+                this.toUpdateCols.add("COMMENT_PUBLISH_USER");
+            }
+        }
         return this;
     }
 
     /**
      * 意见内容。
      */
-    public String commentPublishContent;
+    private String commentPublishContent;
 
     /**
      * 获取：意见内容。
@@ -1379,7 +2594,23 @@ public class PmFundRequirePlanReq {
      * 设置：意见内容。
      */
     public PmFundRequirePlanReq setCommentPublishContent(String commentPublishContent) {
-        this.commentPublishContent = commentPublishContent;
+        if (this.commentPublishContent == null && commentPublishContent == null) {
+            // 均为null，不做处理。
+        } else if (this.commentPublishContent != null && commentPublishContent != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.commentPublishContent.compareTo(commentPublishContent) != 0) {
+                this.commentPublishContent = commentPublishContent;
+                if (!this.toUpdateCols.contains("COMMENT_PUBLISH_CONTENT")) {
+                    this.toUpdateCols.add("COMMENT_PUBLISH_CONTENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.commentPublishContent = commentPublishContent;
+            if (!this.toUpdateCols.contains("COMMENT_PUBLISH_CONTENT")) {
+                this.toUpdateCols.add("COMMENT_PUBLISH_CONTENT");
+            }
+        }
         return this;
     }
 
@@ -1397,6 +2628,7 @@ public class PmFundRequirePlanReq {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -1407,7 +2639,17 @@ public class PmFundRequirePlanReq {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -1428,7 +2670,8 @@ public class PmFundRequirePlanReq {
      * @return
      */
     public static PmFundRequirePlanReq newData() {
-        return modelHelper.newData();
+        PmFundRequirePlanReq obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -1437,7 +2680,8 @@ public class PmFundRequirePlanReq {
      * @return
      */
     public static PmFundRequirePlanReq insertData() {
-        return modelHelper.insertData();
+        PmFundRequirePlanReq obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -1449,7 +2693,8 @@ public class PmFundRequirePlanReq {
      * @return 获取到的对象，若无则为null。
      */
     public static PmFundRequirePlanReq selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        PmFundRequirePlanReq obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -1461,7 +2706,8 @@ public class PmFundRequirePlanReq {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PmFundRequirePlanReq> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<PmFundRequirePlanReq> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -1473,7 +2719,8 @@ public class PmFundRequirePlanReq {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PmFundRequirePlanReq> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<PmFundRequirePlanReq> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

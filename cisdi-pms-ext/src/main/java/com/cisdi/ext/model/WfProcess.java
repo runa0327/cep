@@ -4,8 +4,11 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +21,18 @@ public class WfProcess {
      * 模型助手。
      */
     private static final ModelHelper<WfProcess> modelHelper = new ModelHelper<>("WF_PROCESS", new WfProcess());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -84,7 +99,7 @@ public class WfProcess {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 图标文件组。
+         * 图标。
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
@@ -107,6 +122,10 @@ public class WfProcess {
          * 启用回调。
          */
         public static final String ENABLE_CALLBACK = "ENABLE_CALLBACK";
+        /**
+         * 流程分类。
+         */
+        public static final String WF_CATE_ID = "WF_CATE_ID";
     }
 
     // </editor-fold>
@@ -117,7 +136,7 @@ public class WfProcess {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -130,14 +149,30 @@ public class WfProcess {
      * 设置：ID。
      */
     public WfProcess setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -150,14 +185,30 @@ public class WfProcess {
      * 设置：版本。
      */
     public WfProcess setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -170,14 +221,30 @@ public class WfProcess {
      * 设置：时间戳。
      */
     public WfProcess setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -190,14 +257,30 @@ public class WfProcess {
      * 设置：是否预设。
      */
     public WfProcess setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -210,14 +293,30 @@ public class WfProcess {
      * 设置：创建日期时间。
      */
     public WfProcess setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -230,14 +329,30 @@ public class WfProcess {
      * 设置：创建用户。
      */
     public WfProcess setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -250,14 +365,30 @@ public class WfProcess {
      * 设置：最后修改日期时间。
      */
     public WfProcess setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -270,14 +401,30 @@ public class WfProcess {
      * 设置：最后修改用户。
      */
     public WfProcess setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -290,14 +437,30 @@ public class WfProcess {
      * 设置：记录状态。
      */
     public WfProcess setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -310,14 +473,30 @@ public class WfProcess {
      * 设置：锁定流程实例。
      */
     public WfProcess setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -330,14 +509,30 @@ public class WfProcess {
      * 设置：代码。
      */
     public WfProcess setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -350,14 +545,30 @@ public class WfProcess {
      * 设置：名称。
      */
     public WfProcess setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -370,34 +581,66 @@ public class WfProcess {
      * 设置：备注。
      */
     public WfProcess setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
-     * 图标文件组。
+     * 图标。
      */
-    public String iconFileGroupId;
+    private String iconFileGroupId;
 
     /**
-     * 获取：图标文件组。
+     * 获取：图标。
      */
     public String getIconFileGroupId() {
         return this.iconFileGroupId;
     }
 
     /**
-     * 设置：图标文件组。
+     * 设置：图标。
      */
     public WfProcess setIconFileGroupId(String iconFileGroupId) {
-        this.iconFileGroupId = iconFileGroupId;
+        if (this.iconFileGroupId == null && iconFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.iconFileGroupId != null && iconFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.iconFileGroupId.compareTo(iconFileGroupId) != 0) {
+                this.iconFileGroupId = iconFileGroupId;
+                if (!this.toUpdateCols.contains("ICON_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("ICON_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.iconFileGroupId = iconFileGroupId;
+            if (!this.toUpdateCols.contains("ICON_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("ICON_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 可启动的实体视图列表。
      */
-    public String startableSevIds;
+    private String startableSevIds;
 
     /**
      * 获取：可启动的实体视图列表。
@@ -410,14 +653,30 @@ public class WfProcess {
      * 设置：可启动的实体视图列表。
      */
     public WfProcess setStartableSevIds(String startableSevIds) {
-        this.startableSevIds = startableSevIds;
+        if (this.startableSevIds == null && startableSevIds == null) {
+            // 均为null，不做处理。
+        } else if (this.startableSevIds != null && startableSevIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.startableSevIds.compareTo(startableSevIds) != 0) {
+                this.startableSevIds = startableSevIds;
+                if (!this.toUpdateCols.contains("STARTABLE_SEV_IDS")) {
+                    this.toUpdateCols.add("STARTABLE_SEV_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.startableSevIds = startableSevIds;
+            if (!this.toUpdateCols.contains("STARTABLE_SEV_IDS")) {
+                this.toUpdateCols.add("STARTABLE_SEV_IDS");
+            }
+        }
         return this;
     }
 
     /**
      * 可启动逻辑。
      */
-    public String startableLogic;
+    private String startableLogic;
 
     /**
      * 获取：可启动逻辑。
@@ -430,34 +689,66 @@ public class WfProcess {
      * 设置：可启动逻辑。
      */
     public WfProcess setStartableLogic(String startableLogic) {
-        this.startableLogic = startableLogic;
+        if (this.startableLogic == null && startableLogic == null) {
+            // 均为null，不做处理。
+        } else if (this.startableLogic != null && startableLogic != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.startableLogic.compareTo(startableLogic) != 0) {
+                this.startableLogic = startableLogic;
+                if (!this.toUpdateCols.contains("STARTABLE_LOGIC")) {
+                    this.toUpdateCols.add("STARTABLE_LOGIC");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.startableLogic = startableLogic;
+            if (!this.toUpdateCols.contains("STARTABLE_LOGIC")) {
+                this.toUpdateCols.add("STARTABLE_LOGIC");
+            }
+        }
         return this;
     }
 
     /**
      * 序号。
      */
-    public Double seqNo;
+    private BigDecimal seqNo;
 
     /**
      * 获取：序号。
      */
-    public Double getSeqNo() {
+    public BigDecimal getSeqNo() {
         return this.seqNo;
     }
 
     /**
      * 设置：序号。
      */
-    public WfProcess setSeqNo(Double seqNo) {
-        this.seqNo = seqNo;
+    public WfProcess setSeqNo(BigDecimal seqNo) {
+        if (this.seqNo == null && seqNo == null) {
+            // 均为null，不做处理。
+        } else if (this.seqNo != null && seqNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.seqNo.compareTo(seqNo) != 0) {
+                this.seqNo = seqNo;
+                if (!this.toUpdateCols.contains("SEQ_NO")) {
+                    this.toUpdateCols.add("SEQ_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.seqNo = seqNo;
+            if (!this.toUpdateCols.contains("SEQ_NO")) {
+                this.toUpdateCols.add("SEQ_NO");
+            }
+        }
         return this;
     }
 
     /**
      * 流程类型。
      */
-    public String wfProcessTypeId;
+    private String wfProcessTypeId;
 
     /**
      * 获取：流程类型。
@@ -470,14 +761,30 @@ public class WfProcess {
      * 设置：流程类型。
      */
     public WfProcess setWfProcessTypeId(String wfProcessTypeId) {
-        this.wfProcessTypeId = wfProcessTypeId;
+        if (this.wfProcessTypeId == null && wfProcessTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.wfProcessTypeId != null && wfProcessTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.wfProcessTypeId.compareTo(wfProcessTypeId) != 0) {
+                this.wfProcessTypeId = wfProcessTypeId;
+                if (!this.toUpdateCols.contains("WF_PROCESS_TYPE_ID")) {
+                    this.toUpdateCols.add("WF_PROCESS_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.wfProcessTypeId = wfProcessTypeId;
+            if (!this.toUpdateCols.contains("WF_PROCESS_TYPE_ID")) {
+                this.toUpdateCols.add("WF_PROCESS_TYPE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 启用回调。
      */
-    public Boolean enableCallback;
+    private Boolean enableCallback;
 
     /**
      * 获取：启用回调。
@@ -490,7 +797,59 @@ public class WfProcess {
      * 设置：启用回调。
      */
     public WfProcess setEnableCallback(Boolean enableCallback) {
-        this.enableCallback = enableCallback;
+        if (this.enableCallback == null && enableCallback == null) {
+            // 均为null，不做处理。
+        } else if (this.enableCallback != null && enableCallback != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.enableCallback.compareTo(enableCallback) != 0) {
+                this.enableCallback = enableCallback;
+                if (!this.toUpdateCols.contains("ENABLE_CALLBACK")) {
+                    this.toUpdateCols.add("ENABLE_CALLBACK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.enableCallback = enableCallback;
+            if (!this.toUpdateCols.contains("ENABLE_CALLBACK")) {
+                this.toUpdateCols.add("ENABLE_CALLBACK");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 流程分类。
+     */
+    private String wfCateId;
+
+    /**
+     * 获取：流程分类。
+     */
+    public String getWfCateId() {
+        return this.wfCateId;
+    }
+
+    /**
+     * 设置：流程分类。
+     */
+    public WfProcess setWfCateId(String wfCateId) {
+        if (this.wfCateId == null && wfCateId == null) {
+            // 均为null，不做处理。
+        } else if (this.wfCateId != null && wfCateId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.wfCateId.compareTo(wfCateId) != 0) {
+                this.wfCateId = wfCateId;
+                if (!this.toUpdateCols.contains("WF_CATE_ID")) {
+                    this.toUpdateCols.add("WF_CATE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.wfCateId = wfCateId;
+            if (!this.toUpdateCols.contains("WF_CATE_ID")) {
+                this.toUpdateCols.add("WF_CATE_ID");
+            }
+        }
         return this;
     }
 
@@ -508,6 +867,7 @@ public class WfProcess {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -518,7 +878,17 @@ public class WfProcess {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -539,7 +909,8 @@ public class WfProcess {
      * @return
      */
     public static WfProcess newData() {
-        return modelHelper.newData();
+        WfProcess obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -548,7 +919,8 @@ public class WfProcess {
      * @return
      */
     public static WfProcess insertData() {
-        return modelHelper.insertData();
+        WfProcess obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -560,7 +932,8 @@ public class WfProcess {
      * @return 获取到的对象，若无则为null。
      */
     public static WfProcess selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        WfProcess obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -572,7 +945,8 @@ public class WfProcess {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<WfProcess> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<WfProcess> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -584,7 +958,8 @@ public class WfProcess {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<WfProcess> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<WfProcess> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

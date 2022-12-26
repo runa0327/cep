@@ -4,7 +4,10 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,11 +21,23 @@ public class PmFundApportionPayV {
      */
     private static final ModelHelper<PmFundApportionPayV> modelHelper = new ModelHelper<>("PM_FUND_APPORTION_PAY_V", new PmFundApportionPayV());
 
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
+
     // 实体常量：
     // <editor-fold>
 
     public static final String ENT_CODE = "PM_FUND_APPORTION_PAY_V";
-    public static final EntityTypeE ENTITY_TYPE = EntityTypeE.VIEW;
+    public static final EntityTypeE ENTITY_TYPE = EntityTypeE.SUB_QUERY;
 
     // </editor-fold>
 
@@ -60,7 +75,7 @@ public class PmFundApportionPayV {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -73,14 +88,30 @@ public class PmFundApportionPayV {
      * 设置：ID。
      */
     public PmFundApportionPayV setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 资金来源。
      */
-    public String pmFundSourceId;
+    private String pmFundSourceId;
 
     /**
      * 获取：资金来源。
@@ -93,14 +124,30 @@ public class PmFundApportionPayV {
      * 设置：资金来源。
      */
     public PmFundApportionPayV setPmFundSourceId(String pmFundSourceId) {
-        this.pmFundSourceId = pmFundSourceId;
+        if (this.pmFundSourceId == null && pmFundSourceId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmFundSourceId != null && pmFundSourceId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmFundSourceId.compareTo(pmFundSourceId) != 0) {
+                this.pmFundSourceId = pmFundSourceId;
+                if (!this.toUpdateCols.contains("PM_FUND_SOURCE_ID")) {
+                    this.toUpdateCols.add("PM_FUND_SOURCE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmFundSourceId = pmFundSourceId;
+            if (!this.toUpdateCols.contains("PM_FUND_SOURCE_ID")) {
+                this.toUpdateCols.add("PM_FUND_SOURCE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 项目。
      */
-    public String pmPrjId;
+    private String pmPrjId;
 
     /**
      * 获取：项目。
@@ -113,47 +160,95 @@ public class PmFundApportionPayV {
      * 设置：项目。
      */
     public PmFundApportionPayV setPmPrjId(String pmPrjId) {
-        this.pmPrjId = pmPrjId;
+        if (this.pmPrjId == null && pmPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmPrjId != null && pmPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmPrjId.compareTo(pmPrjId) != 0) {
+                this.pmPrjId = pmPrjId;
+                if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                    this.toUpdateCols.add("PM_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmPrjId = pmPrjId;
+            if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                this.toUpdateCols.add("PM_PRJ_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 分配金额。
      */
-    public Double apportionAmt;
+    private BigDecimal apportionAmt;
 
     /**
      * 获取：分配金额。
      */
-    public Double getApportionAmt() {
+    public BigDecimal getApportionAmt() {
         return this.apportionAmt;
     }
 
     /**
      * 设置：分配金额。
      */
-    public PmFundApportionPayV setApportionAmt(Double apportionAmt) {
-        this.apportionAmt = apportionAmt;
+    public PmFundApportionPayV setApportionAmt(BigDecimal apportionAmt) {
+        if (this.apportionAmt == null && apportionAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.apportionAmt != null && apportionAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.apportionAmt.compareTo(apportionAmt) != 0) {
+                this.apportionAmt = apportionAmt;
+                if (!this.toUpdateCols.contains("APPORTION_AMT")) {
+                    this.toUpdateCols.add("APPORTION_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.apportionAmt = apportionAmt;
+            if (!this.toUpdateCols.contains("APPORTION_AMT")) {
+                this.toUpdateCols.add("APPORTION_AMT");
+            }
+        }
         return this;
     }
 
     /**
      * 支付金额。
      */
-    public Double payAmt;
+    private BigDecimal payAmt;
 
     /**
      * 获取：支付金额。
      */
-    public Double getPayAmt() {
+    public BigDecimal getPayAmt() {
         return this.payAmt;
     }
 
     /**
      * 设置：支付金额。
      */
-    public PmFundApportionPayV setPayAmt(Double payAmt) {
-        this.payAmt = payAmt;
+    public PmFundApportionPayV setPayAmt(BigDecimal payAmt) {
+        if (this.payAmt == null && payAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.payAmt != null && payAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.payAmt.compareTo(payAmt) != 0) {
+                this.payAmt = payAmt;
+                if (!this.toUpdateCols.contains("PAY_AMT")) {
+                    this.toUpdateCols.add("PAY_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.payAmt = payAmt;
+            if (!this.toUpdateCols.contains("PAY_AMT")) {
+                this.toUpdateCols.add("PAY_AMT");
+            }
+        }
         return this;
     }
 
@@ -171,6 +266,7 @@ public class PmFundApportionPayV {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -181,7 +277,17 @@ public class PmFundApportionPayV {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -202,7 +308,8 @@ public class PmFundApportionPayV {
      * @return
      */
     public static PmFundApportionPayV newData() {
-        return modelHelper.newData();
+        PmFundApportionPayV obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -211,7 +318,8 @@ public class PmFundApportionPayV {
      * @return
      */
     public static PmFundApportionPayV insertData() {
-        return modelHelper.insertData();
+        PmFundApportionPayV obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -223,7 +331,8 @@ public class PmFundApportionPayV {
      * @return 获取到的对象，若无则为null。
      */
     public static PmFundApportionPayV selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        PmFundApportionPayV obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -235,7 +344,8 @@ public class PmFundApportionPayV {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PmFundApportionPayV> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<PmFundApportionPayV> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -247,7 +357,8 @@ public class PmFundApportionPayV {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PmFundApportionPayV> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<PmFundApportionPayV> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

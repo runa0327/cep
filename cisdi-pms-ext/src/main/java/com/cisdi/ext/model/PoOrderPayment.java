@@ -4,9 +4,12 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +22,18 @@ public class PoOrderPayment {
      * 模型助手。
      */
     private static final ModelHelper<PoOrderPayment> modelHelper = new ModelHelper<>("PO_ORDER_PAYMENT", new PoOrderPayment());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -85,9 +100,9 @@ public class PoOrderPayment {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 采购合同。
+         * 合同。
          */
-        public static final String PO_ORDER_ID = "PO_ORDER_ID";
+        public static final String CONTRACT_ID = "CONTRACT_ID";
         /**
          * 采购合同明细。
          */
@@ -104,6 +119,18 @@ public class PoOrderPayment {
          * 支付日期。
          */
         public static final String PAY_DATE = "PAY_DATE";
+        /**
+         * 本期支付金额（万）。
+         */
+        public static final String STAGE_PAY_AMT_TWO = "STAGE_PAY_AMT_TWO";
+        /**
+         * 金额（万）。
+         */
+        public static final String AMT = "AMT";
+        /**
+         * 项目。
+         */
+        public static final String PM_PRJ_ID = "PM_PRJ_ID";
     }
 
     // </editor-fold>
@@ -114,7 +141,7 @@ public class PoOrderPayment {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -127,14 +154,30 @@ public class PoOrderPayment {
      * 设置：ID。
      */
     public PoOrderPayment setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -147,14 +190,30 @@ public class PoOrderPayment {
      * 设置：版本。
      */
     public PoOrderPayment setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -167,14 +226,30 @@ public class PoOrderPayment {
      * 设置：时间戳。
      */
     public PoOrderPayment setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -187,14 +262,30 @@ public class PoOrderPayment {
      * 设置：是否预设。
      */
     public PoOrderPayment setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -207,14 +298,30 @@ public class PoOrderPayment {
      * 设置：创建日期时间。
      */
     public PoOrderPayment setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -227,14 +334,30 @@ public class PoOrderPayment {
      * 设置：创建用户。
      */
     public PoOrderPayment setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -247,14 +370,30 @@ public class PoOrderPayment {
      * 设置：最后修改日期时间。
      */
     public PoOrderPayment setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -267,14 +406,30 @@ public class PoOrderPayment {
      * 设置：最后修改用户。
      */
     public PoOrderPayment setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -287,14 +442,30 @@ public class PoOrderPayment {
      * 设置：记录状态。
      */
     public PoOrderPayment setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -307,14 +478,30 @@ public class PoOrderPayment {
      * 设置：锁定流程实例。
      */
     public PoOrderPayment setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -327,14 +514,30 @@ public class PoOrderPayment {
      * 设置：代码。
      */
     public PoOrderPayment setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -347,14 +550,30 @@ public class PoOrderPayment {
      * 设置：名称。
      */
     public PoOrderPayment setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -367,34 +586,66 @@ public class PoOrderPayment {
      * 设置：备注。
      */
     public PoOrderPayment setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
-     * 采购合同。
+     * 合同。
      */
-    public String poOrderId;
+    private String contractId;
 
     /**
-     * 获取：采购合同。
+     * 获取：合同。
      */
-    public String getPoOrderId() {
-        return this.poOrderId;
+    public String getContractId() {
+        return this.contractId;
     }
 
     /**
-     * 设置：采购合同。
+     * 设置：合同。
      */
-    public PoOrderPayment setPoOrderId(String poOrderId) {
-        this.poOrderId = poOrderId;
+    public PoOrderPayment setContractId(String contractId) {
+        if (this.contractId == null && contractId == null) {
+            // 均为null，不做处理。
+        } else if (this.contractId != null && contractId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contractId.compareTo(contractId) != 0) {
+                this.contractId = contractId;
+                if (!this.toUpdateCols.contains("CONTRACT_ID")) {
+                    this.toUpdateCols.add("CONTRACT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contractId = contractId;
+            if (!this.toUpdateCols.contains("CONTRACT_ID")) {
+                this.toUpdateCols.add("CONTRACT_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 采购合同明细。
      */
-    public String poOrderDtlId;
+    private String poOrderDtlId;
 
     /**
      * 获取：采购合同明细。
@@ -407,14 +658,30 @@ public class PoOrderPayment {
      * 设置：采购合同明细。
      */
     public PoOrderPayment setPoOrderDtlId(String poOrderDtlId) {
-        this.poOrderDtlId = poOrderDtlId;
+        if (this.poOrderDtlId == null && poOrderDtlId == null) {
+            // 均为null，不做处理。
+        } else if (this.poOrderDtlId != null && poOrderDtlId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.poOrderDtlId.compareTo(poOrderDtlId) != 0) {
+                this.poOrderDtlId = poOrderDtlId;
+                if (!this.toUpdateCols.contains("PO_ORDER_DTL_ID")) {
+                    this.toUpdateCols.add("PO_ORDER_DTL_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.poOrderDtlId = poOrderDtlId;
+            if (!this.toUpdateCols.contains("PO_ORDER_DTL_ID")) {
+                this.toUpdateCols.add("PO_ORDER_DTL_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 采购合同明细工作进度。
      */
-    public String poOrderDtlProId;
+    private String poOrderDtlProId;
 
     /**
      * 获取：采购合同明细工作进度。
@@ -427,34 +694,66 @@ public class PoOrderPayment {
      * 设置：采购合同明细工作进度。
      */
     public PoOrderPayment setPoOrderDtlProId(String poOrderDtlProId) {
-        this.poOrderDtlProId = poOrderDtlProId;
+        if (this.poOrderDtlProId == null && poOrderDtlProId == null) {
+            // 均为null，不做处理。
+        } else if (this.poOrderDtlProId != null && poOrderDtlProId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.poOrderDtlProId.compareTo(poOrderDtlProId) != 0) {
+                this.poOrderDtlProId = poOrderDtlProId;
+                if (!this.toUpdateCols.contains("PO_ORDER_DTL_PRO_ID")) {
+                    this.toUpdateCols.add("PO_ORDER_DTL_PRO_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.poOrderDtlProId = poOrderDtlProId;
+            if (!this.toUpdateCols.contains("PO_ORDER_DTL_PRO_ID")) {
+                this.toUpdateCols.add("PO_ORDER_DTL_PRO_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 支付金额。
      */
-    public Double payAmt;
+    private BigDecimal payAmt;
 
     /**
      * 获取：支付金额。
      */
-    public Double getPayAmt() {
+    public BigDecimal getPayAmt() {
         return this.payAmt;
     }
 
     /**
      * 设置：支付金额。
      */
-    public PoOrderPayment setPayAmt(Double payAmt) {
-        this.payAmt = payAmt;
+    public PoOrderPayment setPayAmt(BigDecimal payAmt) {
+        if (this.payAmt == null && payAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.payAmt != null && payAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.payAmt.compareTo(payAmt) != 0) {
+                this.payAmt = payAmt;
+                if (!this.toUpdateCols.contains("PAY_AMT")) {
+                    this.toUpdateCols.add("PAY_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.payAmt = payAmt;
+            if (!this.toUpdateCols.contains("PAY_AMT")) {
+                this.toUpdateCols.add("PAY_AMT");
+            }
+        }
         return this;
     }
 
     /**
      * 支付日期。
      */
-    public LocalDate payDate;
+    private LocalDate payDate;
 
     /**
      * 获取：支付日期。
@@ -467,7 +766,131 @@ public class PoOrderPayment {
      * 设置：支付日期。
      */
     public PoOrderPayment setPayDate(LocalDate payDate) {
-        this.payDate = payDate;
+        if (this.payDate == null && payDate == null) {
+            // 均为null，不做处理。
+        } else if (this.payDate != null && payDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.payDate.compareTo(payDate) != 0) {
+                this.payDate = payDate;
+                if (!this.toUpdateCols.contains("PAY_DATE")) {
+                    this.toUpdateCols.add("PAY_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.payDate = payDate;
+            if (!this.toUpdateCols.contains("PAY_DATE")) {
+                this.toUpdateCols.add("PAY_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 本期支付金额（万）。
+     */
+    private BigDecimal stagePayAmtTwo;
+
+    /**
+     * 获取：本期支付金额（万）。
+     */
+    public BigDecimal getStagePayAmtTwo() {
+        return this.stagePayAmtTwo;
+    }
+
+    /**
+     * 设置：本期支付金额（万）。
+     */
+    public PoOrderPayment setStagePayAmtTwo(BigDecimal stagePayAmtTwo) {
+        if (this.stagePayAmtTwo == null && stagePayAmtTwo == null) {
+            // 均为null，不做处理。
+        } else if (this.stagePayAmtTwo != null && stagePayAmtTwo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.stagePayAmtTwo.compareTo(stagePayAmtTwo) != 0) {
+                this.stagePayAmtTwo = stagePayAmtTwo;
+                if (!this.toUpdateCols.contains("STAGE_PAY_AMT_TWO")) {
+                    this.toUpdateCols.add("STAGE_PAY_AMT_TWO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.stagePayAmtTwo = stagePayAmtTwo;
+            if (!this.toUpdateCols.contains("STAGE_PAY_AMT_TWO")) {
+                this.toUpdateCols.add("STAGE_PAY_AMT_TWO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 金额（万）。
+     */
+    private BigDecimal amt;
+
+    /**
+     * 获取：金额（万）。
+     */
+    public BigDecimal getAmt() {
+        return this.amt;
+    }
+
+    /**
+     * 设置：金额（万）。
+     */
+    public PoOrderPayment setAmt(BigDecimal amt) {
+        if (this.amt == null && amt == null) {
+            // 均为null，不做处理。
+        } else if (this.amt != null && amt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.amt.compareTo(amt) != 0) {
+                this.amt = amt;
+                if (!this.toUpdateCols.contains("AMT")) {
+                    this.toUpdateCols.add("AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.amt = amt;
+            if (!this.toUpdateCols.contains("AMT")) {
+                this.toUpdateCols.add("AMT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 项目。
+     */
+    private String pmPrjId;
+
+    /**
+     * 获取：项目。
+     */
+    public String getPmPrjId() {
+        return this.pmPrjId;
+    }
+
+    /**
+     * 设置：项目。
+     */
+    public PoOrderPayment setPmPrjId(String pmPrjId) {
+        if (this.pmPrjId == null && pmPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmPrjId != null && pmPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmPrjId.compareTo(pmPrjId) != 0) {
+                this.pmPrjId = pmPrjId;
+                if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                    this.toUpdateCols.add("PM_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmPrjId = pmPrjId;
+            if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                this.toUpdateCols.add("PM_PRJ_ID");
+            }
+        }
         return this;
     }
 
@@ -485,6 +908,7 @@ public class PoOrderPayment {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -495,7 +919,17 @@ public class PoOrderPayment {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -516,7 +950,8 @@ public class PoOrderPayment {
      * @return
      */
     public static PoOrderPayment newData() {
-        return modelHelper.newData();
+        PoOrderPayment obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -525,7 +960,8 @@ public class PoOrderPayment {
      * @return
      */
     public static PoOrderPayment insertData() {
-        return modelHelper.insertData();
+        PoOrderPayment obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -537,7 +973,8 @@ public class PoOrderPayment {
      * @return 获取到的对象，若无则为null。
      */
     public static PoOrderPayment selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        PoOrderPayment obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -549,7 +986,8 @@ public class PoOrderPayment {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PoOrderPayment> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<PoOrderPayment> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -561,7 +999,8 @@ public class PoOrderPayment {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PoOrderPayment> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<PoOrderPayment> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

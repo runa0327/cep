@@ -4,9 +4,12 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +22,18 @@ public class PmPrjPlanningPermitReq {
      * 模型助手。
      */
     private static final ModelHelper<PmPrjPlanningPermitReq> modelHelper = new ModelHelper<>("PM_PRJ_PLANNING_PERMIT_REQ", new PmPrjPlanningPermitReq());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -65,47 +80,47 @@ public class PmPrjPlanningPermitReq {
          */
         public static final String NAME = "NAME";
         /**
-         * 项目。
-         */
-        public static final String PM_PRJ_ID = "PM_PRJ_ID";
-        /**
          * 锁定流程实例。
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
-         * 项目编号。
+         * 项目。
          */
-        public static final String PRJ_CODE = "PRJ_CODE";
+        public static final String PM_PRJ_ID = "PM_PRJ_ID";
         /**
          * 记录状态。
          */
         public static final String STATUS = "STATUS";
         /**
-         * 创建用户。
+         * 项目编号。
          */
-        public static final String CRT_USER_ID = "CRT_USER_ID";
+        public static final String PRJ_CODE = "PRJ_CODE";
         /**
          * 业主单位。
          */
         public static final String CUSTOMER_UNIT = "CUSTOMER_UNIT";
         /**
-         * 项目管理模式。
+         * 创建用户。
          */
-        public static final String PRJ_MANAGE_MODE_ID = "PRJ_MANAGE_MODE_ID";
+        public static final String CRT_USER_ID = "CRT_USER_ID";
         /**
          * 创建部门。
          */
         public static final String CRT_DEPT_ID = "CRT_DEPT_ID";
         /**
-         * 创建日期时间。
+         * 项目管理模式。
          */
-        public static final String CRT_DT = "CRT_DT";
+        public static final String PRJ_MANAGE_MODE_ID = "PRJ_MANAGE_MODE_ID";
         /**
          * 建设地点。
          */
         public static final String BASE_LOCATION_ID = "BASE_LOCATION_ID";
         /**
-         * 占地面积（平方）。
+         * 创建日期时间。
+         */
+        public static final String CRT_DT = "CRT_DT";
+        /**
+         * 占地面积(平方米)。
          */
         public static final String FLOOR_AREA = "FLOOR_AREA";
         /**
@@ -120,6 +135,18 @@ public class PmPrjPlanningPermitReq {
          * 建设规模数量。
          */
         public static final String CON_SCALE_QTY = "CON_SCALE_QTY";
+        /**
+         * 数量1。
+         */
+        public static final String QTY_ONE = "QTY_ONE";
+        /**
+         * 数量2。
+         */
+        public static final String QTY_TWO = "QTY_TWO";
+        /**
+         * 数量3。
+         */
+        public static final String QTY_THREE = "QTY_THREE";
         /**
          * 建设规模数量2。
          */
@@ -137,41 +164,33 @@ public class PmPrjPlanningPermitReq {
          */
         public static final String PRJ_SITUATION = "PRJ_SITUATION";
         /**
-         * 招采标流程标题。
+         * 招采项目备案及归档。
          */
-        public static final String BIDDING_NAME_ID = "BIDDING_NAME_ID";
+        public static final String PM_BID_KEEP_FILE_REQ_ID = "PM_BID_KEEP_FILE_REQ_ID";
         /**
-         * 审核状态。
+         * 状态1。
          */
-        public static final String APPROVAL_STATUS = "APPROVAL_STATUS";
+        public static final String STATUS_ONE = "STATUS_ONE";
         /**
-         * 委托单位(文本)。
+         * 业主单位1。
          */
-        public static final String ENTRUSTING_UNIT_TEXT = "ENTRUSTING_UNIT_TEXT";
+        public static final String CUSTOMER_UNIT_ONE = "CUSTOMER_UNIT_ONE";
         /**
          * 采购经办人。
          */
         public static final String PROCURE_USER_ID = "PROCURE_USER_ID";
         /**
-         * 编制单位(文本)。
+         * 中标单位1。
          */
-        public static final String AUTHOR_UNIT_TEXT = "AUTHOR_UNIT_TEXT";
+        public static final String WIN_BID_UNIT_ONE = "WIN_BID_UNIT_ONE";
         /**
-         * 对方负责人。
+         * 联系人1。
          */
-        public static final String OTHER_RESPONSOR = "OTHER_RESPONSOR";
+        public static final String CONTACTS_ONE = "CONTACTS_ONE";
         /**
-         * 进场日期。
+         * 联系人电话1。
          */
-        public static final String IN_DATE = "IN_DATE";
-        /**
-         * 服务周期。
-         */
-        public static final String SERVICE_DAYS = "SERVICE_DAYS";
-        /**
-         * 对方联系方式。
-         */
-        public static final String OTHER_CONTACT_PHONE = "OTHER_CONTACT_PHONE";
+        public static final String CONTACT_MOBILE_ONE = "CONTACT_MOBILE_ONE";
         /**
          * 计划完成日期。
          */
@@ -229,7 +248,7 @@ public class PmPrjPlanningPermitReq {
          */
         public static final String REVIEW_AND_REVISION_REMARK = "REVIEW_AND_REVISION_REMARK";
         /**
-         * 计划完成日期检查。
+         * 计划完成日期。
          */
         public static final String COMPL_PLAN_DATE_CHECK = "COMPL_PLAN_DATE_CHECK";
         /**
@@ -350,7 +369,7 @@ public class PmPrjPlanningPermitReq {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -363,14 +382,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：ID。
      */
     public PmPrjPlanningPermitReq setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -383,14 +418,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：版本。
      */
     public PmPrjPlanningPermitReq setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -403,14 +454,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：时间戳。
      */
     public PmPrjPlanningPermitReq setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -423,14 +490,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：是否预设。
      */
     public PmPrjPlanningPermitReq setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -443,14 +526,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：最后修改日期时间。
      */
     public PmPrjPlanningPermitReq setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -463,14 +562,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：最后修改用户。
      */
     public PmPrjPlanningPermitReq setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -483,14 +598,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：代码。
      */
     public PmPrjPlanningPermitReq setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -503,34 +634,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：名称。
      */
     public PmPrjPlanningPermitReq setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    /**
-     * 项目。
-     */
-    public String pmPrjId;
-
-    /**
-     * 获取：项目。
-     */
-    public String getPmPrjId() {
-        return this.pmPrjId;
-    }
-
-    /**
-     * 设置：项目。
-     */
-    public PmPrjPlanningPermitReq setPmPrjId(String pmPrjId) {
-        this.pmPrjId = pmPrjId;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -543,34 +670,66 @@ public class PmPrjPlanningPermitReq {
      * 设置：锁定流程实例。
      */
     public PmPrjPlanningPermitReq setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 项目编号。
+     * 项目。
      */
-    public String prjCode;
+    private String pmPrjId;
 
     /**
-     * 获取：项目编号。
+     * 获取：项目。
      */
-    public String getPrjCode() {
-        return this.prjCode;
+    public String getPmPrjId() {
+        return this.pmPrjId;
     }
 
     /**
-     * 设置：项目编号。
+     * 设置：项目。
      */
-    public PmPrjPlanningPermitReq setPrjCode(String prjCode) {
-        this.prjCode = prjCode;
+    public PmPrjPlanningPermitReq setPmPrjId(String pmPrjId) {
+        if (this.pmPrjId == null && pmPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmPrjId != null && pmPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmPrjId.compareTo(pmPrjId) != 0) {
+                this.pmPrjId = pmPrjId;
+                if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                    this.toUpdateCols.add("PM_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmPrjId = pmPrjId;
+            if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                this.toUpdateCols.add("PM_PRJ_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -583,34 +742,66 @@ public class PmPrjPlanningPermitReq {
      * 设置：记录状态。
      */
     public PmPrjPlanningPermitReq setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
-     * 创建用户。
+     * 项目编号。
      */
-    public String crtUserId;
+    private String prjCode;
 
     /**
-     * 获取：创建用户。
+     * 获取：项目编号。
      */
-    public String getCrtUserId() {
-        return this.crtUserId;
+    public String getPrjCode() {
+        return this.prjCode;
     }
 
     /**
-     * 设置：创建用户。
+     * 设置：项目编号。
      */
-    public PmPrjPlanningPermitReq setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+    public PmPrjPlanningPermitReq setPrjCode(String prjCode) {
+        if (this.prjCode == null && prjCode == null) {
+            // 均为null，不做处理。
+        } else if (this.prjCode != null && prjCode != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjCode.compareTo(prjCode) != 0) {
+                this.prjCode = prjCode;
+                if (!this.toUpdateCols.contains("PRJ_CODE")) {
+                    this.toUpdateCols.add("PRJ_CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjCode = prjCode;
+            if (!this.toUpdateCols.contains("PRJ_CODE")) {
+                this.toUpdateCols.add("PRJ_CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 业主单位。
      */
-    public String customerUnit;
+    private String customerUnit;
 
     /**
      * 获取：业主单位。
@@ -623,34 +814,66 @@ public class PmPrjPlanningPermitReq {
      * 设置：业主单位。
      */
     public PmPrjPlanningPermitReq setCustomerUnit(String customerUnit) {
-        this.customerUnit = customerUnit;
+        if (this.customerUnit == null && customerUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.customerUnit != null && customerUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.customerUnit.compareTo(customerUnit) != 0) {
+                this.customerUnit = customerUnit;
+                if (!this.toUpdateCols.contains("CUSTOMER_UNIT")) {
+                    this.toUpdateCols.add("CUSTOMER_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.customerUnit = customerUnit;
+            if (!this.toUpdateCols.contains("CUSTOMER_UNIT")) {
+                this.toUpdateCols.add("CUSTOMER_UNIT");
+            }
+        }
         return this;
     }
 
     /**
-     * 项目管理模式。
+     * 创建用户。
      */
-    public String prjManageModeId;
+    private String crtUserId;
 
     /**
-     * 获取：项目管理模式。
+     * 获取：创建用户。
      */
-    public String getPrjManageModeId() {
-        return this.prjManageModeId;
+    public String getCrtUserId() {
+        return this.crtUserId;
     }
 
     /**
-     * 设置：项目管理模式。
+     * 设置：创建用户。
      */
-    public PmPrjPlanningPermitReq setPrjManageModeId(String prjManageModeId) {
-        this.prjManageModeId = prjManageModeId;
+    public PmPrjPlanningPermitReq setCrtUserId(String crtUserId) {
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 创建部门。
      */
-    public String crtDeptId;
+    private String crtDeptId;
 
     /**
      * 获取：创建部门。
@@ -663,34 +886,66 @@ public class PmPrjPlanningPermitReq {
      * 设置：创建部门。
      */
     public PmPrjPlanningPermitReq setCrtDeptId(String crtDeptId) {
-        this.crtDeptId = crtDeptId;
+        if (this.crtDeptId == null && crtDeptId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDeptId != null && crtDeptId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDeptId.compareTo(crtDeptId) != 0) {
+                this.crtDeptId = crtDeptId;
+                if (!this.toUpdateCols.contains("CRT_DEPT_ID")) {
+                    this.toUpdateCols.add("CRT_DEPT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDeptId = crtDeptId;
+            if (!this.toUpdateCols.contains("CRT_DEPT_ID")) {
+                this.toUpdateCols.add("CRT_DEPT_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 创建日期时间。
+     * 项目管理模式。
      */
-    public LocalDateTime crtDt;
+    private String prjManageModeId;
 
     /**
-     * 获取：创建日期时间。
+     * 获取：项目管理模式。
      */
-    public LocalDateTime getCrtDt() {
-        return this.crtDt;
+    public String getPrjManageModeId() {
+        return this.prjManageModeId;
     }
 
     /**
-     * 设置：创建日期时间。
+     * 设置：项目管理模式。
      */
-    public PmPrjPlanningPermitReq setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+    public PmPrjPlanningPermitReq setPrjManageModeId(String prjManageModeId) {
+        if (this.prjManageModeId == null && prjManageModeId == null) {
+            // 均为null，不做处理。
+        } else if (this.prjManageModeId != null && prjManageModeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjManageModeId.compareTo(prjManageModeId) != 0) {
+                this.prjManageModeId = prjManageModeId;
+                if (!this.toUpdateCols.contains("PRJ_MANAGE_MODE_ID")) {
+                    this.toUpdateCols.add("PRJ_MANAGE_MODE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjManageModeId = prjManageModeId;
+            if (!this.toUpdateCols.contains("PRJ_MANAGE_MODE_ID")) {
+                this.toUpdateCols.add("PRJ_MANAGE_MODE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 建设地点。
      */
-    public String baseLocationId;
+    private String baseLocationId;
 
     /**
      * 获取：建设地点。
@@ -703,34 +958,102 @@ public class PmPrjPlanningPermitReq {
      * 设置：建设地点。
      */
     public PmPrjPlanningPermitReq setBaseLocationId(String baseLocationId) {
-        this.baseLocationId = baseLocationId;
+        if (this.baseLocationId == null && baseLocationId == null) {
+            // 均为null，不做处理。
+        } else if (this.baseLocationId != null && baseLocationId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.baseLocationId.compareTo(baseLocationId) != 0) {
+                this.baseLocationId = baseLocationId;
+                if (!this.toUpdateCols.contains("BASE_LOCATION_ID")) {
+                    this.toUpdateCols.add("BASE_LOCATION_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.baseLocationId = baseLocationId;
+            if (!this.toUpdateCols.contains("BASE_LOCATION_ID")) {
+                this.toUpdateCols.add("BASE_LOCATION_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 占地面积（平方）。
+     * 创建日期时间。
      */
-    public Double floorArea;
+    private LocalDateTime crtDt;
 
     /**
-     * 获取：占地面积（平方）。
+     * 获取：创建日期时间。
      */
-    public Double getFloorArea() {
+    public LocalDateTime getCrtDt() {
+        return this.crtDt;
+    }
+
+    /**
+     * 设置：创建日期时间。
+     */
+    public PmPrjPlanningPermitReq setCrtDt(LocalDateTime crtDt) {
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 占地面积(平方米)。
+     */
+    private BigDecimal floorArea;
+
+    /**
+     * 获取：占地面积(平方米)。
+     */
+    public BigDecimal getFloorArea() {
         return this.floorArea;
     }
 
     /**
-     * 设置：占地面积（平方）。
+     * 设置：占地面积(平方米)。
      */
-    public PmPrjPlanningPermitReq setFloorArea(Double floorArea) {
-        this.floorArea = floorArea;
+    public PmPrjPlanningPermitReq setFloorArea(BigDecimal floorArea) {
+        if (this.floorArea == null && floorArea == null) {
+            // 均为null，不做处理。
+        } else if (this.floorArea != null && floorArea != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.floorArea.compareTo(floorArea) != 0) {
+                this.floorArea = floorArea;
+                if (!this.toUpdateCols.contains("FLOOR_AREA")) {
+                    this.toUpdateCols.add("FLOOR_AREA");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.floorArea = floorArea;
+            if (!this.toUpdateCols.contains("FLOOR_AREA")) {
+                this.toUpdateCols.add("FLOOR_AREA");
+            }
+        }
         return this;
     }
 
     /**
      * 项目类型。
      */
-    public String projectTypeId;
+    private String projectTypeId;
 
     /**
      * 获取：项目类型。
@@ -743,14 +1066,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：项目类型。
      */
     public PmPrjPlanningPermitReq setProjectTypeId(String projectTypeId) {
-        this.projectTypeId = projectTypeId;
+        if (this.projectTypeId == null && projectTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.projectTypeId != null && projectTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectTypeId.compareTo(projectTypeId) != 0) {
+                this.projectTypeId = projectTypeId;
+                if (!this.toUpdateCols.contains("PROJECT_TYPE_ID")) {
+                    this.toUpdateCols.add("PROJECT_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectTypeId = projectTypeId;
+            if (!this.toUpdateCols.contains("PROJECT_TYPE_ID")) {
+                this.toUpdateCols.add("PROJECT_TYPE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 建设规模类型。
      */
-    public String conScaleTypeId;
+    private String conScaleTypeId;
 
     /**
      * 获取：建设规模类型。
@@ -763,54 +1102,210 @@ public class PmPrjPlanningPermitReq {
      * 设置：建设规模类型。
      */
     public PmPrjPlanningPermitReq setConScaleTypeId(String conScaleTypeId) {
-        this.conScaleTypeId = conScaleTypeId;
+        if (this.conScaleTypeId == null && conScaleTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.conScaleTypeId != null && conScaleTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.conScaleTypeId.compareTo(conScaleTypeId) != 0) {
+                this.conScaleTypeId = conScaleTypeId;
+                if (!this.toUpdateCols.contains("CON_SCALE_TYPE_ID")) {
+                    this.toUpdateCols.add("CON_SCALE_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.conScaleTypeId = conScaleTypeId;
+            if (!this.toUpdateCols.contains("CON_SCALE_TYPE_ID")) {
+                this.toUpdateCols.add("CON_SCALE_TYPE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 建设规模数量。
      */
-    public Double conScaleQty;
+    private BigDecimal conScaleQty;
 
     /**
      * 获取：建设规模数量。
      */
-    public Double getConScaleQty() {
+    public BigDecimal getConScaleQty() {
         return this.conScaleQty;
     }
 
     /**
      * 设置：建设规模数量。
      */
-    public PmPrjPlanningPermitReq setConScaleQty(Double conScaleQty) {
-        this.conScaleQty = conScaleQty;
+    public PmPrjPlanningPermitReq setConScaleQty(BigDecimal conScaleQty) {
+        if (this.conScaleQty == null && conScaleQty == null) {
+            // 均为null，不做处理。
+        } else if (this.conScaleQty != null && conScaleQty != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.conScaleQty.compareTo(conScaleQty) != 0) {
+                this.conScaleQty = conScaleQty;
+                if (!this.toUpdateCols.contains("CON_SCALE_QTY")) {
+                    this.toUpdateCols.add("CON_SCALE_QTY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.conScaleQty = conScaleQty;
+            if (!this.toUpdateCols.contains("CON_SCALE_QTY")) {
+                this.toUpdateCols.add("CON_SCALE_QTY");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 数量1。
+     */
+    private BigDecimal qtyOne;
+
+    /**
+     * 获取：数量1。
+     */
+    public BigDecimal getQtyOne() {
+        return this.qtyOne;
+    }
+
+    /**
+     * 设置：数量1。
+     */
+    public PmPrjPlanningPermitReq setQtyOne(BigDecimal qtyOne) {
+        if (this.qtyOne == null && qtyOne == null) {
+            // 均为null，不做处理。
+        } else if (this.qtyOne != null && qtyOne != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.qtyOne.compareTo(qtyOne) != 0) {
+                this.qtyOne = qtyOne;
+                if (!this.toUpdateCols.contains("QTY_ONE")) {
+                    this.toUpdateCols.add("QTY_ONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.qtyOne = qtyOne;
+            if (!this.toUpdateCols.contains("QTY_ONE")) {
+                this.toUpdateCols.add("QTY_ONE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 数量2。
+     */
+    private Integer qtyTwo;
+
+    /**
+     * 获取：数量2。
+     */
+    public Integer getQtyTwo() {
+        return this.qtyTwo;
+    }
+
+    /**
+     * 设置：数量2。
+     */
+    public PmPrjPlanningPermitReq setQtyTwo(Integer qtyTwo) {
+        if (this.qtyTwo == null && qtyTwo == null) {
+            // 均为null，不做处理。
+        } else if (this.qtyTwo != null && qtyTwo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.qtyTwo.compareTo(qtyTwo) != 0) {
+                this.qtyTwo = qtyTwo;
+                if (!this.toUpdateCols.contains("QTY_TWO")) {
+                    this.toUpdateCols.add("QTY_TWO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.qtyTwo = qtyTwo;
+            if (!this.toUpdateCols.contains("QTY_TWO")) {
+                this.toUpdateCols.add("QTY_TWO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 数量3。
+     */
+    private Integer qtyThree;
+
+    /**
+     * 获取：数量3。
+     */
+    public Integer getQtyThree() {
+        return this.qtyThree;
+    }
+
+    /**
+     * 设置：数量3。
+     */
+    public PmPrjPlanningPermitReq setQtyThree(Integer qtyThree) {
+        if (this.qtyThree == null && qtyThree == null) {
+            // 均为null，不做处理。
+        } else if (this.qtyThree != null && qtyThree != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.qtyThree.compareTo(qtyThree) != 0) {
+                this.qtyThree = qtyThree;
+                if (!this.toUpdateCols.contains("QTY_THREE")) {
+                    this.toUpdateCols.add("QTY_THREE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.qtyThree = qtyThree;
+            if (!this.toUpdateCols.contains("QTY_THREE")) {
+                this.toUpdateCols.add("QTY_THREE");
+            }
+        }
         return this;
     }
 
     /**
      * 建设规模数量2。
      */
-    public Double conScaleQty2;
+    private BigDecimal conScaleQty2;
 
     /**
      * 获取：建设规模数量2。
      */
-    public Double getConScaleQty2() {
+    public BigDecimal getConScaleQty2() {
         return this.conScaleQty2;
     }
 
     /**
      * 设置：建设规模数量2。
      */
-    public PmPrjPlanningPermitReq setConScaleQty2(Double conScaleQty2) {
-        this.conScaleQty2 = conScaleQty2;
+    public PmPrjPlanningPermitReq setConScaleQty2(BigDecimal conScaleQty2) {
+        if (this.conScaleQty2 == null && conScaleQty2 == null) {
+            // 均为null，不做处理。
+        } else if (this.conScaleQty2 != null && conScaleQty2 != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.conScaleQty2.compareTo(conScaleQty2) != 0) {
+                this.conScaleQty2 = conScaleQty2;
+                if (!this.toUpdateCols.contains("CON_SCALE_QTY2")) {
+                    this.toUpdateCols.add("CON_SCALE_QTY2");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.conScaleQty2 = conScaleQty2;
+            if (!this.toUpdateCols.contains("CON_SCALE_QTY2")) {
+                this.toUpdateCols.add("CON_SCALE_QTY2");
+            }
+        }
         return this;
     }
 
     /**
      * 建设规模单位。
      */
-    public String conScaleUomId;
+    private String conScaleUomId;
 
     /**
      * 获取：建设规模单位。
@@ -823,34 +1318,66 @@ public class PmPrjPlanningPermitReq {
      * 设置：建设规模单位。
      */
     public PmPrjPlanningPermitReq setConScaleUomId(String conScaleUomId) {
-        this.conScaleUomId = conScaleUomId;
+        if (this.conScaleUomId == null && conScaleUomId == null) {
+            // 均为null，不做处理。
+        } else if (this.conScaleUomId != null && conScaleUomId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.conScaleUomId.compareTo(conScaleUomId) != 0) {
+                this.conScaleUomId = conScaleUomId;
+                if (!this.toUpdateCols.contains("CON_SCALE_UOM_ID")) {
+                    this.toUpdateCols.add("CON_SCALE_UOM_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.conScaleUomId = conScaleUomId;
+            if (!this.toUpdateCols.contains("CON_SCALE_UOM_ID")) {
+                this.toUpdateCols.add("CON_SCALE_UOM_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 建设年限。
      */
-    public Double buildYears;
+    private BigDecimal buildYears;
 
     /**
      * 获取：建设年限。
      */
-    public Double getBuildYears() {
+    public BigDecimal getBuildYears() {
         return this.buildYears;
     }
 
     /**
      * 设置：建设年限。
      */
-    public PmPrjPlanningPermitReq setBuildYears(Double buildYears) {
-        this.buildYears = buildYears;
+    public PmPrjPlanningPermitReq setBuildYears(BigDecimal buildYears) {
+        if (this.buildYears == null && buildYears == null) {
+            // 均为null，不做处理。
+        } else if (this.buildYears != null && buildYears != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.buildYears.compareTo(buildYears) != 0) {
+                this.buildYears = buildYears;
+                if (!this.toUpdateCols.contains("BUILD_YEARS")) {
+                    this.toUpdateCols.add("BUILD_YEARS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.buildYears = buildYears;
+            if (!this.toUpdateCols.contains("BUILD_YEARS")) {
+                this.toUpdateCols.add("BUILD_YEARS");
+            }
+        }
         return this;
     }
 
     /**
      * 项目概况。
      */
-    public String prjSituation;
+    private String prjSituation;
 
     /**
      * 获取：项目概况。
@@ -863,74 +1390,138 @@ public class PmPrjPlanningPermitReq {
      * 设置：项目概况。
      */
     public PmPrjPlanningPermitReq setPrjSituation(String prjSituation) {
-        this.prjSituation = prjSituation;
+        if (this.prjSituation == null && prjSituation == null) {
+            // 均为null，不做处理。
+        } else if (this.prjSituation != null && prjSituation != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjSituation.compareTo(prjSituation) != 0) {
+                this.prjSituation = prjSituation;
+                if (!this.toUpdateCols.contains("PRJ_SITUATION")) {
+                    this.toUpdateCols.add("PRJ_SITUATION");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjSituation = prjSituation;
+            if (!this.toUpdateCols.contains("PRJ_SITUATION")) {
+                this.toUpdateCols.add("PRJ_SITUATION");
+            }
+        }
         return this;
     }
 
     /**
-     * 招采标流程标题。
+     * 招采项目备案及归档。
      */
-    public String biddingNameId;
+    private String pmBidKeepFileReqId;
 
     /**
-     * 获取：招采标流程标题。
+     * 获取：招采项目备案及归档。
      */
-    public String getBiddingNameId() {
-        return this.biddingNameId;
+    public String getPmBidKeepFileReqId() {
+        return this.pmBidKeepFileReqId;
     }
 
     /**
-     * 设置：招采标流程标题。
+     * 设置：招采项目备案及归档。
      */
-    public PmPrjPlanningPermitReq setBiddingNameId(String biddingNameId) {
-        this.biddingNameId = biddingNameId;
+    public PmPrjPlanningPermitReq setPmBidKeepFileReqId(String pmBidKeepFileReqId) {
+        if (this.pmBidKeepFileReqId == null && pmBidKeepFileReqId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmBidKeepFileReqId != null && pmBidKeepFileReqId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmBidKeepFileReqId.compareTo(pmBidKeepFileReqId) != 0) {
+                this.pmBidKeepFileReqId = pmBidKeepFileReqId;
+                if (!this.toUpdateCols.contains("PM_BID_KEEP_FILE_REQ_ID")) {
+                    this.toUpdateCols.add("PM_BID_KEEP_FILE_REQ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmBidKeepFileReqId = pmBidKeepFileReqId;
+            if (!this.toUpdateCols.contains("PM_BID_KEEP_FILE_REQ_ID")) {
+                this.toUpdateCols.add("PM_BID_KEEP_FILE_REQ_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 审核状态。
+     * 状态1。
      */
-    public String approvalStatus;
+    private String statusOne;
 
     /**
-     * 获取：审核状态。
+     * 获取：状态1。
      */
-    public String getApprovalStatus() {
-        return this.approvalStatus;
+    public String getStatusOne() {
+        return this.statusOne;
     }
 
     /**
-     * 设置：审核状态。
+     * 设置：状态1。
      */
-    public PmPrjPlanningPermitReq setApprovalStatus(String approvalStatus) {
-        this.approvalStatus = approvalStatus;
+    public PmPrjPlanningPermitReq setStatusOne(String statusOne) {
+        if (this.statusOne == null && statusOne == null) {
+            // 均为null，不做处理。
+        } else if (this.statusOne != null && statusOne != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.statusOne.compareTo(statusOne) != 0) {
+                this.statusOne = statusOne;
+                if (!this.toUpdateCols.contains("STATUS_ONE")) {
+                    this.toUpdateCols.add("STATUS_ONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.statusOne = statusOne;
+            if (!this.toUpdateCols.contains("STATUS_ONE")) {
+                this.toUpdateCols.add("STATUS_ONE");
+            }
+        }
         return this;
     }
 
     /**
-     * 委托单位(文本)。
+     * 业主单位1。
      */
-    public String entrustingUnitText;
+    private String customerUnitOne;
 
     /**
-     * 获取：委托单位(文本)。
+     * 获取：业主单位1。
      */
-    public String getEntrustingUnitText() {
-        return this.entrustingUnitText;
+    public String getCustomerUnitOne() {
+        return this.customerUnitOne;
     }
 
     /**
-     * 设置：委托单位(文本)。
+     * 设置：业主单位1。
      */
-    public PmPrjPlanningPermitReq setEntrustingUnitText(String entrustingUnitText) {
-        this.entrustingUnitText = entrustingUnitText;
+    public PmPrjPlanningPermitReq setCustomerUnitOne(String customerUnitOne) {
+        if (this.customerUnitOne == null && customerUnitOne == null) {
+            // 均为null，不做处理。
+        } else if (this.customerUnitOne != null && customerUnitOne != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.customerUnitOne.compareTo(customerUnitOne) != 0) {
+                this.customerUnitOne = customerUnitOne;
+                if (!this.toUpdateCols.contains("CUSTOMER_UNIT_ONE")) {
+                    this.toUpdateCols.add("CUSTOMER_UNIT_ONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.customerUnitOne = customerUnitOne;
+            if (!this.toUpdateCols.contains("CUSTOMER_UNIT_ONE")) {
+                this.toUpdateCols.add("CUSTOMER_UNIT_ONE");
+            }
+        }
         return this;
     }
 
     /**
      * 采购经办人。
      */
-    public String procureUserId;
+    private String procureUserId;
 
     /**
      * 获取：采购经办人。
@@ -943,114 +1534,138 @@ public class PmPrjPlanningPermitReq {
      * 设置：采购经办人。
      */
     public PmPrjPlanningPermitReq setProcureUserId(String procureUserId) {
-        this.procureUserId = procureUserId;
+        if (this.procureUserId == null && procureUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.procureUserId != null && procureUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.procureUserId.compareTo(procureUserId) != 0) {
+                this.procureUserId = procureUserId;
+                if (!this.toUpdateCols.contains("PROCURE_USER_ID")) {
+                    this.toUpdateCols.add("PROCURE_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.procureUserId = procureUserId;
+            if (!this.toUpdateCols.contains("PROCURE_USER_ID")) {
+                this.toUpdateCols.add("PROCURE_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 编制单位(文本)。
+     * 中标单位1。
      */
-    public String authorUnitText;
+    private String winBidUnitOne;
 
     /**
-     * 获取：编制单位(文本)。
+     * 获取：中标单位1。
      */
-    public String getAuthorUnitText() {
-        return this.authorUnitText;
+    public String getWinBidUnitOne() {
+        return this.winBidUnitOne;
     }
 
     /**
-     * 设置：编制单位(文本)。
+     * 设置：中标单位1。
      */
-    public PmPrjPlanningPermitReq setAuthorUnitText(String authorUnitText) {
-        this.authorUnitText = authorUnitText;
+    public PmPrjPlanningPermitReq setWinBidUnitOne(String winBidUnitOne) {
+        if (this.winBidUnitOne == null && winBidUnitOne == null) {
+            // 均为null，不做处理。
+        } else if (this.winBidUnitOne != null && winBidUnitOne != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.winBidUnitOne.compareTo(winBidUnitOne) != 0) {
+                this.winBidUnitOne = winBidUnitOne;
+                if (!this.toUpdateCols.contains("WIN_BID_UNIT_ONE")) {
+                    this.toUpdateCols.add("WIN_BID_UNIT_ONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.winBidUnitOne = winBidUnitOne;
+            if (!this.toUpdateCols.contains("WIN_BID_UNIT_ONE")) {
+                this.toUpdateCols.add("WIN_BID_UNIT_ONE");
+            }
+        }
         return this;
     }
 
     /**
-     * 对方负责人。
+     * 联系人1。
      */
-    public String otherResponsor;
+    private String contactsOne;
 
     /**
-     * 获取：对方负责人。
+     * 获取：联系人1。
      */
-    public String getOtherResponsor() {
-        return this.otherResponsor;
+    public String getContactsOne() {
+        return this.contactsOne;
     }
 
     /**
-     * 设置：对方负责人。
+     * 设置：联系人1。
      */
-    public PmPrjPlanningPermitReq setOtherResponsor(String otherResponsor) {
-        this.otherResponsor = otherResponsor;
+    public PmPrjPlanningPermitReq setContactsOne(String contactsOne) {
+        if (this.contactsOne == null && contactsOne == null) {
+            // 均为null，不做处理。
+        } else if (this.contactsOne != null && contactsOne != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contactsOne.compareTo(contactsOne) != 0) {
+                this.contactsOne = contactsOne;
+                if (!this.toUpdateCols.contains("CONTACTS_ONE")) {
+                    this.toUpdateCols.add("CONTACTS_ONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contactsOne = contactsOne;
+            if (!this.toUpdateCols.contains("CONTACTS_ONE")) {
+                this.toUpdateCols.add("CONTACTS_ONE");
+            }
+        }
         return this;
     }
 
     /**
-     * 进场日期。
+     * 联系人电话1。
      */
-    public LocalDate inDate;
+    private String contactMobileOne;
 
     /**
-     * 获取：进场日期。
+     * 获取：联系人电话1。
      */
-    public LocalDate getInDate() {
-        return this.inDate;
+    public String getContactMobileOne() {
+        return this.contactMobileOne;
     }
 
     /**
-     * 设置：进场日期。
+     * 设置：联系人电话1。
      */
-    public PmPrjPlanningPermitReq setInDate(LocalDate inDate) {
-        this.inDate = inDate;
-        return this;
-    }
-
-    /**
-     * 服务周期。
-     */
-    public Integer serviceDays;
-
-    /**
-     * 获取：服务周期。
-     */
-    public Integer getServiceDays() {
-        return this.serviceDays;
-    }
-
-    /**
-     * 设置：服务周期。
-     */
-    public PmPrjPlanningPermitReq setServiceDays(Integer serviceDays) {
-        this.serviceDays = serviceDays;
-        return this;
-    }
-
-    /**
-     * 对方联系方式。
-     */
-    public String otherContactPhone;
-
-    /**
-     * 获取：对方联系方式。
-     */
-    public String getOtherContactPhone() {
-        return this.otherContactPhone;
-    }
-
-    /**
-     * 设置：对方联系方式。
-     */
-    public PmPrjPlanningPermitReq setOtherContactPhone(String otherContactPhone) {
-        this.otherContactPhone = otherContactPhone;
+    public PmPrjPlanningPermitReq setContactMobileOne(String contactMobileOne) {
+        if (this.contactMobileOne == null && contactMobileOne == null) {
+            // 均为null，不做处理。
+        } else if (this.contactMobileOne != null && contactMobileOne != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contactMobileOne.compareTo(contactMobileOne) != 0) {
+                this.contactMobileOne = contactMobileOne;
+                if (!this.toUpdateCols.contains("CONTACT_MOBILE_ONE")) {
+                    this.toUpdateCols.add("CONTACT_MOBILE_ONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contactMobileOne = contactMobileOne;
+            if (!this.toUpdateCols.contains("CONTACT_MOBILE_ONE")) {
+                this.toUpdateCols.add("CONTACT_MOBILE_ONE");
+            }
+        }
         return this;
     }
 
     /**
      * 计划完成日期。
      */
-    public LocalDate complPlanDate;
+    private LocalDate complPlanDate;
 
     /**
      * 获取：计划完成日期。
@@ -1063,14 +1678,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：计划完成日期。
      */
     public PmPrjPlanningPermitReq setComplPlanDate(LocalDate complPlanDate) {
-        this.complPlanDate = complPlanDate;
+        if (this.complPlanDate == null && complPlanDate == null) {
+            // 均为null，不做处理。
+        } else if (this.complPlanDate != null && complPlanDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.complPlanDate.compareTo(complPlanDate) != 0) {
+                this.complPlanDate = complPlanDate;
+                if (!this.toUpdateCols.contains("COMPL_PLAN_DATE")) {
+                    this.toUpdateCols.add("COMPL_PLAN_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.complPlanDate = complPlanDate;
+            if (!this.toUpdateCols.contains("COMPL_PLAN_DATE")) {
+                this.toUpdateCols.add("COMPL_PLAN_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 申请时间。
      */
-    public LocalDate applyTime;
+    private LocalDate applyTime;
 
     /**
      * 获取：申请时间。
@@ -1083,14 +1714,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：申请时间。
      */
     public PmPrjPlanningPermitReq setApplyTime(LocalDate applyTime) {
-        this.applyTime = applyTime;
+        if (this.applyTime == null && applyTime == null) {
+            // 均为null，不做处理。
+        } else if (this.applyTime != null && applyTime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.applyTime.compareTo(applyTime) != 0) {
+                this.applyTime = applyTime;
+                if (!this.toUpdateCols.contains("APPLY_TIME")) {
+                    this.toUpdateCols.add("APPLY_TIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.applyTime = applyTime;
+            if (!this.toUpdateCols.contains("APPLY_TIME")) {
+                this.toUpdateCols.add("APPLY_TIME");
+            }
+        }
         return this;
     }
 
     /**
      * 申请人。
      */
-    public String applicant;
+    private String applicant;
 
     /**
      * 获取：申请人。
@@ -1103,14 +1750,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：申请人。
      */
     public PmPrjPlanningPermitReq setApplicant(String applicant) {
-        this.applicant = applicant;
+        if (this.applicant == null && applicant == null) {
+            // 均为null，不做处理。
+        } else if (this.applicant != null && applicant != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.applicant.compareTo(applicant) != 0) {
+                this.applicant = applicant;
+                if (!this.toUpdateCols.contains("APPLICANT")) {
+                    this.toUpdateCols.add("APPLICANT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.applicant = applicant;
+            if (!this.toUpdateCols.contains("APPLICANT")) {
+                this.toUpdateCols.add("APPLICANT");
+            }
+        }
         return this;
     }
 
     /**
      * 环评申请材料。
      */
-    public String eiaReqFile;
+    private String eiaReqFile;
 
     /**
      * 获取：环评申请材料。
@@ -1123,14 +1786,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：环评申请材料。
      */
     public PmPrjPlanningPermitReq setEiaReqFile(String eiaReqFile) {
-        this.eiaReqFile = eiaReqFile;
+        if (this.eiaReqFile == null && eiaReqFile == null) {
+            // 均为null，不做处理。
+        } else if (this.eiaReqFile != null && eiaReqFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.eiaReqFile.compareTo(eiaReqFile) != 0) {
+                this.eiaReqFile = eiaReqFile;
+                if (!this.toUpdateCols.contains("EIA_REQ_FILE")) {
+                    this.toUpdateCols.add("EIA_REQ_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.eiaReqFile = eiaReqFile;
+            if (!this.toUpdateCols.contains("EIA_REQ_FILE")) {
+                this.toUpdateCols.add("EIA_REQ_FILE");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -1143,14 +1822,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：备注。
      */
     public PmPrjPlanningPermitReq setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 专家评审计划完成日期。
      */
-    public LocalDate expertComplPlanDate;
+    private LocalDate expertComplPlanDate;
 
     /**
      * 获取：专家评审计划完成日期。
@@ -1163,14 +1858,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：专家评审计划完成日期。
      */
     public PmPrjPlanningPermitReq setExpertComplPlanDate(LocalDate expertComplPlanDate) {
-        this.expertComplPlanDate = expertComplPlanDate;
+        if (this.expertComplPlanDate == null && expertComplPlanDate == null) {
+            // 均为null，不做处理。
+        } else if (this.expertComplPlanDate != null && expertComplPlanDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.expertComplPlanDate.compareTo(expertComplPlanDate) != 0) {
+                this.expertComplPlanDate = expertComplPlanDate;
+                if (!this.toUpdateCols.contains("EXPERT_COMPL_PLAN_DATE")) {
+                    this.toUpdateCols.add("EXPERT_COMPL_PLAN_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.expertComplPlanDate = expertComplPlanDate;
+            if (!this.toUpdateCols.contains("EXPERT_COMPL_PLAN_DATE")) {
+                this.toUpdateCols.add("EXPERT_COMPL_PLAN_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 专家评审实际完成日期。
      */
-    public LocalDate expertComplActualDate;
+    private LocalDate expertComplActualDate;
 
     /**
      * 获取：专家评审实际完成日期。
@@ -1183,14 +1894,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：专家评审实际完成日期。
      */
     public PmPrjPlanningPermitReq setExpertComplActualDate(LocalDate expertComplActualDate) {
-        this.expertComplActualDate = expertComplActualDate;
+        if (this.expertComplActualDate == null && expertComplActualDate == null) {
+            // 均为null，不做处理。
+        } else if (this.expertComplActualDate != null && expertComplActualDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.expertComplActualDate.compareTo(expertComplActualDate) != 0) {
+                this.expertComplActualDate = expertComplActualDate;
+                if (!this.toUpdateCols.contains("EXPERT_COMPL_ACTUAL_DATE")) {
+                    this.toUpdateCols.add("EXPERT_COMPL_ACTUAL_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.expertComplActualDate = expertComplActualDate;
+            if (!this.toUpdateCols.contains("EXPERT_COMPL_ACTUAL_DATE")) {
+                this.toUpdateCols.add("EXPERT_COMPL_ACTUAL_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 评审单位负责人。
      */
-    public String reviewUnitChief;
+    private String reviewUnitChief;
 
     /**
      * 获取：评审单位负责人。
@@ -1203,14 +1930,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：评审单位负责人。
      */
     public PmPrjPlanningPermitReq setReviewUnitChief(String reviewUnitChief) {
-        this.reviewUnitChief = reviewUnitChief;
+        if (this.reviewUnitChief == null && reviewUnitChief == null) {
+            // 均为null，不做处理。
+        } else if (this.reviewUnitChief != null && reviewUnitChief != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.reviewUnitChief.compareTo(reviewUnitChief) != 0) {
+                this.reviewUnitChief = reviewUnitChief;
+                if (!this.toUpdateCols.contains("REVIEW_UNIT_CHIEF")) {
+                    this.toUpdateCols.add("REVIEW_UNIT_CHIEF");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.reviewUnitChief = reviewUnitChief;
+            if (!this.toUpdateCols.contains("REVIEW_UNIT_CHIEF")) {
+                this.toUpdateCols.add("REVIEW_UNIT_CHIEF");
+            }
+        }
         return this;
     }
 
     /**
      * 评审单位。
      */
-    public String reviewUnit;
+    private String reviewUnit;
 
     /**
      * 获取：评审单位。
@@ -1223,14 +1966,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：评审单位。
      */
     public PmPrjPlanningPermitReq setReviewUnit(String reviewUnit) {
-        this.reviewUnit = reviewUnit;
+        if (this.reviewUnit == null && reviewUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.reviewUnit != null && reviewUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.reviewUnit.compareTo(reviewUnit) != 0) {
+                this.reviewUnit = reviewUnit;
+                if (!this.toUpdateCols.contains("REVIEW_UNIT")) {
+                    this.toUpdateCols.add("REVIEW_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.reviewUnit = reviewUnit;
+            if (!this.toUpdateCols.contains("REVIEW_UNIT")) {
+                this.toUpdateCols.add("REVIEW_UNIT");
+            }
+        }
         return this;
     }
 
     /**
      * 评审单位联系方式。
      */
-    public String reviewUnitPhone;
+    private String reviewUnitPhone;
 
     /**
      * 获取：评审单位联系方式。
@@ -1243,14 +2002,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：评审单位联系方式。
      */
     public PmPrjPlanningPermitReq setReviewUnitPhone(String reviewUnitPhone) {
-        this.reviewUnitPhone = reviewUnitPhone;
+        if (this.reviewUnitPhone == null && reviewUnitPhone == null) {
+            // 均为null，不做处理。
+        } else if (this.reviewUnitPhone != null && reviewUnitPhone != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.reviewUnitPhone.compareTo(reviewUnitPhone) != 0) {
+                this.reviewUnitPhone = reviewUnitPhone;
+                if (!this.toUpdateCols.contains("REVIEW_UNIT_PHONE")) {
+                    this.toUpdateCols.add("REVIEW_UNIT_PHONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.reviewUnitPhone = reviewUnitPhone;
+            if (!this.toUpdateCols.contains("REVIEW_UNIT_PHONE")) {
+                this.toUpdateCols.add("REVIEW_UNIT_PHONE");
+            }
+        }
         return this;
     }
 
     /**
      * 评审稿文件。
      */
-    public String reviewReportFile;
+    private String reviewReportFile;
 
     /**
      * 获取：评审稿文件。
@@ -1263,14 +2038,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：评审稿文件。
      */
     public PmPrjPlanningPermitReq setReviewReportFile(String reviewReportFile) {
-        this.reviewReportFile = reviewReportFile;
+        if (this.reviewReportFile == null && reviewReportFile == null) {
+            // 均为null，不做处理。
+        } else if (this.reviewReportFile != null && reviewReportFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.reviewReportFile.compareTo(reviewReportFile) != 0) {
+                this.reviewReportFile = reviewReportFile;
+                if (!this.toUpdateCols.contains("REVIEW_REPORT_FILE")) {
+                    this.toUpdateCols.add("REVIEW_REPORT_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.reviewReportFile = reviewReportFile;
+            if (!this.toUpdateCols.contains("REVIEW_REPORT_FILE")) {
+                this.toUpdateCols.add("REVIEW_REPORT_FILE");
+            }
+        }
         return this;
     }
 
     /**
      * 评审报告文件。
      */
-    public String reviewDraftFile;
+    private String reviewDraftFile;
 
     /**
      * 获取：评审报告文件。
@@ -1283,14 +2074,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：评审报告文件。
      */
     public PmPrjPlanningPermitReq setReviewDraftFile(String reviewDraftFile) {
-        this.reviewDraftFile = reviewDraftFile;
+        if (this.reviewDraftFile == null && reviewDraftFile == null) {
+            // 均为null，不做处理。
+        } else if (this.reviewDraftFile != null && reviewDraftFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.reviewDraftFile.compareTo(reviewDraftFile) != 0) {
+                this.reviewDraftFile = reviewDraftFile;
+                if (!this.toUpdateCols.contains("REVIEW_DRAFT_FILE")) {
+                    this.toUpdateCols.add("REVIEW_DRAFT_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.reviewDraftFile = reviewDraftFile;
+            if (!this.toUpdateCols.contains("REVIEW_DRAFT_FILE")) {
+                this.toUpdateCols.add("REVIEW_DRAFT_FILE");
+            }
+        }
         return this;
     }
 
     /**
      * 修编稿文件。
      */
-    public String revisionFile;
+    private String revisionFile;
 
     /**
      * 获取：修编稿文件。
@@ -1303,14 +2110,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：修编稿文件。
      */
     public PmPrjPlanningPermitReq setRevisionFile(String revisionFile) {
-        this.revisionFile = revisionFile;
+        if (this.revisionFile == null && revisionFile == null) {
+            // 均为null，不做处理。
+        } else if (this.revisionFile != null && revisionFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.revisionFile.compareTo(revisionFile) != 0) {
+                this.revisionFile = revisionFile;
+                if (!this.toUpdateCols.contains("REVISION_FILE")) {
+                    this.toUpdateCols.add("REVISION_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.revisionFile = revisionFile;
+            if (!this.toUpdateCols.contains("REVISION_FILE")) {
+                this.toUpdateCols.add("REVISION_FILE");
+            }
+        }
         return this;
     }
 
     /**
      * 评审及修编说明。
      */
-    public String reviewAndRevisionRemark;
+    private String reviewAndRevisionRemark;
 
     /**
      * 获取：评审及修编说明。
@@ -1323,34 +2146,66 @@ public class PmPrjPlanningPermitReq {
      * 设置：评审及修编说明。
      */
     public PmPrjPlanningPermitReq setReviewAndRevisionRemark(String reviewAndRevisionRemark) {
-        this.reviewAndRevisionRemark = reviewAndRevisionRemark;
+        if (this.reviewAndRevisionRemark == null && reviewAndRevisionRemark == null) {
+            // 均为null，不做处理。
+        } else if (this.reviewAndRevisionRemark != null && reviewAndRevisionRemark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.reviewAndRevisionRemark.compareTo(reviewAndRevisionRemark) != 0) {
+                this.reviewAndRevisionRemark = reviewAndRevisionRemark;
+                if (!this.toUpdateCols.contains("REVIEW_AND_REVISION_REMARK")) {
+                    this.toUpdateCols.add("REVIEW_AND_REVISION_REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.reviewAndRevisionRemark = reviewAndRevisionRemark;
+            if (!this.toUpdateCols.contains("REVIEW_AND_REVISION_REMARK")) {
+                this.toUpdateCols.add("REVIEW_AND_REVISION_REMARK");
+            }
+        }
         return this;
     }
 
     /**
-     * 计划完成日期检查。
+     * 计划完成日期。
      */
-    public LocalDate complPlanDateCheck;
+    private LocalDate complPlanDateCheck;
 
     /**
-     * 获取：计划完成日期检查。
+     * 获取：计划完成日期。
      */
     public LocalDate getComplPlanDateCheck() {
         return this.complPlanDateCheck;
     }
 
     /**
-     * 设置：计划完成日期检查。
+     * 设置：计划完成日期。
      */
     public PmPrjPlanningPermitReq setComplPlanDateCheck(LocalDate complPlanDateCheck) {
-        this.complPlanDateCheck = complPlanDateCheck;
+        if (this.complPlanDateCheck == null && complPlanDateCheck == null) {
+            // 均为null，不做处理。
+        } else if (this.complPlanDateCheck != null && complPlanDateCheck != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.complPlanDateCheck.compareTo(complPlanDateCheck) != 0) {
+                this.complPlanDateCheck = complPlanDateCheck;
+                if (!this.toUpdateCols.contains("COMPL_PLAN_DATE_CHECK")) {
+                    this.toUpdateCols.add("COMPL_PLAN_DATE_CHECK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.complPlanDateCheck = complPlanDateCheck;
+            if (!this.toUpdateCols.contains("COMPL_PLAN_DATE_CHECK")) {
+                this.toUpdateCols.add("COMPL_PLAN_DATE_CHECK");
+            }
+        }
         return this;
     }
 
     /**
      * 完成日期。
      */
-    public LocalDate complDate;
+    private LocalDate complDate;
 
     /**
      * 获取：完成日期。
@@ -1363,14 +2218,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：完成日期。
      */
     public PmPrjPlanningPermitReq setComplDate(LocalDate complDate) {
-        this.complDate = complDate;
+        if (this.complDate == null && complDate == null) {
+            // 均为null，不做处理。
+        } else if (this.complDate != null && complDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.complDate.compareTo(complDate) != 0) {
+                this.complDate = complDate;
+                if (!this.toUpdateCols.contains("COMPL_DATE")) {
+                    this.toUpdateCols.add("COMPL_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.complDate = complDate;
+            if (!this.toUpdateCols.contains("COMPL_DATE")) {
+                this.toUpdateCols.add("COMPL_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 编制负责人。
      */
-    public String authorResponse;
+    private String authorResponse;
 
     /**
      * 获取：编制负责人。
@@ -1383,14 +2254,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：编制负责人。
      */
     public PmPrjPlanningPermitReq setAuthorResponse(String authorResponse) {
-        this.authorResponse = authorResponse;
+        if (this.authorResponse == null && authorResponse == null) {
+            // 均为null，不做处理。
+        } else if (this.authorResponse != null && authorResponse != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.authorResponse.compareTo(authorResponse) != 0) {
+                this.authorResponse = authorResponse;
+                if (!this.toUpdateCols.contains("AUTHOR_RESPONSE")) {
+                    this.toUpdateCols.add("AUTHOR_RESPONSE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.authorResponse = authorResponse;
+            if (!this.toUpdateCols.contains("AUTHOR_RESPONSE")) {
+                this.toUpdateCols.add("AUTHOR_RESPONSE");
+            }
+        }
         return this;
     }
 
     /**
      * 方案检查ppt文件。
      */
-    public String planCheckPptFileGroupId;
+    private String planCheckPptFileGroupId;
 
     /**
      * 获取：方案检查ppt文件。
@@ -1403,14 +2290,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：方案检查ppt文件。
      */
     public PmPrjPlanningPermitReq setPlanCheckPptFileGroupId(String planCheckPptFileGroupId) {
-        this.planCheckPptFileGroupId = planCheckPptFileGroupId;
+        if (this.planCheckPptFileGroupId == null && planCheckPptFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.planCheckPptFileGroupId != null && planCheckPptFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planCheckPptFileGroupId.compareTo(planCheckPptFileGroupId) != 0) {
+                this.planCheckPptFileGroupId = planCheckPptFileGroupId;
+                if (!this.toUpdateCols.contains("PLAN_CHECK_PPT_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("PLAN_CHECK_PPT_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planCheckPptFileGroupId = planCheckPptFileGroupId;
+            if (!this.toUpdateCols.contains("PLAN_CHECK_PPT_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("PLAN_CHECK_PPT_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 管理局局务预审会会议时间。
      */
-    public LocalDate adminMeetingDate;
+    private LocalDate adminMeetingDate;
 
     /**
      * 获取：管理局局务预审会会议时间。
@@ -1423,14 +2326,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：管理局局务预审会会议时间。
      */
     public PmPrjPlanningPermitReq setAdminMeetingDate(LocalDate adminMeetingDate) {
-        this.adminMeetingDate = adminMeetingDate;
+        if (this.adminMeetingDate == null && adminMeetingDate == null) {
+            // 均为null，不做处理。
+        } else if (this.adminMeetingDate != null && adminMeetingDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adminMeetingDate.compareTo(adminMeetingDate) != 0) {
+                this.adminMeetingDate = adminMeetingDate;
+                if (!this.toUpdateCols.contains("ADMIN_MEETING_DATE")) {
+                    this.toUpdateCols.add("ADMIN_MEETING_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adminMeetingDate = adminMeetingDate;
+            if (!this.toUpdateCols.contains("ADMIN_MEETING_DATE")) {
+                this.toUpdateCols.add("ADMIN_MEETING_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 管理局预审会是否通过。
      */
-    public Boolean adminIsPass;
+    private Boolean adminIsPass;
 
     /**
      * 获取：管理局预审会是否通过。
@@ -1443,14 +2362,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：管理局预审会是否通过。
      */
     public PmPrjPlanningPermitReq setAdminIsPass(Boolean adminIsPass) {
-        this.adminIsPass = adminIsPass;
+        if (this.adminIsPass == null && adminIsPass == null) {
+            // 均为null，不做处理。
+        } else if (this.adminIsPass != null && adminIsPass != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adminIsPass.compareTo(adminIsPass) != 0) {
+                this.adminIsPass = adminIsPass;
+                if (!this.toUpdateCols.contains("ADMIN_IS_PASS")) {
+                    this.toUpdateCols.add("ADMIN_IS_PASS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adminIsPass = adminIsPass;
+            if (!this.toUpdateCols.contains("ADMIN_IS_PASS")) {
+                this.toUpdateCols.add("ADMIN_IS_PASS");
+            }
+        }
         return this;
     }
 
     /**
      * 管理局预审会市委会意见。
      */
-    public String adminCommitteeOpinonFileGroupId;
+    private String adminCommitteeOpinonFileGroupId;
 
     /**
      * 获取：管理局预审会市委会意见。
@@ -1463,14 +2398,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：管理局预审会市委会意见。
      */
     public PmPrjPlanningPermitReq setAdminCommitteeOpinonFileGroupId(String adminCommitteeOpinonFileGroupId) {
-        this.adminCommitteeOpinonFileGroupId = adminCommitteeOpinonFileGroupId;
+        if (this.adminCommitteeOpinonFileGroupId == null && adminCommitteeOpinonFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.adminCommitteeOpinonFileGroupId != null && adminCommitteeOpinonFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adminCommitteeOpinonFileGroupId.compareTo(adminCommitteeOpinonFileGroupId) != 0) {
+                this.adminCommitteeOpinonFileGroupId = adminCommitteeOpinonFileGroupId;
+                if (!this.toUpdateCols.contains("ADMIN_COMMITTEE_OPINON_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("ADMIN_COMMITTEE_OPINON_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adminCommitteeOpinonFileGroupId = adminCommitteeOpinonFileGroupId;
+            if (!this.toUpdateCols.contains("ADMIN_COMMITTEE_OPINON_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("ADMIN_COMMITTEE_OPINON_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 规委会预审会会议时间。
      */
-    public LocalDate planMeetingDate;
+    private LocalDate planMeetingDate;
 
     /**
      * 获取：规委会预审会会议时间。
@@ -1483,14 +2434,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：规委会预审会会议时间。
      */
     public PmPrjPlanningPermitReq setPlanMeetingDate(LocalDate planMeetingDate) {
-        this.planMeetingDate = planMeetingDate;
+        if (this.planMeetingDate == null && planMeetingDate == null) {
+            // 均为null，不做处理。
+        } else if (this.planMeetingDate != null && planMeetingDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planMeetingDate.compareTo(planMeetingDate) != 0) {
+                this.planMeetingDate = planMeetingDate;
+                if (!this.toUpdateCols.contains("PLAN_MEETING_DATE")) {
+                    this.toUpdateCols.add("PLAN_MEETING_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planMeetingDate = planMeetingDate;
+            if (!this.toUpdateCols.contains("PLAN_MEETING_DATE")) {
+                this.toUpdateCols.add("PLAN_MEETING_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 规委会预审会是否通过。
      */
-    public Boolean planIsPass;
+    private Boolean planIsPass;
 
     /**
      * 获取：规委会预审会是否通过。
@@ -1503,14 +2470,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：规委会预审会是否通过。
      */
     public PmPrjPlanningPermitReq setPlanIsPass(Boolean planIsPass) {
-        this.planIsPass = planIsPass;
+        if (this.planIsPass == null && planIsPass == null) {
+            // 均为null，不做处理。
+        } else if (this.planIsPass != null && planIsPass != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planIsPass.compareTo(planIsPass) != 0) {
+                this.planIsPass = planIsPass;
+                if (!this.toUpdateCols.contains("PLAN_IS_PASS")) {
+                    this.toUpdateCols.add("PLAN_IS_PASS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planIsPass = planIsPass;
+            if (!this.toUpdateCols.contains("PLAN_IS_PASS")) {
+                this.toUpdateCols.add("PLAN_IS_PASS");
+            }
+        }
         return this;
     }
 
     /**
      * 规委会预审会市委会意见。
      */
-    public String planCommitteeOpinonFileGroupId;
+    private String planCommitteeOpinonFileGroupId;
 
     /**
      * 获取：规委会预审会市委会意见。
@@ -1523,14 +2506,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：规委会预审会市委会意见。
      */
     public PmPrjPlanningPermitReq setPlanCommitteeOpinonFileGroupId(String planCommitteeOpinonFileGroupId) {
-        this.planCommitteeOpinonFileGroupId = planCommitteeOpinonFileGroupId;
+        if (this.planCommitteeOpinonFileGroupId == null && planCommitteeOpinonFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.planCommitteeOpinonFileGroupId != null && planCommitteeOpinonFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planCommitteeOpinonFileGroupId.compareTo(planCommitteeOpinonFileGroupId) != 0) {
+                this.planCommitteeOpinonFileGroupId = planCommitteeOpinonFileGroupId;
+                if (!this.toUpdateCols.contains("PLAN_COMMITTEE_OPINON_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("PLAN_COMMITTEE_OPINON_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planCommitteeOpinonFileGroupId = planCommitteeOpinonFileGroupId;
+            if (!this.toUpdateCols.contains("PLAN_COMMITTEE_OPINON_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("PLAN_COMMITTEE_OPINON_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 分管副市长预审会会议时间。
      */
-    public LocalDate deputyMayorMeetingDate;
+    private LocalDate deputyMayorMeetingDate;
 
     /**
      * 获取：分管副市长预审会会议时间。
@@ -1543,14 +2542,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：分管副市长预审会会议时间。
      */
     public PmPrjPlanningPermitReq setDeputyMayorMeetingDate(LocalDate deputyMayorMeetingDate) {
-        this.deputyMayorMeetingDate = deputyMayorMeetingDate;
+        if (this.deputyMayorMeetingDate == null && deputyMayorMeetingDate == null) {
+            // 均为null，不做处理。
+        } else if (this.deputyMayorMeetingDate != null && deputyMayorMeetingDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.deputyMayorMeetingDate.compareTo(deputyMayorMeetingDate) != 0) {
+                this.deputyMayorMeetingDate = deputyMayorMeetingDate;
+                if (!this.toUpdateCols.contains("DEPUTY_MAYOR_MEETING_DATE")) {
+                    this.toUpdateCols.add("DEPUTY_MAYOR_MEETING_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.deputyMayorMeetingDate = deputyMayorMeetingDate;
+            if (!this.toUpdateCols.contains("DEPUTY_MAYOR_MEETING_DATE")) {
+                this.toUpdateCols.add("DEPUTY_MAYOR_MEETING_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 分管副市长预审会是否通过。
      */
-    public Boolean deputyMayorIsPass;
+    private Boolean deputyMayorIsPass;
 
     /**
      * 获取：分管副市长预审会是否通过。
@@ -1563,14 +2578,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：分管副市长预审会是否通过。
      */
     public PmPrjPlanningPermitReq setDeputyMayorIsPass(Boolean deputyMayorIsPass) {
-        this.deputyMayorIsPass = deputyMayorIsPass;
+        if (this.deputyMayorIsPass == null && deputyMayorIsPass == null) {
+            // 均为null，不做处理。
+        } else if (this.deputyMayorIsPass != null && deputyMayorIsPass != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.deputyMayorIsPass.compareTo(deputyMayorIsPass) != 0) {
+                this.deputyMayorIsPass = deputyMayorIsPass;
+                if (!this.toUpdateCols.contains("DEPUTY_MAYOR_IS_PASS")) {
+                    this.toUpdateCols.add("DEPUTY_MAYOR_IS_PASS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.deputyMayorIsPass = deputyMayorIsPass;
+            if (!this.toUpdateCols.contains("DEPUTY_MAYOR_IS_PASS")) {
+                this.toUpdateCols.add("DEPUTY_MAYOR_IS_PASS");
+            }
+        }
         return this;
     }
 
     /**
      * 分管副市长预审会市委会意见。
      */
-    public String deputyMayorCommitteeOpinonFileGroupId;
+    private String deputyMayorCommitteeOpinonFileGroupId;
 
     /**
      * 获取：分管副市长预审会市委会意见。
@@ -1583,14 +2614,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：分管副市长预审会市委会意见。
      */
     public PmPrjPlanningPermitReq setDeputyMayorCommitteeOpinonFileGroupId(String deputyMayorCommitteeOpinonFileGroupId) {
-        this.deputyMayorCommitteeOpinonFileGroupId = deputyMayorCommitteeOpinonFileGroupId;
+        if (this.deputyMayorCommitteeOpinonFileGroupId == null && deputyMayorCommitteeOpinonFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.deputyMayorCommitteeOpinonFileGroupId != null && deputyMayorCommitteeOpinonFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.deputyMayorCommitteeOpinonFileGroupId.compareTo(deputyMayorCommitteeOpinonFileGroupId) != 0) {
+                this.deputyMayorCommitteeOpinonFileGroupId = deputyMayorCommitteeOpinonFileGroupId;
+                if (!this.toUpdateCols.contains("DEPUTY_MAYOR_COMMITTEE_OPINON_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("DEPUTY_MAYOR_COMMITTEE_OPINON_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.deputyMayorCommitteeOpinonFileGroupId = deputyMayorCommitteeOpinonFileGroupId;
+            if (!this.toUpdateCols.contains("DEPUTY_MAYOR_COMMITTEE_OPINON_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("DEPUTY_MAYOR_COMMITTEE_OPINON_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 分管副市长和市长预审会会议时间。
      */
-    public LocalDate mayorMeetingDate;
+    private LocalDate mayorMeetingDate;
 
     /**
      * 获取：分管副市长和市长预审会会议时间。
@@ -1603,14 +2650,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：分管副市长和市长预审会会议时间。
      */
     public PmPrjPlanningPermitReq setMayorMeetingDate(LocalDate mayorMeetingDate) {
-        this.mayorMeetingDate = mayorMeetingDate;
+        if (this.mayorMeetingDate == null && mayorMeetingDate == null) {
+            // 均为null，不做处理。
+        } else if (this.mayorMeetingDate != null && mayorMeetingDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.mayorMeetingDate.compareTo(mayorMeetingDate) != 0) {
+                this.mayorMeetingDate = mayorMeetingDate;
+                if (!this.toUpdateCols.contains("MAYOR_MEETING_DATE")) {
+                    this.toUpdateCols.add("MAYOR_MEETING_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.mayorMeetingDate = mayorMeetingDate;
+            if (!this.toUpdateCols.contains("MAYOR_MEETING_DATE")) {
+                this.toUpdateCols.add("MAYOR_MEETING_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 分管副市长和市长预审会是否通过。
      */
-    public Boolean mayorIsPass;
+    private Boolean mayorIsPass;
 
     /**
      * 获取：分管副市长和市长预审会是否通过。
@@ -1623,14 +2686,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：分管副市长和市长预审会是否通过。
      */
     public PmPrjPlanningPermitReq setMayorIsPass(Boolean mayorIsPass) {
-        this.mayorIsPass = mayorIsPass;
+        if (this.mayorIsPass == null && mayorIsPass == null) {
+            // 均为null，不做处理。
+        } else if (this.mayorIsPass != null && mayorIsPass != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.mayorIsPass.compareTo(mayorIsPass) != 0) {
+                this.mayorIsPass = mayorIsPass;
+                if (!this.toUpdateCols.contains("MAYOR_IS_PASS")) {
+                    this.toUpdateCols.add("MAYOR_IS_PASS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.mayorIsPass = mayorIsPass;
+            if (!this.toUpdateCols.contains("MAYOR_IS_PASS")) {
+                this.toUpdateCols.add("MAYOR_IS_PASS");
+            }
+        }
         return this;
     }
 
     /**
      * 分管副市长和市长预审会市委会意见。
      */
-    public String mayorCommitteeOpinonFileGroupId;
+    private String mayorCommitteeOpinonFileGroupId;
 
     /**
      * 获取：分管副市长和市长预审会市委会意见。
@@ -1643,14 +2722,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：分管副市长和市长预审会市委会意见。
      */
     public PmPrjPlanningPermitReq setMayorCommitteeOpinonFileGroupId(String mayorCommitteeOpinonFileGroupId) {
-        this.mayorCommitteeOpinonFileGroupId = mayorCommitteeOpinonFileGroupId;
+        if (this.mayorCommitteeOpinonFileGroupId == null && mayorCommitteeOpinonFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.mayorCommitteeOpinonFileGroupId != null && mayorCommitteeOpinonFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.mayorCommitteeOpinonFileGroupId.compareTo(mayorCommitteeOpinonFileGroupId) != 0) {
+                this.mayorCommitteeOpinonFileGroupId = mayorCommitteeOpinonFileGroupId;
+                if (!this.toUpdateCols.contains("MAYOR_COMMITTEE_OPINON_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("MAYOR_COMMITTEE_OPINON_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.mayorCommitteeOpinonFileGroupId = mayorCommitteeOpinonFileGroupId;
+            if (!this.toUpdateCols.contains("MAYOR_COMMITTEE_OPINON_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("MAYOR_COMMITTEE_OPINON_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 市规委会会议时间。
      */
-    public LocalDate committeeMeetingDate;
+    private LocalDate committeeMeetingDate;
 
     /**
      * 获取：市规委会会议时间。
@@ -1663,14 +2758,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：市规委会会议时间。
      */
     public PmPrjPlanningPermitReq setCommitteeMeetingDate(LocalDate committeeMeetingDate) {
-        this.committeeMeetingDate = committeeMeetingDate;
+        if (this.committeeMeetingDate == null && committeeMeetingDate == null) {
+            // 均为null，不做处理。
+        } else if (this.committeeMeetingDate != null && committeeMeetingDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.committeeMeetingDate.compareTo(committeeMeetingDate) != 0) {
+                this.committeeMeetingDate = committeeMeetingDate;
+                if (!this.toUpdateCols.contains("COMMITTEE_MEETING_DATE")) {
+                    this.toUpdateCols.add("COMMITTEE_MEETING_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.committeeMeetingDate = committeeMeetingDate;
+            if (!this.toUpdateCols.contains("COMMITTEE_MEETING_DATE")) {
+                this.toUpdateCols.add("COMMITTEE_MEETING_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 市规委会是否通过。
      */
-    public Boolean committeeIsPass;
+    private Boolean committeeIsPass;
 
     /**
      * 获取：市规委会是否通过。
@@ -1683,14 +2794,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：市规委会是否通过。
      */
     public PmPrjPlanningPermitReq setCommitteeIsPass(Boolean committeeIsPass) {
-        this.committeeIsPass = committeeIsPass;
+        if (this.committeeIsPass == null && committeeIsPass == null) {
+            // 均为null，不做处理。
+        } else if (this.committeeIsPass != null && committeeIsPass != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.committeeIsPass.compareTo(committeeIsPass) != 0) {
+                this.committeeIsPass = committeeIsPass;
+                if (!this.toUpdateCols.contains("COMMITTEE_IS_PASS")) {
+                    this.toUpdateCols.add("COMMITTEE_IS_PASS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.committeeIsPass = committeeIsPass;
+            if (!this.toUpdateCols.contains("COMMITTEE_IS_PASS")) {
+                this.toUpdateCols.add("COMMITTEE_IS_PASS");
+            }
+        }
         return this;
     }
 
     /**
      * 市委会市规委会意见。
      */
-    public String committeeOpinonFileGroupId;
+    private String committeeOpinonFileGroupId;
 
     /**
      * 获取：市委会市规委会意见。
@@ -1703,14 +2830,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：市委会市规委会意见。
      */
     public PmPrjPlanningPermitReq setCommitteeOpinonFileGroupId(String committeeOpinonFileGroupId) {
-        this.committeeOpinonFileGroupId = committeeOpinonFileGroupId;
+        if (this.committeeOpinonFileGroupId == null && committeeOpinonFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.committeeOpinonFileGroupId != null && committeeOpinonFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.committeeOpinonFileGroupId.compareTo(committeeOpinonFileGroupId) != 0) {
+                this.committeeOpinonFileGroupId = committeeOpinonFileGroupId;
+                if (!this.toUpdateCols.contains("COMMITTEE_OPINON_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("COMMITTEE_OPINON_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.committeeOpinonFileGroupId = committeeOpinonFileGroupId;
+            if (!this.toUpdateCols.contains("COMMITTEE_OPINON_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("COMMITTEE_OPINON_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 工程规划许可证申请时间。
      */
-    public LocalDate prjPlanApplyTime;
+    private LocalDate prjPlanApplyTime;
 
     /**
      * 获取：工程规划许可证申请时间。
@@ -1723,14 +2866,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：工程规划许可证申请时间。
      */
     public PmPrjPlanningPermitReq setPrjPlanApplyTime(LocalDate prjPlanApplyTime) {
-        this.prjPlanApplyTime = prjPlanApplyTime;
+        if (this.prjPlanApplyTime == null && prjPlanApplyTime == null) {
+            // 均为null，不做处理。
+        } else if (this.prjPlanApplyTime != null && prjPlanApplyTime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjPlanApplyTime.compareTo(prjPlanApplyTime) != 0) {
+                this.prjPlanApplyTime = prjPlanApplyTime;
+                if (!this.toUpdateCols.contains("PRJ_PLAN_APPLY_TIME")) {
+                    this.toUpdateCols.add("PRJ_PLAN_APPLY_TIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjPlanApplyTime = prjPlanApplyTime;
+            if (!this.toUpdateCols.contains("PRJ_PLAN_APPLY_TIME")) {
+                this.toUpdateCols.add("PRJ_PLAN_APPLY_TIME");
+            }
+        }
         return this;
     }
 
     /**
      * 预计完成日期。
      */
-    public LocalDate planComplDate;
+    private LocalDate planComplDate;
 
     /**
      * 获取：预计完成日期。
@@ -1743,14 +2902,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：预计完成日期。
      */
     public PmPrjPlanningPermitReq setPlanComplDate(LocalDate planComplDate) {
-        this.planComplDate = planComplDate;
+        if (this.planComplDate == null && planComplDate == null) {
+            // 均为null，不做处理。
+        } else if (this.planComplDate != null && planComplDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planComplDate.compareTo(planComplDate) != 0) {
+                this.planComplDate = planComplDate;
+                if (!this.toUpdateCols.contains("PLAN_COMPL_DATE")) {
+                    this.toUpdateCols.add("PLAN_COMPL_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planComplDate = planComplDate;
+            if (!this.toUpdateCols.contains("PLAN_COMPL_DATE")) {
+                this.toUpdateCols.add("PLAN_COMPL_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 工程规划许可证申请人。
      */
-    public String prjPlanApplicant;
+    private String prjPlanApplicant;
 
     /**
      * 获取：工程规划许可证申请人。
@@ -1763,14 +2938,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：工程规划许可证申请人。
      */
     public PmPrjPlanningPermitReq setPrjPlanApplicant(String prjPlanApplicant) {
-        this.prjPlanApplicant = prjPlanApplicant;
+        if (this.prjPlanApplicant == null && prjPlanApplicant == null) {
+            // 均为null，不做处理。
+        } else if (this.prjPlanApplicant != null && prjPlanApplicant != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjPlanApplicant.compareTo(prjPlanApplicant) != 0) {
+                this.prjPlanApplicant = prjPlanApplicant;
+                if (!this.toUpdateCols.contains("PRJ_PLAN_APPLICANT")) {
+                    this.toUpdateCols.add("PRJ_PLAN_APPLICANT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjPlanApplicant = prjPlanApplicant;
+            if (!this.toUpdateCols.contains("PRJ_PLAN_APPLICANT")) {
+                this.toUpdateCols.add("PRJ_PLAN_APPLICANT");
+            }
+        }
         return this;
     }
 
     /**
      * 工程规划许可证申请材料。
      */
-    public String prjPlanReqFile;
+    private String prjPlanReqFile;
 
     /**
      * 获取：工程规划许可证申请材料。
@@ -1783,14 +2974,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：工程规划许可证申请材料。
      */
     public PmPrjPlanningPermitReq setPrjPlanReqFile(String prjPlanReqFile) {
-        this.prjPlanReqFile = prjPlanReqFile;
+        if (this.prjPlanReqFile == null && prjPlanReqFile == null) {
+            // 均为null，不做处理。
+        } else if (this.prjPlanReqFile != null && prjPlanReqFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjPlanReqFile.compareTo(prjPlanReqFile) != 0) {
+                this.prjPlanReqFile = prjPlanReqFile;
+                if (!this.toUpdateCols.contains("PRJ_PLAN_REQ_FILE")) {
+                    this.toUpdateCols.add("PRJ_PLAN_REQ_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjPlanReqFile = prjPlanReqFile;
+            if (!this.toUpdateCols.contains("PRJ_PLAN_REQ_FILE")) {
+                this.toUpdateCols.add("PRJ_PLAN_REQ_FILE");
+            }
+        }
         return this;
     }
 
     /**
      * 工程规划许可证申请备注。
      */
-    public String prjPlanReqRemark;
+    private String prjPlanReqRemark;
 
     /**
      * 获取：工程规划许可证申请备注。
@@ -1803,14 +3010,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：工程规划许可证申请备注。
      */
     public PmPrjPlanningPermitReq setPrjPlanReqRemark(String prjPlanReqRemark) {
-        this.prjPlanReqRemark = prjPlanReqRemark;
+        if (this.prjPlanReqRemark == null && prjPlanReqRemark == null) {
+            // 均为null，不做处理。
+        } else if (this.prjPlanReqRemark != null && prjPlanReqRemark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjPlanReqRemark.compareTo(prjPlanReqRemark) != 0) {
+                this.prjPlanReqRemark = prjPlanReqRemark;
+                if (!this.toUpdateCols.contains("PRJ_PLAN_REQ_REMARK")) {
+                    this.toUpdateCols.add("PRJ_PLAN_REQ_REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjPlanReqRemark = prjPlanReqRemark;
+            if (!this.toUpdateCols.contains("PRJ_PLAN_REQ_REMARK")) {
+                this.toUpdateCols.add("PRJ_PLAN_REQ_REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 下发时间。
      */
-    public LocalDate issueDate;
+    private LocalDate issueDate;
 
     /**
      * 获取：下发时间。
@@ -1823,14 +3046,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：下发时间。
      */
     public PmPrjPlanningPermitReq setIssueDate(LocalDate issueDate) {
-        this.issueDate = issueDate;
+        if (this.issueDate == null && issueDate == null) {
+            // 均为null，不做处理。
+        } else if (this.issueDate != null && issueDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.issueDate.compareTo(issueDate) != 0) {
+                this.issueDate = issueDate;
+                if (!this.toUpdateCols.contains("ISSUE_DATE")) {
+                    this.toUpdateCols.add("ISSUE_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.issueDate = issueDate;
+            if (!this.toUpdateCols.contains("ISSUE_DATE")) {
+                this.toUpdateCols.add("ISSUE_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 工程规划许可证编号。
      */
-    public String prjPlanReqCode;
+    private String prjPlanReqCode;
 
     /**
      * 获取：工程规划许可证编号。
@@ -1843,14 +3082,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：工程规划许可证编号。
      */
     public PmPrjPlanningPermitReq setPrjPlanReqCode(String prjPlanReqCode) {
-        this.prjPlanReqCode = prjPlanReqCode;
+        if (this.prjPlanReqCode == null && prjPlanReqCode == null) {
+            // 均为null，不做处理。
+        } else if (this.prjPlanReqCode != null && prjPlanReqCode != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjPlanReqCode.compareTo(prjPlanReqCode) != 0) {
+                this.prjPlanReqCode = prjPlanReqCode;
+                if (!this.toUpdateCols.contains("PRJ_PLAN_REQ_CODE")) {
+                    this.toUpdateCols.add("PRJ_PLAN_REQ_CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjPlanReqCode = prjPlanReqCode;
+            if (!this.toUpdateCols.contains("PRJ_PLAN_REQ_CODE")) {
+                this.toUpdateCols.add("PRJ_PLAN_REQ_CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 有效期。
      */
-    public String validTerm;
+    private String validTerm;
 
     /**
      * 获取：有效期。
@@ -1863,14 +3118,30 @@ public class PmPrjPlanningPermitReq {
      * 设置：有效期。
      */
     public PmPrjPlanningPermitReq setValidTerm(String validTerm) {
-        this.validTerm = validTerm;
+        if (this.validTerm == null && validTerm == null) {
+            // 均为null，不做处理。
+        } else if (this.validTerm != null && validTerm != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.validTerm.compareTo(validTerm) != 0) {
+                this.validTerm = validTerm;
+                if (!this.toUpdateCols.contains("VALID_TERM")) {
+                    this.toUpdateCols.add("VALID_TERM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.validTerm = validTerm;
+            if (!this.toUpdateCols.contains("VALID_TERM")) {
+                this.toUpdateCols.add("VALID_TERM");
+            }
+        }
         return this;
     }
 
     /**
      * 工程规划许可证。
      */
-    public String prjPlanReqPermitFileGroupId;
+    private String prjPlanReqPermitFileGroupId;
 
     /**
      * 获取：工程规划许可证。
@@ -1883,7 +3154,23 @@ public class PmPrjPlanningPermitReq {
      * 设置：工程规划许可证。
      */
     public PmPrjPlanningPermitReq setPrjPlanReqPermitFileGroupId(String prjPlanReqPermitFileGroupId) {
-        this.prjPlanReqPermitFileGroupId = prjPlanReqPermitFileGroupId;
+        if (this.prjPlanReqPermitFileGroupId == null && prjPlanReqPermitFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.prjPlanReqPermitFileGroupId != null && prjPlanReqPermitFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjPlanReqPermitFileGroupId.compareTo(prjPlanReqPermitFileGroupId) != 0) {
+                this.prjPlanReqPermitFileGroupId = prjPlanReqPermitFileGroupId;
+                if (!this.toUpdateCols.contains("PRJ_PLAN_REQ_PERMIT_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("PRJ_PLAN_REQ_PERMIT_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjPlanReqPermitFileGroupId = prjPlanReqPermitFileGroupId;
+            if (!this.toUpdateCols.contains("PRJ_PLAN_REQ_PERMIT_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("PRJ_PLAN_REQ_PERMIT_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
@@ -1901,6 +3188,7 @@ public class PmPrjPlanningPermitReq {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -1911,7 +3199,17 @@ public class PmPrjPlanningPermitReq {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -1932,7 +3230,8 @@ public class PmPrjPlanningPermitReq {
      * @return
      */
     public static PmPrjPlanningPermitReq newData() {
-        return modelHelper.newData();
+        PmPrjPlanningPermitReq obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -1941,7 +3240,8 @@ public class PmPrjPlanningPermitReq {
      * @return
      */
     public static PmPrjPlanningPermitReq insertData() {
-        return modelHelper.insertData();
+        PmPrjPlanningPermitReq obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -1953,7 +3253,8 @@ public class PmPrjPlanningPermitReq {
      * @return 获取到的对象，若无则为null。
      */
     public static PmPrjPlanningPermitReq selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        PmPrjPlanningPermitReq obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -1965,7 +3266,8 @@ public class PmPrjPlanningPermitReq {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PmPrjPlanningPermitReq> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<PmPrjPlanningPermitReq> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -1977,7 +3279,8 @@ public class PmPrjPlanningPermitReq {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PmPrjPlanningPermitReq> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<PmPrjPlanningPermitReq> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

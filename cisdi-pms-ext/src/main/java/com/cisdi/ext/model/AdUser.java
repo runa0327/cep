@@ -4,8 +4,10 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +20,18 @@ public class AdUser {
      * 模型助手。
      */
     private static final ModelHelper<AdUser> modelHelper = new ModelHelper<>("AD_USER", new AdUser());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -133,7 +147,7 @@ public class AdUser {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -146,14 +160,30 @@ public class AdUser {
      * 设置：ID。
      */
     public AdUser setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -166,14 +196,30 @@ public class AdUser {
      * 设置：版本。
      */
     public AdUser setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -186,14 +232,30 @@ public class AdUser {
      * 设置：时间戳。
      */
     public AdUser setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -206,14 +268,30 @@ public class AdUser {
      * 设置：是否预设。
      */
     public AdUser setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -226,14 +304,30 @@ public class AdUser {
      * 设置：创建日期时间。
      */
     public AdUser setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -246,14 +340,30 @@ public class AdUser {
      * 设置：创建用户。
      */
     public AdUser setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -266,14 +376,30 @@ public class AdUser {
      * 设置：最后修改日期时间。
      */
     public AdUser setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -286,14 +412,30 @@ public class AdUser {
      * 设置：最后修改用户。
      */
     public AdUser setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -306,14 +448,30 @@ public class AdUser {
      * 设置：记录状态。
      */
     public AdUser setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -326,14 +484,30 @@ public class AdUser {
      * 设置：锁定流程实例。
      */
     public AdUser setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -346,14 +520,30 @@ public class AdUser {
      * 设置：代码。
      */
     public AdUser setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -366,14 +556,30 @@ public class AdUser {
      * 设置：名称。
      */
     public AdUser setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -386,14 +592,30 @@ public class AdUser {
      * 设置：备注。
      */
     public AdUser setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 使用数据库验证。
      */
-    public Boolean useDbValidation;
+    private Boolean useDbValidation;
 
     /**
      * 获取：使用数据库验证。
@@ -406,14 +628,30 @@ public class AdUser {
      * 设置：使用数据库验证。
      */
     public AdUser setUseDbValidation(Boolean useDbValidation) {
-        this.useDbValidation = useDbValidation;
+        if (this.useDbValidation == null && useDbValidation == null) {
+            // 均为null，不做处理。
+        } else if (this.useDbValidation != null && useDbValidation != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.useDbValidation.compareTo(useDbValidation) != 0) {
+                this.useDbValidation = useDbValidation;
+                if (!this.toUpdateCols.contains("USE_DB_VALIDATION")) {
+                    this.toUpdateCols.add("USE_DB_VALIDATION");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.useDbValidation = useDbValidation;
+            if (!this.toUpdateCols.contains("USE_DB_VALIDATION")) {
+                this.toUpdateCols.add("USE_DB_VALIDATION");
+            }
+        }
         return this;
     }
 
     /**
      * 数据库验证密码。
      */
-    public String password;
+    private String password;
 
     /**
      * 获取：数据库验证密码。
@@ -426,14 +664,30 @@ public class AdUser {
      * 设置：数据库验证密码。
      */
     public AdUser setPassword(String password) {
-        this.password = password;
+        if (this.password == null && password == null) {
+            // 均为null，不做处理。
+        } else if (this.password != null && password != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.password.compareTo(password) != 0) {
+                this.password = password;
+                if (!this.toUpdateCols.contains("PASSWORD")) {
+                    this.toUpdateCols.add("PASSWORD");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.password = password;
+            if (!this.toUpdateCols.contains("PASSWORD")) {
+                this.toUpdateCols.add("PASSWORD");
+            }
+        }
         return this;
     }
 
     /**
      * 使用外部验证。
      */
-    public Boolean useExtValidation;
+    private Boolean useExtValidation;
 
     /**
      * 获取：使用外部验证。
@@ -446,14 +700,30 @@ public class AdUser {
      * 设置：使用外部验证。
      */
     public AdUser setUseExtValidation(Boolean useExtValidation) {
-        this.useExtValidation = useExtValidation;
+        if (this.useExtValidation == null && useExtValidation == null) {
+            // 均为null，不做处理。
+        } else if (this.useExtValidation != null && useExtValidation != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.useExtValidation.compareTo(useExtValidation) != 0) {
+                this.useExtValidation = useExtValidation;
+                if (!this.toUpdateCols.contains("USE_EXT_VALIDATION")) {
+                    this.toUpdateCols.add("USE_EXT_VALIDATION");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.useExtValidation = useExtValidation;
+            if (!this.toUpdateCols.contains("USE_EXT_VALIDATION")) {
+                this.toUpdateCols.add("USE_EXT_VALIDATION");
+            }
+        }
         return this;
     }
 
     /**
      * 用户外部验证方。
      */
-    public String adUserExtValidatorId;
+    private String adUserExtValidatorId;
 
     /**
      * 获取：用户外部验证方。
@@ -466,14 +736,30 @@ public class AdUser {
      * 设置：用户外部验证方。
      */
     public AdUser setAdUserExtValidatorId(String adUserExtValidatorId) {
-        this.adUserExtValidatorId = adUserExtValidatorId;
+        if (this.adUserExtValidatorId == null && adUserExtValidatorId == null) {
+            // 均为null，不做处理。
+        } else if (this.adUserExtValidatorId != null && adUserExtValidatorId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adUserExtValidatorId.compareTo(adUserExtValidatorId) != 0) {
+                this.adUserExtValidatorId = adUserExtValidatorId;
+                if (!this.toUpdateCols.contains("AD_USER_EXT_VALIDATOR_ID")) {
+                    this.toUpdateCols.add("AD_USER_EXT_VALIDATOR_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adUserExtValidatorId = adUserExtValidatorId;
+            if (!this.toUpdateCols.contains("AD_USER_EXT_VALIDATOR_ID")) {
+                this.toUpdateCols.add("AD_USER_EXT_VALIDATOR_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 外部验证用户名。
      */
-    public String extValidationUsername;
+    private String extValidationUsername;
 
     /**
      * 获取：外部验证用户名。
@@ -486,14 +772,30 @@ public class AdUser {
      * 设置：外部验证用户名。
      */
     public AdUser setExtValidationUsername(String extValidationUsername) {
-        this.extValidationUsername = extValidationUsername;
+        if (this.extValidationUsername == null && extValidationUsername == null) {
+            // 均为null，不做处理。
+        } else if (this.extValidationUsername != null && extValidationUsername != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.extValidationUsername.compareTo(extValidationUsername) != 0) {
+                this.extValidationUsername = extValidationUsername;
+                if (!this.toUpdateCols.contains("EXT_VALIDATION_USERNAME")) {
+                    this.toUpdateCols.add("EXT_VALIDATION_USERNAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.extValidationUsername = extValidationUsername;
+            if (!this.toUpdateCols.contains("EXT_VALIDATION_USERNAME")) {
+                this.toUpdateCols.add("EXT_VALIDATION_USERNAME");
+            }
+        }
         return this;
     }
 
     /**
      * 手机。
      */
-    public String mobile;
+    private String mobile;
 
     /**
      * 获取：手机。
@@ -506,14 +808,30 @@ public class AdUser {
      * 设置：手机。
      */
     public AdUser setMobile(String mobile) {
-        this.mobile = mobile;
+        if (this.mobile == null && mobile == null) {
+            // 均为null，不做处理。
+        } else if (this.mobile != null && mobile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.mobile.compareTo(mobile) != 0) {
+                this.mobile = mobile;
+                if (!this.toUpdateCols.contains("MOBILE")) {
+                    this.toUpdateCols.add("MOBILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.mobile = mobile;
+            if (!this.toUpdateCols.contains("MOBILE")) {
+                this.toUpdateCols.add("MOBILE");
+            }
+        }
         return this;
     }
 
     /**
      * 邮箱。
      */
-    public String email;
+    private String email;
 
     /**
      * 获取：邮箱。
@@ -526,14 +844,30 @@ public class AdUser {
      * 设置：邮箱。
      */
     public AdUser setEmail(String email) {
-        this.email = email;
+        if (this.email == null && email == null) {
+            // 均为null，不做处理。
+        } else if (this.email != null && email != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.email.compareTo(email) != 0) {
+                this.email = email;
+                if (!this.toUpdateCols.contains("EMAIL")) {
+                    this.toUpdateCols.add("EMAIL");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.email = email;
+            if (!this.toUpdateCols.contains("EMAIL")) {
+                this.toUpdateCols.add("EMAIL");
+            }
+        }
         return this;
     }
 
     /**
      * 来源。
      */
-    public String src;
+    private String src;
 
     /**
      * 获取：来源。
@@ -546,14 +880,30 @@ public class AdUser {
      * 设置：来源。
      */
     public AdUser setSrc(String src) {
-        this.src = src;
+        if (this.src == null && src == null) {
+            // 均为null，不做处理。
+        } else if (this.src != null && src != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.src.compareTo(src) != 0) {
+                this.src = src;
+                if (!this.toUpdateCols.contains("SRC")) {
+                    this.toUpdateCols.add("SRC");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.src = src;
+            if (!this.toUpdateCols.contains("SRC")) {
+                this.toUpdateCols.add("SRC");
+            }
+        }
         return this;
     }
 
     /**
      * 来源记录ID。
      */
-    public String srcRecordId;
+    private String srcRecordId;
 
     /**
      * 获取：来源记录ID。
@@ -566,14 +916,30 @@ public class AdUser {
      * 设置：来源记录ID。
      */
     public AdUser setSrcRecordId(String srcRecordId) {
-        this.srcRecordId = srcRecordId;
+        if (this.srcRecordId == null && srcRecordId == null) {
+            // 均为null，不做处理。
+        } else if (this.srcRecordId != null && srcRecordId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.srcRecordId.compareTo(srcRecordId) != 0) {
+                this.srcRecordId = srcRecordId;
+                if (!this.toUpdateCols.contains("SRC_RECORD_ID")) {
+                    this.toUpdateCols.add("SRC_RECORD_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.srcRecordId = srcRecordId;
+            if (!this.toUpdateCols.contains("SRC_RECORD_ID")) {
+                this.toUpdateCols.add("SRC_RECORD_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 同步时间。
      */
-    public LocalDateTime syncDttm;
+    private LocalDateTime syncDttm;
 
     /**
      * 获取：同步时间。
@@ -586,7 +952,23 @@ public class AdUser {
      * 设置：同步时间。
      */
     public AdUser setSyncDttm(LocalDateTime syncDttm) {
-        this.syncDttm = syncDttm;
+        if (this.syncDttm == null && syncDttm == null) {
+            // 均为null，不做处理。
+        } else if (this.syncDttm != null && syncDttm != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.syncDttm.compareTo(syncDttm) != 0) {
+                this.syncDttm = syncDttm;
+                if (!this.toUpdateCols.contains("SYNC_DTTM")) {
+                    this.toUpdateCols.add("SYNC_DTTM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.syncDttm = syncDttm;
+            if (!this.toUpdateCols.contains("SYNC_DTTM")) {
+                this.toUpdateCols.add("SYNC_DTTM");
+            }
+        }
         return this;
     }
 
@@ -604,6 +986,7 @@ public class AdUser {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -614,7 +997,17 @@ public class AdUser {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -635,7 +1028,8 @@ public class AdUser {
      * @return
      */
     public static AdUser newData() {
-        return modelHelper.newData();
+        AdUser obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -644,7 +1038,8 @@ public class AdUser {
      * @return
      */
     public static AdUser insertData() {
-        return modelHelper.insertData();
+        AdUser obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -656,7 +1051,8 @@ public class AdUser {
      * @return 获取到的对象，若无则为null。
      */
     public static AdUser selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        AdUser obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -668,7 +1064,8 @@ public class AdUser {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdUser> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<AdUser> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -680,7 +1077,8 @@ public class AdUser {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdUser> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<AdUser> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

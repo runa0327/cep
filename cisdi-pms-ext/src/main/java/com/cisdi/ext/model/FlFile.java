@@ -4,8 +4,11 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +21,18 @@ public class FlFile {
      * 模型助手。
      */
     private static final ModelHelper<FlFile> modelHelper = new ModelHelper<>("FL_FILE", new FlFile());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -116,6 +131,10 @@ public class FlFile {
          */
         public static final String PHYSICAL_LOCATION = "PHYSICAL_LOCATION";
         /**
+         * 是否公开读取。
+         */
+        public static final String IS_PUBLIC_READ = "IS_PUBLIC_READ";
+        /**
          * 路径。
          */
         public static final String FL_PATH_ID = "FL_PATH_ID";
@@ -129,7 +148,7 @@ public class FlFile {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -142,14 +161,30 @@ public class FlFile {
      * 设置：ID。
      */
     public FlFile setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -162,14 +197,30 @@ public class FlFile {
      * 设置：版本。
      */
     public FlFile setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -182,14 +233,30 @@ public class FlFile {
      * 设置：时间戳。
      */
     public FlFile setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -202,14 +269,30 @@ public class FlFile {
      * 设置：是否预设。
      */
     public FlFile setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -222,14 +305,30 @@ public class FlFile {
      * 设置：创建日期时间。
      */
     public FlFile setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -242,14 +341,30 @@ public class FlFile {
      * 设置：创建用户。
      */
     public FlFile setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -262,14 +377,30 @@ public class FlFile {
      * 设置：最后修改日期时间。
      */
     public FlFile setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -282,14 +413,30 @@ public class FlFile {
      * 设置：最后修改用户。
      */
     public FlFile setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -302,14 +449,30 @@ public class FlFile {
      * 设置：记录状态。
      */
     public FlFile setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -322,14 +485,30 @@ public class FlFile {
      * 设置：锁定流程实例。
      */
     public FlFile setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -342,14 +521,30 @@ public class FlFile {
      * 设置：代码。
      */
     public FlFile setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -362,14 +557,30 @@ public class FlFile {
      * 设置：名称。
      */
     public FlFile setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -382,14 +593,30 @@ public class FlFile {
      * 设置：备注。
      */
     public FlFile setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 扩展名。
      */
-    public String ext;
+    private String ext;
 
     /**
      * 获取：扩展名。
@@ -402,14 +629,30 @@ public class FlFile {
      * 设置：扩展名。
      */
     public FlFile setExt(String ext) {
-        this.ext = ext;
+        if (this.ext == null && ext == null) {
+            // 均为null，不做处理。
+        } else if (this.ext != null && ext != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ext.compareTo(ext) != 0) {
+                this.ext = ext;
+                if (!this.toUpdateCols.contains("EXT")) {
+                    this.toUpdateCols.add("EXT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ext = ext;
+            if (!this.toUpdateCols.contains("EXT")) {
+                this.toUpdateCols.add("EXT");
+            }
+        }
         return this;
     }
 
     /**
      * 显示名称。
      */
-    public String dspName;
+    private String dspName;
 
     /**
      * 获取：显示名称。
@@ -422,34 +665,66 @@ public class FlFile {
      * 设置：显示名称。
      */
     public FlFile setDspName(String dspName) {
-        this.dspName = dspName;
+        if (this.dspName == null && dspName == null) {
+            // 均为null，不做处理。
+        } else if (this.dspName != null && dspName != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.dspName.compareTo(dspName) != 0) {
+                this.dspName = dspName;
+                if (!this.toUpdateCols.contains("DSP_NAME")) {
+                    this.toUpdateCols.add("DSP_NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.dspName = dspName;
+            if (!this.toUpdateCols.contains("DSP_NAME")) {
+                this.toUpdateCols.add("DSP_NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 大小KB。
      */
-    public Double sizeKb;
+    private BigDecimal sizeKb;
 
     /**
      * 获取：大小KB。
      */
-    public Double getSizeKb() {
+    public BigDecimal getSizeKb() {
         return this.sizeKb;
     }
 
     /**
      * 设置：大小KB。
      */
-    public FlFile setSizeKb(Double sizeKb) {
-        this.sizeKb = sizeKb;
+    public FlFile setSizeKb(BigDecimal sizeKb) {
+        if (this.sizeKb == null && sizeKb == null) {
+            // 均为null，不做处理。
+        } else if (this.sizeKb != null && sizeKb != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.sizeKb.compareTo(sizeKb) != 0) {
+                this.sizeKb = sizeKb;
+                if (!this.toUpdateCols.contains("SIZE_KB")) {
+                    this.toUpdateCols.add("SIZE_KB");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.sizeKb = sizeKb;
+            if (!this.toUpdateCols.contains("SIZE_KB")) {
+                this.toUpdateCols.add("SIZE_KB");
+            }
+        }
         return this;
     }
 
     /**
      * 显示大小。
      */
-    public String dspSize;
+    private String dspSize;
 
     /**
      * 获取：显示大小。
@@ -462,14 +737,30 @@ public class FlFile {
      * 设置：显示大小。
      */
     public FlFile setDspSize(String dspSize) {
-        this.dspSize = dspSize;
+        if (this.dspSize == null && dspSize == null) {
+            // 均为null，不做处理。
+        } else if (this.dspSize != null && dspSize != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.dspSize.compareTo(dspSize) != 0) {
+                this.dspSize = dspSize;
+                if (!this.toUpdateCols.contains("DSP_SIZE")) {
+                    this.toUpdateCols.add("DSP_SIZE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.dspSize = dspSize;
+            if (!this.toUpdateCols.contains("DSP_SIZE")) {
+                this.toUpdateCols.add("DSP_SIZE");
+            }
+        }
         return this;
     }
 
     /**
      * 文件内联URL。
      */
-    public String fileInlineUrl;
+    private String fileInlineUrl;
 
     /**
      * 获取：文件内联URL。
@@ -482,14 +773,30 @@ public class FlFile {
      * 设置：文件内联URL。
      */
     public FlFile setFileInlineUrl(String fileInlineUrl) {
-        this.fileInlineUrl = fileInlineUrl;
+        if (this.fileInlineUrl == null && fileInlineUrl == null) {
+            // 均为null，不做处理。
+        } else if (this.fileInlineUrl != null && fileInlineUrl != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.fileInlineUrl.compareTo(fileInlineUrl) != 0) {
+                this.fileInlineUrl = fileInlineUrl;
+                if (!this.toUpdateCols.contains("FILE_INLINE_URL")) {
+                    this.toUpdateCols.add("FILE_INLINE_URL");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.fileInlineUrl = fileInlineUrl;
+            if (!this.toUpdateCols.contains("FILE_INLINE_URL")) {
+                this.toUpdateCols.add("FILE_INLINE_URL");
+            }
+        }
         return this;
     }
 
     /**
      * 文件附件URL。
      */
-    public String fileAttachmentUrl;
+    private String fileAttachmentUrl;
 
     /**
      * 获取：文件附件URL。
@@ -502,14 +809,30 @@ public class FlFile {
      * 设置：文件附件URL。
      */
     public FlFile setFileAttachmentUrl(String fileAttachmentUrl) {
-        this.fileAttachmentUrl = fileAttachmentUrl;
+        if (this.fileAttachmentUrl == null && fileAttachmentUrl == null) {
+            // 均为null，不做处理。
+        } else if (this.fileAttachmentUrl != null && fileAttachmentUrl != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.fileAttachmentUrl.compareTo(fileAttachmentUrl) != 0) {
+                this.fileAttachmentUrl = fileAttachmentUrl;
+                if (!this.toUpdateCols.contains("FILE_ATTACHMENT_URL")) {
+                    this.toUpdateCols.add("FILE_ATTACHMENT_URL");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.fileAttachmentUrl = fileAttachmentUrl;
+            if (!this.toUpdateCols.contains("FILE_ATTACHMENT_URL")) {
+                this.toUpdateCols.add("FILE_ATTACHMENT_URL");
+            }
+        }
         return this;
     }
 
     /**
      * 上传时间。
      */
-    public LocalDateTime uploadDttm;
+    private LocalDateTime uploadDttm;
 
     /**
      * 获取：上传时间。
@@ -522,14 +845,30 @@ public class FlFile {
      * 设置：上传时间。
      */
     public FlFile setUploadDttm(LocalDateTime uploadDttm) {
-        this.uploadDttm = uploadDttm;
+        if (this.uploadDttm == null && uploadDttm == null) {
+            // 均为null，不做处理。
+        } else if (this.uploadDttm != null && uploadDttm != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.uploadDttm.compareTo(uploadDttm) != 0) {
+                this.uploadDttm = uploadDttm;
+                if (!this.toUpdateCols.contains("UPLOAD_DTTM")) {
+                    this.toUpdateCols.add("UPLOAD_DTTM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.uploadDttm = uploadDttm;
+            if (!this.toUpdateCols.contains("UPLOAD_DTTM")) {
+                this.toUpdateCols.add("UPLOAD_DTTM");
+            }
+        }
         return this;
     }
 
     /**
      * 物理位置。
      */
-    public String physicalLocation;
+    private String physicalLocation;
 
     /**
      * 获取：物理位置。
@@ -542,14 +881,66 @@ public class FlFile {
      * 设置：物理位置。
      */
     public FlFile setPhysicalLocation(String physicalLocation) {
-        this.physicalLocation = physicalLocation;
+        if (this.physicalLocation == null && physicalLocation == null) {
+            // 均为null，不做处理。
+        } else if (this.physicalLocation != null && physicalLocation != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.physicalLocation.compareTo(physicalLocation) != 0) {
+                this.physicalLocation = physicalLocation;
+                if (!this.toUpdateCols.contains("PHYSICAL_LOCATION")) {
+                    this.toUpdateCols.add("PHYSICAL_LOCATION");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.physicalLocation = physicalLocation;
+            if (!this.toUpdateCols.contains("PHYSICAL_LOCATION")) {
+                this.toUpdateCols.add("PHYSICAL_LOCATION");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否公开读取。
+     */
+    private Boolean isPublicRead;
+
+    /**
+     * 获取：是否公开读取。
+     */
+    public Boolean getIsPublicRead() {
+        return this.isPublicRead;
+    }
+
+    /**
+     * 设置：是否公开读取。
+     */
+    public FlFile setIsPublicRead(Boolean isPublicRead) {
+        if (this.isPublicRead == null && isPublicRead == null) {
+            // 均为null，不做处理。
+        } else if (this.isPublicRead != null && isPublicRead != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPublicRead.compareTo(isPublicRead) != 0) {
+                this.isPublicRead = isPublicRead;
+                if (!this.toUpdateCols.contains("IS_PUBLIC_READ")) {
+                    this.toUpdateCols.add("IS_PUBLIC_READ");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPublicRead = isPublicRead;
+            if (!this.toUpdateCols.contains("IS_PUBLIC_READ")) {
+                this.toUpdateCols.add("IS_PUBLIC_READ");
+            }
+        }
         return this;
     }
 
     /**
      * 路径。
      */
-    public String flPathId;
+    private String flPathId;
 
     /**
      * 获取：路径。
@@ -562,7 +953,23 @@ public class FlFile {
      * 设置：路径。
      */
     public FlFile setFlPathId(String flPathId) {
-        this.flPathId = flPathId;
+        if (this.flPathId == null && flPathId == null) {
+            // 均为null，不做处理。
+        } else if (this.flPathId != null && flPathId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.flPathId.compareTo(flPathId) != 0) {
+                this.flPathId = flPathId;
+                if (!this.toUpdateCols.contains("FL_PATH_ID")) {
+                    this.toUpdateCols.add("FL_PATH_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.flPathId = flPathId;
+            if (!this.toUpdateCols.contains("FL_PATH_ID")) {
+                this.toUpdateCols.add("FL_PATH_ID");
+            }
+        }
         return this;
     }
 
@@ -580,6 +987,7 @@ public class FlFile {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -590,7 +998,17 @@ public class FlFile {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -611,7 +1029,8 @@ public class FlFile {
      * @return
      */
     public static FlFile newData() {
-        return modelHelper.newData();
+        FlFile obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -620,7 +1039,8 @@ public class FlFile {
      * @return
      */
     public static FlFile insertData() {
-        return modelHelper.insertData();
+        FlFile obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -632,7 +1052,8 @@ public class FlFile {
      * @return 获取到的对象，若无则为null。
      */
     public static FlFile selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        FlFile obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -644,7 +1065,8 @@ public class FlFile {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<FlFile> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<FlFile> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -656,7 +1078,8 @@ public class FlFile {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<FlFile> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<FlFile> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

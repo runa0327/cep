@@ -4,8 +4,10 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +20,18 @@ public class AdCfgSchemaPeriod {
      * 模型助手。
      */
     private static final ModelHelper<AdCfgSchemaPeriod> modelHelper = new ModelHelper<>("AD_CFG_SCHEMA_PERIOD", new AdCfgSchemaPeriod());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -109,7 +123,7 @@ public class AdCfgSchemaPeriod {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -122,14 +136,30 @@ public class AdCfgSchemaPeriod {
      * 设置：ID。
      */
     public AdCfgSchemaPeriod setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -142,14 +172,30 @@ public class AdCfgSchemaPeriod {
      * 设置：版本。
      */
     public AdCfgSchemaPeriod setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -162,14 +208,30 @@ public class AdCfgSchemaPeriod {
      * 设置：时间戳。
      */
     public AdCfgSchemaPeriod setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -182,14 +244,30 @@ public class AdCfgSchemaPeriod {
      * 设置：是否预设。
      */
     public AdCfgSchemaPeriod setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -202,14 +280,30 @@ public class AdCfgSchemaPeriod {
      * 设置：创建日期时间。
      */
     public AdCfgSchemaPeriod setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -222,14 +316,30 @@ public class AdCfgSchemaPeriod {
      * 设置：创建用户。
      */
     public AdCfgSchemaPeriod setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -242,14 +352,30 @@ public class AdCfgSchemaPeriod {
      * 设置：最后修改日期时间。
      */
     public AdCfgSchemaPeriod setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -262,14 +388,30 @@ public class AdCfgSchemaPeriod {
      * 设置：最后修改用户。
      */
     public AdCfgSchemaPeriod setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -282,14 +424,30 @@ public class AdCfgSchemaPeriod {
      * 设置：记录状态。
      */
     public AdCfgSchemaPeriod setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -302,14 +460,30 @@ public class AdCfgSchemaPeriod {
      * 设置：锁定流程实例。
      */
     public AdCfgSchemaPeriod setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -322,14 +496,30 @@ public class AdCfgSchemaPeriod {
      * 设置：代码。
      */
     public AdCfgSchemaPeriod setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -342,14 +532,30 @@ public class AdCfgSchemaPeriod {
      * 设置：名称。
      */
     public AdCfgSchemaPeriod setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -362,14 +568,30 @@ public class AdCfgSchemaPeriod {
      * 设置：备注。
      */
     public AdCfgSchemaPeriod setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 配置方案。
      */
-    public String adCfgSchemaId;
+    private String adCfgSchemaId;
 
     /**
      * 获取：配置方案。
@@ -382,14 +604,30 @@ public class AdCfgSchemaPeriod {
      * 设置：配置方案。
      */
     public AdCfgSchemaPeriod setAdCfgSchemaId(String adCfgSchemaId) {
-        this.adCfgSchemaId = adCfgSchemaId;
+        if (this.adCfgSchemaId == null && adCfgSchemaId == null) {
+            // 均为null，不做处理。
+        } else if (this.adCfgSchemaId != null && adCfgSchemaId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adCfgSchemaId.compareTo(adCfgSchemaId) != 0) {
+                this.adCfgSchemaId = adCfgSchemaId;
+                if (!this.toUpdateCols.contains("AD_CFG_SCHEMA_ID")) {
+                    this.toUpdateCols.add("AD_CFG_SCHEMA_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adCfgSchemaId = adCfgSchemaId;
+            if (!this.toUpdateCols.contains("AD_CFG_SCHEMA_ID")) {
+                this.toUpdateCols.add("AD_CFG_SCHEMA_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 开始日期时间。
      */
-    public LocalDateTime startDatetime;
+    private LocalDateTime startDatetime;
 
     /**
      * 获取：开始日期时间。
@@ -402,14 +640,30 @@ public class AdCfgSchemaPeriod {
      * 设置：开始日期时间。
      */
     public AdCfgSchemaPeriod setStartDatetime(LocalDateTime startDatetime) {
-        this.startDatetime = startDatetime;
+        if (this.startDatetime == null && startDatetime == null) {
+            // 均为null，不做处理。
+        } else if (this.startDatetime != null && startDatetime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.startDatetime.compareTo(startDatetime) != 0) {
+                this.startDatetime = startDatetime;
+                if (!this.toUpdateCols.contains("START_DATETIME")) {
+                    this.toUpdateCols.add("START_DATETIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.startDatetime = startDatetime;
+            if (!this.toUpdateCols.contains("START_DATETIME")) {
+                this.toUpdateCols.add("START_DATETIME");
+            }
+        }
         return this;
     }
 
     /**
      * 结束日期时间。
      */
-    public LocalDateTime endDatetime;
+    private LocalDateTime endDatetime;
 
     /**
      * 获取：结束日期时间。
@@ -422,14 +676,30 @@ public class AdCfgSchemaPeriod {
      * 设置：结束日期时间。
      */
     public AdCfgSchemaPeriod setEndDatetime(LocalDateTime endDatetime) {
-        this.endDatetime = endDatetime;
+        if (this.endDatetime == null && endDatetime == null) {
+            // 均为null，不做处理。
+        } else if (this.endDatetime != null && endDatetime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.endDatetime.compareTo(endDatetime) != 0) {
+                this.endDatetime = endDatetime;
+                if (!this.toUpdateCols.contains("END_DATETIME")) {
+                    this.toUpdateCols.add("END_DATETIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.endDatetime = endDatetime;
+            if (!this.toUpdateCols.contains("END_DATETIME")) {
+                this.toUpdateCols.add("END_DATETIME");
+            }
+        }
         return this;
     }
 
     /**
      * 是否有效。
      */
-    public Boolean isValid;
+    private Boolean isValid;
 
     /**
      * 获取：是否有效。
@@ -442,7 +712,23 @@ public class AdCfgSchemaPeriod {
      * 设置：是否有效。
      */
     public AdCfgSchemaPeriod setIsValid(Boolean isValid) {
-        this.isValid = isValid;
+        if (this.isValid == null && isValid == null) {
+            // 均为null，不做处理。
+        } else if (this.isValid != null && isValid != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isValid.compareTo(isValid) != 0) {
+                this.isValid = isValid;
+                if (!this.toUpdateCols.contains("IS_VALID")) {
+                    this.toUpdateCols.add("IS_VALID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isValid = isValid;
+            if (!this.toUpdateCols.contains("IS_VALID")) {
+                this.toUpdateCols.add("IS_VALID");
+            }
+        }
         return this;
     }
 
@@ -460,6 +746,7 @@ public class AdCfgSchemaPeriod {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -470,7 +757,17 @@ public class AdCfgSchemaPeriod {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -491,7 +788,8 @@ public class AdCfgSchemaPeriod {
      * @return
      */
     public static AdCfgSchemaPeriod newData() {
-        return modelHelper.newData();
+        AdCfgSchemaPeriod obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -500,7 +798,8 @@ public class AdCfgSchemaPeriod {
      * @return
      */
     public static AdCfgSchemaPeriod insertData() {
-        return modelHelper.insertData();
+        AdCfgSchemaPeriod obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -512,7 +811,8 @@ public class AdCfgSchemaPeriod {
      * @return 获取到的对象，若无则为null。
      */
     public static AdCfgSchemaPeriod selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        AdCfgSchemaPeriod obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -524,7 +824,8 @@ public class AdCfgSchemaPeriod {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdCfgSchemaPeriod> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<AdCfgSchemaPeriod> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -536,7 +837,8 @@ public class AdCfgSchemaPeriod {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdCfgSchemaPeriod> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<AdCfgSchemaPeriod> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

@@ -4,8 +4,11 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +21,18 @@ public class HrDept {
      * 模型助手。
      */
     private static final ModelHelper<HrDept> modelHelper = new ModelHelper<>("HR_DEPT", new HrDept());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -88,6 +103,14 @@ public class HrDept {
          */
         public static final String HR_DEPT_PID = "HR_DEPT_PID";
         /**
+         * 业主单位。
+         */
+        public static final String CUSTOMER_UNIT = "CUSTOMER_UNIT";
+        /**
+         * 用户。
+         */
+        public static final String AD_USER_ID = "AD_USER_ID";
+        /**
          * 背景色（16进制）。
          */
         public static final String BG_COLOR_HEX = "BG_COLOR_HEX";
@@ -121,7 +144,7 @@ public class HrDept {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -134,14 +157,30 @@ public class HrDept {
      * 设置：ID。
      */
     public HrDept setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -154,14 +193,30 @@ public class HrDept {
      * 设置：版本。
      */
     public HrDept setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -174,14 +229,30 @@ public class HrDept {
      * 设置：时间戳。
      */
     public HrDept setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -194,14 +265,30 @@ public class HrDept {
      * 设置：是否预设。
      */
     public HrDept setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -214,14 +301,30 @@ public class HrDept {
      * 设置：创建日期时间。
      */
     public HrDept setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -234,14 +337,30 @@ public class HrDept {
      * 设置：创建用户。
      */
     public HrDept setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -254,14 +373,30 @@ public class HrDept {
      * 设置：最后修改日期时间。
      */
     public HrDept setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -274,14 +409,30 @@ public class HrDept {
      * 设置：最后修改用户。
      */
     public HrDept setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -294,14 +445,30 @@ public class HrDept {
      * 设置：记录状态。
      */
     public HrDept setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -314,14 +481,30 @@ public class HrDept {
      * 设置：锁定流程实例。
      */
     public HrDept setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -334,14 +517,30 @@ public class HrDept {
      * 设置：代码。
      */
     public HrDept setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -354,14 +553,30 @@ public class HrDept {
      * 设置：名称。
      */
     public HrDept setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -374,14 +589,30 @@ public class HrDept {
      * 设置：备注。
      */
     public HrDept setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 父部门。
      */
-    public String hrDeptPid;
+    private String hrDeptPid;
 
     /**
      * 获取：父部门。
@@ -394,14 +625,102 @@ public class HrDept {
      * 设置：父部门。
      */
     public HrDept setHrDeptPid(String hrDeptPid) {
-        this.hrDeptPid = hrDeptPid;
+        if (this.hrDeptPid == null && hrDeptPid == null) {
+            // 均为null，不做处理。
+        } else if (this.hrDeptPid != null && hrDeptPid != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.hrDeptPid.compareTo(hrDeptPid) != 0) {
+                this.hrDeptPid = hrDeptPid;
+                if (!this.toUpdateCols.contains("HR_DEPT_PID")) {
+                    this.toUpdateCols.add("HR_DEPT_PID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.hrDeptPid = hrDeptPid;
+            if (!this.toUpdateCols.contains("HR_DEPT_PID")) {
+                this.toUpdateCols.add("HR_DEPT_PID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 业主单位。
+     */
+    private String customerUnit;
+
+    /**
+     * 获取：业主单位。
+     */
+    public String getCustomerUnit() {
+        return this.customerUnit;
+    }
+
+    /**
+     * 设置：业主单位。
+     */
+    public HrDept setCustomerUnit(String customerUnit) {
+        if (this.customerUnit == null && customerUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.customerUnit != null && customerUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.customerUnit.compareTo(customerUnit) != 0) {
+                this.customerUnit = customerUnit;
+                if (!this.toUpdateCols.contains("CUSTOMER_UNIT")) {
+                    this.toUpdateCols.add("CUSTOMER_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.customerUnit = customerUnit;
+            if (!this.toUpdateCols.contains("CUSTOMER_UNIT")) {
+                this.toUpdateCols.add("CUSTOMER_UNIT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 用户。
+     */
+    private String adUserId;
+
+    /**
+     * 获取：用户。
+     */
+    public String getAdUserId() {
+        return this.adUserId;
+    }
+
+    /**
+     * 设置：用户。
+     */
+    public HrDept setAdUserId(String adUserId) {
+        if (this.adUserId == null && adUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.adUserId != null && adUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adUserId.compareTo(adUserId) != 0) {
+                this.adUserId = adUserId;
+                if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                    this.toUpdateCols.add("AD_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adUserId = adUserId;
+            if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                this.toUpdateCols.add("AD_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 背景色（16进制）。
      */
-    public String bgColorHex;
+    private String bgColorHex;
 
     /**
      * 获取：背景色（16进制）。
@@ -414,14 +733,30 @@ public class HrDept {
      * 设置：背景色（16进制）。
      */
     public HrDept setBgColorHex(String bgColorHex) {
-        this.bgColorHex = bgColorHex;
+        if (this.bgColorHex == null && bgColorHex == null) {
+            // 均为null，不做处理。
+        } else if (this.bgColorHex != null && bgColorHex != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bgColorHex.compareTo(bgColorHex) != 0) {
+                this.bgColorHex = bgColorHex;
+                if (!this.toUpdateCols.contains("BG_COLOR_HEX")) {
+                    this.toUpdateCols.add("BG_COLOR_HEX");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bgColorHex = bgColorHex;
+            if (!this.toUpdateCols.contains("BG_COLOR_HEX")) {
+                this.toUpdateCols.add("BG_COLOR_HEX");
+            }
+        }
         return this;
     }
 
     /**
      * 字体颜色（16进制）。
      */
-    public String fontColorHex;
+    private String fontColorHex;
 
     /**
      * 获取：字体颜色（16进制）。
@@ -434,14 +769,30 @@ public class HrDept {
      * 设置：字体颜色（16进制）。
      */
     public HrDept setFontColorHex(String fontColorHex) {
-        this.fontColorHex = fontColorHex;
+        if (this.fontColorHex == null && fontColorHex == null) {
+            // 均为null，不做处理。
+        } else if (this.fontColorHex != null && fontColorHex != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.fontColorHex.compareTo(fontColorHex) != 0) {
+                this.fontColorHex = fontColorHex;
+                if (!this.toUpdateCols.contains("FONT_COLOR_HEX")) {
+                    this.toUpdateCols.add("FONT_COLOR_HEX");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.fontColorHex = fontColorHex;
+            if (!this.toUpdateCols.contains("FONT_COLOR_HEX")) {
+                this.toUpdateCols.add("FONT_COLOR_HEX");
+            }
+        }
         return this;
     }
 
     /**
      * 责任用户。
      */
-    public String chiefUserId;
+    private String chiefUserId;
 
     /**
      * 获取：责任用户。
@@ -454,34 +805,66 @@ public class HrDept {
      * 设置：责任用户。
      */
     public HrDept setChiefUserId(String chiefUserId) {
-        this.chiefUserId = chiefUserId;
+        if (this.chiefUserId == null && chiefUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.chiefUserId != null && chiefUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.chiefUserId.compareTo(chiefUserId) != 0) {
+                this.chiefUserId = chiefUserId;
+                if (!this.toUpdateCols.contains("CHIEF_USER_ID")) {
+                    this.toUpdateCols.add("CHIEF_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.chiefUserId = chiefUserId;
+            if (!this.toUpdateCols.contains("CHIEF_USER_ID")) {
+                this.toUpdateCols.add("CHIEF_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 序号。
      */
-    public Double seqNo;
+    private BigDecimal seqNo;
 
     /**
      * 获取：序号。
      */
-    public Double getSeqNo() {
+    public BigDecimal getSeqNo() {
         return this.seqNo;
     }
 
     /**
      * 设置：序号。
      */
-    public HrDept setSeqNo(Double seqNo) {
-        this.seqNo = seqNo;
+    public HrDept setSeqNo(BigDecimal seqNo) {
+        if (this.seqNo == null && seqNo == null) {
+            // 均为null，不做处理。
+        } else if (this.seqNo != null && seqNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.seqNo.compareTo(seqNo) != 0) {
+                this.seqNo = seqNo;
+                if (!this.toUpdateCols.contains("SEQ_NO")) {
+                    this.toUpdateCols.add("SEQ_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.seqNo = seqNo;
+            if (!this.toUpdateCols.contains("SEQ_NO")) {
+                this.toUpdateCols.add("SEQ_NO");
+            }
+        }
         return this;
     }
 
     /**
      * CPMS的UUID。
      */
-    public String cpmsUuid;
+    private String cpmsUuid;
 
     /**
      * 获取：CPMS的UUID。
@@ -494,14 +877,30 @@ public class HrDept {
      * 设置：CPMS的UUID。
      */
     public HrDept setCpmsUuid(String cpmsUuid) {
-        this.cpmsUuid = cpmsUuid;
+        if (this.cpmsUuid == null && cpmsUuid == null) {
+            // 均为null，不做处理。
+        } else if (this.cpmsUuid != null && cpmsUuid != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cpmsUuid.compareTo(cpmsUuid) != 0) {
+                this.cpmsUuid = cpmsUuid;
+                if (!this.toUpdateCols.contains("CPMS_UUID")) {
+                    this.toUpdateCols.add("CPMS_UUID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cpmsUuid = cpmsUuid;
+            if (!this.toUpdateCols.contains("CPMS_UUID")) {
+                this.toUpdateCols.add("CPMS_UUID");
+            }
+        }
         return this;
     }
 
     /**
      * CPMS的ID。
      */
-    public String cpmsId;
+    private String cpmsId;
 
     /**
      * 获取：CPMS的ID。
@@ -514,7 +913,23 @@ public class HrDept {
      * 设置：CPMS的ID。
      */
     public HrDept setCpmsId(String cpmsId) {
-        this.cpmsId = cpmsId;
+        if (this.cpmsId == null && cpmsId == null) {
+            // 均为null，不做处理。
+        } else if (this.cpmsId != null && cpmsId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cpmsId.compareTo(cpmsId) != 0) {
+                this.cpmsId = cpmsId;
+                if (!this.toUpdateCols.contains("CPMS_ID")) {
+                    this.toUpdateCols.add("CPMS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cpmsId = cpmsId;
+            if (!this.toUpdateCols.contains("CPMS_ID")) {
+                this.toUpdateCols.add("CPMS_ID");
+            }
+        }
         return this;
     }
 
@@ -532,6 +947,7 @@ public class HrDept {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -542,7 +958,17 @@ public class HrDept {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -563,7 +989,8 @@ public class HrDept {
      * @return
      */
     public static HrDept newData() {
-        return modelHelper.newData();
+        HrDept obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -572,7 +999,8 @@ public class HrDept {
      * @return
      */
     public static HrDept insertData() {
-        return modelHelper.insertData();
+        HrDept obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -584,7 +1012,8 @@ public class HrDept {
      * @return 获取到的对象，若无则为null。
      */
     public static HrDept selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        HrDept obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -596,7 +1025,8 @@ public class HrDept {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<HrDept> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<HrDept> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -608,7 +1038,8 @@ public class HrDept {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<HrDept> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<HrDept> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**
