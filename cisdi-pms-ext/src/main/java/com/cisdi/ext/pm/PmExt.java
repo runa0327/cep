@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +51,7 @@ public class PmExt {
         OrmHelper.copyCols(newTestStu, newPmPrj, Lists.newArrayList("CODE", "NAME"), null);
 
         PmPrj pmPrj = PmPrj.insertData();
-        pmPrj.setCode("123").setName("456").setBuildYears(50d).updateById(Lists.newArrayList(PmPrj.Cols.CODE, PmPrj.Cols.NAME), Lists.newArrayList(PmPrj.Cols.CODE), true);
+        pmPrj.setCode("123").setName("456").setBuildYears(new BigDecimal(50)).updateById(Lists.newArrayList(PmPrj.Cols.CODE, PmPrj.Cols.NAME), Lists.newArrayList(PmPrj.Cols.CODE), true);
 
         HashMap<String, Object> keyValueHashMap = new HashMap<>();
         keyValueHashMap.put(PmPrj.Cols.CODE, "123");
@@ -141,15 +142,15 @@ public class PmExt {
     private static class Project {
         public String id;
         public String name;
-        //业主单位
+        // 业主单位
         public String customerUnit;
         public String type;
-        //建设地点
+        // 建设地点
         public String baseLocation;
         public String total;
-        //是否入省库
+        // 是否入省库
         public String inProvinceRep;
-        //是否入国库
+        // 是否入国库
         public String inCountryRep;
     }
 
