@@ -103,6 +103,8 @@ public class AttLinkExt {
             return linkCUSTOMER_UNIT_ONE(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("PROJECT_SOURCE_TYPE_ID".equals(attCode)){ // 项目来源 属性联动
             return linkPROJECT_SOURCE_TYPE_ID(myJdbcTemplate, attValue, entCode,sevId,param);
+        } else if ("PROJECT_SOURCE_TYPE_TWO_ID".equals(attCode)){
+            return linkPROJECT_SOURCE_TYPE_TWO_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("ORDER_DEMAND_TYPE".equals(attCode)){ //合同需求类型
             return linkORDER_DEMAND_TYPE(myJdbcTemplate,attValue,entCode);
         } else if ("BUILD_PERMIT_TYPE_ID".equals(attCode)){ //施工许可类型
@@ -115,6 +117,76 @@ public class AttLinkExt {
             return linkPO_ORDER_REQ_IDS(myJdbcTemplate, attValue, sevId,entCode);
         } else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
+        }
+
+    }
+
+    // 数据来源属性联动
+    private AttLinkResult linkPROJECT_SOURCE_TYPE_TWO_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        String code = getGrSetCode(myJdbcTemplate,attValue);
+        if ("PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
+            Boolean PROJECT_NAME_WRChangeToShown = false; //手填项目名称默认不隐藏
+            Boolean PM_PRJ_IDSChangeToShown = false; //选择项目名称默认不隐藏
+
+            Boolean CPROJECT_NAME_WRChangeToMandatory = false; //手填项目名称默认非必填
+            Boolean PM_PRJ_IDSChangeToMandatory = false; //选择项目名称默认非必填
+
+            Boolean PROJECT_NAME_WRChangeToEditable = false; //手填项目名称默认不可改
+            Boolean PM_PRJ_IDSChangeToEditable = false; //选择项目名称默认不可改
+
+            String contractSourceValue = null;
+            String contractSourceText = null;
+
+            if ("non_system".equals(code)){
+                PROJECT_NAME_WRChangeToShown = true;
+                CPROJECT_NAME_WRChangeToMandatory = true;
+                PROJECT_NAME_WRChangeToEditable = true;
+                attLinkResult = this.linkPROJECT_SOURCE_TYPE_ID(myJdbcTemplate,attValue,entCode,sevId,param);
+                List<Map<String,Object>> list1 = myJdbcTemplate.queryForList("select id,name from gr_set_value where id = ?",attValue);
+                if (!CollectionUtils.isEmpty(list1)) {
+                    contractSourceValue = JdbcMapUtil.getString(list1.get(0),"id");
+                    contractSourceText = JdbcMapUtil.getString(list1.get(0),"name");
+                }
+            } else {
+                PM_PRJ_IDSChangeToShown = true;
+                PM_PRJ_IDSChangeToMandatory = true;
+                PM_PRJ_IDSChangeToEditable = true;
+            }
+            //项目名称
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToMandatory = CPROJECT_NAME_WRChangeToMandatory;
+                linkedAtt.changeToShown = PROJECT_NAME_WRChangeToShown;
+                linkedAtt.changeToEditable = PROJECT_NAME_WRChangeToEditable;
+                attLinkResult.attMap.put("PROJECT_NAME_WR", linkedAtt);
+            }
+            //项目名称
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToMandatory = PM_PRJ_IDSChangeToMandatory;
+                linkedAtt.changeToShown = PM_PRJ_IDSChangeToShown;
+                linkedAtt.changeToEditable = PM_PRJ_IDSChangeToEditable;
+                attLinkResult.attMap.put("PM_PRJ_IDS", linkedAtt);
+            }
+            //合同来源
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = contractSourceValue;
+                linkedAtt.text = contractSourceText;
+                attLinkResult.attMap.put("PROJECT_SOURCE_TYPE_ID", linkedAtt);
+            }
+
+            return attLinkResult;
+        } else {
+            return null;
         }
 
     }
@@ -624,7 +696,7 @@ public class AttLinkExt {
                 attLinkResult.attMap.put("CONTRACT_AMOUNT", linkedAtt);
             }
             return attLinkResult;
-        } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 补充协议
+        } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "PO_ORDER_CHANGE_REQ".equals(entCode)){ //采购合同签订申请 补充协议
             //系统(system)，非系统(non_system)
             attLinkResult = autoLinkProject(attValue,code);
             attLinkResult = autoLinkPrjDetail(attLinkResult,attValue,code);
@@ -4802,6 +4874,7 @@ public class AttLinkExt {
         list.add("PM_BID_KEEP_FILE_REQ"); //招采项目备案及归档
         list.add("PO_GUARANTEE_LETTER_RETURN_OA_REQ"); //保函退还申请(OA)
         list.add("BID_PROCESS_MANAGE"); //招标过程管理
+        list.add("PO_ORDER_CHANGE_REQ"); //合同需求审批
         return list;
     }
 }

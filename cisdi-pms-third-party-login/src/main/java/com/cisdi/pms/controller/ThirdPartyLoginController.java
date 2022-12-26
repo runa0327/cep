@@ -35,12 +35,7 @@ public class ThirdPartyLoginController {
      */
     @PostMapping("validateCode")
     public ThirdPartyLoginCodeValidationRespBody validate(@RequestBody ThirdPartyLoginCodeValidationReqBody requestBody) {
-
         log.info("请求：" + JSON.toJSONString(requestBody));
-        // if ("1".equalsIgnoreCase("1")) {
-        //     return null;
-        // }
-
         if (requestBody == null) {
             throw new BaseException("参数为空！");
         }
@@ -57,17 +52,16 @@ public class ThirdPartyLoginController {
                 thirdPartyUserInfo = loginService.UnifiedLogin(loginCode);
             } else if ("APP".equalsIgnoreCase(loginType)) {
                 thirdPartyUserInfo = loginService.UnifiedAppLogin(loginCode, loginExtraInfo);
+            } else if ("TOKEN".equalsIgnoreCase(loginType)) {
+                //当类型是token的时候 token存放再loginExtraInfo中
+                thirdPartyUserInfo = loginService.UnifiedTokenLogin(loginExtraInfo);
             }
             if (thirdPartyUserInfo != null) {
                 responseBody.succ = true;
                 responseBody.data = thirdPartyUserInfo;
             }
-        } else {
-            throw new BaseException(BaseException.EXP_MSG_Unkown_Enum + loginThirdParty);
         }
-
         log.info("响应：" + JSON.toJSONString(responseBody));
-
         return responseBody;
     }
 

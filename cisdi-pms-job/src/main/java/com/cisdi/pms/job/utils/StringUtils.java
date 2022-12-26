@@ -1,5 +1,7 @@
 package com.cisdi.pms.job.utils;
 
+import com.google.common.base.Strings;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,5 +58,16 @@ public class StringUtils {
             map.put(values[0], values[1]);
         }
         return map;
+    }
+
+    /**
+     * 将将带T的时间字符串截取为日期
+     */
+    public static String getDateWithOutT(String value) {
+        if (Strings.isNullOrEmpty(value)){
+            return null;
+        }
+        String[] strings = value.split("T");
+        return strings[0];
     }
 }

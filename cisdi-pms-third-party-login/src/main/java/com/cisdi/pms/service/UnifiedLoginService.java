@@ -7,6 +7,7 @@ import com.dtflys.forest.utils.StringUtils;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.ThirdPartyUserInfo;
 import com.qygly.shared.util.JdbcMapUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.Map;
  * @description
  * @date 2022/12/16
  */
+@Slf4j
 @Service
 public class UnifiedLoginService {
 
@@ -48,6 +50,7 @@ public class UnifiedLoginService {
                 .addBody("code", code)
                 .onSuccess((data, req, res) -> {
                     JSONObject tokenJsonObject = (JSONObject) JSONObject.toJSON(data);
+                    log.info("token:" + tokenJsonObject);
                     // 使用access_token换取用户信息
                     Forest.post(unifiedLoginConfig.getDomainName() + "/oidc/me")
                             .setConnectTimeout(5000)
@@ -132,5 +135,36 @@ public class UnifiedLoginService {
                 .executeAsMap();
         return info;
     }
+
+
+    /**
+     * 统一身份认证登录(token)
+     *
+     * @param token
+     * @return
+     */
+    public ThirdPartyUserInfo UnifiedTokenLogin(String token) {
+        ThirdPartyUserInfo info = new ThirdPartyUserInfo();
+        Forest.get(unifiedLoginConfig.getDomainName() + "/api/v2/oidc/validate_token")
+                .setConnectTimeout(5000)
+                .addQuery("id_token", token)
+                .onSuccess((result, request, response) -> {
+                    JSONObject userJsonObject = (JSONObject) JSONObject.toJSON(result);
+                    // 通过手机号匹配当前系统用户
+                    String phoneNumber = userJsonObject.getString("phone_number");
+                    if (StringUtils.isNotBlank(phoneNumber)) {
+                        info.thirdPartyUserCode = phoneNumber;
+                    } else {
+                        throw new BaseException("当前用户未绑定手机号码，无法进行身份确认！请联系:周洲全（15002349596）处理！");
+                    }
+                })
+                .onError((result, request, response) -> {
+                    throw new BaseException("获取用户信息异常，请稍后重试！");
+                })
+                .executeAsMap();
+        return info;
+    }
+
+
 
 }
