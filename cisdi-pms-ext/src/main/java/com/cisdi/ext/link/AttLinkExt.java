@@ -137,6 +137,7 @@ public class AttLinkExt {
 
             String contractSourceValue = null;
             String contractSourceText = null;
+            Boolean contractSourceChangeToEditable = true;
 
             if ("non_system".equals(code)){
                 PROJECT_NAME_WRChangeToShown = true;
@@ -148,6 +149,7 @@ public class AttLinkExt {
                     contractSourceValue = JdbcMapUtil.getString(list1.get(0),"id");
                     contractSourceText = JdbcMapUtil.getString(list1.get(0),"name");
                 }
+                contractSourceChangeToEditable = false;
             } else {
                 PM_PRJ_IDSChangeToShown = true;
                 PM_PRJ_IDSChangeToMandatory = true;
@@ -181,6 +183,7 @@ public class AttLinkExt {
                 linkedAtt.type = AttDataTypeE.TEXT_LONG;
                 linkedAtt.value = contractSourceValue;
                 linkedAtt.text = contractSourceText;
+                linkedAtt.changeToEditable = contractSourceChangeToEditable;
                 attLinkResult.attMap.put("PROJECT_SOURCE_TYPE_ID", linkedAtt);
             }
 
