@@ -4,7 +4,6 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.pms.job.excel.model.ContractAccountModel;
-import com.cisdi.pms.job.excel.model.FundImplementationExportModel;
 import com.cisdi.pms.job.excel.model.request.ContractReq;
 import com.cisdi.pms.job.utils.StringUtils;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -92,7 +91,6 @@ public class ContractAccountController extends BaseController{
         for (Map<String, Object> contractMap : contractList) {
             ContractAccountModel model = JSONObject.parseObject(JSONObject.toJSONString(contractMap), ContractAccountModel.class);
             model.setCreateTime(StringUtils.getDateWithOutT(model.getCreateTime()));
-            model.setEndTime(StringUtils.getDateWithOutT(model.getEndTime()));
             models.add(model);
         }
 
