@@ -53,12 +53,12 @@ public class ContractAccountModel {
     @ColumnWidth(30)
     public String createTime;
 
-    //备注
-    @ExcelProperty("备注")
-    @ColumnWidth(30)
-    public String remark;
-    //采购经办人
-    @ExcelProperty("采购经办人")
-    @ColumnWidth(30)
-    public String userName;
+//    //备注
+//    @ExcelProperty("备注")
+//    @ColumnWidth(30)
+//    public String remark;
+//    //采购经办人
+//    @ExcelProperty("采购经办人")
+//    @ColumnWidth(30)
+//    public String userName;
 }
