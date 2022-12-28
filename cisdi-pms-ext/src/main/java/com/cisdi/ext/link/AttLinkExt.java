@@ -137,6 +137,7 @@ public class AttLinkExt {
 
             String contractSourceValue = null;
             String contractSourceText = null;
+            Boolean contractSourceChangeToEditable = true;
 
             if ("non_system".equals(code)){
                 PROJECT_NAME_WRChangeToShown = true;
@@ -148,6 +149,7 @@ public class AttLinkExt {
                     contractSourceValue = JdbcMapUtil.getString(list1.get(0),"id");
                     contractSourceText = JdbcMapUtil.getString(list1.get(0),"name");
                 }
+                contractSourceChangeToEditable = false;
             } else {
                 PM_PRJ_IDSChangeToShown = true;
                 PM_PRJ_IDSChangeToMandatory = true;
@@ -181,6 +183,7 @@ public class AttLinkExt {
                 linkedAtt.type = AttDataTypeE.TEXT_LONG;
                 linkedAtt.value = contractSourceValue;
                 linkedAtt.text = contractSourceText;
+                linkedAtt.changeToEditable = contractSourceChangeToEditable;
                 attLinkResult.attMap.put("PROJECT_SOURCE_TYPE_ID", linkedAtt);
             }
 
@@ -3871,7 +3874,7 @@ public class AttLinkExt {
                 "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD'," +
                 "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget'," +
                 "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE " +
-                "from pm_prj t join PM_PARTY c on t.CUSTOMER_UNIT=c.id " +
+                "from pm_prj t left join PM_PARTY c on t.CUSTOMER_UNIT=c.id " +
                 "LEFT JOIN gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
                 "LEFT JOIN gr_set_value l on t.BASE_LOCATION_ID=l.id " +
                 "LEFT JOIN gr_set_value pt on t.PROJECT_TYPE_ID=pt.id " +
