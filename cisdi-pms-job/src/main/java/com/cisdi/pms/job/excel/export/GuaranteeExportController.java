@@ -8,10 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
@@ -39,7 +36,7 @@ public class GuaranteeExportController extends BaseController {
      * @param guaranteeModel
      * @param response
      */
-    @PostMapping("/exportOaReq")
+    @GetMapping("/exportOaReq")
     public void exportOaReq(@RequestBody GuaranteeModel guaranteeModel, HttpServletResponse response) {
         try {
             //po_guarantee_letter_return_oa_req     保函退还申请       最下方数据
@@ -83,7 +80,7 @@ public class GuaranteeExportController extends BaseController {
      * @param guaranteeModel
      * @param response
      */
-    @PostMapping("/exportReq")
+    @GetMapping("/exportReq")
     public void exportReq(@RequestBody GuaranteeModel guaranteeModel , HttpServletResponse response) {
         try {
             //po_guarantee_letter_return_oa_req     保函退还申请       最下方数据
