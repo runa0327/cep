@@ -4,9 +4,12 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +22,18 @@ public class PoGuaranteeLetterRequireReq {
      * 模型助手。
      */
     private static final ModelHelper<PoGuaranteeLetterRequireReq> modelHelper = new ModelHelper<>("PO_GUARANTEE_LETTER_REQUIRE_REQ", new PoGuaranteeLetterRequireReq());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -69,29 +84,53 @@ public class PoGuaranteeLetterRequireReq {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 项目。
+         * 项目来源类型2。
          */
-        public static final String PM_PRJ_ID = "PM_PRJ_ID";
+        public static final String PROJECT_SOURCE_TYPE_TWO_ID = "PROJECT_SOURCE_TYPE_TWO_ID";
+        /**
+         * 项目名称。
+         */
+        public static final String PROJECT_NAME_WR = "PROJECT_NAME_WR";
         /**
          * 锁定流程实例。
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
-         * 合同。
+         * 项目。
          */
-        public static final String CONTRACT_ID = "CONTRACT_ID";
+        public static final String PM_PRJ_ID = "PM_PRJ_ID";
+        /**
+         * 项目(多值)。
+         */
+        public static final String PM_PRJ_IDS = "PM_PRJ_IDS";
+        /**
+         * 项目来源类型。
+         */
+        public static final String PROJECT_SOURCE_TYPE_ID = "PROJECT_SOURCE_TYPE_ID";
+        /**
+         * 合同名称。
+         */
+        public static final String CONTRACT_NAME = "CONTRACT_NAME";
         /**
          * 记录状态。
          */
         public static final String STATUS = "STATUS";
         /**
+         * 合同。
+         */
+        public static final String CONTRACT_ID = "CONTRACT_ID";
+        /**
+         * 合同签订(多值)。
+         */
+        public static final String PO_ORDER_REQ_IDS = "PO_ORDER_REQ_IDS";
+        /**
          * 创建用户。
          */
         public static final String CRT_USER_ID = "CRT_USER_ID";
         /**
-         * 费用类型。
+         * 费用类型（多选）。
          */
-        public static final String PM_EXP_TYPE_ID = "PM_EXP_TYPE_ID";
+        public static final String PM_EXP_TYPE_IDS = "PM_EXP_TYPE_IDS";
         /**
          * 创建部门。
          */
@@ -101,13 +140,13 @@ public class PoGuaranteeLetterRequireReq {
          */
         public static final String CONTRACT_AMOUNT = "CONTRACT_AMOUNT";
         /**
-         * 创建日期时间。
-         */
-        public static final String CRT_DT = "CRT_DT";
-        /**
          * 预付款比例。
          */
         public static final String ADVANCE_CHARGE_PERCENT = "ADVANCE_CHARGE_PERCENT";
+        /**
+         * 创建日期时间。
+         */
+        public static final String CRT_DT = "CRT_DT";
         /**
          * 预付款金额。
          */
@@ -125,6 +164,10 @@ public class PoGuaranteeLetterRequireReq {
          */
         public static final String GUARANTEE_LETTER_TYPE_ID = "GUARANTEE_LETTER_TYPE_ID";
         /**
+         * 备注1。
+         */
+        public static final String REMARK_ONE = "REMARK_ONE";
+        /**
          * 保函机构。
          */
         public static final String GUARANTEE_MECHANISM = "GUARANTEE_MECHANISM";
@@ -141,9 +184,17 @@ public class PoGuaranteeLetterRequireReq {
          */
         public static final String GUARANTEE_START_DATE = "GUARANTEE_START_DATE";
         /**
+         * 保函-到期类型。
+         */
+        public static final String GUARANTEE_DATE_TYPE_ID = "GUARANTEE_DATE_TYPE_ID";
+        /**
          * 保函结束日期。
          */
         public static final String GUARANTEE_END_DATE = "GUARANTEE_END_DATE";
+        /**
+         * 到期类型(填写)。
+         */
+        public static final String DATE_TYPE_WR = "DATE_TYPE_WR";
         /**
          * 附件。
          */
@@ -190,7 +241,7 @@ public class PoGuaranteeLetterRequireReq {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -203,14 +254,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：ID。
      */
     public PoGuaranteeLetterRequireReq setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -223,14 +290,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：版本。
      */
     public PoGuaranteeLetterRequireReq setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -243,14 +326,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：时间戳。
      */
     public PoGuaranteeLetterRequireReq setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -263,14 +362,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：是否预设。
      */
     public PoGuaranteeLetterRequireReq setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -283,14 +398,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：最后修改日期时间。
      */
     public PoGuaranteeLetterRequireReq setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -303,14 +434,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：最后修改用户。
      */
     public PoGuaranteeLetterRequireReq setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -323,14 +470,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：代码。
      */
     public PoGuaranteeLetterRequireReq setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -343,14 +506,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：名称。
      */
     public PoGuaranteeLetterRequireReq setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -363,34 +542,102 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：备注。
      */
     public PoGuaranteeLetterRequireReq setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
-     * 项目。
+     * 项目来源类型2。
      */
-    public String pmPrjId;
+    private String projectSourceTypeTwoId;
 
     /**
-     * 获取：项目。
+     * 获取：项目来源类型2。
      */
-    public String getPmPrjId() {
-        return this.pmPrjId;
+    public String getProjectSourceTypeTwoId() {
+        return this.projectSourceTypeTwoId;
     }
 
     /**
-     * 设置：项目。
+     * 设置：项目来源类型2。
      */
-    public PoGuaranteeLetterRequireReq setPmPrjId(String pmPrjId) {
-        this.pmPrjId = pmPrjId;
+    public PoGuaranteeLetterRequireReq setProjectSourceTypeTwoId(String projectSourceTypeTwoId) {
+        if (this.projectSourceTypeTwoId == null && projectSourceTypeTwoId == null) {
+            // 均为null，不做处理。
+        } else if (this.projectSourceTypeTwoId != null && projectSourceTypeTwoId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectSourceTypeTwoId.compareTo(projectSourceTypeTwoId) != 0) {
+                this.projectSourceTypeTwoId = projectSourceTypeTwoId;
+                if (!this.toUpdateCols.contains("PROJECT_SOURCE_TYPE_TWO_ID")) {
+                    this.toUpdateCols.add("PROJECT_SOURCE_TYPE_TWO_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectSourceTypeTwoId = projectSourceTypeTwoId;
+            if (!this.toUpdateCols.contains("PROJECT_SOURCE_TYPE_TWO_ID")) {
+                this.toUpdateCols.add("PROJECT_SOURCE_TYPE_TWO_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 项目名称。
+     */
+    private String projectNameWr;
+
+    /**
+     * 获取：项目名称。
+     */
+    public String getProjectNameWr() {
+        return this.projectNameWr;
+    }
+
+    /**
+     * 设置：项目名称。
+     */
+    public PoGuaranteeLetterRequireReq setProjectNameWr(String projectNameWr) {
+        if (this.projectNameWr == null && projectNameWr == null) {
+            // 均为null，不做处理。
+        } else if (this.projectNameWr != null && projectNameWr != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectNameWr.compareTo(projectNameWr) != 0) {
+                this.projectNameWr = projectNameWr;
+                if (!this.toUpdateCols.contains("PROJECT_NAME_WR")) {
+                    this.toUpdateCols.add("PROJECT_NAME_WR");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectNameWr = projectNameWr;
+            if (!this.toUpdateCols.contains("PROJECT_NAME_WR")) {
+                this.toUpdateCols.add("PROJECT_NAME_WR");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -403,34 +650,174 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：锁定流程实例。
      */
     public PoGuaranteeLetterRequireReq setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 合同。
+     * 项目。
      */
-    public String contractId;
+    private String pmPrjId;
 
     /**
-     * 获取：合同。
+     * 获取：项目。
      */
-    public String getContractId() {
-        return this.contractId;
+    public String getPmPrjId() {
+        return this.pmPrjId;
     }
 
     /**
-     * 设置：合同。
+     * 设置：项目。
      */
-    public PoGuaranteeLetterRequireReq setContractId(String contractId) {
-        this.contractId = contractId;
+    public PoGuaranteeLetterRequireReq setPmPrjId(String pmPrjId) {
+        if (this.pmPrjId == null && pmPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmPrjId != null && pmPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmPrjId.compareTo(pmPrjId) != 0) {
+                this.pmPrjId = pmPrjId;
+                if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                    this.toUpdateCols.add("PM_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmPrjId = pmPrjId;
+            if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                this.toUpdateCols.add("PM_PRJ_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 项目(多值)。
+     */
+    private String pmPrjIds;
+
+    /**
+     * 获取：项目(多值)。
+     */
+    public String getPmPrjIds() {
+        return this.pmPrjIds;
+    }
+
+    /**
+     * 设置：项目(多值)。
+     */
+    public PoGuaranteeLetterRequireReq setPmPrjIds(String pmPrjIds) {
+        if (this.pmPrjIds == null && pmPrjIds == null) {
+            // 均为null，不做处理。
+        } else if (this.pmPrjIds != null && pmPrjIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmPrjIds.compareTo(pmPrjIds) != 0) {
+                this.pmPrjIds = pmPrjIds;
+                if (!this.toUpdateCols.contains("PM_PRJ_IDS")) {
+                    this.toUpdateCols.add("PM_PRJ_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmPrjIds = pmPrjIds;
+            if (!this.toUpdateCols.contains("PM_PRJ_IDS")) {
+                this.toUpdateCols.add("PM_PRJ_IDS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 项目来源类型。
+     */
+    private String projectSourceTypeId;
+
+    /**
+     * 获取：项目来源类型。
+     */
+    public String getProjectSourceTypeId() {
+        return this.projectSourceTypeId;
+    }
+
+    /**
+     * 设置：项目来源类型。
+     */
+    public PoGuaranteeLetterRequireReq setProjectSourceTypeId(String projectSourceTypeId) {
+        if (this.projectSourceTypeId == null && projectSourceTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.projectSourceTypeId != null && projectSourceTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectSourceTypeId.compareTo(projectSourceTypeId) != 0) {
+                this.projectSourceTypeId = projectSourceTypeId;
+                if (!this.toUpdateCols.contains("PROJECT_SOURCE_TYPE_ID")) {
+                    this.toUpdateCols.add("PROJECT_SOURCE_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectSourceTypeId = projectSourceTypeId;
+            if (!this.toUpdateCols.contains("PROJECT_SOURCE_TYPE_ID")) {
+                this.toUpdateCols.add("PROJECT_SOURCE_TYPE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 合同名称。
+     */
+    private String contractName;
+
+    /**
+     * 获取：合同名称。
+     */
+    public String getContractName() {
+        return this.contractName;
+    }
+
+    /**
+     * 设置：合同名称。
+     */
+    public PoGuaranteeLetterRequireReq setContractName(String contractName) {
+        if (this.contractName == null && contractName == null) {
+            // 均为null，不做处理。
+        } else if (this.contractName != null && contractName != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contractName.compareTo(contractName) != 0) {
+                this.contractName = contractName;
+                if (!this.toUpdateCols.contains("CONTRACT_NAME")) {
+                    this.toUpdateCols.add("CONTRACT_NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contractName = contractName;
+            if (!this.toUpdateCols.contains("CONTRACT_NAME")) {
+                this.toUpdateCols.add("CONTRACT_NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -443,14 +830,102 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：记录状态。
      */
     public PoGuaranteeLetterRequireReq setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 合同。
+     */
+    private String contractId;
+
+    /**
+     * 获取：合同。
+     */
+    public String getContractId() {
+        return this.contractId;
+    }
+
+    /**
+     * 设置：合同。
+     */
+    public PoGuaranteeLetterRequireReq setContractId(String contractId) {
+        if (this.contractId == null && contractId == null) {
+            // 均为null，不做处理。
+        } else if (this.contractId != null && contractId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contractId.compareTo(contractId) != 0) {
+                this.contractId = contractId;
+                if (!this.toUpdateCols.contains("CONTRACT_ID")) {
+                    this.toUpdateCols.add("CONTRACT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contractId = contractId;
+            if (!this.toUpdateCols.contains("CONTRACT_ID")) {
+                this.toUpdateCols.add("CONTRACT_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 合同签订(多值)。
+     */
+    private String poOrderReqIds;
+
+    /**
+     * 获取：合同签订(多值)。
+     */
+    public String getPoOrderReqIds() {
+        return this.poOrderReqIds;
+    }
+
+    /**
+     * 设置：合同签订(多值)。
+     */
+    public PoGuaranteeLetterRequireReq setPoOrderReqIds(String poOrderReqIds) {
+        if (this.poOrderReqIds == null && poOrderReqIds == null) {
+            // 均为null，不做处理。
+        } else if (this.poOrderReqIds != null && poOrderReqIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.poOrderReqIds.compareTo(poOrderReqIds) != 0) {
+                this.poOrderReqIds = poOrderReqIds;
+                if (!this.toUpdateCols.contains("PO_ORDER_REQ_IDS")) {
+                    this.toUpdateCols.add("PO_ORDER_REQ_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.poOrderReqIds = poOrderReqIds;
+            if (!this.toUpdateCols.contains("PO_ORDER_REQ_IDS")) {
+                this.toUpdateCols.add("PO_ORDER_REQ_IDS");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -463,34 +938,66 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：创建用户。
      */
     public PoGuaranteeLetterRequireReq setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 费用类型。
+     * 费用类型（多选）。
      */
-    public String pmExpTypeId;
+    private String pmExpTypeIds;
 
     /**
-     * 获取：费用类型。
+     * 获取：费用类型（多选）。
      */
-    public String getPmExpTypeId() {
-        return this.pmExpTypeId;
+    public String getPmExpTypeIds() {
+        return this.pmExpTypeIds;
     }
 
     /**
-     * 设置：费用类型。
+     * 设置：费用类型（多选）。
      */
-    public PoGuaranteeLetterRequireReq setPmExpTypeId(String pmExpTypeId) {
-        this.pmExpTypeId = pmExpTypeId;
+    public PoGuaranteeLetterRequireReq setPmExpTypeIds(String pmExpTypeIds) {
+        if (this.pmExpTypeIds == null && pmExpTypeIds == null) {
+            // 均为null，不做处理。
+        } else if (this.pmExpTypeIds != null && pmExpTypeIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmExpTypeIds.compareTo(pmExpTypeIds) != 0) {
+                this.pmExpTypeIds = pmExpTypeIds;
+                if (!this.toUpdateCols.contains("PM_EXP_TYPE_IDS")) {
+                    this.toUpdateCols.add("PM_EXP_TYPE_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmExpTypeIds = pmExpTypeIds;
+            if (!this.toUpdateCols.contains("PM_EXP_TYPE_IDS")) {
+                this.toUpdateCols.add("PM_EXP_TYPE_IDS");
+            }
+        }
         return this;
     }
 
     /**
      * 创建部门。
      */
-    public String crtDeptId;
+    private String crtDeptId;
 
     /**
      * 获取：创建部门。
@@ -503,34 +1010,102 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：创建部门。
      */
     public PoGuaranteeLetterRequireReq setCrtDeptId(String crtDeptId) {
-        this.crtDeptId = crtDeptId;
+        if (this.crtDeptId == null && crtDeptId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDeptId != null && crtDeptId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDeptId.compareTo(crtDeptId) != 0) {
+                this.crtDeptId = crtDeptId;
+                if (!this.toUpdateCols.contains("CRT_DEPT_ID")) {
+                    this.toUpdateCols.add("CRT_DEPT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDeptId = crtDeptId;
+            if (!this.toUpdateCols.contains("CRT_DEPT_ID")) {
+                this.toUpdateCols.add("CRT_DEPT_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 合同金额。
      */
-    public Double contractAmount;
+    private BigDecimal contractAmount;
 
     /**
      * 获取：合同金额。
      */
-    public Double getContractAmount() {
+    public BigDecimal getContractAmount() {
         return this.contractAmount;
     }
 
     /**
      * 设置：合同金额。
      */
-    public PoGuaranteeLetterRequireReq setContractAmount(Double contractAmount) {
-        this.contractAmount = contractAmount;
+    public PoGuaranteeLetterRequireReq setContractAmount(BigDecimal contractAmount) {
+        if (this.contractAmount == null && contractAmount == null) {
+            // 均为null，不做处理。
+        } else if (this.contractAmount != null && contractAmount != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contractAmount.compareTo(contractAmount) != 0) {
+                this.contractAmount = contractAmount;
+                if (!this.toUpdateCols.contains("CONTRACT_AMOUNT")) {
+                    this.toUpdateCols.add("CONTRACT_AMOUNT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contractAmount = contractAmount;
+            if (!this.toUpdateCols.contains("CONTRACT_AMOUNT")) {
+                this.toUpdateCols.add("CONTRACT_AMOUNT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 预付款比例。
+     */
+    private BigDecimal advanceChargePercent;
+
+    /**
+     * 获取：预付款比例。
+     */
+    public BigDecimal getAdvanceChargePercent() {
+        return this.advanceChargePercent;
+    }
+
+    /**
+     * 设置：预付款比例。
+     */
+    public PoGuaranteeLetterRequireReq setAdvanceChargePercent(BigDecimal advanceChargePercent) {
+        if (this.advanceChargePercent == null && advanceChargePercent == null) {
+            // 均为null，不做处理。
+        } else if (this.advanceChargePercent != null && advanceChargePercent != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.advanceChargePercent.compareTo(advanceChargePercent) != 0) {
+                this.advanceChargePercent = advanceChargePercent;
+                if (!this.toUpdateCols.contains("ADVANCE_CHARGE_PERCENT")) {
+                    this.toUpdateCols.add("ADVANCE_CHARGE_PERCENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.advanceChargePercent = advanceChargePercent;
+            if (!this.toUpdateCols.contains("ADVANCE_CHARGE_PERCENT")) {
+                this.toUpdateCols.add("ADVANCE_CHARGE_PERCENT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -543,54 +1118,66 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：创建日期时间。
      */
     public PoGuaranteeLetterRequireReq setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
-        return this;
-    }
-
-    /**
-     * 预付款比例。
-     */
-    public String advanceChargePercent;
-
-    /**
-     * 获取：预付款比例。
-     */
-    public String getAdvanceChargePercent() {
-        return this.advanceChargePercent;
-    }
-
-    /**
-     * 设置：预付款比例。
-     */
-    public PoGuaranteeLetterRequireReq setAdvanceChargePercent(String advanceChargePercent) {
-        this.advanceChargePercent = advanceChargePercent;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 预付款金额。
      */
-    public Double advanceChargeAmt;
+    private BigDecimal advanceChargeAmt;
 
     /**
      * 获取：预付款金额。
      */
-    public Double getAdvanceChargeAmt() {
+    public BigDecimal getAdvanceChargeAmt() {
         return this.advanceChargeAmt;
     }
 
     /**
      * 设置：预付款金额。
      */
-    public PoGuaranteeLetterRequireReq setAdvanceChargeAmt(Double advanceChargeAmt) {
-        this.advanceChargeAmt = advanceChargeAmt;
+    public PoGuaranteeLetterRequireReq setAdvanceChargeAmt(BigDecimal advanceChargeAmt) {
+        if (this.advanceChargeAmt == null && advanceChargeAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.advanceChargeAmt != null && advanceChargeAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.advanceChargeAmt.compareTo(advanceChargeAmt) != 0) {
+                this.advanceChargeAmt = advanceChargeAmt;
+                if (!this.toUpdateCols.contains("ADVANCE_CHARGE_AMT")) {
+                    this.toUpdateCols.add("ADVANCE_CHARGE_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.advanceChargeAmt = advanceChargeAmt;
+            if (!this.toUpdateCols.contains("ADVANCE_CHARGE_AMT")) {
+                this.toUpdateCols.add("ADVANCE_CHARGE_AMT");
+            }
+        }
         return this;
     }
 
     /**
      * 供应商。
      */
-    public String supplier;
+    private String supplier;
 
     /**
      * 获取：供应商。
@@ -603,14 +1190,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：供应商。
      */
     public PoGuaranteeLetterRequireReq setSupplier(String supplier) {
-        this.supplier = supplier;
+        if (this.supplier == null && supplier == null) {
+            // 均为null，不做处理。
+        } else if (this.supplier != null && supplier != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.supplier.compareTo(supplier) != 0) {
+                this.supplier = supplier;
+                if (!this.toUpdateCols.contains("SUPPLIER")) {
+                    this.toUpdateCols.add("SUPPLIER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.supplier = supplier;
+            if (!this.toUpdateCols.contains("SUPPLIER")) {
+                this.toUpdateCols.add("SUPPLIER");
+            }
+        }
         return this;
     }
 
     /**
      * 受益人。
      */
-    public String beneficiary;
+    private String beneficiary;
 
     /**
      * 获取：受益人。
@@ -623,14 +1226,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：受益人。
      */
     public PoGuaranteeLetterRequireReq setBeneficiary(String beneficiary) {
-        this.beneficiary = beneficiary;
+        if (this.beneficiary == null && beneficiary == null) {
+            // 均为null，不做处理。
+        } else if (this.beneficiary != null && beneficiary != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.beneficiary.compareTo(beneficiary) != 0) {
+                this.beneficiary = beneficiary;
+                if (!this.toUpdateCols.contains("BENEFICIARY")) {
+                    this.toUpdateCols.add("BENEFICIARY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.beneficiary = beneficiary;
+            if (!this.toUpdateCols.contains("BENEFICIARY")) {
+                this.toUpdateCols.add("BENEFICIARY");
+            }
+        }
         return this;
     }
 
     /**
      * 保函类型。
      */
-    public String guaranteeLetterTypeId;
+    private String guaranteeLetterTypeId;
 
     /**
      * 获取：保函类型。
@@ -643,14 +1262,66 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：保函类型。
      */
     public PoGuaranteeLetterRequireReq setGuaranteeLetterTypeId(String guaranteeLetterTypeId) {
-        this.guaranteeLetterTypeId = guaranteeLetterTypeId;
+        if (this.guaranteeLetterTypeId == null && guaranteeLetterTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.guaranteeLetterTypeId != null && guaranteeLetterTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.guaranteeLetterTypeId.compareTo(guaranteeLetterTypeId) != 0) {
+                this.guaranteeLetterTypeId = guaranteeLetterTypeId;
+                if (!this.toUpdateCols.contains("GUARANTEE_LETTER_TYPE_ID")) {
+                    this.toUpdateCols.add("GUARANTEE_LETTER_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.guaranteeLetterTypeId = guaranteeLetterTypeId;
+            if (!this.toUpdateCols.contains("GUARANTEE_LETTER_TYPE_ID")) {
+                this.toUpdateCols.add("GUARANTEE_LETTER_TYPE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 备注1。
+     */
+    private String remarkOne;
+
+    /**
+     * 获取：备注1。
+     */
+    public String getRemarkOne() {
+        return this.remarkOne;
+    }
+
+    /**
+     * 设置：备注1。
+     */
+    public PoGuaranteeLetterRequireReq setRemarkOne(String remarkOne) {
+        if (this.remarkOne == null && remarkOne == null) {
+            // 均为null，不做处理。
+        } else if (this.remarkOne != null && remarkOne != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remarkOne.compareTo(remarkOne) != 0) {
+                this.remarkOne = remarkOne;
+                if (!this.toUpdateCols.contains("REMARK_ONE")) {
+                    this.toUpdateCols.add("REMARK_ONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remarkOne = remarkOne;
+            if (!this.toUpdateCols.contains("REMARK_ONE")) {
+                this.toUpdateCols.add("REMARK_ONE");
+            }
+        }
         return this;
     }
 
     /**
      * 保函机构。
      */
-    public String guaranteeMechanism;
+    private String guaranteeMechanism;
 
     /**
      * 获取：保函机构。
@@ -663,14 +1334,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：保函机构。
      */
     public PoGuaranteeLetterRequireReq setGuaranteeMechanism(String guaranteeMechanism) {
-        this.guaranteeMechanism = guaranteeMechanism;
+        if (this.guaranteeMechanism == null && guaranteeMechanism == null) {
+            // 均为null，不做处理。
+        } else if (this.guaranteeMechanism != null && guaranteeMechanism != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.guaranteeMechanism.compareTo(guaranteeMechanism) != 0) {
+                this.guaranteeMechanism = guaranteeMechanism;
+                if (!this.toUpdateCols.contains("GUARANTEE_MECHANISM")) {
+                    this.toUpdateCols.add("GUARANTEE_MECHANISM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.guaranteeMechanism = guaranteeMechanism;
+            if (!this.toUpdateCols.contains("GUARANTEE_MECHANISM")) {
+                this.toUpdateCols.add("GUARANTEE_MECHANISM");
+            }
+        }
         return this;
     }
 
     /**
      * 保函编号。
      */
-    public String guaranteeCode;
+    private String guaranteeCode;
 
     /**
      * 获取：保函编号。
@@ -683,34 +1370,66 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：保函编号。
      */
     public PoGuaranteeLetterRequireReq setGuaranteeCode(String guaranteeCode) {
-        this.guaranteeCode = guaranteeCode;
+        if (this.guaranteeCode == null && guaranteeCode == null) {
+            // 均为null，不做处理。
+        } else if (this.guaranteeCode != null && guaranteeCode != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.guaranteeCode.compareTo(guaranteeCode) != 0) {
+                this.guaranteeCode = guaranteeCode;
+                if (!this.toUpdateCols.contains("GUARANTEE_CODE")) {
+                    this.toUpdateCols.add("GUARANTEE_CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.guaranteeCode = guaranteeCode;
+            if (!this.toUpdateCols.contains("GUARANTEE_CODE")) {
+                this.toUpdateCols.add("GUARANTEE_CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 保函金额。
      */
-    public Double guaranteeAmt;
+    private BigDecimal guaranteeAmt;
 
     /**
      * 获取：保函金额。
      */
-    public Double getGuaranteeAmt() {
+    public BigDecimal getGuaranteeAmt() {
         return this.guaranteeAmt;
     }
 
     /**
      * 设置：保函金额。
      */
-    public PoGuaranteeLetterRequireReq setGuaranteeAmt(Double guaranteeAmt) {
-        this.guaranteeAmt = guaranteeAmt;
+    public PoGuaranteeLetterRequireReq setGuaranteeAmt(BigDecimal guaranteeAmt) {
+        if (this.guaranteeAmt == null && guaranteeAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.guaranteeAmt != null && guaranteeAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.guaranteeAmt.compareTo(guaranteeAmt) != 0) {
+                this.guaranteeAmt = guaranteeAmt;
+                if (!this.toUpdateCols.contains("GUARANTEE_AMT")) {
+                    this.toUpdateCols.add("GUARANTEE_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.guaranteeAmt = guaranteeAmt;
+            if (!this.toUpdateCols.contains("GUARANTEE_AMT")) {
+                this.toUpdateCols.add("GUARANTEE_AMT");
+            }
+        }
         return this;
     }
 
     /**
      * 保函开始日期。
      */
-    public LocalDate guaranteeStartDate;
+    private LocalDate guaranteeStartDate;
 
     /**
      * 获取：保函开始日期。
@@ -723,14 +1442,66 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：保函开始日期。
      */
     public PoGuaranteeLetterRequireReq setGuaranteeStartDate(LocalDate guaranteeStartDate) {
-        this.guaranteeStartDate = guaranteeStartDate;
+        if (this.guaranteeStartDate == null && guaranteeStartDate == null) {
+            // 均为null，不做处理。
+        } else if (this.guaranteeStartDate != null && guaranteeStartDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.guaranteeStartDate.compareTo(guaranteeStartDate) != 0) {
+                this.guaranteeStartDate = guaranteeStartDate;
+                if (!this.toUpdateCols.contains("GUARANTEE_START_DATE")) {
+                    this.toUpdateCols.add("GUARANTEE_START_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.guaranteeStartDate = guaranteeStartDate;
+            if (!this.toUpdateCols.contains("GUARANTEE_START_DATE")) {
+                this.toUpdateCols.add("GUARANTEE_START_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 保函-到期类型。
+     */
+    private String guaranteeDateTypeId;
+
+    /**
+     * 获取：保函-到期类型。
+     */
+    public String getGuaranteeDateTypeId() {
+        return this.guaranteeDateTypeId;
+    }
+
+    /**
+     * 设置：保函-到期类型。
+     */
+    public PoGuaranteeLetterRequireReq setGuaranteeDateTypeId(String guaranteeDateTypeId) {
+        if (this.guaranteeDateTypeId == null && guaranteeDateTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.guaranteeDateTypeId != null && guaranteeDateTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.guaranteeDateTypeId.compareTo(guaranteeDateTypeId) != 0) {
+                this.guaranteeDateTypeId = guaranteeDateTypeId;
+                if (!this.toUpdateCols.contains("GUARANTEE_DATE_TYPE_ID")) {
+                    this.toUpdateCols.add("GUARANTEE_DATE_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.guaranteeDateTypeId = guaranteeDateTypeId;
+            if (!this.toUpdateCols.contains("GUARANTEE_DATE_TYPE_ID")) {
+                this.toUpdateCols.add("GUARANTEE_DATE_TYPE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 保函结束日期。
      */
-    public LocalDate guaranteeEndDate;
+    private LocalDate guaranteeEndDate;
 
     /**
      * 获取：保函结束日期。
@@ -743,14 +1514,66 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：保函结束日期。
      */
     public PoGuaranteeLetterRequireReq setGuaranteeEndDate(LocalDate guaranteeEndDate) {
-        this.guaranteeEndDate = guaranteeEndDate;
+        if (this.guaranteeEndDate == null && guaranteeEndDate == null) {
+            // 均为null，不做处理。
+        } else if (this.guaranteeEndDate != null && guaranteeEndDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.guaranteeEndDate.compareTo(guaranteeEndDate) != 0) {
+                this.guaranteeEndDate = guaranteeEndDate;
+                if (!this.toUpdateCols.contains("GUARANTEE_END_DATE")) {
+                    this.toUpdateCols.add("GUARANTEE_END_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.guaranteeEndDate = guaranteeEndDate;
+            if (!this.toUpdateCols.contains("GUARANTEE_END_DATE")) {
+                this.toUpdateCols.add("GUARANTEE_END_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 到期类型(填写)。
+     */
+    private String dateTypeWr;
+
+    /**
+     * 获取：到期类型(填写)。
+     */
+    public String getDateTypeWr() {
+        return this.dateTypeWr;
+    }
+
+    /**
+     * 设置：到期类型(填写)。
+     */
+    public PoGuaranteeLetterRequireReq setDateTypeWr(String dateTypeWr) {
+        if (this.dateTypeWr == null && dateTypeWr == null) {
+            // 均为null，不做处理。
+        } else if (this.dateTypeWr != null && dateTypeWr != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.dateTypeWr.compareTo(dateTypeWr) != 0) {
+                this.dateTypeWr = dateTypeWr;
+                if (!this.toUpdateCols.contains("DATE_TYPE_WR")) {
+                    this.toUpdateCols.add("DATE_TYPE_WR");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.dateTypeWr = dateTypeWr;
+            if (!this.toUpdateCols.contains("DATE_TYPE_WR")) {
+                this.toUpdateCols.add("DATE_TYPE_WR");
+            }
+        }
         return this;
     }
 
     /**
      * 附件。
      */
-    public String attFileGroupId;
+    private String attFileGroupId;
 
     /**
      * 获取：附件。
@@ -763,14 +1586,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：附件。
      */
     public PoGuaranteeLetterRequireReq setAttFileGroupId(String attFileGroupId) {
-        this.attFileGroupId = attFileGroupId;
+        if (this.attFileGroupId == null && attFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.attFileGroupId != null && attFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.attFileGroupId.compareTo(attFileGroupId) != 0) {
+                this.attFileGroupId = attFileGroupId;
+                if (!this.toUpdateCols.contains("ATT_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("ATT_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.attFileGroupId = attFileGroupId;
+            if (!this.toUpdateCols.contains("ATT_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("ATT_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 保函材料。
      */
-    public String guaranteeFile;
+    private String guaranteeFile;
 
     /**
      * 获取：保函材料。
@@ -783,14 +1622,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：保函材料。
      */
     public PoGuaranteeLetterRequireReq setGuaranteeFile(String guaranteeFile) {
-        this.guaranteeFile = guaranteeFile;
+        if (this.guaranteeFile == null && guaranteeFile == null) {
+            // 均为null，不做处理。
+        } else if (this.guaranteeFile != null && guaranteeFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.guaranteeFile.compareTo(guaranteeFile) != 0) {
+                this.guaranteeFile = guaranteeFile;
+                if (!this.toUpdateCols.contains("GUARANTEE_FILE")) {
+                    this.toUpdateCols.add("GUARANTEE_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.guaranteeFile = guaranteeFile;
+            if (!this.toUpdateCols.contains("GUARANTEE_FILE")) {
+                this.toUpdateCols.add("GUARANTEE_FILE");
+            }
+        }
         return this;
     }
 
     /**
      * 保函结果材料。
      */
-    public String guaranteeResultFile;
+    private String guaranteeResultFile;
 
     /**
      * 获取：保函结果材料。
@@ -803,14 +1658,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：保函结果材料。
      */
     public PoGuaranteeLetterRequireReq setGuaranteeResultFile(String guaranteeResultFile) {
-        this.guaranteeResultFile = guaranteeResultFile;
+        if (this.guaranteeResultFile == null && guaranteeResultFile == null) {
+            // 均为null，不做处理。
+        } else if (this.guaranteeResultFile != null && guaranteeResultFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.guaranteeResultFile.compareTo(guaranteeResultFile) != 0) {
+                this.guaranteeResultFile = guaranteeResultFile;
+                if (!this.toUpdateCols.contains("GUARANTEE_RESULT_FILE")) {
+                    this.toUpdateCols.add("GUARANTEE_RESULT_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.guaranteeResultFile = guaranteeResultFile;
+            if (!this.toUpdateCols.contains("GUARANTEE_RESULT_FILE")) {
+                this.toUpdateCols.add("GUARANTEE_RESULT_FILE");
+            }
+        }
         return this;
     }
 
     /**
      * 意见发表人。
      */
-    public String commentPublishUser;
+    private String commentPublishUser;
 
     /**
      * 获取：意见发表人。
@@ -823,14 +1694,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：意见发表人。
      */
     public PoGuaranteeLetterRequireReq setCommentPublishUser(String commentPublishUser) {
-        this.commentPublishUser = commentPublishUser;
+        if (this.commentPublishUser == null && commentPublishUser == null) {
+            // 均为null，不做处理。
+        } else if (this.commentPublishUser != null && commentPublishUser != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.commentPublishUser.compareTo(commentPublishUser) != 0) {
+                this.commentPublishUser = commentPublishUser;
+                if (!this.toUpdateCols.contains("COMMENT_PUBLISH_USER")) {
+                    this.toUpdateCols.add("COMMENT_PUBLISH_USER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.commentPublishUser = commentPublishUser;
+            if (!this.toUpdateCols.contains("COMMENT_PUBLISH_USER")) {
+                this.toUpdateCols.add("COMMENT_PUBLISH_USER");
+            }
+        }
         return this;
     }
 
     /**
      * 意见发表日期。
      */
-    public LocalDate commentPublishDate;
+    private LocalDate commentPublishDate;
 
     /**
      * 获取：意见发表日期。
@@ -843,14 +1730,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：意见发表日期。
      */
     public PoGuaranteeLetterRequireReq setCommentPublishDate(LocalDate commentPublishDate) {
-        this.commentPublishDate = commentPublishDate;
+        if (this.commentPublishDate == null && commentPublishDate == null) {
+            // 均为null，不做处理。
+        } else if (this.commentPublishDate != null && commentPublishDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.commentPublishDate.compareTo(commentPublishDate) != 0) {
+                this.commentPublishDate = commentPublishDate;
+                if (!this.toUpdateCols.contains("COMMENT_PUBLISH_DATE")) {
+                    this.toUpdateCols.add("COMMENT_PUBLISH_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.commentPublishDate = commentPublishDate;
+            if (!this.toUpdateCols.contains("COMMENT_PUBLISH_DATE")) {
+                this.toUpdateCols.add("COMMENT_PUBLISH_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 意见内容。
      */
-    public String commentPublishContent;
+    private String commentPublishContent;
 
     /**
      * 获取：意见内容。
@@ -863,14 +1766,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：意见内容。
      */
     public PoGuaranteeLetterRequireReq setCommentPublishContent(String commentPublishContent) {
-        this.commentPublishContent = commentPublishContent;
+        if (this.commentPublishContent == null && commentPublishContent == null) {
+            // 均为null，不做处理。
+        } else if (this.commentPublishContent != null && commentPublishContent != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.commentPublishContent.compareTo(commentPublishContent) != 0) {
+                this.commentPublishContent = commentPublishContent;
+                if (!this.toUpdateCols.contains("COMMENT_PUBLISH_CONTENT")) {
+                    this.toUpdateCols.add("COMMENT_PUBLISH_CONTENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.commentPublishContent = commentPublishContent;
+            if (!this.toUpdateCols.contains("COMMENT_PUBLISH_CONTENT")) {
+                this.toUpdateCols.add("COMMENT_PUBLISH_CONTENT");
+            }
+        }
         return this;
     }
 
     /**
      * 财务意见发表人。
      */
-    public String financePublishUser;
+    private String financePublishUser;
 
     /**
      * 获取：财务意见发表人。
@@ -883,14 +1802,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：财务意见发表人。
      */
     public PoGuaranteeLetterRequireReq setFinancePublishUser(String financePublishUser) {
-        this.financePublishUser = financePublishUser;
+        if (this.financePublishUser == null && financePublishUser == null) {
+            // 均为null，不做处理。
+        } else if (this.financePublishUser != null && financePublishUser != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.financePublishUser.compareTo(financePublishUser) != 0) {
+                this.financePublishUser = financePublishUser;
+                if (!this.toUpdateCols.contains("FINANCE_PUBLISH_USER")) {
+                    this.toUpdateCols.add("FINANCE_PUBLISH_USER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.financePublishUser = financePublishUser;
+            if (!this.toUpdateCols.contains("FINANCE_PUBLISH_USER")) {
+                this.toUpdateCols.add("FINANCE_PUBLISH_USER");
+            }
+        }
         return this;
     }
 
     /**
      * 财务意见发表日期。
      */
-    public LocalDate financePublishDate;
+    private LocalDate financePublishDate;
 
     /**
      * 获取：财务意见发表日期。
@@ -903,14 +1838,30 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：财务意见发表日期。
      */
     public PoGuaranteeLetterRequireReq setFinancePublishDate(LocalDate financePublishDate) {
-        this.financePublishDate = financePublishDate;
+        if (this.financePublishDate == null && financePublishDate == null) {
+            // 均为null，不做处理。
+        } else if (this.financePublishDate != null && financePublishDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.financePublishDate.compareTo(financePublishDate) != 0) {
+                this.financePublishDate = financePublishDate;
+                if (!this.toUpdateCols.contains("FINANCE_PUBLISH_DATE")) {
+                    this.toUpdateCols.add("FINANCE_PUBLISH_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.financePublishDate = financePublishDate;
+            if (!this.toUpdateCols.contains("FINANCE_PUBLISH_DATE")) {
+                this.toUpdateCols.add("FINANCE_PUBLISH_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 财务意见。
      */
-    public String financeMessage;
+    private String financeMessage;
 
     /**
      * 获取：财务意见。
@@ -923,7 +1874,23 @@ public class PoGuaranteeLetterRequireReq {
      * 设置：财务意见。
      */
     public PoGuaranteeLetterRequireReq setFinanceMessage(String financeMessage) {
-        this.financeMessage = financeMessage;
+        if (this.financeMessage == null && financeMessage == null) {
+            // 均为null，不做处理。
+        } else if (this.financeMessage != null && financeMessage != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.financeMessage.compareTo(financeMessage) != 0) {
+                this.financeMessage = financeMessage;
+                if (!this.toUpdateCols.contains("FINANCE_MESSAGE")) {
+                    this.toUpdateCols.add("FINANCE_MESSAGE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.financeMessage = financeMessage;
+            if (!this.toUpdateCols.contains("FINANCE_MESSAGE")) {
+                this.toUpdateCols.add("FINANCE_MESSAGE");
+            }
+        }
         return this;
     }
 
@@ -941,6 +1908,7 @@ public class PoGuaranteeLetterRequireReq {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -951,7 +1919,17 @@ public class PoGuaranteeLetterRequireReq {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -972,7 +1950,8 @@ public class PoGuaranteeLetterRequireReq {
      * @return
      */
     public static PoGuaranteeLetterRequireReq newData() {
-        return modelHelper.newData();
+        PoGuaranteeLetterRequireReq obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -981,7 +1960,8 @@ public class PoGuaranteeLetterRequireReq {
      * @return
      */
     public static PoGuaranteeLetterRequireReq insertData() {
-        return modelHelper.insertData();
+        PoGuaranteeLetterRequireReq obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -993,7 +1973,8 @@ public class PoGuaranteeLetterRequireReq {
      * @return 获取到的对象，若无则为null。
      */
     public static PoGuaranteeLetterRequireReq selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        PoGuaranteeLetterRequireReq obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -1005,7 +1986,8 @@ public class PoGuaranteeLetterRequireReq {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PoGuaranteeLetterRequireReq> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<PoGuaranteeLetterRequireReq> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -1017,7 +1999,8 @@ public class PoGuaranteeLetterRequireReq {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PoGuaranteeLetterRequireReq> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<PoGuaranteeLetterRequireReq> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

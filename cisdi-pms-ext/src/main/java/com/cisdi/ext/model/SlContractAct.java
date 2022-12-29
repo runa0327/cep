@@ -4,9 +4,12 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +22,18 @@ public class SlContractAct {
      * 模型助手。
      */
     private static final ModelHelper<SlContractAct> modelHelper = new ModelHelper<>("SL_CONTRACT_ACT", new SlContractAct());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -122,7 +137,7 @@ public class SlContractAct {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -135,14 +150,30 @@ public class SlContractAct {
      * 设置：ID。
      */
     public SlContractAct setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -155,14 +186,30 @@ public class SlContractAct {
      * 设置：版本。
      */
     public SlContractAct setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -175,14 +222,30 @@ public class SlContractAct {
      * 设置：时间戳。
      */
     public SlContractAct setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -195,14 +258,30 @@ public class SlContractAct {
      * 设置：是否预设。
      */
     public SlContractAct setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -215,14 +294,30 @@ public class SlContractAct {
      * 设置：创建日期时间。
      */
     public SlContractAct setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -235,14 +330,30 @@ public class SlContractAct {
      * 设置：创建用户。
      */
     public SlContractAct setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -255,14 +366,30 @@ public class SlContractAct {
      * 设置：最后修改日期时间。
      */
     public SlContractAct setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -275,14 +402,30 @@ public class SlContractAct {
      * 设置：最后修改用户。
      */
     public SlContractAct setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -295,14 +438,30 @@ public class SlContractAct {
      * 设置：记录状态。
      */
     public SlContractAct setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -315,14 +474,30 @@ public class SlContractAct {
      * 设置：锁定流程实例。
      */
     public SlContractAct setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -335,14 +510,30 @@ public class SlContractAct {
      * 设置：代码。
      */
     public SlContractAct setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -355,14 +546,30 @@ public class SlContractAct {
      * 设置：名称。
      */
     public SlContractAct setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 组织。
      */
-    public String slOrgId;
+    private String slOrgId;
 
     /**
      * 获取：组织。
@@ -375,14 +582,30 @@ public class SlContractAct {
      * 设置：组织。
      */
     public SlContractAct setSlOrgId(String slOrgId) {
-        this.slOrgId = slOrgId;
+        if (this.slOrgId == null && slOrgId == null) {
+            // 均为null，不做处理。
+        } else if (this.slOrgId != null && slOrgId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.slOrgId.compareTo(slOrgId) != 0) {
+                this.slOrgId = slOrgId;
+                if (!this.toUpdateCols.contains("SL_ORG_ID")) {
+                    this.toUpdateCols.add("SL_ORG_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.slOrgId = slOrgId;
+            if (!this.toUpdateCols.contains("SL_ORG_ID")) {
+                this.toUpdateCols.add("SL_ORG_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 区域。
      */
-    public String slRegionId;
+    private String slRegionId;
 
     /**
      * 获取：区域。
@@ -395,14 +618,30 @@ public class SlContractAct {
      * 设置：区域。
      */
     public SlContractAct setSlRegionId(String slRegionId) {
-        this.slRegionId = slRegionId;
+        if (this.slRegionId == null && slRegionId == null) {
+            // 均为null，不做处理。
+        } else if (this.slRegionId != null && slRegionId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.slRegionId.compareTo(slRegionId) != 0) {
+                this.slRegionId = slRegionId;
+                if (!this.toUpdateCols.contains("SL_REGION_ID")) {
+                    this.toUpdateCols.add("SL_REGION_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.slRegionId = slRegionId;
+            if (!this.toUpdateCols.contains("SL_REGION_ID")) {
+                this.toUpdateCols.add("SL_REGION_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 承包模式列表。
      */
-    public String slContractType02Ids;
+    private String slContractType02Ids;
 
     /**
      * 获取：承包模式列表。
@@ -415,14 +654,30 @@ public class SlContractAct {
      * 设置：承包模式列表。
      */
     public SlContractAct setSlContractType02Ids(String slContractType02Ids) {
-        this.slContractType02Ids = slContractType02Ids;
+        if (this.slContractType02Ids == null && slContractType02Ids == null) {
+            // 均为null，不做处理。
+        } else if (this.slContractType02Ids != null && slContractType02Ids != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.slContractType02Ids.compareTo(slContractType02Ids) != 0) {
+                this.slContractType02Ids = slContractType02Ids;
+                if (!this.toUpdateCols.contains("SL_CONTRACT_TYPE02_IDS")) {
+                    this.toUpdateCols.add("SL_CONTRACT_TYPE02_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.slContractType02Ids = slContractType02Ids;
+            if (!this.toUpdateCols.contains("SL_CONTRACT_TYPE02_IDS")) {
+                this.toUpdateCols.add("SL_CONTRACT_TYPE02_IDS");
+            }
+        }
         return this;
     }
 
     /**
      * 商业模式。
      */
-    public String slContractType03Id;
+    private String slContractType03Id;
 
     /**
      * 获取：商业模式。
@@ -435,14 +690,30 @@ public class SlContractAct {
      * 设置：商业模式。
      */
     public SlContractAct setSlContractType03Id(String slContractType03Id) {
-        this.slContractType03Id = slContractType03Id;
+        if (this.slContractType03Id == null && slContractType03Id == null) {
+            // 均为null，不做处理。
+        } else if (this.slContractType03Id != null && slContractType03Id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.slContractType03Id.compareTo(slContractType03Id) != 0) {
+                this.slContractType03Id = slContractType03Id;
+                if (!this.toUpdateCols.contains("SL_CONTRACT_TYPE03_ID")) {
+                    this.toUpdateCols.add("SL_CONTRACT_TYPE03_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.slContractType03Id = slContractType03Id;
+            if (!this.toUpdateCols.contains("SL_CONTRACT_TYPE03_ID")) {
+                this.toUpdateCols.add("SL_CONTRACT_TYPE03_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 项目资质。
      */
-    public String slContractType01Id;
+    private String slContractType01Id;
 
     /**
      * 获取：项目资质。
@@ -455,34 +726,66 @@ public class SlContractAct {
      * 设置：项目资质。
      */
     public SlContractAct setSlContractType01Id(String slContractType01Id) {
-        this.slContractType01Id = slContractType01Id;
+        if (this.slContractType01Id == null && slContractType01Id == null) {
+            // 均为null，不做处理。
+        } else if (this.slContractType01Id != null && slContractType01Id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.slContractType01Id.compareTo(slContractType01Id) != 0) {
+                this.slContractType01Id = slContractType01Id;
+                if (!this.toUpdateCols.contains("SL_CONTRACT_TYPE01_ID")) {
+                    this.toUpdateCols.add("SL_CONTRACT_TYPE01_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.slContractType01Id = slContractType01Id;
+            if (!this.toUpdateCols.contains("SL_CONTRACT_TYPE01_ID")) {
+                this.toUpdateCols.add("SL_CONTRACT_TYPE01_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 签订金额。
      */
-    public Double signAmt;
+    private BigDecimal signAmt;
 
     /**
      * 获取：签订金额。
      */
-    public Double getSignAmt() {
+    public BigDecimal getSignAmt() {
         return this.signAmt;
     }
 
     /**
      * 设置：签订金额。
      */
-    public SlContractAct setSignAmt(Double signAmt) {
-        this.signAmt = signAmt;
+    public SlContractAct setSignAmt(BigDecimal signAmt) {
+        if (this.signAmt == null && signAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.signAmt != null && signAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.signAmt.compareTo(signAmt) != 0) {
+                this.signAmt = signAmt;
+                if (!this.toUpdateCols.contains("SIGN_AMT")) {
+                    this.toUpdateCols.add("SIGN_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.signAmt = signAmt;
+            if (!this.toUpdateCols.contains("SIGN_AMT")) {
+                this.toUpdateCols.add("SIGN_AMT");
+            }
+        }
         return this;
     }
 
     /**
      * 签订日期。
      */
-    public LocalDate signDate;
+    private LocalDate signDate;
 
     /**
      * 获取：签订日期。
@@ -495,14 +798,30 @@ public class SlContractAct {
      * 设置：签订日期。
      */
     public SlContractAct setSignDate(LocalDate signDate) {
-        this.signDate = signDate;
+        if (this.signDate == null && signDate == null) {
+            // 均为null，不做处理。
+        } else if (this.signDate != null && signDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.signDate.compareTo(signDate) != 0) {
+                this.signDate = signDate;
+                if (!this.toUpdateCols.contains("SIGN_DATE")) {
+                    this.toUpdateCols.add("SIGN_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.signDate = signDate;
+            if (!this.toUpdateCols.contains("SIGN_DATE")) {
+                this.toUpdateCols.add("SIGN_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -515,7 +834,23 @@ public class SlContractAct {
      * 设置：备注。
      */
     public SlContractAct setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
@@ -533,6 +868,7 @@ public class SlContractAct {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -543,7 +879,17 @@ public class SlContractAct {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -564,7 +910,8 @@ public class SlContractAct {
      * @return
      */
     public static SlContractAct newData() {
-        return modelHelper.newData();
+        SlContractAct obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -573,7 +920,8 @@ public class SlContractAct {
      * @return
      */
     public static SlContractAct insertData() {
-        return modelHelper.insertData();
+        SlContractAct obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -585,7 +933,8 @@ public class SlContractAct {
      * @return 获取到的对象，若无则为null。
      */
     public static SlContractAct selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        SlContractAct obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -597,7 +946,8 @@ public class SlContractAct {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<SlContractAct> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<SlContractAct> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -609,7 +959,8 @@ public class SlContractAct {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<SlContractAct> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<SlContractAct> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

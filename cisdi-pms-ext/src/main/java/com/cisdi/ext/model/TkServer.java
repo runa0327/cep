@@ -4,8 +4,10 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +20,18 @@ public class TkServer {
      * 模型助手。
      */
     private static final ModelHelper<TkServer> modelHelper = new ModelHelper<>("TK_SERVER", new TkServer());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -121,7 +135,7 @@ public class TkServer {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -134,14 +148,30 @@ public class TkServer {
      * 设置：ID。
      */
     public TkServer setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -154,14 +184,30 @@ public class TkServer {
      * 设置：版本。
      */
     public TkServer setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -174,14 +220,30 @@ public class TkServer {
      * 设置：时间戳。
      */
     public TkServer setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -194,14 +256,30 @@ public class TkServer {
      * 设置：是否预设。
      */
     public TkServer setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -214,14 +292,30 @@ public class TkServer {
      * 设置：创建日期时间。
      */
     public TkServer setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -234,14 +328,30 @@ public class TkServer {
      * 设置：创建用户。
      */
     public TkServer setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -254,14 +364,30 @@ public class TkServer {
      * 设置：最后修改日期时间。
      */
     public TkServer setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -274,14 +400,30 @@ public class TkServer {
      * 设置：最后修改用户。
      */
     public TkServer setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -294,14 +436,30 @@ public class TkServer {
      * 设置：记录状态。
      */
     public TkServer setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -314,14 +472,30 @@ public class TkServer {
      * 设置：锁定流程实例。
      */
     public TkServer setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -334,14 +508,30 @@ public class TkServer {
      * 设置：代码。
      */
     public TkServer setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -354,14 +544,30 @@ public class TkServer {
      * 设置：名称。
      */
     public TkServer setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -374,14 +580,30 @@ public class TkServer {
      * 设置：备注。
      */
     public TkServer setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 服务器IP。
      */
-    public String serverIp;
+    private String serverIp;
 
     /**
      * 获取：服务器IP。
@@ -394,14 +616,30 @@ public class TkServer {
      * 设置：服务器IP。
      */
     public TkServer setServerIp(String serverIp) {
-        this.serverIp = serverIp;
+        if (this.serverIp == null && serverIp == null) {
+            // 均为null，不做处理。
+        } else if (this.serverIp != null && serverIp != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.serverIp.compareTo(serverIp) != 0) {
+                this.serverIp = serverIp;
+                if (!this.toUpdateCols.contains("SERVER_IP")) {
+                    this.toUpdateCols.add("SERVER_IP");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.serverIp = serverIp;
+            if (!this.toUpdateCols.contains("SERVER_IP")) {
+                this.toUpdateCols.add("SERVER_IP");
+            }
+        }
         return this;
     }
 
     /**
      * 心跳线ID。
      */
-    public String heartBeatLineId;
+    private String heartBeatLineId;
 
     /**
      * 获取：心跳线ID。
@@ -414,14 +652,30 @@ public class TkServer {
      * 设置：心跳线ID。
      */
     public TkServer setHeartBeatLineId(String heartBeatLineId) {
-        this.heartBeatLineId = heartBeatLineId;
+        if (this.heartBeatLineId == null && heartBeatLineId == null) {
+            // 均为null，不做处理。
+        } else if (this.heartBeatLineId != null && heartBeatLineId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.heartBeatLineId.compareTo(heartBeatLineId) != 0) {
+                this.heartBeatLineId = heartBeatLineId;
+                if (!this.toUpdateCols.contains("HEART_BEAT_LINE_ID")) {
+                    this.toUpdateCols.add("HEART_BEAT_LINE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.heartBeatLineId = heartBeatLineId;
+            if (!this.toUpdateCols.contains("HEART_BEAT_LINE_ID")) {
+                this.toUpdateCols.add("HEART_BEAT_LINE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 心跳次数。
      */
-    public Integer heartBeatCt;
+    private Integer heartBeatCt;
 
     /**
      * 获取：心跳次数。
@@ -434,14 +688,30 @@ public class TkServer {
      * 设置：心跳次数。
      */
     public TkServer setHeartBeatCt(Integer heartBeatCt) {
-        this.heartBeatCt = heartBeatCt;
+        if (this.heartBeatCt == null && heartBeatCt == null) {
+            // 均为null，不做处理。
+        } else if (this.heartBeatCt != null && heartBeatCt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.heartBeatCt.compareTo(heartBeatCt) != 0) {
+                this.heartBeatCt = heartBeatCt;
+                if (!this.toUpdateCols.contains("HEART_BEAT_CT")) {
+                    this.toUpdateCols.add("HEART_BEAT_CT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.heartBeatCt = heartBeatCt;
+            if (!this.toUpdateCols.contains("HEART_BEAT_CT")) {
+                this.toUpdateCols.add("HEART_BEAT_CT");
+            }
+        }
         return this;
     }
 
     /**
      * 首次心跳日期时间。
      */
-    public LocalDateTime firstHeartBeatDttm;
+    private LocalDateTime firstHeartBeatDttm;
 
     /**
      * 获取：首次心跳日期时间。
@@ -454,14 +724,30 @@ public class TkServer {
      * 设置：首次心跳日期时间。
      */
     public TkServer setFirstHeartBeatDttm(LocalDateTime firstHeartBeatDttm) {
-        this.firstHeartBeatDttm = firstHeartBeatDttm;
+        if (this.firstHeartBeatDttm == null && firstHeartBeatDttm == null) {
+            // 均为null，不做处理。
+        } else if (this.firstHeartBeatDttm != null && firstHeartBeatDttm != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.firstHeartBeatDttm.compareTo(firstHeartBeatDttm) != 0) {
+                this.firstHeartBeatDttm = firstHeartBeatDttm;
+                if (!this.toUpdateCols.contains("FIRST_HEART_BEAT_DTTM")) {
+                    this.toUpdateCols.add("FIRST_HEART_BEAT_DTTM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.firstHeartBeatDttm = firstHeartBeatDttm;
+            if (!this.toUpdateCols.contains("FIRST_HEART_BEAT_DTTM")) {
+                this.toUpdateCols.add("FIRST_HEART_BEAT_DTTM");
+            }
+        }
         return this;
     }
 
     /**
      * 最近心跳日期时间。
      */
-    public LocalDateTime latestHeartBeatDttm;
+    private LocalDateTime latestHeartBeatDttm;
 
     /**
      * 获取：最近心跳日期时间。
@@ -474,14 +760,30 @@ public class TkServer {
      * 设置：最近心跳日期时间。
      */
     public TkServer setLatestHeartBeatDttm(LocalDateTime latestHeartBeatDttm) {
-        this.latestHeartBeatDttm = latestHeartBeatDttm;
+        if (this.latestHeartBeatDttm == null && latestHeartBeatDttm == null) {
+            // 均为null，不做处理。
+        } else if (this.latestHeartBeatDttm != null && latestHeartBeatDttm != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.latestHeartBeatDttm.compareTo(latestHeartBeatDttm) != 0) {
+                this.latestHeartBeatDttm = latestHeartBeatDttm;
+                if (!this.toUpdateCols.contains("LATEST_HEART_BEAT_DTTM")) {
+                    this.toUpdateCols.add("LATEST_HEART_BEAT_DTTM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.latestHeartBeatDttm = latestHeartBeatDttm;
+            if (!this.toUpdateCols.contains("LATEST_HEART_BEAT_DTTM")) {
+                this.toUpdateCols.add("LATEST_HEART_BEAT_DTTM");
+            }
+        }
         return this;
     }
 
     /**
      * 下次心跳日期时间。
      */
-    public LocalDateTime nextHeartBeatDttm;
+    private LocalDateTime nextHeartBeatDttm;
 
     /**
      * 获取：下次心跳日期时间。
@@ -494,14 +796,30 @@ public class TkServer {
      * 设置：下次心跳日期时间。
      */
     public TkServer setNextHeartBeatDttm(LocalDateTime nextHeartBeatDttm) {
-        this.nextHeartBeatDttm = nextHeartBeatDttm;
+        if (this.nextHeartBeatDttm == null && nextHeartBeatDttm == null) {
+            // 均为null，不做处理。
+        } else if (this.nextHeartBeatDttm != null && nextHeartBeatDttm != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.nextHeartBeatDttm.compareTo(nextHeartBeatDttm) != 0) {
+                this.nextHeartBeatDttm = nextHeartBeatDttm;
+                if (!this.toUpdateCols.contains("NEXT_HEART_BEAT_DTTM")) {
+                    this.toUpdateCols.add("NEXT_HEART_BEAT_DTTM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.nextHeartBeatDttm = nextHeartBeatDttm;
+            if (!this.toUpdateCols.contains("NEXT_HEART_BEAT_DTTM")) {
+                this.toUpdateCols.add("NEXT_HEART_BEAT_DTTM");
+            }
+        }
         return this;
     }
 
     /**
      * 过期心跳日期时间。
      */
-    public LocalDateTime expireHeartBeatDttm;
+    private LocalDateTime expireHeartBeatDttm;
 
     /**
      * 获取：过期心跳日期时间。
@@ -514,7 +832,23 @@ public class TkServer {
      * 设置：过期心跳日期时间。
      */
     public TkServer setExpireHeartBeatDttm(LocalDateTime expireHeartBeatDttm) {
-        this.expireHeartBeatDttm = expireHeartBeatDttm;
+        if (this.expireHeartBeatDttm == null && expireHeartBeatDttm == null) {
+            // 均为null，不做处理。
+        } else if (this.expireHeartBeatDttm != null && expireHeartBeatDttm != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.expireHeartBeatDttm.compareTo(expireHeartBeatDttm) != 0) {
+                this.expireHeartBeatDttm = expireHeartBeatDttm;
+                if (!this.toUpdateCols.contains("EXPIRE_HEART_BEAT_DTTM")) {
+                    this.toUpdateCols.add("EXPIRE_HEART_BEAT_DTTM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.expireHeartBeatDttm = expireHeartBeatDttm;
+            if (!this.toUpdateCols.contains("EXPIRE_HEART_BEAT_DTTM")) {
+                this.toUpdateCols.add("EXPIRE_HEART_BEAT_DTTM");
+            }
+        }
         return this;
     }
 
@@ -532,6 +866,7 @@ public class TkServer {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -542,7 +877,17 @@ public class TkServer {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -563,7 +908,8 @@ public class TkServer {
      * @return
      */
     public static TkServer newData() {
-        return modelHelper.newData();
+        TkServer obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -572,7 +918,8 @@ public class TkServer {
      * @return
      */
     public static TkServer insertData() {
-        return modelHelper.insertData();
+        TkServer obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -584,7 +931,8 @@ public class TkServer {
      * @return 获取到的对象，若无则为null。
      */
     public static TkServer selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        TkServer obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -596,7 +944,8 @@ public class TkServer {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<TkServer> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<TkServer> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -608,7 +957,8 @@ public class TkServer {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<TkServer> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<TkServer> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

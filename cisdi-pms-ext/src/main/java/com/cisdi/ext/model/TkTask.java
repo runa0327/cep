@@ -4,8 +4,10 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +20,18 @@ public class TkTask {
      * 模型助手。
      */
     private static final ModelHelper<TkTask> modelHelper = new ModelHelper<>("TK_TASK", new TkTask());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -133,7 +147,7 @@ public class TkTask {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -146,14 +160,30 @@ public class TkTask {
      * 设置：ID。
      */
     public TkTask setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -166,14 +196,30 @@ public class TkTask {
      * 设置：版本。
      */
     public TkTask setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -186,14 +232,30 @@ public class TkTask {
      * 设置：时间戳。
      */
     public TkTask setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -206,14 +268,30 @@ public class TkTask {
      * 设置：是否预设。
      */
     public TkTask setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -226,14 +304,30 @@ public class TkTask {
      * 设置：创建日期时间。
      */
     public TkTask setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -246,14 +340,30 @@ public class TkTask {
      * 设置：创建用户。
      */
     public TkTask setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -266,14 +376,30 @@ public class TkTask {
      * 设置：最后修改日期时间。
      */
     public TkTask setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -286,14 +412,30 @@ public class TkTask {
      * 设置：最后修改用户。
      */
     public TkTask setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -306,14 +448,30 @@ public class TkTask {
      * 设置：记录状态。
      */
     public TkTask setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -326,14 +484,30 @@ public class TkTask {
      * 设置：锁定流程实例。
      */
     public TkTask setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -346,14 +520,30 @@ public class TkTask {
      * 设置：代码。
      */
     public TkTask setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -366,14 +556,30 @@ public class TkTask {
      * 设置：名称。
      */
     public TkTask setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -386,14 +592,30 @@ public class TkTask {
      * 设置：备注。
      */
     public TkTask setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 任务调度类型。
      */
-    public String taskScheduleTypeId;
+    private String taskScheduleTypeId;
 
     /**
      * 获取：任务调度类型。
@@ -406,14 +628,30 @@ public class TkTask {
      * 设置：任务调度类型。
      */
     public TkTask setTaskScheduleTypeId(String taskScheduleTypeId) {
-        this.taskScheduleTypeId = taskScheduleTypeId;
+        if (this.taskScheduleTypeId == null && taskScheduleTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.taskScheduleTypeId != null && taskScheduleTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.taskScheduleTypeId.compareTo(taskScheduleTypeId) != 0) {
+                this.taskScheduleTypeId = taskScheduleTypeId;
+                if (!this.toUpdateCols.contains("TASK_SCHEDULE_TYPE_ID")) {
+                    this.toUpdateCols.add("TASK_SCHEDULE_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.taskScheduleTypeId = taskScheduleTypeId;
+            if (!this.toUpdateCols.contains("TASK_SCHEDULE_TYPE_ID")) {
+                this.toUpdateCols.add("TASK_SCHEDULE_TYPE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 任务调度值。
      */
-    public String taskScheduleValue;
+    private String taskScheduleValue;
 
     /**
      * 获取：任务调度值。
@@ -426,14 +664,30 @@ public class TkTask {
      * 设置：任务调度值。
      */
     public TkTask setTaskScheduleValue(String taskScheduleValue) {
-        this.taskScheduleValue = taskScheduleValue;
+        if (this.taskScheduleValue == null && taskScheduleValue == null) {
+            // 均为null，不做处理。
+        } else if (this.taskScheduleValue != null && taskScheduleValue != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.taskScheduleValue.compareTo(taskScheduleValue) != 0) {
+                this.taskScheduleValue = taskScheduleValue;
+                if (!this.toUpdateCols.contains("TASK_SCHEDULE_VALUE")) {
+                    this.toUpdateCols.add("TASK_SCHEDULE_VALUE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.taskScheduleValue = taskScheduleValue;
+            if (!this.toUpdateCols.contains("TASK_SCHEDULE_VALUE")) {
+                this.toUpdateCols.add("TASK_SCHEDULE_VALUE");
+            }
+        }
         return this;
     }
 
     /**
      * 重复次数。
      */
-    public Integer repeatCount;
+    private Integer repeatCount;
 
     /**
      * 获取：重复次数。
@@ -446,14 +700,30 @@ public class TkTask {
      * 设置：重复次数。
      */
     public TkTask setRepeatCount(Integer repeatCount) {
-        this.repeatCount = repeatCount;
+        if (this.repeatCount == null && repeatCount == null) {
+            // 均为null，不做处理。
+        } else if (this.repeatCount != null && repeatCount != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.repeatCount.compareTo(repeatCount) != 0) {
+                this.repeatCount = repeatCount;
+                if (!this.toUpdateCols.contains("REPEAT_COUNT")) {
+                    this.toUpdateCols.add("REPEAT_COUNT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.repeatCount = repeatCount;
+            if (!this.toUpdateCols.contains("REPEAT_COUNT")) {
+                this.toUpdateCols.add("REPEAT_COUNT");
+            }
+        }
         return this;
     }
 
     /**
      * 开始日期时间。
      */
-    public LocalDateTime startDatetime;
+    private LocalDateTime startDatetime;
 
     /**
      * 获取：开始日期时间。
@@ -466,14 +736,30 @@ public class TkTask {
      * 设置：开始日期时间。
      */
     public TkTask setStartDatetime(LocalDateTime startDatetime) {
-        this.startDatetime = startDatetime;
+        if (this.startDatetime == null && startDatetime == null) {
+            // 均为null，不做处理。
+        } else if (this.startDatetime != null && startDatetime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.startDatetime.compareTo(startDatetime) != 0) {
+                this.startDatetime = startDatetime;
+                if (!this.toUpdateCols.contains("START_DATETIME")) {
+                    this.toUpdateCols.add("START_DATETIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.startDatetime = startDatetime;
+            if (!this.toUpdateCols.contains("START_DATETIME")) {
+                this.toUpdateCols.add("START_DATETIME");
+            }
+        }
         return this;
     }
 
     /**
      * 结束日期时间。
      */
-    public LocalDateTime endDatetime;
+    private LocalDateTime endDatetime;
 
     /**
      * 获取：结束日期时间。
@@ -486,14 +772,30 @@ public class TkTask {
      * 设置：结束日期时间。
      */
     public TkTask setEndDatetime(LocalDateTime endDatetime) {
-        this.endDatetime = endDatetime;
+        if (this.endDatetime == null && endDatetime == null) {
+            // 均为null，不做处理。
+        } else if (this.endDatetime != null && endDatetime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.endDatetime.compareTo(endDatetime) != 0) {
+                this.endDatetime = endDatetime;
+                if (!this.toUpdateCols.contains("END_DATETIME")) {
+                    this.toUpdateCols.add("END_DATETIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.endDatetime = endDatetime;
+            if (!this.toUpdateCols.contains("END_DATETIME")) {
+                this.toUpdateCols.add("END_DATETIME");
+            }
+        }
         return this;
     }
 
     /**
      * 出错回滚。
      */
-    public Boolean rollbackOnError;
+    private Boolean rollbackOnError;
 
     /**
      * 获取：出错回滚。
@@ -506,14 +808,30 @@ public class TkTask {
      * 设置：出错回滚。
      */
     public TkTask setRollbackOnError(Boolean rollbackOnError) {
-        this.rollbackOnError = rollbackOnError;
+        if (this.rollbackOnError == null && rollbackOnError == null) {
+            // 均为null，不做处理。
+        } else if (this.rollbackOnError != null && rollbackOnError != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.rollbackOnError.compareTo(rollbackOnError) != 0) {
+                this.rollbackOnError = rollbackOnError;
+                if (!this.toUpdateCols.contains("ROLLBACK_ON_ERROR")) {
+                    this.toUpdateCols.add("ROLLBACK_ON_ERROR");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.rollbackOnError = rollbackOnError;
+            if (!this.toUpdateCols.contains("ROLLBACK_ON_ERROR")) {
+                this.toUpdateCols.add("ROLLBACK_ON_ERROR");
+            }
+        }
         return this;
     }
 
     /**
      * 任务状态。
      */
-    public String taskStatusId;
+    private String taskStatusId;
 
     /**
      * 获取：任务状态。
@@ -526,14 +844,30 @@ public class TkTask {
      * 设置：任务状态。
      */
     public TkTask setTaskStatusId(String taskStatusId) {
-        this.taskStatusId = taskStatusId;
+        if (this.taskStatusId == null && taskStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.taskStatusId != null && taskStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.taskStatusId.compareTo(taskStatusId) != 0) {
+                this.taskStatusId = taskStatusId;
+                if (!this.toUpdateCols.contains("TASK_STATUS_ID")) {
+                    this.toUpdateCols.add("TASK_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.taskStatusId = taskStatusId;
+            if (!this.toUpdateCols.contains("TASK_STATUS_ID")) {
+                this.toUpdateCols.add("TASK_STATUS_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 任务分配信息。
      */
-    public String taskAssignInfo;
+    private String taskAssignInfo;
 
     /**
      * 获取：任务分配信息。
@@ -546,14 +880,30 @@ public class TkTask {
      * 设置：任务分配信息。
      */
     public TkTask setTaskAssignInfo(String taskAssignInfo) {
-        this.taskAssignInfo = taskAssignInfo;
+        if (this.taskAssignInfo == null && taskAssignInfo == null) {
+            // 均为null，不做处理。
+        } else if (this.taskAssignInfo != null && taskAssignInfo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.taskAssignInfo.compareTo(taskAssignInfo) != 0) {
+                this.taskAssignInfo = taskAssignInfo;
+                if (!this.toUpdateCols.contains("TASK_ASSIGN_INFO")) {
+                    this.toUpdateCols.add("TASK_ASSIGN_INFO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.taskAssignInfo = taskAssignInfo;
+            if (!this.toUpdateCols.contains("TASK_ASSIGN_INFO")) {
+                this.toUpdateCols.add("TASK_ASSIGN_INFO");
+            }
+        }
         return this;
     }
 
     /**
      * 最近任务分配日期时间。
      */
-    public LocalDateTime latestTaskAssignDttm;
+    private LocalDateTime latestTaskAssignDttm;
 
     /**
      * 获取：最近任务分配日期时间。
@@ -566,14 +916,30 @@ public class TkTask {
      * 设置：最近任务分配日期时间。
      */
     public TkTask setLatestTaskAssignDttm(LocalDateTime latestTaskAssignDttm) {
-        this.latestTaskAssignDttm = latestTaskAssignDttm;
+        if (this.latestTaskAssignDttm == null && latestTaskAssignDttm == null) {
+            // 均为null，不做处理。
+        } else if (this.latestTaskAssignDttm != null && latestTaskAssignDttm != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.latestTaskAssignDttm.compareTo(latestTaskAssignDttm) != 0) {
+                this.latestTaskAssignDttm = latestTaskAssignDttm;
+                if (!this.toUpdateCols.contains("LATEST_TASK_ASSIGN_DTTM")) {
+                    this.toUpdateCols.add("LATEST_TASK_ASSIGN_DTTM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.latestTaskAssignDttm = latestTaskAssignDttm;
+            if (!this.toUpdateCols.contains("LATEST_TASK_ASSIGN_DTTM")) {
+                this.toUpdateCols.add("LATEST_TASK_ASSIGN_DTTM");
+            }
+        }
         return this;
     }
 
     /**
      * 分配至任务服务器。
      */
-    public String assignToTkServerId;
+    private String assignToTkServerId;
 
     /**
      * 获取：分配至任务服务器。
@@ -586,7 +952,23 @@ public class TkTask {
      * 设置：分配至任务服务器。
      */
     public TkTask setAssignToTkServerId(String assignToTkServerId) {
-        this.assignToTkServerId = assignToTkServerId;
+        if (this.assignToTkServerId == null && assignToTkServerId == null) {
+            // 均为null，不做处理。
+        } else if (this.assignToTkServerId != null && assignToTkServerId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.assignToTkServerId.compareTo(assignToTkServerId) != 0) {
+                this.assignToTkServerId = assignToTkServerId;
+                if (!this.toUpdateCols.contains("ASSIGN_TO_TK_SERVER_ID")) {
+                    this.toUpdateCols.add("ASSIGN_TO_TK_SERVER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.assignToTkServerId = assignToTkServerId;
+            if (!this.toUpdateCols.contains("ASSIGN_TO_TK_SERVER_ID")) {
+                this.toUpdateCols.add("ASSIGN_TO_TK_SERVER_ID");
+            }
+        }
         return this;
     }
 
@@ -604,6 +986,7 @@ public class TkTask {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -614,7 +997,17 @@ public class TkTask {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -635,7 +1028,8 @@ public class TkTask {
      * @return
      */
     public static TkTask newData() {
-        return modelHelper.newData();
+        TkTask obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -644,7 +1038,8 @@ public class TkTask {
      * @return
      */
     public static TkTask insertData() {
-        return modelHelper.insertData();
+        TkTask obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -656,7 +1051,8 @@ public class TkTask {
      * @return 获取到的对象，若无则为null。
      */
     public static TkTask selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        TkTask obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -668,7 +1064,8 @@ public class TkTask {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<TkTask> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<TkTask> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -680,7 +1077,8 @@ public class TkTask {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<TkTask> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<TkTask> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

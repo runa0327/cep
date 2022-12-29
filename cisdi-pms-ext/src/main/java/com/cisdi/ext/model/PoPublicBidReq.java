@@ -4,9 +4,12 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +22,18 @@ public class PoPublicBidReq {
      * 模型助手。
      */
     private static final ModelHelper<PoPublicBidReq> modelHelper = new ModelHelper<>("PO_PUBLIC_BID_REQ", new PoPublicBidReq());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -286,7 +301,7 @@ public class PoPublicBidReq {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -299,14 +314,30 @@ public class PoPublicBidReq {
      * 设置：ID。
      */
     public PoPublicBidReq setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -319,14 +350,30 @@ public class PoPublicBidReq {
      * 设置：版本。
      */
     public PoPublicBidReq setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -339,14 +386,30 @@ public class PoPublicBidReq {
      * 设置：时间戳。
      */
     public PoPublicBidReq setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -359,14 +422,30 @@ public class PoPublicBidReq {
      * 设置：是否预设。
      */
     public PoPublicBidReq setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -379,14 +458,30 @@ public class PoPublicBidReq {
      * 设置：最后修改日期时间。
      */
     public PoPublicBidReq setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -399,14 +494,30 @@ public class PoPublicBidReq {
      * 设置：最后修改用户。
      */
     public PoPublicBidReq setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -419,14 +530,30 @@ public class PoPublicBidReq {
      * 设置：代码。
      */
     public PoPublicBidReq setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -439,14 +566,30 @@ public class PoPublicBidReq {
      * 设置：名称。
      */
     public PoPublicBidReq setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -459,14 +602,30 @@ public class PoPublicBidReq {
      * 设置：锁定流程实例。
      */
     public PoPublicBidReq setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -479,14 +638,30 @@ public class PoPublicBidReq {
      * 设置：记录状态。
      */
     public PoPublicBidReq setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -499,14 +674,30 @@ public class PoPublicBidReq {
      * 设置：创建用户。
      */
     public PoPublicBidReq setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 创建部门。
      */
-    public String crtDeptId;
+    private String crtDeptId;
 
     /**
      * 获取：创建部门。
@@ -519,14 +710,30 @@ public class PoPublicBidReq {
      * 设置：创建部门。
      */
     public PoPublicBidReq setCrtDeptId(String crtDeptId) {
-        this.crtDeptId = crtDeptId;
+        if (this.crtDeptId == null && crtDeptId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDeptId != null && crtDeptId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDeptId.compareTo(crtDeptId) != 0) {
+                this.crtDeptId = crtDeptId;
+                if (!this.toUpdateCols.contains("CRT_DEPT_ID")) {
+                    this.toUpdateCols.add("CRT_DEPT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDeptId = crtDeptId;
+            if (!this.toUpdateCols.contains("CRT_DEPT_ID")) {
+                this.toUpdateCols.add("CRT_DEPT_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -539,14 +746,30 @@ public class PoPublicBidReq {
      * 设置：创建日期时间。
      */
     public PoPublicBidReq setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 项目。
      */
-    public String pmPrjId;
+    private String pmPrjId;
 
     /**
      * 获取：项目。
@@ -559,14 +782,30 @@ public class PoPublicBidReq {
      * 设置：项目。
      */
     public PoPublicBidReq setPmPrjId(String pmPrjId) {
-        this.pmPrjId = pmPrjId;
+        if (this.pmPrjId == null && pmPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmPrjId != null && pmPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmPrjId.compareTo(pmPrjId) != 0) {
+                this.pmPrjId = pmPrjId;
+                if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                    this.toUpdateCols.add("PM_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmPrjId = pmPrjId;
+            if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                this.toUpdateCols.add("PM_PRJ_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 项目编号。
      */
-    public String prjCode;
+    private String prjCode;
 
     /**
      * 获取：项目编号。
@@ -579,14 +818,30 @@ public class PoPublicBidReq {
      * 设置：项目编号。
      */
     public PoPublicBidReq setPrjCode(String prjCode) {
-        this.prjCode = prjCode;
+        if (this.prjCode == null && prjCode == null) {
+            // 均为null，不做处理。
+        } else if (this.prjCode != null && prjCode != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjCode.compareTo(prjCode) != 0) {
+                this.prjCode = prjCode;
+                if (!this.toUpdateCols.contains("PRJ_CODE")) {
+                    this.toUpdateCols.add("PRJ_CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjCode = prjCode;
+            if (!this.toUpdateCols.contains("PRJ_CODE")) {
+                this.toUpdateCols.add("PRJ_CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 立项批复文号。
      */
-    public String prjReplyNo;
+    private String prjReplyNo;
 
     /**
      * 获取：立项批复文号。
@@ -599,14 +854,30 @@ public class PoPublicBidReq {
      * 设置：立项批复文号。
      */
     public PoPublicBidReq setPrjReplyNo(String prjReplyNo) {
-        this.prjReplyNo = prjReplyNo;
+        if (this.prjReplyNo == null && prjReplyNo == null) {
+            // 均为null，不做处理。
+        } else if (this.prjReplyNo != null && prjReplyNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjReplyNo.compareTo(prjReplyNo) != 0) {
+                this.prjReplyNo = prjReplyNo;
+                if (!this.toUpdateCols.contains("PRJ_REPLY_NO")) {
+                    this.toUpdateCols.add("PRJ_REPLY_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjReplyNo = prjReplyNo;
+            if (!this.toUpdateCols.contains("PRJ_REPLY_NO")) {
+                this.toUpdateCols.add("PRJ_REPLY_NO");
+            }
+        }
         return this;
     }
 
     /**
      * 项目概况。
      */
-    public String prjSituation;
+    private String prjSituation;
 
     /**
      * 获取：项目概况。
@@ -619,14 +890,30 @@ public class PoPublicBidReq {
      * 设置：项目概况。
      */
     public PoPublicBidReq setPrjSituation(String prjSituation) {
-        this.prjSituation = prjSituation;
+        if (this.prjSituation == null && prjSituation == null) {
+            // 均为null，不做处理。
+        } else if (this.prjSituation != null && prjSituation != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjSituation.compareTo(prjSituation) != 0) {
+                this.prjSituation = prjSituation;
+                if (!this.toUpdateCols.contains("PRJ_SITUATION")) {
+                    this.toUpdateCols.add("PRJ_SITUATION");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjSituation = prjSituation;
+            if (!this.toUpdateCols.contains("PRJ_SITUATION")) {
+                this.toUpdateCols.add("PRJ_SITUATION");
+            }
+        }
         return this;
     }
 
     /**
      * 投资来源。
      */
-    public String investmentSourceId;
+    private String investmentSourceId;
 
     /**
      * 获取：投资来源。
@@ -639,14 +926,30 @@ public class PoPublicBidReq {
      * 设置：投资来源。
      */
     public PoPublicBidReq setInvestmentSourceId(String investmentSourceId) {
-        this.investmentSourceId = investmentSourceId;
+        if (this.investmentSourceId == null && investmentSourceId == null) {
+            // 均为null，不做处理。
+        } else if (this.investmentSourceId != null && investmentSourceId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.investmentSourceId.compareTo(investmentSourceId) != 0) {
+                this.investmentSourceId = investmentSourceId;
+                if (!this.toUpdateCols.contains("INVESTMENT_SOURCE_ID")) {
+                    this.toUpdateCols.add("INVESTMENT_SOURCE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.investmentSourceId = investmentSourceId;
+            if (!this.toUpdateCols.contains("INVESTMENT_SOURCE_ID")) {
+                this.toUpdateCols.add("INVESTMENT_SOURCE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 业主单位。
      */
-    public String customerUnit;
+    private String customerUnit;
 
     /**
      * 获取：业主单位。
@@ -659,14 +962,30 @@ public class PoPublicBidReq {
      * 设置：业主单位。
      */
     public PoPublicBidReq setCustomerUnit(String customerUnit) {
-        this.customerUnit = customerUnit;
+        if (this.customerUnit == null && customerUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.customerUnit != null && customerUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.customerUnit.compareTo(customerUnit) != 0) {
+                this.customerUnit = customerUnit;
+                if (!this.toUpdateCols.contains("CUSTOMER_UNIT")) {
+                    this.toUpdateCols.add("CUSTOMER_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.customerUnit = customerUnit;
+            if (!this.toUpdateCols.contains("CUSTOMER_UNIT")) {
+                this.toUpdateCols.add("CUSTOMER_UNIT");
+            }
+        }
         return this;
     }
 
     /**
      * 招标类别。
      */
-    public String pmsReleaseWayId;
+    private String pmsReleaseWayId;
 
     /**
      * 获取：招标类别。
@@ -679,74 +998,138 @@ public class PoPublicBidReq {
      * 设置：招标类别。
      */
     public PoPublicBidReq setPmsReleaseWayId(String pmsReleaseWayId) {
-        this.pmsReleaseWayId = pmsReleaseWayId;
+        if (this.pmsReleaseWayId == null && pmsReleaseWayId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmsReleaseWayId != null && pmsReleaseWayId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmsReleaseWayId.compareTo(pmsReleaseWayId) != 0) {
+                this.pmsReleaseWayId = pmsReleaseWayId;
+                if (!this.toUpdateCols.contains("PMS_RELEASE_WAY_ID")) {
+                    this.toUpdateCols.add("PMS_RELEASE_WAY_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmsReleaseWayId = pmsReleaseWayId;
+            if (!this.toUpdateCols.contains("PMS_RELEASE_WAY_ID")) {
+                this.toUpdateCols.add("PMS_RELEASE_WAY_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 可研批复资金（万）。
      */
-    public Double feasibilityApproveFund;
+    private BigDecimal feasibilityApproveFund;
 
     /**
      * 获取：可研批复资金（万）。
      */
-    public Double getFeasibilityApproveFund() {
+    public BigDecimal getFeasibilityApproveFund() {
         return this.feasibilityApproveFund;
     }
 
     /**
      * 设置：可研批复资金（万）。
      */
-    public PoPublicBidReq setFeasibilityApproveFund(Double feasibilityApproveFund) {
-        this.feasibilityApproveFund = feasibilityApproveFund;
+    public PoPublicBidReq setFeasibilityApproveFund(BigDecimal feasibilityApproveFund) {
+        if (this.feasibilityApproveFund == null && feasibilityApproveFund == null) {
+            // 均为null，不做处理。
+        } else if (this.feasibilityApproveFund != null && feasibilityApproveFund != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.feasibilityApproveFund.compareTo(feasibilityApproveFund) != 0) {
+                this.feasibilityApproveFund = feasibilityApproveFund;
+                if (!this.toUpdateCols.contains("FEASIBILITY_APPROVE_FUND")) {
+                    this.toUpdateCols.add("FEASIBILITY_APPROVE_FUND");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.feasibilityApproveFund = feasibilityApproveFund;
+            if (!this.toUpdateCols.contains("FEASIBILITY_APPROVE_FUND")) {
+                this.toUpdateCols.add("FEASIBILITY_APPROVE_FUND");
+            }
+        }
         return this;
     }
 
     /**
      * 初概批复资金（万）。
      */
-    public Double estimateApproveFund;
+    private BigDecimal estimateApproveFund;
 
     /**
      * 获取：初概批复资金（万）。
      */
-    public Double getEstimateApproveFund() {
+    public BigDecimal getEstimateApproveFund() {
         return this.estimateApproveFund;
     }
 
     /**
      * 设置：初概批复资金（万）。
      */
-    public PoPublicBidReq setEstimateApproveFund(Double estimateApproveFund) {
-        this.estimateApproveFund = estimateApproveFund;
+    public PoPublicBidReq setEstimateApproveFund(BigDecimal estimateApproveFund) {
+        if (this.estimateApproveFund == null && estimateApproveFund == null) {
+            // 均为null，不做处理。
+        } else if (this.estimateApproveFund != null && estimateApproveFund != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.estimateApproveFund.compareTo(estimateApproveFund) != 0) {
+                this.estimateApproveFund = estimateApproveFund;
+                if (!this.toUpdateCols.contains("ESTIMATE_APPROVE_FUND")) {
+                    this.toUpdateCols.add("ESTIMATE_APPROVE_FUND");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.estimateApproveFund = estimateApproveFund;
+            if (!this.toUpdateCols.contains("ESTIMATE_APPROVE_FUND")) {
+                this.toUpdateCols.add("ESTIMATE_APPROVE_FUND");
+            }
+        }
         return this;
     }
 
     /**
      * 财评批复资金（万）。
      */
-    public Double evaluationApproveFund;
+    private BigDecimal evaluationApproveFund;
 
     /**
      * 获取：财评批复资金（万）。
      */
-    public Double getEvaluationApproveFund() {
+    public BigDecimal getEvaluationApproveFund() {
         return this.evaluationApproveFund;
     }
 
     /**
      * 设置：财评批复资金（万）。
      */
-    public PoPublicBidReq setEvaluationApproveFund(Double evaluationApproveFund) {
-        this.evaluationApproveFund = evaluationApproveFund;
+    public PoPublicBidReq setEvaluationApproveFund(BigDecimal evaluationApproveFund) {
+        if (this.evaluationApproveFund == null && evaluationApproveFund == null) {
+            // 均为null，不做处理。
+        } else if (this.evaluationApproveFund != null && evaluationApproveFund != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.evaluationApproveFund.compareTo(evaluationApproveFund) != 0) {
+                this.evaluationApproveFund = evaluationApproveFund;
+                if (!this.toUpdateCols.contains("EVALUATION_APPROVE_FUND")) {
+                    this.toUpdateCols.add("EVALUATION_APPROVE_FUND");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.evaluationApproveFund = evaluationApproveFund;
+            if (!this.toUpdateCols.contains("EVALUATION_APPROVE_FUND")) {
+                this.toUpdateCols.add("EVALUATION_APPROVE_FUND");
+            }
+        }
         return this;
     }
 
     /**
      * 招标单位。
      */
-    public String bidUnit;
+    private String bidUnit;
 
     /**
      * 获取：招标单位。
@@ -759,14 +1142,30 @@ public class PoPublicBidReq {
      * 设置：招标单位。
      */
     public PoPublicBidReq setBidUnit(String bidUnit) {
-        this.bidUnit = bidUnit;
+        if (this.bidUnit == null && bidUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.bidUnit != null && bidUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidUnit.compareTo(bidUnit) != 0) {
+                this.bidUnit = bidUnit;
+                if (!this.toUpdateCols.contains("BID_UNIT")) {
+                    this.toUpdateCols.add("BID_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidUnit = bidUnit;
+            if (!this.toUpdateCols.contains("BID_UNIT")) {
+                this.toUpdateCols.add("BID_UNIT");
+            }
+        }
         return this;
     }
 
     /**
      * 招标依据。
      */
-    public String bidBasis;
+    private String bidBasis;
 
     /**
      * 获取：招标依据。
@@ -779,34 +1178,66 @@ public class PoPublicBidReq {
      * 设置：招标依据。
      */
     public PoPublicBidReq setBidBasis(String bidBasis) {
-        this.bidBasis = bidBasis;
+        if (this.bidBasis == null && bidBasis == null) {
+            // 均为null，不做处理。
+        } else if (this.bidBasis != null && bidBasis != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidBasis.compareTo(bidBasis) != 0) {
+                this.bidBasis = bidBasis;
+                if (!this.toUpdateCols.contains("BID_BASIS")) {
+                    this.toUpdateCols.add("BID_BASIS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidBasis = bidBasis;
+            if (!this.toUpdateCols.contains("BID_BASIS")) {
+                this.toUpdateCols.add("BID_BASIS");
+            }
+        }
         return this;
     }
 
     /**
      * 招标控制价发起。
      */
-    public Double bidCtlPriceLaunch;
+    private BigDecimal bidCtlPriceLaunch;
 
     /**
      * 获取：招标控制价发起。
      */
-    public Double getBidCtlPriceLaunch() {
+    public BigDecimal getBidCtlPriceLaunch() {
         return this.bidCtlPriceLaunch;
     }
 
     /**
      * 设置：招标控制价发起。
      */
-    public PoPublicBidReq setBidCtlPriceLaunch(Double bidCtlPriceLaunch) {
-        this.bidCtlPriceLaunch = bidCtlPriceLaunch;
+    public PoPublicBidReq setBidCtlPriceLaunch(BigDecimal bidCtlPriceLaunch) {
+        if (this.bidCtlPriceLaunch == null && bidCtlPriceLaunch == null) {
+            // 均为null，不做处理。
+        } else if (this.bidCtlPriceLaunch != null && bidCtlPriceLaunch != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidCtlPriceLaunch.compareTo(bidCtlPriceLaunch) != 0) {
+                this.bidCtlPriceLaunch = bidCtlPriceLaunch;
+                if (!this.toUpdateCols.contains("BID_CTL_PRICE_LAUNCH")) {
+                    this.toUpdateCols.add("BID_CTL_PRICE_LAUNCH");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidCtlPriceLaunch = bidCtlPriceLaunch;
+            if (!this.toUpdateCols.contains("BID_CTL_PRICE_LAUNCH")) {
+                this.toUpdateCols.add("BID_CTL_PRICE_LAUNCH");
+            }
+        }
         return this;
     }
 
     /**
      * 服务周期。
      */
-    public Integer serviceDays;
+    private Integer serviceDays;
 
     /**
      * 获取：服务周期。
@@ -819,14 +1250,30 @@ public class PoPublicBidReq {
      * 设置：服务周期。
      */
     public PoPublicBidReq setServiceDays(Integer serviceDays) {
-        this.serviceDays = serviceDays;
+        if (this.serviceDays == null && serviceDays == null) {
+            // 均为null，不做处理。
+        } else if (this.serviceDays != null && serviceDays != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.serviceDays.compareTo(serviceDays) != 0) {
+                this.serviceDays = serviceDays;
+                if (!this.toUpdateCols.contains("SERVICE_DAYS")) {
+                    this.toUpdateCols.add("SERVICE_DAYS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.serviceDays = serviceDays;
+            if (!this.toUpdateCols.contains("SERVICE_DAYS")) {
+                this.toUpdateCols.add("SERVICE_DAYS");
+            }
+        }
         return this;
     }
 
     /**
      * 招标需求附件。
      */
-    public String bidDemandFileGroupId;
+    private String bidDemandFileGroupId;
 
     /**
      * 获取：招标需求附件。
@@ -839,14 +1286,30 @@ public class PoPublicBidReq {
      * 设置：招标需求附件。
      */
     public PoPublicBidReq setBidDemandFileGroupId(String bidDemandFileGroupId) {
-        this.bidDemandFileGroupId = bidDemandFileGroupId;
+        if (this.bidDemandFileGroupId == null && bidDemandFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.bidDemandFileGroupId != null && bidDemandFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidDemandFileGroupId.compareTo(bidDemandFileGroupId) != 0) {
+                this.bidDemandFileGroupId = bidDemandFileGroupId;
+                if (!this.toUpdateCols.contains("BID_DEMAND_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("BID_DEMAND_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidDemandFileGroupId = bidDemandFileGroupId;
+            if (!this.toUpdateCols.contains("BID_DEMAND_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("BID_DEMAND_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -859,14 +1322,30 @@ public class PoPublicBidReq {
      * 设置：备注。
      */
     public PoPublicBidReq setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 核定招标类别。
      */
-    public String approvePmsReleaseWayId;
+    private String approvePmsReleaseWayId;
 
     /**
      * 获取：核定招标类别。
@@ -879,14 +1358,30 @@ public class PoPublicBidReq {
      * 设置：核定招标类别。
      */
     public PoPublicBidReq setApprovePmsReleaseWayId(String approvePmsReleaseWayId) {
-        this.approvePmsReleaseWayId = approvePmsReleaseWayId;
+        if (this.approvePmsReleaseWayId == null && approvePmsReleaseWayId == null) {
+            // 均为null，不做处理。
+        } else if (this.approvePmsReleaseWayId != null && approvePmsReleaseWayId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approvePmsReleaseWayId.compareTo(approvePmsReleaseWayId) != 0) {
+                this.approvePmsReleaseWayId = approvePmsReleaseWayId;
+                if (!this.toUpdateCols.contains("APPROVE_PMS_RELEASE_WAY_ID")) {
+                    this.toUpdateCols.add("APPROVE_PMS_RELEASE_WAY_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approvePmsReleaseWayId = approvePmsReleaseWayId;
+            if (!this.toUpdateCols.contains("APPROVE_PMS_RELEASE_WAY_ID")) {
+                this.toUpdateCols.add("APPROVE_PMS_RELEASE_WAY_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 招标方式。
      */
-    public String approvePurchaseType;
+    private String approvePurchaseType;
 
     /**
      * 获取：招标方式。
@@ -899,34 +1394,66 @@ public class PoPublicBidReq {
      * 设置：招标方式。
      */
     public PoPublicBidReq setApprovePurchaseType(String approvePurchaseType) {
-        this.approvePurchaseType = approvePurchaseType;
+        if (this.approvePurchaseType == null && approvePurchaseType == null) {
+            // 均为null，不做处理。
+        } else if (this.approvePurchaseType != null && approvePurchaseType != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approvePurchaseType.compareTo(approvePurchaseType) != 0) {
+                this.approvePurchaseType = approvePurchaseType;
+                if (!this.toUpdateCols.contains("APPROVE_PURCHASE_TYPE")) {
+                    this.toUpdateCols.add("APPROVE_PURCHASE_TYPE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approvePurchaseType = approvePurchaseType;
+            if (!this.toUpdateCols.contains("APPROVE_PURCHASE_TYPE")) {
+                this.toUpdateCols.add("APPROVE_PURCHASE_TYPE");
+            }
+        }
         return this;
     }
 
     /**
      * 核定招标控制价。
      */
-    public Double approveBidCtlPrice;
+    private BigDecimal approveBidCtlPrice;
 
     /**
      * 获取：核定招标控制价。
      */
-    public Double getApproveBidCtlPrice() {
+    public BigDecimal getApproveBidCtlPrice() {
         return this.approveBidCtlPrice;
     }
 
     /**
      * 设置：核定招标控制价。
      */
-    public PoPublicBidReq setApproveBidCtlPrice(Double approveBidCtlPrice) {
-        this.approveBidCtlPrice = approveBidCtlPrice;
+    public PoPublicBidReq setApproveBidCtlPrice(BigDecimal approveBidCtlPrice) {
+        if (this.approveBidCtlPrice == null && approveBidCtlPrice == null) {
+            // 均为null，不做处理。
+        } else if (this.approveBidCtlPrice != null && approveBidCtlPrice != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approveBidCtlPrice.compareTo(approveBidCtlPrice) != 0) {
+                this.approveBidCtlPrice = approveBidCtlPrice;
+                if (!this.toUpdateCols.contains("APPROVE_BID_CTL_PRICE")) {
+                    this.toUpdateCols.add("APPROVE_BID_CTL_PRICE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approveBidCtlPrice = approveBidCtlPrice;
+            if (!this.toUpdateCols.contains("APPROVE_BID_CTL_PRICE")) {
+                this.toUpdateCols.add("APPROVE_BID_CTL_PRICE");
+            }
+        }
         return this;
     }
 
     /**
      * 领导审批意见。
      */
-    public String leaderApproveComment;
+    private String leaderApproveComment;
 
     /**
      * 获取：领导审批意见。
@@ -939,14 +1466,30 @@ public class PoPublicBidReq {
      * 设置：领导审批意见。
      */
     public PoPublicBidReq setLeaderApproveComment(String leaderApproveComment) {
-        this.leaderApproveComment = leaderApproveComment;
+        if (this.leaderApproveComment == null && leaderApproveComment == null) {
+            // 均为null，不做处理。
+        } else if (this.leaderApproveComment != null && leaderApproveComment != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.leaderApproveComment.compareTo(leaderApproveComment) != 0) {
+                this.leaderApproveComment = leaderApproveComment;
+                if (!this.toUpdateCols.contains("LEADER_APPROVE_COMMENT")) {
+                    this.toUpdateCols.add("LEADER_APPROVE_COMMENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.leaderApproveComment = leaderApproveComment;
+            if (!this.toUpdateCols.contains("LEADER_APPROVE_COMMENT")) {
+                this.toUpdateCols.add("LEADER_APPROVE_COMMENT");
+            }
+        }
         return this;
     }
 
     /**
      * 领导审批附件。
      */
-    public String leaderApproveFileGroupId;
+    private String leaderApproveFileGroupId;
 
     /**
      * 获取：领导审批附件。
@@ -959,14 +1502,30 @@ public class PoPublicBidReq {
      * 设置：领导审批附件。
      */
     public PoPublicBidReq setLeaderApproveFileGroupId(String leaderApproveFileGroupId) {
-        this.leaderApproveFileGroupId = leaderApproveFileGroupId;
+        if (this.leaderApproveFileGroupId == null && leaderApproveFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.leaderApproveFileGroupId != null && leaderApproveFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.leaderApproveFileGroupId.compareTo(leaderApproveFileGroupId) != 0) {
+                this.leaderApproveFileGroupId = leaderApproveFileGroupId;
+                if (!this.toUpdateCols.contains("LEADER_APPROVE_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("LEADER_APPROVE_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.leaderApproveFileGroupId = leaderApproveFileGroupId;
+            if (!this.toUpdateCols.contains("LEADER_APPROVE_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("LEADER_APPROVE_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 招标方式回显。
      */
-    public String approvePurchaseTypeEcho;
+    private String approvePurchaseTypeEcho;
 
     /**
      * 获取：招标方式回显。
@@ -979,34 +1538,66 @@ public class PoPublicBidReq {
      * 设置：招标方式回显。
      */
     public PoPublicBidReq setApprovePurchaseTypeEcho(String approvePurchaseTypeEcho) {
-        this.approvePurchaseTypeEcho = approvePurchaseTypeEcho;
+        if (this.approvePurchaseTypeEcho == null && approvePurchaseTypeEcho == null) {
+            // 均为null，不做处理。
+        } else if (this.approvePurchaseTypeEcho != null && approvePurchaseTypeEcho != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approvePurchaseTypeEcho.compareTo(approvePurchaseTypeEcho) != 0) {
+                this.approvePurchaseTypeEcho = approvePurchaseTypeEcho;
+                if (!this.toUpdateCols.contains("APPROVE_PURCHASE_TYPE_ECHO")) {
+                    this.toUpdateCols.add("APPROVE_PURCHASE_TYPE_ECHO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approvePurchaseTypeEcho = approvePurchaseTypeEcho;
+            if (!this.toUpdateCols.contains("APPROVE_PURCHASE_TYPE_ECHO")) {
+                this.toUpdateCols.add("APPROVE_PURCHASE_TYPE_ECHO");
+            }
+        }
         return this;
     }
 
     /**
      * 招标控制价回显。
      */
-    public Double bidCtlPriceLaunchEcho;
+    private BigDecimal bidCtlPriceLaunchEcho;
 
     /**
      * 获取：招标控制价回显。
      */
-    public Double getBidCtlPriceLaunchEcho() {
+    public BigDecimal getBidCtlPriceLaunchEcho() {
         return this.bidCtlPriceLaunchEcho;
     }
 
     /**
      * 设置：招标控制价回显。
      */
-    public PoPublicBidReq setBidCtlPriceLaunchEcho(Double bidCtlPriceLaunchEcho) {
-        this.bidCtlPriceLaunchEcho = bidCtlPriceLaunchEcho;
+    public PoPublicBidReq setBidCtlPriceLaunchEcho(BigDecimal bidCtlPriceLaunchEcho) {
+        if (this.bidCtlPriceLaunchEcho == null && bidCtlPriceLaunchEcho == null) {
+            // 均为null，不做处理。
+        } else if (this.bidCtlPriceLaunchEcho != null && bidCtlPriceLaunchEcho != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidCtlPriceLaunchEcho.compareTo(bidCtlPriceLaunchEcho) != 0) {
+                this.bidCtlPriceLaunchEcho = bidCtlPriceLaunchEcho;
+                if (!this.toUpdateCols.contains("BID_CTL_PRICE_LAUNCH_ECHO")) {
+                    this.toUpdateCols.add("BID_CTL_PRICE_LAUNCH_ECHO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidCtlPriceLaunchEcho = bidCtlPriceLaunchEcho;
+            if (!this.toUpdateCols.contains("BID_CTL_PRICE_LAUNCH_ECHO")) {
+                this.toUpdateCols.add("BID_CTL_PRICE_LAUNCH_ECHO");
+            }
+        }
         return this;
     }
 
     /**
      * 招标经办人。
      */
-    public String bidUserId;
+    private String bidUserId;
 
     /**
      * 获取：招标经办人。
@@ -1019,14 +1610,30 @@ public class PoPublicBidReq {
      * 设置：招标经办人。
      */
     public PoPublicBidReq setBidUserId(String bidUserId) {
-        this.bidUserId = bidUserId;
+        if (this.bidUserId == null && bidUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.bidUserId != null && bidUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidUserId.compareTo(bidUserId) != 0) {
+                this.bidUserId = bidUserId;
+                if (!this.toUpdateCols.contains("BID_USER_ID")) {
+                    this.toUpdateCols.add("BID_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidUserId = bidUserId;
+            if (!this.toUpdateCols.contains("BID_USER_ID")) {
+                this.toUpdateCols.add("BID_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 招标代理单位。
      */
-    public String bidAgency;
+    private String bidAgency;
 
     /**
      * 获取：招标代理单位。
@@ -1039,14 +1646,30 @@ public class PoPublicBidReq {
      * 设置：招标代理单位。
      */
     public PoPublicBidReq setBidAgency(String bidAgency) {
-        this.bidAgency = bidAgency;
+        if (this.bidAgency == null && bidAgency == null) {
+            // 均为null，不做处理。
+        } else if (this.bidAgency != null && bidAgency != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidAgency.compareTo(bidAgency) != 0) {
+                this.bidAgency = bidAgency;
+                if (!this.toUpdateCols.contains("BID_AGENCY")) {
+                    this.toUpdateCols.add("BID_AGENCY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidAgency = bidAgency;
+            if (!this.toUpdateCols.contains("BID_AGENCY")) {
+                this.toUpdateCols.add("BID_AGENCY");
+            }
+        }
         return this;
     }
 
     /**
      * 需求发起人。
      */
-    public String demandPromoter;
+    private String demandPromoter;
 
     /**
      * 获取：需求发起人。
@@ -1059,14 +1682,30 @@ public class PoPublicBidReq {
      * 设置：需求发起人。
      */
     public PoPublicBidReq setDemandPromoter(String demandPromoter) {
-        this.demandPromoter = demandPromoter;
+        if (this.demandPromoter == null && demandPromoter == null) {
+            // 均为null，不做处理。
+        } else if (this.demandPromoter != null && demandPromoter != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.demandPromoter.compareTo(demandPromoter) != 0) {
+                this.demandPromoter = demandPromoter;
+                if (!this.toUpdateCols.contains("DEMAND_PROMOTER")) {
+                    this.toUpdateCols.add("DEMAND_PROMOTER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.demandPromoter = demandPromoter;
+            if (!this.toUpdateCols.contains("DEMAND_PROMOTER")) {
+                this.toUpdateCols.add("DEMAND_PROMOTER");
+            }
+        }
         return this;
     }
 
     /**
      * 招标文件。
      */
-    public String bidFileGroupId;
+    private String bidFileGroupId;
 
     /**
      * 获取：招标文件。
@@ -1079,14 +1718,30 @@ public class PoPublicBidReq {
      * 设置：招标文件。
      */
     public PoPublicBidReq setBidFileGroupId(String bidFileGroupId) {
-        this.bidFileGroupId = bidFileGroupId;
+        if (this.bidFileGroupId == null && bidFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.bidFileGroupId != null && bidFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidFileGroupId.compareTo(bidFileGroupId) != 0) {
+                this.bidFileGroupId = bidFileGroupId;
+                if (!this.toUpdateCols.contains("BID_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("BID_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidFileGroupId = bidFileGroupId;
+            if (!this.toUpdateCols.contains("BID_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("BID_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 报名时间。
      */
-    public LocalDate registrationDate;
+    private LocalDate registrationDate;
 
     /**
      * 获取：报名时间。
@@ -1099,14 +1754,30 @@ public class PoPublicBidReq {
      * 设置：报名时间。
      */
     public PoPublicBidReq setRegistrationDate(LocalDate registrationDate) {
-        this.registrationDate = registrationDate;
+        if (this.registrationDate == null && registrationDate == null) {
+            // 均为null，不做处理。
+        } else if (this.registrationDate != null && registrationDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.registrationDate.compareTo(registrationDate) != 0) {
+                this.registrationDate = registrationDate;
+                if (!this.toUpdateCols.contains("REGISTRATION_DATE")) {
+                    this.toUpdateCols.add("REGISTRATION_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.registrationDate = registrationDate;
+            if (!this.toUpdateCols.contains("REGISTRATION_DATE")) {
+                this.toUpdateCols.add("REGISTRATION_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 开标时间。
      */
-    public LocalDate bidOpenDate;
+    private LocalDate bidOpenDate;
 
     /**
      * 获取：开标时间。
@@ -1119,14 +1790,30 @@ public class PoPublicBidReq {
      * 设置：开标时间。
      */
     public PoPublicBidReq setBidOpenDate(LocalDate bidOpenDate) {
-        this.bidOpenDate = bidOpenDate;
+        if (this.bidOpenDate == null && bidOpenDate == null) {
+            // 均为null，不做处理。
+        } else if (this.bidOpenDate != null && bidOpenDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidOpenDate.compareTo(bidOpenDate) != 0) {
+                this.bidOpenDate = bidOpenDate;
+                if (!this.toUpdateCols.contains("BID_OPEN_DATE")) {
+                    this.toUpdateCols.add("BID_OPEN_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidOpenDate = bidOpenDate;
+            if (!this.toUpdateCols.contains("BID_OPEN_DATE")) {
+                this.toUpdateCols.add("BID_OPEN_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 招标平台。
      */
-    public String bidPlatform;
+    private String bidPlatform;
 
     /**
      * 获取：招标平台。
@@ -1139,14 +1826,30 @@ public class PoPublicBidReq {
      * 设置：招标平台。
      */
     public PoPublicBidReq setBidPlatform(String bidPlatform) {
-        this.bidPlatform = bidPlatform;
+        if (this.bidPlatform == null && bidPlatform == null) {
+            // 均为null，不做处理。
+        } else if (this.bidPlatform != null && bidPlatform != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidPlatform.compareTo(bidPlatform) != 0) {
+                this.bidPlatform = bidPlatform;
+                if (!this.toUpdateCols.contains("BID_PLATFORM")) {
+                    this.toUpdateCols.add("BID_PLATFORM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidPlatform = bidPlatform;
+            if (!this.toUpdateCols.contains("BID_PLATFORM")) {
+                this.toUpdateCols.add("BID_PLATFORM");
+            }
+        }
         return this;
     }
 
     /**
      * 发标信息。
      */
-    public String bidIssueInfo;
+    private String bidIssueInfo;
 
     /**
      * 获取：发标信息。
@@ -1159,14 +1862,30 @@ public class PoPublicBidReq {
      * 设置：发标信息。
      */
     public PoPublicBidReq setBidIssueInfo(String bidIssueInfo) {
-        this.bidIssueInfo = bidIssueInfo;
+        if (this.bidIssueInfo == null && bidIssueInfo == null) {
+            // 均为null，不做处理。
+        } else if (this.bidIssueInfo != null && bidIssueInfo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidIssueInfo.compareTo(bidIssueInfo) != 0) {
+                this.bidIssueInfo = bidIssueInfo;
+                if (!this.toUpdateCols.contains("BID_ISSUE_INFO")) {
+                    this.toUpdateCols.add("BID_ISSUE_INFO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidIssueInfo = bidIssueInfo;
+            if (!this.toUpdateCols.contains("BID_ISSUE_INFO")) {
+                this.toUpdateCols.add("BID_ISSUE_INFO");
+            }
+        }
         return this;
     }
 
     /**
      * 用章经办人审批意见。
      */
-    public String sealAgentApproveComment;
+    private String sealAgentApproveComment;
 
     /**
      * 获取：用章经办人审批意见。
@@ -1179,14 +1898,30 @@ public class PoPublicBidReq {
      * 设置：用章经办人审批意见。
      */
     public PoPublicBidReq setSealAgentApproveComment(String sealAgentApproveComment) {
-        this.sealAgentApproveComment = sealAgentApproveComment;
+        if (this.sealAgentApproveComment == null && sealAgentApproveComment == null) {
+            // 均为null，不做处理。
+        } else if (this.sealAgentApproveComment != null && sealAgentApproveComment != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.sealAgentApproveComment.compareTo(sealAgentApproveComment) != 0) {
+                this.sealAgentApproveComment = sealAgentApproveComment;
+                if (!this.toUpdateCols.contains("SEAL_AGENT_APPROVE_COMMENT")) {
+                    this.toUpdateCols.add("SEAL_AGENT_APPROVE_COMMENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.sealAgentApproveComment = sealAgentApproveComment;
+            if (!this.toUpdateCols.contains("SEAL_AGENT_APPROVE_COMMENT")) {
+                this.toUpdateCols.add("SEAL_AGENT_APPROVE_COMMENT");
+            }
+        }
         return this;
     }
 
     /**
      * 发标招标文件。
      */
-    public String bidIssueFileGroupId;
+    private String bidIssueFileGroupId;
 
     /**
      * 获取：发标招标文件。
@@ -1199,14 +1934,30 @@ public class PoPublicBidReq {
      * 设置：发标招标文件。
      */
     public PoPublicBidReq setBidIssueFileGroupId(String bidIssueFileGroupId) {
-        this.bidIssueFileGroupId = bidIssueFileGroupId;
+        if (this.bidIssueFileGroupId == null && bidIssueFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.bidIssueFileGroupId != null && bidIssueFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidIssueFileGroupId.compareTo(bidIssueFileGroupId) != 0) {
+                this.bidIssueFileGroupId = bidIssueFileGroupId;
+                if (!this.toUpdateCols.contains("BID_ISSUE_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("BID_ISSUE_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidIssueFileGroupId = bidIssueFileGroupId;
+            if (!this.toUpdateCols.contains("BID_ISSUE_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("BID_ISSUE_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 用章领导审批意见。
      */
-    public String sealApproveComment;
+    private String sealApproveComment;
 
     /**
      * 获取：用章领导审批意见。
@@ -1219,14 +1970,30 @@ public class PoPublicBidReq {
      * 设置：用章领导审批意见。
      */
     public PoPublicBidReq setSealApproveComment(String sealApproveComment) {
-        this.sealApproveComment = sealApproveComment;
+        if (this.sealApproveComment == null && sealApproveComment == null) {
+            // 均为null，不做处理。
+        } else if (this.sealApproveComment != null && sealApproveComment != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.sealApproveComment.compareTo(sealApproveComment) != 0) {
+                this.sealApproveComment = sealApproveComment;
+                if (!this.toUpdateCols.contains("SEAL_APPROVE_COMMENT")) {
+                    this.toUpdateCols.add("SEAL_APPROVE_COMMENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.sealApproveComment = sealApproveComment;
+            if (!this.toUpdateCols.contains("SEAL_APPROVE_COMMENT")) {
+                this.toUpdateCols.add("SEAL_APPROVE_COMMENT");
+            }
+        }
         return this;
     }
 
     /**
      * 中标单位文本。
      */
-    public String winBidUnitTxt;
+    private String winBidUnitTxt;
 
     /**
      * 获取：中标单位文本。
@@ -1239,34 +2006,66 @@ public class PoPublicBidReq {
      * 设置：中标单位文本。
      */
     public PoPublicBidReq setWinBidUnitTxt(String winBidUnitTxt) {
-        this.winBidUnitTxt = winBidUnitTxt;
+        if (this.winBidUnitTxt == null && winBidUnitTxt == null) {
+            // 均为null，不做处理。
+        } else if (this.winBidUnitTxt != null && winBidUnitTxt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.winBidUnitTxt.compareTo(winBidUnitTxt) != 0) {
+                this.winBidUnitTxt = winBidUnitTxt;
+                if (!this.toUpdateCols.contains("WIN_BID_UNIT_TXT")) {
+                    this.toUpdateCols.add("WIN_BID_UNIT_TXT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.winBidUnitTxt = winBidUnitTxt;
+            if (!this.toUpdateCols.contains("WIN_BID_UNIT_TXT")) {
+                this.toUpdateCols.add("WIN_BID_UNIT_TXT");
+            }
+        }
         return this;
     }
 
     /**
      * 投标报价。
      */
-    public String tenderOffer;
+    private BigDecimal tenderOffer;
 
     /**
      * 获取：投标报价。
      */
-    public String getTenderOffer() {
+    public BigDecimal getTenderOffer() {
         return this.tenderOffer;
     }
 
     /**
      * 设置：投标报价。
      */
-    public PoPublicBidReq setTenderOffer(String tenderOffer) {
-        this.tenderOffer = tenderOffer;
+    public PoPublicBidReq setTenderOffer(BigDecimal tenderOffer) {
+        if (this.tenderOffer == null && tenderOffer == null) {
+            // 均为null，不做处理。
+        } else if (this.tenderOffer != null && tenderOffer != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.tenderOffer.compareTo(tenderOffer) != 0) {
+                this.tenderOffer = tenderOffer;
+                if (!this.toUpdateCols.contains("TENDER_OFFER")) {
+                    this.toUpdateCols.add("TENDER_OFFER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.tenderOffer = tenderOffer;
+            if (!this.toUpdateCols.contains("TENDER_OFFER")) {
+                this.toUpdateCols.add("TENDER_OFFER");
+            }
+        }
         return this;
     }
 
     /**
      * 联系人名称。
      */
-    public String contactName;
+    private String contactName;
 
     /**
      * 获取：联系人名称。
@@ -1279,14 +2078,30 @@ public class PoPublicBidReq {
      * 设置：联系人名称。
      */
     public PoPublicBidReq setContactName(String contactName) {
-        this.contactName = contactName;
+        if (this.contactName == null && contactName == null) {
+            // 均为null，不做处理。
+        } else if (this.contactName != null && contactName != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contactName.compareTo(contactName) != 0) {
+                this.contactName = contactName;
+                if (!this.toUpdateCols.contains("CONTACT_NAME")) {
+                    this.toUpdateCols.add("CONTACT_NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contactName = contactName;
+            if (!this.toUpdateCols.contains("CONTACT_NAME")) {
+                this.toUpdateCols.add("CONTACT_NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 中标联系人手机。
      */
-    public String contactMobileWin;
+    private String contactMobileWin;
 
     /**
      * 获取：中标联系人手机。
@@ -1299,14 +2114,30 @@ public class PoPublicBidReq {
      * 设置：中标联系人手机。
      */
     public PoPublicBidReq setContactMobileWin(String contactMobileWin) {
-        this.contactMobileWin = contactMobileWin;
+        if (this.contactMobileWin == null && contactMobileWin == null) {
+            // 均为null，不做处理。
+        } else if (this.contactMobileWin != null && contactMobileWin != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contactMobileWin.compareTo(contactMobileWin) != 0) {
+                this.contactMobileWin = contactMobileWin;
+                if (!this.toUpdateCols.contains("CONTACT_MOBILE_WIN")) {
+                    this.toUpdateCols.add("CONTACT_MOBILE_WIN");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contactMobileWin = contactMobileWin;
+            if (!this.toUpdateCols.contains("CONTACT_MOBILE_WIN")) {
+                this.toUpdateCols.add("CONTACT_MOBILE_WIN");
+            }
+        }
         return this;
     }
 
     /**
      * 中标联系人身份证。
      */
-    public String contactIdcardWin;
+    private String contactIdcardWin;
 
     /**
      * 获取：中标联系人身份证。
@@ -1319,14 +2150,30 @@ public class PoPublicBidReq {
      * 设置：中标联系人身份证。
      */
     public PoPublicBidReq setContactIdcardWin(String contactIdcardWin) {
-        this.contactIdcardWin = contactIdcardWin;
+        if (this.contactIdcardWin == null && contactIdcardWin == null) {
+            // 均为null，不做处理。
+        } else if (this.contactIdcardWin != null && contactIdcardWin != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contactIdcardWin.compareTo(contactIdcardWin) != 0) {
+                this.contactIdcardWin = contactIdcardWin;
+                if (!this.toUpdateCols.contains("CONTACT_IDCARD_WIN")) {
+                    this.toUpdateCols.add("CONTACT_IDCARD_WIN");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contactIdcardWin = contactIdcardWin;
+            if (!this.toUpdateCols.contains("CONTACT_IDCARD_WIN")) {
+                this.toUpdateCols.add("CONTACT_IDCARD_WIN");
+            }
+        }
         return this;
     }
 
     /**
      * 标后附件。
      */
-    public String bidAfterFileGroupId;
+    private String bidAfterFileGroupId;
 
     /**
      * 获取：标后附件。
@@ -1339,14 +2186,30 @@ public class PoPublicBidReq {
      * 设置：标后附件。
      */
     public PoPublicBidReq setBidAfterFileGroupId(String bidAfterFileGroupId) {
-        this.bidAfterFileGroupId = bidAfterFileGroupId;
+        if (this.bidAfterFileGroupId == null && bidAfterFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.bidAfterFileGroupId != null && bidAfterFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidAfterFileGroupId.compareTo(bidAfterFileGroupId) != 0) {
+                this.bidAfterFileGroupId = bidAfterFileGroupId;
+                if (!this.toUpdateCols.contains("BID_AFTER_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("BID_AFTER_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidAfterFileGroupId = bidAfterFileGroupId;
+            if (!this.toUpdateCols.contains("BID_AFTER_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("BID_AFTER_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 标后领导人审批意见。
      */
-    public String bidAfterApproveComment;
+    private String bidAfterApproveComment;
 
     /**
      * 获取：标后领导人审批意见。
@@ -1359,14 +2222,30 @@ public class PoPublicBidReq {
      * 设置：标后领导人审批意见。
      */
     public PoPublicBidReq setBidAfterApproveComment(String bidAfterApproveComment) {
-        this.bidAfterApproveComment = bidAfterApproveComment;
+        if (this.bidAfterApproveComment == null && bidAfterApproveComment == null) {
+            // 均为null，不做处理。
+        } else if (this.bidAfterApproveComment != null && bidAfterApproveComment != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidAfterApproveComment.compareTo(bidAfterApproveComment) != 0) {
+                this.bidAfterApproveComment = bidAfterApproveComment;
+                if (!this.toUpdateCols.contains("BID_AFTER_APPROVE_COMMENT")) {
+                    this.toUpdateCols.add("BID_AFTER_APPROVE_COMMENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidAfterApproveComment = bidAfterApproveComment;
+            if (!this.toUpdateCols.contains("BID_AFTER_APPROVE_COMMENT")) {
+                this.toUpdateCols.add("BID_AFTER_APPROVE_COMMENT");
+            }
+        }
         return this;
     }
 
     /**
      * 中标单位备案。
      */
-    public String winBidUnitRecord;
+    private String winBidUnitRecord;
 
     /**
      * 获取：中标单位备案。
@@ -1379,14 +2258,30 @@ public class PoPublicBidReq {
      * 设置：中标单位备案。
      */
     public PoPublicBidReq setWinBidUnitRecord(String winBidUnitRecord) {
-        this.winBidUnitRecord = winBidUnitRecord;
+        if (this.winBidUnitRecord == null && winBidUnitRecord == null) {
+            // 均为null，不做处理。
+        } else if (this.winBidUnitRecord != null && winBidUnitRecord != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.winBidUnitRecord.compareTo(winBidUnitRecord) != 0) {
+                this.winBidUnitRecord = winBidUnitRecord;
+                if (!this.toUpdateCols.contains("WIN_BID_UNIT_RECORD")) {
+                    this.toUpdateCols.add("WIN_BID_UNIT_RECORD");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.winBidUnitRecord = winBidUnitRecord;
+            if (!this.toUpdateCols.contains("WIN_BID_UNIT_RECORD")) {
+                this.toUpdateCols.add("WIN_BID_UNIT_RECORD");
+            }
+        }
         return this;
     }
 
     /**
      * 投标报价备案。
      */
-    public String tenderOfferRecord;
+    private String tenderOfferRecord;
 
     /**
      * 获取：投标报价备案。
@@ -1399,14 +2294,30 @@ public class PoPublicBidReq {
      * 设置：投标报价备案。
      */
     public PoPublicBidReq setTenderOfferRecord(String tenderOfferRecord) {
-        this.tenderOfferRecord = tenderOfferRecord;
+        if (this.tenderOfferRecord == null && tenderOfferRecord == null) {
+            // 均为null，不做处理。
+        } else if (this.tenderOfferRecord != null && tenderOfferRecord != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.tenderOfferRecord.compareTo(tenderOfferRecord) != 0) {
+                this.tenderOfferRecord = tenderOfferRecord;
+                if (!this.toUpdateCols.contains("TENDER_OFFER_RECORD")) {
+                    this.toUpdateCols.add("TENDER_OFFER_RECORD");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.tenderOfferRecord = tenderOfferRecord;
+            if (!this.toUpdateCols.contains("TENDER_OFFER_RECORD")) {
+                this.toUpdateCols.add("TENDER_OFFER_RECORD");
+            }
+        }
         return this;
     }
 
     /**
      * 是否备案。
      */
-    public Boolean isRecord;
+    private Boolean isRecord;
 
     /**
      * 获取：是否备案。
@@ -1419,14 +2330,30 @@ public class PoPublicBidReq {
      * 设置：是否备案。
      */
     public PoPublicBidReq setIsRecord(Boolean isRecord) {
-        this.isRecord = isRecord;
+        if (this.isRecord == null && isRecord == null) {
+            // 均为null，不做处理。
+        } else if (this.isRecord != null && isRecord != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isRecord.compareTo(isRecord) != 0) {
+                this.isRecord = isRecord;
+                if (!this.toUpdateCols.contains("IS_RECORD")) {
+                    this.toUpdateCols.add("IS_RECORD");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isRecord = isRecord;
+            if (!this.toUpdateCols.contains("IS_RECORD")) {
+                this.toUpdateCols.add("IS_RECORD");
+            }
+        }
         return this;
     }
 
     /**
      * 联系人名称备案。
      */
-    public String contactNameRecord;
+    private String contactNameRecord;
 
     /**
      * 获取：联系人名称备案。
@@ -1439,14 +2366,30 @@ public class PoPublicBidReq {
      * 设置：联系人名称备案。
      */
     public PoPublicBidReq setContactNameRecord(String contactNameRecord) {
-        this.contactNameRecord = contactNameRecord;
+        if (this.contactNameRecord == null && contactNameRecord == null) {
+            // 均为null，不做处理。
+        } else if (this.contactNameRecord != null && contactNameRecord != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contactNameRecord.compareTo(contactNameRecord) != 0) {
+                this.contactNameRecord = contactNameRecord;
+                if (!this.toUpdateCols.contains("CONTACT_NAME_RECORD")) {
+                    this.toUpdateCols.add("CONTACT_NAME_RECORD");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contactNameRecord = contactNameRecord;
+            if (!this.toUpdateCols.contains("CONTACT_NAME_RECORD")) {
+                this.toUpdateCols.add("CONTACT_NAME_RECORD");
+            }
+        }
         return this;
     }
 
     /**
      * 联系人手机备案。
      */
-    public String contactMobileRecord;
+    private String contactMobileRecord;
 
     /**
      * 获取：联系人手机备案。
@@ -1459,14 +2402,30 @@ public class PoPublicBidReq {
      * 设置：联系人手机备案。
      */
     public PoPublicBidReq setContactMobileRecord(String contactMobileRecord) {
-        this.contactMobileRecord = contactMobileRecord;
+        if (this.contactMobileRecord == null && contactMobileRecord == null) {
+            // 均为null，不做处理。
+        } else if (this.contactMobileRecord != null && contactMobileRecord != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contactMobileRecord.compareTo(contactMobileRecord) != 0) {
+                this.contactMobileRecord = contactMobileRecord;
+                if (!this.toUpdateCols.contains("CONTACT_MOBILE_RECORD")) {
+                    this.toUpdateCols.add("CONTACT_MOBILE_RECORD");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contactMobileRecord = contactMobileRecord;
+            if (!this.toUpdateCols.contains("CONTACT_MOBILE_RECORD")) {
+                this.toUpdateCols.add("CONTACT_MOBILE_RECORD");
+            }
+        }
         return this;
     }
 
     /**
      * 联系人身份证备案。
      */
-    public String contactIdcardRecord;
+    private String contactIdcardRecord;
 
     /**
      * 获取：联系人身份证备案。
@@ -1479,14 +2438,30 @@ public class PoPublicBidReq {
      * 设置：联系人身份证备案。
      */
     public PoPublicBidReq setContactIdcardRecord(String contactIdcardRecord) {
-        this.contactIdcardRecord = contactIdcardRecord;
+        if (this.contactIdcardRecord == null && contactIdcardRecord == null) {
+            // 均为null，不做处理。
+        } else if (this.contactIdcardRecord != null && contactIdcardRecord != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contactIdcardRecord.compareTo(contactIdcardRecord) != 0) {
+                this.contactIdcardRecord = contactIdcardRecord;
+                if (!this.toUpdateCols.contains("CONTACT_IDCARD_RECORD")) {
+                    this.toUpdateCols.add("CONTACT_IDCARD_RECORD");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contactIdcardRecord = contactIdcardRecord;
+            if (!this.toUpdateCols.contains("CONTACT_IDCARD_RECORD")) {
+                this.toUpdateCols.add("CONTACT_IDCARD_RECORD");
+            }
+        }
         return this;
     }
 
     /**
      * 中标通知书。
      */
-    public String bidWinNoticeFileGroupId;
+    private String bidWinNoticeFileGroupId;
 
     /**
      * 获取：中标通知书。
@@ -1499,7 +2474,23 @@ public class PoPublicBidReq {
      * 设置：中标通知书。
      */
     public PoPublicBidReq setBidWinNoticeFileGroupId(String bidWinNoticeFileGroupId) {
-        this.bidWinNoticeFileGroupId = bidWinNoticeFileGroupId;
+        if (this.bidWinNoticeFileGroupId == null && bidWinNoticeFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.bidWinNoticeFileGroupId != null && bidWinNoticeFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidWinNoticeFileGroupId.compareTo(bidWinNoticeFileGroupId) != 0) {
+                this.bidWinNoticeFileGroupId = bidWinNoticeFileGroupId;
+                if (!this.toUpdateCols.contains("BID_WIN_NOTICE_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("BID_WIN_NOTICE_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidWinNoticeFileGroupId = bidWinNoticeFileGroupId;
+            if (!this.toUpdateCols.contains("BID_WIN_NOTICE_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("BID_WIN_NOTICE_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
@@ -1517,6 +2508,7 @@ public class PoPublicBidReq {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -1527,7 +2519,17 @@ public class PoPublicBidReq {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -1548,7 +2550,8 @@ public class PoPublicBidReq {
      * @return
      */
     public static PoPublicBidReq newData() {
-        return modelHelper.newData();
+        PoPublicBidReq obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -1557,7 +2560,8 @@ public class PoPublicBidReq {
      * @return
      */
     public static PoPublicBidReq insertData() {
-        return modelHelper.insertData();
+        PoPublicBidReq obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -1569,7 +2573,8 @@ public class PoPublicBidReq {
      * @return 获取到的对象，若无则为null。
      */
     public static PoPublicBidReq selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        PoPublicBidReq obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -1581,7 +2586,8 @@ public class PoPublicBidReq {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PoPublicBidReq> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<PoPublicBidReq> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -1593,7 +2599,8 @@ public class PoPublicBidReq {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PoPublicBidReq> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<PoPublicBidReq> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

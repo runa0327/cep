@@ -4,9 +4,12 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +22,18 @@ public class PmCompanyContractChange {
      * 模型助手。
      */
     private static final ModelHelper<PmCompanyContractChange> modelHelper = new ModelHelper<>("PM_COMPANY_CONTRACT_CHANGE", new PmCompanyContractChange());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -85,17 +100,9 @@ public class PmCompanyContractChange {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 变更类型。
+         * 服务周期。
          */
-        public static final String CHANGE_TYPE = "CHANGE_TYPE";
-        /**
-         * 变更时间。
-         */
-        public static final String CHANGE_DATE = "CHANGE_DATE";
-        /**
-         * 进场日期。
-         */
-        public static final String IN_DATE = "IN_DATE";
+        public static final String SERVICE_DAYS = "SERVICE_DAYS";
         /**
          * 变更金额。
          */
@@ -105,9 +112,17 @@ public class PmCompanyContractChange {
          */
         public static final String PM_COMPANY_CONTRACT_ID = "PM_COMPANY_CONTRACT_ID";
         /**
-         * 服务周期。
+         * 进场日期。
          */
-        public static final String SERVICE_DAYS = "SERVICE_DAYS";
+        public static final String IN_DATE = "IN_DATE";
+        /**
+         * 变更时间。
+         */
+        public static final String CHANGE_DATE = "CHANGE_DATE";
+        /**
+         * 变更类型。
+         */
+        public static final String CHANGE_TYPE = "CHANGE_TYPE";
     }
 
     // </editor-fold>
@@ -118,7 +133,7 @@ public class PmCompanyContractChange {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -131,14 +146,30 @@ public class PmCompanyContractChange {
      * 设置：ID。
      */
     public PmCompanyContractChange setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -151,14 +182,30 @@ public class PmCompanyContractChange {
      * 设置：版本。
      */
     public PmCompanyContractChange setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -171,14 +218,30 @@ public class PmCompanyContractChange {
      * 设置：时间戳。
      */
     public PmCompanyContractChange setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -191,14 +254,30 @@ public class PmCompanyContractChange {
      * 设置：是否预设。
      */
     public PmCompanyContractChange setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -211,14 +290,30 @@ public class PmCompanyContractChange {
      * 设置：创建日期时间。
      */
     public PmCompanyContractChange setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -231,14 +326,30 @@ public class PmCompanyContractChange {
      * 设置：创建用户。
      */
     public PmCompanyContractChange setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -251,14 +362,30 @@ public class PmCompanyContractChange {
      * 设置：最后修改日期时间。
      */
     public PmCompanyContractChange setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -271,14 +398,30 @@ public class PmCompanyContractChange {
      * 设置：最后修改用户。
      */
     public PmCompanyContractChange setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -291,14 +434,30 @@ public class PmCompanyContractChange {
      * 设置：记录状态。
      */
     public PmCompanyContractChange setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -311,14 +470,30 @@ public class PmCompanyContractChange {
      * 设置：锁定流程实例。
      */
     public PmCompanyContractChange setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -331,14 +506,30 @@ public class PmCompanyContractChange {
      * 设置：代码。
      */
     public PmCompanyContractChange setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -351,14 +542,30 @@ public class PmCompanyContractChange {
      * 设置：名称。
      */
     public PmCompanyContractChange setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -371,114 +578,30 @@ public class PmCompanyContractChange {
      * 设置：备注。
      */
     public PmCompanyContractChange setRemark(String remark) {
-        this.remark = remark;
-        return this;
-    }
-
-    /**
-     * 变更类型。
-     */
-    public String changeType;
-
-    /**
-     * 获取：变更类型。
-     */
-    public String getChangeType() {
-        return this.changeType;
-    }
-
-    /**
-     * 设置：变更类型。
-     */
-    public PmCompanyContractChange setChangeType(String changeType) {
-        this.changeType = changeType;
-        return this;
-    }
-
-    /**
-     * 变更时间。
-     */
-    public LocalDateTime changeDate;
-
-    /**
-     * 获取：变更时间。
-     */
-    public LocalDateTime getChangeDate() {
-        return this.changeDate;
-    }
-
-    /**
-     * 设置：变更时间。
-     */
-    public PmCompanyContractChange setChangeDate(LocalDateTime changeDate) {
-        this.changeDate = changeDate;
-        return this;
-    }
-
-    /**
-     * 进场日期。
-     */
-    public LocalDate inDate;
-
-    /**
-     * 获取：进场日期。
-     */
-    public LocalDate getInDate() {
-        return this.inDate;
-    }
-
-    /**
-     * 设置：进场日期。
-     */
-    public PmCompanyContractChange setInDate(LocalDate inDate) {
-        this.inDate = inDate;
-        return this;
-    }
-
-    /**
-     * 变更金额。
-     */
-    public Double changeAmount;
-
-    /**
-     * 获取：变更金额。
-     */
-    public Double getChangeAmount() {
-        return this.changeAmount;
-    }
-
-    /**
-     * 设置：变更金额。
-     */
-    public PmCompanyContractChange setChangeAmount(Double changeAmount) {
-        this.changeAmount = changeAmount;
-        return this;
-    }
-
-    /**
-     * 公司合同。
-     */
-    public String pmCompanyContractId;
-
-    /**
-     * 获取：公司合同。
-     */
-    public String getPmCompanyContractId() {
-        return this.pmCompanyContractId;
-    }
-
-    /**
-     * 设置：公司合同。
-     */
-    public PmCompanyContractChange setPmCompanyContractId(String pmCompanyContractId) {
-        this.pmCompanyContractId = pmCompanyContractId;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 服务周期。
      */
-    public Integer serviceDays;
+    private Integer serviceDays;
 
     /**
      * 获取：服务周期。
@@ -491,7 +614,203 @@ public class PmCompanyContractChange {
      * 设置：服务周期。
      */
     public PmCompanyContractChange setServiceDays(Integer serviceDays) {
-        this.serviceDays = serviceDays;
+        if (this.serviceDays == null && serviceDays == null) {
+            // 均为null，不做处理。
+        } else if (this.serviceDays != null && serviceDays != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.serviceDays.compareTo(serviceDays) != 0) {
+                this.serviceDays = serviceDays;
+                if (!this.toUpdateCols.contains("SERVICE_DAYS")) {
+                    this.toUpdateCols.add("SERVICE_DAYS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.serviceDays = serviceDays;
+            if (!this.toUpdateCols.contains("SERVICE_DAYS")) {
+                this.toUpdateCols.add("SERVICE_DAYS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 变更金额。
+     */
+    private BigDecimal changeAmount;
+
+    /**
+     * 获取：变更金额。
+     */
+    public BigDecimal getChangeAmount() {
+        return this.changeAmount;
+    }
+
+    /**
+     * 设置：变更金额。
+     */
+    public PmCompanyContractChange setChangeAmount(BigDecimal changeAmount) {
+        if (this.changeAmount == null && changeAmount == null) {
+            // 均为null，不做处理。
+        } else if (this.changeAmount != null && changeAmount != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.changeAmount.compareTo(changeAmount) != 0) {
+                this.changeAmount = changeAmount;
+                if (!this.toUpdateCols.contains("CHANGE_AMOUNT")) {
+                    this.toUpdateCols.add("CHANGE_AMOUNT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.changeAmount = changeAmount;
+            if (!this.toUpdateCols.contains("CHANGE_AMOUNT")) {
+                this.toUpdateCols.add("CHANGE_AMOUNT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 公司合同。
+     */
+    private String pmCompanyContractId;
+
+    /**
+     * 获取：公司合同。
+     */
+    public String getPmCompanyContractId() {
+        return this.pmCompanyContractId;
+    }
+
+    /**
+     * 设置：公司合同。
+     */
+    public PmCompanyContractChange setPmCompanyContractId(String pmCompanyContractId) {
+        if (this.pmCompanyContractId == null && pmCompanyContractId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmCompanyContractId != null && pmCompanyContractId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmCompanyContractId.compareTo(pmCompanyContractId) != 0) {
+                this.pmCompanyContractId = pmCompanyContractId;
+                if (!this.toUpdateCols.contains("PM_COMPANY_CONTRACT_ID")) {
+                    this.toUpdateCols.add("PM_COMPANY_CONTRACT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmCompanyContractId = pmCompanyContractId;
+            if (!this.toUpdateCols.contains("PM_COMPANY_CONTRACT_ID")) {
+                this.toUpdateCols.add("PM_COMPANY_CONTRACT_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 进场日期。
+     */
+    private LocalDate inDate;
+
+    /**
+     * 获取：进场日期。
+     */
+    public LocalDate getInDate() {
+        return this.inDate;
+    }
+
+    /**
+     * 设置：进场日期。
+     */
+    public PmCompanyContractChange setInDate(LocalDate inDate) {
+        if (this.inDate == null && inDate == null) {
+            // 均为null，不做处理。
+        } else if (this.inDate != null && inDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.inDate.compareTo(inDate) != 0) {
+                this.inDate = inDate;
+                if (!this.toUpdateCols.contains("IN_DATE")) {
+                    this.toUpdateCols.add("IN_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.inDate = inDate;
+            if (!this.toUpdateCols.contains("IN_DATE")) {
+                this.toUpdateCols.add("IN_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 变更时间。
+     */
+    private LocalDateTime changeDate;
+
+    /**
+     * 获取：变更时间。
+     */
+    public LocalDateTime getChangeDate() {
+        return this.changeDate;
+    }
+
+    /**
+     * 设置：变更时间。
+     */
+    public PmCompanyContractChange setChangeDate(LocalDateTime changeDate) {
+        if (this.changeDate == null && changeDate == null) {
+            // 均为null，不做处理。
+        } else if (this.changeDate != null && changeDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.changeDate.compareTo(changeDate) != 0) {
+                this.changeDate = changeDate;
+                if (!this.toUpdateCols.contains("CHANGE_DATE")) {
+                    this.toUpdateCols.add("CHANGE_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.changeDate = changeDate;
+            if (!this.toUpdateCols.contains("CHANGE_DATE")) {
+                this.toUpdateCols.add("CHANGE_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 变更类型。
+     */
+    private String changeType;
+
+    /**
+     * 获取：变更类型。
+     */
+    public String getChangeType() {
+        return this.changeType;
+    }
+
+    /**
+     * 设置：变更类型。
+     */
+    public PmCompanyContractChange setChangeType(String changeType) {
+        if (this.changeType == null && changeType == null) {
+            // 均为null，不做处理。
+        } else if (this.changeType != null && changeType != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.changeType.compareTo(changeType) != 0) {
+                this.changeType = changeType;
+                if (!this.toUpdateCols.contains("CHANGE_TYPE")) {
+                    this.toUpdateCols.add("CHANGE_TYPE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.changeType = changeType;
+            if (!this.toUpdateCols.contains("CHANGE_TYPE")) {
+                this.toUpdateCols.add("CHANGE_TYPE");
+            }
+        }
         return this;
     }
 
@@ -509,6 +828,7 @@ public class PmCompanyContractChange {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -519,7 +839,17 @@ public class PmCompanyContractChange {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -540,7 +870,8 @@ public class PmCompanyContractChange {
      * @return
      */
     public static PmCompanyContractChange newData() {
-        return modelHelper.newData();
+        PmCompanyContractChange obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -549,7 +880,8 @@ public class PmCompanyContractChange {
      * @return
      */
     public static PmCompanyContractChange insertData() {
-        return modelHelper.insertData();
+        PmCompanyContractChange obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -561,7 +893,8 @@ public class PmCompanyContractChange {
      * @return 获取到的对象，若无则为null。
      */
     public static PmCompanyContractChange selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        PmCompanyContractChange obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -573,7 +906,8 @@ public class PmCompanyContractChange {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PmCompanyContractChange> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<PmCompanyContractChange> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -585,7 +919,8 @@ public class PmCompanyContractChange {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PmCompanyContractChange> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<PmCompanyContractChange> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

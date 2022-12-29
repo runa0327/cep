@@ -4,9 +4,12 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +22,18 @@ public class PmProPlanNode {
      * 模型助手。
      */
     private static final ModelHelper<PmProPlanNode> modelHelper = new ModelHelper<>("PM_PRO_PLAN_NODE", new PmProPlanNode());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -84,6 +99,14 @@ public class PmProPlanNode {
          * 备注。
          */
         public static final String REMARK = "REMARK";
+        /**
+         * 进度计划名称。
+         */
+        public static final String SCHEDULE_NAME = "SCHEDULE_NAME";
+        /**
+         * 序号备用。
+         */
+        public static final String SEQ_NO_BAK = "SEQ_NO_BAK";
         /**
          * 责任部门。
          */
@@ -206,7 +229,7 @@ public class PmProPlanNode {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -219,14 +242,30 @@ public class PmProPlanNode {
      * 设置：ID。
      */
     public PmProPlanNode setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -239,14 +278,30 @@ public class PmProPlanNode {
      * 设置：版本。
      */
     public PmProPlanNode setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -259,14 +314,30 @@ public class PmProPlanNode {
      * 设置：时间戳。
      */
     public PmProPlanNode setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -279,14 +350,30 @@ public class PmProPlanNode {
      * 设置：是否预设。
      */
     public PmProPlanNode setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -299,14 +386,30 @@ public class PmProPlanNode {
      * 设置：创建日期时间。
      */
     public PmProPlanNode setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -319,14 +422,30 @@ public class PmProPlanNode {
      * 设置：创建用户。
      */
     public PmProPlanNode setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -339,14 +458,30 @@ public class PmProPlanNode {
      * 设置：最后修改日期时间。
      */
     public PmProPlanNode setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -359,14 +494,30 @@ public class PmProPlanNode {
      * 设置：最后修改用户。
      */
     public PmProPlanNode setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -379,14 +530,30 @@ public class PmProPlanNode {
      * 设置：记录状态。
      */
     public PmProPlanNode setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -399,14 +566,30 @@ public class PmProPlanNode {
      * 设置：锁定流程实例。
      */
     public PmProPlanNode setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -419,14 +602,30 @@ public class PmProPlanNode {
      * 设置：代码。
      */
     public PmProPlanNode setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -439,14 +638,30 @@ public class PmProPlanNode {
      * 设置：名称。
      */
     public PmProPlanNode setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -459,14 +674,102 @@ public class PmProPlanNode {
      * 设置：备注。
      */
     public PmProPlanNode setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 进度计划名称。
+     */
+    private String scheduleName;
+
+    /**
+     * 获取：进度计划名称。
+     */
+    public String getScheduleName() {
+        return this.scheduleName;
+    }
+
+    /**
+     * 设置：进度计划名称。
+     */
+    public PmProPlanNode setScheduleName(String scheduleName) {
+        if (this.scheduleName == null && scheduleName == null) {
+            // 均为null，不做处理。
+        } else if (this.scheduleName != null && scheduleName != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.scheduleName.compareTo(scheduleName) != 0) {
+                this.scheduleName = scheduleName;
+                if (!this.toUpdateCols.contains("SCHEDULE_NAME")) {
+                    this.toUpdateCols.add("SCHEDULE_NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.scheduleName = scheduleName;
+            if (!this.toUpdateCols.contains("SCHEDULE_NAME")) {
+                this.toUpdateCols.add("SCHEDULE_NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 序号备用。
+     */
+    private BigDecimal seqNoBak;
+
+    /**
+     * 获取：序号备用。
+     */
+    public BigDecimal getSeqNoBak() {
+        return this.seqNoBak;
+    }
+
+    /**
+     * 设置：序号备用。
+     */
+    public PmProPlanNode setSeqNoBak(BigDecimal seqNoBak) {
+        if (this.seqNoBak == null && seqNoBak == null) {
+            // 均为null，不做处理。
+        } else if (this.seqNoBak != null && seqNoBak != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.seqNoBak.compareTo(seqNoBak) != 0) {
+                this.seqNoBak = seqNoBak;
+                if (!this.toUpdateCols.contains("SEQ_NO_BAK")) {
+                    this.toUpdateCols.add("SEQ_NO_BAK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.seqNoBak = seqNoBak;
+            if (!this.toUpdateCols.contains("SEQ_NO_BAK")) {
+                this.toUpdateCols.add("SEQ_NO_BAK");
+            }
+        }
         return this;
     }
 
     /**
      * 责任部门。
      */
-    public String chiefDeptId;
+    private String chiefDeptId;
 
     /**
      * 获取：责任部门。
@@ -479,14 +782,30 @@ public class PmProPlanNode {
      * 设置：责任部门。
      */
     public PmProPlanNode setChiefDeptId(String chiefDeptId) {
-        this.chiefDeptId = chiefDeptId;
+        if (this.chiefDeptId == null && chiefDeptId == null) {
+            // 均为null，不做处理。
+        } else if (this.chiefDeptId != null && chiefDeptId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.chiefDeptId.compareTo(chiefDeptId) != 0) {
+                this.chiefDeptId = chiefDeptId;
+                if (!this.toUpdateCols.contains("CHIEF_DEPT_ID")) {
+                    this.toUpdateCols.add("CHIEF_DEPT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.chiefDeptId = chiefDeptId;
+            if (!this.toUpdateCols.contains("CHIEF_DEPT_ID")) {
+                this.toUpdateCols.add("CHIEF_DEPT_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 责任用户。
      */
-    public String chiefUserId;
+    private String chiefUserId;
 
     /**
      * 获取：责任用户。
@@ -499,14 +818,30 @@ public class PmProPlanNode {
      * 设置：责任用户。
      */
     public PmProPlanNode setChiefUserId(String chiefUserId) {
-        this.chiefUserId = chiefUserId;
+        if (this.chiefUserId == null && chiefUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.chiefUserId != null && chiefUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.chiefUserId.compareTo(chiefUserId) != 0) {
+                this.chiefUserId = chiefUserId;
+                if (!this.toUpdateCols.contains("CHIEF_USER_ID")) {
+                    this.toUpdateCols.add("CHIEF_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.chiefUserId = chiefUserId;
+            if (!this.toUpdateCols.contains("CHIEF_USER_ID")) {
+                this.toUpdateCols.add("CHIEF_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 第几天开始。
      */
-    public Integer startDay;
+    private Integer startDay;
 
     /**
      * 获取：第几天开始。
@@ -519,14 +854,30 @@ public class PmProPlanNode {
      * 设置：第几天开始。
      */
     public PmProPlanNode setStartDay(Integer startDay) {
-        this.startDay = startDay;
+        if (this.startDay == null && startDay == null) {
+            // 均为null，不做处理。
+        } else if (this.startDay != null && startDay != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.startDay.compareTo(startDay) != 0) {
+                this.startDay = startDay;
+                if (!this.toUpdateCols.contains("START_DAY")) {
+                    this.toUpdateCols.add("START_DAY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.startDay = startDay;
+            if (!this.toUpdateCols.contains("START_DAY")) {
+                this.toUpdateCols.add("START_DAY");
+            }
+        }
         return this;
     }
 
     /**
      * 进度状态。
      */
-    public String progressStatusId;
+    private String progressStatusId;
 
     /**
      * 获取：进度状态。
@@ -539,14 +890,30 @@ public class PmProPlanNode {
      * 设置：进度状态。
      */
     public PmProPlanNode setProgressStatusId(String progressStatusId) {
-        this.progressStatusId = progressStatusId;
+        if (this.progressStatusId == null && progressStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.progressStatusId != null && progressStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.progressStatusId.compareTo(progressStatusId) != 0) {
+                this.progressStatusId = progressStatusId;
+                if (!this.toUpdateCols.contains("PROGRESS_STATUS_ID")) {
+                    this.toUpdateCols.add("PROGRESS_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.progressStatusId = progressStatusId;
+            if (!this.toUpdateCols.contains("PROGRESS_STATUS_ID")) {
+                this.toUpdateCols.add("PROGRESS_STATUS_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 预计开始日期。
      */
-    public LocalDate planStartDate;
+    private LocalDate planStartDate;
 
     /**
      * 获取：预计开始日期。
@@ -559,14 +926,30 @@ public class PmProPlanNode {
      * 设置：预计开始日期。
      */
     public PmProPlanNode setPlanStartDate(LocalDate planStartDate) {
-        this.planStartDate = planStartDate;
+        if (this.planStartDate == null && planStartDate == null) {
+            // 均为null，不做处理。
+        } else if (this.planStartDate != null && planStartDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planStartDate.compareTo(planStartDate) != 0) {
+                this.planStartDate = planStartDate;
+                if (!this.toUpdateCols.contains("PLAN_START_DATE")) {
+                    this.toUpdateCols.add("PLAN_START_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planStartDate = planStartDate;
+            if (!this.toUpdateCols.contains("PLAN_START_DATE")) {
+                this.toUpdateCols.add("PLAN_START_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 预计完成日期。
      */
-    public LocalDate planComplDate;
+    private LocalDate planComplDate;
 
     /**
      * 获取：预计完成日期。
@@ -579,14 +962,30 @@ public class PmProPlanNode {
      * 设置：预计完成日期。
      */
     public PmProPlanNode setPlanComplDate(LocalDate planComplDate) {
-        this.planComplDate = planComplDate;
+        if (this.planComplDate == null && planComplDate == null) {
+            // 均为null，不做处理。
+        } else if (this.planComplDate != null && planComplDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planComplDate.compareTo(planComplDate) != 0) {
+                this.planComplDate = planComplDate;
+                if (!this.toUpdateCols.contains("PLAN_COMPL_DATE")) {
+                    this.toUpdateCols.add("PLAN_COMPL_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planComplDate = planComplDate;
+            if (!this.toUpdateCols.contains("PLAN_COMPL_DATE")) {
+                this.toUpdateCols.add("PLAN_COMPL_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 预计总天数。
      */
-    public Integer planTotalDays;
+    private Integer planTotalDays;
 
     /**
      * 获取：预计总天数。
@@ -599,14 +998,30 @@ public class PmProPlanNode {
      * 设置：预计总天数。
      */
     public PmProPlanNode setPlanTotalDays(Integer planTotalDays) {
-        this.planTotalDays = planTotalDays;
+        if (this.planTotalDays == null && planTotalDays == null) {
+            // 均为null，不做处理。
+        } else if (this.planTotalDays != null && planTotalDays != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planTotalDays.compareTo(planTotalDays) != 0) {
+                this.planTotalDays = planTotalDays;
+                if (!this.toUpdateCols.contains("PLAN_TOTAL_DAYS")) {
+                    this.toUpdateCols.add("PLAN_TOTAL_DAYS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planTotalDays = planTotalDays;
+            if (!this.toUpdateCols.contains("PLAN_TOTAL_DAYS")) {
+                this.toUpdateCols.add("PLAN_TOTAL_DAYS");
+            }
+        }
         return this;
     }
 
     /**
      * 预计已开展工期。
      */
-    public Integer planCarryDays;
+    private Integer planCarryDays;
 
     /**
      * 获取：预计已开展工期。
@@ -619,34 +1034,66 @@ public class PmProPlanNode {
      * 设置：预计已开展工期。
      */
     public PmProPlanNode setPlanCarryDays(Integer planCarryDays) {
-        this.planCarryDays = planCarryDays;
+        if (this.planCarryDays == null && planCarryDays == null) {
+            // 均为null，不做处理。
+        } else if (this.planCarryDays != null && planCarryDays != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planCarryDays.compareTo(planCarryDays) != 0) {
+                this.planCarryDays = planCarryDays;
+                if (!this.toUpdateCols.contains("PLAN_CARRY_DAYS")) {
+                    this.toUpdateCols.add("PLAN_CARRY_DAYS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planCarryDays = planCarryDays;
+            if (!this.toUpdateCols.contains("PLAN_CARRY_DAYS")) {
+                this.toUpdateCols.add("PLAN_CARRY_DAYS");
+            }
+        }
         return this;
     }
 
     /**
      * 预计当前进度百分比。
      */
-    public Double planCurrentProPercent;
+    private BigDecimal planCurrentProPercent;
 
     /**
      * 获取：预计当前进度百分比。
      */
-    public Double getPlanCurrentProPercent() {
+    public BigDecimal getPlanCurrentProPercent() {
         return this.planCurrentProPercent;
     }
 
     /**
      * 设置：预计当前进度百分比。
      */
-    public PmProPlanNode setPlanCurrentProPercent(Double planCurrentProPercent) {
-        this.planCurrentProPercent = planCurrentProPercent;
+    public PmProPlanNode setPlanCurrentProPercent(BigDecimal planCurrentProPercent) {
+        if (this.planCurrentProPercent == null && planCurrentProPercent == null) {
+            // 均为null，不做处理。
+        } else if (this.planCurrentProPercent != null && planCurrentProPercent != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planCurrentProPercent.compareTo(planCurrentProPercent) != 0) {
+                this.planCurrentProPercent = planCurrentProPercent;
+                if (!this.toUpdateCols.contains("PLAN_CURRENT_PRO_PERCENT")) {
+                    this.toUpdateCols.add("PLAN_CURRENT_PRO_PERCENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planCurrentProPercent = planCurrentProPercent;
+            if (!this.toUpdateCols.contains("PLAN_CURRENT_PRO_PERCENT")) {
+                this.toUpdateCols.add("PLAN_CURRENT_PRO_PERCENT");
+            }
+        }
         return this;
     }
 
     /**
      * 实际开始日期。
      */
-    public LocalDate actualStartDate;
+    private LocalDate actualStartDate;
 
     /**
      * 获取：实际开始日期。
@@ -659,14 +1106,30 @@ public class PmProPlanNode {
      * 设置：实际开始日期。
      */
     public PmProPlanNode setActualStartDate(LocalDate actualStartDate) {
-        this.actualStartDate = actualStartDate;
+        if (this.actualStartDate == null && actualStartDate == null) {
+            // 均为null，不做处理。
+        } else if (this.actualStartDate != null && actualStartDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actualStartDate.compareTo(actualStartDate) != 0) {
+                this.actualStartDate = actualStartDate;
+                if (!this.toUpdateCols.contains("ACTUAL_START_DATE")) {
+                    this.toUpdateCols.add("ACTUAL_START_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actualStartDate = actualStartDate;
+            if (!this.toUpdateCols.contains("ACTUAL_START_DATE")) {
+                this.toUpdateCols.add("ACTUAL_START_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 实际完成日期。
      */
-    public LocalDate actualComplDate;
+    private LocalDate actualComplDate;
 
     /**
      * 获取：实际完成日期。
@@ -679,14 +1142,30 @@ public class PmProPlanNode {
      * 设置：实际完成日期。
      */
     public PmProPlanNode setActualComplDate(LocalDate actualComplDate) {
-        this.actualComplDate = actualComplDate;
+        if (this.actualComplDate == null && actualComplDate == null) {
+            // 均为null，不做处理。
+        } else if (this.actualComplDate != null && actualComplDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actualComplDate.compareTo(actualComplDate) != 0) {
+                this.actualComplDate = actualComplDate;
+                if (!this.toUpdateCols.contains("ACTUAL_COMPL_DATE")) {
+                    this.toUpdateCols.add("ACTUAL_COMPL_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actualComplDate = actualComplDate;
+            if (!this.toUpdateCols.contains("ACTUAL_COMPL_DATE")) {
+                this.toUpdateCols.add("ACTUAL_COMPL_DATE");
+            }
+        }
         return this;
     }
 
     /**
      * 实际总天数。
      */
-    public Integer actualTotalDays;
+    private Integer actualTotalDays;
 
     /**
      * 获取：实际总天数。
@@ -699,14 +1178,30 @@ public class PmProPlanNode {
      * 设置：实际总天数。
      */
     public PmProPlanNode setActualTotalDays(Integer actualTotalDays) {
-        this.actualTotalDays = actualTotalDays;
+        if (this.actualTotalDays == null && actualTotalDays == null) {
+            // 均为null，不做处理。
+        } else if (this.actualTotalDays != null && actualTotalDays != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actualTotalDays.compareTo(actualTotalDays) != 0) {
+                this.actualTotalDays = actualTotalDays;
+                if (!this.toUpdateCols.contains("ACTUAL_TOTAL_DAYS")) {
+                    this.toUpdateCols.add("ACTUAL_TOTAL_DAYS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actualTotalDays = actualTotalDays;
+            if (!this.toUpdateCols.contains("ACTUAL_TOTAL_DAYS")) {
+                this.toUpdateCols.add("ACTUAL_TOTAL_DAYS");
+            }
+        }
         return this;
     }
 
     /**
      * 实际已开展工期。
      */
-    public Integer actualCarryDays;
+    private Integer actualCarryDays;
 
     /**
      * 获取：实际已开展工期。
@@ -719,34 +1214,66 @@ public class PmProPlanNode {
      * 设置：实际已开展工期。
      */
     public PmProPlanNode setActualCarryDays(Integer actualCarryDays) {
-        this.actualCarryDays = actualCarryDays;
+        if (this.actualCarryDays == null && actualCarryDays == null) {
+            // 均为null，不做处理。
+        } else if (this.actualCarryDays != null && actualCarryDays != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actualCarryDays.compareTo(actualCarryDays) != 0) {
+                this.actualCarryDays = actualCarryDays;
+                if (!this.toUpdateCols.contains("ACTUAL_CARRY_DAYS")) {
+                    this.toUpdateCols.add("ACTUAL_CARRY_DAYS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actualCarryDays = actualCarryDays;
+            if (!this.toUpdateCols.contains("ACTUAL_CARRY_DAYS")) {
+                this.toUpdateCols.add("ACTUAL_CARRY_DAYS");
+            }
+        }
         return this;
     }
 
     /**
      * 实际当前进度百分比。
      */
-    public Double actualCurrentProPercent;
+    private BigDecimal actualCurrentProPercent;
 
     /**
      * 获取：实际当前进度百分比。
      */
-    public Double getActualCurrentProPercent() {
+    public BigDecimal getActualCurrentProPercent() {
         return this.actualCurrentProPercent;
     }
 
     /**
      * 设置：实际当前进度百分比。
      */
-    public PmProPlanNode setActualCurrentProPercent(Double actualCurrentProPercent) {
-        this.actualCurrentProPercent = actualCurrentProPercent;
+    public PmProPlanNode setActualCurrentProPercent(BigDecimal actualCurrentProPercent) {
+        if (this.actualCurrentProPercent == null && actualCurrentProPercent == null) {
+            // 均为null，不做处理。
+        } else if (this.actualCurrentProPercent != null && actualCurrentProPercent != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actualCurrentProPercent.compareTo(actualCurrentProPercent) != 0) {
+                this.actualCurrentProPercent = actualCurrentProPercent;
+                if (!this.toUpdateCols.contains("ACTUAL_CURRENT_PRO_PERCENT")) {
+                    this.toUpdateCols.add("ACTUAL_CURRENT_PRO_PERCENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actualCurrentProPercent = actualCurrentProPercent;
+            if (!this.toUpdateCols.contains("ACTUAL_CURRENT_PRO_PERCENT")) {
+                this.toUpdateCols.add("ACTUAL_CURRENT_PRO_PERCENT");
+            }
+        }
         return this;
     }
 
     /**
      * 进度风险类型。
      */
-    public String progressRiskTypeId;
+    private String progressRiskTypeId;
 
     /**
      * 获取：进度风险类型。
@@ -759,14 +1286,30 @@ public class PmProPlanNode {
      * 设置：进度风险类型。
      */
     public PmProPlanNode setProgressRiskTypeId(String progressRiskTypeId) {
-        this.progressRiskTypeId = progressRiskTypeId;
+        if (this.progressRiskTypeId == null && progressRiskTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.progressRiskTypeId != null && progressRiskTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.progressRiskTypeId.compareTo(progressRiskTypeId) != 0) {
+                this.progressRiskTypeId = progressRiskTypeId;
+                if (!this.toUpdateCols.contains("PROGRESS_RISK_TYPE_ID")) {
+                    this.toUpdateCols.add("PROGRESS_RISK_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.progressRiskTypeId = progressRiskTypeId;
+            if (!this.toUpdateCols.contains("PROGRESS_RISK_TYPE_ID")) {
+                this.toUpdateCols.add("PROGRESS_RISK_TYPE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 进度风险说明。
      */
-    public String progressRiskRemark;
+    private String progressRiskRemark;
 
     /**
      * 获取：进度风险说明。
@@ -779,14 +1322,30 @@ public class PmProPlanNode {
      * 设置：进度风险说明。
      */
     public PmProPlanNode setProgressRiskRemark(String progressRiskRemark) {
-        this.progressRiskRemark = progressRiskRemark;
+        if (this.progressRiskRemark == null && progressRiskRemark == null) {
+            // 均为null，不做处理。
+        } else if (this.progressRiskRemark != null && progressRiskRemark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.progressRiskRemark.compareTo(progressRiskRemark) != 0) {
+                this.progressRiskRemark = progressRiskRemark;
+                if (!this.toUpdateCols.contains("PROGRESS_RISK_REMARK")) {
+                    this.toUpdateCols.add("PROGRESS_RISK_REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.progressRiskRemark = progressRiskRemark;
+            if (!this.toUpdateCols.contains("PROGRESS_RISK_REMARK")) {
+                this.toUpdateCols.add("PROGRESS_RISK_REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 显示在前期手续。
      */
-    public Boolean showInEarlyProc;
+    private Boolean showInEarlyProc;
 
     /**
      * 获取：显示在前期手续。
@@ -799,14 +1358,30 @@ public class PmProPlanNode {
      * 设置：显示在前期手续。
      */
     public PmProPlanNode setShowInEarlyProc(Boolean showInEarlyProc) {
-        this.showInEarlyProc = showInEarlyProc;
+        if (this.showInEarlyProc == null && showInEarlyProc == null) {
+            // 均为null，不做处理。
+        } else if (this.showInEarlyProc != null && showInEarlyProc != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.showInEarlyProc.compareTo(showInEarlyProc) != 0) {
+                this.showInEarlyProc = showInEarlyProc;
+                if (!this.toUpdateCols.contains("SHOW_IN_EARLY_PROC")) {
+                    this.toUpdateCols.add("SHOW_IN_EARLY_PROC");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.showInEarlyProc = showInEarlyProc;
+            if (!this.toUpdateCols.contains("SHOW_IN_EARLY_PROC")) {
+                this.toUpdateCols.add("SHOW_IN_EARLY_PROC");
+            }
+        }
         return this;
     }
 
     /**
      * 显示在项目概览。
      */
-    public Boolean showInPrjOverview;
+    private Boolean showInPrjOverview;
 
     /**
      * 获取：显示在项目概览。
@@ -819,14 +1394,30 @@ public class PmProPlanNode {
      * 设置：显示在项目概览。
      */
     public PmProPlanNode setShowInPrjOverview(Boolean showInPrjOverview) {
-        this.showInPrjOverview = showInPrjOverview;
+        if (this.showInPrjOverview == null && showInPrjOverview == null) {
+            // 均为null，不做处理。
+        } else if (this.showInPrjOverview != null && showInPrjOverview != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.showInPrjOverview.compareTo(showInPrjOverview) != 0) {
+                this.showInPrjOverview = showInPrjOverview;
+                if (!this.toUpdateCols.contains("SHOW_IN_PRJ_OVERVIEW")) {
+                    this.toUpdateCols.add("SHOW_IN_PRJ_OVERVIEW");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.showInPrjOverview = showInPrjOverview;
+            if (!this.toUpdateCols.contains("SHOW_IN_PRJ_OVERVIEW")) {
+                this.toUpdateCols.add("SHOW_IN_PRJ_OVERVIEW");
+            }
+        }
         return this;
     }
 
     /**
      * 项目进度计划父节点。
      */
-    public String pmProPlanNodePid;
+    private String pmProPlanNodePid;
 
     /**
      * 获取：项目进度计划父节点。
@@ -839,34 +1430,66 @@ public class PmProPlanNode {
      * 设置：项目进度计划父节点。
      */
     public PmProPlanNode setPmProPlanNodePid(String pmProPlanNodePid) {
-        this.pmProPlanNodePid = pmProPlanNodePid;
+        if (this.pmProPlanNodePid == null && pmProPlanNodePid == null) {
+            // 均为null，不做处理。
+        } else if (this.pmProPlanNodePid != null && pmProPlanNodePid != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmProPlanNodePid.compareTo(pmProPlanNodePid) != 0) {
+                this.pmProPlanNodePid = pmProPlanNodePid;
+                if (!this.toUpdateCols.contains("PM_PRO_PLAN_NODE_PID")) {
+                    this.toUpdateCols.add("PM_PRO_PLAN_NODE_PID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmProPlanNodePid = pmProPlanNodePid;
+            if (!this.toUpdateCols.contains("PM_PRO_PLAN_NODE_PID")) {
+                this.toUpdateCols.add("PM_PRO_PLAN_NODE_PID");
+            }
+        }
         return this;
     }
 
     /**
      * 序号。
      */
-    public Double seqNo;
+    private BigDecimal seqNo;
 
     /**
      * 获取：序号。
      */
-    public Double getSeqNo() {
+    public BigDecimal getSeqNo() {
         return this.seqNo;
     }
 
     /**
      * 设置：序号。
      */
-    public PmProPlanNode setSeqNo(Double seqNo) {
-        this.seqNo = seqNo;
+    public PmProPlanNode setSeqNo(BigDecimal seqNo) {
+        if (this.seqNo == null && seqNo == null) {
+            // 均为null，不做处理。
+        } else if (this.seqNo != null && seqNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.seqNo.compareTo(seqNo) != 0) {
+                this.seqNo = seqNo;
+                if (!this.toUpdateCols.contains("SEQ_NO")) {
+                    this.toUpdateCols.add("SEQ_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.seqNo = seqNo;
+            if (!this.toUpdateCols.contains("SEQ_NO")) {
+                this.toUpdateCols.add("SEQ_NO");
+            }
+        }
         return this;
     }
 
     /**
      * 项目进度计划。
      */
-    public String pmProPlanId;
+    private String pmProPlanId;
 
     /**
      * 获取：项目进度计划。
@@ -879,14 +1502,30 @@ public class PmProPlanNode {
      * 设置：项目进度计划。
      */
     public PmProPlanNode setPmProPlanId(String pmProPlanId) {
-        this.pmProPlanId = pmProPlanId;
+        if (this.pmProPlanId == null && pmProPlanId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmProPlanId != null && pmProPlanId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmProPlanId.compareTo(pmProPlanId) != 0) {
+                this.pmProPlanId = pmProPlanId;
+                if (!this.toUpdateCols.contains("PM_PRO_PLAN_ID")) {
+                    this.toUpdateCols.add("PM_PRO_PLAN_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmProPlanId = pmProPlanId;
+            if (!this.toUpdateCols.contains("PM_PRO_PLAN_ID")) {
+                this.toUpdateCols.add("PM_PRO_PLAN_ID");
+            }
+        }
         return this;
     }
 
     /**
      * CPMS的UUID。
      */
-    public String cpmsUuid;
+    private String cpmsUuid;
 
     /**
      * 获取：CPMS的UUID。
@@ -899,14 +1538,30 @@ public class PmProPlanNode {
      * 设置：CPMS的UUID。
      */
     public PmProPlanNode setCpmsUuid(String cpmsUuid) {
-        this.cpmsUuid = cpmsUuid;
+        if (this.cpmsUuid == null && cpmsUuid == null) {
+            // 均为null，不做处理。
+        } else if (this.cpmsUuid != null && cpmsUuid != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cpmsUuid.compareTo(cpmsUuid) != 0) {
+                this.cpmsUuid = cpmsUuid;
+                if (!this.toUpdateCols.contains("CPMS_UUID")) {
+                    this.toUpdateCols.add("CPMS_UUID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cpmsUuid = cpmsUuid;
+            if (!this.toUpdateCols.contains("CPMS_UUID")) {
+                this.toUpdateCols.add("CPMS_UUID");
+            }
+        }
         return this;
     }
 
     /**
      * CPMS的ID。
      */
-    public String cpmsId;
+    private String cpmsId;
 
     /**
      * 获取：CPMS的ID。
@@ -919,14 +1574,30 @@ public class PmProPlanNode {
      * 设置：CPMS的ID。
      */
     public PmProPlanNode setCpmsId(String cpmsId) {
-        this.cpmsId = cpmsId;
+        if (this.cpmsId == null && cpmsId == null) {
+            // 均为null，不做处理。
+        } else if (this.cpmsId != null && cpmsId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cpmsId.compareTo(cpmsId) != 0) {
+                this.cpmsId = cpmsId;
+                if (!this.toUpdateCols.contains("CPMS_ID")) {
+                    this.toUpdateCols.add("CPMS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cpmsId = cpmsId;
+            if (!this.toUpdateCols.contains("CPMS_ID")) {
+                this.toUpdateCols.add("CPMS_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 层级。
      */
-    public Integer level;
+    private Integer level;
 
     /**
      * 获取：层级。
@@ -939,14 +1610,30 @@ public class PmProPlanNode {
      * 设置：层级。
      */
     public PmProPlanNode setLevel(Integer level) {
-        this.level = level;
+        if (this.level == null && level == null) {
+            // 均为null，不做处理。
+        } else if (this.level != null && level != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.level.compareTo(level) != 0) {
+                this.level = level;
+                if (!this.toUpdateCols.contains("LEVEL")) {
+                    this.toUpdateCols.add("LEVEL");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.level = level;
+            if (!this.toUpdateCols.contains("LEVEL")) {
+                this.toUpdateCols.add("LEVEL");
+            }
+        }
         return this;
     }
 
     /**
      * 关联的流程。
      */
-    public String linkedWfProcessId;
+    private String linkedWfProcessId;
 
     /**
      * 获取：关联的流程。
@@ -959,14 +1646,30 @@ public class PmProPlanNode {
      * 设置：关联的流程。
      */
     public PmProPlanNode setLinkedWfProcessId(String linkedWfProcessId) {
-        this.linkedWfProcessId = linkedWfProcessId;
+        if (this.linkedWfProcessId == null && linkedWfProcessId == null) {
+            // 均为null，不做处理。
+        } else if (this.linkedWfProcessId != null && linkedWfProcessId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.linkedWfProcessId.compareTo(linkedWfProcessId) != 0) {
+                this.linkedWfProcessId = linkedWfProcessId;
+                if (!this.toUpdateCols.contains("LINKED_WF_PROCESS_ID")) {
+                    this.toUpdateCols.add("LINKED_WF_PROCESS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.linkedWfProcessId = linkedWfProcessId;
+            if (!this.toUpdateCols.contains("LINKED_WF_PROCESS_ID")) {
+                this.toUpdateCols.add("LINKED_WF_PROCESS_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 关联的流程节点。
      */
-    public String linkedWfNodeId;
+    private String linkedWfNodeId;
 
     /**
      * 获取：关联的流程节点。
@@ -979,14 +1682,30 @@ public class PmProPlanNode {
      * 设置：关联的流程节点。
      */
     public PmProPlanNode setLinkedWfNodeId(String linkedWfNodeId) {
-        this.linkedWfNodeId = linkedWfNodeId;
+        if (this.linkedWfNodeId == null && linkedWfNodeId == null) {
+            // 均为null，不做处理。
+        } else if (this.linkedWfNodeId != null && linkedWfNodeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.linkedWfNodeId.compareTo(linkedWfNodeId) != 0) {
+                this.linkedWfNodeId = linkedWfNodeId;
+                if (!this.toUpdateCols.contains("LINKED_WF_NODE_ID")) {
+                    this.toUpdateCols.add("LINKED_WF_NODE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.linkedWfNodeId = linkedWfNodeId;
+            if (!this.toUpdateCols.contains("LINKED_WF_NODE_ID")) {
+                this.toUpdateCols.add("LINKED_WF_NODE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 关联的流程实例。
      */
-    public String linkedWfProcessInstanceId;
+    private String linkedWfProcessInstanceId;
 
     /**
      * 获取：关联的流程实例。
@@ -999,14 +1718,30 @@ public class PmProPlanNode {
      * 设置：关联的流程实例。
      */
     public PmProPlanNode setLinkedWfProcessInstanceId(String linkedWfProcessInstanceId) {
-        this.linkedWfProcessInstanceId = linkedWfProcessInstanceId;
+        if (this.linkedWfProcessInstanceId == null && linkedWfProcessInstanceId == null) {
+            // 均为null，不做处理。
+        } else if (this.linkedWfProcessInstanceId != null && linkedWfProcessInstanceId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.linkedWfProcessInstanceId.compareTo(linkedWfProcessInstanceId) != 0) {
+                this.linkedWfProcessInstanceId = linkedWfProcessInstanceId;
+                if (!this.toUpdateCols.contains("LINKED_WF_PROCESS_INSTANCE_ID")) {
+                    this.toUpdateCols.add("LINKED_WF_PROCESS_INSTANCE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.linkedWfProcessInstanceId = linkedWfProcessInstanceId;
+            if (!this.toUpdateCols.contains("LINKED_WF_PROCESS_INSTANCE_ID")) {
+                this.toUpdateCols.add("LINKED_WF_PROCESS_INSTANCE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 关联的流程节点实例。
      */
-    public String linkedWfNodeInstanceId;
+    private String linkedWfNodeInstanceId;
 
     /**
      * 获取：关联的流程节点实例。
@@ -1019,7 +1754,23 @@ public class PmProPlanNode {
      * 设置：关联的流程节点实例。
      */
     public PmProPlanNode setLinkedWfNodeInstanceId(String linkedWfNodeInstanceId) {
-        this.linkedWfNodeInstanceId = linkedWfNodeInstanceId;
+        if (this.linkedWfNodeInstanceId == null && linkedWfNodeInstanceId == null) {
+            // 均为null，不做处理。
+        } else if (this.linkedWfNodeInstanceId != null && linkedWfNodeInstanceId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.linkedWfNodeInstanceId.compareTo(linkedWfNodeInstanceId) != 0) {
+                this.linkedWfNodeInstanceId = linkedWfNodeInstanceId;
+                if (!this.toUpdateCols.contains("LINKED_WF_NODE_INSTANCE_ID")) {
+                    this.toUpdateCols.add("LINKED_WF_NODE_INSTANCE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.linkedWfNodeInstanceId = linkedWfNodeInstanceId;
+            if (!this.toUpdateCols.contains("LINKED_WF_NODE_INSTANCE_ID")) {
+                this.toUpdateCols.add("LINKED_WF_NODE_INSTANCE_ID");
+            }
+        }
         return this;
     }
 
@@ -1037,6 +1788,7 @@ public class PmProPlanNode {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -1047,7 +1799,17 @@ public class PmProPlanNode {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -1068,7 +1830,8 @@ public class PmProPlanNode {
      * @return
      */
     public static PmProPlanNode newData() {
-        return modelHelper.newData();
+        PmProPlanNode obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -1077,7 +1840,8 @@ public class PmProPlanNode {
      * @return
      */
     public static PmProPlanNode insertData() {
-        return modelHelper.insertData();
+        PmProPlanNode obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -1089,7 +1853,8 @@ public class PmProPlanNode {
      * @return 获取到的对象，若无则为null。
      */
     public static PmProPlanNode selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        PmProPlanNode obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -1101,7 +1866,8 @@ public class PmProPlanNode {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PmProPlanNode> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<PmProPlanNode> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -1113,7 +1879,8 @@ public class PmProPlanNode {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PmProPlanNode> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<PmProPlanNode> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

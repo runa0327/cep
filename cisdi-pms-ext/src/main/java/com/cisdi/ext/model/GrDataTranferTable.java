@@ -4,8 +4,11 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +21,18 @@ public class GrDataTranferTable {
      * 模型助手。
      */
     private static final ModelHelper<GrDataTranferTable> modelHelper = new ModelHelper<>("GR_DATA_TRANFER_TABLE", new GrDataTranferTable());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -125,7 +140,7 @@ public class GrDataTranferTable {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -138,14 +153,30 @@ public class GrDataTranferTable {
      * 设置：ID。
      */
     public GrDataTranferTable setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -158,14 +189,30 @@ public class GrDataTranferTable {
      * 设置：版本。
      */
     public GrDataTranferTable setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -178,14 +225,30 @@ public class GrDataTranferTable {
      * 设置：时间戳。
      */
     public GrDataTranferTable setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -198,14 +261,30 @@ public class GrDataTranferTable {
      * 设置：是否预设。
      */
     public GrDataTranferTable setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -218,14 +297,30 @@ public class GrDataTranferTable {
      * 设置：创建日期时间。
      */
     public GrDataTranferTable setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -238,14 +333,30 @@ public class GrDataTranferTable {
      * 设置：创建用户。
      */
     public GrDataTranferTable setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -258,14 +369,30 @@ public class GrDataTranferTable {
      * 设置：最后修改日期时间。
      */
     public GrDataTranferTable setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -278,14 +405,30 @@ public class GrDataTranferTable {
      * 设置：最后修改用户。
      */
     public GrDataTranferTable setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -298,14 +441,30 @@ public class GrDataTranferTable {
      * 设置：记录状态。
      */
     public GrDataTranferTable setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -318,14 +477,30 @@ public class GrDataTranferTable {
      * 设置：锁定流程实例。
      */
     public GrDataTranferTable setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -338,14 +513,30 @@ public class GrDataTranferTable {
      * 设置：代码。
      */
     public GrDataTranferTable setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -358,14 +549,30 @@ public class GrDataTranferTable {
      * 设置：名称。
      */
     public GrDataTranferTable setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -378,34 +585,66 @@ public class GrDataTranferTable {
      * 设置：备注。
      */
     public GrDataTranferTable setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 序号。
      */
-    public Double seqNo;
+    private BigDecimal seqNo;
 
     /**
      * 获取：序号。
      */
-    public Double getSeqNo() {
+    public BigDecimal getSeqNo() {
         return this.seqNo;
     }
 
     /**
      * 设置：序号。
      */
-    public GrDataTranferTable setSeqNo(Double seqNo) {
-        this.seqNo = seqNo;
+    public GrDataTranferTable setSeqNo(BigDecimal seqNo) {
+        if (this.seqNo == null && seqNo == null) {
+            // 均为null，不做处理。
+        } else if (this.seqNo != null && seqNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.seqNo.compareTo(seqNo) != 0) {
+                this.seqNo = seqNo;
+                if (!this.toUpdateCols.contains("SEQ_NO")) {
+                    this.toUpdateCols.add("SEQ_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.seqNo = seqNo;
+            if (!this.toUpdateCols.contains("SEQ_NO")) {
+                this.toUpdateCols.add("SEQ_NO");
+            }
+        }
         return this;
     }
 
     /**
      * CPMS表。
      */
-    public String cpmsTable;
+    private String cpmsTable;
 
     /**
      * 获取：CPMS表。
@@ -418,14 +657,30 @@ public class GrDataTranferTable {
      * 设置：CPMS表。
      */
     public GrDataTranferTable setCpmsTable(String cpmsTable) {
-        this.cpmsTable = cpmsTable;
+        if (this.cpmsTable == null && cpmsTable == null) {
+            // 均为null，不做处理。
+        } else if (this.cpmsTable != null && cpmsTable != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cpmsTable.compareTo(cpmsTable) != 0) {
+                this.cpmsTable = cpmsTable;
+                if (!this.toUpdateCols.contains("CPMS_TABLE")) {
+                    this.toUpdateCols.add("CPMS_TABLE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cpmsTable = cpmsTable;
+            if (!this.toUpdateCols.contains("CPMS_TABLE")) {
+                this.toUpdateCols.add("CPMS_TABLE");
+            }
+        }
         return this;
     }
 
     /**
      * CPMS的UUID列。
      */
-    public String cpmsUuidCol;
+    private String cpmsUuidCol;
 
     /**
      * 获取：CPMS的UUID列。
@@ -438,14 +693,30 @@ public class GrDataTranferTable {
      * 设置：CPMS的UUID列。
      */
     public GrDataTranferTable setCpmsUuidCol(String cpmsUuidCol) {
-        this.cpmsUuidCol = cpmsUuidCol;
+        if (this.cpmsUuidCol == null && cpmsUuidCol == null) {
+            // 均为null，不做处理。
+        } else if (this.cpmsUuidCol != null && cpmsUuidCol != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cpmsUuidCol.compareTo(cpmsUuidCol) != 0) {
+                this.cpmsUuidCol = cpmsUuidCol;
+                if (!this.toUpdateCols.contains("CPMS_UUID_COL")) {
+                    this.toUpdateCols.add("CPMS_UUID_COL");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cpmsUuidCol = cpmsUuidCol;
+            if (!this.toUpdateCols.contains("CPMS_UUID_COL")) {
+                this.toUpdateCols.add("CPMS_UUID_COL");
+            }
+        }
         return this;
     }
 
     /**
      * 获取数据WHERE语句。
      */
-    public String selectDataWhereClause;
+    private String selectDataWhereClause;
 
     /**
      * 获取：获取数据WHERE语句。
@@ -458,14 +729,30 @@ public class GrDataTranferTable {
      * 设置：获取数据WHERE语句。
      */
     public GrDataTranferTable setSelectDataWhereClause(String selectDataWhereClause) {
-        this.selectDataWhereClause = selectDataWhereClause;
+        if (this.selectDataWhereClause == null && selectDataWhereClause == null) {
+            // 均为null，不做处理。
+        } else if (this.selectDataWhereClause != null && selectDataWhereClause != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.selectDataWhereClause.compareTo(selectDataWhereClause) != 0) {
+                this.selectDataWhereClause = selectDataWhereClause;
+                if (!this.toUpdateCols.contains("SELECT_DATA_WHERE_CLAUSE")) {
+                    this.toUpdateCols.add("SELECT_DATA_WHERE_CLAUSE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.selectDataWhereClause = selectDataWhereClause;
+            if (!this.toUpdateCols.contains("SELECT_DATA_WHERE_CLAUSE")) {
+                this.toUpdateCols.add("SELECT_DATA_WHERE_CLAUSE");
+            }
+        }
         return this;
     }
 
     /**
      * 企业云表。
      */
-    public String qyglyTable;
+    private String qyglyTable;
 
     /**
      * 获取：企业云表。
@@ -478,14 +765,30 @@ public class GrDataTranferTable {
      * 设置：企业云表。
      */
     public GrDataTranferTable setQyglyTable(String qyglyTable) {
-        this.qyglyTable = qyglyTable;
+        if (this.qyglyTable == null && qyglyTable == null) {
+            // 均为null，不做处理。
+        } else if (this.qyglyTable != null && qyglyTable != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.qyglyTable.compareTo(qyglyTable) != 0) {
+                this.qyglyTable = qyglyTable;
+                if (!this.toUpdateCols.contains("QYGLY_TABLE")) {
+                    this.toUpdateCols.add("QYGLY_TABLE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.qyglyTable = qyglyTable;
+            if (!this.toUpdateCols.contains("QYGLY_TABLE")) {
+                this.toUpdateCols.add("QYGLY_TABLE");
+            }
+        }
         return this;
     }
 
     /**
      * 删除数据。
      */
-    public Boolean deleteData;
+    private Boolean deleteData;
 
     /**
      * 获取：删除数据。
@@ -498,14 +801,30 @@ public class GrDataTranferTable {
      * 设置：删除数据。
      */
     public GrDataTranferTable setDeleteData(Boolean deleteData) {
-        this.deleteData = deleteData;
+        if (this.deleteData == null && deleteData == null) {
+            // 均为null，不做处理。
+        } else if (this.deleteData != null && deleteData != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.deleteData.compareTo(deleteData) != 0) {
+                this.deleteData = deleteData;
+                if (!this.toUpdateCols.contains("DELETE_DATA")) {
+                    this.toUpdateCols.add("DELETE_DATA");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.deleteData = deleteData;
+            if (!this.toUpdateCols.contains("DELETE_DATA")) {
+                this.toUpdateCols.add("DELETE_DATA");
+            }
+        }
         return this;
     }
 
     /**
      * 删除数据WHERE语句。
      */
-    public String deleteDataWhereClause;
+    private String deleteDataWhereClause;
 
     /**
      * 获取：删除数据WHERE语句。
@@ -518,14 +837,30 @@ public class GrDataTranferTable {
      * 设置：删除数据WHERE语句。
      */
     public GrDataTranferTable setDeleteDataWhereClause(String deleteDataWhereClause) {
-        this.deleteDataWhereClause = deleteDataWhereClause;
+        if (this.deleteDataWhereClause == null && deleteDataWhereClause == null) {
+            // 均为null，不做处理。
+        } else if (this.deleteDataWhereClause != null && deleteDataWhereClause != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.deleteDataWhereClause.compareTo(deleteDataWhereClause) != 0) {
+                this.deleteDataWhereClause = deleteDataWhereClause;
+                if (!this.toUpdateCols.contains("DELETE_DATA_WHERE_CLAUSE")) {
+                    this.toUpdateCols.add("DELETE_DATA_WHERE_CLAUSE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.deleteDataWhereClause = deleteDataWhereClause;
+            if (!this.toUpdateCols.contains("DELETE_DATA_WHERE_CLAUSE")) {
+                this.toUpdateCols.add("DELETE_DATA_WHERE_CLAUSE");
+            }
+        }
         return this;
     }
 
     /**
      * 逐行UPDATE语句。
      */
-    public String updateSqlForEach;
+    private String updateSqlForEach;
 
     /**
      * 获取：逐行UPDATE语句。
@@ -538,7 +873,23 @@ public class GrDataTranferTable {
      * 设置：逐行UPDATE语句。
      */
     public GrDataTranferTable setUpdateSqlForEach(String updateSqlForEach) {
-        this.updateSqlForEach = updateSqlForEach;
+        if (this.updateSqlForEach == null && updateSqlForEach == null) {
+            // 均为null，不做处理。
+        } else if (this.updateSqlForEach != null && updateSqlForEach != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.updateSqlForEach.compareTo(updateSqlForEach) != 0) {
+                this.updateSqlForEach = updateSqlForEach;
+                if (!this.toUpdateCols.contains("UPDATE_SQL_FOR_EACH")) {
+                    this.toUpdateCols.add("UPDATE_SQL_FOR_EACH");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.updateSqlForEach = updateSqlForEach;
+            if (!this.toUpdateCols.contains("UPDATE_SQL_FOR_EACH")) {
+                this.toUpdateCols.add("UPDATE_SQL_FOR_EACH");
+            }
+        }
         return this;
     }
 
@@ -556,6 +907,7 @@ public class GrDataTranferTable {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -566,7 +918,17 @@ public class GrDataTranferTable {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -587,7 +949,8 @@ public class GrDataTranferTable {
      * @return
      */
     public static GrDataTranferTable newData() {
-        return modelHelper.newData();
+        GrDataTranferTable obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -596,7 +959,8 @@ public class GrDataTranferTable {
      * @return
      */
     public static GrDataTranferTable insertData() {
-        return modelHelper.insertData();
+        GrDataTranferTable obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -608,7 +972,8 @@ public class GrDataTranferTable {
      * @return 获取到的对象，若无则为null。
      */
     public static GrDataTranferTable selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        GrDataTranferTable obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -620,7 +985,8 @@ public class GrDataTranferTable {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<GrDataTranferTable> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<GrDataTranferTable> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -632,7 +998,8 @@ public class GrDataTranferTable {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<GrDataTranferTable> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<GrDataTranferTable> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

@@ -101,10 +101,6 @@ public class PoOrderReqExt {
         // 流程id
         String procInstId = ExtJarHelper.procInstId.get();
         // 审批意见
-//        String sql = "select GROUP_CONCAT(tk.USER_COMMENT order by tk.LAST_MODI_DT desc SEPARATOR '；') as user_comment, " +
-//                "GROUP_CONCAT(tk.USER_ATTACHMENT order by tk.LAST_MODI_DT desc SEPARATOR',') as USER_ATTACHMENT " +
-//                "from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id";
-        // 审批意见
         String sql = "select tk.USER_COMMENT,tk.USER_ATTACHMENT " +
                 "from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id and tk.status='ap' " +
                 "join ad_user u on tk.ad_user_id=u.id" +

@@ -4,22 +4,35 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
-import lombok.ToString;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * 地图信息。
  */
-@ToString
 public class MapInfo {
 
     /**
      * 模型助手。
      */
     private static final ModelHelper<MapInfo> modelHelper = new ModelHelper<>("MAP_INFO", new MapInfo());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -86,6 +99,14 @@ public class MapInfo {
          */
         public static final String REMARK = "REMARK";
         /**
+         * CPMS的ID。
+         */
+        public static final String CPMS_ID = "CPMS_ID";
+        /**
+         * CPMS的UUID。
+         */
+        public static final String CPMS_UUID = "CPMS_UUID";
+        /**
          * 填充不透明度。
          */
         public static final String FILL_OPACITY = "FILL_OPACITY";
@@ -106,13 +127,9 @@ public class MapInfo {
          */
         public static final String STROKE_OPACITY = "STROKE_OPACITY";
         /**
-         * 项目。
+         * 项目id(多项目)。
          */
-        public static final String PM_PRJ_ID = "PM_PRJ_ID";
-        /**
-         * 项目名称。
-         */
-        public static final String PRJ_NAME = "PRJ_NAME";
+        public static final String PRJ_IDS = "PRJ_IDS";
         /**
          * 笔画宽度。
          */
@@ -151,7 +168,7 @@ public class MapInfo {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -164,14 +181,30 @@ public class MapInfo {
      * 设置：ID。
      */
     public MapInfo setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -184,14 +217,30 @@ public class MapInfo {
      * 设置：版本。
      */
     public MapInfo setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -204,14 +253,30 @@ public class MapInfo {
      * 设置：时间戳。
      */
     public MapInfo setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -224,14 +289,30 @@ public class MapInfo {
      * 设置：是否预设。
      */
     public MapInfo setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -244,14 +325,30 @@ public class MapInfo {
      * 设置：创建日期时间。
      */
     public MapInfo setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -264,14 +361,30 @@ public class MapInfo {
      * 设置：创建用户。
      */
     public MapInfo setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -284,14 +397,30 @@ public class MapInfo {
      * 设置：最后修改日期时间。
      */
     public MapInfo setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -304,14 +433,30 @@ public class MapInfo {
      * 设置：最后修改用户。
      */
     public MapInfo setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -324,14 +469,30 @@ public class MapInfo {
      * 设置：记录状态。
      */
     public MapInfo setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -344,14 +505,30 @@ public class MapInfo {
      * 设置：锁定流程实例。
      */
     public MapInfo setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -364,14 +541,30 @@ public class MapInfo {
      * 设置：代码。
      */
     public MapInfo setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -384,14 +577,30 @@ public class MapInfo {
      * 设置：名称。
      */
     public MapInfo setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -404,14 +613,102 @@ public class MapInfo {
      * 设置：备注。
      */
     public MapInfo setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * CPMS的ID。
+     */
+    private String cpmsId;
+
+    /**
+     * 获取：CPMS的ID。
+     */
+    public String getCpmsId() {
+        return this.cpmsId;
+    }
+
+    /**
+     * 设置：CPMS的ID。
+     */
+    public MapInfo setCpmsId(String cpmsId) {
+        if (this.cpmsId == null && cpmsId == null) {
+            // 均为null，不做处理。
+        } else if (this.cpmsId != null && cpmsId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cpmsId.compareTo(cpmsId) != 0) {
+                this.cpmsId = cpmsId;
+                if (!this.toUpdateCols.contains("CPMS_ID")) {
+                    this.toUpdateCols.add("CPMS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cpmsId = cpmsId;
+            if (!this.toUpdateCols.contains("CPMS_ID")) {
+                this.toUpdateCols.add("CPMS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * CPMS的UUID。
+     */
+    private String cpmsUuid;
+
+    /**
+     * 获取：CPMS的UUID。
+     */
+    public String getCpmsUuid() {
+        return this.cpmsUuid;
+    }
+
+    /**
+     * 设置：CPMS的UUID。
+     */
+    public MapInfo setCpmsUuid(String cpmsUuid) {
+        if (this.cpmsUuid == null && cpmsUuid == null) {
+            // 均为null，不做处理。
+        } else if (this.cpmsUuid != null && cpmsUuid != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cpmsUuid.compareTo(cpmsUuid) != 0) {
+                this.cpmsUuid = cpmsUuid;
+                if (!this.toUpdateCols.contains("CPMS_UUID")) {
+                    this.toUpdateCols.add("CPMS_UUID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cpmsUuid = cpmsUuid;
+            if (!this.toUpdateCols.contains("CPMS_UUID")) {
+                this.toUpdateCols.add("CPMS_UUID");
+            }
+        }
         return this;
     }
 
     /**
      * 填充不透明度。
      */
-    public String fillOpacity;
+    private String fillOpacity;
 
     /**
      * 获取：填充不透明度。
@@ -424,14 +721,30 @@ public class MapInfo {
      * 设置：填充不透明度。
      */
     public MapInfo setFillOpacity(String fillOpacity) {
-        this.fillOpacity = fillOpacity;
+        if (this.fillOpacity == null && fillOpacity == null) {
+            // 均为null，不做处理。
+        } else if (this.fillOpacity != null && fillOpacity != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.fillOpacity.compareTo(fillOpacity) != 0) {
+                this.fillOpacity = fillOpacity;
+                if (!this.toUpdateCols.contains("FILL_OPACITY")) {
+                    this.toUpdateCols.add("FILL_OPACITY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.fillOpacity = fillOpacity;
+            if (!this.toUpdateCols.contains("FILL_OPACITY")) {
+                this.toUpdateCols.add("FILL_OPACITY");
+            }
+        }
         return this;
     }
 
     /**
      * 地图id。
      */
-    public String mapId;
+    private String mapId;
 
     /**
      * 获取：地图id。
@@ -444,14 +757,30 @@ public class MapInfo {
      * 设置：地图id。
      */
     public MapInfo setMapId(String mapId) {
-        this.mapId = mapId;
+        if (this.mapId == null && mapId == null) {
+            // 均为null，不做处理。
+        } else if (this.mapId != null && mapId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.mapId.compareTo(mapId) != 0) {
+                this.mapId = mapId;
+                if (!this.toUpdateCols.contains("MAP_ID")) {
+                    this.toUpdateCols.add("MAP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.mapId = mapId;
+            if (!this.toUpdateCols.contains("MAP_ID")) {
+                this.toUpdateCols.add("MAP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 类型(中间)。
      */
-    public String midType;
+    private String midType;
 
     /**
      * 获取：类型(中间)。
@@ -464,14 +793,30 @@ public class MapInfo {
      * 设置：类型(中间)。
      */
     public MapInfo setMidType(String midType) {
-        this.midType = midType;
+        if (this.midType == null && midType == null) {
+            // 均为null，不做处理。
+        } else if (this.midType != null && midType != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.midType.compareTo(midType) != 0) {
+                this.midType = midType;
+                if (!this.toUpdateCols.contains("MID_TYPE")) {
+                    this.toUpdateCols.add("MID_TYPE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.midType = midType;
+            if (!this.toUpdateCols.contains("MID_TYPE")) {
+                this.toUpdateCols.add("MID_TYPE");
+            }
+        }
         return this;
     }
 
     /**
      * 类型(里面)。
      */
-    public String innerType;
+    private String innerType;
 
     /**
      * 获取：类型(里面)。
@@ -484,94 +829,138 @@ public class MapInfo {
      * 设置：类型(里面)。
      */
     public MapInfo setInnerType(String innerType) {
-        this.innerType = innerType;
+        if (this.innerType == null && innerType == null) {
+            // 均为null，不做处理。
+        } else if (this.innerType != null && innerType != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.innerType.compareTo(innerType) != 0) {
+                this.innerType = innerType;
+                if (!this.toUpdateCols.contains("INNER_TYPE")) {
+                    this.toUpdateCols.add("INNER_TYPE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.innerType = innerType;
+            if (!this.toUpdateCols.contains("INNER_TYPE")) {
+                this.toUpdateCols.add("INNER_TYPE");
+            }
+        }
         return this;
     }
 
     /**
      * 笔画不透明度。
      */
-    public Double strokeOpacity;
+    private BigDecimal strokeOpacity;
 
     /**
      * 获取：笔画不透明度。
      */
-    public Double getStrokeOpacity() {
+    public BigDecimal getStrokeOpacity() {
         return this.strokeOpacity;
     }
 
     /**
      * 设置：笔画不透明度。
      */
-    public MapInfo setStrokeOpacity(Double strokeOpacity) {
-        this.strokeOpacity = strokeOpacity;
+    public MapInfo setStrokeOpacity(BigDecimal strokeOpacity) {
+        if (this.strokeOpacity == null && strokeOpacity == null) {
+            // 均为null，不做处理。
+        } else if (this.strokeOpacity != null && strokeOpacity != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.strokeOpacity.compareTo(strokeOpacity) != 0) {
+                this.strokeOpacity = strokeOpacity;
+                if (!this.toUpdateCols.contains("STROKE_OPACITY")) {
+                    this.toUpdateCols.add("STROKE_OPACITY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.strokeOpacity = strokeOpacity;
+            if (!this.toUpdateCols.contains("STROKE_OPACITY")) {
+                this.toUpdateCols.add("STROKE_OPACITY");
+            }
+        }
         return this;
     }
 
     /**
-     * 项目。
+     * 项目id(多项目)。
      */
-    public String pmPrjId;
+    private String prjIds;
 
     /**
-     * 获取：项目。
+     * 获取：项目id(多项目)。
      */
-    public String getPmPrjId() {
-        return this.pmPrjId;
+    public String getPrjIds() {
+        return this.prjIds;
     }
 
     /**
-     * 设置：项目。
+     * 设置：项目id(多项目)。
      */
-    public MapInfo setPmPrjId(String pmPrjId) {
-        this.pmPrjId = pmPrjId;
-        return this;
-    }
-
-    /**
-     * 项目名称。
-     */
-    public String prjName;
-
-    /**
-     * 获取：项目名称。
-     */
-    public String getPrjName() {
-        return this.prjName;
-    }
-
-    /**
-     * 设置：项目名称。
-     */
-    public MapInfo setPrjName(String prjName) {
-        this.prjName = prjName;
+    public MapInfo setPrjIds(String prjIds) {
+        if (this.prjIds == null && prjIds == null) {
+            // 均为null，不做处理。
+        } else if (this.prjIds != null && prjIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjIds.compareTo(prjIds) != 0) {
+                this.prjIds = prjIds;
+                if (!this.toUpdateCols.contains("PRJ_IDS")) {
+                    this.toUpdateCols.add("PRJ_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjIds = prjIds;
+            if (!this.toUpdateCols.contains("PRJ_IDS")) {
+                this.toUpdateCols.add("PRJ_IDS");
+            }
+        }
         return this;
     }
 
     /**
      * 笔画宽度。
      */
-    public Double strokeWidth;
+    private BigDecimal strokeWidth;
 
     /**
      * 获取：笔画宽度。
      */
-    public Double getStrokeWidth() {
+    public BigDecimal getStrokeWidth() {
         return this.strokeWidth;
     }
 
     /**
      * 设置：笔画宽度。
      */
-    public MapInfo setStrokeWidth(Double strokeWidth) {
-        this.strokeWidth = strokeWidth;
+    public MapInfo setStrokeWidth(BigDecimal strokeWidth) {
+        if (this.strokeWidth == null && strokeWidth == null) {
+            // 均为null，不做处理。
+        } else if (this.strokeWidth != null && strokeWidth != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.strokeWidth.compareTo(strokeWidth) != 0) {
+                this.strokeWidth = strokeWidth;
+                if (!this.toUpdateCols.contains("STROKE_WIDTH")) {
+                    this.toUpdateCols.add("STROKE_WIDTH");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.strokeWidth = strokeWidth;
+            if (!this.toUpdateCols.contains("STROKE_WIDTH")) {
+                this.toUpdateCols.add("STROKE_WIDTH");
+            }
+        }
         return this;
     }
 
     /**
      * 填充。
      */
-    public String fill;
+    private String fill;
 
     /**
      * 获取：填充。
@@ -584,14 +973,30 @@ public class MapInfo {
      * 设置：填充。
      */
     public MapInfo setFill(String fill) {
-        this.fill = fill;
+        if (this.fill == null && fill == null) {
+            // 均为null，不做处理。
+        } else if (this.fill != null && fill != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.fill.compareTo(fill) != 0) {
+                this.fill = fill;
+                if (!this.toUpdateCols.contains("FILL")) {
+                    this.toUpdateCols.add("FILL");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.fill = fill;
+            if (!this.toUpdateCols.contains("FILL")) {
+                this.toUpdateCols.add("FILL");
+            }
+        }
         return this;
     }
 
     /**
      * 笔画。
      */
-    public String stroke;
+    private String stroke;
 
     /**
      * 获取：笔画。
@@ -604,54 +1009,102 @@ public class MapInfo {
      * 设置：笔画。
      */
     public MapInfo setStroke(String stroke) {
-        this.stroke = stroke;
+        if (this.stroke == null && stroke == null) {
+            // 均为null，不做处理。
+        } else if (this.stroke != null && stroke != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.stroke.compareTo(stroke) != 0) {
+                this.stroke = stroke;
+                if (!this.toUpdateCols.contains("STROKE")) {
+                    this.toUpdateCols.add("STROKE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.stroke = stroke;
+            if (!this.toUpdateCols.contains("STROKE")) {
+                this.toUpdateCols.add("STROKE");
+            }
+        }
         return this;
     }
 
     /**
      * 面积。
      */
-    public Double area;
+    private BigDecimal area;
 
     /**
      * 获取：面积。
      */
-    public Double getArea() {
+    public BigDecimal getArea() {
         return this.area;
     }
 
     /**
      * 设置：面积。
      */
-    public MapInfo setArea(Double area) {
-        this.area = area;
+    public MapInfo setArea(BigDecimal area) {
+        if (this.area == null && area == null) {
+            // 均为null，不做处理。
+        } else if (this.area != null && area != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.area.compareTo(area) != 0) {
+                this.area = area;
+                if (!this.toUpdateCols.contains("AREA")) {
+                    this.toUpdateCols.add("AREA");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.area = area;
+            if (!this.toUpdateCols.contains("AREA")) {
+                this.toUpdateCols.add("AREA");
+            }
+        }
         return this;
     }
 
     /**
      * 容积率。
      */
-    public Double plotRatio;
+    private BigDecimal plotRatio;
 
     /**
      * 获取：容积率。
      */
-    public Double getPlotRatio() {
+    public BigDecimal getPlotRatio() {
         return this.plotRatio;
     }
 
     /**
      * 设置：容积率。
      */
-    public MapInfo setPlotRatio(Double plotRatio) {
-        this.plotRatio = plotRatio;
+    public MapInfo setPlotRatio(BigDecimal plotRatio) {
+        if (this.plotRatio == null && plotRatio == null) {
+            // 均为null，不做处理。
+        } else if (this.plotRatio != null && plotRatio != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.plotRatio.compareTo(plotRatio) != 0) {
+                this.plotRatio = plotRatio;
+                if (!this.toUpdateCols.contains("PLOT_RATIO")) {
+                    this.toUpdateCols.add("PLOT_RATIO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.plotRatio = plotRatio;
+            if (!this.toUpdateCols.contains("PLOT_RATIO")) {
+                this.toUpdateCols.add("PLOT_RATIO");
+            }
+        }
         return this;
     }
 
     /**
      * 土地信息备注。
      */
-    public String landNote;
+    private String landNote;
 
     /**
      * 获取：土地信息备注。
@@ -664,14 +1117,30 @@ public class MapInfo {
      * 设置：土地信息备注。
      */
     public MapInfo setLandNote(String landNote) {
-        this.landNote = landNote;
+        if (this.landNote == null && landNote == null) {
+            // 均为null，不做处理。
+        } else if (this.landNote != null && landNote != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.landNote.compareTo(landNote) != 0) {
+                this.landNote = landNote;
+                if (!this.toUpdateCols.contains("LAND_NOTE")) {
+                    this.toUpdateCols.add("LAND_NOTE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.landNote = landNote;
+            if (!this.toUpdateCols.contains("LAND_NOTE")) {
+                this.toUpdateCols.add("LAND_NOTE");
+            }
+        }
         return this;
     }
 
     /**
      * 字典键值。
      */
-    public String dictValue;
+    private String dictValue;
 
     /**
      * 获取：字典键值。
@@ -684,7 +1153,23 @@ public class MapInfo {
      * 设置：字典键值。
      */
     public MapInfo setDictValue(String dictValue) {
-        this.dictValue = dictValue;
+        if (this.dictValue == null && dictValue == null) {
+            // 均为null，不做处理。
+        } else if (this.dictValue != null && dictValue != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.dictValue.compareTo(dictValue) != 0) {
+                this.dictValue = dictValue;
+                if (!this.toUpdateCols.contains("DICT_VALUE")) {
+                    this.toUpdateCols.add("DICT_VALUE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.dictValue = dictValue;
+            if (!this.toUpdateCols.contains("DICT_VALUE")) {
+                this.toUpdateCols.add("DICT_VALUE");
+            }
+        }
         return this;
     }
 
@@ -702,6 +1187,7 @@ public class MapInfo {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -712,7 +1198,17 @@ public class MapInfo {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -733,7 +1229,8 @@ public class MapInfo {
      * @return
      */
     public static MapInfo newData() {
-        return modelHelper.newData();
+        MapInfo obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -742,7 +1239,8 @@ public class MapInfo {
      * @return
      */
     public static MapInfo insertData() {
-        return modelHelper.insertData();
+        MapInfo obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -754,7 +1252,8 @@ public class MapInfo {
      * @return 获取到的对象，若无则为null。
      */
     public static MapInfo selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        MapInfo obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -766,7 +1265,8 @@ public class MapInfo {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<MapInfo> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<MapInfo> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -778,7 +1278,8 @@ public class MapInfo {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<MapInfo> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<MapInfo> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

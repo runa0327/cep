@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -50,28 +51,28 @@ public class PmExt {
         OrmHelper.copyCols(newTestStu, newPmPrj, Lists.newArrayList("CODE", "NAME"), null);
 
         PmPrj pmPrj = PmPrj.insertData();
-        pmPrj.setCode("123").setName("456").setBuildYears(50d).updateById(Lists.newArrayList(PmPrj.Cols.CODE, PmPrj.Cols.NAME), Lists.newArrayList(PmPrj.Cols.CODE), true);
+        pmPrj.setCode("123").setName("456").setBuildYears(new BigDecimal(50)).updateById(Lists.newArrayList(PmPrj.Cols.CODE, PmPrj.Cols.NAME), Lists.newArrayList(PmPrj.Cols.CODE), true);
 
         HashMap<String, Object> keyValueHashMap = new HashMap<>();
         keyValueHashMap.put(PmPrj.Cols.CODE, "123");
         keyValueHashMap.put(PmPrj.Cols.NAME, "456");
         keyValueHashMap.put(PmPrj.Cols.BUILD_YEARS, 50d);
 
-        int i = PmPrj.updateById(pmPrj.id, keyValueHashMap, null, null);
-        int i2 = PmPrj.updateByIds(Lists.newArrayList(pmPrj.id, "id2"), keyValueHashMap, null, null);
+        int i = PmPrj.updateById(pmPrj.getId(), keyValueHashMap, null, null);
+        int i2 = PmPrj.updateByIds(Lists.newArrayList(pmPrj.getId(), "id2"), keyValueHashMap, null, null);
         Where where = new Where();
-        where.eq(PmPrj.Cols.ID, pmPrj.id).contain(PmPrj.Cols.NAME, "5").or().in(PmPrj.Cols.CODE, "a", "b", "c").begin().sql("exists select 1 from xxxx x where x.pm_Prj_id=t.id").or().eq(PmPrj.Cols.NAME, "3").end();
+        where.eq(PmPrj.Cols.ID, pmPrj.getId()).contain(PmPrj.Cols.NAME, "5").or().in(PmPrj.Cols.CODE, "a", "b", "c").begin().sql("exists select 1 from xxxx x where x.pm_Prj_id=t.id").or().eq(PmPrj.Cols.NAME, "3").end();
         PmPrj.updateByWhere(where, keyValueHashMap, null, null);
 
         pmPrj.deleteById();
 
-        int i3 = PmPrj.deleteById(pmPrj.id);
-        int i4 = PmPrj.deleteByIds(Lists.newArrayList(pmPrj.id, "id2"));
+        int i3 = PmPrj.deleteById(pmPrj.getId());
+        int i4 = PmPrj.deleteByIds(Lists.newArrayList(pmPrj.getId(), "id2"));
         Where where1 = new Where();
         PmPrj.deleteByWhere(where1);
 
         PmPrj pmPrj1 = PmPrj.selectById("id1", null, null);
-        List<PmPrj> list = PmPrj.selectByIds(Lists.newArrayList(pmPrj.id, "id2"), null, null);
+        List<PmPrj> list = PmPrj.selectByIds(Lists.newArrayList(pmPrj.getId(), "id2"), null, null);
         Where where2 = new Where();
         List<PmPrj> pmPrjs = PmPrj.selectByWhere(where2, null, Lists.newArrayList(PmPrj.Cols.CODE));
 
@@ -141,15 +142,15 @@ public class PmExt {
     private static class Project {
         public String id;
         public String name;
-        //业主单位
+        // 业主单位
         public String customerUnit;
         public String type;
-        //建设地点
+        // 建设地点
         public String baseLocation;
         public String total;
-        //是否入省库
+        // 是否入省库
         public String inProvinceRep;
-        //是否入国库
+        // 是否入国库
         public String inCountryRep;
     }
 

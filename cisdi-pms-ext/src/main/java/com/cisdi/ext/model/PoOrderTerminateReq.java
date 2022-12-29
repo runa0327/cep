@@ -4,8 +4,12 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +22,18 @@ public class PoOrderTerminateReq {
      * 模型助手。
      */
     private static final ModelHelper<PoOrderTerminateReq> modelHelper = new ModelHelper<>("PO_ORDER_TERMINATE_REQ", new PoOrderTerminateReq());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -68,45 +84,45 @@ public class PoOrderTerminateReq {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 项目。
-         */
-        public static final String PM_PRJ_ID = "PM_PRJ_ID";
-        /**
          * 锁定流程实例。
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
-         * 合同。
+         * 项目。
          */
-        public static final String CONTRACT_ID = "CONTRACT_ID";
+        public static final String PM_PRJ_ID = "PM_PRJ_ID";
         /**
          * 记录状态。
          */
         public static final String STATUS = "STATUS";
         /**
-         * 立项批复文号。
+         * 合同。
          */
-        public static final String PRJ_REPLY_NO = "PRJ_REPLY_NO";
+        public static final String CONTRACT_ID = "CONTRACT_ID";
         /**
          * 创建用户。
          */
         public static final String CRT_USER_ID = "CRT_USER_ID";
         /**
-         * 项目概况。
+         * 立项批复文号。
          */
-        public static final String PRJ_SITUATION = "PRJ_SITUATION";
+        public static final String PRJ_REPLY_NO = "PRJ_REPLY_NO";
         /**
          * 创建部门。
          */
         public static final String CRT_DEPT_ID = "CRT_DEPT_ID";
         /**
-         * 创建日期时间。
+         * 项目概况。
          */
-        public static final String CRT_DT = "CRT_DT";
+        public static final String PRJ_SITUATION = "PRJ_SITUATION";
         /**
          * 投资来源。
          */
         public static final String INVESTMENT_SOURCE_ID = "INVESTMENT_SOURCE_ID";
+        /**
+         * 创建日期时间。
+         */
+        public static final String CRT_DT = "CRT_DT";
         /**
          * 业主单位。
          */
@@ -132,7 +148,7 @@ public class PoOrderTerminateReq {
          */
         public static final String PREPARE_AMT = "PREPARE_AMT";
         /**
-         * 建设期利息。
+         * 建设期利息（万）。
          */
         public static final String CONSTRUCT_PERIOD_INTEREST = "CONSTRUCT_PERIOD_INTEREST";
         /**
@@ -140,17 +156,17 @@ public class PoOrderTerminateReq {
          */
         public static final String CONTRACT_CODE = "CONTRACT_CODE";
         /**
-         * 合同类型。
+         * 合同类型1。
          */
-        public static final String CONTRACT_CATEGORY_ID = "CONTRACT_CATEGORY_ID";
+        public static final String CONTRACT_CATEGORY_ONE_ID = "CONTRACT_CATEGORY_ONE_ID";
         /**
-         * 招采标流程标题。
+         * 招采项目备案及归档。
          */
-        public static final String BIDDING_NAME_ID = "BIDDING_NAME_ID";
+        public static final String PM_BID_KEEP_FILE_REQ_ID = "PM_BID_KEEP_FILE_REQ_ID";
         /**
-         * 招标类别。
+         * 采购方式。
          */
-        public static final String PMS_RELEASE_WAY_ID = "PMS_RELEASE_WAY_ID";
+        public static final String BUY_TYPE_ID = "BUY_TYPE_ID";
         /**
          * 招标控制价发起。
          */
@@ -160,41 +176,33 @@ public class PoOrderTerminateReq {
          */
         public static final String PURCHASE_TYPE = "PURCHASE_TYPE";
         /**
-         * 中标单位文本。
+         * 中标单位1。
          */
-        public static final String WIN_BID_UNIT_TXT = "WIN_BID_UNIT_TXT";
+        public static final String WIN_BID_UNIT_ONE = "WIN_BID_UNIT_ONE";
         /**
          * 中标待签约额。
          */
         public static final String WINNING_BIDS_AMOUNT = "WINNING_BIDS_AMOUNT";
         /**
-         * 合同工期。
+         * 预计总天数。
          */
-        public static final String CONTRACT_DAYS = "CONTRACT_DAYS";
+        public static final String PLAN_TOTAL_DAYS = "PLAN_TOTAL_DAYS";
         /**
-         * 合同金额。
+         * 合同金额（万）。
          */
-        public static final String CONTRACT_AMOUNT = "CONTRACT_AMOUNT";
+        public static final String CONTRACT_PRICE = "CONTRACT_PRICE";
         /**
          * 是否涉及保函下拉。
          */
         public static final String IS_REFER_GUARANTEE_ID = "IS_REFER_GUARANTEE_ID";
         /**
-         * 保函类型。
+         * 保函类型（多选）。
          */
-        public static final String GUARANTEE_LETTER_TYPE_ID = "GUARANTEE_LETTER_TYPE_ID";
+        public static final String GUARANTEE_LETTER_TYPE_IDS = "GUARANTEE_LETTER_TYPE_IDS";
         /**
-         * 相对方联系人。
+         * 是否3。
          */
-        public static final String OPPO_SITE_LINK_MAN = "OPPO_SITE_LINK_MAN";
-        /**
-         * 相对方联系方式。
-         */
-        public static final String OPPO_SITE_CONTACT = "OPPO_SITE_CONTACT";
-        /**
-         * 是否标准合同模板。
-         */
-        public static final String IS_STANDARD_CONTRACT_TEMPLATE_ID = "IS_STANDARD_CONTRACT_TEMPLATE_ID";
+        public static final String YES_NO_THREE = "YES_NO_THREE";
         /**
          * 附件。
          */
@@ -204,6 +212,14 @@ public class PoOrderTerminateReq {
          */
         public static final String ADDITIONAL_REMARK = "ADDITIONAL_REMARK";
         /**
+         * 审批人1。
+         */
+        public static final String APPROVAL_USER_ONE = "APPROVAL_USER_ONE";
+        /**
+         * 审批日期1。
+         */
+        public static final String APPROVAL_DATE_ONE = "APPROVAL_DATE_ONE";
+        /**
          * 部门负责人附件。
          */
         public static final String DEPT_HEAD_FILE_GROUP_ID = "DEPT_HEAD_FILE_GROUP_ID";
@@ -211,6 +227,14 @@ public class PoOrderTerminateReq {
          * 部门负责人审核意见。
          */
         public static final String DEPT_HEAD_APPROVAL_MESSAGE = "DEPT_HEAD_APPROVAL_MESSAGE";
+        /**
+         * 审批人2。
+         */
+        public static final String APPROVAL_USER_TWO = "APPROVAL_USER_TWO";
+        /**
+         * 审批日期2。
+         */
+        public static final String APPROVAL_DATE_TWO = "APPROVAL_DATE_TWO";
         /**
          * 成本合约部附件。
          */
@@ -220,6 +244,14 @@ public class PoOrderTerminateReq {
          */
         public static final String COST_CONTRACT_APPROVAL_MESSAGE = "COST_CONTRACT_APPROVAL_MESSAGE";
         /**
+         * 审批人3。
+         */
+        public static final String APPROVAL_USER_THREE = "APPROVAL_USER_THREE";
+        /**
+         * 审批日期3。
+         */
+        public static final String APPROVAL_DATE_THREE = "APPROVAL_DATE_THREE";
+        /**
          * 财务法务附件。
          */
         public static final String FINANCE_LEGAL_CONTRACT_DEPT_FILE_GROUP_ID = "FINANCE_LEGAL_CONTRACT_DEPT_FILE_GROUP_ID";
@@ -227,6 +259,30 @@ public class PoOrderTerminateReq {
          * 财务法务审核意见。
          */
         public static final String FINANCE_LEGAL_APPROVAL_MESSAGE = "FINANCE_LEGAL_APPROVAL_MESSAGE";
+        /**
+         * 审批人4。
+         */
+        public static final String APPROVAL_USER_FOUR = "APPROVAL_USER_FOUR";
+        /**
+         * 审批日期4。
+         */
+        public static final String APPROVAL_DATE_FOUR = "APPROVAL_DATE_FOUR";
+        /**
+         * 审批附件1。
+         */
+        public static final String APPROVE_FILE_ID_ONE = "APPROVE_FILE_ID_ONE";
+        /**
+         * 审批意见1。
+         */
+        public static final String APPROVAL_COMMENT_ONE = "APPROVAL_COMMENT_ONE";
+        /**
+         * 审批人5。
+         */
+        public static final String APPROVAL_USER_FIVE = "APPROVAL_USER_FIVE";
+        /**
+         * 审批日期5。
+         */
+        public static final String APPROVAL_DATE_FIVE = "APPROVAL_DATE_FIVE";
         /**
          * 领导审批附件。
          */
@@ -245,7 +301,7 @@ public class PoOrderTerminateReq {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -258,14 +314,30 @@ public class PoOrderTerminateReq {
      * 设置：ID。
      */
     public PoOrderTerminateReq setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -278,14 +350,30 @@ public class PoOrderTerminateReq {
      * 设置：版本。
      */
     public PoOrderTerminateReq setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -298,14 +386,30 @@ public class PoOrderTerminateReq {
      * 设置：时间戳。
      */
     public PoOrderTerminateReq setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -318,14 +422,30 @@ public class PoOrderTerminateReq {
      * 设置：是否预设。
      */
     public PoOrderTerminateReq setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -338,14 +458,30 @@ public class PoOrderTerminateReq {
      * 设置：最后修改日期时间。
      */
     public PoOrderTerminateReq setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -358,14 +494,30 @@ public class PoOrderTerminateReq {
      * 设置：最后修改用户。
      */
     public PoOrderTerminateReq setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -378,14 +530,30 @@ public class PoOrderTerminateReq {
      * 设置：代码。
      */
     public PoOrderTerminateReq setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -398,14 +566,30 @@ public class PoOrderTerminateReq {
      * 设置：名称。
      */
     public PoOrderTerminateReq setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -418,34 +602,30 @@ public class PoOrderTerminateReq {
      * 设置：备注。
      */
     public PoOrderTerminateReq setRemark(String remark) {
-        this.remark = remark;
-        return this;
-    }
-
-    /**
-     * 项目。
-     */
-    public String pmPrjId;
-
-    /**
-     * 获取：项目。
-     */
-    public String getPmPrjId() {
-        return this.pmPrjId;
-    }
-
-    /**
-     * 设置：项目。
-     */
-    public PoOrderTerminateReq setPmPrjId(String pmPrjId) {
-        this.pmPrjId = pmPrjId;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -458,34 +638,66 @@ public class PoOrderTerminateReq {
      * 设置：锁定流程实例。
      */
     public PoOrderTerminateReq setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 合同。
+     * 项目。
      */
-    public String contractId;
+    private String pmPrjId;
 
     /**
-     * 获取：合同。
+     * 获取：项目。
      */
-    public String getContractId() {
-        return this.contractId;
+    public String getPmPrjId() {
+        return this.pmPrjId;
     }
 
     /**
-     * 设置：合同。
+     * 设置：项目。
      */
-    public PoOrderTerminateReq setContractId(String contractId) {
-        this.contractId = contractId;
+    public PoOrderTerminateReq setPmPrjId(String pmPrjId) {
+        if (this.pmPrjId == null && pmPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmPrjId != null && pmPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmPrjId.compareTo(pmPrjId) != 0) {
+                this.pmPrjId = pmPrjId;
+                if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                    this.toUpdateCols.add("PM_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmPrjId = pmPrjId;
+            if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                this.toUpdateCols.add("PM_PRJ_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -498,34 +710,66 @@ public class PoOrderTerminateReq {
      * 设置：记录状态。
      */
     public PoOrderTerminateReq setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
-     * 立项批复文号。
+     * 合同。
      */
-    public String prjReplyNo;
+    private String contractId;
 
     /**
-     * 获取：立项批复文号。
+     * 获取：合同。
      */
-    public String getPrjReplyNo() {
-        return this.prjReplyNo;
+    public String getContractId() {
+        return this.contractId;
     }
 
     /**
-     * 设置：立项批复文号。
+     * 设置：合同。
      */
-    public PoOrderTerminateReq setPrjReplyNo(String prjReplyNo) {
-        this.prjReplyNo = prjReplyNo;
+    public PoOrderTerminateReq setContractId(String contractId) {
+        if (this.contractId == null && contractId == null) {
+            // 均为null，不做处理。
+        } else if (this.contractId != null && contractId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contractId.compareTo(contractId) != 0) {
+                this.contractId = contractId;
+                if (!this.toUpdateCols.contains("CONTRACT_ID")) {
+                    this.toUpdateCols.add("CONTRACT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contractId = contractId;
+            if (!this.toUpdateCols.contains("CONTRACT_ID")) {
+                this.toUpdateCols.add("CONTRACT_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -538,34 +782,66 @@ public class PoOrderTerminateReq {
      * 设置：创建用户。
      */
     public PoOrderTerminateReq setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 项目概况。
+     * 立项批复文号。
      */
-    public String prjSituation;
+    private String prjReplyNo;
 
     /**
-     * 获取：项目概况。
+     * 获取：立项批复文号。
      */
-    public String getPrjSituation() {
-        return this.prjSituation;
+    public String getPrjReplyNo() {
+        return this.prjReplyNo;
     }
 
     /**
-     * 设置：项目概况。
+     * 设置：立项批复文号。
      */
-    public PoOrderTerminateReq setPrjSituation(String prjSituation) {
-        this.prjSituation = prjSituation;
+    public PoOrderTerminateReq setPrjReplyNo(String prjReplyNo) {
+        if (this.prjReplyNo == null && prjReplyNo == null) {
+            // 均为null，不做处理。
+        } else if (this.prjReplyNo != null && prjReplyNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjReplyNo.compareTo(prjReplyNo) != 0) {
+                this.prjReplyNo = prjReplyNo;
+                if (!this.toUpdateCols.contains("PRJ_REPLY_NO")) {
+                    this.toUpdateCols.add("PRJ_REPLY_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjReplyNo = prjReplyNo;
+            if (!this.toUpdateCols.contains("PRJ_REPLY_NO")) {
+                this.toUpdateCols.add("PRJ_REPLY_NO");
+            }
+        }
         return this;
     }
 
     /**
      * 创建部门。
      */
-    public String crtDeptId;
+    private String crtDeptId;
 
     /**
      * 获取：创建部门。
@@ -578,34 +854,66 @@ public class PoOrderTerminateReq {
      * 设置：创建部门。
      */
     public PoOrderTerminateReq setCrtDeptId(String crtDeptId) {
-        this.crtDeptId = crtDeptId;
+        if (this.crtDeptId == null && crtDeptId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDeptId != null && crtDeptId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDeptId.compareTo(crtDeptId) != 0) {
+                this.crtDeptId = crtDeptId;
+                if (!this.toUpdateCols.contains("CRT_DEPT_ID")) {
+                    this.toUpdateCols.add("CRT_DEPT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDeptId = crtDeptId;
+            if (!this.toUpdateCols.contains("CRT_DEPT_ID")) {
+                this.toUpdateCols.add("CRT_DEPT_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 创建日期时间。
+     * 项目概况。
      */
-    public LocalDateTime crtDt;
+    private String prjSituation;
 
     /**
-     * 获取：创建日期时间。
+     * 获取：项目概况。
      */
-    public LocalDateTime getCrtDt() {
-        return this.crtDt;
+    public String getPrjSituation() {
+        return this.prjSituation;
     }
 
     /**
-     * 设置：创建日期时间。
+     * 设置：项目概况。
      */
-    public PoOrderTerminateReq setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+    public PoOrderTerminateReq setPrjSituation(String prjSituation) {
+        if (this.prjSituation == null && prjSituation == null) {
+            // 均为null，不做处理。
+        } else if (this.prjSituation != null && prjSituation != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjSituation.compareTo(prjSituation) != 0) {
+                this.prjSituation = prjSituation;
+                if (!this.toUpdateCols.contains("PRJ_SITUATION")) {
+                    this.toUpdateCols.add("PRJ_SITUATION");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjSituation = prjSituation;
+            if (!this.toUpdateCols.contains("PRJ_SITUATION")) {
+                this.toUpdateCols.add("PRJ_SITUATION");
+            }
+        }
         return this;
     }
 
     /**
      * 投资来源。
      */
-    public String investmentSourceId;
+    private String investmentSourceId;
 
     /**
      * 获取：投资来源。
@@ -618,14 +926,66 @@ public class PoOrderTerminateReq {
      * 设置：投资来源。
      */
     public PoOrderTerminateReq setInvestmentSourceId(String investmentSourceId) {
-        this.investmentSourceId = investmentSourceId;
+        if (this.investmentSourceId == null && investmentSourceId == null) {
+            // 均为null，不做处理。
+        } else if (this.investmentSourceId != null && investmentSourceId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.investmentSourceId.compareTo(investmentSourceId) != 0) {
+                this.investmentSourceId = investmentSourceId;
+                if (!this.toUpdateCols.contains("INVESTMENT_SOURCE_ID")) {
+                    this.toUpdateCols.add("INVESTMENT_SOURCE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.investmentSourceId = investmentSourceId;
+            if (!this.toUpdateCols.contains("INVESTMENT_SOURCE_ID")) {
+                this.toUpdateCols.add("INVESTMENT_SOURCE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 创建日期时间。
+     */
+    private LocalDateTime crtDt;
+
+    /**
+     * 获取：创建日期时间。
+     */
+    public LocalDateTime getCrtDt() {
+        return this.crtDt;
+    }
+
+    /**
+     * 设置：创建日期时间。
+     */
+    public PoOrderTerminateReq setCrtDt(LocalDateTime crtDt) {
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 业主单位。
      */
-    public String customerUnit;
+    private String customerUnit;
 
     /**
      * 获取：业主单位。
@@ -638,14 +998,30 @@ public class PoOrderTerminateReq {
      * 设置：业主单位。
      */
     public PoOrderTerminateReq setCustomerUnit(String customerUnit) {
-        this.customerUnit = customerUnit;
+        if (this.customerUnit == null && customerUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.customerUnit != null && customerUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.customerUnit.compareTo(customerUnit) != 0) {
+                this.customerUnit = customerUnit;
+                if (!this.toUpdateCols.contains("CUSTOMER_UNIT")) {
+                    this.toUpdateCols.add("CUSTOMER_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.customerUnit = customerUnit;
+            if (!this.toUpdateCols.contains("CUSTOMER_UNIT")) {
+                this.toUpdateCols.add("CUSTOMER_UNIT");
+            }
+        }
         return this;
     }
 
     /**
      * 项目类型。
      */
-    public String projectTypeId;
+    private String projectTypeId;
 
     /**
      * 获取：项目类型。
@@ -658,114 +1034,210 @@ public class PoOrderTerminateReq {
      * 设置：项目类型。
      */
     public PoOrderTerminateReq setProjectTypeId(String projectTypeId) {
-        this.projectTypeId = projectTypeId;
+        if (this.projectTypeId == null && projectTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.projectTypeId != null && projectTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectTypeId.compareTo(projectTypeId) != 0) {
+                this.projectTypeId = projectTypeId;
+                if (!this.toUpdateCols.contains("PROJECT_TYPE_ID")) {
+                    this.toUpdateCols.add("PROJECT_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectTypeId = projectTypeId;
+            if (!this.toUpdateCols.contains("PROJECT_TYPE_ID")) {
+                this.toUpdateCols.add("PROJECT_TYPE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 总投资（万）。
      */
-    public Double prjTotalInvest;
+    private BigDecimal prjTotalInvest;
 
     /**
      * 获取：总投资（万）。
      */
-    public Double getPrjTotalInvest() {
+    public BigDecimal getPrjTotalInvest() {
         return this.prjTotalInvest;
     }
 
     /**
      * 设置：总投资（万）。
      */
-    public PoOrderTerminateReq setPrjTotalInvest(Double prjTotalInvest) {
-        this.prjTotalInvest = prjTotalInvest;
+    public PoOrderTerminateReq setPrjTotalInvest(BigDecimal prjTotalInvest) {
+        if (this.prjTotalInvest == null && prjTotalInvest == null) {
+            // 均为null，不做处理。
+        } else if (this.prjTotalInvest != null && prjTotalInvest != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjTotalInvest.compareTo(prjTotalInvest) != 0) {
+                this.prjTotalInvest = prjTotalInvest;
+                if (!this.toUpdateCols.contains("PRJ_TOTAL_INVEST")) {
+                    this.toUpdateCols.add("PRJ_TOTAL_INVEST");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjTotalInvest = prjTotalInvest;
+            if (!this.toUpdateCols.contains("PRJ_TOTAL_INVEST")) {
+                this.toUpdateCols.add("PRJ_TOTAL_INVEST");
+            }
+        }
         return this;
     }
 
     /**
      * 工程费用（万）。
      */
-    public Double projectAmt;
+    private BigDecimal projectAmt;
 
     /**
      * 获取：工程费用（万）。
      */
-    public Double getProjectAmt() {
+    public BigDecimal getProjectAmt() {
         return this.projectAmt;
     }
 
     /**
      * 设置：工程费用（万）。
      */
-    public PoOrderTerminateReq setProjectAmt(Double projectAmt) {
-        this.projectAmt = projectAmt;
+    public PoOrderTerminateReq setProjectAmt(BigDecimal projectAmt) {
+        if (this.projectAmt == null && projectAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.projectAmt != null && projectAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectAmt.compareTo(projectAmt) != 0) {
+                this.projectAmt = projectAmt;
+                if (!this.toUpdateCols.contains("PROJECT_AMT")) {
+                    this.toUpdateCols.add("PROJECT_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectAmt = projectAmt;
+            if (!this.toUpdateCols.contains("PROJECT_AMT")) {
+                this.toUpdateCols.add("PROJECT_AMT");
+            }
+        }
         return this;
     }
 
     /**
      * 工程其他费用（万）。
      */
-    public Double projectOtherAmt;
+    private BigDecimal projectOtherAmt;
 
     /**
      * 获取：工程其他费用（万）。
      */
-    public Double getProjectOtherAmt() {
+    public BigDecimal getProjectOtherAmt() {
         return this.projectOtherAmt;
     }
 
     /**
      * 设置：工程其他费用（万）。
      */
-    public PoOrderTerminateReq setProjectOtherAmt(Double projectOtherAmt) {
-        this.projectOtherAmt = projectOtherAmt;
+    public PoOrderTerminateReq setProjectOtherAmt(BigDecimal projectOtherAmt) {
+        if (this.projectOtherAmt == null && projectOtherAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.projectOtherAmt != null && projectOtherAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectOtherAmt.compareTo(projectOtherAmt) != 0) {
+                this.projectOtherAmt = projectOtherAmt;
+                if (!this.toUpdateCols.contains("PROJECT_OTHER_AMT")) {
+                    this.toUpdateCols.add("PROJECT_OTHER_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectOtherAmt = projectOtherAmt;
+            if (!this.toUpdateCols.contains("PROJECT_OTHER_AMT")) {
+                this.toUpdateCols.add("PROJECT_OTHER_AMT");
+            }
+        }
         return this;
     }
 
     /**
      * 预备费（万）。
      */
-    public Double prepareAmt;
+    private BigDecimal prepareAmt;
 
     /**
      * 获取：预备费（万）。
      */
-    public Double getPrepareAmt() {
+    public BigDecimal getPrepareAmt() {
         return this.prepareAmt;
     }
 
     /**
      * 设置：预备费（万）。
      */
-    public PoOrderTerminateReq setPrepareAmt(Double prepareAmt) {
-        this.prepareAmt = prepareAmt;
+    public PoOrderTerminateReq setPrepareAmt(BigDecimal prepareAmt) {
+        if (this.prepareAmt == null && prepareAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.prepareAmt != null && prepareAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prepareAmt.compareTo(prepareAmt) != 0) {
+                this.prepareAmt = prepareAmt;
+                if (!this.toUpdateCols.contains("PREPARE_AMT")) {
+                    this.toUpdateCols.add("PREPARE_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prepareAmt = prepareAmt;
+            if (!this.toUpdateCols.contains("PREPARE_AMT")) {
+                this.toUpdateCols.add("PREPARE_AMT");
+            }
+        }
         return this;
     }
 
     /**
-     * 建设期利息。
+     * 建设期利息（万）。
      */
-    public Double constructPeriodInterest;
+    private BigDecimal constructPeriodInterest;
 
     /**
-     * 获取：建设期利息。
+     * 获取：建设期利息（万）。
      */
-    public Double getConstructPeriodInterest() {
+    public BigDecimal getConstructPeriodInterest() {
         return this.constructPeriodInterest;
     }
 
     /**
-     * 设置：建设期利息。
+     * 设置：建设期利息（万）。
      */
-    public PoOrderTerminateReq setConstructPeriodInterest(Double constructPeriodInterest) {
-        this.constructPeriodInterest = constructPeriodInterest;
+    public PoOrderTerminateReq setConstructPeriodInterest(BigDecimal constructPeriodInterest) {
+        if (this.constructPeriodInterest == null && constructPeriodInterest == null) {
+            // 均为null，不做处理。
+        } else if (this.constructPeriodInterest != null && constructPeriodInterest != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.constructPeriodInterest.compareTo(constructPeriodInterest) != 0) {
+                this.constructPeriodInterest = constructPeriodInterest;
+                if (!this.toUpdateCols.contains("CONSTRUCT_PERIOD_INTEREST")) {
+                    this.toUpdateCols.add("CONSTRUCT_PERIOD_INTEREST");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.constructPeriodInterest = constructPeriodInterest;
+            if (!this.toUpdateCols.contains("CONSTRUCT_PERIOD_INTEREST")) {
+                this.toUpdateCols.add("CONSTRUCT_PERIOD_INTEREST");
+            }
+        }
         return this;
     }
 
     /**
      * 合同编号。
      */
-    public String contractCode;
+    private String contractCode;
 
     /**
      * 获取：合同编号。
@@ -778,94 +1250,174 @@ public class PoOrderTerminateReq {
      * 设置：合同编号。
      */
     public PoOrderTerminateReq setContractCode(String contractCode) {
-        this.contractCode = contractCode;
+        if (this.contractCode == null && contractCode == null) {
+            // 均为null，不做处理。
+        } else if (this.contractCode != null && contractCode != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contractCode.compareTo(contractCode) != 0) {
+                this.contractCode = contractCode;
+                if (!this.toUpdateCols.contains("CONTRACT_CODE")) {
+                    this.toUpdateCols.add("CONTRACT_CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contractCode = contractCode;
+            if (!this.toUpdateCols.contains("CONTRACT_CODE")) {
+                this.toUpdateCols.add("CONTRACT_CODE");
+            }
+        }
         return this;
     }
 
     /**
-     * 合同类型。
+     * 合同类型1。
      */
-    public String contractCategoryId;
+    private String contractCategoryOneId;
 
     /**
-     * 获取：合同类型。
+     * 获取：合同类型1。
      */
-    public String getContractCategoryId() {
-        return this.contractCategoryId;
+    public String getContractCategoryOneId() {
+        return this.contractCategoryOneId;
     }
 
     /**
-     * 设置：合同类型。
+     * 设置：合同类型1。
      */
-    public PoOrderTerminateReq setContractCategoryId(String contractCategoryId) {
-        this.contractCategoryId = contractCategoryId;
+    public PoOrderTerminateReq setContractCategoryOneId(String contractCategoryOneId) {
+        if (this.contractCategoryOneId == null && contractCategoryOneId == null) {
+            // 均为null，不做处理。
+        } else if (this.contractCategoryOneId != null && contractCategoryOneId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contractCategoryOneId.compareTo(contractCategoryOneId) != 0) {
+                this.contractCategoryOneId = contractCategoryOneId;
+                if (!this.toUpdateCols.contains("CONTRACT_CATEGORY_ONE_ID")) {
+                    this.toUpdateCols.add("CONTRACT_CATEGORY_ONE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contractCategoryOneId = contractCategoryOneId;
+            if (!this.toUpdateCols.contains("CONTRACT_CATEGORY_ONE_ID")) {
+                this.toUpdateCols.add("CONTRACT_CATEGORY_ONE_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 招采标流程标题。
+     * 招采项目备案及归档。
      */
-    public String biddingNameId;
+    private String pmBidKeepFileReqId;
 
     /**
-     * 获取：招采标流程标题。
+     * 获取：招采项目备案及归档。
      */
-    public String getBiddingNameId() {
-        return this.biddingNameId;
+    public String getPmBidKeepFileReqId() {
+        return this.pmBidKeepFileReqId;
     }
 
     /**
-     * 设置：招采标流程标题。
+     * 设置：招采项目备案及归档。
      */
-    public PoOrderTerminateReq setBiddingNameId(String biddingNameId) {
-        this.biddingNameId = biddingNameId;
-        return this;
-    }
-
-    /**
-     * 招标类别。
-     */
-    public String pmsReleaseWayId;
-
-    /**
-     * 获取：招标类别。
-     */
-    public String getPmsReleaseWayId() {
-        return this.pmsReleaseWayId;
-    }
-
-    /**
-     * 设置：招标类别。
-     */
-    public PoOrderTerminateReq setPmsReleaseWayId(String pmsReleaseWayId) {
-        this.pmsReleaseWayId = pmsReleaseWayId;
-        return this;
-    }
-
-    /**
-     * 招标控制价发起。
-     */
-    public Double bidCtlPriceLaunch;
-
-    /**
-     * 获取：招标控制价发起。
-     */
-    public Double getBidCtlPriceLaunch() {
-        return this.bidCtlPriceLaunch;
-    }
-
-    /**
-     * 设置：招标控制价发起。
-     */
-    public PoOrderTerminateReq setBidCtlPriceLaunch(Double bidCtlPriceLaunch) {
-        this.bidCtlPriceLaunch = bidCtlPriceLaunch;
+    public PoOrderTerminateReq setPmBidKeepFileReqId(String pmBidKeepFileReqId) {
+        if (this.pmBidKeepFileReqId == null && pmBidKeepFileReqId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmBidKeepFileReqId != null && pmBidKeepFileReqId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmBidKeepFileReqId.compareTo(pmBidKeepFileReqId) != 0) {
+                this.pmBidKeepFileReqId = pmBidKeepFileReqId;
+                if (!this.toUpdateCols.contains("PM_BID_KEEP_FILE_REQ_ID")) {
+                    this.toUpdateCols.add("PM_BID_KEEP_FILE_REQ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmBidKeepFileReqId = pmBidKeepFileReqId;
+            if (!this.toUpdateCols.contains("PM_BID_KEEP_FILE_REQ_ID")) {
+                this.toUpdateCols.add("PM_BID_KEEP_FILE_REQ_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 采购方式。
      */
-    public String purchaseType;
+    private String buyTypeId;
+
+    /**
+     * 获取：采购方式。
+     */
+    public String getBuyTypeId() {
+        return this.buyTypeId;
+    }
+
+    /**
+     * 设置：采购方式。
+     */
+    public PoOrderTerminateReq setBuyTypeId(String buyTypeId) {
+        if (this.buyTypeId == null && buyTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.buyTypeId != null && buyTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.buyTypeId.compareTo(buyTypeId) != 0) {
+                this.buyTypeId = buyTypeId;
+                if (!this.toUpdateCols.contains("BUY_TYPE_ID")) {
+                    this.toUpdateCols.add("BUY_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.buyTypeId = buyTypeId;
+            if (!this.toUpdateCols.contains("BUY_TYPE_ID")) {
+                this.toUpdateCols.add("BUY_TYPE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 招标控制价发起。
+     */
+    private BigDecimal bidCtlPriceLaunch;
+
+    /**
+     * 获取：招标控制价发起。
+     */
+    public BigDecimal getBidCtlPriceLaunch() {
+        return this.bidCtlPriceLaunch;
+    }
+
+    /**
+     * 设置：招标控制价发起。
+     */
+    public PoOrderTerminateReq setBidCtlPriceLaunch(BigDecimal bidCtlPriceLaunch) {
+        if (this.bidCtlPriceLaunch == null && bidCtlPriceLaunch == null) {
+            // 均为null，不做处理。
+        } else if (this.bidCtlPriceLaunch != null && bidCtlPriceLaunch != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.bidCtlPriceLaunch.compareTo(bidCtlPriceLaunch) != 0) {
+                this.bidCtlPriceLaunch = bidCtlPriceLaunch;
+                if (!this.toUpdateCols.contains("BID_CTL_PRICE_LAUNCH")) {
+                    this.toUpdateCols.add("BID_CTL_PRICE_LAUNCH");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.bidCtlPriceLaunch = bidCtlPriceLaunch;
+            if (!this.toUpdateCols.contains("BID_CTL_PRICE_LAUNCH")) {
+                this.toUpdateCols.add("BID_CTL_PRICE_LAUNCH");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 采购方式。
+     */
+    private String purchaseType;
 
     /**
      * 获取：采购方式。
@@ -878,94 +1430,174 @@ public class PoOrderTerminateReq {
      * 设置：采购方式。
      */
     public PoOrderTerminateReq setPurchaseType(String purchaseType) {
-        this.purchaseType = purchaseType;
+        if (this.purchaseType == null && purchaseType == null) {
+            // 均为null，不做处理。
+        } else if (this.purchaseType != null && purchaseType != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.purchaseType.compareTo(purchaseType) != 0) {
+                this.purchaseType = purchaseType;
+                if (!this.toUpdateCols.contains("PURCHASE_TYPE")) {
+                    this.toUpdateCols.add("PURCHASE_TYPE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.purchaseType = purchaseType;
+            if (!this.toUpdateCols.contains("PURCHASE_TYPE")) {
+                this.toUpdateCols.add("PURCHASE_TYPE");
+            }
+        }
         return this;
     }
 
     /**
-     * 中标单位文本。
+     * 中标单位1。
      */
-    public String winBidUnitTxt;
+    private String winBidUnitOne;
 
     /**
-     * 获取：中标单位文本。
+     * 获取：中标单位1。
      */
-    public String getWinBidUnitTxt() {
-        return this.winBidUnitTxt;
+    public String getWinBidUnitOne() {
+        return this.winBidUnitOne;
     }
 
     /**
-     * 设置：中标单位文本。
+     * 设置：中标单位1。
      */
-    public PoOrderTerminateReq setWinBidUnitTxt(String winBidUnitTxt) {
-        this.winBidUnitTxt = winBidUnitTxt;
+    public PoOrderTerminateReq setWinBidUnitOne(String winBidUnitOne) {
+        if (this.winBidUnitOne == null && winBidUnitOne == null) {
+            // 均为null，不做处理。
+        } else if (this.winBidUnitOne != null && winBidUnitOne != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.winBidUnitOne.compareTo(winBidUnitOne) != 0) {
+                this.winBidUnitOne = winBidUnitOne;
+                if (!this.toUpdateCols.contains("WIN_BID_UNIT_ONE")) {
+                    this.toUpdateCols.add("WIN_BID_UNIT_ONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.winBidUnitOne = winBidUnitOne;
+            if (!this.toUpdateCols.contains("WIN_BID_UNIT_ONE")) {
+                this.toUpdateCols.add("WIN_BID_UNIT_ONE");
+            }
+        }
         return this;
     }
 
     /**
      * 中标待签约额。
      */
-    public String winningBidsAmount;
+    private BigDecimal winningBidsAmount;
 
     /**
      * 获取：中标待签约额。
      */
-    public String getWinningBidsAmount() {
+    public BigDecimal getWinningBidsAmount() {
         return this.winningBidsAmount;
     }
 
     /**
      * 设置：中标待签约额。
      */
-    public PoOrderTerminateReq setWinningBidsAmount(String winningBidsAmount) {
-        this.winningBidsAmount = winningBidsAmount;
+    public PoOrderTerminateReq setWinningBidsAmount(BigDecimal winningBidsAmount) {
+        if (this.winningBidsAmount == null && winningBidsAmount == null) {
+            // 均为null，不做处理。
+        } else if (this.winningBidsAmount != null && winningBidsAmount != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.winningBidsAmount.compareTo(winningBidsAmount) != 0) {
+                this.winningBidsAmount = winningBidsAmount;
+                if (!this.toUpdateCols.contains("WINNING_BIDS_AMOUNT")) {
+                    this.toUpdateCols.add("WINNING_BIDS_AMOUNT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.winningBidsAmount = winningBidsAmount;
+            if (!this.toUpdateCols.contains("WINNING_BIDS_AMOUNT")) {
+                this.toUpdateCols.add("WINNING_BIDS_AMOUNT");
+            }
+        }
         return this;
     }
 
     /**
-     * 合同工期。
+     * 预计总天数。
      */
-    public Integer contractDays;
+    private Integer planTotalDays;
 
     /**
-     * 获取：合同工期。
+     * 获取：预计总天数。
      */
-    public Integer getContractDays() {
-        return this.contractDays;
+    public Integer getPlanTotalDays() {
+        return this.planTotalDays;
     }
 
     /**
-     * 设置：合同工期。
+     * 设置：预计总天数。
      */
-    public PoOrderTerminateReq setContractDays(Integer contractDays) {
-        this.contractDays = contractDays;
+    public PoOrderTerminateReq setPlanTotalDays(Integer planTotalDays) {
+        if (this.planTotalDays == null && planTotalDays == null) {
+            // 均为null，不做处理。
+        } else if (this.planTotalDays != null && planTotalDays != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planTotalDays.compareTo(planTotalDays) != 0) {
+                this.planTotalDays = planTotalDays;
+                if (!this.toUpdateCols.contains("PLAN_TOTAL_DAYS")) {
+                    this.toUpdateCols.add("PLAN_TOTAL_DAYS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planTotalDays = planTotalDays;
+            if (!this.toUpdateCols.contains("PLAN_TOTAL_DAYS")) {
+                this.toUpdateCols.add("PLAN_TOTAL_DAYS");
+            }
+        }
         return this;
     }
 
     /**
-     * 合同金额。
+     * 合同金额（万）。
      */
-    public Double contractAmount;
+    private BigDecimal contractPrice;
 
     /**
-     * 获取：合同金额。
+     * 获取：合同金额（万）。
      */
-    public Double getContractAmount() {
-        return this.contractAmount;
+    public BigDecimal getContractPrice() {
+        return this.contractPrice;
     }
 
     /**
-     * 设置：合同金额。
+     * 设置：合同金额（万）。
      */
-    public PoOrderTerminateReq setContractAmount(Double contractAmount) {
-        this.contractAmount = contractAmount;
+    public PoOrderTerminateReq setContractPrice(BigDecimal contractPrice) {
+        if (this.contractPrice == null && contractPrice == null) {
+            // 均为null，不做处理。
+        } else if (this.contractPrice != null && contractPrice != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.contractPrice.compareTo(contractPrice) != 0) {
+                this.contractPrice = contractPrice;
+                if (!this.toUpdateCols.contains("CONTRACT_PRICE")) {
+                    this.toUpdateCols.add("CONTRACT_PRICE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.contractPrice = contractPrice;
+            if (!this.toUpdateCols.contains("CONTRACT_PRICE")) {
+                this.toUpdateCols.add("CONTRACT_PRICE");
+            }
+        }
         return this;
     }
 
     /**
      * 是否涉及保函下拉。
      */
-    public String isReferGuaranteeId;
+    private String isReferGuaranteeId;
 
     /**
      * 获取：是否涉及保函下拉。
@@ -978,94 +1610,102 @@ public class PoOrderTerminateReq {
      * 设置：是否涉及保函下拉。
      */
     public PoOrderTerminateReq setIsReferGuaranteeId(String isReferGuaranteeId) {
-        this.isReferGuaranteeId = isReferGuaranteeId;
+        if (this.isReferGuaranteeId == null && isReferGuaranteeId == null) {
+            // 均为null，不做处理。
+        } else if (this.isReferGuaranteeId != null && isReferGuaranteeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isReferGuaranteeId.compareTo(isReferGuaranteeId) != 0) {
+                this.isReferGuaranteeId = isReferGuaranteeId;
+                if (!this.toUpdateCols.contains("IS_REFER_GUARANTEE_ID")) {
+                    this.toUpdateCols.add("IS_REFER_GUARANTEE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isReferGuaranteeId = isReferGuaranteeId;
+            if (!this.toUpdateCols.contains("IS_REFER_GUARANTEE_ID")) {
+                this.toUpdateCols.add("IS_REFER_GUARANTEE_ID");
+            }
+        }
         return this;
     }
 
     /**
-     * 保函类型。
+     * 保函类型（多选）。
      */
-    public String guaranteeLetterTypeId;
+    private String guaranteeLetterTypeIds;
 
     /**
-     * 获取：保函类型。
+     * 获取：保函类型（多选）。
      */
-    public String getGuaranteeLetterTypeId() {
-        return this.guaranteeLetterTypeId;
+    public String getGuaranteeLetterTypeIds() {
+        return this.guaranteeLetterTypeIds;
     }
 
     /**
-     * 设置：保函类型。
+     * 设置：保函类型（多选）。
      */
-    public PoOrderTerminateReq setGuaranteeLetterTypeId(String guaranteeLetterTypeId) {
-        this.guaranteeLetterTypeId = guaranteeLetterTypeId;
+    public PoOrderTerminateReq setGuaranteeLetterTypeIds(String guaranteeLetterTypeIds) {
+        if (this.guaranteeLetterTypeIds == null && guaranteeLetterTypeIds == null) {
+            // 均为null，不做处理。
+        } else if (this.guaranteeLetterTypeIds != null && guaranteeLetterTypeIds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.guaranteeLetterTypeIds.compareTo(guaranteeLetterTypeIds) != 0) {
+                this.guaranteeLetterTypeIds = guaranteeLetterTypeIds;
+                if (!this.toUpdateCols.contains("GUARANTEE_LETTER_TYPE_IDS")) {
+                    this.toUpdateCols.add("GUARANTEE_LETTER_TYPE_IDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.guaranteeLetterTypeIds = guaranteeLetterTypeIds;
+            if (!this.toUpdateCols.contains("GUARANTEE_LETTER_TYPE_IDS")) {
+                this.toUpdateCols.add("GUARANTEE_LETTER_TYPE_IDS");
+            }
+        }
         return this;
     }
 
     /**
-     * 相对方联系人。
+     * 是否3。
      */
-    public String oppoSiteLinkMan;
+    private String yesNoThree;
 
     /**
-     * 获取：相对方联系人。
+     * 获取：是否3。
      */
-    public String getOppoSiteLinkMan() {
-        return this.oppoSiteLinkMan;
+    public String getYesNoThree() {
+        return this.yesNoThree;
     }
 
     /**
-     * 设置：相对方联系人。
+     * 设置：是否3。
      */
-    public PoOrderTerminateReq setOppoSiteLinkMan(String oppoSiteLinkMan) {
-        this.oppoSiteLinkMan = oppoSiteLinkMan;
-        return this;
-    }
-
-    /**
-     * 相对方联系方式。
-     */
-    public String oppoSiteContact;
-
-    /**
-     * 获取：相对方联系方式。
-     */
-    public String getOppoSiteContact() {
-        return this.oppoSiteContact;
-    }
-
-    /**
-     * 设置：相对方联系方式。
-     */
-    public PoOrderTerminateReq setOppoSiteContact(String oppoSiteContact) {
-        this.oppoSiteContact = oppoSiteContact;
-        return this;
-    }
-
-    /**
-     * 是否标准合同模板。
-     */
-    public String isStandardContractTemplateId;
-
-    /**
-     * 获取：是否标准合同模板。
-     */
-    public String getIsStandardContractTemplateId() {
-        return this.isStandardContractTemplateId;
-    }
-
-    /**
-     * 设置：是否标准合同模板。
-     */
-    public PoOrderTerminateReq setIsStandardContractTemplateId(String isStandardContractTemplateId) {
-        this.isStandardContractTemplateId = isStandardContractTemplateId;
+    public PoOrderTerminateReq setYesNoThree(String yesNoThree) {
+        if (this.yesNoThree == null && yesNoThree == null) {
+            // 均为null，不做处理。
+        } else if (this.yesNoThree != null && yesNoThree != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.yesNoThree.compareTo(yesNoThree) != 0) {
+                this.yesNoThree = yesNoThree;
+                if (!this.toUpdateCols.contains("YES_NO_THREE")) {
+                    this.toUpdateCols.add("YES_NO_THREE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.yesNoThree = yesNoThree;
+            if (!this.toUpdateCols.contains("YES_NO_THREE")) {
+                this.toUpdateCols.add("YES_NO_THREE");
+            }
+        }
         return this;
     }
 
     /**
      * 附件。
      */
-    public String attFileGroupId;
+    private String attFileGroupId;
 
     /**
      * 获取：附件。
@@ -1078,14 +1718,30 @@ public class PoOrderTerminateReq {
      * 设置：附件。
      */
     public PoOrderTerminateReq setAttFileGroupId(String attFileGroupId) {
-        this.attFileGroupId = attFileGroupId;
+        if (this.attFileGroupId == null && attFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.attFileGroupId != null && attFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.attFileGroupId.compareTo(attFileGroupId) != 0) {
+                this.attFileGroupId = attFileGroupId;
+                if (!this.toUpdateCols.contains("ATT_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("ATT_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.attFileGroupId = attFileGroupId;
+            if (!this.toUpdateCols.contains("ATT_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("ATT_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 补充说明。
      */
-    public String additionalRemark;
+    private String additionalRemark;
 
     /**
      * 获取：补充说明。
@@ -1098,14 +1754,102 @@ public class PoOrderTerminateReq {
      * 设置：补充说明。
      */
     public PoOrderTerminateReq setAdditionalRemark(String additionalRemark) {
-        this.additionalRemark = additionalRemark;
+        if (this.additionalRemark == null && additionalRemark == null) {
+            // 均为null，不做处理。
+        } else if (this.additionalRemark != null && additionalRemark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.additionalRemark.compareTo(additionalRemark) != 0) {
+                this.additionalRemark = additionalRemark;
+                if (!this.toUpdateCols.contains("ADDITIONAL_REMARK")) {
+                    this.toUpdateCols.add("ADDITIONAL_REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.additionalRemark = additionalRemark;
+            if (!this.toUpdateCols.contains("ADDITIONAL_REMARK")) {
+                this.toUpdateCols.add("ADDITIONAL_REMARK");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 审批人1。
+     */
+    private String approvalUserOne;
+
+    /**
+     * 获取：审批人1。
+     */
+    public String getApprovalUserOne() {
+        return this.approvalUserOne;
+    }
+
+    /**
+     * 设置：审批人1。
+     */
+    public PoOrderTerminateReq setApprovalUserOne(String approvalUserOne) {
+        if (this.approvalUserOne == null && approvalUserOne == null) {
+            // 均为null，不做处理。
+        } else if (this.approvalUserOne != null && approvalUserOne != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approvalUserOne.compareTo(approvalUserOne) != 0) {
+                this.approvalUserOne = approvalUserOne;
+                if (!this.toUpdateCols.contains("APPROVAL_USER_ONE")) {
+                    this.toUpdateCols.add("APPROVAL_USER_ONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approvalUserOne = approvalUserOne;
+            if (!this.toUpdateCols.contains("APPROVAL_USER_ONE")) {
+                this.toUpdateCols.add("APPROVAL_USER_ONE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 审批日期1。
+     */
+    private LocalDate approvalDateOne;
+
+    /**
+     * 获取：审批日期1。
+     */
+    public LocalDate getApprovalDateOne() {
+        return this.approvalDateOne;
+    }
+
+    /**
+     * 设置：审批日期1。
+     */
+    public PoOrderTerminateReq setApprovalDateOne(LocalDate approvalDateOne) {
+        if (this.approvalDateOne == null && approvalDateOne == null) {
+            // 均为null，不做处理。
+        } else if (this.approvalDateOne != null && approvalDateOne != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approvalDateOne.compareTo(approvalDateOne) != 0) {
+                this.approvalDateOne = approvalDateOne;
+                if (!this.toUpdateCols.contains("APPROVAL_DATE_ONE")) {
+                    this.toUpdateCols.add("APPROVAL_DATE_ONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approvalDateOne = approvalDateOne;
+            if (!this.toUpdateCols.contains("APPROVAL_DATE_ONE")) {
+                this.toUpdateCols.add("APPROVAL_DATE_ONE");
+            }
+        }
         return this;
     }
 
     /**
      * 部门负责人附件。
      */
-    public String deptHeadFileGroupId;
+    private String deptHeadFileGroupId;
 
     /**
      * 获取：部门负责人附件。
@@ -1118,14 +1862,30 @@ public class PoOrderTerminateReq {
      * 设置：部门负责人附件。
      */
     public PoOrderTerminateReq setDeptHeadFileGroupId(String deptHeadFileGroupId) {
-        this.deptHeadFileGroupId = deptHeadFileGroupId;
+        if (this.deptHeadFileGroupId == null && deptHeadFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.deptHeadFileGroupId != null && deptHeadFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.deptHeadFileGroupId.compareTo(deptHeadFileGroupId) != 0) {
+                this.deptHeadFileGroupId = deptHeadFileGroupId;
+                if (!this.toUpdateCols.contains("DEPT_HEAD_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("DEPT_HEAD_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.deptHeadFileGroupId = deptHeadFileGroupId;
+            if (!this.toUpdateCols.contains("DEPT_HEAD_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("DEPT_HEAD_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 部门负责人审核意见。
      */
-    public String deptHeadApprovalMessage;
+    private String deptHeadApprovalMessage;
 
     /**
      * 获取：部门负责人审核意见。
@@ -1138,14 +1898,102 @@ public class PoOrderTerminateReq {
      * 设置：部门负责人审核意见。
      */
     public PoOrderTerminateReq setDeptHeadApprovalMessage(String deptHeadApprovalMessage) {
-        this.deptHeadApprovalMessage = deptHeadApprovalMessage;
+        if (this.deptHeadApprovalMessage == null && deptHeadApprovalMessage == null) {
+            // 均为null，不做处理。
+        } else if (this.deptHeadApprovalMessage != null && deptHeadApprovalMessage != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.deptHeadApprovalMessage.compareTo(deptHeadApprovalMessage) != 0) {
+                this.deptHeadApprovalMessage = deptHeadApprovalMessage;
+                if (!this.toUpdateCols.contains("DEPT_HEAD_APPROVAL_MESSAGE")) {
+                    this.toUpdateCols.add("DEPT_HEAD_APPROVAL_MESSAGE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.deptHeadApprovalMessage = deptHeadApprovalMessage;
+            if (!this.toUpdateCols.contains("DEPT_HEAD_APPROVAL_MESSAGE")) {
+                this.toUpdateCols.add("DEPT_HEAD_APPROVAL_MESSAGE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 审批人2。
+     */
+    private String approvalUserTwo;
+
+    /**
+     * 获取：审批人2。
+     */
+    public String getApprovalUserTwo() {
+        return this.approvalUserTwo;
+    }
+
+    /**
+     * 设置：审批人2。
+     */
+    public PoOrderTerminateReq setApprovalUserTwo(String approvalUserTwo) {
+        if (this.approvalUserTwo == null && approvalUserTwo == null) {
+            // 均为null，不做处理。
+        } else if (this.approvalUserTwo != null && approvalUserTwo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approvalUserTwo.compareTo(approvalUserTwo) != 0) {
+                this.approvalUserTwo = approvalUserTwo;
+                if (!this.toUpdateCols.contains("APPROVAL_USER_TWO")) {
+                    this.toUpdateCols.add("APPROVAL_USER_TWO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approvalUserTwo = approvalUserTwo;
+            if (!this.toUpdateCols.contains("APPROVAL_USER_TWO")) {
+                this.toUpdateCols.add("APPROVAL_USER_TWO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 审批日期2。
+     */
+    private LocalDate approvalDateTwo;
+
+    /**
+     * 获取：审批日期2。
+     */
+    public LocalDate getApprovalDateTwo() {
+        return this.approvalDateTwo;
+    }
+
+    /**
+     * 设置：审批日期2。
+     */
+    public PoOrderTerminateReq setApprovalDateTwo(LocalDate approvalDateTwo) {
+        if (this.approvalDateTwo == null && approvalDateTwo == null) {
+            // 均为null，不做处理。
+        } else if (this.approvalDateTwo != null && approvalDateTwo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approvalDateTwo.compareTo(approvalDateTwo) != 0) {
+                this.approvalDateTwo = approvalDateTwo;
+                if (!this.toUpdateCols.contains("APPROVAL_DATE_TWO")) {
+                    this.toUpdateCols.add("APPROVAL_DATE_TWO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approvalDateTwo = approvalDateTwo;
+            if (!this.toUpdateCols.contains("APPROVAL_DATE_TWO")) {
+                this.toUpdateCols.add("APPROVAL_DATE_TWO");
+            }
+        }
         return this;
     }
 
     /**
      * 成本合约部附件。
      */
-    public String costContractDeptFileGroupId;
+    private String costContractDeptFileGroupId;
 
     /**
      * 获取：成本合约部附件。
@@ -1158,14 +2006,30 @@ public class PoOrderTerminateReq {
      * 设置：成本合约部附件。
      */
     public PoOrderTerminateReq setCostContractDeptFileGroupId(String costContractDeptFileGroupId) {
-        this.costContractDeptFileGroupId = costContractDeptFileGroupId;
+        if (this.costContractDeptFileGroupId == null && costContractDeptFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.costContractDeptFileGroupId != null && costContractDeptFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.costContractDeptFileGroupId.compareTo(costContractDeptFileGroupId) != 0) {
+                this.costContractDeptFileGroupId = costContractDeptFileGroupId;
+                if (!this.toUpdateCols.contains("COST_CONTRACT_DEPT_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("COST_CONTRACT_DEPT_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.costContractDeptFileGroupId = costContractDeptFileGroupId;
+            if (!this.toUpdateCols.contains("COST_CONTRACT_DEPT_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("COST_CONTRACT_DEPT_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 成本合约部审核意见。
      */
-    public String costContractApprovalMessage;
+    private String costContractApprovalMessage;
 
     /**
      * 获取：成本合约部审核意见。
@@ -1178,14 +2042,102 @@ public class PoOrderTerminateReq {
      * 设置：成本合约部审核意见。
      */
     public PoOrderTerminateReq setCostContractApprovalMessage(String costContractApprovalMessage) {
-        this.costContractApprovalMessage = costContractApprovalMessage;
+        if (this.costContractApprovalMessage == null && costContractApprovalMessage == null) {
+            // 均为null，不做处理。
+        } else if (this.costContractApprovalMessage != null && costContractApprovalMessage != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.costContractApprovalMessage.compareTo(costContractApprovalMessage) != 0) {
+                this.costContractApprovalMessage = costContractApprovalMessage;
+                if (!this.toUpdateCols.contains("COST_CONTRACT_APPROVAL_MESSAGE")) {
+                    this.toUpdateCols.add("COST_CONTRACT_APPROVAL_MESSAGE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.costContractApprovalMessage = costContractApprovalMessage;
+            if (!this.toUpdateCols.contains("COST_CONTRACT_APPROVAL_MESSAGE")) {
+                this.toUpdateCols.add("COST_CONTRACT_APPROVAL_MESSAGE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 审批人3。
+     */
+    private String approvalUserThree;
+
+    /**
+     * 获取：审批人3。
+     */
+    public String getApprovalUserThree() {
+        return this.approvalUserThree;
+    }
+
+    /**
+     * 设置：审批人3。
+     */
+    public PoOrderTerminateReq setApprovalUserThree(String approvalUserThree) {
+        if (this.approvalUserThree == null && approvalUserThree == null) {
+            // 均为null，不做处理。
+        } else if (this.approvalUserThree != null && approvalUserThree != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approvalUserThree.compareTo(approvalUserThree) != 0) {
+                this.approvalUserThree = approvalUserThree;
+                if (!this.toUpdateCols.contains("APPROVAL_USER_THREE")) {
+                    this.toUpdateCols.add("APPROVAL_USER_THREE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approvalUserThree = approvalUserThree;
+            if (!this.toUpdateCols.contains("APPROVAL_USER_THREE")) {
+                this.toUpdateCols.add("APPROVAL_USER_THREE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 审批日期3。
+     */
+    private LocalDate approvalDateThree;
+
+    /**
+     * 获取：审批日期3。
+     */
+    public LocalDate getApprovalDateThree() {
+        return this.approvalDateThree;
+    }
+
+    /**
+     * 设置：审批日期3。
+     */
+    public PoOrderTerminateReq setApprovalDateThree(LocalDate approvalDateThree) {
+        if (this.approvalDateThree == null && approvalDateThree == null) {
+            // 均为null，不做处理。
+        } else if (this.approvalDateThree != null && approvalDateThree != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approvalDateThree.compareTo(approvalDateThree) != 0) {
+                this.approvalDateThree = approvalDateThree;
+                if (!this.toUpdateCols.contains("APPROVAL_DATE_THREE")) {
+                    this.toUpdateCols.add("APPROVAL_DATE_THREE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approvalDateThree = approvalDateThree;
+            if (!this.toUpdateCols.contains("APPROVAL_DATE_THREE")) {
+                this.toUpdateCols.add("APPROVAL_DATE_THREE");
+            }
+        }
         return this;
     }
 
     /**
      * 财务法务附件。
      */
-    public String financeLegalContractDeptFileGroupId;
+    private String financeLegalContractDeptFileGroupId;
 
     /**
      * 获取：财务法务附件。
@@ -1198,14 +2150,30 @@ public class PoOrderTerminateReq {
      * 设置：财务法务附件。
      */
     public PoOrderTerminateReq setFinanceLegalContractDeptFileGroupId(String financeLegalContractDeptFileGroupId) {
-        this.financeLegalContractDeptFileGroupId = financeLegalContractDeptFileGroupId;
+        if (this.financeLegalContractDeptFileGroupId == null && financeLegalContractDeptFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.financeLegalContractDeptFileGroupId != null && financeLegalContractDeptFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.financeLegalContractDeptFileGroupId.compareTo(financeLegalContractDeptFileGroupId) != 0) {
+                this.financeLegalContractDeptFileGroupId = financeLegalContractDeptFileGroupId;
+                if (!this.toUpdateCols.contains("FINANCE_LEGAL_CONTRACT_DEPT_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("FINANCE_LEGAL_CONTRACT_DEPT_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.financeLegalContractDeptFileGroupId = financeLegalContractDeptFileGroupId;
+            if (!this.toUpdateCols.contains("FINANCE_LEGAL_CONTRACT_DEPT_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("FINANCE_LEGAL_CONTRACT_DEPT_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 财务法务审核意见。
      */
-    public String financeLegalApprovalMessage;
+    private String financeLegalApprovalMessage;
 
     /**
      * 获取：财务法务审核意见。
@@ -1218,14 +2186,246 @@ public class PoOrderTerminateReq {
      * 设置：财务法务审核意见。
      */
     public PoOrderTerminateReq setFinanceLegalApprovalMessage(String financeLegalApprovalMessage) {
-        this.financeLegalApprovalMessage = financeLegalApprovalMessage;
+        if (this.financeLegalApprovalMessage == null && financeLegalApprovalMessage == null) {
+            // 均为null，不做处理。
+        } else if (this.financeLegalApprovalMessage != null && financeLegalApprovalMessage != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.financeLegalApprovalMessage.compareTo(financeLegalApprovalMessage) != 0) {
+                this.financeLegalApprovalMessage = financeLegalApprovalMessage;
+                if (!this.toUpdateCols.contains("FINANCE_LEGAL_APPROVAL_MESSAGE")) {
+                    this.toUpdateCols.add("FINANCE_LEGAL_APPROVAL_MESSAGE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.financeLegalApprovalMessage = financeLegalApprovalMessage;
+            if (!this.toUpdateCols.contains("FINANCE_LEGAL_APPROVAL_MESSAGE")) {
+                this.toUpdateCols.add("FINANCE_LEGAL_APPROVAL_MESSAGE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 审批人4。
+     */
+    private String approvalUserFour;
+
+    /**
+     * 获取：审批人4。
+     */
+    public String getApprovalUserFour() {
+        return this.approvalUserFour;
+    }
+
+    /**
+     * 设置：审批人4。
+     */
+    public PoOrderTerminateReq setApprovalUserFour(String approvalUserFour) {
+        if (this.approvalUserFour == null && approvalUserFour == null) {
+            // 均为null，不做处理。
+        } else if (this.approvalUserFour != null && approvalUserFour != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approvalUserFour.compareTo(approvalUserFour) != 0) {
+                this.approvalUserFour = approvalUserFour;
+                if (!this.toUpdateCols.contains("APPROVAL_USER_FOUR")) {
+                    this.toUpdateCols.add("APPROVAL_USER_FOUR");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approvalUserFour = approvalUserFour;
+            if (!this.toUpdateCols.contains("APPROVAL_USER_FOUR")) {
+                this.toUpdateCols.add("APPROVAL_USER_FOUR");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 审批日期4。
+     */
+    private LocalDate approvalDateFour;
+
+    /**
+     * 获取：审批日期4。
+     */
+    public LocalDate getApprovalDateFour() {
+        return this.approvalDateFour;
+    }
+
+    /**
+     * 设置：审批日期4。
+     */
+    public PoOrderTerminateReq setApprovalDateFour(LocalDate approvalDateFour) {
+        if (this.approvalDateFour == null && approvalDateFour == null) {
+            // 均为null，不做处理。
+        } else if (this.approvalDateFour != null && approvalDateFour != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approvalDateFour.compareTo(approvalDateFour) != 0) {
+                this.approvalDateFour = approvalDateFour;
+                if (!this.toUpdateCols.contains("APPROVAL_DATE_FOUR")) {
+                    this.toUpdateCols.add("APPROVAL_DATE_FOUR");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approvalDateFour = approvalDateFour;
+            if (!this.toUpdateCols.contains("APPROVAL_DATE_FOUR")) {
+                this.toUpdateCols.add("APPROVAL_DATE_FOUR");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 审批附件1。
+     */
+    private String approveFileIdOne;
+
+    /**
+     * 获取：审批附件1。
+     */
+    public String getApproveFileIdOne() {
+        return this.approveFileIdOne;
+    }
+
+    /**
+     * 设置：审批附件1。
+     */
+    public PoOrderTerminateReq setApproveFileIdOne(String approveFileIdOne) {
+        if (this.approveFileIdOne == null && approveFileIdOne == null) {
+            // 均为null，不做处理。
+        } else if (this.approveFileIdOne != null && approveFileIdOne != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approveFileIdOne.compareTo(approveFileIdOne) != 0) {
+                this.approveFileIdOne = approveFileIdOne;
+                if (!this.toUpdateCols.contains("APPROVE_FILE_ID_ONE")) {
+                    this.toUpdateCols.add("APPROVE_FILE_ID_ONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approveFileIdOne = approveFileIdOne;
+            if (!this.toUpdateCols.contains("APPROVE_FILE_ID_ONE")) {
+                this.toUpdateCols.add("APPROVE_FILE_ID_ONE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 审批意见1。
+     */
+    private String approvalCommentOne;
+
+    /**
+     * 获取：审批意见1。
+     */
+    public String getApprovalCommentOne() {
+        return this.approvalCommentOne;
+    }
+
+    /**
+     * 设置：审批意见1。
+     */
+    public PoOrderTerminateReq setApprovalCommentOne(String approvalCommentOne) {
+        if (this.approvalCommentOne == null && approvalCommentOne == null) {
+            // 均为null，不做处理。
+        } else if (this.approvalCommentOne != null && approvalCommentOne != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approvalCommentOne.compareTo(approvalCommentOne) != 0) {
+                this.approvalCommentOne = approvalCommentOne;
+                if (!this.toUpdateCols.contains("APPROVAL_COMMENT_ONE")) {
+                    this.toUpdateCols.add("APPROVAL_COMMENT_ONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approvalCommentOne = approvalCommentOne;
+            if (!this.toUpdateCols.contains("APPROVAL_COMMENT_ONE")) {
+                this.toUpdateCols.add("APPROVAL_COMMENT_ONE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 审批人5。
+     */
+    private String approvalUserFive;
+
+    /**
+     * 获取：审批人5。
+     */
+    public String getApprovalUserFive() {
+        return this.approvalUserFive;
+    }
+
+    /**
+     * 设置：审批人5。
+     */
+    public PoOrderTerminateReq setApprovalUserFive(String approvalUserFive) {
+        if (this.approvalUserFive == null && approvalUserFive == null) {
+            // 均为null，不做处理。
+        } else if (this.approvalUserFive != null && approvalUserFive != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approvalUserFive.compareTo(approvalUserFive) != 0) {
+                this.approvalUserFive = approvalUserFive;
+                if (!this.toUpdateCols.contains("APPROVAL_USER_FIVE")) {
+                    this.toUpdateCols.add("APPROVAL_USER_FIVE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approvalUserFive = approvalUserFive;
+            if (!this.toUpdateCols.contains("APPROVAL_USER_FIVE")) {
+                this.toUpdateCols.add("APPROVAL_USER_FIVE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 审批日期5。
+     */
+    private LocalDate approvalDateFive;
+
+    /**
+     * 获取：审批日期5。
+     */
+    public LocalDate getApprovalDateFive() {
+        return this.approvalDateFive;
+    }
+
+    /**
+     * 设置：审批日期5。
+     */
+    public PoOrderTerminateReq setApprovalDateFive(LocalDate approvalDateFive) {
+        if (this.approvalDateFive == null && approvalDateFive == null) {
+            // 均为null，不做处理。
+        } else if (this.approvalDateFive != null && approvalDateFive != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.approvalDateFive.compareTo(approvalDateFive) != 0) {
+                this.approvalDateFive = approvalDateFive;
+                if (!this.toUpdateCols.contains("APPROVAL_DATE_FIVE")) {
+                    this.toUpdateCols.add("APPROVAL_DATE_FIVE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.approvalDateFive = approvalDateFive;
+            if (!this.toUpdateCols.contains("APPROVAL_DATE_FIVE")) {
+                this.toUpdateCols.add("APPROVAL_DATE_FIVE");
+            }
+        }
         return this;
     }
 
     /**
      * 领导审批附件。
      */
-    public String leaderApproveFileGroupId;
+    private String leaderApproveFileGroupId;
 
     /**
      * 获取：领导审批附件。
@@ -1238,14 +2438,30 @@ public class PoOrderTerminateReq {
      * 设置：领导审批附件。
      */
     public PoOrderTerminateReq setLeaderApproveFileGroupId(String leaderApproveFileGroupId) {
-        this.leaderApproveFileGroupId = leaderApproveFileGroupId;
+        if (this.leaderApproveFileGroupId == null && leaderApproveFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.leaderApproveFileGroupId != null && leaderApproveFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.leaderApproveFileGroupId.compareTo(leaderApproveFileGroupId) != 0) {
+                this.leaderApproveFileGroupId = leaderApproveFileGroupId;
+                if (!this.toUpdateCols.contains("LEADER_APPROVE_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("LEADER_APPROVE_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.leaderApproveFileGroupId = leaderApproveFileGroupId;
+            if (!this.toUpdateCols.contains("LEADER_APPROVE_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("LEADER_APPROVE_FILE_GROUP_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 领导审批意见。
      */
-    public String leaderApproveComment;
+    private String leaderApproveComment;
 
     /**
      * 获取：领导审批意见。
@@ -1258,7 +2474,23 @@ public class PoOrderTerminateReq {
      * 设置：领导审批意见。
      */
     public PoOrderTerminateReq setLeaderApproveComment(String leaderApproveComment) {
-        this.leaderApproveComment = leaderApproveComment;
+        if (this.leaderApproveComment == null && leaderApproveComment == null) {
+            // 均为null，不做处理。
+        } else if (this.leaderApproveComment != null && leaderApproveComment != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.leaderApproveComment.compareTo(leaderApproveComment) != 0) {
+                this.leaderApproveComment = leaderApproveComment;
+                if (!this.toUpdateCols.contains("LEADER_APPROVE_COMMENT")) {
+                    this.toUpdateCols.add("LEADER_APPROVE_COMMENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.leaderApproveComment = leaderApproveComment;
+            if (!this.toUpdateCols.contains("LEADER_APPROVE_COMMENT")) {
+                this.toUpdateCols.add("LEADER_APPROVE_COMMENT");
+            }
+        }
         return this;
     }
 
@@ -1276,6 +2508,7 @@ public class PoOrderTerminateReq {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -1286,7 +2519,17 @@ public class PoOrderTerminateReq {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -1307,7 +2550,8 @@ public class PoOrderTerminateReq {
      * @return
      */
     public static PoOrderTerminateReq newData() {
-        return modelHelper.newData();
+        PoOrderTerminateReq obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -1316,7 +2560,8 @@ public class PoOrderTerminateReq {
      * @return
      */
     public static PoOrderTerminateReq insertData() {
-        return modelHelper.insertData();
+        PoOrderTerminateReq obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -1328,7 +2573,8 @@ public class PoOrderTerminateReq {
      * @return 获取到的对象，若无则为null。
      */
     public static PoOrderTerminateReq selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        PoOrderTerminateReq obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -1340,7 +2586,8 @@ public class PoOrderTerminateReq {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PoOrderTerminateReq> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<PoOrderTerminateReq> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -1352,7 +2599,8 @@ public class PoOrderTerminateReq {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<PoOrderTerminateReq> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<PoOrderTerminateReq> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

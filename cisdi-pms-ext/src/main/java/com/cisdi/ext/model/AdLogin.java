@@ -4,8 +4,10 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +20,18 @@ public class AdLogin {
      * 模型助手。
      */
     private static final ModelHelper<AdLogin> modelHelper = new ModelHelper<>("AD_LOGIN", new AdLogin());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -121,7 +135,7 @@ public class AdLogin {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -134,14 +148,30 @@ public class AdLogin {
      * 设置：ID。
      */
     public AdLogin setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -154,14 +184,30 @@ public class AdLogin {
      * 设置：版本。
      */
     public AdLogin setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -174,14 +220,30 @@ public class AdLogin {
      * 设置：时间戳。
      */
     public AdLogin setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -194,14 +256,30 @@ public class AdLogin {
      * 设置：是否预设。
      */
     public AdLogin setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -214,14 +292,30 @@ public class AdLogin {
      * 设置：创建日期时间。
      */
     public AdLogin setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -234,14 +328,30 @@ public class AdLogin {
      * 设置：创建用户。
      */
     public AdLogin setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -254,14 +364,30 @@ public class AdLogin {
      * 设置：最后修改日期时间。
      */
     public AdLogin setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -274,14 +400,30 @@ public class AdLogin {
      * 设置：最后修改用户。
      */
     public AdLogin setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -294,14 +436,30 @@ public class AdLogin {
      * 设置：记录状态。
      */
     public AdLogin setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -314,14 +472,30 @@ public class AdLogin {
      * 设置：锁定流程实例。
      */
     public AdLogin setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -334,14 +508,30 @@ public class AdLogin {
      * 设置：代码。
      */
     public AdLogin setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -354,14 +544,30 @@ public class AdLogin {
      * 设置：名称。
      */
     public AdLogin setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -374,14 +580,30 @@ public class AdLogin {
      * 设置：备注。
      */
     public AdLogin setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 用户。
      */
-    public String adUserId;
+    private String adUserId;
 
     /**
      * 获取：用户。
@@ -394,14 +616,30 @@ public class AdLogin {
      * 设置：用户。
      */
     public AdLogin setAdUserId(String adUserId) {
-        this.adUserId = adUserId;
+        if (this.adUserId == null && adUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.adUserId != null && adUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adUserId.compareTo(adUserId) != 0) {
+                this.adUserId = adUserId;
+                if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                    this.toUpdateCols.add("AD_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adUserId = adUserId;
+            if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                this.toUpdateCols.add("AD_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 客户端IP。
      */
-    public String clientIp;
+    private String clientIp;
 
     /**
      * 获取：客户端IP。
@@ -414,14 +652,30 @@ public class AdLogin {
      * 设置：客户端IP。
      */
     public AdLogin setClientIp(String clientIp) {
-        this.clientIp = clientIp;
+        if (this.clientIp == null && clientIp == null) {
+            // 均为null，不做处理。
+        } else if (this.clientIp != null && clientIp != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.clientIp.compareTo(clientIp) != 0) {
+                this.clientIp = clientIp;
+                if (!this.toUpdateCols.contains("CLIENT_IP")) {
+                    this.toUpdateCols.add("CLIENT_IP");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.clientIp = clientIp;
+            if (!this.toUpdateCols.contains("CLIENT_IP")) {
+                this.toUpdateCols.add("CLIENT_IP");
+            }
+        }
         return this;
     }
 
     /**
      * 会话ID。
      */
-    public String sessionId;
+    private String sessionId;
 
     /**
      * 获取：会话ID。
@@ -434,14 +688,30 @@ public class AdLogin {
      * 设置：会话ID。
      */
     public AdLogin setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+        if (this.sessionId == null && sessionId == null) {
+            // 均为null，不做处理。
+        } else if (this.sessionId != null && sessionId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.sessionId.compareTo(sessionId) != 0) {
+                this.sessionId = sessionId;
+                if (!this.toUpdateCols.contains("SESSION_ID")) {
+                    this.toUpdateCols.add("SESSION_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.sessionId = sessionId;
+            if (!this.toUpdateCols.contains("SESSION_ID")) {
+                this.toUpdateCols.add("SESSION_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 登录组织。
      */
-    public String loginOrgId;
+    private String loginOrgId;
 
     /**
      * 获取：登录组织。
@@ -454,14 +724,30 @@ public class AdLogin {
      * 设置：登录组织。
      */
     public AdLogin setLoginOrgId(String loginOrgId) {
-        this.loginOrgId = loginOrgId;
+        if (this.loginOrgId == null && loginOrgId == null) {
+            // 均为null，不做处理。
+        } else if (this.loginOrgId != null && loginOrgId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.loginOrgId.compareTo(loginOrgId) != 0) {
+                this.loginOrgId = loginOrgId;
+                if (!this.toUpdateCols.contains("LOGIN_ORG_ID")) {
+                    this.toUpdateCols.add("LOGIN_ORG_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.loginOrgId = loginOrgId;
+            if (!this.toUpdateCols.contains("LOGIN_ORG_ID")) {
+                this.toUpdateCols.add("LOGIN_ORG_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 登录日期时间。
      */
-    public LocalDateTime loginDatetime;
+    private LocalDateTime loginDatetime;
 
     /**
      * 获取：登录日期时间。
@@ -474,14 +760,30 @@ public class AdLogin {
      * 设置：登录日期时间。
      */
     public AdLogin setLoginDatetime(LocalDateTime loginDatetime) {
-        this.loginDatetime = loginDatetime;
+        if (this.loginDatetime == null && loginDatetime == null) {
+            // 均为null，不做处理。
+        } else if (this.loginDatetime != null && loginDatetime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.loginDatetime.compareTo(loginDatetime) != 0) {
+                this.loginDatetime = loginDatetime;
+                if (!this.toUpdateCols.contains("LOGIN_DATETIME")) {
+                    this.toUpdateCols.add("LOGIN_DATETIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.loginDatetime = loginDatetime;
+            if (!this.toUpdateCols.contains("LOGIN_DATETIME")) {
+                this.toUpdateCols.add("LOGIN_DATETIME");
+            }
+        }
         return this;
     }
 
     /**
      * 注销日期时间。
      */
-    public LocalDateTime logoutDatetime;
+    private LocalDateTime logoutDatetime;
 
     /**
      * 获取：注销日期时间。
@@ -494,14 +796,30 @@ public class AdLogin {
      * 设置：注销日期时间。
      */
     public AdLogin setLogoutDatetime(LocalDateTime logoutDatetime) {
-        this.logoutDatetime = logoutDatetime;
+        if (this.logoutDatetime == null && logoutDatetime == null) {
+            // 均为null，不做处理。
+        } else if (this.logoutDatetime != null && logoutDatetime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.logoutDatetime.compareTo(logoutDatetime) != 0) {
+                this.logoutDatetime = logoutDatetime;
+                if (!this.toUpdateCols.contains("LOGOUT_DATETIME")) {
+                    this.toUpdateCols.add("LOGOUT_DATETIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.logoutDatetime = logoutDatetime;
+            if (!this.toUpdateCols.contains("LOGOUT_DATETIME")) {
+                this.toUpdateCols.add("LOGOUT_DATETIME");
+            }
+        }
         return this;
     }
 
     /**
      * 注销类型。
      */
-    public String logoutType;
+    private String logoutType;
 
     /**
      * 获取：注销类型。
@@ -514,7 +832,23 @@ public class AdLogin {
      * 设置：注销类型。
      */
     public AdLogin setLogoutType(String logoutType) {
-        this.logoutType = logoutType;
+        if (this.logoutType == null && logoutType == null) {
+            // 均为null，不做处理。
+        } else if (this.logoutType != null && logoutType != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.logoutType.compareTo(logoutType) != 0) {
+                this.logoutType = logoutType;
+                if (!this.toUpdateCols.contains("LOGOUT_TYPE")) {
+                    this.toUpdateCols.add("LOGOUT_TYPE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.logoutType = logoutType;
+            if (!this.toUpdateCols.contains("LOGOUT_TYPE")) {
+                this.toUpdateCols.add("LOGOUT_TYPE");
+            }
+        }
         return this;
     }
 
@@ -532,6 +866,7 @@ public class AdLogin {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -542,7 +877,17 @@ public class AdLogin {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -563,7 +908,8 @@ public class AdLogin {
      * @return
      */
     public static AdLogin newData() {
-        return modelHelper.newData();
+        AdLogin obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -572,7 +918,8 @@ public class AdLogin {
      * @return
      */
     public static AdLogin insertData() {
-        return modelHelper.insertData();
+        AdLogin obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -584,7 +931,8 @@ public class AdLogin {
      * @return 获取到的对象，若无则为null。
      */
     public static AdLogin selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        AdLogin obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -596,7 +944,8 @@ public class AdLogin {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdLogin> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<AdLogin> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -608,7 +957,8 @@ public class AdLogin {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdLogin> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<AdLogin> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

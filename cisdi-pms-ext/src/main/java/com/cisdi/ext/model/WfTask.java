@@ -4,8 +4,11 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +21,18 @@ public class WfTask {
      * 模型助手。
      */
     private static final ModelHelper<WfTask> modelHelper = new ModelHelper<>("WF_TASK", new WfTask());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -120,6 +135,10 @@ public class WfTask {
          */
         public static final String USER_COMMENT = "USER_COMMENT";
         /**
+         * 用户附件。
+         */
+        public static final String USER_ATTACHMENT = "USER_ATTACHMENT";
+        /**
          * 操作。
          */
         public static final String AD_ACT_ID = "AD_ACT_ID";
@@ -139,6 +158,18 @@ public class WfTask {
          * 序号。
          */
         public static final String SEQ_NO = "SEQ_NO";
+        /**
+         * 转办自用户。
+         */
+        public static final String DISPATCH_BY_USER_ID = "DISPATCH_BY_USER_ID";
+        /**
+         * 转办日期时间。
+         */
+        public static final String DISPATCH_DATETIME = "DISPATCH_DATETIME";
+        /**
+         * 干预。
+         */
+        public static final String WF_INTERFERE_ID = "WF_INTERFERE_ID";
     }
 
     // </editor-fold>
@@ -149,7 +180,7 @@ public class WfTask {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -162,14 +193,30 @@ public class WfTask {
      * 设置：ID。
      */
     public WfTask setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -182,14 +229,30 @@ public class WfTask {
      * 设置：版本。
      */
     public WfTask setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -202,14 +265,30 @@ public class WfTask {
      * 设置：时间戳。
      */
     public WfTask setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -222,14 +301,30 @@ public class WfTask {
      * 设置：是否预设。
      */
     public WfTask setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -242,14 +337,30 @@ public class WfTask {
      * 设置：创建日期时间。
      */
     public WfTask setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -262,14 +373,30 @@ public class WfTask {
      * 设置：创建用户。
      */
     public WfTask setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -282,14 +409,30 @@ public class WfTask {
      * 设置：最后修改日期时间。
      */
     public WfTask setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -302,14 +445,30 @@ public class WfTask {
      * 设置：最后修改用户。
      */
     public WfTask setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -322,14 +481,30 @@ public class WfTask {
      * 设置：记录状态。
      */
     public WfTask setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -342,14 +517,30 @@ public class WfTask {
      * 设置：锁定流程实例。
      */
     public WfTask setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -362,14 +553,30 @@ public class WfTask {
      * 设置：代码。
      */
     public WfTask setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -382,14 +589,30 @@ public class WfTask {
      * 设置：名称。
      */
     public WfTask setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -402,14 +625,30 @@ public class WfTask {
      * 设置：备注。
      */
     public WfTask setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 流程。
      */
-    public String wfProcessId;
+    private String wfProcessId;
 
     /**
      * 获取：流程。
@@ -422,14 +661,30 @@ public class WfTask {
      * 设置：流程。
      */
     public WfTask setWfProcessId(String wfProcessId) {
-        this.wfProcessId = wfProcessId;
+        if (this.wfProcessId == null && wfProcessId == null) {
+            // 均为null，不做处理。
+        } else if (this.wfProcessId != null && wfProcessId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.wfProcessId.compareTo(wfProcessId) != 0) {
+                this.wfProcessId = wfProcessId;
+                if (!this.toUpdateCols.contains("WF_PROCESS_ID")) {
+                    this.toUpdateCols.add("WF_PROCESS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.wfProcessId = wfProcessId;
+            if (!this.toUpdateCols.contains("WF_PROCESS_ID")) {
+                this.toUpdateCols.add("WF_PROCESS_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 流程实例。
      */
-    public String wfProcessInstanceId;
+    private String wfProcessInstanceId;
 
     /**
      * 获取：流程实例。
@@ -442,14 +697,30 @@ public class WfTask {
      * 设置：流程实例。
      */
     public WfTask setWfProcessInstanceId(String wfProcessInstanceId) {
-        this.wfProcessInstanceId = wfProcessInstanceId;
+        if (this.wfProcessInstanceId == null && wfProcessInstanceId == null) {
+            // 均为null，不做处理。
+        } else if (this.wfProcessInstanceId != null && wfProcessInstanceId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.wfProcessInstanceId.compareTo(wfProcessInstanceId) != 0) {
+                this.wfProcessInstanceId = wfProcessInstanceId;
+                if (!this.toUpdateCols.contains("WF_PROCESS_INSTANCE_ID")) {
+                    this.toUpdateCols.add("WF_PROCESS_INSTANCE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.wfProcessInstanceId = wfProcessInstanceId;
+            if (!this.toUpdateCols.contains("WF_PROCESS_INSTANCE_ID")) {
+                this.toUpdateCols.add("WF_PROCESS_INSTANCE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 节点。
      */
-    public String wfNodeId;
+    private String wfNodeId;
 
     /**
      * 获取：节点。
@@ -462,14 +733,30 @@ public class WfTask {
      * 设置：节点。
      */
     public WfTask setWfNodeId(String wfNodeId) {
-        this.wfNodeId = wfNodeId;
+        if (this.wfNodeId == null && wfNodeId == null) {
+            // 均为null，不做处理。
+        } else if (this.wfNodeId != null && wfNodeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.wfNodeId.compareTo(wfNodeId) != 0) {
+                this.wfNodeId = wfNodeId;
+                if (!this.toUpdateCols.contains("WF_NODE_ID")) {
+                    this.toUpdateCols.add("WF_NODE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.wfNodeId = wfNodeId;
+            if (!this.toUpdateCols.contains("WF_NODE_ID")) {
+                this.toUpdateCols.add("WF_NODE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 节点实例。
      */
-    public String wfNodeInstanceId;
+    private String wfNodeInstanceId;
 
     /**
      * 获取：节点实例。
@@ -482,14 +769,30 @@ public class WfTask {
      * 设置：节点实例。
      */
     public WfTask setWfNodeInstanceId(String wfNodeInstanceId) {
-        this.wfNodeInstanceId = wfNodeInstanceId;
+        if (this.wfNodeInstanceId == null && wfNodeInstanceId == null) {
+            // 均为null，不做处理。
+        } else if (this.wfNodeInstanceId != null && wfNodeInstanceId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.wfNodeInstanceId.compareTo(wfNodeInstanceId) != 0) {
+                this.wfNodeInstanceId = wfNodeInstanceId;
+                if (!this.toUpdateCols.contains("WF_NODE_INSTANCE_ID")) {
+                    this.toUpdateCols.add("WF_NODE_INSTANCE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.wfNodeInstanceId = wfNodeInstanceId;
+            if (!this.toUpdateCols.contains("WF_NODE_INSTANCE_ID")) {
+                this.toUpdateCols.add("WF_NODE_INSTANCE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 用户。
      */
-    public String adUserId;
+    private String adUserId;
 
     /**
      * 获取：用户。
@@ -502,14 +805,30 @@ public class WfTask {
      * 设置：用户。
      */
     public WfTask setAdUserId(String adUserId) {
-        this.adUserId = adUserId;
+        if (this.adUserId == null && adUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.adUserId != null && adUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adUserId.compareTo(adUserId) != 0) {
+                this.adUserId = adUserId;
+                if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                    this.toUpdateCols.add("AD_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adUserId = adUserId;
+            if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                this.toUpdateCols.add("AD_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 接收日期时间。
      */
-    public LocalDateTime receiveDatetime;
+    private LocalDateTime receiveDatetime;
 
     /**
      * 获取：接收日期时间。
@@ -522,14 +841,30 @@ public class WfTask {
      * 设置：接收日期时间。
      */
     public WfTask setReceiveDatetime(LocalDateTime receiveDatetime) {
-        this.receiveDatetime = receiveDatetime;
+        if (this.receiveDatetime == null && receiveDatetime == null) {
+            // 均为null，不做处理。
+        } else if (this.receiveDatetime != null && receiveDatetime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.receiveDatetime.compareTo(receiveDatetime) != 0) {
+                this.receiveDatetime = receiveDatetime;
+                if (!this.toUpdateCols.contains("RECEIVE_DATETIME")) {
+                    this.toUpdateCols.add("RECEIVE_DATETIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.receiveDatetime = receiveDatetime;
+            if (!this.toUpdateCols.contains("RECEIVE_DATETIME")) {
+                this.toUpdateCols.add("RECEIVE_DATETIME");
+            }
+        }
         return this;
     }
 
     /**
      * 查看日期时间。
      */
-    public LocalDateTime viewDatetime;
+    private LocalDateTime viewDatetime;
 
     /**
      * 获取：查看日期时间。
@@ -542,14 +877,30 @@ public class WfTask {
      * 设置：查看日期时间。
      */
     public WfTask setViewDatetime(LocalDateTime viewDatetime) {
-        this.viewDatetime = viewDatetime;
+        if (this.viewDatetime == null && viewDatetime == null) {
+            // 均为null，不做处理。
+        } else if (this.viewDatetime != null && viewDatetime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.viewDatetime.compareTo(viewDatetime) != 0) {
+                this.viewDatetime = viewDatetime;
+                if (!this.toUpdateCols.contains("VIEW_DATETIME")) {
+                    this.toUpdateCols.add("VIEW_DATETIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.viewDatetime = viewDatetime;
+            if (!this.toUpdateCols.contains("VIEW_DATETIME")) {
+                this.toUpdateCols.add("VIEW_DATETIME");
+            }
+        }
         return this;
     }
 
     /**
      * 操作日期时间。
      */
-    public LocalDateTime actDatetime;
+    private LocalDateTime actDatetime;
 
     /**
      * 获取：操作日期时间。
@@ -562,14 +913,30 @@ public class WfTask {
      * 设置：操作日期时间。
      */
     public WfTask setActDatetime(LocalDateTime actDatetime) {
-        this.actDatetime = actDatetime;
+        if (this.actDatetime == null && actDatetime == null) {
+            // 均为null，不做处理。
+        } else if (this.actDatetime != null && actDatetime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actDatetime.compareTo(actDatetime) != 0) {
+                this.actDatetime = actDatetime;
+                if (!this.toUpdateCols.contains("ACT_DATETIME")) {
+                    this.toUpdateCols.add("ACT_DATETIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actDatetime = actDatetime;
+            if (!this.toUpdateCols.contains("ACT_DATETIME")) {
+                this.toUpdateCols.add("ACT_DATETIME");
+            }
+        }
         return this;
     }
 
     /**
      * 用户意见。
      */
-    public String userComment;
+    private String userComment;
 
     /**
      * 获取：用户意见。
@@ -582,14 +949,66 @@ public class WfTask {
      * 设置：用户意见。
      */
     public WfTask setUserComment(String userComment) {
-        this.userComment = userComment;
+        if (this.userComment == null && userComment == null) {
+            // 均为null，不做处理。
+        } else if (this.userComment != null && userComment != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.userComment.compareTo(userComment) != 0) {
+                this.userComment = userComment;
+                if (!this.toUpdateCols.contains("USER_COMMENT")) {
+                    this.toUpdateCols.add("USER_COMMENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.userComment = userComment;
+            if (!this.toUpdateCols.contains("USER_COMMENT")) {
+                this.toUpdateCols.add("USER_COMMENT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 用户附件。
+     */
+    private String userAttachment;
+
+    /**
+     * 获取：用户附件。
+     */
+    public String getUserAttachment() {
+        return this.userAttachment;
+    }
+
+    /**
+     * 设置：用户附件。
+     */
+    public WfTask setUserAttachment(String userAttachment) {
+        if (this.userAttachment == null && userAttachment == null) {
+            // 均为null，不做处理。
+        } else if (this.userAttachment != null && userAttachment != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.userAttachment.compareTo(userAttachment) != 0) {
+                this.userAttachment = userAttachment;
+                if (!this.toUpdateCols.contains("USER_ATTACHMENT")) {
+                    this.toUpdateCols.add("USER_ATTACHMENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.userAttachment = userAttachment;
+            if (!this.toUpdateCols.contains("USER_ATTACHMENT")) {
+                this.toUpdateCols.add("USER_ATTACHMENT");
+            }
+        }
         return this;
     }
 
     /**
      * 操作。
      */
-    public String adActId;
+    private String adActId;
 
     /**
      * 获取：操作。
@@ -602,14 +1021,30 @@ public class WfTask {
      * 设置：操作。
      */
     public WfTask setAdActId(String adActId) {
-        this.adActId = adActId;
+        if (this.adActId == null && adActId == null) {
+            // 均为null，不做处理。
+        } else if (this.adActId != null && adActId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adActId.compareTo(adActId) != 0) {
+                this.adActId = adActId;
+                if (!this.toUpdateCols.contains("AD_ACT_ID")) {
+                    this.toUpdateCols.add("AD_ACT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adActId = adActId;
+            if (!this.toUpdateCols.contains("AD_ACT_ID")) {
+                this.toUpdateCols.add("AD_ACT_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 是否关闭。
      */
-    public Boolean isClosed;
+    private Boolean isClosed;
 
     /**
      * 获取：是否关闭。
@@ -622,14 +1057,30 @@ public class WfTask {
      * 设置：是否关闭。
      */
     public WfTask setIsClosed(Boolean isClosed) {
-        this.isClosed = isClosed;
+        if (this.isClosed == null && isClosed == null) {
+            // 均为null，不做处理。
+        } else if (this.isClosed != null && isClosed != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isClosed.compareTo(isClosed) != 0) {
+                this.isClosed = isClosed;
+                if (!this.toUpdateCols.contains("IS_CLOSED")) {
+                    this.toUpdateCols.add("IS_CLOSED");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isClosed = isClosed;
+            if (!this.toUpdateCols.contains("IS_CLOSED")) {
+                this.toUpdateCols.add("IS_CLOSED");
+            }
+        }
         return this;
     }
 
     /**
      * 任务类型。
      */
-    public String wfTaskTypeId;
+    private String wfTaskTypeId;
 
     /**
      * 获取：任务类型。
@@ -642,14 +1093,30 @@ public class WfTask {
      * 设置：任务类型。
      */
     public WfTask setWfTaskTypeId(String wfTaskTypeId) {
-        this.wfTaskTypeId = wfTaskTypeId;
+        if (this.wfTaskTypeId == null && wfTaskTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.wfTaskTypeId != null && wfTaskTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.wfTaskTypeId.compareTo(wfTaskTypeId) != 0) {
+                this.wfTaskTypeId = wfTaskTypeId;
+                if (!this.toUpdateCols.contains("WF_TASK_TYPE_ID")) {
+                    this.toUpdateCols.add("WF_TASK_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.wfTaskTypeId = wfTaskTypeId;
+            if (!this.toUpdateCols.contains("WF_TASK_TYPE_ID")) {
+                this.toUpdateCols.add("WF_TASK_TYPE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 处于本轮。
      */
-    public Boolean inCurrentRound;
+    private Boolean inCurrentRound;
 
     /**
      * 获取：处于本轮。
@@ -662,27 +1129,167 @@ public class WfTask {
      * 设置：处于本轮。
      */
     public WfTask setInCurrentRound(Boolean inCurrentRound) {
-        this.inCurrentRound = inCurrentRound;
+        if (this.inCurrentRound == null && inCurrentRound == null) {
+            // 均为null，不做处理。
+        } else if (this.inCurrentRound != null && inCurrentRound != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.inCurrentRound.compareTo(inCurrentRound) != 0) {
+                this.inCurrentRound = inCurrentRound;
+                if (!this.toUpdateCols.contains("IN_CURRENT_ROUND")) {
+                    this.toUpdateCols.add("IN_CURRENT_ROUND");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.inCurrentRound = inCurrentRound;
+            if (!this.toUpdateCols.contains("IN_CURRENT_ROUND")) {
+                this.toUpdateCols.add("IN_CURRENT_ROUND");
+            }
+        }
         return this;
     }
 
     /**
      * 序号。
      */
-    public Double seqNo;
+    private BigDecimal seqNo;
 
     /**
      * 获取：序号。
      */
-    public Double getSeqNo() {
+    public BigDecimal getSeqNo() {
         return this.seqNo;
     }
 
     /**
      * 设置：序号。
      */
-    public WfTask setSeqNo(Double seqNo) {
-        this.seqNo = seqNo;
+    public WfTask setSeqNo(BigDecimal seqNo) {
+        if (this.seqNo == null && seqNo == null) {
+            // 均为null，不做处理。
+        } else if (this.seqNo != null && seqNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.seqNo.compareTo(seqNo) != 0) {
+                this.seqNo = seqNo;
+                if (!this.toUpdateCols.contains("SEQ_NO")) {
+                    this.toUpdateCols.add("SEQ_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.seqNo = seqNo;
+            if (!this.toUpdateCols.contains("SEQ_NO")) {
+                this.toUpdateCols.add("SEQ_NO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 转办自用户。
+     */
+    private String dispatchByUserId;
+
+    /**
+     * 获取：转办自用户。
+     */
+    public String getDispatchByUserId() {
+        return this.dispatchByUserId;
+    }
+
+    /**
+     * 设置：转办自用户。
+     */
+    public WfTask setDispatchByUserId(String dispatchByUserId) {
+        if (this.dispatchByUserId == null && dispatchByUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.dispatchByUserId != null && dispatchByUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.dispatchByUserId.compareTo(dispatchByUserId) != 0) {
+                this.dispatchByUserId = dispatchByUserId;
+                if (!this.toUpdateCols.contains("DISPATCH_BY_USER_ID")) {
+                    this.toUpdateCols.add("DISPATCH_BY_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.dispatchByUserId = dispatchByUserId;
+            if (!this.toUpdateCols.contains("DISPATCH_BY_USER_ID")) {
+                this.toUpdateCols.add("DISPATCH_BY_USER_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 转办日期时间。
+     */
+    private LocalDateTime dispatchDatetime;
+
+    /**
+     * 获取：转办日期时间。
+     */
+    public LocalDateTime getDispatchDatetime() {
+        return this.dispatchDatetime;
+    }
+
+    /**
+     * 设置：转办日期时间。
+     */
+    public WfTask setDispatchDatetime(LocalDateTime dispatchDatetime) {
+        if (this.dispatchDatetime == null && dispatchDatetime == null) {
+            // 均为null，不做处理。
+        } else if (this.dispatchDatetime != null && dispatchDatetime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.dispatchDatetime.compareTo(dispatchDatetime) != 0) {
+                this.dispatchDatetime = dispatchDatetime;
+                if (!this.toUpdateCols.contains("DISPATCH_DATETIME")) {
+                    this.toUpdateCols.add("DISPATCH_DATETIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.dispatchDatetime = dispatchDatetime;
+            if (!this.toUpdateCols.contains("DISPATCH_DATETIME")) {
+                this.toUpdateCols.add("DISPATCH_DATETIME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 干预。
+     */
+    private String wfInterfereId;
+
+    /**
+     * 获取：干预。
+     */
+    public String getWfInterfereId() {
+        return this.wfInterfereId;
+    }
+
+    /**
+     * 设置：干预。
+     */
+    public WfTask setWfInterfereId(String wfInterfereId) {
+        if (this.wfInterfereId == null && wfInterfereId == null) {
+            // 均为null，不做处理。
+        } else if (this.wfInterfereId != null && wfInterfereId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.wfInterfereId.compareTo(wfInterfereId) != 0) {
+                this.wfInterfereId = wfInterfereId;
+                if (!this.toUpdateCols.contains("WF_INTERFERE_ID")) {
+                    this.toUpdateCols.add("WF_INTERFERE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.wfInterfereId = wfInterfereId;
+            if (!this.toUpdateCols.contains("WF_INTERFERE_ID")) {
+                this.toUpdateCols.add("WF_INTERFERE_ID");
+            }
+        }
         return this;
     }
 
@@ -700,6 +1307,7 @@ public class WfTask {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -710,7 +1318,17 @@ public class WfTask {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -731,7 +1349,8 @@ public class WfTask {
      * @return
      */
     public static WfTask newData() {
-        return modelHelper.newData();
+        WfTask obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -740,7 +1359,8 @@ public class WfTask {
      * @return
      */
     public static WfTask insertData() {
-        return modelHelper.insertData();
+        WfTask obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -752,7 +1372,8 @@ public class WfTask {
      * @return 获取到的对象，若无则为null。
      */
     public static WfTask selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        WfTask obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -764,7 +1385,8 @@ public class WfTask {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<WfTask> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<WfTask> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -776,7 +1398,8 @@ public class WfTask {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<WfTask> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<WfTask> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

@@ -4,8 +4,10 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +20,18 @@ public class AdSevAttLink {
      * 模型助手。
      */
     private static final ModelHelper<AdSevAttLink> modelHelper = new ModelHelper<>("AD_SEV_ATT_LINK", new AdSevAttLink());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -117,7 +131,7 @@ public class AdSevAttLink {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -130,14 +144,30 @@ public class AdSevAttLink {
      * 设置：ID。
      */
     public AdSevAttLink setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -150,14 +180,30 @@ public class AdSevAttLink {
      * 设置：版本。
      */
     public AdSevAttLink setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -170,14 +216,30 @@ public class AdSevAttLink {
      * 设置：时间戳。
      */
     public AdSevAttLink setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -190,14 +252,30 @@ public class AdSevAttLink {
      * 设置：是否预设。
      */
     public AdSevAttLink setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -210,14 +288,30 @@ public class AdSevAttLink {
      * 设置：创建日期时间。
      */
     public AdSevAttLink setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -230,14 +324,30 @@ public class AdSevAttLink {
      * 设置：创建用户。
      */
     public AdSevAttLink setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -250,14 +360,30 @@ public class AdSevAttLink {
      * 设置：最后修改日期时间。
      */
     public AdSevAttLink setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -270,14 +396,30 @@ public class AdSevAttLink {
      * 设置：最后修改用户。
      */
     public AdSevAttLink setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -290,14 +432,30 @@ public class AdSevAttLink {
      * 设置：记录状态。
      */
     public AdSevAttLink setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -310,14 +468,30 @@ public class AdSevAttLink {
      * 设置：锁定流程实例。
      */
     public AdSevAttLink setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -330,14 +504,30 @@ public class AdSevAttLink {
      * 设置：代码。
      */
     public AdSevAttLink setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -350,14 +540,30 @@ public class AdSevAttLink {
      * 设置：名称。
      */
     public AdSevAttLink setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -370,14 +576,30 @@ public class AdSevAttLink {
      * 设置：备注。
      */
     public AdSevAttLink setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
         return this;
     }
 
     /**
      * 驱动方的属性。
      */
-    public String drivingAttId;
+    private String drivingAttId;
 
     /**
      * 获取：驱动方的属性。
@@ -390,14 +612,30 @@ public class AdSevAttLink {
      * 设置：驱动方的属性。
      */
     public AdSevAttLink setDrivingAttId(String drivingAttId) {
-        this.drivingAttId = drivingAttId;
+        if (this.drivingAttId == null && drivingAttId == null) {
+            // 均为null，不做处理。
+        } else if (this.drivingAttId != null && drivingAttId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.drivingAttId.compareTo(drivingAttId) != 0) {
+                this.drivingAttId = drivingAttId;
+                if (!this.toUpdateCols.contains("DRIVING_ATT_ID")) {
+                    this.toUpdateCols.add("DRIVING_ATT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.drivingAttId = drivingAttId;
+            if (!this.toUpdateCols.contains("DRIVING_ATT_ID")) {
+                this.toUpdateCols.add("DRIVING_ATT_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 被驱动方的属性。
      */
-    public String drivenAttId;
+    private String drivenAttId;
 
     /**
      * 获取：被驱动方的属性。
@@ -410,14 +648,30 @@ public class AdSevAttLink {
      * 设置：被驱动方的属性。
      */
     public AdSevAttLink setDrivenAttId(String drivenAttId) {
-        this.drivenAttId = drivenAttId;
+        if (this.drivenAttId == null && drivenAttId == null) {
+            // 均为null，不做处理。
+        } else if (this.drivenAttId != null && drivenAttId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.drivenAttId.compareTo(drivenAttId) != 0) {
+                this.drivenAttId = drivenAttId;
+                if (!this.toUpdateCols.contains("DRIVEN_ATT_ID")) {
+                    this.toUpdateCols.add("DRIVEN_ATT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.drivenAttId = drivenAttId;
+            if (!this.toUpdateCols.contains("DRIVEN_ATT_ID")) {
+                this.toUpdateCols.add("DRIVEN_ATT_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 被驱动方属性的值逻辑。
      */
-    public String drivenAttValueLogic;
+    private String drivenAttValueLogic;
 
     /**
      * 获取：被驱动方属性的值逻辑。
@@ -430,14 +684,30 @@ public class AdSevAttLink {
      * 设置：被驱动方属性的值逻辑。
      */
     public AdSevAttLink setDrivenAttValueLogic(String drivenAttValueLogic) {
-        this.drivenAttValueLogic = drivenAttValueLogic;
+        if (this.drivenAttValueLogic == null && drivenAttValueLogic == null) {
+            // 均为null，不做处理。
+        } else if (this.drivenAttValueLogic != null && drivenAttValueLogic != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.drivenAttValueLogic.compareTo(drivenAttValueLogic) != 0) {
+                this.drivenAttValueLogic = drivenAttValueLogic;
+                if (!this.toUpdateCols.contains("DRIVEN_ATT_VALUE_LOGIC")) {
+                    this.toUpdateCols.add("DRIVEN_ATT_VALUE_LOGIC");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.drivenAttValueLogic = drivenAttValueLogic;
+            if (!this.toUpdateCols.contains("DRIVEN_ATT_VALUE_LOGIC")) {
+                this.toUpdateCols.add("DRIVEN_ATT_VALUE_LOGIC");
+            }
+        }
         return this;
     }
 
     /**
      * 被驱动方属性的可改逻辑。
      */
-    public String drivenAttEditableLogic;
+    private String drivenAttEditableLogic;
 
     /**
      * 获取：被驱动方属性的可改逻辑。
@@ -450,14 +720,30 @@ public class AdSevAttLink {
      * 设置：被驱动方属性的可改逻辑。
      */
     public AdSevAttLink setDrivenAttEditableLogic(String drivenAttEditableLogic) {
-        this.drivenAttEditableLogic = drivenAttEditableLogic;
+        if (this.drivenAttEditableLogic == null && drivenAttEditableLogic == null) {
+            // 均为null，不做处理。
+        } else if (this.drivenAttEditableLogic != null && drivenAttEditableLogic != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.drivenAttEditableLogic.compareTo(drivenAttEditableLogic) != 0) {
+                this.drivenAttEditableLogic = drivenAttEditableLogic;
+                if (!this.toUpdateCols.contains("DRIVEN_ATT_EDITABLE_LOGIC")) {
+                    this.toUpdateCols.add("DRIVEN_ATT_EDITABLE_LOGIC");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.drivenAttEditableLogic = drivenAttEditableLogic;
+            if (!this.toUpdateCols.contains("DRIVEN_ATT_EDITABLE_LOGIC")) {
+                this.toUpdateCols.add("DRIVEN_ATT_EDITABLE_LOGIC");
+            }
+        }
         return this;
     }
 
     /**
      * 被驱动方属性的必填逻辑。
      */
-    public String drivenAttMandatoryLogic;
+    private String drivenAttMandatoryLogic;
 
     /**
      * 获取：被驱动方属性的必填逻辑。
@@ -470,14 +756,30 @@ public class AdSevAttLink {
      * 设置：被驱动方属性的必填逻辑。
      */
     public AdSevAttLink setDrivenAttMandatoryLogic(String drivenAttMandatoryLogic) {
-        this.drivenAttMandatoryLogic = drivenAttMandatoryLogic;
+        if (this.drivenAttMandatoryLogic == null && drivenAttMandatoryLogic == null) {
+            // 均为null，不做处理。
+        } else if (this.drivenAttMandatoryLogic != null && drivenAttMandatoryLogic != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.drivenAttMandatoryLogic.compareTo(drivenAttMandatoryLogic) != 0) {
+                this.drivenAttMandatoryLogic = drivenAttMandatoryLogic;
+                if (!this.toUpdateCols.contains("DRIVEN_ATT_MANDATORY_LOGIC")) {
+                    this.toUpdateCols.add("DRIVEN_ATT_MANDATORY_LOGIC");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.drivenAttMandatoryLogic = drivenAttMandatoryLogic;
+            if (!this.toUpdateCols.contains("DRIVEN_ATT_MANDATORY_LOGIC")) {
+                this.toUpdateCols.add("DRIVEN_ATT_MANDATORY_LOGIC");
+            }
+        }
         return this;
     }
 
     /**
      * 实体视图。
      */
-    public String adSingleEntViewId;
+    private String adSingleEntViewId;
 
     /**
      * 获取：实体视图。
@@ -490,7 +792,23 @@ public class AdSevAttLink {
      * 设置：实体视图。
      */
     public AdSevAttLink setAdSingleEntViewId(String adSingleEntViewId) {
-        this.adSingleEntViewId = adSingleEntViewId;
+        if (this.adSingleEntViewId == null && adSingleEntViewId == null) {
+            // 均为null，不做处理。
+        } else if (this.adSingleEntViewId != null && adSingleEntViewId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adSingleEntViewId.compareTo(adSingleEntViewId) != 0) {
+                this.adSingleEntViewId = adSingleEntViewId;
+                if (!this.toUpdateCols.contains("AD_SINGLE_ENT_VIEW_ID")) {
+                    this.toUpdateCols.add("AD_SINGLE_ENT_VIEW_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adSingleEntViewId = adSingleEntViewId;
+            if (!this.toUpdateCols.contains("AD_SINGLE_ENT_VIEW_ID")) {
+                this.toUpdateCols.add("AD_SINGLE_ENT_VIEW_ID");
+            }
+        }
         return this;
     }
 
@@ -508,6 +826,7 @@ public class AdSevAttLink {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -518,7 +837,17 @@ public class AdSevAttLink {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -539,7 +868,8 @@ public class AdSevAttLink {
      * @return
      */
     public static AdSevAttLink newData() {
-        return modelHelper.newData();
+        AdSevAttLink obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -548,7 +878,8 @@ public class AdSevAttLink {
      * @return
      */
     public static AdSevAttLink insertData() {
-        return modelHelper.insertData();
+        AdSevAttLink obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -560,7 +891,8 @@ public class AdSevAttLink {
      * @return 获取到的对象，若无则为null。
      */
     public static AdSevAttLink selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        AdSevAttLink obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -572,7 +904,8 @@ public class AdSevAttLink {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdSevAttLink> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<AdSevAttLink> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -584,7 +917,8 @@ public class AdSevAttLink {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdSevAttLink> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<AdSevAttLink> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

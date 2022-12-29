@@ -4,7 +4,6 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.pms.job.excel.model.ContractAccountModel;
-import com.cisdi.pms.job.excel.model.FundImplementationExportModel;
 import com.cisdi.pms.job.excel.model.request.ContractReq;
 import com.cisdi.pms.job.utils.StringUtils;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -42,7 +41,7 @@ public class ContractAccountController extends BaseController{
         StringBuffer sb = new StringBuffer();
         sb.append("SELECT IFNULL(o.PM_PRJ_ID,p2.id) prjId,IFNULL(p.name,o.PROJECT_NAME_WR) prjName,o.CONTRACT_NAME contractName,o.CUSTOMER_UNIT_ONE" +
                 " contractCompanyId,pa.name contractCompanyName,o.WIN_BID_UNIT_ONE cooperationUnit,o.CONTRACT_CATEGORY_ONE_ID contractCategoryId,va" +
-                ".name contractCategoryName,o.AMT_THREE amtExcludeTax,o.AMT_FOUR taxRate,o.AMT_TWO amtIncludeTax,o.CRT_DT createTime,i.END_DATETIME" +
+                ".name contractCategoryName,o.AMT_THREE amtExcludeTax,o.AMT_FOUR taxRate,o.AMT_TWO amtIncludeTax,o.SIGN_DATE createTime,i.END_DATETIME" +
                 " endTime,o.REMARK_LONG_ONE remark,o.CRT_USER_ID userId,u.name userName,o.ATT_FILE_GROUP_ID fileIds\n" +
                 "FROM PO_ORDER_REQ o\n" +
                 "left join pm_prj p on p.id = o.PM_PRJ_ID\n" +
@@ -92,7 +91,6 @@ public class ContractAccountController extends BaseController{
         for (Map<String, Object> contractMap : contractList) {
             ContractAccountModel model = JSONObject.parseObject(JSONObject.toJSONString(contractMap), ContractAccountModel.class);
             model.setCreateTime(StringUtils.getDateWithOutT(model.getCreateTime()));
-            model.setEndTime(StringUtils.getDateWithOutT(model.getEndTime()));
             models.add(model);
         }
 

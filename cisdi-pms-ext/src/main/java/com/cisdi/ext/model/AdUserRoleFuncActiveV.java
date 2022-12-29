@@ -4,7 +4,9 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,11 +20,23 @@ public class AdUserRoleFuncActiveV {
      */
     private static final ModelHelper<AdUserRoleFuncActiveV> modelHelper = new ModelHelper<>("AD_USER_ROLE_FUNC_ACTIVE_V", new AdUserRoleFuncActiveV());
 
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
+
     // 实体常量：
     // <editor-fold>
 
     public static final String ENT_CODE = "AD_USER_ROLE_FUNC_ACTIVE_V";
-    public static final EntityTypeE ENTITY_TYPE = EntityTypeE.VIEW;
+    public static final EntityTypeE ENTITY_TYPE = EntityTypeE.SUB_QUERY;
 
     // </editor-fold>
 
@@ -56,7 +70,7 @@ public class AdUserRoleFuncActiveV {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -69,14 +83,30 @@ public class AdUserRoleFuncActiveV {
      * 设置：ID。
      */
     public AdUserRoleFuncActiveV setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 用户。
      */
-    public String adUserId;
+    private String adUserId;
 
     /**
      * 获取：用户。
@@ -89,14 +119,30 @@ public class AdUserRoleFuncActiveV {
      * 设置：用户。
      */
     public AdUserRoleFuncActiveV setAdUserId(String adUserId) {
-        this.adUserId = adUserId;
+        if (this.adUserId == null && adUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.adUserId != null && adUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adUserId.compareTo(adUserId) != 0) {
+                this.adUserId = adUserId;
+                if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                    this.toUpdateCols.add("AD_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adUserId = adUserId;
+            if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                this.toUpdateCols.add("AD_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 角色。
      */
-    public String adRoleId;
+    private String adRoleId;
 
     /**
      * 获取：角色。
@@ -109,14 +155,30 @@ public class AdUserRoleFuncActiveV {
      * 设置：角色。
      */
     public AdUserRoleFuncActiveV setAdRoleId(String adRoleId) {
-        this.adRoleId = adRoleId;
+        if (this.adRoleId == null && adRoleId == null) {
+            // 均为null，不做处理。
+        } else if (this.adRoleId != null && adRoleId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adRoleId.compareTo(adRoleId) != 0) {
+                this.adRoleId = adRoleId;
+                if (!this.toUpdateCols.contains("AD_ROLE_ID")) {
+                    this.toUpdateCols.add("AD_ROLE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adRoleId = adRoleId;
+            if (!this.toUpdateCols.contains("AD_ROLE_ID")) {
+                this.toUpdateCols.add("AD_ROLE_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 功能。
      */
-    public String adFuncId;
+    private String adFuncId;
 
     /**
      * 获取：功能。
@@ -129,7 +191,23 @@ public class AdUserRoleFuncActiveV {
      * 设置：功能。
      */
     public AdUserRoleFuncActiveV setAdFuncId(String adFuncId) {
-        this.adFuncId = adFuncId;
+        if (this.adFuncId == null && adFuncId == null) {
+            // 均为null，不做处理。
+        } else if (this.adFuncId != null && adFuncId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adFuncId.compareTo(adFuncId) != 0) {
+                this.adFuncId = adFuncId;
+                if (!this.toUpdateCols.contains("AD_FUNC_ID")) {
+                    this.toUpdateCols.add("AD_FUNC_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adFuncId = adFuncId;
+            if (!this.toUpdateCols.contains("AD_FUNC_ID")) {
+                this.toUpdateCols.add("AD_FUNC_ID");
+            }
+        }
         return this;
     }
 
@@ -147,6 +225,7 @@ public class AdUserRoleFuncActiveV {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -157,7 +236,17 @@ public class AdUserRoleFuncActiveV {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -178,7 +267,8 @@ public class AdUserRoleFuncActiveV {
      * @return
      */
     public static AdUserRoleFuncActiveV newData() {
-        return modelHelper.newData();
+        AdUserRoleFuncActiveV obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -187,7 +277,8 @@ public class AdUserRoleFuncActiveV {
      * @return
      */
     public static AdUserRoleFuncActiveV insertData() {
-        return modelHelper.insertData();
+        AdUserRoleFuncActiveV obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -199,7 +290,8 @@ public class AdUserRoleFuncActiveV {
      * @return 获取到的对象，若无则为null。
      */
     public static AdUserRoleFuncActiveV selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        AdUserRoleFuncActiveV obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -211,7 +303,8 @@ public class AdUserRoleFuncActiveV {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdUserRoleFuncActiveV> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<AdUserRoleFuncActiveV> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -223,7 +316,8 @@ public class AdUserRoleFuncActiveV {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdUserRoleFuncActiveV> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<AdUserRoleFuncActiveV> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**

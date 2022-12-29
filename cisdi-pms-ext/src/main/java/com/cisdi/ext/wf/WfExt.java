@@ -192,7 +192,7 @@ public class WfExt {
                     // 资金需求计划申请完成同步数据
                     if ("PM_FUND_REQUIRE_PLAN_REQ".equals(entityCode)) {
                         PmFundReqPlan pmFundReqPlan = PmFundReqPlan.insertData();
-                        String id = pmFundReqPlan.id;
+                        String id = pmFundReqPlan.getId();
                         String pmFundRequirePlanReqId = entityRecord.csCommId;
                         // 项目id
                         String prjId = valueMap.get("AMOUT_PM_PRJ_ID").toString();

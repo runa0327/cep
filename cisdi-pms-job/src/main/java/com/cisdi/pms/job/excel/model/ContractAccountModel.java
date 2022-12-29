@@ -39,7 +39,7 @@ public class ContractAccountModel {
     @ContentStyle(dataFormat = 2)
     public BigDecimal amtExcludeTax;
     //税率
-    @ExcelProperty("税率")
+    @ExcelProperty("税率(%)")
     @ColumnWidth(30)
     @ContentStyle(dataFormat = 2)
     public BigDecimal taxRate;
@@ -52,16 +52,13 @@ public class ContractAccountModel {
     @ExcelProperty("签订时间")
     @ColumnWidth(30)
     public String createTime;
-    //签收时间
-    @ExcelProperty("签收时间")
-    @ColumnWidth(30)
-    public String endTime;
-    //备注
-    @ExcelProperty("备注")
-    @ColumnWidth(30)
-    public String remark;
-    //采购经办人
-    @ExcelProperty("采购经办人")
-    @ColumnWidth(30)
-    public String userName;
+
+//    //备注
+//    @ExcelProperty("备注")
+//    @ColumnWidth(30)
+//    public String remark;
+//    //采购经办人
+//    @ExcelProperty("采购经办人")
+//    @ColumnWidth(30)
+//    public String userName;
 }

@@ -4,8 +4,11 @@ import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.entity.EntityTypeE;
+import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +21,18 @@ public class AdPublishRecordDtl {
      * 模型助手。
      */
     private static final ModelHelper<AdPublishRecordDtl> modelHelper = new ModelHelper<>("AD_PUBLISH_RECORD_DTL", new AdPublishRecordDtl());
+
+    /**
+     * 待更新的列。
+     */
+    private List<String> toUpdateCols = new ArrayList<>();
+
+    /**
+     * 清除待更新的列。
+     */
+    public void clearToUpdateCols() {
+        this.toUpdateCols.clear();
+    }
 
     // 实体常量：
     // <editor-fold>
@@ -84,6 +99,34 @@ public class AdPublishRecordDtl {
          */
         public static final String REMARK = "REMARK";
         /**
+         * 发布内容类型。
+         */
+        public static final String PUBLISH_CONTENT_TYPE = "PUBLISH_CONTENT_TYPE";
+        /**
+         * 发布内容。
+         */
+        public static final String PUBLISH_CONTENT = "PUBLISH_CONTENT";
+        /**
+         * 发布开始时间。
+         */
+        public static final String PUBLISH_START = "PUBLISH_START";
+        /**
+         * 发布结束时间。
+         */
+        public static final String PUBLISH_END = "PUBLISH_END";
+        /**
+         * 发布秒数。
+         */
+        public static final String PUBLISH_SECONDS = "PUBLISH_SECONDS";
+        /**
+         * 发布成功。
+         */
+        public static final String PUBLISH_SUCC = "PUBLISH_SUCC";
+        /**
+         * 报错信息。
+         */
+        public static final String ERR_MSG = "ERR_MSG";
+        /**
          * 发布记录。
          */
         public static final String AD_PUBLISH_RECORD_ID = "AD_PUBLISH_RECORD_ID";
@@ -97,7 +140,7 @@ public class AdPublishRecordDtl {
     /**
      * ID。
      */
-    public String id;
+    private String id;
 
     /**
      * 获取：ID。
@@ -110,14 +153,30 @@ public class AdPublishRecordDtl {
      * 设置：ID。
      */
     public AdPublishRecordDtl setId(String id) {
-        this.id = id;
+        if (this.id == null && id == null) {
+            // 均为null，不做处理。
+        } else if (this.id != null && id != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.id.compareTo(id) != 0) {
+                this.id = id;
+                if (!this.toUpdateCols.contains("ID")) {
+                    this.toUpdateCols.add("ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.id = id;
+            if (!this.toUpdateCols.contains("ID")) {
+                this.toUpdateCols.add("ID");
+            }
+        }
         return this;
     }
 
     /**
      * 版本。
      */
-    public Integer ver;
+    private Integer ver;
 
     /**
      * 获取：版本。
@@ -130,14 +189,30 @@ public class AdPublishRecordDtl {
      * 设置：版本。
      */
     public AdPublishRecordDtl setVer(Integer ver) {
-        this.ver = ver;
+        if (this.ver == null && ver == null) {
+            // 均为null，不做处理。
+        } else if (this.ver != null && ver != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ver.compareTo(ver) != 0) {
+                this.ver = ver;
+                if (!this.toUpdateCols.contains("VER")) {
+                    this.toUpdateCols.add("VER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ver = ver;
+            if (!this.toUpdateCols.contains("VER")) {
+                this.toUpdateCols.add("VER");
+            }
+        }
         return this;
     }
 
     /**
      * 时间戳。
      */
-    public LocalDateTime ts;
+    private LocalDateTime ts;
 
     /**
      * 获取：时间戳。
@@ -150,14 +225,30 @@ public class AdPublishRecordDtl {
      * 设置：时间戳。
      */
     public AdPublishRecordDtl setTs(LocalDateTime ts) {
-        this.ts = ts;
+        if (this.ts == null && ts == null) {
+            // 均为null，不做处理。
+        } else if (this.ts != null && ts != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ts.compareTo(ts) != 0) {
+                this.ts = ts;
+                if (!this.toUpdateCols.contains("TS")) {
+                    this.toUpdateCols.add("TS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ts = ts;
+            if (!this.toUpdateCols.contains("TS")) {
+                this.toUpdateCols.add("TS");
+            }
+        }
         return this;
     }
 
     /**
      * 是否预设。
      */
-    public Boolean isPreset;
+    private Boolean isPreset;
 
     /**
      * 获取：是否预设。
@@ -170,14 +261,30 @@ public class AdPublishRecordDtl {
      * 设置：是否预设。
      */
     public AdPublishRecordDtl setIsPreset(Boolean isPreset) {
-        this.isPreset = isPreset;
+        if (this.isPreset == null && isPreset == null) {
+            // 均为null，不做处理。
+        } else if (this.isPreset != null && isPreset != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPreset.compareTo(isPreset) != 0) {
+                this.isPreset = isPreset;
+                if (!this.toUpdateCols.contains("IS_PRESET")) {
+                    this.toUpdateCols.add("IS_PRESET");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPreset = isPreset;
+            if (!this.toUpdateCols.contains("IS_PRESET")) {
+                this.toUpdateCols.add("IS_PRESET");
+            }
+        }
         return this;
     }
 
     /**
      * 创建日期时间。
      */
-    public LocalDateTime crtDt;
+    private LocalDateTime crtDt;
 
     /**
      * 获取：创建日期时间。
@@ -190,14 +297,30 @@ public class AdPublishRecordDtl {
      * 设置：创建日期时间。
      */
     public AdPublishRecordDtl setCrtDt(LocalDateTime crtDt) {
-        this.crtDt = crtDt;
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 创建用户。
      */
-    public String crtUserId;
+    private String crtUserId;
 
     /**
      * 获取：创建用户。
@@ -210,14 +333,30 @@ public class AdPublishRecordDtl {
      * 设置：创建用户。
      */
     public AdPublishRecordDtl setCrtUserId(String crtUserId) {
-        this.crtUserId = crtUserId;
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改日期时间。
      */
-    public LocalDateTime lastModiDt;
+    private LocalDateTime lastModiDt;
 
     /**
      * 获取：最后修改日期时间。
@@ -230,14 +369,30 @@ public class AdPublishRecordDtl {
      * 设置：最后修改日期时间。
      */
     public AdPublishRecordDtl setLastModiDt(LocalDateTime lastModiDt) {
-        this.lastModiDt = lastModiDt;
+        if (this.lastModiDt == null && lastModiDt == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiDt != null && lastModiDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiDt.compareTo(lastModiDt) != 0) {
+                this.lastModiDt = lastModiDt;
+                if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                    this.toUpdateCols.add("LAST_MODI_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiDt = lastModiDt;
+            if (!this.toUpdateCols.contains("LAST_MODI_DT")) {
+                this.toUpdateCols.add("LAST_MODI_DT");
+            }
+        }
         return this;
     }
 
     /**
      * 最后修改用户。
      */
-    public String lastModiUserId;
+    private String lastModiUserId;
 
     /**
      * 获取：最后修改用户。
@@ -250,14 +405,30 @@ public class AdPublishRecordDtl {
      * 设置：最后修改用户。
      */
     public AdPublishRecordDtl setLastModiUserId(String lastModiUserId) {
-        this.lastModiUserId = lastModiUserId;
+        if (this.lastModiUserId == null && lastModiUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.lastModiUserId != null && lastModiUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lastModiUserId.compareTo(lastModiUserId) != 0) {
+                this.lastModiUserId = lastModiUserId;
+                if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                    this.toUpdateCols.add("LAST_MODI_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lastModiUserId = lastModiUserId;
+            if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
+                this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 记录状态。
      */
-    public String status;
+    private String status;
 
     /**
      * 获取：记录状态。
@@ -270,14 +441,30 @@ public class AdPublishRecordDtl {
      * 设置：记录状态。
      */
     public AdPublishRecordDtl setStatus(String status) {
-        this.status = status;
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
         return this;
     }
 
     /**
      * 锁定流程实例。
      */
-    public String lkWfInstId;
+    private String lkWfInstId;
 
     /**
      * 获取：锁定流程实例。
@@ -290,14 +477,30 @@ public class AdPublishRecordDtl {
      * 设置：锁定流程实例。
      */
     public AdPublishRecordDtl setLkWfInstId(String lkWfInstId) {
-        this.lkWfInstId = lkWfInstId;
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
+            }
+        }
         return this;
     }
 
     /**
      * 代码。
      */
-    public String code;
+    private String code;
 
     /**
      * 获取：代码。
@@ -310,14 +513,30 @@ public class AdPublishRecordDtl {
      * 设置：代码。
      */
     public AdPublishRecordDtl setCode(String code) {
-        this.code = code;
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
         return this;
     }
 
     /**
      * 名称。
      */
-    public String name;
+    private String name;
 
     /**
      * 获取：名称。
@@ -330,14 +549,30 @@ public class AdPublishRecordDtl {
      * 设置：名称。
      */
     public AdPublishRecordDtl setName(String name) {
-        this.name = name;
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
         return this;
     }
 
     /**
      * 备注。
      */
-    public String remark;
+    private String remark;
 
     /**
      * 获取：备注。
@@ -350,14 +585,282 @@ public class AdPublishRecordDtl {
      * 设置：备注。
      */
     public AdPublishRecordDtl setRemark(String remark) {
-        this.remark = remark;
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 发布内容类型。
+     */
+    private String publishContentType;
+
+    /**
+     * 获取：发布内容类型。
+     */
+    public String getPublishContentType() {
+        return this.publishContentType;
+    }
+
+    /**
+     * 设置：发布内容类型。
+     */
+    public AdPublishRecordDtl setPublishContentType(String publishContentType) {
+        if (this.publishContentType == null && publishContentType == null) {
+            // 均为null，不做处理。
+        } else if (this.publishContentType != null && publishContentType != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.publishContentType.compareTo(publishContentType) != 0) {
+                this.publishContentType = publishContentType;
+                if (!this.toUpdateCols.contains("PUBLISH_CONTENT_TYPE")) {
+                    this.toUpdateCols.add("PUBLISH_CONTENT_TYPE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.publishContentType = publishContentType;
+            if (!this.toUpdateCols.contains("PUBLISH_CONTENT_TYPE")) {
+                this.toUpdateCols.add("PUBLISH_CONTENT_TYPE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 发布内容。
+     */
+    private String publishContent;
+
+    /**
+     * 获取：发布内容。
+     */
+    public String getPublishContent() {
+        return this.publishContent;
+    }
+
+    /**
+     * 设置：发布内容。
+     */
+    public AdPublishRecordDtl setPublishContent(String publishContent) {
+        if (this.publishContent == null && publishContent == null) {
+            // 均为null，不做处理。
+        } else if (this.publishContent != null && publishContent != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.publishContent.compareTo(publishContent) != 0) {
+                this.publishContent = publishContent;
+                if (!this.toUpdateCols.contains("PUBLISH_CONTENT")) {
+                    this.toUpdateCols.add("PUBLISH_CONTENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.publishContent = publishContent;
+            if (!this.toUpdateCols.contains("PUBLISH_CONTENT")) {
+                this.toUpdateCols.add("PUBLISH_CONTENT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 发布开始时间。
+     */
+    private LocalDateTime publishStart;
+
+    /**
+     * 获取：发布开始时间。
+     */
+    public LocalDateTime getPublishStart() {
+        return this.publishStart;
+    }
+
+    /**
+     * 设置：发布开始时间。
+     */
+    public AdPublishRecordDtl setPublishStart(LocalDateTime publishStart) {
+        if (this.publishStart == null && publishStart == null) {
+            // 均为null，不做处理。
+        } else if (this.publishStart != null && publishStart != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.publishStart.compareTo(publishStart) != 0) {
+                this.publishStart = publishStart;
+                if (!this.toUpdateCols.contains("PUBLISH_START")) {
+                    this.toUpdateCols.add("PUBLISH_START");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.publishStart = publishStart;
+            if (!this.toUpdateCols.contains("PUBLISH_START")) {
+                this.toUpdateCols.add("PUBLISH_START");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 发布结束时间。
+     */
+    private LocalDateTime publishEnd;
+
+    /**
+     * 获取：发布结束时间。
+     */
+    public LocalDateTime getPublishEnd() {
+        return this.publishEnd;
+    }
+
+    /**
+     * 设置：发布结束时间。
+     */
+    public AdPublishRecordDtl setPublishEnd(LocalDateTime publishEnd) {
+        if (this.publishEnd == null && publishEnd == null) {
+            // 均为null，不做处理。
+        } else if (this.publishEnd != null && publishEnd != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.publishEnd.compareTo(publishEnd) != 0) {
+                this.publishEnd = publishEnd;
+                if (!this.toUpdateCols.contains("PUBLISH_END")) {
+                    this.toUpdateCols.add("PUBLISH_END");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.publishEnd = publishEnd;
+            if (!this.toUpdateCols.contains("PUBLISH_END")) {
+                this.toUpdateCols.add("PUBLISH_END");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 发布秒数。
+     */
+    private BigDecimal publishSeconds;
+
+    /**
+     * 获取：发布秒数。
+     */
+    public BigDecimal getPublishSeconds() {
+        return this.publishSeconds;
+    }
+
+    /**
+     * 设置：发布秒数。
+     */
+    public AdPublishRecordDtl setPublishSeconds(BigDecimal publishSeconds) {
+        if (this.publishSeconds == null && publishSeconds == null) {
+            // 均为null，不做处理。
+        } else if (this.publishSeconds != null && publishSeconds != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.publishSeconds.compareTo(publishSeconds) != 0) {
+                this.publishSeconds = publishSeconds;
+                if (!this.toUpdateCols.contains("PUBLISH_SECONDS")) {
+                    this.toUpdateCols.add("PUBLISH_SECONDS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.publishSeconds = publishSeconds;
+            if (!this.toUpdateCols.contains("PUBLISH_SECONDS")) {
+                this.toUpdateCols.add("PUBLISH_SECONDS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 发布成功。
+     */
+    private Boolean publishSucc;
+
+    /**
+     * 获取：发布成功。
+     */
+    public Boolean getPublishSucc() {
+        return this.publishSucc;
+    }
+
+    /**
+     * 设置：发布成功。
+     */
+    public AdPublishRecordDtl setPublishSucc(Boolean publishSucc) {
+        if (this.publishSucc == null && publishSucc == null) {
+            // 均为null，不做处理。
+        } else if (this.publishSucc != null && publishSucc != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.publishSucc.compareTo(publishSucc) != 0) {
+                this.publishSucc = publishSucc;
+                if (!this.toUpdateCols.contains("PUBLISH_SUCC")) {
+                    this.toUpdateCols.add("PUBLISH_SUCC");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.publishSucc = publishSucc;
+            if (!this.toUpdateCols.contains("PUBLISH_SUCC")) {
+                this.toUpdateCols.add("PUBLISH_SUCC");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 报错信息。
+     */
+    private String errMsg;
+
+    /**
+     * 获取：报错信息。
+     */
+    public String getErrMsg() {
+        return this.errMsg;
+    }
+
+    /**
+     * 设置：报错信息。
+     */
+    public AdPublishRecordDtl setErrMsg(String errMsg) {
+        if (this.errMsg == null && errMsg == null) {
+            // 均为null，不做处理。
+        } else if (this.errMsg != null && errMsg != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.errMsg.compareTo(errMsg) != 0) {
+                this.errMsg = errMsg;
+                if (!this.toUpdateCols.contains("ERR_MSG")) {
+                    this.toUpdateCols.add("ERR_MSG");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.errMsg = errMsg;
+            if (!this.toUpdateCols.contains("ERR_MSG")) {
+                this.toUpdateCols.add("ERR_MSG");
+            }
+        }
         return this;
     }
 
     /**
      * 发布记录。
      */
-    public String adPublishRecordId;
+    private String adPublishRecordId;
 
     /**
      * 获取：发布记录。
@@ -370,7 +873,23 @@ public class AdPublishRecordDtl {
      * 设置：发布记录。
      */
     public AdPublishRecordDtl setAdPublishRecordId(String adPublishRecordId) {
-        this.adPublishRecordId = adPublishRecordId;
+        if (this.adPublishRecordId == null && adPublishRecordId == null) {
+            // 均为null，不做处理。
+        } else if (this.adPublishRecordId != null && adPublishRecordId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adPublishRecordId.compareTo(adPublishRecordId) != 0) {
+                this.adPublishRecordId = adPublishRecordId;
+                if (!this.toUpdateCols.contains("AD_PUBLISH_RECORD_ID")) {
+                    this.toUpdateCols.add("AD_PUBLISH_RECORD_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adPublishRecordId = adPublishRecordId;
+            if (!this.toUpdateCols.contains("AD_PUBLISH_RECORD_ID")) {
+                this.toUpdateCols.add("AD_PUBLISH_RECORD_ID");
+            }
+        }
         return this;
     }
 
@@ -388,6 +907,7 @@ public class AdPublishRecordDtl {
      */
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
+        this.clearToUpdateCols();
     }
 
     /**
@@ -398,7 +918,17 @@ public class AdPublishRecordDtl {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        modelHelper.updateById(includeCols, excludeCols, refreshThis, this.id, this);
+        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+            // 既未指明includeCols，也无toUpdateCols，则不更新。
+
+            if (refreshThis) {
+                modelHelper.refreshThis(this.id, this, "无需更新，直接刷新");
+            }
+        } else {
+            // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
+            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            this.clearToUpdateCols();
+        }
     }
 
     /**
@@ -419,7 +949,8 @@ public class AdPublishRecordDtl {
      * @return
      */
     public static AdPublishRecordDtl newData() {
-        return modelHelper.newData();
+        AdPublishRecordDtl obj = modelHelper.newData();
+        return obj;
     }
 
     /**
@@ -428,7 +959,8 @@ public class AdPublishRecordDtl {
      * @return
      */
     public static AdPublishRecordDtl insertData() {
-        return modelHelper.insertData();
+        AdPublishRecordDtl obj = modelHelper.insertData();
+        return obj;
     }
 
     /**
@@ -440,7 +972,8 @@ public class AdPublishRecordDtl {
      * @return 获取到的对象，若无则为null。
      */
     public static AdPublishRecordDtl selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectById(id, includeCols, excludeCols);
+        AdPublishRecordDtl obj = modelHelper.selectById(id, includeCols, excludeCols);
+        return obj;
     }
 
     /**
@@ -452,7 +985,8 @@ public class AdPublishRecordDtl {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdPublishRecordDtl> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByIds(ids, includeCols, excludeCols);
+        List<AdPublishRecordDtl> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+        return objList;
     }
 
     /**
@@ -464,7 +998,8 @@ public class AdPublishRecordDtl {
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
     public static List<AdPublishRecordDtl> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        return modelHelper.selectByWhere(where, includeCols, excludeCols);
+        List<AdPublishRecordDtl> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        return objList;
     }
 
     /**
