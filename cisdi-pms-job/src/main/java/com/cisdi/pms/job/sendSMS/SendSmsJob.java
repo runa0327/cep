@@ -1,11 +1,11 @@
 package com.cisdi.pms.job.sendSMS;
 
-import cn.hutool.core.util.IdUtil;
 import com.cisdi.pms.job.domain.RemindLog;
 import com.cisdi.pms.job.utils.SendSmsParamsUtils;
 import com.cisdi.pms.job.utils.SendSmsUtils;
 import com.qygly.ext.rest.helper.feign.client.DataFeignClient;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +13,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -38,14 +40,24 @@ public class SendSmsJob {
     @Autowired
     DataFeignClient dataFeignClient;
 
-    @Value("${cisdi-pms-job.sms-switch}")
-    boolean smsSwitch;
+    /**
+     * 提醒真正用户。
+     */
+    @Value("${cisdi-pms-job.remind-real-user}")
+    private Boolean remindRealUser;
 
+    @Value("${cisdi-pms-job.sms-switch}")
+    private boolean smsSwitch;
+
+    /**
+     * 发送紧急消息
+     * 随时发送
+     */
     //@Scheduled(fixedDelayString = "5000")
     @Scheduled(fixedDelayString = "60000")
-    public void sendSMS() {
+    public void sendSmsForUrgent() {
         //开关短信功能
-        if (!smsSwitch){
+        if (!smsSwitch) {
             return;
         }
 
@@ -53,21 +65,134 @@ public class SendSmsJob {
         String lockSql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code='WF_TASK_REMIND_LOCK' and (t.LOCK_EXT_DTTM_ATT01_VAL is null or t.LOCK_EXT_DTTM_ATT01_VAL <= SUBDATE(NOW(),INTERVAL -10 minute))";
         int lock = jdbcTemplate.update(lockSql);
 
-        // 查询  处于当前阶段的任务  且  为被关闭的任务
-        List<RemindLog> collect = this.querySmsInfo();
+        //1.每天早上9点统计每个人没有处理的待办事项TODO  WF_URGENCY_ID 紧急程度不用关心
+        //2.该定时任务是9点发送次数，
+        String selectSql = "SELECT a.userPhone , a.taskName , a.`WF_TASK_TYPE_ID` taskType FROM ( SELECT pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT , t.`WF_TASK_TYPE_ID` FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0  AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND pi.IS_URGENT = '1') a";
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(selectSql);
 
-        // //13976720905   吴坤苗  此用户许需要发送短信
-        List<RemindLog> result = collect.stream()
-                .filter(remindLog -> !remindLog.getUserPhone().equals("13976720905"))
-                .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(maps)) {
+            return;
+        }
+
+        //13976720905   吴坤苗  此用户许需要发送短信
+        List<RemindLog> result = maps.stream()
+                .filter(map -> !map.get("userPhone").equals("13976720905"))
+                .map(stringObjectMap -> {
+                    RemindLog remindLog = new RemindLog();
+                    remindLog.setUserPhone(stringObjectMap.get("userPhone").toString());
+                    remindLog.setTaskName(stringObjectMap.get("taskName").toString());
+                    remindLog.setTaskType(stringObjectMap.get("taskType").toString());
+                    return remindLog;
+                }).collect(Collectors.toList());
 
         try {
             if (lock > 0) {
                 result.forEach(remindLog -> {
-                    // 发送短信
-                    this.sendSms(remindLog);
 
-                    logger.info("日志发送，接收人：{}",remindLog.getUserId());
+                    //2、定时每分钟一次【紧急】
+                    //[工程项目信息协同系统][流程待办]您好“{1}”已到您处，请尽快处理。--1644089
+                    //[工程项目信息协同系统][流程通知]您好“{1}”已到您处，请登陆系统查看。--1644090
+                    String templateId = remindLog.getTaskType().equals("TODO") ? "1644089" : "1644090";
+
+                    //参数封装
+                    ArrayList<String> param = new ArrayList<>();
+                    param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "15023436971");
+                    param.add(remindLog.getTaskName());
+
+                    // 发送短信
+                    this.sendSms(templateId, param);
+
+                    logger.info("日志发送，接收人电话号码：{}", remindLog.getUserPhone());
+                    // 记录日志
+                    this.insertRemindLog(remindLog);
+
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            //加锁成功后才会释放锁
+            if (lock > 0) {
+                //循环10次，放置修改失败
+                for (int i = 0; i < 10; i++) {
+                    String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code=?";
+                    int up = jdbcTemplate.update(sql, "WF_TASK_REMIND_LOCK");
+                    //如果修改成功，直接跳出循环
+                    if (up > 0) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 普通短信
+     * 早上九点发送
+     */
+    //@Scheduled(fixedDelayString = "5000")
+    @Scheduled(cron = "${cisdi-pms-job.sms-timing}")
+    public void sendSmsForNineAlone() {
+        //开关短信功能
+        if (!smsSwitch) {
+            return;
+        }
+
+        //获取当前时间
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String nowTime = format.format(date);
+        //查询当前时间的开关数据
+        String switchSql = "select SMS_STATUS from sms_time where date = ?";
+        Map<String, Object> mapSwitch = jdbcTemplate.queryForMap(switchSql, nowTime);
+        //根据表中数据判断是否   1:发送消息    0：不发送消息
+        if (mapSwitch.get("SMS_STATUS").equals("0")) {
+            return;
+        }
+
+        //锁表  防止多台服务器同时修改
+        String lockSql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code='WF_TASK_REMIND_LOCK' and (t.LOCK_EXT_DTTM_ATT01_VAL is null or t.LOCK_EXT_DTTM_ATT01_VAL <= SUBDATE(NOW(),INTERVAL -10 minute))";
+        int lock = jdbcTemplate.update(lockSql);
+
+        //1.每天早上9点统计每个人没有处理的待办事项TODO  WF_URGENCY_ID 紧急程度不用关心
+        //2.该定时任务是9点发送次数，
+        String selectSql = "SELECT a.userPhone , a.taskName FROM ( SELECT pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0  AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND t.`WF_TASK_TYPE_ID` = 'TODO' AND pi.IS_URGENT = '0') a";
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(selectSql);
+
+        if (CollectionUtils.isEmpty(maps)) {
+            return;
+        }
+
+        //13976720905   吴坤苗  此用户许需要发送短信
+        List<RemindLog> result = maps.stream()
+                .filter(map -> !map.get("userPhone").equals("13976720905"))
+                .map(stringObjectMap -> {
+                    RemindLog remindLog = new RemindLog();
+                    remindLog.setUserPhone(stringObjectMap.get("userPhone").toString());
+                    remindLog.setTaskName(stringObjectMap.get("taskName").toString());
+                    remindLog.setRemark("TODO");
+                    return remindLog;
+                }).collect(Collectors.toList());
+
+        try {
+            if (lock > 0) {
+                result.forEach(remindLog -> {
+
+                    //【普通】
+                    //【待办】
+                    //[工程项目信息协同系统][流程待办]您好:有{1}条流程待办已到您处，请尽快处理。--1644087
+                    String templateId = "1644087";
+
+                    //参数封装
+                    ArrayList<String> param = new ArrayList<>();
+                    param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "15023436971");
+                    param.add(remindLog.getTaskName());
+
+                    // 发送短信
+                    this.sendSms(templateId, param);
+
+                    logger.info("日志发送，接收人电话号码：{}", remindLog.getUserPhone());
                     // 记录日志
                     this.insertRemindLog(remindLog);
 
@@ -92,21 +217,98 @@ public class SendSmsJob {
     }
 
     /**
-     * 提醒真正用户。
+     * 每天9点发送统一短信
+     * 明天早上9点发送
      */
-    @Value("${cisdi-pms-job.remind-real-user}")
-    private Boolean remindRealUser;
+    //@Scheduled(fixedDelayString = "5000")
+    @Scheduled(cron = "${cisdi-pms-job.sms-timing}")
+    public void sendSmsForNineAll() {
+        //开关短信功能
+        if (!smsSwitch) {
+            return;
+        }
 
-    private void sendSms(RemindLog remindLog) {
-        //[工程项目信息协同系统]您好：流程待办“{1}”已到您处，请尽快处理。---1581177
-        //[工程项目信息协同系统]您好：流程通知“{1}”已到您处，请知晓即可。---1581180
-        String templateId = "TODO".equals(remindLog.getTaskType()) ? "1581177" : "1581180";
+        //获取当前时间
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String nowTime = format.format(date);
+        //查询当前时间的开关数据
+        String switchSql = "select SMS_STATUS from sms_time where date = ?";
+        Map<String, Object> mapSwitch = jdbcTemplate.queryForMap(switchSql, nowTime);
+        //根据表中数据判断是否   1:发送消息    0：不发送消息
+        if (mapSwitch.get("SMS_STATUS").equals("0")) {
+            return;
+        }
 
-        ArrayList<String> param = new ArrayList<>();
-        param.add(Boolean.TRUE.equals(remindRealUser)?remindLog.getUserPhone():"15023436971");
-        param.add(remindLog.getTaskName());
+        //锁表  防止多台服务器同时修改
+        String lockSql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code='WF_TASK_REMIND_LOCK' and (t.LOCK_EXT_DTTM_ATT01_VAL is null or t.LOCK_EXT_DTTM_ATT01_VAL <= SUBDATE(NOW(),INTERVAL -10 minute))";
+        int lock = jdbcTemplate.update(lockSql);
+
+        //1.每天早上9点统计每个人没有处理的待办事项TODO  WF_URGENCY_ID 紧急程度不用关心
+        //2.该定时任务是9点发送次数，
+        String selectSql = "SELECT a.userPhone , COUNT(a.userPhone) num FROM ( SELECT pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0  AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND t.`WF_TASK_TYPE_ID` = 'NOTI' AND pi.IS_URGENT = '0') a GROUP BY userPhone";
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(selectSql);
+
+        if (CollectionUtils.isEmpty(maps)) {
+            return;
+        }
+
+        //13976720905   吴坤苗  此用户许需要发送短信
+        List<RemindLog> result = maps.stream()
+                .filter(map -> !map.get("userPhone").equals("13976720905"))
+                .map(stringObjectMap -> {
+                    RemindLog remindLog = new RemindLog();
+                    remindLog.setUserPhone(stringObjectMap.get("userPhone").toString());
+                    remindLog.setCount(stringObjectMap.get("num").toString());
+                    remindLog.setRemark("NOTI");
+                    return remindLog;
+                }).collect(Collectors.toList());
+
+        try {
+            if (lock > 0) {
+                result.forEach(remindLog -> {
+
+                    //    【普通】
+                    //    【通知】
+                    //    [工程项目信息协同系统][流程通知]您有{1}条流程通知，请登录系统查看。--1644086
+                    String templateId = "1644086";
+
+                    //参数封装
+                    ArrayList<String> param = new ArrayList<>();
+                    param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "15023436971");
+                    param.add(remindLog.getCount());
+
+                    // 发送短信
+                    this.sendSms(templateId, param);
+
+                    logger.info("日志发送，接收人电话号码：{}", remindLog.getUserPhone());
+                    // 记录日志
+                    this.insertRemindLog(remindLog);
+
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            //加锁成功后才会释放锁
+            if (lock > 0) {
+                //循环10次，放置修改失败
+                for (int i = 0; i < 10; i++) {
+                    String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code=?";
+                    int up = jdbcTemplate.update(sql, "WF_TASK_REMIND_LOCK");
+                    //如果修改成功，直接跳出循环
+                    if (up > 0) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void sendSms(String templateId, ArrayList<String> param) {
         //封装参数
-        byte[] parmas = new SendSmsParamsUtils().getOneParam(param , templateId);
+        byte[] parmas = new SendSmsParamsUtils().getOneParam(param, templateId);
 
         //发送短信
         SendSmsUtils apiResponse = new SendSmsUtils();
@@ -119,37 +321,49 @@ public class SendSmsJob {
      * @param remindLog
      */
     private void insertRemindLog(RemindLog remindLog) {
+        //定时每分钟一次【紧急】
+        //[工程项目信息协同系统][流程待办]您好“{1}”已到您处，请尽快处理。--1644089
+        //[工程项目信息协同系统][流程通知]您好“{1}”已到您处，请登陆系统查看。--1644090
+
+        //【普通】
+        //【待办】
+
+        //[工程项目信息协同系统][流程待办]您好:有{1}条流程待办已到您处，请尽快处理。--1644087
+        //【普通】
+        //【通知】
+        //[工程项目信息协同系统][流程通知]您有{1}条流程通知，请登录系统查看。--1644086
+
+        String remindText = null;
+        String partO = null;
+        String partT = null;
+        String partF = null;
+        String partG = null;
+
+        if (!StringUtils.isEmpty(remindLog.getTaskType())) {
+            //紧急短信
+            partO = "TODO".equals(remindLog.getTaskType()) ? "[流程待办]" : "[流程通知]";
+            partT = "TODO".equals(remindLog.getTaskType()) ? "请尽快处理" : "请登录系统查看";
+            remindText = "[工程项目信息协同系统]" + partO + "你好“" + remindLog.getTaskName() + "”已到您处，" + partT;
+        } else {
+            //普通短信
+            partO = "TODO".equals(remindLog.getRemark()) ? "[流程待办]" : "[流程通知]";
+            partT = "TODO".equals(remindLog.getRemark()) ? "请尽快处理" : "请登录系统查看";
+            partF = "TODO".equals(remindLog.getRemark()) ? "您好：有" : "您有";
+            partG = "TODO".equals(remindLog.getRemark()) ? "条流程待办已到您处" : "条流程待办通知";
+            remindText = "[工程项目信息协同系统]" + partO + partF + remindLog.getCount() + partG + "，" + partT;
+
+        }
+
         // 提醒文本
-        String partO = "TODO".equals(remindLog.getTaskType()) ? "流程待办" : "流程通知";
-        String partT = "TODO".equals(remindLog.getTaskType()) ? "请尽快处理" : "请知晓即可";
-        String remindText = "[工程项目信息协同系统]您好：" + partO + "“" + remindLog.getTaskName() + "”已到您处，" + partT;
+
 
         // 查询实体id
         String selectEntId = "select ID from ad_ent where CODE = ?";
         String entId = jdbcTemplate.queryForObject(selectEntId, String.class, "WF_TASK");
 
         // 每发一次信息就保存一次记录
-        String updateSql = "INSERT INTO ad_remind_log ( ID, VER, TS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, STATUS, CODE, AD_ENT_ID, ENT_CODE, ENTITY_RECORD_ID, REMIND_USER_ID, REMIND_METHOD, REMIND_TARGET, REMIND_TIME, REMIND_TEXT) VALUES (?,'1', now() , now() ,?,now(),?, 'AP' , 'WF_TASK_REMIND_LOCK' ,?, 'WF_TASK',?,?,'SMS',?,now(),?)";
-        jdbcTemplate.update(updateSql, IdUtil.getSnowflakeNextId(), remindLog.getUserId(), remindLog.getUserId(), entId, remindLog.getTaskId(), remindLog.getUserId(), remindLog.getUserPhone(), remindText);
-    }
-
-    private List<RemindLog> querySmsInfo() {
-        String querySql = "select t.id taskId, pi.name taskName,n.name,t.WF_TASK_TYPE_ID taskType,u.id userId,u.name userName,u.code userPhone from wf_task t join wf_node_instance ni on t.WF_NODE_INSTANCE_ID=ni.id join wf_node n on ni.WF_NODE_ID=n.id join wf_process_instance pi on ni.WF_PROCESS_INSTANCE_ID=pi.id join ad_user u on t.AD_USER_ID=u.id where t.IS_CLOSED=0 and not exists(select 1 from ad_remind_log l where l.ent_code='WF_TASK' and l.ENTITY_RECORD_ID=t.id)";
-        List<Map<String, Object>> maps = jdbcTemplate.queryForList(querySql);
-
-        List<RemindLog> result = maps.stream()
-                .map(stringObjectMap -> {
-                    RemindLog remindLog = new RemindLog();
-                    remindLog.setTaskName(stringObjectMap.get("taskName").toString())
-                            .setTaskId(stringObjectMap.get("taskId").toString())
-                            .setTaskType(stringObjectMap.get("taskType").toString())
-                            .setUserId(stringObjectMap.get("userId").toString())
-                            .setUserName(stringObjectMap.get("userName").toString())
-                            .setUserPhone(stringObjectMap.get("userPhone").toString());
-                    return remindLog;
-                }).collect(Collectors.toList());
-
-        return result;
+        String updateSql = "INSERT INTO ad_remind_log ( ID, VER, TS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, STATUS, CODE, AD_ENT_ID, ENT_CODE, ENTITY_RECORD_ID, REMIND_USER_ID, REMIND_METHOD, REMIND_TARGET, REMIND_TIME, REMIND_TEXT) VALUES (UUID_SHORT(),'1', now() , now() ,?,now(),?, 'AP' , 'WF_TASK_REMIND_LOCK' ,?, 'WF_TASK',?,?,'SMS',?,now(),?)";
+        jdbcTemplate.update(updateSql, remindLog.getUserId(), remindLog.getUserId(), entId, remindLog.getTaskId(), remindLog.getUserId(), remindLog.getUserPhone(), remindText);
     }
 
 }

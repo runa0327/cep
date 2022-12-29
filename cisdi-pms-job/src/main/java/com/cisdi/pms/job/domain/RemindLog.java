@@ -33,4 +33,10 @@ public class RemindLog {
     //最后修改时间
     private String lastUpdateTime;
 
+    //任务数量
+    private String count;
+
+    //备注  日志
+    private String remark;
+
 }

@@ -1,5 +1,6 @@
 package com.cisdi.pms.job.dealtWork;
 
+import cn.hutool.core.util.IdUtil;
 import com.cisdi.pms.job.sendSMS.SendSmsJob;
 import com.cisdi.pms.job.utils.RestTemplateUtils;
 import com.cisdi.pms.job.utils.Util;
@@ -14,6 +15,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,17 +49,18 @@ public class dealtWorkJob {
     @Value("${dealt_work_job.phone_switch}")
     private boolean phoneSwitch;
 
+    @Value("${dealt_work_job.dealt_switch_test}")
+    private boolean dealtSwitchTest;
+
     @Value("${dealt_work_job.dealt_switch}")
     private boolean dealtSwitch;
 
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    /**
-     * 添加待办事项
-     */
+
     //@Scheduled(fixedDelayString = "5000")
-    //@Scheduled(fixedDelayString = "30000")
+    @Scheduled(fixedDelayString = "300000")
     public void handleDealt() {
 
         if (!dealtSwitch) return;
@@ -68,14 +72,24 @@ public class dealtWorkJob {
         try {
             if (lock > 0) {
                 //对比ad_user / user_dealt_infos 两张表   如果有不同的数据则新增数据，如果没有，则直接跳过
-                //savaUserId();
+                savaUserId();
 
+                //旧待办变为已读
+                String queryDealt = "select APP_ID appId,USER_ID userId,MSG_ID msgId from dealt_task_info where REMARK = '0'";
+                Map<String, Object> queryDealtMap = jdbcTemplate.queryForMap(queryDealt);
+                dealtRead(queryDealtMap.get("appId").toString(),queryDealtMap.get("userId").toString(),queryDealtMap.get("msgId").toString());
+
+                //获取dealt_task_info 中remark为0的数据  变成为1 新增数据
+                String updateDealt = "update dealt_task_info set REMARK = '1' where REMARK = '0'";
+                jdbcTemplate.update(updateDealt);
+
+                String testParam = dealtSwitchTest == Boolean.TRUE ? "" : "and w.AD_USER_ID = '0100031468511690944'";
                 //根据wf_task表查询  所有的任务状态  TODO需要添加待办事项
-                String sql = "SELECT w.ID,w.AD_USER_ID,w.WF_PROCESS_INSTANCE_ID from wf_task w WHERE  w.IS_CLOSED = ? and w.WF_TASK_TYPE_ID = ? and w.AD_USER_ID = '0100031468511690944'AND NOT EXISTS (SELECT MSG_ID FROM dealt_task_info d WHERE w.ID = d.MSG_ID)";
+                String sql = "SELECT w.AD_USER_ID,COUNT(w.WF_PROCESS_INSTANCE_ID) num from wf_task w WHERE  w.IS_CLOSED = ? and w.WF_TASK_TYPE_ID = ? " + testParam + " GROUP BY w.AD_USER_ID";
                 List<Map<String, Object>> info = jdbcTemplate.queryForList(sql, "0", "TODO");
 
                 //添加待办事项
-                info.stream().forEach(map -> addDealt(map));
+                info.stream().forEach(map -> newAddDealt(map));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,44 +109,6 @@ public class dealtWorkJob {
         }
     }
 
-
-    /**
-     * 待办事项变更已读
-     */
-    @Scheduled(fixedDelayString = "5000")
-    //@Scheduled(fixedDelayString = "30000")
-    public void dealtTask() {
-
-        if (!dealtSwitch) return;
-
-        //锁表  防止多台服务器同时修改
-        String lockSql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code='DEALT_INFO_LOCK' and (t.LOCK_EXT_DTTM_ATT01_VAL is null or t.LOCK_EXT_DTTM_ATT01_VAL <= SUBDATE(NOW(),INTERVAL -10 minute))";
-        int lock = jdbcTemplate.update(lockSql);
-
-        try {
-            if (lock > 0) {
-
-                //待办事项变更为已读
-                updateRead();
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            //加锁成功后才会释放锁
-            if (lock > 0) {
-                //循环10次，放置修改失败
-                for (int i = 0; i < 10; i++) {
-                    String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code=?";
-                    int up = jdbcTemplate.update(sql, "DEALT_INFO_LOCK");
-                    //如果修改成功，直接跳出循环
-                    if (up > 0) {
-                        break;
-                    }
-                }
-            }
-        }
-    }
 
     /**
      * 将user_id定期存入本地
@@ -146,50 +122,6 @@ public class dealtWorkJob {
         }
     }
 
-    /**
-     * 待办事项变更为已读
-     */
-    private void updateRead() {
-        //根据wf_task表查询  所有的任务状态  TODO需要添加待办事项
-        List<Map<String, Object>> list = queryTaskStatus("1", "NOTI");
-        String parames = "";
-        List<String> msgIds = list.stream()
-                .map(map -> map.get("ID").toString())
-                .distinct().collect(Collectors.toList());
-        for (String msgId : msgIds) {
-            parames += ("," + msgId);
-        }
-        parames = parames.substring(1);
-
-        //获取本地存储的待办事项信息
-        String dealtInfoSql = "select APP_ID , USER_ID , MSG_ID from dealt_task_info where MSG_ID in (" + parames + ")";
-        List<Map<String, Object>> listInfo = jdbcTemplate.queryForList(dealtInfoSql);
-
-        if (CollectionUtils.isEmpty(listInfo)) {
-            return;
-        }
-
-        //变更已读
-        listInfo.stream().forEach(lis -> {
-            dealtRead(lis.get("APP_ID").toString(), lis.get("USER_ID").toString(), lis.get("MSG_ID").toString());
-
-            //2.操作本地表，删除本地表数据   dealt_task_info
-            String updatetaskSql = "delete from dealt_task_info where MSG_ID=?";
-            jdbcTemplate.update(updatetaskSql, lis.get("MSG_ID").toString());
-
-        });
-    }
-
-    /**
-     * @param isClose      1 已办  0 待办
-     * @param wfTaskTypeId TODO  NOTI
-     * @return
-     */
-    private List<Map<String, Object>> queryTaskStatus(String isClose, String wfTaskTypeId) {
-        String taskStatusSql = "select ID,AD_USER_ID,WF_PROCESS_INSTANCE_ID from wf_task where IS_CLOSED = ? and WF_TASK_TYPE_ID = ? and AD_USER_ID = '0100031468511690944'";
-        List<Map<String, Object>> list = jdbcTemplate.queryForList(taskStatusSql, isClose, wfTaskTypeId);
-        return list;
-    }
 
     /**
      * 保存用户id
@@ -214,17 +146,6 @@ public class dealtWorkJob {
         //将所有的用户id保存包本地表中
         String saveSql = "UPDATE dealt_user_info set USER_ID=?,PHONE=?,AD_USER_ID=? where ID=?";
         jdbcTemplate.update(saveSql, userId, phone, adUserId, id);
-    }
-
-    /**
-     * 获取电话号码
-     *
-     * @return
-     */
-    private List<String> queryAllUser() {
-        String selectUserPhone = "select MOBILE from ad_user";
-        List<String> UserPhones = jdbcTemplate.queryForObject(selectUserPhone, List.class);
-        return UserPhones;
     }
 
     /**
@@ -259,7 +180,7 @@ public class dealtWorkJob {
      * @param map msgId(ID) | WF_PROCESS_INSTANCE_ID | AD_USER_ID
      * @return
      */
-    private void addDealt(Map<String, Object> map) {
+    private void newAddDealt(Map<String, Object> map) {
         //获取平台方的用户id
         String userIdSql = "select USER_ID from dealt_user_info where AD_USER_ID = ?";
         List<String> list = jdbcTemplate.queryForList(userIdSql, String.class, map.get("AD_USER_ID"));
@@ -267,31 +188,29 @@ public class dealtWorkJob {
             throw new RuntimeException("该用户不存在");
         }
 
-        //title 在流程实例标题,wf_process_instance表的name列 查询PROCESS_INSTANCE_NAME
-        String sql = "select NAME from wf_process_instance where ID = ?";
-        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, map.get("WF_PROCESS_INSTANCE_ID"));
+        //获取当前时间
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm-ss");
+        String time = format.format(date);
 
-        //内容
-        String content = "[工程项目信息协同系统]您好：流程待办" + "“" + maps.get(0).get("NAME") + "”已到您处，请尽快处理";
+        //内容        您好，截至“2022年12月1日-08:06:20”，4个流程待办已到您处，请尽快处理
+        String content = "[工程项目信息协同系统]您好：截至“"+ time + "”，" + map.get("num") + "个流程待办已到您处，请尽快处理";
+        //标题
+        String titel = "【工程项目信息协同系统】流程待办提醒";
 
         String dealtTaskInfoIdS = Util.insertData(jdbcTemplate, "dealt_task_info");
         //此处还需要本地加一张待办表，将代办信息保存,后续修改为已读时需要
-        String insetSql = "update dealt_task_info set MSG_ID=?, DEALT_TITLE=?,APP_NAME=?,CONTENT=?,CALL_BACK_URL=? where ID = ?";
-        int update = jdbcTemplate.update(insetSql, map.get("ID"), maps.get(0).get("NAME"), appName, content, callbackUrl
+        String insetSql = "update dealt_task_info set REMARK=?, APP_NAME=?,CONTENT=?,CALL_BACK_URL=? where ID = ?";
+        jdbcTemplate.update(insetSql, "0", appName, content, callbackUrl
                 , dealtTaskInfoIdS);
-
-        //当修改本地表失败，则证明当前用户并未存储本地表
-        if (update <= 0) {
-            throw new RuntimeException("该用户不存在");
-        }
 
         Map<String, Object> requestParams = new HashMap<>();
         //用户id
         requestParams.put("userId", list.get(0));
         //消息id
-        requestParams.put("msgId", map.get("ID"));
+        requestParams.put("msgId", IdUtil.getSnowflakeNextId());
         //标题
-        requestParams.put("title", maps.get(0).get("NAME"));
+        requestParams.put("title", titel);
         //平台名称
         requestParams.put("appName", appName);
         //内容
@@ -310,12 +229,11 @@ public class dealtWorkJob {
         Map<String, Object> data = (Map<String, Object>) result.getBody().get("data");
 
         //保存APP_ID
-        String idSql = "update dealt_task_info set APP_ID=? , USER_ID=? where MSG_ID = ?";
-        jdbcTemplate.update(idSql, data.get("id"), list.get(0)
-                , map.get("ID"));
+        String idSql = "update dealt_task_info set APP_ID=? ,MSG_ID = ?, USER_ID=? where ID = ?";
+        jdbcTemplate.update(idSql, data.get("id"),data.get("msgId") , list.get(0)
+                , dealtTaskInfoIdS);
 
     }
-
 
     /**
      * 查询用户id
@@ -334,11 +252,15 @@ public class dealtWorkJob {
         return data.get("id").toString();
     }
 
+    /**
+     * hearder添加信息
+     *
+     * @return
+     */
     private Map<String, String> getHeaders() {
         //设置请求头
         Map<String, String> headers = new HashMap<>();
         headers.put("auth-key", responseParame);
-        //headers.put("ContentType","application/json");
         return headers;
     }
 

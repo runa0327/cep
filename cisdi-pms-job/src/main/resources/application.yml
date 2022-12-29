@@ -81,6 +81,12 @@ cisdi-pms-job:
   remind-real-user: false
   # true：开启   false：关闭
   sms-switch: false
+  # 统一发送每个用户流程通知的数量定时任务corn
+  sms-timing: 0 0 9 * * ?
+  # 短信配置定时任务corn表达式
+  sms-time-corn: 0 0 0 1 1 *
+  # 短信配置定时任务开关  true：开启   false：关闭
+  sms-time-switch: false
 
 
 flylog:
@@ -114,3 +120,5 @@ dealt_work_job:
   phone_switch: false
 #  待办事项开关   true：开  false：关
   dealt_switch: false
+#  待办事项测试数据开关(同时控制待办事项添加  待办事项消除)   true：开  false：关
+  dealt_switch_test: false

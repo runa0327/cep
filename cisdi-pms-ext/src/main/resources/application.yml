@@ -47,7 +47,7 @@ server:
 qygly:
   ext-jar-debug:
     # 每个人要使用不同的debugger-name：
-    debugger-name: demo-ext-qf
+    debugger-name: demo-ext-hgh
 
 # openOffice配置
 jodconverter:
