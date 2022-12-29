@@ -535,4 +535,44 @@ public class ProcessRoleExt {
         purchaseUserList.add(purchaseUser);
         ExtJarHelper.returnValue.set(purchaseUserList);
     }
+
+    /**
+     * 获取成本合约部负责人
+     */
+    public void getCostLeader(){
+        String purchaseUser = getLeader("0099799190825079016");
+        ArrayList<Object> purchaseUserList = new ArrayList<>();
+        purchaseUserList.add(purchaseUser);
+        ExtJarHelper.returnValue.set(purchaseUserList);
+    }
+
+    /**
+     * 获取财务金融部负责人
+     */
+    public void getFinanceLeader(){
+        String purchaseUser = getLeader("0099799190825079028");
+        ArrayList<Object> purchaseUserList = new ArrayList<>();
+        purchaseUserList.add(purchaseUser);
+        ExtJarHelper.returnValue.set(purchaseUserList);
+    }
+    /**
+     * 获取采购管理部负责人
+     */
+    public void getPurchaseLeader(){
+        String purchaseUser = getLeader("0099799190825079033");
+        ArrayList<Object> purchaseUserList = new ArrayList<>();
+        purchaseUserList.add(purchaseUser);
+        ExtJarHelper.returnValue.set(purchaseUserList);
+    }
+
+    private String getLeader(String str) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql = "select CHIEF_USER_ID from HR_DEPT where id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,str);
+        String user = null;
+        if (!CollectionUtils.isEmpty(list)){
+            user = JdbcMapUtil.getString(list.get(0),"CHIEF_USER_ID");
+        }
+        return user;
+    }
 }

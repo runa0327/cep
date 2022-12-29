@@ -157,6 +157,20 @@ public class PmBuyDemandReqExt {
             if (min.compareTo(max) == 1){
                 throw new BaseException("预算金额下限不能超过预算金额上限");
             }
+            //设置分管领导
+            //获取部门信息
+            String deptId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_DEPT_ID");
+            String leader = "";
+            if ("0099799190825079015".equals(deptId) || "0099799190825079017".equals(deptId) || "0099799190825079018".equals(deptId)){
+                leader = "0099902212142088949";
+            } else if ("0099799190825079033".equals(deptId) || "0099799190825079016".equals(deptId) ){
+                leader = "0099952822476371838";
+            } else if ("0099799190825079028".equals(deptId) ){
+                leader = "0099902212142027203";
+            }
+            //更新分管领导
+            Integer exec = myJdbcTemplate.update("update PM_BUY_DEMAND_REQ set CHARGE_USER_IDS = ? where id = ?",leader,csCommId);
+            log.info("已更新：{}",exec);
         } else if("detail".equals(status)){
             //查询明细信息
             String sql1 = "select * from PM_BUY_DEMAND_DETAIL_REQ where PARENT_ID = ?";
@@ -434,6 +448,19 @@ public class PmBuyDemandReqExt {
                     int update2 = myJdbcTemplate.update("update wf_process_instance set name = ? where id = ?",trueName,processInstanceId);
                 }
             }
+        }
+    }
+
+    //采购需求审批-财务岗角色
+    public void getFinanceUser() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            String csCommId = entityRecord.csCommId;
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+            String user_id = myJdbcTemplate.queryForMap("select AD_USER_THREE_ID from PM_BUY_DEMAND_REQ where id=?", csCommId).get("AD_USER_FIVE_ID").toString();
+            ArrayList<Object> userIdList = new ArrayList<>(1);
+            userIdList.add(user_id);
+            ExtJarHelper.returnValue.set(userIdList);
         }
     }
 }
