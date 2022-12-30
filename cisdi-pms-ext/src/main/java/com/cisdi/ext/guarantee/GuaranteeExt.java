@@ -166,7 +166,7 @@ public class GuaranteeExt {
             List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(nameSql, stringObjectMap.get("guaranteeLetterTypeId"));
 
             //获取费用类型
-            String typeSql = "select NAME from gr_set_value where ID=?";
+            String typeSql = "select NAME from pm_exp_type where ID=?";
             List<Map<String, Object>> typeMap = myJdbcTemplate.queryForList(typeSql, stringObjectMap.get("pmExpTypeIds"));
 
             if (nameMap.size() > 0 && nameMap.get(0).containsKey("NAME")) {
