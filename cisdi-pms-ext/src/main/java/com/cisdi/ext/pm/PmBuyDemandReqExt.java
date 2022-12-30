@@ -199,12 +199,6 @@ public class PmBuyDemandReqExt {
                     .set("TEXT_REMARK_ONE", comment).exec();
             log.info("已更新：{}", exec);
         } else if ("start".equals(status)){
-            //获取预算金额下限 预算金额上线限
-            BigDecimal min = new BigDecimal(entityRecord.valueMap.get("PAY_AMT_ONE").toString());
-            BigDecimal max = new BigDecimal(entityRecord.valueMap.get("PAY_AMT_TWO").toString());
-            if (min.compareTo(max) == 1){
-                throw new BaseException("预算金额下限不能超过预算金额上限");
-            }
             //设置分管领导
             //获取部门信息
             String deptId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_DEPT_ID");
@@ -220,6 +214,12 @@ public class PmBuyDemandReqExt {
             Integer exec = myJdbcTemplate.update("update PM_BUY_DEMAND_REQ set CHARGE_USER_IDS = ? where id = ?",leader,csCommId);
             log.info("已更新：{}",exec);
         } else if("detail".equals(status)){
+            //获取预算金额下限 预算金额上线限
+            BigDecimal min = new BigDecimal(entityRecord.valueMap.get("PAY_AMT_ONE").toString());
+            BigDecimal max = new BigDecimal(entityRecord.valueMap.get("PAY_AMT_TWO").toString());
+            if (min.compareTo(max) == 1){
+                throw new BaseException("预算金额下限不能超过预算金额上限");
+            }
             //查询明细信息
             String sql1 = "select * from PM_BUY_DEMAND_DETAIL_REQ where PARENT_ID = ?";
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,csCommId);

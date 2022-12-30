@@ -226,7 +226,7 @@ public class WfExt {
                     //查询该实例紧急程度
                     String urgentSql = "SELECT a.IS_URGENT FROM WF_PROCESS_INSTANCE a left join "+entityCode+" b on a.id = b.LK_WF_INST_ID where b.id = ? ";
                     List<Map<String,Object>> urgentList = myJdbcTemplate.queryForList(urgentSql,csCommId);
-                    String urgent = null;
+                    String urgent = "";
                     if (!CollectionUtils.isEmpty(urgentList)){
                         String urgentType = JdbcMapUtil.getString(urgentList.get(0),"IS_URGENT");
                         if ("1".equals(urgentType)){
