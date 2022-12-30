@@ -203,12 +203,14 @@ public class PmBuyDemandReqExt {
             //获取部门信息
             String deptId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_DEPT_ID");
             String leader = "";
-            if ("0099799190825079015".equals(deptId) || "0099799190825079017".equals(deptId) || "0099799190825079018".equals(deptId)){
-                leader = "0099902212142088949";
-            } else if ("0099799190825079033".equals(deptId) || "0099799190825079016".equals(deptId) ){
-                leader = "0099952822476371838";
-            } else if ("0099799190825079028".equals(deptId) ){
-                leader = "0099902212142027203";
+            if ("0099799190825079015".equals(deptId) || "0099799190825079017".equals(deptId) || "0099799190825079018".equals(deptId)){ //前期 工程 设计
+                leader = "0099902212142088949"; //张景峰
+            } else if ("0099799190825079033".equals(deptId) || "0099799190825079016".equals(deptId) ){ //采购 成本
+                leader = "0099952822476371838"; //吴坤苗
+            } else if ("0099799190825079028".equals(deptId) ){ //财务
+                leader = "0099902212142027203"; //王小冬
+            } else {
+                leader = "0099250247095871681"; //管理员
             }
             //更新分管领导
             Integer exec = myJdbcTemplate.update("update PM_BUY_DEMAND_REQ set CHARGE_USER_IDS = ? where id = ?",leader,csCommId);

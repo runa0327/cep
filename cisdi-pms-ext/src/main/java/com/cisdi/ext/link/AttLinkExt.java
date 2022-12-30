@@ -545,8 +545,8 @@ public class AttLinkExt {
 
             Boolean prjListChangeToEditable = false; //下拉项目默认不可改
             Boolean prjNameChangeToEditable = false; //手写项目默认不可改
-            Boolean isZFChangeToEditable = false; //是否政府投资默认不可改
-            Boolean amtSourceChangeToEditable = false; //资金来源默认不可改
+            Boolean isZFChangeToEditable = true; //是否政府投资默认可改
+            Boolean amtSourceChangeToEditable = true; //资金来源默认可改
 
             if (!"system".equals(code)) {
                 prjNameChangeToShown = true;
@@ -4233,9 +4233,12 @@ public class AttLinkExt {
             if ("0099799190825080705".equals(id)){
                 val = "0099799190825080670";
                 txt = "否";
-            } else {
+            } else if ("0099799190825080704".equals(id) || "0099952822476392682".equals(id)){
                 val = "0099799190825080669";
                 txt = "是";
+            } else {
+                val = null;
+                txt = null;
             }
             //是否政府投资项目
             {
