@@ -45,10 +45,11 @@ public class PmPrjController extends BaseController {
     @SneakyThrows(IOException.class)
     @GetMapping("export")
     public void prjExcel(PrjRequest request, HttpServletResponse response, HttpServletRequest req){
-        Map<String, String> cookieMap = StringUtils.cookieToMap(req.getHeader("Cookie"));
-        String username = cookieMap.get("username");
-        //用户id
-        String userId = this.getUserId(username);
+        String userId = this.getLoginUser(req.getHeader("qygly-session-id"));
+//        Map<String, String> cookieMap = StringUtils.cookieToMap(req.getHeader("Cookie"));
+//        String username = cookieMap.get("username");
+//        //用户id
+//        String userId = this.getUserId(username);
         //项目名
         String name = request.getName();
         //业主
@@ -178,16 +179,16 @@ public class PmPrjController extends BaseController {
 
 
 
-    public static void main(String[] args) {
-////        String planStartDate = String.valueOf("PLAN_START_DATE");
-//        String planStartDate = null;
-//        String actualStartDate = String.valueOf("ACTUAL_START_DATE");
-////        String actualStartDate = null;
-//        String startDate = planStartDate == null ? "无" : planStartDate;
-//        startDate += "/";
-//        startDate += actualStartDate == null ? "无" : actualStartDate;
-//        System.out.println(startDate);
-//        String percent = getPercent("0", 0);
-//        System.out.println(percent);
+    /**
+     * 通过session id获取用户id
+     */
+    private String getLoginUser(String value){
+        String[] strings = value.split("_");
+        String phone = strings[1];
+        List<Map<String, Object>> userList = jdbcTemplate.queryForList("select id from ad_user where code = ?", phone);
+        if (CollectionUtils.isEmpty(userList)){
+            return null;
+        }
+        return JdbcMapUtil.getString(userList.get(0),"id");
     }
 }
