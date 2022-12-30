@@ -5,11 +5,11 @@ spring:
     username: qygly
     password: Qygly@123456
     # 注意更改ip和db：
-    url: jdbc:mysql://121.5.65.165:3306/test?useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://10.130.19.248:3306/prod?useSSL=false&serverTimezone=Asia/Shanghai
     #    type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
   rabbitmq:
-    host: 121.5.71.89
+    host: 10.130.19.241
     port: 5672
     username: admin
     password: admin@1234
@@ -20,8 +20,13 @@ spring:
         concurrency: 5
         # 单个队列的并发消费者的最大数量：
         max-concurrency: 10
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 10.130.19.98:8848
+
 
 server:
   port: 11117
 
-mq-queue: qygly-wf-callback-queue-test
+mq-queue: qygly-wf-callback-queue-prod
