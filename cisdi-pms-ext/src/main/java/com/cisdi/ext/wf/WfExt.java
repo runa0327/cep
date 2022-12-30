@@ -223,6 +223,17 @@ public class WfExt {
                         checkBidReq(entityRecord, csCommId);
                     }
 
+                    //查询该实例紧急程度
+                    String urgentSql = "SELECT a.IS_URGENT FROM WF_PROCESS_INSTANCE a left join "+entityCode+" b on a.id = b.LK_WF_INST_ID where b.id = ? ";
+                    List<Map<String,Object>> urgentList = myJdbcTemplate.queryForList(urgentSql,csCommId);
+                    String urgent = null;
+                    if (!CollectionUtils.isEmpty(urgentList)){
+                        String urgentType = JdbcMapUtil.getString(urgentList.get(0),"IS_URGENT");
+                        if ("1".equals(urgentType)){
+                            urgent = "【紧急】";
+                        }
+                    }
+
                     List<String> tableList = getTableList();
                     if (!CollectionUtils.isEmpty(tableList)) {
                         if (tableList.contains(entityCode)) {
@@ -241,13 +252,13 @@ public class WfExt {
                                 String sql = "";
                                 String sql2 = "SELECT (select name from pm_prj where id = a.PM_PRJ_ID) as projectName," +
                                         "(select name from ad_user where id = a.CRT_USER_ID) as userName," +
-                                        "c.name as processName FROM "+entityCode+" a " +
+                                        "c.name as processName,b.IS_URGENT FROM "+entityCode+" a " +
                                         "LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id LEFT JOIN wf_process c on b.WF_PROCESS_ID = c.id WHERE a.id = ?";
                                 List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,csCommId);
                                 if (!CollectionUtils.isEmpty(list2)){
                                     projectName = JdbcMapUtil.getString(list2.get(0),"projectName");
                                     userName = JdbcMapUtil.getString(list2.get(0),"userName");
-                                    processName = JdbcMapUtil.getString(list2.get(0),"processName");
+                                    processName = urgent+JdbcMapUtil.getString(list2.get(0),"processName");
                                 }
                                 if ("PM_BUY_DEMAND_REQ".equals(entityCode)){ //采购需求审批
                                     sql = "select b.name from PM_BUY_DEMAND_REQ a left join gr_set_value b on a.BUY_MATTER_ID = b.id where a.id = ?";
