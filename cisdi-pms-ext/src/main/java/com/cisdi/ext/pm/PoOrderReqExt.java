@@ -405,7 +405,7 @@ public class PoOrderReqExt {
         String newAddress = "";
         //文件存放地址
 //        String address = list1.get(0).get("PHYSICAL_LOCATION").toString();
-        String address = "C:\\Users\\Administrator\\Desktop\\Demo\\demo.doc";
+        String address = "C:\\Users\\11376\\Desktop\\demo.docx";
         if (!"doc".equals(fileType) && !"docx".equals(fileType)){
             throw new BaseException("合同附件格式为文档");
         }
@@ -417,7 +417,7 @@ public class PoOrderReqExt {
         //显示名称
         String showName = "";
         try {
-            newAddress = "C:\\Users\\Administrator\\Desktop\\Demo\\demo.pdf";
+            newAddress = "C:\\Users\\11376\\Desktop\\demo.pdf";
             Map map = ProFileUtils.testExt(address,newAddress);
             fileSize = Float.valueOf(map.get("size").toString());
             showName = map.get("name").toString();

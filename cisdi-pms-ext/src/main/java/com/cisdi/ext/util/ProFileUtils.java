@@ -117,8 +117,8 @@ public class ProFileUtils {
      */
     public static Map testExt(String input, String output) throws IOException {
 
-//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
-        OpenOfficeConnection connection = new SocketOpenOfficeConnection("124.222.60.191",8100);
+        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
+//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("124.222.60.191",8100);
         connection.connect();
 
         File inputFile = new File(input);
