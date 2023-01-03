@@ -56,7 +56,7 @@ public class PmChangeExt {
      */
     public void getCustomerUnit() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PARTY where `status`='ap' where IS_CUSTOMER = 1");
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PARTY where `status`='ap' and IS_CUSTOMER = 1");
         List<PmParty> pmPartyList = list.stream().map(p -> {
             PmParty pmParty = new PmParty();
             pmParty.id = JdbcMapUtil.getString(p, "ID");
