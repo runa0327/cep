@@ -22,6 +22,8 @@ import java.util.Date;
 @Data
 public class PoGuaranteeLetterReturnOaReq {
 
+    //id
+    private String id;
     // 保函名称
     private String guaranteeLetterTypeId;
     // 费用类型

@@ -61,7 +61,7 @@ public class GuaranteeExt {
         if (map.containsKey("guaranteeStartDate")) {
             guaranteeStartDate = map.get("guaranteeStartDate").toString();
         }
-        String param = " where 1=1 ";
+        String param = " where 1=1 AND STATUS in ('ap','APING') ";
         String temp = " ";
         if (!StringUtils.isEmpty(guaranteeLetterTypeId)) {
             temp += "and GUARANTEE_LETTER_TYPE_ID= '" + guaranteeLetterTypeId + "'";
@@ -71,7 +71,7 @@ public class GuaranteeExt {
             temp += "and GUARANTEE_END_DATE <= '" + guaranteeEndDate + "' and GUARANTEE_START_DATE >= '" + guaranteeStartDate + "'";
         }
 
-        String sql = "select GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,GUARANTEE_COST_TYPE_ID guaranteeCostTypeId,PROJECT_NAME_WR projectNameWr,APPLICANT applicant,GUARANTEE_MECHANISM guaranteeMechanism,GUARANTEE_CODE guaranteeCode,AMT_WR_ONE amtWrOne,GUARANTEE_START_DATE guaranteeStartDate,GUARANTEE_END_DATE guaranteeEndDate,REMARK_LONG_ONE remarkLongOne,AUTHOR author from po_guarantee_letter_return_oa_req " + param + temp + "  order by GUARANTEE_START_DATE " + limit;
+        String sql = "select id,GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,GUARANTEE_COST_TYPE_ID guaranteeCostTypeId,PROJECT_NAME_WR projectNameWr,APPLICANT applicant,GUARANTEE_MECHANISM guaranteeMechanism,GUARANTEE_CODE guaranteeCode,AMT_WR_ONE amtWrOne,GUARANTEE_START_DATE guaranteeStartDate,GUARANTEE_END_DATE guaranteeEndDate,REMARK_LONG_ONE remarkLongOne,AUTHOR author from po_guarantee_letter_return_oa_req " + param + temp + "  order by GUARANTEE_START_DATE " + limit;
         String totalSql = "select GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,GUARANTEE_COST_TYPE_ID guaranteeCostTypeId,PROJECT_NAME_WR projectNameWr,APPLICANT applicant,GUARANTEE_MECHANISM guaranteeMechanism,GUARANTEE_CODE guaranteeCode,AMT_WR_ONE amtWrOne,GUARANTEE_START_DATE guaranteeStartDate,GUARANTEE_END_DATE guaranteeEndDate,REMARK_LONG_ONE remarkLongOne,AUTHOR author from po_guarantee_letter_return_oa_req " + param + temp + "  order by GUARANTEE_START_DATE ";
         List<Map<String, Object>> dataList = myJdbcTemplate.queryForList(sql);
         List<Map<String, Object>> total = myJdbcTemplate.queryForList(totalSql);
@@ -145,7 +145,7 @@ public class GuaranteeExt {
         if (map.containsKey("guaranteeStartDate")) {
             guaranteeStartDate = map.get("guaranteeStartDate").toString();
         }
-        String param = " where 1=1 ";
+        String param = " where 1=1 and status in ('ap','APING') ";
         String temp = " ";
         if (!StringUtils.isEmpty(guaranteeLetterTypeId)) {
             temp += " and GUARANTEE_LETTER_TYPE_ID= '" + guaranteeLetterTypeId + "'";
@@ -154,7 +154,7 @@ public class GuaranteeExt {
         } else if (!StringUtils.isEmpty(guaranteeEndDate) && !StringUtils.isEmpty(guaranteeStartDate)) {
             temp += "and GUARANTEE_END_DATE <= '" + guaranteeEndDate + "' and GUARANTEE_START_DATE >= '" + guaranteeStartDate + "'";
         }
-        String sql = "select GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,PM_EXP_TYPE_IDS pmExpTypeIds,PROJECT_NAME_WR projectNameWr,SUPPLIER supplier,GUARANTEE_MECHANISM guaranteeMechanism,GUARANTEE_CODE guaranteeCode,GUARANTEE_AMT guaranteeAmt,GUARANTEE_START_DATE guaranteeStartDate,GUARANTEE_END_DATE guaranteeEndDate,REMARK_ONE remarkOne,BENEFICIARY beneficiary from po_guarantee_letter_require_req " + param + temp + "  order by GUARANTEE_START_DATE " + limit;
+        String sql = "select id,GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,PM_EXP_TYPE_IDS pmExpTypeIds,PROJECT_NAME_WR projectNameWr,SUPPLIER supplier,GUARANTEE_MECHANISM guaranteeMechanism,GUARANTEE_CODE guaranteeCode,GUARANTEE_AMT guaranteeAmt,GUARANTEE_START_DATE guaranteeStartDate,GUARANTEE_END_DATE guaranteeEndDate,REMARK_ONE remarkOne,BENEFICIARY beneficiary from po_guarantee_letter_require_req " + param + temp + "  order by GUARANTEE_START_DATE " + limit;
         String totalSql = "select GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,PM_EXP_TYPE_IDS pmExpTypeIds,PROJECT_NAME_WR projectNameWr,SUPPLIER supplier,GUARANTEE_MECHANISM guaranteeMechanism,GUARANTEE_CODE guaranteeCode,GUARANTEE_AMT guaranteeAmt,GUARANTEE_START_DATE guaranteeStartDate,GUARANTEE_END_DATE guaranteeEndDate,REMARK_ONE remarkOne,BENEFICIARY beneficiary from po_guarantee_letter_require_req " + param + temp + "  order by GUARANTEE_START_DATE ";
         List<Map<String, Object>> dataList = myJdbcTemplate.queryForList(sql);
         List<Map<String, Object>> total = myJdbcTemplate.queryForList(totalSql);
