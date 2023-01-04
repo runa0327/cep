@@ -6,6 +6,10 @@ import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConne
 import com.artofsolving.jodconverter.openoffice.converter.StreamOpenOfficeDocumentConverter;
 import com.cisdi.pms.job.utils.ListUtils;
 import com.cisdi.pms.job.utils.StringUtils;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.*;
 import com.qygly.ext.rest.helper.feign.client.DataFeignClient;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -22,6 +26,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +57,7 @@ public class PdfFileJob {
      */
 //    @Scheduled(fixedDelayString = "3000")
 //    @Scheduled(cron = "0/10 * * * * ?")
-    @Scheduled(cron = "00 09 17 ? * *")
+    @Scheduled(cron = "00 00 10 ? * *")
     @Async("taskExecutor")
     public void wordToPdf(){
         //合同签订中需要转pdf的文件信息
@@ -95,17 +100,19 @@ public class PdfFileJob {
                             jdbcTemplate.update("insert into fl_file (ID,CRT_DT,CRT_USER_ID) values (?,(now()),?)",newId,userId);
                             //未转换文件存储地址
                             String address = JdbcMapUtil.getString(fileInfo, "PHYSICAL_LOCATION");
-                            //转换后文件存储地址
+                            //转换后文件存储地址(临时)
+                            String tempAddress = address.substring(0,address.lastIndexOf("/")) + "temp.pdf";
+                            //转换后文件存储地址(加水印后)
                             String newAddress = address.substring(0,address.lastIndexOf("/")) + newId + ".pdf";
                             //文件名称
                             String fileName = JdbcMapUtil.getString(fileInfo, "NAME");
                             //文件类型
                             String fileType = JdbcMapUtil.getString(fileInfo, "EXT");
                             Map<Object, Object> sizeAndName = new HashMap<>();
-                            if ("doc".equals(fileType) || "docx".equals(fileType)){
+                            if ("doc".equals(fileType) || "docx".equals(fileType)){//是word格式转pdf
                                 try {
                                     //转换
-                                    sizeAndName = testExt(address, newAddress);
+                                    sizeAndName = toPdf(address, tempAddress,newAddress);
                                 }catch (IOException e){
                                     e.printStackTrace();
                                 }
@@ -118,7 +125,7 @@ public class PdfFileJob {
                                                 "STATUS = 'AP',CRT_DT = (now()),CRT_USER_ID = ?,LAST_MODI_DT = (now()),LAST_MODI_USER_ID = ?,SIZE_KB = ?," +
                                                 "TS = (now()),UPLOAD_DTTM = (now()),PHYSICAL_LOCATION = ?,DSP_NAME = ?,DSP_SIZE = ? where id = ?",
                                         newId,fileName,userId,userId,fileSize,newAddress,showName,fileSize,newId);
-                            }else {//复制
+                            }else {//不是word格式，复制
                                 jdbcTemplate.update("update fl_file f1,fl_file f2 set f1.code = f2.code,f1.name = f2.name,f1.ver = '1',f1.FL_PATH_ID = '0099250247095872690'," +
                                         "f1.EXT = f2.EXT,f1.status = f2.status,f1.CRT_DT = NOW(),f1.CRT_USER_ID = f2.CRT_USER_ID,f1.LAST_MODI_DT = NOW()," +
                                         "f1.LAST_MODI_USER_ID = f2.LAST_MODI_USER_ID,f1.SIZE_KB = f2.SIZE_KB,f1.TS = NOW(),f1.UPLOAD_DTTM = NOW()," +
@@ -138,19 +145,21 @@ public class PdfFileJob {
     /**
      * word转pdf 返回文件大小
      */
-    private Map testExt(String input, String output) throws IOException {
+    private Map toPdf(String input,String temp, String output) throws IOException {
 
-//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
+//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);//本地
         OpenOfficeConnection connection = new SocketOpenOfficeConnection("139.159.138.11",8100);//测试
-//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("124.222.60.191",8100);
+//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("124.222.60.191",8100);//正式
         connection.connect();
 
         File inputFile = new File(input);
         File outputFile = new File(output);
 
-//        DocumentConverter converter = new OpenOfficeDocumentConverter(connection);
         StreamOpenOfficeDocumentConverter converter = new StreamOpenOfficeDocumentConverter(connection);
+        //转pdf
         converter.convert(inputFile, outputFile);
+        //加水印
+        this.addFooterAndWater("无痕水印",temp,output);
         File file = new File(output);
         if (!file.exists() || !file.isFile()){
             throw new BaseException("'"+output+"'该文件不存在");
@@ -161,5 +170,48 @@ public class PdfFileJob {
         map.put("size",length);
         map.put("name",fileName);
         return map;
+    }
+
+
+    private void addFooterAndWater(String str, String output, String outputWaterMark) {
+        try {
+            PdfReader reader = new PdfReader(output);
+            PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(outputWaterMark));
+            //这里的字体设置比较关键，这个设置是支持中文的写法
+            BaseFont base = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);// 使用系统字体
+            int total = reader.getNumberOfPages() + 1;
+            PdfContentByte under;
+            Rectangle pageRect = null;
+            for (int i = 1; i < total; i++) {
+                for (int i1 = 1; i1 <= 3; i1++) {
+                    pageRect = stamper.getReader().getPageSizeWithRotation(i);
+                    // 计算水印X,Y坐标
+                    float x = (pageRect.getWidth()/3)*i1;
+                    float y = (pageRect.getHeight()/3)*i1;
+                    // 获得PDF最顶层
+                    under = stamper.getOverContent(i);
+                    under.saveState();
+                    // set Transparency
+                    PdfGState gs = new PdfGState();
+                    // 设置透明度为0.2
+                    gs.setFillOpacity(1.f);
+                    under.setGState(gs);
+                    under.restoreState();
+                    under.beginText();
+                    under.setFontAndSize(base, 60);
+                    under.setColorFill(BaseColor.ORANGE);
+                    // 水印文字成45度角倾斜
+                    under.showTextAligned(Element.ALIGN_CENTER , str, x, y, 55);
+                    // 添加水印文字
+                    under.endText();
+                    under.setLineWidth(1f);
+                    under.stroke();
+                }
+
+            }
+            stamper.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
