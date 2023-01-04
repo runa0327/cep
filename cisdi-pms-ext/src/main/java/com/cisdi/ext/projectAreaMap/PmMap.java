@@ -1,11 +1,17 @@
 package com.cisdi.ext.projectAreaMap;
 
+import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.util.JdbcMapUtil;
+import org.apache.coyote.OutputBuffer;
+import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -45,15 +51,34 @@ public class PmMap {
         String longitude = String.valueOf(params.get("longitude"));
         String latitude = String.valueOf(params.get("latitude"));
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pj.id,pj.name,IFNULL(v.name,'未启动') statusName from pm_prj pj " +
-                " left join pm_pro_plan pp on pp.PM_PRJ_ID = pj.id  \n" +
-                " left join gr_set_value v on v.id = pp.PROGRESS_STATUS_ID left join gr_set s on s.id = v.gr_set_id and s.code = 'PROGRESS_STATUS'  " +
+//        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pj.id,pj.name,IFNULL(v.name,'未启动') statusName from pm_prj pj " +
+//                " left join pm_pro_plan pp on pp.PM_PRJ_ID = pj.id  \n" +
+//                " left join gr_set_value v on v.id = pp.PROGRESS_STATUS_ID left join gr_set s on s.id = v.gr_set_id and s.code = 'PROGRESS_STATUS'  " +
+//                " where pj.id in (select PM_PRJ_ID from PM_MAP where LONGITUDE=? and LATITUDE=?)", longitude, latitude);
+
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pj.id,pj.name,IFNULL(v.name,'未启动') statusName,pp.ACTUAL_START_DATE as beginTime,pp.ACTUAL_COMPL_DATE as endTime,pmp.`NAME` as projectOwner,gsv.`NAME` as projectType,ggg.`NAME` as manageUnit,pppm.`NAME` as sgUnit\n" +
+                "from pm_prj pj \n" +
+                "left join pm_pro_plan pp on pp.PM_PRJ_ID = pj.id \n" +
+                "left join gr_set_value v on v.id = pp.PROGRESS_STATUS_ID left join gr_set s on s.id = v.gr_set_id and s.code = 'PROGRESS_STATUS'  \n" +
+                "left join PM_PARTY pmp on pmp.id = pj.CUSTOMER_UNIT\n" +
+                "left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID \n" +
+                "left join gr_set_value ggg on ggg.id = pj.PRJ_MANAGE_MODE_ID \n" +
+                "left join pm_party pppm on pppm.id = pj.CONSTRUCTOR_UNIT \n" +
                 " where pj.id in (select PM_PRJ_ID from PM_MAP where LONGITUDE=? and LATITUDE=?)", longitude, latitude);
+
         List<Project> projects = list.stream().map(p -> {
             Project pro = new Project();
             pro.projectId = JdbcMapUtil.getString(p, "ID");
             pro.projectName = JdbcMapUtil.getString(p, "NAME");
             pro.status = JdbcMapUtil.getString(p, "statusName");
+            pro.projectOwner = JdbcMapUtil.getString(p, "projectOwner");
+            pro.projectType = JdbcMapUtil.getString(p, "projectType");
+            pro.beginTime = JdbcMapUtil.getString(p, "beginTime");
+            pro.endTime = JdbcMapUtil.getString(p, "endTime");
+            pro.manageUnit = JdbcMapUtil.getString(p, "manageUnit");
+            pro.sgUnit = JdbcMapUtil.getString(p, "sgUnit");
+            pro.totalInvest = getProjectInvest(pro.projectId);
+            pro.progress = BigDecimal.ZERO;
             return pro;
         }).collect(Collectors.toList());
         OutSide outSide = new OutSide();
@@ -83,6 +108,57 @@ public class PmMap {
     }
 
 
+    private BigDecimal getProjectInvest(String projectId) {
+
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST from PM_INVEST_EST pie \n" +
+                " left join gr_set_value gsv on gsv.id = pie.INVEST_EST_TYPE_ID \n" +
+                " left join gr_set gs on gs.id = gsv.GR_SET_ID and gs.code ='invest_est_type' \n" +
+                " where gsv.code='invest2' and PM_PRJ_ID=?", projectId);
+        if (!CollectionUtils.isEmpty(list)) {
+            return BigDecimalUtil.stringToBigDecimal(String.valueOf(list.get(0).get("PRJ_TOTAL_INVEST")));
+        }
+        return BigDecimal.ZERO;
+    }
+
+
+    /**
+     * 大屏项目统计
+     */
+    public void projectBigScreen() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pj.id,pj.name,ifnull(pj.FLOOR_AREA,0) as area,gsv.`NAME` as projectType from pm_prj pj \n" +
+                "left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID   \n" +
+                "where pj.`STATUS`='ap'");
+        List<ProjectBigScreen> resList = new ArrayList<>();
+        List<Map<String, Object>> list1 = list.stream().filter(p -> "民用建筑".equals(JdbcMapUtil.getString(p, "projectType"))).collect(Collectors.toList());
+        ProjectBigScreen bigScreen = new ProjectBigScreen();
+        bigScreen.projectType = "房建项目";
+        bigScreen.count = list1.size();
+        bigScreen.area = list1.stream().map(p -> new BigDecimal(JdbcMapUtil.getString(p, "area"))).reduce(BigDecimal.ZERO, BigDecimal::add);
+        resList.add(bigScreen);
+        List<Map<String, Object>> list2 = list.stream().filter(p -> "市政道路".equals(JdbcMapUtil.getString(p, "projectType"))).collect(Collectors.toList());
+
+        ProjectBigScreen bigScreen2 = new ProjectBigScreen();
+        bigScreen2.projectType = "市政道路";
+        bigScreen2.count = list2.size();
+        bigScreen2.area = list2.stream().map(p -> new BigDecimal(JdbcMapUtil.getString(p, "area"))).reduce(BigDecimal.ZERO, BigDecimal::add);
+        resList.add(bigScreen2);
+
+        List<Map<String, Object>> list3 = list.stream().filter(p -> !"民用建筑".equals(JdbcMapUtil.getString(p, "projectType")) && !"市政道路".equals(JdbcMapUtil.getString(p, "projectType"))).collect(Collectors.toList());
+        ProjectBigScreen bigScreen3 = new ProjectBigScreen();
+        bigScreen3.projectType ="";
+        bigScreen.count = list3.size();
+        bigScreen.area = list3.stream().map(p -> new BigDecimal(JdbcMapUtil.getString(p, "area"))).reduce(BigDecimal.ZERO, BigDecimal::add);
+        resList.add(bigScreen3);
+
+        OutSide outSide = new OutSide();
+        outSide.bigScreenList = resList;
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+    }
+
+
     public static class Project {
         public String projectId;
         public String projectName;
@@ -90,9 +166,61 @@ public class PmMap {
         public String latitude;
 
         public String status;
+
+        /**
+         * 概算总投资
+         */
+        public BigDecimal totalInvest;
+
+        /**
+         * 形象进度
+         */
+        public BigDecimal progress;
+
+        /**
+         * 项目业主
+         */
+        public String projectOwner;
+
+        /**
+         * 项目类型
+         */
+        public String projectType;
+
+        /**
+         * 开工时间
+         */
+        public String beginTime;
+
+        /**
+         * 竣工时间
+         */
+        public String endTime;
+
+        /**
+         * 管理单位
+         */
+        public String manageUnit;
+
+        /**
+         * 施工单位
+         */
+        public String sgUnit;
+
+
     }
 
-    public static class OutSide{
-       public List<Project> list;
+    public static class OutSide {
+        public List<Project> list;
+        public List<ProjectBigScreen> bigScreenList;
+    }
+
+
+    public static class ProjectBigScreen {
+        public String projectType;
+
+        public int count;
+
+        public BigDecimal area;
     }
 }
