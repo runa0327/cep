@@ -57,7 +57,7 @@ public class PdfFileJob {
      */
 //    @Scheduled(fixedDelayString = "3000")
 //    @Scheduled(cron = "0/10 * * * * ?")
-    @Scheduled(cron = "00 00 10 ? * *")
+//    @Scheduled(cron = "00 50 13 ? * *")
     @Async("taskExecutor")
     public void wordToPdf(){
         //合同签订中需要转pdf的文件信息
@@ -147,8 +147,8 @@ public class PdfFileJob {
      */
     private Map toPdf(String input,String temp, String output) throws IOException {
 
-//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);//本地
-        OpenOfficeConnection connection = new SocketOpenOfficeConnection("139.159.138.11",8100);//测试
+        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);//本地
+//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("139.159.138.11",8100);//测试
 //        OpenOfficeConnection connection = new SocketOpenOfficeConnection("124.222.60.191",8100);//正式
         connection.connect();
 
