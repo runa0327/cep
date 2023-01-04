@@ -101,7 +101,7 @@ public class GuaranteeImportController {
      */
     private void insertOaReq(GuaranteeModel guaranteeModel) {
         //SUPPLIER  GUARANTEE_AMT  缺少这个字段
-        String sql = "update po_guarantee_letter_return_oa_req set GUARANTEE_LETTER_TYPE_ID=?,GUARANTEE_COST_TYPE_ID=?,PROJECT_NAME_WR=?,APPLICANT=?,GUARANTEE_MECHANISM=?,GUARANTEE_CODE=? ,AMT_WR_ONE=?,GUARANTEE_START_DATE=?,GUARANTEE_END_DATE=?,REMARK_LONG_ONE=?,AUTHOR=? where ID=?";
+        String sql = "update po_guarantee_letter_return_oa_req set GUARANTEE_LETTER_TYPE_ID=?,GUARANTEE_COST_TYPE_ID=?,PROJECT_NAME_WR=?,APPLICANT=?,GUARANTEE_MECHANISM=?,GUARANTEE_CODE=? ,AMT_WR_ONE=?,GUARANTEE_START_DATE=?,GUARANTEE_END_DATE=?,REMARK_LONG_ONE=?,AUTHOR=?,STATUS='AP' where ID=?";
         String id = Util.insertData(jdbcTemplate, "po_guarantee_letter_return_oa_req");
         jdbcTemplate.update(sql,
                 guaranteeModel.getGuaranteeLetterTypeId(), guaranteeModel.getGuaranteeCostTypeId(), guaranteeModel.getProjectNameWr()
@@ -117,7 +117,7 @@ public class GuaranteeImportController {
      */
     private void insertReq(GuaranteeModel guaranteeModel) {
         //guaranteeModel.getGuaranteeCostTypeId()  缺少这个字段
-        String sql = "update po_guarantee_letter_require_req set GUARANTEE_LETTER_TYPE_ID=?,PM_EXP_TYPE_IDS=?,PROJECT_NAME_WR=?,SUPPLIER=?,GUARANTEE_MECHANISM=?,GUARANTEE_CODE=?,GUARANTEE_AMT=?,GUARANTEE_START_DATE=?,GUARANTEE_END_DATE=?,REMARK_ONE=?,BENEFICIARY=? where ID=?";
+        String sql = "update po_guarantee_letter_require_req set GUARANTEE_LETTER_TYPE_ID=?,PM_EXP_TYPE_IDS=?,PROJECT_NAME_WR=?,SUPPLIER=?,GUARANTEE_MECHANISM=?,GUARANTEE_CODE=?,GUARANTEE_AMT=?,GUARANTEE_START_DATE=?,GUARANTEE_END_DATE=?,REMARK_ONE=?,BENEFICIARY=?,STATUS='AP' where ID=?";
         String id = Util.insertData(jdbcTemplate, "po_guarantee_letter_require_req");
         jdbcTemplate.update(sql,
                 guaranteeModel.getGuaranteeLetterTypeId(), guaranteeModel.getGuaranteeCostTypeId(), guaranteeModel.getProjectNameWr()
