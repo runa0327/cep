@@ -706,11 +706,37 @@ public class AttLinkExt {
             return attLinkResult;
         } else if (entityCodes.contains(entCode)){
             attLinkResult = autoLinkProject(attValue,code);
+            if ("PIPELINE_RELOCATION_REQ".equals(entCode)){
+                clearPipeLine(attLinkResult);
+            }
             return attLinkResult;
         } else {
             return attLinkResult;
         }
 
+    }
+
+    // 项目来源属性联动-管线迁改-清除
+    private void clearPipeLine(AttLinkResult attLinkResult) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //设计部人员
+        //查询设计部人员默认值
+        String sql1 = "select ATT_DEFAULT_VALUE_LOGIC from AD_ENT_ATT where AD_ENT_ID = '1609896405474889728' and AD_ATT_ID = '1610990575958552576'";
+        String designValue = null, designText = null;
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1);
+        if (!CollectionUtils.isEmpty(list1)){
+            String userId = JdbcMapUtil.getString(list1.get(0),"ATT_DEFAULT_VALUE_LOGIC");
+            userId = userId.replace("'","");
+            designText = userId;
+            designValue = getUser(userId);
+        }
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = designValue;
+            linkedAtt.text = designText;
+            attLinkResult.attMap.put("PRJ_DESIGN_USER_IDS", linkedAtt);
+        }
     }
 
     // 项目来源属性联动 控制项目基础信息显示
@@ -3873,7 +3899,7 @@ public class AttLinkExt {
                 "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS'," +
                 "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD'," +
                 "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget'," +
-                "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE " +
+                "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE,t.PRJ_EARLY_USER_ID,t.PRJ_DESIGN_USER_ID,t.PRJ_COST_USER_ID " +
                 "from pm_prj t left join PM_PARTY c on t.CUSTOMER_UNIT=c.id " +
                 "LEFT JOIN gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
                 "LEFT JOIN gr_set_value l on t.BASE_LOCATION_ID=l.id " +
@@ -3882,18 +3908,12 @@ public class AttLinkExt {
                 "LEFT JOIN gr_set_value su on t.CON_SCALE_UOM_ID=su.id where t.id=? ";
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql1, attValue);
 
-
-//        if (CollectionUtils.isEmpty(list)) {
-//            throw new BaseException("项目的相关属性不完整！");
-//        }
         if (CollectionUtils.isEmpty(list)){
-
             {
                 LinkedAtt linkedAtt = new LinkedAtt();
                 linkedAtt.type = AttDataTypeE.TEXT_SHORT;
                 linkedAtt.value = null;
                 linkedAtt.text = null;
-
                 attLinkResult.attMap.put("PRJ_CODE", linkedAtt); // 项目编号
                 attLinkResult.attMap.put("BUILDING_AREA", linkedAtt); // 建筑面积
                 attLinkResult.attMap.put("CUSTOMER_UNIT", linkedAtt); // 业主单位
@@ -3936,9 +3956,6 @@ public class AttLinkExt {
         if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)) { // 工程开工报审
             String sql = "select PRJ_TOTAL_INVEST,PROJECT_AMT from PM_PRJ_INVEST2 where PM_PRJ_ID = ? and STATUS = 'AP' order by CRT_DT desc limit 1";
             List<Map<String, Object>> map = myJdbcTemplate.queryForList(sql, attValue);
-//            if (CollectionUtils.isEmpty(map)) {
-//                throw new BaseException("该项目的总投资、工程费用信息不完善！");
-//            }
             if (!CollectionUtils.isEmpty(map)) {
                 Map row2 = map.get(0);
                 // 总投资
@@ -3961,6 +3978,8 @@ public class AttLinkExt {
                 }
             }
 
+        } else if ("PIPELINE_RELOCATION_REQ".equals(entCode)){ // 管线迁改
+            pipelineLink(attLinkResult,row);
         }
 
         // 项目编号
@@ -4225,7 +4244,7 @@ public class AttLinkExt {
             attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
             attLinkResult.attMap.put("PM_FUND_SOURCE_ID", linkedAtt);
         }
-        if("PM_BUY_DEMAND_REQ".equals(entCode)){ // 采购需求审批
+        if("PM_BUY_DEMAND_REQ".equals(entCode) || "PIPELINE_RELOCATION_REQ".equals(entCode)){ // 采购需求审批 管线迁改
             // 0099799190825080705 = 企业自筹
             String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
             String val = "";
@@ -4286,6 +4305,39 @@ public class AttLinkExt {
         }
 
         return attLinkResult;
+    }
+
+    // 项目属性联动-管线迁改
+    private void pipelineLink(AttLinkResult attLinkResult, Map row) {
+        String design = JdbcMapUtil.getString(row,"PRJ_DESIGN_USER_ID");
+        if (!SharedUtil.isEmptyString(design)){
+            design = "0100031468512109171,"+design;
+        } else {
+            design = "0100031468512109171";
+        }
+        design = StringUtil.codeToSplit(design);
+        //查询设计岗人员
+        String designName = getUser(design);
+        // 设计部人员
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = designName;
+            linkedAtt.text = design;
+            attLinkResult.attMap.put("PRJ_DESIGN_USER_IDS", linkedAtt);
+        }
+    }
+
+    // 单表查询用户名称
+    private String getUser(String users) {
+        String userName = "";
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql = "select group_concat(name) as name from ad_user where id in ('"+users+"')";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        if (!CollectionUtils.isEmpty(list)){
+            userName = JdbcMapUtil.getString(list.get(0),"name");
+        }
+        return userName;
     }
 
     private AttLinkResult linkForSTATUS(String attValue, String sevId) {

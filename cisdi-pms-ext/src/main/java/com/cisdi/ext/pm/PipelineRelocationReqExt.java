@@ -37,7 +37,7 @@ public class PipelineRelocationReqExt {
     public void getDesignUser(){
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
-            getUser(entityRecord,"AD_USER_SEVEN_ID","设计岗");
+            getUser(entityRecord,"PRJ_DESIGN_USER_IDS","设计岗");
         }
     }
 
@@ -143,13 +143,13 @@ public class PipelineRelocationReqExt {
                 log.info("已更新：{}",exec);
             }
             //判断当前登录人身份
-            String sql3 = "select AD_USER_SIX_ID,AD_USER_SEVEN_ID,AD_USER_THREE_ID from PIPELINE_RELOCATION_REQ where id = ?";
+            String sql3 = "select AD_USER_SIX_ID,PRJ_DESIGN_USER_IDS,AD_USER_THREE_ID from PIPELINE_RELOCATION_REQ where id = ?";
             Map<String,Object> map = myJdbcTemplate.queryForMap(sql3,csCommId);
             String deptName = getDeptName(map,userId);
             String updateSql = "";
             if ("AD_USER_SIX_ID".equals(deptName)){ //工程部专班人员
                 updateSql = "update PIPELINE_RELOCATION_REQ set APPROVAL_COMMENT_ONE = ? where id = ?";
-            } else if ("AD_USER_SEVEN_ID".equals(deptName)){ //设计部专班人员
+            } else if ("PRJ_DESIGN_USER_IDS".equals(deptName)){ //设计部专班人员
                 updateSql = "update PIPELINE_RELOCATION_REQ set APPROVAL_COMMENT_TWO = ? where id = ?";
             } else if ("AD_USER_THREE_ID".equals(deptName)){ //成本部专班人员
                 updateSql = "update PIPELINE_RELOCATION_REQ set APPROVAL_COMMENT_THREE = ? where id = ?";
