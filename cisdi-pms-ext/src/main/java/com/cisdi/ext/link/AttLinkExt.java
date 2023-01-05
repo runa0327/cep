@@ -4882,6 +4882,7 @@ public class AttLinkExt {
         list.add("PO_GUARANTEE_LETTER_RETURN_OA_REQ"); //保函退还申请(OA)
         list.add("BID_PROCESS_MANAGE"); //招标过程管理
         list.add("PO_ORDER_CHANGE_REQ"); //合同需求审批
+        list.add("PIPELINE_RELOCATION_REQ"); //管线迁改
         return list;
     }
 }

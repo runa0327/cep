@@ -234,40 +234,40 @@ public class WfExt {
                         }
                     }
 
+                    //定义流程实例名称规则
+                    String name = "",projectName = "", userName = "", processName = "", otherName = "",nowDate = "";;
+                    String sql2 = "SELECT (select name from pm_prj where id = a.PM_PRJ_ID) as projectName," +
+                            "(select name from ad_user where id = a.CRT_USER_ID) as userName," +
+                            "c.name as processName,b.IS_URGENT,b.START_DATETIME FROM "+entityCode+" a " +
+                            "LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id LEFT JOIN wf_process c on b.WF_PROCESS_ID = c.id WHERE a.id = ?";
+                    List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,csCommId);
+                    if (!CollectionUtils.isEmpty(list2)){
+                        projectName = JdbcMapUtil.getString(list2.get(0),"projectName");
+                        if (SharedUtil.isEmptyString(projectName)){
+                            projectName = getProjectName(myJdbcTemplate,entityRecord);
+                        }
+                        userName = JdbcMapUtil.getString(list2.get(0),"userName");
+                        processName = urgent+JdbcMapUtil.getString(list2.get(0),"processName");
+                        nowDate = JdbcMapUtil.getString(list2.get(0),"START_DATETIME").replace("T"," ");
+                    }
+
                     List<String> tableList = getTableList();
                     if (!CollectionUtils.isEmpty(tableList)) {
                         if (tableList.contains(entityCode)) {
                             // 流程名称按规定创建
                             int update1 = 0;
+                            String sql = "";
 
                             //判断该流程是否有项目信息
                             List<String> noProjectList = getNoProjectList();
                             // 特殊流程 更新流程内name字段
                             List<String> specialList = getSpecialList();
                             if (specialList.contains(entityCode)) {
-                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                String nowDate = sdf.format(new Date());
-                                String name = "",projectName = "", userName = "", processName = "", otherName = "";
-                                StringBuilder sb = new StringBuilder();
-                                String sql = "";
-                                String sql2 = "SELECT (select name from pm_prj where id = a.PM_PRJ_ID) as projectName," +
-                                        "(select name from ad_user where id = a.CRT_USER_ID) as userName," +
-                                        "c.name as processName,b.IS_URGENT FROM "+entityCode+" a " +
-                                        "LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id LEFT JOIN wf_process c on b.WF_PROCESS_ID = c.id WHERE a.id = ?";
-                                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,csCommId);
-                                if (!CollectionUtils.isEmpty(list2)){
-                                    projectName = JdbcMapUtil.getString(list2.get(0),"projectName");
-                                    userName = JdbcMapUtil.getString(list2.get(0),"userName");
-                                    processName = urgent+JdbcMapUtil.getString(list2.get(0),"processName");
-                                }
                                 if ("PM_BUY_DEMAND_REQ".equals(entityCode)){ //采购需求审批
                                     sql = "select b.name from PM_BUY_DEMAND_REQ a left join gr_set_value b on a.BUY_MATTER_ID = b.id where a.id = ?";
                                     List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
                                     if (!CollectionUtils.isEmpty(list)){
                                         otherName = JdbcMapUtil.getString(list.get(0),"name");
-                                    }
-                                    if (SharedUtil.isEmptyString(projectName)){
-                                        projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
                                     }
                                     name = concatProcessName("-",processName,projectName,otherName,userName,nowDate);
                                 } else if ("PO_ORDER_REQ".equals(entityCode)){ //合同签订
@@ -275,9 +275,6 @@ public class WfExt {
                                     List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
                                     if (!CollectionUtils.isEmpty(list)){
                                         otherName = JdbcMapUtil.getString(list.get(0),"CONTRACT_NAME");
-                                    }
-                                    if (SharedUtil.isEmptyString(projectName)){
-                                        projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
                                     }
                                     name = concatProcessName("-",processName,projectName,otherName,userName,nowDate);
                                 } else {
@@ -303,50 +300,17 @@ public class WfExt {
                                 } else {
                                     update1 = myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", name,csCommId);
                                 }
-                                update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id and t.id = ? set pi.name = ? where t.id",csCommId,name);
+                                update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
                                 return;
-                            } else if ("PO_ORDER_CHANGE_REQ".equals(entityCode)){
-                                String sysPrjSql = "update wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id LEFT JOIN PO_ORDER_CHANGE_REQ c on a.id = c.LK_WF_INST_ID " +
-                                        "LEFT JOIN pm_prj d on c.PM_PRJ_ID = d.id LEFT JOIN ad_user e on c.CRT_USER_ID = e.id " +
-                                        "set a.name = concat(b.name,'-',d.name,'-',e.name,'-',now()) where c.id = ?";
-                                String notSysPrjSql = "update wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id LEFT JOIN PO_ORDER_CHANGE_REQ c on a.id = c.LK_WF_INST_ID " +
-                                        "LEFT JOIN ad_user e on c.CRT_USER_ID = e.id " +
-                                        "set a.name = concat(b.name,'-',?,'-',e.name,'-',now()) where c.id = ?";
-                                String notSysPrj = JdbcMapUtil.getString(entityRecord.valueMap, "PROJECT_NAME_WR");
-                                if (Strings.isNullOrEmpty(notSysPrj)){
-                                    myJdbcTemplate.update(sysPrjSql,csCommId);
-                                }else {
-                                    myJdbcTemplate.update(notSysPrjSql,notSysPrj,csCommId);
-                                }
                             } else if (noProjectList.contains(entityCode)){
-                                update1 = myJdbcTemplate.update("UPDATE wf_process_instance pi " +
-                                        "JOIN wf_process p ON pi.WF_PROCESS_ID = p.id " +
-                                        "JOIN ad_user u ON pi.START_USER_ID = u.id " +
-                                        "JOIN "+entityCode+" t ON pi.ENTITY_RECORD_ID = t.id " +
-                                        "SET pi.NAME = concat(p.NAME,'-',u.NAME,'-',pi.START_DATETIME) WHERE t.id = ?",csCommId);
+                                sql = "update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?";
+                                name = concatProcessName("-",processName,userName,nowDate);
+                                update1 = myJdbcTemplate.update(sql, name,csCommId);
                                 return;
                             } else {
-                                List<String> amtPrjList = getAmtPrjList();
-                                List<String> morePrj = getMorePrjList();
-                                if (amtPrjList.contains(entityCode)) {
-                                    // 资金需求计划和付款申请项目\设计任务书名称使用的另外的字段
-                                    update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
-                                            ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
-                                            ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.AMOUT_PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name," +
-                                            "'-', prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
-                                } else {
-                                    if (morePrj.contains(entityCode)){
-                                        String projectName = getProjectName(myJdbcTemplate,entityRecord);
-                                        update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
-                                                ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
-                                                ".ENTITY_RECORD_ID=t.id and t.id=? set pi.name=concat( p.name,'-','"+projectName+"' ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
-                                    } else {
-                                        update1 = myJdbcTemplate.update("update wf_process_instance pi join wf_process p on pi" +
-                                                ".WF_PROCESS_ID=p.id join ad_user u on pi.START_USER_ID=u.id join " + entityCode + " t on pi" +
-                                                ".ENTITY_RECORD_ID=t.id join pm_prj prj on t.PM_PRJ_ID=prj.id and t.id=? set pi.name=concat( p.name,'-',prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
-                                    }
-
-                                }
+                                sql = "update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?";
+                                name = concatProcessName("-",processName,projectName,userName,nowDate);
+                                update1 = myJdbcTemplate.update(sql, name,csCommId);
                             }
                             log.info("已更新：{}", update1);
 
@@ -1379,6 +1343,7 @@ public class WfExt {
         list.add("PM_PRJ_RESTART_ORDER_REQ"); // 工程复工令
         list.add("PM_PRJ_RESTART_TRIAL_REQ"); // 工程复工报审表
         list.add("BID_PROCESS_MANAGE"); // 招标过程管理
+        list.add("PIPELINE_RELOCATION_REQ"); // 管线迁改
         return list;
     }
 
