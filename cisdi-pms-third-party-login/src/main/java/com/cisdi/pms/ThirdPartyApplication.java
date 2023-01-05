@@ -3,6 +3,7 @@ package com.cisdi.pms;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
  * @author 尹涛 * @version V1.0.0
@@ -12,6 +13,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
  * @description 未使用数据库，通过exclude = {DataSourceAutoConfiguration.class}不自动装配，避免报错Failed to configure a DataSource
  * @date 2022/12/16
  */
+@EnableDiscoveryClient
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class ThirdPartyApplication {
     public static void main(String[] args) {
