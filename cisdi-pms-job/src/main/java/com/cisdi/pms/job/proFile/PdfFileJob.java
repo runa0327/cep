@@ -57,7 +57,7 @@ public class PdfFileJob {
      */
 //    @Scheduled(fixedDelayString = "3000")
 //    @Scheduled(cron = "0/10 * * * * ?")
-//    @Scheduled(cron = "00 50 13 ? * *")
+    @Scheduled(cron = "00 15 10 ? * *")
     @Async("taskExecutor")
     public void wordToPdf(){
         //合同签订中需要转pdf的文件信息
@@ -66,7 +66,7 @@ public class PdfFileJob {
 //                "where (r.IS_PDF_CONVERTED = 0 or r.IS_PDF_CONVERTED is null) and (r.STATUS = 'AP' or r.STATUS = 'APING')\n");
         List<Map<String, Object>> contractFileList = jdbcTemplate.queryForList("select r.ID,r.name PROCESS_NAME,r.ATT_FILE_GROUP_ID,r.CRT_USER_ID,u.name USER_NAME from po_order_req r\n" +
                 "left join ad_user u on u.id = r.CRT_USER_ID\n" +
-                "where (r.IS_PDF_CONVERTED = 0 or r.IS_PDF_CONVERTED is null) and (r.STATUS = 'AP' or r.STATUS = 'APING') and r.id = '0099952822476439131'\n");
+                "where (r.IS_PDF_CONVERTED = 0 or r.IS_PDF_CONVERTED is null) and (r.STATUS = 'AP' or r.STATUS = 'APING') and r.id = '0099952822476442308'\n");
         int size = contractFileList.size() / coreSize + 1;//线程数
         List<List<Map<String, Object>>> contractFileLists = ListUtils.split(contractFileList, size);
         AtomicInteger count = new AtomicInteger(1);
@@ -109,29 +109,37 @@ public class PdfFileJob {
                             //文件类型
                             String fileType = JdbcMapUtil.getString(fileInfo, "EXT");
                             Map<Object, Object> sizeAndName = new HashMap<>();
-                            if ("doc".equals(fileType) || "docx".equals(fileType)){//是word格式转pdf
-                                try {
-                                    //转换
-                                    sizeAndName = toPdf(address, tempAddress,newAddress);
-                                }catch (IOException e){
-                                    e.printStackTrace();
-                                }
-                                //文件大小
-                                String fileSize = StringUtils.formatFileSize(Long.valueOf(sizeAndName.get("size").toString()));
-                                //展示名称
-                                String showName = sizeAndName.get("name").toString();
-                                //更新fl_file
-                                jdbcTemplate.update("update fl_file set code = ?,name = ?,ver = '1',FL_PATH_ID = '0099250247095872690',EXT = 'pdf'," +
-                                                "STATUS = 'AP',CRT_DT = (now()),CRT_USER_ID = ?,LAST_MODI_DT = (now()),LAST_MODI_USER_ID = ?,SIZE_KB = ?," +
-                                                "TS = (now()),UPLOAD_DTTM = (now()),PHYSICAL_LOCATION = ?,DSP_NAME = ?,DSP_SIZE = ? where id = ?",
-                                        newId,fileName,userId,userId,fileSize,newAddress,showName,fileSize,newId);
-                            }else {//不是word格式，复制
-                                jdbcTemplate.update("update fl_file f1,fl_file f2 set f1.code = f2.code,f1.name = f2.name,f1.ver = '1',f1.FL_PATH_ID = '0099250247095872690'," +
+                            //暂时没有解决openOffice安装的服务找不到文件服务器的问题
+//                            if ("doc".equals(fileType) || "docx".equals(fileType)){//是word格式转pdf
+//                                try {
+//                                    //转换
+//                                    sizeAndName = toPdf(address, tempAddress,newAddress);
+//                                }catch (IOException e){
+//                                    e.printStackTrace();
+//                                }
+//                                //文件大小
+//                                String fileSize = StringUtils.formatFileSize(Long.valueOf(sizeAndName.get("size").toString()));
+//                                //展示名称
+//                                String showName = sizeAndName.get("name").toString();
+//                                //更新fl_file
+//                                jdbcTemplate.update("update fl_file set code = ?,name = ?,ver = '1',FL_PATH_ID = '0099250247095872690',EXT = 'pdf'," +
+//                                                "STATUS = 'AP',CRT_DT = (now()),CRT_USER_ID = ?,LAST_MODI_DT = (now()),LAST_MODI_USER_ID = ?,SIZE_KB = ?," +
+//                                                "TS = (now()),UPLOAD_DTTM = (now()),PHYSICAL_LOCATION = ?,DSP_NAME = ?,DSP_SIZE = ? where id = ?",
+//                                        newId,fileName,userId,userId,fileSize,newAddress,showName,fileSize,newId);
+//                            }else {//不是word格式，复制
+//                                jdbcTemplate.update("update fl_file f1,fl_file f2 set f1.code = f2.code,f1.name = f2.name,f1.ver = '1',f1.FL_PATH_ID = '0099250247095872690'," +
+//                                        "f1.EXT = f2.EXT,f1.status = f2.status,f1.CRT_DT = NOW(),f1.CRT_USER_ID = f2.CRT_USER_ID,f1.LAST_MODI_DT = NOW()," +
+//                                        "f1.LAST_MODI_USER_ID = f2.LAST_MODI_USER_ID,f1.SIZE_KB = f2.SIZE_KB,f1.TS = NOW(),f1.UPLOAD_DTTM = NOW()," +
+//                                        "f1.PHYSICAL_LOCATION = f2.PHYSICAL_LOCATION,f1.DSP_NAME = f2.DSP_NAME,f1.DSP_SIZE = f2.DSP_SIZE " +
+//                                        "where f1.id = ? and f2.id = ?",id,newId);
+//                            }
+
+                            //暂时用复制代替转换
+                            jdbcTemplate.update("update fl_file f1,fl_file f2 set f1.code = f2.code,f1.name = f2.name,f1.ver = '1',f1.FL_PATH_ID = '0099250247095872690'," +
                                         "f1.EXT = f2.EXT,f1.status = f2.status,f1.CRT_DT = NOW(),f1.CRT_USER_ID = f2.CRT_USER_ID,f1.LAST_MODI_DT = NOW()," +
                                         "f1.LAST_MODI_USER_ID = f2.LAST_MODI_USER_ID,f1.SIZE_KB = f2.SIZE_KB,f1.TS = NOW(),f1.UPLOAD_DTTM = NOW()," +
                                         "f1.PHYSICAL_LOCATION = f2.PHYSICAL_LOCATION,f1.DSP_NAME = f2.DSP_NAME,f1.DSP_SIZE = f2.DSP_SIZE " +
-                                        "where f1.id = ? and f2.id = ?",id,newId);
-                            }
+                                        "where f1.id = ? and f2.id = ?",newId,id);
                             //将生成的pdf写入流程新字段 FILE_ID_FIVE
                             jdbcTemplate.update("update PO_ORDER_REQ set FILE_ID_FIVE = ?,IS_PDF_CONVERTED = 1 where id = ?",newId,csId);
                         }
