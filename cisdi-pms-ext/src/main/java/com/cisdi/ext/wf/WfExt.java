@@ -1291,6 +1291,18 @@ public class WfExt {
             //资质报审附件
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"CONTRACT_FILE_GROUP_ID"),FileCodeEnum.QUALIFICATION_REPORT_ATTACHMENT);
         }
+
+        //招标过程管理
+        if ("BID_PROCESS_MANAGE".equals(entityCode)){
+            String prjId = JdbcMapUtil.getString(valueMap, "PM_PRJ_ID");
+            if(SharedUtil.isEmptyString(prjId)){
+                prjId = this.getWritePrjId(valueMap);
+            }
+            //中标通知书
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"BID_WIN_NOTICE_FILE_GROUP_ID"),FileCodeEnum.MANAGEMENT_BID_WINNING_NOTICE);
+            //备案回执
+            ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.MANAGEMENT_FILING_RECEIPT);
+        }
     }
 
     private List<String> getTableList() {
