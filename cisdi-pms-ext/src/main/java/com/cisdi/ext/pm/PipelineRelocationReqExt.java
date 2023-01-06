@@ -188,7 +188,7 @@ public class PipelineRelocationReqExt {
         Set<String> set = map.keySet();
         for (String tmp : set) {
             String value = map.get(tmp).toString();
-            if (userId.equals(value)){
+            if (value.contains(userId)){
                 return tmp;
             }
         }
