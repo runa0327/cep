@@ -733,8 +733,8 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = designValue;
-            linkedAtt.text = designText;
+            linkedAtt.value = designText;
+            linkedAtt.text = designValue;
             attLinkResult.attMap.put("PRJ_DESIGN_USER_IDS", linkedAtt);
         }
     }
@@ -4310,29 +4310,43 @@ public class AttLinkExt {
     // 项目属性联动-管线迁改
     private void pipelineLink(AttLinkResult attLinkResult, Map row) {
         String design = JdbcMapUtil.getString(row,"PRJ_DESIGN_USER_ID");
+
         if (!SharedUtil.isEmptyString(design)){
             design = "0100031468512109171,"+design;
         } else {
             design = "0100031468512109171";
         }
-        design = StringUtil.codeToSplit(design);
+        String designValue = design;
+        StringBuilder sb = new StringBuilder();
+//        design = StringUtil.codeToSplit(design);
         //查询设计岗人员
-        String designName = getUser(design);
+//        String designName = getUser(design);
+        String designName = getDesignName(designValue,sb);
         // 设计部人员
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = designName;
-            linkedAtt.text = design;
+            linkedAtt.value = designValue;
+            linkedAtt.text = designName;
             attLinkResult.attMap.put("PRJ_DESIGN_USER_IDS", linkedAtt);
         }
+    }
+
+    // 循环查询拼接用户名称
+    private String getDesignName(String str, StringBuilder sb) {
+        List<String> list = Arrays.asList(str.split(","));
+        for (String tmp : list) {
+            String name = getUser(tmp);
+            sb.append(name).append(",");
+        }
+        return sb.substring(0,sb.length()-1);
     }
 
     // 单表查询用户名称
     private String getUser(String users) {
         String userName = "";
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql = "select group_concat(name) as name from ad_user where id in ('"+users+"')";
+        String sql = "select group_concat(name) as name from ad_user where id in ('"+users+"') order by id asc";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
         if (!CollectionUtils.isEmpty(list)){
             userName = JdbcMapUtil.getString(list.get(0),"name");

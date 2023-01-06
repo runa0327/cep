@@ -9,10 +9,7 @@ import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -76,8 +73,17 @@ public class PipelineRelocationReqExt {
             }
         } else {
             sql = "select "+colName+" from PIPELINE_RELOCATION_REQ where id=?";
-            String user_id = myJdbcTemplate.queryForMap(sql, csCommId).get(colName).toString();
-            userIdList.add(user_id);
+            List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
+            if (!CollectionUtils.isEmpty(list)){
+                for (Map<String, Object> tmp : list) {
+                    List<String> userList = Arrays.asList(JdbcMapUtil.getString(tmp,colName).split(","));
+                    userIdList.addAll(userList);
+                }
+//                List<String> userList = list.stream().map(p->JdbcMapUtil.getString(p,colName)).collect(Collectors.toList());
+//                userIdList.addAll(userList);
+            }
+//            String user_id = myJdbcTemplate.queryForMap(sql, csCommId).get(colName).toString();
+
         }
         ExtJarHelper.returnValue.set(userIdList);
     }
