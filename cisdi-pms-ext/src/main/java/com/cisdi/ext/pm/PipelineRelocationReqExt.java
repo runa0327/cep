@@ -3,6 +3,7 @@ package com.cisdi.ext.pm;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -29,12 +30,22 @@ public class PipelineRelocationReqExt {
     }
 
     /**
-     * 管线迁改-角色-获取设计岗人员
+     * 管线迁改-角色-获取设计岗人员-通知
      */
     public void getDesignUser(){
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
-            getUser(entityRecord,"PRJ_DESIGN_USER_IDS","设计岗");
+            getUser(entityRecord,"PRJ_DESIGN_USER_IDS","设计岗-通知");
+        }
+    }
+
+    /**
+     * 管线迁改-角色-获取设计岗人员-审批
+     */
+    public void getDesignUserCheck(){
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            getUser(entityRecord,"PRJ_DESIGN_USER_ID","设计岗-审批");
         }
     }
 
@@ -71,18 +82,24 @@ public class PipelineRelocationReqExt {
                 List<String> userList = list.stream().map(p-> JdbcMapUtil.getString(p,"AD_USER_ID")).collect(Collectors.toList());
                 userIdList.addAll(userList);
             }
+        } else if ("PRJ_DESIGN_USER_ID".equals(colName)){
+            String userId = getDesignCheckUser(myJdbcTemplate);
+            userIdList.add(userId);
         } else {
             sql = "select "+colName+" from PIPELINE_RELOCATION_REQ where id=?";
             List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
             if (!CollectionUtils.isEmpty(list)){
                 for (Map<String, Object> tmp : list) {
-                    List<String> userList = Arrays.asList(JdbcMapUtil.getString(tmp,colName).split(","));
+                    String users = JdbcMapUtil.getString(tmp,colName);
+                    List<String> userList = new ArrayList<>(Arrays.asList(users.split(",")));
+                    if ("PRJ_DESIGN_USER_IDS".equals(colName)){ //设计岗通知
+                        //查询默认审批人
+                        String userId = getDesignCheckUser(myJdbcTemplate);
+                        userList.remove(userId);
+                    }
                     userIdList.addAll(userList);
                 }
-//                List<String> userList = list.stream().map(p->JdbcMapUtil.getString(p,colName)).collect(Collectors.toList());
-//                userIdList.addAll(userList);
             }
-//            String user_id = myJdbcTemplate.queryForMap(sql, csCommId).get(colName).toString();
 
         }
         ExtJarHelper.returnValue.set(userIdList);
@@ -176,5 +193,18 @@ public class PipelineRelocationReqExt {
             }
         }
         return name;
+    }
+
+    // 获取设计岗审批人员
+    public String getDesignCheckUser(MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select ATT_DEFAULT_VALUE_LOGIC from AD_ENT_ATT where AD_ENT_ID = '1609896405474889728' and AD_ATT_ID = '1610990575958552576'";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        String userId = "";
+        if (CollectionUtils.isEmpty(list)){
+            throw new BaseException("当前流程设计岗未设置默认审批人员，请联系管理员处理！");
+        } else {
+            userId = JdbcMapUtil.getString(list.get(0),"ATT_DEFAULT_VALUE_LOGIC").replace("'","");
+        }
+        return userId;
     }
 }
