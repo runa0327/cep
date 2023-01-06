@@ -1,9 +1,10 @@
 package com.cisdi.pms.job.utils;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelReader;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
-import com.alibaba.excel.read.builder.ExcelReaderSheetBuilder;
+import com.alibaba.excel.read.metadata.ReadSheet;
 import com.qygly.shared.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -22,7 +23,9 @@ import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -58,6 +61,45 @@ public class EasyExcelUtil {
         // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
         EasyExcel.read(inputStream, clazz, listener).sheet().doRead();
         return listener.getRows();
+    }
+
+    /**
+     * 读取所有sheet页
+     * @param inputStream excel输入流
+     * @param clazz 模板类型
+     * @param headRowNumber 表头在第几行
+     * @param <T>
+     * @return 以标题作为key，数据作为value的map，一个元素表示一个sheet页
+     */
+    public static <T> Map<String, List<T>> readSheets(InputStream inputStream, final Class<?> clazz,int headRowNumber){
+        if (inputStream == null) {
+            throw new BaseException("解析出错了，文件流是null");
+        }
+        List<String> headNames = new ArrayList<>();
+        DataListener<T> listener = new DataListener<T>() {
+            @Override
+            public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
+                //获取每个表的第一行作为标题，并作为sheet页的名字
+                if (context.readRowHolder().getRowIndex() == 0) {
+                    headNames.add(headMap.get(0));
+                }
+            }
+        };
+
+        ExcelReader reader = EasyExcel.read(inputStream,clazz,listener).headRowNumber(headRowNumber).build();
+        List<ReadSheet> sheets = reader.excelExecutor().sheetList();
+        Map<String, List<T>> sheetData = new HashMap<>();
+        for (int i = 0; i < sheets.size(); i++) {
+            ReadSheet readSheet = sheets.get(i);
+            reader.read(readSheet);
+            String headName = headNames.get(i);
+            List<T> rows = listener.getRows();
+            List<T> data = new ArrayList<>();
+            data.addAll(rows);
+            sheetData.put(headName,data);
+            listener.getRows().clear();
+        }
+        return sheetData;
     }
 
     public static void write(String outFile, List<?> list) {
