@@ -80,6 +80,9 @@ public class PipelineRelocationReqExt {
             List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
             if (!CollectionUtils.isEmpty(list)){
                 List<String> userList = list.stream().map(p-> JdbcMapUtil.getString(p,"AD_USER_ID")).collect(Collectors.toList());
+                //查询分管领导
+                String leader = ProcessRoleExt.getFenGuanLeader(myJdbcTemplate,entityRecord);
+                userList.remove(leader);
                 userIdList.addAll(userList);
             }
         } else if ("PRJ_DESIGN_USER_ID".equals(colName)){

@@ -19,6 +19,20 @@ import java.util.stream.Collectors;
  */
 public class ProcessRoleExt {
 
+    // 查询流程发起人所在部门的分管领导
+    public static String getFenGuanLeader(MyJdbcTemplate myJdbcTemplate, EntityRecord entityRecord) {
+        //分管领导id
+        String userId = "";
+        // 部门id
+        String deptId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_DEPT_ID");
+        String sql = "select AD_USER_ID from HR_DEPT where id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,deptId);
+        if (!CollectionUtils.isEmpty(list)){
+            userId = JdbcMapUtil.getString(list.get(0),"AD_USER_ID");
+        }
+        return userId;
+    }
+
     /** 招标文件审批流程获取所有经办人信息 **/
     public void bidDocProcess(){
         String process = "bidDoc";
