@@ -277,6 +277,13 @@ public class WfExt {
                                         otherName = JdbcMapUtil.getString(list.get(0),"CONTRACT_NAME");
                                     }
                                     name = concatProcessName("-",processName,projectName,otherName,userName,nowDate);
+                                } else if ("PM_BID_APPROVAL_REQ".equals(entityCode)) { //招标文件审批
+                                    sql = "select NAME_ONE from "+entityCode+" where id = ?";
+                                    List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
+                                    if (!CollectionUtils.isEmpty(list)){
+                                        otherName = JdbcMapUtil.getString(list.get(0),"NAME_ONE");
+                                    }
+                                    name = concatProcessName("-",processName,otherName,userName,nowDate);
                                 } else {
                                     if ("PM_PRJ_REQ".equals(entityCode)){
                                         projectName = myJdbcTemplate.queryForList("select PRJ_NAME from PM_PRJ_REQ where id = ?",csCommId).get(0).get("PRJ_NAME").toString();
