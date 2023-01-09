@@ -76,7 +76,7 @@ public class SendSmsJob {
 
         //13976720905   吴坤苗  此用户许需要发送短信
         List<RemindLog> result = maps.stream()
-                .filter(map -> !map.get("userPhone").equals("13976720905"))
+                .filter(map -> !map.get("userPhone").equals("13976720905") && !map.get("userPhone").equals("17721054782"))
                 .map(stringObjectMap -> {
                     RemindLog remindLog = new RemindLog();
                     remindLog.setUserPhone(stringObjectMap.get("userPhone").toString());
