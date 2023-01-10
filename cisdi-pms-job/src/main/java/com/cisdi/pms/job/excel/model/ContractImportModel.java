@@ -23,6 +23,10 @@ public class ContractImportModel {
     @ExcelProperty("签订时间")
     private String signDate;
 
+    //招标类别 采购方式
+    @ExcelProperty("中标单位确定方式（公开招标/电子平台/中介服务超市/代管确定）")
+    private String buyType;
+
     @ExcelProperty("合同金额")
     private String amtIncludeTax;
 

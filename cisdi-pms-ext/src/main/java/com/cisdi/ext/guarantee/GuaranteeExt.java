@@ -2,15 +2,15 @@ package com.cisdi.ext.guarantee;
 
 import com.cisdi.ext.guarantee.domin.*;
 import com.cisdi.ext.util.JsonUtil;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 保函清单台账
@@ -49,6 +49,7 @@ public class GuaranteeExt {
         String guaranteeCostTypeId = null;
         String guaranteeEndDate = null;
         String guaranteeStartDate = null;
+        String projectNameWr = "";
         if (map.containsKey("guaranteeLetterTypeId")) {
             guaranteeLetterTypeId = map.get("guaranteeLetterTypeId").toString();
         }
@@ -61,18 +62,38 @@ public class GuaranteeExt {
         if (map.containsKey("guaranteeStartDate")) {
             guaranteeStartDate = map.get("guaranteeStartDate").toString();
         }
-        String param = " where 1=1 AND STATUS in ('ap','APING') ";
+        if (map.containsKey("projectNameWr")) {
+            projectNameWr = map.get("projectNameWr").toString();
+        }
+        String param = " where 1=1 AND r.STATUS in ('ap','APING') ";
         String temp = " ";
         if (!StringUtils.isEmpty(guaranteeLetterTypeId)) {
-            temp += "and GUARANTEE_LETTER_TYPE_ID= '" + guaranteeLetterTypeId + "'";
-        } else if (!StringUtils.isEmpty(guaranteeCostTypeId)) {
-            temp += "and GUARANTEE_COST_TYPE_ID= '" + guaranteeCostTypeId + "'";
-        } else if (!StringUtils.isEmpty(guaranteeEndDate) && !StringUtils.isEmpty(guaranteeStartDate)) {
-            temp += "and GUARANTEE_END_DATE <= '" + guaranteeEndDate + "' and GUARANTEE_START_DATE >= '" + guaranteeStartDate + "'";
+            temp += " and r.GUARANTEE_LETTER_TYPE_ID= '" + guaranteeLetterTypeId + "'";
+        }
+        if (!StringUtils.isEmpty(guaranteeCostTypeId)) {
+            temp += " and r.GUARANTEE_COST_TYPE_ID= '" + guaranteeCostTypeId + "'";
+        }
+        if (!StringUtils.isEmpty(guaranteeEndDate) && !StringUtils.isEmpty(guaranteeStartDate)) {
+            temp += " and r.GUARANTEE_END_DATE <= '" + guaranteeEndDate + "' and r.GUARANTEE_START_DATE >= '" + guaranteeStartDate + "'";
+        }
+        if (!Strings.isNullOrEmpty(projectNameWr)){
+            temp += " and IFNULL(r.PM_PRJ_ID,p2.id) = '" + projectNameWr + "'";
         }
 
-        String sql = "select id,GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,GUARANTEE_COST_TYPE_ID guaranteeCostTypeId,PROJECT_NAME_WR projectNameWr,APPLICANT applicant,GUARANTEE_MECHANISM guaranteeMechanism,GUARANTEE_CODE guaranteeCode,AMT_WR_ONE amtWrOne,GUARANTEE_START_DATE guaranteeStartDate,GUARANTEE_END_DATE guaranteeEndDate,REMARK_LONG_ONE remarkLongOne,AUTHOR author from po_guarantee_letter_return_oa_req " + param + temp + "  order by GUARANTEE_START_DATE " + limit;
-        String totalSql = "select GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,GUARANTEE_COST_TYPE_ID guaranteeCostTypeId,PROJECT_NAME_WR projectNameWr,APPLICANT applicant,GUARANTEE_MECHANISM guaranteeMechanism,GUARANTEE_CODE guaranteeCode,AMT_WR_ONE amtWrOne,GUARANTEE_START_DATE guaranteeStartDate,GUARANTEE_END_DATE guaranteeEndDate,REMARK_LONG_ONE remarkLongOne,AUTHOR author from po_guarantee_letter_return_oa_req " + param + temp + "  order by GUARANTEE_START_DATE ";
+        String sql = "select r.id,r.GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,r.GUARANTEE_COST_TYPE_ID guaranteeCostTypeId,IFNULL(p1.NAME,r" +
+                ".PROJECT_NAME_WR) projectNameWr,r.APPLICANT applicant,r.GUARANTEE_MECHANISM guaranteeMechanism,r.GUARANTEE_CODE guaranteeCode,r" +
+                ".AMT_WR_ONE amtWrOne,r.GUARANTEE_START_DATE guaranteeStartDate,r.GUARANTEE_END_DATE guaranteeEndDate,r.REMARK_LONG_ONE " +
+                "remarkLongOne,r.AUTHOR author \n" +
+                "from po_guarantee_letter_return_oa_req r\n" +
+                "left join pm_prj p1 on p1.id = r.PM_PRJ_ID\n" +
+                "left join pm_prj p2 on p2.name = r.PROJECT_NAME_WR " + param + temp + "  order by r.GUARANTEE_START_DATE " + limit;
+        String totalSql = "select r.id,r.GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,r.GUARANTEE_COST_TYPE_ID guaranteeCostTypeId,IFNULL(p1" +
+                ".NAME,r.PROJECT_NAME_WR) projectNameWr,r.APPLICANT applicant,r.GUARANTEE_MECHANISM guaranteeMechanism,r.GUARANTEE_CODE " +
+                "guaranteeCode,r.AMT_WR_ONE amtWrOne,r.GUARANTEE_START_DATE guaranteeStartDate,r.GUARANTEE_END_DATE guaranteeEndDate,r" +
+                ".REMARK_LONG_ONE remarkLongOne,r.AUTHOR author \n" +
+                "from po_guarantee_letter_return_oa_req r\n" +
+                "left join pm_prj p1 on p1.id = r.PM_PRJ_ID\n" +
+                "left join pm_prj p2 on p2.name = r.PROJECT_NAME_WR " + param + temp + "  order by r.GUARANTEE_START_DATE ";
         List<Map<String, Object>> dataList = myJdbcTemplate.queryForList(sql);
         List<Map<String, Object>> total = myJdbcTemplate.queryForList(totalSql);
         List<PoGuaranteeLetterReturnOaReq> list = new ArrayList<>();
@@ -84,14 +105,16 @@ public class GuaranteeExt {
             List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(nameSql, stringObjectMap.get("guaranteeLetterTypeId"));
 
             //获取费用类型
-            String typeSql = "select NAME from gr_set_value where ID=?";
+            String typeSql = "select NAME from gr_set_value where FIND_IN_SET(ID,?)";
             List<Map<String, Object>> typeMap = myJdbcTemplate.queryForList(typeSql, stringObjectMap.get("guaranteeCostTypeId"));
 
             if (nameMap.size() > 0 && nameMap.get(0).containsKey("NAME")) {
                 stringObjectMap.replace("guaranteeLetterTypeId", nameMap.get(0).get("NAME"));
             }
             if (typeMap.size() > 0 && typeMap.get(0).containsKey("NAME")) {
-                stringObjectMap.replace("guaranteeCostTypeId", typeMap.get(0).get("NAME"));
+//                stringObjectMap.replace("guaranteeCostTypeId", typeMap.get(0).get("NAME"));
+                String typeNames = typeMap.stream().map(costType -> String.valueOf(costType.get("NAME"))).collect(Collectors.joining(","));
+                stringObjectMap.replace("guaranteeCostTypeId",typeNames);
             }
             PoGuaranteeLetterReturnOaReq oaReq = JsonUtil.convertMapToObject(stringObjectMap, PoGuaranteeLetterReturnOaReq.class);
             list.add(oaReq);
@@ -145,36 +168,76 @@ public class GuaranteeExt {
         if (map.containsKey("guaranteeStartDate")) {
             guaranteeStartDate = map.get("guaranteeStartDate").toString();
         }
-        String param = " where 1=1 and status in ('ap','APING') ";
+        String param = " where 1=1 and r.status in ('ap','APING') ";
         String temp = " ";
         if (!StringUtils.isEmpty(guaranteeLetterTypeId)) {
-            temp += " and GUARANTEE_LETTER_TYPE_ID= '" + guaranteeLetterTypeId + "'";
-        } else if (!StringUtils.isEmpty(projectNameWr)) {
-            temp += " and PROJECT_NAME_WR= '" + projectNameWr + "'";
-        } else if (!StringUtils.isEmpty(guaranteeEndDate) && !StringUtils.isEmpty(guaranteeStartDate)) {
-            temp += "and GUARANTEE_END_DATE <= '" + guaranteeEndDate + "' and GUARANTEE_START_DATE >= '" + guaranteeStartDate + "'";
+            temp += " and r.GUARANTEE_LETTER_TYPE_ID= '" + guaranteeLetterTypeId + "'";
         }
-        String sql = "select id,GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,PM_EXP_TYPE_IDS pmExpTypeIds,PROJECT_NAME_WR projectNameWr,SUPPLIER supplier,GUARANTEE_MECHANISM guaranteeMechanism,GUARANTEE_CODE guaranteeCode,GUARANTEE_AMT guaranteeAmt,GUARANTEE_START_DATE guaranteeStartDate,GUARANTEE_END_DATE guaranteeEndDate,REMARK_ONE remarkOne,BENEFICIARY beneficiary from po_guarantee_letter_require_req " + param + temp + "  order by GUARANTEE_START_DATE " + limit;
-        String totalSql = "select GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,PM_EXP_TYPE_IDS pmExpTypeIds,PROJECT_NAME_WR projectNameWr,SUPPLIER supplier,GUARANTEE_MECHANISM guaranteeMechanism,GUARANTEE_CODE guaranteeCode,GUARANTEE_AMT guaranteeAmt,GUARANTEE_START_DATE guaranteeStartDate,GUARANTEE_END_DATE guaranteeEndDate,REMARK_ONE remarkOne,BENEFICIARY beneficiary from po_guarantee_letter_require_req " + param + temp + "  order by GUARANTEE_START_DATE ";
+        if (!StringUtils.isEmpty(projectNameWr)) {
+            temp += " and FIND_IN_SET('" + projectNameWr + "',IFNULL(r.PM_PRJ_IDS,p2.id))";
+        }
+        if (!StringUtils.isEmpty(guaranteeEndDate) && !StringUtils.isEmpty(guaranteeStartDate)) {
+            temp += " and r.GUARANTEE_END_DATE <= '" + guaranteeEndDate + "' and r.GUARANTEE_START_DATE >= '" + guaranteeStartDate + "'";
+        }
+        String sql = "select r.id,GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,r.PM_EXP_TYPE_IDS pmExpTypeIds,r.PROJECT_NAME_WR projectNameWr,r" +
+                ".SUPPLIER supplier,r.GUARANTEE_MECHANISM guaranteeMechanism,r.GUARANTEE_CODE guaranteeCode,r.GUARANTEE_AMT guaranteeAmt,r" +
+                ".GUARANTEE_START_DATE guaranteeStartDate,r.GUARANTEE_END_DATE guaranteeEndDate,r.REMARK_ONE remarkOne,r.BENEFICIARY beneficiary \n" +
+                "from po_guarantee_letter_require_req r\n" +
+                "left join pm_prj p1 on FIND_IN_SET(p1.id,r.PM_PRJ_IDS)\n" +
+                "left join pm_prj P2 on p2.NAME = r.PROJECT_NAME_WR " + param + temp + "  order by r.GUARANTEE_START_DATE " + limit;
+        String totalSql = "select r.id,GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,r.PM_EXP_TYPE_IDS pmExpTypeIds,r.PROJECT_NAME_WR " +
+                "projectNameWr,r.SUPPLIER supplier,r.GUARANTEE_MECHANISM guaranteeMechanism,r.GUARANTEE_CODE guaranteeCode,r.GUARANTEE_AMT " +
+                "guaranteeAmt,r.GUARANTEE_START_DATE guaranteeStartDate,r.GUARANTEE_END_DATE guaranteeEndDate,r.REMARK_ONE remarkOne,r.BENEFICIARY " +
+                "beneficiary \n" +
+                "from po_guarantee_letter_require_req r\n" +
+                "left join pm_prj p1 on FIND_IN_SET(p1.id,r.PM_PRJ_IDS)\n" +
+                "left join pm_prj P2 on p2.NAME = r.PROJECT_NAME_WR " + param + temp + "  order by r.GUARANTEE_START_DATE ";
         List<Map<String, Object>> dataList = myJdbcTemplate.queryForList(sql);
         List<Map<String, Object>> total = myJdbcTemplate.queryForList(totalSql);
         List<PoGuaranteeLetterRequireReq> list = new ArrayList<>();
         GuaranteeModel guaranteeModel = new GuaranteeModel();
+        //保函类型字典
+        List<Map<String, Object>> guaranteeTypeList = myJdbcTemplate.queryForList("select v.NAME,v.ID from gr_set_value v left join gr_set s on s.id = v.gr_set_id " +
+                "where s.code = 'guarantee_type'");
+        //费用类型字典
+        List<Map<String, Object>> costTypeList = myJdbcTemplate.queryForList("select NAME,ID from pm_exp_type");
         for (Map<String, Object> stringObjectMap : dataList) {
             //获取保函名称
-            String nameSql = "select NAME from gr_set_value where ID=?";
-            List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(nameSql, stringObjectMap.get("guaranteeLetterTypeId"));
+//            String nameSql = "select NAME from gr_set_value where ID=?";
+//            List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(nameSql, stringObjectMap.get("guaranteeLetterTypeId"));
+            Optional<Map<String, Object>> guaranteeTypeOptional = guaranteeTypeList.stream()
+                    .filter(guaranteeType -> String.valueOf(guaranteeType.get("ID")).equals(String.valueOf(stringObjectMap.get("guaranteeLetterTypeId"))))
+                    .findAny();
+
 
             //获取费用类型
-            String typeSql = "select NAME from pm_exp_type where ID=?";
-            List<Map<String, Object>> typeMap = myJdbcTemplate.queryForList(typeSql, stringObjectMap.get("pmExpTypeIds"));
+//            String typeSql = "select NAME from pm_exp_type where FIND_IN_SET(id,?)";
+//            List<Map<String, Object>> typeMap = myJdbcTemplate.queryForList(typeSql, stringObjectMap.get("pmExpTypeIds"));
+            String pmExpTypeIds = String.valueOf(stringObjectMap.get("pmExpTypeIds"));
+            List<String> pmExpTypeIdList = Arrays.asList(pmExpTypeIds.split(","));
 
-            if (nameMap.size() > 0 && nameMap.get(0).containsKey("NAME")) {
-                stringObjectMap.replace("guaranteeLetterTypeId", nameMap.get(0).get("NAME"));
+            String costTypes = costTypeList.stream()
+                    .filter(costType -> pmExpTypeIdList.contains(String.valueOf(costType.get("ID"))))
+                    .map(costType -> String.valueOf(costType.get("NAME"))).collect(Collectors.joining(","));
+
+//            if (nameMap.size() > 0 && nameMap.get(0).containsKey("NAME")) {
+//                stringObjectMap.replace("guaranteeLetterTypeId", nameMap.get(0).get("NAME"));
+//            }
+            if (guaranteeTypeOptional.isPresent()){
+                stringObjectMap.replace("guaranteeLetterTypeId", guaranteeTypeOptional.get().get("NAME"));
             }
-            if (typeMap.size() > 0 && typeMap.get(0).containsKey("NAME")) {
-                stringObjectMap.replace("pmExpTypeIds", typeMap.get(0).get("NAME"));
+            if (!Strings.isNullOrEmpty(costTypes)){
+                stringObjectMap.replace("pmExpTypeIds",costTypes);
             }
+//            if (typeMap.size() > 0 && typeMap.get(0).containsKey("NAME")) {
+////                stringObjectMap.replace("pmExpTypeIds", typeMap.get(0).get("NAME"));
+//                String typeNames = typeMap.stream().map(costType -> String.valueOf(costType.get("NAME"))).collect(Collectors.joining(","));
+//                map.replace("pmExpTypeIds",typeNames);
+//            }
+//            if (costTypeOptional.isPresent()) {
+//                String typeNames = typeMap.stream().map(costType -> String.valueOf(costType.get("NAME"))).collect(Collectors.joining(","));
+//                map.replace("pmExpTypeIds",typeNames);
+//            }
 
 
             list.add(JsonUtil.convertMapToObject(stringObjectMap, PoGuaranteeLetterRequireReq.class));

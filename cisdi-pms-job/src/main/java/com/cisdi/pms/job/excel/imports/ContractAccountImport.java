@@ -88,6 +88,8 @@ public class ContractAccountImport {
         for (String prjName:sheets.keySet()){
             if (!prjNameList.contains(prjName)){//没有找到该项目
                 errorMap.get("prjNotExist").add(prjName);
+                //模拟立项
+
             }else {
                 //同一个项目的合同
                 List<ContractImportModel> models = sheets.get(prjName);
