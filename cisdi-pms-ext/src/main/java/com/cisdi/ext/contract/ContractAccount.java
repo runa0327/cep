@@ -49,10 +49,10 @@ public class ContractAccount {
                 "left join gr_set se on se.id = va.GR_SET_ID and se.code = 'contract_type_one'\n" +
                 "left join ad_user u on u.id = o.CRT_USER_ID\n" +
                 "left join wf_process_instance i on i.id = o.LK_WF_INST_ID\n" +
-                "left join (select PM_PRJ_ID,GROUP_CONCAT(USER_IDS) USER_IDS from pm_dept group by PM_PRJ_ID) temp on temp.PM_PRJ_ID = IFNULL(o.PM_PRJ_ID,p2.id)\n" +
+//                "left join (select PM_PRJ_ID,GROUP_CONCAT(USER_IDS) USER_IDS from pm_dept group by PM_PRJ_ID) temp on temp.PM_PRJ_ID = IFNULL(o.PM_PRJ_ID,p2.id)\n" +
                 "where o.STATUS = 'AP'");
         if (!rootUsers.contains(loginInfo.userId)){
-            sb.append(" and FIND_IN_SET('").append(loginInfo.userId).append("',temp.USER_IDS)");
+            sb.append(" and IFNULL(o.PM_PRJ_ID,p2.id) in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(loginInfo.userId).append("', USER_IDS ))");
         }
         if (Strings.isNotEmpty(requestParam.prjId)){
             sb.append(" and IFNULL(o.PM_PRJ_ID,p2.id) = '").append(requestParam.prjId).append("'");
@@ -81,6 +81,18 @@ public class ContractAccount {
         if (Strings.isNotEmpty(requestParam.userId)){
             sb.append(" and o.CRT_USER_ID = '").append(requestParam.userId).append("'");
         }
+        //查询项目权限
+//        List<Map<String, Object>> projectUserList = myJdbcTemplate.queryForList("select PM_PRJ_ID,USER_IDS from pm_dept");
+//        Map<String, List<Map<String, Object>>> prjUserMap =
+//                projectUserList.stream().collect(Collectors.groupingBy(prjUser -> JdbcMapUtil.getString(prjUser, "PM_PRJ_ID")));
+//        for (String prjId : prjUserMap.keySet()) {
+//            for (Map<String, Object> userIds : prjUserMap.get(prjId)) {
+//
+//            }
+//        }
+        //        Map<String, List<String>> collect = students.stream().collect(Collectors.groupingBy(Student::getClassNumber, Collectors.mapping(Student::getName, Collectors.toList())));
+//        System.out.println(JSON.toJSONString(collect));
+//{"700":["李四","钱七"],"701":["张三","赵六","老八"],"703":["王五"]}
 
         String totalSql = sb.toString();
         sb.append(" order by o.CRT_DT desc");
