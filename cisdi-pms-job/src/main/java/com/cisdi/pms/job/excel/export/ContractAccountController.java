@@ -51,10 +51,11 @@ public class ContractAccountController extends BaseController{
                 "left join gr_set se on se.id = va.GR_SET_ID and se.code = 'contract_type_one'\n" +
                 "left join ad_user u on u.id = o.CRT_USER_ID\n" +
                 "left join wf_process_instance i on i.id = o.LK_WF_INST_ID\n" +
-                "left join (select PM_PRJ_ID,GROUP_CONCAT(USER_IDS) USER_IDS from pm_dept group by PM_PRJ_ID) temp on temp.PM_PRJ_ID = IFNULL(o.PM_PRJ_ID,p2.id)\n" +
+//                "left join (select PM_PRJ_ID,GROUP_CONCAT(USER_IDS) USER_IDS from pm_dept group by PM_PRJ_ID) temp on temp.PM_PRJ_ID = IFNULL(o.PM_PRJ_ID,p2.id)\n" +
                 "where o.STATUS = 'AP'");
         if (!rootUsers.contains(loginUserId)){
-            sb.append(" and FIND_IN_SET('").append(loginUserId).append("',temp.USER_IDS)");
+//            sb.append(" and FIND_IN_SET('").append(loginUserId).append("',temp.USER_IDS)");
+            sb.append(" and IFNULL(o.PM_PRJ_ID,p2.id) in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(loginUserId).append("', USER_IDS ))");
         }
         if (Strings.isNotEmpty(requestParam.getPrjId())){
             sb.append(" and IFNULL(o.PM_PRJ_ID,p2.id) = '").append(requestParam.getPrjId()).append("'");
