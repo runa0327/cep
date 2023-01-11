@@ -251,7 +251,7 @@ public class PmBidApprovalReq {
                 "join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id and tk.status = 'ap' " +
                 "join ad_user u on tk.ad_user_id=u.id " +
                 "where u.id = ?";
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, procInstId,userId,myJdbcTemplate);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, procInstId,userId);
         if (!CollectionUtils.isEmpty(list)) {
             if ("user_comment".equals(type)){
                 value = SharedUtil.isEmptyString(JdbcMapUtil.getString(list.get(0),"user_comment"))  ? "同意" : JdbcMapUtil.getString(list.get(0),"user_comment");
@@ -330,7 +330,7 @@ public class PmBidApprovalReq {
                 sb.append("FILE_ID_SEVEN = null,APPROVAL_COMMENT_SEVEN = null,");
             }
         }
-        sb.substring(0,sb.length()-1);
+        sb.deleteCharAt(sb.length()-1);
         sb.append(" where id = ?");
         Integer exec = myJdbcTemplate.update(sb.toString(),csCommId);
         log.info("已更新：{}",exec);

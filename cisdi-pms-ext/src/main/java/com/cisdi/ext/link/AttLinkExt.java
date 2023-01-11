@@ -909,6 +909,70 @@ public class AttLinkExt {
     private AttLinkResult linkCUSTOMER_UNIT_ONE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
         String userId = ExtJarHelper.loginInfo.get().userId;
+        //通过选择业主单位变换发起人部门
+        List<String> autoGetDept = getAutoGetDept();
+        if ("PM_SEND_APPROVAL_REQ".equals(entCode)){
+            PM_SEND_APPROVAL_REQAttlink(myJdbcTemplate,userId,attValue,attLinkResult);
+        } else if (autoGetDept.contains(entCode)){
+            //每次切换清空原有数据
+            clearUser(attLinkResult);
+            autoChangeDept(myJdbcTemplate,attValue,userId,attLinkResult);
+        }
+
+        return attLinkResult;
+    }
+
+    /**
+     * 业主单位变更，清空各个岗位人员
+     * @param attLinkResult 最终数据返回map
+     */
+    private void clearUser(AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            attLinkResult.attMap.put("OPERATOR_ONE_ID",linkedAtt); // 经办人
+            attLinkResult.attMap.put("AD_USER_THREE_ID",linkedAtt); // 成本岗
+            attLinkResult.attMap.put("AD_USER_FOUR_ID",linkedAtt); // 合同岗
+            attLinkResult.attMap.put("AD_USER_EIGHTH_ID",linkedAtt); // 法务岗用户
+            attLinkResult.attMap.put("AD_USER_NINTH_ID",linkedAtt); // 财务岗用户
+        }
+    }
+
+    /**
+     * 自动根据所选择的公司判断出对应的部门
+     * @param myJdbcTemplate 数据源
+     * @param attValue 属性联动值
+     * @param userId 当前登录人id
+     * @param attLinkResult 最终数据返回map
+     */
+    private void autoChangeDept(MyJdbcTemplate myJdbcTemplate, String attValue, String userId,AttLinkResult attLinkResult) {
+        String value = null, id = null;
+        //根据公司找到部门
+        String sql1 = "select a.id,a.name from hr_dept a LEFT JOIN hr_dept_user b on a.id = b.HR_DEPT_ID where b.AD_USER_ID = ? and a.CUSTOMER_UNIT = ? and b.SYS_TRUE = 1";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId,attValue);
+        if (CollectionUtils.isEmpty(list1)){
+            sql1 = "select a.id,a.name from hr_dept a LEFT JOIN hr_dept_user b on a.id = b.HR_DEPT_ID where b.AD_USER_ID = ? and a.CUSTOMER_UNIT = ? and b.SYS_TRUE != 1 order by b.CRT_DT desc limit 1";
+            list1 = myJdbcTemplate.queryForList(sql1,userId,attValue);
+            if (CollectionUtils.isEmpty(list1)){
+                throw new BaseException("对不起，您在该公司暂未有职位，请联系管理员维护职位信息！");
+            }
+        }
+        id = JdbcMapUtil.getString(list1.get(0),"id");
+        value = JdbcMapUtil.getString(list1.get(0),"name");
+        //部门
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = id;
+            linkedAtt.text = value;
+            attLinkResult.attMap.put("CRT_DEPT_ID",linkedAtt);
+        }
+    }
+
+    /** 业主公司属性联动-发文呈批流程 **/
+    private void PM_SEND_APPROVAL_REQAttlink(MyJdbcTemplate myJdbcTemplate, String userId, String attValue, AttLinkResult attLinkResult) {
         //根据公司找到部门
         String sql1 = "select a.id,a.name from hr_dept a LEFT JOIN hr_dept_user b on a.id = b.HR_DEPT_ID where b.AD_USER_ID = ? and a.CUSTOMER_UNIT = ? order by b.SYS_TRUE desc limit 1";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId,attValue);
@@ -925,7 +989,6 @@ public class AttLinkExt {
             linkedAtt.text = name;
             attLinkResult.attMap.put("HR_DEPT_LIST_ID",linkedAtt);
         }
-        return attLinkResult;
     }
 
     private AttLinkResult linkFUND_PAY_CODE_V_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
@@ -2090,7 +2153,7 @@ public class AttLinkExt {
         Boolean AD_USER_NINTH_IDChangeToEditable = false; //财务岗用户，默认不可改
         Boolean AD_USER_NINTH_IDChangeToMandatory = false; //财务岗用户，默认非必填
         // 是(Y)， 否(N)
-        if ("Y".equals(code)){
+        if ("N".equals(code)){
             AD_USER_EIGHTH_IDChangeToMandatory = true;
             AD_USER_NINTH_IDChangeToMandatory = true;
             AD_USER_EIGHTH_IDChangeToEditable = true;
@@ -4986,6 +5049,13 @@ public class AttLinkExt {
         list.add("BID_PROCESS_MANAGE"); //招标过程管理
         list.add("PO_ORDER_CHANGE_REQ"); //合同需求审批
         list.add("PIPELINE_RELOCATION_REQ"); //管线迁改
+        return list;
+    }
+
+    // CUSTOMER_UNIT_ONE(业主单位)关联自动选择发起人所在部门
+    public List<String> getAutoGetDept() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_BID_APPROVAL_REQ");  //招标文件审批
         return list;
     }
 }

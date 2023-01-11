@@ -72,5 +72,10 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("PO_ORDER_REQ_IDS"); // 合同名称
         entityRecord.extraEditableAttCodeList.add("ORDER_CHANGE_TYPE"); // 变更类型
         entityRecord.extraEditableAttCodeList.add("PRJ_DESIGN_USER_IDS"); // 设计部人员
+        entityRecord.extraEditableAttCodeList.add("OPERATOR_ONE_ID"); // 经办人
+        entityRecord.extraEditableAttCodeList.add("AD_USER_THREE_ID"); // 成本岗
+        entityRecord.extraEditableAttCodeList.add("AD_USER_FOUR_ID"); // 合同岗
+        entityRecord.extraEditableAttCodeList.add("AD_USER_EIGHTH_ID"); // 法务岗用户
+        entityRecord.extraEditableAttCodeList.add("AD_USER_NINTH_ID"); // 财务岗用户
     }
 }
