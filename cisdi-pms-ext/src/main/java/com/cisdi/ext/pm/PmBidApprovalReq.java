@@ -135,18 +135,40 @@ public class PmBidApprovalReq {
         }
     }
 
+    /** 办结通知-发起人+需求经办人**/
+    public void getNoticeUser(){
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            getCreateDeptUser(entityRecord,"notice","办结通知");
+        }
+    }
+
+
     /** 获取流程发起时选择的各个岗位信息 **/
     private void getCreateDeptUser(EntityRecord entityRecord, String code, String name) {
         String csCommId = entityRecord.csCommId;
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql = "select "+code+" from PM_BID_APPROVAL_REQ where id=?";
-        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
-        if (!CollectionUtils.isEmpty(list)){
-            String value = JdbcMapUtil.getString(list.get(0),code);
-            if (!SharedUtil.isEmptyString(value)){
+        if ("notice".equals(code)){
+            String sql = "select OPERATOR_ONE_ID,CRT_USER_ID from PM_BID_APPROVAL_REQ where id=?";
+            List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
+            if (!CollectionUtils.isEmpty(list)){
+                String value1 = JdbcMapUtil.getString(list.get(0),"OPERATOR_ONE_ID");
+                String value2 = JdbcMapUtil.getString(list.get(0),"CRT_USER_ID");
                 ArrayList<Object> userIdList = new ArrayList<>(1);
-                userIdList.add(value);
+                userIdList.add(value1);
+                userIdList.add(value2);
                 ExtJarHelper.returnValue.set(userIdList);
+            }
+        } else {
+            String sql = "select "+code+" from PM_BID_APPROVAL_REQ where id=?";
+            List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
+            if (!CollectionUtils.isEmpty(list)){
+                String value = JdbcMapUtil.getString(list.get(0),code);
+                if (!SharedUtil.isEmptyString(value)){
+                    ArrayList<Object> userIdList = new ArrayList<>(1);
+                    userIdList.add(value);
+                    ExtJarHelper.returnValue.set(userIdList);
+                }
             }
         }
     }
