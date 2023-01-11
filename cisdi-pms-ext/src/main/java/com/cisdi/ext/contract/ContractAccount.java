@@ -122,7 +122,7 @@ public class ContractAccount {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> rootList = myJdbcTemplate.queryForList("select du.AD_USER_ID from hr_dept hd\n" +
                 "left join hr_dept_user du on du.HR_DEPT_ID = hd.id\n" +
-                "where hd.name in ('成本合约部','财务部门') and du.AD_USER_ID is not null");
+                "where hd.name in ('成本合约部','财务金融部') and du.AD_USER_ID is not null");
         List<String> rootUsers = rootList.stream().map(item -> String.valueOf(item.get("AD_USER_ID"))).collect(Collectors.toList());
         rootUsers.add("0099250247095871681");//系统管理员
         return rootUsers;
