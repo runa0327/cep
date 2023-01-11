@@ -187,6 +187,18 @@ public class PmBidApprovalReq {
         newCheck(status);
     }
 
+    /** 采购部负责人-意见回显 **/
+    public void buyLeaderCheck(){
+        String status = "buyLeaderCheck";
+        newCheck(status);
+    }
+
+    /** 采购部负责人-拒绝 **/
+    public void buyLeaderCheckRefuse(){
+        String status = "buyLeaderCheckRefuse";
+        newCheck(status);
+    }
+
     private void newCheck(String status) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
@@ -229,10 +241,18 @@ public class PmBidApprovalReq {
             clearPM_BID_APPROVAL_REQData("lawyer",csCommId,myJdbcTemplate);
         } else if ("lawyerCheck".equals(status)){
             if (firstCheck == true){
-                //成本/合约/需求审批-清除数据
+                //采购部负责人-清除数据
                 clearPM_BID_APPROVAL_REQData("lawyer",csCommId,myJdbcTemplate);
             }
             updatePM_BID_APPROVAL_REQDate("lawyer",file,comment,csCommId,myJdbcTemplate);
+        } else if ("buyLeaderCheck".equals(status)){
+            if (firstCheck == true){
+                //采购部负责人-清除数据
+                clearPM_BID_APPROVAL_REQData("buyLeader",csCommId,myJdbcTemplate);
+            }
+            updatePM_BID_APPROVAL_REQDate("buyLeader",file,comment,csCommId,myJdbcTemplate);
+        } else if ("buyLeaderCheckRefuse".equals(status)){
+            clearPM_BID_APPROVAL_REQData("buyLeader",csCommId,myJdbcTemplate);
         }
     }
 
@@ -305,6 +325,8 @@ public class PmBidApprovalReq {
             sb.append("FILE_ID_NINTH = ?,APPROVAL_COMMENT_NINTH = ?");
         } else if ("lawyer".equals(deptName)){
             sb.append("FILE_ID_SEVEN = ?,APPROVAL_COMMENT_SEVEN = ?");
+        } else if ("buyLeader".equals(deptName)){
+            sb.append("FILE_ID_TENTH = ?,APPROVAL_COMMENT_TENTH = ?");
         }
         sb.append(" where id = ?");
         Integer exec = myJdbcTemplate.update(sb.toString(),file,comment,csCommId);
@@ -328,6 +350,8 @@ public class PmBidApprovalReq {
                 sb.append("FILE_ID_NINTH = null,APPROVAL_COMMENT_NINTH = null,");
             } else if ("lawyer".equals(tmp)){
                 sb.append("FILE_ID_SEVEN = null,APPROVAL_COMMENT_SEVEN = null,");
+            } else if ("buyLeader".equals(tmp)){
+                sb.append("FILE_ID_TENTH = null,APPROVAL_COMMENT_TENTH = null,");
             }
         }
         sb.deleteCharAt(sb.length()-1);
