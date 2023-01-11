@@ -95,7 +95,7 @@ public class WfPrjExt {
             String START_USER_ID = myJdbcTemplate.queryForMap("select AD_USER_ID from PM_BID_APPROVAL_REQ where id=?", csCommId).get("AD_USER_ID").toString();
 
             List<Map<String, Object>> list = myJdbcTemplate.queryForList("select d.chief_user_id from hr_dept_user du join " +
-                    "hr_dept d on du.HR_DEPT_ID=d.id and du.AD_USER_ID=?", START_USER_ID);
+                    "hr_dept d on du.HR_DEPT_ID=d.id and du.AD_USER_ID=? limit 1", START_USER_ID);
             if (CollectionUtils.isEmpty(list) || list.get(0).get("chief_user_id") == null) {
                 throw new BaseException("该经办人没有对应的部门负责人！");
             } else if (list.size() > 1) {
