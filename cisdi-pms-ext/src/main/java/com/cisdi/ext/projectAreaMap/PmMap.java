@@ -93,10 +93,11 @@ public class PmMap {
     public void getMapProject() {
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_MAP");
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pp.PM_PRJ_ID as PM_PRJ_ID,pp.LONGITUDE as LONGITUDE,pp.LATITUDE as LATITUDE,pj.`NAME` as `NAME` from PM_MAP pp left join pm_prj pj on pp.PM_PRJ_ID = pj.id");
         List<Project> projectList = list.stream().map(p -> {
             Project project = new Project();
             project.projectId = JdbcMapUtil.getString(p, "PM_PRJ_ID");
+            project.projectName = JdbcMapUtil.getString(p, "NAME");
             project.longitude = JdbcMapUtil.getString(p, "LONGITUDE");
             project.latitude = JdbcMapUtil.getString(p, "LATITUDE");
             return project;
