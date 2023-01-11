@@ -49,7 +49,6 @@ public class ContractAccount {
                 "left join gr_set se on se.id = va.GR_SET_ID and se.code = 'contract_type_one'\n" +
                 "left join ad_user u on u.id = o.CRT_USER_ID\n" +
                 "left join wf_process_instance i on i.id = o.LK_WF_INST_ID\n" +
-//                "left join (select PM_PRJ_ID,GROUP_CONCAT(USER_IDS) USER_IDS from pm_dept group by PM_PRJ_ID) temp on temp.PM_PRJ_ID = IFNULL(o.PM_PRJ_ID,p2.id)\n" +
                 "where o.STATUS = 'AP'");
         if (!rootUsers.contains(loginInfo.userId)){
             sb.append(" and IFNULL(o.PM_PRJ_ID,p2.id) in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(loginInfo.userId).append("', USER_IDS ))");
@@ -140,6 +139,27 @@ public class ContractAccount {
                 "group by pa.id");
         Map<String, Object> result = new HashMap<>();
         result.put("companyList",companyList);
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+    }
+
+    /**
+     * 项目下拉
+     */
+    public void contractPrjDrop(){
+        LoginInfo loginInfo = ExtJarHelper.loginInfo.get();
+        List<String> rootUsers = this.getRootUsers();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql = "SELECT DISTINCT IFNULL(o.PM_PRJ_ID,p2.id) prjId,IFNULL(p.name,o.PROJECT_NAME_WR) prjName\n" +
+                "FROM PO_ORDER_REQ o left join pm_prj p on p.id = o.PM_PRJ_ID \n" +
+                "left join pm_prj p2 on p2.name = o.PROJECT_NAME_WR \n" +
+                "left join wf_process_instance i on i.id = o.LK_WF_INST_ID where o.STATUS = 'AP' ";
+        if (!rootUsers.contains(loginInfo.userId)){
+            sql += " and IFNULL(o.PM_PRJ_ID,p2.id) in (select DISTINCT pm_prj_id from pm_dept where STATUS = 'AP' and FIND_IN_SET('" + loginInfo.userId + "',USER_IDS))";
+        }
+        List<Map<String, Object>> prjList = myJdbcTemplate.queryForList(sql);
+        HashMap<Object, Object> result = new HashMap<>();
+        result.put("prjList",prjList);
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
