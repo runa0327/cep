@@ -2077,8 +2077,45 @@ public class AttLinkExt {
                 attLinkResult.attMap.put("FILE_ID_FOUR", linkedAtt);
             }
 
+        } else if ("PM_BID_APPROVAL_REQ".equals(entCode)){ //招标文件审批
+            pmBidApprovalReqYesNoOneLink(code,attLinkResult);
         }
         return attLinkResult;
+    }
+
+    // YES_NO_ONE属性联动 关联控制法务岗、财务岗
+    private void pmBidApprovalReqYesNoOneLink(String code, AttLinkResult attLinkResult) {
+        Boolean AD_USER_EIGHTH_IDChangeToEditable = false; //法务岗用户，默认不可改
+        Boolean AD_USER_EIGHTH_IDChangeToMandatory = false; //法务岗用户，默认非必填
+        Boolean AD_USER_NINTH_IDChangeToEditable = false; //财务岗用户，默认不可改
+        Boolean AD_USER_NINTH_IDChangeToMandatory = false; //财务岗用户，默认非必填
+        // 是(Y)， 否(N)
+        if ("Y".equals(code)){
+            AD_USER_EIGHTH_IDChangeToMandatory = true;
+            AD_USER_NINTH_IDChangeToMandatory = true;
+            AD_USER_EIGHTH_IDChangeToEditable = true;
+            AD_USER_NINTH_IDChangeToEditable = true;
+        }
+        // 法务岗
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = "";
+            linkedAtt.text = "";
+            linkedAtt.changeToEditable = AD_USER_EIGHTH_IDChangeToEditable;
+            linkedAtt.changeToMandatory = AD_USER_EIGHTH_IDChangeToMandatory;
+            attLinkResult.attMap.put("AD_USER_EIGHTH_ID", linkedAtt);
+        }
+        // 财务岗
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = "";
+            linkedAtt.text = "";
+            linkedAtt.changeToEditable = AD_USER_NINTH_IDChangeToEditable;
+            linkedAtt.changeToMandatory = AD_USER_NINTH_IDChangeToMandatory;
+            attLinkResult.attMap.put("AD_USER_NINTH_ID", linkedAtt);
+        }
     }
 
     // 是 否  属性联动
