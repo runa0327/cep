@@ -11,6 +11,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
@@ -137,5 +138,28 @@ public class ProFileUtils {
         map.put("size",length);
         map.put("name",fileName);
         return map;
+    }
+
+    /**
+     * 删除项目文件夹数据 + 资料管理文件
+     * @param myJdbcTemplate 数据源
+     * @param projectId 项目id
+     * @return 删除条数
+     */
+    public static Integer backUpFolder(MyJdbcTemplate myJdbcTemplate, String projectId) {
+        int sum = 0;
+        String sql1 = "select id from PF_FOLDER where PM_PRJ_ID = ?";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectId);
+        if (!CollectionUtils.isEmpty(list1)){
+            for (Map<String, Object> tmp : list1) {
+                String id = JdbcMapUtil.getString(tmp,"id");
+                String sql2 = "delete from PF_FILE where PF_FOLDER_ID = ?";
+                myJdbcTemplate.update(sql2,id);
+                sum++;
+            }
+        }
+        String sql = "delete from PF_FOLDER where PM_PRJ_ID = ?";
+        sum = sum + myJdbcTemplate.update(sql,projectId);
+        return sum;
     }
 }

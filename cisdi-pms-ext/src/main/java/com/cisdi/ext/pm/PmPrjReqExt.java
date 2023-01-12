@@ -97,6 +97,7 @@ public class PmPrjReqExt {
                 .set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID")).set("PRJ_CODE", pm_prj_req.get("PRJ_CODE"))
                 .set("BUILDING_AREA", pm_prj_req.get("CON_SCALE_QTY")).set("QTY_ONE",pm_prj_req.get("QTY_ONE"))
                 .set("QTY_TWO",pm_prj_req.get("QTY_TWO")).set("QTY_THREE",pm_prj_req.get("QTY_THREE"))
+                .set("PROJECT_SOURCE_TYPE_ID","0099952822476441374")
                 .exec();
         log.info("已更新：{}", exec);
 
@@ -425,9 +426,14 @@ public class PmPrjReqExt {
         //流程id
         String id = entityRecord.csCommId;
         //查询名称是否存在
-        String sql1 = "select name from PM_PRJ_REQ where PRJ_NAME = ? and id != ?";
+        String sql1 = "select name from PM_PRJ_REQ where PRJ_NAME = ? and id != ? ";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectName,id);
         if (!CollectionUtils.isEmpty(list1)){
+            throw new BaseException("项目名称不能重复，请重新输入项目名称！");
+        }
+        String sql2 = "select name from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'";
+        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,projectName);
+        if (!CollectionUtils.isEmpty(list2)){
             throw new BaseException("项目名称不能重复，请重新输入项目名称！");
         }
     }
@@ -542,6 +548,81 @@ public class PmPrjReqExt {
         }
         prjId = projectId.substring(0,projectId.length()-1);
         return prjId;
+    }
+
+
+    /**
+     * 立项申请-回滚创建项目、创建进度计划、创建投资测算（立项匡算）、创建项目资料库等
+     */
+    public void backUpCreatePrj(){
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            backUpPrjData(entityRecord);
+        }
+    }
+
+    // 回滚立项创建的数据
+    private void backUpPrjData(EntityRecord entityRecord) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //立项申请表id
+        String csCommId = entityRecord.csCommId;
+        //获取项目名称
+        String projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PRJ_NAME");
+        //获取项目id
+        String sql1 = "select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectName);
+        if (!CollectionUtils.isEmpty(list1)){
+            String projectId = JdbcMapUtil.getString(list1.get(0),"id");
+
+            //关闭外键校验
+            String close = "SET FOREIGN_KEY_CHECKS=0;";
+            int exec = myJdbcTemplate.update(close);
+            log.info("关闭外键 已更新：{}", exec);
+
+            //清空立项申请中的项目id
+            Integer exec1 = Crud.from("pm_prj_req").where().eq("ID", csCommId).update().set("pm_prj_id", null).exec();
+            log.info("清空立项申请中的项目id 已更新：{}", exec1);
+
+            //清空项目投资测算
+            exec1 = WfPmInvestUtil.backPrjData(csCommId,"PM_PRJ_REQ",projectId,myJdbcTemplate);
+            log.info("清空项目投资测算 已更新：{}", exec1);
+
+            //清空项目进度计划网络图
+            exec1 = backUpPrjPlan(projectId,myJdbcTemplate);
+            log.info("清空项目进度计划网络图 已更新：{}", exec1);
+
+            //删除项目文件夹数据 + 资料管理文件
+            exec1 = ProFileUtils.backUpFolder(myJdbcTemplate,projectId);
+            log.info("删除项目文件夹数据 已更新：{}", exec1);
+
+            //删除项目表该项目数据
+            exec1 = myJdbcTemplate.update("delete from pm_prj where id = ?",projectId);
+            log.info("清空项目表中的项目id 已更新：{}", exec1);
+
+            //关闭外键校验
+            String start = "SET FOREIGN_KEY_CHECKS=1;";
+            exec = myJdbcTemplate.update(start);
+            log.info("开启外键 已更新：{}", exec);
+        }
+    }
+
+    // 清空项目进度计划网络图
+    private int backUpPrjPlan(String projectId,MyJdbcTemplate myJdbcTemplate) {
+        int sum = 0;
+        //查询项目进度计划
+        String sql1 = "select id from PM_PRO_PLAN where PM_PRJ_ID = ?";
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql1, projectId);
+        if (!CollectionUtils.isEmpty(list)){
+            for (Map<String, Object> tmp : list) {
+                String id = JdbcMapUtil.getString(tmp,"id");
+                //删除项目进度节点id
+                String sql2 = "delete from PM_PRO_PLAN_NODE where PM_PRO_PLAN_ID = ?";
+                myJdbcTemplate.update(sql2,id);
+                sum++;
+            }
+        }
+        sum = sum + myJdbcTemplate.update("delete from PM_PRO_PLAN where PM_PRJ_ID = ?",projectId);
+        return sum;
     }
 }
 

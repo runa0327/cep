@@ -4,11 +4,15 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.util.JdbcMapUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class WfPmInvestUtil {
 
     public static void calculateData(String csCommId, String entCode, String pmPrjId) {
@@ -110,6 +114,31 @@ public class WfPmInvestUtil {
             dtlList.add(dtl);
             getChildren(m, allData, dataMap, newInvestEtsId, dtlList, id);
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 回滚项目投资测算
+     * @param csCommId 流程记录id
+     * @param entCode 表名
+     * @param projectId 项目id
+     */
+    public static int backPrjData(String csCommId, String entCode, String projectId,MyJdbcTemplate myJdbcTemplate) {
+        int sum = 0;
+        // 查询项目投资测算明细
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select t.*,pet.code as PM_EXP_TYPE from PM_INVEST_EST_DTL t " +
+                "left join PM_INVEST_EST a on t.PM_INVEST_EST_ID = a.id " +
+                "left join PM_EXP_TYPE pet on pet.id = t.PM_EXP_TYPE_ID " +
+                "left join gr_set_value gsv on gsv.id = a.INVEST_EST_TYPE_ID " +
+                "left join gr_set gr on gr.id = gsv.GR_SET_ID and gr.`CODE`='invest_est_type' " +
+                "where a.PM_PRJ_ID=? and gsv.`code`= 'invest0'", projectId);
+        if (!CollectionUtils.isEmpty(list)){
+            for (Map<String, Object> tmp : list) {
+                String id = JdbcMapUtil.getString(list.get(0),"id");
+                myJdbcTemplate.update("delete from PM_INVEST_EST_DTL where id = ?",id);
+                sum++;
+            }
+        }
+        return sum;
     }
 
     public static class pmInvestEstDtl {
