@@ -3,6 +3,7 @@ package com.cisdi.pms.job.excel.imports;
 import com.cisdi.pms.job.excel.model.FundReachExportModel;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
 import com.cisdi.pms.job.utils.ReflectUtil;
+import com.cisdi.pms.job.utils.StringUtils;
 import com.cisdi.pms.job.utils.Util;
 import com.google.common.base.Strings;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -16,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -33,18 +36,20 @@ public class FundReachImportController {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    private static String REGEX_CHINESE = "[\u4e00-\u9fa5]";
+
     @SneakyThrows(IOException.class)
     @RequestMapping("/import")
     public Map<String, Object> importData(MultipartFile file) {
         Map<String, Object> result = new HashMap<>();
         List<FundReachExportModel> list = EasyExcelUtil.read(file.getInputStream(), FundReachExportModel.class);
 
-        List<FundReachExportModel> reachList = list.stream().filter(p-> !ReflectUtil.isObjectNull(p)).collect(Collectors.toList());
+        List<FundReachExportModel> reachList = list.stream().filter(p -> !ReflectUtil.isObjectNull(p)).collect(Collectors.toList());
         //如果有不能处理的字段，响应提示
         List<String> res = new ArrayList<>();
         List<Map<String, Object>> prjList = jdbcTemplate.queryForList("select id,name from pm_prj where status = 'AP'");
 
-        for (int i = reachList.size() - 1; i >= 0; i--){//保证列表显示顺序和表格顺序一致
+        for (int i = reachList.size() - 1; i >= 0; i--) {//保证列表显示顺序和表格顺序一致
             List<String> singleRes = this.insertReach(reachList.get(i), prjList);
             if (!CollectionUtils.isEmpty(singleRes)) {
                 res.addAll(singleRes);
@@ -114,9 +119,14 @@ public class FundReachImportController {
             }
         }
 
+        String reachTimes=null;
+        if(!Strings.isNullOrEmpty(reachData.getCount())){
+            reachTimes = this.subHz(reachData.getCount());
+        }
+
         //更新插入的到位空数据
         jdbcTemplate.update("update FUND_REACH set FUND_SOURCE_TEXT = ?,PM_PRJ_ID = ?,REACH_TIMES = ?,FUND_REACH_CATEGORY = ?,REACH_AMOUNT = ?,REACH_DATE = ?,PAYEE = ?,RECEIVING_BANK_ID = ?,RECEIPT_ACCOUNT = ?,REMARK = ? where id = ?",
-                reachData.getSourceName(), prjId, reachData.getCount(), fundReachType, reachData.getDwAmt(), reachData.getDwDate(), payee, bank, account, reachData.getRemark(), id);
+                reachData.getSourceName(), prjId, reachTimes, fundReachType, reachData.getDwAmt(), reachData.getDwDate(), payee, bank, account, reachData.getRemark(), id);
         return res;
     }
 
@@ -133,5 +143,9 @@ public class FundReachImportController {
             return null;
         }
         return JdbcMapUtil.getString(list.get(0), key);
+    }
+
+    private String subHz(String param) {
+        return param.replaceAll(REGEX_CHINESE, "");
     }
 }
