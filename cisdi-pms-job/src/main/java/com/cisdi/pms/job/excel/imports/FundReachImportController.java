@@ -66,9 +66,7 @@ public class FundReachImportController extends BaseController {
             return result;
         } else {
             super.exportTxt(response, res,"资金到位导入日志");
-            result.put("code", 500);
-            result.put("message", "部分数据导入失败！失败条数：" + res.size());
-            return result;
+            return null;
         }
     }
 
