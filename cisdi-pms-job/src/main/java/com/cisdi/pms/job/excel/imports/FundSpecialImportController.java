@@ -45,17 +45,39 @@ public class FundSpecialImportController {
         for (FundSpecialModel fundSpecialModel : dataList) {
             Optional<Map<String, Object>> optional = proList.stream().filter(p -> fundSpecialModel.getProjectName().equals(String.valueOf(p.get("NAME")))).findAny();
             if (optional.isPresent()) {
+                //付款单位
                 String unit = null;
                 Optional<Map<String, Object>> unitOptional = unitList.stream().filter(m -> Objects.equals(fundSpecialModel.getPayUnit(), m.get("NAME"))).findAny();
                 if (unitOptional.isPresent()) {
                     unit = String.valueOf(unitOptional.get().get("ID"));
                 }
+                //付款银行
+                String bank = null;
+                Optional<Map<String, Object>> bankOptional = unitList.stream().filter(m -> Objects.equals(fundSpecialModel.getPayBank(), m.get("NAME"))).findAny();
+                if (bankOptional.isPresent()) {
+                    bank = String.valueOf(bankOptional.get().get("ID"));
+                }
+                //付款账户
+                String account=null;
+                Optional<Map<String, Object>> accountOptional = unitList.stream().filter(m -> Objects.equals(fundSpecialModel.getPayBank(), m.get("NAME"))).findAny();
+                if (accountOptional.isPresent()) {
+                    account = String.valueOf(accountOptional.get().get("ID"));
+                }
+
                 String fundImplementationId = null;
                 List<Map<String, Object>> detilList = jdbcTemplate.queryForList("select fid.* from FUND_IMPLEMENTATION_DETAIL fid \n" +
                         "left join FUND_IMPLEMENTATION fi on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
                         "where fid.PM_PRJ_ID =? and fi.FUND_SOURCE_TEXT = ?", optional.get().get("ID"), fundSpecialModel.getSourceName());
                 if (!CollectionUtils.isEmpty(detilList)) {
                     fundImplementationId = String.valueOf(detilList.get(0).get("ID"));
+                }
+
+                String statusId = null;
+                if(fundSpecialModel.getStatus() !=null){
+                    List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from ad_status where `name` =?", fundSpecialModel.getStatus());
+                    if(!CollectionUtils.isEmpty(list)){
+                        statusId = String.valueOf(list.get(0).get("ID"));
+                    }
                 }
 
                 String id = Util.insertData(jdbcTemplate, "FUND_SPECIAL");
@@ -66,8 +88,8 @@ public class FundSpecialImportController {
                                 "PAYABLE_AMT=?,PAID_AMT=?,UNPAD_AMT=?,PAYEE=?,GUARANTEE_STATES=?,APPROVAL_STATUS=?,FUND_IMPLEMENTATION_V_ID=?,FUND_PAY_CODE=? where ID=?",
                         optional.get().get("ID"), fundSpecialModel.getApprovedAmount(), fundSpecialModel.getLjdwAmt(), fundSpecialModel.getPayAmt(), fundSpecialModel.getWdwAmt(),
                         fundSpecialModel.getJsAmt(), fundSpecialModel.getZcAmt(), fundSpecialModel.getSyAmt(), null, fundSpecialModel.getPeriods(), fundSpecialModel.getFeeName(),
-                        unit, fundSpecialModel.getPayBank(), fundSpecialModel.getPayAccount(), fundSpecialModel.getPayDate(), fundSpecialModel.getYfAmt(),
-                        fundSpecialModel.getHasPayAmt(), 0, fundSpecialModel.getSkUnit(), fundSpecialModel.getBhqk(), fundSpecialModel.getStatus(), fundImplementationId, payCode, id);
+                        unit, bank, account, fundSpecialModel.getPayDate(), fundSpecialModel.getYfAmt(),
+                        fundSpecialModel.getHasPayAmt(), 0, fundSpecialModel.getSkUnit(), fundSpecialModel.getBhqk(), statusId, fundImplementationId, payCode, id);
 
             } else {
                 res.add(fundSpecialModel.getProjectName());

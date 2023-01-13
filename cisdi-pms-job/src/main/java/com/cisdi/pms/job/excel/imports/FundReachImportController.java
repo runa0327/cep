@@ -2,6 +2,7 @@ package com.cisdi.pms.job.excel.imports;
 
 import com.cisdi.pms.job.excel.model.FundReachExportModel;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
+import com.cisdi.pms.job.utils.ReflectUtil;
 import com.cisdi.pms.job.utils.Util;
 import com.google.common.base.Strings;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author 尹涛 * @version V1.0.0
@@ -35,8 +37,9 @@ public class FundReachImportController {
     @RequestMapping("/import")
     public Map<String, Object> importData(MultipartFile file) {
         Map<String, Object> result = new HashMap<>();
-        List<FundReachExportModel> reachList = EasyExcelUtil.read(file.getInputStream(), FundReachExportModel.class);
+        List<FundReachExportModel> list = EasyExcelUtil.read(file.getInputStream(), FundReachExportModel.class);
 
+        List<FundReachExportModel> reachList = list.stream().filter(p-> !ReflectUtil.isObjectNull(p)).collect(Collectors.toList());
         //如果有不能处理的字段，响应提示
         List<String> res = new ArrayList<>();
         List<Map<String, Object>> prjList = jdbcTemplate.queryForList("select id,name from pm_prj where status = 'AP'");
@@ -83,7 +86,7 @@ public class FundReachImportController {
         if ("征拆资金".equals(typeName)) {
             typeName = "征迁资金";
         }
-        List<Map<String, Object>> fundReachTypeList = jdbcTemplate.queryForList("select va.id from gr_set_value va left join gr_set se on se.id = va.GR_SET_ID where va.name = ?", typeName);
+        List<Map<String, Object>> fundReachTypeList = jdbcTemplate.queryForList("select id from fund_type where `name`=?", typeName);
         String fundReachType = this.getStringFromList(fundReachTypeList, "id");
         //收款单位
         List<Map<String, Object>> unitList = jdbcTemplate.queryForList("select id from receiving_bank where level = 1 and name = ?", reachData.getUnit());

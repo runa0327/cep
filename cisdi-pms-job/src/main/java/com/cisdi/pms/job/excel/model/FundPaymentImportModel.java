@@ -15,6 +15,10 @@ import lombok.Data;
 @Data
 public class FundPaymentImportModel {
 
+    @ExcelProperty("序号")
+    @ColumnWidth(value = 30)
+    private String serialNumber;
+
     @ExcelProperty("资金大类")
     @ColumnWidth(value = 30)
     private String fundCategoryFirst;
@@ -60,6 +64,14 @@ public class FundPaymentImportModel {
     @ExcelProperty("收款单位")
     @ColumnWidth(value = 30)
     private String payee;
+
+    @ExcelProperty("支付银行")
+    @ColumnWidth(value = 30)
+    private String payBank;
+
+    @ExcelProperty("支付账户")
+    @ColumnWidth(value = 30)
+    private String payAccount;
 
     @ExcelProperty("收款银行")
     @ColumnWidth(value = 30)

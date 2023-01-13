@@ -2,6 +2,7 @@ package com.cisdi.pms.job.excel.imports;
 
 import com.cisdi.pms.job.excel.model.FundImplementationExportModel;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
+import com.cisdi.pms.job.utils.ReflectUtil;
 import com.cisdi.pms.job.utils.Util;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,10 @@ public class FundImplementationImportController {
         System.out.println("进入导入，导入开始！");
         Map<String, Object> result = new HashMap<>();
         List<String> res = new ArrayList<>();
-        List<FundImplementationExportModel> dataList = EasyExcelUtil.read(file.getInputStream(), FundImplementationExportModel.class);
+        List<FundImplementationExportModel> list = EasyExcelUtil.read(file.getInputStream(), FundImplementationExportModel.class);
+
+        List<FundImplementationExportModel> dataList =  list.stream().filter(p-> !ReflectUtil.isObjectNull(p)).collect(Collectors.toList());
+
         Map<String, List<FundImplementationExportModel>> data = dataList.stream().collect(Collectors.groupingBy(FundImplementationExportModel::getSourceName));
 
         //检查和已有资金来源是否重复，并去重
@@ -77,7 +81,7 @@ public class FundImplementationImportController {
 
     private List<String> importData(List<FundImplementationExportModel> modelList) {
         List<String> res = new ArrayList<>();
-        String typeName = modelList.get(0).getCategoryName();
+        String typeName = modelList.get(0).getCategoryName().toLowerCase();
         List<Map<String, Object>> typeList = jdbcTemplate.queryForList("select * from fund_type where `name`=?", typeName);
         String typeId = "";
         if (CollectionUtils.isEmpty(typeList)) {

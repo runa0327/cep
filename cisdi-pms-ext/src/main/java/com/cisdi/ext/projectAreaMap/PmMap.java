@@ -148,9 +148,9 @@ public class PmMap {
 
         List<Map<String, Object>> list3 = list.stream().filter(p -> !"民用建筑".equals(JdbcMapUtil.getString(p, "projectType")) && !"市政道路".equals(JdbcMapUtil.getString(p, "projectType"))).collect(Collectors.toList());
         ProjectBigScreen bigScreen3 = new ProjectBigScreen();
-        bigScreen3.projectType ="";
-        bigScreen.count = list3.size();
-        bigScreen.area = list3.stream().map(p -> new BigDecimal(JdbcMapUtil.getString(p, "area"))).reduce(BigDecimal.ZERO, BigDecimal::add);
+        bigScreen3.projectType ="其他项目";
+        bigScreen3.count = list3.size();
+        bigScreen3.area = list3.stream().map(p -> new BigDecimal(JdbcMapUtil.getString(p, "area"))).reduce(BigDecimal.ZERO, BigDecimal::add);
         resList.add(bigScreen3);
 
         OutSide outSide = new OutSide();
