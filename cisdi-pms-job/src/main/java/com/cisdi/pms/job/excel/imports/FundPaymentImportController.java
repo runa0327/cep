@@ -1,5 +1,6 @@
 package com.cisdi.pms.job.excel.imports;
 
+import com.cisdi.pms.job.excel.export.BaseController;
 import com.cisdi.pms.job.excel.model.FundPaymentImportModel;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
 import com.cisdi.pms.job.utils.ReflectUtil;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,7 +28,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/paymentImport")
-public class FundPaymentImportController {
+public class FundPaymentImportController extends BaseController {
 
     private JdbcTemplate jdbcTemplate;
 
@@ -37,7 +39,7 @@ public class FundPaymentImportController {
 
     @SneakyThrows(IOException.class)
     @RequestMapping(value = "/import")
-    public Map<String, Object> importData(MultipartFile file) {
+    public Map<String, Object> importData(MultipartFile file, HttpServletResponse response) {
         // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
         // 这里每次会读取100条数据 然后返回过来 直接调用使用数据就行
         List<FundPaymentImportModel> reads = EasyExcelUtil.read(file.getInputStream(), FundPaymentImportModel.class);
@@ -57,75 +59,10 @@ public class FundPaymentImportController {
             result.put("message", "导入成功！");
             return result;
         } else {
-            result.put("code", 500);
-            result.put("message", "项目名称为:" + String.join(",", res) + "不存在，未导入！");
-            return result;
+            super.exportTxt(response, res, "资金支付明细导入日志");
+            return null;
         }
     }
-
-//    private void importData(FundPaymentImportModel modelList) {
-//
-//        //查询项目名称
-//        List<Map<String, Object>> proId = jdbcTemplate.queryForList("select id from pm_prj where name = ?", modelList.getPmPrjId());
-//
-//        //查询付款单位
-//        List<Map<String, Object>> payId = jdbcTemplate.queryForList("select id from receiving_bank where name = ?", modelList.getPayUnit());
-//
-//        //费用大类
-//        List<Map<String, Object>> costId = jdbcTemplate.queryForList("select ID from GR_SET_VALUE where NAME=?", modelList.getReceiptAccount());
-//
-//        if (costId.size() <= 0) {
-//            HashMap<String, Object> map = new HashMap<>();
-//            map.put("ID", null);
-//            costId.add(0, map);
-//        }
-//
-//        //没有付款单位
-//        if (payId.size() <= 0 || proId.size() <= 0) {
-//            return;
-//        }
-//
-//        //资金来源id
-//        List<Map<String, Object>> sourceFundId = jdbcTemplate.queryForList("select fid.ID from fund_implementation fi left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id where fid.PM_PRJ_ID=?", proId.get(0).get("ID"));
-//
-//        //资金大类
-//        List<Map<String, Object>> sourceTypeId = jdbcTemplate.queryForList("SELECT ID FROM FUND_TYPE T WHERE T.FUND_TYPE_PID IS NULL and NAME=?", modelList.getFundCategoryFirst());
-//
-//
-//        List<Map<String, Object>> list = jdbcTemplate.queryForList("select id from receiving_bank where name = ?", modelList.getReceiptBank());
-//        String backId = null;
-//        if (!CollectionUtils.isEmpty(list)) {
-//            backId = String.valueOf(list.get(0).get("ID"));
-//        }
-//
-//        List<Map<String, Object>> acclist = jdbcTemplate.queryForList("select id from receiving_bank where name = ?", modelList.getReceiptAccount());
-//        String accId = null;
-//        if (!CollectionUtils.isEmpty(acclist)) {
-//            accId = String.valueOf(acclist.get(0).get("ID"));
-//        }
-//
-//
-//        if (sourceFundId.size() <= 0 || sourceTypeId.size() <= 0) {
-//            return;
-//        }
-//
-//        //资金支付明细
-//        String fundNewlyIncreasedDetailId = Util.insertData(jdbcTemplate, "fund_newly_increased_detail");
-//
-//        //资金支付信息明细
-//        String fundPayInfoId = Util.insertData(jdbcTemplate, "fund_pay_info");
-//
-//        jdbcTemplate.update(
-//                "update fund_pay_info set FUND_REACH_CATEGORY = ?,COST_CATEGORY_ID = ?,FEE_DETAIL = ? ,PAY_AMT = ?,PAY_UNIT = ?,RECEIPT_BANK = ?,RECEIPT_ACCOUNT = ?,PAYEE = ?,RECEIVE_BANK = ?,RECEIVE_ACCOUNT = ?,FUND_NEWLY_INCREASED_DETAIL_ID=? where ID = ?",
-//                modelList.getFundReachCategory(), costId.get(0).get("ID"), modelList.getFeeDetail(), modelList.getPayAmt().replace(",", ""), payId.get(0).get("id"), null, null, modelList.getPayee(), backId, accId, fundNewlyIncreasedDetailId,
-//                fundPayInfoId);
-//
-//        jdbcTemplate.update(
-//                "update fund_newly_increased_detail set REMARK=?,ACCOUNT_SET=?,PM_PRJ_ID=?,CUSTOMER_UNIT=?,VOUCHER_NUM=?,FUND_IMPLEMENTATION_V_ID=?,FUND_CATEGORY_FIRST=? where ID=?",
-//                modelList.getRemarke(), modelList.getAccountSet(), proId.get(0).get("id"), modelList.getCustomerUnit(), modelList.getVoucherNum(), sourceFundId.get(0).get("ID").toString(), sourceTypeId.get(0).get("ID"),
-//                fundNewlyIncreasedDetailId);
-//
-//    }
 
 
     private List<String> importData(FundPaymentImportModel model, List<Map<String, Object>> bankList) {
@@ -136,43 +73,42 @@ public class FundPaymentImportController {
                 "left join fund_implementation fi on fr.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
                 "where pj.`NAME`=? and fr.FUND_SOURCE_TEXT=? ", model.getPmPrjId(), model.getFundImplementationVId());
         if (CollectionUtils.isEmpty(list)) {
-            res.add(model.getSerialNumber());
+            res.add("序号为：" + model.getSerialNumber());
         } else {
             //付款单位
             String payUnit = null;
-            if(model.getPayUnit()!=null){
-                Optional<Map<String,Object>> optional = bankList.stream().filter(p-> JdbcMapUtil.getString(p,"Name").equals(model.getPayUnit())).findAny();
-                if(optional.isPresent()){
+            if (model.getPayUnit() != null) {
+                Optional<Map<String, Object>> optional = bankList.stream().filter(p -> JdbcMapUtil.getString(p, "Name").equals(model.getPayUnit())).findAny();
+                if (optional.isPresent()) {
                     payUnit = String.valueOf(optional.get().get("ID"));
                 }
             }
 
             String payBank = null;
-            if(model.getPayBank() !=null){
-                Optional<Map<String,Object>> bankOptional = bankList.stream().filter(p-> JdbcMapUtil.getString(p,"Name").equals(model.getPayBank())).findAny();
-                if(bankOptional.isPresent()){
+            if (model.getPayBank() != null) {
+                Optional<Map<String, Object>> bankOptional = bankList.stream().filter(p -> JdbcMapUtil.getString(p, "Name").equals(model.getPayBank())).findAny();
+                if (bankOptional.isPresent()) {
                     payBank = String.valueOf(bankOptional.get().get("ID"));
                 }
             }
 
 
-            String payAccount=null;
-            if(model.getPayAccount() !=null){
-                Optional<Map<String,Object>> accountOptional = bankList.stream().filter(p-> JdbcMapUtil.getString(p,"Name").equals(model.getPayAccount())).findAny();
-                if(accountOptional.isPresent()){
+            String payAccount = null;
+            if (model.getPayAccount() != null) {
+                Optional<Map<String, Object>> accountOptional = bankList.stream().filter(p -> JdbcMapUtil.getString(p, "Name").equals(model.getPayAccount())).findAny();
+                if (accountOptional.isPresent()) {
                     payAccount = String.valueOf(accountOptional.get().get("ID"));
                 }
             }
 
 
             String costCategoryId = null;
-            if(model.getCostCategoryId() !=null){
+            if (model.getCostCategoryId() != null) {
                 List<Map<String, Object>> costList = jdbcTemplate.queryForList("select * from gr_set_value where `NAME`=''", model.getCostCategoryId());
-                if(!CollectionUtils.isEmpty(costList)){
+                if (!CollectionUtils.isEmpty(costList)) {
                     costCategoryId = String.valueOf(costList.get(0).get("ID"));
                 }
             }
-
 
 
             String fundPayInfoId = Util.insertData(jdbcTemplate, "fund_pay_info");
@@ -203,9 +139,11 @@ public class FundPaymentImportController {
                             "CUSTOMER_UNIT=?," +
                             "VOUCHER_NUM=?," +
                             "FUND_IMPLEMENTATION_V_ID=?," +
-                            "FUND_CATEGORY_FIRST=? where ID=?",
+                            "FUND_CATEGORY_FIRST=?," +
+                            "NPER=? where ID=?",
                     model.getRemarke(), model.getAccountSet(), list.get(0).get("PM_PRJ_ID"),
-                    model.getCustomerUnit(), model.getVoucherNum(), list.get(0).get("FUND_IMPLEMENTATION_V_ID"), list.get(0).get("FUND_CATEGORY_FIRST"),
+                    model.getCustomerUnit(), model.getVoucherNum(), list.get(0).get("FUND_IMPLEMENTATION_V_ID"),
+                    list.get(0).get("FUND_CATEGORY_FIRST"), model.getNper(),
                     fundNewlyIncreasedDetailId);
         }
         return res;

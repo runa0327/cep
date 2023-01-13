@@ -57,7 +57,7 @@ public class PdfFileJob {
      */
 //    @Scheduled(fixedDelayString = "3000")
 //    @Scheduled(cron = "0/10 * * * * ?")
-    @Scheduled(cron = "00 15 10 ? * *")
+//    @Scheduled(cron = "00 15 10 ? * *")
     @Async("taskExecutor")
     public void wordToPdf(){
         //合同签订中需要转pdf的文件信息

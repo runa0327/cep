@@ -1,6 +1,10 @@
 package com.cisdi.pms.job.excel.imports;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.support.ExcelTypeEnum;
+import com.cisdi.pms.job.excel.export.BaseController;
 import com.cisdi.pms.job.excel.model.FundImplementationExportModel;
+import com.cisdi.pms.job.excel.model.FundReachExportModel;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
 import com.cisdi.pms.job.utils.ReflectUtil;
 import com.cisdi.pms.job.utils.Util;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,7 +33,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("implementation")
-public class FundImplementationImportController {
+public class FundImplementationImportController extends BaseController {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -40,13 +45,13 @@ public class FundImplementationImportController {
 
     @SneakyThrows(IOException.class)
     @PostMapping(value = "/import")
-    public Map<String, Object> importData(MultipartFile file) {
+    public Map<String, Object> importData(MultipartFile file, HttpServletResponse response) {
         System.out.println("进入导入，导入开始！");
         Map<String, Object> result = new HashMap<>();
         List<String> res = new ArrayList<>();
         List<FundImplementationExportModel> list = EasyExcelUtil.read(file.getInputStream(), FundImplementationExportModel.class);
 
-        List<FundImplementationExportModel> dataList =  list.stream().filter(p-> !ReflectUtil.isObjectNull(p)).collect(Collectors.toList());
+        List<FundImplementationExportModel> dataList = list.stream().filter(p -> !ReflectUtil.isObjectNull(p)).collect(Collectors.toList());
 
         Map<String, List<FundImplementationExportModel>> data = dataList.stream().collect(Collectors.groupingBy(FundImplementationExportModel::getSourceName));
 
@@ -54,7 +59,7 @@ public class FundImplementationImportController {
         Map<String, Set<String>> duplicateMap = this.checkDuplicate(data.keySet());
         Set<String> duplicatedSources = duplicateMap.get("duplicatedSources");
         Set<String> keySet = duplicateMap.get("keySet");
-        if (!CollectionUtils.isEmpty(keySet)){
+        if (!CollectionUtils.isEmpty(keySet)) {
             for (String key : keySet) {
                 // 这里就是你处理代码保存的逻辑了
                 res = this.importData(data.get(key));
@@ -64,18 +69,15 @@ public class FundImplementationImportController {
         if (CollectionUtils.isEmpty(res) && CollectionUtils.isEmpty(duplicatedSources)) {
             result.put("code", 200);
             result.put("message", "导入成功！");
+            return result;
         } else {
-            result.put("code", 500);
-            String message = "";
-            if (!CollectionUtils.isEmpty(res)){
-                message += "项目名称为:" + String.join(",", res) + "不存在，未导入！";
+            for (String duplicatedSource : duplicatedSources) {
+                String msg = "资金来源为:" + duplicatedSource + "重复，未导入！";
+                res.add(msg);
             }
-            if (!CollectionUtils.isEmpty(duplicatedSources)){
-                message += "资金来源为:" + String.join(",", duplicatedSources) + "重复，未导入！";
-            }
-            result.put("message", message);
+            super.exportTxt(response, res,"资金批复导入日志");
+            return null;
         }
-        return result;
     }
 
 
@@ -103,7 +105,7 @@ public class FundImplementationImportController {
                 String detailId = Util.insertData(jdbcTemplate, "fund_implementation_detail");
                 jdbcTemplate.update("update fund_implementation_detail set FUND_IMPLEMENTATION_ID=?,PM_PRJ_ID=?,APPROVED_AMOUNT=? where ID=?", id, pro.get("ID"), model.getApprovedAmount(), detailId);
             } else {
-                res.add(model.getProjectName());
+                res.add("项目名称为:" + model.getProjectName() + "不存在，未导入！");
             }
         }
         return res;
@@ -112,20 +114,21 @@ public class FundImplementationImportController {
 
     /**
      * 检查和已有资金来源是否重复，并去重
+     *
      * @param keySet 待导入的资金来源名称
      */
-    private Map<String,Set<String>> checkDuplicate(Set<String> keySet){
-        Map<String,Set<String>> result = new HashMap<>();
+    private Map<String, Set<String>> checkDuplicate(Set<String> keySet) {
+        Map<String, Set<String>> result = new HashMap<>();
         List<Map<String, Object>> existedSource = jdbcTemplate.queryForList("select FUND_SOURCE_TEXT from fund_implementation");
-        if (!CollectionUtils.isEmpty(keySet) && !CollectionUtils.isEmpty(existedSource)){
+        if (!CollectionUtils.isEmpty(keySet) && !CollectionUtils.isEmpty(existedSource)) {
             Set<String> duplicatedSources = existedSource.stream()
                     .map(sourceMap -> String.valueOf(sourceMap.get("FUND_SOURCE_TEXT")))
                     .filter(sourceName -> keySet.contains(sourceName))
                     .collect(Collectors.toSet());
             keySet.removeAll(duplicatedSources);
-            result.put("duplicatedSources",duplicatedSources);
+            result.put("duplicatedSources", duplicatedSources);
         }
-        result.put("keySet",keySet);
+        result.put("keySet", keySet);
         return result;
     }
 }

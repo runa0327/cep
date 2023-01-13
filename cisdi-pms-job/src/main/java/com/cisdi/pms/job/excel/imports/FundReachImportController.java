@@ -1,5 +1,8 @@
 package com.cisdi.pms.job.excel.imports;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.support.ExcelTypeEnum;
+import com.cisdi.pms.job.excel.export.BaseController;
 import com.cisdi.pms.job.excel.model.FundReachExportModel;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
 import com.cisdi.pms.job.utils.ReflectUtil;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -31,7 +35,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/reach")
-public class FundReachImportController {
+public class FundReachImportController extends BaseController {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -40,7 +44,7 @@ public class FundReachImportController {
 
     @SneakyThrows(IOException.class)
     @RequestMapping("/import")
-    public Map<String, Object> importData(MultipartFile file) {
+    public Map<String, Object> importData(MultipartFile file, HttpServletResponse response) {
         Map<String, Object> result = new HashMap<>();
         List<FundReachExportModel> list = EasyExcelUtil.read(file.getInputStream(), FundReachExportModel.class);
 
@@ -61,8 +65,9 @@ public class FundReachImportController {
             result.put("message", "导入成功！");
             return result;
         } else {
+            super.exportTxt(response, res,"资金到位导入日志");
             result.put("code", 500);
-            result.put("message", "项目名称为:" + String.join(",", res) + "不存在，未导入！");
+            result.put("message", "部分数据导入失败！失败条数：" + res.size());
             return result;
         }
     }
@@ -75,7 +80,7 @@ public class FundReachImportController {
         //项目 先判断项目没有对应项目直接返回
         Optional<Map<String, Object>> optional = prjList.stream().filter(p -> String.valueOf(p.get("name")).equals(reachData.getProjectName())).findAny();
         if (!optional.isPresent()) {
-            res.add(reachData.getProjectName());
+            res.add("项目名称为:" + reachData.getProjectName() + "不存在，未导入！");
             return res;
         }
         String prjId = String.valueOf(optional.get().get("id"));
@@ -113,8 +118,8 @@ public class FundReachImportController {
             }
         }
 
-        String reachTimes=null;
-        if(!Strings.isNullOrEmpty(reachData.getCount())){
+        String reachTimes = null;
+        if (!Strings.isNullOrEmpty(reachData.getCount())) {
             reachTimes = this.subHz(reachData.getCount());
         }
 

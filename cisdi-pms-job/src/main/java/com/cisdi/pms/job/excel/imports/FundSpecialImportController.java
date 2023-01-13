@@ -1,5 +1,6 @@
 package com.cisdi.pms.job.excel.imports;
 
+import com.cisdi.pms.job.excel.export.BaseController;
 import com.cisdi.pms.job.excel.model.FundSpecialModel;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
 import com.cisdi.pms.job.utils.Util;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -29,14 +31,14 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("fundSpecial")
-public class FundSpecialImportController {
+public class FundSpecialImportController extends BaseController {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @SneakyThrows(IOException.class)
     @PostMapping(value = "/import")
-    public Map<String, Object> importData(MultipartFile file) {
+    public Map<String, Object> importData(MultipartFile file, HttpServletResponse response) {
         Map<String, Object> result = new HashMap<>();
         List<String> res = new ArrayList<>();
         List<FundSpecialModel> dataList = EasyExcelUtil.read(file.getInputStream(), FundSpecialModel.class);
@@ -58,7 +60,7 @@ public class FundSpecialImportController {
                     bank = String.valueOf(bankOptional.get().get("ID"));
                 }
                 //付款账户
-                String account=null;
+                String account = null;
                 Optional<Map<String, Object>> accountOptional = unitList.stream().filter(m -> Objects.equals(fundSpecialModel.getPayBank(), m.get("NAME"))).findAny();
                 if (accountOptional.isPresent()) {
                     account = String.valueOf(accountOptional.get().get("ID"));
@@ -73,9 +75,9 @@ public class FundSpecialImportController {
                 }
 
                 String statusId = null;
-                if(fundSpecialModel.getStatus() !=null){
+                if (fundSpecialModel.getStatus() != null) {
                     List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from ad_status where `name` =?", fundSpecialModel.getStatus());
-                    if(!CollectionUtils.isEmpty(list)){
+                    if (!CollectionUtils.isEmpty(list)) {
                         statusId = String.valueOf(list.get(0).get("ID"));
                     }
                 }
@@ -92,7 +94,7 @@ public class FundSpecialImportController {
                         fundSpecialModel.getHasPayAmt(), 0, fundSpecialModel.getSkUnit(), fundSpecialModel.getBhqk(), statusId, fundImplementationId, payCode, id);
 
             } else {
-                res.add(fundSpecialModel.getProjectName());
+                res.add("项目名称为:" + fundSpecialModel.getProjectName() + "不存在，未导入！");
             }
         }
         if (CollectionUtils.isEmpty(res)) {
@@ -100,20 +102,19 @@ public class FundSpecialImportController {
             result.put("message", "导入成功！");
             return result;
         } else {
-            result.put("code", 500);
-            result.put("message", "项目名称为:" + String.join(",", res) + "不存在，未导入！");
-            return result;
+            super.exportTxt(response, res, "资金支付明细导入日志");
+            return null;
         }
     }
 
-    private String getPayCode(Date payDate){
+    private String getPayCode(Date payDate) {
         //支付明细码(FUND_PAY_CODE),文本（短）
         //查询相同日期专项资金支付条数
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(payDate);
-        calendar.add(Calendar.DATE,1);
+        calendar.add(Calendar.DATE, 1);
         Date endDate = calendar.getTime();
-        Map<String, Object> countToday = jdbcTemplate.queryForMap("select count(*) countToday from fund_special where PAY_DATE >= ? and PAY_DATE < ?",payDate,endDate);
+        Map<String, Object> countToday = jdbcTemplate.queryForMap("select count(*) countToday from fund_special where PAY_DATE >= ? and PAY_DATE < ?", payDate, endDate);
         DecimalFormat df = new DecimalFormat("0000");
         String suffixNum = df.format(JdbcMapUtil.getInt(countToday, "countToday") + 1);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
