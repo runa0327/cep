@@ -1,0 +1,55 @@
+server:
+  port: 11138
+  servlet:
+    context-path: /cisdi-pms-api-v1
+
+spring:
+  # 设置时区，以北京时间显示报错信息的时间（等）：
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null
+  application:
+    name: cisdi-pms-external-interface
+#  cloud:
+#    nacos:
+#      discovery:
+#        server-addr: 10.130.19.98:8848
+  datasource:
+    # 测试：
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://121.5.65.165:3306/test?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    username: qygly
+    password: Qygly@123456
+
+flylog:
+  log_sent_mode: thrift
+  flume_agent: 10.100.7.219:4143
+  platform: gcxmxtxxxt
+  application: web
+  flume_batch_size: 1
+  sink_batch_size: 1
+  enabled: true
+  ignore:
+    static:
+      res: css,html,js,jpg,png,bmp,faicon,gif,ico,woff,otf,svg,ttf,woff2,eot,json
+  flume_data_path: E:/iflytek/dir/web
+
+
+logging:
+  #  config: classpath:/log4j-info.xml
+  level:
+    root: info
+    com.itcodai.course03.dao: trace
+
+# forest设置
+forest:
+  backend: httpclient
+  ## 日志总开关，打开/关闭Forest请求/响应日志（默认为 true）
+  log-enabled: true
+  ## 打开/关闭Forest请求日志（默认为 true）
+  log-request: true
+  ## 打开/关闭Forest响应状态日志（默认为 true）
+  log-response-status: true
+  ## 打开/关闭Forest响应内容日志（默认为 false）
+  log-response-content: true
