@@ -39,10 +39,10 @@ public class ContractAccountController extends BaseController{
         String loginUserId = this.getLoginUser(request.getHeader("qygly-session-id"));
         List<String> rootUsers = this.getRootUsers();
         StringBuffer sb = new StringBuffer();
-        sb.append("SELECT IFNULL(o.PM_PRJ_ID,p2.id) prjId,IFNULL(p.name,o.PROJECT_NAME_WR) prjName,o.CONTRACT_NAME contractName,o.CUSTOMER_UNIT_ONE" +
-                " contractCompanyId,pa.name contractCompanyName,o.WIN_BID_UNIT_ONE cooperationUnit,o.CONTRACT_CATEGORY_ONE_ID contractCategoryId,va" +
-                ".name contractCategoryName,o.AMT_THREE amtExcludeTax,o.AMT_FOUR taxRate,o.AMT_TWO amtIncludeTax,o.SIGN_DATE createTime,i.END_DATETIME" +
-                " endTime,o.REMARK_LONG_ONE remark,o.CRT_USER_ID userId,u.name userName,o.FILE_ID_FIVE fileIds\n" +
+        sb.append("SELECT o.id,IFNULL(o.PM_PRJ_ID,p2.id) prjId,IFNULL(p.name,o.PROJECT_NAME_WR) prjName,o.CONTRACT_NAME contractName,o" +
+                ".CUSTOMER_UNIT_ONE contractCompanyId,pa.name contractCompanyName,temp.cooperationUnit,o.CONTRACT_CATEGORY_ONE_ID " +
+                "contractCategoryId,va.name contractCategoryName,o.AMT_THREE amtExcludeTax,o.AMT_FOUR taxRate,o.AMT_TWO amtIncludeTax,o.SIGN_DATE " +
+                "createTime,i.END_DATETIME endTime,o.REMARK_LONG_ONE remark,o.CRT_USER_ID userId,u.name userName,o.FILE_ID_FIVE fileIds\n" +
                 "FROM PO_ORDER_REQ o\n" +
                 "left join pm_prj p on p.id = o.PM_PRJ_ID\n" +
                 "left join pm_prj p2 on p2.name = o.PROJECT_NAME_WR\n" +
@@ -51,7 +51,8 @@ public class ContractAccountController extends BaseController{
                 "left join gr_set se on se.id = va.GR_SET_ID and se.code = 'contract_type_one'\n" +
                 "left join ad_user u on u.id = o.CRT_USER_ID\n" +
                 "left join wf_process_instance i on i.id = o.LK_WF_INST_ID\n" +
-//                "left join (select PM_PRJ_ID,GROUP_CONCAT(USER_IDS) USER_IDS from pm_dept group by PM_PRJ_ID) temp on temp.PM_PRJ_ID = IFNULL(o.PM_PRJ_ID,p2.id)\n" +
+                "left join (select o.id,GROUP_CONCAT(c.WIN_BID_UNIT_ONE) cooperationUnit from po_order_req o left join contract_signing_contact c " +
+                "on c.PARENT_ID = o.id group by o.id) temp on temp.id = o.id\n" +
                 "where o.STATUS = 'AP'");
         if (!rootUsers.contains(loginUserId)){
 //            sb.append(" and FIND_IN_SET('").append(loginUserId).append("',temp.USER_IDS)");
