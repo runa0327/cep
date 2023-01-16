@@ -75,11 +75,15 @@ public class ContractAccountImport extends BaseController {
         //找出待添加的招标类别
         Set<String> buyTypeSet = models.stream().map(model -> model.getBuyType()).filter(buyType -> !Strings.isNullOrEmpty(buyType)).collect(Collectors.toSet());
         List<String> buyTypeNotExists = buyTypeSet.stream().filter(buyType -> !buyTypeExists.contains(buyType)).collect(Collectors.toList());
-        //添加字典
+//        //添加字典
+//        for (String buyTypeNotExist : buyTypeNotExists) {
+//            String buyTypeId = Util.insertData(jdbcTemplate, "gr_set_value");
+//            jdbcTemplate.update("update gr_set_value set name = ?,GR_SET_ID = '0099952822476385220',VER = 101 where id = ?",buyTypeNotExist,buyTypeId);
+//            errorList.add("'新增合同招标类别buy_type：'" + buyTypeNotExist + "'请检查字典是否有类似项");
+//        }
+        //提示字典不存在
         for (String buyTypeNotExist : buyTypeNotExists) {
-            String buyTypeId = Util.insertData(jdbcTemplate, "gr_set_value");
-            jdbcTemplate.update("update gr_set_value set name = ?,GR_SET_ID = '0099952822476385220',VER = 101 where id = ?",buyTypeNotExist,buyTypeId);
-            errorList.add("'新增合同招标类别buy_type：'" + buyTypeNotExist + "'请检查字典是否有类似项");
+            errorList.add("没有找到合同招标类别buy_type：'" + buyTypeNotExist +"'");
         }
         //替换model中的buyType
         List<Map<String, Object>> newBuyTypeDicList = jdbcTemplate.queryForList("select va.id,va.name from gr_set_value va left join gr_set se on se.id = va.GR_SET_ID where se.code = 'buy_type'");
@@ -93,6 +97,8 @@ public class ContractAccountImport extends BaseController {
                     newBuyTypeDicList.stream().filter(buyType -> buyType.get("name").toString().equals(model.getBuyType())).findAny();
             if (buyTypeMap.isPresent()){//字典有就用
                 buyTypeId = JdbcMapUtil.getString(buyTypeMap.get(),"id");
+            }else {
+                buyTypeId = null;
             }
             model.setBuyType(buyTypeId);
         }
@@ -115,12 +121,31 @@ public class ContractAccountImport extends BaseController {
                         String orderId = Util.insertData(jdbcTemplate, "PO_ORDER_REQ");
                         jdbcTemplate.update("update PO_ORDER_REQ set PM_PRJ_ID = ?, CONTRACT_NAME = ?, SIGN_DATE = ?, AMT_TWO = ?, REMARK_LONG_ONE = ?, ESTIMATED_AMOUNT = ?, FINANCIAL_AMOUNT = ?, PAYED_AMT = ?, CUMULATIVE_PAYED_PERCENT = ?,BUY_TYPE_ID = ?,STATUS = 'AP',VER = 101 where id = ?",
                                 model.getProjectId(),model.getContractName(),model.getSignDate(),model.getAmtIncludeTax(),model.getRemark(),model.getEstimateAmt(),model.getFinancialAmt(),model.getPayedAmt(),model.getPayedPercent(),model.getBuyType(),orderId);
+//                        String orderId = IdUtil.getSnowflakeNextIdStr();
+//                        int ap = jdbcTemplate.update("insert into PO_ORDER_REQ (id,PM_PRJ_ID,CONTRACT_NAME,SIGN_DATE,AMT_TWO,REMARK_LONG_ONE," +
+//                                        "ESTIMATED_AMOUNT,FINANCIAL_AMOUNT,PAYED_AMT,CUMULATIVE_PAYED_PERCENT,BUY_TYPE_ID,STATUS,VER,CRT_DT) \n" +
+//                                        "select ?,?,?,?,?,?,?,?,?,?,?,?,?,? where not exists (select 1 from PO_ORDER_REQ where PM_PRJ_ID = ? and " +
+//                                        "CONTRACT_NAME = ? and SIGN_DATE = ? and AMT_TWO = ? and REMARK_LONG_ONE = ? and ESTIMATED_AMOUNT = ? and " +
+//                                        "FINANCIAL_AMOUNT = ? and PAYED_AMT = ? and CUMULATIVE_PAYED_PERCENT = ? and BUY_TYPE_ID = ?)",
+//                                orderId, model.getProjectId(), model.getContractName(), model.getSignDate(), model.getAmtIncludeTax(),
+//                                model.getRemark(), model.getEstimateAmt(), model.getFinancialAmt(), model.getPayedAmt(), model.getPayedPercent(),
+//                                model.getBuyType(), "AP", 101,new Date(),
+//                                model.getProjectId(), model.getContractName(), model.getSignDate(), model.getAmtIncludeTax(),model.getRemark(), model.getEstimateAmt(), model.getFinancialAmt(), model.getPayedAmt(), model.getPayedPercent(),
+//                                model.getBuyType());
                         //插入CONTRACT_SIGNING_CONTACT联系人明细
                         String contactId = Util.insertData(jdbcTemplate, "CONTRACT_SIGNING_CONTACT");
                         jdbcTemplate.update("update CONTRACT_SIGNING_CONTACT set PARENT_ID = ?, WIN_BID_UNIT_ONE = ?, OPPO_SITE_LINK_MAN = ?,STATUS = 'AP',VER = 101 where id = ?"
                                 ,orderId,model.getWinBidUnit(),model.getLinkMan(),contactId);
+//                        String contactId = IdUtil.getSnowflakeNextIdStr();
+//                        jdbcTemplate.update("insert into CONTRACT_SIGNING_CONTACT (id,PARENT_ID,WIN_BID_UNIT_ONE,OPPO_SITE_LINK_MAN,STATUS,VER,CRT_DT) " +
+//                                "select ?,?,?,?,?,?,? where not exists (select 1 from CONTRACT_SIGNING_CONTACT where PARENT_ID = ? and WIN_BID_UNIT_ONE = ? and OPPO_SITE_LINK_MAN = ?)",
+//                                contactId,orderId,model.getWinBidUnit(),model.getLinkMan(),"AP",101,new Date(),orderId,model.getWinBidUnit(),model.getLinkMan());
+
                     }
-                }finally {
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+                finally {
                     latch.countDown();
                 }
             });
