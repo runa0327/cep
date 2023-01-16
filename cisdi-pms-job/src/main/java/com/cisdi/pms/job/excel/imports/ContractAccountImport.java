@@ -142,10 +142,7 @@ public class ContractAccountImport extends BaseController {
 //                                contactId,orderId,model.getWinBidUnit(),model.getLinkMan(),"AP",101,new Date(),orderId,model.getWinBidUnit(),model.getLinkMan());
 
                     }
-                }catch (Exception e) {
-                    e.printStackTrace();
-                }
-                finally {
+                } finally {
                     latch.countDown();
                 }
             });
