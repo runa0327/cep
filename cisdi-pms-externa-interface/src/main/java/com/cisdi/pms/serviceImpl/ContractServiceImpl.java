@@ -107,7 +107,7 @@ public class ContractServiceImpl implements ContractService {
             for (Map<String, Object> tmp : list) {
                 ContractCostDetailApi contractCostDetailApi = new ContractCostDetailApi();
                 contractCostDetailApi.setContractId(contractId);
-                contractCostDetailApi.setCostTypeId(JdbcMapUtil.getString(tmp,"WIN_BID_UNIT_ONE"));
+                contractCostDetailApi.setCostTypeId(JdbcMapUtil.getString(tmp,"COST_TYPE_TREE_ID"));
                 contractCostDetailApi.setCostTypeName(JdbcMapUtil.getString(tmp,"name"));
                 contractCostDetailApi.setCostDetailName(JdbcMapUtil.getString(tmp,"FEE_DETAIL"));
                 contractCostDetailApi.setDutyInclude(new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_ONE")));
