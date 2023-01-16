@@ -27,8 +27,20 @@ public class ContractImportModel {
     @ExcelProperty("中标单位确定方式（公开招标/电子平台/中介服务超市/代管确定）")
     private String buyType;
 
+    @ExcelProperty("概评金额")
+    private String estimateAmt;
+
+    @ExcelProperty("财评金额")
+    private String financialAmt;
+
     @ExcelProperty("合同金额")
     private String amtIncludeTax;
+
+    @ExcelProperty("已支付金额（每期支付详情见批注）")
+    private String payedAmt;
+
+    @ExcelProperty("累计支付比例（%）")
+    private String payedPercent;
 
     @ExcelProperty("联系人")
     private String linkMan;

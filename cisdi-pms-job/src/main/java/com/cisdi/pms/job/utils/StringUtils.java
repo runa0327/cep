@@ -2,8 +2,11 @@ package com.cisdi.pms.job.utils;
 
 import com.google.common.base.Strings;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class StringUtils {
 
@@ -97,5 +100,14 @@ public class StringUtils {
             fileSizeStr = df.format((double) fileSize / G_SIZE) + "G";
         }
         return fileSizeStr;
+    }
+
+
+    public static boolean isDouble(String s) {
+        if (null == s){
+            return false;
+        }
+        Pattern pattern = Pattern.compile("[+-]?\\d+(.\\d+)?");
+        return pattern.matcher(s).matches();
     }
 }
