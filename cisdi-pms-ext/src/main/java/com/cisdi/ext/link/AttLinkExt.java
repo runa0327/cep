@@ -536,92 +536,7 @@ public class AttLinkExt {
         List<String> entityCodes = getWRProject();
         //系统(system)，非系统(non_system)
         if ("PM_BUY_DEMAND_REQ".equals(entCode)) { //采购需求审批
-            Boolean prjListChangeToShown = false; //下拉项目默认隐藏
-            Boolean prjNameChangeToShown = false; //手写项目默认隐藏
-
-            Boolean prjListChangeToMandatory = false; //下拉项目默认非必填
-            Boolean prjNameChangeToMandatory = false; //手写项目默认非必填
-            Boolean isZFChangeToMandatory = true; //政府投资默认必填
-
-            Boolean prjListChangeToEditable = false; //下拉项目默认不可改
-            Boolean prjNameChangeToEditable = false; //手写项目默认不可改
-            Boolean isZFChangeToEditable = true; //是否政府投资默认可改
-            Boolean amtSourceChangeToEditable = true; //资金来源默认可改
-
-            if (!"system".equals(code)) {
-                prjNameChangeToShown = true;
-                prjNameChangeToMandatory = true;
-                prjNameChangeToEditable = true;
-                isZFChangeToEditable = true;
-                amtSourceChangeToEditable = true;
-            } else {
-                prjListChangeToShown = true;
-                prjListChangeToMandatory = true;
-                prjListChangeToEditable = true;
-            }
-
-            //下拉项目列表
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToMandatory = prjListChangeToMandatory;
-                linkedAtt.changeToShown = prjListChangeToShown;
-                linkedAtt.changeToEditable = prjListChangeToEditable;
-                attLinkResult.attMap.put("PM_PRJ_ID", linkedAtt);
-            }
-            //项目名称
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToMandatory = prjNameChangeToMandatory;
-                linkedAtt.changeToShown = prjNameChangeToShown;
-                linkedAtt.changeToEditable = prjNameChangeToEditable;
-                attLinkResult.attMap.put("PROJECT_NAME_WR", linkedAtt);
-            }
-            //是否政府投资项目
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToEditable = isZFChangeToEditable;
-                linkedAtt.changeToMandatory = isZFChangeToMandatory;
-                attLinkResult.attMap.put("YES_NO_ONE", linkedAtt);
-            }
-            //资金来源
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToEditable = amtSourceChangeToEditable;
-                attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
-            }
-            //清空数据
-            //采购启动依据
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToEditable = true;
-                attLinkResult.attMap.put("BUY_START_BASIS_ID", linkedAtt);
-                attLinkResult.attMap.put("REPLY_NO_WR", linkedAtt);
-            }
-            //采购启动依据文件
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.FILE_GROUP;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToEditable = true;
-                linkedAtt.fileInfoList = null;
-                attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
-            }
+            pmBuyDemandReqProjectSourceType(attLinkResult,code);
             return attLinkResult;
         } else if ("PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){ //新增保函申请
             //系统(system)，非系统(non_system)
@@ -693,13 +608,16 @@ public class AttLinkExt {
                 linkedAtt.value = null;
                 linkedAtt.text = null;
                 linkedAtt.changeToMandatory = true;
-//                linkedAtt.changeToMandatory = CONTRACT_AMOUNTChangeToMandatory;
                 linkedAtt.changeToEditable = true;
-//                linkedAtt.changeToEditable = CONTRACT_AMOUNTChangeToEditable;
                 attLinkResult.attMap.put("CONTRACT_AMOUNT", linkedAtt);
             }
             return attLinkResult;
-        } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "PO_ORDER_CHANGE_REQ".equals(entCode)){ //采购合同签订申请 补充协议
+        }
+//        else if ("PO_ORDER_CHANGE_REQ".equals(entCode)){ //合同需求变更
+//            AttLinkExtDetail.getPoOrderChange(attLinkResult,code);
+//            return attLinkResult;
+//        }
+        else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "PO_ORDER_CHANGE_REQ".equals(entCode)){ //采购合同签订申请 补充协议
             //系统(system)，非系统(non_system)
             attLinkResult = autoLinkProject(attValue,code);
             attLinkResult = autoLinkPrjDetail(attLinkResult,attValue,code);
@@ -714,6 +632,96 @@ public class AttLinkExt {
             return attLinkResult;
         }
 
+    }
+
+    // 项目来源属性联动-采购需求审批
+    private void pmBuyDemandReqProjectSourceType(AttLinkResult attLinkResult,String code) {
+        Boolean prjListChangeToShown = false; //下拉项目默认隐藏
+        Boolean prjNameChangeToShown = false; //手写项目默认隐藏
+
+        Boolean prjListChangeToMandatory = false; //下拉项目默认非必填
+        Boolean prjNameChangeToMandatory = false; //手写项目默认非必填
+        Boolean isZFChangeToMandatory = true; //政府投资默认必填
+
+        Boolean prjListChangeToEditable = false; //下拉项目默认不可改
+        Boolean prjNameChangeToEditable = false; //手写项目默认不可改
+        Boolean isZFChangeToEditable = true; //是否政府投资默认可改
+        Boolean amtSourceChangeToEditable = true; //资金来源默认可改
+
+        if (!"system".equals(code)) {
+            prjNameChangeToShown = true;
+            prjNameChangeToMandatory = true;
+            prjNameChangeToEditable = true;
+            isZFChangeToEditable = true;
+            amtSourceChangeToEditable = true;
+        } else {
+            prjListChangeToShown = true;
+            prjListChangeToMandatory = true;
+            prjListChangeToEditable = true;
+        }
+
+        //下拉项目列表
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            linkedAtt.changeToMandatory = prjListChangeToMandatory;
+            linkedAtt.changeToShown = prjListChangeToShown;
+            linkedAtt.changeToEditable = prjListChangeToEditable;
+            attLinkResult.attMap.put("PM_PRJ_ID", linkedAtt);
+        }
+        //项目名称
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            linkedAtt.changeToMandatory = prjNameChangeToMandatory;
+            linkedAtt.changeToShown = prjNameChangeToShown;
+            linkedAtt.changeToEditable = prjNameChangeToEditable;
+            attLinkResult.attMap.put("PROJECT_NAME_WR", linkedAtt);
+        }
+        //是否政府投资项目
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            linkedAtt.changeToEditable = isZFChangeToEditable;
+            linkedAtt.changeToMandatory = isZFChangeToMandatory;
+            attLinkResult.attMap.put("YES_NO_ONE", linkedAtt);
+        }
+        //资金来源
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            linkedAtt.changeToEditable = amtSourceChangeToEditable;
+            attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
+        }
+        //清空数据
+        //采购启动依据
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            linkedAtt.changeToEditable = true;
+            attLinkResult.attMap.put("BUY_START_BASIS_ID", linkedAtt);
+            attLinkResult.attMap.put("REPLY_NO_WR", linkedAtt);
+        }
+        //采购启动依据文件
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.FILE_GROUP;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            linkedAtt.changeToEditable = true;
+            linkedAtt.fileInfoList = null;
+            attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
+        }
     }
 
     // 项目来源属性联动-管线迁改-清除
