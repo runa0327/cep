@@ -61,6 +61,9 @@ public class SendSmsJob {
         // 锁表  防止多台服务器同时修改
         String lockSql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code='WF_TASK_REMIND_LOCK' and (t.LOCK_EXT_DTTM_ATT01_VAL is null or t.LOCK_EXT_DTTM_ATT01_VAL <= ADDDATE(NOW(),INTERVAL -10 minute))";
         int lock = jdbcTemplate.update(lockSql);
+        if (lock == 0) {
+            return;
+        }
 
         // 1.每天早上9点统计每个人没有处理的待办事项TODO  WF_URGENCY_ID 紧急程度不用关心
         // 2.该定时任务是9点发送次数，
@@ -75,7 +78,7 @@ public class SendSmsJob {
 
         // 13976720905   吴坤苗  此用户许需要发送短信
         List<RemindLog> result = maps.stream()
-                .filter(map -> !map.get("userPhone").equals("13976720905") && !map.get("userPhone").equals("17721054782"))
+                .filter(map -> !"13976720905".equals(map.get("userPhone")) && !"17721054782".equals(map.get("userPhone")))
                 .map(stringObjectMap -> {
                     RemindLog remindLog = new RemindLog();
                     remindLog.setUserId(stringObjectMap.get("userId").toString());
@@ -87,41 +90,37 @@ public class SendSmsJob {
                 }).collect(Collectors.toList());
 
         try {
-            if (lock > 0) {
-                result.forEach(remindLog -> {
+            result.forEach(remindLog -> {
 
-                    // 2、定时每分钟一次【紧急】
-                    //[工程项目信息协同系统][流程待办]您好“{1}”已到您处，请尽快处理。--1644089
-                    //[工程项目信息协同系统][流程通知]您好“{1}”已到您处，请登陆系统查看。--1644090
-                    String templateId = remindLog.getTaskType().equals("TODO") ? "1644089" : "1644090";
+                // 2、定时每分钟一次【紧急】
+                //[工程项目信息协同系统][流程待办]您好“{1}”已到您处，请尽快处理。--1644089
+                //[工程项目信息协同系统][流程通知]您好“{1}”已到您处，请登陆系统查看。--1644090
+                String templateId = "TODO".equals(remindLog.getTaskType()) ? "1644089" : "1644090";
 
-                    // 参数封装
-                    ArrayList<String> param = new ArrayList<>();
-                    param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "13696079131");
-                    param.add(remindLog.getTaskName());
+                // 参数封装
+                ArrayList<String> param = new ArrayList<>();
+                param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "18696722176");
+                param.add(remindLog.getTaskName());
 
-                    // 发送短信
-                    this.sendSms(templateId, param);
+                // 发送短信
+                this.sendSms(templateId, param);
 
-                    log.info("日志发送，接收人电话号码：{}", remindLog.getUserPhone());
-                    // 记录日志
-                    this.insertRemindLog(remindLog, false);
+                log.info("日志发送，接收人电话号码：{}", remindLog.getUserPhone());
+                // 记录日志
+                this.insertRemindLog(remindLog, false);
 
-                });
-            }
+            });
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("发送短信出错！", e);
         } finally {
             // 加锁成功后才会释放锁
-            if (lock > 0) {
-                // 循环10次，放置修改失败
-                for (int i = 0; i < 10; i++) {
-                    String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code=?";
-                    int up = jdbcTemplate.update(sql, "WF_TASK_REMIND_LOCK");
-                    // 如果修改成功，直接跳出循环
-                    if (up > 0) {
-                        break;
-                    }
+            // 循环10次，放置修改失败
+            for (int i = 0; i < 10; i++) {
+                String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=null where t.code=?";
+                int affectedRows = jdbcTemplate.update(sql, "WF_TASK_REMIND_LOCK");
+                // 如果修改成功，直接跳出循环
+                if (affectedRows > 0) {
+                    break;
                 }
             }
         }
@@ -192,7 +191,7 @@ public class SendSmsJob {
 
                     // 参数封装
                     ArrayList<String> param = new ArrayList<>();
-                    param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "13696079131");
+                    param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "18696722176");
                     param.add(remindLog.getCount());
 
                     // 发送短信
