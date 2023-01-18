@@ -1,12 +1,9 @@
 package com.cisdi.pms.job.dealtWork;
 
 import cn.hutool.core.util.IdUtil;
-import com.cisdi.pms.job.sendSMS.SendSmsJob;
 import com.cisdi.pms.job.utils.RestTemplateUtils;
 import com.cisdi.pms.job.utils.Util;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +28,6 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class dealtWorkJob {
-
-    private static final Logger logger = LoggerFactory.getLogger(SendSmsJob.class);
 
     @Value("${dealt_work_job.request.path}")
     private String requestPath;
@@ -59,48 +54,48 @@ public class dealtWorkJob {
     JdbcTemplate jdbcTemplate;
 
 
-    //@Scheduled(fixedDelayString = "5000")
-    @Scheduled(fixedDelayString = "300000")
+    // TODO 2023-01-17 先注释掉处理下面的代办的定时任务
+    // @Scheduled(fixedDelayString = "300000")
     public void handleDealt() {
 
         if (!dealtSwitch) return;
 
-        //锁表  防止多台服务器同时修改
+        // 锁表  防止多台服务器同时修改
         String lockSql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code='DEALT_INFO_LOCK' and (t.LOCK_EXT_DTTM_ATT01_VAL is null or t.LOCK_EXT_DTTM_ATT01_VAL <= SUBDATE(NOW(),INTERVAL -10 minute))";
         int lock = jdbcTemplate.update(lockSql);
 
         try {
             if (lock > 0) {
-                //对比ad_user / user_dealt_infos 两张表   如果有不同的数据则新增数据，如果没有，则直接跳过
+                // 对比ad_user / user_dealt_infos 两张表   如果有不同的数据则新增数据，如果没有，则直接跳过
                 savaUserId();
 
-                //旧待办变为已读
+                // 旧待办变为已读
                 String queryDealt = "select APP_ID appId,USER_ID userId,MSG_ID msgId from dealt_task_info where REMARK = '0'";
                 Map<String, Object> queryDealtMap = jdbcTemplate.queryForMap(queryDealt);
-                dealtRead(queryDealtMap.get("appId").toString(),queryDealtMap.get("userId").toString(),queryDealtMap.get("msgId").toString());
+                dealtRead(queryDealtMap.get("appId").toString(), queryDealtMap.get("userId").toString(), queryDealtMap.get("msgId").toString());
 
-                //获取dealt_task_info 中remark为0的数据  变成为1 新增数据
+                // 获取dealt_task_info 中remark为0的数据  变成为1 新增数据
                 String updateDealt = "update dealt_task_info set REMARK = '1' where REMARK = '0'";
                 jdbcTemplate.update(updateDealt);
 
                 String testParam = dealtSwitchTest == Boolean.TRUE ? "" : "and w.AD_USER_ID = '0100031468511690944'";
-                //根据wf_task表查询  所有的任务状态  TODO需要添加待办事项
+                // 根据wf_task表查询  所有的任务状态  TODO需要添加待办事项
                 String sql = "SELECT w.AD_USER_ID,COUNT(w.WF_PROCESS_INSTANCE_ID) num from wf_task w WHERE  w.IS_CLOSED = ? and w.WF_TASK_TYPE_ID = ? " + testParam + " GROUP BY w.AD_USER_ID";
                 List<Map<String, Object>> info = jdbcTemplate.queryForList(sql, "0", "TODO");
 
-                //添加待办事项
+                // 添加待办事项
                 info.stream().forEach(map -> newAddDealt(map));
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            //加锁成功后才会释放锁
+            // 加锁成功后才会释放锁
             if (lock > 0) {
-                //循环10次，放置修改失败
+                // 循环10次，放置修改失败
                 for (int i = 0; i < 10; i++) {
                     String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code=?";
                     int up = jdbcTemplate.update(sql, "DEALT_INFO_LOCK");
-                    //如果修改成功，直接跳出循环
+                    // 如果修改成功，直接跳出循环
                     if (up > 0) {
                         break;
                     }
@@ -114,7 +109,7 @@ public class dealtWorkJob {
      * 将user_id定期存入本地
      */
     private void savaUserId() {
-        //只对ap状态用户
+        // 只对ap状态用户
         String sql = "SELECT DISTINCT a.CODE,a.ID FROM ad_user a WHERE STATUS = 'AP' AND NOT EXISTS (SELECT u.AD_USER_ID  FROM dealt_user_info u WHERE u.AD_USER_ID = a.`ID`)";
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
         if (!CollectionUtils.isEmpty(list)) {
@@ -130,12 +125,12 @@ public class dealtWorkJob {
      * @param phone
      */
     private void saveUserId(String userId, String phone, String adUserId) {
-        //判断当前用户id是否已经存储在本地表中
+        // 判断当前用户id是否已经存储在本地表中
         String selectSql = "select USER_ID from dealt_user_info";
         List<String> list = jdbcTemplate.queryForList(selectSql, String.class);
         if (!CollectionUtils.isEmpty(list) && !list.contains(null)) {
             List<String> userIds = list.stream().filter(lis -> lis.equals(userId)).collect(Collectors.toList());
-            //如果当前用户id已存在，则不保存
+            // 如果当前用户id已存在，则不保存
             if (!CollectionUtils.isEmpty(userIds) && !CollectionUtils.isEmpty(list)) {
                 return;
             }
@@ -143,7 +138,7 @@ public class dealtWorkJob {
 
         String id = Util.insertData(jdbcTemplate, "dealt_user_info");
 
-        //将所有的用户id保存包本地表中
+        // 将所有的用户id保存包本地表中
         String saveSql = "UPDATE dealt_user_info set USER_ID=?,PHONE=?,AD_USER_ID=? where ID=?";
         jdbcTemplate.update(saveSql, userId, phone, adUserId, id);
     }
@@ -159,16 +154,16 @@ public class dealtWorkJob {
         // https://portal.test.yzbays.cn/api/v1/remind/read/third/byuser
         String url = requestPath + "/api/v1/remind/read/third/byuser";
 
-        //参数
+        // 参数
         HashMap<String, Object> requestParams = new HashMap<>();
-        //用户id
+        // 用户id
         requestParams.put("userId", userId);
-        //消息id
+        // 消息id
         requestParams.put("msgId", msgId);
-        //平台id
+        // 平台id
         requestParams.put("id", id);
 
-        //设置请求头
+        // 设置请求头
         Map<String, String> headers = getHeaders();
 
         ResponseEntity<Map> result = RestTemplateUtils.post(url, headers, requestParams, Map.class);
@@ -181,56 +176,56 @@ public class dealtWorkJob {
      * @return
      */
     private void newAddDealt(Map<String, Object> map) {
-        //获取平台方的用户id
+        // 获取平台方的用户id
         String userIdSql = "select USER_ID from dealt_user_info where AD_USER_ID = ?";
         List<String> list = jdbcTemplate.queryForList(userIdSql, String.class, map.get("AD_USER_ID"));
         if (CollectionUtils.isEmpty(list)) {
             throw new RuntimeException("该用户不存在");
         }
 
-        //获取当前时间
+        // 获取当前时间
         Date date = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm-ss");
         String time = format.format(date);
 
-        //内容        您好，截至“2022年12月1日-08:06:20”，4个流程待办已到您处，请尽快处理
-        String content = "[工程项目信息协同系统]您好：截至“"+ time + "”，" + map.get("num") + "个流程待办已到您处，请尽快处理";
-        //标题
+        // 内容        您好，截至“2022年12月1日-08:06:20”，4个流程待办已到您处，请尽快处理
+        String content = "[工程项目信息协同系统]您好：截至“" + time + "”，" + map.get("num") + "个流程待办已到您处，请尽快处理";
+        // 标题
         String titel = "【工程项目信息协同系统】流程待办提醒";
 
         String dealtTaskInfoIdS = Util.insertData(jdbcTemplate, "dealt_task_info");
-        //此处还需要本地加一张待办表，将代办信息保存,后续修改为已读时需要
+        // 此处还需要本地加一张待办表，将代办信息保存,后续修改为已读时需要
         String insetSql = "update dealt_task_info set REMARK=?, APP_NAME=?,CONTENT=?,CALL_BACK_URL=? where ID = ?";
         jdbcTemplate.update(insetSql, "0", appName, content, callbackUrl
                 , dealtTaskInfoIdS);
 
         Map<String, Object> requestParams = new HashMap<>();
-        //用户id
+        // 用户id
         requestParams.put("userId", list.get(0));
-        //消息id
+        // 消息id
         requestParams.put("msgId", IdUtil.getSnowflakeNextId());
-        //标题
+        // 标题
         requestParams.put("title", titel);
-        //平台名称
+        // 平台名称
         requestParams.put("appName", appName);
-        //内容
+        // 内容
         requestParams.put("content", content);
-        //跳转页面
+        // 跳转页面
         requestParams.put("callbackUrl", callbackUrl);
 
-        //设置请求头
+        // 设置请求头
         Map<String, String> headers = getHeaders();
 
-        //url https://portal.test.yzbays.cn/api/v1/remind
+        // url https://portal.test.yzbays.cn/api/v1/remind
         String url = requestPath + "/api/v1/remind";
 
-        //此处会返回平台id（APP_ID）需要保存
+        // 此处会返回平台id（APP_ID）需要保存
         ResponseEntity<Map> result = RestTemplateUtils.put(url, headers, requestParams, Map.class);
         Map<String, Object> data = (Map<String, Object>) result.getBody().get("data");
 
-        //保存APP_ID
+        // 保存APP_ID
         String idSql = "update dealt_task_info set APP_ID=? ,MSG_ID = ?, USER_ID=? where ID = ?";
-        jdbcTemplate.update(idSql, data.get("id"),data.get("msgId") , list.get(0)
+        jdbcTemplate.update(idSql, data.get("id"), data.get("msgId"), list.get(0)
                 , dealtTaskInfoIdS);
 
     }
@@ -258,7 +253,7 @@ public class dealtWorkJob {
      * @return
      */
     private Map<String, String> getHeaders() {
-        //设置请求头
+        // 设置请求头
         Map<String, String> headers = new HashMap<>();
         headers.put("auth-key", responseParame);
         return headers;
