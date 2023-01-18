@@ -119,7 +119,7 @@ public class ContractAccountImport extends BaseController {
                     for (ContractImportModel model : modelList) {
                         //插入PO_ORDER_REQ合同签订
                         String orderId = Util.insertData(jdbcTemplate, "PO_ORDER_REQ");
-                        jdbcTemplate.update("update PO_ORDER_REQ set PM_PRJ_ID = ?, CONTRACT_NAME = ?, SIGN_DATE = ?, AMT_TWO = ?, REMARK_LONG_ONE = ?, ESTIMATED_AMOUNT = ?, FINANCIAL_AMOUNT = ?, PAYED_AMT = ?, CUMULATIVE_PAYED_PERCENT = ?,BUY_TYPE_ID = ?,STATUS = 'AP',VER = 101 where id = ?",
+                        jdbcTemplate.update("update PO_ORDER_REQ set CUSTOMER_UNIT_ONE = null,PM_PRJ_ID = ?, CONTRACT_NAME = ?, SIGN_DATE = ?, AMT_TWO = ?, REMARK_LONG_ONE = ?, ESTIMATED_AMOUNT = ?, FINANCIAL_AMOUNT = ?, PAYED_AMT = ?, CUMULATIVE_PAYED_PERCENT = ?,BUY_TYPE_ID = ?,STATUS = 'AP',VER = 101 where id = ?",
                                 model.getProjectId(),model.getContractName(),model.getSignDate(),model.getAmtIncludeTax(),model.getRemark(),model.getEstimateAmt(),model.getFinancialAmt(),model.getPayedAmt(),model.getPayedPercent(),model.getBuyType(),orderId);
 //                        String orderId = IdUtil.getSnowflakeNextIdStr();
 //                        int ap = jdbcTemplate.update("insert into PO_ORDER_REQ (id,PM_PRJ_ID,CONTRACT_NAME,SIGN_DATE,AMT_TWO,REMARK_LONG_ONE," +
@@ -170,6 +170,7 @@ public class ContractAccountImport extends BaseController {
                 //同一个项目的合同
                 List<ContractImportModel> models = sheets.get(prjName);
                 for (ContractImportModel model : models) {
+                    model.setProjectId(null);
                     if ("合计".equals(model.getContractName()) || "其他合同".equals(model.getContractName())){
                         continue;
                     }
