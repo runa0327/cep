@@ -147,13 +147,16 @@ public class SendSmsJob {
         String switchSql = "select SMS_STATUS from sms_time where date = ?";
         Map<String, Object> mapSwitch = jdbcTemplate.queryForMap(switchSql, nowTime);
         // 根据表中数据判断是否   1:发送消息    0：不发送消息
-        if (mapSwitch.get("SMS_STATUS").equals("0")) {
+        if ("0".equals(mapSwitch.get("SMS_STATUS"))) {
             return;
         }
 
         // 锁表  防止多台服务器同时修改
         String lockSql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code='WF_TASK_REMIND_NORMAL_LOCK' and (t.LOCK_EXT_DTTM_ATT01_VAL is null or t.LOCK_EXT_DTTM_ATT01_VAL <= ADDDATE(NOW(),INTERVAL -10 minute))";
         int lock = jdbcTemplate.update(lockSql);
+        if (lock == 0){
+            return;
+        }
 
         // 1.每天早上9点统计每个人没有处理的待办事项TODO  WF_URGENCY_ID 紧急程度不用关心
         // 2.该定时任务是9点发送次数，
@@ -170,7 +173,7 @@ public class SendSmsJob {
 
         // 13976720905   吴坤苗  此用户不需要发送短信
         List<RemindLog> result = maps.stream()
-                .filter(map -> !map.get("userPhone").equals("13976720905") && !map.get("userPhone").equals("17721054782"))
+                .filter(map -> !"13976720905".equals(map.get("userPhone")) && !"17721054782".equals(map.get("userPhone")))
                 .map(stringObjectMap -> {
                     RemindLog remindLog = new RemindLog();
                     remindLog.setCount(stringObjectMap.get("num").toString());
@@ -205,12 +208,13 @@ public class SendSmsJob {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            log.error("发送短信出错！",e);
         } finally {
             // 加锁成功后才会释放锁
             if (lock > 0) {
                 // 循环10次，放置修改失败
                 for (int i = 0; i < 10; i++) {
-                    String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code=?";
+                    String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=null where t.code=?";
                     int up = jdbcTemplate.update(sql, "WF_TASK_REMIND_NORMAL_LOCK");
                     // 如果修改成功，直接跳出循环
                     if (up > 0) {
