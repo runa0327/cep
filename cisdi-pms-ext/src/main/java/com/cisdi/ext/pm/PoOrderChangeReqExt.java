@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -213,4 +214,193 @@ public class PoOrderChangeReqExt {
             log.info("已更新：{}", exec);
         }
     }
+
+    /**
+     * 合同变更审批-第二版审批流扩展-审批通过
+     */
+    public void flowExtTrueSecond(){
+        //当前节点id
+        String nodeId = ExtJarHelper.nodeInstId.get();
+        //定义节点状态
+        String nodeStatus = getStatus("true",nodeId);
+        //详细处理逻辑
+        handleCHeckData(nodeStatus,nodeId);
+    }
+
+    /**
+     * 合同变更审批-第二版审批流扩展-审批驳回
+     */
+    public void flowExtFalseSecond(){
+        //当前节点id
+        String nodeId = ExtJarHelper.nodeInstId.get();
+        //定义节点状态
+        String nodeStatus = getStatus("false",nodeId);
+        //详细处理逻辑
+        handleCHeckData(nodeStatus,nodeId);
+    }
+
+    /**
+     * 合同需求审批-流程扩展处理详情逻辑
+     * @param nodeStatus 节点信息
+     * @param nodeId 节点id信息
+     */
+    private void handleCHeckData(String nodeStatus,String nodeId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId;
+        // 流程id
+        String procInstId = ExtJarHelper.procInstId.get();
+        // 当前登录人
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        String userName = ExtJarHelper.loginInfo.get().userName;
+        //获取审批意见信息
+        Map<String,String> message = getMessage(nodeId,userId,myJdbcTemplate,procInstId,userName);
+
+        //审批意见内容
+        String file = message.get("file");
+        String comment = message.get("comment");
+
+        //判断当前是否为第一个审批人
+        Boolean firstCheck = ProcessCommon.getFirstCheck(nodeId,userId,myJdbcTemplate);
+
+        //分支判断
+        if ("caiHuaTrue".equals(nodeStatus)){ //才华审批通过
+            if (firstCheck){
+                //才华审批意见清除
+                clearPO_ORDER_CHANGE_REQ("caiHua",csCommId,myJdbcTemplate);
+            }
+            //审批意见数据回显
+            updatePO_ORDER_CHANGE_REQ("caiHua",file,comment,csCommId,myJdbcTemplate);
+        } else if ("caiHuaFalse".equals(nodeStatus)){ //才华审批拒绝
+            //才华审批意见清除
+            clearPO_ORDER_CHANGE_REQ("caiHua",csCommId,myJdbcTemplate);
+        } else if ("costTrue".equals(nodeStatus)){ //成本岗审批
+            if (firstCheck){
+                //成本岗审批意见清除
+                clearPO_ORDER_CHANGE_REQ("AD_USER_THREE_ID",csCommId,myJdbcTemplate);
+            }
+            //审批意见数据回显
+            updatePO_ORDER_CHANGE_REQ("AD_USER_THREE_ID",file,comment,csCommId,myJdbcTemplate);
+        } else if ("costFalse".equals(nodeStatus)){
+            //成本岗审批意见清除
+            clearPO_ORDER_CHANGE_REQ("AD_USER_THREE_ID",csCommId,myJdbcTemplate);
+        }
+    }
+
+    /**
+     * 合同需求审批-数据回显
+     * @param deptName 岗位信息
+     * @param file 审批附件
+     * @param comment 审批意见
+     * @param csCommId 流程业务数据表id
+     * @param myJdbcTemplate 数据库连接
+     */
+    private void updatePO_ORDER_CHANGE_REQ(String deptName, String file, String comment, String csCommId, MyJdbcTemplate myJdbcTemplate) {
+        StringBuilder sb = new StringBuilder("update PO_ORDER_CHANGE_REQ set ");
+        if ("caiHua".equals(deptName)){
+            sb.append("FILE_ID_SEVEN = ?, APPROVAL_COMMENT_SEVEN = ?");
+        } else if ("AD_USER_THREE_ID".equals(deptName)){
+            sb.append("FILE_ID_EIGHTH = ?, APPROVAL_COMMENT_EIGHTH = ?");
+        }
+        sb.append(" where id = ?");
+        Integer exec = myJdbcTemplate.update(sb.toString(),file,comment,csCommId);
+        log.info("已更新：{}",exec);
+    }
+
+    /**
+     * 数据清除
+     * @param str 需要情况的字段
+     * @param csCommId 流程业务表id
+     * @param myJdbcTemplate 数据源
+     */
+    private void clearPO_ORDER_CHANGE_REQ(String str, String csCommId, MyJdbcTemplate myJdbcTemplate) {
+        String[] arr = str.split(",");
+        StringBuilder sb = new StringBuilder("update PO_ORDER_CHANGE_REQ set ");
+        for (String tmp : arr) {
+            if ("caiHua".equals(tmp)){
+                sb.append("APPROVAL_COMMENT_SEVEN = null,FILE_ID_SEVEN = null,");
+            } else if ("AD_USER_THREE_ID".equals(tmp)){
+                sb.append("APPROVAL_COMMENT_EIGHTH = null,FILE_ID_EIGHTH = null,");
+            }
+        }
+        sb.deleteCharAt(sb.length()-1);
+        sb.append(" where id = ?");
+        Integer exec = myJdbcTemplate.update(sb.toString(),csCommId);
+        log.info("已更新：{}",exec);
+    }
+
+    /**
+     * 获取流程当前审批人审批操作时评价信息
+     * @param nodeId 节点id
+     * @param userId 当前操作人id
+     * @param myJdbcTemplate 数据库源
+     * @param procInstId 流程id
+     * @param userName 审批人名称
+     * @return 审批人审批信息
+     */
+    private Map<String, String> getMessage(String nodeId, String userId, MyJdbcTemplate myJdbcTemplate, String procInstId, String userName) {
+        Map<String,String> map = new HashMap<>();
+        String sql = "select a.USER_COMMENT,a.USER_ATTACHMENT from wf_task a " +
+                "left join wf_node_instance b on a.WF_NODE_INSTANCE_ID = b.id and b.status = 'ap' " +
+                "where b.WF_NODE_ID = ? and a.AD_USER_ID = ? and a.status = 'ap' and a.IS_CLOSED = 0 and a.LK_WF_INST_ID = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,nodeId,userId,procInstId);
+        if (!CollectionUtils.isEmpty(map)){
+            String value = SharedUtil.isEmptyString(JdbcMapUtil.getString(list.get(0),"USER_COMMENT")) ? "同意" : JdbcMapUtil.getString(list.get(0),"USER_COMMENT");
+            map.put("comment",userName + "：" + value);
+            map.put("file",JdbcMapUtil.getString(list.get(0),"USER_ATTACHMENT"));
+        }
+        return map;
+    }
+
+    // 节点状态赋值
+    private String getStatus(String status, String nodeId) {
+        String name = "";
+        if ("true".equals(status)){
+            if ("1619159246757302272".equals(nodeId)){ //2-才华预审
+                name = "caiHuaTrue";
+            } else if ("1619158462116270080".equals(nodeId)){ //3-成本岗审批
+                name = "costTrue";
+            } else if ("1619158462284042240".equals(nodeId)){ //4-财务岗审批
+                name = "financeTrue";
+            } else if ("1619158462313402368".equals(nodeId)){ //5-成本/财务审批
+                name = "costFinanceTrue";
+            } else if ("1619158462460203008".equals(nodeId)){ //6-法律顾问审批
+                name = "lawyerTrue";
+            } else if ("1619179426375929856".equals(nodeId)){ //7-法务审批
+                name = "legalTrue";
+            } else if ("1619186764008787968".equals(nodeId)){ //8-法务/财务审批
+                name = "legalFinanceTrue";
+            } else if ("1619186850457587712".equals(nodeId)){ //9-法务/财务/成本审批
+                name = "costLegalFinanceTrue";
+            } else if ("1619158462435037184".equals(nodeId)){ //10-部门领导审批
+                name = "deptLeaderTrue";
+            } else if ("1619158462342762496".equals(nodeId)){ //11-分管领导审批
+                name = "chargeLeaderTrue";
+            }
+        } else if ("false".equals(status)){
+            if ("1619159246757302272".equals(nodeId)){ //2-才华预审
+                name = "caiHuaFalse";
+            } else if ("1619158462116270080".equals(nodeId)){ //3-成本岗审批
+                name = "costFalse";
+            } else if ("1619158462284042240".equals(nodeId)){ //4-财务岗审批
+                name = "financeFalse";
+            } else if ("1619158462313402368".equals(nodeId)){ //5-成本/财务审批
+                name = "costFinanceFalse";
+            } else if ("1619158462460203008".equals(nodeId)){ //6-法律顾问审批
+                name = "lawyerFalse";
+            } else if ("1619179426375929856".equals(nodeId)){ //7-法务审批
+                name = "legalFalse";
+            } else if ("1619186764008787968".equals(nodeId)){ //8-法务/财务审批
+                name = "legalFinanceFalse";
+            } else if ("1619186850457587712".equals(nodeId)){ //9-法务/财务/成本审批
+                name = "costLegalFinanceFalse";
+            } else if ("1619158462435037184".equals(nodeId)){ //10-部门领导审批
+                name = "deptLeaderFalse";
+            } else if ("1619158462342762496".equals(nodeId)){ //11-分管领导审批
+                name = "chargeLeaderFalse";
+            }
+        }
+        return name;
+    }
+
 }
