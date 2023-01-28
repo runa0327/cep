@@ -49,8 +49,7 @@ public class SendSmsJob {
      * 发送紧急消息
      * 随时发送
      */
-//    @Scheduled(cron = "00 47 9 ? * *")
-    //@Scheduled(fixedDelayString = "5000")
+//    @Scheduled(cron = "30 15 11 ? * *")
     @Scheduled(fixedDelayString = "60000")
     public void sendSmsForUrgent() {
         // 开关短信功能
@@ -68,17 +67,15 @@ public class SendSmsJob {
         // 1.每天早上9点统计每个人没有处理的待办事项TODO  WF_URGENCY_ID 紧急程度不用关心
         // 2.该定时任务是9点发送次数，
         // limit 1 测试
-//        String selectSql = "SELECT a.userId,a.userPhone , a.taskName ,a.taskId, a.`WF_TASK_TYPE_ID` taskType FROM ( SELECT t.AD_USER_ID userId, t.id taskId, pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT , t.`WF_TASK_TYPE_ID` FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0 and t.STATUS = 'AP' AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND pi.IS_URGENT = '1') a limit 1";
-        String selectSql = "SELECT a.userId,a.userPhone , a.taskName ,a.taskId, a.`WF_TASK_TYPE_ID` taskType FROM ( SELECT t.AD_USER_ID userId, t.id taskId, pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT , t.`WF_TASK_TYPE_ID` FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0 and t.STATUS = 'AP' AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND pi.IS_URGENT = '1') a";
+//        String selectSql = "SELECT a.userId,a.userPhone , a.taskName ,a.taskId, a.`WF_TASK_TYPE_ID` taskType FROM ( SELECT t.AD_USER_ID userId, t.id taskId, pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT , t.`WF_TASK_TYPE_ID` FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0 and t.STATUS = 'AP' AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND pi.IS_URGENT = '1' AND t.AD_USER_ID not in (select AD_USER_ID from sms_white_list)) a limit 1";
+        String selectSql = "SELECT a.userId,a.userPhone , a.taskName ,a.taskId, a.`WF_TASK_TYPE_ID` taskType FROM ( SELECT t.AD_USER_ID userId, t.id taskId, pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT , t.`WF_TASK_TYPE_ID` FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0 and t.STATUS = 'AP' AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND pi.IS_URGENT = '1' AND t.AD_USER_ID not in (select AD_USER_ID from sms_white_list)) a";
         List<Map<String, Object>> maps = jdbcTemplate.queryForList(selectSql);
 
         if (CollectionUtils.isEmpty(maps)) {
             return;
         }
 
-        // 13976720905   吴坤苗  此用户许需要发送短信
         List<RemindLog> result = maps.stream()
-                .filter(map -> !"13976720905".equals(map.get("userPhone")) && !"17721054782".equals(map.get("userPhone")))
                 .map(stringObjectMap -> {
                     RemindLog remindLog = new RemindLog();
                     remindLog.setUserId(stringObjectMap.get("userId").toString());
@@ -99,7 +96,7 @@ public class SendSmsJob {
 
                 // 参数封装
                 ArrayList<String> param = new ArrayList<>();
-                param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "18696722176");
+                param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "13696079131");
                 param.add(remindLog.getTaskName());
 
                 // 发送短信
@@ -163,17 +160,15 @@ public class SendSmsJob {
         // 原版本sql，查的是具体信息
 //        String selectSql = "SELECT  a.userId, a.userPhone , a.taskName,a.taskId FROM ( SELECT t.AD_USER_ID userId, t.id taskId, pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0  AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND t.`WF_TASK_TYPE_ID` = 'TODO' AND pi.IS_URGENT = '0') a limit 1";
         // limit 1 测试
-//        String selectSql = "SELECT a.userPhone,a.id userId , COUNT(a.userPhone) num FROM ( SELECT u.id, pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0 AND t.STATUS = 'AP'  AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = u.id) AND t.`WF_TASK_TYPE_ID` = 'TODO') a GROUP BY userPhone,userId limit 1";
-        String selectSql = "SELECT a.userPhone,a.id userId , COUNT(a.userPhone) num FROM ( SELECT u.id, pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0 AND t.STATUS = 'AP'  AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = u.id) AND t.`WF_TASK_TYPE_ID` = 'TODO') a GROUP BY userPhone,userId";
+//        String selectSql = "SELECT a.userPhone,a.id userId , COUNT(a.userPhone) num FROM ( SELECT u.id, pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0 AND t.STATUS = 'AP'  AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = u.id) AND t.`WF_TASK_TYPE_ID` = 'TODO' AND t.AD_USER_ID not in (select AD_USER_ID from sms_white_list)) a GROUP BY userPhone,userId limit 1";
+        String selectSql = "SELECT a.userPhone,a.id userId , COUNT(a.userPhone) num FROM ( SELECT u.id, pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0 AND t.STATUS = 'AP'  AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = u.id) AND t.`WF_TASK_TYPE_ID` = 'TODO' AND t.AD_USER_ID not in (select AD_USER_ID from sms_white_list)) a GROUP BY userPhone,userId";
         List<Map<String, Object>> maps = jdbcTemplate.queryForList(selectSql);
 
         if (CollectionUtils.isEmpty(maps)) {
             return;
         }
 
-        // 13976720905   吴坤苗  此用户不需要发送短信
         List<RemindLog> result = maps.stream()
-                .filter(map -> !"13976720905".equals(map.get("userPhone")) && !"17721054782".equals(map.get("userPhone")))
                 .map(stringObjectMap -> {
                     RemindLog remindLog = new RemindLog();
                     remindLog.setCount(stringObjectMap.get("num").toString());
@@ -194,7 +189,7 @@ public class SendSmsJob {
 
                     // 参数封装
                     ArrayList<String> param = new ArrayList<>();
-                    param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "18696722176");
+                    param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "13696079131");
                     param.add(remindLog.getCount());
 
                     // 发送短信
