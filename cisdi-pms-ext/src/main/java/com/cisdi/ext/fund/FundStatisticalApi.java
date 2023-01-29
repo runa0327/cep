@@ -7,9 +7,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -51,7 +49,7 @@ public class FundStatisticalApi {
                 "(ifnull(temp1.sumApp,0) - ifnull(temp.sumAmt,0)) as unInPlaceAmt,\n" +
                 "(ifnull(temp1.sumApp,0) - ifnull(temp4.cumPayAmt,0)) as totalSyAmt,\n" +
                 "CONCAT((CAST(ROUND((ifnull(temp4.cumPayAmt,0)/ifnull(temp1.sumApp,0))*100,0) as char)),'%') as totalPayRate,\n" +
-                "fi.REMARK as remark \n" +
+                "fi.REMARK as remark,fi.CRT_DT createTime \n" +
                 "from FUND_IMPLEMENTATION fi \n" +
                 "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST \n" +
                 "left join FUND_TYPE ft1 on ft1.id = fi.FUND_CATEGORY_SECOND \n" +
@@ -82,20 +80,30 @@ public class FundStatisticalApi {
         if (Strings.isNotEmpty(beginDate) && Strings.isNotEmpty(endDate)) {
             sb.append(" and fi.APPROVAL_TIME between '").append(beginDate).append("' and '").append(endDate).append("'");
         }
-//        sb.append(" group by ft.`NAME`");
 
         sb.append(" order by fi.CRT_DT desc ");
-        String totalSql = sb.toString();
-        int start = pageSize * (pageIndex - 1);
-        sb.append(" limit ").append(start).append(",").append(pageSize);
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
-        List<DataListObject> dataList = list.stream().map(this::convertData).collect(Collectors.toList());
+        Map<String, List<Map<String, Object>>> mapBySourceName = list.stream().distinct().collect(Collectors.groupingBy(item -> String.valueOf(item.get("sourceName"))));
+        if (CollectionUtils.isEmpty(mapBySourceName)){
+            return;
+        }
+        List<Map<String, Object>> listGroupBySource = new ArrayList<>();
+
+        for (String source : mapBySourceName.keySet()) {
+            listGroupBySource.add(mapBySourceName.get(source).get(0));
+        }
+        List<DataListObject> dataList = listGroupBySource.stream()
+                .sorted(Comparator.comparing(item -> String.valueOf(item.get("createTime")),Comparator.reverseOrder()))
+                .skip(pageSize * (pageIndex - 1))
+                .limit(pageSize)
+                .map(this::convertData).collect(Collectors.toList());
+
         if (CollectionUtils.isEmpty(dataList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
-            List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
+//            List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
             OutSide outSide = new OutSide();
-            outSide.total = totalList.size();
+            outSide.total = mapBySourceName.keySet().size();
             outSide.list = dataList;
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
@@ -133,23 +141,25 @@ public class FundStatisticalApi {
                 "CONCAT((CAST(ROUND((ifnull(temp4.cumPayAmt,0)/ifnull(temp1.sumApp,0))*100,0) as char)),'%') as totalPayRate,\n" +
                 "fi.REMARK as remark \n" +
                 "from FUND_IMPLEMENTATION fi \n" +
+                "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
                 "left join FUND_TYPE ft on ft.id = fi.FUND_CATEGORY_FIRST \n" +
                 "left join FUND_TYPE ft1 on ft1.id = fi.FUND_CATEGORY_SECOND \n" +
-                "left join (select sum(REACH_AMOUNT) sumAmt,FUND_SOURCE_TEXT from fund_reach group by FUND_SOURCE_TEXT) temp on temp\n" +
-                ".FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
-                "left join (select sum(a.REACH_AMOUNT) sumZqAmt,a.FUND_SOURCE_TEXT from fund_reach a LEFT JOIN gr_set_value b on a.FUND_REACH_CATEGORY = b.id \n" +
-                "LEFT JOIN gr_set c on b.GR_SET_ID = c.id WHERE c.code = 'fund_reach_category' and b.code = 'fund_reach_category_landmove' \n" +
-                "group by FUND_SOURCE_TEXT) temp2 on temp2.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
-                "left join (select sum(a.REACH_AMOUNT) sumJsAmt,a.FUND_SOURCE_TEXT from fund_reach a LEFT JOIN gr_set_value b on a.FUND_REACH_CATEGORY = b.id \n" +
-                "LEFT JOIN gr_set c on b.GR_SET_ID = c.id WHERE c.code = 'fund_reach_category' and b.code = 'fund_reach_category_engineering' \n" +
-                "group by FUND_SOURCE_TEXT) temp3 on temp3.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
-                "left join (select sum(APPROVED_AMOUNT) sumApp,FUND_IMPLEMENTATION_ID from fund_implementation_detail group by FUND_IMPLEMENTATION_ID) temp1 on temp1\n" +
-                ".FUND_IMPLEMENTATION_ID = fi.id\n" +
-                "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
+                "left join (select sum(REACH_AMOUNT) sumAmt,FUND_SOURCE_TEXT,PM_PRJ_ID from fund_reach group by FUND_SOURCE_TEXT,PM_PRJ_ID) temp on" +
+                " temp.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT and temp.PM_PRJ_ID = fid.PM_PRJ_ID\n" +
+                "left join (select sum(a.REACH_AMOUNT) sumZqAmt,a.FUND_SOURCE_TEXT,PM_PRJ_ID from fund_reach a LEFT JOIN gr_set_value b on a" +
+                ".FUND_REACH_CATEGORY = b.id \n" +
+                "LEFT JOIN gr_set c on b.GR_SET_ID = c.id WHERE c.code = 'fund_reach_category' and b.code = 'fund_reach_category_land_acquisition' " +
+                "\n" +
+                "group by FUND_SOURCE_TEXT,PM_PRJ_ID) temp2 on temp2.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT and temp2.PM_PRJ_ID = fid.PM_PRJ_ID\n" +
+                "left join (select sum(a.REACH_AMOUNT) sumJsAmt,a.FUND_SOURCE_TEXT,PM_PRJ_ID from fund_reach a LEFT JOIN gr_set_value b on a" +
+                ".FUND_REACH_CATEGORY = b.id \n" +
+                "LEFT JOIN gr_set c on b.GR_SET_ID = c.id WHERE c.code = 'fund_reach_category' and b.code = 'fund_reach_category_construction' \n" +
+                "group by FUND_SOURCE_TEXT,PM_PRJ_ID) temp3 on temp3.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT and temp3.PM_PRJ_ID = fid.PM_PRJ_ID\n" +
+                "left join (select sum(APPROVED_AMOUNT) sumApp,FUND_IMPLEMENTATION_ID,PM_PRJ_ID from fund_implementation_detail group by " +
+                "FUND_IMPLEMENTATION_ID,PM_PRJ_ID) temp1 on temp1.FUND_IMPLEMENTATION_ID = fi.id and temp1.PM_PRJ_ID = fid.PM_PRJ_ID\n" +
                 "left join pm_prj pr on pr.id = fid.PM_PRJ_ID \n" +
                 "left join (select sum(IFNULL(fs.PAID_AMT,0)) cumPayAmt,fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID from fund_special fs group by fs" +
-                ".FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp4 on temp4.FUND_IMPLEMENTATION_V_ID = fid.id and temp4.PM_PRJ_ID = fid.PM_PRJ_ID\n" +
-                "where 1=1");
+                ".FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp4 on temp4.FUND_IMPLEMENTATION_V_ID = fid.id and temp4.PM_PRJ_ID = fid.PM_PRJ_ID where 1 = 1");
         if (Strings.isNotEmpty(fundCategoryId)) {
             sb.append(" and fi.FUND_CATEGORY_FIRST = '").append(fundCategoryId).append("'");
         }
