@@ -11,10 +11,7 @@ import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 采购合同变更申请 扩展
@@ -219,33 +216,35 @@ public class PoOrderChangeReqExt {
      * 合同变更审批-第二版审批流扩展-审批通过
      */
     public void flowExtTrueSecond(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //当前节点id
         String nodeId = ExtJarHelper.nodeInstId.get();
         //定义节点状态
-        String nodeStatus = getStatus("true",nodeId);
+        String nodeStatus = getStatus("true",nodeId,myJdbcTemplate);
         //详细处理逻辑
-        handleCHeckData(nodeStatus,nodeId);
+        handleCHeckData(nodeStatus,nodeId,myJdbcTemplate);
     }
 
     /**
      * 合同变更审批-第二版审批流扩展-审批驳回
      */
     public void flowExtFalseSecond(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //当前节点id
         String nodeId = ExtJarHelper.nodeInstId.get();
         //定义节点状态
-        String nodeStatus = getStatus("false",nodeId);
+        String nodeStatus = getStatus("false",nodeId,myJdbcTemplate);
         //详细处理逻辑
-        handleCHeckData(nodeStatus,nodeId);
+        handleCHeckData(nodeStatus,nodeId,myJdbcTemplate);
     }
 
     /**
      * 合同需求审批-流程扩展处理详情逻辑
      * @param nodeStatus 节点信息
      * @param nodeId 节点id信息
+     * @param myJdbcTemplate 数据源
      */
-    private void handleCHeckData(String nodeStatus,String nodeId) {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+    private void handleCHeckData(String nodeStatus,String nodeId,MyJdbcTemplate myJdbcTemplate) {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         String csCommId = entityRecord.csCommId;
         // 流程id
@@ -284,6 +283,92 @@ public class PoOrderChangeReqExt {
         } else if ("costFalse".equals(nodeStatus)){
             //成本岗审批意见清除
             clearPO_ORDER_CHANGE_REQ("AD_USER_THREE_ID",csCommId,myJdbcTemplate);
+        } else if ("financeTrue".equals(nodeStatus)){ //财务岗审批
+            if (firstCheck){
+                //财务岗审批意见清除
+                clearPO_ORDER_CHANGE_REQ("AD_USER_NINTH_ID",csCommId,myJdbcTemplate);
+            }
+            //审批意见数据回显
+            updatePO_ORDER_CHANGE_REQ("AD_USER_NINTH_ID",file,comment,csCommId,myJdbcTemplate);
+        } else if ("financeFalse".equals(nodeStatus)){ // 财务岗拒绝
+            //财务岗审批意见清除
+            clearPO_ORDER_CHANGE_REQ("AD_USER_NINTH_ID",csCommId,myJdbcTemplate);
+        } else if ("costFinanceTrue".equals(nodeStatus)){ //成本/财务审批
+            if (firstCheck){
+                //成本/财务审批意见清除
+                clearPO_ORDER_CHANGE_REQ("AD_USER_THREE_ID,AD_USER_NINTH_ID",csCommId,myJdbcTemplate);
+            }
+            //判断当前登录人岗位信息
+            String deptName = getUserDept(myJdbcTemplate,userId,csCommId);
+            //审批意见数据回显
+            updatePO_ORDER_CHANGE_REQ(deptName,file,comment,csCommId,myJdbcTemplate);
+        } else if ("costFinanceFalse".equals(nodeStatus)){ // 成本/财务审批拒绝
+            //成本/财务审批意见清除
+            clearPO_ORDER_CHANGE_REQ("AD_USER_THREE_ID,AD_USER_NINTH_ID",csCommId,myJdbcTemplate);
+        } else if ("lawyerTrue".equals(nodeStatus)){ //法律顾问审批通过
+            if (firstCheck){
+                //法律顾问审批意见清除
+                clearPO_ORDER_CHANGE_REQ("lawyer",csCommId,myJdbcTemplate);
+            }
+            //审批意见数据回显
+            updatePO_ORDER_CHANGE_REQ("lawyer",file,comment,csCommId,myJdbcTemplate);
+        } else if ("lawyerFalse".equals(nodeStatus)){ // 法律顾问审批拒绝
+            //法律顾问审批意见清除
+            clearPO_ORDER_CHANGE_REQ("lawyer",csCommId,myJdbcTemplate);
+        } else if ("legalTrue".equals(nodeStatus)){ //法务审批通过
+            if (firstCheck){
+                //法务审批意见清除
+                clearPO_ORDER_CHANGE_REQ("AD_USER_EIGHTH_ID",csCommId,myJdbcTemplate);
+            }
+            //审批意见数据回显
+            updatePO_ORDER_CHANGE_REQ("AD_USER_EIGHTH_ID",file,comment,csCommId,myJdbcTemplate);
+        } else if ("legalFalse".equals(nodeStatus)){ // 法务审批拒绝
+            //法务审批意见清除
+            clearPO_ORDER_CHANGE_REQ("AD_USER_EIGHTH_ID",csCommId,myJdbcTemplate);
+        } else if ("legalFinanceTrue".equals(nodeStatus)){ //法务/财务审批审批
+            if (firstCheck){
+                //法务/财务审批审批意见清除
+                clearPO_ORDER_CHANGE_REQ("AD_USER_EIGHTH_ID,AD_USER_NINTH_ID",csCommId,myJdbcTemplate);
+            }
+            //判断当前登录人岗位信息
+            String deptName = getUserDept(myJdbcTemplate,userId,csCommId);
+            //审批意见数据回显
+            updatePO_ORDER_CHANGE_REQ(deptName,file,comment,csCommId,myJdbcTemplate);
+        } else if ("legalFinanceFalse".equals(nodeStatus)){ // 法务/财务审批拒绝
+            //法务/财务审批审批意见清除
+            clearPO_ORDER_CHANGE_REQ("AD_USER_EIGHTH_ID,AD_USER_NINTH_ID",csCommId,myJdbcTemplate);
+        } else if ("costLegalFinanceTrue".equals(nodeStatus)){ //法务/财务/成本审批
+            if (firstCheck){
+                //法务/财务/成本审批意见清除
+                clearPO_ORDER_CHANGE_REQ("AD_USER_THREE_ID,AD_USER_EIGHTH_ID,AD_USER_NINTH_ID",csCommId,myJdbcTemplate);
+            }
+            //判断当前登录人岗位信息
+            String deptName = getUserDept(myJdbcTemplate,userId,csCommId);
+            //审批意见数据回显
+            updatePO_ORDER_CHANGE_REQ(deptName,file,comment,csCommId,myJdbcTemplate);
+        } else if ("costLegalFinanceFalse".equals(nodeStatus)){ // 法务/财务/成本审批拒绝
+            //法务/财务/成本审批意见清除
+            clearPO_ORDER_CHANGE_REQ("AD_USER_THREE_ID,AD_USER_EIGHTH_ID,AD_USER_NINTH_ID",csCommId,myJdbcTemplate);
+        } else if ("deptLeaderTrue".equals(nodeStatus)){ //部门领导审批通过
+            if (firstCheck){
+                //部门领导审批意见清除
+                clearPO_ORDER_CHANGE_REQ("deptLeader",csCommId,myJdbcTemplate);
+            }
+            //审批意见数据回显
+            updatePO_ORDER_CHANGE_REQ("deptLeader",file,comment,csCommId,myJdbcTemplate);
+        } else if ("deptLeaderFalse".equals(nodeStatus)){ // 部门领导审批拒绝
+            //部门领导审批意见清除
+            clearPO_ORDER_CHANGE_REQ("deptLeader",csCommId,myJdbcTemplate);
+        } else if ("chargeLeaderTrue".equals(nodeStatus)){ //分管领导审批通过
+            if (firstCheck){
+                //分管领导审批意见清除
+                clearPO_ORDER_CHANGE_REQ("chargeLeader",csCommId,myJdbcTemplate);
+            }
+            //审批意见数据回显
+            updatePO_ORDER_CHANGE_REQ("chargeLeader",file,comment,csCommId,myJdbcTemplate);
+        } else if ("chargeLeaderFalse".equals(nodeStatus)){ // 分管领导审批拒绝
+            //分管领导审批意见清除
+            clearPO_ORDER_CHANGE_REQ("chargeLeader",csCommId,myJdbcTemplate);
         }
     }
 
@@ -297,10 +382,20 @@ public class PoOrderChangeReqExt {
      */
     private void updatePO_ORDER_CHANGE_REQ(String deptName, String file, String comment, String csCommId, MyJdbcTemplate myJdbcTemplate) {
         StringBuilder sb = new StringBuilder("update PO_ORDER_CHANGE_REQ set ");
-        if ("caiHua".equals(deptName)){
+        if ("caiHua".equals(deptName)){ //才华回显
             sb.append("FILE_ID_SEVEN = ?, APPROVAL_COMMENT_SEVEN = ?");
-        } else if ("AD_USER_THREE_ID".equals(deptName)){
+        } else if ("AD_USER_THREE_ID".equals(deptName)){ //成本岗回显
             sb.append("FILE_ID_EIGHTH = ?, APPROVAL_COMMENT_EIGHTH = ?");
+        } else if ("AD_USER_NINTH_ID".equals(deptName)){ //财务岗回显
+            sb.append("FILE_ID_FOUR = ?, APPROVAL_COMMENT_THREE = ?");
+        } else if ("lawyer".equals(deptName)){ //法律意见回显
+            sb.append("FILE_ID_TWO = ?, APPROVAL_COMMENT_ONE = ?");
+        } else if ("AD_USER_EIGHTH_ID".equals(deptName)){ //法务意见回显
+            sb.append("FILE_ID_THREE = ?, APPROVAL_COMMENT_TWO = ?");
+        } else if ("deptLeader".equals(deptName)){ //部门领导意见回显
+            sb.append("FILE_ID_FIVE = ?, APPROVAL_COMMENT_FOUR = ?");
+        } else if ("chargeLeader".equals(deptName)){ //分管领导意见回显
+            sb.append("FILE_ID_SIX = ?, APPROVAL_COMMENT_FIVE = ?");
         }
         sb.append(" where id = ?");
         Integer exec = myJdbcTemplate.update(sb.toString(),file,comment,csCommId);
@@ -317,10 +412,20 @@ public class PoOrderChangeReqExt {
         String[] arr = str.split(",");
         StringBuilder sb = new StringBuilder("update PO_ORDER_CHANGE_REQ set ");
         for (String tmp : arr) {
-            if ("caiHua".equals(tmp)){
+            if ("caiHua".equals(tmp)){ //才华清除
                 sb.append("APPROVAL_COMMENT_SEVEN = null,FILE_ID_SEVEN = null,");
-            } else if ("AD_USER_THREE_ID".equals(tmp)){
+            } else if ("AD_USER_THREE_ID".equals(tmp)){ //成本岗清除
                 sb.append("APPROVAL_COMMENT_EIGHTH = null,FILE_ID_EIGHTH = null,");
+            } else if ("AD_USER_NINTH_ID".equals(tmp)){ //财务岗清除
+                sb.append("FILE_ID_FOUR = null, APPROVAL_COMMENT_THREE = null,");
+            }  else if ("lawyer".equals(tmp)){ //法律意见清除
+                sb.append("FILE_ID_TWO = null, APPROVAL_COMMENT_ONE = null,");
+            } else if ("AD_USER_EIGHTH_ID".equals(tmp)){ //法务意见清除
+                sb.append("FILE_ID_THREE = null, APPROVAL_COMMENT_TWO = null,");
+            } else if ("deptLeader".equals(tmp)){ //部门领导意见清除
+                sb.append("FILE_ID_FIVE = null, APPROVAL_COMMENT_FOUR = null,");
+            } else if ("chargeLeader".equals(tmp)){ //分管领导意见清除
+                sb.append("FILE_ID_SIX = null, APPROVAL_COMMENT_FIVE = null,");
             }
         }
         sb.deleteCharAt(sb.length()-1);
@@ -342,9 +447,9 @@ public class PoOrderChangeReqExt {
         Map<String,String> map = new HashMap<>();
         String sql = "select a.USER_COMMENT,a.USER_ATTACHMENT from wf_task a " +
                 "left join wf_node_instance b on a.WF_NODE_INSTANCE_ID = b.id and b.status = 'ap' " +
-                "where b.WF_NODE_ID = ? and a.AD_USER_ID = ? and a.status = 'ap' and a.IS_CLOSED = 0 and a.LK_WF_INST_ID = ?";
+                "where b.id = ? and a.AD_USER_ID = ? and a.status = 'ap' and a.IS_CLOSED = 1 and a.WF_PROCESS_INSTANCE_ID = ?";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,nodeId,userId,procInstId);
-        if (!CollectionUtils.isEmpty(map)){
+        if (!CollectionUtils.isEmpty(list)){
             String value = SharedUtil.isEmptyString(JdbcMapUtil.getString(list.get(0),"USER_COMMENT")) ? "同意" : JdbcMapUtil.getString(list.get(0),"USER_COMMENT");
             map.put("comment",userName + "：" + value);
             map.put("file",JdbcMapUtil.getString(list.get(0),"USER_ATTACHMENT"));
@@ -353,7 +458,11 @@ public class PoOrderChangeReqExt {
     }
 
     // 节点状态赋值
-    private String getStatus(String status, String nodeId) {
+    private String getStatus(String status, String wfNodeId, MyJdbcTemplate myJdbcTemplate) {
+        //根据节点实例id查询流程节点id
+        String sql = "select WF_NODE_ID from wf_node_instance where id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,wfNodeId);
+        String nodeId = JdbcMapUtil.getString(list.get(0),"WF_NODE_ID");
         String name = "";
         if ("true".equals(status)){
             if ("1619159246757302272".equals(nodeId)){ //2-才华预审
@@ -399,6 +508,38 @@ public class PoOrderChangeReqExt {
             } else if ("1619158462342762496".equals(nodeId)){ //11-分管领导审批
                 name = "chargeLeaderFalse";
             }
+        }
+        return name;
+    }
+
+
+
+    /**
+     * 查询人员在该流程中的岗位
+     * @param myJdbcTemplate 数据源
+     * @param userId 当前登录人id
+     * @param csCommId 流程实例id
+     * @return
+     */
+    private String getUserDept(MyJdbcTemplate myJdbcTemplate, String userId, String csCommId) {
+        String sql3 = "select AD_USER_THREE_ID,AD_USER_EIGHTH_ID,AD_USER_NINTH_ID from PO_ORDER_CHANGE_REQ where id = ?";
+        Map<String,Object> map = myJdbcTemplate.queryForMap(sql3,csCommId);
+        return getDeptName(map,userId);
+    }
+
+    //判断当前登录人在流程中的岗位
+    private String getDeptName(Map<String, Object> map,String userId) {
+        String name = "";
+        Set<String> set = map.keySet();
+        for (String tmp : set) {
+            Object object = map.get(tmp);
+            if (object != null){
+                String value = object.toString();
+                if (value.contains(userId)){
+                    return tmp;
+                }
+            }
+
         }
         return name;
     }

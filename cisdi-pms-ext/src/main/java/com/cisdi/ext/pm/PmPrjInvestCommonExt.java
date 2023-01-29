@@ -77,5 +77,6 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("AD_USER_FOUR_ID"); // 合同岗
         entityRecord.extraEditableAttCodeList.add("AD_USER_EIGHTH_ID"); // 法务岗用户
         entityRecord.extraEditableAttCodeList.add("AD_USER_NINTH_ID"); // 财务岗用户
+        entityRecord.extraEditableAttCodeList.add("PRJ_REPLY_NO"); // 项目文号
     }
 }

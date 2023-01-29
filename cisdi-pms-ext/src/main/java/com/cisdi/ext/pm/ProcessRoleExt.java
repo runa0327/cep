@@ -589,4 +589,50 @@ public class ProcessRoleExt {
         }
         return user;
     }
+
+    /**
+     * 查询任意流程选择的成本岗用户
+     */
+    public void getProcessCostUser(){
+        getDeptUser("AD_USER_THREE_ID","post_cost","成本岗");
+    }
+
+    /**
+     * 查询任意流程选择的法务岗用户
+     */
+    public void getProcessLegalUser(){
+        getDeptUser("AD_USER_EIGHTH_ID","post_legal","法务岗");
+    }
+
+    /**
+     * 查询任意流程选择的财务岗用户
+     */
+    public void getProcessFinanceUser(){
+        getDeptUser("AD_USER_NINTH_ID","post_finance","财务岗");
+    }
+
+    /**
+     * 查询任意流程中对应岗位人员
+     * @param deptCode 岗位属性代码
+     * @param post_cost 部门树岗位编码
+     * @param deptName 岗位中文说明
+     */
+    private void getDeptUser(String deptCode, String post_cost, String deptName) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //流程id
+        String csCommId = entityRecord.csCommId;
+        //获取流程实体编码
+        String entityCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        String sql1 = "select "+deptCode+" from "+entityCode+" where id = ?";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,csCommId);
+        if (!CollectionUtils.isEmpty(list1)){
+            List<String> userList = list1.stream().map(p-> JdbcMapUtil.getString(p,deptCode)).collect(Collectors.toList());
+            ArrayList<Object> userIdList = new ArrayList<>();
+            userIdList.addAll(userList);
+            ExtJarHelper.returnValue.set(userIdList);
+        } else {
+            throw new BaseException("该流程未配置 ‘"+deptName+"' 人员，请先选择对应人员或联系管理员处理！");
+        }
+    }
 }

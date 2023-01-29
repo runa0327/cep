@@ -1,6 +1,12 @@
 package com.cisdi.ext.link;
 
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.ad.att.AttDataTypeE;
+import com.qygly.shared.util.JdbcMapUtil;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 属性联动详情
@@ -106,6 +112,69 @@ public class AttLinkExtDetail {
             attLinkResult.attMap.put("PROJECT_TYPE_ID", linkedAtt); //项目类型
             attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt); //项目介绍
             attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt); //资金来源
+            attLinkResult.attMap.put("CUSTOMER_UNIT", linkedAtt); //业主单位
         }
     }
+
+    /**
+     * 清空项目配套人员信息
+     * @param attLinkResult 返回的数据结果集
+     */
+    private static void clearProjectUserData(AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            attLinkResult.attMap.put("AD_USER_THREE_ID", linkedAtt); //成本岗
+            attLinkResult.attMap.put("PRJ_COST_USER_ID", linkedAtt); //成本岗
+            attLinkResult.attMap.put("PRJ_DESIGN_USER_ID", linkedAtt); //设计岗
+            attLinkResult.attMap.put("PRJ_EARLY_USER_ID", linkedAtt); //前期岗
+        }
+    }
+
+    /**
+     * 项目成本岗自动带出
+     * @param attLinkResult 返回数据结果集
+     * @param myJdbcTemplate 数据源
+     * @param userId 该岗位人员id
+     */
+    public static void copyPrjCostUser(AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate, String userId) {
+        String name = getName(myJdbcTemplate,userId);
+        //成本岗
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = userId;
+            linkedAtt.text = name;
+            attLinkResult.attMap.put("AD_USER_THREE_ID", linkedAtt);
+        }
+    }
+
+    /**
+     * 查询人员名称
+     * @param myJdbcTemplate 数据源
+     * @param userId 用户id
+     * @return 人员名称
+     */
+    private static String getName(MyJdbcTemplate myJdbcTemplate, String userId) {
+        String name = null;
+        String sql = "select name from ad_user where id = ? ";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,userId);
+        if (!CollectionUtils.isEmpty(list)){
+            name = JdbcMapUtil.getString(list.get(0),"name");
+        }
+        return name;
+    }
+
+    /**
+     * 项目数据来源数据清空
+     * @param attLinkResult 返回的数据结果集
+     */
+    public static void clearDataSourceType(AttLinkResult attLinkResult) {
+        clearProjectAmtData(attLinkResult); //清空资金信息
+        clearBaseProjectData(attLinkResult); //清空项目信息
+        clearProjectUserData(attLinkResult); //清空项目配套人员信息
+    }
+
 }
