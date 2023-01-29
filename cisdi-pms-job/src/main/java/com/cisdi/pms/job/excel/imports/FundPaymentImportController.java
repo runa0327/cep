@@ -124,11 +124,12 @@ public class FundPaymentImportController extends BaseController {
                             "PAYEE = ?," +
                             "RECEIVE_BANK = ?," +
                             "RECEIVE_ACCOUNT = ?," +
-                            "FUND_NEWLY_INCREASED_DETAIL_ID=? " +
+                            "FUND_NEWLY_INCREASED_DETAIL_ID=? ," +
+                            "COLLECTION_ACCOUNT=? " +
                             "where ID = ?",
                     list.get(0).get("FUND_REACH_CATEGORY"), costCategoryId,
                     model.getFeeDetail(), model.getPayAmt().replace(",", ""),
-                    payUnit, payBank, payAccount, model.getPayee(), model.getPayBank(), model.getPayAccount(), fundNewlyIncreasedDetailId,
+                    payUnit, payBank, payAccount, model.getPayee(), model.getPayBank(), model.getPayAccount(), fundNewlyIncreasedDetailId, model.getCollectionAccount(),
                     fundPayInfoId);
 
 

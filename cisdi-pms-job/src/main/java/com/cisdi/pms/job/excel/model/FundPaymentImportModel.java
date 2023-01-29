@@ -73,6 +73,10 @@ public class FundPaymentImportModel {
     @ColumnWidth(value = 30)
     private String payAccount;
 
+    @ExcelProperty("收款账户名称")
+    @ColumnWidth(value = 30)
+    private String collectionAccount;
+
     @ExcelProperty("收款银行")
     @ColumnWidth(value = 30)
     private String receiptBank;
