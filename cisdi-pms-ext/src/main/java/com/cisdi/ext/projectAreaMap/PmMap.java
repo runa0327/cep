@@ -11,10 +11,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -39,7 +36,7 @@ public class PmMap {
         List<String> ids = Arrays.asList(projectIds.split(","));
         for (String s : ids) {
             String id = Crud.from("PM_MAP").insertData();
-            Crud.from("PM_MAP").where().eq("ID" , id).update().set("PM_PRJ_ID" , s).set("LONGITUDE" , longitude).set("LATITUDE" , latitude).exec();
+            Crud.from("PM_MAP").where().eq("ID", id).update().set("PM_PRJ_ID", s).set("LONGITUDE", longitude).set("LATITUDE", latitude).exec();
         }
     }
 
@@ -64,7 +61,7 @@ public class PmMap {
                 "left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID \n" +
                 "left join gr_set_value ggg on ggg.id = pj.PRJ_MANAGE_MODE_ID \n" +
                 "left join pm_party pppm on pppm.id = pj.CONSTRUCTOR_UNIT \n" +
-                " where pj.id in (select PM_PRJ_ID from PM_MAP where LONGITUDE=? and LATITUDE=?)" , longitude, latitude);
+                " where pj.id in (select PM_PRJ_ID from PM_MAP where LONGITUDE=? and LATITUDE=?)", longitude, latitude);
 
         List<Project> projects = list.stream().map(p -> {
             Project pro = new Project();
@@ -114,7 +111,7 @@ public class PmMap {
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST from PM_INVEST_EST pie \n" +
                 " left join gr_set_value gsv on gsv.id = pie.INVEST_EST_TYPE_ID \n" +
                 " left join gr_set gs on gs.id = gsv.GR_SET_ID and gs.code ='invest_est_type' \n" +
-                " where gsv.code='invest2' and PM_PRJ_ID=?" , projectId);
+                " where gsv.code='invest2' and PM_PRJ_ID=?", projectId);
         if (!CollectionUtils.isEmpty(list)) {
             return BigDecimalUtil.stringToBigDecimal(String.valueOf(list.get(0).get("PRJ_TOTAL_INVEST")));
         }
@@ -162,10 +159,12 @@ public class PmMap {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         String code = String.valueOf(params.get("code"));
+        int pageSize = JdbcMapUtil.getInt(params, "pageSize");
+        int pageIndex = JdbcMapUtil.getInt(params, "pageIndex");
 
         String sql = "select pj.id as id ,pj.name as name,pp.name as project_own,gsv.`NAME` as projectType from pm_prj pj " +
                 "                left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID  " +
-                "                left join PM_PARTY pp on pp.id = pj.CUSTOMER_UNIT "+
+                "                left join PM_PARTY pp on pp.id = pj.CUSTOMER_UNIT " +
                 "                where pj.`STATUS`='ap'";
         StringBuffer sb = new StringBuffer();
         sb.append(sql);
@@ -176,6 +175,10 @@ public class PmMap {
         } else {
             sb.append(" and gsv.`NAME` = '市政道路'");
         }
+        String totalSql = sb.toString();
+        int start = pageSize * (pageIndex - 1);
+        sb.append(" limit ").append(start).append(",").append(pageSize);
+
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
         List<ProjectInfo> res = list.stream().map(p -> {
             ProjectInfo info = new ProjectInfo();
@@ -185,10 +188,17 @@ public class PmMap {
             info.own = JdbcMapUtil.getString(p, "project_own");
             return info;
         }).collect(Collectors.toList());
-        OutSide outSide = new OutSide();
-        outSide.res = res;
-        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
-        ExtJarHelper.returnValue.set(outputMap);
+
+        if (CollectionUtils.isEmpty(res)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
+            OutSide outSide = new OutSide();
+            outSide.res = res;
+            outSide.total = totalList.size();
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
     }
 
 
@@ -248,6 +258,8 @@ public class PmMap {
         public List<ProjectBigScreen> bigScreenList;
 
         public List<ProjectInfo> res;
+
+        public Integer total;
     }
 
 
