@@ -56,12 +56,13 @@ public class dealtWorkJob {
 
     // TODO 2023-01-17 先注释掉处理下面的代办的定时任务
     // @Scheduled(fixedDelayString = "300000")
+//    @Scheduled(cron = "20 43 9 ? * *")
     public void handleDealt() {
 
         if (!dealtSwitch) return;
 
         // 锁表  防止多台服务器同时修改
-        String lockSql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code='DEALT_INFO_LOCK' and (t.LOCK_EXT_DTTM_ATT01_VAL is null or t.LOCK_EXT_DTTM_ATT01_VAL <= SUBDATE(NOW(),INTERVAL -10 minute))";
+        String lockSql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code='DEALT_INFO_LOCK' and (t.LOCK_EXT_DTTM_ATT01_VAL is null or t.LOCK_EXT_DTTM_ATT01_VAL <= ADDDATE(NOW(),INTERVAL -10 minute))";
         int lock = jdbcTemplate.update(lockSql);
 
         try {
@@ -80,7 +81,7 @@ public class dealtWorkJob {
 
                 String testParam = dealtSwitchTest == Boolean.TRUE ? "" : "and w.AD_USER_ID = '0100031468511690944'";
                 // 根据wf_task表查询  所有的任务状态  TODO需要添加待办事项
-                String sql = "SELECT w.AD_USER_ID,COUNT(w.WF_PROCESS_INSTANCE_ID) num from wf_task w WHERE  w.IS_CLOSED = ? and w.WF_TASK_TYPE_ID = ? " + testParam + " GROUP BY w.AD_USER_ID";
+                String sql = "SELECT w.AD_USER_ID,COUNT(w.WF_PROCESS_INSTANCE_ID) num from wf_task w WHERE w.STATUS = 'AP' and w.IS_CLOSED = ? and w.WF_TASK_TYPE_ID = ? " + testParam + " GROUP BY w.AD_USER_ID";
                 List<Map<String, Object>> info = jdbcTemplate.queryForList(sql, "0", "TODO");
 
                 // 添加待办事项
@@ -93,7 +94,7 @@ public class dealtWorkJob {
             if (lock > 0) {
                 // 循环10次，放置修改失败
                 for (int i = 0; i < 10; i++) {
-                    String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code=?";
+                    String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=null where t.code=?";
                     int up = jdbcTemplate.update(sql, "DEALT_INFO_LOCK");
                     // 如果修改成功，直接跳出循环
                     if (up > 0) {
