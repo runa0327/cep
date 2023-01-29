@@ -39,7 +39,7 @@ public class PmMap {
         List<String> ids = Arrays.asList(projectIds.split(","));
         for (String s : ids) {
             String id = Crud.from("PM_MAP").insertData();
-            Crud.from("PM_MAP").where().eq("ID", id).update().set("PM_PRJ_ID", s).set("LONGITUDE", longitude).set("LATITUDE", latitude).exec();
+            Crud.from("PM_MAP").where().eq("ID" , id).update().set("PM_PRJ_ID" , s).set("LONGITUDE" , longitude).set("LATITUDE" , latitude).exec();
         }
     }
 
@@ -64,7 +64,7 @@ public class PmMap {
                 "left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID \n" +
                 "left join gr_set_value ggg on ggg.id = pj.PRJ_MANAGE_MODE_ID \n" +
                 "left join pm_party pppm on pppm.id = pj.CONSTRUCTOR_UNIT \n" +
-                " where pj.id in (select PM_PRJ_ID from PM_MAP where LONGITUDE=? and LATITUDE=?)", longitude, latitude);
+                " where pj.id in (select PM_PRJ_ID from PM_MAP where LONGITUDE=? and LATITUDE=?)" , longitude, latitude);
 
         List<Project> projects = list.stream().map(p -> {
             Project pro = new Project();
@@ -91,7 +91,6 @@ public class PmMap {
      * 获取3D地图绑定的项目
      */
     public void getMapProject() {
-        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pp.PM_PRJ_ID as PM_PRJ_ID,pp.LONGITUDE as LONGITUDE,pp.LATITUDE as LATITUDE,pj.`NAME` as `NAME` from PM_MAP pp left join pm_prj pj on pp.PM_PRJ_ID = pj.id");
         List<Project> projectList = list.stream().map(p -> {
@@ -115,7 +114,7 @@ public class PmMap {
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST from PM_INVEST_EST pie \n" +
                 " left join gr_set_value gsv on gsv.id = pie.INVEST_EST_TYPE_ID \n" +
                 " left join gr_set gs on gs.id = gsv.GR_SET_ID and gs.code ='invest_est_type' \n" +
-                " where gsv.code='invest2' and PM_PRJ_ID=?", projectId);
+                " where gsv.code='invest2' and PM_PRJ_ID=?" , projectId);
         if (!CollectionUtils.isEmpty(list)) {
             return BigDecimalUtil.stringToBigDecimal(String.valueOf(list.get(0).get("PRJ_TOTAL_INVEST")));
         }
@@ -148,13 +147,46 @@ public class PmMap {
 
         List<Map<String, Object>> list3 = list.stream().filter(p -> !"民用建筑".equals(JdbcMapUtil.getString(p, "projectType")) && !"市政道路".equals(JdbcMapUtil.getString(p, "projectType"))).collect(Collectors.toList());
         ProjectBigScreen bigScreen3 = new ProjectBigScreen();
-        bigScreen3.projectType ="其他项目";
+        bigScreen3.projectType = "其他项目";
         bigScreen3.count = list3.size();
         bigScreen3.area = list3.stream().map(p -> new BigDecimal(JdbcMapUtil.getString(p, "area"))).reduce(BigDecimal.ZERO, BigDecimal::add);
         resList.add(bigScreen3);
 
         OutSide outSide = new OutSide();
         outSide.bigScreenList = resList;
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+    }
+
+    public void projectTypeList() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
+        String code = String.valueOf(params.get("code"));
+
+        String sql = "select pj.id as id ,pj.name as name,pp.name as project_own,gsv.`NAME` as projectType from pm_prj pj " +
+                "                left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID  " +
+                "                left join PM_PARTY pp on pp.id = pj.CUSTOMER_UNIT "+
+                "                where pj.`STATUS`='ap'";
+        StringBuffer sb = new StringBuffer();
+        sb.append(sql);
+        if ("其他项目".equals(code)) {
+            sb.append(" and gsv.`NAME` not in ('民用建筑','市政道路') ");
+        } else if ("房建项目".equals(code)) {
+            sb.append(" and gsv.`NAME` = '民用建筑'");
+        } else {
+            sb.append(" and gsv.`NAME` = '市政道路'");
+        }
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
+        List<ProjectInfo> res = list.stream().map(p -> {
+            ProjectInfo info = new ProjectInfo();
+            info.id = JdbcMapUtil.getString(p, "id");
+            info.name = JdbcMapUtil.getString(p, "name");
+            info.type = JdbcMapUtil.getString(p, "projectType");
+            info.own = JdbcMapUtil.getString(p, "project_own");
+            return info;
+        }).collect(Collectors.toList());
+        OutSide outSide = new OutSide();
+        outSide.res = res;
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
@@ -214,6 +246,8 @@ public class PmMap {
     public static class OutSide {
         public List<Project> list;
         public List<ProjectBigScreen> bigScreenList;
+
+        public List<ProjectInfo> res;
     }
 
 
@@ -223,5 +257,15 @@ public class PmMap {
         public int count;
 
         public BigDecimal area;
+    }
+
+
+    public static class ProjectInfo {
+        public String id;
+        public String name;
+        public String type;
+        public String own;
+        public BigDecimal invest = BigDecimal.ZERO;
+        public BigDecimal imageProgress = BigDecimal.ZERO;
     }
 }
