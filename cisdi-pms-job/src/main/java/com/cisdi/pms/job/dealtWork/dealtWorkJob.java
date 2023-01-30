@@ -2,6 +2,7 @@ package com.cisdi.pms.job.dealtWork;
 
 import cn.hutool.core.util.IdUtil;
 import com.cisdi.pms.job.utils.RestTemplateUtils;
+import com.cisdi.pms.job.utils.StringUtils;
 import com.cisdi.pms.job.utils.Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,7 @@ public class dealtWorkJob {
 
 
     // TODO 2023-01-17 先注释掉处理下面的代办的定时任务
-    // @Scheduled(fixedDelayString = "300000")
+     @Scheduled(fixedDelayString = "300000")
 //    @Scheduled(cron = "20 43 9 ? * *")
     public void handleDealt() {
 
@@ -72,8 +73,10 @@ public class dealtWorkJob {
 
                 // 旧待办变为已读
                 String queryDealt = "select APP_ID appId,USER_ID userId,MSG_ID msgId from dealt_task_info where REMARK = '0'";
-                Map<String, Object> queryDealtMap = jdbcTemplate.queryForMap(queryDealt);
-                dealtRead(queryDealtMap.get("appId").toString(), queryDealtMap.get("userId").toString(), queryDealtMap.get("msgId").toString());
+                List<Map<String, Object>> queryDealtMaps = jdbcTemplate.queryForList(queryDealt);
+                for (Map<String, Object> queryDealtMap : queryDealtMaps) {
+                    dealtRead(queryDealtMap.get("appId").toString(), queryDealtMap.get("userId").toString(), queryDealtMap.get("msgId").toString());
+                }
 
                 // 获取dealt_task_info 中remark为0的数据  变成为1 新增数据
                 String updateDealt = "update dealt_task_info set REMARK = '1' where REMARK = '0'";
@@ -81,7 +84,7 @@ public class dealtWorkJob {
 
                 String testParam = dealtSwitchTest == Boolean.TRUE ? "" : "and w.AD_USER_ID = '0100031468511690944'";
                 // 根据wf_task表查询  所有的任务状态  TODO需要添加待办事项
-                String sql = "SELECT w.AD_USER_ID,COUNT(w.WF_PROCESS_INSTANCE_ID) num from wf_task w WHERE w.STATUS = 'AP' and w.IS_CLOSED = ? and w.WF_TASK_TYPE_ID = ? " + testParam + " GROUP BY w.AD_USER_ID";
+                String sql = "SELECT w.AD_USER_ID,COUNT(w.WF_PROCESS_INSTANCE_ID) num from wf_task w WHERE w.STATUS = 'AP' and w.IS_CLOSED = ? and w.WF_TASK_TYPE_ID = ? and AD_USER_ID is not null " + testParam + " GROUP BY w.AD_USER_ID";
                 List<Map<String, Object>> info = jdbcTemplate.queryForList(sql, "0", "TODO");
 
                 // 添加待办事项
@@ -110,13 +113,18 @@ public class dealtWorkJob {
      * 将user_id定期存入本地
      */
     private void savaUserId() {
-        // 只对ap状态用户
+        // 只对ap状态用户 查询所有本地用户去除dealt_user已经保存的
         String sql = "SELECT DISTINCT a.CODE,a.ID FROM ad_user a WHERE STATUS = 'AP' AND NOT EXISTS (SELECT u.AD_USER_ID  FROM dealt_user_info u WHERE u.AD_USER_ID = a.`ID`)";
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+        //查询已经同步了id的本地用户
+        String selectSql = "select USER_ID from dealt_user_info";
+        List<String> dealtUsers = jdbcTemplate.queryForList(selectSql, String.class);
         if (!CollectionUtils.isEmpty(list)) {
-            list.stream().forEach(map -> saveUserId(queryUserInfo(map.get("CODE").toString()), map.get("CODE").toString(), map.get("ID").toString()));
+            list.stream().filter(map -> StringUtils.isChinaPhoneLegal(map.get("CODE").toString()))
+                    .forEach(map -> saveUserId(queryUserInfo(map.get("CODE").toString()), map.get("CODE").toString(), map.get("ID").toString(),dealtUsers));
         }
     }
+
 
 
     /**
@@ -125,14 +133,12 @@ public class dealtWorkJob {
      * @param userId
      * @param phone
      */
-    private void saveUserId(String userId, String phone, String adUserId) {
+    private void saveUserId(String userId, String phone, String adUserId,List<String> dealtUsers) {
         // 判断当前用户id是否已经存储在本地表中
-        String selectSql = "select USER_ID from dealt_user_info";
-        List<String> list = jdbcTemplate.queryForList(selectSql, String.class);
-        if (!CollectionUtils.isEmpty(list) && !list.contains(null)) {
-            List<String> userIds = list.stream().filter(lis -> lis.equals(userId)).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(dealtUsers) && !dealtUsers.contains(null)) {
+            List<String> userIds = dealtUsers.stream().filter(lis -> lis.equals(userId)).collect(Collectors.toList());
             // 如果当前用户id已存在，则不保存
-            if (!CollectionUtils.isEmpty(userIds) && !CollectionUtils.isEmpty(list)) {
+            if (!CollectionUtils.isEmpty(userIds) && !CollectionUtils.isEmpty(dealtUsers)) {
                 return;
             }
         }
@@ -181,7 +187,9 @@ public class dealtWorkJob {
         String userIdSql = "select USER_ID from dealt_user_info where AD_USER_ID = ?";
         List<String> list = jdbcTemplate.queryForList(userIdSql, String.class, map.get("AD_USER_ID"));
         if (CollectionUtils.isEmpty(list)) {
-            throw new RuntimeException("该用户不存在");
+            List<String> phones = jdbcTemplate.queryForList("select code from ad_user where id = ?", String.class, map.get("AD_USER_ID"));
+            log.error("该用户不存在" + phones.get(0));
+            return;
         }
 
         // 获取当前时间
@@ -239,13 +247,18 @@ public class dealtWorkJob {
      */
     private String queryUserInfo(String phone) {
         //   https://portal.test.yzbays.cn/api/v1/outside/phoneFindUser?phone=13696079131
+        log.info("手机号" + phone);
         String url = requestPath + "/api/v1/outside/phoneFindUser?phone=" + (Boolean.TRUE.equals(phoneSwitch) ? phone : "13696079131");
         Map<String, String> headers = getHeaders();
-
         ResponseEntity<Map> result = RestTemplateUtils.post(url, headers, "", Map.class, "");
 
         Map<String, Object> data = (Map<String, Object>) result.getBody().get("data");
-        return data.get("id").toString();
+        log.info("返回数据" + data);
+        if (!CollectionUtils.isEmpty(data)){
+            return data.get("id").toString();
+        }else {
+            return "";
+        }
     }
 
     /**
