@@ -130,6 +130,7 @@ public class SendSmsJob {
      */
     // TODO 2023-01-17 暂时注释掉
 //     @Scheduled(cron = "${cisdi-pms-job.sms-timing}")
+//    @Scheduled(fixedDelayString = "10000000")
     public void sendSmsForNineAlone() {
         // 开关短信功能
         if (!smsSwitch) {
@@ -189,15 +190,20 @@ public class SendSmsJob {
 
                     // 参数封装
                     ArrayList<String> param = new ArrayList<>();
-                    param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "13696079131");
-                    param.add(remindLog.getCount());
+                    String phone = Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "13696079131";
+                    //手机号是否合法
+                    if (com.cisdi.pms.job.utils.StringUtils.isChinaPhoneLegal(phone)){
+                        param.add(phone);
+                        param.add(remindLog.getCount());
 
-                    // 发送短信
-                    this.sendSms(templateId, param);
-
-                    log.info("日志发送，接收人电话号码：{}", remindLog.getUserPhone());
-                    // 记录日志
-                    this.insertRemindLog(remindLog, true);
+                        // 发送短信
+                        this.sendSms(templateId, param);
+                        log.info("日志发送，接收人电话号码：{}", remindLog.getUserPhone());
+                        // 记录日志
+                        this.insertRemindLog(remindLog, true);
+                    }else {
+                        log.error(phone + "手机号不合法");
+                    }
 
                 });
             }
