@@ -177,4 +177,115 @@ public class AttLinkExtDetail {
         clearProjectUserData(attLinkResult); //清空项目配套人员信息
     }
 
+    /**
+     * 合同签订、补充协议 是否标准模板属性联动数据清除
+     * @param attLinkResult
+     */
+    public static void clearOrderIsStandard(AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            attLinkResult.attMap.put("FILE_ID_SIX", linkedAtt); //法律审核附件
+            attLinkResult.attMap.put("FILE_ID_TWO", linkedAtt); //财务部门修订稿
+            attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt); //法务部门修订稿
+            attLinkResult.attMap.put("YES_NO_ONE", linkedAtt); //审核意见是否完全采纳
+            attLinkResult.attMap.put("REMARK_ONE", linkedAtt); //审核意见采纳说明
+            attLinkResult.attMap.put("FILE_ID_FOUR", linkedAtt); //采纳意见附件
+            attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt); //合同送审稿
+            attLinkResult.attMap.put("AD_USER_ID", linkedAtt); //合同签订联系人
+        }
+    }
+
+    /**
+     * 合同签订、补充协议 是否标准模板属性联动数
+     * @param attLinkResult 返回的数据结果集
+     * @param code 联动的属性值 是(Y)， 否(N)
+     */
+    public static void handleOrderIsStandard(AttLinkResult attLinkResult, String code) {
+        Boolean faWuChangeToShown =  true; //法务部门修订稿显示
+        Boolean caiWuChangeToShown =  true; //财务部门修订稿显示
+        Boolean isCaiNaChangeToShown =  true; //审核意见是否完全采纳显示
+        Boolean caiNaChangeToShown =  true; //采纳说明显示
+        Boolean caiNaFileChangeToShown =  true; //采纳附件显示
+        Boolean heTongChangeToShown =  true; //合同送审稿显示
+        Boolean falvChangeToShown = true; // 法律审核附件显示
+        Boolean phoneChangeToShown = false; // 联系电话 默认不显示
+        Boolean userChangeToMandatory = true; // 联系人默认必填
+        if ("Y".equals(code)){
+            faWuChangeToShown =  false;
+            caiWuChangeToShown =  false;
+            isCaiNaChangeToShown =  false;
+            caiNaChangeToShown =  false;
+            caiNaFileChangeToShown =  false;
+            heTongChangeToShown =  false;
+            falvChangeToShown = false;
+            userChangeToMandatory = false;
+            phoneChangeToShown = true;
+        }
+        // 法律审核附件
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.changeToShown = falvChangeToShown;
+            attLinkResult.attMap.put("FILE_ID_SIX", linkedAtt);
+        }
+        // 财务部门修订稿
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.changeToShown = faWuChangeToShown;
+            attLinkResult.attMap.put("FILE_ID_TWO", linkedAtt);
+        }
+        // 法务部门修订稿
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.changeToShown = caiWuChangeToShown;
+            attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
+        }
+        // 审核意见是否完全采纳
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.changeToShown = isCaiNaChangeToShown;
+            attLinkResult.attMap.put("YES_NO_ONE", linkedAtt);
+        }
+        // 审核意见采纳说明
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.changeToShown = caiNaChangeToShown;
+            attLinkResult.attMap.put("REMARK_ONE", linkedAtt);
+        }
+        // 采纳意见附件
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.changeToShown = caiNaFileChangeToShown;
+            attLinkResult.attMap.put("FILE_ID_FOUR", linkedAtt);
+        }
+        // 合同送审稿
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.changeToShown = heTongChangeToShown;
+            attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt);
+        }
+        // 联系人
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.changeToMandatory = userChangeToMandatory;
+            attLinkResult.attMap.put("AD_USER_ID", linkedAtt);
+        }
+        // 联系电话
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.changeToShown = phoneChangeToShown;
+            attLinkResult.attMap.put("CONTACT_MOBILE_ONE", linkedAtt);
+        }
+    }
 }

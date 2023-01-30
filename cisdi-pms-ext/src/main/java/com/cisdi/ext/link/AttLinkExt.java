@@ -2224,87 +2224,10 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("YES_NO_FOUR", linkedAtt);
                 }
             }
-        } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 采购合同补充协议申请
-            // 是(Y)， 否(N)
-            Boolean faWuChangeToShown =  true; //法务部门修订稿显示
-            Boolean caiWuChangeToShown =  true; //财务部门修订稿显示
-            Boolean isCaiNaChangeToShown =  true; //审核意见是否完全采纳显示
-            Boolean caiNaChangeToShown =  true; //采纳说明显示
-            Boolean caiNaFileChangeToShown =  true; //采纳附件显示
-            Boolean heTongChangeToShown =  true; //合同送审稿显示
-            Boolean falvChangeToShown = true; // 法律审核附件显示
-            if ("Y".equals(code)){
-                faWuChangeToShown =  false;
-                caiWuChangeToShown =  false;
-                isCaiNaChangeToShown =  false;
-                caiNaChangeToShown =  false;
-                caiNaFileChangeToShown =  false;
-                heTongChangeToShown =  false;
-                falvChangeToShown = false;
-            }
-            // 财务部门修订稿
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                linkedAtt.changeToShown = falvChangeToShown;
-                attLinkResult.attMap.put("FILE_ID_SIX", linkedAtt);
-            }
-            // 财务部门修订稿
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                linkedAtt.changeToShown = faWuChangeToShown;
-                attLinkResult.attMap.put("FILE_ID_TWO", linkedAtt);
-            }
-            // 法务部门修订稿
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                linkedAtt.changeToShown = caiWuChangeToShown;
-                attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
-            }
-            // 审核意见是否完全采纳
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToShown = isCaiNaChangeToShown;
-                attLinkResult.attMap.put("YES_NO_ONE", linkedAtt);
-            }
-            // 审核意见采纳说明
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                linkedAtt.changeToShown = caiNaChangeToShown;
-                attLinkResult.attMap.put("REMARK_ONE", linkedAtt);
-            }
-            // 采纳意见附件
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                linkedAtt.changeToShown = caiNaFileChangeToShown;
-                attLinkResult.attMap.put("FILE_ID_FOUR", linkedAtt);
-            }
-            // 合同送审稿
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                linkedAtt.changeToShown = heTongChangeToShown;
-                attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt);
-            }
+        }
+        else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 采购合同补充协议申请
+            AttLinkExtDetail.clearOrderIsStandard(attLinkResult); //清除属性联动数据
+            AttLinkExtDetail.handleOrderIsStandard(attLinkResult,code);
         }
         return attLinkResult;
     }
