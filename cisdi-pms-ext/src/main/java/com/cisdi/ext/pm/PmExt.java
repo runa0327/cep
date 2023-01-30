@@ -177,4 +177,45 @@ public class PmExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         myJdbcTemplate.update("update pm_prj set PRJ_IMG=? where id=?", imgId, projectId);
     }
+
+    /**
+     * 项目概况，建设单位，勘察单位，设计单位，监理单位，施工单位
+     */
+    public void prjCompany() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String projectId = String.valueOf(map.get("projectId"));
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+
+        Map<String, Object> stringObjectMap = myJdbcTemplate.queryForMap("select p1.`NAME` as jsUnit,p2.`NAME` as kcUnit,p3.`NAME` as sjUnit,p4.`NAME` as jlUnit,p5.`NAME` as sgUnit from pm_prj pj \n" +
+                "left join PM_PARTY p1 on pj.BUILDER_UNIT = p1.id \n" +
+                "left join PM_PARTY p2 on pj.SURVEYOR_UNIT = p2.id \n" +
+                "left join PM_PARTY p3 on pj.DESIGNER_UNIT = p3.id \n" +
+                "left join PM_PARTY p4 on pj.SUPERVISOR_UNIT = p4.id \n" +
+                "left join PM_PARTY p5 on pj.CONSTRUCTOR_UNIT = p5.id \n" +
+                "where pj.id=?", projectId);
+        ProjectCompany company = new ProjectCompany();
+        company.jsUnit = JdbcMapUtil.getString(stringObjectMap, "jsUnit");
+        company.kcUnit = JdbcMapUtil.getString(stringObjectMap, "kcUnit");
+        company.sjUnit = JdbcMapUtil.getString(stringObjectMap, "sjUnit");
+        company.jlUnit = JdbcMapUtil.getString(stringObjectMap, "jlUnit");
+        company.sgUnit = JdbcMapUtil.getString(stringObjectMap, "sgUnit");
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(company), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+    }
+
+
+    public static class ProjectCompany {
+        //建设单位
+        public String jsUnit;
+        //勘察单位
+        public String kcUnit;
+        //设计单位
+        public String sjUnit;
+        //监理单位
+        public String jlUnit;
+        //施工单位
+        public String sgUnit;
+    }
+
+
 }

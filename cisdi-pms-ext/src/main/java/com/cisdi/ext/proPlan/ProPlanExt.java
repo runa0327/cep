@@ -226,7 +226,7 @@ public class ProPlanExt {
                 ExtJarHelper.returnValue.set(null);
             }
         } catch (Exception e) {
-            throw new BaseException(e.getMessage());
+            ExtJarHelper.returnValue.set(null);
         }
     }
 
