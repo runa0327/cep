@@ -152,9 +152,6 @@ public class PoOrderReqExt {
                 log.info("已更新：{}", exec);
             }
 
-//            Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
-//                    .set("TEXT_REMARK_TWO", sbComment).set("FILE_ID_SIX",sbFile).exec();
-
         }  else if ("orderLegalFinanceCheck".equals(status)) { //法务财务审批
             //流程中的审批意见
             String processLegalComment = JdbcMapUtil.getString(entityRecord.valueMap,"TEXT_REMARK_THREE"); //法务意见

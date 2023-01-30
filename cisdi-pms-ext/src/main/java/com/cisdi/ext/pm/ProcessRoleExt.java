@@ -635,4 +635,26 @@ public class ProcessRoleExt {
             throw new BaseException("该流程未配置 ‘"+deptName+"' 人员，请先选择对应人员或联系管理员处理！");
         }
     }
+
+    /**
+     * 合同签订、补充协议 合同经办人角色
+     */
+    public void getOrderUser(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //流程id
+        String csCommId = entityRecord.csCommId;
+        //获取流程实体编码
+        String entityCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        String sql = "select AD_USER_ID from "+entityCode+" where id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
+        if (!CollectionUtils.isEmpty(list)){
+            List<String> userList = list.stream().map(p-> JdbcMapUtil.getString(p,"AD_USER_ID")).collect(Collectors.toList());
+            ArrayList<Object> userIdList = new ArrayList<>();
+            userIdList.addAll(userList);
+            ExtJarHelper.returnValue.set(userIdList);
+        } else {
+            throw new BaseException("未找到对应的合同签订联系人，请选择对应联系人或联系管理员处理！");
+        }
+    }
 }
