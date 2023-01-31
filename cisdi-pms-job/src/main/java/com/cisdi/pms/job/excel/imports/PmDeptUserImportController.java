@@ -1,8 +1,10 @@
 package com.cisdi.pms.job.excel.imports;
 
+import com.cisdi.pms.job.excel.model.FundPaymentImportModel;
 import com.cisdi.pms.job.excel.model.FundSpecialModel;
 import com.cisdi.pms.job.excel.model.PmDeptUserModel;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
+import com.cisdi.pms.job.utils.ReflectUtil;
 import com.cisdi.pms.job.utils.Util;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
@@ -42,7 +44,8 @@ public class PmDeptUserImportController {
         List<String> projectNames = new ArrayList<>();
         List<String> userNames = new ArrayList<>();
         List<String> deptNames = new ArrayList<>();
-        List<PmDeptUserModel> dataList = EasyExcelUtil.read(file.getInputStream(), PmDeptUserModel.class);
+        List<PmDeptUserModel> deptUserModelList = EasyExcelUtil.read(file.getInputStream(), PmDeptUserModel.class);
+        List<PmDeptUserModel> dataList = deptUserModelList.stream().filter(p -> !ReflectUtil.isObjectNull(p)).collect(Collectors.toList());
         //根据项目分组
         Map<String, List<PmDeptUserModel>> pmMapData = dataList.stream().collect(Collectors.groupingBy(PmDeptUserModel::getProjectName));
         List<Map<String, Object>> projectList = jdbcTemplate.queryForList("select * from PM_PRJ where `status` = 'ap'");
