@@ -41,6 +41,7 @@ public class InvestmentStatisticsExt {
         if (Strings.isNotEmpty(managementUnit)) {
             sb.append(" and PRJ_MANAGE_MODE_ID = '").append(managementUnit).append("'");
         }
+        sb.append(" order by crt_dt desc ");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
