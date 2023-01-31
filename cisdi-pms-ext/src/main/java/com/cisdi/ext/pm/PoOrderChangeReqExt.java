@@ -369,6 +369,16 @@ public class PoOrderChangeReqExt {
         } else if ("chargeLeaderFalse".equals(nodeStatus)){ // 分管领导审批拒绝
             //分管领导审批意见清除
             clearPO_ORDER_CHANGE_REQ("chargeLeader",csCommId,myJdbcTemplate);
+        } else if ("costLegalTrue".equals(nodeStatus)){ //法务/成本审批通过
+            if (firstCheck){
+                //法务/成本审批意见清除
+                clearPO_ORDER_CHANGE_REQ("AD_USER_THREE_ID,AD_USER_EIGHTH_ID",csCommId,myJdbcTemplate);
+            }
+            //审批意见数据回显
+            updatePO_ORDER_CHANGE_REQ("AD_USER_THREE_ID,AD_USER_EIGHTH_ID",file,comment,csCommId,myJdbcTemplate);
+        } else if ("costLegalFalse".equals(nodeStatus)){ //法务/成本审批拒绝
+            //法务/成本审批意见清除
+            clearPO_ORDER_CHANGE_REQ("AD_USER_THREE_ID,AD_USER_EIGHTH_ID",csCommId,myJdbcTemplate);
         }
     }
 
@@ -481,9 +491,11 @@ public class PoOrderChangeReqExt {
                 name = "legalFinanceTrue";
             } else if ("1619186850457587712".equals(nodeId)){ //9-法务/财务/成本审批
                 name = "costLegalFinanceTrue";
-            } else if ("1619158462435037184".equals(nodeId)){ //10-部门领导审批
+            } else if ("1620237916917944320".equals(nodeId)){ //10-法务/成本审批
+                name = "costLegalTrue";
+            } else if ("1619158462435037184".equals(nodeId)){ //11-部门领导审批
                 name = "deptLeaderTrue";
-            } else if ("1619158462342762496".equals(nodeId)){ //11-分管领导审批
+            } else if ("1619158462342762496".equals(nodeId)){ //12-分管领导审批
                 name = "chargeLeaderTrue";
             }
         } else if ("false".equals(status)){
@@ -503,9 +515,11 @@ public class PoOrderChangeReqExt {
                 name = "legalFinanceFalse";
             } else if ("1619186850457587712".equals(nodeId)){ //9-法务/财务/成本审批
                 name = "costLegalFinanceFalse";
-            } else if ("1619158462435037184".equals(nodeId)){ //10-部门领导审批
+            } else if ("1620237916917944320".equals(nodeId)){ //10-法务/成本审批
+                name = "costLegalFalse";
+            } else if ("1619158462435037184".equals(nodeId)){ //11-部门领导审批
                 name = "deptLeaderFalse";
-            } else if ("1619158462342762496".equals(nodeId)){ //11-分管领导审批
+            } else if ("1619158462342762496".equals(nodeId)){ //12-分管领导审批
                 name = "chargeLeaderFalse";
             }
         }
