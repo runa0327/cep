@@ -37,7 +37,6 @@ public class ProcedureStatistics {
 
         StringBuffer baseSql = new StringBuffer("select pj.id projectId,pj.NAME projectName,");
         for (Map<String, Object> head : headList) {
-            String nodeNameId = head.get("nodeNameId").toString();
             String nodeName = head.get("nodeName").toString();
             baseSql.append("MAX(IF(pn.name = '").append(nodeName)
                     .append("',IF(ISNULL(pn.ACTUAL_COMPL_DATE),concat( '计划完成时间：', date_format(pn.PLAN_COMPL_DATE," +
@@ -84,10 +83,7 @@ public class ProcedureStatistics {
         // 查询表头并排序
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         // 所有表头
-        List<Map<String, Object>> headers = myJdbcTemplate.queryForList("select distinct pn.NAME nodeName, pn" +
-                ".SCHEDULE_NAME nodeNameId from " +
-                "pm_pro_plan_node pn where pn.SHOW_IN_EARLY_PROC = 1 and pn.SCHEDULE_NAME is not null  and pn.level =" +
-                " '3'");
+        List<Map<String, Object>> headers = myJdbcTemplate.queryForList("select distinct pn.NAME nodeName, pn.SCHEDULE_NAME nodeNameId from pm_pro_plan_node pn where pn.SHOW_IN_EARLY_PROC = 1 and pn.level = '3'");
         // 所有可显示在前期手续的节点
 //        List<Map<String, Object>> allVisualNode = myJdbcTemplate.queryForList("select distinct PM_PRO_PLAN_NODE_PID,
 //        ID,NAME," +
