@@ -71,7 +71,7 @@ public class PmStatisticsManualExt {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
             OutSide outSide = new OutSide();
-            outSide.total = currentYear - 2019 + 1;
+            outSide.total = (currentYear - 2019 + 1) * 12;
             outSide.list = pageResultList;
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
