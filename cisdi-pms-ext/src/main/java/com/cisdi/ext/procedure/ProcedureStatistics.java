@@ -39,7 +39,7 @@ public class ProcedureStatistics {
         for (Map<String, Object> head : headList) {
             String nodeNameId = head.get("nodeNameId").toString();
             String nodeName = head.get("nodeName").toString();
-            baseSql.append("MAX(IF(pn.SCHEDULE_NAME = '").append(nodeNameId)
+            baseSql.append("MAX(IF(pn.name = '").append(nodeName)
                     .append("',IF(ISNULL(pn.ACTUAL_COMPL_DATE),concat( '计划完成时间：', date_format(pn.PLAN_COMPL_DATE," +
                             "'%Y-%m-%d')),concat('完成时间：',pn.ACTUAL_COMPL_DATE)),'')) '")
                     .append(nodeName).append("',");
@@ -49,12 +49,12 @@ public class ProcedureStatistics {
         baseSql.append(" from pm_pro_plan pp \n" +
                 "left join pm_prj pj on pj.id = pp.PM_PRJ_ID \n" +
                 "left join pm_pro_plan_node pn on pn.PM_PRO_PLAN_ID = pp.id \n" +
-                "where pn.LEVEL = 3 and pj.id is not null ");
+                "where pn.LEVEL = 3 and pj.id is not null and pj.STATUS = 'AP' and pn.STATUS = 'AP' ");
         if (!Strings.isNullOrEmpty(projectName)) {
             baseSql.append("and pj.NAME like '%" + projectName + "%' ");
         }
-        baseSql.append("group by pj.id ");
-
+        baseSql.append("group by pj.id order by pj.CRT_DT desc ");
+        String totalSql = baseSql.toString();
         // 分页
         Integer start = pageSize * (pageIndex - 1);
         baseSql.append("limit " + start + "," + pageSize);
@@ -62,6 +62,7 @@ public class ProcedureStatistics {
         log.info(baseSql.toString());
         // 查询
         List<Map<String, Object>> contentList = myJdbcTemplate.queryForList(baseSql.toString());
+        List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
 
         // 响应组装
         HashMap<String, Object> row0Name = new HashMap<>();
@@ -70,7 +71,7 @@ public class ProcedureStatistics {
 
         HashMap<String, Object> result = new HashMap<>();
         result.put("contentList", contentList);
-        result.put("total", contentList.size());
+        result.put("total", totalList.size());
         result.put("headList", headList);
 
         // 响应

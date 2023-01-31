@@ -18,6 +18,8 @@ spring:
     # 注意更改ip和db：
     # 测试：
     url: jdbc:mysql://121.5.65.165:3306/test?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    #演示：
+#    url: jdbc:mysql://121.5.65.165:3306/demo?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
     # 正式：
     # url: jdbc:mysql://124.222.58.152:3306/prod?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
     #    type: com.alibaba.druid.pool.DruidDataSource
