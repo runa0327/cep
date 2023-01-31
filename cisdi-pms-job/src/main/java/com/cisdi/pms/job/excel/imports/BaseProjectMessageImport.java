@@ -38,7 +38,7 @@ public class BaseProjectMessageImport {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    
+
     @PostMapping(value = "/importPrj")
     public Map<String,Object> importPrj(MultipartFile file){
         Map<String, Object> map = new HashMap<>();
@@ -351,10 +351,10 @@ public class BaseProjectMessageImport {
             if (!CollectionUtils.isEmpty(prjList)){
                 for (PmPrjModel tmp : prjList) {
                     String updateSql1 = "update pm_prj set LAST_MODI_DT = now(),VER = '99',NAME = ?,CUSTOMER_UNIT=?,PRJ_MANAGE_MODE_ID=?,BASE_LOCATION_ID=?,FLOOR_AREA=?,PROJECT_TYPE_ID=?," +
-                            "CON_SCALE_TYPE_ID=?,CON_SCALE_QTY=?,QTY_ONE=?,QTY_TWO=?,OTHER=?,QTY_THREE=?,CON_SCALE_QTY2=?,CON_SCALE_UOM_ID=?,BUILD_YEARS=?,PRJ_SITUATION=?,INVESTMENT_SOURCE_ID=?," +
+                            "CON_SCALE_TYPE_ID=?,CON_SCALE_QTY=?,QTY_ONE=?,OTHER=?,QTY_THREE=?,CON_SCALE_QTY2=?,CON_SCALE_UOM_ID=?,BUILD_YEARS=?,PRJ_SITUATION=?,INVESTMENT_SOURCE_ID=?," +
                             "PROJECT_PHASE_ID=?,PRJ_CODE=?,PROJECT_SOURCE_TYPE_ID='0099952822476441374' where id = ?";
                     int update1 = jdbcTemplate.update(updateSql1,tmp.getNAME(),tmp.getCUSTOMER_UNIT(),tmp.getPRJ_MANAGE_MODE_ID(),tmp.getBASE_LOCATION_ID(),tmp.getFLOOR_AREA(),tmp.getPROJECT_TYPE_ID(),
-                            tmp.getCON_SCALE_TYPE_ID(),tmp.getCON_SCALE_QTY(),tmp.getQTY_ONE(),tmp.getQTY_TWO(),tmp.getQTY_TWO(),tmp.getQTY_THREE(),tmp.getCON_SCALE_QTY2(),tmp.getCON_SCALE_UOM_ID(),tmp.getBUILD_YEARS(),
+                            tmp.getCON_SCALE_TYPE_ID(),tmp.getCON_SCALE_QTY(),tmp.getQTY_ONE(),tmp.getQTY_TWO(),tmp.getQTY_THREE(),tmp.getCON_SCALE_QTY2(),tmp.getCON_SCALE_UOM_ID(),tmp.getBUILD_YEARS(),
                             tmp.getPRJ_SITUATION(),tmp.getINVESTMENT_SOURCE_ID(),tmp.getPROJECT_PHASE_ID(),tmp.getPRJ_CODE(),tmp.getId());
                     num = num + update1;
                 }
