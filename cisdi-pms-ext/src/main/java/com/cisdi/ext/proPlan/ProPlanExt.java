@@ -842,7 +842,9 @@ public class ProPlanExt {
         if (Objects.nonNull(data.get("PLAN_COMPL_DATE"))) {
             Date actual = new Date();
             if (Objects.nonNull(data.get("ACTUAL_START_DATE"))) {
-                actual = DateTimeUtil.stringToDate(String.valueOf(data.get("ACTUAL_COMPL_DATE")));
+                if(Objects.nonNull(data.get("ACTUAL_COMPL_DATE"))){
+                    actual = DateTimeUtil.stringToDate(String.valueOf(data.get("ACTUAL_COMPL_DATE")));
+                }
             }
             try {
                 contrast.endOffset = DateTimeUtil.daysBetween(DateTimeUtil.stringToDate(String.valueOf(data.get("PLAN_COMPL_DATE"))), actual);
