@@ -374,8 +374,10 @@ public class PoOrderChangeReqExt {
                 //法务/成本审批意见清除
                 clearPO_ORDER_CHANGE_REQ("AD_USER_THREE_ID,AD_USER_EIGHTH_ID",csCommId,myJdbcTemplate);
             }
+            //判断当前登录人岗位信息
+            String deptName = getUserDept(myJdbcTemplate,userId,csCommId);
             //审批意见数据回显
-            updatePO_ORDER_CHANGE_REQ("AD_USER_THREE_ID,AD_USER_EIGHTH_ID",file,comment,csCommId,myJdbcTemplate);
+            updatePO_ORDER_CHANGE_REQ(deptName,file,comment,csCommId,myJdbcTemplate);
         } else if ("costLegalFalse".equals(nodeStatus)){ //法务/成本审批拒绝
             //法务/成本审批意见清除
             clearPO_ORDER_CHANGE_REQ("AD_USER_THREE_ID,AD_USER_EIGHTH_ID",csCommId,myJdbcTemplate);
@@ -428,7 +430,7 @@ public class PoOrderChangeReqExt {
                 sb.append("APPROVAL_COMMENT_EIGHTH = null,FILE_ID_EIGHTH = null,");
             } else if ("AD_USER_NINTH_ID".equals(tmp)){ //财务岗清除
                 sb.append("FILE_ID_FOUR = null, APPROVAL_COMMENT_THREE = null,");
-            }  else if ("lawyer".equals(tmp)){ //法律意见清除
+            } else if ("lawyer".equals(tmp)){ //法律意见清除
                 sb.append("FILE_ID_TWO = null, APPROVAL_COMMENT_ONE = null,");
             } else if ("AD_USER_EIGHTH_ID".equals(tmp)){ //法务意见清除
                 sb.append("FILE_ID_THREE = null, APPROVAL_COMMENT_TWO = null,");
