@@ -11,7 +11,7 @@ public class AttLinkDifferentProcess {
     // 默认自动带出成本岗的流程
     public static List<String> getAutoCostUser() {
         List<String> list = new ArrayList<>();
-        list.add("PO_ORDER_CHANGE_REQ"); //合同需求审批
+//        list.add("PO_ORDER_CHANGE_REQ"); //合同需求审批,不默认带出
         return list;
     }
 }

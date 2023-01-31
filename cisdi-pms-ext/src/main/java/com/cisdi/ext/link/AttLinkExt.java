@@ -3989,10 +3989,10 @@ public class AttLinkExt {
         Map row = list.get(0);
 
         //需要自动带出成本岗人员流程
-        List<String> autoCostUser = AttLinkDifferentProcess.getAutoCostUser();
-        if (autoCostUser.contains(entCode)){
-            AttLinkExtDetail.copyPrjCostUser(attLinkResult,myJdbcTemplate,JdbcMapUtil.getString(row,"PRJ_COST_USER_ID"));
-        }
+//        List<String> autoCostUser = AttLinkDifferentProcess.getAutoCostUser();
+//        if (autoCostUser.contains(entCode)){
+//            AttLinkExtDetail.copyPrjCostUser(attLinkResult,myJdbcTemplate,JdbcMapUtil.getString(row,"PRJ_COST_USER_ID"));
+//        }
 
         if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)) { // 工程开工报审
             String sql = "select PRJ_TOTAL_INVEST,PROJECT_AMT from PM_PRJ_INVEST2 where PM_PRJ_ID = ? and STATUS = 'AP' order by CRT_DT desc limit 1";
