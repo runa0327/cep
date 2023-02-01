@@ -47,31 +47,36 @@ public class PmMap {
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         String longitude = String.valueOf(params.get("longitude"));
         String latitude = String.valueOf(params.get("latitude"));
+        String longitude1 = longitude.substring(0,longitude.length()-3);
+        System.out.println("longitude1: "+longitude1);
+        String latitude1 = latitude.substring(0,latitude.length()-3);
+        System.out.println("latitude1: "+latitude1);
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 //        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pj.id,pj.name,IFNULL(v.name,'未启动') statusName from pm_prj pj " +
 //                " left join pm_pro_plan pp on pp.PM_PRJ_ID = pj.id  \n" +
 //                " left join gr_set_value v on v.id = pp.PROGRESS_STATUS_ID left join gr_set s on s.id = v.gr_set_id and s.code = 'PROGRESS_STATUS'  " +
 //                " where pj.id in (select PM_PRJ_ID from PM_MAP where LONGITUDE=? and LATITUDE=?)", longitude, latitude);
 
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pj.id,pj.name,IFNULL(v.name,'未启动') statusName,pp.ACTUAL_START_DATE as beginTime,pp.ACTUAL_COMPL_DATE as endTime,pmp.`NAME` as projectOwner,gsv.`NAME` as projectType,ggg.`NAME` as manageUnit,pppm.`NAME` as sgUnit\n" +
-                "from pm_prj pj \n" +
-                "left join pm_pro_plan pp on pp.PM_PRJ_ID = pj.id \n" +
-                "left join gr_set_value v on v.id = pp.PROGRESS_STATUS_ID left join gr_set s on s.id = v.gr_set_id and s.code = 'PROGRESS_STATUS'  \n" +
-                "left join PM_PARTY pmp on pmp.id = pj.CUSTOMER_UNIT\n" +
-                "left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID \n" +
-                "left join gr_set_value ggg on ggg.id = pj.PRJ_MANAGE_MODE_ID \n" +
-                "left join pm_party pppm on pppm.id = pj.CONSTRUCTOR_UNIT \n" +
-                " where pj.id in (select PM_PRJ_ID from PM_MAP where LONGITUDE=? and LATITUDE=?)", longitude, latitude);
+        String sql = "select pj.id,pj.name,IFNULL(v.name,'未启动') statusName,pp.ACTUAL_START_DATE as beginTime,pp.ACTUAL_COMPL_DATE as endTime,pmp.`NAME` as projectOwner,gsv.`NAME` as projectType,ggg.`NAME` as manageUnit,pppm.`NAME` as sgUnit " +
+                "from pm_prj pj " +
+                "left join pm_pro_plan pp on pp.PM_PRJ_ID = pj.id " +
+                "left join gr_set_value v on v.id = pp.PROGRESS_STATUS_ID left join gr_set s on s.id = v.gr_set_id and s.code = 'PROGRESS_STATUS'  " +
+                "left join PM_PARTY pmp on pmp.id = pj.CUSTOMER_UNIT " +
+                "left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID " +
+                "left join gr_set_value ggg on ggg.id = pj.PRJ_MANAGE_MODE_ID " +
+                "left join pm_party pppm on pppm.id = pj.CONSTRUCTOR_UNIT " +
+                " where pj.id in (select PM_PRJ_ID from PM_MAP where LONGITUDE like ('"+longitude1+"%') and LATITUDE like ('"+latitude1+"%'))";
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
 
         List<Project> projects = list.stream().map(p -> {
-
-            Map<String, Object> stringObjectMap = myJdbcTemplate.queryForMap("select p1.`NAME` as jsUnit,p2.`NAME` as kcUnit,p3.`NAME` as sjUnit,p4.`NAME` as jlUnit,p5.`NAME` as sgUnit,PRJ_SITUATION from pm_prj pj \n" +
-                    "left join PM_PARTY p1 on pj.BUILDER_UNIT = p1.id \n" +
-                    "left join PM_PARTY p2 on pj.SURVEYOR_UNIT = p2.id \n" +
-                    "left join PM_PARTY p3 on pj.DESIGNER_UNIT = p3.id \n" +
-                    "left join PM_PARTY p4 on pj.SUPERVISOR_UNIT = p4.id \n" +
-                    "left join PM_PARTY p5 on pj.CONSTRUCTOR_UNIT = p5.id \n" +
-                    "where pj.id=?", JdbcMapUtil.getString(p, "ID"));
+            String sql2 = "select p1.`NAME` as jsUnit,p2.`NAME` as kcUnit,p3.`NAME` as sjUnit,p4.`NAME` as jlUnit,p5.`NAME` as sgUnit,PRJ_SITUATION from pm_prj pj " +
+                    "left join PM_PARTY p1 on pj.BUILDER_UNIT = p1.id " +
+                    "left join PM_PARTY p2 on pj.SURVEYOR_UNIT = p2.id " +
+                    "left join PM_PARTY p3 on pj.DESIGNER_UNIT = p3.id " +
+                    "left join PM_PARTY p4 on pj.SUPERVISOR_UNIT = p4.id " +
+                    "left join PM_PARTY p5 on pj.CONSTRUCTOR_UNIT = p5.id " +
+                    "where pj.id=?";
+            Map<String, Object> stringObjectMap = myJdbcTemplate.queryForMap(sql2, JdbcMapUtil.getString(p, "ID"));
             Project pro = new Project();
             pro.projectId = JdbcMapUtil.getString(p, "ID");
             pro.projectName = JdbcMapUtil.getString(p, "NAME");
