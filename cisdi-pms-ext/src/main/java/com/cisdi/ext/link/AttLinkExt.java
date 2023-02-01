@@ -1357,7 +1357,9 @@ public class AttLinkExt {
                 int count = 0;
                 Map<String, Object> specialCountMap = myJdbcTemplate.queryForMap("select ifnull(max(NPER),0) count from fund_special where PM_PRJ_ID = ? and FUND_IMPLEMENTATION_V_ID = ?", prjId, fundSource);
                 Map<String, Object> payCountMap = myJdbcTemplate.queryForMap("select ifnull(max(NPER),0) count from fund_newly_increased_detail where PM_PRJ_ID = ? and FUND_IMPLEMENTATION_V_ID = ?",prjId,fundSource);
-                count = JdbcMapUtil.getInt(specialCountMap,"count") > JdbcMapUtil.getInt(payCountMap,"count") ? JdbcMapUtil.getInt(specialCountMap,"count") : JdbcMapUtil.getInt(payCountMap,"count");
+                int specialCount = StringUtil.getNum(JdbcMapUtil.getString(specialCountMap,"count"));
+                int payCount = StringUtil.getNum(JdbcMapUtil.getString(payCountMap,"count"));
+                count = specialCount > payCount ? specialCount : payCount;
 
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();

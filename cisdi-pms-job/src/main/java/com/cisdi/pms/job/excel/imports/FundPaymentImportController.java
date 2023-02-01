@@ -68,7 +68,7 @@ public class FundPaymentImportController extends BaseController {
     private List<String> importData(FundPaymentImportModel model, List<Map<String, Object>> bankList) {
         List<String> res = new ArrayList<>();
         //判断资金来源，项目--查询资金到位
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select fr.*,FUND_CATEGORY_FIRST,fi.id as FUND_IMPLEMENTATION_V_ID from fund_reach fr \n" +
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select fr.*,FUND_CATEGORY_FIRST,fi.id as FUND_IMPLEMENTATION_V_ID,pj.CUSTOMER_UNIT,pj.PRJ_MANAGE_MODE_ID from fund_reach fr \n" +
                 "left join pm_prj pj on fr.PM_PRJ_ID = pj.id \n" +
                 "left join fund_implementation fi on fr.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
                 "where pj.`NAME`=? and fr.FUND_SOURCE_TEXT=? ", model.getPmPrjId(), model.getFundImplementationVId());
@@ -148,11 +148,13 @@ public class FundPaymentImportController extends BaseController {
                             "CUSTOMER_UNIT=?," +
                             "VOUCHER_NUM=?," +
                             "FUND_IMPLEMENTATION_V_ID=?," +
+                            "PRJ_MANAGE_MODE_ID=?," +
+                            "CUSTOMER_UNIT=?," +
                             "FUND_CATEGORY_FIRST=?," +
                             "NPER=? where ID=?",
                     model.getRemarke(), model.getAccountSet(), list.get(0).get("PM_PRJ_ID"),
-                    model.getCustomerUnit(), model.getVoucherNum(), fundImplementationVId,
-                    list.get(0).get("FUND_CATEGORY_FIRST"), model.getNper(),
+                    model.getCustomerUnit(), model.getVoucherNum(), fundImplementationVId,list.get(0).get("PRJ_MANAGE_MODE_ID"),
+                    list.get(0).get("CUSTOMER_UNIT"),list.get(0).get("FUND_CATEGORY_FIRST"), model.getNper(),
                     fundNewlyIncreasedDetailId);
         }
         return res;

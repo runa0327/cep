@@ -3,6 +3,9 @@ package com.cisdi.ext.util;
 import com.google.common.base.Strings;
 import com.qygly.shared.util.SharedUtil;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class StringUtil {
 
     public static String codeToSplit(String str) {
@@ -53,4 +56,21 @@ public class StringUtil {
         }
         return str;
     }
+
+    public static int getNum(String data){
+        if (Strings.isNullOrEmpty(data)){
+            return 0;
+        }
+        //正则表达式以匹配字符串中的数字
+        String regex = "\\d+";
+        //创建一个模式对象
+        Pattern pattern = Pattern.compile(regex);
+        //创建一个Matcher对象
+        Matcher matcher = pattern.matcher(data);
+        while(matcher.find()) {
+            return Integer.valueOf(matcher.group());
+        }
+        return 0;
+    }
+
 }
