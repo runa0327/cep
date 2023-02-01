@@ -341,4 +341,32 @@ public class ProFileExt {
         String id = Crud.from("PF_FILE").insertData();
         Crud.from("PF_FILE").where().eq("ID", id).update().set("FL_FILE_ID", fileId).set("PF_FOLDER_ID", folderId).exec();
     }
+
+    /**
+     * 刷新文件大小
+     */
+    public void refreshFileSize(){
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String projectId = String.valueOf(map.get("projectId"));
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        // 查询文件夹
+        List<Map<String, Object>> folderList = myJdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,LK_WF_INST_ID,CODE,NAME,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID,IS_TEMPLATE,FILE_SIZE,FILE_COUNT " +
+                "from pf_folder where PM_PRJ_ID=?", projectId);
+        // 查询所有文件
+        List<Map<String, Object>> fileList = myJdbcTemplate.queryForList("select fl.ID,fl.CODE,fl.NAME,fl.REMARK,fl.VER,fl.FL_PATH_ID,fl.EXT,fl.LK_WF_INST_ID,fl.STATUS,fl.CRT_DT,fl.CRT_USER_ID,fl.LAST_MODI_DT,fl.LAST_MODI_USER_ID,ifnull(SIZE_KB,0) as SIZE_KB,fl.IS_PRESET,fl.FILE_INLINE_URL," +
+                "fl.FILE_ATTACHMENT_URL,fl.TS,UPLOAD_DTTM,fl.PHYSICAL_LOCATION,fl.DSP_NAME,DSP_SIZE,pff.PF_FOLDER_ID as PF_FOLDER_ID from fl_file fl left join pf_file pff on fl.id = pff.FL_FILE_ID " +
+                "left join pf_folder pfr on pff.PF_FOLDER_ID = pfr.id where  pfr.PM_PRJ_ID=?", projectId);
+
+
+        folderList.stream().filter(p -> Objects.equals("0", p.get("PF_FOLDER_PID"))).peek(m -> {
+            List<Map<String, Object>> children = getChildren(m, folderList, fileList);
+            // 获取子级的ID集合
+            List<Object> ids = children.stream().map(q -> q.get("ID")).collect(Collectors.toList());
+            ids.add(m.get("ID"));
+            // 取出文件
+            List<Map<String, Object>> files = fileList.stream().filter(t -> ids.contains(t.get("PF_FOLDER_ID"))).collect(Collectors.toList());
+            BigDecimal totalSize = files.stream().map(n -> new BigDecimal(String.valueOf(n.get("SIZE_KB")))).reduce(BigDecimal.ZERO, BigDecimal::add);
+            Crud.from("pf_folder").where().eq("ID", m.get("ID")).update().set("FILE_COUNT", files.size()).set("FILE_SIZE", totalSize).exec();
+        }).collect(Collectors.toList());
+    }
 }
