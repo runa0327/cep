@@ -76,7 +76,7 @@ public class PoPublicBidExtApi {
                     Map<String, Object> deptUserMap = myJdbcTemplate.queryForMap("select u.name handleUserName,d.name handleDeptName from ad_user u " +
                             "left join hr_dept_user t on t.ad_user_id = u.id " +
                             "left join hr_dept d on d.id = t.hr_dept_id " +
-                            "where u.id = ?", projectTender.bidUserId);
+                            "where u.id = ? limit 1", projectTender.bidUserId);
                     projectTender.handleDeptName = JdbcMapUtil.getString(deptUserMap, "handleDeptName");
                     projectTender.handleUserName = JdbcMapUtil.getString(deptUserMap, "handleUserName");
                 }
