@@ -192,14 +192,14 @@ public class ProFileExt {
             fileInfo.uploadUser = JdbcMapUtil.getString(p, "upload_user");
             fileInfo.uploadTime = JdbcMapUtil.getString(p, "upload_time");
             BigDecimal originSize = JdbcMapUtil.getBigDecimal(p, "size");//换算前大小kb
-            if (originSize == null){
+            if (originSize == null) {
                 fileInfo.size = "0Kb";
             } else if (originSize.compareTo(new BigDecimal(1024)) < 0) {
                 fileInfo.size = originSize + "Kb";
             } else if (originSize.compareTo(new BigDecimal(1024)) >= 0 && originSize.compareTo(new BigDecimal(1024 * 1024)) < 0) {
-                fileInfo.size = originSize.divide(new BigDecimal(1024),2,BigDecimal.ROUND_HALF_UP) + "M";
+                fileInfo.size = originSize.divide(new BigDecimal(1024), 2, BigDecimal.ROUND_HALF_UP) + "M";
             } else {
-                fileInfo.size = originSize.divide(new BigDecimal(1024 * 1024),2,BigDecimal.ROUND_HALF_UP) + "G";
+                fileInfo.size = originSize.divide(new BigDecimal(1024 * 1024), 2, BigDecimal.ROUND_HALF_UP) + "G";
             }
             fileInfo.url = JdbcMapUtil.getString(p, "url");
             fileInfo.type = JdbcMapUtil.getString(p, "type");
@@ -329,5 +329,16 @@ public class ProFileExt {
             BigDecimal totalSize = files.stream().map(n -> new BigDecimal(String.valueOf(n.get("SIZE_KB")))).reduce(BigDecimal.ZERO, BigDecimal::add);
             Crud.from("pf_folder").where().eq("ID", m.get("ID")).update().set("FILE_COUNT", files.size()).set("FILE_SIZE", totalSize).exec();
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 资料管理新增文件
+     */
+    public void uploadFileInfo() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String fileId = String.valueOf(map.get("fileId"));
+        String folderId = String.valueOf(map.get("folderId"));
+        String id = Crud.from("PF_FILE").insertData();
+        Crud.from("PF_FILE").where().eq("ID", id).update().set("FL_FILE_ID", fileId).set("PF_FOLDER_ID", folderId).exec();
     }
 }

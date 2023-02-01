@@ -62,18 +62,40 @@ public class PmMap {
                 " where pj.id in (select PM_PRJ_ID from PM_MAP where LONGITUDE=? and LATITUDE=?)", longitude, latitude);
 
         List<Project> projects = list.stream().map(p -> {
+
+            Map<String, Object> stringObjectMap = myJdbcTemplate.queryForMap("select p1.`NAME` as jsUnit,p2.`NAME` as kcUnit,p3.`NAME` as sjUnit,p4.`NAME` as jlUnit,p5.`NAME` as sgUnit,PRJ_SITUATION from pm_prj pj \n" +
+                    "left join PM_PARTY p1 on pj.BUILDER_UNIT = p1.id \n" +
+                    "left join PM_PARTY p2 on pj.SURVEYOR_UNIT = p2.id \n" +
+                    "left join PM_PARTY p3 on pj.DESIGNER_UNIT = p3.id \n" +
+                    "left join PM_PARTY p4 on pj.SUPERVISOR_UNIT = p4.id \n" +
+                    "left join PM_PARTY p5 on pj.CONSTRUCTOR_UNIT = p5.id \n" +
+                    "where pj.id=?", JdbcMapUtil.getString(p, "ID"));
             Project pro = new Project();
             pro.projectId = JdbcMapUtil.getString(p, "ID");
             pro.projectName = JdbcMapUtil.getString(p, "NAME");
             pro.status = JdbcMapUtil.getString(p, "statusName");
             pro.projectOwner = JdbcMapUtil.getString(p, "projectOwner");
-            pro.projectType = JdbcMapUtil.getString(p, "projectType");
+
+            String type = JdbcMapUtil.getString(p, "projectType");
+            if("民用建筑".equals(type)){
+                pro.projectType ="房建";
+            }else if("市政道路".equals(type)){
+                pro.projectType ="道路";
+            }else{
+                pro.projectType ="其他";
+            }
             pro.beginTime = JdbcMapUtil.getString(p, "beginTime");
             pro.endTime = JdbcMapUtil.getString(p, "endTime");
             pro.manageUnit = JdbcMapUtil.getString(p, "manageUnit");
             pro.sgUnit = JdbcMapUtil.getString(p, "sgUnit");
             pro.totalInvest = getProjectInvest(pro.projectId);
             pro.progress = BigDecimal.ZERO;
+            pro.jsUnit = JdbcMapUtil.getString(stringObjectMap, "jsUnit");
+            pro.kcUnit = JdbcMapUtil.getString(stringObjectMap, "kcUnit");
+            pro.sjUnit = JdbcMapUtil.getString(stringObjectMap, "sjUnit");
+            pro.jlUnit = JdbcMapUtil.getString(stringObjectMap, "jlUnit");
+            pro.sgUnit = JdbcMapUtil.getString(stringObjectMap, "sgUnit");
+            pro.prjSituation = JdbcMapUtil.getString(stringObjectMap, "PRJ_SITUATION");
             return pro;
         }).collect(Collectors.toList());
         OutSide outSide = new OutSide();
@@ -82,18 +104,29 @@ public class PmMap {
         ExtJarHelper.returnValue.set(outputMap);
     }
 
+
+
     /**
      * 获取3D地图绑定的项目
      */
     public void getMapProject() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pp.PM_PRJ_ID as PM_PRJ_ID,pp.LONGITUDE as LONGITUDE,pp.LATITUDE as LATITUDE,pj.`NAME` as `NAME` from PM_MAP pp left join pm_prj pj on pp.PM_PRJ_ID = pj.id");
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pp.PM_PRJ_ID as PM_PRJ_ID,pp.LONGITUDE as LONGITUDE,pp.LATITUDE as LATITUDE,pj.`NAME` as `NAME` ,gsv.`NAME` as projectType " +
+                "from PM_MAP pp left join pm_prj pj on pp.PM_PRJ_ID = pj.id left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID");
         List<Project> projectList = list.stream().map(p -> {
             Project project = new Project();
             project.projectId = JdbcMapUtil.getString(p, "PM_PRJ_ID");
             project.projectName = JdbcMapUtil.getString(p, "NAME");
             project.longitude = JdbcMapUtil.getString(p, "LONGITUDE");
             project.latitude = JdbcMapUtil.getString(p, "LATITUDE");
+            String type = JdbcMapUtil.getString(p, "projectType");
+            if("民用建筑".equals(type)){
+                project.projectType ="房建";
+            }else if("市政道路".equals(type)){
+                project.projectType ="道路";
+            }else{
+                project.projectType ="其他";
+            }
             return project;
         }).collect(Collectors.toList());
         OutSide outSide = new OutSide();
@@ -248,6 +281,17 @@ public class PmMap {
          */
         public String sgUnit;
 
+        //建设单位
+        public String jsUnit;
+        //勘察单位
+        public String kcUnit;
+        //设计单位
+        public String sjUnit;
+        //监理单位
+        public String jlUnit;
+
+        //建设规模及内容
+        public String prjSituation;
 
     }
 
