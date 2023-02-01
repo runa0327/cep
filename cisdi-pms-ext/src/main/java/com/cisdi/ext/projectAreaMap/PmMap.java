@@ -1,5 +1,7 @@
 package com.cisdi.ext.projectAreaMap;
 
+import com.cisdi.ext.demostration.ProjectInfoTemp;
+import com.cisdi.ext.demostration.ProjectMapTemp;
 import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -77,12 +79,12 @@ public class PmMap {
             pro.projectOwner = JdbcMapUtil.getString(p, "projectOwner");
 
             String type = JdbcMapUtil.getString(p, "projectType");
-            if("民用建筑".equals(type)){
-                pro.projectType ="房建";
-            }else if("市政道路".equals(type)){
-                pro.projectType ="道路";
-            }else{
-                pro.projectType ="其他";
+            if ("民用建筑".equals(type)) {
+                pro.projectType = "房建";
+            } else if ("市政道路".equals(type)) {
+                pro.projectType = "道路";
+            } else {
+                pro.projectType = "其他";
             }
             pro.beginTime = JdbcMapUtil.getString(p, "beginTime");
             pro.endTime = JdbcMapUtil.getString(p, "endTime");
@@ -105,7 +107,6 @@ public class PmMap {
     }
 
 
-
     /**
      * 获取3D地图绑定的项目
      */
@@ -120,12 +121,12 @@ public class PmMap {
             project.longitude = JdbcMapUtil.getString(p, "LONGITUDE");
             project.latitude = JdbcMapUtil.getString(p, "LATITUDE");
             String type = JdbcMapUtil.getString(p, "projectType");
-            if("民用建筑".equals(type)){
-                project.projectType ="房建";
-            }else if("市政道路".equals(type)){
-                project.projectType ="道路";
-            }else{
-                project.projectType ="其他";
+            if ("民用建筑".equals(type)) {
+                project.projectType = "房建";
+            } else if ("市政道路".equals(type)) {
+                project.projectType = "道路";
+            } else {
+                project.projectType = "其他";
             }
             return project;
         }).collect(Collectors.toList());
@@ -223,9 +224,30 @@ public class PmMap {
         if (CollectionUtils.isEmpty(res)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
+            String param = "";
+            if("房建项目".equals(code)){
+                param ="民用建筑";
+            }else if("市政道路".equals(code)){
+                param ="市政道路";
+            }else{
+                param ="其他";
+            }
+            List<ProjectInfoTemp> tempList = ProjectMapTemp.getData(param);
+
+            List<ProjectInfo> result = tempList.stream().map(p -> {
+                ProjectInfo info = new ProjectInfo();
+                info.name = p.getName();
+                info.type = p.getType();
+                info.own = p.getUnit();
+                info.invest = p.getAmt();
+                info.imageProgress = p.getRate();
+                return info;
+            }).collect(Collectors.toList());
+            result.addAll(res);
+
             List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
             OutSide outSide = new OutSide();
-            outSide.res = res;
+            outSide.res = result;
             outSide.total = totalList.size();
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
