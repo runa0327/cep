@@ -337,7 +337,9 @@ public class PmPrjReqExt {
 
         Map<String, Object> valueMap = entityRecord.valueMap;
         String con_scale_type_id = JdbcMapUtil.getString(valueMap, "CON_SCALE_TYPE_ID");
-        Double con_scale_qty2 = Double.parseDouble(JdbcMapUtil.getString(valueMap, "CON_SCALE_QTY2"));
+        String CON_SCALE_QTY2 = JdbcMapUtil.getString(valueMap, "CON_SCALE_QTY2");
+        CON_SCALE_QTY2 = SharedUtil.isEmptyString(CON_SCALE_QTY2) ? "0":CON_SCALE_QTY2;
+        Double con_scale_qty2 = Double.parseDouble(CON_SCALE_QTY2);
         boolean need2 = "0099799190825087119".equals(con_scale_type_id);
         if (need2) {
             if (con_scale_qty2 == null || con_scale_qty2 <= 0d) {
