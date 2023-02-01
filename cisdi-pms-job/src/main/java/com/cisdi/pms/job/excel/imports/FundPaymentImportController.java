@@ -72,6 +72,10 @@ public class FundPaymentImportController extends BaseController {
                 "left join pm_prj pj on fr.PM_PRJ_ID = pj.id \n" +
                 "left join fund_implementation fi on fr.FUND_SOURCE_TEXT = fi.FUND_SOURCE_TEXT \n" +
                 "where pj.`NAME`=? and fr.FUND_SOURCE_TEXT=? ", model.getPmPrjId(), model.getFundImplementationVId());
+        //资金批复明细来代表fundImplementationVId
+        List<Map<String, Object>> fidList = jdbcTemplate.queryForList("select fid.id from fund_implementation fi\n" +
+                "left join fund_implementation_detail fid on fid.FUND_IMPLEMENTATION_ID = fi.id\n" +
+                "where fi.FUND_SOURCE_TEXT = '321' and fid.PM_PRJ_ID = '1619959989231816704' limit 1");
         if (CollectionUtils.isEmpty(list)) {
             res.add("序号为：" + model.getSerialNumber());
         } else {
@@ -110,6 +114,10 @@ public class FundPaymentImportController extends BaseController {
                 }
             }
 
+            String fundImplementationVId = null;
+            if (!CollectionUtils.isEmpty(fidList)){
+                fundImplementationVId = String.valueOf(fidList.get(0).get("id"));
+            }
 
             String fundPayInfoId = Util.insertData(jdbcTemplate, "fund_pay_info");
             String fundNewlyIncreasedDetailId = Util.insertData(jdbcTemplate, "fund_newly_increased_detail");
@@ -143,7 +151,7 @@ public class FundPaymentImportController extends BaseController {
                             "FUND_CATEGORY_FIRST=?," +
                             "NPER=? where ID=?",
                     model.getRemarke(), model.getAccountSet(), list.get(0).get("PM_PRJ_ID"),
-                    model.getCustomerUnit(), model.getVoucherNum(), list.get(0).get("FUND_IMPLEMENTATION_V_ID"),
+                    model.getCustomerUnit(), model.getVoucherNum(), fundImplementationVId,
                     list.get(0).get("FUND_CATEGORY_FIRST"), model.getNper(),
                     fundNewlyIncreasedDetailId);
         }
