@@ -36,7 +36,7 @@ public class PmStatisticsManualExt {
         String year = String.valueOf(map.get("year") == null ? "" : map.get("year"));
         int pageSize = Integer.parseInt(String.valueOf(map.get("pageSize")));
         int pageIndex = Integer.parseInt(String.valueOf(map.get("pageIndex")));
-        String sql = "  select PM_PRJ_ID, `year`, `month`,(architectural_engineering_fee + installation_engineering_fee + equipment_purchase_fee + other_fee) as fee " +
+        String sql = "  select PM_PRJ_ID, `year`, `month`,(ifnull(architectural_engineering_fee,0) + ifnull(installation_engineering_fee,0) + ifnull(equipment_purchase_fee,0) + ifnull(other_fee,0)) as fee " +
                 "        from PM_STATISTICS_FEE " +
                 "        where PM_PRJ_ID = ? ";
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, projectId);

@@ -40,7 +40,7 @@ public class ProjectInvestmentInfoStatisticalExt {
         BigDecimal jian = BigDecimal.ZERO;
         int currentYear = LocalDate.now().getYear();
         for (int i = 2019; i <= currentYear; i++) {
-            List<Map<String, Object>> feeList = myJdbcTemplate.queryForList("select PM_PRJ_ID, `year`, `month`,(architectural_engineering_fee + installation_engineering_fee + equipment_purchase_fee + other_fee) as fee, " +
+            List<Map<String, Object>> feeList = myJdbcTemplate.queryForList("select PM_PRJ_ID, `year`, `month`,(ifnull(architectural_engineering_fee,0) + ifnull(installation_engineering_fee,0) + ifnull(equipment_purchase_fee,0) + ifnull(other_fee,0)) as fee, " +
                     "(architectural_engineering_fee + installation_engineering_fee + equipment_purchase_fee ) as jaFee" +
                     " from PM_STATISTICS_FEE  where PM_PRJ_ID = ? and  `year`=? ", projectId, i);
             Optional<Map<String, Object>> yearData = feeList.stream().max(Comparator.comparing(m -> new BigDecimal(JdbcMapUtil.getString(m, "fee"))));
