@@ -7,10 +7,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -48,10 +45,12 @@ public class DynamicCostTempExt {
                 "ifnull(TOTAL_AMT_6,0) as TOTAL_AMT_6,\n" +
                 "REMARK_SHORT \n" +
                 "from DYNAMIC_COST");
-        AtomicInteger index = new AtomicInteger(0);
-        List<ProjectDynamicCostTreeInfo> infoList = list.stream().map(p -> {
+
+        List<ProjectDynamicCostTreeInfo> infoList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            Map<String, Object> p = list.get(i);
             ProjectDynamicCostTreeInfo info = new ProjectDynamicCostTreeInfo();
-            info.numericalOrder = JdbcMapUtil.getString(p, String.valueOf(index.getAndIncrement()));
+            info.numericalOrder = String.valueOf(i+1);
             info.indicatorsName = JdbcMapUtil.getString(p, "COST_TYPE_WR");
             info.estimate = JdbcMapUtil.getBigDecimal(p, "FEASIBILITY_APPROVE_FUND");
             info.budgetEstimate = JdbcMapUtil.getBigDecimal(p, "ESTIMATE_AMT");
@@ -68,8 +67,8 @@ public class DynamicCostTempExt {
             info.paidProRata = JdbcMapUtil.getBigDecimal(p, "AMT_FIVE");
             info.settlementPrice = JdbcMapUtil.getBigDecimal(p, "TOTAL_AMT_6");
             info.remakes = JdbcMapUtil.getBigDecimal(p, "REMARK_SHORT");
-            return info;
-        }).collect(Collectors.toList());
+            infoList.add(info);
+        }
 
         Map<String, Object> res = new HashMap<>();
         res.put("treeInfos", infoList);
