@@ -6,8 +6,10 @@ import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,15 +39,13 @@ public class PoOrderPaymentExtApi {
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuilder baseSql = new StringBuilder();
-        baseSql.append("SELECT a.ID,a.CONTRACT_ID,b.NAME contract_name,a.PM_PRJ_ID project_id,a.STAGE_PAY_AMT_TWO,a.AMT,a.PAY_DATE,a.PAY_AMT,a" +
+        baseSql.append("SELECT a.ID,a.CONTRACT_ID,(select contract_name from po_order_req where id = a.CONTRACT_ID ) contractName,a.PM_PRJ_ID project_id,a.STAGE_PAY_AMT_TWO,a.AMT,a.PAY_DATE,a.PAY_AMT,a" +
                 ".PO_ORDER_DTL_PRO_ID,a.PO_ORDER_DTL_ID ,p.name project_name " +
-                "FROM po_order_payment a left join po_order b on a.CONTRACT_ID = b.CONTRACT_APP_ID  " +
+                "FROM po_order_payment a " +
+//                "left join po_order b on a.CONTRACT_ID = b.CONTRACT_APP_ID  " +
                 "left join pm_prj p on p.id = a.PM_PRJ_ID " +
                 "WHERE a.PM_PRJ_ID = '" + param.projectId + "' ");
         //其他筛选条件
-        if (!SharedUtil.isEmptyString(param.contractName)){
-            baseSql.append("and b.NAME like '%" + param.contractName + "%' ");
-        }
         if (!SharedUtil.isEmptyString(param.startDate) && !SharedUtil.isEmptyString(param.endDate)){
             baseSql.append("and a.pay_date BETWEEN '" + param.startDate + "' and '" + param.endDate + "' ");
         }
@@ -65,7 +65,17 @@ public class PoOrderPaymentExtApi {
         List<Map<String, Object>> totalMaps = myJdbcTemplate.queryForList(totalSql);
         ArrayList<PoOrderPaymentView> paymentViews = new ArrayList<>();
         for (Map<String, Object> payMap : payMaps) {
-            PoOrderPaymentView paymentView = EntityUtil.mapToEntity(PoOrderPaymentView.class,payMap);
+//            PoOrderPaymentView paymentView = EntityUtil.mapToEntity(PoOrderPaymentView.class,payMap);
+            PoOrderPaymentView paymentView = new PoOrderPaymentView();
+            paymentView.setId(payMap.get("id").toString());
+            paymentView.setContractId(payMap.get("CONTRACT_ID").toString());
+            paymentView.setContractName(payMap.get("contractName").toString());
+            paymentView.setProjectId(payMap.get("project_id").toString());
+            paymentView.setStagePayAmtTwo(new BigDecimal(payMap.get("STAGE_PAY_AMT_TWO").toString()));
+            paymentView.setAmt(new BigDecimal(payMap.get("AMT").toString()));
+            paymentView.setPayAmt(new BigDecimal(payMap.get("PAY_AMT").toString()));
+            paymentView.setPayDate(payMap.get("PAY_DATE").toString());
+            paymentView.setProjectName(payMap.get("project_name").toString());
             paymentViews.add(paymentView);
         }
         HashMap<String, Object> result = new HashMap<>();

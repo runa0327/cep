@@ -70,7 +70,7 @@ public class PoPublicBidExtApi {
                 // 招标类型
                 projectTender.approveReleaseWay = findInDict("pms_release_way", projectTender.approvePmsReleaseWayId, myJdbcTemplate);
                 // 招标方式
-                projectTender.approvePurchaseTypeName = findInDict("BUY_TYPE_ID", projectTender.approvePurchaseType, myJdbcTemplate);
+                projectTender.approvePurchaseTypeName = findInDict("buy_type", projectTender.approvePurchaseType, myJdbcTemplate);
                 // 经办部门
                 if (!Strings.isNullOrEmpty(projectTender.bidUserId)) {
                     Map<String, Object> deptUserMap = myJdbcTemplate.queryForMap("select u.name handleUserName,d.name handleDeptName from ad_user u " +
@@ -205,7 +205,7 @@ public class PoPublicBidExtApi {
         tender.bidDemandFileGroupId = JdbcMapUtil.getString(data, "BID_DEMAND_FILE_GROUP_ID");
         tender.remark = JdbcMapUtil.getString(data, "REMARK");
         tender.approvePmsReleaseWayId = JdbcMapUtil.getString(data, "APPROVE_PMS_RELEASE_WAY_ID");
-        tender.approvePurchaseType = JdbcMapUtil.getString(data, "APPROVE_PURCHASE_TYPE");
+        tender.approvePurchaseType = JdbcMapUtil.getString(data, "BUY_TYPE_ID");
         tender.approveBidCtlPrice = JdbcMapUtil.getString(data, "APPROVE_BID_CTL_PRICE");
         tender.approvePurchaseTypeEcho = JdbcMapUtil.getString(data, "APPROVE_PURCHASE_TYPE_ECHO");
         tender.leaderApproveComment = JdbcMapUtil.getString(data, "LEADER_APPROVE_COMMENT");
@@ -254,8 +254,6 @@ public class PoPublicBidExtApi {
         if (!CollectionUtils.isEmpty(list)){
             name = JdbcMapUtil.getString(list.get(0),"name");
         }
-//        JdbcMapUtil.getString(myJdbcTemplate.queryForMap("select v.name from gr_set_value v left join gr_set s on s.id = v.gr_set_id where s.code = ? and " +
-//                "v.id = ?", code, id),"name");
         return name;
     }
 
