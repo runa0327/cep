@@ -130,7 +130,7 @@ public class SendSmsJob {
      */
     // TODO 2023-01-17 暂时注释掉
      @Scheduled(cron = "${cisdi-pms-job.sms-timing}")
-//    @Scheduled(fixedDelayString = "10000000")
+//    @Scheduled(fixedDelayString = "100000000")
     public void sendSmsForNineAlone() {
         // 开关短信功能
         if (!smsSwitch) {
@@ -142,11 +142,16 @@ public class SendSmsJob {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String nowTime = format.format(date);
         // 查询当前时间的开关数据
-        String switchSql = "select SMS_STATUS from sms_time where date = ?";
-        Map<String, Object> mapSwitch = jdbcTemplate.queryForMap(switchSql, nowTime);
-        // 根据表中数据判断是否   1:发送消息    0：不发送消息
-        if ("0".equals(mapSwitch.get("SMS_STATUS"))) {
+        String switchSql = "select ifnull(SMS_STATUS,0) SMS_STATUS from sms_time where date = ?";
+        List<Map<String, Object>> mapSwitches = jdbcTemplate.queryForList(switchSql, nowTime);
+        if (CollectionUtils.isEmpty(mapSwitches)){
             return;
+        }else {
+            // 根据表中数据判断是否   1:发送消息    0：不发送消息
+            String smsStatus = mapSwitches.get(0).get("SMS_STATUS").toString();
+            if ("0".equals(smsStatus)){
+                return;
+            }
         }
 
         // 锁表  防止多台服务器同时修改
