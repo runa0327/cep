@@ -68,6 +68,8 @@ public class PmMap {
                 " where pj.id in (select PM_PRJ_ID from PM_MAP where LONGITUDE like ('"+longitude1+"%') and LATITUDE like ('"+latitude1+"%'))";
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
 
+        //临时获取项目形象进度
+        List<ProjectInfoTemp> prjTemps = ProjectMapTemp.getAllData();
         List<Project> projects = list.stream().map(p -> {
             String sql2 = "select p1.`NAME` as jsUnit,p2.`NAME` as kcUnit,p3.`NAME` as sjUnit,p4.`NAME` as jlUnit,p5.`NAME` as sgUnit,PRJ_SITUATION from pm_prj pj " +
                     "left join PM_PARTY p1 on pj.BUILDER_UNIT = p1.id " +
@@ -96,7 +98,13 @@ public class PmMap {
             pro.manageUnit = JdbcMapUtil.getString(p, "manageUnit");
             pro.sgUnit = JdbcMapUtil.getString(p, "sgUnit");
             pro.totalInvest = getProjectInvest(pro.projectId);
-            pro.progress = BigDecimal.ZERO;
+//            pro.progress = BigDecimal.ZERO;
+            //临时形象进度
+            Optional<BigDecimal> anyPrjTemp =
+                    prjTemps.stream().filter(prjTemp -> prjTemp.getName().equals(pro.projectName)).map(prjTemp -> prjTemp.getRate()).findAny();
+            if (anyPrjTemp.isPresent()){
+                pro.progress = anyPrjTemp.get();
+            }
             pro.jsUnit = JdbcMapUtil.getString(stringObjectMap, "jsUnit");
             pro.kcUnit = JdbcMapUtil.getString(stringObjectMap, "kcUnit");
             pro.sjUnit = JdbcMapUtil.getString(stringObjectMap, "sjUnit");
