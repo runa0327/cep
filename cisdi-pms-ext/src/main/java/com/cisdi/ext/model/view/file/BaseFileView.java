@@ -1,4 +1,4 @@
-package com.cisdi.ext.model.view;
+package com.cisdi.ext.model.view.file;
 
 import com.cisdi.ext.model.BasePageEntity;
 

@@ -36,7 +36,11 @@ public class TestExt {
 
     public void testExt() throws IOException {
 
-        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
+//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
+        String command = "C:\\Program Files (x86)\\OpenOffice 4\\program/soffice.exe -headless -accept=\"socket,host=139.159.138.11,port=8100;urp;";
+        Process pro = Runtime.getRuntime().exec(command);
+        OpenOfficeConnection connection = new SocketOpenOfficeConnection("139.159.138.11",8100);
+//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
         connection.connect();
 
         File inputFile = new File(input);
@@ -46,8 +50,8 @@ public class TestExt {
         converter.convert(inputFile, outputFile);
 
         //添加水印
-        addFooterAndWater("无痕水印",output,outputWaterMark1);
-        addFooterAndWaterNew1("三亚崖州湾科技城三角梅种质保存与应用基地",output,outputWaterMark);
+//        addFooterAndWater("海南城发建设工程有限公司",output,outputWaterMark1);
+        addFooterAndWaterNew1("海南城发建设工程有限公司",output,outputWaterMark);
 
     }
 
@@ -68,14 +72,15 @@ public class TestExt {
             for (int i = 1; i <= n; i++) {
                 pagesize = reader.getPageSizeWithRotation(i);
                 x = (pagesize.getWidth()/2);
-                y = (pagesize.getHeight()/2);
+                y = (pagesize.getHeight()/3);
                 over = stamper.getOverContent(i);
                 over.saveState();
                 over.setGState(gs1);
                 over.setFontAndSize(BaseFont.createFont("STSong-Light","UniGB-UCS2-H", BaseFont.NOT_EMBEDDED),30);
-                over.showTextAligned(Element.ALIGN_CENTER , watermark, x, y, 20);
+                over.showTextAligned(Element.ALIGN_CENTER , watermark, x, y*0.6f, 20);
+                over.showTextAligned(Element.ALIGN_CENTER , watermark, x, y*1.5f, 20);
+                over.showTextAligned(Element.ALIGN_CENTER , watermark, x, y*2.5f, 20);
                 over.restoreState();
-
             }
             log.info("插入水印成功文件页数为"+n);
             stamper.close();

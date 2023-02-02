@@ -1,6 +1,6 @@
 package com.cisdi.ext.api;
 
-import com.cisdi.ext.model.view.BaseFileView;
+import com.cisdi.ext.model.view.file.BaseFileView;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;

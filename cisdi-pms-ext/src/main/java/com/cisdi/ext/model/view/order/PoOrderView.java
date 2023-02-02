@@ -1,7 +1,7 @@
 package com.cisdi.ext.model.view.order;
 
 import com.cisdi.ext.model.BasePageEntity;
-import com.cisdi.ext.model.view.BaseFileView;
+import com.cisdi.ext.model.view.file.BaseFileView;
 
 import java.math.BigDecimal;
 import java.util.List;

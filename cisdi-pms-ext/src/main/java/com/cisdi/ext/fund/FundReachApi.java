@@ -2,7 +2,7 @@ package com.cisdi.ext.fund;
 
 import com.cisdi.ext.fundManage.FileCommon;
 import com.cisdi.ext.model.view.CommonDrop;
-import com.cisdi.ext.model.view.File;
+import com.cisdi.ext.model.view.file.File;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;

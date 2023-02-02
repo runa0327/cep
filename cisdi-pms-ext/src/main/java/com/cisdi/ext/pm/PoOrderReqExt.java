@@ -1,7 +1,9 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.model.view.file.FlFile;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.ProFileUtils;
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -10,15 +12,15 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.jni.Thread;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 采购合同签订扩展
@@ -378,12 +380,22 @@ public class PoOrderReqExt {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //用户姓名
         String waterMark = "工程项目协调系统-" + ExtJarHelper.loginInfo.get().userName;
+        //公司名称
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
+        String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
         //用户id
         String userId = ExtJarHelper.loginInfo.get().userId;
         //流程id
         String csId = entityRecord.csCommId;
+        //是否标准模板 0099799190825080669 = 是，0099799190825080670=否
+        String isModel = JdbcMapUtil.getString(entityRecord.valueMap,"YES_NO_THREE");
         //获取文件id
-        String fileId = JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID");
+        String fileId = "";
+        if ("0099799190825080669".equals(isModel)){
+            fileId = JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"); //合同文本
+        } else {
+            fileId = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"); //合同修订稿
+        }
         if (SharedUtil.isEmptyString(fileId)){
             throw new BaseException("合同文本不能为空，请上传合同文件");
         }
@@ -457,10 +469,6 @@ public class PoOrderReqExt {
                     }
                     //含税总金额
                     BigDecimal amtShui = getSumAmtBy(list2,"AMT_ONE");
-                    //不含税总金额
-//                BigDecimal amtNoShui = getSumAmtBy(list2,"AMT_TWO");
-                    //税率
-//                BigDecimal shuiLv = getShuiLv(list2,"AMT_THREE");
                     //更新合同表合同总金额数
                     String sql3 = "update PO_ORDER_REQ set AMT_TWO = ? where id = ?";
                     myJdbcTemplate.update(sql3,amtShui,orderId);
@@ -468,4 +476,204 @@ public class PoOrderReqExt {
             }
         }
     }
+
+    /**
+     * 合同签订-word转pdf-发起时
+     */
+    public void wordToPdfStart(){
+        String status = "start";
+        wordToPdfNew(status);
+    }
+
+    /**
+     * 合同签订-word转pdf-发起时
+     */
+    public void wordToPdfSecondStart(){
+        String status = "secondStart";
+        wordToPdfNew(status);
+    }
+
+    /**
+     * 合同签订不同情况转pdf
+     * @param status 状态码
+     */
+    private void wordToPdfNew(String status) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //公司名称
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
+        String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
+        //用户id
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        //流程id
+        String csId = entityRecord.csCommId;
+        //是否标准模板 0099799190825080669 = 是，0099799190825080670=否
+        String isModel = JdbcMapUtil.getString(entityRecord.valueMap,"YES_NO_THREE");
+
+        Thread thread = new Thread();
+
+        //获取文件id
+        String fileId = "";
+        if ("start".equals(status)){ //发起时校验
+            fileId = JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"); //合同文本
+        } else {
+            fileId = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"); //合同修订稿
+        }
+
+        //清空历史pdf数据，整理出最新的待转换的word文件信息
+        Map<String,Object> fileMap = getFileList(myJdbcTemplate,fileId);
+        String oldId = fileMap.get("fileId").toString();
+
+        //进行文档转换
+        String pdfId = transferPDF(myJdbcTemplate,fileMap,companyName);
+
+        String sql1 = "select PHYSICAL_LOCATION,EXT,NAME from fl_file where id = ?";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,fileId);
+        if (CollectionUtils.isEmpty(list1)){
+            throw new BaseException("没有找到文件！");
+        }
+
+        //模拟上传文件写入数据
+        String newId = Crud.from("fl_file").insertData();
+
+        //文件类型
+        String fileType = list1.get(0).get("EXT").toString();
+        //输出地址
+        String newAddress = "";
+        //文件存放地址
+//        String address = list1.get(0).get("PHYSICAL_LOCATION").toString();
+        String address = "C:\\Users\\11376\\Desktop\\demo.docx";
+        if (!"doc".equals(fileType) && !"docx".equals(fileType)){
+            throw new BaseException("合同附件格式为文档");
+        }
+//        String addressFront = address.substring(0,address.lastIndexOf("/"));
+        System.out.println("address:"+address);
+//        newAddress = addressFront+newId+".pdf";
+        //文件大小
+        float fileSize = 0l;
+        //显示名称
+        String showName = "";
+        try {
+            newAddress = "C:\\Users\\11376\\Desktop\\demo.pdf";
+            Map map = ProFileUtils.testExt(address,newAddress);
+            fileSize = Float.valueOf(map.get("size").toString());
+            showName = map.get("name").toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //文件名称
+        String fileName = JdbcMapUtil.getString(entityRecord.valueMap,"NAME");
+
+        //当前时间
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String now = sdf.format(new Date());
+
+        //将生成的pdf写入该流程
+//        Crud.from("PO_ORDER_REQ").where().eq("id",csId).update().set("FIRST_INSPECTION_REPORT_FILE",newAddress).exec();
+        Crud.from("TEST_CLASS").where().eq("id",csId).update().set("FILE_ID_ONE",newId).exec();
+
+        Crud.from("fl_file").where().eq("id",newId).update()
+                .set("CODE",newId).set("NAME",fileName).set("VER","1").set("FL_PATH_ID","0099250247095872690").set("EXT","pdf")
+                .set("STATUS","AP").set("CRT_DT",now).set("CRT_USER_ID",userId).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                .set("SIZE_KB",fileSize).set("TS",now).set("UPLOAD_DTTM",now).set("PHYSICAL_LOCATION",newAddress).set("DSP_NAME",showName)
+                .set("DSP_SIZE",fileSize).exec();
+    }
+
+    /**
+     *
+     * @param myJdbcTemplate 数据源
+     * @param fileMap 待转换文件信息
+     * @param companyName 公司名称
+     * @return 文件id
+     */
+    private String transferPDF(MyJdbcTemplate myJdbcTemplate, Map<String, Object> fileMap, String companyName) {
+        StringBuilder sb = new StringBuilder();
+        List<FlFile> list = (List<FlFile>)fileMap.get("fileList");
+        if (!CollectionUtils.isEmpty(list)){
+            for (FlFile tmp : list) {
+                String id = getPDFFileId(myJdbcTemplate,tmp,companyName);
+                sb.append(id).append(",");
+            }
+        }
+        if (sb.length() > 0){
+            sb.deleteCharAt(sb.length()-1);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 单个文件转换
+     * @param myJdbcTemplate
+     * @param tmp
+     * @return 文件id
+     */
+    private String getPDFFileId(MyJdbcTemplate myJdbcTemplate, FlFile tmp, String companyName) {
+        //获取文件地址
+        String path = tmp.getPHYSICAL_LOCATION();
+        System.out.println(path);
+        String newPath = path.substring(0,path.lastIndexOf("/"));
+        System.out.println("new Path: "+path);
+        try {
+            Map map = ProFileUtils.testExt(path,newPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "1";
+    }
+
+    /**
+     * 查询文件信息
+     * @param myJdbcTemplate 数据源
+     * @param fileId 文件id串
+     * @return
+     */
+    private Map<String,Object> getFileList(MyJdbcTemplate myJdbcTemplate, String fileId) {
+        Map<String,Object> map = new HashMap<>();
+        List<FlFile> list = new ArrayList<>();
+        fileId = StringUtil.codeToSplit(fileId);
+        List<String> fileIdList = new ArrayList<>(Arrays.asList(fileId.split(",")));
+        String sql = "select t.*,b.DIR from fl_file t left join fl_path b on t.FL_PATH_ID = b.id where t.id in ('"+fileId+"')";
+        List<Map<String,Object>> fileList = myJdbcTemplate.queryForList(sql);
+        if (!CollectionUtils.isEmpty(fileList)){
+            //清空历史生成的pdf文件，为后续重新生成清除数据
+            fileList.forEach(tmp->{
+                String type = JdbcMapUtil.getString(tmp,"EXT");
+                if ("pdf".equals(type)){
+                    String id = JdbcMapUtil.getString(tmp,"ID");
+                    fileIdList.remove(id);
+                } else {
+                    FlFile flFile = new FlFile();
+                    flFile.setID(JdbcMapUtil.getString(tmp,"ID"));
+                    flFile.setCODE(JdbcMapUtil.getString(tmp,"CODE"));
+                    flFile.setNAME(JdbcMapUtil.getString(tmp,"NAME"));
+                    flFile.setREMARK(JdbcMapUtil.getString(tmp,"REMARK"));
+                    flFile.setVER(JdbcMapUtil.getString(tmp,"VER"));
+                    flFile.setFL_PATH_ID(JdbcMapUtil.getString(tmp,"FL_PATH_ID"));
+                    flFile.setEXT(JdbcMapUtil.getString(tmp,"EXT"));
+                    flFile.setLK_WF_INST_ID(JdbcMapUtil.getString(tmp,"LK_WF_INST_ID"));
+                    flFile.setSTATUS(JdbcMapUtil.getString(tmp,"STATUS"));
+                    flFile.setCRT_DT(JdbcMapUtil.getString(tmp,"CRT_DT"));
+                    flFile.setCRT_USER_ID(JdbcMapUtil.getString(tmp,"CRT_USER_ID"));
+                    flFile.setLAST_MODI_DT(JdbcMapUtil.getString(tmp,"LAST_MODI_DT"));
+                    flFile.setLAST_MODI_USER_ID(JdbcMapUtil.getString(tmp,"LAST_MODI_USER_ID"));
+                    flFile.setSIZE_KB(JdbcMapUtil.getString(tmp,"SIZE_KB"));
+                    flFile.setIS_PRESET(JdbcMapUtil.getString(tmp,"IS_PRESET"));
+                    flFile.setFILE_INLINE_URL(JdbcMapUtil.getString(tmp,"FILE_INLINE_URL"));
+                    flFile.setFILE_ATTACHMENT_URL(JdbcMapUtil.getString(tmp,"FILE_ATTACHMENT_URL"));
+                    flFile.setTS(JdbcMapUtil.getString(tmp,"TS"));
+                    flFile.setUPLOAD_DTTM(JdbcMapUtil.getString(tmp,"UPLOAD_DTTM"));
+                    flFile.setPHYSICAL_LOCATION(JdbcMapUtil.getString(tmp,"PHYSICAL_LOCATION"));
+                    flFile.setDSP_NAME(JdbcMapUtil.getString(tmp,"DSP_NAME"));
+                    flFile.setDSP_SIZE(JdbcMapUtil.getString(tmp,"DSP_SIZE"));
+                    flFile.setIS_PUBLIC_READ(JdbcMapUtil.getString(tmp,"IS_PUBLIC_READ"));
+                    flFile.setDIR(JdbcMapUtil.getString(tmp,"DIR"));
+                    list.add(flFile);
+                }
+            });
+        }
+        map.put("fileList",list);
+        map.put("fileId",String.join(",",fileIdList));
+        return map;
+    }
+
 }

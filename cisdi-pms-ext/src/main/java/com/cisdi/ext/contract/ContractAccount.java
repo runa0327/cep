@@ -2,7 +2,7 @@ package com.cisdi.ext.contract;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.fundManage.FileCommon;
-import com.cisdi.ext.model.view.File;
+import com.cisdi.ext.model.view.file.File;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;

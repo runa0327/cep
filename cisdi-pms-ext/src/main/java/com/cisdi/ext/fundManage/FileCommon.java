@@ -1,6 +1,6 @@
 package com.cisdi.ext.fundManage;
 
-import com.cisdi.ext.model.view.File;
+import com.cisdi.ext.model.view.file.File;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;

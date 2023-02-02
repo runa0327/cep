@@ -2,7 +2,7 @@ package com.cisdi.ext.fund;
 
 import com.cisdi.ext.fundManage.FileCommon;
 import com.cisdi.ext.model.BasePageEntity;
-import com.cisdi.ext.model.view.File;
+import com.cisdi.ext.model.view.file.File;
 import com.cisdi.ext.util.EntityUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
