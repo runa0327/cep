@@ -129,7 +129,7 @@ public class SendSmsJob {
      * 早上九点发送 代办
      */
     // TODO 2023-01-17 暂时注释掉
-//     @Scheduled(cron = "${cisdi-pms-job.sms-timing}")
+     @Scheduled(cron = "${cisdi-pms-job.sms-timing}")
 //    @Scheduled(fixedDelayString = "10000000")
     public void sendSmsForNineAlone() {
         // 开关短信功能
