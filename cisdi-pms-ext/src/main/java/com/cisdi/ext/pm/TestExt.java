@@ -1,11 +1,17 @@
 package com.cisdi.ext.pm;
 
 import com.artofsolving.jodconverter.DocumentConverter;
+import com.artofsolving.jodconverter.DocumentFormat;
 import com.artofsolving.jodconverter.openoffice.connection.OpenOfficeConnection;
 import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConnection;
 import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConverter;
-import com.itextpdf.text.*;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
+import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -15,11 +21,12 @@ import java.io.IOException;
 @Slf4j
 public class TestExt {
 
-    public static String input = "C:\\Users\\EDY\\Desktop\\demo\\demo.doc";
-    public static String inputx = "C:\\Users\\EDY\\Desktop\\demo\\demo.docx";
-    public static String output = "C:\\Users\\EDY\\Desktop\\demo\\demo.pdf";
-    public static String outputWaterMark = "C:\\Users\\EDY\\Desktop\\demo\\demoWater.pdf";
-    public static String outputWaterMark1 = "C:\\Users\\EDY\\Desktop\\demo\\demoWater1.pdf";
+    public static String input = "C:\\demo\\demo.doc";
+    public static String input1 = "C:\\demo\\demo1.doc";
+    public static String inputx = "C:\\demo\\demo.docx";
+    public static String output = "C:\\demo\\demo.pdf";
+    public static String outputWaterMark = "C:\\demo\\demoWater.pdf";
+    public static String outputWaterMark1 = "C:\\demo\\demoWater1.pdf";
 
 //    @Resource
 //    private DocumentConverter converter;
@@ -35,13 +42,14 @@ public class TestExt {
 //    }
 
     public void testExt() throws IOException {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+//        String path = myJdbcTemplate.queryForList("select name from test_demo").get(0).get("name").toString();
 
-//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
-        String command = "C:\\Program Files (x86)\\OpenOffice 4\\program/soffice.exe -headless -accept=\"socket,host=139.159.138.11,port=8100;urp;";
-        Process pro = Runtime.getRuntime().exec(command);
-        OpenOfficeConnection connection = new SocketOpenOfficeConnection("139.159.138.11",8100);
-//        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
+        OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
+//        String command = "C:\\Program Files (x86)\\OpenOffice 4\\program\\soffice.exe -headless -accept=\"socket,host=81.70.1.71,port=8100;urp;";
+//        Process pro = Runtime.getRuntime().exec(command);
         connection.connect();
+
 
         File inputFile = new File(input);
         File outputFile = new File(output);
@@ -51,10 +59,16 @@ public class TestExt {
 
         //添加水印
 //        addFooterAndWater("海南城发建设工程有限公司",output,outputWaterMark1);
-        addFooterAndWaterNew1("海南城发建设工程有限公司",output,outputWaterMark);
+        addFooterAndWaterNew1("海南城发建设工程有限公司",input,input1);
 
     }
 
+    /**
+     *
+     * @param watermark 水印内容
+     * @param src 原始文件
+     * @param dest 加水印后输出文件
+     */
     private void addFooterAndWaterNew1(String watermark, String src, String dest) {
         try {
             log.info("成功调用插入水印方法");
