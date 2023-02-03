@@ -16,6 +16,7 @@
         <module>cisdi-pms-job</module>
         <module>cisdi-pms-third-party-login</module>
         <module>cisdi-pms-externa-interface</module>
+        <module>cisdi-pms-wordToPdf</module>
     </modules>
 
     <properties>
