@@ -59,6 +59,7 @@ public class WfExt {
     public void syncFile(){
         saveFile();
     }
+
     private void changeStatus(String newStatus) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         SevInfo sevInfo = ExtJarHelper.sevInfo.get();
@@ -66,12 +67,25 @@ public class WfExt {
         String entityCode = entityInfo.code;
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
 
+        //发起人
+        String userName =ExtJarHelper.loginInfo.get().userName;
+
         if (entityRecordList != null) {
             for (EntityRecord entityRecord : entityRecordList) {
                 String csCommId = entityRecord.csCommId;
                 Map<String, Object> valueMap = entityRecord.valueMap;
                 int update = myJdbcTemplate.update("update " + entityCode + " t set t.status = ? where t.id=?", newStatus, csCommId);
                 log.info("已更新：{}", update);
+
+                String processName = "", nowDate = "";
+                String sql0 = "SELECT c.name as processName,b.IS_URGENT,b.START_DATETIME FROM "+entityCode+" a " +
+                        "LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id LEFT JOIN wf_process c on b.WF_PROCESS_ID = c.id WHERE a.id = ?";
+                List<Map<String,Object>> list0 = myJdbcTemplate.queryForList(sql0,csCommId);
+                if (!CollectionUtils.isEmpty(list0)){
+                    processName = JdbcMapUtil.getString(list0.get(0),"processName");
+                    nowDate = JdbcMapUtil.getString(list0.get(0),"START_DATETIME").replace("T"," ");
+                }
+
 
                 // 审批流审批通过
                 if ("AP".equals(newStatus)) {
@@ -234,32 +248,36 @@ public class WfExt {
                         }
                     }
 
+                    String sql = "";
                     //定义流程实例名称规则
-                    String name = "",projectName = "", userName = "", processName = "", otherName = "",nowDate = "";;
-                    String sql2 = "SELECT (select name from pm_prj where id = a.PM_PRJ_ID) as projectName," +
-                            "(select name from ad_user where id = a.CRT_USER_ID) as userName," +
-                            "c.name as processName,b.IS_URGENT,b.START_DATETIME FROM "+entityCode+" a " +
-                            "LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id LEFT JOIN wf_process c on b.WF_PROCESS_ID = c.id WHERE a.id = ?";
+                    String name = "",projectName = "", otherName = "";
+                    int update1 = 0;
+
+                    //判断该流程是否有项目信息
+                    List<String> noProjectList = getNoProjectList();
+
+                    if (noProjectList.contains(entityCode)){
+                        sql = "update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?";
+                        String title = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_THREE");
+                        name = concatProcessName("-",processName,title,userName,nowDate);
+                        update1 = myJdbcTemplate.update(sql, name,csCommId);
+                        return;
+                    }
+
+                    String sql2 = "SELECT (select name from pm_prj where id = a.PM_PRJ_ID) as projectName FROM "+entityCode+" a WHERE a.id = ?";
                     List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,csCommId);
                     if (!CollectionUtils.isEmpty(list2)){
                         projectName = JdbcMapUtil.getString(list2.get(0),"projectName");
                         if (SharedUtil.isEmptyString(projectName)){
                             projectName = getProjectName(myJdbcTemplate,entityRecord);
                         }
-                        userName = JdbcMapUtil.getString(list2.get(0),"userName");
-                        processName = urgent+JdbcMapUtil.getString(list2.get(0),"processName");
-                        nowDate = JdbcMapUtil.getString(list2.get(0),"START_DATETIME").replace("T"," ");
                     }
 
                     List<String> tableList = getTableList();
                     if (!CollectionUtils.isEmpty(tableList)) {
                         if (tableList.contains(entityCode)) {
                             // 流程名称按规定创建
-                            int update1 = 0;
-                            String sql = "";
 
-                            //判断该流程是否有项目信息
-                            List<String> noProjectList = getNoProjectList();
                             // 特殊流程 更新流程内name字段
                             List<String> specialList = getSpecialList();
                             if (specialList.contains(entityCode)) {
@@ -309,12 +327,7 @@ public class WfExt {
                                 }
                                 update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
                                 return;
-                            } else if (noProjectList.contains(entityCode)){
-                                sql = "update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?";
-                                name = concatProcessName("-",processName,userName,nowDate);
-                                update1 = myJdbcTemplate.update(sql, name,csCommId);
-                                return;
-                            } else {
+                            }  else {
                                 sql = "update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?";
                                 name = concatProcessName("-",processName,projectName,userName,nowDate);
                                 update1 = myJdbcTemplate.update(sql, name,csCommId);
@@ -1449,7 +1462,7 @@ public class WfExt {
     /** 没有项目的流程 **/
     private List<String> getNoProjectList(){
         List<String> list = new ArrayList<>();
-        list.add("PM_SEND_APPROVAL_REQ"); // 发文呈批表
+        list.add("CONSULTATION_REQ"); // 意见征询
         return list;
     }
 

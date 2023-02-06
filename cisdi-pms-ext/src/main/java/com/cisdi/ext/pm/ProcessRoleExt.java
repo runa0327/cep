@@ -612,6 +612,13 @@ public class ProcessRoleExt {
     }
 
     /**
+     * 查询任意流程的任意岗位人员
+     */
+    public void getUserIds(){
+        getDeptUser("USER_IDS","userIds","人员多选");
+    }
+
+    /**
      * 查询任意流程中对应岗位人员
      * @param deptCode 岗位属性代码
      * @param post_cost 部门树岗位编码
@@ -627,9 +634,13 @@ public class ProcessRoleExt {
         String sql1 = "select "+deptCode+" from "+entityCode+" where id = ?";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,csCommId);
         if (!CollectionUtils.isEmpty(list1)){
-            List<String> userList = list1.stream().map(p-> JdbcMapUtil.getString(p,deptCode)).collect(Collectors.toList());
-            ArrayList<Object> userIdList = new ArrayList<>();
-            userIdList.addAll(userList);
+            ArrayList<Object> userIdList;
+            if ("userIds".equals(post_cost)){
+                String userIds = JdbcMapUtil.getString(list1.get(0), deptCode);
+                userIdList = new ArrayList<>(Arrays.asList(userIds.split(",")));
+            } else {
+                userIdList = list1.stream().map(p -> JdbcMapUtil.getString(p, deptCode)).collect(Collectors.toCollection(ArrayList::new));
+            }
             ExtJarHelper.returnValue.set(userIdList);
         } else {
             throw new BaseException("该流程未配置 ‘"+deptName+"' 人员，请先选择对应人员或联系管理员处理！");
@@ -649,9 +660,7 @@ public class ProcessRoleExt {
         String sql = "select AD_USER_ID from "+entityCode+" where id = ?";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
         if (!CollectionUtils.isEmpty(list)){
-            List<String> userList = list.stream().map(p-> JdbcMapUtil.getString(p,"AD_USER_ID")).collect(Collectors.toList());
-            ArrayList<Object> userIdList = new ArrayList<>();
-            userIdList.addAll(userList);
+            ArrayList<Object> userIdList = list.stream().map(p -> JdbcMapUtil.getString(p, "AD_USER_ID")).collect(Collectors.toCollection(ArrayList::new));
             ExtJarHelper.returnValue.set(userIdList);
         } else {
             throw new BaseException("未找到对应的合同签订联系人，请选择对应联系人或联系管理员处理！");
