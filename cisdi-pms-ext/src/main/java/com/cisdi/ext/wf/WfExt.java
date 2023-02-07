@@ -271,6 +271,7 @@ public class WfExt {
                         if (SharedUtil.isEmptyString(projectName)){
                             projectName = getProjectName(myJdbcTemplate,entityRecord);
                         }
+                        processName = urgent + processName;
                     }
 
                     List<String> tableList = getTableList();
