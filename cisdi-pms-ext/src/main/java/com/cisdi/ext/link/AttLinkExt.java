@@ -4038,7 +4038,7 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILDING_AREA")) ? null:JdbcMapUtil.getString(row, "BUILDING_AREA");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILDING_AREA")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "BUILDING_AREA"));
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILDING_AREA")) ? null:JdbcMapUtil.getString(row, "BUILDING_AREA");
             attLinkResult.attMap.put("BUILDING_AREA", linkedAtt);
         }
@@ -4165,7 +4165,7 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:JdbcMapUtil.getString(row, "FLOOR_AREA");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "FLOOR_AREA"));
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:JdbcMapUtil.getString(row, "FLOOR_AREA");
             linkedAtt.changeToMandatory = floorAreaMustEdit;
             attLinkResult.attMap.put("FLOOR_AREA", linkedAtt);
@@ -4177,7 +4177,7 @@ public class AttLinkExt {
             linkedAtt.changeToShown = areashow;
             linkedAtt.changeToMandatory = areaMustEdit;
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:JdbcMapUtil.getString(row, "QTY_ONE");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:JdbcMapUtil.getString(row, "QTY_ONE");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "QTY_ONE"));
             attLinkResult.attMap.put("QTY_ONE", linkedAtt);
         }
         //海域面积
@@ -4187,7 +4187,7 @@ public class AttLinkExt {
             linkedAtt.changeToShown = seaShow;
             linkedAtt.changeToMandatory = seaMustEdit;
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:JdbcMapUtil.getString(row, "QTY_THREE");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:JdbcMapUtil.getString(row, "QTY_THREE");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "QTY_THREE"));
             attLinkResult.attMap.put("QTY_THREE", linkedAtt);
         }
         //长
@@ -4197,7 +4197,7 @@ public class AttLinkExt {
             linkedAtt.changeToShown = lengthShow;
             linkedAtt.changeToMandatory = lengthMustEdit;
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "CON_SCALE_QTY"));
             attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
         }
         //宽
@@ -4207,7 +4207,7 @@ public class AttLinkExt {
             linkedAtt.changeToShown = widthShow;
             linkedAtt.changeToMandatory = widthMustEdit;
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "CON_SCALE_QTY2"));
             attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
         }
         //其他
