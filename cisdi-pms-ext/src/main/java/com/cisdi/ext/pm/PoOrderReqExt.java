@@ -1,9 +1,11 @@
 package com.cisdi.ext.pm;
 
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONParser;
+import com.alibaba.fastjson.JSON;
 import com.cisdi.ext.model.view.file.FlFile;
-import com.cisdi.ext.util.DateTimeUtil;
-import com.cisdi.ext.util.ProFileUtils;
-import com.cisdi.ext.util.StringUtil;
+import com.cisdi.ext.model.view.order.PoOrderReq;
+import com.cisdi.ext.util.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -12,7 +14,6 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.jni.Thread;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
@@ -20,7 +21,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 采购合同签订扩展
@@ -500,17 +500,56 @@ public class PoOrderReqExt {
     private void wordToPdfNew(String status) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        //公司名称
-        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
-        String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
         //用户id
         String userId = ExtJarHelper.loginInfo.get().userId;
+        String userName = ExtJarHelper.loginInfo.get().userName;
         //流程id
         String csId = entityRecord.csCommId;
+        //流程实例id
+        String procInstId = ExtJarHelper.procInstId.get();
         //是否标准模板 0099799190825080669 = 是，0099799190825080670=否
         String isModel = JdbcMapUtil.getString(entityRecord.valueMap,"YES_NO_THREE");
 
-        Thread thread = new Thread();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //查询接口地址
+                String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
+                List<Map<String,Object>> listUrl = myJdbcTemplate.queryForList(httpSql);
+                if (!CollectionUtils.isEmpty(listUrl)){
+                    String url = listUrl.get(0).get("HOST_ADDR").toString();
+                    if (SharedUtil.isEmptyString(url)){
+                        //写入日志提示表
+                        String id = Crud.from("AD_REMIND_LOG").insertData();
+                        Crud.from("AD_REMIND_LOG").where().eq("id",id).update().set("AD_ENT_ID","0099799190825103145")
+                                .set("ENT_CODE","PO_ORDER_REQ").set("ENTITY_RECORD_ID",csId).set("REMIND_USER_ID","0099250247095871681")
+                                .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
+                                .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
+                    } else {
+                        PoOrderReq poOrderReq = getOrderModel(entityRecord,procInstId,userId,status,myJdbcTemplate);
+                        String param = JSON.toJSONString(poOrderReq);
+                        HttpUtils.sendPost(url,param);
+                    }
+
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * 合同签订实体装数
+     * @param entityRecord
+     * @return
+     */
+    private PoOrderReq getOrderModel(EntityRecord entityRecord,String procInstId,String userId,String status,MyJdbcTemplate myJdbcTemplate) {
+        PoOrderReq poOrderReq = new PoOrderReq();
+        poOrderReq.setId(entityRecord.csCommId);
+        poOrderReq.setProcessInstanceId(procInstId);
+        poOrderReq.setCreateBy(userId);
+        //公司名称
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
+        String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
+        poOrderReq.setCompanyName(companyName);
 
         //获取文件id
         String fileId = "";
@@ -520,63 +559,8 @@ public class PoOrderReqExt {
             fileId = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"); //合同修订稿
         }
 
-        //清空历史pdf数据，整理出最新的待转换的word文件信息
-        Map<String,Object> fileMap = getFileList(myJdbcTemplate,fileId);
-        String oldId = fileMap.get("fileId").toString();
-
-        //进行文档转换
-        String pdfId = transferPDF(myJdbcTemplate,fileMap,companyName);
-
-        String sql1 = "select PHYSICAL_LOCATION,EXT,NAME from fl_file where id = ?";
-        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,fileId);
-        if (CollectionUtils.isEmpty(list1)){
-            throw new BaseException("没有找到文件！");
-        }
-
-        //模拟上传文件写入数据
-        String newId = Crud.from("fl_file").insertData();
-
-        //文件类型
-        String fileType = list1.get(0).get("EXT").toString();
-        //输出地址
-        String newAddress = "";
-        //文件存放地址
-//        String address = list1.get(0).get("PHYSICAL_LOCATION").toString();
-        String address = "C:\\Users\\11376\\Desktop\\demo.docx";
-        if (!"doc".equals(fileType) && !"docx".equals(fileType)){
-            throw new BaseException("合同附件格式为文档");
-        }
-//        String addressFront = address.substring(0,address.lastIndexOf("/"));
-        System.out.println("address:"+address);
-//        newAddress = addressFront+newId+".pdf";
-        //文件大小
-        float fileSize = 0l;
-        //显示名称
-        String showName = "";
-        try {
-            newAddress = "C:\\Users\\11376\\Desktop\\demo.pdf";
-            Map map = ProFileUtils.testExt(address,newAddress);
-            fileSize = Float.valueOf(map.get("size").toString());
-            showName = map.get("name").toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //文件名称
-        String fileName = JdbcMapUtil.getString(entityRecord.valueMap,"NAME");
-
-        //当前时间
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String now = sdf.format(new Date());
-
-        //将生成的pdf写入该流程
-//        Crud.from("PO_ORDER_REQ").where().eq("id",csId).update().set("FIRST_INSPECTION_REPORT_FILE",newAddress).exec();
-        Crud.from("TEST_CLASS").where().eq("id",csId).update().set("FILE_ID_ONE",newId).exec();
-
-        Crud.from("fl_file").where().eq("id",newId).update()
-                .set("CODE",newId).set("NAME",fileName).set("VER","1").set("FL_PATH_ID","0099250247095872690").set("EXT","pdf")
-                .set("STATUS","AP").set("CRT_DT",now).set("CRT_USER_ID",userId).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
-                .set("SIZE_KB",fileSize).set("TS",now).set("UPLOAD_DTTM",now).set("PHYSICAL_LOCATION",newAddress).set("DSP_NAME",showName)
-                .set("DSP_SIZE",fileSize).exec();
+        poOrderReq.setFileId(fileId);
+        return poOrderReq;
     }
 
     /**
