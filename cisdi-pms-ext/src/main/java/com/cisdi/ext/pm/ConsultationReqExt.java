@@ -44,23 +44,30 @@ public class ConsultationReqExt {
             StringBuilder file = new StringBuilder();
             for (int i = 0; i < list.size(); i++) {
                 String file1 = JdbcMapUtil.getString(list.get(i),"USER_ATTACHMENT");
+                String value1 = JdbcMapUtil.getString(list.get(i),"value");
                 if (i != list.size()-1){
-                    sb.append(JdbcMapUtil.getString(list.get(i),"value")).append("\n");
+                    if (!SharedUtil.isEmptyString(value1)){
+                        sb.append(value1).append("\n");
+                    }
                     if (!SharedUtil.isEmptyString(file1)){
                         file.append(file1).append(",");
                     }
                 } else {
-                    sb.append(JdbcMapUtil.getString(list.get(i),"value"));
-                    file.append(file1);
+                    if (!SharedUtil.isEmptyString(value1)){
+                        sb.append(value1);
+                    }
+                    if (!SharedUtil.isEmptyString(file1)){
+                        file.append(file1);
+                    }
                 }
             }
             StringBuilder updateSql = new StringBuilder("update CONSULTATION_REQ set APPROVAL_COMMENT_TWO = ?");
             if (file.length()>0){
-                updateSql.append(",FILE_ID_TWO=?");
+                updateSql.append(",FILE_ID_TWO = '"+file.toString()+"'");
             }
             updateSql.append(" where id = ?");
 
-            Integer exec = myJdbcTemplate.update(updateSql.toString(),sb.toString(),file.toString(),csCommId);
+            Integer exec = myJdbcTemplate.update(updateSql.toString(),sb.toString(),csCommId);
             log.info("已执行：{}",exec);
         }
     }

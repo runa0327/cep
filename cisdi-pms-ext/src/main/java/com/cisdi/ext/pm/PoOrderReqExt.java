@@ -3,6 +3,7 @@ package com.cisdi.ext.pm;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONParser;
 import com.alibaba.fastjson.JSON;
+import com.cisdi.ext.commons.HttpClient;
 import com.cisdi.ext.model.view.file.FlFile;
 import com.cisdi.ext.model.view.order.PoOrderReq;
 import com.cisdi.ext.util.*;
@@ -510,12 +511,17 @@ public class PoOrderReqExt {
         //是否标准模板 0099799190825080669 = 是，0099799190825080670=否
         String isModel = JdbcMapUtil.getString(entityRecord.valueMap,"YES_NO_THREE");
 
+        //查询接口地址
+        String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
+        List<Map<String,Object>> listUrl = myJdbcTemplate.queryForList(httpSql);
+
+        //公司名称
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
+        String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
+
         new Thread(new Runnable() {
             @Override
             public void run() {
-                //查询接口地址
-                String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
-                List<Map<String,Object>> listUrl = myJdbcTemplate.queryForList(httpSql);
                 if (!CollectionUtils.isEmpty(listUrl)){
                     String url = listUrl.get(0).get("HOST_ADDR").toString();
                     if (SharedUtil.isEmptyString(url)){
@@ -526,9 +532,11 @@ public class PoOrderReqExt {
                                 .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
                                 .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
                     } else {
-                        PoOrderReq poOrderReq = getOrderModel(entityRecord,procInstId,userId,status,myJdbcTemplate);
+                        PoOrderReq poOrderReq = getOrderModel(entityRecord,procInstId,userId,status,companyName);
                         String param = JSON.toJSONString(poOrderReq);
-                        HttpUtils.sendPost(url,param);
+                        //调用接口
+                        HttpClient.doPost(url,param,"UTF-8");
+//                        HttpUtils.sendPost(url,param);
                     }
 
                 }
@@ -538,126 +546,31 @@ public class PoOrderReqExt {
 
     /**
      * 合同签订实体装数
-     * @param entityRecord
+     * @param entityRecord 流程所有数据
+     * @param procInstId 流程实例id
+     * @param userId 操作人id
+     * @param status 状态，区分发起还是二次发起
+     * @param companyName 公司名称
      * @return
      */
-    private PoOrderReq getOrderModel(EntityRecord entityRecord,String procInstId,String userId,String status,MyJdbcTemplate myJdbcTemplate) {
+    private PoOrderReq getOrderModel(EntityRecord entityRecord,String procInstId,String userId,String status,String companyName) {
         PoOrderReq poOrderReq = new PoOrderReq();
         poOrderReq.setId(entityRecord.csCommId);
         poOrderReq.setProcessInstanceId(procInstId);
         poOrderReq.setCreateBy(userId);
-        //公司名称
-        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
-        String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
         poOrderReq.setCompanyName(companyName);
 
         //获取文件id
         String fileId = "";
         if ("start".equals(status)){ //发起时校验
             fileId = JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"); //合同文本
+            poOrderReq.setIsModel("1");
         } else {
             fileId = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"); //合同修订稿
+            poOrderReq.setIsModel("0");
         }
-
         poOrderReq.setFileId(fileId);
         return poOrderReq;
-    }
-
-    /**
-     *
-     * @param myJdbcTemplate 数据源
-     * @param fileMap 待转换文件信息
-     * @param companyName 公司名称
-     * @return 文件id
-     */
-    private String transferPDF(MyJdbcTemplate myJdbcTemplate, Map<String, Object> fileMap, String companyName) {
-        StringBuilder sb = new StringBuilder();
-        List<FlFile> list = (List<FlFile>)fileMap.get("fileList");
-        if (!CollectionUtils.isEmpty(list)){
-            for (FlFile tmp : list) {
-                String id = getPDFFileId(myJdbcTemplate,tmp,companyName);
-                sb.append(id).append(",");
-            }
-        }
-        if (sb.length() > 0){
-            sb.deleteCharAt(sb.length()-1);
-        }
-        return sb.toString();
-    }
-
-    /**
-     * 单个文件转换
-     * @param myJdbcTemplate
-     * @param tmp
-     * @return 文件id
-     */
-    private String getPDFFileId(MyJdbcTemplate myJdbcTemplate, FlFile tmp, String companyName) {
-        //获取文件地址
-        String path = tmp.getPHYSICAL_LOCATION();
-        System.out.println(path);
-        String newPath = path.substring(0,path.lastIndexOf("/"));
-        System.out.println("new Path: "+path);
-        try {
-            Map map = ProFileUtils.testExt(path,newPath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "1";
-    }
-
-    /**
-     * 查询文件信息
-     * @param myJdbcTemplate 数据源
-     * @param fileId 文件id串
-     * @return
-     */
-    private Map<String,Object> getFileList(MyJdbcTemplate myJdbcTemplate, String fileId) {
-        Map<String,Object> map = new HashMap<>();
-        List<FlFile> list = new ArrayList<>();
-        fileId = StringUtil.codeToSplit(fileId);
-        List<String> fileIdList = new ArrayList<>(Arrays.asList(fileId.split(",")));
-        String sql = "select t.*,b.DIR from fl_file t left join fl_path b on t.FL_PATH_ID = b.id where t.id in ('"+fileId+"')";
-        List<Map<String,Object>> fileList = myJdbcTemplate.queryForList(sql);
-        if (!CollectionUtils.isEmpty(fileList)){
-            //清空历史生成的pdf文件，为后续重新生成清除数据
-            fileList.forEach(tmp->{
-                String type = JdbcMapUtil.getString(tmp,"EXT");
-                if ("pdf".equals(type)){
-                    String id = JdbcMapUtil.getString(tmp,"ID");
-                    fileIdList.remove(id);
-                } else {
-                    FlFile flFile = new FlFile();
-                    flFile.setID(JdbcMapUtil.getString(tmp,"ID"));
-                    flFile.setCODE(JdbcMapUtil.getString(tmp,"CODE"));
-                    flFile.setNAME(JdbcMapUtil.getString(tmp,"NAME"));
-                    flFile.setREMARK(JdbcMapUtil.getString(tmp,"REMARK"));
-                    flFile.setVER(JdbcMapUtil.getString(tmp,"VER"));
-                    flFile.setFL_PATH_ID(JdbcMapUtil.getString(tmp,"FL_PATH_ID"));
-                    flFile.setEXT(JdbcMapUtil.getString(tmp,"EXT"));
-                    flFile.setLK_WF_INST_ID(JdbcMapUtil.getString(tmp,"LK_WF_INST_ID"));
-                    flFile.setSTATUS(JdbcMapUtil.getString(tmp,"STATUS"));
-                    flFile.setCRT_DT(JdbcMapUtil.getString(tmp,"CRT_DT"));
-                    flFile.setCRT_USER_ID(JdbcMapUtil.getString(tmp,"CRT_USER_ID"));
-                    flFile.setLAST_MODI_DT(JdbcMapUtil.getString(tmp,"LAST_MODI_DT"));
-                    flFile.setLAST_MODI_USER_ID(JdbcMapUtil.getString(tmp,"LAST_MODI_USER_ID"));
-                    flFile.setSIZE_KB(JdbcMapUtil.getString(tmp,"SIZE_KB"));
-                    flFile.setIS_PRESET(JdbcMapUtil.getString(tmp,"IS_PRESET"));
-                    flFile.setFILE_INLINE_URL(JdbcMapUtil.getString(tmp,"FILE_INLINE_URL"));
-                    flFile.setFILE_ATTACHMENT_URL(JdbcMapUtil.getString(tmp,"FILE_ATTACHMENT_URL"));
-                    flFile.setTS(JdbcMapUtil.getString(tmp,"TS"));
-                    flFile.setUPLOAD_DTTM(JdbcMapUtil.getString(tmp,"UPLOAD_DTTM"));
-                    flFile.setPHYSICAL_LOCATION(JdbcMapUtil.getString(tmp,"PHYSICAL_LOCATION"));
-                    flFile.setDSP_NAME(JdbcMapUtil.getString(tmp,"DSP_NAME"));
-                    flFile.setDSP_SIZE(JdbcMapUtil.getString(tmp,"DSP_SIZE"));
-                    flFile.setIS_PUBLIC_READ(JdbcMapUtil.getString(tmp,"IS_PUBLIC_READ"));
-                    flFile.setDIR(JdbcMapUtil.getString(tmp,"DIR"));
-                    list.add(flFile);
-                }
-            });
-        }
-        map.put("fileList",list);
-        map.put("fileId",String.join(",",fileIdList));
-        return map;
     }
 
 }
