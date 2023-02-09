@@ -1,5 +1,6 @@
 package com.cisdi.pms.job.excel.imports;
 
+import com.cisdi.pms.job.excel.export.BaseController;
 import com.cisdi.pms.job.excel.model.GuaranteeModel;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
 import com.cisdi.pms.job.utils.Util;
@@ -8,12 +9,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +32,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/guaranteeImport")
-public class GuaranteeImportController {
+public class GuaranteeImportController extends BaseController {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -37,7 +41,7 @@ public class GuaranteeImportController {
     @SneakyThrows(IOException.class)
     @RequestMapping(value = "/import")
     @Transactional(rollbackFor = Exception.class)
-    public String importData(MultipartFile file) {
+    public String importData(MultipartFile file, HttpServletResponse response) {
 
         //po_guarantee_letter_return_oa_req     保函退还申请       最下方数据
         //po_guarantee_letter_require_req          新增保函申请       全部数据
@@ -47,6 +51,7 @@ public class GuaranteeImportController {
         // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
         // 这里每次会读取100条数据 然后返回过来 直接调用使用数据就行
         List<GuaranteeModel> reads = EasyExcelUtil.read(file.getInputStream(), GuaranteeModel.class);
+        List<String> errorList = new ArrayList<>();
         try {
             int index = 0;
             int cunt = 0;
@@ -58,6 +63,7 @@ public class GuaranteeImportController {
                 log.info("index:{}", index);
                 if (Integer.parseInt(projectCounts.get("num").toString()) <= 0) {
                     log.info("当前项目不存在，项目名称:{}", read.getProjectNameWr());
+                    errorList.add("当前项目不存在，项目名称:" + read.getProjectNameWr());
                     cunt++;
                     log.info("不存在项目数量:{}", cunt);
                     continue;
@@ -90,8 +96,13 @@ public class GuaranteeImportController {
             e.printStackTrace();
             return "导入失败";
         }
+        if (CollectionUtils.isEmpty(errorList)){
+            return "导入成功";
+        }else {
+            super.exportTxt(response,errorList,"合同台账导入");
+            return null;
+        }
 
-        return "导入成功";
     }
 
     /**
