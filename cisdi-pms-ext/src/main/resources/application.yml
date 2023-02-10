@@ -47,17 +47,5 @@ server:
 qygly:
   ext-jar-debug:
     # 每个人要使用不同的debugger-name：
-    debugger-name: demo-ext-hgh
-
-# openOffice配置
-jodconverter:
-  local:
-    enabled: true
-    #openOffice:安装地址
-    office-home: C:\Program Files (x86)\OpenOffice 4
-    #    office-home: opt/openoffice4
-    #每个进程可以处理的最大任务数
-    max-tasks-per-process: 10
-    #每个 JODConverter 处理线程使用的端口列表，以逗号分隔。 office实例数等于端口数，因为每个端口号将启动 1个 office 进程。
-    port-numbers: 8100
+    debugger-name: demo-ext-qf
 

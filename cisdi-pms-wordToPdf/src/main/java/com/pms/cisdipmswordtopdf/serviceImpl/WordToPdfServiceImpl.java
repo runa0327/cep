@@ -39,22 +39,19 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         String companyName = poOrderReq.getCompanyName();
         String fileId = StringUtils.replaceCode(poOrderReq.getFileId(),",","','");
         //获取文件地址
-        String sql1 = "select * from fl_file where id in ('"+fileId+"')";
+        String sql1 = "select * from fl_file where id in ('"+fileId+"') and EXT in ('doc','docx')";
         List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
         StringBuilder sb = new StringBuilder();
+        int i = 1;
+//        String filePath = jdbcTemplate.queryForList("select name from test_demo").get(0).get("name").toString();
+        String code = jdbcTemplate.queryForList("select remark from base_third_interface where code = 'order_word_to_pdf' ").get(0).get("remark").toString();
         if (!CollectionUtils.isEmpty(list1)){
             for (Map<String, Object> tmp : list1) {
-//                String filePath = tmp.get("PHYSICAL_LOCATION").toString();
-                String filePath = jdbcTemplate.queryForList("select name from test_demo").get(0).get("name").toString();
-                System.out.println("文件地址："+filePath);
-                String path = filePath.substring(0,filePath.lastIndexOf("\\")+1);
-                System.out.println("文件地址前缀："+path);
+                String filePath = tmp.get("PHYSICAL_LOCATION").toString();
+                String path = filePath.substring(0,filePath.lastIndexOf(code)+1);
                 String id = IdUtil.getSnowflakeNextIdStr();
                 String copyPath = path+id+"copy.pdf";
-                System.out.println("中间文件地址："+copyPath);
                 String pdfPath = path+id+".pdf";
-                System.out.println("最终文件地址："+pdfPath);
-
                 //word转pdf
                 wordStartToPdf(filePath,copyPath);
                 //pdf加水印
@@ -68,7 +65,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                     //写入文件表
                     updateData(map,poOrderReq,tmp,date);
                 }
-
+                i++;
             }
         }
         if (sb.length() > 0){
@@ -92,13 +89,15 @@ public class WordToPdfServiceImpl implements WordToPdfService {
             attCode = "FILE_ID_ONE";  //合同修订稿
         }
         //查询pdf文件
-        String sql1 = "select id from fl_file where id in (seleCT ATT_FILE_GROUP_ID from po_order_req where id = ?) and EXT = 'PDF'";
-        List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1,poOrderId);
+        String oldFileId = jdbcTemplate.queryForList("seleCT ATT_FILE_GROUP_ID from po_order_req where id = ?",poOrderId).get(0).get("ATT_FILE_GROUP_ID").toString();
+        oldFileId = StringUtils.replaceCode(oldFileId,",","','");
+        String sql1 = "select group_concat(id) as id from fl_file where id in ('"+oldFileId+"') and EXT = 'PDF'";
+        List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
         if (!CollectionUtils.isEmpty(list1)){
             String fileId = list1.get(0).get("id").toString();
             List<String> orderFileIds = new ArrayList<>(Arrays.asList(newFileIds.split(",")));
             List<String> pdfFileIds = new ArrayList<>(Arrays.asList(fileId.split(",")));
-            orderFileIds.remove(pdfFileIds);
+            orderFileIds.removeAll(pdfFileIds);
             newFileIds = String.join(",",orderFileIds);
         }
         newFileIds = newFileIds + "," + newFileId;
@@ -123,7 +122,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         String size = map.get("size").toString();
         String fileSize = map.get("fileSize").toString();
         String fileIdPath = map.get("fileIdPath").toString();
-        String fileName = map.get("fileName").toString();
+        String fileName = name+".pdf";
         String insertSql = "insert into fl_file (ID,CODE,NAME,VER,FL_PATH_ID,EXT,STATUS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID," +
                 "SIZE_KB,TS,UPLOAD_DTTM,PHYSICAL_LOCATION,DSP_NAME,DSP_SIZE,IS_PUBLIC_READ) values (" +
                 "?,?,?,'1',?,'pdf','AP',?,?,?,?,?,?,?,?,?,?,0)";
@@ -143,7 +142,6 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         long size = file.length()/1024;
         String fileSize = getSize(size);
         String fileName = file.getName();
-        System.out.println("文件名称："+fileName);
         map.put("fileSize",fileSize);
         map.put("size",size);
         map.put("fileName",fileName);
@@ -210,12 +208,10 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                 over.showTextAligned(Element.ALIGN_CENTER , name, x, y*2.5f, 20);
                 over.restoreState();
             }
-            log.info("插入水印成功文件页数为"+n);
             stamper.close();
             reader.close();
         } catch (DocumentException | IOException e) {
             res = false;
-//            e.printStackTrace();
         }
         return res;
     }
@@ -236,8 +232,5 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         } catch (ConnectException e) {
             e.printStackTrace();
         }
-
-
-
     }
 }
