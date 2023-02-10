@@ -2987,17 +2987,17 @@ public class AttLinkExt {
                     LinkedRecord linkedRecord = new LinkedRecord();
 
                     // 费用类型
-                    linkedRecord.valueMap.put("COST_TYPE_TREE_ID", tmp.get("COST_TYPE_TREE_ID").toString());
-                    linkedRecord.textMap.put("COST_TYPE_TREE_ID", tmp.get("COST_TYPE_TREE_ID").toString());
+                    linkedRecord.valueMap.put("COST_TYPE_TREE_ID", JdbcMapUtil.getString(tmp,"COST_TYPE_TREE_ID"));
+                    linkedRecord.textMap.put("COST_TYPE_TREE_ID", JdbcMapUtil.getString(tmp,"COST_TYPE_TREE_ID"));
                     // 费用明细
-                    linkedRecord.valueMap.put("FEE_DETAIL", tmp.get("FEE_DETAIL"));
-                    linkedRecord.textMap.put("FEE_DETAIL", tmp.get("FEE_DETAIL").toString());
+                    linkedRecord.valueMap.put("FEE_DETAIL", JdbcMapUtil.getString(tmp,"FEE_DETAIL"));
+                    linkedRecord.textMap.put("FEE_DETAIL", JdbcMapUtil.getString(tmp,"FEE_DETAIL"));
                     // 合同金额
-                    linkedRecord.valueMap.put("AMT", tmp.get("AMT"));
-                    linkedRecord.textMap.put("AMT", tmp.get("AMT").toString());
+                    linkedRecord.valueMap.put("AMT", JdbcMapUtil.getString(tmp,"AMT"));
+                    linkedRecord.textMap.put("AMT", JdbcMapUtil.getString(tmp,"AMT"));
                     // 金额
-                    linkedRecord.valueMap.put("TOTAL_AMT", tmp.get("TOTAL_AMT"));
-                    linkedRecord.textMap.put("TOTAL_AMT", tmp.get("TOTAL_AMT").toString());
+                    linkedRecord.valueMap.put("TOTAL_AMT", JdbcMapUtil.getString(tmp,"TOTAL_AMT"));
+                    linkedRecord.textMap.put("TOTAL_AMT", JdbcMapUtil.getString(tmp,"TOTAL_AMT"));
 
                     linkedRecordList.add(linkedRecord);
                 }
