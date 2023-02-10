@@ -130,13 +130,13 @@ public class GuaranteeExportController extends BaseController {
             }
 
             //GUARANTEE_LETTER_TYPE_ID 保函类型   GUARANTEE_COST_TYPE_ID  费用类型    PROJECT_NAME_WR 项目名称    GUARANTEE_END_DATE  保函到期日期
-            String sql = "select r.GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,r.PM_EXP_TYPE_IDS guaranteeCostTypeId,r.PM_PRJ_IDS,IFNULL(p1" +
-                    ".NAME,r.PROJECT_NAME_WR) projectNameWr,r.PROJECT_NAME_WR,r.SUPPLIER supplier,r.GUARANTEE_MECHANISM guaranteeMechanism,r" +
+            String sql = "select r.GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,r.PM_EXP_TYPE_IDS guaranteeCostTypeId,r.PM_PRJ_IDS,IFNULL(r.PROJECT_NAME_WR,GROUP_CONCAT(p1.name)) projectNameWr," +
+                    "r.PROJECT_NAME_WR,r.SUPPLIER supplier,r.GUARANTEE_MECHANISM guaranteeMechanism,r" +
                     ".GUARANTEE_CODE guaranteeCode,r.GUARANTEE_AMT guaranteeAmt,r.GUARANTEE_START_DATE guaranteeStartDate,r.GUARANTEE_END_DATE " +
                     "guaranteeEndDate,r.REMARK_ONE remark,r.BENEFICIARY author \n" +
                     "from po_guarantee_letter_require_req r\n" +
                     "left join pm_prj p1 on FIND_IN_SET(p1.id,r.PM_PRJ_IDS)\n" +
-                    "left join pm_prj P2 on p2.NAME = r.PROJECT_NAME_WR " + param + temp + "  order by GUARANTEE_START_DATE ";
+                    "left join pm_prj P2 on p2.NAME = r.PROJECT_NAME_WR " + param + temp + " GROUP BY r.id order by GUARANTEE_START_DATE ";
             List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
             List<GuaranteeModel> guaranteeList = new ArrayList<>();
             //保函类型字典

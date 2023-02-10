@@ -179,19 +179,20 @@ public class GuaranteeExt {
         if (!StringUtils.isEmpty(guaranteeEndDate) && !StringUtils.isEmpty(guaranteeStartDate)) {
             temp += " and r.GUARANTEE_END_DATE <= '" + guaranteeEndDate + "' and r.GUARANTEE_START_DATE >= '" + guaranteeStartDate + "'";
         }
-        String sql = "select r.id,GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,r.PM_EXP_TYPE_IDS pmExpTypeIds,r.PROJECT_NAME_WR projectNameWr,r" +
-                ".SUPPLIER supplier,r.GUARANTEE_MECHANISM guaranteeMechanism,r.GUARANTEE_CODE guaranteeCode,r.GUARANTEE_AMT guaranteeAmt,r" +
-                ".GUARANTEE_START_DATE guaranteeStartDate,r.GUARANTEE_END_DATE guaranteeEndDate,r.REMARK_ONE remarkOne,r.BENEFICIARY beneficiary \n" +
+        String sql = "select r.id,GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,r.PM_EXP_TYPE_IDS pmExpTypeIds,IFNULL(r.PROJECT_NAME_WR," +
+                "GROUP_CONCAT(p1.name)) projectNameWr,r.SUPPLIER supplier,r.GUARANTEE_MECHANISM guaranteeMechanism,r.GUARANTEE_CODE guaranteeCode,r" +
+                ".GUARANTEE_AMT guaranteeAmt,r.GUARANTEE_START_DATE guaranteeStartDate,r.GUARANTEE_END_DATE guaranteeEndDate,r.REMARK_ONE " +
+                "remarkOne,r.BENEFICIARY beneficiary \n" +
                 "from po_guarantee_letter_require_req r\n" +
-                "left join pm_prj p1 on FIND_IN_SET(p1.id,r.PM_PRJ_IDS)\n" +
-                "left join pm_prj P2 on p2.NAME = r.PROJECT_NAME_WR " + param + temp + "  order by r.GUARANTEE_START_DATE " + limit;
-        String totalSql = "select r.id,GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,r.PM_EXP_TYPE_IDS pmExpTypeIds,r.PROJECT_NAME_WR " +
-                "projectNameWr,r.SUPPLIER supplier,r.GUARANTEE_MECHANISM guaranteeMechanism,r.GUARANTEE_CODE guaranteeCode,r.GUARANTEE_AMT " +
-                "guaranteeAmt,r.GUARANTEE_START_DATE guaranteeStartDate,r.GUARANTEE_END_DATE guaranteeEndDate,r.REMARK_ONE remarkOne,r.BENEFICIARY " +
-                "beneficiary \n" +
+                "left join pm_prj p1 on FIND_IN_SET(p1.id,r.PM_PRJ_IDS)" +
+                "left join pm_prj P2 on p2.NAME = r.PROJECT_NAME_WR " + param + temp + " GROUP BY r.id order by r.GUARANTEE_START_DATE " + limit;
+        String totalSql = "select r.id,GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,r.PM_EXP_TYPE_IDS pmExpTypeIds,IFNULL(r.PROJECT_NAME_WR," +
+                "GROUP_CONCAT(p1.name)) projectNameWr,r.SUPPLIER supplier,r.GUARANTEE_MECHANISM guaranteeMechanism,r.GUARANTEE_CODE guaranteeCode,r" +
+                ".GUARANTEE_AMT guaranteeAmt,r.GUARANTEE_START_DATE guaranteeStartDate,r.GUARANTEE_END_DATE guaranteeEndDate,r.REMARK_ONE " +
+                "remarkOne,r.BENEFICIARY beneficiary \n" +
                 "from po_guarantee_letter_require_req r\n" +
-                "left join pm_prj p1 on FIND_IN_SET(p1.id,r.PM_PRJ_IDS)\n" +
-                "left join pm_prj P2 on p2.NAME = r.PROJECT_NAME_WR " + param + temp + "  order by r.GUARANTEE_START_DATE ";
+                "left join pm_prj p1 on FIND_IN_SET(p1.id,r.PM_PRJ_IDS)" +
+                "left join pm_prj P2 on p2.NAME = r.PROJECT_NAME_WR " + param + temp + " GROUP BY r.id order by r.GUARANTEE_START_DATE ";
         List<Map<String, Object>> dataList = myJdbcTemplate.queryForList(sql);
         List<Map<String, Object>> total = myJdbcTemplate.queryForList(totalSql);
         List<PoGuaranteeLetterRequireReq> list = new ArrayList<>();
