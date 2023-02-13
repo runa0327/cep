@@ -23,7 +23,10 @@ jodconverter:
   local:
     enabled: true
     #openOffice:安装地址
-    office-home: C:\Program Files (x86)\OpenOffice 4
+    #windows配置
+#    office-home: C:\Program Files (x86)\OpenOffice 4
+    # linux配置
+    office-home: /opt/openoffice4/program/soffice
     #    office-home: opt/openoffice4
     #每个进程可以处理的最大任务数
     max-tasks-per-process: 10
