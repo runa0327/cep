@@ -126,7 +126,7 @@ public class PmMap {
     public void getMapProject() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pp.PM_PRJ_ID as PM_PRJ_ID,pp.LONGITUDE as LONGITUDE,pp.LATITUDE as LATITUDE,pj.`NAME` as `NAME` ,gsv.`NAME` as projectType " +
-                "from PM_MAP pp left join pm_prj pj on pp.PM_PRJ_ID = pj.id left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID");
+                "from PM_MAP pp left join pm_prj pj on pp.PM_PRJ_ID = pj.id left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID where pj.id is not null");
         List<Project> projectList = list.stream().map(p -> {
             Project project = new Project();
             project.projectId = JdbcMapUtil.getString(p, "PM_PRJ_ID");
