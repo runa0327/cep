@@ -509,7 +509,7 @@ public class PoOrderReqExt {
         //流程实例id
         String procInstId = ExtJarHelper.procInstId.get();
         //是否标准模板 0099799190825080669 = 是，0099799190825080670=否
-        String isModel = JdbcMapUtil.getString(entityRecord.valueMap,"YES_NO_THREE");
+//        String isModel = JdbcMapUtil.getString(entityRecord.valueMap,"YES_NO_THREE");
 
         //查询接口地址
         String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
@@ -558,6 +558,9 @@ public class PoOrderReqExt {
         poOrderReq.setId(entityRecord.csCommId);
         poOrderReq.setProcessInstanceId(procInstId);
         poOrderReq.setCreateBy(userId);
+        if (SharedUtil.isEmptyString(companyName)){
+            companyName = "三亚崖州湾科技城开发建设有限公司";
+        }
         poOrderReq.setCompanyName(companyName);
 
         //获取文件id

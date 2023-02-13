@@ -43,8 +43,10 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
         StringBuilder sb = new StringBuilder();
         int i = 1;
+        //windows环境下测试获取文件地址，勿删
 //        String filePath = jdbcTemplate.queryForList("select name from test_demo").get(0).get("name").toString();
         String code = jdbcTemplate.queryForList("select remark from base_third_interface where code = 'order_word_to_pdf' ").get(0).get("remark").toString();
+        StringBuilder errorBuilder = new StringBuilder();
         if (!CollectionUtils.isEmpty(list1)){
             for (Map<String, Object> tmp : list1) {
                 String filePath = tmp.get("PHYSICAL_LOCATION").toString();
@@ -53,9 +55,12 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                 String copyPath = path+id+"copy.pdf";
                 String pdfPath = path+id+".pdf";
                 //word转pdf
-                wordStartToPdf(filePath,copyPath);
+                String error = wordStartToPdf(filePath,copyPath);
+                if (error.length() > 0 && error != null && !"".equals(error)){
+                    errorBuilder.append(error).append("\n ");
+                }
                 //pdf加水印
-                Boolean res = addWater(companyName,copyPath,pdfPath);
+                Boolean res = addWater(companyName,copyPath,pdfPath,errorBuilder);
                 if (res){
                     sb.append(id).append(",");
                     //删除中间文件
@@ -72,6 +77,14 @@ public class WordToPdfServiceImpl implements WordToPdfService {
             String newFileId = sb.deleteCharAt(sb.length()-1).toString();
             //更新合同表
             updateOrder(newFileId,poOrderReq);
+        }
+        if (errorBuilder.length() > 0){
+            //将问题信息计入提示信息表便于排查分析
+            String id = IdUtil.getSnowflakeNextIdStr();
+            String remark = "用户"+poOrderReq.getCreateBy()+"在合同签订上传的合同文本转化为pdf失败";
+            String sql = "update AD_REMIND_LOG set AD_ENT_ID='0099799190825103145',ENT_CODE='PO_ORDER_REQ',ENTITY_RECORD_ID=?,REMIND_USER_ID='0099250247095871681'," +
+                    "REMIND_METHOD='日志提醒',REMIND_TARGET='admin',REMIND_TIME=?,REMIND_TEXT=? where id = ?";
+            jdbcTemplate.update(sql,poOrderReq.getId(),date,remark,id);
         }
     }
 
@@ -182,8 +195,9 @@ public class WordToPdfServiceImpl implements WordToPdfService {
      * @param name 水印名称
      * @param copyPath pdf文件
      * @param pdfPath 加水印后pdf
+     * @param errorBuilder 错误信息记录
      */
-    private Boolean addWater(String name, String copyPath, String pdfPath) {
+    private Boolean addWater(String name, String copyPath, String pdfPath,StringBuilder errorBuilder) {
         boolean res = true;
         try {
             PdfReader reader = new PdfReader(copyPath);
@@ -212,6 +226,8 @@ public class WordToPdfServiceImpl implements WordToPdfService {
             reader.close();
         } catch (DocumentException | IOException e) {
             res = false;
+            errorBuilder.append("添加水印失败\n ");
+            log.error("添加水印失败，详情： ",e);
         }
         return res;
     }
@@ -221,16 +237,25 @@ public class WordToPdfServiceImpl implements WordToPdfService {
      * @param wordPath word文件地址
      * @param pdfPath pdf文件地址
      */
-    private void wordStartToPdf(String wordPath, String pdfPath) {
+    private String wordStartToPdf(String wordPath, String pdfPath) {
+        String error = "";
         try {
             OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
             connection.connect();
             File inputFile = new File(wordPath);
             File outputFile = new File(pdfPath);
             DocumentConverter converter = new OpenOfficeDocumentConverter(connection);
-            converter.convert(inputFile, outputFile);
+            try{
+                converter.convert(inputFile, outputFile);
+            } catch (Exception e){
+                error = "文件转换失败1，"+e;
+                log.error("文件转换失败，详情：",e);
+            }
+
         } catch (ConnectException e) {
-            e.printStackTrace();
+            error = "文件转换失败，"+e;
+            log.error("文件转换失败，详情：",e);
         }
+        return error;
     }
 }
