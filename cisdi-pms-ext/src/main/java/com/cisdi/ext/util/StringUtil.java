@@ -3,6 +3,7 @@ package com.cisdi.ext.util;
 import com.google.common.base.Strings;
 import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -73,4 +74,10 @@ public class StringUtil {
         return 0;
     }
 
+    public static BigDecimal getBigDecimal(String value){
+        if (Strings.isNullOrEmpty(value)){
+            return null;
+        }
+        return new BigDecimal(value);
+    }
 }

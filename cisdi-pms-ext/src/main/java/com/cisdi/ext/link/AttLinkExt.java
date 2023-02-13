@@ -2980,7 +2980,8 @@ public class AttLinkExt {
             }
             List<LinkedRecord> linkedRecordList = new ArrayList<>();
             // 查询明细信息
-            String sql = "select TOTAL_AMT,COST_TYPE_TREE_ID,FEE_DETAIL,AMT from PM_ORDER_COST_DETAIL where CONTRACT_ID = ? order by id asc";
+//            String sql = "select TOTAL_AMT,COST_TYPE_TREE_ID,FEE_DETAIL,AMT from PM_ORDER_COST_DETAIL where CONTRACT_ID = ? order by id asc";
+            String sql = "select AMT_ONE,AMT_THREE,AMT_TWO,COST_TYPE_TREE_ID,FEE_DETAIL from PM_ORDER_COST_DETAIL where CONTRACT_ID = ? order by id asc";
             List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, attValue);
             if (!CollectionUtils.isEmpty(list)) {
                 for (Map<String, Object> tmp : list) {
@@ -2992,13 +2993,15 @@ public class AttLinkExt {
                     // 费用明细
                     linkedRecord.valueMap.put("FEE_DETAIL", JdbcMapUtil.getString(tmp,"FEE_DETAIL"));
                     linkedRecord.textMap.put("FEE_DETAIL", JdbcMapUtil.getString(tmp,"FEE_DETAIL"));
-                    // 合同金额
-                    linkedRecord.valueMap.put("AMT", JdbcMapUtil.getString(tmp,"AMT"));
-                    linkedRecord.textMap.put("AMT", JdbcMapUtil.getString(tmp,"AMT"));
-                    // 金额
-                    linkedRecord.valueMap.put("TOTAL_AMT", JdbcMapUtil.getString(tmp,"TOTAL_AMT"));
-                    linkedRecord.textMap.put("TOTAL_AMT", JdbcMapUtil.getString(tmp,"TOTAL_AMT"));
-
+                    // 含税金额(元)
+                    linkedRecord.valueMap.put("AMT_ONE", StringUtil.getBigDecimal(JdbcMapUtil.getString(tmp,"AMT_ONE")));
+                    linkedRecord.textMap.put("AMT_ONE", JdbcMapUtil.getString(tmp,"AMT_ONE"));
+                    // 不含税金额(元)
+                    linkedRecord.valueMap.put("AMT_TWO", StringUtil.getBigDecimal(JdbcMapUtil.getString(tmp,"AMT_TWO")));
+                    linkedRecord.textMap.put("AMT_TWO", JdbcMapUtil.getString(tmp,"AMT_TWO"));
+                    // 税率(%)
+                    linkedRecord.valueMap.put("AMT_THREE", StringUtil.getBigDecimal(JdbcMapUtil.getString(tmp,"AMT_THREE")));
+                    linkedRecord.textMap.put("AMT_THREE", JdbcMapUtil.getString(tmp,"AMT_THREE"));
                     linkedRecordList.add(linkedRecord);
                 }
                 attLinkResult.childData.put(viewId, linkedRecordList);
@@ -3011,7 +3014,7 @@ public class AttLinkExt {
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTACT_MOBILE_ONE,CONTACTS_ONE,YES_NO_THREE,GUARANTEE_LETTER_TYPE_IDS,IS_REFER_GUARANTEE_ID,PLAN_TOTAL_DAYS," +
                 "CONTRACT_CATEGORY_ONE_ID,FILE_ID_FIVE,WIN_BID_UNIT_ONE,AMT_ONE,WINNING_BIDS_AMOUNT,BUY_TYPE_ID,BID_CTL_PRICE_LAUNCH,BUY_MATTER_ID," +
                 "PM_BID_KEEP_FILE_REQ_ID,CONTRACT_NAME,PM_BID_KEEP_FILE_REQ_ID,CONTRACT_CODE,NAME,WIN_BID_UNIT_ONE,CUSTOMER_UNIT_ONE," +
-                "CONTRACT_PRICE,ATT_FILE_GROUP_ID from po_order_req where id = ?", attValue);
+                "CONTRACT_PRICE,ATT_FILE_GROUP_ID,AMT_ONE,AMT_TWO,AMT_THREE,AMT_FOUR from po_order_req where id = ?", attValue);
 
         if (CollectionUtils.isEmpty(list)) {
             throw new BaseException("合同相关属性不完善！");
@@ -3032,6 +3035,38 @@ public class AttLinkExt {
             linkedAtt.value = id;
             linkedAtt.text = name;
             attLinkResult.attMap.put("CUSTOMER_UNIT_ONE", linkedAtt);
+        }
+        //首付款比列(%)
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = StringUtil.getBigDecimal(JdbcMapUtil.getString(row, "AMT_ONE"));
+            linkedAtt.text = JdbcMapUtil.getString(row, "AMT_ONE");
+            attLinkResult.attMap.put("AMT_ONE", linkedAtt);
+        }
+        //含税总金额(元)
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = StringUtil.getBigDecimal(JdbcMapUtil.getString(row, "AMT_TWO"));
+            linkedAtt.text = JdbcMapUtil.getString(row, "AMT_TWO");
+            attLinkResult.attMap.put("AMT_TWO", linkedAtt);
+        }
+        //不含税总金额(元)
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = StringUtil.getBigDecimal(JdbcMapUtil.getString(row, "AMT_THREE"));
+            linkedAtt.text = JdbcMapUtil.getString(row, "AMT_THREE");
+            attLinkResult.attMap.put("AMT_THREE", linkedAtt);
+        }
+        //税金(%)
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = StringUtil.getBigDecimal(JdbcMapUtil.getString(row, "AMT_FOUR"));
+            linkedAtt.text = JdbcMapUtil.getString(row, "AMT_FOUR");
+            attLinkResult.attMap.put("AMT_FOUR", linkedAtt);
         }
         // 合同编号
         {
