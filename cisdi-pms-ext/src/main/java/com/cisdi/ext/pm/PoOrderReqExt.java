@@ -1,10 +1,7 @@
 package com.cisdi.ext.pm;
 
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONParser;
 import com.alibaba.fastjson.JSON;
 import com.cisdi.ext.commons.HttpClient;
-import com.cisdi.ext.model.view.file.FlFile;
 import com.cisdi.ext.model.view.order.PoOrderReq;
 import com.cisdi.ext.util.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -115,7 +112,6 @@ public class PoOrderReqExt {
             comment = list.get(0).get("user_comment") == null ? null : list.get(0).get("user_comment").toString();
             file = list.get(0).get("USER_ATTACHMENT") == null ? null : list.get(0).get("USER_ATTACHMENT").toString();
         }
-        String updateSql = "";
         String sbComment = "";
         String sbFile = "";
         StringBuilder upSql = new StringBuilder();
@@ -298,12 +294,11 @@ public class PoOrderReqExt {
             BigDecimal shuiAmt = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_ONE"));
             //税率
             BigDecimal shuiLv = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_THREE")).divide(new BigDecimal(100));
-            //含税金额
+            //不含税金额
             BigDecimal noShuiAmt = shuiAmt.divide(shuiLv.add(new BigDecimal(1)),2, RoundingMode.HALF_UP);
             Integer integer = myJdbcTemplate.update("update PM_ORDER_COST_DETAIL set AMT_TWO=? where id = ?",noShuiAmt,detailId);
             tmp.put("AMT_TWO",noShuiAmt);
         }
-//        BigDecimal account = getSumAmt(list1);
         //含税总金额
         BigDecimal amtShui = getSumAmtBy(list1,"AMT_ONE");
         //不含税总金额
