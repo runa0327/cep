@@ -3011,7 +3011,7 @@ public class AttLinkExt {
         }
 
         // 根据id查询招投标信息
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTACT_MOBILE_ONE,CONTACTS_ONE,YES_NO_THREE,GUARANTEE_LETTER_TYPE_IDS,IS_REFER_GUARANTEE_ID,PLAN_TOTAL_DAYS," +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTACT_MOBILE_ONE,AD_USER_ID,YES_NO_THREE,GUARANTEE_LETTER_TYPE_IDS,IS_REFER_GUARANTEE_ID,PLAN_TOTAL_DAYS," +
                 "CONTRACT_CATEGORY_ONE_ID,FILE_ID_FIVE,WIN_BID_UNIT_ONE,AMT_ONE,WINNING_BIDS_AMOUNT,BUY_TYPE_ID,BID_CTL_PRICE_LAUNCH,BUY_MATTER_ID," +
                 "PM_BID_KEEP_FILE_REQ_ID,CONTRACT_NAME,PM_BID_KEEP_FILE_REQ_ID,CONTRACT_CODE,NAME,WIN_BID_UNIT_ONE,CUSTOMER_UNIT_ONE," +
                 "CONTRACT_PRICE,ATT_FILE_GROUP_ID,AMT_ONE,AMT_TWO,AMT_THREE,AMT_FOUR from po_order_req where id = ?", attValue);
@@ -3041,7 +3041,7 @@ public class AttLinkExt {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
             linkedAtt.value = StringUtil.getBigDecimal(JdbcMapUtil.getString(row, "AMT_ONE"));
-            linkedAtt.text = JdbcMapUtil.getString(row, "AMT_ONE");
+            linkedAtt.text = String.valueOf(StringUtil.getBigDecimal(JdbcMapUtil.getString(row, "AMT_ONE")));
             attLinkResult.attMap.put("AMT_ONE", linkedAtt);
         }
         //含税总金额(元)
@@ -3099,14 +3099,6 @@ public class AttLinkExt {
             linkedAtt.value = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
             linkedAtt.text = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
             attLinkResult.attMap.put("CONTRACT_PRICE", linkedAtt);
-        }
-        // 首付款比列
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = JdbcMapUtil.getString(row, "AMT_ONE");
-            linkedAtt.text = JdbcMapUtil.getString(row, "AMT_ONE");
-            attLinkResult.attMap.put("AMT_ONE", linkedAtt);
         }
         //关联招采流程
         {
@@ -3247,9 +3239,13 @@ public class AttLinkExt {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row, "CONTACTS_ONE");
-            linkedAtt.text = JdbcMapUtil.getString(row, "CONTACTS_ONE");
-            attLinkResult.attMap.put("CONTACTS_ONE", linkedAtt);
+            String userId = JdbcMapUtil.getString(row, "AD_USER_ID");
+            List<Map<String, Object>> userNameList = myJdbcTemplate.queryForList("select name from ad_user where id = ?", userId);
+            if (!CollectionUtils.isEmpty(userNameList)){
+                linkedAtt.value = userId;
+                linkedAtt.text = JdbcMapUtil.getString(userNameList.get(0),"name");
+            }
+            attLinkResult.attMap.put("AD_USER_ID", linkedAtt);
         }
         // 联系电话
         {

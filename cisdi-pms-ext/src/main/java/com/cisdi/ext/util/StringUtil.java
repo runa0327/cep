@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,6 +79,6 @@ public class StringUtil {
         if (Strings.isNullOrEmpty(value)){
             return null;
         }
-        return new BigDecimal(value);
+        return new BigDecimal(value).setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 }
