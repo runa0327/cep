@@ -36,6 +36,7 @@ public class ProPlanJob {
 
 
     @Scheduled(fixedDelayString = "${spring.scheduled.fixedDelayString}")
+//    @Scheduled(cron = "0 */1 * * * ?")
     @Async("taskExecutor")
     public void invokeRefreshProNodeStatus() {
         // 未自动登录前不要执行：

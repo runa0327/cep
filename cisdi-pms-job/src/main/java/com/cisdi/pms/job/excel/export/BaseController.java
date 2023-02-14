@@ -26,11 +26,12 @@ public class BaseController {
         response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
     }
 
-    /* 导出txt文件
-     * @author
-     * @param	response
-     * @param	text 导出的字符串
-     * @return
+    /**
+     * 导出txt文件
+     * @param response
+     * @param data
+     * @param name
+     * @throws UnsupportedEncodingException
      */
     public void exportTxt(HttpServletResponse response, List<String> data, String name) throws UnsupportedEncodingException {
         // 设置响应的内容类型

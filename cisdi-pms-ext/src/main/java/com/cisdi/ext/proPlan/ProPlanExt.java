@@ -377,6 +377,9 @@ public class ProPlanExt {
      */
     public void collectProgressStatus() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        if (ExtJarHelper.entityRecordList.get() == null) {
+            return;
+        }
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
             String csCommId = entityRecord.csCommId;
@@ -686,7 +689,7 @@ public class ProPlanExt {
         ProPlanExt.GetPrjProPlanNetworkParam param = JsonUtil.fromJson(json, ProPlanExt.GetPrjProPlanNetworkParam.class);
         String pmPrjId = param.pmPrjId;
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        Map<String, Object>  proMap = myJdbcTemplate.queryForMap("select pr.CODE,pr.NAME,pr.REMARK,pr.ACTUAL_START_DATE,pr.PROGRESS_RISK_REMARK,pr.IS_TEMPLATE,pr.PM_PRJ_ID,pr.PLAN_START_DATE,\n" +
+        Map<String, Object> proMap = myJdbcTemplate.queryForMap("select pr.CODE,pr.NAME,pr.REMARK,pr.ACTUAL_START_DATE,pr.PROGRESS_RISK_REMARK,pr.IS_TEMPLATE,pr.PM_PRJ_ID,pr.PLAN_START_DATE,\n" +
                 "ifnull(PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
                 "ifnull(ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(ACTUAL_TOTAL_DAYS,0),ifnull(PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
                 "ifnull(ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,PLAN_COMPL_DATE,ACTUAL_COMPL_DATE,TEMPLATE_FOR_PROJECT_TYPE_ID,PROGRESS_STATUS_ID,\n" +
@@ -842,7 +845,7 @@ public class ProPlanExt {
         if (Objects.nonNull(data.get("PLAN_COMPL_DATE"))) {
             Date actual = new Date();
             if (Objects.nonNull(data.get("ACTUAL_START_DATE"))) {
-                if(Objects.nonNull(data.get("ACTUAL_COMPL_DATE"))){
+                if (Objects.nonNull(data.get("ACTUAL_COMPL_DATE"))) {
                     actual = DateTimeUtil.stringToDate(String.valueOf(data.get("ACTUAL_COMPL_DATE")));
                 }
             }

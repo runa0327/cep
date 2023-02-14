@@ -65,13 +65,14 @@ public class EasyExcelUtil {
 
     /**
      * 读取所有sheet页
-     * @param inputStream excel输入流
-     * @param clazz 模板类型
+     *
+     * @param inputStream   excel输入流
+     * @param clazz         模板类型
      * @param headRowNumber 表头在第几行
      * @param <T>
      * @return 以标题作为key，数据作为value的map，一个元素表示一个sheet页
      */
-    public static <T> Map<String, List<T>> readSheets(InputStream inputStream, final Class<?> clazz,int headRowNumber){
+    public static <T> Map<String, List<T>> readSheets(InputStream inputStream, final Class<?> clazz, int headRowNumber) {
         if (inputStream == null) {
             throw new BaseException("解析出错了，文件流是null");
         }
@@ -86,7 +87,7 @@ public class EasyExcelUtil {
             }
         };
 
-        ExcelReader reader = EasyExcel.read(inputStream,clazz,listener).headRowNumber(headRowNumber).build();
+        ExcelReader reader = EasyExcel.read(inputStream, clazz, listener).headRowNumber(headRowNumber).build();
         List<ReadSheet> sheets = reader.excelExecutor().sheetList();
         Map<String, List<T>> sheetData = new HashMap<>();
         for (int i = 0; i < sheets.size(); i++) {
@@ -96,7 +97,7 @@ public class EasyExcelUtil {
             List<T> rows = listener.getRows();
             List<T> data = new ArrayList<>();
             data.addAll(rows);
-            sheetData.put(headName,data);
+            sheetData.put(headName, data);
             listener.getRows().clear();
         }
         return sheetData;
@@ -133,8 +134,8 @@ public class EasyExcelUtil {
 
     public static File parseFile(MultipartFile excelPath) {
         try {
-            File file = new File(FilenameUtils.EXTENSION_SEPARATOR+ FilenameUtils.getExtension(excelPath.getOriginalFilename()));
-            FileUtils.copyInputStreamToFile(excelPath.getInputStream(),file);
+            File file = new File(FilenameUtils.EXTENSION_SEPARATOR + FilenameUtils.getExtension(excelPath.getOriginalFilename()));
+            FileUtils.copyInputStreamToFile(excelPath.getInputStream(), file);
             return file;
         } catch (Exception e) {
             log.error(e.toString());
@@ -149,37 +150,24 @@ public class EasyExcelUtil {
         Object val = null;
         if (cell != null && !"".equals(cell) && !" ".equals(cell)) {
             // 判断当前Cell的Type
-            if (cell.getCellType() == CellType.NUMERIC || cell.getCellType() == CellType.FORMULA)
-            {
+            if (cell.getCellType() == CellType.NUMERIC || cell.getCellType() == CellType.FORMULA) {
                 val = cell.getNumericCellValue();
-                if (DateUtil.isCellDateFormatted(cell))
-                {
+                if (DateUtil.isCellDateFormatted(cell)) {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     val = sdf.format(val);
 //                    val = DateUtil.getJavaDate((Double) val); // POI Excel 日期格式转换
-                }
-                else
-                {
-                    if ((Double) val % 1 != 0)
-                    {
+                } else {
+                    if ((Double) val % 1 != 0) {
                         val = new BigDecimal(val.toString());
-                    }
-                    else
-                    {
+                    } else {
                         val = new DecimalFormat("0").format(val);
                     }
                 }
-            }
-            else if (cell.getCellType() == CellType.STRING)
-            {
+            } else if (cell.getCellType() == CellType.STRING) {
                 val = cell.getStringCellValue();
-            }
-            else if (cell.getCellType() == CellType.BOOLEAN)
-            {
+            } else if (cell.getCellType() == CellType.BOOLEAN) {
                 val = cell.getBooleanCellValue();
-            }
-            else if (cell.getCellType() == CellType.ERROR)
-            {
+            } else if (cell.getCellType() == CellType.ERROR) {
                 val = cell.getErrorCellValue();
             } else {
                 val = "";
@@ -190,6 +178,41 @@ public class EasyExcelUtil {
         }
         return result;
     }
+
+    /**
+     * 设置Excel头
+     *
+     * @param headList Excel头信息
+     * @return
+     */
+    public static List<List<String>> head(List<String> headList) {
+        List<List<String>> list = new ArrayList<>();
+        for (String value : headList) {
+            List<String> head = new ArrayList<>();
+            head.add(value);
+            list.add(head);
+        }
+        return list;
+    }
+
+    /**
+     * 数据转换
+     * @param dataList
+     * @param dataStrMap
+     * @return
+     */
+    public static List<List<Object>> dataList(List<Map<String, Object>> dataList, List<String> dataStrMap) {
+        List<List<Object>> list = new ArrayList<>();
+        dataList.forEach(map -> {
+            List<Object> data = new ArrayList<>();
+            for (int i = 0; i < dataStrMap.size(); i++) {
+                data.add(String.valueOf(map.get(dataStrMap.get(i))));
+            }
+            list.add(data);
+        });
+        return list;
+    }
+
 }
 
 class DataListener<T> extends AnalysisEventListener<T> {
