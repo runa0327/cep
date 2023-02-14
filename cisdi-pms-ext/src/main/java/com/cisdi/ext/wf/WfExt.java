@@ -68,7 +68,7 @@ public class WfExt {
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
 
         //发起人
-        String userName =ExtJarHelper.loginInfo.get().userName;
+//        String userName =ExtJarHelper.loginInfo.get().userName;
 
         if (entityRecordList != null) {
             for (EntityRecord entityRecord : entityRecordList) {
@@ -77,13 +77,15 @@ public class WfExt {
                 int update = myJdbcTemplate.update("update " + entityCode + " t set t.status = ? where t.id=?", newStatus, csCommId);
                 log.info("已更新：{}", update);
 
-                String processName = "", nowDate = "";
-                String sql0 = "SELECT c.name as processName,b.IS_URGENT,b.START_DATETIME FROM "+entityCode+" a " +
+                String processName = "", nowDate = "",userName = "";
+                String sql0 = "SELECT c.name as processName,b.IS_URGENT,b.START_DATETIME," +
+                        "(select name from ad_user where id = b.START_USER_ID) as userName FROM "+entityCode+" a " +
                         "LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id LEFT JOIN wf_process c on b.WF_PROCESS_ID = c.id WHERE a.id = ?";
                 List<Map<String,Object>> list0 = myJdbcTemplate.queryForList(sql0,csCommId);
                 if (!CollectionUtils.isEmpty(list0)){
                     processName = JdbcMapUtil.getString(list0.get(0),"processName");
                     nowDate = JdbcMapUtil.getString(list0.get(0),"START_DATETIME").replace("T"," ");
+                    userName = JdbcMapUtil.getString(list0.get(0),"userName");
                 }
 
 
