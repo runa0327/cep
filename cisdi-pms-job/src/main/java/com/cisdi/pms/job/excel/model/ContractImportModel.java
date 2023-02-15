@@ -47,5 +47,8 @@ public class ContractImportModel {
 
     @ExcelProperty("备注")
     private String remark;
+
+    @ExcelProperty("文件路径")
+    private String filePath;
 }
 

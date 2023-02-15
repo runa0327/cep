@@ -66,6 +66,9 @@ qygly:
       userEmail:
       # 经RSA公钥加密后的用户密码：
       # 密码123456、验证码7890对应的密码：
+      #正式
+#      userPsd: Ldw58k5ZboUoLtaWVYsN6eC1dgkzlK/GQx0dICPqffh2rDliLsUH3pB08hz2rg3RWy0PjNNo0FMHw7xuHx8qzptfRe9oeEpZ1l2VcxEProUDU/IdFGEuFyonGhy8u5CMrqg5EfMTxVvA/K/SoCpjCw3+dAnA0Nj5ZCQVsz3iOho=
+      #测试
       userPsd: Cyybrrs7bGko/drYdJtrkr6QtDdEuCw3Yqhr27h3yk1u9wjcuvyFr9IRYSuIQSFNX9DC71Ek6EJEIif+RMvTq4szxZ/Orj97Rk3bDBqFH1QTN9aRQxpzVRYLtfTo3UbUsMx4jbGeymHjUli+qTC5nlqQALYuGaUTNxjd9p+CkZQ=
       valiCodeReqKey: ABCDEFGHIJKLMNOPQRSTUVWXYZ123456
       valiCode: 7890
@@ -136,3 +139,14 @@ jodconverter:
     max-tasks-per-process: 10
     #每个 JODConverter 处理线程使用的端口列表，以逗号分隔。 office实例数等于端口数，因为每个端口号将启动 1个 office 进程。
     port-numbers: 8303
+
+# 历史数据
+history-data:
+  #合同文件路径前缀
+  contract-path-prefix: C:\Users\11376\Desktop\合约模板\20230215
+  #请求地址(测试)
+  requestPath: http://139.159.138.11:9090/qygly-api/qygly-gateway/qygly-file/uploadFile
+  #文件上传参数
+  sevId: "0099799190825106248"
+  fileGroupAttCode: FILE_ID_FIVE
+  erId:

@@ -1,6 +1,7 @@
 package com.cisdi.pms.job.excel.imports;
 
 
+import com.cisdi.pms.job.config.UploadParamConfig;
 import com.cisdi.pms.job.excel.export.BaseController;
 import com.cisdi.pms.job.excel.model.ContractImportModel;
 import com.cisdi.pms.job.utils.*;
@@ -15,10 +16,12 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
@@ -34,26 +37,44 @@ public class ContractAccountImport extends BaseController {
     @Value("${spring.task.execution.pool.core-size}")
     private Integer coreSize;
 
+    @Value("${history-data.contract-path-prefix}")
+    private String pathPrefix;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Resource(name = "taskExecutor")
     private ThreadPoolTaskExecutor asyncExecutor;
 
+    @Autowired
+    private UploadParamConfig config;
+
     @SneakyThrows
     @PostMapping("/import")
-    public Map<String,Object> importData(MultipartFile file, HttpServletResponse response){
+    public Map<String,Object> importData(HttpServletResponse response){
         //报错信息
         List<String> errorList = new ArrayList<>();
-        //读取所有的sheet页,表头为第3行,key为项目名
-        Map<String, List<ContractImportModel>> sheets = EasyExcelUtil.readSheets(file.getInputStream(), ContractImportModel.class, 3);
-        //整理为list
-        List<ContractImportModel> models = this.arrange(sheets, errorList);
-        //检查招标类别字典
-        checkAndInsertDic(models,errorList);
-        //插入数据
-        CountDownLatch latch = this.insert(models, errorList);
-        latch.await();
+        //获取合同数据文件夹
+        List<File> files = new ArrayList<>();
+        File folder = new File("C:\\Users\\11376\\Desktop\\合约模板\\20230215\\excel");
+        if (folder.exists()&&folder.isDirectory()){
+            File[] fileArray = folder.listFiles();
+            assert fileArray != null;
+            files = Arrays.asList(fileArray);
+        }
+        //遍历所有的excel
+        for (File file : files) {
+            //读取所有的sheet页,表头为第3行,key为项目名
+            Map<String,List<ContractImportModel>> sheets = EasyExcelUtil.readSheets(new FileInputStream(file), ContractImportModel.class, 2);
+            //整理为list
+            List<ContractImportModel> models = this.arrange(sheets, errorList);
+            //检查招标类别字典
+            checkAndInsertDic(models,errorList);
+            //插入数据
+            CountDownLatch latch = this.insert(models, errorList);
+            latch.await();
+        }
+
         //组装提示
         Map<String, Object> result = new HashMap<>();
         if (CollectionUtils.isEmpty(errorList)){
@@ -117,31 +138,24 @@ public class ContractAccountImport extends BaseController {
             asyncExecutor.execute(() -> {
                 try {
                     for (ContractImportModel model : modelList) {
+                        ThreadLocal<Boolean> tl = new ThreadLocal<>();
+                        tl.set(true);
+                        String fileIds = this.uploadGetFileIds(model.getFilePath(),model,errorList,tl);
+                        if (!tl.get()){//如果上传文件失败，不导入数据
+                            continue;
+                        }
                         //插入PO_ORDER_REQ合同签订
                         String orderId = Util.insertData(jdbcTemplate, "PO_ORDER_REQ");
-                        jdbcTemplate.update("update PO_ORDER_REQ set CUSTOMER_UNIT_ONE = null,PM_PRJ_ID = ?, CONTRACT_NAME = ?, SIGN_DATE = ?, AMT_TWO = ?, REMARK_LONG_ONE = ?, ESTIMATED_AMOUNT = ?, FINANCIAL_AMOUNT = ?, PAYED_AMT = ?, CUMULATIVE_PAYED_PERCENT = ?,BUY_TYPE_ID = ?,STATUS = 'AP',VER = 101,CRT_USER_ID = '0099250247095871681' where id = ?",
-                                model.getProjectId(),model.getContractName(),model.getSignDate(),model.getAmtIncludeTax(),model.getRemark(),model.getEstimateAmt(),model.getFinancialAmt(),model.getPayedAmt(),model.getPayedPercent(),model.getBuyType(),orderId);
-//                        String orderId = IdUtil.getSnowflakeNextIdStr();
-//                        int ap = jdbcTemplate.update("insert into PO_ORDER_REQ (id,PM_PRJ_ID,CONTRACT_NAME,SIGN_DATE,AMT_TWO,REMARK_LONG_ONE," +
-//                                        "ESTIMATED_AMOUNT,FINANCIAL_AMOUNT,PAYED_AMT,CUMULATIVE_PAYED_PERCENT,BUY_TYPE_ID,STATUS,VER,CRT_DT) \n" +
-//                                        "select ?,?,?,?,?,?,?,?,?,?,?,?,?,? where not exists (select 1 from PO_ORDER_REQ where PM_PRJ_ID = ? and " +
-//                                        "CONTRACT_NAME = ? and SIGN_DATE = ? and AMT_TWO = ? and REMARK_LONG_ONE = ? and ESTIMATED_AMOUNT = ? and " +
-//                                        "FINANCIAL_AMOUNT = ? and PAYED_AMT = ? and CUMULATIVE_PAYED_PERCENT = ? and BUY_TYPE_ID = ?)",
-//                                orderId, model.getProjectId(), model.getContractName(), model.getSignDate(), model.getAmtIncludeTax(),
-//                                model.getRemark(), model.getEstimateAmt(), model.getFinancialAmt(), model.getPayedAmt(), model.getPayedPercent(),
-//                                model.getBuyType(), "AP", 101,new Date(),
-//                                model.getProjectId(), model.getContractName(), model.getSignDate(), model.getAmtIncludeTax(),model.getRemark(), model.getEstimateAmt(), model.getFinancialAmt(), model.getPayedAmt(), model.getPayedPercent(),
-//                                model.getBuyType());
+                        jdbcTemplate.update("update PO_ORDER_REQ set CUSTOMER_UNIT_ONE = null,PM_PRJ_ID = ?, CONTRACT_NAME = ?, SIGN_DATE = ?, AMT_TWO = ?, REMARK_LONG_ONE = ?, ESTIMATED_AMOUNT = ?, FINANCIAL_AMOUNT = ?, PAYED_AMT = ?, CUMULATIVE_PAYED_PERCENT = ?,BUY_TYPE_ID = ?,FILE_ID_FIVE = ?,STATUS = 'AP',VER = 101,CRT_USER_ID = '0099250247095871681' where id = ?",
+                                model.getProjectId(),model.getContractName(),model.getSignDate(),model.getAmtIncludeTax(),model.getRemark(),model.getEstimateAmt(),model.getFinancialAmt(),model.getPayedAmt(),model.getPayedPercent(),model.getBuyType(),fileIds,orderId);
+
                         //插入CONTRACT_SIGNING_CONTACT联系人明细
                         String contactId = Util.insertData(jdbcTemplate, "CONTRACT_SIGNING_CONTACT");
                         jdbcTemplate.update("update CONTRACT_SIGNING_CONTACT set PARENT_ID = ?, WIN_BID_UNIT_ONE = ?, OPPO_SITE_LINK_MAN = ?,STATUS = 'AP',VER = 101,CRT_USER_ID = '0099250247095871681' where id = ?"
                                 ,orderId,model.getWinBidUnit(),model.getLinkMan(),contactId);
-//                        String contactId = IdUtil.getSnowflakeNextIdStr();
-//                        jdbcTemplate.update("insert into CONTRACT_SIGNING_CONTACT (id,PARENT_ID,WIN_BID_UNIT_ONE,OPPO_SITE_LINK_MAN,STATUS,VER,CRT_DT) " +
-//                                "select ?,?,?,?,?,?,? where not exists (select 1 from CONTRACT_SIGNING_CONTACT where PARENT_ID = ? and WIN_BID_UNIT_ONE = ? and OPPO_SITE_LINK_MAN = ?)",
-//                                contactId,orderId,model.getWinBidUnit(),model.getLinkMan(),"AP",101,new Date(),orderId,model.getWinBidUnit(),model.getLinkMan());
-
                     }
+                } catch (Exception e){
+                    errorList.add(e.toString());
                 } finally {
                     latch.countDown();
                 }
@@ -164,8 +178,6 @@ public class ContractAccountImport extends BaseController {
         for (String prjName:sheets.keySet()){
             if (!prjNameList.contains(prjName)){//没有找到该项目
                 errorList.add("没有找到项目：" + prjName);
-                //模拟立项
-
             }else {
                 //同一个项目的合同
                 List<ContractImportModel> models = sheets.get(prjName);
@@ -222,6 +234,33 @@ public class ContractAccountImport extends BaseController {
             if (prjName.equals(JdbcMapUtil.getString(prjMap,"NAME"))){
                 return JdbcMapUtil.getString(prjMap,"ID");
             }
+        }
+        return null;
+    }
+
+    /**
+     * 根据excel的文件路径上传文件，并返回文件id字符串
+     * @param filePaths
+     * @param model
+     * @param errorList
+     * @param tl
+     * @return
+     */
+    private String uploadGetFileIds(String filePaths, ContractImportModel model, List<String> errorList, ThreadLocal<Boolean> tl) throws IOException {
+        List<String> ids = new ArrayList<>();
+        if (!Strings.isNullOrEmpty(filePaths)){
+            String[] filePathArr = filePaths.split(",");
+            for (String filepath : filePathArr) {
+                //找到合同文件路径，上传
+                String id = HttpUtils.uploadFile(pathPrefix + filepath, config);
+                if (!"500".equals(id)){
+                    ids.add(id);
+                }else {
+                    tl.set(false);
+                    errorList.add("项目:" + model.getProjectName() + "中合同:" + model.getContractName() + model.getFilePath() + "上传失败");
+                }
+            }
+            return String.join(",",ids);
         }
         return null;
     }
