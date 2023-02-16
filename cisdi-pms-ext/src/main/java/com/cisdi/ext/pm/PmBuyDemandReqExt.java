@@ -584,4 +584,32 @@ public class PmBuyDemandReqExt {
             ExtJarHelper.returnValue.set(userIdList);
         }
     }
+
+    //采购需求审批-获取采购管理部负责人（未经审批过）
+    public void getBuyDeptUser() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        //流程实例id
+        String processInstanceId = ExtJarHelper.procInstId.get();
+        //节点实例id
+        String nodeId = ExtJarHelper.nodeInstId.get();
+        //流程id
+        String processId = ExtJarHelper.procId.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+            //查询采购管理部负责人
+            String user_id = myJdbcTemplate.queryForMap("select CHIEF_USER_ID from HR_DEPT where id = '0099799190825079033'").get("CHIEF_USER_ID").toString();
+            //查询该流程已经
+            List<String> checkUser = ProcessRoleExt.getCheckUser(processInstanceId,nodeId,processId,myJdbcTemplate);
+            ArrayList<Object> userIdList = new ArrayList<>(1);
+            if (!CollectionUtils.isEmpty(checkUser)){
+                if (!checkUser.contains(user_id)){
+                    userIdList.add(user_id);
+                }
+            } else {
+                userIdList.add(user_id);
+            }
+
+            ExtJarHelper.returnValue.set(userIdList);
+        }
+    }
 }
