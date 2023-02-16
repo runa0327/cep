@@ -30,6 +30,7 @@ public class HttpUtils {
         return uploadFile(file,config);
     }
 
+    //调用企业云接口上传文件
     public static String uploadFile(File file,UploadParamConfig config) throws IOException{
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(config.getRequestPath());
