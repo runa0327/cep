@@ -45,7 +45,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         int i = 1;
         //windows环境下测试获取文件地址，勿删
 //        String filePath = jdbcTemplate.queryForList("select name from test_demo").get(0).get("name").toString();
-        String code = jdbcTemplate.queryForList("select remark from base_third_interface where code = 'order_word_to_pdf' ").get(0).get("remark").toString();
+        String code = jdbcTemplate.queryForList("select remark from base_third_interface where code = 'order_word_to_pdf' and SYS_TRUE = 1 ").get(0).get("remark").toString();
         StringBuilder errorBuilder = new StringBuilder();
         if (!CollectionUtils.isEmpty(list1)){
             for (Map<String, Object> tmp : list1) {
@@ -241,7 +241,8 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         String error = "";
         try {
             //如果是远程调用，使用0.0.0.0。本机调试使用127.0.0.1
-            OpenOfficeConnection connection = new SocketOpenOfficeConnection("0.0.0.0",8100);
+            OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8200);
+//            OpenOfficeConnection connection = new SocketOpenOfficeConnection("0.0.0.0",8100);
             connection.connect();
             File inputFile = new File(wordPath);
             File outputFile = new File(pdfPath);
