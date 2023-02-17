@@ -56,7 +56,7 @@ public class ContractAccountImport extends BaseController {
         List<String> errorList = new ArrayList<>();
         //获取合同数据文件夹
         List<File> files = new ArrayList<>();
-        File folder = new File("C:\\Users\\11376\\Desktop\\合约模板\\20230215\\excel");
+        File folder = new File("C:\\Users\\11376\\Desktop\\合约模板\\20230217\\excel");
         if (folder.exists()&&folder.isDirectory()){
             File[] fileArray = folder.listFiles();
             assert fileArray != null;
@@ -87,46 +87,63 @@ public class ContractAccountImport extends BaseController {
         }
     }
 
-    //检查招标类别字典
+    //检查字典
     private void checkAndInsertDic(List<ContractImportModel> models,List<String> errorList) {
-        //获取招标类别字典
-        List<Map<String, Object>> buyTypeDicList = jdbcTemplate.queryForList("select va.id,va.name from gr_set_value va left join gr_set se on se.id = va.GR_SET_ID where se.code = 'buy_type'");
-        //已存在的招标类别
-        List<String> buyTypeExists = buyTypeDicList.stream().map(buyTypeMap -> buyTypeMap.get("name").toString()).collect(Collectors.toList());
-        //找出待添加的招标类别
-        Set<String> buyTypeSet = models.stream().map(model -> model.getBuyType()).filter(buyType -> !Strings.isNullOrEmpty(buyType)).collect(Collectors.toSet());
-        List<String> buyTypeNotExists = buyTypeSet.stream().filter(buyType -> !buyTypeExists.contains(buyType)).collect(Collectors.toList());
-//        //添加字典
-//        for (String buyTypeNotExist : buyTypeNotExists) {
-//            String buyTypeId = Util.insertData(jdbcTemplate, "gr_set_value");
-//            jdbcTemplate.update("update gr_set_value set name = ?,GR_SET_ID = '0099952822476385220',VER = 101 where id = ?",buyTypeNotExist,buyTypeId);
-//            errorList.add("'新增合同招标类别buy_type：'" + buyTypeNotExist + "'请检查字典是否有类似项");
-//        }
+        //获取合同类型字典
+        List<Map<String, Object>> contractCategoryDicList = jdbcTemplate.queryForList("select va.id,va.name from gr_set_value va left join gr_set se on se.id = va.GR_SET_ID where se.code = 'contract_type_one'");
+        //已存在的合同类型
+        List<String> contractCategoryExists = contractCategoryDicList.stream().map(contractCategoryMap -> contractCategoryMap.get("name").toString()).collect(Collectors.toList());
+        //找出字典中不存在的合同类型
+        List<String> contractCategoryNotExists = models.stream()
+                .map(model -> model.getContractCategoryName())
+                .distinct()
+                .filter(category -> !contractCategoryExists.contains(category))
+                .collect(Collectors.toList());
         //提示字典不存在
-        for (String buyTypeNotExist : buyTypeNotExists) {
-            errorList.add("没有找到合同招标类别buy_type：'" + buyTypeNotExist +"'");
+        for (String contractCategoryNotExist : contractCategoryNotExists) {
+            errorList.add("没有找到合同类型contract_type_one:'" + contractCategoryNotExist +"'");
         }
-        //替换model中的buyType
-        List<Map<String, Object>> newBuyTypeDicList = jdbcTemplate.queryForList("select va.id,va.name from gr_set_value va left join gr_set se on se.id = va.GR_SET_ID where se.code = 'buy_type'");
+        //公司
+        List<Map<String, Object>> unitList = jdbcTemplate.queryForList("select id,name from PM_PARTY where status = 'AP'");
+        List<String> unitExists = unitList.stream().map(unitMap -> String.valueOf(unitMap.get("name"))).collect(Collectors.toList());
+        List<String> unitNotExists = models.stream()
+                .map(model -> model.getCustomerUnitName())
+                .distinct()
+                .filter(unitName -> !unitExists.contains(unitName))
+                .collect(Collectors.toList());
+        for (String unitNotExist : unitNotExists) {
+            errorList.add("没有找到公司PM_PARTY:'" + unitNotExist + "'");
+        }
+        //替换model中的contractCategoryId
         for (ContractImportModel model : models) {
-            if (Strings.isNullOrEmpty(model.getBuyType())){
-                continue;
-            }
-            //获取招标类别id
-            String buyTypeId = "";
-            Optional<Map<String, Object>> buyTypeMap =
-                    newBuyTypeDicList.stream().filter(buyType -> buyType.get("name").toString().equals(model.getBuyType())).findAny();
-            if (buyTypeMap.isPresent()){//字典有就用
-                buyTypeId = JdbcMapUtil.getString(buyTypeMap.get(),"id");
+//            if (Strings.isNullOrEmpty(model.getContractCategoryName())){
+//                continue;
+//            }
+            //获取合同类型id
+            String categoryId = "";
+            Optional<Map<String, Object>> contractCategoryMap =
+                    contractCategoryDicList.stream().filter(category -> category.get("name").toString().equals(model.getContractCategoryName())).findAny();
+            if (contractCategoryMap.isPresent()){//字典有就用
+                categoryId = JdbcMapUtil.getString(contractCategoryMap.get(),"id");
             }else {
-                buyTypeId = null;
+                categoryId = null;
             }
-            model.setBuyType(buyTypeId);
+            model.setContractCategoryId(categoryId);
+            //获取签订公司id
+            String unitId = "";
+            Optional<Map<String, Object>> unitMap =
+                    unitList.stream().filter(unit -> String.valueOf(unit.get("name")).equals(model.getCustomerUnitName())).findAny();
+            if (unitMap.isPresent()){
+                unitId = String.valueOf(unitMap.get().get("id"));
+            }else {
+                unitId = null;
+            }
+            model.setCustomerUnitId(unitId);
         }
     }
 
     /**
-     * 插入 PO_ORDER_REQ合同签订、CONTRACT_SIGNING_CONTACT联系人明细
+     * 插入 PO_ORDER_REQ合同签订、CONTRACT_SIGNING_CONTACT联系人明细、PM_ORDER_COST_DETAIL合同签订费用明细（流程内）
      * @param models
      */
     private CountDownLatch insert(List<ContractImportModel> models, List<String> errorList){
@@ -146,13 +163,18 @@ public class ContractAccountImport extends BaseController {
                         }
                         //插入PO_ORDER_REQ合同签订
                         String orderId = Util.insertData(jdbcTemplate, "PO_ORDER_REQ");
-                        jdbcTemplate.update("update PO_ORDER_REQ set CUSTOMER_UNIT_ONE = null,PM_PRJ_ID = ?, CONTRACT_NAME = ?, SIGN_DATE = ?, AMT_TWO = ?, REMARK_LONG_ONE = ?, ESTIMATED_AMOUNT = ?, FINANCIAL_AMOUNT = ?, PAYED_AMT = ?, CUMULATIVE_PAYED_PERCENT = ?,BUY_TYPE_ID = ?,FILE_ID_FIVE = ?,STATUS = 'AP',VER = 101,CRT_USER_ID = '0099250247095871681' where id = ?",
-                                model.getProjectId(),model.getContractName(),model.getSignDate(),model.getAmtIncludeTax(),model.getRemark(),model.getEstimateAmt(),model.getFinancialAmt(),model.getPayedAmt(),model.getPayedPercent(),model.getBuyType(),fileIds,orderId);
+                        jdbcTemplate.update("update po_order_req set PM_PRJ_ID = ?,CONTRACT_NAME = ?,CUSTOMER_UNIT_ONE = ?,CONTRACT_CATEGORY_ONE_ID = ?,AMT_THREE = ?,AMT_TWO = ?,AMT_FOUR = ?,SIGN_DATE = ?,FILE_ID_FIVE = ?,STATUS = 'AP',VER = 101,CRT_USER_ID = '0099250247095871681' where id = ?",
+                                model.getProjectId(),model.getContractName(),model.getCustomerUnitId(),model.getContractCategoryId(),model.getAmtThree(),model.getAmtTwo(),model.getAmtFour(),model.getSignDate(),fileIds,orderId);
 
                         //插入CONTRACT_SIGNING_CONTACT联系人明细
                         String contactId = Util.insertData(jdbcTemplate, "CONTRACT_SIGNING_CONTACT");
-                        jdbcTemplate.update("update CONTRACT_SIGNING_CONTACT set PARENT_ID = ?, WIN_BID_UNIT_ONE = ?, OPPO_SITE_LINK_MAN = ?,STATUS = 'AP',VER = 101,CRT_USER_ID = '0099250247095871681' where id = ?"
-                                ,orderId,model.getWinBidUnit(),model.getLinkMan(),contactId);
+                        jdbcTemplate.update("update CONTRACT_SIGNING_CONTACT set PARENT_ID = ?, WIN_BID_UNIT_ONE = ?,STATUS = 'AP',VER = 101,CRT_USER_ID = '0099250247095871681' where id = ?"
+                                ,orderId,model.getWinBidUnit(),contactId);
+
+                        //插入PM_ORDER_COST_DETAIL合同签订费用明细
+                        String costId = Util.insertData(jdbcTemplate, "PM_ORDER_COST_DETAIL");
+                        jdbcTemplate.update("update  PM_ORDER_COST_DETAIL set CONTRACT_ID = ?,AMT_ONE = ?,AMT_TWO = ?,AMT_THREE = ?,STATUS = 'AP',VER = 101,CRT_USER_ID = '0099250247095871681' where id = ?",
+                                orderId,model.getAmtTwo(),model.getAmtThree(),model.getAmtFour(),costId);
                     }
                 } catch (Exception e){
                     errorList.add(e.toString());
@@ -192,28 +214,8 @@ public class ContractAccountImport extends BaseController {
                     if ("/".equals(model.getSignDate())){
                         model.setSignDate(null);
                     }
-                    if ("/".equals(model.getBuyType())){
-                        model.setBuyType(null);
-                    }
-                    if (!StringUtils.isDouble(model.getEstimateAmt())){
-                        model.setEstimateAmt(null);
-                    }
-                    if (!StringUtils.isDouble(model.getFinancialAmt())){
-                        model.setFinancialAmt(null);
-                    }
-                    if (!StringUtils.isDouble(model.getAmtIncludeTax())){
-                        model.setAmtIncludeTax(null);
-                    }
-                    if (!StringUtils.isDouble(model.getPayedAmt())){
-                        model.setPayedAmt(null);
-                    }
-                    //累计支付比例整理
-                    if (!Strings.isNullOrEmpty(model.getPayedPercent())){
-                        String payPercent = model.getPayedPercent().replace("%", "");
-                        if (!StringUtils.isDouble(payPercent)){
-                            payPercent = null;
-                        }
-                        model.setPayedPercent(payPercent);
+                    if (!Strings.isNullOrEmpty(model.getFilePath())){
+                        model.setFilePath(model.getFilePath().replaceAll("\\.\\.",""));
                     }
                     model.setProjectName(prjName);
                     model.setProjectId(this.getPrjIdByName(prjList,prjName));
