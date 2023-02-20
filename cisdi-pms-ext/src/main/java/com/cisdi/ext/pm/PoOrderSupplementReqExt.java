@@ -306,65 +306,86 @@ public class PoOrderSupplementReqExt {
         if ("lawyerCheck".equals(status)){ //律师审核
             //流程中的审批意见附件
             String processFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_SIX");
+            //流程中的审批意见
+            String APPROVAL_COMMENT_ONE = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_ONE");
             //判断是否是当轮拒绝回来的、撤销回来的（是否是第一个进入该节点审批的人）
-            String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ?";
+            String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ? and status = 'ap'";
             List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeId,userId);
             if (!CollectionUtils.isEmpty(list2)){
                 String num = JdbcMapUtil.getString(list2.get(0),"num");
                 if (SharedUtil.isEmptyString(num) || "0".equals(num)){
                     Integer exec = Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("ID", csCommId).update()
-                            .set("FILE_ID_SIX",null).exec();
+                            .set("FILE_ID_SIX",null).set("APPROVAL_COMMENT_ONE",null).exec();
                     processFile = "";
+                    APPROVAL_COMMENT_ONE = "";
                 }
             } else {
                 Integer exec = Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("ID", csCommId).update()
-                        .set("FILE_ID_SIX",null).exec();
+                        .set("FILE_ID_SIX",null).set("APPROVAL_COMMENT_ONE",null).exec();
                 processFile = "";
+                APPROVAL_COMMENT_ONE = "";
             }
             sbFile = autoFile(file,processFile);
-            if (!SharedUtil.isEmptyString(sbFile)){
+            sbComment = autoComment(comment,APPROVAL_COMMENT_ONE,userName);
+            if (!SharedUtil.isEmptyString(sbFile) || !SharedUtil.isEmptyString(sbComment)){
                 upSql.append("update PO_ORDER_SUPPLEMENT_REQ set ");
                 if (!SharedUtil.isEmptyString(sbFile)){
                     upSql.append(" FILE_ID_SIX = '"+sbFile+"', ");
+                }
+                if (!SharedUtil.isEmptyString(sbComment)){
+                    upSql.append(" APPROVAL_COMMENT_ONE = '"+sbComment+"', ");
                 }
                 upSql.append(" LAST_MODI_DT = now() where id = ?");
                 Integer exec = myJdbcTemplate.update(upSql.toString(),csCommId);
                 log.info("已更新：{}", exec);
             }
         }  else if ("orderLegalFinanceCheck".equals(status)) { //法务财务审批
-            //流程中的审批意见
+            //流程中的审批意见附件
             String processLegalFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_THREE"); //法务修订稿
             String processFinanceFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_TWO"); //财务修订稿
+            //流程中的审批意见
+            String processLegalComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_THREE"); //法务部门意见
+            String processFinanceComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_TWO"); //财务部门意见
             //查询该人员角色信息
             String sql1 = "select b.id,b.name from ad_role_user a left join ad_role b on a.AD_ROLE_ID = b.id where a.AD_USER_ID = ? and b.id in ('0100070673610711083','0099902212142039415')";
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId);
             if (!CollectionUtils.isEmpty(list1)){
                 //判断是否是当轮拒绝回来的、撤销回来的
-                String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ?";
+                String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ? and status = 'ap'";
                 List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeId,userId);
                 if (!CollectionUtils.isEmpty(list2)){
                     String num = JdbcMapUtil.getString(list2.get(0),"num");
                     if (SharedUtil.isEmptyString(num) || "0".equals(num)){
                         Integer exec = Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("ID", csCommId).update()
-                                .set("FILE_ID_THREE",null).set("FILE_ID_TWO",null).exec();
+                                .set("FILE_ID_THREE",null).set("FILE_ID_TWO",null)
+                                .set("APPROVAL_COMMENT_THREE",null).set("APPROVAL_COMMENT_TWO",null).exec();
                         processLegalFile = "";
                         processFinanceFile = "";
+                        processLegalComment = "";
+                        processFinanceComment = "";
                     }
                 } else {
                     Integer exec = Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("ID", csCommId).update()
-                            .set("FILE_ID_THREE",null).set("FILE_ID_TWO",null).exec();
+                            .set("FILE_ID_THREE",null).set("FILE_ID_TWO",null)
+                            .set("APPROVAL_COMMENT_THREE",null).set("APPROVAL_COMMENT_TWO",null).exec();
                     processLegalFile = "";
                     processFinanceFile = "";
+                    processLegalComment = "";
+                    processFinanceComment = "";
                 }
                 // 0099902212142039415 = 法务部门;0100070673610711083=财务部
                 String id = JdbcMapUtil.getString(list1.get(0),"id");
 
                 if ("0099902212142039415".equals(id)){ //法务
                     sbFile = autoFile(file,processLegalFile);
+                    sbComment = autoComment(comment,processLegalComment,userName);
                     if (!SharedUtil.isEmptyString(sbComment) || !SharedUtil.isEmptyString(sbFile)){
                         upSql.append("update PO_ORDER_SUPPLEMENT_REQ set ");
                         if (!SharedUtil.isEmptyString(sbFile)){
                             upSql.append(" FILE_ID_THREE = '"+sbFile+"', ");
+                        }
+                        if (!SharedUtil.isEmptyString(sbComment)){
+                            upSql.append(" APPROVAL_COMMENT_THREE = '"+sbComment+"', ");
                         }
                         upSql.append(" LAST_MODI_DT = now() where id = ?");
                         Integer exec = myJdbcTemplate.update(upSql.toString(),csCommId);
@@ -373,10 +394,14 @@ public class PoOrderSupplementReqExt {
                 }
                 if ("0100070673610711083".equals(id)){
                     sbFile = autoFile(file,processFinanceFile);
+                    sbComment = autoComment(comment,processFinanceComment,userName);
                     if (!SharedUtil.isEmptyString(sbComment) || !SharedUtil.isEmptyString(sbFile)){
                         upSql.append("update PO_ORDER_SUPPLEMENT_REQ set ");
                         if (!SharedUtil.isEmptyString(sbFile)){
                             upSql.append(" FILE_ID_TWO = '"+sbFile+"', ");
+                        }
+                        if (!SharedUtil.isEmptyString(sbComment)){
+                            upSql.append(" APPROVAL_COMMENT_TWO = '"+sbComment+"', ");
                         }
                         upSql.append(" LAST_MODI_DT = now() where id = ?");
                         Integer exec = myJdbcTemplate.update(upSql.toString(),csCommId);
@@ -398,5 +423,18 @@ public class PoOrderSupplementReqExt {
             }
         }
         return sbFile.toString();
+    }
+
+    // 审核意见自动拼接
+    private String autoComment(String newComment, String oldComment, String userName) {
+        StringBuilder sbComment = new StringBuilder();
+        if (!SharedUtil.isEmptyString(newComment)){
+            if (!SharedUtil.isEmptyString(oldComment)){
+                sbComment.append(oldComment).append("; \n").append(userName).append(":").append(newComment);
+            } else {
+                sbComment.append(userName).append(":").append(newComment);
+            }
+        }
+        return sbComment.toString();
     }
 }

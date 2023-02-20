@@ -67,9 +67,6 @@ public class WfExt {
         String entityCode = entityInfo.code;
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
 
-        //发起人
-//        String userName =ExtJarHelper.loginInfo.get().userName;
-
         if (entityRecordList != null) {
             for (EntityRecord entityRecord : entityRecordList) {
                 String csCommId = entityRecord.csCommId;
@@ -87,7 +84,6 @@ public class WfExt {
                     nowDate = JdbcMapUtil.getString(list0.get(0),"START_DATETIME").replace("T"," ");
                     userName = JdbcMapUtil.getString(list0.get(0),"userName");
                 }
-
 
                 // 审批流审批通过
                 if ("AP".equals(newStatus)) {
@@ -234,10 +230,10 @@ public class WfExt {
                 // 审批流程创建
                 if ("APING".equals(newStatus)) {
 
-                    // 一些额外校验
-                    if ("PO_PUBLIC_BID_REQ".equals(entityCode)) { // 招标校验
-                        checkBidReq(entityRecord, csCommId);
-                    }
+                    // 一些额外校验 该流程弃用 2022-02-20 暂时不删除代码，只注释
+//                    if ("PO_PUBLIC_BID_REQ".equals(entityCode)) { // 招标校验
+//                        checkBidReq(entityRecord, csCommId);
+//                    }
 
                     //查询该实例紧急程度
                     String urgentSql = "SELECT a.IS_URGENT FROM WF_PROCESS_INSTANCE a left join "+entityCode+" b on a.id = b.LK_WF_INST_ID where b.id = ? ";
@@ -292,18 +288,10 @@ public class WfExt {
                                     }
                                     name = concatProcessName("-",processName,projectName,otherName,userName,nowDate);
                                 } else if ("PO_ORDER_REQ".equals(entityCode)){ //合同签订
-                                    sql = "select CONTRACT_NAME from PO_ORDER_REQ where id = ?";
-                                    List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
-                                    if (!CollectionUtils.isEmpty(list)){
-                                        otherName = JdbcMapUtil.getString(list.get(0),"CONTRACT_NAME");
-                                    }
+                                    otherName = getContractName(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
                                     name = concatProcessName("-",processName,projectName,otherName,userName,nowDate);
                                 } else if ("PM_BID_APPROVAL_REQ".equals(entityCode)) { //招标文件审批
-                                    sql = "select NAME_ONE from "+entityCode+" where id = ?";
-                                    List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
-                                    if (!CollectionUtils.isEmpty(list)){
-                                        otherName = JdbcMapUtil.getString(list.get(0),"NAME_ONE");
-                                    }
+                                    otherName = getContractName(entityCode,"NAME_ONE",csCommId,myJdbcTemplate);
                                     name = concatProcessName("-",processName,otherName,userName,nowDate);
                                 } else {
                                     if ("PM_PRJ_REQ".equals(entityCode)){
@@ -315,11 +303,7 @@ public class WfExt {
                                     } else if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
                                         otherName = JdbcMapUtil.getString(valueMap,"CODE_ONE");
                                     } else {
-                                        sql = "select NAME_ONE from "+entityCode+" where id = ?";
-                                        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
-                                        if (!CollectionUtils.isEmpty(list)){
-                                            otherName = JdbcMapUtil.getString(list.get(0),"NAME_ONE");
-                                        }
+                                        otherName = getContractName(entityCode,"NAME_ONE",csCommId,myJdbcTemplate);
                                     }
                                     name = concatProcessName("-",processName,otherName,projectName,userName,nowDate);
                                 }
@@ -330,7 +314,11 @@ public class WfExt {
                                 }
                                 update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
                                 return;
-                            }  else {
+                            }  else if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode) || "PO_ORDER_CHANGE_REQ".equals(entityCode)){ //补充协议/合同需求审批 流程标题规则
+                                otherName = getContractName(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
+                                name = concatProcessName("-",processName,otherName,userName,nowDate);
+                                update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
+                            } else {
                                 sql = "update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?";
                                 name = concatProcessName("-",processName,projectName,userName,nowDate);
                                 update1 = myJdbcTemplate.update(sql, name,csCommId);
@@ -351,6 +339,24 @@ public class WfExt {
                 }
             }
         }
+    }
+
+    /**
+     * 查询流程中某一个字段
+     * @param tableName 流程表名
+     * @param colName 需要查询的字段
+     * @param csCommId 该条记录id
+     * @param myJdbcTemplate 数据源
+     * @return
+     */
+    private String getContractName(String tableName, String colName, String csCommId, MyJdbcTemplate myJdbcTemplate) {
+        String value = "";
+        String sql = "select " + colName + " from " + tableName + " where id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
+        if (!CollectionUtils.isEmpty(list)){
+            value = JdbcMapUtil.getString(list.get(0),colName);
+        }
+        return value;
     }
 
     // 获取发起流程时的项目名称
