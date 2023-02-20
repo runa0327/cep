@@ -222,7 +222,7 @@ public class PmMap {
         }
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
-        sb.append(" limit ").append(start).append(",").append(pageSize);
+//        sb.append(" limit ").append(start).append(",").append(pageSize);
 
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
         List<ProjectInfo> res = list.stream().map(p -> {
@@ -257,11 +257,12 @@ public class PmMap {
                 return info;
             }).collect(Collectors.toList());
             result.addAll(res);
-
-            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
+            List<ProjectInfo> pageList = result.stream().skip(start).limit(pageSize).collect(Collectors.toList());
+//            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
             OutSide outSide = new OutSide();
-            outSide.res = result;
-            outSide.total = totalList.size();
+            outSide.res = pageList;
+//            outSide.total = totalList.size();
+            outSide.total = result.size();
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }

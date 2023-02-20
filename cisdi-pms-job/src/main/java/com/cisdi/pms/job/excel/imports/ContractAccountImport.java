@@ -56,7 +56,7 @@ public class ContractAccountImport extends BaseController {
         List<String> errorList = new ArrayList<>();
         //获取合同数据文件夹
         List<File> files = new ArrayList<>();
-        File folder = new File("C:\\Users\\11376\\Desktop\\合约模板\\20230217\\excel");
+        File folder = new File(pathPrefix + "\\excel");
         if (folder.exists()&&folder.isDirectory()){
             File[] fileArray = folder.listFiles();
             assert fileArray != null;
