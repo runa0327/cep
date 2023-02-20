@@ -316,7 +316,7 @@ public class WfExt {
                                 return;
                             }  else if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode) || "PO_ORDER_CHANGE_REQ".equals(entityCode)){ //补充协议/合同需求审批 流程标题规则
                                 otherName = getContractName(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
-                                name = concatProcessName("-",processName,otherName,userName,nowDate);
+                                name = concatProcessName("-",processName,projectName,otherName,userName,nowDate);
                                 update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
                             } else {
                                 sql = "update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?";
