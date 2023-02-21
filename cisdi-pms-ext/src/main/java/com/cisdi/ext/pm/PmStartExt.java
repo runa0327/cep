@@ -105,7 +105,7 @@ public class PmStartExt {
                 " ps.PM_CODE as PM_CODE, " +
                 " ps.FUND_SOURCE_TYPE_ID as FUND_SOURCE_TYPE_ID, " +
                 " gg.`NAME` as sourceTypeValue," +
-                " ifnull( PRJ_TOTAL_INVEST, 0 ) AS PRJ_TOTAL_INVEST," +
+                " round(ifnull( PRJ_TOTAL_INVEST, 0 ),2) AS PRJ_TOTAL_INVEST," +
                 " ps.PROJECT_TYPE_ID as PROJECT_TYPE_ID," +
                 " gsv.`NAME` AS typeValue," +
                 " ps.BUILDER_UNIT as BUILDER_UNIT," +
@@ -140,7 +140,7 @@ public class PmStartExt {
                 pmStart.type = JdbcMapUtil.getString(m, "PROJECT_TYPE_ID");
                 pmStart.unit = JdbcMapUtil.getString(m, "BUILDER_UNIT");
                 pmStart.description = JdbcMapUtil.getString(m, "PRJ_SITUATION");
-                pmStart.startTime = JdbcMapUtil.getString(m, "START_TIME");
+                pmStart.startTime = StringUtil.withOutT(JdbcMapUtil.getString(m, "START_TIME"));
                 pmStart.agent = JdbcMapUtil.getString(m, "AGENT");
                 pmStart.status = JdbcMapUtil.getString(m, "START_STATUS");
                 pmStart.fileInfoList = this.getFileList(JdbcMapUtil.getString(m, "ATT_FILE_GROUP_ID"));
