@@ -301,6 +301,67 @@ public class PmRosterExt {
     }
 
 
+    /**
+     * 部门树结构
+     */
+    public void getDeptList() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        StringBuffer sb = new StringBuffer();
+        sb.append("select id,name,ifnull(HR_DEPT_PID,0) as pid from hr_dept where status ='ap' ");
+        if (map.get("name") != null) {
+            sb.append(" and `name` like '%").append(map.get("name")).append("%'");
+            ;
+        }
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
+        List<DeptUserTree> treeList = list.stream().map(p -> {
+            DeptUserTree tree = new DeptUserTree();
+            tree.id = JdbcMapUtil.getString(p, "id");
+            tree.name = JdbcMapUtil.getString(p, "name");
+            tree.pid = JdbcMapUtil.getString(p, "pid");
+            return tree;
+        }).collect(Collectors.toList());
+        List<DeptUserTree> resData = treeList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
+            m.children = this.getChildren(m, treeList);
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(resData)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.resData = resData;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    /**
+     * 当前岗位绑定的部门
+     */
+    public void postDept() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_ROSTER where PROJECT_POST=?", map.get("postName"));
+        List<String> ids = list.stream().map(p -> JdbcMapUtil.getString(p, "HR_DEPT_ID")).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(ids)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.strList = ids;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    /**
+     * 岗位绑定部门
+     */
+    public void postBondDept() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        myJdbcTemplate.update("update PM_ROSTER set HR_DEPT_ID=? where PROJECT_POST=?", map.get("deptId"), map.get("postName"));
+    }
+
+
     private List<DeptUserTree> getChildren(DeptUserTree parent, List<DeptUserTree> allData) {
         return allData.stream().filter(p -> parent.id.equals(p.pid)).peek(m -> {
             List<DeptUserTree> children = this.getChildren(m, allData);
