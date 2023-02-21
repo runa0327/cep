@@ -35,8 +35,25 @@ public class PmStartExt {
         int pageSize = Integer.parseInt(String.valueOf(map.get("pageSize")));
         int pageIndex = Integer.parseInt(String.valueOf(map.get("pageIndex")));
         StringBuffer sb = new StringBuffer();
-        sb.append("select ps.ID as ID,ps.`NAME` as `NAME`,PRJ_CODE,ifnull(PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST,gsv.`NAME` as PROJECT_TYPE_ID,pp.`NAME` as BUILDER_UNIT,ps.START_TIME,ps.AGENT,ss.`NAME` as START_STATUS from PRJ_START ps " +
-                "left join gr_set_value gsv on gsv.id = ps.PROJECT_TYPE_ID left join pm_party pp on ps.BUILDER_UNIT = pp.id left join gr_set_value ss on ss.id = ps.PRJ_START_STATUS_ID where ps.`STATUS`='ap'");
+        sb.append("SELECT " +
+                " ps.ID AS ID," +
+                " ps.`NAME` AS `NAME`," +
+                " PM_CODE," +
+                "ROUND(ifnull(PRJ_TOTAL_INVEST, 0 ),2) AS PRJ_TOTAL_INVEST," +
+                " gsv.`NAME` AS PROJECT_TYPE_ID," +
+                " pp.`NAME` AS BUILDER_UNIT," +
+                " ps.START_TIME," +
+                " ps.AGENT," +
+                " ss.`NAME` AS START_STATUS ," +
+                " au.`name` as agentValue " +
+                "FROM " +
+                " PRJ_START ps  " +
+                " LEFT JOIN gr_set_value gsv ON gsv.id = ps.PROJECT_TYPE_ID " +
+                " LEFT JOIN pm_party pp ON ps.BUILDER_UNIT = pp.id " +
+                " LEFT JOIN gr_set_value ss ON ss.id = ps.PRJ_START_STATUS_ID  " +
+                " left join ad_user au on au.id = ps.AGENT " +
+                "WHERE " +
+                " ps.`STATUS` = 'ap'");
         if (!StringUtils.isEmpty(map.get("projectName"))) {
             sb.append(" and ps.`name` like '%").append(map.get("projectName")).append("%'");
         }
@@ -52,13 +69,14 @@ public class PmStartExt {
             PmStart pmStart = new PmStart();
             pmStart.id = JdbcMapUtil.getString(m, "ID");
             pmStart.name = JdbcMapUtil.getString(m, "NAME");
-            pmStart.code = JdbcMapUtil.getString(m, "PRJ_CODE");
+            pmStart.code = JdbcMapUtil.getString(m, "PM_CODE");
             pmStart.invest = JdbcMapUtil.getString(m, "PRJ_TOTAL_INVEST");
             pmStart.type = JdbcMapUtil.getString(m, "PROJECT_TYPE_ID");
             pmStart.unit = JdbcMapUtil.getString(m, "BUILDER_UNIT");
-            pmStart.startTime = JdbcMapUtil.getString(m, "START_TIME");
+            pmStart.startTime = StringUtil.withOutT(JdbcMapUtil.getString(m, "START_TIME"));
             pmStart.agent = JdbcMapUtil.getString(m, "AGENT");
             pmStart.status = JdbcMapUtil.getString(m, "START_STATUS");
+            pmStart.agentValue = JdbcMapUtil.getString(m, "agentValue");
             return pmStart;
         }).collect(Collectors.toList());
 
@@ -154,7 +172,7 @@ public class PmStartExt {
         }
 
         Crud.from("PRJ_START").where().eq("ID", id).update()
-                .set("PRJ_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId)
+                .set("PM_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId)
                 .set("BUILDER_UNIT", input.unit).set("START_TIME", new Date()).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", "1626110930922467328")
                 .set("ATT_FILE_GROUP_ID", input.fileIds).set("FUND_SOURCE_TYPE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).exec();
         String projectId = "";
@@ -171,9 +189,9 @@ public class PmStartExt {
                 .set("PRJ_SITUATION", input.description).exec();
 
         //先删除项目关联的地块
-        myJdbcTemplate.update("delete from parcel_point where PARCEL_ID in (select id from PARCEL where PM_PRJ_ID=?)", projectId);
-        myJdbcTemplate.update("delete from PARCEL where PM_PRJ_ID=?", projectId);
         myJdbcTemplate.update("delete from PRJ_PARCEL where PM_PRJ_ID=?", projectId);
+        myJdbcTemplate.update("delete from parcel_point where PARCEL_ID in (select PARCEL_ID from PRJ_PARCEL where PM_PRJ_ID =?)", projectId);
+        myJdbcTemplate.update("delete from PARCEL where id in (select PARCEL_ID from PRJ_PARCEL where PM_PRJ_ID =?)", projectId);
 
         //再新增 ---新增地块
         List<parcel> parcelList = input.parcels;
@@ -264,7 +282,7 @@ public class PmStartExt {
     private List<parcel> getParcel(String projectId) {
         List<parcel> res = new ArrayList<>();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select FILL,IDENTIFIER,PLOT_RATIO,PARCEL_SHAPE,ifnull(AREA,0) as AREA,ifnull(CENTER_LATITUDE,0) as CENTER_LATITUDE,ifnull(CENTER_LONGITUDE,0) as CENTER_LONGITUDE from PARCEL where id in (select PARCEL_ID from PRJ_PARCEL where PM_PRJ_ID=?)", projectId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ID,FILL,IDENTIFIER,PLOT_RATIO,PARCEL_SHAPE,ifnull(AREA,0) as AREA,ifnull(CENTER_LATITUDE,0) as CENTER_LATITUDE,ifnull(CENTER_LONGITUDE,0) as CENTER_LONGITUDE from PARCEL where id in (select PARCEL_ID from PRJ_PARCEL where PM_PRJ_ID=?)", projectId);
         if (!CollectionUtils.isEmpty(list)) {
             res = list.stream().map(p -> {
                 parcel parcel = new parcel();
