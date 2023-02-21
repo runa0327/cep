@@ -84,19 +84,19 @@ public class PmStartExt {
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("SELECT " +
                 " ps.ID AS ID," +
                 " ps.`NAME` AS `NAME`," +
-                " PM_CODE, " +
-                " FUND_SOURCE_TYPE_ID, " +
+                " ps.PM_CODE as PM_CODE, " +
+                " ps.FUND_SOURCE_TYPE_ID as FUND_SOURCE_TYPE_ID, " +
                 " gg.`NAME` as sourceTypeValue," +
                 " ifnull( PRJ_TOTAL_INVEST, 0 ) AS PRJ_TOTAL_INVEST," +
-                " PROJECT_TYPE_ID," +
+                " ps.PROJECT_TYPE_ID as PROJECT_TYPE_ID," +
                 " gsv.`NAME` AS typeValue," +
-                " BUILDER_UNIT," +
+                " ps.BUILDER_UNIT as BUILDER_UNIT," +
                 " pp.`NAME` AS unitValue," +
                 " ps.START_TIME," +
                 " ps.AGENT," +
                 " ss.`NAME` AS START_STATUS," +
-                " PRJ_SITUATION, " +
-                " ATT_FILE_GROUP_ID, " +
+                " ps.PRJ_SITUATION as PRJ_SITUATION, " +
+                " ps.ATT_FILE_GROUP_ID as ATT_FILE_GROUP_ID, " +
                 " au.`NAME` AS agentValue, " +
                 " pj.ID as projectId " +
                 "FROM " +
