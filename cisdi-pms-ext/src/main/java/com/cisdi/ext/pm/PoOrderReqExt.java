@@ -14,10 +14,8 @@ import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -112,8 +110,8 @@ public class PoOrderReqExt {
             comment = list.get(0).get("user_comment") == null ? null : list.get(0).get("user_comment").toString();
             file = list.get(0).get("USER_ATTACHMENT") == null ? null : list.get(0).get("USER_ATTACHMENT").toString();
         }
-        String sbComment = "";
-        String sbFile = "";
+        String sbComment;
+        String sbFile;
         StringBuilder upSql = new StringBuilder();
         if ("orderLawyerCheck".equals(status)){ //律师审核
             //流程中的审批意见
@@ -125,13 +123,13 @@ public class PoOrderReqExt {
             if (!CollectionUtils.isEmpty(list2)){
                 String num = JdbcMapUtil.getString(list2.get(0),"num");
                 if (SharedUtil.isEmptyString(num) || "0".equals(num)){
-                    Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
+                    Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
                             .set("TEXT_REMARK_TWO", null).set("FILE_ID_SIX",null).exec();
                     processComment = "";
                     processFile = "";
                 }
             } else {
-                Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
+                Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
                     .set("TEXT_REMARK_TWO", null).set("FILE_ID_SIX",null).exec();
                 processComment = "";
                 processFile = "";
@@ -141,10 +139,10 @@ public class PoOrderReqExt {
             if (!SharedUtil.isEmptyString(sbComment) || !SharedUtil.isEmptyString(sbFile)){
                 upSql.append("update PO_ORDER_REQ set ");
                 if (!SharedUtil.isEmptyString(sbComment)){
-                    upSql.append(" TEXT_REMARK_TWO = '"+sbComment+"', ");
+                    upSql.append(" TEXT_REMARK_TWO = '").append(sbComment).append("', ");
                 }
                 if (!SharedUtil.isEmptyString(sbFile)){
-                    upSql.append(" FILE_ID_SIX = '"+sbFile+"', ");
+                    upSql.append(" FILE_ID_SIX = '").append(sbFile).append("', ");
                 }
                 upSql.append(" LAST_MODI_DT = now() where id = ?");
                 Integer exec = myJdbcTemplate.update(upSql.toString(),csCommId);
@@ -167,7 +165,7 @@ public class PoOrderReqExt {
                 if (!CollectionUtils.isEmpty(list2)){
                     String num = JdbcMapUtil.getString(list2.get(0),"num");
                     if (SharedUtil.isEmptyString(num) || "0".equals(num)){
-                        Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
+                        Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
                                 .set("TEXT_REMARK_THREE", null).set("FILE_ID_THREE",null).set("TEXT_REMARK_FOUR",null)
                                 .set("FILE_ID_TWO",null).exec();
                         processLegalComment = "";
@@ -176,7 +174,7 @@ public class PoOrderReqExt {
                         processFinanceFile = "";
                     }
                 } else {
-                    Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
+                    Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
                             .set("TEXT_REMARK_THREE", null).set("FILE_ID_THREE",null).set("TEXT_REMARK_FOUR",null)
                             .set("FILE_ID_TWO",null).exec();
                     processLegalComment = "";
@@ -193,10 +191,10 @@ public class PoOrderReqExt {
                     if (!SharedUtil.isEmptyString(sbComment) || !SharedUtil.isEmptyString(sbFile)){
                         upSql.append("update PO_ORDER_REQ set ");
                         if (!SharedUtil.isEmptyString(sbComment)){
-                            upSql.append(" TEXT_REMARK_THREE = '"+sbComment+"', ");
+                            upSql.append(" TEXT_REMARK_THREE = '").append(sbComment).append("', ");
                         }
                         if (!SharedUtil.isEmptyString(sbFile)){
-                            upSql.append(" FILE_ID_THREE = '"+sbFile+"', ");
+                            upSql.append(" FILE_ID_THREE = '").append(sbFile).append("', ");
                         }
                         upSql.append(" LAST_MODI_DT = now() where id = ?");
                         Integer exec = myJdbcTemplate.update(upSql.toString(),csCommId);
@@ -209,10 +207,10 @@ public class PoOrderReqExt {
                     if (!SharedUtil.isEmptyString(sbComment) || !SharedUtil.isEmptyString(sbFile)){
                         upSql.append("update PO_ORDER_REQ set ");
                         if (!SharedUtil.isEmptyString(sbComment)){
-                            upSql.append(" TEXT_REMARK_FOUR = '"+sbComment+"', ");
+                            upSql.append(" TEXT_REMARK_FOUR = '").append(sbComment).append("', ");
                         }
                         if (!SharedUtil.isEmptyString(sbFile)){
-                            upSql.append(" FILE_ID_TWO = '"+sbFile+"', ");
+                            upSql.append(" FILE_ID_TWO = '").append(sbFile).append("', ");
                         }
                         upSql.append(" LAST_MODI_DT = now() where id = ?");
                         Integer exec = myJdbcTemplate.update(upSql.toString(),csCommId);
@@ -221,7 +219,7 @@ public class PoOrderReqExt {
                 }
             }
         } else if ("orderLegalFinanceReject".equals(status)){
-            Integer exec = Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
+            Crud.from("PO_ORDER_REQ").where().eq("ID", csCommId).update()
                     .set("TEXT_REMARK_THREE", null).set("FILE_ID_THREE",null).set("TEXT_REMARK_FOUR",null)
                     .set("FILE_ID_TWO",null).exec();
         } else if ("first".equals(status)) {
@@ -296,7 +294,7 @@ public class PoOrderReqExt {
             BigDecimal shuiLv = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_THREE")).divide(new BigDecimal(100));
             //不含税金额
             BigDecimal noShuiAmt = shuiAmt.divide(shuiLv.add(new BigDecimal(1)),2, RoundingMode.HALF_UP);
-            Integer integer = myJdbcTemplate.update("update PM_ORDER_COST_DETAIL set AMT_TWO=? where id = ?",noShuiAmt,detailId);
+            myJdbcTemplate.update("update PM_ORDER_COST_DETAIL set AMT_TWO=? where id = ?",noShuiAmt,detailId);
             tmp.put("AMT_TWO",noShuiAmt);
         }
         //含税总金额
@@ -368,85 +366,6 @@ public class PoOrderReqExt {
         return sum;
     }
 
-    /**
-     * 合同最终版 word转pdf 不经过法务
-     */
-    public void wordToPdf(){
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        //用户姓名
-        String waterMark = "工程项目协调系统-" + ExtJarHelper.loginInfo.get().userName;
-        //公司名称
-        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
-        String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
-        //用户id
-        String userId = ExtJarHelper.loginInfo.get().userId;
-        //流程id
-        String csId = entityRecord.csCommId;
-        //是否标准模板 0099799190825080669 = 是，0099799190825080670=否
-        String isModel = JdbcMapUtil.getString(entityRecord.valueMap,"YES_NO_THREE");
-        //获取文件id
-        String fileId = "";
-        if ("0099799190825080669".equals(isModel)){
-            fileId = JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"); //合同文本
-        } else {
-            fileId = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"); //合同修订稿
-        }
-        if (SharedUtil.isEmptyString(fileId)){
-            throw new BaseException("合同文本不能为空，请上传合同文件");
-        }
-        String sql1 = "select PHYSICAL_LOCATION,EXT,NAME from fl_file where id = ?";
-        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,fileId);
-        if (CollectionUtils.isEmpty(list1)){
-            throw new BaseException("没有找到文件！");
-        }
-
-        //模拟上传文件写入数据
-        String newId = Crud.from("fl_file").insertData();
-
-        //文件类型
-        String fileType = list1.get(0).get("EXT").toString();
-        //输出地址
-        String newAddress = "";
-        //文件存放地址
-//        String address = list1.get(0).get("PHYSICAL_LOCATION").toString();
-        String address = "C:\\Users\\11376\\Desktop\\demo.docx";
-        if (!"doc".equals(fileType) && !"docx".equals(fileType)){
-            throw new BaseException("合同附件格式为文档");
-        }
-//        String addressFront = address.substring(0,address.lastIndexOf("/"));
-        System.out.println("address:"+address);
-//        newAddress = addressFront+newId+".pdf";
-        //文件大小
-        float fileSize = 0l;
-        //显示名称
-        String showName = "";
-        try {
-            newAddress = "C:\\Users\\11376\\Desktop\\demo.pdf";
-            Map map = ProFileUtils.testExt(address,newAddress);
-            fileSize = Float.valueOf(map.get("size").toString());
-            showName = map.get("name").toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //文件名称
-        String fileName = JdbcMapUtil.getString(entityRecord.valueMap,"NAME");
-
-        //当前时间
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String now = sdf.format(new Date());
-
-        //将生成的pdf写入该流程
-//        Crud.from("PO_ORDER_REQ").where().eq("id",csId).update().set("FIRST_INSPECTION_REPORT_FILE",newAddress).exec();
-        Crud.from("TEST_CLASS").where().eq("id",csId).update().set("FILE_ID_ONE",newId).exec();
-
-        Crud.from("fl_file").where().eq("id",newId).update()
-                .set("CODE",newId).set("NAME",fileName).set("VER","1").set("FL_PATH_ID","0099250247095872690").set("EXT","pdf")
-                .set("STATUS","AP").set("CRT_DT",now).set("CRT_USER_ID",userId).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
-                .set("SIZE_KB",fileSize).set("TS",now).set("UPLOAD_DTTM",now).set("PHYSICAL_LOCATION",newAddress).set("DSP_NAME",showName)
-                .set("DSP_SIZE",fileSize).exec();
-    }
-
     // 合同签订原本费用明细更新到新税率上
     public void updatePayData(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
@@ -461,7 +380,7 @@ public class PoOrderReqExt {
                 List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,orderId);
                 if (!CollectionUtils.isEmpty(list2)){
                     for (Map<String, Object> tmp : list2) {
-                        int update = myJdbcTemplate.update("update pm_order_cost_detail set AMT_ONE=AMT WHERE id = ?",JdbcMapUtil.getString(tmp,"id"));
+                        myJdbcTemplate.update("update pm_order_cost_detail set AMT_ONE=AMT WHERE id = ?",JdbcMapUtil.getString(tmp,"id"));
                     }
                     //含税总金额
                     BigDecimal amtShui = getSumAmtBy(list2,"AMT_ONE");
@@ -514,27 +433,23 @@ public class PoOrderReqExt {
         String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
         String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (!CollectionUtils.isEmpty(listUrl)){
-                    String url = listUrl.get(0).get("HOST_ADDR").toString();
-                    if (SharedUtil.isEmptyString(url)){
-                        //写入日志提示表
-                        String id = Crud.from("AD_REMIND_LOG").insertData();
-                        Crud.from("AD_REMIND_LOG").where().eq("id",id).update().set("AD_ENT_ID","0099799190825103145")
-                                .set("ENT_CODE","PO_ORDER_REQ").set("ENTITY_RECORD_ID",csId).set("REMIND_USER_ID","0099250247095871681")
-                                .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
-                                .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
-                    } else {
-                        PoOrderReq poOrderReq = getOrderModel(entityRecord,procInstId,userId,status,companyName);
-                        String param = JSON.toJSONString(poOrderReq);
-                        //调用接口
-                        HttpClient.doPost(url,param,"UTF-8");
-//                        HttpUtils.sendPost(url,param);
-                    }
-
+        new Thread(() -> {
+            if (!CollectionUtils.isEmpty(listUrl)){
+                String url = listUrl.get(0).get("HOST_ADDR").toString();
+                if (SharedUtil.isEmptyString(url)){
+                    //写入日志提示表
+                    String id = Crud.from("AD_REMIND_LOG").insertData();
+                    Crud.from("AD_REMIND_LOG").where().eq("id",id).update().set("AD_ENT_ID","0099799190825103145")
+                            .set("ENT_CODE","PO_ORDER_REQ").set("ENTITY_RECORD_ID",csId).set("REMIND_USER_ID","0099250247095871681")
+                            .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
+                            .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
+                } else {
+                    PoOrderReq poOrderReq = getOrderModel(entityRecord,procInstId,userId,status,companyName);
+                    String param = JSON.toJSONString(poOrderReq);
+                    //调用接口
+                    HttpClient.doPost(url,param,"UTF-8");
                 }
+
             }
         }).start();
     }
@@ -546,7 +461,7 @@ public class PoOrderReqExt {
      * @param userId 操作人id
      * @param status 状态，区分发起还是二次发起
      * @param companyName 公司名称
-     * @return
+     * @return 合同信息实体
      */
     private PoOrderReq getOrderModel(EntityRecord entityRecord,String procInstId,String userId,String status,String companyName) {
         PoOrderReq poOrderReq = new PoOrderReq();
@@ -559,7 +474,7 @@ public class PoOrderReqExt {
         poOrderReq.setCompanyName(companyName);
 
         //获取文件id
-        String fileId = "";
+        String fileId;
         if ("start".equals(status)){ //发起时校验
             fileId = JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"); //合同文本
             poOrderReq.setIsModel("1");
