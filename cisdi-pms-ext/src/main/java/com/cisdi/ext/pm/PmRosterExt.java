@@ -238,12 +238,13 @@ public class PmRosterExt {
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         Map<String, Object> queryParams = new HashMap<>();// 创建入参map
         queryParams.put("postName", projectPostUser.postName);
-        queryParams.put("ids", dataList);
-        myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID=null where PROJECT_POST= :postName and PM_PRJ_ID in (:ids) ", queryParams);
-
         queryParams.put("userId", projectPostUser.userId);
-        myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID= :userId where PROJECT_POST= :postName and PM_PRJ_ID in (:ids) ", queryParams);
+        myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID=null where PROJECT_POST= :postName and AD_USER_ID= :userId", queryParams);
 
+        if(!CollectionUtils.isEmpty(dataList)){
+            queryParams.put("ids", dataList);
+            myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID= :userId where PROJECT_POST= :postName and PM_PRJ_ID in (:ids) ", queryParams);
+        }
     }
 
 
