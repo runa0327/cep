@@ -21,6 +21,13 @@ import java.util.stream.Collectors;
  */
 public class ParcelMap {
     /**
+     * 点击项目，返回项目坐标
+     */
+    public void getPrjCoordinate(){
+        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
+
+    }
+    /**
      * 新增/编辑地块
      */
     public void addParcel(){
