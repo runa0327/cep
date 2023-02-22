@@ -7,6 +7,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
 import org.springframework.util.CollectionUtils;
 
@@ -154,6 +155,76 @@ public class ParcelMap {
         ExtJarHelper.returnValue.set(outputMap);
     }
 
+    /**
+     * 项目区域列表
+     */
+    public void listPrjParcel(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
+
+        //待返回的结果集合
+        HashMap<String, Object> result = new HashMap<>();
+
+        //地块原始数据
+        List<Map<String, Object>> originalParcelList = myJdbcTemplate.queryForList("select p.id parcelId,pp.pm_prj_id prjId,p.PARCEL_SHAPE parcelShape,p.CENTER_LONGITUDE centerLongitude,p.CENTER_LATITUDE centerLatitude \n" +
+                "from parcel p left join prj_parcel pp on pp.parcel_id = p.id");
+
+        //点位原始数据
+        List<Map<String, Object>> originalPointList = myJdbcTemplate.queryForList("select id pointId,PARCEL_ID parcelId,longitude,latitude from parcel_point");
+
+        //项目绑定地块的原始数据
+        String prjSql = "select pj.id prjId,pj.name prjName,gsv.NAME as projectType,pj.PRJ_MANAGE_MODE_ID modeId,gv.name modeName from prj_parcel pp " +
+                "left join pm_prj pj on pj.id = pp.pm_prj_id " +
+                "left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID\n" +
+                "left join gr_set_value gv on gv.id = pj.PRJ_MANAGE_MODE_ID\n" +
+                " where 1 = 1";
+        if (!Objects.isNull(params.get("prjName"))){
+            prjSql += " and pj.name like '%" + params.get("prjName").toString() + "%'";
+        }
+        prjSql += " group by pj.id";
+        List<Map<String, Object>> orgPrjList = myJdbcTemplate.queryForList(prjSql);
+
+        List<Project> projects = orgPrjList.stream().map(prj -> {
+            Project project = new Project();
+            project.prjId = String.valueOf(prj.get("prjId"));
+            project.prjName = String.valueOf(prj.get("prjName"));
+            project.modeId = String.valueOf(prj.get("modeId"));
+            project.modeName = String.valueOf(prj.get("modeName"));
+            String type = JdbcMapUtil.getString(prj, "projectType");
+            if ("民用建筑".equals(type)) {
+                project.projectType = "房建";
+            } else if ("市政道路".equals(type)) {
+                project.projectType = "道路";
+            } else {
+                project.projectType = "其他";
+            }
+            project.parcels = originalParcelList.stream()
+                    .filter(par -> String.valueOf(par.get("prjId")).equals(project.prjId))
+                    .map(par -> {
+                        Parcel parcel = new Parcel();
+                        parcel.parcelId = String.valueOf(par.get("parcelId"));
+                        parcel.parcelShape = String.valueOf(par.get("parcelShape"));
+                        parcel.centerLongitude = String.valueOf(par.get("centerLongitude"));
+                        parcel.centerLatitude = String.valueOf(par.get("centerLatitude"));
+                        parcel.points = originalPointList.stream()
+                                .filter(poi -> String.valueOf(poi.get("parcelId")).equals(parcel.parcelId))
+                                .map(poi -> {
+                                    List<BigDecimal> point = new ArrayList<>();
+                                    point.add(new BigDecimal(String.valueOf(poi.get("longitude"))));
+                                    point.add(new BigDecimal(String.valueOf(poi.get("latitude"))));
+                                    return point;
+                                }).collect(Collectors.toList());
+                        return parcel;
+                    }).collect(Collectors.toList());
+            return project;
+        }).collect(Collectors.toList());
+
+        result.put("projects",projects);
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+    }
+
+
     //经度纬度转坐标数组 [经度,纬度]
     private List<BigDecimal> getCoordinate(Map<String, Object> pointMap){
         List<BigDecimal> coordinate = new ArrayList<>();
@@ -287,6 +358,14 @@ public class ParcelMap {
         public String prjId;
         //name
         public String prjName;
+        //项目类型
+        public String projectType;
+        //模式id
+        public String modeId;
+        //模式名
+        public String modeName;
+        //区域
+        public List<Parcel> parcels;
     }
 
     /**
