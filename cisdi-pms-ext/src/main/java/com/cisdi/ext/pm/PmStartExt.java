@@ -220,7 +220,10 @@ public class PmStartExt {
             String aaaid = Crud.from("PRJ_PARCEL").insertData();
             Crud.from("PRJ_PARCEL").where().eq("ID", aaaid).update().set("PM_PRJ_ID", projectId).set("PARCEL_ID", parcelId).exec();
 
-
+            if("Polygon".equals(parcel.parcelShape)){
+                Point first = pointList.get(0);
+                pointList.add(first);
+            }
             for (Point point : pointList) {
                 String pointId = Crud.from("parcel_point").insertData();
                 Crud.from("parcel_point").where().eq("ID", pointId).update().set("LONGITUDE", point.longitude).set("LATITUDE", point.latitude)
@@ -312,7 +315,7 @@ public class PmStartExt {
                 point.latitude = JdbcMapUtil.getBigDecimal(p, "LATITUDE");
                 point.longitude = JdbcMapUtil.getBigDecimal(p, "LONGITUDE");
                 return point;
-            }).collect(Collectors.toList());
+            }).distinct().collect(Collectors.toList());
         }
         return res;
     }
