@@ -10,7 +10,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
     #    单机启用host、port：
-    host: 121.5.71.89
+    host: 124.222.58.152
     port: 6379
     #   单机、哨兵公用password、database：
     password: redis@1234
@@ -29,7 +29,7 @@ spring:
         min-idle: 0
         time-between-eviction-runs: 60s
   rabbitmq:
-    host: 121.5.71.89
+    host: 124.222.58.152
     port: 5672
     username: admin
     password: admin@1234
