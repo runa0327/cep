@@ -1,6 +1,7 @@
 package com.cisdi.ext.pm;
 
 import com.cisdi.ext.util.JsonUtil;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
@@ -297,7 +298,9 @@ public class PmRosterExt {
 
         for (PostUser postUser : dataList) {
             myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID=null where PM_PRJ_ID=? and PROJECT_POST=?", editObj.projectId, postUser.postName);
-            myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID =? where PROJECT_POST=? and PM_PRJ_ID=?", postUser.userId, postUser.postName, editObj.projectId);
+            if(!Strings.isNullOrEmpty(postUser.userId)){
+                myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID =? where PROJECT_POST=? and PM_PRJ_ID=?", postUser.userId, postUser.postName, editObj.projectId);
+            }
         }
     }
 
