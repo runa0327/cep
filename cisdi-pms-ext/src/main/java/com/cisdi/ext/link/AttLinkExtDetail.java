@@ -1,10 +1,13 @@
 package com.cisdi.ext.link;
 
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -288,4 +291,121 @@ public class AttLinkExtDetail {
             attLinkResult.attMap.put("CONTACT_MOBILE_ONE", linkedAtt);
         }
     }
+
+    /**
+     * 流程明细表获取合同费用明细信息
+     * @param attLinkResult 返回的集合
+     * @param sevId 实体视图id
+     * @param myJdbcTemplate 数据源
+     * @param attValue 属性联动值
+     * @return 值
+     */
+    public static void getOrderPayDetail(AttLinkResult attLinkResult, String sevId, MyJdbcTemplate myJdbcTemplate, String attValue) {
+        Map<String,Object> map = getViewPayMap(sevId);
+        String viewId = (String) map.get("viewId");
+        Boolean createTable = (Boolean) map.get("createTable");
+
+        List<LinkedRecord> linkedRecordList = new ArrayList<>();
+        String sql = "select AMT_ONE,AMT_THREE,AMT_TWO,COST_TYPE_TREE_ID,FEE_DETAIL from PM_ORDER_COST_DETAIL where CONTRACT_ID = ? order by id asc";
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, attValue);
+        if (!CollectionUtils.isEmpty(list)) {
+            for (Map<String, Object> tmp : list) {
+                LinkedRecord linkedRecord = new LinkedRecord();
+                // 费用类型
+                linkedRecord.valueMap.put("COST_TYPE_TREE_ID", JdbcMapUtil.getString(tmp,"COST_TYPE_TREE_ID"));
+                linkedRecord.textMap.put("COST_TYPE_TREE_ID", JdbcMapUtil.getString(tmp,"COST_TYPE_TREE_ID"));
+                // 费用明细
+                linkedRecord.valueMap.put("FEE_DETAIL", JdbcMapUtil.getString(tmp,"FEE_DETAIL"));
+                linkedRecord.textMap.put("FEE_DETAIL", JdbcMapUtil.getString(tmp,"FEE_DETAIL"));
+                // 含税金额(元)
+                linkedRecord.valueMap.put("AMT_ONE", StringUtil.getBigDecimal(JdbcMapUtil.getString(tmp,"AMT_ONE")));
+                linkedRecord.textMap.put("AMT_ONE", JdbcMapUtil.getString(tmp,"AMT_ONE"));
+                linkedRecord.valueMap.put("AMT_FIVE", StringUtil.getBigDecimal(JdbcMapUtil.getString(tmp,"AMT_ONE")));
+                linkedRecord.textMap.put("AMT_FIVE", JdbcMapUtil.getString(tmp,"AMT_ONE"));
+                // 不含税金额(元)
+                linkedRecord.valueMap.put("AMT_TWO", StringUtil.getBigDecimal(JdbcMapUtil.getString(tmp,"AMT_TWO")));
+                linkedRecord.textMap.put("AMT_TWO", JdbcMapUtil.getString(tmp,"AMT_TWO"));
+                linkedRecord.valueMap.put("AMT_SIX", StringUtil.getBigDecimal(JdbcMapUtil.getString(tmp,"AMT_TWO")));
+                linkedRecord.textMap.put("AMT_SIX", JdbcMapUtil.getString(tmp,"AMT_TWO"));
+                // 税率(%)
+                linkedRecord.valueMap.put("AMT_THREE", StringUtil.getBigDecimal(JdbcMapUtil.getString(tmp,"AMT_THREE")));
+                linkedRecord.textMap.put("AMT_THREE", JdbcMapUtil.getString(tmp,"AMT_THREE"));
+                linkedRecordList.add(linkedRecord);
+            }
+            attLinkResult.childData.put(viewId, linkedRecordList);
+        }
+        attLinkResult.childCreatable.put(viewId, createTable);
+        attLinkResult.childClear.put(viewId, true);
+    }
+
+    /**
+     * @param sevId 实体视图id
+     * @return 费用明细实体视图对应的视图id及是否允许创建明细表
+     */
+    private static Map<String, Object> getViewPayMap(String sevId) {
+        Map<String,Object> map = new HashMap<>();
+        String viewId = "";
+        Boolean createTable = false;
+        if ("0099902212142028526".equals(sevId)){ // 资金需求计划
+            viewId = "0099952822476362402";
+        } else if ("0099902212142022303".equals(sevId)){ //补充协议
+            viewId = "0099952822476410750";
+            createTable = true;
+        } else if ("0099902212142025475".equals(sevId)){ //合同终止
+            viewId = "1628613927485190144";
+            createTable = true;
+        }
+        map.put("viewId",viewId);
+        map.put("createTable",createTable);
+        return map;
+    }
+
+    /**
+     * @param sevId 实体视图id
+     * @return 联系人明细实体视图对应的视图id
+     */
+    private static String getViewContacts(String sevId) {
+        String viewId = "";
+        if ("0099902212142022303".equals(sevId)){ //补充协议
+            viewId = "0099952822476378742";
+        } else if ("0099902212142025475".equals(sevId)){ //合同终止
+            viewId = "1628614121601773568";
+        }
+        return viewId;
+    }
+
+    /**
+     * 流程明细表获取合同联系人明细信息
+     * @param attLinkResult 返回的数据集
+     * @param sevId 实体视图id
+     * @param myJdbcTemplate 数据源
+     * @param attValue 属性联动值
+     */
+    public static void getOrderContactsDetail(AttLinkResult attLinkResult, String sevId, MyJdbcTemplate myJdbcTemplate, String attValue) {
+            String viewId = getViewContacts(sevId);
+            List<LinkedRecord> linkedRecordList = new ArrayList<>();
+            // 查询明细信息
+            String sql1 = "select WIN_BID_UNIT_ONE,OPPO_SITE_LINK_MAN,OPPO_SITE_CONTACT from CONTRACT_SIGNING_CONTACT where PARENT_ID = ?";
+            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1, attValue);
+            if (!CollectionUtils.isEmpty(list1)) {
+                for (Map<String, Object> tmp : list1) {
+                    LinkedRecord linkedRecord = new LinkedRecord();
+                    // 相对方公司
+                    linkedRecord.valueMap.put("WIN_BID_UNIT_ONE", JdbcMapUtil.getString(tmp,"WIN_BID_UNIT_ONE"));
+                    linkedRecord.textMap.put("WIN_BID_UNIT_ONE", JdbcMapUtil.getString(tmp,"WIN_BID_UNIT_ONE"));
+                    // 相对方联系人
+                    linkedRecord.valueMap.put("OPPO_SITE_LINK_MAN", JdbcMapUtil.getString(tmp,"OPPO_SITE_LINK_MAN"));
+                    linkedRecord.textMap.put("OPPO_SITE_LINK_MAN", JdbcMapUtil.getString(tmp,"OPPO_SITE_LINK_MAN"));
+                    // 相对方联系方式
+                    linkedRecord.valueMap.put("OPPO_SITE_CONTACT", JdbcMapUtil.getString(tmp,"OPPO_SITE_CONTACT"));
+                    linkedRecord.textMap.put("OPPO_SITE_CONTACT", JdbcMapUtil.getString(tmp,"OPPO_SITE_CONTACT"));
+
+                    linkedRecordList.add(linkedRecord);
+                }
+                attLinkResult.childData.put(viewId, linkedRecordList);
+            }
+            attLinkResult.childCreatable.put(viewId, true);
+            attLinkResult.childClear.put(viewId, true);
+    }
+
 }

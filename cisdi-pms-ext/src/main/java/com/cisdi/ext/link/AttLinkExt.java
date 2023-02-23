@@ -57,7 +57,7 @@ public class AttLinkExt {
             return linkForBIDDING_NAME_ID(myJdbcTemplate, attValue, sevId);
         } else if ("CONTRACT_ID".equals(attCode)) {
             return linkForCONTRACT_ID(myJdbcTemplate, attValue, sevId,entCode);
-        } else if (("RELATION_CONTRACT_ID").equals(attCode)) {
+        } else if (("RELATION_CONTRACT_ID").equals(attCode) || "PO_ORDER_REQ_ID".equals(attCode)) { //关联合同
             return linkForRELATION_CONTRACT_ID(myJdbcTemplate, attValue,sevId,entCode);
         } else if ("GUARANTEE_ID".equals(attCode)) {
             return linkForGUARANTEE_ID(myJdbcTemplate, attValue);
@@ -597,7 +597,8 @@ public class AttLinkExt {
 //            AttLinkExtDetail.getPoOrderChange(attLinkResult,code);
 //            return attLinkResult;
 //        }
-        else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "PO_ORDER_CHANGE_REQ".equals(entCode)){ //采购合同签订申请 补充协议
+        else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)
+                || "PO_ORDER_CHANGE_REQ".equals(entCode) || "PO_ORDER_TERMINATE_REQ".equals(entCode)){ //采购合同签订申请 补充协议 合同终止
             //系统(system)，非系统(non_system)
             attLinkResult = autoLinkProject(attValue,code);
             attLinkResult = autoLinkPrjDetail(attLinkResult,attValue,code);
@@ -2203,7 +2204,7 @@ public class AttLinkExt {
                 }
             }
         }
-        else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 采购合同补充协议申请
+        else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "PO_ORDER_TERMINATE_REQ".equals(entCode)){ //采购合同签订申请 采购合同补充协议申请 合同终止
             AttLinkExtDetail.clearOrderIsStandard(attLinkResult); //清除属性联动数据
             AttLinkExtDetail.handleOrderIsStandard(attLinkResult,code);
         }
@@ -2943,49 +2944,6 @@ public class AttLinkExt {
     private AttLinkResult linkForRELATION_CONTRACT_ID(MyJdbcTemplate myJdbcTemplate, String attValue,String sevId, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
 
-        //查询明细表信息
-        //00099902212142022303采购合同补充协议申请-填写项目信息及关联合同信息;00099902212142028526资金需求计划申请-发起 实体视图id
-        if ("0099902212142028526".equals(sevId) || "0099902212142022303".equals(sevId)){
-            String viewId = "";
-            Boolean createTable = false;
-            if ("0099902212142028526".equals(sevId)){
-                viewId = "0099952822476362402";
-            } else if ("0099902212142022303".equals(sevId)){
-                viewId = "0099952822476410750";
-                createTable = true;
-            }
-            List<LinkedRecord> linkedRecordList = new ArrayList<>();
-            // 查询明细信息
-//            String sql = "select TOTAL_AMT,COST_TYPE_TREE_ID,FEE_DETAIL,AMT from PM_ORDER_COST_DETAIL where CONTRACT_ID = ? order by id asc";
-            String sql = "select AMT_ONE,AMT_THREE,AMT_TWO,COST_TYPE_TREE_ID,FEE_DETAIL from PM_ORDER_COST_DETAIL where CONTRACT_ID = ? order by id asc";
-            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, attValue);
-            if (!CollectionUtils.isEmpty(list)) {
-                for (Map<String, Object> tmp : list) {
-                    LinkedRecord linkedRecord = new LinkedRecord();
-
-                    // 费用类型
-                    linkedRecord.valueMap.put("COST_TYPE_TREE_ID", JdbcMapUtil.getString(tmp,"COST_TYPE_TREE_ID"));
-                    linkedRecord.textMap.put("COST_TYPE_TREE_ID", JdbcMapUtil.getString(tmp,"COST_TYPE_TREE_ID"));
-                    // 费用明细
-                    linkedRecord.valueMap.put("FEE_DETAIL", JdbcMapUtil.getString(tmp,"FEE_DETAIL"));
-                    linkedRecord.textMap.put("FEE_DETAIL", JdbcMapUtil.getString(tmp,"FEE_DETAIL"));
-                    // 含税金额(元)
-                    linkedRecord.valueMap.put("AMT_ONE", StringUtil.getBigDecimal(JdbcMapUtil.getString(tmp,"AMT_ONE")));
-                    linkedRecord.textMap.put("AMT_ONE", JdbcMapUtil.getString(tmp,"AMT_ONE"));
-                    // 不含税金额(元)
-                    linkedRecord.valueMap.put("AMT_TWO", StringUtil.getBigDecimal(JdbcMapUtil.getString(tmp,"AMT_TWO")));
-                    linkedRecord.textMap.put("AMT_TWO", JdbcMapUtil.getString(tmp,"AMT_TWO"));
-                    // 税率(%)
-                    linkedRecord.valueMap.put("AMT_THREE", StringUtil.getBigDecimal(JdbcMapUtil.getString(tmp,"AMT_THREE")));
-                    linkedRecord.textMap.put("AMT_THREE", JdbcMapUtil.getString(tmp,"AMT_THREE"));
-                    linkedRecordList.add(linkedRecord);
-                }
-                attLinkResult.childData.put(viewId, linkedRecordList);
-            }
-            attLinkResult.childCreatable.put(viewId, createTable);
-            attLinkResult.childClear.put(viewId, true);
-        }
-
         // 根据id查询招投标信息
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select CONTACT_MOBILE_ONE,AD_USER_ID,YES_NO_THREE,GUARANTEE_LETTER_TYPE_IDS,IS_REFER_GUARANTEE_ID,PLAN_TOTAL_DAYS," +
                 "CONTRACT_CATEGORY_ONE_ID,FILE_ID_FIVE,WIN_BID_UNIT_ONE,AMT_ONE,WINNING_BIDS_AMOUNT,BUY_TYPE_ID,BID_CTL_PRICE_LAUNCH,BUY_MATTER_ID," +
@@ -2996,6 +2954,16 @@ public class AttLinkExt {
             throw new BaseException("合同相关属性不完善！");
         }
         Map row = list.get(0);
+
+        //查询明细表信息
+        if ("0099902212142025475".equals(sevId) || "0099902212142022303".equals(sevId)){ //0099902212142025475(合同终止) 0099902212142022303(补充协议)
+            //流程明细表获取合同费用明细信息
+            AttLinkExtDetail.getOrderPayDetail(attLinkResult,sevId,myJdbcTemplate,attValue);
+            AttLinkExtDetail.getOrderContactsDetail(attLinkResult,sevId,myJdbcTemplate,attValue);
+        } else if ("0099902212142028526".equals(sevId)){ //00099902212142028526资金需求计划申请(资金需求计划申请)
+            //流程明细表获取合同费用明细信息
+            AttLinkExtDetail.getOrderPayDetail(attLinkResult,sevId,myJdbcTemplate,attValue);
+        }
 
         // 签订公司
         {
@@ -3249,38 +3217,6 @@ public class AttLinkExt {
                 getFileInfoList(linkedAtt);
                 attLinkResult.attMap.put("CONTRACT_FILE_GROUP_ID", linkedAtt);
             }
-        }
-        //查询联系人明细表信息
-        //99902212142022303采购合同补充协议申请-填写项目信息及关联合同信息
-        if ("0099902212142022303".equals(sevId)){
-            String viewId = "";
-            if ("0099902212142022303".equals(sevId)){
-                viewId = "0099952822476378742";
-            }
-            List<LinkedRecord> linkedRecordList = new ArrayList<>();
-            // 查询明细信息
-            String sql1 = "select WIN_BID_UNIT_ONE,OPPO_SITE_LINK_MAN,OPPO_SITE_CONTACT from CONTRACT_SIGNING_CONTACT where PARENT_ID = ?";
-            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1, attValue);
-            if (!CollectionUtils.isEmpty(list1)) {
-                for (Map<String, Object> tmp : list1) {
-                    LinkedRecord linkedRecord = new LinkedRecord();
-
-                    // 相对方公司
-                    linkedRecord.valueMap.put("WIN_BID_UNIT_ONE", JdbcMapUtil.getString(tmp,"WIN_BID_UNIT_ONE"));
-                    linkedRecord.textMap.put("WIN_BID_UNIT_ONE", JdbcMapUtil.getString(tmp,"WIN_BID_UNIT_ONE"));
-                    // 相对方联系人
-                    linkedRecord.valueMap.put("OPPO_SITE_LINK_MAN", JdbcMapUtil.getString(tmp,"OPPO_SITE_LINK_MAN"));
-                    linkedRecord.textMap.put("OPPO_SITE_LINK_MAN", JdbcMapUtil.getString(tmp,"OPPO_SITE_LINK_MAN"));
-                    // 相对方联系方式
-                    linkedRecord.valueMap.put("OPPO_SITE_CONTACT", JdbcMapUtil.getString(tmp,"OPPO_SITE_CONTACT"));
-                    linkedRecord.textMap.put("OPPO_SITE_CONTACT", JdbcMapUtil.getString(tmp,"OPPO_SITE_CONTACT"));
-
-                    linkedRecordList.add(linkedRecord);
-                }
-                attLinkResult.childData.put(viewId, linkedRecordList);
-            }
-            attLinkResult.childCreatable.put(viewId, true);
-            attLinkResult.childClear.put(viewId, true);
         }
 
         return attLinkResult;
