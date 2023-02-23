@@ -5,11 +5,9 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StreamUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 流程通用扩展

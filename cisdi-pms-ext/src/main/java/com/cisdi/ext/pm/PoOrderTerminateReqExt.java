@@ -161,4 +161,130 @@ public class PoOrderTerminateReqExt {
                 .set("ORDER_PROCESS_TYPE","合同终止")
                 .exec();
     }
+
+    /**
+     * 合同终止-审批流扩展-审批通过
+     */
+    public void OrderEndFlowExtOK(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //当前节点实例id
+        String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        //定义节点状态
+        String nodeStatus = getStatus("true",nodeInstanceId,myJdbcTemplate);
+        //详细处理逻辑
+        handleCHeckData(nodeStatus,nodeInstanceId,myJdbcTemplate);
+    }
+
+    /**
+     * 合同终止-审批流扩展-审批拒绝
+     */
+    public void OrderEndFlowExtRefuse(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //当前节点实例id
+        String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        //定义节点状态
+        String nodeStatus = getStatus("false",nodeInstanceId,myJdbcTemplate);
+        //详细处理逻辑
+        handleCHeckData(nodeStatus,nodeInstanceId,myJdbcTemplate);
+    }
+
+    /**
+     * 合同终止-流程扩展处理详情逻辑
+     * @param nodeStatus 节点信息
+     * @param nodeInstanceId 节点实例id
+     * @param myJdbcTemplate 数据源
+     */
+    private void handleCHeckData(String nodeStatus, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId;
+        // 流程实例id
+        String procInstId = ExtJarHelper.procInstId.get();
+        // 当前登录人
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        String userName = ExtJarHelper.loginInfo.get().userName;
+
+        //获取审批意见信息
+        Map<String,String> message = ProcessCommon.getComment(procInstId,userId,myJdbcTemplate);
+
+        //审批意见内容
+        String file = message.get("file");
+        String comment = message.get("comment");
+
+        //分支判断
+        if ("lawyerTrue".equals(nodeStatus)){ // 6-法律审核-通过
+            //获取流程中的附件和意见信息
+            String processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_ONE");
+            String processFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_SIX");
+            //判断生成最终的意见和附件信息
+            Map<String,String> map2 = ProcessCommon.getEndComment(userId,userName,processComment,processFile,comment,file,myJdbcTemplate);
+            String newCommentStr = map2.get("comment");
+            String newCommentFile = SharedUtil.isEmptyString(map2.get("file")) ? null:map2.get("file");
+
+            Crud.from("PO_ORDER_TERMINATE_REQ").where().eq("id",csCommId).update()
+                    .set("APPROVAL_COMMENT_ONE",newCommentStr).set("FILE_ID_SIX",newCommentFile).exec();
+        } else if ("legalFinanceTrue".equals(nodeStatus)){ // 7-财务法务审核-通过
+            //判断当前登录人是法务还是财务角色 0100070673610702919-财务；0100070673610702924-法务
+            String roleId = ProcessRoleExt.getUserRole(myJdbcTemplate,userId);
+            if ("0100070673610702919".equals(roleId)){ //财务
+                //获取流程中的附件和意见信息
+                String processComment = JdbcMapUtil.getString(entityRecord.valueMap,"TEXT_REMARK_THREE");
+                String processFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_TWO");
+                //判断生成最终的意见和附件信息
+                Map<String,String> map2 = ProcessCommon.getEndComment(userId,userName,processComment,processFile,comment,file,myJdbcTemplate);
+                String newCommentStr = map2.get("comment");
+                String newCommentFile = SharedUtil.isEmptyString(map2.get("file")) ? null:map2.get("file");
+
+                Crud.from("PO_ORDER_TERMINATE_REQ").where().eq("id",csCommId).update()
+                        .set("TEXT_REMARK_FOUR",newCommentStr).set("FILE_ID_TWO",newCommentFile).exec();
+            } else { //法务
+                //获取流程中的附件和意见信息
+                String processComment = JdbcMapUtil.getString(entityRecord.valueMap,"TEXT_REMARK_THREE");
+                String processFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_THREE");
+                //判断生成最终的意见和附件信息
+                Map<String,String> map2 = ProcessCommon.getEndComment(userId,userName,processComment,processFile,comment,file,myJdbcTemplate);
+                String newCommentStr = map2.get("comment");
+                String newCommentFile = SharedUtil.isEmptyString(map2.get("file")) ? null:map2.get("file");
+
+                Crud.from("PO_ORDER_TERMINATE_REQ").where().eq("id",csCommId).update()
+                        .set("TEXT_REMARK_THREE",newCommentStr).set("FILE_ID_THREE",newCommentFile).exec();
+            }
+        } else if ("lawyerFalse".equals(nodeStatus)){ //法律拒绝
+            Crud.from("PO_ORDER_TERMINATE_REQ").where().eq("id",csCommId).update()
+                    .set("APPROVAL_COMMENT_ONE",null).set("FILE_ID_SIX",null).exec();
+        } else if ("legalFinanceFalse".equals(nodeStatus)){ //法律拒绝
+            Crud.from("PO_ORDER_TERMINATE_REQ").where().eq("id",csCommId).update()
+                    .set("TEXT_REMARK_FOUR",null).set("FILE_ID_TWO",null)
+                    .set("TEXT_REMARK_THREE",null).set("FILE_ID_THREE",null)
+                    .exec();
+        }
+    }
+
+    /**
+     * 节点审批通过状态
+     * @param status 状态码
+     * @param nodeInstanceId 节点实例id
+     * @param myJdbcTemplate 数据源
+     * @return 节点审批状态码
+     */
+    private String getStatus(String status, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
+        //根据节点实例id查询流程节点id
+        String sql = "select WF_NODE_ID from wf_node_instance where id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,nodeInstanceId);
+        String nodeId = JdbcMapUtil.getString(list.get(0),"WF_NODE_ID");
+        String name = "";
+        if ("true".equals(status)){
+            if ("1628588141483012096".equals(nodeId)){ // 6-法律审核
+                name = "lawyerTrue";
+            } else if ("1628588141323628544".equals(nodeId)){ // 7-财务法务审核
+                name = "legalFinanceTrue";
+            }
+        } else if ("false".equals(status)){
+            if ("1628588141483012096".equals(nodeId)){ // 6-法律审核
+                name = "lawyerFalse";
+            } else if ("1628588141323628544".equals(nodeId)){ // 7-财务法务审核
+                name = "legalFinanceFalse";
+            }
+        }
+        return name;
+    }
 }

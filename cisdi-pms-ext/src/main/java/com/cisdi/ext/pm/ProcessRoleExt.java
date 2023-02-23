@@ -35,6 +35,22 @@ public class ProcessRoleExt {
         return userId;
     }
 
+    /**
+     * 查询人员是法务还是财务
+     * @param myJdbcTemplate 数据源
+     * @param userId 人员id
+     * @return 角色id（0100070673610702919-财务；0100070673610702924-法务）
+     */
+    public static String getUserRole(MyJdbcTemplate myJdbcTemplate, String userId) {
+        String sql = "select AD_ROLE_ID from ad_role_user where AD_USER_ID = ? and AD_ROLE_ID in ('0100070673610702924','0100070673610702919')";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,userId);
+        if (!CollectionUtils.isEmpty(list)){
+            return JdbcMapUtil.getString(list.get(0),"AD_ROLE_ID");
+        } else {
+            throw new BaseException("未查询到该用户角色信息，请联系管理员配置");
+        }
+    }
+
     /** 招标文件审批流程获取所有经办人信息 **/
     public void bidDocProcess(){
         String process = "bidDoc";
