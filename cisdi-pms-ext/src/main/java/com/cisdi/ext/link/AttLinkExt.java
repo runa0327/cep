@@ -476,18 +476,6 @@ public class AttLinkExt {
         // contract_signing=合同签订;contract_change=合同变更
         if ("PO_ORDER_CHANGE_REQ".equals(entCode)){//合同变更（合同需求审批） 选择合同签订时，隐藏合同名称、变更类型项
             if ("contract_signing".equals(code)){//选择合同签订
-                //合同名称
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = null;
-                    linkedAtt.text = null;
-                    linkedAtt.changeToMandatory = false;
-                    linkedAtt.changeToShown = false;
-                    linkedAtt.changeToEditable = false;
-                    attLinkResult.attMap.put("CONTRACT_NAME",linkedAtt);
-                }
-
                 //变更类型
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
@@ -501,18 +489,6 @@ public class AttLinkExt {
                 }
             }
             if ("contract_change".equals(code)){ //选择合同变更
-                //合同名称
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = null;
-                    linkedAtt.text = null;
-                    linkedAtt.changeToMandatory = true;
-                    linkedAtt.changeToShown = true;
-                    linkedAtt.changeToEditable = true;
-                    attLinkResult.attMap.put("CONTRACT_NAME",linkedAtt);
-                }
-
                 //变更类型
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();

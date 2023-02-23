@@ -1,5 +1,6 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
@@ -10,6 +11,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -665,5 +667,30 @@ public class ProcessRoleExt {
         } else {
             throw new BaseException("未找到对应的合同签订联系人，请选择对应联系人或联系管理员处理！");
         }
+    }
+
+    /**
+     * 根据流程实例id查询该流程已经审批过的人员
+     * @param processInstanceId 流程实例id
+     * @param nodeId 节点id
+     * @param processId 流程id
+     * @param myJdbcTemplate 数据源
+     * @return 该流程前置节点审批人
+     */
+    public static List<String> getCheckUser(String processInstanceId,String nodeId,String processId,MyJdbcTemplate myJdbcTemplate) {
+        List<String> list = new ArrayList<>();
+        //查询当前节点以前的节点
+        String sql1 = "select group_concat(id) as id from wf_node where WF_PROCESS_ID = ? and status = 'ap' and SEQ_NO < (select SEQ_NO from wf_node where WF_PROCESS_ID = ? and id = (select wf_node_id from wf_node_instance where id = ?))";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,processId,processId,nodeId);
+        if (!CollectionUtils.isEmpty(list1)){
+            String nodeIds = list1.get(0).get("id").toString();
+            nodeIds = StringUtil.replaceCode(nodeIds,",","','");
+            String sql2 = "SELECT DISTINCT a.ad_user_id from wf_task a left join wf_node_instance b on a.wf_node_instance_id = b.id  where a.status = 'ap' and a.IS_CLOSED = 1 and b.wf_node_id in ('"+nodeIds+"') and b.WF_PROCESS_INSTANCE_ID = ? and b.status = 'ap'";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,processInstanceId);
+            if (!CollectionUtils.isEmpty(list2)){
+                list = list2.stream().map(p->JdbcMapUtil.getString(p,"ad_user_id")).collect(Collectors.toList());
+            }
+        }
+        return list;
     }
 }

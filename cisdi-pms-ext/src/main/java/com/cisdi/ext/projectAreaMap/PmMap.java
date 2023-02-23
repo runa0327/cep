@@ -4,6 +4,7 @@ import com.cisdi.ext.demostration.ProjectInfoTemp;
 import com.cisdi.ext.demostration.ProjectMapTemp;
 import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.JsonUtil;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -125,14 +126,25 @@ public class PmMap {
      */
     public void getMapProject() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pp.PM_PRJ_ID as PM_PRJ_ID,pp.LONGITUDE as LONGITUDE,pp.LATITUDE as LATITUDE,pj.`NAME` as `NAME` ,gsv.`NAME` as projectType " +
-                "from PM_MAP pp left join pm_prj pj on pp.PM_PRJ_ID = pj.id left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID where pj.id is not null");
-        List<Project> projectList = list.stream().map(p -> {
+//        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pp.PM_PRJ_ID as PM_PRJ_ID,pp.LONGITUDE as LONGITUDE,pp.LATITUDE as LATITUDE,pj.`NAME` as `NAME` ,gsv.`NAME` as projectType " +
+//                "from PM_MAP pp left join pm_prj pj on pp.PM_PRJ_ID = pj.id left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID where pj.id is not null");
+        List<Map<String, Object>> orgPrjList = myJdbcTemplate.queryForList("select pp.PM_PRJ_ID,pj.NAME,gsv.NAME as projectType,pj.PRJ_MANAGE_MODE_ID modeId,gv.name modeName\n" +
+                "from prj_parcel pp left join pm_prj pj on pp.PM_PRJ_ID = pj.id \n" +
+                "left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID\n" +
+                "left join gr_set_value gv on gv.id = pj.PRJ_MANAGE_MODE_ID\n" +
+                "where pj.id is not null\n" +
+                "group by pp.PM_PRJ_ID");
+
+        List<Map<String, Object>> orgCoordinateList = myJdbcTemplate.queryForList("select p.CENTER_LONGITUDE centerLongitude,CENTER_LATITUDE centerLatitude,pp.PM_PRJ_ID prjId from parcel p left join prj_parcel pp on pp.PARCEL_ID = p.id where CENTER_LATITUDE is not null and CENTER_LATITUDE is not null");
+
+        List<Project> projectList = orgPrjList.stream().map(p -> {
             Project project = new Project();
             project.projectId = JdbcMapUtil.getString(p, "PM_PRJ_ID");
             project.projectName = JdbcMapUtil.getString(p, "NAME");
-            project.longitude = JdbcMapUtil.getString(p, "LONGITUDE");
-            project.latitude = JdbcMapUtil.getString(p, "LATITUDE");
+//            project.longitude = JdbcMapUtil.getString(p, "LONGITUDE");
+//            project.latitude = JdbcMapUtil.getString(p, "LATITUDE");
+            project.modeId = JdbcMapUtil.getString(p,"modeId");
+            project.modeName = JdbcMapUtil.getString(p,"modeName");
             String type = JdbcMapUtil.getString(p, "projectType");
             if ("民用建筑".equals(type)) {
                 project.projectType = "房建";
@@ -141,6 +153,16 @@ public class PmMap {
             } else {
                 project.projectType = "其他";
             }
+            //封装中心点（可能多个）
+            List<List<BigDecimal>> centerCoordinates = orgCoordinateList.stream()
+                    .filter(c -> String.valueOf(c.get("prjId")).equals(project.projectId))
+                    .map(c -> {
+                        List<BigDecimal> coordinate = new ArrayList<>();
+                        coordinate.add(new BigDecimal(c.get("centerLongitude").toString()));
+                        coordinate.add(new BigDecimal(c.get("centerLatitude").toString()));
+                        return coordinate;
+                    }).collect(Collectors.toList());
+            project.coordinates = centerCoordinates;
             return project;
         }).collect(Collectors.toList());
         OutSide outSide = new OutSide();
@@ -220,9 +242,7 @@ public class PmMap {
         } else {
             sb.append(" and gsv.`NAME` = '市政道路'");
         }
-        String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
-        sb.append(" limit ").append(start).append(",").append(pageSize);
 
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
         List<ProjectInfo> res = list.stream().map(p -> {
@@ -257,11 +277,12 @@ public class PmMap {
                 return info;
             }).collect(Collectors.toList());
             result.addAll(res);
-
-            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
+            List<ProjectInfo> pageList = result.stream().skip(start).limit(pageSize).collect(Collectors.toList());
+//            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
             OutSide outSide = new OutSide();
-            outSide.res = result;
-            outSide.total = totalList.size();
+            outSide.res = pageList;
+//            outSide.total = totalList.size();
+            outSide.total = result.size();
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
@@ -271,8 +292,11 @@ public class PmMap {
     public static class Project {
         public String projectId;
         public String projectName;
-        public String longitude;
-        public String latitude;
+        public String modeId;
+        public String modeName;
+//        public String longitude;
+//        public String latitude;
+        public List<List<BigDecimal>> coordinates;
 
         public String status;
 

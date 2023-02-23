@@ -37,7 +37,7 @@ public class ContractAccount {
         List<String> rootUsers = this.getRootUsers();
         RequestParam requestParam = this.getRequestParam();
         StringBuffer sb = new StringBuffer();
-        sb.append("SELECT o.id,IFNULL(o.PM_PRJ_ID,p2.id) prjId,IFNULL(p.name,o.PROJECT_NAME_WR) prjName,o.CONTRACT_NAME contractName,o" +
+        sb.append("SELECT o.DATE_FIVE as expireDate,o.id,IFNULL(o.PM_PRJ_ID,p2.id) prjId,IFNULL(p.name,o.PROJECT_NAME_WR) prjName,o.CONTRACT_NAME contractName,o" +
                 ".CUSTOMER_UNIT_ONE contractCompanyId,pa.name contractCompanyName,temp.cooperationUnit,o.CONTRACT_CATEGORY_ONE_ID " +
                 "contractCategoryId,va.name contractCategoryName,o.AMT_THREE amtExcludeTax,o.AMT_FOUR taxRate,o.AMT_TWO amtIncludeTax,o.SIGN_DATE " +
                 "createTime,i.END_DATETIME endTime,o.REMARK_LONG_ONE remark,o.CRT_USER_ID userId,u.name userName,o.FILE_ID_FIVE fileIds\n" +
@@ -81,6 +81,9 @@ public class ContractAccount {
         }
         if (Strings.isNotEmpty(requestParam.userId)){
             sb.append(" and o.CRT_USER_ID = '").append(requestParam.userId).append("'");
+        }
+        if (Strings.isNotEmpty(requestParam.expireDate)){
+            sb.append(" and o.DATE_FIVE = '").append(requestParam.expireDate).append("'");
         }
         //查询项目权限
 //        List<Map<String, Object>> projectUserList = myJdbcTemplate.queryForList("select PM_PRJ_ID,USER_IDS from pm_dept");
@@ -193,6 +196,8 @@ public class ContractAccount {
         public String createTimeEnd;
         //经办人
         public String userId;
+        //到期日期
+        public String expireDate;
     }
 
     /**
@@ -232,6 +237,8 @@ public class ContractAccount {
         public String userName;
         //合同盖章版文件
         public List<File> files;
+        //到期日期
+        public String expireDate;
 
     }
 

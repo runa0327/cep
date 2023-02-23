@@ -21,7 +21,7 @@ spring:
     #演示：
 #    url: jdbc:mysql://121.5.65.165:3306/demo?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
     # 正式：
-    # url: jdbc:mysql://124.222.58.152:3306/prod?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+#    url: jdbc:mysql://124.222.58.152:3306/prod?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
     #    type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
   cloud:
@@ -66,7 +66,10 @@ qygly:
       userEmail:
       # 经RSA公钥加密后的用户密码：
       # 密码123456、验证码7890对应的密码：
-      userPsd: Cyybrrs7bGko/drYdJtrkr6QtDdEuCw3Yqhr27h3yk1u9wjcuvyFr9IRYSuIQSFNX9DC71Ek6EJEIif+RMvTq4szxZ/Orj97Rk3bDBqFH1QTN9aRQxpzVRYLtfTo3UbUsMx4jbGeymHjUli+qTC5nlqQALYuGaUTNxjd9p+CkZQ=
+      #正式
+#      userPsd: Ldw58k5ZboUoLtaWVYsN6eC1dgkzlK/GQx0dICPqffh2rDliLsUH3pB08hz2rg3RWy0PjNNo0FMHw7xuHx8qzptfRe9oeEpZ1l2VcxEProUDU/IdFGEuFyonGhy8u5CMrqg5EfMTxVvA/K/SoCpjCw3+dAnA0Nj5ZCQVsz3iOho=
+      #测试
+      userPsd: c/ZSy1090v9uGKj2uzNYgaND/T/fnxCy3nOK8gXwM87DV5SBSPtSECq+DKN4x2aBbZT3KtyCBoxS0A06crd4EeUlprtDYrtTf6lS4HDDY3bhkBQznLtnTiSm840f6sFbqwoQ4TvlMshPPFyRkBcXJL0gut+xboLmjjX0wmmFWVQ=
       valiCodeReqKey: ABCDEFGHIJKLMNOPQRSTUVWXYZ123456
       valiCode: 7890
       orgCode: test
@@ -136,3 +139,14 @@ jodconverter:
     max-tasks-per-process: 10
     #每个 JODConverter 处理线程使用的端口列表，以逗号分隔。 office实例数等于端口数，因为每个端口号将启动 1个 office 进程。
     port-numbers: 8303
+
+# 历史数据
+history-data:
+  #合同文件路径前缀
+  contract-path-prefix: C:\Users\11376\Desktop\合约模板\20230217
+  #请求地址(测试)
+  requestPath: http://139.159.138.11:9090/qygly-api/qygly-gateway/qygly-file/uploadFile
+  #文件上传参数
+  sevId: "0099799190825106248"
+  fileGroupAttCode: FILE_ID_FIVE
+  erId:

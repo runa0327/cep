@@ -1,22 +1,22 @@
-package com.pms.cisdipmswordtopdf.serviceImpl;
+package com.cisdi.pms.job.serviceImpl;
 
 import cn.hutool.core.util.IdUtil;
 import com.artofsolving.jodconverter.DocumentConverter;
 import com.artofsolving.jodconverter.openoffice.connection.OpenOfficeConnection;
 import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConnection;
 import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConverter;
+import com.cisdi.pms.job.domain.PoOrderReq;
+import com.cisdi.pms.job.service.WordToPdfService;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
-import com.pms.cisdipmswordtopdf.api.PoOrderReq;
-import com.pms.cisdipmswordtopdf.service.WordToPdfService;
-import com.pms.cisdipmswordtopdf.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import com.cisdi.pms.job.utils.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -241,7 +241,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         String error = "";
         try {
             //如果是远程调用，使用0.0.0.0。本机调试使用127.0.0.1
-            OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8200);
+            OpenOfficeConnection connection = new SocketOpenOfficeConnection("127.0.0.1",8100);
 //            OpenOfficeConnection connection = new SocketOpenOfficeConnection("0.0.0.0",8100);
             connection.connect();
             File inputFile = new File(wordPath);

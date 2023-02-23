@@ -5,6 +5,7 @@ import com.alibaba.excel.ExcelReader;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.read.metadata.ReadSheet;
+import com.google.common.base.Strings;
 import com.qygly.shared.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -82,7 +83,12 @@ public class EasyExcelUtil {
             public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
                 //获取每个表的第一行作为标题，并作为sheet页的名字
                 if (context.readRowHolder().getRowIndex() == 0) {
-                    headNames.add(headMap.get(0));
+                    for (Integer columnIndex : headMap.keySet()) {
+                        if (!Strings.isNullOrEmpty(headMap.get(columnIndex))){
+                            headNames.add(headMap.get(columnIndex));
+                            break;
+                        }
+                    }
                 }
             }
         };
@@ -93,10 +99,12 @@ public class EasyExcelUtil {
         for (int i = 0; i < sheets.size(); i++) {
             ReadSheet readSheet = sheets.get(i);
             reader.read(readSheet);
+            if (i >= headNames.size()){
+                break;
+            }
             String headName = headNames.get(i);
             List<T> rows = listener.getRows();
-            List<T> data = new ArrayList<>();
-            data.addAll(rows);
+            List<T> data = new ArrayList<>(rows);//避免引用传递
             sheetData.put(headName, data);
             listener.getRows().clear();
         }

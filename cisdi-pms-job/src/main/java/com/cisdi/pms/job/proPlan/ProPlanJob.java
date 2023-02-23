@@ -36,7 +36,6 @@ public class ProPlanJob {
 
 
     @Scheduled(fixedDelayString = "${spring.scheduled.fixedDelayString}")
-//    @Scheduled(cron = "0 */1 * * * ?")
     @Async("taskExecutor")
     public void invokeRefreshProNodeStatus() {
         // 未自动登录前不要执行：
@@ -50,15 +49,12 @@ public class ProPlanJob {
         AtomicInteger index = new AtomicInteger(0);
         dataList.forEach(item -> {
             log.info("定时刷新进度计划状态线程运行--------------------当前进程第" + index.getAndIncrement() + "个");
-            List<String> ids = item.stream().map(m -> JdbcMapUtil.getString(m, "ID")).collect(Collectors.toList());
-            List<Integer> vers = item.stream().map(m -> Integer.parseInt(JdbcMapUtil.getString(m, "VER"))).collect(Collectors.toList());
             taskExecutor.execute(() -> {
                 InvokeActParam invokeActParam = new InvokeActParam();
                 invokeActParam.sevId = "0099799190825090826";
                 invokeActParam.actId = "0099902212142027478";
                 invokeActParam.isPreChk = false;
-                invokeActParam.idList = ids;
-                invokeActParam.verList = vers;
+                invokeActParam.valueMapList = item;
                 RespBody<InvokeActResult> respBody = dataFeignClient.invokeAct(invokeActParam);
                 if (respBody.succ) {
                     log.info("成功！");
