@@ -366,6 +366,31 @@ public class PmRosterExt {
     }
 
 
+    /**
+     * 查询项目岗位人员
+     */
+    public void getPostUserByPrj(){
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_ROSTER where PM_PRJ_ID=?", map.get("projectId"));
+        List<PostUser> postUserList = list.stream().map(p->{
+            PostUser user = new PostUser();
+            user.postName = JdbcMapUtil.getString(p,"PROJECT_POST");
+            user.userId = JdbcMapUtil.getString(p,"AD_USER_ID");
+            return user;
+        }).collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(postUserList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.postUserList = postUserList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+
     private List<DeptUserTree> getChildren(DeptUserTree parent, List<DeptUserTree> allData) {
         return allData.stream().filter(p -> parent.id.equals(p.pid)).peek(m -> {
             List<DeptUserTree> children = this.getChildren(m, allData);
@@ -409,6 +434,8 @@ public class PmRosterExt {
         public List<String> strList;
 
         public List<ProjectInfo> projectInfoList;
+
+        public List<PostUser> postUserList;
     }
 
 
