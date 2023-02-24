@@ -1,6 +1,7 @@
 package com.cisdi.ext.wf;
 
 import com.cisdi.ext.enums.FileCodeEnum;
+import com.cisdi.ext.link.AttLinkDifferentProcess;
 import com.cisdi.ext.model.PmFundReqPlan;
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.util.ProFileUtils;
@@ -85,6 +86,9 @@ public class WfExt {
                     userName = JdbcMapUtil.getString(list0.get(0),"userName");
                 }
 
+                //需要自定义标题的流程
+                List<String> tableList = AttLinkDifferentProcess.getTableList();
+
                 // 审批流审批通过
                 if ("AP".equals(newStatus)) {
                     Format formatCount = new DecimalFormat("0000");
@@ -108,7 +112,6 @@ public class WfExt {
 
                     // 合同签订批准后生成合同编号
                     if ("PO_ORDER_REQ".equals(entityCode) || "po_order_req".equals(entityCode)) {
-
                         // 查询当前已审批通过的招标合同数量
                         List<Map<String, Object>> map = myJdbcTemplate.queryForList("select count(*) as num from " +
                                 "PO_ORDER_REQ where status = 'AP' ");
@@ -154,11 +157,9 @@ public class WfExt {
                                 "prj.name ,'-',u.name,'-',pi.START_DATETIME)", csCommId);
                     }
 
-                    // 通用方法。流程审批完后将流程名称写入该流程表名称字段
-                    List<String> nameList = getTableList();
                     // 特殊流程，名称在流程发起时即生成，此处不生成
                     List<String> specialList = getSpecialList();
-                    if (nameList.contains(entityCode)) {
+                    if (tableList.contains(entityCode)) {
                         if (specialList.contains(entityCode)){
                             continue;
                         } else if ("PM_PRJ_REQ".equals(entityCode)) {
@@ -272,7 +273,9 @@ public class WfExt {
                         processName = urgent + processName;
                     }
 
-                    List<String> tableList = getTableList();
+                    //合同流程标题规则
+                    List<String> orderNameTable = AttLinkDifferentProcess.getOrderProcessName();
+
                     if (!CollectionUtils.isEmpty(tableList)) {
                         if (tableList.contains(entityCode)) {
                             // 流程名称按规定创建
@@ -314,7 +317,7 @@ public class WfExt {
                                 }
                                 update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
                                 return;
-                            }  else if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode) || "PO_ORDER_CHANGE_REQ".equals(entityCode)){ //补充协议/合同需求审批 流程标题规则
+                            }  else if (orderNameTable.contains(entityCode)){ //补充协议/合同需求审批/合同终止 流程标题规则
                                 otherName = getContractName(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
                                 name = concatProcessName("-",processName,projectName,otherName,userName,nowDate);
                                 update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
@@ -1296,84 +1299,6 @@ public class WfExt {
             //备案回执
             ProFileUtils.insertProFile(prjId,JdbcMapUtil.getString(valueMap,"ATT_FILE_GROUP_ID"),FileCodeEnum.MANAGEMENT_FILING_RECEIPT);
         }
-    }
-
-    private List<String> getTableList() {
-        List<String> list = new ArrayList<>();
-        list.add("PM_PRJ_REQ"); // 立项申请
-        list.add("PM_PRJ_INVEST1"); // 可研估算
-        list.add("PM_PRJ_INVEST2"); // 初设概算
-        list.add("PM_PRJ_INVEST3"); // 预算财评
-        list.add("PM_STABLE_EVAL"); // 社会稳定性评价
-        list.add("PM_ENERGY_EVAL"); // 固定资产投资节能评价
-        list.add("PM_WATER_PLAN"); // 水保方案
-        list.add("PM_ENVIRONMENT_EVAL"); // 环评
-        list.add("PO_ORDER_REQ"); // 采购合同签订申请
-        list.add("PO_PUBLIC_BID_REQ"); // 采购公开招标申请
-        list.add("PM_CONSTRUCT_PERMIT_REQ"); // 施工许可
-        list.add("PM_PRJ_PLANNING_PERMIT_REQ"); // 工程规划许可
-        list.add("PO_GUARANTEE_LETTER_REQUIRE_REQ"); // 新增保函申请
-        list.add("PO_GUARANTEE_LETTER_RETURN_OA_REQ"); // 保函退还申请
-        list.add("PO_ORDER_SUPPLEMENT_REQ"); // 采购合同补充协议申请
-        list.add("PO_ORDER_TERMINATE_REQ"); // 采购合同终止申请
-        list.add("PO_ORDER_CHANGE_REQ"); // 采购合同变更申请
-        list.add("PM_PRJ_PARTY_REQ"); // 五方责任主体维护申请
-        list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
-        list.add("PM_PRJ_KICK_OFF_REQ"); // 工程开工申请
-        list.add("PM_FUND_REQUIRE_PLAN_REQ"); // 资金需求计划申请
-        list.add("PO_ORDER_PAYMENT_REQ"); // 采购合同付款申请
-        list.add("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD"); // 技术交底与图纸会审记录
-        list.add("PM_CONCEPTUAL_SCHEME_DESIGN"); // 概念方案设计管理
-        list.add("PM_CONSTRUCTION_DRAWING_DESIGN"); // 施工图设计管理
-        list.add("PM_DESIGN_ASSIGNMENT"); // 方案设计管理
-        list.add("PM_DESIGN_ASSIGNMENT_BOOK"); // 设计任务书
-        list.add("PM_FARMING_PROCEDURES"); // 农转用手续办理
-        list.add("PM_WOODLAND_PROCEDURES"); // 林地调整办理手续
-        list.add("PM_LAND_USE_REQ"); // 用地规划许可
-        list.add("PM_LAND_EXAMINE_REQ"); // 征地调查
-        list.add("PM_LAND_CERTIFICATE"); // 土地证办理
-        list.add("PM_TOPSOIL_STRIPPING_REQ"); // 耕作层剥离
-        list.add("PM_LAND_ALLOCATION_REQ"); // 土地划拨
-        list.add("PM_TENDER_VERIFICATION"); // 招核标准
-        list.add("PM_DEFENSE_PLAN_REQ"); // 人防规划报建
-        list.add("PM_DEFENSE_BUILD_REQ"); // 人防施工报建
-        list.add("PM_TERMITE_CONTROL_REQ"); // 白蚁防治
-        list.add("PM_NATIONAL_BUILD_REQ"); // 国安报建
-        list.add("PM_MATERIAL_EXIT"); // 材料退场
-        list.add("MATERIAL_EQUIPMENT_ENTER_CHECK"); // 工程材料设备进场验收
-        list.add("MATERIAL_EQUIPMENT_BRAND_APPROVAL"); // 工程材料设备及品牌报审
-        list.add("PM_BUILD_ORGAN_PLAN_REQ"); // 施工组织设计及施工方案
-        list.add("PM_BUILD_PROGRESS_REQ"); // 施工进度计划
-        list.add("PM_WORK_LIST_REQ"); // 工作联系单
-        list.add("CONTRACT_BRAND_CHANGE_APPLICATION"); // 合同品牌变更申请
-        list.add("SCIENTIFIC_MATERIAL_CHECK"); // 科研材料设备进场验收
-        list.add("PROJECT_QUALITY_INSPECTION"); // 工程质量检查
-        list.add("QUALITY_RECORD"); // 质量交底记录
-        list.add("COMPLETION_PRE_ACCEPTANCE"); // 竣工预验收
-        list.add("EXPENSE_CLAIM_APPROVAL"); // 费用索赔报审表
-        list.add("PROJECT_CLAIM_NOTICE"); // 工程索赔通知书
-        list.add("APPROVAL_INSPECTION"); // 报审、报验
-        list.add("PM_CONTROL_FLOOD_REQ"); // 防洪评价
-        list.add("PM_TRAFFIC_SAFETY_REQ"); // 交通安全评价
-        list.add("APPROVAL_WITH_SEAL"); // 用章审批
-        list.add("PM_DESIGN_CHANGE_REQ"); // 设计变更
-        list.add("PM_SEND_APPROVAL_REQ"); // 发文呈批表
-        list.add("PM_SUPERVISE_NOTICE_REQ"); // 监理通知单
-        list.add("PM_SUPERVISE_NOTICE_REPLY_REQ"); // 监理通知回复单
-        list.add("PM_START_ORDER_REQ"); // 开工令
-        list.add("PM_BUY_DEMAND_REQ"); // 采购需求审批
-        list.add("PM_BID_APPROVAL_REQ"); // 招标文件审批
-        list.add("PM_FILE_CHAPTER_REQ"); // 标前资料用印审批
-        list.add("PM_USE_CHAPTER_REQ"); // 中选单位及标后用印审批
-        list.add("PM_BID_KEEP_FILE_REQ"); // 招采项目备案及归档
-        list.add("PM_PRJ_STOP_ORDER_REQ"); // 工程暂停令
-        list.add("COMPLETION_ACCEPTANCE_COMMENTS"); // 竣工联合验收意见
-        list.add("SUBCONTRACTOR_QUALIFICATION_REPORT"); // 分包单位资质报审
-        list.add("PM_PRJ_RESTART_ORDER_REQ"); // 工程复工令
-        list.add("PM_PRJ_RESTART_TRIAL_REQ"); // 工程复工报审表
-        list.add("BID_PROCESS_MANAGE"); // 招标过程管理
-        list.add("PIPELINE_RELOCATION_REQ"); // 管线迁改
-        return list;
     }
 
 
