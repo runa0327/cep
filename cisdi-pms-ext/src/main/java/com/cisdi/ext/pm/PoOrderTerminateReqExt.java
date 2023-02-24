@@ -327,18 +327,18 @@ public class PoOrderTerminateReqExt {
             for (Map<String, Object> tmp : list) {
                 String detailId = JdbcMapUtil.getString(tmp,"id");
                 //含税金额
-                BigDecimal shuiAmt = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_ONE"));
+                BigDecimal shuiAmt = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_FIVE"));
                 //税率
                 BigDecimal shuiLv = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_THREE")).divide(new BigDecimal(100));
                 //不含税金额
                 BigDecimal noShuiAmt = shuiAmt.divide(shuiLv.add(new BigDecimal(1)),2, RoundingMode.HALF_UP);
-                myJdbcTemplate.update("update CONTRACT_END_PAY set AMT_TWO=? where id = ?",noShuiAmt,detailId);
-                tmp.put("AMT_TWO",noShuiAmt);
+                myJdbcTemplate.update("update CONTRACT_END_PAY set AMT_SIX=? where id = ?",noShuiAmt,detailId);
+                tmp.put("AMT_SIX",noShuiAmt);
             }
             //含税总金额
-            BigDecimal amtShui = getSumAmtBy(list,"AMT_ONE");
+            BigDecimal amtShui = getSumAmtBy(list,"AMT_FIVE");
             //不含税总金额
-            BigDecimal amtNoShui = getSumAmtBy(list,"AMT_TWO");
+            BigDecimal amtNoShui = getSumAmtBy(list,"AMT_SIX");
             //税率
             BigDecimal shuiLv = getShuiLv(list,"AMT_THREE");
             //更新合同表合同总金额数
