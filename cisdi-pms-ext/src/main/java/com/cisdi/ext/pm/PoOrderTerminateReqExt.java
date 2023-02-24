@@ -11,6 +11,8 @@ import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -286,5 +288,88 @@ public class PoOrderTerminateReqExt {
             }
         }
         return name;
+    }
+
+    /**
+     * 合同终止-发起时数据校验
+     */
+    public void orderTerminateStartCheck(){
+        String status = "start";
+        processCheck(status);
+    }
+
+    /**
+     * 流程处理过程中数据校验及处理
+     * @param status 状态码
+     */
+    private void processCheck(String status) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId;
+        // 流程实例id
+        String procInstId = ExtJarHelper.procInstId.get();
+        if ("start".equals(status)){ //流程发起时数据校验
+            checkPayDetail(csCommId,myJdbcTemplate);
+        }
+    }
+
+    /**
+     * 流程发起时校验费用明细信息
+     * @param csCommId 流程业务表id
+     * @param myJdbcTemplate 数据源
+     */
+    private void checkPayDetail(String csCommId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select * from CONTRACT_END_PAY where PO_ORDER_TERMINATE_REQ_ID = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
+        if (CollectionUtils.isEmpty(list)){
+            throw new BaseException("费用明细不能为空！");
+        } else {
+            for (Map<String, Object> tmp : list) {
+                String detailId = JdbcMapUtil.getString(tmp,"id");
+                //含税金额
+                BigDecimal shuiAmt = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_ONE"));
+                //税率
+                BigDecimal shuiLv = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_THREE")).divide(new BigDecimal(100));
+                //不含税金额
+                BigDecimal noShuiAmt = shuiAmt.divide(shuiLv.add(new BigDecimal(1)),2, RoundingMode.HALF_UP);
+                myJdbcTemplate.update("update CONTRACT_END_PAY set AMT_TWO=? where id = ?",noShuiAmt,detailId);
+                tmp.put("AMT_TWO",noShuiAmt);
+            }
+            //含税总金额
+            BigDecimal amtShui = getSumAmtBy(list,"AMT_ONE");
+            //不含税总金额
+            BigDecimal amtNoShui = getSumAmtBy(list,"AMT_TWO");
+            //税率
+            BigDecimal shuiLv = getShuiLv(list,"AMT_THREE");
+            //更新合同表合同总金额数
+            String sql2 = "update PO_ORDER_TERMINATE_REQ set AMT_TWO = ?,AMT_THREE=?,AMT_FOUR=? where id = ?";
+            myJdbcTemplate.update(sql2,amtShui,amtNoShui,shuiLv,csCommId);
+        }
+    }
+
+    //获取税率
+    private BigDecimal getShuiLv(List<Map<String, Object>> list, String str) {
+        BigDecimal sum = new BigDecimal(0);
+        tp: for (Map<String, Object> tmp : list) {
+            String value =JdbcMapUtil.getString(tmp,str);
+            if (!SharedUtil.isEmptyString(value)){
+                sum = new BigDecimal(value);
+                break tp;
+            }
+        }
+        return sum;
+    }
+
+    // 根据字段求和
+    private BigDecimal getSumAmtBy(List<Map<String, Object>> list, String str) {
+        BigDecimal sum = new BigDecimal(0);
+        for (Map<String, Object> tmp : list) {
+            String value =JdbcMapUtil.getString(tmp,str);
+            if (SharedUtil.isEmptyString(value)){
+                value = "0";
+            }
+            sum = sum.add(new BigDecimal(value));
+        }
+        return sum;
     }
 }
