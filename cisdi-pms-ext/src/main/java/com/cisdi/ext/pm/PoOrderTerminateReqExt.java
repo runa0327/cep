@@ -229,7 +229,7 @@ public class PoOrderTerminateReqExt {
             String roleId = ProcessRoleExt.getUserRole(myJdbcTemplate,userId);
             if ("0100070673610702919".equals(roleId)){ //财务
                 //获取流程中的附件和意见信息
-                String processComment = JdbcMapUtil.getString(entityRecord.valueMap,"TEXT_REMARK_THREE");
+                String processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_TWO");
                 String processFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_TWO");
                 //判断生成最终的意见和附件信息
                 Map<String,String> map2 = ProcessCommon.getEndComment(userId,userName,processComment,processFile,comment,file,myJdbcTemplate);
@@ -237,10 +237,10 @@ public class PoOrderTerminateReqExt {
                 String newCommentFile = SharedUtil.isEmptyString(map2.get("file")) ? null:map2.get("file");
 
                 Crud.from("PO_ORDER_TERMINATE_REQ").where().eq("id",csCommId).update()
-                        .set("TEXT_REMARK_FOUR",newCommentStr).set("FILE_ID_TWO",newCommentFile).exec();
+                        .set("APPROVAL_COMMENT_TWO",newCommentStr).set("FILE_ID_TWO",newCommentFile).exec();
             } else { //法务
                 //获取流程中的附件和意见信息
-                String processComment = JdbcMapUtil.getString(entityRecord.valueMap,"TEXT_REMARK_THREE");
+                String processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_THREE");
                 String processFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_THREE");
                 //判断生成最终的意见和附件信息
                 Map<String,String> map2 = ProcessCommon.getEndComment(userId,userName,processComment,processFile,comment,file,myJdbcTemplate);
@@ -248,15 +248,15 @@ public class PoOrderTerminateReqExt {
                 String newCommentFile = SharedUtil.isEmptyString(map2.get("file")) ? null:map2.get("file");
 
                 Crud.from("PO_ORDER_TERMINATE_REQ").where().eq("id",csCommId).update()
-                        .set("TEXT_REMARK_THREE",newCommentStr).set("FILE_ID_THREE",newCommentFile).exec();
+                        .set("APPROVAL_COMMENT_THREE",newCommentStr).set("FILE_ID_THREE",newCommentFile).exec();
             }
         } else if ("lawyerFalse".equals(nodeStatus)){ //法律拒绝
             Crud.from("PO_ORDER_TERMINATE_REQ").where().eq("id",csCommId).update()
                     .set("APPROVAL_COMMENT_ONE",null).set("FILE_ID_SIX",null).exec();
-        } else if ("legalFinanceFalse".equals(nodeStatus)){ //法律拒绝
+        } else if ("legalFinanceFalse".equals(nodeStatus)){ //财务法务拒绝
             Crud.from("PO_ORDER_TERMINATE_REQ").where().eq("id",csCommId).update()
-                    .set("TEXT_REMARK_FOUR",null).set("FILE_ID_TWO",null)
-                    .set("TEXT_REMARK_THREE",null).set("FILE_ID_THREE",null)
+                    .set("APPROVAL_COMMENT_TWO",null).set("FILE_ID_TWO",null)
+                    .set("APPROVAL_COMMENT_THREE",null).set("FILE_ID_THREE",null)
                     .exec();
         }
     }
