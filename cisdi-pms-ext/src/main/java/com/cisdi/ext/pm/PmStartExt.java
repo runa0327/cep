@@ -13,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -26,6 +27,20 @@ import java.util.stream.Collectors;
  * @date 2023/2/16
  */
 public class PmStartExt {
+
+
+    /**
+     * 业主单位
+     */
+    private static final String unitPrefixStr = "海南城发实业集团有限公司-CS,海南城发建设工程有限公司-CJ,三亚崖州湾科技城投资控股有限公司-TK,三亚崖州湾科技城开发建设有限公司-KF";
+    /**
+     * 资金来源类型
+     */
+    private static final String sourcePrefixStr = "政府投资-G,社会投资-S,政府+社会投资-P";
+    /**
+     * 项目类型
+     */
+    private static final String typePrefixStr = "民用建筑-FJ,市政道路-DL,港口航道-GH,园林景观-YL,轨道交通-GJ,工业建筑-GY,市政管道-GD,设备采购-SB,其他-QT";
 
     /**
      * 项目启动列表查询
@@ -168,7 +183,7 @@ public class PmStartExt {
         String prjCode = input.code;
         if (Strings.isNullOrEmpty(input.id)) {
             id = Crud.from("PRJ_START").insertData();
-            prjCode = getPrjCode();
+            prjCode = getPrjCode(input.unit, input.sourceTypeId, input.typeId);
         }
 
         Crud.from("PRJ_START").where().eq("ID", id).update()
@@ -220,7 +235,7 @@ public class PmStartExt {
             String aaaid = Crud.from("PRJ_PARCEL").insertData();
             Crud.from("PRJ_PARCEL").where().eq("ID", aaaid).update().set("PM_PRJ_ID", projectId).set("PARCEL_ID", parcelId).exec();
 
-            if("Polygon".equals(parcel.parcelShape)){
+            if ("Polygon".equals(parcel.parcelShape)) {
                 Point first = pointList.get(0);
                 pointList.add(first);
             }
@@ -325,8 +340,98 @@ public class PmStartExt {
      *
      * @return
      */
-    private String getPrjCode() {
-        return UUID.randomUUID().toString();
+    private String getPrjCode(String unitId, String sourceId, String typeId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String unit = "";
+        List<Map<String, Object>> unitList = myJdbcTemplate.queryForList("select * from  PM_PARTY where id=? ", unitId);
+        if (!CollectionUtils.isEmpty(unitList)) {
+            unit = String.valueOf(unitList.get(0).get("NAME"));
+        }
+        String source = "";
+        List<Map<String, Object>> sourceList = myJdbcTemplate.queryForList("select * from gr_set_value where id=? ", sourceId);
+        if (!CollectionUtils.isEmpty(sourceList)) {
+            source = String.valueOf(sourceList.get(0).get("NAME"));
+        }
+        String type = "";
+        List<Map<String, Object>> typeList = myJdbcTemplate.queryForList("select * from gr_set_value where id=? ", typeId);
+        if (!CollectionUtils.isEmpty(typeList)) {
+            type = String.valueOf(typeList.get(0).get("NAME"));
+        }
+
+        List<String> unitPrefixData = Arrays.asList(unitPrefixStr.split(","));
+        List<String> sourcePrefixData = Arrays.asList(sourcePrefixStr.split(","));
+        List<String> typePrefixData = Arrays.asList(typePrefixStr.split(","));
+
+        String unitPrefix = "";
+        if (!Strings.isNullOrEmpty(unit)) {
+            for (String s : unitPrefixData) {
+                if (s.contains(unit)) {
+                    unitPrefix = s.split("-")[1];
+                }
+            }
+        }
+
+        String sourcePrefix = "";
+        if (!Strings.isNullOrEmpty(source)) {
+            for (String s : sourcePrefixData) {
+                if (s.contains(source)) {
+                    sourcePrefix = s.split("-")[1];
+                }
+            }
+        }
+
+        String typePrefix = "";
+        if (!Strings.isNullOrEmpty(type)) {
+            for (String s : typePrefixData) {
+                if (s.contains(type)) {
+                    typePrefix = s.split("-")[1];
+                }
+            }
+        }
+
+        SimpleDateFormat sd = new SimpleDateFormat("yyMMdd");
+        String dataPrefix = sd.format(new Date());
+
+
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(PM_CODE,0) as PM_CODE from pm_prj  order by right(pm_code,4) desc limit 0,1");
+        Map<String, Object> data = list.get(0);
+        String flowNo = "0001";
+        String code = String.valueOf(data.get("PM_CODE"));
+        if (!"0".equals(code)) {
+            String str = code.substring(code.length() - 4);
+            int count = Integer.parseInt(str) + 1;
+            flowNo = StringUtil.addZeroForNum(String.valueOf(count), 4);
+
+        }
+        StringBuffer sb = new StringBuffer();
+        if (!Strings.isNullOrEmpty(unitPrefix)) {
+            sb.append(unitPrefix).append("-");
+        }
+        if (!Strings.isNullOrEmpty(sourcePrefix)) {
+            sb.append(sourcePrefix).append("-");
+        }
+        if (!Strings.isNullOrEmpty(typePrefix)) {
+            sb.append(typePrefix).append("-");
+        }
+        sb.append(dataPrefix).append(flowNo);
+//        sb.append(unitPrefix).append("-").append(sourcePrefix).append("-").append(typePrefix).append("-").append(dataPrefix).append(flowNo);
+        return sb.toString().trim();
+    }
+
+
+    /**
+     * 初始化项目编码
+     */
+    public void initPmCode() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRJ where status='ap'");
+        for (Map<String, Object> stringObjectMap : list) {
+            String code = getPrjCode(stringObjectMap.get("CUSTOMER_UNIT") == null ? "" : String.valueOf(stringObjectMap.get("CUSTOMER_UNIT")),
+                    stringObjectMap.get("PROJECT_SOURCE_TYPE_ID") == null ? "" : String.valueOf(stringObjectMap.get("PROJECT_SOURCE_TYPE_ID")),
+                    stringObjectMap.get("PROJECT_TYPE_ID") == null ? "" : String.valueOf(stringObjectMap.get("PROJECT_TYPE_ID")));
+            Crud.from("PM_PRJ").where().eq("ID", stringObjectMap.get("ID")).update().set("PM_CODE", code).exec();
+        }
+
     }
 
     public static class OutSide {
@@ -447,4 +552,10 @@ public class PmStartExt {
 
         public List<Point> pointList;
     }
+
+    public static void main(String[] args) {
+        String str = "23022402";
+
+    }
+
 }
