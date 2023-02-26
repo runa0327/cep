@@ -25,6 +25,22 @@ public class PmDeptExt {
 
 
     /**
+     * 项目部门人员新增单条记录
+     * @param userId 创建人员id
+     * @param userIds 项目人员id，多个用,分隔
+     * @param projectId 项目id
+     * @param deptId 部门id
+     * @param myJdbcTemplate 数据源
+     */
+    public static void createPrjUserOne(String userId,String userIds, String projectId, String deptId, MyJdbcTemplate myJdbcTemplate) {
+        String id = Crud.from("pm_dept").insertData();
+        String sql = "update pm_dept set ver = 1, TS = now(),CRT_DT=now(),CRT_USER_ID=?,LAST_MODI_DT=now(),LAST_MODI_USER_ID=?,STATUS='AP'," +
+                "PM_PRJ_ID=?,USER_IDS=?,HR_DEPT_ID=? where id = ?";
+        myJdbcTemplate.update(sql,userId,userId,projectId,userIds,deptId,id);
+
+    }
+
+    /**
      * 项目部门人员新增/修改
      */
     public void pmDeptModify() {

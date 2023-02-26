@@ -626,5 +626,34 @@ public class PmPrjReqExt {
         sum = sum + myJdbcTemplate.update("delete from PM_PRO_PLAN where PM_PRJ_ID = ?",projectId);
         return sum;
     }
+
+    /**
+     * 立项申请流程-流程完结数据处理
+     */
+    public void prjProcessEnd(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //赋予流程发起人查看项目权限
+        createPrjUser(entityRecord,myJdbcTemplate);
+
+    }
+
+    /**
+     * 立项完成，赋予流程发起人查看项目权限
+     * @param entityRecord 流程主数据
+     * @param myJdbcTemplate 数据源
+     */
+    private void createPrjUser(EntityRecord entityRecord, MyJdbcTemplate myJdbcTemplate) {
+        //流程发起人
+        String userId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_USER_ID");
+        //发起部门
+        String deptId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_DEPT_ID");
+        //流程明细
+        String projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PRJ_NAME");
+        //获取项目id
+        String projectId = PmPrj.getProjectId(projectName,"0099952822476441374",myJdbcTemplate);
+        //写入项目部门人员表
+        PmDeptExt.createPrjUserOne(userId,userId,projectId,deptId,myJdbcTemplate);
+    }
 }
 
