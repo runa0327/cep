@@ -197,7 +197,6 @@ public class AttLinkExtDetail {
             attLinkResult.attMap.put("REMARK_ONE", linkedAtt); //审核意见采纳说明
             attLinkResult.attMap.put("FILE_ID_FOUR", linkedAtt); //采纳意见附件
             attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt); //合同送审稿
-            attLinkResult.attMap.put("AD_USER_ID", linkedAtt); //合同签订联系人
         }
     }
 
@@ -275,13 +274,6 @@ public class AttLinkExtDetail {
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
             linkedAtt.changeToShown = heTongChangeToShown;
             attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt);
-        }
-        // 联系人
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.changeToMandatory = userChangeToMandatory;
-            attLinkResult.attMap.put("AD_USER_ID", linkedAtt);
         }
         // 联系电话
         {

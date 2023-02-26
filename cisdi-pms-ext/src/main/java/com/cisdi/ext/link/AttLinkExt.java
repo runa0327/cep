@@ -612,7 +612,6 @@ public class AttLinkExt {
         } else {
             return attLinkResult;
         }
-
     }
 
     // 项目来源属性联动-采购需求审批
