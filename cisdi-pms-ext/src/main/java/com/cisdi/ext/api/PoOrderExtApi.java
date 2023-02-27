@@ -1,13 +1,18 @@
 package com.cisdi.ext.api;
 
+import com.cisdi.ext.base.GrSetValue;
 import com.cisdi.ext.model.view.order.PoOrderContactsView;
 import com.cisdi.ext.model.view.order.PoOrderDtlProView;
 import com.cisdi.ext.model.view.order.PoOrderDtlView;
 import com.cisdi.ext.model.view.order.PoOrderView;
+import com.cisdi.ext.base.PmPrj;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
@@ -19,6 +24,95 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class PoOrderExtApi {
+
+    /**
+     * 合同流程走完后，将数据汇总至合同数据表
+     * @param entityRecord 流程业务数据
+     * @param sourceType 数据来源流程类型
+     * @param myJdbcTemplate 数据源
+     */
+    public static void createData(EntityRecord entityRecord, String sourceType, MyJdbcTemplate myJdbcTemplate) {
+        Map<String, Object> valueMap = entityRecord.valueMap;
+        //流程id
+        String csId = entityRecord.csCommId;
+        //获取合作单位
+        String cooperation = getCooperation(csId,myJdbcTemplate);
+        //项目id
+        String projectId = PmPrj.getProjectIdByProcess(valueMap,myJdbcTemplate);
+        //根据编码code查询数据来源id
+        String sourceTypeId = GrSetValue.getValueId("order_data_source_type",sourceType,myJdbcTemplate);
+        if (!SharedUtil.isEmptyString(projectId)){
+            List<String> list = StringUtil.getStrToList(projectId,",");
+            for (String prjId : list) {
+                /**=============此处需要添加合同已支付金额、累计支付比列查询逻辑===========================**/
+                //判断是否已存在，存在则修改
+                String poOrderId = getDateByProcessDateId(csId,prjId,myJdbcTemplate);
+                if (SharedUtil.isEmptyString(poOrderId)){
+                    poOrderId = Crud.from("po_order").insertData();
+                }
+                //修改合同数据表数据
+                updatePoOrder(valueMap,csId,poOrderId,prjId,cooperation,sourceTypeId);
+            }
+        }
+    }
+
+    /**
+     * 查询合同流程的合作单位明细
+     * @param csId 合同主表id
+     * @param myJdbcTemplate 数据源
+     * @return 合作单位名称
+     */
+    private static String getCooperation(String csId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select group_concat(WIN_BID_UNIT_ONE) as WIN_BID_UNIT_ONE from CONTRACT_SIGNING_CONTACT where PARENT_ID = ? and status = 'ap'";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csId);
+        String value = null;
+        if (!CollectionUtils.isEmpty(list)){
+            value = JdbcMapUtil.getString(list.get(0),"WIN_BID_UNIT_ONE");
+        }
+        return value;
+    }
+
+    /**
+     * 修改合同数据表数据
+     * @param valueMap 主体值
+     * @param csId 流程业务表id
+     * @param poOrderId id
+     * @param projectId 项目id
+     * @param cooperation 合作单位
+     * @param sourceTypeId 数据来源流程类型
+     */
+    private static void updatePoOrder(Map<String, Object> valueMap, String csId, String poOrderId, String projectId, String cooperation, String sourceTypeId) {
+        Crud.from("po_order").where().eq("id",poOrderId).update()
+                .set("PM_PRJ_ID",projectId).set("CONTRACT_APP_ID",csId).set("ORDER_DATA_SOURCE_TYPE",sourceTypeId) //数据来源流程
+                .set("CONTRACT_NAME",JdbcMapUtil.getString(valueMap,"CONTRACT_NAME")) //合同名称
+                .set("WIN_BID_UNIT_ONE",cooperation) //合作单位
+                .set("AMT_FIVE",JdbcMapUtil.getString(valueMap,"AMT_THREE")) // 不含税金额
+                .set("AMT_ONE",JdbcMapUtil.getString(valueMap,"AMT_FOUR")) //税率
+                .set("AMT_SIX",JdbcMapUtil.getString(valueMap,"AMT_TWO")) //含税总金额
+                .set("AMT_SEVEN",null).set("AMT_TWO",null) //已支付金额 累计支付比例
+                .set("AD_USER_ID",JdbcMapUtil.getString(valueMap,"AD_USER_ID")) //合同经办人
+                .set("SIGN_DATE",JdbcMapUtil.getString(valueMap,"SIGN_DATE")) //签订日期
+                .set("DATE_FIVE",JdbcMapUtil.getString(valueMap,"DATE_FIVE")) //到期日期
+                .set("FILE_ATTACHMENT_URL",JdbcMapUtil.getString(valueMap,"FILE_ID_FIVE")) //合同盖章版文件
+                .exec();
+    }
+
+    /**
+     * 根据业务流程id和项目id查询记录是否已经存在
+     * @param csId 业务流程id
+     * @param projectId 项目id
+     * @param myJdbcTemplate 数据源
+     * @return 存在/不存在
+     */
+    private static String getDateByProcessDateId(String csId, String projectId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select id from po_order where status = 'ap' and CONTRACT_APP_ID = ? and PM_PRJ_ID = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csId,projectId);
+        String id = "";
+        if (!CollectionUtils.isEmpty(list)){
+            id = JdbcMapUtil.getString(list.get(0),"id");
+        }
+        return id;
+    }
 
     // 采购合同列表
     public void getPoOrderList() {

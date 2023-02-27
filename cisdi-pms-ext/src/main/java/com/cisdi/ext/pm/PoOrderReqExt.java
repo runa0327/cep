@@ -1,6 +1,7 @@
 package com.cisdi.ext.pm;
 
 import com.alibaba.fastjson.JSON;
+import com.cisdi.ext.api.PoOrderExtApi;
 import com.cisdi.ext.commons.HttpClient;
 import com.cisdi.ext.model.view.order.PoOrderReq;
 import com.cisdi.ext.util.*;
@@ -490,18 +491,18 @@ public class PoOrderReqExt {
      * 合同签订-流程完结时扩展
      */
     public void OrderProcessEnd(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //合同工期
         int duration = JdbcMapUtil.getInt(entityRecord.valueMap,"PLAN_TOTAL_DAYS");
-        System.out.println(duration);
         //合同签订日期
         Date signDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(entityRecord.valueMap,"SIGN_DATE"));
-        System.out.println(signDate);
         //计算到期日期
         Date expireDate = DateTimeUtil.addDays(signDate,duration);
-        System.out.println(expireDate);
         //更新到期日期字段
         Crud.from("PO_ORDER_REQ").where().eq("id",entityRecord.csCommId).update().set("DATE_FIVE",expireDate).exec();
+        //将合同数据写入传输至合同数据表(po_order)
+        PoOrderExtApi.createData(entityRecord,"PO_ORDER_REQ",myJdbcTemplate);
     }
 
 }

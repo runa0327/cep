@@ -5,6 +5,9 @@ import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -117,4 +120,19 @@ public class StringUtil {
         return str;
     }
 
+    /**
+     * 将字符串根据某个字符转为list
+     * @param str 原字符串
+     * @param code 拆分依据字段
+     * @return list
+     */
+    public static List<String> getStrToList(String str, String code) {
+        List<String> list = new ArrayList<>();
+        if (!str.contains(code)){
+            list.add(str);
+        } else {
+            list = new ArrayList<>(Arrays.asList(str.split(code)));
+        }
+        return list;
+    }
 }
