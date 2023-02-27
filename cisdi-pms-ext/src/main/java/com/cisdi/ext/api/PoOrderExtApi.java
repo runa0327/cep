@@ -57,6 +57,34 @@ public class PoOrderExtApi {
     }
 
     /**
+     * 合同签订历史数据汇总
+     * @param tmp 每条实体数据
+     * @param sourceTypeId 合同来源集合值id
+     * @param myJdbcTemplate 数据源
+     */
+    public static void createOrderHistoryData(Map<String, Object> tmp, String sourceTypeId, MyJdbcTemplate myJdbcTemplate) {
+        //流程id
+        String csId = tmp.get("id").toString();
+        //获取合作单位
+        String cooperation = getCooperation(csId,myJdbcTemplate);
+        //项目id
+        String projectId = PmPrj.getProjectIdByProcess(tmp,myJdbcTemplate);
+        if (!SharedUtil.isEmptyString(projectId)){
+            List<String> list = StringUtil.getStrToList(projectId,",");
+            for (String prjId : list) {
+                /**=============此处需要添加合同已支付金额、累计支付比列查询逻辑===========================**/
+                //判断是否已存在，存在则修改
+                String poOrderId = getDateByProcessDateId(csId,prjId,myJdbcTemplate);
+                if (SharedUtil.isEmptyString(poOrderId)){
+                    poOrderId = Crud.from("po_order").insertData();
+                }
+                //修改合同数据表数据
+                updatePoOrder(tmp,csId,poOrderId,prjId,cooperation,sourceTypeId);
+            }
+        }
+    }
+
+    /**
      * 查询合同流程的合作单位明细
      * @param csId 合同主表id
      * @param myJdbcTemplate 数据源

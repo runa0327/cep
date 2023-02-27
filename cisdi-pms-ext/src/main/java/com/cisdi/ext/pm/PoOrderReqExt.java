@@ -2,6 +2,7 @@ package com.cisdi.ext.pm;
 
 import com.alibaba.fastjson.JSON;
 import com.cisdi.ext.api.PoOrderExtApi;
+import com.cisdi.ext.base.GrSetValue;
 import com.cisdi.ext.commons.HttpClient;
 import com.cisdi.ext.model.view.order.PoOrderReq;
 import com.cisdi.ext.util.*;
@@ -389,6 +390,23 @@ public class PoOrderReqExt {
                     String sql3 = "update PO_ORDER_REQ set AMT_TWO = ? where id = ?";
                     myJdbcTemplate.update(sql3,amtShui,orderId);
                 }
+            }
+        }
+    }
+
+    /**
+     * 合同签订-历史数据处理-已完成流程数据汇总至合同数据表
+     */
+    public void historyDataCollect(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //查询所有已经走完的合同
+        String sql = "select * from po_order_req where status = 'ap'";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        //根据编码code查询数据来源id
+        String sourceTypeId = GrSetValue.getValueId("order_data_source_type","po_order_req",myJdbcTemplate);
+        if (!CollectionUtils.isEmpty(list)){
+            for (Map<String, Object> tmp : list) {
+                PoOrderExtApi.createOrderHistoryData(tmp,sourceTypeId,myJdbcTemplate);
             }
         }
     }
