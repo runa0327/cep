@@ -1,10 +1,8 @@
 package com.cisdi.ext.importQYY;
 
 import com.cisdi.ext.importQYY.model.FeasibleImport;
-import com.cisdi.ext.importQYY.model.PrjReqImport;
-import com.cisdi.ext.importQYY.model.PrjReqImportBatch;
+import com.cisdi.ext.importQYY.model.FeasibleImportBatch;
 import com.cisdi.ext.model.PmPrj;
-import com.cisdi.ext.model.PmPrjInvest1;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
@@ -53,8 +51,8 @@ public class FeasibleImportBatchExt {
                         })
                         // .skip(50).limit(5)
                         .forEach(pmPrj -> {
-                            com.cisdi.ext.importQYY.model.PrjReqImport prjReqImport = doGetDtl(pmPrj);
-                            prjReqImport.setPrjReqImportBatchId(csCommId);
+                            com.cisdi.ext.importQYY.model.FeasibleImport prjReqImport = doGetDtl(pmPrj);
+                            prjReqImport.setFeasibleImportBatchId(csCommId);
                             prjReqImport.insertById();
                         });
 
@@ -67,9 +65,9 @@ public class FeasibleImportBatchExt {
      *
      * @param pmPrj
      */
-    private com.cisdi.ext.importQYY.model.PrjReqImport doGetDtl(PmPrj pmPrj) {
-        com.cisdi.ext.importQYY.model.PrjReqImport prjReqImport = com.cisdi.ext.importQYY.model.PrjReqImport.newData();
-        prjReqImport.setPmPrjId(pmPrj.getId()); //项目
+    private com.cisdi.ext.importQYY.model.FeasibleImport doGetDtl(PmPrj pmPrj) {
+        com.cisdi.ext.importQYY.model.FeasibleImport prjReqImport = com.cisdi.ext.importQYY.model.FeasibleImport.newData();
+        prjReqImport.setPmPrjId(pmPrj.getId()); // 项目
 
         // TODO 其他字段的取数逻辑。
 
@@ -87,7 +85,7 @@ public class FeasibleImportBatchExt {
             String csCommId = entityRecord.csCommId;
 
             // 对于批次，先检查状态是否为1，再修改导入状态为2：
-            PrjReqImportBatch batch = PrjReqImportBatch.selectById(csCommId);
+            FeasibleImportBatch batch = FeasibleImportBatch.selectById(csCommId);
             if (!batch.getImportStatusId().equals("1")) {
                 throw new BaseException("只有导入状态为“1-数据收集”才能操作！");
             }
@@ -95,10 +93,10 @@ public class FeasibleImportBatchExt {
             batch.updateById();
 
             // 对于明细，修改导入状态为2：
-            Where where = new Where().eq(com.cisdi.ext.importQYY.model.PrjReqImport.Cols.PRJ_REQ_IMPORT_BATCH_ID, csCommId);
+            Where where = new Where().eq(com.cisdi.ext.importQYY.model.FeasibleImport.Cols.FEASIBLE_IMPORT_BATCH_ID, csCommId);
             HashMap<String, Object> keyValueMap = new HashMap<>();
-            keyValueMap.put(com.cisdi.ext.importQYY.model.PrjReqImport.Cols.IMPORT_STATUS_ID, "2");
-            com.cisdi.ext.importQYY.model.PrjReqImport.updateByWhere(where, keyValueMap);
+            keyValueMap.put(com.cisdi.ext.importQYY.model.FeasibleImport.Cols.IMPORT_STATUS_ID, "2");
+            com.cisdi.ext.importQYY.model.FeasibleImport.updateByWhere(where, keyValueMap);
         }
     }
 
@@ -119,16 +117,16 @@ public class FeasibleImportBatchExt {
             String csCommId = entityRecord.csCommId;
 
             // 对于批次，先检查状态是否为2
-            PrjReqImportBatch batch = PrjReqImportBatch.selectById(csCommId);
+            FeasibleImportBatch batch = FeasibleImportBatch.selectById(csCommId);
             if (!batch.getImportStatusId().equals("2")) {
                 throw new BaseException("只有导入状态为“2-准予导入”才能操作！");
             }
 
             ImportSum importSum = new ImportSum();
-            Where where = new Where().eq(com.cisdi.ext.importQYY.model.PrjReqImport.Cols.PRJ_REQ_IMPORT_BATCH_ID, csCommId);
-            List<com.cisdi.ext.importQYY.model.PrjReqImport> prjReqImportList = com.cisdi.ext.importQYY.model.PrjReqImport.selectByWhere(where);
+            Where where = new Where().eq(FeasibleImport.Cols.FEASIBLE_IMPORT_BATCH_ID, csCommId);
+            List<com.cisdi.ext.importQYY.model.FeasibleImport> prjReqImportList = com.cisdi.ext.importQYY.model.FeasibleImport.selectByWhere(where);
             if (!SharedUtil.isEmptyList(prjReqImportList)) {
-                for (com.cisdi.ext.importQYY.model.PrjReqImport prjReqImport : prjReqImportList) {
+                for (com.cisdi.ext.importQYY.model.FeasibleImport prjReqImport : prjReqImportList) {
                     // 真正执行导入：
                     boolean succ = doImportPrj(prjReqImport);
                     // 累计成功或失败数量：
@@ -154,7 +152,7 @@ public class FeasibleImportBatchExt {
      *
      * @return 是否成功。
      */
-    private boolean doImportPrj(com.cisdi.ext.importQYY.model.PrjReqImport newImport) {
+    private boolean doImportPrj(com.cisdi.ext.importQYY.model.FeasibleImport newImport) {
         boolean succ = true;
         List<String> errInfoList = new ArrayList<>();
         String newImportId = newImport.getId();
@@ -164,17 +162,17 @@ public class FeasibleImportBatchExt {
 
         // 通过项目ID，获取旧的导入记录：
         PmPrj pmPrj = PmPrj.selectById(pmPrjId);
-        com.cisdi.ext.importQYY.model.PrjReqImport oldImport = doGetDtl(pmPrj);
+        com.cisdi.ext.importQYY.model.FeasibleImport oldImport = doGetDtl(pmPrj);
 
         // 若字段的值已不同，则予以处理：
 
         // 示例，处理某个字段：
         try {
-            if (!SharedUtil.toStringEquals(oldImport.getCustomerUnit(), newImport.getCustomerUnit())) {
-                HashMap<String, Object> keyValueMap = new HashMap<>();
-                keyValueMap.put(PmPrj.Cols.CUSTOMER_UNIT, newImport.getCustomerUnit());
-                PmPrj.updateById(pmPrjId, keyValueMap);
-            }
+            // if (!SharedUtil.toStringEquals(oldImport.getCustomerUnit(), newImport.getCustomerUnit())) {
+            //     HashMap<String, Object> keyValueMap = new HashMap<>();
+            //     keyValueMap.put(PmPrj.Cols.CUSTOMER_UNIT, newImport.getCustomerUnit());
+            //     PmPrj.updateById(pmPrjId, keyValueMap);
+            // }
         } catch (Exception ex) {
             succ = false;
             errInfoList.add(ex.toString());
@@ -192,11 +190,11 @@ public class FeasibleImportBatchExt {
         // }
 
         HashMap<String, Object> keyValueMap = new HashMap<>();
-        keyValueMap.put(com.cisdi.ext.importQYY.model.PrjReqImport.Cols.IMPORT_STATUS_ID, "3");
-        keyValueMap.put(com.cisdi.ext.importQYY.model.PrjReqImport.Cols.IMPORT_TIME, LocalDateTime.now());
-        keyValueMap.put(com.cisdi.ext.importQYY.model.PrjReqImport.Cols.IS_SUCCESS, succ);
-        keyValueMap.put(com.cisdi.ext.importQYY.model.PrjReqImport.Cols.ERR_INFO, SharedUtil.isEmptyList(errInfoList) ? null : errInfoList.stream().collect(Collectors.joining("；")));
-        PrjReqImport.updateById(newImportId, keyValueMap);
+        keyValueMap.put(com.cisdi.ext.importQYY.model.FeasibleImport.Cols.IMPORT_STATUS_ID, "3");
+        keyValueMap.put(com.cisdi.ext.importQYY.model.FeasibleImport.Cols.IMPORT_TIME, LocalDateTime.now());
+        keyValueMap.put(com.cisdi.ext.importQYY.model.FeasibleImport.Cols.IS_SUCCESS, succ);
+        keyValueMap.put(com.cisdi.ext.importQYY.model.FeasibleImport.Cols.ERR_INFO, SharedUtil.isEmptyList(errInfoList) ? null : errInfoList.stream().collect(Collectors.joining("；")));
+        FeasibleImport.updateById(newImportId, keyValueMap);
 
         return succ;
     }
