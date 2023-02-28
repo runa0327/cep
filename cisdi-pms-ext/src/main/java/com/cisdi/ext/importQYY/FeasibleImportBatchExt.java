@@ -4,18 +4,23 @@ import com.cisdi.ext.importQYY.model.FeasibleImport;
 import com.cisdi.ext.importQYY.model.FeasibleImportBatch;
 import com.cisdi.ext.model.PmPrj;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -51,9 +56,9 @@ public class FeasibleImportBatchExt {
                         })
                         // .skip(50).limit(5)
                         .forEach(pmPrj -> {
-                            com.cisdi.ext.importQYY.model.FeasibleImport prjReqImport = doGetDtl(pmPrj);
-                            prjReqImport.setFeasibleImportBatchId(csCommId);
-                            prjReqImport.insertById();
+                            FeasibleImport feasibleImport = doGetDtl(pmPrj);
+                            feasibleImport.setFeasibleImportBatchId(csCommId);
+                            feasibleImport.insertById();
                         });
 
             }
@@ -65,13 +70,75 @@ public class FeasibleImportBatchExt {
      *
      * @param pmPrj
      */
-    private com.cisdi.ext.importQYY.model.FeasibleImport doGetDtl(PmPrj pmPrj) {
-        com.cisdi.ext.importQYY.model.FeasibleImport prjReqImport = com.cisdi.ext.importQYY.model.FeasibleImport.newData();
-        prjReqImport.setPmPrjId(pmPrj.getId()); // 项目
+    private FeasibleImport doGetDtl(PmPrj pmPrj) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        FeasibleImport feasibleImport = FeasibleImport.newData();
+        String prjId = pmPrj.getId();
+        feasibleImport.setPmPrjId(prjId); // 项目
+        //根据项目id查询可研数据
+        List<FeasibleImport> list = FeasibleImport.selectByWhere(new Where().eq(FeasibleImport.Cols.PM_PRJ_ID,pmPrj.getId()));
+        if (!CollectionUtils.isEmpty(list)){
+            for (FeasibleImport tmp : list) {
+                feasibleImport.setExpertComplActualDate(tmp.getExpertComplActualDate()); //实际评审日期
+                feasibleImport.setReviewUnitChief(tmp.getReviewUnitChief()); //评审单位负责人
+                feasibleImport.setReviewOrganizationUnit(tmp.getReviewOrganizationUnit()); //评审组织单位
+                feasibleImport.setReviewUnitPhone(tmp.getReviewUnitPhone()); //评审单位联系方式
+                feasibleImport.setExpertFile(tmp.getExpertFile()); //专家意见文件
+                feasibleImport.setReviewReportFile(tmp.getReviewReportFile()); //评审稿文件
+                feasibleImport.setRevisionFile(tmp.getRevisionFile()); //修编稿
+                feasibleImport.setReviewDraftFile(tmp.getReviewDraftFile()); //评审报告文件
+                BigDecimal prjTotalInvest = prjAmt(tmp,prjId,"PRJ_TOTAL_INVEST",myJdbcTemplate);
+                feasibleImport.setPrjTotalInvest(prjTotalInvest); //总投资
+                BigDecimal projectAmt = prjAmt(tmp,prjId,"PROJECT_AMT",myJdbcTemplate);
+                feasibleImport.setProjectAmt(projectAmt); //工程费用
+                BigDecimal constructAmt = prjAmt(tmp,prjId,"CONSTRUCT_AMT",myJdbcTemplate);
+                feasibleImport.setProjectAmt(constructAmt); //建安费
+                BigDecimal equipAmt = prjAmt(tmp,prjId,"EQUIP_AMT",myJdbcTemplate);
+                feasibleImport.setProjectAmt(equipAmt); //设备费
+                BigDecimal equipmentCost = prjAmt(tmp,prjId,"EQUIPMENT_COST",myJdbcTemplate);
+                feasibleImport.setProjectAmt(equipmentCost); //可研设备费
+                BigDecimal projectOtherAmt = prjAmt(tmp,prjId,"PROJECT_OTHER_AMT",myJdbcTemplate);
+                feasibleImport.setProjectAmt(projectOtherAmt); //工程其他费
+                BigDecimal landAmt = prjAmt(tmp,prjId,"LAND_AMT",myJdbcTemplate);
+                feasibleImport.setProjectAmt(landAmt); //土地征迁费
+                BigDecimal prepareAmt = prjAmt(tmp,prjId,"PREPARE_AMT",myJdbcTemplate);
+                feasibleImport.setProjectAmt(prepareAmt); //预备费
+                BigDecimal constructPeriodInterest = prjAmt(tmp,prjId,"CONSTRUCT_PERIOD_INTEREST",myJdbcTemplate);
+                feasibleImport.setProjectAmt(constructPeriodInterest); //建设期利息
+                feasibleImport.setReplyActualDate(tmp.getReplyActualDate()); //实际批复日期
+                feasibleImport.setReplyNoWr(tmp.getReplyNoWr()); //批复文号
+                feasibleImport.setReplyFile(tmp.getReplyFile()); //批复文件
+            }
+        }
 
         // TODO 其他字段的取数逻辑。
 
-        return prjReqImport;
+        return feasibleImport;
+    }
+
+    /**
+     * 查询资金赋值信息
+     * @param tmp 该项目可研数据
+     * @param prjId 项目id
+     * @param code 需要匹配的字段
+     * @param myJdbcTemplate 数据源
+     * @return
+     */
+    private BigDecimal prjAmt(FeasibleImport tmp, String prjId, String code, MyJdbcTemplate myJdbcTemplate) {
+        BigDecimal amtValue = tmp.getPrjTotalInvest();
+        if (amtValue == null){
+            //从项目投资测算明细取数
+            String sql1 = "select a.amt from PM_INVEST_EST_DTL a left join PM_INVEST_EST b on a.PM_INVEST_EST_ID = b.id " +
+                    "left join PM_EXP_TYPE c on a.PM_EXP_TYPE_ID = c.id where b.PM_PRJ_ID = ? and c.code = ?";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,prjId,code);
+            if (!CollectionUtils.isEmpty(list1)){
+                String amt = JdbcMapUtil.getString(list1.get(0),"amt");
+                amtValue = new BigDecimal(amt);
+            } else {
+                amtValue = new BigDecimal(0);
+            }
+        }
+        return amtValue;
     }
 
     /**
