@@ -135,4 +135,20 @@ public class StringUtil {
         }
         return list;
     }
+
+    /**
+     * 截取字符串中某个字符第一次出现前的内容
+     * @param str 原字符串
+     * @param code 判断字符
+     * @return 字符串
+     */
+    public static String getFirstStr(String str, String code) {
+        if (!str.contains(code)){
+            return str;
+        } else {
+            int index = str.indexOf(code);
+            str = str.substring(0,index);
+            return str;
+        }
+    }
 }
