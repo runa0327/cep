@@ -29,9 +29,10 @@ public class PoOrderExtApi {
      * 合同流程走完后，将数据汇总至合同数据表
      * @param entityRecord 流程业务数据
      * @param sourceType 数据来源流程类型
+     * @param viewId 视图id
      * @param myJdbcTemplate 数据源
      */
-    public static void createData(EntityRecord entityRecord, String sourceType, MyJdbcTemplate myJdbcTemplate) {
+    public static void createData(EntityRecord entityRecord, String sourceType, String viewId, MyJdbcTemplate myJdbcTemplate) {
         Map<String, Object> valueMap = entityRecord.valueMap;
         //流程id
         String csId = entityRecord.csCommId;
@@ -51,7 +52,7 @@ public class PoOrderExtApi {
                     poOrderId = Crud.from("po_order").insertData();
                 }
                 //修改合同数据表数据
-                updatePoOrder(valueMap,csId,poOrderId,prjId,cooperation,sourceTypeId);
+                updatePoOrder(valueMap,csId,poOrderId,prjId,cooperation,sourceTypeId,viewId);
             }
         }
     }
@@ -60,9 +61,10 @@ public class PoOrderExtApi {
      * 合同签订历史数据汇总
      * @param tmp 每条实体数据
      * @param sourceTypeId 合同来源集合值id
+     * @param viewId 视图id
      * @param myJdbcTemplate 数据源
      */
-    public static void createOrderHistoryData(Map<String, Object> tmp, String sourceTypeId, MyJdbcTemplate myJdbcTemplate) {
+    public static void createOrderHistoryData(Map<String, Object> tmp, String sourceTypeId, String viewId, MyJdbcTemplate myJdbcTemplate) {
         //流程id
         String csId = tmp.get("id").toString();
         //获取合作单位
@@ -79,7 +81,7 @@ public class PoOrderExtApi {
                     poOrderId = Crud.from("po_order").insertData();
                 }
                 //修改合同数据表数据
-                updatePoOrder(tmp,csId,poOrderId,prjId,cooperation,sourceTypeId);
+                updatePoOrder(tmp,csId,poOrderId,prjId,cooperation,sourceTypeId,viewId);
             }
         }
     }
@@ -108,8 +110,9 @@ public class PoOrderExtApi {
      * @param projectId 项目id
      * @param cooperation 合作单位
      * @param sourceTypeId 数据来源流程类型
+     * @param viewId 视图id
      */
-    private static void updatePoOrder(Map<String, Object> valueMap, String csId, String poOrderId, String projectId, String cooperation, String sourceTypeId) {
+    private static void updatePoOrder(Map<String, Object> valueMap, String csId, String poOrderId, String projectId, String cooperation, String sourceTypeId, String viewId) {
         Crud.from("po_order").where().eq("id",poOrderId).update()
                 .set("PM_PRJ_ID",projectId).set("CONTRACT_APP_ID",csId).set("ORDER_DATA_SOURCE_TYPE",sourceTypeId) //数据来源流程
                 .set("CONTRACT_NAME",JdbcMapUtil.getString(valueMap,"CONTRACT_NAME")) //合同名称
@@ -122,6 +125,7 @@ public class PoOrderExtApi {
                 .set("SIGN_DATE",JdbcMapUtil.getString(valueMap,"SIGN_DATE")) //签订日期
                 .set("DATE_FIVE",JdbcMapUtil.getString(valueMap,"DATE_FIVE")) //到期日期
                 .set("FILE_ATTACHMENT_URL",JdbcMapUtil.getString(valueMap,"FILE_ID_FIVE")) //合同盖章版文件
+                .set("VIEW_ID",viewId) //视图id
                 .exec();
     }
 
@@ -160,7 +164,7 @@ public class PoOrderExtApi {
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuilder sb = new StringBuilder();
-        String sql = "SELECT a.id,a.PM_PRJ_ID as projectId,a.CONTRACT_APP_ID as orderProcessId,a.CONTRACT_NAME as contractName," +
+        String sql = "SELECT a.VIEW_ID as viewId,a.id,a.PM_PRJ_ID as projectId,a.CONTRACT_APP_ID as orderProcessId,a.CONTRACT_NAME as contractName," +
                 "a.WIN_BID_UNIT_ONE as cooperationUnit,a.AMT_FIVE as noShuiAmt,a.AMT_ONE as shuiLv,a.AMT_SIX as shuiAmt," +
                 "a.AMT_SEVEN as aleadyPayAmt,a.AMT_TWO as payPrece,a.AD_USER_ID as agentUser,b.name as agentName," +
                 "a.SIGN_DATE as signDate,a.DATE_FIVE as endDate,a.FILE_ATTACHMENT_URL as fileId " +

@@ -406,7 +406,7 @@ public class PoOrderReqExt {
         String sourceTypeId = GrSetValue.getValueId("order_data_source_type","po_order_req",myJdbcTemplate);
         if (!CollectionUtils.isEmpty(list)){
             for (Map<String, Object> tmp : list) {
-                PoOrderExtApi.createOrderHistoryData(tmp,sourceTypeId,myJdbcTemplate);
+                PoOrderExtApi.createOrderHistoryData(tmp,sourceTypeId,"0100070673610715078",myJdbcTemplate);
             }
         }
     }
@@ -520,7 +520,7 @@ public class PoOrderReqExt {
         //更新到期日期字段
         Crud.from("PO_ORDER_REQ").where().eq("id",entityRecord.csCommId).update().set("DATE_FIVE",expireDate).exec();
         //将合同数据写入传输至合同数据表(po_order)
-        PoOrderExtApi.createData(entityRecord,"PO_ORDER_REQ",myJdbcTemplate);
+        PoOrderExtApi.createData(entityRecord,"PO_ORDER_REQ","0100070673610715078",myJdbcTemplate);
     }
 
 }
