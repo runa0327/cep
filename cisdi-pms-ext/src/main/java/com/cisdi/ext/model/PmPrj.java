@@ -3,6 +3,7 @@ package com.cisdi.ext.model;
 import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
@@ -100,6 +101,10 @@ public class PmPrj {
          */
         public static final String REMARK = "REMARK";
         /**
+         * 项目编码。
+         */
+        public static final String PM_CODE = "PM_CODE";
+        /**
          * 业主单位。
          */
         public static final String CUSTOMER_UNIT = "CUSTOMER_UNIT";
@@ -131,6 +136,10 @@ public class PmPrj {
          * 数量1。
          */
         public static final String QTY_ONE = "QTY_ONE";
+        /**
+         * 其他。
+         */
+        public static final String OTHER = "OTHER";
         /**
          * 数量2。
          */
@@ -255,6 +264,30 @@ public class PmPrj {
          * 项目来源类型。
          */
         public static final String PROJECT_SOURCE_TYPE_ID = "PROJECT_SOURCE_TYPE_ID";
+        /**
+         * 概算金额（万）。
+         */
+        public static final String ESTIMATE_AMT = "ESTIMATE_AMT";
+        /**
+         * 预算金额。
+         */
+        public static final String BUDGET_AMT = "BUDGET_AMT";
+        /**
+         * 结算金额（万）。
+         */
+        public static final String SETTLEMENT_AMT = "SETTLEMENT_AMT";
+        /**
+         * 项目建议书实际完成日期。
+         */
+        public static final String PROJECT_PROPOSAL_ACTUAL_DATE = "PROJECT_PROPOSAL_ACTUAL_DATE";
+        /**
+         * 编制人。
+         */
+        public static final String AUTHOR = "AUTHOR";
+        /**
+         * 盖章的立项申请书。
+         */
+        public static final String STAMPED_PRJ_REQ_FILE = "STAMPED_PRJ_REQ_FILE";
         /**
          * CPMS的UUID。
          */
@@ -743,6 +776,42 @@ public class PmPrj {
     }
 
     /**
+     * 项目编码。
+     */
+    private String pmCode;
+
+    /**
+     * 获取：项目编码。
+     */
+    public String getPmCode() {
+        return this.pmCode;
+    }
+
+    /**
+     * 设置：项目编码。
+     */
+    public PmPrj setPmCode(String pmCode) {
+        if (this.pmCode == null && pmCode == null) {
+            // 均为null，不做处理。
+        } else if (this.pmCode != null && pmCode != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmCode.compareTo(pmCode) != 0) {
+                this.pmCode = pmCode;
+                if (!this.toUpdateCols.contains("PM_CODE")) {
+                    this.toUpdateCols.add("PM_CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmCode = pmCode;
+            if (!this.toUpdateCols.contains("PM_CODE")) {
+                this.toUpdateCols.add("PM_CODE");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 业主单位。
      */
     private String customerUnit;
@@ -1025,6 +1094,42 @@ public class PmPrj {
             this.qtyOne = qtyOne;
             if (!this.toUpdateCols.contains("QTY_ONE")) {
                 this.toUpdateCols.add("QTY_ONE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 其他。
+     */
+    private String other;
+
+    /**
+     * 获取：其他。
+     */
+    public String getOther() {
+        return this.other;
+    }
+
+    /**
+     * 设置：其他。
+     */
+    public PmPrj setOther(String other) {
+        if (this.other == null && other == null) {
+            // 均为null，不做处理。
+        } else if (this.other != null && other != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.other.compareTo(other) != 0) {
+                this.other = other;
+                if (!this.toUpdateCols.contains("OTHER")) {
+                    this.toUpdateCols.add("OTHER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.other = other;
+            if (!this.toUpdateCols.contains("OTHER")) {
+                this.toUpdateCols.add("OTHER");
             }
         }
         return this;
@@ -2147,6 +2252,222 @@ public class PmPrj {
     }
 
     /**
+     * 概算金额（万）。
+     */
+    private BigDecimal estimateAmt;
+
+    /**
+     * 获取：概算金额（万）。
+     */
+    public BigDecimal getEstimateAmt() {
+        return this.estimateAmt;
+    }
+
+    /**
+     * 设置：概算金额（万）。
+     */
+    public PmPrj setEstimateAmt(BigDecimal estimateAmt) {
+        if (this.estimateAmt == null && estimateAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.estimateAmt != null && estimateAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.estimateAmt.compareTo(estimateAmt) != 0) {
+                this.estimateAmt = estimateAmt;
+                if (!this.toUpdateCols.contains("ESTIMATE_AMT")) {
+                    this.toUpdateCols.add("ESTIMATE_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.estimateAmt = estimateAmt;
+            if (!this.toUpdateCols.contains("ESTIMATE_AMT")) {
+                this.toUpdateCols.add("ESTIMATE_AMT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 预算金额。
+     */
+    private BigDecimal budgetAmt;
+
+    /**
+     * 获取：预算金额。
+     */
+    public BigDecimal getBudgetAmt() {
+        return this.budgetAmt;
+    }
+
+    /**
+     * 设置：预算金额。
+     */
+    public PmPrj setBudgetAmt(BigDecimal budgetAmt) {
+        if (this.budgetAmt == null && budgetAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.budgetAmt != null && budgetAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.budgetAmt.compareTo(budgetAmt) != 0) {
+                this.budgetAmt = budgetAmt;
+                if (!this.toUpdateCols.contains("BUDGET_AMT")) {
+                    this.toUpdateCols.add("BUDGET_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.budgetAmt = budgetAmt;
+            if (!this.toUpdateCols.contains("BUDGET_AMT")) {
+                this.toUpdateCols.add("BUDGET_AMT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 结算金额（万）。
+     */
+    private BigDecimal settlementAmt;
+
+    /**
+     * 获取：结算金额（万）。
+     */
+    public BigDecimal getSettlementAmt() {
+        return this.settlementAmt;
+    }
+
+    /**
+     * 设置：结算金额（万）。
+     */
+    public PmPrj setSettlementAmt(BigDecimal settlementAmt) {
+        if (this.settlementAmt == null && settlementAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.settlementAmt != null && settlementAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.settlementAmt.compareTo(settlementAmt) != 0) {
+                this.settlementAmt = settlementAmt;
+                if (!this.toUpdateCols.contains("SETTLEMENT_AMT")) {
+                    this.toUpdateCols.add("SETTLEMENT_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.settlementAmt = settlementAmt;
+            if (!this.toUpdateCols.contains("SETTLEMENT_AMT")) {
+                this.toUpdateCols.add("SETTLEMENT_AMT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 项目建议书实际完成日期。
+     */
+    private LocalDate projectProposalActualDate;
+
+    /**
+     * 获取：项目建议书实际完成日期。
+     */
+    public LocalDate getProjectProposalActualDate() {
+        return this.projectProposalActualDate;
+    }
+
+    /**
+     * 设置：项目建议书实际完成日期。
+     */
+    public PmPrj setProjectProposalActualDate(LocalDate projectProposalActualDate) {
+        if (this.projectProposalActualDate == null && projectProposalActualDate == null) {
+            // 均为null，不做处理。
+        } else if (this.projectProposalActualDate != null && projectProposalActualDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectProposalActualDate.compareTo(projectProposalActualDate) != 0) {
+                this.projectProposalActualDate = projectProposalActualDate;
+                if (!this.toUpdateCols.contains("PROJECT_PROPOSAL_ACTUAL_DATE")) {
+                    this.toUpdateCols.add("PROJECT_PROPOSAL_ACTUAL_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectProposalActualDate = projectProposalActualDate;
+            if (!this.toUpdateCols.contains("PROJECT_PROPOSAL_ACTUAL_DATE")) {
+                this.toUpdateCols.add("PROJECT_PROPOSAL_ACTUAL_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 编制人。
+     */
+    private String author;
+
+    /**
+     * 获取：编制人。
+     */
+    public String getAuthor() {
+        return this.author;
+    }
+
+    /**
+     * 设置：编制人。
+     */
+    public PmPrj setAuthor(String author) {
+        if (this.author == null && author == null) {
+            // 均为null，不做处理。
+        } else if (this.author != null && author != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.author.compareTo(author) != 0) {
+                this.author = author;
+                if (!this.toUpdateCols.contains("AUTHOR")) {
+                    this.toUpdateCols.add("AUTHOR");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.author = author;
+            if (!this.toUpdateCols.contains("AUTHOR")) {
+                this.toUpdateCols.add("AUTHOR");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 盖章的立项申请书。
+     */
+    private String stampedPrjReqFile;
+
+    /**
+     * 获取：盖章的立项申请书。
+     */
+    public String getStampedPrjReqFile() {
+        return this.stampedPrjReqFile;
+    }
+
+    /**
+     * 设置：盖章的立项申请书。
+     */
+    public PmPrj setStampedPrjReqFile(String stampedPrjReqFile) {
+        if (this.stampedPrjReqFile == null && stampedPrjReqFile == null) {
+            // 均为null，不做处理。
+        } else if (this.stampedPrjReqFile != null && stampedPrjReqFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.stampedPrjReqFile.compareTo(stampedPrjReqFile) != 0) {
+                this.stampedPrjReqFile = stampedPrjReqFile;
+                if (!this.toUpdateCols.contains("STAMPED_PRJ_REQ_FILE")) {
+                    this.toUpdateCols.add("STAMPED_PRJ_REQ_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.stampedPrjReqFile = stampedPrjReqFile;
+            if (!this.toUpdateCols.contains("STAMPED_PRJ_REQ_FILE")) {
+                this.toUpdateCols.add("STAMPED_PRJ_REQ_FILE");
+            }
+        }
+        return this;
+    }
+
+    /**
      * CPMS的UUID。
      */
     private String cpmsUuid;
@@ -2272,6 +2593,22 @@ public class PmPrj {
     }
 
     /**
+     * 根据ID插入数据。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
+     */
+    public void insertById(boolean refreshThis) {
+        insertById(null, null, refreshThis);
+    }
+
+    /**
+     * 根据ID插入数据。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     */
+    public void insertById() {
+        insertById(null, null, false);
+    }
+
+    /**
      * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param includeCols 更新时包含的列，空为包含所有。
@@ -2290,6 +2627,22 @@ public class PmPrj {
             modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
             this.clearToUpdateCols();
         }
+    }
+
+    /**
+     * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
+     */
+    public void updateById(boolean refreshThis) {
+        updateById(null, null, refreshThis);
+    }
+
+    /**
+     * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     */
+    public void updateById() {
+        updateById(null, null, false);
     }
 
     /**
@@ -2338,6 +2691,16 @@ public class PmPrj {
     }
 
     /**
+     * 根据ID获取数据。
+     *
+     * @param id ID。
+     * @return 获取到的对象，若无则为null。
+     */
+    public static PmPrj selectById(String id) {
+        return selectById(id, null, null);
+    }
+
+    /**
      * 根据ID列表获取数据。
      *
      * @param ids         ID列表。
@@ -2348,6 +2711,16 @@ public class PmPrj {
     public static List<PmPrj> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
         List<PmPrj> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
+    }
+
+    /**
+     * 根据ID列表获取数据。
+     *
+     * @param ids ID列表。
+     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
+     */
+    public static List<PmPrj> selectByIds(List<String> ids) {
+        return selectByIds(ids, null, null);
     }
 
     /**
@@ -2364,6 +2737,43 @@ public class PmPrj {
     }
 
     /**
+     * 根据Where条件获取数据。
+     *
+     * @param where Where条件。
+     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
+     */
+    public static List<PmPrj> selectByWhere(Where where) {
+        return selectByWhere(where, null, null);
+    }
+
+    /**
+     * 根据Where条件获取数据。
+     *
+     * @param where       Where条件。
+     * @param includeCols 获取时包含的列，空为包含所有。
+     * @param excludeCols 获取时排除的列，空为不排除。
+     * @return 获取到的对象。
+     */
+    public static PmPrj selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<PmPrj> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        if (objList != null && objList.size() > 1) {
+            throw new BaseException("调用PmPrj.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+        }
+
+        return SharedUtil.isEmptyList(objList) ? null : objList.get(0);
+    }
+
+    /**
+     * 根据Where条件获取数据。
+     *
+     * @param where Where条件。
+     * @return 获取到的对象。
+     */
+    public static PmPrj selectOneByWhere(Where where) {
+        return selectOneByWhere(where, null, null);
+    }
+
+    /**
      * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param id          ID。
@@ -2374,6 +2784,17 @@ public class PmPrj {
      */
     public static int updateById(String id, Map<String, Object> keyValueMap, List<String> includeCols, List<String> excludeCols) {
         return modelHelper.updateById(id, keyValueMap, includeCols, excludeCols);
+    }
+
+    /**
+     * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param id          ID。
+     * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
+     * @return 影响的行数。
+     */
+    public static int updateById(String id, Map<String, Object> keyValueMap) {
+        return updateById(id, keyValueMap, null, null);
     }
 
     /**
@@ -2390,6 +2811,17 @@ public class PmPrj {
     }
 
     /**
+     * 根据ID列表更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param ids         ID列表。
+     * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
+     * @return 影响的行数。
+     */
+    public static int updateByIds(List<String> ids, Map<String, Object> keyValueMap) {
+        return updateByIds(ids, keyValueMap, null, null);
+    }
+
+    /**
      * 根据Where条件更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param where       Where条件。
@@ -2400,6 +2832,17 @@ public class PmPrj {
      */
     public static int updateByWhere(Where where, Map<String, Object> keyValueMap, List<String> includeCols, List<String> excludeCols) {
         return modelHelper.updateByWhere(where, keyValueMap, includeCols, excludeCols);
+    }
+
+    /**
+     * 根据Where条件更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param where       Where条件。
+     * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
+     * @return 影响的行数。
+     */
+    public static int updateByWhere(Where where, Map<String, Object> keyValueMap) {
+        return updateByWhere(where, keyValueMap, null, null);
     }
 
     /**
@@ -2442,6 +2885,16 @@ public class PmPrj {
      */
     public static void copyCols(PmPrj fromModel, PmPrj toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
+    }
+
+    /**
+     * 拷贝列值。
+     *
+     * @param fromModel 从模型。
+     * @param toModel   到模型。
+     */
+    public static void copyCols(PmPrj fromModel, PmPrj toModel) {
+        copyCols(fromModel, toModel, null, null);
     }
 
     // </editor-fold>
