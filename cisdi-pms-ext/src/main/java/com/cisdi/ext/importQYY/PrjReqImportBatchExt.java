@@ -7,6 +7,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
+import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.SharedUtil;
@@ -101,6 +102,11 @@ public class PrjReqImportBatchExt {
      * 导入项目。
      */
     public void importPrj() {
+        LoginInfo loginInfo = ExtJarHelper.loginInfo.get();
+        if (!loginInfo.userCode.equalsIgnoreCase("admin")) {
+            throw new BaseException("只有admin才能操作！");
+        }
+
         SevInfo sevInfo = ExtJarHelper.sevInfo.get();
         EntityInfo entityInfo = sevInfo.entityInfo;
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
