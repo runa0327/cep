@@ -55,7 +55,7 @@ public class FeasibleImportBatchExt {
                                 return o1.getName().compareTo(o2.getName());
                             }
                         })
-                         .skip(50).limit(5)
+                        // .skip(50).limit(5)
                         .forEach(pmPrj -> {
                             FeasibleImport feasibleImport = doGetDtl(pmPrj);
                             feasibleImport.setFeasibleImportBatchId(csCommId);
@@ -87,47 +87,44 @@ public class FeasibleImportBatchExt {
                 feasibleImport.setExpertFile(tmp.getExpertFile()); //专家意见文件
                 feasibleImport.setReviewReportFile(tmp.getReviewReportFile()); //评审稿文件
                 feasibleImport.setRevisionFile(tmp.getRevisionFile()); //修编稿
-                feasibleImport.setReviewDraftFile(tmp.getReviewDraftFile()); //评审报告文件
-                BigDecimal prjTotalInvest = prjAmt(tmp,prjId,"PRJ_TOTAL_INVEST",myJdbcTemplate);
+                feasibleImport.setReviewDraftFile(tmp.getReviewReportFile()); //评审报告文件
+                BigDecimal prjTotalInvest = prjAmt(tmp.getPrjTotalInvest(),prjId,"PRJ_TOTAL_INVEST",myJdbcTemplate);
                 feasibleImport.setPrjTotalInvest(prjTotalInvest); //总投资
-                BigDecimal projectAmt = prjAmt(tmp,prjId,"PROJECT_AMT",myJdbcTemplate);
+                BigDecimal projectAmt = prjAmt(tmp.getProjectAmt(),prjId,"PROJECT_AMT",myJdbcTemplate);
                 feasibleImport.setProjectAmt(projectAmt); //工程费用
-                BigDecimal constructAmt = prjAmt(tmp,prjId,"CONSTRUCT_AMT",myJdbcTemplate);
+                BigDecimal constructAmt = prjAmt(tmp.getConstructAmt(),prjId,"CONSTRUCT_AMT",myJdbcTemplate);
                 feasibleImport.setProjectAmt(constructAmt); //建安费
-                BigDecimal equipAmt = prjAmt(tmp,prjId,"EQUIP_AMT",myJdbcTemplate);
+                BigDecimal equipAmt = prjAmt(tmp.getEquipAmt(),prjId,"EQUIP_AMT",myJdbcTemplate);
                 feasibleImport.setProjectAmt(equipAmt); //设备费
-                BigDecimal equipmentCost = prjAmt(tmp,prjId,"EQUIPMENT_COST",myJdbcTemplate);
+                BigDecimal equipmentCost = prjAmt(tmp.getEquipmentCost(),prjId,"EQUIPMENT_COST",myJdbcTemplate);
                 feasibleImport.setProjectAmt(equipmentCost); //可研设备费
-                BigDecimal projectOtherAmt = prjAmt(tmp,prjId,"PROJECT_OTHER_AMT",myJdbcTemplate);
+                BigDecimal projectOtherAmt = prjAmt(tmp.getProjectOtherAmt(),prjId,"PROJECT_OTHER_AMT",myJdbcTemplate);
                 feasibleImport.setProjectAmt(projectOtherAmt); //工程其他费
-                BigDecimal landAmt = prjAmt(tmp,prjId,"LAND_AMT",myJdbcTemplate);
+                BigDecimal landAmt = prjAmt(tmp.getLandAmt(),prjId,"LAND_AMT",myJdbcTemplate);
                 feasibleImport.setProjectAmt(landAmt); //土地征迁费
-                BigDecimal prepareAmt = prjAmt(tmp,prjId,"PREPARE_AMT",myJdbcTemplate);
+                BigDecimal prepareAmt = prjAmt(tmp.getPrepareAmt(),prjId,"PREPARE_AMT",myJdbcTemplate);
                 feasibleImport.setProjectAmt(prepareAmt); //预备费
-                BigDecimal constructPeriodInterest = prjAmt(tmp,prjId,"CONSTRUCT_PERIOD_INTEREST",myJdbcTemplate);
+                BigDecimal constructPeriodInterest = prjAmt(tmp.getConstructPeriodInterest(),prjId,"CONSTRUCT_PERIOD_INTEREST",myJdbcTemplate);
                 feasibleImport.setProjectAmt(constructPeriodInterest); //建设期利息
                 feasibleImport.setReplyActualDate(tmp.getReplyActualDate()); //实际批复日期
                 feasibleImport.setReplyNoWr(tmp.getReplyNoWr()); //批复文号
                 feasibleImport.setReplyFile(tmp.getReplyFile()); //批复文件
             }
         }
-
-        // TODO 其他字段的取数逻辑。
-
         return feasibleImport;
     }
 
     /**
      * 查询资金赋值信息
-     * @param tmp 该项目可研数据
+     * @param val 该项目可研数据
      * @param prjId 项目id
      * @param code 需要匹配的字段
      * @param myJdbcTemplate 数据源
      * @return
      */
-    private BigDecimal prjAmt(PmPrjInvest1 tmp, String prjId, String code, MyJdbcTemplate myJdbcTemplate) {
-        BigDecimal amtValue = tmp.getPrjTotalInvest();
-        if (amtValue == null){
+    private BigDecimal prjAmt(BigDecimal val, String prjId, String code, MyJdbcTemplate myJdbcTemplate) {
+        BigDecimal amtValue = new BigDecimal(0);
+        if (val == null){
             //从项目投资测算明细取数
             String sql1 = "select a.amt from PM_INVEST_EST_DTL a left join PM_INVEST_EST b on a.PM_INVEST_EST_ID = b.id " +
                     "left join PM_EXP_TYPE c on a.PM_EXP_TYPE_ID = c.id where b.PM_PRJ_ID = ? and c.code = ?";
@@ -138,6 +135,8 @@ public class FeasibleImportBatchExt {
             } else {
                 amtValue = new BigDecimal(0);
             }
+        } else {
+            amtValue = val;
         }
         return amtValue;
     }

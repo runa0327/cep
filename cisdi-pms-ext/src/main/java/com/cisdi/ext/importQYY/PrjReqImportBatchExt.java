@@ -26,6 +26,17 @@ import java.util.stream.Collectors;
 
 public class PrjReqImportBatchExt {
 
+    public static final Map<String,String> investMap = new HashMap<>();
+    static {
+        investMap.put("ESTIMATED_TOTAL_INVEST","PRJ_TOTAL_INVEST"); //总投资
+        investMap.put("CONSTRUCT_PRJ_AMT","PROJECT_AMT"); //建安工程费
+        investMap.put("EQUIP_BUY_AMT","EQUIP_AMT"); //设备采购费
+        investMap.put("EQUIPMENT_COST","SCIENTIFIC_EQUIPMENT_AMT"); //科研设备费
+        investMap.put("PROJECT_OTHER_AMT","PROJECT_AMT-OTHER"); //工程其他费用
+        investMap.put("LAND_BUY_AMT","LAND_AMT"); //土地征迁费
+        investMap.put("PREPARE_AMT","PREPARE_AMT"); //预备费
+    }
+
     /**
      * 生成明细。
      */
@@ -68,6 +79,7 @@ public class PrjReqImportBatchExt {
      * @param pmPrj
      */
     private PrjReqImport doGetDtl(PmPrj pmPrj) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         PrjReqImport prjReqImport = PrjReqImport.newData();
         String prjId = pmPrj.getId();
         prjReqImport.setPmPrjId(prjId); //项目
@@ -84,13 +96,27 @@ public class PrjReqImportBatchExt {
         prjReqImport.setOther(pmPrj.getOther()); //其他
 
         prjReqImport.setInvestmentSourceId(pmPrj.getInvestmentSourceId()); // 投资来源
-        prjReqImport.setEstimatedTotalInvest(pmPrj.getEstimatedTotalInvest()); //匡算总投资
-        prjReqImport.setConstructPrjAmt(pmPrj.getConstructPrjAmt()); //建安工程费
-        prjReqImport.setEquipBuyAmt(pmPrj.getEquipBuyAmt()); //设备采购费
-        prjReqImport.setEquipmentCost(pmPrj.getEquipmentCost()); //科研设备费
-        prjReqImport.setProjectOtherAmt(pmPrj.getProjectOtherAmt()); //工程其他费用
-        prjReqImport.setLandBuyAmt(pmPrj.getLandBuyAmt()); //土地征迁费
-        prjReqImport.setPrepareAmt(pmPrj.getPrepareAmt()); //预备费
+
+        BigDecimal prjTotalInvest = prjAmt(pmPrj.getEstimatedTotalInvest(), prjId, "ESTIMATED_TOTAL_INVEST", myJdbcTemplate);
+        prjReqImport.setEstimatedTotalInvest(prjTotalInvest); //总投资
+
+        BigDecimal constructPrjAmt = prjAmt(pmPrj.getConstructPrjAmt(), prjId, "CONSTRUCT_PRJ_AMT", myJdbcTemplate);
+        prjReqImport.setConstructPrjAmt(constructPrjAmt); //建安工程费
+
+        BigDecimal equipBuyAmt = prjAmt(pmPrj.getEquipBuyAmt(), prjId, "EQUIP_BUY_AMT", myJdbcTemplate);
+        prjReqImport.setEquipBuyAmt(equipBuyAmt); //设备采购费
+
+        BigDecimal equipmentCost = prjAmt(pmPrj.getEquipmentCost(), prjId, "EQUIPMENT_COST", myJdbcTemplate);
+        prjReqImport.setEquipmentCost(equipmentCost); //科研设备费
+
+        BigDecimal projectOtherAmt = prjAmt(pmPrj.getProjectOtherAmt(), prjId, "PROJECT_OTHER_AMT", myJdbcTemplate);
+        prjReqImport.setProjectOtherAmt(projectOtherAmt); //工程其他费用
+
+        BigDecimal landBuyAmt = prjAmt(pmPrj.getLandBuyAmt(), prjId, "LAND_BUY_AMT", myJdbcTemplate);
+        prjReqImport.setLandBuyAmt(landBuyAmt); //土地征迁费
+
+        BigDecimal prepareAmt = prjAmt(pmPrj.getPrepareAmt(), prjId, "PREPARE_AMT", myJdbcTemplate);
+        prjReqImport.setPrepareAmt(prepareAmt); //预备费
 
         prjReqImport.setProjectProposalDate(pmPrj.getProjectProposalActualDate()); //项目建议书完成日期
         prjReqImport.setProjectProposalAuthor(pmPrj.getAuthor()); //项目建议书编制人
@@ -101,6 +127,52 @@ public class PrjReqImportBatchExt {
         prjReqImport.setReplyDate(pmPrj.getPrjReplyDate()); //批复日期
         prjReqImport.setReplyFile(pmPrj.getPrjReplyFile()); //批复文件
         return prjReqImport;
+    }
+
+    /**
+     * 查询资金赋值信息
+     * @param val 原值
+     * @param prjId 项目id
+     * @param code 需要匹配的字段
+     * @param myJdbcTemplate 数据源
+     * @return
+     */
+    private BigDecimal prjAmt(BigDecimal val, String prjId, String code, MyJdbcTemplate myJdbcTemplate) {
+        String trueCode = getCode(code,investMap);
+        BigDecimal amtValue = new BigDecimal(0);
+        if (val == null){
+            //从项目投资测算明细取数
+            String sql1 = "select a.amt from PM_INVEST_EST_DTL a left join PM_INVEST_EST b on a.PM_INVEST_EST_ID = b.id " +
+                    "left join PM_EXP_TYPE c on a.PM_EXP_TYPE_ID = c.id where b.PM_PRJ_ID = ? and c.code = ?";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,prjId,trueCode);
+            if (!CollectionUtils.isEmpty(list1)){
+                String amt = JdbcMapUtil.getString(list1.get(0),"amt");
+                amtValue = new BigDecimal(amt);
+            } else {
+                amtValue = new BigDecimal(0);
+            }
+        } else {
+            amtValue = val;
+        }
+        return amtValue;
+    }
+
+    /**
+     * 根据立项中的字段获取测算中的字段
+     * @param code
+     * @param investMap
+     * @return
+     */
+    private String getCode(String code, Map<String, String> investMap) {
+        String value = "";
+        for (Map.Entry entry : investMap.entrySet()){
+            String key = (String) entry.getKey();
+            if (code.equals(key)){
+                value = (String) entry.getValue();
+                break;
+            }
+        }
+        return value;
     }
 
     /**
