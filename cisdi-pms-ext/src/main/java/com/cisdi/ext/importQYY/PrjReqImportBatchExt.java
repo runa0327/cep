@@ -32,20 +32,22 @@ public class PrjReqImportBatchExt {
             if (!SharedUtil.isEmptyList(pmPrjList)) {
                 // 先按名称排序，再逐条取数并插入明细：
                 pmPrjList.stream().sorted((o1, o2) -> {
-                    if (o1.getName() == null && o2.getName() == null) {
-                        return 0;
-                    } else if (o1.getName() == null && o2.getName() != null) {
-                        return -1;
-                    } else if (o1.getName() != null && o2.getName() == null) {
-                        return 1;
-                    } else {
-                        return o1.getName().compareTo(o2.getName());
-                    }
-                }).forEach(pmPrj -> {
-                    PrjReqImport prjReqImport = doGetDtl(pmPrj);
-                    prjReqImport.setPrjReqImportBatchId(csCommId);
-                    prjReqImport.insertById();
-                });
+                            if (o1.getName() == null && o2.getName() == null) {
+                                return 0;
+                            } else if (o1.getName() == null && o2.getName() != null) {
+                                return -1;
+                            } else if (o1.getName() != null && o2.getName() == null) {
+                                return 1;
+                            } else {
+                                return o1.getName().compareTo(o2.getName());
+                            }
+                        })
+                        // .skip(50).limit(5)
+                        .forEach(pmPrj -> {
+                            PrjReqImport prjReqImport = doGetDtl(pmPrj);
+                            prjReqImport.setPrjReqImportBatchId(csCommId);
+                            prjReqImport.insertById();
+                        });
 
             }
         }
