@@ -89,24 +89,34 @@ public class FinancialImportBatchExt {
                 financialImport.setFileIdOne(tmp.getFileIdOne()); //评审意见
                 financialImport.setRevisionFile(tmp.getRevisionFile()); //修编稿
                 financialImport.setReviewReportFile(tmp.getReviewReportFile()); //评审报告文件
+
                 BigDecimal prjTotalInvest = prjAmt(tmp.getPrjTotalInvest(), prjId, "PRJ_TOTAL_INVEST", myJdbcTemplate);
                 financialImport.setPrjTotalInvest(prjTotalInvest); //总投资
+
                 BigDecimal projectAmt = prjAmt(tmp.getProjectAmt(), prjId, "PROJECT_AMT", myJdbcTemplate);
                 financialImport.setProjectAmt(projectAmt); //工程费用
+
                 BigDecimal constructAmt = prjAmt(tmp.getConstructAmt(), prjId, "CONSTRUCT_AMT", myJdbcTemplate);
-                financialImport.setProjectAmt(constructAmt); //建安费
+                financialImport.setConstructAmt(constructAmt); //建安费
+
                 BigDecimal equipAmt = prjAmt(tmp.getEquipAmt(), prjId, "EQUIP_AMT", myJdbcTemplate);
-                financialImport.setProjectAmt(equipAmt); //设备费
+                financialImport.setEquipAmt(equipAmt); //设备费
+
                 BigDecimal equipmentCost = prjAmt(tmp.getEquipmentCost(), prjId, "EQUIPMENT_COST", myJdbcTemplate);
-                financialImport.setProjectAmt(equipmentCost); //可研设备费
+                financialImport.setEquipmentCost(equipmentCost); //科研设备费
+
                 BigDecimal projectOtherAmt = prjAmt(tmp.getProjectOtherAmt(), prjId, "PROJECT_OTHER_AMT", myJdbcTemplate);
-                financialImport.setProjectAmt(projectOtherAmt); //工程其他费
+                financialImport.setProjectOtherAmt(projectOtherAmt); //工程其他费
+
                 BigDecimal landAmt = prjAmt(tmp.getLandAmt(), prjId, "LAND_AMT", myJdbcTemplate);
-                financialImport.setProjectAmt(landAmt); //土地征迁费
+                financialImport.setLandAmt(landAmt); //土地征迁费
+
                 BigDecimal prepareAmt = prjAmt(tmp.getPrepareAmt(), prjId, "PREPARE_AMT", myJdbcTemplate);
-                financialImport.setProjectAmt(prepareAmt); //预备费
+                financialImport.setPrepareAmt(prepareAmt); //预备费
+
                 BigDecimal constructPeriodInterest = prjAmt(tmp.getConstructPeriodInterest(), prjId, "CONSTRUCT_PERIOD_INTEREST", myJdbcTemplate);
-                financialImport.setProjectAmt(constructPeriodInterest); //建设期利息
+                financialImport.setConstructPeriodInterest(constructPeriodInterest); //建设期利息
+
                 financialImport.setReplyActualDate(tmp.getReplyActualDate()); //实际批复日期
                 financialImport.setReplyNoWr(tmp.getReplyNoWr()); //批复文号
                 financialImport.setReplyFile(tmp.getReplyFile()); //批复文件

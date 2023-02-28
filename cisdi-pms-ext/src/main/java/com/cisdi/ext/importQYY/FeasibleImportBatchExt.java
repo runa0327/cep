@@ -88,24 +88,34 @@ public class FeasibleImportBatchExt {
                 feasibleImport.setReviewReportFile(tmp.getReviewReportFile()); //评审稿文件
                 feasibleImport.setRevisionFile(tmp.getRevisionFile()); //修编稿
                 feasibleImport.setReviewDraftFile(tmp.getReviewReportFile()); //评审报告文件
+
                 BigDecimal prjTotalInvest = prjAmt(tmp.getPrjTotalInvest(),prjId,"PRJ_TOTAL_INVEST",myJdbcTemplate);
                 feasibleImport.setPrjTotalInvest(prjTotalInvest); //总投资
+
                 BigDecimal projectAmt = prjAmt(tmp.getProjectAmt(),prjId,"PROJECT_AMT",myJdbcTemplate);
                 feasibleImport.setProjectAmt(projectAmt); //工程费用
+
                 BigDecimal constructAmt = prjAmt(tmp.getConstructAmt(),prjId,"CONSTRUCT_AMT",myJdbcTemplate);
-                feasibleImport.setProjectAmt(constructAmt); //建安费
+                feasibleImport.setConstructAmt(constructAmt); //建安费
+
                 BigDecimal equipAmt = prjAmt(tmp.getEquipAmt(),prjId,"EQUIP_AMT",myJdbcTemplate);
-                feasibleImport.setProjectAmt(equipAmt); //设备费
+                feasibleImport.setEquipAmt(equipAmt); //设备费
+
                 BigDecimal equipmentCost = prjAmt(tmp.getEquipmentCost(),prjId,"EQUIPMENT_COST",myJdbcTemplate);
-                feasibleImport.setProjectAmt(equipmentCost); //可研设备费
+                feasibleImport.setEquipmentCost(equipmentCost); //可研设备费
+
                 BigDecimal projectOtherAmt = prjAmt(tmp.getProjectOtherAmt(),prjId,"PROJECT_OTHER_AMT",myJdbcTemplate);
-                feasibleImport.setProjectAmt(projectOtherAmt); //工程其他费
+                feasibleImport.setProjectOtherAmt(projectOtherAmt); //工程其他费
+
                 BigDecimal landAmt = prjAmt(tmp.getLandAmt(),prjId,"LAND_AMT",myJdbcTemplate);
-                feasibleImport.setProjectAmt(landAmt); //土地征迁费
+                feasibleImport.setLandAmt(landAmt); //土地征迁费
+
                 BigDecimal prepareAmt = prjAmt(tmp.getPrepareAmt(),prjId,"PREPARE_AMT",myJdbcTemplate);
-                feasibleImport.setProjectAmt(prepareAmt); //预备费
+                feasibleImport.setPrepareAmt(prepareAmt); //预备费
+
                 BigDecimal constructPeriodInterest = prjAmt(tmp.getConstructPeriodInterest(),prjId,"CONSTRUCT_PERIOD_INTEREST",myJdbcTemplate);
-                feasibleImport.setProjectAmt(constructPeriodInterest); //建设期利息
+                feasibleImport.setConstructPeriodInterest(constructPeriodInterest); //建设期利息
+
                 feasibleImport.setReplyActualDate(tmp.getReplyActualDate()); //实际批复日期
                 feasibleImport.setReplyNoWr(tmp.getReplyNoWr()); //批复文号
                 feasibleImport.setReplyFile(tmp.getReplyFile()); //批复文件
