@@ -12,8 +12,10 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.SharedUtil;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PrjReqImportBatchExt {
 
@@ -143,40 +145,47 @@ public class PrjReqImportBatchExt {
      */
     private boolean doImportPrj(PrjReqImport newImport) {
         boolean succ = true;
-        String errInfo = null;
+        List<String> errInfoList = new ArrayList<>();
         String newImportId = newImport.getId();
+
+        // 无论新、旧，项目ID都是相同的，通过项目ID获取项目：
+        String pmPrjId = newImport.getPmPrjId();
+
+        // 通过项目ID，获取旧的导入记录：
+        PmPrj pmPrj = PmPrj.selectById(pmPrjId);
+        PrjReqImport oldImport = doGetDtl(pmPrj);
+
+        // 若字段的值已不同，则予以处理：
+
+        // 示例，处理某个字段：
         try {
-            // 无论新、旧，项目ID都是相同的，通过项目ID获取项目：
-            String pmPrjId = newImport.getPmPrjId();
-
-            // 通过项目ID，获取旧的导入记录：
-            PmPrj pmPrj = PmPrj.selectById(pmPrjId);
-            PrjReqImport oldImport = doGetDtl(pmPrj);
-
-            // 若字段的值已不同，则予以处理：
-
             if (!SharedUtil.toStringEquals(oldImport.getCustomerUnit(), newImport.getCustomerUnit())) {
                 HashMap<String, Object> keyValueMap = new HashMap<>();
                 keyValueMap.put(PmPrj.Cols.CUSTOMER_UNIT, newImport.getCustomerUnit());
                 PmPrj.updateById(pmPrjId, keyValueMap);
             }
-
-            // TODO 其他字段的处理逻辑。
-
-            // 执行过程中，可能会自动抛出异常。
-            // 若希望自行抛出异常，则throw：
-            // throw new BaseException("业务异常！");
         } catch (Exception ex) {
             succ = false;
-            errInfo = ex.toString();
-        } finally {
-            HashMap<String, Object> keyValueMap = new HashMap<>();
-            keyValueMap.put(PrjReqImport.Cols.IMPORT_STATUS_ID, "3");
-            keyValueMap.put(PrjReqImport.Cols.IMPORT_TIME, LocalDateTime.now());
-            keyValueMap.put(PrjReqImport.Cols.IS_SUCCESS, succ);
-            keyValueMap.put(PrjReqImport.Cols.ERR_INFO, errInfo);
-            PrjReqImport.updateById(newImportId, keyValueMap);
+            errInfoList.add(ex.toString());
         }
+
+        // TODO 其他字段的处理逻辑。
+
+        // 执行过程中，可能会自动抛出异常。
+        // 若希望自行抛出异常，则throw：
+        // throw new BaseException("业务异常！");
+        // 但要记得catch住：
+        // catch (Exception ex) {
+        //     succ = false;
+        //     errInfoList.add(ex.toString());
+        // }
+
+        HashMap<String, Object> keyValueMap = new HashMap<>();
+        keyValueMap.put(PrjReqImport.Cols.IMPORT_STATUS_ID, "3");
+        keyValueMap.put(PrjReqImport.Cols.IMPORT_TIME, LocalDateTime.now());
+        keyValueMap.put(PrjReqImport.Cols.IS_SUCCESS, succ);
+        keyValueMap.put(PrjReqImport.Cols.ERR_INFO, SharedUtil.isEmptyList(errInfoList) ? null : errInfoList.stream().collect(Collectors.joining("；")));
+        PrjReqImport.updateById(newImportId, keyValueMap);
 
         return succ;
     }
