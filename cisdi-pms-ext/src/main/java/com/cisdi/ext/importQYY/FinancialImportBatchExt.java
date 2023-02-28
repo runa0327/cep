@@ -1,6 +1,5 @@
 package com.cisdi.ext.importQYY;
 
-import com.cisdi.ext.importQYY.model.FeasibleImport;
 import com.cisdi.ext.importQYY.model.FinancialImport;
 import com.cisdi.ext.importQYY.model.FinancialImportBatch;
 import com.cisdi.ext.model.PmPrj;
@@ -62,7 +61,6 @@ public class FinancialImportBatchExt {
                             financialImport.setFinancialImportBatchId(csCommId);
                             financialImport.insertById();
                         });
-
             }
         }
     }
