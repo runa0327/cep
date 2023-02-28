@@ -3,6 +3,7 @@ package com.cisdi.ext.model;
 import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
@@ -288,11 +289,11 @@ public class PmPrjInvest2 {
          */
         public static final String EQUIP_AMT = "EQUIP_AMT";
         /**
-         * 科研设备费（万）。
+         * 科研设备费(万)。
          */
         public static final String EQUIPMENT_COST = "EQUIPMENT_COST";
         /**
-         * 工程其他费用（万）。
+         * 工程其他费用(万)。
          */
         public static final String PROJECT_OTHER_AMT = "PROJECT_OTHER_AMT";
         /**
@@ -300,7 +301,7 @@ public class PmPrjInvest2 {
          */
         public static final String LAND_AMT = "LAND_AMT";
         /**
-         * 预备费（万）。
+         * 预备费(万)。
          */
         public static final String PREPARE_AMT = "PREPARE_AMT";
         /**
@@ -2487,19 +2488,19 @@ public class PmPrjInvest2 {
     }
 
     /**
-     * 科研设备费（万）。
+     * 科研设备费(万)。
      */
     private BigDecimal equipmentCost;
 
     /**
-     * 获取：科研设备费（万）。
+     * 获取：科研设备费(万)。
      */
     public BigDecimal getEquipmentCost() {
         return this.equipmentCost;
     }
 
     /**
-     * 设置：科研设备费（万）。
+     * 设置：科研设备费(万)。
      */
     public PmPrjInvest2 setEquipmentCost(BigDecimal equipmentCost) {
         if (this.equipmentCost == null && equipmentCost == null) {
@@ -2523,19 +2524,19 @@ public class PmPrjInvest2 {
     }
 
     /**
-     * 工程其他费用（万）。
+     * 工程其他费用(万)。
      */
     private BigDecimal projectOtherAmt;
 
     /**
-     * 获取：工程其他费用（万）。
+     * 获取：工程其他费用(万)。
      */
     public BigDecimal getProjectOtherAmt() {
         return this.projectOtherAmt;
     }
 
     /**
-     * 设置：工程其他费用（万）。
+     * 设置：工程其他费用(万)。
      */
     public PmPrjInvest2 setProjectOtherAmt(BigDecimal projectOtherAmt) {
         if (this.projectOtherAmt == null && projectOtherAmt == null) {
@@ -2595,19 +2596,19 @@ public class PmPrjInvest2 {
     }
 
     /**
-     * 预备费（万）。
+     * 预备费(万)。
      */
     private BigDecimal prepareAmt;
 
     /**
-     * 获取：预备费（万）。
+     * 获取：预备费(万)。
      */
     public BigDecimal getPrepareAmt() {
         return this.prepareAmt;
     }
 
     /**
-     * 设置：预备费（万）。
+     * 设置：预备费(万)。
      */
     public PmPrjInvest2 setPrepareAmt(BigDecimal prepareAmt) {
         if (this.prepareAmt == null && prepareAmt == null) {
@@ -2792,6 +2793,22 @@ public class PmPrjInvest2 {
     }
 
     /**
+     * 根据ID插入数据。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
+     */
+    public void insertById(boolean refreshThis) {
+        insertById(null, null, refreshThis);
+    }
+
+    /**
+     * 根据ID插入数据。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     */
+    public void insertById() {
+        insertById(null, null, false);
+    }
+
+    /**
      * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param includeCols 更新时包含的列，空为包含所有。
@@ -2810,6 +2827,22 @@ public class PmPrjInvest2 {
             modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
             this.clearToUpdateCols();
         }
+    }
+
+    /**
+     * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
+     */
+    public void updateById(boolean refreshThis) {
+        updateById(null, null, refreshThis);
+    }
+
+    /**
+     * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     */
+    public void updateById() {
+        updateById(null, null, false);
     }
 
     /**
@@ -2858,6 +2891,16 @@ public class PmPrjInvest2 {
     }
 
     /**
+     * 根据ID获取数据。
+     *
+     * @param id ID。
+     * @return 获取到的对象，若无则为null。
+     */
+    public static PmPrjInvest2 selectById(String id) {
+        return selectById(id, null, null);
+    }
+
+    /**
      * 根据ID列表获取数据。
      *
      * @param ids         ID列表。
@@ -2868,6 +2911,16 @@ public class PmPrjInvest2 {
     public static List<PmPrjInvest2> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
         List<PmPrjInvest2> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
+    }
+
+    /**
+     * 根据ID列表获取数据。
+     *
+     * @param ids ID列表。
+     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
+     */
+    public static List<PmPrjInvest2> selectByIds(List<String> ids) {
+        return selectByIds(ids, null, null);
     }
 
     /**
@@ -2884,6 +2937,43 @@ public class PmPrjInvest2 {
     }
 
     /**
+     * 根据Where条件获取数据。
+     *
+     * @param where Where条件。
+     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
+     */
+    public static List<PmPrjInvest2> selectByWhere(Where where) {
+        return selectByWhere(where, null, null);
+    }
+
+    /**
+     * 根据Where条件获取数据。
+     *
+     * @param where       Where条件。
+     * @param includeCols 获取时包含的列，空为包含所有。
+     * @param excludeCols 获取时排除的列，空为不排除。
+     * @return 获取到的对象。
+     */
+    public static PmPrjInvest2 selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<PmPrjInvest2> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        if (objList != null && objList.size() > 1) {
+            throw new BaseException("调用PmPrjInvest2.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+        }
+
+        return SharedUtil.isEmptyList(objList) ? null : objList.get(0);
+    }
+
+    /**
+     * 根据Where条件获取数据。
+     *
+     * @param where Where条件。
+     * @return 获取到的对象。
+     */
+    public static PmPrjInvest2 selectOneByWhere(Where where) {
+        return selectOneByWhere(where, null, null);
+    }
+
+    /**
      * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param id          ID。
@@ -2894,6 +2984,17 @@ public class PmPrjInvest2 {
      */
     public static int updateById(String id, Map<String, Object> keyValueMap, List<String> includeCols, List<String> excludeCols) {
         return modelHelper.updateById(id, keyValueMap, includeCols, excludeCols);
+    }
+
+    /**
+     * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param id          ID。
+     * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
+     * @return 影响的行数。
+     */
+    public static int updateById(String id, Map<String, Object> keyValueMap) {
+        return updateById(id, keyValueMap, null, null);
     }
 
     /**
@@ -2910,6 +3011,17 @@ public class PmPrjInvest2 {
     }
 
     /**
+     * 根据ID列表更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param ids         ID列表。
+     * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
+     * @return 影响的行数。
+     */
+    public static int updateByIds(List<String> ids, Map<String, Object> keyValueMap) {
+        return updateByIds(ids, keyValueMap, null, null);
+    }
+
+    /**
      * 根据Where条件更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param where       Where条件。
@@ -2920,6 +3032,17 @@ public class PmPrjInvest2 {
      */
     public static int updateByWhere(Where where, Map<String, Object> keyValueMap, List<String> includeCols, List<String> excludeCols) {
         return modelHelper.updateByWhere(where, keyValueMap, includeCols, excludeCols);
+    }
+
+    /**
+     * 根据Where条件更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param where       Where条件。
+     * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
+     * @return 影响的行数。
+     */
+    public static int updateByWhere(Where where, Map<String, Object> keyValueMap) {
+        return updateByWhere(where, keyValueMap, null, null);
     }
 
     /**
@@ -2962,6 +3085,16 @@ public class PmPrjInvest2 {
      */
     public static void copyCols(PmPrjInvest2 fromModel, PmPrjInvest2 toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
+    }
+
+    /**
+     * 拷贝列值。
+     *
+     * @param fromModel 从模型。
+     * @param toModel   到模型。
+     */
+    public static void copyCols(PmPrjInvest2 fromModel, PmPrjInvest2 toModel) {
+        copyCols(fromModel, toModel, null, null);
     }
 
     // </editor-fold>
