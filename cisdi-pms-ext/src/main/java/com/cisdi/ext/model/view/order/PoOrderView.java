@@ -35,6 +35,8 @@ public class PoOrderView extends BasePageEntity {
     // 附件信息
     public String fileId;
     public List<BaseFileView> fileList;
+    //附件个数
+    public Integer fileNum;
     // 状态名称
     public String statusName;
     // 备注

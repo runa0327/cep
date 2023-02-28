@@ -220,10 +220,12 @@ public class PoOrderExtApi {
                 poOrderView.endDate = JdbcMapUtil.getString(p, "endDate");
                 String fileId = SharedUtil.isEmptyString(JdbcMapUtil.getString(p, "fileId")) ? "" : JdbcMapUtil.getString(p, "fileId");
                 if (!SharedUtil.isEmptyString(fileId)){
-                    fileId = StringUtil.getFirstStr(fileId,",");
-                    List<BaseFileView> fileList = FileApi.getFileList(fileId);
-                    poOrderView.fileList = fileList;
+                    List<String> fileList = StringUtil.getStrToList(fileId,",");
+                    fileId = StringUtil.replaceCode(fileId,",","','");
+                    List<BaseFileView> fileDetail = FileApi.getFileList(fileId);
+                    poOrderView.fileNum = fileList.size();
                     poOrderView.fileId = fileId;
+                    poOrderView.fileList = fileDetail;
                 }
                 poOrderView.viewId = JdbcMapUtil.getString(p, "viewId");
                 return poOrderView;
