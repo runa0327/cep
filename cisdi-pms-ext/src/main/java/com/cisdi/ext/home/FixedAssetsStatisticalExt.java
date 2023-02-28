@@ -42,6 +42,7 @@ public class FixedAssetsStatisticalExt {
             sb.append(" and id in (:ids)");
         }
         String totalSql = sb.toString();
+        sb.append("order by CRT_DT desc ");
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
         List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), dataParam);
