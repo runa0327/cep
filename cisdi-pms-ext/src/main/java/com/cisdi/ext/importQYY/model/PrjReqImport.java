@@ -125,17 +125,17 @@ public class PrjReqImport {
          */
         public static final String CUSTOMER_UNIT = "CUSTOMER_UNIT";
         /**
-         * 管理模式。
+         * 项目管理模式。
          */
-        public static final String MANAGE_MODE = "MANAGE_MODE";
+        public static final String PRJ_MANAGE_MODE_ID = "PRJ_MANAGE_MODE_ID";
         /**
          * 建设地点。
          */
-        public static final String BASE_LACATION = "BASE_LACATION";
+        public static final String BASE_LOCATION_ID = "BASE_LOCATION_ID";
         /**
          * 项目类型。
          */
-        public static final String PROJECT_TYPE_NAME = "PROJECT_TYPE_NAME";
+        public static final String PROJECT_TYPE_ID = "PROJECT_TYPE_ID";
         /**
          * 项目概况。
          */
@@ -143,7 +143,7 @@ public class PrjReqImport {
         /**
          * 建设规模类型。
          */
-        public static final String CON_SCALE_TYPE_NAME = "CON_SCALE_TYPE_NAME";
+        public static final String CON_SCALE_TYPE_ID = "CON_SCALE_TYPE_ID";
         /**
          * 占地面积(平方米)。
          */
@@ -167,7 +167,7 @@ public class PrjReqImport {
         /**
          * 投资来源。
          */
-        public static final String INVESTMENT_SOURCE_NAME = "INVESTMENT_SOURCE_NAME";
+        public static final String INVESTMENT_SOURCE_ID = "INVESTMENT_SOURCE_ID";
         /**
          * 匡算总投资(万)。
          */
@@ -920,36 +920,36 @@ public class PrjReqImport {
     }
 
     /**
-     * 管理模式。
+     * 项目管理模式。
      */
-    private String manageMode;
+    private String prjManageModeId;
 
     /**
-     * 获取：管理模式。
+     * 获取：项目管理模式。
      */
-    public String getManageMode() {
-        return this.manageMode;
+    public String getPrjManageModeId() {
+        return this.prjManageModeId;
     }
 
     /**
-     * 设置：管理模式。
+     * 设置：项目管理模式。
      */
-    public PrjReqImport setManageMode(String manageMode) {
-        if (this.manageMode == null && manageMode == null) {
+    public PrjReqImport setPrjManageModeId(String prjManageModeId) {
+        if (this.prjManageModeId == null && prjManageModeId == null) {
             // 均为null，不做处理。
-        } else if (this.manageMode != null && manageMode != null) {
+        } else if (this.prjManageModeId != null && prjManageModeId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.manageMode.compareTo(manageMode) != 0) {
-                this.manageMode = manageMode;
-                if (!this.toUpdateCols.contains("MANAGE_MODE")) {
-                    this.toUpdateCols.add("MANAGE_MODE");
+            if (this.prjManageModeId.compareTo(prjManageModeId) != 0) {
+                this.prjManageModeId = prjManageModeId;
+                if (!this.toUpdateCols.contains("PRJ_MANAGE_MODE_ID")) {
+                    this.toUpdateCols.add("PRJ_MANAGE_MODE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.manageMode = manageMode;
-            if (!this.toUpdateCols.contains("MANAGE_MODE")) {
-                this.toUpdateCols.add("MANAGE_MODE");
+            this.prjManageModeId = prjManageModeId;
+            if (!this.toUpdateCols.contains("PRJ_MANAGE_MODE_ID")) {
+                this.toUpdateCols.add("PRJ_MANAGE_MODE_ID");
             }
         }
         return this;
@@ -958,34 +958,34 @@ public class PrjReqImport {
     /**
      * 建设地点。
      */
-    private String baseLacation;
+    private String baseLocationId;
 
     /**
      * 获取：建设地点。
      */
-    public String getBaseLacation() {
-        return this.baseLacation;
+    public String getBaseLocationId() {
+        return this.baseLocationId;
     }
 
     /**
      * 设置：建设地点。
      */
-    public PrjReqImport setBaseLacation(String baseLacation) {
-        if (this.baseLacation == null && baseLacation == null) {
+    public PrjReqImport setBaseLocationId(String baseLocationId) {
+        if (this.baseLocationId == null && baseLocationId == null) {
             // 均为null，不做处理。
-        } else if (this.baseLacation != null && baseLacation != null) {
+        } else if (this.baseLocationId != null && baseLocationId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.baseLacation.compareTo(baseLacation) != 0) {
-                this.baseLacation = baseLacation;
-                if (!this.toUpdateCols.contains("BASE_LACATION")) {
-                    this.toUpdateCols.add("BASE_LACATION");
+            if (this.baseLocationId.compareTo(baseLocationId) != 0) {
+                this.baseLocationId = baseLocationId;
+                if (!this.toUpdateCols.contains("BASE_LOCATION_ID")) {
+                    this.toUpdateCols.add("BASE_LOCATION_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.baseLacation = baseLacation;
-            if (!this.toUpdateCols.contains("BASE_LACATION")) {
-                this.toUpdateCols.add("BASE_LACATION");
+            this.baseLocationId = baseLocationId;
+            if (!this.toUpdateCols.contains("BASE_LOCATION_ID")) {
+                this.toUpdateCols.add("BASE_LOCATION_ID");
             }
         }
         return this;
@@ -994,34 +994,34 @@ public class PrjReqImport {
     /**
      * 项目类型。
      */
-    private String projectTypeName;
+    private String projectTypeId;
 
     /**
      * 获取：项目类型。
      */
-    public String getProjectTypeName() {
-        return this.projectTypeName;
+    public String getProjectTypeId() {
+        return this.projectTypeId;
     }
 
     /**
      * 设置：项目类型。
      */
-    public PrjReqImport setProjectTypeName(String projectTypeName) {
-        if (this.projectTypeName == null && projectTypeName == null) {
+    public PrjReqImport setProjectTypeId(String projectTypeId) {
+        if (this.projectTypeId == null && projectTypeId == null) {
             // 均为null，不做处理。
-        } else if (this.projectTypeName != null && projectTypeName != null) {
+        } else if (this.projectTypeId != null && projectTypeId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.projectTypeName.compareTo(projectTypeName) != 0) {
-                this.projectTypeName = projectTypeName;
-                if (!this.toUpdateCols.contains("PROJECT_TYPE_NAME")) {
-                    this.toUpdateCols.add("PROJECT_TYPE_NAME");
+            if (this.projectTypeId.compareTo(projectTypeId) != 0) {
+                this.projectTypeId = projectTypeId;
+                if (!this.toUpdateCols.contains("PROJECT_TYPE_ID")) {
+                    this.toUpdateCols.add("PROJECT_TYPE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.projectTypeName = projectTypeName;
-            if (!this.toUpdateCols.contains("PROJECT_TYPE_NAME")) {
-                this.toUpdateCols.add("PROJECT_TYPE_NAME");
+            this.projectTypeId = projectTypeId;
+            if (!this.toUpdateCols.contains("PROJECT_TYPE_ID")) {
+                this.toUpdateCols.add("PROJECT_TYPE_ID");
             }
         }
         return this;
@@ -1066,34 +1066,34 @@ public class PrjReqImport {
     /**
      * 建设规模类型。
      */
-    private String conScaleTypeName;
+    private String conScaleTypeId;
 
     /**
      * 获取：建设规模类型。
      */
-    public String getConScaleTypeName() {
-        return this.conScaleTypeName;
+    public String getConScaleTypeId() {
+        return this.conScaleTypeId;
     }
 
     /**
      * 设置：建设规模类型。
      */
-    public PrjReqImport setConScaleTypeName(String conScaleTypeName) {
-        if (this.conScaleTypeName == null && conScaleTypeName == null) {
+    public PrjReqImport setConScaleTypeId(String conScaleTypeId) {
+        if (this.conScaleTypeId == null && conScaleTypeId == null) {
             // 均为null，不做处理。
-        } else if (this.conScaleTypeName != null && conScaleTypeName != null) {
+        } else if (this.conScaleTypeId != null && conScaleTypeId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.conScaleTypeName.compareTo(conScaleTypeName) != 0) {
-                this.conScaleTypeName = conScaleTypeName;
-                if (!this.toUpdateCols.contains("CON_SCALE_TYPE_NAME")) {
-                    this.toUpdateCols.add("CON_SCALE_TYPE_NAME");
+            if (this.conScaleTypeId.compareTo(conScaleTypeId) != 0) {
+                this.conScaleTypeId = conScaleTypeId;
+                if (!this.toUpdateCols.contains("CON_SCALE_TYPE_ID")) {
+                    this.toUpdateCols.add("CON_SCALE_TYPE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.conScaleTypeName = conScaleTypeName;
-            if (!this.toUpdateCols.contains("CON_SCALE_TYPE_NAME")) {
-                this.toUpdateCols.add("CON_SCALE_TYPE_NAME");
+            this.conScaleTypeId = conScaleTypeId;
+            if (!this.toUpdateCols.contains("CON_SCALE_TYPE_ID")) {
+                this.toUpdateCols.add("CON_SCALE_TYPE_ID");
             }
         }
         return this;
@@ -1282,34 +1282,34 @@ public class PrjReqImport {
     /**
      * 投资来源。
      */
-    private String investmentSourceName;
+    private String investmentSourceId;
 
     /**
      * 获取：投资来源。
      */
-    public String getInvestmentSourceName() {
-        return this.investmentSourceName;
+    public String getInvestmentSourceId() {
+        return this.investmentSourceId;
     }
 
     /**
      * 设置：投资来源。
      */
-    public PrjReqImport setInvestmentSourceName(String investmentSourceName) {
-        if (this.investmentSourceName == null && investmentSourceName == null) {
+    public PrjReqImport setInvestmentSourceId(String investmentSourceId) {
+        if (this.investmentSourceId == null && investmentSourceId == null) {
             // 均为null，不做处理。
-        } else if (this.investmentSourceName != null && investmentSourceName != null) {
+        } else if (this.investmentSourceId != null && investmentSourceId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.investmentSourceName.compareTo(investmentSourceName) != 0) {
-                this.investmentSourceName = investmentSourceName;
-                if (!this.toUpdateCols.contains("INVESTMENT_SOURCE_NAME")) {
-                    this.toUpdateCols.add("INVESTMENT_SOURCE_NAME");
+            if (this.investmentSourceId.compareTo(investmentSourceId) != 0) {
+                this.investmentSourceId = investmentSourceId;
+                if (!this.toUpdateCols.contains("INVESTMENT_SOURCE_ID")) {
+                    this.toUpdateCols.add("INVESTMENT_SOURCE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.investmentSourceName = investmentSourceName;
-            if (!this.toUpdateCols.contains("INVESTMENT_SOURCE_NAME")) {
-                this.toUpdateCols.add("INVESTMENT_SOURCE_NAME");
+            this.investmentSourceId = investmentSourceId;
+            if (!this.toUpdateCols.contains("INVESTMENT_SOURCE_ID")) {
+                this.toUpdateCols.add("INVESTMENT_SOURCE_ID");
             }
         }
         return this;
