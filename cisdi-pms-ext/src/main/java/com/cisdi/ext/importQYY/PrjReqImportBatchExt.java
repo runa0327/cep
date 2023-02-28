@@ -63,8 +63,32 @@ public class PrjReqImportBatchExt {
      */
     private PrjReqImport doGetDtl(PmPrj pmPrj) {
         PrjReqImport prjReqImport = PrjReqImport.newData();
-        prjReqImport.setPmPrjId(pmPrj.getId());
-        prjReqImport.setCustomerUnit(pmPrj.getCustomerUnit());
+        prjReqImport.setPmPrjId(pmPrj.getId()); //项目
+        prjReqImport.setCustomerUnit(pmPrj.getCustomerUnit()); //业主单位
+        prjReqImport.setPrjManageModeId(pmPrj.getPrjManageModeId()); //项目管理模式
+        prjReqImport.setBaseLocationId(pmPrj.getBaseLocationId()); //建设地点
+        prjReqImport.setPrjSituation(pmPrj.getPrjSituation()); //项目介绍
+        prjReqImport.setInvestmentSourceId(pmPrj.getInvestmentSourceId()); // 投资来源
+        prjReqImport.setEstimatedTotalInvest(pmPrj.getEstimatedTotalInvest()); //匡算总投资
+        prjReqImport.setConstructPrjAmt(pmPrj.getConstructPrjAmt()); //建安工程费
+        prjReqImport.setProjectOtherAmt(pmPrj.getProjectOtherAmt()); //工程其他费用
+        prjReqImport.setReplyNo(pmPrj.getPrjReplyNo()); //批复文号
+        prjReqImport.setReplyDate(pmPrj.getPrjReplyDate()); //批复日期
+        prjReqImport.setReplyFile(pmPrj.getPrjReplyFile()); //批复文件
+        prjReqImport.setConScaleTypeId(pmPrj.getConScaleTypeId()); //建设规模类型
+        prjReqImport.setFloorArea(pmPrj.getFloorArea()); //占地面积
+        prjReqImport.setBuildingArea(pmPrj.getBuildingArea()); //建筑面积
+        prjReqImport.setRoadLength(pmPrj.getConScaleQty()); //道路长度
+        prjReqImport.setRoadWidth(pmPrj.getConScaleQty2()); //道路宽度
+        prjReqImport.setOther(pmPrj.getOther()); //其他
+        prjReqImport.setEquipBuyAmt(pmPrj.getEquipBuyAmt()); //设备采购费
+        prjReqImport.setEquipmentCost(pmPrj.getEquipmentCost()); //可研设备费
+        prjReqImport.setLandBuyAmt(pmPrj.getLandBuyAmt()); //土地征迁费
+        prjReqImport.setPrepareAmt(pmPrj.getPrepareAmt()); //预备费
+        prjReqImport.setProjectProposalDate(pmPrj.getProjectProposalActualDate()); //项目建议书完成日期
+        prjReqImport.setProjectProposalAuthor(pmPrj.getAuthor()); //项目建议书编制人
+        prjReqImport.setProjectProposalFile(pmPrj.getStampedPrjReqFile()); //项目建议书
+        prjReqImport.setPrjCode(pmPrj.getPrjCode()); //项目编号
 
         // TODO 其他字段的取数逻辑。
 

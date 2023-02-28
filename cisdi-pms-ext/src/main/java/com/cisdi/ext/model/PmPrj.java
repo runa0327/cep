@@ -300,6 +300,34 @@ public class PmPrj {
          * CPMS建设地点。
          */
         public static final String CPMS_CONSTRUCTION_SITE = "CPMS_CONSTRUCTION_SITE";
+        /**
+         * 匡算总投资(万)。
+         */
+        public static final String ESTIMATED_TOTAL_INVEST = "ESTIMATED_TOTAL_INVEST";
+        /**
+         * 建安工程费(万)。
+         */
+        public static final String CONSTRUCT_PRJ_AMT = "CONSTRUCT_PRJ_AMT";
+        /**
+         * 设备采购费(万)。
+         */
+        public static final String EQUIP_BUY_AMT = "EQUIP_BUY_AMT";
+        /**
+         * 科研设备费(万)。
+         */
+        public static final String EQUIPMENT_COST = "EQUIPMENT_COST";
+        /**
+         * 工程其他费用(万)。
+         */
+        public static final String PROJECT_OTHER_AMT = "PROJECT_OTHER_AMT";
+        /**
+         * 土地征拆费用(万)。
+         */
+        public static final String LAND_BUY_AMT = "LAND_BUY_AMT";
+        /**
+         * 预备费(万)。
+         */
+        public static final String PREPARE_AMT = "PREPARE_AMT";
     }
 
     // </editor-fold>
@@ -2570,6 +2598,258 @@ public class PmPrj {
             this.cpmsConstructionSite = cpmsConstructionSite;
             if (!this.toUpdateCols.contains("CPMS_CONSTRUCTION_SITE")) {
                 this.toUpdateCols.add("CPMS_CONSTRUCTION_SITE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 匡算总投资(万)。
+     */
+    private BigDecimal estimatedTotalInvest;
+
+    /**
+     * 获取：匡算总投资(万)。
+     */
+    public BigDecimal getEstimatedTotalInvest() {
+        return this.estimatedTotalInvest;
+    }
+
+    /**
+     * 设置：匡算总投资(万)。
+     */
+    public PmPrj setEstimatedTotalInvest(BigDecimal estimatedTotalInvest) {
+        if (this.estimatedTotalInvest == null && estimatedTotalInvest == null) {
+            // 均为null，不做处理。
+        } else if (this.estimatedTotalInvest != null && estimatedTotalInvest != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.estimatedTotalInvest.compareTo(estimatedTotalInvest) != 0) {
+                this.estimatedTotalInvest = estimatedTotalInvest;
+                if (!this.toUpdateCols.contains("ESTIMATED_TOTAL_INVEST")) {
+                    this.toUpdateCols.add("ESTIMATED_TOTAL_INVEST");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.estimatedTotalInvest = estimatedTotalInvest;
+            if (!this.toUpdateCols.contains("ESTIMATED_TOTAL_INVEST")) {
+                this.toUpdateCols.add("ESTIMATED_TOTAL_INVEST");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 建安工程费(万)。
+     */
+    private BigDecimal constructPrjAmt;
+
+    /**
+     * 获取：建安工程费(万)。
+     */
+    public BigDecimal getConstructPrjAmt() {
+        return this.constructPrjAmt;
+    }
+
+    /**
+     * 设置：建安工程费(万)。
+     */
+    public PmPrj setConstructPrjAmt(BigDecimal constructPrjAmt) {
+        if (this.constructPrjAmt == null && constructPrjAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.constructPrjAmt != null && constructPrjAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.constructPrjAmt.compareTo(constructPrjAmt) != 0) {
+                this.constructPrjAmt = constructPrjAmt;
+                if (!this.toUpdateCols.contains("CONSTRUCT_PRJ_AMT")) {
+                    this.toUpdateCols.add("CONSTRUCT_PRJ_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.constructPrjAmt = constructPrjAmt;
+            if (!this.toUpdateCols.contains("CONSTRUCT_PRJ_AMT")) {
+                this.toUpdateCols.add("CONSTRUCT_PRJ_AMT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 设备采购费(万)。
+     */
+    private BigDecimal equipBuyAmt;
+
+    /**
+     * 获取：设备采购费(万)。
+     */
+    public BigDecimal getEquipBuyAmt() {
+        return this.equipBuyAmt;
+    }
+
+    /**
+     * 设置：设备采购费(万)。
+     */
+    public PmPrj setEquipBuyAmt(BigDecimal equipBuyAmt) {
+        if (this.equipBuyAmt == null && equipBuyAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.equipBuyAmt != null && equipBuyAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.equipBuyAmt.compareTo(equipBuyAmt) != 0) {
+                this.equipBuyAmt = equipBuyAmt;
+                if (!this.toUpdateCols.contains("EQUIP_BUY_AMT")) {
+                    this.toUpdateCols.add("EQUIP_BUY_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.equipBuyAmt = equipBuyAmt;
+            if (!this.toUpdateCols.contains("EQUIP_BUY_AMT")) {
+                this.toUpdateCols.add("EQUIP_BUY_AMT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 科研设备费(万)。
+     */
+    private BigDecimal equipmentCost;
+
+    /**
+     * 获取：科研设备费(万)。
+     */
+    public BigDecimal getEquipmentCost() {
+        return this.equipmentCost;
+    }
+
+    /**
+     * 设置：科研设备费(万)。
+     */
+    public PmPrj setEquipmentCost(BigDecimal equipmentCost) {
+        if (this.equipmentCost == null && equipmentCost == null) {
+            // 均为null，不做处理。
+        } else if (this.equipmentCost != null && equipmentCost != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.equipmentCost.compareTo(equipmentCost) != 0) {
+                this.equipmentCost = equipmentCost;
+                if (!this.toUpdateCols.contains("EQUIPMENT_COST")) {
+                    this.toUpdateCols.add("EQUIPMENT_COST");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.equipmentCost = equipmentCost;
+            if (!this.toUpdateCols.contains("EQUIPMENT_COST")) {
+                this.toUpdateCols.add("EQUIPMENT_COST");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 工程其他费用(万)。
+     */
+    private BigDecimal projectOtherAmt;
+
+    /**
+     * 获取：工程其他费用(万)。
+     */
+    public BigDecimal getProjectOtherAmt() {
+        return this.projectOtherAmt;
+    }
+
+    /**
+     * 设置：工程其他费用(万)。
+     */
+    public PmPrj setProjectOtherAmt(BigDecimal projectOtherAmt) {
+        if (this.projectOtherAmt == null && projectOtherAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.projectOtherAmt != null && projectOtherAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectOtherAmt.compareTo(projectOtherAmt) != 0) {
+                this.projectOtherAmt = projectOtherAmt;
+                if (!this.toUpdateCols.contains("PROJECT_OTHER_AMT")) {
+                    this.toUpdateCols.add("PROJECT_OTHER_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectOtherAmt = projectOtherAmt;
+            if (!this.toUpdateCols.contains("PROJECT_OTHER_AMT")) {
+                this.toUpdateCols.add("PROJECT_OTHER_AMT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 土地征拆费用(万)。
+     */
+    private BigDecimal landBuyAmt;
+
+    /**
+     * 获取：土地征拆费用(万)。
+     */
+    public BigDecimal getLandBuyAmt() {
+        return this.landBuyAmt;
+    }
+
+    /**
+     * 设置：土地征拆费用(万)。
+     */
+    public PmPrj setLandBuyAmt(BigDecimal landBuyAmt) {
+        if (this.landBuyAmt == null && landBuyAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.landBuyAmt != null && landBuyAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.landBuyAmt.compareTo(landBuyAmt) != 0) {
+                this.landBuyAmt = landBuyAmt;
+                if (!this.toUpdateCols.contains("LAND_BUY_AMT")) {
+                    this.toUpdateCols.add("LAND_BUY_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.landBuyAmt = landBuyAmt;
+            if (!this.toUpdateCols.contains("LAND_BUY_AMT")) {
+                this.toUpdateCols.add("LAND_BUY_AMT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 预备费(万)。
+     */
+    private BigDecimal prepareAmt;
+
+    /**
+     * 获取：预备费(万)。
+     */
+    public BigDecimal getPrepareAmt() {
+        return this.prepareAmt;
+    }
+
+    /**
+     * 设置：预备费(万)。
+     */
+    public PmPrj setPrepareAmt(BigDecimal prepareAmt) {
+        if (this.prepareAmt == null && prepareAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.prepareAmt != null && prepareAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prepareAmt.compareTo(prepareAmt) != 0) {
+                this.prepareAmt = prepareAmt;
+                if (!this.toUpdateCols.contains("PREPARE_AMT")) {
+                    this.toUpdateCols.add("PREPARE_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prepareAmt = prepareAmt;
+            if (!this.toUpdateCols.contains("PREPARE_AMT")) {
+                this.toUpdateCols.add("PREPARE_AMT");
             }
         }
         return this;
