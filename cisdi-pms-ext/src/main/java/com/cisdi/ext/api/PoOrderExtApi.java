@@ -1,6 +1,7 @@
 package com.cisdi.ext.api;
 
 import com.cisdi.ext.base.GrSetValue;
+import com.cisdi.ext.model.view.file.BaseFileView;
 import com.cisdi.ext.model.view.order.PoOrderContactsView;
 import com.cisdi.ext.model.view.order.PoOrderDtlProView;
 import com.cisdi.ext.model.view.order.PoOrderDtlView;
@@ -217,7 +218,14 @@ public class PoOrderExtApi {
                 poOrderView.agentName = JdbcMapUtil.getString(p, "agentName");
                 poOrderView.signDate = JdbcMapUtil.getString(p, "signDate");
                 poOrderView.endDate = JdbcMapUtil.getString(p, "endDate");
-                poOrderView.fileId = SharedUtil.isEmptyString(JdbcMapUtil.getString(p, "fileId")) ? "" : JdbcMapUtil.getString(p, "fileId");
+                String fileId = SharedUtil.isEmptyString(JdbcMapUtil.getString(p, "fileId")) ? "" : JdbcMapUtil.getString(p, "fileId");
+                if (!SharedUtil.isEmptyString(fileId)){
+                    fileId = StringUtil.getFirstStr(fileId,",");
+                    List<BaseFileView> fileList = FileApi.getFileList(fileId);
+                    poOrderView.fileList = fileList;
+                    poOrderView.fileId = fileId;
+                }
+                poOrderView.viewId = JdbcMapUtil.getString(p, "viewId");
                 return poOrderView;
             }).collect(Collectors.toList());
             map1.put("result", inputList);

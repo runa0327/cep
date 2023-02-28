@@ -84,6 +84,7 @@ public class CompleteOutputStatisticsExt {
                     "left join PM_PARTY pmp on pm.CUSTOMER_UNIT = pmp.id\n" +
                     "left join gr_set_value gsv on pm.PRJ_MANAGE_MODE_ID = gsv.id\n" +
                     "left join gr_set gs on gs.id = gsv.GR_SET_ID and gs.code ='management_unit' where pm.id in (:ids) and pm.`STATUS`='AP'");
+            sb.append("order by pm.CRT_DT desc ");
             int start = pageSize * (pageIndex - 1);
             sb.append(" limit ").append(start).append(",").append(pageSize);
             list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), paramMap);
@@ -123,6 +124,7 @@ public class CompleteOutputStatisticsExt {
                     "left join PM_PARTY pmp on pm.CUSTOMER_UNIT = pmp.id\n" +
                     "left join gr_set_value gsv on pm.PRJ_MANAGE_MODE_ID = gsv.id\n" +
                     "left join gr_set gs on gs.id = gsv.GR_SET_ID and gs.code ='management_unit'  where pm.`STATUS`='AP'");
+            sb.append("order by pm.CRT_DT desc ");
             int start = pageSize * (pageIndex - 1);
             sb.append(" limit ").append(start).append(",").append(pageSize);
             list = myJdbcTemplate.queryForList(sb.toString());
