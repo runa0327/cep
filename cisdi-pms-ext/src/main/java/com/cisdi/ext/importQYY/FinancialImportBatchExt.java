@@ -1,21 +1,27 @@
 package com.cisdi.ext.importQYY;
 
+import com.cisdi.ext.importQYY.model.FeasibleImport;
 import com.cisdi.ext.importQYY.model.FinancialImport;
 import com.cisdi.ext.importQYY.model.FinancialImportBatch;
 import com.cisdi.ext.model.PmPrj;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -67,12 +73,72 @@ public class FinancialImportBatchExt {
      * @param pmPrj
      */
     private FinancialImport doGetDtl(PmPrj pmPrj) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         FinancialImport financialImport = FinancialImport.newData();
-        financialImport.setPmPrjId(pmPrj.getId()); //项目
-
-        // TODO 其他字段的取数逻辑。
-
+        String prjId = pmPrj.getId();
+        financialImport.setPmPrjId(prjId); // 项目
+        //根据项目id查询可研数据
+        List<FinancialImport> list = FinancialImport.selectByWhere(new Where().eq(FinancialImport.Cols.PM_PRJ_ID,pmPrj.getId()));
+        if (!CollectionUtils.isEmpty(list)) {
+            for (FinancialImport tmp : list) {
+                financialImport.setExpertFile(tmp.getExpertFile()); //初审意见材料
+                financialImport.setFileIdTwo(tmp.getFileIdTwo()); //初概上回稿文件
+                financialImport.setReviewUnitChief(tmp.getReviewUnitChief()); //评审单位负责人
+                financialImport.setReviewUnitText(tmp.getReviewUnitText()); //评审组织单位
+                financialImport.setReviewUnitPhone(tmp.getReviewUnitPhone()); //评审单位联系方式
+                financialImport.setExpertComplActualDate(tmp.getExpertComplActualDate()); //实际评审日期
+                financialImport.setFileIdOne(tmp.getFileIdOne()); //评审意见
+                financialImport.setRevisionFile(tmp.getRevisionFile()); //修编稿
+                financialImport.setReviewReportFile(tmp.getReviewReportFile()); //评审报告文件
+                BigDecimal prjTotalInvest = prjAmt(tmp, prjId, "PRJ_TOTAL_INVEST", myJdbcTemplate);
+                financialImport.setPrjTotalInvest(prjTotalInvest); //总投资
+                BigDecimal projectAmt = prjAmt(tmp, prjId, "PROJECT_AMT", myJdbcTemplate);
+                financialImport.setProjectAmt(projectAmt); //工程费用
+                BigDecimal constructAmt = prjAmt(tmp, prjId, "CONSTRUCT_AMT", myJdbcTemplate);
+                financialImport.setProjectAmt(constructAmt); //建安费
+                BigDecimal equipAmt = prjAmt(tmp, prjId, "EQUIP_AMT", myJdbcTemplate);
+                financialImport.setProjectAmt(equipAmt); //设备费
+                BigDecimal equipmentCost = prjAmt(tmp, prjId, "EQUIPMENT_COST", myJdbcTemplate);
+                financialImport.setProjectAmt(equipmentCost); //可研设备费
+                BigDecimal projectOtherAmt = prjAmt(tmp, prjId, "PROJECT_OTHER_AMT", myJdbcTemplate);
+                financialImport.setProjectAmt(projectOtherAmt); //工程其他费
+                BigDecimal landAmt = prjAmt(tmp, prjId, "LAND_AMT", myJdbcTemplate);
+                financialImport.setProjectAmt(landAmt); //土地征迁费
+                BigDecimal prepareAmt = prjAmt(tmp, prjId, "PREPARE_AMT", myJdbcTemplate);
+                financialImport.setProjectAmt(prepareAmt); //预备费
+                BigDecimal constructPeriodInterest = prjAmt(tmp, prjId, "CONSTRUCT_PERIOD_INTEREST", myJdbcTemplate);
+                financialImport.setProjectAmt(constructPeriodInterest); //建设期利息
+                financialImport.setReplyActualDate(tmp.getReplyActualDate()); //实际批复日期
+                financialImport.setReplyNoWr(tmp.getReplyNoWr()); //批复文号
+                financialImport.setReplyFile(tmp.getReplyFile()); //批复文件
+            }
+        }
         return financialImport;
+    }
+
+    /**
+     * 查询资金赋值信息
+     * @param tmp 该项目可研数据
+     * @param prjId 项目id
+     * @param code 需要匹配的字段
+     * @param myJdbcTemplate 数据源
+     * @return
+     */
+    private BigDecimal prjAmt(FinancialImport tmp, String prjId, String code, MyJdbcTemplate myJdbcTemplate) {
+        BigDecimal amtValue = tmp.getPrjTotalInvest();
+        if (amtValue == null){
+            //从项目投资测算明细取数
+            String sql1 = "select a.amt from PM_INVEST_EST_DTL a left join PM_INVEST_EST b on a.PM_INVEST_EST_ID = b.id " +
+                    "left join PM_EXP_TYPE c on a.PM_EXP_TYPE_ID = c.id where b.PM_PRJ_ID = ? and c.code = ?";
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,prjId,code);
+            if (!CollectionUtils.isEmpty(list1)){
+                String amt = JdbcMapUtil.getString(list1.get(0),"amt");
+                amtValue = new BigDecimal(amt);
+            } else {
+                amtValue = new BigDecimal(0);
+            }
+        }
+        return amtValue;
     }
 
     /**
