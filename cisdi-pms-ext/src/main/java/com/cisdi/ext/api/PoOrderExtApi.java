@@ -160,32 +160,37 @@ public class PoOrderExtApi {
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuilder sb = new StringBuilder();
-        StringBuilder sb2 = new StringBuilder();
-        String sql = "SELECT a.ORDER_PROCESS_TYPE,a.id, a.PM_PRJ_ID, b.`NAME` as projectName, a.name as contractName,c.`NAME` as statusName, a.OPPO_SITE, a.OPPO_SITE_LINK_MAN, a.OPPO_SITE_CONTACT,a.AGENT, a.AGENT_PHONE, a.CONTRACT_AMOUNT, a.FILE_ATTACHMENT_URL,a.REMARK FROM PO_ORDER a LEFT JOIN pm_prj b on a.PM_PRJ_ID = b.ID LEFT JOIN ad_status c on a.`STATUS` = c.id where 1 = 1 and a.PM_PRJ_ID = ?";
-        String sql2 = "SELECT count(*) as num FROM PO_ORDER a LEFT JOIN pm_prj b on a.PM_PRJ_ID = b.ID LEFT JOIN ad_status c on a.`STATUS` = c.id where 1 = 1 and a.PM_PRJ_ID = ? ";
+        String sql = "SELECT a.id,a.PM_PRJ_ID as projectId,a.CONTRACT_APP_ID as orderProcessId,a.CONTRACT_NAME as contractName," +
+                "a.WIN_BID_UNIT_ONE as cooperationUnit,a.AMT_FIVE as noShuiAmt,a.AMT_ONE as shuiLv,a.AMT_SIX as shuiAmt," +
+                "a.AMT_SEVEN as aleadyPayAmt,a.AMT_TWO as payPrece,a.AD_USER_ID as agentUser,b.name as agentName," +
+                "a.SIGN_DATE as signDate,a.DATE_FIVE as endDate,a.FILE_ATTACHMENT_URL as fileId " +
+                "FROM po_order a left join ad_user b on a.AD_USER_ID = b.id " +
+                "where a.PM_PRJ_ID = ? and a.status = 'ap'";
         sb.append(sql);
-        sb2.append(sql2);
-        // 合同名称
-        if (!SharedUtil.isEmptyString(param.projectName)) {
-            sb.append(" and b.Name like ('%" + param.projectName + "%') ");
-            sb2.append(" and b.Name like ('%" + param.projectName + "%') ");
+        // 合作单位
+        if (!SharedUtil.isEmptyString(param.cooperationUnit)) {
+            sb.append(" and a.WIN_BID_UNIT_ONE like ('%").append(param.cooperationUnit).append("%') ");
         }
+        //合同名称
         if (!SharedUtil.isEmptyString(param.contractName)) {
-            sb.append(" and a.Name like ('%" + param.contractName + "%') ");
-            sb2.append(" and a.Name like ('%" + param.contractName + "%') ");
+            sb.append(" and a.CONTRACT_NAME like ('%").append(param.contractName).append("%') ");
         }
-        // 合同总价
-        if (param.contractAmount != null) {
-            sb.append(" and a.CONTRACT_AMOUNT like ('%" + param.contractAmount + "%') ");
-            sb2.append(" and a.CONTRACT_AMOUNT like ('%" + param.contractAmount + "%') ");
+        //合同签订日期
+        if (!SharedUtil.isEmptyString(param.signDateMin)){
+            sb.append(" and a.SIGN_DATE >= '").append(param.signDateMin).append("'");
         }
-        // 来源
-        if (!SharedUtil.isEmptyString(param.orderProcessType)){
-            sb.append(" and a.order_process_type like ('%" + param.orderProcessType + "%') ");
-            sb2.append(" and a.ORDER_PROCESS_TYPE like ('%" + param.orderProcessType + "%') ");
+        if (!SharedUtil.isEmptyString(param.signDateMax)){
+            sb.append(" and a.SIGN_DATE <= '").append(param.signDateMax).append("'");
         }
-        sb.append("order BY a.CRT_DT DESC ").append(limit);
-        sb2.append("order BY a.CRT_DT DESC");
+        //合同到期日期
+        if (!SharedUtil.isEmptyString(param.endDateMin)){
+            sb.append(" and a.DATE_FIVE >= '").append(param.endDateMin).append("'");
+        }
+        if (!SharedUtil.isEmptyString(param.endDateMax)){
+            sb.append(" and a.DATE_FIVE <= '").append(param.endDateMax).append("'");
+        }
+        StringBuilder sb2 = new StringBuilder(sb);
+        sb.append("order BY a.sign_date asc ").append(limit);
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString(), param.projectId);
         List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(sb2.toString(), param.projectId);
         Map<String, Object> map1 = new HashMap<>();
@@ -195,23 +200,24 @@ public class PoOrderExtApi {
             List<PoOrderView> inputList = list.stream().map(p -> {
                 PoOrderView poOrderView = new PoOrderView();
                 poOrderView.id = p.get("id").toString();
-                poOrderView.projectId = p.get("PM_PRJ_ID").toString();
-                poOrderView.projectName = JdbcMapUtil.getString(p, "projectName");
+                poOrderView.projectId = p.get("projectId").toString();
                 poOrderView.contractName = JdbcMapUtil.getString(p, "contractName");
-                poOrderView.oppoSite = JdbcMapUtil.getString(p, "OPPO_SITE");
-                poOrderView.oppoSiteLinkMan = JdbcMapUtil.getString(p, "OPPO_SITE_LINK_MAN");
-                poOrderView.oppoSiteContact = JdbcMapUtil.getString(p, "OPPO_SITE_CONTACT");
-                poOrderView.agent = JdbcMapUtil.getString(p, "AGENT");
-                poOrderView.agentPhone = JdbcMapUtil.getString(p, "AGENT_PHONE");
-                poOrderView.contractAmount = SharedUtil.isEmptyString(JdbcMapUtil.getString(p, "CONTRACT_AMOUNT")) ? new BigDecimal("0") : new BigDecimal(JdbcMapUtil.getString(p, "CONTRACT_AMOUNT"));
-                poOrderView.statusName = JdbcMapUtil.getString(p, "statusName");
-                poOrderView.remark = JdbcMapUtil.getString(p, "REMARK");
-                poOrderView.orderProcessType = JdbcMapUtil.getString(p, "ORDER_PROCESS_TYPE");
-                poOrderView.fileId = SharedUtil.isEmptyString(JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL")) ? "" : JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
+                poOrderView.orderProcessId = JdbcMapUtil.getString(p, "orderProcessId");
+                poOrderView.cooperationUnit = JdbcMapUtil.getString(p, "cooperationUnit");
+                poOrderView.noShuiAmt = SharedUtil.isEmptyString(JdbcMapUtil.getString(p, "noShuiAmt")) ? new BigDecimal("0") : new BigDecimal(JdbcMapUtil.getString(p, "noShuiAmt"));
+                poOrderView.shuiLv = SharedUtil.isEmptyString(JdbcMapUtil.getString(p, "shuiLv")) ? new BigDecimal("0") : new BigDecimal(JdbcMapUtil.getString(p, "shuiLv"));
+                poOrderView.shuiAmt = SharedUtil.isEmptyString(JdbcMapUtil.getString(p, "shuiAmt")) ? new BigDecimal("0") : new BigDecimal(JdbcMapUtil.getString(p, "shuiAmt"));
+                poOrderView.aleadyPayAmt = SharedUtil.isEmptyString(JdbcMapUtil.getString(p, "aleadyPayAmt")) ? new BigDecimal("0") : new BigDecimal(JdbcMapUtil.getString(p, "aleadyPayAmt"));
+                poOrderView.payPrece = SharedUtil.isEmptyString(JdbcMapUtil.getString(p, "payPrece")) ? new BigDecimal("0") : new BigDecimal(JdbcMapUtil.getString(p, "payPrece"));
+                poOrderView.agentUser = JdbcMapUtil.getString(p, "agentUser");
+                poOrderView.agentName = JdbcMapUtil.getString(p, "agentName");
+                poOrderView.signDate = JdbcMapUtil.getString(p, "signDate");
+                poOrderView.endDate = JdbcMapUtil.getString(p, "endDate");
+                poOrderView.fileId = SharedUtil.isEmptyString(JdbcMapUtil.getString(p, "fileId")) ? "" : JdbcMapUtil.getString(p, "fileId");
                 return poOrderView;
             }).collect(Collectors.toList());
             map1.put("result", inputList);
-            map1.put("total", Integer.valueOf(list2.get(0).get("num").toString()));
+            map1.put("total", Integer.valueOf(list2.size()));
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(map1), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }

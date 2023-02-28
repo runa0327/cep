@@ -41,6 +41,31 @@ public class PoOrderView extends BasePageEntity {
     public String remark;
     //来源
     public String orderProcessType;
+    //合作单位
+    public String cooperationUnit;
+    //合同签订日期
+    public String signDate;
+    public String signDateMin;
+    public String signDateMax;
+    //合同到期日期
+    public String endDate;
+    public String endDateMin;
+    public String endDateMax;
+    //业务流程id
+    public String orderProcessId;
+    //不含税金额
+    public BigDecimal noShuiAmt;
+    //税率
+    public BigDecimal shuiLv;
+    //含税金额
+    public BigDecimal shuiAmt;
+    //已支付金额
+    public BigDecimal aleadyPayAmt;
+    //累计支付比例
+    public BigDecimal payPrece;
+    //合同经办人
+    public String agentUser;
+    public String agentName;
 
     public String getId() {
         return id;
