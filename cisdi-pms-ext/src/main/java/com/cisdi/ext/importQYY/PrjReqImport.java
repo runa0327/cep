@@ -28,6 +28,7 @@ public class PrjReqImport {
     private List<Map<String, Object>> investSourceMaps;
     private List<Map<String, Object>> investPrjMaps;
     private List<Map<String, Object>> investDtlMaps;
+    private List<Map<String, Object>> prjReqMaps;
 
     public void importPrj(){
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
@@ -42,6 +43,8 @@ public class PrjReqImport {
         investSourceMaps = jdbcTemplate.queryForList("select gv.id,gv.name from gr_set_value gv left join gr_set gs on gv.GR_SET_ID = gs.id where gs.code = 'investment_source' and gv.status = 'AP'");
         //投资测算
         investPrjMaps = jdbcTemplate.queryForList("select id,PM_PRJ_ID prjId from pm_invest_est");
+        //立项申请
+        prjReqMaps = jdbcTemplate.queryForList("select id,prj_name from pm_prj_req");
 
         for (EntityRecord entityRecord : entityRecordList) {
             List<String> errorList = new ArrayList<>();
@@ -65,6 +68,8 @@ public class PrjReqImport {
             errorList.add("没有找到项目：" + valueMap.get("PRJ_NAME"));
             return;
         }
+
+        //todo 更新立项表
         //业主单位
         String customerUnitId = this.getCustomerUnitId(valueMap);
         if (customerUnitId == null){
@@ -117,6 +122,8 @@ public class PrjReqImport {
                 .set("PRJ_REPLY_NO",valueMap.get("REPLY_NO"))
                 .set("PRJ_REPLY_DATE",valueMap.get("REPLY_DATE"))
                 .exec();
+
+
 
         //插入项目投资测算 PM_INVEST_EST
         String investId = this.getInvestId(prjId, investPrjMaps);
