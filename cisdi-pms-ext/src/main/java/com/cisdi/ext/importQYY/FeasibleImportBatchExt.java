@@ -1,21 +1,31 @@
 package com.cisdi.ext.importQYY;
 
 import com.cisdi.ext.importQYY.model.FeasibleImport;
+import com.cisdi.ext.importQYY.model.PrjReqImport;
+import com.cisdi.ext.importQYY.model.PrjReqImportBatch;
+import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.model.PmPrjInvest1;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
+import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.SharedUtil;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author dlt
  * @date 2023/2/28 周二
  */
 public class FeasibleImportBatchExt {
+
     /**
      * 生成明细。
      */
@@ -26,29 +36,168 @@ public class FeasibleImportBatchExt {
         for (EntityRecord entityRecord : entityRecordList) {
             String csCommId = entityRecord.csCommId;
 
-            // 获取批准的可研：
-            List<PmPrjInvest1> feasibleList = PmPrjInvest1.selectByWhere(new Where().eq(PmPrjInvest1.Cols.STATUS, "AP"));
-            if (!SharedUtil.isEmptyList(feasibleList)) {
+            // 获取批准的项目：
+            List<PmPrj> pmPrjList = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.STATUS, "AP"));
+            if (!SharedUtil.isEmptyList(pmPrjList)) {
                 // 先按名称排序，再逐条取数并插入明细：
-                feasibleList.stream().sorted((o1, o2) -> {
-                    if (o1.getName() == null && o2.getName() == null) {
-                        return 0;
-                    } else if (o1.getName() == null && o2.getName() != null) {
-                        return -1;
-                    } else if (o1.getName() != null && o2.getName() == null) {
-                        return 1;
-                    } else {
-                        return o1.getName().compareTo(o2.getName());
-                    }
-                })
+                pmPrjList.stream().sorted((o1, o2) -> {
+                            if (o1.getName() == null && o2.getName() == null) {
+                                return 0;
+                            } else if (o1.getName() == null && o2.getName() != null) {
+                                return -1;
+                            } else if (o1.getName() != null && o2.getName() == null) {
+                                return 1;
+                            } else {
+                                return o1.getName().compareTo(o2.getName());
+                            }
+                        })
                         // .skip(50).limit(5)
-                        .forEach(feasible -> {
-//                            FeasibleImport feasibleImport = doGetDtl(feasible);
-//                            feasibleImport.setFeasibleImportBatchId(csCommId);
-//                            feasibleImport.insertById();
+                        .forEach(pmPrj -> {
+                            com.cisdi.ext.importQYY.model.PrjReqImport prjReqImport = doGetDtl(pmPrj);
+                            prjReqImport.setPrjReqImportBatchId(csCommId);
+                            prjReqImport.insertById();
                         });
 
             }
         }
+    }
+
+    /**
+     * 真正获取明细。
+     *
+     * @param pmPrj
+     */
+    private com.cisdi.ext.importQYY.model.PrjReqImport doGetDtl(PmPrj pmPrj) {
+        com.cisdi.ext.importQYY.model.PrjReqImport prjReqImport = com.cisdi.ext.importQYY.model.PrjReqImport.newData();
+        prjReqImport.setPmPrjId(pmPrj.getId()); //项目
+
+        // TODO 其他字段的取数逻辑。
+
+        return prjReqImport;
+    }
+
+    /**
+     * 准予导入。
+     */
+    public void allowImport() {
+        SevInfo sevInfo = ExtJarHelper.sevInfo.get();
+        EntityInfo entityInfo = sevInfo.entityInfo;
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            String csCommId = entityRecord.csCommId;
+
+            // 对于批次，先检查状态是否为1，再修改导入状态为2：
+            PrjReqImportBatch batch = PrjReqImportBatch.selectById(csCommId);
+            if (!batch.getImportStatusId().equals("1")) {
+                throw new BaseException("只有导入状态为“1-数据收集”才能操作！");
+            }
+            batch.setImportStatusId("2");
+            batch.updateById();
+
+            // 对于明细，修改导入状态为2：
+            Where where = new Where().eq(com.cisdi.ext.importQYY.model.PrjReqImport.Cols.PRJ_REQ_IMPORT_BATCH_ID, csCommId);
+            HashMap<String, Object> keyValueMap = new HashMap<>();
+            keyValueMap.put(com.cisdi.ext.importQYY.model.PrjReqImport.Cols.IMPORT_STATUS_ID, "2");
+            com.cisdi.ext.importQYY.model.PrjReqImport.updateByWhere(where, keyValueMap);
+        }
+    }
+
+
+    /**
+     * 导入项目。
+     */
+    public void importPrj() {
+        LoginInfo loginInfo = ExtJarHelper.loginInfo.get();
+        if (!loginInfo.userCode.equalsIgnoreCase("admin")) {
+            throw new BaseException("只有admin才能操作！");
+        }
+
+        SevInfo sevInfo = ExtJarHelper.sevInfo.get();
+        EntityInfo entityInfo = sevInfo.entityInfo;
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : entityRecordList) {
+            String csCommId = entityRecord.csCommId;
+
+            // 对于批次，先检查状态是否为2
+            PrjReqImportBatch batch = PrjReqImportBatch.selectById(csCommId);
+            if (!batch.getImportStatusId().equals("2")) {
+                throw new BaseException("只有导入状态为“2-准予导入”才能操作！");
+            }
+
+            ImportSum importSum = new ImportSum();
+            Where where = new Where().eq(com.cisdi.ext.importQYY.model.PrjReqImport.Cols.PRJ_REQ_IMPORT_BATCH_ID, csCommId);
+            List<com.cisdi.ext.importQYY.model.PrjReqImport> prjReqImportList = com.cisdi.ext.importQYY.model.PrjReqImport.selectByWhere(where);
+            if (!SharedUtil.isEmptyList(prjReqImportList)) {
+                for (com.cisdi.ext.importQYY.model.PrjReqImport prjReqImport : prjReqImportList) {
+                    // 真正执行导入：
+                    boolean succ = doImportPrj(prjReqImport);
+                    // 累计成功或失败数量：
+                    if (succ) {
+                        importSum.succCt++;
+                    } else {
+                        importSum.failCt++;
+                    }
+                }
+            }
+
+            // 对于批次，修改导入状态为3：
+            batch.setImportStatusId("3");
+            batch.setImportTime(LocalDateTime.now());
+            batch.setSccCt(importSum.succCt);
+            batch.setFailCt(importSum.failCt);
+            batch.updateById();
+        }
+    }
+
+    /**
+     * 真正执行导入项目。
+     *
+     * @return 是否成功。
+     */
+    private boolean doImportPrj(com.cisdi.ext.importQYY.model.PrjReqImport newImport) {
+        boolean succ = true;
+        List<String> errInfoList = new ArrayList<>();
+        String newImportId = newImport.getId();
+
+        // 无论新、旧，项目ID都是相同的，通过项目ID获取项目：
+        String pmPrjId = newImport.getPmPrjId();
+
+        // 通过项目ID，获取旧的导入记录：
+        PmPrj pmPrj = PmPrj.selectById(pmPrjId);
+        com.cisdi.ext.importQYY.model.PrjReqImport oldImport = doGetDtl(pmPrj);
+
+        // 若字段的值已不同，则予以处理：
+
+        // 示例，处理某个字段：
+        try {
+            if (!SharedUtil.toStringEquals(oldImport.getCustomerUnit(), newImport.getCustomerUnit())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.CUSTOMER_UNIT, newImport.getCustomerUnit());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+        } catch (Exception ex) {
+            succ = false;
+            errInfoList.add(ex.toString());
+        }
+
+        // TODO 其他字段的处理逻辑。
+
+        // 执行过程中，可能会自动抛出异常。
+        // 若希望自行抛出异常，则throw：
+        // throw new BaseException("业务异常！");
+        // 但要记得catch住：
+        // catch (Exception ex) {
+        //     succ = false;
+        //     errInfoList.add(ex.toString());
+        // }
+
+        HashMap<String, Object> keyValueMap = new HashMap<>();
+        keyValueMap.put(com.cisdi.ext.importQYY.model.PrjReqImport.Cols.IMPORT_STATUS_ID, "3");
+        keyValueMap.put(com.cisdi.ext.importQYY.model.PrjReqImport.Cols.IMPORT_TIME, LocalDateTime.now());
+        keyValueMap.put(com.cisdi.ext.importQYY.model.PrjReqImport.Cols.IS_SUCCESS, succ);
+        keyValueMap.put(com.cisdi.ext.importQYY.model.PrjReqImport.Cols.ERR_INFO, SharedUtil.isEmptyList(errInfoList) ? null : errInfoList.stream().collect(Collectors.joining("；")));
+        PrjReqImport.updateById(newImportId, keyValueMap);
+
+        return succ;
     }
 }
