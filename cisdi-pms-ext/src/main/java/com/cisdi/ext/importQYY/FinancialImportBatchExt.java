@@ -3,6 +3,7 @@ package com.cisdi.ext.importQYY;
 import com.cisdi.ext.importQYY.model.FinancialImport;
 import com.cisdi.ext.importQYY.model.FinancialImportBatch;
 import com.cisdi.ext.model.PmPrj;
+import com.cisdi.ext.model.PmPrjInvest2;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -76,9 +77,9 @@ public class FinancialImportBatchExt {
         String prjId = pmPrj.getId();
         financialImport.setPmPrjId(prjId); // 项目
         //根据项目id查询可研数据
-        List<FinancialImport> list = FinancialImport.selectByWhere(new Where().eq(FinancialImport.Cols.PM_PRJ_ID,pmPrj.getId()));
+        List<PmPrjInvest2> list = PmPrjInvest2.selectByWhere(new Where().eq(PmPrjInvest2.Cols.PM_PRJ_ID,pmPrj.getId()));
         if (!CollectionUtils.isEmpty(list)) {
-            for (FinancialImport tmp : list) {
+            for (PmPrjInvest2 tmp : list) {
                 financialImport.setExpertFile(tmp.getExpertFile()); //初审意见材料
                 financialImport.setFileIdTwo(tmp.getFileIdTwo()); //初概上回稿文件
                 financialImport.setReviewUnitChief(tmp.getReviewUnitChief()); //评审单位负责人
@@ -122,7 +123,7 @@ public class FinancialImportBatchExt {
      * @param myJdbcTemplate 数据源
      * @return
      */
-    private BigDecimal prjAmt(FinancialImport tmp, String prjId, String code, MyJdbcTemplate myJdbcTemplate) {
+    private BigDecimal prjAmt(PmPrjInvest2 tmp, String prjId, String code, MyJdbcTemplate myJdbcTemplate) {
         BigDecimal amtValue = tmp.getPrjTotalInvest();
         if (amtValue == null){
             //从项目投资测算明细取数

@@ -3,6 +3,7 @@ package com.cisdi.ext.importQYY;
 import com.cisdi.ext.importQYY.model.FeasibleImport;
 import com.cisdi.ext.importQYY.model.FeasibleImportBatch;
 import com.cisdi.ext.model.PmPrj;
+import com.cisdi.ext.model.PmPrjInvest1;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -54,7 +55,7 @@ public class FeasibleImportBatchExt {
                                 return o1.getName().compareTo(o2.getName());
                             }
                         })
-                        // .skip(50).limit(5)
+                         .skip(50).limit(5)
                         .forEach(pmPrj -> {
                             FeasibleImport feasibleImport = doGetDtl(pmPrj);
                             feasibleImport.setFeasibleImportBatchId(csCommId);
@@ -76,9 +77,9 @@ public class FeasibleImportBatchExt {
         String prjId = pmPrj.getId();
         feasibleImport.setPmPrjId(prjId); // 项目
         //根据项目id查询可研数据
-        List<FeasibleImport> list = FeasibleImport.selectByWhere(new Where().eq(FeasibleImport.Cols.PM_PRJ_ID,pmPrj.getId()));
+        List<PmPrjInvest1> list = PmPrjInvest1.selectByWhere(new Where().eq(PmPrjInvest1.Cols.PM_PRJ_ID,pmPrj.getId()).eq(PmPrjInvest1.Cols.STATUS,"AP"));
         if (!CollectionUtils.isEmpty(list)){
-            for (FeasibleImport tmp : list) {
+            for (PmPrjInvest1 tmp : list) {
                 feasibleImport.setExpertComplActualDate(tmp.getExpertComplActualDate()); //实际评审日期
                 feasibleImport.setReviewUnitChief(tmp.getReviewUnitChief()); //评审单位负责人
                 feasibleImport.setReviewOrganizationUnit(tmp.getReviewOrganizationUnit()); //评审组织单位
@@ -124,7 +125,7 @@ public class FeasibleImportBatchExt {
      * @param myJdbcTemplate 数据源
      * @return
      */
-    private BigDecimal prjAmt(FeasibleImport tmp, String prjId, String code, MyJdbcTemplate myJdbcTemplate) {
+    private BigDecimal prjAmt(PmPrjInvest1 tmp, String prjId, String code, MyJdbcTemplate myJdbcTemplate) {
         BigDecimal amtValue = tmp.getPrjTotalInvest();
         if (amtValue == null){
             //从项目投资测算明细取数
