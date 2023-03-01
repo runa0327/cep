@@ -1,14 +1,19 @@
 package com.cisdi.ext.api;
 
+import com.cisdi.ext.base.PmPrj;
 import com.cisdi.ext.fundManage.FileCommon;
 import com.cisdi.ext.model.BasePageEntity;
 import com.cisdi.ext.model.view.CommonDrop;
 import com.cisdi.ext.model.view.file.File;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -25,6 +30,71 @@ import java.util.stream.Collectors;
  * @date 2022/9/5
  */
 public class PoPublicBidExtApi {
+
+    /**
+     * 新增单条招标记录
+     * @param entityRecord
+     * @param viewId
+     * @param myJdbcTemplate
+     */
+    public static void createData(EntityRecord entityRecord, String viewId, MyJdbcTemplate myJdbcTemplate) {
+        Map<String, Object> valueMap = entityRecord.valueMap;
+        //业务流程id
+        String csId = entityRecord.csCommId;
+        //项目id
+        String projectId = PmPrj.getProjectIdByProcess(valueMap,myJdbcTemplate);
+        if (!SharedUtil.isEmptyString(projectId)){
+            List<String> list = StringUtil.getStrToList(projectId,",");
+            for (String prjId : list) {
+                //判断是否已存在，存在则修改
+                String publicBidId = getDateByProcessDateId(csId,prjId,myJdbcTemplate);
+                if (SharedUtil.isEmptyString(publicBidId)){
+                    publicBidId = Crud.from("PO_PUBLIC_BID").insertData();
+                }
+                //修改招标台账数据表数据
+                updatePublicBid(valueMap,csId,publicBidId,prjId,viewId);
+            }
+        }
+    }
+
+    /**
+     * 修改合同数据表数据
+     * @param valueMap 主体值
+     * @param csId 流程业务表id
+     * @param publicBidId id
+     * @param projectId 项目id
+     * @param viewId 视图id
+     */
+    private static void updatePublicBid(Map<String, Object> valueMap, String csId, String publicBidId, String projectId, String viewId) {
+        Crud.from("PO_PUBLIC_BID").where().eq("id",publicBidId).update()
+                .set("PM_PRJ_ID",projectId).set("WORK_PROCESS_ID",csId)
+                .set("BUY_PRJ_TYPE_ID",JdbcMapUtil.getString(valueMap,"BUY_PRJ_TYPE_ID")) //采购项目类别
+                .set("BUY_MATTER_ID",JdbcMapUtil.getString(valueMap,"BUY_MATTER_ID")) //采购事项
+                .set("BUY_TYPE_ID",JdbcMapUtil.getString(valueMap,"BUY_TYPE_ID")) //采购方式
+                .set("AMT_FIVE",JdbcMapUtil.getString(valueMap,"AMT_FIVE")) //招标控制价
+                .set("DATE_ONE",JdbcMapUtil.getString(valueMap,"DATE_ONE")) //中标日期
+                .set("AMT_SIX",JdbcMapUtil.getString(valueMap,"AMT_ONE")) //中标价
+                .set("BID_WIN_NOTICE_FILE_GROUP_ID",JdbcMapUtil.getString(valueMap,"BID_WIN_NOTICE_FILE_GROUP_ID")) //中标通知书
+                .set("view_Id",viewId) //视图id
+                .exec();
+    }
+
+    /**
+     * 根据业务流程id和项目id查询记录是否已经存在
+     * @param csId 业务流程id
+     * @param projectId 项目id
+     * @param myJdbcTemplate 数据源
+     * @return 存在/不存在
+     */
+    private static String getDateByProcessDateId(String csId, String projectId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select id from PO_PUBLIC_BID where status = 'ap' and WORK_PROCESS_ID = ? and PM_PRJ_ID = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csId,projectId);
+        String id = "";
+        if (!CollectionUtils.isEmpty(list)){
+            id = JdbcMapUtil.getString(list.get(0),"id");
+        }
+        return id;
+    }
 
     /**
      * 招标列表接口
