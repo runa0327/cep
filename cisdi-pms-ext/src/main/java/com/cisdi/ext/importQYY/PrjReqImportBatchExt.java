@@ -1,10 +1,12 @@
 package com.cisdi.ext.importQYY;
 
+import com.cisdi.ext.base.PmInvestEst;
 import com.cisdi.ext.importQYY.model.PrjReqImport;
 import com.cisdi.ext.importQYY.model.PrjReqImportBatch;
 import com.cisdi.ext.model.PmPrj;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
@@ -17,10 +19,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PrjReqImportBatchExt {
@@ -157,7 +156,7 @@ public class PrjReqImportBatchExt {
                 amtValue = new BigDecimal(0);
             }
         } else {
-            amtValue = val;
+            amtValue = val.divide(new BigDecimal(10000));
         }
         return amtValue;
     }
@@ -264,6 +263,7 @@ public class PrjReqImportBatchExt {
      * @return 是否成功。
      */
     private boolean doImportPrj(PrjReqImport newImport) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         boolean succ = true;
         List<String> errInfoList = new ArrayList<>();
         String newImportId = newImport.getId();
@@ -279,9 +279,168 @@ public class PrjReqImportBatchExt {
 
         // 示例，处理某个字段：
         try {
+            //业主单位
             if (!SharedUtil.toStringEquals(oldImport.getCustomerUnit(), newImport.getCustomerUnit())) {
                 HashMap<String, Object> keyValueMap = new HashMap<>();
                 keyValueMap.put(PmPrj.Cols.CUSTOMER_UNIT, newImport.getCustomerUnit());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //项目管理模式
+            if (!SharedUtil.toStringEquals(oldImport.getPrjManageModeId(), newImport.getPrjManageModeId())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.PRJ_MANAGE_MODE_ID, newImport.getPrjManageModeId());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //建设地点
+            if (!SharedUtil.toStringEquals(oldImport.getBaseLocationId(), newImport.getBaseLocationId())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.BASE_LOCATION_ID, newImport.getBaseLocationId());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //项目类型
+            if (!SharedUtil.toStringEquals(oldImport.getProjectTypeId(), newImport.getProjectTypeId())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.PROJECT_TYPE_ID, newImport.getProjectTypeId());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //项目介绍
+            if (!SharedUtil.toStringEquals(oldImport.getPrjSituation(), newImport.getPrjSituation())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.PRJ_SITUATION, newImport.getPrjSituation());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //建设规模类型
+            if (!SharedUtil.toStringEquals(oldImport.getConScaleTypeId(), newImport.getConScaleTypeId())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.CON_SCALE_TYPE_ID, newImport.getConScaleTypeId());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //占地面积
+            if (!SharedUtil.toStringEquals(oldImport.getFloorArea(), newImport.getFloorArea())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.FLOOR_AREA, newImport.getFloorArea());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //建筑面积
+            if (!SharedUtil.toStringEquals(oldImport.getBuildingArea(), newImport.getBuildingArea())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.BUILDING_AREA, newImport.getBuildingArea());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //道路长度
+            if (!SharedUtil.toStringEquals(oldImport.getRoadLength(), newImport.getRoadLength())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.CON_SCALE_QTY, newImport.getRoadLength());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //道路宽度
+            if (!SharedUtil.toStringEquals(oldImport.getRoadWidth(), newImport.getRoadWidth())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.CON_SCALE_QTY2, newImport.getRoadWidth());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //投资来源
+            if (!SharedUtil.toStringEquals(oldImport.getInvestmentSourceId(), newImport.getInvestmentSourceId())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.INVESTMENT_SOURCE_ID, newImport.getInvestmentSourceId());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //总投资
+            if (!SharedUtil.toStringEquals(oldImport.getEstimatedTotalInvest(), newImport.getEstimatedTotalInvest())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                BigDecimal value = prjAmtNew(newImport.getEstimatedTotalInvest());
+                newImport.setEstimatedTotalInvest(value);
+                keyValueMap.put(PmPrj.Cols.ESTIMATED_TOTAL_INVEST, value);
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //建安工程费
+            if (!SharedUtil.toStringEquals(oldImport.getConstructPrjAmt(), newImport.getConstructPrjAmt())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                BigDecimal value = prjAmtNew(newImport.getConstructPrjAmt());
+                newImport.setConstructPrjAmt(value);
+                keyValueMap.put(PmPrj.Cols.CONSTRUCT_PRJ_AMT, value);
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //设备采购费
+            if (!SharedUtil.toStringEquals(oldImport.getEquipBuyAmt(), newImport.getEquipBuyAmt())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                BigDecimal value = prjAmtNew(newImport.getEquipBuyAmt());
+                newImport.setEquipBuyAmt(value);
+                keyValueMap.put(PmPrj.Cols.EQUIP_BUY_AMT, value);
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //科研设备费
+            if (!SharedUtil.toStringEquals(oldImport.getEquipmentCost(), newImport.getEquipmentCost())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                BigDecimal value = prjAmtNew(newImport.getEquipmentCost());
+                newImport.setEquipmentCost(value);
+                keyValueMap.put(PmPrj.Cols.EQUIPMENT_COST, value);
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //工程其他费用
+            if (!SharedUtil.toStringEquals(oldImport.getProjectOtherAmt(), newImport.getProjectOtherAmt())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                BigDecimal value = prjAmtNew(newImport.getProjectOtherAmt());
+                newImport.setProjectOtherAmt(value);
+                keyValueMap.put(PmPrj.Cols.PROJECT_OTHER_AMT, value);
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //土地征迁费
+            if (!SharedUtil.toStringEquals(oldImport.getLandBuyAmt(), newImport.getLandBuyAmt())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                BigDecimal value = prjAmtNew(newImport.getLandBuyAmt());
+                newImport.setLandBuyAmt(value);
+                keyValueMap.put(PmPrj.Cols.LAND_BUY_AMT, value);
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //预备费
+            if (!SharedUtil.toStringEquals(oldImport.getPrepareAmt(), newImport.getPrepareAmt())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                BigDecimal value = prjAmtNew(newImport.getPrepareAmt());
+                newImport.setPrepareAmt(value);
+                keyValueMap.put(PmPrj.Cols.PREPARE_AMT, value);
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //项目建议书完成日期
+            if (!SharedUtil.toStringEquals(oldImport.getProjectProposalDate(), newImport.getProjectProposalDate())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.PROJECT_PROPOSAL_ACTUAL_DATE, newImport.getProjectProposalDate());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //项目建议书编制人
+            if (!SharedUtil.toStringEquals(oldImport.getProjectProposalAuthor(), newImport.getProjectProposalAuthor())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.AUTHOR, newImport.getProjectProposalAuthor());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //项目建议书
+            if (!SharedUtil.toStringEquals(oldImport.getProjectProposalFile(), newImport.getProjectProposalFile())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.STAMPED_PRJ_REQ_FILE, newImport.getProjectProposalFile());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //项目编号
+            if (!SharedUtil.toStringEquals(oldImport.getPrjCode(), newImport.getPrjCode())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.PRJ_CODE, newImport.getPrjCode());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //批复文号
+            if (!SharedUtil.toStringEquals(oldImport.getReplyNo(), newImport.getReplyNo())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.PRJ_REPLY_NO, newImport.getReplyNo());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //批复日期
+            if (!SharedUtil.toStringEquals(oldImport.getReplyDate(), newImport.getReplyDate())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.PRJ_REPLY_DATE, newImport.getReplyDate());
+                PmPrj.updateById(pmPrjId, keyValueMap);
+            }
+            //批复文件
+            if (!SharedUtil.toStringEquals(oldImport.getReplyFile(), newImport.getReplyFile())) {
+                HashMap<String, Object> keyValueMap = new HashMap<>();
+                keyValueMap.put(PmPrj.Cols.PRJ_REPLY_FILE, newImport.getReplyFile());
                 PmPrj.updateById(pmPrjId, keyValueMap);
             }
         } catch (Exception ex) {
@@ -290,6 +449,14 @@ public class PrjReqImportBatchExt {
         }
 
         // TODO 其他字段的处理逻辑。
+        //信息写入立项申请流程表
+        String error1 = insertPjrReq(newImport);
+        if (!SharedUtil.isEmptyString(error1)){
+            errInfoList.add(error1);
+        }
+
+        //写入投资测算明细主父表
+        PmInvestEst.createPrjData(pmPrjId,newImport,myJdbcTemplate);
 
         // 执行过程中，可能会自动抛出异常。
         // 若希望自行抛出异常，则throw：
@@ -308,5 +475,60 @@ public class PrjReqImportBatchExt {
         PrjReqImport.updateById(newImportId, keyValueMap);
 
         return succ;
+    }
+
+    /**
+     * 金额*10000
+     * @param estimatedTotalInvest
+     * @return
+     */
+    private BigDecimal prjAmtNew(BigDecimal estimatedTotalInvest) {
+        return estimatedTotalInvest.multiply(new BigDecimal(10000));
+    }
+
+    /**
+     * 立项申请流程表数据写入
+     * @param newImport 需要写入的数据明细
+     * @return 写入时错误信息
+     */
+    private String insertPjrReq(PrjReqImport newImport) {
+        String id = Crud.from("pm_prj_req").insertData();
+        Date date = new Date();
+        String error = "";
+        try {
+            Crud.from("pm_prj_req").where().eq("id",id).update()
+                    .set("PRJ_CODE",newImport.getPmPrjId()) //项目
+                    .set("CUSTOMER_UNIT",newImport.getCustomerUnit()) //业主单位
+                    .set("PRJ_MANAGE_MODE_ID",newImport.getPrjManageModeId()) //项目管理模式
+                    .set("BASE_LOCATION_ID",newImport.getBaseLocationId()) //建设地点
+                    .set("FLOOR_AREA",newImport.getFloorArea()) //占地面积
+                    .set("PROJECT_TYPE_ID",newImport.getProjectTypeId()) //项目类型
+                    .set("PRJ_SITUATION",newImport.getPrjSituation()) //项目介绍
+                    .set("CON_SCALE_TYPE_ID",newImport.getConScaleTypeId()) //建设规模类型
+                    .set("QTY_ONE",newImport.getBuildingArea()) //建筑面积
+                    .set("CON_SCALE_QTY",newImport.getRoadLength()) //道路长度
+                    .set("CON_SCALE_QTY2",newImport.getRoadWidth()) //道路宽度
+                    .set("QTY_TWO",newImport.getOther()) //其他
+                    .set("INVESTMENT_SOURCE_ID",newImport.getInvestmentSourceId()) //投资来源
+                    .set("PRJ_TOTAL_INVEST",newImport.getEstimatedTotalInvest()) //总投资
+                    .set("CONSTRUCT_AMT",newImport.getConstructPrjAmt()) //建安工程费
+                    .set("EQUIP_AMT",newImport.getEquipBuyAmt()) //设备采购费
+                    .set("EQUIPMENT_COST",newImport.getEquipmentCost()) //科研设备费
+                    .set("PROJECT_OTHER_AMT",newImport.getProjectOtherAmt()) //工程其他费用
+                    .set("LAND_AMT",newImport.getLandBuyAmt()) //土地征迁费
+                    .set("PREPARE_AMT",newImport.getPrepareAmt()) //预备费
+                    .set("COMPL_DATE",newImport.getProjectProposalDate()) //项目建议书完成日期
+                    .set("AUTHOR",newImport.getProjectProposalAuthor()) //项目建议书编制人
+                    .set("STAMPED_PRJ_REQ_FILE",newImport.getProjectProposalFile()) //项目建议书
+                    .set("CONSTRUCTION_PROJECT_CODE",newImport.getPrjCode()) //项目编号
+                    .set("PRJ_REPLY_NO",newImport.getReplyNo()) //批复文号
+                    .set("PRJ_REPLY_DATE",newImport.getReplyDate()) //批复日期
+                    .set("REPLY_FILE",newImport.getReplyFile()) //批复文件
+                    .set("IS_OMPORT","0099799190825080669") //是导入
+                    .exec();
+        } catch (Exception e){
+            error = "写入流程表异常;";
+        }
+        return error;
     }
 }

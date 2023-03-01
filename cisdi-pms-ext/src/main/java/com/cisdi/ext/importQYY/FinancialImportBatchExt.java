@@ -151,7 +151,7 @@ public class FinancialImportBatchExt {
                 amtValue = new BigDecimal(0);
             }
         } else {
-            amtValue = val;
+            amtValue = val.divide(new BigDecimal(10000));
         }
         return amtValue;
     }
