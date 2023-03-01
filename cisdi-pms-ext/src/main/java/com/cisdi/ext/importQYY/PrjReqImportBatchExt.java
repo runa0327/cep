@@ -29,7 +29,7 @@ public class PrjReqImportBatchExt {
 
     static {
         investMap.put("ESTIMATED_TOTAL_INVEST", "PRJ_TOTAL_INVEST"); // 总投资
-        investMap.put("CONSTRUCT_PRJ_AMT", "PROJECT_AMT"); // 建安工程费
+        investMap.put("CONSTRUCT_PRJ_AMT", "CONSTRUCT_AMT"); // 建安工程费
         investMap.put("EQUIP_BUY_AMT", "EQUIP_AMT"); // 设备采购费
         investMap.put("EQUIPMENT_COST", "SCIENTIFIC_EQUIPMENT_AMT"); // 科研设备费
         investMap.put("PROJECT_OTHER_AMT", "PROJECT_AMT-OTHER"); // 工程其他费用
