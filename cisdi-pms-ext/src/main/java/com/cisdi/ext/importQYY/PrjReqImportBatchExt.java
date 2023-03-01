@@ -149,7 +149,7 @@ public class PrjReqImportBatchExt {
             if (!CollectionUtils.isEmpty(list1)) {
                 String amt = JdbcMapUtil.getString(list1.get(0), "amt");
                 if (!SharedUtil.isEmptyString(amt)) {
-                    amtValue = new BigDecimal(amt);
+                    amtValue = new BigDecimal(amt).divide(new BigDecimal(10000));
                 } else {
                     amtValue = new BigDecimal(0);
                 }
