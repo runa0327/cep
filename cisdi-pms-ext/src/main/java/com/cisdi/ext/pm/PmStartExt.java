@@ -223,7 +223,7 @@ public class PmStartExt {
             List<BigDecimal> bigDecimalList = ParcelUtil.getCenter(param, parcel.parcelShape);
             Object centerLongitude = null;
             Object centerLatitude = null;
-            if (CollectionUtils.isEmpty(bigDecimalList)) {
+            if (!CollectionUtils.isEmpty(bigDecimalList)) {
                 centerLongitude = bigDecimalList.get(0);
                 centerLatitude = bigDecimalList.get(1);
             }
