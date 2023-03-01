@@ -120,6 +120,75 @@ public class PmMap {
         ExtJarHelper.returnValue.set(outputMap);
     }
 
+    /**
+     * 地图详情通过项目id获取
+     */
+    public void getPrjDetail() {
+        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
+        String prjId = String.valueOf(params.get("prjId"));
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+
+        String sql = "select pj.id,pj.name,IFNULL(v.name,'未启动') statusName,pp.ACTUAL_START_DATE as beginTime,pp.ACTUAL_COMPL_DATE as endTime,pmp.`NAME` as projectOwner,gsv.`NAME` as projectType,ggg.`NAME` as manageUnit,pppm.`NAME` as sgUnit " +
+                "from pm_prj pj " +
+                "left join pm_pro_plan pp on pp.PM_PRJ_ID = pj.id " +
+                "left join gr_set_value v on v.id = pp.PROGRESS_STATUS_ID left join gr_set s on s.id = v.gr_set_id and s.code = 'PROGRESS_STATUS'  " +
+                "left join PM_PARTY pmp on pmp.id = pj.CUSTOMER_UNIT " +
+                "left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID " +
+                "left join gr_set_value ggg on ggg.id = pj.PRJ_MANAGE_MODE_ID " +
+                "left join pm_party pppm on pppm.id = pj.CONSTRUCTOR_UNIT " +
+                "where pj.id = ?";
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql,prjId);
+
+        //临时获取项目形象进度
+        List<ProjectInfoTemp> prjTemps = ProjectMapTemp.getAllData();
+        List<Project> projects = list.stream().map(p -> {
+            String sql2 = "select p1.`NAME` as jsUnit,p2.`NAME` as kcUnit,p3.`NAME` as sjUnit,p4.`NAME` as jlUnit,p5.`NAME` as sgUnit,PRJ_SITUATION from pm_prj pj " +
+                    "left join PM_PARTY p1 on pj.BUILDER_UNIT = p1.id " +
+                    "left join PM_PARTY p2 on pj.SURVEYOR_UNIT = p2.id " +
+                    "left join PM_PARTY p3 on pj.DESIGNER_UNIT = p3.id " +
+                    "left join PM_PARTY p4 on pj.SUPERVISOR_UNIT = p4.id " +
+                    "left join PM_PARTY p5 on pj.CONSTRUCTOR_UNIT = p5.id " +
+                    "where pj.id=?";
+            Map<String, Object> stringObjectMap = myJdbcTemplate.queryForMap(sql2, JdbcMapUtil.getString(p, "ID"));
+            Project pro = new Project();
+            pro.projectId = JdbcMapUtil.getString(p, "ID");
+            pro.projectName = JdbcMapUtil.getString(p, "NAME");
+            pro.status = JdbcMapUtil.getString(p, "statusName");
+            pro.projectOwner = JdbcMapUtil.getString(p, "projectOwner");
+
+            String type = JdbcMapUtil.getString(p, "projectType");
+            if ("民用建筑".equals(type)) {
+                pro.projectType = "房建";
+            } else if ("市政道路".equals(type)) {
+                pro.projectType = "道路";
+            } else {
+                pro.projectType = "其他";
+            }
+            pro.beginTime = JdbcMapUtil.getString(p, "beginTime");
+            pro.endTime = JdbcMapUtil.getString(p, "endTime");
+            pro.manageUnit = JdbcMapUtil.getString(p, "manageUnit");
+            pro.sgUnit = JdbcMapUtil.getString(p, "sgUnit");
+            pro.totalInvest = getProjectInvest(pro.projectId);
+//            pro.progress = BigDecimal.ZERO;
+            //临时形象进度
+            Optional<BigDecimal> anyPrjTemp =
+                    prjTemps.stream().filter(prjTemp -> prjTemp.getName().equals(pro.projectName)).map(prjTemp -> prjTemp.getRate()).findAny();
+            if (anyPrjTemp.isPresent()){
+                pro.progress = anyPrjTemp.get();
+            }
+            pro.jsUnit = JdbcMapUtil.getString(stringObjectMap, "jsUnit");
+            pro.kcUnit = JdbcMapUtil.getString(stringObjectMap, "kcUnit");
+            pro.sjUnit = JdbcMapUtil.getString(stringObjectMap, "sjUnit");
+            pro.jlUnit = JdbcMapUtil.getString(stringObjectMap, "jlUnit");
+            pro.sgUnit = JdbcMapUtil.getString(stringObjectMap, "sgUnit");
+            pro.prjSituation = JdbcMapUtil.getString(stringObjectMap, "PRJ_SITUATION");
+            return pro;
+        }).collect(Collectors.toList());
+        OutSide outSide = new OutSide();
+        outSide.list = projects;
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+    }
 
     /**
      * 获取3D地图绑定的项目

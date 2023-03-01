@@ -87,7 +87,55 @@ public class ParcelMap {
     }
 
     /**
-     * 删除
+     * 新增/编辑项目区域
+     */
+    public void addPrjParcel(){
+        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        PrjParcelAddReq prjParcelAddReq = JSONObject.parseObject(JSONObject.toJSONString(params), PrjParcelAddReq.class);
+        for (Project project : prjParcelAddReq.projects) {
+            for (Parcel parcel : project.parcels) {
+                //新增/编辑parcel
+                String parcelId = Strings.isNullOrEmpty(parcel.parcelId) ? Crud.from("PARCEL").insertData() : parcel.parcelId;
+                //计算中心
+                List<BigDecimal> center = this.getCenter(parcel.points, parcel.parcelShape);
+                int updateParcel = Crud.from("PARCEL").where().eq("ID", parcelId).update()
+                        .set("PARCEL_SHAPE", parcel.parcelShape)
+                        .set("FILL", parcel.fillId)
+                        .set("PLOT_RATIO", parcel.plotRatio)
+                        .set("AREA", parcel.area)
+                        .set("IDENTIFIER", parcel.identifier)
+                        .set("CENTER_LONGITUDE", center.get(0))
+                        .set("CENTER_LATITUDE", center.get(1))
+                        .exec();
+                //清空地块对应的点位
+                Crud.from("PARCEL_POINT").where().eq("PARCEL_ID",parcelId).delete().exec();
+                //插入地块点位表,前提是地块表更新成功
+                if (updateParcel == 0){
+                    throw new BaseException("更新地块表失败");
+                }
+                for (List point : parcel.points) {
+                    String parcelPointId = Crud.from("PARCEL_POINT").insertData();
+                    Crud.from("PARCEL_POINT").where().eq("ID",parcelPointId).update()
+                            .set("PARCEL_ID",parcelId)
+                            .set("LONGITUDE",point.get(0))
+                            .set("LATITUDE",point.get(1))
+                            .exec();
+                }
+                //清空关系表
+                myJdbcTemplate.update("delete from PRJ_PARCEL where PARCEL_ID = ? and PM_PRJ_ID = ?",parcel.parcelId,project.prjId);
+                //重新建立关系
+                String prjParcelId = Crud.from("PRJ_PARCEL").insertData();
+                Crud.from("PRJ_PARCEL").where().eq("ID",prjParcelId).update()
+                        .set("PM_PRJ_ID",project.prjId)
+                        .set("PARCEL_ID",parcelId)
+                        .exec();
+            }
+        }
+    }
+
+    /**
+     * 删除地块
      */
     public void delParcel(){
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
@@ -99,6 +147,29 @@ public class ParcelMap {
             Crud.from("PRJ_PARCEL").where().eq("PARCEL_ID",id).delete().exec();
             Crud.from("PARCEL_POINT").where().eq("PARCEL_ID",id).delete().exec();
             Crud.from("PARCEL").where().eq("ID",id).delete().exec();
+        }
+    }
+
+    /**
+     * 删除项目地块
+     */
+    public void delPrjParcel(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
+        DelPrjParcelReq delPrjParcelReq = JSONObject.parseObject(JSONObject.toJSONString(params), DelPrjParcelReq.class);
+        if (CollectionUtils.isEmpty(delPrjParcelReq.prjIds)){
+            return;
+        }
+        for (String prjId : delPrjParcelReq.prjIds){
+            List<Map<String, Object>> parcelIdMaps = myJdbcTemplate.queryForList("select PARCEL_ID parcelId from prj_parcel where PM_PRJ_ID = ?", prjId);
+            for (Map<String, Object> parcelIdMap : parcelIdMaps) {
+                //删关系表
+                myJdbcTemplate.update("delete from PRJ_PARCEL where PARCEL_ID = ? and PM_PRJ_ID = ?",JdbcMapUtil.getString(parcelIdMap,"parcelId"),prjId);
+                //删点位表
+                Crud.from("parcel_point").where().eq("PARCEL_ID",JdbcMapUtil.getString(parcelIdMap,"parcelId")).delete().exec();
+                //删地块表
+                Crud.from("parcel").where().eq("ID",JdbcMapUtil.getString(parcelIdMap,"parcelId")).delete().exec();
+            }
         }
     }
 
@@ -376,9 +447,23 @@ public class ParcelMap {
     }
 
     /**
+     * 批量添加项目区域
+     */
+    public static class PrjParcelAddReq{
+        public List<Project> projects;
+    }
+
+    /**
      * 删除地块请求
      */
     public static class DelParcelReq{
         public List<String> ids;
+    }
+
+    /**
+     * 删除项目地块请求
+     */
+    public static class DelPrjParcelReq{
+        public List<String> prjIds;
     }
 }
