@@ -76,49 +76,49 @@ public class FeasibleImportBatchExt {
         FeasibleImport feasibleImport = FeasibleImport.newData();
         String prjId = pmPrj.getId();
         feasibleImport.setPmPrjId(prjId); // 项目
-        //根据项目id查询可研数据
-        List<PmPrjInvest1> list = PmPrjInvest1.selectByWhere(new Where().eq(PmPrjInvest1.Cols.PM_PRJ_ID,pmPrj.getId()).eq(PmPrjInvest1.Cols.STATUS,"AP"));
-        if (!CollectionUtils.isEmpty(list)){
+        // 根据项目id查询可研数据
+        List<PmPrjInvest1> list = PmPrjInvest1.selectByWhere(new Where().eq(PmPrjInvest1.Cols.PM_PRJ_ID, pmPrj.getId()).eq(PmPrjInvest1.Cols.STATUS, "AP"));
+        if (!CollectionUtils.isEmpty(list)) {
             for (PmPrjInvest1 tmp : list) {
-                feasibleImport.setExpertComplActualDate(tmp.getExpertComplActualDate()); //实际评审日期
-                feasibleImport.setReviewUnitChief(tmp.getReviewUnitChief()); //评审单位负责人
-                feasibleImport.setReviewOrganizationUnit(tmp.getReviewOrganizationUnit()); //评审组织单位
-                feasibleImport.setReviewUnitPhone(tmp.getReviewUnitPhone()); //评审单位联系方式
-                feasibleImport.setExpertFile(tmp.getExpertFile()); //专家意见文件
-                feasibleImport.setReviewReportFile(tmp.getReviewReportFile()); //评审稿文件
-                feasibleImport.setRevisionFile(tmp.getRevisionFile()); //修编稿
-                feasibleImport.setReviewDraftFile(tmp.getReviewReportFile()); //评审报告文件
+                feasibleImport.setExpertComplActualDate(tmp.getExpertComplActualDate()); // 实际评审日期
+                feasibleImport.setReviewUnitChief(tmp.getReviewUnitChief()); // 评审单位负责人
+                feasibleImport.setReviewOrganizationUnit(tmp.getReviewOrganizationUnit()); // 评审组织单位
+                feasibleImport.setReviewUnitPhone(tmp.getReviewUnitPhone()); // 评审单位联系方式
+                feasibleImport.setExpertFile(tmp.getExpertFile()); // 专家意见文件
+                feasibleImport.setReviewReportFile(tmp.getReviewReportFile()); // 评审稿文件
+                feasibleImport.setRevisionFile(tmp.getRevisionFile()); // 修编稿
+                feasibleImport.setReviewDraftFile(tmp.getReviewReportFile()); // 评审报告文件
 
-                BigDecimal prjTotalInvest = prjAmt(tmp.getPrjTotalInvest(),prjId,"PRJ_TOTAL_INVEST",myJdbcTemplate);
-                feasibleImport.setPrjTotalInvest(prjTotalInvest); //总投资
+                BigDecimal prjTotalInvest = prjAmt(tmp.getPrjTotalInvest(), prjId, "PRJ_TOTAL_INVEST", myJdbcTemplate);
+                feasibleImport.setPrjTotalInvest(prjTotalInvest); // 总投资
 
-                BigDecimal projectAmt = prjAmt(tmp.getProjectAmt(),prjId,"PROJECT_AMT",myJdbcTemplate);
-                feasibleImport.setProjectAmt(projectAmt); //工程费用
+                BigDecimal projectAmt = prjAmt(tmp.getProjectAmt(), prjId, "PROJECT_AMT", myJdbcTemplate);
+                feasibleImport.setProjectAmt(projectAmt); // 工程费用
 
-                BigDecimal constructAmt = prjAmt(tmp.getConstructAmt(),prjId,"CONSTRUCT_AMT",myJdbcTemplate);
-                feasibleImport.setConstructAmt(constructAmt); //建安费
+                BigDecimal constructAmt = prjAmt(tmp.getConstructAmt(), prjId, "CONSTRUCT_AMT", myJdbcTemplate);
+                feasibleImport.setConstructAmt(constructAmt); // 建安费
 
-                BigDecimal equipAmt = prjAmt(tmp.getEquipAmt(),prjId,"EQUIP_AMT",myJdbcTemplate);
-                feasibleImport.setEquipAmt(equipAmt); //设备费
+                BigDecimal equipAmt = prjAmt(tmp.getEquipAmt(), prjId, "EQUIP_AMT", myJdbcTemplate);
+                feasibleImport.setEquipAmt(equipAmt); // 设备费
 
-                BigDecimal equipmentCost = prjAmt(tmp.getEquipmentCost(),prjId,"EQUIPMENT_COST",myJdbcTemplate);
-                feasibleImport.setEquipmentCost(equipmentCost); //可研设备费
+                BigDecimal equipmentCost = prjAmt(tmp.getEquipmentCost(), prjId, "EQUIPMENT_COST", myJdbcTemplate);
+                feasibleImport.setEquipmentCost(equipmentCost); // 可研设备费
 
-                BigDecimal projectOtherAmt = prjAmt(tmp.getProjectOtherAmt(),prjId,"PROJECT_OTHER_AMT",myJdbcTemplate);
-                feasibleImport.setProjectOtherAmt(projectOtherAmt); //工程其他费
+                BigDecimal projectOtherAmt = prjAmt(tmp.getProjectOtherAmt(), prjId, "PROJECT_OTHER_AMT", myJdbcTemplate);
+                feasibleImport.setProjectOtherAmt(projectOtherAmt); // 工程其他费
 
-                BigDecimal landAmt = prjAmt(tmp.getLandAmt(),prjId,"LAND_AMT",myJdbcTemplate);
-                feasibleImport.setLandAmt(landAmt); //土地征迁费
+                BigDecimal landAmt = prjAmt(tmp.getLandAmt(), prjId, "LAND_AMT", myJdbcTemplate);
+                feasibleImport.setLandAmt(landAmt); // 土地征迁费
 
-                BigDecimal prepareAmt = prjAmt(tmp.getPrepareAmt(),prjId,"PREPARE_AMT",myJdbcTemplate);
-                feasibleImport.setPrepareAmt(prepareAmt); //预备费
+                BigDecimal prepareAmt = prjAmt(tmp.getPrepareAmt(), prjId, "PREPARE_AMT", myJdbcTemplate);
+                feasibleImport.setPrepareAmt(prepareAmt); // 预备费
 
-                BigDecimal constructPeriodInterest = prjAmt(tmp.getConstructPeriodInterest(),prjId,"CONSTRUCT_PERIOD_INTEREST",myJdbcTemplate);
-                feasibleImport.setConstructPeriodInterest(constructPeriodInterest); //建设期利息
+                BigDecimal constructPeriodInterest = prjAmt(tmp.getConstructPeriodInterest(), prjId, "CONSTRUCT_PERIOD_INTEREST", myJdbcTemplate);
+                feasibleImport.setConstructPeriodInterest(constructPeriodInterest); // 建设期利息
 
-                feasibleImport.setReplyActualDate(tmp.getReplyActualDate()); //实际批复日期
-                feasibleImport.setReplyNoWr(tmp.getReplyNoWr()); //批复文号
-                feasibleImport.setReplyFile(tmp.getReplyFile()); //批复文件
+                feasibleImport.setReplyActualDate(tmp.getReplyActualDate()); // 实际批复日期
+                feasibleImport.setReplyNoWr(tmp.getReplyNoWr()); // 批复文号
+                feasibleImport.setReplyFile(tmp.getReplyFile()); // 批复文件
             }
         }
         return feasibleImport;
@@ -126,21 +126,22 @@ public class FeasibleImportBatchExt {
 
     /**
      * 查询资金赋值信息
-     * @param val 该项目可研数据
-     * @param prjId 项目id
-     * @param code 需要匹配的字段
+     *
+     * @param val            该项目可研数据
+     * @param prjId          项目id
+     * @param code           需要匹配的字段
      * @param myJdbcTemplate 数据源
      * @return
      */
     private BigDecimal prjAmt(BigDecimal val, String prjId, String code, MyJdbcTemplate myJdbcTemplate) {
         BigDecimal amtValue = new BigDecimal(0);
-        if (val == null){
-            //从项目投资测算明细取数
+        if (val == null) {
+            // 从项目投资测算明细取数
             String sql1 = "select a.amt from PM_INVEST_EST_DTL a left join PM_INVEST_EST b on a.PM_INVEST_EST_ID = b.id " +
                     "left join PM_EXP_TYPE c on a.PM_EXP_TYPE_ID = c.id where b.PM_PRJ_ID = ? and c.code = ?";
-            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,prjId,code);
-            if (!CollectionUtils.isEmpty(list1)){
-                String amt = JdbcMapUtil.getString(list1.get(0),"amt");
+            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1, prjId, code);
+            if (!CollectionUtils.isEmpty(list1)) {
+                String amt = JdbcMapUtil.getString(list1.get(0), "amt");
                 amtValue = new BigDecimal(amt);
             } else {
                 amtValue = new BigDecimal(0);
@@ -185,6 +186,10 @@ public class FeasibleImportBatchExt {
         LoginInfo loginInfo = ExtJarHelper.loginInfo.get();
         if (!loginInfo.userCode.equalsIgnoreCase("admin")) {
             throw new BaseException("只有admin才能操作！");
+        }
+
+        if ("1".equals("1")) {
+            throw new BaseException("导入功能实现中...暂未上线！");
         }
 
         SevInfo sevInfo = ExtJarHelper.sevInfo.get();

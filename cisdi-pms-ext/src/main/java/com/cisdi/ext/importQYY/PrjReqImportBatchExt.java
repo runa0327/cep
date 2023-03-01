@@ -217,6 +217,10 @@ public class PrjReqImportBatchExt {
             throw new BaseException("只有admin才能操作！");
         }
 
+        if ("1".equals("1")) {
+            throw new BaseException("导入功能实现中...暂未上线！");
+        }
+
         SevInfo sevInfo = ExtJarHelper.sevInfo.get();
         EntityInfo entityInfo = sevInfo.entityInfo;
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
