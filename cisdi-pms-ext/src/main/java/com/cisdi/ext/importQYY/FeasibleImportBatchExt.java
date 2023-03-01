@@ -141,7 +141,11 @@ public class FeasibleImportBatchExt {
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,prjId,code);
             if (!CollectionUtils.isEmpty(list1)){
                 String amt = JdbcMapUtil.getString(list1.get(0),"amt");
-                amtValue = new BigDecimal(amt);
+                if (!SharedUtil.isEmptyString(amt)){
+                    amtValue = new BigDecimal(amt);
+                } else {
+                    amtValue = new BigDecimal(0);
+                }
             } else {
                 amtValue = new BigDecimal(0);
             }
