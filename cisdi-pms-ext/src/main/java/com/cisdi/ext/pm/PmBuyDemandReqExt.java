@@ -370,7 +370,7 @@ public class PmBuyDemandReqExt {
                 prjNameList = Arrays.asList(projectName.split(","));
             }
             for (String tmp : prjNameList) {
-                String sql1 = "select * from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?";
+                String sql1 = "select * from pm_prj where name = ? and status = 'ap'";
                 List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,tmp,projectType);
                 if (CollectionUtils.isEmpty(list1)){
                     String prjId = Crud.from("pm_prj").insertData();
