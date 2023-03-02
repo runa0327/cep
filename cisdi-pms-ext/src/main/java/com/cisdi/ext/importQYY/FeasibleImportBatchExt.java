@@ -1,11 +1,13 @@
 package com.cisdi.ext.importQYY;
 
+import com.cisdi.ext.base.PmInvestEst;
 import com.cisdi.ext.importQYY.model.FeasibleImport;
 import com.cisdi.ext.importQYY.model.FeasibleImportBatch;
 import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.model.PmPrjInvest1;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
@@ -18,10 +20,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -175,10 +174,10 @@ public class FeasibleImportBatchExt {
             batch.updateById();
 
             // 对于明细，修改导入状态为2：
-            Where where = new Where().eq(com.cisdi.ext.importQYY.model.FeasibleImport.Cols.FEASIBLE_IMPORT_BATCH_ID, csCommId);
+            Where where = new Where().eq(FeasibleImport.Cols.FEASIBLE_IMPORT_BATCH_ID, csCommId);
             HashMap<String, Object> keyValueMap = new HashMap<>();
-            keyValueMap.put(com.cisdi.ext.importQYY.model.FeasibleImport.Cols.IMPORT_STATUS_ID, "2");
-            com.cisdi.ext.importQYY.model.FeasibleImport.updateByWhere(where, keyValueMap);
+            keyValueMap.put(FeasibleImport.Cols.IMPORT_STATUS_ID, "2");
+            FeasibleImport.updateByWhere(where, keyValueMap);
         }
     }
 
@@ -192,9 +191,9 @@ public class FeasibleImportBatchExt {
             throw new BaseException("只有admin才能操作！");
         }
 
-        if ("1".equals("1")) {
-            throw new BaseException("导入功能实现中...暂未上线！");
-        }
+//        if ("1".equals("1")) {
+//            throw new BaseException("导入功能实现中...暂未上线！");
+//        }
 
         SevInfo sevInfo = ExtJarHelper.sevInfo.get();
         EntityInfo entityInfo = sevInfo.entityInfo;
@@ -210,9 +209,9 @@ public class FeasibleImportBatchExt {
 
             ImportSum importSum = new ImportSum();
             Where where = new Where().eq(FeasibleImport.Cols.FEASIBLE_IMPORT_BATCH_ID, csCommId);
-            List<com.cisdi.ext.importQYY.model.FeasibleImport> prjReqImportList = com.cisdi.ext.importQYY.model.FeasibleImport.selectByWhere(where);
+            List<FeasibleImport> prjReqImportList = FeasibleImport.selectByWhere(where);
             if (!SharedUtil.isEmptyList(prjReqImportList)) {
-                for (com.cisdi.ext.importQYY.model.FeasibleImport prjReqImport : prjReqImportList) {
+                for (FeasibleImport prjReqImport : prjReqImportList) {
                     // 真正执行导入：
                     boolean succ = doImportPrj(prjReqImport);
                     // 累计成功或失败数量：
@@ -238,7 +237,8 @@ public class FeasibleImportBatchExt {
      *
      * @return 是否成功。
      */
-    private boolean doImportPrj(com.cisdi.ext.importQYY.model.FeasibleImport newImport) {
+    private boolean doImportPrj(FeasibleImport newImport) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         boolean succ = true;
         List<String> errInfoList = new ArrayList<>();
         String newImportId = newImport.getId();
@@ -248,7 +248,7 @@ public class FeasibleImportBatchExt {
 
         // 通过项目ID，获取旧的导入记录：
         PmPrj pmPrj = PmPrj.selectById(pmPrjId);
-        com.cisdi.ext.importQYY.model.FeasibleImport oldImport = doGetDtl(pmPrj);
+        FeasibleImport oldImport = doGetDtl(pmPrj);
 
         // 若字段的值已不同，则予以处理：
 
@@ -267,10 +267,13 @@ public class FeasibleImportBatchExt {
         // TODO 其他字段的处理逻辑。
 
         //写入可研流程业务表
-//        String error1 = insertInvest1(newImport,pmPrj);
-//        if (!SharedUtil.isEmptyString(error1)){
-//            errInfoList.add(error1);
-//        }
+        String error1 = insertInvest1(newImport,pmPrj);
+        if (!SharedUtil.isEmptyString(error1)){
+            errInfoList.add(error1);
+        }
+
+        //写入投资测算明细主父表
+        PmInvestEst.creatInvest1Data(pmPrjId,newImport,myJdbcTemplate);
 
         // 执行过程中，可能会自动抛出异常。
         // 若希望自行抛出异常，则throw：
@@ -282,12 +285,55 @@ public class FeasibleImportBatchExt {
         // }
 
         HashMap<String, Object> keyValueMap = new HashMap<>();
-        keyValueMap.put(com.cisdi.ext.importQYY.model.FeasibleImport.Cols.IMPORT_STATUS_ID, "3");
-        keyValueMap.put(com.cisdi.ext.importQYY.model.FeasibleImport.Cols.IMPORT_TIME, LocalDateTime.now());
-        keyValueMap.put(com.cisdi.ext.importQYY.model.FeasibleImport.Cols.IS_SUCCESS, succ);
-        keyValueMap.put(com.cisdi.ext.importQYY.model.FeasibleImport.Cols.ERR_INFO, SharedUtil.isEmptyList(errInfoList) ? null : errInfoList.stream().collect(Collectors.joining("；")));
+        keyValueMap.put(FeasibleImport.Cols.IMPORT_STATUS_ID, "3");
+        keyValueMap.put(FeasibleImport.Cols.IMPORT_TIME, LocalDateTime.now());
+        keyValueMap.put(FeasibleImport.Cols.IS_SUCCESS, succ);
+        keyValueMap.put(FeasibleImport.Cols.ERR_INFO, SharedUtil.isEmptyList(errInfoList) ? null : errInfoList.stream().collect(Collectors.joining("；")));
         FeasibleImport.updateById(newImportId, keyValueMap);
 
         return succ;
+    }
+
+    /**
+     * 写入初设概算流程表
+     * @param newImport 初设概算实体信息
+     * @param pmPrj 项目基础信息
+     * @return 错误信息
+     */
+    private String insertInvest1(FeasibleImport newImport, PmPrj pmPrj) {
+        String id = Crud.from("PM_PRJ_INVEST2").insertData();
+        Date date = new Date();
+        String error = "";
+        try {
+            Crud.from("PM_PRJ_INVEST2").where().eq("id",id).update()
+                    .set("PM_PRJ_ID",newImport.getPmPrjId()).set("IS_OMPORT","0099799190825080669").set("status","AP").set("TS",date)
+                    .set("PRJ_CODE",pmPrj.getPrjCode()).set("CUSTOMER_UNIT",pmPrj.getCustomerUnit())
+                    .set("PRJ_MANAGE_MODE_ID",pmPrj.getPrjManageModeId()).set("BASE_LOCATION_ID",pmPrj.getBaseLocationId())
+                    .set("FLOOR_AREA",pmPrj.getFloorArea()).set("PROJECT_TYPE_ID",pmPrj.getProjectTypeId())
+                    .set("CON_SCALE_TYPE_ID",pmPrj.getConScaleTypeId()).set("CON_SCALE_QTY",pmPrj.getConScaleQty())
+                    .set("QTY_ONE",pmPrj.getQtyOne()).set("QTY_TWO",pmPrj.getQtyTwo()).set("QTY_THREE",pmPrj.getQtyThree())
+                    .set("CON_SCALE_QTY2",pmPrj.getConScaleQty2()).set("CON_SCALE_UOM_ID",pmPrj.getConScaleUomId())
+                    .set("BUILD_YEARS",pmPrj.getBuildYears()).set("PRJ_SITUATION",pmPrj.getPrjSituation())
+                    .set("PRJ_TOTAL_INVEST",newImport.getPrjTotalInvest()).set("PROJECT_AMT",newImport.getProjectAmt())
+                    .set("CONSTRUCT_AMT",newImport.getConstructAmt()).set("EQUIP_AMT",newImport.getEquipAmt())
+                    .set("EQUIPMENT_COST",newImport.getEquipmentCost()).set("PROJECT_OTHER_AMT",newImport.getProjectOtherAmt())
+                    .set("LAND_AMT",newImport.getLandAmt()).set("PREPARE_AMT",newImport.getPrepareAmt())
+                    .set("CONSTRUCT_PERIOD_INTEREST",newImport.getConstructPeriodInterest())
+                    .set("EXPERT_COMPL_ACTUAL_DATE",newImport.getExpertComplActualDate()) //实际评审日期
+                    .set("REVIEW_UNIT_CHIEF",newImport.getReviewUnitChief()) //评审单位负责人
+                    .set("REVIEW_ORGANIZATION_UNIT",newImport.getReviewOrganizationUnit()) //评审组织单位
+                    .set("REVIEW_UNIT_PHONE",newImport.getReviewUnitPhone()) //评审单位联系方式
+                    .set("EXPERT_FILE",newImport.getExpertFile()) //专家意见文件
+                    .set("REVIEW_REPORT_FILE",newImport.getReviewReportFile()) // 评审稿文件
+                    .set("REVISION_FILE",newImport.getRevisionFile()) //修编稿
+                    .set("REVIEW_DRAFT_FILE",newImport.getReviewDraftFile()) //评审报告文件
+                    .set("REPLY_ACTUAL_DATE",newImport.getReplyActualDate()) //实际批复日期
+                    .set("REPLY_NO_WR",newImport.getReplyNoWr()) // 批复文号
+                    .set("REPLY_FILE",newImport.getReplyFile()) // 批复文件
+                    .exec();
+        } catch (Exception e){
+            error = "写入初设概算流程表异常;";
+        }
+        return error;
     }
 }

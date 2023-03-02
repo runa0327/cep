@@ -1,5 +1,6 @@
 package com.cisdi.ext.base;
 
+import com.cisdi.ext.importQYY.model.FeasibleImport;
 import com.cisdi.ext.importQYY.model.FinancialImport;
 import com.cisdi.ext.importQYY.model.PrjReqImport;
 import com.cisdi.ext.util.CommonUtils;
@@ -18,7 +19,7 @@ import java.util.*;
 public class PmInvestEst {
 
     /**
-     * 项目投资测算表插入
+     * 项目投资测算表插入-立项导入
      * @param pmPrjId 项目id
      * @param newImport 资金明细信息
      * @param myJdbcTemplate 数据源
@@ -39,7 +40,7 @@ public class PmInvestEst {
     }
 
     /**
-     * 项目投资测算表插入
+     * 项目投资测算表插入-初设概算导入
      * @param pmPrjId 项目id
      * @param newImport 资金明细信息
      * @param myJdbcTemplate 数据源
@@ -62,7 +63,32 @@ public class PmInvestEst {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    /**
+     * 项目投资测算表插入-可研导入
+     * @param pmPrjId 项目id
+     * @param newImport 资金明细信息
+     * @param myJdbcTemplate 数据源
+     * @return 插入错误信息
+     */
+    public static void creatInvest1Data(String pmPrjId, FeasibleImport newImport, MyJdbcTemplate myJdbcTemplate) {
+        //查询该项目的投资测算信息是否已存在
+        String pmInvestId = PmInvestEst.getMainId(pmPrjId,"0099799190825099305",myJdbcTemplate);
+        if (SharedUtil.isEmptyString(pmInvestId)){
+            pmInvestId = Crud.from("PM_INVEST_EST").insertData();
+        }
+        //修改数据
+        updateInvestEst(pmInvestId,pmPrjId,"0099799190825099305",newImport.getPrjTotalInvest());
+        //创建明细模板
+        PmInvestEstDtl.createData(pmInvestId,myJdbcTemplate);
+        //更新投资测算子表
+        try {
+            Map<String,Object> importMap = CommonUtils.convertToMap(newImport);
+            PmInvestEstDtl.updateInvestEstDtlInvest2(pmInvestId,importMap,myJdbcTemplate);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
