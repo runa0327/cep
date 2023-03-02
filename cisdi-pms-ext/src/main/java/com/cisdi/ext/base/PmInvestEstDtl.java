@@ -1,5 +1,6 @@
 package com.cisdi.ext.base;
 
+import com.cisdi.ext.importQYY.model.FinancialImport;
 import com.cisdi.ext.importQYY.model.PrjReqImport;
 import com.cisdi.ext.util.CommonUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -26,20 +27,60 @@ public class PmInvestEstDtl {
         investMap.put("PREPARE_AMT", "prepareAmt"); // 预备费
     }
 
+    public static final Map<String, String> investMap2 = new HashMap<>();
+    static {
+        investMap2.put("PRJ_TOTAL_INVEST", "prjTotalInvest"); // 总投资
+        investMap2.put("CONSTRUCT_AMT", "constructAmt"); // 建安费
+        investMap2.put("EQUIP_AMT", "equipAmt"); // 设备采购费
+        investMap2.put("SCIENTIFIC_EQUIPMENT_AMT", "equipmentCost"); // 科研设备费
+        investMap2.put("PROJECT_AMT", "projectAmt"); // 工程其他费用
+        investMap2.put("LAND_AMT", "landAmt"); // 土地征迁费
+        investMap2.put("PREPARE_AMT", "prepareAmt"); // 预备费
+        investMap2.put("PROJECT_AMT-OTHER", "projectOtherAmt"); // 工程费用-其他
+    }
+
     /**
-     * 
+     *
      * @param pmInvestId 父级id
-     * @param newImport 资金明细信息
      * @param myJdbcTemplate 数据源
      */
-    public static void createData(String pmInvestId, PrjReqImport newImport, MyJdbcTemplate myJdbcTemplate) {
+    public static void createData(String pmInvestId, MyJdbcTemplate myJdbcTemplate) {
         //删除明细信息
         deleteDetail(pmInvestId,myJdbcTemplate);
         //根据模板建立投资测算明细树
         buildPrjInvestDlt(pmInvestId);
-        //更新明细数据
+    }
+
+    /**
+     * 投资测算明细数据修改-立项匡算
+     * @param pmInvestId 主表id
+     * @param newImport 资金明细信息
+     * @param myJdbcTemplate 数据源
+     */
+    public static void updateInvestEstDtlPrj(String pmInvestId, PrjReqImport newImport, MyJdbcTemplate myJdbcTemplate) {
         updateInvestDtl(pmInvestId,newImport,myJdbcTemplate);
     }
+
+    /**
+     * 投资测算明细数据修改-初设概算
+     * @param pmInvestId 主表id
+     * @param importMap 资金明细信息
+     * @param myJdbcTemplate 数据源
+     */
+    public static void updateInvestEstDtlInvest2(String pmInvestId, Map<String,Object> importMap, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select a.id,a.PM_EXP_TYPE_ID,b.code from PM_INVEST_EST_DTL a left join PM_EXP_TYPE b on a.PM_EXP_TYPE_ID = b.id " +
+                "where a.PM_INVEST_EST_ID = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,pmInvestId);
+        for (Map<String, Object> valueMap : list) {
+            String key = JdbcMapUtil.getString(valueMap,"code");
+            key = getKey(key,investMap2);
+            String value = getValue(key,importMap);
+            if (!SharedUtil.isEmptyString(value)){
+                Crud.from("PM_INVEST_EST_DTL").where().eq("id",JdbcMapUtil.getString(valueMap,"id")).update().set("AMT",value).exec();
+            }
+        }
+    }
+
 
     /**
      * 更新投资测算明细信息
@@ -128,4 +169,5 @@ public class PmInvestEstDtl {
         String sql = "delete from PM_INVEST_EST_DTL where PM_INVEST_EST_ID = ?";
         myJdbcTemplate.update(sql,pmInvestId);
     }
+
 }

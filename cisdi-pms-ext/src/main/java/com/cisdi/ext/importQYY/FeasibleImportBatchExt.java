@@ -143,7 +143,7 @@ public class FeasibleImportBatchExt {
             if (!CollectionUtils.isEmpty(list1)) {
                 String amt = JdbcMapUtil.getString(list1.get(0), "amt");
                 if (!SharedUtil.isEmptyString(amt)) {
-                    amtValue = new BigDecimal(amt).divide(new BigDecimal(10000));
+                    amtValue = new BigDecimal(amt);
                 } else {
                     amtValue = new BigDecimal(0);
                 }
@@ -151,7 +151,7 @@ public class FeasibleImportBatchExt {
                 amtValue = new BigDecimal(0);
             }
         } else {
-            amtValue = val.divide(new BigDecimal(10000));
+            amtValue = val;
         }
         return amtValue;
     }
@@ -253,18 +253,24 @@ public class FeasibleImportBatchExt {
         // 若字段的值已不同，则予以处理：
 
         // 示例，处理某个字段：
-        try {
-            // if (!SharedUtil.toStringEquals(oldImport.getCustomerUnit(), newImport.getCustomerUnit())) {
-            //     HashMap<String, Object> keyValueMap = new HashMap<>();
-            //     keyValueMap.put(PmPrj.Cols.CUSTOMER_UNIT, newImport.getCustomerUnit());
-            //     PmPrj.updateById(pmPrjId, keyValueMap);
-            // }
-        } catch (Exception ex) {
-            succ = false;
-            errInfoList.add(ex.toString());
-        }
+//        try {
+            //建设期利息
+//            if (newImport.getConstructPeriodInterest() != null) {
+//                BigDecimal value = prjAmtNew(newImport.getConstructPeriodInterest());
+//                newImport.setConstructPeriodInterest(value);
+//            }
+//        } catch (Exception ex) {
+//            succ = false;
+//            errInfoList.add(ex.toString());
+//        }
 
         // TODO 其他字段的处理逻辑。
+
+        //写入可研流程业务表
+//        String error1 = insertInvest1(newImport,pmPrj);
+//        if (!SharedUtil.isEmptyString(error1)){
+//            errInfoList.add(error1);
+//        }
 
         // 执行过程中，可能会自动抛出异常。
         // 若希望自行抛出异常，则throw：

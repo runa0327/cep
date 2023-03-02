@@ -148,7 +148,7 @@ public class PrjReqImportBatchExt {
             if (!CollectionUtils.isEmpty(list1)) {
                 String amt = JdbcMapUtil.getString(list1.get(0), "amt");
                 if (!SharedUtil.isEmptyString(amt)) {
-                    amtValue = new BigDecimal(amt).divide(new BigDecimal(10000));
+                    amtValue = new BigDecimal(amt);
                 } else {
                     amtValue = new BigDecimal(0);
                 }
@@ -156,7 +156,7 @@ public class PrjReqImportBatchExt {
                 amtValue = new BigDecimal(0);
             }
         } else {
-            amtValue = val.divide(new BigDecimal(10000));
+            amtValue = val;
         }
         return amtValue;
     }
@@ -216,9 +216,9 @@ public class PrjReqImportBatchExt {
             throw new BaseException("只有admin才能操作！");
         }
 
-        if ("1".equals("1")) {
-            throw new BaseException("导入功能实现中...暂未上线！");
-        }
+//        if ("1".equals("1")) {
+//            throw new BaseException("导入功能实现中...暂未上线！");
+//        }
 
         SevInfo sevInfo = ExtJarHelper.sevInfo.get();
         EntityInfo entityInfo = sevInfo.entityInfo;
@@ -348,57 +348,43 @@ public class PrjReqImportBatchExt {
             //总投资
             if (!SharedUtil.toStringEquals(oldImport.getEstimatedTotalInvest(), newImport.getEstimatedTotalInvest())) {
                 HashMap<String, Object> keyValueMap = new HashMap<>();
-                BigDecimal value = prjAmtNew(newImport.getEstimatedTotalInvest());
-                newImport.setEstimatedTotalInvest(value);
-                keyValueMap.put(PmPrj.Cols.ESTIMATED_TOTAL_INVEST, value);
+                keyValueMap.put(PmPrj.Cols.ESTIMATED_TOTAL_INVEST, newImport.getEstimatedTotalInvest());
                 PmPrj.updateById(pmPrjId, keyValueMap);
             }
             //建安工程费
             if (!SharedUtil.toStringEquals(oldImport.getConstructPrjAmt(), newImport.getConstructPrjAmt())) {
                 HashMap<String, Object> keyValueMap = new HashMap<>();
-                BigDecimal value = prjAmtNew(newImport.getConstructPrjAmt());
-                newImport.setConstructPrjAmt(value);
-                keyValueMap.put(PmPrj.Cols.CONSTRUCT_PRJ_AMT, value);
+                keyValueMap.put(PmPrj.Cols.CONSTRUCT_PRJ_AMT, newImport.getConstructPrjAmt());
                 PmPrj.updateById(pmPrjId, keyValueMap);
             }
             //设备采购费
             if (!SharedUtil.toStringEquals(oldImport.getEquipBuyAmt(), newImport.getEquipBuyAmt())) {
                 HashMap<String, Object> keyValueMap = new HashMap<>();
-                BigDecimal value = prjAmtNew(newImport.getEquipBuyAmt());
-                newImport.setEquipBuyAmt(value);
-                keyValueMap.put(PmPrj.Cols.EQUIP_BUY_AMT, value);
+                keyValueMap.put(PmPrj.Cols.EQUIP_BUY_AMT, newImport.getEquipBuyAmt());
                 PmPrj.updateById(pmPrjId, keyValueMap);
             }
             //科研设备费
             if (!SharedUtil.toStringEquals(oldImport.getEquipmentCost(), newImport.getEquipmentCost())) {
                 HashMap<String, Object> keyValueMap = new HashMap<>();
-                BigDecimal value = prjAmtNew(newImport.getEquipmentCost());
-                newImport.setEquipmentCost(value);
-                keyValueMap.put(PmPrj.Cols.EQUIPMENT_COST, value);
+                keyValueMap.put(PmPrj.Cols.EQUIPMENT_COST, newImport.getEquipmentCost());
                 PmPrj.updateById(pmPrjId, keyValueMap);
             }
             //工程其他费用
             if (!SharedUtil.toStringEquals(oldImport.getProjectOtherAmt(), newImport.getProjectOtherAmt())) {
                 HashMap<String, Object> keyValueMap = new HashMap<>();
-                BigDecimal value = prjAmtNew(newImport.getProjectOtherAmt());
-                newImport.setProjectOtherAmt(value);
-                keyValueMap.put(PmPrj.Cols.PROJECT_OTHER_AMT, value);
+                keyValueMap.put(PmPrj.Cols.PROJECT_OTHER_AMT, newImport.getProjectOtherAmt());
                 PmPrj.updateById(pmPrjId, keyValueMap);
             }
             //土地征迁费
             if (!SharedUtil.toStringEquals(oldImport.getLandBuyAmt(), newImport.getLandBuyAmt())) {
                 HashMap<String, Object> keyValueMap = new HashMap<>();
-                BigDecimal value = prjAmtNew(newImport.getLandBuyAmt());
-                newImport.setLandBuyAmt(value);
-                keyValueMap.put(PmPrj.Cols.LAND_BUY_AMT, value);
+                keyValueMap.put(PmPrj.Cols.LAND_BUY_AMT, newImport.getLandBuyAmt());
                 PmPrj.updateById(pmPrjId, keyValueMap);
             }
             //预备费
             if (!SharedUtil.toStringEquals(oldImport.getPrepareAmt(), newImport.getPrepareAmt())) {
                 HashMap<String, Object> keyValueMap = new HashMap<>();
-                BigDecimal value = prjAmtNew(newImport.getPrepareAmt());
-                newImport.setPrepareAmt(value);
-                keyValueMap.put(PmPrj.Cols.PREPARE_AMT, value);
+                keyValueMap.put(PmPrj.Cols.PREPARE_AMT, newImport.getPrepareAmt());
                 PmPrj.updateById(pmPrjId, keyValueMap);
             }
             //项目建议书完成日期
@@ -475,15 +461,6 @@ public class PrjReqImportBatchExt {
         PrjReqImport.updateById(newImportId, keyValueMap);
 
         return succ;
-    }
-
-    /**
-     * 金额*10000
-     * @param estimatedTotalInvest
-     * @return
-     */
-    private BigDecimal prjAmtNew(BigDecimal estimatedTotalInvest) {
-        return estimatedTotalInvest.multiply(new BigDecimal(10000));
     }
 
     /**
