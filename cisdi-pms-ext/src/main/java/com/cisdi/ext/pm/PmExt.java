@@ -158,6 +158,8 @@ public class PmExt {
         public Integer total;
 
         public List<Project> list;
+
+        public List<ProjectInfo> projectInfoList;
     }
 
     private static class RequestParam {
@@ -215,6 +217,141 @@ public class PmExt {
         public String jlUnit;
         //施工单位
         public String sgUnit;
+    }
+
+
+    /**
+     * 项目库查询
+     */
+    public void projectLibrary() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        PrjRequestParam param = JsonUtil.fromJson(json, PrjRequestParam.class);
+        int pageSize = param.pageSize;
+        int pageIndex = param.pageIndex;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        StringBuilder sb = new StringBuilder();
+        sb.append("select pm.id as id,pm.`NAME` as name,pt.`NAME` as unit,gsv.`NAME` as type,pm.PM_CODE as code,ggg.`NAME` as local, \n" +
+                "gsvv.`NAME` as pmode,'0' as invest,gss.`NAME` as status,\n" +
+                "ppp.PLAN_START_DATE as PLAN_START_DATE, \n" +
+                "ppp.ACTUAL_START_DATE as ACTUAL_START_DATE, \n" +
+                "ppp.PLAN_COMPL_DATE AS PLAN_COMPL_DATE, \n" +
+                "ppp.ACTUAL_COMPL_DATE AS ACTUAL_COMPL_DATE, \n" +
+                "ppp.PLAN_CURRENT_PRO_PERCENT AS PLAN_CURRENT_PRO_PERCENT, \n" +
+                "ppp.ACTUAL_CURRENT_PRO_PERCENT AS ACTUAL_CURRENT_PRO_PERCENT  \n" +
+                "from pm_prj pm \n" +
+                "left join pm_party pt on pm.CUSTOMER_UNIT = pt.id \n" +
+                "left join gr_set_value gsv on gsv.id = pm.PROJECT_TYPE_ID \n" +
+                "left join gr_set_value gsvv on gsvv.id = pm.PRJ_MANAGE_MODE_ID \n" +
+                "left join gr_set_value gss on gss.id = pm.PROJECT_PHASE_ID \n" +
+                "left join pm_pro_plan ppp on ppp.PM_PRJ_ID = pm.id \n" +
+                "left join gr_set_value ggg on ggg.id = pm.BASE_LOCATION_ID "+
+                "where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' ");
+        if (Strings.isNotEmpty(param.name)) {
+            sb.append(" and pm.`name` like '%").append(param.name).append("%'");
+        }
+        if (Strings.isNotEmpty(param.code)) {
+            sb.append(" and pm.PM_CODE like '%").append(param.code).append("%'");
+        }
+        if (Strings.isNotEmpty(param.unit)) {
+            sb.append(" and pm.CUSTOMER_UNIT = '").append(param.unit).append("'");
+        }
+        if (Strings.isNotEmpty(param.type)) {
+            sb.append(" and pm.PROJECT_TYPE_ID = '").append(param.type).append("'");
+        }
+        if (Strings.isNotEmpty(param.status)) {
+            sb.append(" and pm.PROJECT_PHASE_ID = '").append(param.status).append("'");
+        }
+        if (Strings.isNotEmpty(param.phase)) {
+            sb.append(" and pm.TRANSITION_PHASE_ID = '").append(param.phase).append("'");
+        }
+        if (Strings.isNotEmpty(param.startTime)) {
+            sb.append(" and DATE_FORMAT(ppp.PLAN_START_DATE,'%Y-%m-%d') = DATE_FORMAT('").append(param.startTime).append("','%Y-%m-%d')");
+        }
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        sb.append(" and IF('").append(userId).append("' in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1, ");
+        sb.append(" pm.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(userId).append("', USER_IDS )))");
+
+        sb.append(" order by pm.CRT_DT desc");
+        String totalSql = sb.toString();
+        int start = pageSize * (pageIndex - 1);
+        sb.append(" limit ").append(start).append(",").append(pageSize);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
+        List<ProjectInfo> projectInfoList = list.stream().map(this::convertProjectInfo).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(projectInfoList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
+            OutSide outSide = new OutSide();
+            outSide.total = totalList.size();
+            outSide.projectInfoList = projectInfoList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    public ProjectInfo convertProjectInfo(Map<String, Object> data) {
+        ProjectInfo projectInfo = new ProjectInfo();
+        projectInfo.id = JdbcMapUtil.getString(data, "id");
+        projectInfo.name = JdbcMapUtil.getString(data, "name");
+        projectInfo.unit = JdbcMapUtil.getString(data, "unit");
+        projectInfo.type = JdbcMapUtil.getString(data, "type");
+        projectInfo.local = JdbcMapUtil.getString(data, "local");
+        projectInfo.code = JdbcMapUtil.getString(data, "code");
+        projectInfo.mode = JdbcMapUtil.getString(data, "pmode");
+        projectInfo.invest = getPrjInvest(projectInfo.id);
+        projectInfo.status = JdbcMapUtil.getString(data, "status");
+        projectInfo.planStartDate = JdbcMapUtil.getString(data, "PLAN_START_DATE");
+        projectInfo.actualStartDate = JdbcMapUtil.getString(data, "ACTUAL_START_DATE");
+        projectInfo.planComplDate = JdbcMapUtil.getString(data, "PLAN_COMPL_DATE");
+        projectInfo.actualComplDate = JdbcMapUtil.getString(data, "ACTUAL_COMPL_DATE");
+        projectInfo.planCurrentProPercent = JdbcMapUtil.getString(data, "PLAN_CURRENT_PRO_PERCENT");
+        projectInfo.actualCurrentProPercent = JdbcMapUtil.getString(data, "ACTUAL_CURRENT_PRO_PERCENT");
+        return projectInfo;
+    }
+
+
+    public String getPrjInvest(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pie.id,round(ifnull(pie.PRJ_TOTAL_INVEST,0),2) as amt ,gsv.code from pm_invest_est pie  " +
+                "left join  gr_set_value gsv on gsv.id = pie.INVEST_EST_TYPE_ID " +
+                "where PM_PRJ_ID=? order by gsv.`CODE` desc limit 0,1  ", projectId);
+        if (CollectionUtils.isEmpty(list)) {
+            return "0";
+        } else {
+            return String.valueOf(list.get(0).get("amt"));
+        }
+    }
+
+
+    public static class PrjRequestParam {
+        public String name;
+        public String code;
+        public String unit;
+        public String type;
+        public String status;
+        public String phase;
+        public String startTime;
+        public Integer pageSize;
+        public Integer pageIndex;
+    }
+
+    public static class ProjectInfo {
+        public String id;
+        public String name;
+        public String unit;
+        public String type;
+        public String local;
+        public String code;
+        public String mode;
+        public String invest;
+        public String status;
+        public String planStartDate;
+        public String actualStartDate;
+        public String planComplDate;
+        public String actualComplDate;
+        public String planCurrentProPercent;
+        public String actualCurrentProPercent;
     }
 
 
