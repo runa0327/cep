@@ -157,7 +157,7 @@ public class PoOrderExtApi {
             throw new BaseException("接口调用失败，项目id不能为空");
         }
         if (param.pageIndex == 0 || param.pageSize == 0) {
-            throw new BaseException("分页参数不能必须大于0");
+            throw new BaseException("分页参数必须大于0");
         }
         // 起始条数
         int start = (param.pageIndex - 1) * param.pageSize;

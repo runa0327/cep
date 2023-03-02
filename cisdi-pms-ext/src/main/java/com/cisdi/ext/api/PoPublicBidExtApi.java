@@ -4,19 +4,25 @@ import com.cisdi.ext.base.PmPrj;
 import com.cisdi.ext.fundManage.FileCommon;
 import com.cisdi.ext.model.BasePageEntity;
 import com.cisdi.ext.model.view.CommonDrop;
+import com.cisdi.ext.model.view.base.PoPublicBidView;
+import com.cisdi.ext.model.view.file.BaseFileView;
 import com.cisdi.ext.model.view.file.File;
+import com.cisdi.ext.model.view.order.PoOrderView;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -58,6 +64,31 @@ public class PoPublicBidExtApi {
     }
 
     /**
+     * 新增单条招标记录-历史记录同步
+     * @param tmp 数据项
+     * @param viewId 对应数据的流程的实体视图id
+     * @param myJdbcTemplate 数据源
+     */
+    public static void createHistoryData(Map<String, Object> tmp, String viewId, MyJdbcTemplate myJdbcTemplate) {
+        //项目id
+        String projectId = PmPrj.getProjectIdByProcess(tmp,myJdbcTemplate);
+        //业务流程id
+        String csId = JdbcMapUtil.getString(tmp,"id");
+        if (!SharedUtil.isEmptyString(projectId)){
+            List<String> list = StringUtil.getStrToList(projectId,",");
+            for (String prjId : list) {
+                //判断是否已存在，存在则修改
+                String publicBidId = getDateByProcessDateId(csId,prjId,myJdbcTemplate);
+                if (SharedUtil.isEmptyString(publicBidId)){
+                    publicBidId = Crud.from("PO_PUBLIC_BID").insertData();
+                }
+                //修改招标台账数据表数据
+                updatePublicBid(tmp,csId,publicBidId,prjId,viewId);
+            }
+        }
+    }
+
+    /**
      * 修改合同数据表数据
      * @param valueMap 主体值
      * @param csId 流程业务表id
@@ -75,6 +106,7 @@ public class PoPublicBidExtApi {
                 .set("DATE_ONE",JdbcMapUtil.getString(valueMap,"DATE_ONE")) //中标日期
                 .set("AMT_SIX",JdbcMapUtil.getString(valueMap,"AMT_ONE")) //中标价
                 .set("BID_WIN_NOTICE_FILE_GROUP_ID",JdbcMapUtil.getString(valueMap,"BID_WIN_NOTICE_FILE_GROUP_ID")) //中标通知书
+                .set("BID_PLATFORM",JdbcMapUtil.getString(valueMap,"BID_PLATFORM")) //招标平台
                 .set("view_Id",viewId) //视图id
                 .exec();
     }
@@ -102,69 +134,118 @@ public class PoPublicBidExtApi {
     public void getPublicBidList() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
-        Input input = JsonUtil.fromJson(json, Input.class);
-        String projectId = input.projectId;
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String baseSql = "select ID,NAME,PM_PRJ_ID,PRJ_CODE,PRJ_REPLY_NO,PRJ_SITUATION,INVESTMENT_SOURCE_ID,CUSTOMER_UNIT,BUY_TYPE_ID," +
-                "FEASIBILITY_APPROVE_FUND,ESTIMATE_APPROVE_FUND,EVALUATION_APPROVE_FUND,BID_UNIT,BID_BASIS,BID_CTL_PRICE_LAUNCH,SERVICE_DAYS," +
-                "BID_DEMAND_FILE_GROUP_ID,REMARK,APPROVE_PMS_RELEASE_WAY_ID,APPROVE_PURCHASE_TYPE,APPROVE_BID_CTL_PRICE,APPROVE_PURCHASE_TYPE_ECHO," +
-                "LEADER_APPROVE_COMMENT,LEADER_APPROVE_FILE_GROUP_ID,BID_CTL_PRICE_LAUNCH_ECHO,BID_USER_ID,BID_AGENCY,DEMAND_PROMOTER," +
-                "BID_FILE_GROUP_ID,REGISTRATION_DATE,BID_OPEN_DATE,WIN_BID_UNIT_TXT,TENDER_OFFER from po_public_bid where PM_PRJ_ID = ? ";
-        // 筛选条件
-        if (!Strings.isNullOrEmpty(input.tenderName)) {// 招标名称模糊查询
-            baseSql += "and NAME like '%" + input.tenderName + "%' ";
+        PoPublicBidView input = JsonUtil.fromJson(json, PoPublicBidView.class);
+        if (SharedUtil.isEmptyString(input.projectId)) {
+            throw new BaseException("接口调用失败，项目id不能为空");
         }
-        if (!Strings.isNullOrEmpty(input.startDate) && !Strings.isNullOrEmpty(input.endDate)) {// 开标日期
-            baseSql += "and BID_OPEN_DATE BETWEEN '" + input.startDate + "' and '" + input.endDate + "' ";
+        if (input.pageIndex == 0 || input.pageSize == 0) {
+            throw new BaseException("分页参数必须大于0");
         }
-        if (!Strings.isNullOrEmpty(input.tenderWayId)) {// 招标方式
-            baseSql += "and APPROVE_PURCHASE_TYPE = '" + input.tenderWayId + "' ";
-        }
-        if (!Strings.isNullOrEmpty(input.tenderReleaseWayId)) {// 招标类型
-            baseSql += "and APPROVE_PMS_RELEASE_WAY_ID = '" + input.tenderReleaseWayId + "' ";
-        }
-        String totalSql = baseSql;
         // 分页
         Integer start = input.pageSize * (input.pageIndex - 1);
-        baseSql += "limit " + start + "," + input.pageSize;
-
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList(baseSql, projectId);
-        List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql, projectId);
-        List<ProjectTender> resList = list.stream().map(this::convertProjectTender).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(resList)) {
+        String limit = "limit " + start + "," + input.pageSize;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        StringBuilder baseSql = new StringBuilder("select (select name from gr_set_value where id = a.BUY_PRJ_TYPE_ID) as buyPrjTypeName, " +
+                "(select name from gr_set_value where id = a.BUY_MATTER_ID) as buyMatterName, " +
+                "(select name from gr_set_value where id = a.BUY_TYPE_ID) as buyTypeName, " +
+                "(select name from gr_set_value where id = a.BID_PLATFORM) as platformName, " +
+                "a.AMT_FIVE as maxAmt,a.AMT_SIX as winAmt,a.DATE_ONE as winDate,a.WORK_PROCESS_ID as workProcessId, " +
+                "a.VIEW_ID as viewId,a.PM_PRJ_ID as projectId,a.BID_WIN_NOTICE_FILE_GROUP_ID as fileId " +
+                " FROM po_public_bid a WHERE a.PM_PRJ_ID = ? and a.STATUS = 'ap' ");
+        // 筛选条件
+        if (!SharedUtil.isEmptyString(input.buyPrjTypeId)) {// 采购项目类别
+            baseSql.append(" and a.BUY_PRJ_TYPE_ID = '").append(input.buyPrjTypeId).append("'");
+        }
+        if (!SharedUtil.isEmptyString(input.buyMatterId)) {// 采购事项
+            baseSql.append(" and a.BUY_MATTER_ID = '").append(input.buyPrjTypeId).append("'");
+        }
+        if (!SharedUtil.isEmptyString(input.buyTypeId)) {// 采购方式
+            baseSql.append(" and a.BUY_TYPE_ID = '").append(input.buyTypeId).append("'");
+        }
+        if (!SharedUtil.isEmptyString(input.platformId)) {// 招标平台
+            baseSql.append(" and a.BID_PLATFORM = '").append(input.platformId).append("'");
+        }
+        //中标日期
+        if (!SharedUtil.isEmptyString(input.winDateMin)){
+            baseSql.append(" and a.DATE_ONE >= '").append(input.winDateMin).append("'");
+        }
+        if (!SharedUtil.isEmptyString(input.winDateMax)){
+            baseSql.append(" and a.DATE_ONE <= '").append(input.winDateMax).append("'");
+        }
+        StringBuilder sb2 = new StringBuilder(baseSql);
+        baseSql.append("order BY a.DATE_ONE asc ").append(limit);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(baseSql.toString(), input.projectId);
+        List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(sb2.toString(), input.projectId);
+        Map<String, Object> map1 = new HashMap<>();
+        if (CollectionUtils.isEmpty(list)){
             ExtJarHelper.returnValue.set(null);
         } else {
-            for (ProjectTender projectTender : resList) {
-                // 招采类型
-                projectTender.pmsReleaseWay = findInDict("pms_tender_type", projectTender.pmsReleaseWayId, myJdbcTemplate);
-                // 招标类型
-                projectTender.approveReleaseWay = findInDict("pms_release_way", projectTender.approvePmsReleaseWayId, myJdbcTemplate);
-                // 招标方式
-                projectTender.approvePurchaseTypeName = findInDict("buy_type", projectTender.approvePurchaseType, myJdbcTemplate);
-                // 经办部门
-                if (!Strings.isNullOrEmpty(projectTender.bidUserId)) {
-                    Map<String, Object> deptUserMap = myJdbcTemplate.queryForMap("select u.name handleUserName,d.name handleDeptName from ad_user u " +
-                            "left join hr_dept_user t on t.ad_user_id = u.id " +
-                            "left join hr_dept d on d.id = t.hr_dept_id " +
-                            "where u.id = ? limit 1", projectTender.bidUserId);
-                    projectTender.handleDeptName = JdbcMapUtil.getString(deptUserMap, "handleDeptName");
-                    projectTender.handleUserName = JdbcMapUtil.getString(deptUserMap, "handleUserName");
+            List<PoPublicBidView> inputList = list.stream().map(p->{
+                PoPublicBidView poPublicBidView = new PoPublicBidView();
+                poPublicBidView.id = JdbcMapUtil.getString(p,"id");
+                poPublicBidView.projectId = JdbcMapUtil.getString(p,"projectId");
+                poPublicBidView.viewId = JdbcMapUtil.getString(p,"viewId");
+                poPublicBidView.buyPrjTypeName = JdbcMapUtil.getString(p,"buyPrjTypeName");
+                poPublicBidView.buyMatterName = JdbcMapUtil.getString(p,"buyMatterName");
+                poPublicBidView.buyTypeName = JdbcMapUtil.getString(p,"buyTypeName");
+                poPublicBidView.platformName = JdbcMapUtil.getString(p,"platformName");
+                String maxAmt = JdbcMapUtil.getString(p,"maxAmt"); //招标控制价
+                poPublicBidView.maxAmt = SharedUtil.isEmptyString(maxAmt) ? new BigDecimal(0):new BigDecimal(maxAmt);
+                String winAmt = JdbcMapUtil.getString(p,"winAmt"); //中标价
+                poPublicBidView.winAmt = SharedUtil.isEmptyString(winAmt) ? new BigDecimal(0):new BigDecimal(winAmt);
+                poPublicBidView.winDate = JdbcMapUtil.getString(p,"winDate");
+                poPublicBidView.workProcessId = JdbcMapUtil.getString(p,"workProcessId");
+                String fileId = JdbcMapUtil.getString(p,"fileId");
+                if (!SharedUtil.isEmptyString(fileId)){
+                    List<String> fileList = StringUtil.getStrToList(fileId,",");
+                    fileId = StringUtil.replaceCode(fileId,",","','");
+                    List<BaseFileView> fileDetail = FileApi.getFileList(fileId);
+                    poPublicBidView.fileNum = fileList.size();
+                    poPublicBidView.fileId = fileId;
+                    poPublicBidView.fileList = fileDetail;
                 }
-                // 项目
-                if (!Strings.isNullOrEmpty(projectTender.projectId)) {
-                    Map<String, Object> projectMap = myJdbcTemplate.queryForMap("select name from pm_prj where id = ?",
-                            projectTender.projectId);
-                    projectTender.projectName = JdbcMapUtil.getString(projectMap, "name");
-                }
-
-            }
-            ProjectObj obj = new ProjectObj();
-            obj.list = resList;
-            obj.total = totalList.size();
-            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(obj), Map.class);
+                return poPublicBidView;
+            }).collect(Collectors.toList());
+            map1.put("result", inputList);
+            map1.put("total", Integer.valueOf(totalList.size()));
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(map1), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
 
+//        List<ProjectTender> resList = list.stream().map(this::convertProjectTender).collect(Collectors.toList());
+//        if (CollectionUtils.isEmpty(resList)) {
+//            ExtJarHelper.returnValue.set(null);
+//        } else {
+//            for (ProjectTender projectTender : resList) {
+//                // 招采类型
+//                projectTender.pmsReleaseWay = findInDict("pms_tender_type", projectTender.pmsReleaseWayId, myJdbcTemplate);
+//                // 招标类型
+//                projectTender.approveReleaseWay = findInDict("pms_release_way", projectTender.approvePmsReleaseWayId, myJdbcTemplate);
+//                // 招标方式
+//                projectTender.approvePurchaseTypeName = findInDict("buy_type", projectTender.approvePurchaseType, myJdbcTemplate);
+//                // 经办部门
+//                if (!Strings.isNullOrEmpty(projectTender.bidUserId)) {
+//                    Map<String, Object> deptUserMap = myJdbcTemplate.queryForMap("select u.name handleUserName,d.name handleDeptName from ad_user u " +
+//                            "left join hr_dept_user t on t.ad_user_id = u.id " +
+//                            "left join hr_dept d on d.id = t.hr_dept_id " +
+//                            "where u.id = ? limit 1", projectTender.bidUserId);
+//                    projectTender.handleDeptName = JdbcMapUtil.getString(deptUserMap, "handleDeptName");
+//                    projectTender.handleUserName = JdbcMapUtil.getString(deptUserMap, "handleUserName");
+//                }
+//                // 项目
+//                if (!Strings.isNullOrEmpty(projectTender.projectId)) {
+//                    Map<String, Object> projectMap = myJdbcTemplate.queryForMap("select name from pm_prj where id = ?",
+//                            projectTender.projectId);
+//                    projectTender.projectName = JdbcMapUtil.getString(projectMap, "name");
+//                }
+//
+//            }
+//            ProjectObj obj = new ProjectObj();
+//            obj.list = resList;
+//            obj.total = totalList.size();
+//            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(obj), Map.class);
+//            ExtJarHelper.returnValue.set(outputMap);
+//        }
     }
 
     /**
