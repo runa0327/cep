@@ -64,7 +64,7 @@ public class CompleteOutputStatisticsExt {
                     "from pm_prj pm\n" +
                     "left join PM_PARTY pmp on pm.CUSTOMER_UNIT = pmp.id\n" +
                     "left join gr_set_value gsv on pm.PRJ_MANAGE_MODE_ID = gsv.id\n" +
-                    "left join gr_set gs on gs.id = gsv.GR_SET_ID and gs.code ='management_unit' where pm.id in  (:ids) and pm.`STATUS`='AP'", paramMap);
+                    "left join gr_set gs on gs.id = gsv.GR_SET_ID and gs.code ='management_unit' where pm.id in  (:ids) and pm.`STATUS`='AP' and pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ", paramMap);
             total = totalList.size();
 
             StringBuilder sb = new StringBuilder();
@@ -83,7 +83,7 @@ public class CompleteOutputStatisticsExt {
                     "from pm_prj pm\n" +
                     "left join PM_PARTY pmp on pm.CUSTOMER_UNIT = pmp.id\n" +
                     "left join gr_set_value gsv on pm.PRJ_MANAGE_MODE_ID = gsv.id\n" +
-                    "left join gr_set gs on gs.id = gsv.GR_SET_ID and gs.code ='management_unit' where pm.id in (:ids) and pm.`STATUS`='AP'");
+                    "left join gr_set gs on gs.id = gsv.GR_SET_ID and gs.code ='management_unit' where pm.id in (:ids) and pm.`STATUS`='AP' and pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374'");
             sb.append("order by pm.CRT_DT desc ");
             int start = pageSize * (pageIndex - 1);
             sb.append(" limit ").append(start).append(",").append(pageSize);
@@ -104,7 +104,7 @@ public class CompleteOutputStatisticsExt {
                     "from pm_prj pm\n" +
                     "left join PM_PARTY pmp on pm.CUSTOMER_UNIT = pmp.id\n" +
                     "left join gr_set_value gsv on pm.PRJ_MANAGE_MODE_ID = gsv.id\n" +
-                    "left join gr_set gs on gs.id = gsv.GR_SET_ID and gs.code ='management_unit' where pm.`STATUS`='AP'");
+                    "left join gr_set gs on gs.id = gsv.GR_SET_ID and gs.code ='management_unit' where pm.`STATUS`='AP' and pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ");
             total = totalList.size();
 
             StringBuilder sb = new StringBuilder();
@@ -123,7 +123,7 @@ public class CompleteOutputStatisticsExt {
                     "from pm_prj pm\n" +
                     "left join PM_PARTY pmp on pm.CUSTOMER_UNIT = pmp.id\n" +
                     "left join gr_set_value gsv on pm.PRJ_MANAGE_MODE_ID = gsv.id\n" +
-                    "left join gr_set gs on gs.id = gsv.GR_SET_ID and gs.code ='management_unit'  where pm.`STATUS`='AP'");
+                    "left join gr_set gs on gs.id = gsv.GR_SET_ID and gs.code ='management_unit'  where pm.`STATUS`='AP' and pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ");
             sb.append("order by pm.CRT_DT desc ");
             int start = pageSize * (pageIndex - 1);
             sb.append(" limit ").append(start).append(",").append(pageSize);

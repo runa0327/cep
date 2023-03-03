@@ -37,12 +37,12 @@ public class FixedAssetsStatisticalExt {
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("select * from pm_prj where status='ap' ");
+        sb.append("select * from pm_prj where status='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ");
         if (Strings.isNotEmpty(projectId)) {
             sb.append(" and id in (:ids)");
         }
         String totalSql = sb.toString();
-        sb.append("order by CRT_DT desc ");
+        sb.append("order by PM_SEQ desc ");
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
         List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), dataParam);
