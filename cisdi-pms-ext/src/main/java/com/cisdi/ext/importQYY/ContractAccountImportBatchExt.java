@@ -14,6 +14,9 @@ import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.SharedUtil;
 
+import java.text.DecimalFormat;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -68,7 +71,7 @@ public class ContractAccountImportBatchExt {
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
             //获取已经导入的台账
-            List<Map<String, Object>> oldImportContracts = jdbcTemplate.queryForList("select id orderId, CONTRACT_NAME contractName,PM_PRJ_ID prjId from PO_ORDER_REQ where status = 'AP' and IS_IMPORT = 1 ");
+            List<Map<String, Object>> oldImportContracts = jdbcTemplate.queryForList("select id orderId, CONTRACT_NAME contractName,PM_PRJ_ID prjId,CONTRACT_CODE contractCode from PO_ORDER_REQ where status = 'AP' and IS_IMPORT = 1 ");
             String csCommId = entityRecord.csCommId;
 
             // 对于批次，先检查状态是否为2
@@ -107,6 +110,7 @@ public class ContractAccountImportBatchExt {
 
         boolean suc = true;
         List<String> errorInfos = new ArrayList<>();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         try {
             //判断导入的数据是否已经导入过
             Optional<Map<String, Object>> any = oldImportContracts.stream()
@@ -115,7 +119,25 @@ public class ContractAccountImportBatchExt {
                     .filter(oldContract -> oldContract.get("prjId").toString().equals(contract.getPmPrjId()))
                     .filter(oldContract -> oldContract.get("contractName").toString().equals(contract.getContractName()))
                     .findAny();
-            String orderId = any.isPresent() ? any.get().get("orderId").toString() : Crud.from("PO_ORDER_REQ").insertData();
+            String orderId = "";
+            String contractCode = "";
+            if (any.isPresent()){
+                orderId = any.get().get("orderId").toString();
+                contractCode = any.get().get("contractCode").toString();
+            }else {
+                orderId = Crud.from("PO_ORDER_REQ").insertData();
+                // 查询当前已审批通过的招标合同数量
+                List<Map<String, Object>> map = myJdbcTemplate.queryForList("select count(*) as num from PO_ORDER_REQ where status = 'AP' ");
+                Date date = new Date();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String year = sdf.format(date).substring(0, 7).replace("-", "");
+                // 合同编码规则
+                int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
+                Format formatCount = new DecimalFormat("0000");
+                String formatNum = formatCount.format(num);
+                contractCode = "gc-" + year + "-" + formatNum;
+            }
+
 
             Crud.from("PO_ORDER_REQ").where().eq("ID",orderId).update()
                     .set("PM_PRJ_ID",contract.getPmPrjId())
@@ -127,6 +149,7 @@ public class ContractAccountImportBatchExt {
                     .set("AMT_FOUR",contract.getAmtFour())
                     .set("SIGN_DATE",contract.getSignDate())
                     .set("FILE_ID_FIVE",contract.getFileIdFive())
+                    .set("CONTRACT_CODE",contractCode)
                     .set("IS_IMPORT",true)
                     .set("STATUS","AP")
                     .exec();
