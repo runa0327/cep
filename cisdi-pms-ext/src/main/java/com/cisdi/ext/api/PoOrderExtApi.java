@@ -168,7 +168,7 @@ public class PoOrderExtApi {
         StringBuilder sb = new StringBuilder();
         String sql = "SELECT a.VIEW_ID as viewId,a.id,a.PM_PRJ_ID as projectId,a.CONTRACT_APP_ID as orderProcessId,a.CONTRACT_NAME as contractName," +
                 "a.WIN_BID_UNIT_ONE as cooperationUnit,a.AMT_FIVE as noShuiAmt,a.AMT_ONE as shuiLv,a.AMT_SIX as shuiAmt," +
-                "a.AMT_SEVEN as aleadyPayAmt,a.AMT_TWO as payPrece,a.AD_USER_ID as agentUser,b.name as agentName,a.WF_PROCESS_INSTANCE_ID as procInstld " +
+                "a.AMT_SEVEN as aleadyPayAmt,a.AMT_TWO as payPrece,a.AD_USER_ID as agentUser,b.name as agentName,a.WF_PROCESS_INSTANCE_ID as procInstld," +
                 "a.SIGN_DATE as signDate,a.DATE_FIVE as endDate,a.FILE_ATTACHMENT_URL as fileId " +
                 "FROM po_order a left join ad_user b on a.AD_USER_ID = b.id " +
                 "where a.PM_PRJ_ID = ? and a.status = 'ap'";
