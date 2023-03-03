@@ -186,4 +186,38 @@ public class ProcessCommon {
         }
         return newComment;
     }
+
+    /**
+     * 根据项目id查询该类型流程是否已发起-仅支持项目字段是 PM_PRJ_ID 的流程
+     * @param entityCode 实体表名称
+     * @param projectId 单个项目id,不支持多项目查询
+     * @param myJdbcTemplate 数据源
+     * @return 返回信息
+     */
+    public static String prjRepeatStartById(String entityCode, String projectId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select count(*) from "+entityCode+" where pm_prj_id = ? and status NOT in ('VD','VDING')";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId);
+        String msg = "";
+        if (!CollectionUtils.isEmpty(list)){
+            msg = "该项目已发起过流程，请勿重复发起！";
+        }
+        return msg;
+    }
+
+    /**
+     * 根据项目id查询该类型流程是否已发起-仅支持项目字段是 PROJECT_NAME_WR 的流程
+     * @param entityCode 实体表名称
+     * @param projectName 单个项目名称,不支持多项目查询
+     * @param myJdbcTemplate 数据源
+     * @return 返回信息
+     */
+    public static String prjRepeatStartByName(String entityCode, String projectName, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select count(*) from "+entityCode+" where PROJECT_NAME_WR = ? and status NOT in ('VD','VDING')";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectName);
+        String msg = "";
+        if (!CollectionUtils.isEmpty(list)){
+            msg = "该项目已发起过流程，请勿重复发起！";
+        }
+        return msg;
+    }
 }

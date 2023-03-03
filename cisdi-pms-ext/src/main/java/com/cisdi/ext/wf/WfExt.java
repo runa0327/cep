@@ -113,8 +113,7 @@ public class WfExt {
                     // 合同签订批准后生成合同编号
                     if ("PO_ORDER_REQ".equals(entityCode) || "po_order_req".equals(entityCode)) {
                         // 查询当前已审批通过的招标合同数量
-                        List<Map<String, Object>> map = myJdbcTemplate.queryForList("select count(*) as num from " +
-                                "PO_ORDER_REQ where status = 'AP' ");
+                        List<Map<String, Object>> map = myJdbcTemplate.queryForList("select count(*) as num from PO_ORDER_REQ where status = 'AP' ");
                         Date date = new Date();
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         String year = sdf.format(date).substring(0, 7).replace("-", "");

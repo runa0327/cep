@@ -2,7 +2,9 @@ package com.cisdi.ext.base;
 
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
@@ -60,5 +62,54 @@ public class PmPrj {
             }
         }
         return projectId;
+    }
+
+    /**
+     * 立项-可研-初概流程更新项目信息(基础信息、资金信息)
+     * @param entityRecord 实体信息
+     * @param entityCode 信息来源名称
+     * @param level 本次数据来源级别
+     * @param myJdbcTemplate 数据源
+     */
+    public static void updatePrjBaseData(EntityRecord entityRecord, String entityCode, int level, MyJdbcTemplate myJdbcTemplate) {
+        //项目id
+        String projectId = getProjectIdByProcess(entityRecord.valueMap,myJdbcTemplate);
+        if (projectId.contains(",")){
+            throw new BaseException("数据更新不支持多项目同时修改，请重新进行数据处理或联系管理员处理！");
+        }
+        // 查询当前项目信息数据级别
+        int oldLevel = getPrjDataLevel(projectId,myJdbcTemplate);
+        if (level >= oldLevel){ //更新数据
+            //更新项目基础信息
+            updateBaseData(projectId,entityRecord.valueMap);
+            //更新项目资金信息
+            
+        }
+    }
+
+    /**
+     * 更新项目基础信息
+     * @param projectId 项目id
+     * @param valueMap map值
+     */
+    private static void updateBaseData(String projectId, Map<String, Object> valueMap) {
+//        Crud.from("pm_prj").where().eq("id",projectId).update()
+//                .set()
+    }
+
+    /**
+     * 获取项目表(pm_prj)中基础信息和资金信息来源级别
+     * @param projectId 项目id
+     * @param myJdbcTemplate 数据源
+     * @return INVEST_PRIORITY 数据级别
+     */
+    private static int getPrjDataLevel(String projectId, MyJdbcTemplate myJdbcTemplate) {
+        int level = 0 ;
+        String sql = "select b.code from pm_prj a left join gr_set_value b on a.INVEST_PRIORITY = b.id where a.id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId);
+        if (!CollectionUtils.isEmpty(list)){
+            level = Integer.valueOf(JdbcMapUtil.getString(list.get(0),"code"));
+        }
+        return level;
     }
 }
