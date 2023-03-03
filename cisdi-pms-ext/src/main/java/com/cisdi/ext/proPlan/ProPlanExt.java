@@ -9,6 +9,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.IdCodeName;
 import com.qygly.shared.util.JdbcMapUtil;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -141,26 +142,12 @@ public class ProPlanExt {
 
         // 结果转换
         List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(p, myJdbcTemplate)).collect(Collectors.toList());
-        // 构建树结构
-        List<PrjProPlanNodeInfo> tree = infoList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
-            m.children = getChildNode(m, infoList);
-        }).collect(Collectors.toList());
-        List<PrjProPlanNodeInfo> list = new ArrayList<>();
-        for (PrjProPlanNodeInfo nodeInfo : tree) {
-            if (nodeInfo.children != null) {
-                List<PrjProPlanNodeInfo> children = nodeInfo.children;
-                convertChildrenToTileList(children, list);
-            }
-            list.add(nodeInfo);
-        }
-
-        List<PrjProPlanNodeInfo> nodeInfoList = list.stream().filter(p -> Objects.equals("1", p.showInPrjOverview)).collect(Collectors.toList());
-        PrjProPlanInfo info = new PrjProPlanInfo();
-        info.nodeInfoList = nodeInfoList;
-        if (nodeInfoList.size() == 0) {
-            ExtJarHelper.returnValue.set(null);
+        if (CollectionUtils.isEmpty(infoList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
-            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(info), Map.class);
+            OutSide outSide = new OutSide();
+            outSide.nodeInfoList =infoList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
     }
@@ -1070,5 +1057,9 @@ public class ProPlanExt {
         public String percentOffset;
 
         public List<ProContrastNode> info;
+    }
+
+    public static class OutSide{
+        public List<PrjProPlanNodeInfo> nodeInfoList;
     }
 }

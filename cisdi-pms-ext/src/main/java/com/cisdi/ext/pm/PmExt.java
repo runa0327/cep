@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -231,7 +232,7 @@ public class PmExt {
         int pageIndex = param.pageIndex;
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuilder sb = new StringBuilder();
-        sb.append("select pm.id as id,pm.`NAME` as name,pt.`NAME` as unit,gsv.`NAME` as type,pm.PM_CODE as code,ggg.`NAME` as local, \n" +
+        sb.append("select pm.PM_SEQ as num,pm.id as id,pm.`NAME` as name,pt.`NAME` as unit,gsv.`NAME` as type,pm.PM_CODE as code,ggg.`NAME` as local, \n" +
                 "gsvv.`NAME` as pmode,'0' as invest,gss.`NAME` as status,\n" +
                 "ppp.PLAN_START_DATE as PLAN_START_DATE, \n" +
                 "ppp.ACTUAL_START_DATE as ACTUAL_START_DATE, \n" +
@@ -290,8 +291,21 @@ public class PmExt {
         }
     }
 
+    /**
+     * 初始化项目序号
+     */
+    public void initPrjNum(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRJ where status='ap' order by CRT_DT");
+        AtomicInteger index = new AtomicInteger(0);
+        for (Map<String, Object> stringObjectMap : list) {
+            Crud.from("PM_PRJ").where().eq("ID", stringObjectMap.get("ID")).update().set("PM_SEQ", index.getAndIncrement()).exec();
+        }
+    }
+
     public ProjectInfo convertProjectInfo(Map<String, Object> data) {
         ProjectInfo projectInfo = new ProjectInfo();
+        projectInfo.num = JdbcMapUtil.getString(data, "num");
         projectInfo.id = JdbcMapUtil.getString(data, "id");
         projectInfo.name = JdbcMapUtil.getString(data, "name");
         projectInfo.unit = JdbcMapUtil.getString(data, "unit");
@@ -337,6 +351,7 @@ public class PmExt {
     }
 
     public static class ProjectInfo {
+        public String num;
         public String id;
         public String name;
         public String unit;
@@ -353,6 +368,5 @@ public class PmExt {
         public String planCurrentProPercent;
         public String actualCurrentProPercent;
     }
-
 
 }
