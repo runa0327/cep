@@ -305,13 +305,13 @@ public class FeasibleImportBatchExt {
         Date date = new Date();
         String error = "";
         try {
-            Crud.from("PM_PRJ_INVEST2").where().eq("id",id).update()
+            Crud.from("PM_PRJ_INVEST1").where().eq("id",id).update()
                     .set("PM_PRJ_ID",newImport.getPmPrjId()).set("IS_OMPORT","0099799190825080669").set("status","AP").set("TS",date)
                     .set("PRJ_CODE",pmPrj.getPrjCode()).set("CUSTOMER_UNIT",pmPrj.getCustomerUnit())
                     .set("PRJ_MANAGE_MODE_ID",pmPrj.getPrjManageModeId()).set("BASE_LOCATION_ID",pmPrj.getBaseLocationId())
                     .set("FLOOR_AREA",pmPrj.getFloorArea()).set("PROJECT_TYPE_ID",pmPrj.getProjectTypeId())
                     .set("CON_SCALE_TYPE_ID",pmPrj.getConScaleTypeId()).set("CON_SCALE_QTY",pmPrj.getConScaleQty())
-                    .set("QTY_ONE",pmPrj.getQtyOne()).set("QTY_TWO",pmPrj.getQtyTwo()).set("QTY_THREE",pmPrj.getQtyThree())
+                    .set("QTY_ONE",pmPrj.getQtyOne()).set("OTHER",pmPrj.getOther()).set("QTY_THREE",pmPrj.getQtyThree())
                     .set("CON_SCALE_QTY2",pmPrj.getConScaleQty2()).set("CON_SCALE_UOM_ID",pmPrj.getConScaleUomId())
                     .set("BUILD_YEARS",pmPrj.getBuildYears()).set("PRJ_SITUATION",pmPrj.getPrjSituation())
                     .set("PRJ_TOTAL_INVEST",newImport.getPrjTotalInvest()).set("PROJECT_AMT",newImport.getProjectAmt())

@@ -83,7 +83,6 @@ public class PmPrj {
             //更新项目基础信息
             updateBaseData(projectId,entityRecord.valueMap);
             //更新项目资金信息
-            
         }
     }
 
@@ -93,8 +92,18 @@ public class PmPrj {
      * @param valueMap map值
      */
     private static void updateBaseData(String projectId, Map<String, Object> valueMap) {
-//        Crud.from("pm_prj").where().eq("id",projectId).update()
-//                .set()
+        Crud.from("pm_prj").where().eq("id",projectId).update()
+                .set("FLOOR_AREA",JdbcMapUtil.getString(valueMap,"FLOOR_AREA")) //占地面积
+                .set("PROJECT_TYPE_ID",JdbcMapUtil.getString(valueMap,"PROJECT_TYPE_ID")) //项目类型
+                .set("CON_SCALE_TYPE_ID",JdbcMapUtil.getString(valueMap,"CON_SCALE_TYPE_ID")) //建设规模类型
+                .set("CON_SCALE_QTY",JdbcMapUtil.getString(valueMap,"CON_SCALE_QTY")) // 道路长度
+                .set("CON_SCALE_QTY2",JdbcMapUtil.getString(valueMap,"CON_SCALE_QTY2")) // 道路宽度
+                .set("QTY_ONE",JdbcMapUtil.getString(valueMap,"QTY_ONE")) // 建筑面积
+                .set("QTY_THREE",JdbcMapUtil.getString(valueMap,"QTY_THREE")) // 建筑面积
+                .set("OTHER",JdbcMapUtil.getString(valueMap,"QTY_THREE")) // 其他
+                .set("CON_SCALE_UOM_ID",JdbcMapUtil.getString(valueMap,"CON_SCALE_UOM_ID")) // 建设规模单位
+                .set("PRJ_SITUATION",JdbcMapUtil.getString(valueMap,"PRJ_SITUATION")) // 项目概况
+                .exec();
     }
 
     /**
