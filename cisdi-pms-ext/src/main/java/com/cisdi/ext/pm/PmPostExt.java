@@ -84,7 +84,7 @@ public class PmPostExt {
         String projectName = String.valueOf(map.get("projectName"));
         StringBuffer sb = new StringBuffer();
         sb.append("select pj.id as id, pj.`NAME` as project_name,GROUP_CONCAT(pp.PROJECT_POST) as post from pm_prj pj " +
-                "left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID where pj.`STATUS`='ap' ");
+                "left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'");
         if (!StringUtils.isEmpty(projectName)) {
             sb.append(" and pj.`NAME` like '%").append(projectName).append("%'");
         }
