@@ -190,7 +190,7 @@ public class ProPlanExt {
                     "ifnull(PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
                     "ifnull(ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(ACTUAL_TOTAL_DAYS,0),ifnull(PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
                     "ifnull(ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,PLAN_COMPL_DATE,ACTUAL_COMPL_DATE,TEMPLATE_FOR_PROJECT_TYPE_ID,PROGRESS_STATUS_ID,\n" +
-                    "PROGRESS_RISK_TYPE_ID,ifnull(START_DAY,0) as START_DAY,pr.CPMS_UUID,pr.CPMS_ID,pj.name as PROJECT_NAME from PM_PRO_PLAN pr left join pm_prj pj on pr.PM_PRJ_ID = pj.id where PM_PRJ_ID=?", pmPrjId);
+                    "PROGRESS_RISK_TYPE_ID,ifnull(START_DAY,0) as START_DAY,pr.CPMS_UUID,pr.CPMS_ID,pj.name as PROJECT_NAME,pr.ver as VER from PM_PRO_PLAN pr left join pm_prj pj on pr.PM_PRJ_ID = pj.id where PM_PRJ_ID=?", pmPrjId);
             if (proMap != null) {
                 planInfo = this.covertPlanInfo(proMap, myJdbcTemplate);
 
