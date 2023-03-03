@@ -141,21 +141,21 @@ public class PmPrjInvest1 {
          */
         public static final String CON_SCALE_QTY = "CON_SCALE_QTY";
         /**
+         * 建设规模数量2。
+         */
+        public static final String CON_SCALE_QTY2 = "CON_SCALE_QTY2";
+        /**
          * 数量1。
          */
         public static final String QTY_ONE = "QTY_ONE";
         /**
-         * 数量2。
+         * 其他。
          */
-        public static final String QTY_TWO = "QTY_TWO";
+        public static final String OTHER = "OTHER";
         /**
          * 数量3。
          */
         public static final String QTY_THREE = "QTY_THREE";
-        /**
-         * 建设规模数量2。
-         */
-        public static final String CON_SCALE_QTY2 = "CON_SCALE_QTY2";
         /**
          * 建设规模单位。
          */
@@ -1140,6 +1140,42 @@ public class PmPrjInvest1 {
     }
 
     /**
+     * 建设规模数量2。
+     */
+    private BigDecimal conScaleQty2;
+
+    /**
+     * 获取：建设规模数量2。
+     */
+    public BigDecimal getConScaleQty2() {
+        return this.conScaleQty2;
+    }
+
+    /**
+     * 设置：建设规模数量2。
+     */
+    public PmPrjInvest1 setConScaleQty2(BigDecimal conScaleQty2) {
+        if (this.conScaleQty2 == null && conScaleQty2 == null) {
+            // 均为null，不做处理。
+        } else if (this.conScaleQty2 != null && conScaleQty2 != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.conScaleQty2.compareTo(conScaleQty2) != 0) {
+                this.conScaleQty2 = conScaleQty2;
+                if (!this.toUpdateCols.contains("CON_SCALE_QTY2")) {
+                    this.toUpdateCols.add("CON_SCALE_QTY2");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.conScaleQty2 = conScaleQty2;
+            if (!this.toUpdateCols.contains("CON_SCALE_QTY2")) {
+                this.toUpdateCols.add("CON_SCALE_QTY2");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 数量1。
      */
     private BigDecimal qtyOne;
@@ -1176,36 +1212,36 @@ public class PmPrjInvest1 {
     }
 
     /**
-     * 数量2。
+     * 其他。
      */
-    private Integer qtyTwo;
+    private String other;
 
     /**
-     * 获取：数量2。
+     * 获取：其他。
      */
-    public Integer getQtyTwo() {
-        return this.qtyTwo;
+    public String getOther() {
+        return this.other;
     }
 
     /**
-     * 设置：数量2。
+     * 设置：其他。
      */
-    public PmPrjInvest1 setQtyTwo(Integer qtyTwo) {
-        if (this.qtyTwo == null && qtyTwo == null) {
+    public PmPrjInvest1 setOther(String other) {
+        if (this.other == null && other == null) {
             // 均为null，不做处理。
-        } else if (this.qtyTwo != null && qtyTwo != null) {
+        } else if (this.other != null && other != null) {
             // 均非null，判定不等，再做处理：
-            if (this.qtyTwo.compareTo(qtyTwo) != 0) {
-                this.qtyTwo = qtyTwo;
-                if (!this.toUpdateCols.contains("QTY_TWO")) {
-                    this.toUpdateCols.add("QTY_TWO");
+            if (this.other.compareTo(other) != 0) {
+                this.other = other;
+                if (!this.toUpdateCols.contains("OTHER")) {
+                    this.toUpdateCols.add("OTHER");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.qtyTwo = qtyTwo;
-            if (!this.toUpdateCols.contains("QTY_TWO")) {
-                this.toUpdateCols.add("QTY_TWO");
+            this.other = other;
+            if (!this.toUpdateCols.contains("OTHER")) {
+                this.toUpdateCols.add("OTHER");
             }
         }
         return this;
@@ -1242,42 +1278,6 @@ public class PmPrjInvest1 {
             this.qtyThree = qtyThree;
             if (!this.toUpdateCols.contains("QTY_THREE")) {
                 this.toUpdateCols.add("QTY_THREE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 建设规模数量2。
-     */
-    private BigDecimal conScaleQty2;
-
-    /**
-     * 获取：建设规模数量2。
-     */
-    public BigDecimal getConScaleQty2() {
-        return this.conScaleQty2;
-    }
-
-    /**
-     * 设置：建设规模数量2。
-     */
-    public PmPrjInvest1 setConScaleQty2(BigDecimal conScaleQty2) {
-        if (this.conScaleQty2 == null && conScaleQty2 == null) {
-            // 均为null，不做处理。
-        } else if (this.conScaleQty2 != null && conScaleQty2 != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.conScaleQty2.compareTo(conScaleQty2) != 0) {
-                this.conScaleQty2 = conScaleQty2;
-                if (!this.toUpdateCols.contains("CON_SCALE_QTY2")) {
-                    this.toUpdateCols.add("CON_SCALE_QTY2");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.conScaleQty2 = conScaleQty2;
-            if (!this.toUpdateCols.contains("CON_SCALE_QTY2")) {
-                this.toUpdateCols.add("CON_SCALE_QTY2");
             }
         }
         return this;
