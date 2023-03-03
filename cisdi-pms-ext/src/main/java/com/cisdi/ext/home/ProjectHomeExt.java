@@ -35,22 +35,15 @@ public class ProjectHomeExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String projectId = String.valueOf(map.get("projectId"));
-        List<Map<String, Object>> typeList = myJdbcTemplate.queryForList("select gsv.* from gr_set_value gsv left join gr_set gs on gsv.GR_SET_ID = gs.id where gs.`CODE`='invest_est_type' order by SEQ_NO  ");
         BigDecimal totalAmt = BigDecimal.ZERO;
         BigDecimal planAmt = BigDecimal.ZERO;
         BigDecimal completeAmt = BigDecimal.ZERO;
-        for (Map<String, Object> stringObjectMap : typeList) {
-            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(pied.AMT,0) as amt from pm_invest_est  pie  " +
-                    "left join pm_invest_est_dtl pied on pie.id = pied.PM_INVEST_EST_ID  " +
-                    "left join pm_exp_type pet on pet.id = pied.PM_EXP_TYPE_ID " +
-                    "where  pet.`code`='PRJ_TOTAL_INVEST' and pie.PM_PRJ_ID=? and pie.INVEST_EST_TYPE_ID=?", projectId, stringObjectMap.get("ID"));
-            if (!CollectionUtils.isEmpty(list)) {
-                BigDecimal amt = new BigDecimal(String.valueOf(list.get(0).get("amt")));
-                if (amt.compareTo(BigDecimal.ZERO) > 0) {
-                    totalAmt = amt;
-                }
-            }
-
+        List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select ifnull(pie.PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST from pm_invest_est pie \n" +
+                "left join gr_set_value gsv on gsv.id = pie.INVEST_EST_TYPE_ID \n" +
+                "where pie.PM_PRJ_ID=? \n" +
+                "order by gsv.code desc limit 0,1", projectId);
+        if(!CollectionUtils.isEmpty(dataList)){
+            totalAmt = new BigDecimal(String.valueOf(dataList.get(0).get("PRJ_TOTAL_INVEST")));
         }
 
         //今年计划投资-取投资计划汇总
