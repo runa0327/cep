@@ -51,7 +51,7 @@ public class InvestmentStatisticsExt {
         List<CostStatisticsInfo> infoList = new ArrayList<>();
         for (Map<String, Object> stringObjectMap : list) {
             String projectId = JdbcMapUtil.getString(stringObjectMap, "ID");
-            List<Map<String, Object>> feeList = myJdbcTemplate.queryForList("select pied.*,pet.`CODE` as feeCode,pie.INVEST_EST_TYPE_ID,gsv.`CODE` estType from pm_invest_est_dtl pied \n" +
+            List<Map<String, Object>> feeList = myJdbcTemplate.queryForList("select ifnull(pied.amt,0) as AMT,pet.`CODE` as feeCode,pie.INVEST_EST_TYPE_ID,gsv.`CODE` estType from pm_invest_est_dtl pied \n" +
                     "left join pm_invest_est pie on pied.PM_INVEST_EST_ID = pie.id \n" +
                     "left join pm_exp_type pet on pied.PM_EXP_TYPE_ID = pet.ID \n" +
                     "left join gr_set_value gsv on pie.INVEST_EST_TYPE_ID = gsv.id \n" +

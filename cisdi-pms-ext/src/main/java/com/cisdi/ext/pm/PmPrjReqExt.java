@@ -37,26 +37,26 @@ public class PmPrjReqExt {
 
         Map<String, Object> valueMap = entityRecord.valueMap;
 
-        String prj_total_investStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "PRJ_TOTAL_INVEST")) ? "0":JdbcMapUtil.getString(valueMap, "PRJ_TOTAL_INVEST");
+        String prj_total_investStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "PRJ_TOTAL_INVEST")) ? "0" : JdbcMapUtil.getString(valueMap, "PRJ_TOTAL_INVEST");
         Double prj_total_invest = Double.parseDouble(prj_total_investStr);
         AmtUtil.checkAmt(sbErr, prj_total_invest, "总投资");
 
-        String CONSTRUCT_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "CONSTRUCT_AMT")) ? "0":JdbcMapUtil.getString(valueMap, "CONSTRUCT_AMT");
+        String CONSTRUCT_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "CONSTRUCT_AMT")) ? "0" : JdbcMapUtil.getString(valueMap, "CONSTRUCT_AMT");
         Double construct_amt = Double.parseDouble(CONSTRUCT_AMTStr);
 
-        String EQUIP_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "EQUIP_AMT")) ? "0":JdbcMapUtil.getString(valueMap, "EQUIP_AMT");
+        String EQUIP_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "EQUIP_AMT")) ? "0" : JdbcMapUtil.getString(valueMap, "EQUIP_AMT");
         Double equip_amt = Double.parseDouble(EQUIP_AMTStr);
 
-        String PROJECT_OTHER_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "PROJECT_OTHER_AMT")) ? "0":JdbcMapUtil.getString(valueMap, "PROJECT_OTHER_AMT");
+        String PROJECT_OTHER_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "PROJECT_OTHER_AMT")) ? "0" : JdbcMapUtil.getString(valueMap, "PROJECT_OTHER_AMT");
         Double project_other_amt = Double.parseDouble(PROJECT_OTHER_AMTStr);
 
-        String LAND_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "LAND_AMT")) ? "0":JdbcMapUtil.getString(valueMap, "LAND_AMT");
+        String LAND_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "LAND_AMT")) ? "0" : JdbcMapUtil.getString(valueMap, "LAND_AMT");
         Double land_amt = Double.parseDouble(LAND_AMTStr);
 
-        String PREPARE_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "PREPARE_AMT")) ? "0":JdbcMapUtil.getString(valueMap, "PREPARE_AMT");
+        String PREPARE_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "PREPARE_AMT")) ? "0" : JdbcMapUtil.getString(valueMap, "PREPARE_AMT");
         Double prepare_amt = Double.parseDouble(PREPARE_AMTStr);
 
-        if (DoubleUtil.add(construct_amt,project_other_amt, prepare_amt,equip_amt,land_amt) > prj_total_invest) {
+        if (DoubleUtil.add(construct_amt, project_other_amt, prepare_amt, equip_amt, land_amt) > prj_total_invest) {
             sbErr.append("建安工程费+工程其他费用+预备费+设备采购费+土地征拆费用>总投资！");
         }
 
@@ -86,19 +86,19 @@ public class PmPrjReqExt {
         // 新建项目：
         String newPrjId = Crud.from("PM_PRJ").insertData();
         Integer exec = Crud.from("PM_PRJ").where().eq("ID", newPrjId).update().set("PM_PRJ_REQ_ID", pm_prj_req.get(
-                        "id")).set("code", pm_prj_req.get("code")).set("name", pm_prj_req.get("PRJ_NAME")).set("CUSTOMER_UNIT",
-                        pm_prj_req.get("CUSTOMER_UNIT")).set("PRJ_MANAGE_MODE_ID", pm_prj_req.get("PRJ_MANAGE_MODE_ID")).set(
-                        "BASE_LOCATION_ID", pm_prj_req.get("BASE_LOCATION_ID")).set("FLOOR_AREA", pm_prj_req.get(
-                        "FLOOR_AREA")).set("PROJECT_TYPE_ID", pm_prj_req.get("PROJECT_TYPE_ID")).set(
-                        "CON_SCALE_TYPE_ID", pm_prj_req.get("CON_SCALE_TYPE_ID")).set("CON_SCALE_QTY"
-                        , pm_prj_req.get("CON_SCALE_QTY")).set("CON_SCALE_QTY2", pm_prj_req.get("CON_SCALE_QTY2")).set(
-                        "CON_SCALE_UOM_ID", pm_prj_req.get("CON_SCALE_UOM_ID")).set("PRJ_SITUATION", pm_prj_req.get(
-                        "PRJ_SITUATION")).set("INVESTMENT_SOURCE_ID", pm_prj_req.get("INVESTMENT_SOURCE_ID"))
+                "id")).set("code", pm_prj_req.get("code")).set("name", pm_prj_req.get("PRJ_NAME")).set("CUSTOMER_UNIT",
+                pm_prj_req.get("CUSTOMER_UNIT")).set("PRJ_MANAGE_MODE_ID", pm_prj_req.get("PRJ_MANAGE_MODE_ID")).set(
+                "BASE_LOCATION_ID", pm_prj_req.get("BASE_LOCATION_ID")).set("FLOOR_AREA", pm_prj_req.get(
+                "FLOOR_AREA")).set("PROJECT_TYPE_ID", pm_prj_req.get("PROJECT_TYPE_ID")).set(
+                "CON_SCALE_TYPE_ID", pm_prj_req.get("CON_SCALE_TYPE_ID")).set("CON_SCALE_QTY"
+                , pm_prj_req.get("CON_SCALE_QTY")).set("CON_SCALE_QTY2", pm_prj_req.get("CON_SCALE_QTY2")).set(
+                "CON_SCALE_UOM_ID", pm_prj_req.get("CON_SCALE_UOM_ID")).set("PRJ_SITUATION", pm_prj_req.get(
+                "PRJ_SITUATION")).set("INVESTMENT_SOURCE_ID", pm_prj_req.get("INVESTMENT_SOURCE_ID"))
                 .set("PRJ_EARLY_USER_ID", pm_prj_req.get("PRJ_EARLY_USER_ID")).set("PRJ_DESIGN_USER_ID", pm_prj_req.get("PRJ_DESIGN_USER_ID"))
                 .set("PRJ_COST_USER_ID", pm_prj_req.get("PRJ_COST_USER_ID")).set("PRJ_CODE", pm_prj_req.get("PRJ_CODE"))
-                .set("BUILDING_AREA", pm_prj_req.get("CON_SCALE_QTY")).set("QTY_ONE",pm_prj_req.get("QTY_ONE"))
-                .set("QTY_TWO",pm_prj_req.get("QTY_TWO")).set("QTY_THREE",pm_prj_req.get("QTY_THREE"))
-                .set("PROJECT_SOURCE_TYPE_ID","0099952822476441374")
+                .set("BUILDING_AREA", pm_prj_req.get("CON_SCALE_QTY")).set("QTY_ONE", pm_prj_req.get("QTY_ONE"))
+                .set("QTY_TWO", pm_prj_req.get("QTY_TWO")).set("QTY_THREE", pm_prj_req.get("QTY_THREE"))
+                .set("PROJECT_SOURCE_TYPE_ID", "0099952822476441374")
                 .exec();
         log.info("已更新：{}", exec);
 
@@ -160,7 +160,7 @@ public class PmPrjReqExt {
         String projectId = entityRecord.valueMap.get("PM_PRJ_ID").toString();
 
         // 获取建设年限
-        String year = JdbcMapUtil.getString(entityRecord.valueMap,"BUILD_YEARS");
+        String year = JdbcMapUtil.getString(entityRecord.valueMap, "BUILD_YEARS");
 
         // 修改项目建设年限信息：
         Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("BUILD_YEARS", year).exec();
@@ -210,7 +210,7 @@ public class PmPrjReqExt {
         // 修改项目建设年限信息：
         Integer exec = Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("PRJ_REPLY_DATE", replyDate)
                 .set("PRJ_REPLY_NO", replyNo).set("PRJ_REPLY_FILE", replyFile).set("INVESTMENT_SOURCE_ID", investmentSourceId)
-                .set("PRJ_EARLY_USER_ID",userId).set("PRJ_CODE",code).exec();
+                .set("PRJ_EARLY_USER_ID", userId).set("PRJ_CODE", code).exec();
         log.info("已更新：{}", exec);
 
         //同步立项后续文件
@@ -339,7 +339,7 @@ public class PmPrjReqExt {
         Map<String, Object> valueMap = entityRecord.valueMap;
         String con_scale_type_id = JdbcMapUtil.getString(valueMap, "CON_SCALE_TYPE_ID");
         String CON_SCALE_QTY2 = JdbcMapUtil.getString(valueMap, "CON_SCALE_QTY2");
-        CON_SCALE_QTY2 = SharedUtil.isEmptyString(CON_SCALE_QTY2) ? "0":CON_SCALE_QTY2;
+        CON_SCALE_QTY2 = SharedUtil.isEmptyString(CON_SCALE_QTY2) ? "0" : CON_SCALE_QTY2;
         Double con_scale_qty2 = Double.parseDouble(CON_SCALE_QTY2);
         boolean need2 = "0099799190825087119".equals(con_scale_type_id);
         if (need2) {
@@ -363,41 +363,38 @@ public class PmPrjReqExt {
      */
     private void createPlan(String projectId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        try {
-            // 根据项目类型查询项目进度计划模板
-            Map<String, Object> proMap = myJdbcTemplate.queryForMap("select ppp.*,PRJ_REPLY_DATE from PM_PRO_PLAN ppp \n" +
-                    "left join pm_prj pp on ppp.TEMPLATE_FOR_PROJECT_TYPE_ID = pp.PROJECT_TYPE_ID\n" +
-                    "where ppp.`STATUS`='AP' and ppp.IS_TEMPLATE='1' and pp.id=?", projectId);
-            if (!Objects.isNull(proMap)) {
-                // 先创建项目的进度计划
-                String newPlanId = Crud.from("PM_PRO_PLAN").insertData();
+        // 根据项目类型查询项目进度计划模板
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ppp.*,PRJ_REPLY_DATE from PM_PRO_PLAN ppp \n" +
+                "left join pm_prj pp on ppp.TEMPLATE_FOR_PROJECT_TYPE_ID = pp.PROJECT_TYPE_ID\n" +
+                "where ppp.`STATUS`='AP' and ppp.IS_TEMPLATE='1' and pp.id=?", projectId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> proMap = list.get(0);
+            // 先创建项目的进度计划
+            String newPlanId = Crud.from("PM_PRO_PLAN").insertData();
 
-                Crud.from("PM_PRO_PLAN").where().eq("ID", newPlanId).update().set("IS_TEMPLATE", 0).set("PM_PRJ_ID", projectId).set("PLAN_TOTAL_DAYS", proMap.get("PLAN_TOTAL_DAYS"))
-                        .set("PROGRESS_STATUS_ID", proMap.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", proMap.get("PROGRESS_RISK_TYPE_ID")).set("START_DAY", proMap.get("START_DAY")).exec();
+            Crud.from("PM_PRO_PLAN").where().eq("ID", newPlanId).update().set("IS_TEMPLATE", 0).set("PM_PRJ_ID", projectId).set("PLAN_TOTAL_DAYS", proMap.get("PLAN_TOTAL_DAYS"))
+                    .set("PROGRESS_STATUS_ID", proMap.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", proMap.get("PROGRESS_RISK_TYPE_ID")).set("START_DAY", proMap.get("START_DAY")).exec();
 
 
-                // 查询项目进度计划节点模板
-                List<Map<String, Object>> planNodeList = myJdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT," +
-                        "LAST_MODI_USER_ID,STATUS,LK_WF_INST_ID,CODE,NAME,REMARK,ACTUAL_START_DATE,PROGRESS_RISK_REMARK,PM_PRO_PLAN_ID,PLAN_START_DATE," +
-                        "PLAN_TOTAL_DAYS,PLAN_CARRY_DAYS,ACTUAL_CARRY_DAYS,ACTUAL_TOTAL_DAYS,PLAN_CURRENT_PRO_PERCENT,ACTUAL_CURRENT_PRO_PERCENT," +
-                        "ifnull(PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,PLAN_COMPL_DATE,ACTUAL_COMPL_DATE,SHOW_IN_EARLY_PROC,SHOW_IN_PRJ_OVERVIEW," +
-                        "PROGRESS_STATUS_ID,PROGRESS_RISK_TYPE_ID,CHIEF_DEPT_ID,CHIEF_USER_ID,START_DAY,SEQ_NO,CPMS_UUID,CPMS_ID,`LEVEL`,LINKED_WF_PROCESS_ID,LINKED_WF_NODE_ID " +
-                        "from PM_PRO_PLAN_NODE where PM_PRO_PLAN_ID=?", proMap.get("ID"));
-                if (planNodeList.size() > 0) {
-                    planNodeList.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")))).peek(m -> {
-                        String id = Crud.from("PM_PRO_PLAN_NODE").insertData();
+            // 查询项目进度计划节点模板
+            List<Map<String, Object>> planNodeList = myJdbcTemplate.queryForList("select ID,VER,TS,IS_PRESET,CRT_DT,CRT_USER_ID,LAST_MODI_DT," +
+                    "LAST_MODI_USER_ID,STATUS,LK_WF_INST_ID,CODE,NAME,REMARK,ACTUAL_START_DATE,PROGRESS_RISK_REMARK,PM_PRO_PLAN_ID,PLAN_START_DATE," +
+                    "PLAN_TOTAL_DAYS,PLAN_CARRY_DAYS,ACTUAL_CARRY_DAYS,ACTUAL_TOTAL_DAYS,PLAN_CURRENT_PRO_PERCENT,ACTUAL_CURRENT_PRO_PERCENT," +
+                    "ifnull(PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,PLAN_COMPL_DATE,ACTUAL_COMPL_DATE,SHOW_IN_EARLY_PROC,SHOW_IN_PRJ_OVERVIEW," +
+                    "PROGRESS_STATUS_ID,PROGRESS_RISK_TYPE_ID,CHIEF_DEPT_ID,CHIEF_USER_ID,START_DAY,SEQ_NO,CPMS_UUID,CPMS_ID,`LEVEL`,LINKED_WF_PROCESS_ID,LINKED_WF_NODE_ID " +
+                    "from PM_PRO_PLAN_NODE where PM_PRO_PLAN_ID=?", proMap.get("ID"));
+            if (planNodeList.size() > 0) {
+                planNodeList.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")))).peek(m -> {
+                    String id = Crud.from("PM_PRO_PLAN_NODE").insertData();
 
-                        Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId)
-                                .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
-                                .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
-                                .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_WF_NODE_ID", m.get("LINKED_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC",m.get("SHOW_IN_EARLY_PROC")).set("SHOW_IN_PRJ_OVERVIEW",m.get("SHOW_IN_PRJ_OVERVIEW")).exec();
+                    Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId)
+                            .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
+                            .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
+                            .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_WF_NODE_ID", m.get("LINKED_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC")).set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).exec();
 
-                        getChildrenNode(m, planNodeList, id, newPlanId);
-                    }).collect(Collectors.toList());
-                }
+                    getChildrenNode(m, planNodeList, id, newPlanId);
+                }).collect(Collectors.toList());
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 
@@ -408,7 +405,7 @@ public class PmPrjReqExt {
                     .set("PM_PRO_PLAN_NODE_PID", pId)
                     .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                     .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
-                    .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_WF_NODE_ID", m.get("LINKED_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC",m.get("SHOW_IN_EARLY_PROC")).set("SHOW_IN_PRJ_OVERVIEW",m.get("SHOW_IN_PRJ_OVERVIEW")).exec();
+                    .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_WF_NODE_ID", m.get("LINKED_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC")).set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).exec();
             getChildrenNode(m, allData, id, newPlanId);
         }).collect(Collectors.toList());
     }
@@ -420,8 +417,10 @@ public class PmPrjReqExt {
         ProFileUtils.createFolder(projectId);
     }
 
-    /** 立项申请-发起时数据校验 **/
-    public void checkCreateDate(){
+    /**
+     * 立项申请-发起时数据校验
+     **/
+    public void checkCreateDate() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //项目名称
@@ -430,25 +429,27 @@ public class PmPrjReqExt {
         String id = entityRecord.csCommId;
         //查询名称是否存在
         String sql1 = "select name from PM_PRJ_REQ where PRJ_NAME = ? and id != ? ";
-        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectName,id);
-        if (!CollectionUtils.isEmpty(list1)){
+        List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1, projectName, id);
+        if (!CollectionUtils.isEmpty(list1)) {
             throw new BaseException("项目名称不能重复，请重新输入项目名称！");
         }
         String sql2 = "select name from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'";
-        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,projectName);
-        if (!CollectionUtils.isEmpty(list2)){
+        List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(sql2, projectName);
+        if (!CollectionUtils.isEmpty(list2)) {
             throw new BaseException("项目名称不能重复，请重新输入项目名称！");
         }
     }
 
-    /** 立项结束没有生产项目进展图的项目 生成项目进展图 **/
-    public void createProcess(){
+    /**
+     * 立项结束没有生产项目进展图的项目 生成项目进展图
+     **/
+    public void createProcess() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //项目id
         String projectId = entityRecord.csCommId;
-        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan where PM_PRJ_ID = ?",projectId);
-        if (CollectionUtils.isEmpty(list)){
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan where PM_PRJ_ID = ?", projectId);
+        if (CollectionUtils.isEmpty(list)) {
             createPlan(projectId);
         }
     }
@@ -456,43 +457,43 @@ public class PmPrjReqExt {
     public static String getPrjId(Map<String, Object> valueMap) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //项目来源类型  0099952822476441375=非立项
-        String projectType = JdbcMapUtil.getString(valueMap,"PROJECT_SOURCE_TYPE_ID");
+        String projectType = JdbcMapUtil.getString(valueMap, "PROJECT_SOURCE_TYPE_ID");
         //部门
         String deptId = JdbcMapUtil.getString(valueMap, "CRT_DEPT_ID");
         String prjId = "";
-        if ("0099952822476441375".equals(projectType)){
+        if ("0099952822476441375".equals(projectType)) {
             //创建人
-            String userId = JdbcMapUtil.getString(valueMap,"CRT_USER_ID");
+            String userId = JdbcMapUtil.getString(valueMap, "CRT_USER_ID");
             //项目名称
-            String projectName = JdbcMapUtil.getString(valueMap,"PROJECT_NAME_WR");
-            projectName = StringUtil.chineseCodeToEnCode(projectName,",");
+            String projectName = JdbcMapUtil.getString(valueMap, "PROJECT_NAME_WR");
+            projectName = StringUtil.chineseCodeToEnCode(projectName, ",");
             List<String> prjNameList = new ArrayList<>();
             int index = projectName.indexOf(",");
-            if (index == -1){
+            if (index == -1) {
                 prjNameList.add(projectName);
             } else {
                 prjNameList = Arrays.asList(projectName.split(","));
             }
             for (String tmp : prjNameList) {
                 String sql1 = "select * from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?";
-                List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,tmp,projectType);
-                if (CollectionUtils.isEmpty(list1)){
+                List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1, tmp, projectType);
+                if (CollectionUtils.isEmpty(list1)) {
                     prjId = Crud.from("pm_prj").insertData();
-                    myJdbcTemplate.update("update pm_prj set CRT_USER_ID = ?,STATUS = ?,NAME = ?,PROJECT_SOURCE_TYPE_ID = ? where id = ?",userId,"AP",tmp,projectType,prjId);
+                    myJdbcTemplate.update("update pm_prj set CRT_USER_ID = ?,STATUS = ?,NAME = ?,PROJECT_SOURCE_TYPE_ID = ? where id = ?", userId, "AP", tmp, projectType, prjId);
                     String pmDeptId = Crud.from("pm_dept").insertData();
-                    myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?",prjId,deptId,userId,1,pmDeptId);
+                    myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?", prjId, deptId, userId, 1, pmDeptId);
                 } else {
-                    prjId = JdbcMapUtil.getString(list1.get(0),"id");
+                    prjId = JdbcMapUtil.getString(list1.get(0), "id");
                     String sql2 = "select * from pm_dept where PM_PRJ_ID=? and HR_DEPT_ID=? and status='ap'";
-                    List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,prjId,deptId);
-                    if (CollectionUtils.isEmpty(list2)){
+                    List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(sql2, prjId, deptId);
+                    if (CollectionUtils.isEmpty(list2)) {
                         String pmDeptId = Crud.from("pm_dept").insertData();
-                        myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?",prjId,deptId,userId,1,pmDeptId);
+                        myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?", prjId, deptId, userId, 1, pmDeptId);
                     } else {
-                        String userIds = JdbcMapUtil.getString(list2.get(0),"USER_IDS");
-                        if (!userIds.contains(userId)){
-                            userIds = userIds+","+userId;
-                            myJdbcTemplate.update("update pm_dept set USER_IDS = ? where id = ?",userIds,JdbcMapUtil.getString(list2.get(0),"id"));
+                        String userIds = JdbcMapUtil.getString(list2.get(0), "USER_IDS");
+                        if (!userIds.contains(userId)) {
+                            userIds = userIds + "," + userId;
+                            myJdbcTemplate.update("update pm_dept set USER_IDS = ? where id = ?", userIds, JdbcMapUtil.getString(list2.get(0), "id"));
                         }
                     }
                 }
@@ -504,52 +505,52 @@ public class PmPrjReqExt {
     public static String getPrjIdNew(Map<String, Object> valueMap) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //项目来源类型  0099952822476441375=非立项
-        String projectType = JdbcMapUtil.getString(valueMap,"PROJECT_SOURCE_TYPE_ID");
+        String projectType = JdbcMapUtil.getString(valueMap, "PROJECT_SOURCE_TYPE_ID");
         //部门
         String deptId = JdbcMapUtil.getString(valueMap, "CRT_DEPT_ID");
         String prjId = "";
         StringBuilder projectId = new StringBuilder();
-        if ("0099952822476441375".equals(projectType)){
+        if ("0099952822476441375".equals(projectType)) {
             //创建人
-            String userId = JdbcMapUtil.getString(valueMap,"CRT_USER_ID");
+            String userId = JdbcMapUtil.getString(valueMap, "CRT_USER_ID");
             //项目名称
-            String projectName = JdbcMapUtil.getString(valueMap,"PROJECT_NAME_WR");
-            projectName = StringUtil.chineseCodeToEnCode(projectName,",");
+            String projectName = JdbcMapUtil.getString(valueMap, "PROJECT_NAME_WR");
+            projectName = StringUtil.chineseCodeToEnCode(projectName, ",");
             List<String> prjNameList = new ArrayList<>();
             int index = projectName.indexOf(",");
-            if (index == -1){
+            if (index == -1) {
                 prjNameList.add(projectName);
             } else {
                 prjNameList = Arrays.asList(projectName.split(","));
             }
             for (String tmp : prjNameList) {
                 String sql1 = "select * from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = ?";
-                List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,tmp,projectType);
-                if (CollectionUtils.isEmpty(list1)){
+                List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1, tmp, projectType);
+                if (CollectionUtils.isEmpty(list1)) {
                     prjId = Crud.from("pm_prj").insertData();
-                    myJdbcTemplate.update("update pm_prj set CRT_USER_ID = ?,STATUS = ?,NAME = ?,PROJECT_SOURCE_TYPE_ID = ? where id = ?",userId,"AP",tmp,projectType,prjId);
+                    myJdbcTemplate.update("update pm_prj set CRT_USER_ID = ?,STATUS = ?,NAME = ?,PROJECT_SOURCE_TYPE_ID = ? where id = ?", userId, "AP", tmp, projectType, prjId);
                     String pmDeptId = Crud.from("pm_dept").insertData();
-                    myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?",prjId,deptId,userId,1,pmDeptId);
+                    myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?", prjId, deptId, userId, 1, pmDeptId);
                     projectId.append(prjId).append(",");
                 } else {
-                    prjId = JdbcMapUtil.getString(list1.get(0),"id");
+                    prjId = JdbcMapUtil.getString(list1.get(0), "id");
                     projectId.append(prjId).append(",");
                     String sql2 = "select * from pm_dept where PM_PRJ_ID=? and HR_DEPT_ID=? and status='ap'";
-                    List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,prjId,deptId);
-                    if (CollectionUtils.isEmpty(list2)){
+                    List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(sql2, prjId, deptId);
+                    if (CollectionUtils.isEmpty(list2)) {
                         String pmDeptId = Crud.from("pm_dept").insertData();
-                        myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?",prjId,deptId,userId,1,pmDeptId);
+                        myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?", prjId, deptId, userId, 1, pmDeptId);
                     } else {
-                        String userIds = JdbcMapUtil.getString(list2.get(0),"USER_IDS");
-                        if (!userIds.contains(userId)){
-                            userIds = userIds+","+userId;
-                            myJdbcTemplate.update("update pm_dept set USER_IDS = ? where id = ?",userIds,JdbcMapUtil.getString(list2.get(0),"id"));
+                        String userIds = JdbcMapUtil.getString(list2.get(0), "USER_IDS");
+                        if (!userIds.contains(userId)) {
+                            userIds = userIds + "," + userId;
+                            myJdbcTemplate.update("update pm_dept set USER_IDS = ? where id = ?", userIds, JdbcMapUtil.getString(list2.get(0), "id"));
                         }
                     }
                 }
             }
         }
-        prjId = projectId.substring(0,projectId.length()-1);
+        prjId = projectId.substring(0, projectId.length() - 1);
         return prjId;
     }
 
@@ -557,7 +558,7 @@ public class PmPrjReqExt {
     /**
      * 立项申请-回滚创建项目、创建进度计划、创建投资测算（立项匡算）、创建项目资料库等
      */
-    public void backUpCreatePrj(){
+    public void backUpCreatePrj() {
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
             backUpPrjData(entityRecord);
@@ -570,12 +571,12 @@ public class PmPrjReqExt {
         //立项申请表id
         String csCommId = entityRecord.csCommId;
         //获取项目名称
-        String projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PRJ_NAME");
+        String projectName = JdbcMapUtil.getString(entityRecord.valueMap, "PRJ_NAME");
         //获取项目id
         String sql1 = "select id from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'";
-        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,projectName);
-        if (!CollectionUtils.isEmpty(list1)){
-            String projectId = JdbcMapUtil.getString(list1.get(0),"id");
+        List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1, projectName);
+        if (!CollectionUtils.isEmpty(list1)) {
+            String projectId = JdbcMapUtil.getString(list1.get(0), "id");
 
             //关闭外键校验
             String close = "SET FOREIGN_KEY_CHECKS=0;";
@@ -587,19 +588,19 @@ public class PmPrjReqExt {
             log.info("清空立项申请中的项目id 已更新：{}", exec1);
 
             //清空项目投资测算
-            exec1 = WfPmInvestUtil.backPrjData(csCommId,"PM_PRJ_REQ",projectId,myJdbcTemplate);
+            exec1 = WfPmInvestUtil.backPrjData(csCommId, "PM_PRJ_REQ", projectId, myJdbcTemplate);
             log.info("清空项目投资测算 已更新：{}", exec1);
 
             //清空项目进度计划网络图
-            exec1 = backUpPrjPlan(projectId,myJdbcTemplate);
+            exec1 = backUpPrjPlan(projectId, myJdbcTemplate);
             log.info("清空项目进度计划网络图 已更新：{}", exec1);
 
             //删除项目文件夹数据 + 资料管理文件
-            exec1 = ProFileUtils.backUpFolder(myJdbcTemplate,projectId);
+            exec1 = ProFileUtils.backUpFolder(myJdbcTemplate, projectId);
             log.info("删除项目文件夹数据 已更新：{}", exec1);
 
             //删除项目表该项目数据
-            exec1 = myJdbcTemplate.update("delete from pm_prj where id = ?",projectId);
+            exec1 = myJdbcTemplate.update("delete from pm_prj where id = ?", projectId);
             log.info("清空项目表中的项目id 已更新：{}", exec1);
 
             //关闭外键校验
@@ -610,51 +611,52 @@ public class PmPrjReqExt {
     }
 
     // 清空项目进度计划网络图
-    private int backUpPrjPlan(String projectId,MyJdbcTemplate myJdbcTemplate) {
+    private int backUpPrjPlan(String projectId, MyJdbcTemplate myJdbcTemplate) {
         int sum = 0;
         //查询项目进度计划
         String sql1 = "select id from PM_PRO_PLAN where PM_PRJ_ID = ?";
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql1, projectId);
-        if (!CollectionUtils.isEmpty(list)){
+        if (!CollectionUtils.isEmpty(list)) {
             for (Map<String, Object> tmp : list) {
-                String id = JdbcMapUtil.getString(tmp,"id");
+                String id = JdbcMapUtil.getString(tmp, "id");
                 //删除项目进度节点id
                 String sql2 = "delete from PM_PRO_PLAN_NODE where PM_PRO_PLAN_ID = ?";
-                myJdbcTemplate.update(sql2,id);
+                myJdbcTemplate.update(sql2, id);
                 sum++;
             }
         }
-        sum = sum + myJdbcTemplate.update("delete from PM_PRO_PLAN where PM_PRJ_ID = ?",projectId);
+        sum = sum + myJdbcTemplate.update("delete from PM_PRO_PLAN where PM_PRJ_ID = ?", projectId);
         return sum;
     }
 
     /**
      * 立项申请流程-流程完结数据处理
      */
-    public void prjProcessEnd(){
+    public void prjProcessEnd() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //赋予流程发起人查看项目权限
-        createPrjUser(entityRecord,myJdbcTemplate);
+        createPrjUser(entityRecord, myJdbcTemplate);
 
     }
 
     /**
      * 立项完成，赋予流程发起人查看项目权限
-     * @param entityRecord 流程主数据
+     *
+     * @param entityRecord   流程主数据
      * @param myJdbcTemplate 数据源
      */
     private void createPrjUser(EntityRecord entityRecord, MyJdbcTemplate myJdbcTemplate) {
         //流程发起人
-        String userId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_USER_ID");
+        String userId = JdbcMapUtil.getString(entityRecord.valueMap, "CRT_USER_ID");
         //发起部门
-        String deptId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_DEPT_ID");
+        String deptId = JdbcMapUtil.getString(entityRecord.valueMap, "CRT_DEPT_ID");
         //流程明细
-        String projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PRJ_NAME");
+        String projectName = JdbcMapUtil.getString(entityRecord.valueMap, "PRJ_NAME");
         //获取项目id
-        String projectId = PmPrj.getProjectId(projectName,"0099952822476441374",myJdbcTemplate);
+        String projectId = PmPrj.getProjectId(projectName, "0099952822476441374", myJdbcTemplate);
         //写入项目部门人员表
-        PmDeptExt.createPrjUserOne(userId,userId,projectId,deptId,myJdbcTemplate);
+        PmDeptExt.createPrjUserOne(userId, userId, projectId, deptId, myJdbcTemplate);
     }
 }
 

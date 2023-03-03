@@ -59,14 +59,16 @@ public class WorkScheduleExt {
 
 
     /**
-     * 工作日程详情
+     * 工作日程详情列表
      */
     public void workScheduleView() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String dateTime = String.valueOf(map.get("dateTime"));
         String userId = String.valueOf(map.get("userId"));
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from WORK_SCHEDULE where DATE_FORMAT(CRT_DT,'%Y-%m-%d') = DATE_FORMAT(?,'%Y-%m-%d') and AD_USER_ID=?", dateTime, userId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ws.ID as ID,ws.CRT_DT as CRT_DT,TITLE,CONTENT,URGENT_LEVEL,WARN_TYPE_ID,gsv.`name` as WARN_TYPE from WORK_SCHEDULE ws" +
+                " left join gr_set_value gsv on gsv.id = ws.WARN_TYPE_ID "+
+                " where DATE_FORMAT(ws.CRT_DT,'%Y-%m-%d') = DATE_FORMAT(?,'%Y-%m-%d') and ws.AD_USER_ID=?", dateTime, userId);
         List<WorkScheduleData> scheduleData = list.stream().map(p -> {
             WorkScheduleData schedule = new WorkScheduleData();
             schedule.id = JdbcMapUtil.getString(p, "ID");
@@ -75,6 +77,7 @@ public class WorkScheduleExt {
             schedule.content = JdbcMapUtil.getString(p, "CONTENT");
             schedule.level = JdbcMapUtil.getString(p, "URGENT_LEVEL");
             schedule.warnTypeId = JdbcMapUtil.getString(p, "WARN_TYPE_ID");
+            schedule.warnType = JdbcMapUtil.getString(p, "WARN_TYPE");
             return schedule;
         }).collect(Collectors.toList());
 
@@ -135,6 +138,7 @@ public class WorkScheduleExt {
         public String content;
         public String level;
         public String warnTypeId;
+        public String warnType;
     }
 
     public static class OutSide {
