@@ -108,6 +108,7 @@ public class PoPublicBidExtApi {
                 .set("BID_WIN_NOTICE_FILE_GROUP_ID",JdbcMapUtil.getString(valueMap,"BID_WIN_NOTICE_FILE_GROUP_ID")) //中标通知书
                 .set("BID_PLATFORM",JdbcMapUtil.getString(valueMap,"BID_PLATFORM")) //招标平台
                 .set("view_Id",viewId) //视图id
+                .set("WF_PROCESS_INSTANCE_ID",JdbcMapUtil.getString(valueMap,"LK_WF_INST_ID")) //流程实例id
                 .exec();
     }
 
@@ -150,7 +151,7 @@ public class PoPublicBidExtApi {
                 "(select name from gr_set_value where id = a.BUY_TYPE_ID) as buyTypeName, " +
                 "(select name from gr_set_value where id = a.BID_PLATFORM) as platformName, " +
                 "a.AMT_FIVE as maxAmt,a.AMT_SIX as winAmt,a.DATE_ONE as winDate,a.WORK_PROCESS_ID as workProcessId, " +
-                "a.VIEW_ID as viewId,a.PM_PRJ_ID as projectId,a.BID_WIN_NOTICE_FILE_GROUP_ID as fileId " +
+                "a.VIEW_ID as viewId,a.PM_PRJ_ID as projectId,a.BID_WIN_NOTICE_FILE_GROUP_ID as fileId,a.WF_PROCESS_INSTANCE_ID as procInstld " +
                 " FROM po_public_bid a WHERE a.PM_PRJ_ID = ? and a.STATUS = 'ap' ");
         // 筛选条件
         if (!SharedUtil.isEmptyString(input.buyPrjTypeId)) {// 采购项目类别
@@ -185,6 +186,7 @@ public class PoPublicBidExtApi {
                 poPublicBidView.id = JdbcMapUtil.getString(p,"id");
                 poPublicBidView.projectId = JdbcMapUtil.getString(p,"projectId");
                 poPublicBidView.viewId = JdbcMapUtil.getString(p,"viewId");
+                poPublicBidView.procInstld = JdbcMapUtil.getString(p,"procInstld");
                 poPublicBidView.buyPrjTypeName = JdbcMapUtil.getString(p,"buyPrjTypeName");
                 poPublicBidView.buyMatterName = JdbcMapUtil.getString(p,"buyMatterName");
                 poPublicBidView.buyTypeName = JdbcMapUtil.getString(p,"buyTypeName");

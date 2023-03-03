@@ -70,6 +70,8 @@ public class PoOrderView extends BasePageEntity {
     public String agentName;
     //视图id
     public String viewId;
+    //流程实例id
+    public String procInstld;
 
     public String getId() {
         return id;

@@ -127,6 +127,7 @@ public class PoOrderExtApi {
                 .set("DATE_FIVE",JdbcMapUtil.getString(valueMap,"DATE_FIVE")) //到期日期
                 .set("FILE_ATTACHMENT_URL",JdbcMapUtil.getString(valueMap,"FILE_ID_FIVE")) //合同盖章版文件
                 .set("VIEW_ID",viewId) //视图id
+                .set("WF_PROCESS_INSTANCE_ID",JdbcMapUtil.getString(valueMap,"LK_WF_INST_ID")) //流程实例id
                 .exec();
     }
 
@@ -167,7 +168,7 @@ public class PoOrderExtApi {
         StringBuilder sb = new StringBuilder();
         String sql = "SELECT a.VIEW_ID as viewId,a.id,a.PM_PRJ_ID as projectId,a.CONTRACT_APP_ID as orderProcessId,a.CONTRACT_NAME as contractName," +
                 "a.WIN_BID_UNIT_ONE as cooperationUnit,a.AMT_FIVE as noShuiAmt,a.AMT_ONE as shuiLv,a.AMT_SIX as shuiAmt," +
-                "a.AMT_SEVEN as aleadyPayAmt,a.AMT_TWO as payPrece,a.AD_USER_ID as agentUser,b.name as agentName," +
+                "a.AMT_SEVEN as aleadyPayAmt,a.AMT_TWO as payPrece,a.AD_USER_ID as agentUser,b.name as agentName,a.WF_PROCESS_INSTANCE_ID as procInstld" +
                 "a.SIGN_DATE as signDate,a.DATE_FIVE as endDate,a.FILE_ATTACHMENT_URL as fileId " +
                 "FROM po_order a left join ad_user b on a.AD_USER_ID = b.id " +
                 "where a.PM_PRJ_ID = ? and a.status = 'ap'";
@@ -228,6 +229,7 @@ public class PoOrderExtApi {
                     poOrderView.fileList = fileDetail;
                 }
                 poOrderView.viewId = JdbcMapUtil.getString(p, "viewId");
+                poOrderView.procInstld = JdbcMapUtil.getString(p, "procInstld");
                 return poOrderView;
             }).collect(Collectors.toList());
             map1.put("result", inputList);

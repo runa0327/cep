@@ -42,4 +42,6 @@ public class PoPublicBidView extends BasePageEntity {
     public Integer fileNum;
     //业务流程id
     public String workProcessId;
+    //流程实例id
+    public String procInstld;
 }
