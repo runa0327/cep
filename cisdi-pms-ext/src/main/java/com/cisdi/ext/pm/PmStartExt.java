@@ -427,7 +427,7 @@ public class PmStartExt {
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRJ where status='ap'");
         for (Map<String, Object> stringObjectMap : list) {
             String code = getPrjCode(stringObjectMap.get("CUSTOMER_UNIT") == null ? "" : String.valueOf(stringObjectMap.get("CUSTOMER_UNIT")),
-                    stringObjectMap.get("PROJECT_SOURCE_TYPE_ID") == null ? "" : String.valueOf(stringObjectMap.get("PROJECT_SOURCE_TYPE_ID")),
+                    stringObjectMap.get("INVESTMENT_SOURCE_ID") == null ? "" : String.valueOf(stringObjectMap.get("INVESTMENT_SOURCE_ID")),
                     stringObjectMap.get("PROJECT_TYPE_ID") == null ? "" : String.valueOf(stringObjectMap.get("PROJECT_TYPE_ID")));
             Crud.from("PM_PRJ").where().eq("ID", stringObjectMap.get("ID")).update().set("PM_CODE", code).exec();
         }
