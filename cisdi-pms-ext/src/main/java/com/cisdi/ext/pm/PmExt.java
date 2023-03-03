@@ -233,7 +233,7 @@ public class PmExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuilder sb = new StringBuilder();
         sb.append("select pm.PM_SEQ as num,pm.id as id,pm.`NAME` as name,pt.`NAME` as unit,gsv.`NAME` as type,pm.PM_CODE as code,ggg.`NAME` as local, \n" +
-                "gsvv.`NAME` as pmode,'0' as invest,gss.`NAME` as status,\n" +
+                "gsvv.`NAME` as pmode,'0' as invest,gss.`NAME` as status,pm.ver as ver, \n" +
                 "ppp.PLAN_START_DATE as PLAN_START_DATE, \n" +
                 "ppp.ACTUAL_START_DATE as ACTUAL_START_DATE, \n" +
                 "ppp.PLAN_COMPL_DATE AS PLAN_COMPL_DATE, \n" +
@@ -315,6 +315,7 @@ public class PmExt {
         projectInfo.mode = JdbcMapUtil.getString(data, "pmode");
         projectInfo.invest = getPrjInvest(projectInfo.id);
         projectInfo.status = JdbcMapUtil.getString(data, "status");
+        projectInfo.ver = JdbcMapUtil.getString(data, "ver");
         projectInfo.planStartDate = JdbcMapUtil.getString(data, "PLAN_START_DATE");
         projectInfo.actualStartDate = JdbcMapUtil.getString(data, "ACTUAL_START_DATE");
         projectInfo.planComplDate = JdbcMapUtil.getString(data, "PLAN_COMPL_DATE");
@@ -361,6 +362,7 @@ public class PmExt {
         public String mode;
         public String invest;
         public String status;
+        public String ver;
         public String planStartDate;
         public String actualStartDate;
         public String planComplDate;

@@ -146,7 +146,7 @@ public class ProPlanExt {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
             OutSide outSide = new OutSide();
-            outSide.nodeInfoList =infoList;
+            outSide.nodeInfoList = infoList;
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
@@ -186,7 +186,7 @@ public class ProPlanExt {
         PrjProPlanInfo planInfo = new PrjProPlanInfo();
         Map<String, Object> proMap = null;
         try {
-            proMap = myJdbcTemplate.queryForMap("select pr.CODE,pr.NAME,pr.REMARK,pr.ACTUAL_START_DATE,pr.PROGRESS_RISK_REMARK,pr.IS_TEMPLATE,pr.PM_PRJ_ID,pr.PLAN_START_DATE,\n" +
+            proMap = myJdbcTemplate.queryForMap("select pr.ID,pr.CODE,pr.NAME,pr.REMARK,pr.ACTUAL_START_DATE,pr.PROGRESS_RISK_REMARK,pr.IS_TEMPLATE,pr.PM_PRJ_ID,pr.PLAN_START_DATE,\n" +
                     "ifnull(PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
                     "ifnull(ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(ACTUAL_TOTAL_DAYS,0),ifnull(PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
                     "ifnull(ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,PLAN_COMPL_DATE,ACTUAL_COMPL_DATE,TEMPLATE_FOR_PROJECT_TYPE_ID,PROGRESS_STATUS_ID,\n" +
@@ -460,12 +460,18 @@ public class ProPlanExt {
      */
     public void refreshProPlanTime() {
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
-        String projectId = entityRecordList.get(0).valueMap.get("PM_PRJ_ID").toString();
-        Date date = null;
-        if (entityRecordList.get(0).valueMap.get("PLAN_START_DATE") != null) {
-            date = DateTimeUtil.stringToDate(entityRecordList.get(0).valueMap.get("PLAN_START_DATE").toString());
+        String proPlanId = entityRecordList.get(0).valueMap.get("ID").toString();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan where id=?", proPlanId);
+        if (!CollectionUtils.isEmpty(list)) {
+            String projectId = String.valueOf(list.get(0).get("PM_PRJ_ID"));
+            Date date = null;
+            if (entityRecordList.get(0).valueMap.get("PLAN_START_DATE") != null) {
+                date = DateTimeUtil.stringToDate(entityRecordList.get(0).valueMap.get("PLAN_START_DATE").toString());
+            }
+            PrjPlanUtil.refreshProPlanTime(projectId, date);
         }
-        PrjPlanUtil.refreshProPlanTime(projectId, date);
+
     }
 
 
@@ -1059,7 +1065,7 @@ public class ProPlanExt {
         public List<ProContrastNode> info;
     }
 
-    public static class OutSide{
+    public static class OutSide {
         public List<PrjProPlanNodeInfo> nodeInfoList;
     }
 }
