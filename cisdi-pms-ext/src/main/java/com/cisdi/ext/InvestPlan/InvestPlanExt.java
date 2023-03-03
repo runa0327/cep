@@ -2,6 +2,7 @@ package com.cisdi.ext.InvestPlan;
 
 import com.cisdi.ext.fund.FundReachApi;
 import com.cisdi.ext.model.ResponseModel;
+import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -198,7 +199,7 @@ public class InvestPlanExt {
 
             BigDecimal percentageComplete = BigDecimal.ZERO;
             if (plan.totalPlanOutputValue.compareTo(BigDecimal.ZERO) != 0) {
-                percentageComplete = totalActualOutputValue.divide(plan.totalPlanOutputValue);
+                percentageComplete = BigDecimalUtil.divide(totalActualOutputValue, 2, plan.totalPlanOutputValue);
             }
             plan.percentageComplete = percentageComplete;
 
