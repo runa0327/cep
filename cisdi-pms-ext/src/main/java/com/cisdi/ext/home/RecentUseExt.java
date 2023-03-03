@@ -50,7 +50,7 @@ public class RecentUseExt {
     public void recentUseList() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from RECENT_USE where AD_USER_ID = ? order by CRT_DT desc limit 0,5 ", map.get("userId"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from (select DISTINCT `NAME`,AD_USER_ID,MENU_TYPE,RECORDED_VALUE,DSP_NAME,OTHER,CRT_DT from RECENT_USE where AD_USER_ID = ?) a order by a.CRT_DT desc limit 0,5  ", map.get("userId"));
         List<InputData> dataList = list.stream().map(p -> {
             InputData data = new InputData();
             data.userId = JdbcMapUtil.getString(p, "AD_USER_ID");
