@@ -38,7 +38,7 @@ public class ContractAccount {
         RequestParam requestParam = this.getRequestParam();
         StringBuffer sb = new StringBuffer();
         sb.append("SELECT o.DATE_FIVE as expireDate,o.id,IFNULL(o.PM_PRJ_ID,p2.id) prjId,IFNULL(p.name,o.PROJECT_NAME_WR) prjName,o.CONTRACT_NAME contractName,o" +
-                ".CUSTOMER_UNIT_ONE contractCompanyId,pa.name contractCompanyName,temp.cooperationUnit,o.CONTRACT_CATEGORY_ONE_ID " +
+                ".CUSTOMER_UNIT_ONE contractCompanyId,pa.name contractCompanyName,temp.cooperationUnit,o.CONTRACT_CODE contractCode,o.CONTRACT_CATEGORY_ONE_ID " +
                 "contractCategoryId,va.name contractCategoryName,o.AMT_THREE amtExcludeTax,o.AMT_FOUR taxRate,o.AMT_TWO amtIncludeTax,o.SIGN_DATE " +
                 "createTime,i.END_DATETIME endTime,o.REMARK_LONG_ONE remark,o.CRT_USER_ID userId,u.name userName,o.FILE_ID_FIVE fileIds\n" +
                 "FROM PO_ORDER_REQ o\n" +
@@ -212,6 +212,8 @@ public class ContractAccount {
         public String prjName;
         //合同名称
         public String contractName;
+        //合同编号
+        public String contractCode;
         //合同签订公司
         public String contractCompanyId;
         public String contractCompanyName;
