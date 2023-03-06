@@ -296,8 +296,8 @@ public class PmExt {
      */
     public void initPrjNum(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRJ where status='ap' order by CRT_DT");
-        AtomicInteger index = new AtomicInteger(0);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRJ where status='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' order by CRT_DT");
+        AtomicInteger index = new AtomicInteger(1);
         for (Map<String, Object> stringObjectMap : list) {
             Crud.from("PM_PRJ").where().eq("ID", stringObjectMap.get("ID")).update().set("PM_SEQ", index.getAndIncrement()).exec();
         }

@@ -183,7 +183,8 @@ public class PmStartExt {
         String prjCode = input.code;
         if (Strings.isNullOrEmpty(input.id)) {
             id = Crud.from("PRJ_START").insertData();
-            prjCode = getPrjCode(input.unit, input.sourceTypeId, input.typeId);
+//            prjCode = getPrjCode(input.unit, input.sourceTypeId, input.typeId);
+            prjCode = getPrjCode();
         }
 
         Crud.from("PRJ_START").where().eq("ID", id).update()
@@ -420,15 +421,43 @@ public class PmStartExt {
 
 
     /**
+     * 获取项目编码
+     *
+     * @return
+     */
+    private String getPrjCode() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(PM_CODE,0) as PM_CODE from pm_prj  order by right(pm_code,4) desc limit 0,1");
+        Map<String, Object> data = list.get(0);
+        String flowNo = "0001";
+        String code = String.valueOf(data.get("PM_CODE"));
+        if (!"0".equals(code)) {
+            String str = code.substring(code.length() - 4);
+            int count = Integer.parseInt(str) + 1;
+            flowNo = StringUtil.addZeroForNum(String.valueOf(count), 4);
+
+        }
+        StringBuilder sb = new StringBuilder();
+
+        SimpleDateFormat sd = new SimpleDateFormat("yyMMdd");
+        String dataPrefix = sd.format(new Date());
+
+        sb.append("GCXT-").append(dataPrefix).append(flowNo);
+        return sb.toString().trim();
+    }
+
+
+    /**
      * 初始化项目编码
      */
     public void initPmCode() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRJ where status='ap'");
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRJ where status='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' order by CRT_DT desc ");
         for (Map<String, Object> stringObjectMap : list) {
-            String code = getPrjCode(stringObjectMap.get("CUSTOMER_UNIT") == null ? "" : String.valueOf(stringObjectMap.get("CUSTOMER_UNIT")),
-                    stringObjectMap.get("INVESTMENT_SOURCE_ID") == null ? "" : String.valueOf(stringObjectMap.get("INVESTMENT_SOURCE_ID")),
-                    stringObjectMap.get("PROJECT_TYPE_ID") == null ? "" : String.valueOf(stringObjectMap.get("PROJECT_TYPE_ID")));
+//            String code = getPrjCode(stringObjectMap.get("CUSTOMER_UNIT") == null ? "" : String.valueOf(stringObjectMap.get("CUSTOMER_UNIT")),
+//                    stringObjectMap.get("INVESTMENT_SOURCE_ID") == null ? "" : String.valueOf(stringObjectMap.get("INVESTMENT_SOURCE_ID")),
+//                    stringObjectMap.get("PROJECT_TYPE_ID") == null ? "" : String.valueOf(stringObjectMap.get("PROJECT_TYPE_ID")));
+            String code = getPrjCode();
             Crud.from("PM_PRJ").where().eq("ID", stringObjectMap.get("ID")).update().set("PM_CODE", code).exec();
         }
 
