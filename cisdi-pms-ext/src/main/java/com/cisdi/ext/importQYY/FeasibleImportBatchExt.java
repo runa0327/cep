@@ -16,6 +16,7 @@ import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
  * @author dlt
  * @date 2023/2/28 周二
  */
+@Slf4j
 public class FeasibleImportBatchExt {
 
     /**
@@ -332,6 +334,7 @@ public class FeasibleImportBatchExt {
                     .set("REPLY_FILE",newImport.getReplyFile()) // 批复文件
                     .exec();
         } catch (Exception e){
+            log.error("错误数据：{}",newImport);
             error = "写入可研报告表异常;";
         }
         return error;
