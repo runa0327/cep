@@ -295,13 +295,13 @@ public class FeasibleImportBatchExt {
     }
 
     /**
-     * 写入初设概算流程表
-     * @param newImport 初设概算实体信息
+     * 写入可研估算流程表
+     * @param newImport 可研报告实体信息
      * @param pmPrj 项目基础信息
      * @return 错误信息
      */
     private String insertInvest1(FeasibleImport newImport, PmPrj pmPrj) {
-        String id = Crud.from("PM_PRJ_INVEST2").insertData();
+        String id = Crud.from("PM_PRJ_INVEST1").insertData();
         Date date = new Date();
         String error = "";
         try {
@@ -332,7 +332,7 @@ public class FeasibleImportBatchExt {
                     .set("REPLY_FILE",newImport.getReplyFile()) // 批复文件
                     .exec();
         } catch (Exception e){
-            error = "写入初设概算流程表异常;";
+            error = "写入可研报告表异常;";
         }
         return error;
     }
