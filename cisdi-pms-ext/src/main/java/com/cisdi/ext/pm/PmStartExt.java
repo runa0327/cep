@@ -2,6 +2,7 @@ package com.cisdi.ext.pm;
 
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.ParcelUtil;
+import com.cisdi.ext.util.PmPrjCodeUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -183,8 +184,7 @@ public class PmStartExt {
         String prjCode = input.code;
         if (Strings.isNullOrEmpty(input.id)) {
             id = Crud.from("PRJ_START").insertData();
-//            prjCode = getPrjCode(input.unit, input.sourceTypeId, input.typeId);
-            prjCode = getPrjCode();
+            prjCode = PmPrjCodeUtil.getPrjCode();
         }
 
         Crud.from("PRJ_START").where().eq("ID", id).update()
@@ -337,127 +337,13 @@ public class PmStartExt {
     }
 
     /**
-     * 获取项目编码
-     *
-     * @return
-     */
-    private String getPrjCode(String unitId, String sourceId, String typeId) {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String unit = "";
-        List<Map<String, Object>> unitList = myJdbcTemplate.queryForList("select * from  PM_PARTY where id=? ", unitId);
-        if (!CollectionUtils.isEmpty(unitList)) {
-            unit = String.valueOf(unitList.get(0).get("NAME"));
-        }
-        String source = "";
-        List<Map<String, Object>> sourceList = myJdbcTemplate.queryForList("select * from gr_set_value where id=? ", sourceId);
-        if (!CollectionUtils.isEmpty(sourceList)) {
-            source = String.valueOf(sourceList.get(0).get("NAME"));
-        }
-        String type = "";
-        List<Map<String, Object>> typeList = myJdbcTemplate.queryForList("select * from gr_set_value where id=? ", typeId);
-        if (!CollectionUtils.isEmpty(typeList)) {
-            type = String.valueOf(typeList.get(0).get("NAME"));
-        }
-
-        List<String> unitPrefixData = Arrays.asList(unitPrefixStr.split(","));
-        List<String> sourcePrefixData = Arrays.asList(sourcePrefixStr.split(","));
-        List<String> typePrefixData = Arrays.asList(typePrefixStr.split(","));
-
-        String unitPrefix = "";
-        if (!Strings.isNullOrEmpty(unit)) {
-            for (String s : unitPrefixData) {
-                if (s.contains(unit)) {
-                    unitPrefix = s.split("-")[1];
-                }
-            }
-        }
-
-        String sourcePrefix = "";
-        if (!Strings.isNullOrEmpty(source)) {
-            for (String s : sourcePrefixData) {
-                if (s.contains(source)) {
-                    sourcePrefix = s.split("-")[1];
-                }
-            }
-        }
-
-        String typePrefix = "";
-        if (!Strings.isNullOrEmpty(type)) {
-            for (String s : typePrefixData) {
-                if (s.contains(type)) {
-                    typePrefix = s.split("-")[1];
-                }
-            }
-        }
-
-        SimpleDateFormat sd = new SimpleDateFormat("yyMMdd");
-        String dataPrefix = sd.format(new Date());
-
-
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(PM_CODE,0) as PM_CODE from pm_prj  order by right(pm_code,4) desc limit 0,1");
-        Map<String, Object> data = list.get(0);
-        String flowNo = "0001";
-        String code = String.valueOf(data.get("PM_CODE"));
-        if (!"0".equals(code)) {
-            String str = code.substring(code.length() - 4);
-            int count = Integer.parseInt(str) + 1;
-            flowNo = StringUtil.addZeroForNum(String.valueOf(count), 4);
-
-        }
-        StringBuffer sb = new StringBuffer();
-        if (!Strings.isNullOrEmpty(unitPrefix)) {
-            sb.append(unitPrefix).append("-");
-        }
-        if (!Strings.isNullOrEmpty(sourcePrefix)) {
-            sb.append(sourcePrefix).append("-");
-        }
-        if (!Strings.isNullOrEmpty(typePrefix)) {
-            sb.append(typePrefix).append("-");
-        }
-        sb.append(dataPrefix).append(flowNo);
-//        sb.append(unitPrefix).append("-").append(sourcePrefix).append("-").append(typePrefix).append("-").append(dataPrefix).append(flowNo);
-        return sb.toString().trim();
-    }
-
-
-    /**
-     * 获取项目编码
-     *
-     * @return
-     */
-    private String getPrjCode() {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(PM_CODE,0) as PM_CODE from pm_prj  order by right(pm_code,4) desc limit 0,1");
-        Map<String, Object> data = list.get(0);
-        String flowNo = "0001";
-        String code = String.valueOf(data.get("PM_CODE"));
-        if (!"0".equals(code)) {
-            String str = code.substring(code.length() - 4);
-            int count = Integer.parseInt(str) + 1;
-            flowNo = StringUtil.addZeroForNum(String.valueOf(count), 4);
-
-        }
-        StringBuilder sb = new StringBuilder();
-
-        SimpleDateFormat sd = new SimpleDateFormat("yyMMdd");
-        String dataPrefix = sd.format(new Date());
-
-        sb.append("GCXT-").append(dataPrefix).append(flowNo);
-        return sb.toString().trim();
-    }
-
-
-    /**
      * 初始化项目编码
      */
     public void initPmCode() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRJ where status='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' order by CRT_DT desc ");
         for (Map<String, Object> stringObjectMap : list) {
-//            String code = getPrjCode(stringObjectMap.get("CUSTOMER_UNIT") == null ? "" : String.valueOf(stringObjectMap.get("CUSTOMER_UNIT")),
-//                    stringObjectMap.get("INVESTMENT_SOURCE_ID") == null ? "" : String.valueOf(stringObjectMap.get("INVESTMENT_SOURCE_ID")),
-//                    stringObjectMap.get("PROJECT_TYPE_ID") == null ? "" : String.valueOf(stringObjectMap.get("PROJECT_TYPE_ID")));
-            String code = getPrjCode();
+            String code = PmPrjCodeUtil.getPrjCode();
             Crud.from("PM_PRJ").where().eq("ID", stringObjectMap.get("ID")).update().set("PM_CODE", code).exec();
         }
 
