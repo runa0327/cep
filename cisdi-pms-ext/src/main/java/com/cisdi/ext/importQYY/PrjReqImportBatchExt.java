@@ -474,7 +474,7 @@ public class PrjReqImportBatchExt {
         String error = "";
         try {
             Crud.from("pm_prj_req").where().eq("id",id).update()
-                    .set("PRJ_CODE",newImport.getPmPrjId()) //项目
+                    .set("PRJ_CODE",newImport.getPrjCode()) //项目
                     .set("CUSTOMER_UNIT",newImport.getCustomerUnit()) //业主单位
                     .set("PRJ_MANAGE_MODE_ID",newImport.getPrjManageModeId()) //项目管理模式
                     .set("BASE_LOCATION_ID",newImport.getBaseLocationId()) //建设地点
@@ -486,6 +486,7 @@ public class PrjReqImportBatchExt {
                     .set("CON_SCALE_QTY",newImport.getRoadLength()) //道路长度
                     .set("CON_SCALE_QTY2",newImport.getRoadWidth()) //道路宽度
                     .set("QTY_TWO",newImport.getOther()) //其他
+                    .set("OTHER",newImport.getOther()) //其他
                     .set("INVESTMENT_SOURCE_ID",newImport.getInvestmentSourceId()) //投资来源
                     .set("PRJ_TOTAL_INVEST",newImport.getEstimatedTotalInvest()) //总投资
                     .set("CONSTRUCT_AMT",newImport.getConstructPrjAmt()) //建安工程费

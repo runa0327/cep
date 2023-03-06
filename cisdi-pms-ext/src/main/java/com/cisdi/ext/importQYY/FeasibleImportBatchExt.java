@@ -352,7 +352,6 @@ public class FeasibleImportBatchExt {
                     .set("REPLY_FILE",newImport.getReplyFile()) // 批复文件
                     .exec();
         } catch (Exception e){
-            log.error("错误数据：{}",newImport);
             error = "写入可研报告表异常;";
         }
         return error;
