@@ -329,7 +329,6 @@ public class FeasibleImportBatchExt {
                     .set("QTY_THREE",pmPrj.getQtyThree())
                     .set("CON_SCALE_QTY2",pmPrj.getConScaleQty2())
                     .set("CON_SCALE_UOM_ID",pmPrj.getConScaleUomId())
-                    .set("BUILD_YEARS",pmPrj.getBuildYears())
                     .set("PRJ_SITUATION",pmPrj.getPrjSituation())
                     .set("PRJ_TOTAL_INVEST",newImport.getPrjTotalInvest())
                     .set("PROJECT_AMT",newImport.getProjectAmt())
