@@ -93,22 +93,22 @@ public class WfExt {
                 if ("AP".equals(newStatus)) {
                     Format formatCount = new DecimalFormat("0000");
 
-                    // 立项申请生成项目编号
-                    if ("PM_PRJ_REQ".equals(entityCode)) {
-                        Object prj_code = myJdbcTemplate.queryForMap("select t.PRJ_CODE from PM_PRJ_REQ t where t.id=?", csCommId).get("PRJ_CODE");
-
-                        // 若无项目编号：
-                        if (SharedUtil.isEmptyObject(prj_code)) {
-                            // 获取新的项目编号：
-                            Object new_prj_code = myJdbcTemplate.queryForMap("select concat('XM','-',lpad((select count(*) from pm_prj_req t),4,0)," +
-                                    "'-',replace(current_date,'-','')) prj_code").get("prj_code");
-
-                            // 设置项目编号、代码：
-                            int update1 = myJdbcTemplate.update("update PM_PRJ_REQ t set t.prj_code=?,t.code=? where t.id=?", new_prj_code,
-                                    new_prj_code, csCommId);
-                            log.info("已更新：{}", update1);
-                        }
-                    }
+                    // 立项申请生成项目编号 2023-03-06弃用
+//                    if ("PM_PRJ_REQ".equals(entityCode)) {
+//                        Object prj_code = myJdbcTemplate.queryForMap("select t.PRJ_CODE from PM_PRJ_REQ t where t.id=?", csCommId).get("PRJ_CODE");
+//
+//                        // 若无项目编号：
+//                        if (SharedUtil.isEmptyObject(prj_code)) {
+//                            // 获取新的项目编号：
+//                            Object new_prj_code = myJdbcTemplate.queryForMap("select concat('XM','-',lpad((select count(*) from pm_prj_req t),4,0)," +
+//                                    "'-',replace(current_date,'-','')) prj_code").get("prj_code");
+//
+//                            // 设置项目编号、代码：
+//                            int update1 = myJdbcTemplate.update("update PM_PRJ_REQ t set t.prj_code=?,t.code=? where t.id=?", new_prj_code,
+//                                    new_prj_code, csCommId);
+//                            log.info("已更新：{}", update1);
+//                        }
+//                    }
 
                     // 合同签订批准后生成合同编号
                     if ("PO_ORDER_REQ".equals(entityCode) || "po_order_req".equals(entityCode)) {

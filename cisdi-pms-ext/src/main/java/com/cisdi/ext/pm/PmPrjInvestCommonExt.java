@@ -78,5 +78,13 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("AD_USER_EIGHTH_ID"); // 法务岗用户
         entityRecord.extraEditableAttCodeList.add("AD_USER_NINTH_ID"); // 财务岗用户
         entityRecord.extraEditableAttCodeList.add("PRJ_REPLY_NO"); // 项目文号
+        entityRecord.extraEditableAttCodeList.add("QTY_ONE"); // 建筑面积
+        entityRecord.extraEditableAttCodeList.add("FLOOR_AREA"); // 占地面积
+        entityRecord.extraEditableAttCodeList.add("CON_SCALE_QTY"); // 道路长度
+        entityRecord.extraEditableAttCodeList.add("CON_SCALE_QTY2"); // 道路宽度
+        entityRecord.extraEditableAttCodeList.add("OTHER"); // 其他
+        entityRecord.extraEditableAttCodeList.add("PROJECT_TYPE_ID"); // 项目类型
+        entityRecord.extraEditableAttCodeList.add("CON_SCALE_TYPE_ID"); // 建设规模类型
+        entityRecord.extraEditableAttCodeList.add("CON_SCALE_UOM_ID"); // 建设规模单位
     }
 }
