@@ -18,6 +18,29 @@ import java.util.Map;
 public class PmInLibraryExt {
 
     /**
+     * 根据名称创建或修改合作方
+     * @param partyName 合作方名称
+     * @param partyType 合作类型
+     * @param myJdbcTemplate 数据源
+     */
+    public static void updateOrCreateParty(String partyName, String partyType, MyJdbcTemplate myJdbcTemplate) {
+        //查询对应合作类型是否存在
+        String sql = "select id,name,"+partyType+" from PM_PARTY where name = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,partyName);
+        String id = "";
+        if (CollectionUtils.isEmpty(list)){
+            id = Crud.from("PM_PARTY").insertData();
+        } else {
+            id = JdbcMapUtil.getString(list.get(0),"id");
+        }
+        Crud.from("PM_PARTY").where().eq("id",id).update()
+                .set("name",partyName)
+                .set(partyType,"1")
+                .exec();
+    }
+
+
+    /**
      * 评审组织单位-入库
      */
     public void reviewInLibrary(){

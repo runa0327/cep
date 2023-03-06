@@ -475,6 +475,7 @@ public class PrjReqImportBatchExt {
         try {
             Crud.from("pm_prj_req").where().eq("id",id).update()
                     .set("PRJ_CODE",newImport.getPrjCode()) //项目
+                    .set("STATUS","AP") //状态
                     .set("CUSTOMER_UNIT",newImport.getCustomerUnit()) //业主单位
                     .set("PRJ_MANAGE_MODE_ID",newImport.getPrjManageModeId()) //项目管理模式
                     .set("BASE_LOCATION_ID",newImport.getBaseLocationId()) //建设地点
