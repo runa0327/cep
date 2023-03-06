@@ -485,7 +485,7 @@ public class PrjReqImportBatchExt {
                     .set("QTY_ONE",newImport.getBuildingArea()) //建筑面积
                     .set("CON_SCALE_QTY",newImport.getRoadLength()) //道路长度
                     .set("CON_SCALE_QTY2",newImport.getRoadWidth()) //道路宽度
-                    .set("QTY_TWO",newImport.getOther()) //其他
+//                    .set("QTY_TWO",newImport.getOther()) //其他
                     .set("OTHER",newImport.getOther()) //其他
                     .set("INVESTMENT_SOURCE_ID",newImport.getInvestmentSourceId()) //投资来源
                     .set("PRJ_TOTAL_INVEST",newImport.getEstimatedTotalInvest()) //总投资
@@ -505,6 +505,7 @@ public class PrjReqImportBatchExt {
                     .set("IS_OMPORT","0099799190825080669") //是导入
                     .exec();
         } catch (Exception e){
+            System.out.println("错误信息："+newImport);
             error = "写入流程表异常;";
         }
         return error;
