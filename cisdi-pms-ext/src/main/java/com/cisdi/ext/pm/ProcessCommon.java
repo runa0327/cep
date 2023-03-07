@@ -62,6 +62,29 @@ public class ProcessCommon {
     }
 
     /**
+     * 获取流程当前审批人审批操作时评价信息
+     * @param nodeInstanceId 节点实例id
+     * @param userId 操作人id
+     * @param myJdbcTemplate 数据源
+     * @param procInstId 流程实例id
+     * @param userName 操作人名称
+     * @return
+     */
+    public static Map<String, String> getCommentNew(String nodeInstanceId, String userId, MyJdbcTemplate myJdbcTemplate, String procInstId, String userName) {
+        Map<String,String> map = new HashMap<>();
+        String sql = "select a.USER_COMMENT,a.USER_ATTACHMENT from wf_task a " +
+                "left join wf_node_instance b on a.WF_NODE_INSTANCE_ID = b.id and b.status = 'ap' " +
+                "where b.id = ? and a.AD_USER_ID = ? and a.status = 'ap' and a.IS_CLOSED = 1 and a.WF_PROCESS_INSTANCE_ID = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,nodeInstanceId,userId,procInstId);
+        if (!CollectionUtils.isEmpty(list)){
+            String value = SharedUtil.isEmptyString(JdbcMapUtil.getString(list.get(0),"USER_COMMENT")) ? "同意" : JdbcMapUtil.getString(list.get(0),"USER_COMMENT");
+            map.put("comment",userName + "：" + value);
+            map.put("file",JdbcMapUtil.getString(list.get(0),"USER_ATTACHMENT"));
+        }
+        return map;
+    }
+
+    /**
      * 判断去重，避免同一个人重复提交相同文件
      * @param userId 当前操作人id
      * @param userName 当前操作人名称
@@ -152,7 +175,7 @@ public class ProcessCommon {
      * @param myJdbcTemplate 数据源
      * @return 历史文件id
      */
-    private static String getHistoryFile(String userId, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
+    public static String getHistoryFile(String userId, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
         String file = "";
         String sql1 = "select GROUP_CONCAT(DISTINCT USER_ATTACHMENT) as USER_ATTACHMENT from wf_task where AD_USER_ID = ? and WF_NODE_INSTANCE_ID = ? and USER_ATTACHMENT is not null";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId,nodeInstanceId);
@@ -169,7 +192,7 @@ public class ProcessCommon {
      * @param comment 本次操作意见内容
      * @return 最新意见内容
      */
-    private static String getNewCommentStr(String userName, String processComment, String comment) {
+    public static String getNewCommentStr(String userName, String processComment, String comment) {
         String newComment = "";
         String newUserComment = userName+":"+comment;
         if (SharedUtil.isEmptyString(processComment)){
@@ -222,4 +245,18 @@ public class ProcessCommon {
         }
         return msg;
     }
+
+    /**
+     * 根据节点实例id查询节点id
+     * @param nodeInstanceId 节点实例id
+     * @param myJdbcTemplate 数据源
+     * @return 节点id
+     */
+    public static String getNodeIdByNodeInstanceId(String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select WF_NODE_ID from wf_node_instance where id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,nodeInstanceId);
+        String nodeId = JdbcMapUtil.getString(list.get(0),"WF_NODE_ID");
+        return nodeId;
+    }
+
 }

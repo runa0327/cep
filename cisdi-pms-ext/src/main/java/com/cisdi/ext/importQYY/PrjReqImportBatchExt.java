@@ -276,6 +276,8 @@ public class PrjReqImportBatchExt {
         PrjReqImport oldImport = doGetDtl(pmPrj);
 
         // 若字段的值已不同，则予以处理：
+        String projectName = pmPrj.getName();
+        newImport.setName(projectName);
 
         // 示例，处理某个字段：
         try {
@@ -474,6 +476,7 @@ public class PrjReqImportBatchExt {
         String error = "";
         try {
             Crud.from("pm_prj_req").where().eq("id",id).update()
+                    .set("PRJ_NAME",newImport.getName()) //项目
                     .set("PRJ_CODE",newImport.getPrjCode()) //项目
                     .set("STATUS","AP") //状态
                     .set("CUSTOMER_UNIT",newImport.getCustomerUnit()) //业主单位

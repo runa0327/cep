@@ -1,6 +1,7 @@
 package com.cisdi.ext.base;
 
 import com.cisdi.ext.pm.PmPrjReqExt;
+import com.cisdi.ext.util.WfPmInvestUtil;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
@@ -69,9 +70,10 @@ public class PmPrj {
      * @param entityRecord 实体信息
      * @param entityCode 信息来源名称
      * @param level 本次数据来源级别
+     * @param code 数据来源表名
      * @param myJdbcTemplate 数据源
      */
-    public static void updatePrjBaseData(EntityRecord entityRecord, String entityCode, int level, MyJdbcTemplate myJdbcTemplate) {
+    public static void updatePrjBaseData(EntityRecord entityRecord, String entityCode, int level, MyJdbcTemplate myJdbcTemplate,String code) {
         //项目id
         String projectId = getProjectIdByProcess(entityRecord.valueMap,myJdbcTemplate);
         if (projectId.contains(",")){
@@ -83,6 +85,7 @@ public class PmPrj {
             //更新项目基础信息
             updateBaseData(projectId,entityRecord.valueMap);
             //更新项目资金信息
+            WfPmInvestUtil.updatePrjInvest(entityRecord,code);
         }
     }
 
@@ -120,5 +123,43 @@ public class PmPrj {
             level = Integer.valueOf(JdbcMapUtil.getString(list.get(0),"code"));
         }
         return level;
+    }
+
+    /**
+     * 获取项目中成本、设计、前期岗人员信息
+     * @param projectId 项目id
+     * @param myJdbcTemplate 数据源
+     * @return 人员对应的map组
+     */
+    public static Map<String, String> getProjectDeptUser(String projectId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select PRJ_EARLY_USER_ID,PRJ_DESIGN_USER_ID,PRJ_COST_USER_ID from pm_prj where id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId);
+        Map<String,String> map = new HashMap<>();
+        if (!CollectionUtils.isEmpty(list)){
+            String early = JdbcMapUtil.getString(list.get(0),"PRJ_EARLY_USER_ID"); //前期部
+            String design = JdbcMapUtil.getString(list.get(0),"PRJ_DESIGN_USER_ID"); //设计部
+            String cost = JdbcMapUtil.getString(list.get(0),"PRJ_COST_USER_ID"); //成本部
+            map.put("early",early);
+            map.put("design",design);
+            map.put("cost",cost);
+        }
+        return map;
+    }
+
+    /**
+     * 获取人员在项目中对应的岗位信息
+     * @param userId 当前用户id
+     * @param map 人员岗位map组
+     * @return 人员岗位信息
+     */
+    public static String getUserDept(String userId, Map<String, String> map) {
+        String dept = "";
+        for (String key : map.keySet()){
+            String value = map.get(key);
+            if (value.equals(userId)){
+                dept = key;
+            }
+        }
+        return dept.toUpperCase(Locale.ROOT);
     }
 }
