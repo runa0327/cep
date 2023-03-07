@@ -104,14 +104,26 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         //查询pdf文件
         String oldFileId = jdbcTemplate.queryForList("seleCT ATT_FILE_GROUP_ID from po_order_req where id = ?",poOrderId).get(0).get("ATT_FILE_GROUP_ID").toString();
         oldFileId = StringUtils.replaceCode(oldFileId,",","','");
-        String sql1 = "select group_concat(id) as id from fl_file where id in ('"+oldFileId+"') and EXT = 'PDF'";
+        String sql1 = "select id as id from fl_file where id in ('"+oldFileId+"') and EXT = 'PDF'";
         List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
         if (!CollectionUtils.isEmpty(list1)){
-            String fileId = list1.get(0).get("id").toString();
-            List<String> orderFileIds = new ArrayList<>(Arrays.asList(newFileIds.split(",")));
-            List<String> pdfFileIds = new ArrayList<>(Arrays.asList(fileId.split(",")));
-            orderFileIds.removeAll(pdfFileIds);
-            newFileIds = String.join(",",orderFileIds);
+            StringBuilder sb = new StringBuilder();
+            for (Map<String, Object> tmp : list1) {
+                String value = tmp.get("id").toString();
+                if (value.length() > 0 && value != null){
+                    sb.append(value).append(",");
+                }
+            }
+            String fileId = sb.deleteCharAt(sb.length()-1).toString();
+            if (fileId.length() > 0 && fileId != null){
+                List<String> orderFileIds = new ArrayList<>(Arrays.asList(newFileIds.split(",")));
+                List<String> pdfFileIds = new ArrayList<>(Arrays.asList(fileId.split(",")));
+                orderFileIds.removeAll(pdfFileIds);
+                newFileIds = String.join(",",orderFileIds);
+            } else {
+                newFileIds = newFileIds + "," + newFileId;
+            }
+//            String fileId = list1.get(0).get("id").toString();
         }
         newFileIds = newFileIds + "," + newFileId;
         String sql2 = "update po_order_req set "+attCode+" = ? where id = ?";
