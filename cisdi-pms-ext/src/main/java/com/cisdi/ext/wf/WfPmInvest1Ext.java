@@ -65,6 +65,7 @@ public class WfPmInvest1Ext {
     }
     /**
      * 插入或更新投资估算。
+     * 更新pm_prj中的资金记录
      */
     public void insertOrUpdateInvestEst() {
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
@@ -72,6 +73,8 @@ public class WfPmInvest1Ext {
         String csCommId = entityRecord.csCommId;
         String pmPrjId = String.valueOf(entityRecord.valueMap.get("PM_PRJ_ID"));
         WfPmInvestUtil.calculateData(csCommId, entCode, pmPrjId);
+        //更新pm_prj资金信息
+        WfPmInvestUtil.updatePrjInvest(entityRecord,entCode);
     }
 
 }

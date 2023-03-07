@@ -1,9 +1,12 @@
 package com.cisdi.ext.util;
 
+import com.cisdi.ext.base.PmPrj;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
@@ -141,6 +144,64 @@ public class WfPmInvestUtil {
         return sum;
     }
 
+    /**
+     * 更新pm_prj的投资数据
+     */
+    public static void updatePrjInvest(EntityRecord entityRecord,String entCode){
+        MyJdbcTemplate jdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> valueMap = entityRecord.valueMap;
+
+        //查询新投资优先级 这里查询的name，和表明entCode对应
+        List<Map<String, Object>> priorityList = jdbcTemplate.queryForList("select gv.id,gv.name,gv.code from gr_set_value gv left join gr_set se on se.id " +
+                "= gv.GR_SET_ID where se.code = 'invest_priority'");
+        Optional<Map<String,Object>> newPriorityOp = priorityList.stream()
+                .filter(priorityMap -> priorityMap.get("name").toString().equals(entCode))
+//                .map(priorityMap -> priorityMap.get("code").toString())
+                .findAny();
+        if (!newPriorityOp.isPresent()){
+            throw new BaseException("entCode没有在字典‘投资测算优先级’中");
+        }
+        String newPriority = newPriorityOp.get().get("code").toString();
+        String newPriorityId = newPriorityOp.get().get("id").toString();
+
+
+        //获取pm_prj现有记录的优先级
+        String prjIds = PmPrj.getProjectIdByProcess(valueMap, jdbcTemplate);
+        List<Map<String, Object>> prjPriorityList = jdbcTemplate.queryForList("select pp.id prjId,gv.code priority from pm_prj pp left join gr_set_value gv on" +
+                " gv.id = pp.INVEST_PRIORITY");
+        String[] prjIdArray = prjIds.split(",");
+        for (String prjId : prjIdArray) {
+            List<String> oldPriorityList = prjPriorityList.stream()
+                    .filter(prjPriorityMap -> String.valueOf(prjPriorityMap.get("prjId")).equals(prjId))
+                    .map(prjPriorityMap -> {
+                        if (prjPriorityMap.get("priority") == null){
+                            return null;
+                        }
+                        return prjPriorityMap.get("priority").toString();
+                    })
+                    .collect(Collectors.toList());
+            if (CollectionUtils.isEmpty(oldPriorityList)){
+                throw new BaseException("没有找到项目id" + prjId);
+            }
+            String oldPriority = oldPriorityList.get(0);
+            if (Strings.isNullOrEmpty(oldPriority) || oldPriority.compareTo(newPriority) < 0){
+                //更新pm_prj金额数据
+                Crud.from("pm_prj").where().eq("ID",prjId).update()
+                        .set("ESTIMATED_TOTAL_INVEST",valueMap.get("PRJ_TOTAL_INVEST"))
+                        .set("PROJECT_AMT",valueMap.get("PROJECT_AMT"))
+                        .set("CONSTRUCT_PRJ_AMT",valueMap.get("CONSTRUCT_AMT"))
+                        .set("EQUIP_BUY_AMT",valueMap.get("EQUIP_AMT"))
+                        .set("EQUIPMENT_COST",valueMap.get("EQUIPMENT_COST"))
+                        .set("PROJECT_OTHER_AMT",valueMap.get("PROJECT_OTHER_AMT"))
+                        .set("LAND_BUY_AMT",valueMap.get("LAND_AMT"))
+                        .set("PREPARE_AMT",valueMap.get("PREPARE_AMT"))
+                        .set("INVEST_PRIORITY",newPriorityId)
+                        .exec();
+            }
+        }
+
+    }
+
     public static class pmInvestEstDtl {
         public String id;
         public String pid;
@@ -149,5 +210,15 @@ public class WfPmInvestUtil {
         public String expTypeId;
         public String code;
         public String seq;
+    }
+
+    public static void main(String[] args) {
+//        String s = String.valueOf(null);
+//        System.out.println(s);
+//        System.out.println(Strings.isNullOrEmpty(null));
+//        System.out.println("1".compareTo("null"));
+        ArrayList<String> strings = new ArrayList<>();
+//        strings.add(null);
+        System.out.println(CollectionUtils.isEmpty(strings));
     }
 }

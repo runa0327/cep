@@ -58,5 +58,7 @@ public class WfPmInvest3Ext {
         String csCommId = entityRecord.csCommId;
         String pmPrjId = String.valueOf(entityRecord.valueMap.get("PM_PRJ_ID"));
         WfPmInvestUtil.calculateData(csCommId, entCode, pmPrjId);
+        //更新pm_prj资金信息
+        WfPmInvestUtil.updatePrjInvest(entityRecord,entCode);
     }
 }
