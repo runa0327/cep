@@ -371,7 +371,7 @@ public class PmBuyDemandReqExt {
             }
             for (String tmp : prjNameList) {
                 String sql1 = "select * from pm_prj where name = ? and status = 'ap'";
-                List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,tmp,projectType);
+                List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,tmp);
                 if (CollectionUtils.isEmpty(list1)){
                     String prjId = Crud.from("pm_prj").insertData();
                     myJdbcTemplate.update("update pm_prj set CRT_USER_ID = ?,STATUS = ?,NAME = ?,PROJECT_SOURCE_TYPE_ID = ? where id = ?",userId,"AP",tmp,projectType,prjId);
