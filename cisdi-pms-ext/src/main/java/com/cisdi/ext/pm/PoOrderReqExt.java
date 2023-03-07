@@ -444,7 +444,7 @@ public class PoOrderReqExt {
         //是否标准模板 0099799190825080669 = 是，0099799190825080670=否
         String isModel = JdbcMapUtil.getString(entityRecord.valueMap,"YES_NO_THREE");
 
-        if (("0099799190825080670".equals(isModel) && "start".equals(status)) || ("0099799190825080669".equals(isModel) && "secondStart".equals(status))){
+        if (("0099799190825080669".equals(isModel) && "start".equals(status)) || ("0099799190825080670".equals(isModel) && "secondStart".equals(status))){
             //查询接口地址
             String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
             List<Map<String,Object>> listUrl = myJdbcTemplate.queryForList(httpSql);
