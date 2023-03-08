@@ -202,7 +202,7 @@ public class PmStartExt {
             projectId = String.valueOf(list.get(0).get("ID"));
         }
         Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", input.name).set("PM_CODE", prjCode)
-                .set("PROJECT_SOURCE_TYPE_ID", input.sourceTypeId).set("PROJECT_TYPE_ID", input.typeId).set("BUILDER_UNIT", input.unit)
+                .set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PROJECT_TYPE_ID", input.typeId).set("BUILDER_UNIT", input.unit)
                 .set("PRJ_SITUATION", input.description).exec();
 
         //先删除项目关联的地块
