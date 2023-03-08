@@ -663,12 +663,8 @@ public class PmPrjReqExt {
         String userId = JdbcMapUtil.getString(entityRecord.valueMap, "CRT_USER_ID");
         //发起部门
         String deptId = JdbcMapUtil.getString(entityRecord.valueMap, "CRT_DEPT_ID");
-        //流程明细
-        String projectName = JdbcMapUtil.getString(entityRecord.valueMap, "PRJ_NAME");
         //获取项目id
-        String projectId = PmPrj.getProjectId(projectName, "0099952822476441374", myJdbcTemplate);
-        //写入项目部门人员表
-        PmDeptExt.createPrjUserOne(userId, userId, projectId, deptId, myJdbcTemplate);
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
     }
 }
 
