@@ -1,6 +1,6 @@
 package com.cisdi.ext.pm;
 
-import com.cisdi.ext.base.PmPrj;
+import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.util.WfPmInvestUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -57,7 +57,7 @@ public class PmPrjInvest1Ext {
         //项目id
         String pmPrjId = String.valueOf(entityRecord.valueMap.get("PM_PRJ_ID"));
         //更新项目信息(基础信息、资金信息)
-        PmPrj.updatePrjBaseData(entityRecord,"PM_PRJ_INVEST1",2,myJdbcTemplate,entCode);
+        PmPrjExt.updatePrjBaseData(entityRecord,"PM_PRJ_INVEST1",2,myJdbcTemplate,entCode);
         //创建项目投资测算汇总可研数据
         WfPmInvestUtil.calculateData(csCommId, entCode, pmPrjId);
         //评审组织单位入库
@@ -124,8 +124,8 @@ public class PmPrjInvest1Ext {
             // 判断当前人岗位信息
             //项目id
             String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
-            Map<String,String> map = PmPrj.getProjectDeptUser(projectId,myJdbcTemplate);
-            String dept = PmPrj.getUserDept(userId,map);
+            Map<String,String> map = PmPrjExt.getProjectDeptUser(projectId,myJdbcTemplate);
+            String dept = PmPrjExt.getUserDept(userId,map);
             String processComment = "", commentEnd = "";
             if ("PRJ_COST_USER_ID".equals(dept)){ //成本岗
                 //获取流程中的意见信息

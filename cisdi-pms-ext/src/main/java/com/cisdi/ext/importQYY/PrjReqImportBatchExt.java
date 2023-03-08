@@ -438,7 +438,7 @@ public class PrjReqImportBatchExt {
 
         // TODO 其他字段的处理逻辑。
         //信息写入立项申请流程表
-        String error1 = insertPjrReq(newImport);
+        String error1 = insertPjrReq(newImport,myJdbcTemplate);
         if (!SharedUtil.isEmptyString(error1)){
             errInfoList.add(error1);
         }
@@ -468,14 +468,22 @@ public class PrjReqImportBatchExt {
     /**
      * 立项申请流程表数据写入
      * @param newImport 需要写入的数据明细
+     * @param myJdbcTemplate 数据源信息
      * @return 写入时错误信息
      */
-    private String insertPjrReq(PrjReqImport newImport) {
-        String id = Crud.from("pm_prj_req").insertData();
-        Date date = new Date();
+    private String insertPjrReq(PrjReqImport newImport, MyJdbcTemplate myJdbcTemplate) {
+        String projectId = newImport.getPmPrjId();
+        String id = "";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select id from pm_prj_req where pm_prj_id = ? AND STATUS NOT IN ('VD','VDING')",projectId);
+        if (CollectionUtils.isEmpty(list)){
+            id = Crud.from("pm_prj_req").insertData();
+        } else {
+            id = JdbcMapUtil.getString(list.get(0),"id");
+        }
         String error = "";
         try {
             Crud.from("pm_prj_req").where().eq("id",id).update()
+                    .set("PM_PRJ_ID",projectId) //项目
                     .set("PRJ_NAME",newImport.getName()) //项目
                     .set("PRJ_CODE",newImport.getPrjCode()) //项目
                     .set("STATUS","AP") //状态
@@ -489,7 +497,6 @@ public class PrjReqImportBatchExt {
                     .set("QTY_ONE",newImport.getBuildingArea()) //建筑面积
                     .set("CON_SCALE_QTY",newImport.getRoadLength()) //道路长度
                     .set("CON_SCALE_QTY2",newImport.getRoadWidth()) //道路宽度
-//                    .set("QTY_TWO",newImport.getOther()) //其他
                     .set("OTHER",newImport.getOther()) //其他
                     .set("INVESTMENT_SOURCE_ID",newImport.getInvestmentSourceId()) //投资来源
                     .set("PRJ_TOTAL_INVEST",newImport.getEstimatedTotalInvest()) //总投资

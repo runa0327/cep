@@ -1,6 +1,7 @@
 package com.cisdi.ext.importQYY;
 
 import com.cisdi.ext.base.PmInvestEst;
+import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.importQYY.model.FeasibleImport;
 import com.cisdi.ext.importQYY.model.FeasibleImportBatch;
 import com.cisdi.ext.model.PmPrj;
@@ -269,13 +270,18 @@ public class FeasibleImportBatchExt {
         // TODO 其他字段的处理逻辑。
 
         //写入可研流程业务表
-        String error1 = insertInvest1(newImport,pmPrj);
+        String error1 = insertInvest1(newImport,pmPrj,myJdbcTemplate);
         if (!SharedUtil.isEmptyString(error1)){
             errInfoList.add(error1);
         }
 
+        //更新项目表信息项目基础信息
+        Map<String,Object> prjMap = getInvestMap(newImport);
+        PmPrjExt.updatePrjBase(pmPrjId,prjMap,"PM_PRJ_INVEST1",2,myJdbcTemplate);
+
         //写入投资测算明细主父表
         PmInvestEst.creatInvest1Data(pmPrjId,newImport,myJdbcTemplate);
+
 
         // 执行过程中，可能会自动抛出异常。
         // 若希望自行抛出异常，则throw：
@@ -297,13 +303,40 @@ public class FeasibleImportBatchExt {
     }
 
     /**
+     * 组装资金信息
+     * @param newImport 可研实体信息
+     * @return 资金信息map
+     */
+    private Map<String, Object> getInvestMap(FeasibleImport newImport) {
+        Map<String,Object> map = new HashMap<>();
+        map.put("PRJ_TOTAL_INVEST",newImport.getPrjTotalInvest()); //总投资
+        map.put("CONSTRUCT_AMT",newImport.getConstructAmt()); //建安费
+        map.put("EQUIP_AMT",newImport.getEquipAmt()); //设备采购费
+        map.put("SCIENTIFIC_EQUIPMENT_AMT",newImport.getEquipmentCost()); //科研设备费
+        map.put("PROJECT_AMT",newImport.getProjectAmt()); //工程其他费用
+        map.put("LAND_AMT",newImport.getLandAmt()); //土地征迁费
+        map.put("PREPARE_AMT",newImport.getPrepareAmt()); //预备费
+        map.put("PROJECT_AMT-OTHER",newImport.getProjectOtherAmt()); //工程费用-其他
+        map.put("CONSTRUCT_PERIOD_INTEREST",newImport.getConstructPeriodInterest()); //建设期利息
+        return map;
+    }
+
+    /**
      * 写入可研估算流程表
      * @param newImport 可研报告实体信息
      * @param pmPrj 项目基础信息
+     * @param myJdbcTemplate 数据源信息
      * @return 错误信息
      */
-    private String insertInvest1(FeasibleImport newImport, PmPrj pmPrj) {
-        String id = Crud.from("PM_PRJ_INVEST1").insertData();
+    private String insertInvest1(FeasibleImport newImport, PmPrj pmPrj, MyJdbcTemplate myJdbcTemplate) {
+        String projectId = newImport.getPmPrjId();
+        String id = "";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select id from PM_PRJ_INVEST1 where pm_prj_id = ? AND STATUS NOT IN ('VD','VDING')",projectId);
+        if (CollectionUtils.isEmpty(list)){
+            id = Crud.from("PM_PRJ_INVEST1").insertData();
+        } else {
+            id = JdbcMapUtil.getString(list.get(0),"id");
+        }
         Date date = new Date();
         String error = "";
         String other = pmPrj.getOther();

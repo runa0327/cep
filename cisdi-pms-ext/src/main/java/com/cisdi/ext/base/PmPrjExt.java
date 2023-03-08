@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * 项目表相关扩展
  */
-public class PmPrj {
+public class PmPrjExt {
 
     /**
      * 根据项目名称查询项目id
@@ -82,8 +82,10 @@ public class PmPrj {
         // 查询当前项目信息数据级别
         int oldLevel = getPrjDataLevel(projectId,myJdbcTemplate);
         if (level >= oldLevel){ //更新数据
+            //当前更新级别id
+            String levelId = GrSetValue.getValueId(String.valueOf(level),"invest_priority",myJdbcTemplate);
             //更新项目基础信息
-            updateBaseData(projectId,entityRecord.valueMap);
+            updateBaseData(projectId,entityRecord.valueMap,levelId);
             //更新项目资金信息
             WfPmInvestUtil.updatePrjInvest(entityRecord,code);
         }
@@ -93,8 +95,9 @@ public class PmPrj {
      * 更新项目基础信息
      * @param projectId 项目id
      * @param valueMap map值
+     * @param level 当前级别
      */
-    private static void updateBaseData(String projectId, Map<String, Object> valueMap) {
+    private static void updateBaseData(String projectId, Map<String, Object> valueMap, String level) {
         Crud.from("pm_prj").where().eq("id",projectId).update()
                 .set("FLOOR_AREA",JdbcMapUtil.getString(valueMap,"FLOOR_AREA")) //占地面积
                 .set("PROJECT_TYPE_ID",JdbcMapUtil.getString(valueMap,"PROJECT_TYPE_ID")) //项目类型
@@ -106,6 +109,7 @@ public class PmPrj {
                 .set("OTHER",JdbcMapUtil.getString(valueMap,"QTY_THREE")) // 其他
                 .set("CON_SCALE_UOM_ID",JdbcMapUtil.getString(valueMap,"CON_SCALE_UOM_ID")) // 建设规模单位
                 .set("PRJ_SITUATION",JdbcMapUtil.getString(valueMap,"PRJ_SITUATION")) // 项目概况
+                .set("level",level) // 来源级别
                 .exec();
     }
 
@@ -120,7 +124,10 @@ public class PmPrj {
         String sql = "select b.code from pm_prj a left join gr_set_value b on a.INVEST_PRIORITY = b.id where a.id = ?";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId);
         if (!CollectionUtils.isEmpty(list)){
-            level = Integer.valueOf(JdbcMapUtil.getString(list.get(0),"code"));
+            String code = JdbcMapUtil.getString(list.get(0),"code");
+            if (!SharedUtil.isEmptyString(code)){
+                level = Integer.valueOf(code);
+            }
         }
         return level;
     }
@@ -161,5 +168,43 @@ public class PmPrj {
             }
         }
         return dept.toUpperCase(Locale.ROOT);
+    }
+
+    /**
+     * 初概-可研-概算-导入信息更新项目基础信息
+     * @param investMap 信息map
+     * @param entityCode 数据来源名称
+     * @param level 更新级别
+     * @param myJdbcTemplate 数据源
+     */
+    public static void updatePrjBase(String pmPrjId,Map<String, Object> investMap, String entityCode, int level, MyJdbcTemplate myJdbcTemplate) {
+        //当前更新级别id
+        String levelId = GrSetValue.getValueId("invest_priority",String.valueOf(level),myJdbcTemplate);
+        // 查询当前项目信息数据级别
+        int oldLevel = getPrjDataLevel(pmPrjId,myJdbcTemplate);
+        if (level >= oldLevel) { //更新数据
+            //更新项目基础信息
+            updatePrjInvestByMap(pmPrjId,investMap,levelId);
+        }
+    }
+
+    /**
+     * 更新项目资金信息
+     * @param pmPrjId 项目id
+     * @param investMap 基础信息map
+     * @param levelId 优先级id
+     */
+    private static void updatePrjInvestByMap(String pmPrjId, Map<String, Object> investMap,String levelId) {
+        Crud.from("pm_prj").where().eq("id",pmPrjId).update()
+                .set("INVEST_PRIORITY",levelId)
+                .set("ESTIMATED_TOTAL_INVEST",investMap.get("PRJ_TOTAL_INVEST")) //总投资
+                .set("PROJECT_AMT",investMap.get("PROJECT_AMT-OTHER")) //工程费用
+                .set("CONSTRUCT_PRJ_AMT",investMap.get("CONSTRUCT_AMT")) //建安费
+                .set("EQUIP_BUY_AMT",investMap.get("EQUIP_AMT")) //设备费
+                .set("EQUIPMENT_COST",investMap.get("SCIENTIFIC_EQUIPMENT_AMT")) //科研费
+                .set("PROJECT_OTHER_AMT",investMap.get("PROJECT_AMT")) //工程其他费用
+                .set("LAND_BUY_AMT",investMap.get("LAND_AMT")) //土地征拆费
+                .set("PREPARE_AMT",investMap.get("PREPARE_AMT")) //预备费
+                .exec();
     }
 }

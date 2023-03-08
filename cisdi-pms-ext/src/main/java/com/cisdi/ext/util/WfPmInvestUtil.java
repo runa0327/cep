@@ -1,6 +1,6 @@
 package com.cisdi.ext.util;
 
-import com.cisdi.ext.base.PmPrj;
+import com.cisdi.ext.base.PmPrjExt;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -166,7 +166,7 @@ public class WfPmInvestUtil {
 
 
         //获取pm_prj现有记录的优先级
-        String prjIds = PmPrj.getProjectIdByProcess(valueMap, jdbcTemplate);
+        String prjIds = PmPrjExt.getProjectIdByProcess(valueMap, jdbcTemplate);
         List<Map<String, Object>> prjPriorityList = jdbcTemplate.queryForList("select pp.id prjId,gv.code priority from pm_prj pp left join gr_set_value gv on" +
                 " gv.id = pp.INVEST_PRIORITY");
         String[] prjIdArray = prjIds.split(",");

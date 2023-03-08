@@ -1,13 +1,12 @@
 package com.cisdi.ext.api;
 
-import com.cisdi.ext.base.PmPrj;
+import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.fundManage.FileCommon;
 import com.cisdi.ext.model.BasePageEntity;
 import com.cisdi.ext.model.view.CommonDrop;
 import com.cisdi.ext.model.view.base.PoPublicBidView;
 import com.cisdi.ext.model.view.file.BaseFileView;
 import com.cisdi.ext.model.view.file.File;
-import com.cisdi.ext.model.view.order.PoOrderView;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
@@ -48,7 +47,7 @@ public class PoPublicBidExtApi {
         //业务流程id
         String csId = entityRecord.csCommId;
         //项目id
-        String projectId = PmPrj.getProjectIdByProcess(valueMap,myJdbcTemplate);
+        String projectId = PmPrjExt.getProjectIdByProcess(valueMap,myJdbcTemplate);
         if (!SharedUtil.isEmptyString(projectId)){
             List<String> list = StringUtil.getStrToList(projectId,",");
             for (String prjId : list) {
@@ -71,7 +70,7 @@ public class PoPublicBidExtApi {
      */
     public static void createHistoryData(Map<String, Object> tmp, String viewId, MyJdbcTemplate myJdbcTemplate) {
         //项目id
-        String projectId = PmPrj.getProjectIdByProcess(tmp,myJdbcTemplate);
+        String projectId = PmPrjExt.getProjectIdByProcess(tmp,myJdbcTemplate);
         //业务流程id
         String csId = JdbcMapUtil.getString(tmp,"id");
         if (!SharedUtil.isEmptyString(projectId)){

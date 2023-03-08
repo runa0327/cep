@@ -37,6 +37,7 @@ public class PmInvestEstDtl {
         investMap2.put("LAND_AMT", "landAmt"); // 土地征迁费
         investMap2.put("PREPARE_AMT", "prepareAmt"); // 预备费
         investMap2.put("PROJECT_AMT-OTHER", "projectOtherAmt"); // 工程费用-其他
+        investMap2.put("CONSTRUCT_PERIOD_INTEREST", "constructPeriodInterest"); // 建设期利息
     }
 
     /**

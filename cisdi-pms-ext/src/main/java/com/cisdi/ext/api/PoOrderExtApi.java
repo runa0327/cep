@@ -6,7 +6,7 @@ import com.cisdi.ext.model.view.order.PoOrderContactsView;
 import com.cisdi.ext.model.view.order.PoOrderDtlProView;
 import com.cisdi.ext.model.view.order.PoOrderDtlView;
 import com.cisdi.ext.model.view.order.PoOrderView;
-import com.cisdi.ext.base.PmPrj;
+import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -40,7 +40,7 @@ public class PoOrderExtApi {
         //获取合作单位
         String cooperation = getCooperation(csId,myJdbcTemplate);
         //项目id
-        String projectId = PmPrj.getProjectIdByProcess(valueMap,myJdbcTemplate);
+        String projectId = PmPrjExt.getProjectIdByProcess(valueMap,myJdbcTemplate);
         //根据编码code查询数据来源id
         String sourceTypeId = GrSetValue.getValueId("order_data_source_type",sourceType,myJdbcTemplate);
         if (!SharedUtil.isEmptyString(projectId)){
@@ -71,7 +71,7 @@ public class PoOrderExtApi {
         //获取合作单位
         String cooperation = getCooperation(csId,myJdbcTemplate);
         //项目id
-        String projectId = PmPrj.getProjectIdByProcess(tmp,myJdbcTemplate);
+        String projectId = PmPrjExt.getProjectIdByProcess(tmp,myJdbcTemplate);
         if (!SharedUtil.isEmptyString(projectId)){
             List<String> list = StringUtil.getStrToList(projectId,",");
             for (String prjId : list) {
