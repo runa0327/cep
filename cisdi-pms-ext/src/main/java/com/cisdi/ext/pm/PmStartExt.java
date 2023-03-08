@@ -29,20 +29,6 @@ import java.util.stream.Collectors;
  */
 public class PmStartExt {
 
-
-    /**
-     * 业主单位
-     */
-    private static final String unitPrefixStr = "海南城发实业集团有限公司-CS,海南城发建设工程有限公司-CJ,三亚崖州湾科技城投资控股有限公司-TK,三亚崖州湾科技城开发建设有限公司-KF";
-    /**
-     * 资金来源类型
-     */
-    private static final String sourcePrefixStr = "政府投资-G,社会投资-S,政府+社会投资-P";
-    /**
-     * 项目类型
-     */
-    private static final String typePrefixStr = "民用建筑-FJ,市政道路-DL,港口航道-GH,园林景观-YL,轨道交通-GJ,工业建筑-GY,市政管道-GD,设备采购-SB,其他-QT";
-
     /**
      * 项目启动列表查询
      */
@@ -76,7 +62,7 @@ public class PmStartExt {
         if (!StringUtils.isEmpty(map.get("status"))) {
             sb.append(" and PRJ_START_STATUS_ID=").append(map.get("status"));
         }
-        sb.append(" order by CRT_DT desc");
+        sb.append(" order by ps.CRT_DT desc");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
@@ -120,7 +106,7 @@ public class PmStartExt {
                 " ps.ID AS ID," +
                 " ps.`NAME` AS `NAME`," +
                 " ps.PM_CODE as PM_CODE, " +
-                " ps.FUND_SOURCE_TYPE_ID as FUND_SOURCE_TYPE_ID, " +
+                " ps.INVESTMENT_SOURCE_ID as INVESTMENT_SOURCE_ID, " +
                 " gg.`NAME` as sourceTypeValue," +
                 " round(ifnull( PRJ_TOTAL_INVEST, 0 ),2) AS PRJ_TOTAL_INVEST," +
                 " ps.PROJECT_TYPE_ID as PROJECT_TYPE_ID," +
@@ -136,7 +122,7 @@ public class PmStartExt {
                 " pj.ID as projectId " +
                 "FROM " +
                 " PRJ_START ps " +
-                " left join gr_set_value gg on gg.id = ps.FUND_SOURCE_TYPE_ID " +
+                " left join gr_set_value gg on gg.id = ps.INVESTMENT_SOURCE_ID " +
                 " LEFT JOIN gr_set_value gsv ON gsv.id = ps.PROJECT_TYPE_ID " +
                 " LEFT JOIN pm_party pp ON ps.BUILDER_UNIT = pp.id " +
                 " LEFT JOIN gr_set_value ss ON ss.id = ps.PRJ_START_STATUS_ID " +
@@ -152,7 +138,7 @@ public class PmStartExt {
                 pmStart.id = JdbcMapUtil.getString(m, "ID");
                 pmStart.name = JdbcMapUtil.getString(m, "NAME");
                 pmStart.code = JdbcMapUtil.getString(m, "PM_CODE");
-                pmStart.sourceTypeId = JdbcMapUtil.getString(m, "FUND_SOURCE_TYPE_ID");
+                pmStart.sourceTypeId = JdbcMapUtil.getString(m, "INVESTMENT_SOURCE_ID");
                 pmStart.invest = JdbcMapUtil.getString(m, "PRJ_TOTAL_INVEST");
                 pmStart.type = JdbcMapUtil.getString(m, "PROJECT_TYPE_ID");
                 pmStart.unit = JdbcMapUtil.getString(m, "BUILDER_UNIT");
@@ -191,7 +177,7 @@ public class PmStartExt {
         Crud.from("PRJ_START").where().eq("ID", id).update()
                 .set("PM_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId)
                 .set("BUILDER_UNIT", input.unit).set("START_TIME", new Date()).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", "1626110930922467328")
-                .set("ATT_FILE_GROUP_ID", input.fileIds).set("FUND_SOURCE_TYPE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).exec();
+                .set("ATT_FILE_GROUP_ID", input.fileIds).set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).exec();
         String projectId = "";
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         // 新增项目---如果存在则修改项目

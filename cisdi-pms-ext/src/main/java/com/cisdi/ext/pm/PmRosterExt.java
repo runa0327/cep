@@ -242,7 +242,7 @@ public class PmRosterExt {
         queryParams.put("userId", projectPostUser.userId);
         myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID=null where PROJECT_POST= :postName and AD_USER_ID= :userId", queryParams);
 
-        if(!CollectionUtils.isEmpty(dataList)){
+        if (!CollectionUtils.isEmpty(dataList)) {
             queryParams.put("ids", dataList);
             myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID= :userId where PROJECT_POST= :postName and PM_PRJ_ID in (:ids) ", queryParams);
         }
@@ -281,6 +281,7 @@ public class PmRosterExt {
             UserInfo userInfo = new UserInfo();
             userInfo.id = JdbcMapUtil.getString(obj, "ID");
             userInfo.name = JdbcMapUtil.getString(obj, "NAME");
+            userInfo.ancestral = getAncestral(String.valueOf(map.get("projectId")));
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(userInfo), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
@@ -298,7 +299,7 @@ public class PmRosterExt {
 
         for (PostUser postUser : dataList) {
             myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID=null where PM_PRJ_ID=? and PROJECT_POST=?", editObj.projectId, postUser.postName);
-            if(!Strings.isNullOrEmpty(postUser.userId)){
+            if (!Strings.isNullOrEmpty(postUser.userId)) {
                 myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID =? where PROJECT_POST=? and PM_PRJ_ID=?", postUser.userId, postUser.postName, editObj.projectId);
             }
         }
@@ -369,14 +370,14 @@ public class PmRosterExt {
     /**
      * 查询项目岗位人员
      */
-    public void getPostUserByPrj(){
+    public void getPostUserByPrj() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_ROSTER where PM_PRJ_ID=?", map.get("projectId"));
-        List<PostUser> postUserList = list.stream().map(p->{
+        List<PostUser> postUserList = list.stream().map(p -> {
             PostUser user = new PostUser();
-            user.postName = JdbcMapUtil.getString(p,"PROJECT_POST");
-            user.userId = JdbcMapUtil.getString(p,"AD_USER_ID");
+            user.postName = JdbcMapUtil.getString(p, "PROJECT_POST");
+            user.userId = JdbcMapUtil.getString(p, "AD_USER_ID");
             return user;
         }).collect(Collectors.toList());
 
@@ -422,6 +423,16 @@ public class PmRosterExt {
         return res;
     }
 
+    public String getAncestral(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> deptList = myJdbcTemplate.queryForList("select * from hr_dept where name = (select pp.`NAME` from pm_prj pm left join pm_party pp on pm.CUSTOMER_UNIT = pp.id where pm.id=?)", projectId);
+        String res = "";
+        if (!CollectionUtils.isEmpty(deptList)) {
+            res = String.valueOf(deptList.get(0).get("ID"));
+        }
+        return res;
+    }
+
     public static class OutSide {
         public List<Map<String, Object>> dataList;
 
@@ -451,6 +462,8 @@ public class PmRosterExt {
         public String id;
         public String name;
         public String type = "1"; //0-部门 1-用户
+
+        public String ancestral;
     }
 
     public static class ProjectInfo {
