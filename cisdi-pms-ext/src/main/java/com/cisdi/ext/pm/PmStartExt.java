@@ -76,6 +76,7 @@ public class PmStartExt {
         if (!StringUtils.isEmpty(map.get("status"))) {
             sb.append(" and PRJ_START_STATUS_ID=").append(map.get("status"));
         }
+        sb.append(" order by CRT_DT desc");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
