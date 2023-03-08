@@ -25,7 +25,7 @@ public class PmPrjCodeUtil {
      */
     public static String getPrjCode() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(PM_CODE,0) as PM_CODE from pm_prj  order by right(pm_code,4) desc limit 0,1");
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(PM_CODE,0) as PM_CODE from pm_prj where pm_code like 'GCXT-%'  order by right(pm_code,4) desc limit 0,1");
         Map<String, Object> data = list.get(0);
         String flowNo = "0001";
         String code = String.valueOf(data.get("PM_CODE"));
