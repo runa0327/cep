@@ -244,7 +244,8 @@ public class PmRosterExt {
 
         if (!CollectionUtils.isEmpty(dataList)) {
             queryParams.put("ids", dataList);
-            myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID= :userId where PROJECT_POST= :postName and PM_PRJ_ID in (:ids) ", queryParams);
+            queryParams.put("ancestral", projectPostUser.ancestral);
+            myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID= :userId,ANCESTRAL=:ancestral where PROJECT_POST= :postName and PM_PRJ_ID in (:ids) ", queryParams);
         }
     }
 
@@ -273,7 +274,9 @@ public class PmRosterExt {
     public void getProjectPostUser() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from ad_user where id in (select AD_USER_ID from PM_ROSTER where PM_PRJ_ID=? and PROJECT_POST=?)", map.get("projectId"), map.get("postName"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select au.*,ANCESTRAL from ad_user au  " +
+                "left join PM_ROSTER pr on au.id = pr.AD_USER_ID " +
+                "where  PM_PRJ_ID=? and PROJECT_POST=? ", map.get("projectId"), map.get("postName"));
         if (CollectionUtils.isEmpty(list)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
@@ -281,7 +284,7 @@ public class PmRosterExt {
             UserInfo userInfo = new UserInfo();
             userInfo.id = JdbcMapUtil.getString(obj, "ID");
             userInfo.name = JdbcMapUtil.getString(obj, "NAME");
-            userInfo.ancestral = getAncestral(String.valueOf(map.get("projectId")));
+            userInfo.ancestral = JdbcMapUtil.getString(obj, "ANCESTRAL");
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(userInfo), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
@@ -300,7 +303,7 @@ public class PmRosterExt {
         for (PostUser postUser : dataList) {
             myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID=null where PM_PRJ_ID=? and PROJECT_POST=?", editObj.projectId, postUser.postName);
             if (!Strings.isNullOrEmpty(postUser.userId)) {
-                myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID =? where PROJECT_POST=? and PM_PRJ_ID=?", postUser.userId, postUser.postName, editObj.projectId);
+                myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID =?,ancestral=? where PROJECT_POST=? and PM_PRJ_ID=?", postUser.userId, postUser.postName, editObj.projectId, postUser.ancestral);
             }
         }
     }
@@ -462,7 +465,6 @@ public class PmRosterExt {
         public String id;
         public String name;
         public String type = "1"; //0-部门 1-用户
-
         public String ancestral;
     }
 
@@ -476,6 +478,11 @@ public class PmRosterExt {
         public String userId;
 
         public String postName;
+
+        /**
+         * 祖籍
+         */
+        public String ancestral;
         /**
          * 选中的集合
          */
@@ -495,6 +502,8 @@ public class PmRosterExt {
         public String postName;
 
         public String userId;
+
+        public String ancestral;
     }
 
 }
