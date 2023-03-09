@@ -1,6 +1,7 @@
 package com.cisdi.pms.job.archive;
 
 import cn.hutool.core.util.IdUtil;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -168,19 +169,38 @@ public class ArchiveGenerationService {
                 for (int j = 0; j < attValueList.size(); j++) {
                     String fileId = attValueList.get(j);
                     List<Map<String, Object>> fileList = jdbcTemplate.queryForList("select * from fl_file where id=?", fileId);
-                    Object fileName = fileList.size() == 0 ? "缺失此文件" : fileList.get(0).get("NAME");
-                    getOrCreateFile(folderIdForAtt, fileName, fileId);
+                    Map<String, Object> file = fileList.get(0);
+                    Object fileName = fileList.size() == 0 ? "缺失此文件" : file.get("NAME");
+                    BigDecimal fileSizeKB = JdbcMapUtil.getBigDecimal(file, "SIZE_KB");
+                    getOrCreateFile(folderIdForAtt, fileName, fileId, fileSizeKB);
                 }
             }
         }
     }
 
-    private String getOrCreateFile(String folderId, Object name, Object flFileId) {
+    private String getOrCreateFile(String folderId, Object name, Object flFileId, BigDecimal fileSizeKB) {
         List<Map<String, Object>> folderList = jdbcTemplate.queryForList("select * from pf_file t where t.remark=? and t.PF_FOLDER_ID=?", flFileId, folderId);
         if (folderList.size() > 0) {
             return JdbcMapUtil.getString(folderList.get(0), "ID");
         } else {
-            return insertFile(folderId, name, flFileId);
+            String newId = insertFile(folderId, name, flFileId);
+            incrFileSizeAndCountForFolderRecursively(new ArrayList<>(), folderId, fileSizeKB);
+            return newId;
+        }
+    }
+
+    private void incrFileSizeAndCountForFolderRecursively(List<String> processedIdList, String folderId, BigDecimal fileSize) {
+        if (processedIdList.contains(folderId)) {
+            throw new BaseException("增加目录的文件大小和数量时，出现死循环！路径上某个目录的ID：" + folderId);
+        }
+
+        processedIdList.add(folderId);
+
+        Map<String, Object> folder = jdbcTemplate.queryForMap("select * from pf_folder where id=?", folderId);
+        jdbcTemplate.update("update pf_folder t set t.FILE_SIZE=ifnull(t.FILE_SIZE,0)+?,t.FILE_COUNT=ifnull(t.FILE_COUNT,0)+1 where t.id=?", fileSize, folderId);
+        String pid = JdbcMapUtil.getString(folder, "PF_FOLDER_PID");
+        if (!SharedUtil.isEmptyString(pid)) {
+            incrFileSizeAndCountForFolderRecursively(processedIdList, pid, fileSize);
         }
     }
 
