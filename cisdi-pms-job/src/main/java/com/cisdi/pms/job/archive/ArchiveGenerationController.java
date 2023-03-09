@@ -19,4 +19,12 @@ public class ArchiveGenerationController {
     public void execute() {
         archiveGenerationService.execute();
     }
+
+    /**
+     * http://localhost:11115/cisdi-pms-job/archiveGeneration/createProcInstForImportedData
+     */
+    @GetMapping("createProcInstForImportedData")
+    public void createProcInstForImportedData() {
+        archiveGenerationService.createProcInstForImportedData();
+    }
 }

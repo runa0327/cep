@@ -11,10 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -37,7 +34,7 @@ public class ArchiveGenerationService {
 
     public void execute() {
 
-        boolean test = false;
+        boolean test = true;
         if (test) {
             // backupAndTruncate();
         }
@@ -54,7 +51,7 @@ public class ArchiveGenerationService {
         // 2、结束的
         // 3、生成未成功
         // 4、生成失败次数<3（失败时，不要老是生成，影响性能）
-        List<Map<String, Object>> procInstList = jdbcTemplate.queryForList("select pi.* from wf_process_instance pi where not exists(select 1 from PF_GENERATION_LOG l where l.wf_process_instance_id=pi.id and l.is_succ=1)/*没有成功*/ and (select count(*) from PF_GENERATION_LOG l where l.wf_process_instance_id=pi.id and l.is_succ=0)<3/*失败小于3次*/ and pi.`STATUS`='AP' and pi.END_DATETIME is not null" + (test ? " and pi.id='1611266580904341504'" : ""));
+        List<Map<String, Object>> procInstList = jdbcTemplate.queryForList("select pi.* from wf_process_instance pi where not exists(select 1 from PF_GENERATION_LOG l where l.wf_process_instance_id=pi.id and l.is_succ=1)/*没有成功*/ and (select count(*) from PF_GENERATION_LOG l where l.wf_process_instance_id=pi.id and l.is_succ=0)<3/*失败小于3次*/ and pi.`STATUS`='AP' and pi.END_DATETIME is not null" + (test ? " and pi.id='1633742420893282304'" : ""));
 
         for (Map<String, Object> procInst : procInstList) {
             String newLogId = insertLog();
@@ -227,5 +224,55 @@ public class ArchiveGenerationService {
 
     private String getPrjId(Map<String, Object> entityRecord) {
         return entityRecord == null || SharedUtil.isEmptyObject(entityRecord.get("pm_prj_id")) ? null : entityRecord.get("pm_prj_id").toString();
+    }
+
+    public void createProcInstForImportedData() {
+
+        Map<String, String> map = new HashMap<>();
+        Map<String, String> map2 = new HashMap<>();
+        // 立项：
+        map.put("pm_prj_req", "0100031468511691070");
+        map2.put("pm_prj_req", "select T.ID from pm_prj_req t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 可研：
+        map.put("pm_prj_invest1", "0100031468512029141");
+        map2.put("pm_prj_invest1", "select T.ID from pm_prj_invest1 t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+
+        // 概算：
+        map.put("pm_prj_invest2", "0100031468512030981");
+        map2.put("pm_prj_invest2", "select T.ID from pm_prj_invest2 t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 合同签订：
+        map.put("po_order_req", "0099952822476409136");
+        map2.put("po_order_req", "select T.ID from po_order_req t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        for (String entCode : map.keySet()) {
+            String procId = map.get(entCode);
+            Map<String, Object> ent = jdbcTemplate.queryForMap("select * from ad_ent where code=?", entCode);
+            Map<String, Object> proc = jdbcTemplate.queryForMap("select * from wf_process where id=?", procId);
+
+            String sql = map2.get(entCode);
+            List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+            for (Map<String, Object> row : list) {
+
+                Object crtUserId = row.get("CRT_USER_ID");
+                Object crt_dt = row.get("CRT_DT");
+
+                String procInstName = proc.get("NAME") + "数据导入";
+
+                Object entityRecordId = row.get("ID");
+                String procInstId = insertProcInst(crtUserId, procInstName, procId, crt_dt, ent.get("ID"), entCode, entityRecordId);
+                jdbcTemplate.update("update " + entCode + " set LK_WF_INST_ID=? WHERE ID=?", procInstId, entityRecordId);
+            }
+        }
+
+    }
+
+    private String insertProcInst(Object userId, Object name, Object procId, Object datetime, Object entId, Object entCode, Object entityRecordId) {
+        java.lang.String newId = IdUtil.getSnowflakeNextIdStr();
+
+        jdbcTemplate.update("INSERT INTO WF_PROCESS_INSTANCE(`ID`,`VER`,`TS`,`IS_PRESET`,`CRT_DT`,`CRT_USER_ID`,`LAST_MODI_DT`,`LAST_MODI_USER_ID`,`STATUS`,`LK_WF_INST_ID`,`CODE`,`NAME`,`REMARK`,`WF_PROCESS_ID`,`START_USER_ID`,`START_DATETIME`,`END_DATETIME`,`AD_ENT_ID`,`ENT_CODE`,`ENTITY_RECORD_ID`,`IS_URGENT`,`WF_INTERFERE_ID`,`CURRENT_NODE_ID`,`CURRENT_NI_ID`,`CURRENT_TODO_USER_IDS`,`CURRENT_VIEW_ID`)VALUES(?/*ID*/,(1)/*VER*/,(NOW())/*TS*/,(null)/*IS_PRESET*/,(NOW())/*CRT_DT*/,(?)/*CRT_USER_ID*/,(NOW())/*LAST_MODI_DT*/,(?)/*LAST_MODI_USER_ID*/,('AP')/*STATUS*/,(null)/*LK_WF_INST_ID*/,(null)/*CODE*/,(?)/*NAME*/,(null)/*REMARK*/,(?)/*WF_PROCESS_ID*/,(?)/*START_USER_ID*/,(?)/*START_DATETIME*/,(?)/*END_DATETIME*/,(?)/*AD_ENT_ID*/,(?)/*ENT_CODE*/,(?)/*ENTITY_RECORD_ID*/,(null)/*IS_URGENT*/,(null)/*WF_INTERFERE_ID*/,(null)/*CURRENT_NODE_ID*/,(null)/*CURRENT_NI_ID*/,(null)/*CURRENT_TODO_USER_IDS*/,(null)/*CURRENT_VIEW_ID*/)", newId, userId, userId, name, procId, userId, datetime, datetime, entId, entCode, entityRecordId);
+        return newId;
     }
 }
