@@ -297,7 +297,7 @@ public class WfExt {
                                     name = concatProcessName("-",processName,otherName,userName,nowDate);
                                 } else {
                                     if ("PM_PRJ_REQ".equals(entityCode)){
-                                        projectName = myJdbcTemplate.queryForList("select PRJ_NAME from PM_PRJ_REQ where id = ?",csCommId).get(0).get("PRJ_NAME").toString();
+                                        projectName = myJdbcTemplate.queryForList("select IFNULL(T.PRJ_NAME,P.NAME) PRJ_NAME from PM_PRJ_REQ T left join PM_PRJ P ON T.PM_PRJ_ID=P.ID WHERE T.id = ?",csCommId).get(0).get("PRJ_NAME").toString();
                                     } else if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
                                         otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
                                     } else if ("QUALITY_RECORD".equals(entityCode)){
