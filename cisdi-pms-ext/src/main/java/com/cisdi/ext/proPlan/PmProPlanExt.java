@@ -108,6 +108,32 @@ public class PmProPlanExt {
                     }
                 }
             }
+
+            // 获取流程、流程实例的相关信息：
+            List<Map<String, Object>> procInfoList = myJdbcTemplate.queryForList("select p.id P_ID,p.name P_NAME,p.EXTRA_INFO P_EXTRA_INFO,pi.id PI_ID,pi.name PI_NAME,pi.ENT_CODE PI_ENT_CODE,pi.ENTITY_RECORD_ID PI_ENTITY_RECORD_ID,PI.CURRENT_VIEW_ID PI_CURRENT_VIEW_ID from PM_PRO_PLAN_NODE pppn join wf_process p on pppn.LINKED_WF_PROCESS_ID=p.id and pppn.id=? left join wf_process_instance pi on pppn.LINKED_WF_PROCESS_INSTANCE_ID=pi.id", nodeId);
+            if(!CollectionUtils.isEmpty(procInfoList)){
+                Map<String, Object> procInfo = procInfoList.get(0);
+
+                viewObj.procId=JdbcMapUtil.getString(procInfo,"P_ID");
+                viewObj.procName=JdbcMapUtil.getString(procInfo,"P_NAME");
+                viewObj.procIcon=JdbcMapUtil.getString(procInfo,"P_EXTRA_INFO");
+
+                viewObj.procInstId=JdbcMapUtil.getString(procInfo,"PI_ID");
+                viewObj.procInstName=JdbcMapUtil.getString(procInfo,"PI_NAME");
+                viewObj.procInstEntityRecordId=JdbcMapUtil.getString(procInfo,"PI_ENTITY_RECORD_ID");
+
+                if(!SharedUtil.isEmptyString(viewObj.procInstId)){
+                    viewObj.procViewId=JdbcMapUtil.getString(procInfo,"PI_CURRENT_VIEW_ID");
+                }else{
+                    List<Map<String, Object>> wfNodeList = myJdbcTemplate.queryForList("select n.AD_VIEW_ID from wf_node n where n.status='ap' and n.WF_PROCESS_ID='0100031468511691070' and n.NODE_TYPE='START_EVENT'");
+                    if(!CollectionUtils.isEmpty(wfNodeList)){
+                        viewObj.procViewId=JdbcMapUtil.getString( wfNodeList.get(0),"AD_VIEW_ID");
+                    }
+                }
+
+            }
+
+
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(viewObj), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         } else {
@@ -162,6 +188,23 @@ public class PmProPlanExt {
         public List<FileListObj> fileListObjList;
 
         public List<Problem> problemList;
+
+        // 流程ID
+        public String procId;
+        // 流程名称
+        public String procName;
+        // 流程图标
+        public String procIcon;
+
+        // 流程实例ID
+        public String procInstId;
+        // 流程实例名称
+        public String procInstName;
+        // 流程实例的关联的实体记录ID
+        public String procInstEntityRecordId;
+
+        // 流程视图ID。若未发起流程，则为流程的启动节点。
+        public String procViewId;
 
     }
 
