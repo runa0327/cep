@@ -34,7 +34,7 @@ public class ArchiveGenerationService {
 
     public void execute() {
 
-        boolean test = true;
+        boolean test = false;
         if (test) {
             // backupAndTruncate();
         }
@@ -51,7 +51,7 @@ public class ArchiveGenerationService {
         // 2、结束的
         // 3、生成未成功
         // 4、生成失败次数<3（失败时，不要老是生成，影响性能）
-        List<Map<String, Object>> procInstList = jdbcTemplate.queryForList("select pi.* from wf_process_instance pi where not exists(select 1 from PF_GENERATION_LOG l where l.wf_process_instance_id=pi.id and l.is_succ=1)/*没有成功*/ and (select count(*) from PF_GENERATION_LOG l where l.wf_process_instance_id=pi.id and l.is_succ=0)<3/*失败小于3次*/ and pi.`STATUS`='AP' and pi.END_DATETIME is not null" + (test ? " and pi.id='1633742420893282304'" : ""));
+        List<Map<String, Object>> procInstList = jdbcTemplate.queryForList("select pi.* from wf_process_instance pi where not exists(select 1 from PF_GENERATION_LOG l where l.wf_process_instance_id=pi.id and l.is_succ=1)/*没有成功*/ and (select count(*) from PF_GENERATION_LOG l where l.wf_process_instance_id=pi.id and l.is_succ=0)<3/*失败小于3次*/ and pi.`STATUS`='AP' and pi.END_DATETIME is not null" + (test ? " and pi.id='1633746047955402752'" : ""));
 
         for (Map<String, Object> procInst : procInstList) {
             String newLogId = insertLog();
@@ -232,20 +232,20 @@ public class ArchiveGenerationService {
         Map<String, String> map2 = new HashMap<>();
         // 立项：
         map.put("pm_prj_req", "0100031468511691070");
-        map2.put("pm_prj_req", "select T.ID from pm_prj_req t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+        map2.put("pm_prj_req", "select T.* from pm_prj_req t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
 
         // 可研：
         map.put("pm_prj_invest1", "0100031468512029141");
-        map2.put("pm_prj_invest1", "select T.ID from pm_prj_invest1 t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+        map2.put("pm_prj_invest1", "select T.* from pm_prj_invest1 t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
 
 
         // 概算：
         map.put("pm_prj_invest2", "0100031468512030981");
-        map2.put("pm_prj_invest2", "select T.ID from pm_prj_invest2 t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+        map2.put("pm_prj_invest2", "select T.* from pm_prj_invest2 t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
 
         // 合同签订：
         map.put("po_order_req", "0099952822476409136");
-        map2.put("po_order_req", "select T.ID from po_order_req t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+        map2.put("po_order_req", "select T.* from po_order_req t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
 
         for (String entCode : map.keySet()) {
             String procId = map.get(entCode);
@@ -259,7 +259,7 @@ public class ArchiveGenerationService {
                 Object crtUserId = row.get("CRT_USER_ID");
                 Object crt_dt = row.get("CRT_DT");
 
-                String procInstName = proc.get("NAME") + "数据导入";
+                String procInstName = proc.get("NAME") + "-历史数据导入";
 
                 Object entityRecordId = row.get("ID");
                 String procInstId = insertProcInst(crtUserId, procInstName, procId, crt_dt, ent.get("ID"), entCode, entityRecordId);
