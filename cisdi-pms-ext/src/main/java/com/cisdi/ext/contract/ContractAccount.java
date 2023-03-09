@@ -99,7 +99,7 @@ public class ContractAccount {
 //{"700":["李四","钱七"],"701":["张三","赵六","老八"],"703":["王五"]}
 
         String totalSql = sb.toString();
-        sb.append(" order by o.CRT_DT desc");
+        sb.append(" order by o.id desc");
         int start = requestParam.pageSize * (requestParam.pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(requestParam.pageSize);
         String sql = sb.toString();
