@@ -244,14 +244,13 @@ public class ParcelMap {
         List<Map<String, Object>> originalPointList = myJdbcTemplate.queryForList("select id pointId,PARCEL_ID parcelId,longitude,latitude from parcel_point");
 
         //项目绑定地块的原始数据
-        String prjSql = "select pj.id prjId,pj.name prjName,gsv.NAME as projectType,pj.PRJ_MANAGE_MODE_ID modeId,gv.name modeName,max(ifnull(gvp" +
-                ".name,'未启动')) proStatusName,max(pl.PROGRESS_STATUS_ID) proStatusId\n" +
+        String prjSql = "select pj.id prjId,pj.name prjName,gsv.NAME as projectType,pj.PRJ_MANAGE_MODE_ID modeId,gv.name modeName,gvp.name " +
+                "phaseName,pj.PROJECT_PHASE_ID phaseId\n" +
                 "from prj_parcel pp \n" +
                 "left join pm_prj pj on pj.id = pp.pm_prj_id \n" +
                 "left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID\n" +
                 "left join gr_set_value gv on gv.id = pj.PRJ_MANAGE_MODE_ID\n" +
-                "left join PM_PRO_PLAN pl on pl.PM_PRJ_ID = pp.PM_PRJ_ID\n" +
-                "left join gr_set_value gvp on gvp.id = pl.PROGRESS_STATUS_ID\n" +
+                "left join gr_set_value gvp on gvp.id = pj.PROJECT_PHASE_ID\n" +
                 "where 1 = 1";
         if (!Objects.isNull(params.get("prjName"))){
             prjSql += " and pj.name like '%" + params.get("prjName").toString() + "%'";
@@ -265,8 +264,8 @@ public class ParcelMap {
             project.prjName = String.valueOf(prj.get("prjName"));
             project.modeId = String.valueOf(prj.get("modeId"));
             project.modeName = String.valueOf(prj.get("modeName"));
-            project.proStatusId = String.valueOf(prj.get("proStatusId"));
-            project.proStatusName = String.valueOf(prj.get("proStatusName"));
+            project.phaseId = String.valueOf(prj.get("phaseId"));
+            project.phaseName = String.valueOf(prj.get("phaseName"));
             String type = JdbcMapUtil.getString(prj, "projectType");
             if ("民用建筑".equals(type)) {
                 project.projectType = "房建";
@@ -442,8 +441,8 @@ public class ParcelMap {
         //模式名
         public String modeName;
         //进度状态
-        public String proStatusId;
-        public String proStatusName;
+        public String phaseName;
+        public String phaseId;
         //区域
         public List<Parcel> parcels;
     }
