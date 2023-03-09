@@ -206,6 +206,9 @@ public class PmProPlanExt {
         // 流程视图ID。若未发起流程，则为流程的启动节点。
         public String procViewId;
 
+        // 能否启动
+        public Integer canStart;
+
     }
 
     public static class Problem {
