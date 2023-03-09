@@ -38,7 +38,7 @@ public class ArchiveGenerationService {
 
     public void execute() {
 
-        boolean test = true;
+        boolean test = false;
         if (test) {
             // backupAndTruncate();
         }
