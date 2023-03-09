@@ -32,7 +32,7 @@ public class PmProPlanExt {
 
         viewObj viewObj = new viewObj();
         List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select hd.`NAME` as post,PLAN_START_DATE,PLAN_COMPL_DATE,PLAN_TOTAL_DAYS, " +
-                "gsv.`NAME` as `status`,ACTUAL_START_DATE,ACTUAL_COMPL_DATE,PLAN_CARRY_DAYS  " +
+                "gsv.`NAME` as `status`,ACTUAL_START_DATE,ACTUAL_COMPL_DATE,PLAN_CARRY_DAYS,ifnull(pppn.CAN_START,0) as  CAN_START " +
                 "from PM_PRO_PLAN_NODE  pppn " +
                 "left join hr_dept hd on hd.id = pppn.CHIEF_DEPT_ID " +
                 "left join gr_set_value gsv on gsv.id = pppn.PROGRESS_STATUS_ID " +
@@ -47,6 +47,7 @@ public class PmProPlanExt {
             viewObj.actualStartTime = JdbcMapUtil.getString(node, "ACTUAL_START_DATE");
             viewObj.actualCompleteTime = JdbcMapUtil.getString(node, "ACTUAL_COMPL_DATE");
             viewObj.surplusDays = JdbcMapUtil.getString(node, "PLAN_CARRY_DAYS");
+            viewObj.canStart = JdbcMapUtil.getInt(node, "CAN_START");
 
             // 查询存在问题 problemList
             List<Map<String, Object>> proList = myJdbcTemplate.queryForList("select np.*,au.`NAME` as userName from NODE_PROBLEM np left join ad_user au on np.AD_USER_ID = au.id  where PM_PRO_PLAN_NODE_ID=?", nodeId);
