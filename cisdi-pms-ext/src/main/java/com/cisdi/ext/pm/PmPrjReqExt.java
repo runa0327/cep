@@ -125,15 +125,15 @@ public class PmPrjReqExt {
         WfPmInvestUtil.calculateData(csCommId, "PM_PRJ_REQ", newPrjId);
 
         // 新增项目进度计划网络图
-        createPlan(newPrjId);
+//        createPlan(newPrjId);
 
         // 创建项目文件夹
-        ProFileUtils.createFolder(newPrjId);
+//        ProFileUtils.createFolder(newPrjId);
 
         // 立项申请文件归档
         // 项目申请材料
-        String reqFile = JdbcMapUtil.getString(pm_prj_req, "PRJ_REQ_FILE");
-        ProFileUtils.insertProFile(newPrjId, reqFile, FileCodeEnum.PRJ_REQ_FILE);
+//        String reqFile = JdbcMapUtil.getString(pm_prj_req, "PRJ_REQ_FILE");
+//        ProFileUtils.insertProFile(newPrjId, reqFile, FileCodeEnum.PRJ_REQ_FILE);
 
     }
 
@@ -422,11 +422,11 @@ public class PmPrjReqExt {
     }
 
 
-    public void createProjectFolder() {
-        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        String projectId = String.valueOf(map.get("pmPrjId"));
-        ProFileUtils.createFolder(projectId);
-    }
+//    public void createProjectFolder() {
+//        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+//        String projectId = String.valueOf(map.get("pmPrjId"));
+//        ProFileUtils.createFolder(projectId);
+//    }
 
     /**
      * 立项申请-发起时数据校验

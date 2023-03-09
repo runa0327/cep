@@ -381,6 +381,7 @@ public class PmRosterExt {
             PostUser user = new PostUser();
             user.postName = JdbcMapUtil.getString(p, "PROJECT_POST");
             user.userId = JdbcMapUtil.getString(p, "AD_USER_ID");
+            user.ancestral = JdbcMapUtil.getString(p, "ANCESTRAL");
             return user;
         }).collect(Collectors.toList());
 

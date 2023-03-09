@@ -350,6 +350,18 @@ public class ProPlanExt {
             idCodeName.name = String.valueOf(userObj.get("NAME"));
             nodeInfo.chiefUser = idCodeName;
         }
+
+        if(!Objects.isNull(dataMap.get("POST_INFO_ID"))){
+            List<Map<String, Object>> postObj = myJdbcTemplate.queryForList("select * from POST_INFO where id=?", dataMap.get("POST_INFO_ID"));
+            if(postObj !=null && postObj.size()>0){
+                Map<String, Object> objectMap = postObj.get(0);
+                IdCodeName idCodeName = new IdCodeName();
+                idCodeName.id = String.valueOf(objectMap.get("ID"));
+                idCodeName.code = String.valueOf(objectMap.get("CODE"));
+                idCodeName.name = String.valueOf(objectMap.get("NAME"));
+                nodeInfo.post = idCodeName;
+            }
+        }
         nodeInfo.showInPrjOverview = JdbcMapUtil.getString(dataMap, "SHOW_IN_PRJ_OVERVIEW");
         nodeInfo.seqNo = JdbcMapUtil.getString(dataMap, "SEQ_NO");
         nodeInfo.level = JdbcMapUtil.getString(dataMap, "LEVEL");
@@ -655,6 +667,11 @@ public class ProPlanExt {
          */
         //
         public IdCodeName chiefUser;
+
+        /**
+         * 岗位
+         */
+        public IdCodeName post;
         /**
          * 是否显示首页
          */
