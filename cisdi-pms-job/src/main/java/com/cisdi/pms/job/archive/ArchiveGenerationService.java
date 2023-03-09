@@ -35,7 +35,6 @@ public class ArchiveGenerationService {
         jdbcTemplate.update("delete from  pf_folder");
     }
 
-
     public void execute() {
 
         boolean test = false;
