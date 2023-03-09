@@ -141,7 +141,7 @@ public class ProPlanExt {
                 "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where SHOW_IN_PRJ_OVERVIEW='1' and ppp.PM_PRJ_ID=?", pmPrjId);
 
         // 结果转换
-        List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(p, myJdbcTemplate)).collect(Collectors.toList());
+        List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(pmPrjId, p, myJdbcTemplate)).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(infoList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
@@ -196,10 +196,10 @@ public class ProPlanExt {
 
                 List<Map<String, Object>> allList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
                         "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
-                        "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO,pppn.`LEVEL` \n" +
+                        "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO,pppn.`LEVEL`,pppn.POST_INFO_ID \n" +
                         "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where ppp.PM_PRJ_ID=?", pmPrjId);
                 // 结果转换
-                List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(p, myJdbcTemplate)).collect(Collectors.toList());
+                List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(pmPrjId, p, myJdbcTemplate)).collect(Collectors.toList());
                 // 构建树结构
                 List<PrjProPlanNodeInfo> tree = infoList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
                     m.children = getChildNode(m, infoList).stream().sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo))).collect(Collectors.toList());
@@ -297,7 +297,7 @@ public class ProPlanExt {
      * @param myJdbcTemplate
      * @return
      */
-    private PrjProPlanNodeInfo convertPlanInfoNode(Map<String, Object> dataMap, MyJdbcTemplate myJdbcTemplate) {
+    private PrjProPlanNodeInfo convertPlanInfoNode(String projectId, Map<String, Object> dataMap, MyJdbcTemplate myJdbcTemplate) {
         PrjProPlanNodeInfo nodeInfo = new PrjProPlanNodeInfo();
         nodeInfo.id = JdbcMapUtil.getString(dataMap, "ID");
         nodeInfo.pid = JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_NODE_PID");
@@ -342,20 +342,53 @@ public class ProPlanExt {
             nodeInfo.chiefDept = idCodeName;
         }
 
-        if (!Objects.isNull(dataMap.get("CHIEF_USER_ID"))) {
-            Map<String, Object> userObj = myJdbcTemplate.queryForMap("select * from ad_user where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_USER_ID"));
-            IdCodeName idCodeName = new IdCodeName();
-            idCodeName.id = String.valueOf(userObj.get("ID"));
-            idCodeName.code = String.valueOf(userObj.get("CODE"));
-            idCodeName.name = String.valueOf(userObj.get("NAME"));
-            nodeInfo.chiefUser = idCodeName;
+//        if (!Objects.isNull(dataMap.get("CHIEF_USER_ID"))) {
+//            Map<String, Object> userObj = myJdbcTemplate.queryForMap("select * from ad_user where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_USER_ID"));
+//            IdCodeName idCodeName = new IdCodeName();
+//            idCodeName.id = String.valueOf(userObj.get("ID"));
+//            idCodeName.code = String.valueOf(userObj.get("CODE"));
+//            idCodeName.name = String.valueOf(userObj.get("NAME"));
+//            nodeInfo.chiefUser = idCodeName;
+//        }
+
+        if (!Objects.isNull(dataMap.get("POST_INFO_ID"))) {
+            List<Map<String, Object>> postObj = myJdbcTemplate.queryForList("select * from POST_INFO where id=?", dataMap.get("POST_INFO_ID"));
+            if (postObj != null && postObj.size() > 0) {
+                Map<String, Object> objectMap = postObj.get(0);
+                IdCodeName idCodeName = new IdCodeName();
+                idCodeName.id = String.valueOf(objectMap.get("ID"));
+                idCodeName.code = String.valueOf(objectMap.get("CODE"));
+                idCodeName.name = String.valueOf(objectMap.get("NAME"));
+                nodeInfo.post = idCodeName;
+            }
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from ad_user where id in ( select ad_user_id from PM_POST_USER where POST_INFO_ID=? and PM_PRJ_ID =?)", dataMap.get("POST_INFO_ID"), projectId);
+            if (list != null && list.size() > 0) {
+                Map<String, Object> userMap = list.get(0);
+                IdCodeName codeName = new IdCodeName();
+                codeName.id = String.valueOf(userMap.get("ID"));
+                codeName.code = String.valueOf(userMap.get("CODE"));
+                codeName.name = String.valueOf(userMap.get("NAME"));
+                nodeInfo.chiefUser = codeName;
+            }
         }
         nodeInfo.showInPrjOverview = JdbcMapUtil.getString(dataMap, "SHOW_IN_PRJ_OVERVIEW");
         nodeInfo.seqNo = JdbcMapUtil.getString(dataMap, "SEQ_NO");
         nodeInfo.level = JdbcMapUtil.getString(dataMap, "LEVEL");
         nodeInfo.chiefDeptId = JdbcMapUtil.getString(dataMap, "CHIEF_DEPT_ID");
         nodeInfo.ver = JdbcMapUtil.getString(dataMap, "VER");
+        nodeInfo.proCount =getProblemCount(nodeInfo.id);
         return nodeInfo;
+    }
+
+
+    private Integer getProblemCount(String nodeId){
+        int res = 0;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from NODE_PROBLEM where PM_PRO_PLAN_NODE_ID = ?", nodeId);
+        if(list !=null){
+            res = list.size();
+        }
+        return res;
     }
 
 
@@ -655,6 +688,11 @@ public class ProPlanExt {
          */
         //
         public IdCodeName chiefUser;
+
+        /**
+         * 岗位
+         */
+        public IdCodeName post;
         /**
          * 是否显示首页
          */
@@ -671,6 +709,8 @@ public class ProPlanExt {
          * 子节点
          */
         public List<PrjProPlanNodeInfo> children;
+
+        public Integer proCount;
     }
 
     /**

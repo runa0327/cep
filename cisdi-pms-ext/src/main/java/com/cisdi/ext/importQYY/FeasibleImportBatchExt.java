@@ -6,6 +6,7 @@ import com.cisdi.ext.importQYY.model.FeasibleImport;
 import com.cisdi.ext.importQYY.model.FeasibleImportBatch;
 import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.model.PmPrjInvest1;
+import com.cisdi.ext.proPlan.PmProPlanExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -282,6 +283,12 @@ public class FeasibleImportBatchExt {
         //写入投资测算明细主父表
         PmInvestEst.creatInvest1Data(pmPrjId,newImport,myJdbcTemplate);
 
+        //更新项目进展图状态
+        String pmProPlanId = PmProPlanExt.updatePrjProPlan(pmPrjId,"pm_prj_req",myJdbcTemplate);
+        //组装更新项目进展图需要的字段
+        List<Map<String,Object>> proPlanList = getProPlanMap(newImport);
+        PmProPlanExt.updatePrjPlanDetailInvest1(pmPrjId,pmProPlanId,proPlanList,myJdbcTemplate);
+
 
         // 执行过程中，可能会自动抛出异常。
         // 若希望自行抛出异常，则throw：
@@ -300,6 +307,24 @@ public class FeasibleImportBatchExt {
         FeasibleImport.updateById(newImportId, keyValueMap);
 
         return succ;
+    }
+
+    /**
+     * 组装更新项目进展图需要的字段
+     * @param newImport 实体信息
+     * @return map
+     */
+    private List<Map<String, Object>> getProPlanMap(FeasibleImport newImport) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String,Object> map1 = new HashMap<>();
+        map1.put("planStatus","0099799190825106802"); //进度状态
+        map1.put("ACTUAL_COMPL_DATE",newImport.getExpertComplActualDate()); //实际完成日期
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("planStatus","0099799190825106802"); //进度状态
+        map2.put("REPLY_ACTUAL_COMPL_DATE",newImport.getReplyActualDate()); //实际完成日期
+        list.add(0,map1);
+        list.add(1,map2);
+        return list;
     }
 
     /**
