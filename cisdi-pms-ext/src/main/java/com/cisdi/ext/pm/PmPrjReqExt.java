@@ -434,7 +434,7 @@ public class PmPrjReqExt {
     public void checkCreateDate() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        //项目名称
+        //项目id
         String projectName = entityRecord.valueMap.get("PRJ_NAME").toString();
         //流程id
         String id = entityRecord.csCommId;
