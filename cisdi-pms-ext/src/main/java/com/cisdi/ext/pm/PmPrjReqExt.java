@@ -432,6 +432,12 @@ public class PmPrjReqExt {
      * 立项申请-发起时数据校验
      **/
     public void checkCreateDate() {
+
+        // 项目改为选择，直接返回：
+        if("1".equals("1")){
+            return;
+        }
+
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //项目id
