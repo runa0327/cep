@@ -167,6 +167,7 @@ public class PmStartExt {
         String id = input.id;
         String prjCode = input.code;
         String dataStatus = "";
+        Date startTime = new Date();
         if (Strings.isNullOrEmpty(input.id)) {
             id = Crud.from("PRJ_START").insertData();
             prjCode = PmPrjCodeUtil.getPrjCode();
@@ -175,7 +176,7 @@ public class PmStartExt {
 
         Crud.from("PRJ_START").where().eq("ID", id).update()
                 .set("PM_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId)
-                .set("BUILDER_UNIT", input.unit).set("START_TIME", new Date()).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", "1626110930922467328")
+                .set("BUILDER_UNIT", input.unit).set("START_TIME", startTime).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", "1626110930922467328")
                 .set("ATT_FILE_GROUP_ID", input.fileIds).set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).exec();
         String projectId = "";
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
@@ -190,12 +191,12 @@ public class PmStartExt {
             }
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", input.name).set("PM_CODE", prjCode)
                     .set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PROJECT_TYPE_ID", input.typeId).set("BUILDER_UNIT", input.unit)
-                    .set("PRJ_SITUATION", input.description).set("PM_SEQ", seq).exec();
+                    .set("PRJ_SITUATION", input.description).set("PM_SEQ", seq).set("BUILDER_UNIT",input.unit).exec();
         } else {
             projectId = String.valueOf(list.get(0).get("ID"));
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", input.name).set("PM_CODE", prjCode)
                     .set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PROJECT_TYPE_ID", input.typeId).set("BUILDER_UNIT", input.unit)
-                    .set("PRJ_SITUATION", input.description).exec();
+                    .set("PRJ_SITUATION", input.description).set("BUILDER_UNIT",input.unit).exec();
         }
 
         //先删除项目关联的地块
@@ -244,6 +245,8 @@ public class PmStartExt {
         if ("add".equals(dataStatus)) {
             //新增项目进展
             PrjPlanUtil.createPlan(projectId);
+            //刷新进度节点时间
+            PrjPlanUtil.refreshProPlanTime(projectId, startTime);
         }
     }
 
