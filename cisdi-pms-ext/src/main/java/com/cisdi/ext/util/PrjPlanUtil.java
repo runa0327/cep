@@ -15,18 +15,21 @@ public class PrjPlanUtil {
 
     public static void refreshProPlanTime(String projectId, Date date) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        if (date == null) {
+            // 查询该项目立项批复时间。若为空，不执行后续操作
+            List<Map<String, Object>> mapZero = myJdbcTemplate.queryForList("select PRJ_REPLY_DATE from PM_PRJ where id = ? ", projectId);
+            if (CollectionUtils.isEmpty(mapZero)) {
+                throw new BaseException("该项目没有批复日期，请稍后在进行节点更新！");
+            }
+            String replyDate = JdbcMapUtil.getString(mapZero.get(0), "PRJ_REPLY_DATE");
+            if (SharedUtil.isEmptyString(replyDate)) {
+                throw new BaseException("该项目没有批复日期，请稍后在进行节点更新！");
+            }
+            date = DateTimeUtil.stringToDate(replyDate);
+        }
 
-        // 查询该项目立项批复时间。若为空，不执行后续操作
-        List<Map<String, Object>> mapZero = myJdbcTemplate.queryForList("select PRJ_REPLY_DATE from PM_PRJ where id = ? ", projectId);
-        if (CollectionUtils.isEmpty(mapZero)) {
-            throw new BaseException("该项目没有批复日期，请稍后在进行节点更新！");
-        }
-        String replyDate = JdbcMapUtil.getString(mapZero.get(0), "PRJ_REPLY_DATE");
-        if (SharedUtil.isEmptyString(replyDate)) {
-            throw new BaseException("该项目没有批复日期，请稍后在进行节点更新！");
-        }
         // 项目计划开始日期 当天加30天，因为当天也算，实际加29天
-        Date planBegin = DateTimeUtil.addDays(DateTimeUtil.stringToDate(replyDate), 29);
+        Date planBegin = DateTimeUtil.addDays(date, 29);
 
         // 查询该项目所有计划节点
         String sql = "SELECT b.id,b.PLAN_START_DATE,b.PLAN_COMPL_DATE,b.PLAN_TOTAL_DAYS,b.NAME,b.START_DAY,ifnull(b.PM_PRO_PLAN_NODE_PID,'0') as PM_PRO_PLAN_NODE_PID " +
