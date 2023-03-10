@@ -84,82 +84,6 @@ public class AttLinkExtDetail {
     }
 
     /**
-     * 清空项目资金信息
-     * @param attLinkResult 返回的数据结果集
-     */
-    public static void clearProjectAmtData(AttLinkResult attLinkResult) {
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = null;
-            linkedAtt.text = null;
-            attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt); //总投资
-            attLinkResult.attMap.put("PROJECT_AMT", linkedAtt); //其中工程费用
-            attLinkResult.attMap.put("PROJECT_OTHER_AMT", linkedAtt); //其中工程建设其他费
-            attLinkResult.attMap.put("PREPARE_AMT", linkedAtt); //其中预备费
-            attLinkResult.attMap.put("CONSTRUCT_PERIOD_INTEREST", linkedAtt); //其中建设期利息
-            attLinkResult.attMap.put("CONSTRUCT_AMT", linkedAtt); //建安费
-            attLinkResult.attMap.put("EQUIP_AMT", linkedAtt); //设备费
-            attLinkResult.attMap.put("EQUIPMENT_COST", linkedAtt); //科研设备费
-            attLinkResult.attMap.put("LAND_AMT", linkedAtt); //土地征迁费
-            attLinkResult.attMap.put("FEASIBILITY_APPROVE_FUND", linkedAtt); // 可研批复资金
-            attLinkResult.attMap.put("ESTIMATE_APPROVE_FUND", linkedAtt); // 初概批复资金
-            attLinkResult.attMap.put("EVALUATION_APPROVE_FUND", linkedAtt); // 财评批复资金
-        }
-    }
-
-    /**
-     * 清空项目基础信息
-     * @param attLinkResult 返回的数据结果集
-     */
-    public static void clearBaseProjectData(AttLinkResult attLinkResult) {
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = null;
-            linkedAtt.text = null;
-            attLinkResult.attMap.put("PM_PRJ_IDS", linkedAtt); //项目名称
-            attLinkResult.attMap.put("PM_PRJ_ID", linkedAtt); //项目名称
-            attLinkResult.attMap.put("PROJECT_NAME_WR", linkedAtt); //项目名称
-            attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt); //项目批复文号
-            attLinkResult.attMap.put("REPLY_NO", linkedAtt); // 批复文号
-            attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt); //资金来源
-            attLinkResult.attMap.put("CUSTOMER_UNIT", linkedAtt); //业主单位
-            attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID", linkedAtt); //项目管理模式
-            attLinkResult.attMap.put("BASE_LOCATION_ID", linkedAtt); //建设地点
-            attLinkResult.attMap.put("FLOOR_AREA", linkedAtt); //占地面积
-            attLinkResult.attMap.put("PROJECT_TYPE_ID", linkedAtt); //项目类型
-            attLinkResult.attMap.put("CON_SCALE_TYPE_ID", linkedAtt); //建设规模类型
-            attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt); //长度
-            attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt); //宽度
-            attLinkResult.attMap.put("QTY_ONE", linkedAtt); //建筑面积
-            attLinkResult.attMap.put("QTY_THREE", linkedAtt); //海域面积
-            attLinkResult.attMap.put("OTHER", linkedAtt); //其他
-            attLinkResult.attMap.put("QTY_TWO", linkedAtt); //其他
-            attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt); //建设规模单位
-            attLinkResult.attMap.put("BUILD_YEARS", linkedAtt); // 建设年限
-            attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt); //项目规模及内容
-        }
-    }
-
-    /**
-     * 清空项目配套人员信息
-     * @param attLinkResult 返回的数据结果集
-     */
-    private static void clearProjectUserData(AttLinkResult attLinkResult) {
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = null;
-            linkedAtt.text = null;
-            attLinkResult.attMap.put("AD_USER_THREE_ID", linkedAtt); //成本岗
-            attLinkResult.attMap.put("PRJ_COST_USER_ID", linkedAtt); //成本岗
-            attLinkResult.attMap.put("PRJ_DESIGN_USER_ID", linkedAtt); //设计岗
-            attLinkResult.attMap.put("PRJ_EARLY_USER_ID", linkedAtt); //前期岗
-        }
-    }
-
-    /**
      * 项目成本岗自动带出
      * @param attLinkResult 返回数据结果集
      * @param myJdbcTemplate 数据源
@@ -201,26 +125,6 @@ public class AttLinkExtDetail {
         clearProjectAmtData(attLinkResult); //清空资金信息
         clearBaseProjectData(attLinkResult); //清空项目信息
         clearProjectUserData(attLinkResult); //清空项目配套人员信息
-    }
-
-    /**
-     * 合同签订、补充协议 是否标准模板属性联动数据清除
-     * @param attLinkResult
-     */
-    public static void clearOrderIsStandard(AttLinkResult attLinkResult) {
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = null;
-            linkedAtt.text = null;
-            attLinkResult.attMap.put("FILE_ID_SIX", linkedAtt); //法律审核附件
-            attLinkResult.attMap.put("FILE_ID_TWO", linkedAtt); //财务部门修订稿
-            attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt); //法务部门修订稿
-            attLinkResult.attMap.put("YES_NO_ONE", linkedAtt); //审核意见是否完全采纳
-            attLinkResult.attMap.put("REMARK_ONE", linkedAtt); //审核意见采纳说明
-            attLinkResult.attMap.put("FILE_ID_FOUR", linkedAtt); //采纳意见附件
-            attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt); //合同送审稿
-        }
     }
 
     /**
@@ -577,8 +481,7 @@ public class AttLinkExtDetail {
      * @param row 单条项目记录
      * @param attLinkResult 返回的集合map
      */
-    private static void prjTypeLinkNew(Map row, AttLinkResult attLinkResult) {
-        Boolean floorAreaMustEdit = false; //占地面积默认非必填
+    public static void prjTypeLinkNew(Map row, AttLinkResult attLinkResult) {
         Boolean roadLengthMustEdit = false; //道路长度默认非必填
         Boolean roadWidthMustEdit = false; //道路宽度默认非必填
         Boolean buildAreaMustEdit = false; //建筑面积默认非必填
@@ -591,51 +494,47 @@ public class AttLinkExtDetail {
         Boolean seaAreaShow = false; //海域面积默认不显示
         Boolean otherShow = false; //其他默认不显示
 
+        Boolean roadLengthChangeToEditable = false; //道路长度默认不可改
+        Boolean roadWidthChangeToEditable = false; //道路宽度默认不可改
+        Boolean buildAreaChangeToEditable = false; //建筑面积默认不可改
+        Boolean seaAreaChangeToEditable = false; //海域面积默认不可改
+        Boolean otherChangeToEditable = false; //其他默认不可改
+
         //项目类型名称
-//        0099799190825080689	民用建筑 1
-//        0099799190825080690	市政道路 1
-//        0099799190825080691	港口航道 1
-//        0099799190825080692	园林景观 1
-//        0099799190825080739	轨道交通 1
-//        0099799190825080740	工业建筑 1
-//        0099799190825080993	市政管道 1
-//        0099799190825080994	设备采购 1
-//        0099799190825080750	其他 1 1
-        String projectTypeName = JdbcMapUtil.getString(row,"pt_name");
-        String projectTypeId = GrSetValue.getValueIdByName(projectTypeName,"PROJECT_TYPE");
+//        0099799190825080689(民用建筑) 0099799190825080690(市政道路)	 0099799190825080691(港口航道)  0099799190825080692(园林景观)
+//        0099799190825080739(轨道交通) 0099799190825080740(工业建筑)   0099799190825080993(市政管道)   0099799190825080994(设备采购)	 0099799190825080750(其他)
+//        String projectTypeName = JdbcMapUtil.getString(row,"pt_name");
+        String projectTypeId = JdbcMapUtil.getString(row,"PROJECT_TYPE_ID");
+//        String projectTypeId = GrSetValue.getValueIdByName(projectTypeName,"PROJECT_TYPE");
         if ("0099799190825080690".equals(projectTypeId) || "0099799190825080739".equals(projectTypeId)){//市政道路、轨道交通，显示长宽
             roadLengthMustEdit = true;
             roadWidthMustEdit = true;
             roadLengthShow = true;
             roadWidthShow = true;
+            roadLengthChangeToEditable = true;
+            roadWidthChangeToEditable = true;
         } else if ("0099799190825080691".equals(projectTypeId)){ //港口航道，显示海域面积
             seaAreaMustEdit = true;
             seaAreaShow = true;
+            seaAreaChangeToEditable = true;
         } else if ("0099799190825080689".equals(projectTypeId) || "0099799190825080692".equals(projectTypeId) || "0099799190825080740".equals(projectTypeId)){
-            // 民用建筑、园林景观、工业建筑，显示建筑面积，占地面积必填
-            floorAreaMustEdit = true;
+            // 民用建筑、园林景观、工业建筑，显示建筑面积
             buildAreaMustEdit = true;
             buildAreaShow = true;
+            buildAreaChangeToEditable = true;
         } else if ("0099799190825080994".equals(projectTypeId) || "0099799190825080750".equals(projectTypeId) || "0099799190825080993".equals(projectTypeId)){
             //其他、设备采购、市政管道，显示其他
             otherMustEdit = true;
             otherShow = true;
-        }
-        // 占地面积
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "FLOOR_AREA"));
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:JdbcMapUtil.getString(row, "FLOOR_AREA");
-            linkedAtt.changeToMandatory = floorAreaMustEdit;
-            attLinkResult.attMap.put("FLOOR_AREA", linkedAtt);
+            otherChangeToEditable = true;
         }
         //建筑面积
         {
             LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
             linkedAtt.changeToShown = buildAreaShow;
             linkedAtt.changeToMandatory = buildAreaMustEdit;
+            linkedAtt.changeToEditable = buildAreaChangeToEditable;
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:JdbcMapUtil.getString(row, "QTY_ONE");
             linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "QTY_ONE"));
             attLinkResult.attMap.put("QTY_ONE", linkedAtt);
@@ -643,9 +542,10 @@ public class AttLinkExtDetail {
         //海域面积
         {
             LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
             linkedAtt.changeToShown = seaAreaShow;
             linkedAtt.changeToMandatory = seaAreaMustEdit;
+            linkedAtt.changeToEditable = seaAreaChangeToEditable;
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:JdbcMapUtil.getString(row, "QTY_THREE");
             linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "QTY_THREE"));
             attLinkResult.attMap.put("QTY_THREE", linkedAtt);
@@ -653,9 +553,10 @@ public class AttLinkExtDetail {
         //长
         {
             LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
             linkedAtt.changeToShown = roadLengthShow;
             linkedAtt.changeToMandatory = roadLengthMustEdit;
+            linkedAtt.changeToEditable = roadLengthChangeToEditable;
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY");
             linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "CON_SCALE_QTY"));
             attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
@@ -663,9 +564,10 @@ public class AttLinkExtDetail {
         //宽
         {
             LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
             linkedAtt.changeToShown = roadWidthShow;
             linkedAtt.changeToMandatory = roadWidthMustEdit;
+            linkedAtt.changeToEditable = roadWidthChangeToEditable;
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
             linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "CON_SCALE_QTY2"));
             attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
@@ -673,9 +575,10 @@ public class AttLinkExtDetail {
         //其他
         {
             LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
             linkedAtt.changeToShown = otherShow;
             linkedAtt.changeToMandatory = otherMustEdit;
+            linkedAtt.changeToEditable = otherChangeToEditable;
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
             linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
             attLinkResult.attMap.put("OTHER", linkedAtt);
@@ -838,6 +741,82 @@ public class AttLinkExtDetail {
     }
 
     /**
+     * 清空项目资金信息
+     * @param attLinkResult 返回的数据结果集
+     */
+    public static void clearProjectAmtData(AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt); //总投资
+            attLinkResult.attMap.put("PROJECT_AMT", linkedAtt); //其中工程费用
+            attLinkResult.attMap.put("PROJECT_OTHER_AMT", linkedAtt); //其中工程建设其他费
+            attLinkResult.attMap.put("PREPARE_AMT", linkedAtt); //其中预备费
+            attLinkResult.attMap.put("CONSTRUCT_PERIOD_INTEREST", linkedAtt); //其中建设期利息
+            attLinkResult.attMap.put("CONSTRUCT_AMT", linkedAtt); //建安费
+            attLinkResult.attMap.put("EQUIP_AMT", linkedAtt); //设备费
+            attLinkResult.attMap.put("EQUIPMENT_COST", linkedAtt); //科研设备费
+            attLinkResult.attMap.put("LAND_AMT", linkedAtt); //土地征迁费
+            attLinkResult.attMap.put("FEASIBILITY_APPROVE_FUND", linkedAtt); // 可研批复资金
+            attLinkResult.attMap.put("ESTIMATE_APPROVE_FUND", linkedAtt); // 初概批复资金
+            attLinkResult.attMap.put("EVALUATION_APPROVE_FUND", linkedAtt); // 财评批复资金
+        }
+    }
+
+    /**
+     * 清空项目基础信息
+     * @param attLinkResult 返回的数据结果集
+     */
+    public static void clearBaseProjectData(AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            attLinkResult.attMap.put("PM_PRJ_IDS", linkedAtt); //项目名称
+            attLinkResult.attMap.put("PM_PRJ_ID", linkedAtt); //项目名称
+            attLinkResult.attMap.put("PROJECT_NAME_WR", linkedAtt); //项目名称
+            attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt); //项目批复文号
+            attLinkResult.attMap.put("REPLY_NO", linkedAtt); // 批复文号
+            attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt); //资金来源
+            attLinkResult.attMap.put("CUSTOMER_UNIT", linkedAtt); //业主单位
+            attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID", linkedAtt); //项目管理模式
+            attLinkResult.attMap.put("BASE_LOCATION_ID", linkedAtt); //建设地点
+            attLinkResult.attMap.put("FLOOR_AREA", linkedAtt); //占地面积
+            attLinkResult.attMap.put("PROJECT_TYPE_ID", linkedAtt); //项目类型
+            attLinkResult.attMap.put("CON_SCALE_TYPE_ID", linkedAtt); //建设规模类型
+            attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt); //长度
+            attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt); //宽度
+            attLinkResult.attMap.put("QTY_ONE", linkedAtt); //建筑面积
+            attLinkResult.attMap.put("QTY_THREE", linkedAtt); //海域面积
+            attLinkResult.attMap.put("OTHER", linkedAtt); //其他
+            attLinkResult.attMap.put("QTY_TWO", linkedAtt); //其他
+            attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt); //建设规模单位
+            attLinkResult.attMap.put("BUILD_YEARS", linkedAtt); // 建设年限
+            attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt); //项目规模及内容
+        }
+    }
+
+    /**
+     * 清空项目配套人员信息
+     * @param attLinkResult 返回的数据结果集
+     */
+    private static void clearProjectUserData(AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            attLinkResult.attMap.put("AD_USER_THREE_ID", linkedAtt); //成本岗
+            attLinkResult.attMap.put("PRJ_COST_USER_ID", linkedAtt); //成本岗
+            attLinkResult.attMap.put("PRJ_DESIGN_USER_ID", linkedAtt); //设计岗
+            attLinkResult.attMap.put("PRJ_EARLY_USER_ID", linkedAtt); //前期岗
+        }
+    }
+
+    /**
      * 清除项目基础信息-不包含项目id
      * @param attLinkResult
      */
@@ -870,6 +849,44 @@ public class AttLinkExtDetail {
             attLinkResult.attMap.put("PRJ_COST_USER_ID", linkedAtt); // 成本岗
             attLinkResult.attMap.put("PRJ_REPLY_DATE", linkedAtt); // 批复日期
             attLinkResult.attMap.put("PRJ_REPLY_FILE", linkedAtt); // 批复材料
+        }
+    }
+
+    /**
+     * 合同签订、补充协议 是否标准模板属性联动数据清除
+     * @param attLinkResult
+     */
+    public static void clearOrderIsStandard(AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            attLinkResult.attMap.put("FILE_ID_SIX", linkedAtt); //法律审核附件
+            attLinkResult.attMap.put("FILE_ID_TWO", linkedAtt); //财务部门修订稿
+            attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt); //法务部门修订稿
+            attLinkResult.attMap.put("YES_NO_ONE", linkedAtt); //审核意见是否完全采纳
+            attLinkResult.attMap.put("REMARK_ONE", linkedAtt); //审核意见采纳说明
+            attLinkResult.attMap.put("FILE_ID_FOUR", linkedAtt); //采纳意见附件
+            attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt); //合同送审稿
+        }
+    }
+
+    /**
+     * 清除项目类型属性联动值
+     * @param attLinkResult 返回map值
+     */
+    public static void clearProjectTypeData(AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt); //道路长度(m)
+            attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt); //道路宽度(m)
+            attLinkResult.attMap.put("QTY_ONE", linkedAtt); // 建筑面积(㎡)
+            attLinkResult.attMap.put("QTY_THREE", linkedAtt); //海域面积(㎡)
+            attLinkResult.attMap.put("OTHER", linkedAtt); //其他
         }
     }
 }
