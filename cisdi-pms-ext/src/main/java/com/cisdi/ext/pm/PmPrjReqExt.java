@@ -437,19 +437,14 @@ public class PmPrjReqExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //项目id
-        String projectName = entityRecord.valueMap.get("PRJ_NAME").toString();
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"pm_prj_id");
         //流程id
         String id = entityRecord.csCommId;
-        //查询名称是否存在
-        String sql1 = "select name from PM_PRJ_REQ where PRJ_NAME = ? and id != ? ";
-        List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1, projectName, id);
+        //查询该项目是否已经发起过流程
+        String sql1 = "select id from PM_PRJ_REQ where pm_prj_id = ? and id != ? and status not in ('VD','VDING')";
+        List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1, projectId, id);
         if (!CollectionUtils.isEmpty(list1)) {
-            throw new BaseException("项目名称不能重复，请重新输入项目名称！");
-        }
-        String sql2 = "select name from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'";
-        List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(sql2, projectName);
-        if (!CollectionUtils.isEmpty(list2)) {
-            throw new BaseException("项目名称不能重复，请重新输入项目名称！");
+            throw new BaseException("项目不允许重复发起立项流程！");
         }
     }
 
