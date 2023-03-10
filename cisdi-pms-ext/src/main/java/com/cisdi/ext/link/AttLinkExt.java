@@ -3888,7 +3888,7 @@ public class AttLinkExt {
                 AttLinkExtDetail.assignmentPrjYesNoOne(id,attLinkResult);
             }
             //赋值
-            AttLinkExtDetail.assignmentAttLinkResult(attLinkResult,row,myJdbcTemplate);
+            AttLinkExtDetail.assignmentAttLinkResult(attLinkResult,row,entCode,myJdbcTemplate);
 
             // 资金信息回显。优先级 可研估算<初设概算<预算财评
             List<String> amtList = getAmtList();

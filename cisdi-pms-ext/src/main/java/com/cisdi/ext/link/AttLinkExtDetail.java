@@ -1,5 +1,6 @@
 package com.cisdi.ext.link;
 
+import com.cisdi.ext.base.GrSetValue;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.ad.att.AttDataTypeE;
@@ -426,11 +427,13 @@ public class AttLinkExtDetail {
      * 项目属性联动-赋值
      * @param attLinkResult 返回的集合值
      * @param row 单条项目属性详情信息
+     * @param entCode 实体表名
      * @param myJdbcTemplate 数据源
      */
-    public static void assignmentAttLinkResult(AttLinkResult attLinkResult, Map row, MyJdbcTemplate myJdbcTemplate) {
+    public static void assignmentAttLinkResult(AttLinkResult attLinkResult, Map row, String entCode, MyJdbcTemplate myJdbcTemplate) {
         //项目类型属性联动处理
-        prjTypeLink(row,attLinkResult);
+        prjTypeLinkNew(row,attLinkResult);
+//        prjTypeLink(row,attLinkResult);
         // 建筑面积
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -505,14 +508,15 @@ public class AttLinkExtDetail {
             attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt);
             attLinkResult.attMap.put("PRJ_INTRODUCE", linkedAtt);
         }
-        // 批复日期
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DATE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_DATE")) ? null:JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_DATE")) ? null:JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
-
-            attLinkResult.attMap.put("PRJ_REPLY_DATE", linkedAtt);
+        if (!"PM_PRJ_REQ".equals(entCode)){
+            // 批复日期
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.DATE;
+                linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_DATE")) ? null:JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
+                linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_DATE")) ? null:JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
+                attLinkResult.attMap.put("PRJ_REPLY_DATE", linkedAtt);
+            }
         }
         // 批复材料
         {
@@ -565,6 +569,117 @@ public class AttLinkExtDetail {
             linkedAtt.text = name;
             attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
             attLinkResult.attMap.put("PM_FUND_SOURCE_ID", linkedAtt);
+        }
+    }
+
+    /**
+     * 项目类型属性联动，根据项目类型联动，控制如：面积、长、宽等
+     * @param row 单条项目记录
+     * @param attLinkResult 返回的集合map
+     */
+    private static void prjTypeLinkNew(Map row, AttLinkResult attLinkResult) {
+        Boolean floorAreaMustEdit = false; //占地面积默认非必填
+        Boolean roadLengthMustEdit = false; //道路长度默认非必填
+        Boolean roadWidthMustEdit = false; //道路宽度默认非必填
+        Boolean buildAreaMustEdit = false; //建筑面积默认非必填
+        Boolean seaAreaMustEdit = false; //海域面积默认非必填
+        Boolean otherMustEdit = false; //其他默认非必填
+
+        Boolean roadLengthShow = false; //道路长度默认不显示
+        Boolean roadWidthShow = false; //道路宽度默认不显示
+        Boolean buildAreaShow = false; //建筑面积默认不显示
+        Boolean seaAreaShow = false; //海域面积默认不显示
+        Boolean otherShow = false; //其他默认不显示
+
+        //项目类型名称
+//        0099799190825080689	民用建筑 1
+//        0099799190825080690	市政道路 1
+//        0099799190825080691	港口航道 1
+//        0099799190825080692	园林景观 1
+//        0099799190825080739	轨道交通 1
+//        0099799190825080740	工业建筑 1
+//        0099799190825080993	市政管道 1
+//        0099799190825080994	设备采购 1
+//        0099799190825080750	其他 1 1
+        String projectTypeName = JdbcMapUtil.getString(row,"pt_name");
+        String projectTypeId = GrSetValue.getValueIdByName(projectTypeName,"PROJECT_TYPE");
+        if ("0099799190825080690".equals(projectTypeId) || "0099799190825080739".equals(projectTypeId)){//市政道路、轨道交通，显示长宽
+            roadLengthMustEdit = true;
+            roadWidthMustEdit = true;
+            roadLengthShow = true;
+            roadWidthShow = true;
+        } else if ("0099799190825080691".equals(projectTypeId)){ //港口航道，显示海域面积
+            seaAreaMustEdit = true;
+            seaAreaShow = true;
+        } else if ("0099799190825080689".equals(projectTypeId) || "0099799190825080692".equals(projectTypeId) || "0099799190825080740".equals(projectTypeId)){
+            // 民用建筑、园林景观、工业建筑，显示建筑面积，占地面积必填
+            floorAreaMustEdit = true;
+            buildAreaMustEdit = true;
+            buildAreaShow = true;
+        } else if ("0099799190825080994".equals(projectTypeId) || "0099799190825080750".equals(projectTypeId) || "0099799190825080993".equals(projectTypeId)){
+            //其他、设备采购、市政管道，显示其他
+            otherMustEdit = true;
+            otherShow = true;
+        }
+        // 占地面积
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "FLOOR_AREA"));
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:JdbcMapUtil.getString(row, "FLOOR_AREA");
+            linkedAtt.changeToMandatory = floorAreaMustEdit;
+            attLinkResult.attMap.put("FLOOR_AREA", linkedAtt);
+        }
+        //建筑面积
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = buildAreaShow;
+            linkedAtt.changeToMandatory = buildAreaMustEdit;
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:JdbcMapUtil.getString(row, "QTY_ONE");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "QTY_ONE"));
+            attLinkResult.attMap.put("QTY_ONE", linkedAtt);
+        }
+        //海域面积
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = seaAreaShow;
+            linkedAtt.changeToMandatory = seaAreaMustEdit;
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:JdbcMapUtil.getString(row, "QTY_THREE");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "QTY_THREE"));
+            attLinkResult.attMap.put("QTY_THREE", linkedAtt);
+        }
+        //长
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = roadLengthShow;
+            linkedAtt.changeToMandatory = roadLengthMustEdit;
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "CON_SCALE_QTY"));
+            attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
+        }
+        //宽
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = roadWidthShow;
+            linkedAtt.changeToMandatory = roadWidthMustEdit;
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "CON_SCALE_QTY2"));
+            attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
+        }
+        //其他
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.changeToShown = otherShow;
+            linkedAtt.changeToMandatory = otherMustEdit;
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
+            attLinkResult.attMap.put("OTHER", linkedAtt);
+//            attLinkResult.attMap.put("QTY_TWO", linkedAtt);
         }
     }
 
