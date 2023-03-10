@@ -33,10 +33,10 @@ public class PmProPlanExt {
         String projectId = String.valueOf(map.get("projectId"));
         String nodeId = String.valueOf(map.get("nodeId"));
 
-        allowStartNodeRecursively(nodeId);
+        allowStartNodeRecursively(new ArrayList<>(), nodeId);
     }
 
-    private void allowStartNodeRecursively(String nodeId) {
+    private void allowStartNodeRecursively(List<String> processedIdList, String nodeId) {
         Map<String, Object> map = Crud.from("PM_PRO_PLAN_NODE")
                 .where().eq("ID", nodeId)
                 .select().execForMap();
@@ -47,7 +47,7 @@ public class PmProPlanExt {
 
             String pid = JdbcMapUtil.getString(map, "PM_PRO_PLAN_NODE_PID");
             if (!SharedUtil.isEmptyString(pid)) {
-                allowStartNodeRecursively(pid);
+                allowStartNodeRecursively(processedIdList, pid);
             }
         }
     }
