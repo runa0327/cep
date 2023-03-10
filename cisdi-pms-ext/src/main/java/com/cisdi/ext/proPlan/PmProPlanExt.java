@@ -6,6 +6,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
@@ -29,14 +30,20 @@ public class PmProPlanExt {
      */
     public void allowStartNode() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String projectId = String.valueOf(map.get("projectId"));
+        // MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        // String projectId = String.valueOf(map.get("projectId"));
         String nodeId = String.valueOf(map.get("nodeId"));
 
         allowStartNodeRecursively(new ArrayList<>(), nodeId);
     }
 
     private void allowStartNodeRecursively(List<String> processedIdList, String nodeId) {
+        if (processedIdList.contains(nodeId)) {
+            throw new BaseException("允许启动节点时，出现死循环！路径上某个节点的ID：" + nodeId);
+        }
+
+        processedIdList.add(nodeId);
+
         Map<String, Object> map = Crud.from("PM_PRO_PLAN_NODE")
                 .where().eq("ID", nodeId)
                 .select().execForMap();
