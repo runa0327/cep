@@ -11,7 +11,6 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +21,7 @@ import java.util.Map;
  */
 public class WfInNodeExt {
 
+    public static final String NOT_STARTED = "0099799190825106800";
     public static final String IN_PROCESSING = "0099799190825106801";
     public static final String COMPLETED = "0099799190825106802";
 
@@ -133,11 +133,21 @@ public class WfInNodeExt {
                 }
             }
 
+            if (minStartDate.compareTo(LocalDate.MAX) == 0) {
+                minStartDate = null;
+            }
+            if (maxEndDate.compareTo(LocalDate.MIN) == 0) {
+                maxEndDate = null;
+            }
+
+            int days = 0;
+            // int days = Period.between(minStartDate, maxEndDate).getDays();
+
             Crud.from("pm_pro_plan_node")
                     .where().eq("ID", id)
                     .update()
                     // 设置进度信息：
-                    .set("PROGRESS_STATUS_ID", allChildEnd ? COMPLETED : IN_PROCESSING).set("ACTUAL_START_DATE", minStartDate).set("ACTUAL_CARRY_DAYS", Period.between(minStartDate, maxEndDate).getDays()).set("ACTUAL_CURRENT_PRO_PERCENT", allChildEnd ? 100 : 50).set("ACTUAL_COMPL_DATE", allChildEnd ? maxEndDate : null).set("ACTUAL_TOTAL_DAYS", allChildEnd ? Period.between(minStartDate, maxEndDate).getDays() : null)
+                    .set("PROGRESS_STATUS_ID", allChildEnd ? COMPLETED : (minStartDate == null ? NOT_STARTED : IN_PROCESSING)).set("ACTUAL_START_DATE", minStartDate).set("ACTUAL_CARRY_DAYS", days).set("ACTUAL_CURRENT_PRO_PERCENT", allChildEnd ? 100 : 10).set("ACTUAL_COMPL_DATE", allChildEnd ? maxEndDate : null).set("ACTUAL_TOTAL_DAYS", allChildEnd ? days : null)
                     // 设置关联信息：
                     .set("LINKED_WF_PROCESS_INSTANCE_ID", null).set("LINKED_START_WF_NODE_INSTANCE_ID", null).set("LINKED_END_WF_NODE_INSTANCE_ID", null)
                     .exec();
