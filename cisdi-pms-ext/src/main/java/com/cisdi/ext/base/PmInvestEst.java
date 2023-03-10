@@ -11,6 +11,7 @@ import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -32,7 +33,7 @@ public class PmInvestEst {
             pmInvestId = Crud.from("PM_INVEST_EST").insertData();
         }
         //修改数据
-        updateInvestEst(pmInvestId,pmPrjId,"0099799190825099302",newImport.getEstimatedTotalInvest());
+        updateInvestEst(pmInvestId,pmPrjId,"0099799190825099302",newImport.getEstimatedTotalInvest(),newImport.getReplyNo(),newImport.getReplyDate(),newImport.getReplyFile());
         //创建明细模板
         PmInvestEstDtl.createData(pmInvestId,myJdbcTemplate);
         //更新投资测算子表
@@ -53,7 +54,7 @@ public class PmInvestEst {
             pmInvestId = Crud.from("PM_INVEST_EST").insertData();
         }
         //修改数据
-        updateInvestEst(pmInvestId,pmPrjId,"0099799190825099306",newImport.getPrjTotalInvest());
+        updateInvestEst(pmInvestId,pmPrjId,"0099799190825099306",newImport.getPrjTotalInvest(),newImport.getReplyNoWr(),newImport.getReplyActualDate(),newImport.getReplyFile());
         //创建明细模板
         PmInvestEstDtl.createData(pmInvestId,myJdbcTemplate);
         //更新投资测算子表
@@ -79,7 +80,7 @@ public class PmInvestEst {
             pmInvestId = Crud.from("PM_INVEST_EST").insertData();
         }
         //修改数据
-        updateInvestEst(pmInvestId,pmPrjId,"0099799190825099305",newImport.getPrjTotalInvest());
+        updateInvestEst(pmInvestId,pmPrjId,"0099799190825099305",newImport.getPrjTotalInvest(),newImport.getReplyNoWr(),newImport.getReplyActualDate(),newImport.getReplyFile());
         //创建明细模板
         PmInvestEstDtl.createData(pmInvestId,myJdbcTemplate);
         //更新投资测算子表
@@ -96,12 +97,18 @@ public class PmInvestEst {
      * @param pmInvestId id
      * @param pmPrjId 项目id
      * @param grSetValueId 投资测算类型id
+     * @param replyNo 批复文号
+     * @param replyDate 实际批复日期
+     * @param replyFile 批复文件
      * @param amt 总投资
      */
-    private static void updateInvestEst(String pmInvestId, String pmPrjId, String grSetValueId, BigDecimal amt) {
+    private static void updateInvestEst(String pmInvestId, String pmPrjId, String grSetValueId, BigDecimal amt, String replyNo, LocalDate replyDate, String replyFile) {
         Crud.from("PM_INVEST_EST").where().eq("id",pmInvestId).update()
                 .set("PM_PRJ_ID",pmPrjId).set("INVEST_EST_TYPE_ID",grSetValueId)
                 .set("PRJ_TOTAL_INVEST",amt)
+                .set("REPLY_NO",replyNo) //批复文号
+                .set("REPLY_ACTUAL_DATE",replyDate) //实际批复日期
+                .set("REPLY_FILE",replyFile) //批复文件
                 .exec();
     }
 
