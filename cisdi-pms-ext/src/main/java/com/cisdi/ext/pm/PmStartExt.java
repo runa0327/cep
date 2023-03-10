@@ -190,12 +190,12 @@ public class PmStartExt {
                 seq = Integer.parseInt(String.valueOf(list1.get(0).get("pm_seq"))) + 1;
             }
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", input.name).set("PM_CODE", prjCode)
-                    .set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PROJECT_TYPE_ID", input.typeId).set("BUILDER_UNIT", input.unit)
+                    .set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PROJECT_TYPE_ID", input.typeId).set("BUILDER_UNIT", input.unit).set("CUSTOMER_UNIT", input.unit)
                     .set("PRJ_SITUATION", input.description).set("PM_SEQ", seq).set("BUILDER_UNIT",input.unit).exec();
         } else {
             projectId = String.valueOf(list.get(0).get("ID"));
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", input.name).set("PM_CODE", prjCode)
-                    .set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PROJECT_TYPE_ID", input.typeId).set("BUILDER_UNIT", input.unit)
+                    .set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PROJECT_TYPE_ID", input.typeId).set("BUILDER_UNIT", input.unit).set("CUSTOMER_UNIT", input.unit)
                     .set("PRJ_SITUATION", input.description).set("BUILDER_UNIT",input.unit).exec();
         }
 
