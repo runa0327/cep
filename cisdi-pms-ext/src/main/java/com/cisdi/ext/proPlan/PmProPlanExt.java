@@ -24,6 +24,34 @@ import java.util.stream.Collectors;
  */
 public class PmProPlanExt {
 
+    /**
+     * 准予启动。
+     */
+    public void allowStartNode() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String projectId = String.valueOf(map.get("projectId"));
+        String nodeId = String.valueOf(map.get("nodeId"));
+
+        allowStartNodeRecursively(nodeId);
+    }
+
+    private void allowStartNodeRecursively(String nodeId) {
+        Map<String, Object> map = Crud.from("PM_PRO_PLAN_NODE")
+                .where().eq("ID", nodeId)
+                .select().execForMap();
+        if (map != null && !Boolean.TRUE.equals(JdbcMapUtil.getBoolean(map, "CAN_START"))) {
+            Crud.from("PM_PRO_PLAN_NODE")
+                    .where().eq("ID", nodeId)
+                    .update().set("CAN_START", true).exec();
+
+            String pid = JdbcMapUtil.getString(map, "PM_PRO_PLAN_NODE_PID");
+            if (!SharedUtil.isEmptyString(pid)) {
+                allowStartNodeRecursively(pid);
+            }
+        }
+    }
+
     public void proPlanView() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
@@ -112,23 +140,23 @@ public class PmProPlanExt {
 
             // 获取流程、流程实例的相关信息：
             List<Map<String, Object>> procInfoList = myJdbcTemplate.queryForList("select p.id P_ID,p.name P_NAME,p.EXTRA_INFO P_EXTRA_INFO,pi.id PI_ID,pi.name PI_NAME,pi.ENT_CODE PI_ENT_CODE,pi.ENTITY_RECORD_ID PI_ENTITY_RECORD_ID,PI.CURRENT_VIEW_ID PI_CURRENT_VIEW_ID from PM_PRO_PLAN_NODE pppn join wf_process p on pppn.LINKED_WF_PROCESS_ID=p.id and pppn.id=? left join wf_process_instance pi on pppn.LINKED_WF_PROCESS_INSTANCE_ID=pi.id", nodeId);
-            if(!CollectionUtils.isEmpty(procInfoList)){
+            if (!CollectionUtils.isEmpty(procInfoList)) {
                 Map<String, Object> procInfo = procInfoList.get(0);
 
-                viewObj.procId=JdbcMapUtil.getString(procInfo,"P_ID");
-                viewObj.procName=JdbcMapUtil.getString(procInfo,"P_NAME");
-                viewObj.procIcon=JdbcMapUtil.getString(procInfo,"P_EXTRA_INFO");
+                viewObj.procId = JdbcMapUtil.getString(procInfo, "P_ID");
+                viewObj.procName = JdbcMapUtil.getString(procInfo, "P_NAME");
+                viewObj.procIcon = JdbcMapUtil.getString(procInfo, "P_EXTRA_INFO");
 
-                viewObj.procInstId=JdbcMapUtil.getString(procInfo,"PI_ID");
-                viewObj.procInstName=JdbcMapUtil.getString(procInfo,"PI_NAME");
-                viewObj.procInstEntityRecordId=JdbcMapUtil.getString(procInfo,"PI_ENTITY_RECORD_ID");
+                viewObj.procInstId = JdbcMapUtil.getString(procInfo, "PI_ID");
+                viewObj.procInstName = JdbcMapUtil.getString(procInfo, "PI_NAME");
+                viewObj.procInstEntityRecordId = JdbcMapUtil.getString(procInfo, "PI_ENTITY_RECORD_ID");
 
-                if(!SharedUtil.isEmptyString(viewObj.procInstId)){
-                    viewObj.procViewId=JdbcMapUtil.getString(procInfo,"PI_CURRENT_VIEW_ID");
-                }else{
+                if (!SharedUtil.isEmptyString(viewObj.procInstId)) {
+                    viewObj.procViewId = JdbcMapUtil.getString(procInfo, "PI_CURRENT_VIEW_ID");
+                } else {
                     List<Map<String, Object>> wfNodeList = myJdbcTemplate.queryForList("select n.AD_VIEW_ID from wf_node n where n.status='ap' and n.WF_PROCESS_ID='0100031468511691070' and n.NODE_TYPE='START_EVENT'");
-                    if(!CollectionUtils.isEmpty(wfNodeList)){
-                        viewObj.procViewId=JdbcMapUtil.getString( wfNodeList.get(0),"AD_VIEW_ID");
+                    if (!CollectionUtils.isEmpty(wfNodeList)) {
+                        viewObj.procViewId = JdbcMapUtil.getString(wfNodeList.get(0), "AD_VIEW_ID");
                     }
                 }
 
@@ -144,15 +172,15 @@ public class PmProPlanExt {
     }
 
     public static class FileObj {
-        //序号
+        // 序号
         public Integer num;
-        //文件名称
+        // 文件名称
         public String fileName;
-        //文件大小
+        // 文件大小
         public String fileSize;
-        //上传人
+        // 上传人
         public String uploadUser;
-        //上传时间
+        // 上传时间
         public String uploadDate;
 
         public String id;
@@ -169,21 +197,21 @@ public class PmProPlanExt {
     }
 
     public static class viewObj {
-        //岗位
+        // 岗位
         public String post;
-        //计划开始实际
+        // 计划开始实际
         public String planStartTime;
-        //计划完成时间
+        // 计划完成时间
         public String planCompleteTime;
-        //预计用时
+        // 预计用时
         public String predictDays;
-        //状态
+        // 状态
         public String status;
-        //实际开始时间
+        // 实际开始时间
         public String actualStartTime;
-        //实际结束时间
+        // 实际结束时间
         public String actualCompleteTime;
-        //剩余用时
+        // 剩余用时
         public String surplusDays;
 
         public List<FileListObj> fileListObjList;
@@ -213,17 +241,17 @@ public class PmProPlanExt {
     }
 
     public static class Problem {
-        //ID
+        // ID
         public String id;
-        //问题描述
+        // 问题描述
         public String des;
-        //解决方式
+        // 解决方式
         public String way;
-        //是否解决
+        // 是否解决
         public String izDo;
-        //提出人
+        // 提出人
         public String userName;
-        //提出时间
+        // 提出时间
         public String ctime;
     }
 
@@ -235,9 +263,9 @@ public class PmProPlanExt {
      * @param myJdbcTemplate 数据源
      */
     public static String updatePrjProPlan(String pmPrjId, String str, MyJdbcTemplate myJdbcTemplate) {
-        //判断该项目的进度计划是否存在
+        // 判断该项目的进度计划是否存在
         String pmProPlanId = getPmProPlanId(pmPrjId, myJdbcTemplate);
-        if (SharedUtil.isEmptyString(pmProPlanId)) { //新增
+        if (SharedUtil.isEmptyString(pmProPlanId)) { // 新增
             pmProPlanId = createPlan(pmPrjId, myJdbcTemplate);
         }
         return pmProPlanId;
@@ -331,27 +359,27 @@ public class PmProPlanExt {
     public static void updatePrjPlanDetailPrjReq(String pmPrjId, String pmProPlanId, List<Map<String, Object>> proPlanList, MyJdbcTemplate myJdbcTemplate) {
         if (!proPlanList.get(0).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "项目建议书编制").update()
-                    .set("PROGRESS_STATUS_ID", proPlanList.get(0).get("planStatus")) //进度状态
-                    .set("ACTUAL_COMPL_DATE", proPlanList.get(0).get("ACTUAL_COMPL_DATE")) //实际完成日期
+                    .set("PROGRESS_STATUS_ID", proPlanList.get(0).get("planStatus")) // 进度状态
+                    .set("ACTUAL_COMPL_DATE", proPlanList.get(0).get("ACTUAL_COMPL_DATE")) // 实际完成日期
                     .exec();
         }
         if (!proPlanList.get(1).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "立项批复").update()
-                    .set("PROGRESS_STATUS_ID", proPlanList.get(1).get("planStatus")) //进度状态
-                    .set("ACTUAL_COMPL_DATE", proPlanList.get(1).get("REPLY_ACTUAL_COMPL_DATE")) //实际完成日期
+                    .set("PROGRESS_STATUS_ID", proPlanList.get(1).get("planStatus")) // 进度状态
+                    .set("ACTUAL_COMPL_DATE", proPlanList.get(1).get("REPLY_ACTUAL_COMPL_DATE")) // 实际完成日期
                     .exec();
         }
         if (!proPlanList.get(1).isEmpty() && !proPlanList.get(0).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "立项").update()
-                    .set("PROGRESS_STATUS_ID", "0099799190825106802") //进度状态
+                    .set("PROGRESS_STATUS_ID", "0099799190825106802") // 进度状态
                     .exec();
         } else if (!proPlanList.get(1).isEmpty() || !proPlanList.get(0).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "立项").update()
-                    .set("PROGRESS_STATUS_ID", "0099799190825106801") //进度状态
+                    .set("PROGRESS_STATUS_ID", "0099799190825106801") // 进度状态
                     .exec();
         } else if (proPlanList.get(1).isEmpty() && proPlanList.get(0).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "立项").update()
-                    .set("PROGRESS_STATUS_ID", "0099799190825106800") //进度状态
+                    .set("PROGRESS_STATUS_ID", "0099799190825106800") // 进度状态
                     .exec();
         }
     }
@@ -367,27 +395,27 @@ public class PmProPlanExt {
     public static void updatePrjPlanDetailInvest1(String pmPrjId, String pmProPlanId, List<Map<String, Object>> proPlanList, MyJdbcTemplate myJdbcTemplate) {
         if (!proPlanList.get(0).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "可研报告编制").update()
-                    .set("PROGRESS_STATUS_ID", proPlanList.get(0).get("planStatus")) //进度状态
-                    .set("ACTUAL_COMPL_DATE", proPlanList.get(0).get("ACTUAL_COMPL_DATE")) //实际完成日期
+                    .set("PROGRESS_STATUS_ID", proPlanList.get(0).get("planStatus")) // 进度状态
+                    .set("ACTUAL_COMPL_DATE", proPlanList.get(0).get("ACTUAL_COMPL_DATE")) // 实际完成日期
                     .exec();
         }
         if (!proPlanList.get(1).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "可研批复").update()
-                    .set("PROGRESS_STATUS_ID", proPlanList.get(1).get("planStatus")) //进度状态
-                    .set("ACTUAL_COMPL_DATE", proPlanList.get(1).get("REPLY_ACTUAL_COMPL_DATE")) //实际完成日期
+                    .set("PROGRESS_STATUS_ID", proPlanList.get(1).get("planStatus")) // 进度状态
+                    .set("ACTUAL_COMPL_DATE", proPlanList.get(1).get("REPLY_ACTUAL_COMPL_DATE")) // 实际完成日期
                     .exec();
         }
         if (!proPlanList.get(1).isEmpty() && !proPlanList.get(0).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "可行性研究").update()
-                    .set("PROGRESS_STATUS_ID", "0099799190825106802") //进度状态
+                    .set("PROGRESS_STATUS_ID", "0099799190825106802") // 进度状态
                     .exec();
         } else if (!proPlanList.get(1).isEmpty() || !proPlanList.get(0).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "可行性研究").update()
-                    .set("PROGRESS_STATUS_ID", "0099799190825106801") //进度状态
+                    .set("PROGRESS_STATUS_ID", "0099799190825106801") // 进度状态
                     .exec();
         } else if (proPlanList.get(1).isEmpty() && proPlanList.get(0).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "可行性研究").update()
-                    .set("PROGRESS_STATUS_ID", "0099799190825106800") //进度状态
+                    .set("PROGRESS_STATUS_ID", "0099799190825106800") // 进度状态
                     .exec();
         }
     }
@@ -403,27 +431,27 @@ public class PmProPlanExt {
     public static void updatePrjPlanDetailInvest2(String pmPrjId, String pmProPlanId, List<Map<String, Object>> proPlanList, MyJdbcTemplate myJdbcTemplate) {
         if (!proPlanList.get(0).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "初步设计及概算编制").update()
-                    .set("PROGRESS_STATUS_ID", proPlanList.get(0).get("planStatus")) //进度状态
-                    .set("ACTUAL_COMPL_DATE", proPlanList.get(0).get("ACTUAL_COMPL_DATE")) //实际完成日期
+                    .set("PROGRESS_STATUS_ID", proPlanList.get(0).get("planStatus")) // 进度状态
+                    .set("ACTUAL_COMPL_DATE", proPlanList.get(0).get("ACTUAL_COMPL_DATE")) // 实际完成日期
                     .exec();
         }
         if (!proPlanList.get(1).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "初步设计概算批复").update()
-                    .set("PROGRESS_STATUS_ID", proPlanList.get(1).get("planStatus")) //进度状态
-                    .set("ACTUAL_COMPL_DATE", proPlanList.get(1).get("REPLY_ACTUAL_COMPL_DATE")) //实际完成日期
+                    .set("PROGRESS_STATUS_ID", proPlanList.get(1).get("planStatus")) // 进度状态
+                    .set("ACTUAL_COMPL_DATE", proPlanList.get(1).get("REPLY_ACTUAL_COMPL_DATE")) // 实际完成日期
                     .exec();
         }
         if (!proPlanList.get(1).isEmpty() && !proPlanList.get(0).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "初步设计及概算").update()
-                    .set("PROGRESS_STATUS_ID", "0099799190825106802") //进度状态
+                    .set("PROGRESS_STATUS_ID", "0099799190825106802") // 进度状态
                     .exec();
         } else if (!proPlanList.get(1).isEmpty() || !proPlanList.get(0).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "初步设计及概算").update()
-                    .set("PROGRESS_STATUS_ID", "0099799190825106801") //进度状态
+                    .set("PROGRESS_STATUS_ID", "0099799190825106801") // 进度状态
                     .exec();
         } else if (proPlanList.get(1).isEmpty() && proPlanList.get(0).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "初步设计及概算").update()
-                    .set("PROGRESS_STATUS_ID", "0099799190825106800") //进度状态
+                    .set("PROGRESS_STATUS_ID", "0099799190825106800") // 进度状态
                     .exec();
         }
     }
