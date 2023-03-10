@@ -11,6 +11,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -52,15 +53,12 @@ public class WfInNodeExt {
         Object pmPrjId = valueMap.get("PM_PRJ_ID");
         if (!SharedUtil.isEmptyObject(pmPrjId)) {
             // 获取项目的进度计划列表：
-            List<Map<String, Object>> planList = Crud.from("PM_PRO_PLAN")
-                    .where().eq("PM_PRJ_ID", pmPrjId)
-                    .select().execForMapList();
+            List<Map<String, Object>> planList = Crud.from("PM_PRO_PLAN").where().eq("PM_PRJ_ID", pmPrjId).select().execForMapList();
             if (!SharedUtil.isEmptyList(planList)) {
                 // 遍历项目的进度计划：
                 for (Map<String, Object> plan : planList) {
                     // 获取关联了当前流程节点的叶子计划节点列表：
-                    List<Map<String, Object>> leafNodeList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node n where n.PM_PRO_PLAN_ID=?/*指定计划*/ and not exists(select 1 from pm_pro_plan_node n2 where n2.PM_PRO_PLAN_NODE_PID=n.id)/*为叶子节点*/ and (n.LINKED_START_WF_NODE_ID=? or n.LINKED_END_WF_NODE_ID=?)/*关联的起始节点或结束节点为当前节点*/",
-                            plan.get("ID"), nodeId, nodeId);
+                    List<Map<String, Object>> leafNodeList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node n where n.PM_PRO_PLAN_ID=?/*指定计划*/ and not exists(select 1 from pm_pro_plan_node n2 where n2.PM_PRO_PLAN_NODE_PID=n.id)/*为叶子节点*/ and (n.LINKED_START_WF_NODE_ID=? or n.LINKED_END_WF_NODE_ID=?)/*关联的起始节点或结束节点为当前节点*/", plan.get("ID"), nodeId, nodeId);
                     if (!SharedUtil.isEmptyList(leafNodeList)) {
                         // 遍历叶子计划节点：
                         for (Map<String, Object> leafNode : leafNodeList) {
@@ -108,9 +106,7 @@ public class WfInNodeExt {
 
         processedIdList.add(id);
 
-        Map<String, Object> planNode = Crud.from("pm_pro_plan_node")
-                .where().eq("ID", id)
-                .select().execForMap();
+        Map<String, Object> planNode = Crud.from("pm_pro_plan_node").where().eq("ID", id).select().execForMap();
         if (!SharedUtil.isEmptyMap(planNode)) {
 
             Where where = new Where();
@@ -140,17 +136,21 @@ public class WfInNodeExt {
                 maxEndDate = null;
             }
 
-            int days = 0;
-            // int days = Period.between(minStartDate, maxEndDate).getDays();
+            Integer actualCarryDays = null;
+            if (minStartDate != null) {
+                actualCarryDays = Period.between(minStartDate, LocalDate.now()).getDays() + 1;
+            }
 
-            Crud.from("pm_pro_plan_node")
-                    .where().eq("ID", id)
-                    .update()
+            Integer actualTotalDays = null;
+            if (minStartDate != null && maxEndDate != null) {
+                actualTotalDays = Period.between(minStartDate, maxEndDate).getDays() + 1;
+            }
+
+            Crud.from("pm_pro_plan_node").where().eq("ID", id).update()
                     // 设置进度信息：
-                    .set("PROGRESS_STATUS_ID", allChildEnd ? COMPLETED : (minStartDate == null ? NOT_STARTED : IN_PROCESSING)).set("ACTUAL_START_DATE", minStartDate).set("ACTUAL_CARRY_DAYS", days).set("ACTUAL_CURRENT_PRO_PERCENT", allChildEnd ? 100 : 10).set("ACTUAL_COMPL_DATE", allChildEnd ? maxEndDate : null).set("ACTUAL_TOTAL_DAYS", allChildEnd ? days : null)
+                    .set("PROGRESS_STATUS_ID", allChildEnd ? COMPLETED : (minStartDate == null ? NOT_STARTED : IN_PROCESSING)).set("ACTUAL_START_DATE", minStartDate).set("ACTUAL_CARRY_DAYS", actualCarryDays).set("ACTUAL_CURRENT_PRO_PERCENT", allChildEnd ? 100 : 10).set("ACTUAL_COMPL_DATE", allChildEnd ? maxEndDate : null).set("ACTUAL_TOTAL_DAYS", allChildEnd ? actualTotalDays : null)
                     // 设置关联信息：
-                    .set("LINKED_WF_PROCESS_INSTANCE_ID", null).set("LINKED_START_WF_NODE_INSTANCE_ID", null).set("LINKED_END_WF_NODE_INSTANCE_ID", null)
-                    .exec();
+                    .set("LINKED_WF_PROCESS_INSTANCE_ID", null).set("LINKED_START_WF_NODE_INSTANCE_ID", null).set("LINKED_END_WF_NODE_INSTANCE_ID", null).exec();
 
             Object pid = planNode.get("PM_PRO_PLAN_NODE_PID");
             if (!SharedUtil.isEmptyObject(pid)) {
@@ -160,25 +160,19 @@ public class WfInNodeExt {
     }
 
     private void updateStartInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode) {
-        Crud.from("pm_pro_plan_node")
-                .where().eq("ID", leafNode.get("ID"))
-                .update()
+        Crud.from("pm_pro_plan_node").where().eq("ID", leafNode.get("ID")).update()
                 // 设置进度信息：
                 .set("PROGRESS_STATUS_ID", IN_PROCESSING).set("ACTUAL_START_DATE", now).set("ACTUAL_CARRY_DAYS", 1).set("ACTUAL_CURRENT_PRO_PERCENT", 10).set("ACTUAL_COMPL_DATE", null).set("ACTUAL_TOTAL_DAYS", null)
                 // 设置关联信息：
-                .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_START_WF_NODE_INSTANCE_ID", nodeInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", null)
-                .exec();
+                .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_START_WF_NODE_INSTANCE_ID", nodeInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", null).exec();
     }
 
     private void updateEndInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode) {
-        Crud.from("pm_pro_plan_node")
-                .where().eq("ID", leafNode.get("ID"))
-                .update()
+        Crud.from("pm_pro_plan_node").where().eq("ID", leafNode.get("ID")).update()
                 // 设置进度信息：
                 .set("PROGRESS_STATUS_ID", COMPLETED).set("ACTUAL_CURRENT_PRO_PERCENT", 100).set("ACTUAL_COMPL_DATE", now)
                 // 设置关联信息：
-                .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", nodeInstId)
-                .exec();
+                .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", nodeInstId).exec();
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         myJdbcTemplate.update("update pm_pro_plan_node t set t.ACTUAL_CARRY_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1,t.ACTUAL_TOTAL_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1 WHERE t.id=?", leafNode.get("ID"));
