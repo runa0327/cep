@@ -5,6 +5,7 @@ import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -231,8 +232,11 @@ public class ParcelMap {
      */
     public void listPrjParcel(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
+        MyNamedParameterJdbcTemplate namedJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+        Map<String, Object> namedMap = new HashMap<>();
 
+        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
+        PrjReq prjReq = JSONObject.parseObject(JSONObject.toJSONString(params), PrjReq.class);
         //待返回的结果集合
         HashMap<String, Object> result = new HashMap<>();
 
@@ -244,7 +248,7 @@ public class ParcelMap {
         List<Map<String, Object>> originalPointList = myJdbcTemplate.queryForList("select id pointId,PARCEL_ID parcelId,longitude,latitude from parcel_point");
 
         //项目绑定地块的原始数据
-        String prjSql = "select pj.id prjId,pj.name prjName,gsv.NAME as projectType,pj.PRJ_MANAGE_MODE_ID modeId,gv.name modeName,gvp.name " +
+        String prjSql = "select pj.id prjId,pj.name prjName,pj.PROJECT_TYPE_ID projectTypeId,gsv.NAME as projectTypeName,pj.PRJ_MANAGE_MODE_ID modeId,gv.name modeName,gvp.name " +
                 "phaseName,pj.PROJECT_PHASE_ID phaseId\n" +
                 "from prj_parcel pp \n" +
                 "left join pm_prj pj on pj.id = pp.pm_prj_id \n" +
@@ -252,36 +256,65 @@ public class ParcelMap {
                 "left join gr_set_value gv on gv.id = pj.PRJ_MANAGE_MODE_ID\n" +
                 "left join gr_set_value gvp on gvp.id = pj.PROJECT_PHASE_ID\n" +
                 "where 1 = 1";
-        if (!Objects.isNull(params.get("prjName"))){
-            prjSql += " and pj.name like '%" + params.get("prjName").toString() + "%'";
+        if (!Strings.isNullOrEmpty(prjReq.prjName)){
+            prjSql += " and pj.name like '%" + prjReq.prjName + "%'";
         }
+        if (!CollectionUtils.isEmpty(prjReq.prjIds)){
+            prjSql += " and pj.id in (:prjIds)";
+            namedMap.put("prjIds",prjReq.prjIds);
+        }
+        if (!CollectionUtils.isEmpty(prjReq.prjTypeIds)){
+            if (prjReq.prjTypeIds.contains("others")){
+                this.replaceTypeOthers(prjReq.prjTypeIds);
+            }
+            prjSql += " and pj.PROJECT_TYPE_ID in (:prjTypeIds)";
+            namedMap.put("prjTypeIds",prjReq.prjTypeIds);
+        }
+        if (!CollectionUtils.isEmpty(prjReq.modeIds)){
+            prjSql += " and pj.PRJ_MANAGE_MODE_ID in (:modeIds)";
+            namedMap.put("modeIds",prjReq.modeIds);
+        }
+        if (!CollectionUtils.isEmpty(prjReq.phaseIds)){
+            prjSql += " and pj.PROJECT_PHASE_ID in (:phaseIds)";
+            namedMap.put("phaseIds",prjReq.phaseIds);
+        }
+
+        //权限
+//        String userId = ExtJarHelper.loginInfo.get().userId;
+//        if (!this.getRootUserIds().contains(userId)){
+//            prjSql += " and pj.id in (select pm_prj_id from pm_dept where status = 'ap' and find_in_set('" + userId + "',user_ids))";
+//        }
+
         prjSql += " group by pj.id";
-        List<Map<String, Object>> orgPrjList = myJdbcTemplate.queryForList(prjSql);
+        List<Map<String, Object>> orgPrjList = namedJdbcTemplate.queryForList(prjSql, namedMap);
+//        List<Map<String, Object>> orgPrjList = myJdbcTemplate.queryForList(prjSql);
 
         List<Project> projects = orgPrjList.stream().map(prj -> {
             Project project = new Project();
-            project.prjId = String.valueOf(prj.get("prjId"));
-            project.prjName = String.valueOf(prj.get("prjName"));
-            project.modeId = String.valueOf(prj.get("modeId"));
-            project.modeName = String.valueOf(prj.get("modeName"));
-            project.phaseId = String.valueOf(prj.get("phaseId"));
-            project.phaseName = String.valueOf(prj.get("phaseName"));
-            String type = JdbcMapUtil.getString(prj, "projectType");
+            project.prjId = JdbcMapUtil.getString(prj,"prjId");
+            project.prjName = JdbcMapUtil.getString(prj,"prjName");
+            project.modeId = JdbcMapUtil.getString(prj,"modeId");
+            project.modeName = JdbcMapUtil.getString(prj,"modeName");
+            project.phaseId = JdbcMapUtil.getString(prj,"phaseId");
+            project.phaseName = JdbcMapUtil.getString(prj,"phaseName");
+            project.projectTypeId = JdbcMapUtil.getString(prj,"projectTypeId");
+            project.projectTypeName = JdbcMapUtil.getString(prj,"projectTypeName");
+            String type = JdbcMapUtil.getString(prj, "projectTypeName");
             if ("民用建筑".equals(type)) {
-                project.projectType = "房建";
-            } else if ("市政道路".equals(type)) {
-                project.projectType = "道路";
+                project.projectTypeName = "房建项目";
+            } else if ("市政管道".equals(type)) {
+                project.projectTypeName = "地下管网";
             } else {
-                project.projectType = "其他";
+                project.projectTypeName = "其他";
             }
             project.parcels = originalParcelList.stream()
                     .filter(par -> String.valueOf(par.get("prjId")).equals(project.prjId))
                     .map(par -> {
                         Parcel parcel = new Parcel();
-                        parcel.parcelId = String.valueOf(par.get("parcelId"));
-                        parcel.parcelShape = String.valueOf(par.get("parcelShape"));
-                        parcel.centerLongitude = String.valueOf(par.get("centerLongitude"));
-                        parcel.centerLatitude = String.valueOf(par.get("centerLatitude"));
+                        parcel.parcelId = JdbcMapUtil.getString(par,"parcelId");
+                        parcel.parcelShape = JdbcMapUtil.getString(par,"parcelShape");
+                        parcel.centerLongitude = JdbcMapUtil.getString(par,"centerLongitude");
+                        parcel.centerLatitude = JdbcMapUtil.getString(par,"centerLatitude");
                         parcel.points = originalPointList.stream()
                                 .filter(poi -> String.valueOf(poi.get("parcelId")).equals(parcel.parcelId))
                                 .map(poi -> {
@@ -300,6 +333,51 @@ public class ParcelMap {
         ExtJarHelper.returnValue.set(outputMap);
     }
 
+    //项目类型字典
+    public List<Map<String,Object>> prjTypeDic(){
+        MyNamedParameterJdbcTemplate namedJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+        List<String> specific = this.getSpecificType();
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("specific",specific);
+        List<Map<String, Object>> typeDic = namedJdbcTemplate.queryForList("select gv.id,gv.name from gr_set_value gv left join gr_set se on se.id = gv" +
+                ".gr_set_id where se.code = 'project_type' and gv.name in (:specific)", paramMap);
+        for (Map<String, Object> dicMap : typeDic) {
+            if ("民用建筑".equals(dicMap.get("name").toString())){
+                dicMap.put("name","房建项目");
+            }
+            if ("市政管道".equals(dicMap.get("name").toString())){
+                dicMap.put("name","地下管网");
+            }
+        }
+        Map<String, Object> otherMap = new HashMap<>();
+        otherMap.put("id","others");
+        otherMap.put("name","其他");
+        typeDic.add(otherMap);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("dict",typeDic);
+        ExtJarHelper.returnValue.set(result);
+        return typeDic;
+    }
+
+    //替换项目类型id中的其他
+    private List<String> replaceTypeOthers(List<String> prjTypeIds){
+        MyNamedParameterJdbcTemplate namedJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+        List<String> specific = this.getSpecificType();
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("specific",specific);
+        List<Map<String, Object>> otherTypeList = namedJdbcTemplate.queryForList("select gv.id,gv.name from gr_set_value gv left join gr_set se on se.id = " +
+                "gv.gr_set_id where se.code = 'project_type' and gv.name not in (:specific)", paramMap);
+        List<String> otherTypeIds = otherTypeList.stream().map(typeMap -> typeMap.get("id").toString()).collect(Collectors.toList());
+        prjTypeIds.remove("others");
+        prjTypeIds.addAll(otherTypeIds);
+        return prjTypeIds;
+    }
+
+    //指定具体的项目类型
+    private List<String> getSpecificType(){
+        return new ArrayList<>(Arrays.asList("民用建筑","市政道路","市政管道"));
+    }
 
     //经度纬度转坐标数组 [经度,纬度]
     private List<BigDecimal> getCoordinate(Map<String, Object> pointMap){
@@ -388,6 +466,14 @@ public class ParcelMap {
         point.add(latitude);
         return point;
     }
+
+    //指定root用户
+    private List<String> getRootUserIds(){
+        List<String> rootUsers = new ArrayList<>();
+        rootUsers.add("0099250247095871681");//系统管理员
+        return rootUsers;
+    }
+
     public static void main(String[] args) {
 //        System.out.println(getSingleLength(new BigDecimal(-6), new BigDecimal(-8)));
 //        BigDecimal a = new BigDecimal(6);
@@ -398,6 +484,9 @@ public class ParcelMap {
 
 //        System.out.println(new BigDecimal(2).compareTo(BigDecimal.ZERO));
 //        System.out.println(new BigDecimal(-5).compareTo(BigDecimal.ZERO));
+//        ArrayList<String> others = new ArrayList<>(Arrays.asList("others", "1"));
+//        replaceTypeOthers(others);
+//        System.out.println(others);
     }
 
     /**
@@ -435,16 +524,32 @@ public class ParcelMap {
         //name
         public String prjName;
         //项目类型
-        public String projectType;
-        //模式id
+        public String projectTypeId;
+        public String projectTypeName;
+        //模式
         public String modeId;
-        //模式名
         public String modeName;
         //进度状态
         public String phaseName;
         public String phaseId;
         //区域
         public List<Parcel> parcels;
+    }
+
+    /**
+     * 筛选项目请求
+     */
+    public static class PrjReq{
+        //项目名称
+        public String prjName;
+        //项目
+        public List<String> prjIds;
+        //项目类型
+        public List<String> prjTypeIds;
+        //进度状态
+        public List<String> phaseIds;
+        //模式
+        public List<String> modeIds;
     }
 
     /**
