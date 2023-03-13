@@ -244,11 +244,14 @@ public class ParcelMap {
         List<Map<String, Object>> originalPointList = myJdbcTemplate.queryForList("select id pointId,PARCEL_ID parcelId,longitude,latitude from parcel_point");
 
         //项目绑定地块的原始数据
-        String prjSql = "select pj.id prjId,pj.name prjName,gsv.NAME as projectType,pj.PRJ_MANAGE_MODE_ID modeId,gv.name modeName from prj_parcel pp " +
-                "left join pm_prj pj on pj.id = pp.pm_prj_id " +
+        String prjSql = "select pj.id prjId,pj.name prjName,gsv.NAME as projectType,pj.PRJ_MANAGE_MODE_ID modeId,gv.name modeName,gvp.name " +
+                "phaseName,pj.PROJECT_PHASE_ID phaseId\n" +
+                "from prj_parcel pp \n" +
+                "left join pm_prj pj on pj.id = pp.pm_prj_id \n" +
                 "left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID\n" +
                 "left join gr_set_value gv on gv.id = pj.PRJ_MANAGE_MODE_ID\n" +
-                " where 1 = 1";
+                "left join gr_set_value gvp on gvp.id = pj.PROJECT_PHASE_ID\n" +
+                "where 1 = 1";
         if (!Objects.isNull(params.get("prjName"))){
             prjSql += " and pj.name like '%" + params.get("prjName").toString() + "%'";
         }
@@ -261,6 +264,8 @@ public class ParcelMap {
             project.prjName = String.valueOf(prj.get("prjName"));
             project.modeId = String.valueOf(prj.get("modeId"));
             project.modeName = String.valueOf(prj.get("modeName"));
+            project.phaseId = String.valueOf(prj.get("phaseId"));
+            project.phaseName = String.valueOf(prj.get("phaseName"));
             String type = JdbcMapUtil.getString(prj, "projectType");
             if ("民用建筑".equals(type)) {
                 project.projectType = "房建";
@@ -435,6 +440,9 @@ public class ParcelMap {
         public String modeId;
         //模式名
         public String modeName;
+        //进度状态
+        public String phaseName;
+        public String phaseId;
         //区域
         public List<Parcel> parcels;
     }
