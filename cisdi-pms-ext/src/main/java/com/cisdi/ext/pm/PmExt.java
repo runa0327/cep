@@ -328,7 +328,7 @@ public class PmExt {
 
     public String getPrjInvest(String projectId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pie.id,round(ifnull(pie.PRJ_TOTAL_INVEST,0),2) as amt ,gsv.code from pm_invest_est pie  " +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pie.id,round(ifnull(pie.PRJ_TOTAL_INVEST/10000,0),2) as amt ,gsv.code from pm_invest_est pie  " +
                 "left join  gr_set_value gsv on gsv.id = pie.INVEST_EST_TYPE_ID " +
                 "where PM_PRJ_ID=? order by gsv.`CODE` desc limit 0,1  ", projectId);
         if (CollectionUtils.isEmpty(list)) {
