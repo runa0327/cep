@@ -296,9 +296,7 @@ public class WfExt {
                                     otherName = getContractName(entityCode,"NAME_ONE",csCommId,myJdbcTemplate);
                                     name = concatProcessName("-",processName,otherName,userName,nowDate);
                                 } else {
-                                    if ("PM_PRJ_REQ".equals(entityCode)){
-                                        projectName = myJdbcTemplate.queryForList("select IFNULL(T.PRJ_NAME,P.NAME) PRJ_NAME from PM_PRJ_REQ T left join PM_PRJ P ON T.PM_PRJ_ID=P.ID WHERE T.id = ?",csCommId).get(0).get("PRJ_NAME").toString();
-                                    } else if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
+                                    if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
                                         otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
                                     } else if ("QUALITY_RECORD".equals(entityCode)){
                                         otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
@@ -1413,7 +1411,7 @@ public class WfExt {
         list.add("PM_BID_APPROVAL_REQ"); //招标文件审批
         list.add("PM_USE_CHAPTER_REQ"); //中选单位及标后用印申请
         list.add("PO_ORDER_REQ"); //合同签订
-        list.add("PM_PRJ_REQ"); // 立项申请
+//        list.add("PM_PRJ_REQ"); // 立项申请
         list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
         list.add("QUALITY_RECORD"); // 质量交底记录
         list.add("PM_SUPERVISE_NOTICE_REQ"); // 监理通知单
