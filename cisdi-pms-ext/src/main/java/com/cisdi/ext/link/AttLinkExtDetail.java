@@ -446,7 +446,6 @@ public class AttLinkExtDetail {
             linkedAtt.type = AttDataTypeE.DOUBLE;
             linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PD")) ? null:JdbcMapUtil.getString(row, "PD");
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PD")) ? null:JdbcMapUtil.getString(row, "PD");
-
             attLinkResult.attMap.put("ESTIMATE_APPROVE_FUND", linkedAtt);
         }
         // 财评批复资金
@@ -455,8 +454,15 @@ public class AttLinkExtDetail {
             linkedAtt.type = AttDataTypeE.DOUBLE;
             linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "budget")) ? null:JdbcMapUtil.getString(row, "budget");
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "budget")) ? null:JdbcMapUtil.getString(row, "budget");
-
             attLinkResult.attMap.put("EVALUATION_APPROVE_FUND", linkedAtt);
+        }
+        // 总投资
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "ESTIMATED_TOTAL_INVEST")) ? null:JdbcMapUtil.getString(row, "ESTIMATED_TOTAL_INVEST");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "ESTIMATED_TOTAL_INVEST")) ? null:JdbcMapUtil.getString(row, "ESTIMATED_TOTAL_INVEST");
+            attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
         }
         // 资金来源
         {
