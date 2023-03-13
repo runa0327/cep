@@ -8,6 +8,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -261,13 +262,32 @@ public class PrjPlanUtil {
      * 新增项目进度网络图
      *
      * @param projectId
+     * @param type
+     * @param sourceId
+     * @param invest
      */
-    public static void createPlan(String projectId) {
+    public static void createPlan(String projectId, String type, String sourceId, BigDecimal invest) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        // 根据项目类型查询项目进度计划模板
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ppp.*,PRJ_REPLY_DATE from PM_PRO_PLAN ppp \n" +
-                "left join pm_prj pp on ppp.TEMPLATE_FOR_PROJECT_TYPE_ID = pp.PROJECT_TYPE_ID\n" +
-                "where ppp.`STATUS`='AP' and ppp.IS_TEMPLATE='1' and pp.id=?", projectId);
+        //根据项目的类型，项目投资来源，项目的总额查询模板
+        String proPlanId = "";
+        List<Map<String, Object>> ruleList = myJdbcTemplate.queryForList("select pptr.*,gsv.`code` as rule from PRO_PLAN_TEMPLATE_RULE pptr left join gr_set_value gsv on pptr.PRO_PLAN_RULE_CONDITION_ID = gsv.id " +
+                "where TEMPLATE_FOR_PROJECT_TYPE_ID=? and INVESTMENT_SOURCE_ID=?", type, sourceId);
+        if (CollectionUtils.isEmpty(ruleList)) {
+            //取默认的模板
+            proPlanId = null;
+        } else {
+            for (Map<String, Object> objectMap : ruleList) {
+                String condition = JdbcMapUtil.getString(objectMap, "rule");
+                String ex = condition.replaceAll("param", String.valueOf(invest));
+                if (StringUtil.doExpression(ex)) {
+                    proPlanId = JdbcMapUtil.getString(objectMap, "PM_PRO_PLAN_ID");
+                    break;
+                }
+            }
+        }
+        //根据规则查询模板
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRO_PLAN where id = ?", proPlanId);
+
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> proMap = list.get(0);
             // 先创建项目的进度计划
@@ -295,7 +315,7 @@ public class PrjPlanUtil {
                             .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                             .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                             .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
-                            .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START",  m.get("CAN_START")).exec();
+                            .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).exec();
 
                     getChildrenNode(m, planNodeList, id, newPlanId, postUserList);
                 }).collect(Collectors.toList());
@@ -315,16 +335,6 @@ public class PrjPlanUtil {
             getChildrenNode(m, allData, id, newPlanId, postUserList);
         }).collect(Collectors.toList());
     }
-
-    private static String getUser(List<Map<String, Object>> postUserList, Object postId) {
-        String userId = null;
-        Optional<Map<String, Object>> any = postUserList.stream().filter(p -> Objects.equals(p.get("POST_INFO_ID"), postId)).findAny();
-        if (any.isPresent()) {
-            userId = String.valueOf(any.get().get("AD_USER_ID"));
-        }
-        return userId;
-    }
-
 
     /**
      * 跟新进度节点状态
@@ -414,5 +424,6 @@ public class PrjPlanUtil {
             }
         }).collect(Collectors.toList());
     }
+
 
 }

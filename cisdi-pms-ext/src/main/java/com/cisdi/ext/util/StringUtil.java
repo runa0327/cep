@@ -2,6 +2,7 @@ package com.cisdi.ext.util;
 
 import com.google.common.base.Strings;
 import com.qygly.shared.util.SharedUtil;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -150,5 +151,20 @@ public class StringUtil {
             str = str.substring(0,index);
             return str;
         }
+    }
+
+    /**
+     * 计算字符串表达式
+     *
+     * @param elString
+     * @return
+     */
+    public static Boolean doExpression(String elString) {
+        SpelExpressionParser spelExpressionParser = new SpelExpressionParser();
+        return spelExpressionParser.parseExpression(elString).getValue(Boolean.class);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(StringUtil.doExpression("100<20"));
     }
 }
