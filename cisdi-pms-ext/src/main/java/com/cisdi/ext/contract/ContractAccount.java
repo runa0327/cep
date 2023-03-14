@@ -42,8 +42,8 @@ public class ContractAccount {
                 "contractCategoryId,va.name contractCategoryName,o.AMT_THREE amtExcludeTax,o.AMT_FOUR taxRate,o.AMT_TWO amtIncludeTax,o.SIGN_DATE " +
                 "createTime,i.END_DATETIME endTime,o.REMARK_LONG_ONE remark,o.CRT_USER_ID userId,u.name userName,o.FILE_ID_FIVE fileIds\n" +
                 "FROM PO_ORDER_REQ o\n" +
-                "left join (select id,name from pm_prj where status = 'AP') p on p.id = o.PM_PRJ_ID\n" +
-                "left join (select id,name from pm_prj where status = 'AP') p2 on p2.name = o.PROJECT_NAME_WR\n" +
+                "left join pm_prj p on p.id = o.PM_PRJ_ID\n" +
+                "left join pm_prj p2 on p2.name = o.PROJECT_NAME_WR\n" +
                 "left join pm_party pa on pa.id = o.CUSTOMER_UNIT_ONE\n" +
                 "left join gr_set_value va on va.id = o.CONTRACT_CATEGORY_ONE_ID\n" +
                 "left join gr_set se on se.id = va.GR_SET_ID and se.code = 'contract_type_one'\n" +
