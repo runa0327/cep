@@ -1,6 +1,6 @@
 package com.pms.cisdipmswordtopdf.service;
 
-import com.pms.cisdipmswordtopdf.api.PoOrderReq;
+import com.pms.cisdipmswordtopdf.model.PoOrderReq;
 
 public interface WordToPdfService {
 

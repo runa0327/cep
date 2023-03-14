@@ -9,7 +9,7 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
-import com.pms.cisdipmswordtopdf.api.PoOrderReq;
+import com.pms.cisdipmswordtopdf.model.PoOrderReq;
 import com.pms.cisdipmswordtopdf.service.WordToPdfService;
 import com.pms.cisdipmswordtopdf.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;

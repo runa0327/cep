@@ -1,25 +1,33 @@
-package com.pms.cisdipmswordtopdf.api;
+package com.pms.cisdipmswordtopdf.model;
+
+import com.alibaba.excel.annotation.ExcelProperty;
 
 public class BriskUser {
 
     //id
     public String id;
 
+    @ExcelProperty("姓名")
     //姓名
     public String userName;
 
+    @ExcelProperty("部门")
     //部门
     public String deptName;
 
+    @ExcelProperty("最近登录时间")
     //最近登录时间
     public String lastLoginDate;
 
+    @ExcelProperty("累计登录次数")
     //累计登录次数
     public String loginNum;
 
+    @ExcelProperty("累计发起流程")
     //累计发起流程
     public String initiateProcessNum;
 
+    @ExcelProperty("累计处理流程")
     //累计处理流程
     public String handleProcessNum;
 
