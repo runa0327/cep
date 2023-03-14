@@ -709,4 +709,63 @@ public class ProcessRoleExt {
         }
         return list;
     }
+
+    /**
+     * 角色-财务人员
+     */
+    public void getFinanceUser(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //获取签订公司
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
+        List<String> userList = new ArrayList<>();
+        if ("0099902212142008832".equals(companyId)){ //三亚崖州湾科技城投资控股有限公司
+            userList = getRoleUser("1635477615899029504",myJdbcTemplate);
+        } else {
+            userList = getRoleUser("1635518656563884032",myJdbcTemplate);
+        }
+        if (CollectionUtils.isEmpty(userList)){
+            throw new BaseException("该流程未配置财务审批人员，请先选择对应人员或联系管理员处理！");
+        } else {
+            ExtJarHelper.returnValue.set(userList);
+        }
+    }
+
+    /**
+     * 角色-财务领导人员
+     */
+    public void getFinanceLeaderUser(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //获取签订公司
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
+        List<String> userList = new ArrayList<>();
+        if ("0099902212142008832".equals(companyId)){ //三亚崖州湾科技城投资控股有限公司
+            userList = getRoleUser("1635517976218415104",myJdbcTemplate);
+        } else {
+            userList = getRoleUser("1635518656576466944",myJdbcTemplate);
+        }
+        if (CollectionUtils.isEmpty(userList)){
+            throw new BaseException("该流程未配置财务审批人员，请先选择对应人员或联系管理员处理！");
+        } else {
+            ExtJarHelper.returnValue.set(userList);
+        }
+    }
+
+
+    /**
+     * 获取该角色人员信息
+     * @param roleId 角色id
+     * @param myJdbcTemplate 数据源
+     * @return 人员id集合
+     */
+    private List<String> getRoleUser(String roleId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select ad_user_id from ad_role_user where ad_role_id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,roleId);
+        List<String> list1 = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(list)){
+            list1 = list.stream().map(p->JdbcMapUtil.getString(p,"ad_user_id")).collect(Collectors.toList());
+        }
+        return list1;
+    }
 }

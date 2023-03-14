@@ -123,7 +123,7 @@ public class AttLinkExtDetail {
      */
     public static void clearDataSourceType(AttLinkResult attLinkResult) {
         clearProjectAmtData(attLinkResult); //清空资金信息
-        clearBaseProjectData(attLinkResult); //清空项目信息
+        clearBaseProjectDataNOPrj(attLinkResult); //清空项目信息
         clearProjectUserData(attLinkResult); //清空项目配套人员信息
     }
 

@@ -14,9 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 保函相关扩展
@@ -75,17 +77,17 @@ public class GuaranteeExt {
         String csCommId = entityRecord.csCommId;
         // 流程id
         String procInstId = ExtJarHelper.procInstId.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select u.id u_id,u.code u_code,u.name u_name,tk.user_comment from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id", procInstId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select u.id u_id,u.code u_code,u.name u_name,tk.user_comment from wf_node_instance ni join wf_task tk on ni.wf_process_instance_id=? and ni.is_current=1 and ni.id=tk.wf_node_instance_id join ad_user u on tk.ad_user_id=u.id where tk.status = 'ap' and ni.status = 'ap' ", procInstId);
         StringBuffer comment = new StringBuffer();
         if (!CollectionUtils.isEmpty(list)) {
             for (Map<String, Object> tmp : list) {
-                String txt = JdbcMapUtil.getString(tmp,"user_comment");
+                String txt = SharedUtil.isEmptyString(JdbcMapUtil.getString(tmp,"user_comment")) ? "同意" : JdbcMapUtil.getString(tmp,"user_comment");
                 if (!SharedUtil.isEmptyString(txt)){
-                    comment = comment.append(JdbcMapUtil.getString(tmp,"u_name")).append("： ").append(txt).append("; ");
+                    comment = comment.append(JdbcMapUtil.getString(tmp,"u_name")).append("： ").append(txt).append(";").append("\n");
                 }
-
             }
         }
+        comment.deleteCharAt(comment.length()-2);
         if ("One".equals(status)) {
             Integer exec = Crud.from("PO_GUARANTEE_LETTER_REQUIRE_REQ").where().eq("ID", csCommId).update()
                     .set("FINANCE_PUBLISH_USER", userId).set("FINANCE_PUBLISH_DATE", now).set("FINANCE_MESSAGE", comment).exec();
@@ -191,5 +193,4 @@ public class GuaranteeExt {
         String sql = "update PO_GUARANTEE_LETTER_RETURN_OA_REQ set REMARK_TWO = ? where id = ?";
         int num = myJdbcTemplate.update(sql,amtChina,id);
     }
-
 }
