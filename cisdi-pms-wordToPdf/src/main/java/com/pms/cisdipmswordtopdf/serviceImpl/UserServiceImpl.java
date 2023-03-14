@@ -37,9 +37,8 @@ public class UserServiceImpl implements UserService {
             endTime = now;
         }
 
-        List<Map<String, Object>> originList = myJdbcTemplate.queryForList("select l.AD_USER_ID userId,u.name userName,max(l.LOGIN_DATETIME) " +
-                "lastLoginDate,count(*) loginNum,max(d.name) " +
-                "deptName,max(ft.initiateProcessNum) initiateProcessNum,max(lt.handleProcessNum) handleProcessNum\n" +
+        List<Map<String, Object>> originList = myJdbcTemplate.queryForList("select l.AD_USER_ID userId,u.name userName,max(l.LOGIN_DATETIME) lastLoginDate," +
+                "count(*) loginNum,max(d.name) deptName,IFNULL(max(ft.initiateProcessNum),0) initiateProcessNum,IFNULL(max(lt.handleProcessNum),0) handleProcessNum\n" +
                 "from main.ad_login l\n" +
                 "left join ad_user u on u.id = l.AD_USER_ID\n" +
                 "left join hr_dept_user du on du.AD_USER_ID = u.id\n" +
@@ -51,8 +50,11 @@ public class UserServiceImpl implements UserService {
                 "where u.name is not null\n" +
                 "and l.LOGIN_DATETIME >= ? and l.LOGIN_DATETIME <= ?\n" +
                 "group by l.AD_USER_ID order by loginNum desc", startTime, endTime);
-        List<BriskUserExportModel> models = originList.stream().map(userMap -> JSONObject.parseObject(JSONObject.toJSONString(userMap),
-                BriskUserExportModel.class)).collect(Collectors.toList());
+        List<BriskUserExportModel> models = originList.stream().map(userMap -> {
+            BriskUserExportModel model = JSONObject.parseObject(JSONObject.toJSONString(userMap), BriskUserExportModel.class);
+            model.lastLoginDate = com.pms.cisdipmswordtopdf.util.StringUtils.replaceCode(model.lastLoginDate,"T"," ");
+            return model;
+        }).collect(Collectors.toList());
         return models;
     }
 }
