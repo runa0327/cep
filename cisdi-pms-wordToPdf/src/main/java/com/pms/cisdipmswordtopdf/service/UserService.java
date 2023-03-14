@@ -1,6 +1,7 @@
 package com.pms.cisdipmswordtopdf.service;
 
-import com.pms.cisdipmswordtopdf.api.BriskUser;
+import com.pms.cisdipmswordtopdf.model.BriskUser;
+import com.pms.cisdipmswordtopdf.model.BriskUserExportModel;
 
 import java.util.List;
 
@@ -11,5 +12,5 @@ public interface UserService {
      * @param briskUser
      * @return
      */
-    List<BriskUser> briskUserImport(BriskUser briskUser);
+    List<BriskUserExportModel> briskUserExport(BriskUser briskUser);
 }
