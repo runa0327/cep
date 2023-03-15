@@ -83,7 +83,7 @@ public class PmPrjExt {
         int oldLevel = getPrjDataLevel(projectId,myJdbcTemplate);
         if (level >= oldLevel){ //更新数据
             //当前更新级别id
-            String levelId = GrSetValue.getValueId(String.valueOf(level),"invest_priority",myJdbcTemplate);
+            String levelId = GrSetValue.getValueId("invest_priority",String.valueOf(level),myJdbcTemplate);
             //更新项目基础信息
             updateBaseData(projectId,entityRecord.valueMap,levelId);
             //更新项目资金信息
@@ -109,7 +109,7 @@ public class PmPrjExt {
                 .set("OTHER",JdbcMapUtil.getString(valueMap,"QTY_THREE")) // 其他
                 .set("CON_SCALE_UOM_ID",JdbcMapUtil.getString(valueMap,"CON_SCALE_UOM_ID")) // 建设规模单位
                 .set("PRJ_SITUATION",JdbcMapUtil.getString(valueMap,"PRJ_SITUATION")) // 项目概况
-                .set("level",level) // 来源级别
+                .set("INVEST_PRIORITY",level) // 来源级别
                 .exec();
     }
 
