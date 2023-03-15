@@ -1,9 +1,6 @@
 package com.cisdi.ext.pm;
 
-import com.cisdi.ext.util.JsonUtil;
-import com.cisdi.ext.util.ParcelUtil;
-import com.cisdi.ext.util.PmPrjCodeUtil;
-import com.cisdi.ext.util.StringUtil;
+import com.cisdi.ext.util.*;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -169,14 +166,17 @@ public class PmStartExt {
         inputData input = JsonUtil.fromJson(json, inputData.class);
         String id = input.id;
         String prjCode = input.code;
+        String dataStatus = "";
+        Date startTime = new Date();
         if (Strings.isNullOrEmpty(input.id)) {
             id = Crud.from("PRJ_START").insertData();
             prjCode = PmPrjCodeUtil.getPrjCode();
+            dataStatus = "add";
         }
 
         Crud.from("PRJ_START").where().eq("ID", id).update()
                 .set("PM_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId)
-                .set("BUILDER_UNIT", input.unit).set("START_TIME", new Date()).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", "1626110930922467328")
+                .set("BUILDER_UNIT", input.unit).set("START_TIME", startTime).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", "1626110930922467328")
                 .set("ATT_FILE_GROUP_ID", input.fileIds).set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).exec();
         String projectId = "";
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
@@ -184,12 +184,22 @@ public class PmStartExt {
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRJ where PM_CODE=?", prjCode);
         if (CollectionUtils.isEmpty(list)) {
             projectId = Crud.from("PM_PRJ").insertData();
+            int seq = 1;
+            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select pm_seq from pm_prj order by PM_SEQ desc limit 0,1");
+            if (list1 != null && list1.size() > 0) {
+                seq = Integer.parseInt(String.valueOf(list1.get(0).get("pm_seq"))) + 1;
+            }
+            Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", input.name).set("PM_CODE", prjCode)
+                    .set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PROJECT_TYPE_ID", input.typeId).set("BUILDER_UNIT", input.unit).set("CUSTOMER_UNIT", input.unit)
+                    .set("PRJ_SITUATION", input.description).set("PM_SEQ", seq).set("BUILDER_UNIT",input.unit)
+                    .set("ESTIMATED_TOTAL_INVEST", input.invest.multiply(new BigDecimal(10000))).exec();
         } else {
             projectId = String.valueOf(list.get(0).get("ID"));
+            Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", input.name).set("PM_CODE", prjCode)
+                    .set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PROJECT_TYPE_ID", input.typeId).set("BUILDER_UNIT", input.unit).set("CUSTOMER_UNIT", input.unit)
+                    .set("PRJ_SITUATION", input.description).set("BUILDER_UNIT",input.unit)
+                    .set("ESTIMATED_TOTAL_INVEST", input.invest.multiply(new BigDecimal(10000))).exec();
         }
-        Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", input.name).set("PM_CODE", prjCode)
-                .set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PROJECT_TYPE_ID", input.typeId).set("BUILDER_UNIT", input.unit)
-                .set("PRJ_SITUATION", input.description).exec();
 
         //先删除项目关联的地块
         myJdbcTemplate.update("delete from PRJ_PARCEL where PM_PRJ_ID=?", projectId);
@@ -234,7 +244,12 @@ public class PmStartExt {
             }
 
         }
-
+        if ("add".equals(dataStatus)) {
+            //新增项目进展
+            PrjPlanUtil.createPlan(projectId);
+            //刷新进度节点时间
+            PrjPlanUtil.refreshProPlanTime(projectId, startTime);
+        }
     }
 
     /**

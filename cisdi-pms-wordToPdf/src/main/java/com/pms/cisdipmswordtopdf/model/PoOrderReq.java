@@ -1,4 +1,4 @@
-package com.pms.cisdipmswordtopdf.api;
+package com.pms.cisdipmswordtopdf.model;
 
 public class PoOrderReq {
     // id

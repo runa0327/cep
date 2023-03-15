@@ -303,7 +303,7 @@ public class PmRosterExt {
         for (PostUser postUser : dataList) {
             myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID=null where PM_PRJ_ID=? and PROJECT_POST=?", editObj.projectId, postUser.postName);
             if (!Strings.isNullOrEmpty(postUser.userId)) {
-                myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID =?,ancestral=? where PROJECT_POST=? and PM_PRJ_ID=?", postUser.userId, postUser.postName, editObj.projectId, postUser.ancestral);
+                myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID =?,ancestral=? where PROJECT_POST=? and PM_PRJ_ID=?", postUser.userId,postUser.ancestral, postUser.postName, editObj.projectId);
             }
         }
     }
@@ -381,6 +381,7 @@ public class PmRosterExt {
             PostUser user = new PostUser();
             user.postName = JdbcMapUtil.getString(p, "PROJECT_POST");
             user.userId = JdbcMapUtil.getString(p, "AD_USER_ID");
+            user.ancestral = JdbcMapUtil.getString(p, "ANCESTRAL");
             return user;
         }).collect(Collectors.toList());
 

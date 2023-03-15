@@ -2,6 +2,7 @@ package com.cisdi.ext.util;
 
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -14,18 +15,21 @@ public class PrjPlanUtil {
 
     public static void refreshProPlanTime(String projectId, Date date) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        if (date == null) {
+            // 查询该项目立项批复时间。若为空，不执行后续操作
+            List<Map<String, Object>> mapZero = myJdbcTemplate.queryForList("select PRJ_REPLY_DATE from PM_PRJ where id = ? ", projectId);
+            if (CollectionUtils.isEmpty(mapZero)) {
+                throw new BaseException("该项目没有批复日期，请稍后在进行节点更新！");
+            }
+            String replyDate = JdbcMapUtil.getString(mapZero.get(0), "PRJ_REPLY_DATE");
+            if (SharedUtil.isEmptyString(replyDate)) {
+                throw new BaseException("该项目没有批复日期，请稍后在进行节点更新！");
+            }
+            date = DateTimeUtil.stringToDate(replyDate);
+        }
 
-        // 查询该项目立项批复时间。若为空，不执行后续操作
-        List<Map<String, Object>> mapZero = myJdbcTemplate.queryForList("select PRJ_REPLY_DATE from PM_PRJ where id = ? ", projectId);
-        if (CollectionUtils.isEmpty(mapZero)) {
-            throw new BaseException("该项目没有批复日期，请稍后在进行节点更新！");
-        }
-        String replyDate = JdbcMapUtil.getString(mapZero.get(0), "PRJ_REPLY_DATE");
-        if (SharedUtil.isEmptyString(replyDate)) {
-            throw new BaseException("该项目没有批复日期，请稍后在进行节点更新！");
-        }
         // 项目计划开始日期 当天加30天，因为当天也算，实际加29天
-        Date planBegin = DateTimeUtil.addDays(DateTimeUtil.stringToDate(replyDate), 29);
+        Date planBegin = DateTimeUtil.addDays(date, 29);
 
         // 查询该项目所有计划节点
         String sql = "SELECT b.id,b.PLAN_START_DATE,b.PLAN_COMPL_DATE,b.PLAN_TOTAL_DAYS,b.NAME,b.START_DAY,ifnull(b.PM_PRO_PLAN_NODE_PID,'0') as PM_PRO_PLAN_NODE_PID " +
@@ -251,6 +255,164 @@ public class PrjPlanUtil {
             maxDate = Collections.max(dates);
         }
         return maxDate;
+    }
+
+    /**
+     * 新增项目进度网络图
+     *
+     * @param projectId
+     */
+    public static void createPlan(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        // 根据项目类型查询项目进度计划模板
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ppp.*,PRJ_REPLY_DATE from PM_PRO_PLAN ppp \n" +
+                "left join pm_prj pp on ppp.TEMPLATE_FOR_PROJECT_TYPE_ID = pp.PROJECT_TYPE_ID\n" +
+                "where ppp.`STATUS`='AP' and ppp.IS_TEMPLATE='1' and pp.id=?", projectId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> proMap = list.get(0);
+            // 先创建项目的进度计划
+            String newPlanId = Crud.from("PM_PRO_PLAN").insertData();
+
+            Crud.from("PM_PRO_PLAN").where().eq("ID", newPlanId).update().set("IS_TEMPLATE", 0).set("PM_PRJ_ID", projectId).set("PLAN_TOTAL_DAYS", proMap.get("PLAN_TOTAL_DAYS"))
+                    .set("PROGRESS_STATUS_ID", proMap.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", proMap.get("PROGRESS_RISK_TYPE_ID")).set("START_DAY", proMap.get("START_DAY")).exec();
+
+
+            // 查询项目进度计划节点模板
+            List<Map<String, Object>> planNodeList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT, \n" +
+                    "pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,ACTUAL_START_DATE,PROGRESS_RISK_REMARK,PM_PRO_PLAN_ID,PLAN_START_DATE, \n" +
+                    "PLAN_TOTAL_DAYS,PLAN_CARRY_DAYS,ACTUAL_CARRY_DAYS,ACTUAL_TOTAL_DAYS,PLAN_CURRENT_PRO_PERCENT,ACTUAL_CURRENT_PRO_PERCENT, \n" +
+                    "ifnull(PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,PLAN_COMPL_DATE,ACTUAL_COMPL_DATE,SHOW_IN_EARLY_PROC,SHOW_IN_PRJ_OVERVIEW,CAN_START, \n" +
+                    "PROGRESS_STATUS_ID,PROGRESS_RISK_TYPE_ID,CHIEF_DEPT_ID,CHIEF_USER_ID,START_DAY,SEQ_NO,CPMS_UUID,CPMS_ID,`LEVEL`,LINKED_WF_PROCESS_ID,LINKED_START_WF_NODE_ID,LINKED_END_WF_NODE_ID,POST_INFO_ID ,AD_USER_ID \n" +
+                    "from PM_PRO_PLAN_NODE pppn \n" +
+                    "left join POST_INFO pi on pppn.POST_INFO_ID = pi.id \n" +
+                    "where PM_PRO_PLAN_ID=?", proMap.get("ID"));
+            if (planNodeList.size() > 0) {
+                // 查询项目岗位人员
+                List<Map<String, Object>> postUserList = myJdbcTemplate.queryForList("select * from pm_post_user where pm_prj_id=?", projectId);
+                planNodeList.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")))).peek(m -> {
+                    String id = Crud.from("PM_PRO_PLAN_NODE").insertData();
+                    Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId)
+                            .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
+                            .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
+                            .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
+                            .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START",  m.get("CAN_START")).exec();
+
+                    getChildrenNode(m, planNodeList, id, newPlanId, postUserList);
+                }).collect(Collectors.toList());
+            }
+        }
+    }
+
+    private static List<Map<String, Object>> getChildrenNode(Map<String, Object> root, List<Map<String, Object>> allData, String pId, String newPlanId, List<Map<String, Object>> postUserList) {
+        return allData.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")), String.valueOf(root.get("ID")))).peek(m -> {
+            String id = Crud.from("PM_PRO_PLAN_NODE").insertData();
+            Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId)
+                    .set("PM_PRO_PLAN_NODE_PID", pId)
+                    .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
+                    .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
+                    .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
+                    .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).exec();
+            getChildrenNode(m, allData, id, newPlanId, postUserList);
+        }).collect(Collectors.toList());
+    }
+
+    private static String getUser(List<Map<String, Object>> postUserList, Object postId) {
+        String userId = null;
+        Optional<Map<String, Object>> any = postUserList.stream().filter(p -> Objects.equals(p.get("POST_INFO_ID"), postId)).findAny();
+        if (any.isPresent()) {
+            userId = String.valueOf(any.get().get("AD_USER_ID"));
+        }
+        return userId;
+    }
+
+
+    /**
+     * 跟新进度节点状态
+     *
+     * @param projectId
+     */
+    public static void updateNodeStatus(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        // 查询所有的进度计划节点
+        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER," +
+                "pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID," +
+                "pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE," +
+                "pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,pppn.PLAN_TOTAL_DAYS," +
+                "pppn.PLAN_CARRY_DAYS,pppn.ACTUAL_CARRY_DAYS,pppn.ACTUAL_TOTAL_DAYS,pppn.PLAN_CURRENT_PRO_PERCENT," +
+                "pppn.ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID," +
+                "pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW," +
+                "pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID," +
+                "pppn.START_DAY,pppn.SEQ_NO,pppn.CPMS_UUID,pppn.CPMS_ID,pppn.LEVEL " +
+                "gsv.`CODE` as PROGRESS_STATUS_CODE from pm_pro_plan_node pppn \n" +
+                "left join pm_pro_plan ppp on pppn.PM_PRO_PLAN_ID = ppp.ID\n" +
+                "left join gr_set_value gsv on gsv.id = pppn.PROGRESS_STATUS_ID\n" +
+                "left join gr_set gr on gr.id = gsv.GR_SET_ID\n" +
+                "where gr.`CODE`='PROGRESS_STATUS' and ppp.PM_PRJ_ID=?", projectId);
+
+        if (nodeList.size() > 0) {
+            nodeList.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")))).peek(m -> {
+                List<Map<String, Object>> children = getChildrenNodeForCollectProgressStatus(m, nodeList, myJdbcTemplate);
+                if (children.size() > 0) {
+                    int count = children.size();
+                    String proStatus = "0";
+                    List<Map<String, Object>> finishList = children.stream().filter(p -> Objects.equals("2", p.get("PROGRESS_STATUS_CODE"))).collect(Collectors.toList());
+                    if (count == finishList.size()) {
+                        // 父级改为已完成
+                        proStatus = "2";
+                    } else {
+                        List<Map<String, Object>> UnBeginList = children.stream().filter(p -> Objects.equals("0", p.get("PROGRESS_STATUS_CODE"))).collect(Collectors.toList());
+                        if (count != UnBeginList.size()) {
+                            // 父级改为进行中
+                            proStatus = "1";
+                        }
+                    }
+                    List<Map<String, Object>> grSetValueList = myJdbcTemplate.queryForList("select gsv.* from gr_set_value gsv " +
+                            "left join gr_set gs on gs.id = gsv.gr_set_id where gs.`code`='PROGRESS_STATUS' and gsv.`code`=?", proStatus);
+                    String proStatusID = "";
+                    if (grSetValueList.size() > 0) {
+                        proStatusID = String.valueOf(grSetValueList.get(0).get("ID"));
+                    }
+                    myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=? where id=?", proStatusID, m.get("ID"));
+                }
+            }).collect(Collectors.toList());
+
+        }
+    }
+
+    /**
+     * 递归修改父节点的状态
+     *
+     * @param root
+     * @param allData
+     * @param myJdbcTemplate
+     * @return
+     */
+    private static List<Map<String, Object>> getChildrenNodeForCollectProgressStatus(Map<String, Object> root, List<Map<String, Object>> allData, MyJdbcTemplate myJdbcTemplate) {
+        return allData.stream().filter(p -> Objects.equals(String.valueOf(root.get("ID")), String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")))).peek(m -> {
+            List<Map<String, Object>> children = getChildrenNodeForCollectProgressStatus(m, allData, myJdbcTemplate);
+            if (children.size() > 0) {
+                int count = children.size();
+                String proStatus = "0";
+                List<Map<String, Object>> finishList = children.stream().filter(p -> Objects.equals("2", p.get("PROGRESS_STATUS_CODE"))).collect(Collectors.toList());
+                if (count == finishList.size()) {
+                    // 父级改为已完成
+                    proStatus = "2";
+                } else {
+                    List<Map<String, Object>> UnBeginList = children.stream().filter(p -> Objects.equals("0", p.get("PROGRESS_STATUS_CODE"))).collect(Collectors.toList());
+                    if (count != UnBeginList.size()) {
+                        // 父级改为进行中
+                        proStatus = "1";
+                    }
+                }
+                List<Map<String, Object>> grSetValueList = myJdbcTemplate.queryForList("select gsv.* from gr_set_value gsv " +
+                        "left join gr_set gs on gs.id = gsv.gr_set_id where gs.`code`='PROGRESS_STATUS' and gsv.`code`=?", proStatus);
+                String proStatusID = "";
+                if (grSetValueList.size() > 0) {
+                    proStatusID = String.valueOf(grSetValueList.get(0).get("ID"));
+                }
+                myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=? where id=?", proStatusID, m.get("ID"));
+            }
+        }).collect(Collectors.toList());
     }
 
 }

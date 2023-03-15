@@ -255,7 +255,7 @@ public class ParcelMap {
                 "left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID\n" +
                 "left join gr_set_value gv on gv.id = pj.PRJ_MANAGE_MODE_ID\n" +
                 "left join gr_set_value gvp on gvp.id = pj.PROJECT_PHASE_ID\n" +
-                "where 1 = 1";
+                "where pj.status = 'AP' or pj.status = 'APING' or pj.status = 'DN'";
         if (!Strings.isNullOrEmpty(prjReq.prjName)){
             prjSql += " and pj.name like '%" + prjReq.prjName + "%'";
         }

@@ -3,6 +3,7 @@ package com.cisdi.ext.model;
 import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
@@ -108,6 +109,10 @@ public class PmProPlanNode {
          */
         public static final String SEQ_NO_BAK = "SEQ_NO_BAK";
         /**
+         * 岗位信息。
+         */
+        public static final String POST_INFO_ID = "POST_INFO_ID";
+        /**
          * 责任部门。
          */
         public static final String CHIEF_DEPT_ID = "CHIEF_DEPT_ID";
@@ -212,6 +217,14 @@ public class PmProPlanNode {
          */
         public static final String LINKED_WF_NODE_ID = "LINKED_WF_NODE_ID";
         /**
+         * 关联的流程节点（开始）。
+         */
+        public static final String LINKED_START_WF_NODE_ID = "LINKED_START_WF_NODE_ID";
+        /**
+         * 关联的流程节点（结束）。
+         */
+        public static final String LINKED_END_WF_NODE_ID = "LINKED_END_WF_NODE_ID";
+        /**
          * 关联的流程实例。
          */
         public static final String LINKED_WF_PROCESS_INSTANCE_ID = "LINKED_WF_PROCESS_INSTANCE_ID";
@@ -219,6 +232,18 @@ public class PmProPlanNode {
          * 关联的流程节点实例。
          */
         public static final String LINKED_WF_NODE_INSTANCE_ID = "LINKED_WF_NODE_INSTANCE_ID";
+        /**
+         * 关联的流程节点实例（开始）。
+         */
+        public static final String LINKED_START_WF_NODE_INSTANCE_ID = "LINKED_START_WF_NODE_INSTANCE_ID";
+        /**
+         * 关联的流程节点实例（结束）。
+         */
+        public static final String LINKED_END_WF_NODE_INSTANCE_ID = "LINKED_END_WF_NODE_INSTANCE_ID";
+        /**
+         * 能否启动。
+         */
+        public static final String CAN_START = "CAN_START";
     }
 
     // </editor-fold>
@@ -761,6 +786,42 @@ public class PmProPlanNode {
             this.seqNoBak = seqNoBak;
             if (!this.toUpdateCols.contains("SEQ_NO_BAK")) {
                 this.toUpdateCols.add("SEQ_NO_BAK");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 岗位信息。
+     */
+    private String postInfoId;
+
+    /**
+     * 获取：岗位信息。
+     */
+    public String getPostInfoId() {
+        return this.postInfoId;
+    }
+
+    /**
+     * 设置：岗位信息。
+     */
+    public PmProPlanNode setPostInfoId(String postInfoId) {
+        if (this.postInfoId == null && postInfoId == null) {
+            // 均为null，不做处理。
+        } else if (this.postInfoId != null && postInfoId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.postInfoId.compareTo(postInfoId) != 0) {
+                this.postInfoId = postInfoId;
+                if (!this.toUpdateCols.contains("POST_INFO_ID")) {
+                    this.toUpdateCols.add("POST_INFO_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.postInfoId = postInfoId;
+            if (!this.toUpdateCols.contains("POST_INFO_ID")) {
+                this.toUpdateCols.add("POST_INFO_ID");
             }
         }
         return this;
@@ -1703,6 +1764,78 @@ public class PmProPlanNode {
     }
 
     /**
+     * 关联的流程节点（开始）。
+     */
+    private String linkedStartWfNodeId;
+
+    /**
+     * 获取：关联的流程节点（开始）。
+     */
+    public String getLinkedStartWfNodeId() {
+        return this.linkedStartWfNodeId;
+    }
+
+    /**
+     * 设置：关联的流程节点（开始）。
+     */
+    public PmProPlanNode setLinkedStartWfNodeId(String linkedStartWfNodeId) {
+        if (this.linkedStartWfNodeId == null && linkedStartWfNodeId == null) {
+            // 均为null，不做处理。
+        } else if (this.linkedStartWfNodeId != null && linkedStartWfNodeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.linkedStartWfNodeId.compareTo(linkedStartWfNodeId) != 0) {
+                this.linkedStartWfNodeId = linkedStartWfNodeId;
+                if (!this.toUpdateCols.contains("LINKED_START_WF_NODE_ID")) {
+                    this.toUpdateCols.add("LINKED_START_WF_NODE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.linkedStartWfNodeId = linkedStartWfNodeId;
+            if (!this.toUpdateCols.contains("LINKED_START_WF_NODE_ID")) {
+                this.toUpdateCols.add("LINKED_START_WF_NODE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 关联的流程节点（结束）。
+     */
+    private String linkedEndWfNodeId;
+
+    /**
+     * 获取：关联的流程节点（结束）。
+     */
+    public String getLinkedEndWfNodeId() {
+        return this.linkedEndWfNodeId;
+    }
+
+    /**
+     * 设置：关联的流程节点（结束）。
+     */
+    public PmProPlanNode setLinkedEndWfNodeId(String linkedEndWfNodeId) {
+        if (this.linkedEndWfNodeId == null && linkedEndWfNodeId == null) {
+            // 均为null，不做处理。
+        } else if (this.linkedEndWfNodeId != null && linkedEndWfNodeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.linkedEndWfNodeId.compareTo(linkedEndWfNodeId) != 0) {
+                this.linkedEndWfNodeId = linkedEndWfNodeId;
+                if (!this.toUpdateCols.contains("LINKED_END_WF_NODE_ID")) {
+                    this.toUpdateCols.add("LINKED_END_WF_NODE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.linkedEndWfNodeId = linkedEndWfNodeId;
+            if (!this.toUpdateCols.contains("LINKED_END_WF_NODE_ID")) {
+                this.toUpdateCols.add("LINKED_END_WF_NODE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 关联的流程实例。
      */
     private String linkedWfProcessInstanceId;
@@ -1774,6 +1907,114 @@ public class PmProPlanNode {
         return this;
     }
 
+    /**
+     * 关联的流程节点实例（开始）。
+     */
+    private String linkedStartWfNodeInstanceId;
+
+    /**
+     * 获取：关联的流程节点实例（开始）。
+     */
+    public String getLinkedStartWfNodeInstanceId() {
+        return this.linkedStartWfNodeInstanceId;
+    }
+
+    /**
+     * 设置：关联的流程节点实例（开始）。
+     */
+    public PmProPlanNode setLinkedStartWfNodeInstanceId(String linkedStartWfNodeInstanceId) {
+        if (this.linkedStartWfNodeInstanceId == null && linkedStartWfNodeInstanceId == null) {
+            // 均为null，不做处理。
+        } else if (this.linkedStartWfNodeInstanceId != null && linkedStartWfNodeInstanceId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.linkedStartWfNodeInstanceId.compareTo(linkedStartWfNodeInstanceId) != 0) {
+                this.linkedStartWfNodeInstanceId = linkedStartWfNodeInstanceId;
+                if (!this.toUpdateCols.contains("LINKED_START_WF_NODE_INSTANCE_ID")) {
+                    this.toUpdateCols.add("LINKED_START_WF_NODE_INSTANCE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.linkedStartWfNodeInstanceId = linkedStartWfNodeInstanceId;
+            if (!this.toUpdateCols.contains("LINKED_START_WF_NODE_INSTANCE_ID")) {
+                this.toUpdateCols.add("LINKED_START_WF_NODE_INSTANCE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 关联的流程节点实例（结束）。
+     */
+    private String linkedEndWfNodeInstanceId;
+
+    /**
+     * 获取：关联的流程节点实例（结束）。
+     */
+    public String getLinkedEndWfNodeInstanceId() {
+        return this.linkedEndWfNodeInstanceId;
+    }
+
+    /**
+     * 设置：关联的流程节点实例（结束）。
+     */
+    public PmProPlanNode setLinkedEndWfNodeInstanceId(String linkedEndWfNodeInstanceId) {
+        if (this.linkedEndWfNodeInstanceId == null && linkedEndWfNodeInstanceId == null) {
+            // 均为null，不做处理。
+        } else if (this.linkedEndWfNodeInstanceId != null && linkedEndWfNodeInstanceId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.linkedEndWfNodeInstanceId.compareTo(linkedEndWfNodeInstanceId) != 0) {
+                this.linkedEndWfNodeInstanceId = linkedEndWfNodeInstanceId;
+                if (!this.toUpdateCols.contains("LINKED_END_WF_NODE_INSTANCE_ID")) {
+                    this.toUpdateCols.add("LINKED_END_WF_NODE_INSTANCE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.linkedEndWfNodeInstanceId = linkedEndWfNodeInstanceId;
+            if (!this.toUpdateCols.contains("LINKED_END_WF_NODE_INSTANCE_ID")) {
+                this.toUpdateCols.add("LINKED_END_WF_NODE_INSTANCE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 能否启动。
+     */
+    private Boolean canStart;
+
+    /**
+     * 获取：能否启动。
+     */
+    public Boolean getCanStart() {
+        return this.canStart;
+    }
+
+    /**
+     * 设置：能否启动。
+     */
+    public PmProPlanNode setCanStart(Boolean canStart) {
+        if (this.canStart == null && canStart == null) {
+            // 均为null，不做处理。
+        } else if (this.canStart != null && canStart != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.canStart.compareTo(canStart) != 0) {
+                this.canStart = canStart;
+                if (!this.toUpdateCols.contains("CAN_START")) {
+                    this.toUpdateCols.add("CAN_START");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.canStart = canStart;
+            if (!this.toUpdateCols.contains("CAN_START")) {
+                this.toUpdateCols.add("CAN_START");
+            }
+        }
+        return this;
+    }
+
     // </editor-fold>
 
     // 实例方法：
@@ -1789,6 +2030,22 @@ public class PmProPlanNode {
     public void insertById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
         modelHelper.insertById(includeCols, excludeCols, refreshThis, this.id, this);
         this.clearToUpdateCols();
+    }
+
+    /**
+     * 根据ID插入数据。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
+     */
+    public void insertById(boolean refreshThis) {
+        insertById(null, null, refreshThis);
+    }
+
+    /**
+     * 根据ID插入数据。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     */
+    public void insertById() {
+        insertById(null, null, false);
     }
 
     /**
@@ -1810,6 +2067,22 @@ public class PmProPlanNode {
             modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
             this.clearToUpdateCols();
         }
+    }
+
+    /**
+     * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
+     */
+    public void updateById(boolean refreshThis) {
+        updateById(null, null, refreshThis);
+    }
+
+    /**
+     * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     */
+    public void updateById() {
+        updateById(null, null, false);
     }
 
     /**
@@ -1858,6 +2131,16 @@ public class PmProPlanNode {
     }
 
     /**
+     * 根据ID获取数据。
+     *
+     * @param id ID。
+     * @return 获取到的对象，若无则为null。
+     */
+    public static PmProPlanNode selectById(String id) {
+        return selectById(id, null, null);
+    }
+
+    /**
      * 根据ID列表获取数据。
      *
      * @param ids         ID列表。
@@ -1868,6 +2151,16 @@ public class PmProPlanNode {
     public static List<PmProPlanNode> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
         List<PmProPlanNode> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
+    }
+
+    /**
+     * 根据ID列表获取数据。
+     *
+     * @param ids ID列表。
+     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
+     */
+    public static List<PmProPlanNode> selectByIds(List<String> ids) {
+        return selectByIds(ids, null, null);
     }
 
     /**
@@ -1884,6 +2177,43 @@ public class PmProPlanNode {
     }
 
     /**
+     * 根据Where条件获取数据。
+     *
+     * @param where Where条件。
+     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
+     */
+    public static List<PmProPlanNode> selectByWhere(Where where) {
+        return selectByWhere(where, null, null);
+    }
+
+    /**
+     * 根据Where条件获取数据。
+     *
+     * @param where       Where条件。
+     * @param includeCols 获取时包含的列，空为包含所有。
+     * @param excludeCols 获取时排除的列，空为不排除。
+     * @return 获取到的对象。
+     */
+    public static PmProPlanNode selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<PmProPlanNode> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        if (objList != null && objList.size() > 1) {
+            throw new BaseException("调用PmProPlanNode.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+        }
+
+        return SharedUtil.isEmptyList(objList) ? null : objList.get(0);
+    }
+
+    /**
+     * 根据Where条件获取数据。
+     *
+     * @param where Where条件。
+     * @return 获取到的对象。
+     */
+    public static PmProPlanNode selectOneByWhere(Where where) {
+        return selectOneByWhere(where, null, null);
+    }
+
+    /**
      * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param id          ID。
@@ -1894,6 +2224,17 @@ public class PmProPlanNode {
      */
     public static int updateById(String id, Map<String, Object> keyValueMap, List<String> includeCols, List<String> excludeCols) {
         return modelHelper.updateById(id, keyValueMap, includeCols, excludeCols);
+    }
+
+    /**
+     * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param id          ID。
+     * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
+     * @return 影响的行数。
+     */
+    public static int updateById(String id, Map<String, Object> keyValueMap) {
+        return updateById(id, keyValueMap, null, null);
     }
 
     /**
@@ -1910,6 +2251,17 @@ public class PmProPlanNode {
     }
 
     /**
+     * 根据ID列表更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param ids         ID列表。
+     * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
+     * @return 影响的行数。
+     */
+    public static int updateByIds(List<String> ids, Map<String, Object> keyValueMap) {
+        return updateByIds(ids, keyValueMap, null, null);
+    }
+
+    /**
      * 根据Where条件更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param where       Where条件。
@@ -1920,6 +2272,17 @@ public class PmProPlanNode {
      */
     public static int updateByWhere(Where where, Map<String, Object> keyValueMap, List<String> includeCols, List<String> excludeCols) {
         return modelHelper.updateByWhere(where, keyValueMap, includeCols, excludeCols);
+    }
+
+    /**
+     * 根据Where条件更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param where       Where条件。
+     * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
+     * @return 影响的行数。
+     */
+    public static int updateByWhere(Where where, Map<String, Object> keyValueMap) {
+        return updateByWhere(where, keyValueMap, null, null);
     }
 
     /**
@@ -1962,6 +2325,16 @@ public class PmProPlanNode {
      */
     public static void copyCols(PmProPlanNode fromModel, PmProPlanNode toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
+    }
+
+    /**
+     * 拷贝列值。
+     *
+     * @param fromModel 从模型。
+     * @param toModel   到模型。
+     */
+    public static void copyCols(PmProPlanNode fromModel, PmProPlanNode toModel) {
+        copyCols(fromModel, toModel, null, null);
     }
 
     // </editor-fold>

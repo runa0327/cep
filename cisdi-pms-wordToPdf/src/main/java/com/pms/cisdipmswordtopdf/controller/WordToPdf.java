@@ -1,6 +1,6 @@
 package com.pms.cisdipmswordtopdf.controller;
 
-import com.pms.cisdipmswordtopdf.api.PoOrderReq;
+import com.pms.cisdipmswordtopdf.model.PoOrderReq;
 import com.pms.cisdipmswordtopdf.service.WordToPdfService;
 import org.springframework.web.bind.annotation.*;
 

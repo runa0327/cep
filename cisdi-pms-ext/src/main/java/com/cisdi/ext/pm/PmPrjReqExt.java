@@ -125,15 +125,15 @@ public class PmPrjReqExt {
         WfPmInvestUtil.calculateData(csCommId, "PM_PRJ_REQ", newPrjId);
 
         // 新增项目进度计划网络图
-        createPlan(newPrjId);
+//        createPlan(newPrjId);
 
         // 创建项目文件夹
-        ProFileUtils.createFolder(newPrjId);
+//        ProFileUtils.createFolder(newPrjId);
 
         // 立项申请文件归档
         // 项目申请材料
-        String reqFile = JdbcMapUtil.getString(pm_prj_req, "PRJ_REQ_FILE");
-        ProFileUtils.insertProFile(newPrjId, reqFile, FileCodeEnum.PRJ_REQ_FILE);
+//        String reqFile = JdbcMapUtil.getString(pm_prj_req, "PRJ_REQ_FILE");
+//        ProFileUtils.insertProFile(newPrjId, reqFile, FileCodeEnum.PRJ_REQ_FILE);
 
     }
 
@@ -392,7 +392,7 @@ public class PmPrjReqExt {
                     "LAST_MODI_USER_ID,STATUS,LK_WF_INST_ID,CODE,NAME,REMARK,ACTUAL_START_DATE,PROGRESS_RISK_REMARK,PM_PRO_PLAN_ID,PLAN_START_DATE," +
                     "PLAN_TOTAL_DAYS,PLAN_CARRY_DAYS,ACTUAL_CARRY_DAYS,ACTUAL_TOTAL_DAYS,PLAN_CURRENT_PRO_PERCENT,ACTUAL_CURRENT_PRO_PERCENT," +
                     "ifnull(PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,PLAN_COMPL_DATE,ACTUAL_COMPL_DATE,SHOW_IN_EARLY_PROC,SHOW_IN_PRJ_OVERVIEW," +
-                    "PROGRESS_STATUS_ID,PROGRESS_RISK_TYPE_ID,CHIEF_DEPT_ID,CHIEF_USER_ID,START_DAY,SEQ_NO,CPMS_UUID,CPMS_ID,`LEVEL`,LINKED_WF_PROCESS_ID,LINKED_WF_NODE_ID " +
+                    "PROGRESS_STATUS_ID,PROGRESS_RISK_TYPE_ID,CHIEF_DEPT_ID,CHIEF_USER_ID,START_DAY,SEQ_NO,CPMS_UUID,CPMS_ID,`LEVEL`,LINKED_WF_PROCESS_ID,LINKED_START_WF_NODE_ID,LINKED_END_WF_NODE_ID " +
                     "from PM_PRO_PLAN_NODE where PM_PRO_PLAN_ID=?", proMap.get("ID"));
             if (planNodeList.size() > 0) {
                 planNodeList.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")))).peek(m -> {
@@ -401,7 +401,8 @@ public class PmPrjReqExt {
                     Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId)
                             .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                             .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
-                            .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_WF_NODE_ID", m.get("LINKED_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC")).set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).exec();
+                            .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID",m.get("LINKED_END_WF_NODE_ID"))
+                            .set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC")).set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).exec();
 
                     getChildrenNode(m, planNodeList, id, newPlanId);
                 }).collect(Collectors.toList());
@@ -416,38 +417,40 @@ public class PmPrjReqExt {
                     .set("PM_PRO_PLAN_NODE_PID", pId)
                     .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                     .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
-                    .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_WF_NODE_ID", m.get("LINKED_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC")).set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).exec();
+                    .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID",m.get("LINKED_END_WF_NODE_ID"))
+                    .set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC")).set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).exec();
             getChildrenNode(m, allData, id, newPlanId);
         }).collect(Collectors.toList());
     }
 
 
-    public void createProjectFolder() {
-        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        String projectId = String.valueOf(map.get("pmPrjId"));
-        ProFileUtils.createFolder(projectId);
-    }
+//    public void createProjectFolder() {
+//        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+//        String projectId = String.valueOf(map.get("pmPrjId"));
+//        ProFileUtils.createFolder(projectId);
+//    }
 
     /**
      * 立项申请-发起时数据校验
      **/
     public void checkCreateDate() {
+
+        // 项目改为选择，直接返回：
+        if("1".equals("1")){
+            return;
+        }
+
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //项目id
-        String projectName = entityRecord.valueMap.get("PRJ_NAME").toString();
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"pm_prj_id");
         //流程id
         String id = entityRecord.csCommId;
-        //查询名称是否存在
-        String sql1 = "select name from PM_PRJ_REQ where PRJ_NAME = ? and id != ? ";
-        List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1, projectName, id);
+        //查询该项目是否已经发起过流程
+        String sql1 = "select id from PM_PRJ_REQ where pm_prj_id = ? and id != ? and status not in ('VD','VDING')";
+        List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1, projectId, id);
         if (!CollectionUtils.isEmpty(list1)) {
-            throw new BaseException("项目名称不能重复，请重新输入项目名称！");
-        }
-        String sql2 = "select name from pm_prj where name = ? and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'";
-        List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(sql2, projectName);
-        if (!CollectionUtils.isEmpty(list2)) {
-            throw new BaseException("项目名称不能重复，请重新输入项目名称！");
+            throw new BaseException("项目不允许重复发起立项流程！");
         }
     }
 
