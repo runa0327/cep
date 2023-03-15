@@ -8,10 +8,23 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtil {
+
+    /**
+     * 转字符串
+     * @param t
+     * @return
+     */
+    public static <T>  String toString(T t){
+        if (Objects.isNull(t)){
+            return null;
+        }
+        return String.valueOf(t);
+    }
 
     public static String codeToSplit(String str) {
         if (SharedUtil.isEmptyString(str)){
