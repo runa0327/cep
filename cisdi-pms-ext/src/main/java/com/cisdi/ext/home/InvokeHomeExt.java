@@ -20,9 +20,10 @@ public class InvokeHomeExt {
                 "from pm_prj p left join gr_set_value v on v.id = p.PROJECT_PHASE_ID left join gr_set s on s.CODE = " +
                 "'project_phase'\n" +
                 " where p.status = 'AP' and p.PROJECT_SOURCE_TYPE_ID='0099952822476441374' \n" +
-                " and IF(? in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1," +
-                " p.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET(?, USER_IDS ))) \n" +
-                "group by v.id",userId,userId);
+//                " and IF(? in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1," +
+//                " p.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET(?, USER_IDS ))) \n" +
+//                "group by v.id",userId,userId);
+                "group by v.id");
         int total = projectPhaseList.stream().mapToInt(item -> Integer.parseInt(item.get("num").toString())).sum();
 //        HashMap<String, Object> totals = new HashMap<>();
 //        totals.put("项目总数", total);
@@ -48,10 +49,11 @@ public class InvokeHomeExt {
                 " from pm_prj p \n" +
                 " left join gr_set_value v on v.id = p.PROJECT_TYPE_ID left join gr_set s on s.CODE = 'project_type' \n" +
                 " where p.status = 'AP' and p.PROJECT_SOURCE_TYPE_ID='0099952822476441374' " +
-                " and IF(? in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1," +
-                " p.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET(?, USER_IDS ))) \n" +
+//                " and IF(? in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1," +
+//                " p.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET(?, USER_IDS ))) \n" +
                 " group by v.id order by v.SEQ_NO \n" +
-                ") a group by a.transitionPhase", userId,userId);
+//                ") a group by a.transitionPhase", userId,userId);
+                ") a group by a.transitionPhase");
         int total = projectPhaseList.stream().mapToInt(item -> Integer.parseInt(item.get("num").toString())).sum();
         HashMap<String, Object> totals = new HashMap<>();
 //        totals.put("项目总数", total);
