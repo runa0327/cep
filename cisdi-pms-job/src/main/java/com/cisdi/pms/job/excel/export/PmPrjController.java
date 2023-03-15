@@ -111,9 +111,9 @@ public class PmPrjController extends BaseController {
         if (Strings.isNotEmpty(year)) {
             baseSql.append(" and DATE_FORMAT(ppp.PLAN_START_DATE,'%Y-%m-%d') = DATE_FORMAT('").append(year).append("','%Y-%m-%d')");
         }
-        baseSql.append(" and IF('").append(userId).append("' in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1, ");
-        baseSql.append(" pm.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(userId).append("', USER_IDS )))");
-        baseSql.append(" order by pm.CRT_DT DESC");
+//        baseSql.append(" and IF('").append(userId).append("' in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1, ");
+//        baseSql.append(" pm.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(userId).append("', USER_IDS )))");
+//        baseSql.append(" order by pm.CRT_DT DESC");
 
         List<Map<String, Object>> prjList = jdbcTemplate.queryForList(baseSql.toString());
 //        List<PmPrjExportModel> models = prjList.stream().map(item -> covertData(item)).collect(Collectors.toList());

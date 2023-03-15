@@ -67,7 +67,7 @@ public class WorkScheduleExt {
         String userId = String.valueOf(map.get("userId"));
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ws.ID as ID,ws.CRT_DT as CRT_DT,TITLE,CONTENT,URGENT_LEVEL,WARN_TYPE_ID,gsv.`name` as WARN_TYPE from WORK_SCHEDULE ws" +
-                " left join gr_set_value gsv on gsv.id = ws.WARN_TYPE_ID "+
+                " left join gr_set_value gsv on gsv.id = ws.WARN_TYPE_ID " +
                 " where DATE_FORMAT(ws.CRT_DT,'%Y-%m-%d') = DATE_FORMAT(?,'%Y-%m-%d') and ws.AD_USER_ID=?", dateTime, userId);
         List<WorkScheduleData> scheduleData = list.stream().map(p -> {
             WorkScheduleData schedule = new WorkScheduleData();
@@ -101,12 +101,12 @@ public class WorkScheduleExt {
         String title = String.valueOf(map.get("title"));
         String content = String.valueOf(map.get("content"));
         String level = String.valueOf(map.get("level"));
-        String warnTypeId = String.valueOf(map.get("warnTypeId"));
+        String warnTypeId = "".equals(map.get("warnTypeId")) ? null : String.valueOf(map.get("warnTypeId"));
         String userId = String.valueOf(map.get("userId"));
         String id = "";
         if (StringUtils.isEmpty(map.get("id"))) {
             id = Crud.from("WORK_SCHEDULE").insertData();
-        }else{
+        } else {
             id = String.valueOf(map.get("id"));
         }
         Crud.from("WORK_SCHEDULE").where().eq("ID", id).update()

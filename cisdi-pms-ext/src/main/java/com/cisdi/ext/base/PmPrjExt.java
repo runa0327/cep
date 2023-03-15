@@ -146,9 +146,9 @@ public class PmPrjExt {
             String early = JdbcMapUtil.getString(list.get(0),"PRJ_EARLY_USER_ID"); //前期部
             String design = JdbcMapUtil.getString(list.get(0),"PRJ_DESIGN_USER_ID"); //设计部
             String cost = JdbcMapUtil.getString(list.get(0),"PRJ_COST_USER_ID"); //成本部
-            map.put("early",early);
-            map.put("design",design);
-            map.put("cost",cost);
+            map.put("PRJ_EARLY_USER_ID",early);
+            map.put("PRJ_DESIGN_USER_ID",design);
+            map.put("PRJ_COST_USER_ID",cost);
         }
         return map;
     }
