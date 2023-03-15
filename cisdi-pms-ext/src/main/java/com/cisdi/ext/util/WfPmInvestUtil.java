@@ -184,7 +184,7 @@ public class WfPmInvestUtil {
                 throw new BaseException("没有找到项目id" + prjId);
             }
             String oldPriority = oldPriorityList.get(0);
-            if (Strings.isNullOrEmpty(oldPriority) || oldPriority.compareTo(newPriority) < 0){
+            if (Strings.isNullOrEmpty(oldPriority) || oldPriority.compareTo(newPriority) <= 0){
                 //更新pm_prj金额数据
                 Crud.from("pm_prj").where().eq("ID",prjId).update()
                         .set("ESTIMATED_TOTAL_INVEST",valueMap.get("PRJ_TOTAL_INVEST"))
