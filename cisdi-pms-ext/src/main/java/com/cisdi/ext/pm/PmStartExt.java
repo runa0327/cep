@@ -43,14 +43,16 @@ public class PmStartExt {
                 " ps.START_TIME," +
                 " ps.AGENT," +
                 " ss.`NAME` AS START_STATUS ," +
-                " au.`name` as agentValue " +
+                " au.`name` as agentValue, " +
+                " gg.`NAME` as tender_way " +
                 "FROM " +
                 " PRJ_START ps  " +
                 " LEFT JOIN gr_set_value gsv ON gsv.id = ps.PROJECT_TYPE_ID " +
                 " LEFT JOIN pm_party pp ON ps.BUILDER_UNIT = pp.id " +
                 " LEFT JOIN gr_set_value ss ON ss.id = ps.PRJ_START_STATUS_ID  " +
                 " left join ad_user au on au.id = ps.AGENT " +
-                "WHERE " +
+                " left join gr_set_value gg on gg.id = ps.TENDER_WAY_ID " +
+                " WHERE " +
                 " ps.`STATUS` = 'ap'");
         if (!StringUtils.isEmpty(map.get("projectName"))) {
             sb.append(" and ps.`name` like '%").append(map.get("projectName")).append("%'");
@@ -76,6 +78,7 @@ public class PmStartExt {
             pmStart.agent = JdbcMapUtil.getString(m, "AGENT");
             pmStart.status = JdbcMapUtil.getString(m, "START_STATUS");
             pmStart.agentValue = JdbcMapUtil.getString(m, "agentValue");
+            pmStart.tenderWay = JdbcMapUtil.getString(m, "tender_way");
             return pmStart;
         }).collect(Collectors.toList());
 
@@ -115,7 +118,9 @@ public class PmStartExt {
                 " ps.PRJ_SITUATION as PRJ_SITUATION, " +
                 " ps.ATT_FILE_GROUP_ID as ATT_FILE_GROUP_ID, " +
                 " au.`NAME` AS agentValue, " +
-                " pj.ID as projectId " +
+                " pj.ID as projectId , " +
+                " ps.TENDER_WAY_ID ," +
+                " gq.`NAME` as tender_way " +
                 "FROM " +
                 " PRJ_START ps " +
                 " left join gr_set_value gg on gg.id = ps.INVESTMENT_SOURCE_ID " +
@@ -124,6 +129,7 @@ public class PmStartExt {
                 " LEFT JOIN gr_set_value ss ON ss.id = ps.PRJ_START_STATUS_ID " +
                 " LEFT JOIN ad_user au ON au.id = ps.AGENT " +
                 " LEFT JOIN PM_PRJ pj ON pj.PM_CODE = ps.PM_CODE " +
+                " left join gr_set_value gq on gq.id = ps.TENDER_WAY_ID" +
                 " WHERE " +
                 " ps.`STATUS` = 'ap' and ps.id=?", map.get("id"));
         if (CollectionUtils.isEmpty(list)) {
@@ -149,6 +155,8 @@ public class PmStartExt {
                 pmStart.agentValue = JdbcMapUtil.getString(m, "agentValue");
                 pmStart.projectId = JdbcMapUtil.getString(m, "projectId");
                 pmStart.parcels = getParcel(pmStart.projectId);
+                pmStart.tenderWayId = JdbcMapUtil.getString(m, "TENDER_WAY_ID");
+                pmStart.tenderWay = JdbcMapUtil.getString(m, "tender_way");
                 return pmStart;
             }).collect(Collectors.toList());
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(dataList.get(0)), Map.class);
@@ -174,9 +182,9 @@ public class PmStartExt {
         }
 
         Crud.from("PRJ_START").where().eq("ID", id).update()
-                .set("PM_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId)
+                .set("PM_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId).set("TENDER_WAY_ID", input.tenderWay)
                 .set("BUILDER_UNIT", input.unit).set("START_TIME", startTime).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", "1626110930922467328")
-                .set("ATT_FILE_GROUP_ID", input.fileIds).set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).set("START_TIME",input.startTime).exec();
+                .set("ATT_FILE_GROUP_ID", input.fileIds).set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).set("START_TIME", input.startTime).exec();
         String projectId = "";
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         // 新增项目---如果存在则修改项目
@@ -190,13 +198,13 @@ public class PmStartExt {
             }
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", input.name).set("PM_CODE", prjCode)
                     .set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PROJECT_TYPE_ID", input.typeId).set("BUILDER_UNIT", input.unit).set("CUSTOMER_UNIT", input.unit)
-                    .set("PRJ_SITUATION", input.description).set("PM_SEQ", seq).set("BUILDER_UNIT",input.unit)
+                    .set("PRJ_SITUATION", input.description).set("PM_SEQ", seq).set("BUILDER_UNIT", input.unit).set("TENDER_WAY_ID", input.tenderWay)
                     .set("ESTIMATED_TOTAL_INVEST", input.invest.multiply(new BigDecimal(10000))).exec();
         } else {
             projectId = String.valueOf(list.get(0).get("ID"));
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", input.name).set("PM_CODE", prjCode)
                     .set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PROJECT_TYPE_ID", input.typeId).set("BUILDER_UNIT", input.unit).set("CUSTOMER_UNIT", input.unit)
-                    .set("PRJ_SITUATION", input.description).set("BUILDER_UNIT",input.unit)
+                    .set("PRJ_SITUATION", input.description).set("BUILDER_UNIT", input.unit).set("TENDER_WAY_ID", input.tenderWay)
                     .set("ESTIMATED_TOTAL_INVEST", input.invest.multiply(new BigDecimal(10000))).exec();
         }
 
@@ -245,7 +253,7 @@ public class PmStartExt {
         }
         if ("add".equals(dataStatus)) {
             //新增项目进展
-            PrjPlanUtil.createPlan(projectId, input.typeId, input.sourceTypeId, input.invest);
+            PrjPlanUtil.createPlan(projectId, input.typeId, input.sourceTypeId, input.invest, input.tenderWay);
             //刷新进度节点时间
             PrjPlanUtil.refreshProPlanTime(projectId, startTime);
         }
@@ -391,6 +399,10 @@ public class PmStartExt {
         public List<parcel> parcels;
 
         public String projectId;
+
+        public String tenderWayId;
+
+        public String tenderWay;
     }
 
     public static class inputData {
@@ -417,6 +429,8 @@ public class PmStartExt {
         public String startTime;
 
         public List<parcel> parcels;
+
+        public String tenderWay;
 
     }
 

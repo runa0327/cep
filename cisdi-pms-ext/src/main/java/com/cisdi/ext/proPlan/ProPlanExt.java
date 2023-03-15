@@ -11,6 +11,7 @@ import com.qygly.shared.interaction.IdCodeName;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -201,7 +202,7 @@ public class ProPlanExt {
                 // 结果转换
                 List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(pmPrjId, p, myJdbcTemplate)).collect(Collectors.toList());
                 // 构建树结构
-                List<PrjProPlanNodeInfo> tree = infoList.stream().filter(p -> "0".equals(p.pid)).peek(m -> {
+                List<PrjProPlanNodeInfo> tree = infoList.stream().filter(p -> "0".equals(p.pid)).sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo))).peek(m -> {
                     m.children = getChildNode(m, infoList).stream().sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo))).collect(Collectors.toList());
                 }).collect(Collectors.toList());
 
