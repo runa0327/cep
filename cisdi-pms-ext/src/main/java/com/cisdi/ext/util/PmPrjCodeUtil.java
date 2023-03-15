@@ -21,6 +21,7 @@ public class PmPrjCodeUtil {
     /**
      * 获取项目编码
      * 规则：GCXT-230001
+     *
      * @return
      */
     public static String getPrjCode() {
@@ -43,4 +44,30 @@ public class PmPrjCodeUtil {
         sb.append("GCXT-").append(dataPrefix).append(flowNo);
         return sb.toString().trim();
     }
+
+
+    public static String getPmPlanCode() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(CODE,0) as CODE from pm_plan where code like 'GCXT-J%'  order by right(code,4) desc limit 0,1");
+        String code = "0";
+        if (list != null && list.size() > 0) {
+            Map<String, Object> data = list.get(0);
+            code = String.valueOf(data.get("CODE"));
+        }
+        String flowNo = "0001";
+        if (!"0".equals(code)) {
+            String str = code.substring(code.length() - 4);
+            int count = Integer.parseInt(str) + 1;
+            flowNo = StringUtil.addZeroForNum(String.valueOf(count), 4);
+
+        }
+        StringBuilder sb = new StringBuilder();
+
+        SimpleDateFormat sd = new SimpleDateFormat("yy");
+        String dataPrefix = sd.format(new Date());
+
+        sb.append("GCXT-J").append(dataPrefix).append(flowNo);
+        return sb.toString().trim();
+    }
+
 }
