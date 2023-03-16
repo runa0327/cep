@@ -110,8 +110,8 @@ public class WeeklyReportService {
         args.addAll(deptIdList);
         args.add(newReportId);
 
-        // 将个人周报关联到部门周报下：
-        jdbcTemplate.update("update hr_weekly_report child join hr_weekly_report parent on child.batch_id=parent.batch_id and child.hr_weekly_report_type_id='P' and child.hr_period_dtl_id=parent.hr_period_dtl_id and child.REPORT_DEPT_ID in(" + deptIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") and d.id=? set child." + weeklyReportpidAttCode + "=parent.id,parent.CT_START=sum(child.CT_START),parent.CT_APPROVE=sum(child.CT_APPROVE),parent.CT_END=sum(child.CT_END),parent.CT_NOTI_DEPT_ON_END=sum(child.CT_NOTI_DEPT_ON_END),parent.CT_NOTI_LEADER_ON_END=sum(child.CT_NOTI_LEADER_ON_END),parent.CT_PROJECT=((select COUNT(DISTINCT D.PM_PRJ_ID) from hr_weekly_report_dtl d where d.hr_weekly_report_id=child.id)),parent.CT_UNEND=sum(child.CT_UNEND)", args.toArray());
+        // 将个人周报关联到相应的部门、分管领导、总经理周报下：
+        jdbcTemplate.update("update hr_weekly_report child join hr_weekly_report parent on child.batch_id=parent.batch_id and child.hr_weekly_report_type_id='P' and child.hr_period_dtl_id=parent.hr_period_dtl_id and child.REPORT_DEPT_ID in(" + deptIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") and child.id=? set child." + weeklyReportpidAttCode + "=parent.id,parent.CT_START=sum(child.CT_START),parent.CT_APPROVE=sum(child.CT_APPROVE),parent.CT_END=sum(child.CT_END),parent.CT_NOTI_DEPT_ON_END=sum(child.CT_NOTI_DEPT_ON_END),parent.CT_NOTI_LEADER_ON_END=sum(child.CT_NOTI_LEADER_ON_END),parent.CT_PROJECT=((select COUNT(DISTINCT D.PM_PRJ_ID) from hr_weekly_report_dtl d where d.hr_weekly_report_id=child.id)),parent.CT_UNEND=sum(child.CT_UNEND)", args.toArray());
     }
 
     /**
