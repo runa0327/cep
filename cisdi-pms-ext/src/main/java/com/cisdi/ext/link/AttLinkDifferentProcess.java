@@ -108,4 +108,15 @@ public class AttLinkDifferentProcess {
         list.add("PIPELINE_RELOCATION_REQ"); // 管线迁改
         return list;
     }
+
+    /**
+     * 项目属性联动-不进行项目类型联动
+     */
+    public static List<String> noPrjTypeLink(){
+        List<String> list = new ArrayList<>();
+        list.add("PM_PRJ_INVEST1"); //可研报告
+        list.add("PM_PRJ_INVEST2"); //初设概算
+        list.add("PM_PRJ_INVEST3"); //预算财评
+        return list;
+    }
 }
