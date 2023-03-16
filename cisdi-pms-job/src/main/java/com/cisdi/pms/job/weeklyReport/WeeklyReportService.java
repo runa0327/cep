@@ -100,18 +100,42 @@ public class WeeklyReportService {
      * @param userId
      * @param batchId
      */
-    private void reCreateDeptLeaderGmReport(Map<String, Object> periodDlt, List<String> deptIdList, String userId, String batchId, String weeklyReportType, String weeklyReportpidAttCode) {
+    private void reCreateDeptLeaderGmReport(Map<String, Object> periodDlt, List<String> deptIdList, String userId, String batchId, String weeklyReportType, String weeklyReportPidAttCode) {
         Object periodDtlId = periodDlt.get("ID");
-        jdbcTemplate.update("delete from hr_weekly_report t where t.hr_weekly_report_type_id='D' and t.REPORT_USER_id=? and t.hr_period_dtl_id=?", userId, periodDtlId);
+        jdbcTemplate.update("delete from hr_weekly_report t where t.hr_weekly_report_type_id=? and t.REPORT_USER_id=? and t.hr_period_dtl_id=?", weeklyReportType, userId, periodDtlId);
 
         String newReportId = insertReport(weeklyReportType, periodDtlId, null/**/, userId, null, null, batchId);
 
         List<String> args = new ArrayList<>();
-        args.addAll(deptIdList);
         args.add(newReportId);
+        args.add(batchId);
+        args.add(periodDtlId.toString());
+        args.addAll(deptIdList);
+        // args.add(newReportId);
 
         // 将个人周报关联到相应的部门、分管领导、总经理周报下：
-        jdbcTemplate.update("update hr_weekly_report child join hr_weekly_report parent on child.batch_id=parent.batch_id and child.hr_weekly_report_type_id='P' and child.hr_period_dtl_id=parent.hr_period_dtl_id and child.REPORT_DEPT_ID in(" + deptIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") and child.id=? set child." + weeklyReportpidAttCode + "=parent.id,parent.CT_START=sum(child.CT_START),parent.CT_APPROVE=sum(child.CT_APPROVE),parent.CT_END=sum(child.CT_END),parent.CT_NOTI_DEPT_ON_END=sum(child.CT_NOTI_DEPT_ON_END),parent.CT_NOTI_LEADER_ON_END=sum(child.CT_NOTI_LEADER_ON_END),parent.CT_PROJECT=((select COUNT(DISTINCT D.PM_PRJ_ID) from hr_weekly_report_dtl d where d.hr_weekly_report_id=child.id)),parent.CT_UNEND=sum(child.CT_UNEND)", args.toArray());
+        jdbcTemplate.update("update hr_weekly_report child set child." + weeklyReportPidAttCode + "=? where child.batch_id=? and child.hr_weekly_report_type_id='P' and child.hr_period_dtl_id=? and child.REPORT_DEPT_ID in(" + deptIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ")", args.toArray());
+        // 获取对应的个人周报列表：
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from hr_weekly_report child where child." + weeklyReportPidAttCode + "=?", newReportId);
+
+        int CT_START = 0;
+        int CT_APPROVE = 0;
+        int CT_END = 0;
+        int CT_NOTI_DEPT_ON_END = 0;
+        int CT_NOTI_LEADER_ON_END = 0;
+        int CT_PROJECT = 0;
+        int CT_UNEND = 0;
+        for (Map<String, Object> row : list) {
+            CT_START += JdbcMapUtil.getInt(row, "CT_START");
+            CT_APPROVE += JdbcMapUtil.getInt(row, "CT_APPROVE");
+            CT_END += JdbcMapUtil.getInt(row, "CT_END");
+            CT_NOTI_DEPT_ON_END += JdbcMapUtil.getInt(row, "CT_NOTI_DEPT_ON_END");
+            CT_NOTI_LEADER_ON_END += JdbcMapUtil.getInt(row, "CT_NOTI_LEADER_ON_END");
+            CT_PROJECT += JdbcMapUtil.getInt(row, "CT_PROJECT");
+            CT_UNEND += JdbcMapUtil.getInt(row, "CT_UNEND");
+        }
+
+        jdbcTemplate.update("update hr_weekly_report p set p.CT_START=?,p.CT_APPROVE=?,p.CT_END=?,p.CT_NOTI_DEPT_ON_END=?,p.CT_NOTI_LEADER_ON_END=?,p.CT_PROJECT=?,p.CT_UNEND=? where p.id=?", CT_START, CT_APPROVE, CT_END, CT_NOTI_DEPT_ON_END, CT_NOTI_LEADER_ON_END, CT_PROJECT, CT_UNEND, newReportId);
     }
 
     /**
