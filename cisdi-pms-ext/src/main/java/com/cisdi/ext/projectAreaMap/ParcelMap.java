@@ -334,7 +334,7 @@ public class ParcelMap {
     }
 
     //项目类型字典
-    public List<Map<String,Object>> prjTypeDic(){
+    public void prjTypeDic(){
         MyNamedParameterJdbcTemplate namedJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         List<String> specific = this.getSpecificType();
         Map<String, Object> paramMap = new HashMap<>();
@@ -357,7 +357,17 @@ public class ParcelMap {
         Map<String, Object> result = new HashMap<>();
         result.put("dict",typeDic);
         ExtJarHelper.returnValue.set(result);
-        return typeDic;
+    }
+
+    //待绑定的项目列表（去除已绑定）
+    public void prjListToBeBound(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> prjList = myJdbcTemplate.queryForList("select pj.id,pj.name from pm_prj pj\n" +
+                "left join prj_parcel pp on pp.PM_PRJ_ID = pj.id\n" +
+                "where pj.status = 'AP' and pp.id is null order by pj.id desc");
+        Map<String, Object> result = new HashMap<>();
+        result.put("prjList",prjList);
+        ExtJarHelper.returnValue.set(result);
     }
 
     //替换项目类型id中的其他
