@@ -78,7 +78,7 @@ public class ProcessCommon {
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,nodeInstanceId,userId,procInstId);
         if (!CollectionUtils.isEmpty(list)){
             String value = SharedUtil.isEmptyString(JdbcMapUtil.getString(list.get(0),"USER_COMMENT")) ? "同意" : JdbcMapUtil.getString(list.get(0),"USER_COMMENT");
-            map.put("comment",userName + "：" + value);
+            map.put("comment",value);
             map.put("file",JdbcMapUtil.getString(list.get(0),"USER_ATTACHMENT"));
         }
         return map;

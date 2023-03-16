@@ -7,6 +7,7 @@ import com.cisdi.ext.importQYY.model.FeasibleImportBatch;
 import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.model.PmPrjInvest1;
 import com.cisdi.ext.proPlan.PmProPlanExt;
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -366,9 +367,8 @@ public class FeasibleImportBatchExt {
         String error = "";
         String other = pmPrj.getOther();
         if (SharedUtil.isEmptyString(other)){
-            other = String.valueOf(pmPrj.getQtyTwo());
+            other = StringUtil.toString(pmPrj.getQtyTwo());
         }
-        System.out.println(other);
         try {
             Crud.from("PM_PRJ_INVEST1").where().eq("id",id).update()
                     .set("PM_PRJ_ID",newImport.getPmPrjId())

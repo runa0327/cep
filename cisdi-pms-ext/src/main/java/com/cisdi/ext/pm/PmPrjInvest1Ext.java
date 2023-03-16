@@ -1,6 +1,7 @@
 package com.cisdi.ext.pm;
 
 import com.cisdi.ext.base.PmPrjExt;
+import com.cisdi.ext.invest.InvestAmtExt;
 import com.cisdi.ext.util.WfPmInvestUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -50,6 +51,8 @@ public class PmPrjInvest1Ext {
     public void invest1ProcessEndCheck(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //校验资金金额
+        InvestAmtExt.checkAmt(entityRecord);
         //流程表名
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         //流程业务表id

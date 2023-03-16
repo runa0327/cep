@@ -3728,7 +3728,7 @@ public class AttLinkExt {
                 "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS'," +
                 "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD'," +
                 "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget'," +
-                "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE,t.PRJ_EARLY_USER_ID,t.PRJ_DESIGN_USER_ID,t.PRJ_COST_USER_ID " +
+                "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE,t.PRJ_EARLY_USER_ID,t.PRJ_DESIGN_USER_ID,t.PRJ_COST_USER_ID,t.ESTIMATED_TOTAL_INVEST " +
                 "from pm_prj t left join PM_PARTY c on t.CUSTOMER_UNIT=c.id " +
                 "LEFT JOIN gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
                 "LEFT JOIN gr_set_value l on t.BASE_LOCATION_ID=l.id " +

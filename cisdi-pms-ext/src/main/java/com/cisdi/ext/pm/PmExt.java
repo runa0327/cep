@@ -269,9 +269,9 @@ public class PmExt {
         if (Strings.isNotEmpty(param.startTime)) {
             sb.append(" and DATE_FORMAT(ppp.PLAN_START_DATE,'%Y-%m-%d') = DATE_FORMAT('").append(param.startTime).append("','%Y-%m-%d')");
         }
-        String userId = ExtJarHelper.loginInfo.get().userId;
-        sb.append(" and IF('").append(userId).append("' in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1, ");
-        sb.append(" pm.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(userId).append("', USER_IDS )))");
+//        String userId = ExtJarHelper.loginInfo.get().userId;
+//        sb.append(" and IF('").append(userId).append("' in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1, ");
+//        sb.append(" pm.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(userId).append("', USER_IDS )))");
 
         sb.append(" order by pm.PM_SEQ desc");
         String totalSql = sb.toString();
@@ -328,7 +328,7 @@ public class PmExt {
 
     public String getPrjInvest(String projectId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pie.id,round(ifnull(pie.PRJ_TOTAL_INVEST,0),2) as amt ,gsv.code from pm_invest_est pie  " +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pie.id,round(ifnull(pie.PRJ_TOTAL_INVEST/10000,0),2) as amt ,gsv.code from pm_invest_est pie  " +
                 "left join  gr_set_value gsv on gsv.id = pie.INVEST_EST_TYPE_ID " +
                 "where PM_PRJ_ID=? order by gsv.`CODE` desc limit 0,1  ", projectId);
         if (CollectionUtils.isEmpty(list)) {
