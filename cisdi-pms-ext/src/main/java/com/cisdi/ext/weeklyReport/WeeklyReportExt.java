@@ -3,9 +3,11 @@ package com.cisdi.ext.weeklyReport;
 import com.cisdi.ext.model.*;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
+import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
 import java.util.*;
@@ -69,6 +71,7 @@ public class WeeklyReportExt {
     private BaseReport getBaseReport(WeeklyReportType weeklyReportType, String parentAttCode) {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String peroidDtlId = String.valueOf(map.get("peroidDtlId"));
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
         LoginInfo loginInfo = ExtJarHelper.loginInfo.get();
 
@@ -95,26 +98,33 @@ public class WeeklyReportExt {
 
         report.hrWeeklyReport = hrWeeklyReport;
 
-        List<HrWeeklyReportDtl> hrWeeklyReportDtlList = HrWeeklyReportDtl.selectByWhere(new Where().eq(parentAttCode, hrWeeklyReport.getId()));
+        // List<HrWeeklyReportDtl> hrWeeklyReportDtlList = HrWeeklyReportDtl.selectByWhere(new Where().eq(parentAttCode, hrWeeklyReport.getId()));
+        List<Map<String, Object>> hrWeeklyReportDtlList = myJdbcTemplate.queryForList("SELECT D.*,PI.NAME WF_PROCESS_INSTANCE_NAME,P.NAME WF_PROCESS_NAME,PRJ.NAME PM_PRJ_NAME FROM HR_WEEKLY_REPORT_DTL D JOIN WF_PROCESS_INSTANCE PI ON D." + parentAttCode + "=? AND D.WF_PROCESS_INSTANCE_ID=PI.ID JOIN WF_PROCESS P ON PI.WF_PROCESS_ID=P.ID LEFT JOIN PM_PRJ PRJ ON D.PM_PRJ_ID=PRJ.ID", hrWeeklyReport.getId());
         report.reportDtlList = convertToReportDtlList(hrWeeklyReportDtlList);
 
         return report;
     }
 
-    private List<ReportDtl> convertToReportDtlList(List<HrWeeklyReportDtl> hrWeeklyReportDtlList) {
+    private List<ReportDtl> convertToReportDtlList(List<Map<String, Object>> hrWeeklyReportDtlList) {
         if (SharedUtil.isEmptyList(hrWeeklyReportDtlList)) {
             return null;
         }
 
         return hrWeeklyReportDtlList.stream().map(item -> {
             ReportDtl reportDtl = new ReportDtl();
-            reportDtl.isStart = item.getIsStart();
-            reportDtl.isApprove = item.getIsApprove();
-            reportDtl.isEnd = item.getIsEnd();
-            reportDtl.isNotiDeptOnEnd = item.getIsNotiDeptOnEnd();
-            reportDtl.isNotiLeaderOnEnd = item.getIsNotiLeaderOnEnd();
-            reportDtl.prj = getPrj(item.getPmPrjId());
-            reportDtl.procInst = getProcInst(item.getWfProcessInstanceId());
+            reportDtl.isStart = JdbcMapUtil.getBoolean(item, "IS_START");
+            reportDtl.isApprove = JdbcMapUtil.getBoolean(item, "IS_APPROVE");
+            reportDtl.isEnd = JdbcMapUtil.getBoolean(item, "IS_END");
+            reportDtl.isNotiDeptOnEnd = JdbcMapUtil.getBoolean(item, "IS_NOTI_DEPT_ON_END");
+            reportDtl.isNotiLeaderOnEnd = JdbcMapUtil.getBoolean(item, "IS_NOTI_LEADER_ON_END");
+            reportDtl.prj = new Prj();
+            reportDtl.prj.id = JdbcMapUtil.getString(item, "PM_PRJ_ID");
+            reportDtl.prj.name = JdbcMapUtil.getString(item, "PM_PRJ_NAME");
+            reportDtl.procInst = new ProcInst();
+            reportDtl.procInst.procId = JdbcMapUtil.getString(item, "WF_PROCESS_ID");
+            reportDtl.procInst.procName = JdbcMapUtil.getString(item, "WF_PROCESS_NAME");
+            reportDtl.procInst.procInstId = JdbcMapUtil.getString(item, "WF_PROCESS_INSTANCE_ID");
+            reportDtl.procInst.procInstName = JdbcMapUtil.getString(item, "WF_PROCESS_INSTANCE_NAME");
             return reportDtl;
         }).collect(Collectors.toList());
     }
