@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 流程实例。
+ * 周报。
  */
-public class WfProcessInstance {
+public class HrWeeklyReport {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<WfProcessInstance> modelHelper = new ModelHelper<>("WF_PROCESS_INSTANCE", new WfProcessInstance());
+    private static final ModelHelper<HrWeeklyReport> modelHelper = new ModelHelper<>("HR_WEEKLY_REPORT", new HrWeeklyReport());
 
     /**
      * 待更新的列。
@@ -37,7 +37,7 @@ public class WfProcessInstance {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "WF_PROCESS_INSTANCE";
+    public static final String ENT_CODE = "HR_WEEKLY_REPORT";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -99,57 +99,77 @@ public class WfProcessInstance {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 流程。
+         * 周报类型。
          */
-        public static final String WF_PROCESS_ID = "WF_PROCESS_ID";
+        public static final String HR_WEEKLY_REPORT_TYPE_ID = "HR_WEEKLY_REPORT_TYPE_ID";
         /**
-         * 启动用户。
+         * 周期明细。
          */
-        public static final String START_USER_ID = "START_USER_ID";
+        public static final String HR_PERIOD_DTL_ID = "HR_PERIOD_DTL_ID";
         /**
-         * 开始日期时间。
+         * 报告部门。
          */
-        public static final String START_DATETIME = "START_DATETIME";
+        public static final String REPORT_DEPT_ID = "REPORT_DEPT_ID";
         /**
-         * 结束日期时间。
+         * 报告用户。
          */
-        public static final String END_DATETIME = "END_DATETIME";
+        public static final String REPORT_USER_ID = "REPORT_USER_ID";
         /**
-         * 实体。
+         * 发起数量。
          */
-        public static final String AD_ENT_ID = "AD_ENT_ID";
+        public static final String CT_START = "CT_START";
         /**
-         * 实体代码。
+         * 审核数量。
          */
-        public static final String ENT_CODE = "ENT_CODE";
+        public static final String CT_APPROVE = "CT_APPROVE";
         /**
-         * 实体记录ID。
+         * 办结数量。
          */
-        public static final String ENTITY_RECORD_ID = "ENTITY_RECORD_ID";
+        public static final String CT_END = "CT_END";
         /**
-         * 是否紧急。
+         * 办结时通知部门数量。
          */
-        public static final String IS_URGENT = "IS_URGENT";
+        public static final String CT_NOTI_DEPT_ON_END = "CT_NOTI_DEPT_ON_END";
         /**
-         * 干预。
+         * 办结时通知分管领导数量。
          */
-        public static final String WF_INTERFERE_ID = "WF_INTERFERE_ID";
+        public static final String CT_NOTI_LEADER_ON_END = "CT_NOTI_LEADER_ON_END";
         /**
-         * 当前节点。
+         * 项目数量。
          */
-        public static final String CURRENT_NODE_ID = "CURRENT_NODE_ID";
+        public static final String CT_PROJECT = "CT_PROJECT";
         /**
-         * 当前节点实例。
+         * 未结数量。
          */
-        public static final String CURRENT_NI_ID = "CURRENT_NI_ID";
+        public static final String CT_UNEND = "CT_UNEND";
         /**
-         * 当前待办用户。
+         * 报告备注。
          */
-        public static final String CURRENT_TODO_USER_IDS = "CURRENT_TODO_USER_IDS";
+        public static final String REPORT_REMARK = "REPORT_REMARK";
         /**
-         * 当前视图。
+         * 报告附件。
          */
-        public static final String CURRENT_VIEW_ID = "CURRENT_VIEW_ID";
+        public static final String REPORT_FILE = "REPORT_FILE";
+        /**
+         * 提交时间。
+         */
+        public static final String SUBMIT_TIME = "SUBMIT_TIME";
+        /**
+         * 所属的部门周报。
+         */
+        public static final String HR_WEEKLY_REPORT_ID_DEPT = "HR_WEEKLY_REPORT_ID_DEPT";
+        /**
+         * 所属的分管领导周报。
+         */
+        public static final String HR_WEEKLY_REPORT_ID_LEADER = "HR_WEEKLY_REPORT_ID_LEADER";
+        /**
+         * 所属的总经理周报。
+         */
+        public static final String HR_WEEKLY_REPORT_ID_GM = "HR_WEEKLY_REPORT_ID_GM";
+        /**
+         * 批号。
+         */
+        public static final String BATCH_ID = "BATCH_ID";
     }
 
     // </editor-fold>
@@ -172,7 +192,7 @@ public class WfProcessInstance {
     /**
      * 设置：ID。
      */
-    public WfProcessInstance setId(String id) {
+    public HrWeeklyReport setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -208,7 +228,7 @@ public class WfProcessInstance {
     /**
      * 设置：版本。
      */
-    public WfProcessInstance setVer(Integer ver) {
+    public HrWeeklyReport setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -244,7 +264,7 @@ public class WfProcessInstance {
     /**
      * 设置：时间戳。
      */
-    public WfProcessInstance setTs(LocalDateTime ts) {
+    public HrWeeklyReport setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -280,7 +300,7 @@ public class WfProcessInstance {
     /**
      * 设置：是否预设。
      */
-    public WfProcessInstance setIsPreset(Boolean isPreset) {
+    public HrWeeklyReport setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -316,7 +336,7 @@ public class WfProcessInstance {
     /**
      * 设置：创建日期时间。
      */
-    public WfProcessInstance setCrtDt(LocalDateTime crtDt) {
+    public HrWeeklyReport setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -352,7 +372,7 @@ public class WfProcessInstance {
     /**
      * 设置：创建用户。
      */
-    public WfProcessInstance setCrtUserId(String crtUserId) {
+    public HrWeeklyReport setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -388,7 +408,7 @@ public class WfProcessInstance {
     /**
      * 设置：最后修改日期时间。
      */
-    public WfProcessInstance setLastModiDt(LocalDateTime lastModiDt) {
+    public HrWeeklyReport setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -424,7 +444,7 @@ public class WfProcessInstance {
     /**
      * 设置：最后修改用户。
      */
-    public WfProcessInstance setLastModiUserId(String lastModiUserId) {
+    public HrWeeklyReport setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -460,7 +480,7 @@ public class WfProcessInstance {
     /**
      * 设置：记录状态。
      */
-    public WfProcessInstance setStatus(String status) {
+    public HrWeeklyReport setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -496,7 +516,7 @@ public class WfProcessInstance {
     /**
      * 设置：锁定流程实例。
      */
-    public WfProcessInstance setLkWfInstId(String lkWfInstId) {
+    public HrWeeklyReport setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -532,7 +552,7 @@ public class WfProcessInstance {
     /**
      * 设置：代码。
      */
-    public WfProcessInstance setCode(String code) {
+    public HrWeeklyReport setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -568,7 +588,7 @@ public class WfProcessInstance {
     /**
      * 设置：名称。
      */
-    public WfProcessInstance setName(String name) {
+    public HrWeeklyReport setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -604,7 +624,7 @@ public class WfProcessInstance {
     /**
      * 设置：备注。
      */
-    public WfProcessInstance setRemark(String remark) {
+    public HrWeeklyReport setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -626,468 +646,648 @@ public class WfProcessInstance {
     }
 
     /**
-     * 流程。
+     * 周报类型。
      */
-    private String wfProcessId;
+    private String hrWeeklyReportTypeId;
 
     /**
-     * 获取：流程。
+     * 获取：周报类型。
      */
-    public String getWfProcessId() {
-        return this.wfProcessId;
+    public String getHrWeeklyReportTypeId() {
+        return this.hrWeeklyReportTypeId;
     }
 
     /**
-     * 设置：流程。
+     * 设置：周报类型。
      */
-    public WfProcessInstance setWfProcessId(String wfProcessId) {
-        if (this.wfProcessId == null && wfProcessId == null) {
+    public HrWeeklyReport setHrWeeklyReportTypeId(String hrWeeklyReportTypeId) {
+        if (this.hrWeeklyReportTypeId == null && hrWeeklyReportTypeId == null) {
             // 均为null，不做处理。
-        } else if (this.wfProcessId != null && wfProcessId != null) {
+        } else if (this.hrWeeklyReportTypeId != null && hrWeeklyReportTypeId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.wfProcessId.compareTo(wfProcessId) != 0) {
-                this.wfProcessId = wfProcessId;
-                if (!this.toUpdateCols.contains("WF_PROCESS_ID")) {
-                    this.toUpdateCols.add("WF_PROCESS_ID");
+            if (this.hrWeeklyReportTypeId.compareTo(hrWeeklyReportTypeId) != 0) {
+                this.hrWeeklyReportTypeId = hrWeeklyReportTypeId;
+                if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_TYPE_ID")) {
+                    this.toUpdateCols.add("HR_WEEKLY_REPORT_TYPE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.wfProcessId = wfProcessId;
-            if (!this.toUpdateCols.contains("WF_PROCESS_ID")) {
-                this.toUpdateCols.add("WF_PROCESS_ID");
+            this.hrWeeklyReportTypeId = hrWeeklyReportTypeId;
+            if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_TYPE_ID")) {
+                this.toUpdateCols.add("HR_WEEKLY_REPORT_TYPE_ID");
             }
         }
         return this;
     }
 
     /**
-     * 启动用户。
+     * 周期明细。
      */
-    private String startUserId;
+    private String hrPeriodDtlId;
 
     /**
-     * 获取：启动用户。
+     * 获取：周期明细。
      */
-    public String getStartUserId() {
-        return this.startUserId;
+    public String getHrPeriodDtlId() {
+        return this.hrPeriodDtlId;
     }
 
     /**
-     * 设置：启动用户。
+     * 设置：周期明细。
      */
-    public WfProcessInstance setStartUserId(String startUserId) {
-        if (this.startUserId == null && startUserId == null) {
+    public HrWeeklyReport setHrPeriodDtlId(String hrPeriodDtlId) {
+        if (this.hrPeriodDtlId == null && hrPeriodDtlId == null) {
             // 均为null，不做处理。
-        } else if (this.startUserId != null && startUserId != null) {
+        } else if (this.hrPeriodDtlId != null && hrPeriodDtlId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.startUserId.compareTo(startUserId) != 0) {
-                this.startUserId = startUserId;
-                if (!this.toUpdateCols.contains("START_USER_ID")) {
-                    this.toUpdateCols.add("START_USER_ID");
+            if (this.hrPeriodDtlId.compareTo(hrPeriodDtlId) != 0) {
+                this.hrPeriodDtlId = hrPeriodDtlId;
+                if (!this.toUpdateCols.contains("HR_PERIOD_DTL_ID")) {
+                    this.toUpdateCols.add("HR_PERIOD_DTL_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.startUserId = startUserId;
-            if (!this.toUpdateCols.contains("START_USER_ID")) {
-                this.toUpdateCols.add("START_USER_ID");
+            this.hrPeriodDtlId = hrPeriodDtlId;
+            if (!this.toUpdateCols.contains("HR_PERIOD_DTL_ID")) {
+                this.toUpdateCols.add("HR_PERIOD_DTL_ID");
             }
         }
         return this;
     }
 
     /**
-     * 开始日期时间。
+     * 报告部门。
      */
-    private LocalDateTime startDatetime;
+    private String reportDeptId;
 
     /**
-     * 获取：开始日期时间。
+     * 获取：报告部门。
      */
-    public LocalDateTime getStartDatetime() {
-        return this.startDatetime;
+    public String getReportDeptId() {
+        return this.reportDeptId;
     }
 
     /**
-     * 设置：开始日期时间。
+     * 设置：报告部门。
      */
-    public WfProcessInstance setStartDatetime(LocalDateTime startDatetime) {
-        if (this.startDatetime == null && startDatetime == null) {
+    public HrWeeklyReport setReportDeptId(String reportDeptId) {
+        if (this.reportDeptId == null && reportDeptId == null) {
             // 均为null，不做处理。
-        } else if (this.startDatetime != null && startDatetime != null) {
+        } else if (this.reportDeptId != null && reportDeptId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.startDatetime.compareTo(startDatetime) != 0) {
-                this.startDatetime = startDatetime;
-                if (!this.toUpdateCols.contains("START_DATETIME")) {
-                    this.toUpdateCols.add("START_DATETIME");
+            if (this.reportDeptId.compareTo(reportDeptId) != 0) {
+                this.reportDeptId = reportDeptId;
+                if (!this.toUpdateCols.contains("REPORT_DEPT_ID")) {
+                    this.toUpdateCols.add("REPORT_DEPT_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.startDatetime = startDatetime;
-            if (!this.toUpdateCols.contains("START_DATETIME")) {
-                this.toUpdateCols.add("START_DATETIME");
+            this.reportDeptId = reportDeptId;
+            if (!this.toUpdateCols.contains("REPORT_DEPT_ID")) {
+                this.toUpdateCols.add("REPORT_DEPT_ID");
             }
         }
         return this;
     }
 
     /**
-     * 结束日期时间。
+     * 报告用户。
      */
-    private LocalDateTime endDatetime;
+    private String reportUserId;
 
     /**
-     * 获取：结束日期时间。
+     * 获取：报告用户。
      */
-    public LocalDateTime getEndDatetime() {
-        return this.endDatetime;
+    public String getReportUserId() {
+        return this.reportUserId;
     }
 
     /**
-     * 设置：结束日期时间。
+     * 设置：报告用户。
      */
-    public WfProcessInstance setEndDatetime(LocalDateTime endDatetime) {
-        if (this.endDatetime == null && endDatetime == null) {
+    public HrWeeklyReport setReportUserId(String reportUserId) {
+        if (this.reportUserId == null && reportUserId == null) {
             // 均为null，不做处理。
-        } else if (this.endDatetime != null && endDatetime != null) {
+        } else if (this.reportUserId != null && reportUserId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.endDatetime.compareTo(endDatetime) != 0) {
-                this.endDatetime = endDatetime;
-                if (!this.toUpdateCols.contains("END_DATETIME")) {
-                    this.toUpdateCols.add("END_DATETIME");
+            if (this.reportUserId.compareTo(reportUserId) != 0) {
+                this.reportUserId = reportUserId;
+                if (!this.toUpdateCols.contains("REPORT_USER_ID")) {
+                    this.toUpdateCols.add("REPORT_USER_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.endDatetime = endDatetime;
-            if (!this.toUpdateCols.contains("END_DATETIME")) {
-                this.toUpdateCols.add("END_DATETIME");
+            this.reportUserId = reportUserId;
+            if (!this.toUpdateCols.contains("REPORT_USER_ID")) {
+                this.toUpdateCols.add("REPORT_USER_ID");
             }
         }
         return this;
     }
 
     /**
-     * 实体。
+     * 发起数量。
      */
-    private String adEntId;
+    private Integer ctStart;
 
     /**
-     * 获取：实体。
+     * 获取：发起数量。
      */
-    public String getAdEntId() {
-        return this.adEntId;
+    public Integer getCtStart() {
+        return this.ctStart;
     }
 
     /**
-     * 设置：实体。
+     * 设置：发起数量。
      */
-    public WfProcessInstance setAdEntId(String adEntId) {
-        if (this.adEntId == null && adEntId == null) {
+    public HrWeeklyReport setCtStart(Integer ctStart) {
+        if (this.ctStart == null && ctStart == null) {
             // 均为null，不做处理。
-        } else if (this.adEntId != null && adEntId != null) {
+        } else if (this.ctStart != null && ctStart != null) {
             // 均非null，判定不等，再做处理：
-            if (this.adEntId.compareTo(adEntId) != 0) {
-                this.adEntId = adEntId;
-                if (!this.toUpdateCols.contains("AD_ENT_ID")) {
-                    this.toUpdateCols.add("AD_ENT_ID");
+            if (this.ctStart.compareTo(ctStart) != 0) {
+                this.ctStart = ctStart;
+                if (!this.toUpdateCols.contains("CT_START")) {
+                    this.toUpdateCols.add("CT_START");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.adEntId = adEntId;
-            if (!this.toUpdateCols.contains("AD_ENT_ID")) {
-                this.toUpdateCols.add("AD_ENT_ID");
+            this.ctStart = ctStart;
+            if (!this.toUpdateCols.contains("CT_START")) {
+                this.toUpdateCols.add("CT_START");
             }
         }
         return this;
     }
 
     /**
-     * 实体代码。
+     * 审核数量。
      */
-    private String entCode;
+    private Integer ctApprove;
 
     /**
-     * 获取：实体代码。
+     * 获取：审核数量。
      */
-    public String getEntCode() {
-        return this.entCode;
+    public Integer getCtApprove() {
+        return this.ctApprove;
     }
 
     /**
-     * 设置：实体代码。
+     * 设置：审核数量。
      */
-    public WfProcessInstance setEntCode(String entCode) {
-        if (this.entCode == null && entCode == null) {
+    public HrWeeklyReport setCtApprove(Integer ctApprove) {
+        if (this.ctApprove == null && ctApprove == null) {
             // 均为null，不做处理。
-        } else if (this.entCode != null && entCode != null) {
+        } else if (this.ctApprove != null && ctApprove != null) {
             // 均非null，判定不等，再做处理：
-            if (this.entCode.compareTo(entCode) != 0) {
-                this.entCode = entCode;
-                if (!this.toUpdateCols.contains("ENT_CODE")) {
-                    this.toUpdateCols.add("ENT_CODE");
+            if (this.ctApprove.compareTo(ctApprove) != 0) {
+                this.ctApprove = ctApprove;
+                if (!this.toUpdateCols.contains("CT_APPROVE")) {
+                    this.toUpdateCols.add("CT_APPROVE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.entCode = entCode;
-            if (!this.toUpdateCols.contains("ENT_CODE")) {
-                this.toUpdateCols.add("ENT_CODE");
+            this.ctApprove = ctApprove;
+            if (!this.toUpdateCols.contains("CT_APPROVE")) {
+                this.toUpdateCols.add("CT_APPROVE");
             }
         }
         return this;
     }
 
     /**
-     * 实体记录ID。
+     * 办结数量。
      */
-    private String entityRecordId;
+    private Integer ctEnd;
 
     /**
-     * 获取：实体记录ID。
+     * 获取：办结数量。
      */
-    public String getEntityRecordId() {
-        return this.entityRecordId;
+    public Integer getCtEnd() {
+        return this.ctEnd;
     }
 
     /**
-     * 设置：实体记录ID。
+     * 设置：办结数量。
      */
-    public WfProcessInstance setEntityRecordId(String entityRecordId) {
-        if (this.entityRecordId == null && entityRecordId == null) {
+    public HrWeeklyReport setCtEnd(Integer ctEnd) {
+        if (this.ctEnd == null && ctEnd == null) {
             // 均为null，不做处理。
-        } else if (this.entityRecordId != null && entityRecordId != null) {
+        } else if (this.ctEnd != null && ctEnd != null) {
             // 均非null，判定不等，再做处理：
-            if (this.entityRecordId.compareTo(entityRecordId) != 0) {
-                this.entityRecordId = entityRecordId;
-                if (!this.toUpdateCols.contains("ENTITY_RECORD_ID")) {
-                    this.toUpdateCols.add("ENTITY_RECORD_ID");
+            if (this.ctEnd.compareTo(ctEnd) != 0) {
+                this.ctEnd = ctEnd;
+                if (!this.toUpdateCols.contains("CT_END")) {
+                    this.toUpdateCols.add("CT_END");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.entityRecordId = entityRecordId;
-            if (!this.toUpdateCols.contains("ENTITY_RECORD_ID")) {
-                this.toUpdateCols.add("ENTITY_RECORD_ID");
+            this.ctEnd = ctEnd;
+            if (!this.toUpdateCols.contains("CT_END")) {
+                this.toUpdateCols.add("CT_END");
             }
         }
         return this;
     }
 
     /**
-     * 是否紧急。
+     * 办结时通知部门数量。
      */
-    private Boolean isUrgent;
+    private Integer ctNotiDeptOnEnd;
 
     /**
-     * 获取：是否紧急。
+     * 获取：办结时通知部门数量。
      */
-    public Boolean getIsUrgent() {
-        return this.isUrgent;
+    public Integer getCtNotiDeptOnEnd() {
+        return this.ctNotiDeptOnEnd;
     }
 
     /**
-     * 设置：是否紧急。
+     * 设置：办结时通知部门数量。
      */
-    public WfProcessInstance setIsUrgent(Boolean isUrgent) {
-        if (this.isUrgent == null && isUrgent == null) {
+    public HrWeeklyReport setCtNotiDeptOnEnd(Integer ctNotiDeptOnEnd) {
+        if (this.ctNotiDeptOnEnd == null && ctNotiDeptOnEnd == null) {
             // 均为null，不做处理。
-        } else if (this.isUrgent != null && isUrgent != null) {
+        } else if (this.ctNotiDeptOnEnd != null && ctNotiDeptOnEnd != null) {
             // 均非null，判定不等，再做处理：
-            if (this.isUrgent.compareTo(isUrgent) != 0) {
-                this.isUrgent = isUrgent;
-                if (!this.toUpdateCols.contains("IS_URGENT")) {
-                    this.toUpdateCols.add("IS_URGENT");
+            if (this.ctNotiDeptOnEnd.compareTo(ctNotiDeptOnEnd) != 0) {
+                this.ctNotiDeptOnEnd = ctNotiDeptOnEnd;
+                if (!this.toUpdateCols.contains("CT_NOTI_DEPT_ON_END")) {
+                    this.toUpdateCols.add("CT_NOTI_DEPT_ON_END");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.isUrgent = isUrgent;
-            if (!this.toUpdateCols.contains("IS_URGENT")) {
-                this.toUpdateCols.add("IS_URGENT");
+            this.ctNotiDeptOnEnd = ctNotiDeptOnEnd;
+            if (!this.toUpdateCols.contains("CT_NOTI_DEPT_ON_END")) {
+                this.toUpdateCols.add("CT_NOTI_DEPT_ON_END");
             }
         }
         return this;
     }
 
     /**
-     * 干预。
+     * 办结时通知分管领导数量。
      */
-    private String wfInterfereId;
+    private Integer ctNotiLeaderOnEnd;
 
     /**
-     * 获取：干预。
+     * 获取：办结时通知分管领导数量。
      */
-    public String getWfInterfereId() {
-        return this.wfInterfereId;
+    public Integer getCtNotiLeaderOnEnd() {
+        return this.ctNotiLeaderOnEnd;
     }
 
     /**
-     * 设置：干预。
+     * 设置：办结时通知分管领导数量。
      */
-    public WfProcessInstance setWfInterfereId(String wfInterfereId) {
-        if (this.wfInterfereId == null && wfInterfereId == null) {
+    public HrWeeklyReport setCtNotiLeaderOnEnd(Integer ctNotiLeaderOnEnd) {
+        if (this.ctNotiLeaderOnEnd == null && ctNotiLeaderOnEnd == null) {
             // 均为null，不做处理。
-        } else if (this.wfInterfereId != null && wfInterfereId != null) {
+        } else if (this.ctNotiLeaderOnEnd != null && ctNotiLeaderOnEnd != null) {
             // 均非null，判定不等，再做处理：
-            if (this.wfInterfereId.compareTo(wfInterfereId) != 0) {
-                this.wfInterfereId = wfInterfereId;
-                if (!this.toUpdateCols.contains("WF_INTERFERE_ID")) {
-                    this.toUpdateCols.add("WF_INTERFERE_ID");
+            if (this.ctNotiLeaderOnEnd.compareTo(ctNotiLeaderOnEnd) != 0) {
+                this.ctNotiLeaderOnEnd = ctNotiLeaderOnEnd;
+                if (!this.toUpdateCols.contains("CT_NOTI_LEADER_ON_END")) {
+                    this.toUpdateCols.add("CT_NOTI_LEADER_ON_END");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.wfInterfereId = wfInterfereId;
-            if (!this.toUpdateCols.contains("WF_INTERFERE_ID")) {
-                this.toUpdateCols.add("WF_INTERFERE_ID");
+            this.ctNotiLeaderOnEnd = ctNotiLeaderOnEnd;
+            if (!this.toUpdateCols.contains("CT_NOTI_LEADER_ON_END")) {
+                this.toUpdateCols.add("CT_NOTI_LEADER_ON_END");
             }
         }
         return this;
     }
 
     /**
-     * 当前节点。
+     * 项目数量。
      */
-    private String currentNodeId;
+    private Integer ctProject;
 
     /**
-     * 获取：当前节点。
+     * 获取：项目数量。
      */
-    public String getCurrentNodeId() {
-        return this.currentNodeId;
+    public Integer getCtProject() {
+        return this.ctProject;
     }
 
     /**
-     * 设置：当前节点。
+     * 设置：项目数量。
      */
-    public WfProcessInstance setCurrentNodeId(String currentNodeId) {
-        if (this.currentNodeId == null && currentNodeId == null) {
+    public HrWeeklyReport setCtProject(Integer ctProject) {
+        if (this.ctProject == null && ctProject == null) {
             // 均为null，不做处理。
-        } else if (this.currentNodeId != null && currentNodeId != null) {
+        } else if (this.ctProject != null && ctProject != null) {
             // 均非null，判定不等，再做处理：
-            if (this.currentNodeId.compareTo(currentNodeId) != 0) {
-                this.currentNodeId = currentNodeId;
-                if (!this.toUpdateCols.contains("CURRENT_NODE_ID")) {
-                    this.toUpdateCols.add("CURRENT_NODE_ID");
+            if (this.ctProject.compareTo(ctProject) != 0) {
+                this.ctProject = ctProject;
+                if (!this.toUpdateCols.contains("CT_PROJECT")) {
+                    this.toUpdateCols.add("CT_PROJECT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.currentNodeId = currentNodeId;
-            if (!this.toUpdateCols.contains("CURRENT_NODE_ID")) {
-                this.toUpdateCols.add("CURRENT_NODE_ID");
+            this.ctProject = ctProject;
+            if (!this.toUpdateCols.contains("CT_PROJECT")) {
+                this.toUpdateCols.add("CT_PROJECT");
             }
         }
         return this;
     }
 
     /**
-     * 当前节点实例。
+     * 未结数量。
      */
-    private String currentNiId;
+    private Integer ctUnend;
 
     /**
-     * 获取：当前节点实例。
+     * 获取：未结数量。
      */
-    public String getCurrentNiId() {
-        return this.currentNiId;
+    public Integer getCtUnend() {
+        return this.ctUnend;
     }
 
     /**
-     * 设置：当前节点实例。
+     * 设置：未结数量。
      */
-    public WfProcessInstance setCurrentNiId(String currentNiId) {
-        if (this.currentNiId == null && currentNiId == null) {
+    public HrWeeklyReport setCtUnend(Integer ctUnend) {
+        if (this.ctUnend == null && ctUnend == null) {
             // 均为null，不做处理。
-        } else if (this.currentNiId != null && currentNiId != null) {
+        } else if (this.ctUnend != null && ctUnend != null) {
             // 均非null，判定不等，再做处理：
-            if (this.currentNiId.compareTo(currentNiId) != 0) {
-                this.currentNiId = currentNiId;
-                if (!this.toUpdateCols.contains("CURRENT_NI_ID")) {
-                    this.toUpdateCols.add("CURRENT_NI_ID");
+            if (this.ctUnend.compareTo(ctUnend) != 0) {
+                this.ctUnend = ctUnend;
+                if (!this.toUpdateCols.contains("CT_UNEND")) {
+                    this.toUpdateCols.add("CT_UNEND");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.currentNiId = currentNiId;
-            if (!this.toUpdateCols.contains("CURRENT_NI_ID")) {
-                this.toUpdateCols.add("CURRENT_NI_ID");
+            this.ctUnend = ctUnend;
+            if (!this.toUpdateCols.contains("CT_UNEND")) {
+                this.toUpdateCols.add("CT_UNEND");
             }
         }
         return this;
     }
 
     /**
-     * 当前待办用户。
+     * 报告备注。
      */
-    private String currentTodoUserIds;
+    private String reportRemark;
 
     /**
-     * 获取：当前待办用户。
+     * 获取：报告备注。
      */
-    public String getCurrentTodoUserIds() {
-        return this.currentTodoUserIds;
+    public String getReportRemark() {
+        return this.reportRemark;
     }
 
     /**
-     * 设置：当前待办用户。
+     * 设置：报告备注。
      */
-    public WfProcessInstance setCurrentTodoUserIds(String currentTodoUserIds) {
-        if (this.currentTodoUserIds == null && currentTodoUserIds == null) {
+    public HrWeeklyReport setReportRemark(String reportRemark) {
+        if (this.reportRemark == null && reportRemark == null) {
             // 均为null，不做处理。
-        } else if (this.currentTodoUserIds != null && currentTodoUserIds != null) {
+        } else if (this.reportRemark != null && reportRemark != null) {
             // 均非null，判定不等，再做处理：
-            if (this.currentTodoUserIds.compareTo(currentTodoUserIds) != 0) {
-                this.currentTodoUserIds = currentTodoUserIds;
-                if (!this.toUpdateCols.contains("CURRENT_TODO_USER_IDS")) {
-                    this.toUpdateCols.add("CURRENT_TODO_USER_IDS");
+            if (this.reportRemark.compareTo(reportRemark) != 0) {
+                this.reportRemark = reportRemark;
+                if (!this.toUpdateCols.contains("REPORT_REMARK")) {
+                    this.toUpdateCols.add("REPORT_REMARK");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.currentTodoUserIds = currentTodoUserIds;
-            if (!this.toUpdateCols.contains("CURRENT_TODO_USER_IDS")) {
-                this.toUpdateCols.add("CURRENT_TODO_USER_IDS");
+            this.reportRemark = reportRemark;
+            if (!this.toUpdateCols.contains("REPORT_REMARK")) {
+                this.toUpdateCols.add("REPORT_REMARK");
             }
         }
         return this;
     }
 
     /**
-     * 当前视图。
+     * 报告附件。
      */
-    private String currentViewId;
+    private String reportFile;
 
     /**
-     * 获取：当前视图。
+     * 获取：报告附件。
      */
-    public String getCurrentViewId() {
-        return this.currentViewId;
+    public String getReportFile() {
+        return this.reportFile;
     }
 
     /**
-     * 设置：当前视图。
+     * 设置：报告附件。
      */
-    public WfProcessInstance setCurrentViewId(String currentViewId) {
-        if (this.currentViewId == null && currentViewId == null) {
+    public HrWeeklyReport setReportFile(String reportFile) {
+        if (this.reportFile == null && reportFile == null) {
             // 均为null，不做处理。
-        } else if (this.currentViewId != null && currentViewId != null) {
+        } else if (this.reportFile != null && reportFile != null) {
             // 均非null，判定不等，再做处理：
-            if (this.currentViewId.compareTo(currentViewId) != 0) {
-                this.currentViewId = currentViewId;
-                if (!this.toUpdateCols.contains("CURRENT_VIEW_ID")) {
-                    this.toUpdateCols.add("CURRENT_VIEW_ID");
+            if (this.reportFile.compareTo(reportFile) != 0) {
+                this.reportFile = reportFile;
+                if (!this.toUpdateCols.contains("REPORT_FILE")) {
+                    this.toUpdateCols.add("REPORT_FILE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.currentViewId = currentViewId;
-            if (!this.toUpdateCols.contains("CURRENT_VIEW_ID")) {
-                this.toUpdateCols.add("CURRENT_VIEW_ID");
+            this.reportFile = reportFile;
+            if (!this.toUpdateCols.contains("REPORT_FILE")) {
+                this.toUpdateCols.add("REPORT_FILE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 提交时间。
+     */
+    private LocalDateTime submitTime;
+
+    /**
+     * 获取：提交时间。
+     */
+    public LocalDateTime getSubmitTime() {
+        return this.submitTime;
+    }
+
+    /**
+     * 设置：提交时间。
+     */
+    public HrWeeklyReport setSubmitTime(LocalDateTime submitTime) {
+        if (this.submitTime == null && submitTime == null) {
+            // 均为null，不做处理。
+        } else if (this.submitTime != null && submitTime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.submitTime.compareTo(submitTime) != 0) {
+                this.submitTime = submitTime;
+                if (!this.toUpdateCols.contains("SUBMIT_TIME")) {
+                    this.toUpdateCols.add("SUBMIT_TIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.submitTime = submitTime;
+            if (!this.toUpdateCols.contains("SUBMIT_TIME")) {
+                this.toUpdateCols.add("SUBMIT_TIME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 所属的部门周报。
+     */
+    private String hrWeeklyReportIdDept;
+
+    /**
+     * 获取：所属的部门周报。
+     */
+    public String getHrWeeklyReportIdDept() {
+        return this.hrWeeklyReportIdDept;
+    }
+
+    /**
+     * 设置：所属的部门周报。
+     */
+    public HrWeeklyReport setHrWeeklyReportIdDept(String hrWeeklyReportIdDept) {
+        if (this.hrWeeklyReportIdDept == null && hrWeeklyReportIdDept == null) {
+            // 均为null，不做处理。
+        } else if (this.hrWeeklyReportIdDept != null && hrWeeklyReportIdDept != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.hrWeeklyReportIdDept.compareTo(hrWeeklyReportIdDept) != 0) {
+                this.hrWeeklyReportIdDept = hrWeeklyReportIdDept;
+                if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_DEPT")) {
+                    this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_DEPT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.hrWeeklyReportIdDept = hrWeeklyReportIdDept;
+            if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_DEPT")) {
+                this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_DEPT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 所属的分管领导周报。
+     */
+    private String hrWeeklyReportIdLeader;
+
+    /**
+     * 获取：所属的分管领导周报。
+     */
+    public String getHrWeeklyReportIdLeader() {
+        return this.hrWeeklyReportIdLeader;
+    }
+
+    /**
+     * 设置：所属的分管领导周报。
+     */
+    public HrWeeklyReport setHrWeeklyReportIdLeader(String hrWeeklyReportIdLeader) {
+        if (this.hrWeeklyReportIdLeader == null && hrWeeklyReportIdLeader == null) {
+            // 均为null，不做处理。
+        } else if (this.hrWeeklyReportIdLeader != null && hrWeeklyReportIdLeader != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.hrWeeklyReportIdLeader.compareTo(hrWeeklyReportIdLeader) != 0) {
+                this.hrWeeklyReportIdLeader = hrWeeklyReportIdLeader;
+                if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_LEADER")) {
+                    this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_LEADER");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.hrWeeklyReportIdLeader = hrWeeklyReportIdLeader;
+            if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_LEADER")) {
+                this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_LEADER");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 所属的总经理周报。
+     */
+    private String hrWeeklyReportIdGm;
+
+    /**
+     * 获取：所属的总经理周报。
+     */
+    public String getHrWeeklyReportIdGm() {
+        return this.hrWeeklyReportIdGm;
+    }
+
+    /**
+     * 设置：所属的总经理周报。
+     */
+    public HrWeeklyReport setHrWeeklyReportIdGm(String hrWeeklyReportIdGm) {
+        if (this.hrWeeklyReportIdGm == null && hrWeeklyReportIdGm == null) {
+            // 均为null，不做处理。
+        } else if (this.hrWeeklyReportIdGm != null && hrWeeklyReportIdGm != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.hrWeeklyReportIdGm.compareTo(hrWeeklyReportIdGm) != 0) {
+                this.hrWeeklyReportIdGm = hrWeeklyReportIdGm;
+                if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_GM")) {
+                    this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_GM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.hrWeeklyReportIdGm = hrWeeklyReportIdGm;
+            if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_GM")) {
+                this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_GM");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 批号。
+     */
+    private String batchId;
+
+    /**
+     * 获取：批号。
+     */
+    public String getBatchId() {
+        return this.batchId;
+    }
+
+    /**
+     * 设置：批号。
+     */
+    public HrWeeklyReport setBatchId(String batchId) {
+        if (this.batchId == null && batchId == null) {
+            // 均为null，不做处理。
+        } else if (this.batchId != null && batchId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.batchId.compareTo(batchId) != 0) {
+                this.batchId = batchId;
+                if (!this.toUpdateCols.contains("BATCH_ID")) {
+                    this.toUpdateCols.add("BATCH_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.batchId = batchId;
+            if (!this.toUpdateCols.contains("BATCH_ID")) {
+                this.toUpdateCols.add("BATCH_ID");
             }
         }
         return this;
@@ -1180,8 +1380,8 @@ public class WfProcessInstance {
      *
      * @return
      */
-    public static WfProcessInstance newData() {
-        WfProcessInstance obj = modelHelper.newData();
+    public static HrWeeklyReport newData() {
+        HrWeeklyReport obj = modelHelper.newData();
         return obj;
     }
 
@@ -1190,8 +1390,8 @@ public class WfProcessInstance {
      *
      * @return
      */
-    public static WfProcessInstance insertData() {
-        WfProcessInstance obj = modelHelper.insertData();
+    public static HrWeeklyReport insertData() {
+        HrWeeklyReport obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1203,8 +1403,8 @@ public class WfProcessInstance {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static WfProcessInstance selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        WfProcessInstance obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static HrWeeklyReport selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        HrWeeklyReport obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1214,7 +1414,7 @@ public class WfProcessInstance {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static WfProcessInstance selectById(String id) {
+    public static HrWeeklyReport selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1226,8 +1426,8 @@ public class WfProcessInstance {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<WfProcessInstance> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<WfProcessInstance> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<HrWeeklyReport> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<HrWeeklyReport> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1237,7 +1437,7 @@ public class WfProcessInstance {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<WfProcessInstance> selectByIds(List<String> ids) {
+    public static List<HrWeeklyReport> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1249,8 +1449,8 @@ public class WfProcessInstance {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<WfProcessInstance> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<WfProcessInstance> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<HrWeeklyReport> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<HrWeeklyReport> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1260,7 +1460,7 @@ public class WfProcessInstance {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<WfProcessInstance> selectByWhere(Where where) {
+    public static List<HrWeeklyReport> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1272,10 +1472,10 @@ public class WfProcessInstance {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static WfProcessInstance selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<WfProcessInstance> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static HrWeeklyReport selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<HrWeeklyReport> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用WfProcessInstance.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用HrWeeklyReport.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmptyList(objList) ? null : objList.get(0);
@@ -1287,7 +1487,7 @@ public class WfProcessInstance {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static WfProcessInstance selectOneByWhere(Where where) {
+    public static HrWeeklyReport selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1401,7 +1601,7 @@ public class WfProcessInstance {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(WfProcessInstance fromModel, WfProcessInstance toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(HrWeeklyReport fromModel, HrWeeklyReport toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1411,7 +1611,7 @@ public class WfProcessInstance {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(WfProcessInstance fromModel, WfProcessInstance toModel) {
+    public static void copyCols(HrWeeklyReport fromModel, HrWeeklyReport toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 
