@@ -299,7 +299,7 @@ public class PoOrderChangeReqExt {
                 clearPO_ORDER_CHANGE_REQ("AD_USER_THREE_ID,AD_USER_NINTH_ID",csCommId,myJdbcTemplate);
             }
             //判断当前登录人岗位信息
-            String deptName = getUserDept(myJdbcTemplate,userId,csCommId);
+            String deptName = getUserDept(myJdbcTemplate,userId,csCommId,nodeId);
             //审批意见数据回显
             updatePO_ORDER_CHANGE_REQ(deptName,file,comment,csCommId,myJdbcTemplate);
         } else if ("costFinanceFalse".equals(nodeStatus)){ // 成本/财务审批拒绝
@@ -331,7 +331,7 @@ public class PoOrderChangeReqExt {
                 clearPO_ORDER_CHANGE_REQ("AD_USER_EIGHTH_ID,AD_USER_NINTH_ID",csCommId,myJdbcTemplate);
             }
             //判断当前登录人岗位信息
-            String deptName = getUserDept(myJdbcTemplate,userId,csCommId);
+            String deptName = getUserDept(myJdbcTemplate,userId,csCommId,nodeId);
             //审批意见数据回显
             updatePO_ORDER_CHANGE_REQ(deptName,file,comment,csCommId,myJdbcTemplate);
         } else if ("legalFinanceFalse".equals(nodeStatus)){ // 法务/财务审批拒绝
@@ -343,7 +343,7 @@ public class PoOrderChangeReqExt {
                 clearPO_ORDER_CHANGE_REQ("AD_USER_THREE_ID,AD_USER_EIGHTH_ID,AD_USER_NINTH_ID",csCommId,myJdbcTemplate);
             }
             //判断当前登录人岗位信息
-            String deptName = getUserDept(myJdbcTemplate,userId,csCommId);
+            String deptName = getUserDept(myJdbcTemplate,userId,csCommId,nodeId);
             //审批意见数据回显
             updatePO_ORDER_CHANGE_REQ(deptName,file,comment,csCommId,myJdbcTemplate);
         } else if ("costLegalFinanceFalse".equals(nodeStatus)){ // 法务/财务/成本审批拒绝
@@ -375,7 +375,7 @@ public class PoOrderChangeReqExt {
                 clearPO_ORDER_CHANGE_REQ("AD_USER_THREE_ID,AD_USER_EIGHTH_ID",csCommId,myJdbcTemplate);
             }
             //判断当前登录人岗位信息
-            String deptName = getUserDept(myJdbcTemplate,userId,csCommId);
+            String deptName = getUserDept(myJdbcTemplate,userId,csCommId,nodeId);
             //审批意见数据回显
             updatePO_ORDER_CHANGE_REQ(deptName,file,comment,csCommId,myJdbcTemplate);
         } else if ("costLegalFalse".equals(nodeStatus)){ //法务/成本审批拒绝
@@ -535,9 +535,12 @@ public class PoOrderChangeReqExt {
      * @param myJdbcTemplate 数据源
      * @param userId 当前登录人id
      * @param csCommId 流程实例id
+     * @param nodeInstanceId 节点实例id
      * @return
      */
-    private String getUserDept(MyJdbcTemplate myJdbcTemplate, String userId, String csCommId) {
+    private String getUserDept(MyJdbcTemplate myJdbcTemplate, String userId, String csCommId,String nodeInstanceId) {
+        //判断是否是转办来的
+        userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
         String sql3 = "select AD_USER_THREE_ID,AD_USER_EIGHTH_ID,AD_USER_NINTH_ID from PO_ORDER_CHANGE_REQ where id = ?";
         Map<String,Object> map = myJdbcTemplate.queryForMap(sql3,csCommId);
         return getDeptName(map,userId);

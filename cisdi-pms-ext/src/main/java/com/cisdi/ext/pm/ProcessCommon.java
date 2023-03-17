@@ -259,4 +259,24 @@ public class ProcessCommon {
         return nodeId;
     }
 
+    /**
+     * 查询流程任务最原始的用户（考虑到转办用户）
+     * @param nodeInstanceId 流程节点实例id
+     * @param userId 用户id
+     * @param myJdbcTemplate 数据源
+     * @return
+     */
+    public static String getOriginalUser(String nodeInstanceId, String userId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select PREV_TASK_ID from wf_task where ad_user_id = ? and WF_NODE_INSTANCE_ID = ? and status = 'ap'";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,userId,nodeInstanceId);
+        String taskId = "";
+        if (!CollectionUtils.isEmpty(list)){
+            taskId = JdbcMapUtil.getString(list.get(0),"PREV_TASK_ID");
+            if (!SharedUtil.isEmptyString(taskId)){
+                String sql2 = "select ad_user_id from wf_task where id = ?";
+                userId = myJdbcTemplate.queryForList(sql2,taskId).get(0).get("ad_user_id").toString();
+            }
+        }
+        return userId;
+    }
 }
