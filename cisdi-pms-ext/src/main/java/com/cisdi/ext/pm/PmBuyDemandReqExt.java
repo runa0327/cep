@@ -139,6 +139,8 @@ public class PmBuyDemandReqExt {
     private void check(String status) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Date date = new Date();
+        //获取当前节点实例id
+        String nodeInstanceId = ExtJarHelper.nodeInstId.get();
         String now = DateTimeUtil.dateToString(date);
         // 当前登录人id
         String userId = ExtJarHelper.loginInfo.get().userId;
@@ -175,6 +177,7 @@ public class PmBuyDemandReqExt {
                 commentStr = userName + ": "+commentStr;
             }
             //查询用户所在岗位 0099799190825079016=成本岗；0099799190825079033=采购岗
+            userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
             String sql1 = "select hr_dept_id FROM hr_dept_user WHERE AD_USER_ID = ? and hr_dept_id in ('0099799190825079016','0099799190825079033')";
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId);
             if (!CollectionUtils.isEmpty(list1)){
