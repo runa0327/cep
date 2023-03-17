@@ -243,7 +243,7 @@ public class PmBidApprovalReq {
                 clearPM_BID_APPROVAL_REQData("OPERATOR_ONE_ID,AD_USER_THREE_ID,AD_USER_FOUR_ID",csCommId,myJdbcTemplate);
             }
             //判断当前登录人岗位
-            String deptName = getUserDept(myJdbcTemplate,userId,csCommId);
+            String deptName = getUserDept(myJdbcTemplate,userId,csCommId,nodeId);
             //根据岗位判断修改数据
             updatePM_BID_APPROVAL_REQDate(deptName,file,comment,csCommId,myJdbcTemplate);
         } else if ("costContractOperatorCheckRefuse".equals(status)){
@@ -255,7 +255,7 @@ public class PmBidApprovalReq {
                 clearPM_BID_APPROVAL_REQData("OPERATOR_ONE_ID,AD_USER_THREE_ID,AD_USER_FOUR_ID,AD_USER_EIGHTH_ID,AD_USER_NINTH_ID",csCommId,myJdbcTemplate);
             }
             //判断当前登录人岗位
-            String deptName = getUserDept(myJdbcTemplate,userId,csCommId);
+            String deptName = getUserDept(myJdbcTemplate,userId,csCommId,nodeId);
             updatePM_BID_APPROVAL_REQDate(deptName,file,comment,csCommId,myJdbcTemplate);
         } else if ("costContractOperatorLegalFinanceCheckRefuse".equals(status)){
             clearPM_BID_APPROVAL_REQData("OPERATOR_ONE_ID,AD_USER_THREE_ID,AD_USER_FOUR_ID,AD_USER_EIGHTH_ID,AD_USER_NINTH_ID",csCommId,myJdbcTemplate);
@@ -313,7 +313,7 @@ public class PmBidApprovalReq {
      */
     private Boolean getFirstCheck(String nodeId, String userId, MyJdbcTemplate myJdbcTemplate) {
         //判断是否是当轮拒绝回来的、撤销回来的（是否是第一个进入该节点审批的人）
-        String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ?";
+        String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ? and status = 'ap'";
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeId,userId);
         Boolean firstCheck = true; //是第一次审批
         if (!CollectionUtils.isEmpty(list2)){
@@ -382,7 +382,9 @@ public class PmBidApprovalReq {
         log.info("已更新：{}",exec);
     }
 
-    private String getUserDept(MyJdbcTemplate myJdbcTemplate,String userId, String csCommId) {
+    private String getUserDept(MyJdbcTemplate myJdbcTemplate,String userId, String csCommId,String nodeInstanceId) {
+        //判断是否是转办来的
+        userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
         String sql3 = "select OPERATOR_ONE_ID,AD_USER_THREE_ID,AD_USER_FOUR_ID,AD_USER_EIGHTH_ID,AD_USER_NINTH_ID from PM_BID_APPROVAL_REQ where id = ?";
         Map<String,Object> map = myJdbcTemplate.queryForMap(sql3,csCommId);
         return getDeptName(map,userId);
