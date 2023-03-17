@@ -10,32 +10,62 @@ import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class WeeklyReportExt {
 
     public enum WeeklyReportType {
-        P,
-        D,
-        L,
-        G,
+        P, D, L, G,
     }
 
     public void getGmWeeklyReport() {
-        LeaderReport report = (LeaderReport) getBaseReport(WeeklyReportType.G, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_GM);
+        getLeaderGmWeeklyReport(WeeklyReportType.G, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_GM);
+    }
+
+    public void getLeaderWeeklyReport() {
+        getLeaderGmWeeklyReport(WeeklyReportType.L, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_LEADER);
+    }
+
+    /**
+     * 获取分管领导、总经理周报。
+     *
+     * @param weeklyReportType
+     * @param parentAttCode
+     */
+    private void getLeaderGmWeeklyReport(WeeklyReportType weeklyReportType, String parentAttCode) {
+        LeaderReport report = (LeaderReport) getBaseReport(weeklyReportType, parentAttCode);
         if (report == null) {
             return;
         }
 
-        setBaseReportAsReturnValue(report);
-    }
+        // 办结统计：
+        if (!SharedUtil.isEmptyList(report.reportDtlList)) {
+            List<ReportDtl> startList = report.reportDtlList.stream().filter(item -> item.isEnd).collect(Collectors.toList());
+            if (!SharedUtil.isEmptyList(startList)) {
+                BigDecimal sum = new BigDecimal(startList.size());
+                Map<String, List<ReportDtl>> map = startList.stream().collect(Collectors.groupingBy(item -> item.procInst.procName));
+                report.endStat = new ArrayList<>(map.size());
+                map.forEach((k, v) -> {
+                    NameCountPercent nameCountPercent = new NameCountPercent();
+                    report.endStat.add(nameCountPercent);
 
+                    nameCountPercent.name = k;
+                    nameCountPercent.count = v.size();
+                    BigDecimal divide = new BigDecimal(v.size()).divide(sum, 4, RoundingMode.HALF_UP);
+                    nameCountPercent.percent = new DecimalFormat("#.##%").format(divide);
+                });
 
-    public void getLeaderWeeklyReport() {
-        LeaderReport report = (LeaderReport) getBaseReport(WeeklyReportType.L, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_LEADER);
-        if (report == null) {
-            return;
+                report.endStat = report.endStat.stream().sorted((o1, o2) -> {
+                    int i = o2.count.compareTo(o1.count);
+
+                    // 注：未实现按照拼音排序：
+                    return i != 0 ? i : o1.name.compareTo(o2.name);
+                }).collect(Collectors.toList());
+            }
         }
 
         setBaseReportAsReturnValue(report);
@@ -45,6 +75,32 @@ public class WeeklyReportExt {
         DeptReport report = (DeptReport) getBaseReport(WeeklyReportType.D, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_DEPT);
         if (report == null) {
             return;
+        }
+
+        // 发起统计：
+        if (!SharedUtil.isEmptyList(report.reportDtlList)) {
+            List<ReportDtl> startList = report.reportDtlList.stream().filter(item -> item.isStart).collect(Collectors.toList());
+            if (!SharedUtil.isEmptyList(startList)) {
+                BigDecimal sum = new BigDecimal(startList.size());
+                Map<String, List<ReportDtl>> map = startList.stream().collect(Collectors.groupingBy(item -> item.procInst.procName));
+                report.startStat = new ArrayList<>(map.size());
+                map.forEach((k, v) -> {
+                    NameCountPercent nameCountPercent = new NameCountPercent();
+                    report.startStat.add(nameCountPercent);
+
+                    nameCountPercent.name = k;
+                    nameCountPercent.count = v.size();
+                    BigDecimal divide = new BigDecimal(v.size()).divide(sum, 4, RoundingMode.HALF_UP);
+                    nameCountPercent.percent = new DecimalFormat("#.##%").format(divide);
+                });
+
+                report.startStat = report.startStat.stream().sorted((o1, o2) -> {
+                    int i = o2.count.compareTo(o1.count);
+
+                    // 注：未实现按照拼音排序：
+                    return i != 0 ? i : o1.name.compareTo(o2.name);
+                }).collect(Collectors.toList());
+            }
         }
 
         setBaseReportAsReturnValue(report);
@@ -193,15 +249,21 @@ public class WeeklyReportExt {
     }
 
     public static class GmReport extends BaseReport {
-
+        public List<NameCountPercent> endStat;
     }
 
     public static class LeaderReport extends BaseReport {
-
+        public List<NameCountPercent> endStat;
     }
 
     public static class DeptReport extends BaseReport {
+        public List<NameCountPercent> startStat;
+    }
 
+    public static class NameCountPercent {
+        public String name;
+        public Integer count;
+        public String percent;
     }
 
     public static class PersonReport extends BaseReport {
