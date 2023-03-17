@@ -30,7 +30,7 @@ public class PmPrjExportModel {
     @ColumnWidth(30)
     private String prjManageMode;
 
-    @ExcelProperty("概算总投资")
+    @ExcelProperty("总投资(万)")
     @ColumnWidth(30)
     private String prjTotalInvest;
 
