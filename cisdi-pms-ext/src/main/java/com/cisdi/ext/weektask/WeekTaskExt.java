@@ -64,6 +64,33 @@ public class WeekTaskExt {
 
     }
 
+    /**
+     * 本周工作任务详情
+     */
+    public void weekTaskView() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String id = JdbcMapUtil.getString(map, "id");
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select wt.*,gsv.`NAME` as task_status from week_task wt left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  where wt.id=?", id);
+        if (!CollectionUtils.isEmpty(list)) {
+            List<WeekTask> weekTaskList = list.stream().map(p -> {
+                WeekTask weekTask = new WeekTask();
+                weekTask.id = JdbcMapUtil.getString(p, "ID");
+                weekTask.userId = JdbcMapUtil.getString(p, "AD_USER_ID");
+                weekTask.title = JdbcMapUtil.getString(p, "TITLE");
+                weekTask.content = JdbcMapUtil.getString(p, "CONTENT");
+                weekTask.publishStart = StringUtil.withOutT(JdbcMapUtil.getString(p, "PUBLISH_START"));
+                weekTask.taskStatus = JdbcMapUtil.getString(p, "task_status");
+                return weekTask;
+            }).collect(Collectors.toList());
+            WeekTask weekTask = weekTaskList.get(0);
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(weekTask), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        } else {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        }
+    }
+
 
     public static class WeekTask {
         public String id;
