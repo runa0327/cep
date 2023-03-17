@@ -128,6 +128,7 @@ public class PmPrjInvest1Ext {
             //项目id
             String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
             Map<String,String> map = PmPrjExt.getProjectDeptUser(projectId,myJdbcTemplate);
+            userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
             String dept = PmPrjExt.getUserDept(userId,map);
             String processComment = "", commentEnd = "";
             if ("PRJ_COST_USER_ID".equals(dept)){ //成本岗

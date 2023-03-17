@@ -207,6 +207,7 @@ public class PoContractReqExt {
             String financialFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_FOUR");//财务附件
             //查询该人员角色信息
             String roleSql = "select b.id,b.name from ad_role_user a left join ad_role b on a.AD_ROLE_ID = b.id where a.AD_USER_ID = ? and b.id in ('0100070673610711083','0099902212142039415')";
+            userId = ProcessCommon.getOriginalUser(nodeId,userId,myJdbcTemplate);
             List<Map<String,Object>> roleList = myJdbcTemplate.queryForList(roleSql,userId);
             if (!CollectionUtils.isEmpty(roleList)){
                 if (!CollectionUtils.isEmpty(entryNumList)){

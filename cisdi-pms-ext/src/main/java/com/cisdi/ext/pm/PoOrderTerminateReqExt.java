@@ -226,6 +226,7 @@ public class PoOrderTerminateReqExt {
                     .set("APPROVAL_COMMENT_ONE",newCommentStr).set("FILE_ID_SIX",newCommentFile).exec();
         } else if ("legalFinanceTrue".equals(nodeStatus)){ // 7-财务法务审核-通过
             //判断当前登录人是法务还是财务角色 0100070673610702919-财务；0100070673610702924-法务
+            userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
             String roleId = ProcessRoleExt.getUserRole(myJdbcTemplate,userId);
             if ("0100070673610702919".equals(roleId)){ //财务
                 //获取流程中的附件和意见信息
