@@ -1,5 +1,6 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.api.PoOrderExtApi;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -437,5 +438,23 @@ public class PoOrderSupplementReqExt {
             }
         }
         return sbComment.toString();
+    }
+
+    /**
+     * 补充协议-流程完结时扩展
+     */
+    public void OrderProcessEnd(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //合同工期
+        int duration = JdbcMapUtil.getInt(entityRecord.valueMap,"PLAN_TOTAL_DAYS");
+        //合同签订日期
+        Date signDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(entityRecord.valueMap,"SIGN_DATE"));
+        //计算到期日期
+        Date expireDate = DateTimeUtil.addDays(signDate,duration);
+        //更新到期日期字段
+        Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("id",entityRecord.csCommId).update().set("DATE_FIVE",expireDate).exec();
+        //将合同数据写入传输至合同数据表(po_order)
+//        PoOrderExtApi.createData(entityRecord,"PO_ORDER_SUPPLEMENT_REQ","0100070673610715221",myJdbcTemplate);
     }
 }
