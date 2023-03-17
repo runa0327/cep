@@ -336,8 +336,10 @@ public class AttLinkExtDetail {
      */
     public static void assignmentAttLinkResult(AttLinkResult attLinkResult, Map row, String entCode, MyJdbcTemplate myJdbcTemplate) {
         //项目类型属性联动处理
-        prjTypeLinkNew(row,attLinkResult);
-//        prjTypeLink(row,attLinkResult);
+        List<String> noPrjTypeList = AttLinkDifferentProcess.noPrjTypeLink();
+        if (!noPrjTypeList.contains(entCode)){
+            prjTypeLinkNew(row,attLinkResult);
+        }
         // 建筑面积
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -480,6 +482,38 @@ public class AttLinkExtDetail {
             attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
             attLinkResult.attMap.put("PM_FUND_SOURCE_ID", linkedAtt);
         }
+        //海域面积
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:JdbcMapUtil.getString(row, "QTY_THREE");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "QTY_THREE"));
+            attLinkResult.attMap.put("QTY_THREE", linkedAtt);
+        }
+        //长
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "CON_SCALE_QTY"));
+            attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
+        }
+        //宽
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "CON_SCALE_QTY2"));
+            attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
+        }
+        //其他
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
+            attLinkResult.attMap.put("OTHER", linkedAtt);
+        }
     }
 
     /**
@@ -541,8 +575,6 @@ public class AttLinkExtDetail {
             linkedAtt.changeToShown = buildAreaShow;
             linkedAtt.changeToMandatory = buildAreaMustEdit;
             linkedAtt.changeToEditable = buildAreaChangeToEditable;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:JdbcMapUtil.getString(row, "QTY_ONE");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "QTY_ONE"));
             attLinkResult.attMap.put("QTY_ONE", linkedAtt);
         }
         //海域面积
@@ -552,8 +584,6 @@ public class AttLinkExtDetail {
             linkedAtt.changeToShown = seaAreaShow;
             linkedAtt.changeToMandatory = seaAreaMustEdit;
             linkedAtt.changeToEditable = seaAreaChangeToEditable;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:JdbcMapUtil.getString(row, "QTY_THREE");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "QTY_THREE"));
             attLinkResult.attMap.put("QTY_THREE", linkedAtt);
         }
         //长
@@ -563,8 +593,6 @@ public class AttLinkExtDetail {
             linkedAtt.changeToShown = roadLengthShow;
             linkedAtt.changeToMandatory = roadLengthMustEdit;
             linkedAtt.changeToEditable = roadLengthChangeToEditable;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "CON_SCALE_QTY"));
             attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
         }
         //宽
@@ -574,8 +602,6 @@ public class AttLinkExtDetail {
             linkedAtt.changeToShown = roadWidthShow;
             linkedAtt.changeToMandatory = roadWidthMustEdit;
             linkedAtt.changeToEditable = roadWidthChangeToEditable;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "CON_SCALE_QTY2"));
             attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
         }
         //其他
@@ -585,10 +611,6 @@ public class AttLinkExtDetail {
             linkedAtt.changeToShown = otherShow;
             linkedAtt.changeToMandatory = otherMustEdit;
             linkedAtt.changeToEditable = otherChangeToEditable;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
-            attLinkResult.attMap.put("OTHER", linkedAtt);
-//            attLinkResult.attMap.put("QTY_TWO", linkedAtt);
         }
     }
 

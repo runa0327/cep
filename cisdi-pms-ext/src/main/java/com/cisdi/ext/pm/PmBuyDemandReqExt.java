@@ -311,7 +311,8 @@ public class PmBuyDemandReqExt {
             for (Map<String, Object> tmp : list) {
                 String uid = JdbcMapUtil.getString(tmp,"u_id");
                 if (purchaseId.equals(uid)){
-                    comment = JdbcMapUtil.getString(tmp,"u_name") + ": " +JdbcMapUtil.getString(tmp,"user_comment");
+                    String specificComment = JdbcMapUtil.getString(tmp,"user_comment") == null ? "拟同意" : JdbcMapUtil.getString(tmp,"user_comment");
+                    comment = JdbcMapUtil.getString(tmp,"u_name") + ": " +specificComment;
                 }
             }
         }
