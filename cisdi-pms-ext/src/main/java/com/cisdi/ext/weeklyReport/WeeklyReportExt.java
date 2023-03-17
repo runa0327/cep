@@ -37,7 +37,7 @@ public class WeeklyReportExt {
      * @param parentAttCode
      */
     private void getLeaderGmWeeklyReport(WeeklyReportType weeklyReportType, String parentAttCode) {
-        LeaderReport report = (LeaderReport) getBaseReport(weeklyReportType, parentAttCode);
+        LeaderGmReport report = (LeaderGmReport) getBaseReport(weeklyReportType, parentAttCode);
         if (report == null) {
             return;
         }
@@ -144,10 +144,8 @@ public class WeeklyReportExt {
             report = new PersonReport();
         } else if (weeklyReportType == WeeklyReportType.D) {
             report = new DeptReport();
-        } else if (weeklyReportType == WeeklyReportType.L) {
-            report = new LeaderReport();
-        } else if (weeklyReportType == WeeklyReportType.G) {
-            report = new GmReport();
+        } else if (weeklyReportType == WeeklyReportType.L || weeklyReportType == WeeklyReportType.G) {
+            report = new LeaderGmReport();
         } else {
             throw new BaseException("未知枚举！" + weeklyReportType);
         }
@@ -248,11 +246,7 @@ public class WeeklyReportExt {
         public List<ReportDtl> reportDtlList;
     }
 
-    public static class GmReport extends BaseReport {
-        public List<NameCountPercent> endStat;
-    }
-
-    public static class LeaderReport extends BaseReport {
+    public static class LeaderGmReport extends BaseReport {
         public List<NameCountPercent> endStat;
     }
 
