@@ -73,14 +73,14 @@ public class ProPlanJob {
      * 生成周任务
      */
 //    @Scheduled(fixedDelayString = "${spring.scheduled.fixedDelayString}")
-    @Scheduled(cron = "0 */1 * * * ?")
+    @Scheduled(cron = "0 0 7 * * ? ")//每天7点执行一次
     public void generateWeekTask() {
         Date paramDate = WeeklyUtils.addDays(new Date(), 7);
         List<Map<String, Object>> list = jdbcTemplate.queryForList("select pm.`NAME` as prjName,pppn.*,pi.AD_USER_ID as default_user from pm_pro_plan_node pppn " +
                 "left join pm_pro_plan ppp on ppp.id = pppn.PM_PRO_PLAN_ID " +
                 "left join pm_prj pm on pm.id = ppp.PM_PRJ_ID " +
                 "left join POST_INFO pi on pi.id = pppn.POST_INFO_ID " +
-                " where `level` = 3 and date_format(pppn.PLAN_START_DATE,'%Y-%m-%d') =? ;", "2025-01-16");
+                " where `level` = 3 and date_format(pppn.PLAN_START_DATE,'%Y-%m-%d') =? ;", paramDate);
 
         String msg = "{0}【{1}】计划将在{2}开始，请及时处理！";
         for (Map<String, Object> objectMap : list) {

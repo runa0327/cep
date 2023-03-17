@@ -33,9 +33,11 @@ public class WeekTaskExt {
         int pageSize = Integer.parseInt(String.valueOf(map.get("pageSize")));
         int pageIndex = Integer.parseInt(String.valueOf(map.get("pageIndex")));
         String userId = ExtJarHelper.loginInfo.get().userId;
-        userId = "0099799190825078670";
         StringBuilder sb = new StringBuilder();
-        sb.append("select wt.*,gsv.`NAME` as task_status from week_task wt left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  where AD_USER_ID = '").append(userId).append("' order by PUBLISH_START desc");
+        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as userName from week_task wt " +
+                "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
+                "left join ad_user au on au.id = wt.AD_USER_ID "+
+                "where AD_USER_ID = '").append(userId).append("' order by PUBLISH_START desc");
 
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
@@ -49,6 +51,7 @@ public class WeekTaskExt {
             weekTask.content = JdbcMapUtil.getString(p, "CONTENT");
             weekTask.publishStart = StringUtil.withOutT(JdbcMapUtil.getString(p, "PUBLISH_START"));
             weekTask.taskStatus = JdbcMapUtil.getString(p, "task_status");
+            weekTask.userName =  JdbcMapUtil.getString(p, "userName");
             return weekTask;
         }).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(weekTaskList)) {
@@ -71,7 +74,10 @@ public class WeekTaskExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String id = JdbcMapUtil.getString(map, "id");
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select wt.*,gsv.`NAME` as task_status from week_task wt left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  where wt.id=?", id);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select wt.*,gsv.`NAME` as task_status,au.name as userName from week_task wt " +
+                "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
+                "left join ad_user au on au.id = wt.AD_USER_ID "+
+                "where wt.id=?", id);
         if (!CollectionUtils.isEmpty(list)) {
             List<WeekTask> weekTaskList = list.stream().map(p -> {
                 WeekTask weekTask = new WeekTask();
@@ -81,6 +87,7 @@ public class WeekTaskExt {
                 weekTask.content = JdbcMapUtil.getString(p, "CONTENT");
                 weekTask.publishStart = StringUtil.withOutT(JdbcMapUtil.getString(p, "PUBLISH_START"));
                 weekTask.taskStatus = JdbcMapUtil.getString(p, "task_status");
+                weekTask.userName = JdbcMapUtil.getString(p, "userName");
                 return weekTask;
             }).collect(Collectors.toList());
             WeekTask weekTask = weekTaskList.get(0);
@@ -99,6 +106,7 @@ public class WeekTaskExt {
         public String content;
         public String publishStart;
         public String taskStatus;
+        public String userName;
     }
 
     public static class OutSide {
