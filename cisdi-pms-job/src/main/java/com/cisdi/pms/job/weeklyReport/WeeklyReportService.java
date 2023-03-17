@@ -53,20 +53,22 @@ public class WeeklyReportService {
 
             // 遍历部门用户：
             deptUserList.stream().map(row -> JdbcMapUtil.getString(row, "AD_USER_ID")).distinct().forEach(userId -> {
+                Map<String, Object> user = jdbcTemplate.queryForMap("select * from ad_user t where t.id=?", userId);
+
                 // 重建用户周报：
-                reCreateUserReport(periodDlt, deptId, userId, batchId, notiDeptProcIdList, notiLeaderProcIdList);
+                createUserReport(periodDlt, deptId, user, batchId, notiDeptProcIdList, notiLeaderProcIdList);
             });
         }
-
 
         // 针对要生成部门周报的部门列表，获取部门的负责人，汇总周报：
         {
             Map<String, List<Map<String, Object>>> map = deptList.stream().filter(item -> JdbcMapUtil.getString(item, "CHIEF_USER_ID") != null).collect(Collectors.groupingBy(item -> JdbcMapUtil.getString(item, "CHIEF_USER_ID")));
             map.forEach((k, v) -> {
-                String chiefUserId = k;
+                String userId = k;
                 List<String> deptIdList = v.stream().map(item -> JdbcMapUtil.getString(item, "ID")).collect(Collectors.toList());
 
-                reCreateDeptLeaderGmReport(periodDlt, deptIdList, chiefUserId, batchId, "D", "HR_WEEKLY_REPORT_ID_DEPT");
+                Map<String, Object> user = jdbcTemplate.queryForMap("select * from ad_user t where t.id=?", userId);
+                createDeptLeaderGmReport(periodDlt, deptIdList, user, batchId, "D", "HR_WEEKLY_REPORT_ID_DEPT");
             });
         }
 
@@ -74,10 +76,11 @@ public class WeeklyReportService {
         {
             Map<String, List<Map<String, Object>>> map = deptList.stream().filter(item -> JdbcMapUtil.getString(item, "AD_USER_ID") != null).collect(Collectors.groupingBy(item -> JdbcMapUtil.getString(item, "AD_USER_ID")));
             map.forEach((k, v) -> {
-                String chiefUserId = k;
+                String userId = k;
                 List<String> deptIdList = v.stream().map(item -> JdbcMapUtil.getString(item, "ID")).collect(Collectors.toList());
 
-                reCreateDeptLeaderGmReport(periodDlt, deptIdList, chiefUserId, batchId, "L", "HR_WEEKLY_REPORT_ID_LEADER");
+                Map<String, Object> user = jdbcTemplate.queryForMap("select * from ad_user t where t.id=?", userId);
+                createDeptLeaderGmReport(periodDlt, deptIdList, user, batchId, "L", "HR_WEEKLY_REPORT_ID_LEADER");
             });
         }
 
@@ -85,26 +88,34 @@ public class WeeklyReportService {
         {
             List<String> deptIdList = deptList.stream().map(item -> JdbcMapUtil.getString(item, "ID")).collect(Collectors.toList());
 
-            reCreateDeptLeaderGmReport(periodDlt, deptIdList, Constants.generalManangerUserId, batchId, "G", "HR_WEEKLY_REPORT_ID_GM");
+            Map<String, Object> user = jdbcTemplate.queryForMap("select * from ad_user t where t.id=?", Constants.generalManangerUserId);
+            createDeptLeaderGmReport(periodDlt, deptIdList, user, batchId, "G", "HR_WEEKLY_REPORT_ID_GM");
         }
+
+        // 令周报明细的“HR_WEEKLY_REPORT_ID_DEPT”、“HR_WEEKLY_REPORT_ID_LEADER”、“HR_WEEKLY_REPORT_ID_GM”与周报的相同：
+        jdbcTemplate.update("update hr_weekly_report_dtl d join hr_weekly_report h on d.hr_weekly_report_id=h.id and h.batch_id=? set d.HR_WEEKLY_REPORT_ID_DEPT=h.HR_WEEKLY_REPORT_ID_DEPT,d.HR_WEEKLY_REPORT_ID_LEADER=h.HR_WEEKLY_REPORT_ID_LEADER,d.HR_WEEKLY_REPORT_ID_GM=h.HR_WEEKLY_REPORT_ID_GM", batchId);
+        // 更改为AP，表示生效了：
+        jdbcTemplate.update("UPDATE hr_weekly_report T SET T.`STATUS`='AP' WHERE T.BATCH_ID=?", batchId);
+        jdbcTemplate.update("UPDATE hr_weekly_report_DTL T SET T.`STATUS`='AP' WHERE T.BATCH_ID=?", batchId);
 
         // 删除此前遗留周报(即：周期相同、批次不同)：
         jdbcTemplate.update("delete from hr_weekly_report t where t.hr_period_dtl_id=? and t.batch_id!=?", periodDlt.get("ID"), batchId);
     }
 
     /**
-     * 重建部门、分管领导、总经理周报。
+     * 创建部门、分管领导、总经理周报。
      *
      * @param periodDlt
      * @param deptIdList
-     * @param userId
+     * @param user
      * @param batchId
      */
-    private void reCreateDeptLeaderGmReport(Map<String, Object> periodDlt, List<String> deptIdList, String userId, String batchId, String weeklyReportType, String weeklyReportPidAttCode) {
+    private void createDeptLeaderGmReport(Map<String, Object> periodDlt, List<String> deptIdList, Map<String, Object> user, String batchId, String weeklyReportType, String weeklyReportPidAttCode) {
+        String userId = JdbcMapUtil.getString(user, "ID");
+        String userName = JdbcMapUtil.getString(user, "NAME");
         Object periodDtlId = periodDlt.get("ID");
-        jdbcTemplate.update("delete from hr_weekly_report t where t.hr_weekly_report_type_id=? and t.REPORT_USER_id=? and t.hr_period_dtl_id=?", weeklyReportType, userId, periodDtlId);
 
-        String newReportId = insertReport(weeklyReportType, periodDtlId, null/**/, userId, null, null, batchId);
+        String newReportId = insertReport(weeklyReportType, periodDtlId, null/**/, userId, null, null, batchId, userName);
 
         List<String> args = new ArrayList<>();
         args.add(newReportId);
@@ -139,9 +150,11 @@ public class WeeklyReportService {
     }
 
     /**
-     * 重建用户周报。
+     * 创建用户周报。
      */
-    private void reCreateUserReport(Map<String, Object> periodDlt, String deptId, String userId, String batchId, List<String> notiDeptProcIdList, List<String> notiLeaderProcIdList) {
+    private void createUserReport(Map<String, Object> periodDlt, String deptId, Map<String, Object> user, String batchId, List<String> notiDeptProcIdList, List<String> notiLeaderProcIdList) {
+        String userId = JdbcMapUtil.getString(user, "ID");
+        String userName = JdbcMapUtil.getString(user, "NAME");
         Object periodDtlId = periodDlt.get("ID");
 
         // 获取此前周报的备注、附件
@@ -154,14 +167,8 @@ public class WeeklyReportService {
             reportFile = row.get("REPORT_FILE");
         }
 
-        // 重新生成周报、明细
-
-        // 删除之前的周报：
-        if (list.size() > 0) {
-            jdbcTemplate.update("delete from hr_weekly_report t where t.hr_weekly_report_type_id='P' and t.report_DEPT_ID=? and t.REPORT_USER_id=? and t.hr_period_dtl_id=?", deptId, userId, periodDtlId);
-        }
         // 插入周报，设上之前获取的周报的备注、附件：
-        String newReportId = insertReport("P", periodDtlId, deptId, userId, reportRemark, reportFile, batchId);
+        String newReportId = insertReport("P", periodDtlId, deptId, userId, reportRemark, reportFile, batchId, userName);
 
         // 获取发起列表：
         List<Map<String, Object>> startList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.`STATUS`='AP' AND EXISTS(SELECT 1 FROM WF_TASK TK WHERE TK.WF_PROCESS_INSTANCE_ID=PI.ID AND TK.`STATUS`='AP' AND TK.IS_PROC_INST_FIRST_TODO_TASK=1 AND TK.AD_USER_ID=? AND TK.ACT_DATETIME BETWEEN ? AND ?)", userId, JdbcMapUtil.getLocalDate(periodDlt, "FROM_DATE"), JdbcMapUtil.getLocalDate(periodDlt, "TO_DATE").plusDays(1));
@@ -200,7 +207,7 @@ public class WeeklyReportService {
         if (!SharedUtil.isEmptyList(prjIdList)) {
             for (String prjId : prjIdList) {
                 String newId = IdUtil.getSnowflakeNextIdStr();
-                jdbcTemplate.update("INSERT INTO HR_WEEKLY_REPORT_DTL(`ID`,`VER`,`TS`,`IS_PRESET`,`CRT_DT`,`CRT_USER_ID`,`LAST_MODI_DT`,`LAST_MODI_USER_ID`,`STATUS`,`LK_WF_INST_ID`,`CODE`,`NAME`,`REMARK`,`WF_PROCESS_ID`,`WF_PROCESS_INSTANCE_ID`,`IS_START`,`IS_APPROVE`,`IS_END`,`HR_WEEKLY_REPORT_ID`,`BATCH_ID`,`PM_PRJ_ID`,`IS_UNEND`,`IS_NOTI_DEPT_ON_END`,`IS_NOTI_LEADER_ON_END`)VALUES(?/*ID*/,(1)/*VER*/,(NOW())/*TS*/,(null)/*IS_PRESET*/,(NOW())/*CRT_DT*/,(?)/*CRT_USER_ID*/,(NOW())/*LAST_MODI_DT*/,(?)/*LAST_MODI_USER_ID*/,('AP')/*STATUS*/,(null)/*LK_WF_INST_ID*/,(null)/*CODE*/,(null)/*NAME*/,(null)/*REMARK*/,(?)/*WF_PROCESS_ID*/,(?)/*WF_PROCESS_INSTANCE_ID*/,(?)/*IS_START*/,(?)/*IS_APPROVE*/,(?)/*IS_END*/,(?)/*HR_WEEKLY_REPORT_ID*/,(?)/*BATCH_ID*/,(?)/*PM_PRJ_ID*/,(?)/*IS_UNEND*/,(?)/*IS_NOTI_DEPT_ON_END*/,(?)/*IS_NOTI_LEADER_ON_END*/)", newId, Constants.adminUserId, Constants.adminUserId, procId, procInstId, isStart, isApprove, isEnd, reportId, batchId, prjId, isUnend, isNotiDeptOnEnd, isNotiLeaderOnEnd);
+                jdbcTemplate.update("INSERT INTO HR_WEEKLY_REPORT_DTL(`ID`,`VER`,`TS`,`IS_PRESET`,`CRT_DT`,`CRT_USER_ID`,`LAST_MODI_DT`,`LAST_MODI_USER_ID`,`STATUS`,`LK_WF_INST_ID`,`CODE`,`NAME`,`REMARK`,`WF_PROCESS_ID`,`WF_PROCESS_INSTANCE_ID`,`IS_START`,`IS_APPROVE`,`IS_END`,`HR_WEEKLY_REPORT_ID`,`BATCH_ID`,`PM_PRJ_ID`,`IS_UNEND`,`IS_NOTI_DEPT_ON_END`,`IS_NOTI_LEADER_ON_END`)VALUES(?/*ID*/,(1)/*VER*/,(NOW())/*TS*/,(null)/*IS_PRESET*/,(NOW())/*CRT_DT*/,(?)/*CRT_USER_ID*/,(NOW())/*LAST_MODI_DT*/,(?)/*LAST_MODI_USER_ID*/,('DR')/*STATUS*/,(null)/*LK_WF_INST_ID*/,(null)/*CODE*/,(null)/*NAME*/,(null)/*REMARK*/,(?)/*WF_PROCESS_ID*/,(?)/*WF_PROCESS_INSTANCE_ID*/,(?)/*IS_START*/,(?)/*IS_APPROVE*/,(?)/*IS_END*/,(?)/*HR_WEEKLY_REPORT_ID*/,(?)/*BATCH_ID*/,(?)/*PM_PRJ_ID*/,(?)/*IS_UNEND*/,(?)/*IS_NOTI_DEPT_ON_END*/,(?)/*IS_NOTI_LEADER_ON_END*/)", newId, Constants.adminUserId, Constants.adminUserId, procId, procInstId, isStart, isApprove, isEnd, reportId, batchId, prjId, isUnend, isNotiDeptOnEnd, isNotiLeaderOnEnd);
             }
         }
     }
@@ -223,9 +230,9 @@ public class WeeklyReportService {
         }
     }
 
-    private String insertReport(String weeklyReportTypeId, Object periodDtlId, String deptId, String userId, Object reportRemark, Object reportFile, String batchId) {
+    private String insertReport(String weeklyReportTypeId, Object periodDtlId, String deptId, String userId, Object reportRemark, Object reportFile, String batchId, String name) {
         String newId = IdUtil.getSnowflakeNextIdStr();
-        jdbcTemplate.update("INSERT INTO HR_WEEKLY_REPORT(`ID`,`VER`,`TS`,`IS_PRESET`,`CRT_DT`,`CRT_USER_ID`,`LAST_MODI_DT`,`LAST_MODI_USER_ID`,`STATUS`,`LK_WF_INST_ID`,`CODE`,`NAME`,`REMARK`,`HR_WEEKLY_REPORT_TYPE_ID`,`HR_PERIOD_DTL_ID`,`REPORT_DEPT_ID`,`REPORT_USER_ID`,`CT_START`,`CT_APPROVE`,`CT_END`,`REPORT_REMARK`,`REPORT_FILE`,`SUBMIT_TIME`,`BATCH_ID`)VALUES(?/*ID*/,(1)/*VER*/,(NOW())/*TS*/,(null)/*IS_PRESET*/,(NOW())/*CRT_DT*/,(?)/*CRT_USER_ID*/,(NOW())/*LAST_MODI_DT*/,(?)/*LAST_MODI_USER_ID*/,('AP')/*STATUS*/,(null)/*LK_WF_INST_ID*/,(null)/*CODE*/,(null)/*NAME*/,(null)/*REMARK*/,(?)/*HR_WEEKLY_REPORT_TYPE_ID*/,(?)/*HR_PERIOD_DTL_ID*/,(?)/*REPORT_DEPT_ID*/,(?)/*REPORT_USER_ID*/,(null)/*CT_START*/,(null)/*CT_APPROVE*/,(null)/*CT_END*/,(?)/*REPORT_REMARK*/,(?)/*REPORT_FILE*/,(null)/*SUBMIT_TIME*/,(?)/*BATCH_ID*/)", newId, Constants.adminUserId, Constants.adminUserId, weeklyReportTypeId, periodDtlId, deptId, userId, reportRemark, reportFile, batchId);
+        jdbcTemplate.update("INSERT INTO HR_WEEKLY_REPORT(`ID`,`VER`,`TS`,`IS_PRESET`,`CRT_DT`,`CRT_USER_ID`,`LAST_MODI_DT`,`LAST_MODI_USER_ID`,`STATUS`,`LK_WF_INST_ID`,`CODE`,`NAME`,`REMARK`,`HR_WEEKLY_REPORT_TYPE_ID`,`HR_PERIOD_DTL_ID`,`REPORT_DEPT_ID`,`REPORT_USER_ID`,`CT_START`,`CT_APPROVE`,`CT_END`,`REPORT_REMARK`,`REPORT_FILE`,`SUBMIT_TIME`,`BATCH_ID`)VALUES(?/*ID*/,(1)/*VER*/,(NOW())/*TS*/,(null)/*IS_PRESET*/,(NOW())/*CRT_DT*/,(?)/*CRT_USER_ID*/,(NOW())/*LAST_MODI_DT*/,(?)/*LAST_MODI_USER_ID*/,('DR')/*STATUS*/,(null)/*LK_WF_INST_ID*/,(null)/*CODE*/,(?)/*NAME*/,(null)/*REMARK*/,(?)/*HR_WEEKLY_REPORT_TYPE_ID*/,(?)/*HR_PERIOD_DTL_ID*/,(?)/*REPORT_DEPT_ID*/,(?)/*REPORT_USER_ID*/,(null)/*CT_START*/,(null)/*CT_APPROVE*/,(null)/*CT_END*/,(?)/*REPORT_REMARK*/,(?)/*REPORT_FILE*/,(null)/*SUBMIT_TIME*/,(?)/*BATCH_ID*/)", newId, Constants.adminUserId, Constants.adminUserId, name, weeklyReportTypeId, periodDtlId, deptId, userId, reportRemark, reportFile, batchId);
         return newId;
     }
 

@@ -4,36 +4,101 @@ import com.cisdi.ext.model.*;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.util.SharedUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class WeeklyReportExt {
+
+    public enum WeeklyReportType {
+        P,
+        D,
+        L,
+        G,
+    }
+
+    public void getGmWeeklyReport() {
+        LeaderReport report = (LeaderReport) getBaseReport(WeeklyReportType.G, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_GM);
+        if (report == null) {
+            return;
+        }
+
+        setBaseReportAsReturnValue(report);
+    }
+
+
+    public void getLeaderWeeklyReport() {
+        LeaderReport report = (LeaderReport) getBaseReport(WeeklyReportType.L, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_LEADER);
+        if (report == null) {
+            return;
+        }
+
+        setBaseReportAsReturnValue(report);
+    }
+
+    public void getDeptWeeklyReport() {
+        DeptReport report = (DeptReport) getBaseReport(WeeklyReportType.D, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_DEPT);
+        if (report == null) {
+            return;
+        }
+
+        setBaseReportAsReturnValue(report);
+    }
+
     public void getPersonWeeklyReport() {
+        PersonReport report = (PersonReport) getBaseReport(WeeklyReportType.P, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID);
+        if (report == null) {
+            return;
+        }
+
+        report.reportRemark = report.hrWeeklyReport.getReportRemark();
+        report.reportFileList = getFileList(report.hrWeeklyReport.getReportFile());
+
+        setBaseReportAsReturnValue(report);
+    }
+
+    private void setBaseReportAsReturnValue(BaseReport baseReport) {
+        baseReport.hrWeeklyReport = null;
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(baseReport), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+    }
+
+    private BaseReport getBaseReport(WeeklyReportType weeklyReportType, String parentAttCode) {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String peroidDtlId = String.valueOf(map.get("peroidDtlId"));
 
         LoginInfo loginInfo = ExtJarHelper.loginInfo.get();
 
-        HrWeeklyReport hrWeeklyReport = HrWeeklyReport.selectOneByWhere(new Where().eq(HrWeeklyReport.Cols.HR_PERIOD_DTL_ID, peroidDtlId).eq(HrWeeklyReport.Cols.HR_WEEKLY_REPORT_TYPE_ID, "P").eq(HrWeeklyReport.Cols.REPORT_USER_ID, loginInfo.userId));
+        List<HrWeeklyReport> hrWeeklyReportList = HrWeeklyReport.selectByWhere(new Where().eq(HrWeeklyReport.Cols.HR_PERIOD_DTL_ID, peroidDtlId).eq(HrWeeklyReport.Cols.HR_WEEKLY_REPORT_TYPE_ID, weeklyReportType.toString()).eq(HrWeeklyReport.Cols.REPORT_USER_ID, loginInfo.userId).eq(HrWeeklyReport.Cols.STATUS, "AP"));
+
+        HrWeeklyReport hrWeeklyReport = SharedUtil.isEmptyList(hrWeeklyReportList) ? null : hrWeeklyReportList.stream().sorted(Comparator.comparing(HrWeeklyReport::getId)).findFirst().get();
 
         if (hrWeeklyReport == null) {
-            return;
+            return null;
         }
 
-        PersonReport personReport = new PersonReport();
-        personReport.reportRemark = hrWeeklyReport.getReportRemark();
-        personReport.reportFileList = getFileList(hrWeeklyReport.getReportFile());
+        BaseReport report = null;
+        if (weeklyReportType == WeeklyReportType.P) {
+            report = new PersonReport();
+        } else if (weeklyReportType == WeeklyReportType.D) {
+            report = new DeptReport();
+        } else if (weeklyReportType == WeeklyReportType.L) {
+            report = new LeaderReport();
+        } else if (weeklyReportType == WeeklyReportType.G) {
+            report = new GmReport();
+        } else {
+            throw new BaseException("未知枚举！" + weeklyReportType);
+        }
 
-        List<HrWeeklyReportDtl> hrWeeklyReportDtlList = HrWeeklyReportDtl.selectByWhere(new Where().eq(HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID, hrWeeklyReport.getId()));
-        personReport.reportDtlList = convertToReportDtlList(hrWeeklyReportDtlList);
+        report.hrWeeklyReport = hrWeeklyReport;
 
-        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(personReport), Map.class);
-        ExtJarHelper.returnValue.set(outputMap);
+        List<HrWeeklyReportDtl> hrWeeklyReportDtlList = HrWeeklyReportDtl.selectByWhere(new Where().eq(parentAttCode, hrWeeklyReport.getId()));
+        report.reportDtlList = convertToReportDtlList(hrWeeklyReportDtlList);
+
+        return report;
     }
 
     private List<ReportDtl> convertToReportDtlList(List<HrWeeklyReportDtl> hrWeeklyReportDtlList) {
@@ -58,8 +123,8 @@ public class WeeklyReportExt {
         if (SharedUtil.isEmptyString(procInstId)) {
             return null;
         }
-        WfProcessInstance wfProcessInstance = WfProcessInstance.selectById(procInstId);
-        WfProcess wfProcess = WfProcess.selectById(wfProcessInstance.getWfProcessId());
+        WfProcessInstance wfProcessInstance = WfProcessInstance.selectById(procInstId, Arrays.asList(WfProcessInstance.Cols.ID, WfProcessInstance.Cols.NAME, WfProcessInstance.Cols.WF_PROCESS_ID), null);
+        WfProcess wfProcess = WfProcess.selectById(wfProcessInstance.getWfProcessId(), Arrays.asList(WfProcess.Cols.ID, WfProcess.Cols.NAME), null);
 
         ProcInst procInst = new ProcInst();
         procInst.procId = wfProcess.getId();
@@ -74,7 +139,7 @@ public class WeeklyReportExt {
         if (SharedUtil.isEmptyString(prjId)) {
             return null;
         }
-        PmPrj pmPrj = PmPrj.selectById(prjId);
+        PmPrj pmPrj = PmPrj.selectById(prjId, Arrays.asList(PmPrj.Cols.ID, PmPrj.Cols.NAME), null);
         Prj prj = new Prj();
         prj.id = pmPrj.getId();
         prj.name = pmPrj.getName();
@@ -96,7 +161,7 @@ public class WeeklyReportExt {
 
         List<File> fileList = new ArrayList<>(fileIdList.size());
         for (String fileId : fileIdList) {
-            FlFile flFile = FlFile.selectById(fileId);
+            FlFile flFile = FlFile.selectById(fileId, Arrays.asList(FlFile.Cols.ID, FlFile.Cols.DSP_NAME, FlFile.Cols.DSP_SIZE), null);
 
             File file = new File();
             fileList.add(file);
@@ -107,10 +172,32 @@ public class WeeklyReportExt {
         return fileList;
     }
 
-    public static class PersonReport {
+    public static class BaseReport {
+
+        /**
+         * 临时性、更好用。返回前清除掉。
+         */
+        public HrWeeklyReport hrWeeklyReport;
+
+        public List<ReportDtl> reportDtlList;
+    }
+
+    public static class GmReport extends BaseReport {
+
+    }
+
+    public static class LeaderReport extends BaseReport {
+
+    }
+
+    public static class DeptReport extends BaseReport {
+
+    }
+
+    public static class PersonReport extends BaseReport {
         public String reportRemark;
         public List<File> reportFileList;
-        public List<ReportDtl> reportDtlList;
+
     }
 
     public static class ReportDtl {
