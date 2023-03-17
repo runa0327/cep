@@ -289,6 +289,10 @@ public class PmStartExt {
         return res;
     }
 
+    /**
+     * 创建项目进展等信息
+     * @param dataMap
+     */
     private void createOtherInfo(Map<String, Object> dataMap) {
         String projectId = "";
         String prjCode = JdbcMapUtil.getString(dataMap, "PM_CODE");
@@ -362,27 +366,6 @@ public class PmStartExt {
         //刷新进度节点时间
         PrjPlanUtil.refreshProPlanTime(projectId, JdbcMapUtil.getDate(dataMap, "START_TIME"));
 
-    }
-
-    private inputData conventInputData(Map<String, Object> dataMap) {
-        inputData inputData = new inputData();
-        inputData.id = JdbcMapUtil.getString(dataMap, "ID");
-        inputData.name = JdbcMapUtil.getString(dataMap, "NAME");
-        inputData.sourceTypeId = JdbcMapUtil.getString(dataMap, "INVESTMENT_SOURCE_ID");
-        inputData.invest = JdbcMapUtil.getBigDecimal(dataMap, "PRJ_TOTAL_INVEST");
-        inputData.typeId = JdbcMapUtil.getString(dataMap, "PROJECT_TYPE_ID");
-        inputData.unit = JdbcMapUtil.getString(dataMap, "BUILDER_UNIT");
-        inputData.description = JdbcMapUtil.getString(dataMap, "PRJ_SITUATION");
-        inputData.fileIds = JdbcMapUtil.getString(dataMap, "ATT_FILE_GROUP_ID");
-        inputData.userId = JdbcMapUtil.getString(dataMap, "AGENT");
-        inputData.code = JdbcMapUtil.getString(dataMap, "PM_CODE");
-        inputData.startTime = JdbcMapUtil.getString(dataMap, "START_TIME");
-        inputData.tenderWay = JdbcMapUtil.getString(dataMap, "TENDER_WAY_ID");
-        inputData.startRemark = JdbcMapUtil.getString(dataMap, "START_REMARK");
-        String object = JdbcMapUtil.getString(dataMap, "LOCATION_INFO");
-        List<parcel> parcelList = JSONObject.parseArray(object, parcel.class);
-        inputData.parcels = parcelList;
-        return inputData;
     }
 
     /**
