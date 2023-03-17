@@ -1,6 +1,5 @@
 package com.cisdi.ext.weektask;
 
-import com.cisdi.ext.fund.FundReachApi;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
