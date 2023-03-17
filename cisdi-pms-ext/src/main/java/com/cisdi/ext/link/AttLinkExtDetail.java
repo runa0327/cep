@@ -717,17 +717,14 @@ public class AttLinkExtDetail {
      * @param attLinkResult 返回值
      */
     public static void assignmentPrjYesNoOne(String id, AttLinkResult attLinkResult) {
-        String val = "";
-        String txt = "";
+        String val = null;
+        String txt = null;
         if ("0099799190825080705".equals(id)){
             val = "0099799190825080670";
             txt = "否";
         } else if ("0099799190825080704".equals(id) || "0099952822476392682".equals(id)){
             val = "0099799190825080669";
             txt = "是";
-        } else {
-            val = null;
-            txt = null;
         }
         //是否政府投资项目
         {
