@@ -1,5 +1,6 @@
 package com.cisdi.ext.link;
 
+import com.cisdi.ext.base.AdUserExt;
 import com.cisdi.ext.base.GrSetValue;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
@@ -18,6 +19,16 @@ import java.util.*;
  * 属性联动详情
  */
 public class AttLinkExtDetail {
+
+    public static final Map<String,String> postCodeMap = new HashMap<>();
+    static {
+        postCodeMap.put("FINANCE_POST","AD_USER_TWENTY_FIVE_ID"); //财务管理岗
+        postCodeMap.put("BUY_POST","AD_USER_TWENTY_ONE_ID"); //采购管理岗
+        postCodeMap.put("TREATY_POST","AD_USER_NINETEEN_ID"); //合约管理岗
+        postCodeMap.put("EARLY_EQUIP_POST","AD_USER_SIXTEEN_ID"); //前期设备岗
+        postCodeMap.put("EQUIP_COST_POST","AD_USER_EIGHTEEN_ID"); //设备成本岗
+        postCodeMap.put("LAND_POST","AD_USER_THIRTEEN_ID"); //土地管理岗
+    }
 
     /**
      * 合同需求变更
@@ -897,11 +908,9 @@ public class AttLinkExtDetail {
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,attValue);
         if (!CollectionUtils.isEmpty(list)){
             //业主单位
-            String companyId = JdbcMapUtil.getString(list.get(0), "CUSTOMER_UNIT");
-            //项目id
-            String projectId = JdbcMapUtil.getString(list.get(0),"projectId");
+            String companyId = JdbcMapUtil.getString(list.get(0), "BUILDER_UNIT");
             //岗位人员赋值
-            assignmentPostLink(attLinkResult,companyId,projectId,myJdbcTemplate);
+            assignmentPostLink(attLinkResult,companyId,attValue,myJdbcTemplate);
             // 资金来源
             {
                 String id = JdbcMapUtil.getString(list.get(0), "INVESTMENT_SOURCE_ID");
@@ -993,6 +1002,67 @@ public class AttLinkExtDetail {
      */
     private static void assignmentPostLink(AttLinkResult attLinkResult, String companyId, String projectId, MyJdbcTemplate myJdbcTemplate) {
         //获取项目岗位默认配置
+        String sql = "select * from BASE_POST_USER where CUSTOMER_UNIT = ? and status = 'AP'";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,companyId);
+        if (!CollectionUtils.isEmpty(list)){
+            //查询出的数据处理成Map集合
+            Map<String,String> postMap = getPostMap(list);
+            for (String key : postMap.keySet()){
+                String userId = postMap.get(key);
+                String userName = AdUserExt.getUserName(userId,myJdbcTemplate);
+                String code = getMapToCode(key,postCodeMap);
+                attLinkResultAddValue(userId,userName,code,attLinkResult);
+            }
+        }
+    }
+
+    /**
+     * 默认岗位信息默认赋值
+     * @param userId 用户id
+     * @param userName 用户姓名
+     * @param code 返回显示的页面表单字段
+     * @param attLinkResult 返回的集合
+     */
+    private static void attLinkResultAddValue(String userId, String userName, String code, AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = userId;
+            linkedAtt.text = userName;
+            attLinkResult.attMap.put(code, linkedAtt);
+        }
+    }
+
+    /**
+     * 默认项目code和流程中的字段匹配
+     * @param key 默认项目岗位的code
+     * @param postCodeMap 匹配关系map
+     * @return 流程岗位的code
+     */
+    private static String getMapToCode(String key, Map<String, String> postCodeMap) {
+        String value = "";
+        for (String tmp : postCodeMap.keySet()){
+            if (key.equals(tmp)){
+                value = postCodeMap.get(tmp);
+                break;
+            }
+        }
+        return value;
+    }
+
+    /**
+     * 默认岗位信息转MAP
+     * @param list 源数据
+     * @return map集合
+     */
+    private static Map<String, String> getPostMap(List<Map<String, Object>> list) {
+        Map<String,String> map = new HashMap<>();
+        for (Map<String, Object> tmp : list) {
+            String code = JdbcMapUtil.getString(tmp,"code");
+            String value = JdbcMapUtil.getString(tmp,"ad_user_id");
+            map.put(code,value);
+        }
+        return map;
     }
 
     /**
