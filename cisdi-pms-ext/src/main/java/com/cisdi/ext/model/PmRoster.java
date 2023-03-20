@@ -7,21 +7,20 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 部门。
+ * 项目花名册。
  */
-public class HrDept {
+public class PmRoster {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<HrDept> modelHelper = new ModelHelper<>("HR_DEPT", new HrDept());
+    private static final ModelHelper<PmRoster> modelHelper = new ModelHelper<>("PM_ROSTER", new PmRoster());
 
     /**
      * 待更新的列。
@@ -38,7 +37,7 @@ public class HrDept {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "HR_DEPT";
+    public static final String ENT_CODE = "PM_ROSTER";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -100,49 +99,33 @@ public class HrDept {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 父部门。
-         */
-        public static final String HR_DEPT_PID = "HR_DEPT_PID";
-        /**
          * 业主单位。
          */
         public static final String CUSTOMER_UNIT = "CUSTOMER_UNIT";
+        /**
+         * 项目。
+         */
+        public static final String PM_PRJ_ID = "PM_PRJ_ID";
+        /**
+         * 部门。
+         */
+        public static final String HR_DEPT_ID = "HR_DEPT_ID";
+        /**
+         * 岗位信息。
+         */
+        public static final String POST_INFO_ID = "POST_INFO_ID";
         /**
          * 用户。
          */
         public static final String AD_USER_ID = "AD_USER_ID";
         /**
-         * 背景色（16进制）。
+         * 祖级。
          */
-        public static final String BG_COLOR_HEX = "BG_COLOR_HEX";
+        public static final String ANCESTRAL = "ANCESTRAL";
         /**
-         * 字体颜色（16进制）。
+         * 项目岗位。
          */
-        public static final String FONT_COLOR_HEX = "FONT_COLOR_HEX";
-        /**
-         * 责任用户。
-         */
-        public static final String CHIEF_USER_ID = "CHIEF_USER_ID";
-        /**
-         * 层级。
-         */
-        public static final String LEVEL = "LEVEL";
-        /**
-         * 序号。
-         */
-        public static final String SEQ_NO = "SEQ_NO";
-        /**
-         * 生成部门周报。
-         */
-        public static final String GENERATE_DEPT_WEEKLY_REPORT = "GENERATE_DEPT_WEEKLY_REPORT";
-        /**
-         * CPMS的UUID。
-         */
-        public static final String CPMS_UUID = "CPMS_UUID";
-        /**
-         * CPMS的ID。
-         */
-        public static final String CPMS_ID = "CPMS_ID";
+        public static final String PROJECT_POST = "PROJECT_POST";
     }
 
     // </editor-fold>
@@ -165,7 +148,7 @@ public class HrDept {
     /**
      * 设置：ID。
      */
-    public HrDept setId(String id) {
+    public PmRoster setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -201,7 +184,7 @@ public class HrDept {
     /**
      * 设置：版本。
      */
-    public HrDept setVer(Integer ver) {
+    public PmRoster setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -237,7 +220,7 @@ public class HrDept {
     /**
      * 设置：时间戳。
      */
-    public HrDept setTs(LocalDateTime ts) {
+    public PmRoster setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -273,7 +256,7 @@ public class HrDept {
     /**
      * 设置：是否预设。
      */
-    public HrDept setIsPreset(Boolean isPreset) {
+    public PmRoster setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -309,7 +292,7 @@ public class HrDept {
     /**
      * 设置：创建日期时间。
      */
-    public HrDept setCrtDt(LocalDateTime crtDt) {
+    public PmRoster setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -345,7 +328,7 @@ public class HrDept {
     /**
      * 设置：创建用户。
      */
-    public HrDept setCrtUserId(String crtUserId) {
+    public PmRoster setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -381,7 +364,7 @@ public class HrDept {
     /**
      * 设置：最后修改日期时间。
      */
-    public HrDept setLastModiDt(LocalDateTime lastModiDt) {
+    public PmRoster setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -417,7 +400,7 @@ public class HrDept {
     /**
      * 设置：最后修改用户。
      */
-    public HrDept setLastModiUserId(String lastModiUserId) {
+    public PmRoster setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -453,7 +436,7 @@ public class HrDept {
     /**
      * 设置：记录状态。
      */
-    public HrDept setStatus(String status) {
+    public PmRoster setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -489,7 +472,7 @@ public class HrDept {
     /**
      * 设置：锁定流程实例。
      */
-    public HrDept setLkWfInstId(String lkWfInstId) {
+    public PmRoster setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -525,7 +508,7 @@ public class HrDept {
     /**
      * 设置：代码。
      */
-    public HrDept setCode(String code) {
+    public PmRoster setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -561,7 +544,7 @@ public class HrDept {
     /**
      * 设置：名称。
      */
-    public HrDept setName(String name) {
+    public PmRoster setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -597,7 +580,7 @@ public class HrDept {
     /**
      * 设置：备注。
      */
-    public HrDept setRemark(String remark) {
+    public PmRoster setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -619,42 +602,6 @@ public class HrDept {
     }
 
     /**
-     * 父部门。
-     */
-    private String hrDeptPid;
-
-    /**
-     * 获取：父部门。
-     */
-    public String getHrDeptPid() {
-        return this.hrDeptPid;
-    }
-
-    /**
-     * 设置：父部门。
-     */
-    public HrDept setHrDeptPid(String hrDeptPid) {
-        if (this.hrDeptPid == null && hrDeptPid == null) {
-            // 均为null，不做处理。
-        } else if (this.hrDeptPid != null && hrDeptPid != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.hrDeptPid.compareTo(hrDeptPid) != 0) {
-                this.hrDeptPid = hrDeptPid;
-                if (!this.toUpdateCols.contains("HR_DEPT_PID")) {
-                    this.toUpdateCols.add("HR_DEPT_PID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.hrDeptPid = hrDeptPid;
-            if (!this.toUpdateCols.contains("HR_DEPT_PID")) {
-                this.toUpdateCols.add("HR_DEPT_PID");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 业主单位。
      */
     private String customerUnit;
@@ -669,7 +616,7 @@ public class HrDept {
     /**
      * 设置：业主单位。
      */
-    public HrDept setCustomerUnit(String customerUnit) {
+    public PmRoster setCustomerUnit(String customerUnit) {
         if (this.customerUnit == null && customerUnit == null) {
             // 均为null，不做处理。
         } else if (this.customerUnit != null && customerUnit != null) {
@@ -691,6 +638,114 @@ public class HrDept {
     }
 
     /**
+     * 项目。
+     */
+    private String pmPrjId;
+
+    /**
+     * 获取：项目。
+     */
+    public String getPmPrjId() {
+        return this.pmPrjId;
+    }
+
+    /**
+     * 设置：项目。
+     */
+    public PmRoster setPmPrjId(String pmPrjId) {
+        if (this.pmPrjId == null && pmPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmPrjId != null && pmPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmPrjId.compareTo(pmPrjId) != 0) {
+                this.pmPrjId = pmPrjId;
+                if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                    this.toUpdateCols.add("PM_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmPrjId = pmPrjId;
+            if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                this.toUpdateCols.add("PM_PRJ_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 部门。
+     */
+    private String hrDeptId;
+
+    /**
+     * 获取：部门。
+     */
+    public String getHrDeptId() {
+        return this.hrDeptId;
+    }
+
+    /**
+     * 设置：部门。
+     */
+    public PmRoster setHrDeptId(String hrDeptId) {
+        if (this.hrDeptId == null && hrDeptId == null) {
+            // 均为null，不做处理。
+        } else if (this.hrDeptId != null && hrDeptId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.hrDeptId.compareTo(hrDeptId) != 0) {
+                this.hrDeptId = hrDeptId;
+                if (!this.toUpdateCols.contains("HR_DEPT_ID")) {
+                    this.toUpdateCols.add("HR_DEPT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.hrDeptId = hrDeptId;
+            if (!this.toUpdateCols.contains("HR_DEPT_ID")) {
+                this.toUpdateCols.add("HR_DEPT_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 岗位信息。
+     */
+    private String postInfoId;
+
+    /**
+     * 获取：岗位信息。
+     */
+    public String getPostInfoId() {
+        return this.postInfoId;
+    }
+
+    /**
+     * 设置：岗位信息。
+     */
+    public PmRoster setPostInfoId(String postInfoId) {
+        if (this.postInfoId == null && postInfoId == null) {
+            // 均为null，不做处理。
+        } else if (this.postInfoId != null && postInfoId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.postInfoId.compareTo(postInfoId) != 0) {
+                this.postInfoId = postInfoId;
+                if (!this.toUpdateCols.contains("POST_INFO_ID")) {
+                    this.toUpdateCols.add("POST_INFO_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.postInfoId = postInfoId;
+            if (!this.toUpdateCols.contains("POST_INFO_ID")) {
+                this.toUpdateCols.add("POST_INFO_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 用户。
      */
     private String adUserId;
@@ -705,7 +760,7 @@ public class HrDept {
     /**
      * 设置：用户。
      */
-    public HrDept setAdUserId(String adUserId) {
+    public PmRoster setAdUserId(String adUserId) {
         if (this.adUserId == null && adUserId == null) {
             // 均为null，不做处理。
         } else if (this.adUserId != null && adUserId != null) {
@@ -727,288 +782,72 @@ public class HrDept {
     }
 
     /**
-     * 背景色（16进制）。
+     * 祖级。
      */
-    private String bgColorHex;
+    private String ancestral;
 
     /**
-     * 获取：背景色（16进制）。
+     * 获取：祖级。
      */
-    public String getBgColorHex() {
-        return this.bgColorHex;
+    public String getAncestral() {
+        return this.ancestral;
     }
 
     /**
-     * 设置：背景色（16进制）。
+     * 设置：祖级。
      */
-    public HrDept setBgColorHex(String bgColorHex) {
-        if (this.bgColorHex == null && bgColorHex == null) {
+    public PmRoster setAncestral(String ancestral) {
+        if (this.ancestral == null && ancestral == null) {
             // 均为null，不做处理。
-        } else if (this.bgColorHex != null && bgColorHex != null) {
+        } else if (this.ancestral != null && ancestral != null) {
             // 均非null，判定不等，再做处理：
-            if (this.bgColorHex.compareTo(bgColorHex) != 0) {
-                this.bgColorHex = bgColorHex;
-                if (!this.toUpdateCols.contains("BG_COLOR_HEX")) {
-                    this.toUpdateCols.add("BG_COLOR_HEX");
+            if (this.ancestral.compareTo(ancestral) != 0) {
+                this.ancestral = ancestral;
+                if (!this.toUpdateCols.contains("ANCESTRAL")) {
+                    this.toUpdateCols.add("ANCESTRAL");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.bgColorHex = bgColorHex;
-            if (!this.toUpdateCols.contains("BG_COLOR_HEX")) {
-                this.toUpdateCols.add("BG_COLOR_HEX");
+            this.ancestral = ancestral;
+            if (!this.toUpdateCols.contains("ANCESTRAL")) {
+                this.toUpdateCols.add("ANCESTRAL");
             }
         }
         return this;
     }
 
     /**
-     * 字体颜色（16进制）。
+     * 项目岗位。
      */
-    private String fontColorHex;
+    private String projectPost;
 
     /**
-     * 获取：字体颜色（16进制）。
+     * 获取：项目岗位。
      */
-    public String getFontColorHex() {
-        return this.fontColorHex;
+    public String getProjectPost() {
+        return this.projectPost;
     }
 
     /**
-     * 设置：字体颜色（16进制）。
+     * 设置：项目岗位。
      */
-    public HrDept setFontColorHex(String fontColorHex) {
-        if (this.fontColorHex == null && fontColorHex == null) {
+    public PmRoster setProjectPost(String projectPost) {
+        if (this.projectPost == null && projectPost == null) {
             // 均为null，不做处理。
-        } else if (this.fontColorHex != null && fontColorHex != null) {
+        } else if (this.projectPost != null && projectPost != null) {
             // 均非null，判定不等，再做处理：
-            if (this.fontColorHex.compareTo(fontColorHex) != 0) {
-                this.fontColorHex = fontColorHex;
-                if (!this.toUpdateCols.contains("FONT_COLOR_HEX")) {
-                    this.toUpdateCols.add("FONT_COLOR_HEX");
+            if (this.projectPost.compareTo(projectPost) != 0) {
+                this.projectPost = projectPost;
+                if (!this.toUpdateCols.contains("PROJECT_POST")) {
+                    this.toUpdateCols.add("PROJECT_POST");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.fontColorHex = fontColorHex;
-            if (!this.toUpdateCols.contains("FONT_COLOR_HEX")) {
-                this.toUpdateCols.add("FONT_COLOR_HEX");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 责任用户。
-     */
-    private String chiefUserId;
-
-    /**
-     * 获取：责任用户。
-     */
-    public String getChiefUserId() {
-        return this.chiefUserId;
-    }
-
-    /**
-     * 设置：责任用户。
-     */
-    public HrDept setChiefUserId(String chiefUserId) {
-        if (this.chiefUserId == null && chiefUserId == null) {
-            // 均为null，不做处理。
-        } else if (this.chiefUserId != null && chiefUserId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.chiefUserId.compareTo(chiefUserId) != 0) {
-                this.chiefUserId = chiefUserId;
-                if (!this.toUpdateCols.contains("CHIEF_USER_ID")) {
-                    this.toUpdateCols.add("CHIEF_USER_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.chiefUserId = chiefUserId;
-            if (!this.toUpdateCols.contains("CHIEF_USER_ID")) {
-                this.toUpdateCols.add("CHIEF_USER_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 层级。
-     */
-    private Integer level;
-
-    /**
-     * 获取：层级。
-     */
-    public Integer getLevel() {
-        return this.level;
-    }
-
-    /**
-     * 设置：层级。
-     */
-    public HrDept setLevel(Integer level) {
-        if (this.level == null && level == null) {
-            // 均为null，不做处理。
-        } else if (this.level != null && level != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.level.compareTo(level) != 0) {
-                this.level = level;
-                if (!this.toUpdateCols.contains("LEVEL")) {
-                    this.toUpdateCols.add("LEVEL");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.level = level;
-            if (!this.toUpdateCols.contains("LEVEL")) {
-                this.toUpdateCols.add("LEVEL");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 序号。
-     */
-    private BigDecimal seqNo;
-
-    /**
-     * 获取：序号。
-     */
-    public BigDecimal getSeqNo() {
-        return this.seqNo;
-    }
-
-    /**
-     * 设置：序号。
-     */
-    public HrDept setSeqNo(BigDecimal seqNo) {
-        if (this.seqNo == null && seqNo == null) {
-            // 均为null，不做处理。
-        } else if (this.seqNo != null && seqNo != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.seqNo.compareTo(seqNo) != 0) {
-                this.seqNo = seqNo;
-                if (!this.toUpdateCols.contains("SEQ_NO")) {
-                    this.toUpdateCols.add("SEQ_NO");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.seqNo = seqNo;
-            if (!this.toUpdateCols.contains("SEQ_NO")) {
-                this.toUpdateCols.add("SEQ_NO");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 生成部门周报。
-     */
-    private Boolean generateDeptWeeklyReport;
-
-    /**
-     * 获取：生成部门周报。
-     */
-    public Boolean getGenerateDeptWeeklyReport() {
-        return this.generateDeptWeeklyReport;
-    }
-
-    /**
-     * 设置：生成部门周报。
-     */
-    public HrDept setGenerateDeptWeeklyReport(Boolean generateDeptWeeklyReport) {
-        if (this.generateDeptWeeklyReport == null && generateDeptWeeklyReport == null) {
-            // 均为null，不做处理。
-        } else if (this.generateDeptWeeklyReport != null && generateDeptWeeklyReport != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.generateDeptWeeklyReport.compareTo(generateDeptWeeklyReport) != 0) {
-                this.generateDeptWeeklyReport = generateDeptWeeklyReport;
-                if (!this.toUpdateCols.contains("GENERATE_DEPT_WEEKLY_REPORT")) {
-                    this.toUpdateCols.add("GENERATE_DEPT_WEEKLY_REPORT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.generateDeptWeeklyReport = generateDeptWeeklyReport;
-            if (!this.toUpdateCols.contains("GENERATE_DEPT_WEEKLY_REPORT")) {
-                this.toUpdateCols.add("GENERATE_DEPT_WEEKLY_REPORT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * CPMS的UUID。
-     */
-    private String cpmsUuid;
-
-    /**
-     * 获取：CPMS的UUID。
-     */
-    public String getCpmsUuid() {
-        return this.cpmsUuid;
-    }
-
-    /**
-     * 设置：CPMS的UUID。
-     */
-    public HrDept setCpmsUuid(String cpmsUuid) {
-        if (this.cpmsUuid == null && cpmsUuid == null) {
-            // 均为null，不做处理。
-        } else if (this.cpmsUuid != null && cpmsUuid != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.cpmsUuid.compareTo(cpmsUuid) != 0) {
-                this.cpmsUuid = cpmsUuid;
-                if (!this.toUpdateCols.contains("CPMS_UUID")) {
-                    this.toUpdateCols.add("CPMS_UUID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.cpmsUuid = cpmsUuid;
-            if (!this.toUpdateCols.contains("CPMS_UUID")) {
-                this.toUpdateCols.add("CPMS_UUID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * CPMS的ID。
-     */
-    private String cpmsId;
-
-    /**
-     * 获取：CPMS的ID。
-     */
-    public String getCpmsId() {
-        return this.cpmsId;
-    }
-
-    /**
-     * 设置：CPMS的ID。
-     */
-    public HrDept setCpmsId(String cpmsId) {
-        if (this.cpmsId == null && cpmsId == null) {
-            // 均为null，不做处理。
-        } else if (this.cpmsId != null && cpmsId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.cpmsId.compareTo(cpmsId) != 0) {
-                this.cpmsId = cpmsId;
-                if (!this.toUpdateCols.contains("CPMS_ID")) {
-                    this.toUpdateCols.add("CPMS_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.cpmsId = cpmsId;
-            if (!this.toUpdateCols.contains("CPMS_ID")) {
-                this.toUpdateCols.add("CPMS_ID");
+            this.projectPost = projectPost;
+            if (!this.toUpdateCols.contains("PROJECT_POST")) {
+                this.toUpdateCols.add("PROJECT_POST");
             }
         }
         return this;
@@ -1101,8 +940,8 @@ public class HrDept {
      *
      * @return
      */
-    public static HrDept newData() {
-        HrDept obj = modelHelper.newData();
+    public static PmRoster newData() {
+        PmRoster obj = modelHelper.newData();
         return obj;
     }
 
@@ -1111,8 +950,8 @@ public class HrDept {
      *
      * @return
      */
-    public static HrDept insertData() {
-        HrDept obj = modelHelper.insertData();
+    public static PmRoster insertData() {
+        PmRoster obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1124,8 +963,8 @@ public class HrDept {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static HrDept selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        HrDept obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static PmRoster selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        PmRoster obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1135,7 +974,7 @@ public class HrDept {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static HrDept selectById(String id) {
+    public static PmRoster selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1147,8 +986,8 @@ public class HrDept {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<HrDept> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<HrDept> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<PmRoster> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<PmRoster> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1158,7 +997,7 @@ public class HrDept {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<HrDept> selectByIds(List<String> ids) {
+    public static List<PmRoster> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1170,8 +1009,8 @@ public class HrDept {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<HrDept> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<HrDept> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<PmRoster> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<PmRoster> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1181,7 +1020,7 @@ public class HrDept {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<HrDept> selectByWhere(Where where) {
+    public static List<PmRoster> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1193,10 +1032,10 @@ public class HrDept {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static HrDept selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<HrDept> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static PmRoster selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<PmRoster> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用HrDept.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用PmRoster.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmptyList(objList) ? null : objList.get(0);
@@ -1208,7 +1047,7 @@ public class HrDept {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static HrDept selectOneByWhere(Where where) {
+    public static PmRoster selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1322,7 +1161,7 @@ public class HrDept {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(HrDept fromModel, HrDept toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(PmRoster fromModel, PmRoster toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1332,7 +1171,7 @@ public class HrDept {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(HrDept fromModel, HrDept toModel) {
+    public static void copyCols(PmRoster fromModel, PmRoster toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 

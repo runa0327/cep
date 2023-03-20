@@ -927,7 +927,7 @@ public class AttLinkExtDetail {
                 linkedAtt.type = AttDataTypeE.DOUBLE;
                 linkedAtt.value = new BigDecimal(JdbcMapUtil.getString(list.get(0),"PRJ_TOTAL_INVEST"));
                 linkedAtt.text = JdbcMapUtil.getString(list.get(0),"PRJ_TOTAL_INVEST");
-                attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
+                attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
             }
             // 项目类型
             {
@@ -986,7 +986,7 @@ public class AttLinkExtDetail {
             {
                 LinkedAtt linkedAtt = new LinkedAtt();
                 linkedAtt.type = AttDataTypeE.FILE_GROUP;
-                linkedAtt.value = JdbcMapUtil.getString(list.get(0), "START_REMARK");
+                linkedAtt.value = JdbcMapUtil.getString(list.get(0), "ATT_FILE_GROUP_ID");
                 getFileInfoList(linkedAtt);
                 attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt);
             }
