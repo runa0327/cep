@@ -226,6 +226,7 @@ public class PoOrderTerminateReqExt {
                     .set("APPROVAL_COMMENT_ONE",newCommentStr).set("FILE_ID_SIX",newCommentFile).exec();
         } else if ("legalFinanceTrue".equals(nodeStatus)){ // 7-财务法务审核-通过
             //判断当前登录人是法务还是财务角色 0100070673610702919-财务；0100070673610702924-法务
+            userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
             String roleId = ProcessRoleExt.getUserRole(myJdbcTemplate,userId);
             if ("0100070673610702919".equals(roleId)){ //财务
                 //获取流程中的附件和意见信息
@@ -371,5 +372,22 @@ public class PoOrderTerminateReqExt {
             sum = sum.add(new BigDecimal(value));
         }
         return sum;
+    }
+
+    /**
+     * 合同终止-流程完结时扩展
+     */
+    public void OrderProcessEnd(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //合同工期
+        int duration = JdbcMapUtil.getInt(entityRecord.valueMap,"PLAN_TOTAL_DAYS");
+        //合同签订日期
+        Date signDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(entityRecord.valueMap,"SIGN_DATE"));
+        //计算到期日期
+        Date expireDate = DateTimeUtil.addDays(signDate,duration);
+        //更新到期日期字段
+        Crud.from("PO_ORDER_TERMINATE_REQ").where().eq("id",entityRecord.csCommId).update().set("DATE_FIVE",expireDate).exec();
+        //将合同数据写入传输至合同数据表(po_order)
     }
 }

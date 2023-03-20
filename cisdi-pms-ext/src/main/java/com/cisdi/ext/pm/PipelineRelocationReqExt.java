@@ -171,6 +171,7 @@ public class PipelineRelocationReqExt {
             //判断当前登录人身份
             String sql3 = "select AD_USER_SIX_ID,PRJ_DESIGN_USER_IDS,AD_USER_THREE_ID from PIPELINE_RELOCATION_REQ where id = ?";
             Map<String,Object> map = myJdbcTemplate.queryForMap(sql3,csCommId);
+            userId = ProcessCommon.getOriginalUser(nodeId,userId,myJdbcTemplate);
             String deptName = getDeptName(map,userId);
             String updateSql = "";
             if ("AD_USER_SIX_ID".equals(deptName)){ //工程部专班人员

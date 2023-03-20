@@ -42,7 +42,7 @@ public class GuaranteeExt {
             // 预付款比例
             BigDecimal percent = new BigDecimal(entityRecord.valueMap.get("ADVANCE_CHARGE_PERCENT").toString());
             // 预付款金额
-            BigDecimal amount = contractAmount.multiply(percent).divide(new BigDecimal(100));
+            BigDecimal amount = contractAmount.multiply(percent).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP);
 
             // 修改预付款金额信息：
             Integer exec = Crud.from("PO_GUARANTEE_LETTER_REQUIRE_REQ").where().eq("ID", id).update().set("ADVANCE_CHARGE_AMT", amount).exec();

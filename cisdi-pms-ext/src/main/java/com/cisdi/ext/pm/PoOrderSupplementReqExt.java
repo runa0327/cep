@@ -1,5 +1,6 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.api.PoOrderExtApi;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -348,6 +349,7 @@ public class PoOrderSupplementReqExt {
             String processFinanceComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_TWO"); //财务部门意见
             //查询该人员角色信息
             String sql1 = "select b.id,b.name from ad_role_user a left join ad_role b on a.AD_ROLE_ID = b.id where a.AD_USER_ID = ? and b.id in ('0100070673610711083','0099902212142039415')";
+            userId = ProcessCommon.getOriginalUser(nodeId,userId,myJdbcTemplate);
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId);
             if (!CollectionUtils.isEmpty(list1)){
                 //判断是否是当轮拒绝回来的、撤销回来的
@@ -436,5 +438,23 @@ public class PoOrderSupplementReqExt {
             }
         }
         return sbComment.toString();
+    }
+
+    /**
+     * 补充协议-流程完结时扩展
+     */
+    public void OrderProcessEnd(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //合同工期
+        int duration = JdbcMapUtil.getInt(entityRecord.valueMap,"PLAN_TOTAL_DAYS");
+        //合同签订日期
+        Date signDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(entityRecord.valueMap,"SIGN_DATE"));
+        //计算到期日期
+        Date expireDate = DateTimeUtil.addDays(signDate,duration);
+        //更新到期日期字段
+        Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("id",entityRecord.csCommId).update().set("DATE_FIVE",expireDate).exec();
+        //将合同数据写入传输至合同数据表(po_order)
+//        PoOrderExtApi.createData(entityRecord,"PO_ORDER_SUPPLEMENT_REQ","0100070673610715221",myJdbcTemplate);
     }
 }

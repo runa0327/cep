@@ -159,6 +159,7 @@ public class PoOrderReqExt {
             String processFinanceFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_TWO"); //财务修订稿
             //查询该人员角色信息
             String sql1 = "select b.id,b.name from ad_role_user a left join ad_role b on a.AD_ROLE_ID = b.id where a.AD_USER_ID = ? and b.id in ('0100070673610711083','0099902212142039415')";
+            userId = ProcessCommon.getOriginalUser(nodeId,userId,myJdbcTemplate);
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId);
             if (!CollectionUtils.isEmpty(list1)){
                 //判断是否是当轮拒绝回来的、撤销回来的
