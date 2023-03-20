@@ -38,7 +38,7 @@ public class PmStartExt {
         sb.append("SELECT " +
                 " ps.ID AS ID," +
                 " ps.`NAME` AS `NAME`," +
-                " PM_CODE," +
+                " ps.PM_CODE," +
                 "ROUND(ifnull(PRJ_TOTAL_INVEST, 0 ),2) AS PRJ_TOTAL_INVEST," +
                 " gsv.`NAME` AS PROJECT_TYPE_ID," +
                 " pp.`NAME` AS BUILDER_UNIT," +
@@ -47,7 +47,8 @@ public class PmStartExt {
                 " ss.`NAME` AS START_STATUS ," +
                 " au.`name` as agentValue, " +
                 " gg.`NAME` as tender_way, " +
-                " ps.INVESTMENT_SOURCE_ID " +
+                " ps.INVESTMENT_SOURCE_ID, " +
+                " pj.id as project_id " +
                 "FROM " +
                 " PRJ_START ps  " +
                 " LEFT JOIN gr_set_value gsv ON gsv.id = ps.PROJECT_TYPE_ID " +
@@ -55,6 +56,7 @@ public class PmStartExt {
                 " LEFT JOIN gr_set_value ss ON ss.id = ps.PRJ_START_STATUS_ID  " +
                 " left join ad_user au on au.id = ps.AGENT " +
                 " left join gr_set_value gg on gg.id = ps.TENDER_WAY_ID " +
+                " left join pm_prj pj on pj.pm_code = ps.pm_code "+
                 " WHERE " +
                 " ps.`STATUS` = 'ap'");
         if (!StringUtils.isEmpty(map.get("projectName"))) {
@@ -83,6 +85,7 @@ public class PmStartExt {
             pmStart.agentValue = JdbcMapUtil.getString(m, "agentValue");
             pmStart.tenderWay = JdbcMapUtil.getString(m, "tender_way");
             pmStart.sourceTypeId = JdbcMapUtil.getString(m, "INVESTMENT_SOURCE_ID");
+            pmStart.projectId = JdbcMapUtil.getString(m, "project_id");
             return pmStart;
         }).collect(Collectors.toList());
 
@@ -430,6 +433,7 @@ public class PmStartExt {
         public String startRemark;
 
         public String statusId;
+
     }
 
     public static class inputData {
