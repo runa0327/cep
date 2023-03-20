@@ -109,7 +109,7 @@ public class PmPlanExt {
         int pageSize = Integer.parseInt(String.valueOf(map.get("pageSize")));
         int pageIndex = Integer.parseInt(String.valueOf(map.get("pageIndex")));
         StringBuilder sb = new StringBuilder();
-        sb.append("select PPP.AD_USER_ID,PPP.REMARK,PPP.ATT_FILE_GROUP_ID,PPP.PLAN_PROGRESS,UPDATE_TIME,PM_PLAN_ID,AU.`NAME` AS USER " +
+        sb.append("select PPP.AD_USER_ID,PPP.REMARK,PPP.ATT_FILE_GROUP_ID,round(PPP.PLAN_PROGRESS,2) as PLAN_PROGRESS,UPDATE_TIME,PM_PLAN_ID,AU.`NAME` AS USER " +
                 "from PM_PLAN_PROGRESS PPP LEFT JOIN AD_USER AU ON AU.ID = PPP.AD_USER_ID where PM_PLAN_ID='").append(id).append("'");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
@@ -209,7 +209,7 @@ public class PmPlanExt {
         plan.location = JdbcMapUtil.getString(dataMap, "location");
         plan.typeId = JdbcMapUtil.getString(dataMap, "PROJECT_TYPE_ID");
         plan.type = JdbcMapUtil.getString(dataMap, "type");
-        plan.updateTime = JdbcMapUtil.getString(dataMap, "UPDATE_TIME");
+        plan.updateTime = StringUtil.withOutT(JdbcMapUtil.getString(dataMap, "UPDATE_TIME"));
         plan.statusId = JdbcMapUtil.getString(dataMap, "PLAN_STATUS_ID");
         plan.status = JdbcMapUtil.getString(dataMap, "STATUS");
         plan.startTime = StringUtil.withOutT(JdbcMapUtil.getString(dataMap, "CRT_DT"));
@@ -222,7 +222,7 @@ public class PmPlanExt {
         planProgress.id = JdbcMapUtil.getString(dataMap, "ID");
         planProgress.remark = JdbcMapUtil.getString(dataMap, "REMARK");
         planProgress.progress = JdbcMapUtil.getString(dataMap, "PLAN_PROGRESS");
-        planProgress.updateTime = JdbcMapUtil.getString(dataMap, "UPDATE_TIME");
+        planProgress.updateTime = StringUtil.withOutT(JdbcMapUtil.getString(dataMap, "UPDATE_TIME"));
         planProgress.user = JdbcMapUtil.getString(dataMap, "USER");
         planProgress.fileInfoList = this.getFileList(JdbcMapUtil.getString(dataMap, "ATT_FILE_GROUP_ID"));
         return planProgress;
