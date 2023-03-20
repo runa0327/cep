@@ -81,10 +81,6 @@ public class PmPrj {
          */
         public static final String LAST_MODI_USER_ID = "LAST_MODI_USER_ID";
         /**
-         * 记录状态。
-         */
-        public static final String STATUS = "STATUS";
-        /**
          * 锁定流程实例。
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
@@ -93,17 +89,29 @@ public class PmPrj {
          */
         public static final String CODE = "CODE";
         /**
-         * 名称。
-         */
-        public static final String NAME = "NAME";
-        /**
          * 备注。
          */
         public static final String REMARK = "REMARK";
         /**
+         * 招标方式。
+         */
+        public static final String TENDER_WAY_ID = "TENDER_WAY_ID";
+        /**
+         * 记录状态。
+         */
+        public static final String STATUS = "STATUS";
+        /**
+         * 名称。
+         */
+        public static final String NAME = "NAME";
+        /**
          * 项目编码。
          */
         public static final String PM_CODE = "PM_CODE";
+        /**
+         * 项目序号。
+         */
+        public static final String PM_SEQ = "PM_SEQ";
         /**
          * 业主单位。
          */
@@ -305,6 +313,10 @@ public class PmPrj {
          */
         public static final String ESTIMATED_TOTAL_INVEST = "ESTIMATED_TOTAL_INVEST";
         /**
+         * 工程费用（万）。
+         */
+        public static final String PROJECT_AMT = "PROJECT_AMT";
+        /**
          * 建安工程费(万)。
          */
         public static final String CONSTRUCT_PRJ_AMT = "CONSTRUCT_PRJ_AMT";
@@ -328,6 +340,14 @@ public class PmPrj {
          * 预备费(万)。
          */
         public static final String PREPARE_AMT = "PREPARE_AMT";
+        /**
+         * 建设期利息（万）。
+         */
+        public static final String CONSTRUCT_PERIOD_INTEREST = "CONSTRUCT_PERIOD_INTEREST";
+        /**
+         * 投资测算优先级。
+         */
+        public static final String INVEST_PRIORITY = "INVEST_PRIORITY";
     }
 
     // </editor-fold>
@@ -624,42 +644,6 @@ public class PmPrj {
     }
 
     /**
-     * 记录状态。
-     */
-    private String status;
-
-    /**
-     * 获取：记录状态。
-     */
-    public String getStatus() {
-        return this.status;
-    }
-
-    /**
-     * 设置：记录状态。
-     */
-    public PmPrj setStatus(String status) {
-        if (this.status == null && status == null) {
-            // 均为null，不做处理。
-        } else if (this.status != null && status != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.status.compareTo(status) != 0) {
-                this.status = status;
-                if (!this.toUpdateCols.contains("STATUS")) {
-                    this.toUpdateCols.add("STATUS");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.status = status;
-            if (!this.toUpdateCols.contains("STATUS")) {
-                this.toUpdateCols.add("STATUS");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 锁定流程实例。
      */
     private String lkWfInstId;
@@ -732,42 +716,6 @@ public class PmPrj {
     }
 
     /**
-     * 名称。
-     */
-    private String name;
-
-    /**
-     * 获取：名称。
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * 设置：名称。
-     */
-    public PmPrj setName(String name) {
-        if (this.name == null && name == null) {
-            // 均为null，不做处理。
-        } else if (this.name != null && name != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.name.compareTo(name) != 0) {
-                this.name = name;
-                if (!this.toUpdateCols.contains("NAME")) {
-                    this.toUpdateCols.add("NAME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.name = name;
-            if (!this.toUpdateCols.contains("NAME")) {
-                this.toUpdateCols.add("NAME");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 备注。
      */
     private String remark;
@@ -804,6 +752,114 @@ public class PmPrj {
     }
 
     /**
+     * 招标方式。
+     */
+    private String tenderWayId;
+
+    /**
+     * 获取：招标方式。
+     */
+    public String getTenderWayId() {
+        return this.tenderWayId;
+    }
+
+    /**
+     * 设置：招标方式。
+     */
+    public PmPrj setTenderWayId(String tenderWayId) {
+        if (this.tenderWayId == null && tenderWayId == null) {
+            // 均为null，不做处理。
+        } else if (this.tenderWayId != null && tenderWayId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.tenderWayId.compareTo(tenderWayId) != 0) {
+                this.tenderWayId = tenderWayId;
+                if (!this.toUpdateCols.contains("TENDER_WAY_ID")) {
+                    this.toUpdateCols.add("TENDER_WAY_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.tenderWayId = tenderWayId;
+            if (!this.toUpdateCols.contains("TENDER_WAY_ID")) {
+                this.toUpdateCols.add("TENDER_WAY_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 记录状态。
+     */
+    private String status;
+
+    /**
+     * 获取：记录状态。
+     */
+    public String getStatus() {
+        return this.status;
+    }
+
+    /**
+     * 设置：记录状态。
+     */
+    public PmPrj setStatus(String status) {
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 名称。
+     */
+    private String name;
+
+    /**
+     * 获取：名称。
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * 设置：名称。
+     */
+    public PmPrj setName(String name) {
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 项目编码。
      */
     private String pmCode;
@@ -834,6 +890,42 @@ public class PmPrj {
             this.pmCode = pmCode;
             if (!this.toUpdateCols.contains("PM_CODE")) {
                 this.toUpdateCols.add("PM_CODE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 项目序号。
+     */
+    private Integer pmSeq;
+
+    /**
+     * 获取：项目序号。
+     */
+    public Integer getPmSeq() {
+        return this.pmSeq;
+    }
+
+    /**
+     * 设置：项目序号。
+     */
+    public PmPrj setPmSeq(Integer pmSeq) {
+        if (this.pmSeq == null && pmSeq == null) {
+            // 均为null，不做处理。
+        } else if (this.pmSeq != null && pmSeq != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmSeq.compareTo(pmSeq) != 0) {
+                this.pmSeq = pmSeq;
+                if (!this.toUpdateCols.contains("PM_SEQ")) {
+                    this.toUpdateCols.add("PM_SEQ");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmSeq = pmSeq;
+            if (!this.toUpdateCols.contains("PM_SEQ")) {
+                this.toUpdateCols.add("PM_SEQ");
             }
         }
         return this;
@@ -2640,6 +2732,42 @@ public class PmPrj {
     }
 
     /**
+     * 工程费用（万）。
+     */
+    private BigDecimal projectAmt;
+
+    /**
+     * 获取：工程费用（万）。
+     */
+    public BigDecimal getProjectAmt() {
+        return this.projectAmt;
+    }
+
+    /**
+     * 设置：工程费用（万）。
+     */
+    public PmPrj setProjectAmt(BigDecimal projectAmt) {
+        if (this.projectAmt == null && projectAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.projectAmt != null && projectAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectAmt.compareTo(projectAmt) != 0) {
+                this.projectAmt = projectAmt;
+                if (!this.toUpdateCols.contains("PROJECT_AMT")) {
+                    this.toUpdateCols.add("PROJECT_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectAmt = projectAmt;
+            if (!this.toUpdateCols.contains("PROJECT_AMT")) {
+                this.toUpdateCols.add("PROJECT_AMT");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 建安工程费(万)。
      */
     private BigDecimal constructPrjAmt;
@@ -2850,6 +2978,78 @@ public class PmPrj {
             this.prepareAmt = prepareAmt;
             if (!this.toUpdateCols.contains("PREPARE_AMT")) {
                 this.toUpdateCols.add("PREPARE_AMT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 建设期利息（万）。
+     */
+    private BigDecimal constructPeriodInterest;
+
+    /**
+     * 获取：建设期利息（万）。
+     */
+    public BigDecimal getConstructPeriodInterest() {
+        return this.constructPeriodInterest;
+    }
+
+    /**
+     * 设置：建设期利息（万）。
+     */
+    public PmPrj setConstructPeriodInterest(BigDecimal constructPeriodInterest) {
+        if (this.constructPeriodInterest == null && constructPeriodInterest == null) {
+            // 均为null，不做处理。
+        } else if (this.constructPeriodInterest != null && constructPeriodInterest != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.constructPeriodInterest.compareTo(constructPeriodInterest) != 0) {
+                this.constructPeriodInterest = constructPeriodInterest;
+                if (!this.toUpdateCols.contains("CONSTRUCT_PERIOD_INTEREST")) {
+                    this.toUpdateCols.add("CONSTRUCT_PERIOD_INTEREST");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.constructPeriodInterest = constructPeriodInterest;
+            if (!this.toUpdateCols.contains("CONSTRUCT_PERIOD_INTEREST")) {
+                this.toUpdateCols.add("CONSTRUCT_PERIOD_INTEREST");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 投资测算优先级。
+     */
+    private String investPriority;
+
+    /**
+     * 获取：投资测算优先级。
+     */
+    public String getInvestPriority() {
+        return this.investPriority;
+    }
+
+    /**
+     * 设置：投资测算优先级。
+     */
+    public PmPrj setInvestPriority(String investPriority) {
+        if (this.investPriority == null && investPriority == null) {
+            // 均为null，不做处理。
+        } else if (this.investPriority != null && investPriority != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.investPriority.compareTo(investPriority) != 0) {
+                this.investPriority = investPriority;
+                if (!this.toUpdateCols.contains("INVEST_PRIORITY")) {
+                    this.toUpdateCols.add("INVEST_PRIORITY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.investPriority = investPriority;
+            if (!this.toUpdateCols.contains("INVEST_PRIORITY")) {
+                this.toUpdateCols.add("INVEST_PRIORITY");
             }
         }
         return this;
