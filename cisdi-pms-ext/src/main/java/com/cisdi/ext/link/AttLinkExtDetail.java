@@ -1,23 +1,34 @@
 package com.cisdi.ext.link;
 
+import com.cisdi.ext.base.AdUserExt;
 import com.cisdi.ext.base.GrSetValue;
+import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
+import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 属性联动详情
  */
 public class AttLinkExtDetail {
+
+    public static final Map<String,String> postCodeMap = new HashMap<>();
+    static {
+        postCodeMap.put("FINANCE_POST","AD_USER_TWENTY_FIVE_ID"); //财务管理岗
+        postCodeMap.put("BUY_POST","AD_USER_TWENTY_ONE_ID"); //采购管理岗
+        postCodeMap.put("TREATY_POST","AD_USER_NINETEEN_ID"); //合约管理岗
+        postCodeMap.put("EARLY_EQUIP_POST","AD_USER_SIXTEEN_ID"); //前期设备岗
+        postCodeMap.put("EQUIP_COST_POST","AD_USER_EIGHTEEN_ID"); //设备成本岗
+        postCodeMap.put("LAND_POST","AD_USER_THIRTEEN_ID"); //土地管理岗
+    }
 
     /**
      * 合同需求变更
@@ -736,7 +747,6 @@ public class AttLinkExtDetail {
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
             linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
             attLinkResult.attMap.put("OTHER", linkedAtt);
-//            attLinkResult.attMap.put("QTY_TWO", linkedAtt);
         }
     }
 
@@ -746,17 +756,14 @@ public class AttLinkExtDetail {
      * @param attLinkResult 返回值
      */
     public static void assignmentPrjYesNoOne(String id, AttLinkResult attLinkResult) {
-        String val = "";
-        String txt = "";
+        String val = null;
+        String txt = null;
         if ("0099799190825080705".equals(id)){
             val = "0099799190825080670";
             txt = "否";
         } else if ("0099799190825080704".equals(id) || "0099952822476392682".equals(id)){
             val = "0099799190825080669";
             txt = "是";
-        } else {
-            val = null;
-            txt = null;
         }
         //是否政府投资项目
         {
@@ -846,7 +853,7 @@ public class AttLinkExtDetail {
 
     /**
      * 清除项目基础信息-不包含项目id
-     * @param attLinkResult
+     * @param attLinkResult 返回的集合信息
      */
     public static void clearBaseProjectDataNOPrj(AttLinkResult attLinkResult) {
         {
@@ -882,7 +889,7 @@ public class AttLinkExtDetail {
 
     /**
      * 合同签订、补充协议 是否标准模板属性联动数据清除
-     * @param attLinkResult
+     * @param attLinkResult 返回的集合信息
      */
     public static void clearOrderIsStandard(AttLinkResult attLinkResult) {
         {
@@ -915,6 +922,213 @@ public class AttLinkExtDetail {
             attLinkResult.attMap.put("QTY_ONE", linkedAtt); // 建筑面积(㎡)
             attLinkResult.attMap.put("QTY_THREE", linkedAtt); //海域面积(㎡)
             attLinkResult.attMap.put("OTHER", linkedAtt); //其他
+        }
+    }
+
+    /**
+     * 项目属性联动-岗位指派流程-项目启动基础信息
+     * @param attLinkResult 返回的集合信息
+     * @param attValue 属性联动值
+     * @param myJdbcTemplate 数据源
+     */
+    public static void selectPostAppointLink(AttLinkResult attLinkResult, String attValue, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select a.*,b.id as projectId from PRJ_START a left join pm_prj b on a.PM_CODE = b.PM_CODE where b.id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,attValue);
+        if (!CollectionUtils.isEmpty(list)){
+            //业主单位
+            String companyId = JdbcMapUtil.getString(list.get(0), "BUILDER_UNIT");
+            //岗位人员赋值
+            assignmentPostLink(attLinkResult,companyId,attValue,myJdbcTemplate);
+            // 资金来源
+            {
+                String id = JdbcMapUtil.getString(list.get(0), "INVESTMENT_SOURCE_ID");
+                String name = GrSetValue.getValueNameById(id);
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = id;
+                linkedAtt.text = name;
+                attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
+            }
+            //资金总额 PRJ_TOTAL_INVEST
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.DOUBLE;
+                linkedAtt.value = new BigDecimal(JdbcMapUtil.getString(list.get(0),"PRJ_TOTAL_INVEST"));
+                linkedAtt.text = JdbcMapUtil.getString(list.get(0),"PRJ_TOTAL_INVEST");
+                attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
+            }
+            // 项目类型
+            {
+                String id = JdbcMapUtil.getString(list.get(0), "PROJECT_TYPE_ID");
+                String name = GrSetValue.getValueNameById(id);
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = id;
+                linkedAtt.text = name;
+                attLinkResult.attMap.put("PROJECT_TYPE_ID", linkedAtt);
+            }
+            // 启动时间
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.DATE;
+                linkedAtt.value = JdbcMapUtil.getString(list.get(0), "START_TIME");
+                linkedAtt.text = JdbcMapUtil.getString(list.get(0), "START_TIME");
+                attLinkResult.attMap.put("START_TIME", linkedAtt);
+            }
+            // 建设单位
+            {
+                String name = GrSetValue.getValueNameById(companyId);
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = companyId;
+                linkedAtt.text = name;
+                attLinkResult.attMap.put("CUSTOMER_UNIT", linkedAtt);
+            }
+            // 招标方式
+            {
+                String id = JdbcMapUtil.getString(list.get(0), "TENDER_WAY_ID");
+                String name = GrSetValue.getValueNameById(id);
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = id;
+                linkedAtt.text = name;
+                attLinkResult.attMap.put("TENDER_WAY_ID", linkedAtt);
+            }
+            // 项目简介
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = JdbcMapUtil.getString(list.get(0), "PRJ_SITUATION");
+                linkedAtt.text = JdbcMapUtil.getString(list.get(0), "PRJ_SITUATION");
+                attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt);
+            }
+            // 启动说明
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = JdbcMapUtil.getString(list.get(0), "START_REMARK");
+                linkedAtt.text = JdbcMapUtil.getString(list.get(0), "START_REMARK");
+                attLinkResult.attMap.put("START_REMARK", linkedAtt);
+            }
+            // 启动依据
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.FILE_GROUP;
+                linkedAtt.value = JdbcMapUtil.getString(list.get(0), "START_REMARK");
+                getFileInfoList(linkedAtt);
+                attLinkResult.attMap.put("FILE_ID_ONE", linkedAtt);
+            }
+        }
+    }
+
+    /**
+     * 项目默认岗位值赋值
+     * @param attLinkResult 返回集合值
+     * @param companyId 业主单位id
+     * @param projectId 项目id
+     * @param myJdbcTemplate 数据源
+     */
+    private static void assignmentPostLink(AttLinkResult attLinkResult, String companyId, String projectId, MyJdbcTemplate myJdbcTemplate) {
+        //获取项目岗位默认配置
+        String sql = "select * from BASE_POST_USER where CUSTOMER_UNIT = ? and status = 'AP'";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,companyId);
+        if (!CollectionUtils.isEmpty(list)){
+            //查询出的数据处理成Map集合
+            Map<String,String> postMap = getPostMap(list);
+            for (String key : postMap.keySet()){
+                String userId = postMap.get(key);
+                String userName = AdUserExt.getUserName(userId,myJdbcTemplate);
+                String code = getMapToCode(key,postCodeMap);
+                attLinkResultAddValue(userId,userName,code,attLinkResult);
+            }
+        }
+    }
+
+    /**
+     * 默认岗位信息默认赋值
+     * @param userId 用户id
+     * @param userName 用户姓名
+     * @param code 返回显示的页面表单字段
+     * @param attLinkResult 返回的集合
+     */
+    private static void attLinkResultAddValue(String userId, String userName, String code, AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = userId;
+            linkedAtt.text = userName;
+            attLinkResult.attMap.put(code, linkedAtt);
+        }
+    }
+
+    /**
+     * 默认项目code和流程中的字段匹配
+     * @param key 默认项目岗位的code
+     * @param postCodeMap 匹配关系map
+     * @return 流程岗位的code
+     */
+    private static String getMapToCode(String key, Map<String, String> postCodeMap) {
+        String value = "";
+        for (String tmp : postCodeMap.keySet()){
+            if (key.equals(tmp)){
+                value = postCodeMap.get(tmp);
+                break;
+            }
+        }
+        return value;
+    }
+
+    /**
+     * 默认岗位信息转MAP
+     * @param list 源数据
+     * @return map集合
+     */
+    private static Map<String, String> getPostMap(List<Map<String, Object>> list) {
+        Map<String,String> map = new HashMap<>();
+        for (Map<String, Object> tmp : list) {
+            String code = JdbcMapUtil.getString(tmp,"code");
+            String value = JdbcMapUtil.getString(tmp,"ad_user_id");
+            map.put(code,value);
+        }
+        return map;
+    }
+
+    /**
+     * 获取处理文件信息列表
+     * @param linkedAtt 属性值
+     */
+    private static void getFileInfoList(LinkedAtt linkedAtt) {
+        if (SharedUtil.isEmptyObject(linkedAtt.value)) {
+            return;
+        }
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+        String[] idArr = linkedAtt.value.toString().split(",");
+        List<String> idList = Arrays.asList(idArr);
+        Map<String, Object> map = new HashMap<>();
+        map.put("ids", idList);
+        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList("select t.*, crt_user.code crt_user_code, crt_user.name crt_user_name from fl_file t left join ad_user crt_user on t.crt_user_id = crt_user.id where t.id in (:ids)", map);
+        if (!CollectionUtils.isEmpty(list)) {
+            linkedAtt.fileInfoList = new ArrayList<>(list.size());
+            StringBuilder sb = new StringBuilder();
+            for (Map<String, Object> row : list) {
+                LinkedAttFileInfo fileInfo = new LinkedAttFileInfo();
+                linkedAtt.fileInfoList.add(fileInfo);
+                fileInfo.attachmentUrl = JdbcMapUtil.getString(row, "FILE_ATTACHMENT_URL");
+                fileInfo.code = JdbcMapUtil.getString(row, "CODE");
+                fileInfo.crtUserCode = JdbcMapUtil.getString(row, "CRT_USER_CODE");
+                fileInfo.crtUserName = JdbcMapUtil.getString(row, "CRT_USER_NAME");
+                fileInfo.dspName = JdbcMapUtil.getString(row, "DSP_NAME");
+                fileInfo.dspSize = JdbcMapUtil.getString(row, "DSP_SIZE");
+                fileInfo.ext = JdbcMapUtil.getString(row, "EXT");
+                fileInfo.id = JdbcMapUtil.getString(row, "ID");
+                String url = JdbcMapUtil.getString(row, "FILE_INLINE_URL");
+                fileInfo.inlineUrl = url;
+                fileInfo.name = JdbcMapUtil.getString(row, "NAME");
+                fileInfo.sizeKiloByte = Double.parseDouble(JdbcMapUtil.getString(row, "SIZE_KB"));
+                fileInfo.uploadDttm = DateTimeUtil.dttmToString(JdbcMapUtil.getObject(row, "UPLOAD_DTTM"));
+                sb.append(url).append(",");
+            }
+            linkedAtt.text = sb.substring(0,sb.length()-1);
         }
     }
 }

@@ -711,6 +711,78 @@ public class ProcessRoleExt {
     }
 
     /**
+     * 部门负责人角色-区分公司-采购管理部负责人
+     */
+    public void getBuyDeptChargeUser(){
+        getDeptChargeUser("CHIEF_USER_ID","post_buy","采购管理部");
+    }
+
+    /**
+     * 部门负责人角色-区分公司-前期管理部负责人
+     */
+    public void getLandDeptChargeUser(){
+        getDeptChargeUser("CHIEF_USER_ID","post_early","前期管理部");
+    }
+
+    /**
+     * 部门负责人角色-区分公司-财务金融部负责人
+     */
+    public void getFinanceDeptChargeUser(){
+        getDeptChargeUser("CHIEF_USER_ID","post_finance","财务金融部");
+    }
+
+    /**
+     * 部门负责人角色-区分公司-工程管理部负责人
+     */
+    public void getEngineeringDeptChargeUser(){
+        getDeptChargeUser("CHIEF_USER_ID","post_engineering","工程管理部");
+    }
+
+    /**
+     * 部门负责人角色-区分公司-设计管理部负责人
+     */
+    public void getDesignDeptChargeUser(){
+        getDeptChargeUser("CHIEF_USER_ID","post_design","设计管理部");
+    }
+
+    /**
+     * 部门负责人角色-区分公司-成本合约部负责人
+     */
+    public void getCostDeptChargeUser(){
+        getDeptChargeUser("CHIEF_USER_ID","post_cost","成本合约部");
+    }
+
+    /**
+     * 部门负责人角色-区分公司-法务管理部负责人
+     */
+    public void getLegalDeptChargeUser(){
+        getDeptChargeUser("CHIEF_USER_ID","post_legal","法务管理部");
+    }
+
+    /**
+     * 查询任意流程中对应岗位人员
+     * @param deptCode 岗位属性代码
+     * @param postCost 部门树岗位编码
+     * @param deptName 岗位中文说明
+     */
+    private void getDeptChargeUser(String deptCode, String postCost, String deptName) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //业主单位
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        String sql1 = "select "+deptCode+" from HR_DEPT where code = ? and CUSTOMER_UNIT = ?";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,postCost,companyId);
+        if (!CollectionUtils.isEmpty(list1)){
+            String userIds = JdbcMapUtil.getString(list1.get(0), deptCode);
+            List<String> list = new ArrayList<>();
+            list.add(userIds);
+            ExtJarHelper.returnValue.set(list);
+        } else {
+            throw new BaseException("该公司部门 ‘"+deptName+"' 未配置负责人员，请先选择对应人员或联系管理员处理！");
+        }
+    }
+
+    /**
      * 角色-财务人员
      */
     public void getFinanceUser(){
