@@ -103,9 +103,9 @@ public class PostInfo {
          */
         public static final String AD_USER_ID = "AD_USER_ID";
         /**
-         * 是否1。
+         * 系统是否。
          */
-        public static final String YES_NO_ONE = "YES_NO_ONE";
+        public static final String SYS_TRUE = "SYS_TRUE";
     }
 
     // </editor-fold>
@@ -618,36 +618,36 @@ public class PostInfo {
     }
 
     /**
-     * 是否1。
+     * 系统是否。
      */
-    private String yesNoOne;
+    private Boolean sysTrue;
 
     /**
-     * 获取：是否1。
+     * 获取：系统是否。
      */
-    public String getYesNoOne() {
-        return this.yesNoOne;
+    public Boolean getSysTrue() {
+        return this.sysTrue;
     }
 
     /**
-     * 设置：是否1。
+     * 设置：系统是否。
      */
-    public PostInfo setYesNoOne(String yesNoOne) {
-        if (this.yesNoOne == null && yesNoOne == null) {
+    public PostInfo setSysTrue(Boolean sysTrue) {
+        if (this.sysTrue == null && sysTrue == null) {
             // 均为null，不做处理。
-        } else if (this.yesNoOne != null && yesNoOne != null) {
+        } else if (this.sysTrue != null && sysTrue != null) {
             // 均非null，判定不等，再做处理：
-            if (this.yesNoOne.compareTo(yesNoOne) != 0) {
-                this.yesNoOne = yesNoOne;
-                if (!this.toUpdateCols.contains("YES_NO_ONE")) {
-                    this.toUpdateCols.add("YES_NO_ONE");
+            if (this.sysTrue.compareTo(sysTrue) != 0) {
+                this.sysTrue = sysTrue;
+                if (!this.toUpdateCols.contains("SYS_TRUE")) {
+                    this.toUpdateCols.add("SYS_TRUE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.yesNoOne = yesNoOne;
-            if (!this.toUpdateCols.contains("YES_NO_ONE")) {
-                this.toUpdateCols.add("YES_NO_ONE");
+            this.sysTrue = sysTrue;
+            if (!this.toUpdateCols.contains("SYS_TRUE")) {
+                this.toUpdateCols.add("SYS_TRUE");
             }
         }
         return this;
