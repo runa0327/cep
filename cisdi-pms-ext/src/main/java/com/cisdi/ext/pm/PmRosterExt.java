@@ -1,11 +1,19 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.model.HrDept;
+import com.cisdi.ext.model.PmRoster;
+import com.cisdi.ext.model.PostInfo;
 import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
+import org.checkerframework.checker.units.qual.K;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -505,6 +513,55 @@ public class PmRosterExt {
         public String userId;
 
         public String ancestral;
+    }
+
+
+    /**
+     * 岗位指派流程完结-数据写入
+     * @param entityRecord 数据值
+     * @param projectId 项目id
+     * @param myJdbcTemplate 数据源
+     * @param map 岗位指派流程字段与岗位对应关系 key：流程表单字段 value：岗位名称
+     */
+    public static void createDataByProcess(EntityRecord entityRecord, String projectId, MyJdbcTemplate myJdbcTemplate, Map<String,String> map) {
+        List<PmRoster> insertList = new ArrayList<>();
+        //业主单位
+        String customerUnit = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        for (String key : map.keySet()){
+            String valueUser = JdbcMapUtil.getString(entityRecord.valueMap,key);
+            if (!SharedUtil.isEmptyString(valueUser)){
+                String value = map.get(key);
+                String postId = PostInfo.selectByWhere(new Where().eq(PostInfo.Cols.YES_NO_ONE,"0099799190825080669")
+                        .eq(PostInfo.Cols.STATUS,"AP").eq(PostInfo.Cols.NAME,value)).get(0).getId();
+                //部门id查询
+                String deptId = HrDept.selectByWhere(new Where().eq(HrDept.Cols.CUSTOMER_UNIT,customerUnit).eq(HrDept.Cols.NAME,value)).get(0).getHrDeptPid();
+                PmRoster pmRoster = new PmRoster();
+                pmRoster.setPmPrjId(projectId);
+                pmRoster.setAdUserId(valueUser);
+                pmRoster.setCustomerUnit(customerUnit);
+                pmRoster.setHrDeptId(deptId);
+                pmRoster.setPostInfoId(postId);
+                insertList.add(pmRoster);
+            }
+        }
+        if (!CollectionUtils.isEmpty(insertList)){
+            for (PmRoster tmp : insertList) {
+                //判断该项目该岗位是否存在，获取id
+                String pmPosterId = "";
+                List<PmRoster> list = PmRoster.selectByWhere(new Where().eq(PmRoster.Cols.PM_PRJ_ID,projectId).eq(PmRoster.Cols.POST_INFO_ID, tmp.getPostInfoId()));
+                if (CollectionUtils.isEmpty(list)){
+                    pmPosterId = Crud.from("PM_ROSTER").insertData();
+                } else {
+                    pmPosterId = list.get(0).getId();
+                }
+                Crud.from("PM_ROSTER").where().eq("ID",pmPosterId).update()
+                        .set("PM_PRJ_ID",projectId).set("CUSTOMER_UNIT",customerUnit)
+                        .set("POST_INFO_ID",tmp.getPostInfoId()).set("AD_USER_ID",tmp.getAdUserId())
+                        .set("HR_DEPT_ID",tmp.getHrDeptId())
+                        .exec();
+            }
+        }
+
     }
 
 }

@@ -29,11 +29,11 @@ public class GrSetValue {
 
     /**
      * 根据id查询名称
-     * @param id
+     * @param id id
      * @return 名称
      */
     public static String getValueNameById(String id) {
-        String name = JdbcMapUtil.getString(Crud.from("gr_set_value").where().eq("id",id).select().execForMap(),"id");
+        String name = JdbcMapUtil.getString(Crud.from("gr_set_value").where().eq("id",id).select().execForMap(),"NAME");
         return name;
     }
 
