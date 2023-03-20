@@ -531,7 +531,7 @@ public class PmRosterExt {
             String valueUser = JdbcMapUtil.getString(entityRecord.valueMap,key);
             if (!SharedUtil.isEmptyString(valueUser)){
                 String value = map.get(key);
-                String postId = PostInfo.selectByWhere(new Where().eq(PostInfo.Cols.YES_NO_ONE,"0099799190825080669")
+                String postId = PostInfo.selectByWhere(new Where().eq(PostInfo.Cols.SYS_TRUE,"1")
                         .eq(PostInfo.Cols.STATUS,"AP").eq(PostInfo.Cols.NAME,value)).get(0).getId();
                 //部门id查询
                 String deptId = HrDept.selectByWhere(new Where().eq(HrDept.Cols.CUSTOMER_UNIT,customerUnit).eq(HrDept.Cols.NAME,value)).get(0).getHrDeptPid();
