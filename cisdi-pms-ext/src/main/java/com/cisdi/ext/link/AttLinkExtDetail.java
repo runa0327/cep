@@ -1,5 +1,6 @@
 package com.cisdi.ext.link;
 
+import com.cisdi.ext.base.AdUserExt;
 import com.cisdi.ext.base.GrSetValue;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
