@@ -1,5 +1,10 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.base.PmProcessPostConExt;
+import com.cisdi.ext.base.WfFlowExt;
+import com.cisdi.ext.model.PmProcessPostCon;
+import com.cisdi.ext.model.WfFlow;
+import com.cisdi.ext.model.WfNode;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -780,5 +785,22 @@ public class ProcessRoleExt {
         } else {
             throw new BaseException("该公司部门 ‘"+deptName+"' 未配置负责人员，请先选择对应人员或联系管理员处理！");
         }
+    }
+
+    /**
+     * 通用角色-花名册获取角色
+     */
+    public void getUserByRoster(){
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //业主单位
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        //流转id
+        String flowId = "";
+        //节点id
+        String nodeId = WfFlowExt.getNodeIdByFlowId(flowId);
+        //查询该节点岗位
+        String deptId = PmProcessPostConExt.getDeptIdByNode(nodeId,companyId);
+        //通过岗位id、花名册查询出人员信息
+        List<String> userList = PmRosterExt.getDeptUserByDept(deptId,companyId);
     }
 }

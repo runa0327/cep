@@ -561,7 +561,16 @@ public class PmRosterExt {
                         .exec();
             }
         }
+    }
 
+    /**
+     * 通过流程岗位id和业主单位id查询
+     * @param deptId
+     * @param companyId
+     * @return
+     */
+    public static List<String> getDeptUserByDept(String deptId, String companyId) {
+        return null;
     }
 
 }
