@@ -566,7 +566,6 @@ public class AttLinkExt {
                 linkedAtt.value = null;
                 linkedAtt.text = null;
                 linkedAtt.changeToMandatory = CONTRACT_IDChangeToMandatory;
-//                linkedAtt.changeToShown = CONTRACT_IDChangeToShown;
                 linkedAtt.changeToShown = false;
                 linkedAtt.changeToEditable = CONTRACT_IDChangeToEditable;
                 attLinkResult.attMap.put("CONTRACT_ID", linkedAtt);
@@ -593,12 +592,11 @@ public class AttLinkExt {
             }
             return attLinkResult;
         }
-//        else if ("PO_ORDER_CHANGE_REQ".equals(entCode)){ //合同需求变更
-//            AttLinkExtDetail.getPoOrderChange(attLinkResult,code);
-//            return attLinkResult;
-//        }
-        else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)
-                || "PO_ORDER_CHANGE_REQ".equals(entCode) || "PO_ORDER_TERMINATE_REQ".equals(entCode)){ //采购合同签订申请 补充协议 合同终止
+        else if ("PO_ORDER_CHANGE_REQ".equals(entCode)){ //合同需求变更
+            AttLinkExtDetail.autoLinkProject(attLinkResult,code,entCode);
+            return attLinkResult;
+        }
+        else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "PO_ORDER_TERMINATE_REQ".equals(entCode)){ //采购合同签订申请 补充协议 合同终止
             //系统(system)，非系统(non_system)
             attLinkResult = autoLinkProject(attValue,code);
             attLinkResult = autoLinkPrjDetail(attLinkResult,attValue,code);

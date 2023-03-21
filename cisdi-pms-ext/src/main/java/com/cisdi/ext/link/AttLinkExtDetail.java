@@ -1,6 +1,5 @@
 package com.cisdi.ext.link;
 
-import com.cisdi.ext.base.AdUserExt;
 import com.cisdi.ext.base.GrSetValue;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
@@ -747,6 +746,7 @@ public class AttLinkExtDetail {
             linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
             linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
             attLinkResult.attMap.put("OTHER", linkedAtt);
+//            attLinkResult.attMap.put("QTY_TWO", linkedAtt);
         }
     }
 
@@ -1129,6 +1129,62 @@ public class AttLinkExtDetail {
                 sb.append(url).append(",");
             }
             linkedAtt.text = sb.substring(0,sb.length()-1);
+        }
+    }
+
+    /**
+     * 系统非系统属性联动-项目手填/多选项目/单选项目
+     * @param attLinkResult 返回数据集
+     * @param code 状态码 系统(system)，非系统(non_system)
+     * @param entCode 业务表名
+     */
+    public static void autoLinkProject(AttLinkResult attLinkResult, String code, String entCode) {
+
+        List<String> list = AttLinkDifferentProcess.sourceTypeLinkProjects();
+        String project = "PM_PRJ_ID";
+        if (list.contains(entCode)){
+            project = "PM_PRJ_IDS";
+        }
+
+        Boolean prjListChangeToShown = false; //下拉项目默认隐藏
+        Boolean prjNameChangeToShown = false; //手写项目默认隐藏
+
+        Boolean prjListChangeToMandatory = false; //下拉项目默认非必填
+        Boolean prjNameChangeToMandatory = false; //手写项目默认非必填
+
+        Boolean prjListChangeToEditable = false; //下拉项目默认不可改
+        Boolean prjNameChangeToEditable = false; //手写项目默认不可改
+
+        if (!"system".equals(code)) {
+            prjNameChangeToShown = true;
+            prjNameChangeToMandatory = true;
+            prjNameChangeToEditable = true;
+        } else {
+            prjListChangeToShown = true;
+            prjListChangeToMandatory = true;
+            prjListChangeToEditable = true;
+        }
+        //下拉项目列表
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            linkedAtt.changeToMandatory = prjListChangeToMandatory;
+            linkedAtt.changeToShown = prjListChangeToShown;
+            linkedAtt.changeToEditable = prjListChangeToEditable;
+            attLinkResult.attMap.put(project, linkedAtt);
+        }
+        //项目名称
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            linkedAtt.changeToMandatory = prjNameChangeToMandatory;
+            linkedAtt.changeToShown = prjNameChangeToShown;
+            linkedAtt.changeToEditable = prjNameChangeToEditable;
+            attLinkResult.attMap.put("PROJECT_NAME_WR", linkedAtt);
         }
     }
 }

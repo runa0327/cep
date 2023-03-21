@@ -120,4 +120,14 @@ public class AttLinkDifferentProcess {
         list.add("PM_PRJ_INVEST3"); //预算财评
         return list;
     }
+
+    /**
+     * 系统非系统属性联动-联动项目来源-多选项目
+     * @return
+     */
+    public static List<String> sourceTypeLinkProjects() {
+        List<String> list = new ArrayList<>();
+        list.add("PO_ORDER_CHANGE_REQ");
+        return list;
+    }
 }
