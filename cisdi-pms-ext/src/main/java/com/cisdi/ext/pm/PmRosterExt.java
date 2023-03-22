@@ -4,6 +4,7 @@ import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.PmRoster;
 import com.cisdi.ext.model.PostInfo;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -29,6 +30,23 @@ import java.util.stream.Collectors;
  * @date 2023/2/9
  */
 public class PmRosterExt {
+
+    public static final Map<String,String> postDeptMap = new HashMap<>();
+    static {
+        postDeptMap.put("AD_USER_TWELVE_ID","前期管理部");
+        postDeptMap.put("AD_USER_THIRTEEN_ID","前期管理部");
+        postDeptMap.put("AD_USER_FOURTEEN_ID","前期管理部");
+        postDeptMap.put("AD_USER_FIFTEEN_ID","前期管理部");
+        postDeptMap.put("AD_USER_SIXTEEN_ID","前期管理部");
+        postDeptMap.put("AD_USER_EIGHTEEN_ID","成本合约部");
+        postDeptMap.put("AD_USER_NINETEEN_ID","成本合约部");
+        postDeptMap.put("AD_USER_TWENTY_ID","成本合约部");
+        postDeptMap.put("AD_USER_TWENTY_ONE_ID","采购管理部");
+        postDeptMap.put("AD_USER_TWENTY_TWO_ID","设计管理部");
+        postDeptMap.put("AD_USER_TWENTY_THREE_ID","工程管理部");
+        postDeptMap.put("AD_USER_TWENTY_FOUR_ID","工程管理部");
+        postDeptMap.put("AD_USER_TWENTY_FIVE_ID","财务金融部");
+    }
 
     /**
      * 花名册列表查询
@@ -534,7 +552,8 @@ public class PmRosterExt {
                 String postId = PostInfo.selectByWhere(new Where().eq(PostInfo.Cols.SYS_TRUE,"1")
                         .eq(PostInfo.Cols.STATUS,"AP").eq(PostInfo.Cols.NAME,value)).get(0).getId();
                 //部门id查询
-                String deptId = HrDept.selectByWhere(new Where().eq(HrDept.Cols.CUSTOMER_UNIT,customerUnit).eq(HrDept.Cols.NAME,value)).get(0).getHrDeptPid();
+                String deptName = getDeptNameByCode(key,postDeptMap);
+                String deptId = HrDept.selectByWhere(new Where().eq(HrDept.Cols.CUSTOMER_UNIT,customerUnit).eq(HrDept.Cols.NAME,deptName)).get(0).getHrDeptPid();
                 PmRoster pmRoster = new PmRoster();
                 pmRoster.setPmPrjId(projectId);
                 pmRoster.setAdUserId(valueUser);
@@ -561,7 +580,36 @@ public class PmRosterExt {
                         .exec();
             }
         }
+    }
 
+    /**
+     * 获取部门名称
+     * @param key 流程字段code
+     * @param postDeptMap code和部门对应集合
+     * @return 部门名称
+     */
+    private static String getDeptNameByCode(String key, Map<String, String> postDeptMap) {
+        String deptName = "";
+        for (String tmp : postDeptMap.keySet()){
+            if (key.equals(tmp)){
+                deptName = postDeptMap.get(tmp);
+            }
+        }
+        return deptName;
+    }
+
+    /**
+     * 通过流程岗位id和业主单位id查询
+     * @param deptId 流程岗位id
+     * @param companyId 业主单位id
+     * @param projectId 项目id
+     * @param myJdbcTemplate 数据源
+     * @return 项目岗位人员id
+     */
+    public static List<String> getDeptUserByDept(String deptId, String companyId, String projectId, MyJdbcTemplate myJdbcTemplate) {
+        List<String> userList = new ArrayList<>();
+        String[] arr = projectId.split(",");
+        return userList;
     }
 
 }
