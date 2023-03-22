@@ -3,9 +3,6 @@ package com.cisdi.ext.pm;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.base.PmProcessPostConExt;
 import com.cisdi.ext.base.WfFlowExt;
-import com.cisdi.ext.model.PmProcessPostCon;
-import com.cisdi.ext.model.WfFlow;
-import com.cisdi.ext.model.WfNode;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -17,7 +14,6 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
