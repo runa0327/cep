@@ -1,5 +1,6 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.base.PmProcessPostConExt;
 import com.cisdi.ext.base.WfFlowExt;
 import com.cisdi.ext.model.PmProcessPostCon;
@@ -791,16 +792,20 @@ public class ProcessRoleExt {
      * 通用角色-花名册获取角色
      */
     public void getUserByRoster(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //业主单位
         String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        //项目id
+        String projectId = PmPrjExt.getProjectIdByProcess(entityRecord.valueMap,myJdbcTemplate);
         //流转id
         String flowId = "";
+//        String flowId = ExtJarHelper.flowId.get();
         //节点id
         String nodeId = WfFlowExt.getNodeIdByFlowId(flowId);
         //查询该节点岗位
         String deptId = PmProcessPostConExt.getDeptIdByNode(nodeId,companyId);
         //通过岗位id、花名册查询出人员信息
-        List<String> userList = PmRosterExt.getDeptUserByDept(deptId,companyId);
+        List<String> userList = PmRosterExt.getDeptUserByDept(deptId,companyId,projectId,myJdbcTemplate);
     }
 }
