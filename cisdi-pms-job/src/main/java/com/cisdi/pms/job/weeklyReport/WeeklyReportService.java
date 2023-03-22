@@ -34,8 +34,8 @@ public class WeeklyReportService {
 
         // 获取流程分级：
         List<Map<String, Object>> procLevelList = jdbcTemplate.queryForList("select * from HR_PROC_LEVEL");
-        List<String> notiDeptProcIdList = procLevelList.stream().filter(item -> Boolean.TRUE.equals(JdbcMapUtil.getBoolean(item, "NOTI_DEPT"))).map(item -> JdbcMapUtil.getString(item, "WF_PROCESS_ID")).collect(Collectors.toList());
-        List<String> notiLeaderProcIdList = procLevelList.stream().filter(item -> Boolean.TRUE.equals(JdbcMapUtil.getBoolean(item, "NOTI_LEADER"))).map(item -> JdbcMapUtil.getString(item, "WF_PROCESS_ID")).collect(Collectors.toList());
+        List<String> notiDeptProcIdList = procLevelList.stream().filter(item -> Boolean.TRUE.equals(JdbcMapUtil.getBoolean(item, "IS_NOTI_DEPT_ON_END"))).map(item -> JdbcMapUtil.getString(item, "WF_PROCESS_ID")).collect(Collectors.toList());
+        List<String> notiLeaderProcIdList = procLevelList.stream().filter(item -> Boolean.TRUE.equals(JdbcMapUtil.getBoolean(item, "IS_NOTI_LEADER_ON_END"))).map(item -> JdbcMapUtil.getString(item, "WF_PROCESS_ID")).collect(Collectors.toList());
 
         // 获取要生成部门周报的部门列表：
         List<Map<String, Object>> deptList = jdbcTemplate.queryForList("select * from hr_dept d where d.`LEVEL`=3 and d.GENERATE_DEPT_WEEKLY_REPORT=1");
