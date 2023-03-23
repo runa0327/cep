@@ -3732,6 +3732,8 @@ public class AttLinkExt {
                 //需要自动岗位人员的流程
                 List<String> processUserList = AttLinkDifferentProcess.getLinkUserProcess();
                 if (processUserList.contains(entCode)){
+                    //清除岗位信息
+                    AttLinkExtDetail.clearPostUserData(attLinkResult);
                     //业主单位
                     String companyId = JdbcMapUtil.getString(list.get(0),"customer_id");
                     AttLinkExtDetail.processLinkUser(attValue,entCode,companyId,attLinkResult,myJdbcTemplate);

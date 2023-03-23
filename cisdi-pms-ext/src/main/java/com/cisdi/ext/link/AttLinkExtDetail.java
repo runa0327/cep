@@ -891,6 +891,23 @@ public class AttLinkExtDetail {
     }
 
     /**
+     * 清除岗位信息
+     * @param attLinkResult 返回的集合信息
+     */
+    public static void clearPostUserData(AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            linkedAtt.changeToEditable = true;
+            attLinkResult.attMap.put("AD_USER_TWO_ID", linkedAtt); // 采购岗
+            attLinkResult.attMap.put("AD_USER_THREE_ID", linkedAtt); // 成本岗
+            attLinkResult.attMap.put("AD_USER_FIVE_ID", linkedAtt); // 财务岗
+        }
+    }
+
+    /**
      * 合同签订、补充协议 是否标准模板属性联动数据清除
      * @param attLinkResult 返回的集合信息
      */
@@ -1064,20 +1081,22 @@ public class AttLinkExtDetail {
         }
     }
     /**
-     * 默认岗位信息默认赋值 含不可改属性
+     * 默认岗位信息默认赋值 含不可改属性 必填属性
      * @param userId 用户id
      * @param userName 用户姓名
      * @param code 返回显示的页面表单字段
-     * @param changeToEditable 返回显示的页面表单字段
+     * @param changeToEditable 是否可改属性
+     * @param changeToMandatory 是否必填属性
      * @param attLinkResult 返回的集合
      */
-    private static void attLinkResultAddValue(String userId, String userName, String code, Boolean changeToEditable, AttLinkResult attLinkResult) {
+    private static void attLinkResultAddValue(String userId, String userName, String code, Boolean changeToMandatory, Boolean changeToEditable, AttLinkResult attLinkResult) {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
             linkedAtt.value = userId;
             linkedAtt.text = userName;
             linkedAtt.changeToEditable = changeToEditable;
+            linkedAtt.changeToMandatory = changeToMandatory;
             attLinkResult.attMap.put(code, linkedAtt);
         }
     }
@@ -1244,10 +1263,11 @@ public class AttLinkExtDetail {
                 if (key.equals(postCode)){
                     //回显赋值
                     String userName = AdUserExt.getUserName(userId,myJdbcTemplate);
-                    attLinkResultAddValue(userId,userName,key,false,attLinkResult);
+                    attLinkResultAddValue(userId,userName,key,false,false,attLinkResult);
                 }
             }
         }
 
     }
+
 }
