@@ -28,7 +28,7 @@ public class PmPostExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         StringBuilder sb = new StringBuilder();
-        sb.append("select * from PM_PARTY where status='ap' ");
+        sb.append("select * from PM_PARTY where status='ap' and IS_CUSTOMER='1' ");
         if(Objects.nonNull(map.get("name"))){
             sb.append(" and name like '%").append(map.get("name")).append("%'");
         }
