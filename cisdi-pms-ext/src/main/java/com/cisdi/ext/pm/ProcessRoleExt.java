@@ -53,27 +53,16 @@ public class ProcessRoleExt {
         }
     }
 
-    /** 招标文件审批流程获取所有经办人信息 **/
-    public void bidDocProcess(){
-        String process = "bidDoc";
-        getHandleBy(process);
-    }
-
-
     /** 查询该流程所有经办人账号 **/
-    public void getHandleBy(String process){
+    public void bidDocProcess(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //流程id
         String csCommId = entityRecord.csCommId;
+        String entityCode = ExtJarHelper.sevInfo.get().entityInfo.code;
 
-        //查询所有经办人
         //需要查询的表
-        String table = "";
-        if ("bidDoc".equals(process)){
-            table = "pm_bid_approval_req";
-        }
-        String sql1 = "select a.AD_USER_ID from wf_task a LEFT JOIN "+table+" b on a.WF_PROCESS_INSTANCE_ID = b.LK_WF_INST_ID WHERE a.IN_CURRENT_ROUND = 1 and b.id = ?";
+        String sql1 = "select a.AD_USER_ID from wf_task a LEFT JOIN "+entityCode+" b on a.WF_PROCESS_INSTANCE_ID = b.LK_WF_INST_ID WHERE a.IN_CURRENT_ROUND = 1 and b.id = ?";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,csCommId);
         if (!CollectionUtils.isEmpty(list1)){
             List<String> userList = list1.stream().map(p-> JdbcMapUtil.getString(p,"AD_USER_ID")).collect(Collectors.toList());
