@@ -1,12 +1,15 @@
 package com.cisdi.ext.weeklyReport;
 
-import com.cisdi.ext.model.*;
+import com.cisdi.ext.model.FlFile;
+import com.cisdi.ext.model.HrWeeklyReport;
+import com.cisdi.ext.model.HrWeeklyReportDtl;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
+import com.qygly.shared.interaction.IdText;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
@@ -77,8 +80,9 @@ public class WeeklyReportExt {
             return;
         }
 
-        // 发起统计：
         if (!SharedUtil.isEmptyList(report.reportDtlList)) {
+
+            // 发起统计：
             List<ReportDtl> startList = report.reportDtlList.stream().filter(item -> item.isStart).collect(Collectors.toList());
             if (!SharedUtil.isEmptyList(startList)) {
                 BigDecimal sum = new BigDecimal(startList.size());
@@ -101,6 +105,34 @@ public class WeeklyReportExt {
                     return i != 0 ? i : o1.name.compareTo(o2.name);
                 }).collect(Collectors.toList());
             }
+
+            // 各个部门汇总：
+            Map<IdText, Map<IdText, List<ReportDtl>>> map = report.reportDtlList.stream().collect(
+                    Collectors.groupingBy(
+                            reportDtl -> reportDtl.dept,
+                            Collectors.groupingBy(
+                                    reportDtl -> reportDtl.user
+                            )));
+
+            List<DeptReport.DeptStat> deptStatList = map.entrySet().stream().map(deptEntry -> {
+                DeptReport.DeptStat deptStat = new DeptReport.DeptStat();
+                deptStat.dept = deptEntry.getKey();
+                deptStat.userStatList = deptEntry.getValue().entrySet().stream().map(userEntry -> {
+                    DeptReport.DeptStat.UserStat userStat = new DeptReport.DeptStat.UserStat();
+                    userStat.user = userEntry.getKey();
+                    userStat.ctStart = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart)).count();
+                    userStat.ctApprove = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isApprove)).count();
+                    userStat.ctEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isEnd)).count();
+                    userStat.ctUnend = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isUnend)).count();
+                    userStat.ctStartApproveEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart) || Boolean.TRUE.equals(reportDtl.isApprove) || Boolean.TRUE.equals(reportDtl.isEnd)).count();
+                    userStat.ctProject= userEntry.getValue().stream().filter(reportDtl -> reportDtl.prj!=null).map(reportDtl -> reportDtl.prj.id).distinct().count();
+                    return userStat;
+                }).sorted((o1, o2) -> o2.ctStartApproveEnd.compareTo(o1.ctStartApproveEnd)).collect(Collectors.toList());
+
+                return deptStat;
+            }).sorted(Comparator.comparing(o -> o.dept.text)).collect(Collectors.toList());
+
+            report.deptStatList = deptStatList;
         }
 
         setBaseReportAsReturnValue(report);
@@ -152,8 +184,7 @@ public class WeeklyReportExt {
 
         report.hrWeeklyReport = hrWeeklyReport;
 
-        // List<HrWeeklyReportDtl> hrWeeklyReportDtlList = HrWeeklyReportDtl.selectByWhere(new Where().eq(parentAttCode, hrWeeklyReport.getId()));
-        List<Map<String, Object>> hrWeeklyReportDtlList = myJdbcTemplate.queryForList("SELECT D.*,PI.NAME WF_PROCESS_INSTANCE_NAME,P.NAME WF_PROCESS_NAME,PRJ.NAME PM_PRJ_NAME FROM HR_WEEKLY_REPORT_DTL D JOIN WF_PROCESS_INSTANCE PI ON D." + parentAttCode + "=? AND D.WF_PROCESS_INSTANCE_ID=PI.ID JOIN WF_PROCESS P ON PI.WF_PROCESS_ID=P.ID LEFT JOIN PM_PRJ PRJ ON D.PM_PRJ_ID=PRJ.ID", hrWeeklyReport.getId());
+        List<Map<String, Object>> hrWeeklyReportDtlList = myJdbcTemplate.queryForList("SELECT D.*,PI.NAME WF_PROCESS_INSTANCE_NAME,P.NAME WF_PROCESS_NAME,PRJ.NAME PM_PRJ_NAME,DEPT.NAME REPORT_DEPT_NAME,USER.NAME REPORT_USER_NAME FROM HR_WEEKLY_REPORT_DTL D JOIN WF_PROCESS_INSTANCE PI ON D." + parentAttCode + "=? AND D.WF_PROCESS_INSTANCE_ID=PI.ID JOIN WF_PROCESS P ON PI.WF_PROCESS_ID=P.ID LEFT JOIN PM_PRJ PRJ ON D.PM_PRJ_ID=PRJ.ID JOIN HR_DEPT DEPT ON D.REPORT_DEPT_ID=DEPT.ID JOIN AD_USER USER ON D.REPORT_USER_ID=USER.ID", hrWeeklyReport.getId());
         report.reportDtlList = convertToReportDtlList(hrWeeklyReportDtlList);
 
         return report;
@@ -166,48 +197,35 @@ public class WeeklyReportExt {
 
         return hrWeeklyReportDtlList.stream().map(item -> {
             ReportDtl reportDtl = new ReportDtl();
+
             reportDtl.isStart = JdbcMapUtil.getBoolean(item, "IS_START");
             reportDtl.isApprove = JdbcMapUtil.getBoolean(item, "IS_APPROVE");
             reportDtl.isEnd = JdbcMapUtil.getBoolean(item, "IS_END");
+            // TODO 230323 暂未写入待办，直接为true：
+            reportDtl.isUnend=true;
             reportDtl.isNotiDeptOnEnd = JdbcMapUtil.getBoolean(item, "IS_NOTI_DEPT_ON_END");
             reportDtl.isNotiLeaderOnEnd = JdbcMapUtil.getBoolean(item, "IS_NOTI_LEADER_ON_END");
+
             reportDtl.prj = new Prj();
             reportDtl.prj.id = JdbcMapUtil.getString(item, "PM_PRJ_ID");
             reportDtl.prj.name = JdbcMapUtil.getString(item, "PM_PRJ_NAME");
+
             reportDtl.procInst = new ProcInst();
             reportDtl.procInst.procId = JdbcMapUtil.getString(item, "WF_PROCESS_ID");
             reportDtl.procInst.procName = JdbcMapUtil.getString(item, "WF_PROCESS_NAME");
             reportDtl.procInst.procInstId = JdbcMapUtil.getString(item, "WF_PROCESS_INSTANCE_ID");
             reportDtl.procInst.procInstName = JdbcMapUtil.getString(item, "WF_PROCESS_INSTANCE_NAME");
+
+            reportDtl.dept = new IdText();
+            reportDtl.dept.id = JdbcMapUtil.getString(item, "REPORT_DEPT_ID");
+            reportDtl.dept.text = JdbcMapUtil.getString(item, "REPORT_DEPT_NAME");
+
+            reportDtl.user = new IdText();
+            reportDtl.user.id = JdbcMapUtil.getString(item, "REPORT_USER_ID");
+            reportDtl.user.text = JdbcMapUtil.getString(item, "REPORT_USER_NAME");
+
             return reportDtl;
         }).collect(Collectors.toList());
-    }
-
-    private ProcInst getProcInst(String procInstId) {
-        if (SharedUtil.isEmptyString(procInstId)) {
-            return null;
-        }
-        WfProcessInstance wfProcessInstance = WfProcessInstance.selectById(procInstId, Arrays.asList(WfProcessInstance.Cols.ID, WfProcessInstance.Cols.NAME, WfProcessInstance.Cols.WF_PROCESS_ID), null);
-        WfProcess wfProcess = WfProcess.selectById(wfProcessInstance.getWfProcessId(), Arrays.asList(WfProcess.Cols.ID, WfProcess.Cols.NAME), null);
-
-        ProcInst procInst = new ProcInst();
-        procInst.procId = wfProcess.getId();
-        procInst.procName = wfProcess.getName();
-        procInst.procInstId = wfProcessInstance.getId();
-        procInst.procInstName = wfProcessInstance.getName();
-
-        return procInst;
-    }
-
-    private Prj getPrj(String prjId) {
-        if (SharedUtil.isEmptyString(prjId)) {
-            return null;
-        }
-        PmPrj pmPrj = PmPrj.selectById(prjId, Arrays.asList(PmPrj.Cols.ID, PmPrj.Cols.NAME), null);
-        Prj prj = new Prj();
-        prj.id = pmPrj.getId();
-        prj.name = pmPrj.getName();
-        return prj;
     }
 
     private List<File> getFileList(String fileIds) {
@@ -252,6 +270,25 @@ public class WeeklyReportExt {
 
     public static class DeptReport extends BaseReport {
         public List<NameCountPercent> startStat;
+
+        public List<DeptStat> deptStatList;
+
+        public static class DeptStat {
+            public IdText dept;
+
+            public List<UserStat> userStatList;
+
+            public static class UserStat {
+                public IdText user;
+                public Long ctStart;
+                public Long ctApprove;
+                public Long ctEnd;
+                public Long ctUnend;
+                public Long ctStartApproveEnd;
+                public Long ctProject;
+            }
+        }
+
     }
 
     public static class NameCountPercent {
@@ -272,8 +309,14 @@ public class WeeklyReportExt {
         public boolean isEnd;
         public boolean isNotiDeptOnEnd;
         public boolean isNotiLeaderOnEnd;
+
+        public boolean isUnend;
+
         public Prj prj;
         public ProcInst procInst;
+
+        public IdText dept;
+        public IdText user;
     }
 
     public static class Prj {
