@@ -82,7 +82,7 @@ public class PmPlanExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String id = String.valueOf(map.get("id"));
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pp.ID,pp.CODE,pp.NAME,ATT_FILE_GROUP_ID,IFNULL(AMT,0) AS AMT,IFNULL(PLAN_PROGRESS,0) AS PLAN_PROGRESS," +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pp.ID,pp.CODE,pp.NAME,ATT_FILE_GROUP_ID,IFNULL(AMT,0)/10000 AS AMT,IFNULL(PLAN_PROGRESS,0) AS PLAN_PROGRESS," +
                 "pp.ad_user_id,pp.PROJECT_TYPE_ID,pp.BASE_LOCATION_ID,PLAN_STATUS_ID,pp.crt_dt,pp.REMARK, " +
                 "UPDATE_TIME,au.name as user,gsv.`NAME` as location,gg.`NAME` as type ,gv.`NAME` as `STATUS` from pm_plan pp  \n" +
                 "left join ad_user au on au.id = pp.AD_USER_ID \n" +

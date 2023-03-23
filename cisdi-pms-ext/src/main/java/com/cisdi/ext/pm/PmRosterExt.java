@@ -41,15 +41,16 @@ public class PmRosterExt {
         StringBuffer sb = new StringBuffer();
         sb.append("select pj.id as id, pj.`NAME` as project_name from pm_prj pj left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'");
         if (!StringUtils.isEmpty(projectName)) {
-            sb.append(" and pj.id like '%").append(projectName).append("%'");
+            sb.append(" and pj.name like '%").append(projectName).append("%'");
         }
-        sb.append("group by pj.id ");
+        sb.append(" and pj.pm_code is not null ");
+        sb.append("group by pj.id order by pj.pm_code desc");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //header
-        List<Map<String, Object>> strList = myJdbcTemplate.queryForList("select PROJECT_POST from PM_ROSTER GROUP BY PROJECT_POST");
+        List<Map<String, Object>> strList = myJdbcTemplate.queryForList("select po.`NAME` as PROJECT_POST from PM_ROSTER pr left join post_info po on pr.POST_INFO_ID = po.id where POST_INFO_ID is not null group by po.id");
         List<String> headerList = strList.stream().map(p -> JdbcMapUtil.getString(p, "PROJECT_POST")).collect(Collectors.toList());
         headerList.add(0, "项目名称");
         headerList.add("ID");
@@ -65,7 +66,7 @@ public class PmRosterExt {
                     newData.put("ID", stringObjectMap.get("id"));
                 } else {
                     String prjId = String.valueOf(stringObjectMap.get("id"));
-                    List<Map<String, Object>> rosterList = myJdbcTemplate.queryForList("select pp.*,au.`NAME` as user_name from PM_ROSTER pp left join ad_user au on pp.AD_USER_ID = au.id where PM_PRJ_ID=? and PROJECT_POST=?", prjId, s);
+                    List<Map<String, Object>> rosterList = myJdbcTemplate.queryForList("select pp.*,au.`NAME` as user_name from PM_ROSTER pp left join ad_user au on pp.AD_USER_ID = au.id left join post_info po on po.id = pp.POST_INFO_ID where PM_PRJ_ID=? and po.`NAME`=? ", prjId, s);
                     String users = "/";
                     if (!CollectionUtils.isEmpty(rosterList)) {
                         users = rosterList.stream().map(mm -> JdbcMapUtil.getString(mm, "user_name")).collect(Collectors.joining(","));
@@ -140,19 +141,24 @@ public class PmRosterExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
 
         StringBuffer sb = new StringBuffer();
-        sb.append("select PROJECT_POST from PM_ROSTER where 1=1 ");
+        sb.append("select id,name from post_info where `STATUS`='ap' ");
         if (StringUtils.isEmpty(map.get("name"))) {
-            sb.append(" and PROJECT_POST like '%").append(map.get("name")).append("%'");
+            sb.append(" and name like '%").append(map.get("name")).append("%'");
         }
-        sb.append(" GROUP BY PROJECT_POST");
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> strList = myJdbcTemplate.queryForList(sb.toString());
-        List<String> res = strList.stream().map(p -> JdbcMapUtil.getString(p, "PROJECT_POST")).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(res)) {
+
+        List<Post> postList = strList.stream().map(p -> {
+            Post info = new Post();
+            info.id = JdbcMapUtil.getString(p, "id");
+            info.name = JdbcMapUtil.getString(p, "name");
+            return info;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(postList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
             OutSide outSide = new OutSide();
-            outSide.strList = res;
+            outSide.postList = postList;
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
@@ -195,7 +201,7 @@ public class PmRosterExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuffer sb = new StringBuffer();
-        sb.append("select * from pm_prj where id in (select PM_PRJ_ID from PM_ROSTER where PROJECT_POST= '").append(map.get("postName")).append("') ");
+        sb.append("select pj.* from pm_prj pj left join PM_ROSTER pr on pj.id = pr.PM_PRJ_ID left join post_info po on po.id = pr.POST_INFO_ID where pr.post_info_id = '").append(map.get("postId")).append("' ");
         if (!StringUtils.isEmpty(map.get("projectName"))) {
             sb.append("and `NAME` like '%").append(map.get("projectName")).append("%'");
         }
@@ -222,7 +228,7 @@ public class PmRosterExt {
     public void postLinkProject() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_ROSTER where AD_USER_ID=? and PROJECT_POST=?", map.get("userId"), map.get("postName"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_ROSTER pr left join post_info po on pr.POST_INFO_ID = po.id where AD_USER_ID=? and po.`NAME`=? ", map.get("userId"), map.get("postName"));
         if (CollectionUtils.isEmpty(list)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
@@ -246,14 +252,14 @@ public class PmRosterExt {
 
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         Map<String, Object> queryParams = new HashMap<>();// 创建入参map
-        queryParams.put("postName", projectPostUser.postName);
+        queryParams.put("postId", projectPostUser.postId);
         queryParams.put("userId", projectPostUser.userId);
-        myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID=null where PROJECT_POST= :postName and AD_USER_ID= :userId", queryParams);
+        myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID=null where POST_INFO_ID= :postId and AD_USER_ID= :userId", queryParams);
 
         if (!CollectionUtils.isEmpty(dataList)) {
             queryParams.put("ids", dataList);
             queryParams.put("ancestral", projectPostUser.ancestral);
-            myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID= :userId,ANCESTRAL=:ancestral where PROJECT_POST= :postName and PM_PRJ_ID in (:ids) ", queryParams);
+            myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID= :userId,ANCESTRAL=:ancestral where POST_INFO_ID= :postId and PM_PRJ_ID in (:ids) ", queryParams);
         }
     }
 
@@ -264,13 +270,18 @@ public class PmRosterExt {
     public void getProjectPost() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_ROSTER where PM_PRJ_ID=?", map.get("projectId"));
-        List<String> str = list.stream().map(p -> JdbcMapUtil.getString(p, "PROJECT_POST")).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(str)) {
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from post_info where id in(select POST_INFO_ID from PM_ROSTER where PM_PRJ_ID=?)", map.get("projectId"));
+        List<Post> postList = list.stream().map(p -> {
+            Post post = new Post();
+            post.id = JdbcMapUtil.getString(p,"ID");
+            post.name = JdbcMapUtil.getString(p,"NAME");
+            return post;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(postList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
             OutSide outSide = new OutSide();
-            outSide.strList = str;
+            outSide.postList = postList;
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
@@ -284,7 +295,7 @@ public class PmRosterExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select au.*,ANCESTRAL from ad_user au  " +
                 "left join PM_ROSTER pr on au.id = pr.AD_USER_ID " +
-                "where  PM_PRJ_ID=? and PROJECT_POST=? ", map.get("projectId"), map.get("postName"));
+                "where  PM_PRJ_ID=? and post_info_id=? ", map.get("projectId"), map.get("postId"));
         if (CollectionUtils.isEmpty(list)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
@@ -309,9 +320,9 @@ public class PmRosterExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
         for (PostUser postUser : dataList) {
-            myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID=null where PM_PRJ_ID=? and PROJECT_POST=?", editObj.projectId, postUser.postName);
+            myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID=null where PM_PRJ_ID=? and post_info_id=?", editObj.projectId, postUser.postId);
             if (!Strings.isNullOrEmpty(postUser.userId)) {
-                myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID =?,ancestral=? where PROJECT_POST=? and PM_PRJ_ID=?", postUser.userId,postUser.ancestral, postUser.postName, editObj.projectId);
+                myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID =?,ancestral=? where post_info_id=? and PM_PRJ_ID=?", postUser.userId, postUser.ancestral, postUser.postId, editObj.projectId);
             }
         }
     }
@@ -356,7 +367,7 @@ public class PmRosterExt {
     public void postDept() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_ROSTER where PROJECT_POST=?", map.get("postName"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pr.* from PM_ROSTER pr left join post_info po on pr.post_info_id = po.id  where po.`name`=?", map.get("postName"));
         List<String> ids = list.stream().map(p -> JdbcMapUtil.getString(p, "HR_DEPT_ID")).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(ids)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
@@ -374,7 +385,7 @@ public class PmRosterExt {
     public void postBondDept() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        myJdbcTemplate.update("update PM_ROSTER set HR_DEPT_ID=? where PROJECT_POST=?", map.get("deptId"), map.get("postName"));
+        myJdbcTemplate.update("update PM_ROSTER set HR_DEPT_ID=? where post_info_id=?", map.get("deptId"), map.get("postId"));
     }
 
 
@@ -384,10 +395,11 @@ public class PmRosterExt {
     public void getPostUserByPrj() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_ROSTER where PM_PRJ_ID=?", map.get("projectId"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pr.*,po.name as post_name from PM_ROSTER pr left join post_info po on pr.post_info_id = po.id  where PM_PRJ_ID=?", map.get("projectId"));
         List<PostUser> postUserList = list.stream().map(p -> {
             PostUser user = new PostUser();
-            user.postName = JdbcMapUtil.getString(p, "PROJECT_POST");
+            user.postId = JdbcMapUtil.getString(p, "post_info_id");
+            user.postName = JdbcMapUtil.getString(p, "post_name");
             user.userId = JdbcMapUtil.getString(p, "AD_USER_ID");
             user.ancestral = JdbcMapUtil.getString(p, "ANCESTRAL");
             return user;
@@ -459,6 +471,8 @@ public class PmRosterExt {
         public List<ProjectInfo> projectInfoList;
 
         public List<PostUser> postUserList;
+
+        public List<Post> postList;
     }
 
 
@@ -486,7 +500,7 @@ public class PmRosterExt {
     public static class ProjectPostUser {
         public String userId;
 
-        public String postName;
+        public String postId;
 
         /**
          * 祖籍
@@ -508,6 +522,8 @@ public class PmRosterExt {
     }
 
     public static class PostUser {
+        public String postId;
+
         public String postName;
 
         public String userId;
@@ -515,26 +531,32 @@ public class PmRosterExt {
         public String ancestral;
     }
 
+    public static class Post {
+        public String id;
+        public String name;
+    }
+
 
     /**
      * 岗位指派流程完结-数据写入
-     * @param entityRecord 数据值
-     * @param projectId 项目id
+     *
+     * @param entityRecord   数据值
+     * @param projectId      项目id
      * @param myJdbcTemplate 数据源
-     * @param map 岗位指派流程字段与岗位对应关系 key：流程表单字段 value：岗位名称
+     * @param map            岗位指派流程字段与岗位对应关系 key：流程表单字段 value：岗位名称
      */
-    public static void createDataByProcess(EntityRecord entityRecord, String projectId, MyJdbcTemplate myJdbcTemplate, Map<String,String> map) {
+    public static void createDataByProcess(EntityRecord entityRecord, String projectId, MyJdbcTemplate myJdbcTemplate, Map<String, String> map) {
         List<PmRoster> insertList = new ArrayList<>();
         //业主单位
-        String customerUnit = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
-        for (String key : map.keySet()){
-            String valueUser = JdbcMapUtil.getString(entityRecord.valueMap,key);
-            if (!SharedUtil.isEmptyString(valueUser)){
+        String customerUnit = JdbcMapUtil.getString(entityRecord.valueMap, "CUSTOMER_UNIT");
+        for (String key : map.keySet()) {
+            String valueUser = JdbcMapUtil.getString(entityRecord.valueMap, key);
+            if (!SharedUtil.isEmptyString(valueUser)) {
                 String value = map.get(key);
-                String postId = PostInfo.selectByWhere(new Where().eq(PostInfo.Cols.YES_NO_ONE,"0099799190825080669")
-                        .eq(PostInfo.Cols.STATUS,"AP").eq(PostInfo.Cols.NAME,value)).get(0).getId();
+                String postId = PostInfo.selectByWhere(new Where().eq(PostInfo.Cols.YES_NO_ONE, "0099799190825080669")
+                        .eq(PostInfo.Cols.STATUS, "AP").eq(PostInfo.Cols.NAME, value)).get(0).getId();
                 //部门id查询
-                String deptId = HrDept.selectByWhere(new Where().eq(HrDept.Cols.CUSTOMER_UNIT,customerUnit).eq(HrDept.Cols.NAME,value)).get(0).getHrDeptPid();
+                String deptId = HrDept.selectByWhere(new Where().eq(HrDept.Cols.CUSTOMER_UNIT, customerUnit).eq(HrDept.Cols.NAME, value)).get(0).getHrDeptPid();
                 PmRoster pmRoster = new PmRoster();
                 pmRoster.setPmPrjId(projectId);
                 pmRoster.setAdUserId(valueUser);
@@ -544,20 +566,20 @@ public class PmRosterExt {
                 insertList.add(pmRoster);
             }
         }
-        if (!CollectionUtils.isEmpty(insertList)){
+        if (!CollectionUtils.isEmpty(insertList)) {
             for (PmRoster tmp : insertList) {
                 //判断该项目该岗位是否存在，获取id
                 String pmPosterId = "";
-                List<PmRoster> list = PmRoster.selectByWhere(new Where().eq(PmRoster.Cols.PM_PRJ_ID,projectId).eq(PmRoster.Cols.POST_INFO_ID, tmp.getPostInfoId()));
-                if (CollectionUtils.isEmpty(list)){
+                List<PmRoster> list = PmRoster.selectByWhere(new Where().eq(PmRoster.Cols.PM_PRJ_ID, projectId).eq(PmRoster.Cols.POST_INFO_ID, tmp.getPostInfoId()));
+                if (CollectionUtils.isEmpty(list)) {
                     pmPosterId = Crud.from("PM_ROSTER").insertData();
                 } else {
                     pmPosterId = list.get(0).getId();
                 }
-                Crud.from("PM_ROSTER").where().eq("ID",pmPosterId).update()
-                        .set("PM_PRJ_ID",projectId).set("CUSTOMER_UNIT",customerUnit)
-                        .set("POST_INFO_ID",tmp.getPostInfoId()).set("AD_USER_ID",tmp.getAdUserId())
-                        .set("HR_DEPT_ID",tmp.getHrDeptId())
+                Crud.from("PM_ROSTER").where().eq("ID", pmPosterId).update()
+                        .set("PM_PRJ_ID", projectId).set("CUSTOMER_UNIT", customerUnit)
+                        .set("POST_INFO_ID", tmp.getPostInfoId()).set("AD_USER_ID", tmp.getAdUserId())
+                        .set("HR_DEPT_ID", tmp.getHrDeptId())
                         .exec();
             }
         }

@@ -61,8 +61,10 @@ public class ProjectPostImportController extends BaseController {
         List<String> res = new ArrayList<>();
         List<Map<String, Object>> prjList = jdbcTemplate.queryForList("select id,name from pm_prj where status = 'AP'");
 
+        List<Map<String, Object>> postList = jdbcTemplate.queryForList("select * from post_info where status ='ap'");
+
         for (int i = postModelList.size() - 1; i >= 0; i--) {//保证列表显示顺序和表格顺序一致
-            List<String> singleRes = this.insertData(postModelList.get(i), prjList);
+            List<String> singleRes = this.insertData(postModelList.get(i), prjList, postList);
             if (!CollectionUtils.isEmpty(singleRes)) {
                 res.addAll(singleRes);
             }
@@ -78,7 +80,7 @@ public class ProjectPostImportController extends BaseController {
         }
     }
 
-    private List<String> insertData(ProjectPostModel model, List<Map<String, Object>> prjList) {
+    private List<String> insertData(ProjectPostModel model, List<Map<String, Object>> prjList, List<Map<String, Object>> postList) {
         List<String> res = new ArrayList<>();
         if (model == null) {
             return null;
@@ -91,13 +93,21 @@ public class ProjectPostImportController extends BaseController {
         }
         String prjId = String.valueOf(optional.get().get("id"));
 
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from PM_ROSTER where PM_PRJ_ID=? and PROJECT_POST=?", prjId, model.getPostName());
+
+        Optional<Map<String, Object>> postOptional = postList.stream().filter(p -> String.valueOf(p.get("name")).equals(model.getPostName())).findAny();
+        if (!postOptional.isPresent()) {
+            res.add("岗位名称为:" + model.getPostName() + "不存在，未导入！");
+            return res;
+        }
+        String postId = String.valueOf(postOptional.get().get("id"));
+
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from PM_ROSTER where PM_PRJ_ID=? and post_info_id=?", prjId, postId);
         if (!CollectionUtils.isEmpty(list)) {
             res.add("项目名称为:" + model.getProjectName() + "岗位" + model.getPostName() + "已存在！");
             return res;
         }
         String id = Util.insertData(jdbcTemplate, "PM_ROSTER");
-        jdbcTemplate.update("update PM_ROSTER set PM_PRJ_ID =?,PROJECT_POST=? where id=?", prjId, model.getPostName(), id);
+        jdbcTemplate.update("update PM_ROSTER set PM_PRJ_ID =?,post_info_id=? where id=?", prjId, postId, id);
         return res;
     }
 }
