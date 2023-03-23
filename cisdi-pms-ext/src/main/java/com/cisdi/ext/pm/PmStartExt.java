@@ -114,7 +114,7 @@ public class PmStartExt {
                 " ps.PM_CODE as PM_CODE, " +
                 " ps.INVESTMENT_SOURCE_ID as INVESTMENT_SOURCE_ID, " +
                 " gg.`NAME` as sourceTypeValue," +
-                " round(ifnull( PRJ_TOTAL_INVEST, 0 ),2) AS PRJ_TOTAL_INVEST," +
+                " round(ifnull( PRJ_TOTAL_INVEST, 0 ),2)/10000 AS PRJ_TOTAL_INVEST," +
                 " ps.PROJECT_TYPE_ID as PROJECT_TYPE_ID," +
                 " gsv.`NAME` AS typeValue," +
                 " ps.BUILDER_UNIT as BUILDER_UNIT," +

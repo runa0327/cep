@@ -60,10 +60,12 @@ public class ProjectRosterImportController extends BaseController {
         List<String> res = new ArrayList<>();
         List<Map<String, Object>> prjList = jdbcTemplate.queryForList("select id,name from pm_prj where status = 'AP'");
 
+        List<Map<String, Object>> postList = jdbcTemplate.queryForList("select * from post_info where status ='ap'");
+
         List<Map<String, Object>> userList = jdbcTemplate.queryForList("select id,name from ad_user where status = 'AP'");
 
         for (int i = rosterModelList.size() - 1; i >= 0; i--) {//保证列表显示顺序和表格顺序一致
-            List<String> singleRes = this.insertData(rosterModelList.get(i), prjList, userList);
+            List<String> singleRes = this.insertData(rosterModelList.get(i), prjList, postList, userList);
             if (!CollectionUtils.isEmpty(singleRes)) {
                 res.addAll(singleRes);
             }
@@ -79,7 +81,7 @@ public class ProjectRosterImportController extends BaseController {
         }
     }
 
-    private List<String> insertData(ProjectRosterModel model, List<Map<String, Object>> prjList, List<Map<String, Object>> userList) {
+    private List<String> insertData(ProjectRosterModel model, List<Map<String, Object>> prjList, List<Map<String, Object>> postList, List<Map<String, Object>> userList) {
         List<String> res = new ArrayList<>();
         if (model == null) {
             return null;
@@ -92,6 +94,13 @@ public class ProjectRosterImportController extends BaseController {
         }
         String prjId = String.valueOf(optional.get().get("id"));
 
+        Optional<Map<String, Object>> postOptional = postList.stream().filter(p -> String.valueOf(p.get("name")).equals(model.getPostName())).findAny();
+        if (!postOptional.isPresent()) {
+            res.add("岗位名称为:" + model.getPostName() + "不存在，未导入！");
+            return res;
+        }
+        String postId = String.valueOf(postOptional.get().get("id"));
+
         Optional<Map<String, Object>> userOptional = userList.stream().filter(p -> String.valueOf(p.get("name")).equals(model.getUserName())).findAny();
         if (!userOptional.isPresent()) {
             res.add("用户名称为:" + model.getUserName() + "不存在，未导入！");
@@ -99,12 +108,12 @@ public class ProjectRosterImportController extends BaseController {
         }
         String userId = String.valueOf(userOptional.get().get("id"));
 
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from PM_ROSTER where PM_PRJ_ID=? and PROJECT_POST=?", prjId, model.getPostName());
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from PM_ROSTER where PM_PRJ_ID=? and post_info_id=?", prjId, postId);
         if (!CollectionUtils.isEmpty(list)) {
             jdbcTemplate.update("update PM_ROSTER set AD_USER_ID=? where id=?", userId, list.get(0).get("ID"));
         } else {
             String id = Util.insertData(jdbcTemplate, "PM_ROSTER");
-            jdbcTemplate.update("update PM_ROSTER set PM_PRJ_ID =?,PROJECT_POST=?,AD_USER_ID=? where id=?", prjId, model.getPostName(), userId, id);
+            jdbcTemplate.update("update PM_ROSTER set PM_PRJ_ID =?,post_info_id=?,AD_USER_ID=? where id=?", prjId, postId, userId, id);
         }
         return res;
     }
