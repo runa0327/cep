@@ -123,12 +123,14 @@ public class WeeklyReportExt {
                     userStat.ctStart = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart)).count();
                     userStat.ctApprove = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isApprove)).count();
                     userStat.ctEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isEnd)).count();
+                    userStat.ctUnend = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isUnend)).count();
                     userStat.ctStartApproveEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart) || Boolean.TRUE.equals(reportDtl.isApprove) || Boolean.TRUE.equals(reportDtl.isEnd)).count();
+                    userStat.ctProject= userEntry.getValue().stream().filter(reportDtl -> reportDtl.prj!=null).map(reportDtl -> reportDtl.prj.id).distinct().count();
                     return userStat;
-                }).collect(Collectors.toList());
+                }).sorted((o1, o2) -> o2.ctStartApproveEnd.compareTo(o1.ctStartApproveEnd)).collect(Collectors.toList());
 
                 return deptStat;
-            }).collect(Collectors.toList());
+            }).sorted(Comparator.comparing(o -> o.dept.text)).collect(Collectors.toList());
 
             report.deptStatList = deptStatList;
         }
@@ -199,6 +201,8 @@ public class WeeklyReportExt {
             reportDtl.isStart = JdbcMapUtil.getBoolean(item, "IS_START");
             reportDtl.isApprove = JdbcMapUtil.getBoolean(item, "IS_APPROVE");
             reportDtl.isEnd = JdbcMapUtil.getBoolean(item, "IS_END");
+            // TODO 230323 暂未写入待办，直接为true：
+            reportDtl.isUnend=true;
             reportDtl.isNotiDeptOnEnd = JdbcMapUtil.getBoolean(item, "IS_NOTI_DEPT_ON_END");
             reportDtl.isNotiLeaderOnEnd = JdbcMapUtil.getBoolean(item, "IS_NOTI_LEADER_ON_END");
 
@@ -305,6 +309,9 @@ public class WeeklyReportExt {
         public boolean isEnd;
         public boolean isNotiDeptOnEnd;
         public boolean isNotiLeaderOnEnd;
+
+        public boolean isUnend;
+
         public Prj prj;
         public ProcInst procInst;
 
