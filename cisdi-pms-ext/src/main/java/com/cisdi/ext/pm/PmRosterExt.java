@@ -603,13 +603,42 @@ public class PmRosterExt {
      * @param deptId 流程岗位id
      * @param companyId 业主单位id
      * @param projectId 项目id
-     * @param myJdbcTemplate 数据源
      * @return 项目岗位人员id
      */
-    public static List<String> getDeptUserByDept(String deptId, String companyId, String projectId, MyJdbcTemplate myJdbcTemplate) {
+    public static List<String> getDeptUserByDept(List<String> deptId, String companyId, String projectId) {
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+        Map<String,Object> map = new HashMap<>();
+        map.put("ids",deptId);
+        map.put("companyId",companyId);
         List<String> userList = new ArrayList<>();
+        String user = "";
         String[] arr = projectId.split(",");
+        for (String prjId : arr) {
+            map.put("prjId",prjId);
+            String sql = "select a.AD_USER_ID FROM PM_ROSTER a " +
+                    "LEFT JOIN post_info B ON A.POST_INFO_ID = B.ID " +
+                    "LEFT JOIN PM_POST_PROPRJ C ON B.ID = C.POST_INFO_ID " +
+                    "WHERE a.PM_PRJ_ID = :prjId and a.CUSTOMER_UNIT = :companyId AND C.BASE_PROCESS_POST_ID in (:ids) AND A.STATUS = 'AP' AND B.STATUS = 'AP' AND C.STATUS = 'AP'";
+            List<Map<String,Object>> list = myNamedParameterJdbcTemplate.queryForList(sql,map);
+            if (!CollectionUtils.isEmpty(list)){
+                for (Map<String, Object> tmp : list) {
+                    user = JdbcMapUtil.getString(tmp,"AD_USER_ID");
+                    if (!SharedUtil.isEmptyString(user)){
+                        if (!userList.contains(user)){
+                            userList.add(user);
+                        }
+                    }
+                }
+
+            }
+        }
         return userList;
+    }
+
+    public static void main(String[] args) {
+        String ss = "dadadasd,sdadad";
+        List<String> list = Arrays.asList(ss.split(","));
+        System.out.println(list);
     }
 
 }

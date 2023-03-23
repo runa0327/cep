@@ -3723,28 +3723,22 @@ public class AttLinkExt {
         if ("PM_POST_APPOINT".equals(entCode)){ //岗位指派单独查询项目信息逻辑
             AttLinkExtDetail.selectPostAppointLink(attLinkResult,attValue,myJdbcTemplate);
         } else {
-            // 项目基础信息
-            String sql1 = "select t.PRJ_CODE as prj_code,t.code code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
-                    "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,t.PROJECT_TYPE_ID,st.id st_id,st.name st_name," +
-                    "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
-                    "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.BUILDING_AREA, " +
-                    "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS'," +
-                    "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD'," +
-                    "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget'," +
-                    "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE,t.PRJ_EARLY_USER_ID,t.PRJ_DESIGN_USER_ID,t.PRJ_COST_USER_ID " +
-                    "from pm_prj t left join PM_PARTY c on t.CUSTOMER_UNIT=c.id " +
-                    "LEFT JOIN gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
-                    "LEFT JOIN gr_set_value l on t.BASE_LOCATION_ID=l.id " +
-                    "LEFT JOIN gr_set_value pt on t.PROJECT_TYPE_ID=pt.id " +
-                    "LEFT JOIN gr_set_value st on t.CON_SCALE_TYPE_ID=st.id " +
-                    "LEFT JOIN gr_set_value su on t.CON_SCALE_UOM_ID=su.id where t.id=? ";
-            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql1, attValue);
+            //查询项目相关信息
+            List<Map<String, Object>> list = LinkSql.PmPrjIdLink(attValue,myJdbcTemplate);
 
             //清空项目基础信息
             AttLinkExtDetail.clearBaseProjectDataNOPrj(attLinkResult);
             AttLinkExtDetail.clearProjectAmtData(attLinkResult);
 
             if (!CollectionUtils.isEmpty(list)){
+                //需要自动岗位人员的流程
+                List<String> processUserList = AttLinkDifferentProcess.getLinkUserProcess();
+                if (processUserList.contains(entCode)){
+                    //业主单位
+                    String companyId = JdbcMapUtil.getString(list.get(0),"customer_id");
+                    AttLinkExtDetail.processLinkUser(attValue,entCode,companyId,attLinkResult,myJdbcTemplate);
+                }
+
                 Map row = list.get(0);
                 if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)) { // 工程开工报审
                     AttLinkProcessDetail.pmPrjKickOffReqPrjLink(attLinkResult,attValue,myJdbcTemplate);
