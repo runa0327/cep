@@ -106,6 +106,7 @@ public class AttLinkDifferentProcess {
         list.add("PM_PRJ_RESTART_TRIAL_REQ"); // 工程复工报审表
         list.add("BID_PROCESS_MANAGE"); // 招标过程管理
         list.add("PIPELINE_RELOCATION_REQ"); // 管线迁改
+        list.add("PRJ_LAND_CHECK"); // 项目红线核查
         return list;
     }
 
