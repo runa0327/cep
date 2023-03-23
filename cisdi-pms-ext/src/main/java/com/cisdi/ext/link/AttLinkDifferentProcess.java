@@ -130,4 +130,14 @@ public class AttLinkDifferentProcess {
         list.add("PO_ORDER_CHANGE_REQ");
         return list;
     }
+
+    /**
+     * 需要自动岗位人员的流程
+     * @return 流程集合
+     */
+    public static List<String> getLinkUserProcess() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_BUY_DEMAND_REQ"); //采购需求审批
+        return list;
+    }
 }

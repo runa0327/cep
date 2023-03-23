@@ -2,6 +2,8 @@ package com.cisdi.ext.link;
 
 import com.cisdi.ext.base.AdUserExt;
 import com.cisdi.ext.base.GrSetValue;
+import com.cisdi.ext.model.PmRoster;
+import com.cisdi.ext.pm.PmBuyDemandReqExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -1061,6 +1063,24 @@ public class AttLinkExtDetail {
             attLinkResult.attMap.put(code, linkedAtt);
         }
     }
+    /**
+     * 默认岗位信息默认赋值 含不可改属性
+     * @param userId 用户id
+     * @param userName 用户姓名
+     * @param code 返回显示的页面表单字段
+     * @param changeToEditable 返回显示的页面表单字段
+     * @param attLinkResult 返回的集合
+     */
+    private static void attLinkResultAddValue(String userId, String userName, String code, Boolean changeToEditable, AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = userId;
+            linkedAtt.text = userName;
+            linkedAtt.changeToEditable = changeToEditable;
+            attLinkResult.attMap.put(code, linkedAtt);
+        }
+    }
 
     /**
      * 默认项目code和流程中的字段匹配
@@ -1187,5 +1207,47 @@ public class AttLinkExtDetail {
             linkedAtt.changeToEditable = prjNameChangeToEditable;
             attLinkResult.attMap.put("PROJECT_NAME_WR", linkedAtt);
         }
+    }
+
+    /**
+     * 流程项目带出人员信息
+     * @param projectId 项目id
+     * @param entCode 流程业务表名
+     * @param companyId 业主单位id
+     * @param attLinkResult 回显数据集
+     * @param myJdbcTemplate 数据源
+     */
+    public static void processLinkUser(String projectId, String entCode, String companyId, AttLinkResult attLinkResult,MyJdbcTemplate myJdbcTemplate) {
+        //查询该项目花名册所有人
+        List<Map<String,Object>> list = LinkSql.prjRoster(projectId,companyId,myJdbcTemplate);
+        if (!CollectionUtils.isEmpty(list)){
+            if ("PM_BUY_DEMAND_REQ".equals(entCode)){ //采购需求回显逻辑
+                Map<String,String> map = PmBuyDemandReqExt.POSTCODEMAP;
+                //人员信息回显
+                userForeach(list,map,attLinkResult,myJdbcTemplate);
+            }
+        }
+    }
+
+    /**
+     * 项目花名册岗位人员信息在流程中回显
+     * @param list 项目花名册信息
+     * @param map 流程中岗位map信息
+     * @param attLinkResult 返回回显的集合
+     * @param myJdbcTemplate 数据源
+     */
+    private static void userForeach(List<Map<String, Object>> list, Map<String, String> map, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
+        for (String key : map.keySet()){
+            for (Map<String, Object> tmp : list) {
+                String userId = JdbcMapUtil.getString(tmp,"ad_user_id");
+                String postCode = JdbcMapUtil.getString(tmp,"postInfoCode");
+                if (key.equals(postCode)){
+                    //回显赋值
+                    String userName = AdUserExt.getUserName(userId,myJdbcTemplate);
+                    attLinkResultAddValue(userId,userName,key,false,attLinkResult);
+                }
+            }
+        }
+
     }
 }

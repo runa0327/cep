@@ -792,17 +792,25 @@ public class ProcessRoleExt {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //业主单位
         String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        if (SharedUtil.isEmptyString(companyId)){
+            companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
+        }
         //项目id
         String projectId = PmPrjExt.getProjectIdByProcess(entityRecord.valueMap,myJdbcTemplate);
         //流转id
-        String flowId = "";
+        String flowId = "1608355651694862336";
 //        String flowId = ExtJarHelper.flowId.get();
         //节点id
         String nodeId = WfFlowExt.getNodeIdByFlowId(flowId);
         //查询该节点岗位
-        String deptId = PmProcessPostConExt.getDeptIdByNode(nodeId,companyId);
+        List<String> deptId = PmProcessPostConExt.getDeptIdByNode(nodeId,companyId);
         //通过岗位id、花名册查询出人员信息
-        List<String> userList = PmRosterExt.getDeptUserByDept(deptId,companyId,projectId,myJdbcTemplate);
+        List<String> userList = PmRosterExt.getDeptUserByDept(deptId,companyId,projectId);
+        if (!CollectionUtils.isEmpty(userList)){
+            ExtJarHelper.returnValue.set(userList);
+        } else {
+            throw new BaseException("该项目对应岗位没有人员，请配置该项目该岗位人员或联系管理员处理！");
+        }
     }
 
     /**

@@ -24,6 +24,13 @@ import java.util.*;
 @Slf4j
 public class PmBuyDemandReqExt {
 
+    public static final Map<String,String> POSTCODEMAP = new HashMap();
+    static {
+            POSTCODEMAP.put("AD_USER_TWO_ID","采购岗");
+            POSTCODEMAP.put("AD_USER_THREE_ID","成本岗");
+            POSTCODEMAP.put("AD_USER_FIVE_ID","财务岗");
+    }
+
     /**
      * 采购需求审批扩展-按照先后顺序审批-第一次审批
      */
