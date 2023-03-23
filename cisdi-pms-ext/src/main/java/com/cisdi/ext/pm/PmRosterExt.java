@@ -228,7 +228,7 @@ public class PmRosterExt {
     public void postLinkProject() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_ROSTER pr left join post_info po on pr.POST_INFO_ID = po.id where AD_USER_ID=? and po.`NAME`=? ", map.get("userId"), map.get("postName"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_ROSTER pr left join post_info po on pr.POST_INFO_ID = po.id where pr.AD_USER_ID=? and po.`NAME`=? ", map.get("userId"), map.get("postName"));
         if (CollectionUtils.isEmpty(list)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
