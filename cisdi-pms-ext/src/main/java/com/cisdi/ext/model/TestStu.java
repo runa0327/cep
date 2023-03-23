@@ -3,6 +3,7 @@ package com.cisdi.ext.model;
 import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
@@ -109,37 +110,37 @@ public class TestStu {
          */
         public static final String TEST_CLASS_ID = "TEST_CLASS_ID";
         /**
-         * 数据库验证密码。
+         * 测试密码。
          */
-        public static final String PASSWORD = "PASSWORD";
+        public static final String TEST_PASSWORD = "TEST_PASSWORD";
         /**
-         * 计算次数。
+         * 测试整数。
          */
-        public static final String CALC_TIMES = "CALC_TIMES";
+        public static final String TEST_INT = "TEST_INT";
         /**
-         * 签订金额。
+         * 测试浮点。
          */
-        public static final String SIGN_AMT = "SIGN_AMT";
+        public static final String TEST_DOUBLE = "TEST_DOUBLE";
         /**
-         * 签订日期。
+         * 测试日期。
          */
-        public static final String SIGN_DATE = "SIGN_DATE";
+        public static final String TEST_DATE = "TEST_DATE";
         /**
          * 测试时间。
          */
         public static final String TEST_TIME = "TEST_TIME";
         /**
-         * 计算日期时间。
+         * 测试日期时间。
          */
-        public static final String CALC_DTTM = "CALC_DTTM";
+        public static final String TEST_DTTM = "TEST_DTTM";
         /**
-         * 计算成功。
+         * 测试布尔。
          */
-        public static final String CALC_SUCC = "CALC_SUCC";
+        public static final String TEST_BOOL = "TEST_BOOL";
         /**
-         * 任务用户附件。
+         * 测试文件组。
          */
-        public static final String TASK_USER_ATTACHMENT = "TASK_USER_ATTACHMENT";
+        public static final String TEST_FILE_GROUP = "TEST_FILE_GROUP";
     }
 
     // </editor-fold>
@@ -688,144 +689,144 @@ public class TestStu {
     }
 
     /**
-     * 数据库验证密码。
+     * 测试密码。
      */
-    private String password;
+    private String testPassword;
 
     /**
-     * 获取：数据库验证密码。
+     * 获取：测试密码。
      */
-    public String getPassword() {
-        return this.password;
+    public String getTestPassword() {
+        return this.testPassword;
     }
 
     /**
-     * 设置：数据库验证密码。
+     * 设置：测试密码。
      */
-    public TestStu setPassword(String password) {
-        if (this.password == null && password == null) {
+    public TestStu setTestPassword(String testPassword) {
+        if (this.testPassword == null && testPassword == null) {
             // 均为null，不做处理。
-        } else if (this.password != null && password != null) {
+        } else if (this.testPassword != null && testPassword != null) {
             // 均非null，判定不等，再做处理：
-            if (this.password.compareTo(password) != 0) {
-                this.password = password;
-                if (!this.toUpdateCols.contains("PASSWORD")) {
-                    this.toUpdateCols.add("PASSWORD");
+            if (this.testPassword.compareTo(testPassword) != 0) {
+                this.testPassword = testPassword;
+                if (!this.toUpdateCols.contains("TEST_PASSWORD")) {
+                    this.toUpdateCols.add("TEST_PASSWORD");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.password = password;
-            if (!this.toUpdateCols.contains("PASSWORD")) {
-                this.toUpdateCols.add("PASSWORD");
+            this.testPassword = testPassword;
+            if (!this.toUpdateCols.contains("TEST_PASSWORD")) {
+                this.toUpdateCols.add("TEST_PASSWORD");
             }
         }
         return this;
     }
 
     /**
-     * 计算次数。
+     * 测试整数。
      */
-    private Integer calcTimes;
+    private Integer testInt;
 
     /**
-     * 获取：计算次数。
+     * 获取：测试整数。
      */
-    public Integer getCalcTimes() {
-        return this.calcTimes;
+    public Integer getTestInt() {
+        return this.testInt;
     }
 
     /**
-     * 设置：计算次数。
+     * 设置：测试整数。
      */
-    public TestStu setCalcTimes(Integer calcTimes) {
-        if (this.calcTimes == null && calcTimes == null) {
+    public TestStu setTestInt(Integer testInt) {
+        if (this.testInt == null && testInt == null) {
             // 均为null，不做处理。
-        } else if (this.calcTimes != null && calcTimes != null) {
+        } else if (this.testInt != null && testInt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.calcTimes.compareTo(calcTimes) != 0) {
-                this.calcTimes = calcTimes;
-                if (!this.toUpdateCols.contains("CALC_TIMES")) {
-                    this.toUpdateCols.add("CALC_TIMES");
+            if (this.testInt.compareTo(testInt) != 0) {
+                this.testInt = testInt;
+                if (!this.toUpdateCols.contains("TEST_INT")) {
+                    this.toUpdateCols.add("TEST_INT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.calcTimes = calcTimes;
-            if (!this.toUpdateCols.contains("CALC_TIMES")) {
-                this.toUpdateCols.add("CALC_TIMES");
+            this.testInt = testInt;
+            if (!this.toUpdateCols.contains("TEST_INT")) {
+                this.toUpdateCols.add("TEST_INT");
             }
         }
         return this;
     }
 
     /**
-     * 签订金额。
+     * 测试浮点。
      */
-    private BigDecimal signAmt;
+    private BigDecimal testDouble;
 
     /**
-     * 获取：签订金额。
+     * 获取：测试浮点。
      */
-    public BigDecimal getSignAmt() {
-        return this.signAmt;
+    public BigDecimal getTestDouble() {
+        return this.testDouble;
     }
 
     /**
-     * 设置：签订金额。
+     * 设置：测试浮点。
      */
-    public TestStu setSignAmt(BigDecimal signAmt) {
-        if (this.signAmt == null && signAmt == null) {
+    public TestStu setTestDouble(BigDecimal testDouble) {
+        if (this.testDouble == null && testDouble == null) {
             // 均为null，不做处理。
-        } else if (this.signAmt != null && signAmt != null) {
+        } else if (this.testDouble != null && testDouble != null) {
             // 均非null，判定不等，再做处理：
-            if (this.signAmt.compareTo(signAmt) != 0) {
-                this.signAmt = signAmt;
-                if (!this.toUpdateCols.contains("SIGN_AMT")) {
-                    this.toUpdateCols.add("SIGN_AMT");
+            if (this.testDouble.compareTo(testDouble) != 0) {
+                this.testDouble = testDouble;
+                if (!this.toUpdateCols.contains("TEST_DOUBLE")) {
+                    this.toUpdateCols.add("TEST_DOUBLE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.signAmt = signAmt;
-            if (!this.toUpdateCols.contains("SIGN_AMT")) {
-                this.toUpdateCols.add("SIGN_AMT");
+            this.testDouble = testDouble;
+            if (!this.toUpdateCols.contains("TEST_DOUBLE")) {
+                this.toUpdateCols.add("TEST_DOUBLE");
             }
         }
         return this;
     }
 
     /**
-     * 签订日期。
+     * 测试日期。
      */
-    private LocalDate signDate;
+    private LocalDate testDate;
 
     /**
-     * 获取：签订日期。
+     * 获取：测试日期。
      */
-    public LocalDate getSignDate() {
-        return this.signDate;
+    public LocalDate getTestDate() {
+        return this.testDate;
     }
 
     /**
-     * 设置：签订日期。
+     * 设置：测试日期。
      */
-    public TestStu setSignDate(LocalDate signDate) {
-        if (this.signDate == null && signDate == null) {
+    public TestStu setTestDate(LocalDate testDate) {
+        if (this.testDate == null && testDate == null) {
             // 均为null，不做处理。
-        } else if (this.signDate != null && signDate != null) {
+        } else if (this.testDate != null && testDate != null) {
             // 均非null，判定不等，再做处理：
-            if (this.signDate.compareTo(signDate) != 0) {
-                this.signDate = signDate;
-                if (!this.toUpdateCols.contains("SIGN_DATE")) {
-                    this.toUpdateCols.add("SIGN_DATE");
+            if (this.testDate.compareTo(testDate) != 0) {
+                this.testDate = testDate;
+                if (!this.toUpdateCols.contains("TEST_DATE")) {
+                    this.toUpdateCols.add("TEST_DATE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.signDate = signDate;
-            if (!this.toUpdateCols.contains("SIGN_DATE")) {
-                this.toUpdateCols.add("SIGN_DATE");
+            this.testDate = testDate;
+            if (!this.toUpdateCols.contains("TEST_DATE")) {
+                this.toUpdateCols.add("TEST_DATE");
             }
         }
         return this;
@@ -868,108 +869,108 @@ public class TestStu {
     }
 
     /**
-     * 计算日期时间。
+     * 测试日期时间。
      */
-    private LocalDateTime calcDttm;
+    private LocalDateTime testDttm;
 
     /**
-     * 获取：计算日期时间。
+     * 获取：测试日期时间。
      */
-    public LocalDateTime getCalcDttm() {
-        return this.calcDttm;
+    public LocalDateTime getTestDttm() {
+        return this.testDttm;
     }
 
     /**
-     * 设置：计算日期时间。
+     * 设置：测试日期时间。
      */
-    public TestStu setCalcDttm(LocalDateTime calcDttm) {
-        if (this.calcDttm == null && calcDttm == null) {
+    public TestStu setTestDttm(LocalDateTime testDttm) {
+        if (this.testDttm == null && testDttm == null) {
             // 均为null，不做处理。
-        } else if (this.calcDttm != null && calcDttm != null) {
+        } else if (this.testDttm != null && testDttm != null) {
             // 均非null，判定不等，再做处理：
-            if (this.calcDttm.compareTo(calcDttm) != 0) {
-                this.calcDttm = calcDttm;
-                if (!this.toUpdateCols.contains("CALC_DTTM")) {
-                    this.toUpdateCols.add("CALC_DTTM");
+            if (this.testDttm.compareTo(testDttm) != 0) {
+                this.testDttm = testDttm;
+                if (!this.toUpdateCols.contains("TEST_DTTM")) {
+                    this.toUpdateCols.add("TEST_DTTM");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.calcDttm = calcDttm;
-            if (!this.toUpdateCols.contains("CALC_DTTM")) {
-                this.toUpdateCols.add("CALC_DTTM");
+            this.testDttm = testDttm;
+            if (!this.toUpdateCols.contains("TEST_DTTM")) {
+                this.toUpdateCols.add("TEST_DTTM");
             }
         }
         return this;
     }
 
     /**
-     * 计算成功。
+     * 测试布尔。
      */
-    private Boolean calcSucc;
+    private Boolean testBool;
 
     /**
-     * 获取：计算成功。
+     * 获取：测试布尔。
      */
-    public Boolean getCalcSucc() {
-        return this.calcSucc;
+    public Boolean getTestBool() {
+        return this.testBool;
     }
 
     /**
-     * 设置：计算成功。
+     * 设置：测试布尔。
      */
-    public TestStu setCalcSucc(Boolean calcSucc) {
-        if (this.calcSucc == null && calcSucc == null) {
+    public TestStu setTestBool(Boolean testBool) {
+        if (this.testBool == null && testBool == null) {
             // 均为null，不做处理。
-        } else if (this.calcSucc != null && calcSucc != null) {
+        } else if (this.testBool != null && testBool != null) {
             // 均非null，判定不等，再做处理：
-            if (this.calcSucc.compareTo(calcSucc) != 0) {
-                this.calcSucc = calcSucc;
-                if (!this.toUpdateCols.contains("CALC_SUCC")) {
-                    this.toUpdateCols.add("CALC_SUCC");
+            if (this.testBool.compareTo(testBool) != 0) {
+                this.testBool = testBool;
+                if (!this.toUpdateCols.contains("TEST_BOOL")) {
+                    this.toUpdateCols.add("TEST_BOOL");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.calcSucc = calcSucc;
-            if (!this.toUpdateCols.contains("CALC_SUCC")) {
-                this.toUpdateCols.add("CALC_SUCC");
+            this.testBool = testBool;
+            if (!this.toUpdateCols.contains("TEST_BOOL")) {
+                this.toUpdateCols.add("TEST_BOOL");
             }
         }
         return this;
     }
 
     /**
-     * 任务用户附件。
+     * 测试文件组。
      */
-    private String taskUserAttachment;
+    private String testFileGroup;
 
     /**
-     * 获取：任务用户附件。
+     * 获取：测试文件组。
      */
-    public String getTaskUserAttachment() {
-        return this.taskUserAttachment;
+    public String getTestFileGroup() {
+        return this.testFileGroup;
     }
 
     /**
-     * 设置：任务用户附件。
+     * 设置：测试文件组。
      */
-    public TestStu setTaskUserAttachment(String taskUserAttachment) {
-        if (this.taskUserAttachment == null && taskUserAttachment == null) {
+    public TestStu setTestFileGroup(String testFileGroup) {
+        if (this.testFileGroup == null && testFileGroup == null) {
             // 均为null，不做处理。
-        } else if (this.taskUserAttachment != null && taskUserAttachment != null) {
+        } else if (this.testFileGroup != null && testFileGroup != null) {
             // 均非null，判定不等，再做处理：
-            if (this.taskUserAttachment.compareTo(taskUserAttachment) != 0) {
-                this.taskUserAttachment = taskUserAttachment;
-                if (!this.toUpdateCols.contains("TASK_USER_ATTACHMENT")) {
-                    this.toUpdateCols.add("TASK_USER_ATTACHMENT");
+            if (this.testFileGroup.compareTo(testFileGroup) != 0) {
+                this.testFileGroup = testFileGroup;
+                if (!this.toUpdateCols.contains("TEST_FILE_GROUP")) {
+                    this.toUpdateCols.add("TEST_FILE_GROUP");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.taskUserAttachment = taskUserAttachment;
-            if (!this.toUpdateCols.contains("TASK_USER_ATTACHMENT")) {
-                this.toUpdateCols.add("TASK_USER_ATTACHMENT");
+            this.testFileGroup = testFileGroup;
+            if (!this.toUpdateCols.contains("TEST_FILE_GROUP")) {
+                this.toUpdateCols.add("TEST_FILE_GROUP");
             }
         }
         return this;
@@ -993,6 +994,22 @@ public class TestStu {
     }
 
     /**
+     * 根据ID插入数据。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
+     */
+    public void insertById(boolean refreshThis) {
+        insertById(null, null, refreshThis);
+    }
+
+    /**
+     * 根据ID插入数据。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     */
+    public void insertById() {
+        insertById(null, null, false);
+    }
+
+    /**
      * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param includeCols 更新时包含的列，空为包含所有。
@@ -1011,6 +1028,22 @@ public class TestStu {
             modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
             this.clearToUpdateCols();
         }
+    }
+
+    /**
+     * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
+     */
+    public void updateById(boolean refreshThis) {
+        updateById(null, null, refreshThis);
+    }
+
+    /**
+     * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     */
+    public void updateById() {
+        updateById(null, null, false);
     }
 
     /**
@@ -1059,6 +1092,16 @@ public class TestStu {
     }
 
     /**
+     * 根据ID获取数据。
+     *
+     * @param id ID。
+     * @return 获取到的对象，若无则为null。
+     */
+    public static TestStu selectById(String id) {
+        return selectById(id, null, null);
+    }
+
+    /**
      * 根据ID列表获取数据。
      *
      * @param ids         ID列表。
@@ -1069,6 +1112,16 @@ public class TestStu {
     public static List<TestStu> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
         List<TestStu> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
+    }
+
+    /**
+     * 根据ID列表获取数据。
+     *
+     * @param ids ID列表。
+     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
+     */
+    public static List<TestStu> selectByIds(List<String> ids) {
+        return selectByIds(ids, null, null);
     }
 
     /**
@@ -1085,6 +1138,43 @@ public class TestStu {
     }
 
     /**
+     * 根据Where条件获取数据。
+     *
+     * @param where Where条件。
+     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
+     */
+    public static List<TestStu> selectByWhere(Where where) {
+        return selectByWhere(where, null, null);
+    }
+
+    /**
+     * 根据Where条件获取数据。
+     *
+     * @param where       Where条件。
+     * @param includeCols 获取时包含的列，空为包含所有。
+     * @param excludeCols 获取时排除的列，空为不排除。
+     * @return 获取到的对象。
+     */
+    public static TestStu selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<TestStu> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+        if (objList != null && objList.size() > 1) {
+            throw new BaseException("调用TestStu.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+        }
+
+        return SharedUtil.isEmptyList(objList) ? null : objList.get(0);
+    }
+
+    /**
+     * 根据Where条件获取数据。
+     *
+     * @param where Where条件。
+     * @return 获取到的对象。
+     */
+    public static TestStu selectOneByWhere(Where where) {
+        return selectOneByWhere(where, null, null);
+    }
+
+    /**
      * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param id          ID。
@@ -1095,6 +1185,17 @@ public class TestStu {
      */
     public static int updateById(String id, Map<String, Object> keyValueMap, List<String> includeCols, List<String> excludeCols) {
         return modelHelper.updateById(id, keyValueMap, includeCols, excludeCols);
+    }
+
+    /**
+     * 根据ID更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param id          ID。
+     * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
+     * @return 影响的行数。
+     */
+    public static int updateById(String id, Map<String, Object> keyValueMap) {
+        return updateById(id, keyValueMap, null, null);
     }
 
     /**
@@ -1111,6 +1212,17 @@ public class TestStu {
     }
 
     /**
+     * 根据ID列表更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param ids         ID列表。
+     * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
+     * @return 影响的行数。
+     */
+    public static int updateByIds(List<String> ids, Map<String, Object> keyValueMap) {
+        return updateByIds(ids, keyValueMap, null, null);
+    }
+
+    /**
      * 根据Where条件更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
      *
      * @param where       Where条件。
@@ -1121,6 +1233,17 @@ public class TestStu {
      */
     public static int updateByWhere(Where where, Map<String, Object> keyValueMap, List<String> includeCols, List<String> excludeCols) {
         return modelHelper.updateByWhere(where, keyValueMap, includeCols, excludeCols);
+    }
+
+    /**
+     * 根据Where条件更新数据。ID自身不会更新。将忽略用户设置、并自动设置VER、TS、LAST_MODI_DT、LAST_MODI_USER_ID（若有）。
+     *
+     * @param where       Where条件。
+     * @param keyValueMap 要更新的列和新值。其中，key为列名、value为新值（可为null）。
+     * @return 影响的行数。
+     */
+    public static int updateByWhere(Where where, Map<String, Object> keyValueMap) {
+        return updateByWhere(where, keyValueMap, null, null);
     }
 
     /**
@@ -1163,6 +1286,16 @@ public class TestStu {
      */
     public static void copyCols(TestStu fromModel, TestStu toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
+    }
+
+    /**
+     * 拷贝列值。
+     *
+     * @param fromModel 从模型。
+     * @param toModel   到模型。
+     */
+    public static void copyCols(TestStu fromModel, TestStu toModel) {
+        copyCols(fromModel, toModel, null, null);
     }
 
     // </editor-fold>

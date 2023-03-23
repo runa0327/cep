@@ -566,7 +566,6 @@ public class AttLinkExt {
                 linkedAtt.value = null;
                 linkedAtt.text = null;
                 linkedAtt.changeToMandatory = CONTRACT_IDChangeToMandatory;
-//                linkedAtt.changeToShown = CONTRACT_IDChangeToShown;
                 linkedAtt.changeToShown = false;
                 linkedAtt.changeToEditable = CONTRACT_IDChangeToEditable;
                 attLinkResult.attMap.put("CONTRACT_ID", linkedAtt);
@@ -593,12 +592,11 @@ public class AttLinkExt {
             }
             return attLinkResult;
         }
-//        else if ("PO_ORDER_CHANGE_REQ".equals(entCode)){ //合同需求变更
-//            AttLinkExtDetail.getPoOrderChange(attLinkResult,code);
-//            return attLinkResult;
-//        }
-        else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)
-                || "PO_ORDER_CHANGE_REQ".equals(entCode) || "PO_ORDER_TERMINATE_REQ".equals(entCode)){ //采购合同签订申请 补充协议 合同终止
+        else if ("PO_ORDER_CHANGE_REQ".equals(entCode)){ //合同需求变更
+            AttLinkExtDetail.autoLinkProject(attLinkResult,code,entCode);
+            return attLinkResult;
+        }
+        else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "PO_ORDER_TERMINATE_REQ".equals(entCode)){ //采购合同签订申请 补充协议 合同终止
             //系统(system)，非系统(non_system)
             attLinkResult = autoLinkProject(attValue,code);
             attLinkResult = autoLinkPrjDetail(attLinkResult,attValue,code);
@@ -3720,49 +3718,53 @@ public class AttLinkExt {
 
     private AttLinkResult linkForPM_PRJ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        // 项目基础信息
-        String sql1 = "select t.PRJ_CODE as prj_code,t.code code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
-                "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,t.PROJECT_TYPE_ID,st.id st_id,st.name st_name," +
-                "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
-                "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.BUILDING_AREA, " +
-                "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS'," +
-                "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD'," +
-                "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget'," +
-                "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE,t.PRJ_EARLY_USER_ID,t.PRJ_DESIGN_USER_ID,t.PRJ_COST_USER_ID,t.ESTIMATED_TOTAL_INVEST " +
-                "from pm_prj t left join PM_PARTY c on t.CUSTOMER_UNIT=c.id " +
-                "LEFT JOIN gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
-                "LEFT JOIN gr_set_value l on t.BASE_LOCATION_ID=l.id " +
-                "LEFT JOIN gr_set_value pt on t.PROJECT_TYPE_ID=pt.id " +
-                "LEFT JOIN gr_set_value st on t.CON_SCALE_TYPE_ID=st.id " +
-                "LEFT JOIN gr_set_value su on t.CON_SCALE_UOM_ID=su.id where t.id=? ";
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql1, attValue);
+        if ("PM_POST_APPOINT".equals(entCode)){ //岗位指派单独查询项目信息逻辑
+            AttLinkExtDetail.selectPostAppointLink(attLinkResult,attValue,myJdbcTemplate);
+        } else {
+            // 项目基础信息
+            String sql1 = "select t.PRJ_CODE as prj_code,t.code code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
+                    "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,t.PROJECT_TYPE_ID,st.id st_id,st.name st_name," +
+                    "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
+                    "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.BUILDING_AREA, " +
+                    "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS'," +
+                    "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD'," +
+                    "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget'," +
+                    "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE,t.PRJ_EARLY_USER_ID,t.PRJ_DESIGN_USER_ID,t.PRJ_COST_USER_ID " +
+                    "from pm_prj t left join PM_PARTY c on t.CUSTOMER_UNIT=c.id " +
+                    "LEFT JOIN gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
+                    "LEFT JOIN gr_set_value l on t.BASE_LOCATION_ID=l.id " +
+                    "LEFT JOIN gr_set_value pt on t.PROJECT_TYPE_ID=pt.id " +
+                    "LEFT JOIN gr_set_value st on t.CON_SCALE_TYPE_ID=st.id " +
+                    "LEFT JOIN gr_set_value su on t.CON_SCALE_UOM_ID=su.id where t.id=? ";
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql1, attValue);
 
-        //清空项目基础信息
-        AttLinkExtDetail.clearBaseProjectDataNOPrj(attLinkResult);
-        AttLinkExtDetail.clearProjectAmtData(attLinkResult);
+            //清空项目基础信息
+            AttLinkExtDetail.clearBaseProjectDataNOPrj(attLinkResult);
+            AttLinkExtDetail.clearProjectAmtData(attLinkResult);
 
-        if (!CollectionUtils.isEmpty(list)){
-            Map row = list.get(0);
-            if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)) { // 工程开工报审
-                AttLinkProcessDetail.pmPrjKickOffReqPrjLink(attLinkResult,attValue,myJdbcTemplate);
-            } else if ("PIPELINE_RELOCATION_REQ".equals(entCode)){ // 管线迁改
-                //设计部人员
-                String design = JdbcMapUtil.getString(row,"PRJ_DESIGN_USER_ID");
-                AttLinkProcessDetail.pipelineLink(design,attLinkResult);
-            } else if("PM_BUY_DEMAND_REQ".equals(entCode) || "PIPELINE_RELOCATION_REQ".equals(entCode)) { // 采购需求审批 管线迁改
-                // 0099799190825080705 = 企业自筹
-                String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
-                AttLinkExtDetail.assignmentPrjYesNoOne(id,attLinkResult);
-            }
-            //赋值
-            AttLinkExtDetail.assignmentAttLinkResult(attLinkResult,row,entCode,myJdbcTemplate);
+            if (!CollectionUtils.isEmpty(list)){
+                Map row = list.get(0);
+                if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)) { // 工程开工报审
+                    AttLinkProcessDetail.pmPrjKickOffReqPrjLink(attLinkResult,attValue,myJdbcTemplate);
+                } else if ("PIPELINE_RELOCATION_REQ".equals(entCode)){ // 管线迁改
+                    //设计部人员
+                    String design = JdbcMapUtil.getString(row,"PRJ_DESIGN_USER_ID");
+                    AttLinkProcessDetail.pipelineLink(design,attLinkResult);
+                } else if("PM_BUY_DEMAND_REQ".equals(entCode) || "PIPELINE_RELOCATION_REQ".equals(entCode)) { // 采购需求审批 管线迁改
+                    // 0099799190825080705 = 企业自筹
+                    String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
+                    AttLinkExtDetail.assignmentPrjYesNoOne(id,attLinkResult);
+                }
+                //赋值
+                AttLinkExtDetail.assignmentAttLinkResult(attLinkResult,row,entCode,myJdbcTemplate);
 
-            // 资金信息回显。优先级 可研估算<初设概算<预算财评
-            List<String> amtList = getAmtList();
-            if (amtList.contains(entCode)) {
-                // 查询预算财评信息
-                Map resultRow1 = getAmtMap(attValue);
-                attLinkResult = getResult(resultRow1, attLinkResult);
+                // 资金信息回显。优先级 可研估算<初设概算<预算财评
+                List<String> amtList = getAmtList();
+                if (amtList.contains(entCode)) {
+                    // 查询预算财评信息
+                    Map resultRow1 = getAmtMap(attValue);
+                    attLinkResult = getResult(resultRow1, attLinkResult);
+                }
             }
         }
         return attLinkResult;

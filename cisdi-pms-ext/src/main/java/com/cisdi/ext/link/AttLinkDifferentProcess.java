@@ -106,6 +106,7 @@ public class AttLinkDifferentProcess {
         list.add("PM_PRJ_RESTART_TRIAL_REQ"); // 工程复工报审表
         list.add("BID_PROCESS_MANAGE"); // 招标过程管理
         list.add("PIPELINE_RELOCATION_REQ"); // 管线迁改
+        list.add("PM_POST_APPOINT"); // 岗位指派
         return list;
     }
 
@@ -117,6 +118,16 @@ public class AttLinkDifferentProcess {
         list.add("PM_PRJ_INVEST1"); //可研报告
         list.add("PM_PRJ_INVEST2"); //初设概算
         list.add("PM_PRJ_INVEST3"); //预算财评
+        return list;
+    }
+
+    /**
+     * 系统非系统属性联动-联动项目来源-多选项目
+     * @return
+     */
+    public static List<String> sourceTypeLinkProjects() {
+        List<String> list = new ArrayList<>();
+        list.add("PO_ORDER_CHANGE_REQ");
         return list;
     }
 }

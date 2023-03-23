@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 流程实例。
+ * 岗位信息。
  */
-public class WfProcessInstance {
+public class PostInfo {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<WfProcessInstance> modelHelper = new ModelHelper<>("WF_PROCESS_INSTANCE", new WfProcessInstance());
+    private static final ModelHelper<PostInfo> modelHelper = new ModelHelper<>("POST_INFO", new PostInfo());
 
     /**
      * 待更新的列。
@@ -37,7 +37,7 @@ public class WfProcessInstance {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "WF_PROCESS_INSTANCE";
+    public static final String ENT_CODE = "POST_INFO";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -99,57 +99,13 @@ public class WfProcessInstance {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 流程。
+         * 用户。
          */
-        public static final String WF_PROCESS_ID = "WF_PROCESS_ID";
+        public static final String AD_USER_ID = "AD_USER_ID";
         /**
-         * 启动用户。
+         * 系统是否。
          */
-        public static final String START_USER_ID = "START_USER_ID";
-        /**
-         * 开始日期时间。
-         */
-        public static final String START_DATETIME = "START_DATETIME";
-        /**
-         * 结束日期时间。
-         */
-        public static final String END_DATETIME = "END_DATETIME";
-        /**
-         * 实体。
-         */
-        public static final String AD_ENT_ID = "AD_ENT_ID";
-        /**
-         * 实体代码。
-         */
-        public static final String ENT_CODE = "ENT_CODE";
-        /**
-         * 实体记录ID。
-         */
-        public static final String ENTITY_RECORD_ID = "ENTITY_RECORD_ID";
-        /**
-         * 是否紧急。
-         */
-        public static final String IS_URGENT = "IS_URGENT";
-        /**
-         * 干预。
-         */
-        public static final String WF_INTERFERE_ID = "WF_INTERFERE_ID";
-        /**
-         * 当前节点。
-         */
-        public static final String CURRENT_NODE_ID = "CURRENT_NODE_ID";
-        /**
-         * 当前节点实例。
-         */
-        public static final String CURRENT_NI_ID = "CURRENT_NI_ID";
-        /**
-         * 当前待办用户。
-         */
-        public static final String CURRENT_TODO_USER_IDS = "CURRENT_TODO_USER_IDS";
-        /**
-         * 当前视图。
-         */
-        public static final String CURRENT_VIEW_ID = "CURRENT_VIEW_ID";
+        public static final String SYS_TRUE = "SYS_TRUE";
     }
 
     // </editor-fold>
@@ -172,7 +128,7 @@ public class WfProcessInstance {
     /**
      * 设置：ID。
      */
-    public WfProcessInstance setId(String id) {
+    public PostInfo setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -208,7 +164,7 @@ public class WfProcessInstance {
     /**
      * 设置：版本。
      */
-    public WfProcessInstance setVer(Integer ver) {
+    public PostInfo setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -244,7 +200,7 @@ public class WfProcessInstance {
     /**
      * 设置：时间戳。
      */
-    public WfProcessInstance setTs(LocalDateTime ts) {
+    public PostInfo setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -280,7 +236,7 @@ public class WfProcessInstance {
     /**
      * 设置：是否预设。
      */
-    public WfProcessInstance setIsPreset(Boolean isPreset) {
+    public PostInfo setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -316,7 +272,7 @@ public class WfProcessInstance {
     /**
      * 设置：创建日期时间。
      */
-    public WfProcessInstance setCrtDt(LocalDateTime crtDt) {
+    public PostInfo setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -352,7 +308,7 @@ public class WfProcessInstance {
     /**
      * 设置：创建用户。
      */
-    public WfProcessInstance setCrtUserId(String crtUserId) {
+    public PostInfo setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -388,7 +344,7 @@ public class WfProcessInstance {
     /**
      * 设置：最后修改日期时间。
      */
-    public WfProcessInstance setLastModiDt(LocalDateTime lastModiDt) {
+    public PostInfo setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -424,7 +380,7 @@ public class WfProcessInstance {
     /**
      * 设置：最后修改用户。
      */
-    public WfProcessInstance setLastModiUserId(String lastModiUserId) {
+    public PostInfo setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -460,7 +416,7 @@ public class WfProcessInstance {
     /**
      * 设置：记录状态。
      */
-    public WfProcessInstance setStatus(String status) {
+    public PostInfo setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -496,7 +452,7 @@ public class WfProcessInstance {
     /**
      * 设置：锁定流程实例。
      */
-    public WfProcessInstance setLkWfInstId(String lkWfInstId) {
+    public PostInfo setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -532,7 +488,7 @@ public class WfProcessInstance {
     /**
      * 设置：代码。
      */
-    public WfProcessInstance setCode(String code) {
+    public PostInfo setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -568,7 +524,7 @@ public class WfProcessInstance {
     /**
      * 设置：名称。
      */
-    public WfProcessInstance setName(String name) {
+    public PostInfo setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -604,7 +560,7 @@ public class WfProcessInstance {
     /**
      * 设置：备注。
      */
-    public WfProcessInstance setRemark(String remark) {
+    public PostInfo setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -626,468 +582,72 @@ public class WfProcessInstance {
     }
 
     /**
-     * 流程。
+     * 用户。
      */
-    private String wfProcessId;
+    private String adUserId;
 
     /**
-     * 获取：流程。
+     * 获取：用户。
      */
-    public String getWfProcessId() {
-        return this.wfProcessId;
+    public String getAdUserId() {
+        return this.adUserId;
     }
 
     /**
-     * 设置：流程。
+     * 设置：用户。
      */
-    public WfProcessInstance setWfProcessId(String wfProcessId) {
-        if (this.wfProcessId == null && wfProcessId == null) {
+    public PostInfo setAdUserId(String adUserId) {
+        if (this.adUserId == null && adUserId == null) {
             // 均为null，不做处理。
-        } else if (this.wfProcessId != null && wfProcessId != null) {
+        } else if (this.adUserId != null && adUserId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.wfProcessId.compareTo(wfProcessId) != 0) {
-                this.wfProcessId = wfProcessId;
-                if (!this.toUpdateCols.contains("WF_PROCESS_ID")) {
-                    this.toUpdateCols.add("WF_PROCESS_ID");
+            if (this.adUserId.compareTo(adUserId) != 0) {
+                this.adUserId = adUserId;
+                if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                    this.toUpdateCols.add("AD_USER_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.wfProcessId = wfProcessId;
-            if (!this.toUpdateCols.contains("WF_PROCESS_ID")) {
-                this.toUpdateCols.add("WF_PROCESS_ID");
+            this.adUserId = adUserId;
+            if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                this.toUpdateCols.add("AD_USER_ID");
             }
         }
         return this;
     }
 
     /**
-     * 启动用户。
+     * 系统是否。
      */
-    private String startUserId;
+    private Boolean sysTrue;
 
     /**
-     * 获取：启动用户。
+     * 获取：系统是否。
      */
-    public String getStartUserId() {
-        return this.startUserId;
+    public Boolean getSysTrue() {
+        return this.sysTrue;
     }
 
     /**
-     * 设置：启动用户。
+     * 设置：系统是否。
      */
-    public WfProcessInstance setStartUserId(String startUserId) {
-        if (this.startUserId == null && startUserId == null) {
+    public PostInfo setSysTrue(Boolean sysTrue) {
+        if (this.sysTrue == null && sysTrue == null) {
             // 均为null，不做处理。
-        } else if (this.startUserId != null && startUserId != null) {
+        } else if (this.sysTrue != null && sysTrue != null) {
             // 均非null，判定不等，再做处理：
-            if (this.startUserId.compareTo(startUserId) != 0) {
-                this.startUserId = startUserId;
-                if (!this.toUpdateCols.contains("START_USER_ID")) {
-                    this.toUpdateCols.add("START_USER_ID");
+            if (this.sysTrue.compareTo(sysTrue) != 0) {
+                this.sysTrue = sysTrue;
+                if (!this.toUpdateCols.contains("SYS_TRUE")) {
+                    this.toUpdateCols.add("SYS_TRUE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.startUserId = startUserId;
-            if (!this.toUpdateCols.contains("START_USER_ID")) {
-                this.toUpdateCols.add("START_USER_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 开始日期时间。
-     */
-    private LocalDateTime startDatetime;
-
-    /**
-     * 获取：开始日期时间。
-     */
-    public LocalDateTime getStartDatetime() {
-        return this.startDatetime;
-    }
-
-    /**
-     * 设置：开始日期时间。
-     */
-    public WfProcessInstance setStartDatetime(LocalDateTime startDatetime) {
-        if (this.startDatetime == null && startDatetime == null) {
-            // 均为null，不做处理。
-        } else if (this.startDatetime != null && startDatetime != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.startDatetime.compareTo(startDatetime) != 0) {
-                this.startDatetime = startDatetime;
-                if (!this.toUpdateCols.contains("START_DATETIME")) {
-                    this.toUpdateCols.add("START_DATETIME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.startDatetime = startDatetime;
-            if (!this.toUpdateCols.contains("START_DATETIME")) {
-                this.toUpdateCols.add("START_DATETIME");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 结束日期时间。
-     */
-    private LocalDateTime endDatetime;
-
-    /**
-     * 获取：结束日期时间。
-     */
-    public LocalDateTime getEndDatetime() {
-        return this.endDatetime;
-    }
-
-    /**
-     * 设置：结束日期时间。
-     */
-    public WfProcessInstance setEndDatetime(LocalDateTime endDatetime) {
-        if (this.endDatetime == null && endDatetime == null) {
-            // 均为null，不做处理。
-        } else if (this.endDatetime != null && endDatetime != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.endDatetime.compareTo(endDatetime) != 0) {
-                this.endDatetime = endDatetime;
-                if (!this.toUpdateCols.contains("END_DATETIME")) {
-                    this.toUpdateCols.add("END_DATETIME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.endDatetime = endDatetime;
-            if (!this.toUpdateCols.contains("END_DATETIME")) {
-                this.toUpdateCols.add("END_DATETIME");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 实体。
-     */
-    private String adEntId;
-
-    /**
-     * 获取：实体。
-     */
-    public String getAdEntId() {
-        return this.adEntId;
-    }
-
-    /**
-     * 设置：实体。
-     */
-    public WfProcessInstance setAdEntId(String adEntId) {
-        if (this.adEntId == null && adEntId == null) {
-            // 均为null，不做处理。
-        } else if (this.adEntId != null && adEntId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.adEntId.compareTo(adEntId) != 0) {
-                this.adEntId = adEntId;
-                if (!this.toUpdateCols.contains("AD_ENT_ID")) {
-                    this.toUpdateCols.add("AD_ENT_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.adEntId = adEntId;
-            if (!this.toUpdateCols.contains("AD_ENT_ID")) {
-                this.toUpdateCols.add("AD_ENT_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 实体代码。
-     */
-    private String entCode;
-
-    /**
-     * 获取：实体代码。
-     */
-    public String getEntCode() {
-        return this.entCode;
-    }
-
-    /**
-     * 设置：实体代码。
-     */
-    public WfProcessInstance setEntCode(String entCode) {
-        if (this.entCode == null && entCode == null) {
-            // 均为null，不做处理。
-        } else if (this.entCode != null && entCode != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.entCode.compareTo(entCode) != 0) {
-                this.entCode = entCode;
-                if (!this.toUpdateCols.contains("ENT_CODE")) {
-                    this.toUpdateCols.add("ENT_CODE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.entCode = entCode;
-            if (!this.toUpdateCols.contains("ENT_CODE")) {
-                this.toUpdateCols.add("ENT_CODE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 实体记录ID。
-     */
-    private String entityRecordId;
-
-    /**
-     * 获取：实体记录ID。
-     */
-    public String getEntityRecordId() {
-        return this.entityRecordId;
-    }
-
-    /**
-     * 设置：实体记录ID。
-     */
-    public WfProcessInstance setEntityRecordId(String entityRecordId) {
-        if (this.entityRecordId == null && entityRecordId == null) {
-            // 均为null，不做处理。
-        } else if (this.entityRecordId != null && entityRecordId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.entityRecordId.compareTo(entityRecordId) != 0) {
-                this.entityRecordId = entityRecordId;
-                if (!this.toUpdateCols.contains("ENTITY_RECORD_ID")) {
-                    this.toUpdateCols.add("ENTITY_RECORD_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.entityRecordId = entityRecordId;
-            if (!this.toUpdateCols.contains("ENTITY_RECORD_ID")) {
-                this.toUpdateCols.add("ENTITY_RECORD_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 是否紧急。
-     */
-    private Boolean isUrgent;
-
-    /**
-     * 获取：是否紧急。
-     */
-    public Boolean getIsUrgent() {
-        return this.isUrgent;
-    }
-
-    /**
-     * 设置：是否紧急。
-     */
-    public WfProcessInstance setIsUrgent(Boolean isUrgent) {
-        if (this.isUrgent == null && isUrgent == null) {
-            // 均为null，不做处理。
-        } else if (this.isUrgent != null && isUrgent != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.isUrgent.compareTo(isUrgent) != 0) {
-                this.isUrgent = isUrgent;
-                if (!this.toUpdateCols.contains("IS_URGENT")) {
-                    this.toUpdateCols.add("IS_URGENT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.isUrgent = isUrgent;
-            if (!this.toUpdateCols.contains("IS_URGENT")) {
-                this.toUpdateCols.add("IS_URGENT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 干预。
-     */
-    private String wfInterfereId;
-
-    /**
-     * 获取：干预。
-     */
-    public String getWfInterfereId() {
-        return this.wfInterfereId;
-    }
-
-    /**
-     * 设置：干预。
-     */
-    public WfProcessInstance setWfInterfereId(String wfInterfereId) {
-        if (this.wfInterfereId == null && wfInterfereId == null) {
-            // 均为null，不做处理。
-        } else if (this.wfInterfereId != null && wfInterfereId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.wfInterfereId.compareTo(wfInterfereId) != 0) {
-                this.wfInterfereId = wfInterfereId;
-                if (!this.toUpdateCols.contains("WF_INTERFERE_ID")) {
-                    this.toUpdateCols.add("WF_INTERFERE_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.wfInterfereId = wfInterfereId;
-            if (!this.toUpdateCols.contains("WF_INTERFERE_ID")) {
-                this.toUpdateCols.add("WF_INTERFERE_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 当前节点。
-     */
-    private String currentNodeId;
-
-    /**
-     * 获取：当前节点。
-     */
-    public String getCurrentNodeId() {
-        return this.currentNodeId;
-    }
-
-    /**
-     * 设置：当前节点。
-     */
-    public WfProcessInstance setCurrentNodeId(String currentNodeId) {
-        if (this.currentNodeId == null && currentNodeId == null) {
-            // 均为null，不做处理。
-        } else if (this.currentNodeId != null && currentNodeId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.currentNodeId.compareTo(currentNodeId) != 0) {
-                this.currentNodeId = currentNodeId;
-                if (!this.toUpdateCols.contains("CURRENT_NODE_ID")) {
-                    this.toUpdateCols.add("CURRENT_NODE_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.currentNodeId = currentNodeId;
-            if (!this.toUpdateCols.contains("CURRENT_NODE_ID")) {
-                this.toUpdateCols.add("CURRENT_NODE_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 当前节点实例。
-     */
-    private String currentNiId;
-
-    /**
-     * 获取：当前节点实例。
-     */
-    public String getCurrentNiId() {
-        return this.currentNiId;
-    }
-
-    /**
-     * 设置：当前节点实例。
-     */
-    public WfProcessInstance setCurrentNiId(String currentNiId) {
-        if (this.currentNiId == null && currentNiId == null) {
-            // 均为null，不做处理。
-        } else if (this.currentNiId != null && currentNiId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.currentNiId.compareTo(currentNiId) != 0) {
-                this.currentNiId = currentNiId;
-                if (!this.toUpdateCols.contains("CURRENT_NI_ID")) {
-                    this.toUpdateCols.add("CURRENT_NI_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.currentNiId = currentNiId;
-            if (!this.toUpdateCols.contains("CURRENT_NI_ID")) {
-                this.toUpdateCols.add("CURRENT_NI_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 当前待办用户。
-     */
-    private String currentTodoUserIds;
-
-    /**
-     * 获取：当前待办用户。
-     */
-    public String getCurrentTodoUserIds() {
-        return this.currentTodoUserIds;
-    }
-
-    /**
-     * 设置：当前待办用户。
-     */
-    public WfProcessInstance setCurrentTodoUserIds(String currentTodoUserIds) {
-        if (this.currentTodoUserIds == null && currentTodoUserIds == null) {
-            // 均为null，不做处理。
-        } else if (this.currentTodoUserIds != null && currentTodoUserIds != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.currentTodoUserIds.compareTo(currentTodoUserIds) != 0) {
-                this.currentTodoUserIds = currentTodoUserIds;
-                if (!this.toUpdateCols.contains("CURRENT_TODO_USER_IDS")) {
-                    this.toUpdateCols.add("CURRENT_TODO_USER_IDS");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.currentTodoUserIds = currentTodoUserIds;
-            if (!this.toUpdateCols.contains("CURRENT_TODO_USER_IDS")) {
-                this.toUpdateCols.add("CURRENT_TODO_USER_IDS");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 当前视图。
-     */
-    private String currentViewId;
-
-    /**
-     * 获取：当前视图。
-     */
-    public String getCurrentViewId() {
-        return this.currentViewId;
-    }
-
-    /**
-     * 设置：当前视图。
-     */
-    public WfProcessInstance setCurrentViewId(String currentViewId) {
-        if (this.currentViewId == null && currentViewId == null) {
-            // 均为null，不做处理。
-        } else if (this.currentViewId != null && currentViewId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.currentViewId.compareTo(currentViewId) != 0) {
-                this.currentViewId = currentViewId;
-                if (!this.toUpdateCols.contains("CURRENT_VIEW_ID")) {
-                    this.toUpdateCols.add("CURRENT_VIEW_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.currentViewId = currentViewId;
-            if (!this.toUpdateCols.contains("CURRENT_VIEW_ID")) {
-                this.toUpdateCols.add("CURRENT_VIEW_ID");
+            this.sysTrue = sysTrue;
+            if (!this.toUpdateCols.contains("SYS_TRUE")) {
+                this.toUpdateCols.add("SYS_TRUE");
             }
         }
         return this;
@@ -1180,8 +740,8 @@ public class WfProcessInstance {
      *
      * @return
      */
-    public static WfProcessInstance newData() {
-        WfProcessInstance obj = modelHelper.newData();
+    public static PostInfo newData() {
+        PostInfo obj = modelHelper.newData();
         return obj;
     }
 
@@ -1190,8 +750,8 @@ public class WfProcessInstance {
      *
      * @return
      */
-    public static WfProcessInstance insertData() {
-        WfProcessInstance obj = modelHelper.insertData();
+    public static PostInfo insertData() {
+        PostInfo obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1203,8 +763,8 @@ public class WfProcessInstance {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static WfProcessInstance selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        WfProcessInstance obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static PostInfo selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        PostInfo obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1214,7 +774,7 @@ public class WfProcessInstance {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static WfProcessInstance selectById(String id) {
+    public static PostInfo selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1226,8 +786,8 @@ public class WfProcessInstance {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<WfProcessInstance> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<WfProcessInstance> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<PostInfo> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<PostInfo> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1237,7 +797,7 @@ public class WfProcessInstance {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<WfProcessInstance> selectByIds(List<String> ids) {
+    public static List<PostInfo> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1249,8 +809,8 @@ public class WfProcessInstance {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<WfProcessInstance> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<WfProcessInstance> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<PostInfo> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<PostInfo> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1260,7 +820,7 @@ public class WfProcessInstance {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<WfProcessInstance> selectByWhere(Where where) {
+    public static List<PostInfo> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1272,10 +832,10 @@ public class WfProcessInstance {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static WfProcessInstance selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<WfProcessInstance> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static PostInfo selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<PostInfo> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用WfProcessInstance.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用PostInfo.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmptyList(objList) ? null : objList.get(0);
@@ -1287,7 +847,7 @@ public class WfProcessInstance {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static WfProcessInstance selectOneByWhere(Where where) {
+    public static PostInfo selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1401,7 +961,7 @@ public class WfProcessInstance {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(WfProcessInstance fromModel, WfProcessInstance toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(PostInfo fromModel, PostInfo toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1411,7 +971,7 @@ public class WfProcessInstance {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(WfProcessInstance fromModel, WfProcessInstance toModel) {
+    public static void copyCols(PostInfo fromModel, PostInfo toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 

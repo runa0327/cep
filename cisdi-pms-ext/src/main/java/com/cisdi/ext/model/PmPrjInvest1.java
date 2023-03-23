@@ -201,25 +201,9 @@ public class PmPrjInvest1 {
          */
         public static final String PM_PRJ_REMARK = "PM_PRJ_REMARK";
         /**
-         * 专家评审计划完成日期。
-         */
-        public static final String EXPERT_COMPL_PLAN_DATE = "EXPERT_COMPL_PLAN_DATE";
-        /**
-         * 专家评审实际完成日期。
-         */
-        public static final String EXPERT_COMPL_ACTUAL_DATE = "EXPERT_COMPL_ACTUAL_DATE";
-        /**
          * 评审单位负责人。
          */
         public static final String REVIEW_UNIT_CHIEF = "REVIEW_UNIT_CHIEF";
-        /**
-         * 修编稿文件。
-         */
-        public static final String REVISION_FILE = "REVISION_FILE";
-        /**
-         * 评审报告文件。
-         */
-        public static final String REVIEW_DRAFT_FILE = "REVIEW_DRAFT_FILE";
         /**
          * 评审组织单位。
          */
@@ -229,21 +213,33 @@ public class PmPrjInvest1 {
          */
         public static final String REVIEW_UNIT_PHONE = "REVIEW_UNIT_PHONE";
         /**
-         * 评审及修编说明。
-         */
-        public static final String REVIEW_AND_REVISION_REMARK = "REVIEW_AND_REVISION_REMARK";
-        /**
          * 专家意见文件。
          */
         public static final String EXPERT_FILE = "EXPERT_FILE";
         /**
-         * 成本部意见。
-         */
-        public static final String COST_COMMENT = "COST_COMMENT";
-        /**
          * 评审稿文件。
          */
         public static final String REVIEW_REPORT_FILE = "REVIEW_REPORT_FILE";
+        /**
+         * 专家评审实际完成日期。
+         */
+        public static final String EXPERT_COMPL_ACTUAL_DATE = "EXPERT_COMPL_ACTUAL_DATE";
+        /**
+         * 修编稿文件。
+         */
+        public static final String REVISION_FILE = "REVISION_FILE";
+        /**
+         * 评审报告文件。
+         */
+        public static final String REVIEW_DRAFT_FILE = "REVIEW_DRAFT_FILE";
+        /**
+         * 评审及修编说明。
+         */
+        public static final String REVIEW_AND_REVISION_REMARK = "REVIEW_AND_REVISION_REMARK";
+        /**
+         * 成本部意见。
+         */
+        public static final String COST_COMMENT = "COST_COMMENT";
         /**
          * 设计部意见。
          */
@@ -252,10 +248,6 @@ public class PmPrjInvest1 {
          * 前期部意见。
          */
         public static final String EARLY_COMMENT = "EARLY_COMMENT";
-        /**
-         * 计划批复日期。
-         */
-        public static final String REPLY_PLAN_DATE = "REPLY_PLAN_DATE";
         /**
          * 总投资（万）。
          */
@@ -304,6 +296,18 @@ public class PmPrjInvest1 {
          * 批复文件。
          */
         public static final String REPLY_FILE = "REPLY_FILE";
+        /**
+         * 专家评审计划完成日期。
+         */
+        public static final String EXPERT_COMPL_PLAN_DATE = "EXPERT_COMPL_PLAN_DATE";
+        /**
+         * 计划批复日期。
+         */
+        public static final String REPLY_PLAN_DATE = "REPLY_PLAN_DATE";
+        /**
+         * 是否导入。
+         */
+        public static final String IS_OMPORT = "IS_OMPORT";
     }
 
     // </editor-fold>
@@ -1680,78 +1684,6 @@ public class PmPrjInvest1 {
     }
 
     /**
-     * 专家评审计划完成日期。
-     */
-    private LocalDate expertComplPlanDate;
-
-    /**
-     * 获取：专家评审计划完成日期。
-     */
-    public LocalDate getExpertComplPlanDate() {
-        return this.expertComplPlanDate;
-    }
-
-    /**
-     * 设置：专家评审计划完成日期。
-     */
-    public PmPrjInvest1 setExpertComplPlanDate(LocalDate expertComplPlanDate) {
-        if (this.expertComplPlanDate == null && expertComplPlanDate == null) {
-            // 均为null，不做处理。
-        } else if (this.expertComplPlanDate != null && expertComplPlanDate != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.expertComplPlanDate.compareTo(expertComplPlanDate) != 0) {
-                this.expertComplPlanDate = expertComplPlanDate;
-                if (!this.toUpdateCols.contains("EXPERT_COMPL_PLAN_DATE")) {
-                    this.toUpdateCols.add("EXPERT_COMPL_PLAN_DATE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.expertComplPlanDate = expertComplPlanDate;
-            if (!this.toUpdateCols.contains("EXPERT_COMPL_PLAN_DATE")) {
-                this.toUpdateCols.add("EXPERT_COMPL_PLAN_DATE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 专家评审实际完成日期。
-     */
-    private LocalDate expertComplActualDate;
-
-    /**
-     * 获取：专家评审实际完成日期。
-     */
-    public LocalDate getExpertComplActualDate() {
-        return this.expertComplActualDate;
-    }
-
-    /**
-     * 设置：专家评审实际完成日期。
-     */
-    public PmPrjInvest1 setExpertComplActualDate(LocalDate expertComplActualDate) {
-        if (this.expertComplActualDate == null && expertComplActualDate == null) {
-            // 均为null，不做处理。
-        } else if (this.expertComplActualDate != null && expertComplActualDate != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.expertComplActualDate.compareTo(expertComplActualDate) != 0) {
-                this.expertComplActualDate = expertComplActualDate;
-                if (!this.toUpdateCols.contains("EXPERT_COMPL_ACTUAL_DATE")) {
-                    this.toUpdateCols.add("EXPERT_COMPL_ACTUAL_DATE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.expertComplActualDate = expertComplActualDate;
-            if (!this.toUpdateCols.contains("EXPERT_COMPL_ACTUAL_DATE")) {
-                this.toUpdateCols.add("EXPERT_COMPL_ACTUAL_DATE");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 评审单位负责人。
      */
     private String reviewUnitChief;
@@ -1782,78 +1714,6 @@ public class PmPrjInvest1 {
             this.reviewUnitChief = reviewUnitChief;
             if (!this.toUpdateCols.contains("REVIEW_UNIT_CHIEF")) {
                 this.toUpdateCols.add("REVIEW_UNIT_CHIEF");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 修编稿文件。
-     */
-    private String revisionFile;
-
-    /**
-     * 获取：修编稿文件。
-     */
-    public String getRevisionFile() {
-        return this.revisionFile;
-    }
-
-    /**
-     * 设置：修编稿文件。
-     */
-    public PmPrjInvest1 setRevisionFile(String revisionFile) {
-        if (this.revisionFile == null && revisionFile == null) {
-            // 均为null，不做处理。
-        } else if (this.revisionFile != null && revisionFile != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.revisionFile.compareTo(revisionFile) != 0) {
-                this.revisionFile = revisionFile;
-                if (!this.toUpdateCols.contains("REVISION_FILE")) {
-                    this.toUpdateCols.add("REVISION_FILE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.revisionFile = revisionFile;
-            if (!this.toUpdateCols.contains("REVISION_FILE")) {
-                this.toUpdateCols.add("REVISION_FILE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 评审报告文件。
-     */
-    private String reviewDraftFile;
-
-    /**
-     * 获取：评审报告文件。
-     */
-    public String getReviewDraftFile() {
-        return this.reviewDraftFile;
-    }
-
-    /**
-     * 设置：评审报告文件。
-     */
-    public PmPrjInvest1 setReviewDraftFile(String reviewDraftFile) {
-        if (this.reviewDraftFile == null && reviewDraftFile == null) {
-            // 均为null，不做处理。
-        } else if (this.reviewDraftFile != null && reviewDraftFile != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.reviewDraftFile.compareTo(reviewDraftFile) != 0) {
-                this.reviewDraftFile = reviewDraftFile;
-                if (!this.toUpdateCols.contains("REVIEW_DRAFT_FILE")) {
-                    this.toUpdateCols.add("REVIEW_DRAFT_FILE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.reviewDraftFile = reviewDraftFile;
-            if (!this.toUpdateCols.contains("REVIEW_DRAFT_FILE")) {
-                this.toUpdateCols.add("REVIEW_DRAFT_FILE");
             }
         }
         return this;
@@ -1932,42 +1792,6 @@ public class PmPrjInvest1 {
     }
 
     /**
-     * 评审及修编说明。
-     */
-    private String reviewAndRevisionRemark;
-
-    /**
-     * 获取：评审及修编说明。
-     */
-    public String getReviewAndRevisionRemark() {
-        return this.reviewAndRevisionRemark;
-    }
-
-    /**
-     * 设置：评审及修编说明。
-     */
-    public PmPrjInvest1 setReviewAndRevisionRemark(String reviewAndRevisionRemark) {
-        if (this.reviewAndRevisionRemark == null && reviewAndRevisionRemark == null) {
-            // 均为null，不做处理。
-        } else if (this.reviewAndRevisionRemark != null && reviewAndRevisionRemark != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.reviewAndRevisionRemark.compareTo(reviewAndRevisionRemark) != 0) {
-                this.reviewAndRevisionRemark = reviewAndRevisionRemark;
-                if (!this.toUpdateCols.contains("REVIEW_AND_REVISION_REMARK")) {
-                    this.toUpdateCols.add("REVIEW_AND_REVISION_REMARK");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.reviewAndRevisionRemark = reviewAndRevisionRemark;
-            if (!this.toUpdateCols.contains("REVIEW_AND_REVISION_REMARK")) {
-                this.toUpdateCols.add("REVIEW_AND_REVISION_REMARK");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 专家意见文件。
      */
     private String expertFile;
@@ -2004,42 +1828,6 @@ public class PmPrjInvest1 {
     }
 
     /**
-     * 成本部意见。
-     */
-    private String costComment;
-
-    /**
-     * 获取：成本部意见。
-     */
-    public String getCostComment() {
-        return this.costComment;
-    }
-
-    /**
-     * 设置：成本部意见。
-     */
-    public PmPrjInvest1 setCostComment(String costComment) {
-        if (this.costComment == null && costComment == null) {
-            // 均为null，不做处理。
-        } else if (this.costComment != null && costComment != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.costComment.compareTo(costComment) != 0) {
-                this.costComment = costComment;
-                if (!this.toUpdateCols.contains("COST_COMMENT")) {
-                    this.toUpdateCols.add("COST_COMMENT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.costComment = costComment;
-            if (!this.toUpdateCols.contains("COST_COMMENT")) {
-                this.toUpdateCols.add("COST_COMMENT");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 评审稿文件。
      */
     private String reviewReportFile;
@@ -2070,6 +1858,186 @@ public class PmPrjInvest1 {
             this.reviewReportFile = reviewReportFile;
             if (!this.toUpdateCols.contains("REVIEW_REPORT_FILE")) {
                 this.toUpdateCols.add("REVIEW_REPORT_FILE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 专家评审实际完成日期。
+     */
+    private LocalDate expertComplActualDate;
+
+    /**
+     * 获取：专家评审实际完成日期。
+     */
+    public LocalDate getExpertComplActualDate() {
+        return this.expertComplActualDate;
+    }
+
+    /**
+     * 设置：专家评审实际完成日期。
+     */
+    public PmPrjInvest1 setExpertComplActualDate(LocalDate expertComplActualDate) {
+        if (this.expertComplActualDate == null && expertComplActualDate == null) {
+            // 均为null，不做处理。
+        } else if (this.expertComplActualDate != null && expertComplActualDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.expertComplActualDate.compareTo(expertComplActualDate) != 0) {
+                this.expertComplActualDate = expertComplActualDate;
+                if (!this.toUpdateCols.contains("EXPERT_COMPL_ACTUAL_DATE")) {
+                    this.toUpdateCols.add("EXPERT_COMPL_ACTUAL_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.expertComplActualDate = expertComplActualDate;
+            if (!this.toUpdateCols.contains("EXPERT_COMPL_ACTUAL_DATE")) {
+                this.toUpdateCols.add("EXPERT_COMPL_ACTUAL_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 修编稿文件。
+     */
+    private String revisionFile;
+
+    /**
+     * 获取：修编稿文件。
+     */
+    public String getRevisionFile() {
+        return this.revisionFile;
+    }
+
+    /**
+     * 设置：修编稿文件。
+     */
+    public PmPrjInvest1 setRevisionFile(String revisionFile) {
+        if (this.revisionFile == null && revisionFile == null) {
+            // 均为null，不做处理。
+        } else if (this.revisionFile != null && revisionFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.revisionFile.compareTo(revisionFile) != 0) {
+                this.revisionFile = revisionFile;
+                if (!this.toUpdateCols.contains("REVISION_FILE")) {
+                    this.toUpdateCols.add("REVISION_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.revisionFile = revisionFile;
+            if (!this.toUpdateCols.contains("REVISION_FILE")) {
+                this.toUpdateCols.add("REVISION_FILE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 评审报告文件。
+     */
+    private String reviewDraftFile;
+
+    /**
+     * 获取：评审报告文件。
+     */
+    public String getReviewDraftFile() {
+        return this.reviewDraftFile;
+    }
+
+    /**
+     * 设置：评审报告文件。
+     */
+    public PmPrjInvest1 setReviewDraftFile(String reviewDraftFile) {
+        if (this.reviewDraftFile == null && reviewDraftFile == null) {
+            // 均为null，不做处理。
+        } else if (this.reviewDraftFile != null && reviewDraftFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.reviewDraftFile.compareTo(reviewDraftFile) != 0) {
+                this.reviewDraftFile = reviewDraftFile;
+                if (!this.toUpdateCols.contains("REVIEW_DRAFT_FILE")) {
+                    this.toUpdateCols.add("REVIEW_DRAFT_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.reviewDraftFile = reviewDraftFile;
+            if (!this.toUpdateCols.contains("REVIEW_DRAFT_FILE")) {
+                this.toUpdateCols.add("REVIEW_DRAFT_FILE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 评审及修编说明。
+     */
+    private String reviewAndRevisionRemark;
+
+    /**
+     * 获取：评审及修编说明。
+     */
+    public String getReviewAndRevisionRemark() {
+        return this.reviewAndRevisionRemark;
+    }
+
+    /**
+     * 设置：评审及修编说明。
+     */
+    public PmPrjInvest1 setReviewAndRevisionRemark(String reviewAndRevisionRemark) {
+        if (this.reviewAndRevisionRemark == null && reviewAndRevisionRemark == null) {
+            // 均为null，不做处理。
+        } else if (this.reviewAndRevisionRemark != null && reviewAndRevisionRemark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.reviewAndRevisionRemark.compareTo(reviewAndRevisionRemark) != 0) {
+                this.reviewAndRevisionRemark = reviewAndRevisionRemark;
+                if (!this.toUpdateCols.contains("REVIEW_AND_REVISION_REMARK")) {
+                    this.toUpdateCols.add("REVIEW_AND_REVISION_REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.reviewAndRevisionRemark = reviewAndRevisionRemark;
+            if (!this.toUpdateCols.contains("REVIEW_AND_REVISION_REMARK")) {
+                this.toUpdateCols.add("REVIEW_AND_REVISION_REMARK");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 成本部意见。
+     */
+    private String costComment;
+
+    /**
+     * 获取：成本部意见。
+     */
+    public String getCostComment() {
+        return this.costComment;
+    }
+
+    /**
+     * 设置：成本部意见。
+     */
+    public PmPrjInvest1 setCostComment(String costComment) {
+        if (this.costComment == null && costComment == null) {
+            // 均为null，不做处理。
+        } else if (this.costComment != null && costComment != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.costComment.compareTo(costComment) != 0) {
+                this.costComment = costComment;
+                if (!this.toUpdateCols.contains("COST_COMMENT")) {
+                    this.toUpdateCols.add("COST_COMMENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.costComment = costComment;
+            if (!this.toUpdateCols.contains("COST_COMMENT")) {
+                this.toUpdateCols.add("COST_COMMENT");
             }
         }
         return this;
@@ -2142,42 +2110,6 @@ public class PmPrjInvest1 {
             this.earlyComment = earlyComment;
             if (!this.toUpdateCols.contains("EARLY_COMMENT")) {
                 this.toUpdateCols.add("EARLY_COMMENT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 计划批复日期。
-     */
-    private LocalDate replyPlanDate;
-
-    /**
-     * 获取：计划批复日期。
-     */
-    public LocalDate getReplyPlanDate() {
-        return this.replyPlanDate;
-    }
-
-    /**
-     * 设置：计划批复日期。
-     */
-    public PmPrjInvest1 setReplyPlanDate(LocalDate replyPlanDate) {
-        if (this.replyPlanDate == null && replyPlanDate == null) {
-            // 均为null，不做处理。
-        } else if (this.replyPlanDate != null && replyPlanDate != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.replyPlanDate.compareTo(replyPlanDate) != 0) {
-                this.replyPlanDate = replyPlanDate;
-                if (!this.toUpdateCols.contains("REPLY_PLAN_DATE")) {
-                    this.toUpdateCols.add("REPLY_PLAN_DATE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.replyPlanDate = replyPlanDate;
-            if (!this.toUpdateCols.contains("REPLY_PLAN_DATE")) {
-                this.toUpdateCols.add("REPLY_PLAN_DATE");
             }
         }
         return this;
@@ -2610,6 +2542,114 @@ public class PmPrjInvest1 {
             this.replyFile = replyFile;
             if (!this.toUpdateCols.contains("REPLY_FILE")) {
                 this.toUpdateCols.add("REPLY_FILE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 专家评审计划完成日期。
+     */
+    private LocalDate expertComplPlanDate;
+
+    /**
+     * 获取：专家评审计划完成日期。
+     */
+    public LocalDate getExpertComplPlanDate() {
+        return this.expertComplPlanDate;
+    }
+
+    /**
+     * 设置：专家评审计划完成日期。
+     */
+    public PmPrjInvest1 setExpertComplPlanDate(LocalDate expertComplPlanDate) {
+        if (this.expertComplPlanDate == null && expertComplPlanDate == null) {
+            // 均为null，不做处理。
+        } else if (this.expertComplPlanDate != null && expertComplPlanDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.expertComplPlanDate.compareTo(expertComplPlanDate) != 0) {
+                this.expertComplPlanDate = expertComplPlanDate;
+                if (!this.toUpdateCols.contains("EXPERT_COMPL_PLAN_DATE")) {
+                    this.toUpdateCols.add("EXPERT_COMPL_PLAN_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.expertComplPlanDate = expertComplPlanDate;
+            if (!this.toUpdateCols.contains("EXPERT_COMPL_PLAN_DATE")) {
+                this.toUpdateCols.add("EXPERT_COMPL_PLAN_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 计划批复日期。
+     */
+    private LocalDate replyPlanDate;
+
+    /**
+     * 获取：计划批复日期。
+     */
+    public LocalDate getReplyPlanDate() {
+        return this.replyPlanDate;
+    }
+
+    /**
+     * 设置：计划批复日期。
+     */
+    public PmPrjInvest1 setReplyPlanDate(LocalDate replyPlanDate) {
+        if (this.replyPlanDate == null && replyPlanDate == null) {
+            // 均为null，不做处理。
+        } else if (this.replyPlanDate != null && replyPlanDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.replyPlanDate.compareTo(replyPlanDate) != 0) {
+                this.replyPlanDate = replyPlanDate;
+                if (!this.toUpdateCols.contains("REPLY_PLAN_DATE")) {
+                    this.toUpdateCols.add("REPLY_PLAN_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.replyPlanDate = replyPlanDate;
+            if (!this.toUpdateCols.contains("REPLY_PLAN_DATE")) {
+                this.toUpdateCols.add("REPLY_PLAN_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否导入。
+     */
+    private String isOmport;
+
+    /**
+     * 获取：是否导入。
+     */
+    public String getIsOmport() {
+        return this.isOmport;
+    }
+
+    /**
+     * 设置：是否导入。
+     */
+    public PmPrjInvest1 setIsOmport(String isOmport) {
+        if (this.isOmport == null && isOmport == null) {
+            // 均为null，不做处理。
+        } else if (this.isOmport != null && isOmport != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isOmport.compareTo(isOmport) != 0) {
+                this.isOmport = isOmport;
+                if (!this.toUpdateCols.contains("IS_OMPORT")) {
+                    this.toUpdateCols.add("IS_OMPORT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isOmport = isOmport;
+            if (!this.toUpdateCols.contains("IS_OMPORT")) {
+                this.toUpdateCols.add("IS_OMPORT");
             }
         }
         return this;

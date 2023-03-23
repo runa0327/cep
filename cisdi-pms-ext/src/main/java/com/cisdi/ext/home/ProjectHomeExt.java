@@ -1,14 +1,14 @@
 package com.cisdi.ext.home;
 
-import com.cisdi.ext.invest.InvestEstActCompareExt;
-import com.cisdi.ext.pm.PmStartExt;
 import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
+import com.cisdi.ext.util.WeeklyUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
+import jdk.nashorn.internal.runtime.options.LoggingOption;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
@@ -42,7 +42,7 @@ public class ProjectHomeExt {
                 "left join gr_set_value gsv on gsv.id = pie.INVEST_EST_TYPE_ID \n" +
                 "where pie.PM_PRJ_ID=? \n" +
                 "order by gsv.code desc limit 0,1", projectId);
-        if(!CollectionUtils.isEmpty(dataList)){
+        if (!CollectionUtils.isEmpty(dataList)) {
             totalAmt = new BigDecimal(String.valueOf(dataList.get(0).get("PRJ_TOTAL_INVEST")));
         }
 
@@ -131,6 +131,44 @@ public class ProjectHomeExt {
     }
 
 
+    /**
+     * 工作台-本周工作情况
+     */
+    public void weekWork() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        Map<String, String> dateMap = WeeklyUtils.weekBeginningAndEnding(new Date());
+        WeekWork weekWork = new WeekWork();
+        //发起流程
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id " +
+                "where a.status = 'AP' and b.status in ('AP','VDING') and a.START_USER_ID = ? " +
+                "and a.START_DATETIME >= ? and a.START_DATETIME <= ? ", userId, dateMap.get("begin"), dateMap.get("end"));
+        if (list != null && list.size() > 0) {
+            weekWork.fqCount = list.size();
+        }
+
+        //处理流程
+        List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id " +
+                        "left join wf_task c on a.id = c.WF_PROCESS_INSTANCE_ID where a.status = 'AP' and b.status in ('AP','VDING') " +
+                        "and c.status = 'AP' and a.START_USER_ID = ? and a.START_DATETIME >= ? and a.START_DATETIME <= ? ",
+                userId, dateMap.get("begin"), dateMap.get("end"));
+        if (list1 != null && list1.size() > 0) {
+            weekWork.clCount = list1.size();
+        }
+
+        //进行中流程
+        List<Map<String, Object>> list2 = myJdbcTemplate.queryForList("select * from wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id " +
+                        "where a.status = 'AP' and b.status in ('AP','VDING') and a.START_USER_ID = ? " +
+                        "and a.START_DATETIME >= ? and a.START_DATETIME <= ? and a.END_DATETIME is null",
+                userId, dateMap.get("begin"), dateMap.get("end"));
+        if (list2 != null && list2.size() > 0) {
+            weekWork.jxzCount = list2.size();
+        }
+        weekWork.cyCount = weekWork.clCount + weekWork.fqCount;
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(weekWork), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+    }
+
     public static class OutSide {
         public BigDecimal totalAmt;
 
@@ -161,4 +199,16 @@ public class ProjectHomeExt {
         public String downloadUrl;
 
     }
+
+    public static class WeekWork {
+        //发起流程
+        public Integer fqCount = 0;
+        //处理流程
+        public Integer clCount = 0;
+        //进行中流程
+        public Integer jxzCount = 0;
+        //参与审批
+        public Integer cyCount = 0;
+    }
+
 }
