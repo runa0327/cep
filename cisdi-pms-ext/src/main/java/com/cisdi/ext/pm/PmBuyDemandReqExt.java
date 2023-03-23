@@ -24,11 +24,11 @@ import java.util.*;
 @Slf4j
 public class PmBuyDemandReqExt {
 
-    public static final Map<String,String> POSTCODEMAP = new HashMap();
+    public static final Map<String,String> POST_CODE_MAP = new HashMap();
     static {
-            POSTCODEMAP.put("AD_USER_TWO_ID","采购岗");
-            POSTCODEMAP.put("AD_USER_THREE_ID","成本岗");
-            POSTCODEMAP.put("AD_USER_FIVE_ID","财务岗");
+        POST_CODE_MAP.put("AD_USER_TWO_ID","采购岗");
+        POST_CODE_MAP.put("AD_USER_THREE_ID","成本岗");
+        POST_CODE_MAP.put("AD_USER_FIVE_ID","财务岗");
     }
 
     /**
@@ -622,5 +622,88 @@ public class PmBuyDemandReqExt {
 
             ExtJarHelper.returnValue.set(userIdList);
         }
+    }
+
+    /**
+     * 采购需求审批-确认
+     */
+    public void buyDemandCheckOK(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        String nodeStatus = processCheck("true",nodeInstanceId,myJdbcTemplate);
+        handleCheckData(nodeStatus,nodeInstanceId,myJdbcTemplate);
+    }
+
+    /**
+     * 采购需求审批-拒绝
+     */
+    public void buyDemandCheckRefuse(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        String nodeStatus = processCheck("false",nodeInstanceId,myJdbcTemplate);
+        handleCheckData(nodeStatus,nodeInstanceId,myJdbcTemplate);
+    }
+
+    /**
+     * 采购需求审批-流程审批处理逻辑
+     * @param nodeStatus 节点状态名称
+     * @param nodeInstanceId 节点实例id
+     * @param myJdbcTemplate 数据源
+     */
+    private void handleCheckData(String nodeStatus, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        String userName = ExtJarHelper.loginInfo.get().userName;
+        //流程实例id
+        String procInstId = ExtJarHelper.procInstId.get();
+        //业务表id
+        String csCommId = entityRecord.csCommId;
+        //获取审批意见
+        Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
+        //审批意见、内容
+        String comment = message.get("comment");
+        //分支判断，逻辑处理
+        if ("chargeLeaderOk".equals(nodeStatus)){
+
+        }
+    }
+
+    /**
+     * 节点赋值
+     * @param status 状态码
+     * @param nodeInstanceId 节点实例id
+     * @param myJdbcTemplate 数据源
+     */
+    private String processCheck(String status, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
+        String nodeId = ProcessCommon.getNodeIdByNodeInstanceId(nodeInstanceId,myJdbcTemplate);
+        String name = "";
+        if ("true".equals(status)){
+            if ("1608274390628331520".equals(nodeId)){ //1-发起
+                name = "startOk";
+            } else if ("1608274390712217600".equals(nodeId)){ //2-业务部门主管审批
+                name = "chargeLeaderOk";
+            } else if ("1608274533448577024".equals(nodeId)){ //3-成本岗审批
+                name = "costOk";
+            } else if ("1608274390733189120".equals(nodeId)){ //4-采购岗/财务岗审批
+                name = "buyAndFinanceOk";
+            } else if ("1608274390846435328".equals(nodeId)){ //5-采购/成本/财务主管审批
+                name = "costFinanceBuyLeaderOK";
+            } else if ("1608274390896766976".equals(nodeId)){
+                name = "chargeLeaderOK";
+            }
+        } else {
+            if ("1608274390712217600".equals(nodeId)){ //2-业务部门主管审批
+                name = "chargeLeaderRefuse";
+            } else if ("1608274533448577024".equals(nodeId)){ //3-成本岗审批
+                name = "costRefuse";
+            } else if ("1608274390733189120".equals(nodeId)){ //4-采购岗/财务岗审批
+                name = "buyAndFinanceRefuse";
+            } else if ("1608274390846435328".equals(nodeId)){ //5-采购/成本/财务主管审批
+                name = "costFinanceBuyLeaderRefuse";
+            } else if ("1608274390896766976".equals(nodeId)){
+                name = "chargeLeaderRefuse";
+            }
+        }
+        return name;
     }
 }

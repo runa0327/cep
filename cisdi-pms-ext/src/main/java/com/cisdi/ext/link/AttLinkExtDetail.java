@@ -1241,7 +1241,7 @@ public class AttLinkExtDetail {
         List<Map<String,Object>> list = LinkSql.prjRoster(projectId,companyId,myJdbcTemplate);
         if (!CollectionUtils.isEmpty(list)){
             if ("PM_BUY_DEMAND_REQ".equals(entCode)){ //采购需求回显逻辑
-                Map<String,String> map = PmBuyDemandReqExt.POSTCODEMAP;
+                Map<String,String> map = PmBuyDemandReqExt.POST_CODE_MAP;
                 //人员信息回显
                 userForeach(list,map,attLinkResult,myJdbcTemplate);
             }
