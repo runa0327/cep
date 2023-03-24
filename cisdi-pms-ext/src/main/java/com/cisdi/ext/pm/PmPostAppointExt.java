@@ -43,7 +43,7 @@ public class PmPostAppointExt {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
         //项目岗位信息写入项目花名册
-        PmRosterExt.createDataByProcess(entityRecord,projectId,myJdbcTemplate,postCodeMap);
+        PmRosterExt.createDataByProcess(entityRecord,projectId, postCodeMap);
     }
 
     /**

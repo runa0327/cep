@@ -1,11 +1,14 @@
 package com.cisdi.ext.pm;
 
 import cn.hutool.core.util.IdUtil;
+import com.cisdi.ext.model.HrDept;
+import com.cisdi.ext.model.PmRoster;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -23,6 +26,16 @@ import java.util.*;
  */
 @Slf4j
 public class PmBuyDemandReqExt {
+
+    /**
+     * 流程中的岗位字段和名称 key:字段 value：流程岗位名称
+     */
+    public static final Map<String,String> POST_CODE_MAP = new HashMap();
+    static {
+        POST_CODE_MAP.put("AD_USER_TWO_ID","采购岗");
+        POST_CODE_MAP.put("AD_USER_THREE_ID","成本岗");
+        POST_CODE_MAP.put("AD_USER_FIVE_ID","财务岗");
+    }
 
     /**
      * 采购需求审批扩展-按照先后顺序审批-第一次审批
@@ -615,5 +628,141 @@ public class PmBuyDemandReqExt {
 
             ExtJarHelper.returnValue.set(userIdList);
         }
+    }
+
+    /**
+     * 采购需求审批-确认
+     */
+    public void buyDemandCheckOK(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        String nodeStatus = processCheck("true",nodeInstanceId,myJdbcTemplate);
+        handleCheckData(nodeStatus,nodeInstanceId,myJdbcTemplate);
+    }
+
+    /**
+     * 采购需求审批-拒绝
+     */
+    public void buyDemandCheckRefuse(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        String nodeStatus = processCheck("false",nodeInstanceId,myJdbcTemplate);
+        handleCheckData(nodeStatus,nodeInstanceId,myJdbcTemplate);
+    }
+
+    /**
+     * 采购需求审批-流程审批处理逻辑
+     * @param nodeStatus 节点状态名称
+     * @param nodeInstanceId 节点实例id
+     * @param myJdbcTemplate 数据源
+     */
+    private void handleCheckData(String nodeStatus, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        String userName = ExtJarHelper.loginInfo.get().userName;
+        //流程实例id
+        String procInstId = ExtJarHelper.procInstId.get();
+        //业务表id
+        String csCommId = entityRecord.csCommId;
+        //获取审批意见
+        Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
+        //审批意见、内容
+        String comment = message.get("comment");
+        //分支判断，逻辑处理
+        if ("chargeLeaderOk".equals(nodeStatus)){
+
+        }
+    }
+
+    /**
+     * 节点赋值
+     * @param status 状态码
+     * @param nodeInstanceId 节点实例id
+     * @param myJdbcTemplate 数据源
+     */
+    private String processCheck(String status, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
+        String nodeId = ProcessCommon.getNodeIdByNodeInstanceId(nodeInstanceId,myJdbcTemplate);
+        String name = "";
+        if ("true".equals(status)){
+            if ("1608274390628331520".equals(nodeId)){ //1-发起
+                name = "startOk";
+            } else if ("1608274390712217600".equals(nodeId)){ //2-业务部门主管审批
+                name = "chargeLeaderOk";
+            } else if ("1608274533448577024".equals(nodeId)){ //3-成本岗审批
+                name = "costOk";
+            } else if ("1608274390733189120".equals(nodeId)){ //4-采购岗/财务岗审批
+                name = "buyAndFinanceOk";
+            } else if ("1608274390846435328".equals(nodeId)){ //5-采购/成本/财务主管审批
+                name = "costFinanceBuyLeaderOK";
+            } else if ("1608274390896766976".equals(nodeId)){
+                name = "chargeLeaderOK";
+            }
+        } else {
+            if ("1608274390712217600".equals(nodeId)){ //2-业务部门主管审批
+                name = "chargeLeaderRefuse";
+            } else if ("1608274533448577024".equals(nodeId)){ //3-成本岗审批
+                name = "costRefuse";
+            } else if ("1608274390733189120".equals(nodeId)){ //4-采购岗/财务岗审批
+                name = "buyAndFinanceRefuse";
+            } else if ("1608274390846435328".equals(nodeId)){ //5-采购/成本/财务主管审批
+                name = "costFinanceBuyLeaderRefuse";
+            } else if ("1608274390896766976".equals(nodeId)){
+                name = "chargeLeaderRefuse";
+            }
+        }
+        return name;
+    }
+
+    /**
+     * 采购需求审批-流程办结时扩展
+     */
+    public void buyDemandEnd(){
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //成本岗、采购岗、财务岗人员信息写入花名册
+        List<PmRoster> rosterList = getRosterList(entityRecord,POST_CODE_MAP,myJdbcTemplate);
+        PmRosterExt.updatePrjUser(rosterList);
+    }
+
+    /**
+     * 项目花名册实体装值
+     * @param entityRecord 流程表单内容
+     * @param postCodeMap 流程中的岗位字段和名称
+     * @param myJdbcTemplate 数据源
+     * @return
+     */
+    private List<PmRoster> getRosterList(EntityRecord entityRecord, Map<String, String> postCodeMap, MyJdbcTemplate myJdbcTemplate) {
+        List<PmRoster> list = new ArrayList<>();
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
+        for (String key : postCodeMap.keySet()){
+            String userId = JdbcMapUtil.getString(entityRecord.valueMap,key);
+            //获取项目岗位信息
+            String prjPostId = getPostId(postCodeMap.get(key),companyId,myJdbcTemplate);
+            PmRoster pmRoster = new PmRoster();
+            pmRoster.setPmPrjId(projectId);
+            pmRoster.setCustomerUnit(companyId);
+            pmRoster.setAdUserId(userId);
+            pmRoster.setPostInfoId(prjPostId);
+            list.add(pmRoster);
+        }
+        return list;
+    }
+
+    /**
+     * 查询项目岗位id
+     * @param processPost 流程岗位名称
+     * @param companyId 业主单位
+     * @param myJdbcTemplate 数据源
+     * @return
+     */
+    private String getPostId(String processPost, String companyId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select a.POST_INFO_ID from PM_POST_PROPRJ a left join BASE_PROCESS_POST b on a.BASE_PROCESS_POST_ID = b.id where a.CUSTOMER_UNIT = ? and b.name = ?";
+        String postInfoId = "";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,companyId,processPost);
+        if (!CollectionUtils.isEmpty(list)){
+            postInfoId = JdbcMapUtil.getString(list.get(0),"id");
+        }
+        return postInfoId;
     }
 }
