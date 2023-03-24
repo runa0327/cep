@@ -353,21 +353,28 @@ public class ProPlanExt {
         }
         nodeInfo.progressRiskRemark = JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_REMARK");
         if (!Objects.isNull(dataMap.get("CHIEF_DEPT_ID"))) {
-            Map<String, Object> deptObj = myJdbcTemplate.queryForMap("select * from hr_dept where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_DEPT_ID"));
-            IdCodeName idCodeName = new IdCodeName();
-            idCodeName.id = String.valueOf(deptObj.get("ID"));
-            idCodeName.code = String.valueOf(deptObj.get("CODE"));
-            idCodeName.name = String.valueOf(deptObj.get("NAME"));
-            nodeInfo.chiefDept = idCodeName;
+            List<Map<String, Object>> deptList = myJdbcTemplate.queryForList("select * from hr_dept where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_DEPT_ID"));
+            if(!CollectionUtils.isEmpty(deptList)){
+                Map<String, Object> deptObj = deptList.get(0);
+                IdCodeName idCodeName = new IdCodeName();
+                idCodeName.id = String.valueOf(deptObj.get("ID"));
+                idCodeName.code = String.valueOf(deptObj.get("CODE"));
+                idCodeName.name = String.valueOf(deptObj.get("NAME"));
+                nodeInfo.chiefDept = idCodeName;
+            }
+
         }
 
         if (!Objects.isNull(dataMap.get("CHIEF_USER_ID"))) {
-            Map<String, Object> userObj = myJdbcTemplate.queryForMap("select * from ad_user where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_USER_ID"));
-            IdCodeName idCodeName = new IdCodeName();
-            idCodeName.id = String.valueOf(userObj.get("ID"));
-            idCodeName.code = String.valueOf(userObj.get("CODE"));
-            idCodeName.name = String.valueOf(userObj.get("NAME"));
-            nodeInfo.chiefUser = idCodeName;
+            List<Map<String, Object>> userList = myJdbcTemplate.queryForList("select * from ad_user where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_USER_ID"));
+            if(!CollectionUtils.isEmpty(userList)){
+                Map<String, Object> userObj =userList.get(0);
+                IdCodeName idCodeName = new IdCodeName();
+                idCodeName.id = String.valueOf(userObj.get("ID"));
+                idCodeName.code = String.valueOf(userObj.get("CODE"));
+                idCodeName.name = String.valueOf(userObj.get("NAME"));
+                nodeInfo.chiefUser = idCodeName;
+            }
         }
 
         if (!Objects.isNull(dataMap.get("POST_INFO_ID"))) {

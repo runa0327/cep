@@ -87,25 +87,27 @@ public class PmProPlanExt {
             viewObj.user = JdbcMapUtil.getString(node, "user");
             // 查询存在问题 problemList
             List<Map<String, Object>> proList = myJdbcTemplate.queryForList("select np.*,au.`NAME` as userName from NODE_PROBLEM np left join ad_user au on np.AD_USER_ID = au.id  where PM_PRO_PLAN_NODE_ID=?", nodeId);
-            List<Problem> problemList = proList.stream().map(p -> {
+            viewObj.problemList = proList.stream().map(p1 -> {
                 Problem problem = new Problem();
-                problem.id = JdbcMapUtil.getString(p, "ID");
-                problem.des = JdbcMapUtil.getString(p, "PROBLEM_DESCRIBE");
-                problem.way = JdbcMapUtil.getString(p, "SOLUTION");
-                problem.izDo = JdbcMapUtil.getString(p, "IS_SOLVE");
-                problem.userName = JdbcMapUtil.getString(p, "userName");
-                problem.ctime = JdbcMapUtil.getString(p, "PROPOSAL_DATE");
+                problem.id = JdbcMapUtil.getString(p1, "ID");
+                problem.des = JdbcMapUtil.getString(p1, "PROBLEM_DESCRIBE");
+                problem.way = JdbcMapUtil.getString(p1, "SOLUTION");
+                problem.izDo = JdbcMapUtil.getString(p1, "IS_SOLVE");
+                problem.userName = JdbcMapUtil.getString(p1, "userName");
+                problem.ctime = JdbcMapUtil.getString(p1, "PROPOSAL_DATE");
                 return problem;
             }).collect(Collectors.toList());
-            viewObj.problemList = problemList;
 
-            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppl.AD_ENT_ID_IMP,pppl.AD_ATT_ID_IMP,ae.`NAME` as ant_name,aa.`NAME` as att_name, ae.`CODE` as ant_code ,aa.`CODE` as att_code " +
-                    "from pm_pro_plan_node pppn " +
-                    "left join base_node bn on bn.`NAME` = pppn.`NAME` " +
-                    "left join PM_PRO_PLAN_LEDGER pppl on pppn.`NAME` = pppl.base_node_id = bn.id " +
-                    "left join ad_ent ae on ae.id = pppl.AD_ENT_ID_IMP  " +
-                    "left join ad_att aa on aa.id = pppl.AD_ATT_ID_IMP " +
-                    "where pppn.id=?", nodeId);
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,abc.* " +
+                    "from pm_pro_plan_node pppn \n" +
+                    "left join \n" +
+                    "( " +
+                    " select bn.`NAME` as base_name,ad.code as ant_code,ad.`NAME` as ant_name,att.`CODE` as att_code,att.`NAME` as att_name from PM_PRO_PLAN_LEDGER a " +
+                    " left join ad_ent ad on a.AD_ENT_ID_IMP = ad.id  " +
+                    " left join ad_att att on att.id = a.AD_ATT_ID_IMP " +
+                    " left join base_node bn on bn.id = a.BASE_NODE_ID " +
+                    ") abc on abc.base_name = pppn.`NAME` " +
+                    "where pppn.id= ?", nodeId);
             if (!CollectionUtils.isEmpty(list)) {
                 if (Objects.nonNull(list.get(0).get("ant_code")) && Objects.nonNull(list.get(0).get("att_code"))) {
                     String tableName = String.valueOf(list.get(0).get("ant_code"));
@@ -126,7 +128,7 @@ public class PmProPlanExt {
                                 queryParams.put("ids", ids);
                                 List<Map<String, Object>> fileList = myNamedParameterJdbcTemplate.queryForList("select ff.ID as ID, DSP_NAME,SIZE_KB,UPLOAD_DTTM,au.`NAME` as USER_NAME,FILE_INLINE_URL,FILE_ATTACHMENT_URL from fl_file ff left join ad_user au on ff.CRT_USER_ID = au.id  where ff.id in (:ids)", queryParams);
                                 AtomicInteger index = new AtomicInteger(0);
-                                List<FileObj> fileObjList = fileList.stream().map(p -> {
+                                fileListObj.fileObjList = fileList.stream().map(p -> {
                                     FileObj obj = new FileObj();
                                     obj.num = index.getAndIncrement() + 1;
                                     obj.fileName = JdbcMapUtil.getString(p, "DSP_NAME");
@@ -138,8 +140,8 @@ public class PmProPlanExt {
                                     obj.downloadUrl = JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
                                     return obj;
                                 }).collect(Collectors.toList());
-                                fileListObj.fileObjList = fileObjList;
                                 fileListObjList.add(fileListObj);
+                                viewObj.fileListObjList = fileListObjList;
                             }
                         }
                     }
