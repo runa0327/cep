@@ -71,7 +71,7 @@ public class PmProPlanExt {
                 "from PM_PRO_PLAN_NODE  pppn " +
                 "left join hr_dept hd on hd.id = pppn.CHIEF_DEPT_ID " +
                 "left join gr_set_value gsv on gsv.id = pppn.PROGRESS_STATUS_ID " +
-                "left join ad_user au on au.id = pppn.CHIEF_USER_ID "+
+                "left join ad_user au on au.id = pppn.CHIEF_USER_ID " +
                 "where pppn.id=?", nodeId);
         if (!CollectionUtils.isEmpty(nodeList)) {
             Map<String, Object> node = nodeList.get(0);
@@ -121,7 +121,7 @@ public class PmProPlanExt {
                         List<Map<String, Object>> dataList = myJdbcTemplate.queryForList(sb.toString());
                         if (!CollectionUtils.isEmpty(dataList)) {
                             String fileIds = JdbcMapUtil.getString(dataList.get(0), column);
-                            if (!"null".equals(fileIds)) {
+                            if (fileIds != null) {
                                 List<String> ids = Arrays.asList(fileIds.split(","));
                                 MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
                                 Map<String, Object> queryParams = new HashMap<>();// 创建入参map
