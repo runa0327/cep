@@ -197,14 +197,14 @@ public class ProPlanExt {
 
                 List<Map<String, Object>> allList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
                         "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,LINKED_WF_PROCESS_ID,\n" +
-                        "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO,pppn.`LEVEL`,pppn.POST_INFO_ID,pppn.CAN_START \n" +
+                        "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO,pppn.`LEVEL`,pppn.POST_INFO_ID,ifnull(pppn.CAN_START,0) CAN_START \n" +
                         "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where ppp.PM_PRJ_ID=?", pmPrjId);
 
                 List<String> notStart = new ArrayList<>();
                 // 结果转换
                 List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(pmPrjId, p, myJdbcTemplate)).collect(Collectors.toList());
                 //处理是否能启动，逻辑：关联同1个流程的多个节点，只有第1个可以启动
-                Map<String, List<PrjProPlanNodeInfo>> mapData = infoList.stream().filter(m -> "1".equals(m.canStart)).collect(Collectors.groupingBy(p -> p.linkedWfProcessId));
+                Map<String, List<PrjProPlanNodeInfo>> mapData = infoList.stream().filter(m -> "1".equals(m.canStart) && m.linkedWfProcessId !=null).collect(Collectors.groupingBy(p -> p.linkedWfProcessId));
                 for (String key : mapData.keySet()) {
                     List<PrjProPlanNodeInfo> data = mapData.get(key);
                     if (!CollectionUtils.isEmpty(data)) {
@@ -353,21 +353,28 @@ public class ProPlanExt {
         }
         nodeInfo.progressRiskRemark = JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_REMARK");
         if (!Objects.isNull(dataMap.get("CHIEF_DEPT_ID"))) {
-            Map<String, Object> deptObj = myJdbcTemplate.queryForMap("select * from hr_dept where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_DEPT_ID"));
-            IdCodeName idCodeName = new IdCodeName();
-            idCodeName.id = String.valueOf(deptObj.get("ID"));
-            idCodeName.code = String.valueOf(deptObj.get("CODE"));
-            idCodeName.name = String.valueOf(deptObj.get("NAME"));
-            nodeInfo.chiefDept = idCodeName;
+            List<Map<String, Object>> deptList = myJdbcTemplate.queryForList("select * from hr_dept where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_DEPT_ID"));
+            if(!CollectionUtils.isEmpty(deptList)){
+                Map<String, Object> deptObj = deptList.get(0);
+                IdCodeName idCodeName = new IdCodeName();
+                idCodeName.id = String.valueOf(deptObj.get("ID"));
+                idCodeName.code = String.valueOf(deptObj.get("CODE"));
+                idCodeName.name = String.valueOf(deptObj.get("NAME"));
+                nodeInfo.chiefDept = idCodeName;
+            }
+
         }
 
         if (!Objects.isNull(dataMap.get("CHIEF_USER_ID"))) {
-            Map<String, Object> userObj = myJdbcTemplate.queryForMap("select * from ad_user where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_USER_ID"));
-            IdCodeName idCodeName = new IdCodeName();
-            idCodeName.id = String.valueOf(userObj.get("ID"));
-            idCodeName.code = String.valueOf(userObj.get("CODE"));
-            idCodeName.name = String.valueOf(userObj.get("NAME"));
-            nodeInfo.chiefUser = idCodeName;
+            List<Map<String, Object>> userList = myJdbcTemplate.queryForList("select * from ad_user where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_USER_ID"));
+            if(!CollectionUtils.isEmpty(userList)){
+                Map<String, Object> userObj =userList.get(0);
+                IdCodeName idCodeName = new IdCodeName();
+                idCodeName.id = String.valueOf(userObj.get("ID"));
+                idCodeName.code = String.valueOf(userObj.get("CODE"));
+                idCodeName.name = String.valueOf(userObj.get("NAME"));
+                nodeInfo.chiefUser = idCodeName;
+            }
         }
 
         if (!Objects.isNull(dataMap.get("POST_INFO_ID"))) {
