@@ -1267,7 +1267,6 @@ public class AttLinkExtDetail {
                 }
             }
         }
-
     }
 
 }

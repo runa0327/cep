@@ -4,7 +4,6 @@ import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.PmRoster;
 import com.cisdi.ext.model.PostInfo;
 import com.cisdi.ext.util.JsonUtil;
-import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -14,7 +13,6 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
-import org.checkerframework.checker.units.qual.K;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -560,10 +558,9 @@ public class PmRosterExt {
      *
      * @param entityRecord   数据值
      * @param projectId      项目id
-     * @param myJdbcTemplate 数据源
      * @param map            岗位指派流程字段与岗位对应关系 key：流程表单字段 value：岗位名称
      */
-    public static void createDataByProcess(EntityRecord entityRecord, String projectId, MyJdbcTemplate myJdbcTemplate, Map<String, String> map) {
+    public static void createDataByProcess(EntityRecord entityRecord, String projectId, Map<String, String> map) {
         List<PmRoster> insertList = new ArrayList<>();
         //业主单位
         String customerUnit = JdbcMapUtil.getString(entityRecord.valueMap, "CUSTOMER_UNIT");
@@ -574,7 +571,7 @@ public class PmRosterExt {
                 String postId = PostInfo.selectByWhere(new Where().eq(PostInfo.Cols.SYS_TRUE,"1")
                         .eq(PostInfo.Cols.STATUS,"AP").eq(PostInfo.Cols.NAME,value)).get(0).getId();
                 //部门id查询
-                String deptName = getDeptNameByCode(key,postDeptMap);
+                String deptName = getDeptNameByCode(key);
                 String deptId = HrDept.selectByWhere(new Where().eq(HrDept.Cols.CUSTOMER_UNIT,customerUnit).eq(HrDept.Cols.NAME,deptName)).get(0).getHrDeptPid();
                 PmRoster pmRoster = new PmRoster();
                 pmRoster.setPmPrjId(projectId);
@@ -588,7 +585,7 @@ public class PmRosterExt {
         if (!CollectionUtils.isEmpty(insertList)) {
             for (PmRoster tmp : insertList) {
                 //判断该项目该岗位是否存在，获取id
-                String pmPosterId = "";
+                String pmPosterId;
                 List<PmRoster> list = PmRoster.selectByWhere(new Where().eq(PmRoster.Cols.PM_PRJ_ID, projectId).eq(PmRoster.Cols.POST_INFO_ID, tmp.getPostInfoId()));
                 if (CollectionUtils.isEmpty(list)) {
                     pmPosterId = Crud.from("PM_ROSTER").insertData();
@@ -607,14 +604,13 @@ public class PmRosterExt {
     /**
      * 获取部门名称
      * @param key 流程字段code
-     * @param postDeptMap code和部门对应集合
      * @return 部门名称
      */
-    private static String getDeptNameByCode(String key, Map<String, String> postDeptMap) {
+    private static String getDeptNameByCode(String key) {
         String deptName = "";
-        for (String tmp : postDeptMap.keySet()){
+        for (String tmp : PmRosterExt.postDeptMap.keySet()){
             if (key.equals(tmp)){
-                deptName = postDeptMap.get(tmp);
+                deptName = PmRosterExt.postDeptMap.get(tmp);
             }
         }
         return deptName;
@@ -633,7 +629,7 @@ public class PmRosterExt {
         map.put("ids",deptId);
         map.put("companyId",companyId);
         List<String> userList = new ArrayList<>();
-        String user = "";
+        String user;
         String[] arr = projectId.split(",");
         for (String prjId : arr) {
             map.put("prjId",prjId);
@@ -657,10 +653,29 @@ public class PmRosterExt {
         return userList;
     }
 
-    public static void main(String[] args) {
-        String ss = "dadadasd,sdadad";
-        List<String> list = Arrays.asList(ss.split(","));
-        System.out.println(list);
+    /**
+     * 流程完结后更新项目花名册人员
+     * @param rosterList 人员信息
+     */
+    public static void updatePrjUser(List<PmRoster> rosterList) {
+        if (!CollectionUtils.isEmpty(rosterList)){
+            for (PmRoster tmp : rosterList) {
+                List<PmRoster> list = PmRoster.selectByWhere(new Where().eq(PmRoster.Cols.PM_PRJ_ID,tmp.getPmPrjId())
+                        .eq(PmRoster.Cols.CUSTOMER_UNIT,tmp.getCustomerUnit())
+                        .eq(PmRoster.Cols.POST_INFO_ID,tmp.getPostInfoId()));
+                String id;
+                if (CollectionUtils.isEmpty(list)){
+                    id = Crud.from("PM_ROSTER").insertData();
+                } else {
+                    id = list.get(0).getId();
+                }
+                Crud.from("PM_ROSTER").where().eq("id",id).update()
+                        .set("CUSTOMER_UNIT",tmp.getCustomerUnit())
+                        .set("PM_PRJ_ID",tmp.getPmPrjId())
+                        .set("POST_INFO_ID",tmp.getPostInfoId())
+                        .set("AD_USER_ID",tmp.getAdUserId())
+                        .exec();
+            }
+        }
     }
-
 }

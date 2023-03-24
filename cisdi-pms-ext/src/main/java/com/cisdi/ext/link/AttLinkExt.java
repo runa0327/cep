@@ -3730,14 +3730,14 @@ public class AttLinkExt {
 
             if (!CollectionUtils.isEmpty(list)){
                 //需要自动岗位人员的流程
-                List<String> processUserList = AttLinkDifferentProcess.getLinkUserProcess();
-                if (processUserList.contains(entCode)){
+//                List<String> processUserList = AttLinkDifferentProcess.getLinkUserProcess();
+//                if (processUserList.contains(entCode)){
                     //清除岗位信息
-                    AttLinkExtDetail.clearPostUserData(attLinkResult);
+//                    AttLinkExtDetail.clearPostUserData(attLinkResult);
                     //业主单位
-                    String companyId = JdbcMapUtil.getString(list.get(0),"customer_id");
-                    AttLinkExtDetail.processLinkUser(attValue,entCode,companyId,attLinkResult,myJdbcTemplate);
-                }
+//                    String companyId = JdbcMapUtil.getString(list.get(0),"customer_id");
+//                    AttLinkExtDetail.processLinkUser(attValue,entCode,companyId,attLinkResult,myJdbcTemplate);
+//                }
 
                 Map row = list.get(0);
                 if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)) { // 工程开工报审
