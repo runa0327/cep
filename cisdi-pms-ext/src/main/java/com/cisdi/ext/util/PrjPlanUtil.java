@@ -291,6 +291,9 @@ public class PrjPlanUtil {
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRO_PLAN where id = ?", proPlanId);
 
         if (!CollectionUtils.isEmpty(list)) {
+            //先清出原来的
+            clearPlan(projectId);
+
             Map<String, Object> proMap = list.get(0);
             // 先创建项目的进度计划
             String newPlanId = Crud.from("PM_PRO_PLAN").insertData();
@@ -336,6 +339,12 @@ public class PrjPlanUtil {
                     .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).exec();
             getChildrenNode(m, allData, id, newPlanId, postUserList);
         }).collect(Collectors.toList());
+    }
+
+    private static void clearPlan(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        myJdbcTemplate.update("delete from PM_PRO_PLAN_NODE where PM_PRO_PLAN_ID in (select id from PM_PRO_PLAN where PM_PRJ_ID=?)", projectId);
+        myJdbcTemplate.update("delete from PM_PRO_PLAN where PM_PRJ_ID=?", projectId);
     }
 
     /**

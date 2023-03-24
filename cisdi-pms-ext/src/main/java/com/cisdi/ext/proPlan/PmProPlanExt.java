@@ -71,7 +71,7 @@ public class PmProPlanExt {
                 "from PM_PRO_PLAN_NODE  pppn " +
                 "left join hr_dept hd on hd.id = pppn.CHIEF_DEPT_ID " +
                 "left join gr_set_value gsv on gsv.id = pppn.PROGRESS_STATUS_ID " +
-                "left join ad_user au on au.id = pppn.CHIEF_USER_ID "+
+                "left join ad_user au on au.id = pppn.CHIEF_USER_ID " +
                 "where pppn.id=?", nodeId);
         if (!CollectionUtils.isEmpty(nodeList)) {
             Map<String, Object> node = nodeList.get(0);
@@ -121,7 +121,7 @@ public class PmProPlanExt {
                         List<Map<String, Object>> dataList = myJdbcTemplate.queryForList(sb.toString());
                         if (!CollectionUtils.isEmpty(dataList)) {
                             String fileIds = JdbcMapUtil.getString(dataList.get(0), column);
-                            if (!"null".equals(fileIds)) {
+                            if (fileIds != null) {
                                 List<String> ids = Arrays.asList(fileIds.split(","));
                                 MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
                                 Map<String, Object> queryParams = new HashMap<>();// 创建入参map
@@ -324,7 +324,7 @@ public class PmProPlanExt {
                             .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                             .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                             .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
-                            .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START",  m.get("CAN_START")).exec();
+                            .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).exec();
 
                     getChildrenNode(m, planNodeList, id, newPlanId, postUserList);
                 }).collect(Collectors.toList());
