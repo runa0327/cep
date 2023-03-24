@@ -140,31 +140,38 @@ public class ProjectHomeExt {
         Map<String, String> dateMap = WeeklyUtils.weekBeginningAndEnding(new Date());
         WeekWork weekWork = new WeekWork();
         //发起流程
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id " +
-                "where a.status = 'AP' and b.status in ('AP','VDING') and a.START_USER_ID = ? " +
-                "and a.START_DATETIME >= ? and a.START_DATETIME <= ? ", userId, dateMap.get("begin"), dateMap.get("end"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select a.* from wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id " +
+                "where a.status = 'AP' and b.status in ('AP','VDING') " +
+                "and a.START_DATETIME >= ? and a.START_DATETIME <= ? ", dateMap.get("begin"), dateMap.get("end"));
         if (list != null && list.size() > 0) {
-            weekWork.fqCount = list.size();
+            weekWork.fqTotal = list.size();
+            List<Map<String, Object>> userCount = list.stream().filter(p -> userId.equals(JdbcMapUtil.getString(p, "START_USER_ID"))).collect(Collectors.toList());
+            weekWork.fqCount = userCount.size();
         }
 
         //处理流程
         List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id " +
                         "left join wf_task c on a.id = c.WF_PROCESS_INSTANCE_ID where a.status = 'AP' and b.status in ('AP','VDING') " +
-                        "and c.status = 'AP' and a.START_USER_ID = ? and a.START_DATETIME >= ? and a.START_DATETIME <= ? ",
-                userId, dateMap.get("begin"), dateMap.get("end"));
+                        "and c.status = 'AP'  and a.START_DATETIME >= ? and a.START_DATETIME <= ? ",
+                dateMap.get("begin"), dateMap.get("end"));
         if (list1 != null && list1.size() > 0) {
-            weekWork.clCount = list1.size();
+            weekWork.clTotal = list1.size();
+            List<Map<String, Object>> userCount = list1.stream().filter(p -> userId.equals(JdbcMapUtil.getString(p, "START_USER_ID"))).collect(Collectors.toList());
+            weekWork.clCount = userCount.size();
         }
 
         //进行中流程
         List<Map<String, Object>> list2 = myJdbcTemplate.queryForList("select * from wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id " +
-                        "where a.status = 'AP' and b.status in ('AP','VDING') and a.START_USER_ID = ? " +
+                        "where a.status = 'AP' and b.status in ('AP','VDING')  " +
                         "and a.START_DATETIME >= ? and a.START_DATETIME <= ? and a.END_DATETIME is null",
-                userId, dateMap.get("begin"), dateMap.get("end"));
+                dateMap.get("begin"), dateMap.get("end"));
         if (list2 != null && list2.size() > 0) {
-            weekWork.jxzCount = list2.size();
+            weekWork.jxzTotal = list2.size();
+            List<Map<String, Object>> userCount = list2.stream().filter(p -> userId.equals(JdbcMapUtil.getString(p, "START_USER_ID"))).collect(Collectors.toList());
+            weekWork.jxzCount = userCount.size();
         }
         weekWork.cyCount = weekWork.clCount + weekWork.fqCount;
+        weekWork.cyTotal = weekWork.clTotal + weekWork.fqTotal;
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(weekWork), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
@@ -203,12 +210,21 @@ public class ProjectHomeExt {
     public static class WeekWork {
         //发起流程
         public Integer fqCount = 0;
+
+        public Integer fqTotal = 0;
+
         //处理流程
         public Integer clCount = 0;
+
+        public Integer clTotal = 0;
         //进行中流程
         public Integer jxzCount = 0;
+
+        public Integer jxzTotal = 0;
         //参与审批
         public Integer cyCount = 0;
+
+        public Integer cyTotal = 0;
     }
 
 }
