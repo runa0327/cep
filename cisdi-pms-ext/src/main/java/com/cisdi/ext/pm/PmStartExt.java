@@ -114,7 +114,7 @@ public class PmStartExt {
                 " ps.PM_CODE as PM_CODE, " +
                 " ps.INVESTMENT_SOURCE_ID as INVESTMENT_SOURCE_ID, " +
                 " gg.`NAME` as sourceTypeValue," +
-                " round(ifnull( PRJ_TOTAL_INVEST, 0 ),2)/10000 AS PRJ_TOTAL_INVEST," +
+                " round(ifnull( PRJ_TOTAL_INVEST, 0 ),2) AS PRJ_TOTAL_INVEST," +
                 " ps.PROJECT_TYPE_ID as PROJECT_TYPE_ID," +
                 " gsv.`NAME` AS typeValue," +
                 " ps.BUILDER_UNIT as BUILDER_UNIT," +
@@ -126,7 +126,7 @@ public class PmStartExt {
                 " ps.ATT_FILE_GROUP_ID as ATT_FILE_GROUP_ID, " +
                 " au.`NAME` AS agentValue, " +
                 " pj.ID as projectId , " +
-                " ps.TENDER_WAY_ID ," +
+                " ps.TENDER_MODE_ID ," +
                 " gq.`NAME` as tender_way, " +
                 " ps.START_REMARK ,ps.PRJ_START_STATUS_ID " +
                 "FROM " +
@@ -163,7 +163,7 @@ public class PmStartExt {
                 pmStart.agentValue = JdbcMapUtil.getString(m, "agentValue");
                 pmStart.projectId = JdbcMapUtil.getString(m, "projectId");
                 pmStart.parcels = getParcel(pmStart.projectId);
-                pmStart.tenderWayId = JdbcMapUtil.getString(m, "TENDER_WAY_ID");
+                pmStart.tenderWayId = JdbcMapUtil.getString(m, "TENDER_MODE_ID");
                 pmStart.tenderWay = JdbcMapUtil.getString(m, "tender_way");
                 pmStart.startRemark = JdbcMapUtil.getString(m, "START_REMARK");
                 pmStart.statusId = JdbcMapUtil.getString(m, "PRJ_START_STATUS_ID");
@@ -194,7 +194,7 @@ public class PmStartExt {
         List<parcel> parcels = input.parcels;
         String location = JSON.toJSON(parcels).toString();
         Crud.from("PRJ_START").where().eq("ID", id).update()
-                .set("PM_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest.multiply(new BigDecimal(10000))).set("PROJECT_TYPE_ID", input.typeId).set("TENDER_MODE_ID", input.tenderWay)
+                .set("PM_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId).set("TENDER_MODE_ID", input.tenderWay)
                 .set("BUILDER_UNIT", input.unit).set("START_TIME", input.startTime).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", status).set("START_REMARK", input.startRemark)
                 .set("ATT_FILE_GROUP_ID", input.fileIds).set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).set("START_TIME", input.startTime)
                 .set("LOCATION_INFO", location).exec();
