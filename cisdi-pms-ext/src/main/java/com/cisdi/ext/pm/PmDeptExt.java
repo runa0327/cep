@@ -1,11 +1,14 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.model.HrDeptUser;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
@@ -263,5 +266,23 @@ public class PmDeptExt {
         public String pid;
         public String name;
         public List<Dept> children;
+    }
+
+    /**
+     * 部门用户校验
+     */
+    public void checkDeptUser(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //是否主部门
+        String sysTrue = JdbcMapUtil.getString(entityRecord.valueMap,"SYS_TRUE");
+        if ("true".equals(sysTrue)){
+            List<HrDeptUser> list = HrDeptUser.selectByWhere(new Where().eq(HrDeptUser.Cols.CUSTOMER_UNIT,JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT"))
+                    .eq(HrDeptUser.Cols.AD_USER_ID,JdbcMapUtil.getString(entityRecord.valueMap,"AD_USER_ID"))
+                    .eq(HrDeptUser.Cols.SYS_TRUE,"1").neq(HrDeptUser.Cols.ID,JdbcMapUtil.getString(entityRecord.valueMap,"id")));
+            if (!CollectionUtils.isEmpty(list)){
+                throw new BaseException("该人员在该业主单位下已有主部门，请勿重复设置！");
+            }
+        }
     }
 }
