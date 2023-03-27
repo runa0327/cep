@@ -1,11 +1,10 @@
 package com.cisdi.ext.wf;
 
 import com.cisdi.ext.enums.FileCodeEnum;
-import com.cisdi.ext.link.AttLinkDifferentProcess;
+import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.PmFundReqPlan;
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.util.ProFileUtils;
-import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;

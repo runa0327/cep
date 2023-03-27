@@ -1,8 +1,9 @@
-package com.cisdi.ext.link;
+package com.cisdi.ext.link.linkPackage;
 
 import com.cisdi.ext.base.AdUserExt;
 import com.cisdi.ext.base.GrSetValue;
-import com.cisdi.ext.model.PmRoster;
+import com.cisdi.ext.link.*;
+import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.pm.PmBuyDemandReqExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
@@ -946,6 +947,25 @@ public class AttLinkExtDetail {
     }
 
     /**
+     * 业主单位切换清空涉及数据
+     * @param attLinkResult
+     */
+    public static void clearUser(AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            attLinkResult.attMap.put("OPERATOR_ONE_ID",linkedAtt); // 经办人
+            attLinkResult.attMap.put("AD_USER_THREE_ID",linkedAtt); // 成本岗
+            attLinkResult.attMap.put("AD_USER_FOUR_ID",linkedAtt); // 合同岗
+            attLinkResult.attMap.put("AD_USER_EIGHTH_ID",linkedAtt); // 法务岗用户
+            attLinkResult.attMap.put("AD_USER_NINTH_ID",linkedAtt); // 财务岗用户
+            attLinkResult.attMap.put("CRT_DEPT_ID",linkedAtt); // 所属部门
+        }
+    }
+
+    /**
      * 项目属性联动-岗位指派流程-项目启动基础信息
      * @param attLinkResult 返回的集合信息
      * @param attValue 属性联动值
@@ -1269,4 +1289,74 @@ public class AttLinkExtDetail {
         }
     }
 
+    /**
+     * 项目属性联动-查询项目金额最高优先级 财评>概算>可研>立项
+     * @param attValue 属性联动值
+     * @param myJdbcTemplate 数据源
+     * @return 资金信息map
+     */
+    public static Map getAmtMap(String attValue, MyJdbcTemplate myJdbcTemplate) {
+        Map resultRow = new HashMap();
+        String sql1 = "SELECT * FROM PM_PRJ WHERE ID = ?";
+        List<Map<String, Object>> map = myJdbcTemplate.queryForList(sql1, attValue);
+        if (!CollectionUtils.isEmpty(map)) {
+            resultRow = map.get(0);
+        }
+        return resultRow;
+    }
+
+    /**
+     * 项目资金信息回显
+     * @param resultRow 数据源信息
+     * @param attLinkResult 返回的集合值
+     * @return 回显值
+     */
+    public static AttLinkResult getResult(Map resultRow, AttLinkResult attLinkResult) {
+        // 总投资
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "PRJ_TOTAL_INVEST")) ? null:new BigDecimal(JdbcMapUtil.getString(resultRow, "PRJ_TOTAL_INVEST"));
+            attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
+        }
+        // 工程费用
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "PROJECT_AMT")) ? null:new BigDecimal(JdbcMapUtil.getString(resultRow, "PROJECT_AMT"));
+            attLinkResult.attMap.put("PROJECT_AMT", linkedAtt);
+        }
+        // 工程建设其他费用
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "PROJECT_OTHER_AMT")) ? null:new BigDecimal(JdbcMapUtil.getString(resultRow, "PROJECT_OTHER_AMT"));
+            attLinkResult.attMap.put("PROJECT_OTHER_AMT", linkedAtt);
+        }
+        // 预备费
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "PREPARE_AMT")) ? null:new BigDecimal(JdbcMapUtil.getString(resultRow, "PREPARE_AMT"));
+            attLinkResult.attMap.put("PREPARE_AMT", linkedAtt);
+        }
+        // 利息
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "CONSTRUCT_PERIOD_INTEREST")) ? null:new BigDecimal(JdbcMapUtil.getString(resultRow, "CONSTRUCT_PERIOD_INTEREST"));
+            attLinkResult.attMap.put("CONSTRUCT_PERIOD_INTEREST", linkedAtt);
+        }
+        //批复文号
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "REPLY_NO_WR")) ? null:JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "REPLY_NO_WR")) ? null:JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
+            attLinkResult.attMap.put("REPLY_NO", linkedAtt);
+            attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
+        }
+
+        return attLinkResult;
+    }
 }

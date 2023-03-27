@@ -1,5 +1,9 @@
 package com.cisdi.ext.link;
 
+import com.cisdi.ext.link.linkPackage.AttLinkExtDetail;
+import com.cisdi.ext.link.linkPackage.AttLinkProcessDetail;
+import com.cisdi.ext.link.linkPackage.CustomerUnitLink;
+import com.cisdi.ext.link.linkPackage.PmPrjIdLink;
 import com.cisdi.ext.util.ConvertUtils;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
@@ -50,7 +54,7 @@ public class AttLinkExt {
         if ("PROJECT_TYPE_ID".equals(attCode)) {
             return linkForPROJECT_TYPE_ID(myJdbcTemplate, attValue,entCode);
         } else if ("PM_PRJ_ID".equals(attCode)) {
-            return linkForPM_PRJ_ID(myJdbcTemplate, attValue, entCode);
+            return PmPrjIdLink.linkForPM_PRJ_ID(myJdbcTemplate, attValue, entCode);
         } else if ("PMS_RELEASE_WAY_ID".equals(attCode) || "GUARANTEE_LETTER_TYPE_ID".equals(attCode) || "CONTRACT_CATEGORY_ID".equals(attCode) || "PRJ_MANAGE_MODE_ID".equals(attCode)) {
             return linkForMany(myJdbcTemplate, attCode, attValue, entCode);
         } else if ("BIDDING_NAME_ID".equals(attCode)) {
@@ -99,8 +103,8 @@ public class AttLinkExt {
             return linkFUND_PAY_CODE_V_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("PM_BID_APPROVAL_REQ_ID".equals(attCode)){ // 招标文件审批 属性联动
             return linkPM_BID_APPROVAL_REQ_ID(myJdbcTemplate, attValue, entCode,sevId,param);
-        } else if ("CUSTOMER_UNIT_ONE".equals(attCode)){ // 签订公司 属性联动
-            return linkCUSTOMER_UNIT_ONE(myJdbcTemplate, attValue, entCode,sevId,param);
+        } else if ("CUSTOMER_UNIT_ONE".equals(attCode) || "CUSTOMER_UNIT".equals(attValue)){ // 签订公司 属性联动
+            return CustomerUnitLink.linkCUSTOMER_UNIT_ONE(myJdbcTemplate, attValue, entCode);
         } else if ("PROJECT_SOURCE_TYPE_ID".equals(attCode)){ // 项目来源 属性联动
             return linkPROJECT_SOURCE_TYPE_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("PROJECT_SOURCE_TYPE_TWO_ID".equals(attCode)){
@@ -889,92 +893,6 @@ public class AttLinkExt {
             attLinkResult.attMap.put("PROJECT_NAME_WR", linkedAtt);
         }
         return attLinkResult;
-    }
-
-    // 签订公司 属性联动
-    private AttLinkResult linkCUSTOMER_UNIT_ONE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
-        AttLinkResult attLinkResult = new AttLinkResult();
-        String userId = ExtJarHelper.loginInfo.get().userId;
-        //通过选择业主单位变换发起人部门
-        List<String> autoGetDept = getAutoGetDept();
-        if ("PM_SEND_APPROVAL_REQ".equals(entCode)){
-            PM_SEND_APPROVAL_REQAttlink(myJdbcTemplate,userId,attValue,attLinkResult);
-        } else if (autoGetDept.contains(entCode)){
-            //每次切换清空原有数据
-            clearUser(attLinkResult);
-            autoChangeDept(myJdbcTemplate,attValue,userId,attLinkResult);
-        }
-
-        return attLinkResult;
-    }
-
-    /**
-     * 业主单位变更，清空各个岗位人员
-     * @param attLinkResult 最终数据返回map
-     */
-    private void clearUser(AttLinkResult attLinkResult) {
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = null;
-            linkedAtt.text = null;
-            attLinkResult.attMap.put("OPERATOR_ONE_ID",linkedAtt); // 经办人
-            attLinkResult.attMap.put("AD_USER_THREE_ID",linkedAtt); // 成本岗
-            attLinkResult.attMap.put("AD_USER_FOUR_ID",linkedAtt); // 合同岗
-            attLinkResult.attMap.put("AD_USER_EIGHTH_ID",linkedAtt); // 法务岗用户
-            attLinkResult.attMap.put("AD_USER_NINTH_ID",linkedAtt); // 财务岗用户
-        }
-    }
-
-    /**
-     * 自动根据所选择的公司判断出对应的部门
-     * @param myJdbcTemplate 数据源
-     * @param attValue 属性联动值
-     * @param userId 当前登录人id
-     * @param attLinkResult 最终数据返回map
-     */
-    private void autoChangeDept(MyJdbcTemplate myJdbcTemplate, String attValue, String userId,AttLinkResult attLinkResult) {
-        String value = null, id = null;
-        //根据公司找到部门
-        String sql1 = "select a.id,a.name from hr_dept a LEFT JOIN hr_dept_user b on a.id = b.HR_DEPT_ID where b.AD_USER_ID = ? and a.CUSTOMER_UNIT = ? and b.SYS_TRUE = 1";
-        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId,attValue);
-        if (CollectionUtils.isEmpty(list1)){
-            sql1 = "select a.id,a.name from hr_dept a LEFT JOIN hr_dept_user b on a.id = b.HR_DEPT_ID where b.AD_USER_ID = ? and a.CUSTOMER_UNIT = ? and b.SYS_TRUE != 1 order by b.CRT_DT desc limit 1";
-            list1 = myJdbcTemplate.queryForList(sql1,userId,attValue);
-            if (CollectionUtils.isEmpty(list1)){
-                throw new BaseException("对不起，您在该公司暂未有职位，请联系管理员维护职位信息！");
-            }
-        }
-        id = JdbcMapUtil.getString(list1.get(0),"id");
-        value = JdbcMapUtil.getString(list1.get(0),"name");
-        //部门
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = id;
-            linkedAtt.text = value;
-            attLinkResult.attMap.put("CRT_DEPT_ID",linkedAtt);
-        }
-    }
-
-    /** 业主公司属性联动-发文呈批流程 **/
-    private void PM_SEND_APPROVAL_REQAttlink(MyJdbcTemplate myJdbcTemplate, String userId, String attValue, AttLinkResult attLinkResult) {
-        //根据公司找到部门
-        String sql1 = "select a.id,a.name from hr_dept a LEFT JOIN hr_dept_user b on a.id = b.HR_DEPT_ID where b.AD_USER_ID = ? and a.CUSTOMER_UNIT = ? order by b.SYS_TRUE desc limit 1";
-        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId,attValue);
-        String name = "", id = "";
-        if (!CollectionUtils.isEmpty(list1)){
-            id = JdbcMapUtil.getString(list1.get(0),"id");
-            name = JdbcMapUtil.getString(list1.get(0),"name");
-        }
-        //部门
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = id;
-            linkedAtt.text = name;
-            attLinkResult.attMap.put("HR_DEPT_LIST_ID",linkedAtt);
-        }
     }
 
     private AttLinkResult linkFUND_PAY_CODE_V_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
@@ -3716,56 +3634,6 @@ public class AttLinkExt {
         return attLinkResult;
     }
 
-    private AttLinkResult linkForPM_PRJ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
-        AttLinkResult attLinkResult = new AttLinkResult();
-        if ("PM_POST_APPOINT".equals(entCode)){ //岗位指派单独查询项目信息逻辑
-            AttLinkExtDetail.selectPostAppointLink(attLinkResult,attValue,myJdbcTemplate);
-        } else {
-            //查询项目相关信息
-            List<Map<String, Object>> list = LinkSql.PmPrjIdLink(attValue,myJdbcTemplate);
-
-            //清空项目基础信息
-            AttLinkExtDetail.clearBaseProjectDataNOPrj(attLinkResult);
-            AttLinkExtDetail.clearProjectAmtData(attLinkResult);
-
-            if (!CollectionUtils.isEmpty(list)){
-                //需要自动岗位人员的流程
-//                List<String> processUserList = AttLinkDifferentProcess.getLinkUserProcess();
-//                if (processUserList.contains(entCode)){
-                    //清除岗位信息
-//                    AttLinkExtDetail.clearPostUserData(attLinkResult);
-                    //业主单位
-//                    String companyId = JdbcMapUtil.getString(list.get(0),"customer_id");
-//                    AttLinkExtDetail.processLinkUser(attValue,entCode,companyId,attLinkResult,myJdbcTemplate);
-//                }
-
-                Map row = list.get(0);
-                if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)) { // 工程开工报审
-                    AttLinkProcessDetail.pmPrjKickOffReqPrjLink(attLinkResult,attValue,myJdbcTemplate);
-                } else if ("PIPELINE_RELOCATION_REQ".equals(entCode)){ // 管线迁改
-                    //设计部人员
-                    String design = JdbcMapUtil.getString(row,"PRJ_DESIGN_USER_ID");
-                    AttLinkProcessDetail.pipelineLink(design,attLinkResult);
-                } else if("PM_BUY_DEMAND_REQ".equals(entCode) || "PIPELINE_RELOCATION_REQ".equals(entCode)) { // 采购需求审批 管线迁改
-                    // 0099799190825080705 = 企业自筹
-                    String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
-                    AttLinkExtDetail.assignmentPrjYesNoOne(id,attLinkResult);
-                }
-                //赋值
-                AttLinkExtDetail.assignmentAttLinkResult(attLinkResult,row,entCode,myJdbcTemplate);
-
-                // 资金信息回显。优先级 可研估算<初设概算<预算财评
-                List<String> amtList = getAmtList();
-                if (amtList.contains(entCode)) {
-                    // 查询预算财评信息
-                    Map resultRow1 = getAmtMap(attValue);
-                    attLinkResult = getResult(resultRow1, attLinkResult);
-                }
-            }
-        }
-        return attLinkResult;
-    }
-
     // 单表查询用户名称
     private String getUser(String users) {
         String userName = "";
@@ -4189,26 +4057,6 @@ public class AttLinkExt {
         return false;
     }
 
-    // 资金信息回显，按照优先级 可研估算<初设概算<预算财评 的流程
-    public List<String> getAmtList() {
-        List<String> list = new ArrayList<>();
-        list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
-        list.add("PM_PRJ_PARTY_REQ"); // 五方责任主体维护申请
-        list.add("PO_ORDER_TERMINATE_REQ"); // 采购合同终止申请
-        list.add("PO_ORDER_CHANGE_REQ"); // 采购合同变更申请
-        list.add("PO_ORDER_SUPPLEMENT_REQ"); // 采购合同补充协议申请
-        list.add("PO_ORDER_REQ"); // 采购合同签订申请
-        list.add("PO_PUBLIC_BID_REQ"); // 采购公开招标申请
-        list.add("PM_BUILD_ORGAN_PLAN_REQ"); // 施工组织设计及施工方案
-        list.add("PM_WORK_LIST_REQ"); // 工作联系单
-        list.add("COMPLETION_PRE_ACCEPTANCE"); // 竣工预验收
-        list.add("EXPENSE_CLAIM_APPROVAL"); // 费用索赔报审表
-        list.add("PROJECT_CLAIM_NOTICE"); // 工程索赔通知书
-        list.add("APPROVAL_INSPECTION"); // 报审、报验
-        list.add("PM_BUILD_PROGRESS_REQ"); // 施工进度计划
-        return list;
-    }
-
     // 查询可研估算<初设概算<预算财评优先级最高的数据
     private Map getAmtMap(String attValue) {
         Map resultRow = new HashMap();
@@ -4358,14 +4206,6 @@ public class AttLinkExt {
         return list;
     }
 
-    // 项目类型属性联动，需要修改属性联动值
-    public List<String> getEditPrjTypeList() {
-        List<String> list = new ArrayList<>();
-        list.add("PM_PRJ_INVEST1"); //可研报告审批
-        list.add("PM_PRJ_INVEST2"); //初设概算审批
-        return list;
-    }
-
     // 项目来源属性联动 需要选择系统/非系统项目
     public List<String> getWRProject() {
         List<String> list = new ArrayList<>();
@@ -4377,13 +4217,6 @@ public class AttLinkExt {
         list.add("BID_PROCESS_MANAGE"); //招标过程管理
         list.add("PO_ORDER_CHANGE_REQ"); //合同需求审批
         list.add("PIPELINE_RELOCATION_REQ"); //管线迁改
-        return list;
-    }
-
-    // CUSTOMER_UNIT_ONE(业主单位)关联自动选择发起人所在部门
-    public List<String> getAutoGetDept() {
-        List<String> list = new ArrayList<>();
-        list.add("PM_BID_APPROVAL_REQ");  //招标文件审批
         return list;
     }
 

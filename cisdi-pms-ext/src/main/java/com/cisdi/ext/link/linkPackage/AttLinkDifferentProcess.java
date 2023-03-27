@@ -1,4 +1,4 @@
-package com.cisdi.ext.link;
+package com.cisdi.ext.link.linkPackage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ public class AttLinkDifferentProcess {
 
     /**
      * 合同相关流程有同一相同标题生码规则
-     * @return
+     * @return 涉及流程
      */
     public static List<String> getOrderProcessName() {
         List<String> list = new ArrayList<>();
@@ -29,7 +29,7 @@ public class AttLinkDifferentProcess {
 
     /**
      * 流程中需要自定义标题的流程
-     * @return
+     * @return 涉及流程
      */
     public static List<String> getTableList() {
         List<String> list = new ArrayList<>();
@@ -108,6 +108,7 @@ public class AttLinkDifferentProcess {
         list.add("PIPELINE_RELOCATION_REQ"); // 管线迁改
         list.add("PM_POST_APPOINT"); // 岗位指派
         list.add("PRJ_LAND_CHECK"); // 项目红线核查
+        list.add("PM_PRJ_SETTLE_ACCOUNTS"); // 项目结算审批
         return list;
     }
 
@@ -124,7 +125,7 @@ public class AttLinkDifferentProcess {
 
     /**
      * 系统非系统属性联动-联动项目来源-多选项目
-     * @return
+     * @return 涉及流程
      */
     public static List<String> sourceTypeLinkProjects() {
         List<String> list = new ArrayList<>();
@@ -139,6 +140,40 @@ public class AttLinkDifferentProcess {
     public static List<String> getLinkUserProcess() {
         List<String> list = new ArrayList<>();
         list.add("PM_BUY_DEMAND_REQ"); //采购需求审批
+        return list;
+    }
+
+    /**
+     * 业主单位变化有对应值需要变化的流程
+     * @return 涉及流程
+     */
+    public static List<String> getAutoGetDept() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_BID_APPROVAL_REQ");  //招标文件审批
+        list.add("PM_PRJ_SETTLE_ACCOUNTS");  //项目结算审批
+        return list;
+    }
+
+    /**
+     * 资金信息回显，按照优先级 可研估算<初设概算<预算财评 的流程
+     * @return 涉及流程
+     */
+    public static List<String> getAmtList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
+        list.add("PM_PRJ_PARTY_REQ"); // 五方责任主体维护申请
+        list.add("PO_ORDER_TERMINATE_REQ"); // 采购合同终止申请
+        list.add("PO_ORDER_CHANGE_REQ"); // 采购合同变更申请
+        list.add("PO_ORDER_SUPPLEMENT_REQ"); // 采购合同补充协议申请
+        list.add("PO_ORDER_REQ"); // 采购合同签订申请
+        list.add("PO_PUBLIC_BID_REQ"); // 采购公开招标申请
+        list.add("PM_BUILD_ORGAN_PLAN_REQ"); // 施工组织设计及施工方案
+        list.add("PM_WORK_LIST_REQ"); // 工作联系单
+        list.add("COMPLETION_PRE_ACCEPTANCE"); // 竣工预验收
+        list.add("EXPENSE_CLAIM_APPROVAL"); // 费用索赔报审表
+        list.add("PROJECT_CLAIM_NOTICE"); // 工程索赔通知书
+        list.add("APPROVAL_INSPECTION"); // 报审、报验
+        list.add("PM_BUILD_PROGRESS_REQ"); // 施工进度计划
         return list;
     }
 }
