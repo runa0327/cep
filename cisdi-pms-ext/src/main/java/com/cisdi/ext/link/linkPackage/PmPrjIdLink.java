@@ -1,15 +1,11 @@
 package com.cisdi.ext.link.linkPackage;
 
 import com.cisdi.ext.enums.EntCodeEnum;
-import com.cisdi.ext.link.AttLinkParam;
 import com.cisdi.ext.link.AttLinkResult;
 import com.cisdi.ext.link.LinkSql;
-import com.cisdi.ext.link.LinkedAtt;
 import com.cisdi.ext.model.LinkedAttModel;
-import com.cisdi.ext.model.PmPrjInvest2;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
-import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -115,7 +111,7 @@ public class PmPrjIdLink {
                 if (amtList.contains(entCode)) {
                     // 查询预算财评信息
                     Map resultRow1 = AttLinkExtDetail.getAmtMap(attValue,myJdbcTemplate);
-                    attLinkResult = AttLinkExtDetail.getResult(resultRow1, attLinkResult);
+                    AttLinkExtDetail.getResult(resultRow1, attLinkResult);
                 }
             }
         }
@@ -130,13 +126,34 @@ public class PmPrjIdLink {
     public static void settlePrjLink(AttLinkResult attLinkResult, String attValue) {
         List<LinkedAttModel> list = new ArrayList<>();
         //查询概算信息
-        List<Map<String,Object>> list2 = Crud.from("PM_PRJ_INVEST2").where().eq("id",attValue).select().execForMapList();
+        List<Map<String,Object>> list2 = Crud.from("PM_PRJ_INVEST2").where().eq("PM_PRJ_ID",attValue)
+                .eq("STATUS","AP").select().execForMapList();
+        List<Map<String,Object>> list3 = Crud.from("PM_PRJ_INVEST3").where().eq("PM_PRJ_ID",attValue)
+                .eq("STATUS","AP").select().execForMapList();
+        getList(list, list2, INVEST2_MAP);
+        getList(list, list3, INVEST3_MAP);
+        for (LinkedAttModel tmp : list) {
+            if (AttDataTypeE.FILE_GROUP == tmp.getType()){
+                AttLinkExtDetail.attLinkResultAddValue(tmp.getValue(),tmp.getKey(),tmp.getType(),attLinkResult);
+            } else {
+                AttLinkExtDetail.attLinkResultAddValue(tmp.getValue(),tmp.getValue(),tmp.getKey(),tmp.getType(),attLinkResult);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param list 最终处理list
+     * @param list2 流程业务list
+     * @param invest2Map 对应关系map
+     */
+    private static void getList(List<LinkedAttModel> list, List<Map<String, Object>> list2, Map<String, String> invest2Map) {
         if (!CollectionUtils.isEmpty(list2)){
-            for (String key : INVEST2_MAP.keySet()){
+            for (String key : invest2Map.keySet()){
                 LinkedAttModel linkedAttModel = new LinkedAttModel();
-                String code = INVEST2_MAP.get(key);
+                String code = invest2Map.get(key);
                 String value = JdbcMapUtil.getString(list2.get(0),code);
-                AttDataTypeE dataTypeE = getCodeType(value, EntCodeEnum.SETTLE_MAP);
+                AttDataTypeE dataTypeE = getCodeType(key);
                 linkedAttModel.setType(dataTypeE);
                 linkedAttModel.setKey(key);
                 if (!SharedUtil.isEmptyString(value)){
@@ -145,26 +162,18 @@ public class PmPrjIdLink {
                 list.add(linkedAttModel);
             }
         }
-        for (LinkedAttModel tmp : list) {
-            if (AttDataTypeE.FILE_GROUP == tmp.getType()){
-                AttLinkExtDetail.attLinkResultAddValue(tmp.getValue(),tmp.getKey(),tmp.getType(),attLinkResult);
-            } else if (AttDataTypeE.DOUBLE == tmp.getType()){
-                AttLinkExtDetail.attLinkResultAddValue(tmp.getValue(),tmp.getValue(),tmp.getKey(),tmp.getType(),attLinkResult);
-            }
-        }
     }
 
     /**
      * 获取回显字段数据
-     * @param value
-     * @param settleMap
-     * @return
+     * @param value 回显字段key
+     * @return 类型
      */
-    private static AttDataTypeE getCodeType(String value, Map<String, Object> settleMap) {
+    private static AttDataTypeE getCodeType(String value) {
         AttDataTypeE type = null;
-        for (String key : settleMap.keySet()){
+        for (String key : EntCodeEnum.SETTLE_MAP.keySet()){
             if (value.equals(key)){
-                type = (AttDataTypeE) settleMap.get(key);
+                type = (AttDataTypeE) EntCodeEnum.SETTLE_MAP.get(key);
             }
         }
         return type;
