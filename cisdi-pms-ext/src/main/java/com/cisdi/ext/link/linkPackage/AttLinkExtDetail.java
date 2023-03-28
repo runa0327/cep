@@ -1091,7 +1091,7 @@ public class AttLinkExtDetail {
      * @param code 返回显示的页面表单字段
      * @param attLinkResult 返回的集合
      */
-    private static void attLinkResultAddValue(String userId, String userName, String code, AttLinkResult attLinkResult) {
+    public static void attLinkResultAddValue(String userId, String userName, String code, AttLinkResult attLinkResult) {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
@@ -1109,7 +1109,7 @@ public class AttLinkExtDetail {
      * @param changeToMandatory 是否必填属性
      * @param attLinkResult 返回的集合
      */
-    private static void attLinkResultAddValue(String userId, String userName, String code, Boolean changeToMandatory, Boolean changeToEditable, AttLinkResult attLinkResult) {
+    public static void attLinkResultAddValue(String userId, String userName, String code, Boolean changeToMandatory, Boolean changeToEditable, AttLinkResult attLinkResult) {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
@@ -1117,6 +1117,39 @@ public class AttLinkExtDetail {
             linkedAtt.text = userName;
             linkedAtt.changeToEditable = changeToEditable;
             linkedAtt.changeToMandatory = changeToMandatory;
+            attLinkResult.attMap.put(code, linkedAtt);
+        }
+    }
+
+    /**
+     * 默认岗位信息默认赋值
+     * @param value 值
+     * @param text text
+     * @param code 返回显示的页面表单字段
+     * @param attLinkResult 返回的集合
+     */
+    public static void attLinkResultAddValue(String value, String text, String code, AttDataTypeE type,AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = type;
+            linkedAtt.value = value;
+            linkedAtt.text = text;
+            attLinkResult.attMap.put(code, linkedAtt);
+        }
+    }
+
+    /**
+     * 默认岗位信息默认赋值
+     * @param value 值
+     * @param code 返回显示的页面表单字段
+     * @param attLinkResult 返回的集合
+     */
+    public static void attLinkResultAddValue(String value, String code, AttDataTypeE type,AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = type;
+            linkedAtt.value = value;
+            getFileInfoList(linkedAtt);
             attLinkResult.attMap.put(code, linkedAtt);
         }
     }

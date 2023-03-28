@@ -1,5 +1,6 @@
 package com.cisdi.ext.link.linkPackage;
 
+import com.cisdi.ext.enums.EntCodeEnum;
 import com.cisdi.ext.link.AttLinkParam;
 import com.cisdi.ext.link.AttLinkResult;
 import com.cisdi.ext.link.LinkSql;
@@ -9,7 +10,9 @@ import com.cisdi.ext.model.PmPrjInvest2;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -131,10 +134,39 @@ public class PmPrjIdLink {
         if (!CollectionUtils.isEmpty(list2)){
             for (String key : INVEST2_MAP.keySet()){
                 LinkedAttModel linkedAttModel = new LinkedAttModel();
-                String value = JdbcMapUtil.getString(list2.get(0),INVEST2_MAP.get(key));
+                String code = INVEST2_MAP.get(key);
+                String value = JdbcMapUtil.getString(list2.get(0),code);
+                AttDataTypeE dataTypeE = getCodeType(value, EntCodeEnum.SETTLE_MAP);
+                linkedAttModel.setType(dataTypeE);
                 linkedAttModel.setKey(key);
-                linkedAttModel.setValue(value);
+                if (!SharedUtil.isEmptyString(value)){
+                    linkedAttModel.setValue(value);
+                }
+                list.add(linkedAttModel);
             }
         }
+        for (LinkedAttModel tmp : list) {
+            if (AttDataTypeE.FILE_GROUP == tmp.getType()){
+                AttLinkExtDetail.attLinkResultAddValue(tmp.getValue(),tmp.getKey(),tmp.getType(),attLinkResult);
+            } else if (AttDataTypeE.DOUBLE == tmp.getType()){
+                AttLinkExtDetail.attLinkResultAddValue(tmp.getValue(),tmp.getValue(),tmp.getKey(),tmp.getType(),attLinkResult);
+            }
+        }
+    }
+
+    /**
+     * 获取回显字段数据
+     * @param value
+     * @param settleMap
+     * @return
+     */
+    private static AttDataTypeE getCodeType(String value, Map<String, Object> settleMap) {
+        AttDataTypeE type = null;
+        for (String key : settleMap.keySet()){
+            if (value.equals(key)){
+                type = (AttDataTypeE) settleMap.get(key);
+            }
+        }
+        return type;
     }
 }
