@@ -1,7 +1,6 @@
 package com.cisdi.ext.link;
 
 import com.cisdi.ext.link.linkPackage.AttLinkExtDetail;
-import com.cisdi.ext.link.linkPackage.AttLinkProcessDetail;
 import com.cisdi.ext.link.linkPackage.CustomerUnitLink;
 import com.cisdi.ext.link.linkPackage.PmPrjIdLink;
 import com.cisdi.ext.util.ConvertUtils;
