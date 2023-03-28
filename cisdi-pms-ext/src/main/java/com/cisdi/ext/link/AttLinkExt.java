@@ -603,9 +603,6 @@ public class AttLinkExt {
             return attLinkResult;
         } else if (entityCodes.contains(entCode)){
             attLinkResult = autoLinkProject(attValue,code);
-            if ("PIPELINE_RELOCATION_REQ".equals(entCode)){
-                clearPipeLine(attLinkResult);
-            }
             return attLinkResult;
         } else {
             return attLinkResult;
@@ -699,29 +696,6 @@ public class AttLinkExt {
             linkedAtt.changeToEditable = true;
             linkedAtt.fileInfoList = null;
             attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
-        }
-    }
-
-    // 项目来源属性联动-管线迁改-清除
-    private void clearPipeLine(AttLinkResult attLinkResult) {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        //设计部人员
-        //查询设计部人员默认值
-        String sql1 = "select ATT_DEFAULT_VALUE_LOGIC from AD_ENT_ATT where AD_ENT_ID = '1609896405474889728' and AD_ATT_ID = '1610990575958552576'";
-        String designValue = null, designText = null;
-        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1);
-        if (!CollectionUtils.isEmpty(list1)){
-            String userId = JdbcMapUtil.getString(list1.get(0),"ATT_DEFAULT_VALUE_LOGIC");
-            userId = userId.replace("'","");
-            designText = userId;
-            designValue = getUser(userId);
-        }
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = designText;
-            linkedAtt.text = designValue;
-            attLinkResult.attMap.put("PRJ_DESIGN_USER_IDS", linkedAtt);
         }
     }
 
@@ -3745,7 +3719,7 @@ public class AttLinkExt {
                 } else if ("PIPELINE_RELOCATION_REQ".equals(entCode)){ // 管线迁改
                     //设计部人员
                     String design = JdbcMapUtil.getString(row,"PRJ_DESIGN_USER_ID");
-                    AttLinkProcessDetail.pipelineLink(design,attLinkResult);
+                    AttLinkProcessDetail.pipelineLink(design,attLinkResult,myJdbcTemplate);
                 } else if("PM_BUY_DEMAND_REQ".equals(entCode) || "PIPELINE_RELOCATION_REQ".equals(entCode)) { // 采购需求审批 管线迁改
                     // 0099799190825080705 = 企业自筹
                     String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
