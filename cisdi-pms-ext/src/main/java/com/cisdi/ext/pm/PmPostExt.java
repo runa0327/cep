@@ -29,7 +29,7 @@ public class PmPostExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         StringBuilder sb = new StringBuilder();
         sb.append("select * from PM_PARTY where status='ap' and IS_CUSTOMER='1' ");
-        if(Objects.nonNull(map.get("name"))){
+        if (Objects.nonNull(map.get("name"))) {
             sb.append(" and name like '%").append(map.get("name")).append("%'");
         }
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
@@ -116,7 +116,7 @@ public class PmPostExt {
         if (!StringUtils.isEmpty(projectName)) {
             sb.append(" and pj.`NAME` like '%").append(projectName).append("%'");
         }
-        sb.append("group by pj.id order by pj.PM_SEQ desc");
+        sb.append("group by pj.id order by pj.pm_code desc");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
