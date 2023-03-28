@@ -273,7 +273,7 @@ public class PrjPlanUtil {
         String proPlanId = "";
         List<Map<String, Object>> ruleList = myJdbcTemplate.queryForList("select pptr.*,gsv.`code` as rule from PRO_PLAN_TEMPLATE_RULE pptr " +
                 "left join gr_set_value gsv on pptr.PRO_PLAN_RULE_CONDITION_ID = gsv.id " +
-                "where TEMPLATE_FOR_PROJECT_TYPE_ID=? and INVESTMENT_SOURCE_ID=? and TENDER_WAY_ID=?", type, sourceId, tenderWay);
+                "where TEMPLATE_FOR_PROJECT_TYPE_ID=? and INVESTMENT_SOURCE_ID=? and TENDER_MODE_ID=?", type, sourceId, tenderWay);
         if (CollectionUtils.isEmpty(ruleList)) {
             //取默认的模板
             proPlanId = "0099902212142021791";

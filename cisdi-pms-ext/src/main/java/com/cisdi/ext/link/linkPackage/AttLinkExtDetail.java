@@ -1026,13 +1026,13 @@ public class AttLinkExtDetail {
             }
             // 招标方式
             {
-                String id = JdbcMapUtil.getString(list.get(0), "TENDER_WAY_ID");
+                String id = JdbcMapUtil.getString(list.get(0), "TENDER_MODE_ID");
                 String name = GrSetValue.getValueNameById(id);
                 LinkedAtt linkedAtt = new LinkedAtt();
                 linkedAtt.type = AttDataTypeE.TEXT_LONG;
                 linkedAtt.value = id;
                 linkedAtt.text = name;
-                attLinkResult.attMap.put("TENDER_WAY_ID", linkedAtt);
+                attLinkResult.attMap.put("TENDER_MODE_ID", linkedAtt);
             }
             // 项目简介
             {

@@ -55,7 +55,7 @@ public class PmStartExt {
                 " LEFT JOIN pm_party pp ON ps.BUILDER_UNIT = pp.id " +
                 " LEFT JOIN gr_set_value ss ON ss.id = ps.PRJ_START_STATUS_ID  " +
                 " left join ad_user au on au.id = ps.AGENT " +
-                " left join gr_set_value gg on gg.id = ps.TENDER_WAY_ID " +
+                " left join gr_set_value gg on gg.id = ps.TENDER_MODE_ID " +
                 " left join pm_prj pj on pj.pm_code = ps.pm_code "+
                 " WHERE " +
                 " ps.`STATUS` = 'ap'");
@@ -114,7 +114,7 @@ public class PmStartExt {
                 " ps.PM_CODE as PM_CODE, " +
                 " ps.INVESTMENT_SOURCE_ID as INVESTMENT_SOURCE_ID, " +
                 " gg.`NAME` as sourceTypeValue," +
-                " round(ifnull( PRJ_TOTAL_INVEST, 0 ),2)/10000 AS PRJ_TOTAL_INVEST," +
+                " round(ifnull( PRJ_TOTAL_INVEST, 0 ),2) AS PRJ_TOTAL_INVEST," +
                 " ps.PROJECT_TYPE_ID as PROJECT_TYPE_ID," +
                 " gsv.`NAME` AS typeValue," +
                 " ps.BUILDER_UNIT as BUILDER_UNIT," +
@@ -126,7 +126,7 @@ public class PmStartExt {
                 " ps.ATT_FILE_GROUP_ID as ATT_FILE_GROUP_ID, " +
                 " au.`NAME` AS agentValue, " +
                 " pj.ID as projectId , " +
-                " ps.TENDER_WAY_ID ," +
+                " ps.TENDER_MODE_ID ," +
                 " gq.`NAME` as tender_way, " +
                 " ps.START_REMARK ,ps.PRJ_START_STATUS_ID " +
                 "FROM " +
@@ -137,7 +137,7 @@ public class PmStartExt {
                 " LEFT JOIN gr_set_value ss ON ss.id = ps.PRJ_START_STATUS_ID " +
                 " LEFT JOIN ad_user au ON au.id = ps.AGENT " +
                 " LEFT JOIN PM_PRJ pj ON pj.PM_CODE = ps.PM_CODE " +
-                " left join gr_set_value gq on gq.id = ps.TENDER_WAY_ID" +
+                " left join gr_set_value gq on gq.id = ps.TENDER_MODE_ID" +
                 " WHERE " +
                 " ps.`STATUS` = 'ap' and ps.id=?", map.get("id"));
         if (CollectionUtils.isEmpty(list)) {
@@ -163,7 +163,7 @@ public class PmStartExt {
                 pmStart.agentValue = JdbcMapUtil.getString(m, "agentValue");
                 pmStart.projectId = JdbcMapUtil.getString(m, "projectId");
                 pmStart.parcels = getParcel(pmStart.projectId);
-                pmStart.tenderWayId = JdbcMapUtil.getString(m, "TENDER_WAY_ID");
+                pmStart.tenderWayId = JdbcMapUtil.getString(m, "TENDER_MODE_ID");
                 pmStart.tenderWay = JdbcMapUtil.getString(m, "tender_way");
                 pmStart.startRemark = JdbcMapUtil.getString(m, "START_REMARK");
                 pmStart.statusId = JdbcMapUtil.getString(m, "PRJ_START_STATUS_ID");
@@ -194,7 +194,7 @@ public class PmStartExt {
         List<parcel> parcels = input.parcels;
         String location = JSON.toJSON(parcels).toString();
         Crud.from("PRJ_START").where().eq("ID", id).update()
-                .set("PM_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest.multiply(new BigDecimal(10000))).set("PROJECT_TYPE_ID", input.typeId).set("TENDER_WAY_ID", input.tenderWay)
+                .set("PM_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId).set("TENDER_MODE_ID", input.tenderWay)
                 .set("BUILDER_UNIT", input.unit).set("START_TIME", input.startTime).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", status).set("START_REMARK", input.startRemark)
                 .set("ATT_FILE_GROUP_ID", input.fileIds).set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).set("START_TIME", input.startTime)
                 .set("LOCATION_INFO", location).exec();
@@ -311,13 +311,13 @@ public class PmStartExt {
             }
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", dataMap.get("NAME")).set("PM_CODE", prjCode)
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
-                    .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("PM_SEQ", seq).set("TENDER_WAY_ID", dataMap.get("TENDER_WAY_ID"))
+                    .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("PM_SEQ", seq).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
                     .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).exec();
         } else {
             projectId = String.valueOf(list.get(0).get("ID"));
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", dataMap.get("NAME")).set("PM_CODE", prjCode)
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
-                    .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("TENDER_WAY_ID", dataMap.get("TENDER_WAY_ID"))
+                    .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
                     .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).exec();
         }
 
@@ -365,7 +365,7 @@ public class PmStartExt {
         }
         //新增项目进展
         PrjPlanUtil.createPlan(projectId, JdbcMapUtil.getString(dataMap, "PROJECT_TYPE_ID"), JdbcMapUtil.getString(dataMap, "INVESTMENT_SOURCE_ID")
-                , BigDecimalUtil.divide(JdbcMapUtil.getBigDecimal(dataMap, "PRJ_TOTAL_INVEST"), new BigDecimal(10000)), JdbcMapUtil.getString(dataMap, "TENDER_WAY_ID"));
+                , BigDecimalUtil.divide(JdbcMapUtil.getBigDecimal(dataMap, "PRJ_TOTAL_INVEST"), new BigDecimal(10000)), JdbcMapUtil.getString(dataMap, "TENDER_MODE_ID"));
         //刷新进度节点时间
         PrjPlanUtil.refreshProPlanTime(projectId, JdbcMapUtil.getDate(dataMap, "START_TIME"));
 
