@@ -204,7 +204,7 @@ public class ProPlanExt {
                 // 结果转换
                 List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(pmPrjId, p, myJdbcTemplate)).collect(Collectors.toList());
                 //处理是否能启动，逻辑：关联同1个流程的多个节点，只有第1个可以启动
-                Map<String, List<PrjProPlanNodeInfo>> mapData = infoList.stream().filter(m -> "1".equals(m.canStart) && m.linkedWfProcessId !=null).collect(Collectors.groupingBy(p -> p.linkedWfProcessId));
+                Map<String, List<PrjProPlanNodeInfo>> mapData = infoList.stream().filter(m -> "1".equals(m.canStart) && m.linkedWfProcessId != null).collect(Collectors.groupingBy(p -> p.linkedWfProcessId));
                 for (String key : mapData.keySet()) {
                     List<PrjProPlanNodeInfo> data = mapData.get(key);
                     if (!CollectionUtils.isEmpty(data)) {
@@ -354,7 +354,7 @@ public class ProPlanExt {
         nodeInfo.progressRiskRemark = JdbcMapUtil.getString(dataMap, "PROGRESS_RISK_REMARK");
         if (!Objects.isNull(dataMap.get("CHIEF_DEPT_ID"))) {
             List<Map<String, Object>> deptList = myJdbcTemplate.queryForList("select * from hr_dept where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_DEPT_ID"));
-            if(!CollectionUtils.isEmpty(deptList)){
+            if (!CollectionUtils.isEmpty(deptList)) {
                 Map<String, Object> deptObj = deptList.get(0);
                 IdCodeName idCodeName = new IdCodeName();
                 idCodeName.id = String.valueOf(deptObj.get("ID"));
@@ -367,8 +367,8 @@ public class ProPlanExt {
 
         if (!Objects.isNull(dataMap.get("CHIEF_USER_ID"))) {
             List<Map<String, Object>> userList = myJdbcTemplate.queryForList("select * from ad_user where id =?", JdbcMapUtil.getString(dataMap, "CHIEF_USER_ID"));
-            if(!CollectionUtils.isEmpty(userList)){
-                Map<String, Object> userObj =userList.get(0);
+            if (!CollectionUtils.isEmpty(userList)) {
+                Map<String, Object> userObj = userList.get(0);
                 IdCodeName idCodeName = new IdCodeName();
                 idCodeName.id = String.valueOf(userObj.get("ID"));
                 idCodeName.code = String.valueOf(userObj.get("CODE"));
@@ -1059,5 +1059,19 @@ public class ProPlanExt {
 
     public static class OutSide {
         public List<PrjProPlanNodeInfo> nodeInfoList;
+    }
+
+
+    /**
+     * 项目进展节点修改
+     */
+    public void nodeModify() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+
+        myJdbcTemplate.update("update pm_pro_plan_node set POST_INFO_ID=?,CHIEF_USER_ID=?,PLAN_TOTAL_DAYS=?,PLAN_START_DATE=?,PLAN_COMPL_DATE=? where id=?",
+                map.get("postId"), map.get("userId"), map.get("days"), map.get("startTime"), map.get("endTime"), map.get("nodeId"));
+
+        PrjPlanUtil.updatePreNodeTime(JdbcMapUtil.getString(map, "nodeId"), JdbcMapUtil.getString(map, "projectId"));
     }
 }
