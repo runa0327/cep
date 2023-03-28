@@ -95,11 +95,6 @@ public class PipelineRelocationReqExt {
                 for (Map<String, Object> tmp : list) {
                     String users = JdbcMapUtil.getString(tmp,colName);
                     List<String> userList = new ArrayList<>(Arrays.asList(users.split(",")));
-                    if ("PRJ_DESIGN_USER_IDS".equals(colName)){ //设计岗通知
-                        //查询默认审批人
-                        String userId = getDesignCheckUser(myJdbcTemplate);
-                        userList.remove(userId);
-                    }
                     userIdList.addAll(userList);
                 }
             }

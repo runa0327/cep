@@ -1,7 +1,8 @@
-package com.cisdi.ext.link.linkPackage;
+package com.cisdi.ext.link;
 
 import com.cisdi.ext.link.AttLinkResult;
 import com.cisdi.ext.link.LinkedAtt;
+import com.cisdi.ext.base.AdUserExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.ad.att.AttDataTypeE;
@@ -49,55 +50,17 @@ public class AttLinkProcessDetail {
      * pm_prj_id 属性联动-管线迁改单独处理逻辑
      * @param design 设计部人员
      * @param attLinkResult 返回的集合值
+     * @param myJdbcTemplate 数据源
      */
-    public static void pipelineLink(String design, AttLinkResult attLinkResult) {
-        if (!SharedUtil.isEmptyString(design)){
-            design = "0100031468512109171,"+design;
-        } else {
-            design = "0100031468512109171";
-        }
-        String designValue = design;
-        StringBuilder sb = new StringBuilder();
-        //查询设计岗人员
-        String designName = getDesignName(designValue,sb);
+    public static void pipelineLink(String design, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
         // 设计部人员
         {
+            String userName = AdUserExt.getUserName(design,myJdbcTemplate);
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = designValue;
-            linkedAtt.text = designName;
+            linkedAtt.value = design;
+            linkedAtt.text = userName;
             attLinkResult.attMap.put("PRJ_DESIGN_USER_IDS", linkedAtt);
         }
-    }
-
-    /**
-     * 循环查询拼接用户名称
-     * @param str 用户id
-     * @param sb 拼接空字符串
-     * @return 用户名称
-     */
-    public static String getDesignName(String str, StringBuilder sb) {
-        List<String> list = Arrays.asList(str.split(","));
-        for (String tmp : list) {
-            String name = getUser(tmp);
-            sb.append(name).append(",");
-        }
-        return sb.substring(0,sb.length()-1);
-    }
-
-    /**
-     * 单表查询用户名称
-     * @param users 用户id
-     * @return 用户名称
-     */
-    public static String getUser(String users) {
-        String userName = "";
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql = "select group_concat(name) as name from ad_user where id in ('"+users+"') order by id asc";
-        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
-        if (!CollectionUtils.isEmpty(list)){
-            userName = JdbcMapUtil.getString(list.get(0),"name");
-        }
-        return userName;
     }
 }
