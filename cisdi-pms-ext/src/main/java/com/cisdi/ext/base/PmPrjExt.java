@@ -92,6 +92,29 @@ public class PmPrjExt {
     }
 
     /**
+     * 更新资金信息
+     * @param entityRecord 表单数据
+     * @param pm_prj_settle_accounts 表
+     * @param level 级别
+     * @param myJdbcTemplate 数据源
+     * @param entCode 业务表名
+     */
+    public static void updatePrjAmt(EntityRecord entityRecord, String pm_prj_settle_accounts, int level, MyJdbcTemplate myJdbcTemplate, String entCode) {
+        //项目id
+        String projectId = getProjectIdByProcess(entityRecord.valueMap,myJdbcTemplate);
+        if (projectId.contains(",")){
+            throw new BaseException("数据更新不支持多项目同时修改，请重新进行数据处理或联系管理员处理！");
+        }
+        // 查询当前项目信息数据级别
+        int oldLevel = getPrjDataLevel(projectId,myJdbcTemplate);
+        if (level >= oldLevel){ //更新数据
+            //更新项目资金信息
+            WfPmInvestUtil.updatePrjInvest(entityRecord,entCode);
+        }
+    }
+
+
+    /**
      * 更新项目基础信息
      * @param projectId 项目id
      * @param valueMap map值

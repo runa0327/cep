@@ -39,6 +39,9 @@ public class WfPmInvestUtil {
                 tableName = "PM_PRJ_INVEST3";
                 code = "invest3";
                 break;
+            case "PM_PRJ_SETTLE_ACCOUNTS" :
+                tableName = "PM_PRJ_SETTLE_ACCOUNTS";
+                code = "invest4";
             default:
                 throw new BaseException("数据错误！");
         }

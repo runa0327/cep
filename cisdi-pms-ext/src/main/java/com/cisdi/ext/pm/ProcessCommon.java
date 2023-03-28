@@ -2,6 +2,8 @@ package com.cisdi.ext.pm;
 
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.shared.BaseException;
+import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
@@ -278,5 +280,27 @@ public class ProcessCommon {
             }
         }
         return userId;
+    }
+
+    /**
+     * 获取人员在流程中的岗位信息
+     * @param userId 用户id
+     * @param projectId 项目id
+     * @param companyId 业主单位id
+     * @param myJdbcTemplate 数据源
+     * @return 流程岗位id
+     */
+    public static String getUserProcessPost(String userId,String projectId, String companyId, MyJdbcTemplate myJdbcTemplate) {
+        String processPostId;
+        String sql = "select a.BASE_PROCESS_POST_ID FROM PM_POST_PROPRJ a " +
+                "left join PM_ROSTER b on a.POST_INFO_ID = b.POST_INFO_ID " +
+                "where b.PM_PRJ_ID = ? and b.CUSTOMER_UNIT = ? and b.AD_USER_ID = ? and a.STATUS = 'AP' and b.STATUS = 'AP'";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId,companyId,userId);
+        if (!CollectionUtils.isEmpty(list)){
+            processPostId = JdbcMapUtil.getString(list.get(0),"BASE_PROCESS_POST_ID");
+        } else {
+            throw new BaseException("该人员在该项目的花名册信息中未匹配到信息，请核对花名册审批人信息或联系管理员处理！");
+        }
+        return processPostId;
     }
 }

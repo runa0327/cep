@@ -27,6 +27,19 @@ public class AttLinkDifferentProcess {
         return list;
     }
 
+    // 特殊流程，名称在流程发起时即生成，此处不生成
+    public static List<String> getSpecialList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_BUY_DEMAND_REQ"); //采购需求审批
+        list.add("PM_BID_APPROVAL_REQ"); //招标文件审批
+        list.add("PM_USE_CHAPTER_REQ"); //中选单位及标后用印申请
+        list.add("PO_ORDER_REQ"); //合同签订
+        list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
+        list.add("QUALITY_RECORD"); // 质量交底记录
+        list.add("PM_SUPERVISE_NOTICE_REQ"); // 监理通知单
+        return list;
+    }
+
     /**
      * 流程中需要自定义标题的流程
      * @return 涉及流程
@@ -108,7 +121,7 @@ public class AttLinkDifferentProcess {
         list.add("PIPELINE_RELOCATION_REQ"); // 管线迁改
         list.add("PM_POST_APPOINT"); // 岗位指派
         list.add("PRJ_LAND_CHECK"); // 项目红线核查
-        list.add("PM_PRJ_SETTLE_ACCOUNTS"); // 项目结算审批
+//        list.add("PM_PRJ_SETTLE_ACCOUNTS"); // 项目结算审批
         return list;
     }
 
