@@ -1,6 +1,7 @@
 package com.cisdi.ext.link.linkPackage;
 
 import com.cisdi.ext.enums.EntCodeEnum;
+import com.cisdi.ext.link.AttLinkProcessDetail;
 import com.cisdi.ext.link.AttLinkResult;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.LinkedAttModel;
@@ -95,7 +96,7 @@ public class PmPrjIdLink {
                 } else if ("PIPELINE_RELOCATION_REQ".equals(entCode)){ // 管线迁改
                     //设计部人员
                     String design = JdbcMapUtil.getString(row,"PRJ_DESIGN_USER_ID");
-                    AttLinkProcessDetail.pipelineLink(design,attLinkResult);
+                    AttLinkProcessDetail.pipelineLink(design,attLinkResult,myJdbcTemplate);
                 } else if("PM_BUY_DEMAND_REQ".equals(entCode) || "PIPELINE_RELOCATION_REQ".equals(entCode)) { // 采购需求审批 管线迁改
                     // 0099799190825080705 = 企业自筹
                     String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
