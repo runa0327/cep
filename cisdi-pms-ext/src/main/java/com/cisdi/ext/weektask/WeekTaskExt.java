@@ -79,9 +79,10 @@ public class WeekTaskExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String id = JdbcMapUtil.getString(map, "id");
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select wt.*,gsv.`NAME` as task_status,CAN_DISPATCH,TRANSFER_USER as transferUserId,au.name as transferUser,TRANSFER_TIME from week_task wt " +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select wt.*,gsv.`NAME` as task_status,CAN_DISPATCH,TRANSFER_USER as transferUserId,au.name as transferUser,TRANSFER_TIME,pm.name as projectName from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
                 "left join ad_user au on au.id = wt.TRANSFER_USER " +
+                "left join pm_prj pm on pm.id = wt.pm_prj_id" +
                 "where wt.id=?", id);
         if (!CollectionUtils.isEmpty(list)) {
             List<WeekTask> weekTaskList = list.stream().map(p -> {
@@ -96,6 +97,8 @@ public class WeekTaskExt {
                 weekTask.transferUserId = JdbcMapUtil.getString(p, "transferUserId");
                 weekTask.transferUser = JdbcMapUtil.getString(p, "transferUser");
                 weekTask.transferTime = JdbcMapUtil.getString(p, "TRANSFER_TIME");
+                weekTask.projectId = JdbcMapUtil.getString(p, "pm_prj_id");
+                weekTask.projectName = JdbcMapUtil.getString(p, "projectName");
                 return weekTask;
             }).collect(Collectors.toList());
             WeekTask weekTask = weekTaskList.get(0);
@@ -217,16 +220,25 @@ public class WeekTaskExt {
     public static class WeekTask {
         public String id;
         public String userId;
+        //标题
         public String title;
+        //内容
         public String content;
+        //发布时间
         public String publishStart;
+        //状态
         public String taskStatus;
+        //是否转办 0-否 1-是
         public String isTransfer;
-
+        //项目ID
         public String projectId;
+        //项目名称
         public String projectName;
+        //转办人ID
         public String transferUserId;
+        //转办人名称
         public String transferUser;
+        //转办时间
         public String transferTime;
     }
 
