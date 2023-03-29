@@ -2,13 +2,16 @@ package com.cisdi.ext.link;
 
 import com.cisdi.ext.base.AdUserExt;
 import com.cisdi.ext.base.GrSetValue;
-import com.cisdi.ext.model.PmRoster;
+import com.cisdi.ext.model.PmPrj;
+import com.cisdi.ext.model.PrjStart;
 import com.cisdi.ext.pm.PmBuyDemandReqExt;
+import com.cisdi.ext.pm.PmStartExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -1269,4 +1272,22 @@ public class AttLinkExtDetail {
         }
     }
 
+    /**
+     * 项目属性联动-联动项目启动的总投资
+     * @param attLinkResult 返回的集合值
+     * @param projectId 项目id
+     */
+    public static void linkPrjTotalInvest(AttLinkResult attLinkResult, String projectId) {
+        String prjCode = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.ID,projectId)).get(0).getPmCode();
+        List<PrjStart> list = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.PM_CODE,prjCode));
+        if (!CollectionUtils.isEmpty(list)){
+            //总投资
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = list.get(0).getPrjTotalInvest();
+                attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
+            }
+        }
+    }
 }
