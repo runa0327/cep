@@ -2,14 +2,14 @@ package com.cisdi.ext.weektask;
 
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
+import com.cisdi.ext.util.WeeklyUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -32,11 +32,14 @@ public class WeekTaskExt {
         int pageSize = Integer.parseInt(String.valueOf(map.get("pageSize")));
         int pageIndex = Integer.parseInt(String.valueOf(map.get("pageIndex")));
         String userId = ExtJarHelper.loginInfo.get().userId;
+        Map<String, String> weekDay = WeeklyUtils.weekBeginningAndEnding();
         StringBuilder sb = new StringBuilder();
-        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as userName from week_task wt " +
+        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,CAN_DISPATCH,TRANSFER_USER as transferUserId,TRANSFER_TIME from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
-                "left join ad_user au on au.id = wt.AD_USER_ID "+
-                "where AD_USER_ID = '").append(userId).append("' order by PUBLISH_START desc");
+                "left join ad_user au on au.id = wt.TRANSFER_USER " +
+                "where AD_USER_ID = '").append(userId).append("' and PUBLISH_START between '")
+                .append(weekDay.get("begin")).append("' and '").append(weekDay.get("end"))
+                .append("' order by PUBLISH_START desc");
 
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
@@ -50,7 +53,10 @@ public class WeekTaskExt {
             weekTask.content = JdbcMapUtil.getString(p, "CONTENT");
             weekTask.publishStart = StringUtil.withOutT(JdbcMapUtil.getString(p, "PUBLISH_START"));
             weekTask.taskStatus = JdbcMapUtil.getString(p, "task_status");
-            weekTask.userName =  JdbcMapUtil.getString(p, "userName");
+            weekTask.isTransfer = JdbcMapUtil.getString(p, "CAN_DISPATCH");
+            weekTask.transferUserId = JdbcMapUtil.getString(p, "transferUserId");
+            weekTask.transferUser = JdbcMapUtil.getString(p, "transferUser");
+            weekTask.transferTime = JdbcMapUtil.getString(p, "TRANSFER_TIME");
             return weekTask;
         }).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(weekTaskList)) {
@@ -73,9 +79,9 @@ public class WeekTaskExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String id = JdbcMapUtil.getString(map, "id");
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select wt.*,gsv.`NAME` as task_status,au.name as userName from week_task wt " +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select wt.*,gsv.`NAME` as task_status,CAN_DISPATCH,TRANSFER_USER as transferUserId,au.name as transferUser,TRANSFER_TIME from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
-                "left join ad_user au on au.id = wt.AD_USER_ID "+
+                "left join ad_user au on au.id = wt.TRANSFER_USER " +
                 "where wt.id=?", id);
         if (!CollectionUtils.isEmpty(list)) {
             List<WeekTask> weekTaskList = list.stream().map(p -> {
@@ -86,7 +92,10 @@ public class WeekTaskExt {
                 weekTask.content = JdbcMapUtil.getString(p, "CONTENT");
                 weekTask.publishStart = StringUtil.withOutT(JdbcMapUtil.getString(p, "PUBLISH_START"));
                 weekTask.taskStatus = JdbcMapUtil.getString(p, "task_status");
-                weekTask.userName = JdbcMapUtil.getString(p, "userName");
+                weekTask.isTransfer = JdbcMapUtil.getString(p, "CAN_DISPATCH");
+                weekTask.transferUserId = JdbcMapUtil.getString(p, "transferUserId");
+                weekTask.transferUser = JdbcMapUtil.getString(p, "transferUser");
+                weekTask.transferTime = JdbcMapUtil.getString(p, "TRANSFER_TIME");
                 return weekTask;
             }).collect(Collectors.toList());
             WeekTask weekTask = weekTaskList.get(0);
@@ -97,6 +106,113 @@ public class WeekTaskExt {
         }
     }
 
+    /**
+     * 转办任务列表
+     */
+    public void transferTaskList() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        int pageSize = Integer.parseInt(String.valueOf(map.get("pageSize")));
+        int pageIndex = Integer.parseInt(String.valueOf(map.get("pageIndex")));
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        Map<String, String> weekDay = WeeklyUtils.weekBeginningAndEnding();
+        StringBuilder sb = new StringBuilder();
+        sb.append("select wt.*,gsv.`NAME` as task_status,TRANSFER_USER as transferUserId,au.name as transferUser,CAN_DISPATCH,TRANSFER_TIME from week_task wt " +
+                "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
+                "left join ad_user au on au.id = wt.AD_USER_ID " + "where wt.id  in (select id from week_task where AD_USER_ID='").append(userId).append("' and WEEK_TASK_STATUS_ID='1640891991728508928') ")
+                .append(" and PUBLISH_START between '")
+                .append(weekDay.get("begin")).append("' and '").append(weekDay.get("end"))
+                .append("' order by PUBLISH_START desc");
+
+        String totalSql = sb.toString();
+        int start = pageSize * (pageIndex - 1);
+        sb.append(" limit ").append(start).append(",").append(pageSize);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
+        List<WeekTask> weekTaskList = list.stream().map(p -> {
+            WeekTask weekTask = new WeekTask();
+            weekTask.id = JdbcMapUtil.getString(p, "ID");
+            weekTask.userId = JdbcMapUtil.getString(p, "AD_USER_ID");
+            weekTask.title = JdbcMapUtil.getString(p, "TITLE");
+            weekTask.content = JdbcMapUtil.getString(p, "CONTENT");
+            weekTask.publishStart = StringUtil.withOutT(JdbcMapUtil.getString(p, "PUBLISH_START"));
+            weekTask.taskStatus = JdbcMapUtil.getString(p, "task_status");
+            weekTask.isTransfer = JdbcMapUtil.getString(p, "CAN_DISPATCH");
+            weekTask.transferUserId = JdbcMapUtil.getString(p, "transferUserId");
+            weekTask.transferUser = JdbcMapUtil.getString(p, "transferUser");
+            weekTask.transferTime = JdbcMapUtil.getString(p, "TRANSFER_TIME");
+            return weekTask;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(weekTaskList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
+            OutSide outSide = new OutSide();
+            outSide.total = totalList.size();
+            outSide.weekTaskList = weekTaskList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+
+    /**
+     * 不涉及
+     */
+    public void noInvolve() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        //把任务关闭
+        myJdbcTemplate.update("update WEEK_TASK set WEEK_TASK_STATUS_ID='1634118629769482240' where id=?", map.get("id"));
+        //把节点状态变成未涉及
+        myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID ='0099902212142036278' where id =(select RELATION_DATA_ID from week_task where id=?)", map.get("id"));
+    }
+
+    /**
+     * 任务转办
+     */
+    public void transferTask() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from WEEK_TASK where id=?", map.get("id"));
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> weekData = list.get(0);
+            //把原来的任务状态改为转办
+            myJdbcTemplate.update("update WEEK_TASK set WEEK_TASK_STATUS_ID='1640891991728508928' where id=?", map.get("id"));
+            //新增任务信息
+            String newId = Crud.from("WEEK_TASK").insertData();
+            myJdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,CAN_DISPATCH='1',WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=?,OLD_WEEK_TASK_ID=?,TRANSFER_USER=?,TRANSFER_TIME=? where id=?",
+                    map.get("userId"), weekData.get("TITLE"), weekData.get("CONTENT"), new Date(), "1634118574056542208", weekData.get("WEEK_TASK_TYPE_ID"), weekData.get("RELATION_DATA_ID"), map.get("id"), weekData.get("AD_USER_ID"), new Date(), newId);
+        }
+    }
+
+    /**
+     * 去处理
+     */
+    public void dealWith() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id =(select RELATION_DATA_ID from WEEK_TASK where id=?)", map.get("id"));
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> node = list.get(0);
+            String processId = JdbcMapUtil.getString(node, "PROCESS_ID");
+            //查询流程的第一个节点的view
+            List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select AD_VIEW_ID from wf_node where  NODE_TYPE = 'START_EVENT' AND STATUS = 'AP' and WF_PROCESS_ID = ? ", processId);
+            if (!CollectionUtils.isEmpty(dataList)) {
+                Map<String, Object> dataMap = dataList.get(0);
+                String viewId = JdbcMapUtil.getString(dataMap, "AD_VIEW_ID");
+                Map<String, String> res = new HashMap<>();
+                res.put("processId", processId);
+                res.put("viewId", viewId);
+                ExtJarHelper.returnValue.set(res);
+            } else {
+                ExtJarHelper.returnValue.set(Collections.emptyMap());
+            }
+        } else {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        }
+
+    }
+
 
     public static class WeekTask {
         public String id;
@@ -105,7 +221,13 @@ public class WeekTaskExt {
         public String content;
         public String publishStart;
         public String taskStatus;
-        public String userName;
+        public String isTransfer;
+
+        public String projectId;
+        public String projectName;
+        public String transferUserId;
+        public String transferUser;
+        public String transferTime;
     }
 
     public static class OutSide {

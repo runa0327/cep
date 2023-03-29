@@ -76,7 +76,7 @@ public class ProPlanJob {
     @Scheduled(cron = "0 0 7 * * ? ")//每天7点执行一次
     public void generateWeekTask() {
         Date paramDate = WeeklyUtils.addDays(new Date(), 7);
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select pm.`NAME` as prjName,pppn.*,pi.AD_USER_ID as default_user from pm_pro_plan_node pppn " +
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select pm.`NAME` as prjName,pppn.*,pi.AD_USER_ID as default_user,pm.id as projectId from pm_pro_plan_node pppn " +
                 "left join pm_pro_plan ppp on ppp.id = pppn.PM_PRO_PLAN_ID " +
                 "left join pm_prj pm on pm.id = ppp.PM_PRJ_ID " +
                 "left join POST_INFO pi on pi.id = pppn.POST_INFO_ID " +
@@ -90,8 +90,8 @@ public class ProPlanJob {
                 userId = JdbcMapUtil.getString(objectMap, "default_user");
             }
             String title = MessageFormat.format(msg, objectMap.get("prjName"), objectMap.get("NAME"), objectMap.get("PLAN_START_DATE"));
-            jdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=? where id=?",
-                    userId, title, title, new Date(), "1634118574056542208", "1635080848313290752", objectMap.get("ID"), id);
+            jdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=?,CAN_DISPATCH='0',PM_PRJ_ID=? where id=?",
+                    userId, title, title, new Date(), "1634118574056542208", "1635080848313290752", objectMap.get("ID"), objectMap.get("projectId"), id);
         }
     }
 }

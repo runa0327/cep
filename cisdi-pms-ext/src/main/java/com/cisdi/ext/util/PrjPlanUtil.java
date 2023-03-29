@@ -80,10 +80,21 @@ public class PrjPlanUtil {
                 List<Map<String, Object>> preList = getPreList(m, allData);
                 preList.forEach(item -> {
                     Date dateOrg = DateTimeUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"));
-                    int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
-                    Date endDate = DateTimeUtil.addDays(dateOrg, days);
-                    item.put("PLAN_START_DATE", sp.format(dateOrg));
-                    item.put("PLAN_COMPL_DATE", sp.format(endDate));
+                    Date oweStart = JdbcMapUtil.getDate(item, "PLAN_START_DATE");
+                    if (oweStart != null) {
+                        if (oweStart.before(dateOrg)) {
+                            int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
+                            Date endDate = DateTimeUtil.addDays(dateOrg, days);
+                            item.put("PLAN_START_DATE", sp.format(dateOrg));
+                            item.put("PLAN_COMPL_DATE", sp.format(endDate));
+                        }
+                    } else {
+                        int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
+                        Date endDate = DateTimeUtil.addDays(dateOrg, days);
+                        item.put("PLAN_START_DATE", sp.format(dateOrg));
+                        item.put("PLAN_COMPL_DATE", sp.format(endDate));
+                    }
+
                 });
             }
         }).collect(Collectors.toList());
@@ -144,10 +155,20 @@ public class PrjPlanUtil {
                 if (!CollectionUtils.isEmpty(preList)) {
                     preList.forEach(item -> {
                         Date dateOrg = DateTimeUtil.stringToDate(JdbcMapUtil.getString(currentNode, "PLAN_COMPL_DATE"));
-                        int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
-                        Date endDate = DateTimeUtil.addDays(dateOrg, days);
-                        item.put("PLAN_START_DATE", sp.format(dateOrg));
-                        item.put("PLAN_COMPL_DATE", sp.format(endDate));
+                        Date oweStart = JdbcMapUtil.getDate(item, "PLAN_START_DATE");
+                        if (oweStart != null) {
+                            if (oweStart.before(dateOrg)) {
+                                int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
+                                Date endDate = DateTimeUtil.addDays(dateOrg, days);
+                                item.put("PLAN_START_DATE", sp.format(dateOrg));
+                                item.put("PLAN_COMPL_DATE", sp.format(endDate));
+                            }
+                        } else {
+                            int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
+                            Date endDate = DateTimeUtil.addDays(dateOrg, days);
+                            item.put("PLAN_START_DATE", sp.format(dateOrg));
+                            item.put("PLAN_COMPL_DATE", sp.format(endDate));
+                        }
                     });
 
                     StringBuilder sb = new StringBuilder();
@@ -214,7 +235,8 @@ public class PrjPlanUtil {
                     "pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,ACTUAL_START_DATE,PROGRESS_RISK_REMARK,PM_PRO_PLAN_ID,PLAN_START_DATE, \n" +
                     "PLAN_TOTAL_DAYS,PLAN_CARRY_DAYS,ACTUAL_CARRY_DAYS,ACTUAL_TOTAL_DAYS,PLAN_CURRENT_PRO_PERCENT,ACTUAL_CURRENT_PRO_PERCENT, \n" +
                     "ifnull(PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,PLAN_COMPL_DATE,ACTUAL_COMPL_DATE,SHOW_IN_EARLY_PROC,SHOW_IN_PRJ_OVERVIEW,CAN_START, \n" +
-                    "PROGRESS_STATUS_ID,PROGRESS_RISK_TYPE_ID,CHIEF_DEPT_ID,CHIEF_USER_ID,START_DAY,SEQ_NO,CPMS_UUID,CPMS_ID,`LEVEL`,LINKED_WF_PROCESS_ID,LINKED_START_WF_NODE_ID,LINKED_END_WF_NODE_ID,POST_INFO_ID ,AD_USER_ID \n" +
+                    "PROGRESS_STATUS_ID,PROGRESS_RISK_TYPE_ID,CHIEF_DEPT_ID,CHIEF_USER_ID,START_DAY,SEQ_NO,CPMS_UUID,CPMS_ID,`LEVEL`,LINKED_WF_PROCESS_ID,LINKED_START_WF_NODE_ID,LINKED_END_WF_NODE_ID,POST_INFO_ID ,AD_USER_ID, \n" +
+                    "PRE_NODE_ID,PROCESS_ID,PROCESS_INSTANCE_ID " +
                     "from PM_PRO_PLAN_NODE pppn \n" +
                     "left join POST_INFO pi on pppn.POST_INFO_ID = pi.id \n" +
                     "where PM_PRO_PLAN_ID=?", proMap.get("ID"));
@@ -227,10 +249,37 @@ public class PrjPlanUtil {
                             .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                             .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                             .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
-                            .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).exec();
+                            .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START"))
+                            .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).set("PROCESS_ID", m.get("PROCESS_ID")).set("PROCESS_INSTANCE_ID", m.get("PROCESS_INSTANCE_ID")).exec();
 
                     getChildrenNode(m, planNodeList, id, newPlanId, postUserList);
                 }).collect(Collectors.toList());
+
+                //刷新前置节点
+                List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PM_PRO_PLAN_ID =(select id from PM_PRO_PLAN where PM_PRJ_ID=?)", projectId);
+                if (!CollectionUtils.isEmpty(nodeList)) {
+                    nodeList.forEach(item -> {
+                        //查找模板种相同的节点
+                        Optional<Map<String, Object>> optional = planNodeList.stream().filter(p -> Objects.equals(item.get("NAME"), p.get("NAME"))).findAny();
+                        if (optional.isPresent()) {
+                            Map<String, Object> tempNode = optional.get();
+                            String tempPreNodeId = JdbcMapUtil.getString(tempNode, "PRE_NODE_ID");
+                            if (!Strings.isNullOrEmpty(tempPreNodeId)) {
+                                //找到模板种前置节点对应的节点
+                                Optional<Map<String, Object>> tempPreOptional = planNodeList.stream().filter(p -> Objects.equals(tempPreNodeId, p.get("ID"))).findAny();
+                                if (tempPreOptional.isPresent()) {
+                                    String tempPreNodeName = JdbcMapUtil.getString(tempPreOptional.get(), "NAME");
+                                    Optional<Map<String, Object>> preNodeOptional = nodeList.stream().filter(f -> Objects.equals(tempPreNodeName, f.get("NAME"))).findAny();
+                                    if (preNodeOptional.isPresent()) {
+                                        String preNodeId = JdbcMapUtil.getString(preNodeOptional.get(), "ID");
+                                        myJdbcTemplate.update("update PM_PRO_PLAN_NODE set PRE_NODE_ID=? where id=?", preNodeId, item.get("ID"));
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
             }
         }
     }
@@ -243,7 +292,8 @@ public class PrjPlanUtil {
                     .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                     .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                     .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
-                    .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).exec();
+                    .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START"))
+                    .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).set("PROCESS_ID", m.get("PROCESS_ID")).set("PROCESS_INSTANCE_ID", m.get("PROCESS_INSTANCE_ID")).exec();
             getChildrenNode(m, allData, id, newPlanId, postUserList);
         }).collect(Collectors.toList());
     }
