@@ -102,7 +102,7 @@ public class AttLinkExt {
             return linkFUND_PAY_CODE_V_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("PM_BID_APPROVAL_REQ_ID".equals(attCode)){ // 招标文件审批 属性联动
             return linkPM_BID_APPROVAL_REQ_ID(myJdbcTemplate, attValue, entCode,sevId,param);
-        } else if ("CUSTOMER_UNIT_ONE".equals(attCode) || "CUSTOMER_UNIT".equals(attValue)){ // 签订公司 属性联动
+        } else if ("CUSTOMER_UNIT_ONE".equals(attCode) || "CUSTOMER_UNIT".equals(attCode)){ // 签订公司 属性联动
             return CustomerUnitLink.linkCUSTOMER_UNIT_ONE(myJdbcTemplate, attValue, entCode);
         } else if ("PROJECT_SOURCE_TYPE_ID".equals(attCode)){ // 项目来源 属性联动
             return linkPROJECT_SOURCE_TYPE_ID(myJdbcTemplate, attValue, entCode,sevId,param);

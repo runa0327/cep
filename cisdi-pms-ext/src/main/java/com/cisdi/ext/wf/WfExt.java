@@ -1492,6 +1492,17 @@ public class WfExt {
     public static void createProcessTitle(String entityCode, EntityRecord entityRecord, MyJdbcTemplate myJdbcTemplate) {
         String processName = "", nowDate = "",userName = "",projectName = "",otherName = "",name = "",sql = "";
         String csCommId = entityRecord.csCommId;
+
+        String sql0 = "SELECT c.name as processName,b.IS_URGENT,b.START_DATETIME," +
+                "(select name from ad_user where id = b.START_USER_ID) as userName FROM "+entityCode+" a " +
+                "LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id LEFT JOIN wf_process c on b.WF_PROCESS_ID = c.id WHERE a.id = ?";
+        List<Map<String,Object>> list0 = myJdbcTemplate.queryForList(sql0,csCommId);
+        if (!CollectionUtils.isEmpty(list0)){
+            processName = JdbcMapUtil.getString(list0.get(0),"processName");
+            nowDate = JdbcMapUtil.getString(list0.get(0),"START_DATETIME").replace("T"," ");
+            userName = JdbcMapUtil.getString(list0.get(0),"userName");
+        }
+
         //查询该实例紧急程度
         String urgentSql = "SELECT a.IS_URGENT FROM WF_PROCESS_INSTANCE a left join "+entityCode+" b on a.id = b.LK_WF_INST_ID where b.id = ? ";
         List<Map<String,Object>> urgentList = myJdbcTemplate.queryForList(urgentSql,csCommId);
@@ -1519,62 +1530,59 @@ public class WfExt {
             if (SharedUtil.isEmptyString(projectName)){
                 projectName = getProjectNameStatic(myJdbcTemplate,entityRecord);
             }
-            processName = urgent + projectName;
+            processName = urgent + processName;
         }
 
         //合同流程标题规则
         List<String> orderNameTable = AttLinkDifferentProcess.getOrderProcessName();
-        List<String> tableList = AttLinkDifferentProcess.getTableList();
 
-        if (!CollectionUtils.isEmpty(tableList)) {
-            if (tableList.contains(entityCode)) {
-                // 流程名称按规定创建
+        // 流程名称按规定创建
 
-                // 特殊流程 更新流程内name字段
-                List<String> specialList = AttLinkDifferentProcess.getSpecialList();
-                if (specialList.contains(entityCode)) {
-                    if ("PM_BUY_DEMAND_REQ".equals(entityCode)){ //采购需求审批
-                        sql = "select b.name from PM_BUY_DEMAND_REQ a left join gr_set_value b on a.BUY_MATTER_ID = b.id where a.id = ?";
-                        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
-                        if (!CollectionUtils.isEmpty(list)){
-                            otherName = JdbcMapUtil.getString(list.get(0),"name");
-                        }
-                        name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
-                    } else if ("PO_ORDER_REQ".equals(entityCode)){ //合同签订
-                        otherName = getContractNameStatic(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
-                        name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
-                    } else if ("PM_BID_APPROVAL_REQ".equals(entityCode)) { //招标文件审批
-                        otherName = getContractNameStatic(entityCode,"NAME_ONE",csCommId,myJdbcTemplate);
-                        name = concatProcessNameStatic("-",processName,otherName,userName,nowDate);
-                    } else {
-                        if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
-                            otherName = JdbcMapUtil.getString(entityRecord.valueMap,"REMARK_ONE");
-                        } else if ("QUALITY_RECORD".equals(entityCode)){
-                            otherName = JdbcMapUtil.getString(entityRecord.valueMap,"REMARK_ONE");
-                        } else if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
-                            otherName = JdbcMapUtil.getString(entityRecord.valueMap,"CODE_ONE");
-                        } else {
-                            otherName = getContractNameStatic(entityCode,"NAME_ONE",csCommId,myJdbcTemplate);
-                        }
-                        name = concatProcessNameStatic("-",processName,otherName,projectName,userName,nowDate);
-                    }
-                    if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
-                        myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", otherName,csCommId);
-                    } else {
-                        myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", name,csCommId);
-                    }
-                    myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
-                }  else if (orderNameTable.contains(entityCode)){ //补充协议/合同需求审批/合同终止 流程标题规则
-                    otherName = getContractNameStatic(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
-                    name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
-                    myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
-                } else {
-                    sql = "update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?";
-                    name = concatProcessNameStatic("-",processName,projectName,userName,nowDate);
-                    myJdbcTemplate.update(sql, name,csCommId);
+        // 特殊流程 更新流程内name字段
+        List<String> specialList = AttLinkDifferentProcess.getSpecialList();
+        if (specialList.contains(entityCode)) {
+            if ("PM_BUY_DEMAND_REQ".equals(entityCode)){ //采购需求审批
+                sql = "select b.name from PM_BUY_DEMAND_REQ a left join gr_set_value b on a.BUY_MATTER_ID = b.id where a.id = ?";
+                List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
+                if (!CollectionUtils.isEmpty(list)){
+                    otherName = JdbcMapUtil.getString(list.get(0),"name");
                 }
+                name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
+            } else if ("PO_ORDER_REQ".equals(entityCode)){ //合同签订
+                otherName = getContractNameStatic(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
+                name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
+            } else if ("PM_BID_APPROVAL_REQ".equals(entityCode)) { //招标文件审批
+                otherName = getContractNameStatic(entityCode,"NAME_ONE",csCommId,myJdbcTemplate);
+                name = concatProcessNameStatic("-",processName,otherName,userName,nowDate);
+            } else {
+                if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
+                    otherName = JdbcMapUtil.getString(entityRecord.valueMap,"REMARK_ONE");
+                } else if ("QUALITY_RECORD".equals(entityCode)){
+                    otherName = JdbcMapUtil.getString(entityRecord.valueMap,"REMARK_ONE");
+                } else if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
+                    otherName = JdbcMapUtil.getString(entityRecord.valueMap,"CODE_ONE");
+                } else {
+                    otherName = getContractNameStatic(entityCode,"NAME_ONE",csCommId,myJdbcTemplate);
+                }
+                name = concatProcessNameStatic("-",processName,otherName,projectName,userName,nowDate);
             }
+            if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
+                myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", otherName,csCommId);
+            } else {
+                myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", name,csCommId);
+            }
+            myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
+        }  else if (orderNameTable.contains(entityCode)){ //补充协议/合同需求审批/合同终止 流程标题规则
+            otherName = getContractNameStatic(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
+            name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
+            myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
+        } else {
+            sql = "update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?";
+            name = concatProcessNameStatic("-",processName,projectName,userName,nowDate);
+            myJdbcTemplate.update(sql, name,csCommId);
         }
+
+
 
     }
 }

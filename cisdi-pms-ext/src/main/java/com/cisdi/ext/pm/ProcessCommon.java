@@ -1,7 +1,10 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.model.HrDeptUser;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -302,5 +305,27 @@ public class ProcessCommon {
             throw new BaseException("该人员在该项目的花名册信息中未匹配到信息，请核对花名册审批人信息或联系管理员处理！");
         }
         return processPostId;
+    }
+
+    /**
+     * 流程在发起时重写通用单据部门信息
+     * @param id 业务表id
+     * @param userId 发起人id
+     * @param companyId 业主单位id
+     * @param entCode 业务表名
+     */
+    public static void updateProcessDept(String id, String userId, String companyId, String entCode) {
+        List<HrDeptUser> list = HrDeptUser.selectByWhere(new Where().eq(HrDeptUser.Cols.AD_USER_ID,userId)
+                .eq(HrDeptUser.Cols.CUSTOMER_UNIT,companyId).eq(HrDeptUser.Cols.STATUS,"AP"));
+        if (CollectionUtils.isEmpty(list)){
+            throw new BaseException("对不起，您在该业主单位下不存在部门关系，请联系管理员处理！");
+        } else {
+            List<HrDeptUser> list1 = list.stream().filter(p->p.getSysTrue()==true).collect(Collectors.toList());
+            if (CollectionUtils.isEmpty(list1)){
+                list1 = list.stream().filter(p->p.getSysTrue()!=true).collect(Collectors.toList());
+            }
+            String deptId = list1.get(0).getHrDeptId();
+            Crud.from(entCode).where().eq("id",id).update().set("CRT_DEPT_ID",deptId).exec();
+        }
     }
 }

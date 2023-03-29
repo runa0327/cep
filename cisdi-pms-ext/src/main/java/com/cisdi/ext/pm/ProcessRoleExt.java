@@ -3,9 +3,11 @@ package com.cisdi.ext.pm;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.base.PmProcessPostConExt;
 import com.cisdi.ext.base.WfFlowExt;
+import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.sev.SevInfo;
@@ -786,9 +788,6 @@ public class ProcessRoleExt {
         }
         //项目id
         String projectId = PmPrjExt.getProjectIdByProcess(entityRecord.valueMap,myJdbcTemplate);
-        //流转id
-//        String flowId = "1608355651694862336";
-//        String flowId = ExtJarHelper.flowId.get();
         //节点id
         String nodeId = ExtJarHelper.nodeId.get();
         //查询该节点岗位
@@ -859,5 +858,23 @@ public class ProcessRoleExt {
             list1 = list.stream().map(p->JdbcMapUtil.getString(p,"ad_user_id")).collect(Collectors.toList());
         }
         return list1;
+    }
+
+    /**
+     * 根据流程发起部门信息获取部门负责人信息
+     */
+    public void getDeptLeaderByDept(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //获取签订公司
+        String deptId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_DEPT_ID");
+        String userId = HrDept.selectByWhere(new Where().eq(HrDept.Cols.ID,deptId)).get(0).getChiefUserId();
+        if (SharedUtil.isEmptyString(userId)){
+            throw new BaseException("该部门没有匹配到部门负责人，请先维护负责人信息或联系管理员处理！");
+        } else {
+            List<String> userList = new ArrayList<>();
+            userList.add(userId);
+            ExtJarHelper.returnValue.set(userList);
+        }
     }
 }

@@ -105,6 +105,8 @@ public class PmPrjSettleAccountsExt {
         String procInstId = ExtJarHelper.procInstId.get();
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        //业主单位
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
         if ("false".equals(status)){ //拒绝
             if ("chargeCheckRefuse".equals(nodeStatus)){ //2-部门主管意见-拒绝
                 clearComment("REMARK_LONG_ONE",id,myJdbcTemplate);
@@ -117,12 +119,12 @@ public class PmPrjSettleAccountsExt {
             }
         } else { //确定，审批通过
             if ("start".equals(nodeStatus)){ //流程标题生成
+                //重写通用单据部门信息
+                ProcessCommon.updateProcessDept(id,userId,companyId,entCode);
                 WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
             } else {
                 //项目id
                 String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
-                //业主单位
-                String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
                 //获取审批意见信息
                 Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
                 //审批意见内容
