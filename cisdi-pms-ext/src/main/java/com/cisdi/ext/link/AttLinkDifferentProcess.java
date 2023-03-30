@@ -141,4 +141,15 @@ public class AttLinkDifferentProcess {
         list.add("PM_BUY_DEMAND_REQ"); //采购需求审批
         return list;
     }
+
+    /**
+     * 资金详细信息需要回显的 如工程费、建安费、总投资此类
+     * @return list集合
+     */
+    public static List<String> getInvestProcess() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_PRJ_INVEST1"); //可研报告审批
+        list.add("PM_PRJ_INVEST2"); //初设概算审批
+        return list;
+    }
 }

@@ -356,6 +356,14 @@ public class AttLinkExtDetail {
         if (!noPrjTypeList.contains(entCode)){
             prjTypeLinkNew(row,attLinkResult);
         }
+        // 项目代码
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "prj_code")) ? null:JdbcMapUtil.getString(row, "prj_code");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "prj_code")) ? null:JdbcMapUtil.getString(row, "prj_code");
+            attLinkResult.attMap.put("PRJ_CODE", linkedAtt);
+        }
         // 建筑面积
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -498,6 +506,14 @@ public class AttLinkExtDetail {
             attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
             attLinkResult.attMap.put("PM_FUND_SOURCE_ID", linkedAtt);
         }
+        //建筑面积
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:JdbcMapUtil.getString(row, "QTY_ONE");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "QTY_ONE"));
+            attLinkResult.attMap.put("QTY_ONE", linkedAtt);
+        }
         //海域面积
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -530,6 +546,8 @@ public class AttLinkExtDetail {
             linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
             attLinkResult.attMap.put("OTHER", linkedAtt);
         }
+        //需要回显资金信息的流程
+        List<String> investProcess = AttLinkDifferentProcess.getInvestProcess();
     }
 
     /**
@@ -627,6 +645,7 @@ public class AttLinkExtDetail {
             linkedAtt.changeToShown = otherShow;
             linkedAtt.changeToMandatory = otherMustEdit;
             linkedAtt.changeToEditable = otherChangeToEditable;
+            attLinkResult.attMap.put("OTHER", linkedAtt);
         }
     }
 

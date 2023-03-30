@@ -1,6 +1,8 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.enums.FileCodeEnum;
+import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.util.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -647,10 +649,15 @@ public class PmPrjReqExt {
      * 立项申请流程-流程完结数据处理
      */
     public void prjProcessEnd() {
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //赋予流程发起人查看项目权限
         createPrjUser(entityRecord, myJdbcTemplate);
+        //更新项目信息
+        PmPrjExt.updatePrjBaseByPrjReq(entityRecord);
+        //更新项目资金信息
+        WfPmInvestUtil.updatePrjInvest(entityRecord,entCode);
 
     }
 
