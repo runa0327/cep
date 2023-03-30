@@ -192,8 +192,8 @@ public class WeeklyReportExt {
         // 获取当前周报之后的周报列表（即ID>当前周报的ID）：
         String reportId = report.hrWeeklyReport.getId();
         List<HrWeeklyReport> list = getNewerPersonReportList(reportId);
-        // 若不存在之后的周报列表，则当前周报可以提交：
-        report.canSubmit = SharedUtil.isEmptyList(list);
+        // 若不存在之后的周报列表、且当前周报没有提交，则当前周报可以提交：
+        report.canSubmit = SharedUtil.isEmptyList(list) && report.hrWeeklyReport.getSubmitTime() == null;
 
         report.reportId = reportId;
 
