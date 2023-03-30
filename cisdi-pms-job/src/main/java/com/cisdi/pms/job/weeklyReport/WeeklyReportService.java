@@ -30,7 +30,9 @@ public class WeeklyReportService {
         String batchId = IdUtil.getSnowflakeNextIdStr();
 
         // 获取或创建当前周期（周六到周五）
+        log.info("【获取或创建期间明细】开始：");
         Map<String, Object> periodDlt = getOrCreatePeriodDlt();
+        log.info("【获取或创建期间明细】结束。");
 
         // 获取流程分级：
         List<Map<String, Object>> procLevelList = jdbcTemplate.queryForList("select * from HR_PROC_LEVEL");
