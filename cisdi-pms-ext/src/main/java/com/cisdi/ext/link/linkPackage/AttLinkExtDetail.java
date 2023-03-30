@@ -1,4 +1,4 @@
-package com.cisdi.ext.link;
+package com.cisdi.ext.link.linkPackage;
 
 import com.cisdi.ext.base.AdUserExt;
 import com.cisdi.ext.base.GrSetValue;

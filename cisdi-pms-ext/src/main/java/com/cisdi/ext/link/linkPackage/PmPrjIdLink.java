@@ -107,6 +107,10 @@ public class PmPrjIdLink {
                 }
                 //赋值
                 AttLinkExtDetail.assignmentAttLinkResult(attLinkResult,row,entCode,myJdbcTemplate);
+                if ("PM_PRJ_REQ".equals(entCode)){ //立项申请
+                    //回显项目启动的总投资
+                    AttLinkExtDetail.linkPrjTotalInvest(attLinkResult,attValue);
+                }
 
                 // 资金信息回显。优先级 可研估算<初设概算<预算财<项目结算
                 List<String> amtList = AttLinkDifferentProcess.getAmtList();
