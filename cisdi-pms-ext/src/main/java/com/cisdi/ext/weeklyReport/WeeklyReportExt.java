@@ -45,16 +45,16 @@ public class WeeklyReportExt {
             return;
         }
 
-        // 办结统计：
         if (!SharedUtil.isEmptyList(report.reportDtlList)) {
-            List<ReportDtl> startList = report.reportDtlList.stream().filter(item -> item.isEnd).collect(Collectors.toList());
+            // 占比统计：
+            List<ReportDtl> startList = report.reportDtlList.stream().filter(item -> item.isStart || item.isApprove || item.isEnd).collect(Collectors.toList());
             if (!SharedUtil.isEmptyList(startList)) {
                 BigDecimal sum = new BigDecimal(startList.size());
                 Map<String, List<ReportDtl>> map = startList.stream().collect(Collectors.groupingBy(item -> item.procInst.procName));
-                report.endStat = new ArrayList<>(map.size());
+                report.proportionStat = new ArrayList<>(map.size());
                 map.forEach((k, v) -> {
                     NameCountPercent nameCountPercent = new NameCountPercent();
-                    report.endStat.add(nameCountPercent);
+                    report.proportionStat.add(nameCountPercent);
 
                     nameCountPercent.name = k;
                     nameCountPercent.count = v.size();
@@ -62,13 +62,52 @@ public class WeeklyReportExt {
                     nameCountPercent.percent = new DecimalFormat("#.##%").format(divide);
                 });
 
-                report.endStat = report.endStat.stream().sorted((o1, o2) -> {
+                report.proportionStat = report.proportionStat.stream().sorted((o1, o2) -> {
                     int i = o2.count.compareTo(o1.count);
 
                     // 注：未实现按照拼音排序：
                     return i != 0 ? i : o1.name.compareTo(o2.name);
                 }).collect(Collectors.toList());
             }
+
+            // 趋势统计：
+
+            // 各个部门汇总：
+            Map<IdText, List<ReportDtl>> map = report.reportDtlList.stream().filter(item -> item.isEnd && item.isNotiLeaderOnEnd).collect(
+                    Collectors.groupingBy(item -> item.dept));
+            report.deptStatList = map.entrySet().stream().map(item -> {
+                LeaderGmReport.DeptStat deptStat = new LeaderGmReport.DeptStat();
+                deptStat.dept = item.getKey();
+                deptStat.reportDtlList = item.getValue();
+                return deptStat;
+            }).collect(Collectors.toList());
+
+            //
+            List<String> userIdList = report.reportDtlList.stream().map(item -> item.user.id).distinct().collect(Collectors.toList());
+
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+            // List<Map<String, Object>> startStatList = myJdbcTemplate.queryForList("SELECT DATE_FORMAT(PI.START_DATETIME,'%Y-%m-%d') DATE,COUNT(*) CT FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP' AND PI.START_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.START_DATETIME,'%Y-%m-%d')");
+            // List<Map<String, Object>> endStatList = myJdbcTemplate.queryForList("SELECT DATE_FORMAT(PI.END_DATETIME,'%Y-%m-%d') DATE,COUNT(*) CT FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP' AND PI.END_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.END_DATETIME,'%Y-%m-%d')");
+
+            List<String> argList = new ArrayList<>();
+            argList.addAll(userIdList);
+            argList.addAll(userIdList);
+
+            report.dateStatList = myJdbcTemplate.queryForList("SELECT T.DATE,SUM(T. CT_START) CT_START,SUM(T.CT_END) CT_END\n" +
+                    "FROM\n" +
+                    "(\n" +
+                    "SELECT DATE_FORMAT(PI.START_DATETIME,'%Y-%m-%d') DATE,COUNT(*) CT_START,0 CT_END FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP' AND PI.START_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.START_DATETIME,'%Y-%m-%d')\n" +
+                    "UNION ALL\n" +
+                    "SELECT DATE_FORMAT(PI.END_DATETIME,'%Y-%m-%d') DATE,0 CT_START,COUNT(*) CT_END FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP'  AND PI.END_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.END_DATETIME,'%Y-%m-%d')\n" +
+                    ") T GROUP BY T.DATE\n" +
+                    "ORDER BY T.DATE", argList.toArray()).stream().map(item -> {
+                LeaderGmReport.DateStat dateStat = new LeaderGmReport.DateStat();
+                dateStat.date = JdbcMapUtil.getString(item, "DATE");
+                dateStat.ctStart = JdbcMapUtil.getLong(item, "CT_START");
+                dateStat.ctEnd = JdbcMapUtil.getLong(item, "CT_END");
+                return dateStat;
+            }).collect(Collectors.toList());
+
         }
 
         setBaseReportAsReturnValue(report);
@@ -125,7 +164,7 @@ public class WeeklyReportExt {
                     userStat.ctEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isEnd)).count();
                     userStat.ctUnend = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isUnend)).count();
                     userStat.ctStartApproveEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart) || Boolean.TRUE.equals(reportDtl.isApprove) || Boolean.TRUE.equals(reportDtl.isEnd)).count();
-                    userStat.ctProject= userEntry.getValue().stream().filter(reportDtl -> reportDtl.prj!=null).map(reportDtl -> reportDtl.prj.id).distinct().count();
+                    userStat.ctProject = userEntry.getValue().stream().filter(reportDtl -> reportDtl.prj != null).map(reportDtl -> reportDtl.prj.id).distinct().count();
                     return userStat;
                 }).sorted((o1, o2) -> o2.ctStartApproveEnd.compareTo(o1.ctStartApproveEnd)).collect(Collectors.toList());
 
@@ -202,7 +241,7 @@ public class WeeklyReportExt {
             reportDtl.isApprove = JdbcMapUtil.getBoolean(item, "IS_APPROVE");
             reportDtl.isEnd = JdbcMapUtil.getBoolean(item, "IS_END");
             // TODO 230323 暂未写入待办，直接为true：
-            reportDtl.isUnend=true;
+            reportDtl.isUnend = true;
             reportDtl.isNotiDeptOnEnd = JdbcMapUtil.getBoolean(item, "IS_NOTI_DEPT_ON_END");
             reportDtl.isNotiLeaderOnEnd = JdbcMapUtil.getBoolean(item, "IS_NOTI_LEADER_ON_END");
 
@@ -265,7 +304,23 @@ public class WeeklyReportExt {
     }
 
     public static class LeaderGmReport extends BaseReport {
-        public List<NameCountPercent> endStat;
+        public List<NameCountPercent> proportionStat;
+
+        public List<DeptStat> deptStatList;
+
+        public static class DeptStat {
+            public IdText dept;
+
+            public List<ReportDtl> reportDtlList;
+        }
+
+        public List<DateStat> dateStatList;
+
+        public static class DateStat {
+            public String date;
+            public Long ctStart;
+            public Long ctEnd;
+        }
     }
 
     public static class DeptReport extends BaseReport {
