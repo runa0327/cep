@@ -2,6 +2,7 @@ package com.cisdi.ext.base;
 
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.util.WfPmInvestUtil;
+import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
@@ -228,6 +229,34 @@ public class PmPrjExt {
                 .set("PROJECT_OTHER_AMT",investMap.get("PROJECT_AMT")) //工程其他费用
                 .set("LAND_BUY_AMT",investMap.get("LAND_AMT")) //土地征拆费
                 .set("PREPARE_AMT",investMap.get("PREPARE_AMT")) //预备费
+                .exec();
+    }
+
+    /**
+     * 立项申请流程完结-更新项目基础信息
+     * @param entityRecord 表单数据源
+     */
+    public static void updatePrjBaseByPrjReq(EntityRecord entityRecord) {
+        String id = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        Map map = entityRecord.valueMap;
+        Crud.from("PM_PRJ").where().eq("ID",id).update()
+                .set("PRJ_REPLY_DATE",JdbcMapUtil.getString(map,"PRJ_REPLY_DATE")) //立项批复日期
+                .set("PRJ_REPLY_NO",JdbcMapUtil.getString(map,"PRJ_REPLY_NO")) //立项批复文号
+                .set("PRJ_REPLY_FILE",JdbcMapUtil.getString(map,"REPLY_FILE")) //立项批复材料
+                .set("PRJ_EARLY_USER_ID",JdbcMapUtil.getString(map,"PRJ_EARLY_USER_ID")) //前期岗
+                .set("PRJ_DESIGN_USER_ID",JdbcMapUtil.getString(map,"PRJ_DESIGN_USER_ID")) //设计岗
+                .set("PRJ_COST_USER_ID",JdbcMapUtil.getString(map,"PRJ_COST_USER_ID")) //成本岗
+                .set("PRJ_CODE",JdbcMapUtil.getString(map,"CONSTRUCTION_PROJECT_CODE")) //项目编号
+                .set("PRJ_MANAGE_MODE_ID",JdbcMapUtil.getString(map,"PRJ_MANAGE_MODE_ID")) //项目管理模式
+                .set("BASE_LOCATION_ID",JdbcMapUtil.getString(map,"BASE_LOCATION_ID")) //建设地点
+                .set("FLOOR_AREA",JdbcMapUtil.getString(map,"FLOOR_AREA")) //占地面积
+                .set("CON_SCALE_TYPE_ID",JdbcMapUtil.getString(map,"CON_SCALE_TYPE_ID")) //建设规模类型
+                .set("CON_SCALE_QTY",JdbcMapUtil.getString(map,"CON_SCALE_QTY")) //道路长度
+                .set("CON_SCALE_QTY2",JdbcMapUtil.getString(map,"CON_SCALE_QTY2")) //道路宽度
+                .set("QTY_ONE",JdbcMapUtil.getString(map,"QTY_ONE")) //建筑面积
+                .set("QTY_THREE",JdbcMapUtil.getString(map,"QTY_THREE")) //海域面积
+                .set("OTHER",JdbcMapUtil.getString(map,"OTHER")) //其他
+                .set("CON_SCALE_UOM_ID",JdbcMapUtil.getString(map,"CON_SCALE_UOM_ID")) //建设规模单位
                 .exec();
     }
 }
