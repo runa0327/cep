@@ -1,5 +1,6 @@
 package com.cisdi.ext.home;
 
+import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -56,11 +57,11 @@ public class InvestmentConstructionExt {
             MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
             Map<String, Object> dataParam = new HashMap<>();
             dataParam.put("ids", ids);
-            List<Map<String, Object>> tzList = myNamedParameterJdbcTemplate.queryForList(" select ifnull(PRJ_TOTAL_INVEST,0) PRJ_TOTAL_INVEST from PM_INVEST_EST pie \n" +
+            List<Map<String, Object>> tzList = myNamedParameterJdbcTemplate.queryForList(" select sum(PRJ_TOTAL_INVEST) PRJ_TOTAL_INVEST from PM_INVEST_EST pie \n" +
                     " left join gr_set_value gsv on pie.INVEST_EST_TYPE_ID = gsv.id \n" +
-                    " where  gsv.`CODE`='invest2' and pie.PM_PRJ_ID in (:ids);", dataParam);
+                    " where  pie.PM_PRJ_ID in (:ids) order by gsv.code desc limit 0,1 ", dataParam);
             BigDecimal totalInvestment = tzList.stream().map(p -> new BigDecimal(JdbcMapUtil.getString(p, "PRJ_TOTAL_INVEST"))).reduce(BigDecimal.ZERO, BigDecimal::add);
-            data.totalInvestment = totalInvestment.divide(new BigDecimal(10000), 2, BigDecimal.ROUND_HALF_UP);
+            data.totalInvestment = totalInvestment;
             //完成投资
             List<Map<String, Object>> wcList = myNamedParameterJdbcTemplate.queryForList("select * from pm_statistics_fee where PM_PRJ_ID in (:ids)", dataParam);
             Map<String, List<Map<String, Object>>> feeMapData = wcList.stream().collect(Collectors.groupingBy(p -> JdbcMapUtil.getString(p, "PM_PRJ_ID")));
@@ -80,7 +81,7 @@ public class InvestmentConstructionExt {
 
                 }
             }
-            data.completeInvestment = completeInvestment.divide(new BigDecimal(10000), 2, BigDecimal.ROUND_HALF_UP);
+            data.completeInvestment = completeInvestment.multiply(new BigDecimal(10000));
             //完成支付
             List<Map<String, Object>> zfList = myNamedParameterJdbcTemplate.queryForList("select pod.*,ifnull(sum(pop.PAY_AMT),0) as PAY_AMT from PO_ORDER_DTL pod \n" +
                     "left join po_order po on po.id = pod.PO_ORDER_ID \n" +
