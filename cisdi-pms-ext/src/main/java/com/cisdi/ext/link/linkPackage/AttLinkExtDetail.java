@@ -33,7 +33,7 @@ public class AttLinkExtDetail {
         postCodeMap.put("BUY_POST","AD_USER_TWENTY_ONE_ID"); //采购管理岗
         postCodeMap.put("TREATY_POST","AD_USER_NINETEEN_ID"); //合约管理岗
         postCodeMap.put("EARLY_EQUIP_POST","AD_USER_SIXTEEN_ID"); //前期设备岗
-        postCodeMap.put("EQUIP_COST_POST","AD_USER_EIGHTEEN_ID"); //设备成本岗
+        postCodeMap.put("EQUIP_COST_POST","AD_USER_TWENTY_ID"); //设备成本岗
         postCodeMap.put("LAND_POST","AD_USER_THIRTEEN_ID"); //土地管理岗
     }
 
@@ -1017,7 +1017,7 @@ public class AttLinkExtDetail {
                 linkedAtt.type = AttDataTypeE.DATE;
                 linkedAtt.value = JdbcMapUtil.getString(list.get(0), "START_TIME");
                 linkedAtt.text = JdbcMapUtil.getString(list.get(0), "START_TIME");
-                attLinkResult.attMap.put("START_TIME", linkedAtt);
+                attLinkResult.attMap.put("START_DATE", linkedAtt);
             }
             // 建设单位
             {

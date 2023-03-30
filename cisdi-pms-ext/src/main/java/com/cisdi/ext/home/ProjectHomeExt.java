@@ -45,14 +45,14 @@ public class ProjectHomeExt {
         if (!CollectionUtils.isEmpty(dataList)) {
             totalAmt = new BigDecimal(String.valueOf(dataList.get(0).get("PRJ_TOTAL_INVEST")));
         }
-
+        totalAmt = BigDecimalUtil.divide(totalAmt,new BigDecimal(10000));
         //今年计划投资-取投资计划汇总
         int currentYear = LocalDate.now().getYear();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(AMT,0) as AMT from PM_INVESTMENT_YEAR_PLAN where PM_PRJ_ID =? and `year`=?", projectId, currentYear);
         if (!CollectionUtils.isEmpty(list)) {
             planAmt = new BigDecimal(String.valueOf(list.get(0).get("AMT")));
         }
-
+        planAmt = BigDecimalUtil.divide(planAmt,new BigDecimal(10000));
         //今年完成投资-取纳统汇总
         String sql = " select id,\n" +
                 "        PM_PRJ_ID,\n" +
