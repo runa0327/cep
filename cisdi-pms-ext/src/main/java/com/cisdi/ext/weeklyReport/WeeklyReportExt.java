@@ -75,14 +75,16 @@ public class WeeklyReportExt {
             // 趋势统计：
 
             // 各个部门汇总：
-            Map<IdText, List<ReportDtl>> map = report.reportDtlList.stream().filter(item -> item.isEnd && item.isNotiLeaderOnEnd).collect(
-                    Collectors.groupingBy(item -> item.dept));
-            report.deptStatList = map.entrySet().stream().map(item -> {
-                LeaderGmReport.DeptStat deptStat = new LeaderGmReport.DeptStat();
-                deptStat.dept = item.getKey();
-                deptStat.reportDtlList = item.getValue();
-                return deptStat;
-            }).collect(Collectors.toList());
+            // Map<IdText, List<ReportDtl>> map = report.reportDtlList.stream().filter(item -> item.isEnd && item.isNotiLeaderOnEnd).collect(
+            //         Collectors.groupingBy(item -> item.dept));
+            // report.deptStatList = map.entrySet().stream().map(item -> {
+            //     LeaderGmReport.DeptStat deptStat = new LeaderGmReport.DeptStat();
+            //     deptStat.dept = item.getKey();
+            //     deptStat.reportDtlList = item.getValue();
+            //     return deptStat;
+            // }).collect(Collectors.toList());
+            // 各个部门汇总：
+            report.deptStatList = getDeptStats(report.reportDtlList);
 
             //
             List<String> userIdList = report.reportDtlList.stream().map(item -> item.user.id).distinct().collect(Collectors.toList());
@@ -148,35 +150,38 @@ public class WeeklyReportExt {
             }
 
             // 各个部门汇总：
-            Map<IdText, Map<IdText, List<ReportDtl>>> map = report.reportDtlList.stream().collect(
-                    Collectors.groupingBy(
-                            reportDtl -> reportDtl.dept,
-                            Collectors.groupingBy(
-                                    reportDtl -> reportDtl.user
-                            )));
-
-            List<DeptReport.DeptStat> deptStatList = map.entrySet().stream().map(deptEntry -> {
-                DeptReport.DeptStat deptStat = new DeptReport.DeptStat();
-                deptStat.dept = deptEntry.getKey();
-                deptStat.userStatList = deptEntry.getValue().entrySet().stream().map(userEntry -> {
-                    DeptReport.DeptStat.UserStat userStat = new DeptReport.DeptStat.UserStat();
-                    userStat.user = userEntry.getKey();
-                    userStat.ctStart = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart)).count();
-                    userStat.ctApprove = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isApprove)).count();
-                    userStat.ctEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isEnd)).count();
-                    userStat.ctUnend = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isUnend)).count();
-                    userStat.ctStartApproveEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart) || Boolean.TRUE.equals(reportDtl.isApprove) || Boolean.TRUE.equals(reportDtl.isEnd)).count();
-                    userStat.ctProject = userEntry.getValue().stream().filter(reportDtl -> reportDtl.prj != null).map(reportDtl -> reportDtl.prj.id).distinct().count();
-                    return userStat;
-                }).sorted((o1, o2) -> o2.ctStartApproveEnd.compareTo(o1.ctStartApproveEnd)).collect(Collectors.toList());
-
-                return deptStat;
-            }).sorted(Comparator.comparing(o -> o.dept.text)).collect(Collectors.toList());
-
-            report.deptStatList = deptStatList;
+            report.deptStatList = getDeptStats(report.reportDtlList);
         }
 
         setBaseReportAsReturnValue(report);
+    }
+
+    private List<DeptStat> getDeptStats(List<ReportDtl> reportDtlList) {
+        Map<IdText, Map<IdText, List<ReportDtl>>> map = reportDtlList.stream().collect(
+                Collectors.groupingBy(
+                        reportDtl -> reportDtl.dept,
+                        Collectors.groupingBy(
+                                reportDtl -> reportDtl.user
+                        )));
+
+        List<DeptStat> deptStatList = map.entrySet().stream().map(deptEntry -> {
+            DeptStat deptStat = new DeptStat();
+            deptStat.dept = deptEntry.getKey();
+            deptStat.userStatList = deptEntry.getValue().entrySet().stream().map(userEntry -> {
+                DeptStat.UserStat userStat = new DeptStat.UserStat();
+                userStat.user = userEntry.getKey();
+                userStat.ctStart = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart)).count();
+                userStat.ctApprove = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isApprove)).count();
+                userStat.ctEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isEnd)).count();
+                userStat.ctUnend = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isUnend)).count();
+                userStat.ctStartApproveEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart) || Boolean.TRUE.equals(reportDtl.isApprove) || Boolean.TRUE.equals(reportDtl.isEnd)).count();
+                userStat.ctProject = userEntry.getValue().stream().filter(reportDtl -> reportDtl.prj != null).map(reportDtl -> reportDtl.prj.id).distinct().count();
+                return userStat;
+            }).sorted((o1, o2) -> o2.ctStartApproveEnd.compareTo(o1.ctStartApproveEnd)).collect(Collectors.toList());
+
+            return deptStat;
+        }).sorted(Comparator.comparing(o -> o.dept.text)).collect(Collectors.toList());
+        return deptStatList;
     }
 
     public void getPersonWeeklyReport() {
@@ -356,11 +361,11 @@ public class WeeklyReportExt {
 
         public List<DeptStat> deptStatList;
 
-        public static class DeptStat {
-            public IdText dept;
-
-            public List<ReportDtl> reportDtlList;
-        }
+        // public static class DeptStat {
+        //     public IdText dept;
+        //
+        //     public List<ReportDtl> reportDtlList;
+        // }
 
         public List<DateStat> dateStatList;
 
@@ -375,23 +380,22 @@ public class WeeklyReportExt {
         public List<NameCountPercent> startStat;
 
         public List<DeptStat> deptStatList;
+    }
 
-        public static class DeptStat {
-            public IdText dept;
+    public static class DeptStat {
+        public IdText dept;
 
-            public List<UserStat> userStatList;
+        public List<UserStat> userStatList;
 
-            public static class UserStat {
-                public IdText user;
-                public Long ctStart;
-                public Long ctApprove;
-                public Long ctEnd;
-                public Long ctUnend;
-                public Long ctStartApproveEnd;
-                public Long ctProject;
-            }
+        public static class UserStat {
+            public IdText user;
+            public Long ctStart;
+            public Long ctApprove;
+            public Long ctEnd;
+            public Long ctUnend;
+            public Long ctStartApproveEnd;
+            public Long ctProject;
         }
-
     }
 
     public static class NameCountPercent {
