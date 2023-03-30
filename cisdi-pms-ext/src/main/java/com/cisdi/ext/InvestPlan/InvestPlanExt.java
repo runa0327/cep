@@ -219,6 +219,7 @@ public class InvestPlanExt {
                 if (!CollectionUtils.isEmpty(nList)) {
                     sj = new BigDecimal(String.valueOf(nList.get(0).get("fee")));
                 }
+                sj = sj.multiply(new BigDecimal(10000));
                 monthPlan.sjAmt = sj;
                 BigDecimal wcR = BigDecimal.ZERO;
                 if (monthPlan.amt.compareTo(BigDecimal.ZERO) != 0) {
