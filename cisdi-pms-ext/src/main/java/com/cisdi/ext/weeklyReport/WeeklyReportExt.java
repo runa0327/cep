@@ -10,12 +10,14 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.IdText;
+import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -185,11 +187,57 @@ public class WeeklyReportExt {
 
         report.reportRemark = report.hrWeeklyReport.getReportRemark();
         report.reportFileList = getFileList(report.hrWeeklyReport.getReportFile());
+        report.submitTime = report.hrWeeklyReport.getSubmitTime() == null ? null : DateTimeUtil.dttmToString(DateTimeUtil.localDateTimeToDate(report.hrWeeklyReport.getSubmitTime()));
+
+        // 获取当前周报之后的周报列表（即ID>当前周报的ID）：
+        String reportId = report.hrWeeklyReport.getId();
+        List<HrWeeklyReport> list = getNewerPersonReportList(reportId);
+        // 若不存在之后的周报列表，则当前周报可以提交：
+        report.canSubmit = SharedUtil.isEmptyList(list);
+
+        report.reportId = reportId;
 
         setBaseReportAsReturnValue(report);
     }
 
+    /**
+     * 获取之后的个人周报列表。
+     *
+     * @param reportId
+     * @return
+     */
+    private List<HrWeeklyReport> getNewerPersonReportList(String reportId) {
+        return HrWeeklyReport.selectByWhere(new Where().eq(HrWeeklyReport.Cols.HR_WEEKLY_REPORT_TYPE_ID, WeeklyReportType.P.toString()).eq(HrWeeklyReport.Cols.REPORT_USER_ID, ExtJarHelper.loginInfo.get().userId).eq(HrWeeklyReport.Cols.STATUS, "AP").gt(HrWeeklyReport.Cols.ID, reportId), Arrays.asList(HrWeeklyReport.Cols.ID), null);
+    }
+
+    public void submitPersonWeeklyReport() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String reportId = String.valueOf(map.get("reportId"));
+        String reportRemark = String.valueOf(map.get("reportRemark"));
+        String reportFile = String.valueOf(map.get("reportFile"));
+
+        if (SharedUtil.isEmptyString(reportId)) {
+            throw new BaseException("周报ID不能为空！");
+        }
+
+        List<HrWeeklyReport> list = getNewerPersonReportList(reportId);
+        if (!SharedUtil.isEmptyList(list)) {
+            throw new BaseException("因后续周报已生成，该周报已无法提交！");
+        }
+
+        HrWeeklyReport hrWeeklyReport = HrWeeklyReport.selectById(reportId);
+        if (hrWeeklyReport.getSubmitTime() != null) {
+            throw new BaseException("因该周报已提交，故无法再次提交！");
+        }
+
+        hrWeeklyReport.setSubmitTime(LocalDateTime.now());
+        hrWeeklyReport.setReportRemark(reportRemark);
+        hrWeeklyReport.setReportFile(reportFile);
+        hrWeeklyReport.updateById();
+    }
+
     private void setBaseReportAsReturnValue(BaseReport baseReport) {
+        // 属性hrWeeklyReport无需返回：
         baseReport.hrWeeklyReport = null;
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(baseReport), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
@@ -355,6 +403,12 @@ public class WeeklyReportExt {
     public static class PersonReport extends BaseReport {
         public String reportRemark;
         public List<File> reportFileList;
+
+        public String submitTime;
+
+        public Boolean canSubmit;
+
+        public String reportId;
 
     }
 
