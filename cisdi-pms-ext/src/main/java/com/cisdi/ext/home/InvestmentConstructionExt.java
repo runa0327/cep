@@ -62,7 +62,16 @@ public class InvestmentConstructionExt {
                     " where  pie.PM_PRJ_ID in (:ids) order by gsv.code desc limit 0,1 ", dataParam);
             data.totalInvestment = tzList.stream().map(p1 -> new BigDecimal(JdbcMapUtil.getString(p1, "PRJ_TOTAL_INVEST"))).reduce(BigDecimal.ZERO, BigDecimal::add);
             //完成投资
-            List<Map<String, Object>> wcList = myNamedParameterJdbcTemplate.queryForList("select * from pm_statistics_fee where PM_PRJ_ID in (:ids)", dataParam);
+            List<Map<String, Object>> wcList = myNamedParameterJdbcTemplate.queryForList("select YEAR,ifnull(ARCHITECTURAL_ENGINEERING_FEE,0) as ARCHITECTURAL_ENGINEERING_FEE, \n" +
+                    "ifnull(INSTALLATION_ENGINEERING_FEE,0) as INSTALLATION_ENGINEERING_FEE, \n" +
+                    "ifnull(OTHER_FEE,0) as OTHER_FEE, \n" +
+                    "ifnull(EQUIPMENT_PURCHASE_FEE,0) as EQUIPMENT_PURCHASE_FEE, \n" +
+                    "ifnull(THIS_YEAR_INVESTMENT,0) as THIS_YEAR_INVESTMENT,PM_PRJ_ID,MONTH, \n" +
+                    "ifnull(THIS_MONTH_INVESTMENT,0) as THIS_MONTH_INVESTMENT, \n" +
+                    "ifnull(PURCHASE_OLD_EQUIPMENT,0) as PURCHASE_OLD_EQUIPMENT, \n" +
+                    "ifnull(CONSTRUCTION_LAND_CHARGE,0) as CONSTRUCTION_LAND_CHARGE, \n" +
+                    "ifnull(RESIDENTIAL,0) as RESIDENTIAL, \n" +
+                    "ifnull(PURCHASE_OLD_BUILDING,0) as PURCHASE_OLD_BUILDING  from pm_statistics_fee where PM_PRJ_ID in (:ids)", dataParam);
             Map<String, List<Map<String, Object>>> feeMapData = wcList.stream().collect(Collectors.groupingBy(p -> JdbcMapUtil.getString(p, "PM_PRJ_ID")));
             BigDecimal completeInvestment = BigDecimal.ZERO;
             for (String feeKey : feeMapData.keySet()) {
