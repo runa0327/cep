@@ -93,9 +93,9 @@ public class PmPrj {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 招标方式。
+         * 招标模式。
          */
-        public static final String TENDER_WAY_ID = "TENDER_WAY_ID";
+        public static final String TENDER_MODE_ID = "TENDER_MODE_ID";
         /**
          * 记录状态。
          */
@@ -752,36 +752,36 @@ public class PmPrj {
     }
 
     /**
-     * 招标方式。
+     * 招标模式。
      */
-    private String tenderWayId;
+    private String tenderModeId;
 
     /**
-     * 获取：招标方式。
+     * 获取：招标模式。
      */
-    public String getTenderWayId() {
-        return this.tenderWayId;
+    public String getTenderModeId() {
+        return this.tenderModeId;
     }
 
     /**
-     * 设置：招标方式。
+     * 设置：招标模式。
      */
-    public PmPrj setTenderWayId(String tenderWayId) {
-        if (this.tenderWayId == null && tenderWayId == null) {
+    public PmPrj setTenderModeId(String tenderModeId) {
+        if (this.tenderModeId == null && tenderModeId == null) {
             // 均为null，不做处理。
-        } else if (this.tenderWayId != null && tenderWayId != null) {
+        } else if (this.tenderModeId != null && tenderModeId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.tenderWayId.compareTo(tenderWayId) != 0) {
-                this.tenderWayId = tenderWayId;
-                if (!this.toUpdateCols.contains("TENDER_WAY_ID")) {
-                    this.toUpdateCols.add("TENDER_WAY_ID");
+            if (this.tenderModeId.compareTo(tenderModeId) != 0) {
+                this.tenderModeId = tenderModeId;
+                if (!this.toUpdateCols.contains("TENDER_MODE_ID")) {
+                    this.toUpdateCols.add("TENDER_MODE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.tenderWayId = tenderWayId;
-            if (!this.toUpdateCols.contains("TENDER_WAY_ID")) {
-                this.toUpdateCols.add("TENDER_WAY_ID");
+            this.tenderModeId = tenderModeId;
+            if (!this.toUpdateCols.contains("TENDER_MODE_ID")) {
+                this.toUpdateCols.add("TENDER_MODE_ID");
             }
         }
         return this;

@@ -270,14 +270,11 @@ public class PrjPlanUtil {
     public static void createPlan(String projectId, String type, String sourceId, BigDecimal invest, String tenderWay) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //根据项目的类型，项目投资来源，项目的总额，招标方式查询模板
-        String proPlanId = "";
+        String proPlanId = "0099902212142021791";  //默认的模板
         List<Map<String, Object>> ruleList = myJdbcTemplate.queryForList("select pptr.*,gsv.`code` as rule from PRO_PLAN_TEMPLATE_RULE pptr " +
                 "left join gr_set_value gsv on pptr.PRO_PLAN_RULE_CONDITION_ID = gsv.id " +
                 "where TEMPLATE_FOR_PROJECT_TYPE_ID=? and INVESTMENT_SOURCE_ID=? and TENDER_MODE_ID=?", type, sourceId, tenderWay);
-        if (CollectionUtils.isEmpty(ruleList)) {
-            //取默认的模板
-            proPlanId = "0099902212142021791";
-        } else {
+        if (!CollectionUtils.isEmpty(ruleList)) {
             for (Map<String, Object> objectMap : ruleList) {
                 String condition = JdbcMapUtil.getString(objectMap, "rule");
                 String ex = condition.replaceAll("param", String.valueOf(invest));
