@@ -40,19 +40,19 @@ public class ProjectHomeExt {
         BigDecimal completeAmt = BigDecimal.ZERO;
         List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select ifnull(pie.PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST from pm_invest_est pie \n" +
                 "left join gr_set_value gsv on gsv.id = pie.INVEST_EST_TYPE_ID \n" +
-                "where pie.PM_PRJ_ID=? \n" +
+                "where pie.PM_PRJ_ID=? and PRJ_TOTAL_INVEST<>0 \n" +
                 "order by gsv.code desc limit 0,1", projectId);
         if (!CollectionUtils.isEmpty(dataList)) {
             totalAmt = new BigDecimal(String.valueOf(dataList.get(0).get("PRJ_TOTAL_INVEST")));
         }
-
+        totalAmt = BigDecimalUtil.divide(totalAmt,new BigDecimal(10000));
         //今年计划投资-取投资计划汇总
         int currentYear = LocalDate.now().getYear();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(AMT,0) as AMT from PM_INVESTMENT_YEAR_PLAN where PM_PRJ_ID =? and `year`=?", projectId, currentYear);
         if (!CollectionUtils.isEmpty(list)) {
             planAmt = new BigDecimal(String.valueOf(list.get(0).get("AMT")));
         }
-
+        planAmt = BigDecimalUtil.divide(planAmt,new BigDecimal(10000));
         //今年完成投资-取纳统汇总
         String sql = " select id,\n" +
                 "        PM_PRJ_ID,\n" +
@@ -80,9 +80,9 @@ public class ProjectHomeExt {
         }
 
         OutSide outSide = new OutSide();
-        outSide.totalAmt = totalAmt;
-        outSide.planAmt = planAmt;
-        outSide.completeAmt = completeAmt;
+        outSide.totalAmt = totalAmt.multiply(new BigDecimal(10000));
+        outSide.planAmt = planAmt.multiply(new BigDecimal(10000));
+        outSide.completeAmt = completeAmt.multiply(new BigDecimal(10000));
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }

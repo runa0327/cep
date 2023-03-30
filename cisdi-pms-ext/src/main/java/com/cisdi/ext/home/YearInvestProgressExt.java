@@ -26,7 +26,7 @@ public class YearInvestProgressExt {
         String year = String.valueOf(map.get("year"));
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         AnnualInvestmentProgress res = new AnnualInvestmentProgress();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select IFNULL(pimp.AMT,0) AMT, MONTH from pm_investment_month_plan pimp \n" +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select IFNULL(pimp.AMT,0)/10000 AMT, MONTH from pm_investment_month_plan pimp \n" +
                 "left join PM_INVESTMENT_YEAR_PLAN  piyp on pimp.PM_INVESTMENT_YEAR_PLAN_ID = piyp.id  \n" +
                 "where piyp.`YEAR`=?", year);
 

@@ -67,7 +67,7 @@ public class InvestPlanExt {
             if (!CollectionUtils.isEmpty(ntList)) {
                 totalActualOutputValue = ntList.stream().map(m -> new BigDecimal(JdbcMapUtil.getString(m, "fee"))).reduce(BigDecimal.ZERO, BigDecimal::add);
             }
-
+            totalActualOutputValue = totalActualOutputValue.multiply(new BigDecimal(10000));
             plan.totalActualOutputValue = totalActualOutputValue;
 
             BigDecimal percentageComplete = BigDecimal.ZERO;
@@ -194,7 +194,7 @@ public class InvestPlanExt {
             if (!CollectionUtils.isEmpty(ntList)) {
                 totalActualOutputValue = ntList.stream().map(m -> new BigDecimal(JdbcMapUtil.getString(m, "fee"))).reduce(BigDecimal.ZERO, BigDecimal::add);
             }
-
+            totalActualOutputValue = totalActualOutputValue.multiply(new BigDecimal(10000));
             plan.totalActualOutputValue = totalActualOutputValue;
 
             BigDecimal percentageComplete = BigDecimal.ZERO;
@@ -219,6 +219,7 @@ public class InvestPlanExt {
                 if (!CollectionUtils.isEmpty(nList)) {
                     sj = new BigDecimal(String.valueOf(nList.get(0).get("fee")));
                 }
+                sj = sj.multiply(new BigDecimal(10000));
                 monthPlan.sjAmt = sj;
                 BigDecimal wcR = BigDecimal.ZERO;
                 if (monthPlan.amt.compareTo(BigDecimal.ZERO) != 0) {

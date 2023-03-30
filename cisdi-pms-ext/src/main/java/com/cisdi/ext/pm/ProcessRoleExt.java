@@ -786,9 +786,6 @@ public class ProcessRoleExt {
         }
         //项目id
         String projectId = PmPrjExt.getProjectIdByProcess(entityRecord.valueMap,myJdbcTemplate);
-        //流转id
-//        String flowId = "1608355651694862336";
-//        String flowId = ExtJarHelper.flowId.get();
         //节点id
         String nodeId = ExtJarHelper.nodeId.get();
         //查询该节点岗位

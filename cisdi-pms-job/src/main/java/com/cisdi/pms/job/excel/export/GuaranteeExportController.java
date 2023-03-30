@@ -48,7 +48,7 @@ public class GuaranteeExportController extends BaseController {
             Date guaranteeEndDate = guaranteeModel.getGuaranteeEndDate();
             Date guaranteeStartDate = guaranteeModel.getGuaranteeStartDate();
             String projectNameWr = guaranteeModel.getProjectNameWr();
-        String param = " where 1=1 ";
+        String param = " where 1=1 AND r.STATUS IN ( 'ap', 'APING' ) ";
             String temp = " ";
             if (!StringUtils.isEmpty(guaranteeLetterTypeId)) {
                 temp += " and r.GUARANTEE_LETTER_TYPE_ID= '" + guaranteeLetterTypeId + "'";
@@ -67,7 +67,7 @@ public class GuaranteeExportController extends BaseController {
         String sql = "select r.id,r.GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,r.GUARANTEE_COST_TYPE_ID guaranteeCostTypeId,IFNULL(p1.NAME,r" +
                 ".PROJECT_NAME_WR) projectNameWr,r.APPLICANT applicant,r.GUARANTEE_MECHANISM guaranteeMechanism,r.GUARANTEE_CODE guaranteeCode,r" +
                 ".AMT_WR_ONE amtWrOne,r.GUARANTEE_START_DATE guaranteeStartDate,r.GUARANTEE_END_DATE guaranteeEndDate,r.REMARK_LONG_ONE " +
-                "remarkLongOne,r.AUTHOR author \n" +
+                "remarkLongOne,r.AUTHOR supplier \n" +
                 "from po_guarantee_letter_return_oa_req r\n" +
                 "left join pm_prj p1 on p1.id = r.PM_PRJ_ID\n" +
                 "left join pm_prj p2 on p2.name = r.PROJECT_NAME_WR " + param + temp + "  order by r.GUARANTEE_START_DATE ";
@@ -117,7 +117,7 @@ public class GuaranteeExportController extends BaseController {
             String projectNameWr = guaranteeModel.getProjectNameWr();
             Date guaranteeEndDate = guaranteeModel.getGuaranteeEndDate();
             Date guaranteeStartDate = guaranteeModel.getGuaranteeStartDate();
-            String param = " where 1=1 ";
+            String param = " where 1=1 AND r.STATUS IN ( 'ap', 'APING' ) ";
             String temp = " ";
             if (!StringUtils.isEmpty(guaranteeLetterTypeId)) {
                 temp += " and GUARANTEE_LETTER_TYPE_ID= '" + guaranteeLetterTypeId + "'";

@@ -2,13 +2,16 @@ package com.cisdi.ext.link;
 
 import com.cisdi.ext.base.AdUserExt;
 import com.cisdi.ext.base.GrSetValue;
-import com.cisdi.ext.model.PmRoster;
+import com.cisdi.ext.model.PmPrj;
+import com.cisdi.ext.model.PrjStart;
 import com.cisdi.ext.pm.PmBuyDemandReqExt;
+import com.cisdi.ext.pm.PmStartExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -28,7 +31,7 @@ public class AttLinkExtDetail {
         postCodeMap.put("BUY_POST","AD_USER_TWENTY_ONE_ID"); //采购管理岗
         postCodeMap.put("TREATY_POST","AD_USER_NINETEEN_ID"); //合约管理岗
         postCodeMap.put("EARLY_EQUIP_POST","AD_USER_SIXTEEN_ID"); //前期设备岗
-        postCodeMap.put("EQUIP_COST_POST","AD_USER_EIGHTEEN_ID"); //设备成本岗
+        postCodeMap.put("EQUIP_COST_POST","AD_USER_TWENTY_ID"); //设备成本岗
         postCodeMap.put("LAND_POST","AD_USER_THIRTEEN_ID"); //土地管理岗
     }
 
@@ -993,7 +996,7 @@ public class AttLinkExtDetail {
                 linkedAtt.type = AttDataTypeE.DATE;
                 linkedAtt.value = JdbcMapUtil.getString(list.get(0), "START_TIME");
                 linkedAtt.text = JdbcMapUtil.getString(list.get(0), "START_TIME");
-                attLinkResult.attMap.put("START_TIME", linkedAtt);
+                attLinkResult.attMap.put("START_DATE", linkedAtt);
             }
             // 建设单位
             {
@@ -1269,4 +1272,22 @@ public class AttLinkExtDetail {
         }
     }
 
+    /**
+     * 项目属性联动-联动项目启动的总投资
+     * @param attLinkResult 返回的集合值
+     * @param projectId 项目id
+     */
+    public static void linkPrjTotalInvest(AttLinkResult attLinkResult, String projectId) {
+        String prjCode = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.ID,projectId)).get(0).getPmCode();
+        List<PrjStart> list = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.PM_CODE,prjCode));
+        if (!CollectionUtils.isEmpty(list)){
+            //总投资
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = list.get(0).getPrjTotalInvest();
+                attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
+            }
+        }
+    }
 }

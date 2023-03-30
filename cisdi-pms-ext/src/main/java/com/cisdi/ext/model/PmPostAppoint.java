@@ -8,6 +8,7 @@ import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -116,9 +117,9 @@ public class PmPostAppoint {
          */
         public static final String PROJECT_TYPE_ID = "PROJECT_TYPE_ID";
         /**
-         * 启动时间。
+         * 启动日期。
          */
-        public static final String START_TIME = "START_TIME";
+        public static final String START_DATE = "START_DATE";
         /**
          * 创建日期时间。
          */
@@ -128,9 +129,9 @@ public class PmPostAppoint {
          */
         public static final String CUSTOMER_UNIT = "CUSTOMER_UNIT";
         /**
-         * 招标方式。
+         * 招标模式。
          */
-        public static final String TENDER_WAY_ID = "TENDER_WAY_ID";
+        public static final String TENDER_MODE_ID = "TENDER_MODE_ID";
         /**
          * 项目概况。
          */
@@ -815,36 +816,36 @@ public class PmPostAppoint {
     }
 
     /**
-     * 启动时间。
+     * 启动日期。
      */
-    private LocalDateTime startTime;
+    private LocalDate startDate;
 
     /**
-     * 获取：启动时间。
+     * 获取：启动日期。
      */
-    public LocalDateTime getStartTime() {
-        return this.startTime;
+    public LocalDate getStartDate() {
+        return this.startDate;
     }
 
     /**
-     * 设置：启动时间。
+     * 设置：启动日期。
      */
-    public PmPostAppoint setStartTime(LocalDateTime startTime) {
-        if (this.startTime == null && startTime == null) {
+    public PmPostAppoint setStartDate(LocalDate startDate) {
+        if (this.startDate == null && startDate == null) {
             // 均为null，不做处理。
-        } else if (this.startTime != null && startTime != null) {
+        } else if (this.startDate != null && startDate != null) {
             // 均非null，判定不等，再做处理：
-            if (this.startTime.compareTo(startTime) != 0) {
-                this.startTime = startTime;
-                if (!this.toUpdateCols.contains("START_TIME")) {
-                    this.toUpdateCols.add("START_TIME");
+            if (this.startDate.compareTo(startDate) != 0) {
+                this.startDate = startDate;
+                if (!this.toUpdateCols.contains("START_DATE")) {
+                    this.toUpdateCols.add("START_DATE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.startTime = startTime;
-            if (!this.toUpdateCols.contains("START_TIME")) {
-                this.toUpdateCols.add("START_TIME");
+            this.startDate = startDate;
+            if (!this.toUpdateCols.contains("START_DATE")) {
+                this.toUpdateCols.add("START_DATE");
             }
         }
         return this;
@@ -923,36 +924,36 @@ public class PmPostAppoint {
     }
 
     /**
-     * 招标方式。
+     * 招标模式。
      */
-    private String tenderWayId;
+    private String tenderModeId;
 
     /**
-     * 获取：招标方式。
+     * 获取：招标模式。
      */
-    public String getTenderWayId() {
-        return this.tenderWayId;
+    public String getTenderModeId() {
+        return this.tenderModeId;
     }
 
     /**
-     * 设置：招标方式。
+     * 设置：招标模式。
      */
-    public PmPostAppoint setTenderWayId(String tenderWayId) {
-        if (this.tenderWayId == null && tenderWayId == null) {
+    public PmPostAppoint setTenderModeId(String tenderModeId) {
+        if (this.tenderModeId == null && tenderModeId == null) {
             // 均为null，不做处理。
-        } else if (this.tenderWayId != null && tenderWayId != null) {
+        } else if (this.tenderModeId != null && tenderModeId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.tenderWayId.compareTo(tenderWayId) != 0) {
-                this.tenderWayId = tenderWayId;
-                if (!this.toUpdateCols.contains("TENDER_WAY_ID")) {
-                    this.toUpdateCols.add("TENDER_WAY_ID");
+            if (this.tenderModeId.compareTo(tenderModeId) != 0) {
+                this.tenderModeId = tenderModeId;
+                if (!this.toUpdateCols.contains("TENDER_MODE_ID")) {
+                    this.toUpdateCols.add("TENDER_MODE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.tenderWayId = tenderWayId;
-            if (!this.toUpdateCols.contains("TENDER_WAY_ID")) {
-                this.toUpdateCols.add("TENDER_WAY_ID");
+            this.tenderModeId = tenderModeId;
+            if (!this.toUpdateCols.contains("TENDER_MODE_ID")) {
+                this.toUpdateCols.add("TENDER_MODE_ID");
             }
         }
         return this;

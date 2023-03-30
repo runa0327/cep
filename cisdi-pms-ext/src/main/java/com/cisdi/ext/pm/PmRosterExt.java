@@ -636,7 +636,7 @@ public class PmRosterExt {
             String sql = "select a.AD_USER_ID FROM PM_ROSTER a " +
                     "LEFT JOIN post_info B ON A.POST_INFO_ID = B.ID " +
                     "LEFT JOIN PM_POST_PROPRJ C ON B.ID = C.POST_INFO_ID " +
-                    "WHERE a.PM_PRJ_ID = :prjId and a.CUSTOMER_UNIT = :companyId AND C.BASE_PROCESS_POST_ID in (:ids) AND A.STATUS = 'AP' AND B.STATUS = 'AP' AND C.STATUS = 'AP'";
+                    "WHERE a.PM_PRJ_ID = :prjId and a.CUSTOMER_UNIT = :companyId AND C.BASE_PROCESS_POST_ID in (:ids) AND A.STATUS = 'AP' AND B.STATUS = 'AP' AND C.STATUS = 'AP' and a.ad_user_id != '1641281525532323840'";
             List<Map<String,Object>> list = myNamedParameterJdbcTemplate.queryForList(sql,map);
             if (!CollectionUtils.isEmpty(list)){
                 for (Map<String, Object> tmp : list) {

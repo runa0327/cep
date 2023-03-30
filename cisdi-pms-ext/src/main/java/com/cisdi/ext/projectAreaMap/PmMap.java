@@ -263,11 +263,11 @@ public class PmMap {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pj.id,pj.name,ifnull(pj.FLOOR_AREA,0) as area,gsv.`NAME` as projectType from pm_prj pj \n" +
                 "left join gr_set_value gsv on gsv.id = pj.PROJECT_TYPE_ID   \n" +
-                "where pj.`STATUS`='ap'");
+                "where pj.`STATUS`='ap' and pj.PROJECT_SOURCE_TYPE_ID='0099952822476441374' ");
         List<ProjectBigScreen> resList = new ArrayList<>();
-        List<Map<String, Object>> list1 = list.stream().filter(p -> "民用建筑".equals(JdbcMapUtil.getString(p, "projectType"))).collect(Collectors.toList());
+        List<Map<String, Object>> list1 = list.stream().filter(p -> "房建工程".equals(JdbcMapUtil.getString(p, "projectType"))).collect(Collectors.toList());
         ProjectBigScreen bigScreen = new ProjectBigScreen();
-        bigScreen.projectType = "房建项目";
+        bigScreen.projectType = "房建工程";
         bigScreen.count = list1.size();
         bigScreen.area = list1.stream().map(p -> new BigDecimal(JdbcMapUtil.getString(p, "area"))).reduce(BigDecimal.ZERO, BigDecimal::add);
         resList.add(bigScreen);
@@ -279,7 +279,7 @@ public class PmMap {
         bigScreen2.area = list2.stream().map(p -> new BigDecimal(JdbcMapUtil.getString(p, "area"))).reduce(BigDecimal.ZERO, BigDecimal::add);
         resList.add(bigScreen2);
 
-        List<Map<String, Object>> list3 = list.stream().filter(p -> !"民用建筑".equals(JdbcMapUtil.getString(p, "projectType")) && !"市政道路".equals(JdbcMapUtil.getString(p, "projectType"))).collect(Collectors.toList());
+        List<Map<String, Object>> list3 = list.stream().filter(p -> !"房建工程".equals(JdbcMapUtil.getString(p, "projectType")) && !"市政道路".equals(JdbcMapUtil.getString(p, "projectType"))).collect(Collectors.toList());
         ProjectBigScreen bigScreen3 = new ProjectBigScreen();
         bigScreen3.projectType = "其他项目";
         bigScreen3.count = list3.size();
