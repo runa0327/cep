@@ -81,6 +81,33 @@ public class WeeklyReportExt {
                 deptStat.reportDtlList = item.getValue();
                 return deptStat;
             }).collect(Collectors.toList());
+
+            //
+            List<String> userIdList = report.reportDtlList.stream().map(item -> item.user.id).distinct().collect(Collectors.toList());
+
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+            // List<Map<String, Object>> startStatList = myJdbcTemplate.queryForList("SELECT DATE_FORMAT(PI.START_DATETIME,'%Y-%m-%d') DATE,COUNT(*) CT FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP' AND PI.START_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.START_DATETIME,'%Y-%m-%d')");
+            // List<Map<String, Object>> endStatList = myJdbcTemplate.queryForList("SELECT DATE_FORMAT(PI.END_DATETIME,'%Y-%m-%d') DATE,COUNT(*) CT FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP' AND PI.END_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.END_DATETIME,'%Y-%m-%d')");
+
+            List<String> argList = new ArrayList<>();
+            argList.addAll(userIdList);
+            argList.addAll(userIdList);
+
+            report.dateStatList = myJdbcTemplate.queryForList("SELECT T.DATE,SUM(T. CT_START) CT_START,SUM(T.CT_END) CT_END\n" +
+                    "FROM\n" +
+                    "(\n" +
+                    "SELECT DATE_FORMAT(PI.START_DATETIME,'%Y-%m-%d') DATE,COUNT(*) CT_START,0 CT_END FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP' AND PI.START_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.START_DATETIME,'%Y-%m-%d')\n" +
+                    "UNION ALL\n" +
+                    "SELECT DATE_FORMAT(PI.END_DATETIME,'%Y-%m-%d') DATE,0 CT_START,COUNT(*) CT_END FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP'  AND PI.END_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.END_DATETIME,'%Y-%m-%d')\n" +
+                    ") T GROUP BY T.DATE\n" +
+                    "ORDER BY T.DATE", argList.toArray()).stream().map(item -> {
+                LeaderGmReport.DateStat dateStat = new LeaderGmReport.DateStat();
+                dateStat.date = JdbcMapUtil.getString(item, "DATE");
+                dateStat.ctStart = JdbcMapUtil.getLong(item, "CT_START");
+                dateStat.ctEnd = JdbcMapUtil.getLong(item, "CT_END");
+                return dateStat;
+            }).collect(Collectors.toList());
+
         }
 
         setBaseReportAsReturnValue(report);
@@ -285,6 +312,14 @@ public class WeeklyReportExt {
             public IdText dept;
 
             public List<ReportDtl> reportDtlList;
+        }
+
+        public List<DateStat> dateStatList;
+
+        public static class DateStat {
+            public String date;
+            public Long ctStart;
+            public Long ctEnd;
         }
     }
 
