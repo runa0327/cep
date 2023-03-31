@@ -1213,7 +1213,7 @@ public class AttLinkExtDetail {
      * 获取处理文件信息列表
      * @param linkedAtt 属性值
      */
-    private static void getFileInfoList(LinkedAtt linkedAtt) {
+    public static void getFileInfoList(LinkedAtt linkedAtt) {
         if (SharedUtil.isEmptyObject(linkedAtt.value)) {
             return;
         }

@@ -200,4 +200,44 @@ public class AttLinkDifferentProcess {
         list.add("PM_PRJ_INVEST2"); //初设概算审批
         return list;
     }
+
+    /**
+     * 需要带出相对方联系人明细的实体试图
+     * @return list集合
+     */
+    public static List<String> getContactDetailList() {
+        List<String> list = new ArrayList<>();
+        list.add("0099902212142025475"); // 采购合同终止申请--填写项目信息及合同变更信息
+        return list;
+    }
+
+    /**
+     * 相对方联系人 只读
+     * @return list集合
+     */
+    public static List<String> getContactListRead() {
+        List<String> list = new ArrayList<>();
+        list.add("0099902212142025475"); // 采购合同终止申请--填写项目信息及合同变更信息
+        return list;
+    }
+
+    /**
+     * 关联合同不需要自动带出保函类型的流程
+     * @return list集合
+     */
+    public static List<String> getNotAutoBaoHan() {
+        List<String> list = new ArrayList<>();
+        list.add("PO_GUARANTEE_LETTER_REQUIRE_REQ"); //新增保函
+        return list;
+    }
+
+    /**
+     * 保函逻辑可改
+     * @return list集合
+     */
+    public static List<String> getEditGuarantee() {
+        List<String> editGuarantee = new ArrayList<>();
+        editGuarantee.add("PO_ORDER_TERMINATE_REQ"); //采购合同终止申请
+        return editGuarantee;
+    }
 }
