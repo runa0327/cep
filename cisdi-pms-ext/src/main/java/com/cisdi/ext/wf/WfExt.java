@@ -1714,8 +1714,5 @@ public class WfExt {
             name = concatProcessNameStatic("-",processName,projectName,userName,nowDate);
             myJdbcTemplate.update(sql, name,csCommId);
         }
-
-
-
     }
 }

@@ -5,6 +5,7 @@ import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.PmRoster;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
+import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -636,8 +637,9 @@ public class PmBuyDemandReqExt {
     public void buyDemandCheckOK(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String nodeInstanceId = ExtJarHelper.nodeInstId.get();
-        String nodeStatus = processCheck("true",nodeInstanceId,myJdbcTemplate);
-        handleCheckData(nodeStatus,nodeInstanceId,myJdbcTemplate);
+        String status = "OK";
+        String nodeStatus = processCheck(status,nodeInstanceId,myJdbcTemplate);
+        handleCheckData(status,nodeStatus,nodeInstanceId,myJdbcTemplate);
     }
 
     /**
@@ -646,31 +648,33 @@ public class PmBuyDemandReqExt {
     public void buyDemandCheckRefuse(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String nodeInstanceId = ExtJarHelper.nodeInstId.get();
-        String nodeStatus = processCheck("false",nodeInstanceId,myJdbcTemplate);
-        handleCheckData(nodeStatus,nodeInstanceId,myJdbcTemplate);
+        String status = "false";
+        String nodeStatus = processCheck(status,nodeInstanceId,myJdbcTemplate);
+        handleCheckData(status,nodeStatus,nodeInstanceId,myJdbcTemplate);
     }
 
     /**
      * 采购需求审批-流程审批处理逻辑
+     * @param status 状态码
      * @param nodeStatus 节点状态名称
      * @param nodeInstanceId 节点实例id
      * @param myJdbcTemplate 数据源
      */
-    private void handleCheckData(String nodeStatus, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
+    private void handleCheckData(String status,String nodeStatus, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         String userId = ExtJarHelper.loginInfo.get().userId;
         String userName = ExtJarHelper.loginInfo.get().userName;
+        //表名
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         //流程实例id
         String procInstId = ExtJarHelper.procInstId.get();
-        //业务表id
-        String csCommId = entityRecord.csCommId;
         //获取审批意见
         Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
         //审批意见、内容
         String comment = message.get("comment");
         //分支判断，逻辑处理
-        if ("chargeLeaderOk".equals(nodeStatus)){
-
+        if ("OK".equals(status)){
+            WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
         }
     }
 
@@ -683,7 +687,7 @@ public class PmBuyDemandReqExt {
     private String processCheck(String status, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
         String nodeId = ProcessCommon.getNodeIdByNodeInstanceId(nodeInstanceId,myJdbcTemplate);
         String name = "";
-        if ("true".equals(status)){
+        if ("OK".equals(status)){
             if ("1608274390628331520".equals(nodeId)){ //1-发起
                 name = "startOk";
             } else if ("1608274390712217600".equals(nodeId)){ //2-业务部门主管审批
