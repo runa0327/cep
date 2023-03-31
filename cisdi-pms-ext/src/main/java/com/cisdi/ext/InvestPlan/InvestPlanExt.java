@@ -1,9 +1,8 @@
 package com.cisdi.ext.InvestPlan;
 
-import com.cisdi.ext.fund.FundReachApi;
-import com.cisdi.ext.model.ResponseModel;
 import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -74,7 +73,7 @@ public class InvestPlanExt {
             if (plan.totalPlanOutputValue.compareTo(BigDecimal.ZERO) != 0) {
                 percentageComplete = totalActualOutputValue.divide(plan.totalPlanOutputValue, RoundingMode.HALF_UP);
             }
-            plan.percentageComplete = percentageComplete;
+            plan.percentageComplete = StringUtil.getPercentStr(percentageComplete);
         }
 
         if (CollectionUtils.isEmpty(planList)) {
@@ -201,7 +200,7 @@ public class InvestPlanExt {
             if (plan.totalPlanOutputValue.compareTo(BigDecimal.ZERO) != 0) {
                 percentageComplete = BigDecimalUtil.divide(totalActualOutputValue, 2, plan.totalPlanOutputValue);
             }
-            plan.percentageComplete = percentageComplete;
+            plan.percentageComplete = StringUtil.getPercentStr(percentageComplete);
 
 
             List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ID,MONTH,round(ifnull(AMT,0),2) as AMT from PM_INVESTMENT_MONTH_PLAN where PM_INVESTMENT_YEAR_PLAN_ID=?", id);
@@ -225,7 +224,7 @@ public class InvestPlanExt {
                 if (monthPlan.amt.compareTo(BigDecimal.ZERO) != 0) {
                     wcR = sj.divide(monthPlan.amt, RoundingMode.HALF_UP);
                 }
-                monthPlan.wcRate = wcR;
+                monthPlan.wcRate = wcR.multiply(new BigDecimal(100)) + "%";
                 return monthPlan;
             }).collect(Collectors.toList());
 
@@ -284,7 +283,7 @@ public class InvestPlanExt {
         /**
          * 完成率
          */
-        public BigDecimal percentageComplete;
+        public String percentageComplete;
 
         public List<InvestMonthPlan> monthPlanList;
     }
@@ -297,7 +296,7 @@ public class InvestPlanExt {
         //实际产值
         public BigDecimal sjAmt;
         //完成率
-        public BigDecimal wcRate;
+        public String wcRate;
     }
 
     private static class RequestParam {
