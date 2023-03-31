@@ -11,7 +11,10 @@ import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.SharedUtil;
+import org.springframework.beans.BeanUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +28,6 @@ public class PrjUpdateImportBatchExt {
      * 准予导入。
      */
     public void allowImport() {
-        SevInfo sevInfo = ExtJarHelper.sevInfo.get();
-        EntityInfo entityInfo = sevInfo.entityInfo;
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
             String csCommId = entityRecord.csCommId;
@@ -101,6 +102,8 @@ public class PrjUpdateImportBatchExt {
         String errors = "";
         try {
             PmPrj pmPrj =new PmPrj();
+            File file = new File("");
+//            BeanUtils.copyProperties(prjImport,pmPrj);
             pmPrj.setIsImport(true);
             pmPrj.setId(prjImport.getPmPrjId());
             pmPrj.setProjectTypeId(prjImport.getProjectTypeId());
