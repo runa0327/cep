@@ -1,7 +1,6 @@
 package com.cisdi.ext.pm;
 
 import cn.hutool.core.util.IdUtil;
-import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.PmRoster;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
@@ -9,7 +8,6 @@ import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
-import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -580,11 +578,11 @@ public class PmBuyDemandReqExt {
                     String name5 = list3.get(0).get("START_DATETIME").toString().replace("T"," ");
                     String trueName = name1 + prjName + "-" + name3 + "-" + name4 + "-" + name5;
                     //更新名称
-                    int update1 = myJdbcTemplate.update("update PM_BUY_DEMAND_REQ set name = ? where id = ?",trueName,id);
+                    myJdbcTemplate.update("update PM_BUY_DEMAND_REQ set name = ? where id = ?",trueName,id);
                     //更新流程实例名称
                     //获取流程实例id
                     String processInstanceId = JdbcMapUtil.getString(tmp,"LK_WF_INST_ID");
-                    int update2 = myJdbcTemplate.update("update wf_process_instance set name = ? where id = ?",trueName,processInstanceId);
+                    myJdbcTemplate.update("update wf_process_instance set name = ? where id = ?",trueName,processInstanceId);
                 }
             }
         }
@@ -724,25 +722,24 @@ public class PmBuyDemandReqExt {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //成本岗、采购岗、财务岗人员信息写入花名册
-        List<PmRoster> rosterList = getRosterList(entityRecord,POST_CODE_MAP,myJdbcTemplate);
+        List<PmRoster> rosterList = getRosterList(entityRecord, myJdbcTemplate);
         PmRosterExt.updatePrjUser(rosterList);
     }
 
     /**
      * 项目花名册实体装值
      * @param entityRecord 流程表单内容
-     * @param postCodeMap 流程中的岗位字段和名称
      * @param myJdbcTemplate 数据源
-     * @return
+     * @return 项目花名册信息
      */
-    private List<PmRoster> getRosterList(EntityRecord entityRecord, Map<String, String> postCodeMap, MyJdbcTemplate myJdbcTemplate) {
+    private List<PmRoster> getRosterList(EntityRecord entityRecord, MyJdbcTemplate myJdbcTemplate) {
         List<PmRoster> list = new ArrayList<>();
         String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
         String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
-        for (String key : postCodeMap.keySet()){
+        for (String key : PmBuyDemandReqExt.POST_CODE_MAP.keySet()){
             String userId = JdbcMapUtil.getString(entityRecord.valueMap,key);
             //获取项目岗位信息
-            String prjPostId = getPostId(postCodeMap.get(key),companyId,myJdbcTemplate);
+            String prjPostId = getPostId(PmBuyDemandReqExt.POST_CODE_MAP.get(key),companyId,myJdbcTemplate);
             PmRoster pmRoster = new PmRoster();
             pmRoster.setPmPrjId(projectId);
             pmRoster.setCustomerUnit(companyId);
@@ -758,7 +755,7 @@ public class PmBuyDemandReqExt {
      * @param processPost 流程岗位名称
      * @param companyId 业主单位
      * @param myJdbcTemplate 数据源
-     * @return
+     * @return 项目岗位id
      */
     private String getPostId(String processPost, String companyId, MyJdbcTemplate myJdbcTemplate) {
         String sql = "select a.POST_INFO_ID from PM_POST_PROPRJ a left join BASE_PROCESS_POST b on a.BASE_PROCESS_POST_ID = b.id where a.CUSTOMER_UNIT = ? and b.name = ?";
