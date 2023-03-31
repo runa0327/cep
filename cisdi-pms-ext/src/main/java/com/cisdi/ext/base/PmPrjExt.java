@@ -1,5 +1,6 @@
 package com.cisdi.ext.base;
 
+import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.util.WfPmInvestUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -258,5 +259,13 @@ public class PmPrjExt {
                 .set("OTHER",JdbcMapUtil.getString(map,"OTHER")) //其他
                 .set("CON_SCALE_UOM_ID",JdbcMapUtil.getString(map,"CON_SCALE_UOM_ID")) //建设规模单位
                 .exec();
+    }
+
+    /**
+     * 更新项目表信息
+     * @param pmPrj 项目实体
+      */
+    public static void updateData(PmPrj pmPrj) {
+        pmPrj.updateById();
     }
 }

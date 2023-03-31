@@ -1,8 +1,10 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.model.PmParty;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -37,6 +39,28 @@ public class PmInLibraryExt {
                 .set("name",partyName)
                 .set(partyType,"1")
                 .exec();
+    }
+
+    /**
+     * 根据合作方名称及类型修改或创建合作方
+     * @param partyName 合作方名称
+     * @param partyType 类型
+     * return 合作方id
+     */
+    public static String createOrUpdateParty(String partyName, String partyType) {
+        String id = "";
+        //判断该合作方是否存在
+        List<PmParty> list = PmParty.selectByWhere(new Where().eq(PmParty.Cols.NAME,partyName).eq(PmParty.Cols.STATUS,"AP"));
+        if (CollectionUtils.isEmpty(list)){
+            id = Crud.from("PM_PARTY").insertData();
+        } else {
+            id = list.get(0).getId();
+        }
+        Crud.from("PM_PARTY").where().eq("id",id).update()
+                .set("name",partyName)
+                .set(partyType,"1")
+                .exec();
+        return id;
     }
 
 
