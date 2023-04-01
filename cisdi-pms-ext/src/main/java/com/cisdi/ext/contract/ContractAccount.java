@@ -89,13 +89,13 @@ public class ContractAccount {
         //条件过滤
         List<Map<String, Object>> totalResultList = contractList.stream().filter(m -> {
             if (Strings.isNotEmpty(requestParam.prjId)){
-                return m.get("projectId").equals(requestParam.prjId);
+                return requestParam.prjId.equals(m.get("projectId"));
             }
             return true;
         }).filter(m -> {
             if (Strings.isNotEmpty(requestParam.contractName)){
                 Pattern pattern = Pattern.compile(requestParam.contractName);
-                Matcher matcher = pattern.matcher((CharSequence) m.get("contractName"));
+                Matcher matcher = pattern.matcher(String.valueOf(m.get("contractName")));
                 if (!matcher.find()){
                     return false;
                 }
@@ -103,12 +103,12 @@ public class ContractAccount {
             return true;
         }).filter(m -> {
             if (Strings.isNotEmpty(requestParam.contractCompanyId)){
-                return m.get("contractCompanyId").equals(requestParam.contractCompanyId);
+                return requestParam.contractCompanyId.equals(m.get("contractCompanyId"));
             }
             return true;
         }).filter(m -> {
             if (Strings.isNotEmpty(requestParam.contractCategoryId)){
-                return m.get("contractCategoryId").equals(requestParam.contractCategoryId);
+                return requestParam.contractCategoryId.equals(m.get("contractCategoryId"));
             }
             return true;
         }).filter(m -> {
