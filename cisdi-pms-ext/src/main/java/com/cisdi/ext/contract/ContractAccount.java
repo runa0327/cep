@@ -190,7 +190,7 @@ public class ContractAccount {
 //        if (!rootUsers.contains(loginInfo.userId)){
 //            sql += " and IFNULL(o.PM_PRJ_ID,p2.id) in (select DISTINCT pm_prj_id from pm_dept where STATUS = 'AP' and FIND_IN_SET('" + loginInfo.userId + "',USER_IDS))";
 //        }
-        String sql = "select * from (\n" +
+        String sql = "select prjId,max(prjName) prjName from (\n" +
                 "\tselect p.id prjId,IFNULL(p.name,o.PROJECT_NAME_WR) prjName from po_order_req o left join pm_prj p on p.id = o.PM_PRJ_ID \n" +
                 "\twhere p.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and o.status = 'AP'\n" +
                 "\tunion all\n" +
