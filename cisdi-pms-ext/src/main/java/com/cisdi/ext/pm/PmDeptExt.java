@@ -188,7 +188,7 @@ public class PmDeptExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String id = String.valueOf(map.get("id"));
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from ad_user where id in (select AD_USER_ID from hr_dept_user where HR_DEPT_ID =?) and status = 'AP'", id);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from ad_user where id in (select AD_USER_ID from hr_dept_user where HR_DEPT_ID =? and AD_USER_ID != '1641281525532323840') and status = 'AP'", id);
         List<User> users = list.stream().map(p -> {
             User user = new User();
             user.id = JdbcMapUtil.getString(p, "ID");
