@@ -67,10 +67,6 @@ public class ImportBatch {
          */
         public static final String IMPORT_BATCH_CLASS_ID = "IMPORT_BATCH_CLASS_ID";
         /**
-         * 导入批次。
-         */
-        public static final String IMPORT_BATCH_ID = "IMPORT_BATCH_ID";
-        /**
          * ID。
          */
         public static final String ID = "ID";
@@ -304,42 +300,6 @@ public class ImportBatch {
             this.importBatchClassId = importBatchClassId;
             if (!this.toUpdateCols.contains("IMPORT_BATCH_CLASS_ID")) {
                 this.toUpdateCols.add("IMPORT_BATCH_CLASS_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 导入批次。
-     */
-    private String importBatchId;
-
-    /**
-     * 获取：导入批次。
-     */
-    public String getImportBatchId() {
-        return this.importBatchId;
-    }
-
-    /**
-     * 设置：导入批次。
-     */
-    public ImportBatch setImportBatchId(String importBatchId) {
-        if (this.importBatchId == null && importBatchId == null) {
-            // 均为null，不做处理。
-        } else if (this.importBatchId != null && importBatchId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.importBatchId.compareTo(importBatchId) != 0) {
-                this.importBatchId = importBatchId;
-                if (!this.toUpdateCols.contains("IMPORT_BATCH_ID")) {
-                    this.toUpdateCols.add("IMPORT_BATCH_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.importBatchId = importBatchId;
-            if (!this.toUpdateCols.contains("IMPORT_BATCH_ID")) {
-                this.toUpdateCols.add("IMPORT_BATCH_ID");
             }
         }
         return this;
