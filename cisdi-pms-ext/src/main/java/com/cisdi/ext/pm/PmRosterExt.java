@@ -83,11 +83,11 @@ public class PmRosterExt {
                 } else {
                     String prjId = String.valueOf(stringObjectMap.get("id"));
                     List<Map<String, Object>> rosterList = myJdbcTemplate.queryForList("select pp.*,au.`NAME` as user_name from PM_ROSTER pp left join ad_user au on pp.AD_USER_ID = au.id left join post_info po on po.id = pp.POST_INFO_ID where PM_PRJ_ID=? and po.`NAME`=? ", prjId, s);
-                    String users = "/";
+                    String users = "";
                     if (!CollectionUtils.isEmpty(rosterList)) {
                         users = rosterList.stream().map(mm -> JdbcMapUtil.getString(mm, "user_name")).collect(Collectors.joining(","));
                         if ("null".equals(users)) {
-                            users = "/";
+                            users = "";
                         }
                     }
 
