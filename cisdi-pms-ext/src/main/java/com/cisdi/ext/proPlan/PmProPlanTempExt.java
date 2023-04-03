@@ -1,0 +1,408 @@
+package com.cisdi.ext.proPlan;
+
+import com.cisdi.ext.util.JsonUtil;
+import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.util.JdbcMapUtil;
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.util.CollectionUtils;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * @author 尹涛 * @version V1.0.0
+ * @projectName cisdi-pms-service
+ * @title PmProPlanTempExt
+ * @package com.cisdi.ext.proPlan
+ * @description 项目进度模板
+ * @date 2023/4/3
+ */
+public class PmProPlanTempExt {
+
+
+    /**
+     * 初始化条件规则
+     */
+    public void initRule() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> conditionList = myJdbcTemplate.queryForList("select gsv.* from gr_set_value gsv left join gr_set gs on gsv.GR_SET_ID = gs.id where gs.`CODE`='pro_plan_rule_condition'");
+        List<Map<String, Object>> modeList = myJdbcTemplate.queryForList("select gsv.* from gr_set_value gsv left join gr_set gs on gsv.GR_SET_ID = gs.id where gs.`CODE`='tender_mode'");
+        List<Map<String, Object>> typeList = myJdbcTemplate.queryForList("select gsv.* from gr_set_value gsv left join gr_set gs on gsv.GR_SET_ID = gs.id where gs.`CODE`='project_type'");
+        List<Map<String, Object>> sourceList = myJdbcTemplate.queryForList("select gsv.* from gr_set_value gsv left join gr_set gs on gsv.GR_SET_ID = gs.id where gs.`CODE`='investment_source'");
+        List<Map<String, Object>> ruleList = myJdbcTemplate.queryForList("select * from PRO_PLAN_TEMPLATE_RULE");
+        for (Map<String, Object> objectMap : conditionList) {
+            for (Map<String, Object> stringObjectMap : modeList) {
+                for (Map<String, Object> map : typeList) {
+                    for (Map<String, Object> objectMap1 : sourceList) {
+                        String condition = JdbcMapUtil.getString(objectMap, "ID");
+                        String modeId = JdbcMapUtil.getString(stringObjectMap, "ID");
+                        String typeId = JdbcMapUtil.getString(map, "ID");
+                        String sourceId = JdbcMapUtil.getString(objectMap1, "ID");
+                        Optional<Map<String, Object>> optional = ruleList.stream().filter(p -> condition.equals(JdbcMapUtil.getString(p, "PRO_PLAN_RULE_CONDITION_ID")) && modeId.equals(JdbcMapUtil.getString(p, "TENDER_MODE_ID"))
+                                && typeId.equals(JdbcMapUtil.getString(p, "TEMPLATE_FOR_PROJECT_TYPE_ID")) && sourceId.equals(JdbcMapUtil.getString(p, "INVESTMENT_SOURCE_ID"))).findAny();
+                        if (!optional.isPresent()) {
+                            String id = Crud.from("PRO_PLAN_TEMPLATE_RULE").insertData();
+                            Crud.from("PRO_PLAN_TEMPLATE_RULE").where().eq("ID", id).update().set("PRO_PLAN_RULE_CONDITION_ID", condition).set("TENDER_MODE_ID", modeId)
+                                    .set("TEMPLATE_FOR_PROJECT_TYPE_ID", typeId).set("INVESTMENT_SOURCE_ID", sourceId).exec();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 模板规则列表接
+     */
+    public void proPlanRule() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String keyWord = JdbcMapUtil.getString(map, "keyWord");
+        StringBuilder sb = new StringBuilder();
+        sb.append("select pptr.ID as id,PRO_PLAN_RULE_CONDITION_ID,gsv.`NAME` as condtion_name,\n" +
+                "TENDER_MODE_ID,gs.`NAME` as mode_name,\n" +
+                "TEMPLATE_FOR_PROJECT_TYPE_ID,rs.`NAME` as type_name,\n" +
+                "INVESTMENT_SOURCE_ID,gg.`NAME` as source_name,\n" +
+                "PM_PRO_PLAN_ID from PRO_PLAN_TEMPLATE_RULE pptr \n" +
+                "left join gr_set_value gsv on gsv.id = pptr.PRO_PLAN_RULE_CONDITION_ID\n" +
+                "left join gr_set_value gs on gs.id = pptr.TENDER_MODE_ID\n" +
+                "left join gr_set_value rs on rs.id = pptr.TEMPLATE_FOR_PROJECT_TYPE_ID\n" +
+                "left join gr_set_value gg on gg.id = pptr.INVESTMENT_SOURCE_ID where 1=1 ");
+        if (Strings.isNotEmpty(keyWord)) {
+            sb.append(" and gsv.`NAME` like '%").append(keyWord).append("%'");
+            sb.append(" or gs.`NAME` like '%").append(keyWord).append("%'");
+            sb.append(" or rs.`NAME` like '%").append(keyWord).append("%'");
+            sb.append(" or gg.`NAME` like '%").append(keyWord).append("%'");
+        }
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
+        List<ProPlanTempRule> ruleList = list.stream().map(p -> {
+            ProPlanTempRule rule = new ProPlanTempRule();
+            rule.id = JdbcMapUtil.getString(p, "id");
+            rule.condtionId = JdbcMapUtil.getString(p, "PRO_PLAN_RULE_CONDITION_ID");
+            rule.condtionName = JdbcMapUtil.getString(p, "condtion_name");
+            rule.modeId = JdbcMapUtil.getString(p, "TENDER_MODE_ID");
+            rule.modeName = JdbcMapUtil.getString(p, "mode_name");
+            rule.typeId = JdbcMapUtil.getString(p, "TEMPLATE_FOR_PROJECT_TYPE_ID");
+            rule.typeName = JdbcMapUtil.getString(p, "type_name");
+            rule.sourceId = JdbcMapUtil.getString(p, "INVESTMENT_SOURCE_ID");
+            rule.sourceName = JdbcMapUtil.getString(p, "source_name");
+            rule.proPlanId = JdbcMapUtil.getString(p, "PM_PRO_PLAN_ID");
+            return rule;
+        }).collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(ruleList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.ruleList = ruleList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+
+    /**
+     * 根据模板ID查询模板
+     */
+    public void ruleGetNode() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,pi.name as post_name,pre.name as pre_name,wp.name as processName  " +
+                "from pm_pro_plan_node pppn left join post_info pi on pppn.POST_INFO_ID = pi.id  " +
+                "left join pm_pro_plan_node pre on pppn.PRE_NODE_ID = pre.id  " +
+                "left join WF_PROCESS wp on pppn.LINKED_WF_PROCESS_ID = wp.id  " +
+                "where pppn.PM_PRO_PLAN_ID=?", map.get("planId"));
+        List<PlanNode> nodeList = list.stream().map(p -> {
+            PlanNode node = new PlanNode();
+            node.id = JdbcMapUtil.getString(p, "ID");
+            node.pid = JdbcMapUtil.getString(p, "PM_PRO_PLAN_NODE_PID") == null ? "0" : JdbcMapUtil.getString(p, "PM_PRO_PLAN_NODE_PID");
+            node.name = JdbcMapUtil.getString(p, "NAME");
+            node.postId = JdbcMapUtil.getString(p, "PRE_NODE_ID");
+            node.days = JdbcMapUtil.getInt(p, "PLAN_TOTAL_DAYS");
+            node.preNodeId = JdbcMapUtil.getString(p, "PRE_NODE_ID");
+            node.processId = JdbcMapUtil.getString(p, "LINKED_WF_PROCESS_ID");
+            node.startNode = JdbcMapUtil.getString(p, "LINKED_START_WF_NODE_ID");
+            node.endNode = JdbcMapUtil.getString(p, "LINKED_END_WF_NODE_ID");
+            node.seqNo = JdbcMapUtil.getString(p, "SEQ_NO");
+            node.postName = JdbcMapUtil.getString(p, "post_name");
+            node.iz_milestone = JdbcMapUtil.getString(p, "IZ_MILESTONE");
+            node.preNodeName = JdbcMapUtil.getString(p, "pre_name");
+            node.processName = JdbcMapUtil.getString(p, "processName");
+            return node;
+        }).collect(Collectors.toList());
+
+        List<PlanNode> tree = nodeList.stream().filter(p -> "0".equals(p.pid)).sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo))).peek(m -> {
+            m.children = getChildren(m, nodeList).stream().sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo))).collect(Collectors.toList());
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(tree)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.tree = tree;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    /**
+     * 模板节点详情
+     */
+    public void tempNodeView() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,pi.name as post_name,pre.name as pre_name,wp.name as processName " +
+                "from pm_pro_plan_node pppn left join post_info pi on pppn.POST_INFO_ID = pi.id " +
+                "left join pm_pro_plan_node pre on pppn.PRE_NODE_ID = pre.id " +
+                "left join WF_PROCESS wp on pppn.LINKED_WF_PROCESS_ID = wp.id " +
+                "where pppn.ID=?", map.get("nodeId"));
+        if (CollectionUtils.isEmpty(list)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            Map<String, Object> dataMap = list.get(0);
+            PlanNode node = new PlanNode();
+            node.id = JdbcMapUtil.getString(dataMap, "ID");
+            node.pid = JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_NODE_PID");
+            node.name = JdbcMapUtil.getString(dataMap, "NAME");
+            node.postId = JdbcMapUtil.getString(dataMap, "POST_INFO_ID");
+            node.postName = JdbcMapUtil.getString(dataMap, "post_name");
+            node.days = JdbcMapUtil.getInt(dataMap, "PLAN_TOTAL_DAYS");
+            node.preNodeId = JdbcMapUtil.getString(dataMap, "PRE_NODE_ID");
+            node.preNodeName = JdbcMapUtil.getString(dataMap, "pre_name");
+            node.processId = JdbcMapUtil.getString(dataMap, "LINKED_WF_PROCESS_ID");
+            node.processName = JdbcMapUtil.getString(dataMap, "processName");
+            node.startNode = JdbcMapUtil.getString(dataMap, "LINKED_START_WF_NODE_ID");
+            node.endNode = JdbcMapUtil.getString(dataMap, "LINKED_END_WF_NODE_ID");
+            node.iz_milestone = JdbcMapUtil.getString(dataMap, "IZ_MILESTONE");
+            node.seqNo = JdbcMapUtil.getString(dataMap, "SEQ_NO");
+            node.proPlanId = JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_ID");
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(node), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+
+    /**
+     * 节点新增修改
+     */
+    public void tempNodeModify() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        NodeInput input = JsonUtil.fromJson(json, NodeInput.class);
+        String proPlanId = input.proPlanId;
+        if (Strings.isEmpty(input.proPlanId)) {
+            proPlanId = Crud.from("pm_pro_plan").insertData();
+            Crud.from("pm_pro_plan").where().eq("ID", proPlanId).update().set("NAME", input.proPlanName).exec();
+            Crud.from("PRO_PLAN_TEMPLATE_RULE").where().eq("ID", input.ruleId).update().set("PM_PRO_PLAN_ID", proPlanId).exec();
+        }
+        String id = input.id;
+        if (Strings.isEmpty(input.id)) {
+            id = Crud.from("pm_pro_plan_node").insertData();
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("update pm_pro_plan_node set LAST_MODI_DT =NOW(),set PM_PRO_PLAN_ID= '").append(proPlanId).append("' ");
+        if (Strings.isEmpty(input.pid)) {
+            sb.append(",set PM_PRO_PLAN_NODE_PID ='").append(input.pid).append("'");
+        }
+        if (Strings.isEmpty(input.postId)) {
+            sb.append(",set POST_INFO_ID ='").append(input.postId).append("'");
+        }
+        if (Strings.isNotEmpty(input.preNodeId)) {
+            sb.append(",set PRE_NODE_ID ='").append(input.preNodeId).append("'");
+        }
+        if (Strings.isEmpty(input.processId)) {
+            sb.append(",set LINKED_WF_PROCESS_ID ='").append(input.processId).append("'");
+        }
+
+        if (Strings.isEmpty(input.startNodeId)) {
+            sb.append(",set LINKED_START_WF_NODE_ID ='").append(input.startNodeId).append("'");
+        }
+        if (Strings.isEmpty(input.endNodeId)) {
+            sb.append(",set LINKED_END_WF_NODE_ID ='").append(input.endNodeId).append("'");
+        }
+        if (input.days > 0) {
+            sb.append(",set PLAN_TOTAL_DAYS =").append(input.days);
+        }
+        sb.append(",set IZ_MILESTONE =").append(input.izMilestone);
+        sb.append(" where id='").append(id).append("'");
+        myJdbcTemplate.update(sb.toString());
+    }
+
+    /**
+     * 节点删除
+     */
+    public void delTempNode() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        myJdbcTemplate.update("delete from pm_pro_plan_node where id=?", map.get("nodeId"));
+    }
+
+    /**
+     * 设置里程碑
+     */
+    public void setMilestone() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        myJdbcTemplate.update("update pm_pro_plan_node set IZ_MILESTONE=? where id=?", map.get("izMilestone"), map.get("nodeId"));
+    }
+
+    /**
+     * 标准节点
+     */
+    public void baseNodeList() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from BASE_NODE where status ='ap'");
+        List<String> names = list.stream().map(p -> JdbcMapUtil.getString(p, "NAME")).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(names)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.names = names;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    /**
+     * 前置节点选择列表
+     */
+    public void preNodeList() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PM_PRO_PLAN_ID=?", map.get("proPlanId"));
+        List<ObjInfo> objInfoList = list.stream().map(p -> {
+            ObjInfo objInfo = new ObjInfo();
+            objInfo.id = JdbcMapUtil.getString(p, "ID");
+            objInfo.name = JdbcMapUtil.getString(p, "NAME");
+            return objInfo;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(objInfoList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.objInfoList = objInfoList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    /**
+     * 流程列表
+     */
+    public void processList() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from WF_PROCESS where status='ap'  order by SEQ_NO");
+        List<ObjInfo> objInfoList = list.stream().map(p -> {
+            ObjInfo objInfo = new ObjInfo();
+            objInfo.id = JdbcMapUtil.getString(p, "ID");
+            objInfo.name = JdbcMapUtil.getString(p, "NAME");
+            return objInfo;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(objInfoList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.objInfoList = objInfoList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    /**
+     * 流程节点列表
+     */
+    public void processNodeList() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from WF_NODE where WF_PROCESS_ID=? order by SEQ_NO", map.get("processId"));
+        List<ObjInfo> objInfoList = list.stream().map(p -> {
+            ObjInfo objInfo = new ObjInfo();
+            objInfo.id = JdbcMapUtil.getString(p, "ID");
+            objInfo.name = JdbcMapUtil.getString(p, "NAME");
+            return objInfo;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(objInfoList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.objInfoList = objInfoList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+
+    private List<PlanNode> getChildren(PlanNode parentNode, List<PlanNode> allData) {
+        return allData.stream().filter(p -> parentNode.id.equals(p.pid)).peek(m -> {
+            m.children = getChildren(m, allData).stream().sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo))).collect(Collectors.toList());
+        }).collect(Collectors.toList());
+    }
+
+    public static class ProPlanTempRule {
+        public String id;
+        public String condtionId;
+        public String condtionName;
+        public String modeId;
+        public String modeName;
+        public String typeId;
+        public String typeName;
+        public String sourceId;
+        public String sourceName;
+        public String proPlanId;
+    }
+
+    public static class PlanNode {
+        public String id;
+        public String pid;
+        public String name;
+        public String postId;
+        public String postName;
+        public Integer days;
+        public String preNodeId;
+        public String preNodeName;
+        public String processId;
+        public String processName;
+        public String startNode;
+        public String endNode;
+        public List<String> atts;
+        public String iz_milestone;
+        public String seqNo;
+        public String proPlanId;
+
+        public List<PlanNode> children;
+
+    }
+
+    public static class OutSide {
+        public List<ProPlanTempRule> ruleList;
+        public List<PlanNode> tree;
+        public List<String> names;
+        public List<ObjInfo> objInfoList;
+    }
+
+    public static class NodeInput {
+        public String ruleId;
+        public String proPlanId;
+        public String proPlanName;
+        public String id;
+        public String pid;
+        public String name;
+        public String postId;
+        public Integer days = 0;
+        public String preNodeId;
+        public String processId;
+        public String startNodeId;
+        public String endNodeId;
+        public List<String> atts;
+        public String izMilestone = "0";
+    }
+
+    public static class ObjInfo {
+        public String id;
+        public String name;
+    }
+
+}
