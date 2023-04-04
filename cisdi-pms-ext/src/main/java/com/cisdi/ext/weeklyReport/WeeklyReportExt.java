@@ -10,12 +10,14 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.IdText;
+import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,16 +47,16 @@ public class WeeklyReportExt {
             return;
         }
 
-        // 办结统计：
         if (!SharedUtil.isEmptyList(report.reportDtlList)) {
-            List<ReportDtl> startList = report.reportDtlList.stream().filter(item -> item.isEnd).collect(Collectors.toList());
+            // 占比统计：
+            List<ReportDtl> startList = report.reportDtlList.stream().filter(item -> item.isStart || item.isApprove || item.isEnd).collect(Collectors.toList());
             if (!SharedUtil.isEmptyList(startList)) {
                 BigDecimal sum = new BigDecimal(startList.size());
                 Map<String, List<ReportDtl>> map = startList.stream().collect(Collectors.groupingBy(item -> item.procInst.procName));
-                report.endStat = new ArrayList<>(map.size());
+                report.proportionStat = new ArrayList<>(map.size());
                 map.forEach((k, v) -> {
                     NameCountPercent nameCountPercent = new NameCountPercent();
-                    report.endStat.add(nameCountPercent);
+                    report.proportionStat.add(nameCountPercent);
 
                     nameCountPercent.name = k;
                     nameCountPercent.count = v.size();
@@ -62,13 +64,54 @@ public class WeeklyReportExt {
                     nameCountPercent.percent = new DecimalFormat("#.##%").format(divide);
                 });
 
-                report.endStat = report.endStat.stream().sorted((o1, o2) -> {
+                report.proportionStat = report.proportionStat.stream().sorted((o1, o2) -> {
                     int i = o2.count.compareTo(o1.count);
 
                     // 注：未实现按照拼音排序：
                     return i != 0 ? i : o1.name.compareTo(o2.name);
                 }).collect(Collectors.toList());
             }
+
+            // 趋势统计：
+
+            // 各个部门汇总：
+            // Map<IdText, List<ReportDtl>> map = report.reportDtlList.stream().filter(item -> item.isEnd && item.isNotiLeaderOnEnd).collect(
+            //         Collectors.groupingBy(item -> item.dept));
+            // report.deptStatList = map.entrySet().stream().map(item -> {
+            //     LeaderGmReport.DeptStat deptStat = new LeaderGmReport.DeptStat();
+            //     deptStat.dept = item.getKey();
+            //     deptStat.reportDtlList = item.getValue();
+            //     return deptStat;
+            // }).collect(Collectors.toList());
+            // 各个部门汇总：
+            report.deptStatList = getDeptStats(report.reportDtlList);
+
+            //
+            List<String> userIdList = report.reportDtlList.stream().map(item -> item.user.id).distinct().collect(Collectors.toList());
+
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+            // List<Map<String, Object>> startStatList = myJdbcTemplate.queryForList("SELECT DATE_FORMAT(PI.START_DATETIME,'%Y-%m') DATE,COUNT(*) CT FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP' AND PI.START_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.START_DATETIME,'%Y-%m')");
+            // List<Map<String, Object>> endStatList = myJdbcTemplate.queryForList("SELECT DATE_FORMAT(PI.END_DATETIME,'%Y-%m') DATE,COUNT(*) CT FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP' AND PI.END_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.END_DATETIME,'%Y-%m')");
+
+            List<String> argList = new ArrayList<>();
+            argList.addAll(userIdList);
+            argList.addAll(userIdList);
+
+            report.dateStatList = myJdbcTemplate.queryForList("SELECT T.DATE,SUM(T. CT_START) CT_START,SUM(T.CT_END) CT_END\n" +
+                    "FROM\n" +
+                    "(\n" +
+                    "SELECT DATE_FORMAT(PI.START_DATETIME,'%Y-%m') DATE,COUNT(*) CT_START,0 CT_END FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP' AND PI.START_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.START_DATETIME,'%Y-%m')\n" +
+                    "UNION ALL\n" +
+                    "SELECT DATE_FORMAT(PI.END_DATETIME,'%Y-%m') DATE,0 CT_START,COUNT(*) CT_END FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP'  AND PI.END_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.END_DATETIME,'%Y-%m')\n" +
+                    ") T GROUP BY T.DATE\n" +
+                    "ORDER BY T.DATE", argList.toArray()).stream().map(item -> {
+                LeaderGmReport.DateStat dateStat = new LeaderGmReport.DateStat();
+                dateStat.date = JdbcMapUtil.getString(item, "DATE");
+                dateStat.ctStart = JdbcMapUtil.getLong(item, "CT_START");
+                dateStat.ctEnd = JdbcMapUtil.getLong(item, "CT_END");
+                return dateStat;
+            }).collect(Collectors.toList());
+
         }
 
         setBaseReportAsReturnValue(report);
@@ -107,35 +150,38 @@ public class WeeklyReportExt {
             }
 
             // 各个部门汇总：
-            Map<IdText, Map<IdText, List<ReportDtl>>> map = report.reportDtlList.stream().collect(
-                    Collectors.groupingBy(
-                            reportDtl -> reportDtl.dept,
-                            Collectors.groupingBy(
-                                    reportDtl -> reportDtl.user
-                            )));
-
-            List<DeptReport.DeptStat> deptStatList = map.entrySet().stream().map(deptEntry -> {
-                DeptReport.DeptStat deptStat = new DeptReport.DeptStat();
-                deptStat.dept = deptEntry.getKey();
-                deptStat.userStatList = deptEntry.getValue().entrySet().stream().map(userEntry -> {
-                    DeptReport.DeptStat.UserStat userStat = new DeptReport.DeptStat.UserStat();
-                    userStat.user = userEntry.getKey();
-                    userStat.ctStart = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart)).count();
-                    userStat.ctApprove = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isApprove)).count();
-                    userStat.ctEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isEnd)).count();
-                    userStat.ctUnend = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isUnend)).count();
-                    userStat.ctStartApproveEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart) || Boolean.TRUE.equals(reportDtl.isApprove) || Boolean.TRUE.equals(reportDtl.isEnd)).count();
-                    userStat.ctProject= userEntry.getValue().stream().filter(reportDtl -> reportDtl.prj!=null).map(reportDtl -> reportDtl.prj.id).distinct().count();
-                    return userStat;
-                }).sorted((o1, o2) -> o2.ctStartApproveEnd.compareTo(o1.ctStartApproveEnd)).collect(Collectors.toList());
-
-                return deptStat;
-            }).sorted(Comparator.comparing(o -> o.dept.text)).collect(Collectors.toList());
-
-            report.deptStatList = deptStatList;
+            report.deptStatList = getDeptStats(report.reportDtlList);
         }
 
         setBaseReportAsReturnValue(report);
+    }
+
+    private List<DeptStat> getDeptStats(List<ReportDtl> reportDtlList) {
+        Map<IdText, Map<IdText, List<ReportDtl>>> map = reportDtlList.stream().collect(
+                Collectors.groupingBy(
+                        reportDtl -> reportDtl.dept,
+                        Collectors.groupingBy(
+                                reportDtl -> reportDtl.user
+                        )));
+
+        List<DeptStat> deptStatList = map.entrySet().stream().map(deptEntry -> {
+            DeptStat deptStat = new DeptStat();
+            deptStat.dept = deptEntry.getKey();
+            deptStat.userStatList = deptEntry.getValue().entrySet().stream().map(userEntry -> {
+                DeptStat.UserStat userStat = new DeptStat.UserStat();
+                userStat.user = userEntry.getKey();
+                userStat.ctStart = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart)).count();
+                userStat.ctApprove = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isApprove)).count();
+                userStat.ctEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isEnd)).count();
+                userStat.ctUnend = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isUnend)).count();
+                userStat.ctStartApproveEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart) || Boolean.TRUE.equals(reportDtl.isApprove) || Boolean.TRUE.equals(reportDtl.isEnd)).count();
+                userStat.ctProject = userEntry.getValue().stream().filter(reportDtl -> reportDtl.prj != null).map(reportDtl -> reportDtl.prj.id).distinct().count();
+                return userStat;
+            }).sorted((o1, o2) -> o2.ctStartApproveEnd.compareTo(o1.ctStartApproveEnd)).collect(Collectors.toList());
+
+            return deptStat;
+        }).sorted(Comparator.comparing(o -> o.dept.text)).collect(Collectors.toList());
+        return deptStatList;
     }
 
     public void getPersonWeeklyReport() {
@@ -146,11 +192,57 @@ public class WeeklyReportExt {
 
         report.reportRemark = report.hrWeeklyReport.getReportRemark();
         report.reportFileList = getFileList(report.hrWeeklyReport.getReportFile());
+        report.submitTime = report.hrWeeklyReport.getSubmitTime() == null ? null : DateTimeUtil.dttmToString(DateTimeUtil.localDateTimeToDate(report.hrWeeklyReport.getSubmitTime()));
+
+        // 获取当前周报之后的周报列表（即ID>当前周报的ID）：
+        String reportId = report.hrWeeklyReport.getId();
+        List<HrWeeklyReport> list = getNewerPersonReportList(reportId);
+        // 若不存在之后的周报列表、且当前周报没有提交，则当前周报可以提交：
+        report.canSubmit = SharedUtil.isEmptyList(list) && report.hrWeeklyReport.getSubmitTime() == null;
+
+        report.reportId = reportId;
 
         setBaseReportAsReturnValue(report);
     }
 
+    /**
+     * 获取之后的个人周报列表。
+     *
+     * @param reportId
+     * @return
+     */
+    private List<HrWeeklyReport> getNewerPersonReportList(String reportId) {
+        return HrWeeklyReport.selectByWhere(new Where().eq(HrWeeklyReport.Cols.HR_WEEKLY_REPORT_TYPE_ID, WeeklyReportType.P.toString()).eq(HrWeeklyReport.Cols.REPORT_USER_ID, ExtJarHelper.loginInfo.get().userId).eq(HrWeeklyReport.Cols.STATUS, "AP").gt(HrWeeklyReport.Cols.ID, reportId), Arrays.asList(HrWeeklyReport.Cols.ID), null);
+    }
+
+    public void submitPersonWeeklyReport() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String reportId = String.valueOf(map.get("reportId"));
+        String reportRemark = String.valueOf(map.get("reportRemark"));
+        String reportFile = String.valueOf(map.get("reportFile"));
+
+        if (SharedUtil.isEmptyString(reportId)) {
+            throw new BaseException("周报ID不能为空！");
+        }
+
+        List<HrWeeklyReport> list = getNewerPersonReportList(reportId);
+        if (!SharedUtil.isEmptyList(list)) {
+            throw new BaseException("因后续周报已生成，该周报已无法提交！");
+        }
+
+        HrWeeklyReport hrWeeklyReport = HrWeeklyReport.selectById(reportId);
+        if (hrWeeklyReport.getSubmitTime() != null) {
+            throw new BaseException("因该周报已提交，故无法再次提交！");
+        }
+
+        hrWeeklyReport.setSubmitTime(LocalDateTime.now());
+        hrWeeklyReport.setReportRemark(reportRemark);
+        hrWeeklyReport.setReportFile(reportFile);
+        hrWeeklyReport.updateById();
+    }
+
     private void setBaseReportAsReturnValue(BaseReport baseReport) {
+        // 属性hrWeeklyReport无需返回：
         baseReport.hrWeeklyReport = null;
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(baseReport), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
@@ -202,7 +294,7 @@ public class WeeklyReportExt {
             reportDtl.isApprove = JdbcMapUtil.getBoolean(item, "IS_APPROVE");
             reportDtl.isEnd = JdbcMapUtil.getBoolean(item, "IS_END");
             // TODO 230323 暂未写入待办，直接为true：
-            reportDtl.isUnend=true;
+            reportDtl.isUnend = true;
             reportDtl.isNotiDeptOnEnd = JdbcMapUtil.getBoolean(item, "IS_NOTI_DEPT_ON_END");
             reportDtl.isNotiLeaderOnEnd = JdbcMapUtil.getBoolean(item, "IS_NOTI_LEADER_ON_END");
 
@@ -265,30 +357,45 @@ public class WeeklyReportExt {
     }
 
     public static class LeaderGmReport extends BaseReport {
-        public List<NameCountPercent> endStat;
+        public List<NameCountPercent> proportionStat;
+
+        public List<DeptStat> deptStatList;
+
+        // public static class DeptStat {
+        //     public IdText dept;
+        //
+        //     public List<ReportDtl> reportDtlList;
+        // }
+
+        public List<DateStat> dateStatList;
+
+        public static class DateStat {
+            public String date;
+            public Long ctStart;
+            public Long ctEnd;
+        }
     }
 
     public static class DeptReport extends BaseReport {
         public List<NameCountPercent> startStat;
 
         public List<DeptStat> deptStatList;
+    }
 
-        public static class DeptStat {
-            public IdText dept;
+    public static class DeptStat {
+        public IdText dept;
 
-            public List<UserStat> userStatList;
+        public List<UserStat> userStatList;
 
-            public static class UserStat {
-                public IdText user;
-                public Long ctStart;
-                public Long ctApprove;
-                public Long ctEnd;
-                public Long ctUnend;
-                public Long ctStartApproveEnd;
-                public Long ctProject;
-            }
+        public static class UserStat {
+            public IdText user;
+            public Long ctStart;
+            public Long ctApprove;
+            public Long ctEnd;
+            public Long ctUnend;
+            public Long ctStartApproveEnd;
+            public Long ctProject;
         }
-
     }
 
     public static class NameCountPercent {
@@ -300,6 +407,12 @@ public class WeeklyReportExt {
     public static class PersonReport extends BaseReport {
         public String reportRemark;
         public List<File> reportFileList;
+
+        public String submitTime;
+
+        public Boolean canSubmit;
+
+        public String reportId;
 
     }
 
