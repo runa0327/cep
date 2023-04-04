@@ -132,6 +132,7 @@ public class PmProPlanTempExt {
             node.iz_milestone = JdbcMapUtil.getString(p, "IZ_MILESTONE");
             node.preNodeName = JdbcMapUtil.getString(p, "pre_name");
             node.processName = JdbcMapUtil.getString(p, "processName");
+            node.level = JdbcMapUtil.getString(p, "level");
             return node;
         }).collect(Collectors.toList());
 
@@ -179,6 +180,7 @@ public class PmProPlanTempExt {
             node.iz_milestone = JdbcMapUtil.getString(dataMap, "IZ_MILESTONE");
             node.seqNo = JdbcMapUtil.getString(dataMap, "SEQ_NO");
             node.proPlanId = JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_ID");
+            node.level = JdbcMapUtil.getString(dataMap, "level");
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(node), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
@@ -196,7 +198,7 @@ public class PmProPlanTempExt {
         String proPlanId = input.proPlanId;
         if (Strings.isEmpty(input.proPlanId)) {
             proPlanId = Crud.from("pm_pro_plan").insertData();
-            Crud.from("pm_pro_plan").where().eq("ID", proPlanId).update().set("NAME", input.proPlanName).set("IS_TEMPLATE","1").exec();
+            Crud.from("pm_pro_plan").where().eq("ID", proPlanId).update().set("NAME", input.proPlanName).set("IS_TEMPLATE", "1").exec();
             Crud.from("PRO_PLAN_TEMPLATE_RULE").where().eq("ID", input.ruleId).update().set("PM_PRO_PLAN_ID", proPlanId).exec();
         }
         String id = input.id;
@@ -204,30 +206,34 @@ public class PmProPlanTempExt {
             id = Crud.from("pm_pro_plan_node").insertData();
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("update pm_pro_plan_node set LAST_MODI_DT =NOW(),set PM_PRO_PLAN_ID= '").append(proPlanId).append("' ");
-        if (Strings.isEmpty(input.pid)) {
-            sb.append(",set PM_PRO_PLAN_NODE_PID ='").append(input.pid).append("'");
+        sb.append("update pm_pro_plan_node set LAST_MODI_DT =NOW(),PM_PRO_PLAN_ID= '").append(proPlanId).append("' ");
+        if (Strings.isNotEmpty(input.pid)) {
+            sb.append(",PM_PRO_PLAN_NODE_PID ='").append(input.pid).append("'");
         }
-        if (Strings.isEmpty(input.postId)) {
-            sb.append(",set POST_INFO_ID ='").append(input.postId).append("'");
+        if(Strings.isNotEmpty(input.name)){
+            sb.append(",`NAME` ='").append(input.name).append("'");
+        }
+        if (Strings.isNotEmpty(input.postId)) {
+            sb.append(",POST_INFO_ID ='").append(input.postId).append("'");
         }
         if (Strings.isNotEmpty(input.preNodeId)) {
-            sb.append(",set PRE_NODE_ID ='").append(input.preNodeId).append("'");
+            sb.append(",PRE_NODE_ID ='").append(input.preNodeId).append("'");
         }
-        if (Strings.isEmpty(input.processId)) {
-            sb.append(",set LINKED_WF_PROCESS_ID ='").append(input.processId).append("'");
+        if (Strings.isNotEmpty(input.processId)) {
+            sb.append(",LINKED_WF_PROCESS_ID ='").append(input.processId).append("'");
         }
 
-        if (Strings.isEmpty(input.startNodeId)) {
-            sb.append(",set LINKED_START_WF_NODE_ID ='").append(input.startNodeId).append("'");
+        if (Strings.isNotEmpty(input.startNodeId)) {
+            sb.append(",LINKED_START_WF_NODE_ID ='").append(input.startNodeId).append("'");
         }
-        if (Strings.isEmpty(input.endNodeId)) {
-            sb.append(",set LINKED_END_WF_NODE_ID ='").append(input.endNodeId).append("'");
+        if (Strings.isNotEmpty(input.endNodeId)) {
+            sb.append(",LINKED_END_WF_NODE_ID ='").append(input.endNodeId).append("'");
         }
         if (input.days > 0) {
-            sb.append(",set PLAN_TOTAL_DAYS =").append(input.days);
+            sb.append(",PLAN_TOTAL_DAYS =").append(input.days);
         }
-        sb.append(",set IZ_MILESTONE =").append(input.izMilestone);
+        sb.append(",IZ_MILESTONE =").append(input.izMilestone);
+        sb.append(",`LEVEL`=").append(input.level);
         sb.append(" where id='").append(id).append("'");
         myJdbcTemplate.update(sb.toString());
     }
@@ -239,7 +245,7 @@ public class PmProPlanTempExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PM_PRO_PLAN_NODE_PID=?", map.get("nodeId"));
-        if(!CollectionUtils.isEmpty(list1)){
+        if (!CollectionUtils.isEmpty(list1)) {
             throw new BaseException("当前节点有子节点，不能删除！");
         }
         //删除的时候判断当前节点是不是别的节点的前置，如果是就删不掉，要去掉前置
@@ -384,6 +390,7 @@ public class PmProPlanTempExt {
         public String iz_milestone;
         public String seqNo;
         public String proPlanId;
+        public String level;
 
         public List<PlanNode> children;
 
@@ -411,6 +418,7 @@ public class PmProPlanTempExt {
         public String endNodeId;
         public List<String> atts;
         public String izMilestone = "0";
+        public String level;
     }
 
     public static class ObjInfo {
