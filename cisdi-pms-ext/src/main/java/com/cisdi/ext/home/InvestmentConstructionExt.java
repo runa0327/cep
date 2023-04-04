@@ -57,10 +57,12 @@ public class InvestmentConstructionExt {
             MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
             Map<String, Object> dataParam = new HashMap<>();
             dataParam.put("ids", ids);
-            List<Map<String, Object>> tzList = myNamedParameterJdbcTemplate.queryForList(" select sum(ifnull(PRJ_TOTAL_INVEST,0)) PRJ_TOTAL_INVEST from PM_INVEST_EST pie \n" +
+            List<Map<String, Object>> tzList = myNamedParameterJdbcTemplate.queryForList(" select ifnull(sum(PRJ_TOTAL_INVEST),0) PRJ_TOTAL_INVEST from PM_INVEST_EST pie \n" +
                     " left join gr_set_value gsv on pie.INVEST_EST_TYPE_ID = gsv.id \n" +
                     " where  pie.PM_PRJ_ID in (:ids) order by gsv.code desc limit 0,1 ", dataParam);
-            data.totalInvestment = tzList.stream().map(p1 -> new BigDecimal(JdbcMapUtil.getString(p1, "PRJ_TOTAL_INVEST"))).reduce(BigDecimal.ZERO, BigDecimal::add);
+            data.totalInvestment = tzList.stream()
+                    .map(p1 -> new BigDecimal(JdbcMapUtil.getString(p1, "PRJ_TOTAL_INVEST")))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
             //完成投资
             List<Map<String, Object>> wcList = myNamedParameterJdbcTemplate.queryForList("select YEAR,ifnull(ARCHITECTURAL_ENGINEERING_FEE,0) as ARCHITECTURAL_ENGINEERING_FEE, \n" +
                     "ifnull(INSTALLATION_ENGINEERING_FEE,0) as INSTALLATION_ENGINEERING_FEE, \n" +

@@ -6,6 +6,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +16,16 @@ import java.util.regex.Pattern;
 
 public class StringUtil {
 
+    /**
+     *
+     * @param b
+     * @return 获取数字百分数
+     */
+    public static String getPercentStr(BigDecimal b){
+        NumberFormat percent = NumberFormat.getPercentInstance();
+        percent.setMaximumFractionDigits(2);
+        return percent.format(b);
+    }
     /**
      * 转字符串
      * @param t

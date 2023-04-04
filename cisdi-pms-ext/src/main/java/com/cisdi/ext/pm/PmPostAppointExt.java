@@ -59,4 +59,12 @@ public class PmPostAppointExt {
             throw new BaseException("该项目已有流程正在启动指派中，请勿重复发起指派");
         }
     }
+
+    /**
+     * 岗位流程-自动发起流程
+     */
+    public static void autoCreateProcess(String projectId,String userId){
+        Map<String,Object> map = new HashMap<>();
+        //组装
+    }
 }

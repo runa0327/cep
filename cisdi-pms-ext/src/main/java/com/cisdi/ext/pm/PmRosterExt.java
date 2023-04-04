@@ -82,12 +82,12 @@ public class PmRosterExt {
                     newData.put("ID", stringObjectMap.get("id"));
                 } else {
                     String prjId = String.valueOf(stringObjectMap.get("id"));
-                    List<Map<String, Object>> rosterList = myJdbcTemplate.queryForList("select pp.*,au.`NAME` as user_name from PM_ROSTER pp left join ad_user au on pp.AD_USER_ID = au.id left join post_info po on po.id = pp.POST_INFO_ID where PM_PRJ_ID=? and po.`NAME`=? ", prjId, s);
-                    String users = "/";
+                    List<Map<String, Object>> rosterList = myJdbcTemplate.queryForList("select pp.*,au.`NAME` as user_name from PM_ROSTER pp left join ad_user au on pp.AD_USER_ID = au.id left join post_info po on po.id = pp.POST_INFO_ID where PM_PRJ_ID=? and po.`NAME`=? and pp.AD_USER_ID != '1641281525532323840'", prjId, s);
+                    String users = "";
                     if (!CollectionUtils.isEmpty(rosterList)) {
                         users = rosterList.stream().map(mm -> JdbcMapUtil.getString(mm, "user_name")).collect(Collectors.joining(","));
                         if ("null".equals(users)) {
-                            users = "/";
+                            users = "";
                         }
                     }
 
@@ -451,7 +451,7 @@ public class PmRosterExt {
     private List<UserInfo> getUserList(String deptId) {
         List<UserInfo> res = new ArrayList<>();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from ad_user where id in (select AD_USER_ID from hr_dept_user where HR_DEPT_ID=?)", deptId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from ad_user where id in (select AD_USER_ID from hr_dept_user where HR_DEPT_ID=? and AD_USER_ID != '1641281525532323840')", deptId);
         if (!CollectionUtils.isEmpty(list)) {
             res = list.stream().map(p -> {
                 UserInfo userInfo = new UserInfo();
