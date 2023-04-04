@@ -60,7 +60,7 @@ public class AttLinkDifferentProcess {
         list.add("PM_ENERGY_EVAL"); // 固定资产投资节能评价
         list.add("PM_WATER_PLAN"); // 水保方案
         list.add("PM_ENVIRONMENT_EVAL"); // 环评
-        list.add("PO_ORDER_REQ"); // 采购合同签订申请
+//        list.add("PO_ORDER_REQ"); // 采购合同签订申请
         list.add("PO_PUBLIC_BID_REQ"); // 采购公开招标申请
         list.add("PM_CONSTRUCT_PERMIT_REQ"); // 施工许可
         list.add("PM_PRJ_PLANNING_PERMIT_REQ"); // 工程规划许可

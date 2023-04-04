@@ -1,6 +1,7 @@
 package com.cisdi.ext.pm;
 
 import com.cisdi.ext.model.HrDeptUser;
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -327,5 +328,24 @@ public class ProcessCommon {
             String deptId = list1.get(0).getHrDeptId();
             Crud.from(entCode).where().eq("id",id).update().set("CRT_DEPT_ID",deptId).exec();
         }
+    }
+
+    /**
+     * 流程数据清理
+     * @param str 需求清除的字段数据
+     * @param csCommId 业务流程id
+     * @param entCode 业务表名
+     * @param myJdbcTemplate 数据源
+     */
+    public static void clearData(String str, String csCommId, String entCode, MyJdbcTemplate myJdbcTemplate) {
+        StringBuilder sb = new StringBuilder("UPDATE ");
+        sb.append(entCode).append(" SET ");
+        List<String> list = StringUtil.getStrToList(str,",");
+        for (String tmp : list) {
+            sb.append(tmp).append(" = null,");
+        }
+        sb.deleteCharAt(sb.length()-1);
+        sb.append(" WHERE ID = ?");
+        myJdbcTemplate.update(sb.toString(),csCommId);
     }
 }
