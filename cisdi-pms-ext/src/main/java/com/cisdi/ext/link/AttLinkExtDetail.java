@@ -356,6 +356,14 @@ public class AttLinkExtDetail {
         if (!noPrjTypeList.contains(entCode)){
             prjTypeLinkNew(row,attLinkResult);
         }
+        // 占地面积
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.DOUBLE;
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "FLOOR_AREA"));
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:JdbcMapUtil.getString(row, "FLOOR_AREA");
+            attLinkResult.attMap.put("FLOOR_AREA", linkedAtt);
+        }
         // 项目代码
         {
             LinkedAtt linkedAtt = new LinkedAtt();
