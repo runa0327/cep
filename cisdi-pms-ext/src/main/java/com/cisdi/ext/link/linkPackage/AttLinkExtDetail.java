@@ -1380,7 +1380,7 @@ public class AttLinkExtDetail {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "PRJ_TOTAL_INVEST")) ? null:new BigDecimal(JdbcMapUtil.getString(resultRow, "PRJ_TOTAL_INVEST"));
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "ESTIMATED_TOTAL_INVEST")) ? null:new BigDecimal(JdbcMapUtil.getString(resultRow, "ESTIMATED_TOTAL_INVEST"));
             attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
         }
         // 工程费用
@@ -1415,8 +1415,8 @@ public class AttLinkExtDetail {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "REPLY_NO_WR")) ? null:JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "REPLY_NO_WR")) ? null:JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "REPLY_NO")) ? null:JdbcMapUtil.getString(resultRow, "REPLY_NO");
+            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(resultRow, "REPLY_NO")) ? null:JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
             attLinkResult.attMap.put("REPLY_NO", linkedAtt);
             attLinkResult.attMap.put("PRJ_REPLY_NO", linkedAtt);
         }
