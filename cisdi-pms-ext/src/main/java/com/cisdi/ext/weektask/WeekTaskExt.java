@@ -197,7 +197,7 @@ public class WeekTaskExt {
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id =(select RELATION_DATA_ID from WEEK_TASK where id=?)", map.get("id"));
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> node = list.get(0);
-            String processId = JdbcMapUtil.getString(node, "PROCESS_ID");
+            String processId = JdbcMapUtil.getString(node, "LINKED_WF_PROCESS_ID");
             //查询流程的第一个节点的view
             List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select AD_VIEW_ID from wf_node where  NODE_TYPE = 'START_EVENT' AND STATUS = 'AP' and WF_PROCESS_ID = ? ", processId);
             if (!CollectionUtils.isEmpty(dataList)) {

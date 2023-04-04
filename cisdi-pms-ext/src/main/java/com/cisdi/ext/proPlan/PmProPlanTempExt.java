@@ -4,6 +4,7 @@ import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
@@ -195,7 +196,7 @@ public class PmProPlanTempExt {
         String proPlanId = input.proPlanId;
         if (Strings.isEmpty(input.proPlanId)) {
             proPlanId = Crud.from("pm_pro_plan").insertData();
-            Crud.from("pm_pro_plan").where().eq("ID", proPlanId).update().set("NAME", input.proPlanName).exec();
+            Crud.from("pm_pro_plan").where().eq("ID", proPlanId).update().set("NAME", input.proPlanName).set("IS_TEMPLATE","1").exec();
             Crud.from("PRO_PLAN_TEMPLATE_RULE").where().eq("ID", input.ruleId).update().set("PM_PRO_PLAN_ID", proPlanId).exec();
         }
         String id = input.id;
@@ -237,7 +238,19 @@ public class PmProPlanTempExt {
     public void delTempNode() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        myJdbcTemplate.update("delete from pm_pro_plan_node where id=?", map.get("nodeId"));
+        List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PM_PRO_PLAN_NODE_PID=?", map.get("nodeId"));
+        if(!CollectionUtils.isEmpty(list1)){
+            throw new BaseException("当前节点有子节点，不能删除！");
+        }
+        //删除的时候判断当前节点是不是别的节点的前置，如果是就删不掉，要去掉前置
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PRE_NODE_ID=?", map.get("nodeId"));
+        if (CollectionUtils.isEmpty(list)) {
+            myJdbcTemplate.update("delete from pm_pro_plan_node where id=?", map.get("nodeId"));
+        } else {
+            String nodeNames = list.stream().map(p -> JdbcMapUtil.getString(p, "NAME")).collect(Collectors.joining(","));
+            String msg = "当前节点是节点【" + nodeNames + "】的前置节点，请取消前置，再删除！";
+            throw new BaseException(msg);
+        }
     }
 
     /**

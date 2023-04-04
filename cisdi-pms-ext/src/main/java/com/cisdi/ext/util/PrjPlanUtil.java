@@ -233,13 +233,11 @@ public class PrjPlanUtil {
                     "PLAN_TOTAL_DAYS,PLAN_CARRY_DAYS,ACTUAL_CARRY_DAYS,ACTUAL_TOTAL_DAYS,PLAN_CURRENT_PRO_PERCENT,ACTUAL_CURRENT_PRO_PERCENT, \n" +
                     "ifnull(PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,PLAN_COMPL_DATE,ACTUAL_COMPL_DATE,SHOW_IN_EARLY_PROC,SHOW_IN_PRJ_OVERVIEW,CAN_START, \n" +
                     "PROGRESS_STATUS_ID,PROGRESS_RISK_TYPE_ID,CHIEF_DEPT_ID,CHIEF_USER_ID,START_DAY,SEQ_NO,CPMS_UUID,CPMS_ID,`LEVEL`,LINKED_WF_PROCESS_ID,LINKED_START_WF_NODE_ID,LINKED_END_WF_NODE_ID,POST_INFO_ID ,AD_USER_ID, \n" +
-                    "PRE_NODE_ID,PROCESS_ID,PROCESS_INSTANCE_ID " +
+                    "PRE_NODE_ID  " +
                     "from PM_PRO_PLAN_NODE pppn \n" +
                     "left join POST_INFO pi on pppn.POST_INFO_ID = pi.id \n" +
                     "where PM_PRO_PLAN_ID=?", proMap.get("ID"));
             if (planNodeList.size() > 0) {
-                // 查询项目岗位人员
-                List<Map<String, Object>> postUserList = myJdbcTemplate.queryForList("select * from pm_post_user where pm_prj_id=?", projectId);
                 planNodeList.stream().filter(p -> Objects.equals("0", String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")))).peek(m -> {
                     String id = Crud.from("PM_PRO_PLAN_NODE").insertData();
                     Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId)
@@ -247,9 +245,9 @@ public class PrjPlanUtil {
                             .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                             .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
                             .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START"))
-                            .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).set("PROCESS_ID", m.get("PROCESS_ID")).set("PROCESS_INSTANCE_ID", m.get("PROCESS_INSTANCE_ID")).exec();
+                            .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).exec();
 
-                    getChildrenNode(m, planNodeList, id, newPlanId, postUserList);
+                    getChildrenNode(m, planNodeList, id, newPlanId);
                 }).collect(Collectors.toList());
 
                 //刷新前置节点
@@ -281,7 +279,7 @@ public class PrjPlanUtil {
         }
     }
 
-    private static List<Map<String, Object>> getChildrenNode(Map<String, Object> root, List<Map<String, Object>> allData, String pId, String newPlanId, List<Map<String, Object>> postUserList) {
+    private static List<Map<String, Object>> getChildrenNode(Map<String, Object> root, List<Map<String, Object>> allData, String pId, String newPlanId) {
         return allData.stream().filter(p -> Objects.equals(String.valueOf(p.get("PM_PRO_PLAN_NODE_PID")), String.valueOf(root.get("ID")))).peek(m -> {
             String id = Crud.from("PM_PRO_PLAN_NODE").insertData();
             Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId)
@@ -290,8 +288,8 @@ public class PrjPlanUtil {
                     .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                     .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
                     .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START"))
-                    .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).set("PROCESS_ID", m.get("PROCESS_ID")).set("PROCESS_INSTANCE_ID", m.get("PROCESS_INSTANCE_ID")).exec();
-            getChildrenNode(m, allData, id, newPlanId, postUserList);
+                    .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).exec();
+            getChildrenNode(m, allData, id, newPlanId);
         }).collect(Collectors.toList());
     }
 
