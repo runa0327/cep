@@ -1,54 +1,19 @@
 package com.cisdi.ext.pm;
 
-import com.cisdi.ext.base.PmPrjExt;
-import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.interaction.EntityRecord;
-import com.qygly.shared.util.JdbcMapUtil;
 
 /**
- * 方案设计-扩展
+ * 方案审批管理-扩展
  */
-public class PmDesignAssignmentExt {
+public class PmSchemeCheckReq {
 
     /**
-     * 流程-方案设计-结束时校验
+     * 流程操作-方案审批管理-确定按钮
      */
-    public void designAssignmentEndCheck(){
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        //流程表名
-        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
-        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        //项目id
-        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
-        //获取设计单位名称
-        String designUnitOne = JdbcMapUtil.getString(entityRecord.valueMap,"DESIGN_UNIT_ONE");
-        //更新写入勘察信息
-        String partyId = PmInLibraryExt.createOrUpdateParty(designUnitOne,"IS_DESIGNER");
-        //更新项目设计单位信息
-        PmPrj pmPrj = appointValue(projectId,partyId);
-        PmPrjExt.updateData(pmPrj);
-    }
-
-    /**
-     * 项目实体赋值
-     * @param projectId 项目id
-     * @param partyId 合作方类型id
-     * @return 项目实体
-     */
-    public PmPrj appointValue(String projectId, String partyId) {
-        PmPrj pmPrj = new PmPrj();
-        pmPrj.setDesignerUnit(partyId);
-        pmPrj.setId(projectId);
-        return pmPrj;
-    }
-
-    /**
-     * 流程操作-方案设计-确定按钮
-     */
-    public void designAssignmentProcessOK(){
+    public void schemeCheckProcessOK(){
         String status = "OK";
         String nodeId = ExtJarHelper.nodeId.get();
         String nodeStatus = getNodeStatus(status,nodeId);
@@ -56,16 +21,21 @@ public class PmDesignAssignmentExt {
     }
 
     /**
-     * 流程操作-方案设计-拒绝按钮
+     * 流程操作-方案审批管理-拒绝按钮
      */
-    public void designAssignmentProcessRefuse(){
+    public void schemeCheckProcessRefuse(){
         String status = "refuse";
         String nodeId = ExtJarHelper.nodeId.get();
         String nodeStatus = getNodeStatus(status,nodeId);
         processHandle(nodeStatus,status);
     }
 
-    private void processHandle(String nodeStatus, String status) {
+    /**
+     * 流程流转详细处理逻辑
+     * @param nodeStatus 节点状态码
+     * @param status 操作状态码
+     */
+    public void processHandle(String nodeStatus, String status) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String userId = ExtJarHelper.loginInfo.get().userId;
         String userName = ExtJarHelper.loginInfo.get().userName;
@@ -90,7 +60,7 @@ public class PmDesignAssignmentExt {
     private String getNodeStatus(String status, String nodeId) {
         String nodeName = "";
         if ("OK".equals(status)){
-            if ("0099902212142089953".equals(nodeId)){ //1-发起
+            if ("1643134468053262336".equals(nodeId)){ //1-发起
                 nodeName = "start";
             }
         } else {
