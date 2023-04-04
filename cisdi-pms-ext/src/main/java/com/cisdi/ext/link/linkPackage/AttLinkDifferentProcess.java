@@ -71,7 +71,7 @@ public class AttLinkDifferentProcess {
         list.add("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD"); // 技术交底与图纸会审记录
         list.add("PM_CONCEPTUAL_SCHEME_DESIGN"); // 概念方案设计管理
         list.add("PM_CONSTRUCTION_DRAWING_DESIGN"); // 施工图设计管理
-        list.add("PM_DESIGN_ASSIGNMENT"); // 方案设计管理
+//        list.add("PM_DESIGN_ASSIGNMENT"); // 方案设计管理
         list.add("PM_DESIGN_ASSIGNMENT_BOOK"); // 设计任务书
         list.add("PM_FARMING_PROCEDURES"); // 农转用手续办理
         list.add("PM_WOODLAND_PROCEDURES"); // 林地调整办理手续
