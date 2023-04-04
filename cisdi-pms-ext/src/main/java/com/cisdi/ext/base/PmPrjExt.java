@@ -248,9 +248,11 @@ public class PmPrjExt {
                 .set("PRJ_DESIGN_USER_ID",JdbcMapUtil.getString(map,"PRJ_DESIGN_USER_ID")) //设计岗
                 .set("PRJ_COST_USER_ID",JdbcMapUtil.getString(map,"PRJ_COST_USER_ID")) //成本岗
                 .set("PRJ_CODE",JdbcMapUtil.getString(map,"CONSTRUCTION_PROJECT_CODE")) //项目编号
+                .set("CUSTOMER_UNIT",JdbcMapUtil.getString(map,"CUSTOMER_UNIT")) //业主单位
                 .set("PRJ_MANAGE_MODE_ID",JdbcMapUtil.getString(map,"PRJ_MANAGE_MODE_ID")) //项目管理模式
                 .set("BASE_LOCATION_ID",JdbcMapUtil.getString(map,"BASE_LOCATION_ID")) //建设地点
                 .set("FLOOR_AREA",JdbcMapUtil.getString(map,"FLOOR_AREA")) //占地面积
+                .set("PROJECT_TYPE_ID",JdbcMapUtil.getString(map,"PROJECT_TYPE_ID")) //项目类型
                 .set("CON_SCALE_TYPE_ID",JdbcMapUtil.getString(map,"CON_SCALE_TYPE_ID")) //建设规模类型
                 .set("CON_SCALE_QTY",JdbcMapUtil.getString(map,"CON_SCALE_QTY")) //道路长度
                 .set("CON_SCALE_QTY2",JdbcMapUtil.getString(map,"CON_SCALE_QTY2")) //道路宽度
@@ -258,6 +260,7 @@ public class PmPrjExt {
                 .set("QTY_THREE",JdbcMapUtil.getString(map,"QTY_THREE")) //海域面积
                 .set("OTHER",JdbcMapUtil.getString(map,"OTHER")) //其他
                 .set("CON_SCALE_UOM_ID",JdbcMapUtil.getString(map,"CON_SCALE_UOM_ID")) //建设规模单位
+                .set("PRJ_SITUATION",JdbcMapUtil.getString(map,"PRJ_SITUATION")) //项目简介
                 .exec();
     }
 
