@@ -1,7 +1,13 @@
 package com.cisdi.ext.link;
 
+import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.shared.util.JdbcMapUtil;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 属性联动分支判断各类流程
@@ -109,6 +115,17 @@ public class AttLinkDifferentProcess {
         list.add("PM_POST_APPOINT"); // 岗位指派
         list.add("PRJ_LAND_CHECK"); // 项目红线核查
         return list;
+    }
+
+    /**
+     * 获取所有流程的表名
+     * @return
+     */
+    public static List<String> getAllProcessList(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> codeMaps = myJdbcTemplate.queryForList("select code from ad_ent where PARENT_ENT_ID = '0099799190825077752' and status = 'AP'");
+        List<String> codes = codeMaps.stream().map(m -> JdbcMapUtil.getString(m, "code")).collect(Collectors.toList());
+        return codes;
     }
 
     /**

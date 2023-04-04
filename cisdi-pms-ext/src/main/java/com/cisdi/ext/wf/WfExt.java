@@ -406,7 +406,7 @@ public class WfExt {
             List<String> orderNameTable = AttLinkDifferentProcess.getOrderProcessName();
 
             //需要自定义标题的流程
-            List<String> tableList = AttLinkDifferentProcess.getTableList();
+            List<String> tableList = AttLinkDifferentProcess.getAllProcessList();
 
             if (!CollectionUtils.isEmpty(tableList)) {
                 if (tableList.contains(entityCode)) {
