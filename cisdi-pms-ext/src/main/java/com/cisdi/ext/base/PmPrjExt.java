@@ -111,6 +111,7 @@ public class PmPrjExt {
                 .set("CON_SCALE_UOM_ID",JdbcMapUtil.getString(valueMap,"CON_SCALE_UOM_ID")) // 建设规模单位
                 .set("PRJ_SITUATION",JdbcMapUtil.getString(valueMap,"PRJ_SITUATION")) // 项目概况
                 .set("INVEST_PRIORITY",level) // 来源级别
+                .set("REPLY_NO",JdbcMapUtil.getString(valueMap,"REPLY_NO_WR")) // 来源级别
                 .exec();
     }
 
@@ -219,6 +220,7 @@ public class PmPrjExt {
         Crud.from("PM_PRJ").where().eq("ID",id).update()
                 .set("PRJ_REPLY_DATE",JdbcMapUtil.getString(map,"PRJ_REPLY_DATE")) //立项批复日期
                 .set("PRJ_REPLY_NO",JdbcMapUtil.getString(map,"PRJ_REPLY_NO")) //立项批复文号
+                .set("REPLY_NO",JdbcMapUtil.getString(map,"PRJ_REPLY_NO")) //批复文号
                 .set("PRJ_REPLY_FILE",JdbcMapUtil.getString(map,"REPLY_FILE")) //立项批复材料
                 .set("PRJ_EARLY_USER_ID",JdbcMapUtil.getString(map,"PRJ_EARLY_USER_ID")) //前期岗
                 .set("PRJ_DESIGN_USER_ID",JdbcMapUtil.getString(map,"PRJ_DESIGN_USER_ID")) //设计岗
