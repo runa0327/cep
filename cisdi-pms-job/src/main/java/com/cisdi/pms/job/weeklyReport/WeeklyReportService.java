@@ -159,14 +159,14 @@ public class WeeklyReportService {
         // 关键过滤条件：流程实例首个待办任务、操作时间在本周
         List<Map<String, Object>> startList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.`STATUS`='AP' AND EXISTS(SELECT 1 FROM WF_TASK TK WHERE TK.WF_PROCESS_INSTANCE_ID=PI.ID AND TK.`STATUS`='AP' AND TK.IS_PROC_INST_FIRST_TODO_TASK=1 AND TK.AD_USER_ID=? AND TK.ACT_DATETIME BETWEEN ? AND ?)", userId, fromDate, toDatePlus1Day);
         for (Map<String, Object> row : startList) {
-            insertReportDtl(newReportId, row.get("WF_PROCESS_ID"), row.get("ID"), true, false, batchId, row, false, false, false, periodDtlId, deptId, userId, getEndViewId(processedProcIdToEndViewIdMap, JdbcMapUtil.getString(row, "WF_PROCESS_ID")), JdbcMapUtil.getString(row, "ENT_CODE"), JdbcMapUtil.getString(row, "ENTITY_RECORD_ID"));
+            insertReportDtl(newReportId, row.get("WF_PROCESS_ID"), row.get("ID"), true, false, batchId, row, false, false, false, periodDtlId, deptId, userId, getEndViewId(processedProcIdToEndViewIdMap, JdbcMapUtil.getString(row, "WF_PROCESS_ID")), JdbcMapUtil.getString(row, "ENT_CODE"), JdbcMapUtil.getString(row, "ENTITY_RECORD_ID"),JdbcMapUtil.getDate(row,"START_DATETIME"),JdbcMapUtil.getDate(row,"END_DATETIME"));
         }
 
         // 获取协办列表：
         // 关键过滤条件：操作的节点为TRX节点，操作时间在本周
         List<Map<String, Object>> unendList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.`STATUS`='AP' AND EXISTS(SELECT 1 FROM WF_TASK TK,AD_ACT A,WF_NODE N WHERE TK.WF_PROCESS_INSTANCE_ID=PI.ID AND TK.`STATUS`='AP' AND TK.AD_ACT_ID=A.ID/* AND A.AD_ACT_DIRECTION_ID IN('FORWARD')*/ AND TK.AD_USER_ID=? AND TK.WF_NODE_ID=N.ID AND IFNULL(INSTR(N.EXTRA_INFO,'ASSIST'),0)>0 AND TK.ACT_DATETIME BETWEEN ? AND ?)", userId, fromDate, toDatePlus1Day);
         for (Map<String, Object> row : unendList) {
-            insertReportDtl(newReportId, row.get("WF_PROCESS_ID"), row.get("ID"), false, false, batchId, row, true, false, false, periodDtlId, deptId, userId, getEndViewId(processedProcIdToEndViewIdMap, JdbcMapUtil.getString(row, "WF_PROCESS_ID")), JdbcMapUtil.getString(row, "ENT_CODE"), JdbcMapUtil.getString(row, "ENTITY_RECORD_ID"));
+            insertReportDtl(newReportId, row.get("WF_PROCESS_ID"), row.get("ID"), false, false, batchId, row, true, false, false, periodDtlId, deptId, userId, getEndViewId(processedProcIdToEndViewIdMap, JdbcMapUtil.getString(row, "WF_PROCESS_ID")), JdbcMapUtil.getString(row, "ENT_CODE"), JdbcMapUtil.getString(row, "ENTITY_RECORD_ID"),JdbcMapUtil.getDate(row,"START_DATETIME"),JdbcMapUtil.getDate(row,"END_DATETIME"));
         }
 
         // 获取办结列表：
@@ -177,7 +177,7 @@ public class WeeklyReportService {
             boolean notiDeptOnEnd = notiDeptProcIdList.contains(procId.toString());
             boolean notiLeaderOnEnd = notiLeaderProcIdList.contains(procId.toString());
 
-            insertReportDtl(newReportId, procId, row.get("ID"), false, true, batchId, row, false, notiDeptOnEnd, notiLeaderOnEnd, periodDtlId, deptId, userId, getEndViewId(processedProcIdToEndViewIdMap, JdbcMapUtil.getString(row, "WF_PROCESS_ID")), JdbcMapUtil.getString(row, "ENT_CODE"), JdbcMapUtil.getString(row, "ENTITY_RECORD_ID"));
+            insertReportDtl(newReportId, procId, row.get("ID"), false, true, batchId, row, false, notiDeptOnEnd, notiLeaderOnEnd, periodDtlId, deptId, userId, getEndViewId(processedProcIdToEndViewIdMap, JdbcMapUtil.getString(row, "WF_PROCESS_ID")), JdbcMapUtil.getString(row, "ENT_CODE"), JdbcMapUtil.getString(row, "ENTITY_RECORD_ID"),JdbcMapUtil.getDate(row,"START_DATETIME"),JdbcMapUtil.getDate(row,"END_DATETIME"));
         }
     }
 
@@ -192,12 +192,12 @@ public class WeeklyReportService {
         return viewId;
     }
 
-    private void insertReportDtl(String reportId, Object procId, Object procInstId, boolean isStart, boolean isEnd, String batchId, Map<String, Object> procInst, boolean isAssist, boolean isNotiDeptOnEnd, boolean isNotiLeaderOnEnd, Object periodDtlId, Object deptId, Object userId, Object viewId, Object entCode, Object entityRecordId) {
+    private void insertReportDtl(String reportId, Object procId, Object procInstId, boolean isStart, boolean isEnd, String batchId, Map<String, Object> procInst, boolean isAssist, boolean isNotiDeptOnEnd, boolean isNotiLeaderOnEnd, Object periodDtlId, Object deptId, Object userId, Object viewId, Object entCode, Object entityRecordId,Object startDate,Object endDate) {
         List<String> prjIdList = getPrjIdList(procInst);
         if (!SharedUtil.isEmptyList(prjIdList)) {
             for (String prjId : prjIdList) {
                 String newId = IdUtil.getSnowflakeNextIdStr();
-                jdbcTemplate.update("INSERT INTO HR_WEEKLY_REPORT_DTL(`ID`,`VER`,`TS`,`IS_PRESET`,`CRT_DT`,`CRT_USER_ID`,`LAST_MODI_DT`,`LAST_MODI_USER_ID`,`STATUS`,`LK_WF_INST_ID`,`CODE`,`NAME`,`REMARK`,`WF_PROCESS_ID`,`WF_PROCESS_INSTANCE_ID`,`IS_START`,`IS_END`,`HR_WEEKLY_REPORT_ID_PERSON`,`BATCH_ID`,`PM_PRJ_ID`,`IS_ASSIST`,`IS_NOTI_DEPT_ON_END`,`IS_NOTI_LEADER_ON_END`,HR_PERIOD_DTL_ID,REPORT_DEPT_ID,REPORT_USER_ID,AD_VIEW_ID,ENT_CODE,ENTITY_RECORD_ID)VALUES(?/*ID*/,(1)/*VER*/,(NOW())/*TS*/,(null)/*IS_PRESET*/,(NOW())/*CRT_DT*/,(?)/*CRT_USER_ID*/,(NOW())/*LAST_MODI_DT*/,(?)/*LAST_MODI_USER_ID*/,('DR')/*STATUS*/,(null)/*LK_WF_INST_ID*/,(null)/*CODE*/,(null)/*NAME*/,(null)/*REMARK*/,(?)/*WF_PROCESS_ID*/,(?)/*WF_PROCESS_INSTANCE_ID*/,(?)/*IS_START*/,(?)/*IS_END*/,(?)/*HR_WEEKLY_REPORT_ID_PERSON*/,(?)/*BATCH_ID*/,(?)/*PM_PRJ_ID*/,(?)/*IS_ASSIST*/,(?)/*IS_NOTI_DEPT_ON_END*/,(?)/*IS_NOTI_LEADER_ON_END*/,(?)/*HR_PERIOD_DTL_ID*/,(?)/*REPORT_DEPT_ID*/,(?)/*REPORT_USER_ID*/,(?)/*AD_VIEW_ID*/,(?)/*ENT_CODE*/,(?)/*ENTITY_RECORD_ID*/)", newId, Constants.adminUserId, Constants.adminUserId, procId, procInstId, isStart, isEnd, reportId, batchId, prjId, isAssist, isNotiDeptOnEnd, isNotiLeaderOnEnd, periodDtlId, deptId, userId, viewId, entCode, entityRecordId);
+                jdbcTemplate.update("INSERT INTO HR_WEEKLY_REPORT_DTL(`ID`,`VER`,`TS`,`IS_PRESET`,`CRT_DT`,`CRT_USER_ID`,`LAST_MODI_DT`,`LAST_MODI_USER_ID`,`STATUS`,`LK_WF_INST_ID`,`CODE`,`NAME`,`REMARK`,`WF_PROCESS_ID`,`WF_PROCESS_INSTANCE_ID`,`IS_START`,`IS_END`,`HR_WEEKLY_REPORT_ID_PERSON`,`BATCH_ID`,`PM_PRJ_ID`,`IS_ASSIST`,`IS_NOTI_DEPT_ON_END`,`IS_NOTI_LEADER_ON_END`,HR_PERIOD_DTL_ID,REPORT_DEPT_ID,REPORT_USER_ID,AD_VIEW_ID,ENT_CODE,ENTITY_RECORD_ID,START_DATE,END_DATE)VALUES(?/*ID*/,(1)/*VER*/,(NOW())/*TS*/,(null)/*IS_PRESET*/,(NOW())/*CRT_DT*/,(?)/*CRT_USER_ID*/,(NOW())/*LAST_MODI_DT*/,(?)/*LAST_MODI_USER_ID*/,('DR')/*STATUS*/,(null)/*LK_WF_INST_ID*/,(null)/*CODE*/,(null)/*NAME*/,(null)/*REMARK*/,(?)/*WF_PROCESS_ID*/,(?)/*WF_PROCESS_INSTANCE_ID*/,(?)/*IS_START*/,(?)/*IS_END*/,(?)/*HR_WEEKLY_REPORT_ID_PERSON*/,(?)/*BATCH_ID*/,(?)/*PM_PRJ_ID*/,(?)/*IS_ASSIST*/,(?)/*IS_NOTI_DEPT_ON_END*/,(?)/*IS_NOTI_LEADER_ON_END*/,(?)/*HR_PERIOD_DTL_ID*/,(?)/*REPORT_DEPT_ID*/,(?)/*REPORT_USER_ID*/,(?)/*AD_VIEW_ID*/,(?)/*ENT_CODE*/,(?)/*ENTITY_RECORD_ID*/,(?)/*START_DATE*/,(?)/*END_DATE*/)", newId, Constants.adminUserId, Constants.adminUserId, procId, procInstId, isStart, isEnd, reportId, batchId, prjId, isAssist, isNotiDeptOnEnd, isNotiLeaderOnEnd, periodDtlId, deptId, userId, viewId, entCode, entityRecordId,startDate,endDate);
             }
         }
     }

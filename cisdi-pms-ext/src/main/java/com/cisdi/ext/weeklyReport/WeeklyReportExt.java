@@ -13,6 +13,7 @@ import com.qygly.shared.interaction.IdText;
 import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -313,6 +314,10 @@ public class WeeklyReportExt {
             reportDtl.user.id = JdbcMapUtil.getString(item, "REPORT_USER_ID");
             reportDtl.user.text = JdbcMapUtil.getString(item, "REPORT_USER_NAME");
 
+            reportDtl.viewId=JdbcMapUtil.getString(item, "AD_VIEW_ID");
+            reportDtl.entCode=JdbcMapUtil.getString(item, "ENT_CODE");
+            reportDtl.entityRecordId=JdbcMapUtil.getString(item, "ENTITY_RECORD_ID");
+
             return reportDtl;
         }).collect(Collectors.toList());
     }
@@ -419,12 +424,15 @@ public class WeeklyReportExt {
         public boolean isNotiDeptOnEnd;
         public boolean isNotiLeaderOnEnd;
 
-
         public Prj prj;
         public ProcInst procInst;
 
         public IdText dept;
         public IdText user;
+
+        public String viewId;
+        public String entCode;
+        public String entityRecordId;
     }
 
     public static class Prj {

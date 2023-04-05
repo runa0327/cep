@@ -7,6 +7,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -174,6 +175,14 @@ public class HrWeeklyReportDtl {
          * 报告用户。
          */
         public static final String REPORT_USER_ID = "REPORT_USER_ID";
+        /**
+         * 启动日期。
+         */
+        public static final String START_DATE = "START_DATE";
+        /**
+         * 结束日期。
+         */
+        public static final String END_DATE = "END_DATE";
     }
 
     // </editor-fold>
@@ -1328,6 +1337,78 @@ public class HrWeeklyReportDtl {
             this.reportUserId = reportUserId;
             if (!this.toUpdateCols.contains("REPORT_USER_ID")) {
                 this.toUpdateCols.add("REPORT_USER_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 启动日期。
+     */
+    private LocalDate startDate;
+
+    /**
+     * 获取：启动日期。
+     */
+    public LocalDate getStartDate() {
+        return this.startDate;
+    }
+
+    /**
+     * 设置：启动日期。
+     */
+    public HrWeeklyReportDtl setStartDate(LocalDate startDate) {
+        if (this.startDate == null && startDate == null) {
+            // 均为null，不做处理。
+        } else if (this.startDate != null && startDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.startDate.compareTo(startDate) != 0) {
+                this.startDate = startDate;
+                if (!this.toUpdateCols.contains("START_DATE")) {
+                    this.toUpdateCols.add("START_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.startDate = startDate;
+            if (!this.toUpdateCols.contains("START_DATE")) {
+                this.toUpdateCols.add("START_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 结束日期。
+     */
+    private LocalDate endDate;
+
+    /**
+     * 获取：结束日期。
+     */
+    public LocalDate getEndDate() {
+        return this.endDate;
+    }
+
+    /**
+     * 设置：结束日期。
+     */
+    public HrWeeklyReportDtl setEndDate(LocalDate endDate) {
+        if (this.endDate == null && endDate == null) {
+            // 均为null，不做处理。
+        } else if (this.endDate != null && endDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.endDate.compareTo(endDate) != 0) {
+                this.endDate = endDate;
+                if (!this.toUpdateCols.contains("END_DATE")) {
+                    this.toUpdateCols.add("END_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.endDate = endDate;
+            if (!this.toUpdateCols.contains("END_DATE")) {
+                this.toUpdateCols.add("END_DATE");
             }
         }
         return this;
