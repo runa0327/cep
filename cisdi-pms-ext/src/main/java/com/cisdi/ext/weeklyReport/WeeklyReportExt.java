@@ -27,6 +27,34 @@ public class WeeklyReportExt {
         P, D, L, G,
     }
 
+    /**
+     * 财务分管领导。
+     */
+    public void getFinanceLeaderWeeklyReport() {
+        getLeaderWeeklyReport();
+    }
+
+    /**
+     * 采购分管领导。
+     */
+    public void getProcureLeaderWeeklyReport() {
+        getLeaderWeeklyReport();
+    }
+
+    /**
+     * 董事长。
+     */
+    public void getChairmanWeeklyReport() {
+        getLeaderWeeklyReport();
+    }
+
+    /**
+     * 书记。
+     */
+    public void getSecretaryWeeklyReport() {
+        getLeaderWeeklyReport();
+    }
+
     public void getGmWeeklyReport() {
         getLeaderGmWeeklyReport(WeeklyReportType.G, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_GM);
     }
