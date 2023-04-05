@@ -158,14 +158,7 @@ public class WeeklyReportService {
         // 关键过滤条件：流程实例首个待办任务、操作时间在本周
         List<Map<String, Object>> startList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.`STATUS`='AP' AND EXISTS(SELECT 1 FROM WF_TASK TK WHERE TK.WF_PROCESS_INSTANCE_ID=PI.ID AND TK.`STATUS`='AP' AND TK.IS_PROC_INST_FIRST_TODO_TASK=1 AND TK.AD_USER_ID=? AND TK.ACT_DATETIME BETWEEN ? AND ?)", userId, fromDate, toDatePlus1Day);
         for (Map<String, Object> row : startList) {
-            insertReportDtl(newReportId, row.get("WF_PROCESS_ID"), row.get("ID"), true, false, false, batchId, row, false, false, false, periodDtlId, deptId, userId);
-        }
-
-        // 获取审批列表：
-        // 关键过滤条件：正向、逆向操作，操作时间在本周，节点非TRX节点
-        List<Map<String, Object>> approveList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.`STATUS`='AP' AND EXISTS(SELECT 1 FROM WF_TASK TK,AD_ACT A,WF_NODE N WHERE TK.WF_PROCESS_INSTANCE_ID=PI.ID AND TK.`STATUS`='AP' AND TK.AD_ACT_ID=A.ID AND AND A.AD_ACT_DIRECTION_ID IN('FORWARD','BACKWARD') AND TK.AD_USER_ID=? AND TK.ACT_DATETIME BETWEEN ? AND ? AND TK.WF_NODE_ID=N.ID AND IFNULL(INSTR(N.EXTRA_INFO,'TRX'),0)=0)", userId, fromDate, toDatePlus1Day);
-        for (Map<String, Object> row : approveList) {
-            insertReportDtl(newReportId, row.get("WF_PROCESS_ID"), row.get("ID"), false, true, false, batchId, row, false, false, false, periodDtlId, deptId, userId);
+            insertReportDtl(newReportId, row.get("WF_PROCESS_ID"), row.get("ID"), true, false, batchId, row, false, false, false, periodDtlId, deptId, userId);
         }
 
         // 获取办结列表：
@@ -176,22 +169,22 @@ public class WeeklyReportService {
             boolean notiDeptOnEnd = notiDeptProcIdList.contains(procId.toString());
             boolean notiLeaderOnEnd = notiLeaderProcIdList.contains(procId.toString());
 
-            insertReportDtl(newReportId, procId, row.get("ID"), false, false, true, batchId, row, false, notiDeptOnEnd, notiLeaderOnEnd, periodDtlId, deptId, userId);
+            insertReportDtl(newReportId, procId, row.get("ID"), false, true, batchId, row, false, notiDeptOnEnd, notiLeaderOnEnd, periodDtlId, deptId, userId);
         }
 
         // 获取协办列表：
         List<Map<String, Object>> unendList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.`STATUS`='AP' AND EXISTS(SELECT 1 FROM WF_TASK TK WHERE TK.WF_PROCESS_INSTANCE_ID=PI.ID AND TK.`STATUS`='AP' AND TK.IS_PROC_INST_FIRST_TODO_TASK=1 AND TK.AD_USER_ID=? AND TK.ACT_DATETIME BETWEEN ? AND ?)", userId, fromDate, toDatePlus1Day);
         for (Map<String, Object> row : unendList) {
-            insertReportDtl(newReportId, row.get("WF_PROCESS_ID"), row.get("ID"), false, false, false, batchId, row, true, false, false, periodDtlId, deptId, userId);
+            insertReportDtl(newReportId, row.get("WF_PROCESS_ID"), row.get("ID"), false, false, batchId, row, true, false, false, periodDtlId, deptId, userId);
         }
     }
 
-    private void insertReportDtl(String reportId, Object procId, Object procInstId, boolean isStart, boolean isApprove, boolean isEnd, String batchId, Map<String, Object> procInst, boolean isAssist, boolean isNotiDeptOnEnd, boolean isNotiLeaderOnEnd, Object periodDtlId, Object deptId, Object userId) {
+    private void insertReportDtl(String reportId, Object procId, Object procInstId, boolean isStart, boolean isEnd, String batchId, Map<String, Object> procInst, boolean isAssist, boolean isNotiDeptOnEnd, boolean isNotiLeaderOnEnd, Object periodDtlId, Object deptId, Object userId) {
         List<String> prjIdList = getPrjIdList(procInst);
         if (!SharedUtil.isEmptyList(prjIdList)) {
             for (String prjId : prjIdList) {
                 String newId = IdUtil.getSnowflakeNextIdStr();
-                jdbcTemplate.update("INSERT INTO HR_WEEKLY_REPORT_DTL(`ID`,`VER`,`TS`,`IS_PRESET`,`CRT_DT`,`CRT_USER_ID`,`LAST_MODI_DT`,`LAST_MODI_USER_ID`,`STATUS`,`LK_WF_INST_ID`,`CODE`,`NAME`,`REMARK`,`WF_PROCESS_ID`,`WF_PROCESS_INSTANCE_ID`,`IS_START`,`IS_APPROVE`,`IS_END`,`HR_WEEKLY_REPORT_ID_PERSON`,`BATCH_ID`,`PM_PRJ_ID`,`IS_ASSIST`,`IS_NOTI_DEPT_ON_END`,`IS_NOTI_LEADER_ON_END`,HR_PERIOD_DTL_ID,REPORT_DEPT_ID,REPORT_USER_ID)VALUES(?/*ID*/,(1)/*VER*/,(NOW())/*TS*/,(null)/*IS_PRESET*/,(NOW())/*CRT_DT*/,(?)/*CRT_USER_ID*/,(NOW())/*LAST_MODI_DT*/,(?)/*LAST_MODI_USER_ID*/,('DR')/*STATUS*/,(null)/*LK_WF_INST_ID*/,(null)/*CODE*/,(null)/*NAME*/,(null)/*REMARK*/,(?)/*WF_PROCESS_ID*/,(?)/*WF_PROCESS_INSTANCE_ID*/,(?)/*IS_START*/,(?)/*IS_APPROVE*/,(?)/*IS_END*/,(?)/*HR_WEEKLY_REPORT_ID_PERSON*/,(?)/*BATCH_ID*/,(?)/*PM_PRJ_ID*/,(?)/*IS_ASSIST*/,(?)/*IS_NOTI_DEPT_ON_END*/,(?)/*IS_NOTI_LEADER_ON_END*/,(?)/*HR_PERIOD_DTL_ID*/,(?)/*REPORT_DEPT_ID*/,(?)/*REPORT_USER_ID*/)", newId, Constants.adminUserId, Constants.adminUserId, procId, procInstId, isStart, isApprove, isEnd, reportId, batchId, prjId, isAssist, isNotiDeptOnEnd, isNotiLeaderOnEnd, periodDtlId, deptId, userId);
+                jdbcTemplate.update("INSERT INTO HR_WEEKLY_REPORT_DTL(`ID`,`VER`,`TS`,`IS_PRESET`,`CRT_DT`,`CRT_USER_ID`,`LAST_MODI_DT`,`LAST_MODI_USER_ID`,`STATUS`,`LK_WF_INST_ID`,`CODE`,`NAME`,`REMARK`,`WF_PROCESS_ID`,`WF_PROCESS_INSTANCE_ID`,`IS_START`,`IS_END`,`HR_WEEKLY_REPORT_ID_PERSON`,`BATCH_ID`,`PM_PRJ_ID`,`IS_ASSIST`,`IS_NOTI_DEPT_ON_END`,`IS_NOTI_LEADER_ON_END`,HR_PERIOD_DTL_ID,REPORT_DEPT_ID,REPORT_USER_ID)VALUES(?/*ID*/,(1)/*VER*/,(NOW())/*TS*/,(null)/*IS_PRESET*/,(NOW())/*CRT_DT*/,(?)/*CRT_USER_ID*/,(NOW())/*LAST_MODI_DT*/,(?)/*LAST_MODI_USER_ID*/,('DR')/*STATUS*/,(null)/*LK_WF_INST_ID*/,(null)/*CODE*/,(null)/*NAME*/,(null)/*REMARK*/,(?)/*WF_PROCESS_ID*/,(?)/*WF_PROCESS_INSTANCE_ID*/,(?)/*IS_START*/,(?)/*IS_END*/,(?)/*HR_WEEKLY_REPORT_ID_PERSON*/,(?)/*BATCH_ID*/,(?)/*PM_PRJ_ID*/,(?)/*IS_ASSIST*/,(?)/*IS_NOTI_DEPT_ON_END*/,(?)/*IS_NOTI_LEADER_ON_END*/,(?)/*HR_PERIOD_DTL_ID*/,(?)/*REPORT_DEPT_ID*/,(?)/*REPORT_USER_ID*/)", newId, Constants.adminUserId, Constants.adminUserId, procId, procInstId, isStart,  isEnd, reportId, batchId, prjId, isAssist, isNotiDeptOnEnd, isNotiLeaderOnEnd, periodDtlId, deptId, userId);
             }
         }
     }
