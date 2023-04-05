@@ -48,29 +48,6 @@ public class WeeklyReportExt {
         }
 
         if (!SharedUtil.isEmptyList(report.reportDtlList)) {
-            // 占比统计：
-            List<ReportDtl> startList = report.reportDtlList.stream().filter(item -> item.isStart || item.isAssist || item.isEnd).collect(Collectors.toList());
-            if (!SharedUtil.isEmptyList(startList)) {
-                BigDecimal sum = new BigDecimal(startList.size());
-                Map<String, List<ReportDtl>> map = startList.stream().collect(Collectors.groupingBy(item -> item.procInst.procName));
-                report.proportionStat = new ArrayList<>(map.size());
-                map.forEach((k, v) -> {
-                    NameCountPercent nameCountPercent = new NameCountPercent();
-                    report.proportionStat.add(nameCountPercent);
-
-                    nameCountPercent.name = k;
-                    nameCountPercent.count = v.size();
-                    BigDecimal divide = new BigDecimal(v.size()).divide(sum, 4, RoundingMode.HALF_UP);
-                    nameCountPercent.percent = new DecimalFormat("#.##%").format(divide);
-                });
-
-                report.proportionStat = report.proportionStat.stream().sorted((o1, o2) -> {
-                    int i = o2.count.compareTo(o1.count);
-
-                    // 注：未实现按照拼音排序：
-                    return i != 0 ? i : o1.name.compareTo(o2.name);
-                }).collect(Collectors.toList());
-            }
 
             // 趋势统计：
 
@@ -84,7 +61,7 @@ public class WeeklyReportExt {
             //     return deptStat;
             // }).collect(Collectors.toList());
             // 各个部门汇总：
-            report.deptStatList = getDeptStatList(report.reportDtlList);
+            report.deptStatList = getDeptStatList(report.hrWeeklyReport.getHrPeriodDtlId(), report.reportDtlList);
 
             //
             List<String> userIdList = report.reportDtlList.stream().map(item -> item.user.id).distinct().collect(Collectors.toList());
@@ -114,6 +91,9 @@ public class WeeklyReportExt {
 
         }
 
+        // 占比统计：
+        calcProportionStat(report);
+
         setBaseReportAsReturnValue(report);
     }
 
@@ -124,39 +104,46 @@ public class WeeklyReportExt {
         }
 
         if (!SharedUtil.isEmptyList(report.reportDtlList)) {
-
-            // 办理统计：
-            List<ReportDtl> list = report.reportDtlList.stream().filter(item -> item.isStart || item.isAssist || item.isEnd).collect(Collectors.toList());
-            if (!SharedUtil.isEmptyList(list)) {
-                BigDecimal sum = new BigDecimal(list.size());
-                Map<String, List<ReportDtl>> map = list.stream().collect(Collectors.groupingBy(item -> item.procInst.procName));
-                report.proportionStat = new ArrayList<>(map.size());
-                map.forEach((k, v) -> {
-                    NameCountPercent nameCountPercent = new NameCountPercent();
-                    report.proportionStat.add(nameCountPercent);
-
-                    nameCountPercent.name = k;
-                    nameCountPercent.count = v.size();
-                    BigDecimal divide = new BigDecimal(v.size()).divide(sum, 4, RoundingMode.HALF_UP);
-                    nameCountPercent.percent = new DecimalFormat("#.##%").format(divide);
-                });
-
-                report.proportionStat = report.proportionStat.stream().sorted((o1, o2) -> {
-                    int i = o2.count.compareTo(o1.count);
-
-                    // 注：未实现按照拼音排序：
-                    return i != 0 ? i : o1.name.compareTo(o2.name);
-                }).collect(Collectors.toList());
-            }
-
             // 各个部门汇总：
-            report.deptStatList = getDeptStatList(report.reportDtlList);
+            report.deptStatList = getDeptStatList(report.hrWeeklyReport.getHrPeriodDtlId(), report.reportDtlList);
         }
 
         // 合并报表明细列表：
         mergeReportDtlList(report);
 
+        // 占比统计：
+        calcProportionStat(report);
+
         setBaseReportAsReturnValue(report);
+    }
+
+    private void calcProportionStat(BaseReport report) {
+        if (SharedUtil.isEmptyList(report.reportDtlList)) {
+            return;
+        }
+
+        List<ReportDtl> list = report.reportDtlList.stream().filter(item -> item.isStart || item.isAssist || item.isEnd).collect(Collectors.toList());
+        if (!SharedUtil.isEmptyList(list)) {
+            BigDecimal sum = new BigDecimal(list.size());
+            Map<String, List<ReportDtl>> map = list.stream().collect(Collectors.groupingBy(item -> item.procInst.procName));
+            report.proportionStat = new ArrayList<>(map.size());
+            map.forEach((k, v) -> {
+                NameCountPercent nameCountPercent = new NameCountPercent();
+                report.proportionStat.add(nameCountPercent);
+
+                nameCountPercent.name = k;
+                nameCountPercent.count = v.size();
+                BigDecimal divide = new BigDecimal(v.size()).divide(sum, 4, RoundingMode.HALF_UP);
+                nameCountPercent.percent = new DecimalFormat("#.##%").format(divide);
+            });
+
+            report.proportionStat = report.proportionStat.stream().sorted((o1, o2) -> {
+                int i = o2.count.compareTo(o1.count);
+
+                // 注：未实现按照拼音排序：
+                return i != 0 ? i : o1.name.compareTo(o2.name);
+            }).collect(Collectors.toList());
+        }
     }
 
     /**
@@ -191,7 +178,18 @@ public class WeeklyReportExt {
         }).collect(Collectors.toList());
     }
 
-    private List<DeptStat> getDeptStatList(List<ReportDtl> reportDtlList) {
+    private List<DeptStat> getDeptStatList(String periodDtlId, List<ReportDtl> reportDtlList) {
+
+        List<String> userIdList = reportDtlList.stream().map(item -> item.user.id).distinct().collect(Collectors.toList());
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+
+        List<String> args = new ArrayList<>();
+        args.add(periodDtlId);
+        args.addAll(userIdList);
+
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("SELECT T.REPORT_USER_ID,T.REPORT_REMARK FROM HR_WEEKLY_REPORT T WHERE T.`STATUS`='AP' AND T.HR_WEEKLY_REPORT_TYPE_ID='P' AND T.HR_PERIOD_DTL_ID=? AND T.REPORT_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ")", args.toArray());
+        Map<String, List<Map<String, Object>>> userIdToReportRemarkListMap = list.stream().collect(Collectors.groupingBy(item -> JdbcMapUtil.getString(item, "REPORT_USER_ID")));
+
         Map<IdText, Map<IdText, List<ReportDtl>>> map = reportDtlList.stream().collect(
                 Collectors.groupingBy(
                         reportDtl -> reportDtl.dept,
@@ -210,6 +208,7 @@ public class WeeklyReportExt {
                 userStat.ctEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isEnd)).count();
                 userStat.ctAll = userEntry.getValue().stream().filter(reportDtl -> reportDtl.isStart || reportDtl.isAssist || reportDtl.isEnd).count();
                 userStat.ctProject = userEntry.getValue().stream().filter(reportDtl -> reportDtl.prj != null).map(reportDtl -> reportDtl.prj.id).distinct().count();
+                userStat.reportRemark = JdbcMapUtil.getString(userIdToReportRemarkListMap.get(userStat.user.id).get(0), "REPORT_REMARK");
                 return userStat;
             }).sorted((o1, o2) -> o2.ctAll.compareTo(o1.ctAll)).collect(Collectors.toList());
 
@@ -278,6 +277,7 @@ public class WeeklyReportExt {
     private void setBaseReportAsReturnValue(BaseReport baseReport) {
         // 属性hrWeeklyReport无需返回：
         baseReport.hrWeeklyReport = null;
+
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(baseReport), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
@@ -390,18 +390,11 @@ public class WeeklyReportExt {
         public HrWeeklyReport hrWeeklyReport;
 
         public List<ReportDtl> reportDtlList;
-    }
 
-    public static class LeaderGmReport extends BaseReport {
+        /**
+         * 占比统计。
+         */
         public List<NameCountPercent> proportionStat;
-
-        public List<DeptStat> deptStatList;
-
-        // public static class DeptStat {
-        //     public IdText dept;
-        //
-        //     public List<ReportDtl> reportDtlList;
-        // }
 
         public List<DateStat> dateStatList;
 
@@ -410,11 +403,20 @@ public class WeeklyReportExt {
             public Long ctStart;
             public Long ctEnd;
         }
+
+    }
+
+    public static class LeaderGmReport extends BaseReport {
+        public List<DeptStat> deptStatList;
+
+        // public static class DeptStat {
+        //     public IdText dept;
+        //
+        //     public List<ReportDtl> reportDtlList;
+        // }
     }
 
     public static class DeptReport extends BaseReport {
-        public List<NameCountPercent> proportionStat;
-
         public List<DeptStat> deptStatList;
     }
 
@@ -430,6 +432,8 @@ public class WeeklyReportExt {
             public Long ctEnd;
             public Long ctAll;
             public Long ctProject;
+
+            public String reportRemark;
         }
     }
 
