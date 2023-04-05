@@ -47,49 +47,8 @@ public class WeeklyReportExt {
             return;
         }
 
-        if (!SharedUtil.isEmptyList(report.reportDtlList)) {
-
-            // 趋势统计：
-
-            // 各个部门汇总：
-            // Map<IdText, List<ReportDtl>> map = report.reportDtlList.stream().filter(item -> item.isEnd && item.isNotiLeaderOnEnd).collect(
-            //         Collectors.groupingBy(item -> item.dept));
-            // report.deptStatList = map.entrySet().stream().map(item -> {
-            //     LeaderGmReport.DeptStat deptStat = new LeaderGmReport.DeptStat();
-            //     deptStat.dept = item.getKey();
-            //     deptStat.reportDtlList = item.getValue();
-            //     return deptStat;
-            // }).collect(Collectors.toList());
-            // 各个部门汇总：
-            report.deptStatList = getDeptStatList(report.hrWeeklyReport.getHrPeriodDtlId(), report.reportDtlList);
-
-            //
-            List<String> userIdList = report.reportDtlList.stream().map(item -> item.user.id).distinct().collect(Collectors.toList());
-
-            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-            // List<Map<String, Object>> startStatList = myJdbcTemplate.queryForList("SELECT DATE_FORMAT(PI.START_DATETIME,'%Y-%m') DATE,COUNT(*) CT FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP' AND PI.START_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.START_DATETIME,'%Y-%m')");
-            // List<Map<String, Object>> endStatList = myJdbcTemplate.queryForList("SELECT DATE_FORMAT(PI.END_DATETIME,'%Y-%m') DATE,COUNT(*) CT FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP' AND PI.END_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.END_DATETIME,'%Y-%m')");
-
-            List<String> argList = new ArrayList<>();
-            argList.addAll(userIdList);
-            argList.addAll(userIdList);
-
-            report.dateStatList = myJdbcTemplate.queryForList("SELECT T.DATE,SUM(T. CT_START) CT_START,SUM(T.CT_END) CT_END\n" +
-                    "FROM\n" +
-                    "(\n" +
-                    "SELECT DATE_FORMAT(PI.START_DATETIME,'%Y-%m') DATE,COUNT(*) CT_START,0 CT_END FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP' AND PI.START_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.START_DATETIME,'%Y-%m')\n" +
-                    "UNION ALL\n" +
-                    "SELECT DATE_FORMAT(PI.END_DATETIME,'%Y-%m') DATE,0 CT_START,COUNT(*) CT_END FROM WF_PROCESS_INSTANCE PI WHERE PI.START_USER_ID IN(" + userIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") AND PI.STATUS='AP'  AND PI.END_DATETIME IS NOT NULL GROUP BY DATE_FORMAT(PI.END_DATETIME,'%Y-%m')\n" +
-                    ") T GROUP BY T.DATE\n" +
-                    "ORDER BY T.DATE", argList.toArray()).stream().map(item -> {
-                LeaderGmReport.DateStat dateStat = new LeaderGmReport.DateStat();
-                dateStat.date = JdbcMapUtil.getString(item, "DATE");
-                dateStat.ctStart = JdbcMapUtil.getLong(item, "CT_START");
-                dateStat.ctEnd = JdbcMapUtil.getLong(item, "CT_END");
-                return dateStat;
-            }).collect(Collectors.toList());
-
-        }
+        // 计算部门办结流程实例Map：
+        calcDeptEndProcInstMap(report);
 
         // 合并报表明细列表：
         mergeReportDtlList(report);
@@ -97,7 +56,81 @@ public class WeeklyReportExt {
         // 占比统计：
         calcProportionStat(report);
 
+        // 计算日期统计列表：
+        calcDateStatList(report);
+
+
         setBaseReportAsReturnValue(report);
+    }
+
+    /**
+     * 计算部门办结流程实例Map。
+     *
+     * @param report
+     */
+    private void calcDeptEndProcInstMap(LeaderGmReport report) {
+        if (SharedUtil.isEmptyList(report.reportDtlList)) {
+            return;
+        }
+
+        Map<IdText, List<ReportDtl>> map = report.reportDtlList.stream().collect(Collectors.groupingBy(item -> item.dept));
+        report.deptEndStatList = map.entrySet().stream().map(entry -> {
+            BaseReport.DeptEndStat deptEndStat = new BaseReport.DeptEndStat();
+            deptEndStat.dept = entry.getKey();
+            deptEndStat.endProcInstList = entry.getValue().stream().filter(item -> item.isEnd).map(item -> {
+                BaseReport.DeptEndStat.EndProcInst endProcInst = new BaseReport.DeptEndStat.EndProcInst();
+                endProcInst.prjName = item.prj.name;
+                endProcInst.procName = item.procInst.procName;
+                endProcInst.userName = item.user.text;
+                endProcInst.viewId = item.viewId;
+                endProcInst.entCode = item.entCode;
+                endProcInst.entityRecordId = item.entityRecordId;
+                return endProcInst;
+            }).distinct().collect(Collectors.toList());
+            return deptEndStat;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 计算日期统计列表。
+     *
+     * @param report
+     */
+    private void calcDateStatList(BaseReport report) {
+        if (SharedUtil.isEmptyList(report.reportDtlList)) {
+            return;
+        }
+
+        Map<String, Long> startMap = report.reportDtlList.stream().filter(item -> item.isStart && item.startDate != null).map(item -> item.startDate.substring(0, 7)).collect(Collectors.groupingBy(item -> item, LinkedHashMap::new, Collectors.counting()));
+        Map<String, Long> endMap = report.reportDtlList.stream().filter(item -> item.isEnd && item.endDate != null).map(item -> item.endDate.substring(0, 7)).collect(Collectors.groupingBy(item -> item, LinkedHashMap::new, Collectors.counting()));
+
+        if (SharedUtil.isEmptyMap(startMap) && SharedUtil.isEmptyMap(endMap)) {
+            return;
+        }
+
+        report.dateStatList = new ArrayList<>();
+
+        for (Map.Entry<String, Long> entry : startMap.entrySet()) {
+            BaseReport.DateStat dateStat = new BaseReport.DateStat();
+            String date = entry.getKey();
+            dateStat.date = date;
+            dateStat.ctStart = entry.getValue();
+            dateStat.ctEnd = endMap.containsKey(date) ? endMap.get(date) : 0;
+            report.dateStatList.add(dateStat);
+        }
+
+        for (Map.Entry<String, Long> entry : endMap.entrySet()) {
+            String date = entry.getKey();
+            if (!startMap.containsKey(date)) {
+                BaseReport.DateStat dateStat = new BaseReport.DateStat();
+                dateStat.date = date;
+                dateStat.ctStart = 0L;
+                dateStat.ctEnd = entry.getValue();
+                report.dateStatList.add(dateStat);
+            }
+        }
+
+        report.dateStatList = report.dateStatList.stream().sorted(Comparator.comparing(o -> o.date)).collect(Collectors.toList());
     }
 
     public void getDeptWeeklyReport() {
@@ -106,10 +139,8 @@ public class WeeklyReportExt {
             return;
         }
 
-        if (!SharedUtil.isEmptyList(report.reportDtlList)) {
-            // 各个部门汇总：
-            report.deptStatList = getDeptStatList(report.hrWeeklyReport.getHrPeriodDtlId(), report.reportDtlList);
-        }
+        // 技术各个部门汇总：
+        calcDeptStatList(report, report.hrWeeklyReport.getHrPeriodDtlId());
 
         // 合并报表明细列表：
         mergeReportDtlList(report);
@@ -156,7 +187,7 @@ public class WeeklyReportExt {
      * @param report
      */
     private void mergeReportDtlList(BaseReport report) {
-        if (report == null || SharedUtil.isEmptyList(report.reportDtlList)) {
+        if (SharedUtil.isEmptyList(report.reportDtlList)) {
             return;
         }
 
@@ -181,7 +212,17 @@ public class WeeklyReportExt {
         }).collect(Collectors.toList());
     }
 
-    private List<DeptStat> getDeptStatList(String periodDtlId, List<ReportDtl> reportDtlList) {
+    /**
+     * 技术各个部门汇总。
+     *
+     * @param report
+     * @param periodDtlId
+     */
+    private void calcDeptStatList(DeptReport report, String periodDtlId) {
+        List<ReportDtl> reportDtlList = report.reportDtlList;
+        if (SharedUtil.isEmptyList(reportDtlList)) {
+            return;
+        }
 
         List<String> userIdList = reportDtlList.stream().map(item -> item.user.id).distinct().collect(Collectors.toList());
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
@@ -217,7 +258,7 @@ public class WeeklyReportExt {
 
             return deptStat;
         }).sorted(Comparator.comparing(o -> o.dept.text)).collect(Collectors.toList());
-        return deptStatList;
+        report.deptStatList = deptStatList;
     }
 
     public void getPersonWeeklyReport() {
@@ -355,6 +396,9 @@ public class WeeklyReportExt {
             reportDtl.entCode = JdbcMapUtil.getString(item, "ENT_CODE");
             reportDtl.entityRecordId = JdbcMapUtil.getString(item, "ENTITY_RECORD_ID");
 
+            reportDtl.startDate = JdbcMapUtil.getString(item, "START_DATE");
+            reportDtl.endDate = JdbcMapUtil.getString(item, "END_DATE");
+
             return reportDtl;
         }).collect(Collectors.toList());
     }
@@ -407,7 +451,26 @@ public class WeeklyReportExt {
             public Long ctEnd;
         }
 
+        public List<DeptEndStat> deptEndStatList;
+
+        public static class DeptEndStat {
+            public IdText dept;
+            public List<EndProcInst> endProcInstList;
+
+            /**
+             * 办结流程信息。
+             */
+            public static class EndProcInst {
+                public String prjName;
+                public String procName;
+                public String userName;
+                public String viewId;
+                public String entCode;
+                public String entityRecordId;
+            }
+        }
     }
+
 
     public static class LeaderGmReport extends BaseReport {
         public List<DeptStat> deptStatList;
@@ -474,6 +537,9 @@ public class WeeklyReportExt {
         public String viewId;
         public String entCode;
         public String entityRecordId;
+
+        public String startDate;
+        public String endDate;
     }
 
     public static class Prj {
