@@ -13,7 +13,6 @@ import com.qygly.shared.interaction.IdText;
 import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
-import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -85,7 +84,7 @@ public class WeeklyReportExt {
             //     return deptStat;
             // }).collect(Collectors.toList());
             // 各个部门汇总：
-            report.deptStatList = getDeptStats(report.reportDtlList);
+            report.deptStatList = getDeptStatList(report.reportDtlList);
 
             //
             List<String> userIdList = report.reportDtlList.stream().map(item -> item.user.id).distinct().collect(Collectors.toList());
@@ -126,15 +125,15 @@ public class WeeklyReportExt {
 
         if (!SharedUtil.isEmptyList(report.reportDtlList)) {
 
-            // 发起统计：
-            List<ReportDtl> startList = report.reportDtlList.stream().filter(item -> item.isStart).collect(Collectors.toList());
-            if (!SharedUtil.isEmptyList(startList)) {
-                BigDecimal sum = new BigDecimal(startList.size());
-                Map<String, List<ReportDtl>> map = startList.stream().collect(Collectors.groupingBy(item -> item.procInst.procName));
-                report.startStat = new ArrayList<>(map.size());
+            // 办理统计：
+            List<ReportDtl> list = report.reportDtlList.stream().filter(item -> item.isStart || item.isAssist || item.isEnd).collect(Collectors.toList());
+            if (!SharedUtil.isEmptyList(list)) {
+                BigDecimal sum = new BigDecimal(list.size());
+                Map<String, List<ReportDtl>> map = list.stream().collect(Collectors.groupingBy(item -> item.procInst.procName));
+                report.proportionStat = new ArrayList<>(map.size());
                 map.forEach((k, v) -> {
                     NameCountPercent nameCountPercent = new NameCountPercent();
-                    report.startStat.add(nameCountPercent);
+                    report.proportionStat.add(nameCountPercent);
 
                     nameCountPercent.name = k;
                     nameCountPercent.count = v.size();
@@ -142,7 +141,7 @@ public class WeeklyReportExt {
                     nameCountPercent.percent = new DecimalFormat("#.##%").format(divide);
                 });
 
-                report.startStat = report.startStat.stream().sorted((o1, o2) -> {
+                report.proportionStat = report.proportionStat.stream().sorted((o1, o2) -> {
                     int i = o2.count.compareTo(o1.count);
 
                     // 注：未实现按照拼音排序：
@@ -151,13 +150,48 @@ public class WeeklyReportExt {
             }
 
             // 各个部门汇总：
-            report.deptStatList = getDeptStats(report.reportDtlList);
+            report.deptStatList = getDeptStatList(report.reportDtlList);
         }
+
+        // 合并报表明细列表：
+        mergeReportDtlList(report);
 
         setBaseReportAsReturnValue(report);
     }
 
-    private List<DeptStat> getDeptStats(List<ReportDtl> reportDtlList) {
+    /**
+     * 合并报表明细列表。
+     * 保证流程实例唯一性，合并不同部门、不同用户的报表明细，合并后清空部门、用户。
+     *
+     * @param report
+     */
+    private void mergeReportDtlList(BaseReport report) {
+        if (report == null || SharedUtil.isEmptyList(report.reportDtlList)) {
+            return;
+        }
+
+        Map<String, List<ReportDtl>> map = report.reportDtlList.stream().collect(Collectors.groupingBy(item -> item.procInst.procInstId));
+        report.reportDtlList = map.entrySet().stream().map(item -> {
+            List<ReportDtl> list = item.getValue();
+            ReportDtl merged = list.get(0);
+            merged.dept = null;
+            merged.user = null;
+            if (list.size() > 1) {
+                for (int i = 1; i < list.size(); i++) {
+                    ReportDtl row = list.get(i);
+                    // 只要任何一行的isStart属性为true，合并后的则为true；其他属性同理：
+                    merged.isStart = row.isStart || merged.isStart;
+                    merged.isAssist = row.isAssist || merged.isAssist;
+                    merged.isEnd = row.isEnd || merged.isEnd;
+                    merged.isNotiDeptOnEnd = row.isNotiDeptOnEnd || merged.isNotiDeptOnEnd;
+                    merged.isNotiLeaderOnEnd = row.isNotiLeaderOnEnd || merged.isNotiLeaderOnEnd;
+                }
+            }
+            return merged;
+        }).collect(Collectors.toList());
+    }
+
+    private List<DeptStat> getDeptStatList(List<ReportDtl> reportDtlList) {
         Map<IdText, Map<IdText, List<ReportDtl>>> map = reportDtlList.stream().collect(
                 Collectors.groupingBy(
                         reportDtl -> reportDtl.dept,
@@ -174,10 +208,10 @@ public class WeeklyReportExt {
                 userStat.ctStart = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart)).count();
                 userStat.ctAssist = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isAssist)).count();
                 userStat.ctEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isEnd)).count();
-                userStat.ctStartAssistEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart) || Boolean.TRUE.equals(reportDtl.isAssist) || Boolean.TRUE.equals(reportDtl.isEnd)).count();
+                userStat.ctAll = userEntry.getValue().stream().filter(reportDtl -> reportDtl.isStart || reportDtl.isAssist || reportDtl.isEnd).count();
                 userStat.ctProject = userEntry.getValue().stream().filter(reportDtl -> reportDtl.prj != null).map(reportDtl -> reportDtl.prj.id).distinct().count();
                 return userStat;
-            }).sorted((o1, o2) -> o2.ctStartAssistEnd.compareTo(o1.ctStartAssistEnd)).collect(Collectors.toList());
+            }).sorted((o1, o2) -> o2.ctAll.compareTo(o1.ctAll)).collect(Collectors.toList());
 
             return deptStat;
         }).sorted(Comparator.comparing(o -> o.dept.text)).collect(Collectors.toList());
@@ -314,9 +348,9 @@ public class WeeklyReportExt {
             reportDtl.user.id = JdbcMapUtil.getString(item, "REPORT_USER_ID");
             reportDtl.user.text = JdbcMapUtil.getString(item, "REPORT_USER_NAME");
 
-            reportDtl.viewId=JdbcMapUtil.getString(item, "AD_VIEW_ID");
-            reportDtl.entCode=JdbcMapUtil.getString(item, "ENT_CODE");
-            reportDtl.entityRecordId=JdbcMapUtil.getString(item, "ENTITY_RECORD_ID");
+            reportDtl.viewId = JdbcMapUtil.getString(item, "AD_VIEW_ID");
+            reportDtl.entCode = JdbcMapUtil.getString(item, "ENT_CODE");
+            reportDtl.entityRecordId = JdbcMapUtil.getString(item, "ENTITY_RECORD_ID");
 
             return reportDtl;
         }).collect(Collectors.toList());
@@ -379,7 +413,7 @@ public class WeeklyReportExt {
     }
 
     public static class DeptReport extends BaseReport {
-        public List<NameCountPercent> startStat;
+        public List<NameCountPercent> proportionStat;
 
         public List<DeptStat> deptStatList;
     }
@@ -394,7 +428,7 @@ public class WeeklyReportExt {
             public Long ctStart;
             public Long ctAssist;
             public Long ctEnd;
-            public Long ctStartAssistEnd;
+            public Long ctAll;
             public Long ctProject;
         }
     }
