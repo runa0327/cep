@@ -49,7 +49,7 @@ public class WeeklyReportExt {
 
         if (!SharedUtil.isEmptyList(report.reportDtlList)) {
             // 占比统计：
-            List<ReportDtl> startList = report.reportDtlList.stream().filter(item -> item.isStart || item.isApprove || item.isEnd).collect(Collectors.toList());
+            List<ReportDtl> startList = report.reportDtlList.stream().filter(item -> item.isStart || item.isAssist || item.isEnd).collect(Collectors.toList());
             if (!SharedUtil.isEmptyList(startList)) {
                 BigDecimal sum = new BigDecimal(startList.size());
                 Map<String, List<ReportDtl>> map = startList.stream().collect(Collectors.groupingBy(item -> item.procInst.procName));
@@ -171,13 +171,12 @@ public class WeeklyReportExt {
                 DeptStat.UserStat userStat = new DeptStat.UserStat();
                 userStat.user = userEntry.getKey();
                 userStat.ctStart = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart)).count();
-                userStat.ctApprove = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isApprove)).count();
+                userStat.ctAssist = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isAssist)).count();
                 userStat.ctEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isEnd)).count();
-                userStat.ctUnend = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isUnend)).count();
-                userStat.ctStartApproveEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart) || Boolean.TRUE.equals(reportDtl.isApprove) || Boolean.TRUE.equals(reportDtl.isEnd)).count();
+                userStat.ctStartAssistEnd = userEntry.getValue().stream().filter(reportDtl -> Boolean.TRUE.equals(reportDtl.isStart) || Boolean.TRUE.equals(reportDtl.isAssist) || Boolean.TRUE.equals(reportDtl.isEnd)).count();
                 userStat.ctProject = userEntry.getValue().stream().filter(reportDtl -> reportDtl.prj != null).map(reportDtl -> reportDtl.prj.id).distinct().count();
                 return userStat;
-            }).sorted((o1, o2) -> o2.ctStartApproveEnd.compareTo(o1.ctStartApproveEnd)).collect(Collectors.toList());
+            }).sorted((o1, o2) -> o2.ctStartAssistEnd.compareTo(o1.ctStartAssistEnd)).collect(Collectors.toList());
 
             return deptStat;
         }).sorted(Comparator.comparing(o -> o.dept.text)).collect(Collectors.toList());
@@ -185,7 +184,7 @@ public class WeeklyReportExt {
     }
 
     public void getPersonWeeklyReport() {
-        PersonReport report = (PersonReport) getBaseReport(WeeklyReportType.P, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID);
+        PersonReport report = (PersonReport) getBaseReport(WeeklyReportType.P, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_PERSON);
         if (report == null) {
             return;
         }
@@ -291,10 +290,8 @@ public class WeeklyReportExt {
             ReportDtl reportDtl = new ReportDtl();
 
             reportDtl.isStart = JdbcMapUtil.getBoolean(item, "IS_START");
-            reportDtl.isApprove = JdbcMapUtil.getBoolean(item, "IS_APPROVE");
+            reportDtl.isAssist = JdbcMapUtil.getBoolean(item, "IS_ASSIST");
             reportDtl.isEnd = JdbcMapUtil.getBoolean(item, "IS_END");
-            // TODO 230323 暂未写入待办，直接为true：
-            reportDtl.isUnend = true;
             reportDtl.isNotiDeptOnEnd = JdbcMapUtil.getBoolean(item, "IS_NOTI_DEPT_ON_END");
             reportDtl.isNotiLeaderOnEnd = JdbcMapUtil.getBoolean(item, "IS_NOTI_LEADER_ON_END");
 
@@ -390,10 +387,9 @@ public class WeeklyReportExt {
         public static class UserStat {
             public IdText user;
             public Long ctStart;
-            public Long ctApprove;
+            public Long ctAssist;
             public Long ctEnd;
-            public Long ctUnend;
-            public Long ctStartApproveEnd;
+            public Long ctStartAssistEnd;
             public Long ctProject;
         }
     }
@@ -418,12 +414,11 @@ public class WeeklyReportExt {
 
     public static class ReportDtl {
         public boolean isStart;
-        public boolean isApprove;
+        public boolean isAssist;
         public boolean isEnd;
         public boolean isNotiDeptOnEnd;
         public boolean isNotiLeaderOnEnd;
 
-        public boolean isUnend;
 
         public Prj prj;
         public ProcInst procInst;

@@ -111,10 +111,6 @@ public class HrWeeklyReportDtl {
          */
         public static final String IS_START = "IS_START";
         /**
-         * 是否审核。
-         */
-        public static final String IS_APPROVE = "IS_APPROVE";
-        /**
          * 是否办结。
          */
         public static final String IS_END = "IS_END";
@@ -127,17 +123,29 @@ public class HrWeeklyReportDtl {
          */
         public static final String IS_NOTI_LEADER_ON_END = "IS_NOTI_LEADER_ON_END";
         /**
-         * 是否未结。
+         * 是否协助。
          */
-        public static final String IS_UNEND = "IS_UNEND";
+        public static final String IS_ASSIST = "IS_ASSIST";
         /**
          * 项目。
          */
         public static final String PM_PRJ_ID = "PM_PRJ_ID";
         /**
-         * 周报。
+         * 视图。
          */
-        public static final String HR_WEEKLY_REPORT_ID = "HR_WEEKLY_REPORT_ID";
+        public static final String AD_VIEW_ID = "AD_VIEW_ID";
+        /**
+         * 实体代码。
+         */
+        public static final String ENT_CODE = "ENT_CODE";
+        /**
+         * 实体记录ID。
+         */
+        public static final String ENTITY_RECORD_ID = "ENTITY_RECORD_ID";
+        /**
+         * 所属的个人周报。
+         */
+        public static final String HR_WEEKLY_REPORT_ID_PERSON = "HR_WEEKLY_REPORT_ID_PERSON";
         /**
          * 所属的部门周报。
          */
@@ -154,6 +162,18 @@ public class HrWeeklyReportDtl {
          * 批号。
          */
         public static final String BATCH_ID = "BATCH_ID";
+        /**
+         * 周期明细。
+         */
+        public static final String HR_PERIOD_DTL_ID = "HR_PERIOD_DTL_ID";
+        /**
+         * 报告部门。
+         */
+        public static final String REPORT_DEPT_ID = "REPORT_DEPT_ID";
+        /**
+         * 报告用户。
+         */
+        public static final String REPORT_USER_ID = "REPORT_USER_ID";
     }
 
     // </editor-fold>
@@ -738,42 +758,6 @@ public class HrWeeklyReportDtl {
     }
 
     /**
-     * 是否审核。
-     */
-    private Boolean isApprove;
-
-    /**
-     * 获取：是否审核。
-     */
-    public Boolean getIsApprove() {
-        return this.isApprove;
-    }
-
-    /**
-     * 设置：是否审核。
-     */
-    public HrWeeklyReportDtl setIsApprove(Boolean isApprove) {
-        if (this.isApprove == null && isApprove == null) {
-            // 均为null，不做处理。
-        } else if (this.isApprove != null && isApprove != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.isApprove.compareTo(isApprove) != 0) {
-                this.isApprove = isApprove;
-                if (!this.toUpdateCols.contains("IS_APPROVE")) {
-                    this.toUpdateCols.add("IS_APPROVE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.isApprove = isApprove;
-            if (!this.toUpdateCols.contains("IS_APPROVE")) {
-                this.toUpdateCols.add("IS_APPROVE");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 是否办结。
      */
     private Boolean isEnd;
@@ -882,36 +866,36 @@ public class HrWeeklyReportDtl {
     }
 
     /**
-     * 是否未结。
+     * 是否协助。
      */
-    private Boolean isUnend;
+    private Boolean isAssist;
 
     /**
-     * 获取：是否未结。
+     * 获取：是否协助。
      */
-    public Boolean getIsUnend() {
-        return this.isUnend;
+    public Boolean getIsAssist() {
+        return this.isAssist;
     }
 
     /**
-     * 设置：是否未结。
+     * 设置：是否协助。
      */
-    public HrWeeklyReportDtl setIsUnend(Boolean isUnend) {
-        if (this.isUnend == null && isUnend == null) {
+    public HrWeeklyReportDtl setIsAssist(Boolean isAssist) {
+        if (this.isAssist == null && isAssist == null) {
             // 均为null，不做处理。
-        } else if (this.isUnend != null && isUnend != null) {
+        } else if (this.isAssist != null && isAssist != null) {
             // 均非null，判定不等，再做处理：
-            if (this.isUnend.compareTo(isUnend) != 0) {
-                this.isUnend = isUnend;
-                if (!this.toUpdateCols.contains("IS_UNEND")) {
-                    this.toUpdateCols.add("IS_UNEND");
+            if (this.isAssist.compareTo(isAssist) != 0) {
+                this.isAssist = isAssist;
+                if (!this.toUpdateCols.contains("IS_ASSIST")) {
+                    this.toUpdateCols.add("IS_ASSIST");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.isUnend = isUnend;
-            if (!this.toUpdateCols.contains("IS_UNEND")) {
-                this.toUpdateCols.add("IS_UNEND");
+            this.isAssist = isAssist;
+            if (!this.toUpdateCols.contains("IS_ASSIST")) {
+                this.toUpdateCols.add("IS_ASSIST");
             }
         }
         return this;
@@ -954,36 +938,144 @@ public class HrWeeklyReportDtl {
     }
 
     /**
-     * 周报。
+     * 视图。
      */
-    private String hrWeeklyReportId;
+    private String adViewId;
 
     /**
-     * 获取：周报。
+     * 获取：视图。
      */
-    public String getHrWeeklyReportId() {
-        return this.hrWeeklyReportId;
+    public String getAdViewId() {
+        return this.adViewId;
     }
 
     /**
-     * 设置：周报。
+     * 设置：视图。
      */
-    public HrWeeklyReportDtl setHrWeeklyReportId(String hrWeeklyReportId) {
-        if (this.hrWeeklyReportId == null && hrWeeklyReportId == null) {
+    public HrWeeklyReportDtl setAdViewId(String adViewId) {
+        if (this.adViewId == null && adViewId == null) {
             // 均为null，不做处理。
-        } else if (this.hrWeeklyReportId != null && hrWeeklyReportId != null) {
+        } else if (this.adViewId != null && adViewId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.hrWeeklyReportId.compareTo(hrWeeklyReportId) != 0) {
-                this.hrWeeklyReportId = hrWeeklyReportId;
-                if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID")) {
-                    this.toUpdateCols.add("HR_WEEKLY_REPORT_ID");
+            if (this.adViewId.compareTo(adViewId) != 0) {
+                this.adViewId = adViewId;
+                if (!this.toUpdateCols.contains("AD_VIEW_ID")) {
+                    this.toUpdateCols.add("AD_VIEW_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.hrWeeklyReportId = hrWeeklyReportId;
-            if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID")) {
-                this.toUpdateCols.add("HR_WEEKLY_REPORT_ID");
+            this.adViewId = adViewId;
+            if (!this.toUpdateCols.contains("AD_VIEW_ID")) {
+                this.toUpdateCols.add("AD_VIEW_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 实体代码。
+     */
+    private String entCode;
+
+    /**
+     * 获取：实体代码。
+     */
+    public String getEntCode() {
+        return this.entCode;
+    }
+
+    /**
+     * 设置：实体代码。
+     */
+    public HrWeeklyReportDtl setEntCode(String entCode) {
+        if (this.entCode == null && entCode == null) {
+            // 均为null，不做处理。
+        } else if (this.entCode != null && entCode != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.entCode.compareTo(entCode) != 0) {
+                this.entCode = entCode;
+                if (!this.toUpdateCols.contains("ENT_CODE")) {
+                    this.toUpdateCols.add("ENT_CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.entCode = entCode;
+            if (!this.toUpdateCols.contains("ENT_CODE")) {
+                this.toUpdateCols.add("ENT_CODE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 实体记录ID。
+     */
+    private String entityRecordId;
+
+    /**
+     * 获取：实体记录ID。
+     */
+    public String getEntityRecordId() {
+        return this.entityRecordId;
+    }
+
+    /**
+     * 设置：实体记录ID。
+     */
+    public HrWeeklyReportDtl setEntityRecordId(String entityRecordId) {
+        if (this.entityRecordId == null && entityRecordId == null) {
+            // 均为null，不做处理。
+        } else if (this.entityRecordId != null && entityRecordId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.entityRecordId.compareTo(entityRecordId) != 0) {
+                this.entityRecordId = entityRecordId;
+                if (!this.toUpdateCols.contains("ENTITY_RECORD_ID")) {
+                    this.toUpdateCols.add("ENTITY_RECORD_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.entityRecordId = entityRecordId;
+            if (!this.toUpdateCols.contains("ENTITY_RECORD_ID")) {
+                this.toUpdateCols.add("ENTITY_RECORD_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 所属的个人周报。
+     */
+    private String hrWeeklyReportIdPerson;
+
+    /**
+     * 获取：所属的个人周报。
+     */
+    public String getHrWeeklyReportIdPerson() {
+        return this.hrWeeklyReportIdPerson;
+    }
+
+    /**
+     * 设置：所属的个人周报。
+     */
+    public HrWeeklyReportDtl setHrWeeklyReportIdPerson(String hrWeeklyReportIdPerson) {
+        if (this.hrWeeklyReportIdPerson == null && hrWeeklyReportIdPerson == null) {
+            // 均为null，不做处理。
+        } else if (this.hrWeeklyReportIdPerson != null && hrWeeklyReportIdPerson != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.hrWeeklyReportIdPerson.compareTo(hrWeeklyReportIdPerson) != 0) {
+                this.hrWeeklyReportIdPerson = hrWeeklyReportIdPerson;
+                if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_PERSON")) {
+                    this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_PERSON");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.hrWeeklyReportIdPerson = hrWeeklyReportIdPerson;
+            if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_PERSON")) {
+                this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_PERSON");
             }
         }
         return this;
@@ -1128,6 +1220,114 @@ public class HrWeeklyReportDtl {
             this.batchId = batchId;
             if (!this.toUpdateCols.contains("BATCH_ID")) {
                 this.toUpdateCols.add("BATCH_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 周期明细。
+     */
+    private String hrPeriodDtlId;
+
+    /**
+     * 获取：周期明细。
+     */
+    public String getHrPeriodDtlId() {
+        return this.hrPeriodDtlId;
+    }
+
+    /**
+     * 设置：周期明细。
+     */
+    public HrWeeklyReportDtl setHrPeriodDtlId(String hrPeriodDtlId) {
+        if (this.hrPeriodDtlId == null && hrPeriodDtlId == null) {
+            // 均为null，不做处理。
+        } else if (this.hrPeriodDtlId != null && hrPeriodDtlId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.hrPeriodDtlId.compareTo(hrPeriodDtlId) != 0) {
+                this.hrPeriodDtlId = hrPeriodDtlId;
+                if (!this.toUpdateCols.contains("HR_PERIOD_DTL_ID")) {
+                    this.toUpdateCols.add("HR_PERIOD_DTL_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.hrPeriodDtlId = hrPeriodDtlId;
+            if (!this.toUpdateCols.contains("HR_PERIOD_DTL_ID")) {
+                this.toUpdateCols.add("HR_PERIOD_DTL_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 报告部门。
+     */
+    private String reportDeptId;
+
+    /**
+     * 获取：报告部门。
+     */
+    public String getReportDeptId() {
+        return this.reportDeptId;
+    }
+
+    /**
+     * 设置：报告部门。
+     */
+    public HrWeeklyReportDtl setReportDeptId(String reportDeptId) {
+        if (this.reportDeptId == null && reportDeptId == null) {
+            // 均为null，不做处理。
+        } else if (this.reportDeptId != null && reportDeptId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.reportDeptId.compareTo(reportDeptId) != 0) {
+                this.reportDeptId = reportDeptId;
+                if (!this.toUpdateCols.contains("REPORT_DEPT_ID")) {
+                    this.toUpdateCols.add("REPORT_DEPT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.reportDeptId = reportDeptId;
+            if (!this.toUpdateCols.contains("REPORT_DEPT_ID")) {
+                this.toUpdateCols.add("REPORT_DEPT_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 报告用户。
+     */
+    private String reportUserId;
+
+    /**
+     * 获取：报告用户。
+     */
+    public String getReportUserId() {
+        return this.reportUserId;
+    }
+
+    /**
+     * 设置：报告用户。
+     */
+    public HrWeeklyReportDtl setReportUserId(String reportUserId) {
+        if (this.reportUserId == null && reportUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.reportUserId != null && reportUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.reportUserId.compareTo(reportUserId) != 0) {
+                this.reportUserId = reportUserId;
+                if (!this.toUpdateCols.contains("REPORT_USER_ID")) {
+                    this.toUpdateCols.add("REPORT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.reportUserId = reportUserId;
+            if (!this.toUpdateCols.contains("REPORT_USER_ID")) {
+                this.toUpdateCols.add("REPORT_USER_ID");
             }
         }
         return this;
