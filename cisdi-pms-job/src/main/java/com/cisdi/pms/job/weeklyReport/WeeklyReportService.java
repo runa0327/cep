@@ -57,7 +57,7 @@ public class WeeklyReportService {
                 Map<String, Object> user = jdbcTemplate.queryForMap("select * from ad_user t where t.id=?", userId);
 
                 // 重建用户周报：
-                createPersonReport(periodDlt, deptId, user, batchId, notiDeptProcIdList, notiLeaderProcIdList,processedProcIdToEndViewIdMap);
+                createPersonReport(periodDlt, deptId, user, batchId, notiDeptProcIdList, notiLeaderProcIdList, processedProcIdToEndViewIdMap);
             });
         }
 
@@ -92,6 +92,9 @@ public class WeeklyReportService {
             Map<String, Object> user = jdbcTemplate.queryForMap("select * from ad_user t where t.id=?", Constants.generalManangerUserId);
             createDeptLeaderGmReport(periodDlt, deptIdList, user, batchId, "G", "HR_WEEKLY_REPORT_ID_GM");
         }
+
+        // 删除“未涉及”用户的周报：
+        jdbcTemplate.update("DELETE FROM HR_WEEKLY_REPORT T WHERE T.REPORT_USER_ID IN(SELECT X.ID FROM AD_USER X WHERE X.CODE='NOUSER') AND T.BATCH_ID=?", batchId);
 
         // 更改为AP，表示生效了：
         jdbcTemplate.update("UPDATE hr_weekly_report T SET T.`STATUS`='AP' WHERE T.BATCH_ID=?", batchId);
@@ -156,14 +159,14 @@ public class WeeklyReportService {
         // 关键过滤条件：流程实例首个待办任务、操作时间在本周
         List<Map<String, Object>> startList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.`STATUS`='AP' AND EXISTS(SELECT 1 FROM WF_TASK TK WHERE TK.WF_PROCESS_INSTANCE_ID=PI.ID AND TK.`STATUS`='AP' AND TK.IS_PROC_INST_FIRST_TODO_TASK=1 AND TK.AD_USER_ID=? AND TK.ACT_DATETIME BETWEEN ? AND ?)", userId, fromDate, toDatePlus1Day);
         for (Map<String, Object> row : startList) {
-            insertReportDtl(newReportId, row.get("WF_PROCESS_ID"), row.get("ID"), true, false, batchId, row, false, false, false, periodDtlId, deptId, userId,getEndViewId(processedProcIdToEndViewIdMap,JdbcMapUtil.getString(row,"WF_PROCESS_ID")),JdbcMapUtil.getString(row,"ENT_CODE"),JdbcMapUtil.getString(row,"ENTITY_RECORD_ID"));
+            insertReportDtl(newReportId, row.get("WF_PROCESS_ID"), row.get("ID"), true, false, batchId, row, false, false, false, periodDtlId, deptId, userId, getEndViewId(processedProcIdToEndViewIdMap, JdbcMapUtil.getString(row, "WF_PROCESS_ID")), JdbcMapUtil.getString(row, "ENT_CODE"), JdbcMapUtil.getString(row, "ENTITY_RECORD_ID"));
         }
 
         // 获取协办列表：
         // 关键过滤条件：操作的节点为TRX节点，操作时间在本周
         List<Map<String, Object>> unendList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.`STATUS`='AP' AND EXISTS(SELECT 1 FROM WF_TASK TK,AD_ACT A,WF_NODE N WHERE TK.WF_PROCESS_INSTANCE_ID=PI.ID AND TK.`STATUS`='AP' AND TK.AD_ACT_ID=A.ID/* AND A.AD_ACT_DIRECTION_ID IN('FORWARD')*/ AND TK.AD_USER_ID=? AND TK.WF_NODE_ID=N.ID AND IFNULL(INSTR(N.EXTRA_INFO,'ASSIST'),0)>0 AND TK.ACT_DATETIME BETWEEN ? AND ?)", userId, fromDate, toDatePlus1Day);
         for (Map<String, Object> row : unendList) {
-            insertReportDtl(newReportId, row.get("WF_PROCESS_ID"), row.get("ID"), false, false, batchId, row, true, false, false, periodDtlId, deptId, userId,getEndViewId(processedProcIdToEndViewIdMap,JdbcMapUtil.getString(row,"WF_PROCESS_ID")),JdbcMapUtil.getString(row,"ENT_CODE"),JdbcMapUtil.getString(row,"ENTITY_RECORD_ID"));
+            insertReportDtl(newReportId, row.get("WF_PROCESS_ID"), row.get("ID"), false, false, batchId, row, true, false, false, periodDtlId, deptId, userId, getEndViewId(processedProcIdToEndViewIdMap, JdbcMapUtil.getString(row, "WF_PROCESS_ID")), JdbcMapUtil.getString(row, "ENT_CODE"), JdbcMapUtil.getString(row, "ENTITY_RECORD_ID"));
         }
 
         // 获取办结列表：
@@ -174,7 +177,7 @@ public class WeeklyReportService {
             boolean notiDeptOnEnd = notiDeptProcIdList.contains(procId.toString());
             boolean notiLeaderOnEnd = notiLeaderProcIdList.contains(procId.toString());
 
-            insertReportDtl(newReportId, procId, row.get("ID"), false, true, batchId, row, false, notiDeptOnEnd, notiLeaderOnEnd, periodDtlId, deptId, userId,getEndViewId(processedProcIdToEndViewIdMap,JdbcMapUtil.getString(row,"WF_PROCESS_ID")),JdbcMapUtil.getString(row,"ENT_CODE"),JdbcMapUtil.getString(row,"ENTITY_RECORD_ID"));
+            insertReportDtl(newReportId, procId, row.get("ID"), false, true, batchId, row, false, notiDeptOnEnd, notiLeaderOnEnd, periodDtlId, deptId, userId, getEndViewId(processedProcIdToEndViewIdMap, JdbcMapUtil.getString(row, "WF_PROCESS_ID")), JdbcMapUtil.getString(row, "ENT_CODE"), JdbcMapUtil.getString(row, "ENTITY_RECORD_ID"));
         }
     }
 
