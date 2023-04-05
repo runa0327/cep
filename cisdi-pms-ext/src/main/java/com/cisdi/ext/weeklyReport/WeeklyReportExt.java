@@ -91,6 +91,9 @@ public class WeeklyReportExt {
 
         }
 
+        // 合并报表明细列表：
+        mergeReportDtlList(report);
+
         // 占比统计：
         calcProportionStat(report);
 
