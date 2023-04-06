@@ -600,6 +600,9 @@ public class WeeklyReportExt {
             reportDtl.startDate = JdbcMapUtil.getString(item, "START_DATE");
             reportDtl.endDate = JdbcMapUtil.getString(item, "END_DATE");
 
+            reportDtl.isFinanceProc = JdbcMapUtil.getBoolean(item, "IS_FINANCE_PROC");
+            reportDtl.isProcureProc = JdbcMapUtil.getBoolean(item, "IS_PROCURE_PROC");
+
             return reportDtl;
         }).collect(Collectors.toList());
     }
@@ -744,6 +747,9 @@ public class WeeklyReportExt {
 
         public String startDate;
         public String endDate;
+
+        public boolean isFinanceProc;
+        public boolean isProcureProc;
 
         /**
          * 合并流程实例后，若发起，则发起的用户的姓名拼接在此。如：张三,李四。通常，只有1个发起用户。
