@@ -13,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -56,7 +57,7 @@ public class PmStartExt {
                 " LEFT JOIN gr_set_value ss ON ss.id = ps.PRJ_START_STATUS_ID  " +
                 " left join ad_user au on au.id = ps.AGENT " +
                 " left join gr_set_value gg on gg.id = ps.TENDER_MODE_ID " +
-                " left join pm_prj pj on pj.pm_code = ps.pm_code "+
+                " left join pm_prj pj on pj.pm_code = ps.pm_code " +
                 " WHERE " +
                 " ps.`STATUS` = 'ap'");
         if (!StringUtils.isEmpty(map.get("projectName"))) {
@@ -188,8 +189,8 @@ public class PmStartExt {
             id = Crud.from("PRJ_START").insertData();
             prjCode = PmPrjCodeUtil.getPrjCode();
         }
-        if(Strings.isNullOrEmpty(status)){
-            status ="1636549534274465792";
+        if (Strings.isNullOrEmpty(status)) {
+            status = "1636549534274465792";
         }
         List<parcel> parcels = input.parcels;
         String location = JSON.toJSON(parcels).toString();
@@ -294,6 +295,7 @@ public class PmStartExt {
 
     /**
      * 创建项目进展等信息
+     *
      * @param dataMap
      */
     private void createOtherInfo(Map<String, Object> dataMap) {
@@ -368,7 +370,51 @@ public class PmStartExt {
                 , BigDecimalUtil.divide(JdbcMapUtil.getBigDecimal(dataMap, "PRJ_TOTAL_INVEST"), new BigDecimal(10000)), JdbcMapUtil.getString(dataMap, "TENDER_MODE_ID"));
         //刷新进度节点时间
         PrjPlanUtil.refreshProPlanTime(projectId, JdbcMapUtil.getDate(dataMap, "START_TIME"));
+        //发送本周任务
+        sendWeekTask(projectId);
 
+    }
+
+    /**
+     * 发送本周任务
+     *
+     * @param projectId
+     */
+    private void sendWeekTask(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pm.`NAME` as prjName,pppn.*,pi.AD_USER_ID as default_user,pm.id as projectId from pm_pro_plan_node pppn \n" +
+                "left join pm_pro_plan ppp on ppp.id = pppn.PM_PRO_PLAN_ID \n" +
+                "left join pm_prj pm on pm.id = ppp.PM_PRJ_ID \n" +
+                "left join POST_INFO pi on pi.id = pppn.POST_INFO_ID \n" +
+                "where pm.id=?", projectId);
+        if (!CollectionUtils.isEmpty(nodeList)) {
+            List<Map<String, Object>> firstNodeList = nodeList.stream().filter(p -> 1 == JdbcMapUtil.getInt(p, "LEVEL")).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(firstNodeList)) {
+                Map<String, Object> firstNode = firstNodeList.get(0);
+                List<Map<String, Object>> secondNodeList = nodeList.stream().filter(p -> Objects.equals(firstNode.get("ID"), p.get("PM_PRO_PLAN_NODE_PID"))).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(secondNodeList)) {
+                    Map<String, Object> secondNode = secondNodeList.get(0);
+                    List<Map<String, Object>> threeNodeList = nodeList.stream().filter(p -> Objects.equals(secondNode.get("ID"), p.get("PM_PRO_PLAN_NODE_PID"))).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(threeNodeList)) {
+                        Map<String, Object> threeNode = threeNodeList.get(0);
+
+                        String msg = "{0}【{1}】计划将在{2}开始，请及时处理！";
+                        String id = Crud.from("WEEK_TASK").insertData();
+
+                        String userId = JdbcMapUtil.getString(threeNode, "CHIEF_USER_ID");
+                        if (Objects.isNull(threeNode.get("CHIEF_USER_ID"))) {
+                            userId = JdbcMapUtil.getString(threeNode, "default_user");
+                        }
+                        String title = MessageFormat.format(msg, threeNode.get("prjName"), threeNode.get("NAME"), threeNode.get("PLAN_START_DATE"));
+                        myJdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=?,CAN_DISPATCH='0',PM_PRJ_ID=? where id=?",
+                                userId, title, title, new Date(), "1634118574056542208", "1635080848313290752", threeNode.get("ID"), threeNode.get("projectId"), id);
+                    }
+
+                }
+
+            }
+
+        }
     }
 
     /**
@@ -387,11 +433,11 @@ public class PmStartExt {
     /**
      * 测试用-刷新项目的时间
      */
-    public void refreshNodeTime(){
+    public void refreshNodeTime() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        String projectId = JdbcMapUtil.getString(map,"projectId");
+        String projectId = JdbcMapUtil.getString(map, "projectId");
         Date paramDate = DateTimeUtil.stringToDate("2023-03-15");
-        PrjPlanUtil.refreshProPlanTime(projectId,paramDate);
+        PrjPlanUtil.refreshProPlanTime(projectId, paramDate);
     }
 
     public static class OutSide {

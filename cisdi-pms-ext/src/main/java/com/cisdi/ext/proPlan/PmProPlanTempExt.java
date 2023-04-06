@@ -9,6 +9,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
+import javax.jws.Oneway;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -236,6 +237,9 @@ public class PmProPlanTempExt {
         sb.append(",`LEVEL`=").append(input.level);
         sb.append(" where id='").append(id).append("'");
         myJdbcTemplate.update(sb.toString());
+        Map<String,String> obj = new HashMap<>();
+        obj.put("proPlanId",proPlanId);
+        ExtJarHelper.returnValue.set(obj);
     }
 
     /**

@@ -29,47 +29,58 @@ public class PrjPlanUtil {
             Map<String, Object> proMap = list.get(0);
             String proPlanId = JdbcMapUtil.getString(proMap, "ID");
             List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PM_PRO_PLAN_ID=?", proPlanId);
+            if (!CollectionUtils.isEmpty(nodeList)) {
+                List<Map<String, Object>> firstNodeList = nodeList.stream().filter(p -> 1 == JdbcMapUtil.getInt(p, "LEVEL")).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(firstNodeList)) {
+                    Map<String, Object> firstNode = firstNodeList.get(0);
+                    List<Map<String, Object>> secondNodeList = nodeList.stream().filter(p -> Objects.equals(firstNode.get("ID"), p.get("PM_PRO_PLAN_NODE_PID"))).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(secondNodeList)) {
+                        Map<String, Object> secondNode = secondNodeList.get(0);
+                        List<Map<String, Object>> threeNodeList = nodeList.stream().filter(p -> Objects.equals(secondNode.get("ID"), p.get("PM_PRO_PLAN_NODE_PID"))).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+                        if (!CollectionUtils.isEmpty(threeNodeList)) {
+                            Map<String, Object> threeNode = threeNodeList.get(0);
 
-            List<Map<String, Object>> firstNodeList = nodeList.stream().filter(p -> 1 == JdbcMapUtil.getInt(p, "LEVEL")).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
-            Map<String, Object> firstNode = firstNodeList.get(0);
-            List<Map<String, Object>> secondNodeList = nodeList.stream().filter(p -> Objects.equals(firstNode.get("ID"), p.get("PM_PRO_PLAN_NODE_PID"))).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
-            Map<String, Object> secondNode = secondNodeList.get(0);
-            List<Map<String, Object>> threeNodeList = nodeList.stream().filter(p -> Objects.equals(secondNode.get("ID"), p.get("PM_PRO_PLAN_NODE_PID"))).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
-            Map<String, Object> threeNode = threeNodeList.get(0);
+                            SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
+                            int totalDays = JdbcMapUtil.getInt(threeNode, "PLAN_TOTAL_DAYS");
+                            Date completeDate = DateTimeUtil.addDays(paramDate, totalDays);
 
-            SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
-            int totalDays = JdbcMapUtil.getInt(threeNode, "PLAN_TOTAL_DAYS");
-            Date completeDate = DateTimeUtil.addDays(paramDate, totalDays);
+                            List<Map<String, Object>> threeList = nodeList.stream().filter(p -> 3 == JdbcMapUtil.getInt(p, "LEVEL")).collect(Collectors.toList());
 
-            List<Map<String, Object>> threeList = nodeList.stream().filter(p -> 3 == JdbcMapUtil.getInt(p, "LEVEL")).collect(Collectors.toList());
+                            threeList.forEach(m -> {
+                                if (Objects.equals(m.get("ID"), threeNode.get("ID"))) {
+                                    m.put("PLAN_START_DATE", sp.format(paramDate));
+                                    m.put("PLAN_COMPL_DATE", sp.format(completeDate));
+                                }
+                                if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_START_DATE"))) {
+                                    List<Map<String, Object>> preList = getPreList(m, threeList);
+                                    if (!CollectionUtils.isEmpty(preList)) {
+                                        preList.forEach(item -> {
+                                            Date dateOrg = DateTimeUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"));
+                                            int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
+                                            Date endDate = DateTimeUtil.addDays(dateOrg, days);
+                                            item.put("PLAN_START_DATE", sp.format(dateOrg));
+                                            item.put("PLAN_COMPL_DATE", sp.format(endDate));
+                                        });
+                                    }
+                                }
+                            });
+                            StringBuilder sb = new StringBuilder();
+                            threeList.forEach(item -> {
+                                if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(item, "PLAN_START_DATE"))) {
+                                    sb.append("update pm_pro_plan_node set PLAN_START_DATE='").append(item.get("PLAN_START_DATE"))
+                                            .append("', PLAN_COMPL_DATE ='").append(item.get("PLAN_COMPL_DATE")).append("' where id='").append(item.get("ID")).append("' ;");
+                                }
+                            });
+                            myJdbcTemplate.update(sb.toString());
+                            updateNodeTime(projectId);
+                        }
 
-            threeList.forEach(m -> {
-                if (Objects.equals(m.get("ID"), threeNode.get("ID"))) {
-                    m.put("PLAN_START_DATE", sp.format(paramDate));
-                    m.put("PLAN_COMPL_DATE", sp.format(completeDate));
-                }
-                if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_START_DATE"))) {
-                    List<Map<String, Object>> preList = getPreList(m, threeList);
-                    if (!CollectionUtils.isEmpty(preList)) {
-                        preList.forEach(item -> {
-                            Date dateOrg = DateTimeUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"));
-                            int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
-                            Date endDate = DateTimeUtil.addDays(dateOrg, days);
-                            item.put("PLAN_START_DATE", sp.format(dateOrg));
-                            item.put("PLAN_COMPL_DATE", sp.format(endDate));
-                        });
                     }
+
                 }
-            });
-            StringBuilder sb = new StringBuilder();
-            threeList.forEach(item -> {
-                if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(item, "PLAN_START_DATE"))) {
-                    sb.append("update pm_pro_plan_node set PLAN_START_DATE='").append(item.get("PLAN_START_DATE"))
-                            .append("', PLAN_COMPL_DATE ='").append(item.get("PLAN_COMPL_DATE")).append("' where id='").append(item.get("ID")).append("' ;");
-                }
-            });
-            myJdbcTemplate.update(sb.toString());
-            updateNodeTime(projectId);
+
+            }
+
         }
     }
 
