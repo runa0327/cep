@@ -2,6 +2,7 @@ package com.cisdi.ext.pm;
 
 import com.cisdi.ext.api.PoOrderExtApi;
 import com.cisdi.ext.util.DateTimeUtil;
+import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -456,5 +457,82 @@ public class PoOrderSupplementReqExt {
         Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("id",entityRecord.csCommId).update().set("DATE_FIVE",expireDate).exec();
         //将合同数据写入传输至合同数据表(po_order)
 //        PoOrderExtApi.createData(entityRecord,"PO_ORDER_SUPPLEMENT_REQ","0100070673610715221",myJdbcTemplate);
+    }
+
+    /**
+     * 流程操作-补充协议-确认操作
+     */
+    public void orderSupplementProcessOK(){
+        String status = "OK";
+        String nodeId = ExtJarHelper.nodeId.get();
+        String nodeStatus = getNodeStatus(status,nodeId);
+        processHandle(nodeStatus,status);
+    }
+
+    /**
+     * 流程操作-补充协议-拒绝操作
+     */
+    public void orderSupplementProcessRefuse(){
+        String status = "refuse";
+        String nodeId = ExtJarHelper.nodeId.get();
+        String nodeStatus = getNodeStatus(status,nodeId);
+        processHandle(nodeStatus,status);
+    }
+
+    /**
+     * 流程流程操作详细处理逻辑
+     * @param nodeStatus 节点状态码
+     * @param status 流程操作状态码
+     */
+    private void processHandle(String nodeStatus, String status) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        String userName = ExtJarHelper.loginInfo.get().userName;
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId;
+        String procInstId = ExtJarHelper.procInstId.get();
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        if ("OK".equals(status)){
+            if ("start".equals(nodeStatus) || "caiHuaStart".equals(nodeStatus) || "secondStart".equals(nodeStatus)){
+                WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
+            }
+        } else {
+            if ("lawyerRefuse".equals(nodeStatus)){ // 法律审批拒绝
+                ProcessCommon.clearData("APPROVAL_COMMENT_ONE,FILE_ID_SIX",csCommId,entCode,myJdbcTemplate);
+            } else if ("financeLegalRefuse".equals(nodeStatus)){ //财务部法务部审批-通过
+                ProcessCommon.clearData("APPROVAL_COMMENT_TWO,FILE_ID_TWO,APPROVAL_COMMENT_THREE,FILE_ID_THREE",csCommId,entCode,myJdbcTemplate);
+            }
+        }
+    }
+
+    /**
+     * 各审批节点赋值
+     * @param status 状态码
+     * @param nodeId 节点id
+     * @return 节点状态名称
+     */
+    private String getNodeStatus(String status, String nodeId) {
+        String nodeName = "";
+        if ("OK".equals(status)){
+            if ("0099902212142022658".equals(nodeId)){ //1-发起
+                nodeName = "start";
+            } else if ("0099902212142022659".equals(nodeId)){ //4-才华预审
+                nodeName = "caiHuaStart";
+            } else if ("0099902212142022662".equals(nodeId)){ //8-发起人重新提交
+                nodeName = "secondStart";
+            } else if ("0099952822476418938".equals(nodeId)){ //6-法律审核意见-通过
+                nodeName = "lawyerOK";
+            } else if ("0099902212142022661".equals(nodeId)){ //7-财务部法务部审批-通过
+                nodeName = "financeLegalOK";
+            }
+        } else {
+            if ("0099952822476418938".equals(nodeId)){ //6-法律审核意见-拒绝
+                nodeName = "lawyerRefuse";
+            } else if ("0099902212142022661".equals(nodeId)){ //7-财务部法务部审批-拒绝
+                nodeName = "financeLegalRefuse";
+            }
+        }
+        return nodeName;
     }
 }

@@ -568,7 +568,7 @@ public class PoOrderReqExt {
         } else {
             if ("lawyerRefuse".equals(nodeStatus)){ // 法律审批拒绝
                 ProcessCommon.clearData("FILE_ID_SIX,TEXT_REMARK_TWO",csCommId,entCode,myJdbcTemplate);
-            } else if ("financeLegalOK".equals(nodeStatus)){ //财务部法务部审批-通过
+            } else if ("financeLegalRefuse".equals(nodeStatus)){ //财务部法务部审批-通过
                 ProcessCommon.clearData("FILE_ID_THREE,TEXT_REMARK_THREE,FILE_ID_TWO,TEXT_REMARK_FOUR",csCommId,entCode,myJdbcTemplate);
             }
         }
