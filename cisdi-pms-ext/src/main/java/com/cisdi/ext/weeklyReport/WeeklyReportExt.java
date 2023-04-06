@@ -8,7 +8,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
-import com.qygly.shared.ad.login.LoginInfo;
+import com.qygly.shared.interaction.CodeName;
 import com.qygly.shared.interaction.IdText;
 import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -25,6 +25,88 @@ public class WeeklyReportExt {
 
     public enum WeeklyReportType {
         P, D, L, G,
+    }
+
+    public void getLeaderInfoList() {
+        List<LeaderInfo> list = new ArrayList<>(4);
+
+        {
+            LeaderInfo leaderInfo = new LeaderInfo();
+            list.add(leaderInfo);
+
+            leaderInfo.leaderType = new CodeName();
+            leaderInfo.leaderType.code = LeaderType.FinanceLeader.toString();
+            leaderInfo.leaderType.name = "财务分管领导";
+
+            leaderInfo.user = new IdText();
+            leaderInfo.user.id = "0099902212142027203";
+            leaderInfo.user.text = "王小冬";
+
+            leaderInfo.extApiCode = "getFinanceLeaderWeeklyReport";
+        }
+
+        {
+            LeaderInfo leaderInfo = new LeaderInfo();
+            list.add(leaderInfo);
+
+            leaderInfo.leaderType = new CodeName();
+            leaderInfo.leaderType.code = LeaderType.ProcureLeader.toString();
+            leaderInfo.leaderType.name = "采购分管领导";
+
+            leaderInfo.user = new IdText();
+            leaderInfo.user.id = "0099952822476371838";
+            leaderInfo.user.text = "吴坤苗";
+
+            leaderInfo.extApiCode = "getProcureLeaderWeeklyReport";
+        }
+
+        {
+            LeaderInfo leaderInfo = new LeaderInfo();
+            list.add(leaderInfo);
+
+            leaderInfo.leaderType = new CodeName();
+            leaderInfo.leaderType.code = LeaderType.EngineeringLeader.toString();
+            leaderInfo.leaderType.name = "工程分管领导";
+
+            leaderInfo.user = new IdText();
+            leaderInfo.user.id = "0099902212142088949";
+            leaderInfo.user.text = "张景峰";
+
+            leaderInfo.extApiCode = "getLeaderWeeklyReport";
+        }
+
+        {
+            LeaderInfo leaderInfo = new LeaderInfo();
+            list.add(leaderInfo);
+
+            leaderInfo.leaderType = new CodeName();
+            leaderInfo.leaderType.code = LeaderType.CostLeader.toString();
+            leaderInfo.leaderType.name = "成本分管领导";
+
+            leaderInfo.user = new IdText();
+            leaderInfo.user.id = "1628695703503114240";
+            leaderInfo.user.text = "李宁";
+
+            leaderInfo.extApiCode = "getLeaderWeeklyReport";
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("leaderInfoList", list);
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(map), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+    }
+
+    public static class LeaderInfo {
+        public CodeName leaderType;
+        public IdText user;
+        public String extApiCode;
+    }
+
+    public enum LeaderType {
+        FinanceLeader,
+        ProcureLeader,
+        EngineeringLeader,
+        CostLeader,
     }
 
     /**
@@ -113,6 +195,7 @@ public class WeeklyReportExt {
                 endProcInst.viewId = item.viewId;
                 endProcInst.entCode = item.entCode;
                 endProcInst.entityRecordId = item.entityRecordId;
+                endProcInst.procInstId = item.procInst.procInstId;
                 return endProcInst;
             }).distinct().collect(Collectors.toList());
             return deptEndStat;
@@ -222,6 +305,9 @@ public class WeeklyReportExt {
         Map<String, List<ReportDtl>> map = report.reportDtlList.stream().collect(Collectors.groupingBy(item -> item.procInst.procInstId));
         report.reportDtlList = map.entrySet().stream().map(item -> {
             List<ReportDtl> list = item.getValue();
+            String startUserNames = list.stream().filter(row -> row.isStart).map(row -> row.user.text).sorted(String::compareTo).distinct().collect(Collectors.joining(","));
+            String trxUserNames = list.stream().filter(row -> row.isEnd).map(row -> row.user.text).sorted(String::compareTo).distinct().collect(Collectors.joining(","));
+
             ReportDtl merged = list.get(0);
             merged.dept = null;
             merged.user = null;
@@ -236,6 +322,15 @@ public class WeeklyReportExt {
                     merged.isNotiLeaderOnEnd = row.isNotiLeaderOnEnd || merged.isNotiLeaderOnEnd;
                 }
             }
+
+            if (!SharedUtil.isEmptyString(startUserNames)) {
+                merged.startUserNames = startUserNames;
+            }
+
+            if (!SharedUtil.isEmptyString(trxUserNames)) {
+                merged.trxUserNames = trxUserNames;
+            }
+
             return merged;
         }).collect(Collectors.toList());
     }
@@ -307,6 +402,9 @@ public class WeeklyReportExt {
 
         report.reportId = reportId;
 
+        // 合并报表明细列表：
+        mergeReportDtlList(report);
+
         setBaseReportAsReturnValue(report);
     }
 
@@ -317,14 +415,17 @@ public class WeeklyReportExt {
      * @return
      */
     private List<HrWeeklyReport> getNewerPersonReportList(String reportId) {
-        return HrWeeklyReport.selectByWhere(new Where().eq(HrWeeklyReport.Cols.HR_WEEKLY_REPORT_TYPE_ID, WeeklyReportType.P.toString()).eq(HrWeeklyReport.Cols.REPORT_USER_ID, ExtJarHelper.loginInfo.get().userId).eq(HrWeeklyReport.Cols.STATUS, "AP").gt(HrWeeklyReport.Cols.ID, reportId), Arrays.asList(HrWeeklyReport.Cols.ID), null);
+        HrWeeklyReport hrWeeklyReport = HrWeeklyReport.selectById(reportId);
+
+        return HrWeeklyReport.selectByWhere(new Where().eq(HrWeeklyReport.Cols.HR_WEEKLY_REPORT_TYPE_ID, WeeklyReportType.P.toString()).eq(HrWeeklyReport.Cols.REPORT_USER_ID, hrWeeklyReport.getReportUserId()).eq(HrWeeklyReport.Cols.STATUS, "AP").gt(HrWeeklyReport.Cols.ID, reportId), Arrays.asList(HrWeeklyReport.Cols.ID), null);
     }
 
     public void submitPersonWeeklyReport() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        String reportId = String.valueOf(map.get("reportId"));
-        String reportRemark = String.valueOf(map.get("reportRemark"));
-        String reportFile = String.valueOf(map.get("reportFile"));
+        String reportId = SharedUtil.isEmptyObject(map.get("reportId")) ? null : String.valueOf(map.get("reportId"));
+        String reportRemark = SharedUtil.isEmptyObject(map.get("reportRemark")) ? null : String.valueOf(map.get("reportRemark"));
+        String reportFile = SharedUtil.isEmptyObject(map.get("reportFile")) ? null : String.valueOf(map.get("reportFile"));
+
 
         if (SharedUtil.isEmptyString(reportId)) {
             throw new BaseException("周报ID不能为空！");
@@ -357,11 +458,12 @@ public class WeeklyReportExt {
     private BaseReport getBaseReport(WeeklyReportType weeklyReportType, String parentAttCode) {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String peroidDtlId = String.valueOf(map.get("peroidDtlId"));
+        // 若参数里有userId，则以参数为准；否则以当前登录用户ID为准：
+        // TODO 230406 控制权限，不能随意查看别人的周报：
+        String userId = SharedUtil.isEmptyObject(map.get("userId")) ? ExtJarHelper.loginInfo.get().userId : String.valueOf(map.get("userId"));
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
-        LoginInfo loginInfo = ExtJarHelper.loginInfo.get();
-
-        List<HrWeeklyReport> hrWeeklyReportList = HrWeeklyReport.selectByWhere(new Where().eq(HrWeeklyReport.Cols.HR_PERIOD_DTL_ID, peroidDtlId).eq(HrWeeklyReport.Cols.HR_WEEKLY_REPORT_TYPE_ID, weeklyReportType.toString()).eq(HrWeeklyReport.Cols.REPORT_USER_ID, loginInfo.userId).eq(HrWeeklyReport.Cols.STATUS, "AP"));
+        List<HrWeeklyReport> hrWeeklyReportList = HrWeeklyReport.selectByWhere(new Where().eq(HrWeeklyReport.Cols.HR_PERIOD_DTL_ID, peroidDtlId).eq(HrWeeklyReport.Cols.HR_WEEKLY_REPORT_TYPE_ID, weeklyReportType.toString()).eq(HrWeeklyReport.Cols.REPORT_USER_ID, userId).eq(HrWeeklyReport.Cols.STATUS, "AP"));
 
         HrWeeklyReport hrWeeklyReport = SharedUtil.isEmptyList(hrWeeklyReportList) ? null : hrWeeklyReportList.stream().sorted(Comparator.comparing(HrWeeklyReport::getId)).findFirst().get();
 
@@ -495,6 +597,7 @@ public class WeeklyReportExt {
                 public String viewId;
                 public String entCode;
                 public String entityRecordId;
+                public String procInstId;
             }
         }
     }
@@ -568,6 +671,16 @@ public class WeeklyReportExt {
 
         public String startDate;
         public String endDate;
+
+        /**
+         * 合并流程实例后，若发起，则发起的用户的姓名拼接在此。如：张三,李四。通常，只有1个发起用户。
+         */
+        public String startUserNames;
+
+        /**
+         * 合并流程实例后，若办结，则办理的用户的姓名拼接在此。如：张三,李四
+         */
+        public String trxUserNames;
     }
 
     public static class Prj {
