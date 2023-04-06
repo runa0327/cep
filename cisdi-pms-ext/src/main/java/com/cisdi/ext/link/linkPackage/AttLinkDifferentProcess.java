@@ -67,7 +67,7 @@ public class AttLinkDifferentProcess {
         list.add("PO_GUARANTEE_LETTER_REQUIRE_REQ"); // 新增保函申请
         list.add("PO_GUARANTEE_LETTER_RETURN_OA_REQ"); // 保函退还申请
 //        list.add("PO_ORDER_SUPPLEMENT_REQ"); // 采购合同补充协议申请
-        list.add("PO_ORDER_TERMINATE_REQ"); // 采购合同终止申请
+//        list.add("PO_ORDER_TERMINATE_REQ"); // 采购合同终止申请
         list.add("PO_ORDER_CHANGE_REQ"); // 采购合同变更申请
         list.add("PM_PRJ_PARTY_REQ"); // 五方责任主体维护申请
         list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
