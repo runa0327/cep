@@ -113,46 +113,7 @@ public class WeeklyReportExt {
      * 财务分管领导。
      */
     public void getFinanceLeaderWeeklyReport() {
-        getLeaderWeeklyReport();
-    }
-
-    /**
-     * 采购分管领导。
-     */
-    public void getProcureLeaderWeeklyReport() {
-        getLeaderWeeklyReport();
-    }
-
-    /**
-     * 董事长。
-     */
-    public void getChairmanWeeklyReport() {
-        getLeaderWeeklyReport();
-    }
-
-    /**
-     * 书记。
-     */
-    public void getSecretaryWeeklyReport() {
-        getLeaderWeeklyReport();
-    }
-
-    public void getGmWeeklyReport() {
-        getLeaderGmWeeklyReport(WeeklyReportType.G, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_GM);
-    }
-
-    public void getLeaderWeeklyReport() {
-        getLeaderGmWeeklyReport(WeeklyReportType.L, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_LEADER);
-    }
-
-    /**
-     * 获取分管领导、总经理周报。
-     *
-     * @param weeklyReportType
-     * @param parentAttCode
-     */
-    private void getLeaderGmWeeklyReport(WeeklyReportType weeklyReportType, String parentAttCode) {
-        LeaderGmReport report = (LeaderGmReport) getBaseReport(weeklyReportType, parentAttCode);
+        LeaderGmReport report = (LeaderGmReport) getBaseReport(WeeklyReportType.L, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_LEADER, true, null);
         if (report == null) {
             return;
         }
@@ -169,6 +130,84 @@ public class WeeklyReportExt {
         // 计算日期统计列表：
         calcDateStatList(report);
 
+        setBaseReportAsReturnValue(report);
+    }
+
+    /**
+     * 采购分管领导。
+     */
+    public void getProcureLeaderWeeklyReport() {
+        LeaderGmReport report = (LeaderGmReport) getBaseReport(WeeklyReportType.L, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_LEADER, null, true);
+        if (report == null) {
+            return;
+        }
+
+        // 计算部门办结流程实例Map：
+        calcDeptEndProcInstMap(report);
+
+        // 合并报表明细列表：
+        mergeReportDtlList(report);
+
+        // 占比统计：
+        calcProportionStat(report);
+
+        // 计算日期统计列表：
+        calcDateStatList(report);
+
+        setBaseReportAsReturnValue(report);
+    }
+
+    /**
+     * 董事长。
+     */
+    public void getChairmanWeeklyReport() {
+        LeaderGmReport report = (LeaderGmReport) getBaseReport(WeeklyReportType.L, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_GM, null, null);
+        if (report == null) {
+            return;
+        }
+
+        // 计算部门办结流程实例Map：
+        // calcDeptEndProcInstMap(report);
+
+        // 合并报表明细列表：
+        mergeReportDtlList(report);
+
+        // 占比统计：
+        calcProportionStat(report);
+
+        // 计算日期统计列表：
+        calcDateStatList(report);
+
+        setBaseReportAsReturnValue(report);
+    }
+
+    /**
+     * 书记。
+     */
+    public void getSecretaryWeeklyReport() {
+        getChairmanWeeklyReport();
+    }
+
+    /**
+     * 获取分管领导周报。
+     */
+    public void getLeaderWeeklyReport() {
+        LeaderGmReport report = (LeaderGmReport) getBaseReport(WeeklyReportType.L, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_LEADER, null, null);
+        if (report == null) {
+            return;
+        }
+
+        // 计算部门办结流程实例Map：
+        calcDeptEndProcInstMap(report);
+
+        // 合并报表明细列表：
+        mergeReportDtlList(report);
+
+        // 占比统计：
+        calcProportionStat(report);
+
+        // 计算日期统计列表：
+        calcDateStatList(report);
 
         setBaseReportAsReturnValue(report);
     }
@@ -191,11 +230,13 @@ public class WeeklyReportExt {
                 BaseReport.DeptEndStat.EndProcInst endProcInst = new BaseReport.DeptEndStat.EndProcInst();
                 endProcInst.prjName = item.prj.name;
                 endProcInst.procName = item.procInst.procName;
+                endProcInst.procExtraInfo = item.procInst.procExtraInfo;
                 endProcInst.userName = item.user.text;
                 endProcInst.viewId = item.viewId;
                 endProcInst.entCode = item.entCode;
                 endProcInst.entityRecordId = item.entityRecordId;
                 endProcInst.procInstId = item.procInst.procInstId;
+                endProcInst.procInstName = item.procInst.procInstName;
                 return endProcInst;
             }).distinct().collect(Collectors.toList());
             return deptEndStat;
@@ -245,7 +286,7 @@ public class WeeklyReportExt {
     }
 
     public void getDeptWeeklyReport() {
-        DeptReport report = (DeptReport) getBaseReport(WeeklyReportType.D, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_DEPT);
+        DeptReport report = (DeptReport) getBaseReport(WeeklyReportType.D, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_DEPT, null, null);
         if (report == null) {
             return;
         }
@@ -385,7 +426,7 @@ public class WeeklyReportExt {
     }
 
     public void getPersonWeeklyReport() {
-        PersonReport report = (PersonReport) getBaseReport(WeeklyReportType.P, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_PERSON);
+        PersonReport report = (PersonReport) getBaseReport(WeeklyReportType.P, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_PERSON, null, null);
         if (report == null) {
             return;
         }
@@ -455,7 +496,25 @@ public class WeeklyReportExt {
         ExtJarHelper.returnValue.set(outputMap);
     }
 
-    private BaseReport getBaseReport(WeeklyReportType weeklyReportType, String parentAttCode) {
+    private BaseReport getBaseReport(WeeklyReportType weeklyReportType, String parentAttCode, Boolean isFinanceProc, Boolean isProcureProc) {
+        int i = 0;
+        if (!SharedUtil.isEmptyString(parentAttCode)) {
+            i++;
+        }
+        if (!SharedUtil.isEmptyObject(isFinanceProc)) {
+            i++;
+        }
+        if (!SharedUtil.isEmptyObject(isProcureProc)) {
+            i++;
+        }
+
+        if (i == 0) {
+            throw new BaseException("获取BaseReport时，parentAttCode、isFinanceProc、isProcureProc不能全部为空！");
+        } else if (i > 1) {
+            throw new BaseException("获取BaseReport时，parentAttCode、isFinanceProc、isProcureProc最多只能1者非空！");
+        }
+
+
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String peroidDtlId = String.valueOf(map.get("peroidDtlId"));
         // 若参数里有userId，则以参数为准；否则以当前登录用户ID为准：
@@ -483,8 +542,19 @@ public class WeeklyReportExt {
         }
 
         report.hrWeeklyReport = hrWeeklyReport;
+        String batchId = hrWeeklyReport.getBatchId();
 
-        List<Map<String, Object>> hrWeeklyReportDtlList = myJdbcTemplate.queryForList("SELECT D.*,PI.NAME WF_PROCESS_INSTANCE_NAME,P.NAME WF_PROCESS_NAME,PRJ.NAME PM_PRJ_NAME,DEPT.NAME REPORT_DEPT_NAME,USER.NAME REPORT_USER_NAME FROM HR_WEEKLY_REPORT_DTL D JOIN WF_PROCESS_INSTANCE PI ON D." + parentAttCode + "=? AND D.WF_PROCESS_INSTANCE_ID=PI.ID JOIN WF_PROCESS P ON PI.WF_PROCESS_ID=P.ID LEFT JOIN PM_PRJ PRJ ON D.PM_PRJ_ID=PRJ.ID JOIN HR_DEPT DEPT ON D.REPORT_DEPT_ID=DEPT.ID JOIN AD_USER USER ON D.REPORT_USER_ID=USER.ID", hrWeeklyReport.getId());
+        List<Map<String, Object>> hrWeeklyReportDtlList = null;
+
+        if (!SharedUtil.isEmptyString(parentAttCode)) {
+            hrWeeklyReportDtlList = myJdbcTemplate.queryForList("SELECT D.*,PI.NAME WF_PROCESS_INSTANCE_NAME,P.NAME WF_PROCESS_NAME,P.EXTRA_INFO WF_PROCESS_EXTRA_INFO,PRJ.NAME PM_PRJ_NAME,DEPT.NAME REPORT_DEPT_NAME,USER.NAME REPORT_USER_NAME FROM HR_WEEKLY_REPORT_DTL D JOIN WF_PROCESS_INSTANCE PI ON D.BATCH_ID=? AND D." + parentAttCode + "=? AND D.WF_PROCESS_INSTANCE_ID=PI.ID JOIN WF_PROCESS P ON PI.WF_PROCESS_ID=P.ID LEFT JOIN PM_PRJ PRJ ON D.PM_PRJ_ID=PRJ.ID JOIN HR_DEPT DEPT ON D.REPORT_DEPT_ID=DEPT.ID JOIN AD_USER USER ON D.REPORT_USER_ID=USER.ID", batchId, hrWeeklyReport.getId());
+        } else if (!SharedUtil.isEmptyObject(isFinanceProc)) {
+            hrWeeklyReportDtlList = myJdbcTemplate.queryForList("SELECT D.*,PI.NAME WF_PROCESS_INSTANCE_NAME,P.NAME WF_PROCESS_NAME,P.EXTRA_INFO WF_PROCESS_EXTRA_INFO,PRJ.NAME PM_PRJ_NAME,DEPT.NAME REPORT_DEPT_NAME,USER.NAME REPORT_USER_NAME FROM HR_WEEKLY_REPORT_DTL D JOIN WF_PROCESS_INSTANCE PI ON D.BATCH_ID=? AND D.IS_FINANCE_PROC=1 AND D.WF_PROCESS_INSTANCE_ID=PI.ID JOIN WF_PROCESS P ON PI.WF_PROCESS_ID=P.ID LEFT JOIN PM_PRJ PRJ ON D.PM_PRJ_ID=PRJ.ID JOIN HR_DEPT DEPT ON D.REPORT_DEPT_ID=DEPT.ID JOIN AD_USER USER ON D.REPORT_USER_ID=USER.ID", batchId);
+        } else if (!SharedUtil.isEmptyObject(isProcureProc)) {
+            hrWeeklyReportDtlList = myJdbcTemplate.queryForList("SELECT D.*,PI.NAME WF_PROCESS_INSTANCE_NAME,P.NAME WF_PROCESS_NAME,P.EXTRA_INFO WF_PROCESS_EXTRA_INFO,PRJ.NAME PM_PRJ_NAME,DEPT.NAME REPORT_DEPT_NAME,USER.NAME REPORT_USER_NAME FROM HR_WEEKLY_REPORT_DTL D JOIN WF_PROCESS_INSTANCE PI ON D.BATCH_ID=? AND D.IS_PROCURE_PROC=1 AND D.WF_PROCESS_INSTANCE_ID=PI.ID JOIN WF_PROCESS P ON PI.WF_PROCESS_ID=P.ID LEFT JOIN PM_PRJ PRJ ON D.PM_PRJ_ID=PRJ.ID JOIN HR_DEPT DEPT ON D.REPORT_DEPT_ID=DEPT.ID JOIN AD_USER USER ON D.REPORT_USER_ID=USER.ID", batchId);
+        } else {
+            throw new BaseException("获取BaseReport时，parentAttCode、isFinanceProc、isProcureProc不能全部为空！");
+        }
         report.reportDtlList = convertToReportDtlList(hrWeeklyReportDtlList);
 
         return report;
@@ -511,6 +581,7 @@ public class WeeklyReportExt {
             reportDtl.procInst = new ProcInst();
             reportDtl.procInst.procId = JdbcMapUtil.getString(item, "WF_PROCESS_ID");
             reportDtl.procInst.procName = JdbcMapUtil.getString(item, "WF_PROCESS_NAME");
+            reportDtl.procInst.procExtraInfo = JdbcMapUtil.getString(item, "WF_PROCESS_EXTRA_INFO");
             reportDtl.procInst.procInstId = JdbcMapUtil.getString(item, "WF_PROCESS_INSTANCE_ID");
             reportDtl.procInst.procInstName = JdbcMapUtil.getString(item, "WF_PROCESS_INSTANCE_NAME");
 
@@ -593,11 +664,13 @@ public class WeeklyReportExt {
             public static class EndProcInst {
                 public String prjName;
                 public String procName;
+                public String procExtraInfo;
                 public String userName;
                 public String viewId;
                 public String entCode;
                 public String entityRecordId;
                 public String procInstId;
+                public String procInstName;
             }
         }
     }
@@ -691,6 +764,8 @@ public class WeeklyReportExt {
     public static class ProcInst {
         public String procId;
         public String procName;
+        public String procExtraInfo;
+
         public String procInstId;
         public String procInstName;
     }
