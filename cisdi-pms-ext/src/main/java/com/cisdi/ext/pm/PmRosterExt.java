@@ -451,7 +451,7 @@ public class PmRosterExt {
     private List<UserInfo> getUserList(String deptId) {
         List<UserInfo> res = new ArrayList<>();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from ad_user where id in (select AD_USER_ID from hr_dept_user where HR_DEPT_ID=? and AD_USER_ID != '1641281525532323840')", deptId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from ad_user where `status` = 'ap' and id in (select AD_USER_ID from hr_dept_user where HR_DEPT_ID=? and AD_USER_ID != '1641281525532323840')", deptId);
         if (!CollectionUtils.isEmpty(list)) {
             res = list.stream().map(p -> {
                 UserInfo userInfo = new UserInfo();
