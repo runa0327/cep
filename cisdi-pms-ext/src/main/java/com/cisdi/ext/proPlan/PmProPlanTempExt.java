@@ -211,7 +211,7 @@ public class PmProPlanTempExt {
         if (Strings.isNotEmpty(input.pid)) {
             sb.append(",PM_PRO_PLAN_NODE_PID ='").append(input.pid).append("'");
         }
-        if(Strings.isNotEmpty(input.name)){
+        if (Strings.isNotEmpty(input.name)) {
             sb.append(",`NAME` ='").append(input.name).append("'");
         }
         if (Strings.isNotEmpty(input.postId)) {
@@ -235,10 +235,11 @@ public class PmProPlanTempExt {
         }
         sb.append(",IZ_MILESTONE =").append(input.izMilestone);
         sb.append(",`LEVEL`=").append(input.level);
+        sb.append(", SEQ_NO =").append(input.seqNo);
         sb.append(" where id='").append(id).append("'");
         myJdbcTemplate.update(sb.toString());
-        Map<String,String> obj = new HashMap<>();
-        obj.put("proPlanId",proPlanId);
+        Map<String, String> obj = new HashMap<>();
+        obj.put("proPlanId", proPlanId);
         ExtJarHelper.returnValue.set(obj);
     }
 
@@ -423,6 +424,7 @@ public class PmProPlanTempExt {
         public List<String> atts;
         public String izMilestone = "0";
         public String level;
+        public String seqNo;
     }
 
     public static class ObjInfo {
