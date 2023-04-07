@@ -134,6 +134,10 @@ public class PmProPlanTempExt {
             node.processName = JdbcMapUtil.getString(p, "processName");
             node.level = JdbcMapUtil.getString(p, "level");
             node.baseNodeId = JdbcMapUtil.getString(p, "SCHEDULE_NAME");
+            String att = JdbcMapUtil.getString(p, "AD_ATT_ID_IMP");
+            if(Strings.isNotEmpty(att)){
+                node.atts = Arrays.asList(att.split(","));
+            }
             return node;
         }).collect(Collectors.toList());
 
