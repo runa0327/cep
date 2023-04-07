@@ -164,8 +164,8 @@ public class WeekTaskExt {
     public void noInvolve() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        //把任务关闭
-        myJdbcTemplate.update("update WEEK_TASK set WEEK_TASK_STATUS_ID='1634118629769482240' where id=?", map.get("id"));
+        //把任务状态改为不涉及
+        myJdbcTemplate.update("update WEEK_TASK set WEEK_TASK_STATUS_ID='1644140265205915648',REASON_EXPLAIN=? where id=?", map.get("reason"), map.get("id"));
         //把节点状态变成未涉及
         myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID ='0099902212142036278' where id =(select RELATION_DATA_ID from week_task where id=?)", map.get("id"));
     }
