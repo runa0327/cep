@@ -65,6 +65,11 @@ public class PmDesignAssignmentExt {
         processHandle(nodeStatus,status);
     }
 
+    /**
+     * 流程按钮详情处理逻辑
+     * @param nodeStatus 节点状态码
+     * @param status 流转状态码
+     */
     private void processHandle(String nodeStatus, String status) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String userId = ExtJarHelper.loginInfo.get().userId;

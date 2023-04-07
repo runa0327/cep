@@ -348,4 +348,15 @@ public class ProcessCommon {
         sb.append(" WHERE ID = ?");
         myJdbcTemplate.update(sb.toString(),csCommId);
     }
+
+    /**
+     * 流程审批意见回显
+     * @param code 单个字段
+     * @param comment 审批意见
+     * @param csCommId 业务流程id
+     * @param entCode 业务流程表名
+     */
+    public static void commentShow(String code, String comment, String csCommId, String entCode) {
+        Crud.from(entCode).where().eq("ID",csCommId).update().set(code,comment).exec();
+    }
 }
