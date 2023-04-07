@@ -4,10 +4,7 @@ import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
-import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
-import com.qygly.shared.util.SharedUtil;
-import org.apache.commons.collections.IterableMap;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -244,7 +241,7 @@ public class PrjPlanUtil {
                     "PLAN_TOTAL_DAYS,PLAN_CARRY_DAYS,ACTUAL_CARRY_DAYS,ACTUAL_TOTAL_DAYS,PLAN_CURRENT_PRO_PERCENT,ACTUAL_CURRENT_PRO_PERCENT, \n" +
                     "ifnull(PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,PLAN_COMPL_DATE,ACTUAL_COMPL_DATE,SHOW_IN_EARLY_PROC,SHOW_IN_PRJ_OVERVIEW,CAN_START, \n" +
                     "PROGRESS_STATUS_ID,PROGRESS_RISK_TYPE_ID,CHIEF_DEPT_ID,CHIEF_USER_ID,START_DAY,SEQ_NO,CPMS_UUID,CPMS_ID,`LEVEL`,LINKED_WF_PROCESS_ID,LINKED_START_WF_NODE_ID,LINKED_END_WF_NODE_ID,POST_INFO_ID ,AD_USER_ID, \n" +
-                    "PRE_NODE_ID  " +
+                    "PRE_NODE_ID,AD_ENT_ID_IMP,AD_ATT_ID_IMP,IZ_MILESTONE  " +
                     "from PM_PRO_PLAN_NODE pppn \n" +
                     "left join POST_INFO pi on pppn.POST_INFO_ID = pi.id \n" +
                     "where PM_PRO_PLAN_ID=?", proMap.get("ID"));
@@ -256,8 +253,7 @@ public class PrjPlanUtil {
                             .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                             .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
                             .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START"))
-                            .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).exec();
-
+                            .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).set("AD_ENT_ID_IMP", m.get("AD_ENT_ID_IMP")).set("AD_ATT_ID_IMP", m.get("AD_ATT_ID_IMP")).set("IZ_MILESTONE", m.get("IZ_MILESTONE")).exec();
                     getChildrenNode(m, planNodeList, id, newPlanId);
                 }).collect(Collectors.toList());
 
@@ -299,7 +295,7 @@ public class PrjPlanUtil {
                     .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                     .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
                     .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START"))
-                    .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).exec();
+                    .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).set("AD_ENT_ID_IMP", m.get("AD_ENT_ID_IMP")).set("AD_ATT_ID_IMP", m.get("AD_ATT_ID_IMP")).set("IZ_MILESTONE", m.get("IZ_MILESTONE")).exec();
             getChildrenNode(m, allData, id, newPlanId);
         }).collect(Collectors.toList());
     }
@@ -326,7 +322,7 @@ public class PrjPlanUtil {
                 "pppn.ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID," +
                 "pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW," +
                 "pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID," +
-                "pppn.START_DAY,pppn.SEQ_NO,pppn.CPMS_UUID,pppn.CPMS_ID,pppn.LEVEL, " +
+                "pppn.START_DAY,pppn.SEQ_NO,pppn.CPMS_UUID,pppn.CPMS_ID,pppn.LEVEL,AD_ENT_ID_IMP,AD_ATT_ID_IMP, " +
                 "gsv.`CODE` as PROGRESS_STATUS_CODE from pm_pro_plan_node pppn \n" +
                 "left join pm_pro_plan ppp on pppn.PM_PRO_PLAN_ID = ppp.ID\n" +
                 "left join gr_set_value gsv on gsv.id = pppn.PROGRESS_STATUS_ID\n" +

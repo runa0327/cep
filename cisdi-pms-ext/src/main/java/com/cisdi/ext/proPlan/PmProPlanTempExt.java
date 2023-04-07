@@ -232,6 +232,15 @@ public class PmProPlanTempExt {
         if (input.days > 0) {
             sb.append(",PLAN_TOTAL_DAYS =").append(input.days);
         }
+        if (Strings.isNotEmpty(input.tableId)) {
+            sb.append(",AD_ENT_ID_IMP ='").append(input.tableId).append("'");
+        }
+        if (Strings.isNotEmpty(input.attIds)) {
+            sb.append(",AD_ATT_ID_IMP ='").append(input.attIds).append("'");
+        }
+        if (Strings.isNotEmpty(input.baseNodeId)) {
+            sb.append(",SCHEDULE_NAME ='").append(input.baseNodeId).append("'");
+        }
         sb.append(",IZ_MILESTONE =").append(input.izMilestone);
         sb.append(",`LEVEL`=").append(input.level);
         sb.append(", SEQ_NO =").append(input.seqNo);
@@ -277,13 +286,18 @@ public class PmProPlanTempExt {
      */
     public void baseNodeList() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from BASE_NODE where status ='ap'");
-        List<String> names = list.stream().map(p -> JdbcMapUtil.getString(p, "NAME")).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(names)) {
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from STANDARD_NODE_NAME where status ='ap'");
+        List<ObjInfo> objInfoList = list.stream().map(p -> {
+            ObjInfo objInfo = new ObjInfo();
+            objInfo.id = JdbcMapUtil.getString(p, "ID");
+            objInfo.name = JdbcMapUtil.getString(p, "NAME");
+            return objInfo;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(objInfoList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
             OutSide outSide = new OutSide();
-            outSide.names = names;
+            outSide.objInfoList = objInfoList;
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
@@ -357,6 +371,38 @@ public class PmProPlanTempExt {
         }
     }
 
+    /**
+     * 根据流程获取对应的台账表，字段
+     */
+    public void proLinkAttList() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("SELECT m.*,att.id as att_id,att.`CODE` as att_code,att.`NAME` as att_name FROM \n" +
+                "( \n" +
+                " select c.id,c.code,c.name from wf_process a \n" +
+                " LEFT JOIN AD_SINGLE_ENT_VIEW b ON a.STARTABLE_SEV_IDS = b.id \n" +
+                " LEFT JOIN AD_ENT c ON b.AD_ENT_ID = c.id where a.id =? \n" +
+                " ) m \n" +
+                " left join AD_ENT_ATT aet on m.id = aet.AD_ENT_ID \n" +
+                " left join ad_att att on att.id = aet.AD_ATT_ID \n" +
+                " where att.AD_ATT_SUB_TYPE_ID in('FILE_GROUP','FILE_GROUP2')", map.get("processId"));
+        List<AttInfo> attInfoList = list.stream().map(p -> {
+            AttInfo info = new AttInfo();
+            info.id = JdbcMapUtil.getString(p, "att_id");
+            info.name = JdbcMapUtil.getString(p, "att_name");
+            info.tableId = JdbcMapUtil.getString(p, "id");
+            return info;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(attInfoList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.attInfoList = attInfoList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
 
     private List<PlanNode> getChildren(PlanNode parentNode, List<PlanNode> allData) {
         return allData.stream().filter(p -> parentNode.id.equals(p.pid)).peek(m -> {
@@ -405,6 +451,7 @@ public class PmProPlanTempExt {
         public List<PlanNode> tree;
         public List<String> names;
         public List<ObjInfo> objInfoList;
+        public List<AttInfo> attInfoList;
     }
 
     public static class NodeInput {
@@ -424,11 +471,22 @@ public class PmProPlanTempExt {
         public String izMilestone = "0";
         public String level;
         public String seqNo;
+
+        public String attIds;
+        public String tableId;
+
+        public String baseNodeId;
     }
 
     public static class ObjInfo {
         public String id;
         public String name;
+    }
+
+    public static class AttInfo {
+        public String id;
+        public String name;
+        public String tableId;
     }
 
 }
