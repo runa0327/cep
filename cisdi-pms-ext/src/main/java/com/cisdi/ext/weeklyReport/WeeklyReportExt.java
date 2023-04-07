@@ -1,8 +1,6 @@
 package com.cisdi.ext.weeklyReport;
 
-import com.cisdi.ext.model.FlFile;
-import com.cisdi.ext.model.HrWeeklyReport;
-import com.cisdi.ext.model.HrWeeklyReportDtl;
+import com.cisdi.ext.model.*;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -113,7 +111,7 @@ public class WeeklyReportExt {
      * 财务分管领导。
      */
     public void getFinanceLeaderWeeklyReport() {
-        LeaderGmReport report = (LeaderGmReport) getBaseReport(WeeklyReportType.L, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_LEADER, true, null);
+        LeaderGmReport report = (LeaderGmReport) getBaseReport(WeeklyReportType.L, null, true, null);
         if (report == null) {
             return;
         }
@@ -137,7 +135,7 @@ public class WeeklyReportExt {
      * 采购分管领导。
      */
     public void getProcureLeaderWeeklyReport() {
-        LeaderGmReport report = (LeaderGmReport) getBaseReport(WeeklyReportType.L, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_LEADER, null, true);
+        LeaderGmReport report = (LeaderGmReport) getBaseReport(WeeklyReportType.L, null, null, true);
         if (report == null) {
             return;
         }
@@ -161,7 +159,7 @@ public class WeeklyReportExt {
      * 董事长。
      */
     public void getChairmanWeeklyReport() {
-        LeaderGmReport report = (LeaderGmReport) getBaseReport(WeeklyReportType.L, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_GM, null, null);
+        LeaderGmReport report = (LeaderGmReport) getBaseReport(WeeklyReportType.G, HrWeeklyReportDtl.Cols.HR_WEEKLY_REPORT_ID_GM, null, null);
         if (report == null) {
             return;
         }
@@ -516,6 +514,12 @@ public class WeeklyReportExt {
 
 
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        if (SharedUtil.isEmptyObject(map)) {
+            throw new BaseException("参数不能为空！");
+        }
+        if (SharedUtil.isEmptyObject(map.get("peroidDtlId"))) {
+            throw new BaseException("参数peroidDtlId不能为空！");
+        }
         String peroidDtlId = String.valueOf(map.get("peroidDtlId"));
         // 若参数里有userId，则以参数为准；否则以当前登录用户ID为准：
         // TODO 230406 控制权限，不能随意查看别人的周报：
@@ -544,8 +548,18 @@ public class WeeklyReportExt {
         report.hrWeeklyReport = hrWeeklyReport;
         String batchId = hrWeeklyReport.getBatchId();
 
-        List<Map<String, Object>> hrWeeklyReportDtlList = null;
+        HrPeriodDtl hrPeriodDtl = HrPeriodDtl.selectById(peroidDtlId);
+        report.periodDtl = new IdText();
+        report.periodDtl.id = hrPeriodDtl.getId();
+        report.periodDtl.text = hrPeriodDtl.getName();
 
+        AdUser adUser = AdUser.selectById(userId);
+        report.reportUser = new IdText();
+        report.reportUser.id = adUser.getId();
+        report.reportUser.text = adUser.getName();
+
+        // 获取报告明细：
+        List<Map<String, Object>> hrWeeklyReportDtlList = null;
         if (!SharedUtil.isEmptyString(parentAttCode)) {
             hrWeeklyReportDtlList = myJdbcTemplate.queryForList("SELECT D.*,PI.NAME WF_PROCESS_INSTANCE_NAME,P.NAME WF_PROCESS_NAME,P.EXTRA_INFO WF_PROCESS_EXTRA_INFO,PRJ.NAME PM_PRJ_NAME,DEPT.NAME REPORT_DEPT_NAME,USER.NAME REPORT_USER_NAME FROM HR_WEEKLY_REPORT_DTL D JOIN WF_PROCESS_INSTANCE PI ON D.BATCH_ID=? AND D." + parentAttCode + "=? AND D.WF_PROCESS_INSTANCE_ID=PI.ID JOIN WF_PROCESS P ON PI.WF_PROCESS_ID=P.ID LEFT JOIN PM_PRJ PRJ ON D.PM_PRJ_ID=PRJ.ID JOIN HR_DEPT DEPT ON D.REPORT_DEPT_ID=DEPT.ID JOIN AD_USER USER ON D.REPORT_USER_ID=USER.ID", batchId, hrWeeklyReport.getId());
         } else if (!SharedUtil.isEmptyObject(isFinanceProc)) {
@@ -634,6 +648,11 @@ public class WeeklyReportExt {
     }
 
     public static class BaseReport {
+
+        public IdText periodDtl;
+
+        public IdText reportUser;
+
 
         /**
          * 临时性、更好用。返回前清除掉。
