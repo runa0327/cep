@@ -103,7 +103,7 @@ public class PoPublicBidExtApi {
                 .set("BUY_TYPE_ID",JdbcMapUtil.getString(valueMap,"BUY_TYPE_ID")) //采购方式
                 .set("AMT_FIVE",JdbcMapUtil.getString(valueMap,"AMT_FIVE")) //招标控制价
                 .set("DATE_ONE",JdbcMapUtil.getString(valueMap,"DATE_ONE")) //中标日期
-                .set("AMT_SIX",JdbcMapUtil.getString(valueMap,"AMT_ONE")) //中标价
+                .set("AMT_SIX",JdbcMapUtil.getString(valueMap,"AMT_SIX")) //中标价
                 .set("BID_WIN_NOTICE_FILE_GROUP_ID",JdbcMapUtil.getString(valueMap,"BID_WIN_NOTICE_FILE_GROUP_ID")) //中标通知书
                 .set("BID_PLATFORM",JdbcMapUtil.getString(valueMap,"BID_PLATFORM")) //招标平台
                 .set("view_Id",viewId) //视图id
