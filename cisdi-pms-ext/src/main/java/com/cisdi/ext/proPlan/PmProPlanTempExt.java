@@ -133,6 +133,7 @@ public class PmProPlanTempExt {
             node.preNodeName = JdbcMapUtil.getString(p, "pre_name");
             node.processName = JdbcMapUtil.getString(p, "processName");
             node.level = JdbcMapUtil.getString(p, "level");
+            node.baseNodeId = JdbcMapUtil.getString(p, "SCHEDULE_NAME");
             return node;
         }).collect(Collectors.toList());
 
@@ -181,6 +182,11 @@ public class PmProPlanTempExt {
             node.seqNo = JdbcMapUtil.getString(dataMap, "SEQ_NO");
             node.proPlanId = JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_ID");
             node.level = JdbcMapUtil.getString(dataMap, "level");
+            node.baseNodeId = JdbcMapUtil.getString(dataMap, "SCHEDULE_NAME");
+            String att = JdbcMapUtil.getString(dataMap, "AD_ATT_ID_IMP");
+            if(Strings.isNotEmpty(att)){
+                node.atts = Arrays.asList(att.split(","));
+            }
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(node), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
@@ -443,6 +449,7 @@ public class PmProPlanTempExt {
         public String level;
 
         public List<PlanNode> children;
+        public String baseNodeId;
 
     }
 
