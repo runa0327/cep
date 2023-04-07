@@ -33,21 +33,6 @@ public class WeeklyReportExt {
             list.add(leaderInfo);
 
             leaderInfo.leaderType = new CodeName();
-            leaderInfo.leaderType.code = LeaderType.FinanceLeader.toString();
-            leaderInfo.leaderType.name = "财务分管领导";
-
-            leaderInfo.user = new IdText();
-            leaderInfo.user.id = "0099902212142027203";
-            leaderInfo.user.text = "王小冬";
-
-            leaderInfo.extApiCode = "getFinanceLeaderWeeklyReport";
-        }
-
-        {
-            LeaderInfo leaderInfo = new LeaderInfo();
-            list.add(leaderInfo);
-
-            leaderInfo.leaderType = new CodeName();
             leaderInfo.leaderType.code = LeaderType.ProcureLeader.toString();
             leaderInfo.leaderType.name = "采购分管领导";
 
@@ -56,6 +41,21 @@ public class WeeklyReportExt {
             leaderInfo.user.text = "吴坤苗";
 
             leaderInfo.extApiCode = "getProcureLeaderWeeklyReport";
+        }
+
+        {
+            LeaderInfo leaderInfo = new LeaderInfo();
+            list.add(leaderInfo);
+
+            leaderInfo.leaderType = new CodeName();
+            leaderInfo.leaderType.code = LeaderType.FinanceLeader.toString();
+            leaderInfo.leaderType.name = "财务分管领导";
+
+            leaderInfo.user = new IdText();
+            leaderInfo.user.id = "0099902212142027203";
+            leaderInfo.user.text = "王小冬";
+
+            leaderInfo.extApiCode = "getFinanceLeaderWeeklyReport";
         }
 
         {
@@ -128,6 +128,9 @@ public class WeeklyReportExt {
         // 计算日期统计列表：
         calcDateStatList(report);
 
+        // 过滤为办结的报表明细列表：
+        filterEndReportDtlList(report);
+
         setBaseReportAsReturnValue(report);
     }
 
@@ -151,6 +154,9 @@ public class WeeklyReportExt {
 
         // 计算日期统计列表：
         calcDateStatList(report);
+
+        // 过滤为办结的报表明细列表：
+        filterEndReportDtlList(report);
 
         setBaseReportAsReturnValue(report);
     }
@@ -220,11 +226,15 @@ public class WeeklyReportExt {
             return;
         }
 
-        Map<IdText, List<ReportDtl>> map = report.reportDtlList.stream().collect(Collectors.groupingBy(item -> item.dept));
+        Map<IdText, List<ReportDtl>> map = report.reportDtlList.stream().filter(item -> item.isEnd).collect(Collectors.groupingBy(item -> item.dept));
+        if (SharedUtil.isEmptyMap(map)) {
+            return;
+        }
+
         report.deptEndStatList = map.entrySet().stream().map(entry -> {
             BaseReport.DeptEndStat deptEndStat = new BaseReport.DeptEndStat();
             deptEndStat.dept = entry.getKey();
-            deptEndStat.endProcInstList = entry.getValue().stream().filter(item -> item.isEnd).map(item -> {
+            deptEndStat.endProcInstList = entry.getValue().stream().map(item -> {
                 BaseReport.DeptEndStat.EndProcInst endProcInst = new BaseReport.DeptEndStat.EndProcInst();
                 endProcInst.prjName = item.prj.name;
                 endProcInst.procName = item.procInst.procName;
@@ -307,27 +317,37 @@ public class WeeklyReportExt {
         }
 
         List<ReportDtl> list = report.reportDtlList.stream().filter(item -> item.isStart || item.isAssist || item.isEnd).collect(Collectors.toList());
-        if (!SharedUtil.isEmptyList(list)) {
-            BigDecimal sum = new BigDecimal(list.size());
-            Map<String, List<ReportDtl>> map = list.stream().collect(Collectors.groupingBy(item -> item.procInst.procName));
-            report.proportionStat = new ArrayList<>(map.size());
-            map.forEach((k, v) -> {
-                NameCountPercent nameCountPercent = new NameCountPercent();
-                report.proportionStat.add(nameCountPercent);
-
-                nameCountPercent.name = k;
-                nameCountPercent.count = v.size();
-                BigDecimal divide = new BigDecimal(v.size()).divide(sum, 4, RoundingMode.HALF_UP);
-                nameCountPercent.percent = new DecimalFormat("#.##%").format(divide);
-            });
-
-            report.proportionStat = report.proportionStat.stream().sorted((o1, o2) -> {
-                int i = o2.count.compareTo(o1.count);
-
-                // 注：未实现按照拼音排序：
-                return i != 0 ? i : o1.name.compareTo(o2.name);
-            }).collect(Collectors.toList());
+        if (SharedUtil.isEmptyList(list)) {
+            return;
         }
+        BigDecimal sum = new BigDecimal(list.size());
+        Map<String, List<ReportDtl>> map = list.stream().collect(Collectors.groupingBy(item -> item.procInst.procName));
+        report.proportionStat = new ArrayList<>(map.size());
+        map.forEach((k, v) -> {
+            NameCountPercent nameCountPercent = new NameCountPercent();
+            report.proportionStat.add(nameCountPercent);
+
+            nameCountPercent.name = k;
+            nameCountPercent.count = v.size();
+            BigDecimal divide = new BigDecimal(v.size()).divide(sum, 4, RoundingMode.HALF_UP);
+            nameCountPercent.percent = new DecimalFormat("#.##%").format(divide);
+        });
+
+        report.proportionStat = report.proportionStat.stream().sorted((o1, o2) -> {
+            int i = o2.count.compareTo(o1.count);
+
+            // 注：未实现按照拼音排序：
+            return i != 0 ? i : o1.name.compareTo(o2.name);
+        }).collect(Collectors.toList());
+    }
+
+    private void filterEndReportDtlList(BaseReport report) {
+        if (SharedUtil.isEmptyList(report.reportDtlList)) {
+            return;
+        }
+
+        List<ReportDtl> list = report.reportDtlList.stream().filter(item -> item.isEnd).collect(Collectors.toList());
+        report.reportDtlList=SharedUtil.isEmptyList(list)?null:list;
     }
 
     /**
