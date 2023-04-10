@@ -121,7 +121,7 @@ public class PmProPlanTempExt {
             node.id = JdbcMapUtil.getString(p, "ID");
             node.pid = JdbcMapUtil.getString(p, "PM_PRO_PLAN_NODE_PID") == null ? "0" : JdbcMapUtil.getString(p, "PM_PRO_PLAN_NODE_PID");
             node.name = JdbcMapUtil.getString(p, "NAME");
-            node.postId = JdbcMapUtil.getString(p, "PRE_NODE_ID");
+            node.postId = JdbcMapUtil.getString(p, "POST_INFO_ID");
             node.days = JdbcMapUtil.getInt(p, "PLAN_TOTAL_DAYS");
             node.preNodeId = JdbcMapUtil.getString(p, "PRE_NODE_ID");
             node.processId = JdbcMapUtil.getString(p, "LINKED_WF_PROCESS_ID");
