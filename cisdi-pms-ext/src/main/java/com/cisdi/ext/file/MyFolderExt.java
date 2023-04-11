@@ -220,6 +220,7 @@ public class MyFolderExt {
             }).collect(Collectors.toList());
             HashMap<String, Object> result = new HashMap<>();
             result.put("result",resData);
+            result.put("total",resData.size());
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         } else {
