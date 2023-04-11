@@ -134,6 +134,7 @@ public class PmProPlanTempExt {
             node.processName = JdbcMapUtil.getString(p, "processName");
             node.level = JdbcMapUtil.getString(p, "level");
             node.baseNodeId = JdbcMapUtil.getString(p, "SCHEDULE_NAME");
+            node.ver = JdbcMapUtil.getString(p, "VER");
             String att = JdbcMapUtil.getString(p, "AD_ATT_ID_IMP");
             if(Strings.isNotEmpty(att)){
                 node.atts = Arrays.asList(att.split(","));
@@ -187,6 +188,7 @@ public class PmProPlanTempExt {
             node.proPlanId = JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_ID");
             node.level = JdbcMapUtil.getString(dataMap, "level");
             node.baseNodeId = JdbcMapUtil.getString(dataMap, "SCHEDULE_NAME");
+            node.ver = JdbcMapUtil.getString(dataMap, "VER");
             String att = JdbcMapUtil.getString(dataMap, "AD_ATT_ID_IMP");
             if(Strings.isNotEmpty(att)){
                 node.atts = Arrays.asList(att.split(","));
@@ -454,6 +456,8 @@ public class PmProPlanTempExt {
 
         public List<PlanNode> children;
         public String baseNodeId;
+
+        public String ver;
 
     }
 
