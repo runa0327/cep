@@ -4,13 +4,11 @@ import com.cisdi.ext.model.MyFolderFile;
 import com.cisdi.ext.model.view.file.MyFolderFileView;
 import com.cisdi.ext.model.view.file.MyFolderView;
 import com.cisdi.ext.pm.MyFolder;
-import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
-import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -92,7 +90,7 @@ public class MyFolderExt {
             List<MyFolderView> fileViewList = getResData(sb.toString(),userId,myJdbcTemplate);
             resData = fileViewList.stream().filter(p->"0".equals(p.getMyFolderId())).peek(m->{
                 List<MyFolderView> children = this.getChilden(m,fileViewList);
-                m.setChildrenList(children);
+                m.setChildren(children);
             }).collect(Collectors.toList());
 
         }
@@ -138,7 +136,7 @@ public class MyFolderExt {
     public List<MyFolderView> getChilden(MyFolderView myFolderView, List<MyFolderView> list) {
         return list.stream().filter(p->myFolderView.id.equals(p.getMyFolderId())).peek(m->{
             List<MyFolderView> children = this.getChilden(m,list);
-            m.setChildrenList(children);
+            m.setChildren(children);
         }).collect(Collectors.toList());
     }
 

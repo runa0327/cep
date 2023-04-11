@@ -12,7 +12,7 @@ public class MyFolderView {
     public String createDate;
     public String status;
     public String myFolderId;
-    public List<MyFolderView> childrenList;
+    public List<MyFolderView> children;
 
     public String getId() {
         return id;
@@ -62,11 +62,11 @@ public class MyFolderView {
         this.myFolderId = myFolderId;
     }
 
-    public List<MyFolderView> getChildrenList() {
-        return childrenList;
+    public List<MyFolderView> getChildren() {
+        return children;
     }
 
-    public void setChildrenList(List<MyFolderView> childrenList) {
-        this.childrenList = childrenList;
+    public void setChildren(List<MyFolderView> children) {
+        this.children = children;
     }
 }
