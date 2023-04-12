@@ -210,7 +210,7 @@ public class MyFolderExt {
                 myFolderFileView.setFolderId(JdbcMapUtil.getString(p,"folderId"));
                 myFolderFileView.setFileName(JdbcMapUtil.getString(p,"fileName"));
                 myFolderFileView.setFileSize(JdbcMapUtil.getString(p,"fileSize"));
-                myFolderFileView.setUploadTime(JdbcMapUtil.getString(p,"uploadTime"));
+                myFolderFileView.setUploadTime(StringUtil.replaceCode(JdbcMapUtil.getString(p,"uploadTime"),"T"," "));
                 myFolderFileView.setAddress(JdbcMapUtil.getString(p,"address"));
                 myFolderFileView.setDownloadAddress(JdbcMapUtil.getString(p,"downloadAddress"));
                 myFolderFileView.setPreviewAddress(JdbcMapUtil.getString(p,"previewAddress"));
