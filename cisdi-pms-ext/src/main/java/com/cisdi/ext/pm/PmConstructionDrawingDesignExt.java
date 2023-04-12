@@ -81,7 +81,7 @@ public class PmConstructionDrawingDesignExt {
         if ("OK".equals(status)){
             if ("start".equals(nodeStatus)){ //标题生成
                 WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
-            } 
+            }
         }
     }
 

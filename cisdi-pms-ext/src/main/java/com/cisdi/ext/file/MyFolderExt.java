@@ -195,7 +195,7 @@ public class MyFolderExt {
         int start = (param.pageIndex - 1) * param.pageSize;
         String limit = "limit " + start + "," + param.pageSize;
 
-        String sql = "select A.id,A.FL_FILE_ID AS fileId,A.MY_FOLDER_ID as folderId,B.DSP_NAME as fileName,B.DSP_SIZE as fileSize,B.UPLOAD_DTTM as uploadTime,B.PHYSICAL_LOCATION as address,B.FILE_ATTACHMENT_URL as downloadAddress,B.FILE_INLINE_URL as previewAddress from MY_FOLDER_FILE a left join fl_file B ON A.FL_FILE_ID = B.ID WHERE A.MY_FOLDER_ID = ? AND A.STATUS = 'AP' AND B.STATUS = 'AP'";
+        String sql = "select A.id,A.FL_FILE_ID AS fileId,A.MY_FOLDER_ID as folderId,B.DSP_NAME as fileName,B.DSP_SIZE as fileSize,B.UPLOAD_DTTM as uploadTime,B.PHYSICAL_LOCATION as address,B.FILE_ATTACHMENT_URL as downloadAddress,B.FILE_INLINE_URL as previewAddress,C.NAME AS userName from MY_FOLDER_FILE a left join fl_file B ON A.FL_FILE_ID = B.ID LEFT JOIN AD_USER C ON B.CRT_USER_ID = C.ID WHERE A.MY_FOLDER_ID = ? AND A.STATUS = 'AP' AND B.STATUS = 'AP'";
         StringBuilder sb = new StringBuilder(sql);
         if (!SharedUtil.isEmptyString(param.getFileName())){
             sb.append(" and b.name like ('%").append(param.getFileName()).append("%') ");
@@ -214,6 +214,7 @@ public class MyFolderExt {
                 myFolderFileView.setAddress(JdbcMapUtil.getString(p,"address"));
                 myFolderFileView.setDownloadAddress(JdbcMapUtil.getString(p,"downloadAddress"));
                 myFolderFileView.setPreviewAddress(JdbcMapUtil.getString(p,"previewAddress"));
+                myFolderFileView.setUserName(JdbcMapUtil.getString(p,"userName"));
                 return myFolderFileView;
             }).collect(Collectors.toList());
             HashMap<String, Object> result = new HashMap<>();

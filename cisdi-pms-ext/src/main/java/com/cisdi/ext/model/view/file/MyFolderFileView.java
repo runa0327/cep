@@ -15,6 +15,7 @@ public class MyFolderFileView extends BasePageEntity {
     public String address;
     public String downloadAddress;
     public String previewAddress;
+    public String userName;
 
     public String getId() {
         return id;
@@ -86,5 +87,13 @@ public class MyFolderFileView extends BasePageEntity {
 
     public void setPreviewAddress(String previewAddress) {
         this.previewAddress = previewAddress;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }
