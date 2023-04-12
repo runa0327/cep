@@ -81,32 +81,7 @@ public class PmConstructionDrawingDesignExt {
         if ("OK".equals(status)){
             if ("start".equals(nodeStatus)){ //标题生成
                 WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
-            } else {
-                //获取审批意见信息
-                Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
-                //审批意见内容
-                String comment = message.get("comment");
-
-                if ("externalCheckOK".equals(nodeStatus)){ // 外审审批 意见回显
-                    //获取流程中的意见信息
-                    String processComment = JdbcMapUtil.getString(entityRecord.valueMap,"TEXT_REMARK_TWO");
-                    //生成最终的意见信息
-                    String commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
-                    ProcessCommon.commentShow("TEXT_REMARK_TWO",commentEnd,csCommId,entCode);
-                } else if ("replyOK".equals(nodeStatus)){
-                    //获取流程中的意见信息
-                    String processComment = JdbcMapUtil.getString(entityRecord.valueMap,"TEXT_REMARK_THREE");
-                    //生成最终的意见信息
-                    String commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
-                    ProcessCommon.commentShow("TEXT_REMARK_THREE",commentEnd,csCommId,entCode);
-                }
-            }
-        } else {
-            if ("externalCheckRefuse".equals(nodeStatus)){ // 外审审批 意见清除
-                ProcessCommon.clearData("TEXT_REMARK_TWO",csCommId,entCode,myJdbcTemplate);
-            } else if ("replyRefuse".equals(nodeStatus)){ // 批复审批 意见清除
-                ProcessCommon.clearData("TEXT_REMARK_THREE",csCommId,entCode,myJdbcTemplate);
-            }
+            } 
         }
     }
 
