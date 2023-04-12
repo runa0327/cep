@@ -7,6 +7,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.util.JdbcMapUtil;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -229,17 +230,12 @@ public class WeekTaskExt {
         String status = null;
         if ("去处理".equals(opr)) {
             status = "1634118609016066048";//进行中
+            String instanceId = JdbcMapUtil.getString(map,"instanceId");
+            if(Strings.isNotEmpty(instanceId)){
+                myJdbcTemplate.update("update pm_pro_plan_node set LINKED_WF_PROCESS_INSTANCE_ID=? where id =(select RELATION_DATA_ID from week_task where id=? )", instanceId, map.get("id"));
+            }
         }
         myJdbcTemplate.update("update WEEK_TASK set WEEK_TASK_STATUS_ID=? where id=?", status, map.get("id"));
-    }
-
-    /**
-     * 写入流程实例
-     */
-    public void updateProcessInstance(){
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        myJdbcTemplate.update("update pm_pro_plan_node set LINKED_WF_PROCESS_INSTANCE_ID=? where id =(select RELATION_DATA_ID from week_task where id=? )", map.get("instanceId"), map.get("id"));
     }
 
 
@@ -260,11 +256,18 @@ public class WeekTaskExt {
                 String viewId = JdbcMapUtil.getString(dataMap, "AD_VIEW_ID");
                 Map<String, String> res = new HashMap<>();
                 res.put("processId", processId);
-                res.put("viewId", viewId);
+                res.put("WF_NODE_VIEW_ID", viewId);
                 res.put("icon", JdbcMapUtil.getString(dataMap, "EXTRA_INFO"));
                 res.put("title", JdbcMapUtil.getString(node, "NAME"));
                 res.put("projectId", JdbcMapUtil.getString(node, "pm_prj_id"));
-                res.put("instanceId",JdbcMapUtil.getString(node, "LINKED_WF_PROCESS_INSTANCE_ID"));
+                res.put("WF_PROCESS_INSTANCE_ID",JdbcMapUtil.getString(node, "LINKED_WF_PROCESS_INSTANCE_ID"));
+                List<Map<String, Object>> instanceList = myJdbcTemplate.queryForList("select * from wf_process_instance where id=?", JdbcMapUtil.getString(node, "LINKED_WF_PROCESS_INSTANCE_ID"));
+                if(!CollectionUtils.isEmpty(instanceList)){
+                    Map<String, Object> objectMap = instanceList.get(0);
+                    res.put("ENTITY_RECORD_ID",JdbcMapUtil.getString(objectMap, "ENTITY_RECORD_ID"));
+                }
+
+                res.put("nodeId",JdbcMapUtil.getString(node, "ID"));
                 ExtJarHelper.returnValue.set(res);
             } else {
                 ExtJarHelper.returnValue.set(Collections.emptyMap());
