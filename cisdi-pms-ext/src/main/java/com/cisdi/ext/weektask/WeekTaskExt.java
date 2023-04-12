@@ -194,18 +194,21 @@ public class WeekTaskExt {
     public void dealWith() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id =(select RELATION_DATA_ID from WEEK_TASK where id=?)", map.get("id"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,pm_prj_id from pm_pro_plan_node pppn left join WEEK_TASK wt on pppn.id = wt.RELATION_DATA_ID where wt.id= ?", map.get("id"));
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> node = list.get(0);
             String processId = JdbcMapUtil.getString(node, "LINKED_WF_PROCESS_ID");
             //查询流程的第一个节点的view
-            List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select AD_VIEW_ID from wf_node where  NODE_TYPE = 'START_EVENT' AND STATUS = 'AP' and WF_PROCESS_ID = ? ", processId);
+            List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select wn.ad_view_id as AD_VIEW_ID,wp.EXTRA_INFO  as EXTRA_INFO from wf_node wn left join WF_PROCESS wp on wp.id = wn.WF_PROCESS_ID where wn.NODE_TYPE = 'START_EVENT' AND wn.`STATUS` = 'AP' and wn.WF_PROCESS_ID= ? ", processId);
             if (!CollectionUtils.isEmpty(dataList)) {
                 Map<String, Object> dataMap = dataList.get(0);
                 String viewId = JdbcMapUtil.getString(dataMap, "AD_VIEW_ID");
                 Map<String, String> res = new HashMap<>();
                 res.put("processId", processId);
                 res.put("viewId", viewId);
+                res.put("icon", JdbcMapUtil.getString(dataMap, "EXTRA_INFO"));
+                res.put("title", JdbcMapUtil.getString(node, "NAME"));
+                res.put("projectId", JdbcMapUtil.getString(node, "pm_prj_id"));
                 ExtJarHelper.returnValue.set(res);
             } else {
                 ExtJarHelper.returnValue.set(Collections.emptyMap());
@@ -216,6 +219,60 @@ public class WeekTaskExt {
 
     }
 
+    /**
+     * 改变任务状态
+     */
+    public void changeWeekTaskStatus() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String opr = JdbcMapUtil.getString(map, "opr");
+        String status = null;
+        if ("去处理".equals(opr)) {
+            status = "1634118609016066048";//进行中
+        }
+        myJdbcTemplate.update("update WEEK_TASK set WEEK_TASK_STATUS_ID=? where id=?", status, map.get("id"));
+    }
+
+    /**
+     * 写入流程实例
+     */
+    public void updateProcessInstance(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        myJdbcTemplate.update("update pm_pro_plan_node set LINKED_WF_PROCESS_INSTANCE_ID=? where id =(select RELATION_DATA_ID from week_task where id=? )", map.get("instanceId"), map.get("id"));
+    }
+
+
+    /**
+     * 查看进度
+     */
+    public void checkProcess(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,pm_prj_id from pm_pro_plan_node pppn left join WEEK_TASK wt on pppn.id = wt.RELATION_DATA_ID where wt.id= ?", map.get("id"));
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> node = list.get(0);
+            String processId = JdbcMapUtil.getString(node, "LINKED_WF_PROCESS_ID");
+            //查询流程的第一个节点的view
+            List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select wn.ad_view_id as AD_VIEW_ID,wp.EXTRA_INFO  as EXTRA_INFO from wf_node wn left join WF_PROCESS wp on wp.id = wn.WF_PROCESS_ID where wn.NODE_TYPE = 'START_EVENT' AND wn.`STATUS` = 'AP' and wn.WF_PROCESS_ID= ? ", processId);
+            if (!CollectionUtils.isEmpty(dataList)) {
+                Map<String, Object> dataMap = dataList.get(0);
+                String viewId = JdbcMapUtil.getString(dataMap, "AD_VIEW_ID");
+                Map<String, String> res = new HashMap<>();
+                res.put("processId", processId);
+                res.put("viewId", viewId);
+                res.put("icon", JdbcMapUtil.getString(dataMap, "EXTRA_INFO"));
+                res.put("title", JdbcMapUtil.getString(node, "NAME"));
+                res.put("projectId", JdbcMapUtil.getString(node, "pm_prj_id"));
+                res.put("instanceId",JdbcMapUtil.getString(node, "LINKED_WF_PROCESS_INSTANCE_ID"));
+                ExtJarHelper.returnValue.set(res);
+            } else {
+                ExtJarHelper.returnValue.set(Collections.emptyMap());
+            }
+        } else {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        }
+    }
 
     public static class WeekTask {
         public String id;
