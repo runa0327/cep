@@ -35,7 +35,7 @@ public class WeekTaskExt {
         String userId = ExtJarHelper.loginInfo.get().userId;
         Map<String, String> weekDay = WeeklyUtils.weekBeginningAndEnding();
         StringBuilder sb = new StringBuilder();
-        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,CAN_DISPATCH,TRANSFER_USER as transferUserId,TRANSFER_TIME from week_task wt " +
+        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId,TRANSFER_TIME from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
                 "left join ad_user au on au.id = wt.TRANSFER_USER " +
                 "where AD_USER_ID = '").append(userId).append("' and PUBLISH_START between '")
@@ -54,10 +54,10 @@ public class WeekTaskExt {
             weekTask.content = JdbcMapUtil.getString(p, "CONTENT");
             weekTask.publishStart = StringUtil.withOutT(JdbcMapUtil.getString(p, "PUBLISH_START"));
             weekTask.taskStatus = JdbcMapUtil.getString(p, "task_status");
-            weekTask.isTransfer = JdbcMapUtil.getString(p, "CAN_DISPATCH");
+            weekTask.isTransfer = JdbcMapUtil.getString(p, "isTransfer");
             weekTask.transferUserId = JdbcMapUtil.getString(p, "transferUserId");
             weekTask.transferUser = JdbcMapUtil.getString(p, "transferUser");
-            weekTask.transferTime = JdbcMapUtil.getString(p, "TRANSFER_TIME");
+            weekTask.transferTime = JdbcMapUtil.getString(p, "TRANSFER_TIME") == null ? null : StringUtil.withOutT(JdbcMapUtil.getString(p, "TRANSFER_TIME"));
             return weekTask;
         }).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(weekTaskList)) {
@@ -230,8 +230,8 @@ public class WeekTaskExt {
         String status = null;
         if ("去处理".equals(opr)) {
             status = "1634118609016066048";//进行中
-            String instanceId = JdbcMapUtil.getString(map,"instanceId");
-            if(Strings.isNotEmpty(instanceId)){
+            String instanceId = JdbcMapUtil.getString(map, "instanceId");
+            if (Strings.isNotEmpty(instanceId)) {
                 myJdbcTemplate.update("update pm_pro_plan_node set LINKED_WF_PROCESS_INSTANCE_ID=? where id =(select RELATION_DATA_ID from week_task where id=? )", instanceId, map.get("id"));
             }
         }
@@ -242,7 +242,7 @@ public class WeekTaskExt {
     /**
      * 查看进度
      */
-    public void checkProcess(){
+    public void checkProcess() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,pm_prj_id from pm_pro_plan_node pppn left join WEEK_TASK wt on pppn.id = wt.RELATION_DATA_ID where wt.id= ?", map.get("id"));
@@ -260,14 +260,14 @@ public class WeekTaskExt {
                 res.put("icon", JdbcMapUtil.getString(dataMap, "EXTRA_INFO"));
                 res.put("title", JdbcMapUtil.getString(node, "NAME"));
                 res.put("projectId", JdbcMapUtil.getString(node, "pm_prj_id"));
-                res.put("WF_PROCESS_INSTANCE_ID",JdbcMapUtil.getString(node, "LINKED_WF_PROCESS_INSTANCE_ID"));
+                res.put("WF_PROCESS_INSTANCE_ID", JdbcMapUtil.getString(node, "LINKED_WF_PROCESS_INSTANCE_ID"));
                 List<Map<String, Object>> instanceList = myJdbcTemplate.queryForList("select * from wf_process_instance where id=?", JdbcMapUtil.getString(node, "LINKED_WF_PROCESS_INSTANCE_ID"));
-                if(!CollectionUtils.isEmpty(instanceList)){
+                if (!CollectionUtils.isEmpty(instanceList)) {
                     Map<String, Object> objectMap = instanceList.get(0);
-                    res.put("ENTITY_RECORD_ID",JdbcMapUtil.getString(objectMap, "ENTITY_RECORD_ID"));
+                    res.put("ENTITY_RECORD_ID", JdbcMapUtil.getString(objectMap, "ENTITY_RECORD_ID"));
                 }
 
-                res.put("nodeId",JdbcMapUtil.getString(node, "ID"));
+                res.put("nodeId", JdbcMapUtil.getString(node, "ID"));
                 ExtJarHelper.returnValue.set(res);
             } else {
                 ExtJarHelper.returnValue.set(Collections.emptyMap());
