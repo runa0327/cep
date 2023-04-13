@@ -311,7 +311,7 @@ public class PrjPlanUtil {
 
     private static void clearPlan(String projectId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        myJdbcTemplate.update("delete from PM_PRO_PLAN_NODE where PM_PRO_PLAN_ID in (select id from PM_PRO_PLAN where PM_PRJ_ID=?)", projectId);
+        myJdbcTemplate.update("SET FOREIGN_KEY_CHECKS = 0;delete from PM_PRO_PLAN_NODE where PM_PRO_PLAN_ID in (select id from PM_PRO_PLAN where PM_PRJ_ID=?);SET FOREIGN_KEY_CHECKS = 1;", projectId);
         myJdbcTemplate.update("delete from PM_PRO_PLAN where PM_PRJ_ID=?", projectId);
     }
 
