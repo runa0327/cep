@@ -9,6 +9,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.IdCodeName;
 import com.qygly.shared.util.JdbcMapUtil;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -195,8 +196,9 @@ public class ProPlanExt {
                 planInfo = this.covertPlanInfo(proMap, myJdbcTemplate);
 
                 List<Map<String, Object>> allList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
-                        "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,LINKED_WF_PROCESS_ID,\n" +
-                        "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO,pppn.`LEVEL`,pppn.POST_INFO_ID,ifnull(pppn.CAN_START,0) CAN_START \n" +
+                        " ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,LINKED_WF_PROCESS_ID,\n" +
+                        " ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO,pppn.`LEVEL`,pppn.POST_INFO_ID,ifnull(pppn.CAN_START,0) CAN_START, \n" +
+                        " PRE_NODE_ID,AD_ENT_ID_IMP,AD_ATT_ID_IMP,IZ_MILESTONE,SCHEDULE_NAME  "+
                         "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where ppp.PM_PRJ_ID=?", pmPrjId);
 
                 List<String> notStart = new ArrayList<>();
@@ -1055,15 +1057,120 @@ public class ProPlanExt {
 
 
     /**
+     * 全景节点详情
+     */
+    public void nodeEditView() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,pi.name as post_name,pre.name as pre_name,wp.name as processName " +
+                "from pm_pro_plan_node pppn left join post_info pi on pppn.POST_INFO_ID = pi.id " +
+                "left join pm_pro_plan_node pre on pppn.PRE_NODE_ID = pre.id " +
+                "left join WF_PROCESS wp on pppn.LINKED_WF_PROCESS_ID = wp.id " +
+                "where pppn.ID=?", map.get("nodeId"));
+        if (CollectionUtils.isEmpty(list)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            Map<String, Object> dataMap = list.get(0);
+            PmProPlanTempExt.PlanNode node = new PmProPlanTempExt.PlanNode();
+            node.id = JdbcMapUtil.getString(dataMap, "ID");
+            node.pid = JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_NODE_PID");
+            node.name = JdbcMapUtil.getString(dataMap, "NAME");
+            node.postId = JdbcMapUtil.getString(dataMap, "POST_INFO_ID");
+            node.postName = JdbcMapUtil.getString(dataMap, "post_name");
+            node.days = JdbcMapUtil.getInt(dataMap, "PLAN_TOTAL_DAYS");
+            node.preNodeId = JdbcMapUtil.getString(dataMap, "PRE_NODE_ID");
+            node.preNodeName = JdbcMapUtil.getString(dataMap, "pre_name");
+            node.processId = JdbcMapUtil.getString(dataMap, "LINKED_WF_PROCESS_ID");
+            node.processName = JdbcMapUtil.getString(dataMap, "processName");
+            node.startNode = JdbcMapUtil.getString(dataMap, "LINKED_START_WF_NODE_ID");
+            node.endNode = JdbcMapUtil.getString(dataMap, "LINKED_END_WF_NODE_ID");
+            node.iz_milestone = JdbcMapUtil.getString(dataMap, "IZ_MILESTONE");
+            node.seqNo = JdbcMapUtil.getString(dataMap, "SEQ_NO");
+            node.proPlanId = JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_ID");
+            node.level = JdbcMapUtil.getString(dataMap, "level");
+            node.baseNodeId = JdbcMapUtil.getString(dataMap, "SCHEDULE_NAME");
+            node.ver = JdbcMapUtil.getString(dataMap, "VER");
+            String att = JdbcMapUtil.getString(dataMap, "AD_ATT_ID_IMP");
+            if(Strings.isNotEmpty(att)){
+                node.atts = Arrays.asList(att.split(","));
+            }
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(node), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    /**
      * 项目进展节点修改
      */
     public void nodeModify() {
-        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        NodeInput input = JsonUtil.fromJson(json, NodeInput.class);
 
-        myJdbcTemplate.update("update pm_pro_plan_node set POST_INFO_ID=?,CHIEF_USER_ID=?,PLAN_TOTAL_DAYS=?,PLAN_START_DATE=?,PLAN_COMPL_DATE=? where id=?",
-                map.get("postId"), map.get("userId"), map.get("days"), map.get("startTime"), map.get("endTime"), map.get("nodeId"));
-
+        StringBuilder sb = new StringBuilder();
+        sb.append("update pm_pro_plan_node set LAST_MODI_DT =NOW() ");
+        if (Strings.isNotEmpty(input.name)) {
+            sb.append(",`NAME` ='").append(input.name).append("'");
+        }
+        if (Strings.isNotEmpty(input.postId)) {
+            sb.append(",POST_INFO_ID ='").append(input.postId).append("'");
+        }
+        if (Strings.isNotEmpty(input.preNodeId)) {
+            sb.append(",PRE_NODE_ID ='").append(input.preNodeId).append("'");
+        }
+        if (Strings.isNotEmpty(input.processId)) {
+            sb.append(",LINKED_WF_PROCESS_ID ='").append(input.processId).append("'");
+        }
+        if (Strings.isNotEmpty(input.startNodeId)) {
+            sb.append(",LINKED_START_WF_NODE_ID ='").append(input.startNodeId).append("'");
+        }
+        if (Strings.isNotEmpty(input.endNodeId)) {
+            sb.append(",LINKED_END_WF_NODE_ID ='").append(input.endNodeId).append("'");
+        }
+        if (input.days > 0) {
+            sb.append(",PLAN_TOTAL_DAYS =").append(input.days);
+        }
+        if (Strings.isNotEmpty(input.tableId)) {
+            sb.append(",AD_ENT_ID_IMP ='").append(input.tableId).append("'");
+        }
+        if (Strings.isNotEmpty(input.attIds)) {
+            sb.append(",AD_ATT_ID_IMP ='").append(input.attIds).append("'");
+        }
+        if (Strings.isNotEmpty(input.baseNodeId)) {
+            sb.append(",SCHEDULE_NAME ='").append(input.baseNodeId).append("'");
+        }
+        sb.append(",IZ_MILESTONE =").append(input.izMilestone);
+        sb.append(" where id='").append(input.id).append("'");
+        myJdbcTemplate.update(sb.toString());
+        //刷新时间
         PrjPlanUtil.updatePreNodeTime(JdbcMapUtil.getString(map, "nodeId"), JdbcMapUtil.getString(map, "projectId"));
+    }
+
+    public static class NodeInput {
+        //节点ID
+        public String id;
+        //名称
+        public String name;
+        //岗位ID
+        public String postId;
+        //工期
+        public Integer days = 0;
+        //前置节点
+        public String preNodeId;
+        //流程
+        public String processId;
+        //开始节点
+        public String startNodeId;
+        //结束节点
+        public String endNodeId;
+        //是否是里程碑
+        public String izMilestone = "0";
+        //展示字段
+        public String attIds;
+        //表
+        public String tableId;
+        //标准节点ID
+        public String baseNodeId;
     }
 }
