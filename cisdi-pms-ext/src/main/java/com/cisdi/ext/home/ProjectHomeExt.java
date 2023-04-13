@@ -8,7 +8,6 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
-import jdk.nashorn.internal.runtime.options.LoggingOption;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
@@ -176,6 +175,62 @@ public class ProjectHomeExt {
         ExtJarHelper.returnValue.set(outputMap);
     }
 
+
+    /**
+     * 获取项目地块信息
+     */
+    public void getMapData(){
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String projectId = String.valueOf(map.get("projectId"));
+        List<parcel> parcelList = getParcel(projectId);
+        if (CollectionUtils.isEmpty(parcelList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.parcelList = parcelList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    private List<parcel> getParcel(String projectId) {
+        List<parcel> res = new ArrayList<>();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ID,FILL,IDENTIFIER,PLOT_RATIO,PARCEL_SHAPE,ifnull(AREA,0) as AREA,ifnull(CENTER_LATITUDE,0) as CENTER_LATITUDE,ifnull(CENTER_LONGITUDE,0) as CENTER_LONGITUDE from PARCEL where id in (select PARCEL_ID from PRJ_PARCEL where PM_PRJ_ID=?)", projectId);
+        if (!CollectionUtils.isEmpty(list)) {
+            res = list.stream().map(p -> {
+                parcel parcel = new parcel();
+                parcel.id = JdbcMapUtil.getString(p, "ID");
+                parcel.fill = JdbcMapUtil.getString(p, "FILL");
+                parcel.area = JdbcMapUtil.getBigDecimal(p, "AREA");
+                parcel.plotRatio = JdbcMapUtil.getBigDecimal(p, "PLOT_RATIO");
+                parcel.identifier = JdbcMapUtil.getString(p, "IDENTIFIER");
+                parcel.parcelShape = JdbcMapUtil.getString(p, "PARCEL_SHAPE");
+                parcel.centerLongitude = JdbcMapUtil.getBigDecimal(p, "CENTER_LONGITUDE");
+                parcel.centerLatitude = JdbcMapUtil.getBigDecimal(p, "CENTER_LATITUDE");
+                parcel.pointList = getPoint(parcel.id);
+                return parcel;
+            }).collect(Collectors.toList());
+        }
+        return res;
+    }
+
+
+    private List<Point> getPoint(String parcelId) {
+        List<Point> res = new ArrayList<>();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PARCEL_POINT where PARCEL_ID=?", parcelId);
+        if (!CollectionUtils.isEmpty(list)) {
+            res = list.stream().map(p -> {
+                Point point = new Point();
+                point.latitude = JdbcMapUtil.getBigDecimal(p, "LATITUDE");
+                point.longitude = JdbcMapUtil.getBigDecimal(p, "LONGITUDE");
+                return point;
+            }).distinct().collect(Collectors.toList());
+        }
+        return res;
+    }
+
     public static class OutSide {
         public BigDecimal totalAmt;
 
@@ -184,6 +239,8 @@ public class ProjectHomeExt {
         public BigDecimal completeAmt;
 
         public List<FileObj> fileObjList;
+
+        public List<parcel> parcelList;
 
     }
 
@@ -225,6 +282,38 @@ public class ProjectHomeExt {
         public Integer cyCount = 0;
 
         public Integer cyTotal = 0;
+    }
+
+    /**
+     * 经纬度
+     */
+    public static class Point {
+        public BigDecimal longitude;
+
+        public BigDecimal latitude;
+    }
+
+
+    /**
+     * 地块
+     */
+    public static class parcel {
+        public String id;
+        public String fill;
+
+        public BigDecimal area;
+
+        public BigDecimal plotRatio;
+
+        public String identifier;
+
+        public String parcelShape;
+
+        public BigDecimal centerLongitude;
+
+        public BigDecimal centerLatitude;
+
+        public List<Point> pointList;
     }
 
 }

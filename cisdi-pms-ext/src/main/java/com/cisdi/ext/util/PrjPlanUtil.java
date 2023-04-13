@@ -84,6 +84,15 @@ public class PrjPlanUtil {
     private static List<Map<String, Object>> getPreList(Map<String, Object> own, List<Map<String, Object>> allData) {
         SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
         return allData.stream().filter(p -> Objects.equals(own.get("ID"), p.get("PRE_NODE_ID"))).peek(m -> {
+            if(!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"))){
+                Date endaaDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"));
+                if (endaaDate != null) {
+                    int days = JdbcMapUtil.getInt(m, "PLAN_TOTAL_DAYS");
+                    Date endmDate = DateTimeUtil.addDays(endaaDate, days);
+                    m.put("PLAN_START_DATE", sp.format(endaaDate));
+                    m.put("PLAN_COMPL_DATE", sp.format(endmDate));
+                }
+            }
             if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_START_DATE"))) {
                 List<Map<String, Object>> preList = getPreList(m, allData);
                 preList.forEach(item -> {
