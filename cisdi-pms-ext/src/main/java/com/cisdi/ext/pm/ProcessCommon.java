@@ -323,6 +323,7 @@ public class ProcessCommon {
                 if (!CollectionUtils.isEmpty(list2)){
                     Crud.from(tableName).where().eq("ID",recordId).update()
                             .set("PROJECT_SOURCE_TYPE_ID","0099952822476441374")
+                            .set("PROJECT_NAME_WR",null)
                             .set("PM_PRJ_ID",projectId).exec();
                 }
             }
