@@ -129,7 +129,7 @@ public class PmStartExt {
                 " pj.ID as projectId , " +
                 " ps.TENDER_MODE_ID ," +
                 " gq.`NAME` as tender_way, " +
-                " ps.START_REMARK ,ps.PRJ_START_STATUS_ID " +
+                " ps.START_REMARK as  START_REMARK ,ps.PRJ_START_STATUS_ID as PRJ_START_STATUS_ID,ps.LOCATION_INFO as LOCATION_INFO " +
                 "FROM " +
                 " PRJ_START ps " +
                 " left join gr_set_value gg on gg.id = ps.INVESTMENT_SOURCE_ID " +
@@ -163,7 +163,7 @@ public class PmStartExt {
                 pmStart.unitValue = JdbcMapUtil.getString(m, "unitValue");
                 pmStart.agentValue = JdbcMapUtil.getString(m, "agentValue");
                 pmStart.projectId = JdbcMapUtil.getString(m, "projectId");
-                pmStart.parcels = getParcel(pmStart.projectId);
+                pmStart.parcels = JSONObject.parseArray(JdbcMapUtil.getString(m, "LOCATION_INFO"), parcel.class);
                 pmStart.tenderWayId = JdbcMapUtil.getString(m, "TENDER_MODE_ID");
                 pmStart.tenderWay = JdbcMapUtil.getString(m, "tender_way");
                 pmStart.startRemark = JdbcMapUtil.getString(m, "START_REMARK");
