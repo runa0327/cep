@@ -347,7 +347,7 @@ public class WeeklyReportExt {
         }
 
         List<ReportDtl> list = report.reportDtlList.stream().filter(item -> item.isEnd).collect(Collectors.toList());
-        report.reportDtlList=SharedUtil.isEmptyList(list)?null:list;
+        report.reportDtlList = SharedUtil.isEmptyList(list) ? null : list;
     }
 
     /**
@@ -458,6 +458,8 @@ public class WeeklyReportExt {
         List<HrWeeklyReport> list = getNewerPersonReportList(reportId);
         // 若不存在之后的周报列表、且当前周报没有提交，则当前周报可以提交：
         report.canSubmit = SharedUtil.isEmptyList(list) && report.hrWeeklyReport.getSubmitTime() == null;
+        // 若不存在之后的周报列表、且当前周报已经提交，则当前周报可以撤回：
+        report.canSubmit = SharedUtil.isEmptyList(list) && report.hrWeeklyReport.getSubmitTime() != null;
 
         report.reportId = reportId;
 
@@ -501,6 +503,33 @@ public class WeeklyReportExt {
         }
 
         hrWeeklyReport.setSubmitTime(LocalDateTime.now());
+        hrWeeklyReport.setReportRemark(reportRemark);
+        hrWeeklyReport.setReportFile(reportFile);
+        hrWeeklyReport.updateById();
+    }
+
+    public void revokePersonWeeklyReport() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String reportId = SharedUtil.isEmptyObject(map.get("reportId")) ? null : String.valueOf(map.get("reportId"));
+        String reportRemark = SharedUtil.isEmptyObject(map.get("reportRemark")) ? null : String.valueOf(map.get("reportRemark"));
+        String reportFile = SharedUtil.isEmptyObject(map.get("reportFile")) ? null : String.valueOf(map.get("reportFile"));
+
+
+        if (SharedUtil.isEmptyString(reportId)) {
+            throw new BaseException("周报ID不能为空！");
+        }
+
+        List<HrWeeklyReport> list = getNewerPersonReportList(reportId);
+        if (!SharedUtil.isEmptyList(list)) {
+            throw new BaseException("因后续周报已生成，该周报已无法撤回！");
+        }
+
+        HrWeeklyReport hrWeeklyReport = HrWeeklyReport.selectById(reportId);
+        if (hrWeeklyReport.getSubmitTime() == null) {
+            throw new BaseException("因该周报未提交，故无法撤回！");
+        }
+
+        hrWeeklyReport.setSubmitTime(null);
         hrWeeklyReport.setReportRemark(reportRemark);
         hrWeeklyReport.setReportFile(reportFile);
         hrWeeklyReport.updateById();
@@ -762,6 +791,8 @@ public class WeeklyReportExt {
         public String submitTime;
 
         public Boolean canSubmit;
+
+        public Boolean canRevoke;
 
         public String reportId;
 
