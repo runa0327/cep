@@ -459,7 +459,7 @@ public class WeeklyReportExt {
         // 若不存在之后的周报列表、且当前周报没有提交，则当前周报可以提交：
         report.canSubmit = SharedUtil.isEmptyList(list) && report.hrWeeklyReport.getSubmitTime() == null;
         // 若不存在之后的周报列表、且当前周报已经提交，则当前周报可以撤回：
-        report.canSubmit = SharedUtil.isEmptyList(list) && report.hrWeeklyReport.getSubmitTime() != null;
+        report.canRevoke = SharedUtil.isEmptyList(list) && report.hrWeeklyReport.getSubmitTime() != null;
 
         report.reportId = reportId;
 
