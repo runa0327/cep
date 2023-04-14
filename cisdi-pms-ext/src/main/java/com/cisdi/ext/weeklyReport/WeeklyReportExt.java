@@ -511,9 +511,6 @@ public class WeeklyReportExt {
     public void revokePersonWeeklyReport() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String reportId = SharedUtil.isEmptyObject(map.get("reportId")) ? null : String.valueOf(map.get("reportId"));
-        String reportRemark = SharedUtil.isEmptyObject(map.get("reportRemark")) ? null : String.valueOf(map.get("reportRemark"));
-        String reportFile = SharedUtil.isEmptyObject(map.get("reportFile")) ? null : String.valueOf(map.get("reportFile"));
-
 
         if (SharedUtil.isEmptyString(reportId)) {
             throw new BaseException("周报ID不能为空！");
@@ -530,8 +527,6 @@ public class WeeklyReportExt {
         }
 
         hrWeeklyReport.setSubmitTime(null);
-        hrWeeklyReport.setReportRemark(reportRemark);
-        hrWeeklyReport.setReportFile(reportFile);
         hrWeeklyReport.updateById();
     }
 
