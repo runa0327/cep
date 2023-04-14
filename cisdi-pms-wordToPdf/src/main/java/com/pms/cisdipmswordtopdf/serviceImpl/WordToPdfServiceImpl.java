@@ -9,6 +9,11 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
+import com.jacob.activeX.ActiveXComponent;
+import com.jacob.com.ComThread;
+import com.jacob.com.Dispatch;
+import com.jacob.com.Variant;
+import com.pms.cisdipmswordtopdf.controller.ToPdfController;
 import com.pms.cisdipmswordtopdf.model.PoOrderReq;
 import com.pms.cisdipmswordtopdf.service.WordToPdfService;
 import com.pms.cisdipmswordtopdf.util.StringUtils;
@@ -28,6 +33,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class WordToPdfServiceImpl implements WordToPdfService {
+
+    private static final int wdFormatPDF = 17; // PDF 格式
+    private static final int xlTypePDF = 0;  // xls格式s
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -55,7 +63,8 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                 String copyPath = path+id+"copy.pdf";
                 String pdfPath = path+id+".pdf";
                 //word转pdf
-                String error = wordStartToPdf(filePath,copyPath);
+                String error = newPdf(filePath,copyPath);
+//                String error = wordStartToPdf(filePath,copyPath);
                 if (error.length() > 0 && error != null && !"".equals(error)){
                     errorBuilder.append(error).append("\n ");
                 }
@@ -86,6 +95,47 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                     "REMIND_METHOD='日志提醒',REMIND_TARGET='admin',REMIND_TIME=?,REMIND_TEXT=? where id = ?";
             jdbcTemplate.update(sql,poOrderReq.getId(),date,remark,id);
         }
+    }
+
+    private String newPdf(String sfileName, String toFileName) {
+        String error = "";
+        long start = System.currentTimeMillis();
+        ActiveXComponent app = null;
+        Dispatch doc = null;
+        boolean result = true;
+
+        try {
+            app = new ActiveXComponent("Word.Application");
+            app.setProperty("Visible", new Variant(false));
+            Dispatch docs = app.getProperty("Documents").toDispatch();
+            doc = Dispatch.call(docs, "Open", sfileName).toDispatch();
+            System.out.println("打开文档..." + sfileName);
+            System.out.println("转换文档到 PDF..." + toFileName);
+            File tofile = new File(toFileName);
+            if (tofile.exists()) {
+                tofile.delete();
+            }
+            Dispatch.call(doc, "SaveAs", toFileName, wdFormatPDF);
+            long end = System.currentTimeMillis();
+            System.out.println("转换完成..用时：" + (end - start) + "ms.");
+
+            result = true;
+        } catch (Exception e) {
+            // TODO: handle exception
+
+            System.out.println("========Error:文档转换失败：" + e.getMessage());
+            error = "转换失败";
+            result = false;
+        } finally {
+            Dispatch.call(doc, "Close", false);
+            System.out.println("关闭文档");
+            if (app != null) {
+                app.invoke("Quit", new Variant[] {});
+            }
+        }
+
+        ComThread.Release();
+        return error;
     }
 
     /**
