@@ -136,7 +136,7 @@ public class PmProPlanTempExt {
             node.baseNodeId = JdbcMapUtil.getString(p, "SCHEDULE_NAME");
             node.ver = JdbcMapUtil.getString(p, "VER");
             String att = JdbcMapUtil.getString(p, "AD_ATT_ID_IMP");
-            if(Strings.isNotEmpty(att)){
+            if (Strings.isNotEmpty(att)) {
                 node.atts = Arrays.asList(att.split(","));
             }
             return node;
@@ -190,7 +190,7 @@ public class PmProPlanTempExt {
             node.baseNodeId = JdbcMapUtil.getString(dataMap, "SCHEDULE_NAME");
             node.ver = JdbcMapUtil.getString(dataMap, "VER");
             String att = JdbcMapUtil.getString(dataMap, "AD_ATT_ID_IMP");
-            if(Strings.isNotEmpty(att)){
+            if (Strings.isNotEmpty(att)) {
                 node.atts = Arrays.asList(att.split(","));
             }
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(node), Map.class);
@@ -210,7 +210,19 @@ public class PmProPlanTempExt {
         String proPlanId = input.proPlanId;
         if (Strings.isEmpty(input.proPlanId)) {
             proPlanId = Crud.from("pm_pro_plan").insertData();
-            Crud.from("pm_pro_plan").where().eq("ID", proPlanId).update().set("NAME", input.proPlanName).set("IS_TEMPLATE", "1").exec();
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select  \n" +
+                    "concat(gg.`NAME`,'+',gsv.`NAME`,'+', rs.`NAME`,'+',gs.`NAME`) as tempName\n" +
+                    "from PRO_PLAN_TEMPLATE_RULE pptr \n" +
+                    "left join gr_set_value gsv on gsv.id = pptr.PRO_PLAN_RULE_CONDITION_ID \n" +
+                    "left join gr_set_value gs on gs.id = pptr.TENDER_MODE_ID \n" +
+                    "left join gr_set_value rs on rs.id = pptr.TEMPLATE_FOR_PROJECT_TYPE_ID \n" +
+                    "left join gr_set_value gg on gg.id = pptr.INVESTMENT_SOURCE_ID where pptr.id=? ", input.ruleId);
+            String tempName = "自定义模板";
+            if (!CollectionUtils.isEmpty(list)) {
+                Map<String, Object> dataMap = list.get(0);
+                tempName = JdbcMapUtil.getString(dataMap, "tempName");
+            }
+            Crud.from("pm_pro_plan").where().eq("ID", proPlanId).update().set("NAME", tempName).set("IS_TEMPLATE", "1").exec();
             Crud.from("PRO_PLAN_TEMPLATE_RULE").where().eq("ID", input.ruleId).update().set("PM_PRO_PLAN_ID", proPlanId).exec();
         }
         String id = input.id;
