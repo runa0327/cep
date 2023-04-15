@@ -570,7 +570,13 @@ public class WeeklyReportExt {
         String userId = SharedUtil.isEmptyObject(map.get("userId")) ? ExtJarHelper.loginInfo.get().userId : String.valueOf(map.get("userId"));
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
-        List<HrWeeklyReport> hrWeeklyReportList = HrWeeklyReport.selectByWhere(new Where().eq(HrWeeklyReport.Cols.HR_PERIOD_DTL_ID, peroidDtlId).eq(HrWeeklyReport.Cols.HR_WEEKLY_REPORT_TYPE_ID, weeklyReportType.toString()).eq(HrWeeklyReport.Cols.REPORT_USER_ID, userId).eq(HrWeeklyReport.Cols.STATUS, "AP"));
+        Where where = new Where();
+        where.eq(HrWeeklyReport.Cols.HR_PERIOD_DTL_ID, peroidDtlId).eq(HrWeeklyReport.Cols.HR_WEEKLY_REPORT_TYPE_ID, weeklyReportType.toString()).eq(HrWeeklyReport.Cols.STATUS, "AP");
+        // 若查看的不是总经理周报，则可能针对不同用户有不同的，所以还要采用REPORT_USER_ID过滤：
+        if (weeklyReportType != WeeklyReportType.G) {
+            where.eq(HrWeeklyReport.Cols.REPORT_USER_ID, userId);
+        }
+        List<HrWeeklyReport> hrWeeklyReportList = HrWeeklyReport.selectByWhere(where);
 
         HrWeeklyReport hrWeeklyReport = SharedUtil.isEmptyList(hrWeeklyReportList) ? null : hrWeeklyReportList.stream().sorted(Comparator.comparing(HrWeeklyReport::getId)).findFirst().get();
 
