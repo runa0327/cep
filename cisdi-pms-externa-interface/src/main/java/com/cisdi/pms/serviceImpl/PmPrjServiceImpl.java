@@ -1,6 +1,6 @@
 package com.cisdi.pms.serviceImpl;
 
-import com.cisdi.pms.api.PmPrj;
+import com.cisdi.pms.domain.PmPrj;
 import com.cisdi.pms.service.PmPrjService;
 import com.cisdi.pms.util.StringUtilsNew;
 import com.qygly.shared.util.JdbcMapUtil;

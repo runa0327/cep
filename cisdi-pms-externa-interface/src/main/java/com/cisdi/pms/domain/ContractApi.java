@@ -1,4 +1,4 @@
-package com.cisdi.pms.api;
+package com.cisdi.pms.domain;
 
 import lombok.Data;
 

@@ -1,10 +1,9 @@
 package com.cisdi.pms.controller;
 
-import com.cisdi.pms.api.ContractApi;
+import com.cisdi.pms.domain.ContractApi;
 import com.cisdi.pms.resultCommen.AjaxResult;
 import com.cisdi.pms.service.ContractService;
 import com.qygly.shared.util.SharedUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
