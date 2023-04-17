@@ -179,6 +179,8 @@ public class WfInNodeExt {
 
         //给后续节点发周任务
         sendPreNodeWeekTask(JdbcMapUtil.getString(leafNode, "ID"));
+        //当前节点有关的工作台任务状态变为已完成
+        myJdbcTemplate.update("update week_task set WEEK_TASK_STATUS_ID='1634118629769482240' where RELATION_DATA_ID=?", JdbcMapUtil.getString(leafNode, "ID"));
     }
 
 
