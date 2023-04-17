@@ -9,8 +9,10 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import org.springframework.util.CollectionUtils;
 
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
@@ -203,7 +205,22 @@ public class WfInNodeExt {
                 if (Objects.isNull(objectMap.get("CHIEF_USER_ID"))) {
                     userId = JdbcMapUtil.getString(objectMap, "default_user");
                 }
-                String title = MessageFormat.format(msg, objectMap.get("prjName"), objectMap.get("NAME"), objectMap.get("PLAN_START_DATE"));
+                String processName = JdbcMapUtil.getString(objectMap, "NAME");
+                if (Objects.nonNull(objectMap.get("LINKED_WF_PROCESS_ID"))) {
+                    //取流程名称
+                    List<Map<String, Object>> processlist = myJdbcTemplate.queryForList("select * from WF_PROCESS where id=?", objectMap.get("LINKED_WF_PROCESS_ID"));
+                    if (!CollectionUtils.isEmpty(processlist)) {
+                        Map<String, Object> dataMap = processlist.get(0);
+                        processName = JdbcMapUtil.getString(dataMap, "NAME");
+                    }
+                }
+                String dateOrg = "";
+                if (Objects.nonNull(objectMap.get("PLAN_COMPL_DATE"))) {
+                    Date compDate = JdbcMapUtil.getDate(objectMap, "PLAN_COMPL_DATE");
+                    SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
+                    dateOrg = sp.format(compDate);
+                }
+                String title = MessageFormat.format(msg, objectMap.get("prjName"), processName, dateOrg);
                 myJdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=?,CAN_DISPATCH='0',PM_PRJ_ID=? where id=?",
                         userId, title, title, new Date(), "1634118574056542208", "1635080848313290752", objectMap.get("ID"), objectMap.get("projectId"), id);
             }

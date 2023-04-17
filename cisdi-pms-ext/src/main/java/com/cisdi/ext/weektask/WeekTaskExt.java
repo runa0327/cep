@@ -123,7 +123,7 @@ public class WeekTaskExt {
         StringBuilder sb = new StringBuilder();
         sb.append("select wt.*,gsv.`NAME` as task_status,TRANSFER_USER as transferUserId,au.name as transferUser,CAN_DISPATCH,TRANSFER_TIME from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
-                "left join ad_user au on au.id = wt.AD_USER_ID " + "where wt.id  in (select id from week_task where AD_USER_ID='").append(userId).append("' and WEEK_TASK_STATUS_ID='1640891991728508928') ")
+                "left join ad_user au on au.id = wt.AD_USER_ID " + "where wt.id  in (select id from week_task where TRANSFER_USER='").append(userId)
                 .append(" and PUBLISH_START between '")
                 .append(weekDay.get("begin")).append("' and '").append(weekDay.get("end"))
                 .append("' order by PUBLISH_START desc");
@@ -180,12 +180,9 @@ public class WeekTaskExt {
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from WEEK_TASK where id=?", map.get("id"));
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> weekData = list.get(0);
-            //把原来的任务状态改为转办
-            myJdbcTemplate.update("update WEEK_TASK set WEEK_TASK_STATUS_ID='1640891991728508928' where id=?", map.get("id"));
-            //新增任务信息
-            String newId = Crud.from("WEEK_TASK").insertData();
-            myJdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,CAN_DISPATCH='1',WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=?,OLD_WEEK_TASK_ID=?,TRANSFER_USER=?,TRANSFER_TIME=? where id=?",
-                    map.get("userId"), weekData.get("TITLE"), weekData.get("CONTENT"), new Date(), "1634118574056542208", weekData.get("WEEK_TASK_TYPE_ID"), weekData.get("RELATION_DATA_ID"), map.get("id"), weekData.get("AD_USER_ID"), new Date(), newId);
+            //把当前任务的用户改成指定的人，转办人写入原记录的用户
+            Crud.from("WEEK_TASK").where().eq("ID", map.get("id")).update()
+                    .set("AD_USER_ID", map.get("userId")).set("CAN_DISPATCH", "1").set("TRANSFER_USER", weekData.get("AD_USER_ID")).set("TRANSFER_TIME", new Date()).exec();
         }
     }
 

@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -398,14 +399,29 @@ public class PmStartExt {
                     if (!CollectionUtils.isEmpty(threeNodeList)) {
                         Map<String, Object> threeNode = threeNodeList.get(0);
 
-                        String msg = "{0}【{1}】计划将在{2}开始，请及时处理！";
+                        String msg = "{0}【{1}】计划在{2}开始，请及时处理！";
                         String id = Crud.from("WEEK_TASK").insertData();
 
                         String userId = JdbcMapUtil.getString(threeNode, "CHIEF_USER_ID");
                         if (Objects.isNull(threeNode.get("CHIEF_USER_ID"))) {
                             userId = JdbcMapUtil.getString(threeNode, "default_user");
                         }
-                        String title = MessageFormat.format(msg, threeNode.get("prjName"), threeNode.get("NAME"), threeNode.get("PLAN_START_DATE"));
+                        String processName = JdbcMapUtil.getString(threeNode, "NAME");
+                        if (Objects.nonNull(threeNode.get("LINKED_WF_PROCESS_ID"))) {
+                            //取流程名称
+                            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from WF_PROCESS where id=?", threeNode.get("LINKED_WF_PROCESS_ID"));
+                            if (!CollectionUtils.isEmpty(list)) {
+                                Map<String, Object> dataMap = list.get(0);
+                                processName = JdbcMapUtil.getString(dataMap, "NAME");
+                            }
+                        }
+                        String dateOrg = "";
+                        if (Objects.nonNull(threeNode.get("PLAN_COMPL_DATE"))) {
+                            Date compDate = JdbcMapUtil.getDate(threeNode, "PLAN_COMPL_DATE");
+                            SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
+                            dateOrg = sp.format(compDate);
+                        }
+                        String title = MessageFormat.format(msg, threeNode.get("prjName"), processName, dateOrg);
                         myJdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=?,CAN_DISPATCH='0',PM_PRJ_ID=? where id=?",
                                 userId, title, title, new Date(), "1634118574056542208", "1635080848313290752", threeNode.get("ID"), threeNode.get("projectId"), id);
                     }
