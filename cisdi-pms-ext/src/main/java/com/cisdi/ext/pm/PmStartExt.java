@@ -2,12 +2,14 @@ package com.cisdi.ext.pm;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.cisdi.ext.model.PmPostAppoint;
 import com.cisdi.ext.util.*;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -85,7 +87,15 @@ public class PmStartExt {
             pmStart.agentValue = JdbcMapUtil.getString(m, "agentValue");
             pmStart.tenderWay = JdbcMapUtil.getString(m, "tender_way");
             pmStart.sourceTypeId = JdbcMapUtil.getString(m, "INVESTMENT_SOURCE_ID");
-            pmStart.projectId = JdbcMapUtil.getString(m, "project_id");
+            String projectId = JdbcMapUtil.getString(m, "project_id");
+            pmStart.projectId = projectId;
+            List<PmPostAppoint> postList = PmPostAppoint.selectByWhere(new Where().eq(PmPostAppoint.Cols.PM_PRJ_ID,projectId)
+                    .nin(PmPostAppoint.Cols.STATUS,"VD,VDING"));
+            if (!CollectionUtils.isEmpty(postList)){
+                pmStart.postProTrue = 1;
+            } else {
+                pmStart.postProTrue = 0;
+            }
             return pmStart;
         }).collect(Collectors.toList());
 
@@ -433,6 +443,9 @@ public class PmStartExt {
         public String startRemark;
 
         public String statusId;
+
+        //是否发起岗位指派流程 1已发起 0未发起
+        public Integer postProTrue;
 
     }
 
