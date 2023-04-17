@@ -41,15 +41,13 @@ public class PrjPlanUtil {
                             int totalDays = JdbcMapUtil.getInt(threeNode, "PLAN_TOTAL_DAYS");
                             Date completeDate = DateTimeUtil.addDays(paramDate, totalDays);
 
-                            List<Map<String, Object>> threeList = nodeList.stream().filter(p -> 3 == JdbcMapUtil.getInt(p, "LEVEL")).collect(Collectors.toList());
-
-                            threeList.forEach(m -> {
+                            nodeList.forEach(m -> {
                                 if (Objects.equals(m.get("ID"), threeNode.get("ID"))) {
                                     m.put("PLAN_START_DATE", sp.format(paramDate));
                                     m.put("PLAN_COMPL_DATE", sp.format(completeDate));
                                 }
                                 if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_START_DATE"))) {
-                                    List<Map<String, Object>> preList = getPreList(m, threeList);
+                                    List<Map<String, Object>> preList = getPreList(m, nodeList);
                                     if (!CollectionUtils.isEmpty(preList)) {
                                         preList.forEach(item -> {
                                             Date dateOrg = DateTimeUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"));
@@ -62,7 +60,7 @@ public class PrjPlanUtil {
                                 }
                             });
                             StringBuilder sb = new StringBuilder();
-                            threeList.forEach(item -> {
+                            nodeList.forEach(item -> {
                                 if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(item, "PLAN_START_DATE"))) {
                                     sb.append("update pm_pro_plan_node set PLAN_START_DATE='").append(item.get("PLAN_START_DATE"))
                                             .append("', PLAN_COMPL_DATE ='").append(item.get("PLAN_COMPL_DATE")).append("' where id='").append(item.get("ID")).append("' ;");
