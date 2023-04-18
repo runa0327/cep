@@ -222,9 +222,10 @@ public class WfInNodeExt {
                     SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
                     dateOrg = sp.format(compDate);
                 }
-                String title = MessageFormat.format(msg, objectMap.get("prjName"), processName, dateOrg);
+                String title = objectMap.get("prjName") + "-" + processName;
+                String content = MessageFormat.format(msg, objectMap.get("prjName"), processName, dateOrg);
                 myJdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=?,CAN_DISPATCH='0',PM_PRJ_ID=? where id=?",
-                        userId, title, title, new Date(), "1634118574056542208", "1635080848313290752", objectMap.get("ID"), objectMap.get("projectId"), id);
+                        userId, title, content, new Date(), "1634118574056542208", "1635080848313290752", objectMap.get("ID"), objectMap.get("projectId"), id);
             }
         }
     }
