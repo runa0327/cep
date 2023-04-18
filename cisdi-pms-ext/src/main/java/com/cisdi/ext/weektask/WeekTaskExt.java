@@ -123,7 +123,7 @@ public class WeekTaskExt {
         StringBuilder sb = new StringBuilder();
         sb.append("select wt.*,gsv.`NAME` as task_status,TRANSFER_USER as transferUserId,au.name as transferUser,CAN_DISPATCH,TRANSFER_TIME from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
-                "left join ad_user au on au.id = wt.AD_USER_ID " + "where wt.id  in (select id from week_task where TRANSFER_USER='").append(userId)
+                "left join ad_user au on au.id = wt.AD_USER_ID " + "where wt.id  in (select id from week_task where TRANSFER_USER='").append(userId).append("')")
                 .append(" and PUBLISH_START between '")
                 .append(weekDay.get("begin")).append("' and '").append(weekDay.get("end"))
                 .append("' order by PUBLISH_START desc");

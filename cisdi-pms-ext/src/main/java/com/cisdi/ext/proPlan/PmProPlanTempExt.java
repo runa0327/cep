@@ -1,8 +1,10 @@
 package com.cisdi.ext.proPlan;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -46,7 +48,7 @@ public class PmProPlanTempExt {
                         if (!optional.isPresent()) {
                             String id = Crud.from("PRO_PLAN_TEMPLATE_RULE").insertData();
                             Crud.from("PRO_PLAN_TEMPLATE_RULE").where().eq("ID", id).update().set("PRO_PLAN_RULE_CONDITION_ID", condition).set("TENDER_MODE_ID", modeId)
-                                    .set("TEMPLATE_FOR_PROJECT_TYPE_ID", typeId).set("INVESTMENT_SOURCE_ID", sourceId).exec();
+                                    .set("TEMPLATE_FOR_PROJECT_TYPE_ID", typeId).set("INVESTMENT_SOURCE_ID", sourceId).set("EDIT_STATUS_ID","1647776398129225728").exec();
                         }
                     }
                 }
@@ -59,26 +61,53 @@ public class PmProPlanTempExt {
      * 模板规则列表接
      */
     public void proPlanRule() {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+//        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        String keyWord = JdbcMapUtil.getString(map, "keyWord");
+        ModelReq modelReq = JSONObject.parseObject(JSONObject.toJSONString(map), ModelReq.class);
+        String keyWord = modelReq.keyWord;
         StringBuilder sb = new StringBuilder();
         sb.append("select pptr.ID as id,PRO_PLAN_RULE_CONDITION_ID,gsv.`NAME` as condtion_name,\n" +
                 "TENDER_MODE_ID,gs.`NAME` as mode_name,\n" +
                 "TEMPLATE_FOR_PROJECT_TYPE_ID,rs.`NAME` as type_name,\n" +
                 "INVESTMENT_SOURCE_ID,gg.`NAME` as source_name,\n" +
+                "EDIT_STATUS_ID,v1.name as editStatusName,\n" +
                 "PM_PRO_PLAN_ID from PRO_PLAN_TEMPLATE_RULE pptr \n" +
                 "left join gr_set_value gsv on gsv.id = pptr.PRO_PLAN_RULE_CONDITION_ID\n" +
                 "left join gr_set_value gs on gs.id = pptr.TENDER_MODE_ID\n" +
                 "left join gr_set_value rs on rs.id = pptr.TEMPLATE_FOR_PROJECT_TYPE_ID\n" +
-                "left join gr_set_value gg on gg.id = pptr.INVESTMENT_SOURCE_ID where 1=1 ");
+                "left join gr_set_value gg on gg.id = pptr.INVESTMENT_SOURCE_ID \n" +
+                "left join gr_set_value v1 on v1.id = pptr.EDIT_STATUS_ID\n" +
+                "where 1=1  ");
         if (Strings.isNotEmpty(keyWord)) {
-            sb.append(" and gsv.`NAME` like '%").append(keyWord).append("%'");
+            sb.append(" and (gsv.`NAME` like '%").append(keyWord).append("%'");
             sb.append(" or gs.`NAME` like '%").append(keyWord).append("%'");
             sb.append(" or rs.`NAME` like '%").append(keyWord).append("%'");
-            sb.append(" or gg.`NAME` like '%").append(keyWord).append("%'");
+            sb.append(" or gg.`NAME` like '%").append(keyWord).append("%')");
         }
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
+        Map<String, Object> namedParamMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(modelReq.sourceIds)) {
+            sb.append( "and pptr.INVESTMENT_SOURCE_ID in (:sourceIds)");
+            namedParamMap.put("sourceIds", modelReq.sourceIds);
+        }
+        if (!CollectionUtils.isEmpty(modelReq.conditionIds)) {
+            sb.append(" and pptr.PRO_PLAN_RULE_CONDITION_ID in (:conditionIds)");
+            namedParamMap.put("conditionIds",modelReq.conditionIds);
+        }
+        if (!CollectionUtils.isEmpty(modelReq.typeIds)) {
+            sb.append( " and pptr.TEMPLATE_FOR_PROJECT_TYPE_ID in (:typeIds)");
+            namedParamMap.put("typeIds",modelReq.typeIds);
+        }
+        if (!CollectionUtils.isEmpty(modelReq.modeIds)) {
+            sb.append( " and pptr.TENDER_MODE_ID in (:modeIds)");
+            namedParamMap.put("modeIds",modelReq.modeIds);
+        }
+        if (!CollectionUtils.isEmpty(modelReq.editStatusIds)) {
+            sb.append( " and pptr.EDIT_STATUS_ID in (:editStatusIds)");
+            namedParamMap.put("editStatusIds", modelReq.editStatusIds);
+        }
+
+        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(),namedParamMap);
         List<ProPlanTempRule> ruleList = list.stream().map(p -> {
             ProPlanTempRule rule = new ProPlanTempRule();
             rule.id = JdbcMapUtil.getString(p, "id");
@@ -91,6 +120,8 @@ public class PmProPlanTempExt {
             rule.sourceId = JdbcMapUtil.getString(p, "INVESTMENT_SOURCE_ID");
             rule.sourceName = JdbcMapUtil.getString(p, "source_name");
             rule.proPlanId = JdbcMapUtil.getString(p, "PM_PRO_PLAN_ID");
+            rule.editStatusId = JdbcMapUtil.getString(p, "EDIT_STATUS_ID");
+            rule.editStatusName = JdbcMapUtil.getString(p, "editStatusName");
             return rule;
         }).collect(Collectors.toList());
 
@@ -310,8 +341,29 @@ public class PmProPlanTempExt {
      */
     public void baseNodeList() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from STANDARD_NODE_NAME where status ='ap'");
-        List<ObjInfo> objInfoList = list.stream().map(p -> {
+        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
+        String nodeId = JdbcMapUtil.getString(params, "nodeId");
+        String direction = JdbcMapUtil.getString(params,"direction");
+
+
+        List<Map<String, Object>> standardIdList = myJdbcTemplate.queryForList("select SCHEDULE_NAME from pm_pro_plan_node where id = ?", nodeId);
+
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        if (CollectionUtils.isEmpty(standardIdList) || JdbcMapUtil.getString(standardIdList.get(0),"SCHEDULE_NAME") == null){//标准节点为空，说明是新建，返回所有一级
+            resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME where level = 1 and status = 'AP' order by SEQ_NO");
+        }else {
+            if ("down".equals(direction)){//向下新增，返回子级标准节点名称
+                resultList = myJdbcTemplate.queryForList("select ID,NAME,level from STANDARD_NODE_NAME \n" +
+                        "where status ='ap' and STANDARD_NODE_NAME_PID =  (select SCHEDULE_NAME from pm_pro_plan_node where id = " +
+                        "?) order by SEQ_NO",nodeId);
+            }
+            if ("flat".equals(direction)){//编辑本节点，之后节点，返回平级标准节点名称
+                resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME " +
+                        "where status ='ap' and STANDARD_NODE_NAME_PID = (select STANDARD_NODE_NAME_PID from STANDARD_NODE_NAME where id = (select " +
+                        "SCHEDULE_NAME from pm_pro_plan_node where id = ? )) order by SEQ_NO",nodeId);
+            }
+        }
+        List<ObjInfo> objInfoList = resultList.stream().map(p -> {
             ObjInfo objInfo = new ObjInfo();
             objInfo.id = JdbcMapUtil.getString(p, "ID");
             objInfo.name = JdbcMapUtil.getString(p, "NAME");
@@ -445,6 +497,8 @@ public class PmProPlanTempExt {
         public String sourceId;
         public String sourceName;
         public String proPlanId;
+        public String editStatusName;
+        public String editStatusId;
     }
 
     public static class PlanNode {
@@ -514,6 +568,22 @@ public class PmProPlanTempExt {
         public String id;
         public String name;
         public String tableId;
+    }
+
+    //模板列表入参
+    public static class ModelReq {
+        //关键字
+        public String keyWord;
+        //资金来源id
+        public List<String> sourceIds;
+        //投资总额
+        public List<String> conditionIds;
+        //项目类型
+        public List<String> typeIds;
+        //招标模式
+        public List<String> modeIds;
+        //编辑状态
+        public List<String> editStatusIds;
     }
 
 }
