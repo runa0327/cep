@@ -8,6 +8,7 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -189,6 +190,12 @@ public class WfPmInvestUtil {
             }
             String oldPriority = oldPriorityList.get(0);
             if (Strings.isNullOrEmpty(oldPriority) || oldPriority.compareTo(newPriority) <= 0){
+
+                //建设期利息
+                String CONSTRUCT_PERIOD_INTEREST = JdbcMapUtil.getString(valueMap,"CONSTRUCT_PERIOD_INTEREST");
+                if (SharedUtil.isEmptyString(CONSTRUCT_PERIOD_INTEREST)){
+                    CONSTRUCT_PERIOD_INTEREST = "0";
+                }
                 //更新pm_prj金额数据
                 Crud.from("pm_prj").where().eq("ID",prjId).update()
                         .set("ESTIMATED_TOTAL_INVEST",valueMap.get("PRJ_TOTAL_INVEST"))
@@ -200,6 +207,7 @@ public class WfPmInvestUtil {
                         .set("LAND_BUY_AMT",valueMap.get("LAND_AMT"))
                         .set("PREPARE_AMT",valueMap.get("PREPARE_AMT"))
                         .set("INVEST_PRIORITY",newPriorityId)
+                        .set("CONSTRUCT_PERIOD_INTEREST",CONSTRUCT_PERIOD_INTEREST)
                         .exec();
             }
         }
