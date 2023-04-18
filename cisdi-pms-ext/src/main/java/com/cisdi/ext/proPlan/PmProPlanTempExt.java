@@ -342,27 +342,8 @@ public class PmProPlanTempExt {
     public void baseNodeList() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
-        String nodeId = JdbcMapUtil.getString(params, "nodeId");
-        String direction = JdbcMapUtil.getString(params,"direction");
-
-
-        List<Map<String, Object>> standardIdList = myJdbcTemplate.queryForList("select SCHEDULE_NAME from pm_pro_plan_node where id = ?", nodeId);
-
-        List<Map<String, Object>> resultList = new ArrayList<>();
-        if (CollectionUtils.isEmpty(standardIdList) || JdbcMapUtil.getString(standardIdList.get(0),"SCHEDULE_NAME") == null){//标准节点为空，说明是新建，返回所有一级
-            resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME where level = 1 and status = 'AP' order by SEQ_NO");
-        }else {
-            if ("down".equals(direction)){//向下新增，返回子级标准节点名称
-                resultList = myJdbcTemplate.queryForList("select ID,NAME,level from STANDARD_NODE_NAME \n" +
-                        "where status ='ap' and STANDARD_NODE_NAME_PID =  (select SCHEDULE_NAME from pm_pro_plan_node where id = " +
-                        "?) order by SEQ_NO",nodeId);
-            }
-            if ("flat".equals(direction)){//编辑本节点，之后节点，返回平级标准节点名称
-                resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME " +
-                        "where status ='ap' and STANDARD_NODE_NAME_PID = (select STANDARD_NODE_NAME_PID from STANDARD_NODE_NAME where id = (select " +
-                        "SCHEDULE_NAME from pm_pro_plan_node where id = ? )) order by SEQ_NO",nodeId);
-            }
-        }
+        String level = JdbcMapUtil.getString(params, "level");
+        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME where level = ? and status = 'AP' order by SEQ_NO",level);
         List<ObjInfo> objInfoList = resultList.stream().map(p -> {
             ObjInfo objInfo = new ObjInfo();
             objInfo.id = JdbcMapUtil.getString(p, "ID");
@@ -516,6 +497,7 @@ public class PmProPlanTempExt {
         public String endNode;
         public List<String> atts;
         public String iz_milestone;
+        public String planStartDay;
         public String seqNo;
         public String proPlanId;
         public String level;

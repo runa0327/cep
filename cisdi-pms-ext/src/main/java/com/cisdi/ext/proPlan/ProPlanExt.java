@@ -1086,6 +1086,7 @@ public class ProPlanExt {
             node.endNode = JdbcMapUtil.getString(dataMap, "LINKED_END_WF_NODE_ID");
             node.iz_milestone = JdbcMapUtil.getString(dataMap, "IZ_MILESTONE");
             node.seqNo = JdbcMapUtil.getString(dataMap, "SEQ_NO");
+            node.planStartDay = JdbcMapUtil.getString(dataMap, "PLAN_START_DATE");
             node.proPlanId = JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_ID");
             node.level = JdbcMapUtil.getString(dataMap, "level");
             node.baseNodeId = JdbcMapUtil.getString(dataMap, "SCHEDULE_NAME");
@@ -1172,5 +1173,67 @@ public class ProPlanExt {
         public String tableId;
         //标准节点ID
         public String baseNodeId;
+    }
+
+
+
+    /**
+     * 根据项目id查进度计划
+     */
+    public void getNodeByPrj() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,pi.name as post_name,pre.name as pre_name,wp.name as processName  " +
+                "from pm_pro_plan_node pppn left join post_info pi on pppn.POST_INFO_ID = pi.id  " +
+                "left join pm_pro_plan_node pre on pppn.PRE_NODE_ID = pre.id  " +
+                "left join WF_PROCESS wp on pppn.LINKED_WF_PROCESS_ID = wp.id  " +
+                "left join pm_pro_plan ppp on ppp.id = pppn.PM_PRO_PLAN_ID " +
+                "where ppp.pm_prj_id = ?", map.get("prjId"));
+        List<PmProPlanTempExt.PlanNode> nodeList = list.stream().map(p -> {
+            PmProPlanTempExt.PlanNode node = new PmProPlanTempExt.PlanNode();
+            node.id = JdbcMapUtil.getString(p, "ID");
+            node.pid = JdbcMapUtil.getString(p, "PM_PRO_PLAN_NODE_PID") == null ? "0" : JdbcMapUtil.getString(p, "PM_PRO_PLAN_NODE_PID");
+            node.name = JdbcMapUtil.getString(p, "NAME");
+            node.postId = JdbcMapUtil.getString(p, "POST_INFO_ID");
+            node.days = JdbcMapUtil.getInt(p, "PLAN_TOTAL_DAYS");
+            node.preNodeId = JdbcMapUtil.getString(p, "PRE_NODE_ID");
+            node.processId = JdbcMapUtil.getString(p, "LINKED_WF_PROCESS_ID");
+            node.startNode = JdbcMapUtil.getString(p, "LINKED_START_WF_NODE_ID");
+            node.endNode = JdbcMapUtil.getString(p, "LINKED_END_WF_NODE_ID");
+            node.seqNo = JdbcMapUtil.getString(p, "SEQ_NO");
+            node.postName = JdbcMapUtil.getString(p, "post_name");
+            node.iz_milestone = JdbcMapUtil.getString(p, "IZ_MILESTONE");
+            node.preNodeName = JdbcMapUtil.getString(p, "pre_name");
+            node.processName = JdbcMapUtil.getString(p, "processName");
+            node.level = JdbcMapUtil.getString(p, "level");
+            node.baseNodeId = JdbcMapUtil.getString(p, "SCHEDULE_NAME");
+            node.ver = JdbcMapUtil.getString(p, "VER");
+            String att = JdbcMapUtil.getString(p, "AD_ATT_ID_IMP");
+            if (Strings.isNotEmpty(att)) {
+                node.atts = Arrays.asList(att.split(","));
+            }
+            return node;
+        }).collect(Collectors.toList());
+
+        List<PmProPlanTempExt.PlanNode> tree = nodeList.stream()
+                .filter(p -> "0".equals(p.pid))
+                .sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo)))
+                .peek(m -> m.children = getChildren(m, nodeList).stream()
+                        .sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo)))
+                        .collect(Collectors.toList()))
+                .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(tree)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            PmProPlanTempExt.OutSide outSide = new PmProPlanTempExt.OutSide();
+            outSide.tree = tree;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+    private List<PmProPlanTempExt.PlanNode> getChildren(PmProPlanTempExt.PlanNode parentNode, List<PmProPlanTempExt.PlanNode> allData) {
+        return allData.stream().filter(p -> parentNode.id.equals(p.pid)).peek(m -> {
+            m.children = getChildren(m, allData).stream().sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo))).collect(Collectors.toList());
+        }).collect(Collectors.toList());
     }
 }

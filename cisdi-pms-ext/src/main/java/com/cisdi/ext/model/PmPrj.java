@@ -273,6 +273,10 @@ public class PmPrj {
          */
         public static final String RESPONSIBLE_ID = "RESPONSIBLE_ID";
         /**
+         * 批复文号。
+         */
+        public static final String REPLY_NO = "REPLY_NO";
+        /**
          * 项目来源类型。
          */
         public static final String PROJECT_SOURCE_TYPE_ID = "PROJECT_SOURCE_TYPE_ID";
@@ -2370,6 +2374,42 @@ public class PmPrj {
             this.responsibleId = responsibleId;
             if (!this.toUpdateCols.contains("RESPONSIBLE_ID")) {
                 this.toUpdateCols.add("RESPONSIBLE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 批复文号。
+     */
+    private String replyNo;
+
+    /**
+     * 获取：批复文号。
+     */
+    public String getReplyNo() {
+        return this.replyNo;
+    }
+
+    /**
+     * 设置：批复文号。
+     */
+    public PmPrj setReplyNo(String replyNo) {
+        if (this.replyNo == null && replyNo == null) {
+            // 均为null，不做处理。
+        } else if (this.replyNo != null && replyNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.replyNo.compareTo(replyNo) != 0) {
+                this.replyNo = replyNo;
+                if (!this.toUpdateCols.contains("REPLY_NO")) {
+                    this.toUpdateCols.add("REPLY_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.replyNo = replyNo;
+            if (!this.toUpdateCols.contains("REPLY_NO")) {
+                this.toUpdateCols.add("REPLY_NO");
             }
         }
         return this;
