@@ -49,4 +49,18 @@ public class LinkSql {
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId,companyId);
         return list;
     }
+
+    /**
+     * 查询项目的项目结算流程已批准数据
+     * @param pmPrjId 项目id
+     * @param myJdbcTemplate 数据源
+     * @return 查询的结果
+     */
+    public static List<Map<String, Object>> getSettleAmyHistory(String pmPrjId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select PRJ_TOTAL_INVEST,CONSTRUCT_AMT,PROJECT_OTHER_AMT,EQUIP_AMT,EQUIPMENT_COST,LAND_AMT,PREPARE_AMT," +
+                "CONSTRUCT_PERIOD_INTEREST,CUM_PAY_AMT_ONE,CUMULATIVE_PAYED_PERCENT,TEXT_REMARK_ONE,REPLY_DATE_SETTLE," +
+                "FILE_ID_ONE,FILE_ID_TWO,FILE_ID_THREE " +
+                "from PM_PRJ_SETTLE_ACCOUNTS where PM_PRJ_ID = ? AND STATUS = 'AP' ORDER BY LAST_MODI_DT DESC";
+        return myJdbcTemplate.queryForList(sql,pmPrjId);
+    }
 }

@@ -5,7 +5,6 @@ import com.cisdi.ext.link.AttLinkProcessDetail;
 import com.cisdi.ext.link.AttLinkResult;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.LinkedAttModel;
-import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.ad.att.AttDataTypeE;
@@ -91,8 +90,13 @@ public class PmPrjIdLink {
 //                    AttLinkExtDetail.processLinkUser(attValue,entCode,companyId,attLinkResult,myJdbcTemplate);
 //                }
 
+                //赋值
                 Map row = list.get(0);
-                if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)) { // 工程开工报审
+                AttLinkExtDetail.assignmentAttLinkResult(attLinkResult,row,entCode,myJdbcTemplate);
+                if ("PM_PRJ_REQ".equals(entCode)){ //立项申请
+                    //回显项目启动的总投资
+                    AttLinkExtDetail.linkPrjTotalInvest(attLinkResult,attValue);
+                } else if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)) { // 工程开工报审
                     AttLinkProcessDetail.pmPrjKickOffReqPrjLink(attLinkResult,attValue,myJdbcTemplate);
                 } else if ("PIPELINE_RELOCATION_REQ".equals(entCode)){ // 管线迁改
                     //设计部人员
@@ -104,12 +108,6 @@ public class PmPrjIdLink {
                     AttLinkExtDetail.assignmentPrjYesNoOne(id,attLinkResult);
                 } else if ("PM_PRJ_SETTLE_ACCOUNTS".equals(entCode)){ //项目结算审批
                     settlePrjLink(attLinkResult,attValue);
-                }
-                //赋值
-                AttLinkExtDetail.assignmentAttLinkResult(attLinkResult,row,entCode,myJdbcTemplate);
-                if ("PM_PRJ_REQ".equals(entCode)){ //立项申请
-                    //回显项目启动的总投资
-                    AttLinkExtDetail.linkPrjTotalInvest(attLinkResult,attValue);
                 }
 
                 // 资金信息回显。优先级 可研估算<初设概算<预算财<项目结算
@@ -145,6 +143,9 @@ public class PmPrjIdLink {
                 AttLinkExtDetail.attLinkResultAddValue(tmp.getValue(),tmp.getValue(),tmp.getKey(),tmp.getType(),attLinkResult);
             }
         }
+        //历史结算信息汇总模块 处理显示
+        LinkUtils.mapAddValueNull("PRJ_TOTAL_INVEST",AttDataTypeE.DOUBLE,attLinkResult); //总投资
+        AttLinkExtDetail.settleAmtHistory(attValue,attLinkResult);
     }
 
     /**
