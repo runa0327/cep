@@ -7,7 +7,6 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.util.JdbcMapUtil;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -221,18 +220,18 @@ public class WeekTaskExt {
      * 改变任务状态
      */
     public void changeWeekTaskStatus() {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        String opr = JdbcMapUtil.getString(map, "opr");
-        String status = null;
-        if ("去处理".equals(opr)) {
-            status = "1634118609016066048";//进行中
-            String instanceId = JdbcMapUtil.getString(map, "instanceId");
-            if (Strings.isNotEmpty(instanceId)) {
-                myJdbcTemplate.update("update pm_pro_plan_node set LINKED_WF_PROCESS_INSTANCE_ID=? where id =(select RELATION_DATA_ID from week_task where id=? )", instanceId, map.get("id"));
-            }
-        }
-        myJdbcTemplate.update("update WEEK_TASK set WEEK_TASK_STATUS_ID=? where id=?", status, map.get("id"));
+//        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+//        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+//        String opr = JdbcMapUtil.getString(map, "opr");
+//        String status = null;
+//        if ("去处理".equals(opr)) {
+//            status = "1634118609016066048";//进行中
+//            String instanceId = JdbcMapUtil.getString(map, "instanceId");
+//            if (Strings.isNotEmpty(instanceId)) {
+//                myJdbcTemplate.update("update pm_pro_plan_node set LINKED_WF_PROCESS_INSTANCE_ID=? where id =(select RELATION_DATA_ID from week_task where id=? )", instanceId, map.get("id"));
+//            }
+//        }
+//        myJdbcTemplate.update("update WEEK_TASK set WEEK_TASK_STATUS_ID=? where id=?", status, map.get("id"));
     }
 
 

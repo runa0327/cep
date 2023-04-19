@@ -164,11 +164,15 @@ public class WfInNodeExt {
     }
 
     private void updateStartInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Crud.from("pm_pro_plan_node").where().eq("ID", leafNode.get("ID")).update()
                 // 设置进度信息：
                 .set("PROGRESS_STATUS_ID", IN_PROCESSING).set("ACTUAL_START_DATE", now).set("ACTUAL_CARRY_DAYS", 1).set("ACTUAL_CURRENT_PRO_PERCENT", 10).set("ACTUAL_COMPL_DATE", null).set("ACTUAL_TOTAL_DAYS", null)
                 // 设置关联信息：
                 .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_START_WF_NODE_INSTANCE_ID", nodeInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", null).exec();
+
+        //当前节点有关的工作台任务状态变为进行中
+        myJdbcTemplate.update("update week_task set WEEK_TASK_STATUS_ID='1634118609016066048' where RELATION_DATA_ID=?", JdbcMapUtil.getString(leafNode, "ID"));
     }
 
     private void updateEndInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode) {
