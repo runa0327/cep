@@ -48,7 +48,7 @@ public class PmProPlanTempExt {
                         if (!optional.isPresent()) {
                             String id = Crud.from("PRO_PLAN_TEMPLATE_RULE").insertData();
                             Crud.from("PRO_PLAN_TEMPLATE_RULE").where().eq("ID", id).update().set("PRO_PLAN_RULE_CONDITION_ID", condition).set("TENDER_MODE_ID", modeId)
-                                    .set("TEMPLATE_FOR_PROJECT_TYPE_ID", typeId).set("INVESTMENT_SOURCE_ID", sourceId).set("EDIT_STATUS_ID","1647776398129225728").exec();
+                                    .set("TEMPLATE_FOR_PROJECT_TYPE_ID", typeId).set("INVESTMENT_SOURCE_ID", sourceId).set("EDIT_STATUS_ID", "1647776398129225728").exec();
                         }
                     }
                 }
@@ -87,27 +87,27 @@ public class PmProPlanTempExt {
         }
         Map<String, Object> namedParamMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(modelReq.sourceIds)) {
-            sb.append( "and pptr.INVESTMENT_SOURCE_ID in (:sourceIds)");
+            sb.append("and pptr.INVESTMENT_SOURCE_ID in (:sourceIds)");
             namedParamMap.put("sourceIds", modelReq.sourceIds);
         }
         if (!CollectionUtils.isEmpty(modelReq.conditionIds)) {
             sb.append(" and pptr.PRO_PLAN_RULE_CONDITION_ID in (:conditionIds)");
-            namedParamMap.put("conditionIds",modelReq.conditionIds);
+            namedParamMap.put("conditionIds", modelReq.conditionIds);
         }
         if (!CollectionUtils.isEmpty(modelReq.typeIds)) {
-            sb.append( " and pptr.TEMPLATE_FOR_PROJECT_TYPE_ID in (:typeIds)");
-            namedParamMap.put("typeIds",modelReq.typeIds);
+            sb.append(" and pptr.TEMPLATE_FOR_PROJECT_TYPE_ID in (:typeIds)");
+            namedParamMap.put("typeIds", modelReq.typeIds);
         }
         if (!CollectionUtils.isEmpty(modelReq.modeIds)) {
-            sb.append( " and pptr.TENDER_MODE_ID in (:modeIds)");
-            namedParamMap.put("modeIds",modelReq.modeIds);
+            sb.append(" and pptr.TENDER_MODE_ID in (:modeIds)");
+            namedParamMap.put("modeIds", modelReq.modeIds);
         }
         if (!CollectionUtils.isEmpty(modelReq.editStatusIds)) {
-            sb.append( " and pptr.EDIT_STATUS_ID in (:editStatusIds)");
+            sb.append(" and pptr.EDIT_STATUS_ID in (:editStatusIds)");
             namedParamMap.put("editStatusIds", modelReq.editStatusIds);
         }
 
-        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(),namedParamMap);
+        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), namedParamMap);
         List<ProPlanTempRule> ruleList = list.stream().map(p -> {
             ProPlanTempRule rule = new ProPlanTempRule();
             rule.id = JdbcMapUtil.getString(p, "id");
@@ -259,9 +259,15 @@ public class PmProPlanTempExt {
             Crud.from("PRO_PLAN_TEMPLATE_RULE").where().eq("ID", input.ruleId).update().set("PM_PRO_PLAN_ID", proPlanId).exec();
         }
         String id = input.id;
+        String preNodeId = input.postId;
+        if (id.equals(preNodeId)) {
+            throw new BaseException("前置节点不能是自己！");
+        }
         if (Strings.isEmpty(input.id)) {
             id = Crud.from("pm_pro_plan_node").insertData();
         }
+
+
         StringBuilder sb = new StringBuilder();
         sb.append("update pm_pro_plan_node set LAST_MODI_DT =NOW(),PM_PRO_PLAN_ID= '").append(proPlanId).append("' ");
         if (Strings.isNotEmpty(input.pid)) {
@@ -345,7 +351,7 @@ public class PmProPlanTempExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         String level = JdbcMapUtil.getString(params, "level");
-        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME where level = ? and status = 'AP' order by SEQ_NO",level);
+        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME where level = ? and status = 'AP' order by SEQ_NO", level);
         List<ObjInfo> objInfoList = resultList.stream().map(p -> {
             ObjInfo objInfo = new ObjInfo();
             objInfo.id = JdbcMapUtil.getString(p, "ID");
