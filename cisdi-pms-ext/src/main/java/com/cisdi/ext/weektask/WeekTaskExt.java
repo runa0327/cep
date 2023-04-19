@@ -3,6 +3,7 @@ package com.cisdi.ext.weektask;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.cisdi.ext.util.WeeklyUtils;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -200,12 +201,28 @@ public class WeekTaskExt {
             if (!CollectionUtils.isEmpty(dataList)) {
                 Map<String, Object> dataMap = dataList.get(0);
                 String viewId = JdbcMapUtil.getString(dataMap, "AD_VIEW_ID");
-                Map<String, String> res = new HashMap<>();
+                Map<String, Object> res = new HashMap<>();
                 res.put("processId", processId);
                 res.put("viewId", viewId);
                 res.put("icon", JdbcMapUtil.getString(dataMap, "EXTRA_INFO"));
                 res.put("title", JdbcMapUtil.getString(node, "NAME"));
                 res.put("projectId", JdbcMapUtil.getString(node, "pm_prj_id"));
+                //查询标准节点附加信息
+                String baseNodeId = JdbcMapUtil.getString(node, "SCHEDULE_NAME");
+                List<AttData> attDataList = new ArrayList<>();
+                if (!Strings.isNullOrEmpty(baseNodeId)) {
+                    List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from STANDARD_NODE_NAME_DEFAULT_ATT where STANDARD_NODE_NAME_ID=?", baseNodeId);
+                    attDataList = list1.stream().map(m -> {
+                        AttData attData = new AttData();
+                        attData.AD_ATT_ID = JdbcMapUtil.getString(m, "AD_ATT_ID");
+                        attData.ATT_VALUE = JdbcMapUtil.getString(m, "ATT_VALUE");
+                        attData.FOR_NODE = JdbcMapUtil.getString(m, "FOR_NODE");
+                        attData.FOR_PROC = JdbcMapUtil.getString(m, "FOR_PROC");
+                        return attData;
+                    }).collect(Collectors.toList());
+                    res.put("attData", attDataList);
+                }
+
                 ExtJarHelper.returnValue.set(res);
             } else {
                 ExtJarHelper.returnValue.set(Collections.emptyMap());
@@ -301,5 +318,12 @@ public class WeekTaskExt {
     public static class OutSide {
         public List<WeekTask> weekTaskList;
         public Integer total;
+    }
+
+    public static class AttData {
+        public String AD_ATT_ID;
+        public String ATT_VALUE;
+        public String FOR_NODE;
+        public String FOR_PROC;
     }
 }
