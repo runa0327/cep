@@ -1189,13 +1189,18 @@ public class ProPlanExt {
                 "left join WF_PROCESS wp on pppn.LINKED_WF_PROCESS_ID = wp.id  " +
                 "left join pm_pro_plan ppp on ppp.id = pppn.PM_PRO_PLAN_ID " +
                 "where ppp.pm_prj_id = ?", map.get("prjId"));
-        List<PmProPlanTempExt.PlanNode> nodeList = list.stream().map(p -> {
-            PmProPlanTempExt.PlanNode node = new PmProPlanTempExt.PlanNode();
+        List<PlanNode> nodeList = list.stream().map(p -> {
+            PlanNode node = new PlanNode();
             node.id = JdbcMapUtil.getString(p, "ID");
             node.pid = JdbcMapUtil.getString(p, "PM_PRO_PLAN_NODE_PID") == null ? "0" : JdbcMapUtil.getString(p, "PM_PRO_PLAN_NODE_PID");
             node.name = JdbcMapUtil.getString(p, "NAME");
             node.postId = JdbcMapUtil.getString(p, "POST_INFO_ID");
             node.days = JdbcMapUtil.getInt(p, "PLAN_TOTAL_DAYS");
+            node.actualDays = JdbcMapUtil.getInt(p,"ACTUAL_TOTAL_DAYS");
+            node.planStartDay = JdbcMapUtil.getString(p, "PLAN_START_DATE");
+            node.planComplDay = JdbcMapUtil.getString(p,"PLAN_COMPL_DATE");
+            node.actualStartDay = JdbcMapUtil.getString(p,"ACTUAL_START_DATE");
+            node.actualComplDay = JdbcMapUtil.getString(p,"ACTUAL_COMPL_DATE");
             node.preNodeId = JdbcMapUtil.getString(p, "PRE_NODE_ID");
             node.processId = JdbcMapUtil.getString(p, "LINKED_WF_PROCESS_ID");
             node.startNode = JdbcMapUtil.getString(p, "LINKED_START_WF_NODE_ID");
@@ -1215,7 +1220,7 @@ public class ProPlanExt {
             return node;
         }).collect(Collectors.toList());
 
-        List<PmProPlanTempExt.PlanNode> tree = nodeList.stream()
+        List<PlanNode> tree = nodeList.stream()
                 .filter(p -> "0".equals(p.pid))
                 .sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo)))
                 .peek(m -> m.children = getChildren(m, nodeList).stream()
@@ -1225,15 +1230,80 @@ public class ProPlanExt {
         if (CollectionUtils.isEmpty(tree)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
-            PmProPlanTempExt.OutSide outSide = new PmProPlanTempExt.OutSide();
+            PlanOutSide outSide = new PlanOutSide();
             outSide.tree = tree;
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
     }
-    private List<PmProPlanTempExt.PlanNode> getChildren(PmProPlanTempExt.PlanNode parentNode, List<PmProPlanTempExt.PlanNode> allData) {
+    private List<PlanNode> getChildren(PlanNode parentNode, List<PlanNode> allData) {
         return allData.stream().filter(p -> parentNode.id.equals(p.pid)).peek(m -> {
             m.children = getChildren(m, allData).stream().sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo))).collect(Collectors.toList());
         }).collect(Collectors.toList());
+    }
+
+    public static class PlanOutSide {
+        public List<ProPlanTempRule> ruleList;
+        public List<PlanNode> tree;
+        public List<String> names;
+        public List<ObjInfo> objInfoList;
+        public List<AttInfo> attInfoList;
+    }
+
+    public static class AttInfo {
+        public String id;
+        public String name;
+        public String tableId;
+    }
+
+    public static class ObjInfo {
+        public String id;
+        public String name;
+    }
+
+    public static class ProPlanTempRule {
+        public String id;
+        public String condtionId;
+        public String condtionName;
+        public String modeId;
+        public String modeName;
+        public String typeId;
+        public String typeName;
+        public String sourceId;
+        public String sourceName;
+        public String proPlanId;
+        public String editStatusName;
+        public String editStatusId;
+    }
+
+    public static class PlanNode {
+        public String id;
+        public String pid;
+        public String name;
+        public String postId;
+        public String postName;
+        public Integer days;
+        public Integer actualDays;
+        public String planStartDay;
+        public String planComplDay;
+        public String actualStartDay;
+        public String actualComplDay;
+        public String preNodeId;
+        public String preNodeName;
+        public String processId;
+        public String processName;
+        public String startNode;
+        public String endNode;
+        public List<String> atts;
+        public String iz_milestone;
+        public String seqNo;
+        public String proPlanId;
+        public String level;
+
+        public List<PlanNode> children;
+        public String baseNodeId;
+
+        public String ver;
+
     }
 }

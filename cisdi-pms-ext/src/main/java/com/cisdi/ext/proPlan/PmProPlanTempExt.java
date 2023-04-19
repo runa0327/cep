@@ -146,7 +146,9 @@ public class PmProPlanTempExt {
                 "from pm_pro_plan_node pppn left join post_info pi on pppn.POST_INFO_ID = pi.id  " +
                 "left join pm_pro_plan_node pre on pppn.PRE_NODE_ID = pre.id  " +
                 "left join WF_PROCESS wp on pppn.LINKED_WF_PROCESS_ID = wp.id  " +
-                "where pppn.PM_PRO_PLAN_ID=?", map.get("planId"));
+                "left join PRO_PLAN_TEMPLATE_RULE r on r.PM_PRO_PLAN_ID = pppn.PM_PRO_PLAN_ID " +
+//                "where pppn.PM_PRO_PLAN_ID=?", map.get("planId"));
+                "where r.id=?", map.get("ruleId"));
         List<PlanNode> nodeList = list.stream().map(p -> {
             PlanNode node = new PlanNode();
             node.id = JdbcMapUtil.getString(p, "ID");
