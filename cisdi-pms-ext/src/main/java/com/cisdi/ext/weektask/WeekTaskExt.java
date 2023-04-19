@@ -201,17 +201,17 @@ public class WeekTaskExt {
             if (!CollectionUtils.isEmpty(dataList)) {
                 Map<String, Object> dataMap = dataList.get(0);
                 String viewId = JdbcMapUtil.getString(dataMap, "AD_VIEW_ID");
-                Map<String, Object> res = new HashMap<>();
-                res.put("processId", processId);
-                res.put("viewId", viewId);
-                res.put("icon", JdbcMapUtil.getString(dataMap, "EXTRA_INFO"));
-                res.put("title", JdbcMapUtil.getString(node, "NAME"));
-                res.put("projectId", JdbcMapUtil.getString(node, "pm_prj_id"));
+                ProcessData resData = new ProcessData();
+                resData.processId = processId;
+                resData.viewId = viewId;
+                resData.icon = JdbcMapUtil.getString(dataMap, "EXTRA_INFO");
+                resData.title = JdbcMapUtil.getString(node, "NAME");
+                resData.projectId = JdbcMapUtil.getString(node, "pm_prj_id");
                 //查询标准节点附加信息
                 String baseNodeId = JdbcMapUtil.getString(node, "SCHEDULE_NAME");
                 List<AttData> attDataList = new ArrayList<>();
                 if (!Strings.isNullOrEmpty(baseNodeId)) {
-                    List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from STANDARD_NODE_NAME_DEFAULT_ATT where STANDARD_NODE_NAME_ID=?", baseNodeId);
+                    List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select AD_ATT_ID,ATT_VALUE,ifnull(FOR_NODE,0) as FOR_NODE,ifnull(FOR_PROC,0) as FOR_PROC from STANDARD_NODE_NAME_DEFAULT_ATT where STANDARD_NODE_NAME_ID=?", baseNodeId);
                     attDataList = list1.stream().map(m -> {
                         AttData attData = new AttData();
                         attData.AD_ATT_ID = JdbcMapUtil.getString(m, "AD_ATT_ID");
@@ -220,10 +220,10 @@ public class WeekTaskExt {
                         attData.FOR_PROC = JdbcMapUtil.getString(m, "FOR_PROC");
                         return attData;
                     }).collect(Collectors.toList());
-                    res.put("attData", attDataList);
+                    resData.attDataList = attDataList;
                 }
-
-                ExtJarHelper.returnValue.set(res);
+                Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resData), Map.class);
+                ExtJarHelper.returnValue.set(outputMap);
             } else {
                 ExtJarHelper.returnValue.set(Collections.emptyMap());
             }
@@ -318,6 +318,16 @@ public class WeekTaskExt {
     public static class OutSide {
         public List<WeekTask> weekTaskList;
         public Integer total;
+    }
+
+    public static class ProcessData {
+        public String processId;
+        public String viewId;
+        public String icon;
+        public String title;
+        public String projectId;
+
+        public List<AttData> attDataList;
     }
 
     public static class AttData {
