@@ -1,6 +1,7 @@
 package com.cisdi.ext.wf;
 
 import com.cisdi.ext.model.PmProPlanNode;
+import com.cisdi.ext.util.DateTimeUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -9,6 +10,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.text.MessageFormat;
@@ -20,11 +22,13 @@ import java.util.*;
 /**
  * 进入流程节点时的扩展。
  */
+@Slf4j
 public class WfInNodeExt {
 
     public static final String NOT_STARTED = "0099799190825106800";
     public static final String IN_PROCESSING = "0099799190825106801";
     public static final String COMPLETED = "0099799190825106802";
+
 
 
     /**
@@ -168,13 +172,24 @@ public class WfInNodeExt {
     }
 
     private void updateEndInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //计算时间工期
+        int actualDays = 0;
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", leafNode.get("ID"));
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> currentNode = list.get(0);
+            Date startDate = JdbcMapUtil.getDate(currentNode, "ACTUAL_START_DATE");
+            try {
+                actualDays = DateTimeUtil.daysBetween(now, startDate);
+            }catch (Exception e){log.error("计算实际完成工期失败！");}
+        }
         Crud.from("pm_pro_plan_node").where().eq("ID", leafNode.get("ID")).update()
                 // 设置进度信息：
-                .set("PROGRESS_STATUS_ID", COMPLETED).set("ACTUAL_CURRENT_PRO_PERCENT", 100).set("ACTUAL_COMPL_DATE", now)
+                .set("PROGRESS_STATUS_ID", COMPLETED).set("ACTUAL_CURRENT_PRO_PERCENT", 100).set("ACTUAL_COMPL_DATE", now).set("ACTUAL_TOTAL_DAYS", actualDays)
                 // 设置关联信息：
                 .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", nodeInstId).exec();
 
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+
         myJdbcTemplate.update("update pm_pro_plan_node t set t.ACTUAL_CARRY_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1,t.ACTUAL_TOTAL_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1 WHERE t.id=?", leafNode.get("ID"));
 
         //给后续节点发周任务
