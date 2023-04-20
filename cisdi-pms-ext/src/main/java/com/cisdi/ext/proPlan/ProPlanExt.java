@@ -1183,11 +1183,12 @@ public class ProPlanExt {
     public void getNodeByPrj() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,pi.name as post_name,pre.name as pre_name,wp.name as processName  " +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,pi.name as post_name,pre.name as pre_name,wp.name as processName,v.name progressStatusName  " +
                 "from pm_pro_plan_node pppn left join post_info pi on pppn.POST_INFO_ID = pi.id  " +
                 "left join pm_pro_plan_node pre on pppn.PRE_NODE_ID = pre.id  " +
                 "left join WF_PROCESS wp on pppn.LINKED_WF_PROCESS_ID = wp.id  " +
                 "left join pm_pro_plan ppp on ppp.id = pppn.PM_PRO_PLAN_ID " +
+                "left join gr_set_value v on v.id = pppn.PROGRESS_STATUS_ID " +
                 "where ppp.pm_prj_id = ?", map.get("prjId"));
         List<PlanNode> nodeList = list.stream().map(p -> {
             PlanNode node = new PlanNode();
@@ -1201,6 +1202,8 @@ public class ProPlanExt {
             node.planComplDay = JdbcMapUtil.getString(p,"PLAN_COMPL_DATE");
             node.actualStartDay = JdbcMapUtil.getString(p,"ACTUAL_START_DATE");
             node.actualComplDay = JdbcMapUtil.getString(p,"ACTUAL_COMPL_DATE");
+            node.progressStatusId = JdbcMapUtil.getString(p,"PROGRESS_STATUS_ID");
+            node.progressStatusName = JdbcMapUtil.getString(p,"progressStatusName");
             node.preNodeId = JdbcMapUtil.getString(p, "PRE_NODE_ID");
             node.processId = JdbcMapUtil.getString(p, "LINKED_WF_PROCESS_ID");
             node.startNode = JdbcMapUtil.getString(p, "LINKED_START_WF_NODE_ID");
@@ -1305,5 +1308,7 @@ public class ProPlanExt {
 
         public String ver;
 
+        public String progressStatusId;
+        public String progressStatusName;
     }
 }
