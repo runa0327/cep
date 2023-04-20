@@ -68,16 +68,18 @@ public class PmProPlanExt {
         String nodeId = String.valueOf(map.get("nodeId"));
 
         viewObj viewObj = new viewObj();
-        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select hd.`NAME` as post,PLAN_START_DATE,PLAN_COMPL_DATE,PLAN_TOTAL_DAYS, " +
+        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select hd.`NAME` as post,po.name postName,PLAN_START_DATE,PLAN_COMPL_DATE,PLAN_TOTAL_DAYS, " +
                 "gsv.`NAME` as `status`,ACTUAL_START_DATE,ACTUAL_COMPL_DATE,PLAN_CARRY_DAYS,ifnull(pppn.CAN_START,0) as  CAN_START,au.`NAME` AS user " +
                 "from PM_PRO_PLAN_NODE  pppn " +
                 "left join hr_dept hd on hd.id = pppn.CHIEF_DEPT_ID " +
+                "left join POST_INFO po on po.id = pppn.POST_INFO_ID " +
                 "left join gr_set_value gsv on gsv.id = pppn.PROGRESS_STATUS_ID " +
                 "left join ad_user au on au.id = pppn.CHIEF_USER_ID " +
                 "where pppn.id=?", nodeId);
         if (!CollectionUtils.isEmpty(nodeList)) {
             Map<String, Object> node = nodeList.get(0);
             viewObj.post = JdbcMapUtil.getString(node, "post");
+            viewObj.postName = JdbcMapUtil.getString(node, "postName");
             viewObj.planStartTime = JdbcMapUtil.getString(node, "PLAN_START_DATE");
             viewObj.planCompleteTime = JdbcMapUtil.getString(node, "PLAN_COMPL_DATE");
             viewObj.predictDays = JdbcMapUtil.getString(node, "PLAN_TOTAL_DAYS");
@@ -184,6 +186,20 @@ public class PmProPlanExt {
 
     }
 
+    /**
+     * 三级节点下拉（选前置节点）
+     */
+    public void thirdNodeList(){
+        Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> thirdNodeList = myJdbcTemplate.queryForList("SELECT nd.id,nd.name FROM pm_pro_plan_node nd\n" +
+                "left join pm_pro_plan pl on pl.id = nd.PM_PRO_PLAN_ID\n" +
+                "where nd.level = 3 and pl.PM_PRJ_ID = ? and pl.status = 'AP' and nd.status = 'AP'",input.get("prjId"));
+        Map<String, Object> result = new HashMap<>();
+        result.put("thirdNodeList",thirdNodeList);
+        ExtJarHelper.returnValue.set(result);
+    }
+
     public static class FileObj {
         // 序号
         public Integer num;
@@ -212,6 +228,7 @@ public class PmProPlanExt {
     public static class viewObj {
         // 岗位
         public String post;
+        public String postName;
 
         public String user;
 

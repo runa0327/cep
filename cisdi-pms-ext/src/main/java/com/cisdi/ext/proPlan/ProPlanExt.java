@@ -5,6 +5,7 @@ import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.PrjPlanUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.IdCodeName;
@@ -1108,6 +1109,9 @@ public class ProPlanExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
         NodeInput input = JsonUtil.fromJson(json, NodeInput.class);
+        if (Strings.isEmpty(input.id)){
+            input.id = Crud.from("pm_pro_plan_node").insertData();
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append("update pm_pro_plan_node set LAST_MODI_DT =NOW() ");
@@ -1129,7 +1133,7 @@ public class ProPlanExt {
         if (Strings.isNotEmpty(input.endNodeId)) {
             sb.append(",LINKED_END_WF_NODE_ID ='").append(input.endNodeId).append("'");
         }
-        if (input.days > 0) {
+        if (null  != input.days && input.days > 0) {
             sb.append(",PLAN_TOTAL_DAYS =").append(input.days);
         }
         if (Strings.isNotEmpty(input.tableId)) {
@@ -1140,6 +1144,21 @@ public class ProPlanExt {
         }
         if (Strings.isNotEmpty(input.baseNodeId)) {
             sb.append(",SCHEDULE_NAME ='").append(input.baseNodeId).append("'");
+        }
+        if (Strings.isNotEmpty(input.level)){
+            sb.append(",LEVEL = '").append(input.level).append("'");
+        }
+        if (Strings.isNotEmpty(input.proPlanId)){
+            sb.append(",PM_PRO_PLAN_ID = '").append(input.proPlanId).append("'");
+        }
+        if (Strings.isNotEmpty(input.pid)){
+            sb.append(",PM_PRO_PLAN_NODE_PID = '").append(input.pid).append("'");
+        }
+        if (Strings.isNotEmpty(input.seqNo)){
+            sb.append(",SEQ_NO = '").append(input.seqNo).append("'");
+        }
+        if (Strings.isEmpty(input.izMilestone)){
+            input.izMilestone = "0";
         }
         sb.append(",IZ_MILESTONE =").append(input.izMilestone);
         sb.append(" where id='").append(input.id).append("'");
@@ -1173,6 +1192,14 @@ public class ProPlanExt {
         public String tableId;
         //标准节点ID
         public String baseNodeId;
+        //层级
+        public String level;
+        //计划id
+        public String proPlanId;
+        //父id
+        public String pid;
+        //序号
+        public String seqNo;
     }
 
 
@@ -1183,6 +1210,7 @@ public class ProPlanExt {
     public void getNodeByPrj() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        Map<String, Object> proPlanIdMap = myJdbcTemplate.queryForMap("select id proPlanId from pm_pro_plan where pm_prj_id = ?", map.get("prjId"));
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,pi.name as post_name,pre.name as pre_name,wp.name as processName,v.name progressStatusName  " +
                 "from pm_pro_plan_node pppn left join post_info pi on pppn.POST_INFO_ID = pi.id  " +
                 "left join pm_pro_plan_node pre on pppn.PRE_NODE_ID = pre.id  " +
@@ -1234,6 +1262,7 @@ public class ProPlanExt {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
             PlanOutSide outSide = new PlanOutSide();
+            outSide.proPlanId = proPlanIdMap.get("proPlanId").toString();
             outSide.tree = tree;
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
@@ -1246,6 +1275,7 @@ public class ProPlanExt {
     }
 
     public static class PlanOutSide {
+        public String proPlanId;
         public List<ProPlanTempRule> ruleList;
         public List<PlanNode> tree;
         public List<String> names;
