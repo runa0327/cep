@@ -217,13 +217,14 @@ public class WeekTaskExt {
                 String baseNodeId = JdbcMapUtil.getString(node, "SCHEDULE_NAME");
                 List<AttData> attDataList = new ArrayList<>();
                 if (!Strings.isNullOrEmpty(baseNodeId)) {
-                    List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select AD_ATT_ID,ATT_VALUE,ifnull(FOR_NODE,0) as FOR_NODE,ifnull(FOR_PROC,0) as FOR_PROC,aa.code as ad_att_code from STANDARD_NODE_NAME_DEFAULT_ATT t " +
+                    List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select AD_ATT_ID,ATT_VALUE,ifnull(FOR_NODE,0) as FOR_NODE,ifnull(FOR_PROC,0) as FOR_PROC,aa.code as ad_att_code,aa.`NAME` as ad_att_text from STANDARD_NODE_NAME_DEFAULT_ATT t " +
                             " left join AD_ATT aa on t.AD_ATT_ID = aa.id  where STANDARD_NODE_NAME_ID=?", baseNodeId);
                     attDataList = list1.stream().map(m -> {
                         AttData attData = new AttData();
                         attData.AD_ATT_ID = JdbcMapUtil.getString(m, "AD_ATT_ID");
                         attData.AD_ATT_CODE = JdbcMapUtil.getString(m, "ad_att_code");
                         attData.ATT_VALUE = JdbcMapUtil.getString(m, "ATT_VALUE");
+                        attData.ATT_TXT = JdbcMapUtil.getString(m, "ad_att_text");
                         attData.FOR_NODE = JdbcMapUtil.getString(m, "FOR_NODE");
                         attData.FOR_PROC = JdbcMapUtil.getString(m, "FOR_PROC");
                         return attData;
@@ -344,6 +345,8 @@ public class WeekTaskExt {
 
         public String AD_ATT_CODE;
         public String ATT_VALUE;
+
+        public String ATT_TXT;
         public String FOR_NODE;
         public String FOR_PROC;
     }
