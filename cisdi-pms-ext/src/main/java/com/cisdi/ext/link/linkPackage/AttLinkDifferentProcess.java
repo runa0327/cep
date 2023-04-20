@@ -258,4 +258,14 @@ public class AttLinkDifferentProcess {
         editGuarantee.add("PO_ORDER_TERMINATE_REQ"); //采购合同终止申请
         return editGuarantee;
     }
+
+    /**
+     * 流程岗位审批人员从页面表单取数 字段花名册同属
+     * @return list集合
+     */
+    public static List<String> getPostProList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_PRJ_SETTLE_ACCOUNTS"); //项目结算
+        return list;
+    }
 }

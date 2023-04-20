@@ -1456,9 +1456,11 @@ public class AttLinkExtDetail {
                     String userId = JdbcMapUtil.getString(tmp,"AD_USER_ID");
                     String userName = JdbcMapUtil.getString(tmp,"userName");
                     String code = JdbcMapUtil.getString(tmp,"CODE");
-                    List<String> codeList = StringUtil.getStrToList(code,",");
-                    for (String tp : codeList) {
-                        LinkUtils.mapAddValueByValueNoEdit(tp,userName,userId,AttDataTypeE.TEXT_LONG,false,attLinkResult);
+                    if (!SharedUtil.isEmptyString(userId)){
+                        List<String> codeList = StringUtil.getStrToList(code,",");
+                        for (String tp : codeList) {
+                            LinkUtils.mapAddValueByValueNoEdit(tp,userName,userId,AttDataTypeE.TEXT_LONG,false,attLinkResult);
+                        }
                     }
                 }
             }

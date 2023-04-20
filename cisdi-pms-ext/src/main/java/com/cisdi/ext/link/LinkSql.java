@@ -1,9 +1,15 @@
 package com.cisdi.ext.link;
 
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.shared.util.JdbcMapUtil;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 属性联动涉及sql
@@ -74,5 +80,40 @@ public class LinkSql {
     public static List<Map<String, Object>> getPrjPostUser(String attValue, String companyId, MyJdbcTemplate myJdbcTemplate) {
         String sql = "select a.AD_USER_ID,b.CODE,(SELECT NAME FROM AD_USER WHERE ID = a.AD_USER_ID) AS userName from pm_roster a left join post_info b on a.POST_INFO_ID = b.id where a.PM_PRJ_ID = ? and a.CUSTOMER_UNIT = ? and a.status = 'AP' and b.status = 'AP'";
         return myJdbcTemplate.queryForList(sql,attValue,companyId);
+    }
+
+    /**
+     * 查询项目审批节点对应的岗位的字段
+     * @param deptId 流程岗位id
+     * @param companyId 业主单位
+     * @param myJdbcTemplate 数据源
+     * @return 岗位在流程会可能会涉及的字段
+     */
+    public static List<String> getProcessPostCode(String deptId, String companyId, MyJdbcTemplate myJdbcTemplate) {
+        List<String> code = new ArrayList<>();
+        String sql = "SELECT group_concat( DISTINCT a.CODE ) as CODE FROM post_info A LEFT JOIN PM_POST_PROPRJ B ON A.ID = B.POST_INFO_ID " +
+                "WHERE B.BASE_PROCESS_POST_ID = ? AND B.CUSTOMER_UNIT = ? AND A.STATUS = 'AP' AND B.STATUS = 'AP'";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,deptId,companyId);
+        if (!CollectionUtils.isEmpty(list)){
+            String codeStr = JdbcMapUtil.getString(list.get(0),"CODE");
+            code = Arrays.asList(codeStr.split(","));
+        }
+        return code;
+    }
+
+    /**
+     * 查询某个表所有的字段 根据表名查询
+     * @param entCode 表名
+     * @param myJdbcTemplate 数据源
+     * @return 字段集合
+     */
+    public static List<String> getEntCodeAtt(String entCode, MyJdbcTemplate myJdbcTemplate) {
+        List<String> codeList = new ArrayList<>();
+        String sql = "select a.code from AD_ATT a left join AD_ENT_ATT b on a.id = b.AD_ATT_ID left join AD_ENT c on b.AD_ENT_ID = c.id where c.code = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,entCode);
+        if (!CollectionUtils.isEmpty(list)){
+            codeList = list.stream().map(p->JdbcMapUtil.getString(p,"code")).collect(Collectors.toList());
+        }
+        return codeList;
     }
 }

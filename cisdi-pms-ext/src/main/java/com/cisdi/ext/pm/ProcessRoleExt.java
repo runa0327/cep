@@ -3,6 +3,8 @@ package com.cisdi.ext.pm;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.base.PmProcessPostConExt;
 import com.cisdi.ext.base.WfFlowExt;
+import com.cisdi.ext.link.LinkSql;
+import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -781,6 +783,10 @@ public class ProcessRoleExt {
     public void getUserByRoster(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //业务表名
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        //流程业务id
+        String csCommId = entityRecord.csCommId;
         //业主单位
         String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
         if (SharedUtil.isEmptyString(companyId)){
@@ -790,10 +796,32 @@ public class ProcessRoleExt {
         String projectId = PmPrjExt.getProjectIdByProcess(entityRecord.valueMap,myJdbcTemplate);
         //节点id
         String nodeId = ExtJarHelper.nodeId.get();
-        //查询该节点岗位
+        //查询该节点岗位(流程岗位id)
         List<String> deptId = PmProcessPostConExt.getDeptIdByNode(nodeId,companyId);
-        //通过岗位id、花名册查询出人员信息
-        List<String> userList = PmRosterExt.getDeptUserByDept(deptId,companyId,projectId);
+        List<String> userList = new ArrayList<>();
+        //岗位信息在流程表单中有显示
+        List<String> postProList = AttLinkDifferentProcess.getPostProList();
+        if (postProList.contains(entCode)){
+            if (!CollectionUtils.isEmpty(deptId)){
+                //查询该表单所有字段
+                List<String> adEntAtt = LinkSql.getEntCodeAtt(entCode,myJdbcTemplate);
+                //循环遍历每个岗位人员(优先取数表单，其次花名册)
+                for (String tp : deptId) {
+                    //查询该流程岗位对应的字段
+                    List<String> code = LinkSql.getProcessPostCode(tp,companyId,myJdbcTemplate);
+                    code = code.stream().filter(adEntAtt::contains).collect(Collectors.toList());
+                    for (String tmp : code) {
+                        List<String> userList1 = ProcessRoleExt.getProcessUser(tmp,entCode,csCommId,myJdbcTemplate);
+                        if (!CollectionUtils.isEmpty(userList1)){
+                            userList.addAll(userList1);
+                        }
+                    }
+                }
+            }
+        } else {
+            //通过岗位id、花名册查询出人员信息
+            userList = PmRosterExt.getDeptUserByDept(deptId,companyId,projectId);
+        }
         if (!CollectionUtils.isEmpty(userList)){
             ExtJarHelper.returnValue.set(userList);
         } else {
@@ -876,5 +904,25 @@ public class ProcessRoleExt {
             userList.add(userId);
             ExtJarHelper.returnValue.set(userList);
         }
+    }
+
+    /**
+     * 获取流程表单中某个字段的值
+     * @param code 字段名
+     * @param entCode 表名
+     * @param myJdbcTemplate 数据源
+     * @return
+     */
+    public static List<String> getProcessUser(String code, String entCode, String csCommId, MyJdbcTemplate myJdbcTemplate) {
+        List<String> userList = new ArrayList<>();
+        String sql = "select " + code + " from " + entCode + " where id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
+        if (!CollectionUtils.isEmpty(list)){
+            String user = JdbcMapUtil.getString(list.get(0),code);
+            if (!SharedUtil.isEmptyString(user)){
+                userList.add(user);
+            }
+        }
+        return userList;
     }
 }
