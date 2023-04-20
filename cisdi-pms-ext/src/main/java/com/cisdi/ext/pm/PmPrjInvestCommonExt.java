@@ -86,5 +86,18 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("PROJECT_TYPE_ID"); // 项目类型
         entityRecord.extraEditableAttCodeList.add("CON_SCALE_TYPE_ID"); // 建设规模类型
         entityRecord.extraEditableAttCodeList.add("CON_SCALE_UOM_ID"); // 建设规模单位
+        entityRecord.extraEditableAttCodeList.add("AD_USER_TWENTY_FIVE_ID"); // 财务管理岗
+        entityRecord.extraEditableAttCodeList.add("AD_USER_TWENTY_FOUR_ID"); // 征拆对接岗
+        entityRecord.extraEditableAttCodeList.add("AD_USER_TWENTY_THREE_ID"); // 工程管理岗
+        entityRecord.extraEditableAttCodeList.add("AD_USER_TWENTY_TWO_ID"); // 设计管理岗
+        entityRecord.extraEditableAttCodeList.add("AD_USER_TWENTY_ONE_ID"); // 采购管理岗
+        entityRecord.extraEditableAttCodeList.add("AD_USER_TWENTY_ID"); // 设备成本岗
+        entityRecord.extraEditableAttCodeList.add("AD_USER_NINETEEN_ID"); // 合约管理岗
+        entityRecord.extraEditableAttCodeList.add("AD_USER_EIGHTEEN_ID"); // 成本管理岗
+        entityRecord.extraEditableAttCodeList.add("AD_USER_SIXTEEN_ID"); // 前期设备岗
+        entityRecord.extraEditableAttCodeList.add("AD_USER_FIFTEEN_ID"); // 计划运营岗
+        entityRecord.extraEditableAttCodeList.add("AD_USER_FOURTEEN_ID"); // 管线迁改岗
+        entityRecord.extraEditableAttCodeList.add("AD_USER_THIRTEEN_ID"); // 土地管理岗
+        entityRecord.extraEditableAttCodeList.add("AD_USER_TWELVE_ID"); // 前期报建岗
     }
 }

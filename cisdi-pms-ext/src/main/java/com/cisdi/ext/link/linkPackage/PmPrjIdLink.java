@@ -80,15 +80,6 @@ public class PmPrjIdLink {
             AttLinkExtDetail.clearProjectAmtData(attLinkResult);
 
             if (!CollectionUtils.isEmpty(list)){
-                //需要自动岗位人员的流程
-//                List<String> processUserList = AttLinkDifferentProcess.getLinkUserProcess();
-//                if (processUserList.contains(entCode)){
-                //清除岗位信息
-//                    AttLinkExtDetail.clearPostUserData(attLinkResult);
-                //业主单位
-//                    String companyId = JdbcMapUtil.getString(list.get(0),"customer_id");
-//                    AttLinkExtDetail.processLinkUser(attValue,entCode,companyId,attLinkResult,myJdbcTemplate);
-//                }
 
                 //赋值
                 Map row = list.get(0);
@@ -108,6 +99,15 @@ public class PmPrjIdLink {
                     AttLinkExtDetail.assignmentPrjYesNoOne(id,attLinkResult);
                 } else if ("PM_PRJ_SETTLE_ACCOUNTS".equals(entCode)){ //项目结算审批
                     settlePrjLink(attLinkResult,attValue);
+                }
+
+                //需要自动岗位人员的流程
+                List<String> processUserList = AttLinkDifferentProcess.getLinkUserProcess();
+                if (processUserList.contains(entCode)){ //岗位自动人员
+                    //清除人员岗位信息
+                    AttLinkExtDetail.clearProcessPostUser(attLinkResult);
+                    String companyId = JdbcMapUtil.getString(row,"customer_id");
+                    AttLinkExtDetail.autoPostUser(entCode,attValue,companyId,attLinkResult,myJdbcTemplate);
                 }
 
                 // 资金信息回显。优先级 可研估算<初设概算<预算财<项目结算

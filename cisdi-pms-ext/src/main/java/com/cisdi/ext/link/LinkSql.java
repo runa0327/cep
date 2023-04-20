@@ -63,4 +63,16 @@ public class LinkSql {
                 "from PM_PRJ_SETTLE_ACCOUNTS where PM_PRJ_ID = ? AND STATUS = 'AP' ORDER BY LAST_MODI_DT DESC";
         return myJdbcTemplate.queryForList(sql,pmPrjId);
     }
+
+    /**
+     * 查询项目花名册信息
+     * @param attValue 项目id
+     * @param companyId 业主单位id
+     * @param myJdbcTemplate 数据源
+     * @return 查询数据集合
+     */
+    public static List<Map<String, Object>> getPrjPostUser(String attValue, String companyId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select a.AD_USER_ID,b.CODE,(SELECT NAME FROM AD_USER WHERE ID = a.AD_USER_ID) AS userName from pm_roster a left join post_info b on a.POST_INFO_ID = b.id where a.PM_PRJ_ID = ? and a.CUSTOMER_UNIT = ? and a.status = 'AP' and b.status = 'AP'";
+        return myJdbcTemplate.queryForList(sql,attValue,companyId);
+    }
 }

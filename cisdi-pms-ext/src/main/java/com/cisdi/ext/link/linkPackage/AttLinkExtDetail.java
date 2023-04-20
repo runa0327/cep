@@ -866,6 +866,32 @@ public class AttLinkExtDetail {
     }
 
     /**
+     * 清除项目流程审批岗位信息
+     */
+    public static void clearProcessPostUser(AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            linkedAtt.changeToEditable = true;
+            attLinkResult.attMap.put("AD_USER_TWENTY_FIVE_ID", linkedAtt); // 财务管理岗
+            attLinkResult.attMap.put("AD_USER_TWENTY_FOUR_ID", linkedAtt); // 征拆对接岗
+            attLinkResult.attMap.put("AD_USER_TWENTY_THREE_ID", linkedAtt); // 工程管理岗
+            attLinkResult.attMap.put("AD_USER_TWENTY_TWO_ID", linkedAtt); // 设计管理岗
+            attLinkResult.attMap.put("AD_USER_TWENTY_ONE_ID", linkedAtt); // 采购管理岗
+            attLinkResult.attMap.put("AD_USER_TWENTY_ID", linkedAtt); // 设备成本岗
+            attLinkResult.attMap.put("AD_USER_NINETEEN_ID", linkedAtt); // 合约管理岗
+            attLinkResult.attMap.put("AD_USER_EIGHTEEN_ID", linkedAtt); // 成本管理岗
+            attLinkResult.attMap.put("AD_USER_SIXTEEN_ID", linkedAtt); // 前期设备岗
+            attLinkResult.attMap.put("AD_USER_FIFTEEN_ID", linkedAtt); // 计划运营岗
+            attLinkResult.attMap.put("AD_USER_FOURTEEN_ID", linkedAtt); // 管线迁改岗
+            attLinkResult.attMap.put("AD_USER_THIRTEEN_ID", linkedAtt); // 土地管理岗
+            attLinkResult.attMap.put("AD_USER_TWELVE_ID", linkedAtt); // 前期报建岗
+        }
+    }
+
+    /**
      * 合同签订、补充协议 是否标准模板属性联动数据清除
      * @param attLinkResult 返回的集合信息
      */
@@ -1412,4 +1438,31 @@ public class AttLinkExtDetail {
         map.put("file3",file3); //其他附件
         return map;
     }
+
+    /**
+     * 项目属性联动-自动关联岗位信息
+     * @param entCode 流程业务表
+     * @param attValue 属性联动值(项目id)
+     * @param companyId 业主单位id
+     * @param attLinkResult 返回集合
+     * @param myJdbcTemplate 数据源
+     */
+    public static void autoPostUser(String entCode, String attValue, String companyId, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
+        if ("PM_PRJ_SETTLE_ACCOUNTS".equals(entCode)){ //项目结算 带出前期报建岗、工程管理岗、设计管理岗、财务管理岗
+            //查询项目花名册信息
+            List<Map<String,Object>> list = LinkSql.getPrjPostUser(attValue,companyId,myJdbcTemplate);
+            if (!CollectionUtils.isEmpty(list)){
+                for (Map<String, Object> tmp : list) {
+                    String userId = JdbcMapUtil.getString(tmp,"AD_USER_ID");
+                    String userName = JdbcMapUtil.getString(tmp,"userName");
+                    String code = JdbcMapUtil.getString(tmp,"CODE");
+                    List<String> codeList = StringUtil.getStrToList(code,",");
+                    for (String tp : codeList) {
+                        LinkUtils.mapAddValueByValueNoEdit(tp,userName,userId,AttDataTypeE.TEXT_LONG,false,attLinkResult);
+                    }
+                }
+            }
+        }
+    }
+
 }

@@ -169,7 +169,7 @@ public class AttLinkDifferentProcess {
      */
     public static List<String> getLinkUserProcess() {
         List<String> list = new ArrayList<>();
-        list.add("PM_BUY_DEMAND_REQ"); //采购需求审批
+        list.add("PM_PRJ_SETTLE_ACCOUNTS"); //项目结算审批
         return list;
     }
 
