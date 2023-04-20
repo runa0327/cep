@@ -8,6 +8,7 @@ import com.cisdi.ext.model.PrjInventoryDetail;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
@@ -113,79 +114,141 @@ public class PrjMaterialInventory {
      */
     public void prjInventoryList(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         listReq listReq = JSONObject.parseObject(JSONObject.toJSONString(inputMap), listReq.class);
         List<String> prjIds = listReq.getPrjIds();
+        int pageSize = listReq.getPageSize();
+        int pageIndex = listReq.getPageIndex();
+        int start = pageSize * (pageIndex - 1);
 
-        List<Map<String, Object>> detailList = myJdbcTemplate.queryForList("select \n" +
-                "i.PM_PRJ_ID prjId,\n" +
-                "p.name prjName,\n" +
-                "ty.FILE_MASTER_INVENTORY_TYPE_ID masterTypeId,\n" +
-                "v.name masterInventoryName,\n" +
-                "d.FL_FILE_ID fileId,\n" +
-                "d.id detailId,\n" +
-                "i.id prjInventoryId,\n" +
-                "d.WF_PROCESS_INSTANCE_ID instanceId\n" +
-                "from prj_inventory_detail d \n" +
-                "left join prj_inventory i on i.id = d.PRJ_INVENTORY_ID\n" +
-                "left join pm_prj p on p.id = i.PM_PRJ_ID\n" +
-                "left join material_inventory_type ty on ty.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
-                "left join gr_set_value v on v.id = ty.FILE_MASTER_INVENTORY_TYPE_ID\n" +
-                "order by i.PM_PRJ_ID");
 
-        //项目主清单应有的子清单
-        List<Map<String, Object>> prjMasterShouldHave = myJdbcTemplate.queryForList("select i.PM_PRJ_ID prjId,p.name prjName,COUNT(i" +
-                ".MATERIAL_INVENTORY_TYPE_ID) shouldHave,v.name masterTypeName,v.id masterTypeId from prj_inventory i \n" +
+//        List<Map<String, Object>> detailList = myJdbcTemplate.queryForList("select \n" +
+//                "i.PM_PRJ_ID prjId,\n" +
+//                "p.name prjName,\n" +
+//                "ty.FILE_MASTER_INVENTORY_TYPE_ID masterTypeId,\n" +
+//                "v.name masterInventoryName,\n" +
+//                "d.FL_FILE_ID fileId,\n" +
+//                "d.id detailId,\n" +
+//                "i.id prjInventoryId,\n" +
+//                "d.WF_PROCESS_INSTANCE_ID instanceId\n" +
+//                "from prj_inventory_detail d \n" +
+//                "left join prj_inventory i on i.id = d.PRJ_INVENTORY_ID\n" +
+//                "left join pm_prj p on p.id = i.PM_PRJ_ID\n" +
+//                "left join material_inventory_type ty on ty.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
+//                "left join gr_set_value v on v.id = ty.FILE_MASTER_INVENTORY_TYPE_ID\n" +
+//                "order by i.PM_PRJ_ID");
+//
+//        //项目主清单应有的子清单
+//        List<Map<String, Object>> prjMasterShouldHave = myJdbcTemplate.queryForList("select i.PM_PRJ_ID prjId,p.name prjName,COUNT(i" +
+//                ".MATERIAL_INVENTORY_TYPE_ID) shouldHave,v.name masterTypeName,v.id masterTypeId from prj_inventory i \n" +
+//                "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID \n" +
+//                "left join gr_set_value v on v.id = t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
+//                "left join pm_prj p on p.id = i.PM_PRJ_ID\n" +
+//                "where i.IS_INVOLVED = 1\n" +
+//                "group by i.PM_PRJ_ID,t.FILE_MASTER_INVENTORY_TYPE_ID");
+//
+//        //项目主清单实际有的子清单
+//        List<Map<String, Object>> prjMasterActualHave = myJdbcTemplate.queryForList("select prjId,masterTypeId,sum(have) actualHave from (\n" +
+//                "select i.PM_PRJ_ID prjId,t.id typeId,t.name typeName,IF(count(d.id) > 0,1,0) have,t.FILE_MASTER_INVENTORY_TYPE_ID masterTypeId\n" +
+//                "from prj_inventory i \n" +
+//                "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID \n" +
+//                "left join prj_inventory_detail d on d.PRJ_INVENTORY_ID = i.id\n" +
+//                "where i.IS_INVOLVED = 1\n" +
+//                "group by i.PM_PRJ_ID,t.id\n" +
+//                ") temp group by prjId,masterTypeId");
+//
+//        //组合
+//        for (Map<String, Object> shouldHaveMap : prjMasterShouldHave) {
+//            for (Map<String, Object> actualHaveMap : prjMasterActualHave) {
+//                String shouldPrjId = JdbcMapUtil.getString(shouldHaveMap, "prjId");
+//                String actualPrjId = JdbcMapUtil.getString(actualHaveMap, "prjId");
+//                String shouldMasterTypeId = JdbcMapUtil.getString(shouldHaveMap, "masterTypeId");
+//                String actualMasterTypeId = JdbcMapUtil.getString(actualHaveMap, "masterTypeId");
+//                String shouldHave = JdbcMapUtil.getString(shouldHaveMap, "shouldHave");
+//                String actualHave = JdbcMapUtil.getString(actualHaveMap, "actualHave");
+//                if (shouldPrjId.equals(actualPrjId) && shouldMasterTypeId.equals(actualMasterTypeId)){
+//                    if (Integer.parseInt(shouldHave) > Integer.parseInt(actualHave)){
+//                        shouldHaveMap.put("shouldHave",actualHave + "/" + shouldHave + "（缺少文件）");
+//                    }else {
+//                        shouldHaveMap.put("shouldHave",actualHave + "/" + shouldHave);
+//                    }
+//                }
+//            }
+//        }
+        List<Map<String, Object>> prjIdList = myJdbcTemplate.queryForList("select id from pm_prj where status = 'AP' limit ?,?", start, pageSize);
+        List<String> pagePrjIds = prjIdList.stream().map(m -> JdbcMapUtil.getString(m, "id")).collect(Collectors.toList());
+        StringBuffer sb = new StringBuffer();
+        sb.append("select sv.prjId,sv.prjName,sv.masterTypeId,sv.masterTypeName,sv.shouldHave,ah.actualHave,lt.lackTypeName from (\n" +
+                "select i.PM_PRJ_ID prjId,p.name prjName,COUNT(i.MATERIAL_INVENTORY_TYPE_ID) shouldHave,v.name masterTypeName,v.id masterTypeId " +
+                "from prj_inventory i \n" +
                 "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID \n" +
                 "left join gr_set_value v on v.id = t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
                 "left join pm_prj p on p.id = i.PM_PRJ_ID\n" +
-                "where i.IS_INVOLVED = 1\n" +
-                "group by i.PM_PRJ_ID,t.FILE_MASTER_INVENTORY_TYPE_ID");
-
-        //项目主清单实际有的子清单
-        List<Map<String, Object>> prjMasterActualHave = myJdbcTemplate.queryForList("select prjId,masterTypeId,sum(have) actualHave from (\n" +
+                "where i.IS_INVOLVED = 1 and p.status = 'AP'\n" +
+                "group by i.PM_PRJ_ID,t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
+                ") sv\n" +
+                "left join \n" +
+                "(select prjId,masterTypeId,sum(have) actualHave from (\n" +
                 "select i.PM_PRJ_ID prjId,t.id typeId,t.name typeName,IF(count(d.id) > 0,1,0) have,t.FILE_MASTER_INVENTORY_TYPE_ID masterTypeId\n" +
                 "from prj_inventory i \n" +
                 "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID \n" +
                 "left join prj_inventory_detail d on d.PRJ_INVENTORY_ID = i.id\n" +
                 "where i.IS_INVOLVED = 1\n" +
                 "group by i.PM_PRJ_ID,t.id\n" +
-                ") temp group by prjId,masterTypeId");
+                ") temp group by prjId,masterTypeId) ah on ah.prjId = sv.prjId and ah.masterTypeId = sv.masterTypeId\n" +
+                "left join \n" +
+                "(select prjId,masterTypeId,GROUP_CONCAT(typeName) lackTypeName from (\n" +
+                "select i.PM_PRJ_ID prjId,\n" +
+                "v.name masterTypeName,\n" +
+                "v.id masterTypeId,\n" +
+                "t.name typeName,\n" +
+                "count(d.id)\n" +
+                "from prj_inventory i \n" +
+                "left join material_inventory_type t on t.id= i.MATERIAL_INVENTORY_TYPE_ID\n" +
+                "left join gr_set_value v on v.id = t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
+                "left join prj_inventory_detail d on d.PRJ_INVENTORY_ID = i.id\n" +
+                "where i.IS_INVOLVED = 1\n" +
+                "group by i.PM_PRJ_ID,t.FILE_MASTER_INVENTORY_TYPE_ID,t.id\n" +
+                "having count(d.id) = 0\n" +
+                ") temp group by prjId,masterTypeId) lt on lt.prjId = sv.prjId and lt.masterTypeId = sv.masterTypeId where 1 = 1");
+        Map<String, Object> sqlParams = new HashMap<>();
+        if (CollectionUtils.isEmpty(prjIds)){
+            sb.append(" and sv.prjId in (:prjIds) ");
+            sqlParams.put("prjIds",prjIds);
+        }
+        sb.append(" order by sv.prjId desc ");
+        sb.append(" limit :start,:pageSize ");
+        sqlParams.put("start",start);
+        sqlParams.put("pageSize",pageSize);
+        List<Map<String, Object>> originList = myNamedParameterJdbcTemplate.queryForList(sb.toString(), sqlParams);
 
-        //组合
-        for (Map<String, Object> shouldHaveMap : prjMasterShouldHave) {
-            for (Map<String, Object> actualHaveMap : prjMasterActualHave) {
-                String shouldPrjId = JdbcMapUtil.getString(shouldHaveMap, "prjId");
-                String actualPrjId = JdbcMapUtil.getString(actualHaveMap, "prjId");
-                String shouldMasterTypeId = JdbcMapUtil.getString(shouldHaveMap, "masterTypeId");
-                String actualMasterTypeId = JdbcMapUtil.getString(actualHaveMap, "masterTypeId");
-                String shouldHave = JdbcMapUtil.getString(shouldHaveMap, "shouldHave");
-                String actualHave = JdbcMapUtil.getString(actualHaveMap, "actualHave");
-                if (shouldPrjId.equals(actualPrjId) && shouldMasterTypeId.equals(actualMasterTypeId)){
-                    if (Integer.parseInt(shouldHave) > Integer.parseInt(actualHave)){
-                        shouldHaveMap.put("shouldHave",actualHave + "/" + shouldHave + "（缺少文件）");
-                    }else {
-                        shouldHaveMap.put("shouldHave",actualHave + "/" + shouldHave);
-                    }
+        //获取动态表头
+        List<Map<String, Object>> headerMaps = myJdbcTemplate.queryForList("select v.name from gr_set_value v left join gr_set s on s.id = v.GR_SET_ID " +
+                "where s.code = 'file_master_list_type' and v.status = 'AP'");
+        List<String> headers = headerMaps.stream().map(m -> m.get("name").toString()).collect(Collectors.toList());
+
+        //封装
+        Map<String, List<Map<String, Object>>> data = originList.stream().collect(Collectors.groupingBy(item -> item.get("prjId").toString()));
+        List<inventoryData> inventoryDataList = new ArrayList<>();//列表数据
+        for (String prjId : data.keySet()) {
+            inventoryData inventoryData = new inventoryData();//单条列表数据
+            List<Map<String,Object>> statistic = new ArrayList<>();//单条动态数据
+            Map<String, Object> cellData = new HashMap<>();//单个单元格
+            List<Map<String, Object>> prjOriginList = data.get(prjId);//单条项目维度的初始数据
+            for (String header : headers) {
+                Optional<Object> shouldHaveOp = prjOriginList.stream().filter(d -> d.get("masterTypeName").equals(header)).map(d -> d.get("shouldHave")).findAny();
+                if (shouldHaveOp.isPresent()){
+                    cellData.put(header,shouldHaveOp.get().toString());
+                    statistic.add(cellData);
                 }
             }
+            inventoryData.statistic = statistic;
+            inventoryData.prjId = prjId;
+            inventoryData.prjName = JdbcMapUtil.getString(data.get(prjId).get(0),"prjName");
+            inventoryDataList.add(inventoryData);
         }
-
-        List<String> headers = new ArrayList<>();
-        //
-        Map<String, List<Map<String, Object>>> data =
-                prjMasterShouldHave.stream().collect(Collectors.groupingBy(item -> item.get("prjId").toString()));
-        ArrayList<Object> result = new ArrayList<>();
-        for (String prjId : data.keySet()) {
-            Map<String, Object> resultData = new HashMap<>();
-            List<Map<String, Object>> list = data.get(prjId);
-            for (String header : headers) {
-                Optional<Object> shouldHaveOp = list.stream().filter(d -> d.get("masterTypeName").equals(header)).map(d -> d.get("shouldHave")).findAny();
-                resultData.put(header,shouldHaveOp.get().toString());
-
-            }
-        }
-        System.out.println(data);
+        System.out.println(inventoryDataList);
 
 
     }
@@ -196,6 +259,8 @@ public class PrjMaterialInventory {
     @Data
     private static class listReq{
         private List<String> prjIds;
+        private Integer pageSize;
+        private Integer pageIndex;
     }
 
     /**
