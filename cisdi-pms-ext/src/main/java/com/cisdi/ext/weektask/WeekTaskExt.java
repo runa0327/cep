@@ -192,7 +192,10 @@ public class WeekTaskExt {
     public void dealWith() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,pm_prj_id from pm_pro_plan_node pppn left join WEEK_TASK wt on pppn.id = wt.RELATION_DATA_ID where wt.id= ?", map.get("id"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(" select pppn.*,wt.pm_prj_id as projectId,pm.`NAME` as projectName from pm_pro_plan_node pppn \n" +
+                " left join WEEK_TASK wt on pppn.id = wt.RELATION_DATA_ID \n" +
+                " left join pm_prj pm on pm.id = wt.PM_PRJ_ID \n" +
+                " where wt.id= ?", map.get("id"));
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> node = list.get(0);
             String processId = JdbcMapUtil.getString(node, "LINKED_WF_PROCESS_ID");
@@ -206,7 +209,10 @@ public class WeekTaskExt {
                 resData.viewId = viewId;
                 resData.icon = JdbcMapUtil.getString(dataMap, "EXTRA_INFO");
                 resData.title = JdbcMapUtil.getString(node, "NAME");
-                resData.projectId = JdbcMapUtil.getString(node, "pm_prj_id");
+                Project project = new Project();
+                project.id = JdbcMapUtil.getString(node, "projectId");
+                project.name = JdbcMapUtil.getString(node, "projectName");
+                resData.project = project;
                 //查询标准节点附加信息
                 String baseNodeId = JdbcMapUtil.getString(node, "SCHEDULE_NAME");
                 List<AttData> attDataList = new ArrayList<>();
@@ -327,7 +333,8 @@ public class WeekTaskExt {
         public String viewId;
         public String icon;
         public String title;
-        public String projectId;
+
+        public Project project;
 
         public List<AttData> attDataList;
     }
@@ -339,5 +346,10 @@ public class WeekTaskExt {
         public String ATT_VALUE;
         public String FOR_NODE;
         public String FOR_PROC;
+    }
+
+    public static class Project {
+        public String id;
+        public String name;
     }
 }
