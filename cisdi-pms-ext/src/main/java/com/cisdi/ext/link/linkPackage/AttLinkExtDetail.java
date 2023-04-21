@@ -1448,19 +1448,17 @@ public class AttLinkExtDetail {
      * @param myJdbcTemplate 数据源
      */
     public static void autoPostUser(String entCode, String attValue, String companyId, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
-        if ("PM_PRJ_SETTLE_ACCOUNTS".equals(entCode)){ //项目结算 带出前期报建岗、工程管理岗、设计管理岗、财务管理岗
-            //查询项目花名册信息
-            List<Map<String,Object>> list = LinkSql.getPrjPostUser(attValue,companyId,myJdbcTemplate);
-            if (!CollectionUtils.isEmpty(list)){
-                for (Map<String, Object> tmp : list) {
-                    String userId = JdbcMapUtil.getString(tmp,"AD_USER_ID");
-                    String userName = JdbcMapUtil.getString(tmp,"userName");
-                    String code = JdbcMapUtil.getString(tmp,"CODE");
-                    if (!SharedUtil.isEmptyString(userId)){
-                        List<String> codeList = StringUtil.getStrToList(code,",");
-                        for (String tp : codeList) {
-                            LinkUtils.mapAddValueByValueNoEdit(tp,userName,userId,AttDataTypeE.TEXT_LONG,false,attLinkResult);
-                        }
+        //查询项目花名册信息
+        List<Map<String,Object>> list = LinkSql.getPrjPostUser(attValue,companyId,myJdbcTemplate);
+        if (!CollectionUtils.isEmpty(list)){
+            for (Map<String, Object> tmp : list) {
+                String userId = JdbcMapUtil.getString(tmp,"AD_USER_ID");
+                String userName = JdbcMapUtil.getString(tmp,"userName");
+                String code = JdbcMapUtil.getString(tmp,"CODE");
+                if (!SharedUtil.isEmptyString(userId)){
+                    List<String> codeList = StringUtil.getStrToList(code,",");
+                    for (String tp : codeList) {
+                        LinkUtils.mapAddValueByValueNoEdit(tp,userName,userId,AttDataTypeE.TEXT_LONG,false,attLinkResult);
                     }
                 }
             }

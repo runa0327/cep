@@ -1,5 +1,6 @@
 package com.cisdi.ext.link.linkPackage;
 
+import cn.hutool.core.annotation.Link;
 import com.cisdi.ext.enums.EntCodeEnum;
 import com.cisdi.ext.link.AttLinkProcessDetail;
 import com.cisdi.ext.link.AttLinkResult;
@@ -7,6 +8,7 @@ import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.LinkedAttModel;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -97,8 +99,10 @@ public class PmPrjIdLink {
                     // 0099799190825080705 = 企业自筹
                     String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
                     AttLinkExtDetail.assignmentPrjYesNoOne(id,attLinkResult);
-                } else if ("PM_PRJ_SETTLE_ACCOUNTS".equals(entCode)){ //项目结算审批
+                } else if ("PM_PRJ_SETTLE_ACCOUNTS".equals(entCode)){ // 项目结算审批
                     settlePrjLink(attLinkResult,attValue);
+                } else if ("PM_EXTENSION_REQUEST_REQ".equals(entCode)){ // 节点延期申请
+                    handlePrjNode(attValue,myJdbcTemplate);
                 }
 
                 //需要自动岗位人员的流程
@@ -120,6 +124,18 @@ public class PmPrjIdLink {
             }
         }
         return attLinkResult;
+    }
+
+    /**
+     * 属性联动-项目计划进度节点-3级节点
+     * @param attValue 属性联动值(项目id)
+     * @param myJdbcTemplate 数据源
+     */
+    public static void handlePrjNode(String attValue, MyJdbcTemplate myJdbcTemplate) {
+        List<Map<String,Object>> list = LinkSql.selectPrjNode(attValue,"3",myJdbcTemplate);
+        if (CollectionUtils.isEmpty(list)){
+            throw new BaseException("对不起，该项目不存在项目进度计划节点信息，请先维护进度计划或联系管理员处理！");
+        }
     }
 
     /**

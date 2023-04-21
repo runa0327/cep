@@ -1,16 +1,19 @@
 package com.cisdi.ext.proPlan;
 
+import com.cisdi.ext.model.PmProPlanNode;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -466,6 +469,25 @@ public class PmProPlanExt {
         } else if (proPlanList.get(1).isEmpty() && proPlanList.get(0).isEmpty()) {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).eq("NAME", "初步设计及概算").update()
                     .set("PROGRESS_STATUS_ID", "0099799190825106800") // 进度状态
+                    .exec();
+        }
+    }
+
+    /**
+     * 更新单个节点预计完成时间
+     * @param projectId 项目id
+     * @param proNodeId 节点id
+     * @param day 延期天数
+     * @param myJdbcTemplate 数据源
+     */
+    public static void updatePlanEndDate(String projectId, String proNodeId, Integer day, MyJdbcTemplate myJdbcTemplate) {
+        List<PmProPlanNode> list = PmProPlanNode.selectByWhere(new Where().eq(PmProPlanNode.Cols.ID,proNodeId));
+        if (!CollectionUtils.isEmpty(list)){
+            int oldDay = list.get(0).getPlanTotalDays();
+            LocalDate endDate = list.get(0).getPlanComplDate();
+            endDate = endDate.plusDays(day);
+            Crud.from("PM_PRO_PLAN_NODE").where().eq("ID",proNodeId).update()
+                    .set("PLAN_COMPL_DATE",endDate).set("PLAN_TOTAL_DAYS",oldDay+day)
                     .exec();
         }
     }

@@ -116,7 +116,10 @@ public class AttLinkExt {
             return linkGUARANTEE_DATE_TYPE_ID(myJdbcTemplate,attValue,entCode);
         } else if ("PO_ORDER_REQ_IDS".equals(attCode)){ //合同选择，多选
             return linkPO_ORDER_REQ_IDS(myJdbcTemplate, attValue, sevId,entCode);
-        } else {
+        } else if ("PM_PRO_PLAN_NODE_ID".equals(attCode)){
+            return PmProPlanNodeLink.linkForPM_PRO_PLAN_NODE_ID(myJdbcTemplate, attValue, entCode);
+        }
+        else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");
         }
 

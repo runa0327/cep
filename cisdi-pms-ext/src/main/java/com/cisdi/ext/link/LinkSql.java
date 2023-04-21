@@ -116,4 +116,17 @@ public class LinkSql {
         }
         return codeList;
     }
+
+    /**
+     * 查询项目几级节点
+     * @param projectId 项目id
+     * @param level 层级
+     * @param myJdbcTemplate 数据源
+     * @return
+     */
+    public static List<Map<String, Object>> selectPrjNode(String projectId, String level, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select a.id,a.name from PM_PRO_PLAN_NODE a left join pm_pro_plan b on a.PM_PRO_PLAN_ID = b.id " +
+                "where b.pm_prj_id = ? and a.level = ? and a.status = 'ap' and b.status = 'ap' ";
+        return myJdbcTemplate.queryForList(sql,projectId,level);
+    }
 }

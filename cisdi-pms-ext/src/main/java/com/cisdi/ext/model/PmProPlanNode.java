@@ -105,17 +105,17 @@ public class PmProPlanNode {
          */
         public static final String SCHEDULE_NAME = "SCHEDULE_NAME";
         /**
-         * 序号备用。
+         * 前置节点。
          */
-        public static final String SEQ_NO_BAK = "SEQ_NO_BAK";
-        /**
-         * 岗位信息。
-         */
-        public static final String POST_INFO_ID = "POST_INFO_ID";
+        public static final String PRE_NODE_ID = "PRE_NODE_ID";
         /**
          * 责任部门。
          */
         public static final String CHIEF_DEPT_ID = "CHIEF_DEPT_ID";
+        /**
+         * 岗位信息。
+         */
+        public static final String POST_INFO_ID = "POST_INFO_ID";
         /**
          * 责任用户。
          */
@@ -193,6 +193,10 @@ public class PmProPlanNode {
          */
         public static final String SEQ_NO = "SEQ_NO";
         /**
+         * 序号备用。
+         */
+        public static final String SEQ_NO_BAK = "SEQ_NO_BAK";
+        /**
          * 项目进度计划。
          */
         public static final String PM_PRO_PLAN_ID = "PM_PRO_PLAN_ID";
@@ -244,6 +248,18 @@ public class PmProPlanNode {
          * 能否启动。
          */
         public static final String CAN_START = "CAN_START";
+        /**
+         * 是否是里程碑。
+         */
+        public static final String IZ_MILESTONE = "IZ_MILESTONE";
+        /**
+         * 实体(台账)。
+         */
+        public static final String AD_ENT_ID_IMP = "AD_ENT_ID_IMP";
+        /**
+         * 属性(台账文件字段)。
+         */
+        public static final String AD_ATT_ID_IMP = "AD_ATT_ID_IMP";
     }
 
     // </editor-fold>
@@ -756,72 +772,36 @@ public class PmProPlanNode {
     }
 
     /**
-     * 序号备用。
+     * 前置节点。
      */
-    private BigDecimal seqNoBak;
+    private String preNodeId;
 
     /**
-     * 获取：序号备用。
+     * 获取：前置节点。
      */
-    public BigDecimal getSeqNoBak() {
-        return this.seqNoBak;
+    public String getPreNodeId() {
+        return this.preNodeId;
     }
 
     /**
-     * 设置：序号备用。
+     * 设置：前置节点。
      */
-    public PmProPlanNode setSeqNoBak(BigDecimal seqNoBak) {
-        if (this.seqNoBak == null && seqNoBak == null) {
+    public PmProPlanNode setPreNodeId(String preNodeId) {
+        if (this.preNodeId == null && preNodeId == null) {
             // 均为null，不做处理。
-        } else if (this.seqNoBak != null && seqNoBak != null) {
+        } else if (this.preNodeId != null && preNodeId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.seqNoBak.compareTo(seqNoBak) != 0) {
-                this.seqNoBak = seqNoBak;
-                if (!this.toUpdateCols.contains("SEQ_NO_BAK")) {
-                    this.toUpdateCols.add("SEQ_NO_BAK");
+            if (this.preNodeId.compareTo(preNodeId) != 0) {
+                this.preNodeId = preNodeId;
+                if (!this.toUpdateCols.contains("PRE_NODE_ID")) {
+                    this.toUpdateCols.add("PRE_NODE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.seqNoBak = seqNoBak;
-            if (!this.toUpdateCols.contains("SEQ_NO_BAK")) {
-                this.toUpdateCols.add("SEQ_NO_BAK");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 岗位信息。
-     */
-    private String postInfoId;
-
-    /**
-     * 获取：岗位信息。
-     */
-    public String getPostInfoId() {
-        return this.postInfoId;
-    }
-
-    /**
-     * 设置：岗位信息。
-     */
-    public PmProPlanNode setPostInfoId(String postInfoId) {
-        if (this.postInfoId == null && postInfoId == null) {
-            // 均为null，不做处理。
-        } else if (this.postInfoId != null && postInfoId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.postInfoId.compareTo(postInfoId) != 0) {
-                this.postInfoId = postInfoId;
-                if (!this.toUpdateCols.contains("POST_INFO_ID")) {
-                    this.toUpdateCols.add("POST_INFO_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.postInfoId = postInfoId;
-            if (!this.toUpdateCols.contains("POST_INFO_ID")) {
-                this.toUpdateCols.add("POST_INFO_ID");
+            this.preNodeId = preNodeId;
+            if (!this.toUpdateCols.contains("PRE_NODE_ID")) {
+                this.toUpdateCols.add("PRE_NODE_ID");
             }
         }
         return this;
@@ -858,6 +838,42 @@ public class PmProPlanNode {
             this.chiefDeptId = chiefDeptId;
             if (!this.toUpdateCols.contains("CHIEF_DEPT_ID")) {
                 this.toUpdateCols.add("CHIEF_DEPT_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 岗位信息。
+     */
+    private String postInfoId;
+
+    /**
+     * 获取：岗位信息。
+     */
+    public String getPostInfoId() {
+        return this.postInfoId;
+    }
+
+    /**
+     * 设置：岗位信息。
+     */
+    public PmProPlanNode setPostInfoId(String postInfoId) {
+        if (this.postInfoId == null && postInfoId == null) {
+            // 均为null，不做处理。
+        } else if (this.postInfoId != null && postInfoId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.postInfoId.compareTo(postInfoId) != 0) {
+                this.postInfoId = postInfoId;
+                if (!this.toUpdateCols.contains("POST_INFO_ID")) {
+                    this.toUpdateCols.add("POST_INFO_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.postInfoId = postInfoId;
+            if (!this.toUpdateCols.contains("POST_INFO_ID")) {
+                this.toUpdateCols.add("POST_INFO_ID");
             }
         }
         return this;
@@ -1548,6 +1564,42 @@ public class PmProPlanNode {
     }
 
     /**
+     * 序号备用。
+     */
+    private BigDecimal seqNoBak;
+
+    /**
+     * 获取：序号备用。
+     */
+    public BigDecimal getSeqNoBak() {
+        return this.seqNoBak;
+    }
+
+    /**
+     * 设置：序号备用。
+     */
+    public PmProPlanNode setSeqNoBak(BigDecimal seqNoBak) {
+        if (this.seqNoBak == null && seqNoBak == null) {
+            // 均为null，不做处理。
+        } else if (this.seqNoBak != null && seqNoBak != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.seqNoBak.compareTo(seqNoBak) != 0) {
+                this.seqNoBak = seqNoBak;
+                if (!this.toUpdateCols.contains("SEQ_NO_BAK")) {
+                    this.toUpdateCols.add("SEQ_NO_BAK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.seqNoBak = seqNoBak;
+            if (!this.toUpdateCols.contains("SEQ_NO_BAK")) {
+                this.toUpdateCols.add("SEQ_NO_BAK");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 项目进度计划。
      */
     private String pmProPlanId;
@@ -2010,6 +2062,114 @@ public class PmProPlanNode {
             this.canStart = canStart;
             if (!this.toUpdateCols.contains("CAN_START")) {
                 this.toUpdateCols.add("CAN_START");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否是里程碑。
+     */
+    private Boolean izMilestone;
+
+    /**
+     * 获取：是否是里程碑。
+     */
+    public Boolean getIzMilestone() {
+        return this.izMilestone;
+    }
+
+    /**
+     * 设置：是否是里程碑。
+     */
+    public PmProPlanNode setIzMilestone(Boolean izMilestone) {
+        if (this.izMilestone == null && izMilestone == null) {
+            // 均为null，不做处理。
+        } else if (this.izMilestone != null && izMilestone != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.izMilestone.compareTo(izMilestone) != 0) {
+                this.izMilestone = izMilestone;
+                if (!this.toUpdateCols.contains("IZ_MILESTONE")) {
+                    this.toUpdateCols.add("IZ_MILESTONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.izMilestone = izMilestone;
+            if (!this.toUpdateCols.contains("IZ_MILESTONE")) {
+                this.toUpdateCols.add("IZ_MILESTONE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 实体(台账)。
+     */
+    private String adEntIdImp;
+
+    /**
+     * 获取：实体(台账)。
+     */
+    public String getAdEntIdImp() {
+        return this.adEntIdImp;
+    }
+
+    /**
+     * 设置：实体(台账)。
+     */
+    public PmProPlanNode setAdEntIdImp(String adEntIdImp) {
+        if (this.adEntIdImp == null && adEntIdImp == null) {
+            // 均为null，不做处理。
+        } else if (this.adEntIdImp != null && adEntIdImp != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adEntIdImp.compareTo(adEntIdImp) != 0) {
+                this.adEntIdImp = adEntIdImp;
+                if (!this.toUpdateCols.contains("AD_ENT_ID_IMP")) {
+                    this.toUpdateCols.add("AD_ENT_ID_IMP");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adEntIdImp = adEntIdImp;
+            if (!this.toUpdateCols.contains("AD_ENT_ID_IMP")) {
+                this.toUpdateCols.add("AD_ENT_ID_IMP");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 属性(台账文件字段)。
+     */
+    private String adAttIdImp;
+
+    /**
+     * 获取：属性(台账文件字段)。
+     */
+    public String getAdAttIdImp() {
+        return this.adAttIdImp;
+    }
+
+    /**
+     * 设置：属性(台账文件字段)。
+     */
+    public PmProPlanNode setAdAttIdImp(String adAttIdImp) {
+        if (this.adAttIdImp == null && adAttIdImp == null) {
+            // 均为null，不做处理。
+        } else if (this.adAttIdImp != null && adAttIdImp != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adAttIdImp.compareTo(adAttIdImp) != 0) {
+                this.adAttIdImp = adAttIdImp;
+                if (!this.toUpdateCols.contains("AD_ATT_ID_IMP")) {
+                    this.toUpdateCols.add("AD_ATT_ID_IMP");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adAttIdImp = adAttIdImp;
+            if (!this.toUpdateCols.contains("AD_ATT_ID_IMP")) {
+                this.toUpdateCols.add("AD_ATT_ID_IMP");
             }
         }
         return this;

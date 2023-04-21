@@ -21,6 +21,24 @@ public class LinkUtils {
      * @param type 字段类型
      * @param attLinkResult 回显集
      */
+    public static void mapAddValueByValue(String showCode, String textValue, int value, AttDataTypeE type, AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = type;
+            linkedAtt.text = textValue;
+            linkedAtt.value = value;
+            attLinkResult.attMap.put(showCode, linkedAtt);
+        }
+    }
+
+    /**
+     * 属性联动赋值 显示参数并传 BigDecimal
+     * @param showCode 显示字段
+     * @param textValue text显示值
+     * @param value value显示值
+     * @param type 字段类型
+     * @param attLinkResult 回显集
+     */
     public static void mapAddValueByValue(String showCode, String textValue, BigDecimal value, AttDataTypeE type, AttLinkResult attLinkResult) {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
