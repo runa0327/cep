@@ -116,8 +116,8 @@ public class WeeklyReportExt {
             return;
         }
 
-        // 计算部门办结流程实例Map：
-        calcDeptEndProcInstMap(report);
+        // 计算部门办结流程统计列表：
+        calcDeptEndProcStatList(report);
 
         // 合并报表明细列表：
         mergeReportDtlList(report);
@@ -143,8 +143,8 @@ public class WeeklyReportExt {
             return;
         }
 
-        // 计算部门办结流程实例Map：
-        calcDeptEndProcInstMap(report);
+        // 计算部门办结流程统计列表：
+        calcDeptEndProcStatList(report);
 
         // 合并报表明细列表：
         mergeReportDtlList(report);
@@ -201,8 +201,8 @@ public class WeeklyReportExt {
             return;
         }
 
-        // 计算部门办结流程实例Map：
-        calcDeptEndProcInstMap(report);
+        // 计算部门办结流程统计列表：
+        calcDeptEndProcStatList(report);
 
         // 合并报表明细列表：
         mergeReportDtlList(report);
@@ -221,7 +221,7 @@ public class WeeklyReportExt {
      *
      * @param report
      */
-    private void calcDeptEndProcInstMap(LeaderGmReport report) {
+    private void calcDeptEndProcStatList(LeaderGmReport report) {
         if (SharedUtil.isEmptyList(report.reportDtlList)) {
             return;
         }
@@ -230,6 +230,11 @@ public class WeeklyReportExt {
         if (SharedUtil.isEmptyMap(map)) {
             return;
         }
+
+        List<String> deptIdList = map.keySet().stream().map(item -> item.id).collect(Collectors.toList());
+
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, BigDecimal> deptIdSeqNoMap = myJdbcTemplate.queryForList("SELECT d.ID,d.SEQ_NO from hr_dept d where d.id in(" + deptIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ")", deptIdList.toArray()).stream().collect(Collectors.toMap(stringObjectMap -> JdbcMapUtil.getString(stringObjectMap, "ID"), stringObjectMap -> JdbcMapUtil.getBigDecimal(stringObjectMap, "SEQ_NO")));
 
         report.deptEndStatList = map.entrySet().stream().map(entry -> {
             BaseReport.DeptEndStat deptEndStat = new BaseReport.DeptEndStat();
@@ -248,7 +253,7 @@ public class WeeklyReportExt {
                 return endProcInst;
             }).distinct().collect(Collectors.toList());
             return deptEndStat;
-        }).collect(Collectors.toList());
+        }).sorted(Comparator.comparing(o -> deptIdSeqNoMap.get(o.dept.id))).collect(Collectors.toList());
     }
 
     /**
