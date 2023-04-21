@@ -129,4 +129,31 @@ public class LinkSql {
                 "where b.pm_prj_id = ? and a.level = ? and a.status = 'ap' and b.status = 'ap' ";
         return myJdbcTemplate.queryForList(sql,projectId,level);
     }
+
+    /**
+     * 根据流程id、业主单位id查询所有流程岗位信息
+     * @param processId 流程id
+     * @param companyId 业主单位id
+     * @param myJdbcTemplate 数据源
+     * @return 流程岗位集合
+     */
+    public static List<Map<String, Object>> getProcessPostByProcessCompany(String processId, String companyId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "SELECT DISTINCT base_process_post_id as id from PM_PROCESS_POST_CON a LEFT JOIN wf_node b on a.WF_NODE_ID = b.id " +
+                "where b.WF_PROCESS_ID = ? and a.CUSTOMER_UNIT = ? and b.status = 'ap' and a.status = 'ap'";
+        return myJdbcTemplate.queryForList(sql,processId,companyId);
+    }
+
+    /**
+     * 查询项目某个审批字段在花名册重点项目岗位id
+     * @param deptId 流程岗位id
+     * @param companyId 业主单位
+     * @param tmp 项目岗位自动code
+     * @param myJdbcTemplate 数据源
+     * @return 岗位在流程会可能会涉及的字段
+     */
+    public static List<Map<String, Object>> getPrjPostIdByCode(String deptId, String companyId, String tmp, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "SELECT a.id FROM post_info A LEFT JOIN PM_POST_PROPRJ B ON A.ID = B.POST_INFO_ID " +
+                "WHERE B.BASE_PROCESS_POST_ID = ? AND B.CUSTOMER_UNIT = ? AND A.STATUS = 'AP' AND B.STATUS = 'AP' and find_in_set(?,a.code)";
+        return  myJdbcTemplate.queryForList(sql,deptId,companyId,tmp);
+    }
 }

@@ -20,9 +20,17 @@ public class PmExtensionRequestReqExt {
     public void extensionProEndCheck(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //流程id
+        String processId = ExtJarHelper.procId.get();
+        //业务表名
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         //项目id
         String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
-        //节点id
+        //业务记录id
+        String csCommId = entityRecord.csCommId;
+        //业主单位
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        //进度计划节点id
         String proNodeId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRO_PLAN_NODE_ID");
         //延期天数
         Integer day = JdbcMapUtil.getInt(entityRecord.valueMap,"DAYS_ONE");
@@ -30,6 +38,8 @@ public class PmExtensionRequestReqExt {
         PmProPlanExt.updatePlanEndDate(projectId,proNodeId,day,myJdbcTemplate);
         //刷新项目进度节点
 //        PrjPlanUtil.updatePreNodeTime(proNodeId,projectId);
+        //审批人员信息写入花名册(计划运营岗)
+        ProcessCommon.addPrjPostUser(projectId,entCode,processId,companyId,csCommId,myJdbcTemplate);
     }
 
     /**

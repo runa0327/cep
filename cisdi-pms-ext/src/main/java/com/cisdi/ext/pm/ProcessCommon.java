@@ -1,6 +1,8 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.HrDeptUser;
+import com.cisdi.ext.model.PmRoster;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -358,5 +360,55 @@ public class ProcessCommon {
      */
     public static void commentShow(String code, String comment, String csCommId, String entCode) {
         Crud.from(entCode).where().eq("ID",csCommId).update().set(code,comment).exec();
+    }
+
+    /**
+     * 流程完结时，将岗位人员信息写入花名册
+     * @param projectId 项目id
+     * @param entCode 业务表名
+     * @param processId 流程id
+     * @param companyId 业主单位id
+     * @param csCommId 业务记录id
+     * @param myJdbcTemplate 数据源
+     */
+    public static void addPrjPostUser(String projectId, String entCode, String processId, String companyId, String csCommId, MyJdbcTemplate myJdbcTemplate) {
+        //查询该流程所有流程岗位信息
+        List<Map<String,Object>> procPostList = LinkSql.getProcessPostByProcessCompany(processId,companyId,myJdbcTemplate);
+        if (!CollectionUtils.isEmpty(procPostList)){
+            //取出流程岗位id
+            List<String> deptId = procPostList.stream().map(p->JdbcMapUtil.getString(p,"id")).filter(p->!SharedUtil.isEmptyString(p)).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(deptId)){
+                //查询该表单所有字段
+                List<String> adEntAtt = LinkSql.getEntCodeAtt(entCode,myJdbcTemplate);
+                List<PmRoster> rosterList = new ArrayList<>();
+                //循环遍历每个岗位人员(优先取数表单，其次花名册)
+                for (String tp : deptId) {
+                    //查询该流程岗位对应的字段
+                    List<String> code = LinkSql.getProcessPostCode(tp,companyId,myJdbcTemplate);
+                    code = code.stream().filter(adEntAtt::contains).collect(Collectors.toList());
+                    for (String tmp : code) {
+                        //根据流程岗位+项目岗位Code+业主单位 查询项目id
+                        List<Map<String,Object>> postIdList = LinkSql.getPrjPostIdByCode(tp,companyId,tmp,myJdbcTemplate);
+                        String postId = "";
+                        if (!CollectionUtils.isEmpty(postIdList)){
+                            postId = JdbcMapUtil.getString(postIdList.get(0),"id");
+                        }
+                        List<String> userList1 = ProcessRoleExt.getProcessUser(tmp,entCode,csCommId,myJdbcTemplate);
+                        if (!CollectionUtils.isEmpty(userList1)){
+                            PmRoster pmRoster = new PmRoster();
+                            pmRoster.setCustomerUnit(companyId);
+                            pmRoster.setPmPrjId(projectId);
+                            pmRoster.setPostInfoId(postId); //岗位id
+                            pmRoster.setAdUserId(userList1.get(0));
+                            rosterList.add(pmRoster);
+                        }
+                    }
+                }
+                if (!CollectionUtils.isEmpty(rosterList)){
+                    PmRosterExt.updatePrjUser(rosterList);
+                }
+            }
+        }
+
     }
 }
