@@ -1157,6 +1157,9 @@ public class ProPlanExt {
         if (Strings.isNotEmpty(input.seqNo)){
             sb.append(",SEQ_NO = '").append(input.seqNo).append("'");
         }
+        if (Strings.isNotEmpty(input.planStartDay)){
+            sb.append(",PLAN_START_DATE = '").append(input.planStartDay).append("'");
+        }
         if (Strings.isEmpty(input.izMilestone)){
             input.izMilestone = "0";
         }
@@ -1165,6 +1168,22 @@ public class ProPlanExt {
         myJdbcTemplate.update(sb.toString());
         //刷新时间
         PrjPlanUtil.updatePreNodeTime(JdbcMapUtil.getString(map, "nodeId"), JdbcMapUtil.getString(map, "projectId"));
+    }
+
+    public void delPrjNode(){
+        Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String nodeId = JdbcMapUtil.getString(inputMap, "nodeId");
+        List<Map<String, Object>> progressStatusList =
+                myJdbcTemplate.queryForList("select v.name from pm_pro_plan_node n left join gr_set_value v on v.id = n.PROGRESS_STATUS_ID");
+        String statusName = JdbcMapUtil.getString(progressStatusList.get(0), "name");
+        List<Map<String, Object>> childIdList = myJdbcTemplate.queryForList("select id childId from pm_pro_plan_node n where PM_PRO_PLAN_NODE_PID = ?", nodeId);
+        if (CollectionUtils.isEmpty(childIdList) && Strings.isNotEmpty(statusName) && statusName.equals("未启动")){
+            myJdbcTemplate.update("delete from pm_pro_plan_node where id = ?",nodeId);
+        }else {
+            throw new BaseException("不能删除该节点！");
+        }
+
     }
 
     public static class NodeInput {
@@ -1200,6 +1219,8 @@ public class ProPlanExt {
         public String pid;
         //序号
         public String seqNo;
+        //计划开始日期
+        public String planStartDay;
     }
 
 
