@@ -259,12 +259,12 @@ public class PmProPlanTempExt {
             Crud.from("PRO_PLAN_TEMPLATE_RULE").where().eq("ID", input.ruleId).update().set("PM_PRO_PLAN_ID", proPlanId).exec();
         }
         String id = input.id;
-        String preNodeId = input.postId;
-        if (id.equals(preNodeId)) {
-            throw new BaseException("前置节点不能是自己！");
-        }
+        String preNodeId = input.preNodeId;
         if (Strings.isEmpty(input.id)) {
             id = Crud.from("pm_pro_plan_node").insertData();
+        }
+        if (id.equals(preNodeId)) {
+            throw new BaseException("前置节点不能是自己！");
         }
 
 
