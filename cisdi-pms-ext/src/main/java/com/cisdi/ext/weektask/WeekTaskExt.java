@@ -312,6 +312,36 @@ public class WeekTaskExt {
         }
     }
 
+    /**
+     * 延期申请
+     */
+    public void delayApply() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select wt.*,pm.`NAME` as projectName from WEEK_TASK wt \n" +
+                " left join pm_prj pm on wt.PM_PRJ_ID = pm.id \n" +
+                " where wt.id=? ", map.get("id"));
+        ProcessData processData = new ProcessData();
+        processData.processId = "1649227469557063680";
+        processData.viewId = "1649226141279707136";
+
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> pmData = list.get(0);
+            Project project = new Project();
+            project.id = JdbcMapUtil.getString(pmData, "PM_PRJ_ID");
+            project.name = JdbcMapUtil.getString(pmData, "projectName");
+            processData.project = project;
+            processData.nodeId = JdbcMapUtil.getString(pmData, "RELATION_DATA_ID");
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(processData), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        } else {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        }
+    }
+
+
+
+
     public static class WeekTask {
         public String id;
         public String userId;
@@ -340,6 +370,7 @@ public class WeekTaskExt {
     public static class OutSide {
         public List<WeekTask> weekTaskList;
         public Integer total;
+        public List<DelayApplyHistory> historyList;
     }
 
     public static class ProcessData {
@@ -349,6 +380,8 @@ public class WeekTaskExt {
         public String title;
 
         public Project project;
+
+        public String nodeId;
 
         public List<AttData> attDataList;
     }
@@ -367,6 +400,19 @@ public class WeekTaskExt {
     public static class Project {
         public String id;
         public String name;
+    }
+
+    public static class DelayApplyHistory {
+        //序号
+        public String serNo;
+        //延期天数
+        public String delayNum;
+        //延期说明
+        public String description;
+        //申请人
+        public String applyUser;
+        //申请时间
+        public String applyTime;
     }
 
     public static final String NOT_STARTED = "0099799190825106800";

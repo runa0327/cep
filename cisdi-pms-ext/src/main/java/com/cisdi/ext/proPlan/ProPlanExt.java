@@ -3,6 +3,7 @@ package com.cisdi.ext.proPlan;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.PrjPlanUtil;
+import com.cisdi.ext.weektask.WeekTaskExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -14,6 +15,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class ProPlanExt {
@@ -1185,6 +1187,35 @@ public class ProPlanExt {
         }
 
     }
+
+
+    /**
+     * 延期申请历史
+     */
+    public void delayApplyHistory() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pe.*,ad.`NAME` as user_name from PM_EXTENSION_REQUEST_REQ pe left join ad_user ad on pe.CRT_USER_ID = ad.id where PM_PRO_PLAN_NODE_ID = ?", map.get("nodeId"));
+        AtomicInteger index = new AtomicInteger(1);
+        List<WeekTaskExt.DelayApplyHistory> historyList = list.stream().map(p -> {
+            WeekTaskExt.DelayApplyHistory history = new WeekTaskExt.DelayApplyHistory();
+            history.serNo = String.valueOf(index.getAndIncrement());
+            history.delayNum = JdbcMapUtil.getString(p, "DAYS_ONE");
+            history.description = JdbcMapUtil.getString(p, "TEXT_REMARK_ONE");
+            history.applyUser = JdbcMapUtil.getString(p, "user_name");
+            history.applyTime = JdbcMapUtil.getString(p, "CRT_DT");
+            return history;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(historyList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            WeekTaskExt.OutSide outSide = new WeekTaskExt.OutSide();
+            outSide.historyList = historyList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
 
     public static class NodeInput {
         //节点ID
