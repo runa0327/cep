@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,12 +25,38 @@ public class WeeklyReportService {
     JdbcTemplate jdbcTemplate;
 
     public void execute() {
-        String batchId = IdUtil.getSnowflakeNextIdStr();
 
         // 获取或创建当前周期（周六到周五）
-        log.info("【获取或创建期间明细】开始：");
-        Map<String, Object> periodDlt = getOrCreatePeriodDlt();
-        log.info("【获取或创建期间明细】结束。");
+        Map<String, Object> currentPeriodDlt = getOrCreateCurrentPeriodDlt();
+        // 获取上个周期：
+        Map<String, Object> previousPeriodDlt = getPreviousPeriodDlt(currentPeriodDlt);
+        // 若有上个周期、且周报未提交，则重新生成上个周期的周报，并提交：
+        if (previousPeriodDlt != null && !Boolean.TRUE.equals(JdbcMapUtil.getBoolean(previousPeriodDlt, "IS_WEEKLY_REPORT_SUBMIT"))) {
+            // 重新生成上个周期的周报：
+            String previousBatchId = reCreateWeeklyReport(previousPeriodDlt);
+
+            // 提交上个周期的周报：
+            LocalDateTime now = LocalDateTime.now();
+            int update = jdbcTemplate.update("update hr_weekly_report t set t.VER=t.ver+1,t.ts=?,t.SUBMIT_TIME=? where t.BATCH_ID=? and t.HR_WEEKLY_REPORT_TYPE_ID='P'", now, now, previousBatchId);
+            log.info("已提交：" + update);
+
+            // 更新上个周期明细的周报是否提交为true：
+            int update1 = jdbcTemplate.update("update hr_period_dtl t set t.VER=t.ver+1,t.ts=?,t.IS_WEEKLY_REPORT_SUBMIT=1 where t.id=?", now, JdbcMapUtil.getString(previousPeriodDlt, "ID"));
+            log.info("已更新：" + update1);
+        }
+
+        // 重新生成当前周期的周报：
+        reCreateWeeklyReport(currentPeriodDlt);
+    }
+
+    /**
+     * 处理周报。
+     *
+     * @param periodDlt
+     */
+    private String reCreateWeeklyReport(Map<String, Object> periodDlt) {
+        // 生成批次ID：
+        String batchId = IdUtil.getSnowflakeNextIdStr();
 
         // 获取流程分级：
         List<Map<String, Object>> procLevelList = jdbcTemplate.queryForList("select * from HR_PROC_LEVEL");
@@ -59,7 +86,7 @@ public class WeeklyReportService {
                 Map<String, Object> user = jdbcTemplate.queryForMap("select * from ad_user t where t.id=?", userId);
 
                 // 重建用户周报：
-                createPersonReport(periodDlt, deptId, user, batchId, notiDeptProcIdList, notiLeaderProcIdList, processedProcIdToEndViewIdMap,financeProcIdList,procureProcIdList);
+                createPersonReport(periodDlt, deptId, user, batchId, notiDeptProcIdList, notiLeaderProcIdList, processedProcIdToEndViewIdMap, financeProcIdList, procureProcIdList);
             });
         }
 
@@ -105,6 +132,8 @@ public class WeeklyReportService {
 
         // 删除此前遗留周报(即：周期相同、批次不同)：
         jdbcTemplate.update("delete from hr_weekly_report t where t.hr_period_dtl_id=? and t.batch_id!=?", periodDlt.get("ID"), batchId);
+
+        return batchId;
     }
 
     /**
@@ -253,13 +282,13 @@ public class WeeklyReportService {
         }
     }
 
-    private Map<String, Object> getOrCreatePeriodDlt() {
-        LocalDate now = LocalDate.now();
+    private Map<String, Object> getOrCreateCurrentPeriodDlt() {
+        LocalDate today = LocalDate.now();
         LocalDate fromDate = null;
         LocalDate toDate = null;
         for (int i = 0; i < 7; i++) {
-            LocalDate prevDate = now.minusDays(i);
-            LocalDate nextDate = now.plusDays(i);
+            LocalDate prevDate = today.minusDays(i);
+            LocalDate nextDate = today.plusDays(i);
             if (prevDate.getDayOfWeek() == DayOfWeek.SATURDAY) {
                 fromDate = prevDate;
             }
@@ -289,6 +318,17 @@ public class WeeklyReportService {
         jdbcTemplate.update("update hr_period_dtl d set d.is_current=1 where d.hr_period_id=? and d.id=? and d.IS_CURRENT=0", periodId, periodDtlId);
 
         return periodDtl;
+    }
+
+    private Map<String, Object> getPreviousPeriodDlt(Map<String, Object> currentPeriodDlt) {
+        String hrPeriodId = JdbcMapUtil.getString(currentPeriodDlt, "HR_PERIOD_ID");
+        LocalDate fromDate = JdbcMapUtil.getLocalDate(currentPeriodDlt, "FROM_DATE");
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from hr_period_dtl d where d.hr_period_id=? and d.FROM_DATE=?", hrPeriodId, fromDate.minusDays(7));
+        if (SharedUtil.isEmptyList(list)) {
+            return null;
+        } else {
+            return list.get(0);
+        }
     }
 
     private Map<String, Object> insertPeriodDtl(Object periodId, LocalDate fromDate, LocalDate toDate) {
