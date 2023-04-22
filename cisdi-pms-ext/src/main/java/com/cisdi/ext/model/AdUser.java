@@ -7,21 +7,20 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 周报明细。
+ * 用户。
  */
-public class HrWeeklyReportDtl {
+public class AdUser {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<HrWeeklyReportDtl> modelHelper = new ModelHelper<>("HR_WEEKLY_REPORT_DTL", new HrWeeklyReportDtl());
+    private static final ModelHelper<AdUser> modelHelper = new ModelHelper<>("AD_USER", new AdUser());
 
     /**
      * 待更新的列。
@@ -38,7 +37,7 @@ public class HrWeeklyReportDtl {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "HR_WEEKLY_REPORT_DTL";
+    public static final String ENT_CODE = "AD_USER";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -100,89 +99,41 @@ public class HrWeeklyReportDtl {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 流程。
+         * 使用数据库验证。
          */
-        public static final String WF_PROCESS_ID = "WF_PROCESS_ID";
+        public static final String USE_DB_VALIDATION = "USE_DB_VALIDATION";
         /**
-         * 流程实例。
+         * 数据库验证密码。
          */
-        public static final String WF_PROCESS_INSTANCE_ID = "WF_PROCESS_INSTANCE_ID";
+        public static final String PASSWORD = "PASSWORD";
         /**
-         * 是否发起。
+         * 使用外部验证。
          */
-        public static final String IS_START = "IS_START";
+        public static final String USE_EXT_VALIDATION = "USE_EXT_VALIDATION";
         /**
-         * 是否办结。
+         * 外部验证用户名。
          */
-        public static final String IS_END = "IS_END";
+        public static final String EXT_VALIDATION_USERNAME = "EXT_VALIDATION_USERNAME";
         /**
-         * 是否办结时通知部门。
+         * 手机。
          */
-        public static final String IS_NOTI_DEPT_ON_END = "IS_NOTI_DEPT_ON_END";
+        public static final String MOBILE = "MOBILE";
         /**
-         * 是否办结时通知分管领导。
+         * 邮箱。
          */
-        public static final String IS_NOTI_LEADER_ON_END = "IS_NOTI_LEADER_ON_END";
+        public static final String EMAIL = "EMAIL";
         /**
-         * 是否协助。
+         * 来源。
          */
-        public static final String IS_ASSIST = "IS_ASSIST";
+        public static final String SRC = "SRC";
         /**
-         * 项目。
+         * 来源记录ID。
          */
-        public static final String PM_PRJ_ID = "PM_PRJ_ID";
+        public static final String SRC_RECORD_ID = "SRC_RECORD_ID";
         /**
-         * 视图。
+         * 同步时间。
          */
-        public static final String AD_VIEW_ID = "AD_VIEW_ID";
-        /**
-         * 实体代码。
-         */
-        public static final String ENT_CODE = "ENT_CODE";
-        /**
-         * 实体记录ID。
-         */
-        public static final String ENTITY_RECORD_ID = "ENTITY_RECORD_ID";
-        /**
-         * 所属的个人周报。
-         */
-        public static final String HR_WEEKLY_REPORT_ID_PERSON = "HR_WEEKLY_REPORT_ID_PERSON";
-        /**
-         * 所属的部门周报。
-         */
-        public static final String HR_WEEKLY_REPORT_ID_DEPT = "HR_WEEKLY_REPORT_ID_DEPT";
-        /**
-         * 所属的分管领导周报。
-         */
-        public static final String HR_WEEKLY_REPORT_ID_LEADER = "HR_WEEKLY_REPORT_ID_LEADER";
-        /**
-         * 所属的总经理周报。
-         */
-        public static final String HR_WEEKLY_REPORT_ID_GM = "HR_WEEKLY_REPORT_ID_GM";
-        /**
-         * 批号。
-         */
-        public static final String BATCH_ID = "BATCH_ID";
-        /**
-         * 周期明细。
-         */
-        public static final String HR_PERIOD_DTL_ID = "HR_PERIOD_DTL_ID";
-        /**
-         * 报告部门。
-         */
-        public static final String REPORT_DEPT_ID = "REPORT_DEPT_ID";
-        /**
-         * 报告用户。
-         */
-        public static final String REPORT_USER_ID = "REPORT_USER_ID";
-        /**
-         * 启动日期。
-         */
-        public static final String START_DATE = "START_DATE";
-        /**
-         * 结束日期。
-         */
-        public static final String END_DATE = "END_DATE";
+        public static final String SYNC_DTTM = "SYNC_DTTM";
     }
 
     // </editor-fold>
@@ -205,7 +156,7 @@ public class HrWeeklyReportDtl {
     /**
      * 设置：ID。
      */
-    public HrWeeklyReportDtl setId(String id) {
+    public AdUser setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -241,7 +192,7 @@ public class HrWeeklyReportDtl {
     /**
      * 设置：版本。
      */
-    public HrWeeklyReportDtl setVer(Integer ver) {
+    public AdUser setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -277,7 +228,7 @@ public class HrWeeklyReportDtl {
     /**
      * 设置：时间戳。
      */
-    public HrWeeklyReportDtl setTs(LocalDateTime ts) {
+    public AdUser setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -313,7 +264,7 @@ public class HrWeeklyReportDtl {
     /**
      * 设置：是否预设。
      */
-    public HrWeeklyReportDtl setIsPreset(Boolean isPreset) {
+    public AdUser setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -349,7 +300,7 @@ public class HrWeeklyReportDtl {
     /**
      * 设置：创建日期时间。
      */
-    public HrWeeklyReportDtl setCrtDt(LocalDateTime crtDt) {
+    public AdUser setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -385,7 +336,7 @@ public class HrWeeklyReportDtl {
     /**
      * 设置：创建用户。
      */
-    public HrWeeklyReportDtl setCrtUserId(String crtUserId) {
+    public AdUser setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -421,7 +372,7 @@ public class HrWeeklyReportDtl {
     /**
      * 设置：最后修改日期时间。
      */
-    public HrWeeklyReportDtl setLastModiDt(LocalDateTime lastModiDt) {
+    public AdUser setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -457,7 +408,7 @@ public class HrWeeklyReportDtl {
     /**
      * 设置：最后修改用户。
      */
-    public HrWeeklyReportDtl setLastModiUserId(String lastModiUserId) {
+    public AdUser setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -493,7 +444,7 @@ public class HrWeeklyReportDtl {
     /**
      * 设置：记录状态。
      */
-    public HrWeeklyReportDtl setStatus(String status) {
+    public AdUser setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -529,7 +480,7 @@ public class HrWeeklyReportDtl {
     /**
      * 设置：锁定流程实例。
      */
-    public HrWeeklyReportDtl setLkWfInstId(String lkWfInstId) {
+    public AdUser setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -565,7 +516,7 @@ public class HrWeeklyReportDtl {
     /**
      * 设置：代码。
      */
-    public HrWeeklyReportDtl setCode(String code) {
+    public AdUser setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -601,7 +552,7 @@ public class HrWeeklyReportDtl {
     /**
      * 设置：名称。
      */
-    public HrWeeklyReportDtl setName(String name) {
+    public AdUser setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -637,7 +588,7 @@ public class HrWeeklyReportDtl {
     /**
      * 设置：备注。
      */
-    public HrWeeklyReportDtl setRemark(String remark) {
+    public AdUser setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -659,756 +610,324 @@ public class HrWeeklyReportDtl {
     }
 
     /**
-     * 流程。
+     * 使用数据库验证。
      */
-    private String wfProcessId;
+    private Boolean useDbValidation;
 
     /**
-     * 获取：流程。
+     * 获取：使用数据库验证。
      */
-    public String getWfProcessId() {
-        return this.wfProcessId;
+    public Boolean getUseDbValidation() {
+        return this.useDbValidation;
     }
 
     /**
-     * 设置：流程。
+     * 设置：使用数据库验证。
      */
-    public HrWeeklyReportDtl setWfProcessId(String wfProcessId) {
-        if (this.wfProcessId == null && wfProcessId == null) {
+    public AdUser setUseDbValidation(Boolean useDbValidation) {
+        if (this.useDbValidation == null && useDbValidation == null) {
             // 均为null，不做处理。
-        } else if (this.wfProcessId != null && wfProcessId != null) {
+        } else if (this.useDbValidation != null && useDbValidation != null) {
             // 均非null，判定不等，再做处理：
-            if (this.wfProcessId.compareTo(wfProcessId) != 0) {
-                this.wfProcessId = wfProcessId;
-                if (!this.toUpdateCols.contains("WF_PROCESS_ID")) {
-                    this.toUpdateCols.add("WF_PROCESS_ID");
+            if (this.useDbValidation.compareTo(useDbValidation) != 0) {
+                this.useDbValidation = useDbValidation;
+                if (!this.toUpdateCols.contains("USE_DB_VALIDATION")) {
+                    this.toUpdateCols.add("USE_DB_VALIDATION");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.wfProcessId = wfProcessId;
-            if (!this.toUpdateCols.contains("WF_PROCESS_ID")) {
-                this.toUpdateCols.add("WF_PROCESS_ID");
+            this.useDbValidation = useDbValidation;
+            if (!this.toUpdateCols.contains("USE_DB_VALIDATION")) {
+                this.toUpdateCols.add("USE_DB_VALIDATION");
             }
         }
         return this;
     }
 
     /**
-     * 流程实例。
+     * 数据库验证密码。
      */
-    private String wfProcessInstanceId;
+    private String password;
 
     /**
-     * 获取：流程实例。
+     * 获取：数据库验证密码。
      */
-    public String getWfProcessInstanceId() {
-        return this.wfProcessInstanceId;
+    public String getPassword() {
+        return this.password;
     }
 
     /**
-     * 设置：流程实例。
+     * 设置：数据库验证密码。
      */
-    public HrWeeklyReportDtl setWfProcessInstanceId(String wfProcessInstanceId) {
-        if (this.wfProcessInstanceId == null && wfProcessInstanceId == null) {
+    public AdUser setPassword(String password) {
+        if (this.password == null && password == null) {
             // 均为null，不做处理。
-        } else if (this.wfProcessInstanceId != null && wfProcessInstanceId != null) {
+        } else if (this.password != null && password != null) {
             // 均非null，判定不等，再做处理：
-            if (this.wfProcessInstanceId.compareTo(wfProcessInstanceId) != 0) {
-                this.wfProcessInstanceId = wfProcessInstanceId;
-                if (!this.toUpdateCols.contains("WF_PROCESS_INSTANCE_ID")) {
-                    this.toUpdateCols.add("WF_PROCESS_INSTANCE_ID");
+            if (this.password.compareTo(password) != 0) {
+                this.password = password;
+                if (!this.toUpdateCols.contains("PASSWORD")) {
+                    this.toUpdateCols.add("PASSWORD");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.wfProcessInstanceId = wfProcessInstanceId;
-            if (!this.toUpdateCols.contains("WF_PROCESS_INSTANCE_ID")) {
-                this.toUpdateCols.add("WF_PROCESS_INSTANCE_ID");
+            this.password = password;
+            if (!this.toUpdateCols.contains("PASSWORD")) {
+                this.toUpdateCols.add("PASSWORD");
             }
         }
         return this;
     }
 
     /**
-     * 是否发起。
+     * 使用外部验证。
      */
-    private Boolean isStart;
+    private Boolean useExtValidation;
 
     /**
-     * 获取：是否发起。
+     * 获取：使用外部验证。
      */
-    public Boolean getIsStart() {
-        return this.isStart;
+    public Boolean getUseExtValidation() {
+        return this.useExtValidation;
     }
 
     /**
-     * 设置：是否发起。
+     * 设置：使用外部验证。
      */
-    public HrWeeklyReportDtl setIsStart(Boolean isStart) {
-        if (this.isStart == null && isStart == null) {
+    public AdUser setUseExtValidation(Boolean useExtValidation) {
+        if (this.useExtValidation == null && useExtValidation == null) {
             // 均为null，不做处理。
-        } else if (this.isStart != null && isStart != null) {
+        } else if (this.useExtValidation != null && useExtValidation != null) {
             // 均非null，判定不等，再做处理：
-            if (this.isStart.compareTo(isStart) != 0) {
-                this.isStart = isStart;
-                if (!this.toUpdateCols.contains("IS_START")) {
-                    this.toUpdateCols.add("IS_START");
+            if (this.useExtValidation.compareTo(useExtValidation) != 0) {
+                this.useExtValidation = useExtValidation;
+                if (!this.toUpdateCols.contains("USE_EXT_VALIDATION")) {
+                    this.toUpdateCols.add("USE_EXT_VALIDATION");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.isStart = isStart;
-            if (!this.toUpdateCols.contains("IS_START")) {
-                this.toUpdateCols.add("IS_START");
+            this.useExtValidation = useExtValidation;
+            if (!this.toUpdateCols.contains("USE_EXT_VALIDATION")) {
+                this.toUpdateCols.add("USE_EXT_VALIDATION");
             }
         }
         return this;
     }
 
     /**
-     * 是否办结。
+     * 外部验证用户名。
      */
-    private Boolean isEnd;
+    private String extValidationUsername;
 
     /**
-     * 获取：是否办结。
+     * 获取：外部验证用户名。
      */
-    public Boolean getIsEnd() {
-        return this.isEnd;
+    public String getExtValidationUsername() {
+        return this.extValidationUsername;
     }
 
     /**
-     * 设置：是否办结。
+     * 设置：外部验证用户名。
      */
-    public HrWeeklyReportDtl setIsEnd(Boolean isEnd) {
-        if (this.isEnd == null && isEnd == null) {
+    public AdUser setExtValidationUsername(String extValidationUsername) {
+        if (this.extValidationUsername == null && extValidationUsername == null) {
             // 均为null，不做处理。
-        } else if (this.isEnd != null && isEnd != null) {
+        } else if (this.extValidationUsername != null && extValidationUsername != null) {
             // 均非null，判定不等，再做处理：
-            if (this.isEnd.compareTo(isEnd) != 0) {
-                this.isEnd = isEnd;
-                if (!this.toUpdateCols.contains("IS_END")) {
-                    this.toUpdateCols.add("IS_END");
+            if (this.extValidationUsername.compareTo(extValidationUsername) != 0) {
+                this.extValidationUsername = extValidationUsername;
+                if (!this.toUpdateCols.contains("EXT_VALIDATION_USERNAME")) {
+                    this.toUpdateCols.add("EXT_VALIDATION_USERNAME");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.isEnd = isEnd;
-            if (!this.toUpdateCols.contains("IS_END")) {
-                this.toUpdateCols.add("IS_END");
+            this.extValidationUsername = extValidationUsername;
+            if (!this.toUpdateCols.contains("EXT_VALIDATION_USERNAME")) {
+                this.toUpdateCols.add("EXT_VALIDATION_USERNAME");
             }
         }
         return this;
     }
 
     /**
-     * 是否办结时通知部门。
+     * 手机。
      */
-    private Boolean isNotiDeptOnEnd;
+    private String mobile;
 
     /**
-     * 获取：是否办结时通知部门。
+     * 获取：手机。
      */
-    public Boolean getIsNotiDeptOnEnd() {
-        return this.isNotiDeptOnEnd;
+    public String getMobile() {
+        return this.mobile;
     }
 
     /**
-     * 设置：是否办结时通知部门。
+     * 设置：手机。
      */
-    public HrWeeklyReportDtl setIsNotiDeptOnEnd(Boolean isNotiDeptOnEnd) {
-        if (this.isNotiDeptOnEnd == null && isNotiDeptOnEnd == null) {
+    public AdUser setMobile(String mobile) {
+        if (this.mobile == null && mobile == null) {
             // 均为null，不做处理。
-        } else if (this.isNotiDeptOnEnd != null && isNotiDeptOnEnd != null) {
+        } else if (this.mobile != null && mobile != null) {
             // 均非null，判定不等，再做处理：
-            if (this.isNotiDeptOnEnd.compareTo(isNotiDeptOnEnd) != 0) {
-                this.isNotiDeptOnEnd = isNotiDeptOnEnd;
-                if (!this.toUpdateCols.contains("IS_NOTI_DEPT_ON_END")) {
-                    this.toUpdateCols.add("IS_NOTI_DEPT_ON_END");
+            if (this.mobile.compareTo(mobile) != 0) {
+                this.mobile = mobile;
+                if (!this.toUpdateCols.contains("MOBILE")) {
+                    this.toUpdateCols.add("MOBILE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.isNotiDeptOnEnd = isNotiDeptOnEnd;
-            if (!this.toUpdateCols.contains("IS_NOTI_DEPT_ON_END")) {
-                this.toUpdateCols.add("IS_NOTI_DEPT_ON_END");
+            this.mobile = mobile;
+            if (!this.toUpdateCols.contains("MOBILE")) {
+                this.toUpdateCols.add("MOBILE");
             }
         }
         return this;
     }
 
     /**
-     * 是否办结时通知分管领导。
+     * 邮箱。
      */
-    private Boolean isNotiLeaderOnEnd;
+    private String email;
 
     /**
-     * 获取：是否办结时通知分管领导。
+     * 获取：邮箱。
      */
-    public Boolean getIsNotiLeaderOnEnd() {
-        return this.isNotiLeaderOnEnd;
+    public String getEmail() {
+        return this.email;
     }
 
     /**
-     * 设置：是否办结时通知分管领导。
+     * 设置：邮箱。
      */
-    public HrWeeklyReportDtl setIsNotiLeaderOnEnd(Boolean isNotiLeaderOnEnd) {
-        if (this.isNotiLeaderOnEnd == null && isNotiLeaderOnEnd == null) {
+    public AdUser setEmail(String email) {
+        if (this.email == null && email == null) {
             // 均为null，不做处理。
-        } else if (this.isNotiLeaderOnEnd != null && isNotiLeaderOnEnd != null) {
+        } else if (this.email != null && email != null) {
             // 均非null，判定不等，再做处理：
-            if (this.isNotiLeaderOnEnd.compareTo(isNotiLeaderOnEnd) != 0) {
-                this.isNotiLeaderOnEnd = isNotiLeaderOnEnd;
-                if (!this.toUpdateCols.contains("IS_NOTI_LEADER_ON_END")) {
-                    this.toUpdateCols.add("IS_NOTI_LEADER_ON_END");
+            if (this.email.compareTo(email) != 0) {
+                this.email = email;
+                if (!this.toUpdateCols.contains("EMAIL")) {
+                    this.toUpdateCols.add("EMAIL");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.isNotiLeaderOnEnd = isNotiLeaderOnEnd;
-            if (!this.toUpdateCols.contains("IS_NOTI_LEADER_ON_END")) {
-                this.toUpdateCols.add("IS_NOTI_LEADER_ON_END");
+            this.email = email;
+            if (!this.toUpdateCols.contains("EMAIL")) {
+                this.toUpdateCols.add("EMAIL");
             }
         }
         return this;
     }
 
     /**
-     * 是否协助。
+     * 来源。
      */
-    private Boolean isAssist;
+    private String src;
 
     /**
-     * 获取：是否协助。
+     * 获取：来源。
      */
-    public Boolean getIsAssist() {
-        return this.isAssist;
+    public String getSrc() {
+        return this.src;
     }
 
     /**
-     * 设置：是否协助。
+     * 设置：来源。
      */
-    public HrWeeklyReportDtl setIsAssist(Boolean isAssist) {
-        if (this.isAssist == null && isAssist == null) {
+    public AdUser setSrc(String src) {
+        if (this.src == null && src == null) {
             // 均为null，不做处理。
-        } else if (this.isAssist != null && isAssist != null) {
+        } else if (this.src != null && src != null) {
             // 均非null，判定不等，再做处理：
-            if (this.isAssist.compareTo(isAssist) != 0) {
-                this.isAssist = isAssist;
-                if (!this.toUpdateCols.contains("IS_ASSIST")) {
-                    this.toUpdateCols.add("IS_ASSIST");
+            if (this.src.compareTo(src) != 0) {
+                this.src = src;
+                if (!this.toUpdateCols.contains("SRC")) {
+                    this.toUpdateCols.add("SRC");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.isAssist = isAssist;
-            if (!this.toUpdateCols.contains("IS_ASSIST")) {
-                this.toUpdateCols.add("IS_ASSIST");
+            this.src = src;
+            if (!this.toUpdateCols.contains("SRC")) {
+                this.toUpdateCols.add("SRC");
             }
         }
         return this;
     }
 
     /**
-     * 项目。
+     * 来源记录ID。
      */
-    private String pmPrjId;
+    private String srcRecordId;
 
     /**
-     * 获取：项目。
+     * 获取：来源记录ID。
      */
-    public String getPmPrjId() {
-        return this.pmPrjId;
+    public String getSrcRecordId() {
+        return this.srcRecordId;
     }
 
     /**
-     * 设置：项目。
+     * 设置：来源记录ID。
      */
-    public HrWeeklyReportDtl setPmPrjId(String pmPrjId) {
-        if (this.pmPrjId == null && pmPrjId == null) {
+    public AdUser setSrcRecordId(String srcRecordId) {
+        if (this.srcRecordId == null && srcRecordId == null) {
             // 均为null，不做处理。
-        } else if (this.pmPrjId != null && pmPrjId != null) {
+        } else if (this.srcRecordId != null && srcRecordId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.pmPrjId.compareTo(pmPrjId) != 0) {
-                this.pmPrjId = pmPrjId;
-                if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
-                    this.toUpdateCols.add("PM_PRJ_ID");
+            if (this.srcRecordId.compareTo(srcRecordId) != 0) {
+                this.srcRecordId = srcRecordId;
+                if (!this.toUpdateCols.contains("SRC_RECORD_ID")) {
+                    this.toUpdateCols.add("SRC_RECORD_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.pmPrjId = pmPrjId;
-            if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
-                this.toUpdateCols.add("PM_PRJ_ID");
+            this.srcRecordId = srcRecordId;
+            if (!this.toUpdateCols.contains("SRC_RECORD_ID")) {
+                this.toUpdateCols.add("SRC_RECORD_ID");
             }
         }
         return this;
     }
 
     /**
-     * 视图。
+     * 同步时间。
      */
-    private String adViewId;
+    private LocalDateTime syncDttm;
 
     /**
-     * 获取：视图。
+     * 获取：同步时间。
      */
-    public String getAdViewId() {
-        return this.adViewId;
+    public LocalDateTime getSyncDttm() {
+        return this.syncDttm;
     }
 
     /**
-     * 设置：视图。
+     * 设置：同步时间。
      */
-    public HrWeeklyReportDtl setAdViewId(String adViewId) {
-        if (this.adViewId == null && adViewId == null) {
+    public AdUser setSyncDttm(LocalDateTime syncDttm) {
+        if (this.syncDttm == null && syncDttm == null) {
             // 均为null，不做处理。
-        } else if (this.adViewId != null && adViewId != null) {
+        } else if (this.syncDttm != null && syncDttm != null) {
             // 均非null，判定不等，再做处理：
-            if (this.adViewId.compareTo(adViewId) != 0) {
-                this.adViewId = adViewId;
-                if (!this.toUpdateCols.contains("AD_VIEW_ID")) {
-                    this.toUpdateCols.add("AD_VIEW_ID");
+            if (this.syncDttm.compareTo(syncDttm) != 0) {
+                this.syncDttm = syncDttm;
+                if (!this.toUpdateCols.contains("SYNC_DTTM")) {
+                    this.toUpdateCols.add("SYNC_DTTM");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.adViewId = adViewId;
-            if (!this.toUpdateCols.contains("AD_VIEW_ID")) {
-                this.toUpdateCols.add("AD_VIEW_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 实体代码。
-     */
-    private String entCode;
-
-    /**
-     * 获取：实体代码。
-     */
-    public String getEntCode() {
-        return this.entCode;
-    }
-
-    /**
-     * 设置：实体代码。
-     */
-    public HrWeeklyReportDtl setEntCode(String entCode) {
-        if (this.entCode == null && entCode == null) {
-            // 均为null，不做处理。
-        } else if (this.entCode != null && entCode != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.entCode.compareTo(entCode) != 0) {
-                this.entCode = entCode;
-                if (!this.toUpdateCols.contains("ENT_CODE")) {
-                    this.toUpdateCols.add("ENT_CODE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.entCode = entCode;
-            if (!this.toUpdateCols.contains("ENT_CODE")) {
-                this.toUpdateCols.add("ENT_CODE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 实体记录ID。
-     */
-    private String entityRecordId;
-
-    /**
-     * 获取：实体记录ID。
-     */
-    public String getEntityRecordId() {
-        return this.entityRecordId;
-    }
-
-    /**
-     * 设置：实体记录ID。
-     */
-    public HrWeeklyReportDtl setEntityRecordId(String entityRecordId) {
-        if (this.entityRecordId == null && entityRecordId == null) {
-            // 均为null，不做处理。
-        } else if (this.entityRecordId != null && entityRecordId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.entityRecordId.compareTo(entityRecordId) != 0) {
-                this.entityRecordId = entityRecordId;
-                if (!this.toUpdateCols.contains("ENTITY_RECORD_ID")) {
-                    this.toUpdateCols.add("ENTITY_RECORD_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.entityRecordId = entityRecordId;
-            if (!this.toUpdateCols.contains("ENTITY_RECORD_ID")) {
-                this.toUpdateCols.add("ENTITY_RECORD_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 所属的个人周报。
-     */
-    private String hrWeeklyReportIdPerson;
-
-    /**
-     * 获取：所属的个人周报。
-     */
-    public String getHrWeeklyReportIdPerson() {
-        return this.hrWeeklyReportIdPerson;
-    }
-
-    /**
-     * 设置：所属的个人周报。
-     */
-    public HrWeeklyReportDtl setHrWeeklyReportIdPerson(String hrWeeklyReportIdPerson) {
-        if (this.hrWeeklyReportIdPerson == null && hrWeeklyReportIdPerson == null) {
-            // 均为null，不做处理。
-        } else if (this.hrWeeklyReportIdPerson != null && hrWeeklyReportIdPerson != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.hrWeeklyReportIdPerson.compareTo(hrWeeklyReportIdPerson) != 0) {
-                this.hrWeeklyReportIdPerson = hrWeeklyReportIdPerson;
-                if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_PERSON")) {
-                    this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_PERSON");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.hrWeeklyReportIdPerson = hrWeeklyReportIdPerson;
-            if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_PERSON")) {
-                this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_PERSON");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 所属的部门周报。
-     */
-    private String hrWeeklyReportIdDept;
-
-    /**
-     * 获取：所属的部门周报。
-     */
-    public String getHrWeeklyReportIdDept() {
-        return this.hrWeeklyReportIdDept;
-    }
-
-    /**
-     * 设置：所属的部门周报。
-     */
-    public HrWeeklyReportDtl setHrWeeklyReportIdDept(String hrWeeklyReportIdDept) {
-        if (this.hrWeeklyReportIdDept == null && hrWeeklyReportIdDept == null) {
-            // 均为null，不做处理。
-        } else if (this.hrWeeklyReportIdDept != null && hrWeeklyReportIdDept != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.hrWeeklyReportIdDept.compareTo(hrWeeklyReportIdDept) != 0) {
-                this.hrWeeklyReportIdDept = hrWeeklyReportIdDept;
-                if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_DEPT")) {
-                    this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_DEPT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.hrWeeklyReportIdDept = hrWeeklyReportIdDept;
-            if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_DEPT")) {
-                this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_DEPT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 所属的分管领导周报。
-     */
-    private String hrWeeklyReportIdLeader;
-
-    /**
-     * 获取：所属的分管领导周报。
-     */
-    public String getHrWeeklyReportIdLeader() {
-        return this.hrWeeklyReportIdLeader;
-    }
-
-    /**
-     * 设置：所属的分管领导周报。
-     */
-    public HrWeeklyReportDtl setHrWeeklyReportIdLeader(String hrWeeklyReportIdLeader) {
-        if (this.hrWeeklyReportIdLeader == null && hrWeeklyReportIdLeader == null) {
-            // 均为null，不做处理。
-        } else if (this.hrWeeklyReportIdLeader != null && hrWeeklyReportIdLeader != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.hrWeeklyReportIdLeader.compareTo(hrWeeklyReportIdLeader) != 0) {
-                this.hrWeeklyReportIdLeader = hrWeeklyReportIdLeader;
-                if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_LEADER")) {
-                    this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_LEADER");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.hrWeeklyReportIdLeader = hrWeeklyReportIdLeader;
-            if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_LEADER")) {
-                this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_LEADER");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 所属的总经理周报。
-     */
-    private String hrWeeklyReportIdGm;
-
-    /**
-     * 获取：所属的总经理周报。
-     */
-    public String getHrWeeklyReportIdGm() {
-        return this.hrWeeklyReportIdGm;
-    }
-
-    /**
-     * 设置：所属的总经理周报。
-     */
-    public HrWeeklyReportDtl setHrWeeklyReportIdGm(String hrWeeklyReportIdGm) {
-        if (this.hrWeeklyReportIdGm == null && hrWeeklyReportIdGm == null) {
-            // 均为null，不做处理。
-        } else if (this.hrWeeklyReportIdGm != null && hrWeeklyReportIdGm != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.hrWeeklyReportIdGm.compareTo(hrWeeklyReportIdGm) != 0) {
-                this.hrWeeklyReportIdGm = hrWeeklyReportIdGm;
-                if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_GM")) {
-                    this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_GM");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.hrWeeklyReportIdGm = hrWeeklyReportIdGm;
-            if (!this.toUpdateCols.contains("HR_WEEKLY_REPORT_ID_GM")) {
-                this.toUpdateCols.add("HR_WEEKLY_REPORT_ID_GM");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 批号。
-     */
-    private String batchId;
-
-    /**
-     * 获取：批号。
-     */
-    public String getBatchId() {
-        return this.batchId;
-    }
-
-    /**
-     * 设置：批号。
-     */
-    public HrWeeklyReportDtl setBatchId(String batchId) {
-        if (this.batchId == null && batchId == null) {
-            // 均为null，不做处理。
-        } else if (this.batchId != null && batchId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.batchId.compareTo(batchId) != 0) {
-                this.batchId = batchId;
-                if (!this.toUpdateCols.contains("BATCH_ID")) {
-                    this.toUpdateCols.add("BATCH_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.batchId = batchId;
-            if (!this.toUpdateCols.contains("BATCH_ID")) {
-                this.toUpdateCols.add("BATCH_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 周期明细。
-     */
-    private String hrPeriodDtlId;
-
-    /**
-     * 获取：周期明细。
-     */
-    public String getHrPeriodDtlId() {
-        return this.hrPeriodDtlId;
-    }
-
-    /**
-     * 设置：周期明细。
-     */
-    public HrWeeklyReportDtl setHrPeriodDtlId(String hrPeriodDtlId) {
-        if (this.hrPeriodDtlId == null && hrPeriodDtlId == null) {
-            // 均为null，不做处理。
-        } else if (this.hrPeriodDtlId != null && hrPeriodDtlId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.hrPeriodDtlId.compareTo(hrPeriodDtlId) != 0) {
-                this.hrPeriodDtlId = hrPeriodDtlId;
-                if (!this.toUpdateCols.contains("HR_PERIOD_DTL_ID")) {
-                    this.toUpdateCols.add("HR_PERIOD_DTL_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.hrPeriodDtlId = hrPeriodDtlId;
-            if (!this.toUpdateCols.contains("HR_PERIOD_DTL_ID")) {
-                this.toUpdateCols.add("HR_PERIOD_DTL_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 报告部门。
-     */
-    private String reportDeptId;
-
-    /**
-     * 获取：报告部门。
-     */
-    public String getReportDeptId() {
-        return this.reportDeptId;
-    }
-
-    /**
-     * 设置：报告部门。
-     */
-    public HrWeeklyReportDtl setReportDeptId(String reportDeptId) {
-        if (this.reportDeptId == null && reportDeptId == null) {
-            // 均为null，不做处理。
-        } else if (this.reportDeptId != null && reportDeptId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.reportDeptId.compareTo(reportDeptId) != 0) {
-                this.reportDeptId = reportDeptId;
-                if (!this.toUpdateCols.contains("REPORT_DEPT_ID")) {
-                    this.toUpdateCols.add("REPORT_DEPT_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.reportDeptId = reportDeptId;
-            if (!this.toUpdateCols.contains("REPORT_DEPT_ID")) {
-                this.toUpdateCols.add("REPORT_DEPT_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 报告用户。
-     */
-    private String reportUserId;
-
-    /**
-     * 获取：报告用户。
-     */
-    public String getReportUserId() {
-        return this.reportUserId;
-    }
-
-    /**
-     * 设置：报告用户。
-     */
-    public HrWeeklyReportDtl setReportUserId(String reportUserId) {
-        if (this.reportUserId == null && reportUserId == null) {
-            // 均为null，不做处理。
-        } else if (this.reportUserId != null && reportUserId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.reportUserId.compareTo(reportUserId) != 0) {
-                this.reportUserId = reportUserId;
-                if (!this.toUpdateCols.contains("REPORT_USER_ID")) {
-                    this.toUpdateCols.add("REPORT_USER_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.reportUserId = reportUserId;
-            if (!this.toUpdateCols.contains("REPORT_USER_ID")) {
-                this.toUpdateCols.add("REPORT_USER_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 启动日期。
-     */
-    private LocalDate startDate;
-
-    /**
-     * 获取：启动日期。
-     */
-    public LocalDate getStartDate() {
-        return this.startDate;
-    }
-
-    /**
-     * 设置：启动日期。
-     */
-    public HrWeeklyReportDtl setStartDate(LocalDate startDate) {
-        if (this.startDate == null && startDate == null) {
-            // 均为null，不做处理。
-        } else if (this.startDate != null && startDate != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.startDate.compareTo(startDate) != 0) {
-                this.startDate = startDate;
-                if (!this.toUpdateCols.contains("START_DATE")) {
-                    this.toUpdateCols.add("START_DATE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.startDate = startDate;
-            if (!this.toUpdateCols.contains("START_DATE")) {
-                this.toUpdateCols.add("START_DATE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 结束日期。
-     */
-    private LocalDate endDate;
-
-    /**
-     * 获取：结束日期。
-     */
-    public LocalDate getEndDate() {
-        return this.endDate;
-    }
-
-    /**
-     * 设置：结束日期。
-     */
-    public HrWeeklyReportDtl setEndDate(LocalDate endDate) {
-        if (this.endDate == null && endDate == null) {
-            // 均为null，不做处理。
-        } else if (this.endDate != null && endDate != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.endDate.compareTo(endDate) != 0) {
-                this.endDate = endDate;
-                if (!this.toUpdateCols.contains("END_DATE")) {
-                    this.toUpdateCols.add("END_DATE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.endDate = endDate;
-            if (!this.toUpdateCols.contains("END_DATE")) {
-                this.toUpdateCols.add("END_DATE");
+            this.syncDttm = syncDttm;
+            if (!this.toUpdateCols.contains("SYNC_DTTM")) {
+                this.toUpdateCols.add("SYNC_DTTM");
             }
         }
         return this;
@@ -1501,8 +1020,8 @@ public class HrWeeklyReportDtl {
      *
      * @return
      */
-    public static HrWeeklyReportDtl newData() {
-        HrWeeklyReportDtl obj = modelHelper.newData();
+    public static AdUser newData() {
+        AdUser obj = modelHelper.newData();
         return obj;
     }
 
@@ -1511,8 +1030,8 @@ public class HrWeeklyReportDtl {
      *
      * @return
      */
-    public static HrWeeklyReportDtl insertData() {
-        HrWeeklyReportDtl obj = modelHelper.insertData();
+    public static AdUser insertData() {
+        AdUser obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1524,8 +1043,8 @@ public class HrWeeklyReportDtl {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static HrWeeklyReportDtl selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        HrWeeklyReportDtl obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static AdUser selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        AdUser obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1535,7 +1054,7 @@ public class HrWeeklyReportDtl {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static HrWeeklyReportDtl selectById(String id) {
+    public static AdUser selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1547,8 +1066,8 @@ public class HrWeeklyReportDtl {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<HrWeeklyReportDtl> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<HrWeeklyReportDtl> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<AdUser> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<AdUser> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1558,7 +1077,7 @@ public class HrWeeklyReportDtl {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<HrWeeklyReportDtl> selectByIds(List<String> ids) {
+    public static List<AdUser> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1570,8 +1089,8 @@ public class HrWeeklyReportDtl {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<HrWeeklyReportDtl> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<HrWeeklyReportDtl> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<AdUser> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<AdUser> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1581,7 +1100,7 @@ public class HrWeeklyReportDtl {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<HrWeeklyReportDtl> selectByWhere(Where where) {
+    public static List<AdUser> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1593,10 +1112,10 @@ public class HrWeeklyReportDtl {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static HrWeeklyReportDtl selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<HrWeeklyReportDtl> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static AdUser selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<AdUser> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用HrWeeklyReportDtl.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用AdUser.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmptyList(objList) ? null : objList.get(0);
@@ -1608,7 +1127,7 @@ public class HrWeeklyReportDtl {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static HrWeeklyReportDtl selectOneByWhere(Where where) {
+    public static AdUser selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1722,7 +1241,7 @@ public class HrWeeklyReportDtl {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(HrWeeklyReportDtl fromModel, HrWeeklyReportDtl toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(AdUser fromModel, AdUser toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1732,7 +1251,7 @@ public class HrWeeklyReportDtl {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(HrWeeklyReportDtl fromModel, HrWeeklyReportDtl toModel) {
+    public static void copyCols(AdUser fromModel, AdUser toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 
