@@ -280,7 +280,7 @@ public class WeeklyReportExt {
             String date = entry.getKey();
             dateStat.date = date;
             dateStat.ctStart = entry.getValue();
-            dateStat.ctEnd = endMap.containsKey(date) ? endMap.get(date) : 0;
+            dateStat.ctEnd = endMap.containsKey(date) ? endMap.get(date) : 0l;
             report.dateStatList.add(dateStat);
         }
 

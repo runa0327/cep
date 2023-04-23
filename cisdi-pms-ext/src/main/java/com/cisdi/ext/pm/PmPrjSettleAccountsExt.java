@@ -43,17 +43,23 @@ public class PmPrjSettleAccountsExt {
      */
     public void prjSettleEndCheck(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //流程id
+        String processId = ExtJarHelper.procId.get();
         //流程表名
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //项目id
         String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        //业主单位
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
         //流程业务表id
         String csCommId = entityRecord.csCommId;
         //更新资金信息
         PmPrjExt.updatePrjAmt(entityRecord,"PM_PRJ_SETTLE_ACCOUNTS",4,myJdbcTemplate,entCode);
         //创建项目投资测算汇总可研数据
         WfPmInvestUtil.calculateData(csCommId, entCode, projectId);
+        //审批人员信息写入花名册(计划运营岗)
+        ProcessCommon.addPrjPostUser(projectId,entCode,processId,companyId,csCommId,myJdbcTemplate);
     }
 
 
