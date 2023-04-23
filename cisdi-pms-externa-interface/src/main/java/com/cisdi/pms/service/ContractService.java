@@ -1,6 +1,6 @@
 package com.cisdi.pms.service;
 
-import com.cisdi.pms.api.ContractApi;
+import com.cisdi.pms.domain.ContractApi;
 
 import java.util.List;
 

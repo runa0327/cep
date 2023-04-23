@@ -4,12 +4,15 @@ import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.HrDeptUser;
 import com.cisdi.ext.model.PmRoster;
 import com.cisdi.ext.util.StringUtil;
+import com.cisdi.ext.model.WfProcessInstance;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
@@ -33,7 +36,7 @@ public class ProcessCommon {
         //判断是否是当轮拒绝回来的、撤销回来的（是否是第一个进入该节点审批的人）
         String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ?";
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeId,userId);
-        Boolean firstCheck = true; //是第一次审批
+        boolean firstCheck = true; //是第一次审批
         if (!CollectionUtils.isEmpty(list2)){
             String num = JdbcMapUtil.getString(list2.get(0),"num");
             if (!SharedUtil.isEmptyString(num) && !"0".equals(num)){
@@ -76,7 +79,7 @@ public class ProcessCommon {
      * @param myJdbcTemplate 数据源
      * @param procInstId 流程实例id
      * @param userName 操作人名称
-     * @return
+     * @return 审批意见信息
      */
     public static Map<String, String> getCommentNew(String nodeInstanceId, String userId, MyJdbcTemplate myJdbcTemplate, String procInstId, String userName) {
         Map<String,String> map = new HashMap<>();
@@ -118,7 +121,7 @@ public class ProcessCommon {
      * @param processFile 流程文件信息
      * @param file 本次操作文件信息
      * @param myJdbcTemplate 数据源
-     * @return
+     * @return 最新的意见附件信息
      */
     private static String getNewCommentFile(String userId, String processFile, String file, MyJdbcTemplate myJdbcTemplate) {
         String newFile = "";
@@ -144,7 +147,7 @@ public class ProcessCommon {
      * @return 最新需要回显的意见附件
      */
     private static String getNewFile(String userId, String nodeInstanceId, String processFile, String file,MyJdbcTemplate myJdbcTemplate) {
-        String newFile = "";
+        String newFile;
         //查询该人员该节点是否有历史提交文件
         String historyFile = getHistoryFile(userId,nodeInstanceId,myJdbcTemplate);
         if (SharedUtil.isEmptyString(historyFile) && SharedUtil.isEmptyString(file)){ //历史审批文件为空，本次提交意见附件为空，取流程文件
@@ -201,7 +204,7 @@ public class ProcessCommon {
      * @return 最新意见内容
      */
     public static String getNewCommentStr(String userName, String processComment, String comment) {
-        String newComment = "";
+        String newComment;
         String newUserComment = userName+":"+comment;
         if (SharedUtil.isEmptyString(processComment)){
             newComment = newUserComment;
@@ -263,8 +266,7 @@ public class ProcessCommon {
     public static String getNodeIdByNodeInstanceId(String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
         String sql = "select WF_NODE_ID from wf_node_instance where id = ?";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,nodeInstanceId);
-        String nodeId = JdbcMapUtil.getString(list.get(0),"WF_NODE_ID");
-        return nodeId;
+        return JdbcMapUtil.getString(list.get(0),"WF_NODE_ID");
     }
 
     /**
@@ -272,12 +274,12 @@ public class ProcessCommon {
      * @param nodeInstanceId 流程节点实例id
      * @param userId 用户id
      * @param myJdbcTemplate 数据源
-     * @return
+     * @return 原始用户id
      */
     public static String getOriginalUser(String nodeInstanceId, String userId, MyJdbcTemplate myJdbcTemplate) {
         String sql = "select PREV_TASK_ID from wf_task where ad_user_id = ? and WF_NODE_INSTANCE_ID = ? and status = 'ap'";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,userId,nodeInstanceId);
-        String taskId = "";
+        String taskId;
         if (!CollectionUtils.isEmpty(list)){
             taskId = JdbcMapUtil.getString(list.get(0),"PREV_TASK_ID");
             if (!SharedUtil.isEmptyString(taskId)){
@@ -406,6 +408,55 @@ public class ProcessCommon {
                 }
                 if (!CollectionUtils.isEmpty(rosterList)){
                     PmRosterExt.updatePrjUser(rosterList);
+                }
+            }
+        }
+
+    }
+
+    /**
+     * 根据项目名称，将项目由非系统项目改为系统项目
+     * @param projectName 项目名称
+     * @param prjId 项目id
+     */
+    public static void updateProcessTitleByProjectName(String projectName, String prjId) {
+        List<WfProcessInstance> list = WfProcessInstance.selectByWhere(new Where().contain(WfProcessInstance.Cols.NAME,projectName)
+                .eq(WfProcessInstance.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list)){
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+            for (WfProcessInstance tmp : list) {
+                //判断该条数据是否符合修改条件
+                //业务表名
+                String tableName = tmp.getEntCode();
+                //该条记录id
+                String recordId = tmp.getEntityRecordId();
+                checkData(tableName,recordId,projectName,prjId,myJdbcTemplate);
+            }
+        }
+    }
+
+    /**
+     * 判断单条流程语句是否符合修改为系统项目条件
+     * @param tableName 业务表名
+     * @param recordId 业务记录id
+     * @param projectName 项目名称
+     * @param projectId 项目id
+     * @param myJdbcTemplate 数据源
+     */
+    public static void checkData(String tableName, String recordId, String projectName, String projectId, MyJdbcTemplate myJdbcTemplate) {
+        //查询该表是否保函项目来源字段
+        String sql2 = "select C.CODE from AD_ENT_ATT A LEFT JOIN AD_ENT B ON A.AD_ENT_ID = B.ID LEFT JOIN AD_ATT C ON A.AD_ATT_ID = C.ID WHERE B.CODE = ?";
+        List<Map<String,Object>> codeList = myJdbcTemplate.queryForList(sql2,tableName);
+        if (!CollectionUtils.isEmpty(codeList)){
+            List<String> list = codeList.stream().map(p->JdbcMapUtil.getString(p,"CODE")).collect(Collectors.toList());
+            if (list.contains("PROJECT_SOURCE_TYPE_ID")){
+                String sql = "select * from " + tableName +" where id = ? and STATUS NOT IN ('VD','VDING') and PROJECT_NAME_WR = ?";
+                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql,recordId,projectName);
+                if (!CollectionUtils.isEmpty(list2)){
+                    Crud.from(tableName).where().eq("ID",recordId).update()
+                            .set("PROJECT_SOURCE_TYPE_ID","0099952822476441374")
+                            .set("PROJECT_NAME_WR",null)
+                            .set("PM_PRJ_ID",projectId).exec();
                 }
             }
         }

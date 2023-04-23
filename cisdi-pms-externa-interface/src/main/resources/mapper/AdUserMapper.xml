@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.mapper.AdUserMapper">
+    <resultMap id="adUser" type="com.cisdi.pms.domain.AdUser">
+        <id property="id" column="id" />
+        <result property="userName" column="userName" />
+    </resultMap>
+
+    <select id="getUserByName" resultMap="adUser">
+        select id,name as userName from ad_user where 1 = 1
+        <if test="userName != null">
+            and name like concat('%',#{userName},'%')
+        </if>
+    </select>
+</mapper>

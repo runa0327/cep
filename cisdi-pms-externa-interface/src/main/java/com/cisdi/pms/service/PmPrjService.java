@@ -1,6 +1,6 @@
 package com.cisdi.pms.service;
 
-import com.cisdi.pms.api.PmPrj;
+import com.cisdi.pms.domain.PmPrj;
 
 import java.util.List;
 

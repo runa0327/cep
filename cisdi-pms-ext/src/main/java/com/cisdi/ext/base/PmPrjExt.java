@@ -2,10 +2,12 @@ package com.cisdi.ext.base;
 
 import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.pm.PmPrjReqExt;
+import com.cisdi.ext.pm.ProcessCommon;
 import com.cisdi.ext.util.WfPmInvestUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -13,6 +15,7 @@ import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 项目表相关扩展
@@ -272,5 +275,27 @@ public class PmPrjExt {
       */
     public static void updateData(PmPrj pmPrj) {
         pmPrj.updateById();
+    }
+
+    /**
+     * 重复非系统项目作废扩展
+     */
+    public void vdRepeatPrj(){
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String projectName = JdbcMapUtil.getString(entityRecord.valueMap,"NAME");
+        String vdProjectId = JdbcMapUtil.getString(entityRecord.valueMap,"ID");
+        List<PmPrj> list = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.NAME,projectName).eq(PmPrj.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list)){
+            List<PmPrj> prjList = list.stream().filter(p->"0099952822476441374".equals(p.getProjectSourceTypeId())).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(prjList)){
+                String prjId = prjList.get(0).getId();
+                //作废非系统项目
+                Crud.from("PM_PRJ").where().eq("ID",vdProjectId).update().set("STATUS","VD").exec();
+                //涉及流程标题处理
+                ProcessCommon.updateProcessTitleByProjectName(projectName,prjId);
+            } else {
+                throw new BaseException("该项目不存在其他项目来源位 ”系统“ 的数据，不允许作废！");
+            }
+        }
     }
 }

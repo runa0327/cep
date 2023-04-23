@@ -6,6 +6,8 @@ import com.cisdi.ext.base.WfFlowExt;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.HrDept;
+import com.cisdi.ext.model.HrDept;
+import com.cisdi.ext.model.HrDeptUser;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -924,5 +926,35 @@ public class ProcessRoleExt {
             }
         }
         return userList;
+    }
+
+    /**
+     * 部门人员-区分公司-合约管理岗
+     */
+    public void getCompanyDeptUser(){
+        getDeptUserByCompany("AD_USER_ID","post_contract","合约管理岗");
+    }
+
+    /**
+     * 查询公司该部门人员
+     * @param entCode 查询的字段
+     * @param postCode 岗位编码
+     * @param postName 岗位名称
+     */
+    public void getDeptUserByCompany(String entCode, String postCode, String postName) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //获取签订公司
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
+        List<HrDept> list = HrDept.selectByWhere(new Where().eq(HrDept.Cols.CODE,postCode).eq(HrDept.Cols.CUSTOMER_UNIT,companyId).eq(HrDept.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list)){
+            String id = list.get(0).getId();
+            String sql = "select a.ad_user_id from hr_dept_user a left join ad_user b on a.ad_user_id = b.id where a.hr_dept_id = ? and a.status = 'ap' and b.status = 'ap'";
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql,id);
+            if (!CollectionUtils.isEmpty(list2)){
+                List<String> userList = list2.stream().map(p->JdbcMapUtil.getString(p,"ad_user_id")).collect(Collectors.toList());
+                ExtJarHelper.returnValue.set(userList);
+            }
+        }
     }
 }
