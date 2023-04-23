@@ -318,12 +318,14 @@ public class WeekTaskExt {
     public void delayApply() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select wt.*,pm.`NAME` as projectName from WEEK_TASK wt \n" +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,wt.*,pm.`NAME` as projectName from WEEK_TASK wt \n" +
                 " left join pm_prj pm on wt.PM_PRJ_ID = pm.id \n" +
+                " left join pm_pro_plan_node pppn on wt.RELATION_DATA_ID = pppn.id \n" +
                 " where wt.id=? ", map.get("id"));
         ProcessData processData = new ProcessData();
         processData.processId = "1649227469557063680";
         processData.viewId = "1649226141279707136";
+        List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select wn.ad_view_id as AD_VIEW_ID,wp.EXTRA_INFO  as EXTRA_INFO from wf_node wn left join WF_PROCESS wp on wp.id = wn.WF_PROCESS_ID where wn.NODE_TYPE = 'START_EVENT' AND wn.`STATUS` = 'AP' and wn.WF_PROCESS_ID= ? ", processData.processId);
 
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> pmData = list.get(0);
@@ -332,6 +334,10 @@ public class WeekTaskExt {
             project.name = JdbcMapUtil.getString(pmData, "projectName");
             processData.project = project;
             processData.nodeId = JdbcMapUtil.getString(pmData, "RELATION_DATA_ID");
+            if (!CollectionUtils.isEmpty(dataList)){
+                processData.icon = JdbcMapUtil.getString(dataList.get(0), "EXTRA_INFO");
+            }
+            processData.title = JdbcMapUtil.getString(pmData, "NAME");
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(processData), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         } else {

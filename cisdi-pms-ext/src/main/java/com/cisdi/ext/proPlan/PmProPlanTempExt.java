@@ -304,7 +304,9 @@ public class PmProPlanTempExt {
         if (Strings.isNotEmpty(input.baseNodeId)) {
             sb.append(",SCHEDULE_NAME ='").append(input.baseNodeId).append("'");
         }
-        sb.append(",IZ_MILESTONE =").append(input.izMilestone);
+        if (Strings.isNotEmpty(input.izMilestone)) {
+            sb.append(",IZ_MILESTONE =").append(input.izMilestone);
+        }
         sb.append(",`LEVEL`=").append(input.level);
         sb.append(", SEQ_NO =").append(input.seqNo);
         sb.append(" where id='").append(id).append("'");
