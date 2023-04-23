@@ -1,7 +1,13 @@
-package com.cisdi.ext.link;
+package com.cisdi.ext.link.linkPackage;
+
+import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.shared.util.JdbcMapUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 属性联动分支判断各类流程
@@ -17,7 +23,7 @@ public class AttLinkDifferentProcess {
 
     /**
      * 合同相关流程有同一相同标题生码规则
-     * @return
+     * @return 涉及流程
      */
     public static List<String> getOrderProcessName() {
         List<String> list = new ArrayList<>();
@@ -27,28 +33,41 @@ public class AttLinkDifferentProcess {
         return list;
     }
 
+    // 特殊流程，名称在流程发起时即生成，此处不生成
+    public static List<String> getSpecialList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_BUY_DEMAND_REQ"); //采购需求审批
+        list.add("PM_BID_APPROVAL_REQ"); //招标文件审批
+        list.add("PM_USE_CHAPTER_REQ"); //中选单位及标后用印申请
+        list.add("PO_ORDER_REQ"); //合同签订
+        list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
+        list.add("QUALITY_RECORD"); // 质量交底记录
+        list.add("PM_SUPERVISE_NOTICE_REQ"); // 监理通知单
+        return list;
+    }
+
     /**
      * 流程中需要自定义标题的流程
-     * @return
+     * @return 涉及流程
      */
     public static List<String> getTableList() {
         List<String> list = new ArrayList<>();
         list.add("PM_PRJ_REQ"); // 立项申请
         list.add("PM_PRJ_INVEST1"); // 可研估算
         list.add("PM_PRJ_INVEST2"); // 初设概算
-        list.add("PM_PRJ_INVEST3"); // 预算财评
+//        list.add("PM_PRJ_INVEST3"); // 预算财评
         list.add("PM_STABLE_EVAL"); // 社会稳定性评价
         list.add("PM_ENERGY_EVAL"); // 固定资产投资节能评价
         list.add("PM_WATER_PLAN"); // 水保方案
         list.add("PM_ENVIRONMENT_EVAL"); // 环评
-        list.add("PO_ORDER_REQ"); // 采购合同签订申请
+//        list.add("PO_ORDER_REQ"); // 采购合同签订申请
         list.add("PO_PUBLIC_BID_REQ"); // 采购公开招标申请
         list.add("PM_CONSTRUCT_PERMIT_REQ"); // 施工许可
         list.add("PM_PRJ_PLANNING_PERMIT_REQ"); // 工程规划许可
         list.add("PO_GUARANTEE_LETTER_REQUIRE_REQ"); // 新增保函申请
         list.add("PO_GUARANTEE_LETTER_RETURN_OA_REQ"); // 保函退还申请
-        list.add("PO_ORDER_SUPPLEMENT_REQ"); // 采购合同补充协议申请
-        list.add("PO_ORDER_TERMINATE_REQ"); // 采购合同终止申请
+//        list.add("PO_ORDER_SUPPLEMENT_REQ"); // 采购合同补充协议申请
+//        list.add("PO_ORDER_TERMINATE_REQ"); // 采购合同终止申请
         list.add("PO_ORDER_CHANGE_REQ"); // 采购合同变更申请
         list.add("PM_PRJ_PARTY_REQ"); // 五方责任主体维护申请
         list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
@@ -57,8 +76,8 @@ public class AttLinkDifferentProcess {
         list.add("PO_ORDER_PAYMENT_REQ"); // 采购合同付款申请
         list.add("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD"); // 技术交底与图纸会审记录
         list.add("PM_CONCEPTUAL_SCHEME_DESIGN"); // 概念方案设计管理
-        list.add("PM_CONSTRUCTION_DRAWING_DESIGN"); // 施工图设计管理
-        list.add("PM_DESIGN_ASSIGNMENT"); // 方案设计管理
+//        list.add("PM_CONSTRUCTION_DRAWING_DESIGN"); // 施工图设计管理
+//        list.add("PM_DESIGN_ASSIGNMENT"); // 方案设计管理
         list.add("PM_DESIGN_ASSIGNMENT_BOOK"); // 设计任务书
         list.add("PM_FARMING_PROCEDURES"); // 农转用手续办理
         list.add("PM_WOODLAND_PROCEDURES"); // 林地调整办理手续
@@ -94,7 +113,7 @@ public class AttLinkDifferentProcess {
         list.add("PM_SUPERVISE_NOTICE_REQ"); // 监理通知单
         list.add("PM_SUPERVISE_NOTICE_REPLY_REQ"); // 监理通知回复单
         list.add("PM_START_ORDER_REQ"); // 开工令
-        list.add("PM_BUY_DEMAND_REQ"); // 采购需求审批
+//        list.add("PM_BUY_DEMAND_REQ"); // 采购需求审批
         list.add("PM_BID_APPROVAL_REQ"); // 招标文件审批
         list.add("PM_FILE_CHAPTER_REQ"); // 标前资料用印审批
         list.add("PM_USE_CHAPTER_REQ"); // 中选单位及标后用印审批
@@ -108,7 +127,19 @@ public class AttLinkDifferentProcess {
         list.add("PIPELINE_RELOCATION_REQ"); // 管线迁改
         list.add("PM_POST_APPOINT"); // 岗位指派
         list.add("PRJ_LAND_CHECK"); // 项目红线核查
+//        list.add("PM_PRJ_SETTLE_ACCOUNTS"); // 项目结算审批
         return list;
+    }
+
+    /**
+     * 获取所有流程的表名
+     * @return
+     */
+    public static List<String> getAllProcessList(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> codeMaps = myJdbcTemplate.queryForList("select code from ad_ent where PARENT_ENT_ID = '0099799190825077752' and status = 'AP'");
+        List<String> codes = codeMaps.stream().map(m -> JdbcMapUtil.getString(m, "code")).collect(Collectors.toList());
+        return codes;
     }
 
     /**
@@ -124,7 +155,7 @@ public class AttLinkDifferentProcess {
 
     /**
      * 系统非系统属性联动-联动项目来源-多选项目
-     * @return
+     * @return 涉及流程
      */
     public static List<String> sourceTypeLinkProjects() {
         List<String> list = new ArrayList<>();
@@ -138,7 +169,42 @@ public class AttLinkDifferentProcess {
      */
     public static List<String> getLinkUserProcess() {
         List<String> list = new ArrayList<>();
-        list.add("PM_BUY_DEMAND_REQ"); //采购需求审批
+        list.add("PM_PRJ_SETTLE_ACCOUNTS"); //项目结算审批
+        list.add("PM_EXTENSION_REQUEST_REQ"); //节点延期申请
+        return list;
+    }
+
+    /**
+     * 业主单位变化有对应值需要变化的流程
+     * @return 涉及流程
+     */
+    public static List<String> getAutoGetDept() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_BID_APPROVAL_REQ");  //招标文件审批
+        list.add("PM_PRJ_SETTLE_ACCOUNTS");  //项目结算审批
+        return list;
+    }
+
+    /**
+     * 资金信息回显，按照优先级 可研估算<初设概算<预算财评 的流程
+     * @return 涉及流程
+     */
+    public static List<String> getAmtList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
+        list.add("PM_PRJ_PARTY_REQ"); // 五方责任主体维护申请
+        list.add("PO_ORDER_TERMINATE_REQ"); // 采购合同终止申请
+        list.add("PO_ORDER_CHANGE_REQ"); // 采购合同变更申请
+        list.add("PO_ORDER_SUPPLEMENT_REQ"); // 采购合同补充协议申请
+        list.add("PO_ORDER_REQ"); // 采购合同签订申请
+        list.add("PO_PUBLIC_BID_REQ"); // 采购公开招标申请
+        list.add("PM_BUILD_ORGAN_PLAN_REQ"); // 施工组织设计及施工方案
+        list.add("PM_WORK_LIST_REQ"); // 工作联系单
+        list.add("COMPLETION_PRE_ACCEPTANCE"); // 竣工预验收
+        list.add("EXPENSE_CLAIM_APPROVAL"); // 费用索赔报审表
+        list.add("PROJECT_CLAIM_NOTICE"); // 工程索赔通知书
+        list.add("APPROVAL_INSPECTION"); // 报审、报验
+        list.add("PM_BUILD_PROGRESS_REQ"); // 施工进度计划
         return list;
     }
 
@@ -150,6 +216,58 @@ public class AttLinkDifferentProcess {
         List<String> list = new ArrayList<>();
         list.add("PM_PRJ_INVEST1"); //可研报告审批
         list.add("PM_PRJ_INVEST2"); //初设概算审批
+        list.add("PM_PRJ_INVEST3"); //预算财评
+        return list;
+    }
+
+    /**
+     * 需要带出相对方联系人明细的实体试图
+     * @return list集合
+     */
+    public static List<String> getContactDetailList() {
+        List<String> list = new ArrayList<>();
+        list.add("0099902212142025475"); // 采购合同终止申请--填写项目信息及合同变更信息
+        return list;
+    }
+
+    /**
+     * 相对方联系人 只读
+     * @return list集合
+     */
+    public static List<String> getContactListRead() {
+        List<String> list = new ArrayList<>();
+        list.add("0099902212142025475"); // 采购合同终止申请--填写项目信息及合同变更信息
+        return list;
+    }
+
+    /**
+     * 关联合同不需要自动带出保函类型的流程
+     * @return list集合
+     */
+    public static List<String> getNotAutoBaoHan() {
+        List<String> list = new ArrayList<>();
+        list.add("PO_GUARANTEE_LETTER_REQUIRE_REQ"); //新增保函
+        return list;
+    }
+
+    /**
+     * 保函逻辑可改
+     * @return list集合
+     */
+    public static List<String> getEditGuarantee() {
+        List<String> editGuarantee = new ArrayList<>();
+        editGuarantee.add("PO_ORDER_TERMINATE_REQ"); //采购合同终止申请
+        return editGuarantee;
+    }
+
+    /**
+     * 流程岗位审批人员从页面表单取数 字段花名册同属
+     * @return list集合
+     */
+    public static List<String> getPostProList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_PRJ_SETTLE_ACCOUNTS"); //项目结算
+        list.add("PM_EXTENSION_REQUEST_REQ"); //节点延期申请
         return list;
     }
 }

@@ -1,7 +1,15 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.link.LinkSql;
+import com.cisdi.ext.model.HrDeptUser;
+import com.cisdi.ext.model.PmRoster;
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
+import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
@@ -278,5 +286,129 @@ public class ProcessCommon {
             }
         }
         return userId;
+    }
+
+    /**
+     * 获取人员在流程中的岗位信息
+     * @param userId 用户id
+     * @param projectId 项目id
+     * @param companyId 业主单位id
+     * @param myJdbcTemplate 数据源
+     * @return 流程岗位id
+     */
+    public static String getUserProcessPost(String userId,String projectId, String companyId, MyJdbcTemplate myJdbcTemplate) {
+        String processPostId;
+        String sql = "select a.BASE_PROCESS_POST_ID FROM PM_POST_PROPRJ a " +
+                "left join PM_ROSTER b on a.POST_INFO_ID = b.POST_INFO_ID " +
+                "where b.PM_PRJ_ID = ? and b.CUSTOMER_UNIT = ? and b.AD_USER_ID = ? and a.STATUS = 'AP' and b.STATUS = 'AP'";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId,companyId,userId);
+        if (!CollectionUtils.isEmpty(list)){
+            processPostId = JdbcMapUtil.getString(list.get(0),"BASE_PROCESS_POST_ID");
+        } else {
+            throw new BaseException("该人员在该项目的花名册信息中未匹配到信息，请核对花名册审批人信息或联系管理员处理！");
+        }
+        return processPostId;
+    }
+
+    /**
+     * 流程在发起时重写通用单据部门信息
+     * @param id 业务表id
+     * @param userId 发起人id
+     * @param companyId 业主单位id
+     * @param entCode 业务表名
+     */
+    public static void updateProcessDept(String id, String userId, String companyId, String entCode) {
+        List<HrDeptUser> list = HrDeptUser.selectByWhere(new Where().eq(HrDeptUser.Cols.AD_USER_ID,userId)
+                .eq(HrDeptUser.Cols.CUSTOMER_UNIT,companyId).eq(HrDeptUser.Cols.STATUS,"AP"));
+        if (CollectionUtils.isEmpty(list)){
+            throw new BaseException("对不起，您在该业主单位下不存在部门关系，请联系管理员处理！");
+        } else {
+            List<HrDeptUser> list1 = list.stream().filter(p->p.getSysTrue()==true).collect(Collectors.toList());
+            if (CollectionUtils.isEmpty(list1)){
+                list1 = list.stream().filter(p->p.getSysTrue()!=true).collect(Collectors.toList());
+            }
+            String deptId = list1.get(0).getHrDeptId();
+            Crud.from(entCode).where().eq("id",id).update().set("CRT_DEPT_ID",deptId).exec();
+        }
+    }
+
+    /**
+     * 流程数据清理
+     * @param str 需求清除的字段数据
+     * @param csCommId 业务流程id
+     * @param entCode 业务表名
+     * @param myJdbcTemplate 数据源
+     */
+    public static void clearData(String str, String csCommId, String entCode, MyJdbcTemplate myJdbcTemplate) {
+        StringBuilder sb = new StringBuilder("UPDATE ");
+        sb.append(entCode).append(" SET ");
+        List<String> list = StringUtil.getStrToList(str,",");
+        for (String tmp : list) {
+            sb.append(tmp).append(" = null,");
+        }
+        sb.deleteCharAt(sb.length()-1);
+        sb.append(" WHERE ID = ?");
+        myJdbcTemplate.update(sb.toString(),csCommId);
+    }
+
+    /**
+     * 流程审批意见回显
+     * @param code 单个字段
+     * @param comment 审批意见
+     * @param csCommId 业务流程id
+     * @param entCode 业务流程表名
+     */
+    public static void commentShow(String code, String comment, String csCommId, String entCode) {
+        Crud.from(entCode).where().eq("ID",csCommId).update().set(code,comment).exec();
+    }
+
+    /**
+     * 流程完结时，将岗位人员信息写入花名册
+     * @param projectId 项目id
+     * @param entCode 业务表名
+     * @param processId 流程id
+     * @param companyId 业主单位id
+     * @param csCommId 业务记录id
+     * @param myJdbcTemplate 数据源
+     */
+    public static void addPrjPostUser(String projectId, String entCode, String processId, String companyId, String csCommId, MyJdbcTemplate myJdbcTemplate) {
+        //查询该流程所有流程岗位信息
+        List<Map<String,Object>> procPostList = LinkSql.getProcessPostByProcessCompany(processId,companyId,myJdbcTemplate);
+        if (!CollectionUtils.isEmpty(procPostList)){
+            //取出流程岗位id
+            List<String> deptId = procPostList.stream().map(p->JdbcMapUtil.getString(p,"id")).filter(p->!SharedUtil.isEmptyString(p)).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(deptId)){
+                //查询该表单所有字段
+                List<String> adEntAtt = LinkSql.getEntCodeAtt(entCode,myJdbcTemplate);
+                List<PmRoster> rosterList = new ArrayList<>();
+                //循环遍历每个岗位人员(优先取数表单，其次花名册)
+                for (String tp : deptId) {
+                    //查询该流程岗位对应的字段
+                    List<String> code = LinkSql.getProcessPostCode(tp,companyId,myJdbcTemplate);
+                    code = code.stream().filter(adEntAtt::contains).collect(Collectors.toList());
+                    for (String tmp : code) {
+                        //根据流程岗位+项目岗位Code+业主单位 查询项目id
+                        List<Map<String,Object>> postIdList = LinkSql.getPrjPostIdByCode(tp,companyId,tmp,myJdbcTemplate);
+                        String postId = "";
+                        if (!CollectionUtils.isEmpty(postIdList)){
+                            postId = JdbcMapUtil.getString(postIdList.get(0),"id");
+                        }
+                        List<String> userList1 = ProcessRoleExt.getProcessUser(tmp,entCode,csCommId,myJdbcTemplate);
+                        if (!CollectionUtils.isEmpty(userList1)){
+                            PmRoster pmRoster = new PmRoster();
+                            pmRoster.setCustomerUnit(companyId);
+                            pmRoster.setPmPrjId(projectId);
+                            pmRoster.setPostInfoId(postId); //岗位id
+                            pmRoster.setAdUserId(userList1.get(0));
+                            rosterList.add(pmRoster);
+                        }
+                    }
+                }
+                if (!CollectionUtils.isEmpty(rosterList)){
+                    PmRosterExt.updatePrjUser(rosterList);
+                }
+            }
+        }
+
     }
 }

@@ -1,11 +1,11 @@
-package com.cisdi.ext.link;
+package com.cisdi.ext.link.linkPackage;
 
 import com.cisdi.ext.base.AdUserExt;
 import com.cisdi.ext.base.GrSetValue;
+import com.cisdi.ext.link.*;
 import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.model.PrjStart;
 import com.cisdi.ext.pm.PmBuyDemandReqExt;
-import com.cisdi.ext.pm.PmStartExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -356,147 +356,33 @@ public class AttLinkExtDetail {
         if (!noPrjTypeList.contains(entCode)){
             prjTypeLinkNew(row,attLinkResult);
         }
-        // 占地面积
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "FLOOR_AREA"));
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:JdbcMapUtil.getString(row, "FLOOR_AREA");
-            attLinkResult.attMap.put("FLOOR_AREA", linkedAtt);
-        }
-        // 项目代码
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "prj_code")) ? null:JdbcMapUtil.getString(row, "prj_code");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "prj_code")) ? null:JdbcMapUtil.getString(row, "prj_code");
-            attLinkResult.attMap.put("PRJ_CODE", linkedAtt);
-        }
-        // 建筑面积
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILDING_AREA")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "BUILDING_AREA"));
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILDING_AREA")) ? null:JdbcMapUtil.getString(row, "BUILDING_AREA");
-            attLinkResult.attMap.put("BUILDING_AREA", linkedAtt);
-        }
-        // 业主单位
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "customer_id")) ? null:JdbcMapUtil.getString(row, "customer_id");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "customer_name")) ? null:JdbcMapUtil.getString(row, "customer_name");
-            attLinkResult.attMap.put("CUSTOMER_UNIT", linkedAtt);
-        }
-        // 项目管理模式
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "m_id")) ? null:JdbcMapUtil.getString(row, "m_id");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "m_name")) ? null:JdbcMapUtil.getString(row, "m_name");
-            attLinkResult.attMap.put("PRJ_MANAGE_MODE_ID", linkedAtt);
-        }
-        // 建设地点
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "l_id")) ? null:JdbcMapUtil.getString(row, "l_id");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "l_name")) ? null:JdbcMapUtil.getString(row, "l_name");
-            attLinkResult.attMap.put("BASE_LOCATION_ID", linkedAtt);
-        }
-        // 项目类型
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "pt_id")) ? null:JdbcMapUtil.getString(row, "pt_id");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "pt_name")) ? null:JdbcMapUtil.getString(row, "pt_name");
-            attLinkResult.attMap.put("PROJECT_TYPE_ID", linkedAtt);
-        }
-        // 建设规模类型
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "st_id")) ? null:JdbcMapUtil.getString(row, "st_id");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "st_name")) ? null:JdbcMapUtil.getString(row, "st_name");
-            attLinkResult.attMap.put("CON_SCALE_TYPE_ID", linkedAtt);
-        }
-        // 建设规模单位
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "su_id")) ? null:JdbcMapUtil.getString(row, "su_id");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "su_name")) ? null:JdbcMapUtil.getString(row, "su_name");
-            attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt);
-        }
-        // 建设年限
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILD_YEARS")) ? null:JdbcMapUtil.getString(row, "BUILD_YEARS");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "BUILD_YEARS")) ? null:JdbcMapUtil.getString(row, "BUILD_YEARS");
-            attLinkResult.attMap.put("BUILD_YEARS", linkedAtt);
-        }
-        // 项目概况
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_SITUATION")) ? null:JdbcMapUtil.getString(row, "PRJ_SITUATION");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_SITUATION")) ? null:JdbcMapUtil.getString(row, "PRJ_SITUATION");
+        mapAddValue("PRJ_CODE","prj_code",row,AttDataTypeE.TEXT_LONG,attLinkResult); //项目代码
+        mapAddValue("BUILD_YEARS","BUILD_YEARS",row,AttDataTypeE.TEXT_LONG,attLinkResult); //建设年限
+        mapAddValue("PRJ_SITUATION","PRJ_SITUATION",row,AttDataTypeE.TEXT_LONG,attLinkResult); //项目概况
+        mapAddValue("PRJ_INTRODUCE","PRJ_SITUATION",row,AttDataTypeE.TEXT_LONG,attLinkResult); //项目概况
+        mapAddValue("PRJ_REPLY_FILE","PRJ_REPLY_FILE",row,AttDataTypeE.FILE_GROUP,attLinkResult); //项目概况
+        mapAddValue("FEASIBILITY_APPROVE_FUND","FS",row,AttDataTypeE.DOUBLE,attLinkResult); //可研批复资金
+        mapAddValue("ESTIMATE_APPROVE_FUND","PD",row,AttDataTypeE.DOUBLE,attLinkResult); //初概批复资金
+        mapAddValue("EVALUATION_APPROVE_FUND","budget",row,AttDataTypeE.DOUBLE,attLinkResult); //财评批复资金
+        mapAddValue("PRJ_TOTAL_INVEST","ESTIMATED_TOTAL_INVEST",row,AttDataTypeE.DOUBLE,attLinkResult); //总投资
+        mapAddValue("OTHER","QTY_TWO",row,AttDataTypeE.TEXT_LONG,attLinkResult); //其他
 
-            attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt);
-            attLinkResult.attMap.put("PRJ_INTRODUCE", linkedAtt);
-        }
+        mapAddBigDecimalValue("FLOOR_AREA","FLOOR_AREA",row,AttDataTypeE.DOUBLE,attLinkResult); //占地面积
+        mapAddBigDecimalValue("BUILDING_AREA","BUILDING_AREA",row,AttDataTypeE.TEXT_LONG,attLinkResult); //建筑面积
+        mapAddBigDecimalValue("QTY_ONE","QTY_ONE",row,AttDataTypeE.TEXT_LONG,attLinkResult); //建筑面积
+        mapAddBigDecimalValue("QTY_THREE","QTY_THREE",row,AttDataTypeE.TEXT_LONG,attLinkResult); //海域面积
+        mapAddBigDecimalValue("CON_SCALE_QTY","CON_SCALE_QTY",row,AttDataTypeE.TEXT_LONG,attLinkResult); //长
+        mapAddBigDecimalValue("CON_SCALE_QTY2","CON_SCALE_QTY2",row,AttDataTypeE.TEXT_LONG,attLinkResult); //宽
+
+        mapAddRefValue("CUSTOMER_UNIT","customer_id","customer_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //业主单位
+        mapAddRefValue("PRJ_MANAGE_MODE_ID","m_id","m_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //项目管理模式
+        mapAddRefValue("BASE_LOCATION_ID","l_id","l_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //建设地点
+        mapAddRefValue("PROJECT_TYPE_ID","pt_id","pt_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //建设地点
+        mapAddRefValue("CON_SCALE_TYPE_ID","st_id","st_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //建设规模类型
+        mapAddRefValue("CON_SCALE_UOM_ID","su_id","su_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //建设规模单位
+
         if (!"PM_PRJ_REQ".equals(entCode)){
-            // 批复日期
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DATE;
-                linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_DATE")) ? null:JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
-                linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_DATE")) ? null:JdbcMapUtil.getString(row, "PRJ_REPLY_DATE");
-                attLinkResult.attMap.put("PRJ_REPLY_DATE", linkedAtt);
-            }
-        }
-        // 批复材料
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.FILE_GROUP;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_FILE")) ? null:JdbcMapUtil.getString(row, "PRJ_REPLY_FILE");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PRJ_REPLY_FILE")) ? null:JdbcMapUtil.getString(row, "PRJ_REPLY_FILE");
-
-            attLinkResult.attMap.put("PRJ_REPLY_FILE", linkedAtt);
-        }
-        // 可研批复资金
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FS")) ? null:JdbcMapUtil.getString(row, "FS");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FS")) ? null:JdbcMapUtil.getString(row, "FS");
-
-            attLinkResult.attMap.put("FEASIBILITY_APPROVE_FUND", linkedAtt);
-        }
-        // 初概批复资金
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PD")) ? null:JdbcMapUtil.getString(row, "PD");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "PD")) ? null:JdbcMapUtil.getString(row, "PD");
-            attLinkResult.attMap.put("ESTIMATE_APPROVE_FUND", linkedAtt);
-        }
-        // 财评批复资金
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "budget")) ? null:JdbcMapUtil.getString(row, "budget");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "budget")) ? null:JdbcMapUtil.getString(row, "budget");
-            attLinkResult.attMap.put("EVALUATION_APPROVE_FUND", linkedAtt);
-        }
-        // 总投资
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "ESTIMATED_TOTAL_INVEST")) ? null:JdbcMapUtil.getString(row, "ESTIMATED_TOTAL_INVEST");
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "ESTIMATED_TOTAL_INVEST")) ? null:JdbcMapUtil.getString(row, "ESTIMATED_TOTAL_INVEST");
-            attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
+            mapAddValue("PRJ_REPLY_DATE","PRJ_REPLY_DATE",row,AttDataTypeE.DATE,attLinkResult); //批复日期
         }
         // 资金来源
         {
@@ -514,48 +400,90 @@ public class AttLinkExtDetail {
             attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
             attLinkResult.attMap.put("PM_FUND_SOURCE_ID", linkedAtt);
         }
-        //建筑面积
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:JdbcMapUtil.getString(row, "QTY_ONE");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "QTY_ONE"));
-            attLinkResult.attMap.put("QTY_ONE", linkedAtt);
-        }
-        //海域面积
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:JdbcMapUtil.getString(row, "QTY_THREE");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "QTY_THREE"));
-            attLinkResult.attMap.put("QTY_THREE", linkedAtt);
-        }
-        //长
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "CON_SCALE_QTY"));
-            attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
-        }
-        //宽
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "CON_SCALE_QTY2"));
-            attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
-        }
-        //其他
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
-            attLinkResult.attMap.put("OTHER", linkedAtt);
-        }
+
         //需要回显资金信息的流程
         List<String> investProcess = AttLinkDifferentProcess.getInvestProcess();
+        if (investProcess.contains(entCode)){
+            mapAddValue("PRJ_TOTAL_INVEST","ESTIMATED_TOTAL_INVEST",row,AttDataTypeE.DOUBLE,attLinkResult); //总投资
+            mapAddValue("PROJECT_AMT","PROJECT_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //工程费用
+            mapAddValue("CONSTRUCT_AMT","CONSTRUCT_PRJ_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //建安工程费
+            mapAddValue("EQUIP_AMT","EQUIP_BUY_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //设备采购费
+            mapAddValue("PROJECT_OTHER_AMT","PROJECT_OTHER_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //工程建设其他费
+            mapAddValue("EQUIPMENT_COST","EQUIPMENT_COST",row,AttDataTypeE.DOUBLE,attLinkResult); //科研设备费
+            mapAddValue("LAND_AMT","LAND_BUY_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //土地拆迁费
+            mapAddValue("PREPARE_AMT","PREPARE_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //预备费
+            mapAddValue("CONSTRUCT_PERIOD_INTEREST","CONSTRUCT_PERIOD_INTEREST",row,AttDataTypeE.DOUBLE,attLinkResult); //建设期利息
+        }
+    }
+
+    /**
+     * 属性联动 引用值类型回显
+     * @param showCode 需要回显的字段
+     * @param valueCode 数据来源字段 回显value
+     * @param textCode 数据来源字段 回显text
+     * @param row 数据源
+     * @param type 回显类型
+     * @param attLinkResult 返回值
+     */
+    public static void mapAddRefValue(String showCode, String valueCode, String textCode, Map row, AttDataTypeE type, AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = type;
+            linkedAtt.text = JdbcMapUtil.getString(row, textCode);
+            linkedAtt.value = JdbcMapUtil.getString(row, valueCode);
+            attLinkResult.attMap.put(showCode, linkedAtt);
+        }
+    }
+
+    /**
+     * 属性联动返回值赋值
+     * @param showCode 需要回显的字段
+     * @param sourceCode 数据来源字段
+     * @param row 数据源
+     * @param type 回显类型
+     * @param attLinkResult 返回值
+     */
+    public static void mapAddValue(String showCode, String sourceCode, Map row, AttDataTypeE type, AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = type;
+            linkedAtt.text = JdbcMapUtil.getString(row, sourceCode);
+            linkedAtt.value = JdbcMapUtil.getString(row, sourceCode);
+            attLinkResult.attMap.put(showCode, linkedAtt);
+        }
+    }
+    /**
+     * 属性联动返回值赋值 BigDecimal类型
+     * @param showCode 需要回显的字段
+     * @param sourceCode 数据来源字段
+     * @param row 数据源
+     * @param type 回显类型
+     * @param attLinkResult 返回值
+     */
+    public static void mapAddBigDecimalValue(String showCode, String sourceCode, Map row, AttDataTypeE type, AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = type;
+            linkedAtt.text = JdbcMapUtil.getString(row, sourceCode);
+            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, sourceCode)) ? null:new BigDecimal(JdbcMapUtil.getString(row, sourceCode));
+            attLinkResult.attMap.put(showCode, linkedAtt);
+        }
+    }
+
+    /**
+     * 属性联动返回值赋值 文件赋值
+     * @param showCode 需要回显的字段
+     * @param type 回显类型
+     * @param attLinkResult 返回值
+     */
+    public static void mapAddFileValue(String showCode, AttDataTypeE type, AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = type;
+            linkedAtt.text = null;
+            linkedAtt.value = null;
+            attLinkResult.attMap.put(showCode, linkedAtt);
+        }
     }
 
     /**
@@ -938,6 +866,32 @@ public class AttLinkExtDetail {
     }
 
     /**
+     * 清除项目流程审批岗位信息
+     */
+    public static void clearProcessPostUser(AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            linkedAtt.changeToEditable = true;
+            attLinkResult.attMap.put("AD_USER_TWENTY_FIVE_ID", linkedAtt); // 财务管理岗
+            attLinkResult.attMap.put("AD_USER_TWENTY_FOUR_ID", linkedAtt); // 征拆对接岗
+            attLinkResult.attMap.put("AD_USER_TWENTY_THREE_ID", linkedAtt); // 工程管理岗
+            attLinkResult.attMap.put("AD_USER_TWENTY_TWO_ID", linkedAtt); // 设计管理岗
+            attLinkResult.attMap.put("AD_USER_TWENTY_ONE_ID", linkedAtt); // 采购管理岗
+            attLinkResult.attMap.put("AD_USER_TWENTY_ID", linkedAtt); // 设备成本岗
+            attLinkResult.attMap.put("AD_USER_NINETEEN_ID", linkedAtt); // 合约管理岗
+            attLinkResult.attMap.put("AD_USER_EIGHTEEN_ID", linkedAtt); // 成本管理岗
+            attLinkResult.attMap.put("AD_USER_SIXTEEN_ID", linkedAtt); // 前期设备岗
+            attLinkResult.attMap.put("AD_USER_FIFTEEN_ID", linkedAtt); // 计划运营岗
+            attLinkResult.attMap.put("AD_USER_FOURTEEN_ID", linkedAtt); // 管线迁改岗
+            attLinkResult.attMap.put("AD_USER_THIRTEEN_ID", linkedAtt); // 土地管理岗
+            attLinkResult.attMap.put("AD_USER_TWELVE_ID", linkedAtt); // 前期报建岗
+        }
+    }
+
+    /**
      * 合同签订、补充协议 是否标准模板属性联动数据清除
      * @param attLinkResult 返回的集合信息
      */
@@ -976,6 +930,25 @@ public class AttLinkExtDetail {
     }
 
     /**
+     * 业主单位切换清空涉及数据
+     * @param attLinkResult
+     */
+    public static void clearUser(AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+            linkedAtt.value = null;
+            linkedAtt.text = null;
+            attLinkResult.attMap.put("OPERATOR_ONE_ID",linkedAtt); // 经办人
+            attLinkResult.attMap.put("AD_USER_THREE_ID",linkedAtt); // 成本岗
+            attLinkResult.attMap.put("AD_USER_FOUR_ID",linkedAtt); // 合同岗
+            attLinkResult.attMap.put("AD_USER_EIGHTH_ID",linkedAtt); // 法务岗用户
+            attLinkResult.attMap.put("AD_USER_NINTH_ID",linkedAtt); // 财务岗用户
+            attLinkResult.attMap.put("CRT_DEPT_ID",linkedAtt); // 所属部门
+        }
+    }
+
+    /**
      * 项目属性联动-岗位指派流程-项目启动基础信息
      * @param attLinkResult 返回的集合信息
      * @param attValue 属性联动值
@@ -999,14 +972,10 @@ public class AttLinkExtDetail {
                 linkedAtt.text = name;
                 attLinkResult.attMap.put("INVESTMENT_SOURCE_ID", linkedAtt);
             }
-            //资金总额 PRJ_TOTAL_INVEST
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.value = new BigDecimal(JdbcMapUtil.getString(list.get(0),"PRJ_TOTAL_INVEST"));
-                linkedAtt.text = JdbcMapUtil.getString(list.get(0),"PRJ_TOTAL_INVEST");
-                attLinkResult.attMap.put("PRJ_TOTAL_INVEST", linkedAtt);
-            }
+            mapAddBigDecimalValue("PRJ_TOTAL_INVEST","PRJ_TOTAL_INVEST",list.get(0),AttDataTypeE.DOUBLE,attLinkResult); //资金总额 PRJ_TOTAL_INVEST
+            mapAddValue("START_DATE","START_TIME",list.get(0),AttDataTypeE.DATE,attLinkResult); //启动时间
+            mapAddValue("PRJ_SITUATION","PRJ_SITUATION",list.get(0),AttDataTypeE.TEXT_LONG,attLinkResult); //项目简介
+            mapAddValue("START_REMARK","START_REMARK",list.get(0),AttDataTypeE.TEXT_LONG,attLinkResult); //启动说明
             // 项目类型
             {
                 String id = JdbcMapUtil.getString(list.get(0), "PROJECT_TYPE_ID");
@@ -1016,14 +985,6 @@ public class AttLinkExtDetail {
                 linkedAtt.value = id;
                 linkedAtt.text = name;
                 attLinkResult.attMap.put("PROJECT_TYPE_ID", linkedAtt);
-            }
-            // 启动时间
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DATE;
-                linkedAtt.value = JdbcMapUtil.getString(list.get(0), "START_TIME");
-                linkedAtt.text = JdbcMapUtil.getString(list.get(0), "START_TIME");
-                attLinkResult.attMap.put("START_DATE", linkedAtt);
             }
             // 建设单位
             {
@@ -1043,22 +1004,6 @@ public class AttLinkExtDetail {
                 linkedAtt.value = id;
                 linkedAtt.text = name;
                 attLinkResult.attMap.put("TENDER_MODE_ID", linkedAtt);
-            }
-            // 项目简介
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = JdbcMapUtil.getString(list.get(0), "PRJ_SITUATION");
-                linkedAtt.text = JdbcMapUtil.getString(list.get(0), "PRJ_SITUATION");
-                attLinkResult.attMap.put("PRJ_SITUATION", linkedAtt);
-            }
-            // 启动说明
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = JdbcMapUtil.getString(list.get(0), "START_REMARK");
-                linkedAtt.text = JdbcMapUtil.getString(list.get(0), "START_REMARK");
-                attLinkResult.attMap.put("START_REMARK", linkedAtt);
             }
             // 启动依据
             {
@@ -1101,7 +1046,7 @@ public class AttLinkExtDetail {
      * @param code 返回显示的页面表单字段
      * @param attLinkResult 返回的集合
      */
-    private static void attLinkResultAddValue(String userId, String userName, String code, AttLinkResult attLinkResult) {
+    public static void attLinkResultAddValue(String userId, String userName, String code, AttLinkResult attLinkResult) {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
@@ -1119,7 +1064,7 @@ public class AttLinkExtDetail {
      * @param changeToMandatory 是否必填属性
      * @param attLinkResult 返回的集合
      */
-    private static void attLinkResultAddValue(String userId, String userName, String code, Boolean changeToMandatory, Boolean changeToEditable, AttLinkResult attLinkResult) {
+    public static void attLinkResultAddValue(String userId, String userName, String code, Boolean changeToMandatory, Boolean changeToEditable, AttLinkResult attLinkResult) {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
@@ -1127,6 +1072,39 @@ public class AttLinkExtDetail {
             linkedAtt.text = userName;
             linkedAtt.changeToEditable = changeToEditable;
             linkedAtt.changeToMandatory = changeToMandatory;
+            attLinkResult.attMap.put(code, linkedAtt);
+        }
+    }
+
+    /**
+     * 默认岗位信息默认赋值
+     * @param value 值
+     * @param text text
+     * @param code 返回显示的页面表单字段
+     * @param attLinkResult 返回的集合
+     */
+    public static void attLinkResultAddValue(String value, String text, String code, AttDataTypeE type,AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = type;
+            linkedAtt.value = value;
+            linkedAtt.text = text;
+            attLinkResult.attMap.put(code, linkedAtt);
+        }
+    }
+
+    /**
+     * 默认岗位信息默认赋值
+     * @param value 值
+     * @param code 返回显示的页面表单字段
+     * @param attLinkResult 返回的集合
+     */
+    public static void attLinkResultAddValue(String value, String code, AttDataTypeE type,AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = type;
+            linkedAtt.value = value;
+            getFileInfoList(linkedAtt);
             attLinkResult.attMap.put(code, linkedAtt);
         }
     }
@@ -1167,7 +1145,7 @@ public class AttLinkExtDetail {
      * 获取处理文件信息列表
      * @param linkedAtt 属性值
      */
-    private static void getFileInfoList(LinkedAtt linkedAtt) {
+    public static void getFileInfoList(LinkedAtt linkedAtt) {
         if (SharedUtil.isEmptyObject(linkedAtt.value)) {
             return;
         }
@@ -1300,6 +1278,39 @@ public class AttLinkExtDetail {
     }
 
     /**
+     * 项目属性联动-查询项目金额最高优先级 财评>概算>可研>立项
+     * @param attValue 属性联动值
+     * @param myJdbcTemplate 数据源
+     * @return 资金信息map
+     */
+    public static Map getAmtMap(String attValue, MyJdbcTemplate myJdbcTemplate) {
+        Map resultRow = new HashMap();
+        String sql1 = "SELECT * FROM PM_PRJ WHERE ID = ?";
+        List<Map<String, Object>> map = myJdbcTemplate.queryForList(sql1, attValue);
+        if (!CollectionUtils.isEmpty(map)) {
+            resultRow = map.get(0);
+        }
+        return resultRow;
+    }
+
+    /**
+     * 项目资金信息回显
+     * @param resultRow 数据源信息
+     * @param attLinkResult 返回的集合值
+     * @return 回显值
+     */
+    public static AttLinkResult getResult(Map resultRow, AttLinkResult attLinkResult) {
+        mapAddBigDecimalValue("PRJ_TOTAL_INVEST","ESTIMATED_TOTAL_INVEST",resultRow,AttDataTypeE.DOUBLE,attLinkResult); //总投资
+        mapAddBigDecimalValue("PROJECT_AMT","PROJECT_AMT",resultRow,AttDataTypeE.DOUBLE,attLinkResult); //工程费用
+        mapAddBigDecimalValue("PROJECT_OTHER_AMT","PROJECT_OTHER_AMT",resultRow,AttDataTypeE.DOUBLE,attLinkResult); //工程建设其他费用
+        mapAddBigDecimalValue("PREPARE_AMT","PREPARE_AMT",resultRow,AttDataTypeE.DOUBLE,attLinkResult); //预备费
+        mapAddBigDecimalValue("CONSTRUCT_PERIOD_INTEREST","CONSTRUCT_PERIOD_INTEREST",resultRow,AttDataTypeE.DOUBLE,attLinkResult); //利息
+        mapAddValue("REPLY_NO","REPLY_NO",resultRow,AttDataTypeE.TEXT_LONG,attLinkResult); //批复文号
+        mapAddValue("PRJ_REPLY_NO","REPLY_NO",resultRow,AttDataTypeE.TEXT_LONG,attLinkResult); //批复文号
+
+        return attLinkResult;
+    }
+    /**
      * 项目属性联动-联动项目启动的总投资
      * @param attLinkResult 返回的集合值
      * @param projectId 项目id
@@ -1317,4 +1328,141 @@ public class AttLinkExtDetail {
             }
         }
     }
+
+    /**
+     * 项目属性联动-项目结算-历史结算信息汇总
+     * @param pmPrjId 项目id
+     * @param attLinkResult 返回数据集合
+     */
+    public static void settleAmtHistory(String pmPrjId, AttLinkResult attLinkResult) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //查询该项目历史完结数据
+        List<Map<String,Object>> list = LinkSql.getSettleAmyHistory(pmPrjId,myJdbcTemplate);
+
+        if (CollectionUtils.isEmpty(list)){
+            LinkUtils.mapAddValueNull("PRJ_TOTAL_HISTORY",AttDataTypeE.DOUBLE,attLinkResult); //总投资
+            LinkUtils.mapAddValueNull("CONSTRUCT_PRJ_AMT_HISTORY",AttDataTypeE.DOUBLE,attLinkResult); //建安工程费
+            LinkUtils.mapAddValueNull("PROJECT_OTHER_AMT_HISTORY",AttDataTypeE.DOUBLE,attLinkResult); //工程其他费用
+            LinkUtils.mapAddValueNull("EQUIP_BUY_AMT_HISTORY",AttDataTypeE.DOUBLE,attLinkResult); //设备采购费
+            LinkUtils.mapAddValueNull("EQUIPMENT_COST_HISTORY",AttDataTypeE.DOUBLE,attLinkResult); //科研设备费
+            LinkUtils.mapAddValueNull("LAND_AMT_HISTORY",AttDataTypeE.DOUBLE,attLinkResult); //土地征拆费用
+            LinkUtils.mapAddValueNull("PREPARE_AMT_HISTORY",AttDataTypeE.DOUBLE,attLinkResult); //预备费
+            LinkUtils.mapAddValueNull("CONSTRUCT_PERIOD_HISTORY",AttDataTypeE.DOUBLE,attLinkResult); //建设期利息
+            LinkUtils.mapAddValueNull("CUM_PAY_AMT_TWO",AttDataTypeE.DOUBLE,attLinkResult); //累计已支付金额
+            LinkUtils.mapAddValueNull("OVER_PAYED_PERCENT",AttDataTypeE.DOUBLE,attLinkResult); //已支付比例(%)
+            LinkUtils.mapAddValueNull("TEXT_REMARK_TWO",AttDataTypeE.TEXT_LONG,attLinkResult); //项目结算内容摘要
+            LinkUtils.mapAddValueNull("DATE_TWO",AttDataTypeE.DATE,attLinkResult); //上次结算日期
+            LinkUtils.mapAddValueNull("FILE_ID_FOUR",AttDataTypeE.FILE_GROUP,attLinkResult); //结算盖章文件
+            LinkUtils.mapAddValueNull("FILE_ID_FIVE",AttDataTypeE.FILE_GROUP,attLinkResult); //项目结算电子资料
+            LinkUtils.mapAddValueNull("FILE_ID_SIX",AttDataTypeE.FILE_GROUP,attLinkResult); //项目结算内容摘要
+        } else {
+            mapAddBigDecimalValue("CUM_PAY_AMT_TWO","CUM_PAY_AMT_ONE",list.get(0),AttDataTypeE.DOUBLE,attLinkResult); //累计已支付金额
+            mapAddBigDecimalValue("OVER_PAYED_PERCENT","CUMULATIVE_PAYED_PERCENT",list.get(0),AttDataTypeE.DOUBLE,attLinkResult); //已支付比例(%)
+            mapAddValue("DATE_TWO","REPLY_DATE_SETTLE",list.get(0),AttDataTypeE.DATE,attLinkResult); //上次结算日期
+            Map<String,Object> map = getAllData(list);
+            BigDecimal allPrjTotalAmt = (BigDecimal) map.get("allPrjTotalAmt"); //总投资
+            BigDecimal allConstructAmt =(BigDecimal) map.get("allConstructAmt"); //建安工程费
+            BigDecimal allPrjOtherAmt = (BigDecimal) map.get("allPrjOtherAmt"); //工程其他费用
+            BigDecimal allEquipAmt = (BigDecimal) map.get("allEquipAmt"); //设备采购费
+            BigDecimal allEquipmentAmt = (BigDecimal) map.get("allEquipmentAmt"); //科研设备费
+            BigDecimal allLandAmt = (BigDecimal) map.get("allLandAmt"); //土地征拆费用
+            BigDecimal allPrepareAmt = (BigDecimal) map.get("allPrepareAmt"); //预备费
+            BigDecimal allConstructPeriodAmt = (BigDecimal) map.get("allConstructPeriodAmt"); //建设期利息
+            String comment = map.get("comment").toString(); //项目结算内容摘要
+            String file1 = map.get("file1").toString(); //结算盖章文件
+            String file2 = map.get("file2").toString(); //项目结算电子资料
+            String file3 = map.get("file3").toString(); //其他附件
+            LinkUtils.mapAddValueByValue("PRJ_TOTAL_HISTORY",String.valueOf(allPrjTotalAmt),allPrjTotalAmt,AttDataTypeE.DOUBLE,attLinkResult); //总投资
+            LinkUtils.mapAddValueByValue("CONSTRUCT_PRJ_AMT_HISTORY",String.valueOf(allConstructAmt),allConstructAmt,AttDataTypeE.DOUBLE,attLinkResult); //建安工程费
+            LinkUtils.mapAddValueByValue("PROJECT_OTHER_AMT_HISTORY",String.valueOf(allPrjOtherAmt),allPrjOtherAmt,AttDataTypeE.DOUBLE,attLinkResult); //工程其他费用
+            LinkUtils.mapAddValueByValue("EQUIP_BUY_AMT_HISTORY",String.valueOf(allEquipAmt),allEquipAmt,AttDataTypeE.DOUBLE,attLinkResult); //设备采购费
+            LinkUtils.mapAddValueByValue("EQUIPMENT_COST_HISTORY",String.valueOf(allEquipmentAmt),allEquipmentAmt,AttDataTypeE.DOUBLE,attLinkResult); //科研设备费
+            LinkUtils.mapAddValueByValue("LAND_AMT_HISTORY",String.valueOf(allLandAmt),allLandAmt,AttDataTypeE.DOUBLE,attLinkResult); //土地征拆费用
+            LinkUtils.mapAddValueByValue("PREPARE_AMT_HISTORY",String.valueOf(allPrepareAmt),allPrepareAmt,AttDataTypeE.DOUBLE,attLinkResult); //预备费
+            LinkUtils.mapAddValueByValue("CONSTRUCT_PERIOD_HISTORY",String.valueOf(allConstructPeriodAmt),allConstructPeriodAmt,AttDataTypeE.DOUBLE,attLinkResult); //建设期利息
+            LinkUtils.mapAddValueByValue("TEXT_REMARK_TWO",comment,comment,AttDataTypeE.TEXT_LONG,attLinkResult); //项目结算内容摘要
+            LinkUtils.mapAddValueByValueFile("FILE_ID_FOUR",file1,file1,AttDataTypeE.FILE_GROUP,attLinkResult); //结算盖章文件
+            LinkUtils.mapAddValueByValueFile("FILE_ID_FIVE",file2,file2,AttDataTypeE.FILE_GROUP,attLinkResult); //项目结算电子资料
+            LinkUtils.mapAddValueByValueFile("FILE_ID_SIX",file3,file3,AttDataTypeE.FILE_GROUP,attLinkResult); //其他附件
+        }
+    }
+
+    /**
+     * 获取历史汇总信息
+     * @param list 历史信息
+     * @return 汇总后信息
+     */
+    public static Map<String, Object> getAllData(List<Map<String, Object>> list) {
+        Map<String,Object> map = new HashMap<>();
+        BigDecimal allPrjTotalAmt = new BigDecimal(0);
+        BigDecimal allConstructAmt = new BigDecimal(0);
+        BigDecimal allPrjOtherAmt = new BigDecimal(0);
+        BigDecimal allEquipAmt = new BigDecimal(0);
+        BigDecimal allEquipmentAmt = new BigDecimal(0);
+        BigDecimal allLandAmt = new BigDecimal(0);
+        BigDecimal allPrepareAmt = new BigDecimal(0);
+        BigDecimal allConstructPeriodAmt = new BigDecimal(0);
+        StringBuilder comment = new StringBuilder();
+        StringBuilder file1 = new StringBuilder();
+        StringBuilder file2 = new StringBuilder();
+        StringBuilder file3 = new StringBuilder();
+        for (Map<String, Object> tmp : list) {
+            allPrjTotalAmt = allPrjTotalAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"PRJ_TOTAL_INVEST"))); //总投资
+            allConstructAmt = allConstructAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"CONSTRUCT_AMT"))); //建安工程费
+            allPrjOtherAmt = allPrjOtherAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"PROJECT_OTHER_AMT"))); //工程其他费用
+            allEquipAmt = allEquipAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"EQUIP_AMT"))); //设备采购费
+            allEquipmentAmt = allEquipmentAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"EQUIPMENT_COST"))); //科研设备费
+            allLandAmt = allLandAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"LAND_AMT"))); //土地征拆费用
+            allPrepareAmt = allPrepareAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"PREPARE_AMT"))); //预备费
+            allConstructPeriodAmt = allConstructPeriodAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"CONSTRUCT_PERIOD_INTEREST"))); //建设期利息
+            comment.append(JdbcMapUtil.getString(tmp,"REPLY_DATE_SETTLE")).append("结算内容： ").append(JdbcMapUtil.getString(tmp,"TEXT_REMARK_ONE")).append(";\n"); //结算内容
+            file1.append(JdbcMapUtil.getString(tmp,"FILE_ID_ONE")).append(","); //结算盖章文件
+            file2.append(JdbcMapUtil.getString(tmp,"FILE_ID_TWO")).append(","); //项目结算电子资料
+            file3.append(JdbcMapUtil.getString(tmp,"FILE_ID_THREE")).append(","); //其他附件
+        }
+        comment.deleteCharAt(comment.length()-1);
+        file1.deleteCharAt(file1.length()-1);
+        file2.deleteCharAt(file2.length()-1);
+        file3.deleteCharAt(file3.length()-1);
+        map.put("allPrjTotalAmt",allPrjTotalAmt); //总投资
+        map.put("allConstructAmt",allConstructAmt); //建安工程费
+        map.put("allPrjOtherAmt",allPrjOtherAmt); //工程其他费用
+        map.put("allEquipAmt",allEquipAmt); //设备采购费
+        map.put("allEquipmentAmt",allEquipmentAmt); //科研设备费
+        map.put("allLandAmt",allLandAmt); //土地征拆费用
+        map.put("allPrepareAmt",allPrepareAmt); //预备费
+        map.put("allConstructPeriodAmt",allConstructPeriodAmt); //建设期利息
+        map.put("comment",comment); //结算内容
+        map.put("file1",file1); //结算盖章文件
+        map.put("file2",file2); //项目结算电子资料
+        map.put("file3",file3); //其他附件
+        return map;
+    }
+
+    /**
+     * 项目属性联动-自动关联岗位信息
+     * @param entCode 流程业务表
+     * @param attValue 属性联动值(项目id)
+     * @param companyId 业主单位id
+     * @param attLinkResult 返回集合
+     * @param myJdbcTemplate 数据源
+     */
+    public static void autoPostUser(String entCode, String attValue, String companyId, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
+        //查询项目花名册信息
+        List<Map<String,Object>> list = LinkSql.getPrjPostUser(attValue,companyId,myJdbcTemplate);
+        if (!CollectionUtils.isEmpty(list)){
+            for (Map<String, Object> tmp : list) {
+                String userId = JdbcMapUtil.getString(tmp,"AD_USER_ID");
+                String userName = JdbcMapUtil.getString(tmp,"userName");
+                String code = JdbcMapUtil.getString(tmp,"CODE");
+                if (!SharedUtil.isEmptyString(userId)){
+                    List<String> codeList = StringUtil.getStrToList(code,",");
+                    for (String tp : codeList) {
+                        LinkUtils.mapAddValueByValueNoEdit(tp,userName,userId,AttDataTypeE.TEXT_LONG,false,attLinkResult);
+                    }
+                }
+            }
+        }
+    }
+
 }

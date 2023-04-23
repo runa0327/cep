@@ -1,5 +1,7 @@
 package com.cisdi.ext.link;
 
+import com.cisdi.ext.link.AttLinkResult;
+import com.cisdi.ext.link.LinkedAtt;
 import com.cisdi.ext.base.AdUserExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -20,7 +22,7 @@ public class AttLinkProcessDetail {
      * @param myJdbcTemplate 数据源
      * @param attLinkResult 返回的集合值
      */
-    public static void pmPrjKickOffReqPrjLink(AttLinkResult attLinkResult,String attValue, MyJdbcTemplate myJdbcTemplate) {
+    public static void pmPrjKickOffReqPrjLink(AttLinkResult attLinkResult, String attValue, MyJdbcTemplate myJdbcTemplate) {
         String sql = "select PRJ_TOTAL_INVEST,PROJECT_AMT from PM_PRJ_INVEST2 where PM_PRJ_ID = ? and STATUS = 'AP' order by CRT_DT desc limit 1";
         List<Map<String, Object>> map = myJdbcTemplate.queryForList(sql, attValue);
         if (!CollectionUtils.isEmpty(map)) {

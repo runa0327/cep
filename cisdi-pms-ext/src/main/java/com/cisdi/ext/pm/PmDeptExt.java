@@ -1,6 +1,8 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.HrDeptUser;
+import com.cisdi.ext.model.PmParty;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -13,6 +15,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -285,4 +288,93 @@ public class PmDeptExt {
             }
         }
     }
+
+    /**
+     * 新增业主单位，克隆目标业主单位所有部门信息
+     * @param id 业主单位id
+     * @param name 业主单位名称
+     */
+    public static void cloneCustomer(String id, String name) {
+        //判断该业主单位是否已存在部门信息，存在则不进行新增。
+        List<HrDept> companyDept = HrDept.selectByWhere(new Where().eq(HrDept.Cols.CUSTOMER_UNIT,id).eq(HrDept.Cols.STATUS,"AP"));
+        if (CollectionUtils.isEmpty(companyDept)){
+            List<PmParty> companyList = PmParty.selectByWhere(new Where().eq(PmParty.Cols.ID,"0099902212142008831"));
+            //原始业主单位名称
+            String companyName = companyList.get(0).getName();
+            String companyId = companyList.get(0).getId();
+            //查询 三亚崖州湾科技城开发建设有限公司 该业主单位所有部门信息
+            List<HrDept> list = HrDept.selectByWhere(new Where().eq(HrDept.Cols.STATUS,"AP").eq(HrDept.Cols.CUSTOMER_UNIT,companyId));
+            if (!CollectionUtils.isEmpty(list)){
+                //查询父级id
+                String parentId = list.stream().filter(p->companyName.equals(p.getName())).collect(Collectors.toList()).get(0).getHrDeptPid();
+                //查询最大序号
+                List<HrDept> seqNoList = HrDept.selectByWhere(new Where().eq(HrDept.Cols.HR_DEPT_PID,parentId).eq(HrDept.Cols.STATUS,"AP")).stream().sorted(Comparator.comparing(HrDept::getSeqNo).reversed()).collect(Collectors.toList());
+                BigDecimal seqNo = seqNoList.get(0).getSeqNo();
+                BigDecimal newNo = seqNo.add(new BigDecimal(10));
+                //原list重新排序按照树形风格封装
+                foreachToTree(list,id,name,newNo,parentId);
+                if (!CollectionUtils.isEmpty(list)){
+                    list.forEach(p->{
+                        Crud.from("HR_DEPT").where().eq("ID",p.getId()).update()
+                                .set("HR_DEPT_PID",p.getHrDeptPid()).set("CODE",p.getCode()).set("NAME",p.getName())
+                                .set("CUSTOMER_UNIT",p.getCustomerUnit()).set("AD_USER_ID",p.getAdUserId())
+                                .set("BG_COLOR_HEX",p.getBgColorHex()).set("FONT_COLOR_HEX",p.getFontColorHex())
+                                .set("CHIEF_USER_ID",p.getChiefUserId()).set("LEVEL",p.getLevel())
+                                .set("SEQ_NO",p.getSeqNo()).set("GENERATE_DEPT_WEEKLY_REPORT",p.getGenerateDeptWeeklyReport())
+                                .exec();
+                    });
+                }
+            }
+        }
+    }
+
+    /**
+     * 原list重新排序按照树形风格封装
+     * @param list 原list
+     * @param companyId 业主单位id
+     * @param companyName 业主单位名称
+     * @param seqNo 父级序号
+     * @param oldParentId 原始最外层父级id
+     */
+    public static List<HrDept> foreachToTree(List<HrDept> list, String companyId, String companyName,BigDecimal seqNo,String oldParentId) {
+        for (HrDept tmp : list) {
+            String hrDeptPid = tmp.getHrDeptPid();
+            if (oldParentId.equals(hrDeptPid)){
+                oldParentId = tmp.getId();
+                String id = Crud.from("HR_DEPT").insertData();
+                tmp.setId(id);
+                tmp.setName(companyName);
+                tmp.setCustomerUnit(companyId);
+                tmp.setSeqNo(seqNo);
+                String newParentId = id;
+                list = foreachToTree(list,companyId,newParentId,oldParentId);
+
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 部门子级赋值
+     * @param list 原数据集
+     * @param companyId 业主单位id
+     * @param newParentId 父级id
+     * @param oldParentId 原始父级id
+     */
+    public static List<HrDept> foreachToTree(List<HrDept> list, String companyId, String newParentId,String oldParentId) {
+        for (HrDept tmp : list) {
+            String hrDeptPid = tmp.getHrDeptPid();
+            if (oldParentId.equals(hrDeptPid)){
+                String oldParentId1 = tmp.getId();
+                String id = Crud.from("HR_DEPT").insertData();
+                tmp.setId(id);
+                tmp.setCustomerUnit(companyId);
+                tmp.setHrDeptPid(newParentId);
+                String newParentId1 = id;
+                list = foreachToTree(list,companyId,newParentId1,oldParentId1);
+            }
+        }
+        return list;
+    }
+
 }

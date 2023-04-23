@@ -1,5 +1,6 @@
 package com.cisdi.ext.base;
 
+import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.util.WfPmInvestUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -93,6 +94,29 @@ public class PmPrjExt {
     }
 
     /**
+     * 更新资金信息
+     * @param entityRecord 表单数据
+     * @param pm_prj_settle_accounts 表
+     * @param level 级别
+     * @param myJdbcTemplate 数据源
+     * @param entCode 业务表名
+     */
+    public static void updatePrjAmt(EntityRecord entityRecord, String pm_prj_settle_accounts, int level, MyJdbcTemplate myJdbcTemplate, String entCode) {
+        //项目id
+        String projectId = getProjectIdByProcess(entityRecord.valueMap,myJdbcTemplate);
+        if (projectId.contains(",")){
+            throw new BaseException("数据更新不支持多项目同时修改，请重新进行数据处理或联系管理员处理！");
+        }
+        // 查询当前项目信息数据级别
+        int oldLevel = getPrjDataLevel(projectId,myJdbcTemplate);
+        if (level >= oldLevel){ //更新数据
+            //更新项目资金信息
+            WfPmInvestUtil.updatePrjInvest(entityRecord,entCode);
+        }
+    }
+
+
+    /**
      * 更新项目基础信息
      * @param projectId 项目id
      * @param valueMap map值
@@ -111,6 +135,7 @@ public class PmPrjExt {
                 .set("CON_SCALE_UOM_ID",JdbcMapUtil.getString(valueMap,"CON_SCALE_UOM_ID")) // 建设规模单位
                 .set("PRJ_SITUATION",JdbcMapUtil.getString(valueMap,"PRJ_SITUATION")) // 项目概况
                 .set("INVEST_PRIORITY",level) // 来源级别
+                .set("REPLY_NO",JdbcMapUtil.getString(valueMap,"REPLY_NO_WR")) // 来源级别
                 .exec();
     }
 
@@ -219,6 +244,7 @@ public class PmPrjExt {
         Crud.from("PM_PRJ").where().eq("ID",id).update()
                 .set("PRJ_REPLY_DATE",JdbcMapUtil.getString(map,"PRJ_REPLY_DATE")) //立项批复日期
                 .set("PRJ_REPLY_NO",JdbcMapUtil.getString(map,"PRJ_REPLY_NO")) //立项批复文号
+                .set("REPLY_NO",JdbcMapUtil.getString(map,"PRJ_REPLY_NO")) //批复文号
                 .set("PRJ_REPLY_FILE",JdbcMapUtil.getString(map,"REPLY_FILE")) //立项批复材料
                 .set("PRJ_EARLY_USER_ID",JdbcMapUtil.getString(map,"PRJ_EARLY_USER_ID")) //前期岗
                 .set("PRJ_DESIGN_USER_ID",JdbcMapUtil.getString(map,"PRJ_DESIGN_USER_ID")) //设计岗
@@ -238,5 +264,13 @@ public class PmPrjExt {
                 .set("CON_SCALE_UOM_ID",JdbcMapUtil.getString(map,"CON_SCALE_UOM_ID")) //建设规模单位
                 .set("PRJ_SITUATION",JdbcMapUtil.getString(map,"PRJ_SITUATION")) //项目简介
                 .exec();
+    }
+
+    /**
+     * 更新项目表信息
+     * @param pmPrj 项目实体
+      */
+    public static void updateData(PmPrj pmPrj) {
+        pmPrj.updateById();
     }
 }

@@ -1,6 +1,7 @@
 package com.cisdi.ext.pm;
 
 import com.cisdi.ext.util.DateTimeUtil;
+import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -171,8 +172,10 @@ public class PoOrderTerminateReqExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //当前节点实例id
         String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        //节点id
+        String nodeId = ExtJarHelper.nodeId.get();
         //定义节点状态
-        String nodeStatus = getStatus("true",nodeInstanceId,myJdbcTemplate);
+        String nodeStatus = getStatus("true",nodeId);
         //详细处理逻辑
         handleCHeckData(nodeStatus,nodeInstanceId,myJdbcTemplate);
     }
@@ -184,8 +187,10 @@ public class PoOrderTerminateReqExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //当前节点实例id
         String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        //节点id
+        String nodeId = ExtJarHelper.nodeId.get();
         //定义节点状态
-        String nodeStatus = getStatus("false",nodeInstanceId,myJdbcTemplate);
+        String nodeStatus = getStatus("false",nodeId);
         //详细处理逻辑
         handleCHeckData(nodeStatus,nodeInstanceId,myJdbcTemplate);
     }
@@ -204,6 +209,7 @@ public class PoOrderTerminateReqExt {
         // 当前登录人
         String userId = ExtJarHelper.loginInfo.get().userId;
         String userName = ExtJarHelper.loginInfo.get().userName;
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
 
         //获取审批意见信息
         Map<String,String> message = ProcessCommon.getComment(procInstId,userId,myJdbcTemplate);
@@ -252,34 +258,33 @@ public class PoOrderTerminateReqExt {
                         .set("APPROVAL_COMMENT_THREE",newCommentStr).set("FILE_ID_THREE",newCommentFile).exec();
             }
         } else if ("lawyerFalse".equals(nodeStatus)){ //法律拒绝
-            Crud.from("PO_ORDER_TERMINATE_REQ").where().eq("id",csCommId).update()
-                    .set("APPROVAL_COMMENT_ONE",null).set("FILE_ID_SIX",null).exec();
+            ProcessCommon.clearData("APPROVAL_COMMENT_ONE,FILE_ID_SIX",csCommId,entCode,myJdbcTemplate);
         } else if ("legalFinanceFalse".equals(nodeStatus)){ //财务法务拒绝
-            Crud.from("PO_ORDER_TERMINATE_REQ").where().eq("id",csCommId).update()
-                    .set("APPROVAL_COMMENT_TWO",null).set("FILE_ID_TWO",null)
-                    .set("APPROVAL_COMMENT_THREE",null).set("FILE_ID_THREE",null)
-                    .exec();
+            ProcessCommon.clearData("APPROVAL_COMMENT_TWO,FILE_ID_TWO,APPROVAL_COMMENT_THREE,FILE_ID_THREE",csCommId,entCode,myJdbcTemplate);
+        } else if ("start".equals(nodeStatus) || "caiHuaStart".equals(nodeStatus) || "secondStart".equals(nodeStatus)){
+            WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
         }
     }
 
     /**
      * 节点审批通过状态
      * @param status 状态码
-     * @param nodeInstanceId 节点实例id
-     * @param myJdbcTemplate 数据源
+     * @param nodeId 节点id
      * @return 节点审批状态码
      */
-    private String getStatus(String status, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
-        //根据节点实例id查询流程节点id
-        String sql = "select WF_NODE_ID from wf_node_instance where id = ?";
-        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,nodeInstanceId);
-        String nodeId = JdbcMapUtil.getString(list.get(0),"WF_NODE_ID");
+    private String getStatus(String status, String nodeId) {
         String name = "";
         if ("true".equals(status)){
             if ("1628588141483012096".equals(nodeId)){ // 6-法律审核
                 name = "lawyerTrue";
             } else if ("1628588141323628544".equals(nodeId)){ // 7-财务法务审核
                 name = "legalFinanceTrue";
+            } else if ("1628588141222965248".equals(nodeId)){ //1-发起
+                name = "start";
+            } else if ("1628588141256519680".equals(nodeId)){ //4-才华预审
+                name = "caiHuaStart";
+            } else if ("1628588141361377280".equals(nodeId)){ //8-发起人重新提交
+                name = "secondStart";
             }
         } else if ("false".equals(status)){
             if ("1628588141483012096".equals(nodeId)){ // 6-法律审核
