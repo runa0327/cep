@@ -2,12 +2,9 @@ package com.cisdi.ext.pm;
 
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.base.PmProcessPostConExt;
-import com.cisdi.ext.base.WfFlowExt;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.HrDept;
-import com.cisdi.ext.model.HrDept;
-import com.cisdi.ext.model.HrDeptUser;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
