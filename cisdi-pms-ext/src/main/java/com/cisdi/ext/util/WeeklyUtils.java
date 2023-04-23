@@ -1,5 +1,8 @@
 package com.cisdi.ext.util;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,6 +36,7 @@ public class WeeklyUtils {
         map.put("begin", beginTime);
 
         c.set(Calendar.DAY_OF_WEEK, c.getFirstDayOfWeek() + 6); // Sunday
+        c.add(Calendar.DATE,1);//next week Monday
         String endTime = format.format(c.getTime());        //当前自然周的截止时间
         map.put("end", endTime);
         return map;
