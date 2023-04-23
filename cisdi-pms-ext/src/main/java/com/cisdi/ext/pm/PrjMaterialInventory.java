@@ -6,6 +6,7 @@ import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.model.PrjInventory;
 import com.cisdi.ext.model.PrjInventoryDetail;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -219,6 +220,53 @@ public class PrjMaterialInventory {
     }
 
     /**
+     * 清单详情列表
+     */
+    public void inventoryDltList(){
+        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        DltReq dltReq = JSONObject.parseObject(JSONObject.toJSONString(params), DltReq.class);
+        String sql = "select ty.name typeName,f.id fileId,f.DSP_NAME fileName,f.DSP_SIZE fileSize,f.UPLOAD_DTTM uploadTime,u.name uploadUser from " +
+                "prj_inventory_detail d \n" +
+                "left join prj_inventory i on i.id = d.PRJ_INVENTORY_ID\n" +
+                "left join material_inventory_type ty on ty.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
+                "left join fl_file f on f.id = d.FL_FILE_ID\n" +
+                "left join ad_user u on u.id = f.CRT_USER_ID\n" +
+                "where i.PM_PRJ_ID = '" + dltReq.prjId + "'";
+        //主清单类型 不传查所有
+        if (!Strings.isNullOrEmpty(dltReq.masterTypeId)){
+            sql += " and ty.FILE_MASTER_INVENTORY_TYPE_ID = '" + dltReq.masterTypeId + "'";
+        }
+        //清单名称
+        if (!Strings.isNullOrEmpty(dltReq.typeName)){
+            sql += " and ty.name like '%" + dltReq.typeName + "%'";
+        }
+        //资料名称
+        if (!Strings.isNullOrEmpty(dltReq.fileName)){
+            sql += " and f.DSP_NAME like '%" + dltReq.fileName + "%'";
+        }
+        int start = (dltReq.pageIndex - 1) * dltReq.pageSize;
+        List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(sql);
+        sql += " order by ty.name limit " + start + "," + dltReq.pageSize;
+        List<Map<String, Object>> dtlList = myJdbcTemplate.queryForList(sql);
+
+        //封装返回
+        List<InventoryDtl> inventoryDtls = dtlList.stream()
+                .map(m -> {
+                    InventoryDtl inventoryDtl = JSONObject.parseObject(JSONObject.toJSONString(m), InventoryDtl.class);
+                    inventoryDtl.uploadTime = StringUtil.withOutT(inventoryDtl.uploadTime);
+                    return inventoryDtl;
+                })
+                .collect(Collectors.toList());
+
+        DtlResp dtlResp = new DtlResp();
+        dtlResp.inventoryDtls = inventoryDtls;
+        dtlResp.total = totalList.size();
+        Map result = JsonUtil.fromJson(JsonUtil.toJson(dtlResp), Map.class);
+        ExtJarHelper.returnValue.set(result);
+    }
+
+    /**
      * 列表请求入参
      */
     @Data
@@ -243,6 +291,52 @@ public class PrjMaterialInventory {
         private String prjName;
         //动态列
         private List<Map<String,Object>> statistic;
+    }
+
+    /**
+     * 明细请求入参
+     */
+    @Data
+    private static class DltReq{
+        private Integer pageIndex;
+        private Integer pageSize;
+        //项目id
+        private String prjId;
+        //主清单类型id
+        private String masterTypeId;
+        //清单名称
+        private String typeName;
+        //资料名称
+        private String fileName;
+    }
+
+    /**
+     * 清单明细
+     */
+    @Data
+    private static class InventoryDtl{
+        //清单名称
+        private String typeName;
+        //文件id
+        private String fileId;
+        //文件名称
+        private String fileName;
+        //文件大小
+        private String fileSize;
+        //上传时间
+        private String uploadTime;
+        //上传人
+        private String uploadUser;
+    }
+
+    /**
+     * 明细响应
+     */
+    @Data
+    private static class DtlResp{
+        private List<InventoryDtl> inventoryDtls;
+        //总数
+        private Integer total;
     }
 
 
