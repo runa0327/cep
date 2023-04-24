@@ -6,6 +6,7 @@ import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.model.PrjInventory;
 import com.cisdi.ext.model.PrjInventoryDetail;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -14,6 +15,7 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
@@ -33,26 +35,10 @@ public class PrjMaterialInventory {
      */
     public void initPrjInventory() {
         List<PmPrj> pmPrjs = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.STATUS, "AP"));
-        List<MaterialInventoryType> materialInventoryTypes = MaterialInventoryType.selectByWhere(new Where().eq(MaterialInventoryType.Cols.STATUS,
-                "AP"));
+        List<MaterialInventoryType> materialInventoryTypes = MaterialInventoryType.selectByWhere(new Where().eq(MaterialInventoryType.Cols.STATUS, "AP"));
         List<PrjInventory> prjInventories = PrjInventory.selectByWhere(new Where().eq(PrjInventory.Cols.STATUS, "AP"));
         for (PmPrj pmPrj : pmPrjs) {
-            for (MaterialInventoryType type : materialInventoryTypes) {
-                //如果该条项目清单已有，跳过
-                if (!CollectionUtils.isEmpty(prjInventories)) {
-                    Optional<PrjInventory> opPrjInventory = prjInventories.stream()
-                            .filter(prjInventory -> prjInventory.getPmPrjId().equals(pmPrj.getId()) && prjInventory.getMaterialInventoryTypeId().equals(type.getId()))
-                            .findAny();
-                    if (opPrjInventory.isPresent()) {
-                        log.info("跳过" + pmPrj.getName() + type.getName());
-                        continue;
-                    }
-                }
-                //没有该条项目清单，插入
-                PrjInventory prjInventory = PrjInventory.newData();
-                prjInventory.setPmPrjId(pmPrj.getId()).setMaterialInventoryTypeId(type.getId()).setIsInvolved(true);
-                prjInventory.insertById();
-            }
+            doAddPrjInventory(pmPrj,materialInventoryTypes,prjInventories);
         }
     }
 
@@ -219,6 +205,93 @@ public class PrjMaterialInventory {
     }
 
     /**
+     * 清单详情列表
+     */
+    public void inventoryDltList(){
+        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        DltReq dltReq = JSONObject.parseObject(JSONObject.toJSONString(params), DltReq.class);
+        String sql = "select ty.name typeName,f.id fileId,f.DSP_NAME fileName,f.DSP_SIZE fileSize,f.UPLOAD_DTTM uploadTime,u.name uploadUser from " +
+                "prj_inventory_detail d \n" +
+                "left join prj_inventory i on i.id = d.PRJ_INVENTORY_ID\n" +
+                "left join material_inventory_type ty on ty.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
+                "left join fl_file f on f.id = d.FL_FILE_ID\n" +
+                "left join ad_user u on u.id = f.CRT_USER_ID\n" +
+                "where i.PM_PRJ_ID = '" + dltReq.prjId + "'";
+        //主清单类型 不传查所有
+        if (!Strings.isNullOrEmpty(dltReq.masterTypeId)){
+            sql += " and ty.FILE_MASTER_INVENTORY_TYPE_ID = '" + dltReq.masterTypeId + "'";
+        }
+        //清单名称
+        if (!Strings.isNullOrEmpty(dltReq.typeName)){
+            sql += " and ty.name like '%" + dltReq.typeName + "%'";
+        }
+        //资料名称
+        if (!Strings.isNullOrEmpty(dltReq.fileName)){
+            sql += " and f.DSP_NAME like '%" + dltReq.fileName + "%'";
+        }
+        int start = (dltReq.pageIndex - 1) * dltReq.pageSize;
+        List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(sql);
+        sql += " order by ty.name limit " + start + "," + dltReq.pageSize;
+        List<Map<String, Object>> dtlList = myJdbcTemplate.queryForList(sql);
+
+        //封装返回
+        List<InventoryDtl> inventoryDtls = dtlList.stream()
+                .map(m -> {
+                    InventoryDtl inventoryDtl = JSONObject.parseObject(JSONObject.toJSONString(m), InventoryDtl.class);
+                    inventoryDtl.uploadTime = StringUtil.withOutT(inventoryDtl.uploadTime);
+                    return inventoryDtl;
+                })
+                .collect(Collectors.toList());
+
+        DtlResp dtlResp = new DtlResp();
+        dtlResp.inventoryDtls = inventoryDtls;
+        dtlResp.total = totalList.size();
+        Map result = JsonUtil.fromJson(JsonUtil.toJson(dtlResp), Map.class);
+        ExtJarHelper.returnValue.set(result);
+    }
+
+    /**
+     * 提供给外部的，为项目添加清单
+     * @param prjId
+     */
+    public static void addPrjInventory(String prjId){
+        //项目对象
+        PmPrj pmPrj = PmPrj.selectById(prjId);
+        //清单类型
+        List<MaterialInventoryType> materialInventoryTypes = MaterialInventoryType.selectByWhere(new Where().eq(MaterialInventoryType.Cols.STATUS, "AP"));
+        //所有的项目清单
+        List<PrjInventory> prjInventories = PrjInventory.selectByWhere(new Where().eq(PrjInventory.Cols.STATUS, "AP"));
+
+        doAddPrjInventory(pmPrj,materialInventoryTypes,prjInventories);
+    }
+
+    /**
+     * 真正添加项目清单
+     * @param pmPrj 项目实体
+     * @param materialInventoryTypes 清单类型集合
+     * @param prjInventories 已有的项目清单
+     */
+    public static void doAddPrjInventory(PmPrj pmPrj,List<MaterialInventoryType> materialInventoryTypes,List<PrjInventory> prjInventories){
+        for (MaterialInventoryType type : materialInventoryTypes) {
+            //如果该条项目清单已有，跳过
+            if (!CollectionUtils.isEmpty(prjInventories)) {
+                Optional<PrjInventory> opPrjInventory = prjInventories.stream()
+                        .filter(prjInventory -> prjInventory.getPmPrjId().equals(pmPrj.getId()) && prjInventory.getMaterialInventoryTypeId().equals(type.getId()))
+                        .findAny();
+                if (opPrjInventory.isPresent()) {
+                    log.info("跳过" + pmPrj.getName() + type.getName());
+                    continue;
+                }
+            }
+            //没有该条项目清单，插入
+            PrjInventory prjInventory = PrjInventory.newData();
+            prjInventory.setPmPrjId(pmPrj.getId()).setMaterialInventoryTypeId(type.getId()).setIsInvolved(true);
+            prjInventory.insertById();
+        }
+    }
+
+    /**
      * 列表请求入参
      */
     @Data
@@ -243,6 +316,52 @@ public class PrjMaterialInventory {
         private String prjName;
         //动态列
         private List<Map<String,Object>> statistic;
+    }
+
+    /**
+     * 明细请求入参
+     */
+    @Data
+    private static class DltReq{
+        private Integer pageIndex;
+        private Integer pageSize;
+        //项目id
+        private String prjId;
+        //主清单类型id
+        private String masterTypeId;
+        //清单名称
+        private String typeName;
+        //资料名称
+        private String fileName;
+    }
+
+    /**
+     * 清单明细
+     */
+    @Data
+    private static class InventoryDtl{
+        //清单名称
+        private String typeName;
+        //文件id
+        private String fileId;
+        //文件名称
+        private String fileName;
+        //文件大小
+        private String fileSize;
+        //上传时间
+        private String uploadTime;
+        //上传人
+        private String uploadUser;
+    }
+
+    /**
+     * 明细响应
+     */
+    @Data
+    private static class DtlResp{
+        private List<InventoryDtl> inventoryDtls;
+        //总数
+        private Integer total;
     }
 
 
