@@ -48,6 +48,10 @@ public class PmStartExt {
                 " pp.`NAME` AS BUILDER_UNIT," +
                 " ps.START_TIME," +
                 " ps.AGENT," +
+                " ps.AD_USER_ID,"+
+                " ps.BASE_LOCATION_ID,"+
+                " ps.PLAN_START_TIME,"+
+                " ps.PLAN_END_TIME,"+
                 " ss.`NAME` AS START_STATUS ," +
                 " au.`name` as agentValue, " +
                 " gg.`NAME` as tender_way, " +
