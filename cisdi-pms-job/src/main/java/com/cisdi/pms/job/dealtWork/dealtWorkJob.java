@@ -68,8 +68,8 @@ public class dealtWorkJob {
     private MqttConfig mqttConfig;
 
 
-//     @Scheduled(fixedDelayString = "300000")
-    @Scheduled(fixedDelayString = "10000000")
+     @Scheduled(fixedDelayString = "300000")
+//    @Scheduled(fixedDelayString = "10000000")
     public void handleDealt() {
 
         if (!dealtSwitch) return;
