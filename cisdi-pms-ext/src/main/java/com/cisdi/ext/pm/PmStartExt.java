@@ -50,7 +50,9 @@ public class PmStartExt {
                 " au.`name` as agentValue, " +
                 " gg.`NAME` as tender_way, " +
                 " ps.INVESTMENT_SOURCE_ID, " +
-                " pj.id as project_id " +
+                " pj.id as project_id, " +
+                " pj.name as project_name ,"+
+                " pj.ver as project_ver "+
                 "FROM " +
                 " PRJ_START ps  " +
                 " LEFT JOIN gr_set_value gsv ON gsv.id = ps.PROJECT_TYPE_ID " +
@@ -88,6 +90,8 @@ public class PmStartExt {
             pmStart.tenderWay = JdbcMapUtil.getString(m, "tender_way");
             pmStart.sourceTypeId = JdbcMapUtil.getString(m, "INVESTMENT_SOURCE_ID");
             pmStart.projectId = JdbcMapUtil.getString(m, "project_id");
+            pmStart.projectName = JdbcMapUtil.getString(m, "project_name");
+            pmStart.projectVer = JdbcMapUtil.getString(m, "project_ver");
             return pmStart;
         }).collect(Collectors.toList());
 
@@ -230,7 +234,6 @@ public class PmStartExt {
         }
 
     }
-
 
     private List<FileInfo> getFileList(String fileIds) {
         if (Strings.isNullOrEmpty(fileIds)) {
@@ -507,6 +510,10 @@ public class PmStartExt {
 
         public String statusId;
 
+        public String projectName;
+
+        public String projectVer;
+
     }
 
     public static class inputData {
@@ -590,10 +597,6 @@ public class PmStartExt {
         public BigDecimal centerLatitude;
 
         public List<Point> pointList;
-    }
-
-    public static void main(String[] args) {
-        String str = "23022402";
     }
 
 }
