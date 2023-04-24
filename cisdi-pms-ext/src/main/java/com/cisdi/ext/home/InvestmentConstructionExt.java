@@ -57,12 +57,22 @@ public class InvestmentConstructionExt {
             MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
             Map<String, Object> dataParam = new HashMap<>();
             dataParam.put("ids", ids);
-            List<Map<String, Object>> tzList = myNamedParameterJdbcTemplate.queryForList(" select ifnull(sum(PRJ_TOTAL_INVEST),0) PRJ_TOTAL_INVEST from PM_INVEST_EST pie \n" +
-                    " left join gr_set_value gsv on pie.INVEST_EST_TYPE_ID = gsv.id \n" +
-                    " where  pie.PM_PRJ_ID in (:ids) order by gsv.code desc limit 0,1 ", dataParam);
-            data.totalInvestment = tzList.stream()
-                    .map(p1 -> new BigDecimal(JdbcMapUtil.getString(p1, "PRJ_TOTAL_INVEST")))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            List<Map<String, Object>> tzList = myNamedParameterJdbcTemplate.queryForList("select ifnull(sum(PRJ_TOTAL_INVEST),0) PRJ_TOTAL_INVEST\n" +
+                    "from pm_invest_est pie\n" +
+                    "left join gr_set_value gsv on pie.INVEST_EST_TYPE_ID = gsv.id \n" +
+                    "left join (\n" +
+                    "\tselect \n" +
+                    "\tpie.PM_PRJ_ID,\n" +
+                    "\tMAX(gsv.code) maxCode\n" +
+                    "\tfrom PM_INVEST_EST pie \n" +
+                    "\tleft join gr_set_value gsv on pie.INVEST_EST_TYPE_ID = gsv.id \n" +
+                    "\twhere  pie.PM_PRJ_ID in (:ids) and PRJ_TOTAL_INVEST<>0 \n" +
+                    "\tgroup by pie.PM_PRJ_ID\n" +
+                    ") t on t.PM_PRJ_ID = pie.PM_PRJ_ID and t.maxCode = gsv.code\n" +
+                    "where t.PM_PRJ_ID is not null and t.maxCode is not null", dataParam);
+            if (!CollectionUtils.isEmpty(tzList)){
+                data.totalInvestment = new BigDecimal(tzList.get(0).get("PRJ_TOTAL_INVEST").toString());
+            }
             //完成投资
             List<Map<String, Object>> wcList = myNamedParameterJdbcTemplate.queryForList("select YEAR,ifnull(ARCHITECTURAL_ENGINEERING_FEE,0) as ARCHITECTURAL_ENGINEERING_FEE, \n" +
                     "ifnull(INSTALLATION_ENGINEERING_FEE,0) as INSTALLATION_ENGINEERING_FEE, \n" +
