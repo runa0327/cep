@@ -35,7 +35,7 @@ public class ProjectRosterExportController extends BaseController {
     @SneakyThrows(IOException.class)
     @GetMapping("export")
     public void exportExcel(String projectName, HttpServletResponse response) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("select pj.id as id, pj.`NAME` as project_name from pm_prj pj left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID where pj.`STATUS`='ap' ");
         if (!StringUtils.isEmpty(projectName)) {
             sb.append(" and pj.id like '%").append(projectName).append("%'");
@@ -45,6 +45,8 @@ public class ProjectRosterExportController extends BaseController {
         List<Map<String, Object>> strList = jdbcTemplate.queryForList("select PROJECT_POST from PM_ROSTER GROUP BY PROJECT_POST");
         List<String> headerList = strList.stream().map(p -> JdbcMapUtil.getString(p, "PROJECT_POST")).collect(Collectors.toList());
         headerList.add(0, "项目名称");
+        headerList.removeAll(Collections.singleton(null));
+
         //数据
         List<Map<String, Object>> dataList = new ArrayList<>();
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
@@ -53,7 +55,7 @@ public class ProjectRosterExportController extends BaseController {
             for (String s : headerList) {
                 if ("项目名称".equals(s)) {
                     newData.put("项目名称", stringObjectMap.get("project_name"));
-                }  else {
+                } else {
                     String prjId = String.valueOf(stringObjectMap.get("id"));
                     List<Map<String, Object>> rosterList = jdbcTemplate.queryForList("select pp.*,au.`NAME` as user_name from PM_ROSTER pp left join ad_user au on pp.AD_USER_ID = au.id where PM_PRJ_ID=? and PROJECT_POST=?", prjId, s);
                     String users = "/";

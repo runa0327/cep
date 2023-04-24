@@ -23,6 +23,7 @@ public class InvokeHomeExt {
 //                " and IF(? in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1," +
 //                " p.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET(?, USER_IDS ))) \n" +
 //                "group by v.id",userId,userId);
+                " and PROJECT_PHASE_ID <> '0099902212142009989' "+
                 "group by v.id");
         int total = projectPhaseList.stream().mapToInt(item -> Integer.parseInt(item.get("num").toString())).sum();
 //        HashMap<String, Object> totals = new HashMap<>();
@@ -51,6 +52,7 @@ public class InvokeHomeExt {
                 " where p.status = 'AP' and p.PROJECT_SOURCE_TYPE_ID='0099952822476441374' " +
 //                " and IF(? in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1," +
 //                " p.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET(?, USER_IDS ))) \n" +
+                " and PROJECT_PHASE_ID <> '0099902212142009989' "+
                 " group by v.id order by v.SEQ_NO \n" +
 //                ") a group by a.transitionPhase", userId,userId);
                 ") a group by a.transitionPhase");
