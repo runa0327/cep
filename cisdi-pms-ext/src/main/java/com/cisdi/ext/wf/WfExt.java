@@ -1591,6 +1591,9 @@ public class WfExt {
     public List<String> getEndProcessList() {
         List<String> list = new ArrayList<>();
         list.add("PM_FARMING_PROCEDURES"); //农转用手续办理
+        list.add("PM_EARTHWORK_PRJ_REQ"); //土石方工程施工
+        list.add("PM_BUILD_FOUNDATION_REQ"); //基坑支护工程施工
+        list.add("PM_BUILD_PILE_REQ"); //桩基工程施工
         return list;
     }
 
