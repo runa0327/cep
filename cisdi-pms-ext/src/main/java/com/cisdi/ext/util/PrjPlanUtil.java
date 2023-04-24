@@ -82,7 +82,7 @@ public class PrjPlanUtil {
     private static List<Map<String, Object>> getPreList(Map<String, Object> own, List<Map<String, Object>> allData) {
         SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
         return allData.stream().filter(p -> Objects.equals(own.get("ID"), p.get("PRE_NODE_ID"))).peek(m -> {
-            if(!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"))){
+            if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"))) {
                 Date endaaDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"));
                 if (endaaDate != null) {
                     int days = JdbcMapUtil.getInt(m, "PLAN_TOTAL_DAYS");
@@ -257,7 +257,7 @@ public class PrjPlanUtil {
                     String id = Crud.from("PM_PRO_PLAN_NODE").insertData();
                     Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId)
                             .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
-                            .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
+                            .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                             .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
                             .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START"))
                             .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).set("AD_ENT_ID_IMP", m.get("AD_ENT_ID_IMP")).set("AD_ATT_ID_IMP", m.get("AD_ATT_ID_IMP")).set("IZ_MILESTONE", m.get("IZ_MILESTONE")).set("SCHEDULE_NAME", m.get("SCHEDULE_NAME")).exec();
@@ -288,7 +288,41 @@ public class PrjPlanUtil {
                         }
                     });
                 }
+                setFirstNodeUser(projectId);
+            }
+        }
+    }
 
+    /**
+     * 把项目启动里的前期报建岗人员，初始化搞第一个节点上
+     *
+     * @param projectId
+     */
+    private static void setFirstNodeUser(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan where PM_PRJ_ID=?", projectId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> proMap = list.get(0);
+            String proPlanId = JdbcMapUtil.getString(proMap, "ID");
+            List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PM_PRO_PLAN_ID=?", proPlanId);
+            if (!CollectionUtils.isEmpty(nodeList)) {
+                List<Map<String, Object>> firstNodeList = nodeList.stream().filter(p -> 1 == JdbcMapUtil.getInt(p, "LEVEL")).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(firstNodeList)) {
+                    Map<String, Object> firstNode = firstNodeList.get(0);
+                    List<Map<String, Object>> secondNodeList = nodeList.stream().filter(p -> Objects.equals(firstNode.get("ID"), p.get("PM_PRO_PLAN_NODE_PID"))).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(secondNodeList)) {
+                        Map<String, Object> secondNode = secondNodeList.get(0);
+                        List<Map<String, Object>> threeNodeList = nodeList.stream().filter(p -> Objects.equals(secondNode.get("ID"), p.get("PM_PRO_PLAN_NODE_PID"))).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+                        if (!CollectionUtils.isEmpty(threeNodeList)) {
+                            Map<String, Object> threeNode = threeNodeList.get(0);
+                            List<Map<String, Object>> startList = myJdbcTemplate.queryForList("select ps.* from pm_prj pm left join prj_start ps on pm.pm_code = ps.pm_code where pm.id=?", projectId);
+                            if (!CollectionUtils.isEmpty(startList)) {
+                                Map<String, Object> startObj = startList.get(0);
+                                myJdbcTemplate.update("update pm_pro_plan_node set CHIEF_USER_ID=? where id=?", startObj.get("AD_USER_ID"), threeNode.get("ID"));
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -299,7 +333,7 @@ public class PrjPlanUtil {
             Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", m.get("NAME")).set("PM_PRO_PLAN_ID", newPlanId)
                     .set("PM_PRO_PLAN_NODE_PID", pId)
                     .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
-                    .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
+                    .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                     .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
                     .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START"))
                     .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).set("AD_ENT_ID_IMP", m.get("AD_ENT_ID_IMP")).set("AD_ATT_ID_IMP", m.get("AD_ATT_ID_IMP")).set("IZ_MILESTONE", m.get("IZ_MILESTONE")).set("SCHEDULE_NAME", m.get("SCHEDULE_NAME")).exec();

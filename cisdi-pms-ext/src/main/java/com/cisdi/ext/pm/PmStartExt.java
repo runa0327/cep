@@ -214,7 +214,7 @@ public class PmStartExt {
                 .set("PM_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId).set("TENDER_MODE_ID", input.tenderWay)
                 .set("BUILDER_UNIT", input.unit).set("START_TIME", input.startTime).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", status).set("START_REMARK", input.startRemark)
                 .set("ATT_FILE_GROUP_ID", input.fileIds).set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).set("START_TIME", input.startTime)
-                .set("LOCATION_INFO", location).exec();
+                .set("LOCATION_INFO", location).set("AD_USER_ID",input.qqUserId).set("BASE_LOCATION_ID",input.locationId).set("PLAN_START_TIME",input.planStartTime).set("PLAN_END_TIME",input.planEndTime).exec();
     }
 
     /**
@@ -329,13 +329,13 @@ public class PmStartExt {
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", dataMap.get("NAME")).set("PM_CODE", prjCode)
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("PM_SEQ", seq).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
-                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).exec();
+                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID",dataMap.get("BASE_LOCATION_ID")).exec();
         } else {
             projectId = String.valueOf(list.get(0).get("ID"));
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", dataMap.get("NAME")).set("PM_CODE", prjCode)
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
-                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).exec();
+                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID",dataMap.get("BASE_LOCATION_ID")).exec();
         }
 
         //先删除项目关联的地块
@@ -560,6 +560,18 @@ public class PmStartExt {
         public String startRemark;
 
         public String status;
+
+        //前期报建岗人员
+        public String qqUserId;
+
+        //建设地点
+        public String locationId;
+
+        //计划开工时间
+        public String planStartTime;
+
+        //计划竣工时间
+        public String planEndTime;
     }
 
     public static class FileInfo {
