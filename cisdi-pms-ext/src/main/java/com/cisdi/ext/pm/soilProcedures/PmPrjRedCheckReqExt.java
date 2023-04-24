@@ -1,14 +1,35 @@
 package com.cisdi.ext.pm.soilProcedures;
 
+import com.cisdi.ext.pm.ProcessCommon;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
 
 /**
  * 项目红线核查-流程扩展
  */
 public class PmPrjRedCheckReqExt {
+
+    /**
+     * 流程-项目红线核查-完结时操作
+     */
+    public void prjRedProcessEnd(){
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //项目id
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        //业主单位
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        //流程业务表id
+        String csCommId = entityRecord.csCommId;
+        //流程id
+        String processId = ExtJarHelper.procId.get();
+        //审批人员信息写入花名册(计划运营岗)
+        ProcessCommon.addPrjPostUser(projectId,entCode,processId,companyId,csCommId,myJdbcTemplate);
+    }
 
     /**
      * 流程操作-项目红线核查-确认操作
