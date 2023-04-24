@@ -42,7 +42,7 @@ public class ProjectRosterExportController extends BaseController {
         }
         sb.append("group by pj.id  limit 0,10");
         //header
-        List<Map<String, Object>> strList = jdbcTemplate.queryForList("select PROJECT_POST from PM_ROSTER GROUP BY PROJECT_POST");
+        List<Map<String, Object>> strList = jdbcTemplate.queryForList("select p.`NAME` as PROJECT_POST from PM_ROSTER t  left join post_info p on t.POST_INFO_ID = p.id where p.`NAME` is not null GROUP BY p.id");
         List<String> headerList = strList.stream().map(p -> JdbcMapUtil.getString(p, "PROJECT_POST")).collect(Collectors.toList());
         headerList.add(0, "项目名称");
         headerList.removeAll(Collections.singleton(null));
@@ -57,7 +57,7 @@ public class ProjectRosterExportController extends BaseController {
                     newData.put("项目名称", stringObjectMap.get("project_name"));
                 } else {
                     String prjId = String.valueOf(stringObjectMap.get("id"));
-                    List<Map<String, Object>> rosterList = jdbcTemplate.queryForList("select pp.*,au.`NAME` as user_name from PM_ROSTER pp left join ad_user au on pp.AD_USER_ID = au.id where PM_PRJ_ID=? and PROJECT_POST=?", prjId, s);
+                    List<Map<String, Object>> rosterList = jdbcTemplate.queryForList("select pp.*,au.`NAME` as user_name from PM_ROSTER pp left join ad_user au on pp.AD_USER_ID = au.id left join post_info pi on pp.POST_INFO_ID = pi.id where PM_PRJ_ID=? and pi.`NAME`=?;", prjId, s);
                     String users = "/";
                     if (!CollectionUtils.isEmpty(rosterList)) {
                         users = rosterList.stream().map(mm -> JdbcMapUtil.getString(mm, "user_name")).collect(Collectors.joining(","));
