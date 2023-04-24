@@ -1594,6 +1594,12 @@ public class WfExt {
         list.add("PM_EARTHWORK_PRJ_REQ"); //土石方工程施工
         list.add("PM_BUILD_FOUNDATION_REQ"); //基坑支护工程施工
         list.add("PM_BUILD_PILE_REQ"); //桩基工程施工
+        list.add("PM_BUILD_PLUS_MINUS_REQ"); //正负零施工
+        list.add("PM_SUBJECT_CAPPING_REQ"); //主体结构封顶
+        list.add("PM_SECOND_STRUCTURAL_REQ"); //二次结构工程
+        list.add("PM_ROOFING_REQ"); //屋面工程
+        list.add("PM_WAIL_REQ"); //幕墙工程
+        list.add("PM_ELECTROMECHANICAL_REQ"); //机电
         return list;
     }
 
