@@ -40,7 +40,7 @@ public class ProjectRosterExportController extends BaseController {
         if (!StringUtils.isEmpty(projectName)) {
             sb.append(" and pj.id like '%").append(projectName).append("%'");
         }
-        sb.append("group by pj.id  limit 0,10");
+        sb.append("group by pj.id ");
         //header
         List<Map<String, Object>> strList = jdbcTemplate.queryForList("select p.`NAME` as PROJECT_POST from PM_ROSTER t  left join post_info p on t.POST_INFO_ID = p.id where p.`NAME` is not null GROUP BY p.id");
         List<String> headerList = strList.stream().map(p -> JdbcMapUtil.getString(p, "PROJECT_POST")).collect(Collectors.toList());
