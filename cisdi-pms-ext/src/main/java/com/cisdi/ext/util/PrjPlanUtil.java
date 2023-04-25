@@ -82,7 +82,7 @@ public class PrjPlanUtil {
     private static List<Map<String, Object>> getPreList(Map<String, Object> own, List<Map<String, Object>> allData) {
         SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
         return allData.stream().filter(p -> Objects.equals(own.get("ID"), p.get("PRE_NODE_ID"))).peek(m -> {
-            if(!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"))){
+            if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"))) {
                 Date endaaDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"));
                 if (endaaDate != null) {
                     int days = JdbcMapUtil.getInt(m, "PLAN_TOTAL_DAYS");
@@ -95,7 +95,9 @@ public class PrjPlanUtil {
                 List<Map<String, Object>> preList = getPreList(m, allData);
                 preList.forEach(item -> {
                     Date dateOrg = DateTimeUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"));
-                    Date oweStart = JdbcMapUtil.getDate(item, "PLAN_START_DATE");
+                    Object ob = item.get("PLAN_START_DATE");
+                    System.out.println("计划开始日期-------------------------------：" + ob);
+                    Date oweStart = DateTimeUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_START_DATE"));
                     if (oweStart != null) {
                         if (oweStart.before(dateOrg)) {
                             int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
@@ -170,7 +172,7 @@ public class PrjPlanUtil {
                 if (!CollectionUtils.isEmpty(preList)) {
                     preList.forEach(item -> {
                         Date dateOrg = DateTimeUtil.stringToDate(JdbcMapUtil.getString(currentNode, "PLAN_COMPL_DATE"));
-                        Date oweStart = JdbcMapUtil.getDate(item, "PLAN_START_DATE");
+                        Date oweStart = DateTimeUtil.stringToDate(JdbcMapUtil.getString(item, "PLAN_START_DATE"));
                         if (oweStart != null) {
                             if (oweStart.before(dateOrg)) {
                                 int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
