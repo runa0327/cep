@@ -31,9 +31,7 @@ public class PmProPlanNodeLink {
         if (CollectionUtils.isEmpty(list)){
             throw new BaseException("对不起，未查询到该条记录进度计划明细，请联系管理员处理！");
         } else {
-            LocalDate start = list.get(0).getPlanStartDate();
-            LocalDate end = list.get(0).getPlanComplDate();
-            int cha = (int)ChronoUnit.DAYS.between(start,end)+1;
+            int cha = list.get(0).getPlanTotalDays();
             LinkUtils.mapAddValueByValue("DURATION_ONE",String.valueOf(cha), cha,AttDataTypeE.INTEGER,attLinkResult);
         }
         return attLinkResult;

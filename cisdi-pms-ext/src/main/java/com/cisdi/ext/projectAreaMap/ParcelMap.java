@@ -359,12 +359,12 @@ public class ParcelMap {
         ExtJarHelper.returnValue.set(result);
     }
 
-    //待绑定的项目列表（去除已绑定）
+    //待绑定的项目列表（去除已绑定），过滤非系统
     public void prjListToBeBound(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> prjList = myJdbcTemplate.queryForList("select pj.id,pj.name from pm_prj pj\n" +
                 "left join prj_parcel pp on pp.PM_PRJ_ID = pj.id\n" +
-                "where pj.status = 'AP' and pp.id is null order by pj.id desc");
+                "where pj.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pj.status = 'AP' and pp.id is null order by pj.id desc");
         Map<String, Object> result = new HashMap<>();
         result.put("prjList",prjList);
         ExtJarHelper.returnValue.set(result);

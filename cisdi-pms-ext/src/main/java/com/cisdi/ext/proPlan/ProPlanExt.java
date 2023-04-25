@@ -1326,6 +1326,15 @@ public class ProPlanExt {
         }).collect(Collectors.toList());
     }
 
+
+    /**
+     * 刷新当前节点时间及其后置节点时间
+     */
+    public void refreshCurrentNodeTime(){
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        PrjPlanUtil.updatePreNodeTime(JdbcMapUtil.getString(map,"nodeId"),JdbcMapUtil.getString(map,"projectId"));
+    }
+
     public static class PlanOutSide {
         public String proPlanId;
         public List<ProPlanTempRule> ruleList;
