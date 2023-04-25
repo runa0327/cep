@@ -437,4 +437,32 @@ public class PrjPlanUtil {
     }
 
 
+    /**
+     * 更加花名册刷新全景的负责人
+     *
+     * @param projectId
+     */
+    public static void refreshProPlanUser(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_roster where PM_PRJ_ID=?", projectId);
+        //查询未启动的节点
+        List<Map<String, Object>> proList = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where pn.PROGRESS_STATUS_ID ='0099799190825106800' and  PM_PRJ_ID=?");
+        list.forEach(item -> {
+            String postId = JdbcMapUtil.getString(item, "POST_INFO_ID");
+            if (!Strings.isNullOrEmpty(postId)) {
+                String userId = JdbcMapUtil.getString(item, "AD_USER_ID");
+                if (!Strings.isNullOrEmpty(userId)) {
+                    List<Map<String, Object>> dataList = proList.stream().filter(p -> Objects.equals(postId, JdbcMapUtil.getString(p, "POST_INFO_ID"))).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(dataList)) {
+                        dataList.forEach(m -> {
+                            myJdbcTemplate.update("update pm_pro_plan_node set CHIEF_USER_ID=? where id=?", userId, m.get("ID"));
+                        });
+                    }
+
+                }
+            }
+        });
+    }
+
+
 }

@@ -130,45 +130,45 @@ public class PmStartExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("SELECT " +
-                        " ps.ID AS ID," +
-                        " ps.`NAME` AS `NAME`," +
-                        " ps.PM_CODE as PM_CODE, " +
-                        " ps.INVESTMENT_SOURCE_ID as INVESTMENT_SOURCE_ID, " +
-                        " gg.`NAME` as sourceTypeValue," +
-                        " round(ifnull( PRJ_TOTAL_INVEST, 0 ),2) AS PRJ_TOTAL_INVEST," +
-                        " ps.PROJECT_TYPE_ID as PROJECT_TYPE_ID," +
-                        " gsv.`NAME` AS typeValue," +
-                        " ps.BUILDER_UNIT as BUILDER_UNIT," +
-                        " pp.`NAME` AS unitValue," +
-                        " ps.START_TIME," +
-                        " ps.AGENT," +
-                        " ss.`NAME` AS START_STATUS," +
-                        " ps.PRJ_SITUATION as PRJ_SITUATION, " +
-                        " ps.ATT_FILE_GROUP_ID as ATT_FILE_GROUP_ID, " +
-                        " au.`NAME` AS agentValue, " +
-                        " pj.ID as projectId , " +
-                        " ps.TENDER_MODE_ID ," +
-                        " gq.`NAME` as tender_way, " +
-                        " ps.START_REMARK as  START_REMARK ,ps.PRJ_START_STATUS_ID as PRJ_START_STATUS_ID,ps.LOCATION_INFO as LOCATION_INFO, " +
-                        " ps.AD_USER_ID," +
-                        " aa.`NAME` as user_name ," +
-                        " ps.BASE_LOCATION_ID ," +
-                        " ggs.`NAME` as location," +
-                        " ps.PLAN_START_TIME," +
-                        " ps.PLAN_END_TIME " +
-                        "FROM " +
-                        " PRJ_START ps " +
-                        " left join gr_set_value gg on gg.id = ps.INVESTMENT_SOURCE_ID " +
-                        " LEFT JOIN gr_set_value gsv ON gsv.id = ps.PROJECT_TYPE_ID " +
-                        " LEFT JOIN pm_party pp ON ps.BUILDER_UNIT = pp.id " +
-                        " LEFT JOIN gr_set_value ss ON ss.id = ps.PRJ_START_STATUS_ID " +
-                        " LEFT JOIN ad_user au ON au.id = ps.AGENT " +
-                        " LEFT JOIN PM_PRJ pj ON pj.PM_CODE = ps.PM_CODE " +
-                        " left join gr_set_value gq on gq.id = ps.TENDER_MODE_ID" +
-                        " left join ad_user aa on aa.id = ps.AD_USER_ID " +
-                        " left join gr_set_value ggs on ggs.id = ps.BASE_LOCATION_ID "+
+                " ps.ID AS ID," +
+                " ps.`NAME` AS `NAME`," +
+                " ps.PM_CODE as PM_CODE, " +
+                " ps.INVESTMENT_SOURCE_ID as INVESTMENT_SOURCE_ID, " +
+                " gg.`NAME` as sourceTypeValue," +
+                " round(ifnull( PRJ_TOTAL_INVEST, 0 ),2) AS PRJ_TOTAL_INVEST," +
+                " ps.PROJECT_TYPE_ID as PROJECT_TYPE_ID," +
+                " gsv.`NAME` AS typeValue," +
+                " ps.BUILDER_UNIT as BUILDER_UNIT," +
+                " pp.`NAME` AS unitValue," +
+                " ps.START_TIME," +
+                " ps.AGENT," +
+                " ss.`NAME` AS START_STATUS," +
+                " ps.PRJ_SITUATION as PRJ_SITUATION, " +
+                " ps.ATT_FILE_GROUP_ID as ATT_FILE_GROUP_ID, " +
+                " au.`NAME` AS agentValue, " +
+                " pj.ID as projectId , " +
+                " ps.TENDER_MODE_ID ," +
+                " gq.`NAME` as tender_way, " +
+                " ps.START_REMARK as  START_REMARK ,ps.PRJ_START_STATUS_ID as PRJ_START_STATUS_ID,ps.LOCATION_INFO as LOCATION_INFO, " +
+                " ps.AD_USER_ID," +
+                " aa.`NAME` as user_name ," +
+                " ps.BASE_LOCATION_ID ," +
+                " ggs.`NAME` as location," +
+                " ps.PLAN_START_TIME," +
+                " ps.PLAN_END_TIME " +
+                "FROM " +
+                " PRJ_START ps " +
+                " left join gr_set_value gg on gg.id = ps.INVESTMENT_SOURCE_ID " +
+                " LEFT JOIN gr_set_value gsv ON gsv.id = ps.PROJECT_TYPE_ID " +
+                " LEFT JOIN pm_party pp ON ps.BUILDER_UNIT = pp.id " +
+                " LEFT JOIN gr_set_value ss ON ss.id = ps.PRJ_START_STATUS_ID " +
+                " LEFT JOIN ad_user au ON au.id = ps.AGENT " +
+                " LEFT JOIN PM_PRJ pj ON pj.PM_CODE = ps.PM_CODE " +
+                " left join gr_set_value gq on gq.id = ps.TENDER_MODE_ID" +
+                " left join ad_user aa on aa.id = ps.AD_USER_ID " +
+                " left join gr_set_value ggs on ggs.id = ps.BASE_LOCATION_ID " +
                 " WHERE " +
-                        " ps.`STATUS` = 'ap' and ps.id=?", map.get("id"));
+                " ps.`STATUS` = 'ap' and ps.id=?", map.get("id"));
         if (CollectionUtils.isEmpty(list)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
@@ -398,6 +398,11 @@ public class PmStartExt {
                         .set("PARCEL_ID", parcelId).exec();
             }
         }
+
+
+        //初始化默认岗位-- 把默认岗位刷给新的项目
+        initPrjPost(projectId, JdbcMapUtil.getString(dataMap, "BUILDER_UNIT"));
+
         //新增项目进展
         PrjPlanUtil.createPlan(projectId, JdbcMapUtil.getString(dataMap, "PROJECT_TYPE_ID"), JdbcMapUtil.getString(dataMap, "INVESTMENT_SOURCE_ID")
                 , BigDecimalUtil.divide(JdbcMapUtil.getBigDecimal(dataMap, "PRJ_TOTAL_INVEST"), new BigDecimal(10000)), JdbcMapUtil.getString(dataMap, "TENDER_MODE_ID"));
@@ -487,6 +492,21 @@ public class PmStartExt {
         String projectId = JdbcMapUtil.getString(map, "projectId");
         Date paramDate = DateTimeUtil.stringToDate("2023-01-01");
         PrjPlanUtil.refreshProPlanTime(projectId, paramDate);
+    }
+
+    /**
+     * 初始化项目岗位--刷新默认岗位
+     */
+    private void initPrjPost(String projectId, String customerUnit) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from post_info where SYS_TRUE='1'");
+        if (!CollectionUtils.isEmpty(list)) {
+            list.forEach(item -> {
+                String id = Crud.from("PM_ROSTER").insertData();
+                Crud.from("PM_ROSTER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId)
+                        .set("POST_INFO_ID", item.get("ID")).set("CUSTOMER_UNIT", customerUnit).exec();
+            });
+        }
     }
 
     public static class OutSide {
