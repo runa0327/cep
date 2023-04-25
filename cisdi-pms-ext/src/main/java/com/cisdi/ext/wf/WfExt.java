@@ -1601,6 +1601,14 @@ public class WfExt {
         list.add("PM_WAIL_REQ"); //幕墙工程
         list.add("PM_ELECTROMECHANICAL_REQ"); //机电
         list.add("PM_INTERIOR_DECORATION_REQ"); //室内精装工程
+        list.add("PM_BUILD_INTELLIGENT_REQ"); //建筑智能化安装工程
+        list.add("PM_ELEVATOR_INSTALL_REQ"); //电梯安装工程
+        list.add("PM_FLOOD_LIGHTING_REQ"); //泛光照明工程
+        list.add("PM_MUNICIPAL_MATCHED_REQ"); //配套市政工程
+        list.add("PM_SIGN_PRJ_REQ"); //标识牌工程
+        list.add("PM_LANDSCAPE_REQ"); //园林景观工程
+        list.add("PM_ORGAN_SYS_DEBUG_REQ"); //组织系统联合调试
+        list.add("PM_HOUSE_CADASTRE_REQ"); //房屋、地籍实测
         return list;
     }
 
