@@ -48,17 +48,17 @@ public class PmStartExt {
                 " pp.`NAME` AS BUILDER_UNIT," +
                 " ps.START_TIME," +
                 " ps.AGENT," +
-                " ps.AD_USER_ID,"+
-                " ps.BASE_LOCATION_ID,"+
-                " ps.PLAN_START_TIME,"+
-                " ps.PLAN_END_TIME,"+
+                " ps.AD_USER_ID," +
+                " ps.BASE_LOCATION_ID," +
+                " ps.PLAN_START_TIME," +
+                " ps.PLAN_END_TIME," +
                 " ss.`NAME` AS START_STATUS ," +
                 " au.`name` as agentValue, " +
                 " gg.`NAME` as tender_way, " +
                 " ps.INVESTMENT_SOURCE_ID, " +
                 " pj.id as project_id, " +
-                " pj.name as project_name ,"+
-                " pj.ver as project_ver "+
+                " pj.name as project_name ," +
+                " pj.ver as project_ver " +
                 "FROM " +
                 " PRJ_START ps  " +
                 " LEFT JOIN gr_set_value gsv ON gsv.id = ps.PROJECT_TYPE_ID " +
@@ -97,9 +97,9 @@ public class PmStartExt {
             pmStart.sourceTypeId = JdbcMapUtil.getString(m, "INVESTMENT_SOURCE_ID");
             String projectId = JdbcMapUtil.getString(m, "project_id");
             pmStart.projectId = projectId;
-            List<PmPostAppoint> postList = PmPostAppoint.selectByWhere(new Where().eq(PmPostAppoint.Cols.PM_PRJ_ID,projectId)
-                    .nin(PmPostAppoint.Cols.STATUS,"VD,VDING"));
-            if (!CollectionUtils.isEmpty(postList)){
+            List<PmPostAppoint> postList = PmPostAppoint.selectByWhere(new Where().eq(PmPostAppoint.Cols.PM_PRJ_ID, projectId)
+                    .nin(PmPostAppoint.Cols.STATUS, "VD,VDING"));
+            if (!CollectionUtils.isEmpty(postList)) {
                 pmStart.postProTrue = 1;
             } else {
                 pmStart.postProTrue = 0;
@@ -130,37 +130,45 @@ public class PmStartExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("SELECT " +
-                " ps.ID AS ID," +
-                " ps.`NAME` AS `NAME`," +
-                " ps.PM_CODE as PM_CODE, " +
-                " ps.INVESTMENT_SOURCE_ID as INVESTMENT_SOURCE_ID, " +
-                " gg.`NAME` as sourceTypeValue," +
-                " round(ifnull( PRJ_TOTAL_INVEST, 0 ),2) AS PRJ_TOTAL_INVEST," +
-                " ps.PROJECT_TYPE_ID as PROJECT_TYPE_ID," +
-                " gsv.`NAME` AS typeValue," +
-                " ps.BUILDER_UNIT as BUILDER_UNIT," +
-                " pp.`NAME` AS unitValue," +
-                " ps.START_TIME," +
-                " ps.AGENT," +
-                " ss.`NAME` AS START_STATUS," +
-                " ps.PRJ_SITUATION as PRJ_SITUATION, " +
-                " ps.ATT_FILE_GROUP_ID as ATT_FILE_GROUP_ID, " +
-                " au.`NAME` AS agentValue, " +
-                " pj.ID as projectId , " +
-                " ps.TENDER_MODE_ID ," +
-                " gq.`NAME` as tender_way, " +
-                " ps.START_REMARK as  START_REMARK ,ps.PRJ_START_STATUS_ID as PRJ_START_STATUS_ID,ps.LOCATION_INFO as LOCATION_INFO " +
-                "FROM " +
-                " PRJ_START ps " +
-                " left join gr_set_value gg on gg.id = ps.INVESTMENT_SOURCE_ID " +
-                " LEFT JOIN gr_set_value gsv ON gsv.id = ps.PROJECT_TYPE_ID " +
-                " LEFT JOIN pm_party pp ON ps.BUILDER_UNIT = pp.id " +
-                " LEFT JOIN gr_set_value ss ON ss.id = ps.PRJ_START_STATUS_ID " +
-                " LEFT JOIN ad_user au ON au.id = ps.AGENT " +
-                " LEFT JOIN PM_PRJ pj ON pj.PM_CODE = ps.PM_CODE " +
-                " left join gr_set_value gq on gq.id = ps.TENDER_MODE_ID" +
+                        " ps.ID AS ID," +
+                        " ps.`NAME` AS `NAME`," +
+                        " ps.PM_CODE as PM_CODE, " +
+                        " ps.INVESTMENT_SOURCE_ID as INVESTMENT_SOURCE_ID, " +
+                        " gg.`NAME` as sourceTypeValue," +
+                        " round(ifnull( PRJ_TOTAL_INVEST, 0 ),2) AS PRJ_TOTAL_INVEST," +
+                        " ps.PROJECT_TYPE_ID as PROJECT_TYPE_ID," +
+                        " gsv.`NAME` AS typeValue," +
+                        " ps.BUILDER_UNIT as BUILDER_UNIT," +
+                        " pp.`NAME` AS unitValue," +
+                        " ps.START_TIME," +
+                        " ps.AGENT," +
+                        " ss.`NAME` AS START_STATUS," +
+                        " ps.PRJ_SITUATION as PRJ_SITUATION, " +
+                        " ps.ATT_FILE_GROUP_ID as ATT_FILE_GROUP_ID, " +
+                        " au.`NAME` AS agentValue, " +
+                        " pj.ID as projectId , " +
+                        " ps.TENDER_MODE_ID ," +
+                        " gq.`NAME` as tender_way, " +
+                        " ps.START_REMARK as  START_REMARK ,ps.PRJ_START_STATUS_ID as PRJ_START_STATUS_ID,ps.LOCATION_INFO as LOCATION_INFO, " +
+                        " ps.AD_USER_ID," +
+                        " aa.`NAME` as user_name ," +
+                        " ps.BASE_LOCATION_ID ," +
+                        " ggs.`NAME` as location," +
+                        " ps.PLAN_START_TIME," +
+                        " ps.PLAN_END_TIME " +
+                        "FROM " +
+                        " PRJ_START ps " +
+                        " left join gr_set_value gg on gg.id = ps.INVESTMENT_SOURCE_ID " +
+                        " LEFT JOIN gr_set_value gsv ON gsv.id = ps.PROJECT_TYPE_ID " +
+                        " LEFT JOIN pm_party pp ON ps.BUILDER_UNIT = pp.id " +
+                        " LEFT JOIN gr_set_value ss ON ss.id = ps.PRJ_START_STATUS_ID " +
+                        " LEFT JOIN ad_user au ON au.id = ps.AGENT " +
+                        " LEFT JOIN PM_PRJ pj ON pj.PM_CODE = ps.PM_CODE " +
+                        " left join gr_set_value gq on gq.id = ps.TENDER_MODE_ID" +
+                        " left join ad_user aa on aa.id = ps.AD_USER_ID " +
+                        " left join gr_set_value ggs on ggs.id = ps.BASE_LOCATION_ID "+
                 " WHERE " +
-                " ps.`STATUS` = 'ap' and ps.id=?", map.get("id"));
+                        " ps.`STATUS` = 'ap' and ps.id=?", map.get("id"));
         if (CollectionUtils.isEmpty(list)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
@@ -188,6 +196,12 @@ public class PmStartExt {
                 pmStart.tenderWay = JdbcMapUtil.getString(m, "tender_way");
                 pmStart.startRemark = JdbcMapUtil.getString(m, "START_REMARK");
                 pmStart.statusId = JdbcMapUtil.getString(m, "PRJ_START_STATUS_ID");
+                pmStart.qqUserId = JdbcMapUtil.getString(m, "AD_USER_ID");
+                pmStart.qqUserName = JdbcMapUtil.getString(m, "user_name");
+                pmStart.locationId = JdbcMapUtil.getString(m, "BASE_LOCATION_ID");
+                pmStart.location = JdbcMapUtil.getString(m, "location");
+                pmStart.planStartTime = JdbcMapUtil.getString(m, "PLAN_START_TIME");
+                pmStart.planEndTime = JdbcMapUtil.getString(m, "PLAN_END_TIME");
                 return pmStart;
             }).collect(Collectors.toList());
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(dataList.get(0)), Map.class);
@@ -218,7 +232,7 @@ public class PmStartExt {
                 .set("PM_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId).set("TENDER_MODE_ID", input.tenderWay)
                 .set("BUILDER_UNIT", input.unit).set("START_TIME", input.startTime).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", status).set("START_REMARK", input.startRemark)
                 .set("ATT_FILE_GROUP_ID", input.fileIds).set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).set("START_TIME", input.startTime)
-                .set("LOCATION_INFO", location).set("AD_USER_ID",input.qqUserId).set("BASE_LOCATION_ID",input.locationId).set("PLAN_START_TIME",input.planStartTime).set("PLAN_END_TIME",input.planEndTime).exec();
+                .set("LOCATION_INFO", location).set("AD_USER_ID", input.qqUserId).set("BASE_LOCATION_ID", input.locationId).set("PLAN_START_TIME", input.planStartTime).set("PLAN_END_TIME", input.planEndTime).exec();
     }
 
     /**
@@ -333,13 +347,13 @@ public class PmStartExt {
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", dataMap.get("NAME")).set("PM_CODE", prjCode)
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("PM_SEQ", seq).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
-                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID",dataMap.get("BASE_LOCATION_ID")).exec();
+                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).exec();
         } else {
             projectId = String.valueOf(list.get(0).get("ID"));
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", dataMap.get("NAME")).set("PM_CODE", prjCode)
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
-                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID",dataMap.get("BASE_LOCATION_ID")).exec();
+                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).exec();
         }
 
         //先删除项目关联的地块
@@ -531,6 +545,24 @@ public class PmStartExt {
 
         //是否发起岗位指派流程 1已发起 0未发起
         public Integer postProTrue;
+
+        //前期报建岗人员
+        public String qqUserId;
+
+        //前期报建岗人员名称
+        public String qqUserName;
+
+        //建设地点ID
+        public String locationId;
+
+        //建设地点
+        public String location;
+
+        //计划开工时间
+        public String planStartTime;
+
+        //计划竣工时间
+        public String planEndTime;
 
     }
 
