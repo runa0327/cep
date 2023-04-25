@@ -1600,6 +1600,7 @@ public class WfExt {
         list.add("PM_ROOFING_REQ"); //屋面工程
         list.add("PM_WAIL_REQ"); //幕墙工程
         list.add("PM_ELECTROMECHANICAL_REQ"); //机电
+        list.add("PM_INTERIOR_DECORATION_REQ"); //室内精装工程
         return list;
     }
 

@@ -1,6 +1,7 @@
 package com.cisdi.ext.pm;
 
 import com.cisdi.ext.proPlan.PmProPlanExt;
+import com.cisdi.ext.util.PrjPlanUtil;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -37,7 +38,7 @@ public class PmExtensionRequestReqExt {
         //更新进度计划完成时间
         PmProPlanExt.updatePlanEndDate(projectId,proNodeId,day,myJdbcTemplate);
         //刷新项目进度节点
-//        PrjPlanUtil.updatePreNodeTime(proNodeId,projectId);
+        PrjPlanUtil.updatePreNodeTime(proNodeId,projectId);
         //审批人员信息写入花名册(计划运营岗)
         ProcessCommon.addPrjPostUser(projectId,entCode,processId,companyId,csCommId,myJdbcTemplate);
     }
