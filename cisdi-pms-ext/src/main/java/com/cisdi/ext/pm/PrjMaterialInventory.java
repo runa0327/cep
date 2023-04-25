@@ -292,6 +292,17 @@ public class PrjMaterialInventory {
     }
 
     /**
+     * @param prjId 项目id
+     * @param processId 流程id
+     * @param processIncId 流程实例id
+     */
+    public void addInventoryDtl(String prjId,String processId,String processIncId){
+        //根据流程实例id，获取申请单
+
+
+    }
+
+    /**
      * 列表请求入参
      */
     @Data
