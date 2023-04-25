@@ -318,10 +318,11 @@ public class WeekTaskExt {
     public void delayApply() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,wt.*,pm.`NAME` as projectName from WEEK_TASK wt \n" +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,wt.*,pm.`NAME` as projectName,pppn.name nodeName from WEEK_TASK wt \n" +
                 " left join pm_prj pm on wt.PM_PRJ_ID = pm.id \n" +
                 " left join pm_pro_plan_node pppn on wt.RELATION_DATA_ID = pppn.id \n" +
                 " where wt.id=? ", map.get("id"));
+        Map<String, Object> processNameMap = myJdbcTemplate.queryForMap("select name from wf_process where id = '1649227469557063680'");
         ProcessData processData = new ProcessData();
         processData.processId = "1649227469557063680";
         processData.viewId = "1649226141279707136";
@@ -333,18 +334,20 @@ public class WeekTaskExt {
             project.id = JdbcMapUtil.getString(pmData, "PM_PRJ_ID");
             project.name = JdbcMapUtil.getString(pmData, "projectName");
             processData.project = project;
-            processData.nodeId = JdbcMapUtil.getString(pmData, "RELATION_DATA_ID");
+            Node node = new Node();
+            node.nodeId = JdbcMapUtil.getString(pmData, "RELATION_DATA_ID");
+            node.nodeName = JdbcMapUtil.getString(pmData, "nodeName");
+            processData.node = node;
             if (!CollectionUtils.isEmpty(dataList)){
                 processData.icon = JdbcMapUtil.getString(dataList.get(0), "EXTRA_INFO");
             }
-            processData.title = JdbcMapUtil.getString(pmData, "NAME");
+            processData.title = JdbcMapUtil.getString(processNameMap, "name");
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(processData), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         } else {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         }
     }
-
 
 
 
@@ -387,7 +390,7 @@ public class WeekTaskExt {
 
         public Project project;
 
-        public String nodeId;
+        public Node node;
 
         public List<AttData> attDataList;
     }
@@ -406,6 +409,11 @@ public class WeekTaskExt {
     public static class Project {
         public String id;
         public String name;
+    }
+
+    public static class Node {
+        public String nodeId;
+        public String nodeName;
     }
 
     public static class DelayApplyHistory {
