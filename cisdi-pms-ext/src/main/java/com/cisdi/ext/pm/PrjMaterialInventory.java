@@ -1,10 +1,7 @@
 package com.cisdi.ext.pm;
 
 import com.alibaba.fastjson.JSONObject;
-import com.cisdi.ext.model.MaterialInventoryType;
-import com.cisdi.ext.model.PmPrj;
-import com.cisdi.ext.model.PrjInventory;
-import com.cisdi.ext.model.PrjInventoryDetail;
+import com.cisdi.ext.model.*;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
@@ -297,7 +294,13 @@ public class PrjMaterialInventory {
      * @param processIncId 流程实例id
      */
     public void addInventoryDtl(String prjId,String processId,String processIncId){
-        //根据流程实例id，获取申请单
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //流程实例
+        WfProcessInstance processInc = WfProcessInstance.selectById(processIncId);
+        //找出流程中需要映射的字段名
+
+        //
+        myJdbcTemplate.queryForList("select * from " + processInc.getEntCode() + " where id = ?",processInc.getEntityRecordId());
 
 
     }
