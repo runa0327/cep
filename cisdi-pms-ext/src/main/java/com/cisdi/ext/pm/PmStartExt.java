@@ -499,12 +499,16 @@ public class PmStartExt {
      */
     private void initPrjPost(String projectId, String customerUnit) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> rosterList = myJdbcTemplate.queryForList("select * from pm_roster where  PM_PRJ_ID=?",projectId);
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from post_info where SYS_TRUE='1'");
         if (!CollectionUtils.isEmpty(list)) {
             list.forEach(item -> {
-                String id = Crud.from("PM_ROSTER").insertData();
-                Crud.from("PM_ROSTER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId)
-                        .set("POST_INFO_ID", item.get("ID")).set("CUSTOMER_UNIT", customerUnit).exec();
+                Optional<Map<String,Object>> optional = rosterList.stream().filter(p->Objects.equals(p.get("POST_INFO_ID"),item.get("ID"))).findAny();
+                if(!optional.isPresent()){
+                    String id = Crud.from("PM_ROSTER").insertData();
+                    Crud.from("PM_ROSTER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId)
+                            .set("POST_INFO_ID", item.get("ID")).set("CUSTOMER_UNIT", customerUnit).exec();
+                }
             });
         }
     }
