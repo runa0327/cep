@@ -436,7 +436,7 @@ public class PmStartExt {
                     if (!CollectionUtils.isEmpty(threeNodeList)) {
                         Map<String, Object> threeNode = threeNodeList.get(0);
 
-                        String msg = "{0}【{1}】计划在{2}开始，请及时处理！";
+                        String msg = "{0}【{1}】计划在{2}完成，请及时处理！";
                         String id = Crud.from("WEEK_TASK").insertData();
 
                         String userId = JdbcMapUtil.getString(threeNode, "CHIEF_USER_ID");

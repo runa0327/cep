@@ -216,7 +216,7 @@ public class WfInNodeExt {
                 "left join POST_INFO pi on pi.id = pppn.POST_INFO_ID  \n" +
                 "where PRE_NODE_ID =?", nodeId);
 
-        String msg = "{0}【{1}】计划将在{2}开始，请及时处理！";
+        String msg = "{0}【{1}】计划将在{2}完成，请及时处理！";
         for (Map<String, Object> objectMap : list) {
             //当节点状态是未启动的时候才发周任务
             String status = JdbcMapUtil.getString(objectMap, "PROGRESS_STATUS_ID");
