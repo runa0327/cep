@@ -82,10 +82,12 @@ public class WeekTaskExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String id = JdbcMapUtil.getString(map, "id");
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select wt.*,gsv.`NAME` as task_status,CAN_DISPATCH,TRANSFER_USER as transferUserId,au.name as transferUser,TRANSFER_TIME,pm.name as projectName from week_task wt " +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select wt.*,gsv.`NAME` as task_status,CAN_DISPATCH,TRANSFER_USER as transferUserId,au.name as transferUser,TRANSFER_TIME,pm.name as projectName,PLAN_COMPL_DATE " +
+                " from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
                 "left join ad_user au on au.id = wt.TRANSFER_USER " +
                 "left join pm_prj pm on pm.id = wt.pm_prj_id " +
+                "left join pm_pro_plan_node pn on pn.id = wt.RELATION_DATA_ID "+
                 "where wt.id=?", id);
         if (!CollectionUtils.isEmpty(list)) {
             List<WeekTask> weekTaskList = list.stream().map(p -> {
@@ -102,6 +104,7 @@ public class WeekTaskExt {
                 weekTask.transferTime = JdbcMapUtil.getString(p, "TRANSFER_TIME");
                 weekTask.projectId = JdbcMapUtil.getString(p, "pm_prj_id");
                 weekTask.projectName = JdbcMapUtil.getString(p, "projectName");
+                weekTask.completeTime = JdbcMapUtil.getString(p, "PLAN_COMPL_DATE");
                 return weekTask;
             }).collect(Collectors.toList());
             WeekTask weekTask = weekTaskList.get(0);
@@ -365,6 +368,8 @@ public class WeekTaskExt {
         public String transferUser;
         //转办时间
         public String transferTime;
+
+        public String completeTime;
     }
 
     public static class OutSide {
