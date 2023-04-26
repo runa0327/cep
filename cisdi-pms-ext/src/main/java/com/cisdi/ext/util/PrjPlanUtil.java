@@ -446,7 +446,7 @@ public class PrjPlanUtil {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_roster where PM_PRJ_ID=?", projectId);
         //查询未启动的节点
-        List<Map<String, Object>> proList = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where pn.PROGRESS_STATUS_ID ='0099799190825106800' and  PM_PRJ_ID=?");
+        List<Map<String, Object>> proList = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where pn.PROGRESS_STATUS_ID ='0099799190825106800' and  PM_PRJ_ID=?",projectId);
         list.forEach(item -> {
             String postId = JdbcMapUtil.getString(item, "POST_INFO_ID");
             if (!Strings.isNullOrEmpty(postId)) {
