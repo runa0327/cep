@@ -68,7 +68,7 @@ public class PmRosterExt {
         sb.append(" limit ").append(start).append(",").append(pageSize);
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //header
-        List<Map<String, Object>> strList = myJdbcTemplate.queryForList("select po.`NAME` as PROJECT_POST from PM_ROSTER pr left join post_info po on pr.POST_INFO_ID = po.id where POST_INFO_ID is not null group by po.id");
+        List<Map<String, Object>> strList = myJdbcTemplate.queryForList("select po.`NAME` as PROJECT_POST from PM_ROSTER pr left join post_info po on pr.POST_INFO_ID = po.id where POST_INFO_ID is not null AND po.`NAME` is not null group by po.id");
         List<String> headerList = strList.stream().map(p -> JdbcMapUtil.getString(p, "PROJECT_POST")).collect(Collectors.toList());
         headerList.add(0, "项目名称");
         headerList.add("ID");

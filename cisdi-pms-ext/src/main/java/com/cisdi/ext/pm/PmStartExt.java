@@ -401,7 +401,7 @@ public class PmStartExt {
 
 
         //初始化默认岗位-- 把默认岗位刷给新的项目
-        initPrjPost(projectId, JdbcMapUtil.getString(dataMap, "BUILDER_UNIT"));
+        initPrjPost(projectId, JdbcMapUtil.getString(dataMap, "BUILDER_UNIT"), JdbcMapUtil.getString(dataMap, "AD_USER_ID"));
 
         //新增项目进展
         PrjPlanUtil.createPlan(projectId, JdbcMapUtil.getString(dataMap, "PROJECT_TYPE_ID"), JdbcMapUtil.getString(dataMap, "INVESTMENT_SOURCE_ID")
@@ -497,17 +497,23 @@ public class PmStartExt {
     /**
      * 初始化项目岗位--刷新默认岗位
      */
-    private void initPrjPost(String projectId, String customerUnit) {
+    private void initPrjPost(String projectId, String customerUnit, String qqUserId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> rosterList = myJdbcTemplate.queryForList("select * from pm_roster where  PM_PRJ_ID=?",projectId);
+        List<Map<String, Object>> rosterList = myJdbcTemplate.queryForList("select * from pm_roster where  PM_PRJ_ID=?", projectId);
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from post_info where SYS_TRUE='1'");
         if (!CollectionUtils.isEmpty(list)) {
             list.forEach(item -> {
-                Optional<Map<String,Object>> optional = rosterList.stream().filter(p->Objects.equals(p.get("POST_INFO_ID"),item.get("ID"))).findAny();
-                if(!optional.isPresent()){
+                Optional<Map<String, Object>> optional = rosterList.stream().filter(p -> Objects.equals(p.get("POST_INFO_ID"), item.get("ID"))).findAny();
+                if (!optional.isPresent()) {
                     String id = Crud.from("PM_ROSTER").insertData();
-                    Crud.from("PM_ROSTER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId)
-                            .set("POST_INFO_ID", item.get("ID")).set("CUSTOMER_UNIT", customerUnit).exec();
+                    if (Objects.equals("AD_USER_TWELVE_ID", item.get("CODE"))) {
+                        //处理前期报建岗
+                        Crud.from("PM_ROSTER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId)
+                                .set("POST_INFO_ID", item.get("ID")).set("CUSTOMER_UNIT", customerUnit).set("AD_USER_ID", qqUserId).exec();
+                    } else {
+                        Crud.from("PM_ROSTER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId)
+                                .set("POST_INFO_ID", item.get("ID")).set("CUSTOMER_UNIT", customerUnit).exec();
+                    }
                 }
             });
         }
