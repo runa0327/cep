@@ -1,13 +1,18 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.model.PmExtensionRequestReq;
 import com.cisdi.ext.proPlan.PmProPlanExt;
 import com.cisdi.ext.util.PrjPlanUtil;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,6 +46,38 @@ public class PmExtensionRequestReqExt {
         PrjPlanUtil.updatePreNodeTime(proNodeId,projectId);
         //审批人员信息写入花名册(计划运营岗)
         ProcessCommon.addPrjPostUser(projectId,entCode,processId,companyId,csCommId,myJdbcTemplate);
+    }
+
+    /**
+     * 流程-节点延期申请-发起时校验
+     */
+    public void extensionProStart(){
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //进度计划节点id
+        String planNodeId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRO_PLAN_NODE_ID");
+        //业务记录id
+        String csCommId = entityRecord.csCommId;
+        Boolean planNodePro = this.getPlanNodePro(planNodeId,csCommId);
+        if (planNodePro){
+            throw new BaseException("对不起，该节点有延期流程正在处理中，请勿重复发起!");
+        }
+    }
+
+    /**
+     * 查询该节点是否有审批中流程
+     * @param planNodeId 进度计划节点id
+     * @param csCommId 流程业务表id
+     * @return 返回结果是否存在
+     */
+    public static Boolean getPlanNodePro(String planNodeId, String csCommId) {
+        Boolean res = false;
+        List<PmExtensionRequestReq> list = PmExtensionRequestReq.selectByWhere(new Where()
+                .eq(PmExtensionRequestReq.Cols.PM_PRO_PLAN_NODE_ID,planNodeId)
+                .in(PmExtensionRequestReq.Cols.STATUS,"APING","DN","DR"));
+        if (!CollectionUtils.isEmpty(list)){
+            res = true;
+        }
+        return res;
     }
 
     /**
@@ -93,7 +130,6 @@ public class PmExtensionRequestReqExt {
                 //获取审批意见信息
                 Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
                 //审批意见内容
-                String file = message.get("file");
                 String comment = message.get("comment");
 
                 if ("leaderCheckOk".equals(nodeStatus)){ // 2-部门领导审批
