@@ -48,11 +48,17 @@ public class PmStartExt {
                 " pp.`NAME` AS BUILDER_UNIT," +
                 " ps.START_TIME," +
                 " ps.AGENT," +
+                " ps.AD_USER_ID," +
+                " ps.BASE_LOCATION_ID," +
+                " ps.PLAN_START_TIME," +
+                " ps.PLAN_END_TIME," +
                 " ss.`NAME` AS START_STATUS ," +
                 " au.`name` as agentValue, " +
                 " gg.`NAME` as tender_way, " +
                 " ps.INVESTMENT_SOURCE_ID, " +
-                " pj.id as project_id " +
+                " pj.id as project_id, " +
+                " pj.name as project_name ," +
+                " pj.ver as project_ver " +
                 "FROM " +
                 " PRJ_START ps  " +
                 " LEFT JOIN gr_set_value gsv ON gsv.id = ps.PROJECT_TYPE_ID " +
@@ -91,13 +97,16 @@ public class PmStartExt {
             pmStart.sourceTypeId = JdbcMapUtil.getString(m, "INVESTMENT_SOURCE_ID");
             String projectId = JdbcMapUtil.getString(m, "project_id");
             pmStart.projectId = projectId;
-            List<PmPostAppoint> postList = PmPostAppoint.selectByWhere(new Where().eq(PmPostAppoint.Cols.PM_PRJ_ID,projectId)
-                    .nin(PmPostAppoint.Cols.STATUS,"VD,VDING"));
-            if (!CollectionUtils.isEmpty(postList)){
+            List<PmPostAppoint> postList = PmPostAppoint.selectByWhere(new Where().eq(PmPostAppoint.Cols.PM_PRJ_ID, projectId)
+                    .nin(PmPostAppoint.Cols.STATUS, "VD,VDING"));
+            if (!CollectionUtils.isEmpty(postList)) {
                 pmStart.postProTrue = 1;
             } else {
                 pmStart.postProTrue = 0;
             }
+            pmStart.projectId = JdbcMapUtil.getString(m, "project_id");
+            pmStart.projectName = JdbcMapUtil.getString(m, "project_name");
+            pmStart.projectVer = JdbcMapUtil.getString(m, "project_ver");
             return pmStart;
         }).collect(Collectors.toList());
 
@@ -140,7 +149,13 @@ public class PmStartExt {
                 " pj.ID as projectId , " +
                 " ps.TENDER_MODE_ID ," +
                 " gq.`NAME` as tender_way, " +
-                " ps.START_REMARK as  START_REMARK ,ps.PRJ_START_STATUS_ID as PRJ_START_STATUS_ID,ps.LOCATION_INFO as LOCATION_INFO " +
+                " ps.START_REMARK as  START_REMARK ,ps.PRJ_START_STATUS_ID as PRJ_START_STATUS_ID,ps.LOCATION_INFO as LOCATION_INFO, " +
+                " ps.AD_USER_ID," +
+                " aa.`NAME` as user_name ," +
+                " ps.BASE_LOCATION_ID ," +
+                " ggs.`NAME` as location," +
+                " ps.PLAN_START_TIME," +
+                " ps.PLAN_END_TIME " +
                 "FROM " +
                 " PRJ_START ps " +
                 " left join gr_set_value gg on gg.id = ps.INVESTMENT_SOURCE_ID " +
@@ -150,6 +165,8 @@ public class PmStartExt {
                 " LEFT JOIN ad_user au ON au.id = ps.AGENT " +
                 " LEFT JOIN PM_PRJ pj ON pj.PM_CODE = ps.PM_CODE " +
                 " left join gr_set_value gq on gq.id = ps.TENDER_MODE_ID" +
+                " left join ad_user aa on aa.id = ps.AD_USER_ID " +
+                " left join gr_set_value ggs on ggs.id = ps.BASE_LOCATION_ID " +
                 " WHERE " +
                 " ps.`STATUS` = 'ap' and ps.id=?", map.get("id"));
         if (CollectionUtils.isEmpty(list)) {
@@ -179,6 +196,12 @@ public class PmStartExt {
                 pmStart.tenderWay = JdbcMapUtil.getString(m, "tender_way");
                 pmStart.startRemark = JdbcMapUtil.getString(m, "START_REMARK");
                 pmStart.statusId = JdbcMapUtil.getString(m, "PRJ_START_STATUS_ID");
+                pmStart.qqUserId = JdbcMapUtil.getString(m, "AD_USER_ID");
+                pmStart.qqUserName = JdbcMapUtil.getString(m, "user_name");
+                pmStart.locationId = JdbcMapUtil.getString(m, "BASE_LOCATION_ID");
+                pmStart.location = JdbcMapUtil.getString(m, "location");
+                pmStart.planStartTime = JdbcMapUtil.getString(m, "PLAN_START_TIME");
+                pmStart.planEndTime = JdbcMapUtil.getString(m, "PLAN_END_TIME");
                 return pmStart;
             }).collect(Collectors.toList());
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(dataList.get(0)), Map.class);
@@ -209,7 +232,7 @@ public class PmStartExt {
                 .set("PM_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId).set("TENDER_MODE_ID", input.tenderWay)
                 .set("BUILDER_UNIT", input.unit).set("START_TIME", input.startTime).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", status).set("START_REMARK", input.startRemark)
                 .set("ATT_FILE_GROUP_ID", input.fileIds).set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).set("START_TIME", input.startTime)
-                .set("LOCATION_INFO", location).exec();
+                .set("LOCATION_INFO", location).set("AD_USER_ID", input.qqUserId).set("BASE_LOCATION_ID", input.locationId).set("PLAN_START_TIME", input.planStartTime).set("PLAN_END_TIME", input.planEndTime).exec();
     }
 
     /**
@@ -240,7 +263,6 @@ public class PmStartExt {
         }
 
     }
-
 
     private List<FileInfo> getFileList(String fileIds) {
         if (Strings.isNullOrEmpty(fileIds)) {
@@ -327,6 +349,7 @@ public class PmStartExt {
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("PM_SEQ", seq).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
                     .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("PROJECT_PHASE_ID","0099799190825080706").exec();
+                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).exec();
         } else {
             projectId = String.valueOf(list.get(0).get("ID"));
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", dataMap.get("NAME")).set("PM_CODE", prjCode)
@@ -334,6 +357,7 @@ public class PmStartExt {
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
                     .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("PROJECT_PHASE_ID","0099799190825080706").exec();
             //--修改20230424--项目启动产生的项目默认为前期状态
+                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).exec();
         }
 
         //先删除项目关联的地块
@@ -378,6 +402,11 @@ public class PmStartExt {
                         .set("PARCEL_ID", parcelId).exec();
             }
         }
+
+
+        //初始化默认岗位-- 把默认岗位刷给新的项目
+        initPrjPost(projectId, JdbcMapUtil.getString(dataMap, "BUILDER_UNIT"), JdbcMapUtil.getString(dataMap, "AD_USER_ID"));
+
         //新增项目进展
         PrjPlanUtil.createPlan(projectId, JdbcMapUtil.getString(dataMap, "PROJECT_TYPE_ID"), JdbcMapUtil.getString(dataMap, "INVESTMENT_SOURCE_ID")
                 , BigDecimalUtil.divide(JdbcMapUtil.getBigDecimal(dataMap, "PRJ_TOTAL_INVEST"), new BigDecimal(10000)), JdbcMapUtil.getString(dataMap, "TENDER_MODE_ID"));
@@ -411,7 +440,7 @@ public class PmStartExt {
                     if (!CollectionUtils.isEmpty(threeNodeList)) {
                         Map<String, Object> threeNode = threeNodeList.get(0);
 
-                        String msg = "{0}【{1}】计划在{2}开始，请及时处理！";
+                        String msg = "{0}【{1}】计划在{2}完成，请及时处理！";
                         String id = Crud.from("WEEK_TASK").insertData();
 
                         String userId = JdbcMapUtil.getString(threeNode, "CHIEF_USER_ID");
@@ -469,6 +498,31 @@ public class PmStartExt {
         PrjPlanUtil.refreshProPlanTime(projectId, paramDate);
     }
 
+    /**
+     * 初始化项目岗位--刷新默认岗位
+     */
+    private void initPrjPost(String projectId, String customerUnit, String qqUserId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> rosterList = myJdbcTemplate.queryForList("select * from pm_roster where  PM_PRJ_ID=?", projectId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from post_info where SYS_TRUE='1'");
+        if (!CollectionUtils.isEmpty(list)) {
+            list.forEach(item -> {
+                Optional<Map<String, Object>> optional = rosterList.stream().filter(p -> Objects.equals(p.get("POST_INFO_ID"), item.get("ID"))).findAny();
+                if (!optional.isPresent()) {
+                    String id = Crud.from("PM_ROSTER").insertData();
+                    if (Objects.equals("AD_USER_TWELVE_ID", item.get("CODE"))) {
+                        //处理前期报建岗
+                        Crud.from("PM_ROSTER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId)
+                                .set("POST_INFO_ID", item.get("ID")).set("CUSTOMER_UNIT", customerUnit).set("AD_USER_ID", qqUserId).exec();
+                    } else {
+                        Crud.from("PM_ROSTER").where().eq("ID", id).update().set("PM_PRJ_ID", projectId)
+                                .set("POST_INFO_ID", item.get("ID")).set("CUSTOMER_UNIT", customerUnit).exec();
+                    }
+                }
+            });
+        }
+    }
+
     public static class OutSide {
         public Integer total;
         public List<PmStart> startList;
@@ -519,8 +573,30 @@ public class PmStartExt {
 
         public String statusId;
 
+        public String projectName;
+
+        public String projectVer;
+
         //是否发起岗位指派流程 1已发起 0未发起
         public Integer postProTrue;
+
+        //前期报建岗人员
+        public String qqUserId;
+
+        //前期报建岗人员名称
+        public String qqUserName;
+
+        //建设地点ID
+        public String locationId;
+
+        //建设地点
+        public String location;
+
+        //计划开工时间
+        public String planStartTime;
+
+        //计划竣工时间
+        public String planEndTime;
 
     }
 
@@ -554,6 +630,18 @@ public class PmStartExt {
         public String startRemark;
 
         public String status;
+
+        //前期报建岗人员
+        public String qqUserId;
+
+        //建设地点
+        public String locationId;
+
+        //计划开工时间
+        public String planStartTime;
+
+        //计划竣工时间
+        public String planEndTime;
     }
 
     public static class FileInfo {
@@ -605,10 +693,6 @@ public class PmStartExt {
         public BigDecimal centerLatitude;
 
         public List<Point> pointList;
-    }
-
-    public static void main(String[] args) {
-        String str = "23022402";
     }
 
 }
