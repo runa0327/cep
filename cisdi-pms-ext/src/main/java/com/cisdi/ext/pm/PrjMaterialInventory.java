@@ -342,55 +342,6 @@ public class PrjMaterialInventory {
                 }
             }
         }
-
-
-    }
-
-    /**
-     * 清单详情列表
-     */
-    public void inventoryDltList(){
-        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        DltReq dltReq = JSONObject.parseObject(JSONObject.toJSONString(params), DltReq.class);
-        String sql = "select ty.name typeName,f.id fileId,f.DSP_NAME fileName,f.DSP_SIZE fileSize,f.UPLOAD_DTTM uploadTime,u.name uploadUser from " +
-                "prj_inventory_detail d \n" +
-                "left join prj_inventory i on i.id = d.PRJ_INVENTORY_ID\n" +
-                "left join material_inventory_type ty on ty.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
-                "left join fl_file f on f.id = d.FL_FILE_ID\n" +
-                "left join ad_user u on u.id = f.CRT_USER_ID\n" +
-                "where i.PM_PRJ_ID = '" + dltReq.prjId + "'";
-        //主清单类型 不传查所有
-        if (!Strings.isNullOrEmpty(dltReq.masterTypeId)){
-            sql += " and ty.FILE_MASTER_INVENTORY_TYPE_ID = '" + dltReq.masterTypeId + "'";
-        }
-        //清单名称
-        if (!Strings.isNullOrEmpty(dltReq.typeName)){
-            sql += " and ty.name like '%" + dltReq.typeName + "%'";
-        }
-        //资料名称
-        if (!Strings.isNullOrEmpty(dltReq.fileName)){
-            sql += " and f.DSP_NAME like '%" + dltReq.fileName + "%'";
-        }
-        int start = (dltReq.pageIndex - 1) * dltReq.pageSize;
-        List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(sql);
-        sql += " order by ty.name limit " + start + "," + dltReq.pageSize;
-        List<Map<String, Object>> dtlList = myJdbcTemplate.queryForList(sql);
-
-        //封装返回
-        List<InventoryDtl> inventoryDtls = dtlList.stream()
-                .map(m -> {
-                    InventoryDtl inventoryDtl = JSONObject.parseObject(JSONObject.toJSONString(m), InventoryDtl.class);
-                    inventoryDtl.uploadTime = StringUtil.withOutT(inventoryDtl.uploadTime);
-                    return inventoryDtl;
-                })
-                .collect(Collectors.toList());
-
-        DtlResp dtlResp = new DtlResp();
-        dtlResp.inventoryDtls = inventoryDtls;
-        dtlResp.total = totalList.size();
-        Map result = JsonUtil.fromJson(JsonUtil.toJson(dtlResp), Map.class);
-        ExtJarHelper.returnValue.set(result);
     }
 
     /**
