@@ -171,6 +171,7 @@ public class AttLinkDifferentProcess {
         List<String> list = new ArrayList<>();
         list.add("PM_PRJ_SETTLE_ACCOUNTS"); //项目结算审批
         list.add("PM_EXTENSION_REQUEST_REQ"); //节点延期申请
+        list.add("PM_PRJ_REQ"); //立项申请审批
         return list;
     }
 
