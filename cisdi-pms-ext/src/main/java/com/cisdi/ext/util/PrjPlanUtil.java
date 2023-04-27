@@ -40,25 +40,25 @@ public class PrjPlanUtil {
                             SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
                             int totalDays = JdbcMapUtil.getInt(threeNode, "PLAN_TOTAL_DAYS");
                             Date completeDate = DateTimeUtil.addDays(paramDate, totalDays);
-
-                            nodeList.forEach(m -> {
-                                if (Objects.equals(m.get("ID"), threeNode.get("ID"))) {
-                                    m.put("PLAN_START_DATE", sp.format(paramDate));
-                                    m.put("PLAN_COMPL_DATE", sp.format(completeDate));
-                                }
-                                if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_START_DATE"))) {
-                                    List<Map<String, Object>> preList = getPreList(m, nodeList);
-                                    if (!CollectionUtils.isEmpty(preList)) {
-                                        preList.forEach(item -> {
+                            //待优化
+                            for (int i = 0; i < 10; i++) {
+                                nodeList.forEach(m -> {
+                                    if (Objects.equals(m.get("ID"), threeNode.get("ID"))) {
+                                        m.put("PLAN_START_DATE", sp.format(paramDate));
+                                        m.put("PLAN_COMPL_DATE", sp.format(completeDate));
+                                    }
+                                    nodeList.stream().filter(p -> Objects.equals(m.get("ID"), p.get("PRE_NODE_ID"))).forEach(item -> {
+                                        if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_START_DATE"))) {
                                             Date dateOrg = DateTimeUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"));
                                             int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
                                             Date endDate = DateTimeUtil.addDays(dateOrg, days);
                                             item.put("PLAN_START_DATE", sp.format(dateOrg));
                                             item.put("PLAN_COMPL_DATE", sp.format(endDate));
-                                        });
-                                    }
-                                }
-                            });
+                                        }
+                                    });
+                                });
+                            }
+
                             StringBuilder sb = new StringBuilder();
                             nodeList.forEach(item -> {
                                 if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(item, "PLAN_START_DATE"))) {
