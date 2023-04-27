@@ -312,7 +312,7 @@ public class PmPrjExt {
         String dept = "";
         Map<String,Object> map = PmRosterExt.getUserDeptCodeByRoster(userId,projectId,companyId,myJdbcTemplate);
         if (!map.isEmpty()){
-            dept = (String) map.get("dept");
+            dept = (String) map.get("deptCode");
         }
         return dept;
     }
