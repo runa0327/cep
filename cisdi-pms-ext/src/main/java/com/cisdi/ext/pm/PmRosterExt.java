@@ -1,5 +1,6 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.PmRoster;
 import com.cisdi.ext.model.PostInfo;
@@ -11,6 +12,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -685,5 +687,24 @@ public class PmRosterExt {
                         .exec();
             }
         }
+    }
+
+    /**
+     * 根据花名册信息查询人员所在岗位信息
+     * @param userId 人员id
+     * @param projectId 项目id
+     * @param companyId 业主单位id
+     * @param myJdbcTemplate 数据源
+     * @return 查询数据结果
+     */
+    public static Map<String, Object> getUserDeptCodeByRoster(String userId, String projectId, String companyId, MyJdbcTemplate myJdbcTemplate) {
+        Map<String,Object> map = new HashMap<>();
+        List<Map<String,Object>> list = LinkSql.getUserDeptCodeByRoster(userId,projectId,companyId,myJdbcTemplate);
+        if (CollectionUtils.isEmpty(list)){
+            throw new BaseException("对不起，在花名册中该项目没有您对应的岗位信息，请联系管理员处理！");
+        } else {
+            map.put("deptCode",JdbcMapUtil.getString(list.get(0),"code"));
+        }
+        return map;
     }
 }

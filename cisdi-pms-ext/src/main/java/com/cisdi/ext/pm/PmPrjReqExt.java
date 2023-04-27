@@ -658,7 +658,12 @@ public class PmPrjReqExt {
         PmPrjExt.updatePrjBaseByPrjReq(entityRecord);
         //更新项目资金信息
         WfPmInvestUtil.updatePrjInvest(entityRecord,entCode);
-
+        //审批人员信息写入花名册
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        String processId = ExtJarHelper.procId.get();
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        String csCommId = entityRecord.csCommId;
+        ProcessCommon.addPrjPostUser(projectId,entCode,processId,companyId,csCommId,myJdbcTemplate);
     }
 
     /**

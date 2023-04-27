@@ -799,7 +799,7 @@ public class ProcessRoleExt {
         List<String> deptId = PmProcessPostConExt.getDeptIdByNode(nodeId,companyId);
         List<String> userList = new ArrayList<>();
         //岗位信息在流程表单中有显示
-        List<String> postProList = AttLinkDifferentProcess.getPostProList();
+        List<String> postProList = AttLinkDifferentProcess.getLinkUserProcess();
         if (postProList.contains(entCode)){
             if (!CollectionUtils.isEmpty(deptId)){
                 //查询该表单所有字段
