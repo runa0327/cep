@@ -65,5 +65,10 @@ public class PmPrjInvest2Ext {
         PmPrjExt.updatePrjBaseData(entityRecord,"PM_PRJ_INVEST2",3,myJdbcTemplate,entCode);
         //创建项目投资测算汇总可研数据
         WfPmInvestUtil.calculateData(csCommId, entCode, pmPrjId);
+        //审批人员信息写入花名册
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        String processId = ExtJarHelper.procId.get();
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        ProcessCommon.addPrjPostUser(projectId,entCode,processId,companyId,csCommId,myJdbcTemplate);
     }
 }
