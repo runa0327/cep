@@ -293,7 +293,7 @@ public class PrjMaterialInventory {
      * @param processId 流程id
      * @param processIncId 流程实例id
      */
-    public void addInventoryDtl(String prjId,String processId,String processIncId){
+    public static void addInventoryDtl(String prjId,String processId,String processIncId){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //流程实例
         WfProcessInstance processInc = WfProcessInstance.selectById(processIncId);
