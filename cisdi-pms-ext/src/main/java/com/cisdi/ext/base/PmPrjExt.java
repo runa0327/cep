@@ -2,6 +2,7 @@ package com.cisdi.ext.base;
 
 import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.pm.PmPrjReqExt;
+import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.pm.ProcessCommon;
 import com.cisdi.ext.util.WfPmInvestUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -297,5 +298,22 @@ public class PmPrjExt {
                 throw new BaseException("该项目不存在其他项目来源位 ”系统“ 的数据，不允许作废！");
             }
         }
+    }
+
+    /**
+     * 在花名册中根据岗位判断改人员所在部门
+     * @param userId 人员id
+     * @param projectId 项目id
+     * @param companyId 业主单位id
+     * @param myJdbcTemplate 数据源
+     * @return 人员部门信息
+     */
+    public static String getUserDeptByRoster(String userId, String projectId, String companyId, MyJdbcTemplate myJdbcTemplate) {
+        String dept = "";
+        Map<String,Object> map = PmRosterExt.getUserDeptCodeByRoster(userId,projectId,companyId,myJdbcTemplate);
+        if (!map.isEmpty()){
+            dept = (String) map.get("dept");
+        }
+        return dept;
     }
 }

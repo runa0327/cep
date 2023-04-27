@@ -156,4 +156,18 @@ public class LinkSql {
                 "WHERE B.BASE_PROCESS_POST_ID = ? AND B.CUSTOMER_UNIT = ? AND A.STATUS = 'AP' AND B.STATUS = 'AP' and find_in_set(?,a.code)";
         return  myJdbcTemplate.queryForList(sql,deptId,companyId,tmp);
     }
+
+    /**
+     * 根据花名册信息查询人员所在岗位信息
+     * @param userId 人员id
+     * @param projectId 项目id
+     * @param companyId 业主单位id
+     * @param myJdbcTemplate 数据源
+     * @return 查询数据结果
+     */
+    public static List<Map<String, Object>> getUserDeptCodeByRoster(String userId, String projectId, String companyId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select b.code FROM pm_roster a LEFT JOIN post_info b on a.POST_INFO_ID = b.id " +
+                "WHERE a.PM_PRJ_ID = ? and a.CUSTOMER_UNIT = ? AND a.AD_USER_ID = ? and a.status = 'ap' and b.status = 'ap'";
+        return myJdbcTemplate.queryForList(sql,projectId,companyId,userId);
+    }
 }
