@@ -71,7 +71,7 @@ public class PmProPlanExt {
         String nodeId = String.valueOf(map.get("nodeId"));
 
         viewObj viewObj = new viewObj();
-        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select hd.`NAME` as post,po.name postName,PLAN_START_DATE,PLAN_COMPL_DATE,PLAN_TOTAL_DAYS, " +
+        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select hd.`NAME` as post,po.name postName,PLAN_START_DATE,PLAN_COMPL_DATE,PLAN_TOTAL_DAYS,ACTUAL_TOTAL_DAYS, " +
                 "gsv.`NAME` as `status`,ACTUAL_START_DATE,ACTUAL_COMPL_DATE,PLAN_CARRY_DAYS,ifnull(pppn.CAN_START,0) as  CAN_START,au.`NAME` AS user " +
                 "from PM_PRO_PLAN_NODE  pppn " +
                 "left join hr_dept hd on hd.id = pppn.CHIEF_DEPT_ID " +
@@ -86,6 +86,7 @@ public class PmProPlanExt {
             viewObj.planStartTime = JdbcMapUtil.getString(node, "PLAN_START_DATE");
             viewObj.planCompleteTime = JdbcMapUtil.getString(node, "PLAN_COMPL_DATE");
             viewObj.predictDays = JdbcMapUtil.getString(node, "PLAN_TOTAL_DAYS");
+            viewObj.actualDays = JdbcMapUtil.getString(node, "ACTUAL_TOTAL_DAYS");
             viewObj.status = JdbcMapUtil.getString(node, "status");
             viewObj.actualStartTime = JdbcMapUtil.getString(node, "ACTUAL_START_DATE");
             viewObj.actualCompleteTime = JdbcMapUtil.getString(node, "ACTUAL_COMPL_DATE");
@@ -241,6 +242,8 @@ public class PmProPlanExt {
         public String planCompleteTime;
         // 预计用时
         public String predictDays;
+        // 实际天数
+        public String actualDays;
         // 状态
         public String status;
         // 实际开始时间
