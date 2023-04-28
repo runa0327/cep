@@ -139,7 +139,7 @@ public class PmPrjInvest1Ext {
 //            Map<String,String> map = PmPrjExt.getProjectDeptUser(projectId,myJdbcTemplate);
             userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
 //            String dept = PmPrjExt.getUserDept(userId,map);
-            String dept = PmPrjExt.getUserDeptByRoster(userId,projectId,companyId,myJdbcTemplate);
+            String dept = PmPrjExt.getUserDeptByRoster(userId,projectId,companyId,csCommId,entCode,myJdbcTemplate);
             if (!SharedUtil.isEmptyString(dept)){
                 String processComment = "", commentEnd = "";
                 if (dept.contains("AD_USER_EIGHTEEN_ID")){ //成本岗

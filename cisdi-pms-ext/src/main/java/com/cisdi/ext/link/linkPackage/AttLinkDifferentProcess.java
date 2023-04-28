@@ -54,7 +54,7 @@ public class AttLinkDifferentProcess {
         List<String> list = new ArrayList<>();
         list.add("PM_PRJ_REQ"); // 立项申请
 //        list.add("PM_PRJ_INVEST1"); // 可研估算
-        list.add("PM_PRJ_INVEST2"); // 初设概算
+//        list.add("PM_PRJ_INVEST2"); // 初设概算
 //        list.add("PM_PRJ_INVEST3"); // 预算财评
         list.add("PM_STABLE_EVAL"); // 社会稳定性评价
         list.add("PM_ENERGY_EVAL"); // 固定资产投资节能评价
