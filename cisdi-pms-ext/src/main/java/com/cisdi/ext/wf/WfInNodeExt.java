@@ -39,7 +39,8 @@ public class WfInNodeExt {
         }
         for (Map<String, Object> nodeInst : nodeInstList) {
             Map<String, Object> procInst = myJdbcTemplate.queryForMap("select * from WF_PROCESS_INSTANCE t where t.id=?", nodeInst.get("WF_PROCESS_INSTANCE_ID"));
-            updatePrjProPlanNode(procInst, JdbcMapUtil.getString(nodeInst, "ID"), false);
+
+            updatePrjProPlanNode(procInst, nodeInst, false);
         }
     }
 
@@ -53,16 +54,33 @@ public class WfInNodeExt {
         String nodeInstId = ExtJarHelper.nodeInstId.get();
 
         Map<String, Object> procInst = myJdbcTemplate.queryForMap("select * from WF_PROCESS_INSTANCE t where t.id=?", procInstId);
-        updatePrjProPlanNode(procInst, nodeInstId, true);
+        Map<String, Object> nodeInst = myJdbcTemplate.queryForMap("select * from wf_node_instance t where t.id=?", nodeInstId);
+        updatePrjProPlanNode(procInst, nodeInst, true);
+    }
+
+    private static Date getDateOnly(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        // 时
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        // 分
+        calendar.set(Calendar.MINUTE, 0);
+        // 秒
+        calendar.set(Calendar.SECOND, 0);
+        // 毫秒
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
     }
 
     /**
      * 更新项目进度计划节点。
      */
-    private void updatePrjProPlanNode(Map<String, Object> procInst, String nodeInstId, boolean processWeekTask) {
+    private void updatePrjProPlanNode(Map<String, Object> procInst, Map<String, Object> nodeInst, boolean processWeekTask) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String nodeId = myJdbcTemplate.queryForMap("select t.WF_NODE_ID from wf_node_instance t where t.id=?", nodeInstId).get("WF_NODE_ID").toString();
-        Date now = new Date();
+
+        String nodeInstId = JdbcMapUtil.getString(nodeInst, "ID");
+        String nodeId = JdbcMapUtil.getString(nodeInst, "WF_NODE_ID");
+        Date now = getDateOnly(JdbcMapUtil.getDate(nodeInst, "START_DATETIME"));
 
         String procInstId = JdbcMapUtil.getString(procInst, "ID");
 
