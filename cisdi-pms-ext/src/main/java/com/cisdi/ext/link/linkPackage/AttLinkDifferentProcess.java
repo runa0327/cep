@@ -53,8 +53,8 @@ public class AttLinkDifferentProcess {
     public static List<String> getTableList() {
         List<String> list = new ArrayList<>();
         list.add("PM_PRJ_REQ"); // 立项申请
-        list.add("PM_PRJ_INVEST1"); // 可研估算
-        list.add("PM_PRJ_INVEST2"); // 初设概算
+//        list.add("PM_PRJ_INVEST1"); // 可研估算
+//        list.add("PM_PRJ_INVEST2"); // 初设概算
 //        list.add("PM_PRJ_INVEST3"); // 预算财评
         list.add("PM_STABLE_EVAL"); // 社会稳定性评价
         list.add("PM_ENERGY_EVAL"); // 固定资产投资节能评价
@@ -172,6 +172,9 @@ public class AttLinkDifferentProcess {
         list.add("PM_PRJ_SETTLE_ACCOUNTS"); //项目结算审批
         list.add("PM_EXTENSION_REQUEST_REQ"); //节点延期申请
         list.add("PM_PRJ_RED_CHECK_REQ"); //项目红线核查
+        list.add("PM_PRJ_REQ"); //立项申请审批
+        list.add("PM_PRJ_INVEST1"); //可研报告审批
+        list.add("PM_PRJ_INVEST2"); //初设概算审批
         return list;
     }
 

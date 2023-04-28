@@ -3,6 +3,7 @@ package com.cisdi.ext.pm;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.invest.InvestAmtExt;
 import com.cisdi.ext.util.WfPmInvestUtil;
+import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -66,6 +67,11 @@ public class PmPrjInvest1Ext {
         //评审组织单位入库
         String reviewOrganizationName = JdbcMapUtil.getString(entityRecord.valueMap,"REVIEW_ORGANIZATION_UNIT"); //评审组织单位
         PmInLibraryExt.updateOrCreateParty(reviewOrganizationName,"IS_REVIEW",myJdbcTemplate);
+        //审批人员信息写入花名册
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        String processId = ExtJarHelper.procId.get();
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        ProcessCommon.addPrjPostUser(projectId,entCode,processId,companyId,csCommId,myJdbcTemplate);
     }
 
     /**
@@ -101,6 +107,8 @@ public class PmPrjInvest1Ext {
      * @param myJdbcTemplate 数据源
      */
     private void handleCHeckData(String nodeStatus, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
+        //业务表名
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         String csCommId = entityRecord.csCommId;
         // 流程id
@@ -127,20 +135,24 @@ public class PmPrjInvest1Ext {
             // 判断当前人岗位信息
             //项目id
             String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
-            Map<String,String> map = PmPrjExt.getProjectDeptUser(projectId,myJdbcTemplate);
+            String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+//            Map<String,String> map = PmPrjExt.getProjectDeptUser(projectId,myJdbcTemplate);
             userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
-            String dept = PmPrjExt.getUserDept(userId,map);
-            String processComment = "", commentEnd = "";
-            if ("PRJ_COST_USER_ID".equals(dept)){ //成本岗
-                //获取流程中的意见信息
-                processComment = JdbcMapUtil.getString(entityRecord.valueMap,"COST_COMMENT");
-                commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
-                Crud.from("PM_PRJ_INVEST1").where().eq("id",csCommId).update().set("COST_COMMENT",commentEnd).exec();
-            } else if ("PRJ_DESIGN_USER_ID".equals(dept)){ //设计岗
-                //获取流程中的意见信息
-                processComment = JdbcMapUtil.getString(entityRecord.valueMap,"DESIGN_COMMENT");
-                commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
-                Crud.from("PM_PRJ_INVEST1").where().eq("id",csCommId).update().set("DESIGN_COMMENT",commentEnd).exec();
+//            String dept = PmPrjExt.getUserDept(userId,map);
+            String dept = PmPrjExt.getUserDeptByRoster(userId,projectId,companyId,csCommId,entCode,myJdbcTemplate);
+            if (!SharedUtil.isEmptyString(dept)){
+                String processComment = "", commentEnd = "";
+                if (dept.contains("AD_USER_EIGHTEEN_ID")){ //成本岗
+                    //获取流程中的意见信息
+                    processComment = JdbcMapUtil.getString(entityRecord.valueMap,"COST_COMMENT");
+                    commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                    Crud.from("PM_PRJ_INVEST1").where().eq("id",csCommId).update().set("COST_COMMENT",commentEnd).exec();
+                } else if (dept.contains("AD_USER_TWENTY_TWO_ID")){ //设计岗
+                    //获取流程中的意见信息
+                    processComment = JdbcMapUtil.getString(entityRecord.valueMap,"DESIGN_COMMENT");
+                    commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                    Crud.from("PM_PRJ_INVEST1").where().eq("id",csCommId).update().set("DESIGN_COMMENT",commentEnd).exec();
+                }
             }
         } else if ("earlyLeaderCheckOK".equals(nodeStatus)){ //6-前期部领导审批-OK
             //获取流程中的意见信息
@@ -152,6 +164,8 @@ public class PmPrjInvest1Ext {
         } else if ("earlyLeaderCheckRefuse".equals(nodeStatus)){ //6-前期部领导审批-拒绝
             Crud.from("PM_PRJ_INVEST1").where().eq("id",csCommId).update()
                     .set("EARLY_COMMENT",null).exec();
+        } else if ("start".equals(nodeStatus)){
+            WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
         }
 
     }
@@ -173,6 +187,8 @@ public class PmPrjInvest1Ext {
                 name = "costDesignCheck";
             } else if ("0100031468512029161".equals(nodeId)){ //6-前期部领导审批
                 name = "earlyLeaderCheckOK";
+            } else if ("0100031468512029142".equals(nodeId)){
+                name = "start";
             }
         } else {
             if ("0100031468512029161".equals(nodeId)){ //6-前期部领导审批
