@@ -700,9 +700,7 @@ public class PmRosterExt {
     public static Map<String, Object> getUserDeptCodeByRoster(String userId, String projectId, String companyId, MyJdbcTemplate myJdbcTemplate) {
         Map<String,Object> map = new HashMap<>();
         List<Map<String,Object>> list = LinkSql.getUserDeptCodeByRoster(userId,projectId,companyId,myJdbcTemplate);
-        if (CollectionUtils.isEmpty(list)){
-            throw new BaseException("对不起，在花名册中该项目没有您对应的岗位信息，请联系管理员处理！");
-        } else {
+        if (!CollectionUtils.isEmpty(list)){
             map.put("deptCode",JdbcMapUtil.getString(list.get(0),"code"));
         }
         return map;

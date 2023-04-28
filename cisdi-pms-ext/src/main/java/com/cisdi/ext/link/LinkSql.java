@@ -170,4 +170,16 @@ public class LinkSql {
                 "WHERE a.PM_PRJ_ID = ? and a.CUSTOMER_UNIT = ? AND a.AD_USER_ID = ? and a.status = 'ap' and b.status = 'ap'";
         return myJdbcTemplate.queryForList(sql,projectId,companyId,userId);
     }
+
+    /**
+     * 查询业务表单条数据
+     * @param csCommId 唯一id
+     * @param entCode 业务表名
+     * @param myJdbcTemplate 数据源
+     * @return 查询结果
+     */
+    public static List<Map<String, Object>> getPrjProcessUserDept(String csCommId, String entCode, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select * from " + entCode + " where id = ?";
+        return myJdbcTemplate.queryForList(sql,csCommId);
+    }
 }

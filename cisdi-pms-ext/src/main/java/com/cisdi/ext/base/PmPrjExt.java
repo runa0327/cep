@@ -1,5 +1,6 @@
 package com.cisdi.ext.base;
 
+import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.pm.PmRosterExt;
@@ -305,14 +306,32 @@ public class PmPrjExt {
      * @param userId 人员id
      * @param projectId 项目id
      * @param companyId 业主单位id
+     * @param csCommId 业务数据表id
+     * @param entCode 业务表名
      * @param myJdbcTemplate 数据源
      * @return 人员部门信息
      */
-    public static String getUserDeptByRoster(String userId, String projectId, String companyId, MyJdbcTemplate myJdbcTemplate) {
+    public static String getUserDeptByRoster(String userId, String projectId, String companyId, String csCommId, String entCode, MyJdbcTemplate myJdbcTemplate) {
         String dept = "";
         Map<String,Object> map = PmRosterExt.getUserDeptCodeByRoster(userId,projectId,companyId,myJdbcTemplate);
         if (!map.isEmpty()){
             dept = (String) map.get("deptCode");
+        } else {
+            List<Map<String,Object>> list = LinkSql.getPrjProcessUserDept(csCommId,entCode,myJdbcTemplate);
+            if (!CollectionUtils.isEmpty(list)){
+                map = list.get(0);
+                if (!map.isEmpty()){
+                    for (String tmp : map.keySet()){
+                        Object value1 = map.get(tmp);
+                        if (value1 != null){
+                            String value = value1.toString();
+                            if (!SharedUtil.isEmptyString(value) && userId.equals(value)){
+                                dept = tmp;
+                            }
+                        }
+                    }
+                }
+            }
         }
         return dept;
     }
