@@ -47,4 +47,4 @@ server:
 qygly:
   ext-jar-debug:
     # 每个人要使用不同的debugger-name：
-    debugger-name: demo-ext-dlt
+    debugger-name: demo-ext-qf

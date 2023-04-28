@@ -227,9 +227,12 @@ public class ArchiveGenerationService {
     }
 
     public void createProcInstForImportedData() {
-
+        // K为实体代码，V为对应的流程ID。
         Map<String, String> map = new HashMap<>();
+
+        // K为实体代码，V为获取表单数据的ID。
         Map<String, String> map2 = new HashMap<>();
+
         // 立项：
         map.put("pm_prj_req", "0100031468511691070");
         map2.put("pm_prj_req", "select T.* from pm_prj_req t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
@@ -264,15 +267,61 @@ public class ArchiveGenerationService {
                 Object entityRecordId = row.get("ID");
                 String procInstId = insertProcInst(crtUserId, procInstName, procId, crt_dt, ent.get("ID"), entCode, entityRecordId);
                 jdbcTemplate.update("update " + entCode + " set LK_WF_INST_ID=? WHERE ID=?", procInstId, entityRecordId);
+
+                createNodeList(procId, crtUserId, crt_dt, procInstId);
             }
         }
+    }
 
+    private void createNodeList(String procId, Object crtUserId, Object crt_dt, String procInstId) {
+        List<Map<String, Object>> nodeList = jdbcTemplate.queryForList("SELECT N.* FROM WF_NODE N WHERE N.WF_PROCESS_ID=? AND N.`STATUS`='AP' ORDER BY N.SEQ_NO", procId);
+        Object lastNodeId = null;
+        Object lastNodeInstId = null;
+        Object lastNodeViewId = null;
+        // 若有节点列表，则针对每个节点，插入节点实例：
+        if (!SharedUtil.isEmptyList(nodeList)) {
+            for (int i = 0; i < nodeList.size(); i++) {
+                Map<String, Object> node = nodeList.get(i);
+                boolean isLast = i == nodeList.size() - 1;
+                Object nodeId = node.get("ID");
+                String nodeInstId = insertNodeInst(crtUserId, procId, procInstId, nodeId, crt_dt, isLast, node.get("NAME"));
+                if (isLast) {
+                    lastNodeId = nodeId;
+                    lastNodeInstId = nodeInstId;
+                    lastNodeViewId = node.get("AD_VIEW_ID");
+                }
+            }
+        }
+        // 若有最末的节点实例ID，则设置流程实例的当前信息：
+        if (!SharedUtil.isEmptyObject(lastNodeId)) {
+            int update = jdbcTemplate.update("update wf_process_instance pi set pi.CURRENT_NODE_ID=?,pi.CURRENT_NI_ID=?,pi.CURRENT_VIEW_ID=? where pi.id=?", lastNodeId, lastNodeInstId, lastNodeViewId, procInstId);
+            log.info("已更新流程实例：" + update);
+        }
+    }
+
+    public void createNodeInstListForImportedData() {
+        // 获取
+        List<Map<String, Object>> procInstList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.NAME LIKE '%-历史数据导入' AND NOT EXISTS(SELECT 1 FROM WF_NODE_INSTANCE N WHERE N.WF_PROCESS_INSTANCE_ID=PI.ID)/* AND PI.ID='1634108398195544064'*/");
+        if (SharedUtil.isEmptyList(procInstList)) {
+            return;
+        }
+
+        for (Map<String, Object> procInst : procInstList) {
+            createNodeList(JdbcMapUtil.getString(procInst, "WF_PROCESS_ID"), JdbcMapUtil.getString(procInst, "START_USER_ID"), JdbcMapUtil.getString(procInst, "START_DATETIME"), JdbcMapUtil.getString(procInst, "ID"));
+        }
     }
 
     private String insertProcInst(Object userId, Object name, Object procId, Object datetime, Object entId, Object entCode, Object entityRecordId) {
         java.lang.String newId = IdUtil.getSnowflakeNextIdStr();
 
         jdbcTemplate.update("INSERT INTO WF_PROCESS_INSTANCE(`ID`,`VER`,`TS`,`IS_PRESET`,`CRT_DT`,`CRT_USER_ID`,`LAST_MODI_DT`,`LAST_MODI_USER_ID`,`STATUS`,`LK_WF_INST_ID`,`CODE`,`NAME`,`REMARK`,`WF_PROCESS_ID`,`START_USER_ID`,`START_DATETIME`,`END_DATETIME`,`AD_ENT_ID`,`ENT_CODE`,`ENTITY_RECORD_ID`,`IS_URGENT`,`WF_INTERFERE_ID`,`CURRENT_NODE_ID`,`CURRENT_NI_ID`,`CURRENT_TODO_USER_IDS`,`CURRENT_VIEW_ID`)VALUES(?/*ID*/,(1)/*VER*/,(NOW())/*TS*/,(null)/*IS_PRESET*/,(NOW())/*CRT_DT*/,(?)/*CRT_USER_ID*/,(NOW())/*LAST_MODI_DT*/,(?)/*LAST_MODI_USER_ID*/,('AP')/*STATUS*/,(null)/*LK_WF_INST_ID*/,(null)/*CODE*/,(?)/*NAME*/,(null)/*REMARK*/,(?)/*WF_PROCESS_ID*/,(?)/*START_USER_ID*/,(?)/*START_DATETIME*/,(?)/*END_DATETIME*/,(?)/*AD_ENT_ID*/,(?)/*ENT_CODE*/,(?)/*ENTITY_RECORD_ID*/,(null)/*IS_URGENT*/,(null)/*WF_INTERFERE_ID*/,(null)/*CURRENT_NODE_ID*/,(null)/*CURRENT_NI_ID*/,(null)/*CURRENT_TODO_USER_IDS*/,(null)/*CURRENT_VIEW_ID*/)", newId, userId, userId, name, procId, userId, datetime, datetime, entId, entCode, entityRecordId);
+        return newId;
+    }
+
+    private String insertNodeInst(Object userId, Object procId, Object procInstId, Object nodeId, Object datetime, Object isCurrent, Object name) {
+        java.lang.String newId = IdUtil.getSnowflakeNextIdStr();
+
+        jdbcTemplate.update("INSERT INTO WF_NODE_INSTANCE(`ID`,`VER`,`TS`,`IS_PRESET`,`CRT_DT`,`CRT_USER_ID`,`LAST_MODI_DT`,`LAST_MODI_USER_ID`,`STATUS`,`LK_WF_INST_ID`,`CODE`,`NAME`,`REMARK`,`WF_PROCESS_ID`,`WF_PROCESS_INSTANCE_ID`,`WF_NODE_ID`,`START_DATETIME`,`END_DATETIME`,`EFFECTIVE_ACT_ID`,`FROM_FLOW_ID`,`IN_CURRENT_ROUND`,`IS_CURRENT`,`SEQ_NO`,`WF_INTERFERE_ID`,`FORWARD_TO_NODE_ID`)VALUES(?/*ID*/,(1)/*VER*/,(NOW())/*TS*/,(null)/*IS_PRESET*/,(NOW())/*CRT_DT*/,(?)/*CRT_USER_ID*/,(NOW())/*LAST_MODI_DT*/,(?)/*LAST_MODI_USER_ID*/,('AP')/*STATUS*/,(null)/*LK_WF_INST_ID*/,(null)/*CODE*/,(?)/*NAME*/,(null)/*REMARK*/,(?)/*WF_PROCESS_ID*/,(?)/*WF_PROCESS_INSTANCE_ID*/,(?)/*WF_NODE_ID*/,(?)/*START_DATETIME*/,(?)/*END_DATETIME*/,(null)/*EFFECTIVE_ACT_ID*/,(null)/*FROM_FLOW_ID*/,(1)/*IN_CURRENT_ROUND*/,(?)/*IS_CURRENT*/,(?)/*SEQ_NO*/,(null)/*WF_INTERFERE_ID*/,(null)/*FORWARD_TO_NODE_ID*/)", newId, userId, userId, name, procId, procInstId, nodeId, datetime, datetime, isCurrent, IdUtil.getSnowflakeNextIdStr());
         return newId;
     }
 }
