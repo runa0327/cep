@@ -29,15 +29,18 @@ public class WfInNodeExt {
     public static final String COMPLETED = "0099799190825106802";
 
     /**
-     * 根据所有的流程实例，更新所有的项目的进入计划。
+     * 根据所有的流程实例，更新所有的项目的进度计划。
      */
     public void updateAllPrjProPlanByAllProcInst() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> nodeInstList = myJdbcTemplate.queryForList("select ni from wf_node_instance ni where ni.`STATUS`='AP' ORDER BY ni.id");
+        // 获取所有的节点实例：
+        List<Map<String, Object>> nodeInstList = myJdbcTemplate.queryForList("select ni.* from wf_node_instance ni where ni.`STATUS`='AP'/* and ni.wf_process_instance_id='1634108398195544064'*/ ORDER BY ni.id");
         if (SharedUtil.isEmptyList(nodeInstList)) {
             return;
         }
+
         for (Map<String, Object> nodeInst : nodeInstList) {
+            // 获取对应的流程实例：
             Map<String, Object> procInst = myJdbcTemplate.queryForMap("select * from WF_PROCESS_INSTANCE t where t.id=?", nodeInst.get("WF_PROCESS_INSTANCE_ID"));
 
             updatePrjProPlanNode(procInst, nodeInst, false);
