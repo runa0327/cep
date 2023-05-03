@@ -415,9 +415,18 @@ public class PrjPlanUtil {
         myJdbcTemplate.update("delete from pm_pro_plan where IS_TEMPLATE <>'1'");
 
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_prj where status ='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' order by pm_code desc");
-        list.forEach(item -> {
-            createPlan(JdbcMapUtil.getString(item, "ID"));
-        });
+        int i = 0;
+        for (Map<String, Object> objectMap : list) {
+            i++;
+            createPlan(JdbcMapUtil.getString(objectMap, "ID"));
+            // 每100个节点实例处理后，提交一次：
+            if (i % 100 == 0) {
+                myJdbcTemplate.execute("COMMIT");
+            }
+        }
+        // 剩下的也提交了：
+        myJdbcTemplate.execute("COMMIT");
+        ;
     }
 
 
