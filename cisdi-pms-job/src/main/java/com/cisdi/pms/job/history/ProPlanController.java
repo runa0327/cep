@@ -78,8 +78,8 @@ public class ProPlanController {
 
             String newPlanId = Util.insertData(myJdbcTemplate, "PM_PRO_PLAN");
 
-            myJdbcTemplate.update("update PM_PRO_PLAN set IS_TEMPLATE=0 ,PM_PRJ_ID=?,PLAN_TOTAL_DAYS=?,PLAN_TOTAL_DAYS=?,PROGRESS_STATUS_ID=?,PROGRESS_RISK_TYPE_ID=?,START_DAY=? where id=?",
-                    projectId, proMap.get("PLAN_TOTAL_DAYS"), proMap.get("PROGRESS_STATUS_ID"), proMap.get("PROGRESS_RISK_TYPE_ID"), proMap.get("START_DAY"),newPlanId);
+            myJdbcTemplate.update("update PM_PRO_PLAN set IS_TEMPLATE=0 ,PM_PRJ_ID=?,PLAN_TOTAL_DAYS=?,PROGRESS_STATUS_ID=?,PROGRESS_RISK_TYPE_ID=?,START_DAY=? where id=?",
+                    projectId, proMap.get("PLAN_TOTAL_DAYS"), proMap.get("PROGRESS_STATUS_ID"), proMap.get("PROGRESS_RISK_TYPE_ID"), proMap.get("START_DAY"), newPlanId);
 
             // 查询项目进度计划节点模板
             List<Map<String, Object>> planNodeList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT, \n" +
@@ -97,7 +97,7 @@ public class ProPlanController {
 
                     myJdbcTemplate.update("update PM_PRO_PLAN_NODE set NAME=?,PM_PRO_PLAN_ID=?, PLAN_TOTAL_DAYS=?,PROGRESS_STATUS_ID=?,PROGRESS_RISK_TYPE_ID=?,CHIEF_DEPT_ID=?,START_DAY=?,SEQ_NO=?," +
                                     "LEVEL=?,LINKED_WF_PROCESS_ID=?,LINKED_START_WF_NODE_ID=?,LINKED_END_WF_NODE_ID=?,SHOW_IN_EARLY_PROC=?,SHOW_IN_PRJ_OVERVIEW=?,POST_INFO_ID=?,CHIEF_USER_ID=?,CAN_START=?,PRE_NODE_ID=?," +
-                                    "AD_ENT_ID_IMP=?,AD_ENT_ID_IMP=?,AD_ATT_ID_IMP=?,IZ_MILESTONE=?,SCHEDULE_NAME=? where id=?", m.get("NAME"), newPlanId, m.get("PLAN_TOTAL_DAYS"), m.get("PROGRESS_STATUS_ID"), m.get("PROGRESS_RISK_TYPE_ID"),
+                                    "AD_ENT_ID_IMP=?,AD_ATT_ID_IMP=?,IZ_MILESTONE=?,SCHEDULE_NAME=? where id=?", m.get("NAME"), newPlanId, m.get("PLAN_TOTAL_DAYS"), m.get("PROGRESS_STATUS_ID"), m.get("PROGRESS_RISK_TYPE_ID"),
                             m.get("CHIEF_DEPT_ID"), m.get("START_DAY"), m.get("SEQ_NO"), m.get("LEVEL"), m.get("LINKED_WF_PROCESS_ID"), m.get("LINKED_START_WF_NODE_ID"), m.get("LINKED_END_WF_NODE_ID"), m.get("SHOW_IN_EARLY_PROC"),
                             m.get("SHOW_IN_PRJ_OVERVIEW"), m.get("POST_INFO_ID"), m.get("AD_USER_ID"), m.get("CAN_START"), m.get("PRE_NODE_ID"), m.get("AD_ENT_ID_IMP"), m.get("AD_ATT_ID_IMP"), m.get("IZ_MILESTONE"), m.get("SCHEDULE_NAME"), id);
 
@@ -145,9 +145,9 @@ public class ProPlanController {
 
             myJdbcTemplate.update("update PM_PRO_PLAN_NODE set NAME=?,PM_PRO_PLAN_ID=?, PLAN_TOTAL_DAYS=?,PROGRESS_STATUS_ID=?,PROGRESS_RISK_TYPE_ID=?,CHIEF_DEPT_ID=?,START_DAY=?,SEQ_NO=?," +
                             "LEVEL=?,LINKED_WF_PROCESS_ID=?,LINKED_START_WF_NODE_ID=?,LINKED_END_WF_NODE_ID=?,SHOW_IN_EARLY_PROC=?,SHOW_IN_PRJ_OVERVIEW=?,POST_INFO_ID=?,CHIEF_USER_ID=?,CAN_START=?,PRE_NODE_ID=?," +
-                            "AD_ENT_ID_IMP=?,AD_ENT_ID_IMP=?,AD_ATT_ID_IMP=?,IZ_MILESTONE=?,SCHEDULE_NAME=? where id=?", m.get("NAME"), newPlanId, m.get("PLAN_TOTAL_DAYS"), m.get("PROGRESS_STATUS_ID"), m.get("PROGRESS_RISK_TYPE_ID"),
+                            "AD_ENT_ID_IMP=?,AD_ATT_ID_IMP=?,IZ_MILESTONE=?,SCHEDULE_NAME=?,PM_PRO_PLAN_NODE_PID=? where id=?", m.get("NAME"), newPlanId, m.get("PLAN_TOTAL_DAYS"), m.get("PROGRESS_STATUS_ID"), m.get("PROGRESS_RISK_TYPE_ID"),
                     m.get("CHIEF_DEPT_ID"), m.get("START_DAY"), m.get("SEQ_NO"), m.get("LEVEL"), m.get("LINKED_WF_PROCESS_ID"), m.get("LINKED_START_WF_NODE_ID"), m.get("LINKED_END_WF_NODE_ID"), m.get("SHOW_IN_EARLY_PROC"),
-                    m.get("SHOW_IN_PRJ_OVERVIEW"), m.get("POST_INFO_ID"), m.get("AD_USER_ID"), m.get("CAN_START"), m.get("PRE_NODE_ID"), m.get("AD_ENT_ID_IMP"), m.get("AD_ATT_ID_IMP"), m.get("IZ_MILESTONE"), m.get("SCHEDULE_NAME"), id);
+                    m.get("SHOW_IN_PRJ_OVERVIEW"), m.get("POST_INFO_ID"), m.get("AD_USER_ID"), m.get("CAN_START"), m.get("PRE_NODE_ID"), m.get("AD_ENT_ID_IMP"), m.get("AD_ATT_ID_IMP"), m.get("IZ_MILESTONE"), m.get("SCHEDULE_NAME"), pId, id);
 
             getChildrenNode(m, allData, id, newPlanId);
         }).collect(Collectors.toList());
