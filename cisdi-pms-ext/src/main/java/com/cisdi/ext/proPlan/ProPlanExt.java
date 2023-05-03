@@ -1176,17 +1176,17 @@ public class ProPlanExt {
     /**
      * 删除时查询当前节点的后置节点
      */
-    public void nodeDelCheck(){
+    public void nodeDelCheck() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PRE_NODE_ID=?", map.get("id"));
-        if(!CollectionUtils.isEmpty(list)){
-            List<String> res = list.stream().map(p->JdbcMapUtil.getString(p,"ID")).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(list)) {
+            List<String> res = list.stream().map(p -> JdbcMapUtil.getString(p, "ID")).collect(Collectors.toList());
             PlanOutSide outSide = new PlanOutSide();
             outSide.ids = res;
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
-        }else{
+        } else {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         }
     }
@@ -1370,6 +1370,7 @@ public class ProPlanExt {
         public List<String> names;
         public List<ObjInfo> objInfoList;
         public List<AttInfo> attInfoList;
+        public List<String> ids;
     }
 
     public static class AttInfo {
@@ -1429,20 +1430,5 @@ public class ProPlanExt {
 
         public String progressStatusId;
         public String progressStatusName;
-    }
-
-
-    /**
-     * 刷新进度节点
-     */
-    public void intiPrjProPlan() {
-        PrjPlanUtil.intiPrjProPlan();
-    }
-
-    /**
-     * 刷新全景节点责任人
-     */
-    public void initPrjProPlanUser() {
-        PrjPlanUtil.initPrjProPlanUser();
     }
 }
