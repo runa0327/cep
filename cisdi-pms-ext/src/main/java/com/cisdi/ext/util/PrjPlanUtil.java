@@ -414,7 +414,7 @@ public class PrjPlanUtil {
         myJdbcTemplate.update("SET FOREIGN_KEY_CHECKS = 0;delete from pm_pro_plan_node where pm_pro_plan_id in (select id from pm_pro_plan where IS_TEMPLATE <>'1');SET FOREIGN_KEY_CHECKS = 1;");
         myJdbcTemplate.update("delete from pm_pro_plan where IS_TEMPLATE <>'1'");
 
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_prj where status ='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' order by pm_code desc limit 0,5");
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_prj where status ='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' order by pm_code desc");
         list.forEach(item -> {
             createPlan(JdbcMapUtil.getString(item, "ID"));
         });
