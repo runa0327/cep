@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 进入流程节点时的扩展。
@@ -29,72 +30,154 @@ public class WfInNodeExt {
     public static final String IN_PROCESSING = "0099799190825106801";
     public static final String COMPLETED = "0099799190825106802";
 
+    /**
+     * 根据所有的流程实例，更新所有的项目的进度计划。
+     */
+    public void updateAllPrjProPlanByAllProcInst() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        // 获取所有的节点实例：
+        List<Map<String, Object>> nodeInstList = myJdbcTemplate.queryForList("select ni.* from wf_node_instance ni where ni.`STATUS`='AP'/* and ni.wf_process_instance_id='1634108398195544064'*/ ORDER BY ni.wf_process_instance_id, ni.id");
+        update(myJdbcTemplate, nodeInstList);
+    }
 
+    /**
+     * 根据选择的流程实例，更新相应的项目的进度计划。
+     */
+    public void updatePrjProPlanByProcInst() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        // 获取所有的节点实例：
+        List<Map<String, Object>> nodeInstList = myJdbcTemplate.queryForList("select ni.* from wf_node_instance ni where ni.`STATUS`='AP' and ni.wf_process_instance_id in (" + entityRecordList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") ORDER BY ni.wf_process_instance_id, ni.id", entityRecordList.stream().map(item -> item.csCommId).collect(Collectors.toList()).toArray());
+        update(myJdbcTemplate, nodeInstList);
+    }
+
+    private void update(MyJdbcTemplate myJdbcTemplate, List<Map<String, Object>> nodeInstList) {
+        if (SharedUtil.isEmptyList(nodeInstList)) {
+            return;
+        }
+
+        int i = 0;
+
+        for (Map<String, Object> nodeInst : nodeInstList) {
+            i++;
+            // 获取对应的流程实例：
+            Map<String, Object> procInst = myJdbcTemplate.queryForMap("select * from WF_PROCESS_INSTANCE t where t.id=?", nodeInst.get("WF_PROCESS_INSTANCE_ID"));
+
+            updatePrjProPlanNode(procInst, nodeInst, false);
+
+            // 每10个节点实例处理后，提交一次：
+            if (i % 10 == 0) {
+                myJdbcTemplate.execute("COMMIT");
+            }
+        }
+
+        // 剩下的也提交了：
+        myJdbcTemplate.execute("COMMIT");
+    }
 
     /**
      * 更新项目进度计划节点。
+     * 用于流程的节点进入时扩展。
      */
     public void updatePrjProPlanNode() {
-        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
-        if (!SharedUtil.isEmptyList(entityRecordList)) {
-            for (EntityRecord entityRecord : entityRecordList) {
-                updatePrjProPlanNode(entityRecord);
-            }
-        }
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String procInstId = ExtJarHelper.procInstId.get();
+        String nodeInstId = ExtJarHelper.nodeInstId.get();
+
+        Map<String, Object> procInst = myJdbcTemplate.queryForMap("select * from WF_PROCESS_INSTANCE t where t.id=?", procInstId);
+        Map<String, Object> nodeInst = myJdbcTemplate.queryForMap("select * from wf_node_instance t where t.id=?", nodeInstId);
+        updatePrjProPlanNode(procInst, nodeInst, true);
+    }
+
+    private static Date getDateOnly(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        // 时
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        // 分
+        calendar.set(Calendar.MINUTE, 0);
+        // 秒
+        calendar.set(Calendar.SECOND, 0);
+        // 毫秒
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
     }
 
     /**
      * 更新项目进度计划节点。
      */
-    private void updatePrjProPlanNode(EntityRecord entityRecord) {
+    private void updatePrjProPlanNode(Map<String, Object> procInst, Map<String, Object> nodeInst, boolean processWeekTask) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String procInstId = ExtJarHelper.procInstId.get();
-        String nodeInstId = ExtJarHelper.nodeInstId.get();
-        String nodeId = myJdbcTemplate.queryForMap("select t.WF_NODE_ID from wf_node_instance t where t.id=?", nodeInstId).get("WF_NODE_ID").toString();
-        Date now = new Date();
 
-        Map<String, Object> valueMap = entityRecord.valueMap;
-        Object pmPrjId = valueMap.get("PM_PRJ_ID");
-        if (!SharedUtil.isEmptyObject(pmPrjId)) {
-            // 获取项目的进度计划列表：
-            List<Map<String, Object>> planList = Crud.from("PM_PRO_PLAN").where().eq("PM_PRJ_ID", pmPrjId).select().execForMapList();
-            if (!SharedUtil.isEmptyList(planList)) {
-                // 遍历项目的进度计划：
-                for (Map<String, Object> plan : planList) {
-                    // 获取关联了当前流程节点的叶子计划节点列表：
-                    List<Map<String, Object>> leafNodeList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node n where n.PM_PRO_PLAN_ID=?/*指定计划*/ and not exists(select 1 from pm_pro_plan_node n2 where n2.PM_PRO_PLAN_NODE_PID=n.id)/*为叶子节点*/ and (n.LINKED_START_WF_NODE_ID=? or n.LINKED_END_WF_NODE_ID=?)/*关联的起始节点或结束节点为当前节点*/", plan.get("ID"), nodeId, nodeId);
-                    if (!SharedUtil.isEmptyList(leafNodeList)) {
-                        // 遍历叶子计划节点：
-                        for (Map<String, Object> leafNode : leafNodeList) {
+        String nodeInstId = JdbcMapUtil.getString(nodeInst, "ID");
+        String nodeId = JdbcMapUtil.getString(nodeInst, "WF_NODE_ID");
+        Date now = getDateOnly(JdbcMapUtil.getDate(nodeInst, "START_DATETIME"));
 
-                            // 若为开始节点：
-                            String startWfNodeId = JdbcMapUtil.getString(leafNode, "LINKED_START_WF_NODE_ID");
-                            if (nodeId.equals(startWfNodeId)) {
-                                updateStartInfoForPlanNode(procInstId, nodeInstId, now, leafNode);
-                            }
+        String procInstId = JdbcMapUtil.getString(procInst, "ID");
 
-                            // 若为结束节点：
-                            String endWfNodeId = JdbcMapUtil.getString(leafNode, "LINKED_END_WF_NODE_ID");
-                            if (nodeId.equals(endWfNodeId)) {
+        List<String> prjIdList = getPrjIdList(procInst);
 
-                                // 若无开始信息，则先更新开始信息：
-                                if (SharedUtil.isEmptyObject(leafNode.get("ACTUAL_START_DATE"))) {
-                                    updateStartInfoForPlanNode(procInstId, nodeInstId, now, leafNode);
+        if (!SharedUtil.isEmptyList(prjIdList)) {
+            prjIdList.forEach(pmPrjId -> {
+                // 获取项目的进度计划列表：
+                List<Map<String, Object>> planList = Crud.from("PM_PRO_PLAN").where().eq("PM_PRJ_ID", pmPrjId).select().execForMapList();
+                if (!SharedUtil.isEmptyList(planList)) {
+                    // 遍历项目的进度计划：
+                    for (Map<String, Object> plan : planList) {
+                        // 获取关联了当前流程节点的叶子计划节点列表：
+                        List<Map<String, Object>> leafNodeList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node n where n.PM_PRO_PLAN_ID=?/*指定计划*/ and not exists(select 1 from pm_pro_plan_node n2 where n2.PM_PRO_PLAN_NODE_PID=n.id)/*为叶子节点*/ and (n.LINKED_START_WF_NODE_ID=? or n.LINKED_END_WF_NODE_ID=?)/*关联的起始节点或结束节点为当前节点*/", plan.get("ID"), nodeId, nodeId);
+                        if (!SharedUtil.isEmptyList(leafNodeList)) {
+                            // 遍历叶子计划节点：
+                            for (Map<String, Object> leafNode : leafNodeList) {
+
+                                // 若为开始节点：
+                                String startWfNodeId = JdbcMapUtil.getString(leafNode, "LINKED_START_WF_NODE_ID");
+                                if (nodeId.equals(startWfNodeId)) {
+                                    updateStartInfoForPlanNode(procInstId, nodeInstId, now, leafNode, processWeekTask);
                                 }
 
-                                // 更新结束信息：
-                                updateEndInfoForPlanNode(procInstId, nodeInstId, now, leafNode);
-                            }
+                                // 若为结束节点：
+                                String endWfNodeId = JdbcMapUtil.getString(leafNode, "LINKED_END_WF_NODE_ID");
+                                if (nodeId.equals(endWfNodeId)) {
 
-                            // 针对父节点，进行递归：
-                            Object pid = leafNode.get("PM_PRO_PLAN_NODE_PID");
-                            if (!SharedUtil.isEmptyObject(pid)) {
-                                updateStartEndInfoForNodeRecursively(new ArrayList<>(), pid.toString());
+                                    // 若无开始信息，则先更新开始信息：
+                                    if (SharedUtil.isEmptyObject(leafNode.get("ACTUAL_START_DATE"))) {
+                                        updateStartInfoForPlanNode(procInstId, nodeInstId, now, leafNode, processWeekTask);
+                                    }
+
+                                    // 更新结束信息：
+                                    updateEndInfoForPlanNode(procInstId, nodeInstId, now, leafNode, processWeekTask);
+                                }
+
+                                // 针对父节点，进行递归：
+                                Object pid = leafNode.get("PM_PRO_PLAN_NODE_PID");
+                                if (!SharedUtil.isEmptyObject(pid)) {
+                                    updateStartEndInfoForNodeRecursively(new ArrayList<>(), pid.toString());
+                                }
                             }
                         }
                     }
                 }
-            }
+            });
+        }
+    }
+
+    private List<String> getPrjIdList(Map<String, Object> procInst) {
+        String entCode = JdbcMapUtil.getString(procInst, "ENT_CODE");
+        String entityRecordId = JdbcMapUtil.getString(procInst, "ENTITY_RECORD_ID");
+        List<Map<String, Object>> entityRecordlist = ExtJarHelper.myJdbcTemplate.get().queryForList("select * from " + entCode + " t where t.id=?", entityRecordId);
+        if (entityRecordlist.size() != 1) {
+            // throw new BaseException("没有对应的表单的实体记录！（实体代码：" + entCode + "实体记录ID：" + entityRecordId + "）");
+            return null;
+        }
+
+        Map<String, Object> entityRecord = entityRecordlist.get(0);
+        if (!SharedUtil.isEmptyObject(entityRecord.get("pm_prj_id"))) {
+            return Arrays.asList(entityRecord.get("pm_prj_id").toString());
+        } else if (!SharedUtil.isEmptyObject(entityRecord.get("PM_PRJ_IDS"))) {
+            return SharedUtil.strArrToStrList(entityRecord.get("PM_PRJ_IDS").toString().split(","));
+        } else {
+            return null;
         }
     }
 
@@ -163,7 +246,7 @@ public class WfInNodeExt {
         }
     }
 
-    private void updateStartInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode) {
+    private void updateStartInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode, boolean processWeekTask) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Crud.from("pm_pro_plan_node").where().eq("ID", leafNode.get("ID")).update()
                 // 设置进度信息：
@@ -171,13 +254,15 @@ public class WfInNodeExt {
                 // 设置关联信息：
                 .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_START_WF_NODE_INSTANCE_ID", nodeInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", null).exec();
 
-        //当前节点有关的工作台任务状态变为进行中
-        myJdbcTemplate.update("update week_task set WEEK_TASK_STATUS_ID='1634118609016066048' where RELATION_DATA_ID=?", JdbcMapUtil.getString(leafNode, "ID"));
+        if (processWeekTask) {
+            // 当前节点有关的工作台任务状态变为进行中
+            myJdbcTemplate.update("update week_task set WEEK_TASK_STATUS_ID='1634118609016066048' where RELATION_DATA_ID=?", JdbcMapUtil.getString(leafNode, "ID"));
+        }
     }
 
-    private void updateEndInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode) {
+    private void updateEndInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode, boolean processWeekTask) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        //计算时间工期
+        // 计算时间工期
         int actualDays = 0;
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", leafNode.get("ID"));
         if (!CollectionUtils.isEmpty(list)) {
@@ -185,7 +270,9 @@ public class WfInNodeExt {
             Date startDate = JdbcMapUtil.getDate(currentNode, "ACTUAL_START_DATE");
             try {
                 actualDays = DateTimeUtil.daysBetween(now, startDate);
-            }catch (Exception e){log.error("计算实际完成工期失败！");}
+            } catch (Exception e) {
+                log.error("计算实际完成工期失败！");
+            }
         }
         Crud.from("pm_pro_plan_node").where().eq("ID", leafNode.get("ID")).update()
                 // 设置进度信息：
@@ -196,10 +283,12 @@ public class WfInNodeExt {
 
         myJdbcTemplate.update("update pm_pro_plan_node t set t.ACTUAL_CARRY_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1,t.ACTUAL_TOTAL_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1 WHERE t.id=?", leafNode.get("ID"));
 
-        //给后续节点发周任务
-        sendPreNodeWeekTask(JdbcMapUtil.getString(leafNode, "ID"));
-        //当前节点有关的工作台任务状态变为已完成
-        myJdbcTemplate.update("update week_task set WEEK_TASK_STATUS_ID='1634118629769482240' where RELATION_DATA_ID=?", JdbcMapUtil.getString(leafNode, "ID"));
+        if (processWeekTask) {
+            // 给后续节点发周任务
+            sendPreNodeWeekTask(JdbcMapUtil.getString(leafNode, "ID"));
+            // 当前节点有关的工作台任务状态变为已完成
+            myJdbcTemplate.update("update week_task set WEEK_TASK_STATUS_ID='1634118629769482240' where RELATION_DATA_ID=?", JdbcMapUtil.getString(leafNode, "ID"));
+        }
     }
 
 
@@ -218,7 +307,7 @@ public class WfInNodeExt {
 
         String msg = "{0}【{1}】计划将在{2}完成，请及时处理！";
         for (Map<String, Object> objectMap : list) {
-            //当节点状态是未启动的时候才发周任务
+            // 当节点状态是未启动的时候才发周任务
             String status = JdbcMapUtil.getString(objectMap, "PROGRESS_STATUS_ID");
             if (NOT_STARTED.equals(status)) {
                 String id = Crud.from("WEEK_TASK").insertData();
@@ -228,7 +317,7 @@ public class WfInNodeExt {
                 }
                 String processName = JdbcMapUtil.getString(objectMap, "NAME");
                 if (Objects.nonNull(objectMap.get("LINKED_WF_PROCESS_ID"))) {
-                    //取流程名称
+                    // 取流程名称
                     List<Map<String, Object>> processlist = myJdbcTemplate.queryForList("select * from WF_PROCESS where id=?", objectMap.get("LINKED_WF_PROCESS_ID"));
                     if (!CollectionUtils.isEmpty(processlist)) {
                         Map<String, Object> dataMap = processlist.get(0);

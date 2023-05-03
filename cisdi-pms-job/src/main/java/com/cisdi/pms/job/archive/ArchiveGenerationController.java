@@ -27,4 +27,12 @@ public class ArchiveGenerationController {
     public void createProcInstForImportedData() {
         archiveGenerationService.createProcInstForImportedData();
     }
+
+    /**
+     * http://localhost:11115/cisdi-pms-job/archiveGeneration/createNodeInstListForImportedData
+     */
+    @GetMapping("createNodeInstListForImportedData")
+    public void createNodeInstListForImportedData() {
+        archiveGenerationService.createNodeInstListForImportedData();
+    }
 }
