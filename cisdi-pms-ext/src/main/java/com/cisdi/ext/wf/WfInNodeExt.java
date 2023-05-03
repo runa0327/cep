@@ -39,12 +39,23 @@ public class WfInNodeExt {
             return;
         }
 
+        int i=0;
+
         for (Map<String, Object> nodeInst : nodeInstList) {
+            i++;
             // 获取对应的流程实例：
             Map<String, Object> procInst = myJdbcTemplate.queryForMap("select * from WF_PROCESS_INSTANCE t where t.id=?", nodeInst.get("WF_PROCESS_INSTANCE_ID"));
 
             updatePrjProPlanNode(procInst, nodeInst, false);
+
+            // 每100个节点实例处理后，提交一次：
+            if(i%100==0) {
+                myJdbcTemplate.execute("COMMIT");
+            }
         }
+
+        // 剩下的也提交了：
+        myJdbcTemplate.execute("COMMIT");
     }
 
     /**
