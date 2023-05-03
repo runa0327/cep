@@ -66,7 +66,7 @@ public class WfInNodeExt {
             updatePrjProPlanNode(procInst, nodeInst, false);
 
             // 每100个节点实例处理后，提交一次：
-            if (i % 100 == 0) {
+            if (i % 10 == 0) {
                 myJdbcTemplate.execute("COMMIT");
             }
         }
