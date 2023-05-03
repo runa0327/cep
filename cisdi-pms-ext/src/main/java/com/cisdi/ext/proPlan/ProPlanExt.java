@@ -1407,19 +1407,4 @@ public class ProPlanExt {
         public String progressStatusId;
         public String progressStatusName;
     }
-
-
-    /**
-     * 刷新进度节点
-     */
-    public void intiPrjProPlan() {
-        PrjPlanUtil.intiPrjProPlan();
-    }
-
-    /**
-     * 刷新全景节点责任人
-     */
-    public void initPrjProPlanUser() {
-        PrjPlanUtil.initPrjProPlanUser();
-    }
 }
