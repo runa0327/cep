@@ -1,6 +1,7 @@
 package com.cisdi.pms.job.history;
 
 import com.cisdi.pms.job.utils.ListUtils;
+import com.cisdi.pms.job.utils.MapUtils;
 import com.cisdi.pms.job.utils.Util;
 import com.google.common.base.Strings;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -54,7 +55,7 @@ public class ProPlanController {
         List<List<Map<String, Object>>> dataList = ListUtils.split(list, 50);
         AtomicInteger index = new AtomicInteger(0);
         dataList.forEach(item -> {
-            log.info("定时刷新进度计划状态线程运行--------------------当前进程第" + index.getAndIncrement() + "个");
+            log.info("刷新全景多线程运行--------------------当前进程第" + index.getAndIncrement() + "个");
             taskExecutor.execute(() -> {
                 for (Map<String, Object> objectMap : item) {
                     createPlan(JdbcMapUtil.getString(objectMap, "ID"));
@@ -151,5 +152,36 @@ public class ProPlanController {
 
             getChildrenNode(m, allData, id, newPlanId);
         }).collect(Collectors.toList());
+    }
+
+
+    @GetMapping("/refreshUser")
+    @Async("taskExecutor")
+    public String initPrjProPlanUser(){
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_roster where status='ap'");
+        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID as PM_PRJ_ID from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where pl.IS_TEMPLATE<>'1'");
+        Map<String, List<Map<String, Object>>> dataMap = nodeList.stream().collect(Collectors.groupingBy(p -> JdbcMapUtil.getString(p, "PM_PRJ_ID")));
+
+        List<Map<String, List<Map<String, Object>>>> subList = MapUtils.splitByChunkSize(dataMap,50);
+        AtomicInteger index = new AtomicInteger(0);
+        subList.forEach(it -> {
+            log.info("刷新全景责任用户多线程运行--------------------当前进程第" + index.getAndIncrement() + "个");
+            taskExecutor.execute(() -> {
+                for (String key : it.keySet()) {
+                    List<Map<String, Object>> prjPostList = list.stream().filter(m -> Objects.equals(key, m.get("PM_PRJ_ID"))).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(prjPostList)) {
+                        List<Map<String, Object>> prjNodeList = dataMap.get(key);
+                        prjNodeList.forEach(item -> {
+                            Optional<Map<String, Object>> optional = prjPostList.stream().filter(o -> Objects.equals(item.get("POST_INFO_ID"), o.get("POST_INFO_ID"))).findAny();
+                            if (optional.isPresent()) {
+                                Map<String, Object> postInfo = optional.get();
+                                myJdbcTemplate.update("update pm_pro_plan_node set CHIEF_USER_ID=? where id=?", postInfo.get("AD_USER_ID"), item.get("ID"));
+                            }
+                        });
+                    }
+                }
+            });
+        });
+        return "";
     }
 }
