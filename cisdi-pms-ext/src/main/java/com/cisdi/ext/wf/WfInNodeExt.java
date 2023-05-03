@@ -139,7 +139,8 @@ public class WfInNodeExt {
         String entityRecordId = JdbcMapUtil.getString(procInst, "ENTITY_RECORD_ID");
         List<Map<String, Object>> entityRecordlist = ExtJarHelper.myJdbcTemplate.get().queryForList("select * from " + entCode + " t where t.id=?", entityRecordId);
         if (entityRecordlist.size() != 1) {
-            throw new BaseException("没有对应的表单的实体记录！（实体代码：" + entCode + "实体记录ID：" + entityRecordId + "）");
+            // throw new BaseException("没有对应的表单的实体记录！（实体代码：" + entCode + "实体记录ID：" + entityRecordId + "）");
+            return null;
         }
 
         Map<String, Object> entityRecord = entityRecordlist.get(0);
