@@ -458,7 +458,6 @@ public class PrjPlanUtil {
                             myJdbcTemplate.update("update pm_pro_plan_node set CHIEF_USER_ID=? where id=?", userId, m.get("ID"));
                         });
                     }
-
                 }
             }
         });
