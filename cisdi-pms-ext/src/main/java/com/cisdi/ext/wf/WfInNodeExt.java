@@ -7,6 +7,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 进入流程节点时的扩展。
@@ -34,12 +36,27 @@ public class WfInNodeExt {
     public void updateAllPrjProPlanByAllProcInst() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         // 获取所有的节点实例：
-        List<Map<String, Object>> nodeInstList = myJdbcTemplate.queryForList("select ni.* from wf_node_instance ni where ni.`STATUS`='AP'/* and ni.wf_process_instance_id='1634108398195544064'*/ ORDER BY ni.id");
+        List<Map<String, Object>> nodeInstList = myJdbcTemplate.queryForList("select ni.* from wf_node_instance ni where ni.`STATUS`='AP'/* and ni.wf_process_instance_id='1634108398195544064'*/ ORDER BY ni.wf_process_instance_id, ni.id");
+        update(myJdbcTemplate, nodeInstList);
+    }
+
+    /**
+     * 根据选择的流程实例，更新相应的项目的进度计划。
+     */
+    public void updatePrjProPlanByProcInst() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        // 获取所有的节点实例：
+        List<Map<String, Object>> nodeInstList = myJdbcTemplate.queryForList("select ni.* from wf_node_instance ni where ni.`STATUS`='AP' and ni.wf_process_instance_id in (" + entityRecordList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") ORDER BY ni.wf_process_instance_id, ni.id", entityRecordList.stream().map(item -> item.csCommId).collect(Collectors.toList()).toArray());
+        update(myJdbcTemplate, nodeInstList);
+    }
+
+    private void update(MyJdbcTemplate myJdbcTemplate, List<Map<String, Object>> nodeInstList) {
         if (SharedUtil.isEmptyList(nodeInstList)) {
             return;
         }
 
-        int i=0;
+        int i = 0;
 
         for (Map<String, Object> nodeInst : nodeInstList) {
             i++;
@@ -49,7 +66,7 @@ public class WfInNodeExt {
             updatePrjProPlanNode(procInst, nodeInst, false);
 
             // 每100个节点实例处理后，提交一次：
-            if(i%100==0) {
+            if (i % 100 == 0) {
                 myJdbcTemplate.execute("COMMIT");
             }
         }
