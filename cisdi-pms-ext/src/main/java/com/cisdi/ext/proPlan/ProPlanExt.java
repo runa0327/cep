@@ -1195,7 +1195,6 @@ public class ProPlanExt {
     /**
      * 删除节点
      */
-    public void delPrjNode(){
     public void delPrjNode() {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
