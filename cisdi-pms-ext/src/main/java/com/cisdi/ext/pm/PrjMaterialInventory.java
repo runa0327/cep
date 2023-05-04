@@ -9,6 +9,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -127,43 +128,44 @@ public class PrjMaterialInventory {
         List<String> headers = headerMaps.stream().map(m -> m.get("name").toString()).collect(Collectors.toList());
 
         List<Map<String, Object>> originList = new ArrayList<>();
+        String orgSql = "select sv.prjId,sv.prjName,sv.masterTypeId,sv.masterTypeName,sv" +
+                ".shouldHave,ah.actualHave,lt.lackTypeName from (\n" +
+                "select i.PM_PRJ_ID prjId,p.name prjName,COUNT(i.MATERIAL_INVENTORY_TYPE_ID) shouldHave,v.name masterTypeName,v.id masterTypeId " +
+                "from prj_inventory i \n" +
+                "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID \n" +
+                "left join gr_set_value v on v.id = t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
+                "left join pm_prj p on p.id = i.PM_PRJ_ID\n" +
+                "where i.IS_INVOLVED = 1 and p.status = 'AP'\n" +
+                "group by i.PM_PRJ_ID,t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
+                ") sv\n" +
+                "left join \n" +
+                "(select prjId,masterTypeId,sum(have) actualHave from (\n" +
+                "select i.PM_PRJ_ID prjId,t.id typeId,t.name typeName,IF(count(d.id) > 0,1,0) have,t.FILE_MASTER_INVENTORY_TYPE_ID " +
+                "masterTypeId\n" +
+                "from prj_inventory i \n" +
+                "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID \n" +
+                "left join prj_inventory_detail d on d.PRJ_INVENTORY_ID = i.id\n" +
+                "where i.IS_INVOLVED = 1\n" +
+                "group by i.PM_PRJ_ID,t.id\n" +
+                ") temp group by prjId,masterTypeId) ah on ah.prjId = sv.prjId and ah.masterTypeId = sv.masterTypeId\n" +
+                "left join \n" +
+                "(select prjId,masterTypeId,GROUP_CONCAT(typeName) lackTypeName from (\n" +
+                "select i.PM_PRJ_ID prjId,\n" +
+                "v.name masterTypeName,\n" +
+                "v.id masterTypeId,\n" +
+                "t.name typeName,\n" +
+                "count(d.id)\n" +
+                "from prj_inventory i \n" +
+                "left join material_inventory_type t on t.id= i.MATERIAL_INVENTORY_TYPE_ID\n" +
+                "left join gr_set_value v on v.id = t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
+                "left join prj_inventory_detail d on d.PRJ_INVENTORY_ID = i.id\n" +
+                "where i.IS_INVOLVED = 1\n" +
+                "group by i.PM_PRJ_ID,t.FILE_MASTER_INVENTORY_TYPE_ID,t.id\n" +
+                "having count(d.id) = 0\n" +
+                ") temp group by prjId,masterTypeId) lt on lt.prjId = sv.prjId and lt.masterTypeId = sv.masterTypeId where sv.prjId = ?";
         //给分页后的每个项目组装数据
         for (String prjId : prjIdList) {
-            List<Map<String, Object>> partOriginList = myJdbcTemplate.queryForList("select sv.prjId,sv.prjName,sv.masterTypeId,sv.masterTypeName,sv" +
-                    ".shouldHave,ah.actualHave,lt.lackTypeName from (\n" +
-                    "select i.PM_PRJ_ID prjId,p.name prjName,COUNT(i.MATERIAL_INVENTORY_TYPE_ID) shouldHave,v.name masterTypeName,v.id masterTypeId " +
-                    "from prj_inventory i \n" +
-                    "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID \n" +
-                    "left join gr_set_value v on v.id = t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
-                    "left join pm_prj p on p.id = i.PM_PRJ_ID\n" +
-                    "where i.IS_INVOLVED = 1 and p.status = 'AP'\n" +
-                    "group by i.PM_PRJ_ID,t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
-                    ") sv\n" +
-                    "left join \n" +
-                    "(select prjId,masterTypeId,sum(have) actualHave from (\n" +
-                    "select i.PM_PRJ_ID prjId,t.id typeId,t.name typeName,IF(count(d.id) > 0,1,0) have,t.FILE_MASTER_INVENTORY_TYPE_ID " +
-                    "masterTypeId\n" +
-                    "from prj_inventory i \n" +
-                    "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID \n" +
-                    "left join prj_inventory_detail d on d.PRJ_INVENTORY_ID = i.id\n" +
-                    "where i.IS_INVOLVED = 1\n" +
-                    "group by i.PM_PRJ_ID,t.id\n" +
-                    ") temp group by prjId,masterTypeId) ah on ah.prjId = sv.prjId and ah.masterTypeId = sv.masterTypeId\n" +
-                    "left join \n" +
-                    "(select prjId,masterTypeId,GROUP_CONCAT(typeName) lackTypeName from (\n" +
-                    "select i.PM_PRJ_ID prjId,\n" +
-                    "v.name masterTypeName,\n" +
-                    "v.id masterTypeId,\n" +
-                    "t.name typeName,\n" +
-                    "count(d.id)\n" +
-                    "from prj_inventory i \n" +
-                    "left join material_inventory_type t on t.id= i.MATERIAL_INVENTORY_TYPE_ID\n" +
-                    "left join gr_set_value v on v.id = t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
-                    "left join prj_inventory_detail d on d.PRJ_INVENTORY_ID = i.id\n" +
-                    "where i.IS_INVOLVED = 1\n" +
-                    "group by i.PM_PRJ_ID,t.FILE_MASTER_INVENTORY_TYPE_ID,t.id\n" +
-                    "having count(d.id) = 0\n" +
-                    ") temp group by prjId,masterTypeId) lt on lt.prjId = sv.prjId and lt.masterTypeId = sv.masterTypeId where sv.prjId = ?", prjId);
+            List<Map<String, Object>> partOriginList = myJdbcTemplate.queryForList(orgSql, prjId);
             originList.addAll(partOriginList);
         }
         //封装
@@ -294,6 +296,11 @@ public class PrjMaterialInventory {
      * @param processIncId 流程实例id
      */
     public static void addInventoryDtl(String prjId,String processId,String processIncId){
+        if (Strings.isNullOrEmpty(prjId)){
+            throw new BaseException("项目id不能为空");
+        }
+        //先将流程实例对应的清单明细删除，避免重复添加
+        PrjInventoryDetail.deleteByWhere(new Where().eq(PrjInventoryDetail.Cols.WF_PROCESS_INSTANCE_ID,processIncId));
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //流程实例
         WfProcessInstance processInc = WfProcessInstance.selectById(processIncId);
@@ -419,6 +426,7 @@ public class PrjMaterialInventory {
         private Integer total;
     }
 
+    @Data
     private static class Attribute{
         //属性代码
         private String attCode;

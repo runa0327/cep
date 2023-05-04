@@ -658,7 +658,8 @@ public class PmPrjReqExt {
         PmPrjExt.updatePrjBaseByPrjReq(entityRecord);
         //更新项目资金信息
         WfPmInvestUtil.updatePrjInvest(entityRecord,entCode);
-
+        //资料清单
+        PrjMaterialInventory.addInventoryDtl(String.valueOf(entityRecord.valueMap.get("PM_PRJ_ID")),ExtJarHelper.procId.get(),ExtJarHelper.procInstId.get());
     }
 
     /**
