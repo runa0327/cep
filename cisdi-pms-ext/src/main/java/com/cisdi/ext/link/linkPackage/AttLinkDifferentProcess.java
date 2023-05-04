@@ -124,7 +124,7 @@ public class AttLinkDifferentProcess {
         list.add("PM_PRJ_RESTART_ORDER_REQ"); // 工程复工令
         list.add("PM_PRJ_RESTART_TRIAL_REQ"); // 工程复工报审表
         list.add("BID_PROCESS_MANAGE"); // 招标过程管理
-        list.add("PIPELINE_RELOCATION_REQ"); // 管线迁改
+//        list.add("PIPELINE_RELOCATION_REQ"); // 管线迁改
         list.add("PM_POST_APPOINT"); // 岗位指派
         list.add("PRJ_LAND_CHECK"); // 项目红线核查
 //        list.add("PM_PRJ_SETTLE_ACCOUNTS"); // 项目结算审批
@@ -176,6 +176,7 @@ public class AttLinkDifferentProcess {
         list.add("PM_PRJ_INVEST1"); //可研报告审批
         list.add("PM_PRJ_INVEST2"); //初设概算审批
         list.add("PM_TERMITE_CONTROL_REQ"); //白蚁防治
+        list.add("PIPELINE_RELOCATION_REQ"); //管线迁改
         return list;
     }
 

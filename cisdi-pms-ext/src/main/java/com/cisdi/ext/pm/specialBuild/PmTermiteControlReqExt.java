@@ -1,20 +1,14 @@
 package com.cisdi.ext.pm.specialBuild;
 
-import com.cisdi.ext.base.PmPrjExt;
-import com.cisdi.ext.invest.InvestAmtExt;
 import com.cisdi.ext.pm.ProcessCommon;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
-import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
-import com.qygly.shared.util.SharedUtil;
-
-import java.util.Map;
 
 /**
- * 流程-白蚁防治-扩展
+ * 专项报建-流程-白蚁防治-扩展
  */
 public class PmTermiteControlReqExt {
 

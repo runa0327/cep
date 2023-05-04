@@ -6,7 +6,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.interaction.EntityRecord;
 
 /**
- * 项目入库-流程扩展
+ * 综合办公-项目入库-流程扩展
  */
 public class PmPrjLibraryReqExt {
 

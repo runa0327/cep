@@ -1,5 +1,9 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.specialBuild;
 
+import com.cisdi.ext.base.PmPrjExt;
+import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.ProcessRoleExt;
+import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -14,10 +18,134 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 管线迁改-扩展
+ * 专项报建-管线迁改-扩展
  */
 @Slf4j
 public class PipelineRelocationReqExt {
+
+    /**
+     * 管线迁改-结束时数据校验处理
+     */
+    public void pipelineEndCheck(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //流程表名
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        //流程业务表id
+        String csCommId = entityRecord.csCommId;
+        //审批人员信息写入花名册
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        String processId = ExtJarHelper.procId.get();
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        ProcessCommon.addPrjPostUser(projectId,entCode,processId,companyId,csCommId,myJdbcTemplate);
+    }
+
+    /**
+     * 流程操作-管线迁改-确认操作
+     */
+    public void pipelineCheckOk() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //当前节点实例id
+        String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        //定义节点状态
+        String status = "OK";
+        String nodeStatus = getStatus(status,nodeInstanceId,myJdbcTemplate);
+        //详细处理逻辑
+        handleCHeckData(status,nodeStatus,nodeInstanceId,myJdbcTemplate);
+    }
+
+    /**
+     * 流程操作-管线迁改-拒绝操作
+     */
+    public void pipelineCheckRefuse() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //当前节点实例id
+        String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        //定义节点状态
+        String status = "false";
+        String nodeStatus = getStatus(status,nodeInstanceId,myJdbcTemplate);
+        //详细处理逻辑
+        handleCHeckData(status,nodeStatus,nodeInstanceId,myJdbcTemplate);
+    }
+
+    /**
+     * 流程操作详细处理逻辑
+     * @param status 状态码
+     * @param nodeStatus 节点状态码
+     * @param nodeInstanceId 节点实例id
+     * @param myJdbcTemplate 数据源
+     */
+    public void handleCHeckData(String status, String nodeStatus, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        String userName = ExtJarHelper.loginInfo.get().userName;
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId;
+        String procInstId = ExtJarHelper.procInstId.get();
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        if ("OK".equals(status)){
+            if ("start".equals(nodeStatus)){ // 1-发起
+                WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
+            } else {
+                //获取审批意见信息
+                Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
+                //审批意见内容
+                String comment = message.get("comment");
+                if ("manageDesignCostOK".equals(nodeStatus)){ // 2-工程部/设计部/成本部意见
+                    // 判断当前人岗位信息
+                    //项目id
+                    String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+                    String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+                    userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
+                    String dept = PmPrjExt.getUserDeptByRoster(userId,projectId,companyId,csCommId,entCode,myJdbcTemplate);
+                    if (!SharedUtil.isEmptyString(dept)){
+                        String processComment = "", commentEnd = "";
+                        if (dept.contains("AD_USER_EIGHTEEN_ID")){ //成本岗
+                            //获取流程中的意见信息
+                            processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_THREE");
+                            commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                            ProcessCommon.commentShow("APPROVAL_COMMENT_THREE",commentEnd,csCommId,entCode);
+                        } else if (dept.contains("AD_USER_TWENTY_TWO_ID")){ //设计岗
+                            processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_TWO");
+                            commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                            ProcessCommon.commentShow("APPROVAL_COMMENT_TWO",commentEnd,csCommId,entCode);
+                        } else if (dept.contains("AD_USER_TWENTY_THREE_ID")){ //工程岗
+                            processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_ONE");
+                            commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                            ProcessCommon.commentShow("APPROVAL_COMMENT_ONE",commentEnd,csCommId,entCode);
+                        }
+                    }
+                }
+            }
+        } else {
+            if ("manageDesignCostFalse".equals(nodeStatus)){ // 2-工程部/设计部/成本部意见
+                ProcessCommon.clearData("APPROVAL_COMMENT_ONE,APPROVAL_COMMENT_TWO,APPROVAL_COMMENT_THREE",csCommId,entCode,myJdbcTemplate);
+            }
+        }
+    }
+
+    /**
+     * 节点赋值
+     * @param status 状态码
+     * @param nodeInstanceId 节点实例id
+     * @param myJdbcTemplate 数据源
+     * @return 节点状态名
+     */
+    private String getStatus(String status, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
+        String nodeId = ProcessCommon.getNodeIdByNodeInstanceId(nodeInstanceId,myJdbcTemplate);
+        String name = "";
+        if ("OK".equals(status)){
+            if ("1610562683109801984".equals(nodeId)){ //1-经办人发起
+                name = "start";
+            } else if ("1610563185197350912".equals(nodeId)){ // 2-工程部/设计部/成本部意见
+                name = "manageDesignCostOK";
+            }
+        } else {
+            if ("1610563185197350912".equals(nodeId)){ // 2-工程部/设计部/成本部意见
+                name = "manageDesignCostFalse";
+            }
+        }
+        return name;
+    }
 
     /**
      * 管线迁改-角色-获取工程岗人员

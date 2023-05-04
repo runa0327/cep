@@ -8,7 +8,7 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 
 /**
- * 项目红线核查-流程扩展
+ * 土地手续-项目红线核查-流程扩展
  */
 public class PmPrjRedCheckReqExt {
 
