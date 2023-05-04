@@ -8,6 +8,7 @@ import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -32,19 +33,25 @@ public class PrjMaterialInventory {
      * 根据清单类型给每个项目加一套清单
      */
     public void initPrjInventory() {
+        //清空历史数据
+        emptyInventory();
+
         List<PmPrj> pmPrjs = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.STATUS, "AP"));
         List<MaterialInventoryType> materialInventoryTypes = MaterialInventoryType.selectByWhere(new Where().eq(MaterialInventoryType.Cols.STATUS, "AP"));
         List<PrjInventory> prjInventories = PrjInventory.selectByWhere(new Where().eq(PrjInventory.Cols.STATUS, "AP"));
         for (PmPrj pmPrj : pmPrjs) {
             doAddPrjInventory(pmPrj,materialInventoryTypes,prjInventories);
         }
+
+        //初始化清单明细
+        initInventoryDetail();
     }
 
     /**
      * 初始化清单明细
      * 将流程中的文件填入清单明细
      */
-    public void initInventoryDetail() {
+    private void initInventoryDetail() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
         //和清单相关的流程实例，带清单对应的字段
@@ -96,6 +103,15 @@ public class PrjMaterialInventory {
     }
 
     /**
+     * 清空项目清单和清单明细
+     */
+    private void emptyInventory(){
+        Crud.from(PrjInventoryDetail.ENT_CODE).delete().exec();
+        //暂时不需要清除项目清单表，因为doAddPrjInventory做了重复判断
+//        Crud.from(PrjInventory.ENT_CODE).delete().exec();
+    }
+
+    /**
      * 项目清单列表
      */
     public void prjInventoryList(){
@@ -117,13 +133,12 @@ public class PrjMaterialInventory {
             sql += " and id in (:prjId)";
             queryParams.put("prjId",prjIds);
         }
-        String totalSql = sql;
-        int total = myJdbcTemplate.queryForList(totalSql).size();
+        int total = myNamedParameterJdbcTemplate.queryForList(sql,queryParams).size();
         sql += " order by id desc limit :start,:pageSize";
         List<Map<String, Object>> prjIdMaps = myNamedParameterJdbcTemplate.queryForList(sql,queryParams);
         List<String> prjIdList = prjIdMaps.stream().map(m -> m.get("id").toString()).collect(Collectors.toList());
         //获取动态表头
-        List<Map<String, Object>> headerMaps = myJdbcTemplate.queryForList("select v.name from gr_set_value v left join gr_set s on s.id = v.GR_SET_ID " +
+        List<Map<String, Object>> headerMaps = myJdbcTemplate.queryForList("select v.id,v.name from gr_set_value v left join gr_set s on s.id = v.GR_SET_ID " +
                 "where s.code = 'file_master_list_type' and v.status = 'AP'");
         List<String> headers = headerMaps.stream().map(m -> m.get("name").toString()).collect(Collectors.toList());
 
@@ -173,22 +188,22 @@ public class PrjMaterialInventory {
         List<InventoryData> inventoryDataList = new ArrayList<>();//列表数据
         for (String prjId : prjIdList) {
             InventoryData inventoryData = new InventoryData();//单条列表数据
-            List<Map<String,Object>> statistic = new ArrayList<>();//单条动态数据
+            Map<String,Object> cellData = new HashMap<>();//单条动态数据
             List<Map<String, Object>> prjOriginList = data.get(prjId);//单条项目维度的初始数据
             if (CollectionUtils.isEmpty(prjOriginList)){//可能有项目没有刷出清单模板
                 continue;
             }
             for (String header : headers) {
-                Map<String,Object> cellData = new HashMap<>();//单个单元格
+//                Map<String,Object> cellData = new HashMap<>();//单个单元格
                 Map<String, Object> partCell = new HashMap<>();//单个单元格的一部分数据
                 Optional<Map<String, Object>> masterTypeOp = prjOriginList.stream().filter(d -> d.get("masterTypeName").equals(header)).findAny();
                 if (masterTypeOp.isPresent()){
                     partCell = masterTypeOp.get();
                 }
+//                cellData.put(header,partCell);
                 cellData.put(header,partCell);
-                statistic.add(cellData);
             }
-            inventoryData.statistic = statistic;
+            inventoryData.cellData = cellData;
             inventoryData.prjId = prjId;
             inventoryData.prjName = JdbcMapUtil.getString(data.get(prjId).get(0),"prjName");
             inventoryDataList.add(inventoryData);
@@ -198,6 +213,7 @@ public class PrjMaterialInventory {
         ListResp listResp = new ListResp();
         listResp.inventoryDataList = inventoryDataList;
         listResp.total = total;
+        listResp.headerMaps = headerMaps;
         Map output = JsonUtil.fromJson(JsonUtil.toJson(listResp), Map.class);
         ExtJarHelper.returnValue.set(output);
 
@@ -367,6 +383,7 @@ public class PrjMaterialInventory {
     private static class ListResp {
         private List<InventoryData> inventoryDataList;
         private Integer total;
+        private List<Map<String, Object>> headerMaps;
     }
 
     /**
@@ -377,7 +394,7 @@ public class PrjMaterialInventory {
         private String prjId;
         private String prjName;
         //动态列
-        private List<Map<String,Object>> statistic;
+        private Map<String,Object> cellData;
     }
 
     /**
