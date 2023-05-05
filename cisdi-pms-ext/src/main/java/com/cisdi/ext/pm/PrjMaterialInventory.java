@@ -203,8 +203,8 @@ public class PrjMaterialInventory {
                     partCell.put("prjName",prjOriginList.get(0).get("prjName"));
                     Map<String, Object> foundHeaderMap =
                             headerMaps.stream().filter(headerMap -> header.equals(headerMap.get("name").toString())).findAny().get();
-                    partCell.put("materTypeId",foundHeaderMap.get("id"));
-                    partCell.put("materTypeName",foundHeaderMap.get("name"));
+                    partCell.put("masterTypeId",foundHeaderMap.get("id"));
+                    partCell.put("masterTypeName",foundHeaderMap.get("name"));
                 }
                 cellData.put(header,partCell);
             }
