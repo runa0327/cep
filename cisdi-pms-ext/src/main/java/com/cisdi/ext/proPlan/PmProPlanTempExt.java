@@ -445,7 +445,7 @@ public class PmProPlanTempExt {
     public void proLinkAttList() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("SELECT m.*,att.id as att_id,att.`CODE` as att_code,att.`NAME` as att_name FROM \n" +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("SELECT m.*,att.id as att_id,att.`CODE` as att_code,ifnull(aet.ATT_NAME,att.`NAME`) as att_name FROM \n" +
                 "( \n" +
                 " select c.id,c.code,c.name from wf_process a \n" +
                 " LEFT JOIN AD_SINGLE_ENT_VIEW b ON a.STARTABLE_SEV_IDS = b.id \n" +

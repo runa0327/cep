@@ -946,7 +946,8 @@ public class ProcessRoleExt {
         List<HrDept> list = HrDept.selectByWhere(new Where().eq(HrDept.Cols.CODE,postCode).eq(HrDept.Cols.CUSTOMER_UNIT,companyId).eq(HrDept.Cols.STATUS,"AP"));
         if (!CollectionUtils.isEmpty(list)){
             String id = list.get(0).getId();
-            String sql = "select a.ad_user_id from hr_dept_user a left join ad_user b on a.ad_user_id = b.id where a.hr_dept_id = ? and a.status = 'ap' and b.status = 'ap'";
+            String sql = "select a.ad_user_id from hr_dept_user a left join ad_user b on a.ad_user_id = b.id " +
+                    "where a.hr_dept_id = ? and a.status = 'ap' and b.status = 'ap' and b.id != '1641281525532323840'";
             List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql,id);
             if (!CollectionUtils.isEmpty(list2)){
                 List<String> userList = list2.stream().map(p->JdbcMapUtil.getString(p,"ad_user_id")).collect(Collectors.toList());
