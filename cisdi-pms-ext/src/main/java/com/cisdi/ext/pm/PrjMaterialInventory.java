@@ -194,13 +194,18 @@ public class PrjMaterialInventory {
                 continue;
             }
             for (String header : headers) {
-//                Map<String,Object> cellData = new HashMap<>();//单个单元格
                 Map<String, Object> partCell = new HashMap<>();//单个单元格的一部分数据
                 Optional<Map<String, Object>> masterTypeOp = prjOriginList.stream().filter(d -> d.get("masterTypeName").equals(header)).findAny();
                 if (masterTypeOp.isPresent()){
                     partCell = masterTypeOp.get();
+                }else {//表头没有对应的资料，也要将项目、清单信息赋值
+                    partCell.put("prjId",prjOriginList.get(0).get("prjId"));
+                    partCell.put("prjName",prjOriginList.get(0).get("prjName"));
+                    Map<String, Object> foundHeaderMap =
+                            headerMaps.stream().filter(headerMap -> header.equals(headerMap.get("name").toString())).findAny().get();
+                    partCell.put("materTypeId",foundHeaderMap.get("id"));
+                    partCell.put("materTypeName",foundHeaderMap.get("name"));
                 }
-//                cellData.put(header,partCell);
                 cellData.put(header,partCell);
             }
             inventoryData.cellData = cellData;
