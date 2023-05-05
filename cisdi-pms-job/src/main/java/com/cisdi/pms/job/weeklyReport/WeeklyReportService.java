@@ -2,6 +2,7 @@ package com.cisdi.pms.job.weeklyReport;
 
 import cn.hutool.core.util.IdUtil;
 import com.cisdi.pms.job.utils.Constants;
+import com.cisdi.pms.job.utils.DateUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -9,7 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -336,5 +339,91 @@ public class WeeklyReportService {
         jdbcTemplate.update("INSERT INTO HR_PERIOD_DTL(`ID`,`VER`,`TS`,`IS_PRESET`,`CRT_DT`,`CRT_USER_ID`,`LAST_MODI_DT`,`LAST_MODI_USER_ID`,`STATUS`,`LK_WF_INST_ID`,`CODE`,`NAME`,`REMARK`,`FROM_DATE`,`TO_DATE`,`HR_PERIOD_ID`,`IS_CURRENT`)VALUES(?/*ID*/,(1)/*VER*/,(NOW())/*TS*/,(null)/*IS_PRESET*/,(NOW())/*CRT_DT*/,(?)/*CRT_USER_ID*/,(NOW())/*LAST_MODI_DT*/,(?)/*LAST_MODI_USER_ID*/,('AP')/*STATUS*/,(null)/*LK_WF_INST_ID*/,(null)/*CODE*/,(?)/*NAME*/,(null)/*REMARK*/,(?)/*FROM_DATE*/,(?)/*TO_DATE*/,(?)/*HR_PERIOD_ID*/,0/*IS_CURRENT*/)", newId, Constants.adminUserId, Constants.adminUserId, fromDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "到" + toDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), fromDate, toDate, periodId);
 
         return jdbcTemplate.queryForMap("select * from hr_period_dtl d where d.id=?", newId);
+    }
+
+    /**
+     * 自动生成形象进度周报
+     */
+    public void createProgressWeekly() {
+        List<Map<String,Object>> jobList = jdbcTemplate.queryForList("select * from BASE_JOB_CONFIG where STATUS = 'AP' AND CODE = 'createProgressWeekly'");
+        if (!CollectionUtils.isEmpty(jobList)){
+            String sysTrue = jobList.get(0).get("SYS_TRUE").toString(); //是否强制执行。1是0否
+            Date date = new Date();
+            int week = DateUtil.getWeekDay(date);
+            if (week == 5){
+                String startDate = DateUtil.getTimeStrDay(date);
+                Date date2 = DateUtil.addDays(date,6);
+                String endDate = DateUtil.getTimeStrDay(date2);
+                autoCreateProgressWeek(startDate,endDate,date);
+            } else if ( week != 5 && "1".equals(sysTrue)){
+                Map<String,String> map = getDateMap(week,date);
+                autoCreateProgressWeek(map.get("startDate"),map.get("endDate"),date);
+            }
+        }
+    }
+
+    /**
+     * 非星期五情况下，推断当天所属周的
+     * @param week 当天周几。0为周天
+     * @param date 当天日期
+     * @return 周几集合
+     */
+    private Map<String, String> getDateMap(int week, Date date) {
+        Map<String,String> map = new HashMap<>();
+        Date start = date;
+        Date end = date;
+        if (week == 1){
+            start = DateUtil.addDays(date,-3);
+            end = DateUtil.addDays(date,3);
+        } else if ( week == 2){
+            start = DateUtil.addDays(date,-4);
+            end = DateUtil.addDays(date,2);
+        } else if ( week == 3){
+            start = DateUtil.addDays(date,-5);
+            end = DateUtil.addDays(date,1);
+        } else if ( week == 4){
+            start = DateUtil.addDays(date,-6);
+        } else if ( week == 6){
+            start = DateUtil.addDays(date,-1);
+            end = DateUtil.addDays(date,5);
+        } else if ( week == 0){
+            start = DateUtil.addDays(date,-2);
+            end = DateUtil.addDays(date,4);
+        }
+        map.put("startDate",DateUtil.getTimeStrDay(start));
+        map.put("endDate",DateUtil.getTimeStrDay(end));
+        return map;
+    }
+
+    /**
+     * 开始自动生成形象进度周报
+     * startDate 开始时间
+     * endDate 结束时间
+     * date 当前时间
+     */
+    private void autoCreateProgressWeek(String startDate, String endDate, Date date) {
+        String nowDate = DateUtil.getNormalTimeStr(date);
+        String weekDate = startDate + "-" + endDate;
+        //判断该时间范围内是否已经有进度计划，有，则不进行二次添加
+        List<Map<String,Object>> list = jdbcTemplate.queryForList("select * from PM_PROGRESS_WEEKLY where status = 'ap' and FROM_DATE = ? and TO_DATE = ?",startDate,endDate);
+        if (CollectionUtils.isEmpty(list)){
+            String weekId = IdUtil.getSnowflakeNextIdStr();
+            String sql1 = "insert into PM_PROGRESS_WEEKLY " +
+                    "(ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,DATE,TO_DATE,FROM_DATE) " +
+                    "values (?,1,?,?,'0099250247095871681',?,'0099250247095871681','AP',?,?,?)";
+            jdbcTemplate.update(sql1,weekId,nowDate,nowDate,nowDate,weekDate,endDate,startDate);
+
+            //查询所有项目信息
+            List<Map<String,Object>> prjList = jdbcTemplate.queryForList("select id from pm_prj where status = 'ap'");
+            for (Map<String, Object> tmp : prjList) {
+                String prjId = JdbcMapUtil.getString(tmp,"id");
+                //写入进度周报项目信息
+                String weekPrjId = IdUtil.getSnowflakeNextIdStr();
+                String sql2 = "insert into PM_PROGRESS_WEEKLY_PRJ " +
+                        "(ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PM_PROGRESS_WEEKLY_ID,DATE,PM_PRJ_ID,TO_DATE,SYS_TRUE,FROM_DATE) " +
+                        "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',?,?,?,?,'1',?)";
+                jdbcTemplate.update(sql2,weekPrjId,nowDate,nowDate,nowDate,weekId,weekDate,prjId,endDate,startDate);
+            }
+        }
     }
 }
