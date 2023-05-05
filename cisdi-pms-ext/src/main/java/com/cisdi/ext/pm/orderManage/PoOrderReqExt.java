@@ -1,10 +1,11 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.orderManage;
 
 import com.alibaba.fastjson.JSON;
 import com.cisdi.ext.api.PoOrderExtApi;
 import com.cisdi.ext.base.GrSetValue;
 import com.cisdi.ext.commons.HttpClient;
 import com.cisdi.ext.model.view.order.PoOrderReq;
+import com.cisdi.ext.pm.ProcessCommon;
 import com.cisdi.ext.util.*;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -22,7 +23,7 @@ import java.math.RoundingMode;
 import java.util.*;
 
 /**
- * 采购合同签订扩展
+ * 合约管理-采购合同签订扩展
  */
 @Slf4j
 public class PoOrderReqExt {
@@ -525,6 +526,8 @@ public class PoOrderReqExt {
         Crud.from("PO_ORDER_REQ").where().eq("id",entityRecord.csCommId).update().set("DATE_FIVE",expireDate).exec();
         //将合同数据写入传输至合同数据表(po_order)
         PoOrderExtApi.createData(entityRecord,"PO_ORDER_REQ","0100070673610715078",myJdbcTemplate);
+        //项目信息写入明细表
+        PoOrderPrjDetailExt.createData(entityRecord);
     }
 
     /**

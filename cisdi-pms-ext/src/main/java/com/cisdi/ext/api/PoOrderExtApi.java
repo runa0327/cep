@@ -125,9 +125,12 @@ public class PoOrderExtApi {
                 .set("AD_USER_ID",JdbcMapUtil.getString(valueMap,"AD_USER_ID")) //合同经办人
                 .set("SIGN_DATE",JdbcMapUtil.getString(valueMap,"SIGN_DATE")) //签订日期
                 .set("DATE_FIVE",JdbcMapUtil.getString(valueMap,"DATE_FIVE")) //到期日期
-                .set("FILE_ATTACHMENT_URL",JdbcMapUtil.getString(valueMap,"FILE_ID_FIVE")) //合同盖章版文件
+                .set("FILE_ID_ONE",JdbcMapUtil.getString(valueMap,"FILE_ID_FIVE")) //合同盖章版文件
                 .set("VIEW_ID",viewId) //视图id
                 .set("WF_PROCESS_INSTANCE_ID",JdbcMapUtil.getString(valueMap,"LK_WF_INST_ID")) //流程实例id
+                .set("CONTRACT_CODE",JdbcMapUtil.getString(valueMap,"CONTRACT_CODE")) //合同编号
+                .set("CUSTOMER_UNIT",JdbcMapUtil.getString(valueMap,"CUSTOMER_UNIT_ONE")) //合同签订公司
+                .set("CONTRACT_CATEGORY_ONE_ID",JdbcMapUtil.getString(valueMap,"CONTRACT_CATEGORY_ONE_ID")) //合同类型
                 .exec();
     }
 
