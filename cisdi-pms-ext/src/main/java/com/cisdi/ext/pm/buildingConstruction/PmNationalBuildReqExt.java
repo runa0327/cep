@@ -6,7 +6,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.interaction.EntityRecord;
 
 /**
- * 国安报建-流程扩展
+ * 施工报建手续-国安报建-流程扩展
  */
 public class PmNationalBuildReqExt {
 

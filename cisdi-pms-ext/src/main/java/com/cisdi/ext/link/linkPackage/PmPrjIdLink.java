@@ -91,11 +91,13 @@ public class PmPrjIdLink {
                     AttLinkExtDetail.linkPrjTotalInvest(attLinkResult,attValue);
                 } else if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)) { // 工程开工报审
                     AttLinkProcessDetail.pmPrjKickOffReqPrjLink(attLinkResult,attValue,myJdbcTemplate);
-                } else if ("PIPELINE_RELOCATION_REQ".equals(entCode)){ // 管线迁改
-                    //设计部人员
-                    String design = JdbcMapUtil.getString(row,"PRJ_DESIGN_USER_ID");
-                    AttLinkProcessDetail.pipelineLink(design,attLinkResult,myJdbcTemplate);
-                } else if("PM_BUY_DEMAND_REQ".equals(entCode) || "PIPELINE_RELOCATION_REQ".equals(entCode)) { // 采购需求审批 管线迁改
+                }
+//                else if ("PIPELINE_RELOCATION_REQ".equals(entCode)){ // 管线迁改
+//                    //设计部人员
+//                    String design = JdbcMapUtil.getString(row,"PRJ_DESIGN_USER_ID");
+//                    AttLinkProcessDetail.pipelineLink(design,attLinkResult,myJdbcTemplate);
+//                }
+                else if("PM_BUY_DEMAND_REQ".equals(entCode) || "PIPELINE_RELOCATION_REQ".equals(entCode)) { // 采购需求审批 管线迁改
                     // 0099799190825080705 = 企业自筹
                     String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
                     AttLinkExtDetail.assignmentPrjYesNoOne(id,attLinkResult);
