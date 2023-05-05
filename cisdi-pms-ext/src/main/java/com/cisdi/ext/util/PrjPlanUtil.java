@@ -290,7 +290,41 @@ public class PrjPlanUtil {
                         }
                     });
                 }
+                setFirstNodeUser(projectId);
+            }
+        }
+    }
 
+    /**
+     * 把项目启动里的前期报建岗人员，初始化搞第一个节点上
+     *
+     * @param projectId
+     */
+    private static void setFirstNodeUser(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan where PM_PRJ_ID=?", projectId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> proMap = list.get(0);
+            String proPlanId = JdbcMapUtil.getString(proMap, "ID");
+            List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PM_PRO_PLAN_ID=?", proPlanId);
+            if (!CollectionUtils.isEmpty(nodeList)) {
+                List<Map<String, Object>> firstNodeList = nodeList.stream().filter(p -> 1 == JdbcMapUtil.getInt(p, "LEVEL")).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(firstNodeList)) {
+                    Map<String, Object> firstNode = firstNodeList.get(0);
+                    List<Map<String, Object>> secondNodeList = nodeList.stream().filter(p -> Objects.equals(firstNode.get("ID"), p.get("PM_PRO_PLAN_NODE_PID"))).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(secondNodeList)) {
+                        Map<String, Object> secondNode = secondNodeList.get(0);
+                        List<Map<String, Object>> threeNodeList = nodeList.stream().filter(p -> Objects.equals(secondNode.get("ID"), p.get("PM_PRO_PLAN_NODE_PID"))).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+                        if (!CollectionUtils.isEmpty(threeNodeList)) {
+                            Map<String, Object> threeNode = threeNodeList.get(0);
+                            List<Map<String, Object>> startList = myJdbcTemplate.queryForList("select ps.* from pm_prj pm left join prj_start ps on pm.pm_code = ps.pm_code where pm.id=?", projectId);
+                            if (!CollectionUtils.isEmpty(startList)) {
+                                Map<String, Object> startObj = startList.get(0);
+                                myJdbcTemplate.update("update pm_pro_plan_node set CHIEF_USER_ID=? where id=?", startObj.get("AD_USER_ID"), threeNode.get("ID"));
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -403,4 +437,33 @@ public class PrjPlanUtil {
             }
         }).collect(Collectors.toList());
     }
+
+
+    /**
+     * 更加花名册刷新全景的负责人
+     *
+     * @param projectId
+     */
+    public static void refreshProPlanUser(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_roster where PM_PRJ_ID=?", projectId);
+        //查询未启动的节点
+        List<Map<String, Object>> proList = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where pn.PROGRESS_STATUS_ID ='0099799190825106800' and  PM_PRJ_ID=?",projectId);
+        list.forEach(item -> {
+            String postId = JdbcMapUtil.getString(item, "POST_INFO_ID");
+            if (!Strings.isNullOrEmpty(postId)) {
+                String userId = JdbcMapUtil.getString(item, "AD_USER_ID");
+                if (!Strings.isNullOrEmpty(userId)) {
+                    List<Map<String, Object>> dataList = proList.stream().filter(p -> Objects.equals(postId, JdbcMapUtil.getString(p, "POST_INFO_ID"))).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(dataList)) {
+                        dataList.forEach(m -> {
+                            myJdbcTemplate.update("update pm_pro_plan_node set CHIEF_USER_ID=? where id=?", userId, m.get("ID"));
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+
 }

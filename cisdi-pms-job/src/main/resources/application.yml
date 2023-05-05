@@ -115,12 +115,20 @@ logging:
     com.itcodai.course03.dao: trace
 
 dealt_work_job:
+  mq:
+    #测试环境
+    username: yazhoubayusercenter
+    password: fb7614f9ed314a9285bc502dd24d3e2a
+    broker: tcp://59.50.38.27:1663
+    remind_add_topic: /api/v1/remind/add
+    remind_read_topic: /api/v1/remind/read
   request:
     path: https://portal.test.yzbays.cn
   response:
     hearder_parame: A2VvMvqa9+swnBswZ/ZB+Vj2TiqCzv3ouY1/xymoAgU=
   callback_url: http://139.159.138.11:9090/pc/unifiedLogin?redirect=/pc/process&activeName=2
   app_name: "工程项目信息协同系统"
+  app_id: 61efaced4141ed89deeecbdb
 #  ture： 真实电话   false： 测试电话
   phone_switch: false
 #  待办事项开关   true：开  false：关
@@ -144,6 +152,8 @@ jodconverter:
 history-data:
   #合同文件路径前缀
   contract-path-prefix: C:\Users\11376\Desktop\合约模板\20230217
+  #项目导入文件路径前缀
+  prj-path-prefix: C:\Users\11376\Desktop\项目模板\20230224
   #请求地址(测试)
   requestPath: http://139.159.138.11:9090/qygly-api/qygly-gateway/qygly-file/uploadFile
   #文件上传参数

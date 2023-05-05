@@ -1,10 +1,15 @@
 package com.cisdi.pms.job.dealtWork;
 
-import cn.hutool.core.util.IdUtil;
+import com.cisdi.pms.job.config.MqttConfig;
+import com.cisdi.pms.job.utils.DealtWorkUtil;
 import com.cisdi.pms.job.utils.RestTemplateUtils;
 import com.cisdi.pms.job.utils.StringUtils;
 import com.cisdi.pms.job.utils.Util;
+import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +34,11 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class dealtWorkJob {
+    @Value("${dealt_work_job.mq.username}")
+    private String username;
+
+    @Value("${dealt_work_job.mq.password}")
+    private String password;
 
     @Value("${dealt_work_job.request.path}")
     private String requestPath;
@@ -54,15 +64,17 @@ public class dealtWorkJob {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private MqttConfig mqttConfig;
 
-    // TODO 2023-01-17 先注释掉处理下面的代办的定时任务
+
      @Scheduled(fixedDelayString = "300000")
-//    @Scheduled(cron = "20 43 9 ? * *")
+//    @Scheduled(fixedDelayString = "10000000")
     public void handleDealt() {
 
         if (!dealtSwitch) return;
 
-        // 锁表  防止多台服务器同时修改
+        // 锁表  防止多台服务器同时修改1
         String lockSql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code='DEALT_INFO_LOCK' and (t.LOCK_EXT_DTTM_ATT01_VAL is null or t.LOCK_EXT_DTTM_ATT01_VAL <= ADDDATE(NOW(),INTERVAL -10 minute))";
         int lock = jdbcTemplate.update(lockSql);
 
@@ -74,9 +86,12 @@ public class dealtWorkJob {
                 // 旧待办变为已读
                 String queryDealt = "select APP_ID appId,USER_ID userId,MSG_ID msgId from dealt_task_info where REMARK = '0'";
                 List<Map<String, Object>> queryDealtMaps = jdbcTemplate.queryForList(queryDealt);
+                MqttClient client = DealtWorkUtil.getClient(mqttConfig);
                 for (Map<String, Object> queryDealtMap : queryDealtMaps) {
-                    dealtRead(queryDealtMap.get("appId").toString(), queryDealtMap.get("userId").toString(), queryDealtMap.get("msgId").toString());
+                    //调用 更新为已读接口
+                    DealtWorkUtil.readRemind(JdbcMapUtil.getString(queryDealtMap,"msgId"),client,mqttConfig);
                 }
+
 
                 // 获取dealt_task_info 中remark为0的数据  变成为1 新增数据
                 String updateDealt = "update dealt_task_info set REMARK = '1' where REMARK = '0'";
@@ -88,7 +103,8 @@ public class dealtWorkJob {
                 List<Map<String, Object>> info = jdbcTemplate.queryForList(sql, "0", "TODO");
 
                 // 添加待办事项
-                info.stream().forEach(map -> newAddDealt(map));
+                info.stream().forEach(map -> newAddDealt(map,client));
+                DealtWorkUtil.disconnect(client);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -182,7 +198,7 @@ public class dealtWorkJob {
      * @param map msgId(ID) | WF_PROCESS_INSTANCE_ID | AD_USER_ID
      * @return
      */
-    private void newAddDealt(Map<String, Object> map) {
+    private void newAddDealt(Map<String, Object> map,MqttClient client) {
         // 获取平台方的用户id
         String userIdSql = "select USER_ID from dealt_user_info where AD_USER_ID = ?";
         List<String> list = jdbcTemplate.queryForList(userIdSql, String.class, map.get("AD_USER_ID"));
@@ -200,42 +216,18 @@ public class dealtWorkJob {
         // 内容        您好，截至“2022年12月1日-08:06:20”，4个流程待办已到您处，请尽快处理
         String content = "[工程项目信息协同系统]您好：截至“" + time + "”，" + map.get("num") + "个流程待办已到您处，请尽快处理";
         // 标题
-        String titel = "【工程项目信息协同系统】流程待办提醒";
+        String title = "【工程项目信息协同系统】流程待办提醒";
 
         String dealtTaskInfoIdS = Util.insertData(jdbcTemplate, "dealt_task_info");
         // 此处还需要本地加一张待办表，将代办信息保存,后续修改为已读时需要
         String insetSql = "update dealt_task_info set REMARK=?, APP_NAME=?,CONTENT=?,CALL_BACK_URL=? where ID = ?";
-        jdbcTemplate.update(insetSql, "0", appName, content, callbackUrl
-                , dealtTaskInfoIdS);
+        jdbcTemplate.update(insetSql, "0", appName, content, callbackUrl, dealtTaskInfoIdS);
 
-        Map<String, Object> requestParams = new HashMap<>();
-        // 用户id
-        requestParams.put("userId", list.get(0));
-        // 消息id
-        requestParams.put("msgId", IdUtil.getSnowflakeNextId());
-        // 标题
-        requestParams.put("title", titel);
-        // 平台名称
-        requestParams.put("appName", appName);
-        // 内容
-        requestParams.put("content", content);
-        // 跳转页面
-        requestParams.put("callbackUrl", callbackUrl);
-
-        // 设置请求头
-        Map<String, String> headers = getHeaders();
-
-        // url https://portal.test.yzbays.cn/api/v1/remind
-        String url = requestPath + "/api/v1/remind";
-
-        // 此处会返回平台id（APP_ID）需要保存
-        ResponseEntity<Map> result = RestTemplateUtils.put(url, headers, requestParams, Map.class);
-        Map<String, Object> data = (Map<String, Object>) result.getBody().get("data");
-
+        //调用 添加代办接口
+        Map<String, Object> result = DealtWorkUtil.addRemind(list.get(0), title, content,client,mqttConfig);
         // 保存APP_ID
-        String idSql = "update dealt_task_info set APP_ID=? ,MSG_ID = ?, USER_ID=? where ID = ?";
-        jdbcTemplate.update(idSql, data.get("id"), data.get("msgId"), list.get(0)
-                , dealtTaskInfoIdS);
+        String idSql = "update dealt_task_info set MSG_ID = ?, USER_ID=? where ID = ?";
+        jdbcTemplate.update(idSql, result.get("id"), list.get(0), dealtTaskInfoIdS);
 
     }
 

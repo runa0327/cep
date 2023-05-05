@@ -5,6 +5,7 @@ import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.PmRoster;
 import com.cisdi.ext.model.PostInfo;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.PrjPlanUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -31,21 +32,22 @@ import java.util.stream.Collectors;
  */
 public class PmRosterExt {
 
-    public static final Map<String,String> postDeptMap = new HashMap<>();
+    public static final Map<String, String> postDeptMap = new HashMap<>();
+
     static {
-        postDeptMap.put("AD_USER_TWELVE_ID","前期管理部");
-        postDeptMap.put("AD_USER_THIRTEEN_ID","前期管理部");
-        postDeptMap.put("AD_USER_FOURTEEN_ID","前期管理部");
-        postDeptMap.put("AD_USER_FIFTEEN_ID","前期管理部");
-        postDeptMap.put("AD_USER_SIXTEEN_ID","前期管理部");
-        postDeptMap.put("AD_USER_EIGHTEEN_ID","成本合约部");
-        postDeptMap.put("AD_USER_NINETEEN_ID","成本合约部");
-        postDeptMap.put("AD_USER_TWENTY_ID","成本合约部");
-        postDeptMap.put("AD_USER_TWENTY_ONE_ID","采购管理部");
-        postDeptMap.put("AD_USER_TWENTY_TWO_ID","设计管理部");
-        postDeptMap.put("AD_USER_TWENTY_THREE_ID","工程管理部");
-        postDeptMap.put("AD_USER_TWENTY_FOUR_ID","工程管理部");
-        postDeptMap.put("AD_USER_TWENTY_FIVE_ID","财务金融部");
+        postDeptMap.put("AD_USER_TWELVE_ID", "前期管理部");
+        postDeptMap.put("AD_USER_THIRTEEN_ID", "前期管理部");
+        postDeptMap.put("AD_USER_FOURTEEN_ID", "前期管理部");
+        postDeptMap.put("AD_USER_FIFTEEN_ID", "前期管理部");
+        postDeptMap.put("AD_USER_SIXTEEN_ID", "前期管理部");
+        postDeptMap.put("AD_USER_EIGHTEEN_ID", "成本合约部");
+        postDeptMap.put("AD_USER_NINETEEN_ID", "成本合约部");
+        postDeptMap.put("AD_USER_TWENTY_ID", "成本合约部");
+        postDeptMap.put("AD_USER_TWENTY_ONE_ID", "采购管理部");
+        postDeptMap.put("AD_USER_TWENTY_TWO_ID", "设计管理部");
+        postDeptMap.put("AD_USER_TWENTY_THREE_ID", "工程管理部");
+        postDeptMap.put("AD_USER_TWENTY_FOUR_ID", "工程管理部");
+        postDeptMap.put("AD_USER_TWENTY_FIVE_ID", "财务金融部");
     }
 
     /**
@@ -68,7 +70,7 @@ public class PmRosterExt {
         sb.append(" limit ").append(start).append(",").append(pageSize);
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //header
-        List<Map<String, Object>> strList = myJdbcTemplate.queryForList("select po.`NAME` as PROJECT_POST from PM_ROSTER pr left join post_info po on pr.POST_INFO_ID = po.id where POST_INFO_ID is not null group by po.id");
+        List<Map<String, Object>> strList = myJdbcTemplate.queryForList("select po.`NAME` as PROJECT_POST from PM_ROSTER pr left join post_info po on pr.POST_INFO_ID = po.id where POST_INFO_ID is not null AND po.`NAME` is not null group by po.id");
         List<String> headerList = strList.stream().map(p -> JdbcMapUtil.getString(p, "PROJECT_POST")).collect(Collectors.toList());
         headerList.add(0, "项目名称");
         headerList.add("ID");
@@ -279,6 +281,8 @@ public class PmRosterExt {
             queryParams.put("ancestral", projectPostUser.ancestral);
             myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID= :userId,ANCESTRAL=:ancestral where POST_INFO_ID= :postId and PM_PRJ_ID in (:ids) ", queryParams);
         }
+        //刷新项目的进度节点用户
+        dataList.forEach(PrjPlanUtil::refreshProPlanUser);
     }
 
 
@@ -291,8 +295,8 @@ public class PmRosterExt {
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from post_info where id in(select POST_INFO_ID from PM_ROSTER where PM_PRJ_ID=?)", map.get("projectId"));
         List<Post> postList = list.stream().map(p -> {
             Post post = new Post();
-            post.id = JdbcMapUtil.getString(p,"ID");
-            post.name = JdbcMapUtil.getString(p,"NAME");
+            post.id = JdbcMapUtil.getString(p, "ID");
+            post.name = JdbcMapUtil.getString(p, "NAME");
             return post;
         }).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(postList)) {
@@ -343,6 +347,7 @@ public class PmRosterExt {
                 myJdbcTemplate.update("update PM_ROSTER set AD_USER_ID =?,ancestral=? where post_info_id=? and PM_PRJ_ID=?", postUser.userId, postUser.ancestral, postUser.postId, editObj.projectId);
             }
         }
+        PrjPlanUtil.refreshProPlanUser(editObj.projectId);
     }
 
 
@@ -558,9 +563,9 @@ public class PmRosterExt {
     /**
      * 岗位指派流程完结-数据写入
      *
-     * @param entityRecord   数据值
-     * @param projectId      项目id
-     * @param map            岗位指派流程字段与岗位对应关系 key：流程表单字段 value：岗位名称
+     * @param entityRecord 数据值
+     * @param projectId    项目id
+     * @param map          岗位指派流程字段与岗位对应关系 key：流程表单字段 value：岗位名称
      */
     public static void createDataByProcess(EntityRecord entityRecord, String projectId, Map<String, String> map) {
         List<PmRoster> insertList = new ArrayList<>();
@@ -570,11 +575,11 @@ public class PmRosterExt {
             String valueUser = JdbcMapUtil.getString(entityRecord.valueMap, key);
             if (!SharedUtil.isEmptyString(valueUser)) {
                 String value = map.get(key);
-                String postId = PostInfo.selectByWhere(new Where().eq(PostInfo.Cols.SYS_TRUE,"1")
-                        .eq(PostInfo.Cols.STATUS,"AP").eq(PostInfo.Cols.NAME,value)).get(0).getId();
+                String postId = PostInfo.selectByWhere(new Where().eq(PostInfo.Cols.SYS_TRUE, "1")
+                        .eq(PostInfo.Cols.STATUS, "AP").eq(PostInfo.Cols.NAME, value)).get(0).getId();
                 //部门id查询
                 String deptName = getDeptNameByCode(key);
-                String deptId = HrDept.selectByWhere(new Where().eq(HrDept.Cols.CUSTOMER_UNIT,customerUnit).eq(HrDept.Cols.NAME,deptName)).get(0).getHrDeptPid();
+                String deptId = HrDept.selectByWhere(new Where().eq(HrDept.Cols.CUSTOMER_UNIT, customerUnit).eq(HrDept.Cols.NAME, deptName)).get(0).getHrDeptPid();
                 PmRoster pmRoster = new PmRoster();
                 pmRoster.setPmPrjId(projectId);
                 pmRoster.setAdUserId(valueUser);
@@ -605,13 +610,14 @@ public class PmRosterExt {
 
     /**
      * 获取部门名称
+     *
      * @param key 流程字段code
      * @return 部门名称
      */
     private static String getDeptNameByCode(String key) {
         String deptName = "";
-        for (String tmp : PmRosterExt.postDeptMap.keySet()){
-            if (key.equals(tmp)){
+        for (String tmp : PmRosterExt.postDeptMap.keySet()) {
+            if (key.equals(tmp)) {
                 deptName = PmRosterExt.postDeptMap.get(tmp);
             }
         }
@@ -620,31 +626,32 @@ public class PmRosterExt {
 
     /**
      * 通过流程岗位id和业主单位id查询
-     * @param deptId 流程岗位id
+     *
+     * @param deptId    流程岗位id
      * @param companyId 业主单位id
      * @param projectId 项目id
      * @return 项目岗位人员id
      */
     public static List<String> getDeptUserByDept(List<String> deptId, String companyId, String projectId) {
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
-        Map<String,Object> map = new HashMap<>();
-        map.put("ids",deptId);
-        map.put("companyId",companyId);
+        Map<String, Object> map = new HashMap<>();
+        map.put("ids", deptId);
+        map.put("companyId", companyId);
         List<String> userList = new ArrayList<>();
         String user;
         String[] arr = projectId.split(",");
         for (String prjId : arr) {
-            map.put("prjId",prjId);
+            map.put("prjId", prjId);
             String sql = "select a.AD_USER_ID FROM PM_ROSTER a " +
                     "LEFT JOIN post_info B ON A.POST_INFO_ID = B.ID " +
                     "LEFT JOIN PM_POST_PROPRJ C ON B.ID = C.POST_INFO_ID " +
                     "WHERE a.PM_PRJ_ID = :prjId and a.CUSTOMER_UNIT = :companyId AND C.BASE_PROCESS_POST_ID in (:ids) AND A.STATUS = 'AP' AND B.STATUS = 'AP' AND C.STATUS = 'AP' and a.ad_user_id != '1641281525532323840'";
-            List<Map<String,Object>> list = myNamedParameterJdbcTemplate.queryForList(sql,map);
-            if (!CollectionUtils.isEmpty(list)){
+            List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sql, map);
+            if (!CollectionUtils.isEmpty(list)) {
                 for (Map<String, Object> tmp : list) {
-                    user = JdbcMapUtil.getString(tmp,"AD_USER_ID");
-                    if (!SharedUtil.isEmptyString(user)){
-                        if (!userList.contains(user)){
+                    user = JdbcMapUtil.getString(tmp, "AD_USER_ID");
+                    if (!SharedUtil.isEmptyString(user)) {
+                        if (!userList.contains(user)) {
                             userList.add(user);
                         }
                     }
@@ -657,25 +664,26 @@ public class PmRosterExt {
 
     /**
      * 流程完结后更新项目花名册人员
+     *
      * @param rosterList 人员信息
      */
     public static void updatePrjUser(List<PmRoster> rosterList) {
-        if (!CollectionUtils.isEmpty(rosterList)){
+        if (!CollectionUtils.isEmpty(rosterList)) {
             for (PmRoster tmp : rosterList) {
-                List<PmRoster> list = PmRoster.selectByWhere(new Where().eq(PmRoster.Cols.PM_PRJ_ID,tmp.getPmPrjId())
-                        .eq(PmRoster.Cols.CUSTOMER_UNIT,tmp.getCustomerUnit())
-                        .eq(PmRoster.Cols.POST_INFO_ID,tmp.getPostInfoId()));
+                List<PmRoster> list = PmRoster.selectByWhere(new Where().eq(PmRoster.Cols.PM_PRJ_ID, tmp.getPmPrjId())
+                        .eq(PmRoster.Cols.CUSTOMER_UNIT, tmp.getCustomerUnit())
+                        .eq(PmRoster.Cols.POST_INFO_ID, tmp.getPostInfoId()));
                 String id;
-                if (CollectionUtils.isEmpty(list)){
+                if (CollectionUtils.isEmpty(list)) {
                     id = Crud.from("PM_ROSTER").insertData();
                 } else {
                     id = list.get(0).getId();
                 }
-                Crud.from("PM_ROSTER").where().eq("id",id).update()
-                        .set("CUSTOMER_UNIT",tmp.getCustomerUnit())
-                        .set("PM_PRJ_ID",tmp.getPmPrjId())
-                        .set("POST_INFO_ID",tmp.getPostInfoId())
-                        .set("AD_USER_ID",tmp.getAdUserId())
+                Crud.from("PM_ROSTER").where().eq("id", id).update()
+                        .set("CUSTOMER_UNIT", tmp.getCustomerUnit())
+                        .set("PM_PRJ_ID", tmp.getPmPrjId())
+                        .set("POST_INFO_ID", tmp.getPostInfoId())
+                        .set("AD_USER_ID", tmp.getAdUserId())
                         .exec();
             }
         }

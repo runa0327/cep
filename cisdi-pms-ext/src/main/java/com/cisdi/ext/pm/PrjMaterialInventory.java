@@ -1,10 +1,7 @@
 package com.cisdi.ext.pm;
 
 import com.alibaba.fastjson.JSONObject;
-import com.cisdi.ext.model.MaterialInventoryType;
-import com.cisdi.ext.model.PmPrj;
-import com.cisdi.ext.model.PrjInventory;
-import com.cisdi.ext.model.PrjInventoryDetail;
+import com.cisdi.ext.model.*;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
@@ -15,6 +12,7 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
@@ -34,26 +32,10 @@ public class PrjMaterialInventory {
      */
     public void initPrjInventory() {
         List<PmPrj> pmPrjs = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.STATUS, "AP"));
-        List<MaterialInventoryType> materialInventoryTypes = MaterialInventoryType.selectByWhere(new Where().eq(MaterialInventoryType.Cols.STATUS,
-                "AP"));
+        List<MaterialInventoryType> materialInventoryTypes = MaterialInventoryType.selectByWhere(new Where().eq(MaterialInventoryType.Cols.STATUS, "AP"));
         List<PrjInventory> prjInventories = PrjInventory.selectByWhere(new Where().eq(PrjInventory.Cols.STATUS, "AP"));
         for (PmPrj pmPrj : pmPrjs) {
-            for (MaterialInventoryType type : materialInventoryTypes) {
-                //如果该条项目清单已有，跳过
-                if (!CollectionUtils.isEmpty(prjInventories)) {
-                    Optional<PrjInventory> opPrjInventory = prjInventories.stream()
-                            .filter(prjInventory -> prjInventory.getPmPrjId().equals(pmPrj.getId()) && prjInventory.getMaterialInventoryTypeId().equals(type.getId()))
-                            .findAny();
-                    if (opPrjInventory.isPresent()) {
-                        log.info("跳过" + pmPrj.getName() + type.getName());
-                        continue;
-                    }
-                }
-                //没有该条项目清单，插入
-                PrjInventory prjInventory = PrjInventory.newData();
-                prjInventory.setPmPrjId(pmPrj.getId()).setMaterialInventoryTypeId(type.getId()).setIsInvolved(true);
-                prjInventory.insertById();
-            }
+            doAddPrjInventory(pmPrj,materialInventoryTypes,prjInventories);
         }
     }
 
@@ -267,6 +249,102 @@ public class PrjMaterialInventory {
     }
 
     /**
+     * 提供给外部的，为项目添加清单
+     * @param prjId
+     */
+    public static void addPrjInventory(String prjId){
+        //项目对象
+        PmPrj pmPrj = PmPrj.selectById(prjId);
+        //清单类型
+        List<MaterialInventoryType> materialInventoryTypes = MaterialInventoryType.selectByWhere(new Where().eq(MaterialInventoryType.Cols.STATUS, "AP"));
+        //所有的项目清单
+        List<PrjInventory> prjInventories = PrjInventory.selectByWhere(new Where().eq(PrjInventory.Cols.STATUS, "AP"));
+
+        doAddPrjInventory(pmPrj,materialInventoryTypes,prjInventories);
+    }
+
+    /**
+     * 真正添加项目清单
+     * @param pmPrj 项目实体
+     * @param materialInventoryTypes 清单类型集合
+     * @param prjInventories 已有的项目清单
+     */
+    public static void doAddPrjInventory(PmPrj pmPrj,List<MaterialInventoryType> materialInventoryTypes,List<PrjInventory> prjInventories){
+        for (MaterialInventoryType type : materialInventoryTypes) {
+            //如果该条项目清单已有，跳过
+            if (!CollectionUtils.isEmpty(prjInventories)) {
+                Optional<PrjInventory> opPrjInventory = prjInventories.stream()
+                        .filter(prjInventory -> prjInventory.getPmPrjId().equals(pmPrj.getId()) && prjInventory.getMaterialInventoryTypeId().equals(type.getId()))
+                        .findAny();
+                if (opPrjInventory.isPresent()) {
+                    log.info("跳过" + pmPrj.getName() + type.getName());
+                    continue;
+                }
+            }
+            //没有该条项目清单，插入
+            PrjInventory prjInventory = PrjInventory.newData();
+            prjInventory.setPmPrjId(pmPrj.getId()).setMaterialInventoryTypeId(type.getId()).setIsInvolved(true);
+            prjInventory.insertById();
+        }
+    }
+
+    /**
+     * @param prjId 项目id
+     * @param processId 流程id
+     * @param processIncId 流程实例id
+     */
+    public static void addInventoryDtl(String prjId,String processId,String processIncId){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //流程实例
+        WfProcessInstance processInc = WfProcessInstance.selectById(processIncId);
+        //找出流程中需要映射的字段名
+        List<Map<String, Object>> attMaps = myJdbcTemplate.queryForList("select a.code attCode,ea.id entAttId from material_inventory_type t \n" +
+                "left join ad_ent_att ea on ea.id = t.AD_ENT_ATT_V_ID\n" +
+                "left join ad_att a on a.id = ea.AD_ATT_ID\n" +
+                "where t.WF_PROCESS_ID = ?", processId);
+        if (CollectionUtils.isEmpty(attMaps)){//没有对应的清单字段
+            return;
+        }
+        List<Attribute> attributes = attMaps.stream().map(attMap -> JSONObject.parseObject(JSONObject.toJSONString(attMap), Attribute.class)).collect(Collectors.toList());
+
+        //申请单
+        List<Map<String, Object>> applyDataMaps = myJdbcTemplate.queryForList("select * from " + processInc.getEntCode() + " where id = ?", processInc.getEntityRecordId());
+        if (CollectionUtils.isEmpty(applyDataMaps)){
+            return;
+        }
+        Map<String, Object> applyData = applyDataMaps.get(0);
+
+        for (Attribute att : attributes) {
+            //项目清单id
+            List<Map<String, Object>> prjInventoryIdMaps = myJdbcTemplate.queryForList("select i.id from prj_inventory i \n" +
+                    "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
+                    "where i.PM_PRJ_ID = ? and t.AD_ENT_ATT_V_ID = ? and WF_PROCESS_ID = ?", prjId, att.entAttId, processId);
+            if (CollectionUtils.isEmpty(prjInventoryIdMaps)){
+                continue;
+            }
+
+            for (Map<String, Object> prjInventoryIdMap : prjInventoryIdMaps) {
+                String prjInventoryId = JdbcMapUtil.getString(prjInventoryIdMap, "id");
+
+                //从申请单取出字段值(文件ids)
+                String fileIds = JdbcMapUtil.getString(applyData, att.attCode);
+                if (Strings.isNullOrEmpty(fileIds)){//字段为空，跳过
+                    continue;
+                }
+                String[] fileIdArr = fileIds.split(",");
+                for (String fileId : fileIdArr) {
+                    //插入清单明细
+                    PrjInventoryDetail prjInventoryDetail = PrjInventoryDetail.newData();
+                    prjInventoryDetail.setPrjInventoryId(prjInventoryId);
+                    prjInventoryDetail.setFlFileId(fileId);
+                    prjInventoryDetail.setWfProcessInstanceId(processIncId);
+                    prjInventoryDetail.insertById();
+                }
+            }
+        }
+    }
+
+    /**
      * 列表请求入参
      */
     @Data
@@ -275,7 +353,7 @@ public class PrjMaterialInventory {
         private Integer pageSize;
         private Integer pageIndex;
     }
-    
+
     @Data
     private static class ListResp {
         private List<InventoryData> inventoryDataList;
@@ -339,9 +417,19 @@ public class PrjMaterialInventory {
         private Integer total;
     }
 
+    private static class Attribute{
+        //属性代码
+        private String attCode;
+        //实体属性id
+        private String entAttId;
+    }
+
 
     public static void main(String[] args) {
-        
+        ArrayList<Object> list = new ArrayList<>();
+        list.add(null);
+        list.add(null);
+        System.out.println(list);
     }
 
 

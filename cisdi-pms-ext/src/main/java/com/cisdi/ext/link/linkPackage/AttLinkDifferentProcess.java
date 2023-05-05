@@ -175,6 +175,7 @@ public class AttLinkDifferentProcess {
         list.add("PM_PRJ_REQ"); //立项申请审批
         list.add("PM_PRJ_INVEST1"); //可研报告审批
         list.add("PM_PRJ_INVEST2"); //初设概算审批
+        list.add("PM_PRJ_RED_CHECK_REQ"); //项目红线核查
         list.add("PM_TERMITE_CONTROL_REQ"); //白蚁防治
         list.add("PIPELINE_RELOCATION_REQ"); //管线迁改
         return list;
