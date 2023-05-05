@@ -366,18 +366,26 @@ public class PmExt {
     }
 
 
+    /**
+     * 取数逻辑  启动填写<匡算<概算<预算<财评<结算
+     * @param projectId
+     * @return
+     */
     public String getPrjInvest(String projectId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pie.id,round(ifnull(pie.PRJ_TOTAL_INVEST,0)/10000,2) as amt ,gsv.code from pm_invest_est pie  " +
                 "left join  gr_set_value gsv on gsv.id = pie.INVEST_EST_TYPE_ID " +
                 "where PM_PRJ_ID=? and PRJ_TOTAL_INVEST<>0 order by gsv.`CODE` desc limit 0,1  ", projectId);
         if (CollectionUtils.isEmpty(list)) {
+            List<Map<String, Object>> startList = myJdbcTemplate.queryForList("select round(ifnull(PRJ_TOTAL_INVEST,0)/10000,2) PRJ_TOTAL_INVEST from  prj_start where PM_CODE= (select PM_CODE from pm_prj where id=?)", projectId);
+            if (!CollectionUtils.isEmpty(startList)) {
+                return String.valueOf(startList.get(0).get("PRJ_TOTAL_INVEST"));
+            }
             return "0";
         } else {
             return String.valueOf(list.get(0).get("amt"));
         }
     }
-
 
     public static class PrjRequestParam {
         public String name;
