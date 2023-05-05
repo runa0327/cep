@@ -1431,4 +1431,14 @@ public class ProPlanExt {
         public String progressStatusId;
         public String progressStatusName;
     }
+
+
+    /**
+     * 隐藏显示二级节点
+     */
+    public void displaySecondLevel() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        myJdbcTemplate.update("update PM_PRO_PLAN_NODE set IZ_DISPLAY=? where id=?", map.get("izDisplay"), map.get("nodeId"));
+    }
 }
