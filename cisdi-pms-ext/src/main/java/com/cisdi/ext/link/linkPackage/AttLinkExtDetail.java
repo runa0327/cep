@@ -957,6 +957,9 @@ public class AttLinkExtDetail {
     public static void selectPostAppointLink(AttLinkResult attLinkResult, String attValue, MyJdbcTemplate myJdbcTemplate) {
         String sql = "select a.*,b.id as projectId from PRJ_START a left join pm_prj b on a.PM_CODE = b.PM_CODE where b.id = ?";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,attValue);
+        if (CollectionUtils.isEmpty(list)){
+            list = myJdbcTemplate.queryForList("select *,id projectId,ESTIMATED_TOTAL_INVEST PRJ_TOTAL_INVEST from pm_prj where id = ?", attValue);
+        }
         if (!CollectionUtils.isEmpty(list)){
             //业主单位
             String companyId = JdbcMapUtil.getString(list.get(0), "BUILDER_UNIT");
