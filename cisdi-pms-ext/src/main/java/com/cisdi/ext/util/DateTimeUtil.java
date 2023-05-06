@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -256,4 +258,87 @@ public class DateTimeUtil {
         return Integer.parseInt(String.valueOf(between_days));
     }
 
+    /**
+     * 获取当前所在周的开始和结束时间 第一天从周五开始算
+     * @param date 当前时间
+     * @return 本周第一天和最后一天集合
+     */
+    public static Map<String, Object> getDateWeekMap(Date date) {
+        Map<String,Object> map = new HashMap<>();
+        int week = getWeekDay(date);
+        Date start = date;
+        Date end = date;
+        if (week == 1){
+            start = addDays(date,-3);
+            end = addDays(date,3);
+        } else if ( week == 2){
+            start = addDays(date,-4);
+            end = addDays(date,2);
+        } else if ( week == 3){
+            start = addDays(date,-5);
+            end = addDays(date,1);
+        } else if ( week == 4){
+            start = addDays(date,-6);
+        } else if ( week == 5){
+            end = addDays(date,6);
+        } else if ( week == 6){
+            start = addDays(date,-1);
+            end = addDays(date,5);
+        } else if ( week == 0){
+            start = addDays(date,-2);
+            end = addDays(date,4);
+        }
+        map.put("startDate",dateToString(start));
+        map.put("endDate",dateToString(end));
+        return map;
+    }
+
+    /**
+     * 获取当天在本周中属于第几天。国际日历中周天为第一天为1，周六最后一天为7
+     * @param date 当前时间
+     * @return 第几天
+     */
+    public static int getWeekDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int weekIdx = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+        return weekIdx;
+    }
+
+    /**
+     * 获取当前所在周的开始和结束时间 第一天从周五开始算
+     * @param date 当前时间
+     * @return 本周第一天和最后一天集合
+     */
+    public static Map<String, Object> getDateTwoWeekMap(Date date) {
+        Map<String,Object> map = new HashMap<>();
+        int week = getWeekDay(date);
+        Date start = date;
+        Date end = date;
+        if (week == 1){
+            start = addDays(date,-10);
+            end = addDays(date,10);
+        } else if ( week == 2){
+            start = addDays(date,-11);
+            end = addDays(date,9);
+        } else if ( week == 3){
+            start = addDays(date,-12);
+            end = addDays(date,8);
+        } else if ( week == 4){
+            end = addDays(date,7);
+            start = addDays(date,-13);
+        } else if ( week == 5){
+            start = addDays(date,-7);
+            end = addDays(date,13);
+        } else if ( week == 6){
+            start = addDays(date,-8);
+            end = addDays(date,12);
+        } else if ( week == 0){
+            start = addDays(date,-9);
+            end = addDays(date,11);
+        }
+        map.put("startDate",dateToString(start));
+        map.put("endDate",dateToString(end));
+        return map;
+    }
 }
