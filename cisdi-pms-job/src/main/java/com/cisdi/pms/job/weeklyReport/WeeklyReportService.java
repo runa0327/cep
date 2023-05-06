@@ -407,23 +407,61 @@ public class WeeklyReportService {
         //判断该时间范围内是否已经有进度计划，有，则不进行二次添加
         List<Map<String,Object>> list = jdbcTemplate.queryForList("select * from PM_PROGRESS_WEEKLY where status = 'ap' and FROM_DATE = ? and TO_DATE = ?",startDate,endDate);
         if (CollectionUtils.isEmpty(list)){
+
             String weekId = IdUtil.getSnowflakeNextIdStr();
+
+            //查询该项目最近一次生成周报的数据
+            List<Map<String,Object>> list2 = jdbcTemplate.queryForList("select id from PM_PROGRESS_WEEKLY where status = 'ap' order by FROM_DATE desc limit 1");
+            String lastWeekId = null;
+            if (!CollectionUtils.isEmpty(list2)){
+                lastWeekId = JdbcMapUtil.getString(list2.get(0),"id");
+            }
+
+            //查询所有项目信息
+            List<Map<String,Object>> prjList = jdbcTemplate.queryForList("select DISTINCT a.PM_PRJ_ID AS projectId,b.IZ_START_REQUIRE as izStart,b.IZ_END as izEnd " +
+                    "from pm_roster a left join pm_prj b on a.pm_prj_id = b.id " +
+                    "where a.status = 'ap' and b.status = 'ap'");
+            for (Map<String, Object> tmp : prjList) {
+                String prjId = JdbcMapUtil.getString(tmp,"projectId");
+                String izStart = JdbcMapUtil.getString(tmp,"izStart"); //是否符合开工条件
+                String izEnd = JdbcMapUtil.getString(tmp,"izEnd"); //是否竣工
+                String weekPrjId = IdUtil.getSnowflakeNextIdStr();
+                String weekPrjDetailId = IdUtil.getSnowflakeNextIdStr();
+                //查询该项目最近一次生成周报的数据
+                if (SharedUtil.isEmptyString(lastWeekId)){
+                    String sql3 = "insert into PM_PROGRESS_WEEKLY_PRJ_DETAIL (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PROCESS_REMARK_TEXT,DATE,TO_DATE," +
+                            "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IS_END) " +
+                            "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',null,?,?,null,?,null,null,?,?,null,?,?,?)";
+                    jdbcTemplate.update(sql3,weekPrjDetailId,nowDate,nowDate,nowDate,weekDate,endDate,weekId,startDate,weekPrjId,prjId,izStart,izEnd);
+                } else {
+                    //查询该项目上一周情况
+                    List<Map<String,Object>> list3 = jdbcTemplate.queryForList("select * from pm_progress_weekly_prj_detail where PM_PROGRESS_WEEKLY_ID = ? and status = 'ap' and pm_prj_id = ?",lastWeekId,prjId);
+                    if (CollectionUtils.isEmpty(list3)){
+                        String sql3 = "insert into PM_PROGRESS_WEEKLY_PRJ_DETAIL (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PROCESS_REMARK_TEXT,DATE,TO_DATE," +
+                                "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IS_END) " +
+                                "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',null,?,?,null,?,null,null,?,?,null,?,?,?)";
+                        jdbcTemplate.update(sql3,weekPrjDetailId,nowDate,nowDate,nowDate,weekDate,endDate,weekId,startDate,weekPrjId,prjId,izStart,izEnd);
+                    } else {
+                        String sql3 = "insert into PM_PROGRESS_WEEKLY_PRJ_DETAIL (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PROCESS_REMARK_TEXT,DATE,TO_DATE," +
+                                "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IS_END) " +
+                                "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',?,?,?,null,?,null,?,?,?,?,?,?,?)";
+                        jdbcTemplate.update(sql3,weekPrjDetailId,nowDate,nowDate,nowDate,JdbcMapUtil.getString(list3.get(0),"PROCESS_REMARK_TEXT"),
+                                weekDate,endDate,weekId,JdbcMapUtil.getString(list3.get(0),"VISUAL_PROGRESS"),startDate,weekPrjId,JdbcMapUtil.getString(list3.get(0),"VISUAL_PROGRESS_DESCRIBE"),prjId,izStart,izEnd);
+                    }
+                }
+
+                //写入进度周报项目信息
+                String sql2 = "insert into PM_PROGRESS_WEEKLY_PRJ " +
+                        "(ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PM_PROGRESS_WEEKLY_ID,DATE,PM_PRJ_ID,TO_DATE,SYS_TRUE,FROM_DATE,IS_END,IZ_WRITE) " +
+                        "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',?,?,?,?,?,?,?,'0')";
+                jdbcTemplate.update(sql2,weekPrjId,nowDate,nowDate,nowDate,weekId,weekDate,prjId,endDate,izStart,startDate,izEnd);
+            }
+
+            //写入形象进度周报-周信息
             String sql1 = "insert into PM_PROGRESS_WEEKLY " +
                     "(ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,DATE,TO_DATE,FROM_DATE) " +
                     "values (?,1,?,?,'0099250247095871681',?,'0099250247095871681','AP',?,?,?)";
             jdbcTemplate.update(sql1,weekId,nowDate,nowDate,nowDate,weekDate,endDate,startDate);
-
-            //查询所有项目信息
-            List<Map<String,Object>> prjList = jdbcTemplate.queryForList("select id from pm_prj where status = 'ap'");
-            for (Map<String, Object> tmp : prjList) {
-                String prjId = JdbcMapUtil.getString(tmp,"id");
-                //写入进度周报项目信息
-                String weekPrjId = IdUtil.getSnowflakeNextIdStr();
-                String sql2 = "insert into PM_PROGRESS_WEEKLY_PRJ " +
-                        "(ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PM_PROGRESS_WEEKLY_ID,DATE,PM_PRJ_ID,TO_DATE,SYS_TRUE,FROM_DATE) " +
-                        "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',?,?,?,?,'1',?)";
-                jdbcTemplate.update(sql2,weekPrjId,nowDate,nowDate,nowDate,weekId,weekDate,prjId,endDate,startDate);
-            }
         }
     }
 }
