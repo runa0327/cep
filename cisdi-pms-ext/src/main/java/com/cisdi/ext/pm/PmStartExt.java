@@ -410,6 +410,8 @@ public class PmStartExt {
         PrjPlanUtil.refreshProPlanTime(projectId, JdbcMapUtil.getDate(dataMap, "START_TIME"));
         //发送本周任务
         sendWeekTask(projectId);
+        //为项目添加清单
+        PrjMaterialInventory.addPrjInventory(projectId);
 
     }
 

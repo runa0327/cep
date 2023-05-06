@@ -16,6 +16,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.util.*;
@@ -142,7 +143,6 @@ public class PrjMaterialInventory {
                 "where s.code = 'file_master_list_type' and v.status = 'AP'");
         List<String> headers = headerMaps.stream().map(m -> m.get("name").toString()).collect(Collectors.toList());
 
-        List<Map<String, Object>> originList = new ArrayList<>();
         String orgSql = "select sv.prjId,sv.prjName,sv.masterTypeId,sv.masterTypeName,sv" +
                 ".shouldHave,ah.actualHave,lt.lackTypeName from (\n" +
                 "select i.PM_PRJ_ID prjId,p.name prjName,COUNT(i.MATERIAL_INVENTORY_TYPE_ID) shouldHave,v.name masterTypeName,v.id masterTypeId " +
@@ -177,12 +177,11 @@ public class PrjMaterialInventory {
                 "where i.IS_INVOLVED = 1\n" +
                 "group by i.PM_PRJ_ID,t.FILE_MASTER_INVENTORY_TYPE_ID,t.id\n" +
                 "having count(d.id) = 0\n" +
-                ") temp group by prjId,masterTypeId) lt on lt.prjId = sv.prjId and lt.masterTypeId = sv.masterTypeId where sv.prjId = ?";
-        //给分页后的每个项目组装数据
-        for (String prjId : prjIdList) {
-            List<Map<String, Object>> partOriginList = myJdbcTemplate.queryForList(orgSql, prjId);
-            originList.addAll(partOriginList);
-        }
+                ") temp group by prjId,masterTypeId) lt on lt.prjId = sv.prjId and lt.masterTypeId = sv.masterTypeId where sv.prjId in (:prjIdList) order by sv.prjId desc";
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("prjIdList",prjIdList);
+        List<Map<String, Object>> originList = myNamedParameterJdbcTemplate.queryForList(orgSql,params);
+
         //封装
         Map<String, List<Map<String, Object>>> data = originList.stream().collect(Collectors.groupingBy(item -> item.get("prjId").toString()));
         List<InventoryData> inventoryDataList = new ArrayList<>();//列表数据
@@ -292,7 +291,7 @@ public class PrjMaterialInventory {
      * @param materialInventoryTypes 清单类型集合
      * @param prjInventories 已有的项目清单
      */
-    public static void doAddPrjInventory(PmPrj pmPrj,List<MaterialInventoryType> materialInventoryTypes,List<PrjInventory> prjInventories){
+    private static void doAddPrjInventory(PmPrj pmPrj,List<MaterialInventoryType> materialInventoryTypes,List<PrjInventory> prjInventories){
         for (MaterialInventoryType type : materialInventoryTypes) {
             //如果该条项目清单已有，跳过
             if (!CollectionUtils.isEmpty(prjInventories)) {
@@ -312,14 +311,16 @@ public class PrjMaterialInventory {
     }
 
     /**
-     * @param prjId 项目id
+     * 添加项目清单明细
+     * @param prjIds 项目ids，英文逗号连接
      * @param processId 流程id
      * @param processIncId 流程实例id
      */
-    public static void addInventoryDtl(String prjId,String processId,String processIncId){
-        if (Strings.isNullOrEmpty(prjId)){
-            throw new BaseException("项目id不能为空");
+    public static void addInventoryDtl(String prjIds,String processId,String processIncId){
+        if (Strings.isNullOrEmpty(prjIds)){
+            throw new BaseException("项目ids不能为空");
         }
+
         //先将流程实例对应的清单明细删除，避免重复添加
         PrjInventoryDetail.deleteByWhere(new Where().eq(PrjInventoryDetail.Cols.WF_PROCESS_INSTANCE_ID,processIncId));
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
@@ -342,31 +343,34 @@ public class PrjMaterialInventory {
         }
         Map<String, Object> applyData = applyDataMaps.get(0);
 
-        for (Attribute att : attributes) {
-            //项目清单id
-            List<Map<String, Object>> prjInventoryIdMaps = myJdbcTemplate.queryForList("select i.id from prj_inventory i \n" +
-                    "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
-                    "where i.PM_PRJ_ID = ? and t.AD_ENT_ATT_V_ID = ? and WF_PROCESS_ID = ?", prjId, att.entAttId, processId);
-            if (CollectionUtils.isEmpty(prjInventoryIdMaps)){
-                continue;
-            }
-
-            for (Map<String, Object> prjInventoryIdMap : prjInventoryIdMaps) {
-                String prjInventoryId = JdbcMapUtil.getString(prjInventoryIdMap, "id");
-
-                //从申请单取出字段值(文件ids)
-                String fileIds = JdbcMapUtil.getString(applyData, att.attCode);
-                if (Strings.isNullOrEmpty(fileIds)){//字段为空，跳过
+        String[] prjIdArr = prjIds.split(",");
+        for (String prjId : prjIdArr) {//每个项目
+            for (Attribute att : attributes) {
+                //项目清单id
+                List<Map<String, Object>> prjInventoryIdMaps = myJdbcTemplate.queryForList("select i.id from prj_inventory i \n" +
+                        "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
+                        "where i.PM_PRJ_ID = ? and t.AD_ENT_ATT_V_ID = ? and WF_PROCESS_ID = ?", prjId, att.entAttId, processId);
+                if (CollectionUtils.isEmpty(prjInventoryIdMaps)){
                     continue;
                 }
-                String[] fileIdArr = fileIds.split(",");
-                for (String fileId : fileIdArr) {
-                    //插入清单明细
-                    PrjInventoryDetail prjInventoryDetail = PrjInventoryDetail.newData();
-                    prjInventoryDetail.setPrjInventoryId(prjInventoryId);
-                    prjInventoryDetail.setFlFileId(fileId);
-                    prjInventoryDetail.setWfProcessInstanceId(processIncId);
-                    prjInventoryDetail.insertById();
+
+                for (Map<String, Object> prjInventoryIdMap : prjInventoryIdMaps) {
+                    String prjInventoryId = JdbcMapUtil.getString(prjInventoryIdMap, "id");
+
+                    //从申请单取出字段值(文件ids)
+                    String fileIds = JdbcMapUtil.getString(applyData, att.attCode);
+                    if (Strings.isNullOrEmpty(fileIds)){//字段为空，跳过
+                        continue;
+                    }
+                    String[] fileIdArr = fileIds.split(",");
+                    for (String fileId : fileIdArr) {
+                        //插入清单明细
+                        PrjInventoryDetail prjInventoryDetail = PrjInventoryDetail.newData();
+                        prjInventoryDetail.setPrjInventoryId(prjInventoryId);
+                        prjInventoryDetail.setFlFileId(fileId);
+                        prjInventoryDetail.setWfProcessInstanceId(processIncId);
+                        prjInventoryDetail.insertById();
+                    }
                 }
             }
         }
