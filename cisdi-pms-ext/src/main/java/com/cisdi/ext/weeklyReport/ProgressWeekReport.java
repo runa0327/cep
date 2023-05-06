@@ -208,6 +208,50 @@ public class ProgressWeekReport {
      * 形象进度工程周报-填写-填报记录-项目列表
      */
     public void getUserHistory(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        // 获取输入：
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        PmPrjView param = JsonUtil.fromJson(json,PmPrjView.class);
+        if (param.pageIndex == 0 || param.pageSize == 0) {
+            throw new BaseException("分页参数不能必须大于0");
+        }
+        // 起始条数
+        int start = (param.pageIndex - 1) * param.pageSize;
+        String limit = "limit " + start + "," + param.pageSize;
+
+        //获取当前登录用户
         String userId = ExtJarHelper.loginInfo.get().userId;
+        String projectName = param.projectName;
+        String projectId = param.projectId;
+
+        String sql1 = "select distinct a.pm_prj_id,c.name,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted f" +
+                "rom PM_ROSTER a left join POST_INFO b on a.POST_INFO_ID = b.id LEFT JOIN pm_prj c on a.PM_PRJ_ID = c.id " +
+                "where b.code = 'AD_USER_TWENTY_THREE_ID' and a.AD_USER_ID = ? and a.status = 'ap'";
+        StringBuilder sb = new StringBuilder(sql1);
+        if (!SharedUtil.isEmptyString(projectName)){
+            sb.append(" and c.name like ('%").append(projectName).append("%') ");
+        }
+        StringBuilder sb2 = new StringBuilder(sb);
+        sb.append(" order by c.IZ_START_REQUIRE desc,c.IZ_END asc,a.pm_prj_id desc").append(limit);
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString(),userId);
+        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sb2.toString(),userId);
+        if (!CollectionUtils.isEmpty(list1)){
+            Map<String, Object> map1 = new HashMap<>();
+            List<PmPrjView> list = list1.stream().map(p->{
+                PmPrjView pmPrjView = new PmPrjView();
+                pmPrjView.id = JdbcMapUtil.getString(p,"pm_prj_id");
+                pmPrjView.projectName = JdbcMapUtil.getString(p,"name");
+                pmPrjView.weatherStart = JdbcMapUtil.getInt(p,"weatherStart");
+                pmPrjView.weatherCompleted = JdbcMapUtil.getInt(p,"weatherCompleted");
+                return pmPrjView;
+            }).collect(Collectors.toList());
+            map1.put("result", list);
+            map1.put("total", list2.size());
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(map1), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        } else {
+            ExtJarHelper.returnValue.set(null);
+        }
     }
 }
