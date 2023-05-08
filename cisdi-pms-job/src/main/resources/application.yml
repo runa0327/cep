@@ -160,3 +160,10 @@ history-data:
   sevId: "0099799190825106248"
   fileGroupAttCode: FILE_ID_FIVE
   erId:
+
+
+mybatis:
+  # 搜索指定包别名
+  typeAliasesPackage: com.cisdi.pms.job.domain
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
