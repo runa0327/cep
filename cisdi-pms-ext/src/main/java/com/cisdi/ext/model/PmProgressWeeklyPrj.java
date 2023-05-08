@@ -112,13 +112,17 @@ public class PmProgressWeeklyPrj {
          */
         public static final String SYS_TRUE = "SYS_TRUE";
         /**
-         * 是否办结。
+         * 是否结束。
          */
-        public static final String IS_END = "IS_END";
+        public static final String IZ_END = "IZ_END";
         /**
          * 是否填写。
          */
         public static final String IZ_WRITE = "IZ_WRITE";
+        /**
+         * 用户。
+         */
+        public static final String AD_USER_ID = "AD_USER_ID";
         /**
          * 日期（从）。
          */
@@ -715,36 +719,36 @@ public class PmProgressWeeklyPrj {
     }
 
     /**
-     * 是否办结。
+     * 是否结束。
      */
-    private Boolean isEnd;
+    private Boolean izEnd;
 
     /**
-     * 获取：是否办结。
+     * 获取：是否结束。
      */
-    public Boolean getIsEnd() {
-        return this.isEnd;
+    public Boolean getIzEnd() {
+        return this.izEnd;
     }
 
     /**
-     * 设置：是否办结。
+     * 设置：是否结束。
      */
-    public PmProgressWeeklyPrj setIsEnd(Boolean isEnd) {
-        if (this.isEnd == null && isEnd == null) {
+    public PmProgressWeeklyPrj setIzEnd(Boolean izEnd) {
+        if (this.izEnd == null && izEnd == null) {
             // 均为null，不做处理。
-        } else if (this.isEnd != null && isEnd != null) {
+        } else if (this.izEnd != null && izEnd != null) {
             // 均非null，判定不等，再做处理：
-            if (this.isEnd.compareTo(isEnd) != 0) {
-                this.isEnd = isEnd;
-                if (!this.toUpdateCols.contains("IS_END")) {
-                    this.toUpdateCols.add("IS_END");
+            if (this.izEnd.compareTo(izEnd) != 0) {
+                this.izEnd = izEnd;
+                if (!this.toUpdateCols.contains("IZ_END")) {
+                    this.toUpdateCols.add("IZ_END");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.isEnd = isEnd;
-            if (!this.toUpdateCols.contains("IS_END")) {
-                this.toUpdateCols.add("IS_END");
+            this.izEnd = izEnd;
+            if (!this.toUpdateCols.contains("IZ_END")) {
+                this.toUpdateCols.add("IZ_END");
             }
         }
         return this;
@@ -781,6 +785,42 @@ public class PmProgressWeeklyPrj {
             this.izWrite = izWrite;
             if (!this.toUpdateCols.contains("IZ_WRITE")) {
                 this.toUpdateCols.add("IZ_WRITE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 用户。
+     */
+    private String adUserId;
+
+    /**
+     * 获取：用户。
+     */
+    public String getAdUserId() {
+        return this.adUserId;
+    }
+
+    /**
+     * 设置：用户。
+     */
+    public PmProgressWeeklyPrj setAdUserId(String adUserId) {
+        if (this.adUserId == null && adUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.adUserId != null && adUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adUserId.compareTo(adUserId) != 0) {
+                this.adUserId = adUserId;
+                if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                    this.toUpdateCols.add("AD_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adUserId = adUserId;
+            if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                this.toUpdateCols.add("AD_USER_ID");
             }
         }
         return this;

@@ -1,13 +1,17 @@
 package com.cisdi.ext.model.view.weekReport;
 
+import com.cisdi.ext.model.BasePageEntity;
 import com.cisdi.ext.model.view.file.BaseFileView;
+import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
  * 形象进度工程周报填写记录
  */
-public class WeekMessage {
+@Data
+public class WeekMessage extends BasePageEntity {
 
     //id
     public String id;
@@ -15,14 +19,18 @@ public class WeekMessage {
     public String projectId;
     //项目名称
     public String projectName;
-    //填报周期
+    //填报时间
     public String writeDate;
-    //是否符合开工条件 1符合0不符合
+    public String writeDateMin;
+    public String writeDateMax;
+    //是否符合开工条件 1符合0不符合2全部
     public Integer weatherStart;
-    //是否竣工 1已竣工0未竣工
+    //是否竣工 1已竣工0未竣工2全部
     public Integer weatherCompleted;
     //整体形象进度
-    public Integer progress;
+    public BigDecimal progress;
+    public BigDecimal progressMin;
+    public BigDecimal progressMax;
     //累计形象进度说明
     public String progressDescribe;
     //本周项目进展
@@ -44,4 +52,10 @@ public class WeekMessage {
     public Integer buttonStatus;
     //是否填写 0未填写1已填写
     public Integer izWrite;
+    //记录人
+    public String recordById;
+    public String recordByName;
+    //项目负责人
+    public String manageUserId;
+    public String manageUserName;
 }

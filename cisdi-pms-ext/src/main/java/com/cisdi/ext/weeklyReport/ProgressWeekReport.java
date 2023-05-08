@@ -2,7 +2,9 @@ package com.cisdi.ext.weeklyReport;
 
 import com.cisdi.ext.file.BaseFileExt;
 import com.cisdi.ext.model.PmProgressWeeklyPrj;
+import com.cisdi.ext.model.PmProgressWeeklyPrjDetail;
 import com.cisdi.ext.model.view.project.PmPrjView;
+import com.cisdi.ext.model.view.weekReport.PmProgressWeeklyView;
 import com.cisdi.ext.model.view.weekReport.WeekMessage;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
@@ -15,10 +17,8 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -46,17 +46,16 @@ public class ProgressWeekReport {
         String userId = ExtJarHelper.loginInfo.get().userId;
         String projectName = param.projectName;
 
-        String sql1 = "select distinct a.pm_prj_id,c.name,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted f" +
-                "rom PM_ROSTER a left join POST_INFO b on a.POST_INFO_ID = b.id LEFT JOIN pm_prj c on a.PM_PRJ_ID = c.id " +
+        String sql1 = "select distinct a.pm_prj_id,c.name,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted " +
+                "from PM_ROSTER a left join POST_INFO b on a.POST_INFO_ID = b.id LEFT JOIN pm_prj c on a.PM_PRJ_ID = c.id " +
                 "where b.code = 'AD_USER_TWENTY_THREE_ID' and a.AD_USER_ID = ? and a.status = 'ap'";
         StringBuilder sb = new StringBuilder(sql1);
         if (!SharedUtil.isEmptyString(projectName)){
             sb.append(" and c.name like ('%").append(projectName).append("%') ");
         }
-        StringBuilder sb2 = new StringBuilder(sb);
-        sb.append(" order by c.IZ_START_REQUIRE desc,c.IZ_END asc,a.pm_prj_id desc").append(limit);
+        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sb.toString(),userId);
+        sb.append(" order by weatherStart desc,weatherCompleted asc,a.pm_prj_id desc ").append(limit);
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString(),userId);
-        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sb2.toString(),userId);
         if (!CollectionUtils.isEmpty(list1)){
             Map<String, Object> map1 = new HashMap<>();
             List<PmPrjView> list = list1.stream().map(p->{
@@ -101,10 +100,10 @@ public class ProgressWeekReport {
         if (!CollectionUtils.isEmpty(progressPrj)){
             weekId = progressPrj.get(0).getPmProgressWeeklyId();
             sql = "select a.id,a.DATE as writeDate,A.VISUAL_PROGRESS AS progress,A.VISUAL_PROGRESS_DESCRIBE AS progressDescribe,A.PROCESS_REMARK_TEXT AS progressWeek," +
-                    "a.TEXT_REMARK_ONE as progressRemark,c.SYS_TRUE as weatherStart,c.IS_END as weatherCompleted,'new' as dataType " +
-                    "a.PM_PROGRESS_WEEKLY_ID as weekId,a.PM_PROGRESS_WEEKLY_PRJ as weekPrjId,b.PM_PRJ_ID as projectId,b.IZ_WRITE as izWrite " +
-                    "from pm_progress_weekly_prj_detail a left join PM_PROGRESS_WEEKLY_PRJ b on a.PM_PROGRESS_WEEKLY_PRJ = b.id " +
-                    "where a.STATUS = 'ap' and b.status = 'ap' and pm_prj_id = ? and a.PM_PROGRESS_WEEKLY_ID = '"+weekId+"' and b.PM_PROGRESS_WEEKLY_ID = '"+weekId+"' ";
+                    "a.TEXT_REMARK_ONE as progressRemark,b.SYS_TRUE as weatherStart,b.IZ_END as weatherCompleted,'new' as dataType, " +
+                    "a.PM_PROGRESS_WEEKLY_ID as weekId,a.PM_PROGRESS_WEEKLY_PRJ_ID as weekPrjId,b.PM_PRJ_ID as projectId,b.IZ_WRITE as izWrite " +
+                    "from pm_progress_weekly_prj_detail a left join PM_PROGRESS_WEEKLY_PRJ b on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id " +
+                    "where a.STATUS = 'ap' and b.status = 'ap' and b.pm_prj_id = ? and a.PM_PROGRESS_WEEKLY_ID = '"+weekId+"' and b.PM_PROGRESS_WEEKLY_ID = '"+weekId+"' ";
         }
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId);
         if (!CollectionUtils.isEmpty(list)){
@@ -113,13 +112,22 @@ public class ProgressWeekReport {
                 WeekMessage weekMessage = new WeekMessage();
                 weekMessage.id = JdbcMapUtil.getString(p,"id"); //id
                 weekMessage.writeDate = JdbcMapUtil.getString(p,"writeDate"); //填报日期
-                weekMessage.progress = SharedUtil.isEmptyString(JdbcMapUtil.getString(p,"progress")) ? 0:JdbcMapUtil.getInt(p,"progress"); //填报日期
+                String progress = JdbcMapUtil.getString(p,"progress"); //整体形象进度
+                if (SharedUtil.isEmptyString(progress)){
+                    weekMessage.progress = new BigDecimal(0);
+                } else {
+                    weekMessage.progress = new BigDecimal(progress);
+                }
                 weekMessage.progressDescribe = JdbcMapUtil.getString(p,"progressDescribe"); //累计形象进度说明
                 weekMessage.progressWeek = JdbcMapUtil.getString(p,"progressWeek"); //本周项目进展
                 weekMessage.progressRemark = JdbcMapUtil.getString(p,"progressRemark"); //备注说明
                 weekMessage.weatherCompleted = JdbcMapUtil.getInt(p,"weatherCompleted"); // 是否已竣工
                 weekMessage.weatherStart = JdbcMapUtil.getInt(p,"weatherStart"); // 是否符合开工条件
-                String fileId = JdbcMapUtil.getString(p,"fileId");
+                weekMessage.izWrite = JdbcMapUtil.getInt(p,"izWrite"); // 是否填写
+                weekMessage.weekPrjId = JdbcMapUtil.getString(p,"weekPrjId"); //周项目id
+                weekMessage.projectId = JdbcMapUtil.getString(p,"projectId"); //项目id
+                weekMessage.weekId = JdbcMapUtil.getString(p,"weekId"); //周批次id
+                String fileId = JdbcMapUtil.getString(p,"fileId"); //文件id
                 if (!SharedUtil.isEmptyString(fileId)){
                     weekMessage.fileList =BaseFileExt.getFile(fileId);
                 }
@@ -141,42 +149,36 @@ public class ProgressWeekReport {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
         WeekMessage param = JsonUtil.fromJson(json,WeekMessage.class);
+        String userId = ExtJarHelper.loginInfo.get().userId;
         String id = param.id;
-        String dataType = param.dataType;
         String writeDate = param.writeDate; //填报日期
         String weekPrjId = param.weekPrjId; //进度周报-周项目信息id
         if (SharedUtil.isEmptyString(id)){
             throw new BaseException("记录id不能为空！");
         }
-        if (SharedUtil.isEmptyString(dataType)){
-            throw new BaseException("数据来源级别不能为空！");
-        }
         if (SharedUtil.isEmptyString(writeDate)){
             throw new BaseException("填报日期不能为空！");
         }
-        if ("old".equals(dataType)){
-            id = Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").insertData();
-        }
-        String start = writeDate.substring(0,9);
-        String end = writeDate.substring(11,20);
+        String start = writeDate.substring(0,10);
+        String end = writeDate.substring(11,21);
         //数据保存
         Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",id).update()
                 .set("DATE",writeDate).set("PM_PRJ_ID",param.projectId)
                 .set("VISUAL_PROGRESS",param.progress).set("PROCESS_REMARK_TEXT",param.progressWeek)
                 .set("VISUAL_PROGRESS_DESCRIBE",param.progressDescribe).set("FILE_ID_ONE",param.fileId)
                 .set("TEXT_REMARK_ONE",param.progressRemark).set("SYS_TRUE",param.weatherStart)
-                .set("IS_END",param.weatherCompleted).set("FROM_DATE",start).set("TO_DATE",end)
-                .set("PM_PROGRESS_WEEKLY_ID",param.weekId).set("PM_PROGRESS_WEEKLY_PRJ",weekPrjId)
+                .set("IZ_END",param.weatherCompleted).set("FROM_DATE",start).set("TO_DATE",end)
+                .set("PM_PROGRESS_WEEKLY_ID",param.weekId).set("PM_PROGRESS_WEEKLY_PRJ_ID",weekPrjId)
+                .set("AD_USER_ID",userId).set("LAST_MODI_DT",DateTimeUtil.dttmToString(new Date())).set("LAST_MODI_USER_ID",userId)
                 .exec();
         //主表更新，该项目该周已更新
-        Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update().set("IZ_WRITE",1).exec();
+        Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update().set("IZ_WRITE",1).set("AD_USER_ID",userId).exec();
     }
 
     /**
      * 形象进度工程周报-填写-符合开工条件/是否竣工 关闭/打开
      */
     public void openOrClose(){
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         // 获取输入：
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
@@ -186,18 +188,17 @@ public class ProgressWeekReport {
         String projectId = param.projectId;
         String weekPrjId = param.weekPrjId;
         String id = param.id;
-        Map<String,Object> dateMap = new HashMap<>();
         if ( buttonType == null ){
             throw new BaseException("按钮类型名称不能为空");
         }
         if ( buttonStatus == null){
             throw new BaseException("按照状态不能为空");
         }
-        if (buttonType == 1){ //处理开工条件
+        if (buttonType == 0){ //处理开工条件
             Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_START_REQUIRE",buttonStatus).exec();
             Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update().set("SYS_TRUE",buttonStatus).exec();
             Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",id).update().set("SYS_TRUE",buttonStatus).exec();
-        } else { //处理竣工条件
+        } else if (buttonType == 1){ //处理竣工条件
             Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_END",buttonStatus).exec();
             Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update().set("IZ_END",buttonStatus).exec();
             Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",id).update().set("IZ_END",buttonStatus).exec();
@@ -207,7 +208,7 @@ public class ProgressWeekReport {
     /**
      * 形象进度工程周报-填写-填报记录-项目列表
      */
-    public void getUserHistory(){
+    public void getUserHistoryPrj(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         // 获取输入：
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
@@ -225,22 +226,24 @@ public class ProgressWeekReport {
         String projectName = param.projectName;
         String projectId = param.projectId;
 
-        String sql1 = "select distinct a.pm_prj_id,c.name,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted f" +
-                "rom PM_ROSTER a left join POST_INFO b on a.POST_INFO_ID = b.id LEFT JOIN pm_prj c on a.PM_PRJ_ID = c.id " +
-                "where b.code = 'AD_USER_TWENTY_THREE_ID' and a.AD_USER_ID = ? and a.status = 'ap'";
+        String sql1 = "select DISTINCT b.PM_PRJ_ID,c.name,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted " +
+                "from pm_roster a left join pm_progress_weekly_prj b on a.PM_PRJ_ID = b.PM_PRJ_ID left join pm_prj c on b.PM_PRJ_ID = c.id " +
+                "where a.status = 'ap' and b.status = 'ap' and b.IZ_WRITE = '1' and a.AD_USER_ID = ? and a.POST_INFO_ID = '1633997482885255168' ";
         StringBuilder sb = new StringBuilder(sql1);
         if (!SharedUtil.isEmptyString(projectName)){
             sb.append(" and c.name like ('%").append(projectName).append("%') ");
         }
-        StringBuilder sb2 = new StringBuilder(sb);
-        sb.append(" order by c.IZ_START_REQUIRE desc,c.IZ_END asc,a.pm_prj_id desc").append(limit);
+        if (!SharedUtil.isEmptyString(projectId)){
+            sb.append(" and b.pm_prj_id = '").append(projectId).append("' ");
+        }
+        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sb.toString(),userId);
+        sb.append(" order by weatherStart desc,weatherCompleted asc,b.pm_prj_id desc ").append(limit);
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString(),userId);
-        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sb2.toString(),userId);
         if (!CollectionUtils.isEmpty(list1)){
             Map<String, Object> map1 = new HashMap<>();
             List<PmPrjView> list = list1.stream().map(p->{
                 PmPrjView pmPrjView = new PmPrjView();
-                pmPrjView.id = JdbcMapUtil.getString(p,"pm_prj_id");
+                pmPrjView.id = JdbcMapUtil.getString(p,"PM_PRJ_ID");
                 pmPrjView.projectName = JdbcMapUtil.getString(p,"name");
                 pmPrjView.weatherStart = JdbcMapUtil.getInt(p,"weatherStart");
                 pmPrjView.weatherCompleted = JdbcMapUtil.getInt(p,"weatherCompleted");
@@ -253,5 +256,310 @@ public class ProgressWeekReport {
         } else {
             ExtJarHelper.returnValue.set(null);
         }
+    }
+
+    /**
+     * 形象进度工程周报-填写-填报记录-单项目历史填报记录
+     */
+    public void selectPrjHistory(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        // 获取输入：
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        WeekMessage param = JsonUtil.fromJson(json,WeekMessage.class);
+        String projectId = param.projectId;
+        if (SharedUtil.isEmptyString(projectId)){
+            throw new BaseException("项目id信息不能为空！");
+        }
+        if (param.pageIndex == 0 || param.pageSize == 0) {
+            throw new BaseException("分页参数不能必须大于0");
+        }
+        // 起始条数
+        int start = (param.pageIndex - 1) * param.pageSize;
+        String limit = "limit " + start + "," + param.pageSize;
+
+        String sql = "select a.id,c.DATE as writeDate,a.VISUAL_PROGRESS as progress,a.VISUAL_PROGRESS_DESCRIBE as progressDescribe,a.PROCESS_REMARK_TEXT as progressWeek," +
+                "a.TEXT_REMARK_ONE as progressRemark,a.SYS_TRUE as weatherStart,a.IZ_END as weatherCompleted," +
+                "a.AD_USER_ID as recordById,d.name as recordByName,a.FILE_ID_ONE as fileId,b.PM_PRJ_ID as projectId," +
+                "(select name from pm_prj where id = b.id) as projectName " +
+                "from PM_PROGRESS_WEEKLY_PRJ_DETAIL a left join PM_PROGRESS_WEEKLY_PRJ b on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id " +
+                "LEFT JOIN pm_progress_weekly c on a.PM_PROGRESS_WEEKLY_ID = c.id " +
+                "left join ad_user d on a.AD_USER_ID = d.id " +
+                "where a.status = 'ap' and b.status = 'ap' and c.status = 'ap' and b.PM_PRJ_ID = ?";
+        StringBuilder sb = new StringBuilder(sql);
+        if (!SharedUtil.isEmptyString(param.writeDateMin)){
+            sb.append(" and c.FROM_DATE >= '").append(param.writeDateMin).append("' ");
+        }
+        if (!SharedUtil.isEmptyString(param.writeDateMax)){
+            sb.append(" and c.TO_DATE <= '").append(param.writeDateMax).append("' ");
+        }
+        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(String.valueOf(sb),projectId);
+        sb.append(" order by a.LAST_MODI_DT desc ").append(limit);
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString(),projectId);
+        if (!CollectionUtils.isEmpty(list1)){
+            Map<String, Object> map1 = new HashMap<>();
+            List<WeekMessage> returnList = list1.stream().map(p->{
+                WeekMessage weekMessage = new WeekMessage();
+                weekMessage.id = JdbcMapUtil.getString(p,"id"); //id
+                weekMessage.projectId = JdbcMapUtil.getString(p,"projectId"); //项目id
+                weekMessage.projectName = JdbcMapUtil.getString(p,"projectName"); //项目名称
+                weekMessage.writeDate = JdbcMapUtil.getString(p,"writeDate"); //填报时间
+                weekMessage.weatherStart = JdbcMapUtil.getInt(p,"weatherStart"); //是否符合开工条件 1符合0不符合
+                weekMessage.weatherCompleted = JdbcMapUtil.getInt(p,"weatherCompleted"); //是否竣工 1已竣工0未竣工
+                String progress = JdbcMapUtil.getString(p,"progress"); //整体形象进度
+                if (SharedUtil.isEmptyString(progress)){
+                    weekMessage.progress = new BigDecimal(0);
+                } else {
+                    weekMessage.progress = new BigDecimal(progress);
+                }
+                weekMessage.progressDescribe = JdbcMapUtil.getString(p,"progressDescribe"); //累计形象进度说明
+                weekMessage.progressWeek = JdbcMapUtil.getString(p,"progressWeek"); //本周项目进展
+                weekMessage.progressRemark = JdbcMapUtil.getString(p,"progressRemark"); //备注说明
+                weekMessage.recordById = JdbcMapUtil.getString(p,"recordById"); //记录人
+                weekMessage.recordByName = JdbcMapUtil.getString(p,"recordByName"); //记录人
+                String fileId = JdbcMapUtil.getString(p,"fileId"); //形象进度影像
+                if (!SharedUtil.isEmptyString(fileId)){
+                    weekMessage.fileList = BaseFileExt.getFile(fileId);
+                }
+                return weekMessage;
+            }).collect(Collectors.toList());
+            map1.put("result", returnList);
+            map1.put("total", list2.size());
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(map1), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        } else {
+            ExtJarHelper.returnValue.set(null);
+        }
+    }
+
+    /**
+     * 进度周报统计-周列表
+     */
+    public void getWeekList(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select id,DATE,FROM_DATE,TO_DATE from PM_PROGRESS_WEEKLY where status = 'ap' order by FROM_DATE desc");
+        if (!CollectionUtils.isEmpty(list)){
+            Map<String,Object> dateMap = DateTimeUtil.getDateWeekMap(new Date());
+            String startDate = dateMap.get("startDate").toString();
+            String endDate = dateMap.get("endDate").toString();
+            List<PmProgressWeeklyView> returnList = list.stream().map(p->{
+                PmProgressWeeklyView pmProgressWeeklyView = new PmProgressWeeklyView();
+                pmProgressWeeklyView.id = JdbcMapUtil.getString(p,"id"); //id
+                pmProgressWeeklyView.weekId = JdbcMapUtil.getString(p,"id"); //id
+                String writeDate = JdbcMapUtil.getString(p,"DATE"); //填报时间
+                String start = JdbcMapUtil.getString(p,"FROM_DATE"); //开始日期
+                String end = JdbcMapUtil.getString(p,"TO_DATE"); //开始日期
+                if (startDate.equals(start) && endDate.equals(end)){
+                    writeDate = writeDate + "（本周）";
+                }
+                pmProgressWeeklyView.writeDate = writeDate;
+                return pmProgressWeeklyView;
+
+            }).collect(Collectors.toList());
+            Map<String,Object> map1 = new HashMap<>();
+            map1.put("result", returnList);
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(map1), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        } else {
+            ExtJarHelper.returnValue.set(null);
+        }
+    }
+
+    /**
+     * 进度周报统计-详情列表页
+     */
+    public void getPrjWeekHistory(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        // 获取输入：
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        WeekMessage param = JsonUtil.fromJson(json,WeekMessage.class);
+        String weekId = param.weekId;
+        if (SharedUtil.isEmptyString(weekId)){
+            throw new BaseException("周信息不能为空！");
+        }if (param.pageIndex == 0 || param.pageSize == 0) {
+            throw new BaseException("分页参数不能必须大于0");
+        }
+        // 起始条数
+        int start = (param.pageIndex - 1) * param.pageSize;
+        String limit = "limit " + start + "," + param.pageSize;
+
+        //查询该周项目总览情况
+        Map<String,Object> canMap = getMapCan(weekId,limit);
+        Map<String,Object> records = getRecords(canMap,param,myJdbcTemplate);
+        Map<String,Object> map1 = getPrjWeekAll(records);
+        if (records.isEmpty()){
+            ExtJarHelper.returnValue.set(null);
+        } else {
+            Map<String,Object> returnMap = new HashMap<>();
+            returnMap.put("header",map1);
+            returnMap.put("record",records);
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(returnMap), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    /**
+     * 查询数据集合
+     * @param canMap 查询参数
+     * @param myJdbcTemplate 数据源
+     * @param param 请求参数
+     * @return 查询结果
+     */
+    public Map<String,Object> getRecords(Map<String, Object> canMap, WeekMessage param, MyJdbcTemplate myJdbcTemplate) {
+        String weekId = getCanMapValue("weekId",canMap); //周id
+        String projectId = getCanMapValue("projectId",canMap); //项目id
+        String projectName = param.projectName; //项目名称
+        String writeDateMin = param.writeDateMin; //最小填写日期
+        String writeDateMax = param.writeDateMax; //最大填写日期
+        String manageUserName = param.manageUserName; //项目负责人
+        BigDecimal progressMin = param.progressMin; //最小进度
+        BigDecimal progressMax = param.progressMax; //最大进度
+        Integer weatherStart = param.weatherStart; //是否符合开工条件
+        Integer weatherCompleted = param.weatherCompleted; //是否竣工
+        String limit = canMap.get("limit").toString();
+        String sql = "select a.id,c.DATE as writeDate,a.VISUAL_PROGRESS as progress,a.VISUAL_PROGRESS_DESCRIBE as progressDescribe,a.PROCESS_REMARK_TEXT as progressWeek," +
+                "a.TEXT_REMARK_ONE as progressRemark,a.SYS_TRUE as weatherStart,a.IZ_END as weatherCompleted," +
+                "(select name from ad_user where id = a.ad_user_id) as recordByName,a.AD_USER_ID as recordById, " +
+                "a.FILE_ID_ONE as fileId,b.PM_PRJ_ID as projectId," +
+                "e.name as projectName,d.AD_USER_ID as manageUserId," +
+                "f.name as manageUserName,b.IZ_WRITE as izWrite " +
+                "from PM_PROGRESS_WEEKLY_PRJ_DETAIL a " +
+                "left join PM_PROGRESS_WEEKLY_PRJ b on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id " +
+                "LEFT JOIN pm_progress_weekly c on b.PM_PROGRESS_WEEKLY_ID = c.id " +
+                "left join (select ad_user_id,PM_PRJ_ID from pm_roster where post_info_id = '1633997482885255168' " +
+                "and ad_user_id is not null GROUP BY PM_PRJ_ID,ad_user_id) d on b.pm_prj_id = d.PM_PRJ_ID " +
+                "left join pm_prj e on b.pm_prj_id = e.id " +
+                "LEFT JOIN ad_user f ON d.ad_user_id = f.id " +
+                "where a.status = 'ap' and b.status = 'ap' and c.status = 'ap' ";
+        StringBuilder sb = new StringBuilder(sql);
+        if (!SharedUtil.isEmptyString(weekId)){
+            sb.append(" and c.id = '").append(weekId).append("' "); // 周-批次id
+        }
+        if (!SharedUtil.isEmptyString(projectId)){
+            sb.append(" and b.pm_prj_id = '").append(projectId).append("' "); //项目id
+        }
+        if (!SharedUtil.isEmptyString(projectName)){
+            sb.append(" and e.name like ('%").append(projectName).append("%') "); //项目名称
+        }
+        if (!SharedUtil.isEmptyString(writeDateMin)){
+            sb.append(" and c.FROM_DATE >= '").append(writeDateMin).append("' "); //最小填写日期
+        }
+        if (!SharedUtil.isEmptyString(writeDateMax)){
+            sb.append(" and c.TO_DATE <= '").append(writeDateMax).append("' "); //最大填写日期
+        }
+        if (!SharedUtil.isEmptyString(manageUserName)){
+            sb.append(" and f.name like ('%").append(manageUserName).append("%') "); //项目负责人
+        }
+        if (!SharedUtil.isEmptyString(param.manageUserId)){
+            sb.append(" and d.ad_user_id = '").append(param.manageUserId).append("' "); //项目负责人
+        }
+        if (progressMin != null){
+            sb.append(" and a.VISUAL_PROGRESS >= '").append(progressMin).append("' "); //最小进度
+        }
+        if (progressMax != null){
+            sb.append(" and a.VISUAL_PROGRESS <= '").append(progressMax).append("' "); //最大进度
+        }
+        if (weatherStart != null){
+            sb.append(" and b.SYS_TRUE = '").append(weatherStart).append("' "); //是否符合开工条件
+        }
+        if (weatherCompleted != null){
+            sb.append(" and b.IZ_END = '").append(weatherCompleted).append("' "); //是否竣工
+        }
+        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(String.valueOf(sb));
+        sb.append(" order by a.LAST_MODI_DT desc,b.pm_prj_id desc ").append(limit);
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString());
+        Map<String,Object> map = new HashMap<>();
+        if (!CollectionUtils.isEmpty(list1)){
+            List<WeekMessage> returnList = list1.stream().map(p->{
+                WeekMessage weekMessage = new WeekMessage();
+                weekMessage.id = JdbcMapUtil.getString(p,"id"); //id
+                weekMessage.writeDate = JdbcMapUtil.getString(p,"writeDate"); //填报日期
+                String progress = JdbcMapUtil.getString(p,"progress"); //整体形象进度
+                if (SharedUtil.isEmptyString(progress)){
+                    weekMessage.progress = new BigDecimal(0);
+                } else {
+                    weekMessage.progress = new BigDecimal(progress);
+                }
+                weekMessage.progressDescribe = JdbcMapUtil.getString(p,"progressDescribe"); //累计形象进度说明
+                weekMessage.progressWeek = JdbcMapUtil.getString(p,"progressWeek"); //本周项目进展
+                weekMessage.progressRemark = JdbcMapUtil.getString(p,"progressRemark"); //备注说明
+                weekMessage.weatherCompleted = JdbcMapUtil.getInt(p,"weatherCompleted"); // 是否已竣工
+                weekMessage.weatherStart = JdbcMapUtil.getInt(p,"weatherStart"); // 是否符合开工条件
+                weekMessage.izWrite = JdbcMapUtil.getInt(p,"izWrite"); // 是否填写
+                weekMessage.manageUserId = JdbcMapUtil.getString(p,"manageUserId"); // 项目负责人
+                weekMessage.manageUserName = JdbcMapUtil.getString(p,"manageUserName"); // 项目负责人
+                weekMessage.recordById = JdbcMapUtil.getString(p,"recordById"); // 记录人
+                weekMessage.recordByName = JdbcMapUtil.getString(p,"recordByName"); // 记录人
+                weekMessage.projectId = JdbcMapUtil.getString(p,"projectId"); // 项目id
+                weekMessage.projectName = JdbcMapUtil.getString(p,"projectName"); // 项目名称
+                String fileId = JdbcMapUtil.getString(p,"fileId");
+                if (!SharedUtil.isEmptyString(fileId)){
+                    weekMessage.fileList =BaseFileExt.getFile(fileId);
+                }
+                return weekMessage;
+            }).collect(Collectors.toList());
+            map.put("total",list2.size());
+            map.put("result", returnList);
+        }
+        return map;
+    }
+
+    /**
+     * 获取参数值
+     * @param str 需要查询的参数键
+     * @param canMap 参数集合
+     * @return 参数值
+     */
+    public String getCanMapValue(String str, Map<String, Object> canMap) {
+        String value = "";
+        for (String tmp : canMap.keySet()){
+            if (str.equals(tmp)){
+                value = canMap.get(tmp).toString();
+            }
+        }
+        return value;
+    }
+
+    /**
+     * 根据周id查询该周项目填报总情况
+     * @param records 结果集
+     * @return 周总览信息
+     */
+    public Map<String, Object> getPrjWeekAll(Map<String,Object> records) {
+        Map<String,Object> map = new HashMap<>();
+        if (!records.isEmpty()){
+            List<WeekMessage> list = (List<WeekMessage>) records.get("result");
+            //填报数
+            int writes = (int) list.stream().filter(p->p.getIzWrite() == 1).count();
+            //不符合开工条件
+            int noStarts = (int) list.stream().filter(p-> p.getWeatherStart() == 0).count();
+            //已竣工
+            int completes = (int) list.stream().filter(p->p.getWeatherCompleted() == 1).count();
+            map.put("projectNums",list.size());
+            map.put("writes",writes);
+            map.put("noStarts",noStarts);
+            map.put("completes",completes);
+        } else {
+            map.put("projectNums",0);
+            map.put("writes",0);
+            map.put("noStarts",0);
+            map.put("completes",0);
+        }
+        return map;
+    }
+
+
+    /**
+     * 封装查询参数
+     * @param weekId 周id
+     * @param limit 限制语句
+     * @return 参数集合
+     */
+    public Map<String, Object> getMapCan(String weekId, String limit) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("weekId",weekId);
+        map.put("limit",limit);
+        return map;
     }
 }
