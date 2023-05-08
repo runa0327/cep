@@ -1,20 +1,17 @@
 package com.cisdi.pms.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.cisdi.pms.config.GovernmentWXConfig;
 import com.cisdi.pms.config.UnifiedLoginConfig;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.utils.StringUtils;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.ThirdPartyUserInfo;
-import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,9 +26,17 @@ import java.util.Map;
 @Service
 public class UnifiedLoginService {
 
+
+    private static final String token_key = "WX_TOKEN";
+
     @Resource
     private UnifiedLoginConfig unifiedLoginConfig;
 
+    @Resource
+    private GovernmentWXConfig gvConfig;
+
+//    @Resource
+//    public RedisCache redisCache;
 
     /**
      * 统一身份认证登录
@@ -76,7 +81,6 @@ public class UnifiedLoginService {
                 .executeAsMap();
         return info;
     }
-
 
     /**
      * 统一身份认证登录(APP)
@@ -165,6 +169,72 @@ public class UnifiedLoginService {
         return info;
     }
 
+
+    /**
+     * 政务企业微信单点登录处理
+     *
+     * @param code
+     * @return
+     */
+    public ThirdPartyUserInfo UnifiedWXLogin(String code) {
+        ThirdPartyUserInfo info = new ThirdPartyUserInfo();
+        //获取token
+        Map<String, String> tokenMap = getWxToken();
+        String token = tokenMap.get("token");
+        //根据token获取用户信息
+        Forest.get(gvConfig.getDomain() + "/user/getuserinfo")
+                .addQuery("access_token", token)
+                .addQuery("code", code)
+                .onSuccess((result, request, response) -> {
+                    JSONObject userJsonObject = (JSONObject) JSONObject.toJSON(result);
+                    log.info("用户信息：:" + userJsonObject);
+                    if ("0".equals(userJsonObject.getString("errcode"))) {
+                        info.thirdPartyUserCode = userJsonObject.getString("UserId");
+                    } else {
+                        throw new BaseException("获取用户信息异常，请稍后重试！");
+                    }
+                })
+                .onError((result, request, response) -> {
+                    throw new BaseException("获取用户信息异常，请稍后重试！");
+                }).executeAsMap();
+
+        return info;
+    }
+
+
+    /**
+     * 获取token
+     *
+     * @return
+     */
+    private Map<String, String> getWxToken() {
+        Map<String, String> result = new HashMap<>();
+//        String cacheToken = redisCache.getCacheObject(token_key);
+//        if (Strings.isNullOrEmpty(cacheToken)) {
+        Forest.get(gvConfig.getDomain() + "/gettoken")
+                .setConnectTimeout(10000)
+                .addQuery("corpid", gvConfig.getCorpid())
+                .addQuery("corpsecret", gvConfig.getCorpsecret())
+                .onSuccess((data, req, res) -> {
+                    JSONObject tokenJsonObject = (JSONObject) JSONObject.toJSON(data);
+                    log.info("token:" + tokenJsonObject);
+                    if ("0".equals(tokenJsonObject.getString("errcode"))) {
+                        String token = tokenJsonObject.getString("access_token");
+                        result.put("token", token);
+//                        redisCache.setCacheObject(token_key, token);
+//                        redisCache.expire(token_key, 7200);
+                    } else {
+                        throw new BaseException("换取accessToken异常，请稍后重试！");
+                    }
+                })
+                .onError((ex, req, res) -> {
+                    throw new BaseException("换取accessToken异常，请稍后重试！");
+                }).executeAsMap();
+//        } else {
+//            result.put("token", cacheToken);
+//        }
+        return result;
+    }
 
 
 }

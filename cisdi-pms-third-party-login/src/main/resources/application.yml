@@ -18,6 +18,26 @@ spring:
 #        server-addr: 10.130.19.98:8848
         #测试
         server-addr: 121.5.62.215:8848
+#  redis:
+    #    单机启用host、port：
+#    host: 124.222.58.152
+#    port: 6379
+    #   单机、哨兵公用password、database：
+#    password: redis@1234
+    #    企业管理云的REDIS库：
+#    database: 8
+    #   哨兵使用sentinel.master、sentinel.nodes：
+    #    sentinel:
+    #      master:
+    #      nodes:
+    #   连接池：
+#    jedis:
+#      pool:
+#        max-active: 200
+#        max-idle: 10
+#        max-wait: 5s
+#        min-idle: 0
+#        time-between-eviction-runs: 60s
 
 mybatis:
   # 搜索指定包别名
@@ -76,3 +96,9 @@ yzbays:
   appClientId: yzb-gcxxxt
   appClientSecret: d44cc4fe-74ae-4f1e-a828-1b72042cfd36
   appDomainName: https://api.test.yzbays.com
+
+# 政务微信单点登录
+gwx:
+  domain: http://im.yazhou-bay.com:10060/cgi-bin
+  corpid: ww808726c44a3ff6dc
+  corpsecret: X4SOKLItOrh5OJq4nXBRKgM8t5QaXjw-LJP0RI6M7mI

@@ -45,8 +45,8 @@ public class ThirdPartyLoginController {
         String loginType = requestBody.loginType;
         ThirdPartyLoginCodeValidationRespBody responseBody = new ThirdPartyLoginCodeValidationRespBody();
         responseBody.succ = false;
+        ThirdPartyUserInfo thirdPartyUserInfo = new ThirdPartyUserInfo();
         if ("YZW".equalsIgnoreCase(loginThirdParty)) {
-            ThirdPartyUserInfo thirdPartyUserInfo = new ThirdPartyUserInfo();
             thirdPartyUserInfo.thirdParty = loginThirdParty;
             if ("PC".equalsIgnoreCase(loginType)) {
                 thirdPartyUserInfo = loginService.UnifiedLogin(loginCode);
@@ -56,10 +56,15 @@ public class ThirdPartyLoginController {
                 //当类型是token的时候 token存放再loginExtraInfo中
                 thirdPartyUserInfo = loginService.UnifiedTokenLogin(loginExtraInfo);
             }
-            if (thirdPartyUserInfo != null) {
-                responseBody.succ = true;
-                responseBody.data = thirdPartyUserInfo;
+        } else if ("GWX".equalsIgnoreCase(loginThirdParty)) {
+            thirdPartyUserInfo.thirdParty = loginThirdParty;
+            if ("H5".equalsIgnoreCase(loginType)) {
+                thirdPartyUserInfo = loginService.UnifiedWXLogin(loginCode);
             }
+        }
+        if (thirdPartyUserInfo != null) {
+            responseBody.succ = true;
+            responseBody.data = thirdPartyUserInfo;
         }
         log.info("响应：" + JSON.toJSONString(responseBody));
         return responseBody;
