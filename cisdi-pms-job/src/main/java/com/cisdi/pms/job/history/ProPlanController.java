@@ -257,10 +257,12 @@ public class ProPlanController {
                                     nodeList.stream().filter(p -> Objects.equals(m.get("ID"), p.get("PRE_NODE_ID"))).forEach(item -> {
                                         if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_START_DATE"))) {
                                             Date dateOrg = DateUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"));
-                                            int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
-                                            Date endDate = DateUtil.addDays(dateOrg, days);
-                                            item.put("PLAN_START_DATE", sp.format(dateOrg));
-                                            item.put("PLAN_COMPL_DATE", sp.format(endDate));
+                                            if (dateOrg != null) {
+                                                int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
+                                                Date endDate = DateUtil.addDays(dateOrg, days);
+                                                item.put("PLAN_START_DATE", sp.format(dateOrg));
+                                                item.put("PLAN_COMPL_DATE", sp.format(endDate));
+                                            }
                                         }
                                     });
                                 });
