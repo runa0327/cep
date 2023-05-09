@@ -1,5 +1,6 @@
 package com.cisdi.pms.job.history;
 
+import com.cisdi.pms.job.utils.DateUtil;
 import com.cisdi.pms.job.utils.ListUtils;
 import com.cisdi.pms.job.utils.MapUtils;
 import com.cisdi.pms.job.utils.Util;
@@ -8,7 +9,6 @@ import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,10 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -43,8 +41,12 @@ public class ProPlanController {
     private ThreadPoolTaskExecutor taskExecutor;
 
 
+    /**
+     * 初始化默认模板
+     *
+     * @return
+     */
     @GetMapping("/refreshData")
-    @Async("taskExecutor")
     public String intiPrjProPlan() {
 
         myJdbcTemplate.update("SET FOREIGN_KEY_CHECKS = 0;delete from pm_pro_plan_node where pm_pro_plan_id in (select id from pm_pro_plan where IS_TEMPLATE <>'1');SET FOREIGN_KEY_CHECKS = 1;");
@@ -155,14 +157,18 @@ public class ProPlanController {
     }
 
 
+    /**
+     * 初始化责任用户
+     *
+     * @return
+     */
     @GetMapping("/refreshUser")
-    @Async("taskExecutor")
-    public String initPrjProPlanUser(){
+    public String initPrjProPlanUser() {
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_roster where status='ap'");
         List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID as PM_PRJ_ID from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where pl.IS_TEMPLATE<>'1'");
         Map<String, List<Map<String, Object>>> dataMap = nodeList.stream().collect(Collectors.groupingBy(p -> JdbcMapUtil.getString(p, "PM_PRJ_ID")));
 
-        List<Map<String, List<Map<String, Object>>>> subList = MapUtils.splitByChunkSize(dataMap,50);
+        List<Map<String, List<Map<String, Object>>>> subList = MapUtils.splitByChunkSize(dataMap, 50);
         AtomicInteger index = new AtomicInteger(0);
         subList.forEach(it -> {
             log.info("刷新全景责任用户多线程运行--------------------当前进程第" + index.getAndIncrement() + "个");
@@ -183,5 +189,127 @@ public class ProPlanController {
             });
         });
         return "";
+    }
+
+
+    /**
+     * 初始化计划时间
+     *
+     * @return
+     */
+    @GetMapping("/refreshTime")
+    public String initPrjProPlanTime() {
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_prj where status ='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' order by pm_code desc");
+        List<List<Map<String, Object>>> dataList = ListUtils.split(list, 50);
+        AtomicInteger index = new AtomicInteger(0);
+        dataList.forEach(item -> {
+            log.info("刷新全景计划时间多线程运行--------------------当前进程第" + index.getAndIncrement() + "个");
+            taskExecutor.execute(() -> {
+                for (Map<String, Object> objectMap : item) {
+                    refreshProPlanTime(JdbcMapUtil.getString(objectMap, "ID"), DateUtil.stringToDate("2023-05-01"));
+                }
+            });
+        });
+        return "正在处理";
+    }
+
+    /**
+     * 新版刷新项目进展时间--通过项目启动时间，立项节点的开始时间为项目启动时间
+     *
+     * @param projectId
+     * @param paramDate
+     */
+    private void refreshProPlanTime(String projectId, Date paramDate) {
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan where PM_PRJ_ID=?", projectId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> proMap = list.get(0);
+            String proPlanId = JdbcMapUtil.getString(proMap, "ID");
+            List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PM_PRO_PLAN_ID=?", proPlanId);
+            if (!CollectionUtils.isEmpty(nodeList)) {
+                List<Map<String, Object>> firstNodeList = nodeList.stream().filter(p -> 1 == JdbcMapUtil.getInt(p, "LEVEL")).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(firstNodeList)) {
+                    Map<String, Object> firstNode = firstNodeList.get(0);
+                    List<Map<String, Object>> secondNodeList = nodeList.stream().filter(p -> Objects.equals(firstNode.get("ID"), p.get("PM_PRO_PLAN_NODE_PID"))).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(secondNodeList)) {
+                        Map<String, Object> secondNode = secondNodeList.get(0);
+                        List<Map<String, Object>> threeNodeList = nodeList.stream().filter(p -> Objects.equals(secondNode.get("ID"), p.get("PM_PRO_PLAN_NODE_PID"))).sorted(Comparator.comparing(c -> JdbcMapUtil.getBigDecimal(c, "SEQ_NO"))).collect(Collectors.toList());
+                        if (!CollectionUtils.isEmpty(threeNodeList)) {
+                            Map<String, Object> threeNode = threeNodeList.get(0);
+
+                            SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
+                            int totalDays = JdbcMapUtil.getInt(threeNode, "PLAN_TOTAL_DAYS");
+                            Date completeDate = DateUtil.addDays(paramDate, totalDays);
+                            //待优化
+                            for (int i = 0; i < 10; i++) {
+                                nodeList.forEach(m -> {
+                                    if (Objects.equals(m.get("ID"), threeNode.get("ID"))) {
+                                        m.put("PLAN_START_DATE", sp.format(paramDate));
+                                        m.put("PLAN_COMPL_DATE", sp.format(completeDate));
+                                    }
+                                    nodeList.stream().filter(p -> Objects.equals(m.get("ID"), p.get("PRE_NODE_ID"))).forEach(item -> {
+                                        if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_START_DATE"))) {
+                                            Date dateOrg = DateUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"));
+                                            int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
+                                            Date endDate = DateUtil.addDays(dateOrg, days);
+                                            item.put("PLAN_START_DATE", sp.format(dateOrg));
+                                            item.put("PLAN_COMPL_DATE", sp.format(endDate));
+                                        }
+                                    });
+                                });
+                            }
+
+                            StringBuilder sb = new StringBuilder();
+                            nodeList.forEach(item -> {
+                                if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(item, "PLAN_START_DATE"))) {
+                                    sb.append("update pm_pro_plan_node set PLAN_START_DATE='").append(item.get("PLAN_START_DATE"))
+                                            .append("', PLAN_COMPL_DATE ='").append(item.get("PLAN_COMPL_DATE")).append("' where id='").append(item.get("ID")).append("' ;");
+                                }
+                            });
+                            myJdbcTemplate.update(sb.toString());
+                            updateNodeTime(projectId);
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    }
+
+    private void updateNodeTime(String projectId) {
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan where PM_PRJ_ID=?", projectId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> proMap = list.get(0);
+            String proPlanId = JdbcMapUtil.getString(proMap, "ID");
+            List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select ID,name,ifnull(PM_PRO_PLAN_NODE_PID,0) as pid,PLAN_START_DATE,PLAN_COMPL_DATE from pm_pro_plan_node where PM_PRO_PLAN_ID=?", proPlanId);
+
+            nodeList.stream().filter(p -> Objects.equals("0", p.get("pid"))).forEach(item -> getChildren(item, nodeList));
+
+            List<Map<String, Object>> newNodeList = myJdbcTemplate.queryForList("select ID,name,ifnull(PM_PRO_PLAN_NODE_PID,0) as pid,PLAN_START_DATE,PLAN_COMPL_DATE from pm_pro_plan_node where PM_PRO_PLAN_ID=?", proPlanId);
+            newNodeList.stream().filter(p -> Objects.equals("0", p.get("pid"))).forEach(item -> {
+                List<Map<String, Object>> sonList = newNodeList.stream().filter(p -> Objects.equals(item.get("ID"), p.get("pid"))).collect(Collectors.toList());
+                List<Map<String, Object>> noNullData = sonList.stream().filter(p -> JdbcMapUtil.getDate(p, "PLAN_START_DATE") != null).collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(noNullData)) {
+                    Object o = noNullData.stream().sorted(Comparator.comparing(m -> JdbcMapUtil.getDate(m, "PLAN_START_DATE"))).collect(Collectors.toList()).get(0).get("PLAN_START_DATE");
+                    Object o1 = noNullData.stream().sorted(Comparator.comparing(f -> JdbcMapUtil.getDate((Map<String, Object>) f, "PLAN_COMPL_DATE")).reversed()).collect(Collectors.toList()).get(0).get("PLAN_COMPL_DATE");
+                    myJdbcTemplate.update("update pm_pro_plan_node set PLAN_START_DATE=?,PLAN_COMPL_DATE=? where id=?", o, o1, item.get("ID"));
+                }
+            });
+
+        }
+    }
+
+    private List<Map<String, Object>> getChildren(Map<String, Object> parent, List<Map<String, Object>> allData) {
+        return allData.stream().filter(p -> Objects.equals(parent.get("id"), p.get("pid"))).peek(item -> {
+            List<Map<String, Object>> sonList = getChildren(item, allData);
+            List<Map<String, Object>> noNullData = sonList.stream().filter(p -> JdbcMapUtil.getDate(p, "PLAN_START_DATE") != null).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(noNullData)) {
+                Object o = noNullData.stream().sorted(Comparator.comparing(m -> JdbcMapUtil.getDate(m, "PLAN_START_DATE"))).collect(Collectors.toList()).get(0).get("PLAN_START_DATE");
+                Object o1 = noNullData.stream().sorted(Comparator.comparing(f -> JdbcMapUtil.getDate((Map<String, Object>) f, "PLAN_COMPL_DATE")).reversed()).collect(Collectors.toList()).get(0).get("PLAN_COMPL_DATE");
+                myJdbcTemplate.update("update pm_pro_plan_node set PLAN_START_DATE=?,PLAN_COMPL_DATE=? where id=?", o, o1, item.get("ID"));
+            }
+        }).collect(Collectors.toList());
     }
 }
