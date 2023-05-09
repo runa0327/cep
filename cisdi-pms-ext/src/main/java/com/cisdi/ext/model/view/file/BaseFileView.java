@@ -18,4 +18,6 @@ public class BaseFileView extends BasePageEntity {
     // 上传人
     public String uploadById;
     public String uploadByName;
+    //文件类型
+    public String fileType;
 }
