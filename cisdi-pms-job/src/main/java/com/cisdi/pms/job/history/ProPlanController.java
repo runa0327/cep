@@ -206,7 +206,15 @@ public class ProPlanController {
             log.info("刷新全景计划时间多线程运行--------------------当前进程第" + index.getAndIncrement() + "个");
             taskExecutor.execute(() -> {
                 for (Map<String, Object> objectMap : item) {
-                    refreshProPlanTime(JdbcMapUtil.getString(objectMap, "ID"), DateUtil.stringToDate("2023-05-01"));
+                    Date paraData = DateUtil.stringToDate("2023-01-01");
+                    List<Map<String, Object>> startList = myJdbcTemplate.queryForList("select * from PRJ_START where pm_code=?", objectMap.get("pm_code"));
+                    if (!CollectionUtils.isEmpty(startList)) {
+                        Map<String, Object> dataMap = startList.get(0);
+                        if (Objects.nonNull(dataMap.get("START_TIME"))) {
+                            paraData = DateUtil.stringToDate(JdbcMapUtil.getString(dataMap, "START_TIME"));
+                        }
+                    }
+                    refreshProPlanTime(JdbcMapUtil.getString(objectMap, "ID"), paraData);
                 }
             });
         });
