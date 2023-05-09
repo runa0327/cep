@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyPrjDetailMapper">
+
+    <resultMap id="PmProgressWeeklyResult" type="com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrjDetail">
+        <id column="id" property="id"/>
+        <result column="projectId" property="projectId"/>
+        <result column="projectName" property="projectName"/>
+        <result column="writeDate" property="writeDate"/>
+        <result column="writeDateMin" property="writeDateMin"/>
+        <result column="writeDateMax" property="writeDateMax"/>
+        <result column="weatherStart" property="weatherStart"/>
+        <result column="weatherCompleted" property="weatherCompleted"/>
+        <result column="progress" property="progress"/>
+        <result column="progressMin" property="progressMin"/>
+        <result column="progressMax" property="progressMax"/>
+        <result column="progressDescribe" property="progressDescribe"/>
+        <result column="progressWeek" property="progressWeek"/>
+        <result column="progressRemark" property="progressRemark"/>
+        <result column="fileId" property="fileId"/>
+        <result column="dataType" property="dataType"/>
+        <result column="weekId" property="weekId"/>
+        <result column="weekPrjId" property="weekPrjId"/>
+        <result column="buttonType" property="buttonType"/>
+        <result column="buttonStatus" property="buttonStatus"/>
+        <result column="izWrite" property="izWrite"/>
+        <result column="recordById" property="recordById"/>
+        <result column="recordByName" property="recordByName"/>
+        <result column="manageUserId" property="manageUserId"/>
+        <result column="manageUserName" property="manageUserName"/>
+    </resultMap>
+
+    <select id="getPrjRecords" resultMap="PmProgressWeeklyResult">
+        SELECT
+        a.id,
+        c.DATE AS writeDate,
+        a.VISUAL_PROGRESS AS progress,
+        a.VISUAL_PROGRESS_DESCRIBE AS progressDescribe,
+        a.PROCESS_REMARK_TEXT AS progressWeek,
+        a.TEXT_REMARK_ONE AS progressRemark,
+        a.SYS_TRUE AS weatherStart,
+        a.IZ_END AS weatherCompleted,
+        a.AD_USER_ID AS recordById,
+        d.NAME AS recordByName,
+        a.FILE_ID_ONE AS fileId,
+        b.PM_PRJ_ID AS projectId,
+        ( SELECT NAME FROM pm_prj WHERE id = b.id ) AS projectName
+        FROM
+        PM_PROGRESS_WEEKLY_PRJ_DETAIL a
+        LEFT JOIN PM_PROGRESS_WEEKLY_PRJ b ON a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id
+        LEFT JOIN pm_progress_weekly c ON a.PM_PROGRESS_WEEKLY_ID = c.id
+        LEFT JOIN ad_user d ON a.AD_USER_ID = d.id
+        WHERE
+        a.STATUS = 'ap'
+        AND b.STATUS = 'ap'
+        AND c.STATUS = 'ap'
+        AND b.PM_PRJ_ID = #{projectId}
+        <if test="writeDateMin != null and writeDateMin != ''">
+            and c.FROM_DATE >= #{writeDateMin}
+        </if>
+        <if test="writeDateMax != null and writeDateMax != ''">
+            <![CDATA[ and c.TO_DATE <= #{writeDateMax} ]]>
+        </if>
+        order by a.LAST_MODI_DT desc
+    </select>
+</mapper>

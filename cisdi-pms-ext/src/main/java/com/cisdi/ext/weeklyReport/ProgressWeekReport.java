@@ -2,7 +2,6 @@ package com.cisdi.ext.weeklyReport;
 
 import com.cisdi.ext.file.BaseFileExt;
 import com.cisdi.ext.model.PmProgressWeeklyPrj;
-import com.cisdi.ext.model.PmProgressWeeklyPrjDetail;
 import com.cisdi.ext.model.view.project.PmPrjView;
 import com.cisdi.ext.model.view.weekReport.PmProgressWeeklyView;
 import com.cisdi.ext.model.view.weekReport.WeekMessage;
