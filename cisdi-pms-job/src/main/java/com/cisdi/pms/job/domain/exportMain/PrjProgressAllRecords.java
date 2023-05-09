@@ -6,13 +6,16 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class PrjProgressRecords {
+public class PrjProgressAllRecords {
 
     @ExcelProperty("项目名称")
     public String projectName;
 
     @ExcelProperty("填报时间")
     public String writeDate;
+
+    @ExcelProperty("项目负责人")
+    public String manageUserName;
 
     @ExcelProperty("整体形象进度")
     public BigDecimal progress;
@@ -26,4 +29,9 @@ public class PrjProgressRecords {
     @ExcelProperty("备注说明")
     public String progressRemark;
 
+    @ExcelProperty("是否符合开工条件")
+    public String weatherStart;
+
+    @ExcelProperty("是否竣工")
+    public String weatherCompleted;
 }

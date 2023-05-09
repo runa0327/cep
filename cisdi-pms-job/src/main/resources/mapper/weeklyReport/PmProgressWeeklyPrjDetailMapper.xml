@@ -40,28 +40,58 @@
         a.VISUAL_PROGRESS_DESCRIBE AS progressDescribe,
         a.PROCESS_REMARK_TEXT AS progressWeek,
         a.TEXT_REMARK_ONE AS progressRemark,
-        a.SYS_TRUE AS weatherStart,
-        a.IZ_END AS weatherCompleted,
+        ifnull(b.SYS_TRUE,'1') AS weatherStart,
+        ifnull(b.IZ_END,'0') AS weatherCompleted,
         a.AD_USER_ID AS recordById,
-        d.NAME AS recordByName,
+        (select name from ad_user where id = a.ad_user_id) AS recordByName,
         a.FILE_ID_ONE AS fileId,
         b.PM_PRJ_ID AS projectId,
-        ( SELECT NAME FROM pm_prj WHERE id = b.id ) AS projectName
+        e.name AS projectName,
+        c.id as weekId,
+        e.name as projectName,
+        d.AD_USER_ID as manageUserId,
+        f.name as manageUserName,
+        b.IZ_WRITE as izWrite
         FROM
         PM_PROGRESS_WEEKLY_PRJ_DETAIL a
         LEFT JOIN PM_PROGRESS_WEEKLY_PRJ b ON a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id
         LEFT JOIN pm_progress_weekly c ON a.PM_PROGRESS_WEEKLY_ID = c.id
-        LEFT JOIN ad_user d ON a.AD_USER_ID = d.id
+        LEFT JOIN PM_PRJ e on b.pm_prj_id = e.id
+        left join (select ad_user_id,PM_PRJ_ID from pm_roster where post_info_id = '1633997482885255168' and ad_user_id is not null GROUP BY PM_PRJ_ID,ad_user_id) d on b.pm_prj_id = d.PM_PRJ_ID
+        LEFT JOIN ad_user f ON d.AD_USER_ID = f.id
         WHERE
         a.STATUS = 'ap'
         AND b.STATUS = 'ap'
         AND c.STATUS = 'ap'
-        AND b.PM_PRJ_ID = #{projectId}
+        <if test="weatherStart != null and weatherStart != ''">
+            b.SYS_TRUE = #{weatherStart}
+        </if>
+        <if test="weatherCompleted != null and weatherCompleted != ''">
+            b.IZ_END = #{weatherCompleted}
+        </if>
+        <if test="progressMin != null and progressMin != ''">
+            and a.VISUAL_PROGRESS >= #{progressMin}
+        </if>
+        <if test="progressMax != null and progressMax != ''">
+            <![CDATA[ and a.VISUAL_PROGRESS <= #{progressMax} ]]>
+        </if>
+        <if test="manageUserName != null and manageUserName != ''">
+            and f.name like concat('%',#{manageUserName},'%')
+        </if>
+        <if test="projectId != null and projectId != ''">
+            AND b.PM_PRJ_ID = #{projectId}
+        </if>
+        <if test="projectName != null and projectName != ''">
+            AND e.name like concat('%',#{projectName},'%')
+        </if>
         <if test="writeDateMin != null and writeDateMin != ''">
             and c.FROM_DATE >= #{writeDateMin}
         </if>
         <if test="writeDateMax != null and writeDateMax != ''">
             <![CDATA[ and c.TO_DATE <= #{writeDateMax} ]]>
+        </if>
+        <if test="weekId != '' and weekId != null">
+            and c.id = #{weekId}
         </if>
         order by a.LAST_MODI_DT desc
     </select>

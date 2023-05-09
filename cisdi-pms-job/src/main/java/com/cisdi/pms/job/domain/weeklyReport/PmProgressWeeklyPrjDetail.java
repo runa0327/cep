@@ -51,4 +51,6 @@ public class PmProgressWeeklyPrjDetail extends BasePageEntity {
     //项目负责人
     public String manageUserId;
     public String manageUserName;
+    //导出类型 1按项目维度导出 0按周维度导出
+    public Integer exportType;
 }
