@@ -53,7 +53,7 @@ public class ProgressWeekReport {
             sb.append(" and c.name like ('%").append(projectName).append("%') ");
         }
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sb.toString(),userId);
-        sb.append(" order by weatherStart desc,weatherCompleted asc,a.pm_prj_id desc ").append(limit);
+        sb.append(" order by weatherCompleted asc,weatherStart desc,a.pm_prj_id desc ").append(limit);
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString(),userId);
         if (!CollectionUtils.isEmpty(list1)){
             Map<String, Object> map1 = new HashMap<>();
@@ -236,7 +236,7 @@ public class ProgressWeekReport {
             sb.append(" and b.pm_prj_id = '").append(projectId).append("' ");
         }
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sb.toString(),userId);
-        sb.append(" order by weatherStart desc,weatherCompleted asc,b.pm_prj_id desc ").append(limit);
+        sb.append(" order by weatherCompleted asc,weatherStart desc,b.pm_prj_id desc ").append(limit);
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString(),userId);
         if (!CollectionUtils.isEmpty(list1)){
             Map<String, Object> map1 = new HashMap<>();
