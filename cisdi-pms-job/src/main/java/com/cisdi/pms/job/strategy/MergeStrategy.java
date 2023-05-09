@@ -43,7 +43,7 @@ public class MergeStrategy extends AbstractMergeStrategy {
 
         //在这里判断从哪一行开始调用合并的方法
         if (cell.getRowIndex() >= this.startRow && cell.getColumnIndex() >= startCol) {
-            if (relativeRowIndex == null || relativeRowIndex == 0) {
+            if (relativeRowIndex == null) {
                 return;
             }
             List<CellRangeAddress> mergeList = this.cellRangeAddressList;

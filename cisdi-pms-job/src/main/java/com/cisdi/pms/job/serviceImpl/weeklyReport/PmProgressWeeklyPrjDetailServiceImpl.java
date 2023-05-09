@@ -108,7 +108,7 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
         list.add(0,prjProgressAllRecords);
         //设置合并
         List<CellRangeAddress> cellRangeAddresses = new ArrayList<>();
-        cellRangeAddresses.add(new CellRangeAddress(0,0,0,8));
+        cellRangeAddresses.add(new CellRangeAddress(1,1,0,8));
         //设置头居中
         WriteCellStyle headWriteCellStyle = new WriteCellStyle();
         headWriteCellStyle.setHorizontalAlignment(HorizontalAlignment.CENTER);
