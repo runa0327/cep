@@ -98,7 +98,7 @@ public class ProgressWeekReport {
                 .eq(PmProgressWeeklyPrj.Cols.TO_DATE,dateMap.get("endDate")).eq(PmProgressWeeklyPrj.Cols.STATUS,"AP"));
         if (!CollectionUtils.isEmpty(progressPrj)){
             weekId = progressPrj.get(0).getPmProgressWeeklyId();
-            sql = "select a.id,a.DATE as writeDate,A.VISUAL_PROGRESS AS progress,A.VISUAL_PROGRESS_DESCRIBE AS progressDescribe,A.PROCESS_REMARK_TEXT AS progressWeek," +
+            sql = "select a.file_id_one as fileId,a.id,a.DATE as writeDate,A.VISUAL_PROGRESS AS progress,A.VISUAL_PROGRESS_DESCRIBE AS progressDescribe,A.PROCESS_REMARK_TEXT AS progressWeek," +
                     "a.TEXT_REMARK_ONE as progressRemark,b.SYS_TRUE as weatherStart,b.IZ_END as weatherCompleted,'new' as dataType, " +
                     "a.PM_PROGRESS_WEEKLY_ID as weekId,a.PM_PROGRESS_WEEKLY_PRJ_ID as weekPrjId,b.PM_PRJ_ID as projectId,b.IZ_WRITE as izWrite " +
                     "from pm_progress_weekly_prj_detail a left join PM_PROGRESS_WEEKLY_PRJ b on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id " +
@@ -128,6 +128,7 @@ public class ProgressWeekReport {
                 weekMessage.weekId = JdbcMapUtil.getString(p,"weekId"); //周批次id
                 String fileId = JdbcMapUtil.getString(p,"fileId"); //文件id
                 if (!SharedUtil.isEmptyString(fileId)){
+                    weekMessage.fileId = fileId;
                     weekMessage.fileList =BaseFileExt.getFile(fileId);
                 }
                 return weekMessage;
