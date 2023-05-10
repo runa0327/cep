@@ -120,8 +120,6 @@ public class PmLifeCycleExt {
         List<Map<String, Object>> dataList = new ArrayList<>();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
 
-        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id left join gr_set_value gsv on gsv.id = pn.PROGRESS_STATUS_ID where pl.IS_TEMPLATE <>1");
-
         for (Map<String, Object> stringObjectMap : list) {
             Map<String, Object> newData = new HashMap<>();
             for (String s : headerList) {
@@ -132,9 +130,12 @@ public class PmLifeCycleExt {
                 } else if ("前期手续经办人".equals(s)) {
                     newData.put("ID", stringObjectMap.get("qqusers"));
                 } else {
-                    Optional<Map<String, Object>> optional = nodeList.stream().filter(p -> Objects.equals(stringObjectMap.get("id"), p.get("PM_PRJ_ID")) && Objects.equals(s, p.get("NAME"))).findAny();
-                    if (optional.isPresent()) {
-                        Map<String, Object> dataMap = optional.get();
+                    List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name from pm_pro_plan_node pn " +
+                            "left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id " +
+                            "left join gr_set_value gsv on gsv.id = pn.PROGRESS_STATUS_ID " +
+                            "where pl.IS_TEMPLATE <>1 and pl.PM_PRJ_ID =? and pn.name=?", stringObjectMap.get("id"), s);
+                    if (!CollectionUtils.isEmpty(nodeList)) {
+                        Map<String, Object> dataMap = nodeList.get(0);
                         JSONObject json = new JSONObject();
                         if (Objects.nonNull(dataMap.get("status_name"))) {
                             String status = JdbcMapUtil.getString(dataMap, "status_name");
