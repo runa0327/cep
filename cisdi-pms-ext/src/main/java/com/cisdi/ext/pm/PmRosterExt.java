@@ -12,7 +12,6 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
-import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -70,7 +69,7 @@ public class PmRosterExt {
         sb.append(" limit ").append(start).append(",").append(pageSize);
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //header
-        List<Map<String, Object>> strList = myJdbcTemplate.queryForList("select po.`NAME` as PROJECT_POST from PM_ROSTER pr left join post_info po on pr.POST_INFO_ID = po.id where POST_INFO_ID is not null AND po.`NAME` is not null group by po.id");
+        List<Map<String, Object>> strList = myJdbcTemplate.queryForList("select po.`NAME` as PROJECT_POST from PM_ROSTER pr left join post_info po on pr.POST_INFO_ID = po.id where POST_INFO_ID is not null AND po.`NAME` is not null group by po.id  order by po.seq_no");
         List<String> headerList = strList.stream().map(p -> JdbcMapUtil.getString(p, "PROJECT_POST")).collect(Collectors.toList());
         headerList.add(0, "项目名称");
         headerList.add("ID");
