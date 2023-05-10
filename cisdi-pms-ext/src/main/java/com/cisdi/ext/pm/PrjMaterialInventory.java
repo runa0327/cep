@@ -231,8 +231,8 @@ public class PrjMaterialInventory {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         DltReq dltReq = JSONObject.parseObject(JSONObject.toJSONString(params), DltReq.class);
         String sql = "select ty.name typeName,f.id fileId,f.DSP_NAME fileName,f.DSP_SIZE fileSize,f.UPLOAD_DTTM uploadTime,u.name uploadUser from " +
-                "prj_inventory_detail d \n" +
-                "left join prj_inventory i on i.id = d.PRJ_INVENTORY_ID\n" +
+                "prj_inventory i \n" +
+                "left join prj_inventory_detail d on i.id = d.PRJ_INVENTORY_ID\n" +
                 "left join material_inventory_type ty on ty.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
                 "left join fl_file f on f.id = d.FL_FILE_ID\n" +
                 "left join ad_user u on u.id = f.CRT_USER_ID\n" +
