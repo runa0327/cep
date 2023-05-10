@@ -460,6 +460,19 @@ public class ProcessCommon {
                 }
             }
         }
+    }
 
+    /**
+     * 流程实例数据作废-作废对应流程表
+     */
+    public void cancelData(){
+        List<WfProcessInstance> list = WfProcessInstance.selectByWhere(new Where().eq(WfProcessInstance.Cols.STATUS,"VD"));
+        if (!CollectionUtils.isEmpty(list)){
+            for (WfProcessInstance tmp : list) {
+                String id = tmp.getEntityRecordId();
+                String code = tmp.getEntCode();
+                Crud.from(code).where().eq("id",id).update().set("status","VD").exec();
+            }
+        }
     }
 }

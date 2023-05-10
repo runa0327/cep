@@ -445,6 +445,18 @@ public class PoOrderReqExt {
     }
 
     /**
+     * 合同签订作废数据更新
+     */
+    public void orderCancel(){
+        List<PoOrderReq> list = PoOrderReq.selectByWhere(new Where().eq(PoOrderReq.Cols.STATUS,"VD"));
+        if (!CollectionUtils.isEmpty(list)){
+            for (PoOrderReq tmp : list) {
+                Crud.from("po_order").where().eq("CONTRACT_APP_ID",tmp.getId()).update().set("STATUS","VD").exec();
+            }
+        }
+    }
+
+    /**
      * 合同签订-word转pdf-发起时
      */
     public void wordToPdfStart(){
