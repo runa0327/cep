@@ -24,6 +24,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -558,6 +561,8 @@ public class PoOrderReqExt {
     public void OrderProcessEnd(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String id = entityRecord.csCommId;
+        Map<String, Object> valueMap = entityRecord.valueMap;
         //合同工期
         int duration = JdbcMapUtil.getInt(entityRecord.valueMap,"PLAN_TOTAL_DAYS");
         //合同签订日期
@@ -565,11 +570,40 @@ public class PoOrderReqExt {
         //计算到期日期
         Date expireDate = DateTimeUtil.addDays(signDate,duration);
         //更新到期日期字段
-        Crud.from("PO_ORDER_REQ").where().eq("id",entityRecord.csCommId).update().set("DATE_FIVE",expireDate).exec();
+        Crud.from("PO_ORDER_REQ").where().eq("id",id).update().set("DATE_FIVE",expireDate).exec();
+        //生产合同编号
+        createOrderCode(id,valueMap,myJdbcTemplate);
         //将合同数据写入传输至合同数据表(po_order)
         PoOrderExtApi.createData(entityRecord,"PO_ORDER_REQ","0100070673610715078",myJdbcTemplate);
         //项目信息写入明细表
         PoOrderPrjDetailExt.createData(entityRecord);
+    }
+
+    /**
+     * 流程完结生成合同编号
+     * @param id 唯一id
+     * @param valueMap 表单值
+     * @param myJdbcTemplate 数据源
+     */
+    public void createOrderCode(String id, Map<String, Object> valueMap, MyJdbcTemplate myJdbcTemplate) {
+        List<PoOrderReq> list = PoOrderReq.selectByWhere(new Where().eq(PoOrderReq.Cols.ID,id));
+        if (!CollectionUtils.isEmpty(list)){
+            String code = list.get(0).getContractCode();
+            if (SharedUtil.isEmptyString(code)){
+                // 查询当前已审批通过的招标合同数量
+                List<Map<String, Object>> map = myJdbcTemplate.queryForList("select count(*) as num from PO_ORDER_REQ where status = 'AP' ");
+                Date date = new Date();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String year = sdf.format(date).substring(0, 7).replace("-", "");
+                // 合同编码规则
+                int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
+                Format formatCount = new DecimalFormat("0000");
+                String formatNum = formatCount.format(num);
+                code = "gc-" + year + "-" + formatNum;
+            }
+            String name = valueMap.get("CONTRACT_NAME").toString();
+            myJdbcTemplate.update("update PO_ORDER_REQ set CONTRACT_CODE = ? , NAME = ? where id = ?",code, name, id);
+        }
     }
 
     /**
