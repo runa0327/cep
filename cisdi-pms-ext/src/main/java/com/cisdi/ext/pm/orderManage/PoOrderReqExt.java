@@ -572,7 +572,8 @@ public class PoOrderReqExt {
         //更新到期日期字段
         Crud.from("PO_ORDER_REQ").where().eq("id",id).update().set("DATE_FIVE",expireDate).exec();
         //生产合同编号
-        createOrderCode(id,valueMap,myJdbcTemplate);
+        String orderCode = createOrderCode(id,valueMap,myJdbcTemplate);
+        valueMap.put("CONTRACT_CODE",orderCode);
         //将合同数据写入传输至合同数据表(po_order)
         PoOrderExtApi.createData(entityRecord,"PO_ORDER_REQ","0100070673610715078",myJdbcTemplate);
         //项目信息写入明细表
@@ -584,8 +585,10 @@ public class PoOrderReqExt {
      * @param id 唯一id
      * @param valueMap 表单值
      * @param myJdbcTemplate 数据源
+     * @return 合同编号
      */
-    public void createOrderCode(String id, Map<String, Object> valueMap, MyJdbcTemplate myJdbcTemplate) {
+    public String createOrderCode(String id, Map<String, Object> valueMap, MyJdbcTemplate myJdbcTemplate) {
+        String orderCode = "";
         List<PoOrderReq> list = PoOrderReq.selectByWhere(new Where().eq(PoOrderReq.Cols.ID,id));
         if (!CollectionUtils.isEmpty(list)){
             String code = list.get(0).getContractCode();
@@ -603,7 +606,9 @@ public class PoOrderReqExt {
             }
             String name = valueMap.get("CONTRACT_NAME").toString();
             myJdbcTemplate.update("update PO_ORDER_REQ set CONTRACT_CODE = ? , NAME = ? where id = ?",code, name, id);
+            orderCode = code;
         }
+        return orderCode;
     }
 
     /**

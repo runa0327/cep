@@ -1,6 +1,8 @@
 package com.cisdi.ext.api;
 
 import com.cisdi.ext.base.GrSetValue;
+import com.cisdi.ext.model.PoOrder;
+import com.cisdi.ext.model.PoOrderReq;
 import com.cisdi.ext.model.view.file.BaseFileView;
 import com.cisdi.ext.model.view.order.PoOrderContactsView;
 import com.cisdi.ext.model.view.order.PoOrderDtlProView;
@@ -12,6 +14,7 @@ import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -432,6 +435,23 @@ public class PoOrderExtApi {
         } else {
             ExtJarHelper.returnValue.set(null);
         }
+    }
 
+    /**
+     * 合同编号刷数据
+     */
+    public void refreshOrderCode(){
+        List<PoOrder> list = PoOrder.selectByWhere(new Where().eq(PoOrder.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list)){
+            for (PoOrder tmp : list) {
+                String poOrderReqId = tmp.getContractAppId();
+                String id = tmp.getId();
+                List<PoOrderReq> orderReqList = PoOrderReq.selectByWhere(new Where().eq(PoOrderReq.Cols.ID,poOrderReqId));
+                if (!CollectionUtils.isEmpty(orderReqList)){
+                    String orderCode = orderReqList.get(0).getContractCode();
+                    Crud.from(PoOrder.ENT_CODE).where().eq(PoOrder.Cols.ID,id).update().set(PoOrder.Cols.CONTRACT_CODE,orderCode).exec();
+                }
+            }
+        }
     }
 }
