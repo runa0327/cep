@@ -40,6 +40,8 @@ public class PoOrderExtApi {
         Map<String, Object> valueMap = entityRecord.valueMap;
         //流程id
         String csId = entityRecord.csCommId;
+        //删除原有所有数据
+        Crud.from("po_order").where().eq("CONTRACT_APP_ID",csId).delete().exec();
         //获取合作单位
         String cooperation = getCooperation(csId,myJdbcTemplate);
         //项目id
@@ -50,11 +52,7 @@ public class PoOrderExtApi {
             List<String> list = StringUtil.getStrToList(projectId,",");
             for (String prjId : list) {
                 /**=============此处需要添加合同已支付金额、累计支付比列查询逻辑===========================**/
-                //判断是否已存在，存在则修改
-                String poOrderId = getDateByProcessDateId(csId,prjId,myJdbcTemplate);
-                if (SharedUtil.isEmptyString(poOrderId)){
-                    poOrderId = Crud.from("po_order").insertData();
-                }
+                String poOrderId = Crud.from("po_order").insertData();
                 //修改合同数据表数据
                 updatePoOrder(valueMap,csId,poOrderId,prjId,cooperation,sourceTypeId,viewId);
             }
@@ -71,6 +69,8 @@ public class PoOrderExtApi {
     public static void createOrderHistoryData(Map<String, Object> tmp, String sourceTypeId, String viewId, MyJdbcTemplate myJdbcTemplate) {
         //流程id
         String csId = tmp.get("id").toString();
+        //删除原有所有数据
+        Crud.from("po_order").where().eq("CONTRACT_APP_ID",csId).delete().exec();
         //获取合作单位
         String cooperation = getCooperation(csId,myJdbcTemplate);
         //项目id
@@ -79,11 +79,7 @@ public class PoOrderExtApi {
             List<String> list = StringUtil.getStrToList(projectId,",");
             for (String prjId : list) {
                 /**=============此处需要添加合同已支付金额、累计支付比列查询逻辑===========================**/
-                //判断是否已存在，存在则修改
-                String poOrderId = getDateByProcessDateId(csId,prjId,myJdbcTemplate);
-                if (SharedUtil.isEmptyString(poOrderId)){
-                    poOrderId = Crud.from("po_order").insertData();
-                }
+                String poOrderId = Crud.from("po_order").insertData();
                 //修改合同数据表数据
                 updatePoOrder(tmp,csId,poOrderId,prjId,cooperation,sourceTypeId,viewId);
             }
