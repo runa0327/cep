@@ -1,6 +1,5 @@
 package com.cisdi.ext.importQYY;
 
-import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -69,7 +68,6 @@ public class PrjReqImport {
             return;
         }
 
-        //todo 更新立项表
 
         //业主单位
         String customerUnitId = this.getCustomerUnitId(valueMap);

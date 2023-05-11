@@ -3,6 +3,7 @@ package com.cisdi.ext.pm;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.FeeDemandDtl;
 import com.cisdi.ext.model.SecondCategoryFeeDemand;
+import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -70,10 +72,52 @@ public class SecondFeeExt {
      * 选择项目、合同、费用明细后回显
      */
     public void echo(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         SecondFeeAddReq req = JSONObject.parseObject(JSONObject.toJSONString(input), SecondFeeAddReq.class);
+        List<SecondCategoryFeeDemand> demands = SecondCategoryFeeDemand.selectByWhere(new Where()
+                .eq(SecondCategoryFeeDemand.Cols.PM_PRJ_ID, req.prjId)
+                .eq(SecondCategoryFeeDemand.Cols.PO_ORDER_REQ_ID, req.orderReqId));
+        //查到继续查明细，没查到回显默认数据
+        List<Map<String, Object>> originMaps;
+        if (demands.isEmpty()){
+            List<Map<String, Object>> nodeMaps = myJdbcTemplate.queryForList("select v.id feeDemandNodeId,v.name feeDemandNodeName from gr_set_value v left join gr_set s on s.id = v" +
+                    ".GR_SET_ID where s.code = 'fee_demand_node' order by v.SEQ_NO");
+            originMaps = nodeMaps;
+        }else {
+            SecondCategoryFeeDemand demand = demands.get(0);
+            //查明细
+            List<Map<String, Object>> feeDtlMaps = myJdbcTemplate.queryForList("select d.id feeDemandNodeId,v.name feeDemandNodeName,d.APPROVED_AMOUNT " +
+                    "approvedAmount,d.PAYABLE_RATIO payableRatio,d.PAYABLE_AMOUNT payableAmount,d.PAID_AMOUNT paidAmount,d.PAYMENT_RATIO paymentRatio,d.REQUIRED_AMOUNT " +
+                    "requiredAmount,d.SUBMIT_TIME submitTime from fee_demand_dtl d\n" +
+                    "left join gr_set_value v on v.id = d.FEE_DEMAND_NODE\n" +
+                    "where d.SECOND_CATEGORY_FEE_DEMAND_ID = ? order by v.SEQ_NO", demand.getId());
+            originMaps = feeDtlMaps;
+        }
+        List<DemandDtl> demandDtls = this.mapsToDemandDtls(originMaps);
+        //封装返回带上主表数据
+        SecondFeeAddReq resp = new SecondFeeAddReq();
+        resp = req;
+        resp.secondFeeId = demands.get(0).getId();
+        resp.feeDemandDtls = demandDtls;
+        Map output = JsonUtil.fromJson(JsonUtil.toJson(resp), Map.class);
+        ExtJarHelper.returnValue.set(output);
+    }
 
-
+    /**
+     * 原始maps转DemandDtl集合
+     * @param originMaps
+     * @return
+     */
+    private List<DemandDtl> mapsToDemandDtls(List<Map<String, Object>> originMaps){
+        List<DemandDtl> demandDtls = new ArrayList<>();
+        if (!originMaps.isEmpty()){
+            for (Map<String, Object> originMap : originMaps) {
+                DemandDtl demandDtl = JSONObject.parseObject(JSONObject.toJSONString(originMap), DemandDtl.class);
+                demandDtls.add(demandDtl);
+            }
+        }
+        return demandDtls;
     }
 
     /**
