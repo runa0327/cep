@@ -166,20 +166,25 @@ public class PmLifeCycleExt {
                             } else if ("未涉及".equals(status)) {
                                 nameOrg = "未涉及";
                                 statusOrg = "未涉及";
-                            } else if ("进行中".equals(status)) {
-                                nameOrg = "计划完成";
+                            } else {
                                 if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                    dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
+                                    Date planCompDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                                    if (planCompDate.before(new Date())) {
+                                        statusOrg = "已超期";
+                                    } else {
+                                        if ("进行中".equals(status)) {
+                                            statusOrg = "进行中";
+                                        } else if ("未启动".equals(status)) {
+                                            statusOrg = "未启动";
+                                        }
+                                    }
+                                    nameOrg = "计划完成";
+                                    if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
+                                        dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
+                                    }
                                 }
-                                statusOrg = "进行中";
-
-                            } else if ("未启动".equals(status)) {
-                                nameOrg = "计划完成";
-                                if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                    dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
-                                }
-                                statusOrg = "未启动";
                             }
+
 
                             int days = 0;
                             if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE")) && Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
