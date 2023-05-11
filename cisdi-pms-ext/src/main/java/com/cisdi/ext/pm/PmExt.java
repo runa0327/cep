@@ -245,7 +245,7 @@ public class PmExt {
                 "left join gr_set_value gss on gss.id = pm.PROJECT_PHASE_ID \n" +
                 "left join pm_pro_plan ppp on ppp.PM_PRJ_ID = pm.id \n" +
                 "left join gr_set_value ggg on ggg.id = pm.BASE_LOCATION_ID "+
-                "where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' ");
+                "where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 ");
         if (Strings.isNotEmpty(param.name)) {
             sb.append(" and pm.`name` like '%").append(param.name).append("%'");
         }
