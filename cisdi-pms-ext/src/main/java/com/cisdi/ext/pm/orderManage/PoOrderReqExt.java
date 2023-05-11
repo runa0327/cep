@@ -423,6 +423,25 @@ public class PoOrderReqExt {
     }
 
     /**
+     * 合同签订-历史数据处理-项目写入合同签订-项目名称(流程内)明细表
+     */
+    public void historyPrjInsertPrjDetail(){
+        List<PoOrderReq> list = PoOrderReq.selectByWhere(new Where().eq(PoOrderReq.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list)){
+            for (PoOrderReq tmp : list) {
+                String poOrderReqId = tmp.getId();
+                String prjIds = tmp.getPmPrjIds();
+                List<String> prjList = StringUtil.getStrToList(prjIds,",");
+                if (!CollectionUtils.isEmpty(prjList)){
+                    for (String tp : prjList) {
+                        
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * 合同签订-非系统项目转系统项目
      */
     public void noSystemPrjCode(){
