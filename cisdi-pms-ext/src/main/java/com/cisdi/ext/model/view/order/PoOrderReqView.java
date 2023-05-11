@@ -2,7 +2,7 @@ package com.cisdi.ext.model.view.order;
 
 import com.cisdi.ext.model.BasePageEntity;
 
-public class PoOrderReq extends BasePageEntity {
+public class PoOrderReqView extends BasePageEntity {
     // id
     public String id;
     // 项目id

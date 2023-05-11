@@ -336,4 +336,19 @@ public class PmPrjExt {
         }
         return dept;
     }
+
+    /**
+     * 根据项目名称创建项目
+     * @param projectName 项目名称
+     * @param prjCode 项目编码
+     * @return 项目id
+     */
+    public static String createPrj(String projectName, String prjCode) {
+        String id = Crud.from("pm_prj").insertData();
+        Crud.from("pm_prj").where().eq("id",id).update()
+                .set("name",projectName).set("PROJECT_SOURCE_TYPE_ID","0099952822476441374")
+                .set("PM_CODE",prjCode).set("IZ_END",0).set("IZ_START_REQUIRE",1)
+                .exec();
+        return id;
+    }
 }

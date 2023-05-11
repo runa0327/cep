@@ -110,21 +110,21 @@ public class WfExt {
 //                        }
 //                    }
 
-                    // 合同签订批准后生成合同编号
-                    if ("PO_ORDER_REQ".equals(entityCode) || "po_order_req".equals(entityCode)) {
-                        // 查询当前已审批通过的招标合同数量
-                        List<Map<String, Object>> map = myJdbcTemplate.queryForList("select count(*) as num from PO_ORDER_REQ where status = 'AP' ");
-                        Date date = new Date();
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        String year = sdf.format(date).substring(0, 7).replace("-", "");
-                        // 合同编码规则
-                        int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
-
-                        String formatNum = formatCount.format(num);
-                        String code = "gc-" + year + "-" + formatNum;
-                        String name = valueMap.get("CONTRACT_NAME").toString();
-                        int update2 = myJdbcTemplate.update("update PO_ORDER_REQ set CONTRACT_CODE = ? , NAME = ? where id = ?",code, name, csCommId);
-                    }
+                    // 合同签订批准后生成合同编号 2023-05-10取消，换到流程完结时扩展中生产
+//                    if ("PO_ORDER_REQ".equals(entityCode) || "po_order_req".equals(entityCode)) {
+//                        // 查询当前已审批通过的招标合同数量
+//                        List<Map<String, Object>> map = myJdbcTemplate.queryForList("select count(*) as num from PO_ORDER_REQ where status = 'AP' ");
+//                        Date date = new Date();
+//                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                        String year = sdf.format(date).substring(0, 7).replace("-", "");
+//                        // 合同编码规则
+//                        int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
+//
+//                        String formatNum = formatCount.format(num);
+//                        String code = "gc-" + year + "-" + formatNum;
+//                        String name = valueMap.get("CONTRACT_NAME").toString();
+//                        int update2 = myJdbcTemplate.update("update PO_ORDER_REQ set CONTRACT_CODE = ? , NAME = ? where id = ?",code, name, csCommId);
+//                    }
                     // 补充合同批准后生成合同编号
                     if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode)) {
                         // 查询当前审批通过的补充合同数量和该合同的name

@@ -9,6 +9,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import org.apache.logging.log4j.util.Strings;
 
 import java.math.BigDecimal;
@@ -33,7 +34,7 @@ public class ContractAccount {
     /**
      * 合同台账列表查询
      */
-    public void contractAccountList(){
+      /** public void contractAccountList(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         LoginInfo loginInfo = ExtJarHelper.loginInfo.get();
         List<String> rootUsers = this.getRootUsers();
@@ -146,7 +147,73 @@ public class ContractAccount {
         responseData.contractInfos = contractInfos;
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(responseData), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
+    } **/
+
+    /**
+     * 合同台账列表查询
+     */
+    public void contractAccountList(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        RequestParam requestParam = this.getRequestParam();
+        // 起始条数
+        int start = (requestParam.pageIndex - 1) * requestParam.pageSize;
+        String limit = "limit " + start + "," + requestParam.pageSize;
+
+        String sql = "SELECT A.PM_PRJ_ID AS prjId,B.NAME AS prjName,A.CONTRACT_NAME AS contractName,A.CONTRACT_APP_ID as id," +
+                "A.CONTRACT_CODE AS contractCode,A.CUSTOMER_UNIT as contractCompanyId,D.NAME AS contractCompanyName," +
+                "A.WIN_BID_UNIT_ONE AS cooperationUnit,A.CONTRACT_CATEGORY_ONE_ID as contractCategoryId," +
+                "C.NAME AS contractCategoryName,A.AMT_FIVE AS amtExcludeTax,A.AMT_ONE AS taxRate," +
+                "A.AMT_SIX AS amtIncludeTax,A.SIGN_DATE AS createTime,A.DATE_FIVE AS expireDate,A.FILE_ID_ONE AS fileIds " +
+                "FROM PO_ORDER A " +
+                "LEFT JOIN PM_PRJ B ON A.PM_PRJ_ID = B.ID " +
+                "LEFT JOIN GR_SET_VALUE C ON A.CONTRACT_CATEGORY_ONE_ID = C.ID " +
+                "LEFT JOIN pm_party D ON B.CUSTOMER_UNIT = D.ID " +
+                "WHERE A.STATUS = 'AP' and ORDER_DATA_SOURCE_TYPE = '1630087650826432512' ";
+        StringBuffer sb = new StringBuffer(sql);
+        if (!SharedUtil.isEmptyString(requestParam.prjId)){
+            sb.append(" and a.pm_prj_id = '").append(requestParam.prjId).append("' ");
+        }
+        if (!SharedUtil.isEmptyString(requestParam.contractName)){
+            sb.append(" and a.CONTRACT_NAME like '%").append(requestParam.contractName).append("'%");
+        }
+        if (!SharedUtil.isEmptyString(requestParam.contractCompanyId)){
+            sb.append(" and A.CUSTOMER_UNIT = '").append(requestParam.contractCompanyId).append("'");
+        }
+        if (!SharedUtil.isEmptyString(requestParam.contractCategoryId)){
+            sb.append(" and A.CONTRACT_CATEGORY_ONE_ID = '").append(requestParam.contractCategoryId).append("'");
+        }
+        if (!SharedUtil.isEmptyString(requestParam.amtIncludeTaxStart)){
+            sb.append(" and A.AMT_SIX >= '").append(requestParam.amtIncludeTaxStart).append("'");
+        }
+        if (!SharedUtil.isEmptyString(requestParam.amtIncludeTaxEnd)){
+            sb.append(" and A.AMT_SIX <= '").append(requestParam.amtIncludeTaxEnd).append("'");
+        }
+        if (!SharedUtil.isEmptyString(requestParam.createTimeStart)){
+            sb.append(" and A.SIGN_DATE >= '").append(requestParam.createTimeStart).append("'");
+        }
+        if (!SharedUtil.isEmptyString(requestParam.createTimeEnd)){
+            sb.append(" and A.SIGN_DATE <= '").append(requestParam.createTimeEnd).append("'");
+        }
+        sb.append(" order by A.ID DESC ");
+        StringBuilder sb2 = new StringBuilder(sb);
+        sb.append(limit);
+
+        ResponseData responseData = new ResponseData();
+        List<Map<String, Object>> contractList = myJdbcTemplate.queryForList(sb.toString());
+        List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(sb2.toString());
+        //计算总数
+        responseData.total = totalList.size();
+        List<ContractInfo> contractInfos = new ArrayList<>();
+        for (Map<String, Object> contractMap : contractList) {
+            ContractInfo contractInfo = JSONObject.parseObject(JSONObject.toJSONString(contractMap), ContractInfo.class);
+            contractInfo.files = FileCommon.getFileResp(JdbcMapUtil.getString(contractMap, "fileIds"), myJdbcTemplate);
+            contractInfos.add(contractInfo);
+        }
+        responseData.contractInfos = contractInfos;
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(responseData), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
     }
+
     /**
      * 获取拥有所有权限用户id
      */
