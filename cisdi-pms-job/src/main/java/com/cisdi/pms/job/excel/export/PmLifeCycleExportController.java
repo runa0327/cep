@@ -8,6 +8,8 @@ import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +35,9 @@ public class PmLifeCycleExportController extends BaseController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private NamedParameterJdbcTemplate myNamedParameterJdbcTemplate;
+
 
     @SneakyThrows(IOException.class)
     @GetMapping("export")
@@ -53,7 +58,7 @@ public class PmLifeCycleExportController extends BaseController {
         sb.append("group by pj.id,au.`NAME` order by pj.pm_code desc");
 
         //header
-        List<Map<String, Object>> strList = jdbcTemplate.queryForList("select `NAME` from pm_pro_plan_node where `NAME` is not null and `LEVEL`=3 GROUP BY `NAME`");
+        List<Map<String, Object>> strList = jdbcTemplate.queryForList("select `NAME`,ifnull(IZ_DISPLAY,0) as IZ_DISPLAY from STANDARD_NODE_NAME where `LEVEL`=3 order by SEQ_NO");
 
         List<String> headerList = strList.stream().map(p -> JdbcMapUtil.getString(p, "NAME")).collect(Collectors.toList());
         headerList.add(0, "项目名称");
@@ -63,8 +68,16 @@ public class PmLifeCycleExportController extends BaseController {
         List<Map<String, Object>> dataList = new ArrayList<>();
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
 
-        List<Map<String, Object>> nodeList = jdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id left join gr_set_value gsv on gsv.id = pn.PROGRESS_STATUS_ID where pl.IS_TEMPLATE <>1");
-
+        List<Map<String, Object>> nodeList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(list)) {
+            List<String> ids = list.stream().map(p -> JdbcMapUtil.getString(p, "id")).collect(Collectors.toList());
+            Map<String, Object> queryParams = new HashMap<>();// 创建入参map
+            queryParams.put("ids", ids);
+            nodeList = myNamedParameterJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name from pm_pro_plan_node pn " +
+                    "left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id " +
+                    "left join gr_set_value gsv on gsv.id = pn.PROGRESS_STATUS_ID " +
+                    "where pl.IS_TEMPLATE <>1 and pl.PM_PRJ_ID in (:ids)  ", queryParams);
+        }
         for (Map<String, Object> stringObjectMap : list) {
             Map<String, Object> newData = new HashMap<>();
             for (String s : headerList) {
@@ -101,12 +114,12 @@ public class PmLifeCycleExportController extends BaseController {
                                 }
                                 statusOrg = "进行中";
 
-                            } else if ("未开始".equals(status)) {
+                            } else if ("未启动".equals(status)) {
                                 nameOrg = "计划完成";
                                 if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
                                     dateOrg = DateUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
                                 }
-                                statusOrg = "进行中";
+                                statusOrg = "未启动";
                             }
 
                             int days = 0;
