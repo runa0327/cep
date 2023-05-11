@@ -1,6 +1,7 @@
 package com.cisdi.pms.job.archive;
 
 import cn.hutool.core.util.IdUtil;
+import com.cisdi.pms.job.utils.StringUtils;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -78,10 +80,13 @@ public class ArchiveGenerationService {
                     updateLog(true, "表单没有PM_PRJ_ID属性或PM_PRJ_ID属性值为空，无需生成资料。", procInstId, newLogId);
                     continue;
                 }
-
-                String folderIdForProcInst = getOrCreateFoldersForMainCateSubCateProcProcInst(prjId, folderList.get(0));
-                createFoldersAndFilesForEntityRecord(prjId, folderIdForProcInst, entCode, entityRecord);
-
+                List<String> prjIdList = StringUtils.splitByCode(prjId,",");
+                if (!CollectionUtils.isEmpty(prjIdList)){
+                    for (String projectId : prjIdList) {
+                        String folderIdForProcInst = getOrCreateFoldersForMainCateSubCateProcProcInst(projectId, folderList.get(0));
+                        createFoldersAndFilesForEntityRecord(projectId, folderIdForProcInst, entCode, entityRecord);
+                    }
+                }
                 updateLog(true, null, procInstId, newLogId);
             } catch (Exception ex) {
                 log.error("根据流程生成资料出错！", ex);
@@ -223,7 +228,13 @@ public class ArchiveGenerationService {
     }
 
     private String getPrjId(Map<String, Object> entityRecord) {
-        return entityRecord == null || SharedUtil.isEmptyObject(entityRecord.get("pm_prj_id")) ? null : entityRecord.get("pm_prj_id").toString();
+        String projectId = null;
+        if (entityRecord != null && !SharedUtil.isEmptyObject(entityRecord.get("pm_prj_id"))){
+            projectId = entityRecord.get("pm_prj_id").toString();
+        } else if (!SharedUtil.isEmptyObject(entityRecord.get("pm_prj_ids"))){
+            projectId = entityRecord.get("pm_prj_ids").toString();
+        }
+        return projectId;
     }
 
     public void createProcInstForImportedData() {

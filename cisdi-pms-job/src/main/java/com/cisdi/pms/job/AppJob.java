@@ -2,6 +2,7 @@ package com.cisdi.pms.job;
 
 import com.iflytek.fsp.flylog.sdk.java.core.FlylogTypeFilter;
 import lombok.extern.slf4j.Slf4j;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -17,6 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Slf4j
 @EnableScheduling
 @SpringBootApplication
+@MapperScan(basePackages = {"com.cisdi.pms.job.mapper"})
 public class AppJob {
     public AppJob() {
     }

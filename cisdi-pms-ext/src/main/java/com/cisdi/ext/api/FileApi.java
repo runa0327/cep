@@ -33,7 +33,8 @@ public class FileApi {
         fileId = StringUtil.codeToSplit(fileId);
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql = "select a.id,a.DSP_NAME,a.SIZE_KB,a.PHYSICAL_LOCATION,a.UPLOAD_DTTM,a.CRT_USER_ID,b.NAME AS userName from fl_file a left join ad_user b on a.CRT_USER_ID = b.id where a.id in ('" + fileId + "')";
+        String sql = "select a.id,a.DSP_NAME,a.SIZE_KB,a.PHYSICAL_LOCATION,a.UPLOAD_DTTM,a.CRT_USER_ID,b.NAME AS userName,A.DSP_SIZE AS DSP_SIZE " +
+                "from fl_file a left join ad_user b on a.CRT_USER_ID = b.id where a.id in ('" + fileId + "')";
         List<Map<String, Object>> fileList = myJdbcTemplate.queryForList(sql);
         if (!CollectionUtils.isEmpty(fileList)) {
             List<BaseFileView> baseFile = fileList.stream().map(q -> {
@@ -64,7 +65,8 @@ public class FileApi {
      */
     public static List<BaseFileView> getFileList(String str) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql = "select a.id,a.DSP_NAME,a.SIZE_KB,a.PHYSICAL_LOCATION,a.UPLOAD_DTTM,a.CRT_USER_ID,b.NAME AS userName from fl_file a left join ad_user b on a.CRT_USER_ID = b.id where a.id in ('" + str + "')";
+        String sql = "select a.ext as fileType,a.id,a.DSP_NAME,a.SIZE_KB,a.PHYSICAL_LOCATION,a.UPLOAD_DTTM,a.CRT_USER_ID,b.NAME AS userName,A.DSP_SIZE AS DSP_SIZE " +
+                "from fl_file a left join ad_user b on a.CRT_USER_ID = b.id where a.id in ('" + str + "')";
         List<Map<String, Object>> fileList = myJdbcTemplate.queryForList(sql);
         List<BaseFileView> baseFile = new ArrayList<>();
         if (!CollectionUtils.isEmpty(fileList)) {
@@ -73,10 +75,12 @@ public class FileApi {
                 baseFileView.id = JdbcMapUtil.getString(q, "id");
                 baseFileView.fileName = JdbcMapUtil.getString(q, "DSP_NAME");// 显示文件名称
                 baseFileView.fileSize = JdbcMapUtil.getString(q, "SIZE_KB");// 文件大小
+                baseFileView.dspSize = JdbcMapUtil.getString(q, "DSP_SIZE");// 文件大小
                 baseFileView.fileAddress = JdbcMapUtil.getString(q, "PHYSICAL_LOCATION");// 文件位置
                 baseFileView.uploadTime = JdbcMapUtil.getString(q, "UPLOAD_DTTM").replace("T", " ");// 上传时间
                 baseFileView.uploadById = JdbcMapUtil.getString(q, "CRT_USER_ID");// 上传人id
                 baseFileView.uploadByName = JdbcMapUtil.getString(q, "userName");
+                baseFileView.fileType = JdbcMapUtil.getString(q, "fileType"); //文件类型
                 return baseFileView;
             }).collect(Collectors.toList());
         }

@@ -9,4 +9,8 @@ public class PmPrjView extends BasePageEntity {
     public String projectId;
     //名称
     public String projectName;
+    //是否符合开工条件 1符合0不合格
+    public Integer weatherStart;
+    //是否竣工 1已竣工0未竣工
+    public Integer weatherCompleted;
 }

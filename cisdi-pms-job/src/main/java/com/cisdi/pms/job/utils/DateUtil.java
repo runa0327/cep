@@ -56,4 +56,23 @@ public class DateUtil {
         }
     }
 
+    /**
+     * 获取当天周几
+     */
+    public static int getWeekDay(Date date){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int weekIdx = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+        return weekIdx;
+    }
+
+    /**
+     * 格式化日期
+     * @param date 日期
+     * @return 字符串类型日期
+     */
+    public static String getTimeStrDay(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(date);
+    }
 }

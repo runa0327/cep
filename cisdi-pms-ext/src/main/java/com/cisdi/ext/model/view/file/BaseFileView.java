@@ -12,9 +12,12 @@ public class BaseFileView extends BasePageEntity {
     public String fileAddress;
     // 文件大小
     public String fileSize;
+    public String dspSize;
     // 上传时间
     public String uploadTime;
     // 上传人
     public String uploadById;
     public String uploadByName;
+    //文件类型
+    public String fileType;
 }

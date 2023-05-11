@@ -2,6 +2,7 @@ package com.cisdi.ext.base;
 
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.PmPrj;
+import com.cisdi.ext.model.view.project.PmPrjView;
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.pm.ProcessCommon;

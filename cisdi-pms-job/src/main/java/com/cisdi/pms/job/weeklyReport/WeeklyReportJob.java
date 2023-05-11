@@ -22,4 +22,18 @@ public class WeeklyReportJob {
             log.error("【流程周报】自动生成结束（失败）！", ex);
         }
     }
+
+    /**
+     * 进度周报生成 每周五凌晨执行一次
+     */
+    @Scheduled(cron = "0 5 0 * * ?")
+    public void createProgressWeekly(){
+        try {
+            log.info("【形象进度周报】自动生成开始");
+            weeklyReportService.createProgressWeekly();
+            log.info("【形象进度周报】自动生成结束");
+        } catch (Exception e){
+            log.error("【形象进度周报】自动生成失败");
+        }
+    }
 }
