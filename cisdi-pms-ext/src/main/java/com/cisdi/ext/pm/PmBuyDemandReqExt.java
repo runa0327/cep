@@ -390,7 +390,7 @@ public class PmBuyDemandReqExt {
                 List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,tmp);
                 if (CollectionUtils.isEmpty(list1)){
                     String prjId = Crud.from("pm_prj").insertData();
-                    myJdbcTemplate.update("update pm_prj set CRT_USER_ID = ?,STATUS = ?,NAME = ?,PROJECT_SOURCE_TYPE_ID = ? where id = ?",userId,"AP",tmp,projectType,prjId);
+                    myJdbcTemplate.update("update pm_prj set CRT_USER_ID = ?,STATUS = ?,NAME = ?,PROJECT_SOURCE_TYPE_ID = ?,IZ_FORMAL_PRJ = 0 where id = ?",userId,"AP",tmp,projectType,prjId);
                     String pmDeptId = Crud.from("pm_dept").insertData();
                     myJdbcTemplate.update("update pm_dept set PM_PRJ_ID = ?,HR_DEPT_ID = ?,USER_IDS = ?,ver = ? where id = ?",prjId,deptId,userId,1,pmDeptId);
                 } else {
