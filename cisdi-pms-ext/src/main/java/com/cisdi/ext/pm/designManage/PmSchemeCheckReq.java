@@ -1,4 +1,4 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.designManage;
 
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -6,7 +6,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.interaction.EntityRecord;
 
 /**
- * 方案审批管理-扩展
+ * 设计管理-方案审批管理-扩展
  */
 public class PmSchemeCheckReq {
 
