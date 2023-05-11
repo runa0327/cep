@@ -6,6 +6,7 @@ import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -51,9 +52,7 @@ public class PmLifeCycleExt {
      */
     public void getColumnList() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> strList = myJdbcTemplate.queryForList("select a.`NAME`,ifnull(b.IZ_DISPLAY,0) as IZ_DISPLAY  from \n" +
-                "(select `NAME`,SCHEDULE_NAME from pm_pro_plan_node where `NAME` is not null and `LEVEL`=3 GROUP BY `NAME`,SCHEDULE_NAME) a \n" +
-                "left join STANDARD_NODE_NAME b on a.SCHEDULE_NAME = b.id;");
+        List<Map<String, Object>> strList = myJdbcTemplate.queryForList("select `NAME`,ifnull(IZ_DISPLAY,0) as IZ_DISPLAY from STANDARD_NODE_NAME where `LEVEL`=3 order by SEQ_NO");
         List<HeaderObj> columnList = strList.stream().map(p -> {
             HeaderObj obj = new HeaderObj();
             obj.name = JdbcMapUtil.getString(p, "NAME");
@@ -108,7 +107,7 @@ public class PmLifeCycleExt {
         sb.append(" limit ").append(start).append(",").append(pageSize);
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //header
-        List<Map<String, Object>> strList = myJdbcTemplate.queryForList("select `NAME` from pm_pro_plan_node where `NAME` is not null and `LEVEL`=3 GROUP BY `NAME`");
+        List<Map<String, Object>> strList = myJdbcTemplate.queryForList("select `NAME`,ifnull(IZ_DISPLAY,0) as IZ_DISPLAY from STANDARD_NODE_NAME where `LEVEL`=3 order by SEQ_NO ");
 
         List<String> headerList = strList.stream().map(p -> JdbcMapUtil.getString(p, "NAME")).collect(Collectors.toList());
 
@@ -119,34 +118,56 @@ public class PmLifeCycleExt {
         //数据
         List<Map<String, Object>> dataList = new ArrayList<>();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
+        List<Map<String, Object>> nodeList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(list)) {
+            List<String> ids = list.stream().map(p -> JdbcMapUtil.getString(p, "id")).collect(Collectors.toList());
+            MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+            Map<String, Object> queryParams = new HashMap<>();// 创建入参map
+            queryParams.put("ids", ids);
+            nodeList = myNamedParameterJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name from pm_pro_plan_node pn " +
+                    "left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id " +
+                    "left join gr_set_value gsv on gsv.id = pn.PROGRESS_STATUS_ID " +
+                    "where pl.IS_TEMPLATE <>1 and pl.PM_PRJ_ID in (:ids)  ", queryParams);
+        }
+
 
         for (Map<String, Object> stringObjectMap : list) {
             Map<String, Object> newData = new HashMap<>();
             for (String s : headerList) {
                 if ("项目名称".equals(s)) {
-                    newData.put("项目名称", stringObjectMap.get("project_name"));
+                    JSONObject json = new JSONObject();
+                    json.put("nameOrg", stringObjectMap.get("project_name"));
+                    newData.put("项目名称", json);
                 } else if ("ID".equals(s)) {
-                    newData.put("ID", stringObjectMap.get("id"));
+                    JSONObject json = new JSONObject();
+                    json.put("nameOrg", stringObjectMap.get("id"));
+                    newData.put("ID", json);
                 } else if ("前期手续经办人".equals(s)) {
-                    newData.put("ID", stringObjectMap.get("qqusers"));
+                    JSONObject json = new JSONObject();
+                    json.put("nameOrg", stringObjectMap.get("qqusers"));
+                    newData.put("ID", json);
                 } else {
-                    List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name from pm_pro_plan_node pn " +
-                            "left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id " +
-                            "left join gr_set_value gsv on gsv.id = pn.PROGRESS_STATUS_ID " +
-                            "where pl.IS_TEMPLATE <>1 and pl.PM_PRJ_ID =? and pn.name=?", stringObjectMap.get("id"), s);
-                    if (!CollectionUtils.isEmpty(nodeList)) {
-                        Map<String, Object> dataMap = nodeList.get(0);
+//                    List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name from pm_pro_plan_node pn " +
+//                            "left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id " +
+//                            "left join gr_set_value gsv on gsv.id = pn.PROGRESS_STATUS_ID " +
+//                            "where pl.IS_TEMPLATE <>1 and pl.PM_PRJ_ID =? and pn.name=?", stringObjectMap.get("id"), s);
+                    Optional<Map<String, Object>> optional = nodeList.stream().filter(p -> Objects.equals(stringObjectMap.get("id"), p.get("PM_PRJ_ID")) && Objects.equals(s, p.get("NAME"))).findAny();
+                    if (optional.isPresent()) {
+                        Map<String, Object> dataMap = optional.get();
+//                    }
+//                    if (!CollectionUtils.isEmpty(nodeList)) {
+//                        Map<String, Object> dataMap = nodeList.get(0);
                         JSONObject json = new JSONObject();
                         if (Objects.nonNull(dataMap.get("status_name"))) {
                             String status = JdbcMapUtil.getString(dataMap, "status_name");
                             String nameOrg = "";
-                            Date dateOrg = null;
+                            String dateOrg = "";
                             String statusOrg = "";
                             String tips = null;
                             if ("已完成".equals(status)) {
                                 nameOrg = "实际完成";
                                 if (Objects.nonNull(dataMap.get("ACTUAL_COMPL_DATE"))) {
-                                    dateOrg = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE"));
+                                    dateOrg = JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE");
                                 }
                                 statusOrg = "已完成";
                             } else if ("未涉及".equals(status)) {
@@ -155,16 +176,16 @@ public class PmLifeCycleExt {
                             } else if ("进行中".equals(status)) {
                                 nameOrg = "计划完成";
                                 if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                    dateOrg = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                                    dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
                                 }
                                 statusOrg = "进行中";
 
-                            } else if ("未开始".equals(status)) {
+                            } else if ("未启动".equals(status)) {
                                 nameOrg = "计划完成";
                                 if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                    dateOrg = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                                    dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
                                 }
-                                statusOrg = "进行中";
+                                statusOrg = "未启动";
                             }
 
                             int days = 0;
@@ -182,7 +203,7 @@ public class PmLifeCycleExt {
                             } else {
                                 if (days > 0) {
                                     tips = "提前" + days + "完成！";
-                                } else {
+                                } else if (days < 0) {
                                     tips = "超期" + Math.abs(days) + "天";
                                 }
                             }
