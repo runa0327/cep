@@ -189,6 +189,7 @@ public class AttLinkDifferentProcess {
         List<String> list = new ArrayList<>();
         list.add("PM_BID_APPROVAL_REQ");  //招标文件审批
         list.add("PM_PRJ_SETTLE_ACCOUNTS");  //项目结算审批
+        list.add("PM_SCHEME_CHECK_REQ");  // 方案审批管理
         return list;
     }
 

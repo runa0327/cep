@@ -1,12 +1,10 @@
 package com.cisdi.ext.link.linkPackage;
 
 import com.cisdi.ext.link.AttLinkResult;
-import com.cisdi.ext.link.LinkedAtt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.att.AttDataTypeE;
-import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -56,15 +54,16 @@ public class CustomerUnitLink {
                 throw new BaseException("对不起，您在该公司暂未有职位，请联系管理员维护职位信息！");
             }
         }
-        id = JdbcMapUtil.getString(list1.get(0),"id");
-        value = JdbcMapUtil.getString(list1.get(0),"name");
+        AttLinkExtDetail.mapAddRefValue("CRT_DEPT_ID","id","name",list1.get(0),AttDataTypeE.TEXT_LONG,attLinkResult); //部门
+//        id = JdbcMapUtil.getString(list1.get(0),"id");
+//        value = JdbcMapUtil.getString(list1.get(0),"name");
         //部门
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = id;
-            linkedAtt.text = value;
-            attLinkResult.attMap.put("CRT_DEPT_ID",linkedAtt);
-        }
+//        {
+//            LinkedAtt linkedAtt = new LinkedAtt();
+//            linkedAtt.type = AttDataTypeE.TEXT_LONG;
+//            linkedAtt.value = id;
+//            linkedAtt.text = value;
+//            attLinkResult.attMap.put("CRT_DEPT_ID",linkedAtt);
+//        }
     }
 }
