@@ -5,6 +5,7 @@ import com.cisdi.ext.model.FeeDemandDtl;
 import com.cisdi.ext.model.SecondCategoryFeeDemand;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -43,7 +44,7 @@ public class SecondFeeExt {
                 .eq(SecondCategoryFeeDemand.Cols.PO_ORDER_REQ_ID, req.orderReqId));
 
         SecondCategoryFeeDemand demand;
-        if (demands.isEmpty()){//不存在，插入
+        if (CollectionUtils.isEmpty(demands)){//不存在，插入
             demand = SecondCategoryFeeDemand.insertData();
             demand.setPmPrjId(req.prjId);
             demand.setPoOrderReqId(req.orderReqId);
@@ -71,18 +72,20 @@ public class SecondFeeExt {
     }
 
     /**
-     * 选择项目、合同、费用明细后回显
+     * 选择项目、合同、费用明细后详情回显
      */
-    public void echo(){
+    public void secondFeeEcho(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         SecondFeeAddReq req = JSONObject.parseObject(JSONObject.toJSONString(input), SecondFeeAddReq.class);
+
+
         List<SecondCategoryFeeDemand> demands = SecondCategoryFeeDemand.selectByWhere(new Where()
                 .eq(SecondCategoryFeeDemand.Cols.PM_PRJ_ID, req.prjId)
                 .eq(SecondCategoryFeeDemand.Cols.PO_ORDER_REQ_ID, req.orderReqId));
         //查到继续查明细，没查到回显默认数据
         List<Map<String, Object>> originMaps;
-        if (demands.isEmpty()){//没有明细，返回默认
+        if (CollectionUtils.isEmpty(demands)){//没有明细，返回默认
             List<Map<String, Object>> nodeMaps = myJdbcTemplate.queryForList("select v.id feeDemandNodeId,v.name feeDemandNodeName from gr_set_value v left join gr_set s on s.id = v" +
                     ".GR_SET_ID where s.code = 'fee_demand_node' order by v.SEQ_NO");
             originMaps = nodeMaps;
@@ -100,28 +103,56 @@ public class SecondFeeExt {
         List<DemandDtl> demandDtls = this.mapsToDemandDtls(originMaps);
         //明细 转 明细包装
         List<DemandDtlWrapper> demandDtlWrappers = this.dtlsToWrappers(demandDtls);
+        //查合同批复金额
+        List<Map<String, Object>> approvedAmountMaps = myJdbcTemplate.queryForList("select IFNULL(AMT_TWO,0) approvedAmount from po_order_req o where o.id = ?",
+                req.orderReqId);
+        if (!CollectionUtils.isEmpty(approvedAmountMaps)){
+            demandDtlWrappers.get(0).approvedAmount.text = approvedAmountMaps.get(0).get("approvedAmount").toString();
+            demandDtlWrappers.get(0).approvedAmount.value = demandDtlWrappers.get(0).approvedAmount.text;
+        }
+        //根据项目投资节点走到哪步，之前填报情况，设置可填、必填状态
+        this.setStatusByPrjMaxTypeInvest(req.prjId, demandDtlWrappers);
+
+        //合同历史
+
 
         //封装返回带上主表数据
-        SecondFeeAddReq resp = req;
-        resp.secondFeeId = demands.get(0).getId();
-        resp.feeDemandDtls = demandDtls;
+        SecondFeeAddResp resp = new SecondFeeAddResp();
+        resp.prjId = req.prjId;
+        resp.orderReqId = req.orderReqId;
+        resp.secondFeeId = (demands == null ? null : demands.get(0).getId());
+        resp.feeDemandDtls = demandDtlWrappers;
         Map output = JsonUtil.fromJson(JsonUtil.toJson(resp), Map.class);
         ExtJarHelper.returnValue.set(output);
     }
 
     /**
-     * 获取项目投资走到哪步了 立项、可研、初概。。。
+     * 获取项目投资走到哪步了 立项、可研、初概、财评、结算,则之前的投资节点都可填
      * @param prjId
      */
-    private void getPrjMaxTypeInvest(String prjId,List<DemandDtlWrapper> demandDtlWrappers){
+    private void setStatusByPrjMaxTypeInvest(String prjId,List<DemandDtlWrapper> demandDtlWrappers){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> maxInvestMaps = myJdbcTemplate.queryForList("select MAX(v.SEQ_NO) maxSeq from pm_invest_est e left join gr_set_value v on v" +
                 ".id = e.INVEST_EST_TYPE_ID where e.PM_PRJ_ID = ?", prjId);
-        int maxSeq = 0;
-        if (!maxInvestMaps.isEmpty()){
-            maxSeq = Integer.parseInt(maxInvestMaps.get(0).get("maxSeq").toString());
+        int maxSeq = 1;
+        if (!CollectionUtils.isEmpty(maxInvestMaps) && !CollectionUtils.isEmpty(maxInvestMaps.get(0))){
+            if (maxInvestMaps.get(0).get("maxSeq") != null){
+                String maxSeqStr = maxInvestMaps.get(0).get("maxSeq").toString();
+                maxSeq = Integer.parseInt(maxSeqStr.substring(0,maxSeqStr.indexOf(".")));
+            }
         }
-        //dlttodo
+
+        //项目投资进行到哪步，则之前的投资都可填
+        for (int i = 0; i <= maxSeq - 1; i++) {
+            if (Strings.isNullOrEmpty(demandDtlWrappers.get(i).approvedAmount.getText())){//批复金额没值可填，填过不可填
+                demandDtlWrappers.get(i).approvedAmount.editable = true;
+                demandDtlWrappers.get(i).approvedAmount.mandatory = true;
+            }
+            if (Strings.isNullOrEmpty(demandDtlWrappers.get(i).payableRatio.getText())){//可支付比例没值可填，填过不可填
+                demandDtlWrappers.get(i).payableRatio.editable = true;
+                demandDtlWrappers.get(i).payableRatio.mandatory = true;
+            }
+        }
     }
 
     /**
@@ -131,7 +162,7 @@ public class SecondFeeExt {
      */
     private List<DemandDtl> mapsToDemandDtls(List<Map<String, Object>> originMaps){
         List<DemandDtl> demandDtls = new ArrayList<>();
-        if (!originMaps.isEmpty()){
+        if (!CollectionUtils.isEmpty(originMaps)){
             for (Map<String, Object> originMap : originMaps) {
                 DemandDtl demandDtl = JSONObject.parseObject(JSONObject.toJSONString(originMap), DemandDtl.class);
                 demandDtls.add(demandDtl);
@@ -147,7 +178,7 @@ public class SecondFeeExt {
      */
     private List<DemandDtlWrapper> dtlsToWrappers(List<DemandDtl> demandDtls){
         List<DemandDtlWrapper> wrappers = new ArrayList<>();
-        if (!demandDtls.isEmpty()){
+        if (!CollectionUtils.isEmpty(demandDtls)){
             for (DemandDtl demandDtl : demandDtls) {
                 DemandDtlWrapper demandDtlWrapper = new DemandDtlWrapper();
                 demandDtlWrapper.feeDemandNode = new CellWrapper(demandDtl.feeDemandNodeName,demandDtl.feeDemandNodeId);
@@ -192,7 +223,7 @@ public class SecondFeeExt {
         //合同明细id
         private String orderDtlId;
         //费用需求明细
-        private List<Map<String,CellWrapper>> feeDemandDtls;
+        private List<DemandDtlWrapper> feeDemandDtls;
     }
 
     /**
