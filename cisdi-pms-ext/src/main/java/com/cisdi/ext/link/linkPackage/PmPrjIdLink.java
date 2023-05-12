@@ -1,6 +1,5 @@
 package com.cisdi.ext.link.linkPackage;
 
-import cn.hutool.core.annotation.Link;
 import com.cisdi.ext.enums.EntCodeEnum;
 import com.cisdi.ext.link.AttLinkProcessDetail;
 import com.cisdi.ext.link.AttLinkResult;
@@ -92,11 +91,6 @@ public class PmPrjIdLink {
                 } else if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)) { // 工程开工报审
                     AttLinkProcessDetail.pmPrjKickOffReqPrjLink(attLinkResult,attValue,myJdbcTemplate);
                 }
-//                else if ("PIPELINE_RELOCATION_REQ".equals(entCode)){ // 管线迁改
-//                    //设计部人员
-//                    String design = JdbcMapUtil.getString(row,"PRJ_DESIGN_USER_ID");
-//                    AttLinkProcessDetail.pipelineLink(design,attLinkResult,myJdbcTemplate);
-//                }
                 else if("PM_BUY_DEMAND_REQ".equals(entCode) || "PIPELINE_RELOCATION_REQ".equals(entCode)) { // 采购需求审批 管线迁改
                     // 0099799190825080705 = 企业自筹
                     String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
@@ -106,6 +100,9 @@ public class PmPrjIdLink {
                 } else if ("PM_EXTENSION_REQUEST_REQ".equals(entCode)){ // 节点延期申请
                     handlePrjNode(attValue,myJdbcTemplate);
                 }
+
+                //所属部门会变化的流程
+                List<String> autoDeptList = AttLinkDifferentProcess.getAutoGetDept();
 
                 //需要自动岗位人员的流程
                 List<String> processUserList = AttLinkDifferentProcess.getLinkUserProcess();

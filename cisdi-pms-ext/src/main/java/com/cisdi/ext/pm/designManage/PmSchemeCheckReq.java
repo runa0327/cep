@@ -1,9 +1,13 @@
 package com.cisdi.ext.pm.designManage;
 
+import com.cisdi.ext.pm.ProcessCommon;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
+
+import java.util.Map;
 
 /**
  * 设计管理-方案审批管理-扩展
@@ -40,13 +44,29 @@ public class PmSchemeCheckReq {
         String userId = ExtJarHelper.loginInfo.get().userId;
         String userName = ExtJarHelper.loginInfo.get().userName;
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        String id = entityRecord.csCommId;
+        String csCommId = entityRecord.csCommId;
         String procInstId = ExtJarHelper.procInstId.get();
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         String nodeInstanceId = ExtJarHelper.nodeInstId.get();
         if ("OK".equals(status)){
-            if ("start".equals(nodeStatus)){
+            if ("start".equals(nodeStatus)){ // 1-发起
                 WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
+            } else {
+                //获取审批意见信息
+                Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
+                //审批意见内容
+                String comment = message.get("comment");
+                String processComment = "", commentEnd = "";
+                if ("deptLeaderCheckOK".equals(nodeStatus)){ // 2-部门负责人审批
+                    //获取流程中的意见信息
+                    processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_ONE");
+                    commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                    ProcessCommon.commentShow("APPROVAL_COMMENT_ONE",commentEnd,csCommId,entCode);
+                }
+            }
+        } else {
+            if ("deptLeaderCheckRefuse".equals(nodeStatus)){ // 2-部门负责人审批
+                ProcessCommon.clearData("APPROVAL_COMMENT_ONE",csCommId,entCode,myJdbcTemplate);
             }
         }
     }
@@ -60,11 +80,15 @@ public class PmSchemeCheckReq {
     private String getNodeStatus(String status, String nodeId) {
         String nodeName = "";
         if ("OK".equals(status)){
-            if ("1643134468053262336".equals(nodeId)){ //1-发起
+            if ("1643134468053262336".equals(nodeId)){ // 1-发起
                 nodeName = "start";
+            } else if ("1656856307451510784".equals(nodeId)){ // 2-部门负责人审批
+                nodeName = "deptLeaderCheckOK";
             }
         } else {
-
+            if ("1656856307451510784".equals(nodeId)){ // 2-部门负责人审批
+                nodeName = "deptLeaderCheckRefuse";
+            }
         }
         return nodeName;
     }
