@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,7 +43,7 @@ public class PmLifeCycleExportController extends BaseController {
 
     @SneakyThrows(IOException.class)
     @GetMapping("export")
-    public void exportExcel(String projectName, String projectType, String userId, String columns, HttpServletResponse response) {
+    public void exportExcel(String projectName, String projectType, String userId, String columns, HttpServletResponse response) throws ParseException {
         StringBuilder sb = new StringBuilder();
         sb.append("select pj.id as id, pj.`NAME` as project_name,au.`NAME` as qquser from pm_prj pj \n" +
                 "left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID and pp.POST_INFO_ID='1633731474912055296'\n" +
@@ -105,7 +106,7 @@ public class PmLifeCycleExportController extends BaseController {
                         if (Objects.nonNull(dataMap.get("status_name"))) {
                             String status = JdbcMapUtil.getString(dataMap, "status_name");
                             String nameOrg = "";
-                            String dateOrg = null;
+                            String dateOrg = "";
                             String statusOrg = "";
                             String tips = null;
                             if ("已完成".equals(status)) {
@@ -113,42 +114,42 @@ public class PmLifeCycleExportController extends BaseController {
                                 if (Objects.nonNull(dataMap.get("ACTUAL_COMPL_DATE"))) {
                                     dateOrg = JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE");
                                 }
+                                if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE")) && Objects.nonNull(dataMap.get("ACTUAL_COMPL_DATE"))) {
+                                    Date plan = DateUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                                    Date actual = DateUtil.stringToDate(JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE"));
+                                    int days = DateUtil.daysBetween(plan, actual);
+                                    if (days > 0) {
+                                        tips = "提前" + days + "完成！";
+                                    } else if (days < 0) {
+                                        tips = "超期" + Math.abs(days) + "天";
+                                    }
+                                }
                                 statusOrg = "已完成";
                             } else if ("未涉及".equals(status)) {
                                 nameOrg = "未涉及";
-                                statusOrg = "未涉及";
-                            } else if ("进行中".equals(status)) {
-                                nameOrg = "计划完成";
-                                if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                    dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
-                                }
-                                statusOrg = "进行中";
-
-                            } else if ("未启动".equals(status)) {
-                                nameOrg = "计划完成";
-                                if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                    dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
-                                }
-                                statusOrg = "未启动";
-                            }
-
-                            int days = 0;
-                            if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE")) && Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                Date plan = DateUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
-                                Date actual = DateUtil.stringToDate(JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE"));
-                                try {
-                                    days = DateUtil.daysBetween(plan, actual);
-                                } catch (Exception ignored) {
-                                }
-                            }
-
-                            if ("未涉及".equals(status)) {
                                 tips = "项目未涉及" + JdbcMapUtil.getString(dataMap, "NAME");
+                                statusOrg = "未涉及";
                             } else {
-                                if (days > 0) {
-                                    tips = "提前" + days + "完成！";
-                                } else {
-                                    tips = "超期" + Math.abs(days) + "天";
+                                if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
+                                    nameOrg = "计划完成";
+                                    Date planCompDate = DateUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                                    if (planCompDate.before(new Date())) {
+                                        statusOrg = "已超期";
+                                        if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
+                                            Date plan = DateUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                                            int days = DateUtil.daysBetween(plan, new Date());
+                                            tips = "超期" + Math.abs(days) + "天";
+                                        }
+                                    } else {
+                                        if ("进行中".equals(status)) {
+                                            statusOrg = "进行中";
+                                        } else if ("未启动".equals(status)) {
+                                            statusOrg = "未启动";
+                                        }
+                                    }
+                                    if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
+                                        dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
+                                    }
                                 }
                             }
 
@@ -177,8 +178,10 @@ public class PmLifeCycleExportController extends BaseController {
                     if ("未涉及".equals(jsonObject.getString("statusOrg"))) {
                         msg = jsonObject.getString("statusOrg");
                     } else {
-                        String dataOrg = jsonObject.getString("dateOrg") == null ? "" : jsonObject.getString("dateOrg");
-                        msg = jsonObject.getString("nameOrg") + "-" + dataOrg;
+                        if (jsonObject.getString("nameOrg") != null) {
+                            String dataOrg = jsonObject.getString("dateOrg") == null ? "" : jsonObject.getString("dateOrg");
+                            msg = jsonObject.getString("nameOrg") + "-" + dataOrg;
+                        }
                     }
                 }
                 obj.add(msg);

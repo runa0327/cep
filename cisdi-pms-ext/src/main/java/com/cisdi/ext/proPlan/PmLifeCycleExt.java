@@ -11,6 +11,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -81,7 +82,7 @@ public class PmLifeCycleExt {
     /**
      * 项目推进计划列表查询
      */
-    public void pmLifeCycleList() {
+    public void pmLifeCycleList() throws ParseException {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         int pageSize = Integer.parseInt(String.valueOf(map.get("pageSize")));
         int pageIndex = Integer.parseInt(String.valueOf(map.get("pageIndex")));
@@ -162,15 +163,31 @@ public class PmLifeCycleExt {
                                 if (Objects.nonNull(dataMap.get("ACTUAL_COMPL_DATE"))) {
                                     dateOrg = JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE");
                                 }
+                                if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE")) && Objects.nonNull(dataMap.get("ACTUAL_COMPL_DATE"))) {
+                                    Date plan = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                                    Date actual = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE"));
+                                    int days = DateTimeUtil.daysBetween(plan, actual);
+                                    if (days > 0) {
+                                        tips = "提前" + days + "完成！";
+                                    } else if (days < 0) {
+                                        tips = "超期" + Math.abs(days) + "天";
+                                    }
+                                }
                                 statusOrg = "已完成";
                             } else if ("未涉及".equals(status)) {
                                 nameOrg = "未涉及";
+                                tips = "项目未涉及" + JdbcMapUtil.getString(dataMap, "NAME");
                                 statusOrg = "未涉及";
                             } else {
                                 if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
                                     Date planCompDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
                                     if (planCompDate.before(new Date())) {
                                         statusOrg = "已超期";
+                                        if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
+                                            Date plan = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                                            int days = DateTimeUtil.daysBetween(plan, new Date());
+                                            tips = "超期" + Math.abs(days) + "天";
+                                        }
                                     } else {
                                         if ("进行中".equals(status)) {
                                             statusOrg = "进行中";
@@ -182,27 +199,6 @@ public class PmLifeCycleExt {
                                     if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
                                         dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
                                     }
-                                }
-                            }
-
-
-                            int days = 0;
-                            if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE")) && Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                Date plan = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
-                                Date actual = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE"));
-                                try {
-                                    days = DateTimeUtil.daysBetween(plan, actual);
-                                } catch (Exception ignored) {
-                                }
-                            }
-
-                            if ("未涉及".equals(status)) {
-                                tips = "项目未涉及" + JdbcMapUtil.getString(dataMap, "NAME");
-                            } else {
-                                if (days > 0) {
-                                    tips = "提前" + days + "完成！";
-                                } else if (days < 0) {
-                                    tips = "超期" + Math.abs(days) + "天";
                                 }
                             }
 
