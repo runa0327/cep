@@ -5,6 +5,9 @@ import lombok.Data;
 @Data
 public class PmRoster {
 
+    //id
+    public String id;
+
     //业主单位id
     public String customerUnitId;
 
