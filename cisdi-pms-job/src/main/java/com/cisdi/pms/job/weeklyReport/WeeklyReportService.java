@@ -1,6 +1,7 @@
 package com.cisdi.pms.job.weeklyReport;
 
 import cn.hutool.core.util.IdUtil;
+import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyPrjDetailMapper;
 import com.cisdi.pms.job.utils.Constants;
 import com.cisdi.pms.job.utils.DateUtil;
 import com.qygly.shared.BaseException;
@@ -10,8 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -344,6 +347,7 @@ public class WeeklyReportService {
     /**
      * 自动生成形象进度周报
      */
+    @Transactional(rollbackFor = Exception.class)
     public void createProgressWeekly() {
         List<Map<String,Object>> jobList = jdbcTemplate.queryForList("select * from BASE_JOB_CONFIG where STATUS = 'AP' AND CODE = 'createProgressWeekly'");
         if (!CollectionUtils.isEmpty(jobList)){
@@ -415,7 +419,7 @@ public class WeeklyReportService {
                     "values (?,1,?,?,'0099250247095871681',?,'0099250247095871681','AP',?,?,?)";
             jdbcTemplate.update(sql1,weekId,nowDate,nowDate,nowDate,weekDate,endDate,startDate);
 
-            //查询该项目最近一次生成周报的数据
+            //查询该最近一次生成周报的数据
             List<Map<String,Object>> list2 = jdbcTemplate.queryForList("select id from PM_PROGRESS_WEEKLY where status = 'ap' and id != ? order by FROM_DATE desc limit 1",weekId);
             String lastWeekId = null;
             if (!CollectionUtils.isEmpty(list2)){
@@ -435,14 +439,14 @@ public class WeeklyReportService {
 
                 //写入进度周报项目信息
                 String sql2 = "insert into PM_PROGRESS_WEEKLY_PRJ " +
-                        "(ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PM_PROGRESS_WEEKLY_ID,DATE,PM_PRJ_ID,TO_DATE,SYS_TRUE,FROM_DATE,IS_END,IZ_WRITE) " +
+                        "(ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PM_PROGRESS_WEEKLY_ID,DATE,PM_PRJ_ID,TO_DATE,SYS_TRUE,FROM_DATE,IZ_END,IZ_WRITE) " +
                         "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',?,?,?,?,?,?,?,'0')";
                 jdbcTemplate.update(sql2,weekPrjId,nowDate,nowDate,nowDate,weekId,weekDate,prjId,endDate,izStart,startDate,izEnd);
 
                 //查询该项目最近一次生成周报的数据
                 if (SharedUtil.isEmptyString(lastWeekId)){
                     String sql3 = "insert into PM_PROGRESS_WEEKLY_PRJ_DETAIL (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PROCESS_REMARK_TEXT,DATE,TO_DATE," +
-                            "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ_ID,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IS_END) " +
+                            "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ_ID,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IZ_END) " +
                             "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',null,?,?,null,?,null,null,?,?,null,?,?,?)";
                     jdbcTemplate.update(sql3,weekPrjDetailId,nowDate,nowDate,nowDate,weekDate,endDate,weekId,startDate,weekPrjId,prjId,izStart,izEnd);
                 } else {
@@ -450,12 +454,12 @@ public class WeeklyReportService {
                     List<Map<String,Object>> list3 = jdbcTemplate.queryForList("select * from pm_progress_weekly_prj_detail where PM_PROGRESS_WEEKLY_ID = ? and status = 'ap' and pm_prj_id = ?",lastWeekId,prjId);
                     if (CollectionUtils.isEmpty(list3)){
                         String sql3 = "insert into PM_PROGRESS_WEEKLY_PRJ_DETAIL (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PROCESS_REMARK_TEXT,DATE,TO_DATE," +
-                                "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ_ID,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IS_END) " +
+                                "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ_ID,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IZ_END) " +
                                 "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',null,?,?,null,?,null,null,?,?,null,?,?,?)";
                         jdbcTemplate.update(sql3,weekPrjDetailId,nowDate,nowDate,nowDate,weekDate,endDate,weekId,startDate,weekPrjId,prjId,izStart,izEnd);
                     } else {
                         String sql3 = "insert into PM_PROGRESS_WEEKLY_PRJ_DETAIL (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PROCESS_REMARK_TEXT,DATE,TO_DATE," +
-                                "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ_ID,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IS_END) " +
+                                "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ_ID,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IZ_END) " +
                                 "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',?,?,?,null,?,null,?,?,?,?,?,?,?)";
                         jdbcTemplate.update(sql3,weekPrjDetailId,nowDate,nowDate,nowDate,JdbcMapUtil.getString(list3.get(0),"PROCESS_REMARK_TEXT"),
                                 weekDate,endDate,weekId,JdbcMapUtil.getString(list3.get(0),"VISUAL_PROGRESS"),startDate,weekPrjId,JdbcMapUtil.getString(list3.get(0),"VISUAL_PROGRESS_DESCRIBE"),prjId,izStart,izEnd);
