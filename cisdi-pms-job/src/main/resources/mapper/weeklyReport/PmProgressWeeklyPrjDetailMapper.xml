@@ -63,11 +63,11 @@
         a.STATUS = 'ap'
         AND b.STATUS = 'ap'
         AND c.STATUS = 'ap'
-        <if test="weatherStart != null and weatherStart != ''">
-            b.SYS_TRUE = #{weatherStart}
+        <if test="weatherStart != null">
+            and b.SYS_TRUE = #{weatherStart}
         </if>
-        <if test="weatherCompleted != null and weatherCompleted != ''">
-            b.IZ_END = #{weatherCompleted}
+        <if test="weatherCompleted != null">
+            and b.IZ_END = #{weatherCompleted}
         </if>
         <if test="progressMin != null and progressMin != ''">
             and a.VISUAL_PROGRESS >= #{progressMin}

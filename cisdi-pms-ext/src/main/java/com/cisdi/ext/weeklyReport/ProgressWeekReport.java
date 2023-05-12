@@ -419,7 +419,7 @@ public class ProgressWeekReport {
         Integer weatherCompleted = param.weatherCompleted; //是否竣工
         String limit = canMap.get("limit").toString();
         String sql = "select a.id,c.DATE as writeDate,a.VISUAL_PROGRESS as progress,a.VISUAL_PROGRESS_DESCRIBE as progressDescribe,a.PROCESS_REMARK_TEXT as progressWeek," +
-                "a.TEXT_REMARK_ONE as progressRemark,ifnull(a.SYS_TRUE,'1') as weatherStart,ifnull(a.IZ_END,'0') as weatherCompleted," +
+                "a.TEXT_REMARK_ONE as progressRemark,ifnull(b.SYS_TRUE,'1') as weatherStart,ifnull(b.IZ_END,'0') as weatherCompleted," +
                 "(select name from ad_user where id = a.ad_user_id) as recordByName,a.AD_USER_ID as recordById, " +
                 "a.FILE_ID_ONE as fileId,b.PM_PRJ_ID as projectId," +
                 "e.name as projectName,d.AD_USER_ID as manageUserId," +
