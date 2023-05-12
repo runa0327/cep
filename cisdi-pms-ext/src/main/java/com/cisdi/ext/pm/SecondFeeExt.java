@@ -3,6 +3,7 @@ package com.cisdi.ext.pm;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.FeeDemandDtl;
 import com.cisdi.ext.model.SecondCategoryFeeDemand;
+import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
@@ -13,12 +14,10 @@ import lombok.Data;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 二类费扩展
@@ -53,6 +52,8 @@ public class SecondFeeExt {
 
         //清空明细
         FeeDemandDtl.deleteByWhere(new Where().eq(FeeDemandDtl.Cols.SECOND_CATEGORY_FEE_DEMAND_ID,demand.getId()));
+        //计算
+        this.calculate(req.feeDemandDtls);
         //插入明细
         for (DemandDtl dtlReq : req.feeDemandDtls) {
             FeeDemandDtl feeDemandDtl = FeeDemandDtl.newData();
@@ -115,7 +116,7 @@ public class SecondFeeExt {
                 "cumulativePayedPercent from " +
                 "contract_pay_history ph \n" +
                 "left join po_order o on o.id = ph.PO_ORDER_ID \n" +
-                "where CONTRACT_APP_ID = ?", req.orderReqId);
+                "where CONTRACT_APP_ID = ? order by ph.PAY_TIME desc", req.orderReqId);
         List<PayHistory> payHistories = this.mapsToPayHistories(contractPayMaps);
 
         //封装返回带上主表数据
@@ -134,10 +135,35 @@ public class SecondFeeExt {
     /**
      * 明细计算回显
      */
-    private void calculateAndEcho(){
-        Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
-        List<DemandDtl> demandDtls = JSONObject.parseArray(JSONObject.toJSONString(input), DemandDtl.class);
+    private void calculate(List<DemandDtl> demandDtls){
+        if (demandDtls == null || demandDtls.get(0).payableRatio == null){
+            return;
+        }
+        for (int i = 0; i < demandDtls.size(); i++) {
+            DemandDtl demandDtl = demandDtls.get(i);
+            if (demandDtl.approvedAmount == null && demandDtl.payableRatio == null){
+                continue;
+            }
+            //可支付金额
+            BigDecimal firstApprovedAmount = demandDtls.get(0).approvedAmount.multiply(demandDtl.payableRatio);
+            demandDtl.payableAmount = demandDtl.approvedAmount.multiply(demandDtl.payableRatio);
+            //和第一个比，取较小值
+            demandDtl.payableAmount = (demandDtl.payableAmount.compareTo(firstApprovedAmount) < 0 ? demandDtl.payableAmount : firstApprovedAmount);
 
+            //已支付金额：合同已支付金额合计,待后续完善
+            demandDtl.paidAmount = new BigDecimal(BigInteger.ZERO);
+
+            //支付比例：已支付金额 / 合同金额
+            demandDtl.paymentRatio = demandDtl.paidAmount.divide(demandDtls.get(0).approvedAmount);
+
+            //需求资金：已支付比例*合同金额 - 已支付金额
+            demandDtl.requiredAmount = demandDtl.paymentRatio.multiply(demandDtls.get(0).approvedAmount).subtract(demandDtl.paidAmount);
+
+            //报送时间：提交日期
+            if (Strings.isNullOrEmpty(demandDtl.submitTime)){
+                demandDtl.submitTime = DateTimeUtil.dttmToString(new Date());
+            }
+        }
     }
 
     /**
