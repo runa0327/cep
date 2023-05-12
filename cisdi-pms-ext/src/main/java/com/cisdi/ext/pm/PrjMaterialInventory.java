@@ -34,6 +34,9 @@ public class PrjMaterialInventory {
      * 根据清单类型给每个项目加一套清单
      */
     public void initPrjInventory() {
+        AdRemindLog beginLog = AdRemindLog.insertData();
+        beginLog.setRemindText("开始执行initPrjInventory");
+        beginLog.updateById();
         //清空历史数据
         emptyInventory();
 
@@ -46,6 +49,11 @@ public class PrjMaterialInventory {
 
         //初始化清单明细
         initInventoryDetail();
+        AdRemindLog endLog = AdRemindLog.insertData();
+        endLog.setRemindText("开始执行initPrjInventory");
+        endLog.updateById();
+        endLog.setRemindText("结束执行initPrjInventory");
+
     }
 
     /**

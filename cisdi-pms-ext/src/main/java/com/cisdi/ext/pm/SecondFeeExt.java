@@ -8,14 +8,11 @@ import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
-import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import lombok.Data;
-import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -114,7 +111,12 @@ public class SecondFeeExt {
         this.setStatusByPrjMaxTypeInvest(req.prjId, demandDtlWrappers);
 
         //合同历史
-
+        List<Map<String, Object>> contractPayMaps = myJdbcTemplate.queryForList("select ph.PAY_TIME payTime,ph.PAY_AMT payAmt,ph.CUMULATIVE_PAYED_PERCENT " +
+                "cumulativePayedPercent from " +
+                "contract_pay_history ph \n" +
+                "left join po_order o on o.id = ph.PO_ORDER_ID \n" +
+                "where CONTRACT_APP_ID = ?", req.orderReqId);
+        List<PayHistory> payHistories = this.mapsToPayHistories(contractPayMaps);
 
         //封装返回带上主表数据
         SecondFeeAddResp resp = new SecondFeeAddResp();
@@ -122,8 +124,20 @@ public class SecondFeeExt {
         resp.orderReqId = req.orderReqId;
         resp.secondFeeId = (demands == null ? null : demands.get(0).getId());
         resp.feeDemandDtls = demandDtlWrappers;
-        Map output = JsonUtil.fromJson(JsonUtil.toJson(resp), Map.class);
+        resp.payHistories = payHistories;
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("resp",resp);
+        Map output = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
         ExtJarHelper.returnValue.set(output);
+    }
+
+    /**
+     * 明细计算回显
+     */
+    private void calculateAndEcho(){
+        Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
+        List<DemandDtl> demandDtls = JSONObject.parseArray(JSONObject.toJSONString(input), DemandDtl.class);
+
     }
 
     /**
@@ -196,6 +210,25 @@ public class SecondFeeExt {
     }
 
     /**
+     * maps转payHistories
+     * @param contractPayMaps
+     * @return
+     */
+    private List<PayHistory> mapsToPayHistories(List<Map<String,Object>> contractPayMaps){
+        List<PayHistory> payHistories = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(contractPayMaps)){
+            for (Map<String, Object> contractPayMap : contractPayMaps) {
+                PayHistory payHistory = JSONObject.parseObject(JSONObject.toJSONString(contractPayMap), PayHistory.class);
+                if (payHistory.payTime != null){
+                    payHistory.payTime = StringUtil.withOutT(payHistory.payTime);
+                }
+                payHistories.add(payHistory);
+            }
+        }
+        return payHistories;
+    }
+
+    /**
      * 新增、修改请求
      */
     @Data
@@ -212,6 +245,9 @@ public class SecondFeeExt {
         private List<DemandDtl> feeDemandDtls;
     }
 
+    /**
+     * 二类费响应
+     */
     @Data
     private static class SecondFeeAddResp{
         //id
@@ -224,6 +260,23 @@ public class SecondFeeExt {
         private String orderDtlId;
         //费用需求明细
         private List<DemandDtlWrapper> feeDemandDtls;
+        //合同支付历史
+        private List<PayHistory> payHistories;
+    }
+
+    /**
+     * 合同支付历史
+     */
+    @Data
+    private static class PayHistory{
+        //id
+        private String contractPayHistoryId;
+        //支付时间
+        private String payTime;
+        //支付金额
+        private BigDecimal payAmt;
+        //累计支付比例
+        private BigDecimal cumulativePayedPercent;
     }
 
     /**
