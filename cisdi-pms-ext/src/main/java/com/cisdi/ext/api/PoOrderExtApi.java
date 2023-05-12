@@ -1,6 +1,8 @@
 package com.cisdi.ext.api;
 
 import com.cisdi.ext.base.GrSetValue;
+import com.cisdi.ext.model.PoOrder;
+import com.cisdi.ext.model.PoOrderReq;
 import com.cisdi.ext.model.view.file.BaseFileView;
 import com.cisdi.ext.model.view.order.PoOrderContactsView;
 import com.cisdi.ext.model.view.order.PoOrderDtlProView;
@@ -12,6 +14,7 @@ import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -37,6 +40,8 @@ public class PoOrderExtApi {
         Map<String, Object> valueMap = entityRecord.valueMap;
         //流程id
         String csId = entityRecord.csCommId;
+        //删除原有所有数据
+        Crud.from("po_order").where().eq("CONTRACT_APP_ID",csId).delete().exec();
         //获取合作单位
         String cooperation = getCooperation(csId,myJdbcTemplate);
         //项目id
@@ -47,11 +52,7 @@ public class PoOrderExtApi {
             List<String> list = StringUtil.getStrToList(projectId,",");
             for (String prjId : list) {
                 /**=============此处需要添加合同已支付金额、累计支付比列查询逻辑===========================**/
-                //判断是否已存在，存在则修改
-                String poOrderId = getDateByProcessDateId(csId,prjId,myJdbcTemplate);
-                if (SharedUtil.isEmptyString(poOrderId)){
-                    poOrderId = Crud.from("po_order").insertData();
-                }
+                String poOrderId = Crud.from("po_order").insertData();
                 //修改合同数据表数据
                 updatePoOrder(valueMap,csId,poOrderId,prjId,cooperation,sourceTypeId,viewId);
             }
@@ -68,6 +69,8 @@ public class PoOrderExtApi {
     public static void createOrderHistoryData(Map<String, Object> tmp, String sourceTypeId, String viewId, MyJdbcTemplate myJdbcTemplate) {
         //流程id
         String csId = tmp.get("id").toString();
+        //删除原有所有数据
+        Crud.from("po_order").where().eq("CONTRACT_APP_ID",csId).delete().exec();
         //获取合作单位
         String cooperation = getCooperation(csId,myJdbcTemplate);
         //项目id
@@ -76,11 +79,7 @@ public class PoOrderExtApi {
             List<String> list = StringUtil.getStrToList(projectId,",");
             for (String prjId : list) {
                 /**=============此处需要添加合同已支付金额、累计支付比列查询逻辑===========================**/
-                //判断是否已存在，存在则修改
-                String poOrderId = getDateByProcessDateId(csId,prjId,myJdbcTemplate);
-                if (SharedUtil.isEmptyString(poOrderId)){
-                    poOrderId = Crud.from("po_order").insertData();
-                }
+                String poOrderId = Crud.from("po_order").insertData();
                 //修改合同数据表数据
                 updatePoOrder(tmp,csId,poOrderId,prjId,cooperation,sourceTypeId,viewId);
             }
@@ -125,9 +124,12 @@ public class PoOrderExtApi {
                 .set("AD_USER_ID",JdbcMapUtil.getString(valueMap,"AD_USER_ID")) //合同经办人
                 .set("SIGN_DATE",JdbcMapUtil.getString(valueMap,"SIGN_DATE")) //签订日期
                 .set("DATE_FIVE",JdbcMapUtil.getString(valueMap,"DATE_FIVE")) //到期日期
-                .set("FILE_ATTACHMENT_URL",JdbcMapUtil.getString(valueMap,"FILE_ID_FIVE")) //合同盖章版文件
+                .set("FILE_ID_ONE",JdbcMapUtil.getString(valueMap,"FILE_ID_FIVE")) //合同盖章版文件
                 .set("VIEW_ID",viewId) //视图id
                 .set("WF_PROCESS_INSTANCE_ID",JdbcMapUtil.getString(valueMap,"LK_WF_INST_ID")) //流程实例id
+                .set("CONTRACT_CODE",JdbcMapUtil.getString(valueMap,"CONTRACT_CODE")) //合同编号
+                .set("CUSTOMER_UNIT",JdbcMapUtil.getString(valueMap,"CUSTOMER_UNIT_ONE")) //合同签订公司
+                .set("CONTRACT_CATEGORY_ONE_ID",JdbcMapUtil.getString(valueMap,"CONTRACT_CATEGORY_ONE_ID")) //合同类型
                 .exec();
     }
 
@@ -429,6 +431,23 @@ public class PoOrderExtApi {
         } else {
             ExtJarHelper.returnValue.set(null);
         }
+    }
 
+    /**
+     * 合同编号刷数据
+     */
+    public void refreshOrderCode(){
+        List<PoOrder> list = PoOrder.selectByWhere(new Where().eq(PoOrder.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list)){
+            for (PoOrder tmp : list) {
+                String poOrderReqId = tmp.getContractAppId();
+                String id = tmp.getId();
+                List<PoOrderReq> orderReqList = PoOrderReq.selectByWhere(new Where().eq(PoOrderReq.Cols.ID,poOrderReqId));
+                if (!CollectionUtils.isEmpty(orderReqList)){
+                    String orderCode = orderReqList.get(0).getContractCode();
+                    Crud.from(PoOrder.ENT_CODE).where().eq(PoOrder.Cols.ID,id).update().set(PoOrder.Cols.CONTRACT_CODE,orderCode).exec();
+                }
+            }
+        }
     }
 }
