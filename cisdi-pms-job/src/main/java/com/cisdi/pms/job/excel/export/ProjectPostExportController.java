@@ -36,10 +36,8 @@ public class ProjectPostExportController extends BaseController {
     @GetMapping("export")
     public void exportExcel(String projectName, HttpServletResponse response) {
         StringBuffer sb = new StringBuffer();
-        sb.append("select pj.id as id, pj.`NAME` as project_name,GROUP_CONCAT(pi.`NAME`) as post from pm_prj pj  \n" +
-                " left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID  \n" +
-                " left join post_info pi on pp.POST_INFO_ID = pi.id \n" +
-                " where pj.`STATUS`='ap' and pj.IZ_FORMAL_PRJ='1' and pj.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ");
+        sb.append("select pj.id as id, pj.`NAME` as project_name,GROUP_CONCAT(pp.PROJECT_POST) as post from pm_prj pj " +
+                "left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID where pj.`STATUS`='ap' ");
         if (!StringUtils.isEmpty(projectName)) {
             sb.append(" and pj.`NAME` like '%").append(projectName).append("%'");
         }
