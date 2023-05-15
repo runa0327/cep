@@ -420,7 +420,7 @@ public class PmBidApprovalReqExt {
         String csCommId = entityRecord.csCommId;
         //计算公示日期
         Date bidDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(entityRecord.valueMap,"DATE_TWO")); //开标日期
-        Date publicDate = DateTimeUtil.addDays(bidDate,4); //加三个工作日，不算当天
+        Date publicDate = DateTimeUtil.addDays(bidDate,3); 
         Crud.from("PM_BID_APPROVAL_REQ").where().eq("id",csCommId).update().set("DATE_THREE",publicDate).exec();
         //项目信息写入明细表
         String projectIds = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
