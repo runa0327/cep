@@ -4,7 +4,6 @@ import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.model.PmBidApprovalReq;
 import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.pm.ProcessCommon;
-import com.cisdi.ext.pm.ProcessRoleExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.PmPrjCodeUtil;
 import com.cisdi.ext.wf.WfExt;
@@ -420,7 +419,7 @@ public class PmBidApprovalReqExt {
         String csCommId = entityRecord.csCommId;
         //计算公示日期
         Date bidDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(entityRecord.valueMap,"DATE_TWO")); //开标日期
-        Date publicDate = DateTimeUtil.addDays(bidDate,3); 
+        Date publicDate = DateTimeUtil.addDays(bidDate,3);
         Crud.from("PM_BID_APPROVAL_REQ").where().eq("id",csCommId).update().set("DATE_THREE",publicDate).exec();
         //项目信息写入明细表
         String projectIds = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");

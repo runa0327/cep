@@ -1,8 +1,6 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.bidPurchase;
 
-import com.cisdi.ext.api.PoOrderExtApi;
 import com.cisdi.ext.api.PoPublicBidExtApi;
-import com.cisdi.ext.base.GrSetValue;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.interaction.EntityRecord;
@@ -12,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 流程-招标过程管理-扩展
+ * 招标采购-招标过程管理-扩展
  */
 public class BidProcessManage {
 
