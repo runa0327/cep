@@ -146,7 +146,7 @@ public class ProcessCommon {
      * @param myJdbcTemplate 数据源
      * @return 最新需要回显的意见附件
      */
-    private static String getNewFile(String userId, String nodeInstanceId, String processFile, String file,MyJdbcTemplate myJdbcTemplate) {
+    public static String getNewFile(String userId, String nodeInstanceId, String processFile, String file,MyJdbcTemplate myJdbcTemplate) {
         String newFile;
         //查询该人员该节点是否有历史提交文件
         String historyFile = getHistoryFile(userId,nodeInstanceId,myJdbcTemplate);
@@ -188,7 +188,7 @@ public class ProcessCommon {
      */
     public static String getHistoryFile(String userId, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
         String file = "";
-        String sql1 = "select GROUP_CONCAT(DISTINCT USER_ATTACHMENT) as USER_ATTACHMENT from wf_task where AD_USER_ID = ? and WF_NODE_INSTANCE_ID = ? and USER_ATTACHMENT is not null";
+        String sql1 = "select GROUP_CONCAT(DISTINCT USER_ATTACHMENT) as USER_ATTACHMENT from wf_task where AD_USER_ID = ? and WF_NODE_INSTANCE_ID = ? and USER_ATTACHMENT is not null and status = 'ap'";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId,nodeInstanceId);
         if (!CollectionUtils.isEmpty(list1)) {
             file = JdbcMapUtil.getString(list1.get(0), "USER_ATTACHMENT");

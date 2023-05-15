@@ -43,7 +43,7 @@ public class CustomerUnitLink {
      * @param attLinkResult 返回结果
      */
     private static void autoChangeDept(MyJdbcTemplate myJdbcTemplate, String attValue, String userId, AttLinkResult attLinkResult) {
-        String value, id;
+//        String value, id;
         //根据公司找到部门
         String sql1 = "select a.id,a.name from hr_dept a LEFT JOIN hr_dept_user b on a.id = b.HR_DEPT_ID where b.AD_USER_ID = ? and a.CUSTOMER_UNIT = ? and b.SYS_TRUE = 1";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId,attValue);

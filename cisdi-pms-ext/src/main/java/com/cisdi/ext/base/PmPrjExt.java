@@ -346,8 +346,8 @@ public class PmPrjExt {
     public static String createPrj(String projectName, String prjCode) {
         String id = Crud.from("pm_prj").insertData();
         Crud.from("pm_prj").where().eq("id",id).update()
-                .set("name",projectName).set("PROJECT_SOURCE_TYPE_ID","0099952822476441374")
-                .set("PM_CODE",prjCode).set("IZ_END",0).set("IZ_START_REQUIRE",1)
+                .set("name",projectName).set("PROJECT_SOURCE_TYPE_ID","0099952822476441375")
+                .set("PM_CODE",prjCode).set("IZ_END",0).set("IZ_START_REQUIRE",1).set("IZ_FORMAL_PRJ","1")
                 .exec();
         return id;
     }
