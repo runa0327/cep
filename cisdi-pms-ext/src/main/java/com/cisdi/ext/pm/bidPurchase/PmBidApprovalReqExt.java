@@ -2,10 +2,9 @@ package com.cisdi.ext.pm.bidPurchase;
 
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.model.PmBidApprovalReq;
-import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.bidPurchase.detail.BidApprovalPrjDetailExt;
 import com.cisdi.ext.util.DateTimeUtil;
-import com.cisdi.ext.util.PmPrjCodeUtil;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -423,7 +422,7 @@ public class PmBidApprovalReqExt {
         Crud.from("PM_BID_APPROVAL_REQ").where().eq("id",csCommId).update().set("DATE_THREE",publicDate).exec();
         //项目信息写入明细表
         String projectIds = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
-        BidApprovalPrjDetail.createData(csCommId,projectIds);
+        BidApprovalPrjDetailExt.createData(csCommId,projectIds);
     }
 
     /**
@@ -438,14 +437,7 @@ public class PmBidApprovalReqExt {
             for (PmBidApprovalReq tmp : noPrjList) {
                 String id = tmp.getId();
                 String projectName = tmp.getProjectNameWr();
-                List<PmPrj> prjList = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.NAME,projectName).eq(PmPrj.Cols.STATUS,"AP"));
-                String projectId = "";
-                if (CollectionUtils.isEmpty(prjList)){
-                    String prjCode = PmPrjCodeUtil.getPrjCode();
-                    projectId = PmPrjExt.createPrj(projectName,prjCode);
-                } else {
-                    projectId = prjList.get(0).getId();
-                }
+                String projectId = PmPrjExt.createPrjByMoreName(projectName);
                 Crud.from(PmBidApprovalReq.ENT_CODE).where().eq(PmBidApprovalReq.Cols.ID,id).update()
                         .set(PmBidApprovalReq.Cols.PM_PRJ_IDS,projectId)
                         .exec();
@@ -478,7 +470,7 @@ public class PmBidApprovalReqExt {
             for (PmBidApprovalReq tmp : list2) {
                 String projectId = tmp.getPmPrjIds();
                 if (!SharedUtil.isEmptyString(projectId)){
-                    BidApprovalPrjDetail.createData(tmp.getId(),projectId);
+                    BidApprovalPrjDetailExt.createData(tmp.getId(),projectId);
                 }
             }
         }

@@ -1,4 +1,4 @@
-package com.cisdi.ext.pm.bidPurchase;
+package com.cisdi.ext.pm.bidPurchase.detail;
 
 import com.cisdi.ext.model.PmBidApprovalPrjDetail;
 import com.cisdi.ext.util.StringUtil;
@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 招标文件审批-项目明细扩展
  */
-public class BidApprovalPrjDetail {
+public class BidApprovalPrjDetailExt {
 
     /**
      *新增信息

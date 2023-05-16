@@ -6,6 +6,8 @@ import com.cisdi.ext.model.view.project.PmPrjView;
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.util.PmPrjCodeUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.cisdi.ext.util.WfPmInvestUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -338,17 +340,30 @@ public class PmPrjExt {
     }
 
     /**
-     * 根据项目名称创建项目
+     * 非系统多项目-根据项目名称创建项目
      * @param projectName 项目名称
-     * @param prjCode 项目编码
      * @return 项目id
      */
-    public static String createPrj(String projectName, String prjCode) {
-        String id = Crud.from("pm_prj").insertData();
-        Crud.from("pm_prj").where().eq("id",id).update()
-                .set("name",projectName).set("PROJECT_SOURCE_TYPE_ID","0099952822476441375")
-                .set("PM_CODE",prjCode).set("IZ_END",0).set("IZ_START_REQUIRE",1).set("IZ_FORMAL_PRJ","1")
-                .exec();
-        return id;
+    public static String createPrjByMoreName(String projectName) {
+        StringBuilder sb = new StringBuilder();
+        List<String> prjNameList = StringUtil.getStrToList(projectName,",");
+        for (String tp : prjNameList) {
+            List<PmPrj> prjList = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.NAME,projectName).eq(PmPrj.Cols.STATUS,"AP"));
+            String prjCode = "", id = "";
+            if (CollectionUtils.isEmpty(prjList)){
+                prjCode = PmPrjCodeUtil.getPrjCode();
+                id = Crud.from("pm_prj").insertData();
+            } else {
+                prjCode = prjList.get(0).getPmCode();
+                id = prjList.get(0).getId();
+            }
+            Crud.from("pm_prj").where().eq("id",id).update()
+                    .set("name",projectName).set("PROJECT_SOURCE_TYPE_ID","0099952822476441375")
+                    .set("PM_CODE",prjCode).set("IZ_END",0).set("IZ_START_REQUIRE",1).set("IZ_FORMAL_PRJ","1")
+                    .exec();
+            sb.append(id).append(",");
+        }
+        sb.deleteCharAt(sb.length()-1);
+        return sb.toString();
     }
 }
