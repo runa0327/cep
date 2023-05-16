@@ -2,9 +2,7 @@ package com.cisdi.pms.job.utils;
 
 import com.google.common.base.Strings;
 
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,22 +10,20 @@ import java.util.regex.PatternSyntaxException;
 
 public class StringUtils {
 
-    //
-    public static List<String> splitByCode(String str, String s) {
-        int index = str.indexOf(s);
-        List<String> res = new ArrayList<>();
-        if (index != 0){
-            String[] arr = str.split(s);
-            for (String tmp : arr) {
-                tmp = tmp.substring(tmp.indexOf("1"),tmp.length()).replace(" ","");
-                res.add(tmp);
-            }
-            return res;
+    /**
+     * 将字符串根据某个字符转为list
+     * @param str 原字符串
+     * @param code 拆分依据字段
+     * @return list
+     */
+    public static List<String> splitByCode(String str, String code) {
+        List<String> list = new ArrayList<>();
+        if (!str.contains(code)){
+            list.add(str);
         } else {
-            res.add(str);
-            return res;
+            list = new ArrayList<>(Arrays.asList(str.split(code)));
         }
-
+        return list;
     }
 
     /**

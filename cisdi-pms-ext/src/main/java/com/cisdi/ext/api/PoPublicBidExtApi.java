@@ -47,7 +47,7 @@ public class PoPublicBidExtApi {
         //业务流程id
         String csId = entityRecord.csCommId;
         //项目id
-        String projectId = PmPrjExt.getProjectIdByProcess(valueMap,myJdbcTemplate);
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
         if (!SharedUtil.isEmptyString(projectId)){
             List<String> list = StringUtil.getStrToList(projectId,",");
             for (String prjId : list) {

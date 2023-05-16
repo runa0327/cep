@@ -53,7 +53,7 @@ public class ArchiveGenerationService {
         // 2、结束的
         // 3、生成未成功
         // 4、生成失败次数<3（失败时，不要老是生成，影响性能）
-        List<Map<String, Object>> procInstList = jdbcTemplate.queryForList("select pi.* from wf_process_instance pi where not exists(select 1 from PF_GENERATION_LOG l where l.wf_process_instance_id=pi.id and l.is_succ=1)/*没有成功*/ and (select count(*) from PF_GENERATION_LOG l where l.wf_process_instance_id=pi.id and l.is_succ=0)<3/*失败小于3次*/ and pi.`STATUS`='AP' and pi.END_DATETIME is not null" + (test ? " and pi.id='1633746047955402752'" : ""));
+        List<Map<String, Object>> procInstList = jdbcTemplate.queryForList("select pi.* from wf_process_instance pi where not exists(select 1 from PF_GENERATION_LOG l where l.wf_process_instance_id=pi.id and l.is_succ=1)/*没有成功*/ and (select count(*) from PF_GENERATION_LOG l where l.wf_process_instance_id=pi.id and l.is_succ=0)<3/*失败小于3次*/ and pi.`STATUS`='AP' and pi.END_DATETIME is not null" + (test ? " and pi.id='1658352219441057792'" : ""));
 
         for (Map<String, Object> procInst : procInstList) {
             String newLogId = insertLog();

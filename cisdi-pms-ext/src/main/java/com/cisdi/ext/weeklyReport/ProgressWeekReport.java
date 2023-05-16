@@ -419,7 +419,7 @@ public class ProgressWeekReport {
         Integer weatherCompleted = param.weatherCompleted; //是否竣工
         String limit = canMap.get("limit").toString();
         String sql = "select a.id,c.DATE as writeDate,a.VISUAL_PROGRESS as progress,a.VISUAL_PROGRESS_DESCRIBE as progressDescribe,a.PROCESS_REMARK_TEXT as progressWeek," +
-                "a.TEXT_REMARK_ONE as progressRemark,ifnull(a.SYS_TRUE,'1') as weatherStart,ifnull(a.IZ_END,'0') as weatherCompleted," +
+                "a.TEXT_REMARK_ONE as progressRemark,ifnull(b.SYS_TRUE,'1') as weatherStart,ifnull(b.IZ_END,'0') as weatherCompleted," +
                 "(select name from ad_user where id = a.ad_user_id) as recordByName,a.AD_USER_ID as recordById, " +
                 "a.FILE_ID_ONE as fileId,b.PM_PRJ_ID as projectId," +
                 "e.name as projectName,d.AD_USER_ID as manageUserId," +
@@ -467,42 +467,53 @@ public class ProgressWeekReport {
             sb.append(" and b.IZ_END = '").append(weatherCompleted).append("' "); //是否竣工
         }
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(String.valueOf(sb));
-        sb.append(" order by a.LAST_MODI_DT desc,b.pm_prj_id desc ").append(limit);
+        sb.append(" order by b.IZ_END asc,b.SYS_TRUE desc,b.PM_PRJ_ID desc ").append(limit);
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString());
         Map<String,Object> map = new HashMap<>();
         if (!CollectionUtils.isEmpty(list1)){
-            List<WeekMessage> returnList = list1.stream().map(p->{
-                WeekMessage weekMessage = new WeekMessage();
-                weekMessage.id = JdbcMapUtil.getString(p,"id"); //id
-                weekMessage.writeDate = JdbcMapUtil.getString(p,"writeDate"); //填报日期
-                String progress = JdbcMapUtil.getString(p,"progress"); //整体形象进度
-                if (SharedUtil.isEmptyString(progress)){
-                    weekMessage.progress = new BigDecimal(0);
-                } else {
-                    weekMessage.progress = new BigDecimal(progress);
-                }
-                weekMessage.progressDescribe = JdbcMapUtil.getString(p,"progressDescribe"); //累计形象进度说明
-                weekMessage.progressWeek = JdbcMapUtil.getString(p,"progressWeek"); //本周项目进展
-                weekMessage.progressRemark = JdbcMapUtil.getString(p,"progressRemark"); //备注说明
-                weekMessage.weatherCompleted = JdbcMapUtil.getInt(p,"weatherCompleted"); // 是否已竣工
-                weekMessage.weatherStart = JdbcMapUtil.getInt(p,"weatherStart"); // 是否符合开工条件
-                weekMessage.izWrite = JdbcMapUtil.getInt(p,"izWrite"); // 是否填写
-                weekMessage.manageUserId = JdbcMapUtil.getString(p,"manageUserId"); // 项目负责人
-                weekMessage.manageUserName = JdbcMapUtil.getString(p,"manageUserName"); // 项目负责人
-                weekMessage.recordById = JdbcMapUtil.getString(p,"recordById"); // 记录人
-                weekMessage.recordByName = JdbcMapUtil.getString(p,"recordByName"); // 记录人
-                weekMessage.projectId = JdbcMapUtil.getString(p,"projectId"); // 项目id
-                weekMessage.projectName = JdbcMapUtil.getString(p,"projectName"); // 项目名称
-                String fileId = JdbcMapUtil.getString(p,"fileId");
-                if (!SharedUtil.isEmptyString(fileId)){
-                    weekMessage.fileList =BaseFileExt.getFile(fileId);
-                }
-                return weekMessage;
-            }).collect(Collectors.toList());
+            List<WeekMessage> returnList = getWeekMessageList(list1);
+            List<WeekMessage> allList = getWeekMessageList(list2);
             map.put("total",list2.size());
+            map.put("all",allList);
             map.put("result", returnList);
         }
         return map;
+    }
+
+    /**
+     * Map数据转实体对象
+     * @param list1 查询Map数据
+     * @return 转换结果
+     */
+    private List<WeekMessage> getWeekMessageList(List<Map<String, Object>> list1) {
+        return list1.stream().map(p->{
+            WeekMessage weekMessage = new WeekMessage();
+            weekMessage.id = JdbcMapUtil.getString(p,"id"); //id
+            weekMessage.writeDate = JdbcMapUtil.getString(p,"writeDate"); //填报日期
+            String progress = JdbcMapUtil.getString(p,"progress"); //整体形象进度
+            if (SharedUtil.isEmptyString(progress)){
+                weekMessage.progress = new BigDecimal(0);
+            } else {
+                weekMessage.progress = new BigDecimal(progress);
+            }
+            weekMessage.progressDescribe = JdbcMapUtil.getString(p,"progressDescribe"); //累计形象进度说明
+            weekMessage.progressWeek = JdbcMapUtil.getString(p,"progressWeek"); //本周项目进展
+            weekMessage.progressRemark = JdbcMapUtil.getString(p,"progressRemark"); //备注说明
+            weekMessage.weatherCompleted = JdbcMapUtil.getInt(p,"weatherCompleted"); // 是否已竣工
+            weekMessage.weatherStart = JdbcMapUtil.getInt(p,"weatherStart"); // 是否符合开工条件
+            weekMessage.izWrite = JdbcMapUtil.getInt(p,"izWrite"); // 是否填写
+            weekMessage.manageUserId = JdbcMapUtil.getString(p,"manageUserId"); // 项目负责人
+            weekMessage.manageUserName = JdbcMapUtil.getString(p,"manageUserName"); // 项目负责人
+            weekMessage.recordById = JdbcMapUtil.getString(p,"recordById"); // 记录人
+            weekMessage.recordByName = JdbcMapUtil.getString(p,"recordByName"); // 记录人
+            weekMessage.projectId = JdbcMapUtil.getString(p,"projectId"); // 项目id
+            weekMessage.projectName = JdbcMapUtil.getString(p,"projectName"); // 项目名称
+            String fileId = JdbcMapUtil.getString(p,"fileId");
+            if (!SharedUtil.isEmptyString(fileId)){
+                weekMessage.fileList =BaseFileExt.getFile(fileId);
+            }
+            return weekMessage;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -529,7 +540,7 @@ public class ProgressWeekReport {
     public Map<String, Object> getPrjWeekAll(Map<String,Object> records) {
         Map<String,Object> map = new HashMap<>();
         if (!records.isEmpty()){
-            List<WeekMessage> list = (List<WeekMessage>) records.get("result");
+            List<WeekMessage> list = (List<WeekMessage>) records.get("all");
             //填报数
             int writes = (int) list.stream().filter(p->p.getIzWrite() == 1).count();
             //不符合开工条件

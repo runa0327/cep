@@ -1,10 +1,15 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.bidPurchase;
 
+import com.cisdi.ext.base.PmPrjExt;
+import com.cisdi.ext.model.PmBidApprovalReq;
+import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.bidPurchase.detail.BidApprovalPrjDetailExt;
 import com.cisdi.ext.util.DateTimeUtil;
+import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
-import com.qygly.shared.BaseException;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
@@ -14,10 +19,10 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 
 /**
- *  招标文件审批 扩展
+ *  招标采购-招标文件审批-扩展
  */
 @Slf4j
-public class PmBidApprovalReq {
+public class PmBidApprovalReqExt {
 
     /**
      * 招标文件审批扩展-按照先后顺序审批-第一次审批
@@ -401,5 +406,226 @@ public class PmBidApprovalReq {
             }
         }
         return name;
+    }
+
+    /**
+     * 招标文件审批-结束时数据校验处理
+     */
+    public void bidApprovalEndCheck(){
+        //插入日志结束
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //流程业务表id
+        String csCommId = entityRecord.csCommId;
+        //计算公示日期
+        Date bidDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(entityRecord.valueMap,"DATE_TWO")); //开标日期
+        Date publicDate = DateTimeUtil.addDays(bidDate,3);
+        Crud.from("PM_BID_APPROVAL_REQ").where().eq("id",csCommId).update().set("DATE_THREE",publicDate).exec();
+        //项目信息写入明细表
+        String projectIds = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
+        BidApprovalPrjDetailExt.createData(csCommId,projectIds);
+    }
+
+    /**
+     * 招标文件审批-历史数据处理
+     */
+    public void bidApprovalHistory(){
+
+        //处理非系统项目，存储进系统项目库
+        List<PmBidApprovalReq> noPrjList = PmBidApprovalReq.selectByWhere(new Where().nin(PmBidApprovalReq.Cols.STATUS,"VD","VDING")
+                .eq(PmBidApprovalReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
+        if (!CollectionUtils.isEmpty(noPrjList)){
+            for (PmBidApprovalReq tmp : noPrjList) {
+                String id = tmp.getId();
+                String projectName = tmp.getProjectNameWr();
+                String projectId = PmPrjExt.createPrjByMoreName(projectName);
+                Crud.from(PmBidApprovalReq.ENT_CODE).where().eq(PmBidApprovalReq.Cols.ID,id).update()
+                        .set(PmBidApprovalReq.Cols.PM_PRJ_IDS,projectId)
+                        .exec();
+            }
+        }
+
+        //多选项目id赋值
+        List<PmBidApprovalReq> list = PmBidApprovalReq.selectByWhere(new Where().nin(PmBidApprovalReq.Cols.STATUS,"VD","VDING"));
+        if (!CollectionUtils.isEmpty(list)){
+            for (PmBidApprovalReq tmp : list) {
+                String type = tmp.getProjectSourceTypeId();
+                String id = tmp.getId();
+                String projectId = "";
+                if ("0099952822476441375".equals(type)){ //非系统
+                    projectId = tmp.getPmPrjIds();
+                } else {
+                    projectId = tmp.getPmPrjId();
+                    if (SharedUtil.isEmptyString(projectId)){
+                        projectId = tmp.getPmPrjIds();
+                    }
+                }
+                Crud.from(PmBidApprovalReq.ENT_CODE).where().eq(PmBidApprovalReq.Cols.ID,id).update()
+                        .set(PmBidApprovalReq.Cols.PM_PRJ_IDS,projectId).exec();
+            }
+        }
+
+        //审批通过的数据写入明细表
+        List<PmBidApprovalReq> list2 = PmBidApprovalReq.selectByWhere(new Where().eq(PmBidApprovalReq.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list2)){
+            for (PmBidApprovalReq tmp : list2) {
+                String projectId = tmp.getPmPrjIds();
+                if (!SharedUtil.isEmptyString(projectId)){
+                    BidApprovalPrjDetailExt.createData(tmp.getId(),projectId);
+                }
+            }
+        }
+
+    }
+
+    /**
+     * 流程操作-招标文件审批-确定按钮
+     */
+    public void approvalProcessOK(){
+        String status = "OK";
+        String nodeId = ExtJarHelper.nodeId.get();
+        String nodeStatus = getNodeStatus(status,nodeId);
+        processHandle(nodeStatus,status);
+    }
+
+    /**
+     * 流程操作-招标文件审批-拒绝按钮
+     */
+    public void approvalProcessRefuse(){
+        String status = "refuse";
+        String nodeId = ExtJarHelper.nodeId.get();
+        String nodeStatus = getNodeStatus(status,nodeId);
+        processHandle(nodeStatus,status);
+    }
+
+    /**
+     * 流程流转详细处理逻辑
+     * @param nodeStatus 节点状态码
+     * @param status 操作状态码
+     */
+    public void processHandle(String nodeStatus, String status) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        String userName = ExtJarHelper.loginInfo.get().userName;
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId;
+        String procInstId = ExtJarHelper.procInstId.get();
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        String nodeId = ExtJarHelper.nodeId.get();
+        if ("OK".equals(status)){
+            if ("start".equals(nodeStatus)){ // 1-发起
+                WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
+            } else {
+                //获取审批意见信息
+                Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
+                //审批意见内容
+                String comment = message.get("comment");
+                String file = message.get("file");
+                String processComment, processFile, commentEnd, fileEnd;
+                if ("buyLeader".equals(nodeStatus)){ // 2-采购部负责人审批
+                    //获取流程中的意见信息
+                    processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_TENTH");
+                    commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                    ProcessCommon.commentShow("APPROVAL_COMMENT_TENTH",commentEnd,csCommId,entCode);
+                    ProcessCommon.commentShow("FILE_ID_TENTH",file,csCommId,entCode);
+                } else if ("costOrderOperator".equals(nodeStatus)){ // 3-成本/合约/需求经办人审批
+                    String deptId = getUserDept(myJdbcTemplate,userId,csCommId,nodeId);
+                    if ("AD_USER_THREE_ID".equals(deptId)){ //成本岗
+                        processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_FOUR");
+                        commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                        ProcessCommon.commentShow("APPROVAL_COMMENT_FOUR",commentEnd,csCommId,entCode);
+                        ProcessCommon.commentShow("FILE_ID_FIVE",file,csCommId,entCode);
+                    } else if ("AD_USER_FOUR_ID".equals(deptId)){ // 合同岗
+                        processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_SIX");
+                        commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                        ProcessCommon.commentShow("APPROVAL_COMMENT_SIX",commentEnd,csCommId,entCode);
+                        ProcessCommon.commentShow("FILE_ID_SIX",file,csCommId,entCode);
+                    } else if ("OPERATOR_ONE_ID".equals(deptId)){ //经办人
+                        processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_THREE");
+                        commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                        ProcessCommon.commentShow("APPROVAL_COMMENT_THREE",commentEnd,csCommId,entCode);
+                        ProcessCommon.commentShow("FILE_ID_FOUR",file,csCommId,entCode);
+                    }
+                } else if ("lawyerOK".equals(nodeStatus)){ // 4-法律审批
+                    WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
+                    processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_SEVEN");
+                    commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                    ProcessCommon.commentShow("APPROVAL_COMMENT_SEVEN",commentEnd,csCommId,entCode);
+                    ProcessCommon.commentShow("FILE_ID_SEVEN",file,csCommId,entCode);
+                } else if ("costOrderFinance".equals(nodeStatus)){ // 5-成本/合约/需求/财务/法务部审批
+                    String deptId = getUserDept(myJdbcTemplate,userId,csCommId,nodeId);
+                    if ("AD_USER_THREE_ID".equals(deptId)){ //成本岗
+                        processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_FOUR");
+                        commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                        ProcessCommon.commentShow("APPROVAL_COMMENT_FOUR",commentEnd,csCommId,entCode);
+                        ProcessCommon.commentShow("FILE_ID_FIVE",file,csCommId,entCode);
+                    } else if ("AD_USER_FOUR_ID".equals(deptId)){ // 合同岗
+                        processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_SIX");
+                        commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                        ProcessCommon.commentShow("APPROVAL_COMMENT_SIX",commentEnd,csCommId,entCode);
+                        ProcessCommon.commentShow("FILE_ID_SIX",file,csCommId,entCode);
+                    } else if ("OPERATOR_ONE_ID".equals(deptId)){ //经办人
+                        processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_THREE");
+                        commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                        ProcessCommon.commentShow("APPROVAL_COMMENT_THREE",commentEnd,csCommId,entCode);
+                        ProcessCommon.commentShow("FILE_ID_FOUR",file,csCommId,entCode);
+                    } else if ("AD_USER_EIGHTH_ID".equals(deptId)){ //法务岗
+                        processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_EIGHTH");
+                        commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                        ProcessCommon.commentShow("APPROVAL_COMMENT_EIGHTH",commentEnd,csCommId,entCode);
+                        ProcessCommon.commentShow("FILE_ID_EIGHTH",file,csCommId,entCode);
+                    } else if ("AD_USER_NINTH_ID".equals(deptId)){ //财务岗
+                        processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_NINTH");
+                        commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                        ProcessCommon.commentShow("APPROVAL_COMMENT_NINTH",commentEnd,csCommId,entCode);
+                        ProcessCommon.commentShow("FILE_ID_NINTH",file,csCommId,entCode);
+                    }
+                }
+            }
+        } else {
+            if ("buyLeaderRefuse".equals(nodeStatus)){ // 2-采购部负责人审批
+                ProcessCommon.clearData("APPROVAL_COMMENT_TENTH,FILE_ID_TENTH",csCommId,entCode,myJdbcTemplate);
+            } else if ("costOrderOperatorRefuse".equals(nodeStatus)){ // 3-成本/合约/需求经办人审批
+                ProcessCommon.clearData("FILE_ID_FIVE,APPROVAL_COMMENT_FOUR,FILE_ID_SIX,APPROVAL_COMMENT_SIX,FILE_ID_FOUR,APPROVAL_COMMENT_THREE",csCommId,entCode,myJdbcTemplate);
+            } else if ("lawyerOKRefuse".equals(nodeStatus)){ // 4-法律审批
+                ProcessCommon.clearData("APPROVAL_COMMENT_SEVEN,FILE_ID_SEVEN",csCommId,entCode,myJdbcTemplate);
+            } else if ("costOrderFinanceRefuse".equals(nodeStatus)){ // 5-成本/合约/需求/财务/法务部审批
+                ProcessCommon.clearData("FILE_ID_FIVE,APPROVAL_COMMENT_FOUR,FILE_ID_SIX,APPROVAL_COMMENT_SIX,FILE_ID_FOUR,APPROVAL_COMMENT_THREE,FILE_ID_NINTH,APPROVAL_COMMENT_NINTH,FILE_ID_EIGHTH,APPROVAL_COMMENT_EIGHTH",csCommId,entCode,myJdbcTemplate);
+            }
+        }
+    }
+
+    /**
+     * 各审批节点赋值
+     * @param status 状态码
+     * @param nodeId 节点id
+     * @return 节点状态名称
+     */
+    private String getNodeStatus(String status, String nodeId) {
+        String nodeName = "";
+        if ("OK".equals(status)){
+            if ("1612712172176171008".equals(nodeId)){ // 1-发起
+                nodeName = "start";
+            } else if ("1612712172583018496".equals(nodeId)){ // 2-采购部负责人审批
+                nodeName = "buyLeader";
+            } else if ("1612712172352331776".equals(nodeId)){ // 3-成本/合约/需求经办人审批
+                nodeName = "costOrderOperator";
+            } else if ("1612712172373303296".equals(nodeId)){ // 4-法律审批
+                nodeName = "lawyerOK";
+            } else if ("1612713839856607232".equals(nodeId)){ // 5-成本/合约/需求/财务/法务部审批
+                nodeName = "costOrderFinance";
+            }
+        } else {
+            if ("1612712172583018496".equals(nodeId)){ // 2-采购部负责人审批
+                nodeName = "buyLeaderRefuse";
+            } else if ("1612712172352331776".equals(nodeId)){ // 3-成本/合约/需求经办人审批
+                nodeName = "costOrderOperatorRefuse";
+            } else if ("1612712172373303296".equals(nodeId)){ // 4-法律审批
+                nodeName = "lawyerOKRefuse";
+            } else if ("1612713839856607232".equals(nodeId)){ // 5-成本/合约/需求/财务/法务部审批
+                nodeName = "costOrderFinanceRefuse";
+            }
+        }
+        return nodeName;
     }
 }
