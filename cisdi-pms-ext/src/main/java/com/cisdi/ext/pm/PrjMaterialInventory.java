@@ -14,11 +14,8 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,9 +31,6 @@ public class PrjMaterialInventory {
      * 根据清单类型给每个项目加一套清单
      */
     public void initPrjInventory() {
-        AdRemindLog beginLog = AdRemindLog.insertData();
-        beginLog.setRemindText("开始执行initPrjInventory");
-        beginLog.updateById();
         //清空历史数据
         emptyInventory();
 
@@ -49,10 +43,6 @@ public class PrjMaterialInventory {
 
         //初始化清单明细
         initInventoryDetail();
-        AdRemindLog endLog = AdRemindLog.insertData();
-        endLog.setRemindText("结束执行initPrjInventory");
-        endLog.updateById();
-
     }
 
     /**
@@ -291,7 +281,7 @@ public class PrjMaterialInventory {
         }
         int start = (dltReq.pageIndex - 1) * dltReq.pageSize;
         List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(sql);
-        sql += " order by ty.name limit " + start + "," + dltReq.pageSize;
+        sql += " order by ty.SEQ_NO limit " + start + "," + dltReq.pageSize;
         List<Map<String, Object>> dtlList = myJdbcTemplate.queryForList(sql);
 
         //封装返回
