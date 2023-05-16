@@ -3,6 +3,7 @@ package com.cisdi.ext.pm;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.FeeDemandDtl;
 import com.cisdi.ext.model.SecondCategoryFeeDemand;
+import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
@@ -10,6 +11,7 @@ import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
 import org.springframework.util.CollectionUtils;
 
@@ -29,7 +31,7 @@ public class SecondFeeExt {
     /**
      * 新增、修改
      */
-    public void addAndModify(){
+    public void feeAddAndModify(){
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         SecondFeeAddReq req = JSONObject.parseObject(JSONObject.toJSONString(input), SecondFeeAddReq.class);
@@ -44,7 +46,7 @@ public class SecondFeeExt {
             demand = SecondCategoryFeeDemand.insertData();
             demand.setPmPrjId(req.prjId);
             demand.setPoOrderReqId(req.orderReqId);
-            demand.setPoOrderDtlId(req.orderDtlId);
+            demand.setPmOrderCostDetailId(req.orderDtlId);
             demand.updateById();
         }else {//存在，只是获取，方便插入明细
             demand = demands.get(0);
@@ -65,7 +67,10 @@ public class SecondFeeExt {
             feeDemandDtl.setPaidAmount(dtlReq.paidAmount);
             feeDemandDtl.setPaymentRatio(dtlReq.paymentRatio);
             feeDemandDtl.setRequiredAmount(dtlReq.requiredAmount);
-            feeDemandDtl.setSubmitTime(LocalDateTime.parse(dtlReq.submitTime,df));
+            if (!Strings.isNullOrEmpty(dtlReq.submitTime)){
+                feeDemandDtl.setSubmitTime(LocalDateTime.parse(dtlReq.submitTime,df));
+            }
+            feeDemandDtl.insertById();
         }
     }
 
@@ -111,6 +116,13 @@ public class SecondFeeExt {
         //根据项目投资节点走到哪步，之前填报情况，设置可填、必填状态
         this.setStatusByPrjMaxTypeInvest(req.prjId, demandDtlWrappers);
 
+        //合同科目，查合同明细第一条的费用类型
+        String orderDltId = "";
+        List<Map<String, Object>> orderDltIdMaps = myJdbcTemplate.queryForList("select id orderDtlId from PM_ORDER_COST_DETAIL where CONTRACT_ID = ? limit 1",req.orderReqId);
+        if (!CollectionUtils.isEmpty(orderDltIdMaps)){
+            orderDltId = JdbcMapUtil.getString(orderDltIdMaps.get(0),"orderDtlId");
+        }
+
         //合同历史
         List<Map<String, Object>> contractPayMaps = myJdbcTemplate.queryForList("select ph.PAY_TIME payTime,ph.PAY_AMT payAmt,ph.CUMULATIVE_PAYED_PERCENT " +
                 "cumulativePayedPercent from " +
@@ -123,6 +135,7 @@ public class SecondFeeExt {
         SecondFeeAddResp resp = new SecondFeeAddResp();
         resp.prjId = req.prjId;
         resp.orderReqId = req.orderReqId;
+        resp.orderDtlId = orderDltId;
         resp.secondFeeId = (demands == null ? null : demands.get(0).getId());
         resp.feeDemandDtls = demandDtlWrappers;
         resp.payHistories = payHistories;
@@ -130,6 +143,37 @@ public class SecondFeeExt {
         result.put("resp",resp);
         Map output = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
         ExtJarHelper.returnValue.set(output);
+    }
+
+    /**
+     * 选项目后，合同下拉框
+     */
+    public void contractDrop(){
+        Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
+        String prjId = input.get("prjId").toString();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> contractMaps = myJdbcTemplate.queryForList("select id orderReqId,CONTRACT_NAME orderReqName from po_order_req r where " +
+                "FIND_IN_SET(?,r.PM_PRJ_IDS) and status = 'AP'", prjId);
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("contractMaps",contractMaps);
+        Map output = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
+        ExtJarHelper.returnValue.set(output);
+    }
+
+    /**
+     * 合同科目下拉
+     */
+    public void subjectDrop(){
+        Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
+        String orderReqId = input.get("orderReqId").toString();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> dltMaps = myJdbcTemplate.queryForList("select id orderDtlId,FEE_DETAIL orderDtlName from pm_order_cost_detail d " +
+                "where CONTRACT_ID = ? and d.status = 'AP'", orderReqId);
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("dltMaps",dltMaps);
+        Map output = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
+        ExtJarHelper.returnValue.set(output);
+
     }
 
     /**
@@ -205,6 +249,13 @@ public class SecondFeeExt {
         if (!CollectionUtils.isEmpty(originMaps)){
             for (Map<String, Object> originMap : originMaps) {
                 DemandDtl demandDtl = JSONObject.parseObject(JSONObject.toJSONString(originMap), DemandDtl.class);
+                demandDtl.approvedAmount = BigDecimalUtil.setStringScale(JdbcMapUtil.getString(originMap,"approvedAmount"),2);
+                demandDtl.payableRatio = BigDecimalUtil.setStringScale(JdbcMapUtil.getString(originMap,"payableRatio"),2);
+                demandDtl.payableAmount = BigDecimalUtil.setStringScale(JdbcMapUtil.getString(originMap,"payableAmount"),2);
+                demandDtl.paidAmount = BigDecimalUtil.setStringScale(JdbcMapUtil.getString(originMap,"paidAmount"),2);
+                demandDtl.paymentRatio = BigDecimalUtil.setStringScale(JdbcMapUtil.getString(originMap,"paymentRatio"),2);
+                demandDtl.requiredAmount = BigDecimalUtil.setStringScale(JdbcMapUtil.getString(originMap,"requiredAmount"),2);
+                demandDtl.submitTime = StringUtil.withOutT(demandDtl.submitTime);
                 demandDtls.add(demandDtl);
             }
         }

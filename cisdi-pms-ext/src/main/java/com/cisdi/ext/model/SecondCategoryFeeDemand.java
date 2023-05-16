@@ -107,9 +107,9 @@ public class SecondCategoryFeeDemand {
          */
         public static final String PO_ORDER_REQ_ID = "PO_ORDER_REQ_ID";
         /**
-         * 采购合同明细。
+         * 合同签订费用明细。
          */
-        public static final String PO_ORDER_DTL_ID = "PO_ORDER_DTL_ID";
+        public static final String PM_ORDER_COST_DETAIL_ID = "PM_ORDER_COST_DETAIL_ID";
     }
 
     // </editor-fold>
@@ -658,36 +658,36 @@ public class SecondCategoryFeeDemand {
     }
 
     /**
-     * 采购合同明细。
+     * 合同签订费用明细。
      */
-    private String poOrderDtlId;
+    private String pmOrderCostDetailId;
 
     /**
-     * 获取：采购合同明细。
+     * 获取：合同签订费用明细。
      */
-    public String getPoOrderDtlId() {
-        return this.poOrderDtlId;
+    public String getPmOrderCostDetailId() {
+        return this.pmOrderCostDetailId;
     }
 
     /**
-     * 设置：采购合同明细。
+     * 设置：合同签订费用明细。
      */
-    public SecondCategoryFeeDemand setPoOrderDtlId(String poOrderDtlId) {
-        if (this.poOrderDtlId == null && poOrderDtlId == null) {
+    public SecondCategoryFeeDemand setPmOrderCostDetailId(String pmOrderCostDetailId) {
+        if (this.pmOrderCostDetailId == null && pmOrderCostDetailId == null) {
             // 均为null，不做处理。
-        } else if (this.poOrderDtlId != null && poOrderDtlId != null) {
+        } else if (this.pmOrderCostDetailId != null && pmOrderCostDetailId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.poOrderDtlId.compareTo(poOrderDtlId) != 0) {
-                this.poOrderDtlId = poOrderDtlId;
-                if (!this.toUpdateCols.contains("PO_ORDER_DTL_ID")) {
-                    this.toUpdateCols.add("PO_ORDER_DTL_ID");
+            if (this.pmOrderCostDetailId.compareTo(pmOrderCostDetailId) != 0) {
+                this.pmOrderCostDetailId = pmOrderCostDetailId;
+                if (!this.toUpdateCols.contains("PM_ORDER_COST_DETAIL_ID")) {
+                    this.toUpdateCols.add("PM_ORDER_COST_DETAIL_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.poOrderDtlId = poOrderDtlId;
-            if (!this.toUpdateCols.contains("PO_ORDER_DTL_ID")) {
-                this.toUpdateCols.add("PO_ORDER_DTL_ID");
+            this.pmOrderCostDetailId = pmOrderCostDetailId;
+            if (!this.toUpdateCols.contains("PM_ORDER_COST_DETAIL_ID")) {
+                this.toUpdateCols.add("PM_ORDER_COST_DETAIL_ID");
             }
         }
         return this;

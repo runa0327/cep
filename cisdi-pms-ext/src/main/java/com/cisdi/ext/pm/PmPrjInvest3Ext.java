@@ -63,7 +63,7 @@ public class PmPrjInvest3Ext {
         //更新项目信息(基础信息、资金信息)
         PmPrjExt.updatePrjBaseData(entityRecord,"PM_PRJ_INVEST3",4,myJdbcTemplate,entCode);
         //创建项目投资测算汇总财评数据
-//        WfPmInvestUtil.calculateData(csCommId, entCode, pmPrjId);
+        WfPmInvestUtil.calculateData(csCommId, entCode, pmPrjId);
     }
 
     /**
