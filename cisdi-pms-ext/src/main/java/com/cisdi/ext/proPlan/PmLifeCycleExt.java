@@ -4,9 +4,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.proPlan.model.HeaderObj;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -64,6 +67,7 @@ public class PmLifeCycleExt {
         columnList.add(0, HeaderObj.builder().name("ID").izDisplay("0").build());
         columnList.add(1, HeaderObj.builder().name("项目名称").izDisplay("1").build());
         columnList.add(2, HeaderObj.builder().name("前期手续经办人").izDisplay("1").build());
+        columnList.add(3, HeaderObj.builder().name("备注说明").izDisplay("1").build());
 
         if (CollectionUtils.isEmpty(columnList)) {
             OutSide outSide = new OutSide();
@@ -115,6 +119,7 @@ public class PmLifeCycleExt {
         headerList.add(0, "ID");
         headerList.add(1, "项目名称");
         headerList.add(2, "前期手续经办人");
+        headerList.add(3, "备注说明");
 
         //数据
         List<Map<String, Object>> dataList = new ArrayList<>();
@@ -146,7 +151,16 @@ public class PmLifeCycleExt {
                 } else if ("前期手续经办人".equals(s)) {
                     JSONObject json = new JSONObject();
                     json.put("nameOrg", stringObjectMap.get("qqusers"));
-                    newData.put("ID", json);
+                    newData.put("前期手续经办人", json);
+                } else if ("备注说明".equals(s)) {
+                    JSONObject json = new JSONObject();
+                    List<String> contentList = new ArrayList<>();
+                    List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from REMARK_INFO where REMARK_TYPE='1' and PM_PRJ_ID=?", stringObjectMap.get("id"));
+                    if (!CollectionUtils.isEmpty(list1)) {
+                        contentList = list1.stream().map(m -> JdbcMapUtil.getString(m, "CONTENT")).collect(Collectors.toList());
+                    }
+                    json.put("nameOrg", contentList);
+                    newData.put("备注说明", json);
                 } else {
                     Optional<Map<String, Object>> optional = nodeList.stream().filter(p -> Objects.equals(stringObjectMap.get("id"), p.get("PM_PRJ_ID")) && Objects.equals(s, p.get("NAME"))).findAny();
                     if (optional.isPresent()) {
@@ -234,6 +248,71 @@ public class PmLifeCycleExt {
     }
 
 
+    /**
+     * 查看项目备注说明/节点备注说明
+     */
+    public void checkPmRemark() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        StringBuilder sql = new StringBuilder();
+        if ("1".equals(JdbcMapUtil.getString(map, "type"))) {
+            sql.append("select ri.*,au.`NAME` as user_name from REMARK_INFO ri left join ad_user au on ri.AD_USER_ID = au.id where REMARK_TYPE='1' and PM_PRJ_ID='").append(map.get("projectId")).append("'");
+        } else if ("2".equals(JdbcMapUtil.getString(map, "type"))) {
+            sql.append("select ri.*,au.`NAME` as user_name from REMARK_INFO ri left join ad_user au on ri.AD_USER_ID = au.id left join STANDARD_NODE_NAME sn on sn.id = ri.SCHEDULE_NAME");
+            sql.append(" where REMARK_TYPE='2' and PM_PRJ_ID='").append(map.get("projectId")).append("' and sn.`NAME`='").append(map.get("nodeName")).append("'");
+        }
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql.toString());
+        List<RemarkInfo> remarkInfos = list.stream().map(p -> {
+            RemarkInfo info = new RemarkInfo();
+            info.id = JdbcMapUtil.getString(p, "ID");
+            info.content = JdbcMapUtil.getString(p, "CONTENT");
+            info.submitTime = StringUtil.withOutT(JdbcMapUtil.getString(p, "SUBMIT_TIME"));
+            info.user = JdbcMapUtil.getString(p, "user_name");
+            return info;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(remarkInfos)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.remarkInfos = remarkInfos;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    /**
+     * 备注说明填报
+     */
+    public void fillRemark() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        InputInfo input = JsonUtil.fromJson(json, InputInfo.class);
+        String id = input.id;
+        if (Strings.isNullOrEmpty(input.id)) {
+            id = Crud.from("REMARK_INFO").insertData();
+        }
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String standardNodeNameId = null;
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from STANDARD_NODE_NAME where name=?", input.nodeName);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> dataMap = list.get(0);
+            standardNodeNameId = JdbcMapUtil.getString(dataMap, "ID");
+        }
+        Crud.from("REMARK_INFO").where().eq("ID", id).update()
+                .set("PM_PRJ_ID", input.projectId).set("AD_USER_ID", ExtJarHelper.loginInfo.get().userId).set("SCHEDULE_NAME", standardNodeNameId)
+                .set("CONTENT", input.content).set("SUBMIT_TIME", new Date()).set("REMARK_TYPE", input.type).exec();
+    }
+
+    /**
+     * 备注说明删除
+     */
+    public void delRemark() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        myJdbcTemplate.update("delete from REMARK_INFO where id=?", map.get("id"));
+    }
+
+
     public static class ObjInfo {
         public String id;
         public String name;
@@ -251,5 +330,22 @@ public class PmLifeCycleExt {
         public Integer total;
 
         public List<Map<String, Object>> dataList;
+
+        public List<RemarkInfo> remarkInfos;
+    }
+
+    public static class RemarkInfo {
+        public String id;
+        public String content;
+        public String submitTime;
+        public String user;
+    }
+
+    public static class InputInfo {
+        public String id;
+        public String content;
+        public String nodeName;
+        public String projectId;
+        public String type;
     }
 }
