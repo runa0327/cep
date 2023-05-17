@@ -492,7 +492,7 @@ public class PmStartExt {
     public void refreshNodeTime() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String projectId = JdbcMapUtil.getString(map, "projectId");
-        Date paramDate = DateTimeUtil.stringToDate("2023-01-01");
+        Date paramDate = DateTimeUtil.stringToDate(map.get("paramDate").toString());
         PrjPlanUtil.refreshProPlanTime(projectId, paramDate);
     }
 
