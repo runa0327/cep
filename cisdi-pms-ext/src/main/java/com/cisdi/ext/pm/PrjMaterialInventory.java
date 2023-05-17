@@ -2,20 +2,25 @@ package com.cisdi.ext.pm;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.*;
+import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.util.FileInfoUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -260,7 +265,7 @@ public class PrjMaterialInventory {
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         DltReq dltReq = JSONObject.parseObject(JSONObject.toJSONString(params), DltReq.class);
-        String sql = "select ty.name typeName,f.id fileId,f.DSP_NAME fileName,f.DSP_SIZE fileSize,f.UPLOAD_DTTM uploadTime,u.name uploadUser from " +
+        String sql = "select i.id inventoryId,i.IS_INVOLVED isInvolved,i.remark,ty.name typeName,f.id fileId,if(i.IS_INVOLVED = 1,f.DSP_NAME,'不涉及') fileName,f.DSP_SIZE fileSize,f.UPLOAD_DTTM uploadTime,u.name uploadUser from " +
                 "prj_inventory i \n" +
                 "left join prj_inventory_detail d on i.id = d.PRJ_INVENTORY_ID\n" +
                 "left join material_inventory_type ty on ty.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
@@ -298,6 +303,103 @@ public class PrjMaterialInventory {
         dtlResp.total = totalList.size();
         Map result = JsonUtil.fromJson(JsonUtil.toJson(dtlResp), Map.class);
         ExtJarHelper.returnValue.set(result);
+    }
+
+    /**
+     * 绑定文件
+     */
+    public void bindingFile(){
+        Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String inventoryId = input.get("inventoryId").toString();
+        String fileIds = input.get("fileIds").toString();
+
+        //生成流程实例
+
+
+
+        //绑定文件
+        String[] fileIdArr = fileIds.split(",");
+        for (String fileId : fileIdArr) {
+            PrjInventoryDetail prjInventoryDetail = PrjInventoryDetail.newData();
+            prjInventoryDetail.setPrjInventoryId(inventoryId);
+            prjInventoryDetail.setFlFileId(fileId);
+            prjInventoryDetail.insertById();
+        }
+    }
+
+    /**
+     * 模拟生成流程实例
+     * @param inventoryId 清单id
+     */
+    private void generateProcessInstance(String inventoryId,String fileIds){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //清单对应的流程信息
+        List<Map<String, Object>> processInfos = myJdbcTemplate.queryForList("select i.PM_PRJ_ID prjId,p.name prjName,it.WF_PROCESS_ID processId,pr" +
+                ".name processName,aa.code attCode,pe.AD_ENT_ID entId,e.code entCode \n" +
+                "from prj_inventory i\n" +
+                "left join MATERIAL_INVENTORY_TYPE it on it.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
+                "left join ad_ent_att ea on ea.id = it.AD_ENT_ATT_V_ID\n" +
+                "left join ad_att aa on aa.id = ea.AD_ATT_ID\n" +
+                "left join BASE_PROCESS_ENT pe on pe.WF_PROCESS_ID = it.WF_PROCESS_ID\n" +
+                "left join ad_ent e on e.id = pe.AD_ENT_ID\n" +
+                "left join wf_process pr on pr.id = it.WF_PROCESS_ID\n" +
+                "left join pm_prj p on p.id = i.PM_PRJ_ID " +
+                "where i.id = ?", inventoryId);
+        //生成流程实例
+        if (CollectionUtils.isEmpty(processInfos)){
+            return;
+        }
+        Info info = JSONObject.parseObject(JSONObject.toJSONString(processInfos.get(0)), Info.class);
+
+
+        //流程申请单用的是PM_PRJ_ID还是PM_PRJ_IDS
+        List<Map<String, Object>> processPrjFields = myJdbcTemplate.queryForList("select pe.AD_ENT_ID,e.code entCode,GROUP_CONCAT(a.code) attCodes from " +
+                "BASE_PROCESS_ENT pe \n" +
+                "left join wf_process pr on pr.id = pe.WF_PROCESS_ID\n" +
+                "left join ad_ent e on e.id = pe.AD_ENT_ID\n" +
+                "left join ad_ent_att ea on ea.AD_ENT_ID = e.id\n" +
+                "left join ad_att a on a.id = ea.AD_ATT_ID\n" +
+                "where (a.code = 'PM_PRJ_ID' or a.code = 'PM_PRJ_IDS')\n" +
+                "GROUP BY e.code");
+        boolean isSinglePrj = isSinglePrj(processPrjFields, info.entCode);
+        String prjIdCode = (isSinglePrj == true ? "PM_PRJ_ID" : "PM_PRJ_IDS");
+
+        //同一项目同一流程是否已经走过
+        String processPrjSql = "select id from " + info.entCode + " where " + prjIdCode + " = "  + info.prjId + " and status = 'AP'";
+        List<Map<String, Object>> anyProcessForm = myJdbcTemplate.queryForList(processPrjSql);
+        String entRecordId = "";
+        if (CollectionUtils.isEmpty(anyProcessForm)){
+            entRecordId  = Crud.from(info.entCode).insertData();
+        }else {
+            entRecordId = anyProcessForm.get(0).get("id").toString();
+        }
+        //生成一条申请单数据，并赋项目id、文件id
+        Crud.from(info.entCode).where().eq("ID",entRecordId).update()
+                .set(prjIdCode,info.prjId)
+                .set(info.attCode,fileIds).exec();
+
+        //生成一条流程实例
+        WfProcessInstance wfProcessInstance = WfProcessInstance.newData();
+        String[] nameArr = {info.processName,info.prjName, DateTimeUtil.dttmToString(new Date())};
+        wfProcessInstance.setName(String.join("-",nameArr));
+        wfProcessInstance.setStatus("AP");
+        wfProcessInstance.setWfProcessId(info.processId);
+        wfProcessInstance.setStartUserId(ExtJarHelper.loginInfo.get().userId);
+        wfProcessInstance.setStartDatetime(LocalDateTime.now());
+        wfProcessInstance.setEndDatetime(LocalDateTime.now());
+        wfProcessInstance.setAdEntId(info.entId);
+        wfProcessInstance.setEntCode(info.entCode);
+        wfProcessInstance.setEntityRecordId("");
+    }
+
+    /**
+     * 修改项目清单
+     */
+    public void modifyInventory(){
+        Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
+        PrjInventory prjInventory = JSONObject.parseObject(JSONObject.toJSONString(input), PrjInventory.class);
+        prjInventory.updateById();
     }
 
     /**
@@ -409,6 +511,19 @@ public class PrjMaterialInventory {
     }
 
     /**
+     * 生成流程实例的信息
+     */
+    @Data
+    private static class Info{
+        private String prjId;
+        private String prjName;
+        private String processId;
+        private String processName;
+        private String attCode;
+        private String entCode;
+        private String entId;
+    }
+    /**
      * 列表请求入参
      */
     @Data
@@ -458,8 +573,14 @@ public class PrjMaterialInventory {
      */
     @Data
     private static class InventoryDtl{
+        //清单id，不是明细id
+        private String inventoryId;
         //清单名称
         private String typeName;
+        //备注
+        private String remark;
+        //是否涉及
+        private boolean isInvolved;
         //文件id
         private String fileId;
         //文件名称
@@ -490,12 +611,20 @@ public class PrjMaterialInventory {
         private String entAttId;
     }
 
+    /**
+     * 修改请求
+     */
+    @Data
+    private static class ModifyReq{
+        //清单id
+        private String inventoryId;
+        //备注
+        private String remark;
+        //是否涉及
+        private boolean isInvolved;
+    }
 
     public static void main(String[] args) {
-        ArrayList<Object> list = new ArrayList<>();
-        list.add(null);
-        list.add(null);
-        System.out.println(list);
     }
 
 
