@@ -9,6 +9,7 @@ import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.model.PoOrderReq;
 import com.cisdi.ext.model.view.order.PoOrderReqView;
 import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.orderManage.detail.PoOrderPrjDetailExt;
 import com.cisdi.ext.util.*;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
