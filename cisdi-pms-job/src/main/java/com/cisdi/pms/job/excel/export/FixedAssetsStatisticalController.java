@@ -3,8 +3,6 @@ package com.cisdi.pms.job.excel.export;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.write.style.column.SimpleColumnWidthStyleStrategy;
-import com.cisdi.pms.job.excel.model.PmPrjExportModel;
-import com.cisdi.pms.job.excel.model.request.FixedAssetRequest;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
@@ -13,7 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
@@ -37,16 +37,17 @@ public class FixedAssetsStatisticalController extends BaseController {
 
 
     @SneakyThrows
-    @PostMapping("/export")
-    public void fixedAssetsStatistical(@RequestBody FixedAssetRequest request, HttpServletResponse response) {
-
-        List<String> projectIds = request.getProjectIds();
-
+    @GetMapping("/export")
+    public void fixedAssetsStatistical(String projectIds, HttpServletResponse response) {
+        List<String> ids = new ArrayList<>();
+        if (Strings.isNotEmpty(projectIds)) {
+            ids = Arrays.asList(projectIds.split(","));
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("select * from pm_prj where status='ap' ");
         Map<String, Object> dataParam = new HashMap<>();
-        if (!CollectionUtils.isEmpty(projectIds)) {
-            dataParam.put("ids", projectIds);
+        if (!CollectionUtils.isEmpty(ids)) {
+            dataParam.put("ids", ids);
             sb.append(" and id in (:ids)");
         }
         List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), dataParam);
@@ -78,7 +79,7 @@ public class FixedAssetsStatisticalController extends BaseController {
         for (FixedAssetsInfo fixedAssetsInfo : fixedAssetsInfoList) {
             modelList.add(this.getList(fixedAssetsInfo));
         }
-        super.setExcelRespProp(response,"固定资产计划");
+        super.setExcelRespProp(response, "固定资产计划");
         EasyExcel.write(response.getOutputStream())
                 .head(this.getHeader(resp.headerList))
                 .excelType(ExcelTypeEnum.XLSX)
@@ -92,15 +93,15 @@ public class FixedAssetsStatisticalController extends BaseController {
      */
     private List<List<String>> getHeader(List<String> headerList) {
         List<List<String>> headTitles = new ArrayList<>();
-        headTitles.add(Arrays.asList("项目名称","项目名称"));
-        headTitles.add(Arrays.asList("项目业主","项目业主"));
-        headTitles.add(Arrays.asList("建设规模与内容","建设规模与内容"));
-        headTitles.add(Arrays.asList("建设性质","建设性质"));
-        headTitles.add(Arrays.asList("行业属性","行业属性"));
-        headTitles.add(Arrays.asList("建设地点","建设地点"));
-        headTitles.add(Arrays.asList("开工或计划开工","开工或计划开工"));
-        headTitles.add(Arrays.asList("计划竣工年月","计划竣工年月"));
-        headTitles.add(Arrays.asList("总投资","总投资"));
+        headTitles.add(Arrays.asList("项目名称", "项目名称"));
+        headTitles.add(Arrays.asList("项目业主", "项目业主"));
+        headTitles.add(Arrays.asList("建设规模与内容", "建设规模与内容"));
+        headTitles.add(Arrays.asList("建设性质", "建设性质"));
+        headTitles.add(Arrays.asList("行业属性", "行业属性"));
+        headTitles.add(Arrays.asList("建设地点", "建设地点"));
+        headTitles.add(Arrays.asList("开工或计划开工", "开工或计划开工"));
+        headTitles.add(Arrays.asList("计划竣工年月", "计划竣工年月"));
+        headTitles.add(Arrays.asList("总投资", "总投资"));
 
         //往年计划投资
         for (String yearHeader : headerList) {
@@ -115,10 +116,11 @@ public class FixedAssetsStatisticalController extends BaseController {
 
     /**
      * 导出内容单元格
+     *
      * @param info
      * @return
      */
-    private List getList(FixedAssetsInfo info){
+    private List getList(FixedAssetsInfo info) {
         List<Object> infoList = new ArrayList<>();
         infoList.add(info.projectName);
         infoList.add(info.projectOwner);
@@ -135,6 +137,7 @@ public class FixedAssetsStatisticalController extends BaseController {
         }
         return infoList;
     }
+
     /**
      * 获取概算总投资
      *

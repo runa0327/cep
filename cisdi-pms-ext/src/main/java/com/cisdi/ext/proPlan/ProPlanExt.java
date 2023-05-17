@@ -1324,6 +1324,7 @@ public class ProPlanExt {
                 if (Strings.isNotEmpty(att)) {
                     node.atts = Arrays.asList(att.split(","));
                 }
+                node.izDisplay = JdbcMapUtil.getString(p, "IZ_DISPLAY");
                 return node;
             }).collect(Collectors.toList());
 
@@ -1430,5 +1431,17 @@ public class ProPlanExt {
 
         public String progressStatusId;
         public String progressStatusName;
+
+        public String izDisplay;
+    }
+
+
+    /**
+     * 隐藏显示二级节点
+     */
+    public void displaySecondLevel() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        myJdbcTemplate.update("update PM_PRO_PLAN_NODE set IZ_DISPLAY=? where id=?", map.get("izDisplay"), map.get("nodeId"));
     }
 }
