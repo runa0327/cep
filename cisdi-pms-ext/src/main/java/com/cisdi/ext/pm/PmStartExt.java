@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -708,7 +709,11 @@ public class PmStartExt {
             List<Map<String, Object>> sonList = getChildrenNode(m, allData);
             if (!CollectionUtils.isEmpty(sonList)) {
                 Map<String, Object> topDate = sonList.get(0);
-                myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=? where id=?", topDate.get("PLAN_COMPL_DATE"), m.get("id"));
+                String start = topDate.get("PLAN_START_DATE").toString();
+                String end = topDate.get("PLAN_COMPL_DATE").toString();
+                int cha = getDateCha(end,start);
+                myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
+//                myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=? where id=?", topDate.get("PLAN_COMPL_DATE"), m.get("id"));
             }
         }).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
     }
@@ -733,8 +738,21 @@ public class PmStartExt {
             List<Map<String, Object>> sonList = getChildrenNode(m, nodeList);
             if (!CollectionUtils.isEmpty(sonList)) {
                 Map<String, Object> topDate = sonList.get(0);
-                myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=? where id=?", topDate.get("PLAN_COMPL_DATE"), m.get("id"));
+                String start = topDate.get("PLAN_START_DATE").toString();
+                String end = topDate.get("PLAN_COMPL_DATE").toString();
+                int cha = getDateCha(end,start);
+                myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
             }
         }).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
+    }
+
+    public static int getDateCha(String end, String start) {
+        int cha = 0;
+        try {
+            cha = DateTimeUtil.getTwoTimeStringDays(end,start);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return cha;
     }
 }
