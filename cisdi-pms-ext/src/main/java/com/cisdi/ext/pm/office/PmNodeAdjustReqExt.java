@@ -1,14 +1,49 @@
 package com.cisdi.ext.pm.office;
 
+import com.cisdi.ext.model.PmNodeAdjustReq;
+import com.cisdi.ext.pm.PmStartExt;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 /**
  * 综合办公-全景计划展示表
  */
 public class PmNodeAdjustReqExt {
+
+    /**
+     * 前景计划展示表-发起时数据校验
+     */
+    public void adjustNodeStart(){
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //流程业务表id
+        String csCommId = entityRecord.csCommId;
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        //校验该项目是否有未审批结束的流程
+        Boolean isAp = getNoApProcess(projectId,csCommId);
+        if (isAp == false){
+            throw new BaseException("对不起，该项目有 全景计划展示表 流程未审批结束，请审批结束后再发起流程");
+        }
+    }
+
+    /**
+     * 前景计划展示表-结束时数据校验
+     */
+    public void adjustNodeEnd(){
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //流程业务表id
+        String csCommId = entityRecord.csCommId;
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        //刷新项目进度节点信息
+        PmStartExt.handleData(csCommId,projectId);
+    }
 
     /**
      * 流程操作-全景计划展示表-确认操作
@@ -23,7 +58,7 @@ public class PmNodeAdjustReqExt {
     }
 
     /**
-     * 流程操作-全景计划展示表-确认操作
+     * 流程操作-全景计划展示表-拒绝操作
      */
     public void nodeAdjustRefuse(){
         String status = "OK";
@@ -67,5 +102,21 @@ public class PmNodeAdjustReqExt {
             }
         }
         return nodeName;
+    }
+
+    /**
+     * 查询项目是否有未审批结束的流程
+     * @param projectId 项目id
+     * @param id id
+     * @return 查询结果 没有(true) 、 有(false)
+     */
+    public Boolean getNoApProcess(String projectId, String id) {
+        List<PmNodeAdjustReq> list = PmNodeAdjustReq.selectByWhere(new Where().nin(PmNodeAdjustReq.Cols.STATUS,"AP","VD","VDING")
+                .eq(PmNodeAdjustReq.Cols.PM_PRJ_ID,projectId).neq(PmNodeAdjustReq.Cols.ID,id));
+        if (CollectionUtils.isEmpty(list)){
+            return true;
+        } else {
+            return false;
+        }
     }
 }
