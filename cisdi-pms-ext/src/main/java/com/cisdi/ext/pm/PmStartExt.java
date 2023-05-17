@@ -348,14 +348,14 @@ public class PmStartExt {
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", dataMap.get("NAME")).set("PM_CODE", prjCode)
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("PM_SEQ", seq).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
-                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID","0099799190825080706").exec();
+                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID", "0099799190825080706").exec();
         } else {
             projectId = String.valueOf(list.get(0).get("ID"));
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", dataMap.get("NAME")).set("PM_CODE", prjCode)
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
-            //--修改20230424--项目启动产生的项目默认为前期状态
-                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID","0099799190825080706").exec();
+                    //--修改20230424--项目启动产生的项目默认为前期状态
+                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID", "0099799190825080706").exec();
         }
 
         //先删除项目关联的地块
@@ -524,6 +524,8 @@ public class PmStartExt {
     public static class OutSide {
         public Integer total;
         public List<PmStart> startList;
+
+        public List<NodeInfo> nodeInfoList;
     }
 
     public static class PmStart {
@@ -693,4 +695,75 @@ public class PmStartExt {
         public List<Point> pointList;
     }
 
+
+    /**
+     * 根据项目ID查询节点信息
+     */
+    public void pmLinkPlanNode() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where pn.level= 3 and  PM_PRJ_ID=?", map.get("projectId"));
+        List<NodeInfo> nodeInfoList = list.stream().map(p -> {
+            NodeInfo info = new NodeInfo();
+            info.nodeId = JdbcMapUtil.getString(p, "ID");
+            info.nodeName = JdbcMapUtil.getString(p, "NAME");
+            info.completeDate = JdbcMapUtil.getString(p, "PLAN_COMPL_DATE");
+            return info;
+        }).collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(nodeInfoList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.nodeInfoList = nodeInfoList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    /**
+     * 全景时间调整审批后刷新节点时间
+     * 传参 projectId-项目ID  id-全景时间调整台账ID
+     */
+    public void adjustPlanDate() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_NODE_ADJUST_REQ_DETAIL where PM_NODE_ADJUST_REQ_ID=?", map.get("id"));
+        if (!CollectionUtils.isEmpty(list)) {
+            StringBuilder sb = new StringBuilder();
+            list.forEach(item -> {
+                sb.append("update pm_pro_plan_node set PLAN_COMPL_DATE='").append(item.get("PLAN_COMPL_DATE")).append("' where id='").append(item.get("PM_PRO_PLAN_NODE_ID")).append("' ;");
+            });
+            myJdbcTemplate.update(sb.toString());
+        }
+        // 刷新父节点时间
+        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pn.*,ifnull(PM_PRO_PLAN_NODE_PID,0) as pid from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where PM_PRJ_ID=?", map.get("projectId"));
+        nodeList.stream().filter(p -> Objects.equals("0", p.get("pid"))).peek(m -> {
+            List<Map<String, Object>> sonList = getChildrenNode(m, nodeList);
+            if (!CollectionUtils.isEmpty(sonList)) {
+                Map<String, Object> topDate = sonList.get(0);
+                myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=? where id=?", topDate.get("PLAN_COMPL_DATE"), m.get("id"));
+            }
+        }).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
+
+    }
+
+
+    public static class NodeInfo {
+        public String nodeId;
+        public String nodeName;
+        public String completeDate;
+    }
+
+
+    public List<Map<String, Object>> getChildrenNode(Map<String, Object> parent, List<Map<String, Object>> allData) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        return allData.stream().filter(p -> Objects.equals(parent.get("id"), p.get("PM_PRO_PLAN_NODE_PID"))).peek(m -> {
+            List<Map<String, Object>> sonList = getChildrenNode(m, allData);
+            if (!CollectionUtils.isEmpty(sonList)) {
+                Map<String, Object> topDate = sonList.get(0);
+                myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=? where id=?", topDate.get("PLAN_COMPL_DATE"), m.get("id"));
+            }
+        }).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
+    }
 }
