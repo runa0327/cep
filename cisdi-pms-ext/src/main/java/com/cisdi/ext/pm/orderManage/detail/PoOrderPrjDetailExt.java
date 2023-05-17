@@ -1,4 +1,4 @@
-package com.cisdi.ext.pm.orderManage;
+package com.cisdi.ext.pm.orderManage.detail;
 
 import com.cisdi.ext.model.PoOrderPrjDetail;
 import com.cisdi.ext.util.StringUtil;

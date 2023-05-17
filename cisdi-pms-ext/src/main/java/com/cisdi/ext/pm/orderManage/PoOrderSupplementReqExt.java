@@ -1,6 +1,6 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.orderManage;
 
-import com.cisdi.ext.api.PoOrderExtApi;
+import com.cisdi.ext.pm.ProcessCommon;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -18,10 +18,9 @@ import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 
 /**
- * 采购合同补充协议申请-扩展
+ * 合约管理-补充协议-扩展
  */
 @Slf4j
 public class PoOrderSupplementReqExt {
