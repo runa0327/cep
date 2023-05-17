@@ -31,6 +31,6 @@ public class PoOrderPrjDetailExt {
                         .set("PO_ORDER_REQ_ID",csCommId).set("PM_PRJ_ID",tmp).exec();
             }
         }
-
     }
+
 }
