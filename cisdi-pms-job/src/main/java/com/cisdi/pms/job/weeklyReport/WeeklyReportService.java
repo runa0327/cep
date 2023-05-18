@@ -1,6 +1,7 @@
 package com.cisdi.pms.job.weeklyReport;
 
 import cn.hutool.core.util.IdUtil;
+import com.cisdi.pms.job.mapper.process.ProcessMapper;
 import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyPrjDetailMapper;
 import com.cisdi.pms.job.utils.Constants;
 import com.cisdi.pms.job.utils.DateUtil;
@@ -32,6 +33,9 @@ public class WeeklyReportService {
 
     @Resource
     public PmProgressWeeklyPrjDetailMapper pmProgressWeeklyPrjDetailMapper;
+
+    @Resource
+    public ProcessMapper processMapper;
 
     public void execute() {
 
@@ -197,8 +201,10 @@ public class WeeklyReportService {
 
         // 获取发起列表：
         // TODO 20230405 原型里只取“核心”流程（核心流程就是全景计划里面关联的流程），目前没有过滤：
+        //查询非核心流程
+        Map<String,Object> noCorePro = getNotCoreProcess();
         // 关键过滤条件：流程实例首个待办任务、操作时间在本周
-        List<Map<String, Object>> startList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.`STATUS`='AP' AND EXISTS(SELECT 1 FROM WF_TASK TK WHERE TK.WF_PROCESS_INSTANCE_ID=PI.ID AND TK.`STATUS`='AP' AND TK.IS_PROC_INST_FIRST_TODO_TASK=1 AND TK.AD_USER_ID=? AND TK.ACT_DATETIME BETWEEN ? AND ?)", userId, fromDate, toDatePlus1Day);
+        List<Map<String, Object>> startList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.`STATUS`='AP' AND PI.WF_PROCESS_ID NOT IN (:notCore) AND EXISTS(SELECT 1 FROM WF_TASK TK WHERE TK.WF_PROCESS_INSTANCE_ID=PI.ID AND TK.`STATUS`='AP' AND TK.IS_PROC_INST_FIRST_TODO_TASK=1 AND TK.AD_USER_ID=? AND TK.ACT_DATETIME BETWEEN ? AND ?)", noCorePro,userId, fromDate, toDatePlus1Day);
         for (Map<String, Object> row : startList) {
             Object procId = row.get("WF_PROCESS_ID");
             boolean isFinanceProc = financeProcIdList.contains(procId.toString());
@@ -209,7 +215,7 @@ public class WeeklyReportService {
 
         // 获取协办列表：
         // 关键过滤条件：操作的节点为TRX节点，操作时间在本周
-        List<Map<String, Object>> assistList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.`STATUS`='AP' AND EXISTS(SELECT 1 FROM WF_TASK TK,AD_ACT A,WF_NODE N WHERE TK.WF_PROCESS_INSTANCE_ID=PI.ID AND TK.`STATUS`='AP' AND TK.AD_ACT_ID=A.ID/* AND A.AD_ACT_DIRECTION_ID IN('FORWARD')*/ AND TK.AD_USER_ID=? AND TK.WF_NODE_ID=N.ID AND IFNULL(INSTR(N.EXTRA_INFO,'ASSIST'),0)>0 AND TK.ACT_DATETIME BETWEEN ? AND ?)", userId, fromDate, toDatePlus1Day);
+        List<Map<String, Object>> assistList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.`STATUS`='AP' AND PI.WF_PROCESS_ID NOT IN (:notCore) AND EXISTS(SELECT 1 FROM WF_TASK TK,AD_ACT A,WF_NODE N WHERE TK.WF_PROCESS_INSTANCE_ID=PI.ID AND TK.`STATUS`='AP' AND TK.AD_ACT_ID=A.ID/* AND A.AD_ACT_DIRECTION_ID IN('FORWARD')*/ AND TK.AD_USER_ID=? AND TK.WF_NODE_ID=N.ID AND IFNULL(INSTR(N.EXTRA_INFO,'ASSIST'),0)>0 AND TK.ACT_DATETIME BETWEEN ? AND ?)", noCorePro,userId, fromDate, toDatePlus1Day);
         for (Map<String, Object> row : assistList) {
             Object procId = row.get("WF_PROCESS_ID");
             boolean isFinanceProc = financeProcIdList.contains(procId.toString());
@@ -220,7 +226,7 @@ public class WeeklyReportService {
 
         // 获取办结列表：
         // 关键过滤条件：操作的节点为TRX节点，流程实例结束时间在本周
-        List<Map<String, Object>> endList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.`STATUS`='AP' AND EXISTS(SELECT 1 FROM WF_TASK TK,AD_ACT A,WF_NODE N WHERE TK.WF_PROCESS_INSTANCE_ID=PI.ID AND TK.`STATUS`='AP' AND TK.AD_ACT_ID=A.ID/* AND A.AD_ACT_DIRECTION_ID IN('FORWARD')*/ AND TK.AD_USER_ID=? AND TK.WF_NODE_ID=N.ID AND IFNULL(INSTR(N.EXTRA_INFO,'TRX'),0)>0) AND PI.END_DATETIME BETWEEN ? AND ?", userId, fromDate, toDatePlus1Day);
+        List<Map<String, Object>> endList = jdbcTemplate.queryForList("SELECT * FROM WF_PROCESS_INSTANCE PI WHERE PI.`STATUS`='AP' AND PI.WF_PROCESS_ID NOT IN (:notCore) AND EXISTS(SELECT 1 FROM WF_TASK TK,AD_ACT A,WF_NODE N WHERE TK.WF_PROCESS_INSTANCE_ID=PI.ID AND TK.`STATUS`='AP' AND TK.AD_ACT_ID=A.ID/* AND A.AD_ACT_DIRECTION_ID IN('FORWARD')*/ AND TK.AD_USER_ID=? AND TK.WF_NODE_ID=N.ID AND IFNULL(INSTR(N.EXTRA_INFO,'TRX'),0)>0) AND PI.END_DATETIME BETWEEN ? AND ?", noCorePro,userId, fromDate, toDatePlus1Day);
         for (Map<String, Object> row : endList) {
             Object procId = row.get("WF_PROCESS_ID");
             boolean notiDeptOnEnd = notiDeptProcIdList.contains(procId.toString());
@@ -505,5 +511,16 @@ public class WeeklyReportService {
         pmProgressWeeklyPrjDetailMapper.updatePrjWeekByWeekId(weekId);
         //根据周id更新本周周报明细提交状态
         pmProgressWeeklyPrjDetailMapper.updatePrjDetailWeekByWeekId(weekId);
+    }
+
+    /**
+     * 获取非核心流程
+     * @return
+     */
+    public Map<String, Object> getNotCoreProcess() {
+        List<String> proList = processMapper.getNotCoreProId();
+        Map<String,Object> map = new HashMap<>();
+        map.put("notCore",proList);
+        return map;
     }
 }
