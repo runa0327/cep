@@ -156,6 +156,10 @@ public class PmProgressWeeklyPrjDetail {
          * 项目。
          */
         public static final String PM_PRJ_ID = "PM_PRJ_ID";
+        /**
+         * 周报是否提交。
+         */
+        public static final String IS_WEEKLY_REPORT_SUBMIT = "IS_WEEKLY_REPORT_SUBMIT";
     }
 
     // </editor-fold>
@@ -1130,6 +1134,42 @@ public class PmProgressWeeklyPrjDetail {
             this.pmPrjId = pmPrjId;
             if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
                 this.toUpdateCols.add("PM_PRJ_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 周报是否提交。
+     */
+    private Boolean isWeeklyReportSubmit;
+
+    /**
+     * 获取：周报是否提交。
+     */
+    public Boolean getIsWeeklyReportSubmit() {
+        return this.isWeeklyReportSubmit;
+    }
+
+    /**
+     * 设置：周报是否提交。
+     */
+    public PmProgressWeeklyPrjDetail setIsWeeklyReportSubmit(Boolean isWeeklyReportSubmit) {
+        if (this.isWeeklyReportSubmit == null && isWeeklyReportSubmit == null) {
+            // 均为null，不做处理。
+        } else if (this.isWeeklyReportSubmit != null && isWeeklyReportSubmit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isWeeklyReportSubmit.compareTo(isWeeklyReportSubmit) != 0) {
+                this.isWeeklyReportSubmit = isWeeklyReportSubmit;
+                if (!this.toUpdateCols.contains("IS_WEEKLY_REPORT_SUBMIT")) {
+                    this.toUpdateCols.add("IS_WEEKLY_REPORT_SUBMIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isWeeklyReportSubmit = isWeeklyReportSubmit;
+            if (!this.toUpdateCols.contains("IS_WEEKLY_REPORT_SUBMIT")) {
+                this.toUpdateCols.add("IS_WEEKLY_REPORT_SUBMIT");
             }
         }
         return this;
