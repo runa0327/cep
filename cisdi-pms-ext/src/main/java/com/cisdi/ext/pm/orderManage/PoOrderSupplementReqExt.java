@@ -566,7 +566,7 @@ public class PoOrderSupplementReqExt {
         //系统项目id写入pm_prj_ids
         List<PoOrderSupplementReq> list2 = PoOrderSupplementReq.selectByWhere(new Where()
                 .nin(PoOrderSupplementReq.Cols.STATUS,"VD","VDING")
-                .eq(PoOrderSupplementReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441374"));
+                .eq(PoOrderSupplementReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
         if (!CollectionUtils.isEmpty(list2)){
             for (PoOrderSupplementReq tp : list2) {
                 String id = tp.getId();
@@ -583,6 +583,9 @@ public class PoOrderSupplementReqExt {
             for (PoOrderSupplementReq tmp : list3) {
                 String id = tmp.getId();
                 String projectId = tmp.getPmPrjIds();
+                if (SharedUtil.isEmptyString(projectId)){
+                    projectId = tmp.getPmPrjId();
+                }
                 PoOrderSupplementPrjDetailExt.insertData(id,projectId);
             }
         }

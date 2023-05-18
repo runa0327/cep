@@ -21,7 +21,7 @@ public class PoOrderPrjDetailExt {
      */
     public static void createData(EntityRecord entityRecord) {
         String csCommId = entityRecord.csCommId;
-        Crud.from("PO_ORDER_PRJ_DETAIL").delete().exec();
+        Crud.from("PO_ORDER_PRJ_DETAIL").where().eq(PoOrderPrjDetail.Cols.PO_ORDER_REQ_ID,csCommId).delete().exec();
         String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
         List<String> projectList = StringUtil.getStrToList(projectId,",");
         if (!CollectionUtils.isEmpty(projectList)){
@@ -33,4 +33,20 @@ public class PoOrderPrjDetailExt {
         }
     }
 
+    /**
+     * 根据合同签订id和项目信息 新增信息
+     * @param poOrderReqId 合同签订id
+     * @param prjIds 项目id
+     */
+    public static void insertData(String poOrderReqId, String prjIds) {
+        Crud.from("PO_ORDER_PRJ_DETAIL").where().eq(PoOrderPrjDetail.Cols.PO_ORDER_REQ_ID,poOrderReqId).delete().exec();
+        List<String> projectList = StringUtil.getStrToList(prjIds,",");
+        if (!CollectionUtils.isEmpty(projectList)){
+            for (String tmp : projectList) {
+                String id = Crud.from("PO_ORDER_PRJ_DETAIL").insertData();
+                Crud.from("PO_ORDER_PRJ_DETAIL").where().eq("id",id).update()
+                        .set("PO_ORDER_REQ_ID",poOrderReqId).set("PM_PRJ_ID",tmp).exec();
+            }
+        }
+    }
 }

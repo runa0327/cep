@@ -15,7 +15,7 @@ public class PoOrderSupplementPrjDetailExt {
      * @param projectId 项目id
      */
     public static void insertData(String supplementId, String projectId) {
-        Crud.from(PoOrderSupplementPrjDetail.ENT_CODE).delete().exec();
+        Crud.from(PoOrderSupplementPrjDetail.ENT_CODE).where().eq(PoOrderSupplementPrjDetail.Cols.PO_ORDER_SUPPLEMENT_REQ_ID,supplementId).delete().exec();
         List<String> projectList = StringUtil.getStrToList(projectId,",");
         if (!CollectionUtils.isEmpty(projectList)){
             for (String tmp : projectList) {
