@@ -38,7 +38,7 @@ public class ProjectRosterExportController extends BaseController {
         StringBuilder sb = new StringBuilder();
         sb.append("select pj.id as id, pj.`NAME` as project_name from pm_prj pj left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID where pj.`STATUS`='ap' ");
         if (!StringUtils.isEmpty(projectName)) {
-            sb.append(" and pj.id like '%").append(projectName).append("%'");
+            sb.append(" and pj.`NAME` like '%").append(projectName).append("%'");
         }
         sb.append("group by pj.id ");
         //header
