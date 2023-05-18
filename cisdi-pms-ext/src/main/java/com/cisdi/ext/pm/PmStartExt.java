@@ -412,7 +412,6 @@ public class PmStartExt {
         sendWeekTask(projectId);
         //为项目添加清单
         PrjMaterialInventory.addPrjInventory(projectId);
-
     }
 
     /**
