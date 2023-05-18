@@ -191,4 +191,17 @@ public class StringUtil {
     public static void main(String[] args) {
         System.out.println(StringUtil.doExpression("100<20"));
     }
+
+    /**
+     * 字符串控制判断 结果转 BigDecimal 类型
+     * @param oldStr 原字符串
+     * @return BigDecimal值
+     */
+    public static BigDecimal valueNullToBig(String oldStr) {
+        BigDecimal decimal = new BigDecimal(0);
+        if (!SharedUtil.isEmptyString(oldStr)){
+            decimal = new BigDecimal(oldStr);
+        }
+        return decimal;
+    }
 }

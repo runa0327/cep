@@ -1410,14 +1410,38 @@ public class AttLinkExtDetail {
         StringBuilder file2 = new StringBuilder();
         StringBuilder file3 = new StringBuilder();
         for (Map<String, Object> tmp : list) {
-            allPrjTotalAmt = allPrjTotalAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"PRJ_TOTAL_INVEST"))); //总投资
-            allConstructAmt = allConstructAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"CONSTRUCT_AMT"))); //建安工程费
-            allPrjOtherAmt = allPrjOtherAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"PROJECT_OTHER_AMT"))); //工程其他费用
-            allEquipAmt = allEquipAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"EQUIP_AMT"))); //设备采购费
-            allEquipmentAmt = allEquipmentAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"EQUIPMENT_COST"))); //科研设备费
-            allLandAmt = allLandAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"LAND_AMT"))); //土地征拆费用
-            allPrepareAmt = allPrepareAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"PREPARE_AMT"))); //预备费
-            allConstructPeriodAmt = allConstructPeriodAmt.add(new BigDecimal(JdbcMapUtil.getString(tmp,"CONSTRUCT_PERIOD_INTEREST"))); //建设期利息
+            //总投资
+            String allPrjTotalAmtStr = JdbcMapUtil.getString(tmp,"PRJ_TOTAL_INVEST");
+            allPrjTotalAmt = allPrjTotalAmt.add(StringUtil.valueNullToBig(allPrjTotalAmtStr));
+
+            //建安工程费
+            String allConstructAmtStr = JdbcMapUtil.getString(tmp,"CONSTRUCT_AMT");
+            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allConstructAmtStr));
+
+            //工程其他费用
+            String allPrjOtherAmtStr = JdbcMapUtil.getString(tmp,"PROJECT_OTHER_AMT");
+            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allPrjOtherAmtStr));
+
+            //设备采购费
+            String allEquipAmtStr = JdbcMapUtil.getString(tmp,"EQUIP_AMT");
+            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allEquipAmtStr));
+
+            //科研设备费
+            String allEquipmentAmtStr = JdbcMapUtil.getString(tmp,"EQUIPMENT_COST");
+            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allEquipmentAmtStr));
+
+            //土地征拆费用
+            String allLandAmtStr = JdbcMapUtil.getString(tmp,"LAND_AMT");
+            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allLandAmtStr));
+
+            //预备费
+            String allPrepareAmtStr = JdbcMapUtil.getString(tmp,"PREPARE_AMT");
+            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allPrepareAmtStr));
+
+            //建设期利息
+            String allConstructPeriodAmtStr = JdbcMapUtil.getString(tmp,"CONSTRUCT_PERIOD_INTEREST");
+            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allConstructPeriodAmtStr));
+
             comment.append(JdbcMapUtil.getString(tmp,"REPLY_DATE_SETTLE")).append("结算内容： ").append(JdbcMapUtil.getString(tmp,"TEXT_REMARK_ONE")).append(";\n"); //结算内容
             file1.append(JdbcMapUtil.getString(tmp,"FILE_ID_ONE")).append(","); //结算盖章文件
             file2.append(JdbcMapUtil.getString(tmp,"FILE_ID_TWO")).append(","); //项目结算电子资料
