@@ -446,18 +446,18 @@ public class PrjMaterialInventory {
      * 添加项目清单明细
      * @param prjIds 项目ids，英文逗号连接
      * @param processId 流程id
-     * @param processIncId 流程实例id
+     * @param processInsId 流程实例id
      */
-    public static void addInventoryDtl(String prjIds,String processId,String processIncId){
+    public static void addInventoryDtl(String prjIds,String processId,String processInsId){
         if (Strings.isNullOrEmpty(prjIds)){
             throw new BaseException("项目ids不能为空");
         }
 
         //先将流程实例对应的清单明细删除，避免重复添加
-        PrjInventoryDetail.deleteByWhere(new Where().eq(PrjInventoryDetail.Cols.WF_PROCESS_INSTANCE_ID,processIncId));
+        PrjInventoryDetail.deleteByWhere(new Where().eq(PrjInventoryDetail.Cols.WF_PROCESS_INSTANCE_ID,processInsId));
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //流程实例
-        WfProcessInstance processInc = WfProcessInstance.selectById(processIncId);
+        WfProcessInstance processInc = WfProcessInstance.selectById(processInsId);
         //找出流程中需要映射的字段名
         List<Map<String, Object>> attMaps = myJdbcTemplate.queryForList("select a.code attCode,ea.id entAttId from material_inventory_type t \n" +
                 "left join ad_ent_att ea on ea.id = t.AD_ENT_ATT_V_ID\n" +
@@ -500,7 +500,7 @@ public class PrjMaterialInventory {
                         PrjInventoryDetail prjInventoryDetail = PrjInventoryDetail.newData();
                         prjInventoryDetail.setPrjInventoryId(prjInventoryId);
                         prjInventoryDetail.setFlFileId(fileId);
-                        prjInventoryDetail.setWfProcessInstanceId(processIncId);
+                        prjInventoryDetail.setWfProcessInstanceId(processInsId);
                         prjInventoryDetail.insertById();
                     }
                 }
