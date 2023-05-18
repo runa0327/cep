@@ -1442,15 +1442,48 @@ public class AttLinkExtDetail {
             String allConstructPeriodAmtStr = JdbcMapUtil.getString(tmp,"CONSTRUCT_PERIOD_INTEREST");
             allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allConstructPeriodAmtStr));
 
-            comment.append(JdbcMapUtil.getString(tmp,"REPLY_DATE_SETTLE")).append("结算内容： ").append(JdbcMapUtil.getString(tmp,"TEXT_REMARK_ONE")).append(";\n"); //结算内容
-            file1.append(JdbcMapUtil.getString(tmp,"FILE_ID_ONE")).append(","); //结算盖章文件
-            file2.append(JdbcMapUtil.getString(tmp,"FILE_ID_TWO")).append(","); //项目结算电子资料
-            file3.append(JdbcMapUtil.getString(tmp,"FILE_ID_THREE")).append(","); //其他附件
+            //结算内容
+            String commentStr = JdbcMapUtil.getString(tmp,"TEXT_REMARK_ONE");
+            if (!SharedUtil.isEmptyString(commentStr)){
+                comment.append(JdbcMapUtil.getString(tmp,"REPLY_DATE_SETTLE")).append("结算内容： ").append(commentStr).append(";\n");
+            }
+
+            //结算盖章文件
+            String file1Str = JdbcMapUtil.getString(tmp,"FILE_ID_ONE");
+            if (!SharedUtil.isEmptyString(file1Str)){
+                file1.append(file1Str).append(",");
+            }
+
+            //项目结算电子资料
+            String file2Str = JdbcMapUtil.getString(tmp,"FILE_ID_TWO");
+            if (!SharedUtil.isEmptyString(file2Str)){
+                file2.append(file2Str).append(",");
+            }
+
+            //其他附件
+            String file3Str = JdbcMapUtil.getString(tmp,"FILE_ID_THREE");
+            if (!SharedUtil.isEmptyString(file3Str)){
+                file3.append(file3Str).append(",");
+            }
+
         }
-        comment.deleteCharAt(comment.length()-1);
-        file1.deleteCharAt(file1.length()-1);
-        file2.deleteCharAt(file2.length()-1);
-        file3.deleteCharAt(file3.length()-1);
+
+        if (comment.length() > 0){
+            comment.deleteCharAt(comment.length()-1);
+        }
+
+        if (file1.length() > 0){
+            file1.deleteCharAt(file1.length()-1);
+        }
+
+        if (file2.length() > 0){
+            file2.deleteCharAt(file2.length()-1);
+        }
+
+        if (file3.length() > 0){
+            file3.deleteCharAt(file3.length()-1);
+        }
+
         map.put("allPrjTotalAmt",allPrjTotalAmt); //总投资
         map.put("allConstructAmt",allConstructAmt); //建安工程费
         map.put("allPrjOtherAmt",allPrjOtherAmt); //工程其他费用
