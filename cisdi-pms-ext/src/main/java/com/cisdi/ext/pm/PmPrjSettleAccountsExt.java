@@ -140,7 +140,7 @@ public class PmPrjSettleAccountsExt {
                 } else if ("earlyManageDesignFinanceCheckOK".equals(nodeStatus)){ //3-前期/工程/设计/财务审批-通过
                     userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
                     //根据花名册信息推出该人员
-                    String processPostId = ProcessCommon.getUserProcessPost(userId,projectId,companyId,myJdbcTemplate);
+                    String processPostId = ProcessCommon.getUserProcessPost(userId,projectId,companyId,entCode,id,myJdbcTemplate);
                     if ("1636192694655168512".equals(processPostId)){ //前期岗
                         updateComment("REMARK_LONG_TWO",userName,comment,entityRecord.valueMap,id);
                     } else if ("1637988041987633152".equals(processPostId)){ //工程岗

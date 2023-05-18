@@ -1,8 +1,10 @@
 package com.cisdi.ext.pm;
 
+import cn.hutool.core.annotation.Link;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.HrDeptUser;
 import com.cisdi.ext.model.PmRoster;
+import com.cisdi.ext.model.PostInfo;
 import com.cisdi.ext.util.StringUtil;
 import com.cisdi.ext.model.WfProcessInstance;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -295,10 +297,12 @@ public class ProcessCommon {
      * @param userId 用户id
      * @param projectId 项目id
      * @param companyId 业主单位id
+     * @param tableName 表名
+     * @param id 表数据id
      * @param myJdbcTemplate 数据源
      * @return 流程岗位id
      */
-    public static String getUserProcessPost(String userId,String projectId, String companyId, MyJdbcTemplate myJdbcTemplate) {
+    public static String getUserProcessPost(String userId,String projectId, String companyId,String tableName, String id, MyJdbcTemplate myJdbcTemplate) {
         String processPostId;
         String sql = "select a.BASE_PROCESS_POST_ID FROM PM_POST_PROPRJ a " +
                 "left join PM_ROSTER b on a.POST_INFO_ID = b.POST_INFO_ID " +
@@ -307,9 +311,52 @@ public class ProcessCommon {
         if (!CollectionUtils.isEmpty(list)){
             processPostId = JdbcMapUtil.getString(list.get(0),"BASE_PROCESS_POST_ID");
         } else {
-            throw new BaseException("该人员在该项目的花名册信息中未匹配到信息，请核对花名册审批人信息或联系管理员处理！");
+            processPostId = getUserPostByProcess(tableName,id,userId,myJdbcTemplate);
         }
         return processPostId;
+    }
+
+    /**
+     * 获取人员在流程发起中选择的岗位id信息
+     * @param tableName 流程表名
+     * @param id 流程表数据id
+     * @param userId 用户id
+     * @param myJdbcTemplate 数据源
+     * @return 岗位id
+     */
+    public static String getUserPostByProcess(String tableName, String id, String userId, MyJdbcTemplate myJdbcTemplate) {
+        String postId = "",postCode = "";
+        List<Map<String,Object>> list = LinkSql.getPrjProcessUserDept(id,tableName,myJdbcTemplate);
+        if (!CollectionUtils.isEmpty(list)){
+            tp:for (Map<String, Object> tp : list) {
+                for (String tmp : tp.keySet()){
+                    if (tmp.contains("AD_USER") && userId.equals(tp.get(tmp))){
+                        postCode = tmp;
+                        break tp;
+                    }
+                }
+            }
+        }
+        if ("AD_USER_FIFTEEN_ID".equals(postCode)){ //计划运营岗
+            postId = "1649315416767717376";
+        } else if ("AD_USER_THIRTEEN_ID".equals(postCode)){ //土地管理岗
+            postId = "1638733006686535680";
+        } else if ("AD_USER_TWENTY_ONE_ID".equals(postCode)){ //采购管理岗
+            postId = "1637991453391237120";
+        } else if ("AD_USER_TWENTY_THREE_ID".equals(postCode)){ //工程管理岗
+            postId = "1637988041987633152";
+        } else if ("AD_USER_NINETEEN_ID".equals(postCode)){ //合约管理岗
+            postId = "1637988017434177536";
+        } else if ("AD_USER_TWENTY_FIVE_ID".equals(postCode)){ //财务管理岗
+            postId = "1637988004163399680";
+        } else if ("AD_USER_TWENTY_TWO_ID".equals(postCode)){ //设计管理岗
+            postId = "1637987984030740480";
+        } else if ("AD_USER_EIGHTEEN_ID".equals(postCode)){ //成本管理岗
+            postId = "1637987965638717440";
+        } else if ("AD_USER_TWELVE_ID".equals(postCode)){ //前期报建岗
+            postId = "1636192694655168512";
+        }
+        return postId;
     }
 
     /**
