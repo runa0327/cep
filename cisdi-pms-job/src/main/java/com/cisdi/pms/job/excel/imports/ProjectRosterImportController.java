@@ -86,16 +86,17 @@ public class ProjectRosterImportController extends BaseController {
             String projectName = row.getCell(0).toString();
             int rowNum1 = row.getLastCellNum() - row.getFirstCellNum();
             for (int i = 1; i < rowNum1; i++) {
-                String userName = row.getCell(i).toString();
-                if (!"".equals(userName) && !"/".equals(userName)) {
+                Object obj = row.getCell(i);
+                if (obj != null && !"".equals(obj.toString()) && !"/".equals(obj.toString())) {
                     ProjectRosterModel model = new ProjectRosterModel();
                     model.setProjectName(projectName);
                     model.setPostName(firstRow.getCell(i).toString());
-                    model.setUserName(userName);
+                    model.setUserName(obj.toString());
                     list.add(model);
                 }
             }
         }
+
         //去除空行
         List<ProjectRosterModel> rosterModelList = list.stream().filter(p -> !ReflectUtil.isObjectNull(p)).collect(Collectors.toList());
 
