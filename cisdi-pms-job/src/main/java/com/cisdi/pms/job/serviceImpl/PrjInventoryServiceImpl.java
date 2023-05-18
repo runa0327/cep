@@ -39,7 +39,7 @@ public class PrjInventoryServiceImpl implements PrjInventoryService {
     @Override
     public void init() {
         //清空明细
-        jdbcTemplate.update("delete from PRJ_INVENTORY_DETAIL");
+//        jdbcTemplate.update("delete from PRJ_INVENTORY_DETAIL");
 
         List<Map<String, Object>> prjMaps = jdbcTemplate.queryForList("select * from pm_prj where status = 'AP'");
         List<Map<String, Object>> materialInventoryTypeMaps = jdbcTemplate.queryForList("select * from MATERIAL_INVENTORY_TYPE where status = 'AP'");
@@ -83,6 +83,10 @@ public class PrjInventoryServiceImpl implements PrjInventoryService {
                 "left join ad_att a on a.id = ea.AD_ATT_ID\n" +
                 "where ty.WF_PROCESS_ID is not null and i.status = 'AP' and ty.status = 'AP' and ea.status = 'AP' and a.status = 'AP'");
 
+        //全部清单明细
+        List<Map<String, Object>> inventoryDtlList = jdbcTemplate.queryForList("select id,PRJ_INVENTORY_ID inventoryId,FL_FILE_ID fileId,WF_PROCESS_INSTANCE_ID" +
+                " instanceId from PRJ_INVENTORY_DETAIL");
+
         for (Map<String, Object> instance : instanceList) {
             String instanceId = instance.get("instanceId").toString();//流程实例id
             String typeId = instance.get("typeId").toString();//清单类型id
@@ -125,6 +129,13 @@ public class PrjInventoryServiceImpl implements PrjInventoryService {
                 //走到这里，fileIds不为空
                 String[] fileIdArr = fileIds.split(",");
                 for (String fileId : fileIdArr) {
+                    Optional<Map<String, Object>> anyDlt = inventoryDtlList.stream()
+                            .filter(dlt -> inventoryId.equals(String.valueOf(dlt.get("inventoryId"))) && fileId.equals(String.valueOf(dlt.get(
+                                    "fileId"))) && instanceId.equals(String.valueOf(dlt.get("instanceId"))))
+                            .findAny();
+                    if (anyDlt.isPresent()){//存在dtl，不插入，跳过
+                        continue;
+                    }
                     //插入清单明细
                     String detailId = Util.insertData(jdbcTemplate, "PRJ_INVENTORY_DETAIL");
                     jdbcTemplate.update("update PRJ_INVENTORY_DETAIL set prj_inventory_id = ?,fl_file_id = ?,wf_process_instance_id = ? where id = ?"

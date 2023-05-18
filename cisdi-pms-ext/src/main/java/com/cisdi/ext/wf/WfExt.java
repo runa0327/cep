@@ -4,6 +4,7 @@ import com.cisdi.ext.enums.FileCodeEnum;
 import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.PmFundReqPlan;
 import com.cisdi.ext.pm.PmPrjReqExt;
+import com.cisdi.ext.pm.PrjMaterialInventory;
 import com.cisdi.ext.util.ProFileUtils;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -40,6 +41,8 @@ public class WfExt {
     public void changeStatusToAp() {
         String newStatus = "AP";
         changeStatus(newStatus);
+        //写文件到项目清单明细
+        this.addInventoryDtl();
     }
 
     public void changeStatusToDn() {
@@ -1735,4 +1738,23 @@ public class WfExt {
             myJdbcTemplate.update(sql, name,csCommId);
         }
     }
+
+    /**
+     * 流程结束将需要的文件写入项目清单明细
+     */
+    private void addInventoryDtl(){
+        Map<String, Object> valueMap = ExtJarHelper.entityRecordList.get().get(0).valueMap;
+
+        String prjIds = "";
+        if (valueMap.get("PM_PRJ_IDS") != null){
+            prjIds = JdbcMapUtil.getString(valueMap,"PM_PRJ_IDS");
+        }else {
+            prjIds = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
+        }
+
+        if (!Strings.isNullOrEmpty(prjIds)){
+            PrjMaterialInventory.addInventoryDtl(prjIds,ExtJarHelper.procId.get(),ExtJarHelper.procInstId.get());
+        }
+    }
+
 }
