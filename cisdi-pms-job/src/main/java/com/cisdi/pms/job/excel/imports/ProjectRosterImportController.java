@@ -7,7 +7,12 @@ import com.cisdi.pms.job.excel.model.ProjectRosterModel;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
 import com.cisdi.pms.job.utils.ReflectUtil;
 import com.cisdi.pms.job.utils.Util;
+import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
@@ -40,24 +45,61 @@ public class ProjectRosterImportController extends BaseController {
     @SneakyThrows(IOException.class)
     @GetMapping("exportTemplate")
     public void exportExcel(HttpServletResponse response) {
-        super.setExcelRespProp(response, "项目花名册");
+        List<Map<String, Object>> strList = jdbcTemplate.queryForList("select p.`NAME` as PROJECT_POST from PM_ROSTER t  left join post_info p on t.POST_INFO_ID = p.id where p.`NAME` is not null GROUP BY p.id");
+        List<String> headerList = strList.stream().map(p -> JdbcMapUtil.getString(p, "PROJECT_POST")).collect(Collectors.toList());
+        headerList.add(0, "项目名称");
+        headerList.removeAll(Collections.singleton(null));
+
+        super.setExcelRespProp(response, "项目花名册导入模板");
         EasyExcel.write(response.getOutputStream())
-                .head(ProjectRosterModel.class)
+                .head(EasyExcelUtil.head(headerList))
                 .excelType(ExcelTypeEnum.XLSX)
-                .sheet("项目花名册")
+                .sheet("项目花名册导入模板")
                 .doWrite(new ArrayList<>());
     }
 
-
+    /**
+     * 新版导入
+     *
+     * @param file
+     * @param response
+     * @return
+     */
     @SneakyThrows(IOException.class)
     @RequestMapping("/import")
     public Map<String, Object> importData(MultipartFile file, HttpServletResponse response) {
         Map<String, Object> result = new HashMap<>();
-        List<ProjectRosterModel> list = EasyExcelUtil.read(file.getInputStream(), ProjectRosterModel.class);
-        //去除空行
-        List<ProjectRosterModel> rosterModelList = list.stream().filter(p -> !ReflectUtil.isObjectNull(p)).collect(Collectors.toList());
         //如果有不能处理的字段，响应提示
         List<String> res = new ArrayList<>();
+
+        Workbook workbook = new XSSFWorkbook(file.getInputStream());
+        Sheet sheet = workbook.getSheetAt(0);
+        Row firstRow = sheet.getRow(sheet.getFirstRowNum()); //获取第一行数据
+        if (null == firstRow) { //判断第一行数据是否为空
+            res.add("第一行没有读取到任何数据！");
+        }
+        int rowStart = sheet.getFirstRowNum() + 1; //根据模板确定开始解析内容的行标
+        int rowEnd = sheet.getPhysicalNumberOfRows(); //结束的行标
+        List<ProjectRosterModel> list = new ArrayList<>();
+        for (int rowNum = rowStart; rowNum < rowEnd; rowNum++) {
+            Row row = sheet.getRow(rowNum); //根据下标逐次获取行对象
+            String projectName = row.getCell(0).toString();
+            int rowNum1 = row.getLastCellNum() - row.getFirstCellNum();
+            for (int i = 1; i < rowNum1; i++) {
+                Object obj = row.getCell(i);
+                if (obj != null && !"".equals(obj.toString()) && !"/".equals(obj.toString())) {
+                    ProjectRosterModel model = new ProjectRosterModel();
+                    model.setProjectName(projectName);
+                    model.setPostName(firstRow.getCell(i).toString());
+                    model.setUserName(obj.toString());
+                    list.add(model);
+                }
+            }
+        }
+
+        //去除空行
+        List<ProjectRosterModel> rosterModelList = list.stream().filter(p -> !ReflectUtil.isObjectNull(p)).collect(Collectors.toList());
+
         List<Map<String, Object>> prjList = jdbcTemplate.queryForList("select id,name from pm_prj where status = 'AP'");
 
         List<Map<String, Object>> postList = jdbcTemplate.queryForList("select * from post_info where status ='ap'");
@@ -81,6 +123,39 @@ public class ProjectRosterImportController extends BaseController {
         }
     }
 
+    //旧版导入
+//    @SneakyThrows(IOException.class)
+//    @RequestMapping("/import")
+//    public Map<String, Object> importData(MultipartFile file, HttpServletResponse response) {
+//        Map<String, Object> result = new HashMap<>();
+//        List<ProjectRosterModel> list = EasyExcelUtil.read(file.getInputStream(), ProjectRosterModel.class);
+//        //去除空行
+//        List<ProjectRosterModel> rosterModelList = list.stream().filter(p -> !ReflectUtil.isObjectNull(p)).collect(Collectors.toList());
+//        //如果有不能处理的字段，响应提示
+//        List<String> res = new ArrayList<>();
+//        List<Map<String, Object>> prjList = jdbcTemplate.queryForList("select id,name from pm_prj where status = 'AP'");
+//
+//        List<Map<String, Object>> postList = jdbcTemplate.queryForList("select * from post_info where status ='ap'");
+//
+//        List<Map<String, Object>> userList = jdbcTemplate.queryForList("select id,name from ad_user where status = 'AP'");
+//
+//        for (int i = rosterModelList.size() - 1; i >= 0; i--) {//保证列表显示顺序和表格顺序一致
+//            List<String> singleRes = this.insertData(rosterModelList.get(i), prjList, postList, userList);
+//            if (!CollectionUtils.isEmpty(singleRes)) {
+//                res.addAll(singleRes);
+//            }
+//        }
+//
+//        if (CollectionUtils.isEmpty(res)) {
+//            result.put("code", 200);
+//            result.put("message", "导入成功！");
+//            return result;
+//        } else {
+//            super.exportTxt(response, res, "项目岗位导入日志");
+//            return null;
+//        }
+//    }
+//
     private List<String> insertData(ProjectRosterModel model, List<Map<String, Object>> prjList, List<Map<String, Object>> postList, List<Map<String, Object>> userList) {
         List<String> res = new ArrayList<>();
         if (model == null) {

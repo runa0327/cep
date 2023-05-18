@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -493,7 +494,7 @@ public class PmStartExt {
     public void refreshNodeTime() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String projectId = JdbcMapUtil.getString(map, "projectId");
-        Date paramDate = DateTimeUtil.stringToDate("2023-01-01");
+        Date paramDate = DateTimeUtil.stringToDate(map.get("paramDate").toString());
         PrjPlanUtil.refreshProPlanTime(projectId, paramDate);
     }
 
@@ -525,6 +526,8 @@ public class PmStartExt {
     public static class OutSide {
         public Integer total;
         public List<PmStart> startList;
+
+        public List<NodeInfo> nodeInfoList;
     }
 
     public static class PmStart {
@@ -694,4 +697,63 @@ public class PmStartExt {
         public List<Point> pointList;
     }
 
+    public static class NodeInfo {
+        public String nodeId;
+        public String nodeName;
+        public String completeDate;
+    }
+
+
+    public static List<Map<String, Object>> getChildrenNode(Map<String, Object> parent, List<Map<String, Object>> allData) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        return allData.stream().filter(p -> Objects.equals(parent.get("id"), p.get("PM_PRO_PLAN_NODE_PID"))).peek(m -> {
+            List<Map<String, Object>> sonList = getChildrenNode(m, allData);
+            if (!CollectionUtils.isEmpty(sonList)) {
+                Map<String, Object> topDate = sonList.get(0);
+                String start = topDate.get("PLAN_START_DATE").toString();
+                String end = topDate.get("PLAN_COMPL_DATE").toString();
+                int cha = getDateCha(end,start);
+                myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
+//                myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=? where id=?", topDate.get("PLAN_COMPL_DATE"), m.get("id"));
+            }
+        }).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
+    }
+
+    /**
+     * 全景时间调整审批后刷新节点时间
+     * 传参 projectId-项目ID  id-全景时间调整台账ID
+     */
+    public static void handleData(String id, String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_NODE_ADJUST_REQ_DETAIL where PM_NODE_ADJUST_REQ_ID=?", id);
+        if (!CollectionUtils.isEmpty(list)) {
+            StringBuilder sb = new StringBuilder();
+            list.forEach(item -> {
+                sb.append("update pm_pro_plan_node set PLAN_COMPL_DATE='").append(item.get("PLAN_COMPL_DATE")).append("' where id='").append(item.get("PM_PRO_PLAN_NODE_ID")).append("' ;");
+            });
+            myJdbcTemplate.update(sb.toString());
+        }
+        // 刷新父节点时间
+        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pn.*,ifnull(PM_PRO_PLAN_NODE_PID,0) as pid from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where PM_PRJ_ID=?", projectId);
+        nodeList.stream().filter(p -> Objects.equals("0", p.get("pid"))).peek(m -> {
+            List<Map<String, Object>> sonList = getChildrenNode(m, nodeList);
+            if (!CollectionUtils.isEmpty(sonList)) {
+                Map<String, Object> topDate = sonList.get(0);
+                String start = topDate.get("PLAN_START_DATE").toString();
+                String end = topDate.get("PLAN_COMPL_DATE").toString();
+                int cha = getDateCha(end,start);
+                myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
+            }
+        }).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
+    }
+
+    public static int getDateCha(String end, String start) {
+        int cha = 0;
+        try {
+            cha = DateTimeUtil.getTwoTimeStringDays(end,start);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return cha;
+    }
 }

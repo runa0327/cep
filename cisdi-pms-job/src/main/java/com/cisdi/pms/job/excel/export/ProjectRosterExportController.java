@@ -41,7 +41,7 @@ public class ProjectRosterExportController extends BaseController {
                 " left join post_info pi on pp.POST_INFO_ID = pi.id \n" +
                 " where pj.`STATUS`='ap' and pj.IZ_FORMAL_PRJ='1' and pj.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ");
         if (!StringUtils.isEmpty(projectName)) {
-            sb.append(" and pj.id like '%").append(projectName).append("%'");
+            sb.append(" and pj.`NAME` like '%").append(projectName).append("%'");
         }
         sb.append("group by pj.id ");
         //header

@@ -4,6 +4,7 @@ import com.cisdi.ext.enums.EntCodeEnum;
 import com.cisdi.ext.link.AttLinkProcessDetail;
 import com.cisdi.ext.link.AttLinkResult;
 import com.cisdi.ext.link.LinkSql;
+import com.cisdi.ext.link.LinkedRecord;
 import com.cisdi.ext.model.LinkedAttModel;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -66,9 +67,10 @@ public class PmPrjIdLink {
      * @param myJdbcTemplate 数据源
      * @param attValue 属性联动值
      * @param entCode 业务表名
+     * @param sevId 实体视图id
      * @return 回显值
      */
-    public static AttLinkResult linkForPM_PRJ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
+    public static AttLinkResult linkForPM_PRJ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
         if ("PM_POST_APPOINT".equals(entCode)){ //岗位指派单独查询项目信息逻辑
             AttLinkExtDetail.selectPostAppointLink(attLinkResult,attValue,myJdbcTemplate);
@@ -99,6 +101,8 @@ public class PmPrjIdLink {
                     settlePrjLink(attLinkResult,attValue);
                 } else if ("PM_EXTENSION_REQUEST_REQ".equals(entCode)){ // 节点延期申请
                     handlePrjNode(attValue,myJdbcTemplate);
+                } else if ("PM_NODE_ADJUST_REQ".equals(entCode)){ // 全景计划展示表
+                    nodeDetail(attValue,sevId,attLinkResult,myJdbcTemplate);
                 }
 
                 //所属部门会变化的流程
@@ -199,5 +203,37 @@ public class PmPrjIdLink {
             }
         }
         return type;
+    }
+
+    /**
+     * 全景计划展示表-节点明细
+     * @param projectId 项目id
+     * @param sevId 实体视图id
+     * @param attLinkResult 返回结果集
+     * @param myJdbcTemplate 数据源
+     */
+    public static void nodeDetail(String projectId, String sevId, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
+        List<Map<String, Object>> list = LinkSql.getPrjNodeLevel3(projectId,myJdbcTemplate);
+        if (CollectionUtils.isEmpty(list)){
+            throw new BaseException("该项目不存在项目进度节点信息，请先处理！");
+        } else {
+            if ("1658641185226608640".equals(sevId)){
+                List<LinkedRecord> linkedRecordList = new ArrayList<>();
+                for (Map<String, Object> tmp : list) {
+                    LinkedRecord linkedRecord = new LinkedRecord();
+                    //项目进度计划节点
+                    linkedRecord.valueMap.put("PM_PRO_PLAN_NODE_ID", JdbcMapUtil.getString(tmp,"ID"));
+                    linkedRecord.textMap.put("PM_PRO_PLAN_NODE_ID", JdbcMapUtil.getString(tmp,"NAME"));
+                    //计划完成日期
+                    linkedRecord.valueMap.put("PLAN_COMPL_DATE", JdbcMapUtil.getString(tmp,"PLAN_COMPL_DATE"));
+                    linkedRecord.textMap.put("PLAN_COMPL_DATE", JdbcMapUtil.getString(tmp,"PLAN_COMPL_DATE"));
+
+                    linkedRecordList.add(linkedRecord);
+                }
+                attLinkResult.childData.put("1658642775492775936", linkedRecordList);
+                attLinkResult.childCreatable.put("1658642775492775936", true);
+                attLinkResult.childClear.put("1658642775492775936", true);
+            }
+        }
     }
 }

@@ -182,4 +182,15 @@ public class LinkSql {
         String sql = "select * from " + entCode + " where id = ?";
         return myJdbcTemplate.queryForList(sql,csCommId);
     }
+
+    /**
+     * 查询项目3级计划节点
+     * @param projectId 项目id
+     * @param myJdbcTemplate 数据源
+     * @return 查询结果
+     */
+    public static List<Map<String, Object>> getPrjNodeLevel3(String projectId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where pn.level= 3 and  PM_PRJ_ID=?";
+        return myJdbcTemplate.queryForList(sql, projectId);
+    }
 }
