@@ -36,4 +36,18 @@ public class WeeklyReportJob {
             log.error("【形象进度周报】自动生成失败");
         }
     }
+
+    /**
+     * 进度周报提交 每周四晚上 10点02分执行
+     */
+    @Scheduled(cron = "0 02 22 * * ?")
+    public void autoSubmitProgressWeekly(){
+        try {
+            log.info("【形象进度周报】自动提交开始");
+            weeklyReportService.submitProgressWeekly();
+            log.info("【形象进度周报】自动提交结束");
+        } catch (Exception e){
+            log.error("【形象进度周报】自动提交失败");
+        }
+    }
 }

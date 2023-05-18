@@ -30,6 +30,9 @@ public class WeeklyReportService {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    @Resource
+    public PmProgressWeeklyPrjDetailMapper pmProgressWeeklyPrjDetailMapper;
+
     public void execute() {
 
         // 获取或创建当前周期（周六到周五）
@@ -467,5 +470,40 @@ public class WeeklyReportService {
                 }
             }
         }
+    }
+
+    /**
+     * 自动提交当周形象工程周报
+     */
+    public void submitProgressWeekly() {
+        List<Map<String,Object>> jobList = jdbcTemplate.queryForList("select * from BASE_JOB_CONFIG where STATUS = 'AP' AND CODE = 'submitProgressWeekly'");
+        if (!CollectionUtils.isEmpty(jobList)){
+            String status = jobList.get(0).get("STATUS").toString();
+            if ("AP".equals(status)){
+                String sysTrue = jobList.get(0).get("SYS_TRUE").toString(); //是否强制执行。1是0否
+                Date date = new Date();
+                int week = DateUtil.getWeekDay(date);
+                Map<String,String> map = getDateMap(week,date);
+                if (week == 4){
+                    submitProgressData(map);
+                } else if (week != 4 && "1".equals(sysTrue)){
+                    submitProgressData(map);
+                }
+            }
+        }
+    }
+
+    /**
+     * 自动提交形象周报数据
+     * @param map 日期信息
+     */
+    public void submitProgressData(Map<String, String> map) {
+        String startDate = map.get("startDate").toString();
+        String endDate = map.get("endDate").toString();
+        String weekId = pmProgressWeeklyPrjDetailMapper.getWeekIdByDate(startDate,endDate);
+        //根据周id更新本周周报提交状态
+        pmProgressWeeklyPrjDetailMapper.updatePrjWeekByWeekId(weekId);
+        //根据周id更新本周周报明细提交状态
+        pmProgressWeeklyPrjDetailMapper.updatePrjDetailWeekByWeekId(weekId);
     }
 }

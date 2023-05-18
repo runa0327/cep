@@ -30,6 +30,7 @@
         <result column="recordByName" property="recordByName"/>
         <result column="manageUserId" property="manageUserId"/>
         <result column="manageUserName" property="manageUserName"/>
+        <result column="isSubmit" property="isSubmit"/>
     </resultMap>
 
     <select id="getPrjRecords" resultMap="PmProgressWeeklyResult">
@@ -95,4 +96,19 @@
         </if>
         order by b.IZ_END asc,b.SYS_TRUE desc,b.PM_PRJ_ID desc
     </select>
+
+    <!--根据开始结束日期查询周id-->
+    <select id="getWeekIdByDate" resultType="String">
+        select id from pm_progress_weekly where FROM_DATE = #{startDate} and TO_DATE = #{endDate}
+    </select>
+
+    <!--根据周id更新进度周报项目信息-->
+    <update id="updatePrjWeekByWeekId">
+        update PM_PROGRESS_WEEKLY_PRJ set IS_WEEKLY_REPORT_SUBMIT = 1 where PM_PROGRESS_WEEKLY_ID = #{weekId}
+    </update>
+
+    <!--根据周id更新本周周报明细提交状态-->
+    <update id="updatePrjDetailWeekByWeekId">
+        update PM_PROGRESS_WEEKLY_PRJ_DETAIL set IS_WEEKLY_REPORT_SUBMIT = 1 where PM_PROGRESS_WEEKLY_ID = #{weekId}
+    </update>
 </mapper>
