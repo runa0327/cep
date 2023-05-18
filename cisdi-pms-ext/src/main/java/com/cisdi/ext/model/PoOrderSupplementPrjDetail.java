@@ -7,22 +7,20 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 进度周报-项目填写记录。
+ * 补充协议-项目明细(流程内)。
  */
-public class PmProgressWeeklyPrjDetail {
+public class PoOrderSupplementPrjDetail {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<PmProgressWeeklyPrjDetail> modelHelper = new ModelHelper<>("PM_PROGRESS_WEEKLY_PRJ_DETAIL", new PmProgressWeeklyPrjDetail());
+    private static final ModelHelper<PoOrderSupplementPrjDetail> modelHelper = new ModelHelper<>("PO_ORDER_SUPPLEMENT_PRJ_DETAIL", new PoOrderSupplementPrjDetail());
 
     /**
      * 待更新的列。
@@ -39,7 +37,7 @@ public class PmProgressWeeklyPrjDetail {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "PM_PROGRESS_WEEKLY_PRJ_DETAIL";
+    public static final String ENT_CODE = "PO_ORDER_SUPPLEMENT_PRJ_DETAIL";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -101,65 +99,13 @@ public class PmProgressWeeklyPrjDetail {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 日期。
+         * 补充协议。
          */
-        public static final String DATE = "DATE";
-        /**
-         * 形象进度。
-         */
-        public static final String VISUAL_PROGRESS = "VISUAL_PROGRESS";
-        /**
-         * 进展说明(TEXT)。
-         */
-        public static final String PROCESS_REMARK_TEXT = "PROCESS_REMARK_TEXT";
-        /**
-         * 形象进度说明。
-         */
-        public static final String VISUAL_PROGRESS_DESCRIBE = "VISUAL_PROGRESS_DESCRIBE";
-        /**
-         * 附件1。
-         */
-        public static final String FILE_ID_ONE = "FILE_ID_ONE";
-        /**
-         * 长备注1。
-         */
-        public static final String TEXT_REMARK_ONE = "TEXT_REMARK_ONE";
-        /**
-         * 系统是否。
-         */
-        public static final String SYS_TRUE = "SYS_TRUE";
-        /**
-         * 是否结束。
-         */
-        public static final String IZ_END = "IZ_END";
-        /**
-         * 用户。
-         */
-        public static final String AD_USER_ID = "AD_USER_ID";
-        /**
-         * 日期（从）。
-         */
-        public static final String FROM_DATE = "FROM_DATE";
-        /**
-         * 日期（到）。
-         */
-        public static final String TO_DATE = "TO_DATE";
-        /**
-         * 进度周报-周信息。
-         */
-        public static final String PM_PROGRESS_WEEKLY_ID = "PM_PROGRESS_WEEKLY_ID";
-        /**
-         * 进度周报-项目。
-         */
-        public static final String PM_PROGRESS_WEEKLY_PRJ_ID = "PM_PROGRESS_WEEKLY_PRJ_ID";
+        public static final String PO_ORDER_SUPPLEMENT_REQ_ID = "PO_ORDER_SUPPLEMENT_REQ_ID";
         /**
          * 项目。
          */
         public static final String PM_PRJ_ID = "PM_PRJ_ID";
-        /**
-         * 周报是否提交。
-         */
-        public static final String IS_WEEKLY_REPORT_SUBMIT = "IS_WEEKLY_REPORT_SUBMIT";
     }
 
     // </editor-fold>
@@ -182,7 +128,7 @@ public class PmProgressWeeklyPrjDetail {
     /**
      * 设置：ID。
      */
-    public PmProgressWeeklyPrjDetail setId(String id) {
+    public PoOrderSupplementPrjDetail setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -218,7 +164,7 @@ public class PmProgressWeeklyPrjDetail {
     /**
      * 设置：版本。
      */
-    public PmProgressWeeklyPrjDetail setVer(Integer ver) {
+    public PoOrderSupplementPrjDetail setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -254,7 +200,7 @@ public class PmProgressWeeklyPrjDetail {
     /**
      * 设置：时间戳。
      */
-    public PmProgressWeeklyPrjDetail setTs(LocalDateTime ts) {
+    public PoOrderSupplementPrjDetail setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -290,7 +236,7 @@ public class PmProgressWeeklyPrjDetail {
     /**
      * 设置：是否预设。
      */
-    public PmProgressWeeklyPrjDetail setIsPreset(Boolean isPreset) {
+    public PoOrderSupplementPrjDetail setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -326,7 +272,7 @@ public class PmProgressWeeklyPrjDetail {
     /**
      * 设置：创建日期时间。
      */
-    public PmProgressWeeklyPrjDetail setCrtDt(LocalDateTime crtDt) {
+    public PoOrderSupplementPrjDetail setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -362,7 +308,7 @@ public class PmProgressWeeklyPrjDetail {
     /**
      * 设置：创建用户。
      */
-    public PmProgressWeeklyPrjDetail setCrtUserId(String crtUserId) {
+    public PoOrderSupplementPrjDetail setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -398,7 +344,7 @@ public class PmProgressWeeklyPrjDetail {
     /**
      * 设置：最后修改日期时间。
      */
-    public PmProgressWeeklyPrjDetail setLastModiDt(LocalDateTime lastModiDt) {
+    public PoOrderSupplementPrjDetail setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -434,7 +380,7 @@ public class PmProgressWeeklyPrjDetail {
     /**
      * 设置：最后修改用户。
      */
-    public PmProgressWeeklyPrjDetail setLastModiUserId(String lastModiUserId) {
+    public PoOrderSupplementPrjDetail setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -470,7 +416,7 @@ public class PmProgressWeeklyPrjDetail {
     /**
      * 设置：记录状态。
      */
-    public PmProgressWeeklyPrjDetail setStatus(String status) {
+    public PoOrderSupplementPrjDetail setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -506,7 +452,7 @@ public class PmProgressWeeklyPrjDetail {
     /**
      * 设置：锁定流程实例。
      */
-    public PmProgressWeeklyPrjDetail setLkWfInstId(String lkWfInstId) {
+    public PoOrderSupplementPrjDetail setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -542,7 +488,7 @@ public class PmProgressWeeklyPrjDetail {
     /**
      * 设置：代码。
      */
-    public PmProgressWeeklyPrjDetail setCode(String code) {
+    public PoOrderSupplementPrjDetail setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -578,7 +524,7 @@ public class PmProgressWeeklyPrjDetail {
     /**
      * 设置：名称。
      */
-    public PmProgressWeeklyPrjDetail setName(String name) {
+    public PoOrderSupplementPrjDetail setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -614,7 +560,7 @@ public class PmProgressWeeklyPrjDetail {
     /**
      * 设置：备注。
      */
-    public PmProgressWeeklyPrjDetail setRemark(String remark) {
+    public PoOrderSupplementPrjDetail setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -636,468 +582,36 @@ public class PmProgressWeeklyPrjDetail {
     }
 
     /**
-     * 日期。
+     * 补充协议。
      */
-    private String date;
+    private String poOrderSupplementReqId;
 
     /**
-     * 获取：日期。
+     * 获取：补充协议。
      */
-    public String getDate() {
-        return this.date;
+    public String getPoOrderSupplementReqId() {
+        return this.poOrderSupplementReqId;
     }
 
     /**
-     * 设置：日期。
+     * 设置：补充协议。
      */
-    public PmProgressWeeklyPrjDetail setDate(String date) {
-        if (this.date == null && date == null) {
+    public PoOrderSupplementPrjDetail setPoOrderSupplementReqId(String poOrderSupplementReqId) {
+        if (this.poOrderSupplementReqId == null && poOrderSupplementReqId == null) {
             // 均为null，不做处理。
-        } else if (this.date != null && date != null) {
+        } else if (this.poOrderSupplementReqId != null && poOrderSupplementReqId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.date.compareTo(date) != 0) {
-                this.date = date;
-                if (!this.toUpdateCols.contains("DATE")) {
-                    this.toUpdateCols.add("DATE");
+            if (this.poOrderSupplementReqId.compareTo(poOrderSupplementReqId) != 0) {
+                this.poOrderSupplementReqId = poOrderSupplementReqId;
+                if (!this.toUpdateCols.contains("PO_ORDER_SUPPLEMENT_REQ_ID")) {
+                    this.toUpdateCols.add("PO_ORDER_SUPPLEMENT_REQ_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.date = date;
-            if (!this.toUpdateCols.contains("DATE")) {
-                this.toUpdateCols.add("DATE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 形象进度。
-     */
-    private BigDecimal visualProgress;
-
-    /**
-     * 获取：形象进度。
-     */
-    public BigDecimal getVisualProgress() {
-        return this.visualProgress;
-    }
-
-    /**
-     * 设置：形象进度。
-     */
-    public PmProgressWeeklyPrjDetail setVisualProgress(BigDecimal visualProgress) {
-        if (this.visualProgress == null && visualProgress == null) {
-            // 均为null，不做处理。
-        } else if (this.visualProgress != null && visualProgress != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.visualProgress.compareTo(visualProgress) != 0) {
-                this.visualProgress = visualProgress;
-                if (!this.toUpdateCols.contains("VISUAL_PROGRESS")) {
-                    this.toUpdateCols.add("VISUAL_PROGRESS");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.visualProgress = visualProgress;
-            if (!this.toUpdateCols.contains("VISUAL_PROGRESS")) {
-                this.toUpdateCols.add("VISUAL_PROGRESS");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 进展说明(TEXT)。
-     */
-    private String processRemarkText;
-
-    /**
-     * 获取：进展说明(TEXT)。
-     */
-    public String getProcessRemarkText() {
-        return this.processRemarkText;
-    }
-
-    /**
-     * 设置：进展说明(TEXT)。
-     */
-    public PmProgressWeeklyPrjDetail setProcessRemarkText(String processRemarkText) {
-        if (this.processRemarkText == null && processRemarkText == null) {
-            // 均为null，不做处理。
-        } else if (this.processRemarkText != null && processRemarkText != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.processRemarkText.compareTo(processRemarkText) != 0) {
-                this.processRemarkText = processRemarkText;
-                if (!this.toUpdateCols.contains("PROCESS_REMARK_TEXT")) {
-                    this.toUpdateCols.add("PROCESS_REMARK_TEXT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.processRemarkText = processRemarkText;
-            if (!this.toUpdateCols.contains("PROCESS_REMARK_TEXT")) {
-                this.toUpdateCols.add("PROCESS_REMARK_TEXT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 形象进度说明。
-     */
-    private String visualProgressDescribe;
-
-    /**
-     * 获取：形象进度说明。
-     */
-    public String getVisualProgressDescribe() {
-        return this.visualProgressDescribe;
-    }
-
-    /**
-     * 设置：形象进度说明。
-     */
-    public PmProgressWeeklyPrjDetail setVisualProgressDescribe(String visualProgressDescribe) {
-        if (this.visualProgressDescribe == null && visualProgressDescribe == null) {
-            // 均为null，不做处理。
-        } else if (this.visualProgressDescribe != null && visualProgressDescribe != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.visualProgressDescribe.compareTo(visualProgressDescribe) != 0) {
-                this.visualProgressDescribe = visualProgressDescribe;
-                if (!this.toUpdateCols.contains("VISUAL_PROGRESS_DESCRIBE")) {
-                    this.toUpdateCols.add("VISUAL_PROGRESS_DESCRIBE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.visualProgressDescribe = visualProgressDescribe;
-            if (!this.toUpdateCols.contains("VISUAL_PROGRESS_DESCRIBE")) {
-                this.toUpdateCols.add("VISUAL_PROGRESS_DESCRIBE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 附件1。
-     */
-    private String fileIdOne;
-
-    /**
-     * 获取：附件1。
-     */
-    public String getFileIdOne() {
-        return this.fileIdOne;
-    }
-
-    /**
-     * 设置：附件1。
-     */
-    public PmProgressWeeklyPrjDetail setFileIdOne(String fileIdOne) {
-        if (this.fileIdOne == null && fileIdOne == null) {
-            // 均为null，不做处理。
-        } else if (this.fileIdOne != null && fileIdOne != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.fileIdOne.compareTo(fileIdOne) != 0) {
-                this.fileIdOne = fileIdOne;
-                if (!this.toUpdateCols.contains("FILE_ID_ONE")) {
-                    this.toUpdateCols.add("FILE_ID_ONE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.fileIdOne = fileIdOne;
-            if (!this.toUpdateCols.contains("FILE_ID_ONE")) {
-                this.toUpdateCols.add("FILE_ID_ONE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 长备注1。
-     */
-    private String textRemarkOne;
-
-    /**
-     * 获取：长备注1。
-     */
-    public String getTextRemarkOne() {
-        return this.textRemarkOne;
-    }
-
-    /**
-     * 设置：长备注1。
-     */
-    public PmProgressWeeklyPrjDetail setTextRemarkOne(String textRemarkOne) {
-        if (this.textRemarkOne == null && textRemarkOne == null) {
-            // 均为null，不做处理。
-        } else if (this.textRemarkOne != null && textRemarkOne != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.textRemarkOne.compareTo(textRemarkOne) != 0) {
-                this.textRemarkOne = textRemarkOne;
-                if (!this.toUpdateCols.contains("TEXT_REMARK_ONE")) {
-                    this.toUpdateCols.add("TEXT_REMARK_ONE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.textRemarkOne = textRemarkOne;
-            if (!this.toUpdateCols.contains("TEXT_REMARK_ONE")) {
-                this.toUpdateCols.add("TEXT_REMARK_ONE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 系统是否。
-     */
-    private Boolean sysTrue;
-
-    /**
-     * 获取：系统是否。
-     */
-    public Boolean getSysTrue() {
-        return this.sysTrue;
-    }
-
-    /**
-     * 设置：系统是否。
-     */
-    public PmProgressWeeklyPrjDetail setSysTrue(Boolean sysTrue) {
-        if (this.sysTrue == null && sysTrue == null) {
-            // 均为null，不做处理。
-        } else if (this.sysTrue != null && sysTrue != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.sysTrue.compareTo(sysTrue) != 0) {
-                this.sysTrue = sysTrue;
-                if (!this.toUpdateCols.contains("SYS_TRUE")) {
-                    this.toUpdateCols.add("SYS_TRUE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.sysTrue = sysTrue;
-            if (!this.toUpdateCols.contains("SYS_TRUE")) {
-                this.toUpdateCols.add("SYS_TRUE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 是否结束。
-     */
-    private Boolean izEnd;
-
-    /**
-     * 获取：是否结束。
-     */
-    public Boolean getIzEnd() {
-        return this.izEnd;
-    }
-
-    /**
-     * 设置：是否结束。
-     */
-    public PmProgressWeeklyPrjDetail setIzEnd(Boolean izEnd) {
-        if (this.izEnd == null && izEnd == null) {
-            // 均为null，不做处理。
-        } else if (this.izEnd != null && izEnd != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.izEnd.compareTo(izEnd) != 0) {
-                this.izEnd = izEnd;
-                if (!this.toUpdateCols.contains("IZ_END")) {
-                    this.toUpdateCols.add("IZ_END");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.izEnd = izEnd;
-            if (!this.toUpdateCols.contains("IZ_END")) {
-                this.toUpdateCols.add("IZ_END");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 用户。
-     */
-    private String adUserId;
-
-    /**
-     * 获取：用户。
-     */
-    public String getAdUserId() {
-        return this.adUserId;
-    }
-
-    /**
-     * 设置：用户。
-     */
-    public PmProgressWeeklyPrjDetail setAdUserId(String adUserId) {
-        if (this.adUserId == null && adUserId == null) {
-            // 均为null，不做处理。
-        } else if (this.adUserId != null && adUserId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.adUserId.compareTo(adUserId) != 0) {
-                this.adUserId = adUserId;
-                if (!this.toUpdateCols.contains("AD_USER_ID")) {
-                    this.toUpdateCols.add("AD_USER_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.adUserId = adUserId;
-            if (!this.toUpdateCols.contains("AD_USER_ID")) {
-                this.toUpdateCols.add("AD_USER_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 日期（从）。
-     */
-    private LocalDate fromDate;
-
-    /**
-     * 获取：日期（从）。
-     */
-    public LocalDate getFromDate() {
-        return this.fromDate;
-    }
-
-    /**
-     * 设置：日期（从）。
-     */
-    public PmProgressWeeklyPrjDetail setFromDate(LocalDate fromDate) {
-        if (this.fromDate == null && fromDate == null) {
-            // 均为null，不做处理。
-        } else if (this.fromDate != null && fromDate != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.fromDate.compareTo(fromDate) != 0) {
-                this.fromDate = fromDate;
-                if (!this.toUpdateCols.contains("FROM_DATE")) {
-                    this.toUpdateCols.add("FROM_DATE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.fromDate = fromDate;
-            if (!this.toUpdateCols.contains("FROM_DATE")) {
-                this.toUpdateCols.add("FROM_DATE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 日期（到）。
-     */
-    private LocalDate toDate;
-
-    /**
-     * 获取：日期（到）。
-     */
-    public LocalDate getToDate() {
-        return this.toDate;
-    }
-
-    /**
-     * 设置：日期（到）。
-     */
-    public PmProgressWeeklyPrjDetail setToDate(LocalDate toDate) {
-        if (this.toDate == null && toDate == null) {
-            // 均为null，不做处理。
-        } else if (this.toDate != null && toDate != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.toDate.compareTo(toDate) != 0) {
-                this.toDate = toDate;
-                if (!this.toUpdateCols.contains("TO_DATE")) {
-                    this.toUpdateCols.add("TO_DATE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.toDate = toDate;
-            if (!this.toUpdateCols.contains("TO_DATE")) {
-                this.toUpdateCols.add("TO_DATE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 进度周报-周信息。
-     */
-    private String pmProgressWeeklyId;
-
-    /**
-     * 获取：进度周报-周信息。
-     */
-    public String getPmProgressWeeklyId() {
-        return this.pmProgressWeeklyId;
-    }
-
-    /**
-     * 设置：进度周报-周信息。
-     */
-    public PmProgressWeeklyPrjDetail setPmProgressWeeklyId(String pmProgressWeeklyId) {
-        if (this.pmProgressWeeklyId == null && pmProgressWeeklyId == null) {
-            // 均为null，不做处理。
-        } else if (this.pmProgressWeeklyId != null && pmProgressWeeklyId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.pmProgressWeeklyId.compareTo(pmProgressWeeklyId) != 0) {
-                this.pmProgressWeeklyId = pmProgressWeeklyId;
-                if (!this.toUpdateCols.contains("PM_PROGRESS_WEEKLY_ID")) {
-                    this.toUpdateCols.add("PM_PROGRESS_WEEKLY_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.pmProgressWeeklyId = pmProgressWeeklyId;
-            if (!this.toUpdateCols.contains("PM_PROGRESS_WEEKLY_ID")) {
-                this.toUpdateCols.add("PM_PROGRESS_WEEKLY_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 进度周报-项目。
-     */
-    private String pmProgressWeeklyPrjId;
-
-    /**
-     * 获取：进度周报-项目。
-     */
-    public String getPmProgressWeeklyPrjId() {
-        return this.pmProgressWeeklyPrjId;
-    }
-
-    /**
-     * 设置：进度周报-项目。
-     */
-    public PmProgressWeeklyPrjDetail setPmProgressWeeklyPrjId(String pmProgressWeeklyPrjId) {
-        if (this.pmProgressWeeklyPrjId == null && pmProgressWeeklyPrjId == null) {
-            // 均为null，不做处理。
-        } else if (this.pmProgressWeeklyPrjId != null && pmProgressWeeklyPrjId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.pmProgressWeeklyPrjId.compareTo(pmProgressWeeklyPrjId) != 0) {
-                this.pmProgressWeeklyPrjId = pmProgressWeeklyPrjId;
-                if (!this.toUpdateCols.contains("PM_PROGRESS_WEEKLY_PRJ_ID")) {
-                    this.toUpdateCols.add("PM_PROGRESS_WEEKLY_PRJ_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.pmProgressWeeklyPrjId = pmProgressWeeklyPrjId;
-            if (!this.toUpdateCols.contains("PM_PROGRESS_WEEKLY_PRJ_ID")) {
-                this.toUpdateCols.add("PM_PROGRESS_WEEKLY_PRJ_ID");
+            this.poOrderSupplementReqId = poOrderSupplementReqId;
+            if (!this.toUpdateCols.contains("PO_ORDER_SUPPLEMENT_REQ_ID")) {
+                this.toUpdateCols.add("PO_ORDER_SUPPLEMENT_REQ_ID");
             }
         }
         return this;
@@ -1118,7 +632,7 @@ public class PmProgressWeeklyPrjDetail {
     /**
      * 设置：项目。
      */
-    public PmProgressWeeklyPrjDetail setPmPrjId(String pmPrjId) {
+    public PoOrderSupplementPrjDetail setPmPrjId(String pmPrjId) {
         if (this.pmPrjId == null && pmPrjId == null) {
             // 均为null，不做处理。
         } else if (this.pmPrjId != null && pmPrjId != null) {
@@ -1134,42 +648,6 @@ public class PmProgressWeeklyPrjDetail {
             this.pmPrjId = pmPrjId;
             if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
                 this.toUpdateCols.add("PM_PRJ_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 周报是否提交。
-     */
-    private Boolean isWeeklyReportSubmit;
-
-    /**
-     * 获取：周报是否提交。
-     */
-    public Boolean getIsWeeklyReportSubmit() {
-        return this.isWeeklyReportSubmit;
-    }
-
-    /**
-     * 设置：周报是否提交。
-     */
-    public PmProgressWeeklyPrjDetail setIsWeeklyReportSubmit(Boolean isWeeklyReportSubmit) {
-        if (this.isWeeklyReportSubmit == null && isWeeklyReportSubmit == null) {
-            // 均为null，不做处理。
-        } else if (this.isWeeklyReportSubmit != null && isWeeklyReportSubmit != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.isWeeklyReportSubmit.compareTo(isWeeklyReportSubmit) != 0) {
-                this.isWeeklyReportSubmit = isWeeklyReportSubmit;
-                if (!this.toUpdateCols.contains("IS_WEEKLY_REPORT_SUBMIT")) {
-                    this.toUpdateCols.add("IS_WEEKLY_REPORT_SUBMIT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.isWeeklyReportSubmit = isWeeklyReportSubmit;
-            if (!this.toUpdateCols.contains("IS_WEEKLY_REPORT_SUBMIT")) {
-                this.toUpdateCols.add("IS_WEEKLY_REPORT_SUBMIT");
             }
         }
         return this;
@@ -1262,8 +740,8 @@ public class PmProgressWeeklyPrjDetail {
      *
      * @return
      */
-    public static PmProgressWeeklyPrjDetail newData() {
-        PmProgressWeeklyPrjDetail obj = modelHelper.newData();
+    public static PoOrderSupplementPrjDetail newData() {
+        PoOrderSupplementPrjDetail obj = modelHelper.newData();
         return obj;
     }
 
@@ -1272,8 +750,8 @@ public class PmProgressWeeklyPrjDetail {
      *
      * @return
      */
-    public static PmProgressWeeklyPrjDetail insertData() {
-        PmProgressWeeklyPrjDetail obj = modelHelper.insertData();
+    public static PoOrderSupplementPrjDetail insertData() {
+        PoOrderSupplementPrjDetail obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1285,8 +763,8 @@ public class PmProgressWeeklyPrjDetail {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static PmProgressWeeklyPrjDetail selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        PmProgressWeeklyPrjDetail obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static PoOrderSupplementPrjDetail selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        PoOrderSupplementPrjDetail obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1296,7 +774,7 @@ public class PmProgressWeeklyPrjDetail {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static PmProgressWeeklyPrjDetail selectById(String id) {
+    public static PoOrderSupplementPrjDetail selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1308,8 +786,8 @@ public class PmProgressWeeklyPrjDetail {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<PmProgressWeeklyPrjDetail> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<PmProgressWeeklyPrjDetail> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<PoOrderSupplementPrjDetail> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<PoOrderSupplementPrjDetail> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1319,7 +797,7 @@ public class PmProgressWeeklyPrjDetail {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<PmProgressWeeklyPrjDetail> selectByIds(List<String> ids) {
+    public static List<PoOrderSupplementPrjDetail> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1331,8 +809,8 @@ public class PmProgressWeeklyPrjDetail {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<PmProgressWeeklyPrjDetail> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<PmProgressWeeklyPrjDetail> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<PoOrderSupplementPrjDetail> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<PoOrderSupplementPrjDetail> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1342,7 +820,7 @@ public class PmProgressWeeklyPrjDetail {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<PmProgressWeeklyPrjDetail> selectByWhere(Where where) {
+    public static List<PoOrderSupplementPrjDetail> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1354,10 +832,10 @@ public class PmProgressWeeklyPrjDetail {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static PmProgressWeeklyPrjDetail selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<PmProgressWeeklyPrjDetail> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static PoOrderSupplementPrjDetail selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<PoOrderSupplementPrjDetail> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用PmProgressWeeklyPrjDetail.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用PoOrderSupplementPrjDetail.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmptyList(objList) ? null : objList.get(0);
@@ -1369,7 +847,7 @@ public class PmProgressWeeklyPrjDetail {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static PmProgressWeeklyPrjDetail selectOneByWhere(Where where) {
+    public static PoOrderSupplementPrjDetail selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1483,7 +961,7 @@ public class PmProgressWeeklyPrjDetail {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(PmProgressWeeklyPrjDetail fromModel, PmProgressWeeklyPrjDetail toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(PoOrderSupplementPrjDetail fromModel, PoOrderSupplementPrjDetail toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1493,7 +971,7 @@ public class PmProgressWeeklyPrjDetail {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(PmProgressWeeklyPrjDetail fromModel, PmProgressWeeklyPrjDetail toModel) {
+    public static void copyCols(PoOrderSupplementPrjDetail fromModel, PoOrderSupplementPrjDetail toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 

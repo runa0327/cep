@@ -5,10 +5,10 @@ import com.cisdi.ext.api.PoOrderExtApi;
 import com.cisdi.ext.base.GrSetValue;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.commons.HttpClient;
-import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.model.PoOrderReq;
 import com.cisdi.ext.model.view.order.PoOrderReqView;
 import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.orderManage.detail.PoOrderPrjDetailExt;
 import com.cisdi.ext.util.*;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -28,7 +28,6 @@ import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 合约管理-采购合同签订扩展
@@ -426,16 +425,28 @@ public class PoOrderReqExt {
      * 合同签订-历史数据处理-项目写入合同签订-项目名称(流程内)明细表
      */
     public void historyPrjInsertPrjDetail(){
+
+        // PM_PRJ_IDS赋值
+        List<PoOrderReq> list1 = PoOrderReq.selectByWhere(new Where().nin(PoOrderReq.Cols.STATUS,"VD","VDING")
+                .neq(PoOrderReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
+        if (!CollectionUtils.isEmpty(list1)){
+            for (PoOrderReq tmp : list1) {
+                String projectId = tmp.getPmPrjId();
+                String id = tmp.getId();
+                if (!SharedUtil.isEmptyString(projectId)){
+                    Crud.from("PO_ORDER_REQ").where().eq("ID",id).update()
+                            .set("PM_PRJ_IDS",projectId).exec();
+                }
+            }
+        }
+
         List<PoOrderReq> list = PoOrderReq.selectByWhere(new Where().eq(PoOrderReq.Cols.STATUS,"AP"));
         if (!CollectionUtils.isEmpty(list)){
             for (PoOrderReq tmp : list) {
                 String poOrderReqId = tmp.getId();
                 String prjIds = tmp.getPmPrjIds();
-                List<String> prjList = StringUtil.getStrToList(prjIds,",");
-                if (!CollectionUtils.isEmpty(prjList)){
-                    for (String tp : prjList) {
-
-                    }
+                if (!SharedUtil.isEmptyString(prjIds)){
+                    PoOrderPrjDetailExt.insertData(poOrderReqId,prjIds);
                 }
             }
         }

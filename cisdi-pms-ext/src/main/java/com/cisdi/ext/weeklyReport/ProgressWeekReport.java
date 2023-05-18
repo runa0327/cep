@@ -2,6 +2,7 @@ package com.cisdi.ext.weeklyReport;
 
 import com.cisdi.ext.file.BaseFileExt;
 import com.cisdi.ext.model.PmProgressWeeklyPrj;
+import com.cisdi.ext.model.PmProgressWeeklyPrjDetail;
 import com.cisdi.ext.model.view.project.PmPrjView;
 import com.cisdi.ext.model.view.weekReport.PmProgressWeeklyView;
 import com.cisdi.ext.model.view.weekReport.WeekMessage;
@@ -103,39 +104,41 @@ public class ProgressWeekReport {
                     "a.PM_PROGRESS_WEEKLY_ID as weekId,a.PM_PROGRESS_WEEKLY_PRJ_ID as weekPrjId,b.PM_PRJ_ID as projectId,b.IZ_WRITE as izWrite " +
                     "from pm_progress_weekly_prj_detail a left join PM_PROGRESS_WEEKLY_PRJ b on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id " +
                     "where a.STATUS = 'ap' and b.status = 'ap' and b.pm_prj_id = ? and a.PM_PROGRESS_WEEKLY_ID = '"+weekId+"' and b.PM_PROGRESS_WEEKLY_ID = '"+weekId+"' ";
-        }
-        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId);
-        if (!CollectionUtils.isEmpty(list)){
-            Map<String, Object> map1 = new HashMap<>();
-            List<WeekMessage> returnList = list.stream().map(p->{
-                WeekMessage weekMessage = new WeekMessage();
-                weekMessage.id = JdbcMapUtil.getString(p,"id"); //id
-                weekMessage.writeDate = JdbcMapUtil.getString(p,"writeDate"); //填报日期
-                String progress = JdbcMapUtil.getString(p,"progress"); //整体形象进度
-                if (SharedUtil.isEmptyString(progress)){
-                    weekMessage.progress = new BigDecimal(0);
-                } else {
-                    weekMessage.progress = new BigDecimal(progress);
-                }
-                weekMessage.progressDescribe = JdbcMapUtil.getString(p,"progressDescribe"); //累计形象进度说明
-                weekMessage.progressWeek = JdbcMapUtil.getString(p,"progressWeek"); //本周项目进展
-                weekMessage.progressRemark = JdbcMapUtil.getString(p,"progressRemark"); //备注说明
-                weekMessage.weatherCompleted = JdbcMapUtil.getInt(p,"weatherCompleted"); // 是否已竣工
-                weekMessage.weatherStart = JdbcMapUtil.getInt(p,"weatherStart"); // 是否符合开工条件
-                weekMessage.izWrite = JdbcMapUtil.getInt(p,"izWrite"); // 是否填写
-                weekMessage.weekPrjId = JdbcMapUtil.getString(p,"weekPrjId"); //周项目id
-                weekMessage.projectId = JdbcMapUtil.getString(p,"projectId"); //项目id
-                weekMessage.weekId = JdbcMapUtil.getString(p,"weekId"); //周批次id
-                String fileId = JdbcMapUtil.getString(p,"fileId"); //文件id
-                if (!SharedUtil.isEmptyString(fileId)){
-                    weekMessage.fileId = fileId;
-                    weekMessage.fileList =BaseFileExt.getFile(fileId);
-                }
-                return weekMessage;
-            }).collect(Collectors.toList());
-            map1.put("result", returnList);
-            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(map1), Map.class);
-            ExtJarHelper.returnValue.set(outputMap);
+            List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId);
+            if (!CollectionUtils.isEmpty(list)) {
+                Map<String, Object> map1 = new HashMap<>();
+                List<WeekMessage> returnList = list.stream().map(p -> {
+                    WeekMessage weekMessage = new WeekMessage();
+                    weekMessage.id = JdbcMapUtil.getString(p, "id"); //id
+                    weekMessage.writeDate = JdbcMapUtil.getString(p, "writeDate"); //填报日期
+                    String progress = JdbcMapUtil.getString(p, "progress"); //整体形象进度
+                    if (SharedUtil.isEmptyString(progress)) {
+                        weekMessage.progress = new BigDecimal(0);
+                    } else {
+                        weekMessage.progress = new BigDecimal(progress);
+                    }
+                    weekMessage.progressDescribe = JdbcMapUtil.getString(p, "progressDescribe"); //累计形象进度说明
+                    weekMessage.progressWeek = JdbcMapUtil.getString(p, "progressWeek"); //本周项目进展
+                    weekMessage.progressRemark = JdbcMapUtil.getString(p, "progressRemark"); //备注说明
+                    weekMessage.weatherCompleted = JdbcMapUtil.getInt(p, "weatherCompleted"); // 是否已竣工
+                    weekMessage.weatherStart = JdbcMapUtil.getInt(p, "weatherStart"); // 是否符合开工条件
+                    weekMessage.izWrite = JdbcMapUtil.getInt(p, "izWrite"); // 是否填写
+                    weekMessage.weekPrjId = JdbcMapUtil.getString(p, "weekPrjId"); //周项目id
+                    weekMessage.projectId = JdbcMapUtil.getString(p, "projectId"); //项目id
+                    weekMessage.weekId = JdbcMapUtil.getString(p, "weekId"); //周批次id
+                    String fileId = JdbcMapUtil.getString(p, "fileId"); //文件id
+                    if (!SharedUtil.isEmptyString(fileId)) {
+                        weekMessage.fileId = fileId;
+                        weekMessage.fileList = BaseFileExt.getFile(fileId);
+                    }
+                    return weekMessage;
+                }).collect(Collectors.toList());
+                map1.put("result", returnList);
+                Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(map1), Map.class);
+                ExtJarHelper.returnValue.set(outputMap);
+            } else {
+                ExtJarHelper.returnValue.set(null);
+            }
         } else {
             ExtJarHelper.returnValue.set(null);
         }
@@ -151,6 +154,12 @@ public class ProgressWeekReport {
         WeekMessage param = JsonUtil.fromJson(json,WeekMessage.class);
         String userId = ExtJarHelper.loginInfo.get().userId;
         String id = param.id;
+        //判断是否可改
+        List<PmProgressWeeklyPrjDetail> list1 = PmProgressWeeklyPrjDetail.selectByWhere(new Where().eq("ID",id));
+        boolean isSubmit = list1.get(0).getIsWeeklyReportSubmit();
+        if (isSubmit){
+            throw new BaseException("本周周报已超过提交时间，不允许修改");
+        }
         String writeDate = param.writeDate; //填报日期
         String weekPrjId = param.weekPrjId; //进度周报-周项目信息id
         if (SharedUtil.isEmptyString(id)){
@@ -431,7 +440,7 @@ public class ProgressWeekReport {
                 "and ad_user_id is not null GROUP BY PM_PRJ_ID,ad_user_id) d on b.pm_prj_id = d.PM_PRJ_ID " +
                 "left join pm_prj e on b.pm_prj_id = e.id " +
                 "LEFT JOIN ad_user f ON d.ad_user_id = f.id " +
-                "where a.status = 'ap' and b.status = 'ap' and c.status = 'ap' ";
+                "where a.status = 'ap' and b.status = 'ap' and c.status = 'ap' and b.IS_WEEKLY_REPORT_SUBMIT = 1 and a.IS_WEEKLY_REPORT_SUBMIT = 1 ";
         StringBuilder sb = new StringBuilder(sql);
         if (!SharedUtil.isEmptyString(weekId)){
             sb.append(" and c.id = '").append(weekId).append("' "); // 周-批次id

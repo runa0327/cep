@@ -1,11 +1,15 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.orderManage;
 
-import com.cisdi.ext.api.PoOrderExtApi;
+import com.cisdi.ext.base.PmPrjExt;
+import com.cisdi.ext.model.PoOrderSupplementReq;
+import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.orderManage.detail.PoOrderSupplementPrjDetailExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -18,10 +22,9 @@ import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 
 /**
- * 采购合同补充协议申请-扩展
+ * 合约管理-补充协议-扩展
  */
 @Slf4j
 public class PoOrderSupplementReqExt {
@@ -447,6 +450,7 @@ public class PoOrderSupplementReqExt {
     public void OrderProcessEnd(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String id = entityRecord.csCommId;
         //合同工期
         int duration = JdbcMapUtil.getInt(entityRecord.valueMap,"PLAN_TOTAL_DAYS");
         //合同签订日期
@@ -454,9 +458,12 @@ public class PoOrderSupplementReqExt {
         //计算到期日期
         Date expireDate = DateTimeUtil.addDays(signDate,duration);
         //更新到期日期字段
-        Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("id",entityRecord.csCommId).update().set("DATE_FIVE",expireDate).exec();
+        Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("id",id).update().set("DATE_FIVE",expireDate).exec();
         //将合同数据写入传输至合同数据表(po_order)
 //        PoOrderExtApi.createData(entityRecord,"PO_ORDER_SUPPLEMENT_REQ","0100070673610715221",myJdbcTemplate);
+        //项目信息项目明细表
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
+        PoOrderSupplementPrjDetailExt.insertData(id,projectId);
     }
 
     /**
@@ -534,5 +541,53 @@ public class PoOrderSupplementReqExt {
             }
         }
         return nodeName;
+    }
+
+    /**
+     * 历史数据处理
+     */
+    public void supplementHistoryData(){
+
+        // 非系统项目转系统项目
+        List<PoOrderSupplementReq> list1 = PoOrderSupplementReq.selectByWhere(new Where()
+                .nin(PoOrderSupplementReq.Cols.STATUS,"VD","VDING")
+                .eq(PoOrderSupplementReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
+        if (!CollectionUtils.isEmpty(list1)){
+            for (PoOrderSupplementReq tmp : list1) {
+                String projectName = tmp.getProjectNameWr();
+                String projectId = PmPrjExt.createPrjByMoreName(projectName);
+                String id = tmp.getId();
+                Crud.from(PoOrderSupplementReq.ENT_CODE).where().eq(PoOrderSupplementReq.Cols.ID,id).update()
+                        .set(PoOrderSupplementReq.Cols.PM_PRJ_IDS,projectId)
+                        .exec();
+            }
+        }
+
+        //系统项目id写入pm_prj_ids
+        List<PoOrderSupplementReq> list2 = PoOrderSupplementReq.selectByWhere(new Where()
+                .nin(PoOrderSupplementReq.Cols.STATUS,"VD","VDING")
+                .eq(PoOrderSupplementReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
+        if (!CollectionUtils.isEmpty(list2)){
+            for (PoOrderSupplementReq tp : list2) {
+                String id = tp.getId();
+                String projectId = tp.getPmPrjId();
+                Crud.from(PoOrderSupplementReq.ENT_CODE).where().eq(PoOrderSupplementReq.Cols.ID,id).update()
+                        .set(PoOrderSupplementReq.Cols.PM_PRJ_IDS,projectId)
+                        .exec();
+            }
+        }
+
+        //已批准流程项目id写入明细表
+        List<PoOrderSupplementReq> list3 = PoOrderSupplementReq.selectByWhere(new Where().eq(PoOrderSupplementReq.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list3)){
+            for (PoOrderSupplementReq tmp : list3) {
+                String id = tmp.getId();
+                String projectId = tmp.getPmPrjIds();
+                if (SharedUtil.isEmptyString(projectId)){
+                    projectId = tmp.getPmPrjId();
+                }
+                PoOrderSupplementPrjDetailExt.insertData(id,projectId);
+            }
+        }
     }
 }
