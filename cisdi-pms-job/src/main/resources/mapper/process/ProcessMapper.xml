@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.process.ProcessMapper">
+    <resultMap id="WfProcessResult" type="com.cisdi.pms.job.domain.process.WfProcess"></resultMap>
+
+    <!--查询非核心流程id-->
+    <select id="getNotCoreProId" resultType="String">
+        select WF_PROCESS_ID from HR_PROC_LEVEL where STATUS = 'AP' AND IZ_CORE = 0;
+    </select>
+</mapper>
