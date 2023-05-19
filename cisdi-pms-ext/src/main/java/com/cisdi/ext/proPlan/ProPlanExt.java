@@ -1169,7 +1169,7 @@ public class ProPlanExt {
         sb.append(" where id='").append(input.id).append("'");
         myJdbcTemplate.update(sb.toString());
         //刷新时间
-        PrjPlanUtil.updatePreNodeTime(JdbcMapUtil.getString(map, "nodeId"), JdbcMapUtil.getString(map, "projectId"));
+        PrjPlanUtil.updatePreNodeTime(input.id, input.projectId);
     }
 
 
@@ -1275,6 +1275,8 @@ public class ProPlanExt {
         public String seqNo;
         //计划开始日期
         public String planStartDay;
+
+        public String projectId;
     }
 
 
