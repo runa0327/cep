@@ -24,9 +24,9 @@ public class WeeklyReportJob {
     }
 
     /**
-     * 进度周报生成 每周五凌晨执行一次
+     * 进度周报生成 5分钟执行一次
      */
-    @Scheduled(cron = "0 5 0 * * ?")
+    @Scheduled(cron = "0 0/5 * * * ?")
     public void createProgressWeekly(){
         try {
             log.info("【形象进度周报】自动生成开始");

@@ -1,5 +1,7 @@
 package com.cisdi.pms.job.service.weeklyReport;
 
+import com.cisdi.pms.job.domain.project.PmPrj;
+import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeekly;
 import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrjDetail;
 
 import javax.servlet.http.HttpServletResponse;
@@ -12,4 +14,23 @@ public interface PmProgressWeeklyPrjDetailService {
      * @param response 响应结果
      */
     void downloadPrjUserRecords(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail, HttpServletResponse response);
+
+    /**
+     * 形象工程周报-填报明细新增
+     * @param weekId 周id
+     * @param weekPrjId 周项目id
+     * @param tmp 项目信息
+     * @param pmProgressWeekly 周信息
+     */
+    void createData(String weekId, String weekPrjId, PmPrj tmp, PmProgressWeekly pmProgressWeekly);
+
+    /**
+     * 根据上周填报信息填报 形象工程周报-填报明细新增
+     * @param lastWeekId 上周id
+     * @param weekId 周id
+     * @param weekPrjId 周项目id
+     * @param tmp 项目信息
+     * @param pmProgressWeekly 周信息
+     */
+    void createDataByLastWeek(String lastWeekId, String weekId, String weekPrjId, PmPrj tmp, PmProgressWeekly pmProgressWeekly);
 }

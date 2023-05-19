@@ -1,8 +1,16 @@
 package com.cisdi.pms.job.weeklyReport;
 
 import cn.hutool.core.util.IdUtil;
+import com.cisdi.pms.job.domain.project.PmPrj;
+import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeekly;
+import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrj;
 import com.cisdi.pms.job.mapper.process.ProcessMapper;
+import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyMapper;
 import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyPrjDetailMapper;
+import com.cisdi.pms.job.service.project.PmPrjService;
+import com.cisdi.pms.job.service.weeklyReport.PmProgressWeeklyPrjDetailService;
+import com.cisdi.pms.job.service.weeklyReport.PmProgressWeeklyPrjService;
+import com.cisdi.pms.job.serviceImpl.weeklyReport.PmProgressWeeklyServiceImpl;
 import com.cisdi.pms.job.utils.Constants;
 import com.cisdi.pms.job.utils.DateUtil;
 import com.qygly.shared.BaseException;
@@ -17,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,6 +44,18 @@ public class WeeklyReportService {
 
     @Resource
     public PmProgressWeeklyPrjDetailMapper pmProgressWeeklyPrjDetailMapper;
+
+    @Resource
+    private PmProgressWeeklyPrjDetailService pmProgressWeeklyPrjDetailService;
+
+    @Resource
+    private PmProgressWeeklyPrjService pmProgressWeeklyPrjService;
+
+    @Resource
+    private PmProgressWeeklyMapper pmProgressWeeklyMapper;
+
+    @Resource
+    private PmPrjService pmPrjService;
 
     @Resource
     public ProcessMapper processMapper;
@@ -376,10 +395,12 @@ public class WeeklyReportService {
                 String startDate = DateUtil.getTimeStrDay(date);
                 Date date2 = DateUtil.addDays(date,6);
                 String endDate = DateUtil.getTimeStrDay(date2);
-                autoCreateProgressWeek(startDate,endDate,date);
+//                autoCreateProgressWeek(startDate,endDate,date);
+                autoCreateProgressWeekNew(startDate,endDate,date);
             } else if ( week != 5 && "1".equals(sysTrue)){
                 Map<String,String> map = getDateMap(week,date);
-                autoCreateProgressWeek(map.get("startDate"),map.get("endDate"),date);
+//                autoCreateProgressWeek(map.get("startDate"),map.get("endDate"),date);
+                autoCreateProgressWeekNew(map.get("startDate"),map.get("endDate"),date);
             }
         }
     }
@@ -415,6 +436,54 @@ public class WeeklyReportService {
         map.put("startDate",DateUtil.getTimeStrDay(start));
         map.put("endDate",DateUtil.getTimeStrDay(end));
         return map;
+    }
+
+    /**
+     * 开始自动生成形象进度周报
+     * startDate 开始时间
+     * endDate 结束时间
+     * date 当前时间
+     */
+    private void autoCreateProgressWeekNew(String startDate, String endDate, Date date) {
+        String nowDate = DateUtil.getNormalTimeStr(date);
+        String weekDate = startDate + "到" + endDate;
+
+        PmProgressWeekly pmProgressWeekly = new PmProgressWeekly();
+
+        //获取周id
+        String weekId = pmProgressWeeklyMapper.getWeekIdByDate(startDate,endDate);
+        if (SharedUtil.isEmptyString(weekId)){
+            weekId = IdUtil.getSnowflakeNextIdStr();
+            pmProgressWeekly = PmProgressWeeklyServiceImpl.setWeekValue(weekId,nowDate,weekDate,startDate,endDate);
+            pmProgressWeeklyMapper.createData(pmProgressWeekly);
+        }
+        pmProgressWeekly.setTs(nowDate);
+
+        //获取上周weekId
+        String lastWeekId = pmProgressWeeklyMapper.getLastWeekId(startDate,endDate,weekId);
+
+        //获取项目信息
+        List<PmPrj> prjList = pmPrjService.getNeedWeekPrj();
+        if (!CollectionUtils.isEmpty(prjList)){
+            for (PmPrj tmp : prjList) {
+                String projectId = tmp.getProjectId();
+                String weekPrjId = "";
+                //判断本周该项目是否已生成
+                List<PmProgressWeeklyPrj> weekPrj = pmProgressWeeklyPrjService.getWeekPrj(projectId,weekId);
+                if (CollectionUtils.isEmpty(weekPrj)){
+                    weekPrjId = IdUtil.getSnowflakeNextIdStr();
+                    pmProgressWeeklyPrjService.createData(weekId,weekPrjId,tmp,pmProgressWeekly);
+
+                    //填报明细生产
+                    if (SharedUtil.isEmptyString(lastWeekId)){
+                        pmProgressWeeklyPrjDetailService.createData(weekId,weekPrjId,tmp,pmProgressWeekly);
+                    } else {
+                        //新增数据，将上周值赋值到本周
+                        pmProgressWeeklyPrjDetailService.createDataByLastWeek(lastWeekId,weekId,weekPrjId,tmp,pmProgressWeekly);
+                    }
+                }
+            }
+        }
     }
 
     /**

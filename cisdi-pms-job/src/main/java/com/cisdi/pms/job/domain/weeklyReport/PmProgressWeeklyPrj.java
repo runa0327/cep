@@ -1,14 +1,18 @@
 package com.cisdi.pms.job.domain.weeklyReport;
 
+import com.cisdi.pms.job.domain.BaseDomain;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class PmProgressWeeklyPrj {
+public class PmProgressWeeklyPrj extends BaseDomain {
 
     //id
     private String id;
+
+    //周id
+    private String weekId;
 
     //填报时间
     private String date;
@@ -37,4 +41,10 @@ public class PmProgressWeeklyPrj {
 
     //结束日期
     private Date toDate;
+
+    //状态
+    private String status;
+
+    //是否提交 0未提交 1已提交
+    private Integer izSubmit;
 }

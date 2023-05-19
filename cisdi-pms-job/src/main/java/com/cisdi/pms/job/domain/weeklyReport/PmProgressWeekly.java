@@ -1,11 +1,12 @@
 package com.cisdi.pms.job.domain.weeklyReport;
 
+import com.cisdi.pms.job.domain.BaseDomain;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class PmProgressWeekly {
+public class PmProgressWeekly extends BaseDomain {
 
     //id
     private String id;
