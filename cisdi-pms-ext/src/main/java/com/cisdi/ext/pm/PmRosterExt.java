@@ -495,6 +495,8 @@ public class PmRosterExt {
         public List<PostUser> postUserList;
 
         public List<Post> postList;
+
+        public Map<String, List<ObjInfo>> collect;
     }
 
 
@@ -690,18 +692,57 @@ public class PmRosterExt {
 
     /**
      * 根据花名册信息查询人员所在岗位信息
-     * @param userId 人员id
-     * @param projectId 项目id
-     * @param companyId 业主单位id
+     *
+     * @param userId         人员id
+     * @param projectId      项目id
+     * @param companyId      业主单位id
      * @param myJdbcTemplate 数据源
      * @return 查询数据结果
      */
     public static Map<String, Object> getUserDeptCodeByRoster(String userId, String projectId, String companyId, MyJdbcTemplate myJdbcTemplate) {
-        Map<String,Object> map = new HashMap<>();
-        List<Map<String,Object>> list = LinkSql.getUserDeptCodeByRoster(userId,projectId,companyId,myJdbcTemplate);
-        if (!CollectionUtils.isEmpty(list)){
-            map.put("deptCode",JdbcMapUtil.getString(list.get(0),"code"));
+        Map<String, Object> map = new HashMap<>();
+        List<Map<String, Object>> list = LinkSql.getUserDeptCodeByRoster(userId, projectId, companyId, myJdbcTemplate);
+        if (!CollectionUtils.isEmpty(list)) {
+            map.put("deptCode", JdbcMapUtil.getString(list.get(0), "code"));
         }
         return map;
+    }
+
+
+    /**
+     * app花名册详情
+     */
+    public void rosterView() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pr.id as id,pi.`NAME` as postName,au.`NAME` as userName,au.code as phone from pm_roster pr left join post_info pi on pr.POST_INFO_ID = pi.id left join ad_user au on pr.AD_USER_ID = au.id where PM_PRJ_ID=? and pr.ad_user_id is not null", map.get("projectId"));
+        if (!CollectionUtils.isEmpty(list)) {
+            List<ObjInfo> objInfoList = list.stream().map(p -> {
+                ObjInfo info = new ObjInfo();
+                info.id = JdbcMapUtil.getString(p, "id");
+                info.postName = JdbcMapUtil.getString(p, "postName");
+                info.userName = JdbcMapUtil.getString(p, "userName");
+                info.phone = JdbcMapUtil.getString(p, "phone");
+                return info;
+            }).collect(Collectors.toList());
+            Map<String, List<ObjInfo>> collect = objInfoList.stream().collect(Collectors.groupingBy(m -> m.postName));
+            OutSide outSide = new OutSide();
+            outSide.collect = collect;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }else{
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        }
+    }
+
+
+    public static class ObjInfo {
+        public String id;
+
+        public String postName;
+
+        public String userName;
+
+        public String phone;
     }
 }
