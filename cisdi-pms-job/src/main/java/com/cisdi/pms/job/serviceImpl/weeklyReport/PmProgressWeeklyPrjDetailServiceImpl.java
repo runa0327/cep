@@ -1,5 +1,6 @@
 package com.cisdi.pms.job.serviceImpl.weeklyReport;
 
+import cn.hutool.core.util.IdUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.write.metadata.style.WriteCellStyle;
@@ -7,6 +8,8 @@ import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
 import com.alibaba.excel.write.style.column.SimpleColumnWidthStyleStrategy;
 import com.cisdi.pms.job.domain.exportMain.PrjProgressAllRecords;
 import com.cisdi.pms.job.domain.exportMain.PrjProgressRecords;
+import com.cisdi.pms.job.domain.project.PmPrj;
+import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeekly;
 import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrjDetail;
 import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyPrjDetailMapper;
 import com.cisdi.pms.job.service.weeklyReport.PmProgressWeeklyPrjDetailService;
@@ -130,6 +133,79 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
                 .registerWriteHandler(new MergeStrategy(0,0,cellRangeAddresses))
                 .registerWriteHandler(horizontalCellStyleStrategy)
                 .doWrite(list);
+    }
+
+    /**
+     * 形象工程周报-填报明细新增
+     * @param weekId 周id
+     * @param weekPrjId 周项目id
+     * @param tmp 项目信息
+     * @param pmProgressWeekly 周信息
+     */
+    @Override
+    public void createData(String weekId, String weekPrjId, PmPrj tmp, PmProgressWeekly pmProgressWeekly) {
+        String weekPrjDetailId = IdUtil.getSnowflakeNextIdStr();
+        PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail = new PmProgressWeeklyPrjDetail();
+        pmProgressWeeklyPrjDetail.setId(weekPrjDetailId);
+        pmProgressWeeklyPrjDetail.setVer("1");
+        pmProgressWeeklyPrjDetail.setTs(pmProgressWeekly.getTs());
+        pmProgressWeeklyPrjDetail.setCrtDt(pmProgressWeekly.getCrtDt());
+        pmProgressWeeklyPrjDetail.setCrtUserId(pmProgressWeekly.getCrtUserId());
+        pmProgressWeeklyPrjDetail.setLastModiDt(pmProgressWeekly.getLastModiDt());
+        pmProgressWeeklyPrjDetail.setLastModiUserId(pmProgressWeekly.getLastModiUserId());
+        pmProgressWeeklyPrjDetail.setStatus("AP");
+        pmProgressWeeklyPrjDetail.setWriteDate(pmProgressWeekly.getDate());
+        pmProgressWeeklyPrjDetail.setToDate(pmProgressWeekly.getToDate());
+        pmProgressWeeklyPrjDetail.setWeekId(weekId);
+        pmProgressWeeklyPrjDetail.setFromDate(pmProgressWeekly.getFromDate());
+        pmProgressWeeklyPrjDetail.setProjectId(tmp.getProjectId());
+        pmProgressWeeklyPrjDetail.setWeatherStart(tmp.getIzStart());
+        pmProgressWeeklyPrjDetail.setWeekPrjId(weekPrjId);
+        pmProgressWeeklyPrjDetail.setWeatherCompleted(tmp.getIzEnd());
+        pmProgressWeeklyPrjDetail.setIzSubmit(0);
+        pmProgressWeeklyPrjDetailMapper.insertData(pmProgressWeeklyPrjDetail);
+    }
+
+    /**
+     * 根据上周填报信息填报 形象工程周报-填报明细新增
+     * @param lastWeekId 上周id
+     * @param weekId 周id
+     * @param weekPrjId 周项目id
+     * @param tmp 项目信息
+     * @param pmProgressWeekly 周信息
+     */
+    @Override
+    public void createDataByLastWeek(String lastWeekId, String weekId, String weekPrjId, PmPrj tmp, PmProgressWeekly pmProgressWeekly) {
+        String projectId = tmp.getProjectId();
+        //查询上周信息
+        List<PmProgressWeeklyPrjDetail> list = pmProgressWeeklyPrjDetailMapper.getLastWeekDateByPrj(lastWeekId,projectId);
+        if (CollectionUtils.isEmpty(list)){
+            createData(weekId,weekPrjId,tmp,pmProgressWeekly);
+        } else {
+            String weekPrjDetailId = IdUtil.getSnowflakeNextIdStr();
+            PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail = new PmProgressWeeklyPrjDetail();
+            pmProgressWeeklyPrjDetail.setId(weekPrjDetailId);
+            pmProgressWeeklyPrjDetail.setVer("1");
+            pmProgressWeeklyPrjDetail.setTs(pmProgressWeekly.getTs());
+            pmProgressWeeklyPrjDetail.setCrtDt(pmProgressWeekly.getCrtDt());
+            pmProgressWeeklyPrjDetail.setCrtUserId(pmProgressWeekly.getCrtUserId());
+            pmProgressWeeklyPrjDetail.setLastModiDt(pmProgressWeekly.getLastModiDt());
+            pmProgressWeeklyPrjDetail.setLastModiUserId(pmProgressWeekly.getLastModiUserId());
+            pmProgressWeeklyPrjDetail.setStatus("AP");
+            pmProgressWeeklyPrjDetail.setWriteDate(pmProgressWeekly.getDate());
+            pmProgressWeeklyPrjDetail.setToDate(pmProgressWeekly.getToDate());
+            pmProgressWeeklyPrjDetail.setWeekId(weekId);
+            pmProgressWeeklyPrjDetail.setFromDate(pmProgressWeekly.getFromDate());
+            pmProgressWeeklyPrjDetail.setProjectId(projectId);
+            pmProgressWeeklyPrjDetail.setWeatherStart(tmp.getIzStart());
+            pmProgressWeeklyPrjDetail.setWeekPrjId(weekPrjId);
+            pmProgressWeeklyPrjDetail.setWeatherCompleted(tmp.getIzEnd());
+            pmProgressWeeklyPrjDetail.setIzSubmit(0);
+            pmProgressWeeklyPrjDetail.setProgressRemark(list.get(0).getProgressRemark());
+            pmProgressWeeklyPrjDetail.setProgress(list.get(0).getProgress());
+            pmProgressWeeklyPrjDetail.setProgressDescribe(list.get(0).getProgressDescribe());
+            pmProgressWeeklyPrjDetailMapper.insertData(pmProgressWeeklyPrjDetail);
+        }
     }
 }
 

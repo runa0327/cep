@@ -33,4 +33,18 @@ public interface PmProgressWeeklyPrjDetailMapper {
      * @param weekId 周id
      */
     void updatePrjDetailWeekByWeekId(String weekId);
+
+    /**
+     * 形象进度工程周报-插入数据
+     * @param pmProgressWeeklyPrjDetail 形象进度工程周报实体
+     */
+    void insertData(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail);
+
+    /**
+     * 根据周id和项目id查询填报信息
+     * @param weekId 周id
+     * @param projectId 项目id
+     * @return 查询结果
+     */
+    List<PmProgressWeeklyPrjDetail> getLastWeekDateByPrj(@Param("weekId") String weekId, @Param("projectId")String projectId);
 }
