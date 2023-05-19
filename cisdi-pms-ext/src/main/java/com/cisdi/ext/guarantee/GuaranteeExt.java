@@ -65,7 +65,7 @@ public class GuaranteeExt {
         if (map.containsKey("projectNameWr")) {
             projectNameWr = map.get("projectNameWr").toString();
         }
-        String param = " where 1=1 AND r.STATUS in ('ap','APING') ";
+        String param = " where 1=1 AND r.STATUS = 'AP' ";
         String temp = " ";
         if (!StringUtils.isEmpty(guaranteeLetterTypeId)) {
             temp += " and r.GUARANTEE_LETTER_TYPE_ID= '" + guaranteeLetterTypeId + "'";
@@ -168,7 +168,7 @@ public class GuaranteeExt {
         if (map.containsKey("guaranteeStartDate")) {
             guaranteeStartDate = map.get("guaranteeStartDate").toString();
         }
-        String param = " where 1=1 and r.status in ('ap','APING') ";
+        String param = " where 1=1 and r.status = 'AP' ";
         String temp = " ";
         if (!StringUtils.isEmpty(guaranteeLetterTypeId)) {
             temp += " and r.GUARANTEE_LETTER_TYPE_ID= '" + guaranteeLetterTypeId + "'";
