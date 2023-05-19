@@ -348,7 +348,7 @@ public class PmPrjExt {
         StringBuilder sb = new StringBuilder();
         List<String> prjNameList = StringUtil.getStrToList(projectName,",");
         for (String tp : prjNameList) {
-            List<PmPrj> prjList = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.NAME,projectName).eq(PmPrj.Cols.STATUS,"AP"));
+            List<PmPrj> prjList = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.NAME,tp).eq(PmPrj.Cols.STATUS,"AP"));
             String prjCode = "", id = "";
             if (CollectionUtils.isEmpty(prjList)){
                 prjCode = PmPrjCodeUtil.getPrjCode();
