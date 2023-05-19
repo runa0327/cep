@@ -664,8 +664,6 @@ public class PmPrjReqExt {
         String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
         String csCommId = entityRecord.csCommId;
         ProcessCommon.addPrjPostUser(projectId,entCode,processId,companyId,csCommId,myJdbcTemplate);
-        //资料清单
-        PrjMaterialInventory.addInventoryDtl(String.valueOf(entityRecord.valueMap.get("PM_PRJ_ID")),ExtJarHelper.procId.get(),ExtJarHelper.procInstId.get());
     }
 
     /**
