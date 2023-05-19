@@ -3,6 +3,7 @@ package com.cisdi.ext.pm;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.PmPostAppoint;
+import com.cisdi.ext.pm.office.PmNodeAdjustReqExt;
 import com.cisdi.ext.util.*;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -105,6 +106,7 @@ public class PmStartExt {
             } else {
                 pmStart.postProTrue = 0;
             }
+            pmStart.isNodeAdjust = PmNodeAdjustReqExt.getNodeAdjustByPrj(projectId);
             pmStart.projectId = JdbcMapUtil.getString(m, "project_id");
             pmStart.projectName = JdbcMapUtil.getString(m, "project_name");
             pmStart.projectVer = JdbcMapUtil.getString(m, "project_ver");
@@ -122,7 +124,6 @@ public class PmStartExt {
             ExtJarHelper.returnValue.set(outputMap);
         }
     }
-
 
     /**
      * 项目启动详情
@@ -581,6 +582,9 @@ public class PmStartExt {
 
         //是否发起岗位指派流程 1已发起 0未发起
         public Integer postProTrue;
+
+        //是否存在未审批完成全景计划展示表 1存在正在审批中0不存在
+        public Integer isNodeAdjust;
 
         //前期报建岗人员
         public String qqUserId;

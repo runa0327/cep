@@ -457,28 +457,28 @@ public class WeeklyReportService {
 
                 //写入进度周报项目信息
                 String sql2 = "insert into PM_PROGRESS_WEEKLY_PRJ " +
-                        "(ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PM_PROGRESS_WEEKLY_ID,DATE,PM_PRJ_ID,TO_DATE,SYS_TRUE,FROM_DATE,IZ_END,IZ_WRITE) " +
-                        "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',?,?,?,?,?,?,?,'0')";
+                        "(ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PM_PROGRESS_WEEKLY_ID,DATE,PM_PRJ_ID,TO_DATE,SYS_TRUE,FROM_DATE,IZ_END,IZ_WRITE,IS_WEEKLY_REPORT_SUBMIT) " +
+                        "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',?,?,?,?,?,?,?,'0','0')";
                 jdbcTemplate.update(sql2,weekPrjId,nowDate,nowDate,nowDate,weekId,weekDate,prjId,endDate,izStart,startDate,izEnd);
 
                 //查询该项目最近一次生成周报的数据
                 if (SharedUtil.isEmptyString(lastWeekId)){
                     String sql3 = "insert into PM_PROGRESS_WEEKLY_PRJ_DETAIL (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PROCESS_REMARK_TEXT,DATE,TO_DATE," +
-                            "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ_ID,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IZ_END) " +
-                            "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',null,?,?,null,?,null,null,?,?,null,?,?,?)";
+                            "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ_ID,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IZ_END,IS_WEEKLY_REPORT_SUBMIT) " +
+                            "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',null,?,?,null,?,null,null,?,?,null,?,?,?,'0')";
                     jdbcTemplate.update(sql3,weekPrjDetailId,nowDate,nowDate,nowDate,weekDate,endDate,weekId,startDate,weekPrjId,prjId,izStart,izEnd);
                 } else {
                     //查询该项目上一周情况
                     List<Map<String,Object>> list3 = jdbcTemplate.queryForList("select * from pm_progress_weekly_prj_detail where PM_PROGRESS_WEEKLY_ID = ? and status = 'ap' and pm_prj_id = ?",lastWeekId,prjId);
                     if (CollectionUtils.isEmpty(list3)){
                         String sql3 = "insert into PM_PROGRESS_WEEKLY_PRJ_DETAIL (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PROCESS_REMARK_TEXT,DATE,TO_DATE," +
-                                "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ_ID,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IZ_END) " +
-                                "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',null,?,?,null,?,null,null,?,?,null,?,?,?)";
+                                "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ_ID,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IZ_END,IS_WEEKLY_REPORT_SUBMIT) " +
+                                "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',null,?,?,null,?,null,null,?,?,null,?,?,?,'0')";
                         jdbcTemplate.update(sql3,weekPrjDetailId,nowDate,nowDate,nowDate,weekDate,endDate,weekId,startDate,weekPrjId,prjId,izStart,izEnd);
                     } else {
                         String sql3 = "insert into PM_PROGRESS_WEEKLY_PRJ_DETAIL (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,PROCESS_REMARK_TEXT,DATE,TO_DATE," +
-                                "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ_ID,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IZ_END) " +
-                                "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',?,?,?,null,?,null,?,?,?,?,?,?,?)";
+                                "FILE_ID_ONE,PM_PROGRESS_WEEKLY_ID,TEXT_REMARK_ONE,VISUAL_PROGRESS,FROM_DATE,PM_PROGRESS_WEEKLY_PRJ_ID,VISUAL_PROGRESS_DESCRIBE,PM_PRJ_ID,SYS_TRUE,IZ_END,IS_WEEKLY_REPORT_SUBMIT) " +
+                                "values (?,'1',?,?,'0099250247095871681',?,'0099250247095871681','AP',?,?,?,null,?,null,?,?,?,?,?,?,?,'0')";
                         jdbcTemplate.update(sql3,weekPrjDetailId,nowDate,nowDate,nowDate,JdbcMapUtil.getString(list3.get(0),"PROCESS_REMARK_TEXT"),
                                 weekDate,endDate,weekId,JdbcMapUtil.getString(list3.get(0),"VISUAL_PROGRESS"),startDate,weekPrjId,JdbcMapUtil.getString(list3.get(0),"VISUAL_PROGRESS_DESCRIBE"),prjId,izStart,izEnd);
                     }

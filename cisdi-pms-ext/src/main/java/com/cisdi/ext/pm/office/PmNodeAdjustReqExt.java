@@ -19,6 +19,22 @@ import java.util.List;
 public class PmNodeAdjustReqExt {
 
     /**
+     * 根据项目判断是否存在未审批完的数据
+     * @param projectId 项目id
+     * @return 存在1不存在0
+     */
+    public static Integer getNodeAdjustByPrj(String projectId) {
+        List<PmNodeAdjustReq> list = PmNodeAdjustReq.selectByWhere(new Where()
+                .nin(PmNodeAdjustReq.Cols.STATUS,"AP","VD","VDING")
+                .eq(PmNodeAdjustReq.Cols.PM_PRJ_ID,projectId));
+        if (CollectionUtils.isEmpty(list)){
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
+    /**
      * 前景计划展示表-发起时数据校验
      */
     public void adjustNodeStart(){
