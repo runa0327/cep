@@ -79,43 +79,6 @@ public class PrjPlanUtil {
         }
     }
 
-    private static List<Map<String, Object>> getPreList(Map<String, Object> own, List<Map<String, Object>> allData) {
-        SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
-        return allData.stream().filter(p -> Objects.equals(own.get("ID"), p.get("PRE_NODE_ID"))).peek(m -> {
-            if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"))) {
-                Date endaaDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"));
-                if (endaaDate != null) {
-                    int days = JdbcMapUtil.getInt(m, "PLAN_TOTAL_DAYS");
-                    Date endmDate = DateTimeUtil.addDays(endaaDate, days);
-                    m.put("PLAN_START_DATE", sp.format(endaaDate));
-                    m.put("PLAN_COMPL_DATE", sp.format(endmDate));
-                }
-            }
-            if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(m, "PLAN_START_DATE"))) {
-                List<Map<String, Object>> preList = getPreList(m, allData);
-                preList.forEach(item -> {
-                    Date dateOrg = DateTimeUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_COMPL_DATE"));
-                    Object ob = item.get("PLAN_START_DATE");
-                    System.out.println("计划开始日期-------------------------------：" + ob);
-                    Date oweStart = DateTimeUtil.stringToDate(JdbcMapUtil.getString(m, "PLAN_START_DATE"));
-                    if (oweStart != null) {
-                        if (oweStart.before(dateOrg)) {
-                            int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
-                            Date endDate = DateTimeUtil.addDays(dateOrg, days);
-                            item.put("PLAN_START_DATE", sp.format(dateOrg));
-                            item.put("PLAN_COMPL_DATE", sp.format(endDate));
-                        }
-                    } else {
-                        int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
-                        Date endDate = DateTimeUtil.addDays(dateOrg, days);
-                        item.put("PLAN_START_DATE", sp.format(dateOrg));
-                        item.put("PLAN_COMPL_DATE", sp.format(endDate));
-                    }
-
-                });
-            }
-        }).collect(Collectors.toList());
-    }
 
     private static void updateNodeTime(String projectId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
@@ -165,42 +128,70 @@ public class PrjPlanUtil {
         List<Map<String, Object>> currentNodeList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", nodeId);
         if (!CollectionUtils.isEmpty(currentNodeList)) {
             Map<String, Object> currentNode = currentNodeList.get(0);
+
+            //先刷新一下当前节点的时间
+            int currentDays = JdbcMapUtil.getInt(currentNode, "PLAN_TOTAL_DAYS");
+            Date planDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(currentNode, "PLAN_START_DATE"));
+            //当前节点结束日期
+            Date dateOrg = DateTimeUtil.addDays(planDate, currentDays);
+            myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=? where id=?", dateOrg, nodeId);
+
             List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where pm_pro_plan_id = ? and LEVEL =3 ", currentNode.get("pm_pro_plan_id"));
             if (!CollectionUtils.isEmpty(list)) {
                 SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
-                List<Map<String, Object>> preList = getPreList(currentNode, list);
-                if (!CollectionUtils.isEmpty(preList)) {
-                    preList.forEach(item -> {
-                        Date dateOrg = DateTimeUtil.stringToDate(JdbcMapUtil.getString(currentNode, "PLAN_COMPL_DATE"));
-                        Date oweStart = DateTimeUtil.stringToDate(JdbcMapUtil.getString(item, "PLAN_START_DATE"));
-                        if (oweStart != null) {
-                            if (oweStart.before(dateOrg)) {
-                                int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
-                                Date endDate = DateTimeUtil.addDays(dateOrg, days);
-                                item.put("PLAN_START_DATE", sp.format(dateOrg));
-                                item.put("PLAN_COMPL_DATE", sp.format(endDate));
-                            }
-                        } else {
+                List<Map<String, Object>> preList = list.stream().filter(p -> Objects.equals(currentNode.get("ID"), p.get("PRE_NODE_ID"))).peek(item -> {
+                    Date oweStart = DateTimeUtil.stringToDate(JdbcMapUtil.getString(item, "PLAN_START_DATE"));
+                    if (oweStart != null) {
+                        if (oweStart.before(dateOrg)) {
                             int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
                             Date endDate = DateTimeUtil.addDays(dateOrg, days);
                             item.put("PLAN_START_DATE", sp.format(dateOrg));
                             item.put("PLAN_COMPL_DATE", sp.format(endDate));
                         }
-                    });
+                    } else {
+                        int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
+                        Date endDate = DateTimeUtil.addDays(dateOrg, days);
+                        item.put("PLAN_START_DATE", sp.format(dateOrg));
+                        item.put("PLAN_COMPL_DATE", sp.format(endDate));
+                    }
+                    getPreList(item, list);
+                }).collect(Collectors.toList());
 
-                    StringBuilder sb = new StringBuilder();
-                    list.forEach(item -> {
-                        if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(item, "PLAN_START_DATE"))) {
-                            sb.append("update pm_pro_plan_node set PLAN_START_DATE='").append(item.get("PLAN_START_DATE"))
-                                    .append("', PLAN_COMPL_DATE ='").append(item.get("PLAN_COMPL_DATE")).append("' where id='").append(item.get("ID")).append("' ;");
-                        }
-                    });
-                    myJdbcTemplate.update(sb.toString());
-                    updateNodeTime(projectId);
-                }
+                StringBuilder sb = new StringBuilder();
+                list.forEach(item -> {
+                    if (!Strings.isNullOrEmpty(JdbcMapUtil.getString(item, "PLAN_START_DATE"))) {
+                        sb.append("update pm_pro_plan_node set PLAN_START_DATE='").append(item.get("PLAN_START_DATE"))
+                                .append("', PLAN_COMPL_DATE ='").append(item.get("PLAN_COMPL_DATE")).append("' where id='").append(item.get("ID")).append("' ;");
+                    }
+                });
+                myJdbcTemplate.update(sb.toString());
+                updateNodeTime(projectId);
+
             }
 
         }
+    }
+
+    private static List<Map<String, Object>> getPreList(Map<String, Object> own, List<Map<String, Object>> allData) {
+        SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
+        return allData.stream().filter(p -> Objects.equals(own.get("ID"), p.get("PRE_NODE_ID"))).peek(item -> {
+            Date dateOrg = DateTimeUtil.stringToDate(JdbcMapUtil.getString(own, "PLAN_COMPL_DATE"));
+            Date oweStart = DateTimeUtil.stringToDate(JdbcMapUtil.getString(item, "PLAN_START_DATE"));
+            if (oweStart != null) {
+                if (oweStart.before(dateOrg)) {
+                    int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
+                    Date endDate = DateTimeUtil.addDays(dateOrg, days);
+                    item.put("PLAN_START_DATE", sp.format(dateOrg));
+                    item.put("PLAN_COMPL_DATE", sp.format(endDate));
+                }
+            } else {
+                int days = JdbcMapUtil.getInt(item, "PLAN_TOTAL_DAYS");
+                Date endDate = DateTimeUtil.addDays(dateOrg, days);
+                item.put("PLAN_START_DATE", sp.format(dateOrg));
+                item.put("PLAN_COMPL_DATE", sp.format(endDate));
+            }
+            getPreList(item, allData);
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -448,7 +439,7 @@ public class PrjPlanUtil {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_roster where PM_PRJ_ID=?", projectId);
         //查询未启动的节点
-        List<Map<String, Object>> proList = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where pn.PROGRESS_STATUS_ID ='0099799190825106800' and  PM_PRJ_ID=?",projectId);
+        List<Map<String, Object>> proList = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where pn.PROGRESS_STATUS_ID ='0099799190825106800' and  PM_PRJ_ID=?", projectId);
         list.forEach(item -> {
             String postId = JdbcMapUtil.getString(item, "POST_INFO_ID");
             if (!Strings.isNullOrEmpty(postId)) {
