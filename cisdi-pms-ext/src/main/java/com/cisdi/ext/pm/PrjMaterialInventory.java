@@ -318,6 +318,7 @@ public class PrjMaterialInventory {
 
 
 
+        PrjInventoryDetail.deleteByWhere(new Where().eq(PrjInventoryDetail.Cols.PRJ_INVENTORY_ID,inventoryId));//临时改动
         //绑定文件
         String[] fileIdArr = fileIds.split(",");
         for (String fileId : fileIdArr) {
