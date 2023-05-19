@@ -6,9 +6,11 @@ import com.cisdi.ext.base.GrSetValue;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.commons.HttpClient;
 import com.cisdi.ext.model.PoOrderReq;
+import com.cisdi.ext.model.PoOrderSupplementReq;
 import com.cisdi.ext.model.view.order.PoOrderReqView;
 import com.cisdi.ext.pm.ProcessCommon;
 import com.cisdi.ext.pm.orderManage.detail.PoOrderPrjDetailExt;
+import com.cisdi.ext.pm.orderManage.detail.PoOrderSupplementPrjDetailExt;
 import com.cisdi.ext.util.*;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -456,18 +458,61 @@ public class PoOrderReqExt {
      * 合同签订-非系统项目转系统项目
      */
     public void noSystemPrjCode(){
-        List<PoOrderReq> list = PoOrderReq.selectByWhere(new Where().nin(PoOrderReq.Cols.STATUS,"VD","VDING")
+
+        // 非系统项目转系统项目
+        List<PoOrderReq> list1 = PoOrderReq.selectByWhere(new Where()
+                .nin(PoOrderReq.Cols.STATUS,"VD","VDING")
                 .eq(PoOrderReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
-        if (!CollectionUtils.isEmpty(list)){
-            for (PoOrderReq tmp : list) {
-                String poOrderReqId = tmp.getId();
+        if (!CollectionUtils.isEmpty(list1)){
+            for (PoOrderReq tmp : list1) {
                 String projectName = tmp.getProjectNameWr();
                 String projectId = PmPrjExt.createPrjByMoreName(projectName);
-                Crud.from("po_order_req").where().eq("id",poOrderReqId).update()
-                        .set("PM_PRJ_IDS",projectId)
+                String id = tmp.getId();
+                Crud.from(PoOrderReq.ENT_CODE).where().eq(PoOrderReq.Cols.ID,id).update()
+                        .set(PoOrderReq.Cols.PM_PRJ_IDS,projectId)
                         .exec();
             }
         }
+
+        //系统项目id写入pm_prj_ids
+        List<PoOrderReq> list2 = PoOrderReq.selectByWhere(new Where()
+                .nin(PoOrderReq.Cols.STATUS,"VD","VDING")
+                .neq(PoOrderReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
+        if (!CollectionUtils.isEmpty(list2)){
+            for (PoOrderReq tp : list2) {
+                String id = tp.getId();
+                String projectId = tp.getPmPrjId();
+                Crud.from(PoOrderReq.ENT_CODE).where().eq(PoOrderReq.Cols.ID,id).update()
+                        .set(PoOrderReq.Cols.PM_PRJ_IDS,projectId)
+                        .exec();
+            }
+        }
+
+        //已批准流程项目id写入明细表
+        List<PoOrderReq> list3 = PoOrderReq.selectByWhere(new Where().eq(PoOrderReq.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list3)){
+            for (PoOrderReq tmp : list3) {
+                String id = tmp.getId();
+                String projectId = tmp.getPmPrjIds();
+                if (SharedUtil.isEmptyString(projectId)){
+                    projectId = tmp.getPmPrjId();
+                }
+                PoOrderPrjDetailExt.insertData(id,projectId);
+            }
+        }
+
+//        List<PoOrderReq> list = PoOrderReq.selectByWhere(new Where().nin(PoOrderReq.Cols.STATUS,"VD","VDING")
+//                .eq(PoOrderReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
+//        if (!CollectionUtils.isEmpty(list)){
+//            for (PoOrderReq tmp : list) {
+//                String poOrderReqId = tmp.getId();
+//                String projectName = tmp.getProjectNameWr();
+//                String projectId = PmPrjExt.createPrjByMoreName(projectName);
+//                Crud.from("po_order_req").where().eq("id",poOrderReqId).update()
+//                        .set("PM_PRJ_IDS",projectId)
+//                        .exec();
+//            }
+//        }
     }
 
     /**
