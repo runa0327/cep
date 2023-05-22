@@ -522,4 +522,26 @@ public class ProcessCommon {
             }
         }
     }
+
+    /**
+     * 流程通用-多项目流程实时校验更新项目明细
+     */
+    public void checkProcessPrjDetail(){
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        String pmPrjIds = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
+        String csCommId = entityRecord.csCommId;
+        String[] prjArr = pmPrjIds.split(",");
+        if (prjArr.length > 0 && prjArr != null){
+            String detailCode = entCode + "_PRJ_DETAIL";
+            String parentId = entCode + "_ID";
+            Crud.from(detailCode).where().eq(parentId,csCommId).delete().exec();
+            for (String tp : prjArr) {
+                String id = Crud.from(detailCode).insertData();
+                Crud.from(detailCode).where().eq("ID",id).update()
+                        .set(parentId,csCommId).set("PM_PRJ_ID",tp)
+                        .exec();
+            }
+        }
+    }
 }

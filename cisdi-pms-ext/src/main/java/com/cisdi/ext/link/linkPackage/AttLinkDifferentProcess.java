@@ -279,4 +279,14 @@ public class AttLinkDifferentProcess {
         list.add("PM_PRJ_RED_CHECK_REQ"); //项目红线核查
         return list;
     }
+
+    /**
+     * 需要判断登录人所在岗位的流程
+     * @return list集合
+     */
+    public static List<String> getUserPost() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_BUY_DEMAND_REQ"); //采购需求审批
+        return list;
+    }
 }
