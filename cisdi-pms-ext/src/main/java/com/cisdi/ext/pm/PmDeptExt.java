@@ -12,6 +12,7 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
@@ -44,6 +45,49 @@ public class PmDeptExt {
                 "PM_PRJ_ID=?,USER_IDS=?,HR_DEPT_ID=? where id = ?";
         myJdbcTemplate.update(sql,userId,userId,projectId,userIds,deptId,id);
 
+    }
+
+    /**
+     * 根据人员id和业主单位查询部门编码
+     * @param userId 用户id
+     * @param companyId 业主单位id
+     * @return 部门编码
+     */
+    public static String getUserPostIdByDeptId(String userId, String companyId,MyJdbcTemplate myJdbcTemplate) {
+        String postId = "", postCode = "";
+        String sql = "select case " +
+                "when (select t.hr_dept_id from hr_dept_user t where 1=1 and t.ad_user_id=? and t.CUSTOMER_UNIT = ? and t.SYS_TRUE= 1 and t.status = 'AP' order by t.CRT_DT desc limit 1) is null " +
+                "then (select t.hr_dept_id from hr_dept_user t where 1=1 and t.ad_user_id=? and t.CUSTOMER_UNIT = ? and t.SYS_TRUE != 1 and t.status = 'AP' order by t.CRT_DT asc limit 1) " +
+                "else (select t.hr_dept_id from hr_dept_user t where 1=1 and t.ad_user_id=? and t.CUSTOMER_UNIT = ? and t.SYS_TRUE= 1 and t.status = 'AP' order by t.CRT_DT desc limit 1) end";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,userId,companyId,userId,companyId,userId,companyId);
+        if (!CollectionUtils.isEmpty(list)){
+            postId = JdbcMapUtil.getString(list.get(0),"hr_dept_id");
+        }
+        if (SharedUtil.isEmptyString(postId)){
+            postCode = HrDept.selectByWhere(new Where().eq(HrDept.Cols.ID,postId)).get(0).getCode();
+        }
+        return postCode;
+    }
+
+    /**
+     * 根据部门编码转岗位id
+     * @param deptCode 部门编码
+     * @return 岗位id
+     */
+    public static String getPostIdByDept(String deptCode) {
+        String deptId = "";
+        if ("post_early".equals(deptCode)){ //前期报建岗
+            deptId = "1633731474912055296";
+        } else if ("post_buy".equals(deptCode)){ // 采购管理岗
+            deptId = "1635196942323789824";
+        } else if ("post_engineering".equals(deptCode)){ // 工程管理岗
+            deptId = "1633997482885255168";
+        } else if ("post_design".equals(deptCode)){ // 设计管理岗
+            deptId = "1633731282104094720";
+        } else if ("post_cost".equals(deptCode) || "post_contract".equals(deptCode)){ // 成本管理岗
+            deptId = "1633731431354208256";
+        }
+        return deptId;
     }
 
     /**
