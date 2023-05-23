@@ -2,14 +2,12 @@ package com.cisdi.pms.job.history;
 
 import com.cisdi.pms.job.excel.export.BaseController;
 import com.cisdi.pms.job.utils.StringUtils;
+import com.cisdi.pms.job.utils.Util;
 import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -93,6 +91,7 @@ public class PlanOperationController extends BaseController {
      */
     public List<String> dealWithData(Row headRow, Row dataRow) {
         List<String> res = new ArrayList<>();
+        //先判断项目名称是不是为空
         Cell cell = dataRow.getCell(1);
         if (cell != null) {
             String projectName = cell.toString();
@@ -103,27 +102,41 @@ public class PlanOperationController extends BaseController {
                 int rowNum1 = dataRow.getLastCellNum() - dataRow.getFirstCellNum();
                 for (int i = 2; i < rowNum1; i++) {
                     String headOrg = headRow.getCell(i).toString();
-                    List<Map<String, Object>> nodeList = jdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.ID where PM_PRJ_ID=? and pn.`NAME`=?", projectId, headOrg);
-                    if (!CollectionUtils.isEmpty(nodeList)) {
-                        Map<String, Object> nodeMap = nodeList.get(0);
-                        Object obj = dataRow.getCell(i);
+                    Object obj = dataRow.getCell(i);
+                    if ("备注".equals(headOrg)) {
+                        String projectRemark = null;
                         if (null != obj) {
-                            if (!"/".equals(obj.toString())) {
-                                if ("完成".equals(obj.toString())) {
-                                    jdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=? where id=?", COMPLETED, nodeMap.get("ID"));
-                                } else {
-                                    String[] split = obj.toString().split("\\.");
-                                    String dateOrg = split[0] + "-" + StringUtils.addZeroForNum(split[1], 2) + "-" + split[2];
-                                    Date comDate = DateTimeUtil.stringToDate(dateOrg);
-                                    jdbcTemplate.update("update pm_pro_plan_node set ACTUAL_COMPL_DATE=?,PROGRESS_STATUS_ID=? where id=?", comDate, COMPLETED, nodeMap.get("ID"));
+                            projectRemark = obj.toString();
+                        }
+                        insertRemark(projectId, null, projectRemark, "1");
+                    } else {
+                        List<Map<String, Object>> nodeList = jdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.ID where PM_PRJ_ID=? and pn.`NAME`=?", projectId, headOrg);
+                        if (!CollectionUtils.isEmpty(nodeList)) {
+                            Map<String, Object> nodeMap = nodeList.get(0);
+                            if (null != obj) {
+                                if (!"/".equals(obj.toString())) {
+                                    if ("完成".equals(obj.toString())) {
+                                        jdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=? where id=?", COMPLETED, nodeMap.get("ID"));
+                                    } else {
+                                        String[] split = obj.toString().split("\\.");
+                                        String dateOrg = split[0] + "-" + StringUtils.addZeroForNum(split[1], 2) + "-" + split[2];
+                                        Date comDate = DateTimeUtil.stringToDate(dateOrg);
+                                        jdbcTemplate.update("update pm_pro_plan_node set ACTUAL_COMPL_DATE=?,PROGRESS_STATUS_ID=? where id=?", comDate, COMPLETED, nodeMap.get("ID"));
+                                    }
                                 }
                             }
+                            //处理批注
+                            Comment cellComment = dataRow.getCell(i).getCellComment();
+                            if (cellComment != null) {
+                                String commentStr = cellComment.getString().toString();
+                                insertRemark(projectId, JdbcMapUtil.getString(nodeMap, "SCHEDULE_NAME"), commentStr, "2");
+                            }
+
+
+                        } else {
+                            res.add("序号为:" + dataRow.getCell(0) + "的数据，全景节点【" + headOrg + "】不存在！");
                         }
-
-                    } else {
-                        res.add("序号为:" + dataRow.getCell(0) + "的数据，全景节点【" + headOrg + "】不存在！");
                     }
-
                 }
                 for (int i = 0; i < 5; i++) {
                     refreshNodeStatus(projectId);
@@ -174,5 +187,23 @@ public class PlanOperationController extends BaseController {
                 }
             }
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 新增备注信息
+     *
+     * @param projectId
+     * @param baseNodeId
+     * @param content
+     * @param type       1-项目备注 2-节点备注
+     */
+    private void insertRemark(String projectId, String baseNodeId, String content, String type) {
+        String id = Util.insertData(jdbcTemplate, "REMARK_INFO");
+        if ("1".equals(type)) {
+            jdbcTemplate.update("update REMARK_INFO set PM_PRJ_ID=?,CONTENT=?,SUBMIT_TIME=?,REMARK_TYPE=1 where id=?", projectId, content, new Date(), id);
+        } else {
+            jdbcTemplate.update("update REMARK_INFO set PM_PRJ_ID=?,CONTENT=?,SUBMIT_TIME=?,REMARK_TYPE=2,SCHEDULE_NAME=? where id=?", projectId, content, new Date(), baseNodeId, id);
+        }
+
     }
 }
