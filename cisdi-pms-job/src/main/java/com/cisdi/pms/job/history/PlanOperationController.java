@@ -121,7 +121,7 @@ public class PlanOperationController extends BaseController {
                         }
 
                     } else {
-                        res.add("序号为:" + dataRow.getCell(0) + "的数据，全景节点不存在！");
+                        res.add("序号为:" + dataRow.getCell(0) + "的数据，全景节点【" + headOrg + "】不存在！");
                     }
 
                 }
