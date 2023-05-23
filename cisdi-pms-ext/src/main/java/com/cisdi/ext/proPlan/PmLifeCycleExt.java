@@ -150,7 +150,7 @@ public class PmLifeCycleExt {
                     newData.put("ID", json);
                 } else if ("前期手续经办人".equals(s)) {
                     JSONObject json = new JSONObject();
-                    json.put("nameOrg", stringObjectMap.get("qqusers"));
+                    json.put("nameOrg", stringObjectMap.get("qquser"));
                     newData.put("前期手续经办人", json);
                 } else if ("备注说明".equals(s)) {
                     JSONObject json = new JSONObject();
