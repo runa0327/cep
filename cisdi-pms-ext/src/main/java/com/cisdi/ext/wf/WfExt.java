@@ -177,22 +177,7 @@ public class WfExt {
                                     "set a.name = concat(b.name,'-',d.name,'-',e.name,'-',now()) where c.id = ?";
                             int update1 = myJdbcTemplate.update(sql, csCommId);
                             update1 = myJdbcTemplate.update("update pm_bid_keep_file_req a LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id set a.name = b.name where a.id = ?",csCommId);
-                        }
-//                        else if ("BID_PROCESS_MANAGE".equals(entityCode)){
-//                            String sysPrjSql = "update wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id LEFT JOIN BID_PROCESS_MANAGE c on a.id = c.LK_WF_INST_ID " +
-//                                    "LEFT JOIN pm_prj d on c.PM_PRJ_ID = d.id LEFT JOIN ad_user e on c.CRT_USER_ID = e.id " +
-//                                    "set a.name = concat(b.name,'-',d.name,'-',e.name,'-',now()) where c.id = ?";
-//                            String notSysPrjSql = "update wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id LEFT JOIN BID_PROCESS_MANAGE c on a.id = c.LK_WF_INST_ID " +
-//                                    "LEFT JOIN ad_user e on c.CRT_USER_ID = e.id " +
-//                                    "set a.name = concat(b.name,'-',?,'-',e.name,'-',now()) where c.id = ?";
-//                            String notSysPrj = JdbcMapUtil.getString(entityRecord.valueMap, "PROJECT_NAME_WR");
-//                            if (Strings.isNullOrEmpty(notSysPrj)){
-//                                myJdbcTemplate.update(sysPrjSql,csCommId);
-//                            }else {
-//                                myJdbcTemplate.update(notSysPrjSql,notSysPrj,csCommId);
-//                            }
-//                        }
-                        else {
+                        } else {
                             String sql1 = "select a.NAME from wf_process_instance a left join " + entityCode + " b on a.id = b.LK_WF_INST_ID where " +
                                     "b.id = ?";
                             List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql1, csCommId);
@@ -1614,6 +1599,10 @@ public class WfExt {
         list.add("PM_LANDSCAPE_REQ"); //园林景观工程
         list.add("PM_ORGAN_SYS_DEBUG_REQ"); //组织系统联合调试
         list.add("PM_HOUSE_CADASTRE_REQ"); //房屋、地籍实测
+        list.add("PM_SEWAGE_REQ"); //污水工程
+        list.add("PM_RAIN_REQ"); //雨水工程
+        list.add("PM_PIPE_GALLERY_REQ"); //管廊工程
+        list.add("PM_ROAD_BASE_REQ"); //路面基层(碎石层与水稳层)
         return list;
     }
 
