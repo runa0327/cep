@@ -350,6 +350,8 @@ public class PmStartExt {
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("PM_SEQ", seq).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
                     .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID","0099799190825080706").set("IZ_FORMAL_PRJ",1).exec();
+            //为项目添加清单
+            PrjMaterialInventory.addPrjInventory(projectId);
         } else {
             projectId = String.valueOf(list.get(0).get("ID"));
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", dataMap.get("NAME")).set("PM_CODE", prjCode)
@@ -413,8 +415,6 @@ public class PmStartExt {
         PrjPlanUtil.refreshProPlanTime(projectId, JdbcMapUtil.getDate(dataMap, "START_TIME"));
         //发送本周任务
         sendWeekTask(projectId);
-        //为项目添加清单
-        PrjMaterialInventory.addPrjInventory(projectId);
     }
 
     /**

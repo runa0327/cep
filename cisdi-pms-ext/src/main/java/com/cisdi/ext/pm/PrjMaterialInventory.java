@@ -37,7 +37,7 @@ public class PrjMaterialInventory {
      */
     public void initPrjInventory() {
         //清空历史数据
-        emptyInventory();
+//        emptyInventory();
 
         List<PmPrj> pmPrjs = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.STATUS, "AP"));
         List<MaterialInventoryType> materialInventoryTypes = MaterialInventoryType.selectByWhere(new Where().eq(MaterialInventoryType.Cols.STATUS, "AP"));
