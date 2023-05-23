@@ -746,4 +746,11 @@ public class PmBuyDemandReqExt {
         }
         return postInfoId;
     }
+
+    /**
+     * 历史数据处理-多项目/元
+     */
+    public void buyDemandHistory(){
+        
+    }
 }

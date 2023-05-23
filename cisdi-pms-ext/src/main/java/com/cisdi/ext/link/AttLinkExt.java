@@ -1769,27 +1769,9 @@ public class AttLinkExt {
             Boolean changeToMandatory = false; //是否必填
             String value = "";
             String text = "";
-            String projectId = JdbcMapUtil.getString(param.valueMap, "PM_PRJ_ID");
-            String projectIdWr = JdbcMapUtil.getString(param.valueMap, "PROJECT_NAME_WR");
-            String typeId = JdbcMapUtil.getString(param.valueMap,"PROJECT_SOURCE_TYPE_ID"); //0099952822476441375=非立项
-            String typeCode = getGrSetCode(myJdbcTemplate,typeId);
-            if (Strings.isNullOrEmpty(projectId) && SharedUtil.isEmptyString(projectIdWr)){
-                throw new BaseException("项目信息不能为空！");
-            }
-            if ("non_system".equals(typeCode)){
-                changeToMandatory = false;
-                changeToEditable = true;
-                //采购启动依据文件
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.FILE_GROUP;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-                    linkedAtt.changeToMandatory = false;
-                    linkedAtt.changeToEditable = true;
-                    linkedAtt.fileInfoList = null;
-                    attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
-                }
+            String projectId = JdbcMapUtil.getString(param.valueMap, "PM_PRJ_IDS");
+            if (projectId.contains(",")){
+                return attLinkResult;
             }
             if ("meeting_minutes".equals(code) || "other".equals(code) || "start_up_letter".equals(code)){
                 changeToEditable = true;
@@ -1812,7 +1794,7 @@ public class AttLinkExt {
                 String sql = "";
                 String fileValue = "";
                 if ("project_initiation".equals(code)){
-                    sql = "select PRJ_REPLY_NO as REPLY_NO_WR,REPLY_FILE as file from pm_prj_req WHERE PRJ_NAME = (select name from pm_prj WHERE id = ?) and `STATUS` = 'ap' order by CRT_DT desc limit 1";
+                    sql = "select PRJ_REPLY_NO as REPLY_NO_WR,REPLY_FILE as file from pm_prj_req WHERE pm_prj_id = ? and `STATUS` = 'ap' order by CRT_DT desc limit 1";
                 } else if ("feasibility_study".equals(code)){
                     sql = "select REPLY_NO_WR,REPLY_FILE as file from PM_PRJ_INVEST1 WHERE pm_prj_id = ? and status = 'ap' order by CRT_DT desc limit 1";
                 } else if ("preliminary_outline".equals(code)){

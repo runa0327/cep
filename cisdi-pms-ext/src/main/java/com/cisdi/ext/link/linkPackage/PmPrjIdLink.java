@@ -113,16 +113,6 @@ public class PmPrjIdLink {
                     nodeDetail(attValue,sevId,attLinkResult,myJdbcTemplate);
                 }
 
-
-                //所属部门会变化的流程
-                List<String> autoDeptList = AttLinkDifferentProcess.getAutoGetDept();
-
-                //当前操作人在在该项目中的岗位>所在部门，判断岗位信息
-                List<String> userPostList = AttLinkDifferentProcess.getUserPost();
-                if (userPostList.contains(entCode)){
-                    checkUserPost(attValue,companyId,attLinkResult,myJdbcTemplate);
-                }
-
                 //需要自动岗位人员的流程
                 List<String> processUserList = AttLinkDifferentProcess.getLinkUserProcess();
                 if (processUserList.contains(entCode)){ //岗位自动人员
