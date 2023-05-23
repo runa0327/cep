@@ -136,6 +136,10 @@ public class PmBuyDemandReq {
          */
         public static final String BUDGET_AMT = "BUDGET_AMT";
         /**
+         * 金额5(存元)。
+         */
+        public static final String AMT_FIVE = "AMT_FIVE";
+        /**
          * 采购岗用户。
          */
         public static final String AD_USER_TWO_ID = "AD_USER_TWO_ID";
@@ -172,6 +176,10 @@ public class PmBuyDemandReq {
          */
         public static final String FILE_ID_FOUR = "FILE_ID_FOUR";
         /**
+         * 金额6(存元)。
+         */
+        public static final String AMT_SIX = "AMT_SIX";
+        /**
          * 付款金额（万）。
          */
         public static final String PAY_AMT_ONE = "PAY_AMT_ONE";
@@ -179,6 +187,10 @@ public class PmBuyDemandReq {
          * 付款金额。
          */
         public static final String PAY_AMT_TWO = "PAY_AMT_TWO";
+        /**
+         * 金额7(存元)。
+         */
+        public static final String AMT_SEVEN = "AMT_SEVEN";
         /**
          * 附件2。
          */
@@ -216,9 +228,9 @@ public class PmBuyDemandReq {
          */
         public static final String APPROVAL_COMMENT_THREE = "APPROVAL_COMMENT_THREE";
         /**
-         * 分管领导(多选)。
+         * 岗位信息(多选)。
          */
-        public static final String CHARGE_USER_IDS = "CHARGE_USER_IDS";
+        public static final String POST_INFO_IDS = "POST_INFO_IDS";
         /**
          * 备注1。
          */
@@ -1047,6 +1059,42 @@ public class PmBuyDemandReq {
     }
 
     /**
+     * 金额5(存元)。
+     */
+    private BigDecimal amtFive;
+
+    /**
+     * 获取：金额5(存元)。
+     */
+    public BigDecimal getAmtFive() {
+        return this.amtFive;
+    }
+
+    /**
+     * 设置：金额5(存元)。
+     */
+    public PmBuyDemandReq setAmtFive(BigDecimal amtFive) {
+        if (this.amtFive == null && amtFive == null) {
+            // 均为null，不做处理。
+        } else if (this.amtFive != null && amtFive != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.amtFive.compareTo(amtFive) != 0) {
+                this.amtFive = amtFive;
+                if (!this.toUpdateCols.contains("AMT_FIVE")) {
+                    this.toUpdateCols.add("AMT_FIVE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.amtFive = amtFive;
+            if (!this.toUpdateCols.contains("AMT_FIVE")) {
+                this.toUpdateCols.add("AMT_FIVE");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 采购岗用户。
      */
     private String adUserTwoId;
@@ -1371,6 +1419,42 @@ public class PmBuyDemandReq {
     }
 
     /**
+     * 金额6(存元)。
+     */
+    private BigDecimal amtSix;
+
+    /**
+     * 获取：金额6(存元)。
+     */
+    public BigDecimal getAmtSix() {
+        return this.amtSix;
+    }
+
+    /**
+     * 设置：金额6(存元)。
+     */
+    public PmBuyDemandReq setAmtSix(BigDecimal amtSix) {
+        if (this.amtSix == null && amtSix == null) {
+            // 均为null，不做处理。
+        } else if (this.amtSix != null && amtSix != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.amtSix.compareTo(amtSix) != 0) {
+                this.amtSix = amtSix;
+                if (!this.toUpdateCols.contains("AMT_SIX")) {
+                    this.toUpdateCols.add("AMT_SIX");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.amtSix = amtSix;
+            if (!this.toUpdateCols.contains("AMT_SIX")) {
+                this.toUpdateCols.add("AMT_SIX");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 付款金额（万）。
      */
     private BigDecimal payAmtOne;
@@ -1437,6 +1521,42 @@ public class PmBuyDemandReq {
             this.payAmtTwo = payAmtTwo;
             if (!this.toUpdateCols.contains("PAY_AMT_TWO")) {
                 this.toUpdateCols.add("PAY_AMT_TWO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 金额7(存元)。
+     */
+    private BigDecimal amtSeven;
+
+    /**
+     * 获取：金额7(存元)。
+     */
+    public BigDecimal getAmtSeven() {
+        return this.amtSeven;
+    }
+
+    /**
+     * 设置：金额7(存元)。
+     */
+    public PmBuyDemandReq setAmtSeven(BigDecimal amtSeven) {
+        if (this.amtSeven == null && amtSeven == null) {
+            // 均为null，不做处理。
+        } else if (this.amtSeven != null && amtSeven != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.amtSeven.compareTo(amtSeven) != 0) {
+                this.amtSeven = amtSeven;
+                if (!this.toUpdateCols.contains("AMT_SEVEN")) {
+                    this.toUpdateCols.add("AMT_SEVEN");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.amtSeven = amtSeven;
+            if (!this.toUpdateCols.contains("AMT_SEVEN")) {
+                this.toUpdateCols.add("AMT_SEVEN");
             }
         }
         return this;
@@ -1767,36 +1887,36 @@ public class PmBuyDemandReq {
     }
 
     /**
-     * 分管领导(多选)。
+     * 岗位信息(多选)。
      */
-    private String chargeUserIds;
+    private String postInfoIds;
 
     /**
-     * 获取：分管领导(多选)。
+     * 获取：岗位信息(多选)。
      */
-    public String getChargeUserIds() {
-        return this.chargeUserIds;
+    public String getPostInfoIds() {
+        return this.postInfoIds;
     }
 
     /**
-     * 设置：分管领导(多选)。
+     * 设置：岗位信息(多选)。
      */
-    public PmBuyDemandReq setChargeUserIds(String chargeUserIds) {
-        if (this.chargeUserIds == null && chargeUserIds == null) {
+    public PmBuyDemandReq setPostInfoIds(String postInfoIds) {
+        if (this.postInfoIds == null && postInfoIds == null) {
             // 均为null，不做处理。
-        } else if (this.chargeUserIds != null && chargeUserIds != null) {
+        } else if (this.postInfoIds != null && postInfoIds != null) {
             // 均非null，判定不等，再做处理：
-            if (this.chargeUserIds.compareTo(chargeUserIds) != 0) {
-                this.chargeUserIds = chargeUserIds;
-                if (!this.toUpdateCols.contains("CHARGE_USER_IDS")) {
-                    this.toUpdateCols.add("CHARGE_USER_IDS");
+            if (this.postInfoIds.compareTo(postInfoIds) != 0) {
+                this.postInfoIds = postInfoIds;
+                if (!this.toUpdateCols.contains("POST_INFO_IDS")) {
+                    this.toUpdateCols.add("POST_INFO_IDS");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.chargeUserIds = chargeUserIds;
-            if (!this.toUpdateCols.contains("CHARGE_USER_IDS")) {
-                this.toUpdateCols.add("CHARGE_USER_IDS");
+            this.postInfoIds = postInfoIds;
+            if (!this.toUpdateCols.contains("POST_INFO_IDS")) {
+                this.toUpdateCols.add("POST_INFO_IDS");
             }
         }
         return this;

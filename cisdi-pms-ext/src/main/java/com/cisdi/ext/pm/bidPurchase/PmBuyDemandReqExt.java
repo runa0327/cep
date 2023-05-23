@@ -1,16 +1,19 @@
 package com.cisdi.ext.pm.bidPurchase;
 
 import cn.hutool.core.util.IdUtil;
+import com.cisdi.ext.base.PmPrjExt;
+import com.cisdi.ext.model.PmBuyDemandReq;
 import com.cisdi.ext.model.PmRoster;
-import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.pm.ProcessCommon;
 import com.cisdi.ext.pm.ProcessRoleExt;
+import com.cisdi.ext.pm.bidPurchase.detail.PmBuyDemandReqPrjDetailExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -701,9 +704,9 @@ public class PmBuyDemandReqExt {
     public void buyDemandEnd(){
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        //成本岗、采购岗、财务岗人员信息写入花名册
-        List<PmRoster> rosterList = getRosterList(entityRecord, myJdbcTemplate);
-        PmRosterExt.updatePrjUser(rosterList);
+        //成本岗、采购岗、财务岗人员信息写入花名册 不写入花名册 暂不删除该代码
+        /** List<PmRoster> rosterList = getRosterList(entityRecord, myJdbcTemplate);
+        PmRosterExt.updatePrjUser(rosterList); **/
     }
 
     /**
@@ -748,9 +751,51 @@ public class PmBuyDemandReqExt {
     }
 
     /**
-     * 历史数据处理-多项目/元
+     * 历史数据处理-多项目
      */
     public void buyDemandHistory(){
-        
+        // 非系统项目转系统项目
+        List<PmBuyDemandReq> list1 = PmBuyDemandReq.selectByWhere(new Where()
+                .nin(PmBuyDemandReq.Cols.STATUS,"VD","VDING")
+                .eq(PmBuyDemandReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
+        if (!CollectionUtils.isEmpty(list1)){
+            for (PmBuyDemandReq tmp : list1) {
+                String projectName = tmp.getProjectNameWr();
+                String projectId = PmPrjExt.createPrjByMoreName(projectName);
+                String id = tmp.getId();
+                Crud.from(PmBuyDemandReq.ENT_CODE).where().eq(PmBuyDemandReq.Cols.ID,id).update()
+                        .set(PmBuyDemandReq.Cols.PM_PRJ_IDS,projectId)
+                        .exec();
+            }
+        }
+
+        //系统项目id写入pm_prj_ids
+        List<PmBuyDemandReq> list2 = PmBuyDemandReq.selectByWhere(new Where()
+                .nin(PmBuyDemandReq.Cols.STATUS,"VD","VDING")
+                .neq(PmBuyDemandReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
+        if (!CollectionUtils.isEmpty(list2)){
+            for (PmBuyDemandReq tp : list2) {
+                String id = tp.getId();
+                String projectId = tp.getPmPrjId();
+                Crud.from(PmBuyDemandReq.ENT_CODE).where().eq(PmBuyDemandReq.Cols.ID,id).update()
+                        .set(PmBuyDemandReq.Cols.PM_PRJ_IDS,projectId)
+                        .exec();
+            }
+        }
+
+        //已批准流程项目id写入明细表
+        List<PmBuyDemandReq> list3 = PmBuyDemandReq.selectByWhere(new Where().eq(PmBuyDemandReq.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list3)){
+            for (PmBuyDemandReq tmp : list3) {
+                String id = tmp.getId();
+                String projectId = tmp.getPmPrjIds();
+                if (SharedUtil.isEmptyString(projectId)){
+                    projectId = tmp.getPmPrjId();
+                }
+                if (!SharedUtil.isEmptyString(projectId)){
+                    PmBuyDemandReqPrjDetailExt.insertData(id,projectId);
+                }
+            }
+        }
     }
 }
