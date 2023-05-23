@@ -9,6 +9,7 @@ import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Update;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
@@ -35,10 +36,14 @@ public class FundImplementationApi {
             id = Crud.from("fund_implementation").insertData();
         }
         //更新落实表
-        Crud.from("fund_implementation").where().eq("ID", id).update().set("REMARK", fundImplementation.remark)
+        Update updateValue = Crud.from("fund_implementation").where().eq("ID", id).update().set("REMARK", fundImplementation.remark)
                 .set("FUND_SOURCE_TEXT", fundImplementation.fundSourceText).set("FUND_CATEGORY_FIRST", fundImplementation.fundCategoryFirst)
                 .set("FUND_CATEGORY_SECOND", fundImplementation.fundCategorySecond).set("DECLARED_AMOUNT", fundImplementation.declaredAmount)
-                .set("APPROVAL_TIME", fundImplementation.approvalTime).set("ATT_FILE_GROUP_ID", fundImplementation.attFileGroupId).exec();
+                .set("ATT_FILE_GROUP_ID", fundImplementation.attFileGroupId);
+        if (!Strings.isNullOrEmpty(fundImplementation.approvalTime)){
+            updateValue.set("APPROVAL_TIME", fundImplementation.approvalTime);
+        }
+        updateValue.exec();
         //删除明细
         Crud.from("fund_implementation_detail").where().eq("FUND_IMPLEMENTATION_ID", id).delete().exec();
         //插入明细表
