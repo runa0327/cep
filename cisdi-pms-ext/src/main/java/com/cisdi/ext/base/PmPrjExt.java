@@ -366,4 +366,19 @@ public class PmPrjExt {
         sb.deleteCharAt(sb.length()-1);
         return sb.toString();
     }
+
+    /**
+     * 项目库系统写入项目启动/项目谋划
+     */
+    public void prjInsertStart(){
+        List<PmPrj> prjList = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.STATUS,"AP")
+                .eq(PmPrj.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441374"));
+        if (!CollectionUtils.isEmpty(prjList)){
+            for (PmPrj tmp : prjList) {
+                String prjCode = tmp.getPmCode();
+                String prjName = tmp.getName();
+                //通过名称和code查询项目启动中是否存在
+            }
+        }
+    }
 }
