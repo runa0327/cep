@@ -1446,4 +1446,12 @@ public class ProPlanExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         myJdbcTemplate.update("update PM_PRO_PLAN_NODE set IZ_DISPLAY=? where id=?", map.get("izDisplay"), map.get("nodeId"));
     }
+
+    /**
+     * 刷新项目全景
+     */
+    public void initPrjProPlan() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map
+        PrjPlanUtil.createPlan(JdbcMapUtil.getString(map, "projectId"), null, null, null, null);
+    }
 }
