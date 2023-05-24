@@ -170,7 +170,6 @@ public class PmBuyDemandReqExt {
                 if (!SharedUtil.isEmptyString(txt)){
                     comment = comment.append(JdbcMapUtil.getString(tmp,"u_name")).append("： ").append(txt).append("\n");
                 }
-
             }
         }
         if ("buyDemandCostCheck".equals(status)){ //成本岗采购岗审批
@@ -213,8 +212,8 @@ public class PmBuyDemandReqExt {
             log.info("已更新：{}", exec);
         } else if("detail".equals(status)){
             //获取预算金额下限 预算金额上线限
-            BigDecimal min = new BigDecimal(entityRecord.valueMap.get("PAY_AMT_ONE").toString());
-            BigDecimal max = new BigDecimal(entityRecord.valueMap.get("PAY_AMT_TWO").toString());
+            BigDecimal min = new BigDecimal(entityRecord.valueMap.get("AMT_SIX").toString());
+            BigDecimal max = new BigDecimal(entityRecord.valueMap.get("AMT_SEVEN").toString());
             if (min.compareTo(max) == 1){
                 throw new BaseException("预算金额下限不能超过预算金额上限");
             }
