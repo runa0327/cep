@@ -23,6 +23,6 @@
         WHERE
             a.STATUS = 'ap'
           AND b.STATUS = 'ap'
-          AND A.POST_INFO_ID IS NOT NULL
+          AND A.POST_INFO_ID = '1633997482885255168'
     </select>
 </mapper>
