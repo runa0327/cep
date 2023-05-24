@@ -440,7 +440,7 @@ public class ProgressWeekReport {
                 "and ad_user_id is not null GROUP BY PM_PRJ_ID,ad_user_id) d on b.pm_prj_id = d.PM_PRJ_ID " +
                 "left join pm_prj e on b.pm_prj_id = e.id " +
                 "LEFT JOIN ad_user f ON d.ad_user_id = f.id " +
-                "where a.status = 'ap' and b.status = 'ap' and c.status = 'ap' and b.IS_WEEKLY_REPORT_SUBMIT = 1 and a.IS_WEEKLY_REPORT_SUBMIT = 1 and f.name is not null ";
+                "where a.status = 'ap' and b.status = 'ap' and c.status = 'ap' and f.name is not null ";
         StringBuilder sb = new StringBuilder(sql);
         if (!SharedUtil.isEmptyString(weekId)){
             sb.append(" and c.id = '").append(weekId).append("' "); // 周-批次id
