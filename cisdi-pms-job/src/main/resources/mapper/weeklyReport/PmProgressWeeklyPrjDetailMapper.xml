@@ -64,6 +64,7 @@
         a.STATUS = 'ap'
         AND b.STATUS = 'ap'
         AND c.STATUS = 'ap'
+        AND F.NAME IS NOT NULL
         <if test="weatherStart != null">
             and b.SYS_TRUE = #{weatherStart}
         </if>
