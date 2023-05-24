@@ -2,11 +2,8 @@ package com.cisdi.ext.pm;
 
 import cn.hutool.core.annotation.Link;
 import com.cisdi.ext.link.LinkSql;
-import com.cisdi.ext.model.HrDeptUser;
-import com.cisdi.ext.model.PmRoster;
-import com.cisdi.ext.model.PostInfo;
+import com.cisdi.ext.model.*;
 import com.cisdi.ext.util.StringUtil;
-import com.cisdi.ext.model.WfProcessInstance;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -513,13 +510,52 @@ public class ProcessCommon {
      * 流程实例数据作废-作废对应流程表
      */
     public void cancelData(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<WfProcessInstance> list = WfProcessInstance.selectByWhere(new Where().eq(WfProcessInstance.Cols.STATUS,"VD"));
         if (!CollectionUtils.isEmpty(list)){
             for (WfProcessInstance tmp : list) {
+                String mainId = tmp.getId();
                 String id = tmp.getEntityRecordId();
                 String code = tmp.getEntCode();
-                Crud.from(code).where().eq("id",id).update().set("status","VD").exec();
+                List<AdEnt> adEntList = AdEnt.selectByWhere(new Where().eq(AdEnt.Cols.CODE,code));
+                if (!CollectionUtils.isEmpty(adEntList)){
+                    Crud.from(code).where().eq("id",id).update().set("status","VD").exec();
+                }
+                Crud.from(WfProcessInstance.ENT_CODE).where().eq(WfProcessInstance.Cols.ID,mainId).update().set("STATUS","VD").exec();
+                Crud.from("WF_NODE_INSTANCE").where().eq("WF_PROCESS_INSTANCE_ID",mainId).update().set("STATUS","VD").exec();
+                Crud.from("WF_TASK").where().eq("WF_PROCESS_INSTANCE_ID",mainId).update().set("STATUS","VD").exec();
             }
         }
+
+        //正式环境不启用以下代码
+//        List<WfProcessInstance> list2 = WfProcessInstance.selectByWhere(new Where().eq(WfProcessInstance.Cols.STATUS,"AP"));
+//        if (!CollectionUtils.isEmpty(list2)){
+//            for (WfProcessInstance tmp : list2) {
+//                String mainId = tmp.getId();
+//                String id = tmp.getEntityRecordId();
+//                String code = tmp.getEntCode();
+//                List<AdEnt> adEntList = AdEnt.selectByWhere(new Where().eq(AdEnt.Cols.CODE,code));
+//                if (!CollectionUtils.isEmpty(adEntList)){
+//                    String sql = "select id from "+code+" where id = ?";
+//                    List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sql,id);
+//                    if (CollectionUtils.isEmpty(list3)){
+//                        Crud.from(WfProcessInstance.ENT_CODE).where().eq(WfProcessInstance.Cols.ID,mainId).update().set("STATUS","VD").exec();
+//                        Crud.from("WF_NODE_INSTANCE").where().eq("WF_PROCESS_INSTANCE_ID",mainId).update().set("STATUS","VD").exec();
+//                        Crud.from("WF_TASK").where().eq("WF_PROCESS_INSTANCE_ID",mainId).update().set("STATUS","VD").exec();
+//                    } else {
+//                        String id2 = JdbcMapUtil.getString(list3.get(0),"id");
+//                        if (SharedUtil.isEmptyString(id2)){
+//                            Crud.from(WfProcessInstance.ENT_CODE).where().eq(WfProcessInstance.Cols.ID,mainId).update().set("STATUS","VD").exec();
+//                            Crud.from("WF_NODE_INSTANCE").where().eq("WF_PROCESS_INSTANCE_ID",mainId).update().set("STATUS","VD").exec();
+//                            Crud.from("WF_TASK").where().eq("WF_PROCESS_INSTANCE_ID",mainId).update().set("STATUS","VD").exec();
+//                        }
+//                    }
+//                } else {
+//                    Crud.from(WfProcessInstance.ENT_CODE).where().eq(WfProcessInstance.Cols.ID,mainId).update().set("STATUS","VD").exec();
+//                    Crud.from("WF_NODE_INSTANCE").where().eq("WF_PROCESS_INSTANCE_ID",mainId).update().set("STATUS","VD").exec();
+//                    Crud.from("WF_TASK").where().eq("WF_PROCESS_INSTANCE_ID",mainId).update().set("STATUS","VD").exec();
+//                }
+//            }
+//        }
     }
 }

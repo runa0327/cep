@@ -37,7 +37,7 @@ public class PrjMaterialInventory {
      */
     public void initPrjInventory() {
         //清空历史数据
-        emptyInventory();
+//        emptyInventory();
 
         List<PmPrj> pmPrjs = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.STATUS, "AP"));
         List<MaterialInventoryType> materialInventoryTypes = MaterialInventoryType.selectByWhere(new Where().eq(MaterialInventoryType.Cols.STATUS, "AP"));
@@ -161,7 +161,7 @@ public class PrjMaterialInventory {
         int start = pageSize * (pageIndex - 1);
 
 
-        String sql = "select id from pm_prj where status = 'AP' ";
+        String sql = "select id from pm_prj where status = 'AP' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and IZ_FORMAL_PRJ = 1 ";
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("start",start);
         queryParams.put("pageSize",pageSize);
@@ -318,6 +318,7 @@ public class PrjMaterialInventory {
 
 
 
+        PrjInventoryDetail.deleteByWhere(new Where().eq(PrjInventoryDetail.Cols.PRJ_INVENTORY_ID,inventoryId));//临时改动
         //绑定文件
         String[] fileIdArr = fileIds.split(",");
         for (String fileId : fileIdArr) {

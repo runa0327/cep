@@ -3,6 +3,7 @@ package com.cisdi.ext.pm;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.PmPostAppoint;
+import com.cisdi.ext.pm.office.PmNodeAdjustReqExt;
 import com.cisdi.ext.util.*;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -105,6 +106,7 @@ public class PmStartExt {
             } else {
                 pmStart.postProTrue = 0;
             }
+            pmStart.isNodeAdjust = PmNodeAdjustReqExt.getNodeAdjustByPrj(projectId);
             pmStart.projectId = JdbcMapUtil.getString(m, "project_id");
             pmStart.projectName = JdbcMapUtil.getString(m, "project_name");
             pmStart.projectVer = JdbcMapUtil.getString(m, "project_ver");
@@ -122,7 +124,6 @@ public class PmStartExt {
             ExtJarHelper.returnValue.set(outputMap);
         }
     }
-
 
     /**
      * 项目启动详情
@@ -350,6 +351,8 @@ public class PmStartExt {
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("PM_SEQ", seq).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
                     .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID","0099799190825080706").set("IZ_FORMAL_PRJ",1).exec();
+            //为项目添加清单
+            PrjMaterialInventory.addPrjInventory(projectId);
         } else {
             projectId = String.valueOf(list.get(0).get("ID"));
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", dataMap.get("NAME")).set("PM_CODE", prjCode)
@@ -413,8 +416,6 @@ public class PmStartExt {
         PrjPlanUtil.refreshProPlanTime(projectId, JdbcMapUtil.getDate(dataMap, "START_TIME"));
         //发送本周任务
         sendWeekTask(projectId);
-        //为项目添加清单
-        PrjMaterialInventory.addPrjInventory(projectId);
     }
 
     /**
@@ -581,6 +582,9 @@ public class PmStartExt {
 
         //是否发起岗位指派流程 1已发起 0未发起
         public Integer postProTrue;
+
+        //是否存在未审批完成全景计划展示表 1存在正在审批中0不存在
+        public Integer isNodeAdjust;
 
         //前期报建岗人员
         public String qqUserId;

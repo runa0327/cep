@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyMapper">
+    <resultMap id="PmProgressWeeklyResult" type="com.cisdi.pms.job.domain.weeklyReport.PmProgressWeekly">
+        <id property="id" column="id" />
+        <result property="date" column="date" />
+        <result property="fromDate" column="fromDate" />
+        <result property="toDate" column="toDate" />
+    </resultMap>
+
+    <!--根据开始结束日期查询周id-->
+    <select id="getWeekIdByDate" resultType="String">
+        select id from pm_progress_weekly where FROM_DATE = #{startDate} and TO_DATE = #{endDate}
+    </select>
+
+    <!--获取上周weekId-->
+    <select id="getLastWeekId" resultType="String">
+        select id from pm_progress_weekly where FROM_DATE = #{startDate} and TO_DATE = #{endDate} AND id != #{weekId} order by FROM_DATE desc limit 1
+    </select>
+
+    <!--根据实体信息新增数据-->
+    <insert id="createData">
+        insert into PM_PROGRESS_WEEKLY (
+            ID,
+            VER,
+            TS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            STATUS,
+            DATE,
+            TO_DATE,
+            FROM_DATE
+        ) values (
+            #{id},
+            #{ver},
+            #{ts},
+            #{crtDt},
+            #{crtUserId},
+            #{lastModiDt},
+            #{lastModiUserId},
+            #{status},
+            #{date},
+            #{toDate},
+            #{fromDate}
+        )
+    </insert>
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.project.PmPrjMapper">
+    <resultMap id="pmPrjResult" type="com.cisdi.pms.job.domain.project.PmPrj">
+        <id property="id" column="id" />
+        <result property="projectId" column="projectId" />
+        <result property="projectName" column="projectName" />
+        <result property="izStart" column="izStart" />
+        <result property="izEnd" column="izEnd" />
+    </resultMap>
+
+    <!--形象进度工程周报-需要自动生成周报的项目-->
+    <select id="getNeedWeekPrj" resultMap="pmPrjResult">
+        SELECT DISTINCT
+            a.PM_PRJ_ID AS projectId,
+            IFNULL( b.IZ_START_REQUIRE, '1' ) AS izStart,
+            IFNULL( b.IZ_END, '0' ) AS izEnd
+        FROM
+            pm_roster a
+        LEFT JOIN pm_prj b ON a.pm_prj_id = b.id
+        WHERE
+            a.STATUS = 'ap'
+          AND b.STATUS = 'ap'
+    </select>
+</mapper>

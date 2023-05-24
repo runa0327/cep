@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyPrjMapper">
+    <resultMap id="PmProgressWeeklyPrjResult" type="com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrj">
+        <id column="id" property="id" />
+        <result column="weekId" property="weekId" />
+        <result column="date" property="date" />
+        <result column="projectId" property="projectId" />
+        <result column="projectName" property="projectName" />
+        <result column="weatherStart" property="weatherStart" />
+        <result column="weatherComplete" property="weatherComplete" />
+        <result column="izWrite" property="izWrite" />
+        <result column="recordBy" property="recordBy" />
+        <result column="recordName" property="recordName" />
+        <result column="fromDate" property="fromDate" />
+        <result column="toDate" property="toDate" />
+    </resultMap>
+
+    <!--形象进度工程周报-项目信息-->
+    <select id="selectPrjWeek" resultMap="PmProgressWeeklyPrjResult">
+        select id from pm_progress_weekly_prj where PM_PROGRESS_WEEKLY_ID = #{weekId} and PM_PRJ_ID = #{projectId} and STATUS = 'AP'
+    </select>
+
+    <!--形象进度工程周报-项目-新增-->
+    <insert id="insertData">
+        insert into PM_PROGRESS_WEEKLY_PRJ (
+            ID,
+            VER,
+            TS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            STATUS,
+            PM_PROGRESS_WEEKLY_ID,
+            DATE,
+            PM_PRJ_ID,
+            TO_DATE,
+            SYS_TRUE,
+            FROM_DATE,
+            IZ_END,
+            IZ_WRITE,
+            IS_WEEKLY_REPORT_SUBMIT
+        ) values (
+            #{id},
+            #{ver},
+            #{ts},
+            #{crtDt},
+            #{crtUserId},
+            #{lastModiDt},
+            #{lastModiUserId},
+            #{status},
+            #{weekId},
+            #{date},
+            #{projectId},
+            #{toDate},
+            #{weatherStart},
+            #{fromDate},
+            #{weatherComplete},
+            #{izWrite},
+            #{izSubmit}
+        )
+    </insert>
+</mapper>

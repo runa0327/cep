@@ -55,7 +55,7 @@ public class SecondFeeExt {
         //清空明细
         FeeDemandDtl.deleteByWhere(new Where().eq(FeeDemandDtl.Cols.SECOND_CATEGORY_FEE_DEMAND_ID,demand.getId()));
         //计算
-        this.calculate(req.feeDemandDtls);
+        this.calculate(req.feeDemandDtls,req.secondFeeId);
         //插入明细
         for (DemandDtl dtlReq : req.feeDemandDtls) {
             FeeDemandDtl feeDemandDtl = FeeDemandDtl.newData();
@@ -179,13 +179,22 @@ public class SecondFeeExt {
     /**
      * 明细计算回显
      */
-    private void calculate(List<DemandDtl> demandDtls){
+    private void calculate(List<DemandDtl> demandDtls,String secondFeeId){
         if (demandDtls == null || demandDtls.get(0).payableRatio == null){
             return;
         }
+        //已支付金额
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> paidAmtList = myJdbcTemplate.queryForList("select ifnull(sum(h.PAY_AMT),0) paidAmt from contract_pay_history h \n" +
+                "left join po_order o on o.id = h.PO_ORDER_ID\n" +
+                "where o.CONTRACT_APP_ID = ?", secondFeeId);
+        BigDecimal paidAmt = new BigDecimal(paidAmtList.get(0).get("paidAmt").toString());
         for (int i = 0; i < demandDtls.size(); i++) {
             DemandDtl demandDtl = demandDtls.get(i);
-            if (demandDtl.approvedAmount == null && demandDtl.payableRatio == null){
+            if (!Strings.isNullOrEmpty(demandDtl.submitTime)){//已经提交过的跳过
+                continue;
+            }
+            if (demandDtl.approvedAmount == null && demandDtl.payableRatio == null){//没有填批复金额和可支付比例的跳过
                 continue;
             }
             //可支付金额
@@ -228,11 +237,11 @@ public class SecondFeeExt {
 
         //项目投资进行到哪步，则之前的投资都可填
         for (int i = 0; i <= maxSeq - 1; i++) {
-            if (Strings.isNullOrEmpty(demandDtlWrappers.get(i).approvedAmount.getText())){//批复金额没值可填，填过不可填
+            if (Strings.isNullOrEmpty(demandDtlWrappers.get(i).approvedAmount.getText()) || demandDtlWrappers.get(i).approvedAmount.getText().equals("0")){//批复金额没值可填，填过不可填
                 demandDtlWrappers.get(i).approvedAmount.editable = true;
                 demandDtlWrappers.get(i).approvedAmount.mandatory = true;
             }
-            if (Strings.isNullOrEmpty(demandDtlWrappers.get(i).payableRatio.getText())){//可支付比例没值可填，填过不可填
+            if (Strings.isNullOrEmpty(demandDtlWrappers.get(i).payableRatio.getText()) || demandDtlWrappers.get(i).payableRatio.getText().equals("0")){//可支付比例没值可填，填过不可填
                 demandDtlWrappers.get(i).payableRatio.editable = true;
                 demandDtlWrappers.get(i).payableRatio.mandatory = true;
             }
