@@ -90,6 +90,7 @@ public class PmLifeCycleExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         int pageSize = Integer.parseInt(String.valueOf(map.get("pageSize")));
         int pageIndex = Integer.parseInt(String.valueOf(map.get("pageIndex")));
+
         String projectName = String.valueOf(map.get("projectName"));
         String projectType = String.valueOf(map.get("projectType"));
         String userId = String.valueOf(map.get("userId"));
@@ -143,14 +144,17 @@ public class PmLifeCycleExt {
                 if ("项目名称".equals(s)) {
                     JSONObject json = new JSONObject();
                     json.put("nameOrg", stringObjectMap.get("project_name"));
+                    json.put("remarkCount", 0);
                     newData.put("项目名称", json);
                 } else if ("ID".equals(s)) {
                     JSONObject json = new JSONObject();
                     json.put("nameOrg", stringObjectMap.get("id"));
+                    json.put("remarkCount", 0);
                     newData.put("ID", json);
                 } else if ("前期手续经办人".equals(s)) {
                     JSONObject json = new JSONObject();
                     json.put("nameOrg", stringObjectMap.get("qquser"));
+                    json.put("remarkCount", 0);
                     newData.put("前期手续经办人", json);
                 } else if ("备注说明".equals(s)) {
                     JSONObject json = new JSONObject();
@@ -159,7 +163,13 @@ public class PmLifeCycleExt {
                     if (!CollectionUtils.isEmpty(list1)) {
                         contentList = list1.stream().map(m -> JdbcMapUtil.getString(m, "CONTENT")).collect(Collectors.toList());
                     }
+                    int reCount = 0;
+                    List<Map<String, Object>> reList = myJdbcTemplate.queryForList("select * from remark_info where REMARK_TYPE='1' and PM_PRJ_ID=?", stringObjectMap.get("id"));
+                    if (CollectionUtils.isEmpty(reList)) {
+                        reCount = reList.size();
+                    }
                     json.put("nameOrg", contentList);
+                    json.put("remarkCount", reCount);
                     newData.put("备注说明", json);
                 } else {
                     Optional<Map<String, Object>> optional = nodeList.stream().filter(p -> Objects.equals(stringObjectMap.get("id"), p.get("PM_PRJ_ID")) && Objects.equals(s, p.get("NAME"))).findAny();
@@ -220,6 +230,8 @@ public class PmLifeCycleExt {
                             json.put("dateOrg", dateOrg);
                             json.put("statusOrg", statusOrg);
                             json.put("tips", tips);
+                            int count = getRemarkCount(JdbcMapUtil.getString(stringObjectMap, "ID"), JdbcMapUtil.getString(dataMap, "SCHEDULE_NAME"));
+                            json.put("remarkCount", count);
                         }
                         newData.put(s, json);
                     } else {
@@ -247,6 +259,16 @@ public class PmLifeCycleExt {
 
     }
 
+
+    private int getRemarkCount(String projectId, String baseNodeId) {
+        int count = 0;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from remark_info where REMARK_TYPE='2' and PM_PRJ_ID=? and SCHEDULE_NAME=?", projectId, baseNodeId);
+        if (!CollectionUtils.isEmpty(list)) {
+            count = list.size();
+        }
+        return count;
+    }
 
     /**
      * 查看项目备注说明/节点备注说明

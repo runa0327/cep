@@ -2,7 +2,7 @@ package com.cisdi.ext.fund;
 
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
-import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
@@ -32,12 +32,11 @@ public class FundStatisticalApi {
         //资金大类
         String fundCategoryId = param.fundCategoryId;
         //资金来源
-        String sourceName = param.sourceName;
+        String sourceNames = param.sourceNames;
         //批复日期
         String beginDate = param.beginDate;
         String endDate = param.endDate;
 
-        MyJdbcTemplate jdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuilder sb = new StringBuilder();
 
         sb.append("select fi.id,ft.name as categoryName,ft.id categoryNameId,ft1.name as categoryNameSecond,ft1.id categoryNameSecondId,fi.FUND_SOURCE_TEXT as sourceName, ifnull(fi" +
@@ -71,20 +70,26 @@ public class FundStatisticalApi {
                 "left join (select sum(IFNULL(fs.PAID_AMT,0)) cumPayAmt,fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID from fund_special fs group by fs" +
                 ".FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp4 on temp4.FUND_IMPLEMENTATION_V_ID = fid.id and temp4.PM_PRJ_ID = fid.PM_PRJ_ID\n" +
                 "where 1=1");
+        Map<String, Object> queryParams = new HashMap<>();// 创建入参map
         if (Strings.isNotEmpty(fundCategoryId)) {
-            sb.append(" and fi.FUND_CATEGORY_FIRST = '").append(fundCategoryId).append("'");
+            sb.append(" and fi.FUND_CATEGORY_FIRST =:fundCategoryId ");
+            queryParams.put("fundCategoryId", fundCategoryId);
         }
-        if (Strings.isNotEmpty(sourceName)) {
-            sb.append(" and fi.FUND_SOURCE_TEXT like '%").append(sourceName).append("%'");
+        if (Strings.isNotEmpty(sourceNames)) {
+            sb.append(" and fi.FUND_SOURCE_TEXT  in (:sourceNames)");
+            queryParams.put("sourceNames", Arrays.asList(sourceNames.split(",")));
         }
         if (Strings.isNotEmpty(beginDate) && Strings.isNotEmpty(endDate)) {
-            sb.append(" and fi.APPROVAL_TIME between '").append(beginDate).append("' and '").append(endDate).append("'");
+            sb.append(" and fi.APPROVAL_TIME between :beginDate and :endDate ");
+            queryParams.put("beginDate", beginDate);
+            queryParams.put("endDate", endDate);
         }
 
         sb.append(" order by fi.CRT_DT desc ");
-        List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), queryParams);
         Map<String, List<Map<String, Object>>> mapBySourceName = list.stream().distinct().collect(Collectors.groupingBy(item -> String.valueOf(item.get("sourceName"))));
-        if (CollectionUtils.isEmpty(mapBySourceName)){
+        if (CollectionUtils.isEmpty(mapBySourceName)) {
             return;
         }
         List<Map<String, Object>> listGroupBySource = new ArrayList<>();
@@ -93,7 +98,7 @@ public class FundStatisticalApi {
             listGroupBySource.add(mapBySourceName.get(source).get(0));
         }
         List<DataListObject> dataList = listGroupBySource.stream()
-                .sorted(Comparator.comparing(item -> String.valueOf(item.get("createTime")),Comparator.reverseOrder()))
+                .sorted(Comparator.comparing(item -> String.valueOf(item.get("createTime")), Comparator.reverseOrder()))
                 .skip(pageSize * (pageIndex - 1))
                 .limit(pageSize)
                 .map(this::convertData).collect(Collectors.toList());
@@ -101,7 +106,6 @@ public class FundStatisticalApi {
         if (CollectionUtils.isEmpty(dataList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
-//            List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
             OutSide outSide = new OutSide();
             outSide.total = mapBySourceName.keySet().size();
             outSide.list = dataList;
@@ -122,12 +126,12 @@ public class FundStatisticalApi {
         //资金大类
         String fundCategoryId = param.fundCategoryId;
         //资金来源
-        String sourceName = param.sourceName;
+        String sourceNames = param.sourceNames;
         //批复日期
         String beginDate = param.beginDate;
         String endDate = param.endDate;
 
-        MyJdbcTemplate jdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+
         StringBuilder sb = new StringBuilder();
 
         sb.append("select fi.id,ft.name as categoryName,ft.id categoryNameId,ft1.name as categoryNameSecond,ft1.id categoryNameSecondId,fi" +
@@ -160,26 +164,32 @@ public class FundStatisticalApi {
                 "left join pm_prj pr on pr.id = fid.PM_PRJ_ID \n" +
                 "left join (select sum(IFNULL(fs.PAID_AMT,0)) cumPayAmt,fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID from fund_special fs group by fs" +
                 ".FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp4 on temp4.FUND_IMPLEMENTATION_V_ID = fid.id and temp4.PM_PRJ_ID = fid.PM_PRJ_ID where 1 = 1");
+        Map<String, Object> queryParams = new HashMap<>();// 创建入参map
         if (Strings.isNotEmpty(fundCategoryId)) {
-            sb.append(" and fi.FUND_CATEGORY_FIRST = '").append(fundCategoryId).append("'");
+            sb.append(" and fi.FUND_CATEGORY_FIRST =:fundCategoryId ");
+            queryParams.put("fundCategoryId", fundCategoryId);
         }
-        if (Strings.isNotEmpty(sourceName)) {
-            sb.append(" and fi.FUND_SOURCE_TEXT like '%").append(sourceName).append("%'");
+        if (Strings.isNotEmpty(sourceNames)) {
+            sb.append(" and fi.FUND_SOURCE_TEXT  in (:sourceNames)");
+            queryParams.put("sourceNames", Arrays.asList(sourceNames.split(",")));
         }
         if (Strings.isNotEmpty(beginDate) && Strings.isNotEmpty(endDate)) {
-            sb.append(" and fi.APPROVAL_TIME between '").append(beginDate).append("' and '").append(endDate).append("'");
+            sb.append(" and fi.APPROVAL_TIME between :beginDate and :endDate ");
+            queryParams.put("beginDate", beginDate);
+            queryParams.put("endDate", endDate);
         }
 
         sb.append(" order by fi.CRT_DT desc ");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
-        List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), queryParams);
         List<DataListObjectIncludePrj> dataList = list.stream().map(this::convertDataIncludePrj).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(dataList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
-            List<Map<String, Object>> totalList = jdbcTemplate.queryForList(totalSql);
+            List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(totalSql, queryParams);
             OutSideIncludePrj outSide = new OutSideIncludePrj();
             outSide.total = totalList.size();
             outSide.list = dataList;
@@ -199,8 +209,8 @@ public class FundStatisticalApi {
         DataListObject obj = new DataListObject();
         obj.categoryName = JdbcMapUtil.getString(data, "categoryName");
         obj.categoryNameId = JdbcMapUtil.getString(data, "categoryNameId");
-        obj.secondCategoryName = JdbcMapUtil.getString(data,"categoryNameSecond");
-        obj.secondCategoryNameId = JdbcMapUtil.getString(data,"categoryNameSecondId");
+        obj.secondCategoryName = JdbcMapUtil.getString(data, "categoryNameSecond");
+        obj.secondCategoryNameId = JdbcMapUtil.getString(data, "categoryNameSecondId");
         obj.sourceName = JdbcMapUtil.getString(data, "sourceName");
         obj.declaredAmount = JdbcMapUtil.getString(data, "declaredAmount");
         obj.approvedAmount = JdbcMapUtil.getString(data, "approvedAmount");
@@ -227,11 +237,11 @@ public class FundStatisticalApi {
         DataListObjectIncludePrj obj = new DataListObjectIncludePrj();
         obj.categoryName = JdbcMapUtil.getString(data, "categoryName");
         obj.categoryNameId = JdbcMapUtil.getString(data, "categoryNameId");
-        obj.secondCategoryName = JdbcMapUtil.getString(data,"categoryNameSecond");
-        obj.secondCategoryNameId = JdbcMapUtil.getString(data,"categoryNameSecondId");
+        obj.secondCategoryName = JdbcMapUtil.getString(data, "categoryNameSecond");
+        obj.secondCategoryNameId = JdbcMapUtil.getString(data, "categoryNameSecondId");
         obj.sourceName = JdbcMapUtil.getString(data, "sourceName");
-        obj.prjId = JdbcMapUtil.getString(data,"prjId");
-        obj.prjName = JdbcMapUtil.getString(data,"prjName");
+        obj.prjId = JdbcMapUtil.getString(data, "prjId");
+        obj.prjName = JdbcMapUtil.getString(data, "prjName");
         obj.declaredAmount = JdbcMapUtil.getString(data, "declaredAmount");
         obj.approvedAmount = JdbcMapUtil.getString(data, "approvedAmount");
         obj.approvedDate = JdbcMapUtil.getString(data, "approvedDate");
@@ -335,6 +345,8 @@ public class FundStatisticalApi {
         public String fundCategoryId;
         //资金来源
         public String sourceName;
+        //资金来源多选
+        public String sourceNames;
         //批复日期
         public String beginDate;
         public String endDate;

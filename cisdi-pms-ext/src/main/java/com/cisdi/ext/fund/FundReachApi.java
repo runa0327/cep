@@ -6,6 +6,7 @@ import com.cisdi.ext.model.view.file.File;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -41,9 +42,8 @@ public class FundReachApi {
      */
     public void fundReachList() {
         RequestParam param = this.getRequestParam();
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String sourceName = param.sourceName;
-        String projectId = param.projectId;
+        String projectIds = param.projectIds;
         String beginTime = param.beginTime;
         String endTime = param.endTime;
         int pageSize = param.pageSize;
@@ -62,32 +62,40 @@ public class FundReachApi {
                 "left join gr_set_value sv on sv.id = r.FUND_REACH_CATEGORY " +
                 "left join gr_set se on se.id = sv.GR_SET_ID and se.code = 'fund_reach_category' " +
                 "where 1=1 ");
+        Map<String, Object> queryParams = new HashMap<>();// 创建入参map
         if (Strings.isNotEmpty(sourceName)) {
-            sb.append(" and r.FUND_SOURCE_TEXT like '%").append(sourceName).append("%'");
+            sb.append(" and r.FUND_SOURCE_TEXT like :sourceName ");
+            queryParams.put("sourceName", "%" + sourceName + "%");
         }
-        if (Strings.isNotEmpty(projectId)) {
-            sb.append(" and r.PM_PRJ_ID = '").append(projectId).append("'");
+        if (Strings.isNotEmpty(projectIds)) {
+            sb.append(" and r.PM_PRJ_ID in (:ids) ");
+            queryParams.put("ids", Arrays.asList(projectIds.split(",")));
         }
         if (Strings.isNotEmpty(beginTime) && Strings.isNotEmpty(endTime)) {
-            sb.append(" and r.REACH_DATE between '").append(beginTime).append("' and '").append(endTime).append("'");
+            sb.append(" and r.REACH_DATE BETWEEN :beginTime and :endTime ");
+            queryParams.put("beginTime", beginTime);
+            queryParams.put("endTime", endTime);
         }
         if (!com.google.common.base.Strings.isNullOrEmpty(categoryNameId)) {
-            sb.append("and t1.id = '").append(categoryNameId).append("' ");
+            sb.append("and t1.id = :categoryNameId  ");
+            queryParams.put("categoryNameId", categoryNameId);
         }
         if (!com.google.common.base.Strings.isNullOrEmpty(secondCategoryNameId)) {
-            sb.append("and t2.id = '").append(secondCategoryNameId).append("' ");
+            sb.append("and t2.id =:secondCategoryNameId ");
+            queryParams.put("secondCategoryNameId", secondCategoryNameId);
         }
 
         sb.append("order by r.CRT_DT desc ");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), queryParams);
         List<FundReach> dataList = list.stream().map(m -> this.convertFundReach(m, "1")).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(dataList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
-            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
+            List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(totalSql, queryParams);
             OutSide outSide = new OutSide();
             outSide.total = totalList.size();
             outSide.list = dataList;
@@ -152,9 +160,9 @@ public class FundReachApi {
         Map<String, Object> sumMap = myJdbcTemplate.queryForMap(sumSql, sourceName, projectId, type);
 
         HashMap<String, Object> result = new HashMap<>();
-        result.put("recordList",recordList);
-        result.put("detailMap",detailMap);
-        result.put("sumMap",sumMap);
+        result.put("recordList", recordList);
+        result.put("detailMap", detailMap);
+        result.put("sumMap", sumMap);
 
         ExtJarHelper.returnValue.set(result);
     }
@@ -170,11 +178,11 @@ public class FundReachApi {
         if (!Strings.isNotEmpty(id)) {
             id = Crud.from("FUND_REACH").insertData();
         }
-        Crud.from("FUND_REACH").where().eq("ID",id).update()
-                .set("PM_PRJ_ID",input.projectId).set("FUND_SOURCE_TEXT",input.sourceName).set("FUND_REACH_CATEGORY",input.type)
-                .set("REACH_AMOUNT",input.amt).set("PAYEE",input.unit).set("RECEIPT_ACCOUNT",input.account).set("REACH_DATE",input.reachDate)
-                .set("ATT_FILE_GROUP_ID", input.fileIds).set("RECEIVING_BANK_ID",input.bank).set("REMARK",input.remark)
-                .set("REACH_TIMES",input.reachTimes).exec();
+        Crud.from("FUND_REACH").where().eq("ID", id).update()
+                .set("PM_PRJ_ID", input.projectId).set("FUND_SOURCE_TEXT", input.sourceName).set("FUND_REACH_CATEGORY", input.type)
+                .set("REACH_AMOUNT", input.amt).set("PAYEE", input.unit).set("RECEIPT_ACCOUNT", input.account).set("REACH_DATE", input.reachDate)
+                .set("ATT_FILE_GROUP_ID", input.fileIds).set("RECEIVING_BANK_ID", input.bank).set("REMARK", input.remark)
+                .set("REACH_TIMES", input.reachTimes).exec();
     }
 
     /**
@@ -189,7 +197,6 @@ public class FundReachApi {
 
     /**
      * 项目下拉
-     *
      */
     public void impPrjDrop() {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
@@ -219,7 +226,6 @@ public class FundReachApi {
 
     /**
      * 资金来源下拉
-     *
      */
     public void sourceDrop() {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
@@ -251,13 +257,6 @@ public class FundReachApi {
     }
 
     /**
-     * 资金到位导出
-     */
-    public void fundReachExport() {
-        //TODO 导出逻辑
-    }
-
-    /**
      * 数据转换
      *
      * @param data Map数据集
@@ -278,24 +277,23 @@ public class FundReachApi {
         fundReach.amt = JdbcMapUtil.getString(data, "amt");
         fundReach.reachDate = JdbcMapUtil.getString(data, "reachDate");
         if (Objects.equals("2", mark)) {
-            fundReach.prjId = JdbcMapUtil.getString(data,"prjId");
+            fundReach.prjId = JdbcMapUtil.getString(data, "prjId");
             fundReach.bankId = JdbcMapUtil.getString(data, "bankId");
             fundReach.accountId = JdbcMapUtil.getString(data, "accountId");
-            fundReach.payeeId = JdbcMapUtil.getString(data,"payeeId");
-            fundReach.payee = JdbcMapUtil.getString(data,"payee");
-            fundReach.bank = JdbcMapUtil.getString(data,"bank");
-            fundReach.account = JdbcMapUtil.getString(data,"account");
+            fundReach.payeeId = JdbcMapUtil.getString(data, "payeeId");
+            fundReach.payee = JdbcMapUtil.getString(data, "payee");
+            fundReach.bank = JdbcMapUtil.getString(data, "bank");
+            fundReach.account = JdbcMapUtil.getString(data, "account");
             fundReach.remark = JdbcMapUtil.getString(data, "remark");
             fundReach.sumAmt = JdbcMapUtil.getString(data, "sumAmt");
-            fundReach.count = JdbcMapUtil.getInt(data,"count");
-            fundReach.approvalTime = JdbcMapUtil.getString(data,"APPROVAL_TIME");
-            fundReach.reachTimes = JdbcMapUtil.getInt(data,"REACH_TIMES");
-            List<File> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(data,"fileIds"), myJdbcTemplate);
+            fundReach.count = JdbcMapUtil.getInt(data, "count");
+            fundReach.approvalTime = JdbcMapUtil.getString(data, "APPROVAL_TIME");
+            fundReach.reachTimes = JdbcMapUtil.getInt(data, "REACH_TIMES");
+            List<File> fileList = FileCommon.getFileResp(JdbcMapUtil.getString(data, "fileIds"), myJdbcTemplate);
             fundReach.fileList = fileList;
         }
         return fundReach;
     }
-
 
 
     /**
@@ -307,6 +305,8 @@ public class FundReachApi {
         public String sourceName;
         public Integer pageSize;
         public Integer pageIndex;
+
+        public String projectIds;
         //项目
         public String projectId;
 

@@ -20,4 +20,6 @@ public class FundReachRequest{
     private String beginTime;
 
     private String endTime;
+
+    private String projectIds;
 }

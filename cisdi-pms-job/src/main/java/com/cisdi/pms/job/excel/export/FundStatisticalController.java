@@ -9,7 +9,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,10 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -36,7 +33,7 @@ import java.util.stream.Collectors;
 public class FundStatisticalController extends BaseController {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private NamedParameterJdbcTemplate myNamedParameterJdbcTemplate;
 
     /**
      * 资金批复，到位，支付总表导出
@@ -47,7 +44,7 @@ public class FundStatisticalController extends BaseController {
         //资金大类
         String fundCategoryId = fundStatisticalRequest.fundCategoryId;
         //资金来源
-        String sourceName = fundStatisticalRequest.sourceName;
+        String sourceNames = fundStatisticalRequest.sourceNames;
         //批复日期
         String beginDate = fundStatisticalRequest.beginDate;
         String endDate = fundStatisticalRequest.endDate;
@@ -79,20 +76,27 @@ public class FundStatisticalController extends BaseController {
                 "left join (select sum(IFNULL(fs.PAID_AMT,0)) cumPayAmt,fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID from fund_special fs group by fs" +
                 ".FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp4 on temp4.FUND_IMPLEMENTATION_V_ID = fid.id and temp4.PM_PRJ_ID = fid.PM_PRJ_ID\n" +
                 "where 1=1");
+
+        Map<String, Object> queryParams = new HashMap<>();// 创建入参map
         if (Strings.isNotEmpty(fundCategoryId)) {
-            sb.append(" and fi.FUND_CATEGORY_FIRST = '").append(fundCategoryId).append("'");
+            sb.append(" and fi.FUND_CATEGORY_FIRST = :fundCategoryId ");
+            queryParams.put("fundCategoryId", fundCategoryId);
+
         }
-        if (Strings.isNotEmpty(sourceName)) {
-            sb.append(" and fi.FUND_SOURCE_TEXT like '%").append(sourceName).append("%'");
+        if (Strings.isNotEmpty(sourceNames)) {
+            sb.append(" and fi.FUND_SOURCE_TEXT  in (:sourceNames)");
+            queryParams.put("sourceNames", Arrays.asList(sourceNames.split(",")));
         }
         if (Strings.isNotEmpty(beginDate) && Strings.isNotEmpty(endDate)) {
-            sb.append(" and fi.APPROVAL_TIME between '").append(beginDate).append("' and '").append(endDate).append("'");
+            sb.append(" and fi.APPROVAL_TIME between :beginDate and :endDate ");
+            queryParams.put("beginDate", beginDate);
+            queryParams.put("endDate", endDate);
         }
         sb.append(" order by fi.CRT_DT desc ");
-        List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
+        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), queryParams);
 
         Map<String, List<Map<String, Object>>> mapBySourceName = list.stream().distinct().collect(Collectors.groupingBy(item -> String.valueOf(item.get("sourceName"))));
-        if (CollectionUtils.isEmpty(mapBySourceName)){
+        if (CollectionUtils.isEmpty(mapBySourceName)) {
             return;
         }
         List<Map<String, Object>> listGroupBySource = new ArrayList<>();
@@ -101,11 +105,8 @@ public class FundStatisticalController extends BaseController {
             listGroupBySource.add(mapBySourceName.get(source).get(0));
         }
         List<FundStatisticalExportModel> resList = listGroupBySource.stream()
-                .sorted(Comparator.comparing(item -> String.valueOf(item.get("createTime")),Comparator.reverseOrder()))
+                .sorted(Comparator.comparing(item -> String.valueOf(item.get("createTime")), Comparator.reverseOrder()))
                 .map(this::convertData).collect(Collectors.toList());
-
-
-//        List<FundStatisticalExportModel> resList = list.stream().map(this::convertData).collect(Collectors.toList());
         super.setExcelRespProp(response, "资金批复，到位，支付总表");
         EasyExcel.write(response.getOutputStream())
                 .head(FundStatisticalExportModel.class)
@@ -123,7 +124,7 @@ public class FundStatisticalController extends BaseController {
         //资金大类
         String fundCategoryId = fundStatisticalRequest.fundCategoryId;
         //资金来源
-        String sourceName = fundStatisticalRequest.sourceName;
+        String sourceNames = fundStatisticalRequest.sourceNames;
         //批复日期
         String beginDate = fundStatisticalRequest.beginDate;
         String endDate = fundStatisticalRequest.endDate;
@@ -159,17 +160,22 @@ public class FundStatisticalController extends BaseController {
                 "left join pm_prj pr on pr.id = fid.PM_PRJ_ID \n" +
                 "left join (select sum(IFNULL(fs.PAID_AMT,0)) cumPayAmt,fs.FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID from fund_special fs group by fs" +
                 ".FUND_IMPLEMENTATION_V_ID,fs.PM_PRJ_ID) temp4 on temp4.FUND_IMPLEMENTATION_V_ID = fid.id and temp4.PM_PRJ_ID = fid.PM_PRJ_ID where 1 = 1");
+        Map<String, Object> queryParams = new HashMap<>();// 创建入参map
         if (Strings.isNotEmpty(fundCategoryId)) {
-            sb.append(" and fi.FUND_CATEGORY_FIRST = '").append(fundCategoryId).append("'");
+            sb.append(" and fi.FUND_CATEGORY_FIRST = :fundCategoryId ");
+            queryParams.put("fundCategoryId", fundCategoryId);
         }
-        if (Strings.isNotEmpty(sourceName)) {
-            sb.append(" and fi.FUND_SOURCE_TEXT like '%").append(sourceName).append("%'");
+        if (Strings.isNotEmpty(sourceNames)) {
+            sb.append(" and fi.FUND_SOURCE_TEXT  in (:sourceNames)");
+            queryParams.put("sourceNames", Arrays.asList(sourceNames.split(",")));
         }
         if (Strings.isNotEmpty(beginDate) && Strings.isNotEmpty(endDate)) {
-            sb.append(" and fi.APPROVAL_TIME between '").append(beginDate).append("' and '").append(endDate).append("'");
+            sb.append(" and fi.APPROVAL_TIME between :beginDate and :endDate ");
+            queryParams.put("beginDate", beginDate);
+            queryParams.put("endDate", endDate);
         }
         sb.append(" order by fi.CRT_DT desc ");
-        List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
+        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), queryParams);
         List<FundPrjStatisticalExportModel> resList = list.stream().map(this::convertPrjData).collect(Collectors.toList());
         super.setExcelRespProp(response, "资金到位，支付总表");
         EasyExcel.write(response.getOutputStream())
