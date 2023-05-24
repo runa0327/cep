@@ -8,7 +8,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
-public class GrSetValue {
+public class GrSetValueExt {
 
     /**
      * 根据集合code和集合值编码查询集合值id

@@ -1,7 +1,7 @@
 package com.cisdi.ext.link.linkPackage;
 
 import com.cisdi.ext.base.AdUserExt;
-import com.cisdi.ext.base.GrSetValue;
+import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.link.*;
 import com.cisdi.ext.model.PmPrj;
 import com.cisdi.ext.model.PrjStart;
@@ -968,7 +968,7 @@ public class AttLinkExtDetail {
             // 资金来源
             {
                 String id = JdbcMapUtil.getString(list.get(0), "INVESTMENT_SOURCE_ID");
-                String name = GrSetValue.getValueNameById(id);
+                String name = GrSetValueExt.getValueNameById(id);
                 LinkedAtt linkedAtt = new LinkedAtt();
                 linkedAtt.type = AttDataTypeE.TEXT_LONG;
                 linkedAtt.value = id;
@@ -982,7 +982,7 @@ public class AttLinkExtDetail {
             // 项目类型
             {
                 String id = JdbcMapUtil.getString(list.get(0), "PROJECT_TYPE_ID");
-                String name = GrSetValue.getValueNameById(id);
+                String name = GrSetValueExt.getValueNameById(id);
                 LinkedAtt linkedAtt = new LinkedAtt();
                 linkedAtt.type = AttDataTypeE.TEXT_LONG;
                 linkedAtt.value = id;
@@ -991,7 +991,7 @@ public class AttLinkExtDetail {
             }
             // 建设单位
             {
-                String name = GrSetValue.getValueNameById(companyId);
+                String name = GrSetValueExt.getValueNameById(companyId);
                 LinkedAtt linkedAtt = new LinkedAtt();
                 linkedAtt.type = AttDataTypeE.TEXT_LONG;
                 linkedAtt.value = companyId;
@@ -1001,7 +1001,7 @@ public class AttLinkExtDetail {
             // 招标方式
             {
                 String id = JdbcMapUtil.getString(list.get(0), "TENDER_MODE_ID");
-                String name = GrSetValue.getValueNameById(id);
+                String name = GrSetValueExt.getValueNameById(id);
                 LinkedAtt linkedAtt = new LinkedAtt();
                 linkedAtt.type = AttDataTypeE.TEXT_LONG;
                 linkedAtt.value = id;

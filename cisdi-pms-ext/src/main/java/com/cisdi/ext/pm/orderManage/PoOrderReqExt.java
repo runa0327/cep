@@ -2,15 +2,13 @@ package com.cisdi.ext.pm.orderManage;
 
 import com.alibaba.fastjson.JSON;
 import com.cisdi.ext.api.PoOrderExtApi;
-import com.cisdi.ext.base.GrSetValue;
+import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.commons.HttpClient;
 import com.cisdi.ext.model.PoOrderReq;
-import com.cisdi.ext.model.PoOrderSupplementReq;
 import com.cisdi.ext.model.view.order.PoOrderReqView;
 import com.cisdi.ext.pm.ProcessCommon;
 import com.cisdi.ext.pm.orderManage.detail.PoOrderPrjDetailExt;
-import com.cisdi.ext.pm.orderManage.detail.PoOrderSupplementPrjDetailExt;
 import com.cisdi.ext.util.*;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -415,7 +413,7 @@ public class PoOrderReqExt {
         String sql = "select * from po_order_req where status = 'ap'";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
         //根据编码code查询数据来源id
-        String sourceTypeId = GrSetValue.getValueId("order_data_source_type","po_order_req",myJdbcTemplate);
+        String sourceTypeId = GrSetValueExt.getValueId("order_data_source_type","po_order_req",myJdbcTemplate);
         if (!CollectionUtils.isEmpty(list)){
             for (Map<String, Object> tmp : list) {
                 PoOrderExtApi.createOrderHistoryData(tmp,sourceTypeId,"0100070673610715078",myJdbcTemplate);
