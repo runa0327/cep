@@ -8,16 +8,14 @@ import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -33,7 +31,7 @@ import java.util.stream.Collectors;
 public class FundReachController extends BaseController {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private NamedParameterJdbcTemplate myNamedParameterJdbcTemplate;
 
     /**
      * 资金到位导出
@@ -45,7 +43,7 @@ public class FundReachController extends BaseController {
     @GetMapping("export")
     public void reachExcel(FundReachRequest fundReachRequest, HttpServletResponse response) {
         String sourceName = fundReachRequest.getSourceName();
-        String projectId = fundReachRequest.getProjectId();
+        String projectIds = fundReachRequest.getProjectIds();
         String beginTime = fundReachRequest.getBeginTime();
         String endTime = fundReachRequest.getEndTime();
 
@@ -63,17 +61,23 @@ public class FundReachController extends BaseController {
                 "by FUND_SOURCE_TEXT,PM_PRJ_ID,FUND_REACH_CATEGORY) temp on temp.FUND_SOURCE_TEXT = r.FUND_SOURCE_TEXT and temp.PM_PRJ_ID = r" +
                 ".PM_PRJ_ID and temp.FUND_REACH_CATEGORY = r.FUND_REACH_CATEGORY " +
                 "where 1=1 ");
+
+        Map<String, Object> queryParams = new HashMap<>();// 创建入参map
         if (Strings.isNotEmpty(sourceName)) {
-            sb.append(" and r.FUND_SOURCE_TEXT like '%").append(sourceName).append("%'");
+            sb.append(" and r.FUND_SOURCE_TEXT like :sourceName ");
+            queryParams.put("sourceName", "%" + sourceName + "%");
         }
-        if (Strings.isNotEmpty(projectId)) {
-            sb.append(" and r.PM_PRJ_ID = '").append(projectId).append("'");
+        if (Strings.isNotEmpty(projectIds)) {
+            sb.append("and r.PM_PRJ_ID in (:ids) ");
+            queryParams.put("ids", Arrays.asList(projectIds.split(",")));
         }
         if (Strings.isNotEmpty(beginTime) && Strings.isNotEmpty(endTime)) {
-            sb.append(" and r.REACH_DATE between '").append(beginTime).append("' and '").append(endTime).append("'");
+            sb.append("and r.REACH_DATE :beginTime and :endTime ");
+            queryParams.put("beginTime", beginTime);
+            queryParams.put("endTime", endTime);
         }
         sb.append(" order by r.CRT_DT desc ");
-        List<Map<String, Object>> list = jdbcTemplate.queryForList(sb.toString());
+        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), queryParams);
         List<FundReachExportModel> resList = list.stream().map(this::dataConvert).collect(Collectors.toList());
         super.setExcelRespProp(response, "资金到位明细");
         EasyExcel.write(response.getOutputStream())
@@ -86,18 +90,18 @@ public class FundReachController extends BaseController {
 
     private FundReachExportModel dataConvert(Map<String, Object> data) {
         FundReachExportModel model = new FundReachExportModel();
-        model.setCategoryName(JdbcMapUtil.getString(data,"firstTypeName"));
-        model.setSourceName(JdbcMapUtil.getString(data,"sourceName"));
-        model.setProjectName(JdbcMapUtil.getString(data,"projectName"));
-        model.setCount(JdbcMapUtil.getString(data,"count"));
-        model.setTypeName(JdbcMapUtil.getString(data,"reachCategory"));
-        model.setDwAmt(JdbcMapUtil.getBigDecimal(data,"amt"));
-        model.setTotalDwAmt(JdbcMapUtil.getBigDecimal(data,"sumAmt"));
-        model.setDwDate(JdbcMapUtil.getString(data,"reachDate"));
-        model.setUnit(JdbcMapUtil.getString(data,"payee"));
-        model.setBank(JdbcMapUtil.getString(data,"bank"));
-        model.setRemark(JdbcMapUtil.getString(data,"remark"));
-        model.setAccount(JdbcMapUtil.getString(data,"account"));
+        model.setCategoryName(JdbcMapUtil.getString(data, "firstTypeName"));
+        model.setSourceName(JdbcMapUtil.getString(data, "sourceName"));
+        model.setProjectName(JdbcMapUtil.getString(data, "projectName"));
+        model.setCount(JdbcMapUtil.getString(data, "count"));
+        model.setTypeName(JdbcMapUtil.getString(data, "reachCategory"));
+        model.setDwAmt(JdbcMapUtil.getBigDecimal(data, "amt"));
+        model.setTotalDwAmt(JdbcMapUtil.getBigDecimal(data, "sumAmt"));
+        model.setDwDate(JdbcMapUtil.getString(data, "reachDate"));
+        model.setUnit(JdbcMapUtil.getString(data, "payee"));
+        model.setBank(JdbcMapUtil.getString(data, "bank"));
+        model.setRemark(JdbcMapUtil.getString(data, "remark"));
+        model.setAccount(JdbcMapUtil.getString(data, "account"));
         return model;
     }
 
