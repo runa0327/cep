@@ -89,7 +89,7 @@ public class PmPrjController extends BaseController {
                 "left join pm_pro_plan ppp on ppp.PM_PRJ_ID = pm.id \n" +
                 "left join gr_set_value ggg on ggg.id = pm.BASE_LOCATION_ID "+
                 "left join gr_set_value ggt on ggt.id = pm.TRANSITION_PHASE_ID "+
-                "where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' ");
+                "where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 and (pm.PROJECT_STATUS != '1661568714048413696' or pm.PROJECT_STATUS is null )");
         if (Strings.isNotEmpty(name)){
             baseSql.append(" and pm.name like '%" + name + "%'");
         }
