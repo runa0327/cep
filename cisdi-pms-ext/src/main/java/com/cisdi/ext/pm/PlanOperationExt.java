@@ -76,6 +76,9 @@ public class PlanOperationExt {
         if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)){
             sqlSb.append(" and pp.PROJECT_PHASE_ID in (:prjPhaseIds)");
         }
+        if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)){
+            sqlSb.append(" and pp.PROJECT_TYPE_ID in (:prjTypeIds)");
+        }
         if (!CollectionUtils.isEmpty(selectReq.prjTagIds)){
             sqlSb.append(" and (");
             for (int i = 0;i < selectReq.prjTagIds.size();i++) {
@@ -377,6 +380,9 @@ public class PlanOperationExt {
         if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)){
             sqlSb.append(" and pp.PROJECT_PHASE_ID in (:prjPhaseIds)");
         }
+        if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)){
+            sqlSb.append(" and pp.PROJECT_TYPE_ID in (:prjTypeIds)");
+        }
         if (!CollectionUtils.isEmpty(selectReq.prjTagIds)){
             sqlSb.append(" and (");
             for (int i = 0;i < selectReq.prjTagIds.size();i++) {
@@ -452,6 +458,9 @@ public class PlanOperationExt {
         }
         if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)){
             sqlSb.append(" and pp.PROJECT_PHASE_ID in (:prjPhaseIds)");
+        }
+        if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)){
+            sqlSb.append(" and pp.PROJECT_TYPE_ID in (:prjTypeIds)");
         }
         if (!CollectionUtils.isEmpty(selectReq.prjTagIds)){
             sqlSb.append(" and (");
@@ -633,6 +642,8 @@ public class PlanOperationExt {
         private List<String> prjPhaseIds;
         //建设地点
         private List<String> locationIds;
+        //项目类型
+        private List<String> prjTypeIds;
         //页码
         private Integer pageIndex;
         //页面大小
