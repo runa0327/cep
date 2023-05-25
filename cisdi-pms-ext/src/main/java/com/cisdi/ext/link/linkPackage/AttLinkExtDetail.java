@@ -3,7 +3,7 @@ package com.cisdi.ext.link.linkPackage;
 import com.cisdi.ext.base.AdUserExt;
 import com.cisdi.ext.base.GrSetValue;
 import com.cisdi.ext.link.*;
-import com.cisdi.ext.model.PmPrj;
+import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.model.PrjStart;
 import com.cisdi.ext.pm.PmBuyDemandReqExt;
 import com.cisdi.ext.util.DateTimeUtil;

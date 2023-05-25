@@ -2,7 +2,7 @@ package com.cisdi.ext.importQYY;
 
 import com.cisdi.ext.importQYY.model.ImportBatch;
 import com.cisdi.ext.importQYY.model.PrjUpdateImport;
-import com.cisdi.ext.model.PmPrj;
+import com.cisdi.ext.model.base.PmPrj;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
@@ -11,10 +11,8 @@ import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.SharedUtil;
-import org.springframework.beans.BeanUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;

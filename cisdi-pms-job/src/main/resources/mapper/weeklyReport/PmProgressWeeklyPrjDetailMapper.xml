@@ -64,7 +64,7 @@
         a.STATUS = 'ap'
         AND b.STATUS = 'ap'
         AND c.STATUS = 'ap'
-        AND F.NAME IS NOT NULL
+        AND F.NAME IS NOT NULL AND (e.PROJECT_STATUS != '1661568714048413696' or e.PROJECT_STATUS is null )
         <if test="weatherStart != null">
             and b.SYS_TRUE = #{weatherStart}
         </if>
