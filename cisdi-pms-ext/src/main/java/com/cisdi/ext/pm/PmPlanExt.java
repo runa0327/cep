@@ -1,5 +1,8 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.model.PmPlan;
+import com.cisdi.ext.model.base.PmPrj;
+import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.PmPrjCodeUtil;
 import com.cisdi.ext.util.StringUtil;
@@ -8,6 +11,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -27,6 +31,39 @@ import java.util.stream.Collectors;
  */
 public class PmPlanExt {
 
+    /**
+     * 项目库暂停更新谋划库
+     * @param projectId 项目id
+     * @param project 项目明细信息
+     */
+    public static void refreshPrj(String projectId, PmPrj project) {
+        String prjName = project.getName();
+        String now = DateTimeUtil.dateToString(new Date());
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        List<com.cisdi.ext.model.PmPlan> pmPlanList = com.cisdi.ext.model.PmPlan.selectByWhere(new Where().eq(com.cisdi.ext.model.PmPlan.Cols.NAME,prjName).eq(com.cisdi.ext.model.PmPlan.Cols.STATUS,"AP"));
+        if (CollectionUtils.isEmpty(pmPlanList)){
+            String pmPlanId = Crud.from(com.cisdi.ext.model.PmPlan.ENT_CODE).insertData();
+            String pmPlanCode = PmPrjCodeUtil.getPmPlanCode();
+            Crud.from(com.cisdi.ext.model.PmPlan.ENT_CODE).where().eq(com.cisdi.ext.model.PmPlan.Cols.ID,pmPlanId).update()
+                    .set(com.cisdi.ext.model.PmPlan.Cols.VER,99).set(com.cisdi.ext.model.PmPlan.Cols.CRT_USER_ID,userId)
+                    .set(com.cisdi.ext.model.PmPlan.Cols.LAST_MODI_DT,now).set(com.cisdi.ext.model.PmPlan.Cols.LAST_MODI_USER_ID,userId)
+                    .set(com.cisdi.ext.model.PmPlan.Cols.STATUS,"AP").set(com.cisdi.ext.model.PmPlan.Cols.CODE,pmPlanCode)
+                    .set(com.cisdi.ext.model.PmPlan.Cols.NAME,prjName).set(com.cisdi.ext.model.PmPlan.Cols.BASE_LOCATION_ID,project.getBaseLocationId())
+                    .set(com.cisdi.ext.model.PmPlan.Cols.PROJECT_TYPE_ID,project.getProjectTypeId()).set(com.cisdi.ext.model.PmPlan.Cols.PLAN_STATUS_ID,"1635456054244651008")
+                    .set(com.cisdi.ext.model.PmPlan.Cols.AMT,project.getEstimatedTotalInvest())
+                    .exec();
+        } else {
+            String pmPlanId = pmPlanList.get(0).getId();
+            Crud.from(com.cisdi.ext.model.PmPlan.ENT_CODE).where().eq(com.cisdi.ext.model.PmPlan.Cols.ID,pmPlanId).update()
+                    .set(com.cisdi.ext.model.PmPlan.Cols.VER,99).set(com.cisdi.ext.model.PmPlan.Cols.CRT_USER_ID,userId)
+                    .set(com.cisdi.ext.model.PmPlan.Cols.LAST_MODI_DT,now).set(com.cisdi.ext.model.PmPlan.Cols.LAST_MODI_USER_ID,userId)
+                    .set(com.cisdi.ext.model.PmPlan.Cols.STATUS,"AP")
+                    .set(com.cisdi.ext.model.PmPlan.Cols.NAME,prjName).set(com.cisdi.ext.model.PmPlan.Cols.BASE_LOCATION_ID,project.getBaseLocationId())
+                    .set(com.cisdi.ext.model.PmPlan.Cols.PROJECT_TYPE_ID,project.getProjectTypeId()).set(com.cisdi.ext.model.PmPlan.Cols.PLAN_STATUS_ID,"1635456054244651008")
+                    .set(com.cisdi.ext.model.PmPlan.Cols.AMT,project.getEstimatedTotalInvest())
+                    .exec();
+        }
+    }
 
     /**
      * 项目谋划列表查询

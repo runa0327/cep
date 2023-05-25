@@ -3,7 +3,7 @@ package com.cisdi.ext.importQYY;
 import com.cisdi.ext.base.PmInvestEst;
 import com.cisdi.ext.importQYY.model.PrjReqImport;
 import com.cisdi.ext.importQYY.model.PrjReqImportBatch;
-import com.cisdi.ext.model.PmPrj;
+import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.proPlan.PmProPlanExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
