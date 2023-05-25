@@ -2,12 +2,13 @@ package com.cisdi.ext.base;
 
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.PmPlan;
-import com.cisdi.ext.model.PmPrj;
+import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.model.PrjStart;
-import com.cisdi.ext.model.view.project.PmPrjView;
+import com.cisdi.ext.pm.PmPlanExt;
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.PmPrjCodeUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.cisdi.ext.util.WfPmInvestUtil;
@@ -416,5 +417,33 @@ public class PmPrjExt {
                 }
             }
         }
+    }
+
+    /**
+     * 项目暂停
+     */
+    public void prjStatusChange(){
+        // 获取输入：
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        PmPrj param = JsonUtil.fromJson(json, PmPrj.class);
+        String projectId = param.getId();
+        if (SharedUtil.isEmptyString(projectId)){
+            throw new BaseException("项目id不能为空");
+        }
+        param = PmPrj.selectById(projectId);
+        startToStop(projectId,param);
+    }
+
+    /**
+     * 项目暂停
+     * @param projectId 项目id
+     * @param project 项目信息
+     */
+    private void startToStop(String projectId, PmPrj project) {
+        //更新项目库状态
+        Crud.from(PmPrj.ENT_CODE).where().eq(PmPrj.Cols.ID,projectId).update().set(PmPrj.Cols.PROJECT_STATUS,"1661568714048413696").exec();
+        //刷新谋划库
+        PmPlanExt.refreshPrj(projectId,project);
     }
 }

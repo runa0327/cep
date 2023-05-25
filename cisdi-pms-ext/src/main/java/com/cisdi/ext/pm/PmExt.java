@@ -1,6 +1,6 @@
 package com.cisdi.ext.pm;
 
-import com.cisdi.ext.model.PmPrj;
+import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.model.TestStu;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StrUtil;

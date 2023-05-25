@@ -1,8 +1,7 @@
 package com.cisdi.ext.pm;
 
 import com.cisdi.ext.base.PmPrjExt;
-import com.cisdi.ext.model.PmPrj;
-import com.cisdi.ext.util.WfPmInvestUtil;
+import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
