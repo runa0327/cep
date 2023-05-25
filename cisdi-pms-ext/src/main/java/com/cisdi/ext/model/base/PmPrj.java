@@ -1,4 +1,4 @@
-package com.cisdi.ext.model;
+package com.cisdi.ext.model.base;
 
 import com.qygly.ext.jar.helper.orm.ModelHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
@@ -189,9 +189,25 @@ public class PmPrj {
          */
         public static final String PROJECT_PHASE_ID = "PROJECT_PHASE_ID";
         /**
+         * 项目状态。
+         */
+        public static final String PROJECT_STATUS = "PROJECT_STATUS";
+        /**
          * 进度阶段。
          */
         public static final String TRANSITION_PHASE_ID = "TRANSITION_PHASE_ID";
+        /**
+         * 是否正式项目。
+         */
+        public static final String IZ_FORMAL_PRJ = "IZ_FORMAL_PRJ";
+        /**
+         * 是否符合开工条件。
+         */
+        public static final String IZ_START_REQUIRE = "IZ_START_REQUIRE";
+        /**
+         * 是否结束。
+         */
+        public static final String IZ_END = "IZ_END";
         /**
          * 立项申请。
          */
@@ -272,6 +288,10 @@ public class PmPrj {
          * 责任人。
          */
         public static final String RESPONSIBLE_ID = "RESPONSIBLE_ID";
+        /**
+         * 批复日期。
+         */
+        public static final String REPLY_DATE = "REPLY_DATE";
         /**
          * 批复文号。
          */
@@ -1624,6 +1644,42 @@ public class PmPrj {
     }
 
     /**
+     * 项目状态。
+     */
+    private String projectStatus;
+
+    /**
+     * 获取：项目状态。
+     */
+    public String getProjectStatus() {
+        return this.projectStatus;
+    }
+
+    /**
+     * 设置：项目状态。
+     */
+    public PmPrj setProjectStatus(String projectStatus) {
+        if (this.projectStatus == null && projectStatus == null) {
+            // 均为null，不做处理。
+        } else if (this.projectStatus != null && projectStatus != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectStatus.compareTo(projectStatus) != 0) {
+                this.projectStatus = projectStatus;
+                if (!this.toUpdateCols.contains("PROJECT_STATUS")) {
+                    this.toUpdateCols.add("PROJECT_STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectStatus = projectStatus;
+            if (!this.toUpdateCols.contains("PROJECT_STATUS")) {
+                this.toUpdateCols.add("PROJECT_STATUS");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 进度阶段。
      */
     private String transitionPhaseId;
@@ -1654,6 +1710,114 @@ public class PmPrj {
             this.transitionPhaseId = transitionPhaseId;
             if (!this.toUpdateCols.contains("TRANSITION_PHASE_ID")) {
                 this.toUpdateCols.add("TRANSITION_PHASE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否正式项目。
+     */
+    private Boolean izFormalPrj;
+
+    /**
+     * 获取：是否正式项目。
+     */
+    public Boolean getIzFormalPrj() {
+        return this.izFormalPrj;
+    }
+
+    /**
+     * 设置：是否正式项目。
+     */
+    public PmPrj setIzFormalPrj(Boolean izFormalPrj) {
+        if (this.izFormalPrj == null && izFormalPrj == null) {
+            // 均为null，不做处理。
+        } else if (this.izFormalPrj != null && izFormalPrj != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.izFormalPrj.compareTo(izFormalPrj) != 0) {
+                this.izFormalPrj = izFormalPrj;
+                if (!this.toUpdateCols.contains("IZ_FORMAL_PRJ")) {
+                    this.toUpdateCols.add("IZ_FORMAL_PRJ");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.izFormalPrj = izFormalPrj;
+            if (!this.toUpdateCols.contains("IZ_FORMAL_PRJ")) {
+                this.toUpdateCols.add("IZ_FORMAL_PRJ");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否符合开工条件。
+     */
+    private Boolean izStartRequire;
+
+    /**
+     * 获取：是否符合开工条件。
+     */
+    public Boolean getIzStartRequire() {
+        return this.izStartRequire;
+    }
+
+    /**
+     * 设置：是否符合开工条件。
+     */
+    public PmPrj setIzStartRequire(Boolean izStartRequire) {
+        if (this.izStartRequire == null && izStartRequire == null) {
+            // 均为null，不做处理。
+        } else if (this.izStartRequire != null && izStartRequire != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.izStartRequire.compareTo(izStartRequire) != 0) {
+                this.izStartRequire = izStartRequire;
+                if (!this.toUpdateCols.contains("IZ_START_REQUIRE")) {
+                    this.toUpdateCols.add("IZ_START_REQUIRE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.izStartRequire = izStartRequire;
+            if (!this.toUpdateCols.contains("IZ_START_REQUIRE")) {
+                this.toUpdateCols.add("IZ_START_REQUIRE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否结束。
+     */
+    private Boolean izEnd;
+
+    /**
+     * 获取：是否结束。
+     */
+    public Boolean getIzEnd() {
+        return this.izEnd;
+    }
+
+    /**
+     * 设置：是否结束。
+     */
+    public PmPrj setIzEnd(Boolean izEnd) {
+        if (this.izEnd == null && izEnd == null) {
+            // 均为null，不做处理。
+        } else if (this.izEnd != null && izEnd != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.izEnd.compareTo(izEnd) != 0) {
+                this.izEnd = izEnd;
+                if (!this.toUpdateCols.contains("IZ_END")) {
+                    this.toUpdateCols.add("IZ_END");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.izEnd = izEnd;
+            if (!this.toUpdateCols.contains("IZ_END")) {
+                this.toUpdateCols.add("IZ_END");
             }
         }
         return this;
@@ -2374,6 +2538,42 @@ public class PmPrj {
             this.responsibleId = responsibleId;
             if (!this.toUpdateCols.contains("RESPONSIBLE_ID")) {
                 this.toUpdateCols.add("RESPONSIBLE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 批复日期。
+     */
+    private LocalDate replyDate;
+
+    /**
+     * 获取：批复日期。
+     */
+    public LocalDate getReplyDate() {
+        return this.replyDate;
+    }
+
+    /**
+     * 设置：批复日期。
+     */
+    public PmPrj setReplyDate(LocalDate replyDate) {
+        if (this.replyDate == null && replyDate == null) {
+            // 均为null，不做处理。
+        } else if (this.replyDate != null && replyDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.replyDate.compareTo(replyDate) != 0) {
+                this.replyDate = replyDate;
+                if (!this.toUpdateCols.contains("REPLY_DATE")) {
+                    this.toUpdateCols.add("REPLY_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.replyDate = replyDate;
+            if (!this.toUpdateCols.contains("REPLY_DATE")) {
+                this.toUpdateCols.add("REPLY_DATE");
             }
         }
         return this;
