@@ -61,35 +61,41 @@ public class PlanOperationExt {
         if (!Strings.isNullOrEmpty(selectReq.totalInvestEnd)){
             sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST <= :totalInvestEnd");
         }
-        if (!CollectionUtils.isEmpty(selectReq.locationIds)){
-            sqlSb.append(" and pp.BASE_LOCATION_ID in (:locationIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)){
-            sqlSb.append(" and rtemp.AD_USER_ID in (:earlyUserIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.keyProjectTypeIds)){
-            sqlSb.append(" and po.KEY_PROJECT_TYPE_ID in (:keyProjectTypeIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.prjManageModeIds)){
-            sqlSb.append(" and pp.PRJ_MANAGE_MODE_ID in (:prjManageModeIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)){
-            sqlSb.append(" and pp.PROJECT_PHASE_ID in (:prjPhaseIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)){
-            sqlSb.append(" and pp.PROJECT_TYPE_ID in (:prjTypeIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.prjTagIds)){
-            sqlSb.append(" and (");
-            for (int i = 0;i < selectReq.prjTagIds.size();i++) {
-                if (i > 0){
-                    sqlSb.append(" or ");
-                }
-                sqlSb.append(" FIND_IN_SET(:prjTagId" + i + ",po.PRJ_TAG_IDS" + ")");
-                sqlParams.put("prjTagId" + i,selectReq.prjTagIds.get(i));
+        //高级筛选begin------
+        if (!this.isDisableFilter(selectReq)){//是否关闭高级筛选
+            sqlSb.append(" and ( 1 != 1");
+            if (!CollectionUtils.isEmpty(selectReq.locationIds)){
+                sqlSb.append(" or pp.BASE_LOCATION_ID in (:locationIds)");
             }
-            sqlSb.append(" )");
+            if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)){
+                sqlSb.append(" or rtemp.AD_USER_ID in (:earlyUserIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.keyProjectTypeIds)){
+                sqlSb.append(" or po.KEY_PROJECT_TYPE_ID in (:keyProjectTypeIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.prjManageModeIds)){
+                sqlSb.append(" or pp.PRJ_MANAGE_MODE_ID in (:prjManageModeIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)){
+                sqlSb.append(" or pp.PROJECT_PHASE_ID in (:prjPhaseIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)){
+                sqlSb.append(" or pp.PROJECT_TYPE_ID in (:prjTypeIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.prjTagIds)){
+                sqlSb.append(" or (");
+                for (int i = 0;i < selectReq.prjTagIds.size();i++) {
+                    if (i > 0){
+                        sqlSb.append(" or ");
+                    }
+                    sqlSb.append(" FIND_IN_SET(:prjTagId" + i + ",po.PRJ_TAG_IDS" + ")");
+                    sqlParams.put("prjTagId" + i,selectReq.prjTagIds.get(i));
+                }
+                sqlSb.append(" )");
+            }
+            sqlSb.append(")");
         }
+        //高级筛选end-------
         if (selectReq.isFollow != null && selectReq.isFollow == true){
             sqlSb.append(" and FIND_IN_SET(:loginId,ftemp.AdUserIds)");
         }
@@ -365,35 +371,43 @@ public class PlanOperationExt {
         if (!Strings.isNullOrEmpty(selectReq.totalInvestEnd)){
             sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST <= :totalInvestEnd");
         }
-        if (!CollectionUtils.isEmpty(selectReq.locationIds)){
-            sqlSb.append(" and pp.BASE_LOCATION_ID in (:locationIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)){
-            sqlSb.append(" and rtemp.AD_USER_ID in (:earlyUserIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.keyProjectTypeIds)){
-            sqlSb.append(" and po.KEY_PROJECT_TYPE_ID in (:keyProjectTypeIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.prjManageModeIds)){
-            sqlSb.append(" and pp.PRJ_MANAGE_MODE_ID in (:prjManageModeIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)){
-            sqlSb.append(" and pp.PROJECT_PHASE_ID in (:prjPhaseIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)){
-            sqlSb.append(" and pp.PROJECT_TYPE_ID in (:prjTypeIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.prjTagIds)){
-            sqlSb.append(" and (");
-            for (int i = 0;i < selectReq.prjTagIds.size();i++) {
-                if (i > 0){
-                    sqlSb.append(" or ");
-                }
-                sqlSb.append(" FIND_IN_SET(:prjTagId" + i + ",po.PRJ_TAG_IDS" + ")");
-                sqlParams.put("prjTagId" + i,selectReq.prjTagIds.get(i));
+
+        //高级筛选begin------
+        if (!this.isDisableFilter(selectReq)){//是否关闭高级筛选
+            sqlSb.append(" and ( 1 != 1");
+            if (!CollectionUtils.isEmpty(selectReq.locationIds)){
+                sqlSb.append(" or pp.BASE_LOCATION_ID in (:locationIds)");
             }
-            sqlSb.append(" )");
+            if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)){
+                sqlSb.append(" or rtemp.AD_USER_ID in (:earlyUserIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.keyProjectTypeIds)){
+                sqlSb.append(" or po.KEY_PROJECT_TYPE_ID in (:keyProjectTypeIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.prjManageModeIds)){
+                sqlSb.append(" or pp.PRJ_MANAGE_MODE_ID in (:prjManageModeIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)){
+                sqlSb.append(" or pp.PROJECT_PHASE_ID in (:prjPhaseIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)){
+                sqlSb.append(" or pp.PROJECT_TYPE_ID in (:prjTypeIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.prjTagIds)){
+                sqlSb.append(" or (");
+                for (int i = 0;i < selectReq.prjTagIds.size();i++) {
+                    if (i > 0){
+                        sqlSb.append(" or ");
+                    }
+                    sqlSb.append(" FIND_IN_SET(:prjTagId" + i + ",po.PRJ_TAG_IDS" + ")");
+                    sqlParams.put("prjTagId" + i,selectReq.prjTagIds.get(i));
+                }
+                sqlSb.append(" )");
+            }
+            sqlSb.append(")");
         }
+        //高级筛选end-------
+
         if (selectReq.isFollow != null && selectReq.isFollow == true){
             sqlSb.append(" and FIND_IN_SET(:loginId,ftemp.AdUserIds)");
         }
@@ -444,35 +458,41 @@ public class PlanOperationExt {
         if (!Strings.isNullOrEmpty(selectReq.totalInvestEnd)){
             sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST <= :totalInvestEnd");
         }
-        if (!CollectionUtils.isEmpty(selectReq.locationIds)){
-            sqlSb.append(" and pp.BASE_LOCATION_ID in (:locationIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)){
-            sqlSb.append(" and rtemp.AD_USER_ID in (:earlyUserIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.keyProjectTypeIds)){
-            sqlSb.append(" and po.KEY_PROJECT_TYPE_ID in (:keyProjectTypeIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.prjManageModeIds)){
-            sqlSb.append(" and pp.PRJ_MANAGE_MODE_ID in (:prjManageModeIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)){
-            sqlSb.append(" and pp.PROJECT_PHASE_ID in (:prjPhaseIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)){
-            sqlSb.append(" and pp.PROJECT_TYPE_ID in (:prjTypeIds)");
-        }
-        if (!CollectionUtils.isEmpty(selectReq.prjTagIds)){
-            sqlSb.append(" and (");
-            for (int i = 0;i < selectReq.prjTagIds.size();i++) {
-                if (i > 0){
-                    sqlSb.append(" or ");
-                }
-                sqlSb.append(" FIND_IN_SET(:prjTagId" + i + ",po.PRJ_TAG_IDS" + ")");
-                sqlParams.put("prjTagId" + i,selectReq.prjTagIds.get(i));
+        //高级筛选begin------
+        if (!this.isDisableFilter(selectReq)){//是否关闭高级筛选
+            sqlSb.append(" and ( 1 != 1");
+            if (!CollectionUtils.isEmpty(selectReq.locationIds)){
+                sqlSb.append(" or pp.BASE_LOCATION_ID in (:locationIds)");
             }
-            sqlSb.append(" )");
+            if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)){
+                sqlSb.append(" or rtemp.AD_USER_ID in (:earlyUserIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.keyProjectTypeIds)){
+                sqlSb.append(" or po.KEY_PROJECT_TYPE_ID in (:keyProjectTypeIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.prjManageModeIds)){
+                sqlSb.append(" or pp.PRJ_MANAGE_MODE_ID in (:prjManageModeIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)){
+                sqlSb.append(" or pp.PROJECT_PHASE_ID in (:prjPhaseIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)){
+                sqlSb.append(" or pp.PROJECT_TYPE_ID in (:prjTypeIds)");
+            }
+            if (!CollectionUtils.isEmpty(selectReq.prjTagIds)){
+                sqlSb.append(" or (");
+                for (int i = 0;i < selectReq.prjTagIds.size();i++) {
+                    if (i > 0){
+                        sqlSb.append(" or ");
+                    }
+                    sqlSb.append(" FIND_IN_SET(:prjTagId" + i + ",po.PRJ_TAG_IDS" + ")");
+                    sqlParams.put("prjTagId" + i,selectReq.prjTagIds.get(i));
+                }
+                sqlSb.append(" )");
+            }
+            sqlSb.append(")");
         }
+        //高级筛选end-------
         sqlSb.append(" group by pp.PROJECT_TYPE_ID");
         List<Map<String, Object>> originList = myNamedParameterJdbcTemplate.queryForList(sqlSb.toString(), sqlParams);
         Map<String, Object> result = new HashMap<>();
@@ -519,6 +539,16 @@ public class PlanOperationExt {
         return planOperationResps;
     }
 
+    //是否关闭高级筛选，筛选参数全为空true
+    private boolean isDisableFilter(OperationSelectReq selectReq){
+        return CollectionUtils.isEmpty(selectReq.locationIds)
+                && CollectionUtils.isEmpty(selectReq.earlyUserIds)
+                && CollectionUtils.isEmpty(selectReq.keyProjectTypeIds)
+                && CollectionUtils.isEmpty(selectReq.prjManageModeIds)
+                && CollectionUtils.isEmpty(selectReq.prjPhaseIds)
+                && CollectionUtils.isEmpty(selectReq.prjTypeIds)
+                && CollectionUtils.isEmpty(selectReq.prjTagIds);
+    }
 
     /**
      * 新增项目下拉
