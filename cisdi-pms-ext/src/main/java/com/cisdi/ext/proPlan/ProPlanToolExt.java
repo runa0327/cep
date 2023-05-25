@@ -32,8 +32,10 @@ public class ProPlanToolExt {
         InputData inputData = JsonUtil.fromJson(json, InputData.class);
         StringBuilder sb = new StringBuilder();
         sb.append("select * from pm_prj where status = 'ap' ");
+        List<Map<String, Object>> list = new ArrayList<>();
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         Map<String, Object> queryParams = new HashMap<>();// 创建入参map
-        if ("".equals(inputData.type)) {
+        if ("1".equals(inputData.type)) {
             if (Strings.isNotEmpty(inputData.sources)) {
                 sb.append(" and INVESTMENT_SOURCE_ID in (:sources)");
                 queryParams.put("sources", Arrays.asList(inputData.sources.split(",")));
@@ -51,15 +53,15 @@ public class ProPlanToolExt {
                 sb.append(" and TENDER_MODE_ID in (:tendModes)");
                 queryParams.put("tendModes", Arrays.asList(inputData.tendModes.split(",")));
             }
-        } else {
+            list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), queryParams);
+        } else if ("2".equals(inputData.type)) {
             if (Strings.isNotEmpty(inputData.projectIds)) {
                 sb.append(" and id in (:projectIds)");
                 queryParams.put("projectIds", Arrays.asList(inputData.projectIds.split(",")));
             }
+            list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), queryParams);
         }
 
-        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
-        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), queryParams);
         if (!CollectionUtils.isEmpty(list)) {
             list.forEach(item -> {
                 //刷新项目全景计划
