@@ -214,7 +214,7 @@ public class PlanOperationController extends BaseController {
 
 
     private void insertWeekTask(String projectId) {
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where level=3 and PROGRESS_STATUS_ID= '0099799190825106802' and  PM_PRJ_ID=? ", projectId);
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where level=3 and pn.PROGRESS_STATUS_ID= '0099799190825106802' and  PM_PRJ_ID=? ", projectId);
         List<Map<String, Object>> taskList = jdbcTemplate.queryForList("select * from week_task where WEEK_TASK_TYPE_ID='1635080848313290752' and PM_PRJ_ID=?", projectId);
         if (!CollectionUtils.isEmpty(list)) {
             list.forEach(item -> {
