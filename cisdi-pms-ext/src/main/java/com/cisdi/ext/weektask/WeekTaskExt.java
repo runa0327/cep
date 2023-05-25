@@ -42,8 +42,7 @@ public class WeekTaskExt {
                 "left join ad_user au on au.id = wt.TRANSFER_USER left join pm_prj pj on wt.pm_prj_id = pj.id " +
                 "where AD_USER_ID = '").append(userId).append("' and PUBLISH_START between '")
                 .append(weekDay.get("begin")).append("' and '").append(weekDay.get("end"))
-                .append(" and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null ) ")
-                .append("' order by PUBLISH_START desc");
+                .append("' and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null ) order by PUBLISH_START desc");
 
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
@@ -133,8 +132,7 @@ public class WeekTaskExt {
                 "where wt.id  in (select id from week_task where TRANSFER_USER='").append(userId).append("')")
                 .append(" and PUBLISH_START between '")
                 .append(weekDay.get("begin")).append("' and '").append(weekDay.get("end"))
-                .append(" and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null ) ")
-                .append("' order by PUBLISH_START desc");
+                .append("' and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null ) order by PUBLISH_START desc");
 
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
