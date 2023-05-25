@@ -131,10 +131,11 @@ public class PmLifeCycleExt {
             MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
             Map<String, Object> queryParams = new HashMap<>();// 创建入参map
             queryParams.put("ids", ids);
-            nodeList = myNamedParameterJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name from pm_pro_plan_node pn " +
-                    "left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id " +
-                    "left join gr_set_value gsv on gsv.id = pn.PROGRESS_STATUS_ID " +
-                    "where pl.IS_TEMPLATE <>1 and pl.PM_PRJ_ID in (:ids)  ", queryParams);
+            nodeList = myNamedParameterJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name,snn.`NAME` as nodeName from pm_pro_plan_node pn  \n" +
+                    " left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id \n" +
+                    " left join gr_set_value gsv on gsv.id = pn.PROGRESS_STATUS_ID  \n" +
+                    " left join STANDARD_NODE_NAME snn on pn.SCHEDULE_NAME = snn.id  \n" +
+                    " where pl.IS_TEMPLATE <>1 and pl.PM_PRJ_ID  in (:ids)  ", queryParams);
         }
 
 
@@ -172,7 +173,7 @@ public class PmLifeCycleExt {
                     json.put("remarkCount", reCount);
                     newData.put("备注说明", json);
                 } else {
-                    Optional<Map<String, Object>> optional = nodeList.stream().filter(p -> Objects.equals(stringObjectMap.get("id"), p.get("PM_PRJ_ID")) && Objects.equals(s, p.get("NAME"))).findAny();
+                    Optional<Map<String, Object>> optional = nodeList.stream().filter(p -> Objects.equals(stringObjectMap.get("id"), p.get("PM_PRJ_ID")) && Objects.equals(s, p.get("nodeName"))).findAny();
                     if (optional.isPresent()) {
                         Map<String, Object> dataMap = optional.get();
                         JSONObject json = new JSONObject();
