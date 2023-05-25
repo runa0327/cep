@@ -194,34 +194,17 @@ public class PrjPlanUtil {
         }).collect(Collectors.toList());
     }
 
+
     /**
-     * 新增项目进度网络图
+     * 刷新项目模板
      *
      * @param projectId
-     * @param type
-     * @param sourceId
-     * @param invest
-     * @param invest
+     * @param templateId
      */
-    public static void createPlan(String projectId, String type, String sourceId, BigDecimal invest, String tenderWay) {
+    public static void createPlan(String projectId, String templateId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        //根据项目的类型，项目投资来源，项目的总额，招标方式查询模板
-        String proPlanId = "1648561483233353728";  //默认的模板
-        List<Map<String, Object>> ruleList = myJdbcTemplate.queryForList("select pptr.*,gsv.`code` as rule from PRO_PLAN_TEMPLATE_RULE pptr " +
-                "left join gr_set_value gsv on pptr.PRO_PLAN_RULE_CONDITION_ID = gsv.id " +
-                "where TEMPLATE_FOR_PROJECT_TYPE_ID=? and INVESTMENT_SOURCE_ID=? and TENDER_MODE_ID=?", type, sourceId, tenderWay);
-        if (!CollectionUtils.isEmpty(ruleList)) {
-            for (Map<String, Object> objectMap : ruleList) {
-                String condition = JdbcMapUtil.getString(objectMap, "rule");
-                String ex = condition.replaceAll("param", String.valueOf(invest));
-                if (StringUtil.doExpression(ex)) {
-                    proPlanId = JdbcMapUtil.getString(objectMap, "PM_PRO_PLAN_ID");
-                    break;
-                }
-            }
-        }
         //根据规则查询模板
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRO_PLAN where id = ?", proPlanId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRO_PLAN where id = ?", templateId);
 
         if (!CollectionUtils.isEmpty(list)) {
             //先清出原来的
@@ -252,7 +235,7 @@ public class PrjPlanUtil {
                             .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                             .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                             .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
-                            .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).set("IZ_MORE",m.get("IZ_MORE"))
+                            .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).set("IZ_MORE", m.get("IZ_MORE"))
                             .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).set("AD_ENT_ID_IMP", m.get("AD_ENT_ID_IMP")).set("AD_ATT_ID_IMP", m.get("AD_ATT_ID_IMP")).set("IZ_MILESTONE", m.get("IZ_MILESTONE")).set("SCHEDULE_NAME", m.get("SCHEDULE_NAME")).exec();
                     getChildrenNode(m, planNodeList, id, newPlanId);
                 }).collect(Collectors.toList());
@@ -284,6 +267,35 @@ public class PrjPlanUtil {
                 setFirstNodeUser(projectId);
             }
         }
+    }
+
+    /**
+     * 新增项目进度网络图
+     *
+     * @param projectId
+     * @param type
+     * @param sourceId
+     * @param invest
+     * @param invest
+     */
+    public static void createPlan(String projectId, String type, String sourceId, BigDecimal invest, String tenderWay) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //根据项目的类型，项目投资来源，项目的总额，招标方式查询模板
+        String proPlanId = "1648561483233353728";  //默认的模板
+        List<Map<String, Object>> ruleList = myJdbcTemplate.queryForList("select pptr.*,gsv.`code` as rule from PRO_PLAN_TEMPLATE_RULE pptr " +
+                "left join gr_set_value gsv on pptr.PRO_PLAN_RULE_CONDITION_ID = gsv.id " +
+                "where TEMPLATE_FOR_PROJECT_TYPE_ID=? and INVESTMENT_SOURCE_ID=? and TENDER_MODE_ID=?", type, sourceId, tenderWay);
+        if (!CollectionUtils.isEmpty(ruleList)) {
+            for (Map<String, Object> objectMap : ruleList) {
+                String condition = JdbcMapUtil.getString(objectMap, "rule");
+                String ex = condition.replaceAll("param", String.valueOf(invest));
+                if (StringUtil.doExpression(ex)) {
+                    proPlanId = JdbcMapUtil.getString(objectMap, "PM_PRO_PLAN_ID");
+                    break;
+                }
+            }
+        }
+        createPlan(projectId, proPlanId);
     }
 
     /**
@@ -328,7 +340,7 @@ public class PrjPlanUtil {
                     .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                     .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                     .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
-                    .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).set("IZ_MORE",m.get("IZ_MORE"))
+                    .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).set("IZ_MORE", m.get("IZ_MORE"))
                     .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).set("AD_ENT_ID_IMP", m.get("AD_ENT_ID_IMP")).set("AD_ATT_ID_IMP", m.get("AD_ATT_ID_IMP")).set("IZ_MILESTONE", m.get("IZ_MILESTONE")).set("SCHEDULE_NAME", m.get("SCHEDULE_NAME")).exec();
             getChildrenNode(m, allData, id, newPlanId);
         }).collect(Collectors.toList());
