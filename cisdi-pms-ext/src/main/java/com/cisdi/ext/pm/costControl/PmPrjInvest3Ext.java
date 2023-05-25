@@ -1,7 +1,9 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.costControl;
 
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.invest.InvestAmtExt;
+import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.util.StringUtil;
 import com.cisdi.ext.util.WfPmInvestUtil;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -15,7 +17,7 @@ import com.qygly.shared.util.SharedUtil;
 import java.util.Map;
 
 /**
- * 预算财评-流程扩展
+ * 成本管控-预算财评-流程扩展
  */
 public class PmPrjInvest3Ext {
 
@@ -44,6 +46,9 @@ public class PmPrjInvest3Ext {
         if (!SharedUtil.isEmptyString(errorMsg)){
             throw new BaseException(errorMsg);
         }
+
+        //送审信息写入批复信息
+        writeReply(entityRecord.valueMap,id);
     }
 
     /**
@@ -155,5 +160,45 @@ public class PmPrjInvest3Ext {
             }
         }
         return name;
+    }
+
+    /**
+     * 预算财评-发起时送审财评信息写入批复信息
+     * @param valueMap 数据集合
+     * @param id 财评表id
+     */
+    private void writeReply(Map<String, Object> valueMap, String id) {
+        String PRJ_TOTAL_INVEST_ONE = StringUtil.valueNullToStrNumber(JdbcMapUtil.getString(valueMap,"PRJ_TOTAL_INVEST_ONE")); // 总投资
+        String PROJECT_AMT_ONE = StringUtil.valueNullToStrNumber(JdbcMapUtil.getString(valueMap,"PROJECT_AMT_ONE")); // 工程费用
+        String CONSTRUCT_AMT_ONE = StringUtil.valueNullToStrNumber(JdbcMapUtil.getString(valueMap,"CONSTRUCT_AMT_ONE")); // 建安工程费
+        String EQUIP_AMT_ONE = StringUtil.valueNullToStrNumber(JdbcMapUtil.getString(valueMap,"EQUIP_AMT_ONE")); // 设备采购费
+        String PROJECT_OTHER_AMT_ONE = StringUtil.valueNullToStrNumber(JdbcMapUtil.getString(valueMap,"PROJECT_OTHER_AMT_ONE")); // 工程建设其他费
+        String EQUIPMENT_COST_ONE = StringUtil.valueNullToStrNumber(JdbcMapUtil.getString(valueMap,"EQUIPMENT_COST_ONE")); // 科研设备费
+        String LAND_AMT_ONE = StringUtil.valueNullToStrNumber(JdbcMapUtil.getString(valueMap,"LAND_AMT_ONE")); // 土地征拆费用
+        String PREPARE_AMT_ONE = StringUtil.valueNullToStrNumber(JdbcMapUtil.getString(valueMap,"PREPARE_AMT_ONE")); // 预备费
+        String CONSTRUCT_PERIOD_ONE = StringUtil.valueNullToStrNumber(JdbcMapUtil.getString(valueMap,"CONSTRUCT_PERIOD_ONE")); // 建设期利息
+        Crud.from("PM_PRJ_INVEST3").where().eq("ID",id).update()
+                .set("PRJ_TOTAL_INVEST",PRJ_TOTAL_INVEST_ONE) // 总投资
+                .set("PROJECT_AMT",PROJECT_AMT_ONE) // 工程费用
+                .set("CONSTRUCT_AMT",CONSTRUCT_AMT_ONE) // 建安工程费
+                .set("EQUIP_AMT",EQUIP_AMT_ONE) // 设备采购费
+                .set("PROJECT_OTHER_AMT",PROJECT_OTHER_AMT_ONE) // 工程建设其他费
+                .set("EQUIPMENT_COST",EQUIPMENT_COST_ONE) // 科研设备费
+                .set("LAND_AMT",LAND_AMT_ONE) // 土地征拆费用
+                .set("PREPARE_AMT",PREPARE_AMT_ONE) // 预备费
+                .set("CONSTRUCT_PERIOD_INTEREST",CONSTRUCT_PERIOD_ONE) // 建设期利息
+                .exec();
+    }
+
+    /**
+     * 金额空值判断
+     * @param amt 金额
+     * @return 判断后数据
+     */
+    private String getAmt(String amt) {
+        if (SharedUtil.isEmptyString(amt)){
+            amt = "0";
+        }
+        return amt;
     }
 }
