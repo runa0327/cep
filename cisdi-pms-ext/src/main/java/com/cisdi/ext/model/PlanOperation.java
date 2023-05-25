@@ -99,7 +99,7 @@ public class PlanOperation {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 项目标签。
+         * 项目标签（多值）。
          */
         public static final String PRJ_TAG_IDS = "PRJ_TAG_IDS";
         /**
@@ -586,19 +586,19 @@ public class PlanOperation {
     }
 
     /**
-     * 项目标签。
+     * 项目标签（多值）。
      */
     private String prjTagIds;
 
     /**
-     * 获取：项目标签。
+     * 获取：项目标签（多值）。
      */
     public String getPrjTagIds() {
         return this.prjTagIds;
     }
 
     /**
-     * 设置：项目标签。
+     * 设置：项目标签（多值）。
      */
     public PlanOperation setPrjTagIds(String prjTagIds) {
         if (this.prjTagIds == null && prjTagIds == null) {
