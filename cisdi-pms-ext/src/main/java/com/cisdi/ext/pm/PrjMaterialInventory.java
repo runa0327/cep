@@ -265,12 +265,14 @@ public class PrjMaterialInventory {
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         DltReq dltReq = JSONObject.parseObject(JSONObject.toJSONString(params), DltReq.class);
-        String sql = "select i.id inventoryId,i.IS_INVOLVED isInvolved,i.remark,ty.name typeName,f.id fileId,if(i.IS_INVOLVED = 1,f.DSP_NAME,'不涉及') fileName,f.DSP_SIZE fileSize,f.UPLOAD_DTTM uploadTime,u.name uploadUser from " +
-                "prj_inventory i \n" +
+        String sql = "select i.id inventoryId,i.IS_INVOLVED isInvolved,i.remark,ty.name typeName,GROUP_CONCAT(f.id) fileId,\n" +
+                "if(i.IS_INVOLVED = 1,SUBSTRING_INDEX(GROUP_CONCAT(f.DSP_NAME),',',1) ,'不涉及') fileName,\n" +
+                "SUBSTRING_INDEX(GROUP_CONCAT(f.DSP_SIZE),',',1) fileSize,SUBSTRING_INDEX(GROUP_CONCAT(f.UPLOAD_DTTM),',',1) uploadTime,\n" +
+                "SUBSTRING_INDEX(GROUP_CONCAT(u.name),',',1) uploadUser from prj_inventory i \n" +
                 "left join prj_inventory_detail d on i.id = d.PRJ_INVENTORY_ID\n" +
                 "left join material_inventory_type ty on ty.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
                 "left join fl_file f on f.id = d.FL_FILE_ID\n" +
-                "left join ad_user u on u.id = f.CRT_USER_ID\n" +
+                "left join ad_user u on u.id = f.CRT_USER_ID " +
                 "where i.PM_PRJ_ID = '" + dltReq.prjId + "'";
         //主清单类型 不传查所有
         if (!Strings.isNullOrEmpty(dltReq.masterTypeId)){
@@ -284,8 +286,9 @@ public class PrjMaterialInventory {
         if (!Strings.isNullOrEmpty(dltReq.fileName)){
             sql += " and f.DSP_NAME like '%" + dltReq.fileName + "%'";
         }
-        int start = (dltReq.pageIndex - 1) * dltReq.pageSize;
+        sql += " group by i.id";
         List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(sql);
+        int start = (dltReq.pageIndex - 1) * dltReq.pageSize;
         sql += " order by ty.SEQ_NO limit " + start + "," + dltReq.pageSize;
         List<Map<String, Object>> dtlList = myJdbcTemplate.queryForList(sql);
 
@@ -318,7 +321,6 @@ public class PrjMaterialInventory {
 
 
 
-        PrjInventoryDetail.deleteByWhere(new Where().eq(PrjInventoryDetail.Cols.PRJ_INVENTORY_ID,inventoryId));//临时改动
         //绑定文件
         String[] fileIdArr = fileIds.split(",");
         for (String fileId : fileIdArr) {

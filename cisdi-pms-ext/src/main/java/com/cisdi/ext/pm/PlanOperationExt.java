@@ -55,8 +55,14 @@ public class PlanOperationExt {
         if (!CollectionUtils.isEmpty(selectReq.prjIds)){
             sqlSb.append(" and po.PM_PRJ_ID in (:prjIds)");
         }
-        if (!Strings.isNullOrEmpty(selectReq.totalInvestStart) && !Strings.isNullOrEmpty(selectReq.totalInvestEnd)){
-            sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST between :totalInvestStart and :totalInvestEnd");
+        if (!Strings.isNullOrEmpty(selectReq.totalInvestStart)){
+            sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST >= :totalInvestStart");
+        }
+        if (!Strings.isNullOrEmpty(selectReq.totalInvestEnd)){
+            sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST <= :totalInvestEnd");
+        }
+        if (!CollectionUtils.isEmpty(selectReq.locationIds)){
+            sqlSb.append(" and pp.BASE_LOCATION_ID in (:locationIds)");
         }
         if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)){
             sqlSb.append(" and rtemp.AD_USER_ID in (:earlyUserIds)");
@@ -350,8 +356,14 @@ public class PlanOperationExt {
         if (!CollectionUtils.isEmpty(selectReq.prjIds)){
             sqlSb.append(" and po.PM_PRJ_ID in (:prjIds)");
         }
-        if (!Strings.isNullOrEmpty(selectReq.totalInvestStart) && !Strings.isNullOrEmpty(selectReq.totalInvestEnd)){
-            sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST between :totalInvestStart and :totalInvestEnd");
+        if (!Strings.isNullOrEmpty(selectReq.totalInvestStart)){
+            sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST >= :totalInvestStart");
+        }
+        if (!Strings.isNullOrEmpty(selectReq.totalInvestEnd)){
+            sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST <= :totalInvestEnd");
+        }
+        if (!CollectionUtils.isEmpty(selectReq.locationIds)){
+            sqlSb.append(" and pp.BASE_LOCATION_ID in (:locationIds)");
         }
         if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)){
             sqlSb.append(" and rtemp.AD_USER_ID in (:earlyUserIds)");
@@ -420,8 +432,14 @@ public class PlanOperationExt {
         if (!CollectionUtils.isEmpty(selectReq.prjIds)){
             sqlSb.append(" and po.PM_PRJ_ID in (:prjIds)");
         }
-        if (!Strings.isNullOrEmpty(selectReq.totalInvestStart) && !Strings.isNullOrEmpty(selectReq.totalInvestEnd)){
-            sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST between :totalInvestStart and :totalInvestEnd");
+        if (!Strings.isNullOrEmpty(selectReq.totalInvestStart)){
+            sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST >= :totalInvestStart");
+        }
+        if (!Strings.isNullOrEmpty(selectReq.totalInvestEnd)){
+            sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST <= :totalInvestEnd");
+        }
+        if (!CollectionUtils.isEmpty(selectReq.locationIds)){
+            sqlSb.append(" and pp.BASE_LOCATION_ID in (:locationIds)");
         }
         if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)){
             sqlSb.append(" and rtemp.AD_USER_ID in (:earlyUserIds)");
@@ -613,6 +631,8 @@ public class PlanOperationExt {
         private List<String> prjTagIds;
         //项目状态
         private List<String> prjPhaseIds;
+        //建设地点
+        private List<String> locationIds;
         //页码
         private Integer pageIndex;
         //页面大小
