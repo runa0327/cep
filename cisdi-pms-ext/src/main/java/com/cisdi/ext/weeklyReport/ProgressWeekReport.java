@@ -170,6 +170,7 @@ public class ProgressWeekReport {
         }
         String start = writeDate.substring(0,10);
         String end = writeDate.substring(11,21);
+        String now = DateTimeUtil.dttmToString(new Date());
         //数据保存
         Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",id).update()
                 .set("DATE",writeDate).set("PM_PRJ_ID",param.projectId)
@@ -178,7 +179,8 @@ public class ProgressWeekReport {
                 .set("TEXT_REMARK_ONE",param.progressRemark).set("SYS_TRUE",param.weatherStart)
                 .set("IZ_END",param.weatherCompleted).set("FROM_DATE",start).set("TO_DATE",end)
                 .set("PM_PROGRESS_WEEKLY_ID",param.weekId).set("PM_PROGRESS_WEEKLY_PRJ_ID",weekPrjId)
-                .set("AD_USER_ID",userId).set("LAST_MODI_DT",DateTimeUtil.dttmToString(new Date())).set("LAST_MODI_USER_ID",userId)
+                .set("AD_USER_ID",userId).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                .set("TS",now)
                 .exec();
         //主表更新，该项目该周已更新
         Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update().set("IZ_WRITE",1).set("AD_USER_ID",userId).exec();
@@ -440,7 +442,7 @@ public class ProgressWeekReport {
                 "and ad_user_id is not null GROUP BY PM_PRJ_ID,ad_user_id) d on b.pm_prj_id = d.PM_PRJ_ID " +
                 "left join pm_prj e on b.pm_prj_id = e.id " +
                 "LEFT JOIN ad_user f ON d.ad_user_id = f.id " +
-                "where a.status = 'ap' and b.status = 'ap' and c.status = 'ap' and b.IS_WEEKLY_REPORT_SUBMIT = 1 and a.IS_WEEKLY_REPORT_SUBMIT = 1 ";
+                "where a.status = 'ap' and b.status = 'ap' and c.status = 'ap' and f.name is not null ";
         StringBuilder sb = new StringBuilder(sql);
         if (!SharedUtil.isEmptyString(weekId)){
             sb.append(" and c.id = '").append(weekId).append("' "); // 周-批次id
@@ -476,7 +478,7 @@ public class ProgressWeekReport {
             sb.append(" and b.IZ_END = '").append(weatherCompleted).append("' "); //是否竣工
         }
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(String.valueOf(sb));
-        sb.append(" order by b.IZ_END asc,b.SYS_TRUE desc,b.PM_PRJ_ID desc ").append(limit);
+        sb.append(" order by a.ts desc,b.IZ_END asc,b.SYS_TRUE desc,b.PM_PRJ_ID desc ").append(limit);
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString());
         Map<String,Object> map = new HashMap<>();
         if (!CollectionUtils.isEmpty(list1)){

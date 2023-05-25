@@ -1,7 +1,9 @@
 package com.cisdi.ext.base;
 
 import com.cisdi.ext.link.LinkSql;
+import com.cisdi.ext.model.PmPlan;
 import com.cisdi.ext.model.PmPrj;
+import com.cisdi.ext.model.PrjStart;
 import com.cisdi.ext.model.view.project.PmPrjView;
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.pm.PmRosterExt;
@@ -19,6 +21,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -365,5 +368,53 @@ public class PmPrjExt {
         }
         sb.deleteCharAt(sb.length()-1);
         return sb.toString();
+    }
+
+    /**
+     * 项目库系统写入项目启动/项目谋划
+     */
+    public void prjInsertStart(){
+        List<PmPrj> prjList = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.STATUS,"AP")
+                .eq(PmPrj.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441374"));
+        if (!CollectionUtils.isEmpty(prjList)){
+            for (PmPrj tmp : prjList) {
+                String prjCode = tmp.getPmCode();
+                String prjName = tmp.getName();
+                //通过名称和code查询项目启动中是否存在
+                List<PrjStart> prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.PM_CODE,prjCode)
+                        .eq(PrjStart.Cols.STATUS,"AP").eq(PrjStart.Cols.NAME,prjName));
+                if (CollectionUtils.isEmpty(prjStartList)){ // 新增项目启动
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String nowDate = sdf.format(new Date());
+                    String prjStartId = Crud.from(PrjStart.ENT_CODE).insertData();
+                    Crud.from(PrjStart.ENT_CODE).where().eq(PrjStart.Cols.ID,prjStartId).update()
+                            .set(PrjStart.Cols.VER,99).set(PrjStart.Cols.TS,nowDate)
+                            .set(PrjStart.Cols.CRT_DT,nowDate).set(PrjStart.Cols.CRT_USER_ID,"0099799190825078690")
+                            .set(PrjStart.Cols.LAST_MODI_DT,nowDate).set(PrjStart.Cols.LAST_MODI_USER_ID,"0099799190825078690")
+                            .set(PrjStart.Cols.STATUS,"AP").set(PrjStart.Cols.PRJ_SITUATION,tmp.getPrjSituation())
+                            .set(PrjStart.Cols.NAME,prjName).set(PrjStart.Cols.PRJ_TOTAL_INVEST,tmp.getEstimatedTotalInvest())
+                            .set(PrjStart.Cols.PROJECT_TYPE_ID,tmp.getProjectTypeId()).set(PrjStart.Cols.BUILDER_UNIT,tmp.getBuilderUnit())
+                            .set(PrjStart.Cols.PM_CODE,prjCode).set(PrjStart.Cols.INVESTMENT_SOURCE_ID,tmp.getInvestmentSourceId())
+                            .set(PrjStart.Cols.BASE_LOCATION_ID,tmp.getBaseLocationId()).set(PrjStart.Cols.TENDER_MODE_ID,tmp.getTenderModeId())
+                            .set(PrjStart.Cols.PRJ_START_STATUS_ID,"1636549534274465792")
+                            .exec();
+
+                    //写入项目谋划库
+                    List<PmPlan> pmPlanList = PmPlan.selectByWhere(new Where().eq(PmPlan.Cols.NAME,prjName).eq(PmPlan.Cols.STATUS,"AP"));
+                    if (CollectionUtils.isEmpty(pmPlanList)){
+                        String pmPlanId = Crud.from(PmPlan.ENT_CODE).insertData();
+                        String pmPlanCode = PmPrjCodeUtil.getPmPlanCode();
+                        Crud.from(PmPlan.ENT_CODE).where().eq(PmPlan.Cols.ID,pmPlanId).update()
+                                .set(PmPlan.Cols.VER,99).set(PmPlan.Cols.CRT_USER_ID,"0099799190825078690")
+                                .set(PmPlan.Cols.LAST_MODI_DT,nowDate).set(PmPlan.Cols.LAST_MODI_USER_ID,"0099799190825078690")
+                                .set(PmPlan.Cols.STATUS,"AP").set(PmPlan.Cols.CODE,pmPlanCode)
+                                .set(PmPlan.Cols.NAME,prjName).set(PmPlan.Cols.BASE_LOCATION_ID,tmp.getBaseLocationId())
+                                .set(PmPlan.Cols.PROJECT_TYPE_ID,tmp.getProjectTypeId()).set(PmPlan.Cols.PLAN_STATUS_ID,"1635456054244651008")
+                                .set(PmPlan.Cols.AMT,tmp.getEstimatedTotalInvest())
+                                .exec();
+                    }
+                }
+            }
+        }
     }
 }
