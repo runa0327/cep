@@ -468,7 +468,7 @@ public class PlanOperationExt {
                 if (i > 0){
                     sqlSb.append(" or ");
                 }
-                sqlSb.append(" FIND_IN_SET(:prjTagId" + i + ")");
+                sqlSb.append(" FIND_IN_SET(:prjTagId" + i + ",po.PRJ_TAG_IDS" + ")");
                 sqlParams.put("prjTagId" + i,selectReq.prjTagIds.get(i));
             }
             sqlSb.append(" )");
