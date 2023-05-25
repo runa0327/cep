@@ -364,8 +364,10 @@ public class AttLinkExtDetail {
         mapAddValue("FEASIBILITY_APPROVE_FUND","FS",row,AttDataTypeE.DOUBLE,attLinkResult); //可研批复资金
         mapAddValue("ESTIMATE_APPROVE_FUND","PD",row,AttDataTypeE.DOUBLE,attLinkResult); //初概批复资金
         mapAddValue("EVALUATION_APPROVE_FUND","budget",row,AttDataTypeE.DOUBLE,attLinkResult); //财评批复资金
-        mapAddValue("PRJ_TOTAL_INVEST","ESTIMATED_TOTAL_INVEST",row,AttDataTypeE.DOUBLE,attLinkResult); //总投资
         mapAddValue("OTHER","QTY_TWO",row,AttDataTypeE.TEXT_LONG,attLinkResult); //其他
+        if (!"PM_PRJ_INVEST3".equals(entCode)){ //财评不自动回显总投资
+            mapAddValue("PRJ_TOTAL_INVEST","ESTIMATED_TOTAL_INVEST",row,AttDataTypeE.DOUBLE,attLinkResult); //总投资
+        }
 
         mapAddBigDecimalValue("FLOOR_AREA","FLOOR_AREA",row,AttDataTypeE.DOUBLE,attLinkResult); //占地面积
         mapAddBigDecimalValue("BUILDING_AREA","BUILDING_AREA",row,AttDataTypeE.TEXT_LONG,attLinkResult); //建筑面积

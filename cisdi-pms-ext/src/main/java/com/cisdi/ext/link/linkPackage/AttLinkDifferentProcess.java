@@ -224,7 +224,7 @@ public class AttLinkDifferentProcess {
         List<String> list = new ArrayList<>();
         list.add("PM_PRJ_INVEST1"); //可研报告审批
         list.add("PM_PRJ_INVEST2"); //初设概算审批
-        list.add("PM_PRJ_INVEST3"); //预算财评
+//        list.add("PM_PRJ_INVEST3"); //预算财评
         return list;
     }
 
