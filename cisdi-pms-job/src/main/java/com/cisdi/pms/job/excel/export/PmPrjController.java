@@ -42,7 +42,7 @@ public class PmPrjController extends BaseController {
     @SneakyThrows(IOException.class)
     @GetMapping("export")
     public void prjExcel(PrjRequest request, HttpServletResponse response, HttpServletRequest req){
-        String userId = this.getLoginUser(req.getHeader("qygly-session-id"));
+//        String userId = this.getLoginUser(req.getHeader("qygly-session-id"));
 //        Map<String, String> cookieMap = StringUtils.cookieToMap(req.getHeader("Cookie"));
 //        String username = cookieMap.get("username");
 //        //用户id

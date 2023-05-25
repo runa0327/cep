@@ -64,6 +64,7 @@
         a.STATUS = 'ap'
         AND b.STATUS = 'ap'
         AND c.STATUS = 'ap'
+        AND F.NAME IS NOT NULL
         <if test="weatherStart != null">
             and b.SYS_TRUE = #{weatherStart}
         </if>
@@ -111,4 +112,70 @@
     <update id="updatePrjDetailWeekByWeekId">
         update PM_PROGRESS_WEEKLY_PRJ_DETAIL set IS_WEEKLY_REPORT_SUBMIT = 1 where PM_PROGRESS_WEEKLY_ID = #{weekId}
     </update>
+
+    <!--形象进度工程周报-填报明细-新增-->
+    <insert id="insertData">
+        insert into PM_PROGRESS_WEEKLY_PRJ_DETAIL (
+            ID,
+            VER,
+            TS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            STATUS,
+            PROCESS_REMARK_TEXT,
+            DATE,
+            TO_DATE,
+            FILE_ID_ONE,
+            PM_PROGRESS_WEEKLY_ID,
+            TEXT_REMARK_ONE,
+            VISUAL_PROGRESS,
+            FROM_DATE,
+            PM_PROGRESS_WEEKLY_PRJ_ID,
+            VISUAL_PROGRESS_DESCRIBE,
+            PM_PRJ_ID,
+            SYS_TRUE,
+            IZ_END,
+            IS_WEEKLY_REPORT_SUBMIT
+        ) values (
+            #{id},
+            #{ver},
+            #{ts},
+            #{crtDt},
+            #{crtUserId},
+            #{lastModiDt},
+            #{lastModiUserId},
+            #{status},
+            #{progressWeek},
+            #{writeDate},
+            #{toDate},
+            #{fileId},
+            #{weekId},
+            #{progressRemark},
+            #{progress},
+            #{fromDate},
+            #{weekPrjId},
+            #{progressDescribe},
+            #{projectId},
+            #{weatherStart},
+            #{weatherCompleted},
+            #{izSubmit}
+        )
+    </insert>
+
+    <!--根据周id和项目id查询填报信息-->
+    <select id="getLastWeekDateByPrj" resultMap="PmProgressWeeklyResult">
+        SELECT
+            ID as id,
+            PROCESS_REMARK_TEXT as progressWeek,
+            VISUAL_PROGRESS as progress,
+            VISUAL_PROGRESS_DESCRIBE as progressDescribe
+        FROM
+            pm_progress_weekly_prj_detail
+        WHERE
+            PM_PROGRESS_WEEKLY_ID = #{weekId}
+          AND STATUS = 'ap'
+          AND pm_prj_id = #{projectId}
+    </select>
 </mapper>

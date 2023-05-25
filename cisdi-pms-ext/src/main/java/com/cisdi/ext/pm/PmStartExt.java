@@ -3,6 +3,8 @@ package com.cisdi.ext.pm;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.PmPostAppoint;
+import com.cisdi.ext.model.PrjStart;
+import com.cisdi.ext.pm.office.PmNodeAdjustReqExt;
 import com.cisdi.ext.util.*;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -10,6 +12,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -105,6 +108,7 @@ public class PmStartExt {
             } else {
                 pmStart.postProTrue = 0;
             }
+            pmStart.isNodeAdjust = PmNodeAdjustReqExt.getNodeAdjustByPrj(projectId);
             pmStart.projectId = JdbcMapUtil.getString(m, "project_id");
             pmStart.projectName = JdbcMapUtil.getString(m, "project_name");
             pmStart.projectVer = JdbcMapUtil.getString(m, "project_ver");
@@ -122,7 +126,6 @@ public class PmStartExt {
             ExtJarHelper.returnValue.set(outputMap);
         }
     }
-
 
     /**
      * 项目启动详情
@@ -220,6 +223,11 @@ public class PmStartExt {
         String id = input.id;
         String prjCode = input.code;
         String status = input.status;
+        String prjName = input.name;
+        List<PrjStart> prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME,prjName).eq(PrjStart.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(prjStartList)){
+            throw new BaseException("对不起，该项目已存在，请勿重复创建！");
+        }
         if (Strings.isNullOrEmpty(input.id)) {
             id = Crud.from("PRJ_START").insertData();
             prjCode = PmPrjCodeUtil.getPrjCode();
@@ -230,7 +238,7 @@ public class PmStartExt {
         List<parcel> parcels = input.parcels;
         String location = JSON.toJSON(parcels).toString();
         Crud.from("PRJ_START").where().eq("ID", id).update()
-                .set("PM_CODE", prjCode).set("NAME", input.name).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId).set("TENDER_MODE_ID", input.tenderWay)
+                .set("PM_CODE", prjCode).set("NAME", prjName).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId).set("TENDER_MODE_ID", input.tenderWay)
                 .set("BUILDER_UNIT", input.unit).set("START_TIME", input.startTime).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", status).set("START_REMARK", input.startRemark)
                 .set("ATT_FILE_GROUP_ID", input.fileIds).set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).set("START_TIME", input.startTime)
                 .set("LOCATION_INFO", location).set("AD_USER_ID", input.qqUserId).set("BASE_LOCATION_ID", input.locationId).set("PLAN_START_TIME", input.planStartTime).set("PLAN_END_TIME", input.planEndTime).exec();
@@ -581,6 +589,9 @@ public class PmStartExt {
 
         //是否发起岗位指派流程 1已发起 0未发起
         public Integer postProTrue;
+
+        //是否存在未审批完成全景计划展示表 1存在正在审批中0不存在
+        public Integer isNodeAdjust;
 
         //前期报建岗人员
         public String qqUserId;

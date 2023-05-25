@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 项目启动。
+ * 项目谋划。
  */
-public class PrjStart {
+public class PmPlan {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<PrjStart> modelHelper = new ModelHelper<>("PRJ_START", new PrjStart());
+    private static final ModelHelper<PmPlan> modelHelper = new ModelHelper<>("PM_PLAN", new PmPlan());
 
     /**
      * 待更新的列。
@@ -38,7 +38,7 @@ public class PrjStart {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "PRJ_START";
+    public static final String ENT_CODE = "PM_PLAN";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -92,81 +92,49 @@ public class PrjStart {
          */
         public static final String CODE = "CODE";
         /**
+         * 名称。
+         */
+        public static final String NAME = "NAME";
+        /**
          * 备注。
          */
         public static final String REMARK = "REMARK";
-        /**
-         * 招标模式。
-         */
-        public static final String TENDER_MODE_ID = "TENDER_MODE_ID";
-        /**
-         * 用户。
-         */
-        public static final String AD_USER_ID = "AD_USER_ID";
-        /**
-         * 位置信息。
-         */
-        public static final String LOCATION_INFO = "LOCATION_INFO";
-        /**
-         * 项目编码。
-         */
-        public static final String PM_CODE = "PM_CODE";
-        /**
-         * 计划开工时间。
-         */
-        public static final String PLAN_START_TIME = "PLAN_START_TIME";
-        /**
-         * 附件。
-         */
-        public static final String ATT_FILE_GROUP_ID = "ATT_FILE_GROUP_ID";
         /**
          * 建设地点。
          */
         public static final String BASE_LOCATION_ID = "BASE_LOCATION_ID";
         /**
-         * 投资来源。
-         */
-        public static final String INVESTMENT_SOURCE_ID = "INVESTMENT_SOURCE_ID";
-        /**
-         * 项目概况。
-         */
-        public static final String PRJ_SITUATION = "PRJ_SITUATION";
-        /**
-         * 计划竣工时间。
-         */
-        public static final String PLAN_END_TIME = "PLAN_END_TIME";
-        /**
-         * 启动说明。
-         */
-        public static final String START_REMARK = "START_REMARK";
-        /**
-         * 名称。
-         */
-        public static final String NAME = "NAME";
-        /**
-         * 总投资（万）。
-         */
-        public static final String PRJ_TOTAL_INVEST = "PRJ_TOTAL_INVEST";
-        /**
          * 项目类型。
          */
         public static final String PROJECT_TYPE_ID = "PROJECT_TYPE_ID";
         /**
-         * 建设单位。
+         * 用户。
          */
-        public static final String BUILDER_UNIT = "BUILDER_UNIT";
-        /**
-         * 启动时间。
-         */
-        public static final String START_TIME = "START_TIME";
+        public static final String AD_USER_ID = "AD_USER_ID";
         /**
          * 经办人。
          */
         public static final String AGENT = "AGENT";
         /**
-         * 项目启动状态。
+         * 谋划状态。
          */
-        public static final String PRJ_START_STATUS_ID = "PRJ_START_STATUS_ID";
+        public static final String PLAN_STATUS_ID = "PLAN_STATUS_ID";
+        /**
+         * 谋划进度。
+         */
+        public static final String PLAN_PROGRESS = "PLAN_PROGRESS";
+        /**
+         * 金额（万）。
+         */
+        public static final String AMT = "AMT";
+        /**
+         * 附件。
+         */
+        public static final String ATT_FILE_GROUP_ID = "ATT_FILE_GROUP_ID";
+        /**
+         * 更新日期。
+         */
+        public static final String UPDATE_TIME = "UPDATE_TIME";
     }
 
     // </editor-fold>
@@ -189,7 +157,7 @@ public class PrjStart {
     /**
      * 设置：ID。
      */
-    public PrjStart setId(String id) {
+    public PmPlan setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -225,7 +193,7 @@ public class PrjStart {
     /**
      * 设置：版本。
      */
-    public PrjStart setVer(Integer ver) {
+    public PmPlan setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -261,7 +229,7 @@ public class PrjStart {
     /**
      * 设置：时间戳。
      */
-    public PrjStart setTs(LocalDateTime ts) {
+    public PmPlan setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -297,7 +265,7 @@ public class PrjStart {
     /**
      * 设置：是否预设。
      */
-    public PrjStart setIsPreset(Boolean isPreset) {
+    public PmPlan setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -333,7 +301,7 @@ public class PrjStart {
     /**
      * 设置：创建日期时间。
      */
-    public PrjStart setCrtDt(LocalDateTime crtDt) {
+    public PmPlan setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -369,7 +337,7 @@ public class PrjStart {
     /**
      * 设置：创建用户。
      */
-    public PrjStart setCrtUserId(String crtUserId) {
+    public PmPlan setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -405,7 +373,7 @@ public class PrjStart {
     /**
      * 设置：最后修改日期时间。
      */
-    public PrjStart setLastModiDt(LocalDateTime lastModiDt) {
+    public PmPlan setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -441,7 +409,7 @@ public class PrjStart {
     /**
      * 设置：最后修改用户。
      */
-    public PrjStart setLastModiUserId(String lastModiUserId) {
+    public PmPlan setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -477,7 +445,7 @@ public class PrjStart {
     /**
      * 设置：记录状态。
      */
-    public PrjStart setStatus(String status) {
+    public PmPlan setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -513,7 +481,7 @@ public class PrjStart {
     /**
      * 设置：锁定流程实例。
      */
-    public PrjStart setLkWfInstId(String lkWfInstId) {
+    public PmPlan setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -549,7 +517,7 @@ public class PrjStart {
     /**
      * 设置：代码。
      */
-    public PrjStart setCode(String code) {
+    public PmPlan setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -571,438 +539,6 @@ public class PrjStart {
     }
 
     /**
-     * 备注。
-     */
-    private String remark;
-
-    /**
-     * 获取：备注。
-     */
-    public String getRemark() {
-        return this.remark;
-    }
-
-    /**
-     * 设置：备注。
-     */
-    public PrjStart setRemark(String remark) {
-        if (this.remark == null && remark == null) {
-            // 均为null，不做处理。
-        } else if (this.remark != null && remark != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.remark.compareTo(remark) != 0) {
-                this.remark = remark;
-                if (!this.toUpdateCols.contains("REMARK")) {
-                    this.toUpdateCols.add("REMARK");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.remark = remark;
-            if (!this.toUpdateCols.contains("REMARK")) {
-                this.toUpdateCols.add("REMARK");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 招标模式。
-     */
-    private String tenderModeId;
-
-    /**
-     * 获取：招标模式。
-     */
-    public String getTenderModeId() {
-        return this.tenderModeId;
-    }
-
-    /**
-     * 设置：招标模式。
-     */
-    public PrjStart setTenderModeId(String tenderModeId) {
-        if (this.tenderModeId == null && tenderModeId == null) {
-            // 均为null，不做处理。
-        } else if (this.tenderModeId != null && tenderModeId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.tenderModeId.compareTo(tenderModeId) != 0) {
-                this.tenderModeId = tenderModeId;
-                if (!this.toUpdateCols.contains("TENDER_MODE_ID")) {
-                    this.toUpdateCols.add("TENDER_MODE_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.tenderModeId = tenderModeId;
-            if (!this.toUpdateCols.contains("TENDER_MODE_ID")) {
-                this.toUpdateCols.add("TENDER_MODE_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 用户。
-     */
-    private String adUserId;
-
-    /**
-     * 获取：用户。
-     */
-    public String getAdUserId() {
-        return this.adUserId;
-    }
-
-    /**
-     * 设置：用户。
-     */
-    public PrjStart setAdUserId(String adUserId) {
-        if (this.adUserId == null && adUserId == null) {
-            // 均为null，不做处理。
-        } else if (this.adUserId != null && adUserId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.adUserId.compareTo(adUserId) != 0) {
-                this.adUserId = adUserId;
-                if (!this.toUpdateCols.contains("AD_USER_ID")) {
-                    this.toUpdateCols.add("AD_USER_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.adUserId = adUserId;
-            if (!this.toUpdateCols.contains("AD_USER_ID")) {
-                this.toUpdateCols.add("AD_USER_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 位置信息。
-     */
-    private String locationInfo;
-
-    /**
-     * 获取：位置信息。
-     */
-    public String getLocationInfo() {
-        return this.locationInfo;
-    }
-
-    /**
-     * 设置：位置信息。
-     */
-    public PrjStart setLocationInfo(String locationInfo) {
-        if (this.locationInfo == null && locationInfo == null) {
-            // 均为null，不做处理。
-        } else if (this.locationInfo != null && locationInfo != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.locationInfo.compareTo(locationInfo) != 0) {
-                this.locationInfo = locationInfo;
-                if (!this.toUpdateCols.contains("LOCATION_INFO")) {
-                    this.toUpdateCols.add("LOCATION_INFO");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.locationInfo = locationInfo;
-            if (!this.toUpdateCols.contains("LOCATION_INFO")) {
-                this.toUpdateCols.add("LOCATION_INFO");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 项目编码。
-     */
-    private String pmCode;
-
-    /**
-     * 获取：项目编码。
-     */
-    public String getPmCode() {
-        return this.pmCode;
-    }
-
-    /**
-     * 设置：项目编码。
-     */
-    public PrjStart setPmCode(String pmCode) {
-        if (this.pmCode == null && pmCode == null) {
-            // 均为null，不做处理。
-        } else if (this.pmCode != null && pmCode != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.pmCode.compareTo(pmCode) != 0) {
-                this.pmCode = pmCode;
-                if (!this.toUpdateCols.contains("PM_CODE")) {
-                    this.toUpdateCols.add("PM_CODE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.pmCode = pmCode;
-            if (!this.toUpdateCols.contains("PM_CODE")) {
-                this.toUpdateCols.add("PM_CODE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 计划开工时间。
-     */
-    private LocalDateTime planStartTime;
-
-    /**
-     * 获取：计划开工时间。
-     */
-    public LocalDateTime getPlanStartTime() {
-        return this.planStartTime;
-    }
-
-    /**
-     * 设置：计划开工时间。
-     */
-    public PrjStart setPlanStartTime(LocalDateTime planStartTime) {
-        if (this.planStartTime == null && planStartTime == null) {
-            // 均为null，不做处理。
-        } else if (this.planStartTime != null && planStartTime != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.planStartTime.compareTo(planStartTime) != 0) {
-                this.planStartTime = planStartTime;
-                if (!this.toUpdateCols.contains("PLAN_START_TIME")) {
-                    this.toUpdateCols.add("PLAN_START_TIME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.planStartTime = planStartTime;
-            if (!this.toUpdateCols.contains("PLAN_START_TIME")) {
-                this.toUpdateCols.add("PLAN_START_TIME");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 附件。
-     */
-    private String attFileGroupId;
-
-    /**
-     * 获取：附件。
-     */
-    public String getAttFileGroupId() {
-        return this.attFileGroupId;
-    }
-
-    /**
-     * 设置：附件。
-     */
-    public PrjStart setAttFileGroupId(String attFileGroupId) {
-        if (this.attFileGroupId == null && attFileGroupId == null) {
-            // 均为null，不做处理。
-        } else if (this.attFileGroupId != null && attFileGroupId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.attFileGroupId.compareTo(attFileGroupId) != 0) {
-                this.attFileGroupId = attFileGroupId;
-                if (!this.toUpdateCols.contains("ATT_FILE_GROUP_ID")) {
-                    this.toUpdateCols.add("ATT_FILE_GROUP_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.attFileGroupId = attFileGroupId;
-            if (!this.toUpdateCols.contains("ATT_FILE_GROUP_ID")) {
-                this.toUpdateCols.add("ATT_FILE_GROUP_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 建设地点。
-     */
-    private String baseLocationId;
-
-    /**
-     * 获取：建设地点。
-     */
-    public String getBaseLocationId() {
-        return this.baseLocationId;
-    }
-
-    /**
-     * 设置：建设地点。
-     */
-    public PrjStart setBaseLocationId(String baseLocationId) {
-        if (this.baseLocationId == null && baseLocationId == null) {
-            // 均为null，不做处理。
-        } else if (this.baseLocationId != null && baseLocationId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.baseLocationId.compareTo(baseLocationId) != 0) {
-                this.baseLocationId = baseLocationId;
-                if (!this.toUpdateCols.contains("BASE_LOCATION_ID")) {
-                    this.toUpdateCols.add("BASE_LOCATION_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.baseLocationId = baseLocationId;
-            if (!this.toUpdateCols.contains("BASE_LOCATION_ID")) {
-                this.toUpdateCols.add("BASE_LOCATION_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 投资来源。
-     */
-    private String investmentSourceId;
-
-    /**
-     * 获取：投资来源。
-     */
-    public String getInvestmentSourceId() {
-        return this.investmentSourceId;
-    }
-
-    /**
-     * 设置：投资来源。
-     */
-    public PrjStart setInvestmentSourceId(String investmentSourceId) {
-        if (this.investmentSourceId == null && investmentSourceId == null) {
-            // 均为null，不做处理。
-        } else if (this.investmentSourceId != null && investmentSourceId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.investmentSourceId.compareTo(investmentSourceId) != 0) {
-                this.investmentSourceId = investmentSourceId;
-                if (!this.toUpdateCols.contains("INVESTMENT_SOURCE_ID")) {
-                    this.toUpdateCols.add("INVESTMENT_SOURCE_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.investmentSourceId = investmentSourceId;
-            if (!this.toUpdateCols.contains("INVESTMENT_SOURCE_ID")) {
-                this.toUpdateCols.add("INVESTMENT_SOURCE_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 项目概况。
-     */
-    private String prjSituation;
-
-    /**
-     * 获取：项目概况。
-     */
-    public String getPrjSituation() {
-        return this.prjSituation;
-    }
-
-    /**
-     * 设置：项目概况。
-     */
-    public PrjStart setPrjSituation(String prjSituation) {
-        if (this.prjSituation == null && prjSituation == null) {
-            // 均为null，不做处理。
-        } else if (this.prjSituation != null && prjSituation != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.prjSituation.compareTo(prjSituation) != 0) {
-                this.prjSituation = prjSituation;
-                if (!this.toUpdateCols.contains("PRJ_SITUATION")) {
-                    this.toUpdateCols.add("PRJ_SITUATION");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.prjSituation = prjSituation;
-            if (!this.toUpdateCols.contains("PRJ_SITUATION")) {
-                this.toUpdateCols.add("PRJ_SITUATION");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 计划竣工时间。
-     */
-    private LocalDateTime planEndTime;
-
-    /**
-     * 获取：计划竣工时间。
-     */
-    public LocalDateTime getPlanEndTime() {
-        return this.planEndTime;
-    }
-
-    /**
-     * 设置：计划竣工时间。
-     */
-    public PrjStart setPlanEndTime(LocalDateTime planEndTime) {
-        if (this.planEndTime == null && planEndTime == null) {
-            // 均为null，不做处理。
-        } else if (this.planEndTime != null && planEndTime != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.planEndTime.compareTo(planEndTime) != 0) {
-                this.planEndTime = planEndTime;
-                if (!this.toUpdateCols.contains("PLAN_END_TIME")) {
-                    this.toUpdateCols.add("PLAN_END_TIME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.planEndTime = planEndTime;
-            if (!this.toUpdateCols.contains("PLAN_END_TIME")) {
-                this.toUpdateCols.add("PLAN_END_TIME");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 启动说明。
-     */
-    private String startRemark;
-
-    /**
-     * 获取：启动说明。
-     */
-    public String getStartRemark() {
-        return this.startRemark;
-    }
-
-    /**
-     * 设置：启动说明。
-     */
-    public PrjStart setStartRemark(String startRemark) {
-        if (this.startRemark == null && startRemark == null) {
-            // 均为null，不做处理。
-        } else if (this.startRemark != null && startRemark != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.startRemark.compareTo(startRemark) != 0) {
-                this.startRemark = startRemark;
-                if (!this.toUpdateCols.contains("START_REMARK")) {
-                    this.toUpdateCols.add("START_REMARK");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.startRemark = startRemark;
-            if (!this.toUpdateCols.contains("START_REMARK")) {
-                this.toUpdateCols.add("START_REMARK");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 名称。
      */
     private String name;
@@ -1017,7 +553,7 @@ public class PrjStart {
     /**
      * 设置：名称。
      */
-    public PrjStart setName(String name) {
+    public PmPlan setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -1039,36 +575,72 @@ public class PrjStart {
     }
 
     /**
-     * 总投资（万）。
+     * 备注。
      */
-    private BigDecimal prjTotalInvest;
+    private String remark;
 
     /**
-     * 获取：总投资（万）。
+     * 获取：备注。
      */
-    public BigDecimal getPrjTotalInvest() {
-        return this.prjTotalInvest;
+    public String getRemark() {
+        return this.remark;
     }
 
     /**
-     * 设置：总投资（万）。
+     * 设置：备注。
      */
-    public PrjStart setPrjTotalInvest(BigDecimal prjTotalInvest) {
-        if (this.prjTotalInvest == null && prjTotalInvest == null) {
+    public PmPlan setRemark(String remark) {
+        if (this.remark == null && remark == null) {
             // 均为null，不做处理。
-        } else if (this.prjTotalInvest != null && prjTotalInvest != null) {
+        } else if (this.remark != null && remark != null) {
             // 均非null，判定不等，再做处理：
-            if (this.prjTotalInvest.compareTo(prjTotalInvest) != 0) {
-                this.prjTotalInvest = prjTotalInvest;
-                if (!this.toUpdateCols.contains("PRJ_TOTAL_INVEST")) {
-                    this.toUpdateCols.add("PRJ_TOTAL_INVEST");
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.prjTotalInvest = prjTotalInvest;
-            if (!this.toUpdateCols.contains("PRJ_TOTAL_INVEST")) {
-                this.toUpdateCols.add("PRJ_TOTAL_INVEST");
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 建设地点。
+     */
+    private String baseLocationId;
+
+    /**
+     * 获取：建设地点。
+     */
+    public String getBaseLocationId() {
+        return this.baseLocationId;
+    }
+
+    /**
+     * 设置：建设地点。
+     */
+    public PmPlan setBaseLocationId(String baseLocationId) {
+        if (this.baseLocationId == null && baseLocationId == null) {
+            // 均为null，不做处理。
+        } else if (this.baseLocationId != null && baseLocationId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.baseLocationId.compareTo(baseLocationId) != 0) {
+                this.baseLocationId = baseLocationId;
+                if (!this.toUpdateCols.contains("BASE_LOCATION_ID")) {
+                    this.toUpdateCols.add("BASE_LOCATION_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.baseLocationId = baseLocationId;
+            if (!this.toUpdateCols.contains("BASE_LOCATION_ID")) {
+                this.toUpdateCols.add("BASE_LOCATION_ID");
             }
         }
         return this;
@@ -1089,7 +661,7 @@ public class PrjStart {
     /**
      * 设置：项目类型。
      */
-    public PrjStart setProjectTypeId(String projectTypeId) {
+    public PmPlan setProjectTypeId(String projectTypeId) {
         if (this.projectTypeId == null && projectTypeId == null) {
             // 均为null，不做处理。
         } else if (this.projectTypeId != null && projectTypeId != null) {
@@ -1111,72 +683,36 @@ public class PrjStart {
     }
 
     /**
-     * 建设单位。
+     * 用户。
      */
-    private String builderUnit;
+    private String adUserId;
 
     /**
-     * 获取：建设单位。
+     * 获取：用户。
      */
-    public String getBuilderUnit() {
-        return this.builderUnit;
+    public String getAdUserId() {
+        return this.adUserId;
     }
 
     /**
-     * 设置：建设单位。
+     * 设置：用户。
      */
-    public PrjStart setBuilderUnit(String builderUnit) {
-        if (this.builderUnit == null && builderUnit == null) {
+    public PmPlan setAdUserId(String adUserId) {
+        if (this.adUserId == null && adUserId == null) {
             // 均为null，不做处理。
-        } else if (this.builderUnit != null && builderUnit != null) {
+        } else if (this.adUserId != null && adUserId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.builderUnit.compareTo(builderUnit) != 0) {
-                this.builderUnit = builderUnit;
-                if (!this.toUpdateCols.contains("BUILDER_UNIT")) {
-                    this.toUpdateCols.add("BUILDER_UNIT");
+            if (this.adUserId.compareTo(adUserId) != 0) {
+                this.adUserId = adUserId;
+                if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                    this.toUpdateCols.add("AD_USER_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.builderUnit = builderUnit;
-            if (!this.toUpdateCols.contains("BUILDER_UNIT")) {
-                this.toUpdateCols.add("BUILDER_UNIT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 启动时间。
-     */
-    private LocalDateTime startTime;
-
-    /**
-     * 获取：启动时间。
-     */
-    public LocalDateTime getStartTime() {
-        return this.startTime;
-    }
-
-    /**
-     * 设置：启动时间。
-     */
-    public PrjStart setStartTime(LocalDateTime startTime) {
-        if (this.startTime == null && startTime == null) {
-            // 均为null，不做处理。
-        } else if (this.startTime != null && startTime != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.startTime.compareTo(startTime) != 0) {
-                this.startTime = startTime;
-                if (!this.toUpdateCols.contains("START_TIME")) {
-                    this.toUpdateCols.add("START_TIME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.startTime = startTime;
-            if (!this.toUpdateCols.contains("START_TIME")) {
-                this.toUpdateCols.add("START_TIME");
+            this.adUserId = adUserId;
+            if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                this.toUpdateCols.add("AD_USER_ID");
             }
         }
         return this;
@@ -1197,7 +733,7 @@ public class PrjStart {
     /**
      * 设置：经办人。
      */
-    public PrjStart setAgent(String agent) {
+    public PmPlan setAgent(String agent) {
         if (this.agent == null && agent == null) {
             // 均为null，不做处理。
         } else if (this.agent != null && agent != null) {
@@ -1219,36 +755,180 @@ public class PrjStart {
     }
 
     /**
-     * 项目启动状态。
+     * 谋划状态。
      */
-    private String prjStartStatusId;
+    private String planStatusId;
 
     /**
-     * 获取：项目启动状态。
+     * 获取：谋划状态。
      */
-    public String getPrjStartStatusId() {
-        return this.prjStartStatusId;
+    public String getPlanStatusId() {
+        return this.planStatusId;
     }
 
     /**
-     * 设置：项目启动状态。
+     * 设置：谋划状态。
      */
-    public PrjStart setPrjStartStatusId(String prjStartStatusId) {
-        if (this.prjStartStatusId == null && prjStartStatusId == null) {
+    public PmPlan setPlanStatusId(String planStatusId) {
+        if (this.planStatusId == null && planStatusId == null) {
             // 均为null，不做处理。
-        } else if (this.prjStartStatusId != null && prjStartStatusId != null) {
+        } else if (this.planStatusId != null && planStatusId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.prjStartStatusId.compareTo(prjStartStatusId) != 0) {
-                this.prjStartStatusId = prjStartStatusId;
-                if (!this.toUpdateCols.contains("PRJ_START_STATUS_ID")) {
-                    this.toUpdateCols.add("PRJ_START_STATUS_ID");
+            if (this.planStatusId.compareTo(planStatusId) != 0) {
+                this.planStatusId = planStatusId;
+                if (!this.toUpdateCols.contains("PLAN_STATUS_ID")) {
+                    this.toUpdateCols.add("PLAN_STATUS_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.prjStartStatusId = prjStartStatusId;
-            if (!this.toUpdateCols.contains("PRJ_START_STATUS_ID")) {
-                this.toUpdateCols.add("PRJ_START_STATUS_ID");
+            this.planStatusId = planStatusId;
+            if (!this.toUpdateCols.contains("PLAN_STATUS_ID")) {
+                this.toUpdateCols.add("PLAN_STATUS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 谋划进度。
+     */
+    private BigDecimal planProgress;
+
+    /**
+     * 获取：谋划进度。
+     */
+    public BigDecimal getPlanProgress() {
+        return this.planProgress;
+    }
+
+    /**
+     * 设置：谋划进度。
+     */
+    public PmPlan setPlanProgress(BigDecimal planProgress) {
+        if (this.planProgress == null && planProgress == null) {
+            // 均为null，不做处理。
+        } else if (this.planProgress != null && planProgress != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planProgress.compareTo(planProgress) != 0) {
+                this.planProgress = planProgress;
+                if (!this.toUpdateCols.contains("PLAN_PROGRESS")) {
+                    this.toUpdateCols.add("PLAN_PROGRESS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planProgress = planProgress;
+            if (!this.toUpdateCols.contains("PLAN_PROGRESS")) {
+                this.toUpdateCols.add("PLAN_PROGRESS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 金额（万）。
+     */
+    private BigDecimal amt;
+
+    /**
+     * 获取：金额（万）。
+     */
+    public BigDecimal getAmt() {
+        return this.amt;
+    }
+
+    /**
+     * 设置：金额（万）。
+     */
+    public PmPlan setAmt(BigDecimal amt) {
+        if (this.amt == null && amt == null) {
+            // 均为null，不做处理。
+        } else if (this.amt != null && amt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.amt.compareTo(amt) != 0) {
+                this.amt = amt;
+                if (!this.toUpdateCols.contains("AMT")) {
+                    this.toUpdateCols.add("AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.amt = amt;
+            if (!this.toUpdateCols.contains("AMT")) {
+                this.toUpdateCols.add("AMT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 附件。
+     */
+    private String attFileGroupId;
+
+    /**
+     * 获取：附件。
+     */
+    public String getAttFileGroupId() {
+        return this.attFileGroupId;
+    }
+
+    /**
+     * 设置：附件。
+     */
+    public PmPlan setAttFileGroupId(String attFileGroupId) {
+        if (this.attFileGroupId == null && attFileGroupId == null) {
+            // 均为null，不做处理。
+        } else if (this.attFileGroupId != null && attFileGroupId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.attFileGroupId.compareTo(attFileGroupId) != 0) {
+                this.attFileGroupId = attFileGroupId;
+                if (!this.toUpdateCols.contains("ATT_FILE_GROUP_ID")) {
+                    this.toUpdateCols.add("ATT_FILE_GROUP_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.attFileGroupId = attFileGroupId;
+            if (!this.toUpdateCols.contains("ATT_FILE_GROUP_ID")) {
+                this.toUpdateCols.add("ATT_FILE_GROUP_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 更新日期。
+     */
+    private LocalDateTime updateTime;
+
+    /**
+     * 获取：更新日期。
+     */
+    public LocalDateTime getUpdateTime() {
+        return this.updateTime;
+    }
+
+    /**
+     * 设置：更新日期。
+     */
+    public PmPlan setUpdateTime(LocalDateTime updateTime) {
+        if (this.updateTime == null && updateTime == null) {
+            // 均为null，不做处理。
+        } else if (this.updateTime != null && updateTime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.updateTime.compareTo(updateTime) != 0) {
+                this.updateTime = updateTime;
+                if (!this.toUpdateCols.contains("UPDATE_TIME")) {
+                    this.toUpdateCols.add("UPDATE_TIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.updateTime = updateTime;
+            if (!this.toUpdateCols.contains("UPDATE_TIME")) {
+                this.toUpdateCols.add("UPDATE_TIME");
             }
         }
         return this;
@@ -1341,8 +1021,8 @@ public class PrjStart {
      *
      * @return
      */
-    public static PrjStart newData() {
-        PrjStart obj = modelHelper.newData();
+    public static PmPlan newData() {
+        PmPlan obj = modelHelper.newData();
         return obj;
     }
 
@@ -1351,8 +1031,8 @@ public class PrjStart {
      *
      * @return
      */
-    public static PrjStart insertData() {
-        PrjStart obj = modelHelper.insertData();
+    public static PmPlan insertData() {
+        PmPlan obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1364,8 +1044,8 @@ public class PrjStart {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static PrjStart selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        PrjStart obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static PmPlan selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        PmPlan obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1375,7 +1055,7 @@ public class PrjStart {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static PrjStart selectById(String id) {
+    public static PmPlan selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1387,8 +1067,8 @@ public class PrjStart {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<PrjStart> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<PrjStart> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<PmPlan> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<PmPlan> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1398,7 +1078,7 @@ public class PrjStart {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<PrjStart> selectByIds(List<String> ids) {
+    public static List<PmPlan> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1410,8 +1090,8 @@ public class PrjStart {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<PrjStart> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<PrjStart> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<PmPlan> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<PmPlan> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1421,7 +1101,7 @@ public class PrjStart {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<PrjStart> selectByWhere(Where where) {
+    public static List<PmPlan> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1433,10 +1113,10 @@ public class PrjStart {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static PrjStart selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<PrjStart> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static PmPlan selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<PmPlan> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用PrjStart.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用PmPlan.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmptyList(objList) ? null : objList.get(0);
@@ -1448,7 +1128,7 @@ public class PrjStart {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static PrjStart selectOneByWhere(Where where) {
+    public static PmPlan selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1562,7 +1242,7 @@ public class PrjStart {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(PrjStart fromModel, PrjStart toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(PmPlan fromModel, PmPlan toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1572,7 +1252,7 @@ public class PrjStart {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(PrjStart fromModel, PrjStart toModel) {
+    public static void copyCols(PmPlan fromModel, PmPlan toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 

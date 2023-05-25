@@ -204,4 +204,16 @@ public class StringUtil {
         }
         return decimal;
     }
+
+    /**
+     * 字符串数字控制判断
+     * @param oldStr 原字符串
+     * @return BigDecimal值
+     */
+    public static String valueNullToStrNumber(String oldStr) {
+        if (SharedUtil.isEmptyString(oldStr)){
+            oldStr = "0";
+        }
+        return oldStr;
+    }
 }

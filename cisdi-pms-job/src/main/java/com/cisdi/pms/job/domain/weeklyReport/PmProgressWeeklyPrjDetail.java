@@ -4,6 +4,7 @@ import com.cisdi.pms.job.domain.BasePageEntity;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 public class PmProgressWeeklyPrjDetail extends BasePageEntity {
@@ -54,5 +55,33 @@ public class PmProgressWeeklyPrjDetail extends BasePageEntity {
     //导出类型 1按项目维度导出 0按周维度导出
     public Integer exportType;
     //是否提交 0未提交1已提交
-    public Integer isSubmit;
+    public Integer izSubmit;
+
+    //状态
+    private String status;
+
+    //版本
+    private String ver;
+
+    //时间戳
+    private String ts;
+
+    //创建时间
+    private String crtDt;
+
+    //创建人
+    private String crtUserId;
+
+    //上次修改时间
+    private String lastModiDt;
+
+    //上次修改人
+    private String lastModiUserId;
+
+    //开始时间
+    private Date fromDate;
+
+    //结束日期
+    private Date toDate;
+
 }
