@@ -264,9 +264,10 @@ public class PrjMaterialInventory {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         DltReq dltReq = JSONObject.parseObject(JSONObject.toJSONString(params), DltReq.class);
         String sql = "select i.id inventoryId,i.IS_INVOLVED isInvolved,i.remark,ty.name typeName,GROUP_CONCAT(f.id) fileId,\n" +
-                "if(i.IS_INVOLVED = 1,SUBSTRING_INDEX(GROUP_CONCAT(f.DSP_NAME),',',1) ,'不涉及') fileName,\n" +
-                "SUBSTRING_INDEX(GROUP_CONCAT(f.DSP_SIZE),',',1) fileSize,SUBSTRING_INDEX(GROUP_CONCAT(f.UPLOAD_DTTM),',',1) uploadTime,\n" +
-                "SUBSTRING_INDEX(GROUP_CONCAT(u.name),',',1) uploadUser from prj_inventory i \n" +
+                "if(i.IS_INVOLVED = 1,SUBSTRING_INDEX(GROUP_CONCAT(f.DSP_NAME order by f.CRT_DT desc),',',1) ,'不涉及') fileName,\n" +
+                "SUBSTRING_INDEX(GROUP_CONCAT(f.DSP_SIZE order by f.CRT_DT desc),',',1) fileSize,SUBSTRING_INDEX(GROUP_CONCAT(f.UPLOAD_DTTM order " +
+                "by f.CRT_DT desc),',',1) uploadTime,\n" +
+                "SUBSTRING_INDEX(GROUP_CONCAT(u.name order by f.CRT_DT desc),',',1) uploadUser from prj_inventory i \n" +
                 "left join prj_inventory_detail d on i.id = d.PRJ_INVENTORY_ID\n" +
                 "left join material_inventory_type ty on ty.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
                 "left join fl_file f on f.id = d.FL_FILE_ID\n" +
