@@ -95,10 +95,11 @@ public class PmLifeCycleExt {
         String projectType = String.valueOf(map.get("projectType"));
         String userId = String.valueOf(map.get("userId"));
         StringBuilder sb = new StringBuilder();
-        sb.append("select pj.id as id, pj.`NAME` as project_name,au.`NAME` as qquser from pm_prj pj \n" +
-                "left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID and pp.POST_INFO_ID='1633731474912055296'\n" +
-                "left join ad_user au on pp.AD_USER_ID = au.id \n" +
-                "where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' \n");
+        sb.append("select po.pm_prj_id as id, pj.`NAME` as project_name,au.`NAME` as qquser from PLAN_OPERATION po  \n" +
+                " left join pm_prj pj  on pj.id = po.PM_PRJ_ID\n" +
+                " left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID and pp.POST_INFO_ID='1633731474912055296'\n" +
+                " left join ad_user au on pp.AD_USER_ID = au.id \n" +
+                " where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ");
         sb.append(" and pj.PROJECT_TYPE_ID ='").append(projectType).append("'");
         if (!StringUtils.isEmpty(projectName)) {
             sb.append(" and pj.name like '%").append(projectName).append("%'");
