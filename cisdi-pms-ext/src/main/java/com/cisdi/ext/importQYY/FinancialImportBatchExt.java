@@ -2,10 +2,9 @@ package com.cisdi.ext.importQYY;
 
 import com.cisdi.ext.base.PmInvestEst;
 import com.cisdi.ext.base.PmPrjExt;
-import com.cisdi.ext.importQYY.model.FeasibleImport;
 import com.cisdi.ext.importQYY.model.FinancialImport;
 import com.cisdi.ext.importQYY.model.FinancialImportBatch;
-import com.cisdi.ext.model.PmPrj;
+import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.model.PmPrjInvest2;
 import com.cisdi.ext.proPlan.PmProPlanExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;

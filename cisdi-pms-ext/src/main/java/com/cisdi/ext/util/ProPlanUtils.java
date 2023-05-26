@@ -1,0 +1,80 @@
+package com.cisdi.ext.util;
+
+import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.util.JdbcMapUtil;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author 尹涛 * @version V1.0.0
+ * @projectName cisdi-pms-service
+ * @title ProPlanUtils
+ * @package com.cisdi.ext.util
+ * @description
+ * @date 2023/5/22
+ */
+public class ProPlanUtils {
+
+    /**
+     * 多标段产生逻辑
+     *
+     * @param projectId
+     * @param count
+     */
+    public static void moreSection(String projectId, int count) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where IZ_MORE='1' and  pl.PM_PRJ_ID==?", projectId);
+        for (Map<String, Object> nodeMap : list) {
+            for (int i = 0; i < count; i++) {
+                String newId = insertData(nodeMap, nodeMap.get("pm_pro_plan_node_pid"));
+                if ("1".equals(JdbcMapUtil.getString(nodeMap, "level"))) {
+                    //查询当前节点下的所有节点，进行复制操作
+                    List<Map<String, Object>> secondList = selectSonNode(JdbcMapUtil.getString(nodeMap, "ID"));
+                    if (!CollectionUtils.isEmpty(secondList)) {
+                        for (Map<String, Object> stringObjectMap : secondList) {
+                            String newSecondId = insertData(stringObjectMap, newId);
+                            List<Map<String, Object>> thirdList = selectSonNode(JdbcMapUtil.getString(stringObjectMap, "ID"));
+                            if (!CollectionUtils.isEmpty(thirdList)) {
+                                //三级节点
+                                for (Map<String, Object> map : thirdList) {
+                                    insertData(map, newSecondId);
+                                }
+                            }
+                        }
+                    }
+                } else if ("2".equals(JdbcMapUtil.getString(nodeMap, "level"))) {
+                    //查询当前节点下的所有节点，进行复制操作
+                    List<Map<String, Object>> thirdList = selectSonNode(JdbcMapUtil.getString(nodeMap, "ID"));
+                    if (!CollectionUtils.isEmpty(thirdList)) {
+                        //三级节点
+                        for (Map<String, Object> stringObjectMap : thirdList) {
+                            insertData(stringObjectMap, newId);
+                        }
+                    }
+                }
+            }
+        }
+
+
+    }
+
+    public static List<Map<String, Object>> selectSonNode(String nodeId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        return myJdbcTemplate.queryForList("select * from PM_PRO_PLAN_NODE where PM_PRO_PLAN_NODE_PID=?", nodeId);
+    }
+
+    private static String insertData(Map<String, Object> objectMap, Object pId) {
+        String id = Crud.from("PM_PRO_PLAN_NODE").insertData();
+        Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", id).update().set("NAME", objectMap.get("NAME")).set("PM_PRO_PLAN_ID", objectMap.get("PM_PRO_PLAN_ID")).set("PM_PRO_PLAN_NODE_PID", pId)
+                .set("PLAN_TOTAL_DAYS", objectMap.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", objectMap.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", objectMap.get("PROGRESS_RISK_TYPE_ID"))
+                .set("CHIEF_DEPT_ID", objectMap.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", objectMap.get("CHIEF_USER_ID")).set("START_DAY", objectMap.get("START_DAY")).set("SEQ_NO", objectMap.get("SEQ_NO")).set("LEVEL", objectMap.get("LEVEL"))
+                .set("LINKED_WF_PROCESS_ID", objectMap.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", objectMap.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", objectMap.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", objectMap.get("SHOW_IN_EARLY_PROC"))
+                .set("SHOW_IN_PRJ_OVERVIEW", objectMap.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", objectMap.get("POST_INFO_ID")).set("CHIEF_USER_ID", objectMap.get("AD_USER_ID")).set("CAN_START", objectMap.get("CAN_START")).set("IZ_MORE", objectMap.get("IZ_MORE"))
+                .set("PRE_NODE_ID", objectMap.get("PRE_NODE_ID")).set("AD_ENT_ID_IMP", objectMap.get("AD_ENT_ID_IMP")).set("AD_ATT_ID_IMP", objectMap.get("AD_ATT_ID_IMP")).set("IZ_MILESTONE", objectMap.get("IZ_MILESTONE")).set("SCHEDULE_NAME", objectMap.get("SCHEDULE_NAME")).exec();
+        return id;
+    }
+}

@@ -19,4 +19,6 @@ public class FundStatisticalRequest {
     //批复日期
     public String beginDate;
     public String endDate;
+    //资金来源多选
+    public String sourceNames;
 }

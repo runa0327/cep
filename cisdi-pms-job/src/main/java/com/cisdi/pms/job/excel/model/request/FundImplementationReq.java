@@ -15,4 +15,6 @@ public class FundImplementationReq {
     private String beginTime;
     //结束时间
     private String endTime;
+
+    private String projectIds;
 }

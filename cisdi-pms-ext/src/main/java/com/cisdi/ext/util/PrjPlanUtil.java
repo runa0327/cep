@@ -1,10 +1,12 @@
 package com.cisdi.ext.util;
 
+import com.cisdi.ext.wf.WfInNodeExt;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -40,7 +42,7 @@ public class PrjPlanUtil {
                             SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
                             int totalDays = JdbcMapUtil.getInt(threeNode, "PLAN_TOTAL_DAYS");
                             Date completeDate = DateTimeUtil.addDays(paramDate, totalDays);
-                            //待优化
+                            // 待优化
                             for (int i = 0; i < 10; i++) {
                                 nodeList.forEach(m -> {
                                     if (Objects.equals(m.get("ID"), threeNode.get("ID"))) {
@@ -129,10 +131,10 @@ public class PrjPlanUtil {
         if (!CollectionUtils.isEmpty(currentNodeList)) {
             Map<String, Object> currentNode = currentNodeList.get(0);
 
-            //先刷新一下当前节点的时间
+            // 先刷新一下当前节点的时间
             int currentDays = JdbcMapUtil.getInt(currentNode, "PLAN_TOTAL_DAYS");
             Date planDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(currentNode, "PLAN_START_DATE"));
-            //当前节点结束日期
+            // 当前节点结束日期
             Date dateOrg = DateTimeUtil.addDays(planDate, currentDays);
             myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=? where id=?", dateOrg, nodeId);
 
@@ -194,37 +196,20 @@ public class PrjPlanUtil {
         }).collect(Collectors.toList());
     }
 
+
     /**
-     * 新增项目进度网络图
+     * 刷新项目模板
      *
      * @param projectId
-     * @param type
-     * @param sourceId
-     * @param invest
-     * @param invest
+     * @param templateId
      */
-    public static void createPlan(String projectId, String type, String sourceId, BigDecimal invest, String tenderWay) {
+    public static void createPlan(String projectId, String templateId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        //根据项目的类型，项目投资来源，项目的总额，招标方式查询模板
-        String proPlanId = "1648561483233353728";  //默认的模板
-        List<Map<String, Object>> ruleList = myJdbcTemplate.queryForList("select pptr.*,gsv.`code` as rule from PRO_PLAN_TEMPLATE_RULE pptr " +
-                "left join gr_set_value gsv on pptr.PRO_PLAN_RULE_CONDITION_ID = gsv.id " +
-                "where TEMPLATE_FOR_PROJECT_TYPE_ID=? and INVESTMENT_SOURCE_ID=? and TENDER_MODE_ID=?", type, sourceId, tenderWay);
-        if (!CollectionUtils.isEmpty(ruleList)) {
-            for (Map<String, Object> objectMap : ruleList) {
-                String condition = JdbcMapUtil.getString(objectMap, "rule");
-                String ex = condition.replaceAll("param", String.valueOf(invest));
-                if (StringUtil.doExpression(ex)) {
-                    proPlanId = JdbcMapUtil.getString(objectMap, "PM_PRO_PLAN_ID");
-                    break;
-                }
-            }
-        }
-        //根据规则查询模板
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRO_PLAN where id = ?", proPlanId);
+        // 根据规则查询模板
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRO_PLAN where id = ?", templateId);
 
         if (!CollectionUtils.isEmpty(list)) {
-            //先清出原来的
+            // 先清出原来的
             clearPlan(projectId);
 
             Map<String, Object> proMap = list.get(0);
@@ -241,7 +226,7 @@ public class PrjPlanUtil {
                     "PLAN_TOTAL_DAYS,PLAN_CARRY_DAYS,ACTUAL_CARRY_DAYS,ACTUAL_TOTAL_DAYS,PLAN_CURRENT_PRO_PERCENT,ACTUAL_CURRENT_PRO_PERCENT, \n" +
                     "ifnull(PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,PLAN_COMPL_DATE,ACTUAL_COMPL_DATE,SHOW_IN_EARLY_PROC,SHOW_IN_PRJ_OVERVIEW,CAN_START, \n" +
                     "PROGRESS_STATUS_ID,PROGRESS_RISK_TYPE_ID,CHIEF_DEPT_ID,CHIEF_USER_ID,START_DAY,pppn.SEQ_NO,CPMS_UUID,CPMS_ID,`LEVEL`,LINKED_WF_PROCESS_ID,LINKED_START_WF_NODE_ID,LINKED_END_WF_NODE_ID,POST_INFO_ID ,AD_USER_ID, \n" +
-                    "PRE_NODE_ID,AD_ENT_ID_IMP,AD_ATT_ID_IMP,IZ_MILESTONE,SCHEDULE_NAME  " +
+                    "PRE_NODE_ID,AD_ENT_ID_IMP,AD_ATT_ID_IMP,IZ_MILESTONE,SCHEDULE_NAME,IZ_MORE  " +
                     "from PM_PRO_PLAN_NODE pppn \n" +
                     "left join POST_INFO pi on pppn.POST_INFO_ID = pi.id \n" +
                     "where PM_PRO_PLAN_ID=?", proMap.get("ID"));
@@ -252,22 +237,22 @@ public class PrjPlanUtil {
                             .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                             .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                             .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
-                            .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START"))
+                            .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).set("IZ_MORE", m.get("IZ_MORE"))
                             .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).set("AD_ENT_ID_IMP", m.get("AD_ENT_ID_IMP")).set("AD_ATT_ID_IMP", m.get("AD_ATT_ID_IMP")).set("IZ_MILESTONE", m.get("IZ_MILESTONE")).set("SCHEDULE_NAME", m.get("SCHEDULE_NAME")).exec();
                     getChildrenNode(m, planNodeList, id, newPlanId);
                 }).collect(Collectors.toList());
 
-                //刷新前置节点
+                // 刷新前置节点
                 List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PM_PRO_PLAN_ID =(select id from PM_PRO_PLAN where PM_PRJ_ID=?)", projectId);
                 if (!CollectionUtils.isEmpty(nodeList)) {
                     nodeList.forEach(item -> {
-                        //查找模板种相同的节点
+                        // 查找模板种相同的节点
                         Optional<Map<String, Object>> optional = planNodeList.stream().filter(p -> Objects.equals(item.get("NAME"), p.get("NAME"))).findAny();
                         if (optional.isPresent()) {
                             Map<String, Object> tempNode = optional.get();
                             String tempPreNodeId = JdbcMapUtil.getString(tempNode, "PRE_NODE_ID");
                             if (!Strings.isNullOrEmpty(tempPreNodeId)) {
-                                //找到模板种前置节点对应的节点
+                                // 找到模板种前置节点对应的节点
                                 Optional<Map<String, Object>> tempPreOptional = planNodeList.stream().filter(p -> Objects.equals(tempPreNodeId, p.get("ID"))).findAny();
                                 if (tempPreOptional.isPresent()) {
                                     String tempPreNodeName = JdbcMapUtil.getString(tempPreOptional.get(), "NAME");
@@ -284,6 +269,35 @@ public class PrjPlanUtil {
                 setFirstNodeUser(projectId);
             }
         }
+    }
+
+    /**
+     * 新增项目进度网络图
+     *
+     * @param projectId
+     * @param type
+     * @param sourceId
+     * @param invest
+     * @param invest
+     */
+    public static void createPlan(String projectId, String type, String sourceId, BigDecimal invest, String tenderWay) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        // 根据项目的类型，项目投资来源，项目的总额，招标方式查询模板
+        String proPlanId = "1648561483233353728";  // 默认的模板
+        List<Map<String, Object>> ruleList = myJdbcTemplate.queryForList("select pptr.*,gsv.`code` as rule from PRO_PLAN_TEMPLATE_RULE pptr " +
+                "left join gr_set_value gsv on pptr.PRO_PLAN_RULE_CONDITION_ID = gsv.id " +
+                "where TEMPLATE_FOR_PROJECT_TYPE_ID=? and INVESTMENT_SOURCE_ID=? and TENDER_MODE_ID=?", type, sourceId, tenderWay);
+        if (!CollectionUtils.isEmpty(ruleList)) {
+            for (Map<String, Object> objectMap : ruleList) {
+                String condition = JdbcMapUtil.getString(objectMap, "rule");
+                String ex = condition.replaceAll("param", String.valueOf(invest));
+                if (StringUtil.doExpression(ex)) {
+                    proPlanId = JdbcMapUtil.getString(objectMap, "PM_PRO_PLAN_ID");
+                    break;
+                }
+            }
+        }
+        createPlan(projectId, proPlanId);
     }
 
     /**
@@ -328,7 +342,7 @@ public class PrjPlanUtil {
                     .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                     .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                     .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
-                    .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START"))
+                    .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).set("IZ_MORE", m.get("IZ_MORE"))
                     .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).set("AD_ENT_ID_IMP", m.get("AD_ENT_ID_IMP")).set("AD_ATT_ID_IMP", m.get("AD_ATT_ID_IMP")).set("IZ_MILESTONE", m.get("IZ_MILESTONE")).set("SCHEDULE_NAME", m.get("SCHEDULE_NAME")).exec();
             getChildrenNode(m, allData, id, newPlanId);
         }).collect(Collectors.toList());
@@ -438,7 +452,7 @@ public class PrjPlanUtil {
     public static void refreshProPlanUser(String projectId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_roster where PM_PRJ_ID=?", projectId);
-        //查询未启动的节点
+        // 查询未启动的节点
         List<Map<String, Object>> proList = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where pn.PROGRESS_STATUS_ID ='0099799190825106800' and  PM_PRJ_ID=?", projectId);
         list.forEach(item -> {
             String postId = JdbcMapUtil.getString(item, "POST_INFO_ID");
@@ -456,5 +470,20 @@ public class PrjPlanUtil {
         });
     }
 
+    /**
+     * 根据流程实例更新项目计划。
+     *
+     * @param projectId
+     */
+    public static void updatePrjProPlanByProcInst(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select T.WF_PROCESS_INSTANCE_ID from PM_PRJ_TO_PROC_INST T WHERE T.PM_PRJ_ID=? ORDER BY T.ID", projectId);
+        if (SharedUtil.isEmptyList(list)) {
+            return;
+        }
+        List<String> procInstIdList = list.stream().map(item -> JdbcMapUtil.getString(item, "WF_PROCESS_INSTANCE_ID")).collect(Collectors.toList());
+        // 有一点副作用（但应该没关系），就是若某个流程实例不仅关联了本项目、还关联了其他项目，那么，其他项目的计划也会被更新：
+        new WfInNodeExt().updatePrjProPlanByProcInst(procInstIdList);
+    }
 
 }

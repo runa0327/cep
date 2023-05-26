@@ -44,10 +44,16 @@ public class WfInNodeExt {
      * 根据选择的流程实例，更新相应的项目的进度计划。
      */
     public void updatePrjProPlanByProcInst() {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
-        // 获取所有的节点实例：
-        List<Map<String, Object>> nodeInstList = myJdbcTemplate.queryForList("select ni.* from wf_node_instance ni where ni.`STATUS`='AP' and ni.wf_process_instance_id in (" + entityRecordList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") ORDER BY ni.wf_process_instance_id, ni.id", entityRecordList.stream().map(item -> item.csCommId).collect(Collectors.toList()).toArray());
+        List<String> procInstIdList = entityRecordList.stream().map(item -> item.csCommId).collect(Collectors.toList());
+
+        updatePrjProPlanByProcInst(procInstIdList);
+    }
+
+    public void updatePrjProPlanByProcInst(List<String> procInstIdList) {
+        // 获取指定流程实例的节点实例：
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> nodeInstList = myJdbcTemplate.queryForList("select ni.* from wf_node_instance ni where ni.`STATUS`='AP' and ni.wf_process_instance_id in (" + procInstIdList.stream().map(item -> "?").collect(Collectors.joining(",")) + ") ORDER BY ni.wf_process_instance_id, ni.id", procInstIdList.toArray());
         update(myJdbcTemplate, nodeInstList);
     }
 
@@ -162,7 +168,7 @@ public class WfInNodeExt {
         }
     }
 
-    private List<String> getPrjIdList(Map<String, Object> procInst) {
+    public static List<String> getPrjIdList(Map<String, Object> procInst) {
         String entCode = JdbcMapUtil.getString(procInst, "ENT_CODE");
         String entityRecordId = JdbcMapUtil.getString(procInst, "ENTITY_RECORD_ID");
         List<Map<String, Object>> entityRecordlist = ExtJarHelper.myJdbcTemplate.get().queryForList("select * from " + entCode + " t where t.id=?", entityRecordId);

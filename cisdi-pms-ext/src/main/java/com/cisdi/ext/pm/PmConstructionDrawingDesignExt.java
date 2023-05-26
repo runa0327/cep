@@ -1,14 +1,12 @@
 package com.cisdi.ext.pm;
 
 import com.cisdi.ext.base.PmPrjExt;
-import com.cisdi.ext.model.PmPrj;
+import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
-
-import java.util.Map;
 
 /**
  * 施工图设计管理-扩展

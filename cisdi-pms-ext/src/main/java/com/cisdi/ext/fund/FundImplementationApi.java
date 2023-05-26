@@ -8,15 +8,15 @@ import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Update;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 资金落实
@@ -35,10 +35,14 @@ public class FundImplementationApi {
             id = Crud.from("fund_implementation").insertData();
         }
         //更新落实表
-        Crud.from("fund_implementation").where().eq("ID", id).update().set("REMARK", fundImplementation.remark)
+        Update updateValue = Crud.from("fund_implementation").where().eq("ID", id).update().set("REMARK", fundImplementation.remark)
                 .set("FUND_SOURCE_TEXT", fundImplementation.fundSourceText).set("FUND_CATEGORY_FIRST", fundImplementation.fundCategoryFirst)
                 .set("FUND_CATEGORY_SECOND", fundImplementation.fundCategorySecond).set("DECLARED_AMOUNT", fundImplementation.declaredAmount)
-                .set("APPROVAL_TIME", fundImplementation.approvalTime).set("ATT_FILE_GROUP_ID", fundImplementation.attFileGroupId).exec();
+                .set("ATT_FILE_GROUP_ID", fundImplementation.attFileGroupId);
+        if (!Strings.isNullOrEmpty(fundImplementation.approvalTime)) {
+            updateValue.set("APPROVAL_TIME", fundImplementation.approvalTime);
+        }
+        updateValue.exec();
         //删除明细
         Crud.from("fund_implementation_detail").where().eq("FUND_IMPLEMENTATION_ID", id).delete().exec();
         //插入明细表
@@ -53,27 +57,34 @@ public class FundImplementationApi {
     public void fundImpList() {
         Map<String, Object> fundImpMap = ExtJarHelper.extApiParamMap.get();
         FundImpReq fundImpReq = JsonUtil.fromJson(JsonUtil.toJson(fundImpMap), FundImpReq.class);
-        StringBuffer baseSql = new StringBuffer("select i.id,t1.name FUND_CATEGORY_FIRST,t2.name FUND_CATEGORY_SECOND,i.FUND_SOURCE_TEXT,i" +
+        StringBuilder baseSql = new StringBuilder("select i.id,t1.name FUND_CATEGORY_FIRST,t2.name FUND_CATEGORY_SECOND,i.FUND_SOURCE_TEXT,i" +
                 ".DECLARED_AMOUNT,sum(d.APPROVED_AMOUNT) APPROVED_AMOUNT,i.APPROVAL_TIME " +
                 "from fund_implementation i " +
                 "left join fund_type t1 on t1.id = i.FUND_CATEGORY_FIRST " +
                 "left join fund_type t2 on t2.id = i.FUND_CATEGORY_SECOND " +
                 "left join fund_implementation_detail d on d.FUND_IMPLEMENTATION_ID = i.id " +
                 "where 1 = 1 ");
+        Map<String, Object> queryParams = new HashMap<>();// 创建入参map
         if (!Strings.isNullOrEmpty(fundImpReq.fundSource)) {
-            baseSql.append("and i.FUND_SOURCE_TEXT like '%" + fundImpReq.fundSource + "%' ");
+            baseSql.append("and i.FUND_SOURCE_TEXT like :sourceTxt ");
+            queryParams.put("sourceTxt", "%" + fundImpReq.fundSource + "%");
         }
-        if (!Strings.isNullOrEmpty(fundImpReq.pmPrjId)) {
-            baseSql.append("and d.PM_PRJ_ID = '").append(fundImpReq.pmPrjId).append("' ");
+        if (!Strings.isNullOrEmpty(fundImpReq.pmPrjIds)) {
+            baseSql.append("and d.PM_PRJ_ID in (:ids) ");
+            queryParams.put("ids", Arrays.asList(fundImpReq.pmPrjIds.split(",")));
         }
         if (!Strings.isNullOrEmpty(fundImpReq.beginTime) && !Strings.isNullOrEmpty(fundImpReq.endTime)) {
-            baseSql.append("and i.APPROVAL_TIME BETWEEN '" + fundImpReq.beginTime + "' and '" + fundImpReq.endTime + "' ");
+            baseSql.append("and i.APPROVAL_TIME BETWEEN :beginTime and :endTime ");
+            queryParams.put("beginTime", fundImpReq.beginTime);
+            queryParams.put("endTime", fundImpReq.endTime);
         }
         if (!Strings.isNullOrEmpty(fundImpReq.categoryNameId)) {
-            baseSql.append("and t1.id = '").append(fundImpReq.categoryNameId).append("' ");
+            baseSql.append("and t1.id = :categoryNameId ");
+            queryParams.put("categoryNameId", fundImpReq.categoryNameId);
         }
         if (!Strings.isNullOrEmpty(fundImpReq.secondCategoryNameId)) {
-            baseSql.append("and t2.id = '").append(fundImpReq.secondCategoryNameId).append("' ");
+            baseSql.append("and t2.id = :secondCategoryNameId ");
+            queryParams.put("secondCategoryNameId", fundImpReq.secondCategoryNameId);
         }
         baseSql.append("GROUP BY i.id ");
         // 总条数sql
@@ -83,10 +94,9 @@ public class FundImplementationApi {
 
         Integer start = fundImpReq.pageSize * (fundImpReq.pageIndex - 1);
         baseSql.append("limit " + start + "," + fundImpReq.pageSize);
-
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> impList = myJdbcTemplate.queryForList(baseSql.toString());
-        List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+        List<Map<String, Object>> impList = myNamedParameterJdbcTemplate.queryForList(baseSql.toString(), queryParams);
+        List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(totalSql, queryParams);
         ArrayList<FundImpResp> fundImpRespList = new ArrayList<>();
         for (Map<String, Object> impMap : impList) {
             FundImpResp fundImpResp = EntityUtil.mapToEntity(FundImpResp.class, impMap);
@@ -196,6 +206,8 @@ public class FundImplementationApi {
         public String fundSource;
         //项目id
         public String pmPrjId;
+        //项目id多选
+        public String pmPrjIds;
         //开始批复时间
         public String beginTime;
         //结束批复时间

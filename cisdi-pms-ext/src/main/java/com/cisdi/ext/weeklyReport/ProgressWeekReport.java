@@ -48,7 +48,8 @@ public class ProgressWeekReport {
 
         String sql1 = "select distinct a.pm_prj_id,c.name,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted " +
                 "from PM_ROSTER a left join POST_INFO b on a.POST_INFO_ID = b.id LEFT JOIN pm_prj c on a.PM_PRJ_ID = c.id " +
-                "where b.code = 'AD_USER_TWENTY_THREE_ID' and a.AD_USER_ID = ? and a.status = 'ap'";
+                "where b.code = 'AD_USER_TWENTY_THREE_ID' and a.AD_USER_ID = ? and a.status = 'ap' " +
+                "AND (c.PROJECT_STATUS != '1661568714048413696' or c.PROJECT_STATUS is null ) ";
         StringBuilder sb = new StringBuilder(sql1);
         if (!SharedUtil.isEmptyString(projectName)){
             sb.append(" and c.name like ('%").append(projectName).append("%') ");
@@ -183,7 +184,11 @@ public class ProgressWeekReport {
                 .set("TS",now)
                 .exec();
         //主表更新，该项目该周已更新
-        Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update().set("IZ_WRITE",1).set("AD_USER_ID",userId).exec();
+        Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update()
+                .set("IZ_WRITE",1)
+                .set("AD_USER_ID",userId).set("LAST_MODI_USER_ID",userId)
+                .set("TS",now).set("LAST_MODI_DT",now)
+                .exec();
     }
 
     /**
@@ -239,7 +244,8 @@ public class ProgressWeekReport {
 
         String sql1 = "select DISTINCT b.PM_PRJ_ID,c.name,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted " +
                 "from pm_roster a left join pm_progress_weekly_prj b on a.PM_PRJ_ID = b.PM_PRJ_ID left join pm_prj c on b.PM_PRJ_ID = c.id " +
-                "where a.status = 'ap' and b.status = 'ap' and b.IZ_WRITE = '1' and a.AD_USER_ID = ? and a.POST_INFO_ID = '1633997482885255168' ";
+                "where a.status = 'ap' and b.status = 'ap' and b.IZ_WRITE = '1' and a.AD_USER_ID = ? and a.POST_INFO_ID = '1633997482885255168' " +
+                "AND (c.PROJECT_STATUS != '1661568714048413696' or c.PROJECT_STATUS is null ) ";
         StringBuilder sb = new StringBuilder(sql1);
         if (!SharedUtil.isEmptyString(projectName)){
             sb.append(" and c.name like ('%").append(projectName).append("%') ");
@@ -404,6 +410,7 @@ public class ProgressWeekReport {
         } else {
             Map<String,Object> returnMap = new HashMap<>();
             returnMap.put("header",map1);
+            records.remove("all");
             returnMap.put("record",records);
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(returnMap), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
@@ -434,7 +441,7 @@ public class ProgressWeekReport {
                 "(select name from ad_user where id = a.ad_user_id) as recordByName,a.AD_USER_ID as recordById, " +
                 "a.FILE_ID_ONE as fileId,b.PM_PRJ_ID as projectId," +
                 "e.name as projectName,d.AD_USER_ID as manageUserId," +
-                "f.name as manageUserName,b.IZ_WRITE as izWrite " +
+                "f.name as manageUserName,b.IZ_WRITE as izWrite,b.id as weekPrjId " +
                 "from PM_PROGRESS_WEEKLY_PRJ_DETAIL a " +
                 "left join PM_PROGRESS_WEEKLY_PRJ b on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id " +
                 "LEFT JOIN pm_progress_weekly c on b.PM_PROGRESS_WEEKLY_ID = c.id " +
@@ -442,7 +449,8 @@ public class ProgressWeekReport {
                 "and ad_user_id is not null GROUP BY PM_PRJ_ID,ad_user_id) d on b.pm_prj_id = d.PM_PRJ_ID " +
                 "left join pm_prj e on b.pm_prj_id = e.id " +
                 "LEFT JOIN ad_user f ON d.ad_user_id = f.id " +
-                "where a.status = 'ap' and b.status = 'ap' and c.status = 'ap' and f.name is not null ";
+                "where a.status = 'ap' and b.status = 'ap' and c.status = 'ap' and f.name is not null " +
+                "AND (e.PROJECT_STATUS != '1661568714048413696' or e.PROJECT_STATUS is null ) ";
         StringBuilder sb = new StringBuilder(sql);
         if (!SharedUtil.isEmptyString(weekId)){
             sb.append(" and c.id = '").append(weekId).append("' "); // 周-批次id
@@ -519,6 +527,7 @@ public class ProgressWeekReport {
             weekMessage.recordByName = JdbcMapUtil.getString(p,"recordByName"); // 记录人
             weekMessage.projectId = JdbcMapUtil.getString(p,"projectId"); // 项目id
             weekMessage.projectName = JdbcMapUtil.getString(p,"projectName"); // 项目名称
+            weekMessage.weekPrjId = JdbcMapUtil.getString(p,"weekPrjId"); // 项目周id
             String fileId = JdbcMapUtil.getString(p,"fileId");
             if (!SharedUtil.isEmptyString(fileId)){
                 weekMessage.fileList =BaseFileExt.getFile(fileId);
@@ -583,5 +592,45 @@ public class ProgressWeekReport {
         map.put("weekId",weekId);
         map.put("limit",limit);
         return map;
+    }
+
+    /**
+     * 形象进度周报统计-统计-修改
+     */
+    public void updatePrjHistory(){
+        // 获取输入：
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        WeekMessage param = JsonUtil.fromJson(json,WeekMessage.class);
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        String id = param.id;
+        String writeDate = param.writeDate; //填报日期
+        String weekPrjId = param.weekPrjId; //进度周报-周项目信息id
+        if (SharedUtil.isEmptyString(id)){
+            throw new BaseException("记录id不能为空！");
+        }
+        if (SharedUtil.isEmptyString(writeDate)){
+            throw new BaseException("填报日期不能为空！");
+        }
+        String start = writeDate.substring(0,10);
+        String end = writeDate.substring(11,21);
+        String now = DateTimeUtil.dttmToString(new Date());
+        //数据保存
+        Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",id).update()
+                .set("DATE",writeDate).set("PM_PRJ_ID",param.projectId)
+                .set("VISUAL_PROGRESS",param.progress).set("PROCESS_REMARK_TEXT",param.progressWeek)
+                .set("VISUAL_PROGRESS_DESCRIBE",param.progressDescribe).set("FILE_ID_ONE",param.fileId)
+                .set("TEXT_REMARK_ONE",param.progressRemark).set("SYS_TRUE",param.weatherStart)
+                .set("IZ_END",param.weatherCompleted).set("FROM_DATE",start).set("TO_DATE",end)
+                .set("PM_PROGRESS_WEEKLY_ID",param.weekId).set("PM_PROGRESS_WEEKLY_PRJ_ID",weekPrjId)
+                .set("AD_USER_ID",userId).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                .set("TS",now)
+                .exec();
+        //主表更新，该项目该周已更新
+        Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update()
+                .set("IZ_WRITE",1)
+                .set("AD_USER_ID",userId).set("LAST_MODI_USER_ID",userId)
+                .set("TS",now).set("LAST_MODI_DT",now)
+                .exec();
     }
 }

@@ -174,7 +174,7 @@ public class ContractAccount {
             sb.append(" and a.pm_prj_id = '").append(requestParam.prjId).append("' ");
         }
         if (!SharedUtil.isEmptyString(requestParam.contractName)){
-            sb.append(" and a.CONTRACT_NAME like '%").append(requestParam.contractName).append("'%");
+            sb.append(" and a.CONTRACT_NAME like '%").append(requestParam.contractName).append("%'");
         }
         if (!SharedUtil.isEmptyString(requestParam.contractCompanyId)){
             sb.append(" and A.CUSTOMER_UNIT = '").append(requestParam.contractCompanyId).append("'");

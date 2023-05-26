@@ -81,7 +81,7 @@ public class PmRosterExt {
         int pageIndex = Integer.parseInt(String.valueOf(map.get("pageIndex")));
         String projectName = String.valueOf(map.get("projectName"));
         StringBuffer sb = new StringBuffer();
-        sb.append("select pj.id as id, pj.`NAME` as project_name from pm_prj pj left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pj.IZ_FORMAL_PRJ = 1 ");
+        sb.append("select pj.id as id, pj.`NAME` as project_name from pm_prj pj left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pj.IZ_FORMAL_PRJ = 1 and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null ) ");
         if (!StringUtils.isEmpty(projectName)) {
             sb.append(" and pj.name like '%").append(projectName).append("%'");
         }
