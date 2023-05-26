@@ -184,7 +184,11 @@ public class ProgressWeekReport {
                 .set("TS",now)
                 .exec();
         //主表更新，该项目该周已更新
-        Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update().set("IZ_WRITE",1).set("AD_USER_ID",userId).exec();
+        Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update()
+                .set("IZ_WRITE",1)
+                .set("AD_USER_ID",userId).set("LAST_MODI_USER_ID",userId)
+                .set("TS",now).set("LAST_MODI_DT",now)
+                .exec();
     }
 
     /**
@@ -406,6 +410,7 @@ public class ProgressWeekReport {
         } else {
             Map<String,Object> returnMap = new HashMap<>();
             returnMap.put("header",map1);
+            records.remove("all");
             returnMap.put("record",records);
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(returnMap), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
@@ -436,7 +441,7 @@ public class ProgressWeekReport {
                 "(select name from ad_user where id = a.ad_user_id) as recordByName,a.AD_USER_ID as recordById, " +
                 "a.FILE_ID_ONE as fileId,b.PM_PRJ_ID as projectId," +
                 "e.name as projectName,d.AD_USER_ID as manageUserId," +
-                "f.name as manageUserName,b.IZ_WRITE as izWrite " +
+                "f.name as manageUserName,b.IZ_WRITE as izWrite,b.id as weekPrjId " +
                 "from PM_PROGRESS_WEEKLY_PRJ_DETAIL a " +
                 "left join PM_PROGRESS_WEEKLY_PRJ b on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id " +
                 "LEFT JOIN pm_progress_weekly c on b.PM_PROGRESS_WEEKLY_ID = c.id " +
@@ -522,6 +527,7 @@ public class ProgressWeekReport {
             weekMessage.recordByName = JdbcMapUtil.getString(p,"recordByName"); // 记录人
             weekMessage.projectId = JdbcMapUtil.getString(p,"projectId"); // 项目id
             weekMessage.projectName = JdbcMapUtil.getString(p,"projectName"); // 项目名称
+            weekMessage.weekPrjId = JdbcMapUtil.getString(p,"weekPrjId"); // 项目周id
             String fileId = JdbcMapUtil.getString(p,"fileId");
             if (!SharedUtil.isEmptyString(fileId)){
                 weekMessage.fileList =BaseFileExt.getFile(fileId);
@@ -586,5 +592,45 @@ public class ProgressWeekReport {
         map.put("weekId",weekId);
         map.put("limit",limit);
         return map;
+    }
+
+    /**
+     * 形象进度周报统计-统计-修改
+     */
+    public void updatePrjHistory(){
+        // 获取输入：
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        WeekMessage param = JsonUtil.fromJson(json,WeekMessage.class);
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        String id = param.id;
+        String writeDate = param.writeDate; //填报日期
+        String weekPrjId = param.weekPrjId; //进度周报-周项目信息id
+        if (SharedUtil.isEmptyString(id)){
+            throw new BaseException("记录id不能为空！");
+        }
+        if (SharedUtil.isEmptyString(writeDate)){
+            throw new BaseException("填报日期不能为空！");
+        }
+        String start = writeDate.substring(0,10);
+        String end = writeDate.substring(11,21);
+        String now = DateTimeUtil.dttmToString(new Date());
+        //数据保存
+        Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",id).update()
+                .set("DATE",writeDate).set("PM_PRJ_ID",param.projectId)
+                .set("VISUAL_PROGRESS",param.progress).set("PROCESS_REMARK_TEXT",param.progressWeek)
+                .set("VISUAL_PROGRESS_DESCRIBE",param.progressDescribe).set("FILE_ID_ONE",param.fileId)
+                .set("TEXT_REMARK_ONE",param.progressRemark).set("SYS_TRUE",param.weatherStart)
+                .set("IZ_END",param.weatherCompleted).set("FROM_DATE",start).set("TO_DATE",end)
+                .set("PM_PROGRESS_WEEKLY_ID",param.weekId).set("PM_PROGRESS_WEEKLY_PRJ_ID",weekPrjId)
+                .set("AD_USER_ID",userId).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                .set("TS",now)
+                .exec();
+        //主表更新，该项目该周已更新
+        Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update()
+                .set("IZ_WRITE",1)
+                .set("AD_USER_ID",userId).set("LAST_MODI_USER_ID",userId)
+                .set("TS",now).set("LAST_MODI_DT",now)
+                .exec();
     }
 }
