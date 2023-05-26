@@ -1,10 +1,12 @@
 package com.cisdi.ext.util;
 
+import com.cisdi.ext.wf.WfInNodeExt;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -40,7 +42,7 @@ public class PrjPlanUtil {
                             SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
                             int totalDays = JdbcMapUtil.getInt(threeNode, "PLAN_TOTAL_DAYS");
                             Date completeDate = DateTimeUtil.addDays(paramDate, totalDays);
-                            //待优化
+                            // 待优化
                             for (int i = 0; i < 10; i++) {
                                 nodeList.forEach(m -> {
                                     if (Objects.equals(m.get("ID"), threeNode.get("ID"))) {
@@ -129,10 +131,10 @@ public class PrjPlanUtil {
         if (!CollectionUtils.isEmpty(currentNodeList)) {
             Map<String, Object> currentNode = currentNodeList.get(0);
 
-            //先刷新一下当前节点的时间
+            // 先刷新一下当前节点的时间
             int currentDays = JdbcMapUtil.getInt(currentNode, "PLAN_TOTAL_DAYS");
             Date planDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(currentNode, "PLAN_START_DATE"));
-            //当前节点结束日期
+            // 当前节点结束日期
             Date dateOrg = DateTimeUtil.addDays(planDate, currentDays);
             myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=? where id=?", dateOrg, nodeId);
 
@@ -203,11 +205,11 @@ public class PrjPlanUtil {
      */
     public static void createPlan(String projectId, String templateId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        //根据规则查询模板
+        // 根据规则查询模板
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRO_PLAN where id = ?", templateId);
 
         if (!CollectionUtils.isEmpty(list)) {
-            //先清出原来的
+            // 先清出原来的
             clearPlan(projectId);
 
             Map<String, Object> proMap = list.get(0);
@@ -240,17 +242,17 @@ public class PrjPlanUtil {
                     getChildrenNode(m, planNodeList, id, newPlanId);
                 }).collect(Collectors.toList());
 
-                //刷新前置节点
+                // 刷新前置节点
                 List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PM_PRO_PLAN_ID =(select id from PM_PRO_PLAN where PM_PRJ_ID=?)", projectId);
                 if (!CollectionUtils.isEmpty(nodeList)) {
                     nodeList.forEach(item -> {
-                        //查找模板种相同的节点
+                        // 查找模板种相同的节点
                         Optional<Map<String, Object>> optional = planNodeList.stream().filter(p -> Objects.equals(item.get("NAME"), p.get("NAME"))).findAny();
                         if (optional.isPresent()) {
                             Map<String, Object> tempNode = optional.get();
                             String tempPreNodeId = JdbcMapUtil.getString(tempNode, "PRE_NODE_ID");
                             if (!Strings.isNullOrEmpty(tempPreNodeId)) {
-                                //找到模板种前置节点对应的节点
+                                // 找到模板种前置节点对应的节点
                                 Optional<Map<String, Object>> tempPreOptional = planNodeList.stream().filter(p -> Objects.equals(tempPreNodeId, p.get("ID"))).findAny();
                                 if (tempPreOptional.isPresent()) {
                                     String tempPreNodeName = JdbcMapUtil.getString(tempPreOptional.get(), "NAME");
@@ -280,8 +282,8 @@ public class PrjPlanUtil {
      */
     public static void createPlan(String projectId, String type, String sourceId, BigDecimal invest, String tenderWay) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        //根据项目的类型，项目投资来源，项目的总额，招标方式查询模板
-        String proPlanId = "1648561483233353728";  //默认的模板
+        // 根据项目的类型，项目投资来源，项目的总额，招标方式查询模板
+        String proPlanId = "1648561483233353728";  // 默认的模板
         List<Map<String, Object>> ruleList = myJdbcTemplate.queryForList("select pptr.*,gsv.`code` as rule from PRO_PLAN_TEMPLATE_RULE pptr " +
                 "left join gr_set_value gsv on pptr.PRO_PLAN_RULE_CONDITION_ID = gsv.id " +
                 "where TEMPLATE_FOR_PROJECT_TYPE_ID=? and INVESTMENT_SOURCE_ID=? and TENDER_MODE_ID=?", type, sourceId, tenderWay);
@@ -450,7 +452,7 @@ public class PrjPlanUtil {
     public static void refreshProPlanUser(String projectId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_roster where PM_PRJ_ID=?", projectId);
-        //查询未启动的节点
+        // 查询未启动的节点
         List<Map<String, Object>> proList = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where pn.PROGRESS_STATUS_ID ='0099799190825106800' and  PM_PRJ_ID=?", projectId);
         list.forEach(item -> {
             String postId = JdbcMapUtil.getString(item, "POST_INFO_ID");
@@ -468,5 +470,20 @@ public class PrjPlanUtil {
         });
     }
 
+    /**
+     * 根据流程实例更新项目计划。
+     *
+     * @param projectId
+     */
+    public static void updatePrjProPlanByProcInst(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select T.WF_PROCESS_INSTANCE_ID from PM_PRJ_TO_PROC_INST T WHERE T.PM_PRJ_ID=? ORDER BY T.ID", projectId);
+        if (SharedUtil.isEmptyList(list)) {
+            return;
+        }
+        List<String> procInstIdList = list.stream().map(item -> JdbcMapUtil.getString(item, "WF_PROCESS_INSTANCE_ID")).collect(Collectors.toList());
+        // 有一点副作用（但应该没关系），就是若某个流程实例不仅关联了本项目、还关联了其他项目，那么，其他项目的计划也会被更新：
+        new WfInNodeExt().updatePrjProPlanByProcInst(procInstIdList);
+    }
 
 }
