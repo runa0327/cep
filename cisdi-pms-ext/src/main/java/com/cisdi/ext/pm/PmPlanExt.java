@@ -230,7 +230,6 @@ public class PmPlanExt {
                 break;
         }
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String now = DateTimeUtil.dateToString(new Date());
         myJdbcTemplate.update("update PM_PLAN set PLAN_STATUS_ID=? where id=?", statusId, id);
     }
 
@@ -287,18 +286,20 @@ public class PmPlanExt {
      * @param prjName 项目名称
      */
     private void createPmStart(String id, String prjName) {
-        String startId = "";
+        String startId = "", prjCode = "";
         List<PrjStart> prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME,prjName)
                 .eq(PrjStart.Cols.STATUS,"AP").neq(PrjStart.Cols.ID,id));
         if (!CollectionUtils.isEmpty(prjStartList)){
             startId = prjStartList.get(0).getId();
+            prjCode = prjStartList.get(0).getPmCode();
+        } else {
+            startId = Crud.from("PRJ_START").insertData();
+            prjCode = PmPrjCodeUtil.getPrjCode();
         }
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PLAN where id=?", id);
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> dataMap = list.get(0);
-            startId = Crud.from("PRJ_START").insertData();
-            String prjCode = PmPrjCodeUtil.getPrjCode();
             Crud.from("PRJ_START").where().eq("ID", startId).update()
                     .set("PM_CODE", prjCode).set("NAME", dataMap.get("name")).set("PRJ_TOTAL_INVEST", dataMap.get("AMT")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID"))
                     .set("AGENT", dataMap.get("AGENT")).set("PRJ_START_STATUS_ID", "1635833910065868800")
