@@ -142,7 +142,7 @@ public class ProPlanExt {
         List<Map<String, Object>> allList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
                 "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
                 "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO \n" +
-                "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where SHOW_IN_PRJ_OVERVIEW='1' and ppp.PM_PRJ_ID=?", pmPrjId);
+                "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where SHOW_IN_PRJ_OVERVIEW='1' and pppn.OPREATION_TYPE is null and ppp.PM_PRJ_ID=?", pmPrjId);
 
         // 结果转换
         List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(pmPrjId, p, myJdbcTemplate)).collect(Collectors.toList());
@@ -202,7 +202,7 @@ public class ProPlanExt {
                         " ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,LINKED_WF_PROCESS_ID,\n" +
                         " ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO,pppn.`LEVEL`,pppn.POST_INFO_ID,ifnull(pppn.CAN_START,0) CAN_START, \n" +
                         " PRE_NODE_ID,AD_ENT_ID_IMP,AD_ATT_ID_IMP,IZ_MILESTONE,SCHEDULE_NAME  " +
-                        "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where ppp.PM_PRJ_ID=?", pmPrjId);
+                        "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where pppn.OPREATION_TYPE is null and ppp.PM_PRJ_ID=?", pmPrjId);
 
                 List<String> notStart = new ArrayList<>();
                 // 结果转换
@@ -1111,12 +1111,14 @@ public class ProPlanExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
         NodeInput input = JsonUtil.fromJson(json, NodeInput.class);
+        String operationType = null;
         if (Strings.isEmpty(input.id)) {
             input.id = Crud.from("pm_pro_plan_node").insertData();
+            operationType = "add";
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("update pm_pro_plan_node set LAST_MODI_DT =NOW() ");
+        sb.append("update pm_pro_plan_node set LAST_MODI_DT =NOW(),OPREATION_TYPE='").append(operationType).append("'");
         if (Strings.isNotEmpty(input.name)) {
             sb.append(",`NAME` ='").append(input.name).append("'");
         }
@@ -1193,22 +1195,22 @@ public class ProPlanExt {
 
 
     /**
-     * 删除节点
+     * 删除节点--先给个操作标识符。需要流程审批通过后才删除
      */
     public void delPrjNode() {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String nodeId = JdbcMapUtil.getString(inputMap, "nodeId");
-        List<Map<String, Object>> progressStatusList =
-                myJdbcTemplate.queryForList("select v.name from pm_pro_plan_node n left join gr_set_value v on v.id = n.PROGRESS_STATUS_ID");
-        String statusName = JdbcMapUtil.getString(progressStatusList.get(0), "name");
-        List<Map<String, Object>> childIdList = myJdbcTemplate.queryForList("select id childId from pm_pro_plan_node n where PM_PRO_PLAN_NODE_PID = ?", nodeId);
-        if (CollectionUtils.isEmpty(childIdList) && Strings.isNotEmpty(statusName) && statusName.equals("未启动")) {
-            myJdbcTemplate.update("delete from pm_pro_plan_node where id = ?", nodeId);
-        } else {
-            throw new BaseException("不能删除该节点！");
-        }
-
+//        List<Map<String, Object>> progressStatusList =
+//                myJdbcTemplate.queryForList("select v.name from pm_pro_plan_node n left join gr_set_value v on v.id = n.PROGRESS_STATUS_ID");
+//        String statusName = JdbcMapUtil.getString(progressStatusList.get(0), "name");
+//        List<Map<String, Object>> childIdList = myJdbcTemplate.queryForList("select id childId from pm_pro_plan_node n where PM_PRO_PLAN_NODE_PID = ?", nodeId);
+//        if (CollectionUtils.isEmpty(childIdList) && Strings.isNotEmpty(statusName) && statusName.equals("未启动")) {
+//            myJdbcTemplate.update("delete from pm_pro_plan_node where id = ?", nodeId);
+//        } else {
+//            throw new BaseException("不能删除该节点！");
+//        }
+        myJdbcTemplate.update("update pm_pro_plan_node set OPREATION_TYPE='del' where id=?", nodeId);
     }
 
 
@@ -1295,7 +1297,7 @@ public class ProPlanExt {
                     "left join WF_PROCESS wp on pppn.LINKED_WF_PROCESS_ID = wp.id  " +
                     "left join pm_pro_plan ppp on ppp.id = pppn.PM_PRO_PLAN_ID " +
                     "left join gr_set_value v on v.id = pppn.PROGRESS_STATUS_ID " +
-                    "where ppp.pm_prj_id = ?", map.get("prjId"));
+                    "where pppn.OPREATION_TYPE is null and  ppp.pm_prj_id = ?", map.get("prjId"));
             List<PlanNode> nodeList = list.stream().map(p -> {
                 PlanNode node = new PlanNode();
                 node.id = JdbcMapUtil.getString(p, "ID");
@@ -1350,6 +1352,81 @@ public class ProPlanExt {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         }
     }
+
+    /**
+     * 全景计划调整页数据查询
+     */
+    public void getNodeByPrjAdjust() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> proPlanList = myJdbcTemplate.queryForList("select id proPlanId from pm_pro_plan where pm_prj_id = ?", map.get("prjId"));
+        if (!CollectionUtils.isEmpty(proPlanList)) {
+            Map<String, Object> proPlanIdMap = proPlanList.get(0);
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,pi.name as post_name,pre.name as pre_name,wp.name as processName,v.name progressStatusName  " +
+                    "from pm_pro_plan_node pppn left join post_info pi on pppn.POST_INFO_ID = pi.id  " +
+                    "left join pm_pro_plan_node pre on pppn.PRE_NODE_ID = pre.id  " +
+                    "left join WF_PROCESS wp on pppn.LINKED_WF_PROCESS_ID = wp.id  " +
+                    "left join pm_pro_plan ppp on ppp.id = pppn.PM_PRO_PLAN_ID " +
+                    "left join gr_set_value v on v.id = pppn.PROGRESS_STATUS_ID " +
+                    "where ppp.pm_prj_id = ?", map.get("prjId"));
+            List<PlanNode> nodeList = list.stream().map(p -> {
+                PlanNode node = new PlanNode();
+                node.id = JdbcMapUtil.getString(p, "ID");
+                node.pid = JdbcMapUtil.getString(p, "PM_PRO_PLAN_NODE_PID") == null ? "0" : JdbcMapUtil.getString(p, "PM_PRO_PLAN_NODE_PID");
+                node.name = JdbcMapUtil.getString(p, "NAME");
+                node.postId = JdbcMapUtil.getString(p, "POST_INFO_ID");
+                node.days = JdbcMapUtil.getInt(p, "PLAN_TOTAL_DAYS");
+                node.actualDays = JdbcMapUtil.getInt(p, "ACTUAL_TOTAL_DAYS");
+                node.planStartDay = JdbcMapUtil.getString(p, "PLAN_START_DATE");
+                node.planComplDay = JdbcMapUtil.getString(p, "PLAN_COMPL_DATE");
+                node.actualStartDay = JdbcMapUtil.getString(p, "ACTUAL_START_DATE");
+                node.actualComplDay = JdbcMapUtil.getString(p, "ACTUAL_COMPL_DATE");
+                node.progressStatusId = JdbcMapUtil.getString(p, "PROGRESS_STATUS_ID");
+                node.progressStatusName = JdbcMapUtil.getString(p, "progressStatusName");
+                node.preNodeId = JdbcMapUtil.getString(p, "PRE_NODE_ID");
+                node.processId = JdbcMapUtil.getString(p, "LINKED_WF_PROCESS_ID");
+                node.startNode = JdbcMapUtil.getString(p, "LINKED_START_WF_NODE_ID");
+                node.endNode = JdbcMapUtil.getString(p, "LINKED_END_WF_NODE_ID");
+                node.seqNo = JdbcMapUtil.getString(p, "SEQ_NO");
+                node.postName = JdbcMapUtil.getString(p, "post_name");
+                node.iz_milestone = JdbcMapUtil.getString(p, "IZ_MILESTONE");
+                node.preNodeName = JdbcMapUtil.getString(p, "pre_name");
+                node.processName = JdbcMapUtil.getString(p, "processName");
+                node.level = JdbcMapUtil.getString(p, "level");
+                node.baseNodeId = JdbcMapUtil.getString(p, "SCHEDULE_NAME");
+                node.ver = JdbcMapUtil.getString(p, "VER");
+                String att = JdbcMapUtil.getString(p, "AD_ATT_ID_IMP");
+                if (Strings.isNotEmpty(att)) {
+                    node.atts = Arrays.asList(att.split(","));
+                }
+                node.izDisplay = JdbcMapUtil.getString(p, "IZ_DISPLAY");
+                node.oprType = JdbcMapUtil.getString(p, "OPREATION_TYPE");
+                return node;
+            }).collect(Collectors.toList());
+
+            List<PlanNode> tree = nodeList.stream()
+                    .filter(p -> "0".equals(p.pid))
+                    .sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo)))
+                    .peek(m -> m.children = getChildren(m, nodeList).stream()
+                            .sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo)))
+                            .collect(Collectors.toList()))
+                    .collect(Collectors.toList());
+            if (CollectionUtils.isEmpty(tree)) {
+                ExtJarHelper.returnValue.set(Collections.emptyMap());
+            } else {
+                PlanOutSide outSide = new PlanOutSide();
+                outSide.proPlanId = proPlanIdMap.get("proPlanId").toString();
+                outSide.tree = tree;
+                Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+                ExtJarHelper.returnValue.set(outputMap);
+            }
+        } else {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        }
+    }
+
+
+
 
     private List<PlanNode> getChildren(PlanNode parentNode, List<PlanNode> allData) {
         return allData.stream().filter(p -> parentNode.id.equals(p.pid)).peek(m -> {
@@ -1435,6 +1512,8 @@ public class ProPlanExt {
         public String progressStatusName;
 
         public String izDisplay;
+
+        public String oprType;
     }
 
 

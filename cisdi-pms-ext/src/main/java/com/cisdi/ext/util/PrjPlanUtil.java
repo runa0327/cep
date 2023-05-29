@@ -130,6 +130,12 @@ public class PrjPlanUtil {
         List<Map<String, Object>> currentNodeList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", nodeId);
         if (!CollectionUtils.isEmpty(currentNodeList)) {
             Map<String, Object> currentNode = currentNodeList.get(0);
+            if (!"3".equals(JdbcMapUtil.getString(currentNode, "level"))) {
+                return;
+            }
+            if (currentNode.get("PLAN_START_DATE") == null) {
+                return;
+            }
 
             // 先刷新一下当前节点的时间
             int currentDays = JdbcMapUtil.getInt(currentNode, "PLAN_TOTAL_DAYS");
