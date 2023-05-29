@@ -760,7 +760,7 @@ public class PoOrderReqExt {
      * 通用-合同模块word转pdf
      * @Param status 状态码
      */
-    private void publicWordToPdf() {
+    public void publicWordToPdf() {
         String status = "all";
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
