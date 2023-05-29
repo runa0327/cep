@@ -224,13 +224,14 @@ public class PmStartExt {
         String prjCode = input.code;
         String status = input.status;
         String prjName = input.name;
-        List<PrjStart> prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME,prjName).eq(PrjStart.Cols.STATUS,"AP"));
-        if (!CollectionUtils.isEmpty(prjStartList)){
-            throw new BaseException("对不起，该项目已存在，请勿重复创建！");
-        }
         if (Strings.isNullOrEmpty(input.id)) {
             id = Crud.from("PRJ_START").insertData();
             prjCode = PmPrjCodeUtil.getPrjCode();
+        }
+        List<PrjStart> prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME,prjName)
+                .eq(PrjStart.Cols.STATUS,"AP").neq(PrjStart.Cols.ID,id));
+        if (!CollectionUtils.isEmpty(prjStartList)){
+            throw new BaseException("对不起，该项目已存在，请勿重复创建！");
         }
         if (Strings.isNullOrEmpty(status)) {
             status = "1636549534274465792";
