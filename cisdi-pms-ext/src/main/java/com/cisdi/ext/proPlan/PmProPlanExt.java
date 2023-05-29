@@ -1,5 +1,6 @@
 package com.cisdi.ext.proPlan;
 
+import com.cisdi.ext.model.PmProPlan;
 import com.cisdi.ext.model.PmProPlanNode;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
@@ -28,6 +29,21 @@ import java.util.stream.Collectors;
  * @date 2023/3/1
  */
 public class PmProPlanExt {
+
+    /**
+     * 更新项目进度计划节点状态
+     * @param projectId 项目id
+     */
+    public static void updateNodeOperationType(String projectId) {
+        //获取进度计划id
+        List<PmProPlan> list1 = PmProPlan.selectByWhere(new Where().eq(PmProPlan.Cols.PM_PRJ_ID,projectId));
+        if (!CollectionUtils.isEmpty(list1)){
+            String pmProPlanId = list1.get(0).getId();
+            Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID",pmProPlanId).update()
+                    .set("OPREATION_TYPE",null)
+                    .exec();
+        }
+    }
 
     /**
      * 准予启动。

@@ -101,9 +101,17 @@ public class PmProPlanNode {
          */
         public static final String REMARK = "REMARK";
         /**
+         * 是否显示。
+         */
+        public static final String IZ_DISPLAY = "IZ_DISPLAY";
+        /**
          * 进度计划名称。
          */
         public static final String SCHEDULE_NAME = "SCHEDULE_NAME";
+        /**
+         * 操作类型。
+         */
+        public static final String OPREATION_TYPE = "OPREATION_TYPE";
         /**
          * 前置节点。
          */
@@ -244,6 +252,10 @@ public class PmProPlanNode {
          * 关联的流程节点实例（结束）。
          */
         public static final String LINKED_END_WF_NODE_INSTANCE_ID = "LINKED_END_WF_NODE_INSTANCE_ID";
+        /**
+         * 是否多标段。
+         */
+        public static final String IZ_MORE = "IZ_MORE";
         /**
          * 能否启动。
          */
@@ -736,6 +748,42 @@ public class PmProPlanNode {
     }
 
     /**
+     * 是否显示。
+     */
+    private Boolean izDisplay;
+
+    /**
+     * 获取：是否显示。
+     */
+    public Boolean getIzDisplay() {
+        return this.izDisplay;
+    }
+
+    /**
+     * 设置：是否显示。
+     */
+    public PmProPlanNode setIzDisplay(Boolean izDisplay) {
+        if (this.izDisplay == null && izDisplay == null) {
+            // 均为null，不做处理。
+        } else if (this.izDisplay != null && izDisplay != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.izDisplay.compareTo(izDisplay) != 0) {
+                this.izDisplay = izDisplay;
+                if (!this.toUpdateCols.contains("IZ_DISPLAY")) {
+                    this.toUpdateCols.add("IZ_DISPLAY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.izDisplay = izDisplay;
+            if (!this.toUpdateCols.contains("IZ_DISPLAY")) {
+                this.toUpdateCols.add("IZ_DISPLAY");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 进度计划名称。
      */
     private String scheduleName;
@@ -766,6 +814,42 @@ public class PmProPlanNode {
             this.scheduleName = scheduleName;
             if (!this.toUpdateCols.contains("SCHEDULE_NAME")) {
                 this.toUpdateCols.add("SCHEDULE_NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 操作类型。
+     */
+    private String opreationType;
+
+    /**
+     * 获取：操作类型。
+     */
+    public String getOpreationType() {
+        return this.opreationType;
+    }
+
+    /**
+     * 设置：操作类型。
+     */
+    public PmProPlanNode setOpreationType(String opreationType) {
+        if (this.opreationType == null && opreationType == null) {
+            // 均为null，不做处理。
+        } else if (this.opreationType != null && opreationType != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.opreationType.compareTo(opreationType) != 0) {
+                this.opreationType = opreationType;
+                if (!this.toUpdateCols.contains("OPREATION_TYPE")) {
+                    this.toUpdateCols.add("OPREATION_TYPE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.opreationType = opreationType;
+            if (!this.toUpdateCols.contains("OPREATION_TYPE")) {
+                this.toUpdateCols.add("OPREATION_TYPE");
             }
         }
         return this;
@@ -2026,6 +2110,42 @@ public class PmProPlanNode {
             this.linkedEndWfNodeInstanceId = linkedEndWfNodeInstanceId;
             if (!this.toUpdateCols.contains("LINKED_END_WF_NODE_INSTANCE_ID")) {
                 this.toUpdateCols.add("LINKED_END_WF_NODE_INSTANCE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否多标段。
+     */
+    private Boolean izMore;
+
+    /**
+     * 获取：是否多标段。
+     */
+    public Boolean getIzMore() {
+        return this.izMore;
+    }
+
+    /**
+     * 设置：是否多标段。
+     */
+    public PmProPlanNode setIzMore(Boolean izMore) {
+        if (this.izMore == null && izMore == null) {
+            // 均为null，不做处理。
+        } else if (this.izMore != null && izMore != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.izMore.compareTo(izMore) != 0) {
+                this.izMore = izMore;
+                if (!this.toUpdateCols.contains("IZ_MORE")) {
+                    this.toUpdateCols.add("IZ_MORE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.izMore = izMore;
+            if (!this.toUpdateCols.contains("IZ_MORE")) {
+                this.toUpdateCols.add("IZ_MORE");
             }
         }
         return this;
