@@ -736,7 +736,12 @@ public class PmStartExt {
             List<Map<String, Object>> sonList = getChildrenNode(m, allData);
             if (!CollectionUtils.isEmpty(sonList)) {
                 Map<String, Object> topDate = sonList.get(0);
-                String start = topDate.get("PLAN_START_DATE").toString();
+                String start = JdbcMapUtil.getString(topDate,"PLAN_START_DATE");
+                if (SharedUtil.isEmptyString(start)){
+                    String id = topDate.get("SCHEDULE_NAME").toString();
+                    String name = myJdbcTemplate.queryForList("select name from standard_node_name where id = ?",id).get(0).get("name").toString();
+                    throw new BaseException("进度计划名称为【"+name+"】预计开始日期不能为空！");
+                }
                 String end = topDate.get("PLAN_COMPL_DATE").toString();
                 int cha = getDateCha(end,start);
                 myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
