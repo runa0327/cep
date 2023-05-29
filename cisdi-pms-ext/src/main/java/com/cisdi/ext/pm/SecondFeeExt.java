@@ -198,19 +198,18 @@ public class SecondFeeExt {
                 continue;
             }
             //可支付金额
-            BigDecimal firstApprovedAmount = demandDtls.get(0).approvedAmount.multiply(demandDtl.payableRatio);
-            demandDtl.payableAmount = demandDtl.approvedAmount.multiply(demandDtl.payableRatio);
-            //和第一个比，取较小值
-            demandDtl.payableAmount = (demandDtl.payableAmount.compareTo(firstApprovedAmount) < 0 ? demandDtl.payableAmount : firstApprovedAmount);
+            //取该条明细的批复金额和第一条批复金额比较，取较小值
+            BigDecimal smallerAmount = demandDtl.approvedAmount.compareTo(demandDtls.get(0).approvedAmount) < 0 ? demandDtl.approvedAmount : demandDtls.get(0).approvedAmount;
+            demandDtl.payableAmount = smallerAmount.multiply(demandDtl.payableRatio);
 
-            //已支付金额：合同已支付金额合计,待后续完善
-            demandDtl.paidAmount = new BigDecimal(BigInteger.ZERO);
+            //已支付金额：合同已支付金额合计
+            demandDtl.paidAmount = paidAmt;
 
             //支付比例：已支付金额 / 合同金额
             demandDtl.paymentRatio = demandDtl.paidAmount.divide(demandDtls.get(0).approvedAmount);
 
-            //需求资金：已支付比例*合同金额 - 已支付金额
-            demandDtl.requiredAmount = demandDtl.paymentRatio.multiply(demandDtls.get(0).approvedAmount).subtract(demandDtl.paidAmount);
+            //需求资金：可支付金额 - 已支付金额
+            demandDtl.requiredAmount = demandDtl.payableAmount.subtract(paidAmt);
 
             //报送时间：提交日期
             if (Strings.isNullOrEmpty(demandDtl.submitTime)){
@@ -447,11 +446,5 @@ public class SecondFeeExt {
             this.editable = false;
             this.mandatory = false;
         }
-    }
-
-    public static void main(String[] args) {
-//        String text = null == null ? null : "1".toString();
-//        System.out.println(text);
-        System.out.println(LocalDateTime.now().toString());
     }
 }
