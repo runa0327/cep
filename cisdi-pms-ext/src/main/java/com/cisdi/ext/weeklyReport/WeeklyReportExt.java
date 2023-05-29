@@ -11,6 +11,7 @@ import com.qygly.shared.interaction.IdText;
 import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -262,40 +263,75 @@ public class WeeklyReportExt {
      * @param report
      */
     private void calcDateStatList(BaseReport report) {
-        if (SharedUtil.isEmptyList(report.reportDtlList)) {
-            return;
-        }
-
-        Map<String, Long> startMap = report.reportDtlList.stream().filter(item -> item.isStart && item.startDate != null).map(item -> item.startDate.substring(0, 7)).collect(Collectors.groupingBy(item -> item, LinkedHashMap::new, Collectors.counting()));
-        Map<String, Long> endMap = report.reportDtlList.stream().filter(item -> item.isEnd && item.endDate != null).map(item -> item.endDate.substring(0, 7)).collect(Collectors.groupingBy(item -> item, LinkedHashMap::new, Collectors.counting()));
-
-        if (SharedUtil.isEmptyMap(startMap) && SharedUtil.isEmptyMap(endMap)) {
-            return;
-        }
-
         report.dateStatList = new ArrayList<>();
-
-        for (Map.Entry<String, Long> entry : startMap.entrySet()) {
-            BaseReport.DateStat dateStat = new BaseReport.DateStat();
-            String date = entry.getKey();
-            dateStat.date = date;
-            dateStat.ctStart = entry.getValue();
-            dateStat.ctEnd = endMap.containsKey(date) ? endMap.get(date) : 0l;
-            report.dateStatList.add(dateStat);
-        }
-
-        for (Map.Entry<String, Long> entry : endMap.entrySet()) {
-            String date = entry.getKey();
-            if (!startMap.containsKey(date)) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql1 = "select a.date,a.num as ctStart,b.num as ctEnd from (select a.date,count(*) as num from " +
+                "(SELECT DISTINCT D.ENTITY_RECORD_ID,PI.NAME WF_PROCESS_INSTANCE_NAME,P.EXTRA_INFO WF_PROCESS_EXTRA_INFO," +
+                "DATE_FORMAT(d.START_DATE,'%Y-%m') as date " +
+                "FROM HR_WEEKLY_REPORT_DTL D " +
+                "left JOIN WF_PROCESS_INSTANCE PI ON D.WF_PROCESS_INSTANCE_ID = PI.ID " +
+                "left JOIN WF_PROCESS P ON PI.WF_PROCESS_ID = P.ID " +
+                "LEFT JOIN PM_PRJ PRJ ON D.PM_PRJ_ID = PRJ.ID " +
+                "where pi.STATUS = 'ap' and p.status not in ('VD','VDING') and d.START_DATE >= (DATE_FORMAT(NOW(),'%Y-%m-01 00:00:00') - INTERVAL 6 MONTH) " +
+                "ORDER BY ENTITY_RECORD_ID asc) a GROUP BY a.date ORDER BY a.date asc) a " +
+                "LEFT JOIN " +
+                "(select a.date,count(*) as num from " +
+                "(SELECT DISTINCT D.ENTITY_RECORD_ID," +
+                "PI.NAME WF_PROCESS_INSTANCE_NAME," +
+                "P.EXTRA_INFO WF_PROCESS_EXTRA_INFO," +
+                "DATE_FORMAT(d.START_DATE,'%Y-%m') as date " +
+                "FROM HR_WEEKLY_REPORT_DTL D " +
+                "left JOIN WF_PROCESS_INSTANCE PI ON D.WF_PROCESS_INSTANCE_ID = PI.ID " +
+                "left JOIN WF_PROCESS P ON PI.WF_PROCESS_ID = P.ID " +
+                "LEFT JOIN PM_PRJ PRJ ON D.PM_PRJ_ID = PRJ.ID " +
+                "where pi.STATUS = 'ap' and p.status not in ('VD','VDING') and d.END_DATE >= (DATE_FORMAT(NOW(),'%Y-%m-01 00:00:00') - INTERVAL 6 MONTH) " +
+                "ORDER BY ENTITY_RECORD_ID asc) a GROUP BY a.date ORDER BY a.date asc) b on a.date = b.date " +
+                "ORDER BY a.date asc";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql1);
+        if (!CollectionUtils.isEmpty(list)){
+            for (Map<String, Object> map : list) {
                 BaseReport.DateStat dateStat = new BaseReport.DateStat();
-                dateStat.date = date;
-                dateStat.ctStart = 0L;
-                dateStat.ctEnd = entry.getValue();
+                dateStat.date = map.get("date").toString();
+                dateStat.ctStart = Long.valueOf(map.get("ctStart").toString());
+                dateStat.ctEnd = Long.valueOf(map.get("ctEnd").toString());
                 report.dateStatList.add(dateStat);
             }
         }
-
         report.dateStatList = report.dateStatList.stream().sorted(Comparator.comparing(o -> o.date)).collect(Collectors.toList());
+//        if (SharedUtil.isEmptyList(report.reportDtlList)) {
+//            return;
+//        }
+//
+//        Map<String, Long> startMap = report.reportDtlList.stream().filter(item -> item.isStart && item.startDate != null).map(item -> item.startDate.substring(0, 7)).collect(Collectors.groupingBy(item -> item, LinkedHashMap::new, Collectors.counting()));
+//        Map<String, Long> endMap = report.reportDtlList.stream().filter(item -> item.isEnd && item.endDate != null).map(item -> item.endDate.substring(0, 7)).collect(Collectors.groupingBy(item -> item, LinkedHashMap::new, Collectors.counting()));
+//
+//        if (SharedUtil.isEmptyMap(startMap) && SharedUtil.isEmptyMap(endMap)) {
+//            return;
+//        }
+//
+//        report.dateStatList = new ArrayList<>();
+//
+//        for (Map.Entry<String, Long> entry : startMap.entrySet()) {
+//            BaseReport.DateStat dateStat = new BaseReport.DateStat();
+//            String date = entry.getKey();
+//            dateStat.date = date;
+//            dateStat.ctStart = entry.getValue();
+//            dateStat.ctEnd = endMap.containsKey(date) ? endMap.get(date) : 0l;
+//            report.dateStatList.add(dateStat);
+//        }
+//
+//        for (Map.Entry<String, Long> entry : endMap.entrySet()) {
+//            String date = entry.getKey();
+//            if (!startMap.containsKey(date)) {
+//                BaseReport.DateStat dateStat = new BaseReport.DateStat();
+//                dateStat.date = date;
+//                dateStat.ctStart = 0L;
+//                dateStat.ctEnd = entry.getValue();
+//                report.dateStatList.add(dateStat);
+//            }
+//        }
+
+//        report.dateStatList = report.dateStatList.stream().sorted(Comparator.comparing(o -> o.date)).collect(Collectors.toList());
     }
 
     public void getDeptWeeklyReport() {
