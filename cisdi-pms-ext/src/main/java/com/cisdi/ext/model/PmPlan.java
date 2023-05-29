@@ -116,9 +116,17 @@ public class PmPlan {
          */
         public static final String AGENT = "AGENT";
         /**
+         * 是否显示。
+         */
+        public static final String IZ_DISPLAY = "IZ_DISPLAY";
+        /**
          * 谋划状态。
          */
         public static final String PLAN_STATUS_ID = "PLAN_STATUS_ID";
+        /**
+         * 项目。
+         */
+        public static final String PM_PRJ_ID = "PM_PRJ_ID";
         /**
          * 谋划进度。
          */
@@ -755,6 +763,42 @@ public class PmPlan {
     }
 
     /**
+     * 是否显示。
+     */
+    private Boolean izDisplay;
+
+    /**
+     * 获取：是否显示。
+     */
+    public Boolean getIzDisplay() {
+        return this.izDisplay;
+    }
+
+    /**
+     * 设置：是否显示。
+     */
+    public PmPlan setIzDisplay(Boolean izDisplay) {
+        if (this.izDisplay == null && izDisplay == null) {
+            // 均为null，不做处理。
+        } else if (this.izDisplay != null && izDisplay != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.izDisplay.compareTo(izDisplay) != 0) {
+                this.izDisplay = izDisplay;
+                if (!this.toUpdateCols.contains("IZ_DISPLAY")) {
+                    this.toUpdateCols.add("IZ_DISPLAY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.izDisplay = izDisplay;
+            if (!this.toUpdateCols.contains("IZ_DISPLAY")) {
+                this.toUpdateCols.add("IZ_DISPLAY");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 谋划状态。
      */
     private String planStatusId;
@@ -785,6 +829,42 @@ public class PmPlan {
             this.planStatusId = planStatusId;
             if (!this.toUpdateCols.contains("PLAN_STATUS_ID")) {
                 this.toUpdateCols.add("PLAN_STATUS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 项目。
+     */
+    private String pmPrjId;
+
+    /**
+     * 获取：项目。
+     */
+    public String getPmPrjId() {
+        return this.pmPrjId;
+    }
+
+    /**
+     * 设置：项目。
+     */
+    public PmPlan setPmPrjId(String pmPrjId) {
+        if (this.pmPrjId == null && pmPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmPrjId != null && pmPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmPrjId.compareTo(pmPrjId) != 0) {
+                this.pmPrjId = pmPrjId;
+                if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                    this.toUpdateCols.add("PM_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmPrjId = pmPrjId;
+            if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
+                this.toUpdateCols.add("PM_PRJ_ID");
             }
         }
         return this;

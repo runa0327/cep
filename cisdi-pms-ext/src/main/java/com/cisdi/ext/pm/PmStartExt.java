@@ -270,14 +270,15 @@ public class PmStartExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from gr_set_value where name=?", map.get("status"));
+        String id = map.get("id").toString();
         if (!CollectionUtils.isEmpty(list)) {
             if (!"项目取消".equals(map.get("status"))) {
                 List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from PRJ_START where id=?", map.get("id"));
                 if (!CollectionUtils.isEmpty(list1)) {
-                    this.createOtherInfo(list1.get(0));
+                    this.createOtherInfo(list1.get(0),id);
                 }
             }
-            myJdbcTemplate.update("update PRJ_START set PRJ_START_STATUS_ID=? where id=?", list.get(0).get("ID"), map.get("id"));
+            myJdbcTemplate.update("update PRJ_START set PRJ_START_STATUS_ID=? where id=?", list.get(0).get("ID"), id);
         }
 
     }
@@ -348,8 +349,9 @@ public class PmStartExt {
      * 创建项目进展等信息
      *
      * @param dataMap
+     * @param id 项目启动id
      */
-    private void createOtherInfo(Map<String, Object> dataMap) {
+    private void createOtherInfo(Map<String, Object> dataMap, String id) {
         String projectId = "";
         String prjCode = JdbcMapUtil.getString(dataMap, "PM_CODE");
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
@@ -432,6 +434,10 @@ public class PmStartExt {
         PrjPlanUtil.refreshProPlanTime(projectId, JdbcMapUtil.getDate(dataMap, "START_TIME"));
         //发送本周任务
         sendWeekTask(projectId);
+
+        //项目id写入项目启动、项目谋划
+        Crud.from("PRJ_START").where().eq("ID",id).update().set("PM_PRJ_ID",projectId).exec();
+        Crud.from("PM_PLAN").where().eq("NAME",dataMap.get("NAME")).update().set("PM_PRJ_ID",projectId).set("IZ_DISPLAY",0).exec();
     }
 
     /**
