@@ -756,4 +756,116 @@ public class PoOrderReqExt {
         return nodeName;
     }
 
+    /**
+     * 通用-合同模块word转pdf-第一次
+     */
+    public void wordToPdfOne(){
+        String status = "wordToPdfOne";
+        publicWordToPdf(status);
+    }
+
+    /**
+     * 通用-合同模块word转pdf-第二次
+     */
+    public void wordToPdfTwo(){
+        String status = "wordToPdfTwo";
+        publicWordToPdf(status);
+    }
+
+    /**
+     * 通用-合同模块word转pdf
+     * @Param status 状态码
+     */
+    private void publicWordToPdf(String status) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //用户id
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        String userName = ExtJarHelper.loginInfo.get().userName;
+        //流程id
+        String csId = entityRecord.csCommId;
+        //流程实例id
+        String procInstId = ExtJarHelper.procInstId.get();
+        //合同类型
+        String contractId = JdbcMapUtil.getString(entityRecord.valueMap,"CONTRACT_CATEGORY_ONE_ID");
+        //含税总金额
+        BigDecimal amt = StringUtil.valueNullToBig(JdbcMapUtil.getString(entityRecord.valueMap,"AMT_TWO"));
+        //合同修订稿
+        String file = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE");
+        if (!SharedUtil.isEmptyString(file)){
+            //判断是否需要转换
+            Boolean izToPdf = getResult(status,contractId,amt);
+            if (izToPdf){
+                //查询接口地址
+                String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
+                List<Map<String,Object>> listUrl = myJdbcTemplate.queryForList(httpSql);
+                //公司名称
+                String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
+                String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
+
+                new Thread(() -> {
+                    if (!CollectionUtils.isEmpty(listUrl)){
+                        String url = listUrl.get(0).get("HOST_ADDR").toString();
+                        if (SharedUtil.isEmptyString(url)){
+                            //写入日志提示表
+                            String id = Crud.from("AD_REMIND_LOG").insertData();
+                            Crud.from("AD_REMIND_LOG").where().eq("id",id).update().set("AD_ENT_ID","0099799190825103145")
+                                    .set("ENT_CODE","PO_ORDER_REQ").set("ENTITY_RECORD_ID",csId).set("REMIND_USER_ID","0099250247095871681")
+                                    .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
+                                    .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
+                        } else {
+                            PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName);
+                            String param = JSON.toJSONString(poOrderReqView);
+                            //调用接口
+                            HttpClient.doPost(url,param,"UTF-8");
+                        }
+
+                    }
+                }).start();
+            }
+        }
+    }
+
+    /**
+     * 根据表单信息判断是否需要转换
+     * @param status 节点状态
+     * @param contractId 合同类型id
+     * @param amt 含税总金额
+     * @return
+     */
+    private Boolean getResult(String status, String contractId, BigDecimal amt) {
+        Boolean res = false;
+        if ("wordToPdfOne".equals(status)){ //第一次转换
+            if ("0099952822476392995".equals(contractId) && amt.compareTo(new BigDecimal(4000000)) < 0){
+                res = true;
+            } else if ("0099952822476392996".equals(contractId) && amt.compareTo(new BigDecimal(2000000)) < 0){
+                res = true;
+            } else if ("0099952822476392997".equals(contractId) && amt.compareTo(new BigDecimal(1000000)) < 0){
+                res = true;
+            } else if ("1610113244998029312".equals(contractId) && amt.compareTo(new BigDecimal(1000000)) < 0){
+                res = true;
+            } else if ("0099952822476392998".equals(contractId) && amt.compareTo(new BigDecimal(10000000)) < 0){
+                res = true;
+            } else if ("1610263444660060160".equals(contractId) && amt.compareTo(new BigDecimal(10000000)) < 0){
+                res = true;
+            }
+        } else if ("wordToPdfTwo".equals(status)){ //第二次转换
+            if ("0099952822476392995".equals(contractId) && amt.compareTo(new BigDecimal(4000000)) >= 0){
+                res = true;
+            } else if ("0099952822476392996".equals(contractId) && amt.compareTo(new BigDecimal(2000000)) >= 0){
+                res = true;
+            } else if ("0099952822476392997".equals(contractId) && amt.compareTo(new BigDecimal(1000000)) >= 0){
+                res = true;
+            } else if ("1610113244998029312".equals(contractId) && amt.compareTo(new BigDecimal(1000000)) >= 0){
+                res = true;
+            } else if ("0099952822476392998".equals(contractId) && amt.compareTo(new BigDecimal(10000000)) >= 0){
+                res = true;
+            } else if ("1610263444660060160".equals(contractId) && amt.compareTo(new BigDecimal(10000000)) >= 0){
+                res = true;
+            }
+        }
+        return res;
+    }
+
+
 }
