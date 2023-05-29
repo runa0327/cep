@@ -14,6 +14,7 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -224,14 +225,21 @@ public class PmStartExt {
         String prjCode = input.code;
         String status = input.status;
         String prjName = input.name;
+        List<PrjStart> prjStartList = new ArrayList<>();
+        if (!SharedUtil.isEmptyString(id)){
+            prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME,prjName)
+                    .eq(PrjStart.Cols.STATUS,"AP").neq(PrjStart.Cols.ID,id));
+
+        } else {
+            prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME,prjName)
+                    .eq(PrjStart.Cols.STATUS,"AP"));
+        }
+        if (!CollectionUtils.isEmpty(prjStartList)){
+            throw new BaseException("对不起，该项目已存在，请勿重复创建！");
+        }
         if (Strings.isNullOrEmpty(input.id)) {
             id = Crud.from("PRJ_START").insertData();
             prjCode = PmPrjCodeUtil.getPrjCode();
-        }
-        List<PrjStart> prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME,prjName)
-                .eq(PrjStart.Cols.STATUS,"AP").neq(PrjStart.Cols.ID,id));
-        if (!CollectionUtils.isEmpty(prjStartList)){
-            throw new BaseException("对不起，该项目已存在，请勿重复创建！");
         }
         if (Strings.isNullOrEmpty(status)) {
             status = "1636549534274465792";

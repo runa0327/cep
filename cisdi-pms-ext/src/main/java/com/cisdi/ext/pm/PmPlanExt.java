@@ -1,6 +1,7 @@
 package com.cisdi.ext.pm;
 
 import com.cisdi.ext.model.PmPlan;
+import com.cisdi.ext.model.PrjStart;
 import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
@@ -12,7 +13,9 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -173,6 +176,20 @@ public class PmPlanExt {
         String json = JsonUtil.toJson(map);
         InputData input = JsonUtil.fromJson(json, InputData.class);
         String id = input.id;
+        List<com.cisdi.ext.model.PmPlan> list = new ArrayList<>();
+        if (!SharedUtil.isEmptyString(id)){
+            list = com.cisdi.ext.model.PmPlan.selectByWhere(new Where()
+                    .eq(com.cisdi.ext.model.PmPlan.Cols.NAME,input.name)
+                    .eq(com.cisdi.ext.model.PmPlan.Cols.STATUS,"AP")
+                    .neq(com.cisdi.ext.model.PmPlan.Cols.ID,id));
+        } else {
+            list = com.cisdi.ext.model.PmPlan.selectByWhere(new Where()
+                    .eq(com.cisdi.ext.model.PmPlan.Cols.NAME,input.name)
+                    .eq(com.cisdi.ext.model.PmPlan.Cols.STATUS,"AP"));
+        }
+        if (!CollectionUtils.isEmpty(list)){
+            throw new BaseException("对不起，该项目已存在，请勿重复创建！");
+        }
         if (Strings.isNullOrEmpty(input.id)) {
             id = Crud.from("PM_PLAN").insertData();
         }
@@ -200,12 +217,13 @@ public class PmPlanExt {
     public void changeStatus() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String id = String.valueOf(map.get("id"));
+        String name = map.get("name").toString();
         String status = String.valueOf(map.get("status"));
         String statusId = null;
         switch (status) {
             case "项目启动":
                 statusId = "1635818406316060672";
-                createPmStart(id);
+                createPmStart(id,name);
                 break;
             case "谋划启动":
                 statusId = "1635456054244651008";
@@ -215,6 +233,7 @@ public class PmPlanExt {
                 break;
         }
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String now = DateTimeUtil.dateToString(new Date());
         myJdbcTemplate.update("update PM_PLAN set PLAN_STATUS_ID=? where id=?", statusId, id);
     }
 
@@ -265,12 +284,23 @@ public class PmPlanExt {
         return planProgress;
     }
 
-    private void createPmStart(String id) {
+    /**
+     * 谋划库进入启动库
+     * @param id 谋划id
+     * @param prjName 项目名称
+     */
+    private void createPmStart(String id, String prjName) {
+        String startId = "";
+        List<PrjStart> prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME,prjName)
+                .eq(PrjStart.Cols.STATUS,"AP").neq(PrjStart.Cols.ID,id));
+        if (!CollectionUtils.isEmpty(prjStartList)){
+            startId = prjStartList.get(0).getId();
+        }
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PLAN where id=?", id);
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> dataMap = list.get(0);
-            String startId = Crud.from("PRJ_START").insertData();
+            startId = Crud.from("PRJ_START").insertData();
             String prjCode = PmPrjCodeUtil.getPrjCode();
             Crud.from("PRJ_START").where().eq("ID", startId).update()
                     .set("PM_CODE", prjCode).set("NAME", dataMap.get("name")).set("PRJ_TOTAL_INVEST", dataMap.get("AMT")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID"))
