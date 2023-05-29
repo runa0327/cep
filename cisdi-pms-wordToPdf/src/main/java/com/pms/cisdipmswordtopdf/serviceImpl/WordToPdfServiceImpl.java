@@ -152,7 +152,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
             attCode = "FILE_ID_ONE";  //合同修订稿
         }
         //查询pdf文件
-        String oldFileId = jdbcTemplate.queryForList("seleCT ATT_FILE_GROUP_ID from po_order_req where id = ?",poOrderId).get(0).get("ATT_FILE_GROUP_ID").toString();
+        String oldFileId = jdbcTemplate.queryForList("select "+attCode+" from po_order_req where id = ?",poOrderId).get(0).get(attCode).toString();
         oldFileId = StringUtils.replaceCode(oldFileId,",","','");
         String sql1 = "select id as id from fl_file where id in ('"+oldFileId+"') and EXT = 'PDF'";
         List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
