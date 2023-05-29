@@ -220,6 +220,12 @@ public class PmPrjIdLink {
             if ("1658641185226608640".equals(sevId)){
                 List<LinkedRecord> linkedRecordList = new ArrayList<>();
                 for (Map<String, Object> tmp : list) {
+                    String start = JdbcMapUtil.getString(tmp,"PLAN_START_DATE");
+                    if (SharedUtil.isEmptyString(start)){
+                        String id = tmp.get("SCHEDULE_NAME").toString();
+                        String name = myJdbcTemplate.queryForList("select name from standard_node_name where id = ?",id).get(0).get("name").toString();
+                        throw new BaseException("进度计划名称为【"+name+"】预计开始日期不能为空！");
+                    }
                     LinkedRecord linkedRecord = new LinkedRecord();
                     //项目进度计划节点
                     linkedRecord.valueMap.put("PM_PRO_PLAN_NODE_ID", JdbcMapUtil.getString(tmp,"ID"));
