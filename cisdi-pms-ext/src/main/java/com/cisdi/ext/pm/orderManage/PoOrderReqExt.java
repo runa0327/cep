@@ -757,26 +757,11 @@ public class PoOrderReqExt {
     }
 
     /**
-     * 通用-合同模块word转pdf-第一次
-     */
-    public void wordToPdfOne(){
-        String status = "wordToPdfOne";
-        publicWordToPdf(status);
-    }
-
-    /**
-     * 通用-合同模块word转pdf-第二次
-     */
-    public void wordToPdfTwo(){
-        String status = "wordToPdfTwo";
-        publicWordToPdf(status);
-    }
-
-    /**
      * 通用-合同模块word转pdf
      * @Param status 状态码
      */
-    private void publicWordToPdf(String status) {
+    private void publicWordToPdf() {
+        String status = "all";
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //用户id
@@ -794,8 +779,8 @@ public class PoOrderReqExt {
         String file = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE");
         if (!SharedUtil.isEmptyString(file)){
             //判断是否需要转换
-            Boolean izToPdf = getResult(status,contractId,amt);
-            if (izToPdf){
+//            Boolean izToPdf = getResult(status,contractId,amt);
+//            if (izToPdf){
                 //查询接口地址
                 String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
                 List<Map<String,Object>> listUrl = myJdbcTemplate.queryForList(httpSql);
@@ -822,7 +807,7 @@ public class PoOrderReqExt {
 
                     }
                 }).start();
-            }
+//            }
         }
     }
 
