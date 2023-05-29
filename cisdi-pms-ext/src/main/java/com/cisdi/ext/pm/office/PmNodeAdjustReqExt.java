@@ -1,7 +1,9 @@
 package com.cisdi.ext.pm.office;
 
 import com.cisdi.ext.model.PmNodeAdjustReq;
+import com.cisdi.ext.model.PmProPlanNode;
 import com.cisdi.ext.pm.PmStartExt;
+import com.cisdi.ext.proPlan.PmProPlanExt;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -59,6 +61,8 @@ public class PmNodeAdjustReqExt {
         String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
         //刷新项目进度节点信息
         PmStartExt.handleData(csCommId,projectId);
+        //节点操作类型设置未null
+        PmProPlanExt.updateNodeOperationType(projectId);
     }
 
     /**

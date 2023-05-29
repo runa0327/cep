@@ -44,28 +44,24 @@ public class PmPlanExt {
         String now = DateTimeUtil.dateToString(new Date());
         String userId = ExtJarHelper.loginInfo.get().userId;
         List<com.cisdi.ext.model.PmPlan> pmPlanList = com.cisdi.ext.model.PmPlan.selectByWhere(new Where().eq(com.cisdi.ext.model.PmPlan.Cols.NAME,prjName).eq(com.cisdi.ext.model.PmPlan.Cols.STATUS,"AP"));
+        String pmPlanId = "";
+        String pmPlanCode = "";
         if (CollectionUtils.isEmpty(pmPlanList)){
-            String pmPlanId = Crud.from(com.cisdi.ext.model.PmPlan.ENT_CODE).insertData();
-            String pmPlanCode = PmPrjCodeUtil.getPmPlanCode();
-            Crud.from(com.cisdi.ext.model.PmPlan.ENT_CODE).where().eq(com.cisdi.ext.model.PmPlan.Cols.ID,pmPlanId).update()
-                    .set(com.cisdi.ext.model.PmPlan.Cols.VER,99).set(com.cisdi.ext.model.PmPlan.Cols.CRT_USER_ID,userId)
-                    .set(com.cisdi.ext.model.PmPlan.Cols.LAST_MODI_DT,now).set(com.cisdi.ext.model.PmPlan.Cols.LAST_MODI_USER_ID,userId)
-                    .set(com.cisdi.ext.model.PmPlan.Cols.STATUS,"AP").set(com.cisdi.ext.model.PmPlan.Cols.CODE,pmPlanCode)
-                    .set(com.cisdi.ext.model.PmPlan.Cols.NAME,prjName).set(com.cisdi.ext.model.PmPlan.Cols.BASE_LOCATION_ID,project.getBaseLocationId())
-                    .set(com.cisdi.ext.model.PmPlan.Cols.PROJECT_TYPE_ID,project.getProjectTypeId()).set(com.cisdi.ext.model.PmPlan.Cols.PLAN_STATUS_ID,"1635456054244651008")
-                    .set(com.cisdi.ext.model.PmPlan.Cols.AMT,project.getEstimatedTotalInvest())
-                    .exec();
+            pmPlanId = Crud.from(com.cisdi.ext.model.PmPlan.ENT_CODE).insertData();
+            pmPlanCode = PmPrjCodeUtil.getPmPlanCode();
         } else {
-            String pmPlanId = pmPlanList.get(0).getId();
-            Crud.from(com.cisdi.ext.model.PmPlan.ENT_CODE).where().eq(com.cisdi.ext.model.PmPlan.Cols.ID,pmPlanId).update()
-                    .set(com.cisdi.ext.model.PmPlan.Cols.VER,99).set(com.cisdi.ext.model.PmPlan.Cols.CRT_USER_ID,userId)
-                    .set(com.cisdi.ext.model.PmPlan.Cols.LAST_MODI_DT,now).set(com.cisdi.ext.model.PmPlan.Cols.LAST_MODI_USER_ID,userId)
-                    .set(com.cisdi.ext.model.PmPlan.Cols.STATUS,"AP")
-                    .set(com.cisdi.ext.model.PmPlan.Cols.NAME,prjName).set(com.cisdi.ext.model.PmPlan.Cols.BASE_LOCATION_ID,project.getBaseLocationId())
-                    .set(com.cisdi.ext.model.PmPlan.Cols.PROJECT_TYPE_ID,project.getProjectTypeId()).set(com.cisdi.ext.model.PmPlan.Cols.PLAN_STATUS_ID,"1635456054244651008")
-                    .set(com.cisdi.ext.model.PmPlan.Cols.AMT,project.getEstimatedTotalInvest())
-                    .exec();
+            pmPlanId = pmPlanList.get(0).getId();
+            pmPlanCode = pmPlanList.get(0).getCode();
         }
+        Crud.from(com.cisdi.ext.model.PmPlan.ENT_CODE).where().eq(com.cisdi.ext.model.PmPlan.Cols.ID,pmPlanId).update()
+                .set(com.cisdi.ext.model.PmPlan.Cols.VER,99).set(com.cisdi.ext.model.PmPlan.Cols.CRT_USER_ID,userId)
+                .set(com.cisdi.ext.model.PmPlan.Cols.LAST_MODI_DT,now).set(com.cisdi.ext.model.PmPlan.Cols.LAST_MODI_USER_ID,userId)
+                .set(com.cisdi.ext.model.PmPlan.Cols.STATUS,"AP").set(com.cisdi.ext.model.PmPlan.Cols.CODE,pmPlanCode)
+                .set(com.cisdi.ext.model.PmPlan.Cols.NAME,prjName).set(com.cisdi.ext.model.PmPlan.Cols.BASE_LOCATION_ID,project.getBaseLocationId())
+                .set(com.cisdi.ext.model.PmPlan.Cols.PROJECT_TYPE_ID,project.getProjectTypeId()).set(com.cisdi.ext.model.PmPlan.Cols.PLAN_STATUS_ID,"1635456054244651008")
+                .set(com.cisdi.ext.model.PmPlan.Cols.AMT,project.getEstimatedTotalInvest())
+                .set(com.cisdi.ext.model.PmPlan.Cols.IZ_DISPLAY,1)
+                .exec();
     }
 
     /**
@@ -81,7 +77,8 @@ public class PmPlanExt {
                 "left join ad_user au on au.id = pp.AD_USER_ID  " +
                 "left join gr_set_value gsv on gsv.id = pp.BASE_LOCATION_ID " +
                 "left join gr_set_value gg on gg.id = pp.PROJECT_TYPE_ID " +
-                "left join gr_set_value gv on gv.id = pp.PLAN_STATUS_ID where pp.`status` ='ap'");
+                "left join gr_set_value gv on gv.id = pp.PLAN_STATUS_ID " +
+                "where pp.`status` ='ap' and (pp.IZ_DISPLAY = 1 or IZ_DISPLAY is null )");
         if (!StringUtils.isEmpty(map.get("name"))) {
             sb.append(" and pp.name like '%").append(map.get("name")).append("%'");
         }
@@ -233,7 +230,6 @@ public class PmPlanExt {
                 break;
         }
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String now = DateTimeUtil.dateToString(new Date());
         myJdbcTemplate.update("update PM_PLAN set PLAN_STATUS_ID=? where id=?", statusId, id);
     }
 
@@ -290,18 +286,20 @@ public class PmPlanExt {
      * @param prjName 项目名称
      */
     private void createPmStart(String id, String prjName) {
-        String startId = "";
+        String startId = "", prjCode = "";
         List<PrjStart> prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME,prjName)
                 .eq(PrjStart.Cols.STATUS,"AP").neq(PrjStart.Cols.ID,id));
         if (!CollectionUtils.isEmpty(prjStartList)){
             startId = prjStartList.get(0).getId();
+            prjCode = prjStartList.get(0).getPmCode();
+        } else {
+            startId = Crud.from("PRJ_START").insertData();
+            prjCode = PmPrjCodeUtil.getPrjCode();
         }
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PLAN where id=?", id);
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> dataMap = list.get(0);
-            startId = Crud.from("PRJ_START").insertData();
-            String prjCode = PmPrjCodeUtil.getPrjCode();
             Crud.from("PRJ_START").where().eq("ID", startId).update()
                     .set("PM_CODE", prjCode).set("NAME", dataMap.get("name")).set("PRJ_TOTAL_INVEST", dataMap.get("AMT")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID"))
                     .set("AGENT", dataMap.get("AGENT")).set("PRJ_START_STATUS_ID", "1635833910065868800")
