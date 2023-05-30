@@ -6,8 +6,12 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author 尹涛 * @version V1.0.0
@@ -76,5 +80,41 @@ public class ProPlanUtils {
                 .set("SHOW_IN_PRJ_OVERVIEW", objectMap.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", objectMap.get("POST_INFO_ID")).set("CHIEF_USER_ID", objectMap.get("AD_USER_ID")).set("CAN_START", objectMap.get("CAN_START")).set("IZ_MORE", objectMap.get("IZ_MORE"))
                 .set("PRE_NODE_ID", objectMap.get("PRE_NODE_ID")).set("AD_ENT_ID_IMP", objectMap.get("AD_ENT_ID_IMP")).set("AD_ATT_ID_IMP", objectMap.get("AD_ATT_ID_IMP")).set("IZ_MILESTONE", objectMap.get("IZ_MILESTONE")).set("SCHEDULE_NAME", objectMap.get("SCHEDULE_NAME")).exec();
         return id;
+    }
+
+
+    /**
+     * 排序3级节点
+     *
+     * @param projectId
+     * @return
+     */
+    public static List<Map<String, Object>> sortLevel3(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pn.id as id,pn.`NAME` as nodeName,ifnull(PM_PRO_PLAN_NODE_PID,0) pid,pn.SEQ_NO as seq,pn.level as level,'0' as seq_bak,PLAN_COMPL_DATE " +
+                " from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where PM_PRJ_ID=?", projectId);
+
+        list.stream().filter(p -> "0".equals(JdbcMapUtil.getString(p, "pid")))
+                .sorted(Comparator.comparing(o -> BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(o, "seq")))).peek(m -> {
+            BigDecimal parentSeq = BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(m, "seq")).multiply(new BigDecimal(100));
+            m.put("seq_bak", parentSeq);
+            getChildren(m, list, parentSeq);
+        }).collect(Collectors.toList());
+        return list.stream().filter(p -> "3".equals(JdbcMapUtil.getString(p, "level"))).sorted(Comparator.comparing(o -> JdbcMapUtil.getString(o, "seq_bak"))).collect(Collectors.toList());
+    }
+
+    private static List<Map<String, Object>> getChildren(Map<String, Object> parent, List<Map<String, Object>> allData, BigDecimal parentSeq) {
+        return allData.stream().filter(p -> Objects.equals(parent.get("id"), p.get("pid")))
+                .sorted(Comparator.comparing(o -> BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(o, "seq")))).peek(m -> {
+                    BigDecimal currentSeq = BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(m, "seq"));
+                    if ("1".equals(JdbcMapUtil.getString(m, "level"))) {
+                        currentSeq = BigDecimalUtil.multiply(currentSeq, new BigDecimal(100));
+                    } else if ("2".equals(JdbcMapUtil.getString(m, "level"))) {
+                        currentSeq = BigDecimalUtil.multiply(currentSeq, new BigDecimal(10));
+                    }
+                    BigDecimal obj = parentSeq.add(currentSeq);
+                    m.put("seq_bak", obj);
+                    getChildren(m, allData, obj);
+                }).collect(Collectors.toList());
     }
 }

@@ -1,8 +1,10 @@
 package com.cisdi.ext.proPlan;
 
+import com.cisdi.ext.pm.office.PmNodeAdjustReqExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.PrjPlanUtil;
+import com.cisdi.ext.util.ProPlanUtils;
 import com.cisdi.ext.weektask.WeekTaskExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -1118,7 +1120,10 @@ public class ProPlanExt {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("update pm_pro_plan_node set LAST_MODI_DT =NOW(),OPREATION_TYPE='").append(operationType).append("'");
+        sb.append("update pm_pro_plan_node set LAST_MODI_DT =NOW() ");
+        if (operationType != null) {
+            sb.append(",OPREATION_TYPE=' ").append(operationType).append("'");
+        }
         if (Strings.isNotEmpty(input.name)) {
             sb.append(",`NAME` ='").append(input.name).append("'");
         }
@@ -1426,8 +1431,6 @@ public class ProPlanExt {
     }
 
 
-
-
     private List<PlanNode> getChildren(PlanNode parentNode, List<PlanNode> allData) {
         return allData.stream().filter(p -> parentNode.id.equals(p.pid)).peek(m -> {
             m.children = getChildren(m, allData).stream().sorted(Comparator.comparing(p -> p.seqNo, Comparator.nullsFirst(String::compareTo))).collect(Collectors.toList());
@@ -1524,6 +1527,18 @@ public class ProPlanExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         myJdbcTemplate.update("update PM_PRO_PLAN_NODE set IZ_DISPLAY=? where id=?", map.get("izDisplay"), map.get("nodeId"));
+    }
+
+    /**
+     * 判断是否有正在进行的全景时间调整审批流程
+     */
+    public void chargeDataApprove() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map
+        Integer count = PmNodeAdjustReqExt.getNodeAdjustByPrj(JdbcMapUtil.getString(map, "projectId"));
+        Map obj = new HashMap();
+        obj.put("count", count);
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(obj), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
     }
 
     /**
