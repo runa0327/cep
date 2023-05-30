@@ -70,10 +70,7 @@ public class PmLifeCycleExt {
 //        columnList.add(2, HeaderObj.builder().name("备注说明").izDisplay("1").build());
 
         if (CollectionUtils.isEmpty(columnList)) {
-            OutSide outSide = new OutSide();
-            outSide.columnList = columnList;
-            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
-            ExtJarHelper.returnValue.set(outputMap);
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
             OutSide outSide = new OutSide();
             outSide.columnList = columnList;
@@ -240,6 +237,7 @@ public class PmLifeCycleExt {
                             int count = getRemarkCount(JdbcMapUtil.getString(stringObjectMap, "ID"), JdbcMapUtil.getString(dataMap, "SCHEDULE_NAME"));
                             json.put("remarkCount", count);
                             json.put("postInfo", JdbcMapUtil.getString(dataMap, "postName") + ":" + (JdbcMapUtil.getString(dataMap, "userName") == null ? "" : JdbcMapUtil.getString(dataMap, "userName")));
+                            json.put("nodeId",JdbcMapUtil.getString(stringObjectMap, "ID"));
                         }
                         newData.put(s, json);
                     } else {
