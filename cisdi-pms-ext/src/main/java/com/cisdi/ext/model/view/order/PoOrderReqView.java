@@ -19,6 +19,8 @@ public class PoOrderReqView extends BasePageEntity {
     public String isModel;
     //流程实例id
     public String processInstanceId;
+    //表名
+    public String tableCode;
 
     public String getId() {
         return id;
@@ -82,5 +84,13 @@ public class PoOrderReqView extends BasePageEntity {
 
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
+    }
+
+    public String getTableCode() {
+        return tableCode;
+    }
+
+    public void setTableCode(String tableCode) {
+        this.tableCode = tableCode;
     }
 }

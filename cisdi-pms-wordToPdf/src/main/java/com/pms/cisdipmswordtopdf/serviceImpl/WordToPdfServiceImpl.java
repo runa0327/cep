@@ -84,7 +84,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         }
         if (sb.length() > 0){
             String newFileId = sb.deleteCharAt(sb.length()-1).toString();
-            //更新合同表
+            //更新业务表
             updateOrder(newFileId,poOrderReq);
         }
         if (errorBuilder.length() > 0){
@@ -144,39 +144,37 @@ public class WordToPdfServiceImpl implements WordToPdfService {
      * @param poOrderReq 合同信息
      */
     private void updateOrder(String newFileId, PoOrderReq poOrderReq) {
+        String tableCode = poOrderReq.getTableCode();
         String isModel = poOrderReq.getIsModel();
         String attCode = "",newFileIds = poOrderReq.getFileId(), poOrderId = poOrderReq.getId();
+        List<String> orderFileIds = new ArrayList<>(Arrays.asList(newFileIds.split(",")));
+        List<String> pdfFileIds = new ArrayList<>();
         if ("1".equals(isModel)){ //是模板
             attCode = "ATT_FILE_GROUP_ID"; //合同文本
         } else {
             attCode = "FILE_ID_ONE";  //合同修订稿
         }
         //查询pdf文件
-        String oldFileId = jdbcTemplate.queryForList("select "+attCode+" from po_order_req where id = ?",poOrderId).get(0).get(attCode).toString();
+        String oldFileId = jdbcTemplate.queryForList("select "+attCode+" from "+tableCode+" where id = ?",poOrderId).get(0).get(attCode).toString();
         oldFileId = StringUtils.replaceCode(oldFileId,",","','");
         String sql1 = "select id as id from fl_file where id in ('"+oldFileId+"') and EXT = 'PDF'";
         List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
         if (!CollectionUtils.isEmpty(list1)){
-            StringBuilder sb = new StringBuilder();
             for (Map<String, Object> tmp : list1) {
                 String value = tmp.get("id").toString();
                 if (value.length() > 0 && value != null){
-                    sb.append(value).append(",");
+                    pdfFileIds.add(value);
                 }
             }
-            String fileId = sb.deleteCharAt(sb.length()-1).toString();
-            if (fileId.length() > 0 && fileId != null){
-                List<String> orderFileIds = new ArrayList<>(Arrays.asList(newFileIds.split(",")));
-                List<String> pdfFileIds = new ArrayList<>(Arrays.asList(fileId.split(",")));
+            if (!CollectionUtils.isEmpty(pdfFileIds)){
                 orderFileIds.removeAll(pdfFileIds);
                 newFileIds = String.join(",",orderFileIds);
             } else {
                 newFileIds = newFileIds + "," + newFileId;
             }
-//            String fileId = list1.get(0).get("id").toString();
         }
         newFileIds = newFileIds + "," + newFileId;
-        String sql2 = "update po_order_req set "+attCode+" = ? where id = ?";
+        String sql2 = "update "+tableCode+" set "+attCode+" = ? where id = ?";
         Integer exec = jdbcTemplate.update(sql2,newFileIds,poOrderId);
         log.info("执行成功，共{}条",exec);
     }
