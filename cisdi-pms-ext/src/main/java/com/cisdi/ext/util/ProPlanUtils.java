@@ -96,7 +96,7 @@ public class ProPlanUtils {
 
         list.stream().filter(p -> "0".equals(JdbcMapUtil.getString(p, "pid")))
                 .sorted(Comparator.comparing(o -> BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(o, "seq")))).peek(m -> {
-            BigDecimal parentSeq = BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(m, "seq")).multiply(new BigDecimal(100));
+            BigDecimal parentSeq = BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(m, "seq")).multiply(new BigDecimal(1000));
             m.put("seq_bak", parentSeq);
             getChildren(m, list, parentSeq);
         }).collect(Collectors.toList());
@@ -108,8 +108,10 @@ public class ProPlanUtils {
                 .sorted(Comparator.comparing(o -> BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(o, "seq")))).peek(m -> {
                     BigDecimal currentSeq = BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(m, "seq"));
                     if ("1".equals(JdbcMapUtil.getString(m, "level"))) {
-                        currentSeq = BigDecimalUtil.multiply(currentSeq, new BigDecimal(100));
+                        currentSeq = BigDecimalUtil.multiply(currentSeq, new BigDecimal(1000));
                     } else if ("2".equals(JdbcMapUtil.getString(m, "level"))) {
+                        currentSeq = BigDecimalUtil.multiply(currentSeq, new BigDecimal(100));
+                    } else if ("3".equals(JdbcMapUtil.getString(m, "level"))) {
                         currentSeq = BigDecimalUtil.multiply(currentSeq, new BigDecimal(10));
                     }
                     BigDecimal obj = parentSeq.add(currentSeq);
