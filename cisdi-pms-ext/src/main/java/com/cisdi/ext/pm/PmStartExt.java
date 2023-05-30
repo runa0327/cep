@@ -737,15 +737,11 @@ public class PmStartExt {
             if (!CollectionUtils.isEmpty(sonList)) {
                 Map<String, Object> topDate = sonList.get(0);
                 String start = JdbcMapUtil.getString(topDate,"PLAN_START_DATE");
-                if (SharedUtil.isEmptyString(start)){
-                    String id = topDate.get("SCHEDULE_NAME").toString();
-                    String name = myJdbcTemplate.queryForList("select name from standard_node_name where id = ?",id).get(0).get("name").toString();
-                    throw new BaseException("进度计划名称为【"+name+"】预计开始日期不能为空！");
+                if (!SharedUtil.isEmptyString(start)){
+                    String end = topDate.get("PLAN_COMPL_DATE").toString();
+                    int cha = getDateCha(end,start);
+                    myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
                 }
-                String end = topDate.get("PLAN_COMPL_DATE").toString();
-                int cha = getDateCha(end,start);
-                myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
-//                myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=? where id=?", topDate.get("PLAN_COMPL_DATE"), m.get("id"));
             }
         }).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
     }
@@ -770,10 +766,12 @@ public class PmStartExt {
             List<Map<String, Object>> sonList = getChildrenNode(m, nodeList);
             if (!CollectionUtils.isEmpty(sonList)) {
                 Map<String, Object> topDate = sonList.get(0);
-                String start = topDate.get("PLAN_START_DATE").toString();
-                String end = topDate.get("PLAN_COMPL_DATE").toString();
-                int cha = getDateCha(end,start);
-                myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
+                String start = JdbcMapUtil.getString(topDate,"PLAN_START_DATE");
+                if (!SharedUtil.isEmptyString(start)){
+                    String end = topDate.get("PLAN_COMPL_DATE").toString();
+                    int cha = getDateCha(end,start);
+                    myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
+                }
             }
         }).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
     }
