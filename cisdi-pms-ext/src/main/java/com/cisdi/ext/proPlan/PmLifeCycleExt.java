@@ -239,7 +239,7 @@ public class PmLifeCycleExt {
                             json.put("tips", tips);
                             int count = getRemarkCount(JdbcMapUtil.getString(stringObjectMap, "ID"), JdbcMapUtil.getString(dataMap, "SCHEDULE_NAME"));
                             json.put("remarkCount", count);
-                            json.put("postInfo", JdbcMapUtil.getString(dataMap, "postName") + "" + JdbcMapUtil.getString(dataMap, "userName"));
+                            json.put("postInfo", JdbcMapUtil.getString(dataMap, "postName") + ":" + JdbcMapUtil.getString(dataMap, "userName") == null ? "" : JdbcMapUtil.getString(dataMap, "userName"));
                         }
                         newData.put(s, json);
                     } else {
