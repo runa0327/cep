@@ -548,6 +548,8 @@ public class PoOrderReqExt {
     private void wordToPdfNew(String status) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //表名
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         //用户id
         String userId = ExtJarHelper.loginInfo.get().userId;
         String userName = ExtJarHelper.loginInfo.get().userName;
@@ -574,11 +576,11 @@ public class PoOrderReqExt {
                         //写入日志提示表
                         String id = Crud.from("AD_REMIND_LOG").insertData();
                         Crud.from("AD_REMIND_LOG").where().eq("id",id).update().set("AD_ENT_ID","0099799190825103145")
-                                .set("ENT_CODE","PO_ORDER_REQ").set("ENTITY_RECORD_ID",csId).set("REMIND_USER_ID","0099250247095871681")
+                                .set("ENT_CODE",entCode).set("ENTITY_RECORD_ID",csId).set("REMIND_USER_ID","0099250247095871681")
                                 .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
                                 .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
                     } else {
-                        PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName);
+                        PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode);
                         String param = JSON.toJSONString(poOrderReqView);
                         //调用接口
                         HttpClient.doPost(url,param,"UTF-8");
@@ -596,27 +598,27 @@ public class PoOrderReqExt {
      * @param userId 操作人id
      * @param status 状态，区分发起还是二次发起
      * @param companyName 公司名称
+     * @param entCode 表名
      * @return 合同信息实体
      */
-    private PoOrderReqView getOrderModel(EntityRecord entityRecord, String procInstId, String userId, String status, String companyName) {
+    private PoOrderReqView getOrderModel(EntityRecord entityRecord, String procInstId, String userId, String status, String companyName, String entCode) {
         PoOrderReqView poOrderReqView = new PoOrderReqView();
         poOrderReqView.setId(entityRecord.csCommId);
         poOrderReqView.setProcessInstanceId(procInstId);
         poOrderReqView.setCreateBy(userId);
+        poOrderReqView.setTableCode(entCode);
         if (SharedUtil.isEmptyString(companyName)){
             companyName = "三亚崖州湾科技城开发建设有限公司";
         }
         poOrderReqView.setCompanyName(companyName);
 
-        //获取文件id
-        String fileId;
-        if ("start".equals(status)){ //发起时校验
-            fileId = JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"); //合同文本
-            poOrderReqView.setIsModel("1");
-        } else {
-            fileId = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"); //合同修订稿
-            poOrderReqView.setIsModel("0");
+        if ("PO_ORDER_REQ".equals(entCode) || "po_order_req".equals(entCode)){ //合同签订
+            poOrderReqView.setColsCode("FILE_ID_ONE"); //合同修编稿
+        } else if ("PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "po_order_supplement_req".equals(entCode)){ //补充协议
+            poOrderReqView.setColsCode("FILE_ID_TENTH"); //合同修订稿
         }
+        String fileId = JdbcMapUtil.getString(entityRecord.valueMap,poOrderReqView.getColsCode()); //合同文本
+
         poOrderReqView.setFileId(fileId);
         return poOrderReqView;
     }
@@ -753,5 +755,104 @@ public class PoOrderReqExt {
         }
         return nodeName;
     }
+
+    /**
+     * 通用-合同模块word转pdf
+     * @Param status 状态码
+     */
+    public void publicWordToPdf() {
+        String status = "all";
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //表名
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        //用户id
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        String userName = ExtJarHelper.loginInfo.get().userName;
+        //流程id
+        String csId = entityRecord.csCommId;
+        //流程实例id
+        String procInstId = ExtJarHelper.procInstId.get();
+        //合同类型
+        String contractId = JdbcMapUtil.getString(entityRecord.valueMap,"CONTRACT_CATEGORY_ONE_ID");
+        //含税总金额
+        BigDecimal amt = StringUtil.valueNullToBig(JdbcMapUtil.getString(entityRecord.valueMap,"AMT_TWO"));
+        //合同修订稿
+        String file = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE");
+        if (!SharedUtil.isEmptyString(file)){
+            //判断是否需要转换
+//            Boolean izToPdf = getResult(status,contractId,amt);
+//            if (izToPdf){
+                //查询接口地址
+                String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
+                List<Map<String,Object>> listUrl = myJdbcTemplate.queryForList(httpSql);
+                //公司名称
+                String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
+                String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
+
+                new Thread(() -> {
+                    if (!CollectionUtils.isEmpty(listUrl)){
+                        String url = listUrl.get(0).get("HOST_ADDR").toString();
+                        if (SharedUtil.isEmptyString(url)){
+                            //写入日志提示表
+                            String id = Crud.from("AD_REMIND_LOG").insertData();
+                            Crud.from("AD_REMIND_LOG").where().eq("id",id).update().set("AD_ENT_ID","0099799190825103145")
+                                    .set("ENT_CODE","PO_ORDER_REQ").set("ENTITY_RECORD_ID",csId).set("REMIND_USER_ID","0099250247095871681")
+                                    .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
+                                    .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
+                        } else {
+                            PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode);
+                            String param = JSON.toJSONString(poOrderReqView);
+                            //调用接口
+                            HttpClient.doPost(url,param,"UTF-8");
+                        }
+
+                    }
+                }).start();
+//            }
+        }
+    }
+
+    /**
+     * 根据表单信息判断是否需要转换
+     * @param status 节点状态
+     * @param contractId 合同类型id
+     * @param amt 含税总金额
+     * @return
+     */
+    private Boolean getResult(String status, String contractId, BigDecimal amt) {
+        Boolean res = false;
+        if ("wordToPdfOne".equals(status)){ //第一次转换
+            if ("0099952822476392995".equals(contractId) && amt.compareTo(new BigDecimal(4000000)) < 0){
+                res = true;
+            } else if ("0099952822476392996".equals(contractId) && amt.compareTo(new BigDecimal(2000000)) < 0){
+                res = true;
+            } else if ("0099952822476392997".equals(contractId) && amt.compareTo(new BigDecimal(1000000)) < 0){
+                res = true;
+            } else if ("1610113244998029312".equals(contractId) && amt.compareTo(new BigDecimal(1000000)) < 0){
+                res = true;
+            } else if ("0099952822476392998".equals(contractId) && amt.compareTo(new BigDecimal(10000000)) < 0){
+                res = true;
+            } else if ("1610263444660060160".equals(contractId) && amt.compareTo(new BigDecimal(10000000)) < 0){
+                res = true;
+            }
+        } else if ("wordToPdfTwo".equals(status)){ //第二次转换
+            if ("0099952822476392995".equals(contractId) && amt.compareTo(new BigDecimal(4000000)) >= 0){
+                res = true;
+            } else if ("0099952822476392996".equals(contractId) && amt.compareTo(new BigDecimal(2000000)) >= 0){
+                res = true;
+            } else if ("0099952822476392997".equals(contractId) && amt.compareTo(new BigDecimal(1000000)) >= 0){
+                res = true;
+            } else if ("1610113244998029312".equals(contractId) && amt.compareTo(new BigDecimal(1000000)) >= 0){
+                res = true;
+            } else if ("0099952822476392998".equals(contractId) && amt.compareTo(new BigDecimal(10000000)) >= 0){
+                res = true;
+            } else if ("1610263444660060160".equals(contractId) && amt.compareTo(new BigDecimal(10000000)) >= 0){
+                res = true;
+            }
+        }
+        return res;
+    }
+
 
 }

@@ -64,10 +64,10 @@ public class PmLifeCycleExt {
             return obj;
         }).collect(Collectors.toList());
 
-        columnList.add(0, HeaderObj.builder().name("ID").izDisplay("0").build());
-        columnList.add(1, HeaderObj.builder().name("项目名称").izDisplay("1").build());
-        columnList.add(2, HeaderObj.builder().name("前期手续经办人").izDisplay("1").build());
-        columnList.add(3, HeaderObj.builder().name("备注说明").izDisplay("1").build());
+//        columnList.add(0, HeaderObj.builder().name("ID").izDisplay("0").build());
+//        columnList.add(1, HeaderObj.builder().name("项目名称").izDisplay("1").build());
+//        columnList.add(2, HeaderObj.builder().name("前期手续经办人").izDisplay("1").build());
+//        columnList.add(2, HeaderObj.builder().name("备注说明").izDisplay("1").build());
 
         if (CollectionUtils.isEmpty(columnList)) {
             OutSide outSide = new OutSide();
@@ -120,8 +120,8 @@ public class PmLifeCycleExt {
 
         headerList.add(0, "ID");
         headerList.add(1, "项目名称");
-        headerList.add(2, "前期手续经办人");
-        headerList.add(3, "备注说明");
+//        headerList.add(2, "前期手续经办人");
+        headerList.add(2, "备注说明");
 
         //数据
         List<Map<String, Object>> dataList = new ArrayList<>();
@@ -132,10 +132,12 @@ public class PmLifeCycleExt {
             MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
             Map<String, Object> queryParams = new HashMap<>();// 创建入参map
             queryParams.put("ids", ids);
-            nodeList = myNamedParameterJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name,snn.`NAME` as nodeName from pm_pro_plan_node pn  \n" +
+            nodeList = myNamedParameterJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name,snn.`NAME` as nodeName,po.name as postName,au.name as userName from pm_pro_plan_node pn  \n" +
                     " left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id \n" +
                     " left join gr_set_value gsv on gsv.id = pn.PROGRESS_STATUS_ID  \n" +
                     " left join STANDARD_NODE_NAME snn on pn.SCHEDULE_NAME = snn.id  \n" +
+                    " left join post_info po on pn.post_info_id = po.id   \n" +
+                    " left join ad_user au on au.id = pn.CHIEF_USER_ID  \n" +
                     " where pl.IS_TEMPLATE <>1 and pl.PM_PRJ_ID  in (:ids)  ", queryParams);
         }
 
@@ -153,12 +155,14 @@ public class PmLifeCycleExt {
                     json.put("nameOrg", stringObjectMap.get("id"));
                     json.put("remarkCount", 0);
                     newData.put("ID", json);
-                } else if ("前期手续经办人".equals(s)) {
-                    JSONObject json = new JSONObject();
-                    json.put("nameOrg", stringObjectMap.get("qquser"));
-                    json.put("remarkCount", 0);
-                    newData.put("前期手续经办人", json);
-                } else if ("备注说明".equals(s)) {
+                }
+//                else if ("前期手续经办人".equals(s)) {
+//                    JSONObject json = new JSONObject();
+//                    json.put("nameOrg", stringObjectMap.get("qquser"));
+//                    json.put("remarkCount", 0);
+//                    newData.put("前期手续经办人", json);
+//                }
+                else if ("备注说明".equals(s)) {
                     JSONObject json = new JSONObject();
                     List<String> contentList = new ArrayList<>();
                     List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from REMARK_INFO where REMARK_TYPE='1' and PM_PRJ_ID=?", stringObjectMap.get("id"));
@@ -184,6 +188,7 @@ public class PmLifeCycleExt {
                             String dateOrg = "";
                             String statusOrg = "";
                             String tips = null;
+                            String postInfo = "";
                             if ("已完成".equals(status)) {
                                 nameOrg = "实际完成";
                                 if (Objects.nonNull(dataMap.get("ACTUAL_COMPL_DATE"))) {
@@ -234,6 +239,7 @@ public class PmLifeCycleExt {
                             json.put("tips", tips);
                             int count = getRemarkCount(JdbcMapUtil.getString(stringObjectMap, "ID"), JdbcMapUtil.getString(dataMap, "SCHEDULE_NAME"));
                             json.put("remarkCount", count);
+                            json.put("postInfo", JdbcMapUtil.getString(dataMap, "postName") + "" + JdbcMapUtil.getString(dataMap, "userName"));
                         }
                         newData.put(s, json);
                     } else {

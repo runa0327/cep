@@ -146,6 +146,15 @@ public class PrjMaterialInventory {
     }
 
     /**
+     * 删除文件（和明细解绑）
+     */
+    public void delInventoryFile(){
+        Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        myJdbcTemplate.update("delete from prj_inventory_detail where PRJ_INVENTORY_ID = ? and FL_FILE_ID = ?",input.get("inventoryId"),input.get("fileId"));
+    }
+
+    /**
      * 项目清单列表
      */
     public void prjInventoryList(){
