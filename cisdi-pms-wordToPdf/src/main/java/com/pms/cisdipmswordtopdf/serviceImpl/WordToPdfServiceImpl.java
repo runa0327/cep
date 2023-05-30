@@ -145,15 +145,11 @@ public class WordToPdfServiceImpl implements WordToPdfService {
      */
     private void updateOrder(String newFileId, PoOrderReq poOrderReq) {
         String tableCode = poOrderReq.getTableCode();
-        String isModel = poOrderReq.getIsModel();
-        String attCode = "",newFileIds = poOrderReq.getFileId(), poOrderId = poOrderReq.getId();
+        String attCode = poOrderReq.getColsCode();
+        String newFileIds = poOrderReq.getFileId();
+        String poOrderId = poOrderReq.getId();
         List<String> orderFileIds = new ArrayList<>(Arrays.asList(newFileIds.split(",")));
         List<String> pdfFileIds = new ArrayList<>();
-        if ("1".equals(isModel)){ //是模板
-            attCode = "ATT_FILE_GROUP_ID"; //合同文本
-        } else {
-            attCode = "FILE_ID_ONE";  //合同修订稿
-        }
         //查询pdf文件
         String oldFileId = jdbcTemplate.queryForList("select "+attCode+" from "+tableCode+" where id = ?",poOrderId).get(0).get(attCode).toString();
         oldFileId = StringUtils.replaceCode(oldFileId,",","','");

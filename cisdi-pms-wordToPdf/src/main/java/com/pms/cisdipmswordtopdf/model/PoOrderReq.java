@@ -21,6 +21,8 @@ public class PoOrderReq {
     public String createBy;
     //表名
     public String tableCode;
+    //字段名
+    public String colsCode;
 
     public String getId() {
         return id;
@@ -100,5 +102,13 @@ public class PoOrderReq {
 
     public void setTableCode(String tableCode) {
         this.tableCode = tableCode;
+    }
+
+    public String getColsCode() {
+        return colsCode;
+    }
+
+    public void setColsCode(String colsCode) {
+        this.colsCode = colsCode;
     }
 }

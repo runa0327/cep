@@ -614,15 +614,13 @@ public class PoOrderReqExt {
         }
         poOrderReqView.setCompanyName(companyName);
 
-        //获取文件id
-        String fileId;
-        if ("start".equals(status)){ //发起时校验
-            fileId = JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"); //合同文本
-            poOrderReqView.setIsModel("1");
-        } else {
-            fileId = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"); //合同修订稿
-            poOrderReqView.setIsModel("0");
+        if ("PO_ORDER_REQ".equals(entCode) || "po_order_req".equals(entCode)){ //合同签订
+            poOrderReqView.setColsCode("FILE_ID_ONE"); //合同修编稿
+        } else if ("PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "po_order_supplement_req".equals(entCode)){ //补充协议
+            poOrderReqView.setColsCode("FILE_ID_TENTH"); //合同修订稿
         }
+        String fileId = JdbcMapUtil.getString(entityRecord.valueMap,poOrderReqView.getColsCode()); //合同文本
+
         poOrderReqView.setFileId(fileId);
         return poOrderReqView;
     }
