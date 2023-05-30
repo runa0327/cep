@@ -63,8 +63,8 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                 String copyPath = path+id+"copy.pdf";
                 String pdfPath = path+id+".pdf";
                 //word转pdf
-                String error = newPdf(filePath,copyPath);
-//                String error = wordStartToPdf(filePath,copyPath);
+//                String error = newPdf(filePath,copyPath);
+                String error = wordStartToPdf(filePath,copyPath);
                 if (error.length() > 0 && error != null && !"".equals(error)){
                     errorBuilder.append(error).append("\n ");
                 }
