@@ -55,7 +55,7 @@ public class SecondFeeExt {
         //清空明细
         FeeDemandDtl.deleteByWhere(new Where().eq(FeeDemandDtl.Cols.SECOND_CATEGORY_FEE_DEMAND_ID,demand.getId()));
         //计算
-        this.calculate(req.feeDemandDtls,req.secondFeeId);
+        this.calculate(req.feeDemandDtls,req.orderReqId);
         //插入明细
         for (DemandDtl dtlReq : req.feeDemandDtls) {
             FeeDemandDtl feeDemandDtl = FeeDemandDtl.newData();
@@ -179,7 +179,7 @@ public class SecondFeeExt {
     /**
      * 明细计算回显
      */
-    private void calculate(List<DemandDtl> demandDtls,String secondFeeId){
+    private void calculate(List<DemandDtl> demandDtls,String orderReqId){
         if (demandDtls == null || demandDtls.get(0).payableRatio == null){
             return;
         }
@@ -187,7 +187,7 @@ public class SecondFeeExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> paidAmtList = myJdbcTemplate.queryForList("select ifnull(sum(h.PAY_AMT),0) paidAmt from contract_pay_history h \n" +
                 "left join po_order o on o.id = h.PO_ORDER_ID\n" +
-                "where o.CONTRACT_APP_ID = ?", secondFeeId);
+                "where o.CONTRACT_APP_ID = ?", orderReqId);
         BigDecimal paidAmt = new BigDecimal(paidAmtList.get(0).get("paidAmt").toString());
         for (int i = 0; i < demandDtls.size(); i++) {
             DemandDtl demandDtl = demandDtls.get(i);
@@ -206,7 +206,7 @@ public class SecondFeeExt {
             demandDtl.paidAmount = paidAmt;
 
             //支付比例：已支付金额 / 合同金额
-            demandDtl.paymentRatio = demandDtl.paidAmount.divide(demandDtls.get(0).approvedAmount);
+            demandDtl.paymentRatio = demandDtl.paidAmount.divide(demandDtls.get(0).approvedAmount,4,BigDecimal.ROUND_HALF_UP);
 
             //需求资金：可支付金额 - 已支付金额
             demandDtl.requiredAmount = demandDtl.payableAmount.subtract(paidAmt);
