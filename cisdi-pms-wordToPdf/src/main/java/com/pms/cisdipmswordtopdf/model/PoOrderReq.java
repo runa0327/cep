@@ -19,6 +19,10 @@ public class PoOrderReq {
     public String processInstanceId;
     //创建人
     public String createBy;
+    //表名
+    public String tableCode;
+    //字段名
+    public String colsCode;
 
     public String getId() {
         return id;
@@ -90,5 +94,21 @@ public class PoOrderReq {
 
     public void setCreateBy(String createBy) {
         this.createBy = createBy;
+    }
+
+    public String getTableCode() {
+        return tableCode;
+    }
+
+    public void setTableCode(String tableCode) {
+        this.tableCode = tableCode;
+    }
+
+    public String getColsCode() {
+        return colsCode;
+    }
+
+    public void setColsCode(String colsCode) {
+        this.colsCode = colsCode;
     }
 }
