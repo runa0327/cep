@@ -1,6 +1,5 @@
 package com.cisdi.ext.pm;
 
-import com.cisdi.ext.model.PmPlan;
 import com.cisdi.ext.model.PrjStart;
 import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.util.DateTimeUtil;
@@ -36,31 +35,32 @@ public class PmPlanExt {
 
     /**
      * 项目库暂停更新谋划库
+     *
      * @param projectId 项目id
-     * @param project 项目明细信息
+     * @param project   项目明细信息
      */
     public static void refreshPrj(String projectId, PmPrj project) {
         String prjName = project.getName();
         String now = DateTimeUtil.dateToString(new Date());
         String userId = ExtJarHelper.loginInfo.get().userId;
-        List<com.cisdi.ext.model.PmPlan> pmPlanList = com.cisdi.ext.model.PmPlan.selectByWhere(new Where().eq(com.cisdi.ext.model.PmPlan.Cols.NAME,prjName).eq(com.cisdi.ext.model.PmPlan.Cols.STATUS,"AP"));
+        List<com.cisdi.ext.model.PmPlan> pmPlanList = com.cisdi.ext.model.PmPlan.selectByWhere(new Where().eq(com.cisdi.ext.model.PmPlan.Cols.NAME, prjName).eq(com.cisdi.ext.model.PmPlan.Cols.STATUS, "AP"));
         String pmPlanId = "";
         String pmPlanCode = "";
-        if (CollectionUtils.isEmpty(pmPlanList)){
+        if (CollectionUtils.isEmpty(pmPlanList)) {
             pmPlanId = Crud.from(com.cisdi.ext.model.PmPlan.ENT_CODE).insertData();
             pmPlanCode = PmPrjCodeUtil.getPmPlanCode();
         } else {
             pmPlanId = pmPlanList.get(0).getId();
             pmPlanCode = pmPlanList.get(0).getCode();
         }
-        Crud.from(com.cisdi.ext.model.PmPlan.ENT_CODE).where().eq(com.cisdi.ext.model.PmPlan.Cols.ID,pmPlanId).update()
-                .set(com.cisdi.ext.model.PmPlan.Cols.VER,99).set(com.cisdi.ext.model.PmPlan.Cols.CRT_USER_ID,userId)
-                .set(com.cisdi.ext.model.PmPlan.Cols.LAST_MODI_DT,now).set(com.cisdi.ext.model.PmPlan.Cols.LAST_MODI_USER_ID,userId)
-                .set(com.cisdi.ext.model.PmPlan.Cols.STATUS,"AP").set(com.cisdi.ext.model.PmPlan.Cols.CODE,pmPlanCode)
-                .set(com.cisdi.ext.model.PmPlan.Cols.NAME,prjName).set(com.cisdi.ext.model.PmPlan.Cols.BASE_LOCATION_ID,project.getBaseLocationId())
-                .set(com.cisdi.ext.model.PmPlan.Cols.PROJECT_TYPE_ID,project.getProjectTypeId()).set(com.cisdi.ext.model.PmPlan.Cols.PLAN_STATUS_ID,"1635456054244651008")
-                .set(com.cisdi.ext.model.PmPlan.Cols.AMT,project.getEstimatedTotalInvest())
-                .set(com.cisdi.ext.model.PmPlan.Cols.IZ_DISPLAY,1)
+        Crud.from(com.cisdi.ext.model.PmPlan.ENT_CODE).where().eq(com.cisdi.ext.model.PmPlan.Cols.ID, pmPlanId).update()
+                .set(com.cisdi.ext.model.PmPlan.Cols.VER, 99).set(com.cisdi.ext.model.PmPlan.Cols.CRT_USER_ID, userId)
+                .set(com.cisdi.ext.model.PmPlan.Cols.LAST_MODI_DT, now).set(com.cisdi.ext.model.PmPlan.Cols.LAST_MODI_USER_ID, userId)
+                .set(com.cisdi.ext.model.PmPlan.Cols.STATUS, "AP").set(com.cisdi.ext.model.PmPlan.Cols.CODE, pmPlanCode)
+                .set(com.cisdi.ext.model.PmPlan.Cols.NAME, prjName).set(com.cisdi.ext.model.PmPlan.Cols.BASE_LOCATION_ID, project.getBaseLocationId())
+                .set(com.cisdi.ext.model.PmPlan.Cols.PROJECT_TYPE_ID, project.getProjectTypeId()).set(com.cisdi.ext.model.PmPlan.Cols.PLAN_STATUS_ID, "1635456054244651008")
+                .set(com.cisdi.ext.model.PmPlan.Cols.AMT, project.getEstimatedTotalInvest())
+                .set(com.cisdi.ext.model.PmPlan.Cols.IZ_DISPLAY, 1)
                 .exec();
     }
 
@@ -72,9 +72,10 @@ public class PmPlanExt {
         int pageSize = Integer.parseInt(String.valueOf(map.get("pageSize")));
         int pageIndex = Integer.parseInt(String.valueOf(map.get("pageIndex")));
         StringBuffer sb = new StringBuffer();
-        sb.append("select pp.ID,pp.CODE,pp.NAME,IFNULL(AMT,0) AS AMT,IFNULL(PLAN_PROGRESS,0) AS PLAN_PROGRESS,UPDATE_TIME,au.name as user," +
+        sb.append("select pp.ID,pp.CODE,pp.NAME,IFNULL(AMT,0) AS AMT,IFNULL(PLAN_PROGRESS,0) AS PLAN_PROGRESS,UPDATE_TIME,au.name as user,aus.name as agentUser,AGENT," +
                 " gsv.`NAME` as location,gg.`NAME` as type ,gv.`NAME` as `STATUS` from pm_plan pp \n" +
                 "left join ad_user au on au.id = pp.AD_USER_ID  " +
+                "left join ad_user aus on aus.id = pp.AGENT " +
                 "left join gr_set_value gsv on gsv.id = pp.BASE_LOCATION_ID " +
                 "left join gr_set_value gg on gg.id = pp.PROJECT_TYPE_ID " +
                 "left join gr_set_value gv on gv.id = pp.PLAN_STATUS_ID " +
@@ -119,10 +120,11 @@ public class PmPlanExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String id = String.valueOf(map.get("id"));
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pp.ID,pp.CODE,pp.NAME,ATT_FILE_GROUP_ID,IFNULL(AMT,0)/10000 AS AMT,IFNULL(PLAN_PROGRESS,0) AS PLAN_PROGRESS," +
-                "pp.ad_user_id,pp.PROJECT_TYPE_ID,pp.BASE_LOCATION_ID,PLAN_STATUS_ID,pp.crt_dt,pp.REMARK, " +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pp.ID,pp.CODE,pp.NAME,ATT_FILE_GROUP_ID,IFNULL(AMT,0)/10000 AS AMT,IFNULL(PLAN_PROGRESS,0) AS PLAN_PROGRESS,aus.name as agentUser," +
+                "pp.ad_user_id,pp.PROJECT_TYPE_ID,pp.BASE_LOCATION_ID,PLAN_STATUS_ID,pp.crt_dt,pp.REMARK,AGENT, " +
                 "UPDATE_TIME,au.name as user,gsv.`NAME` as location,gg.`NAME` as type ,gv.`NAME` as `STATUS` from pm_plan pp  \n" +
                 "left join ad_user au on au.id = pp.AD_USER_ID \n" +
+                "left join ad_user aus on aus.id = pp.AGENT " +
                 "left join gr_set_value gsv on gsv.id = pp.BASE_LOCATION_ID\n" +
                 "left join gr_set_value gg on gg.id = pp.PROJECT_TYPE_ID\n" +
                 "left join gr_set_value gv on gv.id = pp.PLAN_STATUS_ID where pp.status ='ap' and pp.id=?", id);
@@ -174,17 +176,17 @@ public class PmPlanExt {
         InputData input = JsonUtil.fromJson(json, InputData.class);
         String id = input.id;
         List<com.cisdi.ext.model.PmPlan> list = new ArrayList<>();
-        if (!SharedUtil.isEmptyString(id)){
+        if (!SharedUtil.isEmptyString(id)) {
             list = com.cisdi.ext.model.PmPlan.selectByWhere(new Where()
-                    .eq(com.cisdi.ext.model.PmPlan.Cols.NAME,input.name)
-                    .eq(com.cisdi.ext.model.PmPlan.Cols.STATUS,"AP")
-                    .neq(com.cisdi.ext.model.PmPlan.Cols.ID,id));
+                    .eq(com.cisdi.ext.model.PmPlan.Cols.NAME, input.name)
+                    .eq(com.cisdi.ext.model.PmPlan.Cols.STATUS, "AP")
+                    .neq(com.cisdi.ext.model.PmPlan.Cols.ID, id));
         } else {
             list = com.cisdi.ext.model.PmPlan.selectByWhere(new Where()
-                    .eq(com.cisdi.ext.model.PmPlan.Cols.NAME,input.name)
-                    .eq(com.cisdi.ext.model.PmPlan.Cols.STATUS,"AP"));
+                    .eq(com.cisdi.ext.model.PmPlan.Cols.NAME, input.name)
+                    .eq(com.cisdi.ext.model.PmPlan.Cols.STATUS, "AP"));
         }
-        if (!CollectionUtils.isEmpty(list)){
+        if (!CollectionUtils.isEmpty(list)) {
             throw new BaseException("对不起，该项目已存在，请勿重复创建！");
         }
         if (Strings.isNullOrEmpty(input.id)) {
@@ -220,7 +222,7 @@ public class PmPlanExt {
         switch (status) {
             case "项目启动":
                 statusId = "1635818406316060672";
-                createPmStart(id,name);
+                createPmStart(id, name);
                 break;
             case "谋划启动":
                 statusId = "1635456054244651008";
@@ -266,6 +268,8 @@ public class PmPlanExt {
         plan.status = JdbcMapUtil.getString(dataMap, "STATUS");
         plan.startTime = StringUtil.withOutT(JdbcMapUtil.getString(dataMap, "CRT_DT"));
         plan.remark = JdbcMapUtil.getString(dataMap, "REMARK");
+        plan.agent = JdbcMapUtil.getString(dataMap, "AGENT");
+        plan.agentUser = JdbcMapUtil.getString(dataMap, "agentUser");
         return plan;
     }
 
@@ -282,14 +286,15 @@ public class PmPlanExt {
 
     /**
      * 谋划库进入启动库
-     * @param id 谋划id
+     *
+     * @param id      谋划id
      * @param prjName 项目名称
      */
     private void createPmStart(String id, String prjName) {
         String startId = "", prjCode = "";
-        List<PrjStart> prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME,prjName)
-                .eq(PrjStart.Cols.STATUS,"AP").neq(PrjStart.Cols.ID,id));
-        if (!CollectionUtils.isEmpty(prjStartList)){
+        List<PrjStart> prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME, prjName)
+                .eq(PrjStart.Cols.STATUS, "AP").neq(PrjStart.Cols.ID, id));
+        if (!CollectionUtils.isEmpty(prjStartList)) {
             startId = prjStartList.get(0).getId();
             prjCode = prjStartList.get(0).getPmCode();
         } else {
@@ -314,6 +319,7 @@ public class PmPlanExt {
         public String name;
         public BigDecimal invest;
         public BigDecimal progress;
+        //谋划人员
         public String userId;
         public String user;
         public String locationId;
@@ -325,6 +331,10 @@ public class PmPlanExt {
         public String status;
         public String startTime;
         public String remark;
+        public String agent;
+
+        public String agentUser;
+
         public List<FileInfo> fileInfoList;
     }
 
@@ -368,6 +378,7 @@ public class PmPlanExt {
         public BigDecimal invest;
         public String location;
         public String type;
+        //前期经办人
         public String agent;
         public String remark;
         public String fileIds;
