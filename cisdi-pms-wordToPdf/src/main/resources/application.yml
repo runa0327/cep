@@ -28,7 +28,8 @@ jodconverter:
 #    office-home: C:\Program Files (x86)\OpenOffice 4
     # linux配置
 #    office-home: /opt/openoffice4/program
-    office-home: /opt/openoffice4
+#    office-home: /opt/openoffice4
+    office-home: /opt/libreoffice7.5
     #    office-home: opt/openoffice4
     #每个进程可以处理的最大任务数
     max-tasks-per-process: 10
