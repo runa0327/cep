@@ -52,13 +52,26 @@ public class SecondFeeExt {
             demand = demands.get(0);
         }
 
-        //清空明细
-        FeeDemandDtl.deleteByWhere(new Where().eq(FeeDemandDtl.Cols.SECOND_CATEGORY_FEE_DEMAND_ID,demand.getId()));
         //计算
         this.calculate(req.feeDemandDtls,req.orderReqId);
+
+        //清空明细
+//        FeeDemandDtl.deleteByWhere(new Where().eq(FeeDemandDtl.Cols.SECOND_CATEGORY_FEE_DEMAND_ID,demand.getId()));
+        List<FeeDemandDtl> existingFeeDemandDtls = FeeDemandDtl.selectByWhere(new Where().eq(FeeDemandDtl.Cols.SECOND_CATEGORY_FEE_DEMAND_ID, demand.getId()));
+
         //插入明细
         for (DemandDtl dtlReq : req.feeDemandDtls) {
-            FeeDemandDtl feeDemandDtl = FeeDemandDtl.newData();
+            FeeDemandDtl feeDemandDtl;
+            if (!CollectionUtils.isEmpty(existingFeeDemandDtls)){//如果有明细，修改
+                feeDemandDtl = existingFeeDemandDtls.stream()
+                        .filter(existingDtl -> existingDtl.getFeeDemandNode().equals(dtlReq.feeDemandNodeId))
+                        .findAny().get();
+                if (feeDemandDtl.getSubmitTime() != null){//如果该明细已经提交过，不可修改
+                    continue;
+                }
+            }else {//没有明细，新增
+                feeDemandDtl = FeeDemandDtl.insertData();
+            }
             feeDemandDtl.setSecondCategoryFeeDemandId(demand.getId());
             feeDemandDtl.setFeeDemandNode(dtlReq.feeDemandNodeId);
             feeDemandDtl.setApprovedAmount(dtlReq.approvedAmount);
@@ -70,7 +83,7 @@ public class SecondFeeExt {
             if (!Strings.isNullOrEmpty(dtlReq.submitTime)){
                 feeDemandDtl.setSubmitTime(LocalDateTime.parse(dtlReq.submitTime,df));
             }
-            feeDemandDtl.insertById();
+            feeDemandDtl.updateById();
         }
     }
 
