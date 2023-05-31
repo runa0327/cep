@@ -1603,6 +1603,11 @@ public class WfExt {
         list.add("PM_RAIN_REQ"); //雨水工程
         list.add("PM_PIPE_GALLERY_REQ"); //管廊工程
         list.add("PM_ROAD_BASE_REQ"); //路面基层(碎石层与水稳层)
+        list.add("PM_COOLING_REQ"); //供冷工程
+        list.add("PM_ROAD_SURFACE_REQ"); //路面面层(沥青摊铺)
+        list.add("PM_BRIDGE_FOUNDATION_REQ"); //桥梁基础工程
+        list.add("PM_BRIDGE_SUBSTRUCTURE_REQ"); //桥梁下部结构
+        list.add("PM_BRIDGE_SUPERSTRUCTURE_DECK_REQ"); //桥梁上部结构与桥面系工程
         return list;
     }
 
