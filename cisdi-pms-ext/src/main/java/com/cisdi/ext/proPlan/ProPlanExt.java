@@ -4,7 +4,6 @@ import com.cisdi.ext.pm.office.PmNodeAdjustReqExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.PrjPlanUtil;
-import com.cisdi.ext.util.ProPlanUtils;
 import com.cisdi.ext.weektask.WeekTaskExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -1122,7 +1121,7 @@ public class ProPlanExt {
         StringBuilder sb = new StringBuilder();
         sb.append("update pm_pro_plan_node set LAST_MODI_DT =NOW() ");
         if (operationType != null) {
-            sb.append(",OPREATION_TYPE=' ").append(operationType).append("'");
+            sb.append(",OPREATION_TYPE='").append(operationType).append("'");
         }
         if (Strings.isNotEmpty(input.name)) {
             sb.append(",`NAME` ='").append(input.name).append("'");
