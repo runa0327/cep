@@ -125,19 +125,14 @@ public class ProPlanUtils {
      * @return
      */
     public static List<Map<String, Object>> selectAllPreNode(String nodeId) {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", nodeId);
         List<Map<String, Object>> result = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(list)) {
-            Map<String, Object> dataMap = list.get(0);
-            getPreNode(JdbcMapUtil.getString(dataMap, "PRE_NODE_ID"), result);
-        }
+        getPreNode(nodeId, result);
         return result;
     }
 
-    private static void getPreNode(String preNodeId, List<Map<String, Object>> result) {
+    private static void getPreNode(String nodeId, List<Map<String, Object>> result) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", preNodeId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", nodeId);
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> dataMap = list.get(0);
             result.add(dataMap);
