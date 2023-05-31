@@ -1609,6 +1609,9 @@ public class WfExt {
         list.add("PM_BRIDGE_SUBSTRUCTURE_REQ"); //桥梁下部结构
         list.add("PM_BRIDGE_SUPERSTRUCTURE_DECK_REQ"); //桥梁上部结构与桥面系工程
         list.add("PM_GREEN_REQ"); //绿化工程
+        list.add("PM_POWER_REQ"); //电力工程
+        list.add("PM_COMPLETED_CHECK_REQ"); //竣工初验
+        list.add("PM_QUALITY_COMPLETED_CHECK_REQ"); //质监竣工验收
         return list;
     }
 
