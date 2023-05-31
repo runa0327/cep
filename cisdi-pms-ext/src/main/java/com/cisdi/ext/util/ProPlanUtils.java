@@ -7,10 +7,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -119,5 +116,34 @@ public class ProPlanUtils {
                     m.put("seq_bak", obj);
                     getChildren(m, allData, obj);
                 }).collect(Collectors.toList());
+    }
+
+    /**
+     * 查询当前节点的前置节点，顺延往上推导
+     *
+     * @param nodeId
+     * @return
+     */
+    public static List<Map<String, Object>> selectAllPreNode(String nodeId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", nodeId);
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> dataMap = list.get(0);
+            getPreNode(JdbcMapUtil.getString(dataMap, "PRE_NODE_ID"), result);
+        }
+        return result;
+    }
+
+    private static void getPreNode(String preNodeId, List<Map<String, Object>> result) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", preNodeId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> dataMap = list.get(0);
+            result.add(dataMap);
+            if (JdbcMapUtil.getString(dataMap, "PRE_NODE_ID") != null) {
+                getPreNode(JdbcMapUtil.getString(dataMap, "PRE_NODE_ID"), result);
+            }
+        }
     }
 }
