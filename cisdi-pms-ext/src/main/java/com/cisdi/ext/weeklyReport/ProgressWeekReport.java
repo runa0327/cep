@@ -436,7 +436,7 @@ public class ProgressWeekReport {
         Integer weatherStart = param.weatherStart; //是否符合开工条件
         Integer weatherCompleted = param.weatherCompleted; //是否竣工
         String limit = canMap.get("limit").toString();
-        String sql = "select a.id,c.DATE as writeDate,a.VISUAL_PROGRESS as progress,a.VISUAL_PROGRESS_DESCRIBE as progressDescribe,a.PROCESS_REMARK_TEXT as progressWeek," +
+        String sql = "select c.id as weekId,a.id,c.DATE as writeDate,a.VISUAL_PROGRESS as progress,a.VISUAL_PROGRESS_DESCRIBE as progressDescribe,a.PROCESS_REMARK_TEXT as progressWeek," +
                 "a.TEXT_REMARK_ONE as progressRemark,ifnull(b.SYS_TRUE,'1') as weatherStart,ifnull(b.IZ_END,'0') as weatherCompleted," +
                 "(select name from ad_user where id = a.ad_user_id) as recordByName,a.AD_USER_ID as recordById, " +
                 "a.FILE_ID_ONE as fileId,b.PM_PRJ_ID as projectId," +
@@ -528,6 +528,7 @@ public class ProgressWeekReport {
             weekMessage.projectId = JdbcMapUtil.getString(p,"projectId"); // 项目id
             weekMessage.projectName = JdbcMapUtil.getString(p,"projectName"); // 项目名称
             weekMessage.weekPrjId = JdbcMapUtil.getString(p,"weekPrjId"); // 项目周id
+            weekMessage.weekId = JdbcMapUtil.getString(p,"weekId"); // 周id
             String fileId = JdbcMapUtil.getString(p,"fileId");
             if (!SharedUtil.isEmptyString(fileId)){
                 weekMessage.fileList =BaseFileExt.getFile(fileId);

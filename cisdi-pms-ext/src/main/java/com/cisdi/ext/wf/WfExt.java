@@ -1608,6 +1608,7 @@ public class WfExt {
         list.add("PM_BRIDGE_FOUNDATION_REQ"); //桥梁基础工程
         list.add("PM_BRIDGE_SUBSTRUCTURE_REQ"); //桥梁下部结构
         list.add("PM_BRIDGE_SUPERSTRUCTURE_DECK_REQ"); //桥梁上部结构与桥面系工程
+        list.add("PM_GREEN_REQ"); //绿化工程
         return list;
     }
 
