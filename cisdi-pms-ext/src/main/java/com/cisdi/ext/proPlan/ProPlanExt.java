@@ -1301,7 +1301,7 @@ public class ProPlanExt {
                     "left join WF_PROCESS wp on pppn.LINKED_WF_PROCESS_ID = wp.id  " +
                     "left join pm_pro_plan ppp on ppp.id = pppn.PM_PRO_PLAN_ID " +
                     "left join gr_set_value v on v.id = pppn.PROGRESS_STATUS_ID " +
-                    "where pppn.OPREATION_TYPE is null and  ppp.pm_prj_id = ?", map.get("prjId"));
+                    "where (pppn.OPREATION_TYPE <> 'add' or pppn.OPREATION_TYPE is null) and  ppp.pm_prj_id = ?", map.get("prjId"));
             List<PlanNode> nodeList = list.stream().map(p -> {
                 PlanNode node = new PlanNode();
                 node.id = JdbcMapUtil.getString(p, "ID");
