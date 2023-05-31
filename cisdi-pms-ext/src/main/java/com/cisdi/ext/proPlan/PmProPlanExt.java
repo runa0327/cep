@@ -39,6 +39,9 @@ public class PmProPlanExt {
         List<PmProPlan> list1 = PmProPlan.selectByWhere(new Where().eq(PmProPlan.Cols.PM_PRJ_ID,projectId));
         if (!CollectionUtils.isEmpty(list1)){
             String pmProPlanId = list1.get(0).getId();
+            //删除需要删除的节点
+            Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID",pmProPlanId).eq(PmProPlanNode.Cols.OPREATION_TYPE,"del").delete()
+                    .exec();
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID",pmProPlanId).update()
                     .set("OPREATION_TYPE",null)
                     .exec();
