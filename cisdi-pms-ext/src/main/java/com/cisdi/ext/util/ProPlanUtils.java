@@ -91,7 +91,8 @@ public class ProPlanUtils {
      */
     public static List<Map<String, Object>> sortLevel3(String projectId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pn.id as id,pn.`NAME` as nodeName,ifnull(PM_PRO_PLAN_NODE_PID,0) pid,pn.SEQ_NO as seq,pn.level as level,'0' as seq_bak,pn.PLAN_COMPL_DATE as PLAN_COMPL_DATE " +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pn.id as id,pn.`NAME` as nodeName,ifnull(PM_PRO_PLAN_NODE_PID,0) pid," +
+                "pn.SEQ_NO as seq,pn.level as level,'0' as seq_bak,pn.PLAN_COMPL_DATE as PLAN_COMPL_DATE,OPREATION_TYPE  " +
                 " from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where PM_PRJ_ID=?", projectId);
 
         list.stream().filter(p -> "0".equals(JdbcMapUtil.getString(p, "pid")))

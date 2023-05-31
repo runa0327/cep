@@ -235,6 +235,8 @@ public class PmPrjIdLink {
                     linkedRecord.valueMap.put("PLAN_COMPL_DATE", JdbcMapUtil.getString(tmp, "PLAN_COMPL_DATE"));
                     linkedRecord.textMap.put("PLAN_COMPL_DATE", JdbcMapUtil.getString(tmp, "PLAN_COMPL_DATE"));
 
+                    //TODO 操作类型字段返回  JdbcMapUtil.getString(tmp, "OPREATION_TYPE")
+
                     linkedRecordList.add(linkedRecord);
                 }
                 attLinkResult.childData.put("1658642775492775936", linkedRecordList);
