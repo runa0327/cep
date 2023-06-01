@@ -48,7 +48,7 @@ public class PmPrjInvest3Ext {
         }
 
         //送审信息写入批复信息
-        writeReply(entityRecord.valueMap,id);
+//        writeReply(entityRecord.valueMap,id);
     }
 
     /**
