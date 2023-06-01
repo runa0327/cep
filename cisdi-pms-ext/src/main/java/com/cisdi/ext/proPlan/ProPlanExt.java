@@ -1205,16 +1205,15 @@ public class ProPlanExt {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String nodeId = JdbcMapUtil.getString(inputMap, "nodeId");
-//        List<Map<String, Object>> progressStatusList =
-//                myJdbcTemplate.queryForList("select v.name from pm_pro_plan_node n left join gr_set_value v on v.id = n.PROGRESS_STATUS_ID");
-//        String statusName = JdbcMapUtil.getString(progressStatusList.get(0), "name");
-//        List<Map<String, Object>> childIdList = myJdbcTemplate.queryForList("select id childId from pm_pro_plan_node n where PM_PRO_PLAN_NODE_PID = ?", nodeId);
-//        if (CollectionUtils.isEmpty(childIdList) && Strings.isNotEmpty(statusName) && statusName.equals("未启动")) {
-//            myJdbcTemplate.update("delete from pm_pro_plan_node where id = ?", nodeId);
-//        } else {
-//            throw new BaseException("不能删除该节点！");
-//        }
-        myJdbcTemplate.update("update pm_pro_plan_node set OPREATION_TYPE='del' where id=?", nodeId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", nodeId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> dataMap = list.get(0);
+            if ("add".equals(JdbcMapUtil.getString(dataMap, "OPREATION_TYPE"))) {
+                myJdbcTemplate.update("delete from pm_pro_plan_node where id=?", nodeId);
+            } else {
+                myJdbcTemplate.update("update pm_pro_plan_node set OPREATION_TYPE='del' where id=?", nodeId);
+            }
+        }
     }
 
 
