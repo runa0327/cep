@@ -1620,6 +1620,8 @@ public class WfExt {
         list.add("PM_TRAFFIC_REQ"); //交通工程
         list.add("PM_LIGHTING_REQ"); //照明工程
         list.add("PM_FEEDWATER_REQ"); //给水工程
+        list.add("PM_RECLAIMED_WATER_REQ"); //中水工程
+        list.add("PM_SUBGRADE_REQ"); //路基工程
         return list;
     }
 
