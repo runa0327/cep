@@ -230,7 +230,22 @@ public class WeekTaskExt {
                 project.id = JdbcMapUtil.getString(node, "projectId");
                 project.name = JdbcMapUtil.getString(node, "projectName");
                 resData.project = project;
-                resData.attData = JdbcMapUtil.getString(node, "ATT_DATA");
+                List<AttData> attDataList = new ArrayList<>();
+                if (JdbcMapUtil.getString(node, "ATT_DATA") != null) {
+                    AttData attData = new AttData();
+                    attData.AD_ATT_CODE = "BUY_MATTER_ID";
+                    attData.ATT_VALUE = JdbcMapUtil.getString(node, "ATT_DATA");
+                    String txt = "";
+                    List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from gr_set_value where id=?", JdbcMapUtil.getString(node, "ATT_DATA"));
+                    if (CollectionUtils.isEmpty(list1)) {
+                        Map<String, Object> mapData = list1.get(0);
+                        txt = JdbcMapUtil.getString(mapData, "NAME");
+                    }
+                    attData.ATT_TXT = txt;
+                    attData.FOR_PROC = "1";
+                    attDataList.add(attData);
+                }
+                resData.attDataList = attDataList;
                 Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resData), Map.class);
                 ExtJarHelper.returnValue.set(outputMap);
             } else {
@@ -379,7 +394,20 @@ public class WeekTaskExt {
         public Project project;
 
         public Node node;
-        public String attData;
+
+        public List<AttData> attDataList;
+
+    }
+
+    public static class AttData {
+        public String AD_ATT_ID;
+
+        public String AD_ATT_CODE;
+        public String ATT_VALUE;
+
+        public String ATT_TXT;
+        public String FOR_NODE;
+        public String FOR_PROC;
     }
 
 
