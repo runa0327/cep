@@ -1617,6 +1617,9 @@ public class WfExt {
         list.add("PM_FUNCTIONAL_OPENING_REQ"); //功能性通车
         list.add("PM_COMMUNICATION_ENGINEERING_REQ"); //通信工程
         list.add("PM_SIDEWALK_BUILD_REQ"); //人行道施工
+        list.add("PM_TRAFFIC_REQ"); //交通工程
+        list.add("PM_LIGHTING_REQ"); //照明工程
+        list.add("PM_FEEDWATER_REQ"); //给水工程
         return list;
     }
 
