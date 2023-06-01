@@ -1337,6 +1337,7 @@ public class ProPlanExt {
                     node.atts = Arrays.asList(att.split(","));
                 }
                 node.izDisplay = JdbcMapUtil.getString(p, "IZ_DISPLAY");
+                node.attData = JdbcMapUtil.getString(p, "ATT_DATA");
                 return node;
             }).collect(Collectors.toList());
 
@@ -1409,6 +1410,7 @@ public class ProPlanExt {
                 }
                 node.izDisplay = JdbcMapUtil.getString(p, "IZ_DISPLAY");
                 node.oprType = JdbcMapUtil.getString(p, "OPREATION_TYPE");
+                node.attData = JdbcMapUtil.getString(p, "ATT_DATA");
                 return node;
             }).collect(Collectors.toList());
 
@@ -1520,6 +1522,8 @@ public class ProPlanExt {
         public String izDisplay;
 
         public String oprType;
+
+        public String attData;
     }
 
 
