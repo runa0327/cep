@@ -1171,6 +1171,9 @@ public class ProPlanExt {
         if (Strings.isEmpty(input.izMilestone)) {
             input.izMilestone = "0";
         }
+        if (Strings.isNotEmpty(input.attData)) {
+            sb.append(",ATT_DATA = '").append(input.attData).append("'");
+        }
         sb.append(",IZ_MILESTONE =").append(input.izMilestone);
         sb.append(" where id='").append(input.id).append("'");
         myJdbcTemplate.update(sb.toString());
@@ -1282,6 +1285,8 @@ public class ProPlanExt {
         public String planStartDay;
 
         public String projectId;
+
+        public String attData;
     }
 
 

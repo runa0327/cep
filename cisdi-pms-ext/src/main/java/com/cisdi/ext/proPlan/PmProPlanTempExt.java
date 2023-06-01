@@ -422,7 +422,7 @@ public class PmProPlanTempExt {
     public void processNodeList() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from WF_NODE where WF_PROCESS_ID=? order by SEQ_NO", map.get("processId"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from WF_NODE where WF_PROCESS_ID=? and `status`='ap' order by SEQ_NO", map.get("processId"));
         List<ObjInfo> objInfoList = list.stream().map(p -> {
             ObjInfo objInfo = new ObjInfo();
             objInfo.id = JdbcMapUtil.getString(p, "ID");
