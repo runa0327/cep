@@ -634,4 +634,67 @@ public class ProgressWeekReport {
                 .set("TS",now).set("LAST_MODI_DT",now)
                 .exec();
     }
+
+    /**
+     * 形象进度周报统计-单个详情
+     */
+    public void progressOneDetail(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        // 获取输入：
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        WeekMessage param = JsonUtil.fromJson(json,WeekMessage.class);
+        String id = param.getId();
+        if (SharedUtil.isEmptyString(id)){
+            throw new BaseException("id不能为空！");
+        }
+        String sql = "select c.id as weekId,a.id,c.DATE as writeDate,a.VISUAL_PROGRESS as progress,a.VISUAL_PROGRESS_DESCRIBE as progressDescribe,a.PROCESS_REMARK_TEXT as progressWeek," +
+                "a.TEXT_REMARK_ONE as progressRemark,ifnull(b.SYS_TRUE,'1') as weatherStart,ifnull(b.IZ_END,'0') as weatherCompleted," +
+                "(select name from ad_user where id = a.ad_user_id) as recordByName,a.AD_USER_ID as recordById, " +
+                "a.FILE_ID_ONE as fileId,b.PM_PRJ_ID as projectId," +
+                "e.name as projectName,d.AD_USER_ID as manageUserId," +
+                "f.name as manageUserName,b.IZ_WRITE as izWrite,b.id as weekPrjId " +
+                "from PM_PROGRESS_WEEKLY_PRJ_DETAIL a " +
+                "left join PM_PROGRESS_WEEKLY_PRJ b on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id " +
+                "LEFT JOIN pm_progress_weekly c on b.PM_PROGRESS_WEEKLY_ID = c.id " +
+                "left join (select ad_user_id,PM_PRJ_ID from pm_roster where post_info_id = '1633997482885255168' " +
+                "and ad_user_id is not null GROUP BY PM_PRJ_ID,ad_user_id) d on b.pm_prj_id = d.PM_PRJ_ID " +
+                "left join pm_prj e on b.pm_prj_id = e.id " +
+                "LEFT JOIN ad_user f ON d.ad_user_id = f.id " +
+                "where a.id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,id);
+        if (CollectionUtils.isEmpty(list)){
+            ExtJarHelper.returnValue.set(null);
+        } else {
+            WeekMessage weekMessage = new WeekMessage();
+            for (Map<String, Object> tmp : list) {
+                weekMessage.setId(JdbcMapUtil.getString(tmp,"id"));
+                weekMessage.setIzWrite(JdbcMapUtil.getInt(tmp,"izWrite"));
+                weekMessage.setWeatherCompleted(JdbcMapUtil.getInt(tmp,"weatherCompleted"));
+                weekMessage.setWeatherStart(JdbcMapUtil.getInt(tmp,"weatherStart"));
+                weekMessage.setManageUserId(JdbcMapUtil.getString(tmp,"manageUserId"));
+                weekMessage.setManageUserName(JdbcMapUtil.getString(tmp,"manageUserName"));
+                weekMessage.setProgress(new BigDecimal(JdbcMapUtil.getString(tmp,"progress")));
+                weekMessage.setProgressDescribe(JdbcMapUtil.getString(tmp,"progressDescribe"));
+                weekMessage.setProgressRemark(JdbcMapUtil.getString(tmp,"progressRemark"));
+                weekMessage.setProgressWeek(JdbcMapUtil.getString(tmp,"progressWeek"));
+                weekMessage.setProjectId(JdbcMapUtil.getString(tmp,"projectId"));
+                weekMessage.setProjectName(JdbcMapUtil.getString(tmp,"projectName"));
+                weekMessage.setRecordById(JdbcMapUtil.getString(tmp,"recordById"));
+                weekMessage.setRecordByName(JdbcMapUtil.getString(tmp,"recordByName"));
+                weekMessage.setWeekId(JdbcMapUtil.getString(tmp,"weekId"));
+                weekMessage.setWeekPrjId(JdbcMapUtil.getString(tmp,"weekPrjId"));
+                weekMessage.setWriteDate(JdbcMapUtil.getString(tmp,"writeDate"));
+                String fileId = JdbcMapUtil.getString(tmp,"fileId");
+                if (!SharedUtil.isEmptyString(fileId)){
+                    weekMessage.fileId = fileId;
+                    weekMessage.fileList = BaseFileExt.getFile(fileId);
+                }
+            }
+            Map<String,Object> returnMap = new HashMap<>();
+            returnMap.put("result",weekMessage);
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(returnMap), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
 }

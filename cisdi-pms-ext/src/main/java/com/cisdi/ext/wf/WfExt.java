@@ -1612,6 +1612,11 @@ public class WfExt {
         list.add("PM_POWER_REQ"); //电力工程
         list.add("PM_COMPLETED_CHECK_REQ"); //竣工初验
         list.add("PM_QUALITY_COMPLETED_CHECK_REQ"); //质监竣工验收
+        list.add("PM_COMPLETED_RECORD_REQ"); //工程竣工备案
+        list.add("PM_PLAN_CHECK_REQ"); //规划验收
+        list.add("PM_FUNCTIONAL_OPENING_REQ"); //功能性通车
+        list.add("PM_COMMUNICATION_ENGINEERING_REQ"); //通信工程
+        list.add("PM_SIDEWALK_BUILD_REQ"); //人行道施工
         return list;
     }
 
