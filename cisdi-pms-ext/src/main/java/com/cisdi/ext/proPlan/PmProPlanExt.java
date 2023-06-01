@@ -35,13 +35,17 @@ public class PmProPlanExt {
      * @param projectId 项目id
      */
     public static void updateNodeOperationType(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //获取进度计划id
         List<PmProPlan> list1 = PmProPlan.selectByWhere(new Where().eq(PmProPlan.Cols.PM_PRJ_ID,projectId));
         if (!CollectionUtils.isEmpty(list1)){
             String pmProPlanId = list1.get(0).getId();
+            System.out.println("id为："+pmProPlanId);
             //删除需要删除的节点
-            Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID",pmProPlanId).eq(PmProPlanNode.Cols.OPREATION_TYPE,"del").delete()
-                    .exec();
+            String sql = "set FOREIGN_key_checks = 0;delete from PM_PRO_PLAN_NODE where PM_PRO_PLAN_ID = '"+pmProPlanId+"' and OPREATION_TYPE = 'del';set FOREIGN_key_checks = 1";
+            myJdbcTemplate.update(sql);
+//            Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID",pmProPlanId).eq(PmProPlanNode.Cols.OPREATION_TYPE,"del").delete()
+//                    .exec();
             Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID",pmProPlanId).update()
                     .set("OPREATION_TYPE",null)
                     .exec();

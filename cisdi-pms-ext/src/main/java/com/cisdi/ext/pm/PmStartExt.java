@@ -773,7 +773,7 @@ public class PmStartExt {
                     myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
                 }
             }
-        }).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
+        }).filter(p->!SharedUtil.isEmptyString(JdbcMapUtil.getString(p,"PLAN_COMPL_DATE"))).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
     }
 
     public static int getDateCha(String end, String start) {
