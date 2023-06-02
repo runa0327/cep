@@ -705,7 +705,7 @@ public class ProgressWeekReport {
     public void lastWeekToWeek(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //查询本周信息
-        Map<String,Object> weekMap = DateTimeUtil.getDateTwoWeekMap(new Date());
+        Map<String,Object> weekMap = DateTimeUtil.getDateWeekMap(new Date());
         String startDate = JdbcMapUtil.getString(weekMap,"startDate");
         String endDate = JdbcMapUtil.getString(weekMap,"endDate");
         //获取本周id
