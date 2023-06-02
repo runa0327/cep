@@ -1622,6 +1622,8 @@ public class WfExt {
         list.add("PM_FEEDWATER_REQ"); //给水工程
         list.add("PM_RECLAIMED_WATER_REQ"); //中水工程
         list.add("PM_SUBGRADE_REQ"); //路基工程
+        list.add("PM_CLEAR_FORM_REQ"); //清表完成
+        list.add("PM_TRIPLET_FLAT_REQ"); //三通一平、临水、临电完成
         return list;
     }
 
