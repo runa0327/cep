@@ -7,8 +7,10 @@ import com.cisdi.ext.model.PmProgressWeeklyPrjDetail;
 import com.cisdi.ext.model.view.project.PmPrjView;
 import com.cisdi.ext.model.view.weekReport.PmProgressWeeklyView;
 import com.cisdi.ext.model.view.weekReport.WeekMessage;
+import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -17,6 +19,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -675,7 +678,7 @@ public class ProgressWeekReport {
                 weekMessage.setWeatherStart(JdbcMapUtil.getInt(tmp,"weatherStart"));
                 weekMessage.setManageUserId(JdbcMapUtil.getString(tmp,"manageUserId"));
                 weekMessage.setManageUserName(JdbcMapUtil.getString(tmp,"manageUserName"));
-                weekMessage.setProgress(new BigDecimal(JdbcMapUtil.getString(tmp,"progress")));
+                weekMessage.setProgress(StringUtil.valueNullToBig(JdbcMapUtil.getString(tmp,"progress")));
                 weekMessage.setProgressDescribe(JdbcMapUtil.getString(tmp,"progressDescribe"));
                 weekMessage.setProgressRemark(JdbcMapUtil.getString(tmp,"progressRemark"));
                 weekMessage.setProgressWeek(JdbcMapUtil.getString(tmp,"progressWeek"));
