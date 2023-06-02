@@ -360,7 +360,7 @@ public class PlanOperationExt {
                 "POST_INFO_ID = '1633731474912055296') rtemp on rtemp.PM_PRJ_ID = po.PM_PRJ_ID\n" +
                 "left join gr_set_value v5 on v5.id = pp.PROJECT_PHASE_ID\n" +
                 "left join (select PM_PRJ_ID,GROUP_CONCAT(AD_USER_ID) AdUserIds from prj_follower group by PM_PRJ_ID) ftemp on ftemp.PM_PRJ_ID = po" +
-                ".PM_PRJ_ID where 1=1");
+                ".PM_PRJ_ID where 1=1 and (pp.PROJECT_STATUS is null or pp.PROJECT_STATUS != '1661568714048413696') ");
         sqlParams.put("loginId",ExtJarHelper.loginInfo.get().userId);
         if (!CollectionUtils.isEmpty(selectReq.prjIds)){
             sqlSb.append(" and po.PM_PRJ_ID in (:prjIds)");
