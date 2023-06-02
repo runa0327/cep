@@ -628,7 +628,7 @@ public class PoOrderReqExt {
                 list.add(map1);
             }
             if (!SharedUtil.isEmptyString(file2)){
-                map2.put("code",file2);
+                map2.put("code",code2);
                 map2.put("file",file2);
                 list.add(map2);
             }
