@@ -1,7 +1,7 @@
 package com.cisdi.pms.job.archive;
 
 import cn.hutool.core.util.IdUtil;
-import com.cisdi.pms.job.utils.StringUtils;
+import com.cisdi.pms.job.utils.StringUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -80,7 +80,7 @@ public class ArchiveGenerationService {
                     updateLog(true, "表单没有PM_PRJ_ID属性或PM_PRJ_ID属性值为空，无需生成资料。", procInstId, newLogId);
                     continue;
                 }
-                List<String> prjIdList = StringUtils.splitByCode(prjId,",");
+                List<String> prjIdList = StringUtil.splitByCode(prjId,",");
                 if (!CollectionUtils.isEmpty(prjIdList)){
                     for (String projectId : prjIdList) {
                         String folderIdForProcInst = getOrCreateFoldersForMainCateSubCateProcProcInst(projectId, folderList.get(0));

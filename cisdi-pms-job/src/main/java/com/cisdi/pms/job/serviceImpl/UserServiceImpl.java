@@ -6,6 +6,7 @@ import com.cisdi.pms.job.domain.BriskUser;
 import com.cisdi.pms.job.domain.BriskUserExportModel;
 
 import com.cisdi.pms.job.service.UserService;
+import com.cisdi.pms.job.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -54,7 +55,7 @@ public class UserServiceImpl implements UserService {
                 "group by l.AD_USER_ID order by loginNum desc", startTime, endTime);
         List<BriskUserExportModel> models = originList.stream().map(userMap -> {
             BriskUserExportModel model = JSONObject.parseObject(JSONObject.toJSONString(userMap), BriskUserExportModel.class);
-            model.lastLoginDate = com.cisdi.pms.job.utils.StringUtils.replaceCode(model.lastLoginDate,"T"," ");
+            model.lastLoginDate = StringUtil.replaceCode(model.lastLoginDate,"T"," ");
             return model;
         }).collect(Collectors.toList());
         return models;
