@@ -1,8 +1,11 @@
 package com.cisdi.ext.pm;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.model.base.PmPrj;
+import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -14,9 +17,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -33,6 +35,7 @@ public class SecondFeeStatisticExt {
         HashMap<String, Object> sqlParams = new HashMap<>(input);
         StatisticReq req = JSONObject.parseObject(JSONObject.toJSONString(input), StatisticReq.class);
         String sql = "select tt.prjId,tt.prjName\n" +
+                ",IFNULL(slt.lastMonthRequiredAmt,0) secondLastMonthRequiredAmt\n" +
                 ",IFNULL(lt.lastMonthRequiredAmt,0) lastMonthRequiredAmt\n" +
                 ",nt.thisMonthRequiredAmt,tt.requiredAmt,tt.contractRequiredTotalAmt,tt.sumPayAmt,tt.paidRatio from \n" +
                 "-- 总需求资金,和其他基础数据\n" +
@@ -72,6 +75,21 @@ public class SecondFeeStatisticExt {
                 "where dtemp.SECOND_CATEGORY_FEE_DEMAND_ID is not null \n" +
                 "group by fd.PM_PRJ_ID) lt on lt.prjId = tt.prjId\n" +
                 "left join\n" +
+                "-- 上上月\n" +
+                "(select fd.PM_PRJ_ID prjId,SUM(IFNULL(dd.REQUIRED_AMOUNT,0)) lastMonthRequiredAmt\n" +
+                "from second_category_fee_demand fd\n" +
+                "left join fee_demand_dtl dd on dd.SECOND_CATEGORY_FEE_DEMAND_ID = fd.id\n" +
+                "left join pm_prj pp on pp.id = fd.PM_PRJ_ID\n" +
+                "left join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
+                "left join (select dd.SECOND_CATEGORY_FEE_DEMAND_ID,max(SEQ_NO) maxSeqNo from fee_demand_dtl dd \n" +
+                "\t\t\t\t\t\tleft join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
+                "\t\t\t\t\t\twhere dd.SUBMIT_TIME is not null\n" +
+                "\t\t\t\t\t\tand DATE_FORMAT(dd.SUBMIT_TIME,'%Y-%m') = DATE_FORMAT(SUBDATE(NOW(),INTERVAL 2 month),'%Y-%m')\n" +
+                "\t\t\t\t\t\tgroup by dd.SECOND_CATEGORY_FEE_DEMAND_ID\n" +
+                "\t\t\t\t\t) dtemp on dtemp.SECOND_CATEGORY_FEE_DEMAND_ID = fd.id and dtemp.maxSeqNo = va.SEQ_NO\n" +
+                "where dtemp.SECOND_CATEGORY_FEE_DEMAND_ID is not null \n" +
+                "group by fd.PM_PRJ_ID) slt on slt.prjId = tt.prjId\n" +
+                "left join\n" +
                 "-- 本月需求资金\n" +
                 "(select fd.PM_PRJ_ID prjId,SUM(IFNULL(dd.REQUIRED_AMOUNT,0)) thisMonthRequiredAmt\n" +
                 "from second_category_fee_demand fd\n" +
@@ -95,6 +113,14 @@ public class SecondFeeStatisticExt {
         sql += " order by tt.submitTime limit " + (req.pageIndex - 1) * req.pageSize + " , " + req.pageSize;
         //分页后的数据
         List<Map<String, Object>> pageList = myNamedParameterJdbcTemplate.queryForList(sql, sqlParams);
+        for (Map<String, Object> dataMap : pageList) {
+            BigDecimal secondLastMonthRequiredAmt = new BigDecimal(dataMap.get("secondLastMonthRequiredAmt").toString());//前两月金额
+            BigDecimal lastMonthRequiredAmt = new BigDecimal(dataMap.get("lastMonthRequiredAmt").toString());//上月金额
+            BigDecimal thisMonthRequiredAmt = new BigDecimal(dataMap.get("thisMonthRequiredAmt").toString());//本月金额
+            //梯次相减
+            dataMap.put("thisMonthRequiredAmt",thisMonthRequiredAmt.subtract(lastMonthRequiredAmt));
+            dataMap.put("lastMonthRequiredAmt",lastMonthRequiredAmt.subtract(secondLastMonthRequiredAmt));
+        }
         List<PrjData> prjDataList = JSONObject.parseArray(JSONObject.toJSONString(pageList), PrjData.class);
         PrjStatisticResp resp = new PrjStatisticResp();
         resp.prjDataList = prjDataList;
@@ -132,9 +158,9 @@ public class SecondFeeStatisticExt {
 
         StringBuffer sqlSb = new StringBuffer();
         StringBuffer groupSql = new StringBuffer();
-        sqlSb.append("select pp.id prjId,pp.name prjName,oo.CONTRACT_NAME contractName,dd.id,dd.LAST_MODI_USER_ID operatorId,u.name operatorName,u" +
-                ".deptId,d.name deptName,dd.SUBMIT_TIME submitTime,dd.REQUIRED_AMOUNT requiredAmt,oo.AMT_SIX contractAmt,dd.PAID_AMOUNT paidAmt,dd" +
-                ".PAYMENT_RATIO paymentRatio\n" +
+        sqlSb.append("select pp.id prjId,pp.name prjName,oo.CONTRACT_NAME contractName,dd.id,dd.LAST_MODI_USER_ID operatorId,u.name operatorName," +
+                "u.deptId,d.name deptName,dd.SUBMIT_TIME submitTime,IFNULL(dd.REQUIRED_AMOUNT,0) requiredAmt,IFNULL(oo.AMT_SIX,0) contractAmt," +
+                "IFNULL(dd.PAID_AMOUNT,0) paidAmt,IFNULL(dd.PAYMENT_RATIO,0) paymentRatio " +
                 "from second_category_fee_demand fd\n" +
                 "left join fee_demand_dtl dd on dd.SECOND_CATEGORY_FEE_DEMAND_ID = fd.id\n" +
                 "left join pm_prj pp on pp.id = fd.PM_PRJ_ID\n" +
@@ -151,7 +177,7 @@ public class SecondFeeStatisticExt {
                 "left join (select PO_ORDER_ID,sum(PAY_AMT) sumPayAmt from contract_pay_history ph group by PO_ORDER_ID) htemp on htemp.PO_ORDER_ID" +
                 " = oo.id\n" +
                 "where dtemp.SECOND_CATEGORY_FEE_DEMAND_ID is not null");
-        groupSql.append("select d.id deptId,d.name deptName,sum(dd.REQUIRED_AMOUNT) requiredAmt\n" +
+        groupSql.append("select d.id deptId,d.name deptName,SUM(IFNULL(dd.REQUIRED_AMOUNT,0)) requiredAmt\n" +
                 "from second_category_fee_demand fd\n" +
                 "left join fee_demand_dtl dd on dd.SECOND_CATEGORY_FEE_DEMAND_ID = fd.id\n" +
                 "left join pm_prj pp on pp.id = fd.PM_PRJ_ID\n" +
@@ -174,6 +200,7 @@ public class SecondFeeStatisticExt {
             sqlSb.append(" and oo.CONTRACT_NAME like :contractName");
             groupSql.append(" and oo.CONTRACT_NAME like :contractName");
             req.contractName = "%" + req.contractName + "%";
+            sqlParams.put("contractName",req.contractName);
         }
         if (!CollectionUtils.isEmpty(req.deptIds)){
             sqlSb.append(" and d.id in (:deptIds)");
@@ -183,11 +210,11 @@ public class SecondFeeStatisticExt {
             sqlSb.append(" and dd.LAST_MODI_USER_ID in (:operatorIds)");
             groupSql.append(" and dd.LAST_MODI_USER_ID in (:operatorIds)");
         }
-        if (Strings.isNullOrEmpty(req.startDate)){
+        if (!Strings.isNullOrEmpty(req.startDate)){
             sqlSb.append(" and dd.SUBMIT_TIME >= :startDate");
             groupSql.append(" and dd.SUBMIT_TIME >= :startDate");
         }
-        if (Strings.isNullOrEmpty(req.endDate)){
+        if (!Strings.isNullOrEmpty(req.endDate)){
             sqlSb.append( " and dd.SUBMIT_TIME <= :endDate");
             groupSql.append( " and dd.SUBMIT_TIME <= :endDate");
         }
@@ -208,11 +235,79 @@ public class SecondFeeStatisticExt {
         resp.deptStatisticList = deptStatisticList;
         Map<String, Object> prjMap = myJdbcTemplate.queryForMap("select name from pm_prj where id = ?", req.prjId);
         resp.prjName = JdbcMapUtil.getString(prjMap,"name");
-        resp.paymentRatio = resp.totalPaidAmt.divide(totalContractAmt,4, RoundingMode.HALF_UP);
+        resp.paymentRatio = totalContractAmt.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : resp.totalPaidAmt.divide(totalContractAmt,4, RoundingMode.HALF_UP);
         resp.total = totalList.size();
         resp.contractDataList = contractDataList;
 
+        //返回
+        Map output = JsonUtil.fromJson(JsonUtil.toJson(resp), Map.class);
+        ExtJarHelper.returnValue.set(output);
     }
+
+    public void deptStatistic(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Date now = new Date();
+        Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
+        String year = JdbcMapUtil.getString(input, "year") == null ? String.valueOf(DateUtil.year(now)) : JdbcMapUtil.getString(input, "year");
+        SimpleDateFormat monthDf = new SimpleDateFormat("MM");
+        int month = Integer.parseInt(monthDf.format(now));
+
+        StringBuffer sqlSb = new StringBuffer();
+        sqlSb.append("select fd.PM_PRJ_ID prjId,pp.name prjName,fd.PO_ORDER_REQ_ID contractId,oo.CONTRACT_NAME contractName,d.id deptId,d.name " +
+                "deptName,dd.REQUIRED_AMOUNT requiredAmt,dd.SUBMIT_TIME submitTime,va.SEQ_NO seqNo\n" +
+                "from second_category_fee_demand fd\n" +
+                "left join fee_demand_dtl dd on dd.SECOND_CATEGORY_FEE_DEMAND_ID = fd.id\n" +
+                "left join pm_prj pp on pp.id = fd.PM_PRJ_ID\n" +
+                "left join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
+                "left join po_order oo on oo.CONTRACT_APP_ID = fd.PO_ORDER_REQ_ID and oo.PM_PRJ_ID = fd.PM_PRJ_ID\n" +
+                "left join (select u.id,u.name,max(d.id) deptId from ad_user u left join hr_dept_user du on du.AD_USER_ID = u.id\n" +
+                "\t\t\t\t\t\tleft join hr_dept d on d.id = du.HR_DEPT_ID group by u.id) u on u.id = dd.LAST_MODI_USER_ID\n" +
+                "left join hr_dept d on d.id = u.deptId");
+
+        sqlSb.append(" where YEAR(dd.SUBMIT_TIME) = ?");
+        //原始数据
+        List<Map<String, Object>> originList = myJdbcTemplate.queryForList(sqlSb.toString(),year);
+        //所有相关的部门
+        Map<String, String> deptMap = originList.stream().collect(Collectors.toMap(map -> map.get("deptId").toString(), map -> map.get("deptName").toString(),(ov,nv) -> nv));
+
+        List<Map<String, Object>> sheetList = new ArrayList<>();
+
+        for (String deptId : deptMap.keySet()) {
+            Map<String, Object> rowCells = new HashMap<>();//一行的单元格
+            rowCells.put("需求部门",deptMap.get(deptId));
+            rowCells.put("deptId",deptId);
+            List<Map<String, Object>> deptData = originList.stream().filter(map -> map.get("deptId").toString().equals(deptId)).collect(Collectors.toList());
+            //这里可以筛选出和该部门相关的数据
+            for (int m = 1; m <= month; m++) {
+                //筛选出该月相关的
+                final int i = m;
+                List<Map<String, Object>> monthData = deptData.stream()
+                        .filter(map -> JdbcMapUtil.getString(map,"submitTime") != null && i == Integer.parseInt(map.get("submitTime").toString().substring(5, 7)))
+                        .collect(Collectors.toList());
+                if (CollectionUtils.isEmpty(monthData)){//没有该月数据
+                    rowCells.put(m + "月",0);
+                    continue;
+                }
+                //有该月数据，根据合同分组
+                Map<String, List<Map<String, Object>>> contractMap = monthData.stream().collect(Collectors.groupingBy(item -> item.get("contractId").toString()));
+                BigDecimal sumAmt = BigDecimal.ZERO;
+                for (String k : contractMap.keySet()) {
+                    List<Map<String, Object>> singleContractData = contractMap.get(k);//单个合同 对应的多条填报记录
+
+                    //单个合同对应的多个填报记录，经过月份、部门筛选后仍剩多个记录，过滤后取节点优先级最大的
+                    Map<String, Object> resultDtl = singleContractData.stream().max(Comparator.comparingDouble(dtl -> Double.parseDouble(dtl.get("seqNo").toString()))).get();
+                    sumAmt = sumAmt.add(new BigDecimal(resultDtl.get("requiredAmt").toString()));
+                }
+                rowCells.put(m + "月",sumAmt);
+            }
+            sheetList.add(rowCells);
+            Map<String, Object> result = new HashMap<>();
+            result.put("sheetList",sheetList);
+            Map output = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
+            ExtJarHelper.returnValue.set(output);
+        }
+    }
+
 
     /**
      * 项目维度统计请求
@@ -327,7 +422,7 @@ public class SecondFeeStatisticExt {
         //经办人
         private String operatorName;
         //需求提出时间
-        private String submitName;
+        private String submitTime;
         //资金需求金额
         private BigDecimal requiredAmt;
         //资金需求合同金额
@@ -336,5 +431,10 @@ public class SecondFeeStatisticExt {
         private BigDecimal paidAmt;
         //支付占比
         private BigDecimal paymentRatio;
+
+        public String getSubmitTime() {
+            this.submitTime = StringUtil.withOutT(this.submitTime);
+            return submitTime;
+        }
     }
 }
