@@ -96,7 +96,7 @@ public class PmLifeCycleExt {
                 " left join pm_prj pj  on pj.id = po.PM_PRJ_ID\n" +
                 " left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID and pp.POST_INFO_ID='1633731474912055296'\n" +
                 " left join ad_user au on pp.AD_USER_ID = au.id \n" +
-                " where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ");
+                " where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and (pj.PROJECT_STATUS <> '1661568714048413696' or pj.PROJECT_STATUS is null) ");
         sb.append(" and pj.PROJECT_TYPE_ID ='").append(projectType).append("'");
         if (!StringUtils.isEmpty(projectName)) {
             sb.append(" and pj.name like '%").append(projectName).append("%'");
