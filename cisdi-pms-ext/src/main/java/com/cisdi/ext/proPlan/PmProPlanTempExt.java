@@ -327,9 +327,9 @@ public class PmProPlanTempExt {
             throw new BaseException("当前节点有子节点，不能删除！");
         }
         //删除的时候判断当前节点是不是别的节点的前置，如果是就删不掉，要去掉前置
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PRE_NODE_ID=?", map.get("nodeId"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PRE_NODE_ID=? and PM_PRO_PLAN_ID=(select PM_PRO_PLAN_ID from pm_pro_plan_node where id=?)", map.get("nodeId"),map.get("nodeId"));
         if (CollectionUtils.isEmpty(list)) {
-            myJdbcTemplate.update("delete from pm_pro_plan_node where id=?", map.get("nodeId"));
+            myJdbcTemplate.update("SET FOREIGN_KEY_CHECKS = 0;delete from pm_pro_plan_node where id=?;SET FOREIGN_KEY_CHECKS = 1;", map.get("nodeId"));
         } else {
             String nodeNames = list.stream().map(p -> JdbcMapUtil.getString(p, "NAME")).collect(Collectors.joining(","));
             String msg = "当前节点是节点【" + nodeNames + "】的前置节点，请取消前置，再删除！";
@@ -354,7 +354,7 @@ public class PmProPlanTempExt {
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         String level = JdbcMapUtil.getString(params, "level");
         String planId = JdbcMapUtil.getString(params, "planId");
-        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME where level = ? and status = 'AP' and id not in (select SCHEDULE_NAME from pm_pro_plan_node where PM_PRO_PLAN_ID = ? and SCHEDULE_NAME is not null) order by SEQ_NO", level,planId);
+        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME where level = ? and status = 'AP' and id not in (select SCHEDULE_NAME from (select SCHEDULE_NAME,OPREATION_TYPE from pm_pro_plan_node where PM_PRO_PLAN_ID = ? and SCHEDULE_NAME is not null) a where a.OPREATION_TYPE <> 'del') order by SEQ_NO", level,planId);
         List<ObjInfo> objInfoList = resultList.stream().map(p -> {
             ObjInfo objInfo = new ObjInfo();
             objInfo.id = JdbcMapUtil.getString(p, "ID");
@@ -422,7 +422,7 @@ public class PmProPlanTempExt {
     public void processNodeList() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from WF_NODE where WF_PROCESS_ID=? order by SEQ_NO", map.get("processId"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from WF_NODE where WF_PROCESS_ID=? and `status`='ap' order by SEQ_NO", map.get("processId"));
         List<ObjInfo> objInfoList = list.stream().map(p -> {
             ObjInfo objInfo = new ObjInfo();
             objInfo.id = JdbcMapUtil.getString(p, "ID");

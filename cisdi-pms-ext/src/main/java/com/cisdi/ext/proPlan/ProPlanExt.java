@@ -4,7 +4,6 @@ import com.cisdi.ext.pm.office.PmNodeAdjustReqExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.PrjPlanUtil;
-import com.cisdi.ext.util.ProPlanUtils;
 import com.cisdi.ext.weektask.WeekTaskExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -1122,13 +1121,18 @@ public class ProPlanExt {
         StringBuilder sb = new StringBuilder();
         sb.append("update pm_pro_plan_node set LAST_MODI_DT =NOW() ");
         if (operationType != null) {
-            sb.append(",OPREATION_TYPE=' ").append(operationType).append("'");
+            sb.append(",OPREATION_TYPE='").append(operationType).append("'");
         }
         if (Strings.isNotEmpty(input.name)) {
             sb.append(",`NAME` ='").append(input.name).append("'");
         }
         if (Strings.isNotEmpty(input.postId)) {
             sb.append(",POST_INFO_ID ='").append(input.postId).append("'");
+            //如果修改的是岗位，把花名册的人，同时也刷过去
+            String userId = getRosterUser(input.projectId, input.postId);
+            if(Objects.nonNull(userId)){
+                sb.append(",CHIEF_USER_ID ='").append(userId).append("'");
+            }
         }
         if (Strings.isNotEmpty(input.preNodeId)) {
             sb.append(",PRE_NODE_ID ='").append(input.preNodeId).append("'");
@@ -1172,11 +1176,32 @@ public class ProPlanExt {
         if (Strings.isEmpty(input.izMilestone)) {
             input.izMilestone = "0";
         }
+        if (Strings.isNotEmpty(input.attData)) {
+            sb.append(",ATT_DATA = '").append(input.attData).append("'");
+        }
         sb.append(",IZ_MILESTONE =").append(input.izMilestone);
         sb.append(" where id='").append(input.id).append("'");
         myJdbcTemplate.update(sb.toString());
         //刷新时间
         PrjPlanUtil.updatePreNodeTime(input.id, input.projectId);
+    }
+
+    /**
+     * 获取花名册人员
+     *
+     * @param projectId
+     * @param postId
+     * @return
+     */
+    private String getRosterUser(String projectId, String postId) {
+        String userId = null;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_ROSTER where PM_PRJ_ID=? and POST_INFO_ID=?", projectId, postId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> dataMap = list.get(0);
+            userId = JdbcMapUtil.getString(dataMap, "AD_USER_ID");
+        }
+        return userId;
     }
 
 
@@ -1206,16 +1231,15 @@ public class ProPlanExt {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String nodeId = JdbcMapUtil.getString(inputMap, "nodeId");
-//        List<Map<String, Object>> progressStatusList =
-//                myJdbcTemplate.queryForList("select v.name from pm_pro_plan_node n left join gr_set_value v on v.id = n.PROGRESS_STATUS_ID");
-//        String statusName = JdbcMapUtil.getString(progressStatusList.get(0), "name");
-//        List<Map<String, Object>> childIdList = myJdbcTemplate.queryForList("select id childId from pm_pro_plan_node n where PM_PRO_PLAN_NODE_PID = ?", nodeId);
-//        if (CollectionUtils.isEmpty(childIdList) && Strings.isNotEmpty(statusName) && statusName.equals("未启动")) {
-//            myJdbcTemplate.update("delete from pm_pro_plan_node where id = ?", nodeId);
-//        } else {
-//            throw new BaseException("不能删除该节点！");
-//        }
-        myJdbcTemplate.update("update pm_pro_plan_node set OPREATION_TYPE='del' where id=?", nodeId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", nodeId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> dataMap = list.get(0);
+            if ("add".equals(JdbcMapUtil.getString(dataMap, "OPREATION_TYPE"))) {
+                myJdbcTemplate.update("delete from pm_pro_plan_node where id=?", nodeId);
+            } else {
+                myJdbcTemplate.update("update pm_pro_plan_node set OPREATION_TYPE='del' where id=?", nodeId);
+            }
+        }
     }
 
 
@@ -1284,6 +1308,8 @@ public class ProPlanExt {
         public String planStartDay;
 
         public String projectId;
+
+        public String attData;
     }
 
 
@@ -1302,7 +1328,7 @@ public class ProPlanExt {
                     "left join WF_PROCESS wp on pppn.LINKED_WF_PROCESS_ID = wp.id  " +
                     "left join pm_pro_plan ppp on ppp.id = pppn.PM_PRO_PLAN_ID " +
                     "left join gr_set_value v on v.id = pppn.PROGRESS_STATUS_ID " +
-                    "where pppn.OPREATION_TYPE is null and  ppp.pm_prj_id = ?", map.get("prjId"));
+                    "where (pppn.OPREATION_TYPE <> 'add' or pppn.OPREATION_TYPE is null) and  ppp.pm_prj_id = ?", map.get("prjId"));
             List<PlanNode> nodeList = list.stream().map(p -> {
                 PlanNode node = new PlanNode();
                 node.id = JdbcMapUtil.getString(p, "ID");
@@ -1334,6 +1360,7 @@ public class ProPlanExt {
                     node.atts = Arrays.asList(att.split(","));
                 }
                 node.izDisplay = JdbcMapUtil.getString(p, "IZ_DISPLAY");
+                node.attData = JdbcMapUtil.getString(p, "ATT_DATA");
                 return node;
             }).collect(Collectors.toList());
 
@@ -1406,6 +1433,7 @@ public class ProPlanExt {
                 }
                 node.izDisplay = JdbcMapUtil.getString(p, "IZ_DISPLAY");
                 node.oprType = JdbcMapUtil.getString(p, "OPREATION_TYPE");
+                node.attData = JdbcMapUtil.getString(p, "ATT_DATA");
                 return node;
             }).collect(Collectors.toList());
 
@@ -1517,6 +1545,8 @@ public class ProPlanExt {
         public String izDisplay;
 
         public String oprType;
+
+        public String attData;
     }
 
 
