@@ -1,5 +1,8 @@
 package com.cisdi.pms.job.domain;
 
+import java.util.List;
+import java.util.Map;
+
 public class PoOrderReq {
     // id
     public String id;
@@ -19,6 +22,8 @@ public class PoOrderReq {
     public String processInstanceId;
     //创建人
     public String createBy;
+    //更新字段及对应文件
+    public List<Map<String,String>> colMap;
 
     public String getId() {
         return id;
@@ -90,5 +95,13 @@ public class PoOrderReq {
 
     public void setCreateBy(String createBy) {
         this.createBy = createBy;
+    }
+
+    public List<Map<String, String>> getColMap() {
+        return colMap;
+    }
+
+    public void setColMap(List<Map<String, String>> colMap) {
+        this.colMap = colMap;
     }
 }

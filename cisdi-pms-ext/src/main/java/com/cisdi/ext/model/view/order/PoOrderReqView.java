@@ -2,6 +2,9 @@ package com.cisdi.ext.model.view.order;
 
 import com.cisdi.ext.model.BasePageEntity;
 
+import java.util.List;
+import java.util.Map;
+
 public class PoOrderReqView extends BasePageEntity {
     // id
     public String id;
@@ -23,6 +26,8 @@ public class PoOrderReqView extends BasePageEntity {
     public String tableCode;
     //字段名
     public String colsCode;
+    //更新字段及对应文件
+    public List<Map<String,String>> colMap;
 
     public String getId() {
         return id;
@@ -102,5 +107,13 @@ public class PoOrderReqView extends BasePageEntity {
 
     public void setColsCode(String colsCode) {
         this.colsCode = colsCode;
+    }
+
+    public List<Map<String, String>> getColMap() {
+        return colMap;
+    }
+
+    public void setColMap(List<Map<String, String>> colMap) {
+        this.colMap = colMap;
     }
 }

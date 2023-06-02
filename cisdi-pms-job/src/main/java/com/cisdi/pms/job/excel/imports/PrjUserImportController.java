@@ -3,7 +3,7 @@ package com.cisdi.pms.job.excel.imports;
 import cn.hutool.core.util.IdUtil;
 import com.cisdi.pms.job.excel.model.BasePrjPartyUser;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
-import com.cisdi.pms.job.utils.StringUtils;
+import com.cisdi.pms.job.utils.StringUtil;
 import com.cisdi.pms.job.utils.Util;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -145,7 +145,7 @@ public class PrjUserImportController {
 //                }
                 StringBuilder sb = new StringBuilder();
                 if (!SharedUtil.isEmptyString(users)){
-                    users = StringUtils.replaceCode(users,",");
+                    users = StringUtil.replaceCode(users,",");
                     String[] userArr = users.split(",");
                     //查询人员信息
                     String sql2 = "select USER_IDS from pm_dept where status = 'ap' and PM_PRJ_ID = ? ";
@@ -322,7 +322,7 @@ public class PrjUserImportController {
 
                 String buildUser1 = EasyExcelUtil.getCellValueAsString(row.getCell(7));
                 StringBuffer userSB = new StringBuffer();
-                List<String> user = StringUtils.splitByCode(buildUser1,",");
+                List<String> user = StringUtil.splitByCode(buildUser1,",");
                 for (String s : user) {
                     int num2 = 0;
                     for (Map<String, Object> tmp : userList) {
@@ -351,7 +351,7 @@ public class PrjUserImportController {
                 //监理单位联系人
                 String buildUser2 = EasyExcelUtil.getCellValueAsString(row.getCell(10));
                 StringBuffer userSB2 = new StringBuffer();
-                List<String> user2 = StringUtils.splitByCode(buildUser2,",");
+                List<String> user2 = StringUtil.splitByCode(buildUser2,",");
                 for (String s : user2) {
                     int num3 = 0;
                     for (Map<String, Object> tmp : userList) {

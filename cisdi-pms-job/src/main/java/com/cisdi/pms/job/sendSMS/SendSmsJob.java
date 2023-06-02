@@ -3,6 +3,7 @@ package com.cisdi.pms.job.sendSMS;
 import com.cisdi.pms.job.domain.RemindLog;
 import com.cisdi.pms.job.utils.SendSmsParamsUtils;
 import com.cisdi.pms.job.utils.SendSmsUtils;
+import com.cisdi.pms.job.utils.StringUtil;
 import com.qygly.ext.rest.helper.feign.client.DataFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -197,7 +198,7 @@ public class SendSmsJob {
                     ArrayList<String> param = new ArrayList<>();
                     String phone = Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "13696079131";
                     //手机号是否合法
-                    if (com.cisdi.pms.job.utils.StringUtils.isChinaPhoneLegal(phone)){
+                    if (StringUtil.isChinaPhoneLegal(phone)){
                         param.add(phone);
                         param.add(remindLog.getCount());
 
