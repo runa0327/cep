@@ -1,7 +1,10 @@
 package com.cisdi.ext.pm;
 
 import com.alibaba.fastjson.JSONObject;
-import com.cisdi.ext.model.*;
+import com.cisdi.ext.model.MaterialInventoryType;
+import com.cisdi.ext.model.PrjInventory;
+import com.cisdi.ext.model.PrjInventoryDetail;
+import com.cisdi.ext.model.WfProcessInstance;
 import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
@@ -305,6 +308,11 @@ public class PrjMaterialInventory {
                 .map(m -> {
                     InventoryDtl inventoryDtl = JSONObject.parseObject(JSONObject.toJSONString(m), InventoryDtl.class);
                     inventoryDtl.uploadTime = StringUtil.withOutT(inventoryDtl.uploadTime);
+                    List<PrjInventoryDetail> dtls = PrjInventoryDetail.selectByWhere(new Where().eq("PRJ_INVENTORY_ID", inventoryDtl.inventoryId));
+                    if (!CollectionUtils.isEmpty(dtls)){
+                        String fileIdStr = dtls.stream().map(dtl -> dtl.getFlFileId()).collect(Collectors.joining(","));
+                        inventoryDtl.fileId = fileIdStr;
+                    }
                     return inventoryDtl;
                 })
                 .collect(Collectors.toList());
