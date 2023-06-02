@@ -1130,7 +1130,9 @@ public class ProPlanExt {
             sb.append(",POST_INFO_ID ='").append(input.postId).append("'");
             //如果修改的是岗位，把花名册的人，同时也刷过去
             String userId = getRosterUser(input.projectId, input.postId);
-            sb.append(",CHIEF_USER_ID ='").append(userId).append("'");
+            if(Objects.nonNull(userId)){
+                sb.append(",CHIEF_USER_ID ='").append(userId).append("'");
+            }
         }
         if (Strings.isNotEmpty(input.preNodeId)) {
             sb.append(",PRE_NODE_ID ='").append(input.preNodeId).append("'");
