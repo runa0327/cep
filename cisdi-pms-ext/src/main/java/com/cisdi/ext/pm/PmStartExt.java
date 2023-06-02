@@ -760,20 +760,20 @@ public class PmStartExt {
             });
             myJdbcTemplate.update(sb.toString());
         }
-        // 刷新父节点时间
-        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pn.*,ifnull(PM_PRO_PLAN_NODE_PID,0) as pid from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where PM_PRJ_ID=?", projectId);
-        nodeList.stream().filter(p -> Objects.equals("0", p.get("pid"))).peek(m -> {
-            List<Map<String, Object>> sonList = getChildrenNode(m, nodeList);
-            if (!CollectionUtils.isEmpty(sonList)) {
-                Map<String, Object> topDate = sonList.get(0);
-                String start = JdbcMapUtil.getString(topDate,"PLAN_START_DATE");
-                if (!SharedUtil.isEmptyString(start)){
-                    String end = topDate.get("PLAN_COMPL_DATE").toString();
-                    int cha = getDateCha(end,start);
-                    myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
-                }
-            }
-        }).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
+        // 刷新父节点时间 2023-06-01注释，暂不删除代码
+//        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pn.*,ifnull(PM_PRO_PLAN_NODE_PID,0) as pid from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where PM_PRJ_ID=?", projectId);
+//        nodeList.stream().filter(p -> Objects.equals("0", p.get("pid"))).peek(m -> {
+//            List<Map<String, Object>> sonList = getChildrenNode(m, nodeList);
+//            if (!CollectionUtils.isEmpty(sonList)) {
+//                Map<String, Object> topDate = sonList.get(0);
+//                String start = JdbcMapUtil.getString(topDate,"PLAN_START_DATE");
+//                if (!SharedUtil.isEmptyString(start)){
+//                    String end = topDate.get("PLAN_COMPL_DATE").toString();
+//                    int cha = getDateCha(end,start);
+//                    myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
+//                }
+//            }
+//        }).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
     }
 
     public static int getDateCha(String end, String start) {
@@ -785,4 +785,5 @@ public class PmStartExt {
         }
         return cha;
     }
+
 }

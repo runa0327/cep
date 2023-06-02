@@ -1609,6 +1609,21 @@ public class WfExt {
         list.add("PM_BRIDGE_SUBSTRUCTURE_REQ"); //桥梁下部结构
         list.add("PM_BRIDGE_SUPERSTRUCTURE_DECK_REQ"); //桥梁上部结构与桥面系工程
         list.add("PM_GREEN_REQ"); //绿化工程
+        list.add("PM_POWER_REQ"); //电力工程
+        list.add("PM_COMPLETED_CHECK_REQ"); //竣工初验
+        list.add("PM_QUALITY_COMPLETED_CHECK_REQ"); //质监竣工验收
+        list.add("PM_COMPLETED_RECORD_REQ"); //工程竣工备案
+        list.add("PM_PLAN_CHECK_REQ"); //规划验收
+        list.add("PM_FUNCTIONAL_OPENING_REQ"); //功能性通车
+        list.add("PM_COMMUNICATION_ENGINEERING_REQ"); //通信工程
+        list.add("PM_SIDEWALK_BUILD_REQ"); //人行道施工
+        list.add("PM_TRAFFIC_REQ"); //交通工程
+        list.add("PM_LIGHTING_REQ"); //照明工程
+        list.add("PM_FEEDWATER_REQ"); //给水工程
+        list.add("PM_RECLAIMED_WATER_REQ"); //中水工程
+        list.add("PM_SUBGRADE_REQ"); //路基工程
+        list.add("PM_CLEAR_FORM_REQ"); //清表完成
+        list.add("PM_TRIPLET_FLAT_REQ"); //三通一平、临水、临电完成
         return list;
     }
 
