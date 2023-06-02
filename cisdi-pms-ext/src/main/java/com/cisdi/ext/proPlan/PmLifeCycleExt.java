@@ -117,7 +117,6 @@ public class PmLifeCycleExt {
 
         headerList.add(0, "ID");
         headerList.add(1, "项目名称");
-//        headerList.add(2, "前期手续经办人");
         headerList.add(2, "备注说明");
 
         //数据
@@ -153,12 +152,6 @@ public class PmLifeCycleExt {
                     json.put("remarkCount", 0);
                     newData.put("ID", json);
                 }
-//                else if ("前期手续经办人".equals(s)) {
-//                    JSONObject json = new JSONObject();
-//                    json.put("nameOrg", stringObjectMap.get("qquser"));
-//                    json.put("remarkCount", 0);
-//                    newData.put("前期手续经办人", json);
-//                }
                 else if ("备注说明".equals(s)) {
                     JSONObject json = new JSONObject();
                     List<String> contentList = new ArrayList<>();
@@ -185,7 +178,6 @@ public class PmLifeCycleExt {
                             String dateOrg = "";
                             String statusOrg = "";
                             String tips = null;
-                            String postInfo = "";
                             if ("已完成".equals(status)) {
                                 nameOrg = "实际完成";
                                 if (Objects.nonNull(dataMap.get("ACTUAL_COMPL_DATE"))) {
@@ -195,10 +187,10 @@ public class PmLifeCycleExt {
                                     Date plan = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
                                     Date actual = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE"));
                                     int days = DateTimeUtil.daysBetween(plan, actual);
-                                    if (days > 0) {
-                                        tips = "提前" + days + "完成！";
-                                    } else if (days < 0) {
+                                    if (plan.before(actual)) {
                                         tips = "超期" + Math.abs(days) + "天";
+                                    } else {
+                                        tips = "提前" + days + "完成！";
                                     }
                                 }
                                 statusOrg = "已完成";
@@ -206,22 +198,39 @@ public class PmLifeCycleExt {
                                 nameOrg = "未涉及";
                                 tips = "项目未涉及" + JdbcMapUtil.getString(dataMap, "NAME");
                                 statusOrg = "未涉及";
-                            } else {
+                            } else if ("进行中".equals(status)) {
+                                statusOrg = "进行中";
                                 if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
                                     Date planCompDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
                                     if (planCompDate.before(new Date())) {
-                                        statusOrg = "已超期";
-                                        if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                            Date plan = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
-                                            int days = DateTimeUtil.daysBetween(plan, new Date());
-                                            tips = "超期" + Math.abs(days) + "天";
-                                        }
-                                    } else {
-                                        if ("进行中".equals(status)) {
-                                            statusOrg = "进行中";
-                                        } else if ("未启动".equals(status)) {
-                                            statusOrg = "未启动";
-                                        }
+                                        int days = DateTimeUtil.daysBetween(planCompDate, new Date());
+                                        tips = "超期" + Math.abs(days) + "天";
+                                    }
+                                    nameOrg = "计划完成";
+                                    if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
+                                        dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
+                                    }
+                                }
+                            } else if ("未启动".equals(status)) {
+                                statusOrg = "未启动";
+                                if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
+                                    Date planCompDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                                    if (planCompDate.before(new Date())) {
+                                        int days = DateTimeUtil.daysBetween(planCompDate, new Date());
+                                        tips = "超期" + Math.abs(days) + "天";
+                                    }
+                                    nameOrg = "计划完成";
+                                    if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
+                                        dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
+                                    }
+                                }
+                            }else if("已超期".equals(status)){
+                                statusOrg = "已超期";
+                                if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
+                                    Date planCompDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                                    if (planCompDate.before(new Date())) {
+                                        int days = DateTimeUtil.daysBetween(planCompDate, new Date());
+                                        tips = "超期" + Math.abs(days) + "天";
                                     }
                                     nameOrg = "计划完成";
                                     if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
@@ -237,7 +246,7 @@ public class PmLifeCycleExt {
                             int count = getRemarkCount(JdbcMapUtil.getString(stringObjectMap, "ID"), JdbcMapUtil.getString(dataMap, "SCHEDULE_NAME"));
                             json.put("remarkCount", count);
                             json.put("postInfo", JdbcMapUtil.getString(dataMap, "postName") + ":" + (JdbcMapUtil.getString(dataMap, "userName") == null ? "" : JdbcMapUtil.getString(dataMap, "userName")));
-                            json.put("nodeId",JdbcMapUtil.getString(stringObjectMap, "ID"));
+                            json.put("nodeId", JdbcMapUtil.getString(dataMap, "ID"));
                         }
                         newData.put(s, json);
                     } else {
