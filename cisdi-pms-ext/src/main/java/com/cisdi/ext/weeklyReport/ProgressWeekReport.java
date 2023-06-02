@@ -487,7 +487,7 @@ public class ProgressWeekReport {
             sb.append(" and b.IZ_END = '").append(weatherCompleted).append("' "); //是否竣工
         }
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(String.valueOf(sb));
-        sb.append(" order by a.ts desc,b.IZ_END asc,b.SYS_TRUE desc,b.PM_PRJ_ID desc ").append(limit);
+        sb.append(" order by b.IZ_END asc,b.SYS_TRUE desc,a.ts desc,b.PM_PRJ_ID desc ").append(limit);
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString());
         Map<String,Object> map = new HashMap<>();
         if (!CollectionUtils.isEmpty(list1)){
