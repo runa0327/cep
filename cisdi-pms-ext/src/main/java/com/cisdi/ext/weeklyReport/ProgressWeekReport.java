@@ -727,10 +727,10 @@ public class ProgressWeekReport {
                 if (!CollectionUtils.isEmpty(prjDetail)){
                     String id = prjDetail.get(0).getId();
                     String projectId = prjDetail.get(0).getPmPrjId();
-                    String progress = String.valueOf(prjDetail.get(0).getVisualProgress());
+                    BigDecimal progress = prjDetail.get(0).getVisualProgress();
                     String jinZhan = prjDetail.get(0).getProcessRemarkText();
                     String describle = prjDetail.get(0).getVisualProgressDescribe();
-                    if (SharedUtil.isEmptyString(progress) && SharedUtil.isEmptyString(jinZhan) && SharedUtil.isEmptyString(describle)){
+                    if (progress == null && SharedUtil.isEmptyString(jinZhan) && SharedUtil.isEmptyString(describle)){
                         //查询上上周的内容
                         List<PmProgressWeeklyPrjDetail> list2 = PmProgressWeeklyPrjDetail.selectByWhere(new Where()
                                 .eq(PmProgressWeeklyPrjDetail.Cols.PM_PROGRESS_WEEKLY_ID,lastWeekId)
