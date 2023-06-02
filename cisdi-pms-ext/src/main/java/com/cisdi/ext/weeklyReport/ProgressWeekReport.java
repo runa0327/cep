@@ -1,6 +1,7 @@
 package com.cisdi.ext.weeklyReport;
 
 import com.cisdi.ext.file.BaseFileExt;
+import com.cisdi.ext.model.PmProgressWeekly;
 import com.cisdi.ext.model.PmProgressWeeklyPrj;
 import com.cisdi.ext.model.PmProgressWeeklyPrjDetail;
 import com.cisdi.ext.model.view.project.PmPrjView;
@@ -695,6 +696,55 @@ public class ProgressWeekReport {
             returnMap.put("result",weekMessage);
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(returnMap), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    /**
+     * 形象进度周报-将上周内容同步致本周
+     */
+    public void lastWeekToWeek(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //查询本周信息
+        Map<String,Object> weekMap = DateTimeUtil.getDateTwoWeekMap(new Date());
+        String startDate = JdbcMapUtil.getString(weekMap,"startDate");
+        String endDate = JdbcMapUtil.getString(weekMap,"endDate");
+        //获取本周id
+        List<PmProgressWeekly> weekList = PmProgressWeekly.selectByWhere(new Where()
+                .eq(PmProgressWeekly.Cols.TO_DATE,endDate).eq(PmProgressWeekly.Cols.FROM_DATE,startDate));
+        String weekId = weekList.get(0).getId();
+        //获取上上周weekId
+        String sql1 = "select id from pm_progress_weekly where id != ? order by FROM_DATE desc limit 1,1";
+        String lastWeekId = JdbcMapUtil.getString(myJdbcTemplate.queryForMap(sql1,weekId),"id");
+        //查询本周项目信息
+        List<PmProgressWeeklyPrj> weeklyPrjList = PmProgressWeeklyPrj.selectByWhere(new Where()
+                .eq(PmProgressWeeklyPrj.Cols.PM_PROGRESS_WEEKLY_ID,weekId));
+        if (!CollectionUtils.isEmpty(weeklyPrjList)){
+            for (PmProgressWeeklyPrj tmp : weeklyPrjList) {
+                String weekPrjId = tmp.getId();
+                //查询本周项目明细
+                List<PmProgressWeeklyPrjDetail> prjDetail = PmProgressWeeklyPrjDetail.selectByWhere(new Where()
+                        .eq(PmProgressWeeklyPrjDetail.Cols.PM_PROGRESS_WEEKLY_PRJ_ID,weekPrjId));
+                if (!CollectionUtils.isEmpty(prjDetail)){
+                    String id = prjDetail.get(0).getId();
+                    String projectId = prjDetail.get(0).getPmPrjId();
+                    String progress = String.valueOf(prjDetail.get(0).getVisualProgress());
+                    String jinZhan = prjDetail.get(0).getProcessRemarkText();
+                    String describle = prjDetail.get(0).getVisualProgressDescribe();
+                    if (SharedUtil.isEmptyString(progress) && SharedUtil.isEmptyString(jinZhan) && SharedUtil.isEmptyString(describle)){
+                        //查询上上周的内容
+                        List<PmProgressWeeklyPrjDetail> list2 = PmProgressWeeklyPrjDetail.selectByWhere(new Where()
+                                .eq(PmProgressWeeklyPrjDetail.Cols.PM_PROGRESS_WEEKLY_ID,lastWeekId)
+                                .eq(PmProgressWeeklyPrjDetail.Cols.PM_PRJ_ID,projectId));
+                        if (!CollectionUtils.isEmpty(list2)){
+                            Crud.from(PmProgressWeeklyPrjDetail.ENT_CODE).where().eq("ID",id).update()
+                                    .set(PmProgressWeeklyPrjDetail.Cols.VISUAL_PROGRESS,list2.get(0).getVisualProgress())
+                                    .set(PmProgressWeeklyPrjDetail.Cols.PROCESS_REMARK_TEXT,list2.get(0).getProcessRemarkText())
+                                    .set(PmProgressWeeklyPrjDetail.Cols.VISUAL_PROGRESS_DESCRIBE,list2.get(0).getVisualProgressDescribe())
+                                    .exec();
+                        }
+                    }
+                }
+            }
         }
     }
 }
