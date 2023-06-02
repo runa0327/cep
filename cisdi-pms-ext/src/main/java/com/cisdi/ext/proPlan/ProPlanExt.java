@@ -1128,6 +1128,9 @@ public class ProPlanExt {
         }
         if (Strings.isNotEmpty(input.postId)) {
             sb.append(",POST_INFO_ID ='").append(input.postId).append("'");
+            //如果修改的是岗位，把花名册的人，同时也刷过去
+            String userId = getRosterUser(input.projectId, input.postId);
+            sb.append(",CHIEF_USER_ID ='").append(userId).append("'");
         }
         if (Strings.isNotEmpty(input.preNodeId)) {
             sb.append(",PRE_NODE_ID ='").append(input.preNodeId).append("'");
@@ -1179,6 +1182,24 @@ public class ProPlanExt {
         myJdbcTemplate.update(sb.toString());
         //刷新时间
         PrjPlanUtil.updatePreNodeTime(input.id, input.projectId);
+    }
+
+    /**
+     * 获取花名册人员
+     *
+     * @param projectId
+     * @param postId
+     * @return
+     */
+    private String getRosterUser(String projectId, String postId) {
+        String userId = null;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_ROSTER where PM_PRJ_ID=? and POST_INFO_ID=?", projectId, postId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> dataMap = list.get(0);
+            userId = JdbcMapUtil.getString(dataMap, "AD_USER_ID");
+        }
+        return userId;
     }
 
 
