@@ -51,6 +51,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
             for (Map<String, String> tp : list) {
                 String file = tp.get("file").toString();
                 if (StringUtils.hasText(file)){
+                    poOrderReq.setFileId(file);
                     String colCode = tp.get("code").toString();
                     poOrderReq.setColsCode(colCode);
                     String fileId = StringUtil.replaceCode(file,",","','");
