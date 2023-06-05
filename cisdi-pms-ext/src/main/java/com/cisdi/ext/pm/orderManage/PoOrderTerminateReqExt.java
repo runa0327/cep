@@ -405,7 +405,7 @@ public class PoOrderTerminateReqExt {
     /**
      * 历史数据处理
      */
-    public void supplementHistoryData(){
+    public void terminateHistoryData(){
 
         // 非系统项目转系统项目
         List<PoOrderTerminateReq> list1 = PoOrderTerminateReq.selectByWhere(new Where()
