@@ -2,8 +2,6 @@ package com.cisdi.ext.pm;
 
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.cisdi.ext.model.base.PmPrj;
-import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
@@ -22,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * 二类费统计
  * @author dlt
  * @date 2023/5/29 周一
  */
@@ -69,7 +68,7 @@ public class SecondFeeStatisticExt {
                 "left join (select dd.SECOND_CATEGORY_FEE_DEMAND_ID,max(SEQ_NO) maxSeqNo from fee_demand_dtl dd \n" +
                 "\t\t\t\t\t\tleft join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
                 "\t\t\t\t\t\twhere dd.SUBMIT_TIME is not null\n" +
-                "\t\t\t\t\t\tand DATE_FORMAT(dd.SUBMIT_TIME,'%Y-%m') = DATE_FORMAT(SUBDATE(NOW(),INTERVAL 1 month),'%Y-%m')\n" +
+                "\t\t\t\t\t\tand DATE_FORMAT(dd.SUBMIT_TIME,'%Y-%m') <= DATE_FORMAT(SUBDATE(NOW(),INTERVAL 1 month),'%Y-%m')\n" +
                 "\t\t\t\t\t\tgroup by dd.SECOND_CATEGORY_FEE_DEMAND_ID\n" +
                 "\t\t\t\t\t) dtemp on dtemp.SECOND_CATEGORY_FEE_DEMAND_ID = fd.id and dtemp.maxSeqNo = va.SEQ_NO\n" +
                 "where dtemp.SECOND_CATEGORY_FEE_DEMAND_ID is not null \n" +
@@ -84,7 +83,7 @@ public class SecondFeeStatisticExt {
                 "left join (select dd.SECOND_CATEGORY_FEE_DEMAND_ID,max(SEQ_NO) maxSeqNo from fee_demand_dtl dd \n" +
                 "\t\t\t\t\t\tleft join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
                 "\t\t\t\t\t\twhere dd.SUBMIT_TIME is not null\n" +
-                "\t\t\t\t\t\tand DATE_FORMAT(dd.SUBMIT_TIME,'%Y-%m') = DATE_FORMAT(SUBDATE(NOW(),INTERVAL 2 month),'%Y-%m')\n" +
+                "\t\t\t\t\t\tand DATE_FORMAT(dd.SUBMIT_TIME,'%Y-%m') <= DATE_FORMAT(SUBDATE(NOW(),INTERVAL 2 month),'%Y-%m')\n" +
                 "\t\t\t\t\t\tgroup by dd.SECOND_CATEGORY_FEE_DEMAND_ID\n" +
                 "\t\t\t\t\t) dtemp on dtemp.SECOND_CATEGORY_FEE_DEMAND_ID = fd.id and dtemp.maxSeqNo = va.SEQ_NO\n" +
                 "where dtemp.SECOND_CATEGORY_FEE_DEMAND_ID is not null \n" +
@@ -99,7 +98,7 @@ public class SecondFeeStatisticExt {
                 "left join (select dd.SECOND_CATEGORY_FEE_DEMAND_ID,max(SEQ_NO) maxSeqNo from fee_demand_dtl dd \n" +
                 "\t\t\t\t\t\tleft join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
                 "\t\t\t\t\t\twhere dd.SUBMIT_TIME is not null\n" +
-                "\t\t\t\t\t\tand DATE_FORMAT(dd.SUBMIT_TIME,'%Y-%m') = DATE_FORMAT(NOW(),'%Y-%m')\n" +
+                "\t\t\t\t\t\tand DATE_FORMAT(dd.SUBMIT_TIME,'%Y-%m') <= DATE_FORMAT(NOW(),'%Y-%m')\n" +
                 "\t\t\t\t\t\tgroup by dd.SECOND_CATEGORY_FEE_DEMAND_ID\n" +
                 "\t\t\t\t\t) dtemp on dtemp.SECOND_CATEGORY_FEE_DEMAND_ID = fd.id and dtemp.maxSeqNo = va.SEQ_NO\n" +
                 "where dtemp.SECOND_CATEGORY_FEE_DEMAND_ID is not null \n" +
@@ -244,13 +243,17 @@ public class SecondFeeStatisticExt {
         ExtJarHelper.returnValue.set(output);
     }
 
+    /**
+     * 部门维度月度统计
+     */
     public void deptStatistic(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Date now = new Date();
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
-        String year = JdbcMapUtil.getString(input, "year") == null ? String.valueOf(DateUtil.year(now)) : JdbcMapUtil.getString(input, "year");
+        int year = JdbcMapUtil.getInt(input, "year") == null ? Integer.valueOf(DateUtil.year(now)) : JdbcMapUtil.getInt(input, "year");
         SimpleDateFormat monthDf = new SimpleDateFormat("MM");
-        int month = Integer.parseInt(monthDf.format(now));
+        //今年的月份取现在之前，往年的月月份取12
+        int month = year == Integer.valueOf(DateUtil.year(now)) ? Integer.parseInt(monthDf.format(now)) : 12;
 
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append("select fd.PM_PRJ_ID prjId,pp.name prjName,fd.PO_ORDER_REQ_ID contractId,oo.CONTRACT_NAME contractName,d.id deptId,d.name " +
@@ -264,50 +267,100 @@ public class SecondFeeStatisticExt {
                 "\t\t\t\t\t\tleft join hr_dept d on d.id = du.HR_DEPT_ID group by u.id) u on u.id = dd.LAST_MODI_USER_ID\n" +
                 "left join hr_dept d on d.id = u.deptId");
 
-        sqlSb.append(" where YEAR(dd.SUBMIT_TIME) = ?");
+        sqlSb.append(" where YEAR(dd.SUBMIT_TIME) <= ?");
         //原始数据
         List<Map<String, Object>> originList = myJdbcTemplate.queryForList(sqlSb.toString(),year);
         //所有相关的部门
         Map<String, String> deptMap = originList.stream().collect(Collectors.toMap(map -> map.get("deptId").toString(), map -> map.get("deptName").toString(),(ov,nv) -> nv));
 
         List<Map<String, Object>> sheetList = new ArrayList<>();
+        List<DeptAmt> deptSumList = new ArrayList<>();
 
         for (String deptId : deptMap.keySet()) {
             Map<String, Object> rowCells = new HashMap<>();//一行的单元格
+            Map<Integer, BigDecimal> tempRowCells = new HashMap<>();//临时一行单元格，存储每月之前的数据总和，方便相减求当月
             rowCells.put("需求部门",deptMap.get(deptId));
             rowCells.put("deptId",deptId);
+            DeptAmt deptAmt = new DeptAmt();//同时统计部门汇总数据
+            deptAmt.deptId = deptId;
+            deptAmt.deptName = deptMap.get(deptId);
+            //该部门相关的数据
             List<Map<String, Object>> deptData = originList.stream().filter(map -> map.get("deptId").toString().equals(deptId)).collect(Collectors.toList());
-            //这里可以筛选出和该部门相关的数据
+            //去年12月的
+            BigDecimal lastDecSumAmt = this.getSumAmt(year - 1, deptData, 12);
+            tempRowCells.put(0, lastDecSumAmt);
             for (int m = 1; m <= month; m++) {
                 //筛选出该月相关的
-                final int i = m;
-                List<Map<String, Object>> monthData = deptData.stream()
-                        .filter(map -> JdbcMapUtil.getString(map,"submitTime") != null && i == Integer.parseInt(map.get("submitTime").toString().substring(5, 7)))
-                        .collect(Collectors.toList());
-                if (CollectionUtils.isEmpty(monthData)){//没有该月数据
-                    rowCells.put(m + "月",0);
-                    continue;
+                BigDecimal sumAmt = this.getSumAmt(year, deptData, m);
+                if (sumAmt.compareTo(BigDecimal.ZERO) == 0) {
+                    rowCells.put(m + "月",BigDecimal.ZERO);
+                    tempRowCells.put(m, BigDecimal.ZERO);
+                    continue;//没有数据，内部已赋0，下一个
                 }
-                //有该月数据，根据合同分组
-                Map<String, List<Map<String, Object>>> contractMap = monthData.stream().collect(Collectors.groupingBy(item -> item.get("contractId").toString()));
-                BigDecimal sumAmt = BigDecimal.ZERO;
-                for (String k : contractMap.keySet()) {
-                    List<Map<String, Object>> singleContractData = contractMap.get(k);//单个合同 对应的多条填报记录
-
-                    //单个合同对应的多个填报记录，经过月份、部门筛选后仍剩多个记录，过滤后取节点优先级最大的
-                    Map<String, Object> resultDtl = singleContractData.stream().max(Comparator.comparingDouble(dtl -> Double.parseDouble(dtl.get("seqNo").toString()))).get();
-                    sumAmt = sumAmt.add(new BigDecimal(resultDtl.get("requiredAmt").toString()));
-                }
-                rowCells.put(m + "月",sumAmt);
+                //有数据，减前一月汇总数据，记录该月汇总数据，汇总部门数据
+                tempRowCells.put(m, sumAmt);
+                BigDecimal thisMonthAmt = sumAmt.subtract(tempRowCells.get(m - 1));
+                rowCells.put(m + "月",thisMonthAmt);
+                deptAmt.sumAmt = deptAmt.sumAmt.add(thisMonthAmt);
             }
             sheetList.add(rowCells);
-            Map<String, Object> result = new HashMap<>();
-            result.put("sheetList",sheetList);
-            Map output = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
-            ExtJarHelper.returnValue.set(output);
+            deptSumList.add(deptAmt);
         }
+
+        //总数统计
+        Map<String, Object> sumMap = myJdbcTemplate.queryForMap("select \n" +
+                "IFNULL(SUM(IFNULL(oo.AMT_SIX,0)),0) contractRequiredTotalAmt\n" +
+                ",IFNULL(SUM(IFNULL(htemp.sumPayAmt,0)),0) sumPayAmt\n" +
+                ",IFNULL(SUM(IFNULL(htemp.sumPayAmt,0))/SUM(IFNULL(oo.AMT_SIX,0)),0) paidRatio\n" +
+                "from second_category_fee_demand fd\n" +
+                "left join po_order oo on oo.CONTRACT_APP_ID = fd.PO_ORDER_REQ_ID and oo.PM_PRJ_ID = fd.PM_PRJ_ID\n" +
+                "left join (select PO_ORDER_ID,sum(PAY_AMT) sumPayAmt from contract_pay_history ph group by PO_ORDER_ID) htemp on htemp.PO_ORDER_ID" +
+                " = oo.id\n" +
+                "where YEAR(fd.CRT_DT) = ?", year);
+        BigDecimal sumRequiredAmt = deptSumList.stream().map(deptAmt -> deptAmt.sumAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+        sumMap.put("sumRequiredAmt",sumRequiredAmt);
+
+
+        //封装返回
+        Map<String, Object> result = new HashMap<>();
+        result.put("sheetList",sheetList);
+        result.put("deptSumList",deptSumList);
+        result.put("sumMap",sumMap);
+        Map output = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
+        ExtJarHelper.returnValue.set(output);
     }
 
+    private BigDecimal getSumAmt(int year, List<Map<String, Object>> deptData, int m) {
+        final int i = m;
+        List<Map<String, Object>> monthData = deptData.stream()
+                .filter(map -> JdbcMapUtil.getString(map,"submitTime") != null
+                        //日期小于等于该月份的
+                        && JdbcMapUtil.getString(map,"submitTime").substring(0, 7).compareTo(year + "-" + String.format("%0" + 2 + "d",i)) < 1)
+                .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(monthData)){//没有该月数据
+            return BigDecimal.ZERO;
+        }
+        //有该月数据，根据合同分组
+        Map<String, List<Map<String, Object>>> contractMap = monthData.stream().collect(Collectors.groupingBy(item -> item.get("contractId").toString()));
+        BigDecimal sumAmt = BigDecimal.ZERO;
+        for (String k : contractMap.keySet()) {
+            List<Map<String, Object>> singleContractData = contractMap.get(k);//单个合同 对应的多条填报记录
+            //单个合同对应的多个填报记录，经过月份、部门筛选后仍剩多个记录，过滤后取节点优先级最大的
+            Map<String, Object> resultDtl = singleContractData.stream().max(Comparator.comparingDouble(dtl -> Double.parseDouble(dtl.get("seqNo").toString()))).get();
+            sumAmt = sumAmt.add(new BigDecimal(resultDtl.get("requiredAmt").toString()));
+        }
+        return sumAmt;
+    }
+
+    /**
+     * 部门需求总金额
+     */
+    @Data
+    private static class DeptAmt{
+        private String deptId;
+        private String deptName;
+        private BigDecimal sumAmt = BigDecimal.ZERO;
+    }
 
     /**
      * 项目维度统计请求
@@ -436,5 +489,15 @@ public class SecondFeeStatisticExt {
             this.submitTime = StringUtil.withOutT(this.submitTime);
             return submitTime;
         }
+    }
+
+    public static void main(String[] args) {
+//        System.out.println("2".compareTo("1"));
+//        System.out.println(String.format("%0" + 2 + "d",1));
+        HashMap<Integer, String> testMap = new HashMap<>();
+        testMap.put(0,"0");
+        testMap.put(1,"1");
+        System.out.println();
+
     }
 }
