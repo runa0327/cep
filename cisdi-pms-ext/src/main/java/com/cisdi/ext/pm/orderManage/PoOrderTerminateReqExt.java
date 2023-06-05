@@ -1,10 +1,16 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.orderManage;
 
+import com.cisdi.ext.base.PmPrjExt;
+import com.cisdi.ext.model.PoOrderTerminateReq;
+import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.ProcessRoleExt;
+import com.cisdi.ext.pm.orderManage.detail.PoOrderTerminateDetailExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -19,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 采购合同终止申请 扩展
+ * 合约管理-合同终止-扩展
  */
 
 @Slf4j
@@ -394,5 +400,53 @@ public class PoOrderTerminateReqExt {
         //更新到期日期字段
         Crud.from("PO_ORDER_TERMINATE_REQ").where().eq("id",entityRecord.csCommId).update().set("DATE_FIVE",expireDate).exec();
         //将合同数据写入传输至合同数据表(po_order)
+    }
+
+    /**
+     * 历史数据处理
+     */
+    public void supplementHistoryData(){
+
+        // 非系统项目转系统项目
+        List<PoOrderTerminateReq> list1 = PoOrderTerminateReq.selectByWhere(new Where()
+                .nin(PoOrderTerminateReq.Cols.STATUS,"VD","VDING")
+                .eq(PoOrderTerminateReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
+        if (!CollectionUtils.isEmpty(list1)){
+            for (PoOrderTerminateReq tmp : list1) {
+                String projectName = tmp.getProjectNameWr();
+                String projectId = PmPrjExt.createPrjByMoreName(projectName);
+                String id = tmp.getId();
+                Crud.from(PoOrderTerminateReq.ENT_CODE).where().eq(PoOrderTerminateReq.Cols.ID,id).update()
+                        .set(PoOrderTerminateReq.Cols.PM_PRJ_IDS,projectId)
+                        .exec();
+            }
+        }
+
+        //系统项目id写入pm_prj_ids
+        List<PoOrderTerminateReq> list2 = PoOrderTerminateReq.selectByWhere(new Where()
+                .nin(PoOrderTerminateReq.Cols.STATUS,"VD","VDING")
+                .neq(PoOrderTerminateReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
+        if (!CollectionUtils.isEmpty(list2)){
+            for (PoOrderTerminateReq tp : list2) {
+                String id = tp.getId();
+                String projectId = tp.getPmPrjId();
+                Crud.from(PoOrderTerminateReq.ENT_CODE).where().eq(PoOrderTerminateReq.Cols.ID,id).update()
+                        .set(PoOrderTerminateReq.Cols.PM_PRJ_IDS,projectId)
+                        .exec();
+            }
+        }
+
+        //已批准流程项目id写入明细表
+        List<PoOrderTerminateReq> list3 = PoOrderTerminateReq.selectByWhere(new Where().eq(PoOrderTerminateReq.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list3)){
+            for (PoOrderTerminateReq tmp : list3) {
+                String id = tmp.getId();
+                String projectId = tmp.getPmPrjIds();
+                if (SharedUtil.isEmptyString(projectId)){
+                    projectId = tmp.getPmPrjId();
+                }
+                PoOrderTerminateDetailExt.insertData(id,projectId);
+            }
+        }
     }
 }
