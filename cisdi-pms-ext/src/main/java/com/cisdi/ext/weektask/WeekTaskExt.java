@@ -237,7 +237,7 @@ public class WeekTaskExt {
                     attData.ATT_VALUE = JdbcMapUtil.getString(node, "ATT_DATA");
                     String txt = "";
                     List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from gr_set_value where id=?", JdbcMapUtil.getString(node, "ATT_DATA"));
-                    if (CollectionUtils.isEmpty(list1)) {
+                    if (!CollectionUtils.isEmpty(list1)) {
                         Map<String, Object> mapData = list1.get(0);
                         txt = JdbcMapUtil.getString(mapData, "NAME");
                     }
