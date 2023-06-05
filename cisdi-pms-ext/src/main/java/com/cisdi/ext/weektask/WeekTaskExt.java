@@ -233,7 +233,7 @@ public class WeekTaskExt {
                 List<AttData> attDataList = new ArrayList<>();
                 if (JdbcMapUtil.getString(node, "ATT_DATA") != null) {
                     AttData attData = new AttData();
-                    attData.AD_ATT_CODE = "BUY_MATTER_ID";
+                    attData.AD_ATT_CODE = "BUY_MATTER_TYPE_ID";
                     attData.ATT_VALUE = JdbcMapUtil.getString(node, "ATT_DATA");
                     String txt = "";
                     List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from gr_set_value where id=?", JdbcMapUtil.getString(node, "ATT_DATA"));
