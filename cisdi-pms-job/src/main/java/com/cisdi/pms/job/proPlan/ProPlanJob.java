@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +44,30 @@ public class ProPlanJob {
                 "where pl.IS_TEMPLATE <> '1' and (IZ_OVERDUE<>'1' or IZ_OVERDUE is null) and  pn.PLAN_COMPL_DATE< NOW() and pn.PROGRESS_STATUS_ID in ('0099799190825106800','0099799190825106801') and `level` = '3'");
         if (!CollectionUtils.isEmpty(list)) {
             List<String> ids = list.stream().map(p -> JdbcMapUtil.getString(p, "ID")).collect(Collectors.toList());
+            List<Map<String, Object>> result = new ArrayList<>();
+            list.forEach(item -> {
+                //获取父级
+                getPreNode(JdbcMapUtil.getString(item, "PM_PRO_PLAN_NODE_PID"), result);
+            });
+            if (!CollectionUtils.isEmpty(result)) {
+                List<String> idList = result.stream().map(p -> JdbcMapUtil.getString(p, "ID")).collect(Collectors.toList());
+                ids.addAll(idList);
+            }
             Map<String, Object> queryParams = new HashMap<>();// 创建入参map
             queryParams.put("ids", ids);
             namedParameterJdbcTemplate.update("update pm_pro_plan_node set IZ_OVERDUE='1' where id in (:ids)", queryParams);
+        }
+    }
+
+
+    private void getPreNode(String nodeId, List<Map<String, Object>> result) {
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", nodeId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> dataMap = list.get(0);
+            result.add(dataMap);
+            if (JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_NODE_PID") != null) {
+                getPreNode(JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_NODE_PID"), result);
+            }
         }
     }
 }
