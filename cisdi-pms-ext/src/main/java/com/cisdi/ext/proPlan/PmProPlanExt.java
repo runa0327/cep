@@ -527,6 +527,7 @@ public class PmProPlanExt {
             endDate = endDate.plusDays(day);
             Crud.from("PM_PRO_PLAN_NODE").where().eq("ID",proNodeId).update()
                     .set("PLAN_COMPL_DATE",endDate).set("PLAN_TOTAL_DAYS",oldDay+day)
+                    .set("IZ_OVERDUE",0)
                     .exec();
         }
     }
