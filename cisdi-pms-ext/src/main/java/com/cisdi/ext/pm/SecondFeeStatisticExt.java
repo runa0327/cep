@@ -307,6 +307,19 @@ public class SecondFeeStatisticExt {
             deptSumList.add(deptAmt);
         }
 
+        //合计
+        Map<String, Object> sumCells = new HashMap<>();//一行的单元格，合计
+        sumCells.put("需求部门","合计");
+        for (int i = 1; i <= month; i++) {
+            BigDecimal sumValue = BigDecimal.ZERO;
+            for (Map<String, Object> deptCells : sheetList) {
+                BigDecimal sheetValue = (BigDecimal) deptCells.get(i + "月");
+                sumValue = sumValue.add(sheetValue);
+            }
+            sumCells.put(i + "月",sumValue);
+        }
+        sheetList.add(sumCells);
+
         //总数统计
         Map<String, Object> sumMap = myJdbcTemplate.queryForMap("select \n" +
                 "IFNULL(SUM(IFNULL(oo.AMT_SIX,0)),0) contractRequiredTotalAmt\n" +
@@ -350,6 +363,85 @@ public class SecondFeeStatisticExt {
             sumAmt = sumAmt.add(new BigDecimal(resultDtl.get("requiredAmt").toString()));
         }
         return sumAmt;
+    }
+
+    /**
+     * 部门合同需求
+     */
+    public void getDeptContractDemand(){
+        Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
+        Map<String, Object> sqlParams = new HashMap<>(input);
+        DeptContractReq req = JSONObject.parseObject(JSONObject.toJSONString(input), DeptContractReq.class);
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+        StringBuffer sqlSb = new StringBuffer();
+        sqlSb.append("select pp.id prjId,pp.name prjName,oo.CONTRACT_NAME contractName,d.id deptId,d.name deptName,u.id operatorId,u.name operatorName,dd" +
+                ".SUBMIT_TIME submitTime,IFNULL(dd.APPROVED_AMOUNT,0) approvedAmt,IFNULL(oo.AMT_SIX,0) contractAmt,IFNULL(htemp.sumPayAmt,0) " +
+                "paidAmt,IFNULL(IFNULL(htemp.sumPayAmt,0)/IFNULL(oo.AMT_SIX,0),0) paidRatio\n" +
+                "from second_category_fee_demand fd\n" +
+                "left join fee_demand_dtl dd on dd.SECOND_CATEGORY_FEE_DEMAND_ID = fd.id\n" +
+                "left join pm_prj pp on pp.id = fd.PM_PRJ_ID\n" +
+                "left join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
+                "left join (select dd.SECOND_CATEGORY_FEE_DEMAND_ID,max(SEQ_NO) maxSeqNo from fee_demand_dtl dd \n" +
+                "\t\t\t\t\t\tleft join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
+                "\t\t\t\t\t\twhere dd.SUBMIT_TIME is not null\n" +
+                "\t\t\t\t\t\tgroup by dd.SECOND_CATEGORY_FEE_DEMAND_ID\n" +
+                "\t\t\t\t\t) dtemp on dtemp.SECOND_CATEGORY_FEE_DEMAND_ID = fd.id and dtemp.maxSeqNo = va.SEQ_NO\n" +
+                "left join po_order oo on oo.CONTRACT_APP_ID = fd.PO_ORDER_REQ_ID and oo.PM_PRJ_ID = fd.PM_PRJ_ID\n" +
+                "left join (select PO_ORDER_ID,sum(PAY_AMT) sumPayAmt from contract_pay_history ph group by PO_ORDER_ID) htemp on htemp.PO_ORDER_ID" +
+                " = oo.id\n" +
+                "left join (select u.id,u.name,max(d.id) deptId from ad_user u left join hr_dept_user du on du.AD_USER_ID = u.id\n" +
+                "\t\t\t\t\t\tleft join hr_dept d on d.id = du.HR_DEPT_ID group by u.id) u on u.id = dd.LAST_MODI_USER_ID\n" +
+                "left join hr_dept d on d.id = u.deptId\n" +
+                "where dtemp.SECOND_CATEGORY_FEE_DEMAND_ID is not null");
+        if (!CollectionUtils.isEmpty(req.deptIds)){
+            sqlSb.append(" and d.id in (:deptId)");
+        }
+        if (!Strings.isNullOrEmpty(req.prjName)){
+            sqlParams.put("prjName","%" + sqlParams.get("prjName") + "%");
+            sqlSb.append(" and pp.name like :prjName");
+        }
+        if (!Strings.isNullOrEmpty(req.contractName)){
+            sqlParams.put("contractName","%" + sqlParams.get("contractName") + "%");
+            sqlSb.append( " and oo.CONTRACT_NAME like :contractName");
+        }
+        if (!Strings.isNullOrEmpty(req.startDate)){
+            sqlSb.append(" and dd.SUBMIT_TIME <= :startDate");
+        }
+        if (!Strings.isNullOrEmpty(req.endDate)){
+            sqlSb.append(" and dd.SUBMIT_TIME <= :endDate");
+        }
+        if (!Strings.isNullOrEmpty(req.yearMonth)){
+            sqlSb.append( " and DATE_FORMAT(dd.SUBMIT_TIME,'%Y-%m') = :yearMonth");
+        }
+        List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(sqlSb.toString(), sqlParams);
+        List<DeptContract> totalDeptContracts = JSONObject.parseArray(JSONObject.toJSONString(totalList), DeptContract.class);//转对象
+
+        DeptContractResp resp = new DeptContractResp();//待返回的对象
+        resp.date = req.yearMonth;//年月
+        if (!CollectionUtils.isEmpty(totalDeptContracts)){//头部汇总
+            for (DeptContract contract : totalDeptContracts) {
+                resp.sumRequiredAmt = resp.sumRequiredAmt.add(contract.requiredAmt);//资金需求总金额
+                resp.sumPaidAmt = resp.sumPaidAmt.add(contract.paidAmt);//已支付总金额
+                resp.sumPaidRatio = resp.sumPaidRatio.add(contract.paidRatio);//支付比例
+            }
+        }
+
+        //部门汇总
+        Map<String, List<DeptContract>> deptIdMap = totalDeptContracts.stream().collect(Collectors.groupingBy(contract -> contract.deptId));
+        List<DeptAmt> deptAmts = new ArrayList<>();
+        for (String deptId : deptIdMap.keySet()) {
+            DeptAmt deptAmt = new DeptAmt();
+            List<DeptContract> deptContracts = deptIdMap.get(deptId);
+            BigDecimal requiredAmt = deptContracts.stream().map(deptContract -> deptContract.requiredAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+            deptAmt.sumAmt = requiredAmt;
+            deptAmt.deptName = deptContracts.get(0).deptName;
+            deptAmt.deptId = deptId;
+            deptAmts.add(deptAmt);
+        }
+
+        //返回
+        Map output = JsonUtil.fromJson(JsonUtil.toJson(resp), Map.class);
+        ExtJarHelper.returnValue.set(output);
     }
 
     /**
@@ -489,6 +581,70 @@ public class SecondFeeStatisticExt {
             this.submitTime = StringUtil.withOutT(this.submitTime);
             return submitTime;
         }
+    }
+
+    /**
+     * 部门合同请求
+     */
+    @Data
+    private static class DeptContractReq{
+        //项目名称
+        private String prjName;
+        //合同名称
+        private String contractName;
+        //需求部门
+        private List<String> deptIds;
+        //经办人
+        private List<String> operatorIds;
+        //年月
+        private String yearMonth;
+        //开始日期
+        private String startDate;
+        //结束日期
+        private String endDate;
+        //分页
+        private Integer pageIndex;
+        private Integer pageSize;
+    }
+
+    @Data
+    private static class DeptContractResp{
+        //日期
+        private String date;
+        //资金需求总金额
+        private BigDecimal sumRequiredAmt;
+        //已支付总金额
+        private BigDecimal sumPaidAmt;
+        //合同支付占比
+        private BigDecimal sumPaidRatio;
+        //部门统计
+        private List<DeptAmt> deptAmts;
+    }
+
+    @Data
+    private static class DeptContract{
+        //项目
+        private String prjId;
+        private String prjName;
+        //合同
+        private String contractName;
+        //需求部门
+        private String deptId;
+        private String deptName;
+        //经办人
+        private String operatorId;
+        private String operatorName;
+        //需求提出时间
+        private String submitTime;
+        //资金需求金额
+        private BigDecimal requiredAmt;
+        //需求资金合同金额
+        private BigDecimal contractAmt;
+        //已支付总金额
+        private BigDecimal paidAmt;
+        //合同支付占比
+        private BigDecimal paidRatio;
+
     }
 
     public static void main(String[] args) {
