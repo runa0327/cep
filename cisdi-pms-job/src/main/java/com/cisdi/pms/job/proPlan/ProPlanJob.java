@@ -37,8 +37,8 @@ public class ProPlanJob {
     /**
      * 全景节点超期处理
      */
-    @Scheduled(fixedDelayString = "5000")
-//    @Scheduled(cron = "0 0 7 * * ? ")//每天7点执行一次
+//    @Scheduled(fixedDelayString = "5000")
+    @Scheduled(cron = "0 0 7 * * ? ")//每天7点执行一次
     public void planNodeOverdue() {
         List<Map<String, Object>> list = jdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.ID \n" +
                 "where pl.IS_TEMPLATE <> '1' and (IZ_OVERDUE<>'1' or IZ_OVERDUE is null) and  pn.PLAN_COMPL_DATE< NOW() and pn.PROGRESS_STATUS_ID in ('0099799190825106800','0099799190825106801') and `level` = '3'");
