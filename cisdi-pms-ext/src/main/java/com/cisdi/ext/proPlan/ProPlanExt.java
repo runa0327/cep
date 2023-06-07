@@ -1361,6 +1361,7 @@ public class ProPlanExt {
                 }
                 node.izDisplay = JdbcMapUtil.getString(p, "IZ_DISPLAY");
                 node.attData = JdbcMapUtil.getString(p, "ATT_DATA");
+                node.IZ_OVERDUE =  JdbcMapUtil.getString(p, "IZ_OVERDUE");
                 return node;
             }).collect(Collectors.toList());
 
@@ -1434,6 +1435,7 @@ public class ProPlanExt {
                 node.izDisplay = JdbcMapUtil.getString(p, "IZ_DISPLAY");
                 node.oprType = JdbcMapUtil.getString(p, "OPREATION_TYPE");
                 node.attData = JdbcMapUtil.getString(p, "ATT_DATA");
+                node.IZ_OVERDUE =  JdbcMapUtil.getString(p, "IZ_OVERDUE");
                 return node;
             }).collect(Collectors.toList());
 
@@ -1547,6 +1549,9 @@ public class ProPlanExt {
         public String oprType;
 
         public String attData;
+
+        //是否超期
+        public String IZ_OVERDUE;
     }
 
 

@@ -1,5 +1,9 @@
 package com.pms.cisdipmswordtopdf.controller;
 
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.*;
 import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.ComFailException;
 import com.jacob.com.ComThread;
@@ -10,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 @RestController
 @RequestMapping(value = "/trans")
@@ -27,9 +33,91 @@ public class ToPdfController {
     public void startPdf(){
 //        String old = "C:\\Users\\EDY\\Desktop\\kkfileview\\demo.pptx";
 //        String old = "C:\\Users\\EDY\\Desktop\\kkfileview\\demo.xlsx";
-        String old = "C:\\Users\\EDY\\Desktop\\kkfileview\\demo.docx";
-        String newPdf = "C:\\Users\\EDY\\Desktop\\kkfileview\\new.pdf";
-        trans(old,newPdf);
+        String old = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）.doc";
+        String newPdf = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）copy.pdf";
+        String pdfPath = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）.pdf";
+        word2PDF(old,newPdf);
+        //pdf加水印
+        String companyName = "三亚崖州湾科技城开发建设有限公司";
+        StringBuilder errorBuilder = new StringBuilder();
+        Boolean res = addWater(companyName,newPdf,pdfPath,errorBuilder);
+    }
+
+    private Boolean addWater(String name, String copyPath, String pdfPath,StringBuilder errorBuilder) {
+        boolean res = true;
+        try {
+            PdfReader reader = new PdfReader(copyPath);
+            int n = reader.getNumberOfPages();
+            PdfStamper stamper = null;
+            stamper = new PdfStamper(reader, new FileOutputStream(pdfPath));
+            PdfGState gs1 = new PdfGState();
+            gs1.setFillOpacity(0.2f);
+            PdfContentByte over;
+            Rectangle pagesize;
+            float x, y;
+            for (int i = 1; i <= n; i++) {
+                pagesize = reader.getPageSizeWithRotation(i);
+                x = (pagesize.getWidth()/2);
+                y = (pagesize.getHeight()/3);
+                over = stamper.getOverContent(i);
+                over.saveState();
+                over.setGState(gs1);
+                over.setFontAndSize(BaseFont.createFont("STSong-Light","UniGB-UCS2-H", BaseFont.NOT_EMBEDDED),30);
+                over.showTextAligned(Element.ALIGN_CENTER , name, x, y*0.6f, 20);
+                over.showTextAligned(Element.ALIGN_CENTER , name, x, y*1.5f, 20);
+                over.showTextAligned(Element.ALIGN_CENTER , name, x, y*2.5f, 20);
+                over.restoreState();
+            }
+            stamper.close();
+            reader.close();
+        } catch (DocumentException | IOException e) {
+            res = false;
+            errorBuilder.append("添加水印失败\n ");
+            System.out.println("添加水印失败，详情：");
+//            log.error("添加水印失败，详情： ",e);
+        }
+        return res;
+    }
+
+    private String newPdf(String sfileName, String toFileName) {
+        String error = "";
+        long start = System.currentTimeMillis();
+        ActiveXComponent app = null;
+        Dispatch doc = null;
+        boolean result = true;
+
+        try {
+            app = new ActiveXComponent("Word.Application");
+            app.setProperty("Visible", new Variant(false));
+            Dispatch docs = app.getProperty("Documents").toDispatch();
+            doc = Dispatch.call(docs, "Open", sfileName).toDispatch();
+            System.out.println("打开文档..." + sfileName);
+            System.out.println("转换文档到 PDF..." + toFileName);
+            File tofile = new File(toFileName);
+            if (tofile.exists()) {
+                tofile.delete();
+            }
+            Dispatch.call(doc, "SaveAs", toFileName, wdFormatPDF);
+            long end = System.currentTimeMillis();
+            System.out.println("转换完成..用时：" + (end - start) + "ms.");
+
+            result = true;
+        } catch (Exception e) {
+            // TODO: handle exception
+
+            System.out.println("========Error:文档转换失败：" + e.getMessage());
+            error = "转换失败";
+            result = false;
+        } finally {
+            Dispatch.call(doc, "Close", false);
+            System.out.println("关闭文档");
+            if (app != null) {
+                app.invoke("Quit", new Variant[] {});
+            }
+        }
+
+        ComThread.Release();
+        return error;
     }
 
     private void trans(String sfileName, String toFileName) {

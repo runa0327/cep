@@ -37,12 +37,20 @@ public class WeekTaskExt {
         String userId = ExtJarHelper.loginInfo.get().userId;
         Map<String, String> weekDay = WeeklyUtils.weekBeginningAndEnding();
         StringBuilder sb = new StringBuilder();
-        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId,TRANSFER_TIME from week_task wt " +
+        sb.append(" select a.* from (");
+        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
                 "left join ad_user au on au.id = wt.TRANSFER_USER left join pm_prj pj on wt.pm_prj_id = pj.id " +
                 "where AD_USER_ID = '").append(userId).append("' and PUBLISH_START between '")
                 .append(weekDay.get("begin")).append("' and '").append(weekDay.get("end"))
-                .append("' and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null ) order by PUBLISH_START desc");
+                .append("' and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null )");
+        sb.append(" union all ");
+        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId from week_task wt " +
+                "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id   " +
+                "left join ad_user au on au.id = wt.TRANSFER_USER left join pm_prj pj on wt.pm_prj_id = pj.id  " +
+                "where AD_USER_ID = '").append(userId).append("' and PUBLISH_START< '").append(weekDay.get("begin")).append("' and WEEK_TASK_STATUS_ID in ('1634118574056542208','1634118609016066048')");
+        sb.append(" and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null )");
+        sb.append(" ) a order by a.PUBLISH_START desc");
 
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
@@ -233,11 +241,11 @@ public class WeekTaskExt {
                 List<AttData> attDataList = new ArrayList<>();
                 if (JdbcMapUtil.getString(node, "ATT_DATA") != null) {
                     AttData attData = new AttData();
-                    attData.AD_ATT_CODE = "BUY_MATTER_ID";
+                    attData.AD_ATT_CODE = "BUY_MATTER_TYPE_ID";
                     attData.ATT_VALUE = JdbcMapUtil.getString(node, "ATT_DATA");
                     String txt = "";
                     List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from gr_set_value where id=?", JdbcMapUtil.getString(node, "ATT_DATA"));
-                    if (CollectionUtils.isEmpty(list1)) {
+                    if (!CollectionUtils.isEmpty(list1)) {
                         Map<String, Object> mapData = list1.get(0);
                         txt = JdbcMapUtil.getString(mapData, "NAME");
                     }
