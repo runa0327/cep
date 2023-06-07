@@ -630,6 +630,7 @@ public class ProgressWeekReport {
         WeekMessage param = JsonUtil.fromJson(json,WeekMessage.class);
         String userId = ExtJarHelper.loginInfo.get().userId;
         String id = param.id;
+        String projectId = param.projectId;
         String writeDate = param.writeDate; //填报日期
         String weekPrjId = param.weekPrjId; //进度周报-周项目信息id
         if (SharedUtil.isEmptyString(id)){
@@ -641,6 +642,9 @@ public class ProgressWeekReport {
         String start = writeDate.substring(0,10);
         String end = writeDate.substring(11,21);
         String now = DateTimeUtil.dttmToString(new Date());
+        //形象进度说明逻辑处理
+        BigDecimal progress = param.progress;
+        progressHandle(progress,projectId,param);
         //数据保存
         Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",id).update()
                 .set("DATE",writeDate).set("PM_PRJ_ID",param.projectId)
