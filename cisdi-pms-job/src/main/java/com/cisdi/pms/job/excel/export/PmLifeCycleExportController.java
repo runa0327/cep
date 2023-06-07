@@ -5,6 +5,7 @@ import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.pms.job.utils.DateUtil;
+import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +46,11 @@ public class PmLifeCycleExportController extends BaseController {
     @GetMapping("export")
     public void exportExcel(String projectName, String projectType, String userId, String columns, HttpServletResponse response) throws ParseException {
         StringBuilder sb = new StringBuilder();
-        sb.append("select pj.id as id, pj.`NAME` as project_name,au.`NAME` as qquser from pm_prj pj \n" +
-                "left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID and pp.POST_INFO_ID='1633731474912055296'\n" +
-                "left join ad_user au on pp.AD_USER_ID = au.id \n" +
-                "where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' \n");
+        sb.append("select po.pm_prj_id as id, pj.`NAME` as project_name,au.`NAME` as qquser from PLAN_OPERATION po  \n" +
+                " left join pm_prj pj  on pj.id = po.PM_PRJ_ID\n" +
+                " left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID and pp.POST_INFO_ID='1633731474912055296'\n" +
+                " left join ad_user au on pp.AD_USER_ID = au.id \n" +
+                " where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and (pj.PROJECT_STATUS <> '1661568714048413696' or pj.PROJECT_STATUS is null) ");
         sb.append(" and pj.PROJECT_TYPE_ID ='").append(projectType).append("'");
         if (!StringUtils.isEmpty(projectName)) {
             sb.append(" and pj.name like '%").append(projectName).append("%'");
@@ -57,7 +59,7 @@ public class PmLifeCycleExportController extends BaseController {
             sb.append(" and au.id = '").append(userId).append("'");
         }
         sb.append(" and pj.pm_code is not null ");
-        sb.append("group by pj.id,au.`NAME` order by pj.pm_code desc ");
+        sb.append("group by pj.id,au.`NAME` order by pj.pm_code desc");
         List<String> headerList;
         if (Objects.nonNull(columns)) {
             headerList = Arrays.asList(columns.split(","));
@@ -69,7 +71,6 @@ public class PmLifeCycleExportController extends BaseController {
             List<Map<String, Object>> strList = jdbcTemplate.queryForList("select `NAME`,ifnull(IZ_DISPLAY,0) as IZ_DISPLAY from STANDARD_NODE_NAME where `LEVEL`=3 and IZ_DISPLAY=1  order by SEQ_NO");
             headerList = strList.stream().map(p -> JdbcMapUtil.getString(p, "NAME")).collect(Collectors.toList());
             headerList.add(0, "项目名称");
-            headerList.add(1, "前期手续经办人");
         }
 
 
@@ -93,13 +94,30 @@ public class PmLifeCycleExportController extends BaseController {
                 if ("项目名称".equals(s)) {
                     JSONObject json = new JSONObject();
                     json.put("nameOrg", stringObjectMap.get("project_name"));
+                    json.put("remarkCount", 0);
                     newData.put("项目名称", json);
-                } else if ("前期手续经办人".equals(s)) {
+                } else if ("ID".equals(s)) {
                     JSONObject json = new JSONObject();
-                    json.put("nameOrg", stringObjectMap.get("qqusers"));
+                    json.put("nameOrg", stringObjectMap.get("id"));
+                    json.put("remarkCount", 0);
                     newData.put("ID", json);
+                } else if ("备注说明".equals(s)) {
+                    JSONObject json = new JSONObject();
+                    List<String> contentList = new ArrayList<>();
+                    List<Map<String, Object>> list1 = jdbcTemplate.queryForList("select * from REMARK_INFO where REMARK_TYPE='1' and PM_PRJ_ID=?", stringObjectMap.get("id"));
+                    if (!CollectionUtils.isEmpty(list1)) {
+                        contentList = list1.stream().map(m -> JdbcMapUtil.getString(m, "CONTENT")).collect(Collectors.toList());
+                    }
+                    int reCount = 0;
+                    List<Map<String, Object>> reList = jdbcTemplate.queryForList("select * from remark_info where REMARK_TYPE='1' and PM_PRJ_ID=?", stringObjectMap.get("id"));
+                    if (CollectionUtils.isEmpty(reList)) {
+                        reCount = reList.size();
+                    }
+                    json.put("nameOrg", contentList);
+                    json.put("remarkCount", reCount);
+                    newData.put("备注说明", json);
                 } else {
-                    Optional<Map<String, Object>> optional = nodeList.stream().filter(p -> Objects.equals(stringObjectMap.get("id"), p.get("PM_PRJ_ID")) && Objects.equals(s, p.get("NAME"))).findAny();
+                    Optional<Map<String, Object>> optional = nodeList.stream().filter(p -> Objects.equals(stringObjectMap.get("id"), p.get("PM_PRJ_ID")) && Objects.equals(s, p.get("nodeName"))).findAny();
                     if (optional.isPresent()) {
                         Map<String, Object> dataMap = optional.get();
                         JSONObject json = new JSONObject();
@@ -115,13 +133,13 @@ public class PmLifeCycleExportController extends BaseController {
                                     dateOrg = JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE");
                                 }
                                 if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE")) && Objects.nonNull(dataMap.get("ACTUAL_COMPL_DATE"))) {
-                                    Date plan = DateUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
-                                    Date actual = DateUtil.stringToDate(JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE"));
+                                    Date plan = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                                    Date actual = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE"));
                                     int days = DateUtil.daysBetween(plan, actual);
-                                    if (days > 0) {
-                                        tips = "提前" + days + "完成！";
-                                    } else if (days < 0) {
+                                    if (plan.before(actual)) {
                                         tips = "超期" + Math.abs(days) + "天";
+                                    } else {
+                                        tips = "提前" + days + "完成！";
                                     }
                                 }
                                 statusOrg = "已完成";
@@ -129,24 +147,34 @@ public class PmLifeCycleExportController extends BaseController {
                                 nameOrg = "未涉及";
                                 tips = "项目未涉及" + JdbcMapUtil.getString(dataMap, "NAME");
                                 statusOrg = "未涉及";
-                            } else {
                                 if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                    nameOrg = "计划完成";
-                                    Date planCompDate = DateUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                                    Date planCompDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
                                     if (planCompDate.before(new Date())) {
-                                        statusOrg = "已超期";
-                                        if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                            Date plan = DateUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
-                                            int days = DateUtil.daysBetween(plan, new Date());
-                                            tips = "超期" + Math.abs(days) + "天";
-                                        }
-                                    } else {
-                                        if ("进行中".equals(status)) {
-                                            statusOrg = "进行中";
-                                        } else if ("未启动".equals(status)) {
-                                            statusOrg = "未启动";
-                                        }
+                                        int days = DateUtil.daysBetween(planCompDate, new Date());
+                                        tips = "超期" + Math.abs(days) + "天";
                                     }
+                                    nameOrg = "计划完成";
+                                    if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
+                                        dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
+                                    }
+                                }
+                            } else {
+                                if ("0".equals(JdbcMapUtil.getString(dataMap, "izOverdue"))) {
+                                    if ("进行中".equals(status)) {
+                                        statusOrg = "进行中";
+                                    } else if ("未启动".equals(status)) {
+                                        statusOrg = "未启动";
+                                    }
+                                } else {
+                                    statusOrg = "已超期";
+                                }
+                                if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
+                                    Date planCompDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                                    if (planCompDate.before(new Date())) {
+                                        int days = DateUtil.daysBetween(planCompDate, new Date());
+                                        tips = "超期" + Math.abs(days) + "天";
+                                    }
+                                    nameOrg = "计划完成";
                                     if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
                                         dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
                                     }
@@ -157,6 +185,10 @@ public class PmLifeCycleExportController extends BaseController {
                             json.put("dateOrg", dateOrg);
                             json.put("statusOrg", statusOrg);
                             json.put("tips", tips);
+                            int count = getRemarkCount(JdbcMapUtil.getString(stringObjectMap, "ID"), JdbcMapUtil.getString(dataMap, "SCHEDULE_NAME"));
+                            json.put("remarkCount", count);
+                            json.put("postInfo", JdbcMapUtil.getString(dataMap, "postName") + ":" + (JdbcMapUtil.getString(dataMap, "userName") == null ? "" : JdbcMapUtil.getString(dataMap, "userName")));
+                            json.put("nodeId", JdbcMapUtil.getString(dataMap, "ID"));
                         }
                         newData.put(s, json);
                     } else {
@@ -211,5 +243,14 @@ public class PmLifeCycleExportController extends BaseController {
             headTitles.add(secondHeader);
         }
         return headTitles;
+    }
+
+    private int getRemarkCount(String projectId, String baseNodeId) {
+        int count = 0;
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from remark_info where REMARK_TYPE='2' and PM_PRJ_ID=? and SCHEDULE_NAME=?", projectId, baseNodeId);
+        if (!CollectionUtils.isEmpty(list)) {
+            count = list.size();
+        }
+        return count;
     }
 }
