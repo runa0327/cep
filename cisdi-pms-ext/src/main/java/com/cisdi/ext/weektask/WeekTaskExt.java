@@ -1,6 +1,7 @@
 package com.cisdi.ext.weektask;
 
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.ProPlanUtils;
 import com.cisdi.ext.util.StringUtil;
 import com.cisdi.ext.util.WeeklyUtils;
 import com.google.common.base.Strings;
@@ -183,7 +184,8 @@ public class WeekTaskExt {
         myJdbcTemplate.update("update WEEK_TASK set WEEK_TASK_STATUS_ID='1644140265205915648',REASON_EXPLAIN=? where id=?", map.get("reason"), map.get("id"));
         //把节点状态变成未涉及
         myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID ='0099902212142036278' where id =(select RELATION_DATA_ID from week_task where id=?)", map.get("id"));
-
+        //当前节点的子节点都是未涉及，那么当前节点也是未涉及
+        nodeNoInvolve(JdbcMapUtil.getString(map, "id"));
         //继续出发后续节点
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select RELATION_DATA_ID from week_task where id=?", map.get("id"));
         if (!CollectionUtils.isEmpty(list)) {
@@ -490,5 +492,66 @@ public class WeekTaskExt {
                         userId, title, content, new Date(), "1634118574056542208", "1635080848313290752", objectMap.get("ID"), objectMap.get("projectId"), id);
             }
         }
+    }
+
+    /**
+     * 当前节点的子节点都是未涉及，那么当前节点也是未涉及
+     *
+     * @param weekTaskId
+     */
+    private void nodeNoInvolve(String weekTaskId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=(select RELATION_DATA_ID from week_task where id=?)", weekTaskId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> dataMap = list.get(0);
+            refreshParentStatus(JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_NODE_PID"));
+            List<Map<String, Object>> parentList = ProPlanUtils.selectAllParentNode(JdbcMapUtil.getString(dataMap, "ID"));
+            if (!CollectionUtils.isEmpty(parentList)) {
+                List<Map<String, Object>> notStart = parentList.stream().filter(p -> "0099799190825106800".equals(JdbcMapUtil.getString(p, "PROGRESS_STATUS_ID"))).collect(Collectors.toList());
+                notStart.forEach(item -> {
+                    myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID='0099799190825106801' where id=?", item.get("ID"));
+                });
+
+            }
+        }
+    }
+
+    /**
+     * 刷新父级节点的未涉及
+     *
+     * @param pid
+     */
+    private void refreshParentStatus(String pid) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> currentList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", pid);
+        if (!CollectionUtils.isEmpty(currentList)) {
+            Map<String, Object> currentNode = currentList.get(0);
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PM_PRO_PLAN_NODE_PID=?", pid);
+            if (!CollectionUtils.isEmpty(list)) {
+                //统计状态是未涉及的记录条数
+                long count = list.stream().filter(p -> "0099902212142036278".equals(JdbcMapUtil.getString(p, "PROGRESS_STATUS_ID"))).count();
+                if (list.size() == count) {
+                    //未涉及数量等于子节点个数，当前节点也改为未涉及
+                    myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID='0099902212142036278' where id=?", pid);
+                    //查询pid的父级
+                    List<Map<String, Object>> pidList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node WHERE id=?", currentNode.get("PM_PRO_PLAN_NODE_PID"));
+                    if (!CollectionUtils.isEmpty(pidList)) {
+                        Map<String, Object> mapData = pidList.get(0);
+                        System.out.println(mapData.get("NAME"));
+                        refreshParentStatus(JdbcMapUtil.getString(mapData, "ID"));
+                    }
+                } else {
+                    List<Map<String, Object>> parentList = ProPlanUtils.selectAllParentNode(pid);
+                    if (!CollectionUtils.isEmpty(parentList)) {
+                        List<Map<String, Object>> notStart = parentList.stream().filter(p -> "0099799190825106800".equals(JdbcMapUtil.getString(p, "PROGRESS_STATUS_ID"))).collect(Collectors.toList());
+                        notStart.forEach(item -> {
+                            myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID='0099799190825106801' where id=?", item.get("ID"));
+                        });
+                    }
+
+                }
+            }
+        }
+
     }
 }

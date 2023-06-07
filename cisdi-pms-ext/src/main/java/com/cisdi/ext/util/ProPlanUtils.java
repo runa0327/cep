@@ -141,4 +141,27 @@ public class ProPlanUtils {
             }
         }
     }
+
+
+    /**
+     * 查询当前节点的父级节点，顺延往上推导
+     *
+     * @param nodeId
+     * @return
+     */
+    public static List<Map<String, Object>> selectAllParentNode(String nodeId) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        getParentNode(nodeId, result);
+        return result;
+    }
+
+    private static void getParentNode(String nodeId, List<Map<String, Object>> result) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select a.*,ifnull(PM_PRO_PLAN_NODE_PID,0) as pid from pm_pro_plan_node a where a.id=?", nodeId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> dataMap = list.get(0);
+            result.add(dataMap);
+            getParentNode(JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_NODE_PID"), result);
+        }
+    }
 }
