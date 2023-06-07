@@ -159,6 +159,7 @@ public class ProgressWeekReport {
         WeekMessage param = JsonUtil.fromJson(json,WeekMessage.class);
         String userId = ExtJarHelper.loginInfo.get().userId;
         String id = param.id;
+        String projectId = param.projectId;
         //判断是否可改
         List<PmProgressWeeklyPrjDetail> list1 = PmProgressWeeklyPrjDetail.selectByWhere(new Where().eq("ID",id));
         boolean isSubmit = list1.get(0).getIsWeeklyReportSubmit();
@@ -176,9 +177,12 @@ public class ProgressWeekReport {
         String start = writeDate.substring(0,10);
         String end = writeDate.substring(11,21);
         String now = DateTimeUtil.dttmToString(new Date());
+        //形象进度说明逻辑处理
+        BigDecimal progress = param.progress;
+        progressHandle(progress,projectId,param);
         //数据保存
         Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",id).update()
-                .set("DATE",writeDate).set("PM_PRJ_ID",param.projectId)
+                .set("DATE",writeDate).set("PM_PRJ_ID",projectId)
                 .set("VISUAL_PROGRESS",param.progress).set("PROCESS_REMARK_TEXT",param.progressWeek)
                 .set("VISUAL_PROGRESS_DESCRIBE",param.progressDescribe).set("FILE_ID_ONE",param.fileId)
                 .set("TEXT_REMARK_ONE",param.progressRemark).set("SYS_TRUE",param.weatherStart)
@@ -193,6 +197,23 @@ public class ProgressWeekReport {
                 .set("AD_USER_ID",userId).set("LAST_MODI_USER_ID",userId)
                 .set("TS",now).set("LAST_MODI_DT",now)
                 .exec();
+    }
+
+    /**
+     * 形象进度处理
+     * @param progress 形象进度
+     * @param projectId 项目id
+     * @param weekMessage 形象进度对象
+     */
+    private void progressHandle(BigDecimal progress, String projectId, WeekMessage weekMessage) {
+        if (progress.compareTo(new BigDecimal(100)) == 1 || progress.compareTo(new BigDecimal(0)) == -1){
+            throw new BaseException("整体形象进度只能处于 0-100 间");
+        }
+        if (progress.compareTo(new BigDecimal(100)) == 0){
+            Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_END",1).exec();
+            Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekMessage.weekPrjId).update().set("IZ_END",1).exec();
+            Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",weekMessage.id).update().set("IZ_END",1).exec();
+        }
     }
 
     /**

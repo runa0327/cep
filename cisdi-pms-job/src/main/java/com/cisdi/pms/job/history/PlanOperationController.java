@@ -1,7 +1,7 @@
 package com.cisdi.pms.job.history;
 
 import com.cisdi.pms.job.excel.export.BaseController;
-import com.cisdi.pms.job.utils.StringUtils;
+import com.cisdi.pms.job.utils.StringUtil;
 import com.cisdi.pms.job.utils.Util;
 import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -121,7 +121,7 @@ public class PlanOperationController extends BaseController {
                                         jdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=? where id=?", COMPLETED, nodeMap.get("ID"));
                                     } else {
                                         String[] split = obj.toString().split("\\.");
-                                        String dateOrg = split[0] + "-" + StringUtils.addZeroForNum(split[1], 2) + "-" + split[2];
+                                        String dateOrg = split[0] + "-" + StringUtil.addZeroForNum(split[1], 2) + "-" + split[2];
                                         Date comDate = DateTimeUtil.stringToDate(dateOrg);
                                         jdbcTemplate.update("update pm_pro_plan_node set ACTUAL_COMPL_DATE=?,PROGRESS_STATUS_ID=? where id=?", comDate, COMPLETED, nodeMap.get("ID"));
                                     }

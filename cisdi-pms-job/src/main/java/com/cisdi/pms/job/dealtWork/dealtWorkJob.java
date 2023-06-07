@@ -3,13 +3,11 @@ package com.cisdi.pms.job.dealtWork;
 import com.cisdi.pms.job.config.MqttConfig;
 import com.cisdi.pms.job.utils.DealtWorkUtil;
 import com.cisdi.pms.job.utils.RestTemplateUtils;
-import com.cisdi.pms.job.utils.StringUtils;
+import com.cisdi.pms.job.utils.StringUtil;
 import com.cisdi.pms.job.utils.Util;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -136,7 +134,7 @@ public class dealtWorkJob {
         String selectSql = "select USER_ID from dealt_user_info";
         List<String> dealtUsers = jdbcTemplate.queryForList(selectSql, String.class);
         if (!CollectionUtils.isEmpty(list)) {
-            list.stream().filter(map -> StringUtils.isChinaPhoneLegal(map.get("CODE").toString()))
+            list.stream().filter(map -> StringUtil.isChinaPhoneLegal(map.get("CODE").toString()))
                     .forEach(map -> saveUserId(queryUserInfo(map.get("CODE").toString()), map.get("CODE").toString(), map.get("ID").toString(),dealtUsers));
         }
     }

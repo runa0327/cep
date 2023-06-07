@@ -1,9 +1,14 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.orderManage;
 
+import com.cisdi.ext.base.PmPrjExt;
+import com.cisdi.ext.model.PoOrderChangeReq;
+import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.orderManage.detail.PoOrderChangeReqPrjDetailExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -14,7 +19,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 
 /**
- * 采购合同变更申请 扩展
+ * 合约管理-合同需求审批-扩展
  */
 @Slf4j
 public class PoOrderChangeReqExt {
@@ -561,6 +566,56 @@ public class PoOrderChangeReqExt {
 
         }
         return name;
+    }
+
+    /**
+     * 历史数据处理
+     */
+    public void orderChangeHistoryData(){
+
+        // 非系统项目转系统项目
+        List<PoOrderChangeReq> list1 = PoOrderChangeReq.selectByWhere(new Where()
+                .nin(PoOrderChangeReq.Cols.STATUS,"VD","VDING")
+                .eq(PoOrderChangeReq.Cols.PM_PRJ_IDS,null)
+                .eq(PoOrderChangeReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
+        if (!CollectionUtils.isEmpty(list1)){
+            for (PoOrderChangeReq tmp : list1) {
+                String projectName = tmp.getProjectNameWr();
+                String projectId = PmPrjExt.createPrjByMoreName(projectName);
+                String id = tmp.getId();
+                Crud.from(PoOrderChangeReq.ENT_CODE).where().eq(PoOrderChangeReq.Cols.ID,id).update()
+                        .set(PoOrderChangeReq.Cols.PM_PRJ_IDS,projectId)
+                        .exec();
+            }
+        }
+
+        //系统项目id写入pm_prj_ids
+        List<PoOrderChangeReq> list2 = PoOrderChangeReq.selectByWhere(new Where()
+                .nin(PoOrderChangeReq.Cols.STATUS,"VD","VDING")
+                .eq(PoOrderChangeReq.Cols.PM_PRJ_IDS,null)
+                .neq(PoOrderChangeReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
+        if (!CollectionUtils.isEmpty(list2)){
+            for (PoOrderChangeReq tp : list2) {
+                String id = tp.getId();
+                String projectId = tp.getPmPrjId();
+                Crud.from(PoOrderChangeReq.ENT_CODE).where().eq(PoOrderChangeReq.Cols.ID,id).update()
+                        .set(PoOrderChangeReq.Cols.PM_PRJ_IDS,projectId)
+                        .exec();
+            }
+        }
+
+        //已批准流程项目id写入明细表
+        List<PoOrderChangeReq> list3 = PoOrderChangeReq.selectByWhere(new Where().eq(PoOrderChangeReq.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list3)){
+            for (PoOrderChangeReq tmp : list3) {
+                String id = tmp.getId();
+                String projectId = tmp.getPmPrjIds();
+                if (SharedUtil.isEmptyString(projectId)){
+                    projectId = tmp.getPmPrjId();
+                }
+                PoOrderChangeReqPrjDetailExt.insertData(id,projectId);
+            }
+        }
     }
 
 }

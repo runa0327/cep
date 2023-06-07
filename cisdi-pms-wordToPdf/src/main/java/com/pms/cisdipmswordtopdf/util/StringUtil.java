@@ -1,6 +1,6 @@
 package com.pms.cisdipmswordtopdf.util;
 
-public class StringUtils {
+public class StringUtil {
 
     /**
      *

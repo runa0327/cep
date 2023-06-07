@@ -265,7 +265,7 @@ public class WeeklyReportExt {
     private void calcDateStatList(BaseReport report) {
         report.dateStatList = new ArrayList<>();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql1 = "select a.date,a.num as ctStart,b.num as ctEnd from (select a.date,count(*) as num from " +
+        String sql1 = "select a.date,ifnull(a.num,0) as ctStart,ifnull(b.num,0) as ctEnd from (select a.date,count(*) as num from " +
                 "(SELECT DISTINCT D.ENTITY_RECORD_ID,PI.NAME WF_PROCESS_INSTANCE_NAME,P.EXTRA_INFO WF_PROCESS_EXTRA_INFO," +
                 "DATE_FORMAT(d.START_DATE,'%Y-%m') as date " +
                 "FROM HR_WEEKLY_REPORT_DTL D " +

@@ -613,15 +613,36 @@ public class PoOrderReqExt {
             companyName = "三亚崖州湾科技城开发建设有限公司";
         }
         poOrderReqView.setCompanyName(companyName);
+        List<Map<String,String>> list = new ArrayList<>();
 
         if ("PO_ORDER_REQ".equals(entCode) || "po_order_req".equals(entCode)){ //合同签订
-            poOrderReqView.setColsCode("FILE_ID_ONE"); //合同修编稿
+            Map<String,String> map1 = new HashMap<>();
+            Map<String,String> map2 = new HashMap<>();
+            String code1 = "FILE_ID_ONE"; //合同修编稿
+            String code2 = "ATT_FILE_GROUP_ID"; //合同文本
+            String file1 = JdbcMapUtil.getString(entityRecord.valueMap,code1);
+            String file2 = JdbcMapUtil.getString(entityRecord.valueMap,code2);
+            if (!SharedUtil.isEmptyString(file1)){
+                map1.put("code",code1);
+                map1.put("file",file1);
+                list.add(map1);
+            }
+            if (!SharedUtil.isEmptyString(file2)){
+                map2.put("code",code2);
+                map2.put("file",file2);
+                list.add(map2);
+            }
         } else if ("PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "po_order_supplement_req".equals(entCode)){ //补充协议
-            poOrderReqView.setColsCode("FILE_ID_TENTH"); //合同修订稿
+            Map<String,String> map1 = new HashMap<>();
+            String code1 = "FILE_ID_TENTH"; //合同修编稿
+            String file1 = JdbcMapUtil.getString(entityRecord.valueMap,code1);
+            if (!SharedUtil.isEmptyString(file1)){
+                map1.put("code",code1);
+                map1.put("file",file1);
+                list.add(map1);
+            }
         }
-        String fileId = JdbcMapUtil.getString(entityRecord.valueMap,poOrderReqView.getColsCode()); //合同文本
-
-        poOrderReqView.setFileId(fileId);
+        poOrderReqView.setColMap(list);
         return poOrderReqView;
     }
 
