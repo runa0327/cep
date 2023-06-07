@@ -39,19 +39,19 @@ public class WeekTaskExt {
         Map<String, String> weekDay = WeeklyUtils.weekBeginningAndEnding();
         StringBuilder sb = new StringBuilder();
         sb.append(" select a.* from (");
-        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId from week_task wt " +
+        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId,gsv.SEQ_NO as SEQ_NO from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
                 "left join ad_user au on au.id = wt.TRANSFER_USER left join pm_prj pj on wt.pm_prj_id = pj.id " +
                 "where AD_USER_ID = '").append(userId).append("' and PUBLISH_START between '")
                 .append(weekDay.get("begin")).append("' and '").append(weekDay.get("end"))
                 .append("' and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null )");
         sb.append(" union all ");
-        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId from week_task wt " +
+        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId,gsv.SEQ_NO as SEQ_NO from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id   " +
                 "left join ad_user au on au.id = wt.TRANSFER_USER left join pm_prj pj on wt.pm_prj_id = pj.id  " +
                 "where AD_USER_ID = '").append(userId).append("' and PUBLISH_START< '").append(weekDay.get("begin")).append("' and WEEK_TASK_STATUS_ID in ('1634118574056542208','1634118609016066048')");
         sb.append(" and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null )");
-        sb.append(" ) a order by a.PUBLISH_START desc");
+        sb.append(" ) a order by a.SEQ_NO ");
 
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
@@ -135,13 +135,13 @@ public class WeekTaskExt {
         String userId = ExtJarHelper.loginInfo.get().userId;
         Map<String, String> weekDay = WeeklyUtils.weekBeginningAndEnding();
         StringBuilder sb = new StringBuilder();
-        sb.append("select wt.*,gsv.`NAME` as task_status,TRANSFER_USER as transferUserId,au.name as transferUser,CAN_DISPATCH,TRANSFER_TIME from week_task wt " +
+        sb.append("select wt.*,gsv.`NAME` as task_status,TRANSFER_USER as transferUserId,au.name as transferUser,CAN_DISPATCH,TRANSFER_TIME,gsv.SEQ_NO as SEQ_NO from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
                 "left join ad_user au on au.id = wt.AD_USER_ID LEFT JOIN PM_PRJ pj on wt.pm_prj_id = pj.id " +
                 "where wt.id  in (select id from week_task where TRANSFER_USER='").append(userId).append("')")
                 .append(" and PUBLISH_START between '")
                 .append(weekDay.get("begin")).append("' and '").append(weekDay.get("end"))
-                .append("' and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null ) order by PUBLISH_START desc");
+                .append("' and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null ) order by SEQ_NO desc");
 
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
