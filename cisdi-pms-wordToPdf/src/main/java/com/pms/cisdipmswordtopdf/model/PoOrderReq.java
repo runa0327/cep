@@ -1,5 +1,8 @@
 package com.pms.cisdipmswordtopdf.model;
 
+import java.util.List;
+import java.util.Map;
+
 public class PoOrderReq {
     // id
     public String id;
@@ -23,6 +26,8 @@ public class PoOrderReq {
     public String tableCode;
     //字段名
     public String colsCode;
+    //更新字段及对应文件
+    public List<Map<String,String>> colMap;
 
     public String getId() {
         return id;
@@ -110,5 +115,13 @@ public class PoOrderReq {
 
     public void setColsCode(String colsCode) {
         this.colsCode = colsCode;
+    }
+
+    public List<Map<String, String>> getColMap() {
+        return colMap;
+    }
+
+    public void setColMap(List<Map<String, String>> colMap) {
+        this.colMap = colMap;
     }
 }

@@ -368,7 +368,7 @@ public class PmStartExt {
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", dataMap.get("NAME")).set("PM_CODE", prjCode)
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("PM_SEQ", seq).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
-                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID","0099799190825080706").set("IZ_FORMAL_PRJ",1).exec();
+                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID","0099799190825080706").set("IZ_FORMAL_PRJ",1).set("PROJECT_STATUS",null).exec();
             //为项目添加清单
             PrjMaterialInventory.addPrjInventory(projectId);
         } else {
@@ -377,7 +377,7 @@ public class PmStartExt {
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
             //--修改20230424--项目启动产生的项目默认为前期状态
-                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID","0099799190825080706").set("IZ_FORMAL_PRJ",1).exec();
+                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID","0099799190825080706").set("IZ_FORMAL_PRJ",1).set("PROJECT_STATUS",null).exec();
         }
 
         //先删除项目关联的地块
@@ -760,20 +760,20 @@ public class PmStartExt {
             });
             myJdbcTemplate.update(sb.toString());
         }
-        // 刷新父节点时间
-        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pn.*,ifnull(PM_PRO_PLAN_NODE_PID,0) as pid from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where PM_PRJ_ID=?", projectId);
-        nodeList.stream().filter(p -> Objects.equals("0", p.get("pid"))).peek(m -> {
-            List<Map<String, Object>> sonList = getChildrenNode(m, nodeList);
-            if (!CollectionUtils.isEmpty(sonList)) {
-                Map<String, Object> topDate = sonList.get(0);
-                String start = JdbcMapUtil.getString(topDate,"PLAN_START_DATE");
-                if (!SharedUtil.isEmptyString(start)){
-                    String end = topDate.get("PLAN_COMPL_DATE").toString();
-                    int cha = getDateCha(end,start);
-                    myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
-                }
-            }
-        }).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
+        // 刷新父节点时间 2023-06-01注释，暂不删除代码
+//        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pn.*,ifnull(PM_PRO_PLAN_NODE_PID,0) as pid from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where PM_PRJ_ID=?", projectId);
+//        nodeList.stream().filter(p -> Objects.equals("0", p.get("pid"))).peek(m -> {
+//            List<Map<String, Object>> sonList = getChildrenNode(m, nodeList);
+//            if (!CollectionUtils.isEmpty(sonList)) {
+//                Map<String, Object> topDate = sonList.get(0);
+//                String start = JdbcMapUtil.getString(topDate,"PLAN_START_DATE");
+//                if (!SharedUtil.isEmptyString(start)){
+//                    String end = topDate.get("PLAN_COMPL_DATE").toString();
+//                    int cha = getDateCha(end,start);
+//                    myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
+//                }
+//            }
+//        }).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
     }
 
     public static int getDateCha(String end, String start) {
@@ -785,4 +785,5 @@ public class PmStartExt {
         }
         return cha;
     }
+
 }

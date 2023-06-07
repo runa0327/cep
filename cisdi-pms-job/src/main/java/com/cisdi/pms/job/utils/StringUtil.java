@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-public class StringUtils {
+public class StringUtil {
 
     /**
      * 将字符串根据某个字符转为list
