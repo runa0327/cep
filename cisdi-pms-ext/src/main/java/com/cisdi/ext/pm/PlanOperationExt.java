@@ -360,7 +360,7 @@ public class PlanOperationExt {
                 "POST_INFO_ID = '1633731474912055296') rtemp on rtemp.PM_PRJ_ID = po.PM_PRJ_ID\n" +
                 "left join gr_set_value v5 on v5.id = pp.PROJECT_PHASE_ID\n" +
                 "left join (select PM_PRJ_ID,GROUP_CONCAT(AD_USER_ID) AdUserIds from prj_follower group by PM_PRJ_ID) ftemp on ftemp.PM_PRJ_ID = po" +
-                ".PM_PRJ_ID where 1=1");
+                ".PM_PRJ_ID where 1=1 and (pp.PROJECT_STATUS is null or pp.PROJECT_STATUS != '1661568714048413696') ");
         sqlParams.put("loginId",ExtJarHelper.loginInfo.get().userId);
         if (!CollectionUtils.isEmpty(selectReq.prjIds)){
             sqlSb.append(" and po.PM_PRJ_ID in (:prjIds)");
@@ -413,6 +413,7 @@ public class PlanOperationExt {
         }
 
         List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(sqlSb.toString(), sqlParams);
+        sqlSb.append( " order by po.CRT_DT desc");
         sqlSb.append(" limit " + (selectReq.pageIndex - 1) * selectReq.pageSize + " , " + selectReq.pageSize);
         List<Map<String, Object>> originList = myNamedParameterJdbcTemplate.queryForList(sqlSb.toString(), sqlParams);
         //标签
@@ -434,11 +435,12 @@ public class PlanOperationExt {
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         Map<String, Object> sqlParams = new HashMap<>(input);
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         OperationSelectReq selectReq = JSONObject.parseObject(JSONObject.toJSONString(input), OperationSelectReq.class);
+        sqlParams.put("loginId",ExtJarHelper.loginInfo.get().userId);
 
         StringBuffer sqlSb = new StringBuffer();
-        sqlSb.append("select count(po.id) num,pp.PROJECT_TYPE_ID prjTypeId,v2.name prjTypeName\n" +
+        sqlSb.append("select IFNULL(t2.num,0) leftNum,t1.num totalNum,t1.prjTypeId,t1.prjTypeName from (\n" +
+                "select count(po.id) num,pp.PROJECT_TYPE_ID prjTypeId,v2.name prjTypeName\n" +
                 "from PLAN_OPERATION po\n" +
                 "left join pm_prj pp on pp.id = po.PM_PRJ_ID\n" +
                 "left join gr_set_value v1 on v1.id = po.KEY_PROJECT_TYPE_ID\n" +
@@ -448,7 +450,21 @@ public class PlanOperationExt {
                 "left join (select ro.PM_PRJ_ID,ro.AD_USER_ID,u.name from PM_ROSTER ro left join ad_user u on u.id = ro.AD_USER_ID where " +
                 "POST_INFO_ID = '1633731474912055296') rtemp on rtemp.PM_PRJ_ID = po.PM_PRJ_ID\n" +
                 "left join gr_set_value v5 on v5.id = pp.PROJECT_PHASE_ID\n" +
-                "where 1=1");
+                "where 1=1 and (pp.PROJECT_STATUS is null or pp.PROJECT_STATUS != '1661568714048413696') group by pp.PROJECT_TYPE_ID\n" +
+                ") t1\n" +
+                "left join (\n" +
+                "select count(po.id) num,pp.PROJECT_TYPE_ID prjTypeId,v2.name prjTypeName\n" +
+                "from PLAN_OPERATION po\n" +
+                "left join pm_prj pp on pp.id = po.PM_PRJ_ID\n" +
+                "left join gr_set_value v1 on v1.id = po.KEY_PROJECT_TYPE_ID\n" +
+                "left join gr_set_value v2 on v2.id = pp.PROJECT_TYPE_ID\n" +
+                "left join gr_set_value v3 on v3.id = pp.BASE_LOCATION_ID\n" +
+                "left join gr_set_value v4 on v4.id = pp.PRJ_MANAGE_MODE_ID\n" +
+                "left join (select ro.PM_PRJ_ID,ro.AD_USER_ID,u.name from PM_ROSTER ro left join ad_user u on u.id = ro.AD_USER_ID where " +
+                "POST_INFO_ID = '1633731474912055296') rtemp on rtemp.PM_PRJ_ID = po.PM_PRJ_ID\n" +
+                "left join gr_set_value v5 on v5.id = pp.PROJECT_PHASE_ID\n" +
+                "left join (select PM_PRJ_ID,GROUP_CONCAT(AD_USER_ID) AdUserIds from prj_follower group by PM_PRJ_ID) ftemp on ftemp.PM_PRJ_ID = po.PM_PRJ_ID " +
+                "where 1=1 and (pp.PROJECT_STATUS is null or pp.PROJECT_STATUS != '1661568714048413696')");
         if (!CollectionUtils.isEmpty(selectReq.prjIds)){
             sqlSb.append(" and po.PM_PRJ_ID in (:prjIds)");
         }
@@ -457,6 +473,9 @@ public class PlanOperationExt {
         }
         if (!Strings.isNullOrEmpty(selectReq.totalInvestEnd)){
             sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST <= :totalInvestEnd");
+        }
+        if (selectReq.isFollow != null && selectReq.isFollow == true){
+            sqlSb.append(" and FIND_IN_SET(:loginId,ftemp.AdUserIds)");
         }
         //高级筛选begin------
         if (!this.isDisableFilter(selectReq)){//是否关闭高级筛选
@@ -494,12 +513,13 @@ public class PlanOperationExt {
         }
         //高级筛选end-------
         sqlSb.append(" group by pp.PROJECT_TYPE_ID");
+        sqlSb.append(" ) t2 on t1.prjTypeId = t2.prjTypeId");
         List<Map<String, Object>> originList = myNamedParameterJdbcTemplate.queryForList(sqlSb.toString(), sqlParams);
         Map<String, Object> result = new HashMap<>();
         if (!CollectionUtils.isEmpty(originList)){
-            int sum = originList.stream().mapToInt(originMap -> Integer.parseInt(originMap.get("num").toString())).sum();
+            int sum = originList.stream().mapToInt(originMap -> Integer.parseInt(originMap.get("leftNum").toString())).sum();//筛选后剩下的总数
             StringBuffer otherStatistic = new StringBuffer();
-            originList.forEach(originMap -> otherStatistic.append(" ").append(originMap.get("prjTypeName")).append(":").append(originMap.get("num")));
+            originList.forEach(originMap -> otherStatistic.append(" ").append(originMap.get("prjTypeName")).append(":").append(originMap.get("leftNum")).append("/").append(originMap.get("totalNum")));
             result.put("prjSum",sum);
             result.put("otherStatistic",otherStatistic);
         }

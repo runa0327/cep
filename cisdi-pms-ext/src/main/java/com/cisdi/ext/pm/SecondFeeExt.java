@@ -52,13 +52,26 @@ public class SecondFeeExt {
             demand = demands.get(0);
         }
 
-        //清空明细
-        FeeDemandDtl.deleteByWhere(new Where().eq(FeeDemandDtl.Cols.SECOND_CATEGORY_FEE_DEMAND_ID,demand.getId()));
         //计算
-        this.calculate(req.feeDemandDtls,req.secondFeeId);
+        this.calculate(req.feeDemandDtls,req.orderReqId);
+
+        //清空明细
+//        FeeDemandDtl.deleteByWhere(new Where().eq(FeeDemandDtl.Cols.SECOND_CATEGORY_FEE_DEMAND_ID,demand.getId()));
+        List<FeeDemandDtl> existingFeeDemandDtls = FeeDemandDtl.selectByWhere(new Where().eq(FeeDemandDtl.Cols.SECOND_CATEGORY_FEE_DEMAND_ID, demand.getId()));
+
         //插入明细
         for (DemandDtl dtlReq : req.feeDemandDtls) {
-            FeeDemandDtl feeDemandDtl = FeeDemandDtl.newData();
+            FeeDemandDtl feeDemandDtl;
+            if (!CollectionUtils.isEmpty(existingFeeDemandDtls)){//如果有明细，修改
+                feeDemandDtl = existingFeeDemandDtls.stream()
+                        .filter(existingDtl -> existingDtl.getFeeDemandNode().equals(dtlReq.feeDemandNodeId))
+                        .findAny().get();
+                if (feeDemandDtl.getSubmitTime() != null){//如果该明细已经提交过，不可修改
+                    continue;
+                }
+            }else {//没有明细，新增
+                feeDemandDtl = FeeDemandDtl.insertData();
+            }
             feeDemandDtl.setSecondCategoryFeeDemandId(demand.getId());
             feeDemandDtl.setFeeDemandNode(dtlReq.feeDemandNodeId);
             feeDemandDtl.setApprovedAmount(dtlReq.approvedAmount);
@@ -70,7 +83,7 @@ public class SecondFeeExt {
             if (!Strings.isNullOrEmpty(dtlReq.submitTime)){
                 feeDemandDtl.setSubmitTime(LocalDateTime.parse(dtlReq.submitTime,df));
             }
-            feeDemandDtl.insertById();
+            feeDemandDtl.updateById();
         }
     }
 
@@ -145,6 +158,18 @@ public class SecondFeeExt {
         ExtJarHelper.returnValue.set(output);
     }
 
+    public void prjWithContracts(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> prjList = myJdbcTemplate.queryForList("select pp.id prjId,pp.name prjName from pm_prj pp \n" +
+                "left join po_order o on o.PM_PRJ_ID = pp.id\n" +
+                "left join gr_set_value v on v.id = o.ORDER_DATA_SOURCE_TYPE\n" +
+                "where v.code = 'PO_ORDER_REQ'\n" +
+                "group by pp.id");
+        Map<String, Object> result = new HashMap<>();
+        result.put("prjList",prjList);
+        ExtJarHelper.returnValue.set(result);
+    }
+
     /**
      * 选项目后，合同下拉框
      */
@@ -179,7 +204,7 @@ public class SecondFeeExt {
     /**
      * 明细计算回显
      */
-    private void calculate(List<DemandDtl> demandDtls,String secondFeeId){
+    private void calculate(List<DemandDtl> demandDtls,String orderReqId){
         if (demandDtls == null || demandDtls.get(0).payableRatio == null){
             return;
         }
@@ -187,7 +212,7 @@ public class SecondFeeExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> paidAmtList = myJdbcTemplate.queryForList("select ifnull(sum(h.PAY_AMT),0) paidAmt from contract_pay_history h \n" +
                 "left join po_order o on o.id = h.PO_ORDER_ID\n" +
-                "where o.CONTRACT_APP_ID = ?", secondFeeId);
+                "where o.CONTRACT_APP_ID = ?", orderReqId);
         BigDecimal paidAmt = new BigDecimal(paidAmtList.get(0).get("paidAmt").toString());
         for (int i = 0; i < demandDtls.size(); i++) {
             DemandDtl demandDtl = demandDtls.get(i);
@@ -198,19 +223,18 @@ public class SecondFeeExt {
                 continue;
             }
             //可支付金额
-            BigDecimal firstApprovedAmount = demandDtls.get(0).approvedAmount.multiply(demandDtl.payableRatio);
-            demandDtl.payableAmount = demandDtl.approvedAmount.multiply(demandDtl.payableRatio);
-            //和第一个比，取较小值
-            demandDtl.payableAmount = (demandDtl.payableAmount.compareTo(firstApprovedAmount) < 0 ? demandDtl.payableAmount : firstApprovedAmount);
+            //取该条明细的批复金额和第一条批复金额比较，取较小值
+            BigDecimal smallerAmount = demandDtl.approvedAmount.compareTo(demandDtls.get(0).approvedAmount) < 0 ? demandDtl.approvedAmount : demandDtls.get(0).approvedAmount;
+            demandDtl.payableAmount = smallerAmount.multiply(demandDtl.payableRatio);
 
-            //已支付金额：合同已支付金额合计,待后续完善
-            demandDtl.paidAmount = new BigDecimal(BigInteger.ZERO);
+            //已支付金额：合同已支付金额合计
+            demandDtl.paidAmount = paidAmt;
 
             //支付比例：已支付金额 / 合同金额
-            demandDtl.paymentRatio = demandDtl.paidAmount.divide(demandDtls.get(0).approvedAmount);
+            demandDtl.paymentRatio = demandDtl.paidAmount.divide(demandDtls.get(0).approvedAmount,4,BigDecimal.ROUND_HALF_UP);
 
-            //需求资金：已支付比例*合同金额 - 已支付金额
-            demandDtl.requiredAmount = demandDtl.paymentRatio.multiply(demandDtls.get(0).approvedAmount).subtract(demandDtl.paidAmount);
+            //需求资金：可支付金额 - 已支付金额
+            demandDtl.requiredAmount = demandDtl.payableAmount.subtract(paidAmt);
 
             //报送时间：提交日期
             if (Strings.isNullOrEmpty(demandDtl.submitTime)){
@@ -447,11 +471,5 @@ public class SecondFeeExt {
             this.editable = false;
             this.mandatory = false;
         }
-    }
-
-    public static void main(String[] args) {
-//        String text = null == null ? null : "1".toString();
-//        System.out.println(text);
-        System.out.println(LocalDateTime.now().toString());
     }
 }

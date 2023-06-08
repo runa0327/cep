@@ -263,6 +263,17 @@ public class PmPrjIdLink {
                     //计划完成日期
                     linkedRecord.valueMap.put("PLAN_COMPL_DATE", JdbcMapUtil.getString(tmp, "PLAN_COMPL_DATE"));
                     linkedRecord.textMap.put("PLAN_COMPL_DATE", JdbcMapUtil.getString(tmp, "PLAN_COMPL_DATE"));
+                    //操作类型
+                    String OPREATION_TYPE = JdbcMapUtil.getString(tmp, "OPREATION_TYPE");
+                    if (!SharedUtil.isEmptyString(OPREATION_TYPE) && ("del".equals(OPREATION_TYPE) || "DEL".equals(OPREATION_TYPE))){
+                        linkedRecord.editableAttCodeList = new ArrayList<>();
+                        linkedRecord.editableAttCodeList.add("OPREATION_TYPE");
+                    } else {
+                        linkedRecord.mandatoryAttCodeList = new ArrayList<>();
+                        linkedRecord.mandatoryAttCodeList.add("PLAN_COMPL_DATE");
+                    }
+
+                    //TODO 操作类型字段返回  JdbcMapUtil.getString(tmp, "OPREATION_TYPE")
 
                     linkedRecordList.add(linkedRecord);
                 }

@@ -1,6 +1,7 @@
 package com.cisdi.ext.weektask;
 
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.ProPlanUtils;
 import com.cisdi.ext.util.StringUtil;
 import com.cisdi.ext.util.WeeklyUtils;
 import com.google.common.base.Strings;
@@ -37,12 +38,20 @@ public class WeekTaskExt {
         String userId = ExtJarHelper.loginInfo.get().userId;
         Map<String, String> weekDay = WeeklyUtils.weekBeginningAndEnding();
         StringBuilder sb = new StringBuilder();
-        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId,TRANSFER_TIME from week_task wt " +
+        sb.append(" select a.* from (");
+        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId,gsv.SEQ_NO as SEQ_NO from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
                 "left join ad_user au on au.id = wt.TRANSFER_USER left join pm_prj pj on wt.pm_prj_id = pj.id " +
                 "where AD_USER_ID = '").append(userId).append("' and PUBLISH_START between '")
                 .append(weekDay.get("begin")).append("' and '").append(weekDay.get("end"))
-                .append("' and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null ) order by PUBLISH_START desc");
+                .append("' and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null )");
+        sb.append(" union all ");
+        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId,gsv.SEQ_NO as SEQ_NO from week_task wt " +
+                "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id   " +
+                "left join ad_user au on au.id = wt.TRANSFER_USER left join pm_prj pj on wt.pm_prj_id = pj.id  " +
+                "where AD_USER_ID = '").append(userId).append("' and PUBLISH_START< '").append(weekDay.get("begin")).append("' and WEEK_TASK_STATUS_ID in ('1634118574056542208','1634118609016066048')");
+        sb.append(" and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null )");
+        sb.append(" ) a order by a.SEQ_NO ");
 
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
@@ -87,7 +96,7 @@ public class WeekTaskExt {
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
                 "left join ad_user au on au.id = wt.TRANSFER_USER " +
                 "left join pm_prj pm on pm.id = wt.pm_prj_id " +
-                "left join pm_pro_plan_node pn on pn.id = wt.RELATION_DATA_ID "+
+                "left join pm_pro_plan_node pn on pn.id = wt.RELATION_DATA_ID " +
                 "where wt.id=?", id);
         if (!CollectionUtils.isEmpty(list)) {
             List<WeekTask> weekTaskList = list.stream().map(p -> {
@@ -126,13 +135,13 @@ public class WeekTaskExt {
         String userId = ExtJarHelper.loginInfo.get().userId;
         Map<String, String> weekDay = WeeklyUtils.weekBeginningAndEnding();
         StringBuilder sb = new StringBuilder();
-        sb.append("select wt.*,gsv.`NAME` as task_status,TRANSFER_USER as transferUserId,au.name as transferUser,CAN_DISPATCH,TRANSFER_TIME from week_task wt " +
+        sb.append("select wt.*,gsv.`NAME` as task_status,TRANSFER_USER as transferUserId,au.name as transferUser,CAN_DISPATCH,TRANSFER_TIME,gsv.SEQ_NO as SEQ_NO from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
                 "left join ad_user au on au.id = wt.AD_USER_ID LEFT JOIN PM_PRJ pj on wt.pm_prj_id = pj.id " +
                 "where wt.id  in (select id from week_task where TRANSFER_USER='").append(userId).append("')")
                 .append(" and PUBLISH_START between '")
                 .append(weekDay.get("begin")).append("' and '").append(weekDay.get("end"))
-                .append("' and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null ) order by PUBLISH_START desc");
+                .append("' and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null ) order by SEQ_NO desc");
 
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
@@ -175,7 +184,8 @@ public class WeekTaskExt {
         myJdbcTemplate.update("update WEEK_TASK set WEEK_TASK_STATUS_ID='1644140265205915648',REASON_EXPLAIN=? where id=?", map.get("reason"), map.get("id"));
         //把节点状态变成未涉及
         myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID ='0099902212142036278' where id =(select RELATION_DATA_ID from week_task where id=?)", map.get("id"));
-
+        //当前节点的子节点都是未涉及，那么当前节点也是未涉及
+        nodeNoInvolve(JdbcMapUtil.getString(map, "id"));
         //继续出发后续节点
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select RELATION_DATA_ID from week_task where id=?", map.get("id"));
         if (!CollectionUtils.isEmpty(list)) {
@@ -230,24 +240,22 @@ public class WeekTaskExt {
                 project.id = JdbcMapUtil.getString(node, "projectId");
                 project.name = JdbcMapUtil.getString(node, "projectName");
                 resData.project = project;
-                //查询标准节点附加信息
-                String baseNodeId = JdbcMapUtil.getString(node, "SCHEDULE_NAME");
                 List<AttData> attDataList = new ArrayList<>();
-                if (!Strings.isNullOrEmpty(baseNodeId)) {
-                    List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select AD_ATT_ID,ATT_VALUE,ifnull(FOR_NODE,0) as FOR_NODE,ifnull(FOR_PROC,0) as FOR_PROC,aa.code as ad_att_code,aa.`NAME` as ad_att_text from STANDARD_NODE_NAME_DEFAULT_ATT t " +
-                            " left join AD_ATT aa on t.AD_ATT_ID = aa.id  where STANDARD_NODE_NAME_ID=?", baseNodeId);
-                    attDataList = list1.stream().map(m -> {
-                        AttData attData = new AttData();
-                        attData.AD_ATT_ID = JdbcMapUtil.getString(m, "AD_ATT_ID");
-                        attData.AD_ATT_CODE = JdbcMapUtil.getString(m, "ad_att_code");
-                        attData.ATT_VALUE = JdbcMapUtil.getString(m, "ATT_VALUE");
-                        attData.ATT_TXT = JdbcMapUtil.getString(m, "ad_att_text");
-                        attData.FOR_NODE = JdbcMapUtil.getString(m, "FOR_NODE");
-                        attData.FOR_PROC = JdbcMapUtil.getString(m, "FOR_PROC");
-                        return attData;
-                    }).collect(Collectors.toList());
-                    resData.attDataList = attDataList;
+                if (JdbcMapUtil.getString(node, "ATT_DATA") != null) {
+                    AttData attData = new AttData();
+                    attData.AD_ATT_CODE = "BUY_MATTER_TYPE_ID";
+                    attData.ATT_VALUE = JdbcMapUtil.getString(node, "ATT_DATA");
+                    String txt = "";
+                    List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from gr_set_value where id=?", JdbcMapUtil.getString(node, "ATT_DATA"));
+                    if (!CollectionUtils.isEmpty(list1)) {
+                        Map<String, Object> mapData = list1.get(0);
+                        txt = JdbcMapUtil.getString(mapData, "NAME");
+                    }
+                    attData.ATT_TXT = txt;
+                    attData.FOR_PROC = "1";
+                    attDataList.add(attData);
                 }
+                resData.attDataList = attDataList;
                 Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resData), Map.class);
                 ExtJarHelper.returnValue.set(outputMap);
             } else {
@@ -342,7 +350,7 @@ public class WeekTaskExt {
             node.nodeId = JdbcMapUtil.getString(pmData, "RELATION_DATA_ID");
             node.nodeName = JdbcMapUtil.getString(pmData, "nodeName");
             processData.node = node;
-            if (!CollectionUtils.isEmpty(dataList)){
+            if (!CollectionUtils.isEmpty(dataList)) {
                 processData.icon = JdbcMapUtil.getString(dataList.get(0), "EXTRA_INFO");
             }
             processData.title = JdbcMapUtil.getString(processNameMap, "name");
@@ -352,7 +360,6 @@ public class WeekTaskExt {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         }
     }
-
 
 
     public static class WeekTask {
@@ -399,6 +406,7 @@ public class WeekTaskExt {
         public Node node;
 
         public List<AttData> attDataList;
+
     }
 
     public static class AttData {
@@ -411,6 +419,7 @@ public class WeekTaskExt {
         public String FOR_NODE;
         public String FOR_PROC;
     }
+
 
     public static class Project {
         public String id;
@@ -483,5 +492,66 @@ public class WeekTaskExt {
                         userId, title, content, new Date(), "1634118574056542208", "1635080848313290752", objectMap.get("ID"), objectMap.get("projectId"), id);
             }
         }
+    }
+
+    /**
+     * 当前节点的子节点都是未涉及，那么当前节点也是未涉及
+     *
+     * @param weekTaskId
+     */
+    private void nodeNoInvolve(String weekTaskId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=(select RELATION_DATA_ID from week_task where id=?)", weekTaskId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> dataMap = list.get(0);
+            refreshParentStatus(JdbcMapUtil.getString(dataMap, "PM_PRO_PLAN_NODE_PID"));
+            List<Map<String, Object>> parentList = ProPlanUtils.selectAllParentNode(JdbcMapUtil.getString(dataMap, "ID"));
+            if (!CollectionUtils.isEmpty(parentList)) {
+                List<Map<String, Object>> notStart = parentList.stream().filter(p -> "0099799190825106800".equals(JdbcMapUtil.getString(p, "PROGRESS_STATUS_ID"))).collect(Collectors.toList());
+                notStart.forEach(item -> {
+                    myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID='0099799190825106801' where id=?", item.get("ID"));
+                });
+
+            }
+        }
+    }
+
+    /**
+     * 刷新父级节点的未涉及
+     *
+     * @param pid
+     */
+    private void refreshParentStatus(String pid) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> currentList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", pid);
+        if (!CollectionUtils.isEmpty(currentList)) {
+            Map<String, Object> currentNode = currentList.get(0);
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PM_PRO_PLAN_NODE_PID=?", pid);
+            if (!CollectionUtils.isEmpty(list)) {
+                //统计状态是未涉及的记录条数
+                long count = list.stream().filter(p -> "0099902212142036278".equals(JdbcMapUtil.getString(p, "PROGRESS_STATUS_ID"))).count();
+                if (list.size() == count) {
+                    //未涉及数量等于子节点个数，当前节点也改为未涉及
+                    myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID='0099902212142036278' where id=?", pid);
+                    //查询pid的父级
+                    List<Map<String, Object>> pidList = myJdbcTemplate.queryForList("select * from pm_pro_plan_node WHERE id=?", currentNode.get("PM_PRO_PLAN_NODE_PID"));
+                    if (!CollectionUtils.isEmpty(pidList)) {
+                        Map<String, Object> mapData = pidList.get(0);
+                        System.out.println(mapData.get("NAME"));
+                        refreshParentStatus(JdbcMapUtil.getString(mapData, "ID"));
+                    }
+                } else {
+                    List<Map<String, Object>> parentList = ProPlanUtils.selectAllParentNode(pid);
+                    if (!CollectionUtils.isEmpty(parentList)) {
+                        List<Map<String, Object>> notStart = parentList.stream().filter(p -> "0099799190825106800".equals(JdbcMapUtil.getString(p, "PROGRESS_STATUS_ID"))).collect(Collectors.toList());
+                        notStart.forEach(item -> {
+                            myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID='0099799190825106801' where id=?", item.get("ID"));
+                        });
+                    }
+
+                }
+            }
+        }
+
     }
 }

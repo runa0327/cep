@@ -13,10 +13,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author 尹涛 * @version V1.0.0
@@ -80,7 +81,7 @@ public class ProWeeklyJob {
                     for (String user : users) {
                         Map<String, Object> userData = jdbcTemplate.queryForMap("select * from ad_user where id =?", user);
                         String id = Util.insertData(jdbcTemplate, "REPORT_REMINDER_RECORD");
-                        jdbcTemplate.update("update REPORT_REMINDER_RECORD REPORT_ID=?,AD_USER_ID=?,MOBILE=?,REMINDER_TIME=?,REMINDER_CONTENT=? where id =?", reportId, user, userData.get("MOBILE"), new Date(), "", id);
+                        jdbcTemplate.update("update REPORT_REMINDER_RECORD set REPORT_ID=?,AD_USER_ID=?,MOBILE=?,REMINDER_TIME=?,REMINDER_CONTENT=? where id =?", reportId, user, userData.get("MOBILE"), new Date(), "", id);
                     }
                 }
             }

@@ -16,7 +16,7 @@ import com.jacob.com.Variant;
 import com.pms.cisdipmswordtopdf.controller.ToPdfController;
 import com.pms.cisdipmswordtopdf.model.PoOrderReq;
 import com.pms.cisdipmswordtopdf.service.WordToPdfService;
-import com.pms.cisdipmswordtopdf.util.StringUtils;
+import com.pms.cisdipmswordtopdf.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -45,7 +45,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String date = sdf.format(new Date());
         String companyName = poOrderReq.getCompanyName();
-        String fileId = StringUtils.replaceCode(poOrderReq.getFileId(),",","','");
+        String fileId = StringUtil.replaceCode(poOrderReq.getFileId(),",","','");
         //获取文件地址
         String sql1 = "select * from fl_file where id in ('"+fileId+"') and EXT in ('doc','docx')";
         List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
@@ -63,8 +63,8 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                 String copyPath = path+id+"copy.pdf";
                 String pdfPath = path+id+".pdf";
                 //word转pdf
-//                String error = newPdf(filePath,copyPath);
-                String error = wordStartToPdf(filePath,copyPath);
+                String error = newPdf(filePath,copyPath);
+//                String error = wordStartToPdf(filePath,copyPath);
                 if (error.length() > 0 && error != null && !"".equals(error)){
                     errorBuilder.append(error).append("\n ");
                 }
@@ -152,7 +152,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         List<String> pdfFileIds = new ArrayList<>();
         //查询pdf文件
         String oldFileId = jdbcTemplate.queryForList("select "+attCode+" from "+tableCode+" where id = ?",poOrderId).get(0).get(attCode).toString();
-        oldFileId = StringUtils.replaceCode(oldFileId,",","','");
+        oldFileId = StringUtil.replaceCode(oldFileId,",","','");
         String sql1 = "select id as id from fl_file where id in ('"+oldFileId+"') and EXT = 'PDF'";
         List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
         if (!CollectionUtils.isEmpty(list1)){

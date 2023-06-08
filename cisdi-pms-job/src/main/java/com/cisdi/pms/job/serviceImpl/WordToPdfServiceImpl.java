@@ -16,7 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import com.cisdi.pms.job.utils.StringUtils;
+import com.cisdi.pms.job.utils.StringUtil;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,54 +38,64 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String date = sdf.format(new Date());
         String companyName = poOrderReq.getCompanyName();
-        String fileId = StringUtils.replaceCode(poOrderReq.getFileId(),",","','");
-        //获取文件地址
-        String sql1 = "select * from fl_file where id in ('"+fileId+"') and EXT in ('doc','docx')";
-        List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
-        StringBuilder sb = new StringBuilder();
-        int i = 1;
-        //windows环境下测试获取文件地址，勿删
+        List<Map<String,String>> list = poOrderReq.getColMap();
+        if (!CollectionUtils.isEmpty(list)){
+            for (Map<String, String> tp : list) {
+                String colsCode = tp.get("code").toString();
+                String file = tp.get("file").toString();
+                if (StringUtils.hasText(file)){
+                    String fileId = StringUtil.replaceCode(file,",","','");
+                    //获取文件地址
+                    String sql1 = "select * from fl_file where id in ('"+fileId+"') and EXT in ('doc','docx')";
+                    List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
+                    StringBuilder sb = new StringBuilder();
+                    int i = 1;
+                    //windows环境下测试获取文件地址，勿删
 //        String filePath = jdbcTemplate.queryForList("select name from test_demo").get(0).get("name").toString();
-        String code = jdbcTemplate.queryForList("select remark from base_third_interface where code = 'order_word_to_pdf' and SYS_TRUE = 1 ").get(0).get("remark").toString();
-        StringBuilder errorBuilder = new StringBuilder();
-        if (!CollectionUtils.isEmpty(list1)){
-            for (Map<String, Object> tmp : list1) {
-                String filePath = tmp.get("PHYSICAL_LOCATION").toString();
-                String path = filePath.substring(0,filePath.lastIndexOf(code)+1);
-                String id = IdUtil.getSnowflakeNextIdStr();
-                String copyPath = path+id+"copy.pdf";
-                String pdfPath = path+id+".pdf";
-                //word转pdf
-                String error = wordStartToPdf(filePath,copyPath);
-                if (error.length() > 0 && error != null && !"".equals(error)){
-                    errorBuilder.append(error).append("\n ");
+                    String code = jdbcTemplate.queryForList("select remark from base_third_interface where code = 'order_word_to_pdf' and SYS_TRUE = 1 ").get(0).get("remark").toString();
+                    StringBuilder errorBuilder = new StringBuilder();
+                    if (!CollectionUtils.isEmpty(list1)){
+                        for (Map<String, Object> tmp : list1) {
+                            String userId = tmp.get("CRT_USER_ID").toString();
+                            String filePath = tmp.get("PHYSICAL_LOCATION").toString();
+                            String path = filePath.substring(0,filePath.lastIndexOf(code)+1);
+                            String id = IdUtil.getSnowflakeNextIdStr();
+                            String copyPath = path+id+"copy.pdf";
+                            String pdfPath = path+id+".pdf";
+                            //word转pdf
+                            String error = wordStartToPdf(filePath,copyPath);
+                            if (error.length() > 0 && error != null && !"".equals(error)){
+                                errorBuilder.append(error).append("\n ");
+                            }
+                            //pdf加水印
+                            Boolean res = addWater(companyName,copyPath,pdfPath,errorBuilder);
+                            if (res){
+                                sb.append(id).append(",");
+                                //删除中间文件
+                                deleteFile(copyPath);
+                                //获取文件相关信息
+                                Map<String,Object> map = getFileMess(pdfPath,id);
+                                //写入文件表
+                                updateData(map,poOrderReq,tmp,date,userId);
+                            }
+                            i++;
+                        }
+                    }
+                    if (sb.length() > 0){
+                        String newFileId = sb.deleteCharAt(sb.length()-1).toString();
+                        //更新合同表
+                        updateOrder(newFileId,poOrderReq,colsCode);
+                    }
+                    if (errorBuilder.length() > 0){
+                        //将问题信息计入提示信息表便于排查分析
+                        String id = IdUtil.getSnowflakeNextIdStr();
+                        String remark = "用户"+poOrderReq.getCreateBy()+"在合同签订上传的合同文本转化为pdf失败";
+                        String sql = "update AD_REMIND_LOG set AD_ENT_ID='0099799190825103145',ENT_CODE='PO_ORDER_REQ',ENTITY_RECORD_ID=?,REMIND_USER_ID='0099250247095871681'," +
+                                "REMIND_METHOD='日志提醒',REMIND_TARGET='admin',REMIND_TIME=?,REMIND_TEXT=? where id = ?";
+                        jdbcTemplate.update(sql,poOrderReq.getId(),date,remark,id);
+                    }
                 }
-                //pdf加水印
-                Boolean res = addWater(companyName,copyPath,pdfPath,errorBuilder);
-                if (res){
-                    sb.append(id).append(",");
-                    //删除中间文件
-                    deleteFile(copyPath);
-                    //获取文件相关信息
-                    Map<String,Object> map = getFileMess(pdfPath,id);
-                    //写入文件表
-                    updateData(map,poOrderReq,tmp,date);
-                }
-                i++;
             }
-        }
-        if (sb.length() > 0){
-            String newFileId = sb.deleteCharAt(sb.length()-1).toString();
-            //更新合同表
-            updateOrder(newFileId,poOrderReq);
-        }
-        if (errorBuilder.length() > 0){
-            //将问题信息计入提示信息表便于排查分析
-            String id = IdUtil.getSnowflakeNextIdStr();
-            String remark = "用户"+poOrderReq.getCreateBy()+"在合同签订上传的合同文本转化为pdf失败";
-            String sql = "update AD_REMIND_LOG set AD_ENT_ID='0099799190825103145',ENT_CODE='PO_ORDER_REQ',ENTITY_RECORD_ID=?,REMIND_USER_ID='0099250247095871681'," +
-                    "REMIND_METHOD='日志提醒',REMIND_TARGET='admin',REMIND_TIME=?,REMIND_TEXT=? where id = ?";
-            jdbcTemplate.update(sql,poOrderReq.getId(),date,remark,id);
         }
     }
 
@@ -92,8 +103,9 @@ public class WordToPdfServiceImpl implements WordToPdfService {
      * 更新合同表
      * @param newFileId pdf文件id
      * @param poOrderReq 合同信息
+     * @param colsCode 获取的字段名
      */
-    private void updateOrder(String newFileId, PoOrderReq poOrderReq) {
+    private void updateOrder(String newFileId, PoOrderReq poOrderReq, String colsCode) {
         String isModel = poOrderReq.getIsModel();
         String attCode = "",newFileIds = poOrderReq.getFileId(), poOrderId = poOrderReq.getId();
         if ("1".equals(isModel)){ //是模板
@@ -103,7 +115,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         }
         //查询pdf文件
         String oldFileId = jdbcTemplate.queryForList("seleCT ATT_FILE_GROUP_ID from po_order_req where id = ?",poOrderId).get(0).get("ATT_FILE_GROUP_ID").toString();
-        oldFileId = StringUtils.replaceCode(oldFileId,",","','");
+        oldFileId = StringUtil.replaceCode(oldFileId,",","','");
         String sql1 = "select group_concat(id) as id from fl_file where id in ('"+oldFileId+"') and EXT = 'PDF'";
         List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
         if (!CollectionUtils.isEmpty(list1)){
@@ -125,13 +137,13 @@ public class WordToPdfServiceImpl implements WordToPdfService {
      * @param poOrderReq 合同信息
      * @param oldFileTmp 原始文件信息
      * @param date 时间
+     * @param userId 上传人
      * @return
      */
-    private void updateData(Map<String, Object> map, PoOrderReq poOrderReq,Map<String, Object> oldFileTmp,String date) {
+    private void updateData(Map<String, Object> map, PoOrderReq poOrderReq,Map<String, Object> oldFileTmp,String date, String userId) {
         String fileId = map.get("fileId").toString();
         String name = oldFileTmp.get("Name").toString();
         String flPathId = oldFileTmp.get("FL_PATH_ID").toString();
-        String createBy = poOrderReq.getCreateBy();
         String size = map.get("size").toString();
         String fileSize = map.get("fileSize").toString();
         String fileIdPath = map.get("fileIdPath").toString();
@@ -139,7 +151,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         String insertSql = "insert into fl_file (ID,CODE,NAME,VER,FL_PATH_ID,EXT,STATUS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID," +
                 "SIZE_KB,TS,UPLOAD_DTTM,PHYSICAL_LOCATION,DSP_NAME,DSP_SIZE,IS_PUBLIC_READ) values (" +
                 "?,?,?,'1',?,'pdf','AP',?,?,?,?,?,?,?,?,?,?,0)";
-        Integer exec = jdbcTemplate.update(insertSql,fileId,fileId,name,flPathId,date,createBy,date,createBy,size,date,date,fileIdPath,fileName,fileSize);
+        Integer exec = jdbcTemplate.update(insertSql,fileId,fileId,name,flPathId,date,userId,date,userId,size,date,date,fileIdPath,fileName,fileSize);
         log.info("执行成功，共{}条",exec);
     }
 

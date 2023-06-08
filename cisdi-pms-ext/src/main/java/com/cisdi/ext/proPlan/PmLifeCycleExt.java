@@ -70,10 +70,7 @@ public class PmLifeCycleExt {
 //        columnList.add(2, HeaderObj.builder().name("备注说明").izDisplay("1").build());
 
         if (CollectionUtils.isEmpty(columnList)) {
-            OutSide outSide = new OutSide();
-            outSide.columnList = columnList;
-            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
-            ExtJarHelper.returnValue.set(outputMap);
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
             OutSide outSide = new OutSide();
             outSide.columnList = columnList;
@@ -99,7 +96,7 @@ public class PmLifeCycleExt {
                 " left join pm_prj pj  on pj.id = po.PM_PRJ_ID\n" +
                 " left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID and pp.POST_INFO_ID='1633731474912055296'\n" +
                 " left join ad_user au on pp.AD_USER_ID = au.id \n" +
-                " where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ");
+                " where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and (pj.PROJECT_STATUS <> '1661568714048413696' or pj.PROJECT_STATUS is null) ");
         sb.append(" and pj.PROJECT_TYPE_ID ='").append(projectType).append("'");
         if (!StringUtils.isEmpty(projectName)) {
             sb.append(" and pj.name like '%").append(projectName).append("%'");
@@ -120,7 +117,6 @@ public class PmLifeCycleExt {
 
         headerList.add(0, "ID");
         headerList.add(1, "项目名称");
-//        headerList.add(2, "前期手续经办人");
         headerList.add(2, "备注说明");
 
         //数据
@@ -132,7 +128,7 @@ public class PmLifeCycleExt {
             MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
             Map<String, Object> queryParams = new HashMap<>();// 创建入参map
             queryParams.put("ids", ids);
-            nodeList = myNamedParameterJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name,snn.`NAME` as nodeName,po.name as postName,au.name as userName from pm_pro_plan_node pn  \n" +
+            nodeList = myNamedParameterJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name,snn.`NAME` as nodeName,po.name as postName,au.name as userName,ifnull(IZ_OVERDUE,0) as izOverdue from pm_pro_plan_node pn  \n" +
                     " left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id \n" +
                     " left join gr_set_value gsv on gsv.id = pn.PROGRESS_STATUS_ID  \n" +
                     " left join STANDARD_NODE_NAME snn on pn.SCHEDULE_NAME = snn.id  \n" +
@@ -155,14 +151,7 @@ public class PmLifeCycleExt {
                     json.put("nameOrg", stringObjectMap.get("id"));
                     json.put("remarkCount", 0);
                     newData.put("ID", json);
-                }
-//                else if ("前期手续经办人".equals(s)) {
-//                    JSONObject json = new JSONObject();
-//                    json.put("nameOrg", stringObjectMap.get("qquser"));
-//                    json.put("remarkCount", 0);
-//                    newData.put("前期手续经办人", json);
-//                }
-                else if ("备注说明".equals(s)) {
+                } else if ("备注说明".equals(s)) {
                     JSONObject json = new JSONObject();
                     List<String> contentList = new ArrayList<>();
                     List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from REMARK_INFO where REMARK_TYPE='1' and PM_PRJ_ID=?", stringObjectMap.get("id"));
@@ -188,7 +177,6 @@ public class PmLifeCycleExt {
                             String dateOrg = "";
                             String statusOrg = "";
                             String tips = null;
-                            String postInfo = "";
                             if ("已完成".equals(status)) {
                                 nameOrg = "实际完成";
                                 if (Objects.nonNull(dataMap.get("ACTUAL_COMPL_DATE"))) {
@@ -198,10 +186,10 @@ public class PmLifeCycleExt {
                                     Date plan = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
                                     Date actual = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "ACTUAL_COMPL_DATE"));
                                     int days = DateTimeUtil.daysBetween(plan, actual);
-                                    if (days > 0) {
-                                        tips = "提前" + days + "完成！";
-                                    } else if (days < 0) {
+                                    if (plan.before(actual)) {
                                         tips = "超期" + Math.abs(days) + "天";
+                                    } else {
+                                        tips = "提前" + days + "完成！";
                                     }
                                 }
                                 statusOrg = "已完成";
@@ -209,22 +197,32 @@ public class PmLifeCycleExt {
                                 nameOrg = "未涉及";
                                 tips = "项目未涉及" + JdbcMapUtil.getString(dataMap, "NAME");
                                 statusOrg = "未涉及";
-                            } else {
                                 if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
                                     Date planCompDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
                                     if (planCompDate.before(new Date())) {
-                                        statusOrg = "已超期";
-                                        if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                            Date plan = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
-                                            int days = DateTimeUtil.daysBetween(plan, new Date());
-                                            tips = "超期" + Math.abs(days) + "天";
-                                        }
-                                    } else {
-                                        if ("进行中".equals(status)) {
-                                            statusOrg = "进行中";
-                                        } else if ("未启动".equals(status)) {
-                                            statusOrg = "未启动";
-                                        }
+                                        int days = DateTimeUtil.daysBetween(planCompDate, new Date());
+                                        tips = "超期" + Math.abs(days) + "天";
+                                    }
+                                    nameOrg = "计划完成";
+                                    if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
+                                        dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
+                                    }
+                                }
+                            } else {
+                                if ("0".equals(JdbcMapUtil.getString(dataMap, "izOverdue"))) {
+                                    if ("进行中".equals(status)) {
+                                        statusOrg = "进行中";
+                                    } else if ("未启动".equals(status)) {
+                                        statusOrg = "未启动";
+                                    }
+                                } else {
+                                    statusOrg = "已超期";
+                                }
+                                if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
+                                    Date planCompDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                                    if (planCompDate.before(new Date())) {
+                                        int days = DateTimeUtil.daysBetween(planCompDate, new Date());
+                                        tips = "超期" + Math.abs(days) + "天";
                                     }
                                     nameOrg = "计划完成";
                                     if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
@@ -239,7 +237,8 @@ public class PmLifeCycleExt {
                             json.put("tips", tips);
                             int count = getRemarkCount(JdbcMapUtil.getString(stringObjectMap, "ID"), JdbcMapUtil.getString(dataMap, "SCHEDULE_NAME"));
                             json.put("remarkCount", count);
-                            json.put("postInfo", JdbcMapUtil.getString(dataMap, "postName") + "" + JdbcMapUtil.getString(dataMap, "userName"));
+                            json.put("postInfo", JdbcMapUtil.getString(dataMap, "postName") + ":" + (JdbcMapUtil.getString(dataMap, "userName") == null ? "" : JdbcMapUtil.getString(dataMap, "userName")));
+                            json.put("nodeId", JdbcMapUtil.getString(dataMap, "ID"));
                         }
                         newData.put(s, json);
                     } else {

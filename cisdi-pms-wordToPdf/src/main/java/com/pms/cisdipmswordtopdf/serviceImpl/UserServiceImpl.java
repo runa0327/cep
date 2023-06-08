@@ -4,12 +4,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.pms.cisdipmswordtopdf.model.BriskUser;
 import com.pms.cisdipmswordtopdf.model.BriskUserExportModel;
 import com.pms.cisdipmswordtopdf.service.UserService;
+import com.pms.cisdipmswordtopdf.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
                 "group by l.AD_USER_ID order by loginNum desc", startTime, endTime);
         List<BriskUserExportModel> models = originList.stream().map(userMap -> {
             BriskUserExportModel model = JSONObject.parseObject(JSONObject.toJSONString(userMap), BriskUserExportModel.class);
-            model.lastLoginDate = com.pms.cisdipmswordtopdf.util.StringUtils.replaceCode(model.lastLoginDate,"T"," ");
+            model.lastLoginDate = StringUtil.replaceCode(model.lastLoginDate,"T"," ");
             return model;
         }).collect(Collectors.toList());
         return models;
