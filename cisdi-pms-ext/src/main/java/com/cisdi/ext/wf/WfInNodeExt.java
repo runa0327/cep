@@ -269,23 +269,27 @@ public class WfInNodeExt {
 
     private void updateEndInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode, boolean processWeekTask) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        // 计算时间工期
-        int actualDays = 0;
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", leafNode.get("ID"));
-        if (!CollectionUtils.isEmpty(list)) {
-            Map<String, Object> currentNode = list.get(0);
-            Date startDate = JdbcMapUtil.getDate(currentNode, "ACTUAL_START_DATE");
-            try {
-                actualDays = DateTimeUtil.daysBetween(now, startDate);
-            } catch (Exception e) {
-                log.error("计算实际完成工期失败！");
+        //更新节点状态判断
+        Boolean izTrue = checkIzChange(procInstId,leafNode,myJdbcTemplate);
+        if (izTrue){
+
+            // 计算时间工期
+            int actualDays = 0;
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", leafNode.get("ID"));
+            if (!CollectionUtils.isEmpty(list)) {
+                Map<String, Object> currentNode = list.get(0);
+                Date startDate = JdbcMapUtil.getDate(currentNode, "ACTUAL_START_DATE");
+                try {
+                    actualDays = DateTimeUtil.daysBetween(now, startDate);
+                } catch (Exception e) {
+                    log.error("计算实际完成工期失败！");
+                }
             }
-        }
-        Crud.from("pm_pro_plan_node").where().eq("ID", leafNode.get("ID")).update()
-                // 设置进度信息：
-                .set("PROGRESS_STATUS_ID", COMPLETED).set("ACTUAL_CURRENT_PRO_PERCENT", 100).set("ACTUAL_COMPL_DATE", now).set("ACTUAL_TOTAL_DAYS", actualDays)
-                // 设置关联信息：
-                .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", nodeInstId).set("IZ_OVERDUE", "0").exec();
+            Crud.from("pm_pro_plan_node").where().eq("ID", leafNode.get("ID")).update()
+                    // 设置进度信息：
+                    .set("PROGRESS_STATUS_ID", COMPLETED).set("ACTUAL_CURRENT_PRO_PERCENT", 100).set("ACTUAL_COMPL_DATE", now).set("ACTUAL_TOTAL_DAYS", actualDays)
+                    // 设置关联信息：
+                    .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", nodeInstId).set("IZ_OVERDUE", "0").exec();
 
 
             myJdbcTemplate.update("update pm_pro_plan_node t set t.ACTUAL_CARRY_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1,t.ACTUAL_TOTAL_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1 WHERE t.id=?", leafNode.get("ID"));
