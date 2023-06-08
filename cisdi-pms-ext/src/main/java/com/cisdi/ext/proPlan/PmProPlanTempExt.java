@@ -147,7 +147,6 @@ public class PmProPlanTempExt {
                 "left join pm_pro_plan_node pre on pppn.PRE_NODE_ID = pre.id  " +
                 "left join WF_PROCESS wp on pppn.LINKED_WF_PROCESS_ID = wp.id  " +
                 "left join PRO_PLAN_TEMPLATE_RULE r on r.PM_PRO_PLAN_ID = pppn.PM_PRO_PLAN_ID " +
-//                "where pppn.PM_PRO_PLAN_ID=?", map.get("planId"));
                 "where r.id=?", map.get("ruleId"));
         List<PlanNode> nodeList = list.stream().map(p -> {
             PlanNode node = new PlanNode();
@@ -172,6 +171,7 @@ public class PmProPlanTempExt {
             if (Strings.isNotEmpty(att)) {
                 node.atts = Arrays.asList(att.split(","));
             }
+            node.attData = JdbcMapUtil.getString(p, "ATT_DATA");
             return node;
         }).collect(Collectors.toList());
 
@@ -520,6 +520,8 @@ public class PmProPlanTempExt {
         public String baseNodeId;
 
         public String ver;
+
+        public String attData;
 
     }
 
