@@ -1,5 +1,6 @@
 package com.cisdi.ext.wf;
 
+import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.PmProPlanNode;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -287,14 +288,45 @@ public class WfInNodeExt {
                 .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", nodeInstId).set("IZ_OVERDUE", "0").exec();
 
 
-        myJdbcTemplate.update("update pm_pro_plan_node t set t.ACTUAL_CARRY_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1,t.ACTUAL_TOTAL_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1 WHERE t.id=?", leafNode.get("ID"));
+            myJdbcTemplate.update("update pm_pro_plan_node t set t.ACTUAL_CARRY_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1,t.ACTUAL_TOTAL_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1 WHERE t.id=?", leafNode.get("ID"));
 
-        if (processWeekTask) {
-            // 给后续节点发周任务
-            sendPreNodeWeekTask(JdbcMapUtil.getString(leafNode, "ID"));
-            // 当前节点有关的工作台任务状态变为已完成
-            myJdbcTemplate.update("update week_task set WEEK_TASK_STATUS_ID='1634118629769482240' where RELATION_DATA_ID=?", JdbcMapUtil.getString(leafNode, "ID"));
+            if (processWeekTask) {
+                // 给后续节点发周任务
+                sendPreNodeWeekTask(JdbcMapUtil.getString(leafNode, "ID"));
+                // 当前节点有关的工作台任务状态变为已完成
+                myJdbcTemplate.update("update week_task set WEEK_TASK_STATUS_ID='1634118629769482240' where RELATION_DATA_ID=?", JdbcMapUtil.getString(leafNode, "ID"));
+            }
         }
+
+    }
+
+    /**
+     * 更新全景计划节点状态-判断是否需要更改
+     * @param procInstId 流程实例id
+     * @param leafNode 项目节点信息
+     * @param myJdbcTemplate 数据源
+     * @return 判断结果
+     */
+    private Boolean checkIzChange(String procInstId, Map<String,Object> leafNode, MyJdbcTemplate myJdbcTemplate) {
+        Boolean izChange = true;
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        List<String> purchaseList = AttLinkDifferentProcess.getPurchaseList();
+        if (purchaseList.contains(entCode)){
+            //获取流程表信息等
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList("select * from wf_process_instance where id = ?",procInstId);
+            String entityRecordId = JdbcMapUtil.getString(list1.get(0),"ENTITY_RECORD_ID");
+            String attData = JdbcMapUtil.getString(leafNode,"ATT_DATA"); //节点中设置的采购事项类型
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList("select * from "+entCode+" where id = ?", entityRecordId);
+            String buyMatterId = JdbcMapUtil.getString(list2.get(0),"BUY_MATTER_ID"); //采购事项
+            List<Map<String,Object>> list3 = myJdbcTemplate.queryForList("select * from BASE_MATTER_TYPE_CON where GR_SET_VALUE_ID = ?", buyMatterId);
+            String buyMatterTypeId = JdbcMapUtil.getString(list3.get(0),"GR_SET_VALUE_ONE_ID"); //采购事项类别
+            if (SharedUtil.isEmptyString(attData)){
+                izChange = false;
+            } else if (SharedUtil.isEmptyString(buyMatterTypeId) || !buyMatterTypeId.equals(attData)){
+                izChange = false;
+            }
+        }
+        return izChange;
     }
 
 
