@@ -450,7 +450,7 @@ public class PlanOperationExt {
                 "left join (select ro.PM_PRJ_ID,ro.AD_USER_ID,u.name from PM_ROSTER ro left join ad_user u on u.id = ro.AD_USER_ID where " +
                 "POST_INFO_ID = '1633731474912055296') rtemp on rtemp.PM_PRJ_ID = po.PM_PRJ_ID\n" +
                 "left join gr_set_value v5 on v5.id = pp.PROJECT_PHASE_ID\n" +
-                "where 1=1 group by pp.PROJECT_TYPE_ID\n" +
+                "where 1=1 and (pp.PROJECT_STATUS is null or pp.PROJECT_STATUS != '1661568714048413696') group by pp.PROJECT_TYPE_ID\n" +
                 ") t1\n" +
                 "left join (\n" +
                 "select count(po.id) num,pp.PROJECT_TYPE_ID prjTypeId,v2.name prjTypeName\n" +
@@ -464,7 +464,7 @@ public class PlanOperationExt {
                 "POST_INFO_ID = '1633731474912055296') rtemp on rtemp.PM_PRJ_ID = po.PM_PRJ_ID\n" +
                 "left join gr_set_value v5 on v5.id = pp.PROJECT_PHASE_ID\n" +
                 "left join (select PM_PRJ_ID,GROUP_CONCAT(AD_USER_ID) AdUserIds from prj_follower group by PM_PRJ_ID) ftemp on ftemp.PM_PRJ_ID = po.PM_PRJ_ID " +
-                "where 1=1");
+                "where 1=1 and (pp.PROJECT_STATUS is null or pp.PROJECT_STATUS != '1661568714048413696')");
         if (!CollectionUtils.isEmpty(selectReq.prjIds)){
             sqlSb.append(" and po.PM_PRJ_ID in (:prjIds)");
         }
