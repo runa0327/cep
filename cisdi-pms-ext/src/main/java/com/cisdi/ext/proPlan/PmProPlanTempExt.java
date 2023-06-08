@@ -307,6 +307,9 @@ public class PmProPlanTempExt {
         if (Strings.isNotEmpty(input.izMilestone)) {
             sb.append(",IZ_MILESTONE =").append(input.izMilestone);
         }
+        if (Strings.isNotEmpty(input.attData)) {
+            sb.append(",ATT_DATA = '").append(input.attData).append("'");
+        }
         sb.append(",`LEVEL`=").append(input.level);
         sb.append(", SEQ_NO =").append(input.seqNo);
         sb.append(" where id='").append(id).append("'");
@@ -550,6 +553,7 @@ public class PmProPlanTempExt {
         public String tableId;
 
         public String baseNodeId;
+        public String attData;
     }
 
     public static class ObjInfo {
