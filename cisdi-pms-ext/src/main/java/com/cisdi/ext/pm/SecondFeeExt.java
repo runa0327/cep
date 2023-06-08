@@ -158,6 +158,18 @@ public class SecondFeeExt {
         ExtJarHelper.returnValue.set(output);
     }
 
+    public void prjWithContracts(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> prjList = myJdbcTemplate.queryForList("select pp.id prjId,pp.name prjName from pm_prj pp \n" +
+                "left join po_order o on o.PM_PRJ_ID = pp.id\n" +
+                "left join gr_set_value v on v.id = o.ORDER_DATA_SOURCE_TYPE\n" +
+                "where v.code = 'PO_ORDER_REQ'\n" +
+                "group by pp.id");
+        Map<String, Object> result = new HashMap<>();
+        result.put("prjList",prjList);
+        ExtJarHelper.returnValue.set(result);
+    }
+
     /**
      * 选项目后，合同下拉框
      */
