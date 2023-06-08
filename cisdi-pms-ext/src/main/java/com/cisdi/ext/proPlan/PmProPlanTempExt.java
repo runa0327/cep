@@ -357,7 +357,7 @@ public class PmProPlanTempExt {
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         String level = JdbcMapUtil.getString(params, "level");
         String planId = JdbcMapUtil.getString(params, "planId");
-        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME where level = ? and status = 'AP' and id not in (select SCHEDULE_NAME from (select SCHEDULE_NAME,OPREATION_TYPE from pm_pro_plan_node where PM_PRO_PLAN_ID = ? and SCHEDULE_NAME is not null) a where a.OPREATION_TYPE <> 'del') order by SEQ_NO", level,planId);
+        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME where level = ? and status = 'AP' and id not in (select SCHEDULE_NAME from (select SCHEDULE_NAME,OPREATION_TYPE from pm_pro_plan_node where PM_PRO_PLAN_ID = ? and SCHEDULE_NAME is not null) a where a.OPREATION_TYPE ='add' or a.OPREATION_TYPE is null) order by SEQ_NO", level,planId);
         List<ObjInfo> objInfoList = resultList.stream().map(p -> {
             ObjInfo objInfo = new ObjInfo();
             objInfo.id = JdbcMapUtil.getString(p, "ID");
