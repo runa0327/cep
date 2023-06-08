@@ -59,13 +59,14 @@ public class PmLifeCycleExportController extends BaseController {
         sb.append(" and pj.pm_code is not null ");
         sb.append("group by pj.id,au.`NAME` order by pj.pm_code desc");
         //header
-        List<String> headerList;
+        List<String> header = new ArrayList<>();
         if (Strings.isNotEmpty(columns)) {
-            headerList = Arrays.asList(columns.split(","));
+            header = Arrays.asList(columns.split(","));
         } else {
             List<Map<String, Object>> strList = jdbcTemplate.queryForList("select `NAME`,ifnull(IZ_DISPLAY,0) as IZ_DISPLAY from STANDARD_NODE_NAME where `LEVEL`=3 order by SEQ_NO ");
-            headerList = strList.stream().map(p -> JdbcMapUtil.getString(p, "NAME")).collect(Collectors.toList());
+            header = strList.stream().map(p -> JdbcMapUtil.getString(p, "NAME")).collect(Collectors.toList());
         }
+        List<String> headerList = new ArrayList<>(header);
         if (!headerList.contains("项目名称")) {
             headerList.add(0, "项目名称");
         }
