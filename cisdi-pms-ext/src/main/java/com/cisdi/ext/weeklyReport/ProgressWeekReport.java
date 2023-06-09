@@ -7,7 +7,6 @@ import com.cisdi.ext.model.PmProgressWeeklyPrjDetail;
 import com.cisdi.ext.model.view.project.PmPrjView;
 import com.cisdi.ext.model.view.weekReport.PmProgressWeeklyView;
 import com.cisdi.ext.model.view.weekReport.WeekMessage;
-import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
@@ -19,7 +18,6 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -210,7 +208,7 @@ public class ProgressWeekReport {
             throw new BaseException("整体形象进度只能处于 0-100 间");
         }
         if (progress.compareTo(new BigDecimal(100)) == 0){
-            Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_END",1).exec();
+            Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_END",1).set("PROJECT_PHASE_ID","0099799190825080708").exec();
             Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekMessage.weekPrjId).update().set("IZ_END",1).exec();
             Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",weekMessage.id).update().set("IZ_END",1).exec();
         }
@@ -240,7 +238,11 @@ public class ProgressWeekReport {
             Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update().set("SYS_TRUE",buttonStatus).exec();
             Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",id).update().set("SYS_TRUE",buttonStatus).exec();
         } else if (buttonType == 1){ //处理竣工条件
-            Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_END",buttonStatus).exec();
+            if (buttonStatus == 1){ //已竣工
+                Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_END",buttonStatus).set("PROJECT_PHASE_ID","0099799190825080708").exec();
+            } else {
+                Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_END",buttonStatus).exec();
+            }
             Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update().set("IZ_END",buttonStatus).exec();
             Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",id).update().set("IZ_END",buttonStatus).exec();
         }
