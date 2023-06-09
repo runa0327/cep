@@ -374,9 +374,9 @@ public class SecondFeeStatisticExt {
         DeptContractReq req = JSONObject.parseObject(JSONObject.toJSONString(input), DeptContractReq.class);
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         StringBuffer sqlSb = new StringBuffer();
-        sqlSb.append("select pp.id prjId,pp.name prjName,oo.CONTRACT_NAME contractName,d.id deptId,d.name deptName,u.id operatorId,u.name operatorName,dd" +
-                ".SUBMIT_TIME submitTime,IFNULL(dd.APPROVED_AMOUNT,0) approvedAmt,IFNULL(oo.AMT_SIX,0) contractAmt,IFNULL(htemp.sumPayAmt,0) " +
-                "paidAmt,IFNULL(IFNULL(htemp.sumPayAmt,0)/IFNULL(oo.AMT_SIX,0),0) paidRatio\n" +
+        sqlSb.append("select pp.id prjId,pp.name prjName,oo.CONTRACT_NAME contractName,d.id deptId,d.name deptName,u.id operatorId,u.name " +
+                "operatorName,dd.SUBMIT_TIME submitTime,IFNULL(dd.REQUIRED_AMOUNT,0) requiredAmt,IFNULL(oo.AMT_SIX,0) contractAmt,IFNULL(htemp" +
+                ".sumPayAmt,0) paidAmt,IFNULL(IFNULL(htemp.sumPayAmt,0)/IFNULL(oo.AMT_SIX,0),0) paidRatio\n" +
                 "from second_category_fee_demand fd\n" +
                 "left join fee_demand_dtl dd on dd.SECOND_CATEGORY_FEE_DEMAND_ID = fd.id\n" +
                 "left join pm_prj pp on pp.id = fd.PM_PRJ_ID\n" +
@@ -438,6 +438,11 @@ public class SecondFeeStatisticExt {
             deptAmt.deptId = deptId;
             deptAmts.add(deptAmt);
         }
+        resp.deptAmts = deptAmts;
+
+        //分页
+        List<DeptContract> pageDeptContracts = totalDeptContracts.stream().skip(req.pageSize * (req.pageIndex - 1)).limit(req.pageSize).collect(Collectors.toList());
+        resp.deptContracts = pageDeptContracts;
 
         //返回
         Map output = JsonUtil.fromJson(JsonUtil.toJson(resp), Map.class);
@@ -612,13 +617,15 @@ public class SecondFeeStatisticExt {
         //日期
         private String date;
         //资金需求总金额
-        private BigDecimal sumRequiredAmt;
+        private BigDecimal sumRequiredAmt = BigDecimal.ZERO;
         //已支付总金额
-        private BigDecimal sumPaidAmt;
+        private BigDecimal sumPaidAmt = BigDecimal.ZERO;
         //合同支付占比
-        private BigDecimal sumPaidRatio;
+        private BigDecimal sumPaidRatio = BigDecimal.ZERO;
         //部门统计
         private List<DeptAmt> deptAmts;
+        //列表页
+        private List<DeptContract> deptContracts;
     }
 
     @Data
@@ -637,23 +644,13 @@ public class SecondFeeStatisticExt {
         //需求提出时间
         private String submitTime;
         //资金需求金额
-        private BigDecimal requiredAmt;
+        private BigDecimal requiredAmt = BigDecimal.ZERO;
         //需求资金合同金额
-        private BigDecimal contractAmt;
+        private BigDecimal contractAmt = BigDecimal.ZERO;
         //已支付总金额
-        private BigDecimal paidAmt;
+        private BigDecimal paidAmt = BigDecimal.ZERO;
         //合同支付占比
-        private BigDecimal paidRatio;
-
-    }
-
-    public static void main(String[] args) {
-//        System.out.println("2".compareTo("1"));
-//        System.out.println(String.format("%0" + 2 + "d",1));
-        HashMap<Integer, String> testMap = new HashMap<>();
-        testMap.put(0,"0");
-        testMap.put(1,"1");
-        System.out.println();
+        private BigDecimal paidRatio = BigDecimal.ZERO;
 
     }
 }
