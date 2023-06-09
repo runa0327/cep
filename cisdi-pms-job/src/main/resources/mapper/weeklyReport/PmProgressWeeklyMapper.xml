@@ -12,12 +12,12 @@
 
     <!--根据开始结束日期查询周id-->
     <select id="getWeekIdByDate" resultType="String">
-        select id from pm_progress_weekly where FROM_DATE = #{startDate} and TO_DATE = #{endDate}
+        select id from pm_progress_weekly where FROM_DATE = #{startDate} and TO_DATE = #{endDate} and status = 'AP'
     </select>
 
     <!--获取上周weekId-->
     <select id="getLastWeekId" resultType="String">
-        select id from pm_progress_weekly where FROM_DATE = #{startDate} and TO_DATE = #{endDate} AND id != #{weekId} order by FROM_DATE desc limit 1
+        select id from pm_progress_weekly where FROM_DATE != #{startDate} and TO_DATE != #{endDate} AND id != #{weekId} order by FROM_DATE desc limit 1
     </select>
 
     <!--根据实体信息新增数据-->
