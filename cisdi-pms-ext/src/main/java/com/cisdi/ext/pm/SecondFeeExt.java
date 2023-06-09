@@ -108,7 +108,7 @@ public class SecondFeeExt {
         }else {//有明细，回显
             SecondCategoryFeeDemand demand = demands.get(0);
             //查明细
-            List<Map<String, Object>> feeDtlMaps = myJdbcTemplate.queryForList("select d.id feeDemandNodeId,v.name feeDemandNodeName,d.APPROVED_AMOUNT " +
+            List<Map<String, Object>> feeDtlMaps = myJdbcTemplate.queryForList("select d.FEE_DEMAND_NODE feeDemandNodeId,v.name feeDemandNodeName,d.APPROVED_AMOUNT " +
                     "approvedAmount,d.PAYABLE_RATIO payableRatio,d.PAYABLE_AMOUNT payableAmount,d.PAID_AMOUNT paidAmount,d.PAYMENT_RATIO paymentRatio,d.REQUIRED_AMOUNT " +
                     "requiredAmount,d.SUBMIT_TIME submitTime from fee_demand_dtl d\n" +
                     "left join gr_set_value v on v.id = d.FEE_DEMAND_NODE\n" +
@@ -214,24 +214,25 @@ public class SecondFeeExt {
                 "left join po_order o on o.id = h.PO_ORDER_ID\n" +
                 "where o.CONTRACT_APP_ID = ?", orderReqId);
         BigDecimal paidAmt = new BigDecimal(paidAmtList.get(0).get("paidAmt").toString());
+        BigDecimal contractAmt = demandDtls.get(0).approvedAmount;
         for (int i = 0; i < demandDtls.size(); i++) {
             DemandDtl demandDtl = demandDtls.get(i);
             if (!Strings.isNullOrEmpty(demandDtl.submitTime)){//已经提交过的跳过
                 continue;
             }
-            if (demandDtl.approvedAmount == null && demandDtl.payableRatio == null){//没有填批复金额和可支付比例的跳过
+            if (isNullOrZero(demandDtl.approvedAmount) && isNullOrZero(demandDtl.payableRatio)){//没有填批复金额和可支付比例的跳过
                 continue;
             }
             //可支付金额
             //取该条明细的批复金额和第一条批复金额比较，取较小值
-            BigDecimal smallerAmount = demandDtl.approvedAmount.compareTo(demandDtls.get(0).approvedAmount) < 0 ? demandDtl.approvedAmount : demandDtls.get(0).approvedAmount;
+            BigDecimal smallerAmount = demandDtl.approvedAmount.compareTo(contractAmt) < 0 ? demandDtl.approvedAmount : demandDtls.get(0).approvedAmount;
             demandDtl.payableAmount = smallerAmount.multiply(demandDtl.payableRatio);
 
             //已支付金额：合同已支付金额合计
             demandDtl.paidAmount = paidAmt;
 
             //支付比例：已支付金额 / 合同金额
-            demandDtl.paymentRatio = demandDtl.paidAmount.divide(demandDtls.get(0).approvedAmount,4,BigDecimal.ROUND_HALF_UP);
+            demandDtl.paymentRatio = (contractAmt.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : demandDtl.paidAmount.divide(contractAmt,4,BigDecimal.ROUND_HALF_UP));
 
             //需求资金：可支付金额 - 已支付金额
             demandDtl.requiredAmount = demandDtl.payableAmount.subtract(paidAmt);
@@ -338,6 +339,17 @@ public class SecondFeeExt {
         return payHistories;
     }
 
+    /**
+     * 是否为空，或者为0
+     * @param b
+     * @return
+     */
+    private boolean isNullOrZero(BigDecimal b){
+        if (b == null || b.compareTo(BigDecimal.ZERO) == 0){
+            return true;
+        }
+        return false;
+    }
     /**
      * 新增、修改请求
      */
