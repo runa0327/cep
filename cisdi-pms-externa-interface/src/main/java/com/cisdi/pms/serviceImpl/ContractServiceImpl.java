@@ -7,11 +7,11 @@ import com.cisdi.pms.domain.FileApi;
 import com.cisdi.pms.service.ContractService;
 import com.cisdi.pms.util.StringUtilsNew;
 import com.qygly.shared.util.JdbcMapUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.Map;
 @Service
 public class ContractServiceImpl implements ContractService {
 
-    @Autowired
+    @Resource
     private JdbcTemplate jdbcTemplate;
 
     @Override
@@ -34,7 +34,7 @@ public class ContractServiceImpl implements ContractService {
         if (!CollectionUtils.isEmpty(list2)){
             projectName = JdbcMapUtil.getString(list2.get(0),"name");
         }
-        sb.append(" and (PM_PRJ_ID = '"+projectId+"' or PROJECT_NAME_WR = '"+projectName+"')");
+        sb.append(" and (PM_PRJ_ID = '").append(projectId).append("' or PROJECT_NAME_WR = '").append(projectName).append("')");
         List<Map<String,Object>> list = jdbcTemplate.queryForList(sb.toString());
         List<ContractApi> contractApiList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(list)){
@@ -72,7 +72,7 @@ public class ContractServiceImpl implements ContractService {
     /**
      * 合同明细文件信息查询
      * @param fileId 文件id
-     * @return
+     * @return 合同文件明细信息
      */
     private List<FileApi> getFile(String fileId) {
         fileId = StringUtilsNew.replaceByCode(fileId,",","','");
@@ -97,7 +97,7 @@ public class ContractServiceImpl implements ContractService {
     /**
      * 合同费用明细查询
      * @param contractId 合同id
-     * @return
+     * @return 合同费用明细信息
      */
     private List<ContractCostDetailApi> getCostDetailList(String contractId) {
         String sql = "select a.CONTRACT_ID,a.COST_TYPE_TREE_ID,a.FEE_DETAIL,a.AMT_ONE,a.AMT_THREE,a.AMT_TWO,b.name from PM_ORDER_COST_DETAIL a left join GR_SET_VALUE b on a.COST_TYPE_TREE_ID = b.id where a.CONTRACT_ID = ?";
@@ -122,7 +122,7 @@ public class ContractServiceImpl implements ContractService {
     /**
      * 合同相对方联系人明细查询
      * @param contractId 合同id
-     * @return
+     * @return 合同相对方联系明细
      */
     private List<ContractSigningApi> getContractAwardList(String contractId) {
         String sql = "select PARENT_ID,WIN_BID_UNIT_ONE,OPPO_SITE_LINK_MAN,OPPO_SITE_CONTACT from CONTRACT_SIGNING_CONTACT where PARENT_ID = ?";
