@@ -128,7 +128,7 @@ public class PmLifeCycleExt {
             MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
             Map<String, Object> queryParams = new HashMap<>();// 创建入参map
             queryParams.put("ids", ids);
-            nodeList = myNamedParameterJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name,snn.`NAME` as nodeName,po.name as postName,au.name as userName from pm_pro_plan_node pn  \n" +
+            nodeList = myNamedParameterJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name,snn.`NAME` as nodeName,po.name as postName,au.name as userName,ifnull(IZ_OVERDUE,0) as izOverdue from pm_pro_plan_node pn  \n" +
                     " left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id \n" +
                     " left join gr_set_value gsv on gsv.id = pn.PROGRESS_STATUS_ID  \n" +
                     " left join STANDARD_NODE_NAME snn on pn.SCHEDULE_NAME = snn.id  \n" +
@@ -151,8 +151,7 @@ public class PmLifeCycleExt {
                     json.put("nameOrg", stringObjectMap.get("id"));
                     json.put("remarkCount", 0);
                     newData.put("ID", json);
-                }
-                else if ("备注说明".equals(s)) {
+                } else if ("备注说明".equals(s)) {
                     JSONObject json = new JSONObject();
                     List<String> contentList = new ArrayList<>();
                     List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from REMARK_INFO where REMARK_TYPE='1' and PM_PRJ_ID=?", stringObjectMap.get("id"));
@@ -198,8 +197,6 @@ public class PmLifeCycleExt {
                                 nameOrg = "未涉及";
                                 tips = "项目未涉及" + JdbcMapUtil.getString(dataMap, "NAME");
                                 statusOrg = "未涉及";
-                            } else if ("进行中".equals(status)) {
-                                statusOrg = "进行中";
                                 if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
                                     Date planCompDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
                                     if (planCompDate.before(new Date())) {
@@ -211,21 +208,16 @@ public class PmLifeCycleExt {
                                         dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
                                     }
                                 }
-                            } else if ("未启动".equals(status)) {
-                                statusOrg = "未启动";
-                                if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                    Date planCompDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
-                                    if (planCompDate.before(new Date())) {
-                                        int days = DateTimeUtil.daysBetween(planCompDate, new Date());
-                                        tips = "超期" + Math.abs(days) + "天";
+                            } else {
+                                if ("0".equals(JdbcMapUtil.getString(dataMap, "izOverdue"))) {
+                                    if ("进行中".equals(status)) {
+                                        statusOrg = "进行中";
+                                    } else if ("未启动".equals(status)) {
+                                        statusOrg = "未启动";
                                     }
-                                    nameOrg = "计划完成";
-                                    if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                        dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
-                                    }
+                                } else {
+                                    statusOrg = "已超期";
                                 }
-                            }else if("已超期".equals(status)){
-                                statusOrg = "已超期";
                                 if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
                                     Date planCompDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
                                     if (planCompDate.before(new Date())) {

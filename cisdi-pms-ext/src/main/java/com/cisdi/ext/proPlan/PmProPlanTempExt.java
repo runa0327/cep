@@ -147,7 +147,6 @@ public class PmProPlanTempExt {
                 "left join pm_pro_plan_node pre on pppn.PRE_NODE_ID = pre.id  " +
                 "left join WF_PROCESS wp on pppn.LINKED_WF_PROCESS_ID = wp.id  " +
                 "left join PRO_PLAN_TEMPLATE_RULE r on r.PM_PRO_PLAN_ID = pppn.PM_PRO_PLAN_ID " +
-//                "where pppn.PM_PRO_PLAN_ID=?", map.get("planId"));
                 "where r.id=?", map.get("ruleId"));
         List<PlanNode> nodeList = list.stream().map(p -> {
             PlanNode node = new PlanNode();
@@ -172,6 +171,7 @@ public class PmProPlanTempExt {
             if (Strings.isNotEmpty(att)) {
                 node.atts = Arrays.asList(att.split(","));
             }
+            node.attData = JdbcMapUtil.getString(p, "ATT_DATA");
             return node;
         }).collect(Collectors.toList());
 
@@ -307,6 +307,9 @@ public class PmProPlanTempExt {
         if (Strings.isNotEmpty(input.izMilestone)) {
             sb.append(",IZ_MILESTONE =").append(input.izMilestone);
         }
+        if (Strings.isNotEmpty(input.attData)) {
+            sb.append(",ATT_DATA = '").append(input.attData).append("'");
+        }
         sb.append(",`LEVEL`=").append(input.level);
         sb.append(", SEQ_NO =").append(input.seqNo);
         sb.append(" where id='").append(id).append("'");
@@ -354,7 +357,7 @@ public class PmProPlanTempExt {
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         String level = JdbcMapUtil.getString(params, "level");
         String planId = JdbcMapUtil.getString(params, "planId");
-        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME where level = ? and status = 'AP' and id not in (select SCHEDULE_NAME from (select SCHEDULE_NAME,OPREATION_TYPE from pm_pro_plan_node where PM_PRO_PLAN_ID = ? and SCHEDULE_NAME is not null) a where a.OPREATION_TYPE <> 'del') order by SEQ_NO", level,planId);
+        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME where level = ? and status = 'AP' and id not in (select SCHEDULE_NAME from (select SCHEDULE_NAME,OPREATION_TYPE from pm_pro_plan_node where PM_PRO_PLAN_ID = ? and SCHEDULE_NAME is not null) a where a.OPREATION_TYPE ='add' or a.OPREATION_TYPE is null) order by SEQ_NO", level,planId);
         List<ObjInfo> objInfoList = resultList.stream().map(p -> {
             ObjInfo objInfo = new ObjInfo();
             objInfo.id = JdbcMapUtil.getString(p, "ID");
@@ -518,6 +521,8 @@ public class PmProPlanTempExt {
 
         public String ver;
 
+        public String attData;
+
     }
 
     public static class OutSide {
@@ -550,6 +555,7 @@ public class PmProPlanTempExt {
         public String tableId;
 
         public String baseNodeId;
+        public String attData;
     }
 
     public static class ObjInfo {
