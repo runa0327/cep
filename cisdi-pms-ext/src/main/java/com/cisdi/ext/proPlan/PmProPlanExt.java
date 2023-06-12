@@ -32,22 +32,23 @@ public class PmProPlanExt {
 
     /**
      * 更新项目进度计划节点状态
+     *
      * @param projectId 项目id
      */
     public static void updateNodeOperationType(String projectId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //获取进度计划id
-        List<PmProPlan> list1 = PmProPlan.selectByWhere(new Where().eq(PmProPlan.Cols.PM_PRJ_ID,projectId));
-        if (!CollectionUtils.isEmpty(list1)){
+        List<PmProPlan> list1 = PmProPlan.selectByWhere(new Where().eq(PmProPlan.Cols.PM_PRJ_ID, projectId));
+        if (!CollectionUtils.isEmpty(list1)) {
             String pmProPlanId = list1.get(0).getId();
-            System.out.println("id为："+pmProPlanId);
+            System.out.println("id为：" + pmProPlanId);
             //删除需要删除的节点
-            String sql = "set FOREIGN_key_checks = 0;delete from PM_PRO_PLAN_NODE where PM_PRO_PLAN_ID = '"+pmProPlanId+"' and OPREATION_TYPE = 'del';set FOREIGN_key_checks = 1";
+            String sql = "set FOREIGN_key_checks = 0;delete from PM_PRO_PLAN_NODE where PM_PRO_PLAN_ID = '" + pmProPlanId + "' and OPREATION_TYPE = 'del';set FOREIGN_key_checks = 1";
             myJdbcTemplate.update(sql);
 //            Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID",pmProPlanId).eq(PmProPlanNode.Cols.OPREATION_TYPE,"del").delete()
 //                    .exec();
-            Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID",pmProPlanId).update()
-                    .set("OPREATION_TYPE",null)
+            Crud.from("PM_PRO_PLAN_NODE").where().eq("PM_PRO_PLAN_ID", pmProPlanId).update()
+                    .set("OPREATION_TYPE", null)
                     .exec();
         }
     }
@@ -95,7 +96,7 @@ public class PmProPlanExt {
 
         viewObj viewObj = new viewObj();
         List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select hd.`NAME` as post,po.name postName,PLAN_START_DATE,PLAN_COMPL_DATE,PLAN_TOTAL_DAYS,ACTUAL_TOTAL_DAYS, " +
-                "gsv.`NAME` as `status`,ACTUAL_START_DATE,ACTUAL_COMPL_DATE,PLAN_CARRY_DAYS,ifnull(pppn.CAN_START,0) as  CAN_START,au.`NAME` AS user " +
+                "gsv.`NAME` as `status`,ACTUAL_START_DATE,ACTUAL_COMPL_DATE,PLAN_CARRY_DAYS,ifnull(pppn.CAN_START,0) as  CAN_START,au.`NAME` AS user,ifnull(pppn.UPDATE_TYPE,0) as UPDATE_TYPE,pppn.ATT_FILE_GROUP_ID as ATT_FILE_GROUP_ID,pppn.NAME as nodeName " +
                 "from PM_PRO_PLAN_NODE  pppn " +
                 "left join hr_dept hd on hd.id = pppn.CHIEF_DEPT_ID " +
                 "left join POST_INFO po on po.id = pppn.POST_INFO_ID " +
@@ -129,57 +130,86 @@ public class PmProPlanExt {
                 return problem;
             }).collect(Collectors.toList());
 
-            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,ad.`CODE` as ant_code from pm_pro_plan_node pppn  " +
-                    "left join ad_ent ad on ad.id = pppn.AD_ENT_ID_IMP where pppn.id=?", nodeId);
-            if (!CollectionUtils.isEmpty(list)) {
-                String tableName = JdbcMapUtil.getString(list.get(0), "ant_code");
-                if (Strings.isNotEmpty(tableName)) {
-                    String attIds = JdbcMapUtil.getString(list.get(0), "AD_ATT_ID_IMP");
-                    if (Strings.isNotEmpty(attIds)) {
-                        Map<String, Object> queryParams = new HashMap<>();// 创建入参map
-                        queryParams.put("ids", Arrays.asList(attIds.split(",")));
-                        List<Map<String, Object>> attList = myNamedParameterJdbcTemplate.queryForList("select * from ad_att where id in (:ids)", queryParams);
-                        if (!CollectionUtils.isEmpty(attList)) {
-                            List<FileListObj> fileListObjList = new ArrayList<>();
-                            attList.forEach(item -> {
-                                String column = JdbcMapUtil.getString(item, "CODE");
-                                FileListObj fileListObj = new FileListObj();
-                                fileListObj.title = JdbcMapUtil.getString(item, "NAME");
-                                try {
-                                    //当表中没有PM_PRJ_ID字段的时候会报错，此次catch一下
-                                    List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select * from " + tableName + " where PM_PRJ_ID ='" + projectId + "'");
-                                    if (!CollectionUtils.isEmpty(dataList)) {
-                                        String fileIds = JdbcMapUtil.getString(dataList.get(0), column);
-                                        if (fileIds != null) {
-                                            List<String> ids = Arrays.asList(fileIds.split(","));
+            String updateType = JdbcMapUtil.getString(node, "UPDATE_TYPE");
+            if ("1".equals(updateType)) {
+                //手动触发更新
+                String fileIds = JdbcMapUtil.getString(node, "ATT_FILE_GROUP_ID");
+                List<FileListObj> fileListObjList = new ArrayList<>();
+                FileListObj fileListObj = new FileListObj();
+                fileListObj.title = JdbcMapUtil.getString(node, "nodeName") + "相关文件";
+                List<String> ids = Arrays.asList(fileIds.split(","));
 
-                                            Map<String, Object> queryFileParams = new HashMap<>();// 创建入参map
-                                            queryFileParams.put("ids", ids);
-                                            List<Map<String, Object>> fileList = myNamedParameterJdbcTemplate.queryForList("select ff.ID as ID, DSP_NAME,SIZE_KB,UPLOAD_DTTM,au.`NAME` as USER_NAME,FILE_INLINE_URL,FILE_ATTACHMENT_URL from fl_file ff left join ad_user au on ff.CRT_USER_ID = au.id  where ff.id in (:ids)", queryFileParams);
-                                            AtomicInteger index = new AtomicInteger(0);
-                                            fileListObj.fileObjList = fileList.stream().map(p -> {
-                                                FileObj obj = new FileObj();
-                                                obj.num = index.getAndIncrement() + 1;
-                                                obj.fileName = JdbcMapUtil.getString(p, "DSP_NAME");
-                                                obj.fileSize = JdbcMapUtil.getString(p, "SIZE_KB");
-                                                obj.uploadUser = JdbcMapUtil.getString(p, "USER_NAME");
-                                                obj.uploadDate = StringUtil.withOutT(JdbcMapUtil.getString(p, "UPLOAD_DTTM"));
-                                                obj.id = JdbcMapUtil.getString(p, "ID");
-                                                obj.viewUrl = JdbcMapUtil.getString(p, "FILE_INLINE_URL");
-                                                obj.downloadUrl = JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
-                                                return obj;
-                                            }).collect(Collectors.toList());
-                                            fileListObjList.add(fileListObj);
+                Map<String, Object> queryFileParams = new HashMap<>();// 创建入参map
+                queryFileParams.put("ids", ids);
+                List<Map<String, Object>> fileList = myNamedParameterJdbcTemplate.queryForList("select ff.ID as ID, DSP_NAME,SIZE_KB,UPLOAD_DTTM,au.`NAME` as USER_NAME,FILE_INLINE_URL,FILE_ATTACHMENT_URL from fl_file ff left join ad_user au on ff.CRT_USER_ID = au.id  where ff.id in (:ids)", queryFileParams);
+                AtomicInteger index = new AtomicInteger(0);
+                fileListObj.fileObjList = fileList.stream().map(p -> {
+                    FileObj obj = new FileObj();
+                    obj.num = index.getAndIncrement() + 1;
+                    obj.fileName = JdbcMapUtil.getString(p, "DSP_NAME");
+                    obj.fileSize = JdbcMapUtil.getString(p, "SIZE_KB");
+                    obj.uploadUser = JdbcMapUtil.getString(p, "USER_NAME");
+                    obj.uploadDate = StringUtil.withOutT(JdbcMapUtil.getString(p, "UPLOAD_DTTM"));
+                    obj.id = JdbcMapUtil.getString(p, "ID");
+                    obj.viewUrl = JdbcMapUtil.getString(p, "FILE_INLINE_URL");
+                    obj.downloadUrl = JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
+                    return obj;
+                }).collect(Collectors.toList());
+                fileListObjList.add(fileListObj);
+                viewObj.fileListObjList = fileListObjList;
+            } else {
+                List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,ad.`CODE` as ant_code from pm_pro_plan_node pppn  " +
+                        "left join ad_ent ad on ad.id = pppn.AD_ENT_ID_IMP where pppn.id=?", nodeId);
+                if (!CollectionUtils.isEmpty(list)) {
+                    String tableName = JdbcMapUtil.getString(list.get(0), "ant_code");
+                    if (Strings.isNotEmpty(tableName)) {
+                        String attIds = JdbcMapUtil.getString(list.get(0), "AD_ATT_ID_IMP");
+                        if (Strings.isNotEmpty(attIds)) {
+                            Map<String, Object> queryParams = new HashMap<>();// 创建入参map
+                            queryParams.put("ids", Arrays.asList(attIds.split(",")));
+                            List<Map<String, Object>> attList = myNamedParameterJdbcTemplate.queryForList("select * from ad_att where id in (:ids)", queryParams);
+                            if (!CollectionUtils.isEmpty(attList)) {
+                                List<FileListObj> fileListObjList = new ArrayList<>();
+                                attList.forEach(item -> {
+                                    String column = JdbcMapUtil.getString(item, "CODE");
+                                    FileListObj fileListObj = new FileListObj();
+                                    fileListObj.title = JdbcMapUtil.getString(item, "NAME");
+                                    try {
+                                        //当表中没有PM_PRJ_ID字段的时候会报错，此次catch一下
+                                        List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select * from " + tableName + " where PM_PRJ_ID ='" + projectId + "'");
+                                        if (!CollectionUtils.isEmpty(dataList)) {
+                                            String fileIds = JdbcMapUtil.getString(dataList.get(0), column);
+                                            if (fileIds != null) {
+                                                List<String> ids = Arrays.asList(fileIds.split(","));
+
+                                                Map<String, Object> queryFileParams = new HashMap<>();// 创建入参map
+                                                queryFileParams.put("ids", ids);
+                                                List<Map<String, Object>> fileList = myNamedParameterJdbcTemplate.queryForList("select ff.ID as ID, DSP_NAME,SIZE_KB,UPLOAD_DTTM,au.`NAME` as USER_NAME,FILE_INLINE_URL,FILE_ATTACHMENT_URL from fl_file ff left join ad_user au on ff.CRT_USER_ID = au.id  where ff.id in (:ids)", queryFileParams);
+                                                AtomicInteger index = new AtomicInteger(0);
+                                                fileListObj.fileObjList = fileList.stream().map(p -> {
+                                                    FileObj obj = new FileObj();
+                                                    obj.num = index.getAndIncrement() + 1;
+                                                    obj.fileName = JdbcMapUtil.getString(p, "DSP_NAME");
+                                                    obj.fileSize = JdbcMapUtil.getString(p, "SIZE_KB");
+                                                    obj.uploadUser = JdbcMapUtil.getString(p, "USER_NAME");
+                                                    obj.uploadDate = StringUtil.withOutT(JdbcMapUtil.getString(p, "UPLOAD_DTTM"));
+                                                    obj.id = JdbcMapUtil.getString(p, "ID");
+                                                    obj.viewUrl = JdbcMapUtil.getString(p, "FILE_INLINE_URL");
+                                                    obj.downloadUrl = JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
+                                                    return obj;
+                                                }).collect(Collectors.toList());
+                                                fileListObjList.add(fileListObj);
+                                            }
                                         }
+                                    } catch (Exception ignored) {
                                     }
-                                } catch (Exception ignored) {}
-                            });
-                            viewObj.fileListObjList = fileListObjList;
+                                });
+                                viewObj.fileListObjList = fileListObjList;
+                            }
                         }
                     }
                 }
             }
-
             // 获取流程、流程实例的相关信息：
             List<Map<String, Object>> procInfoList = myJdbcTemplate.queryForList("select p.id P_ID,p.name P_NAME,p.EXTRA_INFO P_EXTRA_INFO,pi.id PI_ID,pi.name PI_NAME,pi.ENT_CODE PI_ENT_CODE,pi.ENTITY_RECORD_ID PI_ENTITY_RECORD_ID,PI.CURRENT_VIEW_ID PI_CURRENT_VIEW_ID from PM_PRO_PLAN_NODE pppn join wf_process p on pppn.LINKED_WF_PROCESS_ID=p.id and pppn.id=? left join wf_process_instance pi on pppn.LINKED_WF_PROCESS_INSTANCE_ID=pi.id", nodeId);
             if (!CollectionUtils.isEmpty(procInfoList)) {
@@ -216,14 +246,14 @@ public class PmProPlanExt {
     /**
      * 三级节点下拉（选前置节点）
      */
-    public void thirdNodeList(){
+    public void thirdNodeList() {
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> thirdNodeList = myJdbcTemplate.queryForList("SELECT nd.id,nd.name FROM pm_pro_plan_node nd\n" +
                 "left join pm_pro_plan pl on pl.id = nd.PM_PRO_PLAN_ID\n" +
-                "where nd.level = 3 and pl.PM_PRJ_ID = ? and pl.status = 'AP' and nd.status = 'AP'",input.get("prjId"));
+                "where nd.level = 3 and pl.PM_PRJ_ID = ? and pl.status = 'AP' and nd.status = 'AP'", input.get("prjId"));
         Map<String, Object> result = new HashMap<>();
-        result.put("thirdNodeList",thirdNodeList);
+        result.put("thirdNodeList", thirdNodeList);
         ExtJarHelper.returnValue.set(result);
     }
 
@@ -521,20 +551,21 @@ public class PmProPlanExt {
 
     /**
      * 更新单个节点预计完成时间
-     * @param projectId 项目id
-     * @param proNodeId 节点id
-     * @param day 延期天数
+     *
+     * @param projectId      项目id
+     * @param proNodeId      节点id
+     * @param day            延期天数
      * @param myJdbcTemplate 数据源
      */
     public static void updatePlanEndDate(String projectId, String proNodeId, Integer day, MyJdbcTemplate myJdbcTemplate) {
-        List<PmProPlanNode> list = PmProPlanNode.selectByWhere(new Where().eq(PmProPlanNode.Cols.ID,proNodeId));
-        if (!CollectionUtils.isEmpty(list)){
+        List<PmProPlanNode> list = PmProPlanNode.selectByWhere(new Where().eq(PmProPlanNode.Cols.ID, proNodeId));
+        if (!CollectionUtils.isEmpty(list)) {
             int oldDay = list.get(0).getPlanTotalDays();
             LocalDate endDate = list.get(0).getPlanComplDate();
             endDate = endDate.plusDays(day);
-            Crud.from("PM_PRO_PLAN_NODE").where().eq("ID",proNodeId).update()
-                    .set("PLAN_COMPL_DATE",endDate).set("PLAN_TOTAL_DAYS",oldDay+day)
-                    .set("IZ_OVERDUE",0)
+            Crud.from("PM_PRO_PLAN_NODE").where().eq("ID", proNodeId).update()
+                    .set("PLAN_COMPL_DATE", endDate).set("PLAN_TOTAL_DAYS", oldDay + day)
+                    .set("IZ_OVERDUE", 0)
                     .exec();
         }
     }
