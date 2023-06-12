@@ -361,6 +361,8 @@ public class PmLifeCycleExt {
         public List<Map<String, Object>> dataList;
 
         public List<RemarkInfo> remarkInfos;
+
+        public List<BaseNodeInfo> baseNodeTree;
     }
 
     public static class RemarkInfo {
@@ -376,5 +378,48 @@ public class PmLifeCycleExt {
         public String nodeName;
         public String projectId;
         public String type;
+    }
+
+    public static class BaseNodeInfo {
+        public String id;
+        public String pid;
+        public String name;
+        public String level;
+        public String izDisplay;
+        public List<BaseNodeInfo> children;
+    }
+
+    /**
+     * 三层树形列头
+     */
+    public void headerColumn() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ID,`NAME`,ifnull(STANDARD_NODE_NAME_PID,'0') as pid,ifnull(IZ_DISPLAY,0) as IZ_DISPLAY,LEVEL from STANDARD_NODE_NAME where `STATUS`='ap'");
+        List<BaseNodeInfo> baseNodeInfoList = list.stream().map(p -> {
+            BaseNodeInfo info = new BaseNodeInfo();
+            info.id = JdbcMapUtil.getString(p, "ID");
+            info.pid = JdbcMapUtil.getString(p, "pid");
+            info.name = JdbcMapUtil.getString(p, "NAME");
+            info.izDisplay = JdbcMapUtil.getString(p, "IZ_DISPLAY");
+            info.level = JdbcMapUtil.getString(p, "LEVEL");
+            return info;
+        }).collect(Collectors.toList());
+
+        List<BaseNodeInfo> result = baseNodeInfoList.stream().filter(p -> "0".equals(p.pid)).peek(m -> m.children = getChildren(m, baseNodeInfoList)).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(result)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.baseNodeTree = result;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+
+    public List<BaseNodeInfo> getChildren(BaseNodeInfo parent, List<BaseNodeInfo> allData) {
+        return allData.stream().filter(p -> parent.id.equals(p.pid)).peek(m -> {
+            m.children = getChildren(m, allData);
+        }).collect(Collectors.toList());
     }
 }
