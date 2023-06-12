@@ -228,9 +228,9 @@ public class PmPrjIdLink {
                 List<LinkedRecord> linkedRecordList = new ArrayList<>();
                 for (Map<String, Object> tmp : list) {
                     LinkedRecord linkedRecord = new LinkedRecord();
-                    //项目进度计划节点
-                    linkedRecord.valueMap.put("PM_PRO_PLAN_NODE_ID", JdbcMapUtil.getString(tmp, "id"));
-                    linkedRecord.textMap.put("PM_PRO_PLAN_NODE_ID", JdbcMapUtil.getString(tmp, "nodeName"));
+
+                    String planName = JdbcMapUtil.getString(tmp, "nodeName");
+
                     //计划完成日期
                     linkedRecord.valueMap.put("PLAN_COMPL_DATE", JdbcMapUtil.getString(tmp, "PLAN_COMPL_DATE"));
                     linkedRecord.textMap.put("PLAN_COMPL_DATE", JdbcMapUtil.getString(tmp, "PLAN_COMPL_DATE"));
@@ -239,10 +239,18 @@ public class PmPrjIdLink {
                     if (!SharedUtil.isEmptyString(OPREATION_TYPE) && ("del".equals(OPREATION_TYPE) || "DEL".equals(OPREATION_TYPE))){
                         linkedRecord.editableAttCodeList = new ArrayList<>();
                         linkedRecord.editableAttCodeList.add("OPREATION_TYPE");
+                        planName = "待删除："+planName;
                     } else {
+                        if ("add".equals(OPREATION_TYPE) || "ADD".equals(OPREATION_TYPE)){
+                            planName = "待新增："+planName;
+                        }
                         linkedRecord.mandatoryAttCodeList = new ArrayList<>();
                         linkedRecord.mandatoryAttCodeList.add("PLAN_COMPL_DATE");
                     }
+
+                    //项目进度计划节点
+                    linkedRecord.valueMap.put("PM_PRO_PLAN_NODE_ID", JdbcMapUtil.getString(tmp, "id"));
+                    linkedRecord.textMap.put("PM_PRO_PLAN_NODE_ID", planName);
 
                     //TODO 操作类型字段返回  JdbcMapUtil.getString(tmp, "OPREATION_TYPE")
 
