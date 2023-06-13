@@ -1117,7 +1117,8 @@ public class ProPlanExt {
         String operationType = null;
         if (Strings.isEmpty(input.id)) {
             input.id = Crud.from("pm_pro_plan_node").insertData();
-            operationType = "add";
+            //先隐藏该功能，后面在加上
+//            operationType = "add";
         }
 
         StringBuilder sb = new StringBuilder();
@@ -1132,7 +1133,7 @@ public class ProPlanExt {
             sb.append(",POST_INFO_ID ='").append(input.postId).append("'");
             //如果修改的是岗位，把花名册的人，同时也刷过去
             String userId = getRosterUser(input.projectId, input.postId);
-            if(Objects.nonNull(userId)){
+            if (Objects.nonNull(userId)) {
                 sb.append(",CHIEF_USER_ID ='").append(userId).append("'");
             }
         }
@@ -1181,10 +1182,10 @@ public class ProPlanExt {
         if (Strings.isNotEmpty(input.attData)) {
             sb.append(",ATT_DATA = '").append(input.attData).append("'");
         }
-        if(Strings.isNotEmpty(input.startDateField)){
+        if (Strings.isNotEmpty(input.startDateField)) {
             sb.append(",START_DATE_FIELD = '").append(input.startDateField).append("'");
         }
-        if(Strings.isNotEmpty(input.endDateField)){
+        if (Strings.isNotEmpty(input.endDateField)) {
             sb.append(",END_DATE_FIELD = '").append(input.endDateField).append("'");
         }
         sb.append(",IZ_MILESTONE =").append(input.izMilestone);
@@ -1239,14 +1240,25 @@ public class ProPlanExt {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String nodeId = JdbcMapUtil.getString(inputMap, "nodeId");
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", nodeId);
-        if (!CollectionUtils.isEmpty(list)) {
-            Map<String, Object> dataMap = list.get(0);
-            if ("add".equals(JdbcMapUtil.getString(dataMap, "OPREATION_TYPE"))) {
-                myJdbcTemplate.update("delete from pm_pro_plan_node where id=?", nodeId);
-            } else {
-                myJdbcTemplate.update("update pm_pro_plan_node set OPREATION_TYPE='del' where id=?", nodeId);
-            }
+//先隐藏该功能，后续再开启
+//        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", nodeId);
+//        if (!CollectionUtils.isEmpty(list)) {
+//            Map<String, Object> dataMap = list.get(0);
+//            if ("add".equals(JdbcMapUtil.getString(dataMap, "OPREATION_TYPE"))) {
+//                myJdbcTemplate.update("delete from pm_pro_plan_node where id=?", nodeId);
+//            } else {
+//                myJdbcTemplate.update("update pm_pro_plan_node set OPREATION_TYPE='del' where id=?", nodeId);
+//            }
+//        }
+
+        List<Map<String, Object>> progressStatusList =
+                myJdbcTemplate.queryForList("select v.name from pm_pro_plan_node n left join gr_set_value v on v.id = n.PROGRESS_STATUS_ID");
+        String statusName = JdbcMapUtil.getString(progressStatusList.get(0), "name");
+        List<Map<String, Object>> childIdList = myJdbcTemplate.queryForList("select id childId from pm_pro_plan_node n where PM_PRO_PLAN_NODE_PID = ?", nodeId);
+        if (CollectionUtils.isEmpty(childIdList) && Strings.isNotEmpty(statusName) && statusName.equals("未启动")) {
+            myJdbcTemplate.update("delete from pm_pro_plan_node where id = ?", nodeId);
+        } else {
+            throw new BaseException("不能删除该节点！");
         }
     }
 
@@ -1372,7 +1384,7 @@ public class ProPlanExt {
                 }
                 node.izDisplay = JdbcMapUtil.getString(p, "IZ_DISPLAY");
                 node.attData = JdbcMapUtil.getString(p, "ATT_DATA");
-                node.IZ_OVERDUE =  JdbcMapUtil.getString(p, "IZ_OVERDUE");
+                node.IZ_OVERDUE = JdbcMapUtil.getString(p, "IZ_OVERDUE");
                 node.startDateField = JdbcMapUtil.getString(p, "START_DATE_FIELD");
                 node.endDateField = JdbcMapUtil.getString(p, "END_DATE_FIELD");
                 return node;
@@ -1448,7 +1460,7 @@ public class ProPlanExt {
                 node.izDisplay = JdbcMapUtil.getString(p, "IZ_DISPLAY");
                 node.oprType = JdbcMapUtil.getString(p, "OPREATION_TYPE");
                 node.attData = JdbcMapUtil.getString(p, "ATT_DATA");
-                node.IZ_OVERDUE =  JdbcMapUtil.getString(p, "IZ_OVERDUE");
+                node.IZ_OVERDUE = JdbcMapUtil.getString(p, "IZ_OVERDUE");
                 node.startDateField = JdbcMapUtil.getString(p, "START_DATE_FIELD");
                 node.endDateField = JdbcMapUtil.getString(p, "END_DATE_FIELD");
                 return node;
