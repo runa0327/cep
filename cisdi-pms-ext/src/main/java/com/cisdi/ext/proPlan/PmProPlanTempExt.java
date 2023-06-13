@@ -171,7 +171,10 @@ public class PmProPlanTempExt {
             if (Strings.isNotEmpty(att)) {
                 node.atts = Arrays.asList(att.split(","));
             }
+            JdbcMapUtil.getString(p, "ATT_DATA");
             node.attData = JdbcMapUtil.getString(p, "ATT_DATA");
+            node.startDateField = JdbcMapUtil.getString(p, "START_DATE_FIELD");
+            node.endDateField = JdbcMapUtil.getString(p, "END_DATE_FIELD");
             return node;
         }).collect(Collectors.toList());
 
@@ -226,6 +229,8 @@ public class PmProPlanTempExt {
             if (Strings.isNotEmpty(att)) {
                 node.atts = Arrays.asList(att.split(","));
             }
+            node.startDateField = JdbcMapUtil.getString(dataMap, "START_DATE_FIELD");
+            node.endDateField = JdbcMapUtil.getString(dataMap, "END_DATE_FIELD");
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(node), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
@@ -310,6 +315,12 @@ public class PmProPlanTempExt {
         if (Strings.isNotEmpty(input.attData)) {
             sb.append(",ATT_DATA = '").append(input.attData).append("'");
         }
+        if (Strings.isNotEmpty(input.startDateField)) {
+            sb.append(",START_DATE_FIELD = '").append(input.startDateField).append("'");
+        }
+        if (Strings.isNotEmpty(input.endDateField)) {
+            sb.append(",END_DATE_FIELD = '").append(input.endDateField).append("'");
+        }
         sb.append(",`LEVEL`=").append(input.level);
         sb.append(", SEQ_NO =").append(input.seqNo);
         sb.append(" where id='").append(id).append("'");
@@ -330,7 +341,7 @@ public class PmProPlanTempExt {
             throw new BaseException("当前节点有子节点，不能删除！");
         }
         //删除的时候判断当前节点是不是别的节点的前置，如果是就删不掉，要去掉前置
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PRE_NODE_ID=? and PM_PRO_PLAN_ID=(select PM_PRO_PLAN_ID from pm_pro_plan_node where id=?)", map.get("nodeId"),map.get("nodeId"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PRE_NODE_ID=? and PM_PRO_PLAN_ID=(select PM_PRO_PLAN_ID from pm_pro_plan_node where id=?)", map.get("nodeId"), map.get("nodeId"));
         if (CollectionUtils.isEmpty(list)) {
             myJdbcTemplate.update("SET FOREIGN_KEY_CHECKS = 0;delete from pm_pro_plan_node where id=?;SET FOREIGN_KEY_CHECKS = 1;", map.get("nodeId"));
         } else {
@@ -357,7 +368,7 @@ public class PmProPlanTempExt {
         Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
         String level = JdbcMapUtil.getString(params, "level");
         String planId = JdbcMapUtil.getString(params, "planId");
-        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME where level = ? and status = 'AP' and id not in (select SCHEDULE_NAME from (select SCHEDULE_NAME,OPREATION_TYPE from pm_pro_plan_node where PM_PRO_PLAN_ID = ? and SCHEDULE_NAME is not null) a where a.OPREATION_TYPE ='add' or a.OPREATION_TYPE is null) order by SEQ_NO", level,planId);
+        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList("select ID,NAME from STANDARD_NODE_NAME where level = ? and status = 'AP' and id not in (select SCHEDULE_NAME from (select SCHEDULE_NAME,OPREATION_TYPE from pm_pro_plan_node where PM_PRO_PLAN_ID = ? and SCHEDULE_NAME is not null) a where a.OPREATION_TYPE ='add' or a.OPREATION_TYPE is null) order by SEQ_NO", level, planId);
         List<ObjInfo> objInfoList = resultList.stream().map(p -> {
             ObjInfo objInfo = new ObjInfo();
             objInfo.id = JdbcMapUtil.getString(p, "ID");
@@ -474,6 +485,37 @@ public class PmProPlanTempExt {
         }
     }
 
+    /**
+     * 根据流程获取对应的台账表，时间字段
+     */
+    public void proLinkDateAttList() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("SELECT m.*,att.id as att_id,att.`CODE` as att_code,ifnull(aet.ATT_NAME,att.`NAME`) as att_name FROM \n" +
+                "( \n" +
+                " select c.id,c.code,c.name from wf_process a \n" +
+                " LEFT JOIN AD_SINGLE_ENT_VIEW b ON a.STARTABLE_SEV_IDS = b.id \n" +
+                " LEFT JOIN AD_ENT c ON b.AD_ENT_ID = c.id where a.id =? \n" +
+                " ) m \n" +
+                " left join AD_ENT_ATT aet on m.id = aet.AD_ENT_ID \n" +
+                " left join ad_att att on att.id = aet.AD_ATT_ID \n" +
+                " where att.AD_ATT_SUB_TYPE_ID in('DATE','DATETIME','TIME')", map.get("processId"));
+        List<AttInfo> attInfoList = list.stream().map(p -> {
+            AttInfo info = new AttInfo();
+            info.id = JdbcMapUtil.getString(p, "att_id");
+            info.name = JdbcMapUtil.getString(p, "att_name");
+            return info;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(attInfoList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.attInfoList = attInfoList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
 
     private List<PlanNode> getChildren(PlanNode parentNode, List<PlanNode> allData) {
         return allData.stream().filter(p -> parentNode.id.equals(p.pid)).peek(m -> {
@@ -523,6 +565,9 @@ public class PmProPlanTempExt {
 
         public String attData;
 
+        public String startDateField;
+        public String endDateField;
+
     }
 
     public static class OutSide {
@@ -556,6 +601,9 @@ public class PmProPlanTempExt {
 
         public String baseNodeId;
         public String attData;
+
+        public String startDateField;
+        public String endDateField;
     }
 
     public static class ObjInfo {

@@ -1099,6 +1099,8 @@ public class ProPlanExt {
             if (Strings.isNotEmpty(att)) {
                 node.atts = Arrays.asList(att.split(","));
             }
+            node.startDateField = JdbcMapUtil.getString(dataMap, "START_DATE_FIELD");
+            node.endDateField = JdbcMapUtil.getString(dataMap, "END_DATE_FIELD");
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(node), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
@@ -1178,6 +1180,12 @@ public class ProPlanExt {
         }
         if (Strings.isNotEmpty(input.attData)) {
             sb.append(",ATT_DATA = '").append(input.attData).append("'");
+        }
+        if(Strings.isNotEmpty(input.startDateField)){
+            sb.append(",START_DATE_FIELD = '").append(input.startDateField).append("'");
+        }
+        if(Strings.isNotEmpty(input.endDateField)){
+            sb.append(",END_DATE_FIELD = '").append(input.endDateField).append("'");
         }
         sb.append(",IZ_MILESTONE =").append(input.izMilestone);
         sb.append(" where id='").append(input.id).append("'");
@@ -1310,6 +1318,9 @@ public class ProPlanExt {
         public String projectId;
 
         public String attData;
+
+        public String startDateField;
+        public String endDateField;
     }
 
 
@@ -1362,6 +1373,8 @@ public class ProPlanExt {
                 node.izDisplay = JdbcMapUtil.getString(p, "IZ_DISPLAY");
                 node.attData = JdbcMapUtil.getString(p, "ATT_DATA");
                 node.IZ_OVERDUE =  JdbcMapUtil.getString(p, "IZ_OVERDUE");
+                node.startDateField = JdbcMapUtil.getString(p, "START_DATE_FIELD");
+                node.endDateField = JdbcMapUtil.getString(p, "END_DATE_FIELD");
                 return node;
             }).collect(Collectors.toList());
 
@@ -1436,6 +1449,8 @@ public class ProPlanExt {
                 node.oprType = JdbcMapUtil.getString(p, "OPREATION_TYPE");
                 node.attData = JdbcMapUtil.getString(p, "ATT_DATA");
                 node.IZ_OVERDUE =  JdbcMapUtil.getString(p, "IZ_OVERDUE");
+                node.startDateField = JdbcMapUtil.getString(p, "START_DATE_FIELD");
+                node.endDateField = JdbcMapUtil.getString(p, "END_DATE_FIELD");
                 return node;
             }).collect(Collectors.toList());
 
@@ -1552,6 +1567,9 @@ public class ProPlanExt {
 
         //是否超期
         public String IZ_OVERDUE;
+
+        public String startDateField;
+        public String endDateField;
     }
 
 
