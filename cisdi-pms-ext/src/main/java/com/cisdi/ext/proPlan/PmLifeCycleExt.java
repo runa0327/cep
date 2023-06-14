@@ -104,10 +104,11 @@ public class PmLifeCycleExt {
         String projectType = String.valueOf(map.get("projectType"));
         String userId = String.valueOf(map.get("userId"));
         StringBuilder sb = new StringBuilder();
-        sb.append("select po.pm_prj_id as id, pj.`NAME` as project_name,au.`NAME` as qquser from PLAN_OPERATION po  \n" +
+        sb.append("select po.pm_prj_id as id, pj.`NAME` as project_name,au.`NAME` as qquser,gsv.name as pointType from PLAN_OPERATION po  \n" +
                 " left join pm_prj pj  on pj.id = po.PM_PRJ_ID\n" +
                 " left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID and pp.POST_INFO_ID='1633731474912055296'\n" +
                 " left join ad_user au on pp.AD_USER_ID = au.id \n" +
+                " left join gr_set_value gsv on gsv.id = po.KEY_PROJECT_TYPE_ID " +
                 " where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and (pj.PROJECT_STATUS <> '1661568714048413696' or pj.PROJECT_STATUS is null) ");
         if (!"0".equals(projectType)) {
             sb.append(" and pj.PROJECT_TYPE_ID ='").append(projectType).append("'");
@@ -119,7 +120,7 @@ public class PmLifeCycleExt {
             sb.append(" and au.id = '").append(userId).append("'");
         }
         sb.append(" and pj.pm_code is not null ");
-        sb.append("group by pj.id,au.`NAME` order by pj.pm_code desc");
+        sb.append("group by pj.id,au.`NAME`,gsv.`NAME` order by pj.pm_code desc");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
@@ -131,7 +132,8 @@ public class PmLifeCycleExt {
         List<String> headerList = new ArrayList<>(headers);
         headerList.add(0, "ID");
         headerList.add(1, "项目名称");
-        headerList.add(2, "备注说明");
+        headerList.add(2, "重点项目类型");
+        headerList.add(3, "备注说明");
 
         //数据
         List<Map<String, Object>> dataList = new ArrayList<>();
@@ -159,13 +161,15 @@ public class PmLifeCycleExt {
                 if ("项目名称".equals(s)) {
                     JSONObject json = new JSONObject();
                     json.put("nameOrg", stringObjectMap.get("project_name"));
-                    json.put("remarkCount", 0);
                     newData.put("项目名称", json);
                 } else if ("ID".equals(s)) {
                     JSONObject json = new JSONObject();
                     json.put("nameOrg", stringObjectMap.get("id"));
-                    json.put("remarkCount", 0);
                     newData.put("ID", json);
+                } else if ("重点项目类型".equals(s)) {
+                    JSONObject json = new JSONObject();
+                    json.put("nameOrg", stringObjectMap.get("pointType"));
+                    newData.put("重点项目类型", json);
                 } else if ("备注说明".equals(s)) {
                     JSONObject json = new JSONObject();
                     List<String> contentList = new ArrayList<>();
