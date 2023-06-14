@@ -216,17 +216,6 @@ public class PmLifeCycleExt {
                                 nameOrg = "未涉及";
                                 tips = "项目未涉及" + JdbcMapUtil.getString(dataMap, "NAME");
                                 statusOrg = "未涉及";
-                                if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                    Date planCompDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
-                                    if (planCompDate.before(new Date())) {
-                                        int days = DateTimeUtil.daysBetween(planCompDate, new Date());
-                                        tips = "超期" + Math.abs(days) + "天";
-                                    }
-                                    nameOrg = "计划完成";
-                                    if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                                        dateOrg = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
-                                    }
-                                }
                             } else {
                                 if ("0".equals(JdbcMapUtil.getString(dataMap, "izOverdue"))) {
                                     if ("进行中".equals(status)) {
