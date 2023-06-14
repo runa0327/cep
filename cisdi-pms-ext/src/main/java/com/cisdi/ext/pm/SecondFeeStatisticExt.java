@@ -220,7 +220,7 @@ public class SecondFeeStatisticExt {
         groupSql.append(" group by d.id");
         ContractStatisticResp resp = new ContractStatisticResp();
         List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(sqlSb.toString(), sqlParams);
-        List<Map<String, Object>> pageList = totalList.stream().limit((req.pageIndex - 1) * req.pageSize).skip(req.pageSize).collect(Collectors.toList());
+        List<Map<String, Object>> pageList = totalList.stream().skip((req.pageIndex - 1) * req.pageSize).limit(req.pageSize).collect(Collectors.toList());
         List<ContractData> contractDataList = JSONObject.parseArray(JSONObject.toJSONString(pageList), ContractData.class);
         //统计
         BigDecimal totalContractAmt = new BigDecimal(0);
