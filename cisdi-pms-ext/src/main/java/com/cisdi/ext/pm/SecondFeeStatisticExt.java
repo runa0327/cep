@@ -417,13 +417,16 @@ public class SecondFeeStatisticExt {
             sqlSb.append( " and oo.CONTRACT_NAME like :contractName");
         }
         if (!Strings.isNullOrEmpty(req.startDate)){
-            sqlSb.append(" and dd.SUBMIT_TIME <= :startDate");
+            sqlSb.append(" and dd.SUBMIT_TIME >= :startDate");
         }
         if (!Strings.isNullOrEmpty(req.endDate)){
             sqlSb.append(" and dd.SUBMIT_TIME <= :endDate");
         }
         if (!Strings.isNullOrEmpty(req.yearMonth)){
             sqlSb.append( " and DATE_FORMAT(dd.SUBMIT_TIME,'%Y-%m') = :yearMonth");
+        }
+        if (!CollectionUtils.isEmpty(req.operatorIds)){
+            sqlSb.append(" and u.id in (:operatorIds)");
         }
         List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(sqlSb.toString(), sqlParams);
         List<DeptContract> totalDeptContracts = JSONObject.parseArray(JSONObject.toJSONString(totalList), DeptContract.class);//转对象
