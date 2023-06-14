@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.proPlan.model.HeaderObj;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.ProPlanUtils;
 import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -55,20 +56,8 @@ public class PmLifeCycleExt {
      * 查询列头
      */
     public void getColumnList() {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> strList = myJdbcTemplate.queryForList("select `NAME`,ifnull(IZ_DISPLAY,0) as IZ_DISPLAY from STANDARD_NODE_NAME where `LEVEL`=3 order by SEQ_NO");
-        List<HeaderObj> columnList = strList.stream().map(p -> {
-            HeaderObj obj = new HeaderObj();
-            obj.name = JdbcMapUtil.getString(p, "NAME");
-            obj.izDisplay = JdbcMapUtil.getString(p, "IZ_DISPLAY");
-            return obj;
-        }).collect(Collectors.toList());
-
-//        columnList.add(0, HeaderObj.builder().name("ID").izDisplay("0").build());
-//        columnList.add(1, HeaderObj.builder().name("项目名称").izDisplay("1").build());
-//        columnList.add(2, HeaderObj.builder().name("前期手续经办人").izDisplay("1").build());
-//        columnList.add(2, HeaderObj.builder().name("备注说明").izDisplay("1").build());
-
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<HeaderObj> columnList = getHeaderList(JdbcMapUtil.getString(map, "projectType"));
         if (CollectionUtils.isEmpty(columnList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
@@ -77,6 +66,29 @@ public class PmLifeCycleExt {
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
+    }
+
+
+    private List<HeaderObj> getHeaderList(String projectType) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        if ("0".equals(projectType)) {
+            projectType = "0099799190825080689";
+        }
+
+        String sql = "select * from pro_plan_template_rule where TENDER_MODE_ID='1640259853484171264' and INVESTMENT_SOURCE_ID='0099799190825080704'  " +
+                "                and PRO_PLAN_RULE_CONDITION_ID='1635089266470162432'   and TEMPLATE_FOR_PROJECT_TYPE_ID= ?";
+        List<Map<String, Object>> strList = myJdbcTemplate.queryForList(sql, projectType);
+        if (!CollectionUtils.isEmpty(strList)) {
+            String planId = JdbcMapUtil.getString(strList.get(0), "PM_PRO_PLAN_ID");
+            List<Map<String, Object>> result = ProPlanUtils.sortLevel3Bt(planId);
+            return result.stream().map(p -> {
+                HeaderObj obj = new HeaderObj();
+                obj.name = JdbcMapUtil.getString(p, "nodeName");
+                obj.izDisplay = "1";
+                return obj;
+            }).collect(Collectors.toList());
+        }
+        return null;
     }
 
 
@@ -97,7 +109,9 @@ public class PmLifeCycleExt {
                 " left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID and pp.POST_INFO_ID='1633731474912055296'\n" +
                 " left join ad_user au on pp.AD_USER_ID = au.id \n" +
                 " where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and (pj.PROJECT_STATUS <> '1661568714048413696' or pj.PROJECT_STATUS is null) ");
-        sb.append(" and pj.PROJECT_TYPE_ID ='").append(projectType).append("'");
+        if (!"0".equals(projectType)) {
+            sb.append(" and pj.PROJECT_TYPE_ID ='").append(projectType).append("'");
+        }
         if (!StringUtils.isEmpty(projectName)) {
             sb.append(" and pj.name like '%").append(projectName).append("%'");
         }
@@ -111,10 +125,10 @@ public class PmLifeCycleExt {
         sb.append(" limit ").append(start).append(",").append(pageSize);
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //header
-        List<Map<String, Object>> strList = myJdbcTemplate.queryForList("select `NAME`,ifnull(IZ_DISPLAY,0) as IZ_DISPLAY from STANDARD_NODE_NAME where `LEVEL`=3 order by SEQ_NO ");
+        List<HeaderObj> columnList = getHeaderList(projectType);
 
-        List<String> headerList = strList.stream().map(p -> JdbcMapUtil.getString(p, "NAME")).collect(Collectors.toList());
-
+        List<String> headers = columnList.stream().map(p -> p.name).collect(Collectors.toList());
+        List<String> headerList = new ArrayList<>(headers);
         headerList.add(0, "ID");
         headerList.add(1, "项目名称");
         headerList.add(2, "备注说明");
@@ -128,13 +142,14 @@ public class PmLifeCycleExt {
             MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
             Map<String, Object> queryParams = new HashMap<>();// 创建入参map
             queryParams.put("ids", ids);
-            nodeList = myNamedParameterJdbcTemplate.queryForList("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name,snn.`NAME` as nodeName,po.name as postName,au.name as userName,ifnull(IZ_OVERDUE,0) as izOverdue from pm_pro_plan_node pn  \n" +
-                    " left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id \n" +
-                    " left join gr_set_value gsv on gsv.id = pn.PROGRESS_STATUS_ID  \n" +
-                    " left join STANDARD_NODE_NAME snn on pn.SCHEDULE_NAME = snn.id  \n" +
-                    " left join post_info po on pn.post_info_id = po.id   \n" +
-                    " left join ad_user au on au.id = pn.CHIEF_USER_ID  \n" +
-                    " where pl.IS_TEMPLATE <>1 and pl.PM_PRJ_ID  in (:ids)  ", queryParams);
+            StringBuilder su = new StringBuilder();
+            su.append("select pn.*,pl.PM_PRJ_ID,gsv.`NAME` as status_name,pn.`NAME` as nodeName,po.name as postName,au.name as userName,ifnull(IZ_OVERDUE,0) as izOverdue from pm_pro_plan_node pn  " +
+                    "                     left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id " +
+                    "                     left join gr_set_value gsv on gsv.id = pn.PROGRESS_STATUS_ID  " +
+                    "                     left join post_info po on pn.post_info_id = po.id  " +
+                    "                     left join ad_user au on au.id = pn.CHIEF_USER_ID  " +
+                    "                     where pl.IS_TEMPLATE <>1 and pl.PM_PRJ_ID  in (:ids) ");
+            nodeList = myNamedParameterJdbcTemplate.queryForList(su.toString(), queryParams);
         }
 
 
