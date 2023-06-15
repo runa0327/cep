@@ -11,6 +11,7 @@ import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.Data;
 import org.springframework.util.CollectionUtils;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 二类费扩展
@@ -98,6 +100,18 @@ public class SecondFeeExt {
         List<SecondCategoryFeeDemand> demands = SecondCategoryFeeDemand.selectByWhere(new Where()
                 .eq(SecondCategoryFeeDemand.Cols.PM_PRJ_ID, req.prjId)
                 .eq(SecondCategoryFeeDemand.Cols.PO_ORDER_REQ_ID, req.orderReqId));
+
+        //合同科目
+        String orderDtlNames = "";
+        List<Map<String, Object>> contractDltList = myJdbcTemplate.queryForList("select id orderDtlId,FEE_DETAIL orderDtlName from pm_order_cost_detail d " +
+                "where CONTRACT_ID = ? and d.status = 'AP'", req.orderReqId);
+        if (!CollectionUtils.isEmpty(contractDltList)){
+            orderDtlNames = contractDltList.stream()
+                    .filter(dtl -> dtl.get("orderDtlName") != null)
+                    .map(dtl -> JdbcMapUtil.getString(dtl, "orderDtlName"))
+                    .collect(Collectors.joining(";"));
+        }
+
         //查到继续查明细，没查到回显默认数据
         List<Map<String, Object>> originMaps;
         if (CollectionUtils.isEmpty(demands)){//没有明细，返回默认
@@ -148,6 +162,7 @@ public class SecondFeeExt {
         resp.prjId = req.prjId;
         resp.orderReqId = req.orderReqId;
         resp.orderDtlId = orderDltId;
+        resp.orderDltNames = orderDtlNames;
         resp.secondFeeId = (demands == null ? null : demands.get(0).getId());
         resp.feeDemandDtls = demandDtlWrappers;
         resp.payHistories = payHistories;
@@ -221,6 +236,12 @@ public class SecondFeeExt {
             }
             if (isNullOrZero(demandDtl.approvedAmount) && isNullOrZero(demandDtl.payableRatio)){//没有填批复金额和可支付比例的跳过
                 continue;
+            }
+            //可支付比例，本次填报不能小于上次填报
+            if (i != 0){
+                if (demandDtl.payableRatio.compareTo(demandDtls.get(i - 1).payableRatio) < 0){
+                    throw new BaseException("可支付比例'" + demandDtl.payableRatio +"'不能小于上一节点");
+                }
             }
             //可支付金额
             //取该条明细的批复金额和第一条批复金额比较，取较小值
@@ -379,6 +400,8 @@ public class SecondFeeExt {
         private String orderReqId;
         //合同明细id
         private String orderDtlId;
+        //合同明细名称
+        private String orderDltNames;
         //费用需求明细
         private List<DemandDtlWrapper> feeDemandDtls;
         //合同支付历史
