@@ -165,7 +165,7 @@ public class SecondFeeStatisticExt {
                 "left join pm_prj pp on pp.id = fd.PM_PRJ_ID\n" +
                 "left join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
                 "left join (select u.id,u.name,max(d.id) deptId from ad_user u left join hr_dept_user du on du.AD_USER_ID = u.id\n" +
-                "\t\t\t\t\t\tleft join hr_dept d on d.id = du.HR_DEPT_ID group by u.id) u on u.id = dd.LAST_MODI_USER_ID\n" +
+                "\t\t\t\t\t\tleft join hr_dept d on d.id = du.HR_DEPT_ID where d.CUSTOMER_UNIT = '0099902212142008831' group by u.id) u on u.id = dd.LAST_MODI_USER_ID\n" +
                 "left join hr_dept d on d.id = u.deptId\n" +
                 "left join (select dd.SECOND_CATEGORY_FEE_DEMAND_ID,max(SEQ_NO) maxSeqNo from fee_demand_dtl dd \n" +
                 "\t\t\t\t\t\tleft join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
@@ -182,7 +182,7 @@ public class SecondFeeStatisticExt {
                 "left join pm_prj pp on pp.id = fd.PM_PRJ_ID\n" +
                 "left join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
                 "left join (select u.id,u.name,max(d.id) deptId from ad_user u left join hr_dept_user du on du.AD_USER_ID = u.id\n" +
-                "\t\t\t\t\t\tleft join hr_dept d on d.id = du.HR_DEPT_ID group by u.id) u on u.id = dd.LAST_MODI_USER_ID\n" +
+                "\t\t\t\t\t\tleft join hr_dept d on d.id = du.HR_DEPT_ID where d.CUSTOMER_UNIT = '0099902212142008831' group by u.id) u on u.id = dd.LAST_MODI_USER_ID\n" +
                 "left join hr_dept d on d.id = u.deptId\n" +
                 "left join (select dd.SECOND_CATEGORY_FEE_DEMAND_ID,max(SEQ_NO) maxSeqNo from fee_demand_dtl dd \n" +
                 "\t\t\t\t\t\tleft join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
@@ -220,7 +220,7 @@ public class SecondFeeStatisticExt {
         groupSql.append(" group by d.id");
         ContractStatisticResp resp = new ContractStatisticResp();
         List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(sqlSb.toString(), sqlParams);
-        List<Map<String, Object>> pageList = totalList.stream().limit((req.pageIndex - 1) * req.pageSize).skip(req.pageSize).collect(Collectors.toList());
+        List<Map<String, Object>> pageList = totalList.stream().skip((req.pageIndex - 1) * req.pageSize).limit(req.pageSize).collect(Collectors.toList());
         List<ContractData> contractDataList = JSONObject.parseArray(JSONObject.toJSONString(pageList), ContractData.class);
         //统计
         BigDecimal totalContractAmt = new BigDecimal(0);
@@ -264,7 +264,7 @@ public class SecondFeeStatisticExt {
                 "left join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
                 "left join po_order oo on oo.CONTRACT_APP_ID = fd.PO_ORDER_REQ_ID and oo.PM_PRJ_ID = fd.PM_PRJ_ID\n" +
                 "left join (select u.id,u.name,max(d.id) deptId from ad_user u left join hr_dept_user du on du.AD_USER_ID = u.id\n" +
-                "\t\t\t\t\t\tleft join hr_dept d on d.id = du.HR_DEPT_ID group by u.id) u on u.id = dd.LAST_MODI_USER_ID\n" +
+                "\t\t\t\t\t\tleft join hr_dept d on d.id = du.HR_DEPT_ID where d.CUSTOMER_UNIT = '0099902212142008831' group by u.id) u on u.id = dd.LAST_MODI_USER_ID\n" +
                 "left join hr_dept d on d.id = u.deptId");
 
         sqlSb.append(" where YEAR(dd.SUBMIT_TIME) <= ?");
@@ -273,6 +273,14 @@ public class SecondFeeStatisticExt {
         //所有相关的部门
         Map<String, String> deptMap = originList.stream().collect(Collectors.toMap(map -> map.get("deptId").toString(), map -> map.get("deptName").toString(),(ov,nv) -> nv));
 
+        //表头
+        List<HeadCell> header = new ArrayList<>();
+        header.add(new HeadCell("需求部门","需求部门"));
+        for (int i = 1; i <= month; i++) {
+            header.add(new HeadCell(i + "月",i + "月新增需求金额"));
+        }
+
+        //列表
         List<Map<String, Object>> sheetList = new ArrayList<>();
         List<DeptAmt> deptSumList = new ArrayList<>();
 
@@ -300,6 +308,7 @@ public class SecondFeeStatisticExt {
                 //有数据，减前一月汇总数据，记录该月汇总数据，汇总部门数据
                 tempRowCells.put(m, sumAmt);
                 BigDecimal thisMonthAmt = sumAmt.subtract(tempRowCells.get(m - 1));
+//                BigDecimal thisMonthAmt = tempRowCells.get(m);
                 rowCells.put(m + "月",thisMonthAmt);
                 deptAmt.sumAmt = deptAmt.sumAmt.add(thisMonthAmt);
             }
@@ -336,6 +345,7 @@ public class SecondFeeStatisticExt {
 
         //封装返回
         Map<String, Object> result = new HashMap<>();
+        result.put("header",header);
         result.put("sheetList",sheetList);
         result.put("deptSumList",deptSumList);
         result.put("sumMap",sumMap);
@@ -383,18 +393,20 @@ public class SecondFeeStatisticExt {
                 "left join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
                 "left join (select dd.SECOND_CATEGORY_FEE_DEMAND_ID,max(SEQ_NO) maxSeqNo from fee_demand_dtl dd \n" +
                 "\t\t\t\t\t\tleft join gr_set_value va on va.id = dd.FEE_DEMAND_NODE\n" +
-                "\t\t\t\t\t\twhere dd.SUBMIT_TIME is not null\n" +
+                "\t\t\t\t\t\twhere dd.SUBMIT_TIME is not null and DATE_FORMAT(dd.SUBMIT_TIME,'%Y-%m') = :yearMonth\n" +
                 "\t\t\t\t\t\tgroup by dd.SECOND_CATEGORY_FEE_DEMAND_ID\n" +
                 "\t\t\t\t\t) dtemp on dtemp.SECOND_CATEGORY_FEE_DEMAND_ID = fd.id and dtemp.maxSeqNo = va.SEQ_NO\n" +
                 "left join po_order oo on oo.CONTRACT_APP_ID = fd.PO_ORDER_REQ_ID and oo.PM_PRJ_ID = fd.PM_PRJ_ID\n" +
                 "left join (select PO_ORDER_ID,sum(PAY_AMT) sumPayAmt from contract_pay_history ph group by PO_ORDER_ID) htemp on htemp.PO_ORDER_ID" +
                 " = oo.id\n" +
                 "left join (select u.id,u.name,max(d.id) deptId from ad_user u left join hr_dept_user du on du.AD_USER_ID = u.id\n" +
-                "\t\t\t\t\t\tleft join hr_dept d on d.id = du.HR_DEPT_ID group by u.id) u on u.id = dd.LAST_MODI_USER_ID\n" +
+                "\t\t\t\t\t\tleft join hr_dept d on d.id = du.HR_DEPT_ID where d.CUSTOMER_UNIT = '0099902212142008831' group by u.id) u on u.id = dd.LAST_MODI_USER_ID\n" +
                 "left join hr_dept d on d.id = u.deptId\n" +
-                "where dtemp.SECOND_CATEGORY_FEE_DEMAND_ID is not null");
+                "where 1=1 " +
+                "and dtemp.SECOND_CATEGORY_FEE_DEMAND_ID is not null"
+        );
         if (!CollectionUtils.isEmpty(req.deptIds)){
-            sqlSb.append(" and d.id in (:deptId)");
+            sqlSb.append(" and d.id in (:deptIds)");
         }
         if (!Strings.isNullOrEmpty(req.prjName)){
             sqlParams.put("prjName","%" + sqlParams.get("prjName") + "%");
@@ -405,13 +417,16 @@ public class SecondFeeStatisticExt {
             sqlSb.append( " and oo.CONTRACT_NAME like :contractName");
         }
         if (!Strings.isNullOrEmpty(req.startDate)){
-            sqlSb.append(" and dd.SUBMIT_TIME <= :startDate");
+            sqlSb.append(" and dd.SUBMIT_TIME >= :startDate");
         }
         if (!Strings.isNullOrEmpty(req.endDate)){
             sqlSb.append(" and dd.SUBMIT_TIME <= :endDate");
         }
         if (!Strings.isNullOrEmpty(req.yearMonth)){
             sqlSb.append( " and DATE_FORMAT(dd.SUBMIT_TIME,'%Y-%m') = :yearMonth");
+        }
+        if (!CollectionUtils.isEmpty(req.operatorIds)){
+            sqlSb.append(" and u.id in (:operatorIds)");
         }
         List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(sqlSb.toString(), sqlParams);
         List<DeptContract> totalDeptContracts = JSONObject.parseArray(JSONObject.toJSONString(totalList), DeptContract.class);//转对象
@@ -651,6 +666,19 @@ public class SecondFeeStatisticExt {
         private BigDecimal paidAmt = BigDecimal.ZERO;
         //合同支付占比
         private BigDecimal paidRatio = BigDecimal.ZERO;
+    }
 
+    /**
+     * 表头单元格
+     */
+    @Data
+    private static class HeadCell{
+        private String id;
+        private String name;
+
+        public HeadCell(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
     }
 }

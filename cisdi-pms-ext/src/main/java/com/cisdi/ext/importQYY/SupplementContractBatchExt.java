@@ -101,7 +101,7 @@ public class SupplementContractBatchExt {
         boolean suc = true;
         List<String> errorInfos = new ArrayList<>();
 
-//        try {
+        try {
             String supplementId = "";
             //检测是否该条数据是否已经导入过，未导入新增，导入过修改
             Optional<Map<String, Object>> anyOld = oldImportSupplements.stream()
@@ -148,10 +148,10 @@ public class SupplementContractBatchExt {
             contractSupplementContact.insertById();
 
 
-//        }catch (Exception e){
+        }catch (Exception e){
             suc = false;
-//            errorInfos.add(e.toString());
-//        }
+            errorInfos.add(e.toString());
+        }
 
         //更新导入明细状态
         supplement.setImportStatusId("3")
