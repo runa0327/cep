@@ -133,7 +133,9 @@ public class SecondFeeStatisticExt {
                 resp.totalPaidAmt = resp.totalPaidAmt.add(new BigDecimal(staMap.get("sumPayAmt").toString()));
                 totalContractAmt = totalContractAmt.add(new BigDecimal(staMap.get("contractRequiredTotalAmt").toString()));
             }
-            resp.totalPaidRatio = resp.totalPaidAmt.divide(totalContractAmt,4,BigDecimal.ROUND_HALF_UP);
+            if (BigDecimal.ZERO.compareTo(resp.totalPaidAmt) != 0){
+                resp.totalPaidRatio = resp.totalPaidAmt.divide(totalContractAmt,4,BigDecimal.ROUND_HALF_UP);
+            }
         }
 
         HashMap<String, Object> result = new HashMap<>();
