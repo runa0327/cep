@@ -74,6 +74,9 @@ public class PmLifeCycleExt {
         if ("0".equals(projectType)) {
             projectType = "0099799190825080689";
         }
+        //查询标准节点
+        List<Map<String, Object>> baseNodeList = myJdbcTemplate.queryForList("select ID,ifnull(IZ_DISPLAY,0) izDisplay from STANDARD_NODE_NAME where `STATUS`='ap';");
+
 
         String sql = "select * from pro_plan_template_rule where TENDER_MODE_ID='1640259853484171264' and INVESTMENT_SOURCE_ID='0099799190825080704'  " +
                 "                and PRO_PLAN_RULE_CONDITION_ID='1635089266470162432'   and TEMPLATE_FOR_PROJECT_TYPE_ID= ?";
@@ -84,7 +87,15 @@ public class PmLifeCycleExt {
             return result.stream().map(p -> {
                 HeaderObj obj = new HeaderObj();
                 obj.name = JdbcMapUtil.getString(p, "nodeName");
-                obj.izDisplay = "1";
+                Optional<Map<String, Object>> optional = baseNodeList.stream().filter(m -> Objects.equals(m.get("ID"), p.get("SCHEDULE_NAME"))).findAny();
+                String izDisplay = "0";
+                if (optional.isPresent()) {
+                    Map<String, Object> dataMap = optional.get();
+                    if("1".equals(JdbcMapUtil.getString(dataMap,"izDisplay"))){
+                        izDisplay = "1";
+                    }
+                }
+                obj.izDisplay = izDisplay;
                 return obj;
             }).collect(Collectors.toList());
         }
