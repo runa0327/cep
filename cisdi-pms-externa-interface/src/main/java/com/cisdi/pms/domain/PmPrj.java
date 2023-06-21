@@ -34,6 +34,9 @@ public class PmPrj extends BasePageEntity {
     //概算金额
     public String estimateAmt;
 
+    //项目编号
+    public String prjCode;
+
 
 
 }

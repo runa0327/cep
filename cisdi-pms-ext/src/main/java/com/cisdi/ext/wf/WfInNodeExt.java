@@ -154,7 +154,8 @@ public class WfInNodeExt {
                                     }
 
                                     // 更新结束信息：
-                                    updateEndInfoForPlanNode(procInstId, nodeInstId, now, leafNode, processWeekTask);
+                                    String entCode = procInst.get("ENT_CODE").toString();
+                                    updateEndInfoForPlanNode(entCode, procInstId, nodeInstId, now, leafNode, processWeekTask);
                                 }
 
                                 // 针对父节点，进行递归：
@@ -274,11 +275,12 @@ public class WfInNodeExt {
         }
     }
 
-    private void updateEndInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode, boolean processWeekTask) {
+    private void updateEndInfoForPlanNode(String entCode, String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode, boolean processWeekTask) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        //更新节点状态判断
-        Boolean izTrue = checkIzChange(procInstId, leafNode, myJdbcTemplate);
+        // 更新节点状态判断
+        Boolean izTrue = checkIzChange(entCode, procInstId, leafNode, myJdbcTemplate);
         if (izTrue) {
+
             // 计算时间工期
             int actualDays = 0;
             List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", leafNode.get("ID"));
@@ -322,19 +324,18 @@ public class WfInNodeExt {
      * @param myJdbcTemplate 数据源
      * @return 判断结果
      */
-    private Boolean checkIzChange(String procInstId, Map<String, Object> leafNode, MyJdbcTemplate myJdbcTemplate) {
+    private Boolean checkIzChange(String entCode, String procInstId, Map<String, Object> leafNode, MyJdbcTemplate myJdbcTemplate) {
         Boolean izChange = true;
-        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         List<String> purchaseList = AttLinkDifferentProcess.getPurchaseList();
         if (purchaseList.contains(entCode)) {
-            //获取流程表信息等
+            // 获取流程表信息等
             List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from wf_process_instance where id = ?", procInstId);
             String entityRecordId = JdbcMapUtil.getString(list1.get(0), "ENTITY_RECORD_ID");
-            String attData = JdbcMapUtil.getString(leafNode, "ATT_DATA"); //节点中设置的采购事项类型
+            String attData = JdbcMapUtil.getString(leafNode, "ATT_DATA"); // 节点中设置的采购事项类型
             List<Map<String, Object>> list2 = myJdbcTemplate.queryForList("select * from " + entCode + " where id = ?", entityRecordId);
-            String buyMatterId = JdbcMapUtil.getString(list2.get(0), "BUY_MATTER_ID"); //采购事项
+            String buyMatterId = JdbcMapUtil.getString(list2.get(0), "BUY_MATTER_ID"); // 采购事项
             List<Map<String, Object>> list3 = myJdbcTemplate.queryForList("select * from BASE_MATTER_TYPE_CON where GR_SET_VALUE_ID = ?", buyMatterId);
-            String buyMatterTypeId = JdbcMapUtil.getString(list3.get(0), "GR_SET_VALUE_ONE_ID"); //采购事项类别
+            String buyMatterTypeId = JdbcMapUtil.getString(list3.get(0), "GR_SET_VALUE_ONE_ID"); // 采购事项类别
             if (SharedUtil.isEmptyString(attData)) {
                 izChange = false;
             } else if (SharedUtil.isEmptyString(buyMatterTypeId) || !buyMatterTypeId.equals(attData)) {

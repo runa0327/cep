@@ -204,6 +204,7 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
             pmProgressWeeklyPrjDetail.setProgressRemark(list.get(0).getProgressRemark());
             pmProgressWeeklyPrjDetail.setProgress(list.get(0).getProgress());
             pmProgressWeeklyPrjDetail.setProgressDescribe(list.get(0).getProgressDescribe());
+            pmProgressWeeklyPrjDetail.setProgressWeek(list.get(0).getProgressWeek());
             pmProgressWeeklyPrjDetailMapper.insertData(pmProgressWeeklyPrjDetail);
         }
     }
