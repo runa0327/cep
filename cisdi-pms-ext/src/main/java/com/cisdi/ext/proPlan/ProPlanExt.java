@@ -7,6 +7,7 @@ import com.cisdi.ext.util.PrjPlanUtil;
 import com.cisdi.ext.weektask.WeekTaskExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
@@ -1613,4 +1614,77 @@ public class ProPlanExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map
         PrjPlanUtil.createPlan(JdbcMapUtil.getString(map, "projectId"), null, null, null, null);
     }
+
+    /**
+     * 刷新节点流程实例
+     */
+    public void refreshNodeProcess() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String proPlanId = entityRecord.csCommId;
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pn.*,PM_PRJ_ID from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where PM_PRO_PLAN_ID=? and LINKED_WF_PROCESS_ID is not null", proPlanId);
+        if (!CollectionUtils.isEmpty(list)) {
+            list.forEach(item -> {
+                List<Map<String, Object>> entryList = myJdbcTemplate.queryForList("SELECT m.*,att.id as att_id,att.`CODE` as att_code,ifnull(aet.ATT_NAME,att.`NAME`) as att_name FROM \n" +
+                        "( \n" +
+                        "select c.id,c.code,c.name from wf_process a \n" +
+                        "LEFT JOIN AD_SINGLE_ENT_VIEW b ON a.STARTABLE_SEV_IDS = b.id \n" +
+                        "LEFT JOIN AD_ENT c ON b.AD_ENT_ID = c.id where a.id =? \n" +
+                        ") m \n" +
+                        "left join AD_ENT_ATT aet on m.id = aet.AD_ENT_ID \n" +
+                        "left join ad_att att on att.id = aet.AD_ATT_ID  ", item.get("LINKED_WF_PROCESS_ID"));
+                if (!CollectionUtils.isEmpty(entryList)) {
+                    Map<String, Object> mapData = entryList.get(0);
+                    String tableId = JdbcMapUtil.getString(mapData, "code");
+                    Optional optional = entryList.stream().filter(p -> "PM_PRJ_ID".equals(JdbcMapUtil.getString(p, "att_code"))).findAny();
+                    if (optional.isPresent()) {
+                        List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from " + tableId + " where PM_PRJ_ID=?", item.get("PM_PRJ_ID"));
+                        if (!CollectionUtils.isEmpty(list1)) {
+                            refreshData(list1, item, tableId);
+                        }
+                    } else {
+                        Optional optionals = entryList.stream().filter(p -> "pm_prj_ids".equals(JdbcMapUtil.getString(p, "att_code"))).findAny();
+                        if (optionals.isPresent()) {
+                            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from " + tableId + " where find_in_set(?,pm_prj_ids)", item.get("PM_PRJ_ID"));
+                            if (!CollectionUtils.isEmpty(list1)) {
+                                refreshData(list1, item, tableId);
+                            }
+                        }
+                    }
+                }
+            });
+
+        }
+    }
+
+    private void refreshData(List<Map<String, Object>> list1, Map<String, Object> dataMap, String table) {
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<String> ids = list1.stream().map(m -> JdbcMapUtil.getString(m, "ID")).collect(Collectors.toList());
+        Map<String, Object> queryParams = new HashMap<>();// 创建入参map
+        queryParams.put("ids", ids);
+        queryParams.put("processId", dataMap.get("LINKED_WF_PROCESS_ID"));
+        queryParams.put("ent", table);
+        List<Map<String, Object>> instanceList = myNamedParameterJdbcTemplate.queryForList("select * from wf_process_instance where WF_PROCESS_ID=:processId and ENT_CODE=:ent and ENTITY_RECORD_ID in (:ids) order by CRT_DT desc", queryParams);
+        String instanceId = null;
+        String startNodeId = null;
+        String endNodeId = null;
+        if (!CollectionUtils.isEmpty(instanceList)) {
+            Map<String, Object> instance = instanceList.get(0);
+            instanceId = JdbcMapUtil.getString(instance, "ID");
+            List<Map<String, Object>> startNodeList = myJdbcTemplate.queryForList("select * from wf_node_instance where WF_PROCESS_ID =? and WF_PROCESS_INSTANCE_ID=? and WF_NODE_ID=?  order by CRT_DT desc", dataMap.get("LINKED_WF_PROCESS_ID"), instance.get("ID"), dataMap.get("LINKED_START_WF_NODE_ID"));
+            if (!CollectionUtils.isEmpty(startNodeList)) {
+                Map<String, Object> startNode = startNodeList.get(0);
+                startNodeId = JdbcMapUtil.getString(startNode, "ID");
+            }
+            List<Map<String, Object>> endNodeList = myJdbcTemplate.queryForList("select * from wf_node_instance where WF_PROCESS_ID =? and WF_PROCESS_INSTANCE_ID=? and WF_NODE_ID=?  order by CRT_DT desc", dataMap.get("LINKED_WF_PROCESS_ID"), instance.get("ID"), dataMap.get("LINKED_END_WF_NODE_ID"));
+            if (!CollectionUtils.isEmpty(endNodeList)) {
+                Map<String, Object> endNode = endNodeList.get(0);
+                endNodeId = JdbcMapUtil.getString(endNode, "ID");
+            }
+        }
+        myJdbcTemplate.update("update pm_pro_plan_node set LINKED_WF_PROCESS_INSTANCE_ID=?,LINKED_START_WF_NODE_INSTANCE_ID=?,LINKED_END_WF_NODE_INSTANCE_ID=? where id=?", instanceId, startNodeId, endNodeId, dataMap.get("ID"));
+
+    }
+
 }
