@@ -80,6 +80,21 @@ public class ProPlanUtils {
     }
 
 
+    public static List<Map<String, Object>> sortLevel3Bt(String proPlanId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pn.id as id,pn.`NAME` as nodeName,ifnull(PM_PRO_PLAN_NODE_PID,0) pid," +
+                "pn.SEQ_NO as seq,pn.level as level,'0' as seq_bak,pn.PLAN_COMPL_DATE as PLAN_COMPL_DATE,OPREATION_TYPE,SCHEDULE_NAME  " +
+                " from pm_pro_plan_node pn  where PM_PRO_PLAN_ID=?", proPlanId);
+
+        list.stream().filter(p -> "0".equals(JdbcMapUtil.getString(p, "pid")))
+                .sorted(Comparator.comparing(o -> BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(o, "seq")))).peek(m -> {
+            BigDecimal parentSeq = BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(m, "seq")).multiply(new BigDecimal(1000));
+            m.put("seq_bak", parentSeq);
+            getChildren(m, list, parentSeq);
+        }).collect(Collectors.toList());
+        return list.stream().filter(p -> "3".equals(JdbcMapUtil.getString(p, "level"))).sorted(Comparator.comparing(o -> JdbcMapUtil.getString(o, "seq_bak"))).collect(Collectors.toList());
+    }
+
     /**
      * 排序3级节点
      *
@@ -89,7 +104,7 @@ public class ProPlanUtils {
     public static List<Map<String, Object>> sortLevel3(String projectId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pn.id as id,pn.`NAME` as nodeName,ifnull(PM_PRO_PLAN_NODE_PID,0) pid," +
-                "pn.SEQ_NO as seq,pn.level as level,'0' as seq_bak,pn.PLAN_COMPL_DATE as PLAN_COMPL_DATE,OPREATION_TYPE  " +
+                "pn.SEQ_NO as seq,pn.level as level,'0' as seq_bak,pn.PLAN_COMPL_DATE as PLAN_COMPL_DATE,OPREATION_TYPE,SCHEDULE_NAME  " +
                 " from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where PM_PRJ_ID=?", projectId);
 
         list.stream().filter(p -> "0".equals(JdbcMapUtil.getString(p, "pid")))

@@ -3,6 +3,7 @@ package com.cisdi.ext.wf;
 import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.PmProPlanNode;
 import com.cisdi.ext.util.DateTimeUtil;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -153,7 +154,8 @@ public class WfInNodeExt {
                                     }
 
                                     // 更新结束信息：
-                                    updateEndInfoForPlanNode(procInstId, nodeInstId, now, leafNode, processWeekTask);
+                                    String entCode = procInst.get("ENT_CODE").toString();
+                                    updateEndInfoForPlanNode(entCode, procInstId, nodeInstId, now, leafNode, processWeekTask);
                                 }
 
                                 // 针对父节点，进行递归：
@@ -255,9 +257,15 @@ public class WfInNodeExt {
 
     private void updateStartInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode, boolean processWeekTask) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+
+        Date startDate = getStandingBookDate(JdbcMapUtil.getString(leafNode, "ID"), procInstId, "1");
+        if (startDate == null) {
+            startDate = new Date();
+        }
+
         Crud.from("pm_pro_plan_node").where().eq("ID", leafNode.get("ID")).update()
                 // 设置进度信息：
-                .set("PROGRESS_STATUS_ID", IN_PROCESSING).set("ACTUAL_START_DATE", now).set("ACTUAL_CARRY_DAYS", 1).set("ACTUAL_CURRENT_PRO_PERCENT", 10).set("ACTUAL_COMPL_DATE", null).set("ACTUAL_TOTAL_DAYS", null)
+                .set("PROGRESS_STATUS_ID", IN_PROCESSING).set("ACTUAL_START_DATE", startDate).set("ACTUAL_CARRY_DAYS", 1).set("ACTUAL_CURRENT_PRO_PERCENT", 10).set("ACTUAL_COMPL_DATE", null).set("ACTUAL_TOTAL_DAYS", null)
                 // 设置关联信息：
                 .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_START_WF_NODE_INSTANCE_ID", nodeInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", null).exec();
 
@@ -267,11 +275,11 @@ public class WfInNodeExt {
         }
     }
 
-    private void updateEndInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode, boolean processWeekTask) {
+    private void updateEndInfoForPlanNode(String entCode, String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode, boolean processWeekTask) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        //更新节点状态判断
-        Boolean izTrue = checkIzChange(procInstId,leafNode,myJdbcTemplate);
-        if (izTrue){
+        // 更新节点状态判断
+        Boolean izTrue = checkIzChange(entCode, procInstId, leafNode, myJdbcTemplate);
+        if (izTrue) {
 
             // 计算时间工期
             int actualDays = 0;
@@ -285,9 +293,13 @@ public class WfInNodeExt {
                     log.error("计算实际完成工期失败！");
                 }
             }
+            Date endDate = getStandingBookDate(JdbcMapUtil.getString(leafNode, "ID"), procInstId, "2");
+            if (endDate == null) {
+                endDate = new Date();
+            }
             Crud.from("pm_pro_plan_node").where().eq("ID", leafNode.get("ID")).update()
                     // 设置进度信息：
-                    .set("PROGRESS_STATUS_ID", COMPLETED).set("ACTUAL_CURRENT_PRO_PERCENT", 100).set("ACTUAL_COMPL_DATE", now).set("ACTUAL_TOTAL_DAYS", actualDays)
+                    .set("PROGRESS_STATUS_ID", COMPLETED).set("ACTUAL_CURRENT_PRO_PERCENT", 100).set("ACTUAL_COMPL_DATE", endDate).set("ACTUAL_TOTAL_DAYS", actualDays)
                     // 设置关联信息：
                     .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", nodeInstId).set("IZ_OVERDUE", "0").exec();
 
@@ -306,27 +318,27 @@ public class WfInNodeExt {
 
     /**
      * 更新全景计划节点状态-判断是否需要更改
-     * @param procInstId 流程实例id
-     * @param leafNode 项目节点信息
+     *
+     * @param procInstId     流程实例id
+     * @param leafNode       项目节点信息
      * @param myJdbcTemplate 数据源
      * @return 判断结果
      */
-    private Boolean checkIzChange(String procInstId, Map<String,Object> leafNode, MyJdbcTemplate myJdbcTemplate) {
+    private Boolean checkIzChange(String entCode, String procInstId, Map<String, Object> leafNode, MyJdbcTemplate myJdbcTemplate) {
         Boolean izChange = true;
-        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         List<String> purchaseList = AttLinkDifferentProcess.getPurchaseList();
-        if (purchaseList.contains(entCode)){
-            //获取流程表信息等
-            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList("select * from wf_process_instance where id = ?",procInstId);
-            String entityRecordId = JdbcMapUtil.getString(list1.get(0),"ENTITY_RECORD_ID");
-            String attData = JdbcMapUtil.getString(leafNode,"ATT_DATA"); //节点中设置的采购事项类型
-            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList("select * from "+entCode+" where id = ?", entityRecordId);
-            String buyMatterId = JdbcMapUtil.getString(list2.get(0),"BUY_MATTER_ID"); //采购事项
-            List<Map<String,Object>> list3 = myJdbcTemplate.queryForList("select * from BASE_MATTER_TYPE_CON where GR_SET_VALUE_ID = ?", buyMatterId);
-            String buyMatterTypeId = JdbcMapUtil.getString(list3.get(0),"GR_SET_VALUE_ONE_ID"); //采购事项类别
-            if (SharedUtil.isEmptyString(attData)){
+        if (purchaseList.contains(entCode)) {
+            // 获取流程表信息等
+            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from wf_process_instance where id = ?", procInstId);
+            String entityRecordId = JdbcMapUtil.getString(list1.get(0), "ENTITY_RECORD_ID");
+            String attData = JdbcMapUtil.getString(leafNode, "ATT_DATA"); // 节点中设置的采购事项类型
+            List<Map<String, Object>> list2 = myJdbcTemplate.queryForList("select * from " + entCode + " where id = ?", entityRecordId);
+            String buyMatterId = JdbcMapUtil.getString(list2.get(0), "BUY_MATTER_ID"); // 采购事项
+            List<Map<String, Object>> list3 = myJdbcTemplate.queryForList("select * from BASE_MATTER_TYPE_CON where GR_SET_VALUE_ID = ?", buyMatterId);
+            String buyMatterTypeId = JdbcMapUtil.getString(list3.get(0), "GR_SET_VALUE_ONE_ID"); // 采购事项类别
+            if (SharedUtil.isEmptyString(attData)) {
                 izChange = false;
-            } else if (SharedUtil.isEmptyString(buyMatterTypeId) || !buyMatterTypeId.equals(attData)){
+            } else if (SharedUtil.isEmptyString(buyMatterTypeId) || !buyMatterTypeId.equals(attData)) {
                 izChange = false;
             }
         }
@@ -378,5 +390,62 @@ public class WfInNodeExt {
                         userId, title, content, new Date(), "1634118574056542208", "1635080848313290752", objectMap.get("ID"), objectMap.get("projectId"), id);
             }
         }
+    }
+
+    /**
+     * 获取台账中的对应日期
+     *
+     * @param nodeId     节点ID
+     * @param procInstId 流程实例ID
+     * @param mark       1-开始节点  2-结束节点
+     * @return
+     */
+    private Date getStandingBookDate(String nodeId, String procInstId, String mark) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", nodeId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> nodeMap = list.get(0);
+            String processId = JdbcMapUtil.getString(nodeMap, "LINKED_WF_PROCESS_ID");
+            if (!Strings.isNullOrEmpty(processId)) {
+                String filed;
+                if ("1".equals(mark)) {
+                    filed = JdbcMapUtil.getString(nodeMap, "START_DATE_FIELD");
+                } else {
+                    filed = JdbcMapUtil.getString(nodeMap, "END_DATE_FIELD");
+                }
+                if (Strings.isNullOrEmpty(filed)) {
+                    return null;
+                }
+                //判断台账有没有这个字段
+                List<Map<String, Object>> attInfoList = myJdbcTemplate.queryForList("SELECT m.*,att.id as att_id,att.`CODE` as att_code,ifnull(aet.ATT_NAME,att.`NAME`) as att_name FROM \n" +
+                        "( \n" +
+                        "\tselect c.id,c.code,c.name from wf_process a \n" +
+                        "\tLEFT JOIN AD_SINGLE_ENT_VIEW b ON a.STARTABLE_SEV_IDS = b.id \n" +
+                        "\tLEFT JOIN AD_ENT c ON b.AD_ENT_ID = c.id where a.id =? \n" +
+                        ") m \n" +
+                        "left join AD_ENT_ATT aet on m.id = aet.AD_ENT_ID \n" +
+                        "left join ad_att att on att.id = aet.AD_ATT_ID where att.id=?", processId, filed);
+                if (!CollectionUtils.isEmpty(attInfoList)) {
+                    Map<String, Object> attInfo = attInfoList.get(0);
+                    String table = JdbcMapUtil.getString(attInfo, "code");
+                    String fields =  JdbcMapUtil.getString(attInfo, "att_code");
+                    List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from wf_process_instance where id=?", procInstId);
+                    if (!CollectionUtils.isEmpty(list1)) {
+                        Map<String, Object> insInfo = list1.get(0);
+                        String dataId = JdbcMapUtil.getString(insInfo, "ENTITY_RECORD_ID");
+                        String sql = "select * from " + table + " where id='" + dataId + "'";
+                        List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(sql);
+                        if (!CollectionUtils.isEmpty(list2)) {
+                            Map<String, Object> dataMap = list2.get(0);
+                            String dataOrg = JdbcMapUtil.getString(dataMap, fields);
+                            if (!Strings.isNullOrEmpty(dataOrg)) {
+                                return getDateOnly(DateTimeUtil.stringToDate(dataOrg));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 }
