@@ -6,11 +6,10 @@ import com.cisdi.ext.base.GrSetValue;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.commons.HttpClient;
 import com.cisdi.ext.model.PoOrderReq;
-import com.cisdi.ext.model.PoOrderSupplementReq;
 import com.cisdi.ext.model.view.order.PoOrderReqView;
 import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.ProcessRoleExt;
 import com.cisdi.ext.pm.orderManage.detail.PoOrderPrjDetailExt;
-import com.cisdi.ext.pm.orderManage.detail.PoOrderSupplementPrjDetailExt;
 import com.cisdi.ext.util.*;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -736,9 +735,18 @@ public class PoOrderReqExt {
         String procInstId = ExtJarHelper.procInstId.get();
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        String processId = ExtJarHelper.procId.get();
+        String nodeId = ExtJarHelper.nodeId.get();
         if ("OK".equals(status)){
             if ("start".equals(nodeStatus) || "caiHuaStart".equals(nodeStatus) || "secondStart".equals(nodeStatus)){
                 WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
+            } else if ("financeLegalOK".equals(nodeStatus)){ // 7-财务部法务部审批 节点点击操作逻辑
+                // 判断当前用户是否是财务第一个审批的
+                boolean izFirst = ProcessRoleExt.getUserFinanceRole(userId,"0099952822476412306");
+                if (izFirst){
+                    // 将后续审批人员信息写入任务
+                    ProcessCommon.createOrderFinanceCheckUser(nodeInstanceId,"0099952822476412308",processId,procInstId,nodeId);
+                }
             }
         } else {
             if ("lawyerRefuse".equals(nodeStatus)){ // 法律审批拒绝
