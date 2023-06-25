@@ -5,6 +5,7 @@ import com.cisdi.ext.base.PmProcessPostConExt;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.HrDept;
+import com.cisdi.ext.model.base.AdRoleUser;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -954,5 +955,17 @@ public class ProcessRoleExt {
                 ExtJarHelper.returnValue.set(userList);
             }
         }
+    }
+
+    /**
+     * 查询用户是否是该角色下人员
+     * @param userId 人员id
+     * @param roleId 角色id
+     * @return 存在/不存在
+     */
+    public static boolean getUserFinanceRole(String userId, String roleId) {
+        List<AdRoleUser> list = AdRoleUser.selectByWhere(new Where().eq(AdRoleUser.Cols.AD_USER_ID,userId)
+                .eq(AdRoleUser.Cols.AD_ROLE_ID,roleId));
+        return !CollectionUtils.isEmpty(list);
     }
 }

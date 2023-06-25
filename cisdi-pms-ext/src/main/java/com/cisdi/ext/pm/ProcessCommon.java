@@ -1,8 +1,9 @@
 package com.cisdi.ext.pm;
 
-import cn.hutool.core.annotation.Link;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.*;
+import com.cisdi.ext.model.base.AdRoleUser;
+import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -10,8 +11,6 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
-import com.qygly.ext.jar.helper.sql.Crud;
-import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
@@ -334,24 +333,34 @@ public class ProcessCommon {
                 }
             }
         }
-        if ("AD_USER_FIFTEEN_ID".equals(postCode)){ //计划运营岗
-            postId = "1649315416767717376";
-        } else if ("AD_USER_THIRTEEN_ID".equals(postCode)){ //土地管理岗
-            postId = "1638733006686535680";
-        } else if ("AD_USER_TWENTY_ONE_ID".equals(postCode)){ //采购管理岗
-            postId = "1637991453391237120";
-        } else if ("AD_USER_TWENTY_THREE_ID".equals(postCode)){ //工程管理岗
-            postId = "1637988041987633152";
-        } else if ("AD_USER_NINETEEN_ID".equals(postCode)){ //合约管理岗
-            postId = "1637988017434177536";
-        } else if ("AD_USER_TWENTY_FIVE_ID".equals(postCode)){ //财务管理岗
-            postId = "1637988004163399680";
-        } else if ("AD_USER_TWENTY_TWO_ID".equals(postCode)){ //设计管理岗
-            postId = "1637987984030740480";
-        } else if ("AD_USER_EIGHTEEN_ID".equals(postCode)){ //成本管理岗
-            postId = "1637987965638717440";
-        } else if ("AD_USER_TWELVE_ID".equals(postCode)){ //前期报建岗
-            postId = "1636192694655168512";
+        switch (postCode) {
+            case "AD_USER_FIFTEEN_ID":  //计划运营岗
+                postId = "1649315416767717376";
+                break;
+            case "AD_USER_THIRTEEN_ID":  //土地管理岗
+                postId = "1638733006686535680";
+                break;
+            case "AD_USER_TWENTY_ONE_ID":  //采购管理岗
+                postId = "1637991453391237120";
+                break;
+            case "AD_USER_TWENTY_THREE_ID":  //工程管理岗
+                postId = "1637988041987633152";
+                break;
+            case "AD_USER_NINETEEN_ID":  //合约管理岗
+                postId = "1637988017434177536";
+                break;
+            case "AD_USER_TWENTY_FIVE_ID":  //财务管理岗
+                postId = "1637988004163399680";
+                break;
+            case "AD_USER_TWENTY_TWO_ID":  //设计管理岗
+                postId = "1637987984030740480";
+                break;
+            case "AD_USER_EIGHTEEN_ID":  //成本管理岗
+                postId = "1637987965638717440";
+                break;
+            case "AD_USER_TWELVE_ID":  //前期报建岗
+                postId = "1636192694655168512";
+                break;
         }
         return postId;
     }
@@ -369,9 +378,9 @@ public class ProcessCommon {
         if (CollectionUtils.isEmpty(list)){
             throw new BaseException("对不起，您在该业主单位下不存在部门关系，请联系管理员处理！");
         } else {
-            List<HrDeptUser> list1 = list.stream().filter(p->p.getSysTrue()==true).collect(Collectors.toList());
+            List<HrDeptUser> list1 = list.stream().filter(HrDeptUser::getSysTrue).collect(Collectors.toList());
             if (CollectionUtils.isEmpty(list1)){
-                list1 = list.stream().filter(p->p.getSysTrue()!=true).collect(Collectors.toList());
+                list1 = list.stream().filter(p-> !p.getSysTrue()).collect(Collectors.toList());
             }
             String deptId = list1.get(0).getHrDeptId();
             Crud.from(entCode).where().eq("id",id).update().set("CRT_DEPT_ID",deptId).exec();
@@ -568,7 +577,7 @@ public class ProcessCommon {
         String pmPrjIds = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
         String csCommId = entityRecord.csCommId;
         String[] prjArr = pmPrjIds.split(",");
-        if (prjArr.length > 0 && prjArr != null){
+        if (prjArr.length > 0){
             String detailCode = entCode + "_PRJ_DETAIL";
             String parentId = entCode + "_ID";
             Crud.from(detailCode).where().eq(parentId,csCommId).delete().exec();
@@ -578,6 +587,49 @@ public class ProcessCommon {
                         .set(parentId,csCommId).set("PM_PRJ_ID",tp)
                         .exec();
             }
+        }
+    }
+
+    /**
+     * 合同签订模块-财务第一个人审批后添加后续人员审批-模拟先后顺序
+     * @param nodeInstanceId 节点实例id
+     * @param roleId 后续审批角色id
+     * @param processId 流程id
+     * @param procInstId 流程实例id
+     * @param nodeId 节点id
+     */
+    public static void createOrderFinanceCheckUser(String nodeInstanceId, String roleId, String processId, String procInstId, String nodeId) {
+        List<String> newRoleUserList = new ArrayList<>();
+        // 查询人员信息
+        List<AdRoleUser> list = AdRoleUser.selectByWhere(new Where().eq(AdRoleUser.Cols.AD_ROLE_ID,roleId).eq(AdRoleUser.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list)){
+            //查询该节点实例审批人员信息
+            List<WfTask> taskList = WfTask.selectByWhere(new Where().eq(WfTask.Cols.WF_NODE_INSTANCE_ID,nodeInstanceId)
+                    .eq(WfTask.Cols.STATUS,"AP"));
+            List<String> taskUserList = taskList.stream().map(WfTask::getAdUserId).collect(Collectors.toList());
+            for (AdRoleUser tmp : list) {
+                String newUserId = tmp.getAdUserId();
+                if (!taskUserList.contains(newUserId)){
+                    newRoleUserList.add(newUserId);
+                }
+            }
+            //遍历新的审批人员信息写入任务表
+            if (!CollectionUtils.isEmpty(newRoleUserList)){
+                String now = DateTimeUtil.dateToString(new Date());
+                for (String tp : newRoleUserList) {
+                    String id = Crud.from("WF_TASK").insertData();
+                    Crud.from("WF_TASK").where().eq("ID",id).update()
+                            .set("VER","1").set("WF_NODE_INSTANCE_ID",nodeInstanceId).set("AD_USER_ID",tp)
+                            .set("RECEIVE_DATETIME",now).set("IS_CLOSED","0").set("STATUS","AP")
+                            .set("WF_TASK_TYPE_ID","TODO").set("IN_CURRENT_ROUND","1").set("TS",now)
+                            .set("SEQ_NO","1") //序号需要重新生成
+                            .set("WF_PROCESS_ID",processId).set("WF_PROCESS_INSTANCE_ID",procInstId).set("WF_NODE_ID",nodeId)
+                            .set("IS_PROC_INST_FIRST_TODO_TASK",0).set("IS_USER_LAST_CLOSED_TODO_TASK",1)
+                            .set("READ_RELATED",0).set("DISPATCH_RELATED",0).set("COMMENT_RELATED",0).set("REMIND_TIMES",0)
+                            .exec();
+                }
+            }
+
         }
     }
 }
