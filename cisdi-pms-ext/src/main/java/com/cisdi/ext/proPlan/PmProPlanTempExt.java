@@ -467,7 +467,8 @@ public class PmProPlanTempExt {
                 " ) m \n" +
                 " left join AD_ENT_ATT aet on m.id = aet.AD_ENT_ID \n" +
                 " left join ad_att att on att.id = aet.AD_ATT_ID \n" +
-                " where att.AD_ATT_SUB_TYPE_ID in('FILE_GROUP','FILE_GROUP2')", map.get("processId"));
+                " where att.AD_ATT_SUB_TYPE_ID in('FILE_GROUP','FILE_GROUP2') and (aet.ATT_IS_SHOWN_BY_DEFAULT <>'0' or aet.ATT_IS_SHOWN_BY_DEFAULT is null) ",
+                map.get("processId"));
         List<AttInfo> attInfoList = list.stream().map(p -> {
             AttInfo info = new AttInfo();
             info.id = JdbcMapUtil.getString(p, "att_id");
