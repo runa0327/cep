@@ -1,5 +1,6 @@
 package com.cisdi.ext.pm;
 
+import cn.hutool.core.util.IdUtil;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.*;
 import com.cisdi.ext.model.base.AdRoleUser;
@@ -618,11 +619,12 @@ public class ProcessCommon {
                 String now = DateTimeUtil.dateToString(new Date());
                 for (String tp : newRoleUserList) {
                     String id = Crud.from("WF_TASK").insertData();
+                    String seqNo = IdUtil.getSnowflakeNextIdStr();
                     Crud.from("WF_TASK").where().eq("ID",id).update()
                             .set("VER","1").set("WF_NODE_INSTANCE_ID",nodeInstanceId).set("AD_USER_ID",tp)
                             .set("RECEIVE_DATETIME",now).set("IS_CLOSED","0").set("STATUS","AP")
                             .set("WF_TASK_TYPE_ID","TODO").set("IN_CURRENT_ROUND","1").set("TS",now)
-                            .set("SEQ_NO","1") //序号需要重新生成
+                            .set("SEQ_NO",seqNo) //序号需要重新生成
                             .set("WF_PROCESS_ID",processId).set("WF_PROCESS_INSTANCE_ID",procInstId).set("WF_NODE_ID",nodeId)
                             .set("IS_PROC_INST_FIRST_TODO_TASK",0).set("IS_USER_LAST_CLOSED_TODO_TASK",1)
                             .set("READ_RELATED",0).set("DISPATCH_RELATED",0).set("COMMENT_RELATED",0).set("REMIND_TIMES",0)
