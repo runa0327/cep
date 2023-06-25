@@ -6,11 +6,10 @@ import com.cisdi.ext.base.GrSetValue;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.commons.HttpClient;
 import com.cisdi.ext.model.PoOrderReq;
-import com.cisdi.ext.model.PoOrderSupplementReq;
 import com.cisdi.ext.model.view.order.PoOrderReqView;
 import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.ProcessRoleExt;
 import com.cisdi.ext.pm.orderManage.detail.PoOrderPrjDetailExt;
-import com.cisdi.ext.pm.orderManage.detail.PoOrderSupplementPrjDetailExt;
 import com.cisdi.ext.util.*;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -99,7 +98,7 @@ public class PoOrderReqExt {
         String now = DateTimeUtil.dateToString(date);
 
         //获取当前节点实例id
-        String nodeId = ExtJarHelper.nodeInstId.get();
+        String nodeInstanceId = ExtJarHelper.nodeInstId.get();
 
         // 当前登录人
         String userName = ExtJarHelper.loginInfo.get().userName;
@@ -132,7 +131,7 @@ public class PoOrderReqExt {
             String processFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_SIX");
             //判断是否是当轮拒绝回来的、撤销回来的
             String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ?";
-            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeId,userId);
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeInstanceId,userId);
             if (!CollectionUtils.isEmpty(list2)){
                 String num = JdbcMapUtil.getString(list2.get(0),"num");
                 if (SharedUtil.isEmptyString(num) || "0".equals(num)){
@@ -163,6 +162,9 @@ public class PoOrderReqExt {
             }
 
         }  else if ("orderLegalFinanceCheck".equals(status)) { //法务财务审批
+
+            String nodeId = ExtJarHelper.nodeId.get();
+            String processId = ExtJarHelper.procId.get();
             //流程中的审批意见
             String processLegalComment = JdbcMapUtil.getString(entityRecord.valueMap,"TEXT_REMARK_THREE"); //法务意见
             String processLegalFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_THREE"); //法务修订稿
@@ -170,12 +172,12 @@ public class PoOrderReqExt {
             String processFinanceFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_TWO"); //财务修订稿
             //查询该人员角色信息
             String sql1 = "select b.id,b.name from ad_role_user a left join ad_role b on a.AD_ROLE_ID = b.id where a.AD_USER_ID = ? and b.id in ('0100070673610711083','0099902212142039415')";
-            userId = ProcessCommon.getOriginalUser(nodeId,userId,myJdbcTemplate);
+            userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId);
             if (!CollectionUtils.isEmpty(list1)){
                 //判断是否是当轮拒绝回来的、撤销回来的
                 String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ?";
-                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeId,userId);
+                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeInstanceId,userId);
                 if (!CollectionUtils.isEmpty(list2)){
                     String num = JdbcMapUtil.getString(list2.get(0),"num");
                     if (SharedUtil.isEmptyString(num) || "0".equals(num)){
@@ -230,6 +232,12 @@ public class PoOrderReqExt {
                         Integer exec = myJdbcTemplate.update(upSql.toString(),csCommId);
                         log.info("已更新：{}", exec);
                     }
+                }
+                // 判断当前用户是否是财务第一个审批的
+                boolean izFirst = ProcessRoleExt.getUserFinanceRole(userId,"0099952822476412306");
+                if (izFirst){
+                    // 将后续审批人员信息写入任务
+                    ProcessCommon.createOrderFinanceCheckUser(nodeInstanceId,"0099952822476412308",processId,procInstId,nodeId);
                 }
             }
         } else if ("orderLegalFinanceReject".equals(status)){
@@ -736,9 +744,18 @@ public class PoOrderReqExt {
         String procInstId = ExtJarHelper.procInstId.get();
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        String processId = ExtJarHelper.procId.get();
+        String nodeId = ExtJarHelper.nodeId.get();
         if ("OK".equals(status)){
             if ("start".equals(nodeStatus) || "caiHuaStart".equals(nodeStatus) || "secondStart".equals(nodeStatus)){
                 WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
+            } else if ("financeLegalOK".equals(nodeStatus)){ // 7-财务部法务部审批 节点点击操作逻辑
+                // 判断当前用户是否是财务第一个审批的
+                boolean izFirst = ProcessRoleExt.getUserFinanceRole(userId,"0099952822476412306");
+                if (izFirst){
+                    // 将后续审批人员信息写入任务
+                    ProcessCommon.createOrderFinanceCheckUser(nodeInstanceId,"0099952822476412308",processId,procInstId,nodeId);
+                }
             }
         } else {
             if ("lawyerRefuse".equals(nodeStatus)){ // 法律审批拒绝
