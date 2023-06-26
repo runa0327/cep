@@ -8,7 +8,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
-public class GrSetValue {
+public class GrSetValueExt {
 
     /**
      * 根据集合code和集合值编码查询集合值id
@@ -33,8 +33,7 @@ public class GrSetValue {
      * @return 名称
      */
     public static String getValueNameById(String id) {
-        String name = JdbcMapUtil.getString(Crud.from("gr_set_value").where().eq("id",id).select().execForMap(),"NAME");
-        return name;
+        return JdbcMapUtil.getString(Crud.from("gr_set_value").where().eq("id",id).select().execForMap(),"NAME");
     }
 
     /**
