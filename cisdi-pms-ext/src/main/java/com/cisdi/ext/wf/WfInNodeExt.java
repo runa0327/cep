@@ -338,7 +338,6 @@ public class WfInNodeExt {
                 List<Map<String, Object>> list2 = myJdbcTemplate.queryForList("select * from " + entCode + " where id = ?", entityRecordId);
                 if (!CollectionUtils.isEmpty(list2)) {
                     String buyMatterId = JdbcMapUtil.getString(list2.get(0), "BUY_MATTER_ID"); // 采购事项
-                    System.out.println("采购事项："+buyMatterId);
                     List<BaseMatterTypeCon> list3 = BaseMatterTypeCon.selectByWhere(new Where().eq(BaseMatterTypeCon.Cols.GR_SET_VALUE_ID, buyMatterId));
 //                    List<Map<String, Object>> list3 = myJdbcTemplate.queryForList("select * from BASE_MATTER_TYPE_CON where GR_SET_VALUE_ID = ?", buyMatterId);
                     if (!CollectionUtils.isEmpty(list3)) {
