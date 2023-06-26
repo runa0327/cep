@@ -1,6 +1,6 @@
 package com.cisdi.ext.api;
 
-import com.cisdi.ext.base.GrSetValue;
+import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.model.PoOrder;
 import com.cisdi.ext.model.PoOrderReq;
 import com.cisdi.ext.model.view.file.BaseFileView;
@@ -47,7 +47,7 @@ public class PoOrderExtApi {
         //项目id
         String projectId = PmPrjExt.getProjectIdByProcess(valueMap,myJdbcTemplate);
         //根据编码code查询数据来源id
-        String sourceTypeId = GrSetValue.getValueId("order_data_source_type",sourceType,myJdbcTemplate);
+        String sourceTypeId = GrSetValueExt.getValueId("order_data_source_type",sourceType,myJdbcTemplate);
         if (!SharedUtil.isEmptyString(projectId)){
             List<String> list = StringUtil.getStrToList(projectId,",");
             for (String prjId : list) {
