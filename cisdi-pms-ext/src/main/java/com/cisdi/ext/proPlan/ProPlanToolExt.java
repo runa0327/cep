@@ -2,6 +2,8 @@ package com.cisdi.ext.proPlan;
 
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.PrjPlanUtil;
+import com.cisdi.ext.util.ProPlanUtils;
+import com.cisdi.ext.util.WeekTaskUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
@@ -134,6 +136,73 @@ public class ProPlanToolExt {
     public static class ObjInfo {
         public String id;
         public String name;
+    }
+
+
+    /**
+     * 刷新项目全景节点的工作任务
+     */
+    public void refreshPlanNodeWeekTask() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String projectIds = JdbcMapUtil.getString(map, "projectIds");
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from pm_prj where status='ap' ");
+        Map<String, Object> queryParams = new HashMap<>();// 创建入参map
+        if (Strings.isNotEmpty(projectIds)) {
+            sb.append(" and id in (:ids)");
+            queryParams.put("ids", Arrays.asList(projectIds.split(",")));
+        }
+        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), queryParams);
+        if (!CollectionUtils.isEmpty(list)) {
+            list.forEach(item -> {
+                List<Map<String, Object>> nodeList = ProPlanUtils.sortLevel3(JdbcMapUtil.getString(item, "ID"));//排过序的节点
+                List<Map<String, Object>> completeNodeList = nodeList.stream().filter(p -> "0099799190825106802".equals(JdbcMapUtil.getString(p, "status")))
+                        .sorted(Comparator.comparing(m -> JdbcMapUtil.getString((Map<String, Object>) m, "seq_bak")).reversed()).collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(completeNodeList)) {
+                    completeNodeList.forEach(o -> {
+                        List<Map<String, Object>> otherNode = completeNodeList.stream().filter(p -> !Objects.equals(o.get("ID"), p.get("ID"))).collect(Collectors.toList());
+                        List<Map<String, Object>> preNode = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where PRE_NODE_ID=? and PROGRESS_STATUS_ID='0099799190825106800' ", o.get("ID"));
+                        if (!CollectionUtils.isEmpty(preNode)) {
+                            preNode.forEach(t -> {
+                                //判断当前前置是不是其他节点的前置节点
+                                boolean result = chargeNode(otherNode, JdbcMapUtil.getString(t, "ID"));
+                                if (!result) {
+                                    //判断是不是发过本周工作任务
+                                    List<Map<String, Object>> weekList = myJdbcTemplate.queryForList("select * from week_task where WEEK_TASK_TYPE_ID='1635080848313290752' and RELATION_DATA_ID=?", t.get("ID"));
+                                    if (CollectionUtils.isEmpty(weekList)) {
+                                        //发工作任务
+                                        WeekTaskUtils.sendWeekTask(JdbcMapUtil.getString(t, "ID"));
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+    }
+
+    /**
+     * 判断当前完成节点的后置节点是不是其他完成节点的前置节点
+     *
+     * @param otherNode 其他完成的节点
+     * @param preNodeId 循环节点的后置节点Id
+     * @return
+     */
+    public static boolean chargeNode(List<Map<String, Object>> otherNode, String preNodeId) {
+        boolean res = false;
+        for (Map<String, Object> item : otherNode) {
+            List<Map<String, Object>> preNodeList = ProPlanUtils.selectAllPreNode(JdbcMapUtil.getString(item, "ID"));
+            List<String> ids = preNodeList.stream().map(m -> JdbcMapUtil.getString(m, "ID")).collect(Collectors.toList());
+            if (ids.contains(preNodeId)) {
+                res = true;
+            }
+        }
+
+        return res;
     }
 
 }
