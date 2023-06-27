@@ -318,7 +318,10 @@ public class PoOrderReqExt {
         dealBaoHan(baoHan,baoHanType);
         //采购事项一级分类判断处理
         String matterId = JdbcMapUtil.getString(valueMap,"BUY_MATTER_ID");
-        ProcessCommon.updateMatterTypeId(matterId,entCode,id);
+        if (!SharedUtil.isEmptyString(matterId)){
+            ProcessCommon.updateMatterTypeId(matterId,entCode,id);
+        }
+
     }
 
     /**
