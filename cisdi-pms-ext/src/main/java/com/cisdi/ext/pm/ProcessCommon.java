@@ -4,6 +4,7 @@ import cn.hutool.core.util.IdUtil;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.*;
 import com.cisdi.ext.model.base.AdRoleUser;
+import com.cisdi.ext.model.base.BaseMatterTypeCon;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -631,7 +632,26 @@ public class ProcessCommon {
                             .exec();
                 }
             }
-
         }
+    }
+
+    /**
+     * 根据采购事项反推更新采购事项分类
+     * @param matterId 采购事项id
+     * @param entCode 业务表名
+     * @param id 业务表唯一id
+     * @return 采购事项分类id
+     */
+    public static String updateMatterTypeId(String matterId, String entCode, String id) {
+        String matterTypeId = "";
+        List<BaseMatterTypeCon> list = BaseMatterTypeCon.selectByWhere(new Where().eq(BaseMatterTypeCon.Cols.GR_SET_VALUE_ID,matterId)
+                .eq(BaseMatterTypeCon.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list)){
+            matterTypeId = list.get(0).getGrSetValueOneId();
+            Crud.from(entCode).where().eq("ID",id).update().set("BUY_MATTER_TYPE_ID",matterTypeId).exec();
+        } else {
+            throw new BaseException("对不起，所选采购事项未匹配到采购事项一级分类，请联系管理员处理！");
+        }
+        return matterTypeId;
     }
 }

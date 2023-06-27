@@ -446,4 +446,18 @@ public class PmPrjExt {
         //刷新谋划库
         PmPlanExt.refreshPrj(projectId,project);
     }
+
+    /**
+     * 更新项目状态
+     * @param projectIds 项目id
+     * @param statusId 状态id
+     */
+    public static void updatePrjStatus(String projectIds, String statusId) {
+        String[] arr = projectIds.split(",");
+        for (String projectId : arr) {
+            Crud.from(PmPrj.ENT_CODE).where().eq(PmPrj.Cols.ID,projectId).update()
+                    .set(PmPrj.Cols.PROJECT_PHASE_ID,statusId)
+                    .exec();
+        }
+    }
 }
