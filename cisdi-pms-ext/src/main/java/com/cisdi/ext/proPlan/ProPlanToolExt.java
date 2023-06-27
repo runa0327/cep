@@ -7,6 +7,7 @@ import com.cisdi.ext.util.WeekTaskUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
@@ -153,6 +154,8 @@ public class ProPlanToolExt {
         if (Strings.isNotEmpty(projectIds)) {
             sb.append(" and id in (:ids)");
             queryParams.put("ids", Arrays.asList(projectIds.split(",")));
+        } else {
+            throw new BaseException("请选择项目");
         }
         List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), queryParams);
         if (!CollectionUtils.isEmpty(list)) {
