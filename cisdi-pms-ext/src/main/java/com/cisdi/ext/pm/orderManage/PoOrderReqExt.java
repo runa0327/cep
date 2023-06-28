@@ -719,7 +719,10 @@ public class PoOrderReqExt {
         //采购事项判断-施工类型更新项目状态
         String matterTypeId = JdbcMapUtil.getString(valueMap,"BUY_MATTER_TYPE_ID");
         String matterId = JdbcMapUtil.getString(valueMap,"BUY_MATTER_ID");
-        updateProjectStatus(projectId,matterTypeId,matterId,id,entCode);
+        if (!SharedUtil.isEmptyString(matterId)){
+            updateProjectStatus(projectId,matterTypeId,matterId,id,entCode);
+        }
+
     }
 
     /**
