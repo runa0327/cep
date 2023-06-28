@@ -479,6 +479,33 @@ public class PrjPlanUtil {
     }
 
     /**
+     * 刷新项目的工作任务
+     *
+     * @param projectId
+     */
+    public static void refreshWeekTask(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_roster where PM_PRJ_ID=?", projectId);
+        List<Map<String, Object>> proList = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where pn.PROGRESS_STATUS_ID ='0099799190825106800' and  PM_PRJ_ID=?", projectId);
+        List<Map<String, Object>> weekList = myJdbcTemplate.queryForList("select * from week_task where PM_PRJ_ID=? and WEEK_TASK_STATUS_ID='1634118574056542208' ", projectId);
+        proList.forEach(item -> {
+            Optional<Map<String, Object>> postOpt = list.stream().filter(p -> Objects.equals(p.get("POST_INFO_ID"), item.get("POST_INFO_ID"))).findAny();
+            if (postOpt.isPresent()) {
+                Map<String, Object> post = postOpt.get();
+                String postUser = JdbcMapUtil.getString(post, "AD_USER_ID");
+                Optional<Map<String, Object>> weekOpt = weekList.stream().filter(m -> Objects.equals(item.get("ID"), m.get("RELATION_DATA_ID"))).findAny();
+                if (weekOpt.isPresent()) {
+                    Map<String, Object> weekTask = weekOpt.get();
+                    String userId = JdbcMapUtil.getString(weekTask, "AD_USER_ID");
+                    if (!postUser.equals(userId)) {
+                        myJdbcTemplate.update("update week_task set AD_USER_ID=? where id=?", postUser, weekTask.get("ID"));
+                    }
+                }
+            }
+        });
+    }
+
+    /**
      * 根据流程实例更新项目计划。
      *
      * @param projectId
