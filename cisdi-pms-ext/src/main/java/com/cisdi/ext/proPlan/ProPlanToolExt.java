@@ -33,6 +33,14 @@ public class ProPlanToolExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
         InputData inputData = JsonUtil.fromJson(json, InputData.class);
+        String templateId = inputData.templateId;
+        Date paramDate = inputData.paramDate;
+        if(Strings.isEmpty(templateId)){
+            throw new BaseException("未选择模板！");
+        }
+        if(paramDate == null){
+            throw new BaseException("未选择时间！");
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("select * from pm_prj where status = 'ap' ");
         List<Map<String, Object>> list = new ArrayList<>();
@@ -68,7 +76,7 @@ public class ProPlanToolExt {
         if (!CollectionUtils.isEmpty(list)) {
             list.forEach(item -> {
                 //刷新项目全景计划
-                PrjPlanUtil.createPlan(JdbcMapUtil.getString(item, "ID"), inputData.templateId);
+                PrjPlanUtil.createPlan(JdbcMapUtil.getString(item, "ID"), templateId);
                 //刷新项目全景计划时间
                 PrjPlanUtil.refreshProPlanTime(JdbcMapUtil.getString(item, "ID"), inputData.paramDate);
                 //通过流程反刷新项目全景计划状态和完成时间
