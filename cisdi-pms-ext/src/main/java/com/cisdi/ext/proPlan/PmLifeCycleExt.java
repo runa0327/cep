@@ -306,8 +306,9 @@ public class PmLifeCycleExt {
         if ("1".equals(JdbcMapUtil.getString(map, "type"))) {
             sql.append("select ri.*,au.`NAME` as user_name from REMARK_INFO ri left join ad_user au on ri.AD_USER_ID = au.id where REMARK_TYPE='1' and PM_PRJ_ID='").append(map.get("projectId")).append("'");
         } else if ("2".equals(JdbcMapUtil.getString(map, "type"))) {
-            sql.append("select ri.*,au.`NAME` as user_name from REMARK_INFO ri left join ad_user au on ri.AD_USER_ID = au.id left join STANDARD_NODE_NAME sn on sn.id = ri.SCHEDULE_NAME");
-            sql.append(" where REMARK_TYPE='2' and PM_PRJ_ID='").append(map.get("projectId")).append("' and sn.`NAME`='").append(map.get("nodeName")).append("'");
+            sql.append("select ri.*,au.`NAME` as user_name from REMARK_INFO ri left join ad_user au on ri.AD_USER_ID = au.id left join pm_pro_plan_node pn on pn.SCHEDULE_NAME = ri.SCHEDULE_NAME");
+            sql.append(" where REMARK_TYPE='2' and PM_PRJ_ID='").append(map.get("projectId")).append("' and pn.`NAME`='").append(map.get("nodeName")).append("'");
+            sql.append("  GROUP BY ri.id");
         }
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql.toString());
         List<RemarkInfo> remarkInfos = list.stream().map(p -> {
@@ -341,7 +342,7 @@ public class PmLifeCycleExt {
         }
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String standardNodeNameId = null;
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from STANDARD_NODE_NAME where name=?", input.nodeName);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from STANDARD_NODE_NAME where id =(select SCHEDULE_NAME from pm_pro_plan_node pn left join pm_pro_plan pl on pl.id = pn.PM_PRO_PLAN_ID where pn.`NAME`=? and pl.PM_PRJ_ID=?)", input.nodeName,input.projectId);
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> dataMap = list.get(0);
             standardNodeNameId = JdbcMapUtil.getString(dataMap, "ID");
