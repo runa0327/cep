@@ -557,6 +557,7 @@ public class SecondFeeStatisticExt {
         resp.deptAmts = deptAmts;
 
         //分页
+        resp.total = totalDeptContracts.size();
         List<DeptContract> pageDeptContracts = totalDeptContracts.stream().skip(req.pageSize * (req.pageIndex - 1)).limit(req.pageSize).collect(Collectors.toList());
         resp.deptContracts = pageDeptContracts;
 
@@ -742,6 +743,8 @@ public class SecondFeeStatisticExt {
         private List<DeptAmt> deptAmts;
         //列表页
         private List<DeptContract> deptContracts;
+        //总数
+        private Integer total;
     }
 
     @Data
