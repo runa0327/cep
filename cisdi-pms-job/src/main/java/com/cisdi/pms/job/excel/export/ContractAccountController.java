@@ -36,8 +36,8 @@ public class ContractAccountController extends BaseController{
     @SneakyThrows
     @GetMapping("export")
     public void contractExcel(ContractReq requestParam, HttpServletResponse response, HttpServletRequest request){
-        String loginUserId = this.getLoginUser(request.getHeader("qygly-session-id"));
-        List<String> rootUsers = this.getRootUsers();
+//        String loginUserId = this.getLoginUser(request.getHeader("qygly-session-id"));
+//        List<String> rootUsers = this.getRootUsers();
         StringBuffer sb = new StringBuffer();
         sb.append("SELECT o.id,IFNULL(o.PM_PRJ_ID,p2.id) prjId,IFNULL(p.name,o.PROJECT_NAME_WR) prjName,o.CONTRACT_NAME contractName,o" +
                 ".CUSTOMER_UNIT_ONE contractCompanyId,pa.name contractCompanyName,temp.cooperationUnit,o.CONTRACT_CATEGORY_ONE_ID " +
@@ -54,10 +54,10 @@ public class ContractAccountController extends BaseController{
                 "left join (select o.id,GROUP_CONCAT(c.WIN_BID_UNIT_ONE) cooperationUnit from po_order_req o left join contract_signing_contact c " +
                 "on c.PARENT_ID = o.id group by o.id) temp on temp.id = o.id\n" +
                 "where o.STATUS = 'AP'");
-        if (!rootUsers.contains(loginUserId)){
+//        if (!rootUsers.contains(loginUserId)){
 //            sb.append(" and FIND_IN_SET('").append(loginUserId).append("',temp.USER_IDS)");
-            sb.append(" and IFNULL(o.PM_PRJ_ID,p2.id) in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(loginUserId).append("', USER_IDS ))");
-        }
+//            sb.append(" and IFNULL(o.PM_PRJ_ID,p2.id) in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(loginUserId).append("', USER_IDS ))");
+//        }
         if (Strings.isNotEmpty(requestParam.getPrjId())){
             sb.append(" and IFNULL(o.PM_PRJ_ID,p2.id) = '").append(requestParam.getPrjId()).append("'");
         }
