@@ -6,9 +6,14 @@ import com.cisdi.ext.link.AttLinkResult;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.link.LinkedRecord;
 import com.cisdi.ext.model.LinkedAttModel;
+import com.cisdi.ext.model.PostInfo;
+import com.cisdi.ext.pm.PmDeptExt;
+import com.cisdi.ext.pm.PmRosterExt;
+import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.cisdi.ext.util.ProPlanUtils;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -90,8 +95,11 @@ public class PmPrjIdLink {
 
                 //赋值
                 Map row = list.get(0);
-                AttLinkExtDetail.assignmentAttLinkResult(attLinkResult, row, entCode, myJdbcTemplate);
-                if ("PM_PRJ_REQ".equals(entCode)) { //立项申请
+                String companyId = JdbcMapUtil.getString(row,"customer_id");
+
+
+                AttLinkExtDetail.assignmentAttLinkResult(attLinkResult,row,entCode,myJdbcTemplate);
+                if ("PM_PRJ_REQ".equals(entCode)){ //立项申请
                     //回显项目启动的总投资
                     AttLinkExtDetail.linkPrjTotalInvest(attLinkResult, attValue);
                 } else if ("PM_PRJ_KICK_OFF_REQ".equals(entCode)) { // 工程开工报审
@@ -108,16 +116,12 @@ public class PmPrjIdLink {
                     nodeDetail(attValue, sevId, attLinkResult, myJdbcTemplate);
                 }
 
-                //所属部门会变化的流程
-                List<String> autoDeptList = AttLinkDifferentProcess.getAutoGetDept();
-
                 //需要自动岗位人员的流程
                 List<String> processUserList = AttLinkDifferentProcess.getLinkUserProcess();
                 if (processUserList.contains(entCode)) { //岗位自动人员
                     //清除人员岗位信息
                     AttLinkExtDetail.clearProcessPostUser(attLinkResult);
-                    String companyId = JdbcMapUtil.getString(row, "customer_id");
-                    AttLinkExtDetail.autoPostUser(entCode, attValue, companyId, attLinkResult, myJdbcTemplate);
+                    AttLinkExtDetail.autoPostUser(entCode,attValue,companyId,attLinkResult,myJdbcTemplate);
                 }
 
                 // 资金信息回显。优先级 可研估算<初设概算<预算财<项目结算
@@ -130,6 +134,31 @@ public class PmPrjIdLink {
             }
         }
         return attLinkResult;
+    }
+
+    /**
+     * 判断处理人员岗位信息
+     * @param projectId 项目id
+     * @param companyId 业主单位
+     * @param attLinkResult 返回结果集
+     * @param myJdbcTemplate 数据源
+     */
+    private static void checkUserPost(String projectId, String companyId, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        //花名册取数岗位信息
+        String postId = PmRosterExt.getUserPostIdByPrj(userId,projectId,companyId);
+        if (SharedUtil.isEmptyString(postId)){
+            //根据部门信息获取岗位信息
+            String deptCode = PmDeptExt.getUserPostIdByDeptId(userId,companyId,myJdbcTemplate);
+            if (!SharedUtil.isEmptyString(deptCode)){
+                postId = PmDeptExt.getPostIdByDept(deptCode);
+            }
+        }
+        //赋值回显
+        if (!SharedUtil.isEmptyString(postId)){
+            String postName = PostInfo.selectOneByWhere(new Where().eq(PostInfo.Cols.ID,postId)).getName();
+            LinkUtils.mapAddValueByValue("BUY_MATTER_TYPE_ID",postName,postId,AttDataTypeE.TEXT_LONG,attLinkResult);
+        }
     }
 
     /**

@@ -281,6 +281,16 @@ public class AttLinkDifferentProcess {
     }
 
     /**
+     * 需要判断登录人所在岗位的流程
+     * @return list集合
+     */
+    public static List<String> getUserPost() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_BUY_DEMAND_REQ"); //采购需求审批
+        return list;
+    }
+
+    /**
      * 全景计划节点-具体采购事项的流程
      * @return list集合
      */

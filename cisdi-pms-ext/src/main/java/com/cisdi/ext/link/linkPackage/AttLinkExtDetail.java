@@ -5,7 +5,7 @@ import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.link.*;
 import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.model.PrjStart;
-import com.cisdi.ext.pm.PmBuyDemandReqExt;
+import com.cisdi.ext.pm.bidPurchase.PmBuyDemandReqExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
