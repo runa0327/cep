@@ -1,5 +1,6 @@
 package com.cisdi.ext.wf;
 
+import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.enums.FileCodeEnum;
 import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.GrSetValue;
@@ -1720,8 +1721,10 @@ public class WfExt {
                 otherName = getContractNameStatic(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
                 name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
             } else if ("PM_BID_APPROVAL_REQ".equals(entityCode)) { //招标文件审批
-                otherName = getContractNameStatic(entityCode,"NAME_ONE",csCommId,myJdbcTemplate);
-                name = concatProcessNameStatic("-",processName,otherName,userName,nowDate);
+                otherName = getContractNameStatic(entityCode,"NAME_ONE",csCommId,myJdbcTemplate); // 招标名称
+                String matterTypeId = JdbcMapUtil.getString(entityRecord.valueMap,"BUY_MATTER_ID");
+                String matterTypeName = GrSetValueExt.getValueNameById(matterTypeId);
+                name = concatProcessNameStatic("-",processName,otherName,matterTypeName,userName,nowDate);
             } else {
                 if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
                     otherName = JdbcMapUtil.getString(entityRecord.valueMap,"REMARK_ONE");

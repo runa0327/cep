@@ -33,8 +33,7 @@ public class GrSetValueExt {
      * @return 名称
      */
     public static String getValueNameById(String id) {
-        String name = JdbcMapUtil.getString(Crud.from("gr_set_value").where().eq("id",id).select().execForMap(),"NAME");
-        return name;
+        return JdbcMapUtil.getString(Crud.from("gr_set_value").where().eq("id",id).select().execForMap(),"NAME");
     }
 
     /**

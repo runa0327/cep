@@ -263,6 +263,14 @@ public class PoOrderTerminateReqExt {
                 Crud.from("PO_ORDER_TERMINATE_REQ").where().eq("id",csCommId).update()
                         .set("APPROVAL_COMMENT_THREE",newCommentStr).set("FILE_ID_THREE",newCommentFile).exec();
             }
+            String nodeId = ExtJarHelper.nodeId.get();
+            String processId = ExtJarHelper.procId.get();
+            // 判断当前用户是否是财务第一个审批的
+            boolean izFirst = ProcessRoleExt.getUserFinanceRole(userId,"0099952822476412306");
+            if (izFirst){
+                // 将后续审批人员信息写入任务
+                ProcessCommon.createOrderFinanceCheckUser(nodeInstanceId,"0099952822476412308",processId,procInstId,nodeId);
+            }
         } else if ("lawyerFalse".equals(nodeStatus)){ //法律拒绝
             ProcessCommon.clearData("APPROVAL_COMMENT_ONE,FILE_ID_SIX",csCommId,entCode,myJdbcTemplate);
         } else if ("legalFinanceFalse".equals(nodeStatus)){ //财务法务拒绝

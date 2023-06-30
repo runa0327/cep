@@ -188,7 +188,7 @@ public class GuaranteeExt {
         //流程id
         String id = entityRecord.csCommId;
         //获取金额
-        String amt = JdbcMapUtil.getString(entityRecord.valueMap,"AMT_WR_ONE");
+        String amt = JdbcMapUtil.getString(entityRecord.valueMap,"AMT_WR_ONE").trim();
         String amtChina = AmtUtil.number2CNMontrayUnit(new BigDecimal(amt));
         String sql = "update PO_GUARANTEE_LETTER_RETURN_OA_REQ set REMARK_TWO = ? where id = ?";
         int num = myJdbcTemplate.update(sql,amtChina,id);
