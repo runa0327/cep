@@ -455,7 +455,7 @@ public class PrjPlanUtil {
     /**
      * 更加花名册刷新全景的负责人
      *
-     * @param projectId
+     * @param projectId 项目id
      */
     public static void refreshProPlanUser(String projectId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
