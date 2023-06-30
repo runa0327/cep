@@ -90,7 +90,7 @@ public class ContractAccountController extends BaseController{
             sb.append(" and A.SIGN_DATE <= '").append(requestParam.getCreateTimeEnd()).append("'");
         }
 
-        sb.append(" order by o.CRT_DT desc");
+        sb.append(" order by A.ID DESC ");
         List<Map<String, Object>> contractList = myJdbcTemplate.queryForList(sb.toString());
         List<ContractAccountModel> models = new ArrayList<>();
         for (Map<String, Object> contractMap : contractList) {
