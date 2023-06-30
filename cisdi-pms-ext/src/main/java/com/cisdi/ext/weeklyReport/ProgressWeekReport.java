@@ -7,7 +7,6 @@ import com.cisdi.ext.model.PmProgressWeeklyPrjDetail;
 import com.cisdi.ext.model.view.project.PmPrjView;
 import com.cisdi.ext.model.view.weekReport.PmProgressWeeklyView;
 import com.cisdi.ext.model.view.weekReport.WeekMessage;
-import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
@@ -19,7 +18,6 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -210,7 +208,7 @@ public class ProgressWeekReport {
             throw new BaseException("整体形象进度只能处于 0-100 间");
         }
         if (progress.compareTo(new BigDecimal(100)) == 0){
-            Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_END",1).exec();
+            Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_END",1).set("PROJECT_PHASE_ID","0099799190825080708").exec();
             Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekMessage.weekPrjId).update().set("IZ_END",1).exec();
             Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",weekMessage.id).update().set("IZ_END",1).exec();
         }
@@ -236,14 +234,40 @@ public class ProgressWeekReport {
             throw new BaseException("按照状态不能为空");
         }
         if (buttonType == 0){ //处理开工条件
-            Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_START_REQUIRE",buttonStatus).exec();
-            Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update().set("SYS_TRUE",buttonStatus).exec();
-            Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",id).update().set("SYS_TRUE",buttonStatus).exec();
+            handleStart(projectId,weekPrjId,id,buttonStatus);
         } else if (buttonType == 1){ //处理竣工条件
-            Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_END",buttonStatus).exec();
-            Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update().set("IZ_END",buttonStatus).exec();
-            Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",id).update().set("IZ_END",buttonStatus).exec();
+            handleComplete(projectId,weekPrjId,id,buttonStatus);
         }
+    }
+
+    /**
+     * 是否竣工判断
+     * @param projectId 项目id
+     * @param weekPrjId 周-项目id
+     * @param id 周-项目-详情id
+     * @param buttonStatus 状态 0关闭 1开启
+     */
+    private void handleComplete(String projectId, String weekPrjId, String id, Integer buttonStatus) {
+        if (buttonStatus == 1){ //已竣工
+            Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_END",buttonStatus).set("PROJECT_PHASE_ID","0099799190825080708").exec();
+        } else {
+            Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_END",buttonStatus).exec();
+        }
+        Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update().set("IZ_END",buttonStatus).exec();
+        Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",id).update().set("IZ_END",buttonStatus).exec();
+    }
+
+    /**
+     * 处理开工条件
+     * @param projectId 项目id
+     * @param weekPrjId 周-项目id
+     * @param id 周-项目-详情id
+     * @param buttonStatus 状态 0关闭 1开启
+     */
+    private void handleStart(String projectId, String weekPrjId, String id, Integer buttonStatus) {
+        Crud.from("PM_PRJ").where().eq("id",projectId).update().set("IZ_START_REQUIRE",buttonStatus).exec();
+        Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update().set("SYS_TRUE",buttonStatus).exec();
+        Crud.from("PM_PROGRESS_WEEKLY_PRJ_DETAIL").where().eq("id",id).update().set("SYS_TRUE",buttonStatus).exec();
     }
 
     /**
@@ -633,6 +657,8 @@ public class ProgressWeekReport {
         String projectId = param.projectId;
         String writeDate = param.writeDate; //填报日期
         String weekPrjId = param.weekPrjId; //进度周报-周项目信息id
+        Integer weatherStart = param.getWeatherStart(); // 是否符合开工条件
+        Integer weatherCompleted = param.getWeatherCompleted(); // 是否竣工
         if (SharedUtil.isEmptyString(id)){
             throw new BaseException("记录id不能为空！");
         }
@@ -654,7 +680,7 @@ public class ProgressWeekReport {
                 .set("IZ_END",param.weatherCompleted).set("FROM_DATE",start).set("TO_DATE",end)
                 .set("PM_PROGRESS_WEEKLY_ID",param.weekId).set("PM_PROGRESS_WEEKLY_PRJ_ID",weekPrjId)
                 .set("AD_USER_ID",userId).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
-                .set("TS",now)
+                .set("TS",now).set("SYS_TRUE",weatherStart).set("IZ_END",weatherCompleted)
                 .exec();
         //主表更新，该项目该周已更新
         Crud.from("PM_PROGRESS_WEEKLY_PRJ").where().eq("id",weekPrjId).update()
@@ -662,6 +688,8 @@ public class ProgressWeekReport {
                 .set("AD_USER_ID",userId).set("LAST_MODI_USER_ID",userId)
                 .set("TS",now).set("LAST_MODI_DT",now)
                 .exec();
+        handleStart(projectId,weekPrjId,id,weatherStart);
+        handleComplete(projectId,weekPrjId,id,weatherCompleted);
     }
 
     /**

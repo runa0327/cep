@@ -279,4 +279,29 @@ public class AttLinkDifferentProcess {
         list.add("PM_PRJ_RED_CHECK_REQ"); //项目红线核查
         return list;
     }
+
+    /**
+     * 需要判断登录人所在岗位的流程
+     * @return list集合
+     */
+    public static List<String> getUserPost() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_BUY_DEMAND_REQ"); //采购需求审批
+        return list;
+    }
+
+    /**
+     * 全景计划节点-具体采购事项的流程
+     * @return list集合
+     */
+    public static List<String> getPurchaseList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_BUY_DEMAND_REQ"); //采购需求审批
+        list.add("PM_BID_APPROVAL_REQ"); //招标文件审批
+        list.add("BID_PROCESS_MANAGE"); //招标过程管理
+        list.add("PO_ORDER_REQ"); //合同签订
+        list.add("PO_ORDER_TERMINATE_REQ"); //合同终止
+        list.add("PO_ORDER_SUPPLEMENT_REQ"); //补充协议
+        return list;
+    }
 }

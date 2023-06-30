@@ -1,15 +1,19 @@
 package com.cisdi.ext.wf;
 
+import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.enums.FileCodeEnum;
 import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
+import com.cisdi.ext.model.GrSetValue;
 import com.cisdi.ext.model.PmFundReqPlan;
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.pm.PrjMaterialInventory;
 import com.cisdi.ext.util.ProFileUtils;
+import com.cisdi.ext.util.StringUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.sev.SevInfo;
@@ -22,7 +26,6 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -1718,8 +1721,10 @@ public class WfExt {
                 otherName = getContractNameStatic(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
                 name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
             } else if ("PM_BID_APPROVAL_REQ".equals(entityCode)) { //招标文件审批
-                otherName = getContractNameStatic(entityCode,"NAME_ONE",csCommId,myJdbcTemplate);
-                name = concatProcessNameStatic("-",processName,otherName,userName,nowDate);
+                otherName = getContractNameStatic(entityCode,"NAME_ONE",csCommId,myJdbcTemplate); // 招标名称
+                String matterTypeId = JdbcMapUtil.getString(entityRecord.valueMap,"BUY_MATTER_ID");
+                String matterTypeName = GrSetValueExt.getValueNameById(matterTypeId);
+                name = concatProcessNameStatic("-",processName,otherName,matterTypeName,userName,nowDate);
             } else {
                 if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
                     otherName = JdbcMapUtil.getString(entityRecord.valueMap,"REMARK_ONE");
@@ -1738,15 +1743,40 @@ public class WfExt {
                 myJdbcTemplate.update("update "+entityCode+" set name = ? where id = ?", name,csCommId);
             }
             myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
-        }  else if (orderNameTable.contains(entityCode)){ //补充协议/合同需求审批/合同终止 流程标题规则
-            otherName = getContractNameStatic(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
-            name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
+        }  else {
+            if (orderNameTable.contains(entityCode)){ //补充协议/合同需求审批/合同终止 流程标题规则
+                otherName = getContractNameStatic(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
+                name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
+            } else if ("PM_PRJ_SETTLE_ACCOUNTS".equals(entityCode)){ //项目结算
+                otherName = getTitleOtherNameByGrSetValueId(entityCode,"SETTLE_COST_TYPE_IDS",csCommId,myJdbcTemplate);
+                name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
+            } else {
+                name = concatProcessNameStatic("-",processName,projectName,userName,nowDate);
+            }
             myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
-        } else {
-            sql = "update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?";
-            name = concatProcessNameStatic("-",processName,projectName,userName,nowDate);
-            myJdbcTemplate.update(sql, name,csCommId);
         }
+    }
+
+    /**
+     * 根据id查询集合名称
+     * @param entityCode 流程表名
+     * @param colName 查询的字段
+     * @param csCommId 流程业务唯一id
+     * @param myJdbcTemplate 数据源
+     * @return 集合名称
+     */
+    public static String getTitleOtherNameByGrSetValueId(String entityCode, String colName, String csCommId, MyJdbcTemplate myJdbcTemplate) {
+        StringBuilder sb = new StringBuilder();
+        String id = getContractNameStatic(entityCode,colName,csCommId,myJdbcTemplate);
+        List<String> idList = StringUtil.getStrToList(id,",");
+        for (String tmp : idList) {
+            String name = GrSetValue.selectByWhere(new Where().eq(GrSetValue.Cols.ID,tmp)).get(0).getName();
+            sb.append(name).append("、");
+        }
+        if (sb.length() > 0){
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        return sb.toString();
     }
 
     /**

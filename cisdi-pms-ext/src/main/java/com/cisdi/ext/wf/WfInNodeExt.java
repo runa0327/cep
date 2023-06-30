@@ -1,7 +1,12 @@
 package com.cisdi.ext.wf;
 
+import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.PmProPlanNode;
+import com.cisdi.ext.model.WfProcessInstance;
+import com.cisdi.ext.model.base.BaseMatterTypeCon;
 import com.cisdi.ext.util.DateTimeUtil;
+import com.cisdi.ext.util.WeekTaskUtils;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -13,8 +18,6 @@ import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
@@ -152,7 +155,8 @@ public class WfInNodeExt {
                                     }
 
                                     // 更新结束信息：
-                                    updateEndInfoForPlanNode(procInstId, nodeInstId, now, leafNode, processWeekTask);
+                                    String entCode = procInst.get("ENT_CODE").toString();
+                                    updateEndInfoForPlanNode(entCode, procInstId, nodeInstId, now, leafNode, processWeekTask);
                                 }
 
                                 // 针对父节点，进行递归：
@@ -254,9 +258,15 @@ public class WfInNodeExt {
 
     private void updateStartInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode, boolean processWeekTask) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+
+        Date startDate = getStandingBookDate(JdbcMapUtil.getString(leafNode, "ID"), procInstId, "1");
+        if (startDate == null) {
+            startDate = new Date();
+        }
+
         Crud.from("pm_pro_plan_node").where().eq("ID", leafNode.get("ID")).update()
                 // 设置进度信息：
-                .set("PROGRESS_STATUS_ID", IN_PROCESSING).set("ACTUAL_START_DATE", now).set("ACTUAL_CARRY_DAYS", 1).set("ACTUAL_CURRENT_PRO_PERCENT", 10).set("ACTUAL_COMPL_DATE", null).set("ACTUAL_TOTAL_DAYS", null)
+                .set("PROGRESS_STATUS_ID", IN_PROCESSING).set("ACTUAL_START_DATE", startDate).set("ACTUAL_CARRY_DAYS", 1).set("ACTUAL_CURRENT_PRO_PERCENT", 10).set("ACTUAL_COMPL_DATE", null).set("ACTUAL_TOTAL_DAYS", null)
                 // 设置关联信息：
                 .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_START_WF_NODE_INSTANCE_ID", nodeInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", null).exec();
 
@@ -266,81 +276,138 @@ public class WfInNodeExt {
         }
     }
 
-    private void updateEndInfoForPlanNode(String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode, boolean processWeekTask) {
+    private void updateEndInfoForPlanNode(String entCode, String procInstId, String nodeInstId, Date now, Map<String, Object> leafNode, boolean processWeekTask) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        // 计算时间工期
-        int actualDays = 0;
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", leafNode.get("ID"));
-        if (!CollectionUtils.isEmpty(list)) {
-            Map<String, Object> currentNode = list.get(0);
-            Date startDate = JdbcMapUtil.getDate(currentNode, "ACTUAL_START_DATE");
-            try {
-                actualDays = DateTimeUtil.daysBetween(now, startDate);
-            } catch (Exception e) {
-                log.error("计算实际完成工期失败！");
+        // 更新节点状态判断
+        Boolean izTrue = checkIzChange(entCode, procInstId, leafNode, myJdbcTemplate);
+        if (izTrue) {
+            // 计算时间工期
+            int actualDays = 0;
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", leafNode.get("ID"));
+            if (!CollectionUtils.isEmpty(list)) {
+                Map<String, Object> currentNode = list.get(0);
+                Date startDate = JdbcMapUtil.getDate(currentNode, "ACTUAL_START_DATE");
+                try {
+                    actualDays = DateTimeUtil.daysBetween(now, startDate);
+                } catch (Exception e) {
+                    log.error("计算实际完成工期失败！");
+                }
+            }
+            Date endDate = getStandingBookDate(JdbcMapUtil.getString(leafNode, "ID"), procInstId, "2");
+            if (endDate == null) {
+                endDate = new Date();
+            }
+            Crud.from("pm_pro_plan_node").where().eq("ID", leafNode.get("ID")).update()
+                    // 设置进度信息：
+                    .set("PROGRESS_STATUS_ID", COMPLETED).set("ACTUAL_CURRENT_PRO_PERCENT", 100).set("ACTUAL_COMPL_DATE", endDate).set("ACTUAL_TOTAL_DAYS", actualDays)
+                    // 设置关联信息：
+                    .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", nodeInstId).set("IZ_OVERDUE", "0").exec();
+
+
+            myJdbcTemplate.update("update pm_pro_plan_node t set t.ACTUAL_CARRY_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1,t.ACTUAL_TOTAL_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1 WHERE t.id=?", leafNode.get("ID"));
+
+            if (processWeekTask) {
+                // 给后续节点发周任务
+                WeekTaskUtils.sendPreNodeWeekTask(JdbcMapUtil.getString(leafNode, "ID"));
+                // 当前节点有关的工作台任务状态变为已完成
+                myJdbcTemplate.update("update week_task set WEEK_TASK_STATUS_ID='1634118629769482240' where RELATION_DATA_ID=?", JdbcMapUtil.getString(leafNode, "ID"));
             }
         }
-        Crud.from("pm_pro_plan_node").where().eq("ID", leafNode.get("ID")).update()
-                // 设置进度信息：
-                .set("PROGRESS_STATUS_ID", COMPLETED).set("ACTUAL_CURRENT_PRO_PERCENT", 100).set("ACTUAL_COMPL_DATE", now).set("ACTUAL_TOTAL_DAYS", actualDays)
-                // 设置关联信息：
-                .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", nodeInstId).exec();
 
+    }
 
-        myJdbcTemplate.update("update pm_pro_plan_node t set t.ACTUAL_CARRY_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1,t.ACTUAL_TOTAL_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1 WHERE t.id=?", leafNode.get("ID"));
-
-        if (processWeekTask) {
-            // 给后续节点发周任务
-            sendPreNodeWeekTask(JdbcMapUtil.getString(leafNode, "ID"));
-            // 当前节点有关的工作台任务状态变为已完成
-            myJdbcTemplate.update("update week_task set WEEK_TASK_STATUS_ID='1634118629769482240' where RELATION_DATA_ID=?", JdbcMapUtil.getString(leafNode, "ID"));
+    /**
+     * 更新全景计划节点状态-判断是否需要更改
+     *
+     * @param procInstId     流程实例id
+     * @param leafNode       项目节点信息
+     * @param myJdbcTemplate 数据源
+     * @return 判断结果
+     */
+    private Boolean checkIzChange(String entCode, String procInstId, Map<String, Object> leafNode, MyJdbcTemplate myJdbcTemplate) {
+        Boolean izChange = true;
+        List<String> purchaseList = AttLinkDifferentProcess.getPurchaseList();
+        if (purchaseList.contains(entCode)) {
+            // 获取流程表信息等
+//            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from wf_process_instance where id = ?", procInstId);
+            List<WfProcessInstance> list1 = WfProcessInstance.selectByWhere(new Where().eq(WfProcessInstance.Cols.ID,procInstId));
+            if (!CollectionUtils.isEmpty(list1)) {
+                String entityRecordId = list1.get(0).getEntityRecordId();
+                String attData = JdbcMapUtil.getString(leafNode, "ATT_DATA"); // 节点中设置的采购事项类型
+                List<Map<String, Object>> list2 = myJdbcTemplate.queryForList("select * from " + entCode + " where id = ?", entityRecordId);
+                if (!CollectionUtils.isEmpty(list2)) {
+                    String buyMatterId = JdbcMapUtil.getString(list2.get(0), "BUY_MATTER_ID"); // 采购事项
+                    List<BaseMatterTypeCon> list3 = BaseMatterTypeCon.selectByWhere(new Where().eq(BaseMatterTypeCon.Cols.GR_SET_VALUE_ID, buyMatterId));
+//                    List<Map<String, Object>> list3 = myJdbcTemplate.queryForList("select * from BASE_MATTER_TYPE_CON where GR_SET_VALUE_ID = ?", buyMatterId);
+                    if (!CollectionUtils.isEmpty(list3)) {
+                        String buyMatterTypeId = list3.get(0).getGrSetValueOneId(); // 采购事项类别
+                        if (SharedUtil.isEmptyString(attData)) {
+                            izChange = false;
+                        } else if (SharedUtil.isEmptyString(buyMatterTypeId) || !buyMatterTypeId.equals(attData)) {
+                            izChange = false;
+                        }
+                    }
+                }
+            }
         }
+        return izChange;
     }
 
 
     /**
-     * 当前节点完成时，给他的后续节点发周任务
+     * 获取台账中的对应日期
      *
-     * @param nodeId
+     * @param nodeId     节点ID
+     * @param procInstId 流程实例ID
+     * @param mark       1-开始节点  2-结束节点
+     * @return
      */
-    private void sendPreNodeWeekTask(String nodeId) {
+    private Date getStandingBookDate(String nodeId, String procInstId, String mark) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pm.`NAME` as prjName,pppn.*,pi.AD_USER_ID as default_user,pm.id as projectId from pm_pro_plan_node pppn \n" +
-                "left join pm_pro_plan ppp on ppp.id = pppn.PM_PRO_PLAN_ID \n" +
-                "left join pm_prj pm on pm.id = ppp.PM_PRJ_ID  \n" +
-                "left join POST_INFO pi on pi.id = pppn.POST_INFO_ID  \n" +
-                "where PRE_NODE_ID =?", nodeId);
-
-        String msg = "{0}【{1}】计划将在{2}完成，请及时处理！";
-        for (Map<String, Object> objectMap : list) {
-            // 当节点状态是未启动的时候才发周任务
-            String status = JdbcMapUtil.getString(objectMap, "PROGRESS_STATUS_ID");
-            if (NOT_STARTED.equals(status)) {
-                String id = Crud.from("WEEK_TASK").insertData();
-                String userId = JdbcMapUtil.getString(objectMap, "CHIEF_USER_ID");
-                if (Objects.isNull(objectMap.get("CHIEF_USER_ID"))) {
-                    userId = JdbcMapUtil.getString(objectMap, "default_user");
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan_node where id=?", nodeId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> nodeMap = list.get(0);
+            String processId = JdbcMapUtil.getString(nodeMap, "LINKED_WF_PROCESS_ID");
+            if (!Strings.isNullOrEmpty(processId)) {
+                String filed;
+                if ("1".equals(mark)) {
+                    filed = JdbcMapUtil.getString(nodeMap, "START_DATE_FIELD");
+                } else {
+                    filed = JdbcMapUtil.getString(nodeMap, "END_DATE_FIELD");
                 }
-                String processName = JdbcMapUtil.getString(objectMap, "NAME");
-                if (Objects.nonNull(objectMap.get("LINKED_WF_PROCESS_ID"))) {
-                    // 取流程名称
-                    List<Map<String, Object>> processlist = myJdbcTemplate.queryForList("select * from WF_PROCESS where id=?", objectMap.get("LINKED_WF_PROCESS_ID"));
-                    if (!CollectionUtils.isEmpty(processlist)) {
-                        Map<String, Object> dataMap = processlist.get(0);
-                        processName = JdbcMapUtil.getString(dataMap, "NAME");
+                if (Strings.isNullOrEmpty(filed)) {
+                    return null;
+                }
+                //判断台账有没有这个字段
+                List<Map<String, Object>> attInfoList = myJdbcTemplate.queryForList("SELECT m.*,att.id as att_id,att.`CODE` as att_code,ifnull(aet.ATT_NAME,att.`NAME`) as att_name FROM \n" +
+                        "( \n" +
+                        "\tselect c.id,c.code,c.name from wf_process a \n" +
+                        "\tLEFT JOIN AD_SINGLE_ENT_VIEW b ON a.STARTABLE_SEV_IDS = b.id \n" +
+                        "\tLEFT JOIN AD_ENT c ON b.AD_ENT_ID = c.id where a.id =? \n" +
+                        ") m \n" +
+                        "left join AD_ENT_ATT aet on m.id = aet.AD_ENT_ID \n" +
+                        "left join ad_att att on att.id = aet.AD_ATT_ID where att.id=?", processId, filed);
+                if (!CollectionUtils.isEmpty(attInfoList)) {
+                    Map<String, Object> attInfo = attInfoList.get(0);
+                    String table = JdbcMapUtil.getString(attInfo, "code");
+                    String fields =  JdbcMapUtil.getString(attInfo, "att_code");
+                    List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from wf_process_instance where id=?", procInstId);
+                    if (!CollectionUtils.isEmpty(list1)) {
+                        Map<String, Object> insInfo = list1.get(0);
+                        String dataId = JdbcMapUtil.getString(insInfo, "ENTITY_RECORD_ID");
+                        String sql = "select * from " + table + " where id='" + dataId + "'";
+                        List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(sql);
+                        if (!CollectionUtils.isEmpty(list2)) {
+                            Map<String, Object> dataMap = list2.get(0);
+                            String dataOrg = JdbcMapUtil.getString(dataMap, fields);
+                            if (!Strings.isNullOrEmpty(dataOrg)) {
+                                return getDateOnly(DateTimeUtil.stringToDate(dataOrg));
+                            }
+                        }
                     }
                 }
-                String dateOrg = "";
-                if (Objects.nonNull(objectMap.get("PLAN_COMPL_DATE"))) {
-                    Date compDate = JdbcMapUtil.getDate(objectMap, "PLAN_COMPL_DATE");
-                    SimpleDateFormat sp = new SimpleDateFormat("yyyy-MM-dd");
-                    dateOrg = sp.format(compDate);
-                }
-                String title = objectMap.get("prjName") + "-" + processName;
-                String content = MessageFormat.format(msg, objectMap.get("prjName"), processName, dateOrg);
-                myJdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=?,CAN_DISPATCH='0',PM_PRJ_ID=? where id=?",
-                        userId, title, content, new Date(), "1634118574056542208", "1635080848313290752", objectMap.get("ID"), objectMap.get("projectId"), id);
             }
         }
+        return null;
     }
 }

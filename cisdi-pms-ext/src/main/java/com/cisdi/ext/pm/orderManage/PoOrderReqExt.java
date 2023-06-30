@@ -2,15 +2,15 @@ package com.cisdi.ext.pm.orderManage;
 
 import com.alibaba.fastjson.JSON;
 import com.cisdi.ext.api.PoOrderExtApi;
-import com.cisdi.ext.base.GrSetValue;
+import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.commons.HttpClient;
+import com.cisdi.ext.model.GrSetValue;
 import com.cisdi.ext.model.PoOrderReq;
-import com.cisdi.ext.model.PoOrderSupplementReq;
 import com.cisdi.ext.model.view.order.PoOrderReqView;
 import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.ProcessRoleExt;
 import com.cisdi.ext.pm.orderManage.detail.PoOrderPrjDetailExt;
-import com.cisdi.ext.pm.orderManage.detail.PoOrderSupplementPrjDetailExt;
 import com.cisdi.ext.util.*;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -99,7 +99,7 @@ public class PoOrderReqExt {
         String now = DateTimeUtil.dateToString(date);
 
         //获取当前节点实例id
-        String nodeId = ExtJarHelper.nodeInstId.get();
+        String nodeInstanceId = ExtJarHelper.nodeInstId.get();
 
         // 当前登录人
         String userName = ExtJarHelper.loginInfo.get().userName;
@@ -132,7 +132,7 @@ public class PoOrderReqExt {
             String processFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_SIX");
             //判断是否是当轮拒绝回来的、撤销回来的
             String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ?";
-            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeId,userId);
+            List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeInstanceId,userId);
             if (!CollectionUtils.isEmpty(list2)){
                 String num = JdbcMapUtil.getString(list2.get(0),"num");
                 if (SharedUtil.isEmptyString(num) || "0".equals(num)){
@@ -163,6 +163,9 @@ public class PoOrderReqExt {
             }
 
         }  else if ("orderLegalFinanceCheck".equals(status)) { //法务财务审批
+
+            String nodeId = ExtJarHelper.nodeId.get();
+            String processId = ExtJarHelper.procId.get();
             //流程中的审批意见
             String processLegalComment = JdbcMapUtil.getString(entityRecord.valueMap,"TEXT_REMARK_THREE"); //法务意见
             String processLegalFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_THREE"); //法务修订稿
@@ -170,12 +173,12 @@ public class PoOrderReqExt {
             String processFinanceFile = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_TWO"); //财务修订稿
             //查询该人员角色信息
             String sql1 = "select b.id,b.name from ad_role_user a left join ad_role b on a.AD_ROLE_ID = b.id where a.AD_USER_ID = ? and b.id in ('0100070673610711083','0099902212142039415')";
-            userId = ProcessCommon.getOriginalUser(nodeId,userId,myJdbcTemplate);
+            userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId);
             if (!CollectionUtils.isEmpty(list1)){
                 //判断是否是当轮拒绝回来的、撤销回来的
                 String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ?";
-                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeId,userId);
+                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeInstanceId,userId);
                 if (!CollectionUtils.isEmpty(list2)){
                     String num = JdbcMapUtil.getString(list2.get(0),"num");
                     if (SharedUtil.isEmptyString(num) || "0".equals(num)){
@@ -230,6 +233,12 @@ public class PoOrderReqExt {
                         Integer exec = myJdbcTemplate.update(upSql.toString(),csCommId);
                         log.info("已更新：{}", exec);
                     }
+                }
+                // 判断当前用户是否是财务第一个审批的
+                boolean izFirst = ProcessRoleExt.getUserFinanceRole(userId,"0099952822476412306");
+                if (izFirst){
+                    // 将后续审批人员信息写入任务
+                    ProcessCommon.createOrderFinanceCheckUser(nodeInstanceId,"0099952822476412308",processId,procInstId,nodeId);
                 }
             }
         } else if ("orderLegalFinanceReject".equals(status)){
@@ -294,58 +303,94 @@ public class PoOrderReqExt {
     public void checkData() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        Map<String,Object> valueMap = entityRecord.valueMap;
+        String id = entityRecord.csCommId;
+        //表名
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        // 费用明细处理
+        dealFeeDetail(id,myJdbcTemplate);
+        // 联系人明细处理
+        dealPersonDetail(id,myJdbcTemplate);
+        //是否涉及保函
+        String baoHan = JdbcMapUtil.getString(valueMap,"IS_REFER_GUARANTEE_ID");
+        //保函类型
+        String baoHanType = JdbcMapUtil.getString(valueMap,"GUARANTEE_LETTER_TYPE_IDS");
+        dealBaoHan(baoHan,baoHanType);
+        //采购事项一级分类判断处理
+        String matterId = JdbcMapUtil.getString(valueMap,"BUY_MATTER_ID");
+        if (!SharedUtil.isEmptyString(matterId)){
+            ProcessCommon.updateMatterTypeId(matterId,entCode,id);
+        }
+
+    }
+
+    /**
+     * 保函判断
+     * @param baoHan 是否涉及保函
+     * @param baoHanType 保函类型
+     */
+    private void dealBaoHan(String baoHan, String baoHanType) {
+        if ("0099902212142031851".equals(baoHan)){
+            if (SharedUtil.isEmptyString(baoHanType)){
+                throw new BaseException("保函类型不能为空！");
+            }
+        } else {
+            if (!SharedUtil.isEmptyString(baoHanType)){
+                throw new BaseException("未涉及保函，请勿勾选保函类型！");
+            }
+        }
+    }
+
+    /**
+     * 联系人明细判断
+     * @param id 业务主表id
+     * @param myJdbcTemplate 数据源
+     */
+    private void dealPersonDetail(String id, MyJdbcTemplate myJdbcTemplate) {
+        //是否填写联系人
+        List<Map<String, Object>> contactList = myJdbcTemplate.queryForList("SELECT OPPO_SITE_LINK_MAN, OPPO_SITE_CONTACT " +
+                "FROM CONTRACT_SIGNING_CONTACT where PARENT_ID = ?", id);
+        if (CollectionUtils.isEmpty(contactList)){
+            throw new BaseException("联系人不能为空！");
+        }
+    }
+
+    /**
+     * 费用明细处理
+     * @param id 业务主表id
+     * @param myJdbcTemplate 数据源
+     */
+    private void dealFeeDetail(String id, MyJdbcTemplate myJdbcTemplate) {
         // 查询明细表合同总金额
         String sql = "select * from PM_ORDER_COST_DETAIL where CONTRACT_ID = ?";
-        List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql, entityRecord.csCommId);
+        List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql,id);
         if (CollectionUtils.isEmpty(list1)) {
             throw new BaseException("费用明细不能为空！");
         }
         for (Map<String, Object> tmp : list1) {
             String detailId = JdbcMapUtil.getString(tmp,"id");
             //含税金额
-            BigDecimal shuiAmt = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_ONE"));
+            BigDecimal taxAmt = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_ONE"));
             //税率
-            BigDecimal shuiLv = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_THREE")).divide(new BigDecimal(100));
+            BigDecimal tax = new BigDecimal(JdbcMapUtil.getString(tmp,"AMT_THREE")).divide(new BigDecimal(100));
             //不含税金额
-            BigDecimal noShuiAmt = shuiAmt.divide(shuiLv.add(new BigDecimal(1)),2, RoundingMode.HALF_UP);
-            myJdbcTemplate.update("update PM_ORDER_COST_DETAIL set AMT_TWO=? where id = ?",noShuiAmt,detailId);
-            tmp.put("AMT_TWO",noShuiAmt);
+            BigDecimal noTaxAmt = taxAmt.divide(tax.add(new BigDecimal(1)),2, RoundingMode.HALF_UP);
+            myJdbcTemplate.update("update PM_ORDER_COST_DETAIL set AMT_TWO=? where id = ?",noTaxAmt,detailId);
+            tmp.put("AMT_TWO",noTaxAmt);
         }
         //含税总金额
-        BigDecimal amtShui = getSumAmtBy(list1,"AMT_ONE");
+        BigDecimal amtTax = getSumAmtBy(list1,"AMT_ONE");
         //不含税总金额
-        BigDecimal amtNoShui = getSumAmtBy(list1,"AMT_TWO");
+        BigDecimal amtNoTax = getSumAmtBy(list1,"AMT_TWO");
         //税率
-        BigDecimal shuiLv = getShuiLv(list1,"AMT_THREE");
+        BigDecimal tax = getTax(list1,"AMT_THREE");
         //更新合同表合同总金额数
         String sql2 = "update PO_ORDER_REQ set AMT_TWO = ?,AMT_THREE=?,AMT_FOUR=? where id = ?";
-        myJdbcTemplate.update(sql2,amtShui,amtNoShui,shuiLv,entityRecord.csCommId);
-
-        //是否涉及保函
-        String baoHan = JdbcMapUtil.getString(entityRecord.valueMap,"IS_REFER_GUARANTEE");
-        //保函类型
-        String baoHanType = JdbcMapUtil.getString(entityRecord.valueMap,"GUARANTEE_LETTER_TYPE_IDS");
-        if ("true".equals(baoHan)){
-            if (SharedUtil.isEmptyString(baoHanType)){
-                throw new BaseException("保函类型不能为空！");
-            }
-        }
-        if ("false".equals(baoHan)){
-            if (!SharedUtil.isEmptyString(baoHanType)){
-                throw new BaseException("未涉及保函，请勿勾选保函类型！");
-            }
-        }
-
-        //是否填写联系人
-        List<Map<String, Object>> contactList = myJdbcTemplate.queryForList("SELECT OPPO_SITE_LINK_MAN, OPPO_SITE_CONTACT " +
-                "FROM CONTRACT_SIGNING_CONTACT where PARENT_ID = ?", entityRecord.csCommId);
-        if (CollectionUtils.isEmpty(contactList)){
-            throw new BaseException("联系人不能为空！");
-        }
+        myJdbcTemplate.update(sql2,amtTax,amtNoTax,tax,id);
     }
 
     //获取税率
-    private BigDecimal getShuiLv(List<Map<String, Object>> list, String str) {
+    private BigDecimal getTax(List<Map<String, Object>> list, String str) {
         BigDecimal sum = new BigDecimal(0);
         tp: for (Map<String, Object> tmp : list) {
             String value =JdbcMapUtil.getString(tmp,str);
@@ -415,7 +460,7 @@ public class PoOrderReqExt {
         String sql = "select * from po_order_req where status = 'ap'";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
         //根据编码code查询数据来源id
-        String sourceTypeId = GrSetValue.getValueId("order_data_source_type","po_order_req",myJdbcTemplate);
+        String sourceTypeId = GrSetValueExt.getValueId("order_data_source_type","po_order_req",myJdbcTemplate);
         if (!CollectionUtils.isEmpty(list)){
             for (Map<String, Object> tmp : list) {
                 PoOrderExtApi.createOrderHistoryData(tmp,sourceTypeId,"0100070673610715078",myJdbcTemplate);
@@ -652,8 +697,10 @@ public class PoOrderReqExt {
     public void OrderProcessEnd(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         String id = entityRecord.csCommId;
         Map<String, Object> valueMap = entityRecord.valueMap;
+        String projectId = JdbcMapUtil.getString(valueMap,"PM_PRJ_IDS");
         //合同工期
         int duration = JdbcMapUtil.getInt(entityRecord.valueMap,"PLAN_TOTAL_DAYS");
         //合同签订日期
@@ -669,6 +716,32 @@ public class PoOrderReqExt {
         PoOrderExtApi.createData(entityRecord,"PO_ORDER_REQ","0100070673610715078",myJdbcTemplate);
         //项目信息写入明细表
         PoOrderPrjDetailExt.createData(entityRecord);
+        //采购事项判断-施工类型更新项目状态
+        String matterTypeId = JdbcMapUtil.getString(valueMap,"BUY_MATTER_TYPE_ID");
+        String matterId = JdbcMapUtil.getString(valueMap,"BUY_MATTER_ID");
+        if (!SharedUtil.isEmptyString(matterId)){
+            updateProjectStatus(projectId,matterTypeId,matterId,id,entCode);
+        }
+
+    }
+
+    /**
+     * 判断是否更新项目状态
+     * @param projectId 项目id
+     * @param matterTypeId 采购事项一级类型id
+     * @param matterId 采购事项id
+     * @param id 表id
+     * @param entCode 表名
+     */
+    private void updateProjectStatus(String projectId, String matterTypeId, String matterId, String id, String entCode) {
+        if (SharedUtil.isEmptyString(matterTypeId)){
+            //根据采购事项id反推采购事项分类id
+            matterTypeId = ProcessCommon.updateMatterTypeId(matterId,entCode,id);
+        }
+        String name = GrSetValue.selectById(matterTypeId).getName();
+        if ("施工".equals(name)){
+            PmPrjExt.updatePrjStatus(projectId,"1673502467645648896");
+        }
     }
 
     /**
@@ -690,7 +763,7 @@ public class PoOrderReqExt {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String year = sdf.format(date).substring(0, 7).replace("-", "");
                 // 合同编码规则
-                int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
+                int num = Integer.parseInt(map.get(0).get("num").toString()) + 1;
                 Format formatCount = new DecimalFormat("0000");
                 String formatNum = formatCount.format(num);
                 code = "gc-" + year + "-" + formatNum;
@@ -736,9 +809,18 @@ public class PoOrderReqExt {
         String procInstId = ExtJarHelper.procInstId.get();
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        String processId = ExtJarHelper.procId.get();
+        String nodeId = ExtJarHelper.nodeId.get();
         if ("OK".equals(status)){
             if ("start".equals(nodeStatus) || "caiHuaStart".equals(nodeStatus) || "secondStart".equals(nodeStatus)){
                 WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
+            } else if ("financeLegalOK".equals(nodeStatus)){ // 7-财务部法务部审批 节点点击操作逻辑
+                // 判断当前用户是否是财务第一个审批的
+                boolean izFirst = ProcessRoleExt.getUserFinanceRole(userId,"0099952822476412306");
+                if (izFirst){
+                    // 将后续审批人员信息写入任务
+                    ProcessCommon.createOrderFinanceCheckUser(nodeInstanceId,"0099952822476412308",processId,procInstId,nodeId);
+                }
             }
         } else {
             if ("lawyerRefuse".equals(nodeStatus)){ // 法律审批拒绝
@@ -796,85 +878,35 @@ public class PoOrderReqExt {
         String csId = entityRecord.csCommId;
         //流程实例id
         String procInstId = ExtJarHelper.procInstId.get();
-        //合同类型
-        String contractId = JdbcMapUtil.getString(entityRecord.valueMap,"CONTRACT_CATEGORY_ONE_ID");
-        //含税总金额
-        BigDecimal amt = StringUtil.valueNullToBig(JdbcMapUtil.getString(entityRecord.valueMap,"AMT_TWO"));
         //合同修订稿
         String file = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE");
         if (!SharedUtil.isEmptyString(file)){
-            //判断是否需要转换
-//            Boolean izToPdf = getResult(status,contractId,amt);
-//            if (izToPdf){
-                //查询接口地址
-                String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
-                List<Map<String,Object>> listUrl = myJdbcTemplate.queryForList(httpSql);
-                //公司名称
-                String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
-                String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
+            //查询接口地址
+            String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
+            List<Map<String,Object>> listUrl = myJdbcTemplate.queryForList(httpSql);
+            //公司名称
+            String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
+            String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
 
-                new Thread(() -> {
-                    if (!CollectionUtils.isEmpty(listUrl)){
-                        String url = listUrl.get(0).get("HOST_ADDR").toString();
-                        if (SharedUtil.isEmptyString(url)){
-                            //写入日志提示表
-                            String id = Crud.from("AD_REMIND_LOG").insertData();
-                            Crud.from("AD_REMIND_LOG").where().eq("id",id).update().set("AD_ENT_ID","0099799190825103145")
-                                    .set("ENT_CODE","PO_ORDER_REQ").set("ENTITY_RECORD_ID",csId).set("REMIND_USER_ID","0099250247095871681")
-                                    .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
-                                    .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
-                        } else {
-                            PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode);
-                            String param = JSON.toJSONString(poOrderReqView);
-                            //调用接口
-                            HttpClient.doPost(url,param,"UTF-8");
-                        }
-
+            new Thread(() -> {
+                if (!CollectionUtils.isEmpty(listUrl)){
+                    String url = listUrl.get(0).get("HOST_ADDR").toString();
+                    if (SharedUtil.isEmptyString(url)){
+                        //写入日志提示表
+                        String id = Crud.from("AD_REMIND_LOG").insertData();
+                        Crud.from("AD_REMIND_LOG").where().eq("id",id).update().set("AD_ENT_ID","0099799190825103145")
+                                .set("ENT_CODE","PO_ORDER_REQ").set("ENTITY_RECORD_ID",csId).set("REMIND_USER_ID","0099250247095871681")
+                                .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
+                                .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
+                    } else {
+                        PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode);
+                        String param = JSON.toJSONString(poOrderReqView);
+                        //调用接口
+                        HttpClient.doPost(url,param,"UTF-8");
                     }
-                }).start();
-//            }
+                }
+            }).start();
         }
-    }
-
-    /**
-     * 根据表单信息判断是否需要转换
-     * @param status 节点状态
-     * @param contractId 合同类型id
-     * @param amt 含税总金额
-     * @return
-     */
-    private Boolean getResult(String status, String contractId, BigDecimal amt) {
-        Boolean res = false;
-        if ("wordToPdfOne".equals(status)){ //第一次转换
-            if ("0099952822476392995".equals(contractId) && amt.compareTo(new BigDecimal(4000000)) < 0){
-                res = true;
-            } else if ("0099952822476392996".equals(contractId) && amt.compareTo(new BigDecimal(2000000)) < 0){
-                res = true;
-            } else if ("0099952822476392997".equals(contractId) && amt.compareTo(new BigDecimal(1000000)) < 0){
-                res = true;
-            } else if ("1610113244998029312".equals(contractId) && amt.compareTo(new BigDecimal(1000000)) < 0){
-                res = true;
-            } else if ("0099952822476392998".equals(contractId) && amt.compareTo(new BigDecimal(10000000)) < 0){
-                res = true;
-            } else if ("1610263444660060160".equals(contractId) && amt.compareTo(new BigDecimal(10000000)) < 0){
-                res = true;
-            }
-        } else if ("wordToPdfTwo".equals(status)){ //第二次转换
-            if ("0099952822476392995".equals(contractId) && amt.compareTo(new BigDecimal(4000000)) >= 0){
-                res = true;
-            } else if ("0099952822476392996".equals(contractId) && amt.compareTo(new BigDecimal(2000000)) >= 0){
-                res = true;
-            } else if ("0099952822476392997".equals(contractId) && amt.compareTo(new BigDecimal(1000000)) >= 0){
-                res = true;
-            } else if ("1610113244998029312".equals(contractId) && amt.compareTo(new BigDecimal(1000000)) >= 0){
-                res = true;
-            } else if ("0099952822476392998".equals(contractId) && amt.compareTo(new BigDecimal(10000000)) >= 0){
-                res = true;
-            } else if ("1610263444660060160".equals(contractId) && amt.compareTo(new BigDecimal(10000000)) >= 0){
-                res = true;
-            }
-        }
-        return res;
     }
 
 

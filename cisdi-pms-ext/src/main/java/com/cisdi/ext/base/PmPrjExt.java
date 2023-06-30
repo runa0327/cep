@@ -97,7 +97,7 @@ public class PmPrjExt {
         int oldLevel = getPrjDataLevel(projectId,myJdbcTemplate);
         if (level >= oldLevel){ //更新数据
             //当前更新级别id
-            String levelId = GrSetValue.getValueId("invest_priority",String.valueOf(level),myJdbcTemplate);
+            String levelId = GrSetValueExt.getValueId("invest_priority",String.valueOf(level),myJdbcTemplate);
             //更新项目基础信息
             updateBaseData(projectId,entityRecord.valueMap,levelId);
             //更新项目资金信息
@@ -217,7 +217,7 @@ public class PmPrjExt {
      */
     public static void updatePrjBase(String pmPrjId,Map<String, Object> investMap, String entityCode, int level, MyJdbcTemplate myJdbcTemplate) {
         //当前更新级别id
-        String levelId = GrSetValue.getValueId("invest_priority",String.valueOf(level),myJdbcTemplate);
+        String levelId = GrSetValueExt.getValueId("invest_priority",String.valueOf(level),myJdbcTemplate);
         // 查询当前项目信息数据级别
         int oldLevel = getPrjDataLevel(pmPrjId,myJdbcTemplate);
         if (level >= oldLevel) { //更新数据
@@ -445,5 +445,19 @@ public class PmPrjExt {
         Crud.from(PmPrj.ENT_CODE).where().eq(PmPrj.Cols.ID,projectId).update().set(PmPrj.Cols.PROJECT_STATUS,"1661568714048413696").exec();
         //刷新谋划库
         PmPlanExt.refreshPrj(projectId,project);
+    }
+
+    /**
+     * 更新项目状态
+     * @param projectIds 项目id
+     * @param statusId 状态id
+     */
+    public static void updatePrjStatus(String projectIds, String statusId) {
+        String[] arr = projectIds.split(",");
+        for (String projectId : arr) {
+            Crud.from(PmPrj.ENT_CODE).where().eq(PmPrj.Cols.ID,projectId).update()
+                    .set(PmPrj.Cols.PROJECT_PHASE_ID,statusId)
+                    .exec();
+        }
     }
 }

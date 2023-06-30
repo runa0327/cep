@@ -1,13 +1,19 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.bidPurchase;
 
 import cn.hutool.core.util.IdUtil;
+import com.cisdi.ext.base.PmPrjExt;
+import com.cisdi.ext.model.PmBuyDemandReq;
 import com.cisdi.ext.model.PmRoster;
+import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.ProcessRoleExt;
+import com.cisdi.ext.pm.bidPurchase.detail.PmBuyDemandReqPrjDetailExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -21,7 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * 采购需求审批 扩展
+ * 招标采购-采购需求审批 扩展
  */
 @Slf4j
 public class PmBuyDemandReqExt {
@@ -65,14 +71,6 @@ public class PmBuyDemandReqExt {
      */
     public void checkFourth() {
         String status = "fourth";
-        check(status);
-    }
-
-    /**
-     * 采购需求审批扩展-发起时数据校验
-     */
-    public void checkStart() {
-        String status = "start";
         check(status);
     }
 
@@ -172,7 +170,6 @@ public class PmBuyDemandReqExt {
                 if (!SharedUtil.isEmptyString(txt)){
                     comment = comment.append(JdbcMapUtil.getString(tmp,"u_name")).append("： ").append(txt).append("\n");
                 }
-
             }
         }
         if ("buyDemandCostCheck".equals(status)){ //成本岗采购岗审批
@@ -213,27 +210,10 @@ public class PmBuyDemandReqExt {
             Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
                     .set("TEXT_REMARK_ONE", comment).exec();
             log.info("已更新：{}", exec);
-        } else if ("start".equals(status)){
-            //设置分管领导
-            //获取部门信息
-            String deptId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_DEPT_ID");
-            String leader = "";
-            if ("0099799190825079015".equals(deptId) || "0099799190825079017".equals(deptId) || "0099799190825079018".equals(deptId)){ //前期 工程 设计
-                leader = "0099902212142088949"; //张景峰
-            } else if ("0099799190825079033".equals(deptId) || "0099799190825079016".equals(deptId) ){ //采购 成本
-                leader = "0099952822476371838"; //吴坤苗
-            } else if ("0099799190825079028".equals(deptId) ){ //财务
-                leader = "0099902212142027203"; //王小冬
-            } else {
-                leader = "0099250247095871681"; //管理员
-            }
-            //更新分管领导
-            Integer exec = myJdbcTemplate.update("update PM_BUY_DEMAND_REQ set CHARGE_USER_IDS = ? where id = ?",leader,csCommId);
-            log.info("已更新：{}",exec);
         } else if("detail".equals(status)){
             //获取预算金额下限 预算金额上线限
-            BigDecimal min = new BigDecimal(entityRecord.valueMap.get("PAY_AMT_ONE").toString());
-            BigDecimal max = new BigDecimal(entityRecord.valueMap.get("PAY_AMT_TWO").toString());
+            BigDecimal min = new BigDecimal(entityRecord.valueMap.get("AMT_SIX").toString());
+            BigDecimal max = new BigDecimal(entityRecord.valueMap.get("AMT_SEVEN").toString());
             if (min.compareTo(max) == 1){
                 throw new BaseException("预算金额下限不能超过预算金额上限");
             }
@@ -672,7 +652,9 @@ public class PmBuyDemandReqExt {
         String comment = message.get("comment");
         //分支判断，逻辑处理
         if ("OK".equals(status)){
-            WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
+            if ("startOk".equals(nodeStatus)){
+                WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
+            }
         }
     }
 
@@ -721,9 +703,9 @@ public class PmBuyDemandReqExt {
     public void buyDemandEnd(){
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        //成本岗、采购岗、财务岗人员信息写入花名册
-        List<PmRoster> rosterList = getRosterList(entityRecord, myJdbcTemplate);
-        PmRosterExt.updatePrjUser(rosterList);
+        //成本岗、采购岗、财务岗人员信息写入花名册 不写入花名册 暂不删除该代码
+        /** List<PmRoster> rosterList = getRosterList(entityRecord, myJdbcTemplate);
+        PmRosterExt.updatePrjUser(rosterList); **/
     }
 
     /**
@@ -765,5 +747,54 @@ public class PmBuyDemandReqExt {
             postInfoId = JdbcMapUtil.getString(list.get(0),"id");
         }
         return postInfoId;
+    }
+
+    /**
+     * 历史数据处理-多项目
+     */
+    public void buyDemandHistory(){
+        // 非系统项目转系统项目
+        List<PmBuyDemandReq> list1 = PmBuyDemandReq.selectByWhere(new Where()
+                .nin(PmBuyDemandReq.Cols.STATUS,"VD","VDING")
+                .eq(PmBuyDemandReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
+        if (!CollectionUtils.isEmpty(list1)){
+            for (PmBuyDemandReq tmp : list1) {
+                String projectName = tmp.getProjectNameWr();
+                String projectId = PmPrjExt.createPrjByMoreName(projectName);
+                String id = tmp.getId();
+                Crud.from(PmBuyDemandReq.ENT_CODE).where().eq(PmBuyDemandReq.Cols.ID,id).update()
+                        .set(PmBuyDemandReq.Cols.PM_PRJ_IDS,projectId)
+                        .exec();
+            }
+        }
+
+        //系统项目id写入pm_prj_ids
+        List<PmBuyDemandReq> list2 = PmBuyDemandReq.selectByWhere(new Where()
+                .nin(PmBuyDemandReq.Cols.STATUS,"VD","VDING")
+                .neq(PmBuyDemandReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
+        if (!CollectionUtils.isEmpty(list2)){
+            for (PmBuyDemandReq tp : list2) {
+                String id = tp.getId();
+                String projectId = tp.getPmPrjId();
+                Crud.from(PmBuyDemandReq.ENT_CODE).where().eq(PmBuyDemandReq.Cols.ID,id).update()
+                        .set(PmBuyDemandReq.Cols.PM_PRJ_IDS,projectId)
+                        .exec();
+            }
+        }
+
+        //已批准流程项目id写入明细表
+        List<PmBuyDemandReq> list3 = PmBuyDemandReq.selectByWhere(new Where().eq(PmBuyDemandReq.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list3)){
+            for (PmBuyDemandReq tmp : list3) {
+                String id = tmp.getId();
+                String projectId = tmp.getPmPrjIds();
+                if (SharedUtil.isEmptyString(projectId)){
+                    projectId = tmp.getPmPrjId();
+                }
+                if (!SharedUtil.isEmptyString(projectId)){
+                    PmBuyDemandReqPrjDetailExt.insertData(id,projectId);
+                }
+            }
+        }
     }
 }

@@ -50,6 +50,29 @@ public class PmRosterExt {
     }
 
     /**
+     * 根据用户id查询人员岗位信息
+     * @param userId 用户id
+     * @param projectId 项目id
+     * @param companyId 业主单位
+     * @return
+     */
+    public static String getUserPostIdByPrj(String userId, String projectId, String companyId) {
+        StringBuilder sb = new StringBuilder();
+        List<PmRoster> list = PmRoster.selectByWhere(new Where()
+                .eq(PmRoster.Cols.PM_PRJ_ID,projectId)
+                .eq(PmRoster.Cols.CUSTOMER_UNIT,companyId)
+                .eq(PmRoster.Cols.STATUS,"AP")
+                .eq(PmRoster.Cols.AD_USER_ID,userId));
+        if (!CollectionUtils.isEmpty(list)){
+            for (PmRoster tp : list) {
+                sb.append(tp.getPostInfoId()).append(",");
+            }
+            sb.deleteCharAt(sb.length()-1);
+        }
+        return sb.toString();
+    }
+
+    /**
      * 花名册列表查询
      */
     public void pmRosterList() {
@@ -281,7 +304,11 @@ public class PmRosterExt {
             myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID= :userId,ANCESTRAL=:ancestral where POST_INFO_ID= :postId and PM_PRJ_ID in (:ids) ", queryParams);
         }
         //刷新项目的进度节点用户
-        dataList.forEach(PrjPlanUtil::refreshProPlanUser);
+        dataList.forEach(s -> {
+                    PrjPlanUtil.refreshProPlanUser(s);
+                    PrjPlanUtil.refreshWeekTask(s);
+                }
+        );
     }
 
 
@@ -347,6 +374,7 @@ public class PmRosterExt {
             }
         }
         PrjPlanUtil.refreshProPlanUser(editObj.projectId);
+        PrjPlanUtil.refreshWeekTask(editObj.projectId);
     }
 
 
@@ -730,7 +758,7 @@ public class PmRosterExt {
             outSide.collect = collect;
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
-        }else{
+        } else {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         }
     }

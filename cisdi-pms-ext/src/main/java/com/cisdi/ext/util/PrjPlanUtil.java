@@ -232,7 +232,7 @@ public class PrjPlanUtil {
                     "PLAN_TOTAL_DAYS,PLAN_CARRY_DAYS,ACTUAL_CARRY_DAYS,ACTUAL_TOTAL_DAYS,PLAN_CURRENT_PRO_PERCENT,ACTUAL_CURRENT_PRO_PERCENT, \n" +
                     "ifnull(PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,PLAN_COMPL_DATE,ACTUAL_COMPL_DATE,SHOW_IN_EARLY_PROC,SHOW_IN_PRJ_OVERVIEW,CAN_START, \n" +
                     "PROGRESS_STATUS_ID,PROGRESS_RISK_TYPE_ID,CHIEF_DEPT_ID,CHIEF_USER_ID,START_DAY,pppn.SEQ_NO,CPMS_UUID,CPMS_ID,`LEVEL`,LINKED_WF_PROCESS_ID,LINKED_START_WF_NODE_ID,LINKED_END_WF_NODE_ID,POST_INFO_ID ,AD_USER_ID, \n" +
-                    "PRE_NODE_ID,AD_ENT_ID_IMP,AD_ATT_ID_IMP,IZ_MILESTONE,SCHEDULE_NAME,IZ_MORE  " +
+                    "PRE_NODE_ID,AD_ENT_ID_IMP,AD_ATT_ID_IMP,IZ_MILESTONE,SCHEDULE_NAME,IZ_MORE,UPDATE_TYPE,START_DATE_FIELD,END_DATE_FIELD  " +
                     "from PM_PRO_PLAN_NODE pppn \n" +
                     "left join POST_INFO pi on pppn.POST_INFO_ID = pi.id \n" +
                     "where PM_PRO_PLAN_ID=?", proMap.get("ID"));
@@ -243,7 +243,8 @@ public class PrjPlanUtil {
                             .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                             .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                             .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
-                            .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).set("IZ_MORE", m.get("IZ_MORE"))
+                            .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).set("IZ_MORE", m.get("IZ_MORE")).set("UPDATE_TYPE", m.get("UPDATE_TYPE"))
+                            .set("START_DATE_FIELD", m.get("START_DATE_FIELD")).set("END_DATE_FIELD", m.get("END_DATE_FIELD"))
                             .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).set("AD_ENT_ID_IMP", m.get("AD_ENT_ID_IMP")).set("AD_ATT_ID_IMP", m.get("AD_ATT_ID_IMP")).set("IZ_MILESTONE", m.get("IZ_MILESTONE")).set("SCHEDULE_NAME", m.get("SCHEDULE_NAME")).exec();
                     getChildrenNode(m, planNodeList, id, newPlanId);
                 }).collect(Collectors.toList());
@@ -348,7 +349,8 @@ public class PrjPlanUtil {
                     .set("PLAN_TOTAL_DAYS", m.get("PLAN_TOTAL_DAYS")).set("PROGRESS_STATUS_ID", m.get("PROGRESS_STATUS_ID")).set("PROGRESS_RISK_TYPE_ID", m.get("PROGRESS_RISK_TYPE_ID"))
                     .set("CHIEF_DEPT_ID", m.get("CHIEF_DEPT_ID")).set("CHIEF_USER_ID", m.get("CHIEF_USER_ID")).set("START_DAY", m.get("START_DAY")).set("SEQ_NO", m.get("SEQ_NO")).set("LEVEL", m.get("LEVEL"))
                     .set("LINKED_WF_PROCESS_ID", m.get("LINKED_WF_PROCESS_ID")).set("LINKED_START_WF_NODE_ID", m.get("LINKED_START_WF_NODE_ID")).set("LINKED_END_WF_NODE_ID", m.get("LINKED_END_WF_NODE_ID")).set("SHOW_IN_EARLY_PROC", m.get("SHOW_IN_EARLY_PROC"))
-                    .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).set("IZ_MORE", m.get("IZ_MORE"))
+                    .set("SHOW_IN_PRJ_OVERVIEW", m.get("SHOW_IN_PRJ_OVERVIEW")).set("POST_INFO_ID", m.get("POST_INFO_ID")).set("CHIEF_USER_ID", m.get("AD_USER_ID")).set("CAN_START", m.get("CAN_START")).set("IZ_MORE", m.get("IZ_MORE")).set("UPDATE_TYPE", m.get("UPDATE_TYPE"))
+                    .set("START_DATE_FIELD", m.get("START_DATE_FIELD")).set("END_DATE_FIELD", m.get("END_DATE_FIELD"))
                     .set("PRE_NODE_ID", m.get("PRE_NODE_ID")).set("AD_ENT_ID_IMP", m.get("AD_ENT_ID_IMP")).set("AD_ATT_ID_IMP", m.get("AD_ATT_ID_IMP")).set("IZ_MILESTONE", m.get("IZ_MILESTONE")).set("SCHEDULE_NAME", m.get("SCHEDULE_NAME")).exec();
             getChildrenNode(m, allData, id, newPlanId);
         }).collect(Collectors.toList());
@@ -453,7 +455,7 @@ public class PrjPlanUtil {
     /**
      * 更加花名册刷新全景的负责人
      *
-     * @param projectId
+     * @param projectId 项目id
      */
     public static void refreshProPlanUser(String projectId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
@@ -470,6 +472,33 @@ public class PrjPlanUtil {
                         dataList.forEach(m -> {
                             myJdbcTemplate.update("update pm_pro_plan_node set CHIEF_USER_ID=? where id=?", userId, m.get("ID"));
                         });
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * 刷新项目的工作任务
+     *
+     * @param projectId
+     */
+    public static void refreshWeekTask(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_roster where PM_PRJ_ID=?", projectId);
+        List<Map<String, Object>> proList = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where pn.PROGRESS_STATUS_ID ='0099799190825106800' and  PM_PRJ_ID=?", projectId);
+        List<Map<String, Object>> weekList = myJdbcTemplate.queryForList("select * from week_task where PM_PRJ_ID=? and WEEK_TASK_STATUS_ID='1634118574056542208' ", projectId);
+        proList.forEach(item -> {
+            Optional<Map<String, Object>> postOpt = list.stream().filter(p -> Objects.equals(p.get("POST_INFO_ID"), item.get("POST_INFO_ID"))).findAny();
+            if (postOpt.isPresent()) {
+                Map<String, Object> post = postOpt.get();
+                String postUser = JdbcMapUtil.getString(post, "AD_USER_ID");
+                Optional<Map<String, Object>> weekOpt = weekList.stream().filter(m -> Objects.equals(item.get("ID"), m.get("RELATION_DATA_ID"))).findAny();
+                if (weekOpt.isPresent()) {
+                    Map<String, Object> weekTask = weekOpt.get();
+                    String userId = JdbcMapUtil.getString(weekTask, "AD_USER_ID");
+                    if (!postUser.equals(userId)) {
+                        myJdbcTemplate.update("update week_task set AD_USER_ID=? where id=?", postUser, weekTask.get("ID"));
                     }
                 }
             }

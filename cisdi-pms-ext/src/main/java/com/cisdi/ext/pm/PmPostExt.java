@@ -112,7 +112,7 @@ public class PmPostExt {
                 "left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID \n" +
                 "left join post_info po on po.id = pp.POST_INFO_ID \n" +
                 "left join PM_PARTY pt on pt.id = pj.CUSTOMER_UNIT " +
-                "where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ");
+                "where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null ) ");
         if (!StringUtils.isEmpty(projectName)) {
             sb.append(" and pj.`NAME` like '%").append(projectName).append("%'");
         }

@@ -13,6 +13,7 @@ import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.ComThread;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
+import com.pms.cisdipmswordtopdf.controller.ToPdfController;
 import com.pms.cisdipmswordtopdf.model.PoOrderReq;
 import com.pms.cisdipmswordtopdf.service.WordToPdfService;
 import com.pms.cisdipmswordtopdf.util.StringUtil;
@@ -21,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,85 +42,58 @@ public class WordToPdfServiceImpl implements WordToPdfService {
 
     @Override
     public void wordToPdf(PoOrderReq poOrderReq) {
-
-        //获取当前操作系统类别
-        String systemType = getSystemType();
-
-        //获取字符串中地址信息截取
-        String code = getCode(systemType);
-
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String date = sdf.format(new Date());
         String companyName = poOrderReq.getCompanyName();
-
-        List<Map<String,String>> list = poOrderReq.getColMap();
-        if (!CollectionUtils.isEmpty(list)){
-            for (Map<String, String> tp : list) {
-                String file = tp.get("file").toString();
-                if (StringUtils.hasText(file)){
-                    poOrderReq.setFileId(file);
-                    String colCode = tp.get("code").toString();
-                    poOrderReq.setColsCode(colCode);
-                    String fileId = StringUtil.replaceCode(file,",","','");
-                    //获取文件地址
-                    String sql1 = "select * from fl_file where id in ('"+fileId+"') and EXT in ('doc','docx')";
-                    List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
-                    StringBuilder sb = new StringBuilder();
-                    int i = 1;
-                    //windows环境下测试获取文件地址，勿删
+        String fileId = StringUtil.replaceCode(poOrderReq.getFileId(),",","','");
+        //获取文件地址
+        String sql1 = "select * from fl_file where id in ('"+fileId+"') and EXT in ('doc','docx')";
+        List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
+        StringBuilder sb = new StringBuilder();
+        int i = 1;
+        //windows环境下测试获取文件地址，勿删
 //        String filePath = jdbcTemplate.queryForList("select name from test_demo").get(0).get("name").toString();
-                    StringBuilder errorBuilder = new StringBuilder();
-                    if (!CollectionUtils.isEmpty(list1)){
-                        for (Map<String, Object> tmp : list1) {
-                            String userId = tmp.get("CRT_USER_ID").toString();
-                            poOrderReq.setCreateBy(userId);
-                            String filePath = tmp.get("PHYSICAL_LOCATION").toString();
-                            String oldPath = filePath;
-                            //操作系统不一致进行判断
-                            if ("windows".equals(systemType)){ //windows环境下文件路径处理
-                                filePath = pathToWindows(filePath);
-                            }
-
-                            String path = filePath.substring(0,filePath.lastIndexOf(code)+1);
-                            String id = IdUtil.getSnowflakeNextIdStr();
-                            String copyPath = path+id+"copy.pdf";
-                            String pdfPath = path+id+".pdf";
-                            //word转pdf
-                            String error = newPdf(filePath,copyPath);
-//                            String error = wordStartToPdf(filePath,copyPath);
-                            if (error.length() > 0 && error != null && !"".equals(error)){
-                                errorBuilder.append(error).append("\n ");
-                            }
-                            //pdf加水印
-                            Boolean res = addWater(companyName,copyPath,pdfPath,errorBuilder);
-                            if (res){
-                                sb.append(id).append(",");
-                                //删除中间文件
-                                deleteFile(copyPath);
-                                //获取文件相关信息
-                                pdfPath = linuxFileStr(oldPath,id);
-                                Map<String,Object> map = getFileMess(pdfPath,id);
-                                //写入文件表
-                                updateData(map,poOrderReq,tmp,date);
-                            }
-                            i++;
-                        }
-                    }
-                    if (sb.length() > 0){
-                        String newFileId = sb.deleteCharAt(sb.length()-1).toString();
-                        //更新业务表
-                        updateOrder(newFileId,poOrderReq);
-                    }
-                    if (errorBuilder.length() > 0){
-                        //将问题信息计入提示信息表便于排查分析
-                        String id = IdUtil.getSnowflakeNextIdStr();
-                        String remark = "用户"+poOrderReq.getCreateBy()+"在合同签订上传的合同文本转化为pdf失败";
-                        String sql = "update AD_REMIND_LOG set AD_ENT_ID='0099799190825103145',ENT_CODE='PO_ORDER_REQ',ENTITY_RECORD_ID=?,REMIND_USER_ID='0099250247095871681'," +
-                                "REMIND_METHOD='日志提醒',REMIND_TARGET='admin',REMIND_TIME=?,REMIND_TEXT=? where id = ?";
-                        jdbcTemplate.update(sql,poOrderReq.getId(),date,remark,id);
-                    }
+        String code = jdbcTemplate.queryForList("select remark from base_third_interface where code = 'order_word_to_pdf' and SYS_TRUE = 1 ").get(0).get("remark").toString();
+        StringBuilder errorBuilder = new StringBuilder();
+        if (!CollectionUtils.isEmpty(list1)){
+            for (Map<String, Object> tmp : list1) {
+                String filePath = tmp.get("PHYSICAL_LOCATION").toString();
+                String path = filePath.substring(0,filePath.lastIndexOf(code)+1);
+                String id = IdUtil.getSnowflakeNextIdStr();
+                String copyPath = path+id+"copy.pdf";
+                String pdfPath = path+id+".pdf";
+                //word转pdf
+                String error = newPdf(filePath,copyPath);
+//                String error = wordStartToPdf(filePath,copyPath);
+                if (error.length() > 0 && error != null && !"".equals(error)){
+                    errorBuilder.append(error).append("\n ");
                 }
+                //pdf加水印
+                Boolean res = addWater(companyName,copyPath,pdfPath,errorBuilder);
+                if (res){
+                    sb.append(id).append(",");
+                    //删除中间文件
+                    deleteFile(copyPath);
+                    //获取文件相关信息
+                    Map<String,Object> map = getFileMess(pdfPath,id);
+                    //写入文件表
+                    updateData(map,poOrderReq,tmp,date);
+                }
+                i++;
             }
+        }
+        if (sb.length() > 0){
+            String newFileId = sb.deleteCharAt(sb.length()-1).toString();
+            //更新业务表
+            updateOrder(newFileId,poOrderReq);
+        }
+        if (errorBuilder.length() > 0){
+            //将问题信息计入提示信息表便于排查分析
+            String id = IdUtil.getSnowflakeNextIdStr();
+            String remark = "用户"+poOrderReq.getCreateBy()+"在合同签订上传的合同文本转化为pdf失败";
+            String sql = "update AD_REMIND_LOG set AD_ENT_ID='0099799190825103145',ENT_CODE='PO_ORDER_REQ',ENTITY_RECORD_ID=?,REMIND_USER_ID='0099250247095871681'," +
+                    "REMIND_METHOD='日志提醒',REMIND_TARGET='admin',REMIND_TIME=?,REMIND_TEXT=? where id = ?";
+            jdbcTemplate.update(sql,poOrderReq.getId(),date,remark,id);
         }
     }
 
@@ -343,52 +316,4 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         }
         return error;
     }
-
-    /**
-     * 获取当前操作系统类型
-     * @return 操作系统类型
-     */
-    public String getSystemType() {
-        String system = System.getProperty("os.name").toUpperCase();
-        if (system.contains("WINDOWS")){
-            return "windows";
-        } else {
-            return "linux";
-        }
-    }
-
-    /**
-     * 根据操作系统获取文件路径地址中的截取符号
-     * @param systemType 操作系统类型
-     * @return 类别
-     */
-    private String getCode(String systemType) {
-        String sql = "select remark from base_third_interface where code = 'order_word_to_pdf' and SYS_TRUE = 1 and RESERVE_ONE = '" + systemType + "'";
-        return jdbcTemplate.queryForList(sql).get(0).get("remark").toString();
-    }
-
-    /**
-     * 文件路径转换 linux转windows
-     * @param filePath linux文件路径
-     * @return windows文件路径
-     */
-    private String pathToWindows(String filePath) {
-        filePath = filePath.replace("/","\\");
-        filePath = filePath.substring(filePath.indexOf("file")+4);
-        filePath = "\\\\10.130.19.197\\filedisk"+filePath;
-        return filePath;
-    }
-
-    /**
-     * 文件地址最终转为linux地址
-     * @param pdfPath 文件地址
-     * @param id 新文件名称
-     * @return linux格式地址
-     */
-    private String linuxFileStr(String pdfPath, String id) {
-        String path = pdfPath.substring(0,pdfPath.lastIndexOf("/")+1);
-        pdfPath = path + id + ".pdf";
-        return pdfPath;
-    }
-
 }

@@ -226,15 +226,15 @@ public class PmStartExt {
         String status = input.status;
         String prjName = input.name;
         List<PrjStart> prjStartList = new ArrayList<>();
-        if (!SharedUtil.isEmptyString(id)){
-            prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME,prjName)
-                    .eq(PrjStart.Cols.STATUS,"AP").neq(PrjStart.Cols.ID,id));
+        if (!SharedUtil.isEmptyString(id)) {
+            prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME, prjName)
+                    .eq(PrjStart.Cols.STATUS, "AP").neq(PrjStart.Cols.ID, id));
 
         } else {
-            prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME,prjName)
-                    .eq(PrjStart.Cols.STATUS,"AP"));
+            prjStartList = PrjStart.selectByWhere(new Where().eq(PrjStart.Cols.NAME, prjName)
+                    .eq(PrjStart.Cols.STATUS, "AP"));
         }
-        if (!CollectionUtils.isEmpty(prjStartList)){
+        if (!CollectionUtils.isEmpty(prjStartList)) {
             throw new BaseException("对不起，该项目已存在，请勿重复创建！");
         }
         if (Strings.isNullOrEmpty(input.id)) {
@@ -244,8 +244,11 @@ public class PmStartExt {
         if (Strings.isNullOrEmpty(status)) {
             status = "1636549534274465792";
         }
+        String location = null;
         List<parcel> parcels = input.parcels;
-        String location = JSON.toJSON(parcels).toString();
+        if (!CollectionUtils.isEmpty(parcels)) {
+            location = JSON.toJSON(parcels).toString();
+        }
         Crud.from("PRJ_START").where().eq("ID", id).update()
                 .set("PM_CODE", prjCode).set("NAME", prjName).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId).set("TENDER_MODE_ID", input.tenderWay)
                 .set("BUILDER_UNIT", input.unit).set("START_TIME", input.startTime).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", status).set("START_REMARK", input.startRemark)
@@ -275,7 +278,7 @@ public class PmStartExt {
             if (!"项目取消".equals(map.get("status"))) {
                 List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from PRJ_START where id=?", map.get("id"));
                 if (!CollectionUtils.isEmpty(list1)) {
-                    this.createOtherInfo(list1.get(0),id);
+                    this.createOtherInfo(list1.get(0), id);
                 }
             }
             myJdbcTemplate.update("update PRJ_START set PRJ_START_STATUS_ID=? where id=?", list.get(0).get("ID"), id);
@@ -349,7 +352,7 @@ public class PmStartExt {
      * 创建项目进展等信息
      *
      * @param dataMap
-     * @param id 项目启动id
+     * @param id      项目启动id
      */
     private void createOtherInfo(Map<String, Object> dataMap, String id) {
         String projectId = "";
@@ -368,76 +371,67 @@ public class PmStartExt {
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", dataMap.get("NAME")).set("PM_CODE", prjCode)
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("PM_SEQ", seq).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
-                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID","0099799190825080706").set("IZ_FORMAL_PRJ",1).set("PROJECT_STATUS",null).exec();
+                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID", "0099799190825080706")
+                    .set("IZ_FORMAL_PRJ", 1).set("PROJECT_STATUS", null).set("PLAN_START_TIME", dataMap.get("PLAN_START_TIME")).set("PLAN_END_TIME", dataMap.get("PLAN_END_TIME")).exec();
             //为项目添加清单
             PrjMaterialInventory.addPrjInventory(projectId);
+
+            //新增项目区位图信息-------------
+            List<parcel> parcelList = JSONObject.parseArray(JdbcMapUtil.getString(dataMap, "LOCATION_INFO"), parcel.class);
+            for (parcel parcel : parcelList) {
+                List<Point> pointList = parcel.pointList;
+                String parcelId = Crud.from("PARCEL").insertData();
+
+                List<List<BigDecimal>> param = pointList.stream().map(p -> {
+                    List<BigDecimal> b = new ArrayList<>();
+                    b.add(p.longitude);
+                    b.add(p.latitude);
+                    return b;
+                }).collect(Collectors.toList());
+                List<BigDecimal> bigDecimalList = ParcelUtil.getCenter(param, parcel.parcelShape);
+                Object centerLongitude = null;
+                Object centerLatitude = null;
+                if (!CollectionUtils.isEmpty(bigDecimalList)) {
+                    centerLongitude = bigDecimalList.get(0);
+                    centerLatitude = bigDecimalList.get(1);
+                }
+
+                Crud.from("PARCEL").where().eq("ID", parcelId).update().set("FILL", parcel.fill).set("AREA", parcel.area)
+                        .set("PLOT_RATIO", parcel.plotRatio).set("IDENTIFIER", parcel.identifier).set("PARCEL_SHAPE", parcel.parcelShape)
+                        .set("CENTER_LONGITUDE", centerLongitude).set("CENTER_LATITUDE", centerLatitude).exec();
+
+                String aaaid = Crud.from("PRJ_PARCEL").insertData();
+                Crud.from("PRJ_PARCEL").where().eq("ID", aaaid).update().set("PM_PRJ_ID", projectId).set("PARCEL_ID", parcelId).exec();
+
+                if ("Polygon".equals(parcel.parcelShape)) {
+                    Point first = pointList.get(0);
+                    pointList.add(first);
+                }
+                for (Point point : pointList) {
+                    String pointId = Crud.from("parcel_point").insertData();
+                    Crud.from("parcel_point").where().eq("ID", pointId).update().set("LONGITUDE", point.longitude).set("LATITUDE", point.latitude)
+                            .set("PARCEL_ID", parcelId).exec();
+                }
+            }
+            //新增项目区位图信息-------------
+
+            //初始化默认岗位-- 把默认岗位刷给新的项目
+            initPrjPost(projectId, JdbcMapUtil.getString(dataMap, "BUILDER_UNIT"), JdbcMapUtil.getString(dataMap, "AD_USER_ID"));
+            //新增项目进展
+            PrjPlanUtil.createPlan(projectId, JdbcMapUtil.getString(dataMap, "PROJECT_TYPE_ID"), JdbcMapUtil.getString(dataMap, "INVESTMENT_SOURCE_ID")
+                    , BigDecimalUtil.divide(JdbcMapUtil.getBigDecimal(dataMap, "PRJ_TOTAL_INVEST"), new BigDecimal(10000)), JdbcMapUtil.getString(dataMap, "TENDER_MODE_ID"));
+            //刷新进度节点时间
+            PrjPlanUtil.refreshProPlanTime(projectId, JdbcMapUtil.getDate(dataMap, "START_TIME"));
+            //发送本周任务
+            sendWeekTask(projectId);
+            //项目id写入项目启动、项目谋划
+            Crud.from("PRJ_START").where().eq("ID", id).update().set("PM_PRJ_ID", projectId).exec();
+            Crud.from("PM_PLAN").where().eq("NAME", dataMap.get("NAME")).update().set("PM_PRJ_ID", projectId).set("IZ_DISPLAY", 0).exec();
         } else {
             projectId = String.valueOf(list.get(0).get("ID"));
-            Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("NAME", dataMap.get("NAME")).set("PM_CODE", prjCode)
-                    .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
-                    .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
-            //--修改20230424--项目启动产生的项目默认为前期状态
-                    .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID","0099799190825080706").set("IZ_FORMAL_PRJ",1).set("PROJECT_STATUS",null).exec();
+            Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("PROJECT_STATUS", null).exec();
         }
 
-        //先删除项目关联的地块
-        myJdbcTemplate.update("delete from PRJ_PARCEL where PM_PRJ_ID=?", projectId);
-        myJdbcTemplate.update("delete from parcel_point where PARCEL_ID in (select PARCEL_ID from PRJ_PARCEL where PM_PRJ_ID =?)", projectId);
-        myJdbcTemplate.update("delete from PARCEL where id in (select PARCEL_ID from PRJ_PARCEL where PM_PRJ_ID =?)", projectId);
-
-        //再新增 ---新增地块
-        List<parcel> parcelList = JSONObject.parseArray(JdbcMapUtil.getString(dataMap, "LOCATION_INFO"), parcel.class);
-        for (parcel parcel : parcelList) {
-            List<Point> pointList = parcel.pointList;
-            String parcelId = Crud.from("PARCEL").insertData();
-
-            List<List<BigDecimal>> param = pointList.stream().map(p -> {
-                List<BigDecimal> b = new ArrayList<>();
-                b.add(p.longitude);
-                b.add(p.latitude);
-                return b;
-            }).collect(Collectors.toList());
-            List<BigDecimal> bigDecimalList = ParcelUtil.getCenter(param, parcel.parcelShape);
-            Object centerLongitude = null;
-            Object centerLatitude = null;
-            if (!CollectionUtils.isEmpty(bigDecimalList)) {
-                centerLongitude = bigDecimalList.get(0);
-                centerLatitude = bigDecimalList.get(1);
-            }
-
-            Crud.from("PARCEL").where().eq("ID", parcelId).update().set("FILL", parcel.fill).set("AREA", parcel.area)
-                    .set("PLOT_RATIO", parcel.plotRatio).set("IDENTIFIER", parcel.identifier).set("PARCEL_SHAPE", parcel.parcelShape)
-                    .set("CENTER_LONGITUDE", centerLongitude).set("CENTER_LATITUDE", centerLatitude).exec();
-
-            String aaaid = Crud.from("PRJ_PARCEL").insertData();
-            Crud.from("PRJ_PARCEL").where().eq("ID", aaaid).update().set("PM_PRJ_ID", projectId).set("PARCEL_ID", parcelId).exec();
-
-            if ("Polygon".equals(parcel.parcelShape)) {
-                Point first = pointList.get(0);
-                pointList.add(first);
-            }
-            for (Point point : pointList) {
-                String pointId = Crud.from("parcel_point").insertData();
-                Crud.from("parcel_point").where().eq("ID", pointId).update().set("LONGITUDE", point.longitude).set("LATITUDE", point.latitude)
-                        .set("PARCEL_ID", parcelId).exec();
-            }
-        }
-
-
-        //初始化默认岗位-- 把默认岗位刷给新的项目
-        initPrjPost(projectId, JdbcMapUtil.getString(dataMap, "BUILDER_UNIT"), JdbcMapUtil.getString(dataMap, "AD_USER_ID"));
-
-        //新增项目进展
-        PrjPlanUtil.createPlan(projectId, JdbcMapUtil.getString(dataMap, "PROJECT_TYPE_ID"), JdbcMapUtil.getString(dataMap, "INVESTMENT_SOURCE_ID")
-                , BigDecimalUtil.divide(JdbcMapUtil.getBigDecimal(dataMap, "PRJ_TOTAL_INVEST"), new BigDecimal(10000)), JdbcMapUtil.getString(dataMap, "TENDER_MODE_ID"));
-        //刷新进度节点时间
-        PrjPlanUtil.refreshProPlanTime(projectId, JdbcMapUtil.getDate(dataMap, "START_TIME"));
-        //发送本周任务
-        sendWeekTask(projectId);
-
-        //项目id写入项目启动、项目谋划
-        Crud.from("PRJ_START").where().eq("ID",id).update().set("PM_PRJ_ID",projectId).exec();
-        Crud.from("PM_PLAN").where().eq("NAME",dataMap.get("NAME")).update().set("PM_PRJ_ID",projectId).set("IZ_DISPLAY",0).exec();
     }
 
     /**
@@ -736,11 +730,11 @@ public class PmStartExt {
             List<Map<String, Object>> sonList = getChildrenNode(m, allData);
             if (!CollectionUtils.isEmpty(sonList)) {
                 Map<String, Object> topDate = sonList.get(0);
-                String start = JdbcMapUtil.getString(topDate,"PLAN_START_DATE");
-                if (!SharedUtil.isEmptyString(start)){
+                String start = JdbcMapUtil.getString(topDate, "PLAN_START_DATE");
+                if (!SharedUtil.isEmptyString(start)) {
                     String end = topDate.get("PLAN_COMPL_DATE").toString();
-                    int cha = getDateCha(end,start);
-                    myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end,cha, m.get("id"));
+                    int cha = getDateCha(end, start);
+                    myJdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PLAN_TOTAL_DAYS = ? where id=?", end, cha, m.get("id"));
                 }
             }
         }).sorted(Comparator.comparing(o -> DateTimeUtil.stringToDate(JdbcMapUtil.getString((Map<String, Object>) o, "PLAN_COMPL_DATE"))).reversed()).collect(Collectors.toList());
@@ -779,7 +773,7 @@ public class PmStartExt {
     public static int getDateCha(String end, String start) {
         int cha = 0;
         try {
-            cha = DateTimeUtil.getTwoTimeStringDays(end,start);
+            cha = DateTimeUtil.getTwoTimeStringDays(end, start);
         } catch (ParseException e) {
             e.printStackTrace();
         }

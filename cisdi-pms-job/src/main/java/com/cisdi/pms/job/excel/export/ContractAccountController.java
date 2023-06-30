@@ -7,6 +7,7 @@ import com.cisdi.pms.job.excel.model.ContractAccountModel;
 import com.cisdi.pms.job.excel.model.request.ContractReq;
 import com.cisdi.pms.job.utils.StringUtil;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,59 +37,61 @@ public class ContractAccountController extends BaseController{
     @SneakyThrows
     @GetMapping("export")
     public void contractExcel(ContractReq requestParam, HttpServletResponse response, HttpServletRequest request){
-        String loginUserId = this.getLoginUser(request.getHeader("qygly-session-id"));
-        List<String> rootUsers = this.getRootUsers();
-        StringBuffer sb = new StringBuffer();
-        sb.append("SELECT o.id,IFNULL(o.PM_PRJ_ID,p2.id) prjId,IFNULL(p.name,o.PROJECT_NAME_WR) prjName,o.CONTRACT_NAME contractName,o" +
-                ".CUSTOMER_UNIT_ONE contractCompanyId,pa.name contractCompanyName,temp.cooperationUnit,o.CONTRACT_CATEGORY_ONE_ID " +
-                "contractCategoryId,va.name contractCategoryName,o.AMT_THREE amtExcludeTax,o.AMT_FOUR taxRate,o.AMT_TWO amtIncludeTax,o.SIGN_DATE " +
-                "createTime,i.END_DATETIME endTime,o.REMARK_LONG_ONE remark,o.CRT_USER_ID userId,u.name userName,o.FILE_ID_FIVE fileIds\n" +
-                "FROM PO_ORDER_REQ o\n" +
-                "left join pm_prj p on p.id = o.PM_PRJ_ID\n" +
-                "left join pm_prj p2 on p2.name = o.PROJECT_NAME_WR\n" +
-                "left join pm_party pa on pa.id = o.CUSTOMER_UNIT_ONE\n" +
-                "left join gr_set_value va on va.id = o.CONTRACT_CATEGORY_ONE_ID\n" +
-                "left join gr_set se on se.id = va.GR_SET_ID and se.code = 'contract_type_one'\n" +
-                "left join ad_user u on u.id = o.CRT_USER_ID\n" +
-                "left join wf_process_instance i on i.id = o.LK_WF_INST_ID\n" +
-                "left join (select o.id,GROUP_CONCAT(c.WIN_BID_UNIT_ONE) cooperationUnit from po_order_req o left join contract_signing_contact c " +
-                "on c.PARENT_ID = o.id group by o.id) temp on temp.id = o.id\n" +
-                "where o.STATUS = 'AP'");
-        if (!rootUsers.contains(loginUserId)){
+//        String loginUserId = this.getLoginUser(request.getHeader("qygly-session-id"));
+//        List<String> rootUsers = this.getRootUsers();
+        String sql = "SELECT A.PM_PRJ_ID AS prjId,B.NAME AS prjName,A.CONTRACT_NAME AS contractName,A.CONTRACT_APP_ID as id," +
+                "A.CONTRACT_CODE AS contractCode,A.CUSTOMER_UNIT as contractCompanyId,D.NAME AS contractCompanyName," +
+                "A.WIN_BID_UNIT_ONE AS cooperationUnit,A.CONTRACT_CATEGORY_ONE_ID as contractCategoryId," +
+                "C.NAME AS contractCategoryName,A.AMT_FIVE AS amtExcludeTax,A.AMT_ONE AS taxRate," +
+                "A.AMT_SIX AS amtIncludeTax,A.SIGN_DATE AS createTime,A.DATE_FIVE AS expireDate,A.FILE_ID_ONE AS fileIds " +
+                "FROM PO_ORDER A " +
+                "LEFT JOIN PM_PRJ B ON A.PM_PRJ_ID = B.ID " +
+                "LEFT JOIN GR_SET_VALUE C ON A.CONTRACT_CATEGORY_ONE_ID = C.ID " +
+                "LEFT JOIN pm_party D ON B.CUSTOMER_UNIT = D.ID " +
+                "WHERE A.STATUS = 'AP' and ORDER_DATA_SOURCE_TYPE = '1630087650826432512' ";
+        StringBuffer sb = new StringBuffer(sql);
+//        if (!rootUsers.contains(loginUserId)){
 //            sb.append(" and FIND_IN_SET('").append(loginUserId).append("',temp.USER_IDS)");
-            sb.append(" and IFNULL(o.PM_PRJ_ID,p2.id) in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(loginUserId).append("', USER_IDS ))");
+//            sb.append(" and IFNULL(o.PM_PRJ_ID,p2.id) in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(loginUserId).append("', USER_IDS ))");
+//        }
+        // 项目id
+        if (!SharedUtil.isEmptyString(requestParam.getPrjId())){
+            sb.append(" and a.pm_prj_id = '").append(requestParam.getPrjId()).append("' ");
         }
-        if (Strings.isNotEmpty(requestParam.getPrjId())){
-            sb.append(" and IFNULL(o.PM_PRJ_ID,p2.id) = '").append(requestParam.getPrjId()).append("'");
+        // 合同名称
+        if (!SharedUtil.isEmptyString(requestParam.getContractName())){
+            sb.append(" and a.CONTRACT_NAME like '%").append(requestParam.getContractName()).append("%'");
         }
-        if (Strings.isNotEmpty(requestParam.getContractName())) {
-            sb.append(" and o.CONTRACT_NAME like '%").append(requestParam.getContractName()).append("%'");
+        // 合同签订公司id
+        if (!SharedUtil.isEmptyString(requestParam.getContractCompanyId())){
+            sb.append(" and A.CUSTOMER_UNIT = '").append(requestParam.getContractCompanyId()).append("'");
         }
-        if (Strings.isNotEmpty(requestParam.getContractCompanyId())){
-            sb.append(" and o.CUSTOMER_UNIT_ONE = '").append(requestParam.getContractCompanyId()).append("'");
+        // 合同类型
+        if (!SharedUtil.isEmptyString(requestParam.getContractCategoryId())){
+            sb.append(" and A.CONTRACT_CATEGORY_ONE_ID = '").append(requestParam.getContractCategoryId()).append("'");
         }
         if (Strings.isNotEmpty(requestParam.getCooperationUnit())){
             sb.append(" and o.WIN_BID_UNIT_ONE like '%").append(requestParam.getCooperationUnit()).append("%'");
         }
-        if (Strings.isNotEmpty(requestParam.getContractCategoryId())){
-            sb.append(" and o.CONTRACT_CATEGORY_ONE_ID = '").append(requestParam.getContractCategoryId()).append("'");
+        // 最小含税金额
+        if (!SharedUtil.isEmptyString(requestParam.getAmtIncludeTaxStart())){
+            sb.append(" and A.AMT_SIX >= '").append(requestParam.getAmtIncludeTaxStart()).append("'");
         }
-        if (Strings.isNotEmpty(requestParam.getAmtExcludeTaxStart()) && Strings.isNotEmpty(requestParam.getAmtExcludeTaxEnd())) {
-            sb.append(" and o.AMT_THREE between '").append(requestParam.getAmtExcludeTaxStart()).append("' and '").append(requestParam.getAmtExcludeTaxEnd()).append("'");
+        // 最大含税金额
+        if (!SharedUtil.isEmptyString(requestParam.getAmtIncludeTaxEnd())){
+            sb.append(" and A.AMT_SIX <= '").append(requestParam.getAmtIncludeTaxEnd()).append("'");
         }
-        if (Strings.isNotEmpty(requestParam.getAmtIncludeTaxStart()) && Strings.isNotEmpty(requestParam.getAmtIncludeTaxEnd())) {
-            sb.append(" and o.AMT_TWO between '").append(requestParam.getAmtIncludeTaxStart()).append("' and '").append(requestParam.getAmtIncludeTaxEnd()).append("'");
+        // 最小签订时间
+        if (!SharedUtil.isEmptyString(requestParam.getCreateTimeStart())){
+            sb.append(" and A.SIGN_DATE >= '").append(requestParam.getCreateTimeStart()).append("'");
         }
-        if (Strings.isNotEmpty(requestParam.getCreateTimeStart()) && Strings.isNotEmpty(requestParam.getCreateTimeEnd())) {
-            sb.append(" and o.CRT_DT between '").append(requestParam.getCreateTimeStart()).append("' and '").append(requestParam.getCreateTimeEnd()).append("'");
-        }
-        if (Strings.isNotEmpty(requestParam.getUserId())){
-            sb.append(" and o.CRT_USER_ID = '").append(requestParam.getUserId()).append("'");
+        // 最大签订时间
+        if (!SharedUtil.isEmptyString(requestParam.getCreateTimeEnd())){
+            sb.append(" and A.SIGN_DATE <= '").append(requestParam.getCreateTimeEnd()).append("'");
         }
 
-        sb.append(" order by o.CRT_DT desc");
-        String sql = sb.toString();
-        List<Map<String, Object>> contractList = myJdbcTemplate.queryForList(sql);
+        sb.append(" order by A.ID DESC ");
+        List<Map<String, Object>> contractList = myJdbcTemplate.queryForList(sb.toString());
         List<ContractAccountModel> models = new ArrayList<>();
         for (Map<String, Object> contractMap : contractList) {
             ContractAccountModel model = JSONObject.parseObject(JSONObject.toJSONString(contractMap), ContractAccountModel.class);
