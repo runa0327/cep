@@ -1,6 +1,8 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.office;
 
 import com.cisdi.ext.model.PmPostAppoint;
+import com.cisdi.ext.pm.PmRosterExt;
+import com.cisdi.ext.util.PrjPlanUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -58,6 +60,15 @@ public class PmPostAppointExt {
         if (!CollectionUtils.isEmpty(list)){
             throw new BaseException("该项目已有流程正在启动指派中，请勿重复发起指派");
         }
+    }
+
+    /**
+     * 岗位指派-结束时校验
+     */
+    public void postAppointEnd(){
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        PrjPlanUtil.refreshProPlanUser(projectId);
     }
 
     /**
