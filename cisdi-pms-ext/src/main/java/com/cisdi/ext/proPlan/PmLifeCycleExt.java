@@ -228,7 +228,7 @@ public class PmLifeCycleExt {
                                     statusOrg = "已完成";
                                 }
                             } else if ("未涉及".equals(status)) {
-                                nameOrg = "未涉及";
+                                nameOrg = "\\";
                                 tips = "项目未涉及" + JdbcMapUtil.getString(dataMap, "NAME");
                                 statusOrg = "未涉及";
                                 reason = getNoInvolveReason(JdbcMapUtil.getString(dataMap, "ID"));
