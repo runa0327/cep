@@ -91,7 +91,7 @@ public class PmLifeCycleExt {
                 String izDisplay = "0";
                 if (optional.isPresent()) {
                     Map<String, Object> dataMap = optional.get();
-                    if("1".equals(JdbcMapUtil.getString(dataMap,"izDisplay"))){
+                    if ("1".equals(JdbcMapUtil.getString(dataMap, "izDisplay"))) {
                         izDisplay = "1";
                     }
                 }
@@ -207,6 +207,7 @@ public class PmLifeCycleExt {
                             String dateOrg = "";
                             String statusOrg = "";
                             String tips = null;
+                            String reason = null;
                             if ("已完成".equals(status)) {
                                 nameOrg = "实际完成";
                                 if (Objects.nonNull(dataMap.get("ACTUAL_COMPL_DATE"))) {
@@ -218,15 +219,19 @@ public class PmLifeCycleExt {
                                     int days = DateTimeUtil.daysBetween(plan, actual);
                                     if (plan.before(actual)) {
                                         tips = "超期" + Math.abs(days) + "天";
+                                        statusOrg = "超期完成";
                                     } else {
                                         tips = "提前" + days + "完成！";
+                                        statusOrg = "已完成";
                                     }
+                                } else {
+                                    statusOrg = "已完成";
                                 }
-                                statusOrg = "已完成";
                             } else if ("未涉及".equals(status)) {
                                 nameOrg = "未涉及";
                                 tips = "项目未涉及" + JdbcMapUtil.getString(dataMap, "NAME");
                                 statusOrg = "未涉及";
+                                reason = getNoInvolveReason(JdbcMapUtil.getString(dataMap, "ID"));
                             } else {
                                 if ("0".equals(JdbcMapUtil.getString(dataMap, "izOverdue"))) {
                                     if ("进行中".equals(status)) {
@@ -235,7 +240,7 @@ public class PmLifeCycleExt {
                                         statusOrg = "未启动";
                                     }
                                 } else {
-                                    statusOrg = "已超期";
+                                    statusOrg = "超期未完成";
                                 }
                                 if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
                                     Date planCompDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
@@ -258,6 +263,7 @@ public class PmLifeCycleExt {
                             json.put("remarkCount", count);
                             json.put("postInfo", JdbcMapUtil.getString(dataMap, "postName") + ":" + (JdbcMapUtil.getString(dataMap, "userName") == null ? "" : JdbcMapUtil.getString(dataMap, "userName")));
                             json.put("nodeId", JdbcMapUtil.getString(dataMap, "ID"));
+                            json.put("reason", reason);
                         }
                         newData.put(s, json);
                     } else {
@@ -294,6 +300,22 @@ public class PmLifeCycleExt {
             count = list.size();
         }
         return count;
+    }
+
+    /**
+     * 获取不涉及原因
+     *
+     * @param nodeId
+     * @return
+     */
+    private String getNoInvolveReason(String nodeId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from week_task where WEEK_TASK_STATUS_ID='1644140265205915648' and  RELATION_DATA_ID=? ", nodeId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> mapData = list.get(0);
+            return JdbcMapUtil.getString(mapData, "REASON_EXPLAIN");
+        }
+        return null;
     }
 
     /**
@@ -342,7 +364,7 @@ public class PmLifeCycleExt {
         }
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String standardNodeNameId = null;
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from STANDARD_NODE_NAME where id =(select SCHEDULE_NAME from pm_pro_plan_node pn left join pm_pro_plan pl on pl.id = pn.PM_PRO_PLAN_ID where pn.`NAME`=? and pl.PM_PRJ_ID=?)", input.nodeName,input.projectId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from STANDARD_NODE_NAME where id =(select SCHEDULE_NAME from pm_pro_plan_node pn left join pm_pro_plan pl on pl.id = pn.PM_PRO_PLAN_ID where pn.`NAME`=? and pl.PM_PRJ_ID=?)", input.nodeName, input.projectId);
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> dataMap = list.get(0);
             standardNodeNameId = JdbcMapUtil.getString(dataMap, "ID");
