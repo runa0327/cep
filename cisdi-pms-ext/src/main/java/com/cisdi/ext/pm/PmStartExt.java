@@ -376,44 +376,46 @@ public class PmStartExt {
             //为项目添加清单
             PrjMaterialInventory.addPrjInventory(projectId);
 
-            //新增项目区位图信息-------------
+            //新增项目区位图信息------BEGION-------
             List<parcel> parcelList = JSONObject.parseArray(JdbcMapUtil.getString(dataMap, "LOCATION_INFO"), parcel.class);
-            for (parcel parcel : parcelList) {
-                List<Point> pointList = parcel.pointList;
-                String parcelId = Crud.from("PARCEL").insertData();
+            if (!CollectionUtils.isEmpty(parcelList)) {
+                for (parcel parcel : parcelList) {
+                    List<Point> pointList = parcel.pointList;
+                    String parcelId = Crud.from("PARCEL").insertData();
 
-                List<List<BigDecimal>> param = pointList.stream().map(p -> {
-                    List<BigDecimal> b = new ArrayList<>();
-                    b.add(p.longitude);
-                    b.add(p.latitude);
-                    return b;
-                }).collect(Collectors.toList());
-                List<BigDecimal> bigDecimalList = ParcelUtil.getCenter(param, parcel.parcelShape);
-                Object centerLongitude = null;
-                Object centerLatitude = null;
-                if (!CollectionUtils.isEmpty(bigDecimalList)) {
-                    centerLongitude = bigDecimalList.get(0);
-                    centerLatitude = bigDecimalList.get(1);
-                }
+                    List<List<BigDecimal>> param = pointList.stream().map(p -> {
+                        List<BigDecimal> b = new ArrayList<>();
+                        b.add(p.longitude);
+                        b.add(p.latitude);
+                        return b;
+                    }).collect(Collectors.toList());
+                    List<BigDecimal> bigDecimalList = ParcelUtil.getCenter(param, parcel.parcelShape);
+                    Object centerLongitude = null;
+                    Object centerLatitude = null;
+                    if (!CollectionUtils.isEmpty(bigDecimalList)) {
+                        centerLongitude = bigDecimalList.get(0);
+                        centerLatitude = bigDecimalList.get(1);
+                    }
 
-                Crud.from("PARCEL").where().eq("ID", parcelId).update().set("FILL", parcel.fill).set("AREA", parcel.area)
-                        .set("PLOT_RATIO", parcel.plotRatio).set("IDENTIFIER", parcel.identifier).set("PARCEL_SHAPE", parcel.parcelShape)
-                        .set("CENTER_LONGITUDE", centerLongitude).set("CENTER_LATITUDE", centerLatitude).exec();
+                    Crud.from("PARCEL").where().eq("ID", parcelId).update().set("FILL", parcel.fill).set("AREA", parcel.area)
+                            .set("PLOT_RATIO", parcel.plotRatio).set("IDENTIFIER", parcel.identifier).set("PARCEL_SHAPE", parcel.parcelShape)
+                            .set("CENTER_LONGITUDE", centerLongitude).set("CENTER_LATITUDE", centerLatitude).exec();
 
-                String aaaid = Crud.from("PRJ_PARCEL").insertData();
-                Crud.from("PRJ_PARCEL").where().eq("ID", aaaid).update().set("PM_PRJ_ID", projectId).set("PARCEL_ID", parcelId).exec();
+                    String aaaid = Crud.from("PRJ_PARCEL").insertData();
+                    Crud.from("PRJ_PARCEL").where().eq("ID", aaaid).update().set("PM_PRJ_ID", projectId).set("PARCEL_ID", parcelId).exec();
 
-                if ("Polygon".equals(parcel.parcelShape)) {
-                    Point first = pointList.get(0);
-                    pointList.add(first);
-                }
-                for (Point point : pointList) {
-                    String pointId = Crud.from("parcel_point").insertData();
-                    Crud.from("parcel_point").where().eq("ID", pointId).update().set("LONGITUDE", point.longitude).set("LATITUDE", point.latitude)
-                            .set("PARCEL_ID", parcelId).exec();
+                    if ("Polygon".equals(parcel.parcelShape)) {
+                        Point first = pointList.get(0);
+                        pointList.add(first);
+                    }
+                    for (Point point : pointList) {
+                        String pointId = Crud.from("parcel_point").insertData();
+                        Crud.from("parcel_point").where().eq("ID", pointId).update().set("LONGITUDE", point.longitude).set("LATITUDE", point.latitude)
+                                .set("PARCEL_ID", parcelId).exec();
+                    }
                 }
             }
-            //新增项目区位图信息-------------
+            //新增项目区位图信息-------END------
 
             //初始化默认岗位-- 把默认岗位刷给新的项目
             initPrjPost(projectId, JdbcMapUtil.getString(dataMap, "BUILDER_UNIT"), JdbcMapUtil.getString(dataMap, "AD_USER_ID"));
@@ -427,6 +429,9 @@ public class PmStartExt {
             //项目id写入项目启动、项目谋划
             Crud.from("PRJ_START").where().eq("ID", id).update().set("PM_PRJ_ID", projectId).exec();
             Crud.from("PM_PLAN").where().eq("NAME", dataMap.get("NAME")).update().set("PM_PRJ_ID", projectId).set("IZ_DISPLAY", 0).exec();
+            //自动写入计划运营库
+            String planOperationId = Crud.from("PLAN_OPERATION").insertData();
+            Crud.from("PLAN_OPERATION").where().eq("ID", planOperationId).update().set("PM_PRJ_ID", projectId).exec();
         } else {
             projectId = String.valueOf(list.get(0).get("ID"));
             Crud.from("PM_PRJ").where().eq("ID", projectId).update().set("PROJECT_STATUS", null).exec();
