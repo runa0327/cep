@@ -5,9 +5,6 @@ import com.cisdi.ext.model.PmPrjInvest3;
 import com.cisdi.ext.util.ImportUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.ToString;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -40,7 +37,7 @@ public class PmPrjInvest3ImportExt extends ImportUtil {
     }
 
     @Override
-    public boolean doImport(Object dlt, List<Map<String, Object>> oldImportDataList) {
+    public void doImport(Object dlt, List<Map<String, Object>> oldImportDataList) {
         PmPrjInvest3Import invest3Import = (PmPrjInvest3Import) dlt;
         PmPrjInvest3 invest3 = PmPrjInvest3.newData();
         //比对是否导入过
@@ -55,12 +52,13 @@ public class PmPrjInvest3ImportExt extends ImportUtil {
             }
         }
         BeanUtils.copyProperties(invest3Import,invest3,"id");
+
         if (needUpdate) {
             invest3.updateById();
         }else{
             invest3.insertById();
         }
-        return true;
+
     }
 
 

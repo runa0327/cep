@@ -329,13 +329,8 @@ public class PrjMaterialInventory {
      */
     public void bindingFile(){
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String inventoryId = input.get("inventoryId").toString();
         String fileIds = input.get("fileIds").toString();
-
-        //生成流程实例
-
-
 
         //绑定文件
         String[] fileIdArr = fileIds.split(",");
@@ -344,6 +339,38 @@ public class PrjMaterialInventory {
             prjInventoryDetail.setPrjInventoryId(inventoryId);
             prjInventoryDetail.setFlFileId(fileId);
             prjInventoryDetail.insertById();
+        }
+    }
+
+    /**
+     * 合同清单上传文件绑定
+     */
+    public void bindingFileForContract(){
+        Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        ContractFileReq req = JSONObject.parseObject(JSONObject.toJSONString(input), ContractFileReq.class);
+        if (Strings.isNullOrEmpty(req.prjId)){
+            throw new BaseException("需要项目id！");
+        }
+        for (ContractFile contractFile : req.contractFiles) {
+            //如果有合同类型、合同事项，绑定合同类型、合同事项
+            List<Map<String, Object>> inventoryIdList = myJdbcTemplate.queryForList("SELECT pi.id FROM prj_inventory pi \n" +
+                    "left join MATERIAL_INVENTORY_TYPE mi on mi.id = pi.MATERIAL_INVENTORY_TYPE_ID\n" +
+                    "where PM_PRJ_ID = ? and mi.BUY_MATTER_ID = ?", req.prjId,contractFile.buyMatterId);
+            if (CollectionUtils.isEmpty(inventoryIdList)){
+                throw new BaseException("没有找到相关合同事项" + contractFile.buyMatterId + "，请联系管理员配置!");
+            }
+            String inventoryId = inventoryIdList.get(0).get("id").toString();
+            //更新项目清单
+            Crud.from("prj_inventory").where().eq("id",inventoryId).update()
+                    .set("BUY_MATTER_ID", contractFile.buyMatterId)
+                    .set("CONTRACT_CATEGORY_ONE_ID",contractFile.contractTypeId)
+                    .exec();
+            //插入清单明细
+            Crud.from("PRJ_INVENTORY_DETAIL").insert()
+                    .set("PRJ_INVENTORY_ID",inventoryId)
+                    .set("FL_FILE_ID",contractFile.fileId)
+                    .exec();
         }
     }
 
@@ -641,8 +668,29 @@ public class PrjMaterialInventory {
         private boolean isInvolved;
     }
 
-    public static void main(String[] args) {
+    /**
+     * 合同文件，上传绑定
+     */
+    @Data
+    private static class ContractFileReq{
+        //项目id
+        private String prjId;
+        //单个合同文件
+        private List<ContractFile> contractFiles;
     }
+
+    @Data
+    private static class ContractFile{
+        //合同类别id
+        private String contractTypeId;
+        //合同事项
+        private String buyMatterId;
+        //文件id
+        private String fileId;
+    }
+
+//    public static void main(String[] args) {
+//    }
 
 
 

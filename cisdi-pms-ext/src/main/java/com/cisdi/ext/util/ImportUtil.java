@@ -9,7 +9,6 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
-import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
 import java.time.LocalDateTime;
@@ -22,43 +21,9 @@ import java.util.Map;
  * 企业云导入通用
  */
 public abstract class ImportUtil {
-    /**
-     * 通用准予导入按钮
-     */
-    public void allowImportCommon(){
-        List<EntityRecord> entityRecords = ExtJarHelper.entityRecordList.get();
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-
-        //明细字典
-        List<Map<String, Object>> dtlTables = myJdbcTemplate.queryForList("select v.id,v.name,v.code from gr_set_value v " +
-                "left join gr_set s on s.id = v.GR_SET_ID where s.code = 'import_batch_class'");
-
-        //正常导入，任何一条数据的明细表都是同一个，获取批次类型
-        Map<String, Object> valueMap = entityRecords.get(0).valueMap;
-        String batchClassId = JdbcMapUtil.getString(valueMap, "IMPORT_BATCH_CLASS_ID");
-        //明细表名
-        String dtlTableName = dtlTables.stream()
-                .filter(map -> map.get("id").toString().equals(batchClassId))
-                .map(item -> item.get("code").toString()).findAny().get();
-
-        for (EntityRecord entityRecord : entityRecords) {
-            String csCommId = entityRecord.csCommId;
-
-            // 对于批次，先检查状态是否为1，再修改导入状态为2：
-            ImportBatch batch = ImportBatch.selectById(csCommId);
-            if (!batch.getImportStatusId().equals("1")) {
-                throw new BaseException("只有导入状态为“1-数据收集”才能操作！");
-            }
-            batch.setImportStatusId("2");
-            batch.updateById();
-
-            // 对于明细，修改导入状态为2：
-            myJdbcTemplate.update("update " + dtlTableName + " set IMPORT_STATUS_ID = '2' where IMPORT_BATCH_ID = ?",csCommId);
-        }
-    }
 
     /**
-     * 通用导入台账按钮
+     * 通用导入台账
      */
     public void importAccountCommon() throws Exception {
         LoginInfo loginInfo = ExtJarHelper.loginInfo.get();
@@ -90,7 +55,19 @@ public abstract class ImportUtil {
             if (!SharedUtil.isEmptyList(importList)) {
                 for (Object dtlObject : importList) {
                     // 真正执行导入：
-                    boolean succ = doImport(dtlObject,oldImportDataList);
+                    boolean succ = true;
+                    String errorInfo = "";
+                    try {
+                        doImport(dtlObject,oldImportDataList);
+                    }catch (Exception e){
+                        succ = false;
+                        errorInfo = e.toString();
+                    }
+                    //记录单条数据导入信息
+                    importClass.getDeclaredMethod("setImportStatusId",String.class).invoke("3");
+                    importClass.getDeclaredMethod("setImportTime",LocalDateTime.class).invoke(LocalDateTime.now());
+                    importClass.getDeclaredMethod("setIsSuccess",Boolean.class).invoke(succ);
+                    importClass.getDeclaredMethod("setErrInfo",String.class).invoke(errorInfo);
                     // 累计成功或失败数量：
                     if (succ) {
                         importSum.succCt++;
@@ -125,7 +102,6 @@ public abstract class ImportUtil {
      * 执行导入
      * @param dlt
      * @param oldImportDataList
-     * @return
      */
-    public abstract boolean doImport(Object dlt,List<Map<String,Object>> oldImportDataList);
+    public abstract void doImport(Object dlt, List<Map<String,Object>> oldImportDataList) throws Exception;
 }
