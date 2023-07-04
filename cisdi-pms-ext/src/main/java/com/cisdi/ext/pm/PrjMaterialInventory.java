@@ -324,6 +324,66 @@ public class PrjMaterialInventory {
         ExtJarHelper.returnValue.set(result);
     }
 
+
+    /**
+     * 清单详情列表-合同相关单独
+     */
+    public void inventoryDltListForContract(){
+        Map<String, Object> params = ExtJarHelper.extApiParamMap.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        DltReq dltReq = JSONObject.parseObject(JSONObject.toJSONString(params), DltReq.class);
+        String sql = "select i.id inventoryId,i.IS_INVOLVED isInvolved,i.remark,ty.name typeName,v1.name contractTypeName,v2.name buyMatterName," +
+                "GROUP_CONCAT(f.id) fileId,\n" +
+                "if(i.IS_INVOLVED = 1,SUBSTRING_INDEX(GROUP_CONCAT(f.DSP_NAME order by f.CRT_DT desc),',',1) ,'不涉及') fileName,\n" +
+                "SUBSTRING_INDEX(GROUP_CONCAT(f.DSP_SIZE order by f.CRT_DT desc),',',1) fileSize,SUBSTRING_INDEX(GROUP_CONCAT(f.UPLOAD_DTTM order " +
+                "by f.CRT_DT desc),',',1) uploadTime,\n" +
+                "SUBSTRING_INDEX(GROUP_CONCAT(u.name order by f.CRT_DT desc),',',1) uploadUser from prj_inventory i \n" +
+                "left join prj_inventory_detail d on i.id = d.PRJ_INVENTORY_ID\n" +
+                "left join material_inventory_type ty on ty.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
+                "left join fl_file f on f.id = d.FL_FILE_ID\n" +
+                "left join ad_user u on u.id = f.CRT_USER_ID \n" +
+                "left join gr_set_value v1 on v1.id = i.CONTRACT_CATEGORY_ONE_ID\n" +
+                "left join gr_set_value v2 on v2.id = i.BUY_MATTER_ID " +
+                "where v1.name is not null and i.PM_PRJ_ID = '" + dltReq.prjId + "'";
+        //主清单类型 不传查所有
+        if (!Strings.isNullOrEmpty(dltReq.masterTypeId)){
+            sql += " and ty.FILE_MASTER_INVENTORY_TYPE_ID = '" + dltReq.masterTypeId + "'";
+        }
+        //清单名称
+        if (!Strings.isNullOrEmpty(dltReq.typeName)){
+            sql += " and ty.name like '%" + dltReq.typeName + "%'";
+        }
+        //资料名称
+        if (!Strings.isNullOrEmpty(dltReq.fileName)){
+            sql += " and f.DSP_NAME like '%" + dltReq.fileName + "%'";
+        }
+        sql += " group by i.id";
+        List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(sql);
+        int start = (dltReq.pageIndex - 1) * dltReq.pageSize;
+        sql += " order by ty.SEQ_NO limit " + start + "," + dltReq.pageSize;
+        List<Map<String, Object>> dtlList = myJdbcTemplate.queryForList(sql);
+
+        //封装返回
+        List<InventoryDtl> inventoryDtls = dtlList.stream()
+                .map(m -> {
+                    InventoryDtl inventoryDtl = JSONObject.parseObject(JSONObject.toJSONString(m), InventoryDtl.class);
+                    inventoryDtl.uploadTime = StringUtil.withOutT(inventoryDtl.uploadTime);
+                    List<PrjInventoryDetail> dtls = PrjInventoryDetail.selectByWhere(new Where().eq("PRJ_INVENTORY_ID", inventoryDtl.inventoryId));
+                    if (!CollectionUtils.isEmpty(dtls)){
+                        String fileIdStr = dtls.stream().map(dtl -> dtl.getFlFileId()).collect(Collectors.joining(","));
+                        inventoryDtl.fileId = fileIdStr;
+                    }
+                    return inventoryDtl;
+                })
+                .collect(Collectors.toList());
+
+        DtlResp dtlResp = new DtlResp();
+        dtlResp.inventoryDtls = inventoryDtls;
+        dtlResp.total = totalList.size();
+        Map result = JsonUtil.fromJson(JsonUtil.toJson(dtlResp), Map.class);
+        ExtJarHelper.returnValue.set(result);
+    }
+
     /**
      * 绑定文件
      */
@@ -635,6 +695,12 @@ public class PrjMaterialInventory {
         private String uploadTime;
         //上传人
         private String uploadUser;
+
+        //合同相关
+        //合同类型
+        private String contractTypeName;
+        //合同事项
+        private String buyMatterName;
     }
 
     /**
