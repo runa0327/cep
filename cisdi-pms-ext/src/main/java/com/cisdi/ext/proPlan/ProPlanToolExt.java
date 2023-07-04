@@ -35,10 +35,10 @@ public class ProPlanToolExt {
         InputData inputData = JsonUtil.fromJson(json, InputData.class);
         String templateId = inputData.templateId;
         Date paramDate = inputData.paramDate;
-        if(Strings.isEmpty(templateId)){
+        if (Strings.isEmpty(templateId)) {
             throw new BaseException("未选择模板！");
         }
-        if(paramDate == null){
+        if (paramDate == null) {
             throw new BaseException("未选择时间！");
         }
         StringBuilder sb = new StringBuilder();
@@ -79,6 +79,8 @@ public class ProPlanToolExt {
                 PrjPlanUtil.createPlan(JdbcMapUtil.getString(item, "ID"), templateId);
                 //刷新项目全景计划时间
                 PrjPlanUtil.refreshProPlanTime(JdbcMapUtil.getString(item, "ID"), inputData.paramDate);
+                //根据花名册刷新全景人员
+                PrjPlanUtil.refreshProPlanUser(JdbcMapUtil.getString(item, "ID"));
                 //通过流程反刷新项目全景计划状态和完成时间
                 PrjPlanUtil.updatePrjProPlanByProcInst(JdbcMapUtil.getString(item, "ID"));
             });
