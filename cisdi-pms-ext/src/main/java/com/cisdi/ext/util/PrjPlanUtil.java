@@ -493,12 +493,14 @@ public class PrjPlanUtil {
             if (postOpt.isPresent()) {
                 Map<String, Object> post = postOpt.get();
                 String postUser = JdbcMapUtil.getString(post, "AD_USER_ID");
-                Optional<Map<String, Object>> weekOpt = weekList.stream().filter(m -> Objects.equals(item.get("ID"), m.get("RELATION_DATA_ID"))).findAny();
-                if (weekOpt.isPresent()) {
-                    Map<String, Object> weekTask = weekOpt.get();
-                    String userId = JdbcMapUtil.getString(weekTask, "AD_USER_ID");
-                    if (!postUser.equals(userId)) {
-                        myJdbcTemplate.update("update week_task set AD_USER_ID=? where id=?", postUser, weekTask.get("ID"));
+                if(!Strings.isNullOrEmpty(postUser)){
+                    Optional<Map<String, Object>> weekOpt = weekList.stream().filter(m -> Objects.equals(item.get("ID"), m.get("RELATION_DATA_ID"))).findAny();
+                    if (weekOpt.isPresent()) {
+                        Map<String, Object> weekTask = weekOpt.get();
+                        String userId = JdbcMapUtil.getString(weekTask, "AD_USER_ID");
+                        if (!postUser.equals(userId)) {
+                            myJdbcTemplate.update("update week_task set AD_USER_ID=? where id=?", postUser, weekTask.get("ID"));
+                        }
                     }
                 }
             }
