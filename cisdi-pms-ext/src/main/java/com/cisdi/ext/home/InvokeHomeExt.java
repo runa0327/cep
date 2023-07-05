@@ -4,10 +4,13 @@ package com.cisdi.ext.home;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.shared.util.JdbcMapUtil;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class InvokeHomeExt {
 
@@ -23,7 +26,7 @@ public class InvokeHomeExt {
 //                " and IF(? in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1," +
 //                " p.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET(?, USER_IDS ))) \n" +
 //                "group by v.id",userId,userId);
-                " and PROJECT_PHASE_ID <> '0099902212142009989' "+
+                " and PROJECT_PHASE_ID <> '0099902212142009989' " +
                 "group by v.id");
         int total = projectPhaseList.stream().mapToInt(item -> Integer.parseInt(item.get("num").toString())).sum();
 //        HashMap<String, Object> totals = new HashMap<>();
@@ -52,7 +55,7 @@ public class InvokeHomeExt {
                 " where p.status = 'AP' and p.PROJECT_SOURCE_TYPE_ID='0099952822476441374' " +
 //                " and IF(? in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1," +
 //                " p.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET(?, USER_IDS ))) \n" +
-                " and PROJECT_PHASE_ID <> '0099902212142009989' "+
+                " and PROJECT_PHASE_ID <> '0099902212142009989' " +
                 " group by v.id order by v.SEQ_NO \n" +
 //                ") a group by a.transitionPhase", userId,userId);
                 ") a group by a.transitionPhase");
@@ -87,5 +90,38 @@ public class InvokeHomeExt {
         public List<Map<String, Integer>> stageStatus;
 
 
+    }
+
+
+    /**
+     * app项目投资统计
+     */
+    public void appInvestSatistics() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String projectId = JdbcMapUtil.getString(map, "projectId");
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pie.id,round(ifnull(pie.PRJ_TOTAL_INVEST,0)/10000,2) as amt ,gsv.code from pm_invest_est pie  " +
+                "left join  gr_set_value gsv on gsv.id = pie.INVEST_EST_TYPE_ID " +
+                "where PM_PRJ_ID=? and PRJ_TOTAL_INVEST<>0 order by gsv.`CODE` desc limit 0,1  ", projectId);
+        Map<String,Object> res = new HashMap<>();
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> mapDate = list.get(0);
+            List<Map<String, Object>> dtlList = myJdbcTemplate.queryForList("select * from pm_invest_est_dtl where PM_INVEST_EST_ID=?", mapDate.get("id"));
+
+            Optional<Map<String, Object>> optional = dtlList.stream().filter(p -> "0099799190825099548".equals(JdbcMapUtil.getString(p, "PM_EXP_TYPE_ID"))).findAny();
+            optional.ifPresent(stringObjectMap -> res.put("建安费", JdbcMapUtil.getString(stringObjectMap, "AMT")));
+
+            Optional<Map<String, Object>> optional1 = dtlList.stream().filter(p -> "0099799190825099550".equals(JdbcMapUtil.getString(p, "PM_EXP_TYPE_ID"))).findAny();
+            optional1.ifPresent(stringObjectMap -> res.put("工程其他费", JdbcMapUtil.getString(stringObjectMap, "AMT")));
+
+            Optional<Map<String, Object>> optional2 = dtlList.stream().filter(p -> "0099799190825099552".equals(JdbcMapUtil.getString(p, "PM_EXP_TYPE_ID"))).findAny();
+            optional2.ifPresent(stringObjectMap -> res.put("预备费", JdbcMapUtil.getString(stringObjectMap, "AMT")));
+
+            Optional<Map<String, Object>> optional3 = dtlList.stream().filter(p -> "0099799190825099546".equals(JdbcMapUtil.getString(p, "PM_EXP_TYPE_ID"))).findAny();
+            optional3.ifPresent(stringObjectMap -> res.put("总投资", JdbcMapUtil.getString(stringObjectMap, "AMT")));
+
+        }
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(res), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
     }
 }
