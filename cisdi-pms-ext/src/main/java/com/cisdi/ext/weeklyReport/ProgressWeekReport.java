@@ -611,12 +611,14 @@ public class ProgressWeekReport {
         Map<String,Object> map = new HashMap<>();
         if (!records.isEmpty()){
             List<WeekMessage> list = (List<WeekMessage>) records.get("all");
-            //填报数
-            int writes = (int) list.stream().filter(p->p.getIzWrite() == 1).count();
+            //本周项目进展不为空数
+            int progressWeekNum = (int) list.stream().filter(p->!SharedUtil.isEmptyString(p.progressWeek)).count();
             //不符合开工条件
             int noStarts = (int) list.stream().filter(p-> p.getWeatherStart() == 0).count();
             //已竣工
             int completes = (int) list.stream().filter(p->p.getWeatherCompleted() == 1).count();
+            int writes = progressWeekNum - noStarts - completes;
+            writes = writes < 0 ? 0 : writes;
             map.put("projectNums",list.size());
             map.put("writes",writes);
             map.put("noStarts",noStarts);
