@@ -1,7 +1,9 @@
 package com.cisdi.pms.job.serviceImpl;
 
+import cn.hutool.core.util.IdUtil;
 import com.cisdi.pms.job.service.PrjInventoryService;
 import com.cisdi.pms.job.utils.ListUtils;
+import com.cisdi.pms.job.utils.StringUtil;
 import com.cisdi.pms.job.utils.Util;
 import com.google.common.base.Strings;
 import com.qygly.shared.BaseException;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,6 +64,46 @@ public class PrjInventoryServiceImpl implements PrjInventoryService {
         initInventoryDetail();
 
         log.info("success!");
+    }
+
+    //初始化清单，这里主要是针对合同，将合同事项字典每条数据都作为一个清单类型
+    @Override
+    public void initContractInventoryType() {
+        //合同事项
+        List<Map<String, Object>> buyMatterList = jdbcTemplate.queryForList("select v.id,v.name from gr_set_value v left join gr_set s on s.id = v.GR_SET_ID" +
+                " where s.code = 'pms_release_way' and v.status = 'AP'");
+        if (CollectionUtils.isEmpty(buyMatterList)){
+            return;
+        }
+        //已经添加了的、合同相关的清单类型
+        List<Map<String, Object>> existingTypeList = jdbcTemplate.queryForList("select id,name from material_inventory_type where FILE_MASTER_INVENTORY_TYPE_ID" +
+                " = '1675746857843830784'");
+        //最大序号
+        List<Map<String, Object>> maxSeqNoList = jdbcTemplate.queryForList("select max(SEQ_NO) maxSeqNo from material_inventory_type where " +
+                "FILE_MASTER_INVENTORY_TYPE_ID = '1675746857843830784'");
+        String maxSeqNoStr = maxSeqNoList.get(0).get("maxSeqNo").toString();
+        String intStr = maxSeqNoStr.substring(0, maxSeqNoStr.indexOf("."));
+        int seqNo = Integer.parseInt(intStr);
+        for (Map<String, Object> buyMatter : buyMatterList) {
+            //已存在的类型，跳过
+            if (!CollectionUtils.isEmpty(existingTypeList)){
+                Optional<Map<String, Object>> needSkipType =
+                        existingTypeList.stream().filter(existingType -> existingType.get("name").toString().equals(buyMatter.get("name").toString())).findAny();
+                if (needSkipType.isPresent()){
+                    continue;
+                }
+            }
+
+            Date now = new Date();
+            seqNo++;
+            //插入类型
+            jdbcTemplate.update("insert into material_inventory_type (id,name,ver,ts,crt_dt,crt_user_id,last_modi_dt,last_modi_user_id,status," +
+                    "wf_process_id,ad_ent_att_v_id,file_master_inventory_type_id,seq_no,buy_matter_id) " +
+                    "values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    IdUtil.getSnowflakeNextIdStr(),buyMatter.get("name"), 1, now, now, "0099250247095871681", now, "0099250247095871681", "AP",
+                    "0099952822476409136", "0099952822476408965", "1675746857843830784",seqNo,buyMatter.get("id"));
+
+        }
     }
 
     //初始化明细

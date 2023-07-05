@@ -158,6 +158,16 @@ public class PrjMaterialInventory {
     }
 
     /**
+     * 级联删除文件-针对合同清单
+     */
+    public void delFileForContract(){
+        Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        myJdbcTemplate.update("delete from prj_inventory_detail where PRJ_INVENTORY_ID = ? and FL_FILE_ID = ?",input.get("inventoryId"),input.get("fileId"));
+        myJdbcTemplate.update("delete from prj_inventory where id = ?",input.get("inventoryId"));
+    }
+
+    /**
      * 项目清单列表
      */
     public void prjInventoryList(){
@@ -206,7 +216,7 @@ public class PrjMaterialInventory {
                 "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID \n" +
                 "left join prj_inventory_detail d on d.PRJ_INVENTORY_ID = i.id\n" +
                 "where i.IS_INVOLVED = 1\n" +
-                "group by i.PM_PRJ_ID,t.id\n" +
+                "group by i.PM_PRJ_ID,i.id\n" +
                 ") temp group by prjId,masterTypeId) ah on ah.prjId = sv.prjId and ah.masterTypeId = sv.masterTypeId\n" +
                 "left join \n" +
                 "(select prjId,masterTypeId,GROUP_CONCAT(typeName) lackTypeName from (\n" +
@@ -413,21 +423,42 @@ public class PrjMaterialInventory {
             throw new BaseException("需要项目id！");
         }
         for (ContractFile contractFile : req.contractFiles) {
-            //如果有合同类型、合同事项，绑定合同类型、合同事项
-            List<Map<String, Object>> inventoryIdList = myJdbcTemplate.queryForList("SELECT pi.id FROM prj_inventory pi \n" +
-                    "left join MATERIAL_INVENTORY_TYPE mi on mi.id = pi.MATERIAL_INVENTORY_TYPE_ID\n" +
-                    "where PM_PRJ_ID = ? and mi.BUY_MATTER_ID = ?", req.prjId,contractFile.buyMatterId);
-            if (CollectionUtils.isEmpty(inventoryIdList)){
+            //查看在清单类型处，是否配置有该合同事项
+//            List<Map<String, Object>> inventoryIdList = myJdbcTemplate.queryForList("SELECT pi.id,mi.id materialTypeId FROM prj_inventory pi \n" +
+//                    "left join MATERIAL_INVENTORY_TYPE mi on mi.id = pi.MATERIAL_INVENTORY_TYPE_ID\n" +
+//                    "where PM_PRJ_ID = ? and mi.BUY_MATTER_ID = ?", req.prjId,contractFile.buyMatterId);
+//            if (CollectionUtils.isEmpty(inventoryIdList)){
+//                throw new BaseException("没有找到相关合同事项" + contractFile.buyMatterId + "，请联系管理员配置!");
+//            }
+            List<Map<String, Object>> typeIdList = myJdbcTemplate.queryForList("select id materialTypeId from MATERIAL_INVENTORY_TYPE where BUY_MATTER_ID" +
+                    " = ?", contractFile.buyMatterId);
+            if (CollectionUtils.isEmpty(typeIdList)){
                 throw new BaseException("没有找到相关合同事项" + contractFile.buyMatterId + "，请联系管理员配置!");
             }
-            String inventoryId = inventoryIdList.get(0).get("id").toString();
+            //查看是否还有直接可以更新的项目清单，没有就插入一条（因为初始化时默认生成了一条空项目清单）
+            List<Map<String, Object>> editableInventoryIdList = myJdbcTemplate.queryForList("SELECT pi.id FROM prj_inventory pi \n" +
+                    "left join MATERIAL_INVENTORY_TYPE mi on mi.id = pi.MATERIAL_INVENTORY_TYPE_ID\n" +
+                    "where PM_PRJ_ID = ? and mi.BUY_MATTER_ID = ? and pi.BUY_MATTER_ID is null", req.prjId, contractFile.buyMatterId);
+            String inventoryId = "";
+            if (CollectionUtils.isEmpty(editableInventoryIdList)){
+                inventoryId = Crud.from("prj_inventory").insertData();
+                //初始值（项目id，是否涉及，清单类型）
+                Crud.from("prj_inventory").where().eq("ID",inventoryId).update()
+                        .set("IS_INVOLVED",true)
+                        .set("PM_PRJ_ID", req.prjId)
+                        .set("MATERIAL_INVENTORY_TYPE_ID",typeIdList.get(0).get("materialTypeId"))
+                        .exec();
+            }else {
+                inventoryId = editableInventoryIdList.get(0).get("id").toString();
+            }
             //更新项目清单
             Crud.from("prj_inventory").where().eq("id",inventoryId).update()
                     .set("BUY_MATTER_ID", contractFile.buyMatterId)
                     .set("CONTRACT_CATEGORY_ONE_ID",contractFile.contractTypeId)
                     .exec();
             //插入清单明细
-            Crud.from("PRJ_INVENTORY_DETAIL").insert()
+            String dtlId = Crud.from("PRJ_INVENTORY_DETAIL").insertData();
+            Crud.from("PRJ_INVENTORY_DETAIL").where().eq("ID",dtlId).update()
                     .set("PRJ_INVENTORY_ID",inventoryId)
                     .set("FL_FILE_ID",contractFile.fileId)
                     .exec();

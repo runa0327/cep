@@ -18,10 +18,15 @@ public class PrjInventoryController {
     @Autowired
     private PrjInventoryService service;
 
+    //初始化资料清单
     @GetMapping("/init")
     public void init(){
         service.init();
     }
 
-
+    //初始化清单，这里主要是针对合同，将合同事项字典每条数据都作为一个清单类型
+    @GetMapping("/initContractInventoryType")
+    public void initContractInventoryType(){
+        service.initContractInventoryType();
+    }
 }
