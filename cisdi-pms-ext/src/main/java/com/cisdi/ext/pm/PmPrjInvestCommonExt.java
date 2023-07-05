@@ -99,5 +99,7 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("AD_USER_FOURTEEN_ID"); // 管线迁改岗
         entityRecord.extraEditableAttCodeList.add("AD_USER_THIRTEEN_ID"); // 土地管理岗
         entityRecord.extraEditableAttCodeList.add("AD_USER_TWELVE_ID"); // 前期报建岗
+        entityRecord.extraEditableAttCodeList.add("TEXT_REMARK_FIVE"); // 采购需求说明-不分期说明
+        entityRecord.extraEditableAttCodeList.add("FILE_ID_FIVE"); // 采购需求说明-不分期说明附件
     }
 }
