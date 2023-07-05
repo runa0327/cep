@@ -101,35 +101,34 @@ public class InvokeHomeExt {
                 "left join  gr_set_value gsv on gsv.id = pie.INVEST_EST_TYPE_ID " +
                 "where PM_PRJ_ID=? and PRJ_TOTAL_INVEST<>0 order by gsv.`CODE` desc limit 0,1  ", projectId);
         List<DataInfo> dataInfoList = new ArrayList<>();
+        DataInfo info = new DataInfo();
+        DataInfo info1 = new DataInfo();
+        DataInfo info2 = new DataInfo();
+        DataInfo info3 = new DataInfo();
+        info.name = "建安费";
+        info.value = "0";
+        info1.name = "工程其他费";
+        info1.value = "0";
+        info2.name = "预备费";
+        info2.value = "0";
+        info3.name = "总投资";
+        info3.value = "0";
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> mapDate = list.get(0);
             List<Map<String, Object>> dtlList = myJdbcTemplate.queryForList("select * from pm_invest_est_dtl where PM_INVEST_EST_ID=?", mapDate.get("id"));
-
-            DataInfo info = new DataInfo();
-            info.name = "建安费";
             Optional<Map<String, Object>> optional = dtlList.stream().filter(p -> "0099799190825099548".equals(JdbcMapUtil.getString(p, "PM_EXP_TYPE_ID"))).findAny();
             optional.ifPresent(stringObjectMap -> info.value = JdbcMapUtil.getString(stringObjectMap, "AMT"));
-            dataInfoList.add(info);
-
-            DataInfo info1 = new DataInfo();
-            info1.name = "工程其他费";
             Optional<Map<String, Object>> optional1 = dtlList.stream().filter(p -> "0099799190825099550".equals(JdbcMapUtil.getString(p, "PM_EXP_TYPE_ID"))).findAny();
             optional1.ifPresent(stringObjectMap -> info1.value = JdbcMapUtil.getString(stringObjectMap, "AMT"));
-            dataInfoList.add(info1);
-
-            DataInfo info2 = new DataInfo();
-            info2.name = "预备费";
             Optional<Map<String, Object>> optional2 = dtlList.stream().filter(p -> "0099799190825099552".equals(JdbcMapUtil.getString(p, "PM_EXP_TYPE_ID"))).findAny();
             optional2.ifPresent(stringObjectMap -> info2.value = JdbcMapUtil.getString(stringObjectMap, "AMT"));
-            dataInfoList.add(info2);
-
-            DataInfo info3 = new DataInfo();
-            info3.name = "总投资";
             Optional<Map<String, Object>> optional3 = dtlList.stream().filter(p -> "0099799190825099546".equals(JdbcMapUtil.getString(p, "PM_EXP_TYPE_ID"))).findAny();
             optional3.ifPresent(stringObjectMap -> info3.value = JdbcMapUtil.getString(stringObjectMap, "AMT"));
-            dataInfoList.add(info3);
-
         }
+        dataInfoList.add(info);
+        dataInfoList.add(info1);
+        dataInfoList.add(info2);
+        dataInfoList.add(info3);
         if (CollectionUtils.isEmpty(dataInfoList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
