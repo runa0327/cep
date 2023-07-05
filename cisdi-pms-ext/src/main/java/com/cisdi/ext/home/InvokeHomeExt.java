@@ -7,10 +7,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class InvokeHomeExt {
 
@@ -103,25 +100,52 @@ public class InvokeHomeExt {
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pie.id,round(ifnull(pie.PRJ_TOTAL_INVEST,0)/10000,2) as amt ,gsv.code from pm_invest_est pie  " +
                 "left join  gr_set_value gsv on gsv.id = pie.INVEST_EST_TYPE_ID " +
                 "where PM_PRJ_ID=? and PRJ_TOTAL_INVEST<>0 order by gsv.`CODE` desc limit 0,1  ", projectId);
-        Map<String,Object> res = new HashMap<>();
+        List<DataInfo> dataInfoList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> mapDate = list.get(0);
             List<Map<String, Object>> dtlList = myJdbcTemplate.queryForList("select * from pm_invest_est_dtl where PM_INVEST_EST_ID=?", mapDate.get("id"));
 
+            DataInfo info = new DataInfo();
+            info.name = "建安费";
             Optional<Map<String, Object>> optional = dtlList.stream().filter(p -> "0099799190825099548".equals(JdbcMapUtil.getString(p, "PM_EXP_TYPE_ID"))).findAny();
-            optional.ifPresent(stringObjectMap -> res.put("建安费", JdbcMapUtil.getString(stringObjectMap, "AMT")));
+            optional.ifPresent(stringObjectMap -> info.value = JdbcMapUtil.getString(stringObjectMap, "AMT"));
+            dataInfoList.add(info);
 
+            DataInfo info1 = new DataInfo();
+            info1.name = "工程其他费";
             Optional<Map<String, Object>> optional1 = dtlList.stream().filter(p -> "0099799190825099550".equals(JdbcMapUtil.getString(p, "PM_EXP_TYPE_ID"))).findAny();
-            optional1.ifPresent(stringObjectMap -> res.put("工程其他费", JdbcMapUtil.getString(stringObjectMap, "AMT")));
+            optional1.ifPresent(stringObjectMap -> info1.value = JdbcMapUtil.getString(stringObjectMap, "AMT"));
+            dataInfoList.add(info1);
 
+            DataInfo info2 = new DataInfo();
+            info2.name = "预备费";
             Optional<Map<String, Object>> optional2 = dtlList.stream().filter(p -> "0099799190825099552".equals(JdbcMapUtil.getString(p, "PM_EXP_TYPE_ID"))).findAny();
-            optional2.ifPresent(stringObjectMap -> res.put("预备费", JdbcMapUtil.getString(stringObjectMap, "AMT")));
+            optional2.ifPresent(stringObjectMap -> info2.value = JdbcMapUtil.getString(stringObjectMap, "AMT"));
+            dataInfoList.add(info2);
 
+            DataInfo info3 = new DataInfo();
+            info3.name = "总投资";
             Optional<Map<String, Object>> optional3 = dtlList.stream().filter(p -> "0099799190825099546".equals(JdbcMapUtil.getString(p, "PM_EXP_TYPE_ID"))).findAny();
-            optional3.ifPresent(stringObjectMap -> res.put("总投资", JdbcMapUtil.getString(stringObjectMap, "AMT")));
+            optional3.ifPresent(stringObjectMap -> info3.value = JdbcMapUtil.getString(stringObjectMap, "AMT"));
+            dataInfoList.add(info3);
 
         }
-        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(res), Map.class);
-        ExtJarHelper.returnValue.set(outputMap);
+        if (CollectionUtils.isEmpty(dataInfoList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide outSide = new OutSide();
+            outSide.dataInfoList = dataInfoList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    public static class DataInfo {
+        public String name;
+        public String value;
+    }
+
+    public static class OutSide {
+        public List<DataInfo> dataInfoList;
     }
 }
