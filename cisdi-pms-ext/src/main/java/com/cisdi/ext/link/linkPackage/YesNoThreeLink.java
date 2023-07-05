@@ -31,7 +31,7 @@ public class YesNoThreeLink {
             AttLinkExtDetail.clearOrderIsStandard(attLinkResult); //清除属性联动数据
             AttLinkExtDetail.handleOrderIsStandard(attLinkResult,code);
         } else if ("PM_BUY_DEMAND_REQ".equals(entCode)){ // 采购需求审批
-            if ("N".equals(code)){ // 显示说明和附件，且说明为必填
+            if ("Y".equals(code)){ // 显示说明和附件，且说明为必填
                 LinkUtils.mapAddAllValue("TEXT_REMARK_FIVE",AttDataTypeE.TEXT_LONG,null,null,true,true,true,attLinkResult);
                 LinkUtils.mapAddAllValue("FILE_ID_FIVE",AttDataTypeE.FILE_GROUP,null,null,true,false,true,attLinkResult);
             } else {

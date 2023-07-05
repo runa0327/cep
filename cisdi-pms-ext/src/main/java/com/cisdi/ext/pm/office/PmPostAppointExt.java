@@ -78,4 +78,19 @@ public class PmPostAppointExt {
         Map<String,Object> map = new HashMap<>();
         //组装
     }
+
+    /**
+     * 判断是否需要工程部什么
+     * @param entCode 表名
+     * @param entityRecord 表单记录
+     * @return 判断结果
+     */
+    public static boolean checkNeedManageRole(String entCode, EntityRecord entityRecord) {
+        boolean res = true;
+        String projectTypeId = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_TYPE_ID");
+        if ("1638731685728239616".equals(projectTypeId) || "0099799190825080994".equals(projectTypeId) || "0099799190825080740".equals(projectTypeId)){
+            res = false;
+        }
+        return res;
+    }
 }
