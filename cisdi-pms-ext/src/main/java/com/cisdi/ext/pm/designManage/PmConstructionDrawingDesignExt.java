@@ -1,15 +1,19 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.designManage;
 
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.model.base.PmPrj;
+import com.cisdi.ext.pm.PmInLibraryExt;
+import com.cisdi.ext.pm.ProcessCommon;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 
+import java.util.Map;
+
 /**
- * 施工图设计管理-扩展
+ * 设计管理-施工图设计管理-扩展
  */
 public class PmConstructionDrawingDesignExt {
 
@@ -79,6 +83,30 @@ public class PmConstructionDrawingDesignExt {
         if ("OK".equals(status)){
             if ("start".equals(nodeStatus)){ //标题生成
                 WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
+            } else {
+
+                //获取审批意见信息
+                Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
+                //审批意见内容
+                String comment = message.get("comment");
+                String processComment, commentEnd;
+
+                if ("leaderFirstOK".equals(nodeStatus)){ // 2-部门负责人意见 意见回显
+                    //获取流程中的意见信息
+                    processComment = JdbcMapUtil.getString(entityRecord.valueMap,"TEXT_REMARK_FOUR");
+                    commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                    ProcessCommon.commentShow("TEXT_REMARK_FOUR",commentEnd,csCommId,entCode);
+                } else if ("leaderSecondOK".equals(nodeStatus)){ // 4-部门负责人意见
+                    processComment = JdbcMapUtil.getString(entityRecord.valueMap,"TEXT_REMARK_FIVE");
+                    commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+                    ProcessCommon.commentShow("TEXT_REMARK_FIVE",commentEnd,csCommId,entCode);
+                }
+            }
+        } else {
+            if ("leaderFirstRefuse".equals(nodeStatus)){
+                ProcessCommon.clearData("TEXT_REMARK_FOUR",csCommId,entCode,myJdbcTemplate);
+            } else if ("leaderSecondRefuse".equals(nodeStatus)){
+                ProcessCommon.clearData("TEXT_REMARK_FIVE",csCommId,entCode,myJdbcTemplate);
             }
         }
     }
@@ -92,18 +120,26 @@ public class PmConstructionDrawingDesignExt {
     private String getNodeStatus(String status, String nodeId) {
         String nodeName = "";
         if ("OK".equals(status)){
-            if ("0099902212142090122".equals(nodeId)){ //1-发起
+            if ("0099902212142090122".equals(nodeId)){ // 1-设计部发起
                 nodeName = "start";
-            } else if ("0099902212142090123".equals(nodeId)){ // 2-外审
+            } else if ("0099902212142090123".equals(nodeId)){ // 3-经办人上传外审意见
                 nodeName = "externalCheckOK";
-            } else if ("0099902212142090124".equals(nodeId)){ // 3-批复
+            } else if ("0099902212142090124".equals(nodeId)){ // 5-经办人上传批复
                 nodeName = "replyOK";
+            } else if ("1676047023150948352".equals(nodeId)){ // 2-部门负责人意见
+                nodeName = "leaderFirstOK";
+            } else if ("1676047214541234176".equals(nodeId)){ // 4-部门负责人意见
+                nodeName = "leaderSecondOK";
             }
         } else {
-            if ("0099902212142090123".equals(nodeId)){ // 2-外审
+            if ("0099902212142090123".equals(nodeId)){ // 3-经办人上传外审意见
                 nodeName = "externalCheckRefuse";
-            } else if ("0099902212142090124".equals(nodeId)){ // 3-批复
+            } else if ("0099902212142090124".equals(nodeId)){ // 5-经办人上传批复
                 nodeName = "replyRefuse";
+            } else if ("1676047023150948352".equals(nodeId)){ // 2-部门负责人意见
+                nodeName = "leaderFirstRefuse";
+            } else if ("1676047214541234176".equals(nodeId)){ // 4-部门负责人意见
+                nodeName = "leaderSecondRefuse";
             }
         }
         return nodeName;

@@ -73,7 +73,7 @@ public class AttLinkExt {
         } else if ("YES_NO_ONE".equals(attCode)){ // 是否判断
             return linkYES_NO_ONE(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("YES_NO_THREE".equals(attCode)){ // 是否判断
-            return linkYES_NO_THREE(myJdbcTemplate, attValue, entCode,sevId);
+            return YesNoThreeLink.linkYES_NO_THREE(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("YES_NO_TWO".equals(attCode)){ // 有无判断
             return linkYES_NO_TWO(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("IS_REFER_GUARANTEE_ID".equals(attCode)){ // 是否涉及保函
@@ -2041,45 +2041,6 @@ public class AttLinkExt {
             linkedAtt.changeToMandatory = AD_USER_NINTH_IDChangeToMandatory;
             attLinkResult.attMap.put("AD_USER_NINTH_ID", linkedAtt);
         }
-    }
-
-    // 是 否  属性联动
-    private AttLinkResult linkYES_NO_THREE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
-        AttLinkResult attLinkResult = new AttLinkResult();
-        String code = getGrSetCode(myJdbcTemplate,attValue);
-        if ("PM_SEND_APPROVAL_REQ".equals(entCode)){ //发文呈批
-            // 是(Y)， 否(N)
-            if ("Y".equals(code)){  //隐藏 是否呈董事长审批
-                // 是否呈董事长审批
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-                    linkedAtt.changeToShown = false;
-                    linkedAtt.changeToMandatory = false;
-                    linkedAtt.changeToEditable = false;
-                    attLinkResult.attMap.put("YES_NO_FOUR", linkedAtt);
-                }
-            } else {
-                // 是否呈董事长审批
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-                    linkedAtt.changeToShown = true;
-                    linkedAtt.changeToMandatory = true;
-                    linkedAtt.changeToEditable = true;
-                    attLinkResult.attMap.put("YES_NO_FOUR", linkedAtt);
-                }
-            }
-        }
-        else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "PO_ORDER_TERMINATE_REQ".equals(entCode)){ //采购合同签订申请 采购合同补充协议申请 合同终止
-            AttLinkExtDetail.clearOrderIsStandard(attLinkResult); //清除属性联动数据
-            AttLinkExtDetail.handleOrderIsStandard(attLinkResult,code);
-        }
-        return attLinkResult;
     }
 
     //付款依据属性联动

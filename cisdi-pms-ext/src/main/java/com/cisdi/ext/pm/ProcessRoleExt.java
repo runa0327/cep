@@ -6,6 +6,7 @@ import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.base.AdRoleUser;
+import com.cisdi.ext.pm.office.PmPostAppointExt;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -730,7 +731,24 @@ public class ProcessRoleExt {
      * 部门负责人角色-区分公司-工程管理部负责人
      */
     public void getEngineeringDeptChargeUser(){
-        getDeptChargeUser("CHIEF_USER_ID","post_engineering","工程管理部");
+        boolean izCheck = checkNeedRole();
+        if (izCheck){
+            getDeptChargeUser("CHIEF_USER_ID","post_engineering","工程管理部");
+        }
+    }
+
+    /**
+     * 判断是否需要角色审批
+     * @return 判断结果
+     */
+    private boolean checkNeedRole() {
+        boolean res = true;
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        if ("PM_POST_APPOINT".equals(entCode)){ // 岗位指派流程判断
+            res = PmPostAppointExt.checkNeedManageRole(entCode,entityRecord);
+        }
+        return res;
     }
 
     /**
