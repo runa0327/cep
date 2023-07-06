@@ -17,10 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 
 /**
  * @author dlt
@@ -51,12 +50,20 @@ public class PrjInventoryServiceImpl implements PrjInventoryService {
         if (!CollectionUtils.isEmpty(prjMaps)){
             int size = prjMaps.size() / coreSize + 1;
             List<List<Map<String, Object>>> splits = ListUtils.split(prjMaps, size);
+            CountDownLatch latch = new CountDownLatch(splits.size());
             for (List<Map<String, Object>> split : splits) {
                 executor.execute(() -> {
                     for (Map<String, Object> prjMap : split) {
-                        this.doAddPrjInventory(prjMap,materialInventoryTypeMaps,prjInventoryMaps);
+                        this.doAddPrjInventory(prjMap, materialInventoryTypeMaps, prjInventoryMaps);
                     }
+                    latch.countDown();
                 });
+
+            }
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 
@@ -118,28 +125,52 @@ public class PrjInventoryServiceImpl implements PrjInventoryService {
                 "where p.status = 'AP' and (a.code = 'PM_PRJ_ID' or a.code = 'PM_PRJ_IDS')\n" +
                 "group by e.code");
 
-        //和清单相关的流程实例，带清单对应的字段
+        //和清单相关的流程实例，带清单对应的字段，排除合同签订
         List<Map<String, Object>> instanceList = jdbcTemplate.queryForList("select i.id instanceId,ty.id typeId,i.AD_ENT_ID entId,i.ENT_CODE entCode,i" +
                 ".ENTITY_RECORD_ID entRecordId,ty.AD_ENT_ATT_V_ID entAttId,a.code attCode,a.name attName from wf_process_instance i \n" +
                 "left join material_inventory_type ty on ty.WF_PROCESS_ID = i.WF_PROCESS_ID\n" +
                 "left join ad_ent_att ea on ea.id = ty.AD_ENT_ATT_V_ID\n" +
                 "left join ad_att a on a.id = ea.AD_ATT_ID\n" +
-                "where ty.WF_PROCESS_ID is not null and i.status = 'AP' and ty.status = 'AP' and ea.status = 'AP' and a.status = 'AP'");
+                "where ty.WF_PROCESS_ID is not null and i.status = 'AP' and ty.status = 'AP' and ea.status = 'AP' and a.status = 'AP' " +
+                "and i.ENT_CODE != 'po_order_req'");
+        //单独处理合同签订
+        List<Map<String, Object>> contractInstanceList = jdbcTemplate.queryForList("select i.id instanceId,ty.id typeId,i.AD_ENT_ID entId,i.ENT_CODE " +
+                "entCode,i.ENTITY_RECORD_ID entRecordId,ty.AD_ENT_ATT_V_ID entAttId,a.code attCode,a.name attName,ore.PM_PRJ_IDS prjIds," +
+                "ore.BUY_MATTER_ID buyMatterId,ore.CONTRACT_CATEGORY_ONE_ID contractTypeId " +
+                "from wf_process_instance i \n" +
+                "left join po_order_req ore on ore.LK_WF_INST_ID = i.id\n" +
+                "left join material_inventory_type ty on ty.WF_PROCESS_ID = i.WF_PROCESS_ID and ty.BUY_MATTER_ID = ore.BUY_MATTER_ID\n" +
+                "left join ad_ent_att ea on ea.id = ty.AD_ENT_ATT_V_ID\n" +
+                "left join ad_att a on a.id = ea.AD_ATT_ID\n" +
+                "where ty.WF_PROCESS_ID is not null and i.status = 'AP' and ty.status = 'AP' and ea.status = 'AP' and a.status = 'AP' and i" +
+                ".ENT_CODE = 'po_order_req'");
 
         //全部清单明细
         List<Map<String, Object>> inventoryDtlList = jdbcTemplate.queryForList("select id,PRJ_INVENTORY_ID inventoryId,FL_FILE_ID fileId,WF_PROCESS_INSTANCE_ID" +
                 " instanceId from PRJ_INVENTORY_DETAIL");
 
+        //处理一般的流程
+        insertDlt(processPrjFields, instanceList, inventoryDtlList);
+        //单独处理合同签订
+        insertDlt(processPrjFields, contractInstanceList, inventoryDtlList);
+    }
+
+    private void insertDlt(List<Map<String, Object>> processPrjFields, List<Map<String, Object>> instanceList,
+                           List<Map<String, Object>> inventoryDtlList) {
         for (Map<String, Object> instance : instanceList) {
             String instanceId = instance.get("instanceId").toString();//流程实例id
             String typeId = instance.get("typeId").toString();//清单类型id
             String entCode = instance.get("entCode").toString().toUpperCase();//申请单表名
             String attCode = instance.get("attCode").toString();//字段名
             String recordId = instance.get("entRecordId").toString();//记录id
+            String prjIds = JdbcMapUtil.getString(instance,"prjIds");
+            String buyMatterId = JdbcMapUtil.getString(instance,"buyMatterId");
+            String contractTypeId = JdbcMapUtil.getString(instance,"contractTypeId");
             String sql = "";
             try {
                 isSinglePrj(processPrjFields, entCode);//判断项目报错,直接跳过
             }catch (Exception e){
+                log.error(entCode + "单项目/多项目判断异常");
                 continue;
             }
 
@@ -156,8 +187,27 @@ public class PrjInventoryServiceImpl implements PrjInventoryService {
             }
 
             List<Map<String, Object>> recordList = jdbcTemplate.queryForList(sql, recordId, typeId);
+
             if (CollectionUtils.isEmpty(recordList)){
-                continue;
+                if ("PO_ORDER_REQ".equals(entCode)){//合同签订，单独处理
+                    if (Strings.isNullOrEmpty(prjIds)){
+                        continue;
+                    }
+                    String[] prjIdArr = prjIds.split(",");
+
+                    //为涉及的项目插入清单数据初始值
+                    for (String prjId : prjIdArr) {
+                        String inventoryId = Util.insertData(jdbcTemplate, "prj_inventory");
+                        //初始值（项目id，是否涉及，清单类型）
+                        jdbcTemplate.update("update prj_inventory set IS_INVOLVED = true,PM_PRJ_ID = ?,MATERIAL_INVENTORY_TYPE_ID = ?, " +
+                                "BUY_MATTER_ID = ?,CONTRACT_CATEGORY_ONE_ID = ?" +
+                                "where id = ?",prjId,typeId,buyMatterId,contractTypeId,inventoryId);
+                    }
+                    //赋初始值后重新查recordList
+                    recordList = jdbcTemplate.queryForList(sql, recordId, typeId);
+                }else {
+                    continue;
+                }
             }
             for (Map<String, Object> recordMap : recordList) {
                 if (CollectionUtils.isEmpty(recordMap)){
@@ -191,6 +241,10 @@ public class PrjInventoryServiceImpl implements PrjInventoryService {
 
     private void doAddPrjInventory(Map<String, Object> prjMap, List<Map<String, Object>> materialInventoryTypeMaps, List<Map<String, Object>> prjInventoryMaps) {
         for (Map<String,Object> typeMap : materialInventoryTypeMaps) {
+            //主清单类型为 合同清单
+            if ("1675746857843830784".equals(typeMap.get("FILE_MASTER_INVENTORY_TYPE_ID").toString())){
+                continue;
+            }
             //如果该条项目清单已有，跳过
             if (!CollectionUtils.isEmpty(prjInventoryMaps)) {
                 Optional<Map<String, Object>> opPrjInventory = prjInventoryMaps.stream()

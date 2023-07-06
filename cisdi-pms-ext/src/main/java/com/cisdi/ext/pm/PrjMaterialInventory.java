@@ -562,6 +562,10 @@ public class PrjMaterialInventory {
      */
     private static void doAddPrjInventory(PmPrj pmPrj,List<MaterialInventoryType> materialInventoryTypes,List<PrjInventory> prjInventories){
         for (MaterialInventoryType type : materialInventoryTypes) {
+            //合同清单
+            if ("1675746857843830784".equals(type.getId())){
+                continue;
+            }
             //如果该条项目清单已有，跳过
             if (!CollectionUtils.isEmpty(prjInventories)) {
                 Optional<PrjInventory> opPrjInventory = prjInventories.stream()
@@ -596,7 +600,7 @@ public class PrjMaterialInventory {
         //流程实例
         WfProcessInstance processInc = WfProcessInstance.selectById(processInsId);
         //找出流程中需要映射的字段名
-        List<Map<String, Object>> attMaps = myJdbcTemplate.queryForList("select a.code attCode,ea.id entAttId from material_inventory_type t \n" +
+        List<Map<String, Object>> attMaps = myJdbcTemplate.queryForList("select a.code attCode,ea.id entAttId,t.BUY_MATTER_ID buyMatterId from material_inventory_type t \n" +
                 "left join ad_ent_att ea on ea.id = t.AD_ENT_ATT_V_ID\n" +
                 "left join ad_att a on a.id = ea.AD_ATT_ID\n" +
                 "where t.WF_PROCESS_ID = ?", processId);
@@ -613,15 +617,50 @@ public class PrjMaterialInventory {
         Map<String, Object> applyData = applyDataMaps.get(0);
 
         String[] prjIdArr = prjIds.split(",");
-        for (String prjId : prjIdArr) {//每个项目
+        for (String prjId : prjIdArr) {//涉及的每个项目
             for (Attribute att : attributes) {
                 //项目清单id
-                List<Map<String, Object>> prjInventoryIdMaps = myJdbcTemplate.queryForList("select i.id from prj_inventory i \n" +
-                        "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
-                        "where i.PM_PRJ_ID = ? and t.AD_ENT_ATT_V_ID = ? and WF_PROCESS_ID = ?", prjId, att.entAttId, processId);
-                if (CollectionUtils.isEmpty(prjInventoryIdMaps)){
-                    continue;
+                List<Map<String, Object>> prjInventoryIdMaps;
+                if (!processId.equals("0099952822476409136")){//不是合同签订
+                    //项目清单id
+                    prjInventoryIdMaps = myJdbcTemplate.queryForList("select i.id from prj_inventory i \n" +
+                            "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID\n" +
+                            "where i.PM_PRJ_ID = ? and t.AD_ENT_ATT_V_ID = ? and WF_PROCESS_ID = ?", prjId, att.entAttId, processId);
+                    //没有找到清单
+                    if (CollectionUtils.isEmpty(prjInventoryIdMaps)){
+                        continue;
+                    }
+                }else {//是合同签订
+                    List<Map<String, Object>> typeIdList = myJdbcTemplate.queryForList("select t.id materialTypeId,ea.id entAttId from " +
+                            "MATERIAL_INVENTORY_TYPE t\n" +
+                            "left join ad_ent_att ea on ea.id = t.AD_ENT_ATT_V_ID\n" +
+                            "where t.BUY_MATTER_ID = ?", applyData.get("BUY_MATTER_ID"));
+                    //没有找到合同事项的对应的清单类型跳过，
+                    // 或者，清单类型配置的实体属性 和 流程相关的合同事项不同跳过（由于attributes是所有和该流程相关的清单类型属性，但是合同需要特殊处理）
+                    if (CollectionUtils.isEmpty(typeIdList) || !applyData.get("BUY_MATTER_ID").toString().equals(att.buyMatterId)){
+                        continue;
+                    }
+                    //查看是否还有直接可以更新的项目清单，没有就插入一条（因为初始化时默认生成了一条空项目清单）
+                    prjInventoryIdMaps = myJdbcTemplate.queryForList("SELECT pi.id FROM prj_inventory pi \n" +
+                            "left join MATERIAL_INVENTORY_TYPE mi on mi.id = pi.MATERIAL_INVENTORY_TYPE_ID\n" +
+                            "where PM_PRJ_ID = ? and mi.BUY_MATTER_ID = ? and pi.BUY_MATTER_ID is null", prjId, applyData.get("BUY_MATTER_ID"));
+                    String inventoryId = "";
+                    if (CollectionUtils.isEmpty(prjInventoryIdMaps)){
+                        inventoryId = Crud.from("prj_inventory").insertData();
+                        //初始值（项目id，是否涉及，清单类型）
+                        Crud.from("prj_inventory").where().eq("ID",inventoryId).update()
+                                .set("IS_INVOLVED",true)
+                                .set("PM_PRJ_ID", prjId)
+                                .set("MATERIAL_INVENTORY_TYPE_ID",typeIdList.get(0).get("materialTypeId"))
+                                .set("BUY_MATTER_ID",applyData.get("BUY_MATTER_ID"))
+                                .set("CONTRACT_CATEGORY_ONE_ID",applyData.get("CONTRACT_CATEGORY_ONE_ID"))
+                                .exec();
+                        Map<String, Object> idMap = new HashMap<>();
+                        idMap.put("id",inventoryId);
+                        prjInventoryIdMaps.add(idMap);
+                    }
                 }
+
 
                 for (Map<String, Object> prjInventoryIdMap : prjInventoryIdMaps) {
                     String prjInventoryId = JdbcMapUtil.getString(prjInventoryIdMap, "id");
@@ -750,6 +789,8 @@ public class PrjMaterialInventory {
         private String attCode;
         //实体属性id
         private String entAttId;
+        //合同事项-合同专用
+        private String buyMatterId;
     }
 
     /**
