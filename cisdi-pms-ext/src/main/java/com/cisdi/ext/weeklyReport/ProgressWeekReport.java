@@ -536,10 +536,10 @@ public class ProgressWeekReport {
             sb.append(" and b.IZ_END = '").append(weatherCompleted).append("' "); //是否竣工
         }
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(String.valueOf(sb));
-        sb.append(" order by ");
+        sb.append(" order by b.IZ_END asc,b.SYS_TRUE desc,");
         List<SortBean> sortList = param.getSort();;
         if (CollectionUtils.isEmpty(sortList)){
-            sb.append(" b.IZ_END asc,b.SYS_TRUE desc,a.ts desc,b.PM_PRJ_ID desc ");
+            sb.append(" a.ts desc,b.PM_PRJ_ID desc ");
         } else {
             resultSort(sb,sortList);
         }
