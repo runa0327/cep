@@ -19,7 +19,7 @@ public class Dict {
         Map<String, Object> inputMap = ExtJarHelper.extApiParamMap.get();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> dictList = myJdbcTemplate.queryForList("select sv.id,sv.name,sv.remark from gr_set se left join gr_set_value sv on sv.gr_set_id" +
-                " = se.id where se.code = ?", inputMap.get("code").toString());
+                " = se.id where se.code = ? and se.status = 'AP' and sv.status = 'AP'", inputMap.get("code").toString());
         HashMap<String, Object> result = new HashMap<>();
         result.put("dict",dictList);
         ExtJarHelper.returnValue.set(result);

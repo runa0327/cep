@@ -7,4 +7,6 @@ package com.cisdi.pms.job.service;
  */
 public interface PrjInventoryService {
     void init();
+
+    void initContractInventoryType();
 }
