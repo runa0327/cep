@@ -17,10 +17,10 @@ public class PmProgressWeeklyServiceImpl implements PmProgressWeeklyService {
      * @param weekDate 周信息
      * @param startDate 开始日期
      * @param endDate 结束日期
+     * @param pmProgressWeekly 返回信息
      * @return 周信息
      */
-    public static PmProgressWeekly setWeekValue(String weekId, String nowDate, String weekDate, String startDate, String endDate) {
-        PmProgressWeekly pmProgressWeekly = new PmProgressWeekly();
+    public static PmProgressWeekly setWeekValue(String weekId, String nowDate, String weekDate, String startDate, String endDate, PmProgressWeekly pmProgressWeekly) {
         pmProgressWeekly.setId(weekId);
         pmProgressWeekly.setVer("1");
         pmProgressWeekly.setTs(nowDate);
