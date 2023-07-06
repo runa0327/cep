@@ -1,9 +1,12 @@
 package com.cisdi.ext.base;
 
+import com.cisdi.ext.model.GrSetValue;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -51,5 +54,19 @@ public class GrSetValueExt {
             id = JdbcMapUtil.getString(list.get(0),"id");
         }
         return id;
+    }
+
+    /**
+     * 根据id获取编码值
+     * @param myJdbcTemplate 数据源
+     * @param id id
+     * @return 对应的code值
+     */
+    public static String getGrSetCode(MyJdbcTemplate myJdbcTemplate, String id) {
+        String code = "";
+        if (!SharedUtil.isEmptyString(id)){
+            code = GrSetValue.selectById(id).getCode();
+        }
+        return code;
     }
 }

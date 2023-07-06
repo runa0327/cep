@@ -121,4 +121,30 @@ public class LinkUtils {
             attLinkResult.attMap.put(showCode, linkedAtt);
         }
     }
+
+    /**
+     * 属性联动所有值赋值
+     * @param showCode 回显字段
+     * @param type 字段类型
+     * @param value value值 一般引用显示id
+     * @param text text值 一般引用显示name
+     * @param changeToShown 是否显示
+     * @param changeToMandatory 是否必填
+     * @param changeToEditable 是否可改
+     * @param attLinkResult 返回值
+     */
+    public static void mapAddAllValue(String showCode, AttDataTypeE type, String value, String text, boolean changeToShown, boolean changeToMandatory, boolean changeToEditable, AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = type;
+            linkedAtt.value = value;
+            linkedAtt.text = text;
+            linkedAtt.changeToShown = changeToShown;
+            linkedAtt.changeToMandatory = changeToMandatory;
+            linkedAtt.changeToEditable = changeToEditable;
+            attLinkResult.attMap.put(showCode, linkedAtt);
+        }
+    }
+
+
 }

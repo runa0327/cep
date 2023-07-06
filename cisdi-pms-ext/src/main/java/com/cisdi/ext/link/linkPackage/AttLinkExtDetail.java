@@ -3,6 +3,7 @@ package com.cisdi.ext.link.linkPackage;
 import com.cisdi.ext.base.AdUserExt;
 import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.link.*;
+import com.cisdi.ext.model.PmParty;
 import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.model.PrjStart;
 import com.cisdi.ext.pm.bidPurchase.PmBuyDemandReqExt;
@@ -957,16 +958,20 @@ public class AttLinkExtDetail {
      * @param myJdbcTemplate 数据源
      */
     public static void selectPostAppointLink(AttLinkResult attLinkResult, String attValue, MyJdbcTemplate myJdbcTemplate) {
-        String sql = "select a.*,b.id as projectId from PRJ_START a left join pm_prj b on a.PM_CODE = b.PM_CODE where b.id = ?";
+        String sql = "select a.*,b.id as projectId,a.BUILDER_UNIT as CUSTOMER_UNIT from PRJ_START a left join pm_prj b on a.PM_CODE = b.PM_CODE where b.id = ?";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,attValue);
         if (CollectionUtils.isEmpty(list)){
             list = myJdbcTemplate.queryForList("select *,id projectId,ESTIMATED_TOTAL_INVEST PRJ_TOTAL_INVEST from pm_prj where id = ?", attValue);
         }
         if (!CollectionUtils.isEmpty(list)){
+            String projectTypeId = JdbcMapUtil.getString(list.get(0), "PROJECT_TYPE_ID");
             //业主单位
-            String companyId = JdbcMapUtil.getString(list.get(0), "BUILDER_UNIT");
+            String companyId = JdbcMapUtil.getString(list.get(0), "CUSTOMER_UNIT");
             //岗位人员赋值
-            assignmentPostLink(attLinkResult,companyId,attValue,myJdbcTemplate);
+            assignmentPostLink(attLinkResult,companyId,myJdbcTemplate);
+            if ("1638731685728239616".equals(projectTypeId) || "0099799190825080994".equals(projectTypeId) || "0099799190825080740".equals(projectTypeId)){
+                LinkUtils.mapAddValueByValue("AD_USER_TWENTY_FOUR_ID","未涉及","1641281525532323840",AttDataTypeE.TEXT_LONG,attLinkResult);
+            }
             // 资金来源
             {
                 String id = JdbcMapUtil.getString(list.get(0), "INVESTMENT_SOURCE_ID");
@@ -982,23 +987,13 @@ public class AttLinkExtDetail {
             mapAddValue("PRJ_SITUATION","PRJ_SITUATION",list.get(0),AttDataTypeE.TEXT_LONG,attLinkResult); //项目简介
             mapAddValue("START_REMARK","START_REMARK",list.get(0),AttDataTypeE.TEXT_LONG,attLinkResult); //启动说明
             // 项目类型
-            {
-                String id = JdbcMapUtil.getString(list.get(0), "PROJECT_TYPE_ID");
-                String name = GrSetValueExt.getValueNameById(id);
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = id;
-                linkedAtt.text = name;
-                attLinkResult.attMap.put("PROJECT_TYPE_ID", linkedAtt);
-            }
+            String projectTypeName = GrSetValueExt.getValueNameById(projectTypeId);
+            LinkUtils.mapAddValueByValue("PROJECT_TYPE_ID",projectTypeName,projectTypeId,AttDataTypeE.TEXT_LONG,attLinkResult);
             // 建设单位
-            {
-                String name = GrSetValueExt.getValueNameById(companyId);
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = companyId;
-                linkedAtt.text = name;
-                attLinkResult.attMap.put("CUSTOMER_UNIT", linkedAtt);
+            String companyName = "";
+            if (!SharedUtil.isEmptyString(companyId)){
+                companyName = PmParty.selectById(companyId).getName();
+                LinkUtils.mapAddValueByValue("CUSTOMER_UNIT",companyName,companyId,AttDataTypeE.TEXT_LONG,attLinkResult);
             }
             // 招标方式
             {
@@ -1025,10 +1020,9 @@ public class AttLinkExtDetail {
      * 项目默认岗位值赋值
      * @param attLinkResult 返回集合值
      * @param companyId 业主单位id
-     * @param projectId 项目id
      * @param myJdbcTemplate 数据源
      */
-    private static void assignmentPostLink(AttLinkResult attLinkResult, String companyId, String projectId, MyJdbcTemplate myJdbcTemplate) {
+    private static void assignmentPostLink(AttLinkResult attLinkResult, String companyId, MyJdbcTemplate myJdbcTemplate) {
         //获取项目岗位默认配置
         String sql = "select * from BASE_POST_USER where CUSTOMER_UNIT = ? and status = 'AP'";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,companyId);
