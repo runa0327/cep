@@ -167,7 +167,7 @@ public class ContractAccount {
                 "FROM PO_ORDER A " +
                 "LEFT JOIN PM_PRJ B ON A.PM_PRJ_ID = B.ID " +
                 "LEFT JOIN GR_SET_VALUE C ON A.CONTRACT_CATEGORY_ONE_ID = C.ID " +
-                "LEFT JOIN pm_party D ON B.CUSTOMER_UNIT = D.ID " +
+                "LEFT JOIN pm_party D ON A.CUSTOMER_UNIT = D.ID " +
                 "WHERE A.STATUS = 'AP' and ORDER_DATA_SOURCE_TYPE = '1630087650826432512' ";
         StringBuffer sb = new StringBuffer(sql);
         if (!SharedUtil.isEmptyString(requestParam.prjId)){
