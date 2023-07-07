@@ -5,7 +5,6 @@ import com.cisdi.ext.importQYY.ImportSum;
 import com.cisdi.ext.importQYY.model.ImportBatch;
 import com.cisdi.ext.importQYY.model.PmPrjInvest3Import;
 import com.qygly.ext.jar.helper.ExtJarHelper;
-import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
@@ -19,7 +18,7 @@ import java.util.Map;
 /**
  * @author dlt
  * @date 2023/6/8 周四
- * 企业云导入通用
+ * 企业云导入通用工具
  */
 public abstract class ImportUtil {
 
