@@ -1716,7 +1716,8 @@ public class WfExt {
                 if (!CollectionUtils.isEmpty(list)){
                     otherName = JdbcMapUtil.getString(list.get(0),"name");
                 }
-                name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
+                String subTitle = JdbcMapUtil.getString(entityRecord.valueMap,"REMARK_LONG_ONE"); // 副标题
+                name = concatProcessNameStatic("-",processName,projectName,subTitle,otherName,userName,nowDate);
             } else if ("PO_ORDER_REQ".equals(entityCode)){ //合同签订
                 otherName = getContractNameStatic(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
                 name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
