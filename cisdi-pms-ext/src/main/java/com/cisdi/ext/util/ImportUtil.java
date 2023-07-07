@@ -89,7 +89,7 @@ public abstract class ImportUtil {
     }
 
     /**
-     * 获取类型
+     * 获取导入表对应的类型（需要企业云生成模板文件）
      */
     public abstract Class getImportClass();
 
@@ -100,9 +100,9 @@ public abstract class ImportUtil {
     public abstract List<Map<String,Object>> getOldData();
 
     /**
-     * 执行导入
-     * @param dlt
-     * @param oldImportDataList
+     * 真正导入单条数据
+     * @param dtl 单条数据，需要强转
+     * @param oldImportDataList 需要对比的旧数据
      */
-    public abstract void doImport(Object dlt, List<Map<String,Object>> oldImportDataList) throws Exception;
+    public abstract void doImport(Object dtl, List<Map<String,Object>> oldImportDataList) throws Exception;
 }
