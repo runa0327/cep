@@ -8,6 +8,7 @@ import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 
@@ -91,7 +92,7 @@ public class WeekTaskExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String id = JdbcMapUtil.getString(map, "id");
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select wt.*,gsv.`NAME` as task_status,CAN_DISPATCH,TRANSFER_USER as transferUserId,au.name as transferUser,TRANSFER_TIME,pm.name as projectName,PLAN_COMPL_DATE " +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select wt.*,gsv.`NAME` as task_status,CAN_DISPATCH,TRANSFER_USER as transferUserId,au.name as transferUser,TRANSFER_TIME,pm.name as projectName,wt.PLAN_COMPL_DATE as PLAN_COMPL_DATE " +
                 " from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
                 "left join ad_user au on au.id = wt.TRANSFER_USER " +
@@ -448,6 +449,8 @@ public class WeekTaskExt {
     public static final String IN_PROCESSING = "0099799190825106801";
     public static final String COMPLETED = "0099799190825106802";
 
+    public static final String NOT_INVOLVE = "0099902212142036278";
+
     /**
      * 给他的后续节点发周任务
      *
@@ -488,8 +491,8 @@ public class WeekTaskExt {
                 }
                 String title = objectMap.get("prjName") + "-" + processName;
                 String content = MessageFormat.format(msg, objectMap.get("prjName"), processName, dateOrg);
-                myJdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=?,CAN_DISPATCH='0',PM_PRJ_ID=? where id=?",
-                        userId, title, content, new Date(), "1634118574056542208", "1635080848313290752", objectMap.get("ID"), objectMap.get("projectId"), id);
+                myJdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=?,CAN_DISPATCH='0',PM_PRJ_ID=?,PLAN_COMPL_DATE=? where id=?",
+                        userId, title, content, new Date(), "1634118574056542208", "1635080848313290752", objectMap.get("ID"), objectMap.get("projectId"), objectMap.get("PLAN_COMPL_DATE"), id);
             }
         }
     }
@@ -553,5 +556,119 @@ public class WeekTaskExt {
             }
         }
 
+    }
+
+
+    /**
+     * 本周工作任务台账
+     */
+    public void standingBook() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        RequestParam requestParam = JsonUtil.fromJson(json, RequestParam.class);
+        int pageSize = requestParam.pageSize;
+        int pageIndex = requestParam.pageIndex;
+        StringBuilder sb = new StringBuilder();
+        sb.append("select pm.*,gg.`NAME` as pro_status,gsv.`NAME` as location,gs.`NAME` as type from pm_prj pm  " +
+                " left join gr_set_value gg on pm.PROJECT_PHASE_ID = gg.id  " +
+                " left join gr_set_value gsv on pm.BASE_LOCATION_ID = gsv.id " +
+                " left join gr_set_value gs on pm.PROJECT_TYPE_ID = gs.id  " +
+                " where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 and (pm.PROJECT_STATUS != '1661568714048413696' or pm.PROJECT_STATUS is null ) ");
+        if (!Strings.isNullOrEmpty(requestParam.name)) {
+            sb.append(" and `NAME` like '%").append(requestParam.name).append("%'");
+        }
+        if (!Strings.isNullOrEmpty(requestParam.ownner)) {
+            sb.append(" and CUSTOMER_UNIT = '").append(requestParam.ownner).append("'");
+        }
+        if (!Strings.isNullOrEmpty(requestParam.location)) {
+            sb.append(" and BASE_LOCATION_ID = '").append(requestParam.location).append("'");
+        }
+        if (!Strings.isNullOrEmpty(requestParam.type)) {
+            sb.append(" and PROJECT_TYPE_ID = '").append(requestParam.type).append("'");
+        }
+        sb.append(" order by pm.PM_CODE desc ");
+        String totalSql = sb.toString();
+        int start = pageSize * (pageIndex - 1);
+        sb.append(" limit ").append(start).append(",").append(pageSize);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
+        List<DataInfo> dataInfoList = list.stream().map(this::convertData).collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(dataInfoList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
+            ResData resData = new ResData();
+            resData.total = totalList.size();
+            resData.dataInfoList = dataInfoList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resData), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    public static final String TASK_NOT_STARTED = "1634118574056542208";
+    public static final String TASK_IN_PROCESSING = "1634118609016066048";
+    public static final String TASK_COMPLETED = "1634118629769482240";
+    public static final String TASK_NOT_INVOLVE = "1644140265205915648";
+    public static final String TASK_OVERDUE = "1644140821106384896";
+
+
+    public DataInfo convertData(Map<String, Object> dataMap) {
+        DataInfo info = new DataInfo();
+        info.name = JdbcMapUtil.getString(dataMap, "NAME");
+        info.status = JdbcMapUtil.getString(dataMap, "pro_status");
+        info.location = JdbcMapUtil.getString(dataMap, "location");
+        info.type = JdbcMapUtil.getString(dataMap, "type");
+
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from week_task where PM_PRJ_ID=?", dataMap.get("ID"));
+        info.total = list.size();
+        info.notStart = (int) list.stream().filter(p -> TASK_NOT_STARTED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
+        info.underway = (int) list.stream().filter(p -> TASK_IN_PROCESSING.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
+        info.finished = (int) list.stream().filter(p -> TASK_COMPLETED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
+        info.notInvolve = (int) list.stream().filter(p -> TASK_NOT_INVOLVE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
+        info.cqwwc = (int) list.stream().filter(p -> "1".equals(JdbcMapUtil.getString(p, "IZ_OVERDUE"))).count();
+        info.cqwc = (int) list.stream().filter(p -> {
+            if (COMPLETED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))) {
+                if (JdbcMapUtil.getString(p, "PLAN_COMPL_DATE") != null && JdbcMapUtil.getString(p, "ACTUAL_COMPL_DATE") != null) {
+                    Date plan = DateTimeUtil.stringToDate(JdbcMapUtil.getString(p, "PLAN_COMPL_DATE"));
+                    Date actual = DateTimeUtil.stringToDate(JdbcMapUtil.getString(p, "ACTUAL_COMPL_DATE"));
+                    if (actual.before(plan)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }).count();
+        return info;
+    }
+
+
+    public static class RequestParam {
+        public String name;
+        public String ownner;
+        public String location;
+        public String type;
+        public Integer pageSize;
+        public Integer pageIndex;
+    }
+
+    public static class DataInfo {
+        public String name;
+        public String status;
+        public String location;
+        public String type;
+        public Integer total;
+        public Integer notStart;
+        public Integer underway;
+        public Integer finished;
+        public Integer notInvolve;
+        public Integer cqwwc;
+        public Integer cqwc;
+    }
+
+    public static class ResData {
+        public Integer total;
+        public List<DataInfo> dataInfoList;
     }
 }

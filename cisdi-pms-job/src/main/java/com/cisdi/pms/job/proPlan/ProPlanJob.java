@@ -56,6 +56,8 @@ public class ProPlanJob {
             Map<String, Object> queryParams = new HashMap<>();// 创建入参map
             queryParams.put("ids", ids);
             namedParameterJdbcTemplate.update("update pm_pro_plan_node set IZ_OVERDUE='1' where id in (:ids)", queryParams);
+            //节点超期，工作任务也变成超期
+            namedParameterJdbcTemplate.update("update week_task set WEEK_TASK_STATUS_ID='1644140821106384896' where RELATION_DATA_ID in (:ids)", queryParams);
         }
     }
 
