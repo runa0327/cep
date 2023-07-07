@@ -19,16 +19,18 @@ import java.util.Optional;
  */
 public class PmPrjInvest3ImportExt extends ImportUtil {
 
+//    //调用公共导入模板方法(废弃，已有通用导入com.cisdi.ext.importQYY.ImportCommon.importAccount)
+//    public void importAccount() throws Exception {
+//        new PmPrjInvest3ImportExt().importAccountCommon();
+//    }
 
-    public void importAccount() throws Exception {
-        new PmPrjInvest3ImportExt().importAccountCommon();
-    }
-
+    //获取导入表对应的类型（需要企业生成模板文件）
     @Override
     public Class getImportClass() {
         return PmPrjInvest3Import.class;
     }
 
+    //获取需要对比的旧数据，避免重复导入
     @Override
     public List<Map<String, Object>> getOldData() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
@@ -36,9 +38,14 @@ public class PmPrjInvest3ImportExt extends ImportUtil {
         return oldImports;
     }
 
+    /**
+     * 真正导入单条数据
+     * @param dtl 单条数据，需要强转
+     * @param oldImportDataList 需要对比的旧数据
+     */
     @Override
-    public void doImport(Object dlt, List<Map<String, Object>> oldImportDataList) {
-        PmPrjInvest3Import invest3Import = (PmPrjInvest3Import) dlt;
+    public void doImport(Object dtl, List<Map<String, Object>> oldImportDataList) {
+        PmPrjInvest3Import invest3Import = (PmPrjInvest3Import) dtl;
         PmPrjInvest3 invest3 = PmPrjInvest3.newData();
         //比对是否导入过
         boolean needUpdate = false;
@@ -52,6 +59,7 @@ public class PmPrjInvest3ImportExt extends ImportUtil {
             }
         }
         BeanUtils.copyProperties(invest3Import,invest3,"id");
+        invest3.setIsImport(true);
 
         if (needUpdate) {
             invest3.updateById();
@@ -60,33 +68,4 @@ public class PmPrjInvest3ImportExt extends ImportUtil {
         }
 
     }
-
-
-//    @Data
-//    public static class User{
-//        public String name;
-//        public String id;
-////        public String address;
-//    }
-//
-//    @Data
-//    @ToString
-//    public static class Person{
-//        public String name;
-//        public String id;
-//        public String address;
-//    }
-//    public static void main(String[] args) {
-//        User user = new User();
-//        user.setName("a");
-//        user.setId("b");
-////        user.setAddress("c");
-//        Person person = new Person();
-//        person.setName("d");
-//        person.setId("e");
-//        person.setAddress("f");
-//        BeanUtils.copyProperties(user,person,"id");
-//        System.out.println(person);
-//        System.out.println(user);
-//    }
 }

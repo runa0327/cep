@@ -105,6 +105,10 @@ public class PmPrjInvest3 {
          */
         public static final String REMARK = "REMARK";
         /**
+         * 是否导入的记录。
+         */
+        public static final String IS_IMPORT = "IS_IMPORT";
+        /**
          * 项目。
          */
         public static final String PM_PRJ_ID = "PM_PRJ_ID";
@@ -770,6 +774,42 @@ public class PmPrjInvest3 {
             this.remark = remark;
             if (!this.toUpdateCols.contains("REMARK")) {
                 this.toUpdateCols.add("REMARK");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否导入的记录。
+     */
+    private Boolean isImport;
+
+    /**
+     * 获取：是否导入的记录。
+     */
+    public Boolean getIsImport() {
+        return this.isImport;
+    }
+
+    /**
+     * 设置：是否导入的记录。
+     */
+    public PmPrjInvest3 setIsImport(Boolean isImport) {
+        if (this.isImport == null && isImport == null) {
+            // 均为null，不做处理。
+        } else if (this.isImport != null && isImport != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isImport.compareTo(isImport) != 0) {
+                this.isImport = isImport;
+                if (!this.toUpdateCols.contains("IS_IMPORT")) {
+                    this.toUpdateCols.add("IS_IMPORT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isImport = isImport;
+            if (!this.toUpdateCols.contains("IS_IMPORT")) {
+                this.toUpdateCols.add("IS_IMPORT");
             }
         }
         return this;

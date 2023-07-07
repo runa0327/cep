@@ -3,8 +3,8 @@ package com.cisdi.ext.util;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.importQYY.ImportSum;
 import com.cisdi.ext.importQYY.model.ImportBatch;
+import com.cisdi.ext.importQYY.model.PmPrjInvest3Import;
 import com.qygly.ext.jar.helper.ExtJarHelper;
-import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * @author dlt
  * @date 2023/6/8 周四
- * 企业云导入通用
+ * 企业云导入通用工具
  */
 public abstract class ImportUtil {
 
@@ -27,7 +27,6 @@ public abstract class ImportUtil {
      */
     public void importAccountCommon() throws Exception {
         LoginInfo loginInfo = ExtJarHelper.loginInfo.get();
-        MyJdbcTemplate jdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         if (!loginInfo.userCode.equalsIgnoreCase("admin")) {
             throw new BaseException("只有admin才能操作！");
         }
@@ -49,7 +48,7 @@ public abstract class ImportUtil {
             ImportSum importSum = new ImportSum();
             Where where = new Where().eq("IMPORT_BATCH_ID", csCommId);
 
-            Object selectByWhere = importClass.getDeclaredMethod("selectByWhere", where.getClass()).invoke(where);
+            Object selectByWhere = importClass.getDeclaredMethod("selectByWhere", where.getClass()).invoke(null,where);
             List importList = JSONObject.parseArray(JSONObject.toJSONString(selectByWhere), importClass);
 
             if (!SharedUtil.isEmptyList(importList)) {
@@ -63,11 +62,13 @@ public abstract class ImportUtil {
                         succ = false;
                         errorInfo = e.toString();
                     }
+                    new PmPrjInvest3Import().updateById();
                     //记录单条数据导入信息
-                    importClass.getDeclaredMethod("setImportStatusId",String.class).invoke("3");
-                    importClass.getDeclaredMethod("setImportTime",LocalDateTime.class).invoke(LocalDateTime.now());
-                    importClass.getDeclaredMethod("setIsSuccess",Boolean.class).invoke(succ);
-                    importClass.getDeclaredMethod("setErrInfo",String.class).invoke(errorInfo);
+                    importClass.getDeclaredMethod("setImportStatusId",String.class).invoke(dtlObject,"3");
+                    importClass.getDeclaredMethod("setImportTime",LocalDateTime.class).invoke(dtlObject,LocalDateTime.now());
+                    importClass.getDeclaredMethod("setIsSuccess",Boolean.class).invoke(dtlObject,succ);
+                    importClass.getDeclaredMethod("setErrInfo",String.class).invoke(dtlObject,errorInfo);
+                    importClass.getDeclaredMethod("updateById").invoke(dtlObject);
                     // 累计成功或失败数量：
                     if (succ) {
                         importSum.succCt++;
@@ -88,7 +89,7 @@ public abstract class ImportUtil {
     }
 
     /**
-     * 获取类型
+     * 获取导入表对应的类型（需要企业云生成模板文件）
      */
     public abstract Class getImportClass();
 
@@ -99,9 +100,9 @@ public abstract class ImportUtil {
     public abstract List<Map<String,Object>> getOldData();
 
     /**
-     * 执行导入
-     * @param dlt
-     * @param oldImportDataList
+     * 真正导入单条数据
+     * @param dtl 单条数据，需要强转
+     * @param oldImportDataList 需要对比的旧数据
      */
-    public abstract void doImport(Object dlt, List<Map<String,Object>> oldImportDataList) throws Exception;
+    public abstract void doImport(Object dtl, List<Map<String,Object>> oldImportDataList) throws Exception;
 }
