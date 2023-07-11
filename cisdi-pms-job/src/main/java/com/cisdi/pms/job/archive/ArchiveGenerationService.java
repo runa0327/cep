@@ -265,6 +265,10 @@ public class ArchiveGenerationService {
         map.put("PM_LAND_USE_REQ", "0099902212142516744");
         map2.put("PM_LAND_USE_REQ", "select T.* from PM_LAND_USE_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
 
+        // 土地划拨
+        map.put("PM_LAND_ALLOCATION_REQ", "0099902212142592327");
+        map2.put("PM_LAND_ALLOCATION_REQ", "select T.* from PM_LAND_ALLOCATION_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
         for (String entCode : map.keySet()) {
             String procId = map.get(entCode);
             Map<String, Object> ent = jdbcTemplate.queryForMap("select * from ad_ent where code=?", entCode);
