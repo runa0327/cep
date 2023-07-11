@@ -1,9 +1,7 @@
 package com.cisdi.ext.importQYY;
 
 import com.cisdi.ext.importQYY.model.PmLandUseReqImport;
-import com.cisdi.ext.importQYY.model.PmPrjInvest3Import;
 import com.cisdi.ext.model.PmLandUseReq;
-import com.cisdi.ext.model.PmPrjInvest3;
 import com.cisdi.ext.util.ImportUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -14,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class PmLandUserReqImportExt extends ImportUtil {
+public class PmLandUseReqImportExt extends ImportUtil {
     @Override
     public Class getImportClass() {
         return PmLandUseReqImport.class;
