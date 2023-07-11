@@ -50,7 +50,7 @@ public class ProgressWeekReport {
 
         String sql1 = "select distinct a.pm_prj_id,c.name,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted " +
                 "from PM_ROSTER a left join POST_INFO b on a.POST_INFO_ID = b.id LEFT JOIN pm_prj c on a.PM_PRJ_ID = c.id " +
-                "where b.code = 'AD_USER_TWENTY_THREE_ID' and a.AD_USER_ID = ? and a.status = 'ap' " +
+                "where b.code = 'AD_USER_TWENTY_THREE_ID' and a.AD_USER_ID = ? and a.status = 'ap' AND c.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' " +
                 "AND (c.PROJECT_STATUS != '1661568714048413696' or c.PROJECT_STATUS is null ) ";
         StringBuilder sb = new StringBuilder(sql1);
         if (!SharedUtil.isEmptyString(projectName)){
