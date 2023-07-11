@@ -273,6 +273,10 @@ public class ArchiveGenerationService {
         map.put("PM_FARMING_PROCEDURES", "0099902212142514818");
         map2.put("PM_FARMING_PROCEDURES", "select T.* from PM_FARMING_PROCEDURES t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
 
+        // 工作联系单
+        map.put("PM_WORK_LIST_REQ", "0099952822476361887");
+        map2.put("PM_WORK_LIST_REQ", "select T.* from PM_WORK_LIST_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
         for (String entCode : map.keySet()) {
             String procId = map.get(entCode);
             Map<String, Object> ent = jdbcTemplate.queryForMap("select * from ad_ent where code=?", entCode);
