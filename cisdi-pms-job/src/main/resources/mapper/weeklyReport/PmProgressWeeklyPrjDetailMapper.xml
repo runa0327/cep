@@ -38,7 +38,7 @@
         SELECT
         a.id,
         c.DATE AS writeDate,
-        a.VISUAL_PROGRESS AS progressStr,
+        a.VISUAL_PROGRESS AS progress,
         a.VISUAL_PROGRESS_DESCRIBE AS progressDescribe,
         a.PROCESS_REMARK_TEXT AS progressWeek,
         a.TEXT_REMARK_ONE AS progressRemark,
