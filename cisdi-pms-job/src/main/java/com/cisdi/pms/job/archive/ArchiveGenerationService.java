@@ -277,6 +277,18 @@ public class ArchiveGenerationService {
         map.put("PM_WORK_LIST_REQ", "0099952822476361887");
         map2.put("PM_WORK_LIST_REQ", "select T.* from PM_WORK_LIST_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
 
+        // 监理规划及细则
+        map.put("PM_SUPERVISE_PLAN_REQ", "0099902212142023273");
+        map2.put("PM_SUPERVISE_PLAN_REQ", "select T.* from PM_SUPERVISE_PLAN_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 施工组织设计及施工方案
+        map.put("PM_BUILD_ORGAN_PLAN_REQ", "0099952822476361252");
+        map2.put("PM_BUILD_ORGAN_PLAN_REQ", "select T.* from PM_BUILD_ORGAN_PLAN_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 施工组织设计及施工方案
+        map.put("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD", "0099902212142038616");
+        map2.put("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD", "select T.* from SKILL_DISCLOSURE_PAPER_RECHECK_RECORD t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
         for (String entCode : map.keySet()) {
             String procId = map.get(entCode);
             Map<String, Object> ent = jdbcTemplate.queryForMap("select * from ad_ent where code=?", entCode);

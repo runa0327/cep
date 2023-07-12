@@ -21,6 +21,7 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -52,7 +53,10 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
                     PrjProgressRecords prjProgressRecords = new PrjProgressRecords();
                     prjProgressRecords.projectName = p.getProjectName();
                     prjProgressRecords.writeDate = p.getWriteDate();
-                    prjProgressRecords.progress = p.getProgress();
+                    String progress = p.getProgressStr();
+                    if (StringUtils.hasText(progress)){
+                        prjProgressRecords.progress = progress + "%";
+                    }
                     prjProgressRecords.progressDescribe = p.getProgressDescribe();
                     prjProgressRecords.progressWeek = p.getProgressWeek();
                     prjProgressRecords.progressRemark = p.getProgressRemark();
@@ -68,7 +72,10 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
                     PrjProgressAllRecords prjProgressAllRecords = new PrjProgressAllRecords();
                     prjProgressAllRecords.projectName = p.getProjectName();
                     prjProgressAllRecords.writeDate = p.getWriteDate();
-                    prjProgressAllRecords.progress = p.getProgress();
+                    String progress = p.getProgressStr();
+                    if (StringUtils.hasText(progress)){
+                        prjProgressAllRecords.progress = progress + "%";
+                    }
                     prjProgressAllRecords.progressDescribe = p.getProgressDescribe();
                     prjProgressAllRecords.progressWeek = p.getProgressWeek();
                     prjProgressAllRecords.progressRemark = p.getProgressRemark();
