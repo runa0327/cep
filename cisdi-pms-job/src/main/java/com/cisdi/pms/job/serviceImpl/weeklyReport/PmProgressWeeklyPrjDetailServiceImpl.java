@@ -21,11 +21,11 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,9 +53,9 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
                     PrjProgressRecords prjProgressRecords = new PrjProgressRecords();
                     prjProgressRecords.projectName = p.getProjectName();
                     prjProgressRecords.writeDate = p.getWriteDate();
-                    String progress = p.getProgressStr();
-                    if (StringUtils.hasText(progress)){
-                        prjProgressRecords.progress = progress + "%";
+                    BigDecimal progress = p.getProgress();
+                    if (progress != null){
+                        prjProgressRecords.progress = progress.stripTrailingZeros().toPlainString() + "%";
                     }
                     prjProgressRecords.progressDescribe = p.getProgressDescribe();
                     prjProgressRecords.progressWeek = p.getProgressWeek();
@@ -72,9 +72,9 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
                     PrjProgressAllRecords prjProgressAllRecords = new PrjProgressAllRecords();
                     prjProgressAllRecords.projectName = p.getProjectName();
                     prjProgressAllRecords.writeDate = p.getWriteDate();
-                    String progress = p.getProgressStr();
-                    if (StringUtils.hasText(progress)){
-                        prjProgressAllRecords.progress = progress + "%";
+                    BigDecimal progress = p.getProgress();
+                    if (progress != null){
+                        prjProgressAllRecords.progress = progress.stripTrailingZeros().toPlainString() + "%";
                     }
                     prjProgressAllRecords.progressDescribe = p.getProgressDescribe();
                     prjProgressAllRecords.progressWeek = p.getProgressWeek();
