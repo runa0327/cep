@@ -16,6 +16,7 @@
         <result column="progress" property="progress"/>
         <result column="progressMin" property="progressMin"/>
         <result column="progressMax" property="progressMax"/>
+        <result column="progressStr" property="progressStr"/>
         <result column="progressDescribe" property="progressDescribe"/>
         <result column="progressWeek" property="progressWeek"/>
         <result column="progressRemark" property="progressRemark"/>
@@ -37,7 +38,7 @@
         SELECT
         a.id,
         c.DATE AS writeDate,
-        a.VISUAL_PROGRESS AS progress,
+        a.VISUAL_PROGRESS AS progressStr,
         a.VISUAL_PROGRESS_DESCRIBE AS progressDescribe,
         a.PROCESS_REMARK_TEXT AS progressWeek,
         a.TEXT_REMARK_ONE AS progressRemark,

@@ -15,7 +15,7 @@ public class PrjProgressAllRecords {
     public String manageUserName;
 
     @ExcelProperty("整体形象进度")
-    public BigDecimal progress;
+    public String progress;
 
     @ExcelProperty("本周项目进展")
     public String progressWeek;
