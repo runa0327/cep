@@ -25,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,10 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
                     PrjProgressRecords prjProgressRecords = new PrjProgressRecords();
                     prjProgressRecords.projectName = p.getProjectName();
                     prjProgressRecords.writeDate = p.getWriteDate();
-                    prjProgressRecords.progress = p.getProgress();
+                    BigDecimal progress = p.getProgress();
+                    if (progress != null){
+                        prjProgressRecords.progress = progress.stripTrailingZeros().toPlainString() + "%";
+                    }
                     prjProgressRecords.progressDescribe = p.getProgressDescribe();
                     prjProgressRecords.progressWeek = p.getProgressWeek();
                     prjProgressRecords.progressRemark = p.getProgressRemark();
@@ -68,7 +72,10 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
                     PrjProgressAllRecords prjProgressAllRecords = new PrjProgressAllRecords();
                     prjProgressAllRecords.projectName = p.getProjectName();
                     prjProgressAllRecords.writeDate = p.getWriteDate();
-                    prjProgressAllRecords.progress = p.getProgress();
+                    BigDecimal progress = p.getProgress();
+                    if (progress != null){
+                        prjProgressAllRecords.progress = progress.stripTrailingZeros().toPlainString() + "%";
+                    }
                     prjProgressAllRecords.progressDescribe = p.getProgressDescribe();
                     prjProgressAllRecords.progressWeek = p.getProgressWeek();
                     prjProgressAllRecords.progressRemark = p.getProgressRemark();

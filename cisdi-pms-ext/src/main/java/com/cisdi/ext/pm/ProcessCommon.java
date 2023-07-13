@@ -230,7 +230,7 @@ public class ProcessCommon {
      * @return 返回信息
      */
     public static String prjRepeatStartById(String entityCode, String projectId, String id, MyJdbcTemplate myJdbcTemplate) {
-        String sql = "select * from "+entityCode+" where pm_prj_id = ? and status NOT in ('VD','VDING') and id != ?";
+        String sql = "select * from "+entityCode+" where pm_prj_id = ? and status NOT in ('VD','VDING','DR') and id != ?";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId,id);
         String msg = "";
         if (!CollectionUtils.isEmpty(list)){
@@ -248,7 +248,7 @@ public class ProcessCommon {
      * @return 返回信息
      */
     public static String prjRepeatStartByName(String entityCode, String projectName, String id, MyJdbcTemplate myJdbcTemplate) {
-        String sql = "select * from "+entityCode+" where PROJECT_NAME_WR = ? and status NOT in ('VD','VDING') and id != ?";
+        String sql = "select * from "+entityCode+" where PROJECT_NAME_WR = ? and status NOT in ('VD','VDING','DR') and id != ?";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectName,id);
         String msg = "";
         if (!CollectionUtils.isEmpty(list)){

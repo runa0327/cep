@@ -304,7 +304,11 @@ public class PmRosterExt {
             myNamedParameterJdbcTemplate.update("update PM_ROSTER set AD_USER_ID= :userId,ANCESTRAL=:ancestral where POST_INFO_ID= :postId and PM_PRJ_ID in (:ids) ", queryParams);
         }
         //刷新项目的进度节点用户
-        dataList.forEach(PrjPlanUtil::refreshProPlanUser);
+        dataList.forEach(s -> {
+                    PrjPlanUtil.refreshProPlanUser(s);
+                    PrjPlanUtil.refreshWeekTask(s);
+                }
+        );
     }
 
 
@@ -370,6 +374,7 @@ public class PmRosterExt {
             }
         }
         PrjPlanUtil.refreshProPlanUser(editObj.projectId);
+        PrjPlanUtil.refreshWeekTask(editObj.projectId);
     }
 
 
@@ -753,7 +758,7 @@ public class PmRosterExt {
             outSide.collect = collect;
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
-        }else{
+        } else {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         }
     }

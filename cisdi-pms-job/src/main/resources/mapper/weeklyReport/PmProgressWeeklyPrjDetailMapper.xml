@@ -16,6 +16,7 @@
         <result column="progress" property="progress"/>
         <result column="progressMin" property="progressMin"/>
         <result column="progressMax" property="progressMax"/>
+        <result column="progressStr" property="progressStr"/>
         <result column="progressDescribe" property="progressDescribe"/>
         <result column="progressWeek" property="progressWeek"/>
         <result column="progressRemark" property="progressRemark"/>

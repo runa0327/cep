@@ -225,6 +225,9 @@ public class PlanOperationExt {
     }
 
 
+    /**
+     * 新增选项目时的下拉列表
+     */
     public void addPrjDrop(){
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         Map<String, Object> sqlParams = new HashMap<>(input);
@@ -247,7 +250,9 @@ public class PlanOperationExt {
         }
         List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(sql,sqlParams);
 
-        sql += " limit " + (prjDropReq.pageIndex - 1) * prjDropReq.pageSize + " , " + prjDropReq.pageSize;
+        if (prjDropReq.pageIndex != null && prjDropReq.pageSize != null){
+            sql += " limit " + (prjDropReq.pageIndex - 1) * prjDropReq.pageSize + " , " + prjDropReq.pageSize;
+        }
         List<Map<String, Object>> originList = myNamedParameterJdbcTemplate.queryForList(sql,sqlParams);
         List<PrjDropResp> prjDropResps = new ArrayList<>();
         if (!CollectionUtils.isEmpty(originList)){
@@ -414,7 +419,9 @@ public class PlanOperationExt {
 
         List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(sqlSb.toString(), sqlParams);
         sqlSb.append( " order by po.CRT_DT desc");
-        sqlSb.append(" limit " + (selectReq.pageIndex - 1) * selectReq.pageSize + " , " + selectReq.pageSize);
+        if (selectReq.pageIndex != null && selectReq.pageSize != null){
+            sqlSb.append(" limit " + (selectReq.pageIndex - 1) * selectReq.pageSize + " , " + selectReq.pageSize);
+        }
         List<Map<String, Object>> originList = myNamedParameterJdbcTemplate.queryForList(sqlSb.toString(), sqlParams);
         //标签
         List<Map<String, Object>> tagMaps = myJdbcTemplate.queryForList("select ta.id tagId,ta.name tagName,v.name colorNo,v.seq_no seqNo from PRJ_TAG ta left join gr_set_value v on v.id = ta.color");
@@ -727,10 +734,5 @@ public class PlanOperationExt {
     @Data
     private static class OperationAddReq{
         private List<String> prjIds;
-    }
-
-    public static void main(String[] args) {
-        Boolean aBoolean = new Boolean("t");
-        System.out.println(aBoolean == true);
     }
 }
