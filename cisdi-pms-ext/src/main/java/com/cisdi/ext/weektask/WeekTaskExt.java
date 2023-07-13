@@ -15,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -562,7 +563,7 @@ public class WeekTaskExt {
     /**
      * 本周工作任务台账
      */
-    public void standingBook() {
+    public void weekTaskStandingBook() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
@@ -606,6 +607,147 @@ public class WeekTaskExt {
         }
     }
 
+    /**
+     * 本周工作任务台账标题
+     */
+    public void weekTaskStandingBookTitle() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Integer> result = new HashMap<>();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_prj pm where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 and (pm.PROJECT_STATUS != '1661568714048413696' or pm.PROJECT_STATUS is null ) ");
+        result.put("项目总数", list.size());
+        List<Map<String, Object>> weekTaskList = myJdbcTemplate.queryForList("select * from week_task where status='ap'");
+        result.put("工作任务总数", weekTaskList.size());
+        result.put("工作任务已完成数", (int) weekTaskList.stream().filter(p -> TASK_COMPLETED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count());
+        result.put("工作任务未开始数", (int) weekTaskList.stream().filter(p -> TASK_NOT_STARTED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count());
+        result.put("工作任务进行中数", (int) weekTaskList.stream().filter(p -> TASK_IN_PROCESSING.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count());
+        result.put("工作任务超期未完成数", (int) weekTaskList.stream().filter(p -> TASK_OVERDUE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count());
+        result.put("工作任务超期已完成数", (int) weekTaskList.stream().filter(p -> {
+            if (TASK_COMPLETED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))) {
+                if (JdbcMapUtil.getString(p, "PLAN_COMPL_DATE") != null && JdbcMapUtil.getString(p, "ACTUAL_COMPL_DATE") != null) {
+                    Date plan = DateTimeUtil.stringToDate(JdbcMapUtil.getString(p, "PLAN_COMPL_DATE"));
+                    Date actual = DateTimeUtil.stringToDate(JdbcMapUtil.getString(p, "ACTUAL_COMPL_DATE"));
+                    if (actual.before(plan)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }).count());
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+    }
+
+    /**
+     * 本周工作任务台账详情
+     */
+    public void weekTaskStandingBookView() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String projectId = JdbcMapUtil.getString(map, "projectId");
+        String status = JdbcMapUtil.getString(map, "status");
+        String taskName = JdbcMapUtil.getString(map, "taskName");
+        String user = JdbcMapUtil.getString(map, "user");
+        int pageSize = JdbcMapUtil.getInt(map, "pageSize");
+        int pageIndex = JdbcMapUtil.getInt(map, "pageIndex");
+        StringBuilder sb = new StringBuilder();
+        sb.append(" select wt.ID as id,TITLE,ad.`NAME` as user,gsv.`NAME` as status,if(ifnull(CAN_DISPATCH,'0') = '0','否','是') as iz_tran,TRANSFER_TIME,au.`NAME` as tran_user,REASON_EXPLAIN from week_task wt \n" +
+                " left join ad_user ad on wt.AD_USER_ID = ad.id \n" +
+                " left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id \n" +
+                " left join ad_user au on wt.TRANSFER_USER = au.id where wt.status ='ap' ");
+        if (!Strings.isNullOrEmpty(projectId)) {
+            sb.append(" and wt.PM_PRJ_ID ='").append(projectId).append("'");
+        }
+        if (!Strings.isNullOrEmpty(status)) {
+            if ("全部".equals(status)) {
+                sb.append(" and 1=1 ");
+            } else if ("超期完成".equals(status)) {
+                sb.append(" and wt.WEEK_TASK_STATUS_ID='1634118629769482240' and wt.ACTUAL_COMPL_DATE > wt.PLAN_COMPL_DATE ");
+            } else {
+                String stausValue = null;
+                switch (status) {
+                    case "未开始":
+                        stausValue = TASK_NOT_STARTED;
+                        break;
+                    case "进行中":
+                        stausValue = TASK_IN_PROCESSING;
+                        break;
+                    case "已完结":
+                        stausValue = TASK_COMPLETED;
+                        break;
+                    case "不涉及":
+                        stausValue = TASK_NOT_INVOLVE;
+                        break;
+                    case "超期未完成":
+                        stausValue = TASK_OVERDUE;
+                        break;
+                }
+                sb.append(" and wt.WEEK_TASK_STATUS_ID ='").append(stausValue).append("'");
+            }
+        }
+        if (!Strings.isNullOrEmpty(taskName)) {
+            sb.append(" and wt.TITLE like '%").append(taskName).append("%'");
+        }
+        if (!Strings.isNullOrEmpty(user)) {
+            sb.append(" and ad.`NAME` like '%").append(user).append("%'");
+        }
+        sb.append(" order by wt.PUBLISH_START desc ");
+        String totalSql = sb.toString();
+        int start = pageSize * (pageIndex - 1);
+        sb.append(" limit ").append(start).append(",").append(pageSize);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
+        List<WeekTaskInfo> weekTaskInfoList = list.stream().map(this::convertWeekTaskInfo).collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(weekTaskInfoList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
+            ResData resData = new ResData();
+            resData.total = totalList.size();
+            resData.weekTaskInfoList = weekTaskInfoList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resData), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+
+    /**
+     * 延期申请列表
+     */
+    public void delayApplyList() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<DelayApplyHistory> historyList = getDelayApplyList(JdbcMapUtil.getString(map, "id"));
+        if (CollectionUtils.isEmpty(historyList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            WeekTaskExt.OutSide outSide = new WeekTaskExt.OutSide();
+            outSide.historyList = historyList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+
+    public List<DelayApplyHistory> getDelayApplyList(String id) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pe.*,ad.`NAME` as user_name from PM_EXTENSION_REQUEST_REQ pe \n" +
+                " left join ad_user ad on pe.CRT_USER_ID = ad.id \n" +
+                " left join week_task wt on wt.RELATION_DATA_ID = pe.PM_PRO_PLAN_NODE_ID\n" +
+                " where wt.id = ?", map.get("id"));
+        AtomicInteger index = new AtomicInteger(1);
+        return list.stream().map(p -> {
+            DelayApplyHistory history = new DelayApplyHistory();
+            history.serNo = String.valueOf(index.getAndIncrement());
+            history.delayNum = JdbcMapUtil.getString(p, "DAYS_ONE");
+            history.description = JdbcMapUtil.getString(p, "TEXT_REMARK_ONE");
+            history.applyUser = JdbcMapUtil.getString(p, "user_name");
+            history.applyTime = JdbcMapUtil.getString(p, "CRT_DT");
+            return history;
+        }).collect(Collectors.toList());
+    }
+
+
     public static final String TASK_NOT_STARTED = "1634118574056542208";
     public static final String TASK_IN_PROCESSING = "1634118609016066048";
     public static final String TASK_COMPLETED = "1634118629769482240";
@@ -615,6 +757,7 @@ public class WeekTaskExt {
 
     public DataInfo convertData(Map<String, Object> dataMap) {
         DataInfo info = new DataInfo();
+        info.id = JdbcMapUtil.getString(dataMap, "ID");
         info.name = JdbcMapUtil.getString(dataMap, "NAME");
         info.status = JdbcMapUtil.getString(dataMap, "pro_status");
         info.location = JdbcMapUtil.getString(dataMap, "location");
@@ -643,6 +786,25 @@ public class WeekTaskExt {
         return info;
     }
 
+    public WeekTaskInfo convertWeekTaskInfo(Map<String, Object> dataMap) {
+        WeekTaskInfo info = new WeekTaskInfo();
+        info.id = JdbcMapUtil.getString(dataMap, "id");
+        info.title = JdbcMapUtil.getString(dataMap, "TITLE");
+        info.user = JdbcMapUtil.getString(dataMap, "user");
+        info.status = JdbcMapUtil.getString(dataMap, "status");
+        info.izTurn = JdbcMapUtil.getString(dataMap, "iz_tran");
+        info.transferTime = JdbcMapUtil.getString(dataMap, "TRANSFER_TIME");
+        info.transferUser = JdbcMapUtil.getString(dataMap, "tran_user");
+        info.reasonExplain = JdbcMapUtil.getString(dataMap, "REASON_EXPLAIN");
+        int count = 0;
+        List<DelayApplyHistory> historyList = getDelayApplyList(info.id);
+        if (!CollectionUtils.isEmpty(historyList)) {
+            count = historyList.size();
+        }
+        info.count = count;
+        return info;
+    }
+
 
     public static class RequestParam {
         public String name;
@@ -654,6 +816,7 @@ public class WeekTaskExt {
     }
 
     public static class DataInfo {
+        public String id;
         public String name;
         public String status;
         public String location;
@@ -670,5 +833,18 @@ public class WeekTaskExt {
     public static class ResData {
         public Integer total;
         public List<DataInfo> dataInfoList;
+        public List<WeekTaskInfo> weekTaskInfoList;
+    }
+
+    public static class WeekTaskInfo {
+        public String id;
+        public String title;
+        public String user;
+        public String status;
+        public String izTurn;
+        public String transferTime;
+        public String transferUser;
+        public String reasonExplain;
+        public Integer count;
     }
 }
