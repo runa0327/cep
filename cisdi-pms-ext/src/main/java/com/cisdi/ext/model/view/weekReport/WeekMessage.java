@@ -27,13 +27,13 @@ public class WeekMessage extends BasePageEntity {
     public Integer weatherStart;
     //是否竣工 1已竣工0未竣工2全部
     public Integer weatherCompleted;
-    //整体形象进度
+    //整体形象进度 - 整体形象进度
     public BigDecimal progress;
     public BigDecimal progressMin;
     public BigDecimal progressMax;
-    //累计形象进度说明
+    //累计形象进度说明 - 累计详细进度/问题说明
     public String progressDescribe;
-    //本周项目进展
+    //本周项目进展 - 本周工作进展
     public String progressWeek;
     //备注说明
     public String progressRemark;
@@ -58,4 +58,6 @@ public class WeekMessage extends BasePageEntity {
     //项目负责人
     public String manageUserId;
     public String manageUserName;
+    // 排序字段
+    private List<SortBean> sort;
 }

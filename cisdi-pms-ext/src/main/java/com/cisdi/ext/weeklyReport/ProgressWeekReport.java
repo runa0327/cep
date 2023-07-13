@@ -6,6 +6,7 @@ import com.cisdi.ext.model.PmProgressWeeklyPrj;
 import com.cisdi.ext.model.PmProgressWeeklyPrjDetail;
 import com.cisdi.ext.model.view.project.PmPrjView;
 import com.cisdi.ext.model.view.weekReport.PmProgressWeeklyView;
+import com.cisdi.ext.model.view.weekReport.SortBean;
 import com.cisdi.ext.model.view.weekReport.WeekMessage;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
@@ -50,7 +51,7 @@ public class ProgressWeekReport {
 
         String sql1 = "select distinct a.pm_prj_id,c.name,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted " +
                 "from PM_ROSTER a left join POST_INFO b on a.POST_INFO_ID = b.id LEFT JOIN pm_prj c on a.PM_PRJ_ID = c.id " +
-                "where b.code = 'AD_USER_TWENTY_THREE_ID' and a.AD_USER_ID = ? and a.status = 'ap' " +
+                "where b.code = 'AD_USER_TWENTY_THREE_ID' and a.AD_USER_ID = ? and a.status = 'ap' AND c.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' " +
                 "AND (c.PROJECT_STATUS != '1661568714048413696' or c.PROJECT_STATUS is null ) ";
         StringBuilder sb = new StringBuilder(sql1);
         if (!SharedUtil.isEmptyString(projectName)){
@@ -535,7 +536,14 @@ public class ProgressWeekReport {
             sb.append(" and b.IZ_END = '").append(weatherCompleted).append("' "); //是否竣工
         }
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(String.valueOf(sb));
-        sb.append(" order by b.IZ_END asc,b.SYS_TRUE desc,a.ts desc,b.PM_PRJ_ID desc ").append(limit);
+        sb.append(" order by b.IZ_END asc,b.SYS_TRUE desc,");
+        List<SortBean> sortList = param.getSort();;
+        if (CollectionUtils.isEmpty(sortList)){
+            sb.append(" a.ts desc,b.PM_PRJ_ID desc ");
+        } else {
+            resultSort(sb,sortList);
+        }
+        sb.append(" ").append(limit);
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString());
         Map<String,Object> map = new HashMap<>();
         if (!CollectionUtils.isEmpty(list1)){
@@ -546,6 +554,55 @@ public class ProgressWeekReport {
             map.put("result", returnList);
         }
         return map;
+    }
+
+    /**
+     * 自定义排序
+     * @param sb sql字符串
+     * @param sortList 排序字段
+     */
+    private void resultSort(StringBuilder sb, List<SortBean> sortList) {
+        for (SortBean sort : sortList) {
+            switch (sort.getColName()){
+                case "projectName" :
+                    if (sort.isIzUp()){
+                        sb.append(" convert(e.name using gbk) asc,");
+                    } else {
+                        sb.append(" convert(e.name using gbk) desc,");
+                    }
+                    break;
+                case "manageUserName" :
+                    if (sort.isIzUp()){
+                        sb.append(" convert(f.name using gbk) asc,");
+                    } else {
+                        sb.append(" convert(f.name using gbk) desc,");
+                    }
+                    break;
+                case "progress" :
+                    if (sort.isIzUp()){
+                        sb.append(" a.VISUAL_PROGRESS asc,");
+                    } else {
+                        sb.append(" a.VISUAL_PROGRESS desc,");
+                    }
+                    break;
+                case "progressWeek" : // 本周工作进展
+                    if (sort.isIzUp()){
+                        sb.append(" convert(a.PROCESS_REMARK_TEXT using gbk) asc,");
+                    } else {
+                        sb.append(" convert(a.PROCESS_REMARK_TEXT using gbk) desc,");
+                    }
+                    break;
+                case "progressDescribe" : // 累计详细进度/问题说明
+                    if (sort.isIzUp()){
+                        sb.append(" convert(a.VISUAL_PROGRESS_DESCRIBE using gbk) asc,");
+                    } else {
+                        sb.append(" convert(a.VISUAL_PROGRESS_DESCRIBE using gbk) desc,");
+                    }
+                    break;
+                default: break;
+            }
+        }
+        sb.deleteCharAt(sb.length()-1);
     }
 
     /**

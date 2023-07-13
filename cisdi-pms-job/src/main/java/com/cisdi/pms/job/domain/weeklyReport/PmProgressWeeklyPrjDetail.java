@@ -26,6 +26,7 @@ public class PmProgressWeeklyPrjDetail extends BasePageEntity {
     public BigDecimal progress;
     public BigDecimal progressMin;
     public BigDecimal progressMax;
+    public String progressStr;
     //累计形象进度说明
     public String progressDescribe;
     //本周项目进展

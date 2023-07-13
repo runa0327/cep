@@ -454,8 +454,10 @@ public class WeeklyReportService {
         String weekId = pmProgressWeeklyMapper.getWeekIdByDate(startDate,endDate);
         if (SharedUtil.isEmptyString(weekId)){
             weekId = IdUtil.getSnowflakeNextIdStr();
-            pmProgressWeekly = PmProgressWeeklyServiceImpl.setWeekValue(weekId,nowDate,weekDate,startDate,endDate);
+            pmProgressWeekly = PmProgressWeeklyServiceImpl.setWeekValue(weekId,nowDate,weekDate,startDate,endDate,pmProgressWeekly);
             pmProgressWeeklyMapper.createData(pmProgressWeekly);
+        } else {
+            pmProgressWeekly = PmProgressWeeklyServiceImpl.setWeekValue(weekId,nowDate,weekDate,startDate,endDate,pmProgressWeekly);
         }
         pmProgressWeekly.setTs(nowDate);
 

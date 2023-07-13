@@ -261,6 +261,38 @@ public class ArchiveGenerationService {
         map.put("po_order_req", "0099952822476409136");
         map2.put("po_order_req", "select T.* from po_order_req t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
 
+        // 用地规划许可
+        map.put("PM_LAND_USE_REQ", "0099902212142516744");
+        map2.put("PM_LAND_USE_REQ", "select T.* from PM_LAND_USE_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 土地划拨
+        map.put("PM_LAND_ALLOCATION_REQ", "0099902212142592327");
+        map2.put("PM_LAND_ALLOCATION_REQ", "select T.* from PM_LAND_ALLOCATION_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 农转用手续办理
+        map.put("PM_FARMING_PROCEDURES", "0099902212142514818");
+        map2.put("PM_FARMING_PROCEDURES", "select T.* from PM_FARMING_PROCEDURES t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 工作联系单
+        map.put("PM_WORK_LIST_REQ", "0099952822476361887");
+        map2.put("PM_WORK_LIST_REQ", "select T.* from PM_WORK_LIST_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 监理规划及细则
+        map.put("PM_SUPERVISE_PLAN_REQ", "0099902212142023273");
+        map2.put("PM_SUPERVISE_PLAN_REQ", "select T.* from PM_SUPERVISE_PLAN_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 施工组织设计及施工方案
+        map.put("PM_BUILD_ORGAN_PLAN_REQ", "0099952822476361252");
+        map2.put("PM_BUILD_ORGAN_PLAN_REQ", "select T.* from PM_BUILD_ORGAN_PLAN_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 施工组织设计及施工方案
+        map.put("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD", "0099902212142038616");
+        map2.put("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD", "select T.* from SKILL_DISCLOSURE_PAPER_RECHECK_RECORD t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 工程规划许可证申请
+        map.put("PM_PRJ_PLANNING_PERMIT_REQ", "0099902212142008086");
+        map2.put("PM_PRJ_PLANNING_PERMIT_REQ", "select T.* from PM_PRJ_PLANNING_PERMIT_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
         for (String entCode : map.keySet()) {
             String procId = map.get(entCode);
             Map<String, Object> ent = jdbcTemplate.queryForMap("select * from ad_ent where code=?", entCode);

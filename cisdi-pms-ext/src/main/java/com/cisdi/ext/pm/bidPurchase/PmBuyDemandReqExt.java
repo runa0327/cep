@@ -212,8 +212,22 @@ public class PmBuyDemandReqExt {
             log.info("已更新：{}", exec);
         } else if("detail".equals(status)){
             //获取预算金额下限 预算金额上线限
-            BigDecimal min = new BigDecimal(entityRecord.valueMap.get("AMT_SIX").toString());
-            BigDecimal max = new BigDecimal(entityRecord.valueMap.get("AMT_SEVEN").toString());
+            String minAmt = JdbcMapUtil.getString(entityRecord.valueMap,"AMT_SIX");
+            String maxAmt = JdbcMapUtil.getString(entityRecord.valueMap,"AMT_SEVEN");
+            if (SharedUtil.isEmptyString(minAmt)){
+                throw new BaseException("【预算金额下限】不能为空");
+            }
+            if (SharedUtil.isEmptyString(maxAmt)){
+                throw new BaseException("【预算金额上线限】不能为空");
+            }
+            if (!SharedUtil.isEmptyString(minAmt)){
+                minAmt = minAmt.trim();
+            }
+            if (!SharedUtil.isEmptyString(maxAmt)){
+                maxAmt = maxAmt.trim();
+            }
+            BigDecimal min = new BigDecimal(minAmt);
+            BigDecimal max = new BigDecimal(maxAmt);
             if (min.compareTo(max) == 1){
                 throw new BaseException("预算金额下限不能超过预算金额上限");
             }
