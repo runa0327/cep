@@ -289,6 +289,10 @@ public class ArchiveGenerationService {
         map.put("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD", "0099902212142038616");
         map2.put("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD", "select T.* from SKILL_DISCLOSURE_PAPER_RECHECK_RECORD t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
 
+        // 工程规划许可证申请
+        map.put("PM_PRJ_PLANNING_PERMIT_REQ", "0099902212142008086");
+        map2.put("PM_PRJ_PLANNING_PERMIT_REQ", "select T.* from PM_PRJ_PLANNING_PERMIT_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
         for (String entCode : map.keySet()) {
             String procId = map.get(entCode);
             Map<String, Object> ent = jdbcTemplate.queryForMap("select * from ad_ent where code=?", entCode);
