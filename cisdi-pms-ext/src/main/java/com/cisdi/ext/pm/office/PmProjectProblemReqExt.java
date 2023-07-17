@@ -23,7 +23,7 @@ public class PmProjectProblemReqExt {
         //当前节点实例id
         String nodeInstanceId = ExtJarHelper.nodeInstId.get();
         String nodeStatus = getNodeStatus(status, nodeId);
-        processHandle(nodeStatus, status, nodeId, nodeInstanceId);
+        processHandle(nodeStatus, status, nodeInstanceId);
     }
 
     /**
@@ -35,17 +35,16 @@ public class PmProjectProblemReqExt {
         //当前节点实例id
         String nodeInstanceId = ExtJarHelper.nodeInstId.get();
         String nodeStatus = getNodeStatus(status, nodeId);
-        processHandle(nodeStatus, status, nodeId, nodeInstanceId);
+        processHandle(nodeStatus, status, nodeInstanceId);
     }
 
     /**
      * 流程审批操作详细处理逻辑
      * @param nodeStatus     节点状态码名称
      * @param status         流程审批操作状态
-     * @param nodeId         节点id
      * @param nodeInstanceId 节点实例id
      */
-    private void processHandle(String nodeStatus, String status, String nodeId, String nodeInstanceId) {
+    private void processHandle(String nodeStatus, String status, String nodeInstanceId) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //业务表名
