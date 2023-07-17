@@ -637,7 +637,7 @@ public class ProcessRoleExt {
      * 查询任意流程- TO_USER_IDS 所选人员
      */
     public void getToUserIds(){
-        getDeptUser("TO_USER_IDS","toUserIds","人员多选");
+        getDeptUser("TO_USER_IDS","userIds","人员多选");
     }
 
     /**

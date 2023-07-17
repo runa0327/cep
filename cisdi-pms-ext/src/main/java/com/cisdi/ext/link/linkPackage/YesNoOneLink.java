@@ -45,9 +45,9 @@ public class YesNoOneLink {
         } else if ("PM_BID_APPROVAL_REQ".equals(entCode)){ //招标文件审批
             pmBidApprovalReqYesNoOneLink(code,attLinkResult);
         } else if ("PM_PROJECT_PROBLEM_REQ".equals(entCode)){ // 项目问题
-            if ("Y".equals(code)){ // 隐藏处理人,显示指派人
+            if ("Y".equals(code)){ // 隐藏处理人,隐藏指派人
                 LinkUtils.mapAddAllValue("TO_USER_IDS",AttDataTypeE.TEXT_LONG,null,null,false,false,false,attLinkResult);
-                LinkUtils.mapAddAllValue("USER_IDS",AttDataTypeE.TEXT_LONG,null,null,true,false,true,attLinkResult);
+                LinkUtils.mapAddAllValue("USER_IDS",AttDataTypeE.TEXT_LONG,null,null,false,false,false,attLinkResult);
             } else { // 显示处理人，隐藏指派人
                 LinkUtils.mapAddAllValue("TO_USER_IDS",AttDataTypeE.TEXT_LONG,null,null,true,true,true,attLinkResult);
                 LinkUtils.mapAddAllValue("USER_IDS",AttDataTypeE.TEXT_LONG,null,null,false,false,false,attLinkResult);
