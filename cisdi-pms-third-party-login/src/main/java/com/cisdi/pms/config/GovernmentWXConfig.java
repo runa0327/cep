@@ -22,4 +22,6 @@ public class GovernmentWXConfig {
     private String corpid;
 
     private String corpsecret;
+
+    private String agentId;
 }

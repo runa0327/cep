@@ -207,7 +207,7 @@ public class UnifiedLoginService {
      *
      * @return
      */
-    private Map<String, String> getWxToken() {
+    public Map<String, String> getWxToken() {
         Map<String, String> result = new HashMap<>();
 //        String cacheToken = redisCache.getCacheObject(token_key);
 //        if (Strings.isNullOrEmpty(cacheToken)) {
@@ -235,6 +235,4 @@ public class UnifiedLoginService {
 //        }
         return result;
     }
-
-
 }
