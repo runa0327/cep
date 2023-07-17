@@ -434,16 +434,23 @@ public class WeekTaskExt {
     }
 
     public static class DelayApplyHistory {
+        public String id;
         //序号
         public String serNo;
         //延期天数
         public String delayNum;
         //延期说明
         public String description;
-        //申请人
+        //发起人
         public String applyUser;
-        //申请时间
+        //发起时间
         public String applyTime;
+        //延期申请节点
+        public String nodeName;
+        //计划天数
+        public String days;
+        //延期天数
+        public String delayDays;
     }
 
     public static final String NOT_STARTED = "0099799190825106800";
@@ -650,7 +657,8 @@ public class WeekTaskExt {
         int pageSize = JdbcMapUtil.getInt(map, "pageSize");
         int pageIndex = JdbcMapUtil.getInt(map, "pageIndex");
         StringBuilder sb = new StringBuilder();
-        sb.append(" select wt.ID as id,TITLE,ad.`NAME` as user,gsv.`NAME` as status,if(ifnull(CAN_DISPATCH,'0') = '0','否','是') as iz_tran,TRANSFER_TIME,au.`NAME` as tran_user,REASON_EXPLAIN from week_task wt \n" +
+        sb.append(" select wt.ID as id,TITLE,ad.`NAME` as user,gsv.`NAME` as status,if(ifnull(CAN_DISPATCH,'0') = '0','否','是') as iz_tran,TRANSFER_TIME,au.`NAME` as tran_user,REASON_EXPLAIN,PM_PRJ_ID,pm.NAME as projectName from week_task wt \n" +
+                " left join pm_prj pm on pm.id = wt.PM_PRJ_ID "+
                 " left join ad_user ad on wt.AD_USER_ID = ad.id \n" +
                 " left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id \n" +
                 " left join ad_user au on wt.TRANSFER_USER = au.id where wt.status ='ap' ");
@@ -714,7 +722,6 @@ public class WeekTaskExt {
      * 延期申请列表
      */
     public void delayApplyList() {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         List<DelayApplyHistory> historyList = getDelayApplyList(JdbcMapUtil.getString(map, "id"));
         if (CollectionUtils.isEmpty(historyList)) {
@@ -728,21 +735,62 @@ public class WeekTaskExt {
     }
 
 
+    /**
+     * 延期申请列表-查看
+     */
+    public void delayApplyCheck() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pe.*,pm.`NAME` as projectName,pn.`NAME` as nodeName from PM_EXTENSION_REQUEST_REQ pe left join pm_prj pm on pm.id = pe.PM_PRJ_ID\n" +
+                "left join pm_pro_plan_node pn on pe.PM_PRO_PLAN_NODE_ID = pn.id \n" +
+                "where pe.id=? ", map.get("id"));
+        Map<String, Object> processNameMap = myJdbcTemplate.queryForMap("select name from wf_process where id = '1649227469557063680'");
+        ProcessData processData = new ProcessData();
+        processData.processId = "1649227469557063680";
+        processData.viewId = "1649226141279707136";
+        List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select wn.ad_view_id as AD_VIEW_ID,wp.EXTRA_INFO  as EXTRA_INFO from wf_node wn left join WF_PROCESS wp on wp.id = wn.WF_PROCESS_ID where wn.NODE_TYPE = 'START_EVENT' AND wn.`STATUS` = 'AP' and wn.WF_PROCESS_ID= ? ", processData.processId);
+
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> pmData = list.get(0);
+            Project project = new Project();
+            project.id = JdbcMapUtil.getString(pmData, "PM_PRJ_ID");
+            project.name = JdbcMapUtil.getString(pmData, "projectName");
+            processData.project = project;
+            Node node = new Node();
+            node.nodeId = JdbcMapUtil.getString(pmData, "PM_PRO_PLAN_NODE_ID");
+            node.nodeName = JdbcMapUtil.getString(pmData, "nodeName");
+            processData.node = node;
+            if (!CollectionUtils.isEmpty(dataList)) {
+                processData.icon = JdbcMapUtil.getString(dataList.get(0), "EXTRA_INFO");
+            }
+            processData.title = JdbcMapUtil.getString(processNameMap, "name");
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(processData), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        } else {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        }
+    }
+
+
     public List<DelayApplyHistory> getDelayApplyList(String id) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pe.*,ad.`NAME` as user_name from PM_EXTENSION_REQUEST_REQ pe \n" +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pe.*,ad.`NAME` as user_name,pnn.name as nodeName from PM_EXTENSION_REQUEST_REQ pe \n" +
+                " left join pm_pro_plan_node pnn on pe.PM_PRO_PLAN_NODE_ID = pnn.id"+
                 " left join ad_user ad on pe.CRT_USER_ID = ad.id \n" +
                 " left join week_task wt on wt.RELATION_DATA_ID = pe.PM_PRO_PLAN_NODE_ID\n" +
-                " where wt.id = ?", map.get("id"));
+                " where wt.id = ?", id);
         AtomicInteger index = new AtomicInteger(1);
         return list.stream().map(p -> {
             DelayApplyHistory history = new DelayApplyHistory();
+            history.id = JdbcMapUtil.getString(p, "ID");
             history.serNo = String.valueOf(index.getAndIncrement());
             history.delayNum = JdbcMapUtil.getString(p, "DAYS_ONE");
             history.description = JdbcMapUtil.getString(p, "TEXT_REMARK_ONE");
             history.applyUser = JdbcMapUtil.getString(p, "user_name");
             history.applyTime = JdbcMapUtil.getString(p, "CRT_DT");
+            history.nodeName = JdbcMapUtil.getString(p, "nodeName");
+            history.days = JdbcMapUtil.getString(p, "DURATION_ONE");
             return history;
         }).collect(Collectors.toList());
     }
@@ -796,6 +844,8 @@ public class WeekTaskExt {
         info.transferTime = JdbcMapUtil.getString(dataMap, "TRANSFER_TIME");
         info.transferUser = JdbcMapUtil.getString(dataMap, "tran_user");
         info.reasonExplain = JdbcMapUtil.getString(dataMap, "REASON_EXPLAIN");
+        info.projectId = JdbcMapUtil.getString(dataMap, "PM_PRJ_ID");
+        info.projectName= JdbcMapUtil.getString(dataMap, "projectName");
         int count = 0;
         List<DelayApplyHistory> historyList = getDelayApplyList(info.id);
         if (!CollectionUtils.isEmpty(historyList)) {
@@ -838,13 +888,15 @@ public class WeekTaskExt {
 
     public static class WeekTaskInfo {
         public String id;
-        public String title;
-        public String user;
-        public String status;
-        public String izTurn;
-        public String transferTime;
-        public String transferUser;
-        public String reasonExplain;
-        public Integer count;
+        public String title;//任务名称
+        public String user;//责任岗位人员
+        public String status;//当前状态
+        public String izTurn;//是否转办
+        public String transferTime;//转办时间
+        public String transferUser;//转办人
+        public String reasonExplain;//不涉及原因
+        public Integer count;//延期申请说明
+        public String projectId;
+        public String projectName;
     }
 }
