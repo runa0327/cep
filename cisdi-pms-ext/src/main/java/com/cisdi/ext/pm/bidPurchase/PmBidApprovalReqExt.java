@@ -2,7 +2,7 @@ package com.cisdi.ext.pm.bidPurchase;
 
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.model.PmBidApprovalReq;
-import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.pm.bidPurchase.detail.BidApprovalPrjDetailExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.wf.WfExt;

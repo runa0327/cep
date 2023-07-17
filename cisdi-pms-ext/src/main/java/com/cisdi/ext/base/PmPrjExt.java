@@ -7,7 +7,7 @@ import com.cisdi.ext.model.PrjStart;
 import com.cisdi.ext.pm.PmPlanExt;
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.pm.PmRosterExt;
-import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.PmPrjCodeUtil;
 import com.cisdi.ext.util.StringUtil;

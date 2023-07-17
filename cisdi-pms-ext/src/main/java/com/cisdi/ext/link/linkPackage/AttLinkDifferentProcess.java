@@ -223,7 +223,7 @@ public class AttLinkDifferentProcess {
     public static List<String> getInvestProcess() {
         List<String> list = new ArrayList<>();
         list.add("PM_PRJ_INVEST1"); //可研报告审批
-        list.add("PM_PRJ_INVEST2"); //初设概算审批
+//        list.add("PM_PRJ_INVEST2"); //初设概算审批  // 2023-07-17 取消概算自动带出资金信息
 //        list.add("PM_PRJ_INVEST3"); //预算财评
         return list;
     }

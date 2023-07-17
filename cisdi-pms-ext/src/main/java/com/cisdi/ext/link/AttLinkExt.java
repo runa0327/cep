@@ -71,7 +71,7 @@ public class AttLinkExt {
         } else if ("PAY_BASIS_ID".equals(attCode)){ //付款依据属性联动
             return linkPAY_BASIS_ID(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("YES_NO_ONE".equals(attCode)){ // 是否判断
-            return linkYES_NO_ONE(myJdbcTemplate, attValue, entCode,sevId);
+            return YesNoOneLink.linkYES_NO_ONE(myJdbcTemplate, attValue, entCode);
         } else if ("YES_NO_THREE".equals(attCode)){ // 是否判断
             return YesNoThreeLink.linkYES_NO_THREE(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("YES_NO_TWO".equals(attCode)){ // 有无判断
@@ -1948,99 +1948,6 @@ public class AttLinkExt {
             }
         }
         return attLinkResult;
-    }
-
-    // 是否属性联动
-    private AttLinkResult linkYES_NO_ONE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
-        AttLinkResult attLinkResult = new AttLinkResult();
-        String code = getGrSetCode(myJdbcTemplate,attValue);
-        Boolean changeToShown = true;
-        Boolean changeToMandatory = true;
-        Boolean changeToEditable = true;
-        if ("PM_FARMING_PROCEDURES".equals(entCode) || "PM_WOODLAND_PROCEDURES".equals(entCode)){ //农转用手续办理 林地调整办理手续
-            // 是(Y)， 否(N)
-            if (!"N".equals(code)) {  // 是否需要办理选是，文件不做判断
-                changeToShown = true;
-                changeToMandatory = false;
-                changeToEditable = false;
-            }
-            // 附件
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                linkedAtt.changeToShown = changeToShown;
-                linkedAtt.changeToMandatory = changeToMandatory;
-                linkedAtt.changeToEditable = changeToEditable;
-                attLinkResult.attMap.put("ATT_FILE_GROUP_ID", linkedAtt);
-            }
-        } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode)){ //采购合同签订申请 采购合同补充协议申请
-            // 是(Y)， 否(N)
-            Boolean replyChangeToMandatory = true; //审核意见采纳说明必填
-            Boolean fileChangeToMandatory = true; //审核意见附件必填
-            if ("Y".equals(code)){
-                replyChangeToMandatory = false;
-                fileChangeToMandatory = false;
-            }
-            // 审核意见采纳说明
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                linkedAtt.changeToMandatory = replyChangeToMandatory;
-                attLinkResult.attMap.put("REMARK_ONE", linkedAtt);
-            }
-            // 审核意见采纳说明
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = "";
-                linkedAtt.text = "";
-                linkedAtt.changeToMandatory = fileChangeToMandatory;
-                attLinkResult.attMap.put("FILE_ID_FOUR", linkedAtt);
-            }
-
-        } else if ("PM_BID_APPROVAL_REQ".equals(entCode)){ //招标文件审批
-            pmBidApprovalReqYesNoOneLink(code,attLinkResult);
-        }
-        return attLinkResult;
-    }
-
-    // YES_NO_ONE属性联动 关联控制法务岗、财务岗
-    private void pmBidApprovalReqYesNoOneLink(String code, AttLinkResult attLinkResult) {
-        Boolean AD_USER_EIGHTH_IDChangeToEditable = false; //法务岗用户，默认不可改
-        Boolean AD_USER_EIGHTH_IDChangeToMandatory = false; //法务岗用户，默认非必填
-        Boolean AD_USER_NINTH_IDChangeToEditable = false; //财务岗用户，默认不可改
-        Boolean AD_USER_NINTH_IDChangeToMandatory = false; //财务岗用户，默认非必填
-        // 是(Y)， 否(N)
-        if ("N".equals(code)){
-            AD_USER_EIGHTH_IDChangeToMandatory = true;
-            AD_USER_NINTH_IDChangeToMandatory = true;
-            AD_USER_EIGHTH_IDChangeToEditable = true;
-            AD_USER_NINTH_IDChangeToEditable = true;
-        }
-        // 法务岗
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = "";
-            linkedAtt.text = "";
-            linkedAtt.changeToEditable = AD_USER_EIGHTH_IDChangeToEditable;
-            linkedAtt.changeToMandatory = AD_USER_EIGHTH_IDChangeToMandatory;
-            attLinkResult.attMap.put("AD_USER_EIGHTH_ID", linkedAtt);
-        }
-        // 财务岗
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = "";
-            linkedAtt.text = "";
-            linkedAtt.changeToEditable = AD_USER_NINTH_IDChangeToEditable;
-            linkedAtt.changeToMandatory = AD_USER_NINTH_IDChangeToMandatory;
-            attLinkResult.attMap.put("AD_USER_NINTH_ID", linkedAtt);
-        }
     }
 
     //付款依据属性联动

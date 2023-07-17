@@ -3,7 +3,7 @@ package com.cisdi.ext.pm.designManage;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.pm.PmInLibraryExt;
-import com.cisdi.ext.pm.ProcessCommon;
+import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;

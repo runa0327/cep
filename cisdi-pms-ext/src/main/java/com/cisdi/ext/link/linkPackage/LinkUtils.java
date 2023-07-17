@@ -107,6 +107,31 @@ public class LinkUtils {
     }
 
     /**
+     * 属性联动赋值 显示参数并传 String
+     * @param showCode 显示字段
+     * @param text text显示值
+     * @param value value显示值
+     * @param type 字段类型
+     * @param changeToShown 是否显示
+     * @param changeToMandatory 是否必填
+     * @param changeToEditable 是否可改
+     * @param attLinkResult 回显集
+     */
+    public static void mapAddValueByValueFile(String showCode, String text, String value, boolean changeToShown, boolean changeToMandatory, boolean changeToEditable, AttDataTypeE type, AttLinkResult attLinkResult) {
+        {
+            LinkedAtt linkedAtt = new LinkedAtt();
+            linkedAtt.type = type;
+            linkedAtt.text = text;
+            linkedAtt.value = value;
+            linkedAtt.changeToShown = changeToShown;
+            linkedAtt.changeToMandatory = changeToMandatory;
+            linkedAtt.changeToEditable = changeToEditable;
+            AttLinkExtDetail.getFileInfoList(linkedAtt);
+            attLinkResult.attMap.put(showCode, linkedAtt);
+        }
+    }
+
+    /**
      * 属性联动值赋值空
      * @param showCode 显示字段
      * @param type 字段类型

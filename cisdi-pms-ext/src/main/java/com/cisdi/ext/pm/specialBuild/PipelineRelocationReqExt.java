@@ -1,8 +1,8 @@
 package com.cisdi.ext.pm.specialBuild;
 
 import com.cisdi.ext.base.PmPrjExt;
-import com.cisdi.ext.pm.ProcessCommon;
-import com.cisdi.ext.pm.ProcessRoleExt;
+import com.cisdi.ext.pm.processCommon.ProcessCommon;
+import com.cisdi.ext.pm.processCommon.ProcessRoleExt;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;

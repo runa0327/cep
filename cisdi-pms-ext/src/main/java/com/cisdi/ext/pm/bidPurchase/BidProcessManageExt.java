@@ -3,7 +3,6 @@ package com.cisdi.ext.pm.bidPurchase;
 import com.cisdi.ext.api.PoPublicBidExtApi;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.model.BidProcessManage;
-import com.cisdi.ext.pm.ProcessCommon;
 import com.cisdi.ext.pm.bidPurchase.detail.BidProcessManageDetailExt;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
