@@ -1,9 +1,13 @@
 package com.cisdi.ext.pm.office;
 
+import com.cisdi.ext.model.view.base.GrSetValueView;
+import com.cisdi.ext.model.view.process.PmProjectProblemReqView;
 import com.cisdi.ext.pm.processCommon.ProcessCommon;
+import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 
@@ -108,5 +112,25 @@ public class PmProjectProblemReqExt {
             }
         }
         return nodeName;
+    }
+
+    /**
+     * 项目问题台账-列表
+     */
+    public void getProjectProblemList(){
+        // 获取输入：
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        PmProjectProblemReqView param = JsonUtil.fromJson(json, PmProjectProblemReqView.class);
+        if (param.pageIndex == 0 || param.pageSize == 0) {
+            throw new BaseException("分页参数不能必须大于0");
+        }
+        // 起始条数
+        int start = (param.pageIndex - 1) * param.pageSize;
+        String limit = " limit " + start + "," + param.pageSize;
+
+        StringBuilder sb = new StringBuilder();
+        String sql = "select a.id as id,a.pm_prj_id as projectId,c.name as projectName,a.text_remark_one as problemDescribe,a.text_remark_two as solvePlan,a.prj_push_problem_type_id as projectPushProblemTypeId,e.name as projectPushProblemTypeName,a.status as statusId,b.start_user_id as userId,d.name as userName,b.start_dateTime as startTime,b.id as wfProcessInstanceId,b.current_view_id as viewId from pm_project_problem_req a LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id left join pm_prj c on a.pm_prj_id = c.id left join ad_user d on b.start_user_id = d.id left join gr_set_value e on a.prj_push_problem_type_id = e.id where a.status != 'VD' AND a.status != 'VDING' and b.status = 'ap'";
     }
 }
