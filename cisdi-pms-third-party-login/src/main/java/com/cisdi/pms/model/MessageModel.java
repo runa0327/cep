@@ -40,13 +40,6 @@ public class MessageModel {
      */
     private String message;
 
-    /**
-     * 详情地址:list跳转列表也，
-     *         detail跳转详情页
-     *
-     */
-    private String pathSuffix;
-
 }
 
 

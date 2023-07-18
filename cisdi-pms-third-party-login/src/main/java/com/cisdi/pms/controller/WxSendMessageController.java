@@ -59,12 +59,12 @@ public class WxSendMessageController {
 //        messageModel.setObject(textInfo);
 
         messageModel.setType("textcard");
-        messageModel.setPathSuffix("list");
+//        messageModel.setPathSuffix("list");
         TextCardInfo cardInfo = new TextCardInfo();
         cardInfo.setTitle("紧急流程处理通知");
         cardInfo.setDescription("[工程项目信息协同系统][流程通知]你好“【紧急】采购需求审批-南繁科技城街道生态修复工程-设计施工总承包（EPC）-黄锦涛-2023-07-04 15:39:50”已到您处，请登录系统查看");
         StringBuilder sb = new StringBuilder("https://cpms.yazhou-bay.com/h5/unifiedLogin?env=ZWWeiXin");
-        sb.append("&path=").append(messageModel.getPathSuffix());
+//        sb.append("&path=").append(messageModel.getPathSuffix());
         String ada = URLEncoder.encode(sb.toString(), "utf-8");
         cardInfo.setUrl(MessageFormat.format(url, ada));
 //        cardInfo.setUrl("https://open.weixin.qq.com/connect/oauth2/authorize?appid=ww808726c44a3ff6dc&redirect_uri=https%3A%2F%2Fcpms.yazhou-bay.com%2Fh5%2FunifiedLogin%3Fenv%3DZWWeiXin&response_type=code&scope=snsapi_userinfo&agentid=1000005&state=STATE#wechat_redirect");
