@@ -409,6 +409,7 @@ public class WeekTaskExt {
 
         public String instanceId;
 
+        public String entId;
         public List<AttData> attDataList;
 
     }
@@ -773,6 +774,7 @@ public class WeekTaskExt {
             processData.title = JdbcMapUtil.getString(processNameMap, "name");
 
             processData.instanceId = JdbcMapUtil.getString(pmData, "instanceId");
+            processData.entId = JdbcMapUtil.getString(pmData, "ID");
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(processData), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         } else {
