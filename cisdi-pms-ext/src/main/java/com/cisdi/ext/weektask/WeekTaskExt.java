@@ -299,7 +299,7 @@ public class WeekTaskExt {
             Map<String, Object> node = list.get(0);
             String processId = JdbcMapUtil.getString(node, "LINKED_WF_PROCESS_ID");
             //查询流程的第一个节点的view
-            List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select wn.ad_view_id as AD_VIEW_ID,wp.EXTRA_INFO  as EXTRA_INFO from wf_node wn left join WF_PROCESS wp on wp.id = wn.WF_PROCESS_ID where wn.NODE_TYPE = 'START_EVENT' AND wn.`STATUS` = 'AP' and wn.WF_PROCESS_ID= ? ", processId);
+            List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select wn.ad_view_id as AD_VIEW_ID,wp.EXTRA_INFO  as EXTRA_INFO,wp.name as wpname from wf_node wn left join WF_PROCESS wp on wp.id = wn.WF_PROCESS_ID where wn.NODE_TYPE = 'START_EVENT' AND wn.`STATUS` = 'AP' and wn.WF_PROCESS_ID= ? ", processId);
             if (!CollectionUtils.isEmpty(dataList)) {
                 Map<String, Object> dataMap = dataList.get(0);
                 String viewId = JdbcMapUtil.getString(dataMap, "AD_VIEW_ID");
@@ -307,7 +307,7 @@ public class WeekTaskExt {
                 res.put("processId", processId);
                 res.put("WF_NODE_VIEW_ID", viewId);
                 res.put("icon", JdbcMapUtil.getString(dataMap, "EXTRA_INFO"));
-                res.put("title", JdbcMapUtil.getString(node, "NAME"));
+                res.put("title", JdbcMapUtil.getString(dataMap, "wpname"));
                 res.put("projectId", JdbcMapUtil.getString(node, "pm_prj_id"));
                 res.put("WF_PROCESS_INSTANCE_ID", JdbcMapUtil.getString(node, "LINKED_WF_PROCESS_INSTANCE_ID"));
                 List<Map<String, Object>> instanceList = myJdbcTemplate.queryForList("select * from wf_process_instance where id=?", JdbcMapUtil.getString(node, "LINKED_WF_PROCESS_INSTANCE_ID"));
@@ -640,6 +640,7 @@ public class WeekTaskExt {
             }
             return false;
         }).count());
+        result.put("工作任务未涉及数", (int) weekTaskList.stream().filter(p -> TASK_NOT_INVOLVE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count());
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
