@@ -50,7 +50,7 @@ public class ImageWxSendMessageService implements WxSendMessageService {
             object.put("touser", users);
             object.put("toparty", "");
             object.put("totag", "");
-            object.put("msgtype", "image");
+            object.put("msgtype", messageModel.getType());
             object.put("agentid", gvConfig.getAgentId());
             ImageInfo imageInfo = (ImageInfo) messageModel.getObject();
             object.put("image", imageInfo);

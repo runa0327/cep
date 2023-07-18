@@ -15,15 +15,37 @@ import java.util.List;
 @Data
 public class MessageModel {
 
+    /**
+     * 消息接收人手机号
+     */
     private List<String> toUser;
 
+    /**
+     * 部门ID--非必传
+     */
     private List<String> toParty;
 
+    /**
+     * 标签ID--非必传
+     */
     private List<String> toTag;
-    //text,image,voice,video,file,textcard,news
+
+    /**
+     * 消息类型：text,image,voice,video,file,textcard,news
+     */
     private String type;
 
+    /**
+     * 消息体
+     */
     private Object object;
+
+    /**
+     * 详情地址:list跳转列表也，
+     *         detail跳转详情页
+     *
+     */
+    private String pathSuffix;
 
 }
 

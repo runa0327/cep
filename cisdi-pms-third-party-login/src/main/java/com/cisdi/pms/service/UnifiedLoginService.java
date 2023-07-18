@@ -228,6 +228,7 @@ public class UnifiedLoginService {
                     }
                 })
                 .onError((ex, req, res) -> {
+                    System.out.println(ex);
                     throw new BaseException("换取accessToken异常，请稍后重试！");
                 }).executeAsMap();
 //        } else {

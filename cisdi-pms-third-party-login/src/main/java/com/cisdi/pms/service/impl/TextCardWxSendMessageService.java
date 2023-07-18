@@ -3,7 +3,7 @@ package com.cisdi.pms.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.pms.config.GovernmentWXConfig;
 import com.cisdi.pms.model.MessageModel;
-import com.cisdi.pms.model.TextInfo;
+import com.cisdi.pms.model.TextCardInfo;
 import com.cisdi.pms.service.UnifiedLoginService;
 import com.cisdi.pms.service.WxSendMessageService;
 import com.dtflys.forest.Forest;
@@ -18,13 +18,13 @@ import java.util.Map;
 /**
  * @author 尹涛 * @version V1.0.0
  * @projectName cisdi-pms-service
- * @title TextWxSendMessageService
- * @package com.cisdi.pms.service
+ * @title TextCardWxSendMessageService
+ * @package com.cisdi.pms.service.impl
  * @description
- * @date 2023/7/17
+ * @date 2023/7/18
  */
 @Service
-public class TextWxSendMessageService implements WxSendMessageService {
+public class TextCardWxSendMessageService implements WxSendMessageService {
 
     @Autowired
     private UnifiedLoginService loginService;
@@ -53,8 +53,8 @@ public class TextWxSendMessageService implements WxSendMessageService {
             object.put("totag", "");
             object.put("msgtype", messageModel.getType());
             object.put("agentid", gvConfig.getAgentId());
-            TextInfo textInfo = (TextInfo) messageModel.getObject();
-            object.put("text", textInfo);
+            TextCardInfo cardInfo = (TextCardInfo) messageModel.getObject();
+            object.put("textcard", cardInfo);
             Forest.post(gvConfig.getDomain() + "/message/send")
                     .setConnectTimeout(5000)
                     .setContentType("application/json")
@@ -71,7 +71,7 @@ public class TextWxSendMessageService implements WxSendMessageService {
                         res.put("message", "发送失败！");
                     })
                     .executeAsMap();
-        } else {
+        }else{
             res.put("code", "500");
             res.put("message", "发送失败！");
         }
