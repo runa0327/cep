@@ -1,10 +1,17 @@
 package com.cisdi.pms.job.sendSMS;
 
+import com.alibaba.fastjson.JSON;
+import com.cisdi.pms.job.commons.HttpClient;
 import com.cisdi.pms.job.domain.RemindLog;
+import com.cisdi.pms.job.domain.notice.MessageModel;
+import com.cisdi.pms.job.domain.notice.TextCardInfo;
+import com.cisdi.pms.job.enums.HttpEnum;
+import com.cisdi.pms.job.service.notice.SmsWhiteListService;
 import com.cisdi.pms.job.utils.SendSmsParamsUtils;
 import com.cisdi.pms.job.utils.SendSmsUtils;
 import com.cisdi.pms.job.utils.StringUtil;
 import com.qygly.ext.rest.helper.feign.client.DataFeignClient;
+import com.sun.deploy.net.URLEncoder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +21,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +43,9 @@ public class SendSmsJob {
 
     @Autowired
     DataFeignClient dataFeignClient;
+
+    @Resource
+    private SmsWhiteListService smsWhiteListService;
 
     /**
      * 提醒真正用户。
@@ -97,7 +107,7 @@ public class SendSmsJob {
 
                 // 参数封装
                 ArrayList<String> param = new ArrayList<>();
-                param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "13696079131");
+                param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "13072802651");
                 param.add(remindLog.getTaskName());
 
                 // 发送短信
@@ -126,7 +136,7 @@ public class SendSmsJob {
 
 
     /**
-     * 普通短信
+     * 普通短信 汇总短信
      * 早上九点发送 代办
      */
     // TODO 2023-01-17 暂时注释掉
@@ -175,6 +185,9 @@ public class SendSmsJob {
             return;
         }
 
+        // 微信通知白名单
+         List<String> wxWhiteList = smsWhiteListService.getWxWhiteList();
+
         List<RemindLog> result = maps.stream()
                 .map(stringObjectMap -> {
                     RemindLog remindLog = new RemindLog();
@@ -189,6 +202,8 @@ public class SendSmsJob {
             if (lock > 0) {
                 result.forEach(remindLog -> {
 
+                    String userPhone = remindLog.getUserPhone();
+
                     //【普通】
                     //【待办】
                     //[工程项目信息协同系统][流程待办]您好:有{1}条流程待办已到您处，请尽快处理。--1644087
@@ -196,7 +211,7 @@ public class SendSmsJob {
 
                     // 参数封装
                     ArrayList<String> param = new ArrayList<>();
-                    String phone = Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "13696079131";
+                    String phone = Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "13072802651";
                     //手机号是否合法
                     if (StringUtil.isChinaPhoneLegal(phone)){
                         param.add(phone);
@@ -209,6 +224,39 @@ public class SendSmsJob {
                         this.insertRemindLog(remindLog, true);
                     }else {
                         log.error(phone + "手机号不合法");
+                    }
+
+                    // 查询是否进行微信消息通知
+                    List<Map<String,Object>> jobList = jdbcTemplate.queryForList("select * from BASE_JOB_CONFIG where STATUS = 'AP' AND CODE = 'taskSumNoticeUser'");
+                    if (!CollectionUtils.isEmpty(jobList)){
+                        String sysTrue = jobList.get(0).get("SYS_TRUE").toString(); //是否启用 0未启用1启用
+                        if ("1".equals(sysTrue)){
+                            // 微信白名单不进行发生
+                            if (!wxWhiteList.contains(userPhone)){
+                                try {
+                                    MessageModel messageModel = new MessageModel();
+                                    messageModel.setToUser(Arrays.asList(userPhone.split(",")));
+                                    messageModel.setType("textcard");
+                                    messageModel.setPathSuffix("list");
+                                    TextCardInfo cardInfo = new TextCardInfo();
+                                    cardInfo.setTitle("流程代办通知");
+                                    cardInfo.setDescription("[工程项目信息协同系统][流程待办]您好:有{"+remindLog.getCount()+"}条流程待办已到您处，请尽快处理");
+                                    StringBuilder sb = new StringBuilder("https://cpms.yazhou-bay.com/h5/unifiedLogin?env=ZWWeiXin");
+                                    sb.append("&path=").append(messageModel.getPathSuffix());
+                                    String ada = null;
+                                    ada = URLEncoder.encode(sb.toString(),"utf-8");
+                                    cardInfo.setUrl(MessageFormat.format(HttpEnum.WX_SEND_MESSAGE_URL, ada));
+                                    messageModel.setMessage(cardInfo);
+
+                                    String param1 = JSON.toJSONString(messageModel);
+                                    //调用接口
+                                    HttpClient.doPost(HttpEnum.QYQLY_WX_SEND_MESSAGE_URL,param1,"UTF-8");
+
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
                     }
 
                 });
