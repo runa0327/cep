@@ -10,7 +10,12 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -130,7 +135,84 @@ public class PmProjectProblemReqExt {
         int start = (param.pageIndex - 1) * param.pageSize;
         String limit = " limit " + start + "," + param.pageSize;
 
-        StringBuilder sb = new StringBuilder();
-        String sql = "select a.id as id,a.pm_prj_id as projectId,c.name as projectName,a.text_remark_one as problemDescribe,a.text_remark_two as solvePlan,a.prj_push_problem_type_id as projectPushProblemTypeId,e.name as projectPushProblemTypeName,a.status as statusId,b.start_user_id as userId,d.name as userName,b.start_dateTime as startTime,b.id as wfProcessInstanceId,b.current_view_id as viewId from pm_project_problem_req a LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id left join pm_prj c on a.pm_prj_id = c.id left join ad_user d on b.start_user_id = d.id left join gr_set_value e on a.prj_push_problem_type_id = e.id where a.status != 'VD' AND a.status != 'VDING' and b.status = 'ap'";
+        String sql1 = "select a.id as id,a.pm_prj_id as projectId,c.name as projectName,a.text_remark_one as problemDescribe,a.text_remark_two as solvePlan,a.prj_push_problem_type_id as projectPushProblemTypeId,e.name as projectPushProblemTypeName,a.status as statusId,b.start_user_id as userId,d.name as userName,b.start_dateTime as startTime,b.id as wfProcessInstanceId,b.current_view_id as viewId from pm_project_problem_req a LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id left join pm_prj c on a.pm_prj_id = c.id left join ad_user d on b.start_user_id = d.id left join gr_set_value e on a.prj_push_problem_type_id = e.id where a.status != 'VD' AND a.status != 'VDING' and b.status = 'ap'";
+        String sql2 = "select count(*) as num from pm_project_problem_req a LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id left join pm_prj c on a.pm_prj_id = c.id left join ad_user d on b.start_user_id = d.id left join gr_set_value e on a.prj_push_problem_type_id = e.id where a.status != 'VD' AND a.status != 'VDING' and b.status = 'ap'";
+        StringBuilder sb1 = new StringBuilder(sql1);
+        StringBuilder sb2 = new StringBuilder(sql2);
+        if (!SharedUtil.isEmptyString(param.getProjectId())){ // 项目id
+            sb1.append(" and a.pm_prj_id = '").append(param.getProjectId()).append("' ");
+            sb2.append(" and a.pm_prj_id = '").append(param.getProjectId()).append("' ");
+        }
+        if (!SharedUtil.isEmptyString(param.getProjectName())){ // 项目名称
+            sb1.append(" and c.name = '").append(param.getProjectName()).append("' ");
+            sb2.append(" and c.name = '").append(param.getProjectName()).append("' ");
+        }
+        if (!SharedUtil.isEmptyString(param.getUserId())) { // 发起人id
+            sb1.append(" and b.start_user_id = '").append(param.getUserName()).append("' ");
+            sb2.append(" and b.start_user_id = '").append(param.getUserName()).append("' ");
+        }
+        if (!SharedUtil.isEmptyString(param.getProjectPushProblemTypeId())){ // 项目推进问题类型id
+            sb1.append(" and a.prj_push_problem_type_id = '").append(param.getProjectPushProblemTypeId()).append("' ");
+            sb2.append(" and a.prj_push_problem_type_id = '").append(param.getProjectPushProblemTypeId()).append("' ");
+        }
+        if (!SharedUtil.isEmptyString(param.getStatusId())){ // 问题状态
+            if ("AP".equals(param.getStatusId())){
+                sb1.append(" and a.status = 'AP' ");
+                sb2.append(" and a.status = 'AP' ");
+            } else {
+                sb1.append(" and a.status in ('DR','APING','DN') ");
+                sb2.append(" and a.status in ('DR','APING','DN') ");
+            }
+        }
+        if (!SharedUtil.isEmptyString(param.getProblemDescribe())){ // 问题描述
+            sb1.append(" and a.text_remark_one like ('%").append(param.getProblemDescribe()).append("%')");
+            sb2.append(" and a.text_remark_one like ('%").append(param.getProblemDescribe()).append("%')");
+        }
+        if (!SharedUtil.isEmptyString(param.getStartTimeMin())){
+            sb1.append(" and b.start_dateTime >= '").append(param.getStartTimeMin()).append("' ");
+            sb2.append(" and b.start_dateTime >= '").append(param.getStartTimeMin()).append("' ");
+        }
+        if (!SharedUtil.isEmptyString(param.getStartTimeMax())){
+            sb1.append(" and b.start_dateTime <= '").append(param.getStartTimeMax()).append("' ");
+            sb2.append(" and b.start_dateTime <= '").append(param.getStartTimeMax()).append("' ");
+        }
+        String solveUserId = param.getSolveUserId();
+        if (!SharedUtil.isEmptyString(solveUserId)){
+            sb1.append(" and ( find_in_set('").append(solveUserId).append("',a.TO_USER_IDS) or find_in_set('").append(solveUserId).append("',a.USER_IDS) ) ");
+        }
+        sb1.append(" order by a.id desc ");
+        sb1.append(limit);
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb1.toString());
+        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sb2.toString());
+        if (!CollectionUtils.isEmpty(list1)){
+            Map<String,Object> resultMap = new HashMap<>();
+            List<PmProjectProblemReqView> pmProjectProblemReqViewList = new ArrayList<>();
+            list1.forEach(p->{
+                PmProjectProblemReqView pmProjectProblemReqView = new PmProjectProblemReqView();
+
+                pmProjectProblemReqView.setId(JdbcMapUtil.getString(p,"id"));
+                pmProjectProblemReqView.setProjectId(JdbcMapUtil.getString(p,"projectId"));
+                pmProjectProblemReqView.setProjectName(JdbcMapUtil.getString(p,"projectName"));
+                pmProjectProblemReqView.setProblemDescribe(JdbcMapUtil.getString(p,"problemDescribe"));
+                pmProjectProblemReqView.setSolvePlan(JdbcMapUtil.getString(p,"solvePlan"));
+                pmProjectProblemReqView.setProjectPushProblemTypeId(JdbcMapUtil.getString(p,"projectPushProblemTypeId"));
+                pmProjectProblemReqView.setProjectPushProblemTypeName(JdbcMapUtil.getString(p,"projectPushProblemTypeName"));
+                pmProjectProblemReqView.setStatusId(JdbcMapUtil.getString(p,"statusId"));
+                pmProjectProblemReqView.setUserId(JdbcMapUtil.getString(p,"userId"));
+                pmProjectProblemReqView.setUserName(JdbcMapUtil.getString(p,"userName"));
+                pmProjectProblemReqView.setStartTime(JdbcMapUtil.getString(p,"startTime"));
+                pmProjectProblemReqView.setWfProcessInstanceId(JdbcMapUtil.getString(p,"wfProcessInstanceId"));
+                pmProjectProblemReqView.setViewId(JdbcMapUtil.getString(p,"viewId"));
+
+                pmProjectProblemReqViewList.add(pmProjectProblemReqView);
+            });
+            resultMap.put("list",pmProjectProblemReqViewList);
+            resultMap.put("total",JdbcMapUtil.getString(list2.get(0),"num"));
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resultMap), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        } else {
+            ExtJarHelper.returnValue.set(null);
+        }
+
     }
 }
