@@ -38,7 +38,7 @@ public class MessageModel {
     /**
      * 消息体
      */
-    private String message;
+    private Object message;
 
 }
 
