@@ -68,7 +68,8 @@ public class WxSendMessageController {
         String ada = URLEncoder.encode(sb.toString(), "utf-8");
         cardInfo.setUrl(MessageFormat.format(url, ada));
 //        cardInfo.setUrl("https://open.weixin.qq.com/connect/oauth2/authorize?appid=ww808726c44a3ff6dc&redirect_uri=https%3A%2F%2Fcpms.yazhou-bay.com%2Fh5%2FunifiedLogin%3Fenv%3DZWWeiXin&response_type=code&scope=snsapi_userinfo&agentid=1000005&state=STATE#wechat_redirect");
-        messageModel.setObject(cardInfo);
+        String message = cardInfo.toString();
+        messageModel.setMessage(message);
         SendMessageAttribute attribute = new SendMessageAttribute();
         attribute.setAnEnum(MsgTypeEnum.getMsgTypeEnum(messageModel.getType()));
         WxSendMessageService sendMessageService = factory.getService(attribute);

@@ -52,8 +52,7 @@ public class ImageWxSendMessageService implements WxSendMessageService {
             object.put("totag", "");
             object.put("msgtype", messageModel.getType());
             object.put("agentid", gvConfig.getAgentId());
-            ImageInfo imageInfo = (ImageInfo) messageModel.getObject();
-            object.put("image", imageInfo);
+            object.put("image", messageModel.getMessage());
             Forest.post(gvConfig.getDomain() + "/message/send")
                     .setConnectTimeout(5000)
                     .setContentType("application/json")

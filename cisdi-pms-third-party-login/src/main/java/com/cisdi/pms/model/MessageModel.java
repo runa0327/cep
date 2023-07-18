@@ -38,7 +38,7 @@ public class MessageModel {
     /**
      * 消息体
      */
-    private Object object;
+    private String message;
 
     /**
      * 详情地址:list跳转列表也，

@@ -3,7 +3,6 @@ package com.cisdi.pms.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.pms.config.GovernmentWXConfig;
 import com.cisdi.pms.model.MessageModel;
-import com.cisdi.pms.model.TextCardInfo;
 import com.cisdi.pms.service.UnifiedLoginService;
 import com.cisdi.pms.service.WxSendMessageService;
 import com.dtflys.forest.Forest;
@@ -53,8 +52,7 @@ public class TextCardWxSendMessageService implements WxSendMessageService {
             object.put("totag", "");
             object.put("msgtype", messageModel.getType());
             object.put("agentid", gvConfig.getAgentId());
-            TextCardInfo cardInfo = (TextCardInfo) messageModel.getObject();
-            object.put("textcard", cardInfo);
+            object.put("textcard", messageModel.getMessage());
             Forest.post(gvConfig.getDomain() + "/message/send")
                     .setConnectTimeout(5000)
                     .setContentType("application/json")

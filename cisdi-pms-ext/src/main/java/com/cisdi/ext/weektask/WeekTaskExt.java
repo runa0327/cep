@@ -407,6 +407,8 @@ public class WeekTaskExt {
 
         public Node node;
 
+        public String instanceId;
+
         public List<AttData> attDataList;
 
     }
@@ -451,6 +453,8 @@ public class WeekTaskExt {
         public String days;
         //延期天数
         public String delayDays;
+        //审批状态
+        public String astStatus;
     }
 
     public static final String NOT_STARTED = "0099799190825106800";
@@ -619,16 +623,16 @@ public class WeekTaskExt {
      */
     public void weekTaskStandingBookTitle() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        Map<String, Integer> result = new HashMap<>();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_prj pm where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 and (pm.PROJECT_STATUS != '1661568714048413696' or pm.PROJECT_STATUS is null ) ");
-        result.put("项目总数", list.size());
+        TitleCount titleCount = new TitleCount();
+        titleCount.prjCount = list.size();
         List<Map<String, Object>> weekTaskList = myJdbcTemplate.queryForList("select * from week_task where status='ap'");
-        result.put("工作任务总数", weekTaskList.size());
-        result.put("工作任务已完成数", (int) weekTaskList.stream().filter(p -> TASK_COMPLETED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count());
-        result.put("工作任务未开始数", (int) weekTaskList.stream().filter(p -> TASK_NOT_STARTED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count());
-        result.put("工作任务进行中数", (int) weekTaskList.stream().filter(p -> TASK_IN_PROCESSING.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count());
-        result.put("工作任务超期未完成数", (int) weekTaskList.stream().filter(p -> TASK_OVERDUE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count());
-        result.put("工作任务超期已完成数", (int) weekTaskList.stream().filter(p -> {
+        titleCount.taskCount = weekTaskList.size();
+        titleCount.ywcCount = (int) weekTaskList.stream().filter(p -> TASK_COMPLETED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
+        titleCount.wksCount =(int) weekTaskList.stream().filter(p -> TASK_NOT_STARTED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
+        titleCount.jxzCount = (int) weekTaskList.stream().filter(p -> TASK_IN_PROCESSING.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
+        titleCount.cqwwcCount = (int) weekTaskList.stream().filter(p -> TASK_OVERDUE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
+        titleCount.cqywcCount = (int) weekTaskList.stream().filter(p -> {
             if (TASK_COMPLETED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))) {
                 if (JdbcMapUtil.getString(p, "PLAN_COMPL_DATE") != null && JdbcMapUtil.getString(p, "ACTUAL_COMPL_DATE") != null) {
                     Date plan = DateTimeUtil.stringToDate(JdbcMapUtil.getString(p, "PLAN_COMPL_DATE"));
@@ -639,9 +643,10 @@ public class WeekTaskExt {
                 }
             }
             return false;
-        }).count());
-        result.put("工作任务未涉及数", (int) weekTaskList.stream().filter(p -> TASK_NOT_INVOLVE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count());
-        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
+        }).count();
+
+        titleCount.wsjCount =  (int) weekTaskList.stream().filter(p -> TASK_NOT_INVOLVE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(titleCount), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
 
@@ -742,8 +747,9 @@ public class WeekTaskExt {
     public void delayApplyCheck() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pe.*,pm.`NAME` as projectName,pn.`NAME` as nodeName from PM_EXTENSION_REQUEST_REQ pe left join pm_prj pm on pm.id = pe.PM_PRJ_ID\n" +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pe.*,pm.`NAME` as projectName,pn.`NAME` as nodeName,wpi.id as instanceId from PM_EXTENSION_REQUEST_REQ pe left join pm_prj pm on pm.id = pe.PM_PRJ_ID\n" +
                 "left join pm_pro_plan_node pn on pe.PM_PRO_PLAN_NODE_ID = pn.id \n" +
+                "left join wf_process_instance wpi on wpi.ENTITY_RECORD_ID = pe.id "+
                 "where pe.id=? ", map.get("id"));
         Map<String, Object> processNameMap = myJdbcTemplate.queryForMap("select name from wf_process where id = '1649227469557063680'");
         ProcessData processData = new ProcessData();
@@ -765,6 +771,8 @@ public class WeekTaskExt {
                 processData.icon = JdbcMapUtil.getString(dataList.get(0), "EXTRA_INFO");
             }
             processData.title = JdbcMapUtil.getString(processNameMap, "name");
+
+            processData.instanceId = JdbcMapUtil.getString(pmData, "instanceId");
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(processData), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         } else {
@@ -776,10 +784,11 @@ public class WeekTaskExt {
     public List<DelayApplyHistory> getDelayApplyList(String id) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pe.*,ad.`NAME` as user_name,pnn.name as nodeName from PM_EXTENSION_REQUEST_REQ pe \n" +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pe.*,ad.`NAME` as user_name,pnn.name as nodeName,ast.name as astName from PM_EXTENSION_REQUEST_REQ pe \n" +
                 " left join pm_pro_plan_node pnn on pe.PM_PRO_PLAN_NODE_ID = pnn.id"+
                 " left join ad_user ad on pe.CRT_USER_ID = ad.id \n" +
                 " left join week_task wt on wt.RELATION_DATA_ID = pe.PM_PRO_PLAN_NODE_ID\n" +
+                " left join ad_status ast on pe.status = ast.id "+
                 " where wt.id = ?", id);
         AtomicInteger index = new AtomicInteger(1);
         return list.stream().map(p -> {
@@ -792,6 +801,7 @@ public class WeekTaskExt {
             history.applyTime = JdbcMapUtil.getString(p, "CRT_DT");
             history.nodeName = JdbcMapUtil.getString(p, "nodeName");
             history.days = JdbcMapUtil.getString(p, "DURATION_ONE");
+            history.astStatus = JdbcMapUtil.getString(p, "astName");
             return history;
         }).collect(Collectors.toList());
     }
@@ -813,7 +823,7 @@ public class WeekTaskExt {
         info.type = JdbcMapUtil.getString(dataMap, "type");
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from week_task where PM_PRJ_ID=?", dataMap.get("ID"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from week_task where status='ap' and PM_PRJ_ID=?", dataMap.get("ID"));
         info.total = list.size();
         info.notStart = (int) list.stream().filter(p -> TASK_NOT_STARTED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
         info.underway = (int) list.stream().filter(p -> TASK_IN_PROCESSING.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
@@ -899,5 +909,24 @@ public class WeekTaskExt {
         public Integer count;//延期申请说明
         public String projectId;
         public String projectName;
+    }
+
+    public static class TitleCount{
+        //项目数
+        public Integer prjCount;
+        //任务数
+        public Integer taskCount;
+        //未开始数
+        public Integer wksCount;
+        //进行中数
+        public Integer jxzCount;
+        //已完成数
+        public Integer ywcCount;
+        //超期未完成数
+        public Integer cqwwcCount;
+        //超期已完成
+        public Integer cqywcCount;
+        //未涉及
+        public Integer wsjCount;
     }
 }
