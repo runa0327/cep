@@ -460,4 +460,16 @@ public class PmPrjExt {
                     .exec();
         }
     }
+
+    /**
+     * 项目问题台账-项目下拉列表
+     */
+    public void getProjectProblemPrjList(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql = "select distinct a.pm_prj_id as prjId,b.name as prjName from PM_PROJECT_PROBLEM_REQ a left join pm_prj b on a.pm_prj_id = b.id where a.status != 'VD' order by a.pm_prj_id asc";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        Map<String, Object> result = new HashMap<>();
+        result.put("prjList",list);
+        ExtJarHelper.returnValue.set(result);
+    }
 }

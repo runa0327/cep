@@ -1,6 +1,5 @@
 package com.cisdi.ext.pm.office;
 
-import com.cisdi.ext.model.view.base.GrSetValueView;
 import com.cisdi.ext.model.view.process.PmProjectProblemReqView;
 import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.util.JsonUtil;
@@ -136,51 +135,41 @@ public class PmProjectProblemReqExt {
         String limit = " limit " + start + "," + param.pageSize;
 
         String sql1 = "select a.id as id,a.pm_prj_id as projectId,c.name as projectName,a.text_remark_one as problemDescribe,a.text_remark_two as solvePlan,a.prj_push_problem_type_id as projectPushProblemTypeId,e.name as projectPushProblemTypeName,a.status as statusId,b.start_user_id as userId,d.name as userName,b.start_dateTime as startTime,b.id as wfProcessInstanceId,b.current_view_id as viewId from pm_project_problem_req a LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id left join pm_prj c on a.pm_prj_id = c.id left join ad_user d on b.start_user_id = d.id left join gr_set_value e on a.prj_push_problem_type_id = e.id where a.status != 'VD' AND a.status != 'VDING' and b.status = 'ap'";
-        String sql2 = "select count(*) as num from pm_project_problem_req a LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id left join pm_prj c on a.pm_prj_id = c.id left join ad_user d on b.start_user_id = d.id left join gr_set_value e on a.prj_push_problem_type_id = e.id where a.status != 'VD' AND a.status != 'VDING' and b.status = 'ap'";
         StringBuilder sb1 = new StringBuilder(sql1);
-        StringBuilder sb2 = new StringBuilder(sql2);
         if (!SharedUtil.isEmptyString(param.getProjectId())){ // 项目id
             sb1.append(" and a.pm_prj_id = '").append(param.getProjectId()).append("' ");
-            sb2.append(" and a.pm_prj_id = '").append(param.getProjectId()).append("' ");
         }
         if (!SharedUtil.isEmptyString(param.getProjectName())){ // 项目名称
             sb1.append(" and c.name = '").append(param.getProjectName()).append("' ");
-            sb2.append(" and c.name = '").append(param.getProjectName()).append("' ");
         }
         if (!SharedUtil.isEmptyString(param.getUserId())) { // 发起人id
-            sb1.append(" and b.start_user_id = '").append(param.getUserName()).append("' ");
-            sb2.append(" and b.start_user_id = '").append(param.getUserName()).append("' ");
+            sb1.append(" and b.start_user_id = '").append(param.getUserId()).append("' ");
         }
         if (!SharedUtil.isEmptyString(param.getProjectPushProblemTypeId())){ // 项目推进问题类型id
             sb1.append(" and a.prj_push_problem_type_id = '").append(param.getProjectPushProblemTypeId()).append("' ");
-            sb2.append(" and a.prj_push_problem_type_id = '").append(param.getProjectPushProblemTypeId()).append("' ");
         }
         if (!SharedUtil.isEmptyString(param.getStatusId())){ // 问题状态
-            if ("AP".equals(param.getStatusId())){
+            if ("AP".equals(param.getStatusId()) || "ap".equals(param.getStatusId())){
                 sb1.append(" and a.status = 'AP' ");
-                sb2.append(" and a.status = 'AP' ");
             } else {
                 sb1.append(" and a.status in ('DR','APING','DN') ");
-                sb2.append(" and a.status in ('DR','APING','DN') ");
             }
         }
         if (!SharedUtil.isEmptyString(param.getProblemDescribe())){ // 问题描述
             sb1.append(" and a.text_remark_one like ('%").append(param.getProblemDescribe()).append("%')");
-            sb2.append(" and a.text_remark_one like ('%").append(param.getProblemDescribe()).append("%')");
         }
         if (!SharedUtil.isEmptyString(param.getStartTimeMin())){
             sb1.append(" and b.start_dateTime >= '").append(param.getStartTimeMin()).append("' ");
-            sb2.append(" and b.start_dateTime >= '").append(param.getStartTimeMin()).append("' ");
         }
         if (!SharedUtil.isEmptyString(param.getStartTimeMax())){
             sb1.append(" and b.start_dateTime <= '").append(param.getStartTimeMax()).append("' ");
-            sb2.append(" and b.start_dateTime <= '").append(param.getStartTimeMax()).append("' ");
         }
         String solveUserId = param.getSolveUserId();
         if (!SharedUtil.isEmptyString(solveUserId)){
             sb1.append(" and ( find_in_set('").append(solveUserId).append("',a.TO_USER_IDS) or find_in_set('").append(solveUserId).append("',a.USER_IDS) ) ");
         }
         sb1.append(" order by a.id desc ");
+        StringBuilder sb2 = sb1;
         sb1.append(limit);
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb1.toString());
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sb2.toString());
@@ -200,19 +189,40 @@ public class PmProjectProblemReqExt {
                 pmProjectProblemReqView.setStatusId(JdbcMapUtil.getString(p,"statusId"));
                 pmProjectProblemReqView.setUserId(JdbcMapUtil.getString(p,"userId"));
                 pmProjectProblemReqView.setUserName(JdbcMapUtil.getString(p,"userName"));
-                pmProjectProblemReqView.setStartTime(JdbcMapUtil.getString(p,"startTime"));
+                pmProjectProblemReqView.setStartTime(JdbcMapUtil.getString(p,"startTime").replace("T"," "));
                 pmProjectProblemReqView.setWfProcessInstanceId(JdbcMapUtil.getString(p,"wfProcessInstanceId"));
                 pmProjectProblemReqView.setViewId(JdbcMapUtil.getString(p,"viewId"));
 
                 pmProjectProblemReqViewList.add(pmProjectProblemReqView);
             });
+            Map<String,Integer> headerMap = getHeader(list2);
             resultMap.put("list",pmProjectProblemReqViewList);
-            resultMap.put("total",JdbcMapUtil.getString(list2.get(0),"num"));
+            resultMap.put("total",list2.size());
+            resultMap.put("header",headerMap);
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resultMap), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         } else {
             ExtJarHelper.returnValue.set(null);
         }
 
+    }
+
+    /**
+     * 汇总获取台账表头信息
+     * @param list 数据源
+     * @return 表头信息
+     */
+    private Map<String, Integer> getHeader(List<Map<String, Object>> list) {
+        Map<String,Integer> map = new HashMap<>();
+        if (!CollectionUtils.isEmpty(list)){
+            int allNum = list.size();
+            int endNum = (int) list.stream().filter(p -> "AP".equals(JdbcMapUtil.getString(p, "statusId"))).count();
+            int apingNum = allNum - endNum;
+
+            map.put("allNum",allNum);
+            map.put("endNum",endNum);
+            map.put("apingNum",apingNum);
+        }
+        return map;
     }
 }
