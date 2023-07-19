@@ -6,12 +6,12 @@ import com.cisdi.pms.job.domain.RemindLog;
 import com.cisdi.pms.job.domain.notice.MessageModel;
 import com.cisdi.pms.job.domain.notice.TextCardInfo;
 import com.cisdi.pms.job.enums.HttpEnum;
+import com.cisdi.pms.job.mapper.notice.BaseThirdInterfaceMapper;
 import com.cisdi.pms.job.service.notice.SmsWhiteListService;
 import com.cisdi.pms.job.utils.SendSmsParamsUtils;
 import com.cisdi.pms.job.utils.SendSmsUtils;
 import com.cisdi.pms.job.utils.StringUtil;
 import com.qygly.ext.rest.helper.feign.client.DataFeignClient;
-import com.sun.deploy.net.URLEncoder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +23,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -46,6 +47,9 @@ public class SendSmsJob {
 
     @Resource
     private SmsWhiteListService smsWhiteListService;
+
+    @Resource
+    private BaseThirdInterfaceMapper baseThirdInterfaceMapper;
 
     /**
      * 提醒真正用户。
@@ -187,6 +191,8 @@ public class SendSmsJob {
 
         // 微信通知白名单
          List<String> wxWhiteList = smsWhiteListService.getWxWhiteList();
+        // 是否进行企业微信消息推送
+        int sysTrue = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
 
         List<RemindLog> result = maps.stream()
                 .map(stringObjectMap -> {
@@ -203,6 +209,8 @@ public class SendSmsJob {
                 result.forEach(remindLog -> {
 
                     String userPhone = remindLog.getUserPhone();
+                    // 预防调试时误发正式环境相关人员，调试时统一往一个人身上发。！！！！！
+                    String phone = Boolean.TRUE.equals(remindRealUser) ? userPhone : "13072802651";
 
                     //【普通】
                     //【待办】
@@ -211,7 +219,7 @@ public class SendSmsJob {
 
                     // 参数封装
                     ArrayList<String> param = new ArrayList<>();
-                    String phone = Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "13072802651";
+
                     //手机号是否合法
                     if (StringUtil.isChinaPhoneLegal(phone)){
                         param.add(phone);
@@ -227,36 +235,8 @@ public class SendSmsJob {
                     }
 
                     // 查询是否进行微信消息通知
-                    List<Map<String,Object>> jobList = jdbcTemplate.queryForList("select * from BASE_JOB_CONFIG where STATUS = 'AP' AND CODE = 'taskSumNoticeUser'");
-                    if (!CollectionUtils.isEmpty(jobList)){
-                        String sysTrue = jobList.get(0).get("SYS_TRUE").toString(); //是否启用 0未启用1启用
-                        if ("1".equals(sysTrue)){
-                            // 微信白名单不进行发生
-                            if (!wxWhiteList.contains(userPhone)){
-                                try {
-                                    MessageModel messageModel = new MessageModel();
-                                    messageModel.setToUser(Arrays.asList(userPhone.split(",")));
-                                    messageModel.setType("textcard");
-                                    messageModel.setPathSuffix("list");
-                                    TextCardInfo cardInfo = new TextCardInfo();
-                                    cardInfo.setTitle("流程代办通知");
-                                    cardInfo.setDescription("[工程项目信息协同系统][流程待办]您好:有{"+remindLog.getCount()+"}条流程待办已到您处，请尽快处理");
-                                    StringBuilder sb = new StringBuilder("https://cpms.yazhou-bay.com/h5/unifiedLogin?env=ZWWeiXin");
-                                    sb.append("&path=").append(messageModel.getPathSuffix());
-                                    String ada = null;
-                                    ada = URLEncoder.encode(sb.toString(),"utf-8");
-                                    cardInfo.setUrl(MessageFormat.format(HttpEnum.WX_SEND_MESSAGE_URL, ada));
-                                    messageModel.setMessage(cardInfo);
-
-                                    String param1 = JSON.toJSONString(messageModel);
-                                    //调用接口
-                                    HttpClient.doPost(HttpEnum.QYQLY_WX_SEND_MESSAGE_URL,param1,"UTF-8");
-
-                                } catch (UnsupportedEncodingException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
+                    if (sysTrue == 1){
+                        sendMessageToWX(phone,wxWhiteList,remindLog);
                     }
 
                 });
@@ -277,6 +257,44 @@ public class SendSmsJob {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * 发送消息至企业微信
+     * @param userPhone 用户code
+     * @param wxWhiteList 白名单
+     * @param remindLog 单条记录信息
+     */
+    private void sendMessageToWX(String userPhone, List<String> wxWhiteList, RemindLog remindLog) {
+        if (StringUtil.isChinaPhoneLegal(userPhone)){
+            // 微信白名单不进行发生
+            if (!wxWhiteList.contains(userPhone)){
+                try {
+                    MessageModel messageModel = new MessageModel();
+                    messageModel.setToUser(Arrays.asList(userPhone.split(",")));
+                    messageModel.setType("textcard");
+                    messageModel.setPathSuffix("list");
+                    TextCardInfo cardInfo = new TextCardInfo();
+                    cardInfo.setTitle("流程代办通知");
+                    cardInfo.setDescription("[工程项目信息协同系统][流程待办]您好:有{"+remindLog.getCount()+"}条流程待办已到您处，请尽快处理");
+                    StringBuilder sb = new StringBuilder("https://cpms.yazhou-bay.com/h5/unifiedLogin?env=ZWWeiXin");
+                    sb.append("&path=").append(messageModel.getPathSuffix());
+                    String ada = null;
+                    ada = URLEncoder.encode(sb.toString(),"utf-8");
+                    cardInfo.setUrl(MessageFormat.format(HttpEnum.WX_SEND_MESSAGE_URL, ada));
+                    messageModel.setMessage(cardInfo);
+
+                    String param1 = JSON.toJSONString(messageModel);
+                    //调用接口
+                    HttpClient.doPost(HttpEnum.QYQLY_WX_SEND_MESSAGE_URL,param1,"UTF-8");
+
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+        }else {
+            log.error(userPhone + "手机号不合法");
         }
     }
 
