@@ -5,9 +5,11 @@ import com.cisdi.pms.job.commons.HttpClient;
 import com.cisdi.pms.job.domain.RemindLog;
 import com.cisdi.pms.job.domain.notice.MessageModel;
 import com.cisdi.pms.job.domain.notice.TextCardInfo;
+import com.cisdi.pms.job.domain.process.WfProcessInstance;
 import com.cisdi.pms.job.enums.HttpEnum;
 import com.cisdi.pms.job.mapper.notice.BaseThirdInterfaceMapper;
 import com.cisdi.pms.job.service.notice.SmsWhiteListService;
+import com.cisdi.pms.job.service.process.WfProcessInstanceService;
 import com.cisdi.pms.job.utils.SendSmsParamsUtils;
 import com.cisdi.pms.job.utils.SendSmsUtils;
 import com.cisdi.pms.job.utils.StringUtil;
@@ -51,6 +53,9 @@ public class SendSmsJob {
     @Resource
     private BaseThirdInterfaceMapper baseThirdInterfaceMapper;
 
+    @Resource
+    private WfProcessInstanceService wfProcessInstanceService;
+
     /**
      * 提醒真正用户。
      */
@@ -83,8 +88,11 @@ public class SendSmsJob {
         // 2.该定时任务是9点发送次数，
         // limit 1 测试
 //        String selectSql = "SELECT a.userId,a.userPhone , a.taskName ,a.taskId, a.`WF_TASK_TYPE_ID` taskType FROM ( SELECT t.AD_USER_ID userId, t.id taskId, pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT , t.`WF_TASK_TYPE_ID` FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0 and t.STATUS = 'AP' AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND pi.IS_URGENT = '1' AND t.AD_USER_ID not in (select AD_USER_ID from sms_white_list)) a limit 1";
-        String selectSql = "SELECT a.userId,a.userPhone , a.taskName ,a.taskId, a.`WF_TASK_TYPE_ID` taskType FROM ( SELECT t.AD_USER_ID userId, t.id taskId, pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT , t.`WF_TASK_TYPE_ID` FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0 and t.STATUS = 'AP' AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND pi.IS_URGENT = '1' AND t.AD_USER_ID not in (select AD_USER_ID from sms_white_list)) a";
-        List<Map<String, Object>> maps = jdbcTemplate.queryForList(selectSql);
+        // 2023-07-19 注释
+//        String selectSql = "SELECT a.userId,a.userPhone , a.taskName ,a.taskId, a.`WF_TASK_TYPE_ID` taskType FROM ( SELECT t.AD_USER_ID userId, t.id taskId, pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT , t.`WF_TASK_TYPE_ID` FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0 and t.STATUS = 'AP' AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND pi.IS_URGENT = '1' AND t.AD_USER_ID not in (select AD_USER_ID from sms_white_list)) a";
+//        List<Map<String, Object>> maps = jdbcTemplate.queryForList(selectSql);
+
+        List<WfProcessInstance> maps = wfProcessInstanceService.getAllUrgeList();
 
         if (CollectionUtils.isEmpty(maps)) {
             return;
@@ -93,17 +101,23 @@ public class SendSmsJob {
         List<RemindLog> result = maps.stream()
                 .map(stringObjectMap -> {
                     RemindLog remindLog = new RemindLog();
-                    remindLog.setUserId(stringObjectMap.get("userId").toString());
-                    remindLog.setTaskId(stringObjectMap.get("taskId").toString());
-                    remindLog.setUserPhone(stringObjectMap.get("userPhone").toString());
-                    remindLog.setTaskName(stringObjectMap.get("taskName").toString());
-                    remindLog.setTaskType(stringObjectMap.get("taskType").toString());
+                    remindLog.setUserId(stringObjectMap.getUserId());
+                    remindLog.setTaskId(stringObjectMap.getTaskId());
+                    remindLog.setUserPhone(stringObjectMap.getUserCode());
+                    remindLog.setTaskName(stringObjectMap.getWfProcessInstanceName());
+                    remindLog.setTaskType(stringObjectMap.getTaskType());
                     return remindLog;
                 }).collect(Collectors.toList());
 
+        // 查询是否进行微信消息通知
+        int sysTrue = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
+        List<String> wxWhiteList = new ArrayList<>();
+        if (sysTrue == 1){
+            wxWhiteList = smsWhiteListService.getWxWhiteList();
+        }
+
         try {
             result.forEach(remindLog -> {
-
                 // 2、定时每分钟一次【紧急】
                 //[工程项目信息协同系统][流程待办]您好“{1}”已到您处，请尽快处理。--1644089
                 //[工程项目信息协同系统][流程通知]您好“{1}”已到您处，请登陆系统查看。--1644090
@@ -116,6 +130,9 @@ public class SendSmsJob {
 
                 // 发送短信
                 this.sendSms(templateId, param);
+
+                // 发送企业微信
+                sendMessage();
 
                 log.info("日志发送，接收人电话号码：{}", remindLog.getUserPhone());
                 // 记录日志
@@ -136,6 +153,39 @@ public class SendSmsJob {
                 }
             }
         }
+    }
+
+    /**
+     * 发送企业微信消息
+     */
+    private void sendMessage() {
+    }
+
+    /**
+     * 封装调用接口需要的参数
+     * @param tmp 流程代办信息
+     * @return 封装结果
+     */
+    private MessageModel getMessageModel(WfProcessInstance tmp,String message) throws Exception{
+        MessageModel messageModel = new MessageModel();
+        messageModel.setToUser(Arrays.asList(tmp.getUserCode().split(",")));
+        messageModel.setType("textcard");
+        messageModel.setPathSuffix("detail");
+        TextCardInfo cardInfo = new TextCardInfo();
+        cardInfo.setTitle("流程代办通知");
+        cardInfo.setDescription(message);
+        StringBuilder sb = new StringBuilder("https://cpms.yazhou-bay.com/h5/unifiedLogin?env=ZWWeiXin");
+        sb.append("&path=").append(messageModel.getPathSuffix());
+        sb.append("&viewId=").append(tmp.getViewId());
+        sb.append("&processId=").append(tmp.getProcessId());
+        sb.append("&processName=").append(tmp.getProcessName());
+        sb.append("&entityRecordId=").append(tmp.getEntityRecordId());
+        sb.append("&wfProcessInstanceId=").append(tmp.getWfProcessInstanceId());
+        String ada = null;
+        ada = URLEncoder.encode(sb.toString(),"utf-8");
+        cardInfo.setUrl(MessageFormat.format(HttpEnum.WX_SEND_MESSAGE_URL, ada));
+        messageModel.setMessage(cardInfo);
+        return messageModel;
     }
 
 

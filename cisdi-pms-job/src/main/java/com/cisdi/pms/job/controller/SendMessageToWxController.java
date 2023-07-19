@@ -5,9 +5,11 @@ import com.cisdi.pms.job.commons.HttpClient;
 import com.cisdi.pms.job.domain.RemindLog;
 import com.cisdi.pms.job.domain.notice.MessageModel;
 import com.cisdi.pms.job.domain.notice.TextCardInfo;
+import com.cisdi.pms.job.domain.process.WfProcessInstance;
 import com.cisdi.pms.job.enums.HttpEnum;
 import com.cisdi.pms.job.mapper.notice.BaseThirdInterfaceMapper;
 import com.cisdi.pms.job.service.notice.SmsWhiteListService;
+import com.cisdi.pms.job.service.process.WfProcessInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
@@ -36,6 +38,9 @@ public class SendMessageToWxController {
 
     @Resource
     private BaseThirdInterfaceMapper baseThirdInterfaceMapper;
+
+    @Resource
+    private WfProcessInstanceService wfProcessInstanceService;
 
     @GetMapping(value = "/sendWXMessage")
     public void sendWXMessage(){
@@ -88,5 +93,67 @@ public class SendMessageToWxController {
             });
 
         }
+    }
+
+    /**
+     * 企业微信消息发送-单条紧急信息
+     */
+    @GetMapping(value = "/sendUrgeMessageToWX")
+    public void sendUrgeMessageToWX() throws Exception{
+        List<WfProcessInstance> list = wfProcessInstanceService.getAllUrgeList();
+        if (!CollectionUtils.isEmpty(list)){
+            // 查询是否进行微信消息通知
+            int sysTrue = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
+//            int sysTrue = 1;
+            if (sysTrue == 1){
+                // 微信通知白名单
+                List<String> wxWhiteList = smsWhiteListService.getWxWhiteList();
+                for (WfProcessInstance tmp : list) {
+                    String type = tmp.getTaskType();
+                    StringBuilder sb = new StringBuilder();
+                    if ("NOTI".equals(type)){ // 通知
+                        sb.append("[工程项目信息协同系统][流程通知]您好 ");
+                        sb.append(tmp.getWfProcessInstanceName()).append("”已到您处，请登陆系统查看");
+                    } else {
+                        sb.append("[工程项目信息协同系统][流程待办]您好 ");
+                        sb.append(tmp.getWfProcessInstanceName()).append("”已到您处，请尽快处理");
+                    }
+                    MessageModel messageModel = getMessageModel(tmp,sb.toString());
+                    String param1 = JSON.toJSONString(messageModel);
+                    //调用接口
+                    HttpClient.doPost(HttpEnum.QYQLY_WX_SEND_MESSAGE_URL,param1,"UTF-8");
+
+                }
+            }
+        }
+
+    }
+
+    /**
+     * 封装调用接口需要的参数
+     * @param tmp 流程代办信息
+     * @return 封装结果
+     */
+    private MessageModel getMessageModel(WfProcessInstance tmp,String message) throws Exception{
+        MessageModel messageModel = new MessageModel();
+        messageModel.setToUser(Arrays.asList(tmp.getUserCode().split(",")));
+        messageModel.setType("textcard");
+        messageModel.setPathSuffix("detail");
+        TextCardInfo cardInfo = new TextCardInfo();
+        cardInfo.setTitle("流程代办通知");
+        cardInfo.setDescription(message);
+        StringBuilder sb = new StringBuilder("https://cpms.yazhou-bay.com/h5/unifiedLogin?env=ZWWeiXin");
+        sb.append("&path=").append(messageModel.getPathSuffix());
+        sb.append("&viewId=").append(tmp.getViewId());
+        sb.append("&processId=").append(tmp.getProcessId());
+        sb.append("&processName=").append(tmp.getProcessName());
+        sb.append("&entityRecordId=").append(tmp.getEntityRecordId());
+        sb.append("&wfProcessInstanceId=").append(tmp.getWfProcessInstanceId());
+        System.out.println(sb.toString());
+        String ada = null;
+        ada = URLEncoder.encode(sb.toString(),"utf-8");
+        cardInfo.setUrl(MessageFormat.format(HttpEnum.WX_SEND_MESSAGE_URL, ada));
+        messageModel.setMessage(cardInfo);
+        return messageModel;
     }
 }
