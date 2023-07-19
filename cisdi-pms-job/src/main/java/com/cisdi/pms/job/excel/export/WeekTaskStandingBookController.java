@@ -1,7 +1,6 @@
 package com.cisdi.pms.job.excel.export;
 
 import com.google.common.base.Strings;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +32,6 @@ public class WeekTaskStandingBookController {
     public static final String TASK_NOT_INVOLVE = "1644140265205915648";
     public static final String TASK_OVERDUE = "1644140821106384896";
 
-    @SneakyThrows(IOException.class)
     @GetMapping("export")
     public void exportExcel(String projectId, String taskName, String userName, String status, HttpServletResponse response) {
         StringBuilder sb = new StringBuilder();
