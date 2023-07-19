@@ -134,7 +134,7 @@ public class PmProjectProblemReqExt {
         int start = (param.pageIndex - 1) * param.pageSize;
         String limit = " limit " + start + "," + param.pageSize;
 
-        String sql1 = "select a.id as id,a.pm_prj_id as projectId,c.name as projectName,a.text_remark_one as problemDescribe,a.text_remark_two as solvePlan,a.prj_push_problem_type_id as projectPushProblemTypeId,e.name as projectPushProblemTypeName,a.status as statusId,b.start_user_id as userId,d.name as userName,b.start_dateTime as startTime,b.id as wfProcessInstanceId,b.current_view_id as viewId from pm_project_problem_req a LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id left join pm_prj c on a.pm_prj_id = c.id left join ad_user d on b.start_user_id = d.id left join gr_set_value e on a.prj_push_problem_type_id = e.id where a.status != 'VD' AND a.status != 'VDING' and b.status = 'ap'";
+        String sql1 = "select f.EXTRA_INFO as icon,f.name as processName,a.id as id,a.pm_prj_id as projectId,c.name as projectName,a.text_remark_one as problemDescribe,a.text_remark_two as solvePlan,a.prj_push_problem_type_id as projectPushProblemTypeId,e.name as projectPushProblemTypeName,a.status as statusId,b.start_user_id as userId,d.name as userName,b.start_dateTime as startTime,b.id as wfProcessInstanceId,b.current_view_id as viewId from pm_project_problem_req a LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id left join pm_prj c on a.pm_prj_id = c.id left join ad_user d on b.start_user_id = d.id left join gr_set_value e on a.prj_push_problem_type_id = e.id left join wf_process f on b.wf_process_id = f.id where a.status != 'VD' AND a.status != 'VDING' and b.status = 'ap'";
         StringBuilder sb1 = new StringBuilder(sql1);
         if (!SharedUtil.isEmptyString(param.getProjectId())){ // 项目id
             sb1.append(" and a.pm_prj_id = '").append(param.getProjectId()).append("' ");
@@ -192,6 +192,8 @@ public class PmProjectProblemReqExt {
                 pmProjectProblemReqView.setStartTime(JdbcMapUtil.getString(p,"startTime").replace("T"," "));
                 pmProjectProblemReqView.setWfProcessInstanceId(JdbcMapUtil.getString(p,"wfProcessInstanceId"));
                 pmProjectProblemReqView.setViewId(JdbcMapUtil.getString(p,"viewId"));
+                pmProjectProblemReqView.setProcessName(JdbcMapUtil.getString(p,"processName"));
+                pmProjectProblemReqView.setIcon(JdbcMapUtil.getString(p,"icon"));
 
                 pmProjectProblemReqViewList.add(pmProjectProblemReqView);
             });

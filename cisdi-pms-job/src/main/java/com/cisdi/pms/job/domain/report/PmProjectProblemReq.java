@@ -1,8 +1,6 @@
-package com.cisdi.ext.model.view.process;
+package com.cisdi.pms.job.domain.report;
 
-import com.cisdi.ext.model.BasePageEntity;
-
-public class PmProjectProblemReqView extends BasePageEntity {
+public class PmProjectProblemReq {
 
     // id
     private String id;
@@ -53,12 +51,6 @@ public class PmProjectProblemReqView extends BasePageEntity {
 
     // 视图id
     private String viewId;
-
-    // 流程图标
-    private String icon;
-
-    // 流程名称
-    private String processName;
 
     public String getId() {
         return id;
@@ -202,21 +194,5 @@ public class PmProjectProblemReqView extends BasePageEntity {
 
     public void setSolveUserName(String solveUserName) {
         this.solveUserName = solveUserName;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
-    public String getProcessName() {
-        return processName;
-    }
-
-    public void setProcessName(String processName) {
-        this.processName = processName;
     }
 }

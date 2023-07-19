@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.report.PmProjectProblemReqMapper">
+    <resultMap id="PmProjectProblemReqResult" type="com.cisdi.pms.job.domain.report.PmProjectProblemReq">
+        <id property="id" column="id" />
+        <result property="problemDescribe" column="problemDescribe" />
+        <result property="solvePlan" column="solvePlan" />
+        <result property="projectName" column="projectName" />
+        <result property="projectId" column="projectId" />
+        <result property="projectPushProblemTypeId" column="projectPushProblemTypeId" />
+        <result property="projectPushProblemTypeName" column="projectPushProblemTypeName" />
+        <result property="statusId" column="statusId" />
+        <result property="statusName" column="statusName" />
+        <result property="userId" column="userId" />
+        <result property="userName" column="userName" />
+        <result property="solveUserId" column="solveUserId" />
+        <result property="solveUserName" column="solveUserName" />
+        <result property="startTime" column="startTime" />
+        <result property="startTimeMin" column="startTimeMin" />
+        <result property="startTimeMax" column="startTimeMax" />
+        <result property="wfProcessInstanceId" column="wfProcessInstanceId" />
+        <result property="viewId" column="viewId" />
+    </resultMap>
+
+    <!--查询所有信息-->
+    <select id="getAllList" resultMap="PmProjectProblemReqResult">
+        SELECT
+            a.id AS id,
+            a.pm_prj_id AS projectId,
+            c.NAME AS projectName,
+            a.text_remark_one AS problemDescribe,
+            a.text_remark_two AS solvePlan,
+            a.prj_push_problem_type_id AS projectPushProblemTypeId,
+            e.NAME AS projectPushProblemTypeName,
+            a.STATUS AS statusId,
+            b.start_user_id AS userId,
+            d.NAME AS userName,
+            b.start_dateTime AS startTime,
+            b.id AS wfProcessInstanceId,
+            b.current_view_id AS viewId
+        FROM
+            pm_project_problem_req a
+        LEFT JOIN wf_process_instance b ON a.LK_WF_INST_ID = b.id
+        LEFT JOIN pm_prj c ON a.pm_prj_id = c.id
+        LEFT JOIN ad_user d ON b.start_user_id = d.id
+        LEFT JOIN gr_set_value e ON a.prj_push_problem_type_id = e.id
+        WHERE
+            a.STATUS != 'VD'
+	        AND a.STATUS != 'VDING'
+	        AND b.STATUS = 'ap'
+        <if test="projectId != null and projectId != ''">
+            and a.pm_prj_id = #{projectId}
+        </if>
+        <if test="userId != null and userId != ''">
+            and b.start_user_id = #{userId}
+        </if>
+        <if test="projectPushProblemTypeId != null and projectPushProblemTypeId != ''">
+            and a.prj_push_problem_type_id = #{projectPushProblemTypeId}
+        </if>
+        <if test="statusId != null and statusId != ''">
+            <choose>
+                <when test="statusId == 'AP'">
+                    and a.status = #{statusId}
+                </when>
+                <otherwise>
+                    and a.status in ('DR','APING','DN')
+                </otherwise>
+            </choose>
+        </if>
+        <if test="problemDescribe != null and problemDescribe != ''">
+            and a.text_remark_one = #{problemDescribe}
+        </if>
+        <if test="solveUserId != null and solveUserId != ''">
+            and (find_in_set(#{solveUserId,a.TO_USER_IDS}) or find_in_set(#{USER_IDS}))
+        </if>
+        <if test="startTimeMin != null and startTimeMin != ''">
+            and b.start_dateTime >= #{startTimeMin}
+        </if>
+        <if test="startTimeMax != null and startTimeMax != ''">
+            <![CDATA[ and b.start_dateTime <= #{startTimeMax} ]]>
+        </if>
+        order by a.id desc
+    </select>
+</mapper>
