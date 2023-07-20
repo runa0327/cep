@@ -11,4 +11,10 @@ public interface WfProcessInstanceWXMapper {
      * @return 查询结果
      */
     List<WfProcessInstanceWX> getAllUrgeList();
+
+    /**
+     * 查询待发送政务微信的紧急消息代办
+     * @return 查询结果
+     */
+    List<WfProcessInstanceWX> getAllWaitUrgeList();
 }

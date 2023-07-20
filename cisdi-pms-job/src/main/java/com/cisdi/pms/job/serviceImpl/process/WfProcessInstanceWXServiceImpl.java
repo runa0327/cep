@@ -22,4 +22,13 @@ public class WfProcessInstanceWXServiceImpl implements WfProcessInstanceWXServic
     public List<WfProcessInstanceWX> getAllUrgeList() {
         return wfProcessInstanceWXMapper.getAllUrgeList();
     }
+
+    /**
+     * 查询待发送政务微信的紧急消息代办
+     * @return 查询结果
+     */
+    @Override
+    public List<WfProcessInstanceWX> getAllWaitUrgeList() {
+        return wfProcessInstanceWXMapper.getAllWaitUrgeList();
+    }
 }

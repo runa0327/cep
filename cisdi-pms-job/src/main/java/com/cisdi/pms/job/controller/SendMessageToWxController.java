@@ -9,6 +9,7 @@ import com.cisdi.pms.job.domain.notice.TextCardInfo;
 import com.cisdi.pms.job.domain.process.WfProcessInstanceWX;
 import com.cisdi.pms.job.enums.HttpEnum;
 import com.cisdi.pms.job.mapper.notice.BaseThirdInterfaceMapper;
+import com.cisdi.pms.job.service.base.AdRemindLogService;
 import com.cisdi.pms.job.service.notice.SmsWhiteListService;
 import com.cisdi.pms.job.service.process.WfProcessInstanceWXService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,9 @@ public class SendMessageToWxController {
 
     @Resource
     private WfProcessInstanceWXService wfProcessInstanceWXService;
+
+    @Resource
+    private AdRemindLogService adRemindLogService;
 
     @GetMapping(value = "/sendWXMessage")
     public void sendWXMessage(){
@@ -108,23 +112,19 @@ public class SendMessageToWxController {
             BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUserUrgent");
 //            int sysTrue = 1;
             if (baseThirdInterface.getSysTrue() == 1){
+//            if (sysTrue == 1){
                 // 微信通知白名单
                 List<String> wxWhiteList = smsWhiteListService.getWxWhiteList();
                 for (WfProcessInstanceWX tmp : list) {
-                    String type = tmp.getTaskType();
-                    StringBuilder sb = new StringBuilder();
-                    if ("NOTI".equals(type)){ // 通知
-                        sb.append("[工程项目信息协同系统][流程通知]您好 ");
-                        sb.append(tmp.getWfProcessInstanceName()).append("”已到您处，请登陆系统查看");
-                    } else {
-                        sb.append("[工程项目信息协同系统][流程待办]您好 ");
-                        sb.append(tmp.getWfProcessInstanceName()).append("”已到您处，请尽快处理");
-                    }
+                    StringBuilder sb = new StringBuilder("[工程项目信息协同系统][流程待办]您好 ");
+                    sb.append(tmp.getWfProcessInstanceName()).append("”已到您处，请尽快处理");
+                    String txt = sb.toString();
                     MessageModel messageModel = getMessageModel(tmp,sb.toString());
                     String param1 = JSON.toJSONString(messageModel);
                     //调用接口
                     HttpClient.doPost(HttpEnum.QYQLY_WX_SEND_MESSAGE_URL,param1,"UTF-8");
-
+                    // 插入日志表
+                    adRemindLogService.insertLog(txt,"1681918685046108160",tmp);
                 }
             }
         }
