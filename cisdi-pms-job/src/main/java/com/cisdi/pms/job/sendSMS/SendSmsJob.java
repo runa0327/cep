@@ -9,6 +9,7 @@ import com.cisdi.pms.job.domain.notice.TextCardInfo;
 import com.cisdi.pms.job.domain.process.WfProcessInstanceWX;
 import com.cisdi.pms.job.enums.HttpEnum;
 import com.cisdi.pms.job.mapper.notice.BaseThirdInterfaceMapper;
+import com.cisdi.pms.job.service.base.AdRemindLogService;
 import com.cisdi.pms.job.service.notice.SmsWhiteListService;
 import com.cisdi.pms.job.service.process.WfProcessInstanceWXService;
 import com.cisdi.pms.job.utils.SendSmsParamsUtils;
@@ -57,6 +58,9 @@ public class SendSmsJob {
     @Resource
     private WfProcessInstanceWXService wfProcessInstanceWXService;
 
+    @Resource
+    private AdRemindLogService adRemindLogService;
+
     /**
      * 提醒真正用户。
      */
@@ -67,11 +71,10 @@ public class SendSmsJob {
     private boolean smsSwitch;
 
     /**
-     * 发送紧急消息
+     * 发送紧急消息-2分钟一次
      * 随时发送
      */
     @Scheduled(cron = "0 1/2 * * * ?")
-//    @Scheduled(fixedDelayString = "60000")
     public void sendSmsForUrgent() {
         // 开关短信功能
         if (!smsSwitch) {
@@ -93,6 +96,7 @@ public class SendSmsJob {
 //        String selectSql = "SELECT a.userId,a.userPhone , a.taskName ,a.taskId, a.`WF_TASK_TYPE_ID` taskType FROM ( SELECT t.AD_USER_ID userId, t.id taskId, pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT , t.`WF_TASK_TYPE_ID` FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0 and t.STATUS = 'AP' AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND pi.IS_URGENT = '1' AND t.AD_USER_ID not in (select AD_USER_ID from sms_white_list)) a";
 //        List<Map<String, Object>> maps = jdbcTemplate.queryForList(selectSql);
 
+        // 查询待发送消息的紧急待办
         List<WfProcessInstanceWX> maps = wfProcessInstanceWXService.getAllUrgeList();
 
         if (CollectionUtils.isEmpty(maps)) {
@@ -117,14 +121,14 @@ public class SendSmsJob {
                 }).collect(Collectors.toList());
 
         // 查询是否进行微信消息通知
-        BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUserUrgent");
-        List<String> wxWhiteList = new ArrayList<>();
-        if (baseThirdInterface.getSysTrue() == 1){
-            wxWhiteList = smsWhiteListService.getWxWhiteList();
-        }
+//        BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUserUrgent");
+//        List<String> wxWhiteList = new ArrayList<>();
+//        if (baseThirdInterface.getSysTrue() == 1){
+//            wxWhiteList = smsWhiteListService.getWxWhiteList();
+//        }
 
         try {
-            List<String> finalWxWhiteList = wxWhiteList;
+//            List<String> finalWxWhiteList = wxWhiteList;
             result.forEach(remindLog -> {
                 // 2、定时每分钟一次【紧急】
                 //[工程项目信息协同系统][流程待办]您好“{1}”已到您处，请尽快处理。--1644089
@@ -139,12 +143,12 @@ public class SendSmsJob {
                 // 发送短信
                 this.sendSms(templateId, param);
 
-                // 发送企业微信
-                try {
-                    this.sendMessage(finalWxWhiteList,remindLog,baseThirdInterface.getHostAdder());
-                } catch (Exception e) {
-                    log.error("紧急消息发送企业微信失败，任务id为："+remindLog.getTaskId());
-                }
+                // 发送企业微信 单独列出成一个定时任务
+//                try {
+//                    this.sendMessage(finalWxWhiteList,remindLog,baseThirdInterface.getHostAdder());
+//                } catch (Exception e) {
+//                    log.error("紧急消息发送企业微信失败，任务id为："+remindLog.getTaskId());
+//                }
 
                 log.info("日志发送，接收人电话号码：{}", remindLog.getUserPhone());
                 // 记录日志
@@ -196,6 +200,24 @@ public class SendSmsJob {
     }
 
     /**
+     * 发送企业微信消息
+     */
+    private void sendUrgentToWX(List<String> finalWxWhiteList, WfProcessInstanceWX remindLog, String hostAdder,String message) throws Exception{
+        String userPhone = remindLog.getUserCode();
+        userPhone = Boolean.TRUE.equals(remindRealUser) ? userPhone : "13072802651";
+        if (!CollectionUtils.isEmpty(finalWxWhiteList)){
+            if (finalWxWhiteList.contains(userPhone)){
+                return;
+            }
+        }
+        MessageModel messageModel = getMessageModel(remindLog,message);
+        String param1 = JSON.toJSONString(messageModel);
+        //调用接口
+        HttpClient.doPost(hostAdder,param1,"UTF-8");
+
+    }
+
+    /**
      * 封装调用接口需要的参数
      * @param tmp 流程待办信息
      * @return 封装结果
@@ -224,6 +246,34 @@ public class SendSmsJob {
         return messageModel;
     }
 
+    /**
+     * 封装调用接口需要的参数
+     * @param tmp 流程待办信息
+     * @return 封装结果
+     */
+    private MessageModel getMessageModel(WfProcessInstanceWX tmp, String message) throws Exception{
+        String userPhone = tmp.getUserCode();
+        userPhone = Boolean.TRUE.equals(remindRealUser) ? userPhone : "13072802651";
+        MessageModel messageModel = new MessageModel();
+        messageModel.setToUser(Arrays.asList(userPhone.split(",")));
+        messageModel.setType("textcard");
+        messageModel.setPathSuffix("detail");
+        TextCardInfo cardInfo = new TextCardInfo();
+        cardInfo.setTitle("流程待办通知");
+        cardInfo.setDescription(message);
+        StringBuilder sb = new StringBuilder("https://cpms.yazhou-bay.com/h5/unifiedLogin?env=ZWWeiXin");
+        sb.append("&path=").append(messageModel.getPathSuffix());
+        sb.append("&viewId=").append(tmp.getViewId());
+        sb.append("&processId=").append(tmp.getProcessId());
+        sb.append("&processName=").append(tmp.getProcessName());
+        sb.append("&entityRecordId=").append(tmp.getEntityRecordId());
+        sb.append("&wfProcessInstanceId=").append(tmp.getWfProcessInstanceId());
+        String ada = URLEncoder.encode(sb.toString(),"utf-8");
+        cardInfo.setUrl(MessageFormat.format(HttpEnum.WX_SEND_MESSAGE_URL, ada));
+        messageModel.setMessage(cardInfo);
+        return messageModel;
+    }
+
 
     /**
      * 普通短信 汇总短信
@@ -231,7 +281,6 @@ public class SendSmsJob {
      */
     // TODO 2023-01-17 暂时注释掉
      @Scheduled(cron = "${cisdi-pms-job.sms-timing}")
-//    @Scheduled(fixedDelayString = "100000000")
     public void sendSmsForNineAlone() {
         // 开关短信功能
         if (!smsSwitch) {
@@ -387,99 +436,6 @@ public class SendSmsJob {
         }
     }
 
-    /**
-     * 每天9点发送统一短信
-     * 明天早上9点发送 noti 取消
-     */
-//    @Scheduled(cron = "30 45 18 ? * *")
-    //@Scheduled(fixedDelayString = "5000")
-//    @Scheduled(cron = "${cisdi-pms-job.sms-timing}")
-//    public void sendSmsForNineAll() {
-//        //开关短信功能
-//        if (!smsSwitch) {
-//            return;
-//        }
-//
-//        //获取当前时间
-//        Date date = new Date();
-//        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-//        String nowTime = format.format(date);
-//        //查询当前时间的开关数据
-//        String switchSql = "select SMS_STATUS from sms_time where date = ?";
-//        Map<String, Object> mapSwitch = jdbcTemplate.queryForMap(switchSql, nowTime);
-//        //根据表中数据判断是否   1:发送消息    0：不发送消息
-//        if (mapSwitch.get("SMS_STATUS").equals("0")) {
-//            return;
-//        }
-//
-//        //锁表  防止多台服务器同时修改
-//        String lockSql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code='WF_TASK_REMIND_LOCK' and (t.LOCK_EXT_DTTM_ATT01_VAL is null or t.LOCK_EXT_DTTM_ATT01_VAL <= ADDDATE(NOW(),INTERVAL -10 minute))";
-//        int lock = jdbcTemplate.update(lockSql);
-//
-//        //1.每天早上9点统计每个人没有处理的待办事项TODO  WF_URGENCY_ID 紧急程度不用关心
-//        //2.该定时任务是9点发送次数，
-//        //limit 1 测试
-////        String selectSql = "SELECT a.userPhone,a.userId , COUNT(a.userPhone) num FROM ( SELECT pi.NAME taskName,u.id userId,  u.CODE userPhone ,pi.IS_URGENT FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0  AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND t.`WF_TASK_TYPE_ID` = 'NOTI' AND pi.IS_URGENT = '0') a GROUP BY userPhone,userId limit 1";
-//        String selectSql = "SELECT a.userPhone,a.userId , COUNT(a.userPhone) num FROM ( SELECT pi.NAME taskName,u.id userId,  u.CODE userPhone ,pi.IS_URGENT FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0  AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND t.`WF_TASK_TYPE_ID` = 'NOTI' AND pi.IS_URGENT = '0') a GROUP BY userPhone,userId";
-//        List<Map<String, Object>> maps = jdbcTemplate.queryForList(selectSql);
-//
-//        if (CollectionUtils.isEmpty(maps)) {
-//            return;
-//        }
-//
-//        //13976720905   吴坤苗  此用户许需要发送短信
-//        List<RemindLog> result = maps.stream()
-//                .filter(map -> !map.get("userPhone").equals("13976720905") && !map.get("userPhone").equals("17721054782"))
-//                .map(stringObjectMap -> {
-//                    RemindLog remindLog = new RemindLog();
-//                    remindLog.setUserPhone(stringObjectMap.get("userPhone").toString());
-//                    remindLog.setUserId(stringObjectMap.get("userId").toString());
-//                    remindLog.setTaskId(stringObjectMap.get("userId").toString());//因为提醒的是任务个数，所有用userId
-//                    remindLog.setCount(stringObjectMap.get("num").toString());
-//                    remindLog.setRemark("NOTI");
-//                    return remindLog;
-//                }).collect(Collectors.toList());
-//
-//        try {
-//            if (lock > 0) {
-//                result.forEach(remindLog -> {
-//
-//                    //    【普通】
-//                    //    【通知】
-//                    //    [工程项目信息协同系统][流程通知]您有{1}条流程通知，请登录系统查看。--1644086
-//                    String templateId = "1644086";
-//
-//                    //参数封装
-//                    ArrayList<String> param = new ArrayList<>();
-//                    param.add(Boolean.TRUE.equals(remindRealUser) ? remindLog.getUserPhone() : "13696079131");
-//                    param.add(remindLog.getCount());
-//
-//                    // 发送短信
-//                    this.sendSms(templateId, param);
-//
-//                    logger.info("日志发送，接收人电话号码：{}", remindLog.getUserPhone());
-//                    // 记录日志
-//                    this.insertRemindLog(remindLog,true);
-//
-//                });
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            //加锁成功后才会释放锁
-//            if (lock > 0) {
-//                //循环10次，放置修改失败
-//                for (int i = 0; i < 10; i++) {
-//                    String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code=?";
-//                    int up = jdbcTemplate.update(sql, "WF_TASK_REMIND_LOCK");
-//                    //如果修改成功，直接跳出循环
-//                    if (up > 0) {
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//    }
     private void sendSms(String templateId, ArrayList<String> param) {
         // 封装参数
         byte[] parmas = new SendSmsParamsUtils().getOneParam(param, templateId);
@@ -538,6 +494,72 @@ public class SendSmsJob {
         String updateSql = "INSERT INTO ad_remind_log ( ID, VER, TS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, STATUS, CODE, AD_ENT_ID, ENT_CODE, ENTITY_RECORD_ID, REMIND_USER_ID, REMIND_METHOD, REMIND_TARGET, REMIND_TIME, REMIND_TEXT) VALUES (UUID_SHORT(),'1', now() , now() ,?,now(),?, 'AP' , 'WF_TASK_REMIND_LOCK' ,?, 'WF_TASK',?,?,'SMS',?,now(),?)";
         jdbcTemplate.update(updateSql, remindLog.getUserId(), remindLog.getUserId(), entId, remindLog.getTaskId(), remindLog.getUserId(), remindLog.getUserPhone(), remindText);
 
+    }
+
+    /**
+     * 紧急消息通过政务微信进行通知
+     */
+    @Scheduled(cron = "0 1/2 * * * ?")
+    public void sendUrgentMessageToZWWX(){
+        // 开关消息推送
+        if (smsSwitch) {
+
+            boolean lock = getLock();
+            if (lock){
+                // 查询是否进行微信消息通知
+                BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUserUrgent");
+                if (baseThirdInterface.getSysTrue() == 1){
+                    // 政务微信通知白名单
+                    List<String> wxWhiteList = smsWhiteListService.getWxWhiteList();
+                    // 查询待发送的紧急消息代办
+                    List<WfProcessInstanceWX> maps = wfProcessInstanceWXService.getAllWaitUrgeList();
+                    String txt = "";
+                    try {
+                        for (WfProcessInstanceWX tmp : maps) {
+                            try {
+                                StringBuilder sb = new StringBuilder("[工程项目信息协同系统][流程待办]您好 ");
+                                sb.append(tmp.getWfProcessInstanceName()).append("”已到您处，请尽快处理");
+                                txt = sb.toString();
+                                sendUrgentToWX(wxWhiteList,tmp,baseThirdInterface.getHostAdder(),txt);
+                            } catch (Exception e){
+                                txt = "任务id为'"+tmp.getTaskId()+"'的紧急待办任务发送微信消息失败";
+                            }
+                            // 插入日志表
+                            adRemindLogService.insertLog(txt,"1681918685046108160",tmp);
+                        }
+                    } catch (Exception e) {
+                        log.error("发送短信出错！", e);
+                    } finally {
+                        // 加锁成功后才会释放锁
+                        // 循环10次，放置修改失败
+                        for (int i = 0; i < 10; i++) {
+                            String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=null where t.code=?";
+                            int affectedRows = jdbcTemplate.update(sql, "WF_TASK_REMIND_LOCK");
+                            // 如果修改成功，直接跳出循环
+                            if (affectedRows > 0) {
+                                break;
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    /**
+     * 加锁
+     * @return 成功或失败
+     */
+    private boolean getLock() {
+        // 锁表  防止多台服务器同时修改
+        String lockSql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=now() where t.code='WF_TASK_REMIND_LOCK' and (t.LOCK_EXT_DTTM_ATT01_VAL is null or t.LOCK_EXT_DTTM_ATT01_VAL <= ADDDATE(NOW(),INTERVAL -10 minute))";
+        int lock = jdbcTemplate.update(lockSql);
+        if (lock == 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

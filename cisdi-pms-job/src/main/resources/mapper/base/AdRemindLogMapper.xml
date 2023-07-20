@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.base.AdRemindLogMapper">
+    <resultMap id="AdRemindLogResult" type="com.cisdi.pms.job.domain.base.AdRemindLog">
+        <id property="id" column="id" />
+        <result property="adEntId" column="adEntId" />
+        <result property="entCode" column="entCode" />
+        <result property="entityRecordId" column="entityRecordId" />
+        <result property="remindUserId" column="remindUserId" />
+        <result property="remindMethod" column="remindMethod" />
+        <result property="remindTarget" column="remindTarget" />
+        <result property="remindTime" column="remindTime" />
+        <result property="messageNotifyLogType" column="messageNotifyLogType" />
+        <result property="ver" column="ver" />
+        <result property="ts" column="ts" />
+        <result property="createBy" column="createBy" />
+        <result property="createDate" column="createDate" />
+        <result property="lastUpdateBy" column="lastUpdateBy" />
+        <result property="lastUpdateDate" column="lastUpdateDate" />
+        <result property="status" column="status" />
+    </resultMap>
+
+    <!--新增数据-->
+    <insert id="insert" parameterType="com.cisdi.pms.job.domain.base.AdRemindLog">
+        insert into ad_remind_log (
+            ID,
+            VER,
+            TS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            STATUS,
+            CODE,
+            AD_ENT_ID,
+            ENT_CODE,
+            ENTITY_RECORD_ID,
+            REMIND_USER_ID,
+            REMIND_METHOD,
+            REMIND_TARGET,
+            REMIND_TIME,
+            REMIND_TEXT,
+            MESSAGE_NOTIFY_LOG_TYPE_ID
+        ) values (
+            #{id},
+            #{ver},
+            #{ts},
+            #{createDate},
+            #{createBy},
+            #{lastUpdateDate},
+            #{lastUpdateBy},
+            #{status},
+            #{code},
+            #{adEntId},
+            #{entCode},
+            #{entityRecordId},
+            #{remindUserId},
+            #{remindMethod},
+            #{remindTarget},
+            #{remindTime},
+            #{remindText},
+            #{messageNotifyLogType}
+        )
+    </insert>
+</mapper>
