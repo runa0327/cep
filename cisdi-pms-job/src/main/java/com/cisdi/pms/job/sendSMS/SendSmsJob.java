@@ -177,7 +177,7 @@ public class SendSmsJob {
 //                sb.append("[工程项目信息协同系统][流程通知]您好 ");
 //                sb.append(remindLog.getWfProcessInstanceName()).append("”已到您处，请登陆系统查看");
 //            }
-            if ("TODO".equals(type)){ // 紧急代办
+            if ("TODO".equals(type)){ // 紧急待办
                 sb.append("[工程项目信息协同系统][流程待办]您好 ");
                 sb.append(remindLog.getWfProcessInstanceName()).append("”已到您处，请尽快处理");
             }
@@ -190,7 +190,7 @@ public class SendSmsJob {
 
     /**
      * 封装调用接口需要的参数
-     * @param tmp 流程代办信息
+     * @param tmp 流程待办信息
      * @return 封装结果
      */
     private MessageModel getMessageModel(RemindLog tmp, String message) throws Exception{
@@ -201,7 +201,7 @@ public class SendSmsJob {
         messageModel.setType("textcard");
         messageModel.setPathSuffix("detail");
         TextCardInfo cardInfo = new TextCardInfo();
-        cardInfo.setTitle("流程代办通知");
+        cardInfo.setTitle("流程待办通知");
         cardInfo.setDescription(message);
         StringBuilder sb = new StringBuilder("https://cpms.yazhou-bay.com/h5/unifiedLogin?env=ZWWeiXin");
         sb.append("&path=").append(messageModel.getPathSuffix());
@@ -220,7 +220,7 @@ public class SendSmsJob {
 
     /**
      * 普通短信 汇总短信
-     * 早上九点发送 代办
+     * 早上九点发送 待办
      */
     // TODO 2023-01-17 暂时注释掉
      @Scheduled(cron = "${cisdi-pms-job.sms-timing}")
@@ -355,8 +355,8 @@ public class SendSmsJob {
                     messageModel.setType("textcard");
                     messageModel.setPathSuffix("list");
                     TextCardInfo cardInfo = new TextCardInfo();
-                    cardInfo.setTitle("流程代办通知");
-                    cardInfo.setDescription("[工程项目信息协同系统][流程待办]您好:有{"+remindLog.getCount()+"}条流程待办已到您处，请尽快处理");
+                    cardInfo.setTitle("流程待办通知");
+                    cardInfo.setDescription("[工程项目信息协同系统][流程待办]您好:有"+remindLog.getCount()+"条流程待办已到您处，请尽快处理");
                     StringBuilder sb = new StringBuilder("https://cpms.yazhou-bay.com/h5/unifiedLogin?env=ZWWeiXin");
                     sb.append("&path=").append(messageModel.getPathSuffix());
                     String ada = null;
