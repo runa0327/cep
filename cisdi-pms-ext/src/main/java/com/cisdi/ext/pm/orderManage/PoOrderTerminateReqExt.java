@@ -2,8 +2,8 @@ package com.cisdi.ext.pm.orderManage;
 
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.model.PoOrderTerminateReq;
-import com.cisdi.ext.pm.ProcessCommon;
-import com.cisdi.ext.pm.ProcessRoleExt;
+import com.cisdi.ext.pm.processCommon.ProcessCommon;
+import com.cisdi.ext.pm.processCommon.ProcessRoleExt;
 import com.cisdi.ext.pm.orderManage.detail.PoOrderTerminateDetailExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.wf.WfExt;

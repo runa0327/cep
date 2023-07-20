@@ -1,10 +1,11 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.processCommon;
 
 import cn.hutool.core.util.IdUtil;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.*;
 import com.cisdi.ext.model.base.AdRoleUser;
 import com.cisdi.ext.model.base.BaseMatterTypeCon;
+import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -220,6 +221,29 @@ public class ProcessCommon {
         }
         return newComment;
     }
+
+    /**
+     * 流程审批-意见回显-获取最终回显文件信息
+     * @param userId 用户id
+     * @param processFile 流程表单中文件
+     * @param file 本次操作点击上传文件
+     * @param myJdbcTemplate 数据源
+     * @param specialCode 特殊情况代码
+     * @return 最终需要回显的文件id
+     */
+    public static String getEndCommentFile(String userId, String processFile, String file, MyJdbcTemplate myJdbcTemplate, String specialCode) {
+        String endFile = "";
+        String nodeInstanceId = ExtJarHelper.nodeInstId.get();
+        if (SharedUtil.isEmptyString(processFile)){
+            endFile = file;
+        } else {
+            if ("one".equals(specialCode)) { // 项目问题文件意见回显
+                endFile = getNewFile(userId,nodeInstanceId,processFile,file,myJdbcTemplate);
+            }
+        }
+        return endFile;
+    }
+
 
     /**
      * 根据项目id查询该类型流程是否已发起-仅支持项目字段是 PM_PRJ_ID 的流程

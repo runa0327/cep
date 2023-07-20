@@ -1,4 +1,4 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.processCommon;
 
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.base.PmProcessPostConExt;
@@ -6,6 +6,7 @@ import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.base.AdRoleUser;
+import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.pm.office.PmPostAppointExt;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -630,6 +631,13 @@ public class ProcessRoleExt {
      */
     public void getUserIds(){
         getDeptUser("USER_IDS","userIds","人员多选");
+    }
+
+    /**
+     * 查询任意流程- TO_USER_IDS 所选人员
+     */
+    public void getToUserIds(){
+        getDeptUser("TO_USER_IDS","userIds","人员多选");
     }
 
     /**

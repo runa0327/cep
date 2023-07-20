@@ -117,7 +117,7 @@ public class GuaranteeExportController extends BaseController {
             String projectNameWr = guaranteeModel.getProjectNameWr();
             Date guaranteeEndDate = guaranteeModel.getGuaranteeEndDate();
             Date guaranteeStartDate = guaranteeModel.getGuaranteeStartDate();
-            String param = " where 1=1 AND r.STATUS IN = 'AP' ";
+            String param = " where 1=1 AND r.STATUS = 'AP' ";
             String temp = " ";
             if (!StringUtils.isEmpty(guaranteeLetterTypeId)) {
                 temp += " and GUARANTEE_LETTER_TYPE_ID= '" + guaranteeLetterTypeId + "'";
