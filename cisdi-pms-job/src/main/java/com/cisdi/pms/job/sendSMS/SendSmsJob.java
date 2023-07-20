@@ -5,11 +5,11 @@ import com.cisdi.pms.job.commons.HttpClient;
 import com.cisdi.pms.job.domain.RemindLog;
 import com.cisdi.pms.job.domain.notice.MessageModel;
 import com.cisdi.pms.job.domain.notice.TextCardInfo;
-import com.cisdi.pms.job.domain.process.WfProcessInstance;
+import com.cisdi.pms.job.domain.process.WfProcessInstanceWX;
 import com.cisdi.pms.job.enums.HttpEnum;
 import com.cisdi.pms.job.mapper.notice.BaseThirdInterfaceMapper;
 import com.cisdi.pms.job.service.notice.SmsWhiteListService;
-import com.cisdi.pms.job.service.process.WfProcessInstanceService;
+import com.cisdi.pms.job.service.process.WfProcessInstanceWXService;
 import com.cisdi.pms.job.utils.SendSmsParamsUtils;
 import com.cisdi.pms.job.utils.SendSmsUtils;
 import com.cisdi.pms.job.utils.StringUtil;
@@ -54,7 +54,7 @@ public class SendSmsJob {
     private BaseThirdInterfaceMapper baseThirdInterfaceMapper;
 
     @Resource
-    private WfProcessInstanceService wfProcessInstanceService;
+    private WfProcessInstanceWXService wfProcessInstanceWXService;
 
     /**
      * 提醒真正用户。
@@ -92,7 +92,7 @@ public class SendSmsJob {
 //        String selectSql = "SELECT a.userId,a.userPhone , a.taskName ,a.taskId, a.`WF_TASK_TYPE_ID` taskType FROM ( SELECT t.AD_USER_ID userId, t.id taskId, pi.NAME taskName,  u.CODE userPhone ,pi.IS_URGENT , t.`WF_TASK_TYPE_ID` FROM wf_task t JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id JOIN wf_node n ON ni.WF_NODE_ID = n.id JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id JOIN ad_user u ON t.AD_USER_ID = u.id WHERE t.IS_CLOSED = 0 and t.STATUS = 'AP' AND NOT EXISTS ( SELECT 1  FROM ad_remind_log l  WHERE l.ent_code = 'WF_TASK'  AND l.ENTITY_RECORD_ID = t.id) AND pi.IS_URGENT = '1' AND t.AD_USER_ID not in (select AD_USER_ID from sms_white_list)) a";
 //        List<Map<String, Object>> maps = jdbcTemplate.queryForList(selectSql);
 
-        List<WfProcessInstance> maps = wfProcessInstanceService.getAllUrgeList();
+        List<WfProcessInstanceWX> maps = wfProcessInstanceWXService.getAllUrgeList();
 
         if (CollectionUtils.isEmpty(maps)) {
             return;
@@ -166,7 +166,7 @@ public class SendSmsJob {
      * @param tmp 流程代办信息
      * @return 封装结果
      */
-    private MessageModel getMessageModel(WfProcessInstance tmp,String message) throws Exception{
+    private MessageModel getMessageModel(WfProcessInstanceWX tmp, String message) throws Exception{
         MessageModel messageModel = new MessageModel();
         messageModel.setToUser(Arrays.asList(tmp.getUserCode().split(",")));
         messageModel.setType("textcard");

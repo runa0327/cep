@@ -5,11 +5,11 @@ import com.cisdi.pms.job.commons.HttpClient;
 import com.cisdi.pms.job.domain.RemindLog;
 import com.cisdi.pms.job.domain.notice.MessageModel;
 import com.cisdi.pms.job.domain.notice.TextCardInfo;
-import com.cisdi.pms.job.domain.process.WfProcessInstance;
+import com.cisdi.pms.job.domain.process.WfProcessInstanceWX;
 import com.cisdi.pms.job.enums.HttpEnum;
 import com.cisdi.pms.job.mapper.notice.BaseThirdInterfaceMapper;
 import com.cisdi.pms.job.service.notice.SmsWhiteListService;
-import com.cisdi.pms.job.service.process.WfProcessInstanceService;
+import com.cisdi.pms.job.service.process.WfProcessInstanceWXService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
@@ -40,7 +40,7 @@ public class SendMessageToWxController {
     private BaseThirdInterfaceMapper baseThirdInterfaceMapper;
 
     @Resource
-    private WfProcessInstanceService wfProcessInstanceService;
+    private WfProcessInstanceWXService wfProcessInstanceWXService;
 
     @GetMapping(value = "/sendWXMessage")
     public void sendWXMessage(){
@@ -100,7 +100,7 @@ public class SendMessageToWxController {
      */
     @GetMapping(value = "/sendUrgeMessageToWX")
     public void sendUrgeMessageToWX() throws Exception{
-        List<WfProcessInstance> list = wfProcessInstanceService.getAllUrgeList();
+        List<WfProcessInstanceWX> list = wfProcessInstanceWXService.getAllUrgeList();
         if (!CollectionUtils.isEmpty(list)){
             // 查询是否进行微信消息通知
             int sysTrue = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
@@ -108,7 +108,7 @@ public class SendMessageToWxController {
             if (sysTrue == 1){
                 // 微信通知白名单
                 List<String> wxWhiteList = smsWhiteListService.getWxWhiteList();
-                for (WfProcessInstance tmp : list) {
+                for (WfProcessInstanceWX tmp : list) {
                     String type = tmp.getTaskType();
                     StringBuilder sb = new StringBuilder();
                     if ("NOTI".equals(type)){ // 通知
@@ -134,7 +134,7 @@ public class SendMessageToWxController {
      * @param tmp 流程代办信息
      * @return 封装结果
      */
-    private MessageModel getMessageModel(WfProcessInstance tmp,String message) throws Exception{
+    private MessageModel getMessageModel(WfProcessInstanceWX tmp, String message) throws Exception{
         MessageModel messageModel = new MessageModel();
         messageModel.setToUser(Arrays.asList(tmp.getUserCode().split(",")));
         messageModel.setType("textcard");

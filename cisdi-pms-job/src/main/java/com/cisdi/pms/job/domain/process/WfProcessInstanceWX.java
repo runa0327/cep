@@ -1,6 +1,6 @@
 package com.cisdi.pms.job.domain.process;
 
-public class WfProcessInstance {
+public class WfProcessInstanceWX {
 
     // id
     public String id;
