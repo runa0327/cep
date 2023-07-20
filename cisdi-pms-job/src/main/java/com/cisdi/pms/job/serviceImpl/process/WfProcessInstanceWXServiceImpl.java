@@ -31,4 +31,13 @@ public class WfProcessInstanceWXServiceImpl implements WfProcessInstanceWXServic
     public List<WfProcessInstanceWX> getAllWaitUrgeList() {
         return wfProcessInstanceWXMapper.getAllWaitUrgeList();
     }
+
+    /**
+     * 查询人员所有未处理代办
+     * @return 查询结果
+     */
+    @Override
+    public List<WfProcessInstanceWX> getUserAllTaskCount() {
+        return wfProcessInstanceWXMapper.getUserAllTaskCount();
+    }
 }

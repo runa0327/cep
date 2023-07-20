@@ -14,7 +14,13 @@ public interface WfProcessInstanceWXService {
 
     /**
      * 查询待发送政务微信的紧急消息代办
-     * @return
+     * @return 查询结果
      */
     List<WfProcessInstanceWX> getAllWaitUrgeList();
+
+    /**
+     * 查询人员所有未处理代办
+     * @return 查询结果
+     */
+    List<WfProcessInstanceWX> getUserAllTaskCount();
 }

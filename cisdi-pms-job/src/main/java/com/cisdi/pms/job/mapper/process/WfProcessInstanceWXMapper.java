@@ -17,4 +17,10 @@ public interface WfProcessInstanceWXMapper {
      * @return 查询结果
      */
     List<WfProcessInstanceWX> getAllWaitUrgeList();
+
+    /**
+     * 查询人员所有未处理代办
+     * @return 查询结果
+     */
+    List<WfProcessInstanceWX> getUserAllTaskCount();
 }
