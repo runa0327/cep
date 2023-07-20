@@ -106,17 +106,24 @@ public class SendSmsJob {
                     remindLog.setUserPhone(stringObjectMap.getUserCode());
                     remindLog.setTaskName(stringObjectMap.getWfProcessInstanceName());
                     remindLog.setTaskType(stringObjectMap.getTaskType());
+                    remindLog.setWfProcessInstanceName(stringObjectMap.getWfProcessInstanceName());
+                    remindLog.setViewId(stringObjectMap.getViewId());
+                    remindLog.setProcessId(stringObjectMap.getProcessId());
+                    remindLog.setProcessName(stringObjectMap.getProcessName());
+                    remindLog.setEntityRecordId(stringObjectMap.getEntityRecordId());
+                    remindLog.setWfProcessInstanceId(stringObjectMap.getWfProcessInstanceId());
                     return remindLog;
                 }).collect(Collectors.toList());
 
         // 查询是否进行微信消息通知
-        int sysTrue = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
+        int sysTrue = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUserUrgent");
         List<String> wxWhiteList = new ArrayList<>();
         if (sysTrue == 1){
             wxWhiteList = smsWhiteListService.getWxWhiteList();
         }
 
         try {
+            List<String> finalWxWhiteList = wxWhiteList;
             result.forEach(remindLog -> {
                 // 2、定时每分钟一次【紧急】
                 //[工程项目信息协同系统][流程待办]您好“{1}”已到您处，请尽快处理。--1644089
@@ -132,7 +139,11 @@ public class SendSmsJob {
                 this.sendSms(templateId, param);
 
                 // 发送企业微信
-                sendMessage();
+                try {
+                    this.sendMessage(finalWxWhiteList,remindLog);
+                } catch (Exception e) {
+                    log.error("紧急消息发送企业微信失败，任务id为："+remindLog.getTaskId());
+                }
 
                 log.info("日志发送，接收人电话号码：{}", remindLog.getUserPhone());
                 // 记录日志
@@ -158,7 +169,23 @@ public class SendSmsJob {
     /**
      * 发送企业微信消息
      */
-    private void sendMessage() {
+    private void sendMessage(List<String> finalWxWhiteList, RemindLog remindLog) throws Exception{
+        if (!CollectionUtils.isEmpty(finalWxWhiteList)){
+            String type = remindLog.getTaskType();
+            StringBuilder sb = new StringBuilder();
+//            if ("NOTI".equals(type)){ // 通知-不进行通知
+//                sb.append("[工程项目信息协同系统][流程通知]您好 ");
+//                sb.append(remindLog.getWfProcessInstanceName()).append("”已到您处，请登陆系统查看");
+//            }
+            if ("TODO".equals(type)){ // 紧急代办
+                sb.append("[工程项目信息协同系统][流程待办]您好 ");
+                sb.append(remindLog.getWfProcessInstanceName()).append("”已到您处，请尽快处理");
+            }
+            MessageModel messageModel = getMessageModel(remindLog,sb.toString());
+            String param1 = JSON.toJSONString(messageModel);
+            //调用接口
+            HttpClient.doPost(HttpEnum.QYQLY_WX_SEND_MESSAGE_URL,param1,"UTF-8");
+        }
     }
 
     /**
@@ -166,9 +193,11 @@ public class SendSmsJob {
      * @param tmp 流程代办信息
      * @return 封装结果
      */
-    private MessageModel getMessageModel(WfProcessInstanceWX tmp, String message) throws Exception{
+    private MessageModel getMessageModel(RemindLog tmp, String message) throws Exception{
+        String userPhone = tmp.getUserPhone();
+        userPhone = Boolean.TRUE.equals(remindRealUser) ? userPhone : "13072802651";
         MessageModel messageModel = new MessageModel();
-        messageModel.setToUser(Arrays.asList(tmp.getUserCode().split(",")));
+        messageModel.setToUser(Arrays.asList(userPhone.split(",")));
         messageModel.setType("textcard");
         messageModel.setPathSuffix("detail");
         TextCardInfo cardInfo = new TextCardInfo();

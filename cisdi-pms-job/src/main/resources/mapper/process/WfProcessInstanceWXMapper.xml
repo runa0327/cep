@@ -21,7 +21,7 @@
     <select id="getAllUrgeList" resultMap="WfProcessInstanceResult">
         SELECT
             t.AD_USER_ID as userId,
-            t.id as wfProcessInstanceId,
+            pi.id as wfProcessInstanceId,
             pi.NAME as  wfProcessInstanceName,
             u.CODE as  userCode,
             pi.IS_URGENT,
@@ -44,6 +44,6 @@
             AND NOT EXISTS ( SELECT 1 FROM ad_remind_log l WHERE l.ent_code = 'WF_TASK' AND l.ENTITY_RECORD_ID = t.id )
             AND pi.IS_URGENT = '1'
             AND t.AD_USER_ID NOT IN ( SELECT AD_USER_ID FROM sms_white_list )
-
+<!--            AND t.AD_USER_ID = '1655396520176074752'-->
     </select>
 </mapper>

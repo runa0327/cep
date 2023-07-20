@@ -7,6 +7,6 @@
 
     <!--根据第三方接口编码查询接口是否启用-->
     <select id="getSysTrue" resultType="int">
-        select SYS_TRUE from BASE_THIRD_INTERFACE where STATUS = 'AP' AND CODE = #{interfaceCode}
+        select ifnull(max(SYS_TRUE),0) from BASE_THIRD_INTERFACE where STATUS = 'AP' AND CODE = #{interfaceCode}
     </select>
 </mapper>

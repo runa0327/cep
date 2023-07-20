@@ -63,6 +63,7 @@ public class SendMessageToWxController {
                 String userPhone = remindLog.getUserPhone();
                 // 查询是否进行微信消息通知
                 int sysTrue = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
+//                int sysTrue = 1;
                 if (sysTrue == 1){
                     // 微信白名单不进行发生
                     if (!wxWhiteList.contains(userPhone)){
@@ -103,7 +104,7 @@ public class SendMessageToWxController {
         List<WfProcessInstanceWX> list = wfProcessInstanceWXService.getAllUrgeList();
         if (!CollectionUtils.isEmpty(list)){
             // 查询是否进行微信消息通知
-            int sysTrue = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
+            int sysTrue = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUserUrgent");
 //            int sysTrue = 1;
             if (sysTrue == 1){
                 // 微信通知白名单
