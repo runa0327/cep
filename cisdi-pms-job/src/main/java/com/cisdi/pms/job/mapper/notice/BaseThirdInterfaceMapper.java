@@ -1,5 +1,7 @@
 package com.cisdi.pms.job.mapper.notice;
 
+import com.cisdi.pms.job.domain.notice.BaseThirdInterface;
+
 public interface BaseThirdInterfaceMapper {
 
     /**
@@ -7,5 +9,5 @@ public interface BaseThirdInterfaceMapper {
      * @param interfaceCode 接口编码
      * @return 是否启用
      */
-    int getSysTrue(String interfaceCode);
+    BaseThirdInterface getSysTrue(String interfaceCode);
 }
