@@ -15,7 +15,7 @@
     <select id="getSysTrue" resultMap="BaseThirdInterfaceResult">
         select
             ifnull(max(SYS_TRUE),0) as sysTrue,
-            HOST_ADDR as hostAdder
+            any_value(HOST_ADDR) as hostAdder
         from
             BASE_THIRD_INTERFACE
         where

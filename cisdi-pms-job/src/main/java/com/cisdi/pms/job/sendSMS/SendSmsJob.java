@@ -146,7 +146,6 @@ public class SendSmsJob {
                     log.error("紧急消息发送企业微信失败，任务id为："+remindLog.getTaskId());
                 }
 
-                log.info("日志发送，接收人电话号码：{}", remindLog.getUserPhone());
                 // 记录日志
                 this.insertRemindLog(remindLog, false);
 

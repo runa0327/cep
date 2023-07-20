@@ -3,6 +3,7 @@ package com.cisdi.pms.job.controller;
 import com.alibaba.fastjson.JSON;
 import com.cisdi.pms.job.commons.HttpClient;
 import com.cisdi.pms.job.domain.RemindLog;
+import com.cisdi.pms.job.domain.notice.BaseThirdInterface;
 import com.cisdi.pms.job.domain.notice.MessageModel;
 import com.cisdi.pms.job.domain.notice.TextCardInfo;
 import com.cisdi.pms.job.domain.process.WfProcessInstanceWX;
@@ -62,9 +63,9 @@ public class SendMessageToWxController {
             result.forEach(remindLog -> {
                 String userPhone = remindLog.getUserPhone();
                 // 查询是否进行微信消息通知
-                int sysTrue = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
+                BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
 //                int sysTrue = 1;
-                if (sysTrue == 1){
+                if (baseThirdInterface.getSysTrue() == 1){
                     // 微信白名单不进行发生
                     if (!wxWhiteList.contains(userPhone)){
                         try {
@@ -104,9 +105,9 @@ public class SendMessageToWxController {
         List<WfProcessInstanceWX> list = wfProcessInstanceWXService.getAllUrgeList();
         if (!CollectionUtils.isEmpty(list)){
             // 查询是否进行微信消息通知
-            int sysTrue = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUserUrgent");
+            BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUserUrgent");
 //            int sysTrue = 1;
-            if (sysTrue == 1){
+            if (baseThirdInterface.getSysTrue() == 1){
                 // 微信通知白名单
                 List<String> wxWhiteList = smsWhiteListService.getWxWhiteList();
                 for (WfProcessInstanceWX tmp : list) {
