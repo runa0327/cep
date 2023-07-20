@@ -12,6 +12,7 @@ import com.cisdi.pms.job.mapper.notice.BaseThirdInterfaceMapper;
 import com.cisdi.pms.job.service.base.AdRemindLogService;
 import com.cisdi.pms.job.service.notice.SmsWhiteListService;
 import com.cisdi.pms.job.service.process.WfProcessInstanceWXService;
+import com.cisdi.pms.job.utils.DateUtil;
 import com.cisdi.pms.job.utils.SendSmsParamsUtils;
 import com.cisdi.pms.job.utils.SendSmsUtils;
 import com.cisdi.pms.job.utils.StringUtil;
@@ -325,9 +326,9 @@ public class SendSmsJob {
         }
 
         // 微信通知白名单
-         List<String> wxWhiteList = smsWhiteListService.getWxWhiteList();
-        // 是否进行企业微信消息推送
-        BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
+//         List<String> wxWhiteList = smsWhiteListService.getWxWhiteList();
+//        // 是否进行企业微信消息推送
+//        BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
 
         List<RemindLog> result = maps.stream()
                 .map(stringObjectMap -> {
@@ -369,10 +370,10 @@ public class SendSmsJob {
                         log.error(phone + "手机号不合法");
                     }
 
-                    // 查询是否进行微信消息通知
-                    if (baseThirdInterface.getSysTrue() == 1){
-                        sendMessageToWX(phone,wxWhiteList,remindLog,baseThirdInterface.getHostAdder());
-                    }
+//                    // 查询是否进行微信消息通知
+//                    if (baseThirdInterface.getSysTrue() == 1){
+//                        sendMessageToWX(phone,wxWhiteList,remindLog,baseThirdInterface.getHostAdder());
+//                    }
 
                 });
             }
@@ -421,6 +422,46 @@ public class SendSmsJob {
                 sb.append("&path=").append(messageModel.getPathSuffix());
                 String ada = null;
                 ada = URLEncoder.encode(sb.toString(),"utf-8");
+                cardInfo.setUrl(MessageFormat.format(HttpEnum.WX_SEND_MESSAGE_URL, ada));
+                messageModel.setMessage(cardInfo);
+
+                String param1 = JSON.toJSONString(messageModel);
+                //调用接口
+                HttpClient.doPost(hostAdder,param1,"UTF-8");
+
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }else {
+            log.error(userPhone + "手机号不合法");
+        }
+    }
+
+    /**
+     * 发送消息至企业微信
+     * @param userPhone 用户code
+     * @param wxWhiteList 白名单
+     * @param remindLog 单条记录信息
+     */
+    private void sendUserAllTaskSum(String userPhone, List<String> wxWhiteList, WfProcessInstanceWX remindLog,String hostAdder, String message) {
+        if (StringUtil.isChinaPhoneLegal(userPhone)){
+            if (!CollectionUtils.isEmpty(wxWhiteList)){
+                if (wxWhiteList.contains(userPhone)){
+                    return;
+                }
+            }
+            // 微信白名单不进行发生
+            try {
+                MessageModel messageModel = new MessageModel();
+                messageModel.setToUser(Arrays.asList(userPhone.split(",")));
+                messageModel.setType("textcard");
+                messageModel.setPathSuffix("list");
+                TextCardInfo cardInfo = new TextCardInfo();
+                cardInfo.setTitle("流程待办通知");
+                cardInfo.setDescription(message);
+                StringBuilder sb = new StringBuilder("https://cpms.yazhou-bay.com/h5/unifiedLogin?env=ZWWeiXin");
+                sb.append("&path=").append(messageModel.getPathSuffix());
+                String ada = URLEncoder.encode(sb.toString(),"utf-8");
                 cardInfo.setUrl(MessageFormat.format(HttpEnum.WX_SEND_MESSAGE_URL, ada));
                 messageModel.setMessage(cardInfo);
 
@@ -548,6 +589,73 @@ public class SendSmsJob {
     }
 
     /**
+     * 9点汇总消息政务微信推送
+     */
+    @Scheduled(cron = "0 1 9 * * ?")
+    public void sendSumTaskNineToWX(){
+
+        // 开关消息推送
+        if (smsSwitch) {
+
+            // 查询当前时间的开关数据
+            String switchSql = "select ifnull(SMS_STATUS,0) SMS_STATUS from sms_time where date = ?";
+            List<Map<String, Object>> mapSwitches = jdbcTemplate.queryForList(switchSql, DateUtil.getNormalTimeStr(new Date()));
+            int izOpen = 0;
+            if (!CollectionUtils.isEmpty(mapSwitches)){
+                String smsStatus = mapSwitches.get(0).get("SMS_STATUS").toString();
+                if (!"0".equals(smsStatus)){
+                    izOpen = 1;
+                }
+            }
+
+            if (izOpen == 1){
+                boolean lock = getLock();
+                if (lock){
+                    // 查询是否进行微信消息通知
+                    BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
+                    if (baseThirdInterface.getSysTrue() == 1){
+                        // 政务微信通知白名单
+                        List<String> wxWhiteList = smsWhiteListService.getWxWhiteList();
+
+                        // 查询人员所有未处理代办
+                        List<WfProcessInstanceWX> maps = wfProcessInstanceWXService.getUserAllTaskCount();
+                        String txt = "";
+                        try {
+                            for (WfProcessInstanceWX tmp : maps) {
+                                try {
+                                    String phone = tmp.getUserCode();
+                                    txt = "[工程项目信息协同系统][流程待办]您好:有"+tmp.getSum()+"条流程待办已到您处，请尽快处理";
+                                    sendUserAllTaskSum(phone,wxWhiteList,tmp,baseThirdInterface.getHostAdder(),txt);
+                                } catch (Exception e){
+                                    txt = "该用户有"+tmp.getSum()+"条待办通知政务微信失败";
+                                }
+                                // 插入日志表
+                                adRemindLogService.insertLog(txt,"1681918624002207744",tmp);
+                            }
+                        } catch (Exception e) {
+                            log.error("发送短信出错！", e);
+                        } finally {
+                            // 加锁成功后才会释放锁
+                            // 循环10次，放置修改失败
+                            for (int i = 0; i < 10; i++) {
+                                String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=null where t.code=?";
+                                int affectedRows = jdbcTemplate.update(sql, "WF_TASK_REMIND_LOCK");
+                                // 如果修改成功，直接跳出循环
+                                if (affectedRows > 0) {
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+
+
+        }
+    }
+
+    /**
      * 加锁
      * @return 成功或失败
      */
@@ -561,5 +669,7 @@ public class SendSmsJob {
             return true;
         }
     }
+
+
 
 }

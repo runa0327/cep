@@ -15,6 +15,7 @@
         <result property="processName" column="processName" />
         <result property="processId" column="processId" />
         <result property="viewId" column="viewId" />
+        <result property="sum" column="sum" />
     </resultMap>
 
     <!--查询符合条件的紧急流程-->
@@ -74,5 +75,39 @@
             AND t.CRT_DT >= '2023-07-20 16:00:00' <!--历史数据不再进行通知-->
             AND NOT EXISTS ( SELECT 1 FROM ad_remind_log l WHERE l.ent_code = 'WF_TASK' AND l.ENTITY_RECORD_ID = t.id and l.MESSAGE_NOTIFY_LOG_TYPE_ID = '1681918685046108160' )
             AND pi.IS_URGENT = '1'
+    </select>
+
+    <!--查询人员所有未处理代办-->
+    <select id="getUserAllTaskCount" resultMap="WfProcessInstanceResult">
+        SELECT
+            a.userPhone as userCode,
+            a.id as userId,
+            COUNT( a.userPhone ) as sum
+        FROM
+            (
+                SELECT
+                    u.id,
+                    pi.NAME taskName,
+                    u.CODE userPhone,
+                    pi.IS_URGENT
+                FROM
+                    wf_task t
+                JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id
+                JOIN wf_node n ON ni.WF_NODE_ID = n.id
+                JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id
+                JOIN ad_user u ON t.AD_USER_ID = u.id
+                WHERE
+                    t.IS_CLOSED = 0
+                    AND t.STATUS = 'AP'
+                    AND ni.STATUS = 'AP'
+                    AND n.STATUS = 'AP'
+                    AND pi.STATUS = 'AP'
+                    AND NOT EXISTS ( SELECT 1 FROM ad_remind_log l WHERE l.ent_code = 'WF_TASK' AND l.ENTITY_RECORD_ID = u.id )
+                    AND t.`WF_TASK_TYPE_ID` = 'TODO'
+                    AND u.STATUS = 'AP'
+            ) a
+        GROUP BY
+            userPhone,
+            userId
     </select>
 </mapper>

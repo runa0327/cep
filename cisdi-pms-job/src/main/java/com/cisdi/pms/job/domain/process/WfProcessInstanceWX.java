@@ -35,6 +35,9 @@ public class WfProcessInstanceWX {
     // 当前实体视图id
     private String viewId;
 
+    // 待办数
+    private Integer sum;
+
     public String getId() {
         return id;
     }
@@ -121,5 +124,13 @@ public class WfProcessInstanceWX {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
+    }
+
+    public Integer getSum() {
+        return sum;
+    }
+
+    public void setSum(Integer sum) {
+        this.sum = sum;
     }
 }
