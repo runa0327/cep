@@ -207,7 +207,7 @@ public class UnifiedLoginService {
      *
      * @return
      */
-    private Map<String, String> getWxToken() {
+    public Map<String, String> getWxToken() {
         Map<String, String> result = new HashMap<>();
 //        String cacheToken = redisCache.getCacheObject(token_key);
 //        if (Strings.isNullOrEmpty(cacheToken)) {
@@ -228,6 +228,7 @@ public class UnifiedLoginService {
                     }
                 })
                 .onError((ex, req, res) -> {
+                    System.out.println(ex);
                     throw new BaseException("换取accessToken异常，请稍后重试！");
                 }).executeAsMap();
 //        } else {
@@ -235,6 +236,4 @@ public class UnifiedLoginService {
 //        }
         return result;
     }
-
-
 }

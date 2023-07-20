@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.process.WfProcessInstanceWXMapper">
+    <resultMap id="WfProcessInstanceResult" type="com.cisdi.pms.job.domain.process.WfProcessInstanceWX">
+        <id property="id" column="id" />
+        <result property="userId" column="userId" />
+        <result property="userCode" column="userCode" />
+        <result property="wfProcessInstanceName" column="wfProcessInstanceName" />
+        <result property="wfProcessInstanceId" column="wfProcessInstanceId" />
+        <result property="taskId" column="taskId" />
+        <result property="taskType" column="taskType" />
+        <result property="entityRecordId" column="entityRecordId" />
+        <result property="processName" column="processName" />
+        <result property="processId" column="processId" />
+        <result property="viewId" column="viewId" />
+    </resultMap>
+
+    <!--查询符合条件的紧急流程-->
+    <select id="getAllUrgeList" resultMap="WfProcessInstanceResult">
+        SELECT
+            t.AD_USER_ID as userId,
+            pi.id as wfProcessInstanceId,
+            pi.NAME as  wfProcessInstanceName,
+            u.CODE as  userCode,
+            pi.IS_URGENT,
+            t.`WF_TASK_TYPE_ID` as taskType,
+            f.name as processName,
+            pi.CURRENT_VIEW_ID as viewId,
+            pi.wf_process_id as processId,
+            pi.ENTITY_RECORD_ID as entityRecordId,
+            t.id as taskId
+        FROM
+            wf_task t
+        LEFT JOIN wf_node_instance ni ON t.WF_NODE_INSTANCE_ID = ni.id
+        LEFT JOIN wf_node n ON ni.WF_NODE_ID = n.id
+        LEFT JOIN wf_process_instance pi ON ni.WF_PROCESS_INSTANCE_ID = pi.id
+        LEFT JOIN ad_user u ON t.AD_USER_ID = u.id
+        LEFT JOIN wf_process f on ni.WF_PROCESS_ID = f.id
+        WHERE
+            t.IS_CLOSED = 0
+            AND t.STATUS = 'AP'
+            AND NOT EXISTS ( SELECT 1 FROM ad_remind_log l WHERE l.ent_code = 'WF_TASK' AND l.ENTITY_RECORD_ID = t.id )
+            AND pi.IS_URGENT = '1'
+            AND t.AD_USER_ID NOT IN ( SELECT AD_USER_ID FROM sms_white_list )
+<!--            AND t.AD_USER_ID = '1655396520176074752'-->
+    </select>
+</mapper>

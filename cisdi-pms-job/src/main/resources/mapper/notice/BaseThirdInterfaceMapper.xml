@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.notice.BaseThirdInterfaceMapper">
+    <resultMap id="BaseThirdInterfaceResult" type="com.cisdi.pms.job.domain.notice.BaseThirdInterface"></resultMap>
+
+    <!--根据第三方接口编码查询接口是否启用-->
+    <select id="getSysTrue" resultType="int">
+        select ifnull(max(SYS_TRUE),0) from BASE_THIRD_INTERFACE where STATUS = 'AP' AND CODE = #{interfaceCode}
+    </select>
+</mapper>

@@ -219,7 +219,7 @@ public class PlanOperationController extends BaseController {
         if (!CollectionUtils.isEmpty(list)) {
             list.forEach(item -> {
                 //查询项目后置节点(状态是未开始的)
-                List<Map<String, Object>> preList = jdbcTemplate.queryForList("select pm.`NAME` as prjName,pppn.*,pi.AD_USER_ID as default_user,pm.id as projectId from pm_pro_plan_node pppn \n" +
+                List<Map<String, Object>> preList = jdbcTemplate.queryForList("select pm.`NAME` as prjName,pppn.*,pi.AD_USER_ID as default_user,pm.id as projectId,pppn.PLAN_COMPL_DATE as PLAN_COMPL_DATE from pm_pro_plan_node pppn \n" +
                         "left join pm_pro_plan ppp on ppp.id = pppn.PM_PRO_PLAN_ID \n" +
                         "left join pm_prj pm on pm.id = ppp.PM_PRJ_ID  \n" +
                         "left join POST_INFO pi on pi.id = pppn.POST_INFO_ID  \n" +
@@ -265,7 +265,7 @@ public class PlanOperationController extends BaseController {
 
         String title = objectMap.get("prjName") + "-" + processName;
         String content = MessageFormat.format("{0}【{1}】计划将在{2}完成，请及时处理！", objectMap.get("prjName"), processName, dateOrg);
-        jdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=?,CAN_DISPATCH='0',PM_PRJ_ID=? where id=?",
-                userId, title, content, new Date(), "1634118574056542208", "1635080848313290752", objectMap.get("ID"), objectMap.get("projectId"), id);
+        jdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=?,CAN_DISPATCH='0',PM_PRJ_ID=?,PLAN_COMPL_DATE=? where id=?",
+                userId, title, content, new Date(), "1634118574056542208", "1635080848313290752", objectMap.get("ID"), objectMap.get("projectId"), objectMap.get("PLAN_COMPL_DATE"), id);
     }
 }

@@ -1388,6 +1388,22 @@ public class ProPlanExt {
                 node.IZ_OVERDUE = JdbcMapUtil.getString(p, "IZ_OVERDUE");
                 node.startDateField = JdbcMapUtil.getString(p, "START_DATE_FIELD");
                 node.endDateField = JdbcMapUtil.getString(p, "END_DATE_FIELD");
+                //超期状态处理
+                if ("1".equals(node.IZ_OVERDUE)) {
+                    node.progressStatusName = "超期未完成";
+                } else {
+                    //当是完成状态的时候
+                    if ("0099799190825106802".equals(node.progressStatusId)) {
+                        //判断完成时间和计划完成时间
+                        if (node.planComplDay != null && node.actualComplDay != null) {
+                            Date actualComplDay = DateTimeUtil.stringToDate(node.actualComplDay);
+                            Date planComplDay = DateTimeUtil.stringToDate(node.planComplDay);
+                            if (actualComplDay.after(planComplDay)) {
+                                node.progressStatusName = "超期完成";
+                            }
+                        }
+                    }
+                }
                 return node;
             }).collect(Collectors.toList());
 
@@ -1464,6 +1480,22 @@ public class ProPlanExt {
                 node.IZ_OVERDUE = JdbcMapUtil.getString(p, "IZ_OVERDUE");
                 node.startDateField = JdbcMapUtil.getString(p, "START_DATE_FIELD");
                 node.endDateField = JdbcMapUtil.getString(p, "END_DATE_FIELD");
+                //超期状态处理
+                if ("1".equals(node.IZ_OVERDUE)) {
+                    node.progressStatusName = "超期未完成";
+                } else {
+                    //当是完成状态的时候
+                    if ("0099799190825106802".equals(node.progressStatusId)) {
+                        //判断完成时间和计划完成时间
+                        if (node.planComplDay != null && node.actualComplDay != null) {
+                            Date actualComplDay = DateTimeUtil.stringToDate(node.actualComplDay);
+                            Date planComplDay = DateTimeUtil.stringToDate(node.planComplDay);
+                            if (actualComplDay.after(planComplDay)) {
+                                node.progressStatusName = "超期完成";
+                            }
+                        }
+                    }
+                }
                 return node;
             }).collect(Collectors.toList());
 

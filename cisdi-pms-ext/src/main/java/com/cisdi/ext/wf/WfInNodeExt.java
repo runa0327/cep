@@ -310,7 +310,7 @@ public class WfInNodeExt {
                 // 给后续节点发周任务
                 WeekTaskUtils.sendPreNodeWeekTask(JdbcMapUtil.getString(leafNode, "ID"));
                 // 当前节点有关的工作台任务状态变为已完成
-                myJdbcTemplate.update("update week_task set WEEK_TASK_STATUS_ID='1634118629769482240' where RELATION_DATA_ID=?", JdbcMapUtil.getString(leafNode, "ID"));
+                myJdbcTemplate.update("update week_task set WEEK_TASK_STATUS_ID='1634118629769482240',ACTUAL_COMPL_DATE=? where RELATION_DATA_ID=?", endDate, JdbcMapUtil.getString(leafNode, "ID"));
             }
         }
 
@@ -330,7 +330,7 @@ public class WfInNodeExt {
         if (purchaseList.contains(entCode)) {
             // 获取流程表信息等
 //            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from wf_process_instance where id = ?", procInstId);
-            List<WfProcessInstance> list1 = WfProcessInstance.selectByWhere(new Where().eq(WfProcessInstance.Cols.ID,procInstId));
+            List<WfProcessInstance> list1 = WfProcessInstance.selectByWhere(new Where().eq(WfProcessInstance.Cols.ID, procInstId));
             if (!CollectionUtils.isEmpty(list1)) {
                 String entityRecordId = list1.get(0).getEntityRecordId();
                 String attData = JdbcMapUtil.getString(leafNode, "ATT_DATA"); // 节点中设置的采购事项类型
@@ -390,7 +390,7 @@ public class WfInNodeExt {
                 if (!CollectionUtils.isEmpty(attInfoList)) {
                     Map<String, Object> attInfo = attInfoList.get(0);
                     String table = JdbcMapUtil.getString(attInfo, "code");
-                    String fields =  JdbcMapUtil.getString(attInfo, "att_code");
+                    String fields = JdbcMapUtil.getString(attInfo, "att_code");
                     List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from wf_process_instance where id=?", procInstId);
                     if (!CollectionUtils.isEmpty(list1)) {
                         Map<String, Object> insInfo = list1.get(0);

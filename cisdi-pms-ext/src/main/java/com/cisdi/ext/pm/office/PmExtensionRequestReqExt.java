@@ -6,6 +6,7 @@ import com.cisdi.ext.proPlan.PmProPlanExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.PrjPlanUtil;
 import com.cisdi.ext.wf.WfExt;
+import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -218,7 +219,19 @@ public class PmExtensionRequestReqExt {
                     Map<String, Object> taskMap = list1.get(0);
                     String msg = "{0}【{1}】计划将在{2}完成，请及时处理！";
                     String content = MessageFormat.format(msg, taskMap.get("prjName"), processName, endDate);
-                    myJdbcTemplate.update("update week_task set CONTENT=? where id=?", content, taskMap.get("ID"));
+                    //判断状态
+                    String nodeStatus = JdbcMapUtil.getString(dataMap, "PROGRESS_STATUS_ID");
+                    String weekStatus = null;
+                    if (Strings.isNullOrEmpty(nodeStatus) || "0099799190825106800".equals(nodeStatus)) {
+                        weekStatus ="1634118574056542208";
+                    }else if("0099799190825106801".equals(nodeStatus)){
+                        weekStatus ="1634118609016066048";
+                    }else if("0099799190825106802".equals(nodeStatus)){
+                        weekStatus ="1634118629769482240";
+                    }else if("0099902212142036278".equals(nodeStatus)){
+                        weekStatus ="1644140265205915648";
+                    }
+                    myJdbcTemplate.update("update week_task set CONTENT=?,WEEK_TASK_STATUS_ID=? where id=?", content, weekStatus, taskMap.get("ID"));
                 }
 
             }
