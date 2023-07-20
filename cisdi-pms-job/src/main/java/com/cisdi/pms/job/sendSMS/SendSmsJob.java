@@ -3,6 +3,7 @@ package com.cisdi.pms.job.sendSMS;
 import com.alibaba.fastjson.JSON;
 import com.cisdi.pms.job.commons.HttpClient;
 import com.cisdi.pms.job.domain.RemindLog;
+import com.cisdi.pms.job.domain.notice.BaseThirdInterface;
 import com.cisdi.pms.job.domain.notice.MessageModel;
 import com.cisdi.pms.job.domain.notice.TextCardInfo;
 import com.cisdi.pms.job.domain.process.WfProcessInstanceWX;
@@ -69,8 +70,8 @@ public class SendSmsJob {
      * 发送紧急消息
      * 随时发送
      */
-//    @Scheduled(cron = "30 15 11 ? * *")
-    @Scheduled(fixedDelayString = "60000")
+    @Scheduled(cron = "0 1/2 * * * ?")
+//    @Scheduled(fixedDelayString = "60000")
     public void sendSmsForUrgent() {
         // 开关短信功能
         if (!smsSwitch) {
@@ -116,9 +117,9 @@ public class SendSmsJob {
                 }).collect(Collectors.toList());
 
         // 查询是否进行微信消息通知
-        int sysTrue = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUserUrgent");
+        BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUserUrgent");
         List<String> wxWhiteList = new ArrayList<>();
-        if (sysTrue == 1){
+        if (baseThirdInterface.getSysTrue() == 1){
             wxWhiteList = smsWhiteListService.getWxWhiteList();
         }
 
@@ -140,7 +141,7 @@ public class SendSmsJob {
 
                 // 发送企业微信
                 try {
-                    this.sendMessage(finalWxWhiteList,remindLog);
+                    this.sendMessage(finalWxWhiteList,remindLog,baseThirdInterface.getHostAdder());
                 } catch (Exception e) {
                     log.error("紧急消息发送企业微信失败，任务id为："+remindLog.getTaskId());
                 }
@@ -169,23 +170,29 @@ public class SendSmsJob {
     /**
      * 发送企业微信消息
      */
-    private void sendMessage(List<String> finalWxWhiteList, RemindLog remindLog) throws Exception{
+    private void sendMessage(List<String> finalWxWhiteList, RemindLog remindLog, String hostAdder) throws Exception{
+        String userPhone = remindLog.getUserPhone();
+        userPhone = Boolean.TRUE.equals(remindRealUser) ? userPhone : "13072802651";
         if (!CollectionUtils.isEmpty(finalWxWhiteList)){
-            String type = remindLog.getTaskType();
-            StringBuilder sb = new StringBuilder();
+            if (finalWxWhiteList.contains(userPhone)){
+                return;
+            }
+        }
+        String type = remindLog.getTaskType();
+        StringBuilder sb = new StringBuilder();
 //            if ("NOTI".equals(type)){ // 通知-不进行通知
 //                sb.append("[工程项目信息协同系统][流程通知]您好 ");
 //                sb.append(remindLog.getWfProcessInstanceName()).append("”已到您处，请登陆系统查看");
 //            }
-            if ("TODO".equals(type)){ // 紧急待办
-                sb.append("[工程项目信息协同系统][流程待办]您好 ");
-                sb.append(remindLog.getWfProcessInstanceName()).append("”已到您处，请尽快处理");
-            }
-            MessageModel messageModel = getMessageModel(remindLog,sb.toString());
-            String param1 = JSON.toJSONString(messageModel);
-            //调用接口
-            HttpClient.doPost(HttpEnum.QYQLY_WX_SEND_MESSAGE_URL,param1,"UTF-8");
+        if ("TODO".equals(type)){ // 紧急待办
+            sb.append("[工程项目信息协同系统][流程待办]您好 ");
+            sb.append(remindLog.getWfProcessInstanceName()).append("”已到您处，请尽快处理");
         }
+        MessageModel messageModel = getMessageModel(remindLog,sb.toString());
+        String param1 = JSON.toJSONString(messageModel);
+        //调用接口
+        HttpClient.doPost(hostAdder,param1,"UTF-8");
+
     }
 
     /**
@@ -271,7 +278,7 @@ public class SendSmsJob {
         // 微信通知白名单
          List<String> wxWhiteList = smsWhiteListService.getWxWhiteList();
         // 是否进行企业微信消息推送
-        int sysTrue = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
+        BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
 
         List<RemindLog> result = maps.stream()
                 .map(stringObjectMap -> {
@@ -314,8 +321,8 @@ public class SendSmsJob {
                     }
 
                     // 查询是否进行微信消息通知
-                    if (sysTrue == 1){
-                        sendMessageToWX(phone,wxWhiteList,remindLog);
+                    if (baseThirdInterface.getSysTrue() == 1){
+                        sendMessageToWX(phone,wxWhiteList,remindLog,baseThirdInterface.getHostAdder());
                     }
 
                 });
@@ -345,32 +352,35 @@ public class SendSmsJob {
      * @param wxWhiteList 白名单
      * @param remindLog 单条记录信息
      */
-    private void sendMessageToWX(String userPhone, List<String> wxWhiteList, RemindLog remindLog) {
+    private void sendMessageToWX(String userPhone, List<String> wxWhiteList, RemindLog remindLog,String hostAdder) {
         if (StringUtil.isChinaPhoneLegal(userPhone)){
-            // 微信白名单不进行发生
-            if (!wxWhiteList.contains(userPhone)){
-                try {
-                    MessageModel messageModel = new MessageModel();
-                    messageModel.setToUser(Arrays.asList(userPhone.split(",")));
-                    messageModel.setType("textcard");
-                    messageModel.setPathSuffix("list");
-                    TextCardInfo cardInfo = new TextCardInfo();
-                    cardInfo.setTitle("流程待办通知");
-                    cardInfo.setDescription("[工程项目信息协同系统][流程待办]您好:有"+remindLog.getCount()+"条流程待办已到您处，请尽快处理");
-                    StringBuilder sb = new StringBuilder("https://cpms.yazhou-bay.com/h5/unifiedLogin?env=ZWWeiXin");
-                    sb.append("&path=").append(messageModel.getPathSuffix());
-                    String ada = null;
-                    ada = URLEncoder.encode(sb.toString(),"utf-8");
-                    cardInfo.setUrl(MessageFormat.format(HttpEnum.WX_SEND_MESSAGE_URL, ada));
-                    messageModel.setMessage(cardInfo);
-
-                    String param1 = JSON.toJSONString(messageModel);
-                    //调用接口
-                    HttpClient.doPost(HttpEnum.QYQLY_WX_SEND_MESSAGE_URL,param1,"UTF-8");
-
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+            if (!CollectionUtils.isEmpty(wxWhiteList)){
+                if (wxWhiteList.contains(userPhone)){
+                    return;
                 }
+            }
+            // 微信白名单不进行发生
+            try {
+                MessageModel messageModel = new MessageModel();
+                messageModel.setToUser(Arrays.asList(userPhone.split(",")));
+                messageModel.setType("textcard");
+                messageModel.setPathSuffix("list");
+                TextCardInfo cardInfo = new TextCardInfo();
+                cardInfo.setTitle("流程待办通知");
+                cardInfo.setDescription("[工程项目信息协同系统][流程待办]您好:有"+remindLog.getCount()+"条流程待办已到您处，请尽快处理");
+                StringBuilder sb = new StringBuilder("https://cpms.yazhou-bay.com/h5/unifiedLogin?env=ZWWeiXin");
+                sb.append("&path=").append(messageModel.getPathSuffix());
+                String ada = null;
+                ada = URLEncoder.encode(sb.toString(),"utf-8");
+                cardInfo.setUrl(MessageFormat.format(HttpEnum.WX_SEND_MESSAGE_URL, ada));
+                messageModel.setMessage(cardInfo);
+
+                String param1 = JSON.toJSONString(messageModel);
+                //调用接口
+                HttpClient.doPost(hostAdder,param1,"UTF-8");
+
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
             }
         }else {
             log.error(userPhone + "手机号不合法");
