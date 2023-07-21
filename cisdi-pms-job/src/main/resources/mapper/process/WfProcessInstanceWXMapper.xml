@@ -41,8 +41,8 @@
         LEFT JOIN wf_process f on ni.WF_PROCESS_ID = f.id
         WHERE
             t.IS_CLOSED = 0
-            AND t.STATUS = 'AP'
-            AND NOT EXISTS ( SELECT 1 FROM ad_remind_log l WHERE l.ent_code = 'WF_TASK' AND l.ENTITY_RECORD_ID = t.id )
+            AND t.STATUS = 'AP' AND t.CRT_DT >= '2023-07-21 14:35:00' <!--历史数据不再进行通知-->
+            AND NOT EXISTS ( SELECT 1 FROM ad_remind_log l WHERE l.ent_code = 'WF_TASK' AND l.ENTITY_RECORD_ID = t.id and l.MESSAGE_NOTIFY_LOG_TYPE_ID = '1681918594629496832' )
             AND pi.IS_URGENT = '1'
             AND t.AD_USER_ID NOT IN ( SELECT AD_USER_ID FROM sms_white_list )
 <!--            AND t.AD_USER_ID = '1655396520176074752'-->
