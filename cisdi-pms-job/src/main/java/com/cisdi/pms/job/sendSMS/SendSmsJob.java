@@ -44,10 +44,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SendSmsJob {
 
-    @Autowired
+    @Resource
     JdbcTemplate jdbcTemplate;
 
-    @Autowired
+    @Resource
     DataFeignClient dataFeignClient;
 
     @Resource
@@ -152,7 +152,7 @@ public class SendSmsJob {
 //                }
 
                 // 记录日志
-                this.insertRemindLog(remindLog, false);
+                this.insertRemindLog(remindLog, false,"1681918594629496832");
 
             });
         } catch (Exception e) {
@@ -364,7 +364,7 @@ public class SendSmsJob {
                         this.sendSms(templateId, param);
                         log.info("日志发送，接收人电话号码：{}", remindLog.getUserPhone());
                         // 记录日志
-                        this.insertRemindLog(remindLog, true);
+                        this.insertRemindLog(remindLog, true,"1681918514375684096");
                     }else {
                         log.error(phone + "手机号不合法");
                     }
@@ -490,7 +490,7 @@ public class SendSmsJob {
      *
      * @param remindLog
      */
-    private void insertRemindLog(RemindLog remindLog, boolean isRemindNums) {
+    private void insertRemindLog(RemindLog remindLog, boolean isRemindNums, String messageType) {
         // 定时每分钟一次【紧急】
         //[工程项目信息协同系统][流程待办]您好“{1}”已到您处，请尽快处理。--1644089
         //[工程项目信息协同系统][流程通知]您好“{1}”已到您处，请登陆系统查看。--1644090
@@ -526,13 +526,12 @@ public class SendSmsJob {
 
         // 提醒文本
 
-
         // 查询实体id
         String selectEntId = "select ID from ad_ent where CODE = ?";
 
         String entId = jdbcTemplate.queryForObject(selectEntId, String.class, "WF_TASK");
-        String updateSql = "INSERT INTO ad_remind_log ( ID, VER, TS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, STATUS, CODE, AD_ENT_ID, ENT_CODE, ENTITY_RECORD_ID, REMIND_USER_ID, REMIND_METHOD, REMIND_TARGET, REMIND_TIME, REMIND_TEXT) VALUES (UUID_SHORT(),'1', now() , now() ,?,now(),?, 'AP' , 'WF_TASK_REMIND_LOCK' ,?, 'WF_TASK',?,?,'SMS',?,now(),?)";
-        jdbcTemplate.update(updateSql, remindLog.getUserId(), remindLog.getUserId(), entId, remindLog.getTaskId(), remindLog.getUserId(), remindLog.getUserPhone(), remindText);
+        String updateSql = "INSERT INTO ad_remind_log ( ID, VER, TS, CRT_DT, CRT_USER_ID, LAST_MODI_DT, LAST_MODI_USER_ID, STATUS, CODE, AD_ENT_ID, ENT_CODE, ENTITY_RECORD_ID, REMIND_USER_ID, REMIND_METHOD, REMIND_TARGET, REMIND_TIME, REMIND_TEXT,MESSAGE_NOTIFY_LOG_TYPE_ID) VALUES (UUID_SHORT(),'1', now() , now() ,?,now(),?, 'AP' , 'WF_TASK_REMIND_LOCK' ,?, 'WF_TASK',?,?,'SMS',?,now(),?,?)";
+        jdbcTemplate.update(updateSql, remindLog.getUserId(), remindLog.getUserId(), entId, remindLog.getTaskId(), remindLog.getUserId(), remindLog.getUserPhone(), remindText,messageType);
 
     }
 
@@ -598,7 +597,7 @@ public class SendSmsJob {
 
             // 查询当前时间的开关数据
             String switchSql = "select ifnull(SMS_STATUS,0) SMS_STATUS from sms_time where date = ?";
-            List<Map<String, Object>> mapSwitches = jdbcTemplate.queryForList(switchSql, DateUtil.getNormalTimeStr(new Date()));
+            List<Map<String, Object>> mapSwitches = jdbcTemplate.queryForList(switchSql, DateUtil.getTimeStrDay(new Date()));
             int izOpen = 0;
             if (!CollectionUtils.isEmpty(mapSwitches)){
                 String smsStatus = mapSwitches.get(0).get("SMS_STATUS").toString();
