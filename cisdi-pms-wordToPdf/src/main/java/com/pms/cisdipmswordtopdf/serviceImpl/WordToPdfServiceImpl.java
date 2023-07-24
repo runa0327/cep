@@ -16,6 +16,7 @@ import com.jacob.com.Variant;
 import com.pms.cisdipmswordtopdf.controller.ToPdfController;
 import com.pms.cisdipmswordtopdf.model.PoOrderReq;
 import com.pms.cisdipmswordtopdf.service.WordToPdfService;
+import com.pms.cisdipmswordtopdf.util.FileUtil;
 import com.pms.cisdipmswordtopdf.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,13 +59,16 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         if (!CollectionUtils.isEmpty(list1)){
             for (Map<String, Object> tmp : list1) {
                 String filePath = tmp.get("PHYSICAL_LOCATION").toString();
+                // 判断文件是否存在
+                String oldName = filePath.substring(filePath.lastIndexOf(code)+1);
+                boolean fileExist = FileUtil.fileExistCheck(filePath,"C:\\Users\\Administrator\\Desktop\\"+oldName);
                 String path = filePath.substring(0,filePath.lastIndexOf(code)+1);
                 String id = IdUtil.getSnowflakeNextIdStr();
                 String copyPath = path+id+"copy.pdf";
                 String pdfPath = path+id+".pdf";
                 //word转pdf
-//                String error = newPdf(filePath,copyPath); // windows系统转换
-                String error = wordStartToPdf(filePath,copyPath); // linux系统转换
+                String error = newPdf(filePath,copyPath); // windows系统转换
+//                String error = wordStartToPdf(filePath,copyPath); // linux系统转换
                 if (error.length() > 0 && error != null && !"".equals(error)){
                     errorBuilder.append(error).append("\n ");
                 }

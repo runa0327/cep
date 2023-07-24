@@ -9,6 +9,7 @@ import com.jacob.com.ComFailException;
 import com.jacob.com.ComThread;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
+import com.pms.cisdipmswordtopdf.util.FileUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,6 +37,7 @@ public class ToPdfController {
         String old = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）.doc";
         String newPdf = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）copy.pdf";
         String pdfPath = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）.pdf";
+        FileUtil.fileExistCheck(old,"D:\\copyFile\\2.doc");
         word2PDF(old,newPdf);
         //pdf加水印
         String companyName = "三亚崖州湾科技城开发建设有限公司";
