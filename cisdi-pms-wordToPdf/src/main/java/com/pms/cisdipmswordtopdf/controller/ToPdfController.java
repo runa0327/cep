@@ -34,10 +34,13 @@ public class ToPdfController {
     public void startPdf(){
 //        String old = "C:\\Users\\EDY\\Desktop\\kkfileview\\demo.pptx";
 //        String old = "C:\\Users\\EDY\\Desktop\\kkfileview\\demo.xlsx";
-        String old = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）.doc";
-        String newPdf = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）copy.pdf";
-        String pdfPath = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）.pdf";
-        FileUtil.fileExistCheck(old,"D:\\copyFile\\2.doc");
+//        String old = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）.doc";
+        String old = "C:\\Users\\Administrator\\Desktop\\copyFile\\1676762928616783872.docx";
+//        String newPdf = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）copy.pdf";
+        String newPdf = "C:\\Users\\Administrator\\Desktop\\copyFile\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）copy.pdf";
+        String pdfPath = "C:\\Users\\Administrator\\Desktop\\copyFile\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）.pdf";
+//        String pdfPath = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）.pdf";
+        FileUtil.fileExistCheck(old,"C:\\copyFile\\2.doc");
         word2PDF(old,newPdf);
         //pdf加水印
         String companyName = "三亚崖州湾科技城开发建设有限公司";

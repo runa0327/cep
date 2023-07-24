@@ -7,5 +7,9 @@ public class wpsTransPdf {
 
 
         System.out.println(oldPath.substring(oldPath.lastIndexOf(".")));
+
+
+        String type = System.getProperty("os.name");
+        System.out.println(type);
     }
 }
