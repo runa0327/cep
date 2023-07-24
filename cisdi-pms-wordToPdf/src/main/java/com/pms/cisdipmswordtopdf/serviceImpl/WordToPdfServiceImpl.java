@@ -46,7 +46,8 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String date = sdf.format(new Date());
         String companyName = poOrderReq.getCompanyName();
-        String fileId = StringUtil.replaceCode(poOrderReq.getFileId(),",","','");
+        System.out.println("fileId: "+poOrderReq.getColMap().get(0).get("file"));
+        String fileId = StringUtil.replaceCode(poOrderReq.getColMap().get(0).get("file"),",","','");
         //获取文件地址
         String sql1 = "select * from fl_file where id in ('"+fileId+"') and EXT in ('doc','docx')";
         List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
@@ -61,7 +62,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                 String filePath = tmp.get("PHYSICAL_LOCATION").toString();
                 // 判断文件是否存在
                 String oldName = filePath.substring(filePath.lastIndexOf(code)+1);
-                boolean fileExist = FileUtil.fileExistCheck(filePath,"C:\\Users\\Administrator\\Desktop\\"+oldName);
+                boolean fileExist = FileUtil.fileExistCheck(filePath,"C:\\Users\\Administrator\\Desktop\\copyFile\\"+oldName);
                 String path = filePath.substring(0,filePath.lastIndexOf(code)+1);
                 String id = IdUtil.getSnowflakeNextIdStr();
                 String copyPath = path+id+"copy.pdf";
@@ -149,7 +150,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
      */
     private void updateOrder(String newFileId, PoOrderReq poOrderReq) {
         String tableCode = poOrderReq.getTableCode();
-        String attCode = poOrderReq.getColsCode();
+        String attCode = poOrderReq.getColMap().get(0).get("code");
         String newFileIds = poOrderReq.getFileId();
         String poOrderId = poOrderReq.getId();
         List<String> orderFileIds = new ArrayList<>(Arrays.asList(newFileIds.split(",")));
