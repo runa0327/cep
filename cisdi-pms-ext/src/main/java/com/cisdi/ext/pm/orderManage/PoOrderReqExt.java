@@ -659,32 +659,26 @@ public class PoOrderReqExt {
         }
         poOrderReqView.setCompanyName(companyName);
         List<Map<String,String>> list = new ArrayList<>();
+        // 是否标准模板 0099799190825080669=是 0099799190825080670=否
+        String isModel = JdbcMapUtil.getString(entityRecord.valueMap,"YES_NO_THREE");
 
+        Map<String,String> map = new HashMap<>();
         if ("PO_ORDER_REQ".equals(entCode) || "po_order_req".equals(entCode)){ //合同签订
-            Map<String,String> map1 = new HashMap<>();
-            Map<String,String> map2 = new HashMap<>();
-            String code1 = "FILE_ID_ONE"; //合同修编稿
-            String code2 = "ATT_FILE_GROUP_ID"; //合同文本
-            String file1 = JdbcMapUtil.getString(entityRecord.valueMap,code1);
-            String file2 = JdbcMapUtil.getString(entityRecord.valueMap,code2);
-            if (!SharedUtil.isEmptyString(file1)){
-                map1.put("code",code1);
-                map1.put("file",file1);
-                list.add(map1);
+            if ("0099799190825080669".equals(isModel)){ //合同修编稿
+                map.put("code","FILE_ID_ONE");
+                map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"));
+            } else { //合同文本
+                map.put("code","ATT_FILE_GROUP_ID");
+                map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"));
             }
-            if (!SharedUtil.isEmptyString(file2)){
-                map2.put("code",code2);
-                map2.put("file",file2);
-                list.add(map2);
-            }
+            list.add(map);
         } else if ("PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "po_order_supplement_req".equals(entCode)){ //补充协议
-            Map<String,String> map1 = new HashMap<>();
             String code1 = "FILE_ID_TENTH"; //合同修编稿
             String file1 = JdbcMapUtil.getString(entityRecord.valueMap,code1);
             if (!SharedUtil.isEmptyString(file1)){
-                map1.put("code",code1);
-                map1.put("file",file1);
-                list.add(map1);
+                map.put("code",code1);
+                map.put("file",file1);
+                list.add(map);
             }
         }
         poOrderReqView.setColMap(list);
