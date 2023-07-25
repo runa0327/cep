@@ -589,7 +589,7 @@ public class WeekTaskExt {
                 " left join gr_set_value gs on pm.PROJECT_TYPE_ID = gs.id  " +
                 " where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 and (pm.PROJECT_STATUS != '1661568714048413696' or pm.PROJECT_STATUS is null ) ");
         if (!Strings.isNullOrEmpty(requestParam.name)) {
-            sb.append(" and `NAME` like '%").append(requestParam.name).append("%'");
+            sb.append(" and pm.`NAME` like '%").append(requestParam.name).append("%'");
         }
         if (!Strings.isNullOrEmpty(requestParam.ownner)) {
             sb.append(" and CUSTOMER_UNIT = '").append(requestParam.ownner).append("'");
@@ -638,14 +638,11 @@ public class WeekTaskExt {
                 if (JdbcMapUtil.getString(p, "PLAN_COMPL_DATE") != null && JdbcMapUtil.getString(p, "ACTUAL_COMPL_DATE") != null) {
                     Date plan = DateTimeUtil.stringToDate(JdbcMapUtil.getString(p, "PLAN_COMPL_DATE"));
                     Date actual = DateTimeUtil.stringToDate(JdbcMapUtil.getString(p, "ACTUAL_COMPL_DATE"));
-                    if (actual.before(plan)) {
-                        return true;
-                    }
+                    return actual.after(plan);
                 }
             }
             return false;
         }).count();
-
         titleCount.wsjCount =  (int) weekTaskList.stream().filter(p -> TASK_NOT_INVOLVE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(titleCount), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
@@ -831,15 +828,13 @@ public class WeekTaskExt {
         info.underway = (int) list.stream().filter(p -> TASK_IN_PROCESSING.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
         info.finished = (int) list.stream().filter(p -> TASK_COMPLETED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
         info.notInvolve = (int) list.stream().filter(p -> TASK_NOT_INVOLVE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
-        info.cqwwc = (int) list.stream().filter(p -> "1".equals(JdbcMapUtil.getString(p, "IZ_OVERDUE"))).count();
+        info.cqwwc =(int) list.stream().filter(p -> TASK_OVERDUE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
         info.cqwc = (int) list.stream().filter(p -> {
-            if (COMPLETED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))) {
+            if (TASK_COMPLETED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))) {
                 if (JdbcMapUtil.getString(p, "PLAN_COMPL_DATE") != null && JdbcMapUtil.getString(p, "ACTUAL_COMPL_DATE") != null) {
                     Date plan = DateTimeUtil.stringToDate(JdbcMapUtil.getString(p, "PLAN_COMPL_DATE"));
                     Date actual = DateTimeUtil.stringToDate(JdbcMapUtil.getString(p, "ACTUAL_COMPL_DATE"));
-                    if (actual.before(plan)) {
-                        return true;
-                    }
+                    return actual.after(plan);
                 }
             }
             return false;
