@@ -542,6 +542,27 @@ public class ProcessCommon {
     }
 
     /**
+     * 查询流程中所有经办人信息-发起人不在内
+     * @param procInstId 流程实例id
+     * @param processId 流程id
+     * @param myJdbcTemplate 数据源
+     * @return 经办人信息
+     */
+    public static String getProcessAllDealUserNotStart(String procInstId, String processId, MyJdbcTemplate myJdbcTemplate) {
+        // 获取该流程发起节点信息
+        String startNodeId = WfNode.selectByWhere(new Where().eq(WfNode.Cols.WF_PROCESS_ID,processId)
+                .eq(WfNode.Cols.NODE_TYPE,"START_EVENT").eq(WfNode.Cols.STATUS,"AP")).get(0).getId();
+        // 查询所有人员信息
+        String sql = "select group_concat(distinct a.ad_user_id) as users from wf_task a left join wf_node_instance b on a.WF_NODE_INSTANCE_ID = b.id where b.status = 'ap' and a.status = 'ap' and b.WF_PROCESS_INSTANCE_ID = ? and b.WF_NODE_ID != ? and a.wf_task_type_id = 'TODO' and a.is_closed = '1'";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,procInstId,startNodeId);
+        String userIds = "";
+        if (!CollectionUtils.isEmpty(list)){
+            userIds = JdbcMapUtil.getString(list.get(0),"users");
+        }
+        return userIds;
+    }
+
+    /**
      * 流程实例数据作废-作废对应流程表
      */
     public void cancelData(){
