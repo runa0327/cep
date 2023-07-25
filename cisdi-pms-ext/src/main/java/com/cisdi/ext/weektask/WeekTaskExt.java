@@ -452,8 +452,6 @@ public class WeekTaskExt {
         public String nodeName;
         //计划天数
         public String days;
-        //延期天数
-        public String delayDays;
         //审批状态
         public String astStatus;
     }
