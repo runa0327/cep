@@ -6,6 +6,7 @@ import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -58,8 +59,10 @@ public class PmProjectProblemReqExt {
         //业务表名
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         String csCommId = entityRecord.csCommId;
-        // 流程id
+        // 流程实例id
         String procInstId = ExtJarHelper.procInstId.get();
+        // 流程id
+        String processId = ExtJarHelper.procId.get();
         // 当前登录人
         String userId = ExtJarHelper.loginInfo.get().userId;
         String userName = ExtJarHelper.loginInfo.get().userName;
@@ -82,10 +85,30 @@ public class PmProjectProblemReqExt {
                 String fileEnd = ProcessCommon.getEndCommentFile(userId,processFile,file,myJdbcTemplate,"one");
                 ProcessCommon.commentShow("TEXT_REMARK_FOUR", commentEnd, csCommId, entCode);
                 ProcessCommon.commentShow("FILE_ID_TWO", fileEnd, csCommId, entCode);
+
+                // 修改处理人意见
+                updateDealUsers(procInstId,processId,csCommId,myJdbcTemplate);
+
             }
         } else {
             ProcessCommon.clearData("TEXT_REMARK_FOUR,FILE_ID_TWO", csCommId, entCode, myJdbcTemplate);
+            // 修改处理人意见
+            updateDealUsers(procInstId,processId,csCommId,myJdbcTemplate);
         }
+    }
+
+    /**
+     * 更新处理人细心
+     * @param procInstId 流程实例id
+     * @param processId 流程id
+     * @param csCommId 业务表id
+     * @param myJdbcTemplate 数据源
+     */
+    private void updateDealUsers(String procInstId, String processId, String csCommId, MyJdbcTemplate myJdbcTemplate) {
+        String userIds = ProcessCommon.getProcessAllDealUserNotStart(procInstId,processId,myJdbcTemplate);
+        Crud.from("PM_PROJECT_PROBLEM_REQ").where().eq("ID",csCommId).update()
+                .set("DEAL_WITH_USER_IDS",userIds)
+                .exec();
     }
 
     /**
@@ -166,7 +189,7 @@ public class PmProjectProblemReqExt {
         }
         String solveUserId = param.getSolveUserId();
         if (!SharedUtil.isEmptyString(solveUserId)){
-            sb1.append(" and ( find_in_set('").append(solveUserId).append("',a.TO_USER_IDS) or find_in_set('").append(solveUserId).append("',a.USER_IDS) ) ");
+            sb1.append(" and find_in_set('").append(solveUserId).append("',a.DEAL_WITH_USER_IDS)");
         }
         sb1.append(" order by a.id desc ");
         StringBuilder sb2 = sb1;
