@@ -1661,6 +1661,7 @@ public class WfExt {
     public static void createProcessTitle(String entityCode, EntityRecord entityRecord, MyJdbcTemplate myJdbcTemplate) {
         String processName = "", nowDate = "",userName = "",projectName = "",otherName = "",name = "",sql = "";
         String csCommId = entityRecord.csCommId;
+        Map<String,Object> valueMap = entityRecord.valueMap;
 
         String sql0 = "SELECT c.name as processName,b.IS_URGENT,b.START_DATETIME," +
                 "(select name from ad_user where id = b.START_USER_ID) as userName FROM "+entityCode+" a " +
@@ -1686,7 +1687,7 @@ public class WfExt {
         List<String> noProjectList = getNoProjectStaticList();
         if (noProjectList.contains(entityCode)){
             sql = "update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?";
-            String title = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_THREE");
+            String title = JdbcMapUtil.getString(valueMap,"APPROVAL_COMMENT_THREE");
             name = concatProcessNameStatic("-",processName,title,userName,nowDate);
             myJdbcTemplate.update(sql, name,csCommId);
             return;
@@ -1711,28 +1712,27 @@ public class WfExt {
         List<String> specialList = AttLinkDifferentProcess.getSpecialList();
         if (specialList.contains(entityCode)) {
             if ("PM_BUY_DEMAND_REQ".equals(entityCode)){ //采购需求审批
-                sql = "select b.name from PM_BUY_DEMAND_REQ a left join gr_set_value b on a.BUY_MATTER_ID = b.id where a.id = ?";
-                List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,csCommId);
-                if (!CollectionUtils.isEmpty(list)){
-                    otherName = JdbcMapUtil.getString(list.get(0),"name");
-                }
-                String subTitle = JdbcMapUtil.getString(entityRecord.valueMap,"REMARK_LONG_ONE"); // 副标题
+                otherName = GrSetValueExt.getValueNameById(JdbcMapUtil.getString(valueMap,"BUY_MATTER_ID"));
+                String subTitle = JdbcMapUtil.getString(valueMap,"REMARK_LONG_ONE"); // 副标题
                 name = concatProcessNameStatic("-",processName,projectName,subTitle,otherName,userName,nowDate);
             } else if ("PO_ORDER_REQ".equals(entityCode)){ //合同签订
                 otherName = getContractNameStatic(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
                 name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
             } else if ("PM_BID_APPROVAL_REQ".equals(entityCode)) { //招标文件审批
                 otherName = getContractNameStatic(entityCode,"NAME_ONE",csCommId,myJdbcTemplate); // 招标名称
-                String matterTypeId = JdbcMapUtil.getString(entityRecord.valueMap,"BUY_MATTER_ID");
+                String matterTypeId = JdbcMapUtil.getString(valueMap,"BUY_MATTER_ID");
                 String matterTypeName = GrSetValueExt.getValueNameById(matterTypeId);
                 name = concatProcessNameStatic("-",processName,otherName,matterTypeName,userName,nowDate);
+            } else if ("PM_PROJECT_PROBLEM_REQ".equals(entityCode)){
+                otherName = GrSetValueExt.getValueNameById(JdbcMapUtil.getString(valueMap,"PRJ_PUSH_PROBLEM_TYPE_ID"));
+                name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
             } else {
                 if ("PM_SUPERVISE_PLAN_REQ".equals(entityCode)){
-                    otherName = JdbcMapUtil.getString(entityRecord.valueMap,"REMARK_ONE");
+                    otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
                 } else if ("QUALITY_RECORD".equals(entityCode)){
-                    otherName = JdbcMapUtil.getString(entityRecord.valueMap,"REMARK_ONE");
+                    otherName = JdbcMapUtil.getString(valueMap,"REMARK_ONE");
                 } else if ("PM_SUPERVISE_NOTICE_REQ".equals(entityCode)){
-                    otherName = JdbcMapUtil.getString(entityRecord.valueMap,"CODE_ONE");
+                    otherName = JdbcMapUtil.getString(valueMap,"CODE_ONE");
                 } else {
                     otherName = getContractNameStatic(entityCode,"NAME_ONE",csCommId,myJdbcTemplate);
                 }

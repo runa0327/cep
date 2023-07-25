@@ -43,6 +43,7 @@ public class AttLinkDifferentProcess {
         list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
         list.add("QUALITY_RECORD"); // 质量交底记录
         list.add("PM_SUPERVISE_NOTICE_REQ"); // 监理通知单
+        list.add("PM_PROJECT_PROBLEM_REQ"); // 项目问题
         return list;
     }
 

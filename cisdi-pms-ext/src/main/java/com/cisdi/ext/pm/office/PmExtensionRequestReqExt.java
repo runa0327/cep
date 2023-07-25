@@ -204,7 +204,7 @@ public class PmExtensionRequestReqExt {
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> dataMap = list.get(0);
             if (Objects.nonNull(dataMap.get("PLAN_COMPL_DATE"))) {
-                Date endDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE"));
+                String endDate = JdbcMapUtil.getString(dataMap, "PLAN_COMPL_DATE");
                 String processName = JdbcMapUtil.getString(dataMap, "NAME");
                 if (Objects.nonNull(dataMap.get("LINKED_WF_PROCESS_ID"))) {
                     // 取流程名称
@@ -218,7 +218,7 @@ public class PmExtensionRequestReqExt {
                 if (!CollectionUtils.isEmpty(list1)) {
                     Map<String, Object> taskMap = list1.get(0);
                     String msg = "{0}【{1}】计划将在{2}完成，请及时处理！";
-                    String content = MessageFormat.format(msg, taskMap.get("prjName"), processName, endDate);
+                    String content = MessageFormat.format(msg, taskMap.get("projectName"), processName, endDate);
                     //判断状态
                     String nodeStatus = JdbcMapUtil.getString(dataMap, "PROGRESS_STATUS_ID");
                     String weekStatus = null;
@@ -231,7 +231,7 @@ public class PmExtensionRequestReqExt {
                     }else if("0099902212142036278".equals(nodeStatus)){
                         weekStatus ="1644140265205915648";
                     }
-                    myJdbcTemplate.update("update week_task set CONTENT=?,WEEK_TASK_STATUS_ID=? where id=?", content, weekStatus, taskMap.get("ID"));
+                    myJdbcTemplate.update("update week_task set CONTENT=?,WEEK_TASK_STATUS_ID=?,PLAN_COMPL_DATE=? where id=?", content, weekStatus, endDate, taskMap.get("ID"));
                 }
 
             }

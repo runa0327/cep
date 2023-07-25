@@ -29,7 +29,7 @@ public class AdUserExt {
      */
     public void getProjectProblemUserList(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql = "select b.START_USER_ID as id,c.name from PM_PROJECT_PROBLEM_REQ a left join wf_process_instance b on a.id = b.ENTITY_RECORD_ID left join ad_user c on b.START_USER_ID = c.id where a.status != 'VD' and b.status != 'VD' order by b.START_USER_ID asc";
+        String sql = "select distinct b.START_USER_ID as id,c.name from PM_PROJECT_PROBLEM_REQ a left join wf_process_instance b on a.id = b.ENTITY_RECORD_ID left join ad_user c on b.START_USER_ID = c.id where a.status != 'VD' and b.status != 'VD' order by b.START_USER_ID asc";
         List<Map<String, Object>> userList = myJdbcTemplate.queryForList(sql);
         HashMap<String, Object> result = new HashMap<>();
         result.put("userList",userList);
