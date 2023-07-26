@@ -245,13 +245,12 @@ public class WordToPdfServiceImpl implements WordToPdfService {
             if (!CollectionUtils.isEmpty(orderFileIds)){
                 endFileId = String.join(",",orderFileIds);
             }
-
-//            else {
-//
-//                newFileIds = newFileIds + "," + newFileId;
-//            }
         }
-        newFileIds = endFileId + "," + newFileId;
+        if (StringUtils.hasText(endFileId)){
+            newFileIds = endFileId + "," + newFileId;
+        } else {
+            newFileIds = newFileId;
+        }
         String sql2 = "update "+tableCode+" set "+attCode+" = ? where id = ?";
         Integer exec = jdbcTemplate.update(sql2,newFileIds,poOrderId);
         log.info("执行成功，共{}条",exec);
