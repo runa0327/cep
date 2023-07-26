@@ -35,3 +35,9 @@ jodconverter:
     max-tasks-per-process: 10
     #每个 JODConverter 处理线程使用的端口列表，以逗号分隔。 office实例数等于端口数，因为每个端口号将启动 1个 office 进程。
     port-numbers: 8200
+
+mybatis:
+  # 搜索指定包别名
+  typeAliasesPackage: com.pms.cisdipmswordtopdf.model
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath*:mapper/**/*Mapper.xml

@@ -13,16 +13,20 @@ import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.ComThread;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
+import com.pms.cisdipmswordtopdf.model.FlFile;
 import com.pms.cisdipmswordtopdf.model.PoOrderReq;
+import com.pms.cisdipmswordtopdf.service.BaseProcessMessageBakService;
+import com.pms.cisdipmswordtopdf.service.FlFileService;
 import com.pms.cisdipmswordtopdf.service.WordToPdfService;
 import com.pms.cisdipmswordtopdf.util.StringUtil;
 import com.pms.cisdipmswordtopdf.util.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,10 +39,15 @@ import java.util.*;
 public class WordToPdfServiceImpl implements WordToPdfService {
 
     private static final int wdFormatPDF = 17; // PDF 格式
-    private static final int xlTypePDF = 0;  // xls格式s
 
-    @Autowired
+    @Resource
     private JdbcTemplate jdbcTemplate;
+
+    @Resource
+    private FlFileService flFileService;
+
+    @Resource
+    private BaseProcessMessageBakService baseProcessMessageBakService;
 
     @Override
     public void wordToPdf(PoOrderReq poOrderReq) {
@@ -51,43 +60,35 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                 String oldFileId = fileTmp.get("file");
                 poOrderReq.setFileId(oldFileId);
                 poOrderReq.setColsCode(fileTmp.get("code"));
-                String fileId = StringUtil.replaceCode(oldFileId,",","','");
+
                 //获取文件地址
-                String sql1 = "select * from fl_file where id in ('"+fileId+"') and EXT in ('doc','docx')";
-                List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
+                List<FlFile> list1 = flFileService.getFileMessageByFileId(oldFileId);
+
                 StringBuilder sb = new StringBuilder();
-                int i = 1;
                 //windows环境下测试获取文件地址，勿删
-//        String filePath = jdbcTemplate.queryForList("select name from test_demo").get(0).get("name").toString();
+//                String filePath = jdbcTemplate.queryForList("select name from test_demo").get(0).get("name").toString();
                 String code = jdbcTemplate.queryForList("select remark from base_third_interface where code = 'order_word_to_pdf' and SYS_TRUE = 1 ").get(0).get("remark").toString();
                 StringBuilder errorBuilder = new StringBuilder();
+
                 // 判断当前操作系统类型
                 String systemType = SystemUtil.getSystemType();
                 if (!CollectionUtils.isEmpty(list1)){
+                    for (FlFile tmp : list1) {
+                        String filePath = tmp.getFileAddress();
+                        filePath = checkBySystem(systemType,filePath);
 
-                    for (Map<String, Object> tmp : list1) {
-                        String filePath = tmp.get("PHYSICAL_LOCATION").toString();
-                        if ("windows".equals(systemType)){
-                            if (filePath.contains("file2")){
-                                filePath = filePath.replace("/data/qygly/file2/","\\\\10.130.19.197\\filedisk2\\").replace("/","\\");
-                            } else {
-                                filePath = filePath.replace("/data/qygly/file/","\\\\10.130.19.197\\filedisk\\").replace("/","\\");
-                            }
-                        }
                         String path = filePath.substring(0,filePath.lastIndexOf(code)+1);
                         String id = IdUtil.getSnowflakeNextIdStr();
                         String copyPath = path+id+"copy.pdf";
                         String pdfPath = path+id+".pdf";
+
                         //word转pdf
-                        String error = "";
-                        if ("windows".equals(systemType)){
-                            error = newPdf(filePath,copyPath); // windows系统转换
-                        } else {
-                            error = wordStartToPdf(filePath,copyPath); // linux系统转换
-                        }
-                        if (error.length() > 0 && error != null && !"".equals(error)){
+                        String error = wordToPdfMessage(systemType,filePath,copyPath);
+
+                        if (StringUtils.hasText(error)){
                             errorBuilder.append(error).append("\n ");
                         }
+
                         //pdf加水印
                         Boolean res = addWater(companyName,copyPath,pdfPath,errorBuilder);
                         if (res){
@@ -99,9 +100,9 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                             //写入文件表
                             updateData(map,poOrderReq,tmp,date,systemType);
                         }
-                        i++;
                     }
                 }
+
                 if (sb.length() > 0){
                     String newFileId = sb.deleteCharAt(sb.length()-1).toString();
                     //更新业务表
@@ -120,40 +121,72 @@ public class WordToPdfServiceImpl implements WordToPdfService {
 
     }
 
+    /**
+     * 根据操作系统不同采用不同方法进行word转pdf
+     * @param systemType 操作系统
+     * @param filePath word文件地址信息
+     * @param copyPath word生成的pdf文件地址信息
+     * @return 转换过程中记录信息
+     */
+    private String wordToPdfMessage(String systemType,String filePath, String copyPath) {
+        String error;
+        if ("windows".equals(systemType)){
+            error = newPdf(filePath,copyPath); // windows系统转换
+        } else {
+            error = wordStartToPdf(filePath,copyPath); // linux系统转换
+        }
+        return error;
+    }
+
+    /**
+     * 根据操作系统判断地址是否需要处理 windows路径和linux不一致
+     * @param systemType 操作系统类型
+     * @param filePath 文件实际地址
+     * @return 文件地址
+     */
+    private String checkBySystem(String systemType, String filePath) {
+        if ("windows".equals(systemType)){
+            if (filePath.contains("file2")){
+                filePath = filePath.replace("/data/qygly/file2/","\\\\10.130.19.197\\filedisk2\\").replace("/","\\");
+            } else {
+                filePath = filePath.replace("/data/qygly/file/","\\\\10.130.19.197\\filedisk\\").replace("/","\\");
+            }
+        }
+        return filePath;
+    }
+
+    /**
+     * 采用jacob方式转换pdf
+     * @param sfileName word文件地址信息
+     * @param toFileName word生成的pdf文件地址信息
+     * @return 转换过程中错误信息
+     */
     private String newPdf(String sfileName, String toFileName) {
-        log.info("toFileName值为，{}",toFileName);
         String error = "";
         long start = System.currentTimeMillis();
         ActiveXComponent app = null;
         Dispatch doc = null;
-        boolean result = true;
-
         try {
             app = new ActiveXComponent("Word.Application");
             app.setProperty("Visible", new Variant(false));
             Dispatch docs = app.getProperty("Documents").toDispatch();
             doc = Dispatch.call(docs, "Open", sfileName).toDispatch();
-            System.out.println("打开文档..." + sfileName);
-            System.out.println("转换文档到 PDF..." + toFileName);
-            File tofile = new File(toFileName);
-            if (tofile.exists()) {
-                tofile.delete();
-            }
+            log.info("打开文档..." + sfileName);
+            log.info("转换文档到 PDF..." + toFileName);
             File file = new File(toFileName);
             if (file.exists()){
                 file.delete();
             }
-//            Dispatch.call(doc, "SaveAs", toFileName, wdFormatPDF);
-            Dispatch.invoke(doc, "SaveAs", Dispatch.Method,new Object[] {toFileName,new Variant(17)},new int[1]);
+            Dispatch.call(doc, "SaveAs", toFileName, wdFormatPDF);
+//            Dispatch.invoke(doc, "SaveAs", Dispatch.Method,new Object[] {toFileName,new Variant(17)},new int[1]);
             long end = System.currentTimeMillis();
-            System.out.println("转换完成..用时：" + (end - start) + "ms.");
+            log.info("转换完成..用时：" + (end - start) + "ms.");
 
-            result = true;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             Dispatch.call(doc, "Close", false);
-            System.out.println("关闭文档");
+            log.info("关闭文档");
             if (app != null) {
                 app.invoke("Quit", new Variant[] {});
             }
@@ -177,26 +210,30 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         List<String> pdfFileIds = new ArrayList<>();
         //查询pdf文件
         String oldFileId = jdbcTemplate.queryForList("select "+attCode+" from "+tableCode+" where id = ?",poOrderId).get(0).get(attCode).toString();
-        oldFileId = StringUtil.replaceCode(oldFileId,",","','");
-        String sql1 = "select id as id from fl_file where id in ('"+oldFileId+"') and EXT = 'PDF'";
-        List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
-        if (!CollectionUtils.isEmpty(list1)){
-            for (Map<String, Object> tmp : list1) {
-                String value = tmp.get("id").toString();
-                if (value.length() > 0 && value != null){
-                    pdfFileIds.add(value);
-                }
-            }
-            if (!CollectionUtils.isEmpty(pdfFileIds)){
-                orderFileIds.removeAll(pdfFileIds);
-                newFileIds = String.join(",",orderFileIds);
-            } else {
-                newFileIds = newFileIds + "," + newFileId;
-            }
-        }
-        newFileIds = newFileIds + "," + newFileId;
+
+        // 将原始记录存入流程信息备份表
+        baseProcessMessageBakService.insertBak(oldFileId,attCode,tableCode,poOrderReq.getProcessInstanceId(),poOrderReq.getProcessId());
+
+//        oldFileId = StringUtil.replaceCode(oldFileId,",","','");
+//        String sql1 = "select id as id from fl_file where id in ('"+oldFileId+"') and EXT = 'PDF'";
+//        List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
+//        if (!CollectionUtils.isEmpty(list1)){
+//            for (Map<String, Object> tmp : list1) {
+//                String value = tmp.get("id").toString();
+//                if (value.length() > 0 && value != null){
+//                    pdfFileIds.add(value);
+//                }
+//            }
+//            if (!CollectionUtils.isEmpty(pdfFileIds)){
+//                orderFileIds.removeAll(pdfFileIds);
+//                newFileIds = String.join(",",orderFileIds);
+//            } else {
+//                newFileIds = newFileIds + "," + newFileId;
+//            }
+//        }
+//        newFileIds = newFileIds + "," + newFileId;
         String sql2 = "update "+tableCode+" set "+attCode+" = ? where id = ?";
-        Integer exec = jdbcTemplate.update(sql2,newFileIds,poOrderId);
+        Integer exec = jdbcTemplate.update(sql2,newFileId,poOrderId);
         log.info("执行成功，共{}条",exec);
     }
 
@@ -208,24 +245,22 @@ public class WordToPdfServiceImpl implements WordToPdfService {
      * @param date 时间
      * @param systemType 操作系统类型
      */
-    private void updateData(Map<String, Object> map, PoOrderReq poOrderReq,Map<String, Object> oldFileTmp,String date, String systemType) {
+    private void updateData(Map<String, Object> map, PoOrderReq poOrderReq,FlFile oldFileTmp,String date, String systemType) {
+
         String fileId = map.get("fileId").toString();
-        String name = oldFileTmp.get("Name").toString();
-        String flPathId = oldFileTmp.get("FL_PATH_ID").toString();
+        String name = oldFileTmp.getName();
+        String flPathId = oldFileTmp.getFilePathId();
         String createBy = poOrderReq.getCreateBy();
         String size = map.get("size").toString();
         String fileSize = map.get("fileSize").toString();
         String fileIdPath = map.get("fileIdPath").toString();
-        log.info("newFileIds值：{}",fileIdPath);
         if ("windows".equals(systemType)){
-            log.info("进入转换");
             if (fileIdPath.contains("filedisk2")){
                 fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk2\\","/data/qygly/file2/").replace("\\","/");
             } else {
                 fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk\\","/data/qygly/file/").replace("\\","/");
             }
         }
-        log.info("最后的地址：{}",fileIdPath);
         String fileName = name+".pdf";
         String insertSql = "insert into fl_file (ID,CODE,NAME,VER,FL_PATH_ID,EXT,STATUS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID," +
                 "SIZE_KB,TS,UPLOAD_DTTM,PHYSICAL_LOCATION,DSP_NAME,DSP_SIZE,IS_PUBLIC_READ) values (" +
@@ -238,7 +273,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
      * 文件信息
      * @param filePath 文件地址
      * @param fileId 文件id
-     * @return
+     * @return 文件相关信息
      */
     private Map<String, Object> getFileMess(String filePath, String fileId) {
         Map<String,Object> map = new HashMap<>();
@@ -257,10 +292,10 @@ public class WordToPdfServiceImpl implements WordToPdfService {
     /**
      * 文件大小转换
      * @param size 文件大小(KB)
-     * @return
+     * @return 文件大小
      */
     private String getSize(long size) {
-        String fileSize = "";
+        String fileSize;
         if (size >= 1024){
             size = size/1024;
             fileSize = size + "M";
@@ -293,7 +328,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         try {
             PdfReader reader = new PdfReader(copyPath);
             int n = reader.getNumberOfPages();
-            PdfStamper stamper = null;
+            PdfStamper stamper;
             stamper = new PdfStamper(reader, new FileOutputStream(pdfPath));
             PdfGState gs1 = new PdfGState();
             gs1.setFillOpacity(0.2f);

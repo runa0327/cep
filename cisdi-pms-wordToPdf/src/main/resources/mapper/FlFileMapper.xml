@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.cisdipmswordtopdf.mapper.FlFileMapper">
+    <resultMap id="FlFileMapperResult" type="com.pms.cisdipmswordtopdf.model.FlFile">
+        <id column="id" property="id" />
+        <result column="createBy" property="createBy" />
+        <result column="createDate" property="createDate" />
+        <result column="lastUpdateBy" property="lastUpdateBy" />
+        <result column="lastUpdateDate" property="lastUpdateDate" />
+        <result column="nowDate" property="nowDate" />
+        <result column="status" property="status" />
+        <result column="code" property="code" />
+        <result column="name" property="name" />
+        <result column="extName" property="extName" />
+        <result column="showName" property="showName" />
+        <result column="fileSize" property="fileSize" />
+        <result column="showFileSize" property="showFileSize" />
+        <result column="fileInlineUrl" property="fileInlineUrl" />
+        <result column="fileAttachmentUrl" property="fileAttachmentUrl" />
+        <result column="fileUploadDate" property="fileUploadDate" />
+        <result column="fileAddress" property="fileAddress" />
+        <result column="isPublicRead" property="isPublicRead" />
+        <result column="filePathId" property="filePathId" />
+        <result column="ver" property="ver" />
+    </resultMap>
+
+    <sql id="common">
+        ID AS id,
+        CODE as code,
+        NAME as name,
+        VER as ver,
+        FL_PATH_ID as filePathId,
+        EXT as extName,
+        LK_WF_INST_ID,
+        STATUS as status,
+        CRT_DT as createDate,
+        CRT_USER_ID as createBy,
+        LAST_MODI_DT as lastUpdateDate,
+        LAST_MODI_USER_ID as lastUpdateBy,
+        SIZE_KB as fileSize,
+        FILE_INLINE_URL as fileInlineUrl,
+        FILE_ATTACHMENT_URL as fileAttachmentUrl,
+        TS as nowDate,
+        UPLOAD_DTTM as fileUploadDate,
+        PHYSICAL_LOCATION as fileAddress,
+        DSP_NAME as showName,
+        DSP_SIZE as showFileSize,
+        IS_PUBLIC_READ as isPublicRead
+    </sql>
+
+    <!--通过fileId查询文件信息-->
+    <select id="getFileMessageByFileId" resultMap="FlFileMapperResult">
+        select
+            <include refid="common"></include>
+        from
+            FL_FILE
+        where
+            (ext = 'doc' or ext = 'docx')
+            and id in ('${fileId}')
+    </select>
+</mapper>

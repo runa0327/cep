@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.cisdipmswordtopdf.mapper.BaseProcessMessageBakMapper">
+    <resultMap id="BaseProcessMessageBakMapperResult" type="com.pms.cisdipmswordtopdf.model.BaseProcessMessageBak">
+        <id column="id" property="id" />
+        <result column="processId" property="processId" />
+        <result column="wfProcessInstanceId" property="wfProcessInstanceId" />
+        <result column="adAttId" property="adAttId" />
+        <result column="attValue" property="attValue" />
+    </resultMap>
+
+    <!--查询所有列表数据-->
+    <select id="queryList" resultMap="BaseProcessMessageBakMapperResult">
+        select id from BASE_PROCESS_MESSAGE_BAK
+    </select>
+
+    <!--新增数据-->
+    <insert id="insert">
+        insert into base_process_message_bak(
+            ID,
+            VER,
+            TS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            STATUS,
+            WF_PROCESS_ID,
+            AD_ATT_ID,
+            WF_PROCESS_INSTANCE_ID,
+            TEXT_REMARK_ONE
+        ) values (
+            #{id},
+            #{ver},
+            #{nowDate},
+            #{createDate},
+            #{createBy},
+            #{lastUpdateDate},
+            #{lastUpdateBy},
+            #{status},
+            #{processId},
+            #{adAttId},
+            #{wfProcessInstanceId},
+            #{attValue}
+        )
+    </insert>
+
+</mapper>

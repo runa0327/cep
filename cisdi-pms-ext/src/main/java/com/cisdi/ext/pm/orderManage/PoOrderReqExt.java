@@ -604,6 +604,8 @@ public class PoOrderReqExt {
         String csId = entityRecord.csCommId;
         //流程实例id
         String procInstId = ExtJarHelper.procInstId.get();
+        // 流程id
+        String processId = ExtJarHelper.procId.get();
         //是否标准模板 0099799190825080669 = 是，0099799190825080670=否
         String isModel = JdbcMapUtil.getString(entityRecord.valueMap,"YES_NO_THREE");
 
@@ -627,7 +629,7 @@ public class PoOrderReqExt {
                                 .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
                                 .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
                     } else {
-                        PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode);
+                        PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode,processId);
                         String param = JSON.toJSONString(poOrderReqView);
                         //调用接口
                         HttpClient.doPost(url,param,"UTF-8");
@@ -648,7 +650,7 @@ public class PoOrderReqExt {
      * @param entCode 表名
      * @return 合同信息实体
      */
-    private PoOrderReqView getOrderModel(EntityRecord entityRecord, String procInstId, String userId, String status, String companyName, String entCode) {
+    private PoOrderReqView getOrderModel(EntityRecord entityRecord, String procInstId, String userId, String status, String companyName, String entCode,String processId) {
         PoOrderReqView poOrderReqView = new PoOrderReqView();
         poOrderReqView.setId(entityRecord.csCommId);
         poOrderReqView.setProcessInstanceId(procInstId);
@@ -869,6 +871,7 @@ public class PoOrderReqExt {
         String userId = ExtJarHelper.loginInfo.get().userId;
         String userName = ExtJarHelper.loginInfo.get().userName;
         //流程id
+        String processId = ExtJarHelper.procId.get();
         String csId = entityRecord.csCommId;
         //流程实例id
         String procInstId = ExtJarHelper.procInstId.get();
@@ -893,7 +896,7 @@ public class PoOrderReqExt {
                                 .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
                                 .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
                     } else {
-                        PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode);
+                        PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode,processId);
                         String param = JSON.toJSONString(poOrderReqView);
                         //调用接口
                         HttpClient.doPost(url,param,"UTF-8");
