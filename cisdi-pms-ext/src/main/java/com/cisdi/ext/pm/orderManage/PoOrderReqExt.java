@@ -667,7 +667,7 @@ public class PoOrderReqExt {
 
         Map<String,String> map = new HashMap<>();
         if ("PO_ORDER_REQ".equals(entCode) || "po_order_req".equals(entCode)){ //合同签订
-            if ("0099799190825080669".equals(isModel)){ //合同修编稿
+            if ("0099799190825080670".equals(isModel)){ //合同修编稿
                 map.put("code","FILE_ID_ONE");
                 map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"));
             } else { //合同文本
