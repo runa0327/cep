@@ -652,6 +652,7 @@ public class PoOrderReqExt {
      */
     private PoOrderReqView getOrderModel(EntityRecord entityRecord, String procInstId, String userId, String status, String companyName, String entCode,String processId) {
         PoOrderReqView poOrderReqView = new PoOrderReqView();
+        poOrderReqView.setProcessId(processId);
         poOrderReqView.setId(entityRecord.csCommId);
         poOrderReqView.setProcessInstanceId(procInstId);
         poOrderReqView.setCreateBy(userId);

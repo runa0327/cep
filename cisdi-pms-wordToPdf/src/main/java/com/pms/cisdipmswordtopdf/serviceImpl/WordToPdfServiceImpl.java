@@ -61,6 +61,9 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                 poOrderReq.setFileId(oldFileId);
                 poOrderReq.setColsCode(fileTmp.get("code"));
 
+                // 定义被转换的word文件id
+                StringBuilder wordFileId = new StringBuilder();
+
                 //获取文件地址
                 List<FlFile> list1 = flFileService.getFileMessageByFileId(oldFileId);
 
@@ -92,6 +95,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                         //pdf加水印
                         Boolean res = addWater(companyName,copyPath,pdfPath,errorBuilder);
                         if (res){
+                            wordFileId.append(tmp.getId()).append(",");
                             sb.append(id).append(",");
                             //删除中间文件
                             deleteFile(copyPath);
@@ -106,7 +110,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                 if (sb.length() > 0){
                     String newFileId = sb.deleteCharAt(sb.length()-1).toString();
                     //更新业务表
-                    updateOrder(newFileId,poOrderReq);
+                    updateOrder(newFileId,poOrderReq,wordFileId);
                 }
                 if (errorBuilder.length() > 0){
                     //将问题信息计入提示信息表便于排查分析
@@ -200,13 +204,20 @@ public class WordToPdfServiceImpl implements WordToPdfService {
      * 更新合同表
      * @param newFileId pdf文件id
      * @param poOrderReq 合同信息
+     * @param wordFileId 合同信息
      */
-    private void updateOrder(String newFileId, PoOrderReq poOrderReq) {
+    private void updateOrder(String newFileId, PoOrderReq poOrderReq, StringBuilder wordFileId) {
+        wordFileId.deleteCharAt(wordFileId.length()-1);
+
+        List<String> wordList = new ArrayList<>(Arrays.asList(wordFileId.toString().split(","))); // 被转换的word文件id
+        String endFileId = "";
+
         String tableCode = poOrderReq.getTableCode();
         String attCode = poOrderReq.getColsCode();
-        String newFileIds = poOrderReq.getFileId();
+        String newFileIds = poOrderReq.getFileId(); // 该字段原始所有文件id
         String poOrderId = poOrderReq.getId();
         List<String> orderFileIds = new ArrayList<>(Arrays.asList(newFileIds.split(",")));
+
         List<String> pdfFileIds = new ArrayList<>();
         //查询pdf文件
         String oldFileId = jdbcTemplate.queryForList("select "+attCode+" from "+tableCode+" where id = ?",poOrderId).get(0).get(attCode).toString();
@@ -214,26 +225,35 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         // 将原始记录存入流程信息备份表
         baseProcessMessageBakService.insertBak(oldFileId,attCode,tableCode,poOrderReq.getProcessInstanceId(),poOrderReq.getProcessId());
 
-//        oldFileId = StringUtil.replaceCode(oldFileId,",","','");
-//        String sql1 = "select id as id from fl_file where id in ('"+oldFileId+"') and EXT = 'PDF'";
-//        List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
-//        if (!CollectionUtils.isEmpty(list1)){
-//            for (Map<String, Object> tmp : list1) {
-//                String value = tmp.get("id").toString();
-//                if (value.length() > 0 && value != null){
-//                    pdfFileIds.add(value);
-//                }
-//            }
-//            if (!CollectionUtils.isEmpty(pdfFileIds)){
-//                orderFileIds.removeAll(pdfFileIds);
-//                newFileIds = String.join(",",orderFileIds);
-//            } else {
+        oldFileId = StringUtil.replaceCode(oldFileId,",","','");
+        String sql1 = "select id as id from fl_file where id in ('"+oldFileId+"') and EXT = 'PDF'";
+        List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
+        if (!CollectionUtils.isEmpty(list1)){
+            for (Map<String, Object> tmp : list1) {
+                String value = tmp.get("id").toString();
+                if (value.length() > 0 && value != null){
+                    pdfFileIds.add(value);
+                }
+            }
+
+            // word文件转换pdf后不在原字段中显示
+            orderFileIds.removeAll(wordList);
+
+            if (!CollectionUtils.isEmpty(pdfFileIds)){
+                orderFileIds.removeAll(pdfFileIds);
+            }
+            if (!CollectionUtils.isEmpty(orderFileIds)){
+                endFileId = String.join(",",orderFileIds);
+            }
+
+//            else {
+//
 //                newFileIds = newFileIds + "," + newFileId;
 //            }
-//        }
-//        newFileIds = newFileIds + "," + newFileId;
+        }
+        newFileIds = endFileId + "," + newFileId;
         String sql2 = "update "+tableCode+" set "+attCode+" = ? where id = ?";
-        Integer exec = jdbcTemplate.update(sql2,newFileId,poOrderId);
+        Integer exec = jdbcTemplate.update(sql2,newFileIds,poOrderId);
         log.info("执行成功，共{}条",exec);
     }
 
