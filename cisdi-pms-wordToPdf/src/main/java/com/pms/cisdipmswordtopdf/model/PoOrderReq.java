@@ -5,29 +5,31 @@ import java.util.Map;
 
 public class PoOrderReq {
     // id
-    public String id;
+    private String id;
     // 项目id
-    public String projectId;
+    private String projectId;
     // 项目名称
-    public String projectName;
+    private String projectName;
     //公司名称
-    public String companyName;
+    private String companyName;
     // 公司id
-    public String companyId;
+    private String companyId;
     // 附件信息
-    public String fileId;
+    private String fileId;
     //是否标准模板 0099799190825080669 = 是，0099799190825080670=否
-    public String isModel;
+    private String isModel;
     //流程实例id
-    public String processInstanceId;
+    private String processInstanceId;
     //创建人
-    public String createBy;
+    private String createBy;
     //表名
-    public String tableCode;
+    private String tableCode;
     //字段名
-    public String colsCode;
+    private String colsCode;
     //更新字段及对应文件
-    public List<Map<String,String>> colMap;
+    private List<Map<String,String>> colMap;
+    // 流程id
+    private String processId;
 
     public String getId() {
         return id;
@@ -123,5 +125,13 @@ public class PoOrderReq {
 
     public void setColMap(List<Map<String, String>> colMap) {
         this.colMap = colMap;
+    }
+
+    public String getProcessId() {
+        return processId;
+    }
+
+    public void setProcessId(String processId) {
+        this.processId = processId;
     }
 }
