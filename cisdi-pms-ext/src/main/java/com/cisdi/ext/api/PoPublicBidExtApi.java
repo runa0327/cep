@@ -286,10 +286,6 @@ public class PoPublicBidExtApi {
     }
 
     /**
-     *
-     */
-
-    /**
      * 招标详情接口
      */
     public void getPublicBidView() {

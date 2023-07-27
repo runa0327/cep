@@ -1,12 +1,10 @@
 package com.cisdi.ext.api;
 
 import com.cisdi.ext.model.view.order.PoOrderPaymentView;
-import com.cisdi.ext.util.EntityUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
-import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
@@ -39,21 +37,18 @@ public class PoOrderPaymentExtApi {
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuilder baseSql = new StringBuilder();
-        baseSql.append("SELECT a.ID,a.CONTRACT_ID,(select contract_name from po_order_req where id = a.CONTRACT_ID ) contractName,a.PM_PRJ_ID project_id,a.STAGE_PAY_AMT_TWO,a.AMT,a.PAY_DATE,a.PAY_AMT,a" +
-                ".PO_ORDER_DTL_PRO_ID,a.PO_ORDER_DTL_ID ,p.name project_name " +
-                "FROM po_order_payment a " +
+        baseSql.append("SELECT a.ID,a.CONTRACT_ID,(select contract_name from po_order_req where id = a.CONTRACT_ID ) contractName,a.PM_PRJ_ID project_id,a.STAGE_PAY_AMT_TWO,a.AMT,a.PAY_DATE,a.PAY_AMT,a" + ".PO_ORDER_DTL_PRO_ID,a.PO_ORDER_DTL_ID ,p.name project_name " + "FROM po_order_payment a " +
 //                "left join po_order b on a.CONTRACT_ID = b.CONTRACT_APP_ID  " +
-                "left join pm_prj p on p.id = a.PM_PRJ_ID " +
-                "WHERE a.PM_PRJ_ID = '" + param.projectId + "' ");
+                "left join pm_prj p on p.id = a.PM_PRJ_ID " + "WHERE a.PM_PRJ_ID = '").append(param.projectId).append("' ");
         //其他筛选条件
         if (!SharedUtil.isEmptyString(param.startDate) && !SharedUtil.isEmptyString(param.endDate)){
-            baseSql.append("and a.pay_date BETWEEN '" + param.startDate + "' and '" + param.endDate + "' ");
+            baseSql.append("and a.pay_date BETWEEN '").append(param.startDate).append("' and '").append(param.endDate).append("' ");
         }
         if (!SharedUtil.isEmptyString(param.minPayAmt)){
-            baseSql.append("and a.PAY_AMT >= " + param.minPayAmt + " ");
+            baseSql.append("and a.PAY_AMT >= ").append(param.minPayAmt).append(" ");
         }
         if (!SharedUtil.isEmptyString(param.maxPayAmt)){
-            baseSql.append("and a.PAY_AMT <= " + param.maxPayAmt + " ");
+            baseSql.append("and a.PAY_AMT <= ").append(param.maxPayAmt).append(" ");
         }
 
         String totalSql = baseSql.toString();
