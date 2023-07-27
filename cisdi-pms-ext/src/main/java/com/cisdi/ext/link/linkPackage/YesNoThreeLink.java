@@ -23,20 +23,20 @@ public class YesNoThreeLink {
         if ("PM_SEND_APPROVAL_REQ".equals(entCode)){ //发文呈批
             // 是(Y)， 否(N)
             if ("Y".equals(code)){  //隐藏 是否呈董事长审批
-                LinkUtils.mapAddAllValue("YES_NO_FOUR",AttDataTypeE.TEXT_LONG,null,null,false,false,false,attLinkResult);
+                LinkUtils.mapAddAllValue("YES_NO_FOUR",AttDataTypeE.TEXT_LONG,(String) null,null,false,false,false,attLinkResult);
             } else { //显示 是否呈董事长审批
-                LinkUtils.mapAddAllValue("YES_NO_FOUR",AttDataTypeE.TEXT_LONG,null,null,true,true,true,attLinkResult);
+                LinkUtils.mapAddAllValue("YES_NO_FOUR",AttDataTypeE.TEXT_LONG,(String) null,null,true,true,true,attLinkResult);
             }
         } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "PO_ORDER_TERMINATE_REQ".equals(entCode)){ //采购合同签订申请 采购合同补充协议申请 合同终止
             AttLinkExtDetail.clearOrderIsStandard(attLinkResult); //清除属性联动数据
             AttLinkExtDetail.handleOrderIsStandard(attLinkResult,code);
         } else if ("PM_BUY_DEMAND_REQ".equals(entCode)){ // 采购需求审批
             if ("Y".equals(code)){ // 显示说明和附件，且说明为必填
-                LinkUtils.mapAddAllValue("TEXT_REMARK_FIVE",AttDataTypeE.TEXT_LONG,null,null,true,true,true,attLinkResult);
-                LinkUtils.mapAddAllValue("FILE_ID_FIVE",AttDataTypeE.FILE_GROUP,null,null,true,false,true,attLinkResult);
+                LinkUtils.mapAddAllValue("TEXT_REMARK_FIVE",AttDataTypeE.TEXT_LONG,(String) null,null,true,true,true,attLinkResult);
+                LinkUtils.mapAddAllValue("FILE_ID_FIVE",AttDataTypeE.FILE_GROUP,(String) null,null,true,false,true,attLinkResult);
             } else {
-                LinkUtils.mapAddAllValue("TEXT_REMARK_FIVE",AttDataTypeE.TEXT_LONG,null,null,false,false,false,attLinkResult);
-                LinkUtils.mapAddAllValue("FILE_ID_FIVE",AttDataTypeE.FILE_GROUP,null,null,false,false,false,attLinkResult);
+                LinkUtils.mapAddAllValue("TEXT_REMARK_FIVE",AttDataTypeE.TEXT_LONG,(String) null,null,false,false,false,attLinkResult);
+                LinkUtils.mapAddAllValue("FILE_ID_FIVE",AttDataTypeE.FILE_GROUP,(String) null,null,false,false,false,attLinkResult);
             }
         }
         return attLinkResult;

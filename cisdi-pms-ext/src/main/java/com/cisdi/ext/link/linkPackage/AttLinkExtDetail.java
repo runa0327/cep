@@ -1380,9 +1380,9 @@ public class AttLinkExtDetail {
             LinkUtils.mapAddValueByValue("PREPARE_AMT_HISTORY",String.valueOf(allPrepareAmt),allPrepareAmt,AttDataTypeE.DOUBLE,attLinkResult); //预备费
             LinkUtils.mapAddValueByValue("CONSTRUCT_PERIOD_HISTORY",String.valueOf(allConstructPeriodAmt),allConstructPeriodAmt,AttDataTypeE.DOUBLE,attLinkResult); //建设期利息
             LinkUtils.mapAddValueByValue("TEXT_REMARK_TWO",comment,comment,AttDataTypeE.TEXT_LONG,attLinkResult); //项目结算内容摘要
-            LinkUtils.mapAddValueByValueFile("FILE_ID_FOUR",file1,file1,AttDataTypeE.FILE_GROUP,attLinkResult); //结算盖章文件
-            LinkUtils.mapAddValueByValueFile("FILE_ID_FIVE",file2,file2,AttDataTypeE.FILE_GROUP,attLinkResult); //项目结算电子资料
-            LinkUtils.mapAddValueByValueFile("FILE_ID_SIX",file3,file3,AttDataTypeE.FILE_GROUP,attLinkResult); //其他附件
+            LinkUtils.mapAddValueByValueFile("FILE_ID_FOUR",file1,file1,true,false,true,AttDataTypeE.FILE_GROUP,attLinkResult); //项目结算电子资料
+            LinkUtils.mapAddValueByValueFile("FILE_ID_FIVE",file2,file2,true,false,true,AttDataTypeE.FILE_GROUP,attLinkResult); //项目结算电子资料
+            LinkUtils.mapAddValueByValueFile("FILE_ID_SIX",file3,file3,true,false,true,AttDataTypeE.FILE_GROUP,attLinkResult); //其他附件
         }
     }
 
