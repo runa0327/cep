@@ -12,80 +12,6 @@ import java.math.BigDecimal;
 public class LinkUtils {
 
     /**
-     * 属性联动赋值 显示参数并传 BigDecimal
-     * @param showCode 显示字段
-     * @param textValue text显示值
-     * @param value value显示值
-     * @param type 字段类型
-     * @param attLinkResult 回显集
-     */
-    public static void mapAddValueByValue(String showCode, String textValue, int value, AttDataTypeE type, AttLinkResult attLinkResult) {
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = type;
-            linkedAtt.text = textValue;
-            linkedAtt.value = value;
-            attLinkResult.attMap.put(showCode, linkedAtt);
-        }
-    }
-
-    /**
-     * 属性联动赋值 显示参数并传 BigDecimal
-     * @param showCode 显示字段
-     * @param textValue text显示值
-     * @param value value显示值
-     * @param type 字段类型
-     * @param attLinkResult 回显集
-     */
-    public static void mapAddValueByValue(String showCode, String textValue, BigDecimal value, AttDataTypeE type, AttLinkResult attLinkResult) {
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = type;
-            linkedAtt.text = textValue;
-            linkedAtt.value = value;
-            attLinkResult.attMap.put(showCode, linkedAtt);
-        }
-    }
-
-    /**
-     * 属性联动赋值 显示参数并传 String
-     * @param showCode 显示字段
-     * @param textValue text显示值
-     * @param value value显示值
-     * @param type 字段类型
-     * @param attLinkResult 回显集
-     */
-    public static void mapAddValueByValue(String showCode, String textValue, String value, AttDataTypeE type, AttLinkResult attLinkResult) {
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = type;
-            linkedAtt.text = textValue;
-            linkedAtt.value = value;
-            attLinkResult.attMap.put(showCode, linkedAtt);
-        }
-    }
-
-    /**
-     * 属性联动赋值 显示参数并传 String 回显值是否可改
-     * @param showCode 显示字段
-     * @param textValue text显示值
-     * @param value value显示值
-     * @param type 字段类型
-     * @param bl false不可改，true可改
-     * @param attLinkResult 回显集
-     */
-    public static void mapAddValueByValueNoEdit(String showCode, String textValue, String value, AttDataTypeE type, boolean bl, AttLinkResult attLinkResult) {
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = type;
-            linkedAtt.text = textValue;
-            linkedAtt.value = value;
-            linkedAtt.changeToEditable = bl;
-            attLinkResult.attMap.put(showCode, linkedAtt);
-        }
-    }
-
-    /**
      * 属性联动值赋值空
      * @param showCode 显示字段
      * @param type 字段类型
@@ -102,7 +28,7 @@ public class LinkUtils {
     }
 
     /**
-     * 属性联动所有值赋值
+     * 属性联动所有值赋值-String类型
      * @param showCode 回显字段
      * @param type 字段类型
      * @param value value值 一般引用显示id
@@ -126,7 +52,7 @@ public class LinkUtils {
     }
 
     /**
-     * 属性联动所有值赋值
+     * 属性联动所有值赋值-BigDecimal类型
      * @param showCode 回显字段
      * @param type 字段类型
      * @param value value值 一般引用显示id
@@ -150,7 +76,7 @@ public class LinkUtils {
     }
 
     /**
-     * 属性联动赋值 显示参数并传 String
+     * 属性联动赋值 显示参数并传 String 文件
      * @param showCode 显示字段
      * @param text text显示值
      * @param value value显示值

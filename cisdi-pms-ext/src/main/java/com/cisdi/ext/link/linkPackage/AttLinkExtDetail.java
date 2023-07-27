@@ -792,7 +792,7 @@ public class AttLinkExtDetail {
             //岗位人员赋值
             assignmentPostLink(attLinkResult,companyId,myJdbcTemplate);
             if ("1638731685728239616".equals(projectTypeId) || "0099799190825080994".equals(projectTypeId) || "0099799190825080740".equals(projectTypeId)){
-                LinkUtils.mapAddValueByValue("AD_USER_TWENTY_FOUR_ID","未涉及","1641281525532323840",AttDataTypeE.TEXT_LONG,attLinkResult);
+                LinkUtils.mapAddAllValue("AD_USER_TWENTY_FOUR_ID",AttDataTypeE.TEXT_LONG,"1641281525532323840","未涉及",true,false,false,attLinkResult);
             }
             // 资金来源
             {
@@ -810,12 +810,12 @@ public class AttLinkExtDetail {
             mapAddValue("START_REMARK","START_REMARK",list.get(0),AttDataTypeE.TEXT_LONG,attLinkResult); //启动说明
             // 项目类型
             String projectTypeName = GrSetValueExt.getValueNameById(projectTypeId);
-            LinkUtils.mapAddValueByValue("PROJECT_TYPE_ID",projectTypeName,projectTypeId,AttDataTypeE.TEXT_LONG,attLinkResult);
+            LinkUtils.mapAddAllValue("PROJECT_TYPE_ID",AttDataTypeE.TEXT_LONG,projectTypeId,projectTypeName,true,false,false,attLinkResult);
             // 建设单位
             String companyName;
             if (!SharedUtil.isEmptyString(companyId)){
                 companyName = PmParty.selectById(companyId).getName();
-                LinkUtils.mapAddValueByValue("CUSTOMER_UNIT",companyName,companyId,AttDataTypeE.TEXT_LONG,attLinkResult);
+                LinkUtils.mapAddAllValue("CUSTOMER_UNIT",AttDataTypeE.TEXT_LONG,companyId,companyName,true,false,false,attLinkResult);
             }
             // 招标方式
             {
@@ -1193,15 +1193,16 @@ public class AttLinkExtDetail {
             String file1 = map.get("file1").toString(); //结算盖章文件
             String file2 = map.get("file2").toString(); //项目结算电子资料
             String file3 = map.get("file3").toString(); //其他附件
-            LinkUtils.mapAddValueByValue("PRJ_TOTAL_HISTORY",String.valueOf(allPrjTotalAmt),allPrjTotalAmt,AttDataTypeE.DOUBLE,attLinkResult); //总投资
-            LinkUtils.mapAddValueByValue("CONSTRUCT_PRJ_AMT_HISTORY",String.valueOf(allConstructAmt),allConstructAmt,AttDataTypeE.DOUBLE,attLinkResult); //建安工程费
-            LinkUtils.mapAddValueByValue("PROJECT_OTHER_AMT_HISTORY",String.valueOf(allPrjOtherAmt),allPrjOtherAmt,AttDataTypeE.DOUBLE,attLinkResult); //工程其他费用
-            LinkUtils.mapAddValueByValue("EQUIP_BUY_AMT_HISTORY",String.valueOf(allEquipAmt),allEquipAmt,AttDataTypeE.DOUBLE,attLinkResult); //设备采购费
-            LinkUtils.mapAddValueByValue("EQUIPMENT_COST_HISTORY",String.valueOf(allEquipmentAmt),allEquipmentAmt,AttDataTypeE.DOUBLE,attLinkResult); //科研设备费
-            LinkUtils.mapAddValueByValue("LAND_AMT_HISTORY",String.valueOf(allLandAmt),allLandAmt,AttDataTypeE.DOUBLE,attLinkResult); //土地征拆费用
-            LinkUtils.mapAddValueByValue("PREPARE_AMT_HISTORY",String.valueOf(allPrepareAmt),allPrepareAmt,AttDataTypeE.DOUBLE,attLinkResult); //预备费
-            LinkUtils.mapAddValueByValue("CONSTRUCT_PERIOD_HISTORY",String.valueOf(allConstructPeriodAmt),allConstructPeriodAmt,AttDataTypeE.DOUBLE,attLinkResult); //建设期利息
-            LinkUtils.mapAddValueByValue("TEXT_REMARK_TWO",comment,comment,AttDataTypeE.TEXT_LONG,attLinkResult); //项目结算内容摘要
+
+            LinkUtils.mapAddAllValue("PRJ_TOTAL_HISTORY",AttDataTypeE.DOUBLE,allPrjTotalAmt,String.valueOf(allPrjTotalAmt),true,false,false,attLinkResult); //总投资
+            LinkUtils.mapAddAllValue("CONSTRUCT_PRJ_AMT_HISTORY",AttDataTypeE.DOUBLE,allConstructAmt,String.valueOf(allConstructAmt),true,false,false,attLinkResult); //建安工程费
+            LinkUtils.mapAddAllValue("PROJECT_OTHER_AMT_HISTORY",AttDataTypeE.DOUBLE,allPrjOtherAmt,String.valueOf(allPrjOtherAmt),true,false,false,attLinkResult); //工程其他费用
+            LinkUtils.mapAddAllValue("EQUIP_BUY_AMT_HISTORY",AttDataTypeE.DOUBLE,allEquipAmt,String.valueOf(allEquipAmt),true,false,false,attLinkResult); //设备采购费
+            LinkUtils.mapAddAllValue("EQUIPMENT_COST_HISTORY",AttDataTypeE.DOUBLE,allEquipmentAmt,String.valueOf(allEquipmentAmt),true,false,false,attLinkResult); //科研设备费
+            LinkUtils.mapAddAllValue("LAND_AMT_HISTORY",AttDataTypeE.DOUBLE,allLandAmt,String.valueOf(allLandAmt),true,false,false,attLinkResult); //土地征拆费用
+            LinkUtils.mapAddAllValue("PREPARE_AMT_HISTORY",AttDataTypeE.DOUBLE,allPrepareAmt,String.valueOf(allPrepareAmt),true,false,false,attLinkResult); //预备费
+            LinkUtils.mapAddAllValue("CONSTRUCT_PERIOD_HISTORY",AttDataTypeE.DOUBLE,allConstructPeriodAmt,String.valueOf(allConstructPeriodAmt),true,false,false,attLinkResult); //建设期利息
+            LinkUtils.mapAddAllValue("TEXT_REMARK_TWO",AttDataTypeE.TEXT_LONG,comment,comment,true,false,false,attLinkResult); //项目结算内容摘要
             LinkUtils.mapAddValueByValueFile("FILE_ID_FOUR",file1,file1,true,false,true,AttDataTypeE.FILE_GROUP,attLinkResult); //项目结算电子资料
             LinkUtils.mapAddValueByValueFile("FILE_ID_FIVE",file2,file2,true,false,true,AttDataTypeE.FILE_GROUP,attLinkResult); //项目结算电子资料
             LinkUtils.mapAddValueByValueFile("FILE_ID_SIX",file3,file3,true,false,true,AttDataTypeE.FILE_GROUP,attLinkResult); //其他附件
@@ -1336,7 +1337,7 @@ public class AttLinkExtDetail {
                 if (!SharedUtil.isEmptyString(userId)){
                     List<String> codeList = StringUtil.getStrToList(code,",");
                     for (String tp : codeList) {
-                        LinkUtils.mapAddValueByValueNoEdit(tp,userName,userId,AttDataTypeE.TEXT_LONG,false,attLinkResult);
+                        LinkUtils.mapAddAllValue(tp,AttDataTypeE.TEXT_LONG,userId,userName,true,false,false,attLinkResult);
                     }
                 }
             }

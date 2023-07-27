@@ -8,6 +8,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.att.AttDataTypeE;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -16,8 +17,8 @@ import java.util.List;
 public class PmProPlanNodeLink {
 
     /**
-     *
-     * @param myJdbcTemplate
+     * 进度计划节点属性联动入口
+     * @param myJdbcTemplate 数据源
      * @param attValue
      * @param entCode
      * @return
@@ -28,8 +29,8 @@ public class PmProPlanNodeLink {
         if (CollectionUtils.isEmpty(list)){
             throw new BaseException("对不起，未查询到该条记录进度计划明细，请联系管理员处理！");
         } else {
-            int cha = list.get(0).getPlanTotalDays();
-            LinkUtils.mapAddValueByValue("DURATION_ONE",String.valueOf(cha), cha,AttDataTypeE.INTEGER,attLinkResult);
+            String cha = String.valueOf(list.get(0).getPlanTotalDays());
+            LinkUtils.mapAddAllValue("DURATION_ONE",AttDataTypeE.INTEGER,cha,cha,true,true,false,attLinkResult);
         }
         return attLinkResult;
     }
