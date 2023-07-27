@@ -2,7 +2,6 @@ package com.cisdi.ext.link;
 
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class LinkSql {
                 "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS'," +
                 "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD'," +
                 "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget'," +
-                "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE,t.PRJ_EARLY_USER_ID,t.PRJ_DESIGN_USER_ID,t.PRJ_COST_USER_ID, " +
+                "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE,t.PRJ_EARLY_USER_ID,t.PRJ_DESIGN_USER_ID,t.PRJ_COST_USER_ID,t.OTHER " +
                 "t.ESTIMATED_TOTAL_INVEST,t.PROJECT_AMT,t.CONSTRUCT_PRJ_AMT,t.EQUIP_BUY_AMT,t.EQUIPMENT_COST,t.PROJECT_OTHER_AMT,t.LAND_BUY_AMT," +
                 "t.PREPARE_AMT,t.CONSTRUCT_PERIOD_INTEREST " +
                 "from pm_prj t left join PM_PARTY c on t.CUSTOMER_UNIT=c.id " +
@@ -39,8 +38,7 @@ public class LinkSql {
                 "LEFT JOIN gr_set_value pt on t.PROJECT_TYPE_ID=pt.id " +
                 "LEFT JOIN gr_set_value st on t.CON_SCALE_TYPE_ID=st.id " +
                 "LEFT JOIN gr_set_value su on t.CON_SCALE_UOM_ID=su.id where t.id=? ";
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql1, projectId);
-        return list;
+        return myJdbcTemplate.queryForList(sql1, projectId);
     }
 
     /**
@@ -52,8 +50,7 @@ public class LinkSql {
      */
     public static List<Map<String, Object>> prjRoster(String projectId, String companyId, MyJdbcTemplate myJdbcTemplate) {
         String sql = "select a.ad_user_id,b.code as postInfoCode from PM_ROSTER a left join post_info b on a.post_info_id = b.id where a.PM_PRJ_ID = ? and a.CUSTOMER_UNIT = ? and a.status = 'AP'";
-        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId,companyId);
-        return list;
+        return myJdbcTemplate.queryForList(sql,projectId,companyId);
     }
 
     /**
@@ -122,7 +119,7 @@ public class LinkSql {
      * @param projectId 项目id
      * @param level 层级
      * @param myJdbcTemplate 数据源
-     * @return
+     * @return 项目进度计划节点信息
      */
     public static List<Map<String, Object>> selectPrjNode(String projectId, String level, MyJdbcTemplate myJdbcTemplate) {
         String sql = "select a.id,a.name from PM_PRO_PLAN_NODE a left join pm_pro_plan b on a.PM_PRO_PLAN_ID = b.id " +
@@ -192,5 +189,16 @@ public class LinkSql {
     public static List<Map<String, Object>> getPrjNodeLevel3(String projectId, MyJdbcTemplate myJdbcTemplate) {
         String sql = "select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where pn.level= 3 and  PM_PRJ_ID=?";
         return myJdbcTemplate.queryForList(sql, projectId);
+    }
+
+    /**
+     * 查询项目类型联动信息
+     * @param myJdbcTemplate 数据源
+     * @param attValue 项目类型id
+     * @return 查询结果
+     */
+    public static List<Map<String, Object>> selectProjectType(MyJdbcTemplate myJdbcTemplate, String attValue) {
+        String sql = "select v0.id PROJECT_TYPE_ID,v0.name project_type_name,v1.id CON_SCALE_TYPE_ID,v1.name CON_SCALE_TYPE_NAME,v2.id CON_SCALE_UOM_ID,v2.name CON_SCALE_UOM_NAME from pm_prj_type_link t join gr_set_value v0 on t.PROJECT_TYPE_ID=v0.id join gr_set_value v1 on t.CON_SCALE_TYPE_ID=v1.id join gr_set_value v2 on t.CON_SCALE_UOM_ID=v2.id where t.PROJECT_TYPE_ID=?";
+        return myJdbcTemplate.queryForList(sql, attValue);
     }
 }

@@ -97,7 +97,6 @@ public class PmPrjIdLink {
                 Map row = list.get(0);
                 String companyId = JdbcMapUtil.getString(row,"customer_id");
 
-
                 AttLinkExtDetail.assignmentAttLinkResult(attLinkResult,row,entCode,myJdbcTemplate);
                 if ("PM_PRJ_REQ".equals(entCode)){ //立项申请
                     //回显项目启动的总投资

@@ -58,14 +58,14 @@ public class AttLinkExtDetail {
      */
     private static void projectLink(AttLinkResult attLinkResult, String code) {
         //系统(system)，非系统(non_system)
-        Boolean prjListChangeToShown = false; //下拉项目默认隐藏
-        Boolean prjNameChangeToShown = false; //手写项目默认隐藏
+        boolean prjListChangeToShown = false; //下拉项目默认隐藏
+        boolean prjNameChangeToShown = false; //手写项目默认隐藏
 
-        Boolean prjListChangeToMandatory = false; //下拉项目默认非必填
-        Boolean prjNameChangeToMandatory = false; //手写项目默认非必填
+        boolean prjListChangeToMandatory = false; //下拉项目默认非必填
+        boolean prjNameChangeToMandatory = false; //手写项目默认非必填
 
-        Boolean prjListChangeToEditable = false; //下拉项目默认不可改
-        Boolean prjNameChangeToEditable = false; //手写项目默认不可改
+        boolean prjListChangeToEditable = false; //下拉项目默认不可改
+        boolean prjNameChangeToEditable = false; //手写项目默认不可改
 
         if (!"system".equals(code)) {
             prjNameChangeToShown = true;
@@ -150,15 +150,15 @@ public class AttLinkExtDetail {
      * @param code 联动的属性值 是(Y)， 否(N)
      */
     public static void handleOrderIsStandard(AttLinkResult attLinkResult, String code) {
-        Boolean faWuChangeToShown =  true; //法务部门修订稿显示
-        Boolean caiWuChangeToShown =  true; //财务部门修订稿显示
-        Boolean isCaiNaChangeToShown =  true; //审核意见是否完全采纳显示
-        Boolean caiNaChangeToShown =  true; //采纳说明显示
-        Boolean caiNaFileChangeToShown =  true; //采纳附件显示
-        Boolean heTongChangeToShown =  true; //合同送审稿显示
-        Boolean falvChangeToShown = true; // 法律审核附件显示
-        Boolean phoneChangeToShown = false; // 联系电话 默认不显示
-        Boolean userChangeToMandatory = true; // 联系人默认必填
+        boolean faWuChangeToShown =  true; //法务部门修订稿显示
+        boolean caiWuChangeToShown =  true; //财务部门修订稿显示
+        boolean isCaiNaChangeToShown =  true; //审核意见是否完全采纳显示
+        boolean caiNaChangeToShown =  true; //采纳说明显示
+        boolean caiNaFileChangeToShown =  true; //采纳附件显示
+        boolean heTongChangeToShown =  true; //合同送审稿显示
+        boolean falvChangeToShown = true; // 法律审核附件显示
+        boolean phoneChangeToShown = false; // 联系电话 默认不显示
+        boolean userChangeToMandatory = true; // 联系人默认必填
         if ("Y".equals(code)){
             faWuChangeToShown =  false;
             caiWuChangeToShown =  false;
@@ -234,7 +234,6 @@ public class AttLinkExtDetail {
      * @param sevId 实体视图id
      * @param myJdbcTemplate 数据源
      * @param attValue 属性联动值
-     * @return 值
      */
     public static void getOrderPayDetail(AttLinkResult attLinkResult, String sevId, MyJdbcTemplate myJdbcTemplate, String attValue) {
         Map<String,Object> map = getViewPayMap(sevId);
@@ -281,7 +280,7 @@ public class AttLinkExtDetail {
     private static Map<String, Object> getViewPayMap(String sevId) {
         Map<String,Object> map = new HashMap<>();
         String viewId = "";
-        Boolean createTable = false;
+        boolean createTable = false;
         if ("0099902212142028526".equals(sevId)){ // 资金需求计划
             viewId = "0099952822476362402";
         } else if ("0099902212142022303".equals(sevId)){ //补充协议
@@ -351,7 +350,7 @@ public class AttLinkExtDetail {
      * @param entCode 实体表名
      * @param myJdbcTemplate 数据源
      */
-    public static void assignmentAttLinkResult(AttLinkResult attLinkResult, Map row, String entCode, MyJdbcTemplate myJdbcTemplate) {
+    public static void assignmentAttLinkResult(AttLinkResult attLinkResult, Map<String,Object> row, String entCode, MyJdbcTemplate myJdbcTemplate) {
         //项目类型属性联动处理
         List<String> noPrjTypeList = AttLinkDifferentProcess.noPrjTypeLink();
         if (!noPrjTypeList.contains(entCode)){
@@ -365,17 +364,9 @@ public class AttLinkExtDetail {
         mapAddValue("FEASIBILITY_APPROVE_FUND","FS",row,AttDataTypeE.DOUBLE,attLinkResult); //可研批复资金
         mapAddValue("ESTIMATE_APPROVE_FUND","PD",row,AttDataTypeE.DOUBLE,attLinkResult); //初概批复资金
         mapAddValue("EVALUATION_APPROVE_FUND","budget",row,AttDataTypeE.DOUBLE,attLinkResult); //财评批复资金
-        mapAddValue("OTHER","QTY_TWO",row,AttDataTypeE.TEXT_LONG,attLinkResult); //其他
         if (!"PM_PRJ_INVEST3".equals(entCode)){ //财评不自动回显总投资
             mapAddValue("PRJ_TOTAL_INVEST","ESTIMATED_TOTAL_INVEST",row,AttDataTypeE.DOUBLE,attLinkResult); //总投资
         }
-
-        mapAddBigDecimalValue("FLOOR_AREA","FLOOR_AREA",row,AttDataTypeE.DOUBLE,attLinkResult); //占地面积
-        mapAddBigDecimalValue("BUILDING_AREA","BUILDING_AREA",row,AttDataTypeE.TEXT_LONG,attLinkResult); //建筑面积
-        mapAddBigDecimalValue("QTY_ONE","QTY_ONE",row,AttDataTypeE.TEXT_LONG,attLinkResult); //建筑面积
-        mapAddBigDecimalValue("QTY_THREE","QTY_THREE",row,AttDataTypeE.TEXT_LONG,attLinkResult); //海域面积
-        mapAddBigDecimalValue("CON_SCALE_QTY","CON_SCALE_QTY",row,AttDataTypeE.TEXT_LONG,attLinkResult); //长
-        mapAddBigDecimalValue("CON_SCALE_QTY2","CON_SCALE_QTY2",row,AttDataTypeE.TEXT_LONG,attLinkResult); //宽
 
         mapAddRefValue("CUSTOMER_UNIT","customer_id","customer_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //业主单位
         mapAddRefValue("PRJ_MANAGE_MODE_ID","m_id","m_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //项目管理模式
@@ -428,7 +419,7 @@ public class AttLinkExtDetail {
      * @param type 回显类型
      * @param attLinkResult 返回值
      */
-    public static void mapAddRefValue(String showCode, String valueCode, String textCode, Map row, AttDataTypeE type, AttLinkResult attLinkResult) {
+    public static void mapAddRefValue(String showCode, String valueCode, String textCode, Map<String,Object> row, AttDataTypeE type, AttLinkResult attLinkResult) {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = type;
@@ -446,7 +437,7 @@ public class AttLinkExtDetail {
      * @param type 回显类型
      * @param attLinkResult 返回值
      */
-    public static void mapAddValue(String showCode, String sourceCode, Map row, AttDataTypeE type, AttLinkResult attLinkResult) {
+    public static void mapAddValue(String showCode, String sourceCode, Map<String,Object> row, AttDataTypeE type, AttLinkResult attLinkResult) {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = type;
@@ -463,7 +454,7 @@ public class AttLinkExtDetail {
      * @param type 回显类型
      * @param attLinkResult 返回值
      */
-    public static void mapAddBigDecimalValue(String showCode, String sourceCode, Map row, AttDataTypeE type, AttLinkResult attLinkResult) {
+    public static void mapAddBigDecimalValue(String showCode, String sourceCode, Map<String,Object> row, AttDataTypeE type, AttLinkResult attLinkResult) {
         {
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = type;
@@ -474,44 +465,28 @@ public class AttLinkExtDetail {
     }
 
     /**
-     * 属性联动返回值赋值 文件赋值
-     * @param showCode 需要回显的字段
-     * @param type 回显类型
-     * @param attLinkResult 返回值
-     */
-    public static void mapAddFileValue(String showCode, AttDataTypeE type, AttLinkResult attLinkResult) {
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = type;
-            linkedAtt.text = null;
-            linkedAtt.value = null;
-            attLinkResult.attMap.put(showCode, linkedAtt);
-        }
-    }
-
-    /**
      * 项目类型属性联动，根据项目类型联动，控制如：面积、长、宽等
      * @param row 单条项目记录
      * @param attLinkResult 返回的集合map
      */
-    public static void prjTypeLinkNew(Map row, AttLinkResult attLinkResult) {
-        Boolean roadLengthMustEdit = false; //道路长度默认非必填
-        Boolean roadWidthMustEdit = false; //道路宽度默认非必填
-        Boolean buildAreaMustEdit = false; //建筑面积默认非必填
-        Boolean seaAreaMustEdit = false; //海域面积默认非必填
-        Boolean otherMustEdit = false; //其他默认非必填
+    public static void prjTypeLinkNew(Map<String,Object> row, AttLinkResult attLinkResult) {
+        boolean roadLengthMustEdit = false; //道路长度默认非必填
+        boolean roadWidthMustEdit = false; //道路宽度默认非必填
+        boolean buildAreaMustEdit = false; //建筑面积默认非必填
+        boolean seaAreaMustEdit = false; //海域面积默认非必填
+        boolean otherMustEdit = false; //其他默认非必填
 
-        Boolean roadLengthShow = false; //道路长度默认不显示
-        Boolean roadWidthShow = false; //道路宽度默认不显示
-        Boolean buildAreaShow = false; //建筑面积默认不显示
-        Boolean seaAreaShow = false; //海域面积默认不显示
-        Boolean otherShow = false; //其他默认不显示
+        boolean roadLengthShow = false; //道路长度默认不显示
+        boolean roadWidthShow = false; //道路宽度默认不显示
+        boolean buildAreaShow = false; //建筑面积默认不显示
+        boolean seaAreaShow = false; //海域面积默认不显示
+        boolean otherShow = false; //其他默认不显示
 
-        Boolean roadLengthChangeToEditable = false; //道路长度默认不可改
-        Boolean roadWidthChangeToEditable = false; //道路宽度默认不可改
-        Boolean buildAreaChangeToEditable = false; //建筑面积默认不可改
-        Boolean seaAreaChangeToEditable = false; //海域面积默认不可改
-        Boolean otherChangeToEditable = false; //其他默认不可改
+        boolean roadLengthChangeToEditable = false; //道路长度默认不可改
+        boolean roadWidthChangeToEditable = false; //道路宽度默认不可改
+        boolean buildAreaChangeToEditable = false; //建筑面积默认不可改
+        boolean seaAreaChangeToEditable = false; //海域面积默认不可改
+        boolean otherChangeToEditable = false; //其他默认不可改
 
         //项目类型名称
 //        0099799190825080689(民用建筑) 0099799190825080690(市政道路)	 0099799190825080691(港口航道)  0099799190825080692(园林景观)
@@ -542,176 +517,24 @@ public class AttLinkExtDetail {
             otherChangeToEditable = true;
         }
         //建筑面积
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.changeToShown = buildAreaShow;
-            linkedAtt.changeToMandatory = buildAreaMustEdit;
-            linkedAtt.changeToEditable = buildAreaChangeToEditable;
-            attLinkResult.attMap.put("QTY_ONE", linkedAtt);
-        }
+        String buildArea = JdbcMapUtil.getString(row,"QTY_ONE");
+        LinkUtils.mapAddAllValue("QTY_ONE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(buildArea),buildArea,buildAreaShow,buildAreaMustEdit,buildAreaChangeToEditable,attLinkResult);
+
         //海域面积
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.changeToShown = seaAreaShow;
-            linkedAtt.changeToMandatory = seaAreaMustEdit;
-            linkedAtt.changeToEditable = seaAreaChangeToEditable;
-            attLinkResult.attMap.put("QTY_THREE", linkedAtt);
-        }
+        String seaArea = JdbcMapUtil.getString(row,"QTY_THREE");
+        LinkUtils.mapAddAllValue("QTY_THREE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(seaArea),seaArea,seaAreaShow,seaAreaMustEdit,seaAreaChangeToEditable,attLinkResult);
+
         //长
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.changeToShown = roadLengthShow;
-            linkedAtt.changeToMandatory = roadLengthMustEdit;
-            linkedAtt.changeToEditable = roadLengthChangeToEditable;
-            attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
-        }
+        String roadLength = JdbcMapUtil.getString(row,"CON_SCALE_QTY");
+        LinkUtils.mapAddAllValue("CON_SCALE_QTY",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(roadLength),roadLength,roadLengthShow,roadLengthMustEdit,roadLengthChangeToEditable,attLinkResult);
+
         //宽
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.changeToShown = roadWidthShow;
-            linkedAtt.changeToMandatory = roadWidthMustEdit;
-            linkedAtt.changeToEditable = roadWidthChangeToEditable;
-            attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
-        }
+        String roadWidth = JdbcMapUtil.getString(row,"CON_SCALE_QTY2");
+        LinkUtils.mapAddAllValue("CON_SCALE_QTY2",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(roadWidth),roadWidth,roadWidthShow,roadWidthMustEdit,roadWidthChangeToEditable,attLinkResult);
+
         //其他
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.changeToShown = otherShow;
-            linkedAtt.changeToMandatory = otherMustEdit;
-            linkedAtt.changeToEditable = otherChangeToEditable;
-            attLinkResult.attMap.put("OTHER", linkedAtt);
-        }
-    }
-
-    /**
-     * 项目类型属性联动，控制如：面积、长、宽等
-     * @param row 单条项目记录
-     * @param attLinkResult 返回的集合map
-     */
-    public static void prjTypeLink(Map row, AttLinkResult attLinkResult) {
-        Boolean areashow = true; //面积显示
-        Boolean lengthShow = true; //长显示
-        Boolean widthShow = true; //宽显示
-        Boolean otherShow = true; //其他显示
-        Boolean seaShow = true; //海域面积显示
-        Boolean buildAreaShow = false; //海域面积显示
-
-        Boolean areaMustEdit = false; //面积必填
-        Boolean lengthMustEdit = false; //长必填
-        Boolean widthMustEdit = false; //宽必填
-        Boolean otherMustEdit = false; //其他必填
-        Boolean seaMustEdit = false; //海域面积必填
-        Boolean floorAreaMustEdit = false; //占地面积必填
-
-        String name1 = JdbcMapUtil.getString(row, "st_name");
-        if (!SharedUtil.isEmptyString(name1)){
-            if (name1.contains("面积")){
-                if (name1.contains("海域")){
-                    lengthShow = false;
-                    widthShow = false;
-                    otherShow = false;
-                    lengthMustEdit = false;
-                    widthMustEdit = false;
-                    otherMustEdit = false;
-                    areashow = false;
-                    areaMustEdit = false;
-                    buildAreaShow = true;
-                    seaMustEdit = true;
-                } else if (name1.contains("建筑面积")){
-                    lengthShow = false;
-                    widthShow = false;
-                    otherShow = false;
-                    lengthMustEdit = false;
-                    widthMustEdit = false;
-                    otherMustEdit = false;
-                    seaShow = false;
-                    floorAreaMustEdit = true;
-                }
-
-            } else if (name1.contains("长宽")){
-                areashow = false;
-                otherShow = false;
-                areaMustEdit = false;
-                otherMustEdit = false;
-                seaShow = false;
-            } else {
-                if (name1.contains("市政管线")){
-                    floorAreaMustEdit = false;
-                }
-                areashow = false;
-                lengthShow = false;
-                widthShow = false;
-                areaMustEdit = false;
-                lengthMustEdit = false;
-                widthMustEdit = false;
-                seaShow = false;
-            }
-        }
-        // 占地面积
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "FLOOR_AREA"));
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "FLOOR_AREA")) ? null:JdbcMapUtil.getString(row, "FLOOR_AREA");
-            linkedAtt.changeToMandatory = floorAreaMustEdit;
-            attLinkResult.attMap.put("FLOOR_AREA", linkedAtt);
-        }
-        //建筑面积
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.changeToShown = areashow;
-            linkedAtt.changeToMandatory = areaMustEdit;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:JdbcMapUtil.getString(row, "QTY_ONE");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_ONE")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "QTY_ONE"));
-            attLinkResult.attMap.put("QTY_ONE", linkedAtt);
-        }
-        //海域面积
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.changeToShown = seaShow;
-            linkedAtt.changeToMandatory = seaMustEdit;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:JdbcMapUtil.getString(row, "QTY_THREE");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_THREE")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "QTY_THREE"));
-            attLinkResult.attMap.put("QTY_THREE", linkedAtt);
-        }
-        //长
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.changeToShown = lengthShow;
-            linkedAtt.changeToMandatory = lengthMustEdit;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "CON_SCALE_QTY"));
-            attLinkResult.attMap.put("CON_SCALE_QTY", linkedAtt);
-        }
-        //宽
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.changeToShown = widthShow;
-            linkedAtt.changeToMandatory = widthMustEdit;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:JdbcMapUtil.getString(row, "CON_SCALE_QTY2");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "CON_SCALE_QTY2")) ? null:new BigDecimal(JdbcMapUtil.getString(row, "CON_SCALE_QTY2"));
-            attLinkResult.attMap.put("CON_SCALE_QTY2", linkedAtt);
-        }
-        //其他
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.changeToShown = otherShow;
-            linkedAtt.changeToMandatory = otherMustEdit;
-            linkedAtt.text = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
-            linkedAtt.value = SharedUtil.isEmptyString(JdbcMapUtil.getString(row, "QTY_TWO")) ? null:JdbcMapUtil.getString(row, "QTY_TWO");
-            attLinkResult.attMap.put("OTHER", linkedAtt);
-//            attLinkResult.attMap.put("QTY_TWO", linkedAtt);
-        }
+        String other = JdbcMapUtil.getString(row,"OTHER");
+        LinkUtils.mapAddAllValue("OTHER",AttDataTypeE.TEXT_LONG,other,other,otherShow,otherMustEdit,otherChangeToEditable,attLinkResult);
     }
 
     /**
@@ -934,7 +757,6 @@ public class AttLinkExtDetail {
 
     /**
      * 业主单位切换清空涉及数据
-     * @param attLinkResult
      */
     public static void clearUser(AttLinkResult attLinkResult) {
         {
@@ -990,7 +812,7 @@ public class AttLinkExtDetail {
             String projectTypeName = GrSetValueExt.getValueNameById(projectTypeId);
             LinkUtils.mapAddValueByValue("PROJECT_TYPE_ID",projectTypeName,projectTypeId,AttDataTypeE.TEXT_LONG,attLinkResult);
             // 建设单位
-            String companyName = "";
+            String companyName;
             if (!SharedUtil.isEmptyString(companyId)){
                 companyName = PmParty.selectById(companyId).getName();
                 LinkUtils.mapAddValueByValue("CUSTOMER_UNIT",companyName,companyId,AttDataTypeE.TEXT_LONG,attLinkResult);
@@ -1193,14 +1015,14 @@ public class AttLinkExtDetail {
             project = "PM_PRJ_IDS";
         }
 
-        Boolean prjListChangeToShown = false; //下拉项目默认隐藏
-        Boolean prjNameChangeToShown = false; //手写项目默认隐藏
+        boolean prjListChangeToShown = false; //下拉项目默认隐藏
+        boolean prjNameChangeToShown = false; //手写项目默认隐藏
 
-        Boolean prjListChangeToMandatory = false; //下拉项目默认非必填
-        Boolean prjNameChangeToMandatory = false; //手写项目默认非必填
+        boolean prjListChangeToMandatory = false; //下拉项目默认非必填
+        boolean prjNameChangeToMandatory = false; //手写项目默认非必填
 
-        Boolean prjListChangeToEditable = false; //下拉项目默认不可改
-        Boolean prjNameChangeToEditable = false; //手写项目默认不可改
+        boolean prjListChangeToEditable = false; //下拉项目默认不可改
+        boolean prjNameChangeToEditable = false; //手写项目默认不可改
 
         if (!"system".equals(code)) {
             prjNameChangeToShown = true;
@@ -1283,7 +1105,7 @@ public class AttLinkExtDetail {
      * @return 资金信息map
      */
     public static Map getAmtMap(String attValue, MyJdbcTemplate myJdbcTemplate) {
-        Map resultRow = new HashMap();
+        Map<String,Object> resultRow = new HashMap();
         String sql1 = "SELECT * FROM PM_PRJ WHERE ID = ?";
         List<Map<String, Object>> map = myJdbcTemplate.queryForList(sql1, attValue);
         if (!CollectionUtils.isEmpty(map)) {
@@ -1298,7 +1120,7 @@ public class AttLinkExtDetail {
      * @param attLinkResult 返回的集合值
      * @return 回显值
      */
-    public static AttLinkResult getResult(Map resultRow, AttLinkResult attLinkResult) {
+    public static AttLinkResult getResult(Map<String,Object> resultRow, AttLinkResult attLinkResult) {
         mapAddBigDecimalValue("PRJ_TOTAL_INVEST","ESTIMATED_TOTAL_INVEST",resultRow,AttDataTypeE.DOUBLE,attLinkResult); //总投资
         mapAddBigDecimalValue("PROJECT_AMT","PROJECT_AMT",resultRow,AttDataTypeE.DOUBLE,attLinkResult); //工程费用
         mapAddBigDecimalValue("PROJECT_OTHER_AMT","PROJECT_OTHER_AMT",resultRow,AttDataTypeE.DOUBLE,attLinkResult); //工程建设其他费用
