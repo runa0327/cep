@@ -2,6 +2,7 @@ package com.cisdi.ext.pm;
 
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.enums.FileCodeEnum;
+import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.util.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -388,6 +389,13 @@ public class PmPrjReqExt {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //项目id
         String projectId = entityRecord.csCommId;
+
+        PmPrj pmPrj = PmPrj.selectById(projectId);
+        // 生成项目编号
+        createPrjCode(pmPrj,projectId);
+        // 创建项目清单
+        PrjMaterialInventory.addPrjInventory(projectId);
+
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_prj where id=?", projectId);
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> dataMap = list.get(0);
@@ -398,6 +406,20 @@ public class PmPrjReqExt {
                         JdbcMapUtil.getBigDecimal(start, "PRJ_TOTAL_INVEST"), JdbcMapUtil.getString(start, "TENDER_MODE_ID"));
             } else {
                 PrjPlanUtil.createPlan(projectId, null, null, null, null);
+            }
+        }
+    }
+
+    /**
+     * 系统项目，项目编号为空的项目生成项目编号
+     * @param pmPrj 项目信息
+     * @param projectId 项目id
+     */
+    private void createPrjCode(PmPrj pmPrj, String projectId) {
+        if (SharedUtil.isEmptyString(pmPrj.getPrjCode())){
+            if ("0099952822476441374".equals(pmPrj.getProjectSourceTypeId())){
+                String pmCode = PmPrjCodeUtil.getPrjCode();
+                Crud.from("PM_PRJ").where().eq("ID",projectId).update().set("PM_CODE",pmCode).exec();
             }
         }
     }
