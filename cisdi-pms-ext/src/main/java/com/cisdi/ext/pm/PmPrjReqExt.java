@@ -59,8 +59,8 @@ public class PmPrjReqExt {
         String PREPARE_AMTStr = SharedUtil.isEmptyObject(JdbcMapUtil.getString(valueMap, "PREPARE_AMT")) ? "0" : JdbcMapUtil.getString(valueMap, "PREPARE_AMT");
         Double prepare_amt = Double.parseDouble(PREPARE_AMTStr);
 
-        if (DoubleUtil.add(construct_amt, project_other_amt, prepare_amt, equip_amt, land_amt) > prj_total_invest) {
-            sbErr.append("建安工程费+工程其他费用+预备费+设备采购费+土地征拆费用>总投资！");
+        if (DoubleUtil.add(construct_amt, project_other_amt, prepare_amt) > prj_total_invest) {
+            sbErr.append("建安工程费+工程其他费用+预备费>总投资！");
         }
 
         if (sbErr.length() > 0) {
@@ -77,8 +77,6 @@ public class PmPrjReqExt {
     }
 
     private void createPrj(EntityRecord entityRecord) {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-
         String csCommId = entityRecord.csCommId;
 
         // 获取立项申请：
@@ -122,8 +120,7 @@ public class PmPrjReqExt {
         log.info("已更新：{}", exec1);
 
         // 立项匡算的集合值：
-        Map<String, Object> grSetValueInvest0 =
-                Crud.from("GR_SET_VALUE").where().eq("CODE", "invest0").select().execForMap();
+        Map<String, Object> grSetValueInvest0 = Crud.from("GR_SET_VALUE").where().eq("CODE", "invest0").select().execForMap();
 
         // 新建项目投资测算：
         WfPmInvestUtil.calculateData(csCommId, "PM_PRJ_REQ", newPrjId);
@@ -232,7 +229,6 @@ public class PmPrjReqExt {
      */
     public void updateBid() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String procInstId = ExtJarHelper.procInstId.get();
 
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         String csCommId = entityRecord.csCommId;
@@ -347,11 +343,11 @@ public class PmPrjReqExt {
         Double con_scale_qty2 = Double.parseDouble(CON_SCALE_QTY2);
         boolean need2 = "0099799190825087119".equals(con_scale_type_id);
         if (need2) {
-            if (con_scale_qty2 == null || con_scale_qty2 <= 0d) {
+            if (con_scale_qty2 <= 0d) {
                 sbErr.append("建设规模数量2请填写正确宽度！");
             }
         } else {
-            if (con_scale_qty2 != null && con_scale_qty2 != 0d) {
+            if (con_scale_qty2 != 0d) {
                 sbErr.append("建设规模数量2请不要填写！");
             }
         }
@@ -460,7 +456,7 @@ public class PmPrjReqExt {
         String projectType = JdbcMapUtil.getString(valueMap, "PROJECT_SOURCE_TYPE_ID");
         //部门
         String deptId = JdbcMapUtil.getString(valueMap, "CRT_DEPT_ID");
-        String prjId = "";
+        String prjId;
         StringBuilder projectId = new StringBuilder();
         if ("0099952822476441375".equals(projectType)) {
             //创建人
@@ -536,7 +532,7 @@ public class PmPrjReqExt {
             log.info("关闭外键 已更新：{}", exec);
 
             //清空立项申请中的项目id
-            Integer exec1 = Crud.from("pm_prj_req").where().eq("ID", csCommId).update().set("pm_prj_id", null).exec();
+            int exec1 = Crud.from("pm_prj_req").where().eq("ID", csCommId).update().set("pm_prj_id", null).exec();
             log.info("清空立项申请中的项目id 已更新：{}", exec1);
 
             //清空项目投资测算

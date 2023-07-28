@@ -51,7 +51,7 @@ public class PoOrderExtApi {
         if (!SharedUtil.isEmptyString(projectId)){
             List<String> list = StringUtil.getStrToList(projectId,",");
             for (String prjId : list) {
-                /**=============此处需要添加合同已支付金额、累计支付比列查询逻辑===========================**/
+                /*=============此处需要添加合同已支付金额、累计支付比列查询逻辑===========================**/
                 String poOrderId = Crud.from("po_order").insertData();
                 //修改合同数据表数据
                 updatePoOrder(valueMap,csId,poOrderId,prjId,cooperation,sourceTypeId,viewId);
@@ -78,7 +78,7 @@ public class PoOrderExtApi {
         if (!SharedUtil.isEmptyString(projectId)){
             List<String> list = StringUtil.getStrToList(projectId,",");
             for (String prjId : list) {
-                /**=============此处需要添加合同已支付金额、累计支付比列查询逻辑===========================**/
+                /*=============此处需要添加合同已支付金额、累计支付比列查询逻辑===========================**/
                 String poOrderId = Crud.from("po_order").insertData();
                 //修改合同数据表数据
                 updatePoOrder(tmp,csId,poOrderId,prjId,cooperation,sourceTypeId,viewId);
@@ -235,7 +235,7 @@ public class PoOrderExtApi {
                 return poOrderView;
             }).collect(Collectors.toList());
             map1.put("result", inputList);
-            map1.put("total", Integer.valueOf(list2.size()));
+            map1.put("total", list2.size());
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(map1), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
@@ -266,8 +266,8 @@ public class PoOrderExtApi {
         sb.append(sql1);
         sb2.append(sql2);
         if (!SharedUtil.isEmptyString(param.pmExpTypeId)) {
-            sb.append(" and a.COST_TYPE_TREE_ID = '" + param.pmExpTypeId + "' ");
-            sb2.append(" and a.COST_TYPE_TREE_ID = '" + param.pmExpTypeId + "' ");
+            sb.append(" and a.COST_TYPE_TREE_ID = '").append(param.pmExpTypeId).append("' ");
+            sb2.append(" and a.COST_TYPE_TREE_ID = '").append(param.pmExpTypeId).append("' ");
         }
         if (!SharedUtil.isEmptyString(param.payType)) {
             sb.append(" and a.pay_type like ('%").append(param.payType).append("%') ");

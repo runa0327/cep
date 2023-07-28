@@ -25,7 +25,7 @@ public class PoOrderReqLink {
         if (CollectionUtils.isEmpty(list)) {
             throw new BaseException("合同相关属性不完善！");
         }
-        Map row = list.get(0);
+        Map<String, Object> row = list.get(0);
 
         //查询明细表信息
         if ("0099902212142025475".equals(sevId) || "0099902212142022303".equals(sevId)){ //0099902212142025475(合同终止) 0099902212142022303(补充协议)
@@ -52,70 +52,51 @@ public class PoOrderReqLink {
             linkedAtt.text = name;
             attLinkResult.attMap.put("CUSTOMER_UNIT_ONE", linkedAtt);
         }
+
         //首付款比列(%)
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = StringUtil.getBigDecimal(JdbcMapUtil.getString(row, "AMT_ONE"));
-            linkedAtt.text = String.valueOf(StringUtil.getBigDecimal(JdbcMapUtil.getString(row, "AMT_ONE")));
-            attLinkResult.attMap.put("AMT_ONE", linkedAtt);
-        }
+        String pay = JdbcMapUtil.getString(row, "AMT_ONE");
+        LinkUtils.mapAddAllValue("AMT_ONE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(pay),pay,true,false,true,attLinkResult);
+
         //含税总金额(元)
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = StringUtil.getBigDecimal(JdbcMapUtil.getString(row, "AMT_TWO"));
-            linkedAtt.text = JdbcMapUtil.getString(row, "AMT_TWO");
-            attLinkResult.attMap.put("AMT_TWO", linkedAtt);
-        }
+        String amtTwo = JdbcMapUtil.getString(row, "AMT_TWO");
+        LinkUtils.mapAddAllValue("AMT_TWO",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(amtTwo),amtTwo,true,false,false,attLinkResult);
+
         //不含税总金额(元)
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = StringUtil.getBigDecimal(JdbcMapUtil.getString(row, "AMT_THREE"));
-            linkedAtt.text = JdbcMapUtil.getString(row, "AMT_THREE");
-            attLinkResult.attMap.put("AMT_THREE", linkedAtt);
-        }
+        String amtThree = JdbcMapUtil.getString(row, "AMT_THREE");
+        LinkUtils.mapAddAllValue("AMT_THREE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(amtThree),amtThree,true,false,false,attLinkResult);
+
         //税金(%)
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = StringUtil.getBigDecimal(JdbcMapUtil.getString(row, "AMT_FOUR"));
-            linkedAtt.text = JdbcMapUtil.getString(row, "AMT_FOUR");
-            attLinkResult.attMap.put("AMT_FOUR", linkedAtt);
-        }
+        String amtFour = JdbcMapUtil.getString(row, "AMT_FOUR");
+        LinkUtils.mapAddAllValue("AMT_FOUR",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(amtFour),amtFour,true,false,false,attLinkResult);
+
         // 合同编号
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row, "CONTRACT_CODE");
-            linkedAtt.text = JdbcMapUtil.getString(row, "CONTRACT_CODE");
-            attLinkResult.attMap.put("CONTRACT_CODE", linkedAtt);
-        }
+        String contractCode = JdbcMapUtil.getString(row, "CONTRACT_CODE");
+        LinkUtils.mapAddAllValue("CONTRACT_CODE",AttDataTypeE.TEXT_LONG,contractCode,contractCode,true,false,false,attLinkResult);
+
         // 合同名称
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row, "CONTRACT_NAME");
-            linkedAtt.text = JdbcMapUtil.getString(row, "CONTRACT_NAME");
-            attLinkResult.attMap.put("CONTRACT_NAME", linkedAtt);
-        }
+        String contractName = JdbcMapUtil.getString(row, "CONTRACT_NAME");
+        LinkUtils.mapAddAllValue("CONTRACT_NAME",AttDataTypeE.TEXT_LONG,contractName,contractName,true,true,true,attLinkResult);
+
         // 中标单位
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row, "WIN_BID_UNIT_ONE");
-            linkedAtt.text = JdbcMapUtil.getString(row, "WIN_BID_UNIT_ONE");
-            attLinkResult.attMap.put("WIN_BID_UNIT_ONE", linkedAtt);
-        }
+        String winCompany = JdbcMapUtil.getString(row, "WIN_BID_UNIT_ONE");
+        LinkUtils.mapAddAllValue("WIN_BID_UNIT_ONE",AttDataTypeE.TEXT_LONG,winCompany,winCompany,false,false,false,attLinkResult);
+
         // 合同总金额
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
-            linkedAtt.text = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
-            attLinkResult.attMap.put("CONTRACT_PRICE", linkedAtt);
-        }
+        String contractAllAmt = JdbcMapUtil.getString(row, "CONTRACT_PRICE");
+        LinkUtils.mapAddAllValue("CONTRACT_PRICE",AttDataTypeE.TEXT_LONG,contractAllAmt,contractAllAmt,false,false,false,attLinkResult);
+
+        //招标控制价
+        String ctlPrice = JdbcMapUtil.getString(row,"BID_CTL_PRICE_LAUNCH");
+        LinkUtils.mapAddAllValue("BID_CTL_PRICE_LAUNCH",AttDataTypeE.DOUBLE,ctlPrice,ctlPrice,false,false,false,attLinkResult);
+
+        //中标价
+        String winPrice = JdbcMapUtil.getString(row,"WINNING_BIDS_AMOUNT");
+        LinkUtils.mapAddAllValue("WINNING_BIDS_AMOUNT",AttDataTypeE.DOUBLE,winPrice,winPrice,false,false,false,attLinkResult);
+
+        //合同工期
+        String planDay = JdbcMapUtil.getString(row,"PLAN_TOTAL_DAYS");
+        LinkUtils.mapAddAllValue("PLAN_TOTAL_DAYS",AttDataTypeE.TEXT_LONG,planDay,planDay,true,false,true,attLinkResult);
+
         //关联招采流程
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -161,14 +142,7 @@ public class PoOrderReqLink {
             linkedAtt.text = name;
             attLinkResult.attMap.put("BUY_TYPE_ID", linkedAtt);
         }
-        //招标控制价
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = JdbcMapUtil.getString(row,"BID_CTL_PRICE_LAUNCH");
-            linkedAtt.text = JdbcMapUtil.getString(row,"BID_CTL_PRICE_LAUNCH");
-            attLinkResult.attMap.put("BID_CTL_PRICE_LAUNCH",linkedAtt);
-        }
+
         //采购方式
         {
             LinkedAtt linkedAtt = new LinkedAtt();
@@ -184,22 +158,7 @@ public class PoOrderReqLink {
             linkedAtt.text = name;
             attLinkResult.attMap.put("BUY_MATTER_ID",linkedAtt);
         }
-        //中标价
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.DOUBLE;
-            linkedAtt.value = JdbcMapUtil.getString(row,"WINNING_BIDS_AMOUNT");
-            linkedAtt.text = JdbcMapUtil.getString(row,"WINNING_BIDS_AMOUNT");
-            attLinkResult.attMap.put("WINNING_BIDS_AMOUNT",linkedAtt);
-        }
-        //合同工期
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.TEXT_LONG;
-            linkedAtt.value = JdbcMapUtil.getString(row,"PLAN_TOTAL_DAYS");
-            linkedAtt.text = JdbcMapUtil.getString(row,"PLAN_TOTAL_DAYS");
-            attLinkResult.attMap.put("PLAN_TOTAL_DAYS",linkedAtt);
-        }
+
         //是否涉及保函 0099902212142031851=是；0099902212142031855=否
         String baoHanId = JdbcMapUtil.getString(row,"IS_REFER_GUARANTEE_ID");
         {
@@ -214,11 +173,6 @@ public class PoOrderReqLink {
             linkedAtt.value = baoHanId;
             linkedAtt.text = name;
             attLinkResult.attMap.put("IS_REFER_GUARANTEE_ID",linkedAtt);
-        }
-        // 保函类型
-        Boolean isShow = false;
-        if ("0099902212142031851".equals(baoHanId)){
-            isShow = true;
         }
         {
             LinkedAtt linkedAtt = new LinkedAtt();

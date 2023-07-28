@@ -97,7 +97,6 @@ public class PmPrjIdLink {
                 Map row = list.get(0);
                 String companyId = JdbcMapUtil.getString(row,"customer_id");
 
-
                 AttLinkExtDetail.assignmentAttLinkResult(attLinkResult,row,entCode,myJdbcTemplate);
                 if ("PM_PRJ_REQ".equals(entCode)){ //立项申请
                     //回显项目启动的总投资
@@ -157,7 +156,7 @@ public class PmPrjIdLink {
         //赋值回显
         if (!SharedUtil.isEmptyString(postId)){
             String postName = PostInfo.selectOneByWhere(new Where().eq(PostInfo.Cols.ID,postId)).getName();
-            LinkUtils.mapAddValueByValue("BUY_MATTER_TYPE_ID",postName,postId,AttDataTypeE.TEXT_LONG,attLinkResult);
+            LinkUtils.mapAddAllValue("BUY_MATTER_TYPE_ID",AttDataTypeE.TEXT_LONG,postId,postName,false,false,false,attLinkResult);
         }
     }
 

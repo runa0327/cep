@@ -38,7 +38,7 @@ public class YesNoOneLink {
                 fileChangeToMandatory = false;
             }
             // 审核意见采纳说明
-            LinkUtils.mapAddAllValue("REMARK_ONE",AttDataTypeE.TEXT_LONG,null,null,true,replyChangeToMandatory,true,attLinkResult);
+            LinkUtils.mapAddAllValue("REMARK_ONE",AttDataTypeE.TEXT_LONG, (String) null,null,true,replyChangeToMandatory,true,attLinkResult);
             // 审核意见采纳说明
             LinkUtils.mapAddValueByValueFile("FILE_ID_FOUR",null,null,true,fileChangeToMandatory,true,AttDataTypeE.FILE_GROUP,attLinkResult);
 
@@ -46,11 +46,11 @@ public class YesNoOneLink {
             pmBidApprovalReqYesNoOneLink(code,attLinkResult);
         } else if ("PM_PROJECT_PROBLEM_REQ".equals(entCode)){ // 项目问题
             if ("Y".equals(code)){ // 隐藏处理人,隐藏指派人
-                LinkUtils.mapAddAllValue("TO_USER_IDS",AttDataTypeE.TEXT_LONG,null,null,false,false,false,attLinkResult);
-                LinkUtils.mapAddAllValue("USER_IDS",AttDataTypeE.TEXT_LONG,null,null,false,false,false,attLinkResult);
+                LinkUtils.mapAddAllValue("TO_USER_IDS",AttDataTypeE.TEXT_LONG,(String) null,null,false,false,false,attLinkResult);
+                LinkUtils.mapAddAllValue("USER_IDS",AttDataTypeE.TEXT_LONG,(String) null,null,false,false,false,attLinkResult);
             } else { // 显示处理人，隐藏指派人
-                LinkUtils.mapAddAllValue("TO_USER_IDS",AttDataTypeE.TEXT_LONG,null,null,true,true,true,attLinkResult);
-                LinkUtils.mapAddAllValue("USER_IDS",AttDataTypeE.TEXT_LONG,null,null,false,false,false,attLinkResult);
+                LinkUtils.mapAddAllValue("TO_USER_IDS",AttDataTypeE.TEXT_LONG,(String) null,null,true,true,true,attLinkResult);
+                LinkUtils.mapAddAllValue("USER_IDS",AttDataTypeE.TEXT_LONG,(String) null,null,false,false,false,attLinkResult);
             }
         }
         return attLinkResult;
@@ -74,8 +74,8 @@ public class YesNoOneLink {
             AD_USER_NINTH_IDChangeToEditable = true;
         }
         // 法务岗
-        LinkUtils.mapAddAllValue("AD_USER_EIGHTH_ID",AttDataTypeE.TEXT_LONG,null,null,true,AD_USER_EIGHTH_IDChangeToMandatory,AD_USER_EIGHTH_IDChangeToEditable,attLinkResult);
+        LinkUtils.mapAddAllValue("AD_USER_EIGHTH_ID",AttDataTypeE.TEXT_LONG,(String) null,null,true,AD_USER_EIGHTH_IDChangeToMandatory,AD_USER_EIGHTH_IDChangeToEditable,attLinkResult);
         // 财务岗
-        LinkUtils.mapAddAllValue("AD_USER_NINTH_ID",AttDataTypeE.TEXT_LONG,null,null,true,AD_USER_NINTH_IDChangeToMandatory,AD_USER_NINTH_IDChangeToEditable,attLinkResult);
+        LinkUtils.mapAddAllValue("AD_USER_NINTH_ID",AttDataTypeE.TEXT_LONG,(String) null,null,true,AD_USER_NINTH_IDChangeToMandatory,AD_USER_NINTH_IDChangeToEditable,attLinkResult);
     }
 }

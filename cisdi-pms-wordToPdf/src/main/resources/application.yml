@@ -41,3 +41,9 @@ mybatis:
   typeAliasesPackage: com.pms.cisdipmswordtopdf.model
   # 配置mapper的扫描，找到所有的mapper.xml映射文件
   mapperLocations: classpath*:mapper/**/*Mapper.xml
+
+#Prometheus springboot监控配置
+  management.endpoints.web.exposure.include = *
+  management.metrics.export.prometheus.enabled = true
+  # 暴露的数据中添加application label
+  management.metrics.tags.application = springbootprometheus

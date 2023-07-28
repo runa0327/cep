@@ -329,7 +329,6 @@ public class WfInNodeExt {
         List<String> purchaseList = AttLinkDifferentProcess.getPurchaseList();
         if (purchaseList.contains(entCode)) {
             // 获取流程表信息等
-//            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select * from wf_process_instance where id = ?", procInstId);
             List<WfProcessInstance> list1 = WfProcessInstance.selectByWhere(new Where().eq(WfProcessInstance.Cols.ID, procInstId));
             if (!CollectionUtils.isEmpty(list1)) {
                 String entityRecordId = list1.get(0).getEntityRecordId();

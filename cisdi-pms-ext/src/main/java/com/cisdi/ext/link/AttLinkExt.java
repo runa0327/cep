@@ -49,7 +49,7 @@ public class AttLinkExt {
         String entCode = myJdbcTemplate.queryForMap("select e.code ent_code from ad_single_ent_view sev join ad_ent e on sev.AD_ENT_ID = e.ID and sev.id=?", sevId).get("ent_code").toString();
 
         if ("PROJECT_TYPE_ID".equals(attCode)) {
-            return linkForPROJECT_TYPE_ID(myJdbcTemplate, attValue,entCode);
+            return ProjectTypeIdLink.linkForPROJECT_TYPE_ID(myJdbcTemplate, attValue);
         } else if ("PM_PRJ_ID".equals(attCode)) {
             return PmPrjIdLink.linkForPM_PRJ_ID(myJdbcTemplate, attValue, entCode, sevId);
         } else if ("PMS_RELEASE_WAY_ID".equals(attCode) || "GUARANTEE_LETTER_TYPE_ID".equals(attCode) || "CONTRACT_CATEGORY_ID".equals(attCode) || "PRJ_MANAGE_MODE_ID".equals(attCode)) {
@@ -130,18 +130,18 @@ public class AttLinkExt {
         AttLinkResult attLinkResult = new AttLinkResult();
         String code = getGrSetCode(myJdbcTemplate,attValue);
         if ("PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
-            Boolean PROJECT_NAME_WRChangeToShown = false; //手填项目名称默认不隐藏
-            Boolean PM_PRJ_IDSChangeToShown = false; //选择项目名称默认不隐藏
+            boolean PROJECT_NAME_WRChangeToShown = false; //手填项目名称默认不隐藏
+            boolean PM_PRJ_IDSChangeToShown = false; //选择项目名称默认不隐藏
 
-            Boolean CPROJECT_NAME_WRChangeToMandatory = false; //手填项目名称默认非必填
-            Boolean PM_PRJ_IDSChangeToMandatory = false; //选择项目名称默认非必填
+            boolean CPROJECT_NAME_WRChangeToMandatory = false; //手填项目名称默认非必填
+            boolean PM_PRJ_IDSChangeToMandatory = false; //选择项目名称默认非必填
 
-            Boolean PROJECT_NAME_WRChangeToEditable = false; //手填项目名称默认不可改
-            Boolean PM_PRJ_IDSChangeToEditable = false; //选择项目名称默认不可改
+            boolean PROJECT_NAME_WRChangeToEditable = false; //手填项目名称默认不可改
+            boolean PM_PRJ_IDSChangeToEditable = false; //选择项目名称默认不可改
 
             String contractSourceValue = null;
             String contractSourceText = null;
-            Boolean contractSourceChangeToEditable = true;
+            boolean contractSourceChangeToEditable = true;
 
             if ("non_system".equals(code)){
                 PROJECT_NAME_WRChangeToShown = true;
@@ -225,10 +225,10 @@ public class AttLinkExt {
         String code = getGrSetCode(myJdbcTemplate,attValue);
         // 其他(other)，系统(system)
         if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode) || "PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
-            Boolean DATE_TYPE_WRWRChangeToEditable = false; //手填保函到日期，默认不可改
-            Boolean DATE_TYPE_WRWRChangeToMandatory = false; //手填保函到日期，默认非必填
-            Boolean GUARANTEE_END_DATEWRChangeToEditable = false; //选择保函到日期，默认不可改
-            Boolean GUARANTEE_END_DATEWRChangeToMandatory = false; //选择保函到日期，默认非必填
+            boolean DATE_TYPE_WRWRChangeToEditable = false; //手填保函到日期，默认不可改
+            boolean DATE_TYPE_WRWRChangeToMandatory = false; //手填保函到日期，默认非必填
+            boolean GUARANTEE_END_DATEWRChangeToEditable = false; //选择保函到日期，默认不可改
+            boolean GUARANTEE_END_DATEWRChangeToMandatory = false; //选择保函到日期，默认非必填
             if ("system".equals(code)){
                 GUARANTEE_END_DATEWRChangeToEditable = true;
                 GUARANTEE_END_DATEWRChangeToMandatory = true;
@@ -266,8 +266,8 @@ public class AttLinkExt {
         String code = getGrSetCode(myJdbcTemplate,attValue);
         // 其他(other)
         if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode) || "PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
-            Boolean costTypeWRChangeToEditable = false; //手填费用类型，默认不可改
-            Boolean costTypeWRChangeToMandatory = false; //手填费用类型，默认非必填
+            boolean costTypeWRChangeToEditable = false; //手填费用类型，默认不可改
+            boolean costTypeWRChangeToMandatory = false; //手填费用类型，默认非必填
             if ("other".equals(code)){
                 costTypeWRChangeToEditable = true;
                 costTypeWRChangeToMandatory = true;
@@ -294,29 +294,29 @@ public class AttLinkExt {
         //主体工程施工许可申请(subject),基坑及土石方工程施工许可申请(earthwork),主体工程施工许可申请+基坑及土石方工程施工许可申请(subject_earthwork)
         if ("PM_CONSTRUCT_PERMIT_REQ".equals(entCode)){ //施工许可
             // 基坑及土石方工程施工许可申请 组
-            Boolean EARTHWORK_APPLY_DATEChangeToShown = true; //申请时间,默认不显示
-            Boolean COMPL_PLAN_DATE_APPLYChangeToShown = true; //计划完成日期,默认不显示
-            Boolean EARTHWORK_APPLY_USERChangeToShown = true; //申请人,默认不显示
-            Boolean PRJ_REQ_FILEChangeToShown = true; //申请材料,默认不显示
-            Boolean REMARKChangeToShown = true; //备注,默认不显示
-            Boolean EARTHWORK_APPLY_DATEChangeToEditable = false; //申请时间,默认不可改
-            Boolean COMPL_PLAN_DATE_APPLYChangeToEditable = false; //计划完成日期,默认不可改
-            Boolean EARTHWORK_APPLY_USERChangeToEditable = false; //申请人,默认不可改
-            Boolean PRJ_REQ_FILEChangeToEditable = false; //申请材料,默认不可改
-            Boolean REMARKChangeToEditable = false; //备注,默认不可改
-            Boolean PRJ_REQ_FILEChangeToMandatory = false; //申请材料,默认非必填
+            boolean EARTHWORK_APPLY_DATEChangeToShown = true; //申请时间,默认不显示
+            boolean COMPL_PLAN_DATE_APPLYChangeToShown = true; //计划完成日期,默认不显示
+            boolean EARTHWORK_APPLY_USERChangeToShown = true; //申请人,默认不显示
+            boolean PRJ_REQ_FILEChangeToShown = true; //申请材料,默认不显示
+            boolean REMARKChangeToShown = true; //备注,默认不显示
+            boolean EARTHWORK_APPLY_DATEChangeToEditable = false; //申请时间,默认不可改
+            boolean COMPL_PLAN_DATE_APPLYChangeToEditable = false; //计划完成日期,默认不可改
+            boolean EARTHWORK_APPLY_USERChangeToEditable = false; //申请人,默认不可改
+            boolean PRJ_REQ_FILEChangeToEditable = false; //申请材料,默认不可改
+            boolean REMARKChangeToEditable = false; //备注,默认不可改
+            boolean PRJ_REQ_FILEChangeToMandatory = false; //申请材料,默认非必填
             //主体工程施工许可申请 组
-            Boolean SUBJECT_APPLY_DATEChangeToShown = true; //申请时间,默认不显示
-            Boolean SUBJECT_PLAN_COMPL_DATEChangeToShown = true; //计划完成日期,默认不显示
-            Boolean SUBJECT_APPLY_USERChangeToShown = true; //申请人,默认不显示
-            Boolean KEEP_RECORD_FILEChangeToShown = true; //申请材料,默认不显示
-            Boolean ACT_REMARKChangeToShown = true; //备注,默认不显示
-            Boolean SUBJECT_APPLY_DATEChangeToEditable = false; //申请时间,默认不可改
-            Boolean SUBJECT_PLAN_COMPL_DATEChangeToEditable = false; //计划完成日期,默认不可改
-            Boolean SUBJECT_APPLY_USERChangeToEditable = false; //申请人,默认不可改
-            Boolean KEEP_RECORD_FILEChangeToEditable = false; //申请材料,默认不可改
-            Boolean ACT_REMARKChangeToEditable = false; //备注,默认不可改
-            Boolean KEEP_RECORD_FILEChangeToMandatory = false; //申请材料,默认非必填
+            boolean SUBJECT_APPLY_DATEChangeToShown = true; //申请时间,默认不显示
+            boolean SUBJECT_PLAN_COMPL_DATEChangeToShown = true; //计划完成日期,默认不显示
+            boolean SUBJECT_APPLY_USERChangeToShown = true; //申请人,默认不显示
+            boolean KEEP_RECORD_FILEChangeToShown = true; //申请材料,默认不显示
+            boolean ACT_REMARKChangeToShown = true; //备注,默认不显示
+            boolean SUBJECT_APPLY_DATEChangeToEditable = false; //申请时间,默认不可改
+            boolean SUBJECT_PLAN_COMPL_DATEChangeToEditable = false; //计划完成日期,默认不可改
+            boolean SUBJECT_APPLY_USERChangeToEditable = false; //申请人,默认不可改
+            boolean KEEP_RECORD_FILEChangeToEditable = false; //申请材料,默认不可改
+            boolean ACT_REMARKChangeToEditable = false; //备注,默认不可改
+            boolean KEEP_RECORD_FILEChangeToMandatory = false; //申请材料,默认非必填
             if ("subject".equals(code)){
                 SUBJECT_APPLY_DATEChangeToShown = true;
                 SUBJECT_PLAN_COMPL_DATEChangeToShown = true;
@@ -524,20 +524,20 @@ public class AttLinkExt {
             return attLinkResult;
         } else if ("PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){ //新增保函申请
             //系统(system)，非系统(non_system)
-            Boolean CONTRACT_NAMEChangeToShown = false; //手填合同名称默认不隐藏
-            Boolean CONTRACT_IDChangeToShown = false; //选择合同名称默认不隐藏
-            Boolean PO_ORDER_REQ_IDSChangeToShown = false; //选择合同名称默认不隐藏
+            boolean CONTRACT_NAMEChangeToShown = false; //手填合同名称默认不隐藏
+            boolean CONTRACT_IDChangeToShown = false; //选择合同名称默认不隐藏
+            boolean PO_ORDER_REQ_IDSChangeToShown = false; //选择合同名称默认不隐藏
 
-            Boolean CONTRACT_NAMEChangeToMandatory = false; //手填合同名称默认非必填
-            Boolean CONTRACT_IDChangeToMandatory = false; //选择合同名称默认非必填
-            Boolean PO_ORDER_REQ_IDSChangeToMandatory = false; //选择合同名称默认非必填
+            boolean CONTRACT_NAMEChangeToMandatory = false; //手填合同名称默认非必填
+            boolean CONTRACT_IDChangeToMandatory = false; //选择合同名称默认非必填
+            boolean PO_ORDER_REQ_IDSChangeToMandatory = false; //选择合同名称默认非必填
 
-            Boolean CONTRACT_NAMEChangeToEditable = false; //手填合同名称默认不可改
-            Boolean CONTRACT_IDChangeToEditable = false; //选择合同名称默认不可改
-            Boolean PO_ORDER_REQ_IDSChangeToEditable = false; //选择合同名称默认不可改
+            boolean CONTRACT_NAMEChangeToEditable = false; //手填合同名称默认不可改
+            boolean CONTRACT_IDChangeToEditable = false; //选择合同名称默认不可改
+            boolean PO_ORDER_REQ_IDSChangeToEditable = false; //选择合同名称默认不可改
 
-            Boolean CONTRACT_AMOUNTChangeToEditable = false; //合同金额默认不可改
-            Boolean CONTRACT_AMOUNTChangeToMandatory = false; //合同金额默认非必填
+            boolean CONTRACT_AMOUNTChangeToEditable = false; //合同金额默认不可改
+            boolean CONTRACT_AMOUNTChangeToMandatory = false; //合同金额默认非必填
 
             if ("non_system".equals(code)){
                 CONTRACT_NAMEChangeToShown = true;
@@ -615,17 +615,17 @@ public class AttLinkExt {
 
     // 项目来源属性联动-采购需求审批
     private void pmBuyDemandReqProjectSourceType(AttLinkResult attLinkResult,String code) {
-        Boolean prjListChangeToShown = false; //下拉项目默认隐藏
-        Boolean prjNameChangeToShown = false; //手写项目默认隐藏
+        boolean prjListChangeToShown = false; //下拉项目默认隐藏
+        boolean prjNameChangeToShown = false; //手写项目默认隐藏
 
-        Boolean prjListChangeToMandatory = false; //下拉项目默认非必填
-        Boolean prjNameChangeToMandatory = false; //手写项目默认非必填
-        Boolean isZFChangeToMandatory = true; //政府投资默认必填
+        boolean prjListChangeToMandatory = false; //下拉项目默认非必填
+        boolean prjNameChangeToMandatory = false; //手写项目默认非必填
+        boolean isZFChangeToMandatory = true; //政府投资默认必填
 
-        Boolean prjListChangeToEditable = false; //下拉项目默认不可改
-        Boolean prjNameChangeToEditable = false; //手写项目默认不可改
-        Boolean isZFChangeToEditable = true; //是否政府投资默认可改
-        Boolean amtSourceChangeToEditable = true; //资金来源默认可改
+        boolean prjListChangeToEditable = false; //下拉项目默认不可改
+        boolean prjNameChangeToEditable = false; //手写项目默认不可改
+        boolean isZFChangeToEditable = true; //是否政府投资默认可改
+        boolean amtSourceChangeToEditable = true; //资金来源默认可改
 
         if (!"system".equals(code)) {
             prjNameChangeToShown = true;
@@ -706,16 +706,16 @@ public class AttLinkExt {
     // 项目来源属性联动 控制项目基础信息显示
     private AttLinkResult autoLinkPrjDetail(AttLinkResult attLinkResult, String attValue, String code) {
         //系统(system)，非系统(non_system)
-        Boolean REPLY_NOChangeToEditable = false; //项目批复文号，默认不可改
-        Boolean PROJECT_TYPE_IDChangeToEditable = false; //项目类型，默认不可改
-        Boolean PRJ_SITUATIONChangeToEditable = false; //项目介绍，默认不可改
-        Boolean INVESTMENT_SOURCE_IDChangeToEditable = false; //投资来源，默认不可改
-        Boolean CUSTOMER_UNITChangeToEditable = false; //业主单位，默认不可改
-        Boolean PRJ_TOTAL_INVESTChangeToEditable = false; //总投资，默认不可改
-        Boolean PROJECT_AMTChangeToEditable = false; //工程费用，默认不可改
-        Boolean PROJECT_OTHER_AMTChangeToEditable = false; //工程建设其他费用，默认不可改
-        Boolean PREPARE_AMTChangeToEditable = false; //预备费，默认不可改
-        Boolean CONSTRUCT_PERIOD_INTERESTChangeToEditable = false; //建设期利息，默认不可改
+        boolean REPLY_NOChangeToEditable = false; //项目批复文号，默认不可改
+        boolean PROJECT_TYPE_IDChangeToEditable = false; //项目类型，默认不可改
+        boolean PRJ_SITUATIONChangeToEditable = false; //项目介绍，默认不可改
+        boolean INVESTMENT_SOURCE_IDChangeToEditable = false; //投资来源，默认不可改
+        boolean CUSTOMER_UNITChangeToEditable = false; //业主单位，默认不可改
+        boolean PRJ_TOTAL_INVESTChangeToEditable = false; //总投资，默认不可改
+        boolean PROJECT_AMTChangeToEditable = false; //工程费用，默认不可改
+        boolean PROJECT_OTHER_AMTChangeToEditable = false; //工程建设其他费用，默认不可改
+        boolean PREPARE_AMTChangeToEditable = false; //预备费，默认不可改
+        boolean CONSTRUCT_PERIOD_INTERESTChangeToEditable = false; //建设期利息，默认不可改
         if ("non_system".equals(code)){
             REPLY_NOChangeToEditable = true;
             PROJECT_TYPE_IDChangeToEditable = true;
@@ -826,14 +826,14 @@ public class AttLinkExt {
     private AttLinkResult autoLinkProject(String attValue, String code) {
         //系统(system)，非系统(non_system)
         AttLinkResult attLinkResult = new AttLinkResult();
-        Boolean prjListChangeToShown = false; //下拉项目默认隐藏
-        Boolean prjNameChangeToShown = false; //手写项目默认隐藏
+        boolean prjListChangeToShown = false; //下拉项目默认隐藏
+        boolean prjNameChangeToShown = false; //手写项目默认隐藏
 
-        Boolean prjListChangeToMandatory = false; //下拉项目默认非必填
-        Boolean prjNameChangeToMandatory = false; //手写项目默认非必填
+        boolean prjListChangeToMandatory = false; //下拉项目默认非必填
+        boolean prjNameChangeToMandatory = false; //手写项目默认非必填
 
-        Boolean prjListChangeToEditable = false; //下拉项目默认不可改
-        Boolean prjNameChangeToEditable = false; //手写项目默认不可改
+        boolean prjListChangeToEditable = false; //下拉项目默认不可改
+        boolean prjNameChangeToEditable = false; //手写项目默认不可改
 
         if (!"system".equals(code)) {
             prjNameChangeToShown = true;
@@ -1765,8 +1765,8 @@ public class AttLinkExt {
         String code = getGrSetCode(myJdbcTemplate,attValue);
         if ("PM_BUY_DEMAND_REQ".equals(entCode)){ //采购需求审批
             //会议纪要(meeting_minutes)，其他(other),启动函(start_up_letter)
-            Boolean changeToEditable = false; //是否可改
-            Boolean changeToMandatory = false; //是否必填
+            boolean changeToEditable = false; //是否可改
+            boolean changeToMandatory = false; //是否必填
             String value = "";
             String text = "";
             String projectId = JdbcMapUtil.getString(param.valueMap, "PM_PRJ_IDS");
@@ -1839,7 +1839,7 @@ public class AttLinkExt {
         String code = getGrSetCode(myJdbcTemplate,attValue);
         // 公开招标(open_bidding),竞争性磋商(competitive_consultations),竞争性谈判(competitive_negotiation)
         if ("PM_BID_APPROVAL_REQ".equals(entCode)){ //招标文件审批
-            Boolean changeToMandatory = false; //必填
+            boolean changeToMandatory = false; //必填
             if ("open_bidding".equals(code) || "competitive_consultations".equals(code) || "competitive_negotiation".equals(code)){
                 changeToMandatory = true;
             }
@@ -1861,8 +1861,8 @@ public class AttLinkExt {
         AttLinkResult attLinkResult = new AttLinkResult();
         String code = getGrSetCode(myJdbcTemplate,attValue);
         // 到期申请退还，之后续保(expire_return),达到退保条件，申请退保(surrender_return),其他(other)
-        Boolean changeToMandatory = true;
-        Boolean changeToEditable = true;
+        boolean changeToMandatory = true;
+        boolean changeToEditable = true;
         if ("expire_return".equals(code)){
             changeToMandatory = false;
             changeToEditable = false;
@@ -1885,9 +1885,9 @@ public class AttLinkExt {
         AttLinkResult attLinkResult = new AttLinkResult();
         String code = getGrSetCode(myJdbcTemplate,attValue);
         // 是(yes) ，否(no)
-        Boolean changeToShown = true;
-        Boolean changeToMandatory = true;
-        Boolean changeToEditable = true;
+        boolean changeToShown = true;
+        boolean changeToMandatory = true;
+        boolean changeToEditable = true;
 
         List<String> baohanList = getBaoHanList();
         if (baohanList.contains(entCode)){
@@ -1956,11 +1956,11 @@ public class AttLinkExt {
         String code = getGrSetCode(myJdbcTemplate,attValue);
         if ("PO_ORDER_PAYMENT_REQ".equals(entCode)) { //付款申请
             // 其他付款(other_payment) 合同付款(contract_payment)
-            Boolean fileMustChangeToMandatory = false; // 附件默认非必填
-            Boolean contractChangeToMandatory = false; //关联合同默认非必填
-            Boolean fileChangeToShown = true; //附件默认显示
-            Boolean contractChangeToShown = true; //关联合同默认显示
-            Boolean contractAmtChangeToShown = true; //合同金额默认显示
+            boolean fileMustChangeToMandatory = false; // 附件默认非必填
+            boolean contractChangeToMandatory = false; //关联合同默认非必填
+            boolean fileChangeToShown = true; //附件默认显示
+            boolean contractChangeToShown = true; //关联合同默认显示
+            boolean contractAmtChangeToShown = true; //合同金额默认显示
             if ("other_payment".equals(code)){ //必填附件
                 fileMustChangeToMandatory = true;
                 contractChangeToShown = false;
@@ -2035,7 +2035,7 @@ public class AttLinkExt {
             String sql2 = "SELECT COLLECTION_DEPT_TWO,BANK_OF_DEPOSIT,ACCOUNT_NO,RECEIPT,SPECIAL_BANK_OF_DEPOSIT,SPECIAL_ACCOUNT_NO FROM PO_ORDER_PAYMENT_REQ WHERE RELATION_AMOUT_PLAN_REQ_ID = ? AND STATUS = 'AP' ORDER BY CRT_DT DESC limit 1";
             List<Map<String, Object>> list2 = myJdbcTemplate.queryForList(sql2, attValue);
             if (!CollectionUtils.isEmpty(list2)) {
-                Map row2 = list2.get(0);
+                Map<String,Object> row2 = list2.get(0);
                 // 收款单位
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
@@ -2114,7 +2114,7 @@ public class AttLinkExt {
 //            throw new BaseException("项目的相关属性不完整！");
             return attLinkResult;
         }
-        Map row = list.get(0);
+        Map<String,Object> row = list.get(0);
 
         // 回显项目信息
         // 项目编号
@@ -2174,7 +2174,7 @@ public class AttLinkExt {
             String sql = "SELECT COLLECTION_DEPT_TWO,BANK_OF_DEPOSIT,ACCOUNT_NO,RECEIPT,SPECIAL_BANK_OF_DEPOSIT,SPECIAL_ACCOUNT_NO FROM PO_ORDER_PAYMENT_REQ WHERE AMOUT_PM_PRJ_ID = ? AND STATUS = 'AP' ORDER BY CRT_DT DESC limit 1";
             List<Map<String, Object>> map1 = myJdbcTemplate.queryForList(sql, attValue);
             if (!CollectionUtils.isEmpty(map1)) {
-                Map row2 = map1.get(0);
+                Map<String,Object> row2 = map1.get(0);
                 // 收款单位
                 {
                     LinkedAtt linkedAtt = new LinkedAtt();
@@ -2535,7 +2535,7 @@ public class AttLinkExt {
         if (CollectionUtils.isEmpty(list)) {
             throw new BaseException("保函没有相关信息，请先完善");
         }
-        Map row = list.get(0);
+        Map<String,Object> row = list.get(0);
 
         // 保函名称
         {
@@ -2628,39 +2628,6 @@ public class AttLinkExt {
         }
 
 
-        return attLinkResult;
-    }
-
-    private AttLinkResult linkForPROJECT_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue,String entCode) {
-        AttLinkResult attLinkResult = new AttLinkResult();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select v0.id PROJECT_TYPE_ID,v0.name project_type_name,v1.id CON_SCALE_TYPE_ID,v1.name CON_SCALE_TYPE_NAME,v2.id CON_SCALE_UOM_ID,v2.name CON_SCALE_UOM_NAME from pm_prj_type_link t join gr_set_value v0 on t.PROJECT_TYPE_ID=v0.id join gr_set_value v1 on t.CON_SCALE_TYPE_ID=v1.id join gr_set_value v2 on t.CON_SCALE_UOM_ID=v2.id where t.PROJECT_TYPE_ID=?", attValue);
-
-        if (SharedUtil.isEmptyList(list)) {
-            throw new BaseException("未设置相应项目类型的联动！");
-        } else if (list.size() > 1) {
-            throw new BaseException("重复设置相应项目类型的联动！");
-        }
-        Map row = list.get(0);
-        AttLinkExtDetail.clearProjectTypeData(attLinkResult);
-        AttLinkExtDetail.prjTypeLinkNew(row,attLinkResult);
-        //建设规模类型
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = JdbcMapUtil.getString(row, "CON_SCALE_TYPE_ID");
-            linkedAtt.text = JdbcMapUtil.getString(row, "CON_SCALE_TYPE_NAME");
-            attLinkResult.attMap.put("CON_SCALE_TYPE_ID", linkedAtt);
-        }
-        //建设规模单位
-        String id = JdbcMapUtil.getString(row, "CON_SCALE_UOM_ID");
-        String name = JdbcMapUtil.getString(row, "CON_SCALE_UOM_NAME");
-        {
-            LinkedAtt linkedAtt = new LinkedAtt();
-            linkedAtt.type = AttDataTypeE.REF_SINGLE;
-            linkedAtt.value = id;
-            linkedAtt.text = name;
-            attLinkResult.attMap.put("CON_SCALE_UOM_ID", linkedAtt);
-        }
         return attLinkResult;
     }
 

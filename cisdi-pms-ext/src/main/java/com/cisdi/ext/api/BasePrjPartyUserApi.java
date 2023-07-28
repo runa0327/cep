@@ -33,10 +33,9 @@ public class BasePrjPartyUserApi {
         String json = JsonUtil.toJson(map);
         GrSetValueView param = JsonUtil.fromJson(json, GrSetValueView.class);
         StringBuilder sb = new StringBuilder();
-//        sb.append("select id,name from gr_set_value where GR_SET_ID = '0099952822476391029'");
         sb.append("SELECT a.id,a.name from gr_set_value a LEFT JOIN gr_set b on a.GR_SET_ID = b.id WHERE b.code = 'partner_role' and a.status = 'ap' and b.STATUS = 'ap' ");
         if (!SharedUtil.isEmptyString(param.name)){
-            sb.append(" and a.name like '%" + param.name + "%' ");
+            sb.append(" and a.name like '%").append(param.name).append("%' ");
         }
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sb.toString());
         if (CollectionUtils.isEmpty(list)){
@@ -92,20 +91,20 @@ public class BasePrjPartyUserApi {
         baseSql2.append(sql2);
         //筛选条件
         if (!SharedUtil.isEmptyString(param.projectName)){
-            baseSql1.append(" and b.name like ('%" + param.projectName + "%')");
-            baseSql2.append(" and b.name like ('%" + param.projectName + "%')");
+            baseSql1.append(" and b.name like ('%").append(param.projectName).append("%')");
+            baseSql2.append(" and b.name like ('%").append(param.projectName).append("%')");
         }
         if (!SharedUtil.isEmptyString(param.partyName)){
-            baseSql1.append(" and c.name like ('%" + param.partyName + "%')");
-            baseSql2.append(" and c.name like ('%" + param.partyName + "%')");
+            baseSql1.append(" and c.name like ('%").append(param.partyName).append("%')");
+            baseSql2.append(" and c.name like ('%").append(param.partyName).append("%')");
         }
         if (!SharedUtil.isEmptyString(param.pmPartyRoleId)){
-            baseSql1.append(" and d.id = '" + param.pmPartyRoleId+"'");
-            baseSql2.append(" and d.id = '" + param.pmPartyRoleId+"'");
+            baseSql1.append(" and d.id = '").append(param.pmPartyRoleId).append("'");
+            baseSql2.append(" and d.id = '").append(param.pmPartyRoleId).append("'");
         }
         if (!SharedUtil.isEmptyString(param.userId)){
-            baseSql1.append(" and find_in_set('"+param.userId+"',a.USER_IDS) ");
-            baseSql2.append(" and find_in_set('"+param.userId+"',a.USER_IDS) ");
+            baseSql1.append(" and find_in_set('").append(param.userId).append("',a.USER_IDS) ");
+            baseSql2.append(" and find_in_set('").append(param.userId).append("',a.USER_IDS) ");
         }
         baseSql1.append(" order BY a.CRT_DT DESC ").append(limit);
         baseSql2.append(" order BY a.CRT_DT DESC");
@@ -166,8 +165,8 @@ public class BasePrjPartyUserApi {
         baseSql2.append(sql2);
         //筛选条件
         if (!SharedUtil.isEmptyString(param.projectName)){
-            baseSql1.append(" and name like ('%" + param.projectName + "%')");
-            baseSql2.append(" and name like ('%" + param.projectName + "%')");
+            baseSql1.append(" and name like ('%").append(param.projectName).append("%')");
+            baseSql2.append(" and name like ('%").append(param.projectName).append("%')");
         }
         baseSql1.append(" order BY CRT_DT DESC ").append(limit);
         baseSql2.append(" order BY CRT_DT DESC");
@@ -211,8 +210,8 @@ public class BasePrjPartyUserApi {
         baseSql2.append(sql2);
         //筛选条件
         if (!SharedUtil.isEmptyString(param.partyName)){
-            baseSql1.append(" and name like ('%" + param.partyName + "%')");
-            baseSql2.append(" and name like ('%" + param.partyName + "%')");
+            baseSql1.append(" and name like ('%").append(param.partyName).append("%')");
+            baseSql2.append(" and name like ('%").append(param.partyName).append("%')");
         }
         baseSql1.append(" order BY CRT_DT DESC ").append(limit);
         baseSql2.append(" order BY CRT_DT DESC");
@@ -251,7 +250,6 @@ public class BasePrjPartyUserApi {
         // 起始条数
         int start = (param.pageIndex - 1) * param.pageSize;
         String limit = "limit " + start + "," + param.pageSize;
-//        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String sql = "select group_concat(USER_IDS) as user from pm_dept where PM_PRJ_ID = ?";
         List<Map<String,Object>> userList = myJdbcTemplate.queryForList(sql,param.projectId);
         if (CollectionUtils.isEmpty(userList)){
@@ -271,8 +269,8 @@ public class BasePrjPartyUserApi {
         baseSql2.append(sql2);
         //筛选条件
         if (!SharedUtil.isEmptyString(param.userName)){
-            baseSql1.append(" and name like ('%" + param.userName + "%') ");
-            baseSql2.append(" and name like ('%" + param.userName + "%') ");
+            baseSql1.append(" and name like ('%").append(param.userName).append("%') ");
+            baseSql2.append(" and name like ('%").append(param.userName).append("%') ");
         }
         baseSql1.append(" order BY CRT_DT DESC ").append(limit);
         baseSql2.append(" order BY CRT_DT DESC");
@@ -387,6 +385,6 @@ public class BasePrjPartyUserApi {
             throw new BaseException("请选择一条记录！");
         }
         id = id.replace(",","','");
-        int update = myJdbcTemplate.update("update base_prj_party_user set status = 'VD' where id in ('"+id+"')");
+        myJdbcTemplate.update("update base_prj_party_user set status = 'VD' where id in ('"+id+"')");
     }
 }
