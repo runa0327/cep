@@ -247,4 +247,32 @@ public class PoOrderReqLink {
 
         return attLinkResult;
     }
+
+    /**
+     * 合同签订选择 多选 属性联动
+     * @param myJdbcTemplate 数据源
+     * @param attValue 属性联动值
+     * @param sevId 视图id
+     * @param entCode 业务表
+     * @return 属性联动结果
+     */
+    public static AttLinkResult linkPO_ORDER_REQ_IDS(MyJdbcTemplate myJdbcTemplate, String attValue, String sevId, String entCode) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        int len = attValue.split(",").length;
+        if (len == 1){
+            return ContractLink.linkForCONTRACT_ID(myJdbcTemplate, attValue, sevId,entCode);
+        } else {
+            //合同金额可改
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.DOUBLE;
+                linkedAtt.value = null;
+                linkedAtt.text = null;
+                linkedAtt.changeToEditable = true;
+                linkedAtt.changeToMandatory = true;
+                attLinkResult.attMap.put("CONTRACT_AMOUNT",linkedAtt);
+            }
+        }
+        return attLinkResult;
+    }
 }

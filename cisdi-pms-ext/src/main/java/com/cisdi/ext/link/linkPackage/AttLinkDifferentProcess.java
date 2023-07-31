@@ -305,4 +305,45 @@ public class AttLinkDifferentProcess {
         list.add("PO_ORDER_SUPPLEMENT_REQ"); //补充协议
         return list;
     }
+
+    /**
+     * 项目来源属性联动 需要选择系统/非系统项目
+     * @return 结果集
+     */
+    public static List<String> getWRProject() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_BID_APPROVAL_REQ"); //招标文件审批
+        list.add("PM_FILE_CHAPTER_REQ"); //标前资料用印审批
+        list.add("PM_USE_CHAPTER_REQ"); //中选单位及标后用印审批
+        list.add("PM_BID_KEEP_FILE_REQ"); //招采项目备案及归档
+        list.add("PO_GUARANTEE_LETTER_RETURN_OA_REQ"); //保函退还申请(OA)
+        list.add("BID_PROCESS_MANAGE"); //招标过程管理
+        list.add("PO_ORDER_CHANGE_REQ"); //合同需求审批
+        list.add("PIPELINE_RELOCATION_REQ"); //管线迁改
+        return list;
+    }
+
+    /**
+     * 引用到招采备案的流程
+     * @return 结果集
+     */
+    public static List<String> getBeiAnList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_PRJ_INVEST1"); //可研估算
+        list.add("PM_PRJ_INVEST2"); //初设概算
+        list.add("PM_FARMING_PROCEDURES"); //农转用手续办理
+        list.add("PM_WOODLAND_PROCEDURES"); //林地调整办理手续
+        list.add("PM_LAND_USE_REQ"); //用地规划许可
+        list.add("PM_LAND_ALLOCATION_REQ"); //土地划拨
+        list.add("PM_PRJ_PLANNING_PERMIT_REQ"); //工程规划许可证申请
+        list.add("PM_ENVIRONMENT_EVAL"); //环评
+        list.add("PM_WATER_PLAN"); //水保
+        list.add("PM_STABLE_EVAL"); //社会稳定性评价
+        list.add("PM_ENERGY_EVAL"); //固定资产投资节能评价
+        list.add("PM_TRAFFIC_SAFETY_REQ"); //交通安全评价
+        list.add("PM_CONTROL_FLOOD_REQ"); //防洪评价
+        list.add("PM_TERMITE_CONTROL_REQ"); //白蚁防治
+        list.add("PM_TOPSOIL_STRIPPING_REQ"); //耕作层剥离
+        return list;
+    }
 }
