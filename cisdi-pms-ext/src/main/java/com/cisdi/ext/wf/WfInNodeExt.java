@@ -139,30 +139,34 @@ public class WfInNodeExt {
                             // 遍历叶子计划节点：
                             for (Map<String, Object> leafNode : leafNodeList) {
 
-                                // 若为开始节点：
-                                String startWfNodeId = JdbcMapUtil.getString(leafNode, "LINKED_START_WF_NODE_ID");
-                                if (nodeId.equals(startWfNodeId)) {
-                                    updateStartInfoForPlanNode(procInstId, nodeInstId, now, leafNode, processWeekTask);
-                                }
-
-                                // 若为结束节点：
-                                String endWfNodeId = JdbcMapUtil.getString(leafNode, "LINKED_END_WF_NODE_ID");
-                                if (nodeId.equals(endWfNodeId)) {
-
-                                    // 若无开始信息，则先更新开始信息：
-                                    if (SharedUtil.isEmptyObject(leafNode.get("ACTUAL_START_DATE"))) {
+                                // 若进度状态为已完成(处理导入数据情况)，不修改任何数据
+                                String status = JdbcMapUtil.getString(leafNode,"PROGRESS_STATUS_ID");
+                                if (!"0099799190825106802".equals(status)){
+                                    // 若为开始节点：
+                                    String startWfNodeId = JdbcMapUtil.getString(leafNode, "LINKED_START_WF_NODE_ID");
+                                    if (nodeId.equals(startWfNodeId)) {
                                         updateStartInfoForPlanNode(procInstId, nodeInstId, now, leafNode, processWeekTask);
                                     }
 
-                                    // 更新结束信息：
-                                    String entCode = procInst.get("ENT_CODE").toString();
-                                    updateEndInfoForPlanNode(entCode, procInstId, nodeInstId, now, leafNode, processWeekTask);
-                                }
+                                    // 若为结束节点：
+                                    String endWfNodeId = JdbcMapUtil.getString(leafNode, "LINKED_END_WF_NODE_ID");
+                                    if (nodeId.equals(endWfNodeId)) {
 
-                                // 针对父节点，进行递归：
-                                Object pid = leafNode.get("PM_PRO_PLAN_NODE_PID");
-                                if (!SharedUtil.isEmptyObject(pid)) {
-                                    updateStartEndInfoForNodeRecursively(new ArrayList<>(), pid.toString());
+                                        // 若无开始信息，则先更新开始信息：
+                                        if (SharedUtil.isEmptyObject(leafNode.get("ACTUAL_START_DATE"))) {
+                                            updateStartInfoForPlanNode(procInstId, nodeInstId, now, leafNode, processWeekTask);
+                                        }
+
+                                        // 更新结束信息：
+                                        String entCode = procInst.get("ENT_CODE").toString();
+                                        updateEndInfoForPlanNode(entCode, procInstId, nodeInstId, now, leafNode, processWeekTask);
+                                    }
+
+                                    // 针对父节点，进行递归：
+                                    Object pid = leafNode.get("PM_PRO_PLAN_NODE_PID");
+                                    if (!SharedUtil.isEmptyObject(pid)) {
+                                        updateStartEndInfoForNodeRecursively(new ArrayList<>(), pid.toString());
+                                    }
                                 }
                             }
                         }
