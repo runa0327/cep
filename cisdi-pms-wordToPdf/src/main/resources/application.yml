@@ -42,8 +42,19 @@ mybatis:
   # 配置mapper的扫描，找到所有的mapper.xml映射文件
   mapperLocations: classpath*:mapper/**/*Mapper.xml
 
-#Prometheus springboot监控配置
-  management.endpoints.web.exposure.include = *
-  management.metrics.export.prometheus.enabled = true
+  #Prometheus springboot监控配置
+  #  management.endpoints.web.exposure.include = *
+  #  management.metrics.export.prometheus.enabled = true
   # 暴露的数据中添加application label
-  management.metrics.tags.application = springbootprometheus
+#  management.metrics.tags.application = springbootprometheus
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: 'springbootprometheus'
