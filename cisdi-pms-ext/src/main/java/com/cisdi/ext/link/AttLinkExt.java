@@ -119,7 +119,7 @@ public class AttLinkExt {
         } else if ("PM_PRO_PLAN_NODE_ID".equals(attCode)){
             return PmProPlanNodeLink.linkForPM_PRO_PLAN_NODE_ID(myJdbcTemplate, attValue, entCode);
         } else if ("PM_EXP_TYPE_IDS".equals(attCode)){ // 多选-费用类型
-            return PmExpTypeLink.linkForPmExpType(myJdbcTemplate, attValue, entCode);
+            return PmExpTypeLink.linkForPmExpType(myJdbcTemplate, attValue, entCode,sevId,param);
         }
         else {
             throw new BaseException("属性联动的参数的attCode为" + attCode + "，不支持！");

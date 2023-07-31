@@ -339,7 +339,7 @@ public class AttLinkExtDetail {
                 }
                 attLinkResult.childData.put(viewId, linkedRecordList);
             }
-            attLinkResult.childCreatable.put(viewId, true);
+            attLinkResult.childCreatable.put(viewId, false);
             attLinkResult.childClear.put(viewId, true);
     }
 
