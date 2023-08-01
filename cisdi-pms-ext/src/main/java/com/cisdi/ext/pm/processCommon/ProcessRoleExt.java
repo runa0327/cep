@@ -1003,11 +1003,11 @@ public class ProcessRoleExt {
     public void getFirstFinanceUser(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String processInstanceId = ExtJarHelper.procInstId.get();
-        List<WfTask> userList = WfTask.selectByWhere(new Where().eq(WfTask.Cols.WF_NODE_INSTANCE_ID,processInstanceId)
+        List<WfTask> userList = WfTask.selectByWhere(new Where().eq(WfTask.Cols.WF_PROCESS_INSTANCE_ID,processInstanceId)
                 .eq(WfTask.Cols.STATUS,"AP").eq(WfTask.Cols.IS_CLOSED,1).eq(WfTask.Cols.WF_TASK_TYPE_ID,"TODO"));
         List<String> user = new ArrayList<>();
         if (!CollectionUtils.isEmpty(userList)){
-            userList.stream().sorted(Comparator.comparing(WfTask::getActDatetime)).collect(Collectors.toList());
+            userList.stream().filter(p->p.getActDatetime() != null).sorted(Comparator.comparing(WfTask::getActDatetime)).collect(Collectors.toList());
             String sql = "select DISTINCT(b.name) as deptName from hr_dept_user a left join hr_dept b on a.HR_DEPT_ID = b.id where a.AD_USER_ID = ?";
             tp:for (WfTask tmp : userList) {
                 String userId = tmp.getAdUserId();
@@ -1022,7 +1022,7 @@ public class ProcessRoleExt {
                 }
             }
             if (!CollectionUtils.isEmpty(user)){
-                ExtJarHelper.returnValue.set(userList);
+                ExtJarHelper.returnValue.set(user);
             }
         }
 

@@ -141,6 +141,10 @@ public class PoGuaranteeLetterRequireReq {
          */
         public static final String CONTRACT_AMOUNT = "CONTRACT_AMOUNT";
         /**
+         * 金额5(存元)。
+         */
+        public static final String AMT_FIVE = "AMT_FIVE";
+        /**
          * 预付款比例。
          */
         public static final String ADVANCE_CHARGE_PERCENT = "ADVANCE_CHARGE_PERCENT";
@@ -1070,6 +1074,42 @@ public class PoGuaranteeLetterRequireReq {
             this.contractAmount = contractAmount;
             if (!this.toUpdateCols.contains("CONTRACT_AMOUNT")) {
                 this.toUpdateCols.add("CONTRACT_AMOUNT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 金额5(存元)。
+     */
+    private BigDecimal amtFive;
+
+    /**
+     * 获取：金额5(存元)。
+     */
+    public BigDecimal getAmtFive() {
+        return this.amtFive;
+    }
+
+    /**
+     * 设置：金额5(存元)。
+     */
+    public PoGuaranteeLetterRequireReq setAmtFive(BigDecimal amtFive) {
+        if (this.amtFive == null && amtFive == null) {
+            // 均为null，不做处理。
+        } else if (this.amtFive != null && amtFive != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.amtFive.compareTo(amtFive) != 0) {
+                this.amtFive = amtFive;
+                if (!this.toUpdateCols.contains("AMT_FIVE")) {
+                    this.toUpdateCols.add("AMT_FIVE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.amtFive = amtFive;
+            if (!this.toUpdateCols.contains("AMT_FIVE")) {
+                this.toUpdateCols.add("AMT_FIVE");
             }
         }
         return this;

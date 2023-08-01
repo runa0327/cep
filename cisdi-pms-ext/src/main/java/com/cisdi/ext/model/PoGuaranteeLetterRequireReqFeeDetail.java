@@ -64,6 +64,14 @@ public class PoGuaranteeLetterRequireReqFeeDetail {
          */
         public static final String IS_PRESET = "IS_PRESET";
         /**
+         * 创建日期时间。
+         */
+        public static final String CRT_DT = "CRT_DT";
+        /**
+         * 创建用户。
+         */
+        public static final String CRT_USER_ID = "CRT_USER_ID";
+        /**
          * 最后修改日期时间。
          */
         public static final String LAST_MODI_DT = "LAST_MODI_DT";
@@ -71,6 +79,14 @@ public class PoGuaranteeLetterRequireReqFeeDetail {
          * 最后修改用户。
          */
         public static final String LAST_MODI_USER_ID = "LAST_MODI_USER_ID";
+        /**
+         * 记录状态。
+         */
+        public static final String STATUS = "STATUS";
+        /**
+         * 锁定流程实例。
+         */
+        public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
          * 代码。
          */
@@ -88,41 +104,21 @@ public class PoGuaranteeLetterRequireReqFeeDetail {
          */
         public static final String PO_GUARANTEE_LETTER_REQUIRE_REQ_ID = "PO_GUARANTEE_LETTER_REQUIRE_REQ_ID";
         /**
-         * 锁定流程实例。
-         */
-        public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
-        /**
          * 费用类型。
          */
         public static final String PM_EXP_TYPE_ID = "PM_EXP_TYPE_ID";
         /**
-         * 记录状态。
+         * 金额5(存元)。
          */
-        public static final String STATUS = "STATUS";
-        /**
-         * 合同金额。
-         */
-        public static final String CONTRACT_AMOUNT = "CONTRACT_AMOUNT";
-        /**
-         * 创建用户。
-         */
-        public static final String CRT_USER_ID = "CRT_USER_ID";
+        public static final String AMT_FIVE = "AMT_FIVE";
         /**
          * 预付款比例。
          */
         public static final String ADVANCE_CHARGE_PERCENT = "ADVANCE_CHARGE_PERCENT";
         /**
-         * 创建部门。
+         * 金额6(存元)。
          */
-        public static final String CRT_DEPT_ID = "CRT_DEPT_ID";
-        /**
-         * 预付款金额。
-         */
-        public static final String ADVANCE_CHARGE_AMT = "ADVANCE_CHARGE_AMT";
-        /**
-         * 创建日期时间。
-         */
-        public static final String CRT_DT = "CRT_DT";
+        public static final String AMT_SIX = "AMT_SIX";
     }
 
     // </editor-fold>
@@ -275,6 +271,78 @@ public class PoGuaranteeLetterRequireReqFeeDetail {
     }
 
     /**
+     * 创建日期时间。
+     */
+    private LocalDateTime crtDt;
+
+    /**
+     * 获取：创建日期时间。
+     */
+    public LocalDateTime getCrtDt() {
+        return this.crtDt;
+    }
+
+    /**
+     * 设置：创建日期时间。
+     */
+    public PoGuaranteeLetterRequireReqFeeDetail setCrtDt(LocalDateTime crtDt) {
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 创建用户。
+     */
+    private String crtUserId;
+
+    /**
+     * 获取：创建用户。
+     */
+    public String getCrtUserId() {
+        return this.crtUserId;
+    }
+
+    /**
+     * 设置：创建用户。
+     */
+    public PoGuaranteeLetterRequireReqFeeDetail setCrtUserId(String crtUserId) {
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 最后修改日期时间。
      */
     private LocalDateTime lastModiDt;
@@ -341,6 +409,78 @@ public class PoGuaranteeLetterRequireReqFeeDetail {
             this.lastModiUserId = lastModiUserId;
             if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
                 this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 记录状态。
+     */
+    private String status;
+
+    /**
+     * 获取：记录状态。
+     */
+    public String getStatus() {
+        return this.status;
+    }
+
+    /**
+     * 设置：记录状态。
+     */
+    public PoGuaranteeLetterRequireReqFeeDetail setStatus(String status) {
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 锁定流程实例。
+     */
+    private String lkWfInstId;
+
+    /**
+     * 获取：锁定流程实例。
+     */
+    public String getLkWfInstId() {
+        return this.lkWfInstId;
+    }
+
+    /**
+     * 设置：锁定流程实例。
+     */
+    public PoGuaranteeLetterRequireReqFeeDetail setLkWfInstId(String lkWfInstId) {
+        if (this.lkWfInstId == null && lkWfInstId == null) {
+            // 均为null，不做处理。
+        } else if (this.lkWfInstId != null && lkWfInstId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
+                this.lkWfInstId = lkWfInstId;
+                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                    this.toUpdateCols.add("LK_WF_INST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.lkWfInstId = lkWfInstId;
+            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
+                this.toUpdateCols.add("LK_WF_INST_ID");
             }
         }
         return this;
@@ -491,42 +631,6 @@ public class PoGuaranteeLetterRequireReqFeeDetail {
     }
 
     /**
-     * 锁定流程实例。
-     */
-    private String lkWfInstId;
-
-    /**
-     * 获取：锁定流程实例。
-     */
-    public String getLkWfInstId() {
-        return this.lkWfInstId;
-    }
-
-    /**
-     * 设置：锁定流程实例。
-     */
-    public PoGuaranteeLetterRequireReqFeeDetail setLkWfInstId(String lkWfInstId) {
-        if (this.lkWfInstId == null && lkWfInstId == null) {
-            // 均为null，不做处理。
-        } else if (this.lkWfInstId != null && lkWfInstId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.lkWfInstId.compareTo(lkWfInstId) != 0) {
-                this.lkWfInstId = lkWfInstId;
-                if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
-                    this.toUpdateCols.add("LK_WF_INST_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.lkWfInstId = lkWfInstId;
-            if (!this.toUpdateCols.contains("LK_WF_INST_ID")) {
-                this.toUpdateCols.add("LK_WF_INST_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 费用类型。
      */
     private String pmExpTypeId;
@@ -563,108 +667,36 @@ public class PoGuaranteeLetterRequireReqFeeDetail {
     }
 
     /**
-     * 记录状态。
+     * 金额5(存元)。
      */
-    private String status;
+    private BigDecimal amtFive;
 
     /**
-     * 获取：记录状态。
+     * 获取：金额5(存元)。
      */
-    public String getStatus() {
-        return this.status;
+    public BigDecimal getAmtFive() {
+        return this.amtFive;
     }
 
     /**
-     * 设置：记录状态。
+     * 设置：金额5(存元)。
      */
-    public PoGuaranteeLetterRequireReqFeeDetail setStatus(String status) {
-        if (this.status == null && status == null) {
+    public PoGuaranteeLetterRequireReqFeeDetail setAmtFive(BigDecimal amtFive) {
+        if (this.amtFive == null && amtFive == null) {
             // 均为null，不做处理。
-        } else if (this.status != null && status != null) {
+        } else if (this.amtFive != null && amtFive != null) {
             // 均非null，判定不等，再做处理：
-            if (this.status.compareTo(status) != 0) {
-                this.status = status;
-                if (!this.toUpdateCols.contains("STATUS")) {
-                    this.toUpdateCols.add("STATUS");
+            if (this.amtFive.compareTo(amtFive) != 0) {
+                this.amtFive = amtFive;
+                if (!this.toUpdateCols.contains("AMT_FIVE")) {
+                    this.toUpdateCols.add("AMT_FIVE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.status = status;
-            if (!this.toUpdateCols.contains("STATUS")) {
-                this.toUpdateCols.add("STATUS");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 合同金额。
-     */
-    private BigDecimal contractAmount;
-
-    /**
-     * 获取：合同金额。
-     */
-    public BigDecimal getContractAmount() {
-        return this.contractAmount;
-    }
-
-    /**
-     * 设置：合同金额。
-     */
-    public PoGuaranteeLetterRequireReqFeeDetail setContractAmount(BigDecimal contractAmount) {
-        if (this.contractAmount == null && contractAmount == null) {
-            // 均为null，不做处理。
-        } else if (this.contractAmount != null && contractAmount != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.contractAmount.compareTo(contractAmount) != 0) {
-                this.contractAmount = contractAmount;
-                if (!this.toUpdateCols.contains("CONTRACT_AMOUNT")) {
-                    this.toUpdateCols.add("CONTRACT_AMOUNT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.contractAmount = contractAmount;
-            if (!this.toUpdateCols.contains("CONTRACT_AMOUNT")) {
-                this.toUpdateCols.add("CONTRACT_AMOUNT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 创建用户。
-     */
-    private String crtUserId;
-
-    /**
-     * 获取：创建用户。
-     */
-    public String getCrtUserId() {
-        return this.crtUserId;
-    }
-
-    /**
-     * 设置：创建用户。
-     */
-    public PoGuaranteeLetterRequireReqFeeDetail setCrtUserId(String crtUserId) {
-        if (this.crtUserId == null && crtUserId == null) {
-            // 均为null，不做处理。
-        } else if (this.crtUserId != null && crtUserId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.crtUserId.compareTo(crtUserId) != 0) {
-                this.crtUserId = crtUserId;
-                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
-                    this.toUpdateCols.add("CRT_USER_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.crtUserId = crtUserId;
-            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
-                this.toUpdateCols.add("CRT_USER_ID");
+            this.amtFive = amtFive;
+            if (!this.toUpdateCols.contains("AMT_FIVE")) {
+                this.toUpdateCols.add("AMT_FIVE");
             }
         }
         return this;
@@ -707,108 +739,36 @@ public class PoGuaranteeLetterRequireReqFeeDetail {
     }
 
     /**
-     * 创建部门。
+     * 金额6(存元)。
      */
-    private String crtDeptId;
+    private BigDecimal amtSix;
 
     /**
-     * 获取：创建部门。
+     * 获取：金额6(存元)。
      */
-    public String getCrtDeptId() {
-        return this.crtDeptId;
+    public BigDecimal getAmtSix() {
+        return this.amtSix;
     }
 
     /**
-     * 设置：创建部门。
+     * 设置：金额6(存元)。
      */
-    public PoGuaranteeLetterRequireReqFeeDetail setCrtDeptId(String crtDeptId) {
-        if (this.crtDeptId == null && crtDeptId == null) {
+    public PoGuaranteeLetterRequireReqFeeDetail setAmtSix(BigDecimal amtSix) {
+        if (this.amtSix == null && amtSix == null) {
             // 均为null，不做处理。
-        } else if (this.crtDeptId != null && crtDeptId != null) {
+        } else if (this.amtSix != null && amtSix != null) {
             // 均非null，判定不等，再做处理：
-            if (this.crtDeptId.compareTo(crtDeptId) != 0) {
-                this.crtDeptId = crtDeptId;
-                if (!this.toUpdateCols.contains("CRT_DEPT_ID")) {
-                    this.toUpdateCols.add("CRT_DEPT_ID");
+            if (this.amtSix.compareTo(amtSix) != 0) {
+                this.amtSix = amtSix;
+                if (!this.toUpdateCols.contains("AMT_SIX")) {
+                    this.toUpdateCols.add("AMT_SIX");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.crtDeptId = crtDeptId;
-            if (!this.toUpdateCols.contains("CRT_DEPT_ID")) {
-                this.toUpdateCols.add("CRT_DEPT_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 预付款金额。
-     */
-    private BigDecimal advanceChargeAmt;
-
-    /**
-     * 获取：预付款金额。
-     */
-    public BigDecimal getAdvanceChargeAmt() {
-        return this.advanceChargeAmt;
-    }
-
-    /**
-     * 设置：预付款金额。
-     */
-    public PoGuaranteeLetterRequireReqFeeDetail setAdvanceChargeAmt(BigDecimal advanceChargeAmt) {
-        if (this.advanceChargeAmt == null && advanceChargeAmt == null) {
-            // 均为null，不做处理。
-        } else if (this.advanceChargeAmt != null && advanceChargeAmt != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.advanceChargeAmt.compareTo(advanceChargeAmt) != 0) {
-                this.advanceChargeAmt = advanceChargeAmt;
-                if (!this.toUpdateCols.contains("ADVANCE_CHARGE_AMT")) {
-                    this.toUpdateCols.add("ADVANCE_CHARGE_AMT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.advanceChargeAmt = advanceChargeAmt;
-            if (!this.toUpdateCols.contains("ADVANCE_CHARGE_AMT")) {
-                this.toUpdateCols.add("ADVANCE_CHARGE_AMT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 创建日期时间。
-     */
-    private LocalDateTime crtDt;
-
-    /**
-     * 获取：创建日期时间。
-     */
-    public LocalDateTime getCrtDt() {
-        return this.crtDt;
-    }
-
-    /**
-     * 设置：创建日期时间。
-     */
-    public PoGuaranteeLetterRequireReqFeeDetail setCrtDt(LocalDateTime crtDt) {
-        if (this.crtDt == null && crtDt == null) {
-            // 均为null，不做处理。
-        } else if (this.crtDt != null && crtDt != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.crtDt.compareTo(crtDt) != 0) {
-                this.crtDt = crtDt;
-                if (!this.toUpdateCols.contains("CRT_DT")) {
-                    this.toUpdateCols.add("CRT_DT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.crtDt = crtDt;
-            if (!this.toUpdateCols.contains("CRT_DT")) {
-                this.toUpdateCols.add("CRT_DT");
+            this.amtSix = amtSix;
+            if (!this.toUpdateCols.contains("AMT_SIX")) {
+                this.toUpdateCols.add("AMT_SIX");
             }
         }
         return this;

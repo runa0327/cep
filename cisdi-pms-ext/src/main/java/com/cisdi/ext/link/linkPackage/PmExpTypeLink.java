@@ -77,7 +77,7 @@ public class PmExpTypeLink {
             linkedRecord.textMap.put("PO_GUARANTEE_LETTER_REQUIRE_REQ_ID",tmp.getPoGuaranteeLetterRequireReqId());
 
             // 合同金额
-            BigDecimal amt = tmp.getContractAmount();
+            BigDecimal amt = tmp.getAmtFive();
             if (amt != null){
                 linkedRecord.valueMap.put("CONTRACT_AMOUNT",amt);
                 linkedRecord.textMap.put("CONTRACT_AMOUNT",amt.toString());
@@ -91,7 +91,7 @@ public class PmExpTypeLink {
             }
 
             // 预付款金额
-            BigDecimal payAmt = tmp.getAdvanceChargeAmt();
+            BigDecimal payAmt = tmp.getAmtSix();
             if (payAmt != null){
                 linkedRecord.valueMap.put("ADVANCE_CHARGE_AMT",payAmt);
                 linkedRecord.textMap.put("ADVANCE_CHARGE_AMT",payAmt.toString());
@@ -120,29 +120,24 @@ public class PmExpTypeLink {
             PoGuaranteeLetterRequireReqFeeDetail poGuaranteeLetterRequireReqFeeDetail = new PoGuaranteeLetterRequireReqFeeDetail();
             List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,id,value);
             int ver = 1;
-            String mainId;
             if (!CollectionUtils.isEmpty(list)){
                 ver = (int)list.stream().max(Comparator.comparing(p->JdbcMapUtil.getInt(p,"VER"))).get().get("VER") + 1;
                 Map<String,Object> map = list.get(0);
-                String amt = JdbcMapUtil.getString(map,"CONTRACT_AMOUNT"); // 合同金额
+                String amt = JdbcMapUtil.getString(map,"AMT_FIVE"); // 合同金额
                 String pre = JdbcMapUtil.getString(map,"ADVANCE_CHARGE_PERCENT"); // 预付款比例
-                String payAmt = JdbcMapUtil.getString(map,"ADVANCE_CHARGE_AMT"); // 预付款金额
+                String payAmt = JdbcMapUtil.getString(map,"AMT_SIX"); // 预付款金额
                 if (!SharedUtil.isEmptyString(amt)){
-                    poGuaranteeLetterRequireReqFeeDetail.setContractAmount(new BigDecimal(amt));
+                    poGuaranteeLetterRequireReqFeeDetail.setAmtFive(new BigDecimal(amt));
                 }
                 if (!SharedUtil.isEmptyString(pre)){
                     poGuaranteeLetterRequireReqFeeDetail.setAdvanceChargePercent(new BigDecimal(pre));
                 }
                 if (!SharedUtil.isEmptyString(payAmt)){
-                    poGuaranteeLetterRequireReqFeeDetail.setAdvanceChargeAmt(new BigDecimal(payAmt));
+                    poGuaranteeLetterRequireReqFeeDetail.setAmtSix(new BigDecimal(payAmt));
                 }
-                mainId = JdbcMapUtil.getString(map,"ID");
-            } else {
-                mainId = IdUtil.getSnowflakeNextIdStr();
             }
             poGuaranteeLetterRequireReqFeeDetail.setPoGuaranteeLetterRequireReqId(id);
             poGuaranteeLetterRequireReqFeeDetail.setVer(ver);
-//            poGuaranteeLetterRequireReqFeeDetail.setId(mainId);
             poGuaranteeLetterRequireReqFeeDetail.setPmExpTypeId(value); // 费用类型
             feeDetailsList.add(poGuaranteeLetterRequireReqFeeDetail);
         }

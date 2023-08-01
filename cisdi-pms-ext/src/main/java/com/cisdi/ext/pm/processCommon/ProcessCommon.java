@@ -79,10 +79,9 @@ public class ProcessCommon {
      * @param userId 操作人id
      * @param myJdbcTemplate 数据源
      * @param procInstId 流程实例id
-     * @param userName 操作人名称
      * @return 审批意见信息
      */
-    public static Map<String, String> getCommentNew(String nodeInstanceId, String userId, MyJdbcTemplate myJdbcTemplate, String procInstId, String userName) {
+    public static Map<String, String> getCommentNew(String nodeInstanceId, String userId, MyJdbcTemplate myJdbcTemplate, String procInstId) {
         Map<String,String> map = new HashMap<>();
         String sql = "select a.USER_COMMENT,a.USER_ATTACHMENT from wf_task a " +
                 "left join wf_node_instance b on a.WF_NODE_INSTANCE_ID = b.id and b.status = 'ap' " +
