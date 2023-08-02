@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 流程监控扩展
@@ -70,12 +71,106 @@ public class ProcessMonitorExt {
         List<ProcessMonitor> checkList = getCheckTop(start,end,jdbcTemplate);
 
         Map<String,List<ProcessMonitor>> resMap = new HashMap<>();
+//        resMap = dealData(startList,endList,checkList); // 2023-08-02 显示所有分类增加 暂不删除
         resMap.put("start",startList);
         resMap.put("check",checkList);
         resMap.put("end",endList);
 
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resMap), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
+    }
+
+    /**
+     * 发起、审批、办结数据处理
+     * @param startList 发起明细
+     * @param endList 办结明细
+     * @param checkList 办理明细
+     * @return
+     */
+    private Map<String, List<ProcessMonitor>> dealData(List<ProcessMonitor> startList, List<ProcessMonitor> endList, List<ProcessMonitor> checkList) {
+        List<String> startStr = startList.stream().map(ProcessMonitor::getCateTypeName).collect(Collectors.toList());
+        List<String> endStr = endList.stream().map(ProcessMonitor::getCateTypeName).collect(Collectors.toList());
+        List<String> checkStr = checkList.stream().map(ProcessMonitor::getCateTypeName).collect(Collectors.toList());
+        List<String> catStr = distinctName(startStr,endStr,checkStr);
+        Map<String, List<ProcessMonitor>> map = new HashMap<>();
+        return getMap(map,catStr,startList,endList,checkList,startStr,endStr,checkStr);
+    }
+
+    /**
+     * 发起、审批、办结流程去重汇总后按照固定顺序返回
+     * @param map 返回的结果集
+     * @param catStr 去重后流程分类
+     * @param startList 所有发起明细
+     * @param endList 所有办结明细
+     * @param checkList 所有审批明细
+     * @param startStr 发起流程分类信息
+     * @param endStr 办结流程分类信息
+     * @param checkStr 审批流程分类信息
+     * @return 处理后数据
+     */
+    private Map<String, List<ProcessMonitor>> getMap(Map<String, List<ProcessMonitor>> map, List<String> catStr, List<ProcessMonitor> startList, List<ProcessMonitor> endList, List<ProcessMonitor> checkList, List<String> startStr, List<String> endStr, List<String> checkStr) {
+        List<ProcessMonitor> beginList = new ArrayList<>();
+        List<ProcessMonitor> finishList = new ArrayList<>();
+        List<ProcessMonitor> examList = new ArrayList<>();
+        for (String s : catStr) {
+
+            // 处理发起
+            dealProcessDate(s,beginList,startList,startStr);
+
+            // 处理办结
+            dealProcessDate(s,finishList,endList,endStr);
+
+            // 处理审批
+            dealProcessDate(s,examList,checkList,checkStr);
+
+        }
+        map.put("start",beginList);
+        map.put("check",examList);
+        map.put("end",finishList);
+        return map;
+    }
+
+    /**
+     * 数据处理
+     * @param cateName 分类名称
+     * @param resList 返回的数据
+     * @param sourceList 来源数据
+     * @param listStr 来源数据分类去重
+     */
+    private void dealProcessDate(String cateName, List<ProcessMonitor> resList, List<ProcessMonitor> sourceList, List<String> listStr) {
+        if (!CollectionUtils.isEmpty(sourceList)){
+            if (listStr.contains(cateName)){
+                ProcessMonitor processMonitor = sourceList.stream().filter(p->cateName.equals(p.getCateTypeName())).collect(Collectors.toList()).get(0);
+                resList.add(processMonitor);
+                sourceList.removeIf(p -> cateName.equals(p.getCateTypeName()));
+            } else {
+                ProcessMonitor processMonitor = new ProcessMonitor();
+                processMonitor.setCateTypeName(cateName);
+                processMonitor.setNum(0);
+                resList.add(processMonitor);
+            }
+        } else {
+            ProcessMonitor processMonitor = new ProcessMonitor();
+            processMonitor.setCateTypeName(cateName);
+            processMonitor.setNum(0);
+            resList.add(processMonitor);
+        }
+    }
+
+    /**
+     * 流程分类去重
+     * @param startStr 所有发起流程分类
+     * @param endStr 所有办结流程分类
+     * @param checkStr 所有审批流程分类
+     * @return 去重汇总后流程分类
+     */
+    private List<String> distinctName(List<String> startStr, List<String> endStr, List<String> checkStr) {
+        List<String> resList = new ArrayList<>();
+        resList.addAll(startStr);
+        resList.addAll(endStr);
+        resList.addAll(checkStr);
+        resList = resList.stream().distinct().collect(Collectors.toList());
+        return resList;
     }
 
     /**
