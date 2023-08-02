@@ -628,6 +628,13 @@ public class ProcessRoleExt {
     }
 
     /**
+     * 查询任意流程选择的采购岗用户
+     */
+    public void getProcessPurchaseUser(){
+        getDeptUser("AD_USER_TWENTY_ONE_ID","post_buy","采购岗");
+    }
+
+    /**
      * 查询任意流程的任意岗位人员
      */
     public void getUserIds(){

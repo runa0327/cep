@@ -81,7 +81,7 @@ public class AttLinkExt {
         } else if ("REASON".equals(attCode)){ // 退还原因
             return linkREASON(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("BUY_TYPE_ID".equals(attCode)){ // 招采方式
-            return linkBUY_TYPE_ID(myJdbcTemplate, attValue, entCode,sevId);
+            return BuyTypeLink.linkBUY_TYPE_ID(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("BUY_START_BASIS_ID".equals(attCode)){ // 采购启动依据属性联动
             return linkBUY_START_BASIS_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("PM_USE_CHAPTER_REQ_ID".equals(attCode)){ // 中标单位及标后用章属性联动
@@ -548,29 +548,6 @@ public class AttLinkExt {
                 linkedAtt.changeToMandatory = changeToMandatory;
                 linkedAtt.changeToEditable = changeToEditable;
                 attLinkResult.attMap.put("REPLY_NO_WR", linkedAtt);
-            }
-        }
-        return attLinkResult;
-    }
-
-    //招采方式 属性联动
-    private AttLinkResult linkBUY_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
-        AttLinkResult attLinkResult = new AttLinkResult();
-        String code = getGrSetCode(myJdbcTemplate,attValue);
-        // 公开招标(open_bidding),竞争性磋商(competitive_consultations),竞争性谈判(competitive_negotiation)
-        if ("PM_BID_APPROVAL_REQ".equals(entCode)){ //招标文件审批
-            boolean changeToMandatory = false; //必填
-            if ("open_bidding".equals(code) || "competitive_consultations".equals(code) || "competitive_negotiation".equals(code)){
-                changeToMandatory = true;
-            }
-            //BID_AGENCY
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToMandatory = changeToMandatory;
-                attLinkResult.attMap.put("BID_AGENCY", linkedAtt);
             }
         }
         return attLinkResult;

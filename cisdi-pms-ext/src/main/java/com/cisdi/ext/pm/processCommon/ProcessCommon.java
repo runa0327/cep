@@ -698,4 +698,41 @@ public class ProcessCommon {
         }
         return matterTypeId;
     }
+
+/**====================================================================================================================**/
+/**==========================================更新流程主表单字段开始========================================================**/
+/**====================================================================================================================**/
+
+     /**
+     * 流程审批意见回显通用方法
+     * @param colCode 回显字段
+     * @param map 数据源集合
+     * @param comment 本次审批提交意见
+     * @param entCode 需要更新的表名
+     * @param csCommId 更新的表的id
+     * @param userName 本次操作人员名称
+     */
+    public static void updateComment(String colCode, Map<String, Object> map, String comment, String entCode, String csCommId, String userName) {
+        //获取流程中的意见信息
+        String processComment = JdbcMapUtil.getString(map,colCode);
+        //生成最终的意见信息
+        String commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+        updateProcColsValue(colCode,entCode,csCommId,commentEnd);
+    }
+
+    /**
+     * 流程审批拒绝，清空某一字段
+     * @param colCode 回显字段
+     * @param entCode 需要更新的表
+     * @param csCommId 需要更新的表的id
+     * @param value 需要更新的值
+     */
+    public static void updateProcColsValue(String colCode, String entCode, String csCommId, String value) {
+        Crud.from(entCode).where().eq("id",csCommId).update()
+                .set(colCode,value).exec();
+    }
+
+/**====================================================================================================================**/
+/**==========================================更新流程主表单字段结束========================================================**/
+/**====================================================================================================================**/
 }

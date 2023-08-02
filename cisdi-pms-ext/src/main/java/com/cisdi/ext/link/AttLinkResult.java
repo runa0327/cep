@@ -18,6 +18,9 @@ public class AttLinkResult {
     public Map<String, Boolean> childClear = new HashMap<>();
 
     @JsonView({Front.class})
+    public Map<String,Boolean> childShow = new HashMap<>();
+
+    @JsonView({Front.class})
     public Map<String, List<LinkedRecord>> childData = new HashMap<>();
 
 }
