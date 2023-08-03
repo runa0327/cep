@@ -1,6 +1,6 @@
 package com.cisdi.pms.job.service;
 
-import com.cisdi.pms.job.domain.PoOrderReq;
+import com.cisdi.pms.job.domain.process.PoOrderReq;
 
 public interface WordToPdfService {
 
