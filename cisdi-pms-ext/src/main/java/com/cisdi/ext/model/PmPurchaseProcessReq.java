@@ -245,9 +245,9 @@ public class PmPurchaseProcessReq {
          */
         public static final String AMT_EIGHTH = "AMT_EIGHTH";
         /**
-         * 日期。
+         * 日期4。
          */
-        public static final String DATE = "DATE";
+        public static final String DATE_FOUR = "DATE_FOUR";
         /**
          * 金额9(存元)。
          */
@@ -2080,36 +2080,36 @@ public class PmPurchaseProcessReq {
     }
 
     /**
-     * 日期。
+     * 日期4。
      */
-    private String date;
+    private LocalDate dateFour;
 
     /**
-     * 获取：日期。
+     * 获取：日期4。
      */
-    public String getDate() {
-        return this.date;
+    public LocalDate getDateFour() {
+        return this.dateFour;
     }
 
     /**
-     * 设置：日期。
+     * 设置：日期4。
      */
-    public PmPurchaseProcessReq setDate(String date) {
-        if (this.date == null && date == null) {
+    public PmPurchaseProcessReq setDateFour(LocalDate dateFour) {
+        if (this.dateFour == null && dateFour == null) {
             // 均为null，不做处理。
-        } else if (this.date != null && date != null) {
+        } else if (this.dateFour != null && dateFour != null) {
             // 均非null，判定不等，再做处理：
-            if (this.date.compareTo(date) != 0) {
-                this.date = date;
-                if (!this.toUpdateCols.contains("DATE")) {
-                    this.toUpdateCols.add("DATE");
+            if (this.dateFour.compareTo(dateFour) != 0) {
+                this.dateFour = dateFour;
+                if (!this.toUpdateCols.contains("DATE_FOUR")) {
+                    this.toUpdateCols.add("DATE_FOUR");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.date = date;
-            if (!this.toUpdateCols.contains("DATE")) {
-                this.toUpdateCols.add("DATE");
+            this.dateFour = dateFour;
+            if (!this.toUpdateCols.contains("DATE_FOUR")) {
+                this.toUpdateCols.add("DATE_FOUR");
             }
         }
         return this;

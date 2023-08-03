@@ -1,8 +1,10 @@
 package com.cisdi.ext.link.linkPackage;
 
 import com.cisdi.ext.base.GrSetValueExt;
+import com.cisdi.ext.link.AttLinkParam;
 import com.cisdi.ext.link.AttLinkResult;
 import com.cisdi.ext.link.LinkedAtt;
+import com.cisdi.ext.model.PmPurchaseProcessReq;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.ad.att.AttDataTypeE;
 
@@ -19,9 +21,10 @@ public class BuyTypeLink {
      * @param attValue 属性联动值
      * @param entCode 业务表名
      * @param sevId 视图id
+     * @param param 所有参数信息
      * @return 属性联动结果
      */
-    public static AttLinkResult linkBUY_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+    public static AttLinkResult linkBUY_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
         String code = GrSetValueExt.getGrSetCode(myJdbcTemplate,attValue);
         String name = GrSetValueExt.getValueNameById(attValue);
@@ -34,7 +37,7 @@ public class BuyTypeLink {
             //BID_AGENCY
             LinkUtils.mapAddAllValue("BID_AGENCY",AttDataTypeE.TEXT_LONG,(String)null,null,true,changeToMandatory,true,attLinkResult);
         } else if ("PM_PURCHASE_PROCESS_REQ".equals(entCode)){ // 采购过程管理
-            purchaseProAttLink(attLinkResult,name);
+            purchaseProAttLink(attLinkResult,name,param.id);
         }
         return attLinkResult;
     }
@@ -43,8 +46,9 @@ public class BuyTypeLink {
      * 采购过程管理-采购方式-属性联动
      * @param attLinkResult 返回结果只
      * @param name 属性联动名称
+     * @param id 表单id
      */
-    private static void purchaseProAttLink(AttLinkResult attLinkResult, String name) {
+    private static void purchaseProAttLink(AttLinkResult attLinkResult, String name, String id) {
         boolean gongKaiShow = false, gongKaiEdit = false; // 公开类
         boolean notGongKaiShow = false, notGongKaiEdit = false; // 非公开类
 
@@ -59,7 +63,7 @@ public class BuyTypeLink {
             attLinkResult.childShow.put("1686574747338604544", true);
             attLinkResult.childShow.put("1686574170722467840", false);
         }
-        LinkUtils.mapAddAllValue("DATE_ONE",AttDataTypeE.DATE,(String) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 报名时间
+        LinkUtils.mapAddAllValue("DATE_ONE",AttDataTypeE.DATE,(String) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult);
         LinkUtils.mapAddAllValue("DATE_TWO",AttDataTypeE.DATE,(String) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 开标日期
         LinkUtils.mapAddAllValue("RATE_ONE",AttDataTypeE.TEXT_LONG,(BigDecimal) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 下浮率
         LinkUtils.mapAddAllValue("WIN_BID_UNIT_ONE",AttDataTypeE.TEXT_LONG,(String) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 中标单位
@@ -86,7 +90,7 @@ public class BuyTypeLink {
         LinkUtils.mapAddAllValue("PM_PRJ_ID_ONE",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,false,attLinkResult); // 项目名称
         LinkUtils.mapAddAllValue("BUY_TYPE_ONE_ID",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,false,attLinkResult); // 采购方式
         LinkUtils.mapAddAllValue("AMT_EIGHTH",AttDataTypeE.TEXT_LONG,(BigDecimal) null,null,notGongKaiShow,false,false,attLinkResult); // 预算金额
-        LinkUtils.mapAddAllValue("DATE",AttDataTypeE.DATE,(String) null,null,notGongKaiShow,false,false,attLinkResult); // 备案时间
+        LinkUtils.mapAddAllValue("DATE_FOUR",AttDataTypeE.DATE,(String) null,null,notGongKaiShow,false,false,attLinkResult); // 备案时间
         LinkUtils.mapAddAllValue("AMT_NINTH",AttDataTypeE.TEXT_LONG,(BigDecimal) null,null,notGongKaiShow,false,false,attLinkResult); // 中标金额
         LinkUtils.mapAddAllValue("WIN_BID_UNIT_THREE",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,false,attLinkResult); // 委托供应商名称
         LinkUtils.mapAddAllValue("WIN_BID_UNIT_FOUR",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,false,attLinkResult); // 代理机构名称
@@ -102,6 +106,6 @@ public class BuyTypeLink {
         LinkUtils.mapAddAllValue("TEXT_REMARK_SEVEN",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,false,attLinkResult); // 回执意见
         LinkUtils.mapAddAllValue("AD_USER_ID",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,false,attLinkResult); // 采购需求经办人:
         LinkUtils.mapAddAllValue("AD_USER_ONE_ID",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,false,attLinkResult); // 材料接收人:
-
     }
+
 }

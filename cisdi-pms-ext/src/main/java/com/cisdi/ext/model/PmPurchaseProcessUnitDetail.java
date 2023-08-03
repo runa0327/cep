@@ -115,6 +115,10 @@ public class PmPurchaseProcessUnitDetail {
          * 附件1。
          */
         public static final String FILE_ID_ONE = "FILE_ID_ONE";
+        /**
+         * 采购方式。
+         */
+        public static final String BUY_TYPE_ID = "BUY_TYPE_ID";
     }
 
     // </editor-fold>
@@ -729,6 +733,42 @@ public class PmPurchaseProcessUnitDetail {
             this.fileIdOne = fileIdOne;
             if (!this.toUpdateCols.contains("FILE_ID_ONE")) {
                 this.toUpdateCols.add("FILE_ID_ONE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 采购方式。
+     */
+    private String buyTypeId;
+
+    /**
+     * 获取：采购方式。
+     */
+    public String getBuyTypeId() {
+        return this.buyTypeId;
+    }
+
+    /**
+     * 设置：采购方式。
+     */
+    public PmPurchaseProcessUnitDetail setBuyTypeId(String buyTypeId) {
+        if (this.buyTypeId == null && buyTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.buyTypeId != null && buyTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.buyTypeId.compareTo(buyTypeId) != 0) {
+                this.buyTypeId = buyTypeId;
+                if (!this.toUpdateCols.contains("BUY_TYPE_ID")) {
+                    this.toUpdateCols.add("BUY_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.buyTypeId = buyTypeId;
+            if (!this.toUpdateCols.contains("BUY_TYPE_ID")) {
+                this.toUpdateCols.add("BUY_TYPE_ID");
             }
         }
         return this;

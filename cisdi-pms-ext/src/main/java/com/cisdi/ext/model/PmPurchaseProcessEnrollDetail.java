@@ -8,6 +8,7 @@ import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,9 +113,13 @@ public class PmPurchaseProcessEnrollDetail {
          */
         public static final String AMT_FIVE = "AMT_FIVE";
         /**
-         * 日期。
+         * 日期1。
          */
-        public static final String DATE = "DATE";
+        public static final String DATE_ONE = "DATE_ONE";
+        /**
+         * 采购方式。
+         */
+        public static final String BUY_TYPE_ID = "BUY_TYPE_ID";
     }
 
     // </editor-fold>
@@ -699,36 +704,72 @@ public class PmPurchaseProcessEnrollDetail {
     }
 
     /**
-     * 日期。
+     * 日期1。
      */
-    private String date;
+    private LocalDate dateOne;
 
     /**
-     * 获取：日期。
+     * 获取：日期1。
      */
-    public String getDate() {
-        return this.date;
+    public LocalDate getDateOne() {
+        return this.dateOne;
     }
 
     /**
-     * 设置：日期。
+     * 设置：日期1。
      */
-    public PmPurchaseProcessEnrollDetail setDate(String date) {
-        if (this.date == null && date == null) {
+    public PmPurchaseProcessEnrollDetail setDateOne(LocalDate dateOne) {
+        if (this.dateOne == null && dateOne == null) {
             // 均为null，不做处理。
-        } else if (this.date != null && date != null) {
+        } else if (this.dateOne != null && dateOne != null) {
             // 均非null，判定不等，再做处理：
-            if (this.date.compareTo(date) != 0) {
-                this.date = date;
-                if (!this.toUpdateCols.contains("DATE")) {
-                    this.toUpdateCols.add("DATE");
+            if (this.dateOne.compareTo(dateOne) != 0) {
+                this.dateOne = dateOne;
+                if (!this.toUpdateCols.contains("DATE_ONE")) {
+                    this.toUpdateCols.add("DATE_ONE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.date = date;
-            if (!this.toUpdateCols.contains("DATE")) {
-                this.toUpdateCols.add("DATE");
+            this.dateOne = dateOne;
+            if (!this.toUpdateCols.contains("DATE_ONE")) {
+                this.toUpdateCols.add("DATE_ONE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 采购方式。
+     */
+    private String buyTypeId;
+
+    /**
+     * 获取：采购方式。
+     */
+    public String getBuyTypeId() {
+        return this.buyTypeId;
+    }
+
+    /**
+     * 设置：采购方式。
+     */
+    public PmPurchaseProcessEnrollDetail setBuyTypeId(String buyTypeId) {
+        if (this.buyTypeId == null && buyTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.buyTypeId != null && buyTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.buyTypeId.compareTo(buyTypeId) != 0) {
+                this.buyTypeId = buyTypeId;
+                if (!this.toUpdateCols.contains("BUY_TYPE_ID")) {
+                    this.toUpdateCols.add("BUY_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.buyTypeId = buyTypeId;
+            if (!this.toUpdateCols.contains("BUY_TYPE_ID")) {
+                this.toUpdateCols.add("BUY_TYPE_ID");
             }
         }
         return this;

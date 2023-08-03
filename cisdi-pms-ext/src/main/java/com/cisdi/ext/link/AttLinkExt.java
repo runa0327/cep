@@ -81,7 +81,7 @@ public class AttLinkExt {
         } else if ("REASON".equals(attCode)){ // 退还原因
             return linkREASON(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("BUY_TYPE_ID".equals(attCode)){ // 招采方式
-            return BuyTypeLink.linkBUY_TYPE_ID(myJdbcTemplate, attValue, entCode,sevId);
+            return BuyTypeLink.linkBUY_TYPE_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("BUY_START_BASIS_ID".equals(attCode)){ // 采购启动依据属性联动
             return linkBUY_START_BASIS_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("PM_USE_CHAPTER_REQ_ID".equals(attCode)){ // 中标单位及标后用章属性联动

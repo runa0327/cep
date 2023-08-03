@@ -52,6 +52,21 @@ public class PmPurchaseProcessReqExt {
     }
 
     /**
+     * 备案回执信息自动填补字段
+     */
+    public void showRecord(){
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        Map<String,Object> map = entityRecord.valueMap;
+        String id = entityRecord.csCommId;
+        Crud.from("PM_PURCHASE_PROCESS_REQ").where().eq("ID",id).update()
+                .set("PM_PRJ_ID_ONE",JdbcMapUtil.getString(map,"PM_PRJ_ID")) // 项目
+                .set("BUY_TYPE_ONE_ID",JdbcMapUtil.getString(map,"BUY_TYPE_ID")) // 采购方式
+                .set("AMT_EIGHTH",JdbcMapUtil.getString(map,"AMT_FIVE")) // 预算金额
+                .set("AMT_NINTH",JdbcMapUtil.getString(map,"AMT_SEVEN")) // 中标金额
+                .exec();
+    }
+
+    /**
      * 流程操作-采购过程管理-确认操作
      */
     public void purchaseOK(){
