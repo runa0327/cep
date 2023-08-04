@@ -464,4 +464,64 @@ public class PmLifeCycleExt {
             m.children = getChildren(m, allData);
         }).collect(Collectors.toList());
     }
+
+    /**
+     * 节点管理-反显
+     */
+    public void lifeCycleNodeManagementView() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pn.*,PM_PRJ_ID from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where pn.`NAME`=? and PM_PRJ_ID=?",
+                map.get("nodeName"), map.get("projectId"));
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> nodeMap = list.get(0);
+            NodeEditObj obj = new NodeEditObj();
+            obj.projectId = JdbcMapUtil.getString(nodeMap, "PM_PRJ_ID");
+            obj.nodeName = JdbcMapUtil.getString(nodeMap, "NAME");
+            obj.postId = JdbcMapUtil.getString(nodeMap, "POST_INFO_ID");
+            obj.planBegin = JdbcMapUtil.getString(nodeMap, "PLAN_START_DATE");
+            obj.planComp = JdbcMapUtil.getString(nodeMap, "PLAN_COMPL_DATE");
+            obj.actualBegin = JdbcMapUtil.getString(nodeMap, "ACTUAL_START_DATE");
+            obj.actualEnd = JdbcMapUtil.getString(nodeMap, "ACTUAL_COMPL_DATE");
+            obj.planDays = JdbcMapUtil.getString(nodeMap, "PLAN_TOTAL_DAYS");
+            obj.actualDays = JdbcMapUtil.getString(nodeMap, "ACTUAL_TOTAL_DAYS");
+            obj.status = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+            obj.izOverdue = JdbcMapUtil.getString(nodeMap, "IZ_OVERDUE");
+            obj.nodeId = JdbcMapUtil.getString(nodeMap, "ID");
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(obj), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        } else {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        }
+
+    }
+
+    /**
+     * 节点管理-修改
+     */
+    public void lifeCycleNodeManagementModify() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        myJdbcTemplate.update("update pm_pro_plan_node set POST_INFO_ID=?,PLAN_START_DATE=?,PLAN_COMPL_DATE=?,ACTUAL_START_DATE=?,ACTUAL_COMPL_DATE=?,PLAN_TOTAL_DAYS=?,ACTUAL_TOTAL_DAYS=?,PROGRESS_STATUS_ID=?,IZ_OVERDUE=? where id=?",
+                map.get("postId"), map.get("planBegin"), map.get("planComp"), map.get("actualBegin"), map.get("actualEnd"), map.get("planDays"), map.get("actualDays"), map.get("status"), map.get("izOverdue"), map.get("nodeId"));
+
+    }
+
+    public static class NodeEditObj {
+        public String projectId;
+        public String nodeName;
+        public String postId;
+        public String planBegin;
+        public String planComp;
+        public String actualBegin;
+        public String actualEnd;
+        public String planDays;
+        public String actualDays;
+        public String status;
+        public String izOverdue;
+
+        public String nodeId;
+
+    }
+
 }

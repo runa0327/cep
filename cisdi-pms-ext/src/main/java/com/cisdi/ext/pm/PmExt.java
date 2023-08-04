@@ -289,6 +289,78 @@ public class PmExt {
         }
     }
 
+
+    /**
+     * 我的项目库
+     */
+    public void myProjectLibrary(){
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        PrjRequestParam param = JsonUtil.fromJson(json, PrjRequestParam.class);
+        int pageSize = param.pageSize;
+        int pageIndex = param.pageIndex;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        StringBuilder sb = new StringBuilder();
+        sb.append("select pm.PM_SEQ as num,pm.id as id,pm.`NAME` as name,pt.`NAME` as unit,gsv.`NAME` as type,pm.PM_CODE as code,ggg.`NAME` as local, \n" +
+                "gsvv.`NAME` as pmode,'0' as invest,gss.`NAME` as status,pm.ver as ver, \n" +
+                "ppp.PLAN_START_DATE as PLAN_START_DATE, \n" +
+                "ppp.ACTUAL_START_DATE as ACTUAL_START_DATE, \n" +
+                "ppp.PLAN_COMPL_DATE AS PLAN_COMPL_DATE, \n" +
+                "ppp.ACTUAL_COMPL_DATE AS ACTUAL_COMPL_DATE, \n" +
+                "ppp.PLAN_CURRENT_PRO_PERCENT AS PLAN_CURRENT_PRO_PERCENT, \n" +
+                "ppp.ACTUAL_CURRENT_PRO_PERCENT AS ACTUAL_CURRENT_PRO_PERCENT  \n" +
+                "from pm_prj pm \n" +
+                "left join pm_party pt on pm.CUSTOMER_UNIT = pt.id \n" +
+                "left join gr_set_value gsv on gsv.id = pm.PROJECT_TYPE_ID \n" +
+                "left join gr_set_value gsvv on gsvv.id = pm.PRJ_MANAGE_MODE_ID \n" +
+                "left join gr_set_value gss on gss.id = pm.PROJECT_PHASE_ID \n" +
+                "left join pm_pro_plan ppp on ppp.PM_PRJ_ID = pm.id \n" +
+                "left join gr_set_value ggg on ggg.id = pm.BASE_LOCATION_ID "+
+                "where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 and (pm.PROJECT_STATUS != '1661568714048413696' or pm.PROJECT_STATUS is null ) ");
+        if (Strings.isNotEmpty(param.name)) {
+            sb.append(" and pm.`name` like '%").append(param.name).append("%'");
+        }
+        if (Strings.isNotEmpty(param.code)) {
+            sb.append(" and pm.PM_CODE like '%").append(param.code).append("%'");
+        }
+        if (Strings.isNotEmpty(param.unit)) {
+            sb.append(" and pm.CUSTOMER_UNIT = '").append(param.unit).append("'");
+        }
+        if (Strings.isNotEmpty(param.type)) {
+            sb.append(" and pm.PROJECT_TYPE_ID = '").append(param.type).append("'");
+        }
+        if (Strings.isNotEmpty(param.status)) {
+            sb.append(" and pm.PROJECT_PHASE_ID = '").append(param.status).append("'");
+        }
+        if (Strings.isNotEmpty(param.phase)) {
+            sb.append(" and pm.TRANSITION_PHASE_ID = '").append(param.phase).append("'");
+        }
+        if (Strings.isNotEmpty(param.startTime)) {
+            sb.append(" and DATE_FORMAT(ppp.PLAN_START_DATE,'%Y-%m-%d') = DATE_FORMAT('").append(param.startTime).append("','%Y-%m-%d')");
+        }
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        sb.append(" and pm.id in (select PM_PRJ_ID from pm_roster where AD_USER_ID='").append(userId).append("' ) ");
+//        sb.append(" and IF('").append(userId).append("' in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1, ");
+//        sb.append(" pm.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(userId).append("', USER_IDS )))");
+
+        sb.append(" order by pm.PM_SEQ desc");
+        String totalSql = sb.toString();
+        int start = pageSize * (pageIndex - 1);
+        sb.append(" limit ").append(start).append(",").append(pageSize);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
+        List<ProjectInfo> projectInfoList = list.stream().map(this::convertProjectInfo).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(projectInfoList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
+            OutSide outSide = new OutSide();
+            outSide.total = totalList.size();
+            outSide.projectInfoList = projectInfoList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
     /**
      * 初始化项目序号
      */

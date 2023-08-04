@@ -8,6 +8,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -42,6 +43,7 @@ public class PlanOperationController extends BaseController {
     public static final String NOT_STARTED = "0099799190825106800";
     public static final String IN_PROCESSING = "0099799190825106801";
     public static final String COMPLETED = "0099799190825106802";
+    public static final String NOT_INVOLVE = "0099902212142036278";//未涉及
 
     /**
      * 全景计划导入
@@ -104,48 +106,62 @@ public class PlanOperationController extends BaseController {
                 int rowNum1 = dataRow.getLastCellNum() - dataRow.getFirstCellNum();
                 for (int i = 2; i < rowNum1; i++) {
                     String headOrg = headRow.getCell(i).toString();
-                    Object obj = dataRow.getCell(i);
-                    if ("备注".equals(headOrg)) {
-                        String projectRemark = null;
-                        if (null != obj) {
-                            projectRemark = obj.toString();
-                        }
-                        insertRemark(projectId, null, projectRemark, "1");
-                    } else {
-                        List<Map<String, Object>> nodeList = jdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.ID where PM_PRJ_ID=? and pn.`NAME`=?", projectId, headOrg);
-                        if (!CollectionUtils.isEmpty(nodeList)) {
-                            Map<String, Object> nodeMap = nodeList.get(0);
-                            if (null != obj) {
-                                if (!"/".equals(obj.toString())) {
-                                    if ("完成".equals(obj.toString())) {
-                                        jdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=? where id=?", COMPLETED, nodeMap.get("ID"));
+                    Cell cellObj = dataRow.getCell(i);
+                    String bgColor = null;//背景颜色
+                    CellStyle cellStyle = dataRow.getCell(i).getCellStyle();
+                    XSSFColor xssfColor = (XSSFColor) cellStyle.getFillForegroundColorColor();
+                    byte[] bytes;
+                    if (xssfColor != null) {
+                        bytes = xssfColor.getRGB();
+                        bgColor = String.format("#%02X%02X%02X", bytes[0], bytes[1], bytes[2]);
+                    }
+
+                    if (!isEmptyCell(cellObj)) {
+                        if ("备注".equals(headOrg)) {
+                            String projectRemark = null;
+                            projectRemark = cellObj.toString();
+                            insertRemark(projectId, null, projectRemark, "1");
+                        } else {
+                            List<Map<String, Object>> nodeList = jdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.ID where PM_PRJ_ID=? and pn.`NAME`=?", projectId, headOrg);
+                            if (!CollectionUtils.isEmpty(nodeList)) {
+                                Map<String, Object> nodeMap = nodeList.get(0);
+                                //先判断颜色,如果为黄色，节点为超期未完成
+                                if ("#FFFF00".equals(bgColor)) {
+                                    jdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=?,IZ_OVERDUE='1' where id=?", NOT_STARTED, nodeMap.get("ID"));
+                                } else {
+                                    if ("未涉及".equals(cellObj.toString())) {
+                                        jdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=? where id=?", NOT_INVOLVE, nodeMap.get("ID"));
                                     } else {
-                                        String[] split = obj.toString().split("\\.");
+                                        String[] split = cellObj.toString().split("\\.");
+                                        System.out.println("内容为：" + headOrg + ":---:" + cellObj);
                                         String dateOrg = split[0] + "-" + StringUtil.addZeroForNum(split[1], 2) + "-" + split[2];
                                         Date comDate = DateTimeUtil.stringToDate(dateOrg);
-                                        jdbcTemplate.update("update pm_pro_plan_node set ACTUAL_COMPL_DATE=?,PROGRESS_STATUS_ID=? where id=?", comDate, COMPLETED, nodeMap.get("ID"));
+                                        if (comDate.before(new Date())) {
+                                            jdbcTemplate.update("update pm_pro_plan_node set ACTUAL_COMPL_DATE=?,PROGRESS_STATUS_ID=? where id=?", comDate, COMPLETED, nodeMap.get("ID"));
+                                        } else {
+                                            jdbcTemplate.update("update pm_pro_plan_node set PLAN_COMPL_DATE=?,PROGRESS_STATUS_ID=? where id=?", comDate, NOT_STARTED, nodeMap.get("ID"));
+                                        }
                                     }
                                 }
-                            }
-                            //处理批注
-                            Comment cellComment = dataRow.getCell(i).getCellComment();
-                            if (cellComment != null) {
-                                String commentStr = cellComment.getString().toString();
-                                insertRemark(projectId, JdbcMapUtil.getString(nodeMap, "SCHEDULE_NAME"), commentStr, "2");
-                            }
+                                //处理批注
+                                Comment cellComment = dataRow.getCell(i).getCellComment();
+                                if (cellComment != null) {
+                                    String commentStr = cellComment.getString().toString();
+                                    insertRemark(projectId, JdbcMapUtil.getString(nodeMap, "SCHEDULE_NAME"), commentStr, "2");
+                                }
 
 
-                        } else {
-                            res.add("序号为:" + dataRow.getCell(0) + "的数据，全景节点【" + headOrg + "】不存在！");
+                            } else {
+                                res.add("序号为:" + dataRow.getCell(0) + "的数据，全景节点【" + headOrg + "】不存在！");
+                            }
                         }
                     }
                 }
                 for (int i = 0; i < 5; i++) {
                     refreshNodeStatus(projectId);
                 }
-
                 //发送任务
-                insertWeekTask(projectId);
+//                insertWeekTask(projectId);
             } else {
                 res.add("序号为:" + dataRow.getCell(0) + "的数据，项目不存在！");
             }
@@ -267,5 +283,18 @@ public class PlanOperationController extends BaseController {
         String content = MessageFormat.format("{0}【{1}】计划将在{2}完成，请及时处理！", objectMap.get("prjName"), processName, dateOrg);
         jdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=?,CAN_DISPATCH='0',PM_PRJ_ID=?,PLAN_COMPL_DATE=? where id=?",
                 userId, title, content, new Date(), "1634118574056542208", "1635080848313290752", objectMap.get("ID"), objectMap.get("projectId"), objectMap.get("PLAN_COMPL_DATE"), id);
+    }
+
+    /**
+     * 判断单元格是否为空
+     *
+     * @param cell
+     * @return
+     */
+    public static boolean isEmptyCell(Cell cell) {
+        if (cell == null || cell.getCellType().equals(CellType.BLANK)) {
+            return true;
+        }
+        return false;
     }
 }
