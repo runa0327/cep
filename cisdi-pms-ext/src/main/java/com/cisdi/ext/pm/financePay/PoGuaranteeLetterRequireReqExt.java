@@ -1,21 +1,28 @@
 package com.cisdi.ext.pm.financePay;
 
+import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.PoGuaranteeLetterRequireReq;
 import com.cisdi.ext.model.PoGuaranteeLetterRequireReqFeeDetail;
+import com.cisdi.ext.model.view.process.PoGuaranteeLetterRequireReqView;
 import com.cisdi.ext.pm.processCommon.ProcessCommon;
+import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 新增保函-扩展
@@ -156,5 +163,108 @@ public class PoGuaranteeLetterRequireReqExt {
             }
         }
         return nodeName;
+    }
+
+    /**
+     * 新增保函-台账-列表
+     */
+    public void pageGuaranteeRequire(){
+        // 获取输入：
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        PoGuaranteeLetterRequireReqView param = JsonUtil.fromJson(json, PoGuaranteeLetterRequireReqView.class);
+
+        if (param.pageIndex == 0 || param.pageSize == 0) {
+            throw new BaseException("分页参数不能必须大于0");
+        }
+        // 起始条数
+        int start = (param.pageIndex - 1) * param.pageSize;
+        String limit = "limit " + start + "," + param.pageSize;
+
+        String sql1 = "SELECT r.id as id,r.GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId, " +
+                "(select name from gr_set_value where id = r.GUARANTEE_LETTER_TYPE_ID) as guaranteeLetterTypeName, " +
+                "r.PM_EXP_TYPE_IDS pmExpTypeIds,c.name as pmExpTypeName, " +
+                "IFNULL(r.PROJECT_NAME_WR,GROUP_CONCAT( p1.NAME )) projectNameWr, " +
+                "r.SUPPLIER as supplier,r.GUARANTEE_MECHANISM as guaranteeMechanism, " +
+                "r.GUARANTEE_CODE as guaranteeCode,r.GUARANTEE_AMT as guaranteeAmt, " +
+                "r.GUARANTEE_START_DATE as guaranteeStartDate,r.GUARANTEE_END_DATE as guaranteeEndDate, " +
+                "r.REMARK_ONE as remarkOne,r.BENEFICIARY as beneficiary, " +
+                "r.CRT_USER_ID as createUserId,r.CRT_DEPT_ID as deptId, " +
+                "(select name from ad_user where id = r.CRT_USER_ID) as createUserName, " +
+                "(select name from hr_dept where id = r.CRT_DEPT_ID) as deptName, " +
+                "(select name from pm_party where id = r.CUSTOMER_UNIT_ONE) as companyName, " +
+                "r.CUSTOMER_UNIT_ONE as companyId,r.CRT_DT as createDate,r.AMT_SIX as guaranteeAmt " +
+                "FROM po_guarantee_letter_require_req r " +
+                "LEFT JOIN pm_prj p1 ON FIND_IN_SET( p1.id, r.PM_PRJ_IDS ) " +
+                "LEFT JOIN pm_prj P2 ON p2.NAME = r.PROJECT_NAME_WR " +
+                "LEFT JOIN pm_exp_type c on r.PM_EXP_TYPE_IDS = c.id " +
+                "WHERE r.status = 'AP'";
+        StringBuilder sb = new StringBuilder(sql1);
+        appendString(sb,param);
+        StringBuilder sb2 = sb;
+        sb.append(limit);
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString());
+        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sb2.toString());
+        List<PoGuaranteeLetterRequireReqView> list3 = new ArrayList<>();
+        if (CollectionUtils.isEmpty(list1)){
+            for (Map<String, Object> tmp : list1) {
+                
+            }
+        }
+    }
+
+    /**
+     * 拼接筛选条件
+     * @param sb sql
+     * @param param 参数
+     */
+    private void appendString(StringBuilder sb, PoGuaranteeLetterRequireReqView param) {
+        // 创建人
+        if (StringUtils.hasText(param.getCreateBy())){
+            sb.append(" and r.CRT_USER_ID = '").append(param.getCreateBy()).append("'");
+        }
+        // 所属部门
+        String deptId = param.getDeptId();
+        if (StringUtils.hasText(deptId)){
+            String deptName = HrDept.selectById(deptId).getName();
+            List<String> deptIds = HrDept.selectByWhere(new Where().eq(HrDept.Cols.STATUS,"AP").eq(HrDept.Cols.NAME,deptName)).stream().map(HrDept::getId).collect(Collectors.toList());
+            String deptIdStr = String.join("','",deptIds);
+            sb.append(" and r.CRT_DEPT_ID in ('").append(deptIdStr).append("') ");
+        }
+        // 创建日期
+        if (StringUtils.hasText(param.getCreateDateMin())){
+            sb.append(" and r.CRT_DT >= '").append(param.getCreateDateMin()).append("' ");
+        }
+        if (StringUtils.hasText(param.getCreateDateMax())){
+            sb.append(" and r.CRT_DT <= '").append(param.getCreateDateMax()).append("' ");
+        }
+        // 合同签订公司
+        if (StringUtils.hasText(param.getCompanyId())){
+            sb.append(" and r.CUSTOMER_UNIT_ONE = '").append(param.getCompanyId()).append("' ");
+        }
+        // 项目id
+        if (StringUtils.hasText(param.getProjectId())){
+            sb.append(" and FIND_IN_SET('").append(param.getProjectId()).append("',IFNULL(r.PM_PRJ_IDS,p2.id)) ");
+        }
+        // 费用名称
+        if (StringUtils.hasText(param.getPmExpTypeIds())){
+            sb.append(" and find_in_set('").append(param.getPmExpTypeIds()).append("',r.PM_EXP_TYPE_IDS) ");
+        }
+        // 供应商完整名称
+        if (StringUtils.hasText(param.getSupplier())){
+            sb.append(" and r.SUPPLIER like ('%").append(param.getSupplier()).append("%') ");
+        }
+        // 保函类型
+        if (StringUtils.hasText(param.getGuaranteeLetterTypeId())){
+            sb.append(" and r.GUARANTEE_LETTER_TYPE_ID = '").append(param.getGuaranteeLetterTypeId()).append("' ");
+        }
+        // 担保金额
+        if (param.getGuaranteeAmtMin() != null){
+            sb.append(" and r.AMT_SIX >= '").append(param.getGuaranteeAmtMin()).append("' ");
+        }
+        if (param.getGuaranteeAmtMax() != null){
+            sb.append(" and r.AMT_SIX <= '").append(param.getGuaranteeAmtMax()).append("' ");
+        }
     }
 }
