@@ -5,6 +5,7 @@ import com.cisdi.ext.util.JsonUtil;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -36,7 +37,7 @@ public class GuaranteeExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();
 
         //参数校验
-        if (StringUtils.isEmpty(map.get("pageIndex")) || StringUtils.isEmpty(map.get("pageSize"))) {
+        if (!StringUtils.hasText(map.get("pageIndex").toString()) || !StringUtils.hasText(map.get("pageSize").toString())) {
             return;
         }
 
@@ -67,13 +68,13 @@ public class GuaranteeExt {
         }
         String param = " where 1=1 AND r.STATUS = 'AP' ";
         String temp = " ";
-        if (!StringUtils.isEmpty(guaranteeLetterTypeId)) {
+        if (StringUtils.hasText(guaranteeLetterTypeId)) {
             temp += " and r.GUARANTEE_LETTER_TYPE_ID= '" + guaranteeLetterTypeId + "'";
         }
-        if (!StringUtils.isEmpty(guaranteeCostTypeId)) {
+        if (StringUtils.hasText(guaranteeCostTypeId)) {
             temp += " and r.GUARANTEE_COST_TYPE_ID= '" + guaranteeCostTypeId + "'";
         }
-        if (!StringUtils.isEmpty(guaranteeEndDate) && !StringUtils.isEmpty(guaranteeStartDate)) {
+        if (StringUtils.hasText(guaranteeEndDate) && StringUtils.hasText(guaranteeStartDate)) {
             temp += " and r.GUARANTEE_END_DATE <= '" + guaranteeEndDate + "' and r.GUARANTEE_START_DATE >= '" + guaranteeStartDate + "'";
         }
         if (!Strings.isNullOrEmpty(projectNameWr)){
@@ -129,8 +130,7 @@ public class GuaranteeExt {
 
 
     /**
-     * po_guarantee_letter_require_req   全部数据
-     * 分页查询保函清单台账--新增保函申请
+     * 新增保函台账-列表
      */
     public void pageGuaranteeRequire() throws ParseException {
 
@@ -141,7 +141,7 @@ public class GuaranteeExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();
 
         //参数校验
-        if (StringUtils.isEmpty(map.get("pageIndex")) || StringUtils.isEmpty(map.get("pageSize"))) {
+        if (!StringUtils.hasText(map.get("pageIndex").toString()) || !StringUtils.hasText(map.get("pageSize").toString())) {
             return;
         }
 
@@ -150,7 +150,6 @@ public class GuaranteeExt {
         //每页多少条数据
         int pageSize = Integer.parseInt(map.get("pageSize").toString());
         String limit = " limit " + (pageIndex - 1) * pageSize + "," + pageSize;
-
 
         String guaranteeLetterTypeId = null;
         String projectNameWr = null;
@@ -170,13 +169,13 @@ public class GuaranteeExt {
         }
         String param = " where 1=1 and r.status = 'AP' ";
         String temp = " ";
-        if (!StringUtils.isEmpty(guaranteeLetterTypeId)) {
+        if (!SharedUtil.isEmptyString(guaranteeLetterTypeId)) {
             temp += " and r.GUARANTEE_LETTER_TYPE_ID= '" + guaranteeLetterTypeId + "'";
         }
-        if (!StringUtils.isEmpty(projectNameWr)) {
+        if (StringUtils.hasText(projectNameWr)) {
             temp += " and FIND_IN_SET('" + projectNameWr + "',IFNULL(r.PM_PRJ_IDS,p2.id))";
         }
-        if (!StringUtils.isEmpty(guaranteeEndDate) && !StringUtils.isEmpty(guaranteeStartDate)) {
+        if (StringUtils.hasText(guaranteeEndDate) && StringUtils.hasText(guaranteeStartDate)) {
             temp += " and r.GUARANTEE_END_DATE <= '" + guaranteeEndDate + "' and r.GUARANTEE_START_DATE >= '" + guaranteeStartDate + "'";
         }
         String sql = "select r.id,GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId,r.PM_EXP_TYPE_IDS pmExpTypeIds,IFNULL(r.PROJECT_NAME_WR," +
@@ -204,16 +203,11 @@ public class GuaranteeExt {
         List<Map<String, Object>> costTypeList = myJdbcTemplate.queryForList("select NAME,ID from pm_exp_type");
         for (Map<String, Object> stringObjectMap : dataList) {
             //获取保函名称
-//            String nameSql = "select NAME from gr_set_value where ID=?";
-//            List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(nameSql, stringObjectMap.get("guaranteeLetterTypeId"));
             Optional<Map<String, Object>> guaranteeTypeOptional = guaranteeTypeList.stream()
                     .filter(guaranteeType -> String.valueOf(guaranteeType.get("ID")).equals(String.valueOf(stringObjectMap.get("guaranteeLetterTypeId"))))
                     .findAny();
 
-
             //获取费用类型
-//            String typeSql = "select NAME from pm_exp_type where FIND_IN_SET(id,?)";
-//            List<Map<String, Object>> typeMap = myJdbcTemplate.queryForList(typeSql, stringObjectMap.get("pmExpTypeIds"));
             String pmExpTypeIds = String.valueOf(stringObjectMap.get("pmExpTypeIds"));
             List<String> pmExpTypeIdList = Arrays.asList(pmExpTypeIds.split(","));
 
@@ -221,26 +215,10 @@ public class GuaranteeExt {
                     .filter(costType -> pmExpTypeIdList.contains(String.valueOf(costType.get("ID"))))
                     .map(costType -> String.valueOf(costType.get("NAME"))).collect(Collectors.joining(","));
 
-//            if (nameMap.size() > 0 && nameMap.get(0).containsKey("NAME")) {
-//                stringObjectMap.replace("guaranteeLetterTypeId", nameMap.get(0).get("NAME"));
-//            }
-            if (guaranteeTypeOptional.isPresent()){
-                stringObjectMap.replace("guaranteeLetterTypeId", guaranteeTypeOptional.get().get("NAME"));
-            }
+            guaranteeTypeOptional.ifPresent(objectMap -> stringObjectMap.replace("guaranteeLetterTypeId", objectMap.get("NAME")));
             if (!Strings.isNullOrEmpty(costTypes)){
                 stringObjectMap.replace("pmExpTypeIds",costTypes);
             }
-//            if (typeMap.size() > 0 && typeMap.get(0).containsKey("NAME")) {
-////                stringObjectMap.replace("pmExpTypeIds", typeMap.get(0).get("NAME"));
-//                String typeNames = typeMap.stream().map(costType -> String.valueOf(costType.get("NAME"))).collect(Collectors.joining(","));
-//                map.replace("pmExpTypeIds",typeNames);
-//            }
-//            if (costTypeOptional.isPresent()) {
-//                String typeNames = typeMap.stream().map(costType -> String.valueOf(costType.get("NAME"))).collect(Collectors.joining(","));
-//                map.replace("pmExpTypeIds",typeNames);
-//            }
-
-
             list.add(JsonUtil.convertMapToObject(stringObjectMap, PoGuaranteeLetterRequireReq.class));
         }
 

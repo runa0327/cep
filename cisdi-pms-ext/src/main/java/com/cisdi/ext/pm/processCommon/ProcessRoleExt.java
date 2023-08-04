@@ -1014,7 +1014,7 @@ public class ProcessRoleExt {
                 .eq(WfTask.Cols.STATUS,"AP").eq(WfTask.Cols.IS_CLOSED,1).eq(WfTask.Cols.WF_TASK_TYPE_ID,"TODO"));
         List<String> user = new ArrayList<>();
         if (!CollectionUtils.isEmpty(userList)){
-            userList.stream().filter(p->p.getActDatetime() != null).sorted(Comparator.comparing(WfTask::getActDatetime)).collect(Collectors.toList());
+            userList = userList.stream().filter(p->p.getActDatetime() != null).sorted(Comparator.comparing(WfTask::getActDatetime)).collect(Collectors.toList());
             String sql = "select DISTINCT(b.name) as deptName from hr_dept_user a left join hr_dept b on a.HR_DEPT_ID = b.id where a.AD_USER_ID = ?";
             tp:for (WfTask tmp : userList) {
                 String userId = tmp.getAdUserId();
