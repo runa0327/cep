@@ -332,7 +332,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         String fileId = map.get("fileId").toString();
         String name = oldFileTmp.getName();
         String flPathId = oldFileTmp.getFilePathId();
-        String createBy = poOrderReq.getCreateBy();
+        String createBy = oldFileTmp.getCreateBy();
         String size = map.get("size").toString();
         String fileSize = map.get("fileSize").toString();
         String fileIdPath = map.get("fileIdPath").toString();
