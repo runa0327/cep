@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -185,7 +186,7 @@ public class PoGuaranteeLetterRequireReqExt {
         String sql1 = "SELECT r.id as id,r.GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId, " +
                 "(select name from gr_set_value where id = r.GUARANTEE_LETTER_TYPE_ID) as guaranteeLetterTypeName, " +
                 "r.PM_EXP_TYPE_IDS pmExpTypeIds,c.name as pmExpTypeName, " +
-                "IFNULL(r.PROJECT_NAME_WR,GROUP_CONCAT( p1.NAME )) projectNameWr, " +
+                "IFNULL(r.PROJECT_NAME_WR,GROUP_CONCAT( p1.NAME )) as projectName, " +
                 "r.SUPPLIER as supplier,r.GUARANTEE_MECHANISM as guaranteeMechanism, " +
                 "r.GUARANTEE_CODE as guaranteeCode,r.GUARANTEE_AMT as guaranteeAmt, " +
                 "r.GUARANTEE_START_DATE as guaranteeStartDate,r.GUARANTEE_END_DATE as guaranteeEndDate, " +
@@ -199,18 +200,45 @@ public class PoGuaranteeLetterRequireReqExt {
                 "LEFT JOIN pm_prj p1 ON FIND_IN_SET( p1.id, r.PM_PRJ_IDS ) " +
                 "LEFT JOIN pm_prj P2 ON p2.NAME = r.PROJECT_NAME_WR " +
                 "LEFT JOIN pm_exp_type c on r.PM_EXP_TYPE_IDS = c.id " +
-                "WHERE r.status = 'AP'";
+                "WHERE r.status = 'AP' and r.crt_dt >= '2022-11-22 00:00:00' ";
         StringBuilder sb = new StringBuilder(sql1);
         appendString(sb,param);
-        StringBuilder sb2 = sb;
+        sb.append(" GROUP BY r.id order by r.GUARANTEE_START_DATE ");
+        StringBuilder sb2 = new StringBuilder(sb);
         sb.append(limit);
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString());
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sb2.toString());
         List<PoGuaranteeLetterRequireReqView> list3 = new ArrayList<>();
-        if (CollectionUtils.isEmpty(list1)){
+        if (!CollectionUtils.isEmpty(list1)){
             for (Map<String, Object> tmp : list1) {
-                
+                PoGuaranteeLetterRequireReqView poGuaranteeLetterRequireReqView = new PoGuaranteeLetterRequireReqView();
+
+                poGuaranteeLetterRequireReqView.setId(JdbcMapUtil.getString(tmp,"id")); //id
+                poGuaranteeLetterRequireReqView.setCreateUserName(JdbcMapUtil.getString(tmp,"createUserName")); // 创建人
+                poGuaranteeLetterRequireReqView.setDeptName(JdbcMapUtil.getString(tmp,"deptName")); // 创建部门
+                poGuaranteeLetterRequireReqView.setCreateDate(JdbcMapUtil.getString(tmp,"createDate").replace("T"," ")); // 创建日期
+                poGuaranteeLetterRequireReqView.setCompanyName(JdbcMapUtil.getString(tmp,"companyName")); // 合同签订公司
+                poGuaranteeLetterRequireReqView.setProjectName(JdbcMapUtil.getString(tmp,"projectName")); // 项目名称
+                poGuaranteeLetterRequireReqView.setPmExpTypeName(JdbcMapUtil.getString(tmp,"pmExpTypeName")); // 费用类型名称
+                poGuaranteeLetterRequireReqView.setSupplier(JdbcMapUtil.getString(tmp,"supplier")); // 供应商完整名称
+                poGuaranteeLetterRequireReqView.setGuaranteeLetterTypeName(JdbcMapUtil.getString(tmp,"guaranteeLetterTypeName")); // 保函类型名称
+                poGuaranteeLetterRequireReqView.setGuaranteeAmt(new BigDecimal(JdbcMapUtil.getString(tmp,"guaranteeAmt"))); // 担保金额
+                poGuaranteeLetterRequireReqView.setGuaranteeMechanism(JdbcMapUtil.getString(tmp,"guaranteeMechanism")); // 担保银行
+                poGuaranteeLetterRequireReqView.setGuaranteeCode(JdbcMapUtil.getString(tmp,"guaranteeCode")); // 保单号
+                poGuaranteeLetterRequireReqView.setGuaranteeStartDate(JdbcMapUtil.getString(tmp,"guaranteeStartDate").replace("T"," ")); // 签订日期
+                poGuaranteeLetterRequireReqView.setGuaranteeEndDate(JdbcMapUtil.getString(tmp,"guaranteeEndDate").replace("T"," ")); // 担保期限
+                poGuaranteeLetterRequireReqView.setRemarkOne(JdbcMapUtil.getString(tmp,"remarkOne")); // 备注
+                poGuaranteeLetterRequireReqView.setBeneficiary(JdbcMapUtil.getString(tmp,"beneficiary")); // 受益人
+
+                list3.add(poGuaranteeLetterRequireReqView);
             }
+            Map<String,Object> map1 = new HashMap<>();
+            map1.put("total",list2.size());
+            map1.put("reqs",list3);
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(map1), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        } else {
+            ExtJarHelper.returnValue.set(null);
         }
     }
 
@@ -227,10 +255,15 @@ public class PoGuaranteeLetterRequireReqExt {
         // 所属部门
         String deptId = param.getDeptId();
         if (StringUtils.hasText(deptId)){
-            String deptName = HrDept.selectById(deptId).getName();
-            List<String> deptIds = HrDept.selectByWhere(new Where().eq(HrDept.Cols.STATUS,"AP").eq(HrDept.Cols.NAME,deptName)).stream().map(HrDept::getId).collect(Collectors.toList());
-            String deptIdStr = String.join("','",deptIds);
-            sb.append(" and r.CRT_DEPT_ID in ('").append(deptIdStr).append("') ");
+            HrDept hrDept = HrDept.selectById(deptId);
+            if (hrDept != null){
+                String deptName = hrDept.getName();
+                List<String> deptIds = HrDept.selectByWhere(new Where().eq(HrDept.Cols.STATUS,"AP").eq(HrDept.Cols.NAME,deptName)).stream().map(HrDept::getId).collect(Collectors.toList());
+                String deptIdStr = String.join("','",deptIds);
+                sb.append(" and r.CRT_DEPT_ID in ('").append(deptIdStr).append("') ");
+            } else {
+                throw new BaseException("查询不到该部门信息！");
+            }
         }
         // 创建日期
         if (StringUtils.hasText(param.getCreateDateMin())){

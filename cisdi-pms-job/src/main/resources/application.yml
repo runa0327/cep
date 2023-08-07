@@ -1,3 +1,6 @@
+cisdi:
+  profile: D:\cisdi
+
 server:
   port: 11115
   servlet:

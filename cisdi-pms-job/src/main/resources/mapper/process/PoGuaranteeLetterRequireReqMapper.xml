@@ -18,7 +18,7 @@
         <result property="deptName" column="deptName" />
         <result property="deptId" column="deptId" />
         <result property="processInstanceCreateDate" column="processInstanceCreateDate" />
-        <result property="customerUnitId" column="customerUnitId" />
+        <result property="companyId" column="companyId" />
         <result property="customerUnitName" column="customerUnitName" />
         <result property="projectSource" column="projectSource" />
         <result property="projectId" column="projectId" />
@@ -27,7 +27,7 @@
         <result property="contractSource" column="contractSource" />
         <result property="contractName" column="contractName" />
         <result property="contractId" column="contractId" />
-        <result property="feeTypeId" column="feeTypeId" />
+        <result property="pmExpTypeIds" column="pmExpTypeIds" />
         <result property="feeTypeName" column="feeTypeName" />
         <result property="contractAmt" column="contractAmt" />
         <result property="supplier" column="supplier" />
@@ -60,7 +60,9 @@
         a.`NAME` as guaranteeName,
         a.`STATUS` as status,
         a.CRT_USER_ID as createBy,
+        d.name as processInstanceCreateBy,
         a.CRT_DEPT_ID as deptId,
+        c.name as deptName,
         a.CRT_DT as createDate,
         a.CONTRACT_ID as contractId,
         ifnull(g.name,a.CONTRACT_NAME) as contractName,
@@ -73,23 +75,60 @@
         a.GUARANTEE_START_DATE as guaranteeStartDate,
         a.GUARANTEE_END_DATE as guaranteeEndDate,
         concat(a.FINANCE_MESSAGE,a.COMMENT_PUBLISH_CONTENT) as checkRemark,
-        a.PM_EXP_TYPE_IDS as feeTypeId,
+        a.PM_EXP_TYPE_IDS as pmExpTypeIds,
         h.name as feeTypeName,
         a.DATE_TYPE_WR as guaranteeEndRemark,
         a.GUARANTEE_DATE_TYPE_ID as guaranteeEndTypeId,
         a.PO_ORDER_REQ_IDS as contractId,
-        a.CUSTOMER_UNIT_ONE as customerUnitId,
+        a.CUSTOMER_UNIT_ONE as companyId,
         a.DATE_ONE as guaranteeFirstDate,
         ifnull(a.AMT_FIVE,CONTRACT_AMOUNT) as contractAmt,
         b.name as processInstanceName,
-        c.name as deptName,
-        d.name as processInstanceCreateBy,
-        b.START_DATETIME as processInstanceCreateDate,
+        a.CRT_DT as processInstanceCreateDate,
         e.name as customerUnitName,
         (select name from gr_set_value where id = a.PROJECT_SOURCE_TYPE_TWO_ID) as projectSource,
         (select name from gr_set_value where id = a.PROJECT_SOURCE_TYPE_ID) as contractSource,
         (select name from gr_set_value where id = a.GUARANTEE_DATE_TYPE_ID) as guaranteeEndTypeName,
         ifnull((select name from gr_set_value where id = a.GUARANTEE_LETTER_TYPE_ID),a.REMARK_ONE) as guaranteeLetterTypeName
+    </sql>
+
+    <sql id="commonFilter">
+        <if test="guaranteeLetterTypeId != null and guaranteeLetterTypeId != ''">
+            and a.GUARANTEE_DATE_TYPE_ID = #{guaranteeLetterTypeId}
+        </if>
+        <if test="guaranteeStartDate != null and guaranteeStartDate != ''">
+            and a.GUARANTEE_START_DATE >= #{guaranteeStartDate}
+        </if>
+        <if test="guaranteeEndDate != null and guaranteeEndDate != ''">
+            <![CDATA[ and a.GUARANTEE_END_DATE <= #{guaranteeEndDate} ]]>
+        </if>
+        <if test="createBy != null and createBy != ''">
+            and a.CRT_USER_ID = #{createBy}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and a.CRT_DEPT_ID = #{deptId}
+        </if>
+        <if test="createDateMin != null and createDateMin != ''">
+            and a.CRT_DT >= #{createDateMin}
+        </if>
+        <if test="createDateMax != null and createDateMax != ''">
+            <![CDATA[ and a.CRT_DT <= #{createDateMax} ]]>
+        </if>
+        <if test="companyId != null and companyId != ''">
+            and a.CUSTOMER_UNIT_ONE = #{companyId},
+        </if>
+        <if test="pmExpTypeIds != null and pmExpTypeIds != ''">
+            and find_in_set(#{pmExpTypeIds},a.PM_EXP_TYPE_IDS)
+        </if>
+        <if test="supplier != null and supplier != ''">
+            and a.supplier like concat('%',#{supplier},'%')
+        </if>
+        <if test="guaranteeAmtMin != null">
+            and a.GUARANTEE_AMT >= #{guaranteeAmtMin}
+        </if>
+        <if test="guaranteeAmtMax != null">
+            <![CDATA[ and a.GUARANTEE_AMT <= #{guaranteeAmtMax} ]]>
+        </if>
     </sql>
 
     <!--查询项目来源是系统的条件内所有信息-->
@@ -101,7 +140,7 @@
             po_guarantee_letter_require_req a
         left join wf_process_instance b on a.id = b.ENTITY_RECORD_ID
         left join hr_dept c on a.CRT_DEPT_ID = c.id
-        left join ad_user d on b.START_USER_ID = d.id
+        left join ad_user d on a.CRT_USER_ID = d.id
         left join pm_party e on a.CUSTOMER_UNIT_ONE = e.id
         left join pm_prj f on a.PM_PRJ_IDS = f.id
         left join po_order_req g on a.PO_ORDER_REQ_IDS = g.id
@@ -111,15 +150,7 @@
         <if test="projectId != null and projectId != ''">
             and find_in_set(#{projectId},a.PM_PRJ_IDS)
         </if>
-        <if test="guaranteeLetterTypeId != null and guaranteeLetterTypeId != ''">
-            and a.GUARANTEE_DATE_TYPE_ID = #{guaranteeLetterTypeId}
-        </if>
-        <if test="guaranteeStartDate != null and guaranteeStartDate != ''">
-            and a.GUARANTEE_START_DATE >= #{guaranteeStartDate}
-        </if>
-        <if test="guaranteeEndDate != null and guaranteeEndDate != ''">
-            <![CDATA[ and a.GUARANTEE_END_DATE <= #{guaranteeEndDate} ]]>
-        </if>
+        <include refid="commonFilter"></include>
         order by a.id desc
     </select>
 
@@ -141,15 +172,7 @@
         <if test="projectName != null and projectName != ''">
             and a.PROJECT_NAME_WR like concat('%',#{projectName},'%')
         </if>
-        <if test="guaranteeLetterTypeId != null and guaranteeLetterTypeId != ''">
-            and a.GUARANTEE_DATE_TYPE_ID = #{guaranteeLetterTypeId}
-        </if>
-        <if test="guaranteeStartDate != null and guaranteeStartDate != ''">
-            and a.GUARANTEE_START_DATE >= #{guaranteeStartDate}
-        </if>
-        <if test="guaranteeEndDate != null and guaranteeEndDate != ''">
-            <![CDATA[ and a.GUARANTEE_END_DATE <= #{guaranteeEndDate} ]]>
-        </if>
+        <include refid="commonFilter"></include>
         order by a.id desc
     </select>
 </mapper>

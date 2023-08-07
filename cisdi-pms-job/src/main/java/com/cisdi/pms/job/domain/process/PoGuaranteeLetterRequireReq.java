@@ -37,7 +37,7 @@ public class PoGuaranteeLetterRequireReq extends BaseCommon {
     private String processInstanceCreateDate;
 
     // 业主单位id
-    private String customerUnitId;
+    private String companyId;
 
     // 业主单位名称
     @ExcelProperty("业主单位名称")
@@ -67,7 +67,7 @@ public class PoGuaranteeLetterRequireReq extends BaseCommon {
     private String contractId;
 
     // 费用id
-    private String feeTypeId;
+    private String pmExpTypeIds;
 
     // 费用名称
     @ExcelProperty("费用名称")
@@ -103,6 +103,8 @@ public class PoGuaranteeLetterRequireReq extends BaseCommon {
     // 担保金额
     @ExcelProperty("担保金额")
     private BigDecimal guaranteeAmt;
+    private BigDecimal guaranteeAmtMin;
+    private BigDecimal guaranteeAmtMax;
 
     // 保函开立日期
     @ExcelProperty("保函开立日期")

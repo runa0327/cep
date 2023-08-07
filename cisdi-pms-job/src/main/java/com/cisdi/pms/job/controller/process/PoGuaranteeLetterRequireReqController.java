@@ -30,4 +30,13 @@ public class PoGuaranteeLetterRequireReqController {
         List<PoGuaranteeLetterRequireReq> list = poGuaranteeLetterRequireReqService.selectAllMess(poGuaranteeLetterRequireReq);
         ExportUtil.exportExcel(response,"新增保函台账",list, PoGuaranteeLetterRequireReq.class);
     }
+
+    /**
+     * 新增保函-台账-非全字段导出
+     */
+    @GetMapping(value = "/exportListMess")
+    public void exportListMess(PoGuaranteeLetterRequireReq poGuaranteeLetterRequireReq, HttpServletResponse response){
+        List<PoGuaranteeLetterRequireReq> list = poGuaranteeLetterRequireReqService.selectAllMess(poGuaranteeLetterRequireReq);
+        poGuaranteeLetterRequireReqService.exportList(list,"新增保函台账",response);
+    }
 }
