@@ -8,6 +8,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
@@ -216,6 +217,20 @@ public class ProPlanToolExt {
         }
 
         return res;
+    }
+
+
+    /**
+     * 刷新全景节点责任人
+     */
+    public void refreshNodeUer() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_pro_plan where id=?", entityRecord.csCommId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> mapData = list.get(0);
+            PrjPlanUtil.refreshProPlanAllUser(JdbcMapUtil.getString(mapData, "PM_PRJ_ID"));
+        }
     }
 
 }
