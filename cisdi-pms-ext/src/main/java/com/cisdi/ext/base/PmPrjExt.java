@@ -51,13 +51,12 @@ public class PmPrjExt {
     /**
      * 通过流程信息获取项目id
      * @param valueMap 流程主体信息
-     * @param myJdbcTemplate 数据源
      * @return 项目id
      */
-    public static String getProjectIdByProcess(Map<String, Object> valueMap, MyJdbcTemplate myJdbcTemplate) {
+    public static String getProjectIdByProcess(Map<String, Object> valueMap) {
         String projectId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
         if (SharedUtil.isEmptyString(projectId)){
-            projectId = getRealProjectId(valueMap,myJdbcTemplate);
+            projectId = getRealProjectId(valueMap);
         }
         return projectId;
     }
@@ -65,10 +64,9 @@ public class PmPrjExt {
     /**
      * 项目/非项目/项目多选中筛选项目id
      * @param valueMap 流程主体内容
-     * @param myJdbcTemplate 数据源
      * @return 项目id
      */
-    private static String getRealProjectId(Map<String, Object> valueMap, MyJdbcTemplate myJdbcTemplate) {
+    private static String getRealProjectId(Map<String, Object> valueMap) {
         String projectId = JdbcMapUtil.getString(valueMap,"PM_PRJ_IDS");
         if (SharedUtil.isEmptyString(projectId)){
             projectId = JdbcMapUtil.getString(valueMap,"AMOUT_PM_PRJ_ID");
@@ -89,7 +87,7 @@ public class PmPrjExt {
      */
     public static void updatePrjBaseData(EntityRecord entityRecord, String entityCode, int level, MyJdbcTemplate myJdbcTemplate,String code) {
         //项目id
-        String projectId = getProjectIdByProcess(entityRecord.valueMap,myJdbcTemplate);
+        String projectId = getProjectIdByProcess(entityRecord.valueMap);
         if (projectId.contains(",")){
             throw new BaseException("数据更新不支持多项目同时修改，请重新进行数据处理或联系管理员处理！");
         }
@@ -115,7 +113,7 @@ public class PmPrjExt {
      */
     public static void updatePrjAmt(EntityRecord entityRecord, String pm_prj_settle_accounts, int level, MyJdbcTemplate myJdbcTemplate, String entCode) {
         //项目id
-        String projectId = getProjectIdByProcess(entityRecord.valueMap,myJdbcTemplate);
+        String projectId = getProjectIdByProcess(entityRecord.valueMap);
         if (projectId.contains(",")){
             throw new BaseException("数据更新不支持多项目同时修改，请重新进行数据处理或联系管理员处理！");
         }
