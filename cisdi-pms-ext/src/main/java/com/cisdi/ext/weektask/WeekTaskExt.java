@@ -628,7 +628,7 @@ public class WeekTaskExt {
         List<Map<String, Object>> weekTaskList = myJdbcTemplate.queryForList("select * from week_task where status='ap'");
         titleCount.taskCount = weekTaskList.size();
         titleCount.ywcCount = (int) weekTaskList.stream().filter(p -> TASK_COMPLETED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
-        titleCount.wksCount =(int) weekTaskList.stream().filter(p -> TASK_NOT_STARTED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
+        titleCount.wksCount = (int) weekTaskList.stream().filter(p -> TASK_NOT_STARTED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
         titleCount.jxzCount = (int) weekTaskList.stream().filter(p -> TASK_IN_PROCESSING.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
         titleCount.cqwwcCount = (int) weekTaskList.stream().filter(p -> TASK_OVERDUE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
         titleCount.cqywcCount = (int) weekTaskList.stream().filter(p -> {
@@ -641,7 +641,7 @@ public class WeekTaskExt {
             }
             return false;
         }).count();
-        titleCount.wsjCount =  (int) weekTaskList.stream().filter(p -> TASK_NOT_INVOLVE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
+        titleCount.wsjCount = (int) weekTaskList.stream().filter(p -> TASK_NOT_INVOLVE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(titleCount), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
@@ -659,8 +659,8 @@ public class WeekTaskExt {
         int pageSize = JdbcMapUtil.getInt(map, "pageSize");
         int pageIndex = JdbcMapUtil.getInt(map, "pageIndex");
         StringBuilder sb = new StringBuilder();
-        sb.append(" select wt.ID as id,TITLE,ad.`NAME` as user,gsv.`NAME` as status,if(ifnull(CAN_DISPATCH,'0') = '0','否','是') as iz_tran,TRANSFER_TIME,au.`NAME` as tran_user,REASON_EXPLAIN,PM_PRJ_ID,pm.NAME as projectName from week_task wt \n" +
-                " left join pm_prj pm on pm.id = wt.PM_PRJ_ID "+
+        sb.append(" select wt.ID as id,TITLE,ad.`NAME` as user,gsv.`NAME` as status,if(ifnull(CAN_DISPATCH,'0') = '0','否','是') as iz_tran,TRANSFER_TIME,au.`NAME` as tran_user,REASON_EXPLAIN,PM_PRJ_ID,pm.NAME as projectName,RELATION_DATA_ID from week_task wt \n" +
+                " left join pm_prj pm on pm.id = wt.PM_PRJ_ID " +
                 " left join ad_user ad on wt.AD_USER_ID = ad.id \n" +
                 " left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id \n" +
                 " left join ad_user au on wt.TRANSFER_USER = au.id where wt.status ='ap' ");
@@ -745,7 +745,7 @@ public class WeekTaskExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pe.*,pm.`NAME` as projectName,pn.`NAME` as nodeName,wpi.id as instanceId from PM_EXTENSION_REQUEST_REQ pe left join pm_prj pm on pm.id = pe.PM_PRJ_ID\n" +
                 "left join pm_pro_plan_node pn on pe.PM_PRO_PLAN_NODE_ID = pn.id \n" +
-                "left join wf_process_instance wpi on wpi.ENTITY_RECORD_ID = pe.id "+
+                "left join wf_process_instance wpi on wpi.ENTITY_RECORD_ID = pe.id " +
                 "where pe.id=? ", map.get("id"));
         Map<String, Object> processNameMap = myJdbcTemplate.queryForMap("select name from wf_process where id = '1649227469557063680'");
         ProcessData processData = new ProcessData();
@@ -782,10 +782,10 @@ public class WeekTaskExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pe.*,ad.`NAME` as user_name,pnn.name as nodeName,ast.name as astName from PM_EXTENSION_REQUEST_REQ pe \n" +
-                " left join pm_pro_plan_node pnn on pe.PM_PRO_PLAN_NODE_ID = pnn.id"+
+                " left join pm_pro_plan_node pnn on pe.PM_PRO_PLAN_NODE_ID = pnn.id" +
                 " left join ad_user ad on pe.CRT_USER_ID = ad.id \n" +
                 " left join week_task wt on wt.RELATION_DATA_ID = pe.PM_PRO_PLAN_NODE_ID\n" +
-                " left join ad_status ast on pe.status = ast.id "+
+                " left join ad_status ast on pe.status = ast.id " +
                 " where wt.id = ?", id);
         AtomicInteger index = new AtomicInteger(1);
         return list.stream().map(p -> {
@@ -826,7 +826,7 @@ public class WeekTaskExt {
         info.underway = (int) list.stream().filter(p -> TASK_IN_PROCESSING.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
         info.finished = (int) list.stream().filter(p -> TASK_COMPLETED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
         info.notInvolve = (int) list.stream().filter(p -> TASK_NOT_INVOLVE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
-        info.cqwwc =(int) list.stream().filter(p -> TASK_OVERDUE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
+        info.cqwwc = (int) list.stream().filter(p -> TASK_OVERDUE.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))).count();
         info.cqwc = (int) list.stream().filter(p -> {
             if (TASK_COMPLETED.equals(JdbcMapUtil.getString(p, "WEEK_TASK_STATUS_ID"))) {
                 if (JdbcMapUtil.getString(p, "PLAN_COMPL_DATE") != null && JdbcMapUtil.getString(p, "ACTUAL_COMPL_DATE") != null) {
@@ -851,16 +851,32 @@ public class WeekTaskExt {
         info.transferUser = JdbcMapUtil.getString(dataMap, "tran_user");
         info.reasonExplain = JdbcMapUtil.getString(dataMap, "REASON_EXPLAIN");
         info.projectId = JdbcMapUtil.getString(dataMap, "PM_PRJ_ID");
-        info.projectName= JdbcMapUtil.getString(dataMap, "projectName");
+        info.projectName = JdbcMapUtil.getString(dataMap, "projectName");
         int count = 0;
         List<DelayApplyHistory> historyList = getDelayApplyList(info.id);
         if (!CollectionUtils.isEmpty(historyList)) {
             count = historyList.size();
         }
         info.count = count;
+        info.izSend = chargeProcess(JdbcMapUtil.getString(dataMap, "PM_PRJ_ID"), JdbcMapUtil.getString(dataMap, "RELATION_DATA_ID"));
         return info;
     }
 
+    private String chargeProcess(String projectId, String nodeId) {
+        String res = "0";
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from ad_ent where id =(select AD_ENT_ID from BASE_PROCESS_ENT where WF_PROCESS_ID=(select LINKED_WF_PROCESS_ID from pm_pro_plan_node where id=?))", nodeId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> dataMap = list.get(0);
+            String tableName = JdbcMapUtil.getString(dataMap, "CODE");
+            String sql = "select * from " + tableName + " where PM_PRJ_ID=?";
+            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql, projectId);
+            if (!CollectionUtils.isEmpty(list1)) {
+                res = "1";
+            }
+        }
+        return res;
+    }
 
     public static class RequestParam {
         public String name;
@@ -904,9 +920,10 @@ public class WeekTaskExt {
         public Integer count;//延期申请说明
         public String projectId;
         public String projectName;
+        public String izSend;//是否发起过流程
     }
 
-    public static class TitleCount{
+    public static class TitleCount {
         //项目数
         public Integer prjCount;
         //任务数
