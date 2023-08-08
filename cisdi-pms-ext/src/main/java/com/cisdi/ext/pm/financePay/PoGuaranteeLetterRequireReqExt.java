@@ -3,6 +3,7 @@ package com.cisdi.ext.pm.financePay;
 import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.PoGuaranteeLetterRequireReq;
 import com.cisdi.ext.model.PoGuaranteeLetterRequireReqFeeDetail;
+import com.cisdi.ext.model.WfProcessInstance;
 import com.cisdi.ext.model.view.process.PoGuaranteeLetterRequireReqView;
 import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.util.JsonUtil;
@@ -14,6 +15,7 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -38,6 +40,27 @@ public class PoGuaranteeLetterRequireReqExt {
         String id = entityRecordList.csCommId;
         //处理费用明细信息
         feeDetail(id);
+    }
+
+    /**
+     * 新增保函-结束时数据校验
+     */
+    public void guaranteeEndCheck(){
+        EntityRecord entityRecordList = ExtJarHelper.entityRecordList.get().get(0);
+        String id = entityRecordList.csCommId;
+        String processInstanceId = ExtJarHelper.procInstId.get(); // 流程实例id
+        //流程名称写入name
+        updateName(id,processInstanceId);
+    }
+
+    /**
+     * 流程实例名称更新流程汇总name字段
+     * @param id 流程业务表记录id
+     * @param processInstanceId 流程实例id
+     */
+    private void updateName(String id, String processInstanceId) {
+        String name = WfProcessInstance.selectById(processInstanceId).getName();
+        Crud.from("PO_GUARANTEE_LETTER_REQUIRE_REQ").where().eq("ID",id).update().set("NAME",name).exec();
     }
 
     /**
@@ -188,14 +211,14 @@ public class PoGuaranteeLetterRequireReqExt {
                 "r.PM_EXP_TYPE_IDS pmExpTypeIds,c.name as pmExpTypeName, " +
                 "IFNULL(r.PROJECT_NAME_WR,GROUP_CONCAT( p1.NAME )) as projectName, " +
                 "r.SUPPLIER as supplier,r.GUARANTEE_MECHANISM as guaranteeMechanism, " +
-                "r.GUARANTEE_CODE as guaranteeCode,r.GUARANTEE_AMT as guaranteeAmt, " +
+                "r.GUARANTEE_CODE as guaranteeCode,r.AMT_SIX as guaranteeAmt, " +
                 "r.GUARANTEE_START_DATE as guaranteeStartDate,r.GUARANTEE_END_DATE as guaranteeEndDate, " +
                 "r.REMARK_ONE as remarkOne,r.BENEFICIARY as beneficiary, " +
                 "r.CRT_USER_ID as createUserId,r.CRT_DEPT_ID as deptId, " +
                 "(select name from ad_user where id = r.CRT_USER_ID) as createUserName, " +
                 "(select name from hr_dept where id = r.CRT_DEPT_ID) as deptName, " +
                 "(select name from pm_party where id = r.CUSTOMER_UNIT_ONE) as companyName, " +
-                "r.CUSTOMER_UNIT_ONE as companyId,r.CRT_DT as createDate,r.AMT_SIX as guaranteeAmt " +
+                "r.CUSTOMER_UNIT_ONE as companyId,r.CRT_DT as createDate " +
                 "FROM po_guarantee_letter_require_req r " +
                 "LEFT JOIN pm_prj p1 ON FIND_IN_SET( p1.id, r.PM_PRJ_IDS ) " +
                 "LEFT JOIN pm_prj P2 ON p2.NAME = r.PROJECT_NAME_WR " +
@@ -203,7 +226,7 @@ public class PoGuaranteeLetterRequireReqExt {
                 "WHERE r.status = 'AP' and r.crt_dt >= '2022-11-22 00:00:00' ";
         StringBuilder sb = new StringBuilder(sql1);
         appendString(sb,param);
-        sb.append(" GROUP BY r.id order by r.GUARANTEE_START_DATE ");
+        sb.append(" GROUP BY r.id order by r.crt_dt desc ");
         StringBuilder sb2 = new StringBuilder(sb);
         sb.append(limit);
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString());
@@ -216,17 +239,29 @@ public class PoGuaranteeLetterRequireReqExt {
                 poGuaranteeLetterRequireReqView.setId(JdbcMapUtil.getString(tmp,"id")); //id
                 poGuaranteeLetterRequireReqView.setCreateUserName(JdbcMapUtil.getString(tmp,"createUserName")); // 创建人
                 poGuaranteeLetterRequireReqView.setDeptName(JdbcMapUtil.getString(tmp,"deptName")); // 创建部门
-                poGuaranteeLetterRequireReqView.setCreateDate(JdbcMapUtil.getString(tmp,"createDate").replace("T"," ")); // 创建日期
+                String createDate = JdbcMapUtil.getString(tmp,"createDate");
+                if (StringUtils.hasText(createDate)){
+                    poGuaranteeLetterRequireReqView.setCreateDate(createDate.replace("T"," ")); // 创建日期
+                }
                 poGuaranteeLetterRequireReqView.setCompanyName(JdbcMapUtil.getString(tmp,"companyName")); // 合同签订公司
                 poGuaranteeLetterRequireReqView.setProjectName(JdbcMapUtil.getString(tmp,"projectName")); // 项目名称
                 poGuaranteeLetterRequireReqView.setPmExpTypeName(JdbcMapUtil.getString(tmp,"pmExpTypeName")); // 费用类型名称
                 poGuaranteeLetterRequireReqView.setSupplier(JdbcMapUtil.getString(tmp,"supplier")); // 供应商完整名称
                 poGuaranteeLetterRequireReqView.setGuaranteeLetterTypeName(JdbcMapUtil.getString(tmp,"guaranteeLetterTypeName")); // 保函类型名称
-                poGuaranteeLetterRequireReqView.setGuaranteeAmt(new BigDecimal(JdbcMapUtil.getString(tmp,"guaranteeAmt"))); // 担保金额
+                String amt = JdbcMapUtil.getString(tmp,"guaranteeAmt"); // 担保金额
+                if (StringUtils.hasText(amt)){
+                    poGuaranteeLetterRequireReqView.setGuaranteeAmt(new BigDecimal(amt));
+                }
                 poGuaranteeLetterRequireReqView.setGuaranteeMechanism(JdbcMapUtil.getString(tmp,"guaranteeMechanism")); // 担保银行
                 poGuaranteeLetterRequireReqView.setGuaranteeCode(JdbcMapUtil.getString(tmp,"guaranteeCode")); // 保单号
-                poGuaranteeLetterRequireReqView.setGuaranteeStartDate(JdbcMapUtil.getString(tmp,"guaranteeStartDate").replace("T"," ")); // 签订日期
-                poGuaranteeLetterRequireReqView.setGuaranteeEndDate(JdbcMapUtil.getString(tmp,"guaranteeEndDate").replace("T"," ")); // 担保期限
+                String signDate = JdbcMapUtil.getString(tmp,"guaranteeStartDate"); // 签订日期
+                if (StringUtils.hasText(signDate)){
+                    poGuaranteeLetterRequireReqView.setGuaranteeStartDate(signDate.replace("T"," "));
+                }
+                String endDate = JdbcMapUtil.getString(tmp,"guaranteeEndDate");
+                if (StringUtils.hasText(endDate)){
+                    poGuaranteeLetterRequireReqView.setGuaranteeEndDate(endDate.replace("T"," ")); // 担保期限
+                }
                 poGuaranteeLetterRequireReqView.setRemarkOne(JdbcMapUtil.getString(tmp,"remarkOne")); // 备注
                 poGuaranteeLetterRequireReqView.setBeneficiary(JdbcMapUtil.getString(tmp,"beneficiary")); // 受益人
 

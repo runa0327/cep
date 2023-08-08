@@ -175,18 +175,4 @@ public class GuaranteeExt {
         checkFirst(newStatus);
     }
 
-    /**
-     * 保函退还申请 发起时数据校验
-     */
-    public void checkData(){
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        //流程id
-        String id = entityRecord.csCommId;
-        //获取金额
-        String amt = JdbcMapUtil.getString(entityRecord.valueMap,"AMT_WR_ONE").trim();
-        String amtChina = AmtUtil.number2CNMontrayUnit(new BigDecimal(amt));
-        String sql = "update PO_GUARANTEE_LETTER_RETURN_OA_REQ set REMARK_TWO = ? where id = ?";
-        int num = myJdbcTemplate.update(sql,amtChina,id);
-    }
 }

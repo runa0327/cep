@@ -17,6 +17,7 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -621,17 +622,19 @@ public class ProcessCommon {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         String pmPrjIds = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
-        String csCommId = entityRecord.csCommId;
-        String[] prjArr = pmPrjIds.split(",");
-        if (prjArr.length > 0){
-            String detailCode = entCode + "_PRJ_DETAIL";
-            String parentId = entCode + "_ID";
-            Crud.from(detailCode).where().eq(parentId,csCommId).delete().exec();
-            for (String tp : prjArr) {
-                String id = Crud.from(detailCode).insertData();
-                Crud.from(detailCode).where().eq("ID",id).update()
-                        .set(parentId,csCommId).set("PM_PRJ_ID",tp)
-                        .exec();
+        if (!SharedUtil.isEmptyString(pmPrjIds)){
+            String csCommId = entityRecord.csCommId;
+            String[] prjArr = pmPrjIds.split(",");
+            if (prjArr.length > 0){
+                String detailCode = entCode + "_PRJ_DETAIL";
+                String parentId = entCode + "_ID";
+                Crud.from(detailCode).where().eq(parentId,csCommId).delete().exec();
+                for (String tp : prjArr) {
+                    String id = Crud.from(detailCode).insertData();
+                    Crud.from(detailCode).where().eq("ID",id).update()
+                            .set(parentId,csCommId).set("PM_PRJ_ID",tp)
+                            .exec();
+                }
             }
         }
     }
@@ -735,4 +738,64 @@ public class ProcessCommon {
 /**====================================================================================================================**/
 /**==========================================更新流程主表单字段结束========================================================**/
 /**====================================================================================================================**/
+
+/**====================================================================================================================**/
+/**==========================================通用-历史数据处理开始*========================================================**/
+/**====================================================================================================================**/
+
+    /**
+     * 流程历史数据处理-所有未作废数据写入项目明细表
+     */
+    public void prjDetailInsert(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        String sql = "select * from " + entCode + " where status not in ('VD','VDING') ";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        if (!CollectionUtils.isEmpty(list)){
+            String detailCode = entCode + "_PRJ_DETAIL";
+            String parentId = entCode + "_ID";
+            for (Map<String, Object> map : list) {
+                String reqId = JdbcMapUtil.getString(map,"ID");
+                String prjIds = JdbcMapUtil.getString(map,"PM_PRJ_IDS");
+                if (StringUtils.hasText(prjIds)){
+                    Crud.from(detailCode).where().eq(parentId,reqId).delete().exec();
+                    String[] prjArr = prjIds.split(",");
+                    for (String prjId : prjArr) {
+                        String id = Crud.from(detailCode).insertData();
+                        Crud.from(detailCode).where().eq("ID",id).update()
+                                .set(parentId,reqId)
+                                .set("PM_PRJ_ID",prjId)
+                                .exec();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 流程历史数据处理-更新流程业务表name字段
+     */
+    public void updateProcName(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        String sql = "select * from " + entCode + " where status not in ('VD','VDING') ";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        if (!CollectionUtils.isEmpty(list)){
+            for (Map<String, Object> map : list) {
+                String reqId = JdbcMapUtil.getString(map,"ID");
+                String processInstanceId = JdbcMapUtil.getString(map,"LK_WF_INST_ID");
+                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList("select name from wf_process_instance where id = ?",processInstanceId);
+                if (!CollectionUtils.isEmpty(list2)){
+                    String name = JdbcMapUtil.getString(list2.get(0),"name");
+                    Crud.from(entCode).where().eq("ID",reqId).update().set("NAME",name).exec();
+                }
+            }
+        }
+    }
+
+
+/**====================================================================================================================**/
+/**==========================================通用-历史数据处理结束*========================================================**/
+/**====================================================================================================================**/
+
 }

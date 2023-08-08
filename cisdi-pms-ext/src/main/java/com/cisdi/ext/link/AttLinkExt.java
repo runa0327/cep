@@ -49,7 +49,7 @@ public class AttLinkExt {
         String entCode = myJdbcTemplate.queryForMap("select e.code ent_code from ad_single_ent_view sev join ad_ent e on sev.AD_ENT_ID = e.ID and sev.id=?", sevId).get("ent_code").toString();
 
         if ("PROJECT_TYPE_ID".equals(attCode)) {
-            return ProjectTypeIdLink.linkForPROJECT_TYPE_ID(myJdbcTemplate, attValue);
+            return ProjectTypeIdLink.linkForPROJECT_TYPE_ID(myJdbcTemplate, attValue,entCode);
         } else if ("PM_PRJ_ID".equals(attCode)) {
             return PmPrjIdLink.linkForPM_PRJ_ID(myJdbcTemplate, attValue, entCode, sevId);
         } else if ("PMS_RELEASE_WAY_ID".equals(attCode) || "GUARANTEE_LETTER_TYPE_ID".equals(attCode) || "CONTRACT_CATEGORY_ID".equals(attCode) || "PRJ_MANAGE_MODE_ID".equals(attCode)) {

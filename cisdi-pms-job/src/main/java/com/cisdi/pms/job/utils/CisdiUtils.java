@@ -7,18 +7,35 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "cisdi")
 public class CisdiUtils {
 
-    /*文件路径*/
-    private String profile;
+    /*windows文件路径*/
+    private String winProfile;
 
-    public String getProfile() {
-        return profile;
+    /*linux文件路径*/
+    private String linuxProfile;
+
+    public String getWinProfile() {
+        return winProfile;
     }
 
-    public void setProfile(String profile) {
-        this.profile = profile;
+    public void setWinProfile(String winProfile) {
+        this.winProfile = winProfile;
+    }
+
+    public String getLinuxProfile() {
+        return linuxProfile;
+    }
+
+    public void setLinuxProfile(String linuxProfile) {
+        this.linuxProfile = linuxProfile;
     }
 
     public String getDownLoadPath() {
-        return getProfile() + "/download/";
+        String sys = SystemUtil.getSystemType();
+        if ("windows".equals(sys)){
+            return getWinProfile() + "/download/";
+        } else {
+            return getLinuxProfile() + "/download/";
+        }
+
     }
 }

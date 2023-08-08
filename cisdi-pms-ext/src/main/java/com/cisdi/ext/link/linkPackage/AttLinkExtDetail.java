@@ -3,6 +3,7 @@ package com.cisdi.ext.link.linkPackage;
 import com.cisdi.ext.base.AdUserExt;
 import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.link.*;
+import com.cisdi.ext.model.GrSetValue;
 import com.cisdi.ext.model.PmParty;
 import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.model.PrjStart;
@@ -354,7 +355,7 @@ public class AttLinkExtDetail {
         //项目类型属性联动处理
         List<String> noPrjTypeList = AttLinkDifferentProcess.noPrjTypeLink();
         if (!noPrjTypeList.contains(entCode)){
-            prjTypeLinkNew(row,attLinkResult);
+            prjTypeLinkNew(row,attLinkResult,entCode);
         }
         mapAddValue("PRJ_CODE","prj_code",row,AttDataTypeE.TEXT_LONG,attLinkResult); //项目代码
         mapAddValue("BUILD_YEARS","BUILD_YEARS",row,AttDataTypeE.TEXT_LONG,attLinkResult); //建设年限
@@ -372,8 +373,6 @@ public class AttLinkExtDetail {
         mapAddRefValue("PRJ_MANAGE_MODE_ID","m_id","m_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //项目管理模式
         mapAddRefValue("BASE_LOCATION_ID","l_id","l_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //建设地点
         mapAddRefValue("PROJECT_TYPE_ID","pt_id","pt_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //建设地点
-        mapAddRefValue("CON_SCALE_TYPE_ID","st_id","st_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //建设规模类型
-        mapAddRefValue("CON_SCALE_UOM_ID","su_id","su_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //建设规模单位
 
         if (!"PM_PRJ_REQ".equals(entCode)){
             mapAddValue("PRJ_REPLY_DATE","PRJ_REPLY_DATE",row,AttDataTypeE.DATE,attLinkResult); //批复日期
@@ -468,8 +467,12 @@ public class AttLinkExtDetail {
      * 项目类型属性联动，根据项目类型联动，控制如：面积、长、宽等
      * @param row 单条项目记录
      * @param attLinkResult 返回的集合map
+     * @param entCode 表名
      */
-    public static void prjTypeLinkNew(Map<String,Object> row, AttLinkResult attLinkResult) {
+    public static void prjTypeLinkNew(Map<String,Object> row, AttLinkResult attLinkResult, String entCode) {
+
+        List<String> unEditList = AttLinkDifferentProcess.getUnEditList();
+
         boolean roadLengthMustEdit = false; //道路长度默认非必填
         boolean roadWidthMustEdit = false; //道路宽度默认非必填
         boolean buildAreaMustEdit = false; //建筑面积默认非必填
@@ -481,6 +484,7 @@ public class AttLinkExtDetail {
         boolean buildAreaShow = false; //建筑面积默认不显示
         boolean seaAreaShow = false; //海域面积默认不显示
         boolean otherShow = false; //其他默认不显示
+
 
         boolean roadLengthChangeToEditable = false; //道路长度默认不可改
         boolean roadWidthChangeToEditable = false; //道路宽度默认不可改
@@ -516,25 +520,41 @@ public class AttLinkExtDetail {
             otherShow = true;
             otherChangeToEditable = true;
         }
-        //建筑面积
-        String buildArea = JdbcMapUtil.getString(row,"QTY_ONE");
-        LinkUtils.mapAddAllValue("QTY_ONE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(buildArea),buildArea,buildAreaShow,buildAreaMustEdit,buildAreaChangeToEditable,attLinkResult);
 
-        //海域面积
-        String seaArea = JdbcMapUtil.getString(row,"QTY_THREE");
-        LinkUtils.mapAddAllValue("QTY_THREE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(seaArea),seaArea,seaAreaShow,seaAreaMustEdit,seaAreaChangeToEditable,attLinkResult);
+        String buildArea = JdbcMapUtil.getString(row,"QTY_ONE"); //建筑面积
+        String seaArea = JdbcMapUtil.getString(row,"QTY_THREE"); //海域面积
+        String roadLength = JdbcMapUtil.getString(row,"CON_SCALE_QTY"); //长
+        String roadWidth = JdbcMapUtil.getString(row,"CON_SCALE_QTY2"); //宽
+        String other = JdbcMapUtil.getString(row,"OTHER"); //其他
 
-        //长
-        String roadLength = JdbcMapUtil.getString(row,"CON_SCALE_QTY");
-        LinkUtils.mapAddAllValue("CON_SCALE_QTY",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(roadLength),roadLength,roadLengthShow,roadLengthMustEdit,roadLengthChangeToEditable,attLinkResult);
+        if (unEditList.contains(entCode)){
+            LinkUtils.mapAddAllValue("QTY_ONE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(buildArea),buildArea,buildAreaShow,false,false,attLinkResult);
+            LinkUtils.mapAddAllValue("QTY_THREE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(seaArea),seaArea,seaAreaShow,false,false,attLinkResult);
+            LinkUtils.mapAddAllValue("CON_SCALE_QTY",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(roadLength),roadLength,roadLengthShow,false,false,attLinkResult);
+            LinkUtils.mapAddAllValue("CON_SCALE_QTY2",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(roadWidth),roadWidth,roadWidthShow,false,false,attLinkResult);
+            LinkUtils.mapAddAllValue("OTHER",AttDataTypeE.TEXT_LONG,other,other,otherShow,false,false,attLinkResult);
+        } else {
+            LinkUtils.mapAddAllValue("QTY_ONE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(buildArea),buildArea,buildAreaShow,buildAreaMustEdit,buildAreaChangeToEditable,attLinkResult);
+            LinkUtils.mapAddAllValue("QTY_THREE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(seaArea),seaArea,seaAreaShow,seaAreaMustEdit,seaAreaChangeToEditable,attLinkResult);
+            LinkUtils.mapAddAllValue("CON_SCALE_QTY",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(roadLength),roadLength,roadLengthShow,roadLengthMustEdit,roadLengthChangeToEditable,attLinkResult);
+            LinkUtils.mapAddAllValue("CON_SCALE_QTY2",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(roadWidth),roadWidth,roadWidthShow,roadWidthMustEdit,roadWidthChangeToEditable,attLinkResult);
+            LinkUtils.mapAddAllValue("OTHER",AttDataTypeE.TEXT_LONG,other,other,otherShow,otherMustEdit,otherChangeToEditable,attLinkResult);
+        }
 
-        //宽
-        String roadWidth = JdbcMapUtil.getString(row,"CON_SCALE_QTY2");
-        LinkUtils.mapAddAllValue("CON_SCALE_QTY2",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(roadWidth),roadWidth,roadWidthShow,roadWidthMustEdit,roadWidthChangeToEditable,attLinkResult);
+        //建设规模类型
+        String typeId = JdbcMapUtil.getString(row,"st_id");
+        if (!SharedUtil.isEmptyString(typeId)){
+            String typeName = GrSetValue.selectById(typeId).getName();
+            LinkUtils.mapAddAllValue("CON_SCALE_TYPE_ID",AttDataTypeE.TEXT_LONG,typeId,typeName,true,false,false,attLinkResult);
+        }
 
-        //其他
-        String other = JdbcMapUtil.getString(row,"OTHER");
-        LinkUtils.mapAddAllValue("OTHER",AttDataTypeE.TEXT_LONG,other,other,otherShow,otherMustEdit,otherChangeToEditable,attLinkResult);
+        //建设规模单位
+        String unitId = JdbcMapUtil.getString(row,"su_id");
+        if (!SharedUtil.isEmptyString(unitId)){
+            String unitName = GrSetValue.selectById(unitId).getName();
+            LinkUtils.mapAddAllValue("CON_SCALE_UOM_ID",AttDataTypeE.TEXT_LONG,unitId,unitName,true,false,false,attLinkResult);
+        }
+
     }
 
     /**

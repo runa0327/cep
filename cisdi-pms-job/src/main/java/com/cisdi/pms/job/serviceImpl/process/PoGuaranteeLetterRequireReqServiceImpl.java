@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -178,12 +179,20 @@ public class PoGuaranteeLetterRequireReqServiceImpl implements PoGuaranteeLetter
                 // 担保金额(元)
                 Cell cell6 = row.createCell(6);
                 cell6.setCellStyle(content);
-                cell6.setCellValue(list.get(i).getGuaranteeAmt().doubleValue());
+                BigDecimal amt = list.get(i).getGuaranteeAmt();
+                if (amt != null){
+                    cell6.setCellValue(amt.doubleValue());
+                } else {
+                    cell6.setCellValue("-");
+                }
 
                 // 签订日期
                 Cell cell7 = row.createCell(7);
                 cell7.setCellStyle(content);
-                cell7.setCellValue(list.get(i).getGuaranteeStartDate());
+                String date = list.get(i).getGuaranteeStartDate();
+                if (StringUtils.hasText(date)){
+                    cell7.setCellValue(date);
+                }
 
                 // 担保期限
                 Cell cell8 = row.createCell(8);

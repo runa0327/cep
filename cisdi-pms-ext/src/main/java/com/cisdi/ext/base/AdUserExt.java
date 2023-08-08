@@ -35,4 +35,16 @@ public class AdUserExt {
         result.put("userList",userList);
         ExtJarHelper.returnValue.set(result);
     }
+
+    /**
+     * 人员下拉列表
+     */
+    public void getAllUserList(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql = "select id,name from ad_user where status = 'ap' order by id asc";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("userList",list);
+        ExtJarHelper.returnValue.set(result);
+    }
 }
