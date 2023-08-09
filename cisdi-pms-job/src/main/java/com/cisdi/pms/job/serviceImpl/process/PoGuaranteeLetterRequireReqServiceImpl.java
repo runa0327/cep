@@ -225,8 +225,8 @@ public class PoGuaranteeLetterRequireReqServiceImpl implements PoGuaranteeLetter
                 cell13.setCellValue(list.get(i).getCustomerUnitName());
             }
 
-            String realFileName = "新增保函台账.xls";
-            String path = filePath + title + ".xls";
+            String realFileName = title + ".xls";
+            String path = filePath + realFileName;
             outputStream = new FileOutputStream(path);
             workbook.write(outputStream);
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
