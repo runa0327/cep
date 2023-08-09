@@ -876,35 +876,31 @@ public class PoOrderReqExt {
         String csId = entityRecord.csCommId;
         //流程实例id
         String procInstId = ExtJarHelper.procInstId.get();
-        //合同修订稿
-        String file = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE");
-        if (!SharedUtil.isEmptyString(file)){
-            //查询接口地址
-            String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
-            List<Map<String,Object>> listUrl = myJdbcTemplate.queryForList(httpSql);
-            //公司名称
-            String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
-            String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
+        //查询接口地址
+        String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
+        List<Map<String,Object>> listUrl = myJdbcTemplate.queryForList(httpSql);
+        //公司名称
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
+        String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
 
-            new Thread(() -> {
-                if (!CollectionUtils.isEmpty(listUrl)){
-                    String url = listUrl.get(0).get("HOST_ADDR").toString();
-                    if (SharedUtil.isEmptyString(url)){
-                        //写入日志提示表
-                        String id = Crud.from("AD_REMIND_LOG").insertData();
-                        Crud.from("AD_REMIND_LOG").where().eq("id",id).update().set("AD_ENT_ID","0099799190825103145")
-                                .set("ENT_CODE","PO_ORDER_REQ").set("ENTITY_RECORD_ID",csId).set("REMIND_USER_ID","0099250247095871681")
-                                .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
-                                .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
-                    } else {
-                        PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode,processId);
-                        String param = JSON.toJSONString(poOrderReqView);
-                        //调用接口
-                        HttpClient.doPost(url,param,"UTF-8");
-                    }
+        new Thread(() -> {
+            if (!CollectionUtils.isEmpty(listUrl)){
+                String url = listUrl.get(0).get("HOST_ADDR").toString();
+                if (SharedUtil.isEmptyString(url)){
+                    //写入日志提示表
+                    String id = Crud.from("AD_REMIND_LOG").insertData();
+                    Crud.from("AD_REMIND_LOG").where().eq("id",id).update().set("AD_ENT_ID","0099799190825103145")
+                            .set("ENT_CODE","PO_ORDER_REQ").set("ENTITY_RECORD_ID",csId).set("REMIND_USER_ID","0099250247095871681")
+                            .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
+                            .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
+                } else {
+                    PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode,processId);
+                    String param = JSON.toJSONString(poOrderReqView);
+                    //调用接口
+                    HttpClient.doPost(url,param,"UTF-8");
                 }
-            }).start();
-        }
+            }
+        }).start();
     }
 
 
