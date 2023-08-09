@@ -50,8 +50,9 @@ public class ReportCommon {
         String userId = ExtJarHelper.loginInfo.get().userId;
         String now = DateTimeUtil.dttmToString(new Date());
         String userName = ExtJarHelper.loginInfo.get().userName;
-        StringBuilder sb = new StringBuilder("用户:").append(userName).append(" 在 ").append(now);
+        StringBuilder sb2 = new StringBuilder("用户:").append(userName).append(" 在 ").append(now);
         for (EntityRecord tmp : list) {
+            StringBuilder sb = new StringBuilder(sb2);
             Map<String,Object> map = tmp.valueMap;
             String proInstanceId = JdbcMapUtil.getString(map,"LK_WF_INST_ID");
             String isCheck = JdbcMapUtil.getString(map,"IS_CHECK_OVER");
