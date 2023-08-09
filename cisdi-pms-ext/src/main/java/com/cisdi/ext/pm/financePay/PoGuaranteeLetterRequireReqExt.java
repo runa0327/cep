@@ -171,7 +171,7 @@ public class PoGuaranteeLetterRequireReqExt {
      * 节点状态赋值
      * @param status 状态码
      * @param nodeId 节点id
-     * @return
+     * @return 节点状态码
      */
     private String getNodeStatus(String status, String nodeId) {
         String nodeName = "";
