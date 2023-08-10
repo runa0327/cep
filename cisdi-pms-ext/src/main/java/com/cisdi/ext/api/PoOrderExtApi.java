@@ -45,7 +45,7 @@ public class PoOrderExtApi {
         //获取合作单位
         String cooperation = getCooperation(csId,myJdbcTemplate);
         //项目id
-        String projectId = PmPrjExt.getProjectIdByProcess(valueMap,myJdbcTemplate);
+        String projectId = PmPrjExt.getProjectIdByProcess(valueMap);
         //根据编码code查询数据来源id
         String sourceTypeId = GrSetValueExt.getValueId("order_data_source_type",sourceType,myJdbcTemplate);
         if (!SharedUtil.isEmptyString(projectId)){
@@ -74,7 +74,7 @@ public class PoOrderExtApi {
         //获取合作单位
         String cooperation = getCooperation(csId,myJdbcTemplate);
         //项目id
-        String projectId = PmPrjExt.getProjectIdByProcess(tmp,myJdbcTemplate);
+        String projectId = PmPrjExt.getProjectIdByProcess(tmp);
         if (!SharedUtil.isEmptyString(projectId)){
             List<String> list = StringUtil.getStrToList(projectId,",");
             for (String prjId : list) {

@@ -453,7 +453,7 @@ public class PrjPlanUtil {
 
 
     /**
-     * 更加花名册刷新全景的负责人
+     * 更加花名册刷新全景的负责人-未启动的节点
      *
      * @param projectId 项目id
      */
@@ -478,8 +478,65 @@ public class PrjPlanUtil {
         });
     }
 
+
     /**
-     * 刷新项目的工作任务
+     * 根据花名册刷新全景的负责人-全量
+     *
+     * @param projectId 项目id
+     */
+    public static void refreshProPlanAllUser(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_roster where PM_PRJ_ID=?", projectId);
+        List<Map<String, Object>> proList = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where PM_PRJ_ID=?", projectId);
+        list.forEach(item -> {
+            String postId = JdbcMapUtil.getString(item, "POST_INFO_ID");
+            if (!Strings.isNullOrEmpty(postId)) {
+                String userId = JdbcMapUtil.getString(item, "AD_USER_ID");
+                if (!Strings.isNullOrEmpty(userId)) {
+                    List<Map<String, Object>> dataList = proList.stream().filter(p -> Objects.equals(postId, JdbcMapUtil.getString(p, "POST_INFO_ID"))).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(dataList)) {
+                        dataList.forEach(m -> {
+                            myJdbcTemplate.update("update pm_pro_plan_node set CHIEF_USER_ID=? where id=?", userId, m.get("ID"));
+                        });
+                    }
+                }
+            }
+        });
+        refreshSpecialWeekTask(projectId);
+    }
+
+
+    /**
+     * 刷新项目的工作任务-只刷新未开始，进行中的
+     *
+     * @param projectId
+     */
+    public static void refreshSpecialWeekTask(String projectId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_roster where PM_PRJ_ID=?", projectId);
+        List<Map<String, Object>> proList = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where PM_PRJ_ID=?", projectId);
+        List<Map<String, Object>> weekList = myJdbcTemplate.queryForList("select * from week_task where PM_PRJ_ID=? and WEEK_TASK_STATUS_ID in ('1634118574056542208','1634118609016066048') ", projectId);
+        proList.forEach(item -> {
+            Optional<Map<String, Object>> postOpt = list.stream().filter(p -> Objects.equals(p.get("POST_INFO_ID"), item.get("POST_INFO_ID"))).findAny();
+            if (postOpt.isPresent()) {
+                Map<String, Object> post = postOpt.get();
+                String postUser = JdbcMapUtil.getString(post, "AD_USER_ID");
+                if (!Strings.isNullOrEmpty(postUser)) {
+                    Optional<Map<String, Object>> weekOpt = weekList.stream().filter(m -> Objects.equals(item.get("ID"), m.get("RELATION_DATA_ID"))).findAny();
+                    if (weekOpt.isPresent()) {
+                        Map<String, Object> weekTask = weekOpt.get();
+                        String userId = JdbcMapUtil.getString(weekTask, "AD_USER_ID");
+                        if (!postUser.equals(userId)) {
+                            myJdbcTemplate.update("update week_task set AD_USER_ID=? where id=?", postUser, weekTask.get("ID"));
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * 刷新项目的工作任务-只刷新未开始的
      *
      * @param projectId
      */
@@ -493,7 +550,7 @@ public class PrjPlanUtil {
             if (postOpt.isPresent()) {
                 Map<String, Object> post = postOpt.get();
                 String postUser = JdbcMapUtil.getString(post, "AD_USER_ID");
-                if(!Strings.isNullOrEmpty(postUser)){
+                if (!Strings.isNullOrEmpty(postUser)) {
                     Optional<Map<String, Object>> weekOpt = weekList.stream().filter(m -> Objects.equals(item.get("ID"), m.get("RELATION_DATA_ID"))).findAny();
                     if (weekOpt.isPresent()) {
                         Map<String, Object> weekTask = weekOpt.get();

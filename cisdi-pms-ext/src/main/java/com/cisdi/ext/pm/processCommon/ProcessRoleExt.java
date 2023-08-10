@@ -827,7 +827,7 @@ public class ProcessRoleExt {
             companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
         }
         //项目id
-        String projectId = PmPrjExt.getProjectIdByProcess(entityRecord.valueMap,myJdbcTemplate);
+        String projectId = PmPrjExt.getProjectIdByProcess(entityRecord.valueMap);
         //节点id
         String nodeId = ExtJarHelper.nodeId.get();
         //查询该节点岗位(流程岗位id)
