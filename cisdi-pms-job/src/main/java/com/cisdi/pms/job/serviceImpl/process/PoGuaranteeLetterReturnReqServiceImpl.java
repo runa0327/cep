@@ -2,6 +2,7 @@ package com.cisdi.pms.job.serviceImpl.process;
 
 import com.cisdi.pms.job.domain.process.PoGuaranteeLetterRequireReq;
 import com.cisdi.pms.job.domain.process.PoGuaranteeLetterReturnReq;
+import com.cisdi.pms.job.mapper.base.HrDeptMapper;
 import com.cisdi.pms.job.mapper.process.PoGuaranteeLetterReturnReqMapper;
 import com.cisdi.pms.job.mapper.project.PmPrjMapper;
 import com.cisdi.pms.job.service.process.PoGuaranteeLetterReturnReqService;
@@ -21,6 +22,9 @@ public class PoGuaranteeLetterReturnReqServiceImpl implements PoGuaranteeLetterR
     @Resource
     private PmPrjMapper pmPrjMapper;
 
+    @Resource
+    private HrDeptMapper hrDeptMapper;
+
     /**
      * 查询符合条件的所有数据
      *
@@ -34,6 +38,11 @@ public class PoGuaranteeLetterReturnReqServiceImpl implements PoGuaranteeLetterR
         if (StringUtils.hasText(projectId)){
             String projectName = pmPrjMapper.getProjectNameById(projectId);
             poGuaranteeLetterReturnReq.setProjectName(projectName);
+        }
+        String deptId = poGuaranteeLetterReturnReq.getDeptId();
+        if (StringUtils.hasText(deptId)){
+            String deptIds = hrDeptMapper.getDeptIdByName(deptId);
+            poGuaranteeLetterReturnReq.setDeptId(deptIds);
         }
         // 查询系统项目
         List<PoGuaranteeLetterRequireReq> list1 = poGuaranteeLetterReturnReqMapper.getSysMesList(poGuaranteeLetterReturnReq);

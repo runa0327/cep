@@ -19,7 +19,9 @@ import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -188,11 +190,15 @@ public class PmPrjIdLink {
                 .eq("STATUS", "AP").select().execForMapList();
         getList(list, list2, INVEST2_MAP);
         getList(list, list3, INVEST3_MAP);
+        BigDecimal bigValue = new BigDecimal(0);
         for (LinkedAttModel tmp : list) {
             if (AttDataTypeE.FILE_GROUP == tmp.getType()) {
                 AttLinkExtDetail.attLinkResultAddValue(tmp.getValue(), tmp.getKey(), tmp.getType(), attLinkResult);
             } else {
-                AttLinkExtDetail.attLinkResultAddValue(tmp.getValue(), tmp.getValue(), tmp.getKey(), tmp.getType(), attLinkResult);
+                String value = tmp.getValue();
+                bigValue = StringUtils.hasText(value) ? new BigDecimal(value) : bigValue;
+                LinkUtils.mapAddAllValue(tmp.getKey(),AttDataTypeE.TEXT_LONG,bigValue,value,true,false,false,attLinkResult);
+//                AttLinkExtDetail.attLinkResultAddValue(tmp.getValue(), tmp.getValue(), tmp.getKey(), tmp.getType(), attLinkResult);
             }
         }
         //历史结算信息汇总模块 处理显示
@@ -211,6 +217,7 @@ public class PmPrjIdLink {
                 LinkedAttModel linkedAttModel = new LinkedAttModel();
                 String code = invest2Map.get(key);
                 String value = JdbcMapUtil.getString(list2.get(0), code);
+                value = StringUtils.hasText(value) ? value : "0";
                 AttDataTypeE dataTypeE = getCodeType(key);
                 linkedAttModel.setType(dataTypeE);
                 linkedAttModel.setKey(key);

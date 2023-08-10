@@ -1251,35 +1251,35 @@ public class AttLinkExtDetail {
         for (Map<String, Object> tmp : list) {
             //总投资
             String allPrjTotalAmtStr = JdbcMapUtil.getString(tmp,"PRJ_TOTAL_INVEST");
-            allPrjTotalAmt = allPrjTotalAmt.add(StringUtil.valueNullToBig(allPrjTotalAmtStr));
+            allPrjTotalAmt = allPrjTotalAmt.add(StringUtil.valueNullToBig(allPrjTotalAmtStr)).stripTrailingZeros();
 
             //建安工程费
             String allConstructAmtStr = JdbcMapUtil.getString(tmp,"CONSTRUCT_AMT");
-            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allConstructAmtStr));
+            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allConstructAmtStr)).stripTrailingZeros();
 
             //工程其他费用
             String allPrjOtherAmtStr = JdbcMapUtil.getString(tmp,"PROJECT_OTHER_AMT");
-            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allPrjOtherAmtStr));
+            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allPrjOtherAmtStr)).stripTrailingZeros();
 
             //设备采购费
             String allEquipAmtStr = JdbcMapUtil.getString(tmp,"EQUIP_AMT");
-            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allEquipAmtStr));
+            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allEquipAmtStr)).stripTrailingZeros();
 
             //科研设备费
             String allEquipmentAmtStr = JdbcMapUtil.getString(tmp,"EQUIPMENT_COST");
-            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allEquipmentAmtStr));
+            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allEquipmentAmtStr)).stripTrailingZeros();
 
             //土地征拆费用
             String allLandAmtStr = JdbcMapUtil.getString(tmp,"LAND_AMT");
-            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allLandAmtStr));
+            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allLandAmtStr)).stripTrailingZeros();
 
             //预备费
             String allPrepareAmtStr = JdbcMapUtil.getString(tmp,"PREPARE_AMT");
-            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allPrepareAmtStr));
+            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allPrepareAmtStr)).stripTrailingZeros();
 
             //建设期利息
             String allConstructPeriodAmtStr = JdbcMapUtil.getString(tmp,"CONSTRUCT_PERIOD_INTEREST");
-            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allConstructPeriodAmtStr));
+            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allConstructPeriodAmtStr)).stripTrailingZeros();
 
             //结算内容
             String commentStr = JdbcMapUtil.getString(tmp,"TEXT_REMARK_ONE");
