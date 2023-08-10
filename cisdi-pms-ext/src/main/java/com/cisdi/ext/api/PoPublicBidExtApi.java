@@ -70,7 +70,7 @@ public class PoPublicBidExtApi {
      */
     public static void createHistoryData(Map<String, Object> tmp, String viewId, MyJdbcTemplate myJdbcTemplate) {
         //项目id
-        String projectId = PmPrjExt.getProjectIdByProcess(tmp,myJdbcTemplate);
+        String projectId = PmPrjExt.getProjectIdByProcess(tmp);
         //业务流程id
         String csId = JdbcMapUtil.getString(tmp,"id");
         if (!SharedUtil.isEmptyString(projectId)){
