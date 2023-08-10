@@ -99,7 +99,11 @@ yzbays:
 
 # 政务微信单点登录
 gwx:
-  domain: http://im.yazhou-bay.com:10060/cgi-bin
-  corpid: ww808726c44a3ff6dc
-  corpsecret: X4SOKLItOrh5OJq4nXBRKgM8t5QaXjw-LJP0RI6M7mI
-  agentId: 1000005
+  domain: http://qw.yazhou-bay.com:10060/cgi-bin
+  corpid: wwc93a3d2888846f9b
+  corpsecret: robsFWLBEaUUeupQ6VatvvjBqylwu94Y8mD9WKph13w
+  agentId: 1000003
+#  domain: http://im.yazhou-bay.com:10060/cgi-bin
+#  corpid: ww808726c44a3ff6dc
+#  corpsecret: X4SOKLItOrh5OJq4nXBRKgM8t5QaXjw-LJP0RI6M7mI
+#  agentId: 1000005
