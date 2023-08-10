@@ -8,6 +8,7 @@ import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
@@ -86,11 +87,27 @@ public class PoGuaranteeLetterReturnOaReqExt {
 
                 if ("caiLeaderOK".equals(nodeStatus)){ // 财务分管领导审批
                     ProcessCommon.updateComment("APPROVAL_COMMENT_FIVE",entityRecord.valueMap,comment,entCode,csCommId,userName);
+                } else if ("wangOK".equals(nodeStatus)){ // 财务金融部会计审批(助理)
+                    ProcessCommon.updateComment("APPROVAL_COMMENT_TWO",entityRecord.valueMap,comment,entCode,csCommId,userName);
+                } else if ("caiAccountOK".equals(nodeStatus)){ // 财务金融部会计审批(会计)
+                    ProcessCommon.updateComment("APPROVAL_COMMENT_THREE",entityRecord.valueMap,comment,entCode,csCommId,userName);
+                } else if ("caiHeaderOK".equals(nodeStatus)){ // 财务金融部负责人审批
+                    ProcessCommon.updateComment("APPROVAL_COMMENT_FOUR",entityRecord.valueMap,comment,entCode,csCommId,userName);
+                } else if ("jingBanOK".equals(nodeStatus)){ // 经办部门负责人审批
+                    ProcessCommon.updateComment("APPROVAL_COMMENT_ONE",entityRecord.valueMap,comment,entCode,csCommId,userName);
                 }
             }
         } else {
             if ("caiLeaderRefuse".equals(nodeStatus)){
                 ProcessCommon.updateProcColsValue("APPROVAL_COMMENT_FIVE",entCode,csCommId,null);
+            } else if ("wangRefuse".equals(nodeStatus)){ // 财务金融部会计审批(助理)
+                ProcessCommon.updateProcColsValue("APPROVAL_COMMENT_TWO",entCode,csCommId,null);
+            } else if ("caiAccountRefuse".equals(nodeStatus)){ // 财务金融部会计审批(会计)
+                ProcessCommon.updateProcColsValue("APPROVAL_COMMENT_THREE",entCode,csCommId,null);
+            } else if ("caiHeaderRefuse".equals(nodeStatus)){ // 财务金融部负责人审批
+                ProcessCommon.updateProcColsValue("APPROVAL_COMMENT_FOUR",entCode,csCommId,null);
+            } else if ("jingBanRefuse".equals(nodeStatus)){ // 经办部门负责人审批
+                ProcessCommon.updateProcColsValue("APPROVAL_COMMENT_ONE",entCode,csCommId,null);
             }
         }
     }
@@ -108,10 +125,26 @@ public class PoGuaranteeLetterReturnOaReqExt {
                 nodeName = "start";
             } else if ("1688729823704477696".equals(nodeId) || "0100031468512035341".equals(nodeId)){ // 财务分管领导审批
                 nodeName = "caiLeaderOK";
+            } else if ("0100031468512035339".equals(nodeId)){ // 财务金融部会计审批(助理)
+                nodeName = "wangOK";
+            } else if ("0100031468512112193".equals(nodeId) || "1635556049182502912".equals(nodeId)){ // 6-财务金融部会记审批
+                nodeName = "caiAccountOK";
+            } else if ("0100031468512035340".equals(nodeId) || "1635556295602057216".equals(nodeId)){ // 财务金融部负责人审批
+                nodeName = "caiHeaderOK";
+            } else if ("0100031468512035338".equals(nodeId)){ // 2-经办部门负责人审批
+                nodeName = "jingBanOK";
             }
         } else {
             if ("1688729823704477696".equals(nodeId) || "0100031468512035341".equals(nodeId) ){ // 财务分管领导审批
                 nodeName = "caiLeaderRefuse";
+            } else if ("0100031468512035339".equals(nodeId)){ // 3-财务金融部会计审批
+                nodeName = "wangRefuse";
+            } else if ("0100031468512112193".equals(nodeId) || "1635556049182502912".equals(nodeId)){ // 6-财务金融部会记审批
+                nodeName = "caiAccountRefuse";
+            } else if ("0100031468512035340".equals(nodeId) || "1635556295602057216".equals(nodeId)){ // 财务金融部负责人审批
+                nodeName = "caiHeaderRefuse";
+            } else if ("0100031468512035338".equals(nodeId)){ // 2-经办部门负责人审批
+                nodeName = "jingBanRefuse";
             }
         }
         return nodeName;
@@ -254,6 +287,65 @@ public class PoGuaranteeLetterReturnOaReqExt {
         }
         if (param.getGuaranteeAmtMax() != null){
             sb.append(" and r.AMT_FIVE <= '").append(param.getGuaranteeAmtMax()).append("' ");
+        }
+    }
+
+    /**
+     * 历史数据处理-审批意见回显
+     */
+    public void commentShow(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<EntityRecord> entityRecord = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord tmp : entityRecord) {
+            Map<String,Object> map = tmp.valueMap;
+            String id = JdbcMapUtil.getString(map,"ID");
+            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList("select id from wf_process_instance where ENTITY_RECORD_ID = ?",id);
+            if (!CollectionUtils.isEmpty(list1)){
+                String processInstanceId = JdbcMapUtil.getString(list1.get(0),"id");
+                String sql = "select concat(d.name,'：',IFNULL(a.USER_COMMENT,'同意')) as comment,b.WF_NODE_ID " +
+                        "FROM wf_task a " +
+                        "LEFT JOIN wf_node_instance b on a.WF_NODE_INSTANCE_ID = b.id " +
+                        "LEFT JOIN wf_process_instance c on a.WF_PROCESS_INSTANCE_ID = c.id " +
+                        "LEFT JOIN AD_USER d on a.AD_USER_ID = d.id " +
+                        "WHERE a.status = 'AP' and b.status = 'AP' and c.status = 'AP' and a.ACT_DATETIME is not null and a.WF_TASK_TYPE_ID = 'TODO' AND C.ID = ? ";
+                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql,processInstanceId);
+                if (!CollectionUtils.isEmpty(list2)){
+                    String APPROVAL_COMMENT_ONE = null, APPROVAL_COMMENT_TWO = null, APPROVAL_COMMENT_THREE = null, APPROVAL_COMMENT_FOUR = null, APPROVAL_COMMENT_FIVE = null;
+                    for (Map<String, Object> tp : list2) {
+                        String nodeId = JdbcMapUtil.getString(tp,"WF_NODE_ID");
+                        String value = JdbcMapUtil.getString(tp,"comment");
+                        switch (nodeId) {
+                            case "0100031468512035338" : // 经办部门负责人意见
+                                APPROVAL_COMMENT_ONE = value;
+                                break;
+                            case "0100031468512035339" : // 财务会计(助理)
+                                APPROVAL_COMMENT_TWO = value;
+                                break;
+                            case "0100031468512112193" : // 财务会计
+                            case "1635556049182502912" :
+                                APPROVAL_COMMENT_THREE = value;
+                                break;
+                            case "0100031468512035340" : // 财务金融部负责人
+                            case "1635556295602057216" :
+                                APPROVAL_COMMENT_FOUR = value;
+                                break;
+                            case "0100031468512035341" : // 财务分管领导
+                            case "1688729823704477696" :
+                                APPROVAL_COMMENT_FIVE = value;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    Crud.from("PO_GUARANTEE_LETTER_RETURN_OA_REQ").where().eq("ID",id).update()
+                            .set("APPROVAL_COMMENT_ONE",APPROVAL_COMMENT_ONE)
+                            .set("APPROVAL_COMMENT_TWO",APPROVAL_COMMENT_TWO)
+                            .set("APPROVAL_COMMENT_THREE",APPROVAL_COMMENT_THREE)
+                            .set("APPROVAL_COMMENT_FOUR",APPROVAL_COMMENT_FOUR)
+                            .set("APPROVAL_COMMENT_FIVE",APPROVAL_COMMENT_FIVE)
+                            .exec();
+                }
+            }
         }
     }
 }

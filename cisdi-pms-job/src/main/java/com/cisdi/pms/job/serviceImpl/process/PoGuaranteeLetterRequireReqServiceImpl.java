@@ -51,10 +51,11 @@ public class PoGuaranteeLetterRequireReqServiceImpl implements PoGuaranteeLetter
      */
     @Override
     public List<PoGuaranteeLetterRequireReq> selectAllMess(PoGuaranteeLetterRequireReq poGuaranteeLetterRequireReq) {
-        String projectId = poGuaranteeLetterRequireReq.getProjectNameWr();
-        String projectName = pmPrjMapper.getProjectNameById(projectId);
-        poGuaranteeLetterRequireReq.setProjectId(projectId);
-        poGuaranteeLetterRequireReq.setProjectName(projectName);
+        String projectId = poGuaranteeLetterRequireReq.getProjectId();
+        if (StringUtils.hasText(projectId)){
+            String projectName = pmPrjMapper.getProjectNameById(projectId);
+            poGuaranteeLetterRequireReq.setProjectName(projectName);
+        }
         // 查询系统项目
         List<PoGuaranteeLetterRequireReq> list1 = poGuaranteeLetterRequireReqMapper.selectAllMess(poGuaranteeLetterRequireReq);
         // 查询非系统项目
