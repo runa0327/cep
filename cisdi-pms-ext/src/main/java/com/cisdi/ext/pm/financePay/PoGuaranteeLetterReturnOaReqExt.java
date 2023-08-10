@@ -169,7 +169,7 @@ public class PoGuaranteeLetterReturnOaReqExt {
 
         String sql = "SELECT r.id as id,r.GUARANTEE_LETTER_TYPE_ID guaranteeLetterTypeId," +
                 "(select name from gr_set_value where id = r.GUARANTEE_LETTER_TYPE_ID) as guaranteeLetterTypeName," +
-                "r.GUARANTEE_COST_TYPE_ID guaranteeCostTypeId," +
+                "r.GUARANTEE_COST_TYPE_ID guaranteeCostTypeId,r.CRT_DT as createDate," +
                 "(select name from gr_set_value where id = r.GUARANTEE_COST_TYPE_ID) as guaranteeCostTypeName," +
                 "IFNULL( p1.NAME, r.PROJECT_NAME_WR ) projectName," +
                 "r.GUARANTEE_MECHANISM as guaranteeMechanism,r.GUARANTEE_CODE as guaranteeCode," +

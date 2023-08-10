@@ -101,5 +101,40 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("AD_USER_TWELVE_ID"); // 前期报建岗
         entityRecord.extraEditableAttCodeList.add("TEXT_REMARK_FIVE"); // 采购需求说明-不分期说明
         entityRecord.extraEditableAttCodeList.add("FILE_ID_FIVE"); // 采购需求说明-不分期说明附件
+        entityRecord.extraEditableAttCodeList.add("PRJ_TOTAL_INVEST2"); // 总投资
+        entityRecord.extraEditableAttCodeList.add("PROJECT_AMT_INVEST2");
+        entityRecord.extraEditableAttCodeList.add("CONSTRUCT_PRJ_AMT_INVEST2");
+        entityRecord.extraEditableAttCodeList.add("EQUIP_BUY_AMT_INVEST2");
+        entityRecord.extraEditableAttCodeList.add("EQUIPMENT_COST_INVEST2");
+        entityRecord.extraEditableAttCodeList.add("PROJECT_OTHER_AMT_INVEST2");
+        entityRecord.extraEditableAttCodeList.add("LAND_AMT_INVEST2");
+        entityRecord.extraEditableAttCodeList.add("CONSTRUCT_PERIOD_INVEST2");
+        entityRecord.extraEditableAttCodeList.add("REPLY_DATE_INVEST2");
+        entityRecord.extraEditableAttCodeList.add("REPLY_NO_INVEST2");
+        entityRecord.extraEditableAttCodeList.add("REPLY_FILE_INVEST2");
+        entityRecord.extraEditableAttCodeList.add("PRJ_TOTAL_INVEST3");
+        entityRecord.extraEditableAttCodeList.add("PROJECT_AMT_INVEST3");
+        entityRecord.extraEditableAttCodeList.add("CONSTRUCT_PRJ_AMT_INVEST3");
+        entityRecord.extraEditableAttCodeList.add("EQUIP_BUY_AMT_INVEST3");
+        entityRecord.extraEditableAttCodeList.add("EQUIPMENT_COST_INVEST3");
+        entityRecord.extraEditableAttCodeList.add("PROJECT_OTHER_AMT_INVEST3");
+        entityRecord.extraEditableAttCodeList.add("LAND_AMT_INVEST3");
+        entityRecord.extraEditableAttCodeList.add("PREPARE_AMT_INVEST3");
+        entityRecord.extraEditableAttCodeList.add("CONSTRUCT_PERIOD_INVEST3");
+        entityRecord.extraEditableAttCodeList.add("REPLY_DATE_INVEST3");
+        entityRecord.extraEditableAttCodeList.add("REPLY_NO_INVEST3");
+        entityRecord.extraEditableAttCodeList.add("REPLY_FILE_INVEST3");
+        entityRecord.extraEditableAttCodeList.add("PRJ_TOTAL_HISTORY");
+        entityRecord.extraEditableAttCodeList.add("CONSTRUCT_PRJ_AMT_HISTORY");
+        entityRecord.extraEditableAttCodeList.add("PROJECT_OTHER_AMT_HISTORY");
+        entityRecord.extraEditableAttCodeList.add("EQUIP_BUY_AMT_HISTORY");
+        entityRecord.extraEditableAttCodeList.add("EQUIPMENT_COST_HISTORY");
+        entityRecord.extraEditableAttCodeList.add("LAND_AMT_HISTORY");
+        entityRecord.extraEditableAttCodeList.add("PREPARE_AMT_HISTORY");
+        entityRecord.extraEditableAttCodeList.add("CONSTRUCT_PERIOD_HISTORY");
+        entityRecord.extraEditableAttCodeList.add("TEXT_REMARK_TWO");
+        entityRecord.extraEditableAttCodeList.add("FILE_ID_FOUR");
+        entityRecord.extraEditableAttCodeList.add("FILE_ID_FIVE");
+        entityRecord.extraEditableAttCodeList.add("FILE_ID_SIX");
     }
 }

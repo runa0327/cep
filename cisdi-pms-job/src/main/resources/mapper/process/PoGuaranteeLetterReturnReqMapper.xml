@@ -4,9 +4,129 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cisdi.pms.job.mapper.process.PoGuaranteeLetterReturnReqMapper">
     <resultMap id="PoGuaranteeLetterReturnReqResult" type="com.cisdi.pms.job.domain.process.PoGuaranteeLetterReturnReq">
-
+        <id property="id" column="id" />
+        <result property="guaranteeLetterTypeId" column="guaranteeLetterTypeId" />
+        <result property="guaranteeLetterTypeName" column="guaranteeLetterTypeName" />
+        <result property="guaranteeCostTypeId" column="guaranteeCostTypeId" />
+        <result property="guaranteeCostTypeName" column="guaranteeCostTypeName" />
+        <result property="projectId" column="projectId" />
+        <result property="projectName" column="projectName" />
+        <result property="guaranteeMechanism" column="guaranteeMechanism" />
+        <result property="guaranteeCode" column="guaranteeCode" />
+        <result property="guaranteeAmt" column="guaranteeAmt" />
+        <result property="guaranteeAmtMin" column="guaranteeAmtMin" />
+        <result property="guaranteeAmtMax" column="guaranteeAmtMax" />
+        <result property="guaranteeAmtChina" column="guaranteeAmtChina" />
+        <result property="guaranteeStartDate" column="guaranteeStartDate" />
+        <result property="guaranteeStartDateMin" column="guaranteeStartDateMin" />
+        <result property="guaranteeStartDateMax" column="guaranteeStartDateMax" />
+        <result property="guaranteeEndDate" column="guaranteeEndDate" />
+        <result property="guaranteeEndDateMax" column="guaranteeEndDateMax" />
+        <result property="guaranteeEndDateMin" column="guaranteeEndDateMin" />
+        <result property="remarkLongOne" column="remarkLongOne" />
+        <result property="author" column="author" />
+        <result property="createUserId" column="createUserId" />
+        <result property="createUserName" column="createUserName" />
+        <result property="deptId" column="deptId" />
+        <result property="deptName" column="deptName" />
+        <result property="createDate" column="createDate" />
+        <result property="createDateMin" column="createDateMin" />
+        <result property="createDateMax" column="createDateMax" />
+        <result property="companyId" column="companyId" />
+        <result property="companyName" column="companyName" />
+        <result property="applicant" column="applicant" />
+        <result property="reason" column="reason" />
+        <result property="remark" column="remark" />
+        <result property="commentOne" column="commentOne" />
+        <result property="commentTwo" column="commentTwo" />
+        <result property="commentThree" column="commentThree" />
+        <result property="commentFour" column="commentFour" />
+        <result property="commentFive" column="commentFive" />
     </resultMap>
 
+    <!--通用查询表头-->
+    <sql id="commonHeader">
+        (select name from ad_user where id = a.CRT_USER_ID) as processInstanceCreateBy,
+        (select name from hr_dept where id = a.CRT_DEPT_ID) AS deptName,
+        a.CRT_DT AS createDate,
+        (SELECT NAME FROM AD_STATUS WHERE ID = a.status) as STATUS,
+        (select name from pm_party where id = a.CUSTOMER_UNIT_ONE) as customerUnitName,
+        ( SELECT NAME FROM gr_set_value WHERE id = a.PROJECT_SOURCE_TYPE_ID ) AS contractSource,
+        f.NAME AS projectName,
+        a.APPLICANT as applicant,
+        a.AUTHOR as author,
+        a.GUARANTEE_LETTER_TYPE_ID AS guaranteeLetterTypeId,
+        a.GUARANTEE_COST_TYPE_ID as guaranteeCostTypeId,
+        a.GUARANTEE_MECHANISM AS guaranteeMechanism,
+        a.GUARANTEE_CODE AS guaranteeCode,
+        a.AMT_FIVE AS guaranteeAmt,
+        a.REMARK_TWO as guaranteeAmtChina,
+        a.GUARANTEE_START_DATE AS guaranteeStartDate,
+        a.GUARANTEE_DATE_TYPE_ID AS guaranteeEndTypeId,
+        ( SELECT NAME FROM gr_set_value WHERE id = a.GUARANTEE_DATE_TYPE_ID ) AS guaranteeEndTypeName,
+        a.GUARANTEE_END_DATE AS guaranteeEndDate,
+        a.DATE_TYPE_WR AS guaranteeEndRemark,
+        a.REASON as reason,
+        a.REMARK_LONG_ONE as remark,
+        a.APPROVAL_COMMENT_ONE as commentOne,
+        a.APPROVAL_COMMENT_TWO as commentTwo,
+        a.APPROVAL_COMMENT_THREE as commentThree,
+        a.APPROVAL_COMMENT_FOUR as commentFour,
+        a.APPROVAL_COMMENT_FIVE as commentFive
+    </sql>
+
+    <sql id="commonFilter">
+        <if test="createBy != null and createBy != ''">
+            and a.CRT_USER_ID = #{createBy}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and a.CRT_DEPT_ID = #{deptId}
+        </if>
+        <if test="guaranteeLetterTypeId != null and guaranteeLetterTypeId != ''">
+            and a.GUARANTEE_DATE_TYPE_ID = #{guaranteeLetterTypeId}
+        </if>
+        <if test="guaranteeStartDate != null and guaranteeStartDate != ''">
+            and a.GUARANTEE_START_DATE >= #{guaranteeStartDate}
+        </if>
+        <if test="guaranteeEndDate != null and guaranteeEndDate != ''">
+            <![CDATA[ and a.GUARANTEE_END_DATE <= #{guaranteeEndDate} ]]>
+        </if>
+        <if test="createDateMin != null and createDateMin != ''">
+            and a.CRT_DT >= #{createDateMin}
+        </if>
+        <if test="createDateMax != null and createDateMax != ''">
+            <![CDATA[ and a.CRT_DT <= #{createDateMax} ]]>
+        </if>
+        <if test="companyId != null and companyId != ''">
+            and a.CUSTOMER_UNIT_ONE = #{companyId},
+        </if>
+        <if test="pmExpTypeIds != null and pmExpTypeIds != ''">
+            and find_in_set(#{pmExpTypeIds},a.PM_EXP_TYPE_IDS)
+        </if>
+        <if test="supplier != null and supplier != ''">
+            and a.supplier like concat('%',#{supplier},'%')
+        </if>
+        <if test="guaranteeAmtMin != null">
+            and a.GUARANTEE_AMT >= #{guaranteeAmtMin}
+        </if>
+        <if test="guaranteeAmtMax != null">
+            <![CDATA[ and a.GUARANTEE_AMT <= #{guaranteeAmtMax} ]]>
+        </if>
+    </sql>
+
     <!--查询系统类结果-->
-    <select id="getSysMesList" resultMap="PoGuaranteeLetterReturnReqResult"></select>
+    <select id="getSysMesList" resultMap="PoGuaranteeLetterReturnReqResult">
+        select
+            b.NAME AS processInstanceName,
+        <include refid="commonHeader"></include>
+        FROM
+            po_guarantee_letter_return_oa_req a
+        LEFT JOIN wf_process_instance b ON a.id = b.ENTITY_RECORD_ID
+        LEFT JOIN pm_prj f ON a.PM_PRJ_ID = f.id
+        WHERE
+            a.STATUS = 'ap'
+            AND a.PM_PRJ_ID IS not NULL
+            AND a.crt_dt >= '2022-11-22 00:00:00'
+        <include refid="commonFilter"></include>
+    </select>
 </mapper>

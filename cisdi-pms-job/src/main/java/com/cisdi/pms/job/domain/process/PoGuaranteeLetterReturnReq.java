@@ -87,4 +87,19 @@ public class PoGuaranteeLetterReturnReq {
 
     // 备注
     private String remark;
+
+    //经办部门意见
+    private String commentOne;
+
+    //财务金融部会计意见
+    private String commentTwo;
+
+    //财务金融部会计意见
+    private String commentThree;
+
+    //财务金融部负责人意见
+    private String commentFour;
+
+    //财务分管领导意见
+    private String commentFive;
 }
