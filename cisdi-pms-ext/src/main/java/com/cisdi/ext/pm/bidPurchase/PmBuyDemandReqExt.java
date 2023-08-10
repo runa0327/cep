@@ -661,7 +661,7 @@ public class PmBuyDemandReqExt {
         //流程实例id
         String procInstId = ExtJarHelper.procInstId.get();
         //获取审批意见
-        Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
+        Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId);
         //审批意见、内容
         String comment = message.get("comment");
         //分支判断，逻辑处理

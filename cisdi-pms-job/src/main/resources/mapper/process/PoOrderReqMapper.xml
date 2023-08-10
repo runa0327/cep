@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.process.PoOrderReqMapper">
+    <resultMap id="PoOrderReqResult" type="com.cisdi.pms.job.domain.process.PoOrderReq">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+    </resultMap>
+
+    <!--根据合同id数组查询合同名称-->
+    <select id="getContractNameByIdArr" resultType="String">
+        select group_concat(name) from po_order_req where id in
+            <foreach collection="list" item="item" separator="," open="(" close=")" index="index">
+                #{item}
+            </foreach>
+    </select>
+</mapper>

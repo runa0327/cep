@@ -129,7 +129,7 @@ public class PmPrjInvest2Ext {
                 WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
             } else {
                 //获取审批意见信息
-                Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
+                Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId);
 
                 //审批意见内容
                 String file = message.get("file");

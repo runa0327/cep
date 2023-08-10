@@ -17,6 +17,7 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -79,10 +80,9 @@ public class ProcessCommon {
      * @param userId 操作人id
      * @param myJdbcTemplate 数据源
      * @param procInstId 流程实例id
-     * @param userName 操作人名称
      * @return 审批意见信息
      */
-    public static Map<String, String> getCommentNew(String nodeInstanceId, String userId, MyJdbcTemplate myJdbcTemplate, String procInstId, String userName) {
+    public static Map<String, String> getCommentNew(String nodeInstanceId, String userId, MyJdbcTemplate myJdbcTemplate, String procInstId) {
         Map<String,String> map = new HashMap<>();
         String sql = "select a.USER_COMMENT,a.USER_ATTACHMENT from wf_task a " +
                 "left join wf_node_instance b on a.WF_NODE_INSTANCE_ID = b.id and b.status = 'ap' " +
@@ -622,17 +622,19 @@ public class ProcessCommon {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         String pmPrjIds = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
-        String csCommId = entityRecord.csCommId;
-        String[] prjArr = pmPrjIds.split(",");
-        if (prjArr.length > 0){
-            String detailCode = entCode + "_PRJ_DETAIL";
-            String parentId = entCode + "_ID";
-            Crud.from(detailCode).where().eq(parentId,csCommId).delete().exec();
-            for (String tp : prjArr) {
-                String id = Crud.from(detailCode).insertData();
-                Crud.from(detailCode).where().eq("ID",id).update()
-                        .set(parentId,csCommId).set("PM_PRJ_ID",tp)
-                        .exec();
+        if (!SharedUtil.isEmptyString(pmPrjIds)){
+            String csCommId = entityRecord.csCommId;
+            String[] prjArr = pmPrjIds.split(",");
+            if (prjArr.length > 0){
+                String detailCode = entCode + "_PRJ_DETAIL";
+                String parentId = entCode + "_ID";
+                Crud.from(detailCode).where().eq(parentId,csCommId).delete().exec();
+                for (String tp : prjArr) {
+                    String id = Crud.from(detailCode).insertData();
+                    Crud.from(detailCode).where().eq("ID",id).update()
+                            .set(parentId,csCommId).set("PM_PRJ_ID",tp)
+                            .exec();
+                }
             }
         }
     }
@@ -699,4 +701,101 @@ public class ProcessCommon {
         }
         return matterTypeId;
     }
+
+/**====================================================================================================================**/
+/**==========================================更新流程主表单字段开始========================================================**/
+/**====================================================================================================================**/
+
+     /**
+     * 流程审批意见回显通用方法
+     * @param colCode 回显字段
+     * @param map 数据源集合
+     * @param comment 本次审批提交意见
+     * @param entCode 需要更新的表名
+     * @param csCommId 更新的表的id
+     * @param userName 本次操作人员名称
+     */
+    public static void updateComment(String colCode, Map<String, Object> map, String comment, String entCode, String csCommId, String userName) {
+        //获取流程中的意见信息
+        String processComment = JdbcMapUtil.getString(map,colCode);
+        //生成最终的意见信息
+        String commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+        updateProcColsValue(colCode,entCode,csCommId,commentEnd);
+    }
+
+    /**
+     * 流程审批拒绝，清空某一字段
+     * @param colCode 回显字段
+     * @param entCode 需要更新的表
+     * @param csCommId 需要更新的表的id
+     * @param value 需要更新的值
+     */
+    public static void updateProcColsValue(String colCode, String entCode, String csCommId, String value) {
+        Crud.from(entCode).where().eq("id",csCommId).update()
+                .set(colCode,value).exec();
+    }
+
+/**====================================================================================================================**/
+/**==========================================更新流程主表单字段结束========================================================**/
+/**====================================================================================================================**/
+
+/**====================================================================================================================**/
+/**==========================================通用-历史数据处理开始*========================================================**/
+/**====================================================================================================================**/
+
+    /**
+     * 流程历史数据处理-所有未作废数据写入项目明细表
+     */
+    public void prjDetailInsert(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        String sql = "select * from " + entCode + " where status not in ('VD','VDING') ";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        if (!CollectionUtils.isEmpty(list)){
+            String detailCode = entCode + "_PRJ_DETAIL";
+            String parentId = entCode + "_ID";
+            for (Map<String, Object> map : list) {
+                String reqId = JdbcMapUtil.getString(map,"ID");
+                String prjIds = JdbcMapUtil.getString(map,"PM_PRJ_IDS");
+                if (StringUtils.hasText(prjIds)){
+                    Crud.from(detailCode).where().eq(parentId,reqId).delete().exec();
+                    String[] prjArr = prjIds.split(",");
+                    for (String prjId : prjArr) {
+                        String id = Crud.from(detailCode).insertData();
+                        Crud.from(detailCode).where().eq("ID",id).update()
+                                .set(parentId,reqId)
+                                .set("PM_PRJ_ID",prjId)
+                                .exec();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 流程历史数据处理-更新流程业务表name字段
+     */
+    public void updateProcName(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        String sql = "select * from " + entCode + " where status not in ('VD','VDING') ";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        if (!CollectionUtils.isEmpty(list)){
+            for (Map<String, Object> map : list) {
+                String reqId = JdbcMapUtil.getString(map,"ID");
+                String processInstanceId = JdbcMapUtil.getString(map,"LK_WF_INST_ID");
+                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList("select name from wf_process_instance where id = ?",processInstanceId);
+                if (!CollectionUtils.isEmpty(list2)){
+                    String name = JdbcMapUtil.getString(list2.get(0),"name");
+                    Crud.from(entCode).where().eq("ID",reqId).update().set("NAME",name).exec();
+                }
+            }
+        }
+    }
+
+
+/**====================================================================================================================**/
+/**==========================================通用-历史数据处理结束*========================================================**/
+/**====================================================================================================================**/
+
 }

@@ -65,8 +65,8 @@ public class AttLinkDifferentProcess {
         list.add("PO_PUBLIC_BID_REQ"); // 采购公开招标申请
         list.add("PM_CONSTRUCT_PERMIT_REQ"); // 施工许可
         list.add("PM_PRJ_PLANNING_PERMIT_REQ"); // 工程规划许可
-        list.add("PO_GUARANTEE_LETTER_REQUIRE_REQ"); // 新增保函申请
-        list.add("PO_GUARANTEE_LETTER_RETURN_OA_REQ"); // 保函退还申请
+//        list.add("PO_GUARANTEE_LETTER_REQUIRE_REQ"); // 新增保函申请
+//        list.add("PO_GUARANTEE_LETTER_RETURN_OA_REQ"); // 保函退还申请
 //        list.add("PO_ORDER_SUPPLEMENT_REQ"); // 采购合同补充协议申请
 //        list.add("PO_ORDER_TERMINATE_REQ"); // 采购合同终止申请
         list.add("PO_ORDER_CHANGE_REQ"); // 采购合同变更申请
@@ -344,6 +344,16 @@ public class AttLinkDifferentProcess {
         list.add("PM_CONTROL_FLOOD_REQ"); //防洪评价
         list.add("PM_TERMITE_CONTROL_REQ"); //白蚁防治
         list.add("PM_TOPSOIL_STRIPPING_REQ"); //耕作层剥离
+        return list;
+    }
+
+    /**
+     * 项目类型属性联动-结果不可改
+     * @return 结果集
+     */
+    public static List<String> getUnEditList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_TOPSOIL_STRIPPING_REQ"); // 耕作层剥离
         return list;
     }
 }

@@ -26,4 +26,17 @@
           AND A.POST_INFO_ID = '1633997482885255168'
           AND b.PROJECT_SOURCE_TYPE_ID = '0099952822476441374'
     </select>
+
+    <!--根据项目id查询项目名称-->
+    <select id="getProjectNameById" resultType="String">
+        select name from pm_prj where id = #{projectId}
+    </select>
+
+    <!--根据项目id数组查询项目名称-->
+    <select id="getProjectNameByIdArr" resultType="String">
+        select group_concat(name) from pm_prj where id in
+            <foreach collection="list" index="index" close=")" open="(" separator="," item="item">
+                #{item}
+            </foreach>
+    </select>
 </mapper>

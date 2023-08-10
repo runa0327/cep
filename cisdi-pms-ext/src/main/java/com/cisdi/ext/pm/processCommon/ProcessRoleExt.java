@@ -5,6 +5,7 @@ import com.cisdi.ext.base.PmProcessPostConExt;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.HrDept;
+import com.cisdi.ext.model.WfTask;
 import com.cisdi.ext.model.base.AdRoleUser;
 import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.pm.office.PmPostAppointExt;
@@ -627,6 +628,13 @@ public class ProcessRoleExt {
     }
 
     /**
+     * 查询任意流程选择的采购岗用户
+     */
+    public void getProcessPurchaseUser(){
+        getDeptUser("AD_USER_TWENTY_ONE_ID","post_buy","采购岗");
+    }
+
+    /**
      * 查询任意流程的任意岗位人员
      */
     public void getUserIds(){
@@ -993,5 +1001,37 @@ public class ProcessRoleExt {
         List<AdRoleUser> list = AdRoleUser.selectByWhere(new Where().eq(AdRoleUser.Cols.AD_USER_ID,userId)
                 .eq(AdRoleUser.Cols.AD_ROLE_ID,roleId));
         return !CollectionUtils.isEmpty(list);
+    }
+
+
+    /**
+     * 获取流程第一个财务审批人
+     */
+    public void getFirstFinanceUser(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String processInstanceId = ExtJarHelper.procInstId.get();
+        List<WfTask> userList = WfTask.selectByWhere(new Where().eq(WfTask.Cols.WF_PROCESS_INSTANCE_ID,processInstanceId)
+                .eq(WfTask.Cols.STATUS,"AP").eq(WfTask.Cols.IS_CLOSED,1).eq(WfTask.Cols.WF_TASK_TYPE_ID,"TODO"));
+        List<String> user = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(userList)){
+            userList = userList.stream().filter(p->p.getActDatetime() != null).sorted(Comparator.comparing(WfTask::getActDatetime)).collect(Collectors.toList());
+            String sql = "select DISTINCT(b.name) as deptName from hr_dept_user a left join hr_dept b on a.HR_DEPT_ID = b.id where a.AD_USER_ID = ?";
+            tp:for (WfTask tmp : userList) {
+                String userId = tmp.getAdUserId();
+                List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,userId);
+                if (!CollectionUtils.isEmpty(list)){
+                    for (Map<String, Object> p : list) {
+                        if (JdbcMapUtil.getString(p,"deptName").contains("财务")){
+                            user.add(userId);
+                            break tp;
+                        }
+                    }
+                }
+            }
+            if (!CollectionUtils.isEmpty(user)){
+                ExtJarHelper.returnValue.set(user);
+            }
+        }
+
     }
 }

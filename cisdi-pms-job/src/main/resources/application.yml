@@ -1,3 +1,7 @@
+cisdi:
+  winProfile: D:\cisdi
+  linuxProfile: /data/qygly/uploadOrDownload/
+
 server:
   port: 11115
   servlet:

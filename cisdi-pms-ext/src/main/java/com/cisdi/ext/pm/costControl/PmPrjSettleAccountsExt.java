@@ -133,7 +133,7 @@ public class PmPrjSettleAccountsExt {
                 //项目id
                 String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
                 //获取审批意见信息
-                Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
+                Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId);
                 //审批意见内容
                 String comment = message.get("comment");
                 if ("chargeCheckOk".equals(nodeStatus)){ //2-部门主管意见-通过
