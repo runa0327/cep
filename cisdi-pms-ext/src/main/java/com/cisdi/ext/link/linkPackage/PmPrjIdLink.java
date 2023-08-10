@@ -196,9 +196,12 @@ public class PmPrjIdLink {
                 AttLinkExtDetail.attLinkResultAddValue(tmp.getValue(), tmp.getKey(), tmp.getType(), attLinkResult);
             } else {
                 String value = tmp.getValue();
-                bigValue = StringUtils.hasText(value) ? new BigDecimal(value) : bigValue;
-                LinkUtils.mapAddAllValue(tmp.getKey(),AttDataTypeE.TEXT_LONG,bigValue,value,true,false,false,attLinkResult);
-//                AttLinkExtDetail.attLinkResultAddValue(tmp.getValue(), tmp.getValue(), tmp.getKey(), tmp.getType(), attLinkResult);
+                if (value.matches("[0-9]*\\.?[0-9]+")){
+                    bigValue = StringUtils.hasText(value) ? new BigDecimal(value) : bigValue;
+                    LinkUtils.mapAddAllValue(tmp.getKey(),AttDataTypeE.TEXT_LONG,bigValue,value,true,false,false,attLinkResult);
+                } else {
+                    AttLinkExtDetail.attLinkResultAddValue(value, value, tmp.getKey(), tmp.getType(), attLinkResult);
+                }
             }
         }
         //历史结算信息汇总模块 处理显示
