@@ -27,6 +27,53 @@ import java.util.stream.Collectors;
  */
 public class ProjectHomeExt {
 
+
+    /**
+     * 项目信息
+     */
+    public void projectInfo() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pm.name as `NAME`,g1.name as mode,pm.PRJ_SITUATION as des,g2.name as location ,g3.`NAME` as source,g4.`NAME` as type,\n" +
+                "PLAN_START_TIME,PLAN_END_TIME,g5.`NAME` as tender,ACTUAL_START_TIME,ACTUAL_END_TIME,\n" +
+                "p1.`NAME` as js, p2.`NAME` as kc, p3.`NAME` as sj, p4.`NAME` as sg, p5.`NAME` as jl from pm_prj pm \n" +
+                "left join gr_set_value g1 on g1.id = pm.PRJ_MANAGE_MODE_ID\n" +
+                "left join gr_set_value g2 on g2.id = pm.BASE_LOCATION_ID\n" +
+                "left join gr_set_value g3 on g3.id = pm.INVESTMENT_SOURCE_ID\n" +
+                "left join gr_set_value g4 on g4.id = pm.PROJECT_TYPE_ID\n" +
+                "left join gr_set_value g5 on g5.id = pm.TENDER_MODE_ID\n" +
+                "left join pm_party p1 on p1.id = pm.BUILDER_UNIT\n" +
+                "left join pm_party p2 on p2.id = pm.SURVEYOR_UNIT\n" +
+                "left join pm_party p3 on p3.id = pm.DESIGNER_UNIT\n" +
+                "left join pm_party p4 on p4.id = pm.CONSTRUCTOR_UNIT\n" +
+                "left join pm_party p5 on p5.id = pm.SUPERVISOR_UNIT\n" +
+                "where pm.id=?", map.get("projectId"));
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> mapDate = list.get(0);
+            projectInfo info = new projectInfo();
+            info.name = JdbcMapUtil.getString(mapDate, "NAME");
+            info.mode = JdbcMapUtil.getString(mapDate, "mode");
+            info.description = JdbcMapUtil.getString(mapDate, "des");
+            info.location = JdbcMapUtil.getString(mapDate, "location");
+            info.source = JdbcMapUtil.getString(mapDate, "source");
+            info.type = JdbcMapUtil.getString(mapDate, "type");
+            info.planBeginTime = StringUtil.withOutT(JdbcMapUtil.getString(mapDate, "PLAN_START_TIME"));
+            info.planEndTime = StringUtil.withOutT(JdbcMapUtil.getString(mapDate, "PLAN_END_TIME"));
+            info.tenderType = JdbcMapUtil.getString(mapDate, "tender");
+            info.actualBeginTime = StringUtil.withOutT(JdbcMapUtil.getString(mapDate, "ACTUAL_START_TIME"));
+            info.actualEndTime = StringUtil.withOutT(JdbcMapUtil.getString(mapDate, "ACTUAL_END_TIME"));
+            info.jsUnit = JdbcMapUtil.getString(mapDate, "js");
+            info.kcUnit = JdbcMapUtil.getString(mapDate, "kc");
+            info.sjUnit = JdbcMapUtil.getString(mapDate, "sj");
+            info.sgUnit = JdbcMapUtil.getString(mapDate, "sg");
+            info.jlUnit = JdbcMapUtil.getString(mapDate, "jl");
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(info), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        } else {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        }
+    }
+
     /**
      * 项目总投资
      */
@@ -44,14 +91,14 @@ public class ProjectHomeExt {
         if (!CollectionUtils.isEmpty(dataList)) {
             totalAmt = new BigDecimal(String.valueOf(dataList.get(0).get("PRJ_TOTAL_INVEST")));
         }
-        totalAmt = BigDecimalUtil.divide(totalAmt,new BigDecimal(10000));
+        totalAmt = BigDecimalUtil.divide(totalAmt, new BigDecimal(10000));
         //今年计划投资-取投资计划汇总
         int currentYear = LocalDate.now().getYear();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(AMT,0) as AMT from PM_INVESTMENT_YEAR_PLAN where PM_PRJ_ID =? and `year`=?", projectId, currentYear);
         if (!CollectionUtils.isEmpty(list)) {
             planAmt = new BigDecimal(String.valueOf(list.get(0).get("AMT")));
         }
-        planAmt = BigDecimalUtil.divide(planAmt,new BigDecimal(10000));
+        planAmt = BigDecimalUtil.divide(planAmt, new BigDecimal(10000));
         //今年完成投资-取纳统汇总
         String sql = " select id,\n" +
                 "        PM_PRJ_ID,\n" +
@@ -178,7 +225,7 @@ public class ProjectHomeExt {
     /**
      * 获取项目地块信息
      */
-    public void getMapData(){
+    public void getMapData() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String projectId = String.valueOf(map.get("projectId"));
         List<parcel> parcelList = getParcel(projectId);
@@ -228,7 +275,6 @@ public class ProjectHomeExt {
         }
         return res;
     }
-
 
 
     public static class OutSide {
@@ -313,6 +359,25 @@ public class ProjectHomeExt {
         public BigDecimal centerLatitude;
 
         public List<Point> pointList;
+    }
+
+    public static class projectInfo {
+        public String name;
+        public String mode;
+        public String description;
+        public String location;
+        public String source;
+        public String type;
+        public String planBeginTime;
+        public String planEndTime;
+        public String tenderType;
+        public String actualBeginTime;
+        public String actualEndTime;
+        public String jsUnit;
+        public String kcUnit;
+        public String sjUnit;
+        public String sgUnit;
+        public String jlUnit;
     }
 
 }
