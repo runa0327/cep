@@ -5,6 +5,7 @@ import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.*;
 import com.cisdi.ext.model.base.AdRoleUser;
 import com.cisdi.ext.model.base.BaseMatterTypeCon;
+import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
@@ -797,5 +798,60 @@ public class ProcessCommon {
 /**====================================================================================================================**/
 /**==========================================通用-历史数据处理结束*========================================================**/
 /**====================================================================================================================**/
+
+/**====================================================================================================================**/
+/**==========================================通用-流程监控数据刷新开始*====================================================**/
+/**====================================================================================================================**/
+
+    /**
+     * 刷新流程实例名称
+     */
+    public void updateName(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+
+        //刷项目名称
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList("select id from pm_prj order by id asc");
+        if (!CollectionUtils.isEmpty(list1)){
+            for (int i = 0; i < list1.size(); i++) {
+                Crud.from("PM_PRJ").where().eq("ID",JdbcMapUtil.getString(list1.get(i),"id")).update()
+                        .set("name","项目-"+(i+1)).exec();
+            }
+        }
+
+        // 刷新员工名称
+        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList("select id from ad_user order by id asc");
+        if (!CollectionUtils.isEmpty(list2)){
+            for (int i = 0; i < list2.size(); i++) {
+                Crud.from("AD_USER").where().eq("ID",JdbcMapUtil.getString(list2.get(i),"id")).update()
+                        .set("name","员工-"+(i+1)).exec();
+            }
+        }
+
+        // 刷新流程实例
+        List<WfProcessInstance> list3 = WfProcessInstance.selectByWhere(new Where().eq(WfProcessInstance.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list3)){
+            String nowDate = "",name = "";
+            for (WfProcessInstance tmp : list3) {
+                String id = tmp.getId();
+                name = tmp.getName();
+                if (!name.contains("历史数据导入")){
+                    nowDate = name.substring(name.length()-20);
+                }
+                name = "流程实例" + nowDate;
+                Crud.from(WfProcessInstance.ENT_CODE).where().eq("ID",id).update()
+                        .set("NAME",name).exec();
+            }
+        }
+
+        // 刷新业主单位
+        List<Map<String,Object>> list4 = myJdbcTemplate.queryForList("select id from PM_PARTY order by id asc");
+        if (!CollectionUtils.isEmpty(list4)){
+            for (int i = 0; i < list4.size(); i++) {
+                Crud.from("PM_PARTY").where().eq("ID",JdbcMapUtil.getString(list4.get(i),"id")).update()
+                        .set("name","合作方-"+(i+1)).exec();
+            }
+        }
+    }
+
 
 }
