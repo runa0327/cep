@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -119,7 +120,7 @@ public class PoGuaranteeLetterRequireReqServiceImpl implements PoGuaranteeLetter
     public void exportList(List<PoGuaranteeLetterRequireReq> list, String title, HttpServletResponse response) {
         String filePath = cisdiUtils.getDownLoadPath();
         Workbook workbook = new XSSFWorkbook();
-        OutputStream outputStream;
+        OutputStream outputStream = null;
         try {
             Sheet sheet = workbook.createSheet(title);
             sheet.setDefaultColumnWidth(30);
@@ -240,6 +241,19 @@ public class PoGuaranteeLetterRequireReqServiceImpl implements PoGuaranteeLetter
 
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            try {
+                workbook.close();
+            } catch (IOException e1){
+                e1.printStackTrace();
+            }
+            if (outputStream != null){
+                try {
+                    outputStream.close();
+                } catch (IOException e2){
+                    e2.printStackTrace();
+                }
+            }
         }
     }
 

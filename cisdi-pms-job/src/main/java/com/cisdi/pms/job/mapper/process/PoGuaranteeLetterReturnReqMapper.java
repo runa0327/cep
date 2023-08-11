@@ -12,5 +12,12 @@ public interface PoGuaranteeLetterReturnReqMapper {
      * @param poGuaranteeLetterReturnReq poGuaranteeLetterReturnReq实体
      * @return 查询结果
      */
-    List<PoGuaranteeLetterRequireReq> getSysMesList(PoGuaranteeLetterReturnReq poGuaranteeLetterReturnReq);
+    List<PoGuaranteeLetterReturnReq> getSysMesList(PoGuaranteeLetterReturnReq poGuaranteeLetterReturnReq);
+
+    /**
+     * 查询非系统类结果
+     * @param poGuaranteeLetterReturnReq poGuaranteeLetterReturnReq实体
+     * @return 查询结果
+     */
+    List<PoGuaranteeLetterReturnReq> getNotSysMesList(PoGuaranteeLetterReturnReq poGuaranteeLetterReturnReq);
 }

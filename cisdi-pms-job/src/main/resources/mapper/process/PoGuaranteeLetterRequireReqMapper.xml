@@ -71,7 +71,7 @@
         a.GUARANTEE_MECHANISM as guaranteeMechanism,
         a.GUARANTEE_LETTER_TYPE_ID as guaranteeLetterTypeId,
         a.GUARANTEE_CODE as guaranteeCode,
-        a.GUARANTEE_AMT as guaranteeAmt,
+        a.AMT_SIX as guaranteeAmt,
         a.GUARANTEE_START_DATE as guaranteeStartDate,
         a.GUARANTEE_END_DATE as guaranteeEndDate,
         concat(a.FINANCE_MESSAGE,a.COMMENT_PUBLISH_CONTENT) as checkRemark,
@@ -94,7 +94,7 @@
 
     <sql id="commonFilter">
         <if test="guaranteeLetterTypeId != null and guaranteeLetterTypeId != ''">
-            and a.GUARANTEE_DATE_TYPE_ID = #{guaranteeLetterTypeId}
+            and a.GUARANTEE_LETTER_TYPE_ID = #{guaranteeLetterTypeId}
         </if>
         <if test="guaranteeStartDate != null and guaranteeStartDate != ''">
             and a.GUARANTEE_START_DATE >= #{guaranteeStartDate}
@@ -124,10 +124,10 @@
             and a.supplier like concat('%',#{supplier},'%')
         </if>
         <if test="guaranteeAmtMin != null">
-            and a.GUARANTEE_AMT >= #{guaranteeAmtMin}
+            and a.AMT_SIX >= #{guaranteeAmtMin}
         </if>
         <if test="guaranteeAmtMax != null">
-            <![CDATA[ and a.GUARANTEE_AMT <= #{guaranteeAmtMax} ]]>
+            <![CDATA[ and a.AMT_SIX <= #{guaranteeAmtMax} ]]>
         </if>
     </sql>
 
