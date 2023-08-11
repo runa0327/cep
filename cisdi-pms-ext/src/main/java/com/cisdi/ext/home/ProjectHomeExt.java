@@ -90,17 +90,17 @@ public class ProjectHomeExt {
             Map<String, Object> mapData = dataList.get(0);
             totalAmt = new BigDecimal(String.valueOf(mapData.get("PRJ_TOTAL_INVEST")));
             List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(amt,0) as amt from pm_invest_est_dtl dt left join pm_exp_type et on dt.PM_EXP_TYPE_ID = et.id where et.`CODE`='CONSTRUCT_AMT' and PM_INVEST_EST_ID=? ", mapData.get("id"));
-            if(!CollectionUtils.isEmpty(list)){
-                Map<String, Object> jaMapData = dataList.get(0);
-                jaAmt =  new BigDecimal(String.valueOf(jaMapData.get("amt")));
+            if (!CollectionUtils.isEmpty(list)) {
+                Map<String, Object> jaMapData = list.get(0);
+                jaAmt = new BigDecimal(String.valueOf(jaMapData.get("amt")));
             }
 
         }
 
         OutSide outSide = new OutSide();
-        outSide.totalAmt = totalAmt;
-        outSide.jaAmt = jaAmt;
-        outSide.jaCompleteAmt = jaCompleteAmt;
+        outSide.totalAmt = totalAmt.multiply(new BigDecimal(10000));
+        outSide.jaAmt = jaAmt.multiply(new BigDecimal(10000));
+        outSide.jaCompleteAmt = jaCompleteAmt.multiply(new BigDecimal(10000));
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
@@ -352,4 +352,52 @@ public class ProjectHomeExt {
         public String jlUnit;
     }
 
+    /**
+     * 施工进度
+     */
+    public void constructionProgress() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select round(ifnull(VISUAL_PROGRESS,0),2) as VISUAL_PROGRESS,ifnull(FILE_ID_ONE,'') as FILE_ID_ONE,DATE,LAST_MODI_DT from PM_PROGRESS_WEEKLY_PRJ_DETAIL where PM_PRJ_ID=? order by LAST_MODI_DT desc", map.get("projectId"));
+        if (!CollectionUtils.isEmpty(list)) {
+            DataInfo info = new DataInfo();
+            Map<String, Object> mapData = list.get(0);
+            info.imageProcess = JdbcMapUtil.getString(mapData, "VISUAL_PROGRESS");
+            List<FileObj> fileObjList = new ArrayList<>();
+            List<String> fileIds = list.stream().map(p -> JdbcMapUtil.getString(p, "FILE_ID_ONE")).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(fileIds)) {
+                String objs = Strings.join(fileIds, ',');
+                List<String> ids = Arrays.asList(objs.split(","));
+                MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+                Map<String, Object> queryParams = new HashMap<>();// 创建入参map
+                queryParams.put("ids", ids);
+                List<Map<String, Object>> fileList = myNamedParameterJdbcTemplate.queryForList("select ff.ID as ID, DSP_NAME,SIZE_KB,UPLOAD_DTTM,au.`NAME` as USER_NAME,FILE_INLINE_URL,FILE_ATTACHMENT_URL from fl_file ff left join ad_user au on ff.CRT_USER_ID = au.id  where ff.id in (:ids)", queryParams);
+                AtomicInteger index = new AtomicInteger(0);
+                fileObjList = fileList.stream().map(p -> {
+                    FileObj obj = new FileObj();
+                    obj.num = index.getAndIncrement() + 1;
+                    obj.fileName = JdbcMapUtil.getString(p, "DSP_NAME");
+                    obj.fileSize = JdbcMapUtil.getString(p, "SIZE_KB");
+                    obj.uploadUser = JdbcMapUtil.getString(p, "USER_NAME");
+                    obj.uploadDate = StringUtil.withOutT(JdbcMapUtil.getString(p, "UPLOAD_DTTM"));
+                    obj.id = JdbcMapUtil.getString(p, "ID");
+                    obj.viewUrl = JdbcMapUtil.getString(p, "FILE_INLINE_URL");
+                    obj.downloadUrl = JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
+                    return obj;
+                }).collect(Collectors.toList());
+                info.fileObjList = fileObjList;
+            }
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(info), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        } else {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        }
+    }
+
+
+    public static class DataInfo {
+        public String imageProcess;
+
+        public List<FileObj> fileObjList;
+    }
 }
