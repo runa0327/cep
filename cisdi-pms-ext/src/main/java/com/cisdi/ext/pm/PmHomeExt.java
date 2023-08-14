@@ -27,7 +27,7 @@ public class PmHomeExt {
     /**
      * 项目详情
      */
-    public void proViewInfo(){
+    public void proViewInfo() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pm.id as ID,  PRJ_CODE as no, pm.`NAME`,g1.`NAME` as type,g2.`NAME` as source,PRJ_REPLY_NO,PRJ_REPLY_DATE,pp.`NAME` ownner ,g3.`NAME` as mode ,FLOOR_AREA,\n" +
@@ -67,7 +67,7 @@ public class PmHomeExt {
             info.planEndTime = StringUtil.withOutT(JdbcMapUtil.getString(mapData, "PLAN_END_TIME"));
             info.actualBeginTime = StringUtil.withOutT(JdbcMapUtil.getString(mapData, "ACTUAL_START_TIME"));
             info.actualEndTime = StringUtil.withOutT(JdbcMapUtil.getString(mapData, "ACTUAL_END_TIME"));
-            info.imageProcess = JdbcMapUtil.getString(mapData, "0");
+            info.imageProcess = getImageProcess(JdbcMapUtil.getString(map,"projectId"));
             info.step = JdbcMapUtil.getString(mapData, "phase");
             info.jsUnit = JdbcMapUtil.getString(mapData, "js");
             info.kcUnit = JdbcMapUtil.getString(mapData, "kc");
@@ -110,7 +110,7 @@ public class PmHomeExt {
             info.planEndTime = StringUtil.withOutT(JdbcMapUtil.getString(mapData, "PLAN_END_TIME"));
             info.actualBeginTime = StringUtil.withOutT(JdbcMapUtil.getString(mapData, "ACTUAL_START_TIME"));
             info.actualEndTime = StringUtil.withOutT(JdbcMapUtil.getString(mapData, "ACTUAL_END_TIME"));
-            info.imageProcess = JdbcMapUtil.getString(mapData, "0");
+            info.imageProcess = getImageProcess(JdbcMapUtil.getString(map,"projectId"));
             info.step = JdbcMapUtil.getString(mapData, "TRANSITION_PHASE_ID");
             info.jsUnit = JdbcMapUtil.getString(mapData, "BUILDER_UNIT");
             info.kcUnit = JdbcMapUtil.getString(mapData, "SURVEYOR_UNIT");
@@ -315,6 +315,22 @@ public class PmHomeExt {
     public static class Party {
         public String id;
         public String name;
+    }
+
+    /**
+     * 查询形象进度
+     * @param projectId
+     * @return
+     */
+    private String getImageProcess(String projectId) {
+        String imageProcess = "0";
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select round(ifnull(VISUAL_PROGRESS,0),2) as VISUAL_PROGRESS from PM_PROGRESS_WEEKLY_PRJ_DETAIL where PM_PRJ_ID=? and FILE_ID_ONE is not null order by LAST_MODI_DT desc", projectId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> mapData = list.get(0);
+            imageProcess = JdbcMapUtil.getString(mapData, "VISUAL_PROGRESS");
+        }
+        return imageProcess;
     }
 
 }
