@@ -358,7 +358,7 @@ public class ProjectHomeExt {
     public void constructionProgress() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select round(ifnull(VISUAL_PROGRESS,0),2) as VISUAL_PROGRESS,ifnull(FILE_ID_ONE,'') as FILE_ID_ONE,DATE,LAST_MODI_DT from PM_PROGRESS_WEEKLY_PRJ_DETAIL where PM_PRJ_ID=? order by LAST_MODI_DT desc", map.get("projectId"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select round(ifnull(VISUAL_PROGRESS,0),2) as VISUAL_PROGRESS,ifnull(FILE_ID_ONE,'') as FILE_ID_ONE,DATE,LAST_MODI_DT from PM_PROGRESS_WEEKLY_PRJ_DETAIL where PM_PRJ_ID=? and FILE_ID_ONE is not null order by LAST_MODI_DT desc", map.get("projectId"));
         if (!CollectionUtils.isEmpty(list)) {
             DataInfo info = new DataInfo();
             Map<String, Object> mapData = list.get(0);
