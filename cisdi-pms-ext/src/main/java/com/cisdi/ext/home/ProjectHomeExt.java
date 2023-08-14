@@ -98,9 +98,9 @@ public class ProjectHomeExt {
         }
 
         OutSide outSide = new OutSide();
-        outSide.totalAmt = totalAmt.multiply(new BigDecimal(10000));
-        outSide.jaAmt = jaAmt.multiply(new BigDecimal(10000));
-        outSide.jaCompleteAmt = jaCompleteAmt.multiply(new BigDecimal(10000));
+        outSide.totalAmt = totalAmt;
+        outSide.jaAmt = jaAmt;
+        outSide.jaCompleteAmt = jaCompleteAmt;
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
     }
