@@ -1,12 +1,16 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.designManage;
 
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.model.base.PmPrj;
+import com.cisdi.ext.pm.PmInLibraryExt;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import org.springframework.util.StringUtils;
+
+import java.util.Map;
 
 /**
  * 方案设计-扩展
@@ -17,19 +21,36 @@ public class PmDesignAssignmentExt {
      * 流程-方案设计-结束时校验
      */
     public void designAssignmentEndCheck(){
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+//        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //流程表名
-        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+//        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        Map<String,Object> map = entityRecord.valueMap;
         //项目id
-        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
-        //获取设计单位名称
-        String designUnitOne = JdbcMapUtil.getString(entityRecord.valueMap,"DESIGN_UNIT_ONE");
+        String projectId = JdbcMapUtil.getString(map,"PM_PRJ_ID");
         //更新写入勘察信息
-        String partyId = PmInLibraryExt.createOrUpdateParty(designUnitOne,"IS_DESIGNER");
-        //更新项目设计单位信息
-        PmPrj pmPrj = appointValue(projectId,partyId);
-        PmPrjExt.updateData(pmPrj);
+        //获取设计单位名称
+//        String designUnitOne = JdbcMapUtil.getString(map,"DESIGN_UNIT_ONE");
+        //更新项目设计单位信息 2023-08-14废弃 设计单位从合同签订取数
+//        String partyId = PmInLibraryExt.createOrUpdateParty(designUnitOne,"IS_DESIGNER");
+//        PmPrj pmPrj = appointValue(projectId,partyId);
+//        PmPrjExt.updateData(pmPrj);
+
+        // 效果图
+        String rendering = JdbcMapUtil.getString(map,"DESIGN_SKETCH_FILE_ONE");
+        // 效果图写入项目库
+        renderImgToPrj(rendering,projectId);
+    }
+
+    /**
+     * 效果图写入项目库
+     * @param rendering 效果图
+     * @param projectId 项目id
+     */
+    private void renderImgToPrj(String rendering, String projectId) {
+        if (StringUtils.hasText(rendering)){
+            PmPrjExt.updatePrjImg(rendering,projectId);
+        }
     }
 
     /**
