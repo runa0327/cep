@@ -32,7 +32,7 @@ public class PmHomeExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pm.id as ID,  PRJ_CODE as no, pm.`NAME`,g1.`NAME` as type,g2.`NAME` as source,PRJ_REPLY_NO,PRJ_REPLY_DATE,pp.`NAME` ownner ,g3.`NAME` as mode ,FLOOR_AREA,\n" +
                 "g4.`NAME` as tender,g5.`NAME` as location ,pm.PRJ_SITUATION as des,PLAN_START_TIME,PLAN_END_TIME,ACTUAL_START_TIME,ACTUAL_END_TIME, \n" +
-                "g6.`NAME` as phase,p1.`NAME` as js, p2.`NAME` as kc, p3.`NAME` as sj, p4.`NAME` as sg, p5.`NAME` as jl,p6.`NAME` as zjunit  from pm_prj pm\n" +
+                "g6.`NAME` as phase,p1.`NAME` as js, p2.`NAME` as kc, p3.`NAME` as sj, p4.`NAME` as sg, p5.`NAME` as jl,p6.`NAME` as zj  from pm_prj pm\n" +
                 "left join gr_set_value g1 on g1.id = pm.PROJECT_TYPE_ID\n" +
                 "left join gr_set_value g2 on g2.id = pm.INVESTMENT_SOURCE_ID\n" +
                 "left join pm_party pp on pp.id = pm.CUSTOMER_UNIT\n" +
