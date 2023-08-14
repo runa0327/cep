@@ -1,5 +1,9 @@
 package com.cisdi.pms.job.utils;
 
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.http.MediaType;
+
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
@@ -98,5 +102,45 @@ public class FileUtils {
     {
         String encode = URLEncoder.encode(s, StandardCharsets.UTF_8.toString());
         return encode.replaceAll("\\+", "%20");
+    }
+
+    /**
+     * poi文件下载到前端
+     * @param filePath 文件路径
+     * @param title 文件名
+     * @param workbook 文件excel
+     * @param outputStream 输出流
+     * @param response response
+     */
+    public static void downLoadFile(String filePath, String title, Workbook workbook, OutputStream outputStream, HttpServletResponse response) {
+        String realFileName = title + ".xls";
+        String path = filePath + realFileName;
+        try {
+            outputStream = new FileOutputStream(path);
+            workbook.write(outputStream);
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            FileUtils.setAttachmentResponseHeader(response, realFileName);
+            File file = new File(path);
+            if (file.exists()){
+                file.delete();
+            }
+            FileUtils.writeBytes(path, response.getOutputStream());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }  finally {
+            try {
+                workbook.close();
+            } catch (IOException e1){
+                e1.printStackTrace();
+            }
+            if (outputStream != null){
+                try {
+                    outputStream.close();
+                } catch (IOException e2){
+                    e2.printStackTrace();
+                }
+            }
+        }
+
     }
 }

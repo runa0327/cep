@@ -1,11 +1,12 @@
 package com.cisdi.pms.job.domain.process;
 
+import com.cisdi.pms.job.domain.base.BaseCommon;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-public class PoGuaranteeLetterReturnReq {
+public class PoGuaranteeLetterReturnReq extends BaseCommon {
 
     //id
     private String id;
@@ -16,11 +17,17 @@ public class PoGuaranteeLetterReturnReq {
     // 保函类型名称
     private String guaranteeLetterTypeName;
 
+    // 其他保函名称
+    private String otherGuaranteeLetterName;
+
     // 费用类型id
     private String guaranteeCostTypeId;
 
     // 费用类型名称
     private String guaranteeCostTypeName;
+
+    // 其他费用类型名称
+    private String otherGuaranteeCostName;
 
     // 项目id
     private String projectId;
@@ -102,4 +109,19 @@ public class PoGuaranteeLetterReturnReq {
 
     //财务分管领导意见
     private String commentFive;
+
+    // 流程标题
+    private String processInstanceName;
+
+    // 项目来源
+    private String projectSource;
+
+    // 保函到期类型id
+    private String guaranteeEndTypeId;
+
+    // 保函到期类型名称
+    private String guaranteeEndTypeName;
+
+    // 到期说明
+    private String guaranteeEndRemark;
 }

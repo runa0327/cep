@@ -110,6 +110,7 @@ public class PmPrjIdLink {
                     String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
                     AttLinkExtDetail.assignmentPrjYesNoOne(id, attLinkResult);
                 } else if ("PM_PRJ_SETTLE_ACCOUNTS".equals(entCode)) { // 项目结算审批
+                    AttLinkClear.clearSettleData(attLinkResult);
                     settlePrjLink(attLinkResult, attValue);
                 } else if ("PM_EXTENSION_REQUEST_REQ".equals(entCode)) { // 节点延期申请
                     handlePrjNode(attValue, myJdbcTemplate);

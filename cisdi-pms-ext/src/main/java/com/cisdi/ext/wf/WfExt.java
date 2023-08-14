@@ -335,7 +335,7 @@ public class WfExt {
     }
 
     /**
-     * 生成流程实例标题
+     * 暂存-生成流程实例标题
      */
     public void generateProInstanceName(){
 

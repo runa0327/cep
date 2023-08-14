@@ -36,6 +36,5 @@ public class CisdiUtils {
         } else {
             return getLinuxProfile() + "/download/";
         }
-
     }
 }

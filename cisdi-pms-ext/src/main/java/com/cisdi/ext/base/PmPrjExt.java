@@ -21,6 +21,7 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -469,5 +470,37 @@ public class PmPrjExt {
         Map<String, Object> result = new HashMap<>();
         result.put("prjList",list);
         ExtJarHelper.returnValue.set(result);
+    }
+
+    /**
+     * 更新项目效果图
+     * @param rendering 效果图地址
+     * @param projectId 项目id
+     */
+    public static void updatePrjImg(String rendering, String projectId) {
+        String imgUrl = null;
+        PmPrj pmPrj = PmPrj.selectById(projectId);
+        if (pmPrj != null){
+            String prjImg = pmPrj.getPrjImg();
+            if (StringUtils.hasText(prjImg)){
+                imgUrl = prjImg + "," + rendering;
+            } else {
+                imgUrl = rendering;
+            }
+        }
+        if (StringUtils.hasText(imgUrl)){
+            Crud.from("PM_PRJ").where().eq("ID",projectId).update().set(PmPrj.Cols.PRJ_IMG,imgUrl).exec();
+        }
+    }
+
+    /**
+     * 通用-动态根据字段更新值
+     * @param prj 项目id
+     * @param value 更新的值
+     * @param colCode 更新的字段
+     */
+    public static void updateOneColValue(String prj, String value, String colCode) {
+        Crud.from(PmPrj.ENT_CODE).where().eq(PmPrj.Cols.ID,prj).update()
+                .set(colCode,value).exec();
     }
 }

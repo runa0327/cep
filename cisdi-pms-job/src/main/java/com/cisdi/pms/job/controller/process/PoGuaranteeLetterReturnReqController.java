@@ -20,8 +20,21 @@ public class PoGuaranteeLetterReturnReqController {
     @Resource
     private PoGuaranteeLetterReturnReqService poGuaranteeLetterReturnReqService;
 
+    /**
+     * 保函退还导出
+     */
     @GetMapping(value = "/exportListMsg")
     public void exportListMsg(PoGuaranteeLetterReturnReq poGuaranteeLetterReturnReq, HttpServletResponse response){
         List<PoGuaranteeLetterReturnReq> list = poGuaranteeLetterReturnReqService.getAllList(poGuaranteeLetterReturnReq);
+        poGuaranteeLetterReturnReqService.exportListMsg(list,response,"保函退还导出");
+    }
+
+    /**
+     * 保函全字段导出
+     */
+    @GetMapping(value = "/exportAllMsg")
+    public void exportAllMsg(PoGuaranteeLetterReturnReq poGuaranteeLetterReturnReq, HttpServletResponse response){
+        List<PoGuaranteeLetterReturnReq> list = poGuaranteeLetterReturnReqService.getAllList(poGuaranteeLetterReturnReq);
+        poGuaranteeLetterReturnReqService.exportAllMsg(list,response,"保函全字段导出");
     }
 }
