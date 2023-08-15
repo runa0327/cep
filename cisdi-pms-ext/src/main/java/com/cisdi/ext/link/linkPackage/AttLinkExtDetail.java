@@ -18,6 +18,7 @@ import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -1200,6 +1201,7 @@ public class AttLinkExtDetail {
             mapAddBigDecimalValue("CUM_PAY_AMT_TWO","CUM_PAY_AMT_ONE",list.get(0),AttDataTypeE.DOUBLE,attLinkResult); //累计已支付金额
             mapAddBigDecimalValue("OVER_PAYED_PERCENT","CUMULATIVE_PAYED_PERCENT",list.get(0),AttDataTypeE.DOUBLE,attLinkResult); //已支付比例(%)
             mapAddValue("DATE_TWO","REPLY_DATE_SETTLE",list.get(0),AttDataTypeE.DATE,attLinkResult); //上次结算日期
+            String commentStr = JdbcMapUtil.getString(list.get(0),"TEXT_REMARK_ONE"); //结算内容
             Map<String,Object> map = getAllData(list);
             BigDecimal allPrjTotalAmt = (BigDecimal) map.get("allPrjTotalAmt"); //总投资
             BigDecimal allConstructAmt =(BigDecimal) map.get("allConstructAmt"); //建安工程费
@@ -1209,7 +1211,6 @@ public class AttLinkExtDetail {
             BigDecimal allLandAmt = (BigDecimal) map.get("allLandAmt"); //土地征拆费用
             BigDecimal allPrepareAmt = (BigDecimal) map.get("allPrepareAmt"); //预备费
             BigDecimal allConstructPeriodAmt = (BigDecimal) map.get("allConstructPeriodAmt"); //建设期利息
-            String comment = map.get("comment").toString(); //项目结算内容摘要
             String file1 = map.get("file1").toString(); //结算盖章文件
             String file2 = map.get("file2").toString(); //项目结算电子资料
             String file3 = map.get("file3").toString(); //其他附件
@@ -1222,7 +1223,7 @@ public class AttLinkExtDetail {
             LinkUtils.mapAddAllValue("LAND_AMT_HISTORY",AttDataTypeE.DOUBLE,allLandAmt,String.valueOf(allLandAmt),true,false,false,attLinkResult); //土地征拆费用
             LinkUtils.mapAddAllValue("PREPARE_AMT_HISTORY",AttDataTypeE.DOUBLE,allPrepareAmt,String.valueOf(allPrepareAmt),true,false,false,attLinkResult); //预备费
             LinkUtils.mapAddAllValue("CONSTRUCT_PERIOD_HISTORY",AttDataTypeE.DOUBLE,allConstructPeriodAmt,String.valueOf(allConstructPeriodAmt),true,false,false,attLinkResult); //建设期利息
-            LinkUtils.mapAddAllValue("TEXT_REMARK_TWO",AttDataTypeE.TEXT_LONG,comment,comment,true,false,false,attLinkResult); //项目结算内容摘要
+            LinkUtils.mapAddAllValue("TEXT_REMARK_TWO",AttDataTypeE.TEXT_LONG,commentStr,commentStr,true,false,false,attLinkResult); //项目结算内容摘要
             LinkUtils.mapAddValueByValueFile("FILE_ID_FOUR",file1,file1,true,false,true,AttDataTypeE.FILE_GROUP,attLinkResult); //项目结算电子资料
             LinkUtils.mapAddValueByValueFile("FILE_ID_FIVE",file2,file2,true,false,true,AttDataTypeE.FILE_GROUP,attLinkResult); //项目结算电子资料
             LinkUtils.mapAddValueByValueFile("FILE_ID_SIX",file3,file3,true,false,true,AttDataTypeE.FILE_GROUP,attLinkResult); //其他附件
@@ -1236,15 +1237,18 @@ public class AttLinkExtDetail {
      */
     public static Map<String, Object> getAllData(List<Map<String, Object>> list) {
         Map<String,Object> map = new HashMap<>();
-        BigDecimal allPrjTotalAmt = new BigDecimal(0);
-        BigDecimal allConstructAmt = new BigDecimal(0);
-        BigDecimal allPrjOtherAmt = new BigDecimal(0);
-        BigDecimal allEquipAmt = new BigDecimal(0);
-        BigDecimal allEquipmentAmt = new BigDecimal(0);
-        BigDecimal allLandAmt = new BigDecimal(0);
-        BigDecimal allPrepareAmt = new BigDecimal(0);
-        BigDecimal allConstructPeriodAmt = new BigDecimal(0);
-        StringBuilder comment = new StringBuilder();
+        BigDecimal allPrjTotalAmt = new BigDecimal(0); // 总投资
+        BigDecimal allConstructAmt = new BigDecimal(0); // 建安工程费 2023-08-15取消累加，取最新一次数据
+        String allConstructAmtStr = JdbcMapUtil.getString(list.get(0),"CONSTRUCT_AMT");
+        if (StringUtils.hasText(allConstructAmtStr)){
+            allConstructAmt = new BigDecimal(allConstructAmtStr).stripTrailingZeros();
+        }
+        BigDecimal allPrjOtherAmt = new BigDecimal(0); // 工程其他费用
+        BigDecimal allEquipAmt = new BigDecimal(0); // 设备采购费
+        BigDecimal allEquipmentAmt = new BigDecimal(0); // 科研设备费
+        BigDecimal allLandAmt = new BigDecimal(0); // 土地征拆费用
+        BigDecimal allPrepareAmt = new BigDecimal(0); // 预备费
+        BigDecimal allConstructPeriodAmt = new BigDecimal(0); // 建设期利息
         StringBuilder file1 = new StringBuilder();
         StringBuilder file2 = new StringBuilder();
         StringBuilder file3 = new StringBuilder();
@@ -1253,39 +1257,29 @@ public class AttLinkExtDetail {
             String allPrjTotalAmtStr = JdbcMapUtil.getString(tmp,"PRJ_TOTAL_INVEST");
             allPrjTotalAmt = allPrjTotalAmt.add(StringUtil.valueNullToBig(allPrjTotalAmtStr)).stripTrailingZeros();
 
-            //建安工程费
-            String allConstructAmtStr = JdbcMapUtil.getString(tmp,"CONSTRUCT_AMT");
-            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allConstructAmtStr)).stripTrailingZeros();
-
             //工程其他费用
             String allPrjOtherAmtStr = JdbcMapUtil.getString(tmp,"PROJECT_OTHER_AMT");
-            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allPrjOtherAmtStr)).stripTrailingZeros();
+            allPrjOtherAmt = allPrjOtherAmt.add(StringUtil.valueNullToBig(allPrjOtherAmtStr)).stripTrailingZeros();
 
             //设备采购费
             String allEquipAmtStr = JdbcMapUtil.getString(tmp,"EQUIP_AMT");
-            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allEquipAmtStr)).stripTrailingZeros();
+            allEquipAmt = allEquipAmt.add(StringUtil.valueNullToBig(allEquipAmtStr)).stripTrailingZeros();
 
             //科研设备费
             String allEquipmentAmtStr = JdbcMapUtil.getString(tmp,"EQUIPMENT_COST");
-            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allEquipmentAmtStr)).stripTrailingZeros();
+            allEquipmentAmt = allEquipmentAmt.add(StringUtil.valueNullToBig(allEquipmentAmtStr)).stripTrailingZeros();
 
             //土地征拆费用
             String allLandAmtStr = JdbcMapUtil.getString(tmp,"LAND_AMT");
-            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allLandAmtStr)).stripTrailingZeros();
+            allLandAmt = allLandAmt.add(StringUtil.valueNullToBig(allLandAmtStr)).stripTrailingZeros();
 
             //预备费
             String allPrepareAmtStr = JdbcMapUtil.getString(tmp,"PREPARE_AMT");
-            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allPrepareAmtStr)).stripTrailingZeros();
+            allPrepareAmt = allPrepareAmt.add(StringUtil.valueNullToBig(allPrepareAmtStr)).stripTrailingZeros();
 
             //建设期利息
             String allConstructPeriodAmtStr = JdbcMapUtil.getString(tmp,"CONSTRUCT_PERIOD_INTEREST");
-            allConstructAmt = allConstructAmt.add(StringUtil.valueNullToBig(allConstructPeriodAmtStr)).stripTrailingZeros();
-
-            //结算内容
-            String commentStr = JdbcMapUtil.getString(tmp,"TEXT_REMARK_ONE");
-            if (!SharedUtil.isEmptyString(commentStr)){
-                comment.append(JdbcMapUtil.getString(tmp,"REPLY_DATE_SETTLE")).append("结算内容： ").append(commentStr).append(";\n");
-            }
+            allConstructPeriodAmt = allConstructPeriodAmt.add(StringUtil.valueNullToBig(allConstructPeriodAmtStr)).stripTrailingZeros();
 
             //结算盖章文件
             String file1Str = JdbcMapUtil.getString(tmp,"FILE_ID_ONE");
@@ -1305,10 +1299,6 @@ public class AttLinkExtDetail {
                 file3.append(file3Str).append(",");
             }
 
-        }
-
-        if (comment.length() > 0){
-            comment.deleteCharAt(comment.length()-1);
         }
 
         if (file1.length() > 0){
@@ -1331,7 +1321,6 @@ public class AttLinkExtDetail {
         map.put("allLandAmt",allLandAmt); //土地征拆费用
         map.put("allPrepareAmt",allPrepareAmt); //预备费
         map.put("allConstructPeriodAmt",allConstructPeriodAmt); //建设期利息
-        map.put("comment",comment); //结算内容
         map.put("file1",file1); //结算盖章文件
         map.put("file2",file2); //项目结算电子资料
         map.put("file3",file3); //其他附件
