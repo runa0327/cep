@@ -59,7 +59,11 @@ public class ReversalDataExt {
      */
     private void refreshInvest(String tableName) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from " + tableName + " where `STATUS`='ap'");
+        String sql = "select ifnull(PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST,ifnull(CONSTRUCT_AMT,0) as CONSTRUCT_AMT,ifnull(EQUIP_AMT,0) as EQUIP_AMT,ifnull(EQUIPMENT_COST,0) as EQUIPMENT_COST,ifnull(PROJECT_OTHER_AMT,0) as PROJECT_OTHER_AMT,ifnull(LAND_AMT,0) as LAND_AMT,ifnull(PREPARE_AMT,0) as PREPARE_AMT,ifnull(PROJECT_AMT,0) as PROJECT_AMT from " + tableName + " where `STATUS`='ap'";
+        if ("PM_PRJ_SETTLE_ACCOUNTS".equals(tableName)) {
+            sql = "select ifnull(PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST,ifnull(CONSTRUCT_AMT,0) as CONSTRUCT_AMT,ifnull(EQUIP_AMT,0) as EQUIP_AMT,ifnull(EQUIPMENT_COST,0) as EQUIPMENT_COST,ifnull(PROJECT_OTHER_AMT,0) as PROJECT_OTHER_AMT,ifnull(LAND_AMT,0) as LAND_AMT,ifnull(PREPARE_AMT,0) as PREPARE_AMT,0 as PROJECT_AMT from " + tableName + " where `STATUS`='ap'";
+        }
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
         list.forEach(item -> {
             String projectId = JdbcMapUtil.getString(item, "PM_PRJ_ID");
             String typeId = Obj.get(tableName);
