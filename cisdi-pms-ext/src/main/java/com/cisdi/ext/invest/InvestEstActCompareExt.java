@@ -54,7 +54,7 @@ public class InvestEstActCompareExt {
                 "left join PM_INVEST_EST a on t.PM_INVEST_EST_ID = a.id \n" +
                 "left join gr_set_value gsv on gsv.id = a.INVEST_EST_TYPE_ID\n" +
                 "left join gr_set gr on gr.id = gsv.GR_SET_ID and gr.`CODE`='invest_est_type'\n" +
-                "where a.PM_PRJ_ID=?;", pmPrjId);
+                "where a.PM_PRJ_ID=? and gsv.`code` <>'invest4' ", pmPrjId);
 
 
         // 按投资测算类型分组
