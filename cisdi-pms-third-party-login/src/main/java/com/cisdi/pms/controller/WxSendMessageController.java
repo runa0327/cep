@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.cisdi.pms.enums.MsgTypeEnum;
 import com.cisdi.pms.model.MessageModel;
 import com.cisdi.pms.model.TextCardInfo;
+import com.cisdi.pms.model.TextInfo;
 import com.cisdi.pms.service.SendMessageAttribute;
 import com.cisdi.pms.service.SendMessageFactory;
 import com.cisdi.pms.service.WxSendMessageService;
@@ -70,6 +71,19 @@ public class WxSendMessageController {
 //        cardInfo.setUrl("https://open.weixin.qq.com/connect/oauth2/authorize?appid=ww808726c44a3ff6dc&redirect_uri=https%3A%2F%2Fcpms.yazhou-bay.com%2Fh5%2FunifiedLogin%3Fenv%3DZWWeiXin&response_type=code&scope=snsapi_userinfo&agentid=1000005&state=STATE#wechat_redirect");
         String message = cardInfo.toString();
         messageModel.setMessage(message);
+        SendMessageAttribute attribute = new SendMessageAttribute();
+        attribute.setAnEnum(MsgTypeEnum.getMsgTypeEnum(messageModel.getType()));
+        WxSendMessageService sendMessageService = factory.getService(attribute);
+        return sendMessageService.sendMessage(messageModel);
+    }
+
+    @PostMapping("send")
+    public JSONObject sendTextMessageTest(MessageModel messageModel) throws UnsupportedEncodingException {
+        messageModel.setToUser(Arrays.asList("15872337245"));
+        messageModel.setType("text");
+        TextInfo textInfo = new TextInfo();
+        textInfo.setContent("你好！");
+        messageModel.setMessage(textInfo);
         SendMessageAttribute attribute = new SendMessageAttribute();
         attribute.setAnEnum(MsgTypeEnum.getMsgTypeEnum(messageModel.getType()));
         WxSendMessageService sendMessageService = factory.getService(attribute);

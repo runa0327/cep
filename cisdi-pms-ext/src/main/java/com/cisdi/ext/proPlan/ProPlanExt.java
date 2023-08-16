@@ -1,6 +1,8 @@
 package com.cisdi.ext.proPlan;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.pm.office.PmNodeAdjustReqExt;
+import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.PrjPlanUtil;
@@ -16,6 +18,8 @@ import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -132,7 +136,7 @@ public class ProPlanExt {
     /**
      * 获取项目首页-项目进度数据
      */
-    public void getPrjOverviewNodeList() {
+    public void getPrjOverviewNodeList() throws ParseException {
         // 输入：PrjOverviewNodeListParam
         // 输出：List<PrjProPlanNodeInfo>
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
@@ -141,21 +145,136 @@ public class ProPlanExt {
         String pmPrjId = param.pmPrjId;
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
-        List<Map<String, Object>> allList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS,pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS,ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,\n" +
+        List<Map<String, Object>> allList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS," +
+                "pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS," +
+                "ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,pppn.LEVEL,ifnull(IZ_OVERDUE,0) as IZ_OVERDUE,pppn.POST_INFO_ID,\n" +
                 "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
-                "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE,pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO \n" +
-                "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where SHOW_IN_PRJ_OVERVIEW='1' and pppn.OPREATION_TYPE is null and ppp.PM_PRJ_ID=?", pmPrjId);
+                "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE," +
+                "pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO,'0' as seq_bak \n" +
+                "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where pppn.OPREATION_TYPE is null and ppp.PM_PRJ_ID=?", pmPrjId);
+
+
+        allList.stream().filter(p -> "0".equals(JdbcMapUtil.getString(p, "PM_PRO_PLAN_NODE_PID")))
+                .sorted(Comparator.comparing(o -> BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(o, "SEQ_NO")))).peek(m -> {
+            BigDecimal parentSeq = BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(m, "SEQ_NO")).multiply(new BigDecimal(1000));
+            m.put("seq_bak", parentSeq);
+            getSortChildren(m, allList, parentSeq);
+        }).collect(Collectors.toList());
+        List<Map<String, Object>> threeNode = allList.stream().filter(p -> "3".equals(JdbcMapUtil.getString(p, "LEVEL")) && "1".equals(JdbcMapUtil.getString(p, "SHOW_IN_PRJ_OVERVIEW")))
+                .sorted(Comparator.comparing(o -> JdbcMapUtil.getString(o, "seq_bak"))).collect(Collectors.toList());
 
         // 结果转换
-        List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(pmPrjId, p, myJdbcTemplate)).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(infoList)) {
+        List<PrjProPlanNodeInfo> infoList = threeNode.stream().map(p -> this.convertPlanInfoNode(pmPrjId, p, myJdbcTemplate)).collect(Collectors.toList());
+        List<Map<String, Object>> dataList = new ArrayList<>();
+        for (PrjProPlanNodeInfo item : infoList) {
+            JSONObject jsonObject = new JSONObject();
+            String nodeName = item.name;
+            String status = item.progressStatus.name;
+            String nameOrg = "";
+            String dateOrg = "";
+            String statusOrg = "";
+            String tips = null;
+            String reason = null;
+            String post = null;
+
+            if ("已完成".equals(status)) {
+                nameOrg = "实际完成";
+                if (Objects.nonNull(item.actualComplDate)) {
+                    dateOrg = item.actualComplDate;
+                }
+                if (Objects.nonNull(item.planComplDate) && Objects.nonNull(item.actualComplDate)) {
+                    Date plan = DateTimeUtil.stringToDate(item.planComplDate);
+                    Date actual = DateTimeUtil.stringToDate(item.actualComplDate);
+                    int days = DateTimeUtil.daysBetween(plan, actual);
+                    if (plan.before(actual)) {
+                        tips = "超期" + Math.abs(days) + "天";
+                        statusOrg = "超期完成";
+                    } else {
+                        tips = "提前" + days + "完成！";
+                        statusOrg = "已完成";
+                    }
+                } else {
+                    statusOrg = "已完成";
+                }
+            } else if ("未涉及".equals(status)) {
+                nameOrg = "\\";
+                tips = "项目未涉及" + item.name;
+                statusOrg = "未涉及";
+                reason = getNoInvolveReason(item.id);
+            } else {
+                if ("0".equals(item.izOverdue)) {
+                    if ("进行中".equals(status)) {
+                        statusOrg = "进行中";
+                    } else if ("未启动".equals(status)) {
+                        statusOrg = "未启动";
+                    }
+                } else {
+                    statusOrg = "超期未完成";
+                }
+                if (Objects.nonNull(item.planComplDate)) {
+                    Date planCompDate = DateTimeUtil.stringToDate(item.planComplDate);
+                    if (planCompDate.before(new Date())) {
+                        int days = DateTimeUtil.daysBetween(planCompDate, new Date());
+                        tips = "超期" + Math.abs(days) + "天";
+                    }
+                    nameOrg = "计划完成";
+                    if (Objects.nonNull(item.planComplDate)) {
+                        dateOrg = item.planComplDate;
+                    }
+                }
+            }
+            jsonObject.put("nodeName", nodeName);
+            jsonObject.put("nameOrg", nameOrg);
+            jsonObject.put("dateOrg", dateOrg);
+            jsonObject.put("statusOrg", statusOrg);
+            jsonObject.put("tips", tips);
+            jsonObject.put("post", item.post == null ? "" : item.post.name);
+            jsonObject.put("nodeId", item.id);
+            jsonObject.put("reason", reason);
+            dataList.add(jsonObject);
+        }
+
+        if (CollectionUtils.isEmpty(dataList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
             OutSide outSide = new OutSide();
-            outSide.nodeInfoList = infoList;
+            outSide.dataList = dataList;
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(outSide), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         }
+    }
+
+    private static List<Map<String, Object>> getSortChildren(Map<String, Object> parent, List<Map<String, Object>> allData, BigDecimal parentSeq) {
+        return allData.stream().filter(p -> Objects.equals(parent.get("ID"), p.get("PM_PRO_PLAN_NODE_PID")))
+                .sorted(Comparator.comparing(o -> BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(o, "SEQ_NO")))).peek(m -> {
+                    BigDecimal currentSeq = BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(m, "SEQ_NO"));
+                    if ("1".equals(JdbcMapUtil.getString(m, "LEVEL"))) {
+                        currentSeq = BigDecimalUtil.multiply(currentSeq, new BigDecimal(1000));
+                    } else if ("2".equals(JdbcMapUtil.getString(m, "LEVEL"))) {
+                        currentSeq = BigDecimalUtil.multiply(currentSeq, new BigDecimal(100));
+                    } else if ("3".equals(JdbcMapUtil.getString(m, "LEVEL"))) {
+                        currentSeq = BigDecimalUtil.multiply(currentSeq, new BigDecimal(10));
+                    }
+                    BigDecimal obj = parentSeq.add(currentSeq);
+                    m.put("seq_bak", obj);
+                    getSortChildren(m, allData, obj);
+                }).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取不涉及原因
+     *
+     * @param nodeId
+     * @return
+     */
+    private String getNoInvolveReason(String nodeId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from week_task where WEEK_TASK_STATUS_ID='1644140265205915648' and  RELATION_DATA_ID=? ", nodeId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> mapData = list.get(0);
+            return JdbcMapUtil.getString(mapData, "REASON_EXPLAIN");
+        }
+        return null;
     }
 
     /**
@@ -411,6 +530,7 @@ public class ProPlanExt {
         nodeInfo.proCount = getProblemCount(nodeInfo.id);
         nodeInfo.canStart = JdbcMapUtil.getString(dataMap, "CAN_START");
         nodeInfo.linkedWfProcessId = JdbcMapUtil.getString(dataMap, "LINKED_WF_PROCESS_ID");
+        nodeInfo.izOverdue = JdbcMapUtil.getString(dataMap, "IZ_OVERDUE");
         return nodeInfo;
     }
 
@@ -669,6 +789,8 @@ public class ProPlanExt {
         public String canStart;
 
         public String linkedWfProcessId;
+
+        public String izOverdue;
     }
 
     /**
@@ -1058,6 +1180,8 @@ public class ProPlanExt {
 
     public static class OutSide {
         public List<PrjProPlanNodeInfo> nodeInfoList;
+
+        public List<Map<String, Object>> dataList;
     }
 
 
