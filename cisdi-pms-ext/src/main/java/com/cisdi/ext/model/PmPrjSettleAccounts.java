@@ -209,37 +209,41 @@ public class PmPrjSettleAccounts {
          */
         public static final String REPLY_FILE_INVEST3 = "REPLY_FILE_INVEST3";
         /**
-         * 结算总投资。
+         * 结算费用类型(多选)。
          */
-        public static final String PRJ_TOTAL_SETTLE = "PRJ_TOTAL_SETTLE";
+        public static final String SETTLE_COST_TYPE_IDS = "SETTLE_COST_TYPE_IDS";
         /**
-         * 结算建安工程费。
+         * 总投资（万）。
          */
-        public static final String CONSTRUCT_PRJ_AMT_SETTLE = "CONSTRUCT_PRJ_AMT_SETTLE";
+        public static final String PRJ_TOTAL_INVEST = "PRJ_TOTAL_INVEST";
         /**
-         * 结算工程其他费用。
+         * 建安费（万）。
          */
-        public static final String PROJECT_OTHER_AMT_SETTLE = "PROJECT_OTHER_AMT_SETTLE";
+        public static final String CONSTRUCT_AMT = "CONSTRUCT_AMT";
         /**
-         * 结算设备采购费。
+         * 工程其他费用(万)。
          */
-        public static final String EQUIP_BUY_AMT_SETTLE = "EQUIP_BUY_AMT_SETTLE";
+        public static final String PROJECT_OTHER_AMT = "PROJECT_OTHER_AMT";
         /**
-         * 结算科研设备费。
+         * 设备费（万）。
          */
-        public static final String EQUIPMENT_COST_SETTLE = "EQUIPMENT_COST_SETTLE";
+        public static final String EQUIP_AMT = "EQUIP_AMT";
         /**
-         * 结算土地拆迁费。
+         * 科研设备费(万)。
          */
-        public static final String LAND_AMT_SETTLE = "LAND_AMT_SETTLE";
+        public static final String EQUIPMENT_COST = "EQUIPMENT_COST";
         /**
-         * 结算预备费。
+         * 土地拆迁费（万）。
          */
-        public static final String PREPARE_AMT_SETTLE = "PREPARE_AMT_SETTLE";
+        public static final String LAND_AMT = "LAND_AMT";
         /**
-         * 结算建设期利息。
+         * 预备费(万)。
          */
-        public static final String CONSTRUCT_PERIOD_SETTLE = "CONSTRUCT_PERIOD_SETTLE";
+        public static final String PREPARE_AMT = "PREPARE_AMT";
+        /**
+         * 建设期利息（万）。
+         */
+        public static final String CONSTRUCT_PERIOD_INTEREST = "CONSTRUCT_PERIOD_INTEREST";
         /**
          * 累计支付金额。
          */
@@ -253,9 +257,9 @@ public class PmPrjSettleAccounts {
          */
         public static final String TEXT_REMARK_ONE = "TEXT_REMARK_ONE";
         /**
-         * 结算批复文号。
+         * 结算批复日期。
          */
-        public static final String REPLY_NO_SETTLE = "REPLY_NO_SETTLE";
+        public static final String REPLY_DATE_SETTLE = "REPLY_DATE_SETTLE";
         /**
          * 附件1。
          */
@@ -268,6 +272,82 @@ public class PmPrjSettleAccounts {
          * 附件3。
          */
         public static final String FILE_ID_THREE = "FILE_ID_THREE";
+        /**
+         * 前期报建岗。
+         */
+        public static final String AD_USER_TWELVE_ID = "AD_USER_TWELVE_ID";
+        /**
+         * 工程管理岗。
+         */
+        public static final String AD_USER_TWENTY_THREE_ID = "AD_USER_TWENTY_THREE_ID";
+        /**
+         * 设计管理岗。
+         */
+        public static final String AD_USER_TWENTY_TWO_ID = "AD_USER_TWENTY_TWO_ID";
+        /**
+         * 财务管理岗。
+         */
+        public static final String AD_USER_TWENTY_FIVE_ID = "AD_USER_TWENTY_FIVE_ID";
+        /**
+         * 历史总投资。
+         */
+        public static final String PRJ_TOTAL_HISTORY = "PRJ_TOTAL_HISTORY";
+        /**
+         * 历史建安工程费。
+         */
+        public static final String CONSTRUCT_PRJ_AMT_HISTORY = "CONSTRUCT_PRJ_AMT_HISTORY";
+        /**
+         * 历史工程其他费用。
+         */
+        public static final String PROJECT_OTHER_AMT_HISTORY = "PROJECT_OTHER_AMT_HISTORY";
+        /**
+         * 历史设备采购费。
+         */
+        public static final String EQUIP_BUY_AMT_HISTORY = "EQUIP_BUY_AMT_HISTORY";
+        /**
+         * 历史科研设备费。
+         */
+        public static final String EQUIPMENT_COST_HISTORY = "EQUIPMENT_COST_HISTORY";
+        /**
+         * 历史土地拆迁费。
+         */
+        public static final String LAND_AMT_HISTORY = "LAND_AMT_HISTORY";
+        /**
+         * 历史预备费。
+         */
+        public static final String PREPARE_AMT_HISTORY = "PREPARE_AMT_HISTORY";
+        /**
+         * 历史建设期利息。
+         */
+        public static final String CONSTRUCT_PERIOD_HISTORY = "CONSTRUCT_PERIOD_HISTORY";
+        /**
+         * 累计支付金额。
+         */
+        public static final String CUM_PAY_AMT_TWO = "CUM_PAY_AMT_TWO";
+        /**
+         * 已支付比例。
+         */
+        public static final String OVER_PAYED_PERCENT = "OVER_PAYED_PERCENT";
+        /**
+         * 长备注2。
+         */
+        public static final String TEXT_REMARK_TWO = "TEXT_REMARK_TWO";
+        /**
+         * 日期2。
+         */
+        public static final String DATE_TWO = "DATE_TWO";
+        /**
+         * 附件4。
+         */
+        public static final String FILE_ID_FOUR = "FILE_ID_FOUR";
+        /**
+         * 附件5。
+         */
+        public static final String FILE_ID_FIVE = "FILE_ID_FIVE";
+        /**
+         * 附件6。
+         */
+        public static final String FILE_ID_SIX = "FILE_ID_SIX";
         /**
          * 备注1。
          */
@@ -296,6 +376,10 @@ public class PmPrjSettleAccounts {
          * 备注7。
          */
         public static final String REMARK_LONG_SEVEN = "REMARK_LONG_SEVEN";
+        /**
+         * 是否导入的记录。
+         */
+        public static final String IS_IMPORT = "IS_IMPORT";
     }
 
     // </editor-fold>
@@ -1744,288 +1828,324 @@ public class PmPrjSettleAccounts {
     }
 
     /**
-     * 结算总投资。
+     * 结算费用类型(多选)。
      */
-    private BigDecimal prjTotalSettle;
+    private String settleCostTypeIds;
 
     /**
-     * 获取：结算总投资。
+     * 获取：结算费用类型(多选)。
      */
-    public BigDecimal getPrjTotalSettle() {
-        return this.prjTotalSettle;
+    public String getSettleCostTypeIds() {
+        return this.settleCostTypeIds;
     }
 
     /**
-     * 设置：结算总投资。
+     * 设置：结算费用类型(多选)。
      */
-    public PmPrjSettleAccounts setPrjTotalSettle(BigDecimal prjTotalSettle) {
-        if (this.prjTotalSettle == null && prjTotalSettle == null) {
+    public PmPrjSettleAccounts setSettleCostTypeIds(String settleCostTypeIds) {
+        if (this.settleCostTypeIds == null && settleCostTypeIds == null) {
             // 均为null，不做处理。
-        } else if (this.prjTotalSettle != null && prjTotalSettle != null) {
+        } else if (this.settleCostTypeIds != null && settleCostTypeIds != null) {
             // 均非null，判定不等，再做处理：
-            if (this.prjTotalSettle.compareTo(prjTotalSettle) != 0) {
-                this.prjTotalSettle = prjTotalSettle;
-                if (!this.toUpdateCols.contains("PRJ_TOTAL_SETTLE")) {
-                    this.toUpdateCols.add("PRJ_TOTAL_SETTLE");
+            if (this.settleCostTypeIds.compareTo(settleCostTypeIds) != 0) {
+                this.settleCostTypeIds = settleCostTypeIds;
+                if (!this.toUpdateCols.contains("SETTLE_COST_TYPE_IDS")) {
+                    this.toUpdateCols.add("SETTLE_COST_TYPE_IDS");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.prjTotalSettle = prjTotalSettle;
-            if (!this.toUpdateCols.contains("PRJ_TOTAL_SETTLE")) {
-                this.toUpdateCols.add("PRJ_TOTAL_SETTLE");
+            this.settleCostTypeIds = settleCostTypeIds;
+            if (!this.toUpdateCols.contains("SETTLE_COST_TYPE_IDS")) {
+                this.toUpdateCols.add("SETTLE_COST_TYPE_IDS");
             }
         }
         return this;
     }
 
     /**
-     * 结算建安工程费。
+     * 总投资（万）。
      */
-    private BigDecimal constructPrjAmtSettle;
+    private BigDecimal prjTotalInvest;
 
     /**
-     * 获取：结算建安工程费。
+     * 获取：总投资（万）。
      */
-    public BigDecimal getConstructPrjAmtSettle() {
-        return this.constructPrjAmtSettle;
+    public BigDecimal getPrjTotalInvest() {
+        return this.prjTotalInvest;
     }
 
     /**
-     * 设置：结算建安工程费。
+     * 设置：总投资（万）。
      */
-    public PmPrjSettleAccounts setConstructPrjAmtSettle(BigDecimal constructPrjAmtSettle) {
-        if (this.constructPrjAmtSettle == null && constructPrjAmtSettle == null) {
+    public PmPrjSettleAccounts setPrjTotalInvest(BigDecimal prjTotalInvest) {
+        if (this.prjTotalInvest == null && prjTotalInvest == null) {
             // 均为null，不做处理。
-        } else if (this.constructPrjAmtSettle != null && constructPrjAmtSettle != null) {
+        } else if (this.prjTotalInvest != null && prjTotalInvest != null) {
             // 均非null，判定不等，再做处理：
-            if (this.constructPrjAmtSettle.compareTo(constructPrjAmtSettle) != 0) {
-                this.constructPrjAmtSettle = constructPrjAmtSettle;
-                if (!this.toUpdateCols.contains("CONSTRUCT_PRJ_AMT_SETTLE")) {
-                    this.toUpdateCols.add("CONSTRUCT_PRJ_AMT_SETTLE");
+            if (this.prjTotalInvest.compareTo(prjTotalInvest) != 0) {
+                this.prjTotalInvest = prjTotalInvest;
+                if (!this.toUpdateCols.contains("PRJ_TOTAL_INVEST")) {
+                    this.toUpdateCols.add("PRJ_TOTAL_INVEST");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.constructPrjAmtSettle = constructPrjAmtSettle;
-            if (!this.toUpdateCols.contains("CONSTRUCT_PRJ_AMT_SETTLE")) {
-                this.toUpdateCols.add("CONSTRUCT_PRJ_AMT_SETTLE");
+            this.prjTotalInvest = prjTotalInvest;
+            if (!this.toUpdateCols.contains("PRJ_TOTAL_INVEST")) {
+                this.toUpdateCols.add("PRJ_TOTAL_INVEST");
             }
         }
         return this;
     }
 
     /**
-     * 结算工程其他费用。
+     * 建安费（万）。
      */
-    private BigDecimal projectOtherAmtSettle;
+    private BigDecimal constructAmt;
 
     /**
-     * 获取：结算工程其他费用。
+     * 获取：建安费（万）。
      */
-    public BigDecimal getProjectOtherAmtSettle() {
-        return this.projectOtherAmtSettle;
+    public BigDecimal getConstructAmt() {
+        return this.constructAmt;
     }
 
     /**
-     * 设置：结算工程其他费用。
+     * 设置：建安费（万）。
      */
-    public PmPrjSettleAccounts setProjectOtherAmtSettle(BigDecimal projectOtherAmtSettle) {
-        if (this.projectOtherAmtSettle == null && projectOtherAmtSettle == null) {
+    public PmPrjSettleAccounts setConstructAmt(BigDecimal constructAmt) {
+        if (this.constructAmt == null && constructAmt == null) {
             // 均为null，不做处理。
-        } else if (this.projectOtherAmtSettle != null && projectOtherAmtSettle != null) {
+        } else if (this.constructAmt != null && constructAmt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.projectOtherAmtSettle.compareTo(projectOtherAmtSettle) != 0) {
-                this.projectOtherAmtSettle = projectOtherAmtSettle;
-                if (!this.toUpdateCols.contains("PROJECT_OTHER_AMT_SETTLE")) {
-                    this.toUpdateCols.add("PROJECT_OTHER_AMT_SETTLE");
+            if (this.constructAmt.compareTo(constructAmt) != 0) {
+                this.constructAmt = constructAmt;
+                if (!this.toUpdateCols.contains("CONSTRUCT_AMT")) {
+                    this.toUpdateCols.add("CONSTRUCT_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.projectOtherAmtSettle = projectOtherAmtSettle;
-            if (!this.toUpdateCols.contains("PROJECT_OTHER_AMT_SETTLE")) {
-                this.toUpdateCols.add("PROJECT_OTHER_AMT_SETTLE");
+            this.constructAmt = constructAmt;
+            if (!this.toUpdateCols.contains("CONSTRUCT_AMT")) {
+                this.toUpdateCols.add("CONSTRUCT_AMT");
             }
         }
         return this;
     }
 
     /**
-     * 结算设备采购费。
+     * 工程其他费用(万)。
      */
-    private BigDecimal equipBuyAmtSettle;
+    private BigDecimal projectOtherAmt;
 
     /**
-     * 获取：结算设备采购费。
+     * 获取：工程其他费用(万)。
      */
-    public BigDecimal getEquipBuyAmtSettle() {
-        return this.equipBuyAmtSettle;
+    public BigDecimal getProjectOtherAmt() {
+        return this.projectOtherAmt;
     }
 
     /**
-     * 设置：结算设备采购费。
+     * 设置：工程其他费用(万)。
      */
-    public PmPrjSettleAccounts setEquipBuyAmtSettle(BigDecimal equipBuyAmtSettle) {
-        if (this.equipBuyAmtSettle == null && equipBuyAmtSettle == null) {
+    public PmPrjSettleAccounts setProjectOtherAmt(BigDecimal projectOtherAmt) {
+        if (this.projectOtherAmt == null && projectOtherAmt == null) {
             // 均为null，不做处理。
-        } else if (this.equipBuyAmtSettle != null && equipBuyAmtSettle != null) {
+        } else if (this.projectOtherAmt != null && projectOtherAmt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.equipBuyAmtSettle.compareTo(equipBuyAmtSettle) != 0) {
-                this.equipBuyAmtSettle = equipBuyAmtSettle;
-                if (!this.toUpdateCols.contains("EQUIP_BUY_AMT_SETTLE")) {
-                    this.toUpdateCols.add("EQUIP_BUY_AMT_SETTLE");
+            if (this.projectOtherAmt.compareTo(projectOtherAmt) != 0) {
+                this.projectOtherAmt = projectOtherAmt;
+                if (!this.toUpdateCols.contains("PROJECT_OTHER_AMT")) {
+                    this.toUpdateCols.add("PROJECT_OTHER_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.equipBuyAmtSettle = equipBuyAmtSettle;
-            if (!this.toUpdateCols.contains("EQUIP_BUY_AMT_SETTLE")) {
-                this.toUpdateCols.add("EQUIP_BUY_AMT_SETTLE");
+            this.projectOtherAmt = projectOtherAmt;
+            if (!this.toUpdateCols.contains("PROJECT_OTHER_AMT")) {
+                this.toUpdateCols.add("PROJECT_OTHER_AMT");
             }
         }
         return this;
     }
 
     /**
-     * 结算科研设备费。
+     * 设备费（万）。
      */
-    private BigDecimal equipmentCostSettle;
+    private BigDecimal equipAmt;
 
     /**
-     * 获取：结算科研设备费。
+     * 获取：设备费（万）。
      */
-    public BigDecimal getEquipmentCostSettle() {
-        return this.equipmentCostSettle;
+    public BigDecimal getEquipAmt() {
+        return this.equipAmt;
     }
 
     /**
-     * 设置：结算科研设备费。
+     * 设置：设备费（万）。
      */
-    public PmPrjSettleAccounts setEquipmentCostSettle(BigDecimal equipmentCostSettle) {
-        if (this.equipmentCostSettle == null && equipmentCostSettle == null) {
+    public PmPrjSettleAccounts setEquipAmt(BigDecimal equipAmt) {
+        if (this.equipAmt == null && equipAmt == null) {
             // 均为null，不做处理。
-        } else if (this.equipmentCostSettle != null && equipmentCostSettle != null) {
+        } else if (this.equipAmt != null && equipAmt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.equipmentCostSettle.compareTo(equipmentCostSettle) != 0) {
-                this.equipmentCostSettle = equipmentCostSettle;
-                if (!this.toUpdateCols.contains("EQUIPMENT_COST_SETTLE")) {
-                    this.toUpdateCols.add("EQUIPMENT_COST_SETTLE");
+            if (this.equipAmt.compareTo(equipAmt) != 0) {
+                this.equipAmt = equipAmt;
+                if (!this.toUpdateCols.contains("EQUIP_AMT")) {
+                    this.toUpdateCols.add("EQUIP_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.equipmentCostSettle = equipmentCostSettle;
-            if (!this.toUpdateCols.contains("EQUIPMENT_COST_SETTLE")) {
-                this.toUpdateCols.add("EQUIPMENT_COST_SETTLE");
+            this.equipAmt = equipAmt;
+            if (!this.toUpdateCols.contains("EQUIP_AMT")) {
+                this.toUpdateCols.add("EQUIP_AMT");
             }
         }
         return this;
     }
 
     /**
-     * 结算土地拆迁费。
+     * 科研设备费(万)。
      */
-    private BigDecimal landAmtSettle;
+    private BigDecimal equipmentCost;
 
     /**
-     * 获取：结算土地拆迁费。
+     * 获取：科研设备费(万)。
      */
-    public BigDecimal getLandAmtSettle() {
-        return this.landAmtSettle;
+    public BigDecimal getEquipmentCost() {
+        return this.equipmentCost;
     }
 
     /**
-     * 设置：结算土地拆迁费。
+     * 设置：科研设备费(万)。
      */
-    public PmPrjSettleAccounts setLandAmtSettle(BigDecimal landAmtSettle) {
-        if (this.landAmtSettle == null && landAmtSettle == null) {
+    public PmPrjSettleAccounts setEquipmentCost(BigDecimal equipmentCost) {
+        if (this.equipmentCost == null && equipmentCost == null) {
             // 均为null，不做处理。
-        } else if (this.landAmtSettle != null && landAmtSettle != null) {
+        } else if (this.equipmentCost != null && equipmentCost != null) {
             // 均非null，判定不等，再做处理：
-            if (this.landAmtSettle.compareTo(landAmtSettle) != 0) {
-                this.landAmtSettle = landAmtSettle;
-                if (!this.toUpdateCols.contains("LAND_AMT_SETTLE")) {
-                    this.toUpdateCols.add("LAND_AMT_SETTLE");
+            if (this.equipmentCost.compareTo(equipmentCost) != 0) {
+                this.equipmentCost = equipmentCost;
+                if (!this.toUpdateCols.contains("EQUIPMENT_COST")) {
+                    this.toUpdateCols.add("EQUIPMENT_COST");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.landAmtSettle = landAmtSettle;
-            if (!this.toUpdateCols.contains("LAND_AMT_SETTLE")) {
-                this.toUpdateCols.add("LAND_AMT_SETTLE");
+            this.equipmentCost = equipmentCost;
+            if (!this.toUpdateCols.contains("EQUIPMENT_COST")) {
+                this.toUpdateCols.add("EQUIPMENT_COST");
             }
         }
         return this;
     }
 
     /**
-     * 结算预备费。
+     * 土地拆迁费（万）。
      */
-    private BigDecimal prepareAmtSettle;
+    private BigDecimal landAmt;
 
     /**
-     * 获取：结算预备费。
+     * 获取：土地拆迁费（万）。
      */
-    public BigDecimal getPrepareAmtSettle() {
-        return this.prepareAmtSettle;
+    public BigDecimal getLandAmt() {
+        return this.landAmt;
     }
 
     /**
-     * 设置：结算预备费。
+     * 设置：土地拆迁费（万）。
      */
-    public PmPrjSettleAccounts setPrepareAmtSettle(BigDecimal prepareAmtSettle) {
-        if (this.prepareAmtSettle == null && prepareAmtSettle == null) {
+    public PmPrjSettleAccounts setLandAmt(BigDecimal landAmt) {
+        if (this.landAmt == null && landAmt == null) {
             // 均为null，不做处理。
-        } else if (this.prepareAmtSettle != null && prepareAmtSettle != null) {
+        } else if (this.landAmt != null && landAmt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.prepareAmtSettle.compareTo(prepareAmtSettle) != 0) {
-                this.prepareAmtSettle = prepareAmtSettle;
-                if (!this.toUpdateCols.contains("PREPARE_AMT_SETTLE")) {
-                    this.toUpdateCols.add("PREPARE_AMT_SETTLE");
+            if (this.landAmt.compareTo(landAmt) != 0) {
+                this.landAmt = landAmt;
+                if (!this.toUpdateCols.contains("LAND_AMT")) {
+                    this.toUpdateCols.add("LAND_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.prepareAmtSettle = prepareAmtSettle;
-            if (!this.toUpdateCols.contains("PREPARE_AMT_SETTLE")) {
-                this.toUpdateCols.add("PREPARE_AMT_SETTLE");
+            this.landAmt = landAmt;
+            if (!this.toUpdateCols.contains("LAND_AMT")) {
+                this.toUpdateCols.add("LAND_AMT");
             }
         }
         return this;
     }
 
     /**
-     * 结算建设期利息。
+     * 预备费(万)。
      */
-    private BigDecimal constructPeriodSettle;
+    private BigDecimal prepareAmt;
 
     /**
-     * 获取：结算建设期利息。
+     * 获取：预备费(万)。
      */
-    public BigDecimal getConstructPeriodSettle() {
-        return this.constructPeriodSettle;
+    public BigDecimal getPrepareAmt() {
+        return this.prepareAmt;
     }
 
     /**
-     * 设置：结算建设期利息。
+     * 设置：预备费(万)。
      */
-    public PmPrjSettleAccounts setConstructPeriodSettle(BigDecimal constructPeriodSettle) {
-        if (this.constructPeriodSettle == null && constructPeriodSettle == null) {
+    public PmPrjSettleAccounts setPrepareAmt(BigDecimal prepareAmt) {
+        if (this.prepareAmt == null && prepareAmt == null) {
             // 均为null，不做处理。
-        } else if (this.constructPeriodSettle != null && constructPeriodSettle != null) {
+        } else if (this.prepareAmt != null && prepareAmt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.constructPeriodSettle.compareTo(constructPeriodSettle) != 0) {
-                this.constructPeriodSettle = constructPeriodSettle;
-                if (!this.toUpdateCols.contains("CONSTRUCT_PERIOD_SETTLE")) {
-                    this.toUpdateCols.add("CONSTRUCT_PERIOD_SETTLE");
+            if (this.prepareAmt.compareTo(prepareAmt) != 0) {
+                this.prepareAmt = prepareAmt;
+                if (!this.toUpdateCols.contains("PREPARE_AMT")) {
+                    this.toUpdateCols.add("PREPARE_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.constructPeriodSettle = constructPeriodSettle;
-            if (!this.toUpdateCols.contains("CONSTRUCT_PERIOD_SETTLE")) {
-                this.toUpdateCols.add("CONSTRUCT_PERIOD_SETTLE");
+            this.prepareAmt = prepareAmt;
+            if (!this.toUpdateCols.contains("PREPARE_AMT")) {
+                this.toUpdateCols.add("PREPARE_AMT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 建设期利息（万）。
+     */
+    private BigDecimal constructPeriodInterest;
+
+    /**
+     * 获取：建设期利息（万）。
+     */
+    public BigDecimal getConstructPeriodInterest() {
+        return this.constructPeriodInterest;
+    }
+
+    /**
+     * 设置：建设期利息（万）。
+     */
+    public PmPrjSettleAccounts setConstructPeriodInterest(BigDecimal constructPeriodInterest) {
+        if (this.constructPeriodInterest == null && constructPeriodInterest == null) {
+            // 均为null，不做处理。
+        } else if (this.constructPeriodInterest != null && constructPeriodInterest != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.constructPeriodInterest.compareTo(constructPeriodInterest) != 0) {
+                this.constructPeriodInterest = constructPeriodInterest;
+                if (!this.toUpdateCols.contains("CONSTRUCT_PERIOD_INTEREST")) {
+                    this.toUpdateCols.add("CONSTRUCT_PERIOD_INTEREST");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.constructPeriodInterest = constructPeriodInterest;
+            if (!this.toUpdateCols.contains("CONSTRUCT_PERIOD_INTEREST")) {
+                this.toUpdateCols.add("CONSTRUCT_PERIOD_INTEREST");
             }
         }
         return this;
@@ -2140,36 +2260,36 @@ public class PmPrjSettleAccounts {
     }
 
     /**
-     * 结算批复文号。
+     * 结算批复日期。
      */
-    private String replyNoSettle;
+    private LocalDate replyDateSettle;
 
     /**
-     * 获取：结算批复文号。
+     * 获取：结算批复日期。
      */
-    public String getReplyNoSettle() {
-        return this.replyNoSettle;
+    public LocalDate getReplyDateSettle() {
+        return this.replyDateSettle;
     }
 
     /**
-     * 设置：结算批复文号。
+     * 设置：结算批复日期。
      */
-    public PmPrjSettleAccounts setReplyNoSettle(String replyNoSettle) {
-        if (this.replyNoSettle == null && replyNoSettle == null) {
+    public PmPrjSettleAccounts setReplyDateSettle(LocalDate replyDateSettle) {
+        if (this.replyDateSettle == null && replyDateSettle == null) {
             // 均为null，不做处理。
-        } else if (this.replyNoSettle != null && replyNoSettle != null) {
+        } else if (this.replyDateSettle != null && replyDateSettle != null) {
             // 均非null，判定不等，再做处理：
-            if (this.replyNoSettle.compareTo(replyNoSettle) != 0) {
-                this.replyNoSettle = replyNoSettle;
-                if (!this.toUpdateCols.contains("REPLY_NO_SETTLE")) {
-                    this.toUpdateCols.add("REPLY_NO_SETTLE");
+            if (this.replyDateSettle.compareTo(replyDateSettle) != 0) {
+                this.replyDateSettle = replyDateSettle;
+                if (!this.toUpdateCols.contains("REPLY_DATE_SETTLE")) {
+                    this.toUpdateCols.add("REPLY_DATE_SETTLE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.replyNoSettle = replyNoSettle;
-            if (!this.toUpdateCols.contains("REPLY_NO_SETTLE")) {
-                this.toUpdateCols.add("REPLY_NO_SETTLE");
+            this.replyDateSettle = replyDateSettle;
+            if (!this.toUpdateCols.contains("REPLY_DATE_SETTLE")) {
+                this.toUpdateCols.add("REPLY_DATE_SETTLE");
             }
         }
         return this;
@@ -2278,6 +2398,690 @@ public class PmPrjSettleAccounts {
             this.fileIdThree = fileIdThree;
             if (!this.toUpdateCols.contains("FILE_ID_THREE")) {
                 this.toUpdateCols.add("FILE_ID_THREE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 前期报建岗。
+     */
+    private String adUserTwelveId;
+
+    /**
+     * 获取：前期报建岗。
+     */
+    public String getAdUserTwelveId() {
+        return this.adUserTwelveId;
+    }
+
+    /**
+     * 设置：前期报建岗。
+     */
+    public PmPrjSettleAccounts setAdUserTwelveId(String adUserTwelveId) {
+        if (this.adUserTwelveId == null && adUserTwelveId == null) {
+            // 均为null，不做处理。
+        } else if (this.adUserTwelveId != null && adUserTwelveId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adUserTwelveId.compareTo(adUserTwelveId) != 0) {
+                this.adUserTwelveId = adUserTwelveId;
+                if (!this.toUpdateCols.contains("AD_USER_TWELVE_ID")) {
+                    this.toUpdateCols.add("AD_USER_TWELVE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adUserTwelveId = adUserTwelveId;
+            if (!this.toUpdateCols.contains("AD_USER_TWELVE_ID")) {
+                this.toUpdateCols.add("AD_USER_TWELVE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 工程管理岗。
+     */
+    private String adUserTwentyThreeId;
+
+    /**
+     * 获取：工程管理岗。
+     */
+    public String getAdUserTwentyThreeId() {
+        return this.adUserTwentyThreeId;
+    }
+
+    /**
+     * 设置：工程管理岗。
+     */
+    public PmPrjSettleAccounts setAdUserTwentyThreeId(String adUserTwentyThreeId) {
+        if (this.adUserTwentyThreeId == null && adUserTwentyThreeId == null) {
+            // 均为null，不做处理。
+        } else if (this.adUserTwentyThreeId != null && adUserTwentyThreeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adUserTwentyThreeId.compareTo(adUserTwentyThreeId) != 0) {
+                this.adUserTwentyThreeId = adUserTwentyThreeId;
+                if (!this.toUpdateCols.contains("AD_USER_TWENTY_THREE_ID")) {
+                    this.toUpdateCols.add("AD_USER_TWENTY_THREE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adUserTwentyThreeId = adUserTwentyThreeId;
+            if (!this.toUpdateCols.contains("AD_USER_TWENTY_THREE_ID")) {
+                this.toUpdateCols.add("AD_USER_TWENTY_THREE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 设计管理岗。
+     */
+    private String adUserTwentyTwoId;
+
+    /**
+     * 获取：设计管理岗。
+     */
+    public String getAdUserTwentyTwoId() {
+        return this.adUserTwentyTwoId;
+    }
+
+    /**
+     * 设置：设计管理岗。
+     */
+    public PmPrjSettleAccounts setAdUserTwentyTwoId(String adUserTwentyTwoId) {
+        if (this.adUserTwentyTwoId == null && adUserTwentyTwoId == null) {
+            // 均为null，不做处理。
+        } else if (this.adUserTwentyTwoId != null && adUserTwentyTwoId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adUserTwentyTwoId.compareTo(adUserTwentyTwoId) != 0) {
+                this.adUserTwentyTwoId = adUserTwentyTwoId;
+                if (!this.toUpdateCols.contains("AD_USER_TWENTY_TWO_ID")) {
+                    this.toUpdateCols.add("AD_USER_TWENTY_TWO_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adUserTwentyTwoId = adUserTwentyTwoId;
+            if (!this.toUpdateCols.contains("AD_USER_TWENTY_TWO_ID")) {
+                this.toUpdateCols.add("AD_USER_TWENTY_TWO_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 财务管理岗。
+     */
+    private String adUserTwentyFiveId;
+
+    /**
+     * 获取：财务管理岗。
+     */
+    public String getAdUserTwentyFiveId() {
+        return this.adUserTwentyFiveId;
+    }
+
+    /**
+     * 设置：财务管理岗。
+     */
+    public PmPrjSettleAccounts setAdUserTwentyFiveId(String adUserTwentyFiveId) {
+        if (this.adUserTwentyFiveId == null && adUserTwentyFiveId == null) {
+            // 均为null，不做处理。
+        } else if (this.adUserTwentyFiveId != null && adUserTwentyFiveId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.adUserTwentyFiveId.compareTo(adUserTwentyFiveId) != 0) {
+                this.adUserTwentyFiveId = adUserTwentyFiveId;
+                if (!this.toUpdateCols.contains("AD_USER_TWENTY_FIVE_ID")) {
+                    this.toUpdateCols.add("AD_USER_TWENTY_FIVE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.adUserTwentyFiveId = adUserTwentyFiveId;
+            if (!this.toUpdateCols.contains("AD_USER_TWENTY_FIVE_ID")) {
+                this.toUpdateCols.add("AD_USER_TWENTY_FIVE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 历史总投资。
+     */
+    private BigDecimal prjTotalHistory;
+
+    /**
+     * 获取：历史总投资。
+     */
+    public BigDecimal getPrjTotalHistory() {
+        return this.prjTotalHistory;
+    }
+
+    /**
+     * 设置：历史总投资。
+     */
+    public PmPrjSettleAccounts setPrjTotalHistory(BigDecimal prjTotalHistory) {
+        if (this.prjTotalHistory == null && prjTotalHistory == null) {
+            // 均为null，不做处理。
+        } else if (this.prjTotalHistory != null && prjTotalHistory != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjTotalHistory.compareTo(prjTotalHistory) != 0) {
+                this.prjTotalHistory = prjTotalHistory;
+                if (!this.toUpdateCols.contains("PRJ_TOTAL_HISTORY")) {
+                    this.toUpdateCols.add("PRJ_TOTAL_HISTORY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjTotalHistory = prjTotalHistory;
+            if (!this.toUpdateCols.contains("PRJ_TOTAL_HISTORY")) {
+                this.toUpdateCols.add("PRJ_TOTAL_HISTORY");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 历史建安工程费。
+     */
+    private BigDecimal constructPrjAmtHistory;
+
+    /**
+     * 获取：历史建安工程费。
+     */
+    public BigDecimal getConstructPrjAmtHistory() {
+        return this.constructPrjAmtHistory;
+    }
+
+    /**
+     * 设置：历史建安工程费。
+     */
+    public PmPrjSettleAccounts setConstructPrjAmtHistory(BigDecimal constructPrjAmtHistory) {
+        if (this.constructPrjAmtHistory == null && constructPrjAmtHistory == null) {
+            // 均为null，不做处理。
+        } else if (this.constructPrjAmtHistory != null && constructPrjAmtHistory != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.constructPrjAmtHistory.compareTo(constructPrjAmtHistory) != 0) {
+                this.constructPrjAmtHistory = constructPrjAmtHistory;
+                if (!this.toUpdateCols.contains("CONSTRUCT_PRJ_AMT_HISTORY")) {
+                    this.toUpdateCols.add("CONSTRUCT_PRJ_AMT_HISTORY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.constructPrjAmtHistory = constructPrjAmtHistory;
+            if (!this.toUpdateCols.contains("CONSTRUCT_PRJ_AMT_HISTORY")) {
+                this.toUpdateCols.add("CONSTRUCT_PRJ_AMT_HISTORY");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 历史工程其他费用。
+     */
+    private BigDecimal projectOtherAmtHistory;
+
+    /**
+     * 获取：历史工程其他费用。
+     */
+    public BigDecimal getProjectOtherAmtHistory() {
+        return this.projectOtherAmtHistory;
+    }
+
+    /**
+     * 设置：历史工程其他费用。
+     */
+    public PmPrjSettleAccounts setProjectOtherAmtHistory(BigDecimal projectOtherAmtHistory) {
+        if (this.projectOtherAmtHistory == null && projectOtherAmtHistory == null) {
+            // 均为null，不做处理。
+        } else if (this.projectOtherAmtHistory != null && projectOtherAmtHistory != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectOtherAmtHistory.compareTo(projectOtherAmtHistory) != 0) {
+                this.projectOtherAmtHistory = projectOtherAmtHistory;
+                if (!this.toUpdateCols.contains("PROJECT_OTHER_AMT_HISTORY")) {
+                    this.toUpdateCols.add("PROJECT_OTHER_AMT_HISTORY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectOtherAmtHistory = projectOtherAmtHistory;
+            if (!this.toUpdateCols.contains("PROJECT_OTHER_AMT_HISTORY")) {
+                this.toUpdateCols.add("PROJECT_OTHER_AMT_HISTORY");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 历史设备采购费。
+     */
+    private BigDecimal equipBuyAmtHistory;
+
+    /**
+     * 获取：历史设备采购费。
+     */
+    public BigDecimal getEquipBuyAmtHistory() {
+        return this.equipBuyAmtHistory;
+    }
+
+    /**
+     * 设置：历史设备采购费。
+     */
+    public PmPrjSettleAccounts setEquipBuyAmtHistory(BigDecimal equipBuyAmtHistory) {
+        if (this.equipBuyAmtHistory == null && equipBuyAmtHistory == null) {
+            // 均为null，不做处理。
+        } else if (this.equipBuyAmtHistory != null && equipBuyAmtHistory != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.equipBuyAmtHistory.compareTo(equipBuyAmtHistory) != 0) {
+                this.equipBuyAmtHistory = equipBuyAmtHistory;
+                if (!this.toUpdateCols.contains("EQUIP_BUY_AMT_HISTORY")) {
+                    this.toUpdateCols.add("EQUIP_BUY_AMT_HISTORY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.equipBuyAmtHistory = equipBuyAmtHistory;
+            if (!this.toUpdateCols.contains("EQUIP_BUY_AMT_HISTORY")) {
+                this.toUpdateCols.add("EQUIP_BUY_AMT_HISTORY");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 历史科研设备费。
+     */
+    private BigDecimal equipmentCostHistory;
+
+    /**
+     * 获取：历史科研设备费。
+     */
+    public BigDecimal getEquipmentCostHistory() {
+        return this.equipmentCostHistory;
+    }
+
+    /**
+     * 设置：历史科研设备费。
+     */
+    public PmPrjSettleAccounts setEquipmentCostHistory(BigDecimal equipmentCostHistory) {
+        if (this.equipmentCostHistory == null && equipmentCostHistory == null) {
+            // 均为null，不做处理。
+        } else if (this.equipmentCostHistory != null && equipmentCostHistory != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.equipmentCostHistory.compareTo(equipmentCostHistory) != 0) {
+                this.equipmentCostHistory = equipmentCostHistory;
+                if (!this.toUpdateCols.contains("EQUIPMENT_COST_HISTORY")) {
+                    this.toUpdateCols.add("EQUIPMENT_COST_HISTORY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.equipmentCostHistory = equipmentCostHistory;
+            if (!this.toUpdateCols.contains("EQUIPMENT_COST_HISTORY")) {
+                this.toUpdateCols.add("EQUIPMENT_COST_HISTORY");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 历史土地拆迁费。
+     */
+    private BigDecimal landAmtHistory;
+
+    /**
+     * 获取：历史土地拆迁费。
+     */
+    public BigDecimal getLandAmtHistory() {
+        return this.landAmtHistory;
+    }
+
+    /**
+     * 设置：历史土地拆迁费。
+     */
+    public PmPrjSettleAccounts setLandAmtHistory(BigDecimal landAmtHistory) {
+        if (this.landAmtHistory == null && landAmtHistory == null) {
+            // 均为null，不做处理。
+        } else if (this.landAmtHistory != null && landAmtHistory != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.landAmtHistory.compareTo(landAmtHistory) != 0) {
+                this.landAmtHistory = landAmtHistory;
+                if (!this.toUpdateCols.contains("LAND_AMT_HISTORY")) {
+                    this.toUpdateCols.add("LAND_AMT_HISTORY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.landAmtHistory = landAmtHistory;
+            if (!this.toUpdateCols.contains("LAND_AMT_HISTORY")) {
+                this.toUpdateCols.add("LAND_AMT_HISTORY");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 历史预备费。
+     */
+    private BigDecimal prepareAmtHistory;
+
+    /**
+     * 获取：历史预备费。
+     */
+    public BigDecimal getPrepareAmtHistory() {
+        return this.prepareAmtHistory;
+    }
+
+    /**
+     * 设置：历史预备费。
+     */
+    public PmPrjSettleAccounts setPrepareAmtHistory(BigDecimal prepareAmtHistory) {
+        if (this.prepareAmtHistory == null && prepareAmtHistory == null) {
+            // 均为null，不做处理。
+        } else if (this.prepareAmtHistory != null && prepareAmtHistory != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prepareAmtHistory.compareTo(prepareAmtHistory) != 0) {
+                this.prepareAmtHistory = prepareAmtHistory;
+                if (!this.toUpdateCols.contains("PREPARE_AMT_HISTORY")) {
+                    this.toUpdateCols.add("PREPARE_AMT_HISTORY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prepareAmtHistory = prepareAmtHistory;
+            if (!this.toUpdateCols.contains("PREPARE_AMT_HISTORY")) {
+                this.toUpdateCols.add("PREPARE_AMT_HISTORY");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 历史建设期利息。
+     */
+    private BigDecimal constructPeriodHistory;
+
+    /**
+     * 获取：历史建设期利息。
+     */
+    public BigDecimal getConstructPeriodHistory() {
+        return this.constructPeriodHistory;
+    }
+
+    /**
+     * 设置：历史建设期利息。
+     */
+    public PmPrjSettleAccounts setConstructPeriodHistory(BigDecimal constructPeriodHistory) {
+        if (this.constructPeriodHistory == null && constructPeriodHistory == null) {
+            // 均为null，不做处理。
+        } else if (this.constructPeriodHistory != null && constructPeriodHistory != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.constructPeriodHistory.compareTo(constructPeriodHistory) != 0) {
+                this.constructPeriodHistory = constructPeriodHistory;
+                if (!this.toUpdateCols.contains("CONSTRUCT_PERIOD_HISTORY")) {
+                    this.toUpdateCols.add("CONSTRUCT_PERIOD_HISTORY");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.constructPeriodHistory = constructPeriodHistory;
+            if (!this.toUpdateCols.contains("CONSTRUCT_PERIOD_HISTORY")) {
+                this.toUpdateCols.add("CONSTRUCT_PERIOD_HISTORY");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 累计支付金额。
+     */
+    private BigDecimal cumPayAmtTwo;
+
+    /**
+     * 获取：累计支付金额。
+     */
+    public BigDecimal getCumPayAmtTwo() {
+        return this.cumPayAmtTwo;
+    }
+
+    /**
+     * 设置：累计支付金额。
+     */
+    public PmPrjSettleAccounts setCumPayAmtTwo(BigDecimal cumPayAmtTwo) {
+        if (this.cumPayAmtTwo == null && cumPayAmtTwo == null) {
+            // 均为null，不做处理。
+        } else if (this.cumPayAmtTwo != null && cumPayAmtTwo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cumPayAmtTwo.compareTo(cumPayAmtTwo) != 0) {
+                this.cumPayAmtTwo = cumPayAmtTwo;
+                if (!this.toUpdateCols.contains("CUM_PAY_AMT_TWO")) {
+                    this.toUpdateCols.add("CUM_PAY_AMT_TWO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cumPayAmtTwo = cumPayAmtTwo;
+            if (!this.toUpdateCols.contains("CUM_PAY_AMT_TWO")) {
+                this.toUpdateCols.add("CUM_PAY_AMT_TWO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 已支付比例。
+     */
+    private BigDecimal overPayedPercent;
+
+    /**
+     * 获取：已支付比例。
+     */
+    public BigDecimal getOverPayedPercent() {
+        return this.overPayedPercent;
+    }
+
+    /**
+     * 设置：已支付比例。
+     */
+    public PmPrjSettleAccounts setOverPayedPercent(BigDecimal overPayedPercent) {
+        if (this.overPayedPercent == null && overPayedPercent == null) {
+            // 均为null，不做处理。
+        } else if (this.overPayedPercent != null && overPayedPercent != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.overPayedPercent.compareTo(overPayedPercent) != 0) {
+                this.overPayedPercent = overPayedPercent;
+                if (!this.toUpdateCols.contains("OVER_PAYED_PERCENT")) {
+                    this.toUpdateCols.add("OVER_PAYED_PERCENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.overPayedPercent = overPayedPercent;
+            if (!this.toUpdateCols.contains("OVER_PAYED_PERCENT")) {
+                this.toUpdateCols.add("OVER_PAYED_PERCENT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 长备注2。
+     */
+    private String textRemarkTwo;
+
+    /**
+     * 获取：长备注2。
+     */
+    public String getTextRemarkTwo() {
+        return this.textRemarkTwo;
+    }
+
+    /**
+     * 设置：长备注2。
+     */
+    public PmPrjSettleAccounts setTextRemarkTwo(String textRemarkTwo) {
+        if (this.textRemarkTwo == null && textRemarkTwo == null) {
+            // 均为null，不做处理。
+        } else if (this.textRemarkTwo != null && textRemarkTwo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.textRemarkTwo.compareTo(textRemarkTwo) != 0) {
+                this.textRemarkTwo = textRemarkTwo;
+                if (!this.toUpdateCols.contains("TEXT_REMARK_TWO")) {
+                    this.toUpdateCols.add("TEXT_REMARK_TWO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.textRemarkTwo = textRemarkTwo;
+            if (!this.toUpdateCols.contains("TEXT_REMARK_TWO")) {
+                this.toUpdateCols.add("TEXT_REMARK_TWO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 日期2。
+     */
+    private LocalDate dateTwo;
+
+    /**
+     * 获取：日期2。
+     */
+    public LocalDate getDateTwo() {
+        return this.dateTwo;
+    }
+
+    /**
+     * 设置：日期2。
+     */
+    public PmPrjSettleAccounts setDateTwo(LocalDate dateTwo) {
+        if (this.dateTwo == null && dateTwo == null) {
+            // 均为null，不做处理。
+        } else if (this.dateTwo != null && dateTwo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.dateTwo.compareTo(dateTwo) != 0) {
+                this.dateTwo = dateTwo;
+                if (!this.toUpdateCols.contains("DATE_TWO")) {
+                    this.toUpdateCols.add("DATE_TWO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.dateTwo = dateTwo;
+            if (!this.toUpdateCols.contains("DATE_TWO")) {
+                this.toUpdateCols.add("DATE_TWO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 附件4。
+     */
+    private String fileIdFour;
+
+    /**
+     * 获取：附件4。
+     */
+    public String getFileIdFour() {
+        return this.fileIdFour;
+    }
+
+    /**
+     * 设置：附件4。
+     */
+    public PmPrjSettleAccounts setFileIdFour(String fileIdFour) {
+        if (this.fileIdFour == null && fileIdFour == null) {
+            // 均为null，不做处理。
+        } else if (this.fileIdFour != null && fileIdFour != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.fileIdFour.compareTo(fileIdFour) != 0) {
+                this.fileIdFour = fileIdFour;
+                if (!this.toUpdateCols.contains("FILE_ID_FOUR")) {
+                    this.toUpdateCols.add("FILE_ID_FOUR");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.fileIdFour = fileIdFour;
+            if (!this.toUpdateCols.contains("FILE_ID_FOUR")) {
+                this.toUpdateCols.add("FILE_ID_FOUR");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 附件5。
+     */
+    private String fileIdFive;
+
+    /**
+     * 获取：附件5。
+     */
+    public String getFileIdFive() {
+        return this.fileIdFive;
+    }
+
+    /**
+     * 设置：附件5。
+     */
+    public PmPrjSettleAccounts setFileIdFive(String fileIdFive) {
+        if (this.fileIdFive == null && fileIdFive == null) {
+            // 均为null，不做处理。
+        } else if (this.fileIdFive != null && fileIdFive != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.fileIdFive.compareTo(fileIdFive) != 0) {
+                this.fileIdFive = fileIdFive;
+                if (!this.toUpdateCols.contains("FILE_ID_FIVE")) {
+                    this.toUpdateCols.add("FILE_ID_FIVE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.fileIdFive = fileIdFive;
+            if (!this.toUpdateCols.contains("FILE_ID_FIVE")) {
+                this.toUpdateCols.add("FILE_ID_FIVE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 附件6。
+     */
+    private String fileIdSix;
+
+    /**
+     * 获取：附件6。
+     */
+    public String getFileIdSix() {
+        return this.fileIdSix;
+    }
+
+    /**
+     * 设置：附件6。
+     */
+    public PmPrjSettleAccounts setFileIdSix(String fileIdSix) {
+        if (this.fileIdSix == null && fileIdSix == null) {
+            // 均为null，不做处理。
+        } else if (this.fileIdSix != null && fileIdSix != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.fileIdSix.compareTo(fileIdSix) != 0) {
+                this.fileIdSix = fileIdSix;
+                if (!this.toUpdateCols.contains("FILE_ID_SIX")) {
+                    this.toUpdateCols.add("FILE_ID_SIX");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.fileIdSix = fileIdSix;
+            if (!this.toUpdateCols.contains("FILE_ID_SIX")) {
+                this.toUpdateCols.add("FILE_ID_SIX");
             }
         }
         return this;
@@ -2530,6 +3334,42 @@ public class PmPrjSettleAccounts {
             this.remarkLongSeven = remarkLongSeven;
             if (!this.toUpdateCols.contains("REMARK_LONG_SEVEN")) {
                 this.toUpdateCols.add("REMARK_LONG_SEVEN");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否导入的记录。
+     */
+    private Boolean isImport;
+
+    /**
+     * 获取：是否导入的记录。
+     */
+    public Boolean getIsImport() {
+        return this.isImport;
+    }
+
+    /**
+     * 设置：是否导入的记录。
+     */
+    public PmPrjSettleAccounts setIsImport(Boolean isImport) {
+        if (this.isImport == null && isImport == null) {
+            // 均为null，不做处理。
+        } else if (this.isImport != null && isImport != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isImport.compareTo(isImport) != 0) {
+                this.isImport = isImport;
+                if (!this.toUpdateCols.contains("IS_IMPORT")) {
+                    this.toUpdateCols.add("IS_IMPORT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isImport = isImport;
+            if (!this.toUpdateCols.contains("IS_IMPORT")) {
+                this.toUpdateCols.add("IS_IMPORT");
             }
         }
         return this;
