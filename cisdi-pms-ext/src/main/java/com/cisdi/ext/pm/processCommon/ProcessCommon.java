@@ -798,32 +798,33 @@ public class ProcessCommon {
      */
     public void deleteNotInEntCode() throws Exception{
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select * from wf_process_instance");
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select * from wf_process_instance where ENT_CODE not in ('PM_PRJ_REQ','PM_PRJ_INVEST1','PM_PRJ_INVEST2','PM_BUY_DEMAND_REQ','PO_ORDER_CHANGE_REQ','PM_PRJ_INVEST3','PO_ORDER_REQ','PO_GUARANTEE_LETTER_REQUIRE_REQ','PO_GUARANTEE_LETTER_RETURN_OA_REQ')");
         if (!CollectionUtils.isEmpty(list)){
             for (Map<String, Object> map : list) {
                 String entCode = JdbcMapUtil.getString(map,"ENT_CODE");
                 String id = JdbcMapUtil.getString(map,"ID");
                 try {
-                    String recordId = JdbcMapUtil.getString(map,"ENTITY_RECORD_ID");
+//                    String recordId = JdbcMapUtil.getString(map,"ENTITY_RECORD_ID");
 
-                    String sql3 = "select id from " + entCode + " where id = ?";
+//                    String sql3 = "select id from " + entCode + " where id = ?";
 
-                    List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sql3,recordId);
-                    if (CollectionUtils.isEmpty(list3)){
+//                    List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sql3,recordId);
+//                    if (CollectionUtils.isEmpty(list3)){
                         String sql2 = "set foreign_key_checks = 0; delete from WF_TASK where WF_PROCESS_INSTANCE_ID = ?;" +
                                 "delete from WF_NODE_INSTANCE where WF_PROCESS_INSTANCE_ID = ?;" +
                                 "delete from wf_process_instance where id = ?;set foreign_key_checks = 1;";
                         myJdbcTemplate.update(sql2,id,id,id);
-                    } else {
-                        String sql = "select id from " + entCode + " where id = ? and status in ('VD','VDING')";
-                        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql,recordId);
-                        if (!CollectionUtils.isEmpty(list2)){
-                            String sql2 = "set foreign_key_checks = 0; update WF_TASK set status = 'VD' where WF_PROCESS_INSTANCE_ID = ?;" +
-                                    "UPDATE WF_NODE_INSTANCE SET STATUS = 'VD' where WF_PROCESS_INSTANCE_ID = ?;" +
-                                    "UPDATE wf_process_instance SET STATUS = 'VD' where id = ?;set foreign_key_checks = 1;";
-                            myJdbcTemplate.update(sql2,id,id,id);
-                        }
-                    }
+//                    } else {
+//                        String sql = "select id from " + entCode + " where id = ? and status in ('VD','VDING')";
+//                        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql,recordId);
+//                        if (!CollectionUtils.isEmpty(list2)){
+//                            String sql2 = "set foreign_key_checks = 0; update WF_TASK set status = 'VD' where WF_PROCESS_INSTANCE_ID = ?;" +
+//                                    "UPDATE WF_NODE_INSTANCE SET STATUS = 'VD' where WF_PROCESS_INSTANCE_ID = ?;" +
+//                                    "UPDATE wf_process_instance SET STATUS = 'VD' where id = ?;set foreign_key_checks = 1;";
+//                            myJdbcTemplate.update(sql2,id,id,id);
+//                        }
+//                        }
+//                    }
                 } catch (Exception e){
                     System.out.println("错误信息：" + entCode + "; " + id);
                 }
