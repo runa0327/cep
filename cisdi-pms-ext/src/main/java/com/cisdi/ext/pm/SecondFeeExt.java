@@ -136,8 +136,15 @@ public class SecondFeeExt {
         List<Map<String, Object>> approvedAmountMaps = myJdbcTemplate.queryForList("select IFNULL(AMT_TWO,0) approvedAmount from po_order_req o where o.id = ?",
                 req.orderReqId);
         if (!CollectionUtils.isEmpty(approvedAmountMaps)){
-            demandDtlWrappers.get(0).approvedAmount.text = approvedAmountMaps.get(0).get("approvedAmount").toString();
-            demandDtlWrappers.get(0).approvedAmount.value = demandDtlWrappers.get(0).approvedAmount.text;
+            if(CollectionUtils.isEmpty(demandDtlWrappers)){
+                DemandDtlWrapper wrapper = new DemandDtlWrapper();
+                wrapper.approvedAmount.text = approvedAmountMaps.get(0).get("approvedAmount").toString();
+                wrapper.approvedAmount.value = wrapper.approvedAmount.text;
+            }else{
+                demandDtlWrappers.get(0).approvedAmount.text = approvedAmountMaps.get(0).get("approvedAmount").toString();
+                demandDtlWrappers.get(0).approvedAmount.value = demandDtlWrappers.get(0).approvedAmount.text;
+            }
+
         }
         //根据项目投资节点走到哪步，之前填报情况，设置可填、必填状态
         this.setStatusByPrjMaxTypeInvest(req.prjId, demandDtlWrappers);
