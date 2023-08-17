@@ -40,7 +40,6 @@ public class ReversalDataExt {
      * 台账刷新项目信息
      */
     public void reversalData() {
-        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         switch (entCode) {
             case "PM_PRJ_REQ":
@@ -59,9 +58,9 @@ public class ReversalDataExt {
      */
     private void refreshInvest(String tableName) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql = "select ifnull(PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST,ifnull(CONSTRUCT_AMT,0) as CONSTRUCT_AMT,ifnull(EQUIP_AMT,0) as EQUIP_AMT,ifnull(EQUIPMENT_COST,0) as EQUIPMENT_COST,ifnull(PROJECT_OTHER_AMT,0) as PROJECT_OTHER_AMT,ifnull(LAND_AMT,0) as LAND_AMT,ifnull(PREPARE_AMT,0) as PREPARE_AMT,ifnull(PROJECT_AMT,0) as PROJECT_AMT from " + tableName + " where `STATUS`='ap'";
+        String sql = "select PM_PRJ_ID,ifnull(PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST,ifnull(CONSTRUCT_AMT,0) as CONSTRUCT_AMT,ifnull(EQUIP_AMT,0) as EQUIP_AMT,ifnull(EQUIPMENT_COST,0) as EQUIPMENT_COST,ifnull(PROJECT_OTHER_AMT,0) as PROJECT_OTHER_AMT,ifnull(LAND_AMT,0) as LAND_AMT,ifnull(PREPARE_AMT,0) as PREPARE_AMT,ifnull(PROJECT_AMT,0) as PROJECT_AMT from " + tableName + " where `STATUS`='ap'";
         if ("PM_PRJ_SETTLE_ACCOUNTS".equals(tableName)) {
-            sql = "select ifnull(PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST,ifnull(CONSTRUCT_AMT,0) as CONSTRUCT_AMT,ifnull(EQUIP_AMT,0) as EQUIP_AMT,ifnull(EQUIPMENT_COST,0) as EQUIPMENT_COST,ifnull(PROJECT_OTHER_AMT,0) as PROJECT_OTHER_AMT,ifnull(LAND_AMT,0) as LAND_AMT,ifnull(PREPARE_AMT,0) as PREPARE_AMT,0 as PROJECT_AMT from " + tableName + " where `STATUS`='ap'";
+            sql = "select PM_PRJ_ID,ifnull(PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST,ifnull(CONSTRUCT_AMT,0) as CONSTRUCT_AMT,ifnull(EQUIP_AMT,0) as EQUIP_AMT,ifnull(EQUIPMENT_COST,0) as EQUIPMENT_COST,ifnull(PROJECT_OTHER_AMT,0) as PROJECT_OTHER_AMT,ifnull(LAND_AMT,0) as LAND_AMT,ifnull(PREPARE_AMT,0) as PREPARE_AMT,0 as PROJECT_AMT from " + tableName + " where `STATUS`='ap'";
         }
         List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
         list.forEach(item -> {
