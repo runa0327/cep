@@ -41,11 +41,10 @@ public class UserServiceImpl implements UserService {
         }
 
         List<Map<String, Object>> originList = myJdbcTemplate.queryForList("select l.AD_USER_ID userId,u.name userName,max(l.LOGIN_DATETIME) lastLoginDate," +
-                "count(*) loginNum,max(d.name) deptName,IFNULL(max(ft.initiateProcessNum),0) initiateProcessNum,IFNULL(max(lt.handleProcessNum),0) handleProcessNum\n" +
+                "count(*) loginNum,IFNULL(max(ft.initiateProcessNum),0) initiateProcessNum,IFNULL(max(lt.handleProcessNum),0) handleProcessNum," +
+                "(select a.name from hr_dept a left join hr_dept_user b on a.id = b.hr_dept_id where b.ad_user_id = l.AD_USER_ID limit 1) deptName " +
                 "from main.ad_login l\n" +
                 "left join ad_user u on u.id = l.AD_USER_ID\n" +
-                "left join hr_dept_user du on du.AD_USER_ID = u.id\n" +
-                "left join hr_dept d on d.id = du.HR_DEPT_ID\n" +
                 "left join (select count(*) initiateProcessNum,ta.AD_USER_ID from wf_task ta where ta.status = 'AP' and ta" +
                 ".IS_PROC_INST_FIRST_TODO_TASK = 1 group by ta.AD_USER_ID) ft on ft.AD_USER_ID = u.id\n" +
                 "left join (select count(*) handleProcessNum,ta.AD_USER_ID from wf_task ta where ta.status = 'AP' and ta" +
