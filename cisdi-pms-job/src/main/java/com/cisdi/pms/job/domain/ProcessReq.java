@@ -13,4 +13,10 @@ public class ProcessReq {
 
     //结束日期
     private String endDate;
+
+    //开始日期
+    private String startTime;
+
+    //结束日期
+    private String endTime;
 }
