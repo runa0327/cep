@@ -45,10 +45,8 @@ public class UserServiceImpl implements UserService {
                 "(select a.name from hr_dept a left join hr_dept_user b on a.id = b.hr_dept_id where b.ad_user_id = l.AD_USER_ID limit 1) deptName " +
                 "from main.ad_login l\n" +
                 "left join ad_user u on u.id = l.AD_USER_ID\n" +
-                "left join (select count(*) initiateProcessNum,ta.AD_USER_ID from wf_task ta where ta.status = 'AP' and ta" +
-                ".IS_PROC_INST_FIRST_TODO_TASK = 1 group by ta.AD_USER_ID) ft on ft.AD_USER_ID = u.id\n" +
-                "left join (select count(*) handleProcessNum,ta.AD_USER_ID from wf_task ta where ta.status = 'AP' and ta" +
-                ".IS_USER_LAST_CLOSED_TODO_TASK = 1 group by ta.AD_USER_ID) lt on lt.AD_USER_ID = u.id\n" +
+                "left join (select count(*) initiateProcessNum,ta.AD_USER_ID from wf_task ta where ta.status = 'AP' and ta.IS_PROC_INST_FIRST_TODO_TASK = 1 group by ta.AD_USER_ID) ft on ft.AD_USER_ID = u.id\n" +
+                "left join (select count(*) handleProcessNum,ta.AD_USER_ID from wf_task ta where ta.status = 'AP' and ta.IS_USER_LAST_CLOSED_TODO_TASK = 1 group by ta.AD_USER_ID) lt on lt.AD_USER_ID = u.id\n" +
                 "where u.name is not null\n" +
                 "and l.LOGIN_DATETIME >= ? and l.LOGIN_DATETIME <= ?\n" +
                 "group by l.AD_USER_ID order by loginNum desc", startTime, endTime);

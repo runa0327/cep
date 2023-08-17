@@ -444,6 +444,10 @@ public class WfExt {
                         otherName = getContractName(entityCode,"CONTRACT_NAME",csCommId,myJdbcTemplate);
                         name = concatProcessName("-",processName,projectName,otherName,userName,nowDate);
                         update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
+                    } else if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entityCode)) { // 保函退还
+                        otherName = JdbcMapUtil.getString(valueMap,"GUARANTEE_CODE");
+                        name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
+                        update1 = myJdbcTemplate.update("update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?",name,csCommId);
                     } else {
                         sql = "update wf_process_instance pi join " + entityCode + " t on pi.ENTITY_RECORD_ID = t.id set pi.name = ? where t.id = ?";
                         name = concatProcessName("-",processName,projectName,userName,nowDate);
@@ -1750,6 +1754,9 @@ public class WfExt {
                 name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
             } else if ("PM_PRJ_SETTLE_ACCOUNTS".equals(entityCode)){ //项目结算
                 otherName = getTitleOtherNameByGrSetValueId(entityCode,"SETTLE_COST_TYPE_IDS",csCommId,myJdbcTemplate);
+                name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
+            } else if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entityCode)){
+                otherName = JdbcMapUtil.getString(valueMap,"GUARANTEE_CODE");
                 name = concatProcessNameStatic("-",processName,projectName,otherName,userName,nowDate);
             } else {
                 name = concatProcessNameStatic("-",processName,projectName,userName,nowDate);
