@@ -31,6 +31,9 @@ public class ReceiveBankConfigure {
         if (Strings.isNullOrEmpty(bank.parentId)){
             bank.parentId = null;
         }
+        if (Strings.isNullOrEmpty(bank.level)){
+            bank.level = "1";
+        }
         Crud.from("RECEIVING_BANK").where().eq("ID", id).update().set("RECEIVING_BANK_PID", bank.parentId).set("NAME", bank.name)
                 .set("level", bank.level).set("BANK_TYPE",bank.bankType).exec();
     }
