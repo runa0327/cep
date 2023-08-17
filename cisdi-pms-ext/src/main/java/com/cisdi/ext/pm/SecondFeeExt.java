@@ -140,10 +140,12 @@ public class SecondFeeExt {
             Map<String, Object> dataMap = approvedAmountMaps.get(0);
             System.out.println("数====================================据：" + dataMap);
             if (CollectionUtils.isEmpty(demandDtlWrappers)) {
+                System.out.println("判============approvedAmountMaps========================断为空");
                 DemandDtlWrapper wrapper = new DemandDtlWrapper();
                 wrapper.approvedAmount.text = JdbcMapUtil.getString(dataMap, "approvedAmount");
                 wrapper.approvedAmount.value = wrapper.approvedAmount.text;
             } else {
+                System.out.println("判============approvedAmountMaps========================断不为空");
                 demandDtlWrappers.get(0).approvedAmount.text = JdbcMapUtil.getString(dataMap, "approvedAmount");
                 demandDtlWrappers.get(0).approvedAmount.value = demandDtlWrappers.get(0).approvedAmount.text;
             }
