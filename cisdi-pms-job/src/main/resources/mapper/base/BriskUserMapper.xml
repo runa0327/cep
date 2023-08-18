@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.base.BriskUserMapper">
+    <resultMap id="BriskUserResult" type="com.cisdi.pms.job.domain.BriskUser">
+        <id property="id" column="id" />
+        <result property="userName" column="userName" />
+        <result property="deptName" column="deptName" />
+        <result property="lastLoginDate" column="lastLoginDate" />
+        <result property="loginNum" column="loginNum" />
+        <result property="initiateProcessNum" column="initiateProcessNum" />
+        <result property="handleProcessNum" column="handleProcessNum" />
+        <result property="startTime" column="startTime" />
+        <result property="endTime" column="endTime" />
+    </resultMap>
+
+    <!--查询用户活跃信息-->
+    <select id="getBriskUser" resultMap="BriskUserResult">
+        <![CDATA[
+        select
+            l.AD_USER_ID userId,
+            u.name userName,
+            max(l.LOGIN_DATETIME) lastLoginDate,
+            count(*) loginNum,
+            IFNULL(max(ft.initiateProcessNum),0) initiateProcessNum,
+            IFNULL(max(lt.handleProcessNum),0) handleProcessNum,
+            (select a.name from hr_dept a left join hr_dept_user b on a.id = b.hr_dept_id where b.ad_user_id = l.AD_USER_ID limit 1) deptName
+        from main.ad_login l
+        left join ad_user u on u.id = l.AD_USER_ID
+        left join (select count(*) initiateProcessNum,ta.AD_USER_ID from wf_task ta where ta.status = 'AP' and ta.IS_PROC_INST_FIRST_TODO_TASK = 1 and ta.ACT_DATETIME >= #{startTime} and ta.ACT_DATETIME <= #{endTime} group by ta.AD_USER_ID) ft on ft.AD_USER_ID = u.id
+        left join (select count(*) handleProcessNum,ta.AD_USER_ID from wf_task ta where ta.status = 'AP' and ta.IS_USER_LAST_CLOSED_TODO_TASK = 1 and ta.ACT_DATETIME >= #{startTime} and ta.ACT_DATETIME <= #{endTime} group by ta.AD_USER_ID) lt on lt.AD_USER_ID = u.id
+        where
+            u.name is not null
+            and l.LOGIN_DATETIME >= #{startTime}
+            and l.LOGIN_DATETIME <= #{endTime}
+        group by
+            l.AD_USER_ID
+        order by loginNum desc
+            ]]>
+    </select>
+</mapper>
