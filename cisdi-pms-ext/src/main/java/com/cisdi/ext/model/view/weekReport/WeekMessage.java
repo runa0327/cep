@@ -60,4 +60,8 @@ public class WeekMessage extends BasePageEntity {
     public String manageUserName;
     // 排序字段
     private List<SortBean> sort;
+    // 航拍图
+    private String aerialImg;
+    // 问题明细
+    private List<PmProgressWeeklyPrjProblemDetailView> problemDetailList;
 }

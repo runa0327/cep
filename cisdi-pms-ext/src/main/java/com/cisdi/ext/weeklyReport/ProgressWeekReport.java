@@ -5,6 +5,7 @@ import com.cisdi.ext.model.PmProgressWeekly;
 import com.cisdi.ext.model.PmProgressWeeklyPrj;
 import com.cisdi.ext.model.PmProgressWeeklyPrjDetail;
 import com.cisdi.ext.model.view.project.PmPrjView;
+import com.cisdi.ext.model.view.weekReport.PmProgressWeeklyPrjProblemDetailView;
 import com.cisdi.ext.model.view.weekReport.PmProgressWeeklyView;
 import com.cisdi.ext.model.view.weekReport.SortBean;
 import com.cisdi.ext.model.view.weekReport.WeekMessage;
@@ -105,7 +106,7 @@ public class ProgressWeekReport {
             weekId = progressPrj.get(0).getPmProgressWeeklyId();
             sql = "select a.file_id_one as fileId,a.id,a.DATE as writeDate,A.VISUAL_PROGRESS AS progress,A.VISUAL_PROGRESS_DESCRIBE AS progressDescribe,A.PROCESS_REMARK_TEXT AS progressWeek," +
                     "a.TEXT_REMARK_ONE as progressRemark,b.SYS_TRUE as weatherStart,b.IZ_END as weatherCompleted,'new' as dataType, " +
-                    "a.PM_PROGRESS_WEEKLY_ID as weekId,a.PM_PROGRESS_WEEKLY_PRJ_ID as weekPrjId,b.PM_PRJ_ID as projectId,b.IZ_WRITE as izWrite " +
+                    "a.PM_PROGRESS_WEEKLY_ID as weekId,a.PM_PROGRESS_WEEKLY_PRJ_ID as weekPrjId,b.PM_PRJ_ID as projectId,b.IZ_WRITE as izWrite,a.FILE_ID_TWO as aerialImg " +
                     "from pm_progress_weekly_prj_detail a left join PM_PROGRESS_WEEKLY_PRJ b on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id " +
                     "where a.STATUS = 'ap' and b.status = 'ap' and b.pm_prj_id = ? and a.PM_PROGRESS_WEEKLY_ID = '"+weekId+"' and b.PM_PROGRESS_WEEKLY_ID = '"+weekId+"' ";
             List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId);
@@ -127,13 +128,20 @@ public class ProgressWeekReport {
                     weekMessage.weatherCompleted = JdbcMapUtil.getInt(p, "weatherCompleted"); // 是否已竣工
                     weekMessage.weatherStart = JdbcMapUtil.getInt(p, "weatherStart"); // 是否符合开工条件
                     weekMessage.izWrite = JdbcMapUtil.getInt(p, "izWrite"); // 是否填写
-                    weekMessage.weekPrjId = JdbcMapUtil.getString(p, "weekPrjId"); //周项目id
+                    String weekPrjId = JdbcMapUtil.getString(p, "weekPrjId");
+                    weekMessage.weekPrjId = weekPrjId; //周项目id
                     weekMessage.projectId = JdbcMapUtil.getString(p, "projectId"); //项目id
                     weekMessage.weekId = JdbcMapUtil.getString(p, "weekId"); //周批次id
                     String fileId = JdbcMapUtil.getString(p, "fileId"); //文件id
                     if (!SharedUtil.isEmptyString(fileId)) {
                         weekMessage.fileId = fileId;
                         weekMessage.fileList = BaseFileExt.getFile(fileId);
+                    }
+                    weekMessage.setAerialImg(JdbcMapUtil.getString(p,"aerialImg")); // 航拍图
+                    // 获取项目问题明细信息
+                    List<PmProgressWeeklyPrjProblemDetailView> problemDetailList = getProblemDetailListByWeekPrjId(weekPrjId,myJdbcTemplate);
+                    if (!CollectionUtils.isEmpty(problemDetailList)){
+                        weekMessage.setProblemDetailList(problemDetailList);
                     }
                     return weekMessage;
                 }).collect(Collectors.toList());
@@ -146,6 +154,30 @@ public class ProgressWeekReport {
         } else {
             ExtJarHelper.returnValue.set(null);
         }
+    }
+
+    /**
+     * 根据周项目id查询项目问题明细
+     * @param weekPrjId 周项目id
+     * @param myJdbcTemplate 数据源
+     * @return 查询结果
+     */
+    private List<PmProgressWeeklyPrjProblemDetailView> getProblemDetailListByWeekPrjId(String weekPrjId, MyJdbcTemplate myJdbcTemplate) {
+        List<PmProgressWeeklyPrjProblemDetailView> list = new ArrayList<>();
+        String sql = "select A.ID,A.PRJ_PUSH_PROBLEM_TYPE_ID,A.PM_PROGRESS_WEEKLY_PRJ_ID,A.TEXT_REMARK_ONE,B.NAME from PM_PROGRESS_WEEKLY_PRJ_PROBLEM_DETAIL A LEFT JOIN GR_SET_VALUE B ON A.PRJ_PUSH_PROBLEM_TYPE_ID = B.ID where PM_PROGRESS_WEEKLY_PRJ_ID = ? and status = 'AP'";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList("");
+        if (!CollectionUtils.isEmpty(list1)){
+            list1.forEach(p->{
+                PmProgressWeeklyPrjProblemDetailView pmProgressWeeklyPrjProblemDetailView = new PmProgressWeeklyPrjProblemDetailView();
+                pmProgressWeeklyPrjProblemDetailView.setId(JdbcMapUtil.getString(p,"ID"));
+                pmProgressWeeklyPrjProblemDetailView.setPmProgressWeeklyPrjId(JdbcMapUtil.getString(p,"PM_PROGRESS_WEEKLY_PRJ_ID"));
+                pmProgressWeeklyPrjProblemDetailView.setPrjPushProblemTypeId(JdbcMapUtil.getString(p,"PRJ_PUSH_PROBLEM_TYPE_ID"));
+                pmProgressWeeklyPrjProblemDetailView.setPrjPushProblemTypeName(JdbcMapUtil.getString(p,"NAME"));
+                pmProgressWeeklyPrjProblemDetailView.setProblemDescribe(JdbcMapUtil.getString(p,"TEXT_REMARK_ONE"));
+                list.add(pmProgressWeeklyPrjProblemDetailView);
+            });
+        }
+        return list;
     }
 
     /**
