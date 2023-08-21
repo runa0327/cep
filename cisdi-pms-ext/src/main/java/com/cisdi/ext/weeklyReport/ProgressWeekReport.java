@@ -787,8 +787,11 @@ public class ProgressWeekReport {
                     if (StringUtils.hasText(name)){
                         sb.append(name).append("：");
                     }
-                    sb.append(describe).append("\n");
+                    sb.append(describe).append("；");
                 } else {
+                    if (StringUtils.hasText(name)){
+                        sb.append(name).append("：");
+                    }
                     sb.append(describe);
                 }
             }
