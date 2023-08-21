@@ -24,10 +24,10 @@ public class PmProgressWeeklyServiceImpl implements PmProgressWeeklyService {
         pmProgressWeekly.setId(weekId);
         pmProgressWeekly.setVer("1");
         pmProgressWeekly.setTs(nowDate);
-        pmProgressWeekly.setCrtDt(nowDate);
-        pmProgressWeekly.setCrtUserId("0099250247095871681");
-        pmProgressWeekly.setLastModiDt(nowDate);
-        pmProgressWeekly.setLastModiUserId("0099250247095871681");
+        pmProgressWeekly.setCreateDate(nowDate);
+        pmProgressWeekly.setCreateUserId("0099250247095871681");
+        pmProgressWeekly.setLastUpdateDate(nowDate);
+        pmProgressWeekly.setLastUpdateUserId("0099250247095871681");
         pmProgressWeekly.setStatus("AP");
         pmProgressWeekly.setDate(weekDate);
         pmProgressWeekly.setToDate(DateUtil.stringToDate(endDate));

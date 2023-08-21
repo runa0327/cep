@@ -31,8 +31,33 @@
         <result column="recordByName" property="recordByName"/>
         <result column="manageUserId" property="manageUserId"/>
         <result column="manageUserName" property="manageUserName"/>
-        <result column="isSubmit" property="isSubmit"/>
+        <result column="izSubmit" property="izSubmit"/>
     </resultMap>
+
+    <sql id="commonHeader">
+        id as id, -- id
+        CRT_DT as createDate, -- 创建时间
+        CRT_USER_ID as createUserId,  -- 创建人
+        LAST_MODI_DT as lastUpdateDate, -- 上次修改时间
+        LAST_MODI_USER_ID as lastUpdateUserId,  -- 上次修改人
+        `STATUS` as status,  -- 状态
+        PROCESS_REMARK_TEXT as progressWeek, -- 本周工作进展
+        DATE as writeDate, -- 填报周期
+        TO_DATE as toDate,  -- 填报周期结束时间
+        FROM_DATE as fromDate, -- 填报周期开始时间
+        FILE_ID_ONE as fileId, -- 形象进度影像资料
+        PM_PROGRESS_WEEKLY_ID as weekId, -- 周期id
+        TEXT_REMARK_ONE as progressRemark, -- 备注说明
+        VISUAL_PROGRESS as progress, -- 整体形象进度
+        VISUAL_PROGRESS_DESCRIBE as progressDescribe, -- 累计详细进度、问题说明
+        PM_PRJ_ID as projectId, -- 项目id
+        SYS_TRUE as weatherStart, -- 是否符合开工条件
+        AD_USER_ID as recordById,  -- 记录填报人
+        PM_PROGRESS_WEEKLY_PRJ_ID as weekPrjId, -- 进度周报-项目-id
+        IZ_END as weatherCompleted, -- 是否已竣工
+        IS_WEEKLY_REPORT_SUBMIT as izSubmit, -- 是否提交
+        FILE_ID_TWO as aerialImg -- 航拍图
+    </sql>
 
     <select id="getPrjRecords" resultMap="PmProgressWeeklyResult">
         SELECT
@@ -143,10 +168,10 @@
             #{id},
             #{ver},
             #{ts},
-            #{crtDt},
-            #{crtUserId},
-            #{lastModiDt},
-            #{lastModiUserId},
+            #{createDate},
+            #{createUserId},
+            #{lastUpdateDate},
+            #{lastUpdateUserId},
             #{status},
             #{progressWeek},
             #{writeDate},
@@ -178,5 +203,17 @@
             PM_PROGRESS_WEEKLY_ID = #{weekId}
           AND STATUS = 'ap'
           AND pm_prj_id = #{projectId}
+    </select>
+
+    <!--查询项目周报所有明细信息-->
+    <select id="getList" resultMap="PmProgressWeeklyResult">
+        select
+            <include refid="commonHeader" />
+        from
+            pm_progress_weekly_prj_detail
+        where
+            status = 'AP' and VISUAL_PROGRESS_DESCRIBE is not null
+        order by
+            CRT_DT desc
     </select>
 </mapper>

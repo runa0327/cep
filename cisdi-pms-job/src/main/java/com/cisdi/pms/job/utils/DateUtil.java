@@ -7,6 +7,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author dlt
@@ -59,6 +61,42 @@ public class DateUtil {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(date);
     }
+
+    /**
+     * 非星期五情况下，推断当天所属周的
+     * @param week 当天周几。0为周天
+     * @param date 当天日期
+     * @return 周几集合
+     */
+    public static Map<String, String> getDateMap(int week, Date date) {
+        Map<String,String> map = new HashMap<>();
+        Date start = date;
+        Date end = date;
+        if (week == 1){
+            start = DateUtil.addDays(date,-3);
+            end = DateUtil.addDays(date,3);
+        } else if ( week == 2){
+            start = DateUtil.addDays(date,-4);
+            end = DateUtil.addDays(date,2);
+        } else if ( week == 3){
+            start = DateUtil.addDays(date,-5);
+            end = DateUtil.addDays(date,1);
+        } else if ( week == 4){
+            start = DateUtil.addDays(date,-6);
+        } else if ( week == 5){
+            end = DateUtil.addDays(date,6);
+        } else if ( week == 6){
+            start = DateUtil.addDays(date,-1);
+            end = DateUtil.addDays(date,5);
+        } else if ( week == 0){
+            start = DateUtil.addDays(date,-2);
+            end = DateUtil.addDays(date,4);
+        }
+        map.put("startDate",DateUtil.getTimeStrDay(start));
+        map.put("endDate",DateUtil.getTimeStrDay(end));
+        return map;
+    }
+
     /**
      * 计算两个日期之间相差的天数
      *
