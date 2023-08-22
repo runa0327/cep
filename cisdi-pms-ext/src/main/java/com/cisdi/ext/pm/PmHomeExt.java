@@ -342,7 +342,7 @@ public class PmHomeExt {
     private String getImageProcess(String projectId) {
         String imageProcess = "0";
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select round(ifnull(VISUAL_PROGRESS,0),2) as VISUAL_PROGRESS from PM_PROGRESS_WEEKLY_PRJ_DETAIL where PM_PRJ_ID=? and FILE_ID_ONE is not null order by LAST_MODI_DT desc", projectId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select round(ifnull(VISUAL_PROGRESS,0),2) as VISUAL_PROGRESS from PM_PROGRESS_WEEKLY_PRJ_DETAIL where PM_PRJ_ID=?  order by LAST_MODI_DT desc", projectId);
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> mapData = list.get(0);
             imageProcess = JdbcMapUtil.getString(mapData, "VISUAL_PROGRESS");
