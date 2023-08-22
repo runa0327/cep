@@ -4,6 +4,7 @@ import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
@@ -67,7 +68,7 @@ public class PmHomeExt {
             info.planEndTime = StringUtil.withOutT(JdbcMapUtil.getString(mapData, "PLAN_END_TIME"));
             info.actualBeginTime = StringUtil.withOutT(JdbcMapUtil.getString(mapData, "ACTUAL_START_TIME"));
             info.actualEndTime = StringUtil.withOutT(JdbcMapUtil.getString(mapData, "ACTUAL_END_TIME"));
-            info.imageProcess = getImageProcess(JdbcMapUtil.getString(map,"projectId"));
+            info.imageProcess = getImageProcess(JdbcMapUtil.getString(map, "projectId"));
             info.step = JdbcMapUtil.getString(mapData, "phase");
             info.jsUnit = JdbcMapUtil.getString(mapData, "js");
             info.kcUnit = JdbcMapUtil.getString(mapData, "kc");
@@ -110,7 +111,7 @@ public class PmHomeExt {
             info.planEndTime = StringUtil.withOutT(JdbcMapUtil.getString(mapData, "PLAN_END_TIME"));
             info.actualBeginTime = StringUtil.withOutT(JdbcMapUtil.getString(mapData, "ACTUAL_START_TIME"));
             info.actualEndTime = StringUtil.withOutT(JdbcMapUtil.getString(mapData, "ACTUAL_END_TIME"));
-            info.imageProcess = getImageProcess(JdbcMapUtil.getString(map,"projectId"));
+            info.imageProcess = getImageProcess(JdbcMapUtil.getString(map, "projectId"));
             info.step = JdbcMapUtil.getString(mapData, "TRANSITION_PHASE_ID");
             info.jsUnit = JdbcMapUtil.getString(mapData, "BUILDER_UNIT");
             info.kcUnit = JdbcMapUtil.getString(mapData, "SURVEYOR_UNIT");
@@ -252,24 +253,39 @@ public class PmHomeExt {
         if (Strings.isNotEmpty(info.step)) {
             sb.append(" ,TRANSITION_PHASE_ID='").append(info.step).append("'");
         }
+        //单位--特殊处理
         if (Strings.isNotEmpty(info.jsUnit)) {
-            sb.append(" ,BUILDER_UNIT='").append(info.jsUnit).append("'");
+            //建设单位
+            String id = projectParty(info.jsUnit, "2");
+            sb.append(" ,BUILDER_UNIT='").append(id).append("'");
         }
         if (Strings.isNotEmpty(info.kcUnit)) {
-            sb.append(" ,SURVEYOR_UNIT='").append(info.kcUnit).append("'");
+            //勘察单位
+            String id = projectParty(info.kcUnit, "3");
+            sb.append(" ,SURVEYOR_UNIT='").append(id).append("'");
         }
         if (Strings.isNotEmpty(info.sjUnit)) {
-            sb.append(" ,DESIGNER_UNIT='").append(info.sjUnit).append("'");
+            //设计单位
+            String id = projectParty(info.sjUnit, "4");
+            sb.append(" ,DESIGNER_UNIT='").append(id).append("'");
         }
         if (Strings.isNotEmpty(info.sgUnit)) {
-            sb.append(" ,CONSTRUCTOR_UNIT='").append(info.sgUnit).append("'");
+            //施工单位
+            String id = projectParty(info.sgUnit, "5");
+            sb.append(" ,CONSTRUCTOR_UNIT='").append(id).append("'");
         }
         if (Strings.isNotEmpty(info.jlUnit)) {
-            sb.append(" ,SUPERVISOR_UNIT='").append(info.jlUnit).append("'");
+            //监理单位
+            String id = projectParty(info.jlUnit, "6");
+            sb.append(" ,SUPERVISOR_UNIT='").append(id).append("'");
         }
         if (Strings.isNotEmpty(info.zjUnit)) {
-            sb.append(" ,CONSULTER_UNIT='").append(info.zjUnit).append("'");
+            //造价单位
+            String id = projectParty(info.zjUnit, "8");
+            sb.append(" ,CONSULTER_UNIT='").append(id).append("'");
         }
+        //单位--特殊处理
+
         if (Strings.isNotEmpty(info.pics)) {
             sb.append(" ,PRJ_IMG='").append(info.pics).append("'");
         }
@@ -319,18 +335,81 @@ public class PmHomeExt {
 
     /**
      * 查询形象进度
+     *
      * @param projectId
      * @return
      */
     private String getImageProcess(String projectId) {
         String imageProcess = "0";
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select round(ifnull(VISUAL_PROGRESS,0),2) as VISUAL_PROGRESS from PM_PROGRESS_WEEKLY_PRJ_DETAIL where PM_PRJ_ID=? and FILE_ID_ONE is not null order by LAST_MODI_DT desc", projectId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select round(ifnull(VISUAL_PROGRESS,0),2) as VISUAL_PROGRESS from PM_PROGRESS_WEEKLY_PRJ_DETAIL where PM_PRJ_ID=?  order by LAST_MODI_DT desc", projectId);
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> mapData = list.get(0);
             imageProcess = JdbcMapUtil.getString(mapData, "VISUAL_PROGRESS");
         }
         return imageProcess;
+    }
+
+    /**
+     * 处理参见单位
+     *
+     * @param unit
+     * @param mark
+     * @return
+     */
+    private String projectParty(String unit, String mark) {
+        String res = null;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_party where id=?", unit);
+        if (CollectionUtils.isEmpty(list)) {
+            res = Crud.from("pm_party").insertData();
+            StringBuilder sb = new StringBuilder();
+            sb.append("update pm_party set `NAME`='").append(unit).append("'");
+            switch (mark) {
+                case "1":
+                    //业主单位
+                    sb.append(" , IS_CUSTOMER='1' ");
+                    break;
+                case "2":
+                    //建设单位
+                    sb.append(" , IS_BUILDER='1' ");
+                    break;
+                case "3":
+                    //勘察单位
+                    sb.append(" , IS_SURVEYOR='1' ");
+                    break;
+                case "4":
+                    //设计单位
+                    sb.append(" , IS_DESIGNER='1' ");
+                    break;
+                case "5":
+                    //施工单位
+                    sb.append(" , IS_CONSTRUCTOR='1' ");
+                    break;
+                case "6":
+                    //监理单位
+                    sb.append(" , IS_SUPERVISOR='1' ");
+                    break;
+                case "7":
+                    //检查单位
+                    sb.append(" , IS_CHECKER='1' ");
+                    break;
+                case "8":
+                    //造价单位
+                    sb.append(" , IS_CONSULTER='1' ");
+                    break;
+                case "9":
+                    //评审单位
+                    sb.append(" , IS_REVIEW='1' ");
+                    break;
+                default:
+            }
+            sb.append(" where id='").append(res).append("'");
+            myJdbcTemplate.update(sb.toString());
+        } else {
+            res = unit;
+        }
+        return res;
     }
 
 }
