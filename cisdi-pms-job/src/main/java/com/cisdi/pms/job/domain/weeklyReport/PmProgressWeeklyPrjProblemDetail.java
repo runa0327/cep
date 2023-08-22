@@ -26,4 +26,7 @@ public class PmProgressWeeklyPrjProblemDetail extends BaseDomain {
 
     // 项目id
     private String projectId;
+
+    // 周id
+    private String weekId;
 }
