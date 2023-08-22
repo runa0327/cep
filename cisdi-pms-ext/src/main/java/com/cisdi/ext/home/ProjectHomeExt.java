@@ -33,7 +33,7 @@ public class ProjectHomeExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pm.name as `NAME`,g1.name as mode,pm.PRJ_SITUATION as des,g2.name as location ,g3.`NAME` as source,g4.`NAME` as type,\n" +
-                "PLAN_START_TIME,PLAN_END_TIME,g5.`NAME` as tender,ACTUAL_START_TIME,ACTUAL_END_TIME,\n" +
+                "PLAN_START_TIME,PLAN_END_TIME,g5.`NAME` as tender,ACTUAL_START_TIME,ACTUAL_END_TIME,g6.`NAME` as status, \n" +
                 "p1.`NAME` as js, p2.`NAME` as kc, p3.`NAME` as sj, p4.`NAME` as sg, p5.`NAME` as jl from pm_prj pm \n" +
                 "left join gr_set_value g1 on g1.id = pm.PRJ_MANAGE_MODE_ID\n" +
                 "left join gr_set_value g2 on g2.id = pm.BASE_LOCATION_ID\n" +
@@ -45,6 +45,7 @@ public class ProjectHomeExt {
                 "left join pm_party p3 on p3.id = pm.DESIGNER_UNIT\n" +
                 "left join pm_party p4 on p4.id = pm.CONSTRUCTOR_UNIT\n" +
                 "left join pm_party p5 on p5.id = pm.SUPERVISOR_UNIT\n" +
+                "left join gr_set_value g6 on g6.id = PROJECT_PHASE_ID "+
                 "where pm.id=?", map.get("projectId"));
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> mapDate = list.get(0);
@@ -65,6 +66,7 @@ public class ProjectHomeExt {
             info.sjUnit = JdbcMapUtil.getString(mapDate, "sj");
             info.sgUnit = JdbcMapUtil.getString(mapDate, "sg");
             info.jlUnit = JdbcMapUtil.getString(mapDate, "jl");
+            info.status = JdbcMapUtil.getString(mapDate, "status");
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(info), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         } else {
@@ -89,7 +91,7 @@ public class ProjectHomeExt {
         if (!CollectionUtils.isEmpty(dataList)) {
             Map<String, Object> mapData = dataList.get(0);
             totalAmt = new BigDecimal(String.valueOf(mapData.get("PRJ_TOTAL_INVEST")));
-            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(amt,0) as amt from pm_invest_est_dtl dt left join pm_exp_type et on dt.PM_EXP_TYPE_ID = et.id where et.`CODE`='CONSTRUCT_AMT' and PM_INVEST_EST_ID=? ", mapData.get("id"));
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(amt,0) as amt from pm_invest_est_dtl dt left join pm_exp_type et on dt.PM_EXP_TYPE_ID = et.id where et.`CODE`='PROJECT_AMT' and PM_INVEST_EST_ID=? ", mapData.get("id"));
             if (!CollectionUtils.isEmpty(list)) {
                 Map<String, Object> jaMapData = list.get(0);
                 jaAmt = new BigDecimal(String.valueOf(jaMapData.get("amt")));
@@ -350,6 +352,7 @@ public class ProjectHomeExt {
         public String sjUnit;
         public String sgUnit;
         public String jlUnit;
+        public String status;
     }
 
     /**
