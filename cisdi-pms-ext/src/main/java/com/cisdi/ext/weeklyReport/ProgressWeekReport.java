@@ -1074,7 +1074,7 @@ public class ProgressWeekReport {
             List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sb2.toString(),weekId);
             if (!CollectionUtils.isEmpty(list3)){
                 Map<String,Object> resMap = new HashMap<>();
-                resMap.put("total",JdbcMapUtil.getString(list2.get(0),"num"));
+                resMap.put("total",Integer.valueOf(JdbcMapUtil.getString(list2.get(0),"num")));
                 resMap.put("header",resArr);
                 resMap.put("list",list3);
                 Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resMap), Map.class);
