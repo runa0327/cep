@@ -3,6 +3,7 @@ package com.cisdi.ext.model.view.weekReport;
 import com.cisdi.ext.model.BasePageEntity;
 import com.cisdi.ext.model.view.file.BaseFileView;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 /**
  * 形象进度工程周报填写记录
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class WeekMessage extends BasePageEntity {
 
@@ -83,9 +85,15 @@ public class WeekMessage extends BasePageEntity {
 
     // 排序字段
     private List<SortBean> sort;
+
     // 航拍图
     private String aerialImgId;
     private List<BaseFileView> aerialImg;
+
     // 问题明细
     private List<PmProgressWeeklyPrjProblemDetailView> problemDetailList;
+
+    // 项目问题推进类型
+    private String pushProblemTypeId;
+    private String pushProblemTypeName;
 }

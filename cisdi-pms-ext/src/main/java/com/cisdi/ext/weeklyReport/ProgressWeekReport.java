@@ -2,10 +2,7 @@ package com.cisdi.ext.weeklyReport;
 
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.file.BaseFileExt;
-import com.cisdi.ext.model.PmProgressWeekly;
-import com.cisdi.ext.model.PmProgressWeeklyPrj;
-import com.cisdi.ext.model.PmProgressWeeklyPrjDetail;
-import com.cisdi.ext.model.PmProgressWeeklyPrjProblemDetail;
+import com.cisdi.ext.model.*;
 import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.model.view.project.PmPrjView;
 import com.cisdi.ext.model.view.weekReport.PmProgressWeeklyPrjProblemDetailView;
@@ -251,17 +248,19 @@ public class ProgressWeekReport {
      * @param proList 问题明细信息
      */
     private void updateProDetail(String projectId, String weekPrjId, List<PmProgressWeeklyPrjProblemDetailView> proList) {
-        // 删除上一次问题明细信息
-        PmProgressWeeklyPrjProblemDetail.deleteByWhere(new Where().eq(PmProgressWeeklyPrjProblemDetail.Cols.PM_PROGRESS_WEEKLY_PRJ_ID,weekPrjId));
         if (!CollectionUtils.isEmpty(proList)){
-            for (PmProgressWeeklyPrjProblemDetailView tmp : proList) {
-                String typeId = tmp.getPrjPushProblemTypeId();
-                String describe = tmp.getProblemDescribe();
-                String id = Crud.from(PmProgressWeeklyPrjProblemDetail.ENT_CODE).insertData();
-                Crud.from(PmProgressWeeklyPrjProblemDetail.ENT_CODE).where().eq("ID",id).update()
-                        .set("PM_PROGRESS_WEEKLY_PRJ_ID",weekPrjId).set("PRJ_PUSH_PROBLEM_TYPE_ID",typeId)
-                        .set("TEXT_REMARK_ONE",describe).set("PM_PRJ_ID",projectId).set("STATUS","AP")
-                        .exec();
+            // 删除上一次问题明细信息
+            PmProgressWeeklyPrjProblemDetail.deleteByWhere(new Where().eq(PmProgressWeeklyPrjProblemDetail.Cols.PM_PROGRESS_WEEKLY_PRJ_ID,weekPrjId));
+            if (!CollectionUtils.isEmpty(proList)){
+                for (PmProgressWeeklyPrjProblemDetailView tmp : proList) {
+                    String typeId = tmp.getPrjPushProblemTypeId();
+                    String describe = tmp.getProblemDescribe();
+                    String id = Crud.from(PmProgressWeeklyPrjProblemDetail.ENT_CODE).insertData();
+                    Crud.from(PmProgressWeeklyPrjProblemDetail.ENT_CODE).where().eq("ID",id).update()
+                            .set("PM_PROGRESS_WEEKLY_PRJ_ID",weekPrjId).set("PRJ_PUSH_PROBLEM_TYPE_ID",typeId)
+                            .set("TEXT_REMARK_ONE",describe).set("PM_PRJ_ID",projectId).set("STATUS","AP")
+                            .exec();
+                }
             }
         }
     }
@@ -301,7 +300,7 @@ public class ProgressWeekReport {
                 prjImg = String.join(",",arr) + "," + aerialImg;
             }
         }
-        if (StringUtils.hasText(projectImg)){
+        if (StringUtils.hasText(prjImg)){
             PmPrjExt.updateOneColValue(projectId,prjImg,"PRJ_IMG");
         }
     }
@@ -1029,6 +1028,111 @@ public class ProgressWeekReport {
      * 形象进度周报-项目施工进度问题汇总-列表
      */
     public void prjWeeklyProgressSum(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        // 获取输入：
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        WeekMessage param = JsonUtil.fromJson(json,WeekMessage.class);
+        if (param.pageIndex == 0 || param.pageSize == 0) {
+            throw new BaseException("分页参数不能必须大于0");
+        }
+        // 起始条数
+        int start = (param.pageIndex - 1) * param.pageSize;
+        String limit = "limit " + start + "," + param.pageSize;
 
+        String weekId = param.getWeekId(); // 周id
+        String pushProblemTypeId = param.getPushProblemTypeId();
+        LinkedHashMap<String,String> typeMap = getTypeMap(pushProblemTypeId,myJdbcTemplate);
+        List<String> resArr = typeMap.values().stream().collect(Collectors.toList());
+        resArr.add(0,"项目名称");
+        //查询当前页项目id
+
+        StringBuilder sb = new StringBuilder("select group_concat(a.prjIds SEPARATOR ''',''') as prjIds from ( select a.pm_prj_id as prjIds,ifnull(b.IZ_END,'0') as weatherCompleted,ifnull(b.IZ_START_REQUIRE,'1') as weatherStart from PM_PROGRESS_WEEKLY_PRJ a left join pm_prj b on a.pm_prj_id = b.id where a.PM_PROGRESS_WEEKLY_ID = ?");
+        StringBuilder sb1 = new StringBuilder("select count(*) as num from PM_PROGRESS_WEEKLY_PRJ where PM_PROGRESS_WEEKLY_ID = ? ");
+        if (StringUtils.hasText(param.getProjectId())){
+            sb.append(" and a.pm_prj_id in ('").append(param.getProjectId().replace(",","','")).append("')");
+            sb1.append(" and pm_prj_id in ('").append(param.getProjectId().replace(",","','")).append("')");
+        }
+        sb.append(" order by weatherCompleted asc,weatherStart desc,a.pm_prj_id desc ").append(limit).append(" ) a");
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString(),weekId);
+        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sb1.toString(),weekId);
+        if (!CollectionUtils.isEmpty(list1)){
+            String prjIds = JdbcMapUtil.getString(list1.get(0),"prjIds");
+            StringBuilder sb2 = new StringBuilder("select a.projectName,");
+            for (String key: typeMap.keySet()){
+                sb2.append("ifnull(group_concat(case when a.typeId = '").append(key).append("' then a.describeValue else null END SEPARATOR ''),'未涉及') AS '").append(typeMap.get(key)).append("',");
+            }
+            sb2.deleteCharAt(sb2.length()-1);
+            sb2.append(" from ( select c.name as projectName,a.TEXT_REMARK_ONE as describeValue,b.ts,")
+                    .append("a.PRJ_PUSH_PROBLEM_TYPE_ID as typeId,(select name from gr_set_value where id = a.PRJ_PUSH_PROBLEM_TYPE_ID) as typeName ")
+                    .append("from pm_progress_weekly_prj b LEFT JOIN pm_progress_weekly_prj_problem_detail a on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id left join pm_prj c on b.PM_PRJ_ID = c.id where ")
+                    .append("b.PM_PROGRESS_WEEKLY_ID = ? ");
+            if (StringUtils.hasText(prjIds)){
+                sb2.append(" and b.pm_prj_id in ('").append(prjIds).append("') ");
+            }
+            sb2.append("ORDER BY b.ts desc ) a GROUP BY a.projectName ORDER BY any_value(a.ts) desc ");
+            List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sb2.toString(),weekId);
+            if (!CollectionUtils.isEmpty(list3)){
+                Map<String,Object> resMap = new HashMap<>();
+                resMap.put("total",JdbcMapUtil.getString(list2.get(0),"num"));
+                resMap.put("header",resArr);
+                resMap.put("list",list3);
+                Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resMap), Map.class);
+                ExtJarHelper.returnValue.set(outputMap);
+            }
+        } else {
+            ExtJarHelper.returnValue.set(null);
+        }
+    }
+
+    /**
+     * 准备汇总统计表头信息
+     * @param pushProblemTypeId 类型id
+     * @param myJdbcTemplate 数据源
+     * @return 汇总集合
+     */
+    private LinkedHashMap<String, String> getTypeMap(String pushProblemTypeId, MyJdbcTemplate myJdbcTemplate) {
+        LinkedHashMap<String,String> typeMap = new LinkedHashMap<>();
+        if (!StringUtils.hasText(pushProblemTypeId)){
+            List<GrSetValue> typeList = GrSetValue.selectByWhere(new Where().eq("GR_SET_ID","1679759005775429632")
+                    .eq("STATUS","AP")).stream().sorted(Comparator.comparing(GrSetValue::getSeqNo)).collect(Collectors.toList());
+            getMap(typeMap,typeList);
+        } else {
+            Map<String, Object> mapSql = new HashMap<>();
+            List<String> typeStrList = Arrays.asList(pushProblemTypeId.split(","));
+            mapSql.put("ids",typeStrList);
+            List<Map<String,Object>> resMap = myJdbcTemplate.queryForList("select id,name from gr_set_value where status = 'ap' and id in (:ids) order by seq_no asc");
+            getMapByList(typeMap,resMap);
+        }
+        return typeMap;
+    }
+
+    /**
+     * 有序放入
+     * @param linkedHashMap 项目问题有序集合
+     * @param resMap 数据源值
+     * @return 结果值
+     */
+    private LinkedHashMap<String, String> getMapByList(LinkedHashMap<String, String> linkedHashMap, List<Map<String, Object>> resMap) {
+        for (Map<String, Object> map : resMap) {
+            for (String key : map.keySet()){
+                linkedHashMap.put(key,JdbcMapUtil.getString(map,key));
+            }
+        }
+        return linkedHashMap;
+    }
+
+
+    /**
+     * 有序放入
+     * @param linkedHashMap 项目问题有序集合
+     * @param list 数据源值
+     * @return 结果值
+     */
+    private LinkedHashMap<String, String> getMap(LinkedHashMap<String,String> linkedHashMap, List<GrSetValue> list) {
+        for (GrSetValue tmp : list) {
+            linkedHashMap.put(tmp.getId(),tmp.getName());
+        }
+        return linkedHashMap;
     }
 }
