@@ -205,6 +205,7 @@ public class ProgressWeekReport {
         }
         String writeDate = param.getWriteDate(); //填报日期
         String weekPrjId = param.getWeekPrjId(); //进度周报-周项目信息id
+        String weekId = param.getWeekId(); // 周期信息
         if (SharedUtil.isEmptyString(id)){
             throw new BaseException("记录id不能为空！");
         }
@@ -224,7 +225,7 @@ public class ProgressWeekReport {
                 .set("VISUAL_PROGRESS_DESCRIBE",param.getProgressDescribe()).set("FILE_ID_ONE",param.getFileId())
                 .set("TEXT_REMARK_ONE",param.getProgressRemark()).set("SYS_TRUE",param.getWeatherStart())
                 .set("IZ_END",param.getWeatherCompleted()).set("FROM_DATE",start).set("TO_DATE",end)
-                .set("PM_PROGRESS_WEEKLY_ID",param.getWeekId()).set("PM_PROGRESS_WEEKLY_PRJ_ID",weekPrjId)
+                .set("PM_PROGRESS_WEEKLY_ID",weekId).set("PM_PROGRESS_WEEKLY_PRJ_ID",weekPrjId)
                 .set("AD_USER_ID",userId).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
                 .set("TS",now).set("FILE_ID_TWO",param.getAerialImgId())
                 .exec();
@@ -238,7 +239,7 @@ public class ProgressWeekReport {
         updatePrjImg(projectId,aerialImg,id);
         // 保存修改项目问题
         List<PmProgressWeeklyPrjProblemDetailView> proList = param.getProblemDetailList();
-        updateProDetail(projectId,weekPrjId,proList);
+        updateProDetail(projectId,weekPrjId,proList,weekId);
     }
 
     /**
@@ -246,8 +247,9 @@ public class ProgressWeekReport {
      * @param projectId 项目id
      * @param weekPrjId 项目周id
      * @param proList 问题明细信息
+     * @param weekId 周期信息
      */
-    private void updateProDetail(String projectId, String weekPrjId, List<PmProgressWeeklyPrjProblemDetailView> proList) {
+    private void updateProDetail(String projectId, String weekPrjId, List<PmProgressWeeklyPrjProblemDetailView> proList, String weekId) {
         if (!CollectionUtils.isEmpty(proList)){
             // 删除上一次问题明细信息
             PmProgressWeeklyPrjProblemDetail.deleteByWhere(new Where().eq(PmProgressWeeklyPrjProblemDetail.Cols.PM_PROGRESS_WEEKLY_PRJ_ID,weekPrjId));
@@ -259,6 +261,7 @@ public class ProgressWeekReport {
                     Crud.from(PmProgressWeeklyPrjProblemDetail.ENT_CODE).where().eq("ID",id).update()
                             .set("PM_PROGRESS_WEEKLY_PRJ_ID",weekPrjId).set("PRJ_PUSH_PROBLEM_TYPE_ID",typeId)
                             .set("TEXT_REMARK_ONE",describe).set("PM_PRJ_ID",projectId).set("STATUS","AP")
+                            .set("PM_PROGRESS_WEEKLY_ID",weekId)
                             .exec();
                 }
             }
@@ -874,6 +877,7 @@ public class ProgressWeekReport {
         String weekPrjId = param.getWeekPrjId(); //进度周报-周项目信息id
         Integer weatherStart = param.getWeatherStart(); // 是否符合开工条件
         Integer weatherCompleted = param.getWeatherCompleted(); // 是否竣工
+        String weekId = param.getWeekId(); // 周期id
         if (SharedUtil.isEmptyString(id)){
             throw new BaseException("记录id不能为空！");
         }
@@ -893,7 +897,7 @@ public class ProgressWeekReport {
                 .set("VISUAL_PROGRESS_DESCRIBE",param.getProgressDescribe()).set("FILE_ID_ONE",param.getFileId())
                 .set("TEXT_REMARK_ONE",param.getProgressRemark()).set("SYS_TRUE",param.getWeatherStart())
                 .set("IZ_END",param.getWeatherCompleted()).set("FROM_DATE",start).set("TO_DATE",end)
-                .set("PM_PROGRESS_WEEKLY_ID",param.getWeekId()).set("PM_PROGRESS_WEEKLY_PRJ_ID",weekPrjId)
+                .set("PM_PROGRESS_WEEKLY_ID",weekId).set("PM_PROGRESS_WEEKLY_PRJ_ID",weekPrjId)
                 .set("AD_USER_ID",userId).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
                 .set("TS",now).set("SYS_TRUE",weatherStart).set("IZ_END",weatherCompleted).set("FILE_ID_TWO",param.getAerialImgId())
                 .exec();
@@ -909,7 +913,7 @@ public class ProgressWeekReport {
         updatePrjImg(projectId,aerialImg,id);
         // 保存修改项目问题
         List<PmProgressWeeklyPrjProblemDetailView> proList = param.getProblemDetailList();
-        updateProDetail(projectId,weekPrjId,proList);
+        updateProDetail(projectId,weekPrjId,proList,weekId);
     }
 
     /**
@@ -1041,32 +1045,39 @@ public class ProgressWeekReport {
         String limit = "limit " + start + "," + param.pageSize;
 
         String weekId = param.getWeekId(); // 周id
-        String pushProblemTypeId = param.getPushProblemTypeId();
+        String pushProblemTypeId = param.getPrjPushProblemTypeId();
         LinkedHashMap<String,String> typeMap = getTypeMap(pushProblemTypeId,myJdbcTemplate);
         List<String> resArr = typeMap.values().stream().collect(Collectors.toList());
+        String keyIds = String.join("','",typeMap.keySet().stream().collect(Collectors.toList()));
         resArr.add(0,"项目名称");
+        resArr.add("projectId");
         //查询当前页项目id
 
-        StringBuilder sb = new StringBuilder("select group_concat(a.prjIds SEPARATOR ''',''') as prjIds from ( select a.pm_prj_id as prjIds,ifnull(b.IZ_END,'0') as weatherCompleted,ifnull(b.IZ_START_REQUIRE,'1') as weatherStart from PM_PROGRESS_WEEKLY_PRJ a left join pm_prj b on a.pm_prj_id = b.id where a.PM_PROGRESS_WEEKLY_ID = ?");
-        StringBuilder sb1 = new StringBuilder("select count(*) as num from PM_PROGRESS_WEEKLY_PRJ where PM_PROGRESS_WEEKLY_ID = ? ");
+        StringBuilder sb = new StringBuilder("select group_concat(a.prjIds SEPARATOR ''',''') as prjIds from ( select a.pm_prj_id as prjIds,ifnull(b.IZ_END,'0') as weatherCompleted,ifnull(b.IZ_START_REQUIRE,'1') as weatherStart from PM_PROGRESS_WEEKLY_PRJ a left join pm_prj b on a.pm_prj_id = b.id left join pm_progress_weekly_prj_problem_detail c on a.id = c.PM_PROGRESS_WEEKLY_PRJ_ID where a.PM_PROGRESS_WEEKLY_ID = ? ");
+        StringBuilder sb1 = new StringBuilder("select count(*) as num from (SELECT DISTINCT a.id from PM_PROGRESS_WEEKLY_PRJ a left join pm_progress_weekly_prj_problem_detail c on a.id = c.PM_PROGRESS_WEEKLY_PRJ_ID where a.PM_PROGRESS_WEEKLY_ID = ? ");
         if (StringUtils.hasText(param.getProjectId())){
             sb.append(" and a.pm_prj_id in ('").append(param.getProjectId().replace(",","','")).append("')");
             sb1.append(" and pm_prj_id in ('").append(param.getProjectId().replace(",","','")).append("')");
         }
+        if (StringUtils.hasText(pushProblemTypeId)){
+            sb.append("and c.PRJ_PUSH_PROBLEM_TYPE_ID in ('").append(keyIds).append("')");
+            sb1.append("and c.PRJ_PUSH_PROBLEM_TYPE_ID in ('").append(keyIds).append("')");
+        }
+        sb1.append(" ) a ");
         sb.append(" order by weatherCompleted asc,weatherStart desc,a.pm_prj_id desc ").append(limit).append(" ) a");
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString(),weekId);
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sb1.toString(),weekId);
         if (!CollectionUtils.isEmpty(list1)){
             String prjIds = JdbcMapUtil.getString(list1.get(0),"prjIds");
-            StringBuilder sb2 = new StringBuilder("select a.projectName,");
+            StringBuilder sb2 = new StringBuilder("select a.projectName as '项目名称',any_value(a.projectId) as projectId,");
             for (String key: typeMap.keySet()){
                 sb2.append("ifnull(group_concat(case when a.typeId = '").append(key).append("' then a.describeValue else null END SEPARATOR ''),'未涉及') AS '").append(typeMap.get(key)).append("',");
             }
             sb2.deleteCharAt(sb2.length()-1);
-            sb2.append(" from ( select c.name as projectName,a.TEXT_REMARK_ONE as describeValue,b.ts,")
+            sb2.append(" from ( select c.name as projectName,b.pm_prj_id as projectId,a.TEXT_REMARK_ONE as describeValue,b.ts,")
                     .append("a.PRJ_PUSH_PROBLEM_TYPE_ID as typeId,(select name from gr_set_value where id = a.PRJ_PUSH_PROBLEM_TYPE_ID) as typeName ")
                     .append("from pm_progress_weekly_prj b LEFT JOIN pm_progress_weekly_prj_problem_detail a on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id left join pm_prj c on b.PM_PRJ_ID = c.id where ")
-                    .append("b.PM_PROGRESS_WEEKLY_ID = ? ");
+                    .append("b.PM_PROGRESS_WEEKLY_ID = ? and a.PRJ_PUSH_PROBLEM_TYPE_ID in ('").append(keyIds).append("') ");
             if (StringUtils.hasText(prjIds)){
                 sb2.append(" and b.pm_prj_id in ('").append(prjIds).append("') ");
             }
@@ -1099,9 +1110,8 @@ public class ProgressWeekReport {
             getMap(typeMap,typeList);
         } else {
             Map<String, Object> mapSql = new HashMap<>();
-            List<String> typeStrList = Arrays.asList(pushProblemTypeId.split(","));
-            mapSql.put("ids",typeStrList);
-            List<Map<String,Object>> resMap = myJdbcTemplate.queryForList("select id,name from gr_set_value where status = 'ap' and id in (:ids) order by seq_no asc");
+            pushProblemTypeId = pushProblemTypeId.replace(",","','");
+            List<Map<String,Object>> resMap = myJdbcTemplate.queryForList("select id,name from gr_set_value where status = 'ap' and id in ('" + pushProblemTypeId + "') order by seq_no asc");
             getMapByList(typeMap,resMap);
         }
         return typeMap;
@@ -1115,9 +1125,9 @@ public class ProgressWeekReport {
      */
     private LinkedHashMap<String, String> getMapByList(LinkedHashMap<String, String> linkedHashMap, List<Map<String, Object>> resMap) {
         for (Map<String, Object> map : resMap) {
-            for (String key : map.keySet()){
-                linkedHashMap.put(key,JdbcMapUtil.getString(map,key));
-            }
+            String key = JdbcMapUtil.getString(map,"id");
+            String value = JdbcMapUtil.getString(map,"name");
+            linkedHashMap.put(key,value);
         }
         return linkedHashMap;
     }

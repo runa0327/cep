@@ -94,6 +94,6 @@ public class WeekMessage extends BasePageEntity {
     private List<PmProgressWeeklyPrjProblemDetailView> problemDetailList;
 
     // 项目问题推进类型
-    private String pushProblemTypeId;
-    private String pushProblemTypeName;
+    private String prjPushProblemTypeId;
+    private String prjPushProblemTypeName;
 }

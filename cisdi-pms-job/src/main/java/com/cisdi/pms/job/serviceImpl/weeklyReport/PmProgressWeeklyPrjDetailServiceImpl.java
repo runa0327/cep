@@ -25,6 +25,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +35,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -240,6 +242,7 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
                         PmProgressWeeklyPrjProblemDetail pmProgressWeeklyPrjProblemDetail = new PmProgressWeeklyPrjProblemDetail();
                         BeanUtils.copyProperties(tp,pmProgressWeeklyPrjProblemDetail);
                         pmProgressWeeklyPrjProblemDetail.setId(IdUtil.getSnowflakeNextIdStr());
+                        pmProgressWeeklyPrjProblemDetail.setWeekId(tmp.getWeekId());
                         insertBatch.add(pmProgressWeeklyPrjProblemDetail);
                     }
                 } else {
@@ -251,11 +254,23 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
                     pmProgressWeeklyPrjProblemDetail.setCreateDate(DateUtil.getNormalTimeStr(new Date()));
                     pmProgressWeeklyPrjProblemDetail.setCreateUserId("0099250247095871681");
                     pmProgressWeeklyPrjProblemDetail.setPmProgressWeeklyPrjId(weekPrjId);
+                    pmProgressWeeklyPrjProblemDetail.setWeekId(tmp.getWeekId());
                     insertBatch.add(pmProgressWeeklyPrjProblemDetail);
                 }
                 pmProgressWeeklyPrjProblemDetailMapper.insertBatch(insertBatch);
             }
         }
+    }
+
+    /**
+     * 项目问题汇总-列表
+     *
+     * @param pmProgressWeeklyPrjDetail 形象进度周报明细实体
+     * @return 查询结果
+     */
+    @Override
+    public List<Map<String, Object>> getPrjProblemList(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail) {
+        return null;
     }
 }
 

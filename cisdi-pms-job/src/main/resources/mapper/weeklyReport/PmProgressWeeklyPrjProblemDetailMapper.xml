@@ -14,6 +14,7 @@
         <result property="createUserId" column="createUserId" />
         <result property="lastUpdateDate" column="lastUpdateDate" />
         <result property="lastUpdateUserId" column="lastUpdateUserId" />
+        <result property="weekId" column="weekId" />
     </resultMap>
 
     <!--单表通用查询表头-->
@@ -26,7 +27,8 @@
         CRT_DT as createDate,
         CRT_USER_ID as createUserId,
         LAST_MODI_DT as lastUpdateDate,
-        LAST_MODI_USER_ID as lastUpdateUserId
+        LAST_MODI_USER_ID as lastUpdateUserId,
+        PM_PROGRESS_WEEKLY_ID as weekId
     </sql>
 
     <!--新增-->
@@ -72,7 +74,8 @@
             PM_PROGRESS_WEEKLY_PRJ_ID,
             PRJ_PUSH_PROBLEM_TYPE_ID,
             TEXT_REMARK_ONE,
-            PM_PRJ_ID
+            PM_PRJ_ID,
+            PM_PROGRESS_WEEKLY_ID
         ) values (
             replace(UUID_SHORT(),'-',''),
             now(),
@@ -81,7 +84,8 @@
             #{weekPrjId},
             #{item.prjPushProblemTypeId},
             #{item.problemDescribe},
-            #{item.projectId}
+            #{item.projectId},
+            #{item.weekId}
         )
         </foreach>
     </insert>
@@ -112,7 +116,8 @@
             PM_PROGRESS_WEEKLY_PRJ_ID,
             PRJ_PUSH_PROBLEM_TYPE_ID,
             TEXT_REMARK_ONE,
-            PM_PRJ_ID
+            PM_PRJ_ID,
+            PM_PROGRESS_WEEKLY_ID
             ) values (
             #{item.id},
             #{item.createDate},
@@ -121,7 +126,8 @@
             #{item.pmProgressWeeklyPrjId},
             #{item.prjPushProblemTypeId},
             #{item.problemDescribe},
-            #{item.projectId}
+            #{item.projectId},
+            #{item.weekId}
             )
         </foreach>
     </insert>

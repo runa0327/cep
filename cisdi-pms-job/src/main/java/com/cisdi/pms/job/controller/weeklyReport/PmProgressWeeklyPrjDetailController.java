@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/progressWeekly")
@@ -33,5 +35,13 @@ public class PmProgressWeeklyPrjDetailController extends BaseController {
     @GetMapping(value = "/prjProblemDetailOldToNew")
     public void prjProblemDetailOldToNew(){
         pmProgressWeeklyPrjDetailService.updateOldPrjProblemToDetail();
+    }
+
+    /**
+     * 项目问题汇总-导出
+     */
+    @GetMapping(value = "/downloadPrjProblem")
+    public void downloadPrjProblem(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail, HttpServletResponse response){
+        List<Map<String,Object>> list = pmProgressWeeklyPrjDetailService.getPrjProblemList(pmProgressWeeklyPrjDetail);
     }
 }

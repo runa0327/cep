@@ -96,4 +96,10 @@ public class PmProgressWeeklyPrjDetail extends BaseDomain {
     // 航拍图
     private String aerialImg;
 
+    //问题类型id
+    private String prjPushProblemTypeId;
+
+    // 问题类型名称
+    private String prjPushProblemTypeName;
+
 }

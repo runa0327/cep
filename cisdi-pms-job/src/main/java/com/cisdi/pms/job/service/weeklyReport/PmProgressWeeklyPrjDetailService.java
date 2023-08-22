@@ -5,6 +5,8 @@ import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeekly;
 import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrjDetail;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 
 public interface PmProgressWeeklyPrjDetailService {
 
@@ -38,4 +40,11 @@ public interface PmProgressWeeklyPrjDetailService {
      * 更新截止目前所有历史项目问题进入明细表
      */
     void updateOldPrjProblemToDetail();
+
+    /**
+     * 项目问题汇总-列表
+     * @param pmProgressWeeklyPrjDetail 形象进度周报明细实体
+     * @return 查询结果
+     */
+    List<Map<String, Object>> getPrjProblemList(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail);
 }
