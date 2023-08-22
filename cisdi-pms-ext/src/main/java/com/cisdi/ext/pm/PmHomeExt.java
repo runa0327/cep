@@ -40,7 +40,7 @@ public class PmHomeExt {
                 "left join gr_set_value g3 on g3.id = pm.PRJ_MANAGE_MODE_ID\n" +
                 "left join gr_set_value g4 on g4.id = pm.TENDER_MODE_ID\n" +
                 "left join gr_set_value g5 on g5.id = pm.BASE_LOCATION_ID\n" +
-                "left join gr_set_value g6 on g6.id = pm.TRANSITION_PHASE_ID\n" +
+                "left join gr_set_value g6 on g6.id = pm.PROJECT_PHASE_ID\n" +
                 "left join pm_party p1 on p1.id = pm.BUILDER_UNIT\n" +
                 "left join pm_party p2 on p2.id = pm.SURVEYOR_UNIT\n" +
                 "left join pm_party p3 on p3.id = pm.DESIGNER_UNIT\n" +
@@ -112,7 +112,7 @@ public class PmHomeExt {
             info.actualBeginTime = StringUtil.withOutT(JdbcMapUtil.getString(mapData, "ACTUAL_START_TIME"));
             info.actualEndTime = StringUtil.withOutT(JdbcMapUtil.getString(mapData, "ACTUAL_END_TIME"));
             info.imageProcess = getImageProcess(JdbcMapUtil.getString(map, "projectId"));
-            info.step = JdbcMapUtil.getString(mapData, "TRANSITION_PHASE_ID");
+            info.step = JdbcMapUtil.getString(mapData, "PROJECT_PHASE_ID");
             info.jsUnit = JdbcMapUtil.getString(mapData, "BUILDER_UNIT");
             info.kcUnit = JdbcMapUtil.getString(mapData, "SURVEYOR_UNIT");
             info.sjUnit = JdbcMapUtil.getString(mapData, "DESIGNER_UNIT");
