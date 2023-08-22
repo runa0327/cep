@@ -1,9 +1,12 @@
 package com.cisdi.pms.job.weeklyReport;
 
+import com.cisdi.pms.job.service.weeklyReport.PmProgressWeeklyPrjService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 @Component
 @Slf4j
@@ -11,6 +14,9 @@ public class WeeklyReportJob {
 
     @Autowired
     WeeklyReportService weeklyReportService;
+
+    @Resource
+    private PmProgressWeeklyPrjService pmProgressWeeklyPrjService;
 
     @Scheduled(cron = "0 0 0/2 * * ?")
     public void run() {
@@ -30,7 +36,7 @@ public class WeeklyReportJob {
     public void createProgressWeekly(){
         try {
             log.info("【形象进度周报】自动生成开始");
-            weeklyReportService.createProgressWeekly();
+            pmProgressWeeklyPrjService.createProgressWeekly();
             log.info("【形象进度周报】自动生成结束");
         } catch (Exception e){
             log.error("【形象进度周报】自动生成失败");

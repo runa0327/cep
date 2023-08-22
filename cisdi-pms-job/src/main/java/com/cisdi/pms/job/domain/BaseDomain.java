@@ -12,15 +12,15 @@ public class BaseDomain {
     private String ts;
 
     //创建时间
-    private String crtDt;
+    private String createDate;
 
     //创建人
-    private String crtUserId;
+    private String createUserId;
 
     //上次修改时间
-    private String lastModiDt;
+    private String lastUpdateDate;
 
     //上次修改人
-    private String lastModiUserId;
+    private String lastUpdateUserId;
 
 }

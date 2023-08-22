@@ -4,7 +4,11 @@ import com.cisdi.pms.job.domain.BaseDomain;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
+/**
+ * 形象进度周报
+ */
 @Data
 public class PmProgressWeeklyPrj extends BaseDomain {
 
@@ -47,4 +51,7 @@ public class PmProgressWeeklyPrj extends BaseDomain {
 
     //是否提交 0未提交 1已提交
     private Integer izSubmit;
+
+    // 问题明细
+    private List<PmProgressWeeklyPrjProblemDetail> problemDetailList;
 }

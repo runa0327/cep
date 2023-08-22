@@ -3,6 +3,7 @@ package com.cisdi.ext.model.view.weekReport;
 import com.cisdi.ext.model.BasePageEntity;
 import com.cisdi.ext.model.view.file.BaseFileView;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -10,54 +11,89 @@ import java.util.List;
 /**
  * 形象进度工程周报填写记录
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class WeekMessage extends BasePageEntity {
 
     //id
-    public String id;
+    private String id;
+
     //项目id
-    public String projectId;
+    private String projectId;
+
     //项目名称
-    public String projectName;
+    private String projectName;
+
     //填报时间
-    public String writeDate;
-    public String writeDateMin;
-    public String writeDateMax;
+    private String writeDate;
+    private String writeDateMin;
+    private String writeDateMax;
+
     //是否符合开工条件 1符合0不符合2全部
-    public Integer weatherStart;
+    private Integer weatherStart;
+
     //是否竣工 1已竣工0未竣工2全部
-    public Integer weatherCompleted;
+    private Integer weatherCompleted;
+
     //整体形象进度 - 整体形象进度
-    public BigDecimal progress;
-    public BigDecimal progressMin;
-    public BigDecimal progressMax;
+    private BigDecimal progress;
+
+    private BigDecimal progressMin;
+
+    private BigDecimal progressMax;
+
     //累计形象进度说明 - 累计详细进度/问题说明
-    public String progressDescribe;
+    private String progressDescribe;
+
     //本周项目进展 - 本周工作进展
-    public String progressWeek;
+    private String progressWeek;
+
     //备注说明
-    public String progressRemark;
+    private String progressRemark;
+
     //形象进度影像
-    public String fileId;
-    public List<BaseFileView> fileList;
+    private String fileId;
+    private List<BaseFileView> fileList;
+
     //数据显示级别 old new
-    public String dataType;
+    private String dataType;
+
     //进度周报-周信息
-    public String weekId;
+    private String weekId;
+
     //进度周报-周项目信息
-    public String weekPrjId;
+    private String weekPrjId;
+
     //类型 0=开工条件按钮 1=竣工按钮
-    public Integer buttonType;
+    private Integer buttonType;
+
     //状态 0关闭 1开启
-    public Integer buttonStatus;
+    private Integer buttonStatus;
+
     //是否填写 0未填写1已填写
-    public Integer izWrite;
+    private Integer izWrite;
+
     //记录人
-    public String recordById;
-    public String recordByName;
+    private String recordById;
+
+    private String recordByName;
+
     //项目负责人
-    public String manageUserId;
-    public String manageUserName;
+    private String manageUserId;
+
+    private String manageUserName;
+
     // 排序字段
     private List<SortBean> sort;
+
+    // 航拍图
+    private String aerialImgId;
+    private List<BaseFileView> aerialImg;
+
+    // 问题明细
+    private List<PmProgressWeeklyPrjProblemDetailView> problemDetailList;
+
+    // 项目问题推进类型
+    private String pushProblemTypeId;
+    private String pushProblemTypeName;
 }

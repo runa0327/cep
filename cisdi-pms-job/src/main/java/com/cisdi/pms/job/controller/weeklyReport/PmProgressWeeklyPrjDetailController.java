@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 public class PmProgressWeeklyPrjDetailController extends BaseController {
 
     @Resource
-    private PmProgressWeeklyPrjDetailService pmProgressWeeklyService;
+    private PmProgressWeeklyPrjDetailService pmProgressWeeklyPrjDetailService;
 
     /**
      * 形象工程周报-填报记录导出
@@ -24,6 +24,14 @@ public class PmProgressWeeklyPrjDetailController extends BaseController {
      */
     @GetMapping(value = "/downloadPrjUserRecords")
     public void downloadPrjUserRecords(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail, HttpServletResponse response){
-        pmProgressWeeklyService.downloadPrjUserRecords(pmProgressWeeklyPrjDetail,response);
+        pmProgressWeeklyPrjDetailService.downloadPrjUserRecords(pmProgressWeeklyPrjDetail,response);
+    }
+
+    /**
+     * 形象工程周报-老版本数据写入新版本明细信息
+     */
+    @GetMapping(value = "/prjProblemDetailOldToNew")
+    public void prjProblemDetailOldToNew(){
+        pmProgressWeeklyPrjDetailService.updateOldPrjProblemToDetail();
     }
 }

@@ -33,4 +33,9 @@ public interface PmProgressWeeklyPrjDetailService {
      * @param pmProgressWeekly 周信息
      */
     void createDataByLastWeek(String lastWeekId, String weekId, String weekPrjId, PmPrj tmp, PmProgressWeekly pmProgressWeekly);
+
+    /**
+     * 更新截止目前所有历史项目问题进入明细表
+     */
+    void updateOldPrjProblemToDetail();
 }

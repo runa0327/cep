@@ -11,14 +11,18 @@ import com.cisdi.pms.job.domain.exportMain.PrjProgressRecords;
 import com.cisdi.pms.job.domain.project.PmPrj;
 import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeekly;
 import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrjDetail;
+import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrjProblemDetail;
 import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyPrjDetailMapper;
+import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyPrjProblemDetailMapper;
 import com.cisdi.pms.job.service.weeklyReport.PmProgressWeeklyPrjDetailService;
 import com.cisdi.pms.job.strategy.MergeStrategy;
+import com.cisdi.pms.job.utils.DateUtil;
 import com.cisdi.pms.job.utils.ExportUtil;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -28,6 +32,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +42,9 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
 
     @Resource
     private PmProgressWeeklyPrjDetailMapper pmProgressWeeklyPrjDetailMapper;
+
+    @Resource
+    private PmProgressWeeklyPrjProblemDetailMapper pmProgressWeeklyPrjProblemDetailMapper;
 
     /**
      * 形象工程周报-填报记录导出
@@ -151,15 +159,27 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
      */
     @Override
     public void createData(String weekId, String weekPrjId, PmPrj tmp, PmProgressWeekly pmProgressWeekly) {
-        String weekPrjDetailId = IdUtil.getSnowflakeNextIdStr();
+        PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail1 = getPmProgressWeeklyPrjDetail(pmProgressWeekly,tmp,weekPrjId,weekId);
+        pmProgressWeeklyPrjDetailMapper.insertData(pmProgressWeeklyPrjDetail1);
+    }
+
+    /**
+     * PmProgressWeeklyPrjDetail 封装值
+     * @param pmProgressWeekly 周信息
+     * @param tmp 项目信息
+     * @param weekPrjId 周项目id
+     * @param weekId 周id
+     * @return 封装结果
+     */
+    private PmProgressWeeklyPrjDetail getPmProgressWeeklyPrjDetail(PmProgressWeekly pmProgressWeekly, PmPrj tmp, String weekPrjId, String weekId) {
         PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail = new PmProgressWeeklyPrjDetail();
-        pmProgressWeeklyPrjDetail.setId(weekPrjDetailId);
+        pmProgressWeeklyPrjDetail.setId(IdUtil.getSnowflakeNextIdStr());
         pmProgressWeeklyPrjDetail.setVer("1");
         pmProgressWeeklyPrjDetail.setTs(pmProgressWeekly.getTs());
-        pmProgressWeeklyPrjDetail.setCrtDt(pmProgressWeekly.getCrtDt());
-        pmProgressWeeklyPrjDetail.setCrtUserId(pmProgressWeekly.getCrtUserId());
-        pmProgressWeeklyPrjDetail.setLastModiDt(pmProgressWeekly.getLastModiDt());
-        pmProgressWeeklyPrjDetail.setLastModiUserId(pmProgressWeekly.getLastModiUserId());
+        pmProgressWeeklyPrjDetail.setCreateDate(pmProgressWeekly.getCreateDate());
+        pmProgressWeeklyPrjDetail.setCreateUserId(pmProgressWeekly.getCreateUserId());
+        pmProgressWeeklyPrjDetail.setLastUpdateDate(pmProgressWeekly.getLastUpdateDate());
+        pmProgressWeeklyPrjDetail.setLastUpdateUserId(pmProgressWeekly.getLastUpdateUserId());
         pmProgressWeeklyPrjDetail.setStatus("AP");
         pmProgressWeeklyPrjDetail.setWriteDate(pmProgressWeekly.getDate());
         pmProgressWeeklyPrjDetail.setToDate(pmProgressWeekly.getToDate());
@@ -170,7 +190,7 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
         pmProgressWeeklyPrjDetail.setWeekPrjId(weekPrjId);
         pmProgressWeeklyPrjDetail.setWeatherCompleted(tmp.getIzEnd());
         pmProgressWeeklyPrjDetail.setIzSubmit(0);
-        pmProgressWeeklyPrjDetailMapper.insertData(pmProgressWeeklyPrjDetail);
+        return pmProgressWeeklyPrjDetail;
     }
 
     /**
@@ -186,33 +206,55 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
         String projectId = tmp.getProjectId();
         //查询上周信息
         List<PmProgressWeeklyPrjDetail> list = pmProgressWeeklyPrjDetailMapper.getLastWeekDateByPrj(lastWeekId,projectId);
+        List<PmProgressWeeklyPrjProblemDetail> problemDetail = pmProgressWeeklyPrjProblemDetailMapper.getListByWeeklyPrjId(lastWeekId,projectId);
         if (CollectionUtils.isEmpty(list)){
             createData(weekId,weekPrjId,tmp,pmProgressWeekly);
         } else {
-            String weekPrjDetailId = IdUtil.getSnowflakeNextIdStr();
-            PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail = new PmProgressWeeklyPrjDetail();
-            pmProgressWeeklyPrjDetail.setId(weekPrjDetailId);
-            pmProgressWeeklyPrjDetail.setVer("1");
-            pmProgressWeeklyPrjDetail.setTs(pmProgressWeekly.getTs());
-            pmProgressWeeklyPrjDetail.setCrtDt(pmProgressWeekly.getCrtDt());
-            pmProgressWeeklyPrjDetail.setCrtUserId(pmProgressWeekly.getCrtUserId());
-            pmProgressWeeklyPrjDetail.setLastModiDt(pmProgressWeekly.getLastModiDt());
-            pmProgressWeeklyPrjDetail.setLastModiUserId(pmProgressWeekly.getLastModiUserId());
-            pmProgressWeeklyPrjDetail.setStatus("AP");
-            pmProgressWeeklyPrjDetail.setWriteDate(pmProgressWeekly.getDate());
-            pmProgressWeeklyPrjDetail.setToDate(pmProgressWeekly.getToDate());
-            pmProgressWeeklyPrjDetail.setWeekId(weekId);
-            pmProgressWeeklyPrjDetail.setFromDate(pmProgressWeekly.getFromDate());
-            pmProgressWeeklyPrjDetail.setProjectId(projectId);
-            pmProgressWeeklyPrjDetail.setWeatherStart(tmp.getIzStart());
-            pmProgressWeeklyPrjDetail.setWeekPrjId(weekPrjId);
-            pmProgressWeeklyPrjDetail.setWeatherCompleted(tmp.getIzEnd());
-            pmProgressWeeklyPrjDetail.setIzSubmit(0);
+            PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail = getPmProgressWeeklyPrjDetail(pmProgressWeekly,tmp,weekPrjId,weekId);
             pmProgressWeeklyPrjDetail.setProgressRemark(list.get(0).getProgressRemark());
             pmProgressWeeklyPrjDetail.setProgress(list.get(0).getProgress());
             pmProgressWeeklyPrjDetail.setProgressDescribe(list.get(0).getProgressDescribe());
             pmProgressWeeklyPrjDetail.setProgressWeek(list.get(0).getProgressWeek());
             pmProgressWeeklyPrjDetailMapper.insertData(pmProgressWeeklyPrjDetail);
+            // 写入问题明细表
+            if (!CollectionUtils.isEmpty(problemDetail)){
+                pmProgressWeeklyPrjProblemDetailMapper.insertProblemDetailBatchByWeekPrjId(weekPrjId,problemDetail);
+            }
+        }
+    }
+
+    /**
+     * 更新截止目前所有历史项目问题进入明细表
+     */
+    @Override
+    public void updateOldPrjProblemToDetail() {
+        List<PmProgressWeeklyPrjDetail> list = pmProgressWeeklyPrjDetailMapper.getList();
+        if (!CollectionUtils.isEmpty(list)){
+            for (PmProgressWeeklyPrjDetail tmp : list) {
+                String weekPrjId = tmp.getWeekPrjId();
+                List<PmProgressWeeklyPrjProblemDetail> pmProgressWeeklyPrjProblemDetailList = pmProgressWeeklyPrjProblemDetailMapper.getByWeekPrjId(weekPrjId);
+                List<PmProgressWeeklyPrjProblemDetail> insertBatch = new ArrayList<>();
+                if (!CollectionUtils.isEmpty(pmProgressWeeklyPrjProblemDetailList)){
+                    pmProgressWeeklyPrjProblemDetailMapper.deleteByWeekPrjId(weekPrjId);
+                    for (PmProgressWeeklyPrjProblemDetail tp : pmProgressWeeklyPrjProblemDetailList) {
+                        PmProgressWeeklyPrjProblemDetail pmProgressWeeklyPrjProblemDetail = new PmProgressWeeklyPrjProblemDetail();
+                        BeanUtils.copyProperties(tp,pmProgressWeeklyPrjProblemDetail);
+                        pmProgressWeeklyPrjProblemDetail.setId(IdUtil.getSnowflakeNextIdStr());
+                        insertBatch.add(pmProgressWeeklyPrjProblemDetail);
+                    }
+                } else {
+                    PmProgressWeeklyPrjProblemDetail pmProgressWeeklyPrjProblemDetail = new PmProgressWeeklyPrjProblemDetail();
+                    pmProgressWeeklyPrjProblemDetail.setId(IdUtil.getSnowflakeNextIdStr());
+                    pmProgressWeeklyPrjProblemDetail.setPmProgressWeeklyPrjId(tmp.getWeekPrjId());
+                    pmProgressWeeklyPrjProblemDetail.setProblemDescribe(tmp.getProgressDescribe());
+                    pmProgressWeeklyPrjProblemDetail.setProjectId(tmp.getProjectId());
+                    pmProgressWeeklyPrjProblemDetail.setCreateDate(DateUtil.getNormalTimeStr(new Date()));
+                    pmProgressWeeklyPrjProblemDetail.setCreateUserId("0099250247095871681");
+                    pmProgressWeeklyPrjProblemDetail.setPmProgressWeeklyPrjId(weekPrjId);
+                    insertBatch.add(pmProgressWeeklyPrjProblemDetail);
+                }
+                pmProgressWeeklyPrjProblemDetailMapper.insertBatch(insertBatch);
+            }
         }
     }
 }

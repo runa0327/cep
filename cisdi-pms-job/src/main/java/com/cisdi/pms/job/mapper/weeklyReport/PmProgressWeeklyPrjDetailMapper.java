@@ -47,4 +47,10 @@ public interface PmProgressWeeklyPrjDetailMapper {
      * @return 查询结果
      */
     List<PmProgressWeeklyPrjDetail> getLastWeekDateByPrj(@Param("weekId") String weekId, @Param("projectId")String projectId);
+
+    /**
+     * 查询项目周报所有明细信息
+     * @return 查询结果
+     */
+    List<PmProgressWeeklyPrjDetail> getList();
 }

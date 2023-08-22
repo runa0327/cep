@@ -24,4 +24,9 @@ public interface PmProgressWeeklyPrjService {
      * @param pmProgressWeekly 周信息
      */
     void createData(String weekId, String weekPrjId, PmPrj tmp, PmProgressWeekly pmProgressWeekly);
+
+    /**
+     * 形象进度周报定时任务生成
+     */
+    void createProgressWeekly();
 }
