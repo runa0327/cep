@@ -250,20 +250,18 @@ public class ProgressWeekReport {
      * @param weekId 周期信息
      */
     private void updateProDetail(String projectId, String weekPrjId, List<PmProgressWeeklyPrjProblemDetailView> proList, String weekId) {
+        // 删除上一次问题明细信息
+        PmProgressWeeklyPrjProblemDetail.deleteByWhere(new Where().eq(PmProgressWeeklyPrjProblemDetail.Cols.PM_PROGRESS_WEEKLY_PRJ_ID,weekPrjId));
         if (!CollectionUtils.isEmpty(proList)){
-            // 删除上一次问题明细信息
-            PmProgressWeeklyPrjProblemDetail.deleteByWhere(new Where().eq(PmProgressWeeklyPrjProblemDetail.Cols.PM_PROGRESS_WEEKLY_PRJ_ID,weekPrjId));
-            if (!CollectionUtils.isEmpty(proList)){
-                for (PmProgressWeeklyPrjProblemDetailView tmp : proList) {
-                    String typeId = tmp.getPrjPushProblemTypeId();
-                    String describe = tmp.getProblemDescribe();
-                    String id = Crud.from(PmProgressWeeklyPrjProblemDetail.ENT_CODE).insertData();
-                    Crud.from(PmProgressWeeklyPrjProblemDetail.ENT_CODE).where().eq("ID",id).update()
-                            .set("PM_PROGRESS_WEEKLY_PRJ_ID",weekPrjId).set("PRJ_PUSH_PROBLEM_TYPE_ID",typeId)
-                            .set("TEXT_REMARK_ONE",describe).set("PM_PRJ_ID",projectId).set("STATUS","AP")
-                            .set("PM_PROGRESS_WEEKLY_ID",weekId)
-                            .exec();
-                }
+            for (PmProgressWeeklyPrjProblemDetailView tmp : proList) {
+                String typeId = tmp.getPrjPushProblemTypeId();
+                String describe = tmp.getProblemDescribe();
+                String id = Crud.from(PmProgressWeeklyPrjProblemDetail.ENT_CODE).insertData();
+                Crud.from(PmProgressWeeklyPrjProblemDetail.ENT_CODE).where().eq("ID",id).update()
+                        .set("PM_PROGRESS_WEEKLY_PRJ_ID",weekPrjId).set("PRJ_PUSH_PROBLEM_TYPE_ID",typeId)
+                        .set("TEXT_REMARK_ONE",describe).set("PM_PRJ_ID",projectId).set("STATUS","AP")
+                        .set("PM_PROGRESS_WEEKLY_ID",weekId)
+                        .exec();
             }
         }
     }
