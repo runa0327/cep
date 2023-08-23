@@ -6,22 +6,24 @@ import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.write.metadata.style.WriteCellStyle;
 import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
 import com.alibaba.excel.write.style.column.SimpleColumnWidthStyleStrategy;
+import com.cisdi.pms.job.domain.base.GrSetValue;
 import com.cisdi.pms.job.domain.exportMain.PrjProgressAllRecords;
 import com.cisdi.pms.job.domain.exportMain.PrjProgressRecords;
 import com.cisdi.pms.job.domain.project.PmPrj;
 import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeekly;
 import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrjDetail;
 import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrjProblemDetail;
+import com.cisdi.pms.job.mapper.base.GrSetValueMapper;
 import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyPrjDetailMapper;
 import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyPrjProblemDetailMapper;
 import com.cisdi.pms.job.service.weeklyReport.PmProgressWeeklyPrjDetailService;
 import com.cisdi.pms.job.strategy.MergeStrategy;
+import com.cisdi.pms.job.utils.*;
 import com.cisdi.pms.job.utils.DateUtil;
-import com.cisdi.pms.job.utils.ExportUtil;
 import lombok.SneakyThrows;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -30,12 +32,10 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -47,6 +47,12 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
 
     @Resource
     private PmProgressWeeklyPrjProblemDetailMapper pmProgressWeeklyPrjProblemDetailMapper;
+
+    @Resource
+    private GrSetValueMapper grSetValueMapper;
+
+    @Resource
+    private CisdiUtils cisdiUtils;
 
     /**
      * 形象工程周报-填报记录导出
@@ -60,6 +66,7 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
             if (pmProgressWeeklyPrjDetail.getExportType() == 1){
                 String projectName = list.get(0).getProjectName();
                 List<PrjProgressRecords> excelList = list.stream().map(p->{
+                    String weekPrjId = p.getWeekPrjId();
                     PrjProgressRecords prjProgressRecords = new PrjProgressRecords();
                     prjProgressRecords.projectName = p.getProjectName();
                     prjProgressRecords.writeDate = p.getWriteDate();
@@ -67,7 +74,10 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
                     if (progress != null){
                         prjProgressRecords.progress = progress.stripTrailingZeros().toPlainString() + "%";
                     }
-                    prjProgressRecords.progressDescribe = p.getProgressDescribe();
+                    String progressDescribe = pmProgressWeeklyPrjProblemDetailMapper.getPrjDescibleByPrjWeekId(weekPrjId);
+                    if (StringUtils.hasText(progressDescribe)){
+                        prjProgressRecords.progressDescribe = progressDescribe;
+                    }
                     prjProgressRecords.progressWeek = p.getProgressWeek();
                     prjProgressRecords.progressRemark = p.getProgressRemark();
                     return prjProgressRecords;
@@ -79,6 +89,7 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
                 }
             } else if (pmProgressWeeklyPrjDetail.getExportType() == 0){
                 List<PrjProgressAllRecords> excelList = list.stream().map(p->{
+                    String weekPrjId = p.getWeekPrjId();
                     PrjProgressAllRecords prjProgressAllRecords = new PrjProgressAllRecords();
                     prjProgressAllRecords.projectName = p.getProjectName();
                     prjProgressAllRecords.writeDate = p.getWriteDate();
@@ -86,7 +97,10 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
                     if (progress != null){
                         prjProgressAllRecords.progress = progress.stripTrailingZeros().toPlainString() + "%";
                     }
-                    prjProgressAllRecords.progressDescribe = p.getProgressDescribe();
+                    String progressDescribe = pmProgressWeeklyPrjProblemDetailMapper.getPrjDescibleByPrjWeekId(weekPrjId);
+                    if (StringUtils.hasText(progressDescribe)){
+                        prjProgressAllRecords.progressDescribe = progressDescribe;
+                    }
                     prjProgressAllRecords.progressWeek = p.getProgressWeek();
                     prjProgressAllRecords.progressRemark = p.getProgressRemark();
                     prjProgressAllRecords.manageUserName = p.getManageUserName();
@@ -108,9 +122,7 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
                 int noStarts = (int) list.stream().filter(p-> p.getWeatherStart() == 0).count();
                 //已竣工
                 int completes = (int) list.stream().filter(p->p.getWeatherCompleted() == 1).count();
-                StringBuilder sb = new StringBuilder();
-                sb.append("项目总数:").append(list.size()).append(" 本周项目填报数：").append(writes).append(" 不符合开工条件项目数：").append(noStarts).append(" 已竣工：").append(completes);
-                export(excelList,sb.toString(),response);
+                export(excelList, "项目总数:" + list.size() + " 本周项目填报数：" + writes + " 不符合开工条件项目数：" + noStarts + " 已竣工：" + completes,response);
             }
         }
     }
@@ -269,8 +281,136 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
      * @return 查询结果
      */
     @Override
-    public List<Map<String, Object>> getPrjProblemList(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail) {
-        return null;
+    public Map<String, Object> getPrjProblemList(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail) {
+        Map<String,Object> resMap = new HashMap<>();
+        List<GrSetValue> map;
+
+        String prjPushProblemTypeId = pmProgressWeeklyPrjDetail.getPrjPushProblemTypeId(); // 问题类型id
+        String projectId = pmProgressWeeklyPrjDetail.getProjectId();
+
+        if (!StringUtils.hasText(prjPushProblemTypeId)){
+            // 获取所有问题类型
+            map = grSetValueMapper.getValueByGrSetValueCode("prj_push_problem_type");
+        } else {
+            String prjPushProblemTypeIds = prjPushProblemTypeId.replace(",","','");
+            map = grSetValueMapper.getValueByIds(prjPushProblemTypeIds);
+        }
+        List<String> headerList = getHeaderList(map);
+        String keyIds = String.join("','", map.stream().map(GrSetValue::getId).collect(Collectors.toList()));
+
+        if (StringUtils.hasText(projectId)){
+            projectId = projectId.replace(",","','");
+        }
+
+        StringBuilder sb = new StringBuilder("select a.projectName as '项目名称',any_value(a.projectId) as projectId,");
+        for (GrSetValue tmp : map) {
+            sb.append("ifnull(group_concat(case when a.typeId = '").append(tmp.getId()).append("' then a.describeValue else null END SEPARATOR ''),'未涉及') AS '")
+                    .append(tmp.getName()).append("',");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append(" from ( select c.name as projectName,a.pm_prj_id as projectId,a.TEXT_REMARK_ONE as describeValue,a.ts,")
+                .append("a.PRJ_PUSH_PROBLEM_TYPE_ID as typeId,(select name from gr_set_value where id = a.PRJ_PUSH_PROBLEM_TYPE_ID) as typeName ")
+                .append("from pm_progress_weekly_prj_problem_detail a left join pm_prj c on a.PM_PRJ_ID = c.id where ")
+                .append("a.PM_PROGRESS_WEEKLY_ID = '").append(pmProgressWeeklyPrjDetail.getWeekId()).append("' ");
+        if (StringUtils.hasText(projectId)){
+            sb.append(" and a.pm_prj_id in ('").append(projectId).append("') ");
+        }
+        if (StringUtils.hasText(prjPushProblemTypeId)){
+            sb.append(" and a.PRJ_PUSH_PROBLEM_TYPE_ID in ('").append(keyIds).append("') ");
+        }
+        sb.append("ORDER BY a.ts desc ) a GROUP BY a.projectName ORDER BY any_value(a.ts) desc ");
+
+        List<Map<String,String>> listMap = pmProgressWeeklyPrjProblemDetailMapper.selectBySql(sb.toString());
+        resMap.put("header",headerList);
+        resMap.put("list",listMap);
+        return resMap;
+    }
+
+    /**
+     * 项目问题汇总-导出表头
+     * @param map 自动项目问题类型信息
+     * @return 表头信息
+     */
+    private List<String> getHeaderList(List<GrSetValue> map) {
+        List<String> resList = map.stream().map(GrSetValue::getName).collect(Collectors.toList());
+        resList.add(0,"项目名称");
+        return resList;
+    }
+
+    /**
+     * 项目问题汇总导出
+     * @param map      导出信息
+     * @param title    文件名称
+     * @param response 响应
+     */
+    @Override
+    public void downloadPrjProblem(Map<String, Object> map, String title, HttpServletResponse response) {
+        String filePath = cisdiUtils.getDownLoadPath();
+        Workbook workbook = new XSSFWorkbook();
+        OutputStream outputStream = null;
+        try {
+            Sheet sheet = workbook.createSheet(title);
+            sheet.setDefaultColumnWidth(30);
+
+            Row row = sheet.createRow(0);
+            CellStyle cs = PoiExcelUtils.getTableHeaderStyle(workbook);
+            List<String> header = (List<String>)map.get("header");
+            headerCellValue(row,cs,header); // 表头赋值
+
+            // 表格内容复制
+            List<Map<String,String>> listMap = (List<Map<String, String>>) map.get("list");
+            if (!CollectionUtils.isEmpty(listMap)){
+                CellStyle cs2 = PoiExcelUtils.getTableCellStyle(workbook);
+                tableCellValue(sheet,cs2,listMap,header);
+            }
+
+            FileUtils.downLoadFile(filePath,title,workbook,outputStream,response);
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *
+     * @param sheet
+     * @param cs2
+     * @param listMap
+     */
+    private void tableCellValue(Sheet sheet, CellStyle cs2, List<Map<String, String>> listMap, List<String> header) {
+        for (int i = 0; i < listMap.size(); i++) {
+
+            Row row = sheet.createRow(i+1);
+
+            Cell cell0 = row.createCell(0);
+            cell0.setCellStyle(cs2);
+            cell0.setCellValue(i+1);
+
+            for (int j = 0; j < header.size(); j++) {
+                Cell cell = row.createCell(j+1);
+                cell.setCellStyle(cs2);
+                cell.setCellValue(listMap.get(i).get(header.get(j)));
+            }
+        }
+    }
+
+    /**
+     * 项目问题汇总导出表头赋值
+     * @param header 表头信息
+     * @param row 行信息
+     * @param style 样式信息
+     */
+    private void headerCellValue(Row row,CellStyle style,List<String> header) {
+        for (int i = 0; i < header.size()+1; i++) {
+            Cell cell = row.createCell(i);
+            cell.setCellStyle(style);
+            if (i == 0){
+                cell.setCellValue("序号");
+            } else {
+                cell.setCellValue(header.get(i-1));
+            }
+        }
+
     }
 }
 

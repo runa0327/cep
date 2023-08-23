@@ -4,6 +4,7 @@ import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrjProblemDetail;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PmProgressWeeklyPrjProblemDetailMapper {
 
@@ -46,4 +47,18 @@ public interface PmProgressWeeklyPrjProblemDetailMapper {
      * @param insertBatch 数据源
      */
     void insertBatch(@Param("list") List<PmProgressWeeklyPrjProblemDetail> insertBatch);
+
+    /**
+     * 通过传递的sql查询
+     * @param sql sql语句
+     * @return 查询结果
+     */
+    List<Map<String,String>> selectBySql(@Param("sql") String sql);
+
+    /**
+     * 根据周项目id获取项目问题明细
+     * @param weekPrjId
+     * @return
+     */
+    String getPrjDescibleByPrjWeekId(String weekPrjId);
 }

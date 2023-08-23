@@ -131,4 +131,20 @@
             )
         </foreach>
     </insert>
+
+    <!--通过传递的sql查询-->
+    <select id="selectBySql" resultType="java.util.LinkedHashMap">
+        ${sql}
+    </select>
+
+    <!--根据周项目id获取项目问题明细-->
+    <select id="getPrjDescibleByPrjWeekId" resultType="String">
+        select
+            GROUP_CONCAT(CONCAT(b.name,':',a.TEXT_REMARK_ONE) SEPARATOR '\n')
+        FROM
+            pm_progress_weekly_prj_problem_detail a
+        LEFT JOIN gr_set_value b on a.PRJ_PUSH_PROBLEM_TYPE_ID = b.id
+        WHERE
+            a.PM_PROGRESS_WEEKLY_PRJ_ID = #{weekPrjId} and a.status = 'ap'
+    </select>
 </mapper>

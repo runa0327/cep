@@ -46,5 +46,13 @@ public interface PmProgressWeeklyPrjDetailService {
      * @param pmProgressWeeklyPrjDetail 形象进度周报明细实体
      * @return 查询结果
      */
-    List<Map<String, Object>> getPrjProblemList(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail);
+    Map<String, Object> getPrjProblemList(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail);
+
+    /**
+     * 项目问题汇总导出
+     * @param map 导出信息
+     * @param title 文件名称
+     * @param response 响应
+     */
+    void downloadPrjProblem(Map<String, Object> map, String title, HttpServletResponse response);
 }

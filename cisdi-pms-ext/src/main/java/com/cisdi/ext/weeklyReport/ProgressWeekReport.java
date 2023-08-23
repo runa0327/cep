@@ -1053,15 +1053,15 @@ public class ProgressWeekReport {
         resArr.add("projectId");
         //查询当前页项目id
 
-        StringBuilder sb = new StringBuilder("select group_concat(a.prjIds SEPARATOR ''',''') as prjIds from ( select a.pm_prj_id as prjIds,ifnull(b.IZ_END,'0') as weatherCompleted,ifnull(b.IZ_START_REQUIRE,'1') as weatherStart from PM_PROGRESS_WEEKLY_PRJ a left join pm_prj b on a.pm_prj_id = b.id left join pm_progress_weekly_prj_problem_detail c on a.id = c.PM_PROGRESS_WEEKLY_PRJ_ID where a.PM_PROGRESS_WEEKLY_ID = ? ");
-        StringBuilder sb1 = new StringBuilder("select count(*) as num from (SELECT DISTINCT a.id from PM_PROGRESS_WEEKLY_PRJ a left join pm_progress_weekly_prj_problem_detail c on a.id = c.PM_PROGRESS_WEEKLY_PRJ_ID where a.PM_PROGRESS_WEEKLY_ID = ? ");
+        StringBuilder sb = new StringBuilder("select group_concat(a.prjIds SEPARATOR ''',''') as prjIds from ( select a.pm_prj_id as prjIds,ifnull(b.IZ_END,'0') as weatherCompleted,ifnull(b.IZ_START_REQUIRE,'1') as weatherStart from pm_progress_weekly_prj_problem_detail a left join pm_prj b on a.pm_prj_id = b.id where a.PM_PROGRESS_WEEKLY_ID = ? ");
+        StringBuilder sb1 = new StringBuilder("select count(*) as num from (SELECT DISTINCT a.pm_prj_id from pm_progress_weekly_prj_problem_detail a where a.PM_PROGRESS_WEEKLY_ID = ? ");
         if (StringUtils.hasText(param.getProjectId())){
             sb.append(" and a.pm_prj_id in ('").append(param.getProjectId().replace(",","','")).append("')");
-            sb1.append(" and pm_prj_id in ('").append(param.getProjectId().replace(",","','")).append("')");
+            sb1.append(" and a.pm_prj_id in ('").append(param.getProjectId().replace(",","','")).append("')");
         }
         if (StringUtils.hasText(pushProblemTypeId)){
-            sb.append("and c.PRJ_PUSH_PROBLEM_TYPE_ID in ('").append(keyIds).append("')");
-            sb1.append("and c.PRJ_PUSH_PROBLEM_TYPE_ID in ('").append(keyIds).append("')");
+            sb.append("and a.PRJ_PUSH_PROBLEM_TYPE_ID in ('").append(keyIds).append("')");
+            sb1.append("and a.PRJ_PUSH_PROBLEM_TYPE_ID in ('").append(keyIds).append("')");
         }
         sb1.append(" ) a ");
         sb.append(" order by weatherCompleted asc,weatherStart desc,a.pm_prj_id desc ").append(limit).append(" ) a");
@@ -1074,14 +1074,17 @@ public class ProgressWeekReport {
                 sb2.append("ifnull(group_concat(case when a.typeId = '").append(key).append("' then a.describeValue else null END SEPARATOR ''),'未涉及') AS '").append(typeMap.get(key)).append("',");
             }
             sb2.deleteCharAt(sb2.length()-1);
-            sb2.append(" from ( select c.name as projectName,b.pm_prj_id as projectId,a.TEXT_REMARK_ONE as describeValue,b.ts,")
+            sb2.append(" from ( select c.name as projectName,a.pm_prj_id as projectId,a.TEXT_REMARK_ONE as describeValue,a.ts,")
                     .append("a.PRJ_PUSH_PROBLEM_TYPE_ID as typeId,(select name from gr_set_value where id = a.PRJ_PUSH_PROBLEM_TYPE_ID) as typeName ")
-                    .append("from pm_progress_weekly_prj b LEFT JOIN pm_progress_weekly_prj_problem_detail a on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id left join pm_prj c on b.PM_PRJ_ID = c.id where ")
-                    .append("b.PM_PROGRESS_WEEKLY_ID = ? and a.PRJ_PUSH_PROBLEM_TYPE_ID in ('").append(keyIds).append("') ");
+                    .append("from pm_progress_weekly_prj_problem_detail a left join pm_prj c on a.PM_PRJ_ID = c.id where ")
+                    .append("a.PM_PROGRESS_WEEKLY_ID = ? ");
             if (StringUtils.hasText(prjIds)){
-                sb2.append(" and b.pm_prj_id in ('").append(prjIds).append("') ");
+                sb2.append(" and a.pm_prj_id in ('").append(prjIds).append("') ");
             }
-            sb2.append("ORDER BY b.ts desc ) a GROUP BY a.projectName ORDER BY any_value(a.ts) desc ");
+            if (StringUtils.hasText(pushProblemTypeId)){
+                sb2.append(" and a.PRJ_PUSH_PROBLEM_TYPE_ID in ('").append(keyIds).append("') ");
+            }
+            sb2.append("ORDER BY a.ts desc ) a GROUP BY a.projectName ORDER BY any_value(a.ts) desc ");
             List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sb2.toString(),weekId);
             if (!CollectionUtils.isEmpty(list3)){
                 Map<String,Object> resMap = new HashMap<>();

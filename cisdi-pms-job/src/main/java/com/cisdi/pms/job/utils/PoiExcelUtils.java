@@ -43,6 +43,7 @@ public class PoiExcelUtils {
         content.setBorderTop(BorderStyle.THIN);
         content.setBorderRight(BorderStyle.THIN);
         content.setBorderLeft(BorderStyle.THIN);
+        content.setWrapText(true); //开启换行
         return content;
     }
 }
