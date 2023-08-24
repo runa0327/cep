@@ -606,8 +606,6 @@ public class PmPrjReqExt {
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        //赋予流程发起人查看项目权限
-        createPrjUser(entityRecord, myJdbcTemplate);
         //更新项目信息
         PmPrjExt.updatePrjBaseByPrjReq(entityRecord);
         //更新项目资金信息
@@ -620,19 +618,5 @@ public class PmPrjReqExt {
         ProcessCommon.addPrjPostUser(projectId, entCode, processId, companyId, csCommId, myJdbcTemplate);
     }
 
-    /**
-     * 立项完成，赋予流程发起人查看项目权限
-     *
-     * @param entityRecord   流程主数据
-     * @param myJdbcTemplate 数据源
-     */
-    private void createPrjUser(EntityRecord entityRecord, MyJdbcTemplate myJdbcTemplate) {
-        //流程发起人
-        String userId = JdbcMapUtil.getString(entityRecord.valueMap, "CRT_USER_ID");
-        //发起部门
-        String deptId = JdbcMapUtil.getString(entityRecord.valueMap, "CRT_DEPT_ID");
-        //获取项目id
-        String projectId = JdbcMapUtil.getString(entityRecord.valueMap, "PM_PRJ_ID");
-    }
 }
 

@@ -90,8 +90,8 @@ public class PmPrjIdLink {
             List<Map<String, Object>> list = LinkSql.PmPrjIdLink(attValue, myJdbcTemplate);
 
             //清空项目基础信息
-            AttLinkExtDetail.clearBaseProjectDataNOPrj(attLinkResult);
-            AttLinkExtDetail.clearProjectAmtData(attLinkResult);
+            AttLinkClear.clearBaseProjectDataNOPrj(attLinkResult);
+            AttLinkClear.clearProjectAmtData(attLinkResult);
 
             if (!CollectionUtils.isEmpty(list)) {
 
@@ -122,7 +122,7 @@ public class PmPrjIdLink {
                 List<String> processUserList = AttLinkDifferentProcess.getLinkUserProcess();
                 if (processUserList.contains(entCode)) { //岗位自动人员
                     //清除人员岗位信息
-                    AttLinkExtDetail.clearProcessPostUser(attLinkResult);
+                    AttLinkClear.clearProcessPostUser(attLinkResult);
                     AttLinkExtDetail.autoPostUser(entCode,attValue,companyId,attLinkResult,myJdbcTemplate);
                 }
 

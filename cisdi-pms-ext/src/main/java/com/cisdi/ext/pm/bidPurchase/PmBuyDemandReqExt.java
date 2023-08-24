@@ -91,22 +91,6 @@ public class PmBuyDemandReqExt {
     }
 
     /**
-     * 采购需求审批扩展-业务主管审批
-     */
-    public void leaderCheck() {
-        String status = "leaderCheck";
-        check(status);
-    }
-
-    /**
-     * 采购需求审批-成本岗审批意见回显-批准
-     */
-    public void costCheck(){
-        String status = "costCheck";
-        check(status);
-    }
-
-    /**
      * 采购需求审批-成本岗审批-进入时扩展
      */
     public void costCheckInput(){
@@ -206,11 +190,7 @@ public class PmBuyDemandReqExt {
                 throw new BaseException("对不起，所在岗位不正确，请联系管理员处理！");
             }
 
-        } else if ("leaderCheck".equals(status)){
-            Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
-                    .set("TEXT_REMARK_ONE", comment).exec();
-            log.info("已更新：{}", exec);
-        } else if("detail".equals(status)){
+        }  else if("detail".equals(status)){
             //获取预算金额下限 预算金额上线限
             String minAmt = JdbcMapUtil.getString(entityRecord.valueMap,"AMT_SIX");
             String maxAmt = JdbcMapUtil.getString(entityRecord.valueMap,"AMT_SEVEN");
@@ -252,10 +232,6 @@ public class PmBuyDemandReqExt {
         } else if ("fourth".equals(status)) {
             Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
                     .set("APPROVAL_COMMENT_FOUR", comment).exec();
-            log.info("已更新：{}", exec);
-        } else if ("costCheck".equals(status)){
-            Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
-                    .set("TEXT_REMARK_TWO", comment).exec();
             log.info("已更新：{}", exec);
         } else if ("costCheckInput".equals(status)){
             Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
@@ -660,14 +636,27 @@ public class PmBuyDemandReqExt {
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         //流程实例id
         String procInstId = ExtJarHelper.procInstId.get();
-        //获取审批意见
-        Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId);
-        //审批意见、内容
-        String comment = message.get("comment");
+        String csCommId = entityRecord.csCommId; // 主表单id
         //分支判断，逻辑处理
         if ("OK".equals(status)){
             if ("startOk".equals(nodeStatus)){
                 WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
+            } else {
+                //获取审批意见
+                Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId);
+                //审批意见、内容
+                String comment = message.get("comment");
+                if ("costOk".equals(nodeStatus)){ // 成本岗审批
+                    ProcessCommon.updateComment("TEXT_REMARK_TWO",entityRecord.valueMap,comment,entCode,csCommId,userName);
+                } else if ("chargeLeaderOk".equals(nodeStatus)){ // 2-业务部门主管审批
+                    ProcessCommon.updateComment("TEXT_REMARK_ONE",entityRecord.valueMap,comment,entCode,csCommId,userName);
+                }
+            }
+        } else {
+            if ("costRefuse".equals(nodeStatus)){ // 成本岗审批
+                ProcessCommon.updateProcColsValue("TEXT_REMARK_TWO",entCode,csCommId,null);
+            } else if ("chargeLeaderRefuse".equals(nodeStatus)){ // 2-业务部门主管审批
+                ProcessCommon.updateProcColsValue("TEXT_REMARK_ONE",entCode,csCommId,null);
             }
         }
     }

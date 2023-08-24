@@ -278,14 +278,6 @@ public class PmPrjExt {
     }
 
     /**
-     * 更新项目表信息
-     * @param pmPrj 项目实体
-      */
-    public static void updateData(PmPrj pmPrj) {
-        pmPrj.updateById();
-    }
-
-    /**
      * 重复非系统项目作废扩展
      */
     public void vdRepeatPrj(){
@@ -502,5 +494,13 @@ public class PmPrjExt {
     public static void updateOneColValue(String prj, String value, String colCode) {
         Crud.from(PmPrj.ENT_CODE).where().eq(PmPrj.Cols.ID,prj).update()
                 .set(colCode,value).exec();
+    }
+
+    /**
+     * 更新项目表信息
+     * @param pmPrj 项目实体
+     */
+    public static void updateData(PmPrj pmPrj) {
+        pmPrj.updateById();
     }
 }

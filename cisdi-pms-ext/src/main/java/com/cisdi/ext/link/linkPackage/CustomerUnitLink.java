@@ -29,7 +29,7 @@ public class CustomerUnitLink {
         List<String> autoGetDept = AttLinkDifferentProcess.getAutoGetDept();
         if (autoGetDept.contains(entCode)){
             //每次切换清空原有数据
-            AttLinkExtDetail.clearUser(attLinkResult);
+            AttLinkClear.clearUser(attLinkResult);
             autoChangeDept(myJdbcTemplate,attValue,userId,attLinkResult);
         }
         return attLinkResult;

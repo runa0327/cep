@@ -35,7 +35,7 @@ public class ProjectTypeIdLink {
         }
 
         Map<String, Object> row = list.get(0);
-        AttLinkExtDetail.clearProjectTypeData(attLinkResult);
+        AttLinkClear.clearProjectTypeData(attLinkResult);
         AttLinkExtDetail.prjTypeLinkNew(row,attLinkResult,entCode);
 
         //建设规模类型

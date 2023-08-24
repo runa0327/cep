@@ -78,7 +78,8 @@
         e.name as projectName,
         d.AD_USER_ID as manageUserId,
         f.name as manageUserName,
-        b.IZ_WRITE as izWrite
+        b.IZ_WRITE as izWrite,
+        a.PM_PROGRESS_WEEKLY_PRJ_ID as weekPrjId
         FROM
         PM_PROGRESS_WEEKLY_PRJ_DETAIL a
         LEFT JOIN PM_PROGRESS_WEEKLY_PRJ b ON a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id

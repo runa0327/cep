@@ -1,7 +1,9 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.development;
 
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.invest.InvestAmtExt;
+import com.cisdi.ext.model.base.PmPrj;
+import com.cisdi.ext.pm.PmInLibraryExt;
 import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.util.WfPmInvestUtil;
 import com.cisdi.ext.wf.WfExt;
@@ -13,6 +15,7 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -73,6 +76,22 @@ public class PmPrjInvest1Ext {
         String processId = ExtJarHelper.procId.get();
         String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
         ProcessCommon.addPrjPostUser(projectId,entCode,processId,companyId,csCommId,myJdbcTemplate);
+        // 更新项目信息
+        updatePrjBaseDate(entityRecord.valueMap,pmPrjId);
+    }
+
+    /**
+     * 赋值更新项目信息
+     * @param valueMap 数据map
+     * @param pmPrjId 项目id
+     */
+    private void updatePrjBaseDate(Map<String, Object> valueMap, String pmPrjId) {
+        PmPrj pmPrj = new PmPrj();
+        pmPrj.setBuildYears(new BigDecimal(JdbcMapUtil.getString(valueMap,"BUILD_YEARS"))); // 建设年限
+        pmPrj.setPrjCode(JdbcMapUtil.getString(valueMap,"PRJ_CODE")); // 项目代码
+        pmPrj.setId(pmPrjId); // 项目id
+        pmPrj.setReplyNo(JdbcMapUtil.getString(valueMap,"REPLY_NO_WR")); // 批复文号
+        PmPrjExt.updateData(pmPrj);
     }
 
     /**

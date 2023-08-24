@@ -42,6 +42,7 @@ public class PmProgressWeeklyPrjDetailController extends BaseController {
      */
     @GetMapping(value = "/downloadPrjProblem")
     public void downloadPrjProblem(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail, HttpServletResponse response){
-        List<Map<String,Object>> list = pmProgressWeeklyPrjDetailService.getPrjProblemList(pmProgressWeeklyPrjDetail);
+        Map<String,Object> map = pmProgressWeeklyPrjDetailService.getPrjProblemList(pmProgressWeeklyPrjDetail);
+        pmProgressWeeklyPrjDetailService.downloadPrjProblem(map,"项目问题汇总",response);
     }
 }
