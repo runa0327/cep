@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * @projectName cisdi-pms-service
  * @title ReversalDataExt
  * @package com.cisdi.ext.history
- * @description
+ * @description 台账刷新项目信息
  * @date 2023/8/14
  */
 public class ReversalDataExt {
