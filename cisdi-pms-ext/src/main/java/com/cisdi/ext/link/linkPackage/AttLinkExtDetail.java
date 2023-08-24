@@ -303,11 +303,16 @@ public class AttLinkExtDetail {
     public static void assignmentAttLinkResult(AttLinkResult attLinkResult, Map<String,Object> row, String entCode, MyJdbcTemplate myJdbcTemplate) {
         //项目类型属性联动处理
         List<String> noPrjTypeList = AttLinkDifferentProcess.noPrjTypeLink();
-        if (!noPrjTypeList.contains(entCode)){
+        if (noPrjTypeList.contains(entCode)){
             prjTypeLinkNew(row,attLinkResult,entCode);
         }
         mapAddValue("PRJ_CODE","prj_code",row,AttDataTypeE.TEXT_LONG,attLinkResult); //项目代码
-        mapAddValue("BUILD_YEARS","BUILD_YEARS",row,AttDataTypeE.TEXT_LONG,attLinkResult); //建设年限
+        String buildYear = JdbcMapUtil.getString(row,"BUILD_YEARS"); //建设年限
+        if (StringUtils.hasText(buildYear)){
+            BigDecimal year = new BigDecimal(buildYear);
+            LinkUtils.mapAddAllValue("BUILD_YEARS",AttDataTypeE.TEXT_LONG,year,buildYear,true,false,false,attLinkResult);
+        }
+//        mapAddValue("BUILD_YEARS","BUILD_YEARS",row,AttDataTypeE.TEXT_LONG,attLinkResult);
         mapAddValue("PRJ_SITUATION","PRJ_SITUATION",row,AttDataTypeE.TEXT_LONG,attLinkResult); //项目概况
         mapAddValue("PRJ_INTRODUCE","PRJ_SITUATION",row,AttDataTypeE.TEXT_LONG,attLinkResult); //项目概况
         mapAddValue("PRJ_REPLY_FILE","PRJ_REPLY_FILE",row,AttDataTypeE.FILE_GROUP,attLinkResult); //项目概况
@@ -322,7 +327,6 @@ public class AttLinkExtDetail {
         mapAddRefValue("PRJ_MANAGE_MODE_ID","m_id","m_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //项目管理模式
         mapAddRefValue("BASE_LOCATION_ID","l_id","l_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //建设地点
         mapAddRefValue("PROJECT_TYPE_ID","pt_id","pt_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //建设地点
-
         if (!"PM_PRJ_REQ".equals(entCode)){
             mapAddValue("PRJ_REPLY_DATE","PRJ_REPLY_DATE",row,AttDataTypeE.DATE,attLinkResult); //批复日期
         }
@@ -346,15 +350,77 @@ public class AttLinkExtDetail {
         //需要回显资金信息的流程
         List<String> investProcess = AttLinkDifferentProcess.getInvestProcess();
         if (investProcess.contains(entCode)){
-            mapAddValue("PRJ_TOTAL_INVEST","ESTIMATED_TOTAL_INVEST",row,AttDataTypeE.DOUBLE,attLinkResult); //总投资
-            mapAddValue("PROJECT_AMT","PROJECT_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //工程费用
-            mapAddValue("CONSTRUCT_AMT","CONSTRUCT_PRJ_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //建安工程费
-            mapAddValue("EQUIP_AMT","EQUIP_BUY_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //设备采购费
-            mapAddValue("PROJECT_OTHER_AMT","PROJECT_OTHER_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //工程建设其他费
-            mapAddValue("EQUIPMENT_COST","EQUIPMENT_COST",row,AttDataTypeE.DOUBLE,attLinkResult); //科研设备费
-            mapAddValue("LAND_AMT","LAND_BUY_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //土地拆迁费
-            mapAddValue("PREPARE_AMT","PREPARE_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //预备费
-            mapAddValue("CONSTRUCT_PERIOD_INTEREST","CONSTRUCT_PERIOD_INTEREST",row,AttDataTypeE.DOUBLE,attLinkResult); //建设期利息
+            // 总投资
+            String totalInvest = JdbcMapUtil.getString(row,"ESTIMATED_TOTAL_INVEST");
+            if (StringUtils.hasText(totalInvest)){
+                BigDecimal totalInvestBig = new BigDecimal(totalInvest);
+                LinkUtils.mapAddAllValue("PRJ_TOTAL_INVEST",AttDataTypeE.TEXT_LONG,totalInvestBig,totalInvest,true,false,false,attLinkResult);
+            }
+            // 工程费用
+            String projectAmt = JdbcMapUtil.getString(row,"PROJECT_AMT");
+            if (StringUtils.hasText(projectAmt)){
+                BigDecimal projectAmtBig = new BigDecimal(projectAmt);
+                LinkUtils.mapAddAllValue("PROJECT_AMT",AttDataTypeE.TEXT_LONG,projectAmtBig,projectAmt,true,false,false,attLinkResult);
+            }
+
+            // 建安工程费
+            String constructAmt = JdbcMapUtil.getString(row,"CONSTRUCT_PRJ_AMT");
+            if (StringUtils.hasText(constructAmt)){
+                BigDecimal constructAmtBig = new BigDecimal(constructAmt);
+                LinkUtils.mapAddAllValue("CONSTRUCT_AMT",AttDataTypeE.TEXT_LONG,constructAmtBig,constructAmt,true,false,false,attLinkResult);
+            }
+
+            // 设备采购费
+            String equipAmt = JdbcMapUtil.getString(row,"EQUIP_BUY_AMT");
+            if (StringUtils.hasText(equipAmt)){
+                BigDecimal equipAmtBig = new BigDecimal(equipAmt);
+                LinkUtils.mapAddAllValue("EQUIP_AMT",AttDataTypeE.TEXT_LONG,equipAmtBig,equipAmt,true,false,false,attLinkResult);
+            }
+
+            // 工程建设其他费
+            String projectOtherAmt = JdbcMapUtil.getString(row,"PROJECT_OTHER_AMT");
+            if (StringUtils.hasText(projectOtherAmt)){
+                BigDecimal projectOtherAmtBig = new BigDecimal(projectOtherAmt);
+                LinkUtils.mapAddAllValue("PROJECT_OTHER_AMT",AttDataTypeE.TEXT_LONG,projectOtherAmtBig,projectOtherAmt,true,false,false,attLinkResult);
+            }
+
+            // 科研设备费
+            String equipmentAmt = JdbcMapUtil.getString(row,"EQUIPMENT_COST");
+            if (StringUtils.hasText(equipmentAmt)){
+                BigDecimal equipmentAmtBig = new BigDecimal(equipmentAmt);
+                LinkUtils.mapAddAllValue("EQUIPMENT_COST",AttDataTypeE.TEXT_LONG,equipmentAmtBig,equipmentAmt,true,false,false,attLinkResult);
+            }
+
+            // 土地拆迁费
+            String landAmt = JdbcMapUtil.getString(row,"LAND_BUY_AMT");
+            if (StringUtils.hasText(landAmt)){
+                BigDecimal landAmtBig = new BigDecimal(landAmt);
+                LinkUtils.mapAddAllValue("LAND_AMT",AttDataTypeE.TEXT_LONG,landAmtBig,landAmt,true,false,false,attLinkResult);
+            }
+
+            // 预备费
+            String prepareAmt = JdbcMapUtil.getString(row,"PREPARE_AMT");
+            if (StringUtils.hasText(prepareAmt)){
+                BigDecimal prepareAmtBig = new BigDecimal(prepareAmt);
+                LinkUtils.mapAddAllValue("PREPARE_AMT",AttDataTypeE.TEXT_LONG,prepareAmtBig,prepareAmt,true,false,false,attLinkResult);
+            }
+
+            // 建设期利息
+            String periodAmt = JdbcMapUtil.getString(row,"CONSTRUCT_PERIOD_INTEREST");
+            if (StringUtils.hasText(periodAmt)){
+                BigDecimal periodAmtBig = new BigDecimal(periodAmt);
+                LinkUtils.mapAddAllValue("CONSTRUCT_PERIOD_INTEREST",AttDataTypeE.TEXT_LONG,periodAmtBig,periodAmt,true,false,false,attLinkResult);
+            }
+
+//            mapAddValue("PRJ_TOTAL_INVEST","ESTIMATED_TOTAL_INVEST",row,AttDataTypeE.DOUBLE,attLinkResult); //总投资
+//            mapAddValue("PROJECT_AMT","PROJECT_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //工程费用
+//            mapAddValue("CONSTRUCT_AMT","CONSTRUCT_PRJ_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //建安工程费
+//            mapAddValue("EQUIP_AMT","EQUIP_BUY_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //设备采购费
+//            mapAddValue("PROJECT_OTHER_AMT","PROJECT_OTHER_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //工程建设其他费
+//            mapAddValue("EQUIPMENT_COST","EQUIPMENT_COST",row,AttDataTypeE.DOUBLE,attLinkResult); //科研设备费
+//            mapAddValue("LAND_AMT","LAND_BUY_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //土地拆迁费
+//            mapAddValue("PREPARE_AMT","PREPARE_AMT",row,AttDataTypeE.DOUBLE,attLinkResult); //预备费
+//            mapAddValue("CONSTRUCT_PERIOD_INTEREST","CONSTRUCT_PERIOD_INTEREST",row,AttDataTypeE.DOUBLE,attLinkResult); //建设期利息
         }
     }
 
