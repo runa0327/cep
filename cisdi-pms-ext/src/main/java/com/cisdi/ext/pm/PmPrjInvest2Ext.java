@@ -12,7 +12,9 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -171,10 +173,10 @@ public class PmPrjInvest2Ext {
         } else {
             if ("costCheckRefuse".equals(nodeStatus)){ //2-成本岗内部审核
                 ProcessCommon.clearData("REMARK_LONG_ONE",csCommId,entCode,myJdbcTemplate);
-            } else if ("costDesignCheckOK".equals(nodeStatus)){ //8-成本岗/设计岗并行意见
+            } else if ("costDesignCheckRefuse".equals(nodeStatus)){ //8-成本岗/设计岗并行意见
                 ProcessCommon.clearData("COST_COMMENT",csCommId,entCode,myJdbcTemplate);
                 ProcessCommon.clearData("DESIGN_COMMENT",csCommId,entCode,myJdbcTemplate);
-            } else if ("earlyLeaderCheckOK".equals(nodeStatus)){ //9-前期管理部负责人意见
+            } else if ("earlyLeaderCheckRefuse".equals(nodeStatus)){ //9-前期管理部负责人意见
                 ProcessCommon.clearData("APPROVAL_COMMENT_TWO",csCommId,entCode,myJdbcTemplate);
             }
         }
@@ -210,4 +212,32 @@ public class PmPrjInvest2Ext {
         }
         return name;
     }
+
+    /**====================================历史数据处理开始===================================================**/
+
+    /**
+     * 根据选择的记录刷新项目预算及项目资金信息
+     */
+    public void updatePrjAmtByInvest2(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<EntityRecord> entityRecord = ExtJarHelper.entityRecordList.get();
+        if (!CollectionUtils.isEmpty(entityRecord)){
+            for (EntityRecord record : entityRecord) {
+                String csCommId = record.csCommId;
+                //项目id
+                String pmPrjId = String.valueOf(record.valueMap.get("PM_PRJ_ID"));
+                //更新项目信息(基础信息、资金信息)
+                PmPrjExt.updatePrjBaseData(record,"PM_PRJ_INVEST2",3,myJdbcTemplate,"PM_PRJ_INVEST2");
+                //创建项目投资测算汇总可研数据
+                WfPmInvestUtil.calculateData(csCommId, "PM_PRJ_INVEST2", pmPrjId);
+                //审批人员信息写入花名册
+                String projectId = JdbcMapUtil.getString(record.valueMap,"PM_PRJ_ID");
+                String processId = ExtJarHelper.procId.get();
+                String companyId = JdbcMapUtil.getString(record.valueMap,"CUSTOMER_UNIT");
+                ProcessCommon.addPrjPostUser(projectId,"PM_PRJ_INVEST2",processId,companyId,csCommId,myJdbcTemplate);
+            }
+        }
+    }
+
+    /**====================================历史数据处理结束===================================================**/
 }
