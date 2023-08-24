@@ -171,10 +171,10 @@ public class PmPrjInvest2Ext {
         } else {
             if ("costCheckRefuse".equals(nodeStatus)){ //2-成本岗内部审核
                 ProcessCommon.clearData("REMARK_LONG_ONE",csCommId,entCode,myJdbcTemplate);
-            } else if ("costDesignCheckOK".equals(nodeStatus)){ //8-成本岗/设计岗并行意见
+            } else if ("costDesignCheckRefuse".equals(nodeStatus)){ //8-成本岗/设计岗并行意见
                 ProcessCommon.clearData("COST_COMMENT",csCommId,entCode,myJdbcTemplate);
                 ProcessCommon.clearData("DESIGN_COMMENT",csCommId,entCode,myJdbcTemplate);
-            } else if ("earlyLeaderCheckOK".equals(nodeStatus)){ //9-前期管理部负责人意见
+            } else if ("earlyLeaderCheckRefuse".equals(nodeStatus)){ //9-前期管理部负责人意见
                 ProcessCommon.clearData("APPROVAL_COMMENT_TWO",csCommId,entCode,myJdbcTemplate);
             }
         }
