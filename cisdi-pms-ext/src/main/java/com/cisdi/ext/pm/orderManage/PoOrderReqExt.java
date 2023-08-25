@@ -663,7 +663,7 @@ public class PoOrderReqExt {
 
         Map<String,String> map = new HashMap<>();
         if ("PO_ORDER_REQ".equals(entCode) || "po_order_req".equals(entCode)){ //合同签订
-            if ("0099952822476409137".equals(nodeId) && "0099799190825080669".equals(isModel)){
+            if (("0099952822476409137".equals(nodeId) || "0100051820465903855".equals(nodeId)) && "0099799190825080669".equals(isModel)){
                 map.put("code","ATT_FILE_GROUP_ID");
                 map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"));
             } else {
