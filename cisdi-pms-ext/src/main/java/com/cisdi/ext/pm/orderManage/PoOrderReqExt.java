@@ -608,6 +608,7 @@ public class PoOrderReqExt {
         String procInstId = ExtJarHelper.procInstId.get();
         // 流程id
         String processId = ExtJarHelper.procId.get();
+        String nodeId = ExtJarHelper.nodeId.get(); // 节点id
         //是否标准模板 0099799190825080669 = 是，0099799190825080670=否
         String isModel = JdbcMapUtil.getString(entityRecord.valueMap,"YES_NO_THREE");
 
@@ -631,10 +632,13 @@ public class PoOrderReqExt {
                                 .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
                                 .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
                     } else {
-                        PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode,processId);
-                        String param = JSON.toJSONString(poOrderReqView);
-                        //调用接口
-                        HttpClient.doPost(url,param,"UTF-8");
+                        PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode,processId,nodeId);
+                        if (poOrderReqView != null){
+                            String param = JSON.toJSONString(poOrderReqView);
+                            //调用接口
+                            HttpClient.doPost(url,param,"UTF-8");
+                        }
+
                     }
 
                 }
@@ -652,31 +656,32 @@ public class PoOrderReqExt {
      * @param entCode 表名
      * @return 合同信息实体
      */
-    private PoOrderReqView getOrderModel(EntityRecord entityRecord, String procInstId, String userId, String status, String companyName, String entCode,String processId) {
-        PoOrderReqView poOrderReqView = new PoOrderReqView();
-        poOrderReqView.setProcessId(processId);
-        poOrderReqView.setId(entityRecord.csCommId);
-        poOrderReqView.setProcessInstanceId(procInstId);
-        poOrderReqView.setCreateBy(userId);
-        poOrderReqView.setTableCode(entCode);
-        if (SharedUtil.isEmptyString(companyName)){
-            companyName = "三亚崖州湾科技城开发建设有限公司";
-        }
-        poOrderReqView.setCompanyName(companyName);
+    private PoOrderReqView getOrderModel(EntityRecord entityRecord, String procInstId, String userId, String status, String companyName, String entCode,String processId,String nodeId) {
         List<Map<String,String>> list = new ArrayList<>();
         // 是否标准模板 0099799190825080669=是 0099799190825080670=否
         String isModel = JdbcMapUtil.getString(entityRecord.valueMap,"YES_NO_THREE");
 
         Map<String,String> map = new HashMap<>();
         if ("PO_ORDER_REQ".equals(entCode) || "po_order_req".equals(entCode)){ //合同签订
-            if ("0099799190825080670".equals(isModel)){ //合同修编稿
-                map.put("code","FILE_ID_ONE");
-                map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"));
-            } else { //合同文本
+            if (("0099952822476409137".equals(nodeId) || "0100051820465903855".equals(nodeId)) && "0099799190825080669".equals(isModel)){
                 map.put("code","ATT_FILE_GROUP_ID");
                 map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"));
+            } else {
+                if ("0099799190825080670".equals(isModel)){ //合同文本
+                    map.put("code","FILE_ID_ONE");
+                    map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"));
+                }
             }
-            list.add(map);
+//            if ("0099799190825080670".equals(isModel)){ //合同修编稿
+//                map.put("code","FILE_ID_ONE");
+//                map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"));
+//            } else { //合同文本
+//                map.put("code","ATT_FILE_GROUP_ID");
+//                map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"));
+//            }
+            if (!map.isEmpty()){
+                list.add(map);
+            }
         } else if ("PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "po_order_supplement_req".equals(entCode)){ //补充协议
             String code1 = "FILE_ID_TENTH"; //合同修编稿
             String file1 = JdbcMapUtil.getString(entityRecord.valueMap,code1);
@@ -686,8 +691,22 @@ public class PoOrderReqExt {
                 list.add(map);
             }
         }
-        poOrderReqView.setColMap(list);
-        return poOrderReqView;
+        if (!CollectionUtils.isEmpty(list)){
+            PoOrderReqView poOrderReqView = new PoOrderReqView();
+            poOrderReqView.setColMap(list);
+            poOrderReqView.setProcessId(processId);
+            poOrderReqView.setId(entityRecord.csCommId);
+            poOrderReqView.setProcessInstanceId(procInstId);
+            poOrderReqView.setCreateBy(userId);
+            poOrderReqView.setTableCode(entCode);
+            if (SharedUtil.isEmptyString(companyName)){
+                companyName = "三亚崖州湾科技城开发建设有限公司";
+            }
+            poOrderReqView.setCompanyName(companyName);
+            return poOrderReqView;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -941,6 +960,7 @@ public class PoOrderReqExt {
         String csId = entityRecord.csCommId;
         //流程实例id
         String procInstId = ExtJarHelper.procInstId.get();
+        String nodeId = ExtJarHelper.nodeId.get(); // 节点id
         //查询接口地址
         String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
         List<Map<String,Object>> listUrl = myJdbcTemplate.queryForList(httpSql);
@@ -959,7 +979,7 @@ public class PoOrderReqExt {
                             .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
                             .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
                 } else {
-                    PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode,processId);
+                    PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode,processId,nodeId);
                     String param = JSON.toJSONString(poOrderReqView);
                     //调用接口
                     HttpClient.doPost(url,param,"UTF-8");
