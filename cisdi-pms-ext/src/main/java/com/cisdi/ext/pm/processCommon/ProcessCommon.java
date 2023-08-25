@@ -894,4 +894,15 @@ public class ProcessCommon {
     }
 
 
+
+    /**
+     * 根据流程流转id查询节点类型
+     * @param flowId 流转id
+     * @return 节点类型信息
+     */
+    public static String getNodeType(String flowId) {
+        String nodeId = WfFlow.selectById(flowId).getFromNodeId();
+        return WfNode.selectById(nodeId).getNodeType();
+    }
+
 }
