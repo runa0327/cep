@@ -1061,8 +1061,8 @@ public class ProgressWeekReport {
             sb.append("and a.PRJ_PUSH_PROBLEM_TYPE_ID in ('").append(keyIds).append("')");
             sb1.append("and a.PRJ_PUSH_PROBLEM_TYPE_ID in ('").append(keyIds).append("')");
         }
-        sb1.append(" ) a ");
-        sb.append(" order by weatherCompleted asc,weatherStart desc,a.pm_prj_id desc ").append(limit).append(" ) a");
+        sb1.append(" GROUP BY a.PM_PRJ_ID ) a ");
+        sb.append(" GROUP BY a.PM_PRJ_ID order by weatherCompleted asc,weatherStart desc,a.pm_prj_id desc ").append(limit).append(" ) a");
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString(),weekId);
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sb1.toString(),weekId);
         if (!CollectionUtils.isEmpty(list1)){

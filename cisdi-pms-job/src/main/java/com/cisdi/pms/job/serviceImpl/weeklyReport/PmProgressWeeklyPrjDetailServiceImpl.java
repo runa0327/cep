@@ -321,6 +321,7 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
         sb.append("ORDER BY a.ts desc ) a GROUP BY a.projectName ORDER BY any_value(a.ts) desc ");
 
         List<Map<String,String>> listMap = pmProgressWeeklyPrjProblemDetailMapper.selectBySql(sb.toString());
+
         resMap.put("header",headerList);
         resMap.put("list",listMap);
         return resMap;
