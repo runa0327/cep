@@ -237,7 +237,7 @@ public class PoGuaranteeLetterRequireReqServiceImpl implements PoGuaranteeLetter
             if (file.exists()){
                 file.delete();
             }
-            FileUtils.writeBytes(path, response.getOutputStream());
+            FileUtils.writeBytes(path,file,response.getOutputStream());
 
         } catch (Exception e){
             e.printStackTrace();
