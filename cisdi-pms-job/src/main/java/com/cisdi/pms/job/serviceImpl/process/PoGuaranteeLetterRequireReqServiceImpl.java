@@ -234,10 +234,10 @@ public class PoGuaranteeLetterRequireReqServiceImpl implements PoGuaranteeLetter
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             FileUtils.setAttachmentResponseHeader(response, realFileName);
             File file = new File(path);
+            FileUtils.writeBytes(path,file,response.getOutputStream());
             if (file.exists()){
                 file.delete();
             }
-            FileUtils.writeBytes(path,file,response.getOutputStream());
 
         } catch (Exception e){
             e.printStackTrace();
