@@ -18,15 +18,15 @@ public class FileUtils {
      * 输出指定文件的byte数组
      *
      * @param filePath 文件路径
+     * @param file 文件信息
      * @param os 输出流
      * @return
      */
-    public static void writeBytes(String filePath, OutputStream os) throws IOException
+    public static void writeBytes(String filePath, File file, OutputStream os) throws IOException
     {
         FileInputStream fis = null;
         try
         {
-            File file = new File(filePath);
             if (!file.exists())
             {
                 throw new FileNotFoundException(filePath);
@@ -121,10 +121,10 @@ public class FileUtils {
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             FileUtils.setAttachmentResponseHeader(response, realFileName);
             File file = new File(path);
+            FileUtils.writeBytes(path,file,response.getOutputStream());
             if (file.exists()){
                 file.delete();
             }
-            FileUtils.writeBytes(path, response.getOutputStream());
         } catch (Exception e) {
             e.printStackTrace();
         }  finally {
