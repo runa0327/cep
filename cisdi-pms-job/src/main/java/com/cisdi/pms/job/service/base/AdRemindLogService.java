@@ -11,4 +11,10 @@ public interface AdRemindLogService {
      * @param tmp 其他消息体
      */
     void insertLog(String txt, String remindType, WfProcessInstanceWX tmp);
+
+    /**
+     * 根据单个提醒信息插入数据
+     * @param msg 消息体
+     */
+    void insertByMsg(String msg);
 }

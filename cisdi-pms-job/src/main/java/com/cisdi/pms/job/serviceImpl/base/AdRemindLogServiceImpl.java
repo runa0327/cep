@@ -53,4 +53,27 @@ public class AdRemindLogServiceImpl implements AdRemindLogService {
         adRemindLogMapper.insert(adRemindLog);
 
     }
+
+    /**
+     * 根据单个提醒信息插入数据
+     *
+     * @param msg 消息体
+     */
+    @Override
+    public void insertByMsg(String msg) {
+        AdRemindLog adRemindLog = new AdRemindLog();
+        String now = DateUtil.getNormalTimeStr(new Date());
+
+        adRemindLog.setId(IdUtil.getSnowflakeNextIdStr());
+        adRemindLog.setVer("1");
+        adRemindLog.setTs(now);
+        adRemindLog.setCreateDate(now);
+        adRemindLog.setLastUpdateDate(now);
+        adRemindLog.setStatus("AP");
+        adRemindLog.setCode("generateJianAn");
+        adRemindLog.setRemindTime(now);
+        adRemindLog.setRemindText(msg);
+
+        adRemindLogMapper.insert(adRemindLog);
+    }
 }
