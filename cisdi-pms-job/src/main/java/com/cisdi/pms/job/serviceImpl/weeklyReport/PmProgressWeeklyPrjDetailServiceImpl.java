@@ -229,6 +229,7 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
             pmProgressWeeklyPrjDetail.setProgress(list.get(0).getProgress());
             pmProgressWeeklyPrjDetail.setProgressDescribe(list.get(0).getProgressDescribe());
             pmProgressWeeklyPrjDetail.setProgressWeek(list.get(0).getProgressWeek());
+            pmProgressWeeklyPrjDetail.setWeekId(weekId);
             pmProgressWeeklyPrjDetailMapper.insertData(pmProgressWeeklyPrjDetail);
             // 写入问题明细表
             if (!CollectionUtils.isEmpty(problemDetail)){
