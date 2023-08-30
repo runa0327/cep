@@ -2,7 +2,6 @@ package com.cisdi.ext.proPlan;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.pm.office.PmNodeAdjustReqExt;
-import com.cisdi.ext.util.BigDecimalUtil;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.PrjPlanUtil;
@@ -18,7 +17,6 @@ import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -137,12 +135,8 @@ public class ProPlanExt {
      * 获取项目首页-项目进度数据
      */
     public void getPrjOverviewNodeList() throws ParseException {
-        // 输入：PrjOverviewNodeListParam
-        // 输出：List<PrjProPlanNodeInfo>
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        String json = JsonUtil.toJson(map);
-        ProPlanExt.GetPrjOverviewNodeListParam param = JsonUtil.fromJson(json, ProPlanExt.GetPrjOverviewNodeListParam.class);
-        String pmPrjId = param.pmPrjId;
+        String pmPrjId = JdbcMapUtil.getString(map, "pmPrjId");
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
         List<Map<String, Object>> allList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS," +
@@ -151,20 +145,12 @@ public class ProPlanExt {
                 "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
                 "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE," +
                 "pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO,'0' as seq_bak \n" +
-                "from PM_PRO_PLAN_NODE pppn left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where pppn.OPREATION_TYPE is null and ppp.PM_PRJ_ID=?", pmPrjId);
-
-
-        allList.stream().filter(p -> "0".equals(JdbcMapUtil.getString(p, "PM_PRO_PLAN_NODE_PID")))
-                .sorted(Comparator.comparing(o -> BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(o, "SEQ_NO")))).peek(m -> {
-            BigDecimal parentSeq = BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(m, "SEQ_NO")).multiply(new BigDecimal(1000));
-            m.put("seq_bak", parentSeq);
-            getSortChildren(m, allList, parentSeq);
-        }).collect(Collectors.toList());
-        List<Map<String, Object>> threeNode = allList.stream().filter(p -> "3".equals(JdbcMapUtil.getString(p, "LEVEL")) && "1".equals(JdbcMapUtil.getString(p, "SHOW_IN_PRJ_OVERVIEW")))
-                .sorted(Comparator.comparing(o -> JdbcMapUtil.getString(o, "seq_bak"))).collect(Collectors.toList());
+                "from PM_PRO_PLAN_NODE_HOME ph left join PM_PRO_PLAN_NODE pppn on ph.`NAME` = pppn.`NAME` " +
+                "left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where pppn.OPREATION_TYPE is null and ppp.PM_PRJ_ID=? " +
+                "order by ph.SEQ_NO", pmPrjId);
 
         // 结果转换
-        List<PrjProPlanNodeInfo> infoList = threeNode.stream().map(p -> this.convertPlanInfoNode(pmPrjId, p, myJdbcTemplate)).collect(Collectors.toList());
+        List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(pmPrjId, p, myJdbcTemplate)).collect(Collectors.toList());
         List<Map<String, Object>> dataList = new ArrayList<>();
         for (PrjProPlanNodeInfo item : infoList) {
             JSONObject jsonObject = new JSONObject();
@@ -244,23 +230,6 @@ public class ProPlanExt {
         }
     }
 
-    private static List<Map<String, Object>> getSortChildren(Map<String, Object> parent, List<Map<String, Object>> allData, BigDecimal parentSeq) {
-        return allData.stream().filter(p -> Objects.equals(parent.get("ID"), p.get("PM_PRO_PLAN_NODE_PID")))
-                .sorted(Comparator.comparing(o -> BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(o, "SEQ_NO")))).peek(m -> {
-                    BigDecimal currentSeq = BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(m, "SEQ_NO"));
-                    if ("1".equals(JdbcMapUtil.getString(m, "LEVEL"))) {
-                        currentSeq = BigDecimalUtil.multiply(currentSeq, new BigDecimal(1000));
-                    } else if ("2".equals(JdbcMapUtil.getString(m, "LEVEL"))) {
-                        currentSeq = BigDecimalUtil.multiply(currentSeq, new BigDecimal(100));
-                    } else if ("3".equals(JdbcMapUtil.getString(m, "LEVEL"))) {
-                        currentSeq = BigDecimalUtil.multiply(currentSeq, new BigDecimal(10));
-                    }
-                    BigDecimal obj = parentSeq.add(currentSeq);
-                    m.put("seq_bak", obj);
-                    getSortChildren(m, allData, obj);
-                }).collect(Collectors.toList());
-    }
-
     /**
      * 获取不涉及原因
      *
@@ -278,35 +247,11 @@ public class ProPlanExt {
     }
 
     /**
-     * 树转换
-     *
-     * @param source
-     * @param outList
-     */
-    private void convertChildrenToTileList(List<PrjProPlanNodeInfo> source, List<PrjProPlanNodeInfo> outList) {
-        if (outList == null) {
-            outList = new ArrayList<>();
-        }
-        for (PrjProPlanNodeInfo nodeInfo : source) {
-            if (nodeInfo.children != null) {
-                List<PrjProPlanNodeInfo> children = nodeInfo.children;
-                convertChildrenToTileList(children, outList);
-            }
-            outList.add(nodeInfo);
-        }
-
-    }
-
-    /**
      * 获取项目进展树结构数据
      */
     public void getPrjProPlanNetwork() {
-        // 输入：GettPrjProPlanNetworkParam
-        // 输出：PrjProPlanInfo，内含nodeInfoList属性，再含children属性（递归）
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
-        String json = JsonUtil.toJson(map);
-        ProPlanExt.GetPrjProPlanNetworkParam param = JsonUtil.fromJson(json, ProPlanExt.GetPrjProPlanNetworkParam.class);
-        String pmPrjId = param.pmPrjId;
+        String pmPrjId = JdbcMapUtil.getString(map, "pmPrjId");
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         PrjProPlanInfo planInfo = new PrjProPlanInfo();
         Map<String, Object> proMap = null;
@@ -374,12 +319,6 @@ public class ProPlanExt {
         }).collect(Collectors.toList());
     }
 
-    /**
-     * 项目预览中的节点列表的参数。
-     */
-    public static class GetPrjOverviewNodeListParam {
-        public String pmPrjId;
-    }
 
     public static class GetPrjProPlanNetworkParam {
         public String pmPrjId;
@@ -550,7 +489,6 @@ public class ProPlanExt {
      * 汇总进度计划状态
      */
     public void collectProgressStatus() {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         if (ExtJarHelper.entityRecordList.get() == null) {
             return;
         }
