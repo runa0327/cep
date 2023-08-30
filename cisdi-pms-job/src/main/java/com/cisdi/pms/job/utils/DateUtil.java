@@ -135,4 +135,17 @@ public class DateUtil {
         }
     }
 
+    /**
+     * 获取当时时间年
+     * @param date 时间
+     * @return 年份
+     */
+    public static String getYear(Date date) {
+        if (date == null){
+            return null;
+        } else {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+            return sdf.format(date);
+        }
+    }
 }
