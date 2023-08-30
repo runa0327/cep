@@ -49,7 +49,7 @@ public class ProgressWeekReport {
 
         //获取当前登录用户
         String userId = ExtJarHelper.loginInfo.get().userId;
-        String projectName = param.projectName;
+        String projectName = param.getProjectName();
 
         String sql1 = "select distinct a.pm_prj_id,c.name,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted " +
                 "from PM_ROSTER a left join POST_INFO b on a.POST_INFO_ID = b.id LEFT JOIN pm_prj c on a.PM_PRJ_ID = c.id " +
@@ -66,10 +66,10 @@ public class ProgressWeekReport {
             Map<String, Object> map1 = new HashMap<>();
             List<PmPrjView> list = list1.stream().map(p->{
                 PmPrjView pmPrjView = new PmPrjView();
-                pmPrjView.id = JdbcMapUtil.getString(p,"pm_prj_id");
-                pmPrjView.projectName = JdbcMapUtil.getString(p,"name");
-                pmPrjView.weatherStart = JdbcMapUtil.getInt(p,"weatherStart");
-                pmPrjView.weatherCompleted = JdbcMapUtil.getInt(p,"weatherCompleted");
+                pmPrjView.setId(JdbcMapUtil.getString(p,"pm_prj_id"));
+                pmPrjView.setProjectName(JdbcMapUtil.getString(p,"name"));
+                pmPrjView.setWeatherStart(JdbcMapUtil.getInt(p,"weatherStart"));
+                pmPrjView.setWeatherCompleted(JdbcMapUtil.getInt(p,"weatherCompleted"));
                 return pmPrjView;
             }).collect(Collectors.toList());
             map1.put("result", list);
@@ -397,8 +397,8 @@ public class ProgressWeekReport {
 
         //获取当前登录用户
         String userId = ExtJarHelper.loginInfo.get().userId;
-        String projectName = param.projectName;
-        String projectId = param.projectId;
+        String projectName = param.getProjectName();
+        String projectId = param.getProjectId();
 
         String sql1 = "select DISTINCT b.PM_PRJ_ID,c.name,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted " +
                 "from pm_roster a left join pm_progress_weekly_prj b on a.PM_PRJ_ID = b.PM_PRJ_ID left join pm_prj c on b.PM_PRJ_ID = c.id " +
@@ -418,10 +418,10 @@ public class ProgressWeekReport {
             Map<String, Object> map1 = new HashMap<>();
             List<PmPrjView> list = list1.stream().map(p->{
                 PmPrjView pmPrjView = new PmPrjView();
-                pmPrjView.id = JdbcMapUtil.getString(p,"PM_PRJ_ID");
-                pmPrjView.projectName = JdbcMapUtil.getString(p,"name");
-                pmPrjView.weatherStart = JdbcMapUtil.getInt(p,"weatherStart");
-                pmPrjView.weatherCompleted = JdbcMapUtil.getInt(p,"weatherCompleted");
+                pmPrjView.setId(JdbcMapUtil.getString(p,"PM_PRJ_ID"));
+                pmPrjView.setProjectName(JdbcMapUtil.getString(p,"name"));
+                pmPrjView.setWeatherStart(JdbcMapUtil.getInt(p,"weatherStart"));
+                pmPrjView.setWeatherCompleted(JdbcMapUtil.getInt(p,"weatherCompleted"));
                 return pmPrjView;
             }).collect(Collectors.toList());
             map1.put("result", list);

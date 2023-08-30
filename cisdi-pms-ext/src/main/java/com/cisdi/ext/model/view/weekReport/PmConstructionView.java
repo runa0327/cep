@@ -1,6 +1,5 @@
-package com.cisdi.pms.job.domain.weeklyReport;
+package com.cisdi.ext.model.view.weekReport;
 
-import com.cisdi.pms.job.domain.base.BaseCommon;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -9,7 +8,7 @@ import java.math.BigDecimal;
  * 工程建安费用需求填报模块实体
  */
 @Data
-public class PmConstruction extends BaseCommon {
+public class PmConstructionView {
 
     // id
     private String id;
@@ -30,7 +29,7 @@ public class PmConstruction extends BaseCommon {
     private String projectName;
 
     // 月份
-    private int month;
+    private String month;
 
     ///是否符合开工条件 1符合0不合格
     private Integer weatherStart;
@@ -52,4 +51,30 @@ public class PmConstruction extends BaseCommon {
 
     // 月初任务是否已推送工作台 1已推送 0未推送
     private Integer pushWeekTask;
+
+    // 版本
+    private String ver;
+
+    // 时间戳
+    private String ts;
+
+    // 创建人
+    private String createBy;
+
+    // 创建时间
+    private String createDate;
+    private String createDateMin;
+    private String createDateMax;
+
+    // 上次修改人
+    private String lastUpdateBy;
+
+    // 上次修改时间
+    private String lastUpdateDate;
+
+    // 状态
+    private String status;
+
+    // 编码
+    private String code;
 }
