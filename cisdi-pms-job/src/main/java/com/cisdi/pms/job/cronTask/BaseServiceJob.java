@@ -28,7 +28,7 @@ public class BaseServiceJob {
             baseYearService.generateYear();
             log.info("自动生成年份信息-成功");
         } catch (Exception e){
-            log.error("自动生成年份信息-失败");
+            log.error("自动生成年份信息-失败",e);
         }
     }
 }

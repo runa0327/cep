@@ -1,0 +1,29 @@
+package com.cisdi.pms.job.mapper.weeklyReport;
+
+import com.cisdi.pms.job.domain.weeklyReport.PmConstruction;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+public interface PmConstructionMapper {
+
+    /**
+     * 根据年份和项目id查询该项目当年是否已生成计划
+     * @param yearId 年份id
+     * @param projectId 项目id
+     * @return 项目工程建安需求明细
+     */
+    PmConstruction queryByYearIdAndProjectId(@Param("yearId") String yearId, @Param("projectId") String projectId);
+
+    /**
+     * 工程建安需求填报-新增数据
+     * @param pmConstruction 实体信息
+     */
+    void insertFather(PmConstruction pmConstruction);
+
+    /**
+     * 工程建安需求填报明细表批量新增
+     * @param list 明细信息
+     */
+    void insertBatchDetail(@Param("list") List<PmConstruction> list);
+}

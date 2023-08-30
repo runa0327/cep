@@ -47,4 +47,9 @@
             #{name}
         )
     </insert>
+
+    <!--根据编码获取年份id-->
+    <select id="queryIdByCode" resultType="String">
+        select id from base_year where status = 'ap' and code = #{yearCode}
+    </select>
 </mapper>

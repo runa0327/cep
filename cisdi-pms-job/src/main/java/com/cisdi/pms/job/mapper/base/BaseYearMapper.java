@@ -16,4 +16,11 @@ public interface BaseYearMapper {
      * @param baseYear 实体信息
      */
     void insert(BaseYear baseYear);
+
+    /**
+     * 根据编码获取年份id
+     * @param yearCode 年份编码
+     * @return 年份id
+     */
+    String queryIdByCode(String yearCode);
 }
