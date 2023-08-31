@@ -292,7 +292,7 @@ public class ProgressWeekReport {
             } else if (StringUtils.hasText(projectImg) && CollectionUtils.isEmpty(imgStrList)){
                 prjImg = projectImg + "," + aerialImg;
             } else if (StringUtils.hasText(projectImg) && !CollectionUtils.isEmpty(imgStrList)){
-                List<String> arr = Arrays.asList(projectImg.split(","));
+                List<String> arr = new ArrayList<>(Arrays.asList(projectImg.split(",")));
                 for (String tmp : imgStrList) {
                     if (projectImg.contains(tmp)){
                         arr.remove(tmp);

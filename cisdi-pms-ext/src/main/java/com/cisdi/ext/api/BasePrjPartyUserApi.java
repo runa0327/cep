@@ -164,9 +164,9 @@ public class BasePrjPartyUserApi {
         baseSql1.append(sql1);
         baseSql2.append(sql2);
         //筛选条件
-        if (!SharedUtil.isEmptyString(param.projectName)){
-            baseSql1.append(" and name like ('%").append(param.projectName).append("%')");
-            baseSql2.append(" and name like ('%").append(param.projectName).append("%')");
+        if (!SharedUtil.isEmptyString(param.getProjectName())){
+            baseSql1.append(" and name like ('%").append(param.getProjectName()).append("%')");
+            baseSql2.append(" and name like ('%").append(param.getProjectName()).append("%')");
         }
         baseSql1.append(" order BY CRT_DT DESC ").append(limit);
         baseSql2.append(" order BY CRT_DT DESC");
@@ -178,8 +178,8 @@ public class BasePrjPartyUserApi {
         } else {
             List<PmPrjView> inputList = list.stream().map(p->{
                 PmPrjView pmPrjView = new PmPrjView();
-                pmPrjView.projectId = JdbcMapUtil.getString(p,"id");
-                pmPrjView.projectName = JdbcMapUtil.getString(p,"name");
+                pmPrjView.setProjectId(JdbcMapUtil.getString(p,"id"));
+                pmPrjView.setProjectName(JdbcMapUtil.getString(p,"name"));
                 return pmPrjView;
             }).collect(Collectors.toList());
             map1.put("result", inputList);

@@ -5,6 +5,7 @@ import com.cisdi.ext.model.PmPlan;
 import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.model.PrjStart;
 import com.cisdi.ext.model.view.project.PmPrjView;
+import com.cisdi.ext.model.view.weekReport.PmConstructionView;
 import com.cisdi.ext.pm.PmPlanExt;
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.pm.PmRosterExt;
@@ -48,31 +49,6 @@ public class PmPrjExt {
         } else {
             throw new BaseException("在项目表中未查询到该项目，请联系管理员处理！");
         }
-    }
-
-    /**
-     * 根据项目id查询项目状态
-     * @param projectId 项目id
-     * @return
-     */
-    public static PmPrjView queryPrjStatusById(String projectId) {
-        PmPrj pmPrj = PmPrj.selectById(projectId);
-        PmPrjView pmPrjView = new PmPrjView();
-        pmPrjView.setProjectId(pmPrj.getId());
-        boolean start = pmPrj.getIzStartRequire();
-        if (start){
-            pmPrjView.setWeatherStart(1);
-        } else {
-            pmPrjView.setWeatherStart(0);
-        }
-        boolean end = pmPrj.getIzEnd();
-        if (end){
-            pmPrjView.setWeatherCompleted(1);
-        } else {
-            pmPrjView.setWeatherCompleted(0);
-        }
-
-        return pmPrjView;
     }
 
     /**

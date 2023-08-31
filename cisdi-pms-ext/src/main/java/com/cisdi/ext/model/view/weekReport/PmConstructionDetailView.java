@@ -1,19 +1,20 @@
 package com.cisdi.ext.model.view.weekReport;
 
-import com.cisdi.ext.model.BasePageEntity;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * 工程建安费用需求填报模块实体
  */
 @Data
-public class PmConstructionView extends BasePageEntity {
+public class PmConstructionDetailView {
 
     // id
     private String id;
+
+    // 项目id
+    private String projectId;
 
     // 工程建安费用需求父级id
     private String pmConstructionId;
@@ -24,23 +25,8 @@ public class PmConstructionView extends BasePageEntity {
     // 年-名称
     private String year;
 
-    // 项目id
-    private String projectId;
-
-    // 项目名称
-    private String projectName;
-
     // 月份
     private String month;
-
-    ///是否符合开工条件 1符合0不合格
-    private Integer weatherStart;
-
-    //是否竣工 1已竣工0未竣工
-    private Integer weatherComplete;
-
-    // 是否填写年度需求资金
-    private Integer yearAmtNeed;
 
     // 初始填报金额
     private BigDecimal firstAmt;
@@ -79,10 +65,4 @@ public class PmConstructionView extends BasePageEntity {
 
     // 编码
     private String code;
-
-    // 各月明细信息
-    private List<PmConstructionDetailView> detailList;
-
-    // 本年需求总金额
-    private BigDecimal yearAmt;
 }

@@ -355,4 +355,32 @@ public class DateTimeUtil {
             return sdf.format(date);
         }
     }
+
+    /**
+     * 获取当前月份 月不自动添0
+     * @param date 时间
+     * @return 年份
+     */
+    public static String getMonth(Date date) {
+        if (date == null){
+            return null;
+        } else {
+            SimpleDateFormat sdf = new SimpleDateFormat("M");
+            return sdf.format(date);
+        }
+    }
+
+    /**
+     * 获取当前月份 月自动添0
+     * @param date 时间
+     * @return 年份
+     */
+    public static String getMonthDouble(Date date) {
+        if (date == null){
+            return null;
+        } else {
+            SimpleDateFormat sdf = new SimpleDateFormat("MM");
+            return sdf.format(date);
+        }
+    }
 }
