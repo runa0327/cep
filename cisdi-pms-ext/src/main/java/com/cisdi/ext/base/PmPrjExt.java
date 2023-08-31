@@ -505,4 +505,27 @@ public class PmPrjExt {
     public static void updateData(PmPrj pmPrj) {
         pmPrj.updateById();
     }
+
+    /**
+     * 变更项目开工条件、完工状态
+     */
+    public void changePrjStatus(){
+        // 获取输入：
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        PmPrjView param = JsonUtil.fromJson(json,PmPrjView.class);
+        PmPrj pmPrj = new PmPrj();
+        pmPrj.setId(param.getProjectId());
+        if (param.getWeatherCompleted() == 1){
+            pmPrj.setIzEnd(true);
+        } else {
+            pmPrj.setIzEnd(false);
+        }
+        if (param.getWeatherStart() == 1){
+            pmPrj.setIzStartRequire(true);
+        } else {
+            pmPrj.setIzStartRequire(false);
+        }
+        pmPrj.updateById();
+    }
 }
