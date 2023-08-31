@@ -41,16 +41,18 @@ public class WeekTaskExt {
         Map<String, String> weekDay = WeeklyUtils.weekBeginningAndEnding();
         StringBuilder sb = new StringBuilder();
         sb.append(" select a.* from (");
-        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId,gsv.SEQ_NO as SEQ_NO from week_task wt " +
+        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId,gsv.SEQ_NO as SEQ_NO,g1.`NAME` as type from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
                 "left join ad_user au on au.id = wt.TRANSFER_USER left join pm_prj pj on wt.pm_prj_id = pj.id " +
+                "left join gr_set_value g1 on wt.WEEK_TASK_TYPE_ID = g1.id  "+
                 "where AD_USER_ID = '").append(userId).append("' and PUBLISH_START between '")
                 .append(weekDay.get("begin")).append("' and '").append(weekDay.get("end"))
                 .append("' and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null )");
         sb.append(" union all ");
-        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId,gsv.SEQ_NO as SEQ_NO from week_task wt " +
+        sb.append("select wt.*,gsv.`NAME` as task_status,au.name as transferUser,ifnull(CAN_DISPATCH,0) as isTransfer,TRANSFER_USER as transferUserId,gsv.SEQ_NO as SEQ_NO,g1.`NAME` as type from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id   " +
                 "left join ad_user au on au.id = wt.TRANSFER_USER left join pm_prj pj on wt.pm_prj_id = pj.id  " +
+                "left join gr_set_value g1 on wt.WEEK_TASK_TYPE_ID = g1.id "+
                 "where AD_USER_ID = '").append(userId).append("' and PUBLISH_START< '").append(weekDay.get("begin")).append("' and WEEK_TASK_STATUS_ID in ('1634118574056542208','1634118609016066048','1644140821106384896')");
         sb.append(" and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null )");
         sb.append(" ) a order by a.SEQ_NO ");
@@ -71,6 +73,7 @@ public class WeekTaskExt {
             weekTask.transferUserId = JdbcMapUtil.getString(p, "transferUserId");
             weekTask.transferUser = JdbcMapUtil.getString(p, "transferUser");
             weekTask.transferTime = JdbcMapUtil.getString(p, "TRANSFER_TIME") == null ? null : StringUtil.withOutT(JdbcMapUtil.getString(p, "TRANSFER_TIME"));
+            weekTask.type = JdbcMapUtil.getString(p, "type");
             return weekTask;
         }).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(weekTaskList)) {
@@ -137,9 +140,10 @@ public class WeekTaskExt {
         String userId = ExtJarHelper.loginInfo.get().userId;
         Map<String, String> weekDay = WeeklyUtils.weekBeginningAndEnding();
         StringBuilder sb = new StringBuilder();
-        sb.append("select wt.*,gsv.`NAME` as task_status,TRANSFER_USER as transferUserId,au.name as transferUser,CAN_DISPATCH,TRANSFER_TIME,gsv.SEQ_NO as SEQ_NO from week_task wt " +
+        sb.append("select wt.*,gsv.`NAME` as task_status,TRANSFER_USER as transferUserId,au.name as transferUser,CAN_DISPATCH,TRANSFER_TIME,gsv.SEQ_NO as SEQ_NO,g1.`NAME` as type  from week_task wt " +
                 "left join gr_set_value gsv on wt.WEEK_TASK_STATUS_ID = gsv.id  " +
                 "left join ad_user au on au.id = wt.AD_USER_ID LEFT JOIN PM_PRJ pj on wt.pm_prj_id = pj.id " +
+                "left join gr_set_value g1 on wt.WEEK_TASK_TYPE_ID = g1.id "+
                 "where wt.id  in (select id from week_task where TRANSFER_USER='").append(userId).append("')")
                 .append(" and PUBLISH_START between '")
                 .append(weekDay.get("begin")).append("' and '").append(weekDay.get("end"))
@@ -161,6 +165,7 @@ public class WeekTaskExt {
             weekTask.transferUserId = JdbcMapUtil.getString(p, "transferUserId");
             weekTask.transferUser = JdbcMapUtil.getString(p, "transferUser");
             weekTask.transferTime = JdbcMapUtil.getString(p, "TRANSFER_TIME");
+            weekTask.type =  JdbcMapUtil.getString(p, "type");
             return weekTask;
         }).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(weekTaskList)) {
@@ -389,6 +394,8 @@ public class WeekTaskExt {
         public String transferTime;
 
         public String completeTime;
+
+        public String type;
     }
 
     public static class OutSide {
