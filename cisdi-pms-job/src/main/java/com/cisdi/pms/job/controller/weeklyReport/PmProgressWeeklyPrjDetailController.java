@@ -45,4 +45,12 @@ public class PmProgressWeeklyPrjDetailController extends BaseController {
         Map<String,Object> map = pmProgressWeeklyPrjDetailService.getPrjProblemList(pmProgressWeeklyPrjDetail);
         pmProgressWeeklyPrjDetailService.downloadPrjProblem(map,"项目问题汇总",response);
     }
+
+    /**
+     * 将上周航拍图信息更新到本周-只修改航拍图为空的
+     */
+    @GetMapping(value = "/updateAerialImg")
+    public void updateAerialImg(){
+        pmProgressWeeklyPrjDetailService.updateAerialImg();
+    }
 }

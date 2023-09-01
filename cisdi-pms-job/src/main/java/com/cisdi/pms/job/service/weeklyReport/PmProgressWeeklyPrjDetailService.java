@@ -55,4 +55,9 @@ public interface PmProgressWeeklyPrjDetailService {
      * @param response 响应
      */
     void downloadPrjProblem(Map<String, Object> map, String title, HttpServletResponse response);
+
+    /**
+     * 将上周航拍图信息更新到本周-只修改航拍图为空的
+     */
+    void updateAerialImg();
 }

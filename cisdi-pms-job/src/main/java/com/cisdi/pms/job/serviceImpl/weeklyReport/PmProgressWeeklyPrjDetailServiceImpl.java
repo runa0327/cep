@@ -14,6 +14,7 @@ import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeekly;
 import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrjDetail;
 import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrjProblemDetail;
 import com.cisdi.pms.job.mapper.base.GrSetValueMapper;
+import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyMapper;
 import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyPrjDetailMapper;
 import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyPrjProblemDetailMapper;
 import com.cisdi.pms.job.service.weeklyReport.PmProgressWeeklyPrjDetailService;
@@ -53,6 +54,9 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
 
     @Resource
     private CisdiUtils cisdiUtils;
+
+    @Resource
+    private PmProgressWeeklyMapper pmProgressWeeklyMapper;
 
     /**
      * 形象工程周报-填报记录导出
@@ -230,6 +234,7 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
             pmProgressWeeklyPrjDetail.setProgressDescribe(list.get(0).getProgressDescribe());
             pmProgressWeeklyPrjDetail.setProgressWeek(list.get(0).getProgressWeek());
             pmProgressWeeklyPrjDetail.setWeekId(weekId);
+            pmProgressWeeklyPrjDetail.setAerialImg(list.get(0).getAerialImg());
             pmProgressWeeklyPrjDetailMapper.insertData(pmProgressWeeklyPrjDetail);
             // 写入问题明细表
             if (!CollectionUtils.isEmpty(problemDetail)){
@@ -297,7 +302,7 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
             map = grSetValueMapper.getValueByIds(prjPushProblemTypeIds);
         }
         List<String> headerList = getHeaderList(map);
-        String keyIds = String.join("','", map.stream().map(GrSetValue::getId).collect(Collectors.toList()));
+        String keyIds = map.stream().map(GrSetValue::getId).collect(Collectors.joining("','"));
 
         if (StringUtils.hasText(projectId)){
             projectId = projectId.replace(",","','");
@@ -375,9 +380,9 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
 
     /**
      *
-     * @param sheet
-     * @param cs2
-     * @param listMap
+     * @param sheet sheet页
+     * @param cs2 样式
+     * @param listMap 数据详情
      */
     private void tableCellValue(Sheet sheet, CellStyle cs2, List<Map<String, String>> listMap, List<String> header) {
         for (int i = 0; i < listMap.size(); i++) {
@@ -413,6 +418,41 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
             }
         }
 
+    }
+
+    /**
+     * 将上周航拍图信息更新到本周-只修改航拍图为空的
+     */
+    @Override
+    public void updateAerialImg() {
+        // 周五作为一周第一天
+        Date date = new Date();
+        int week = DateUtil.getWeekDay(date);
+        Map<String,String> map = DateUtil.getDateMap(week,date);
+        String startDate = map.get("startDate");
+        String endDate = map.get("endDate");
+        //获取周id
+        String weekId = pmProgressWeeklyMapper.getWeekIdByDate(startDate,endDate);
+        // 获取本周项目明细信息
+        List<PmProgressWeeklyPrjDetail> list = pmProgressWeeklyPrjDetailMapper.queryListByWeekId(weekId);
+        if (!CollectionUtils.isEmpty(list)){
+            // 获取上周id
+            String lastWeekId = pmProgressWeeklyMapper.getLastWeekId(startDate,endDate,weekId);
+            for (PmProgressWeeklyPrjDetail tmp : list) {
+                String aerialImg = tmp.getAerialImg();
+                String projectId= tmp.getProjectId();
+                if (!StringUtils.hasText(aerialImg)){
+                    List<PmProgressWeeklyPrjDetail> list2 = pmProgressWeeklyPrjDetailMapper.getLastWeekDateByPrj(lastWeekId,projectId);
+                    if (!CollectionUtils.isEmpty(list2)){
+                        String oldAerialImg = list2.get(0).getAerialImg();
+                        PmProgressWeeklyPrjDetail tmp2 = new PmProgressWeeklyPrjDetail();
+                        BeanUtils.copyProperties(tmp,tmp2);
+                        tmp2.setAerialImg(oldAerialImg);
+                        pmProgressWeeklyPrjDetailMapper.updateConditionById(tmp2);
+                    }
+                }
+            }
+        }
     }
 }
 

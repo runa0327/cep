@@ -32,6 +32,7 @@
         <result column="manageUserId" property="manageUserId"/>
         <result column="manageUserName" property="manageUserName"/>
         <result column="izSubmit" property="izSubmit"/>
+        <result column="aerialImg" property="aerialImg"/>
     </resultMap>
 
     <sql id="commonHeader">
@@ -197,7 +198,8 @@
             ID as id,
             PROCESS_REMARK_TEXT as progressWeek,
             VISUAL_PROGRESS as progress,
-            VISUAL_PROGRESS_DESCRIBE as progressDescribe
+            VISUAL_PROGRESS_DESCRIBE as progressDescribe,
+            FILE_ID_TWO as aerialImg
         FROM
             pm_progress_weekly_prj_detail
         WHERE
@@ -217,4 +219,28 @@
         order by
             CRT_DT desc
     </select>
+
+    <!--查询本周所有形象进度周报信息-->
+    <select id="queryListByWeekId" resultMap="PmProgressWeeklyResult">
+        select
+            <include refid="commonHeader" />
+        from
+            pm_progress_weekly_prj_detail
+        where
+            status = 'AP'
+            and PM_PROGRESS_WEEKLY_ID = #{weekId}
+            and FILE_ID_TWO is null
+        order by CRT_DT desc
+    </select>
+
+    <!--根据id动态修改数据-->
+    <update id="updateConditionById">
+        update pm_progress_weekly_prj_detail
+        set
+            <if test="aerialImg != null and aerialImg != ''">
+                FILE_ID_TWO = #{aerialImg}
+            </if>
+        where
+            id = #{id}
+    </update>
 </mapper>
