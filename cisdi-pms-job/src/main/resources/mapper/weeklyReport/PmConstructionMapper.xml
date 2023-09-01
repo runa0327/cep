@@ -90,7 +90,7 @@
             LAST_MODI_USER_ID,
             STATUS,
             PM_CONSTRUCTION_ID,
-            MONTH,
+            NUMBER,
             AMT_FIVE,
             AMT_SIX,
             SYS_TRUE_ONE,

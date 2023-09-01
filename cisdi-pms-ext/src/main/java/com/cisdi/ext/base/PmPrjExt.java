@@ -4,6 +4,8 @@ import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.PmPlan;
 import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.model.PrjStart;
+import com.cisdi.ext.model.view.project.PmPrjView;
+import com.cisdi.ext.model.view.weekReport.PmConstructionView;
 import com.cisdi.ext.pm.PmPlanExt;
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.pm.PmRosterExt;
@@ -501,6 +503,29 @@ public class PmPrjExt {
      * @param pmPrj 项目实体
      */
     public static void updateData(PmPrj pmPrj) {
+        pmPrj.updateById();
+    }
+
+    /**
+     * 变更项目开工条件、完工状态
+     */
+    public void changePrjStatus(){
+        // 获取输入：
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        PmPrjView param = JsonUtil.fromJson(json,PmPrjView.class);
+        PmPrj pmPrj = new PmPrj();
+        pmPrj.setId(param.getProjectId());
+        if (param.getWeatherCompleted() == 1){
+            pmPrj.setIzEnd(true);
+        } else {
+            pmPrj.setIzEnd(false);
+        }
+        if (param.getWeatherStart() == 1){
+            pmPrj.setIzStartRequire(true);
+        } else {
+            pmPrj.setIzStartRequire(false);
+        }
         pmPrj.updateById();
     }
 }

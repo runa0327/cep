@@ -49,7 +49,7 @@ public class ProgressWeekReport {
 
         //获取当前登录用户
         String userId = ExtJarHelper.loginInfo.get().userId;
-        String projectName = param.projectName;
+        String projectName = param.getProjectName();
 
         String sql1 = "select distinct a.pm_prj_id,c.name,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted " +
                 "from PM_ROSTER a left join POST_INFO b on a.POST_INFO_ID = b.id LEFT JOIN pm_prj c on a.PM_PRJ_ID = c.id " +
@@ -66,10 +66,10 @@ public class ProgressWeekReport {
             Map<String, Object> map1 = new HashMap<>();
             List<PmPrjView> list = list1.stream().map(p->{
                 PmPrjView pmPrjView = new PmPrjView();
-                pmPrjView.id = JdbcMapUtil.getString(p,"pm_prj_id");
-                pmPrjView.projectName = JdbcMapUtil.getString(p,"name");
-                pmPrjView.weatherStart = JdbcMapUtil.getInt(p,"weatherStart");
-                pmPrjView.weatherCompleted = JdbcMapUtil.getInt(p,"weatherCompleted");
+                pmPrjView.setId(JdbcMapUtil.getString(p,"pm_prj_id"));
+                pmPrjView.setProjectName(JdbcMapUtil.getString(p,"name"));
+                pmPrjView.setWeatherStart(JdbcMapUtil.getInt(p,"weatherStart"));
+                pmPrjView.setWeatherCompleted(JdbcMapUtil.getInt(p,"weatherCompleted"));
                 return pmPrjView;
             }).collect(Collectors.toList());
             map1.put("result", list);
@@ -106,9 +106,9 @@ public class ProgressWeekReport {
         if (!CollectionUtils.isEmpty(progressPrj)){
             weekId = progressPrj.get(0).getPmProgressWeeklyId();
             sql = "select a.file_id_one as fileId,a.id,a.DATE as writeDate,A.VISUAL_PROGRESS AS progress,A.VISUAL_PROGRESS_DESCRIBE AS progressDescribe,A.PROCESS_REMARK_TEXT AS progressWeek," +
-                    "a.TEXT_REMARK_ONE as progressRemark,b.SYS_TRUE as weatherStart,b.IZ_END as weatherCompleted,'new' as dataType, " +
+                    "a.TEXT_REMARK_ONE as progressRemark,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted,'new' as dataType, " +
                     "a.PM_PROGRESS_WEEKLY_ID as weekId,a.PM_PROGRESS_WEEKLY_PRJ_ID as weekPrjId,b.PM_PRJ_ID as projectId,b.IZ_WRITE as izWrite,a.FILE_ID_TWO as aerialImg " +
-                    "from pm_progress_weekly_prj_detail a left join PM_PROGRESS_WEEKLY_PRJ b on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id " +
+                    "from pm_progress_weekly_prj_detail a left join PM_PROGRESS_WEEKLY_PRJ b on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id left join pm_prj c on b.pm_prj_id = c.id " +
                     "where a.STATUS = 'ap' and b.status = 'ap' and b.pm_prj_id = ? and a.PM_PROGRESS_WEEKLY_ID = '"+weekId+"' and b.PM_PROGRESS_WEEKLY_ID = '"+weekId+"' ";
             List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId);
             if (!CollectionUtils.isEmpty(list)) {
@@ -292,7 +292,7 @@ public class ProgressWeekReport {
             } else if (StringUtils.hasText(projectImg) && CollectionUtils.isEmpty(imgStrList)){
                 prjImg = projectImg + "," + aerialImg;
             } else if (StringUtils.hasText(projectImg) && !CollectionUtils.isEmpty(imgStrList)){
-                List<String> arr = Arrays.asList(projectImg.split(","));
+                List<String> arr = new ArrayList<>(Arrays.asList(projectImg.split(",")));
                 for (String tmp : imgStrList) {
                     if (projectImg.contains(tmp)){
                         arr.remove(tmp);
@@ -340,13 +340,26 @@ public class ProgressWeekReport {
             throw new BaseException("按钮类型名称不能为空");
         }
         if ( buttonStatus == null){
-            throw new BaseException("按照状态不能为空");
+            throw new BaseException("开关状态不能为空");
         }
+        PmPrj pmPrj = new PmPrj();
+        pmPrj.setId(param.getProjectId());
         if (buttonType == 0){ //处理开工条件
-            handleStart(projectId,weekPrjId,id,buttonStatus);
+            if (buttonStatus == 1){
+                pmPrj.setIzStartRequire(true);
+            } else {
+                pmPrj.setIzStartRequire(false);
+            }
+//            handleStart(projectId,weekPrjId,id,buttonStatus);
         } else if (buttonType == 1){ //处理竣工条件
-            handleComplete(projectId,weekPrjId,id,buttonStatus);
+//            handleComplete(projectId,weekPrjId,id,buttonStatus);
+            if (buttonStatus == 1){
+                pmPrj.setIzEnd(true);
+            } else {
+                pmPrj.setIzEnd(false);
+            }
         }
+        pmPrj.updateById();
     }
 
     /**
@@ -397,8 +410,8 @@ public class ProgressWeekReport {
 
         //获取当前登录用户
         String userId = ExtJarHelper.loginInfo.get().userId;
-        String projectName = param.projectName;
-        String projectId = param.projectId;
+        String projectName = param.getProjectName();
+        String projectId = param.getProjectId();
 
         String sql1 = "select DISTINCT b.PM_PRJ_ID,c.name,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted " +
                 "from pm_roster a left join pm_progress_weekly_prj b on a.PM_PRJ_ID = b.PM_PRJ_ID left join pm_prj c on b.PM_PRJ_ID = c.id " +
@@ -418,10 +431,10 @@ public class ProgressWeekReport {
             Map<String, Object> map1 = new HashMap<>();
             List<PmPrjView> list = list1.stream().map(p->{
                 PmPrjView pmPrjView = new PmPrjView();
-                pmPrjView.id = JdbcMapUtil.getString(p,"PM_PRJ_ID");
-                pmPrjView.projectName = JdbcMapUtil.getString(p,"name");
-                pmPrjView.weatherStart = JdbcMapUtil.getInt(p,"weatherStart");
-                pmPrjView.weatherCompleted = JdbcMapUtil.getInt(p,"weatherCompleted");
+                pmPrjView.setId(JdbcMapUtil.getString(p,"PM_PRJ_ID"));
+                pmPrjView.setProjectName(JdbcMapUtil.getString(p,"name"));
+                pmPrjView.setWeatherStart(JdbcMapUtil.getInt(p,"weatherStart"));
+                pmPrjView.setWeatherCompleted(JdbcMapUtil.getInt(p,"weatherCompleted"));
                 return pmPrjView;
             }).collect(Collectors.toList());
             map1.put("result", list);
@@ -454,12 +467,12 @@ public class ProgressWeekReport {
         String limit = "limit " + start + "," + param.pageSize;
 
         String sql = "select a.id,c.DATE as writeDate,a.VISUAL_PROGRESS as progress,a.VISUAL_PROGRESS_DESCRIBE as progressDescribe,a.PROCESS_REMARK_TEXT as progressWeek," +
-                "a.TEXT_REMARK_ONE as progressRemark,a.SYS_TRUE as weatherStart,a.IZ_END as weatherCompleted," +
+                "a.TEXT_REMARK_ONE as progressRemark,ifnull(e.IZ_START_REQUIRE,'1') as weatherStartt,ifnull(e.IZ_END,'0') as weatherCompleted ," +
                 "a.AD_USER_ID as recordById,d.name as recordByName,a.FILE_ID_ONE as fileId,b.PM_PRJ_ID as projectId," +
                 "(select name from pm_prj where id = b.id) as projectName " +
                 "from PM_PROGRESS_WEEKLY_PRJ_DETAIL a left join PM_PROGRESS_WEEKLY_PRJ b on a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id " +
                 "LEFT JOIN pm_progress_weekly c on a.PM_PROGRESS_WEEKLY_ID = c.id " +
-                "left join ad_user d on a.AD_USER_ID = d.id " +
+                "left join ad_user d on a.AD_USER_ID = d.id left join pm_prj e on b.pm_prj_id = e.id " +
                 "where a.status = 'ap' and b.status = 'ap' and c.status = 'ap' and b.PM_PRJ_ID = ?";
         StringBuilder sb = new StringBuilder(sql);
         if (!SharedUtil.isEmptyString(param.getWriteDateMin())){
@@ -595,7 +608,7 @@ public class ProgressWeekReport {
         Integer weatherCompleted = param.getWeatherCompleted(); //是否竣工
         String limit = canMap.get("limit").toString();
         String sql = "select c.id as weekId,a.id,c.DATE as writeDate,a.VISUAL_PROGRESS as progress,a.VISUAL_PROGRESS_DESCRIBE as progressDescribe,a.PROCESS_REMARK_TEXT as progressWeek," +
-                "a.TEXT_REMARK_ONE as progressRemark,ifnull(b.SYS_TRUE,'1') as weatherStart,ifnull(b.IZ_END,'0') as weatherCompleted," +
+                "a.TEXT_REMARK_ONE as progressRemark,ifnull(e.IZ_START_REQUIRE,'1') as weatherStart,ifnull(e.IZ_END,'0') as weatherCompleted," +
                 "(select name from ad_user where id = a.ad_user_id) as recordByName,a.AD_USER_ID as recordById, " +
                 "a.FILE_ID_ONE as fileId,b.PM_PRJ_ID as projectId,a.FILE_ID_TWO as aerialImgId," +
                 "e.name as projectName,d.AD_USER_ID as manageUserId," +
@@ -638,10 +651,10 @@ public class ProgressWeekReport {
             sb.append(" and a.VISUAL_PROGRESS <= '").append(progressMax).append("' "); //最大进度
         }
         if (weatherStart != null){
-            sb.append(" and b.SYS_TRUE = '").append(weatherStart).append("' "); //是否符合开工条件
+            sb.append(" and e.IZ_START_REQUIRE = '").append(weatherStart).append("' "); //是否符合开工条件
         }
         if (weatherCompleted != null){
-            sb.append(" and b.IZ_END = '").append(weatherCompleted).append("' "); //是否竣工
+            sb.append(" and e.IZ_END = '").append(weatherCompleted).append("' "); //是否竣工
         }
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(String.valueOf(sb));
         sb.append(" order by b.IZ_END asc,b.SYS_TRUE desc,");
@@ -928,7 +941,7 @@ public class ProgressWeekReport {
             throw new BaseException("id不能为空！");
         }
         String sql = "select c.id as weekId,a.id,c.DATE as writeDate,a.VISUAL_PROGRESS as progress,a.VISUAL_PROGRESS_DESCRIBE as progressDescribe,a.PROCESS_REMARK_TEXT as progressWeek," +
-                "a.TEXT_REMARK_ONE as progressRemark,ifnull(b.SYS_TRUE,'1') as weatherStart,ifnull(b.IZ_END,'0') as weatherCompleted," +
+                "a.TEXT_REMARK_ONE as progressRemark,ifnull(e.IZ_START_REQUIRE,'1') as weatherStart,ifnull(e.IZ_END,'0') as weatherCompleted," +
                 "(select name from ad_user where id = a.ad_user_id) as recordByName,a.AD_USER_ID as recordById, " +
                 "a.FILE_ID_ONE as fileId,b.PM_PRJ_ID as projectId," +
                 "e.name as projectName,d.AD_USER_ID as manageUserId," +

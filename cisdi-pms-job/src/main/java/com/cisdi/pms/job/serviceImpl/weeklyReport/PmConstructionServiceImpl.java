@@ -112,7 +112,7 @@ public class PmConstructionServiceImpl implements PmConstructionService {
             pmConstruction.setLastUpdateDate(now);
             pmConstruction.setLastUpdateBy("0099250247095871681");
             pmConstruction.setStatus("AP");
-            pmConstruction.setMonth(i+"月");
+            pmConstruction.setMonth(i);
             pmConstruction.setFirstAmt(zero);
             pmConstruction.setCheckAmt(zero);
             pmConstruction.setMonthCheck(0);
