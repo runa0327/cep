@@ -40,13 +40,13 @@ public class PmConstructionExt {
         PmConstructionView param = JsonUtil.fromJson(json,PmConstructionView.class);
         String projectId = param.getProjectId(); // 项目id
         String year = DateTimeUtil.getYear(new Date());
-        String yearId = BaseYear.selectByWhere(new Where().eq(BaseYear.Cols.CODE,year).eq(BaseYear.Cols.STATUS,"AP")).get(0).getId(); // 年份id
+        String baseYearId = BaseYear.selectByWhere(new Where().eq(BaseYear.Cols.CODE,year).eq(BaseYear.Cols.STATUS,"AP")).get(0).getId(); // 年份id
         Map<String,Object> resMap = new HashMap<>();
-        PmConstructionView pmConstructionView = queryPrjStatusById(projectId,yearId,myJdbcTemplate); // 获取项目相关信息
+        PmConstructionView pmConstructionView = queryPrjStatusById(projectId,baseYearId,myJdbcTemplate); // 获取项目相关信息
         PmConstructionDetailView nowMonth = getMonth(pmConstructionView.getDetailList()); // 本月需确认或调整金额
 
         resMap.put("project",pmConstructionView);
-        resMap.put("yearId",yearId);
+        resMap.put("baseYearId",baseYearId);
         resMap.put("monthN",nowMonth);
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resMap), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
@@ -55,15 +55,15 @@ public class PmConstructionExt {
     /**
      * 根据项目id查询项目状态
      * @param projectId 项目id
-     * @param yearId 年份id
+     * @param baseYearId 年份id
      * @param myJdbcTemplate 数据源
      * @return
      */
-    public PmConstructionView queryPrjStatusById(String projectId, String yearId, MyJdbcTemplate myJdbcTemplate) {
+    public PmConstructionView queryPrjStatusById(String projectId, String baseYearId, MyJdbcTemplate myJdbcTemplate) {
         PmConstructionView pmConstructionView = new PmConstructionView();
 
         String sql = "select a.pm_prj_id as projectId,ifnull(b.IZ_START_REQUIRE,1) as weatherStart,ifnull(b.IZ_END,0) as weatherComplete,ifnull(a.SYS_TRUE_ONE,0) as yearAmtNeed,a.id as pmConstructionId from pm_construction a left join pm_prj b on a.PM_PRJ_ID = b.id where a.base_year_id = ? and a.pm_prj_id = ?";
-        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,yearId,projectId);
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,baseYearId,projectId);
         if (!CollectionUtils.isEmpty(list)){
             pmConstructionView.setWeatherStart(JdbcMapUtil.getInt(list.get(0),"weatherStart"));
             pmConstructionView.setWeatherComplete(JdbcMapUtil.getInt(list.get(0),"weatherComplete"));
@@ -71,7 +71,7 @@ public class PmConstructionExt {
             pmConstructionView.setYearAmtNeed(JdbcMapUtil.getInt(list.get(0),"yearAmtNeed"));
             pmConstructionView.setPmConstructionId(JdbcMapUtil.getString(list.get(0),"pmConstructionId"));
 
-            List<PmConstructionDetailView> detail = getPrjMonthDetail(projectId,yearId,myJdbcTemplate); // 各月份明细信息
+            List<PmConstructionDetailView> detail = getPrjMonthDetail(projectId,baseYearId,myJdbcTemplate); // 各月份明细信息
             pmConstructionView.setDetailList(detail);
 
             BigDecimal allAmt = detail.stream().map(PmConstructionDetailView::getFirstAmt).reduce(BigDecimal.ZERO,BigDecimal::add);// 本年需求总资金
@@ -97,14 +97,14 @@ public class PmConstructionExt {
     /**
      * 获取项目当年个月明细信息
      * @param projectId 项目id
-     * @param yearId 年份id
+     * @param baseYearId 年份id
      * @param myJdbcTemplate 数据源
      * @return 查询结果
      */
-    public List<PmConstructionDetailView> getPrjMonthDetail(String projectId, String yearId,MyJdbcTemplate myJdbcTemplate) {
+    public List<PmConstructionDetailView> getPrjMonthDetail(String projectId, String baseYearId,MyJdbcTemplate myJdbcTemplate) {
         List<PmConstructionDetailView> list = new ArrayList<>();
         String sql = "SELECT a.BASE_YEAR_ID as baseYearId,c.name as year,a.PM_PRJ_ID as projectId,b.NUMBER as month,b.AMT_FIVE as firstAmt,b.AMT_SIX as checkAmt,a.SYS_TRUE_ONE as yearAmtNeed,b.id as id,a.id as pmConstructionId FROM PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b ON a.id = b.pm_construction_id LEFT JOIN base_year c ON a.BASE_YEAR_ID = c.id WHERE a.pm_prj_id = ? and a.BASE_YEAR_ID = ? ORDER BY b.NUMBER asc";
-        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql,projectId,yearId);
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql,projectId,baseYearId);
         if (!CollectionUtils.isEmpty(list1)){
             for (Map<String, Object> map : list1) {
                 PmConstructionDetailView pmConstructionDetailView = new PmConstructionDetailView();
@@ -115,6 +115,7 @@ public class PmConstructionExt {
                 pmConstructionDetailView.setYear(JdbcMapUtil.getString(map,"year"));
                 pmConstructionDetailView.setProjectId(JdbcMapUtil.getString(map,"projectId"));
                 pmConstructionDetailView.setPmConstructionId(JdbcMapUtil.getString(map,"pmConstructionId"));
+                pmConstructionDetailView.setBaseYearId(JdbcMapUtil.getString(map,"baseYearId"));
                 list.add(pmConstructionDetailView);
             }
         }
@@ -152,10 +153,16 @@ public class PmConstructionExt {
             String now = DateTimeUtil.dttmToString(new Date());
             String userId = ExtJarHelper.loginInfo.get().userId;
             for (PmConstructionDetailView tmp : list) {
-                Crud.from(PmConstructionDetail.ENT_CODE).where().eq("ID",tmp.getId()).update()
-                        .set("AMT_FIVE",tmp.getFirstAmt()).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                String id = tmp.getId();
+                BigDecimal checkAmt = tmp.getCheckAmt();
+                Crud.from(PmConstructionDetail.ENT_CODE).where().eq("ID",id).update()
+                        .set("AMT_FIVE",checkAmt.multiply(WAN)).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
                         .set("TS",now)
                         .exec();
+                BigDecimal firstAmt = PmConstructionDetail.selectById(id).getAmtFive().divide(WAN);
+                String month = param.getYear()+"年"+param.getMonth()+"月";
+                tmp.setMonth(month);
+                insertLog(firstAmt,checkAmt,userId,tmp,now);
             }
             Crud.from(PmConstruction.ENT_CODE).where().eq(PmConstruction.Cols.ID,param.getPmConstructionId()).update()
                     .set(PmConstruction.Cols.SYS_TRUE_ONE,1).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
