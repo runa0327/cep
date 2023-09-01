@@ -445,10 +445,12 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
                     List<PmProgressWeeklyPrjDetail> list2 = pmProgressWeeklyPrjDetailMapper.getLastWeekDateByPrj(lastWeekId,projectId);
                     if (!CollectionUtils.isEmpty(list2)){
                         String oldAerialImg = list2.get(0).getAerialImg();
-                        PmProgressWeeklyPrjDetail tmp2 = new PmProgressWeeklyPrjDetail();
-                        BeanUtils.copyProperties(tmp,tmp2);
-                        tmp2.setAerialImg(oldAerialImg);
-                        pmProgressWeeklyPrjDetailMapper.updateConditionById(tmp2);
+                        if (StringUtils.hasText(oldAerialImg)){
+                            PmProgressWeeklyPrjDetail tmp2 = new PmProgressWeeklyPrjDetail();
+                            BeanUtils.copyProperties(tmp,tmp2);
+                            tmp2.setAerialImg(oldAerialImg);
+                            pmProgressWeeklyPrjDetailMapper.updateConditionById(tmp2);
+                        }
                     }
                 }
             }
