@@ -1,13 +1,13 @@
 package com.cisdi.ext.nt;
 
 import cn.hutool.core.collection.CollUtil;
-import com.cisdi.ext.fund.FundReachApi;
 import com.cisdi.ext.nt.model.InvestmentManagementFixedAssetsResp;
 import com.cisdi.ext.nt.model.PmPrjInvest2;
 import com.cisdi.ext.nt.model.ProjectStatisticsIndicatorsFeeTransferResp;
 import com.cisdi.ext.nt.model.ProjectStatisticsManualFeeResp;
 import com.cisdi.ext.nt.utils.NtDataQueryUtil;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
@@ -57,8 +57,8 @@ public class CompleteOutputStatisticsExt {
                     "'' as operatingUnit,\n" +
                     "FLOOR_AREA as landArea,\n" +
                     "PRJ_SITUATION as description,\n" +
-                    "PRJ_REPLY_DATE as approvalTime,\n" +
-                    "'' as completionTime,\n" +
+                    "ACTUAL_START_TIME as approvalTime,\n" +
+                    "ACTUAL_END_TIME as completionTime,\n" +
                     "'' as latestDevelopments,\n" +
                     "'' as problem \n" +
                     "from pm_prj pm\n" +
@@ -76,8 +76,8 @@ public class CompleteOutputStatisticsExt {
                     "'' as operatingUnit,\n" +
                     "FLOOR_AREA as landArea,\n" +
                     "PRJ_SITUATION as description,\n" +
-                    "PRJ_REPLY_DATE as approvalTime,\n" +
-                    "'' as completionTime,\n" +
+                    "ACTUAL_START_TIME as approvalTime,\n" +
+                    "ACTUAL_END_TIME as completionTime,\n" +
                     "'' as latestDevelopments,\n" +
                     "'' as problem \n" +
                     "from pm_prj pm\n" +
@@ -97,8 +97,8 @@ public class CompleteOutputStatisticsExt {
                     "'' as operatingUnit,\n" +
                     "FLOOR_AREA as landArea,\n" +
                     "PRJ_SITUATION as description,\n" +
-                    "PRJ_REPLY_DATE as approvalTime,\n" +
-                    "'' as completionTime,\n" +
+                    "ACTUAL_START_TIME as approvalTime,\n" +
+                    "ACTUAL_END_TIME as completionTime,\n" +
                     "'' as latestDevelopments,\n" +
                     "'' as problem \n" +
                     "from pm_prj pm\n" +
@@ -116,8 +116,8 @@ public class CompleteOutputStatisticsExt {
                     "'' as operatingUnit,\n" +
                     "FLOOR_AREA as landArea,\n" +
                     "PRJ_SITUATION as description,\n" +
-                    "PRJ_REPLY_DATE as approvalTime,\n" +
-                    "'' as completionTime,\n" +
+                    "ACTUAL_START_TIME as approvalTime,\n" +
+                    "ACTUAL_END_TIME as completionTime,\n" +
                     "'' as latestDevelopments,\n" +
                     "'' as problem \n" +
                     "from pm_prj pm\n" +
@@ -424,8 +424,8 @@ public class CompleteOutputStatisticsExt {
         resp.setOperatingUnit(JdbcMapUtil.getString(data, "operatingUnit"));
         resp.setLandArea(JdbcMapUtil.getString(data, "landArea"));
         resp.setDescription(JdbcMapUtil.getString(data, "description"));
-        resp.setApprovalTime(JdbcMapUtil.getString(data, "approvalTime"));
-        resp.setCompletionTime(JdbcMapUtil.getString(data, "completionTime"));
+        resp.setApprovalTime(StringUtil.withOutT(JdbcMapUtil.getString(data, "approvalTime")));
+        resp.setCompletionTime(StringUtil.withOutT(JdbcMapUtil.getString(data, "completionTime")));
         resp.setLatestDevelopments(JdbcMapUtil.getString(data, "latestDevelopments"));
         resp.setProblem(JdbcMapUtil.getString(data, "problem"));
         return resp;
