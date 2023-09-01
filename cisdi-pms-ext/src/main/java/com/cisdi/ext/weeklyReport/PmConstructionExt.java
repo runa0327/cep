@@ -112,6 +112,7 @@ public class PmConstructionExt {
                 pmConstructionDetailView.setFirstAmt(new BigDecimal(JdbcMapUtil.getString(map,"firstAmt")));
                 pmConstructionDetailView.setYear(JdbcMapUtil.getString(map,"year"));
                 pmConstructionDetailView.setProjectId(JdbcMapUtil.getString(map,"projectId"));
+                pmConstructionDetailView.setPmConstructionId(JdbcMapUtil.getString(map,"pmConstructionId"));
                 list.add(pmConstructionDetailView);
             }
         }
@@ -151,12 +152,41 @@ public class PmConstructionExt {
             for (PmConstructionDetailView tmp : list) {
                 Crud.from(PmConstructionDetail.ENT_CODE).where().eq("ID",tmp.getId()).update()
                         .set("AMT_FIVE",tmp.getFirstAmt()).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                        .set("TS",now)
                         .exec();
             }
             Crud.from(PmConstruction.ENT_CODE).where().eq(PmConstruction.Cols.ID,param.getPmConstructionId()).update()
                     .set(PmConstruction.Cols.SYS_TRUE_ONE,1).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
                     .exec();
         }
+    }
+
+    /**
+     * 工程建安费需求填报-填报年度需求资金-修改单独一个月
+     */
+    public void updateOneMonth(){
+        // 获取输入：
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        PmConstructionDetailView param = JsonUtil.fromJson(json,PmConstructionDetailView.class);
+        String now = DateTimeUtil.dttmToString(new Date());
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        String id = param.getId();
+        BigDecimal firstAmt = PmConstructionDetail.selectById(id).getAmtFive();
+        BigDecimal updateAmt = param.getFirstAmt();
+        Crud.from(PmConstructionDetail.ENT_CODE).where().eq("ID",id).update()
+                .set("AMT_FIVE",updateAmt).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                .set("TS",now)
+                .exec();
+
+        Crud.from(PmConstruction.ENT_CODE).where().eq(PmConstruction.Cols.ID,param.getPmConstructionId()).update()
+                .set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                .exec();
+        // 修改记录写入
+        String month = param.getYear()+"年"+param.getMonth()+"月";
+        param.setMonth(month);
+        insertLog(firstAmt,updateAmt,userId,param,now);
+
     }
 
     /**

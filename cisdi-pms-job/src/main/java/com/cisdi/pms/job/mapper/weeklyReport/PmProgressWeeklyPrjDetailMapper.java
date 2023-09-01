@@ -65,5 +65,5 @@ public interface PmProgressWeeklyPrjDetailMapper {
      * 根据id动态修改数据
      * @param pmProgressWeeklyPrjDetail 实体信息
      */
-    void updateConditionById(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail);
+    void updateContionById(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail);
 }

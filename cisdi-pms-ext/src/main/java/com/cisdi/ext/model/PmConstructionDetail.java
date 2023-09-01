@@ -104,9 +104,9 @@ public class PmConstructionDetail {
          */
         public static final String PM_CONSTRUCTION_ID = "PM_CONSTRUCTION_ID";
         /**
-         * 月份。
+         * 编号。
          */
-        public static final String MONTH = "MONTH";
+        public static final String NUMBER = "NUMBER";
         /**
          * 金额5(存元)。
          */
@@ -635,36 +635,36 @@ public class PmConstructionDetail {
     }
 
     /**
-     * 月份。
+     * 编号。
      */
-    private String month;
+    private Integer number;
 
     /**
-     * 获取：月份。
+     * 获取：编号。
      */
-    public String getMonth() {
-        return this.month;
+    public Integer getNumber() {
+        return this.number;
     }
 
     /**
-     * 设置：月份。
+     * 设置：编号。
      */
-    public PmConstructionDetail setMonth(String month) {
-        if (this.month == null && month == null) {
+    public PmConstructionDetail setNumber(Integer number) {
+        if (this.number == null && number == null) {
             // 均为null，不做处理。
-        } else if (this.month != null && month != null) {
+        } else if (this.number != null && number != null) {
             // 均非null，判定不等，再做处理：
-            if (this.month.compareTo(month) != 0) {
-                this.month = month;
-                if (!this.toUpdateCols.contains("MONTH")) {
-                    this.toUpdateCols.add("MONTH");
+            if (this.number.compareTo(number) != 0) {
+                this.number = number;
+                if (!this.toUpdateCols.contains("NUMBER")) {
+                    this.toUpdateCols.add("NUMBER");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.month = month;
-            if (!this.toUpdateCols.contains("MONTH")) {
-                this.toUpdateCols.add("MONTH");
+            this.number = number;
+            if (!this.toUpdateCols.contains("NUMBER")) {
+                this.toUpdateCols.add("NUMBER");
             }
         }
         return this;
