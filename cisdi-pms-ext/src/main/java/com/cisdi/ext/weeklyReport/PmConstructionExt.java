@@ -15,7 +15,6 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
-import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -27,6 +26,8 @@ import java.util.stream.Collectors;
  * 工程建安费用需求填报
  */
 public class PmConstructionExt {
+
+    public static final BigDecimal WAN = new BigDecimal(10000);
 
     /**
      * 工程建安费需求填报-当年单项目详情
@@ -109,7 +110,8 @@ public class PmConstructionExt {
                 PmConstructionDetailView pmConstructionDetailView = new PmConstructionDetailView();
                 pmConstructionDetailView.setId(JdbcMapUtil.getString(map,"id"));
                 pmConstructionDetailView.setMonth(JdbcMapUtil.getString(map,"month"));
-                pmConstructionDetailView.setFirstAmt(new BigDecimal(JdbcMapUtil.getString(map,"firstAmt")));
+                BigDecimal amt = new BigDecimal(JdbcMapUtil.getString(map,"firstAmt")).divide(WAN);
+                pmConstructionDetailView.setFirstAmt(amt);
                 pmConstructionDetailView.setYear(JdbcMapUtil.getString(map,"year"));
                 pmConstructionDetailView.setProjectId(JdbcMapUtil.getString(map,"projectId"));
                 pmConstructionDetailView.setPmConstructionId(JdbcMapUtil.getString(map,"pmConstructionId"));
@@ -172,8 +174,9 @@ public class PmConstructionExt {
         String now = DateTimeUtil.dttmToString(new Date());
         String userId = ExtJarHelper.loginInfo.get().userId;
         String id = param.getId();
-        BigDecimal firstAmt = PmConstructionDetail.selectById(id).getAmtFive();
-        BigDecimal updateAmt = param.getFirstAmt();
+        BigDecimal firstAmt = PmConstructionDetail.selectById(id).getAmtFive().divide(WAN);
+        BigDecimal updateAmt = param.getFirstAmt().multiply(WAN);
+        BigDecimal updateAmtWan = updateAmt.divide(WAN);
         Crud.from(PmConstructionDetail.ENT_CODE).where().eq("ID",id).update()
                 .set("AMT_FIVE",updateAmt).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
                 .set("TS",now)
@@ -185,7 +188,7 @@ public class PmConstructionExt {
         // 修改记录写入
         String month = param.getYear()+"年"+param.getMonth()+"月";
         param.setMonth(month);
-        insertLog(firstAmt,updateAmt,userId,param,now);
+        insertLog(firstAmt,updateAmtWan,userId,param,now);
 
     }
 
@@ -201,10 +204,11 @@ public class PmConstructionExt {
         BigDecimal firstAmt = param.getFirstAmt();
         BigDecimal checkAmt = param.getCheckAmt();
         if (checkAmt.compareTo(firstAmt) != 0){
+            BigDecimal checkAmtNotWan = checkAmt.multiply(WAN);
             String now = DateTimeUtil.dttmToString(new Date());
             Crud.from(PmConstructionDetail.ENT_CODE).where().eq(PmConstructionDetail.Cols.ID,param.getId()).update()
-                    .set(PmConstructionDetail.Cols.AMT_FIVE,checkAmt)
-                    .set(PmConstructionDetail.Cols.AMT_SIX,checkAmt)
+                    .set(PmConstructionDetail.Cols.AMT_FIVE,checkAmtNotWan)
+                    .set(PmConstructionDetail.Cols.AMT_SIX,checkAmtNotWan)
                     .exec();
             // 修改记录写入
             insertLog(firstAmt,checkAmt,userId,param,now);
@@ -220,7 +224,7 @@ public class PmConstructionExt {
      * @param now 操作时间
      */
     public void insertLog(BigDecimal firstAmt, BigDecimal checkAmt, String userId, PmConstructionDetailView param, String now) {
-        StringBuilder sb = new StringBuilder(param.getMonth()).append(",金额由\" ").append(firstAmt).append("\"修改为\"").append(checkAmt).append("\"");
+        StringBuilder sb = new StringBuilder(param.getMonth()).append(",金额由'").append(firstAmt).append("'修改为'").append(checkAmt).append("'");
         String id = Crud.from(PmConstructionLog.ENT_CODE).insertData();
         Crud.from(PmConstructionLog.ENT_CODE).where().eq(PmConstructionLog.Cols.ID,id).update()
                 .set(PmConstructionLog.Cols.VER,1).set("TS",now).set("CRT_DT",now).set("CRT_USER_ID",userId)
@@ -291,7 +295,7 @@ public class PmConstructionExt {
             StringBuilder sb = new StringBuilder("select a.pm_prj_id as projectId,a.name as projectName,a.IZ_START_REQUIRE as weatherStart,")
                     .append("a.IZ_END as weatherComplete,");
             for (int i = 1; i <= 12; i++) {
-                sb.append("group_concat(case when a.NUMBER = ").append(i).append(" then AMT_FIVE else '' end SEPARATOR '') as '").append(i).append("月',");
+                sb.append("group_concat(case when a.NUMBER = ").append(i).append(" then AMT_FIVE/10000 else '' end SEPARATOR '') as '").append(i).append("月',");
             }
             sb.deleteCharAt(sb.length()-1);
             sb.append(" FROM (select a.pm_prj_id,c.name,c.IZ_START_REQUIRE,c.IZ_END,b.NUMBER,b.AMT_FIVE FROM PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID LEFT JOIN pm_prj c on a.pm_prj_id = c.id WHERE a.BASE_YEAR_ID = '").append(baseYearId).append("' and a.PM_PRJ_ID in ('").append(prjIds).append("') ) a LEFT JOIN (select a.pm_prj_id,any_value(b.LAST_MODI_DT) as date from PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID where a.BASE_YEAR_ID = '").append(baseYearId).append("' and a.PM_PRJ_ID in ('").append(prjIds).append("') GROUP BY a.PM_PRJ_ID order by date desc  ) b on a.pm_prj_id = b.pm_prj_id GROUP BY a.pm_prj_id ORDER BY a.IZ_END asc,a.IZ_START_REQUIRE desc,any_value(b.date) desc");
