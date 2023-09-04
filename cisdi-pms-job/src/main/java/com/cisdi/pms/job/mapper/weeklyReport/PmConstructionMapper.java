@@ -26,4 +26,12 @@ public interface PmConstructionMapper {
      * @param list 明细信息
      */
     void insertBatchDetail(@Param("list") List<PmConstruction> list);
+
+    /**
+     * 查询当月待推送任务
+     * @param yearId 年份id
+     * @param month 月份
+     * @return 本月还没有进行推送的待确认的建安需求费用
+     */
+    List<PmConstruction> queryMonthPushTask(@Param("yearId") String yearId, @Param("month") String month);
 }

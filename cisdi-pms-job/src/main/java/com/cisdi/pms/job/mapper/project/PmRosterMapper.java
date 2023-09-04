@@ -11,4 +11,11 @@ public interface PmRosterMapper {
      * @return 查询结果
      */
     List<PmRoster> selectPrjRosterNoWhere();
+
+    /**
+     * 查询项目工程管理岗人员
+     * @param projectId 项目id
+     * @return 工程管理岗人呢元
+     */
+    String queryMangeUserByProject(String projectId);
 }

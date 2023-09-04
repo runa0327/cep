@@ -115,4 +115,26 @@
         )
         </foreach>
     </insert>
+
+    <!--查询当月待推送任务-->
+    <select id="queryMonthPushTask" resultMap="PmConstructionResult">
+        select
+            a.id as pmConstructionId,
+            b.id as id,
+            a.pm_prj_id as projectId,
+            a.base_year_id as baseYearId,
+            c.iz_start_require as weatherStart,
+            c.iz_end as weatherComplete,
+            c.name as projectName
+        FROM
+            pm_construction a
+                LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID
+                left join pm_prj c on a.pm_prj_id = c.id
+        WHERE
+            a.status = 'AP' and b.status = 'ap'
+          and a.base_year_id = #{yearId}
+          and b.number = #{month} and b.sys_true_two = 0
+          and (c.iz_start_require = 1 or c.iz_start_require is null ) and (c.iz_end = 0 or c.iz_end is null )
+        ORDER BY a.pm_prj_id asc
+    </select>
 </mapper>

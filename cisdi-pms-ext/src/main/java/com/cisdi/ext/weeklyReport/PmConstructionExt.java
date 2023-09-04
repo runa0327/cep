@@ -1,14 +1,12 @@
 package com.cisdi.ext.weeklyReport;
 
-import com.cisdi.ext.model.BaseYear;
-import com.cisdi.ext.model.PmConstruction;
-import com.cisdi.ext.model.PmConstructionDetail;
-import com.cisdi.ext.model.PmConstructionLog;
+import com.cisdi.ext.model.*;
 import com.cisdi.ext.model.view.weekReport.PmConstructionDetailView;
 import com.cisdi.ext.model.view.weekReport.PmConstructionLogView;
 import com.cisdi.ext.model.view.weekReport.PmConstructionView;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
+import com.cisdi.ext.weektask.WeekTaskExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -210,15 +208,34 @@ public class PmConstructionExt {
         String userId = ExtJarHelper.loginInfo.get().userId;
         BigDecimal firstAmt = param.getFirstAmt();
         BigDecimal checkAmt = param.getCheckAmt();
+        String now = DateTimeUtil.dttmToString(new Date());
+        String id = param.getId();
         if (checkAmt.compareTo(firstAmt) != 0){
             BigDecimal checkAmtNotWan = checkAmt.multiply(WAN);
-            String now = DateTimeUtil.dttmToString(new Date());
-            Crud.from(PmConstructionDetail.ENT_CODE).where().eq(PmConstructionDetail.Cols.ID,param.getId()).update()
+            Crud.from(PmConstructionDetail.ENT_CODE).where().eq(PmConstructionDetail.Cols.ID,id).update()
                     .set(PmConstructionDetail.Cols.AMT_FIVE,checkAmtNotWan)
                     .set(PmConstructionDetail.Cols.AMT_SIX,checkAmtNotWan)
                     .exec();
             // 修改记录写入
             insertLog(firstAmt,checkAmt,userId,param,now);
+        }
+        // 关闭工作台任务
+        packageWeekTask(id,now);
+    }
+
+    /**
+     * 关闭工作台任务
+     * @param id 关联的id，月份id
+     * @param now 当前时间
+     */
+    private void packageWeekTask(String id, String now) {
+        List<WeekTask> list = WeekTask.selectByWhere(new Where().eq(WeekTask.Cols.RELATION_DATA_ID,id).eq(WeekTask.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list)){
+            if (list.get(0).getActualComplDate() == null){
+                Crud.from(WeekTask.ENT_CODE).where().eq(WeekTask.Cols.RELATION_DATA_ID,id).update()
+                        .set(WeekTask.Cols.ACTUAL_COMPL_DATE,now).set(WeekTask.Cols.WEEK_TASK_STATUS_ID,"1634118629769482240")
+                        .exec();
+            }
         }
     }
 

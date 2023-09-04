@@ -1,13 +1,14 @@
 package com.cisdi.pms.job.serviceImpl.weeklyReport;
 
 import cn.hutool.core.util.IdUtil;
-import com.cisdi.pms.job.domain.base.BaseYear;
 import com.cisdi.pms.job.domain.project.PmPrj;
 import com.cisdi.pms.job.domain.weeklyReport.PmConstruction;
-import com.cisdi.pms.job.mapper.base.AdRemindLogMapper;
+import com.cisdi.pms.job.domain.weeklyReport.WeekTask;
 import com.cisdi.pms.job.mapper.base.BaseYearMapper;
 import com.cisdi.pms.job.mapper.project.PmPrjMapper;
+import com.cisdi.pms.job.mapper.project.PmRosterMapper;
 import com.cisdi.pms.job.mapper.weeklyReport.PmConstructionMapper;
+import com.cisdi.pms.job.mapper.weeklyReport.WeekTaskMapper;
 import com.cisdi.pms.job.service.base.AdRemindLogService;
 import com.cisdi.pms.job.service.weeklyReport.PmConstructionService;
 import com.cisdi.pms.job.utils.DateUtil;
@@ -35,6 +36,12 @@ public class PmConstructionServiceImpl implements PmConstructionService {
 
     @Resource
     private PmPrjMapper pmPrjMapper;
+
+    @Resource
+    private WeekTaskMapper weekTaskMapper;
+
+    @Resource
+    private PmRosterMapper pmRosterMapper;
 
     /**
      * 工程建安需求填报生成 定时任务
@@ -120,5 +127,66 @@ public class PmConstructionServiceImpl implements PmConstructionService {
             list.add(pmConstruction);
         }
         pmConstructionMapper.insertBatchDetail(list);
+    }
+
+    /**
+     * 工程建安需求填报-月初待确认任务生成
+     */
+    @Override
+    public void monthCheckAmt() {
+        Date nowDate = new Date();
+        String year = DateUtil.getYear(nowDate); // 当前年
+        String yearId = baseYearMapper.queryIdByCode(year); // 当前年份id
+        String month = DateUtil.getMonth(nowDate); // 当前月
+        // 查询当月待推送任务
+        List<PmConstruction> list = pmConstructionMapper.queryMonthPushTask(yearId,month);
+        if (!CollectionUtils.isEmpty(list)){
+            String now = DateUtil.getNormalTimeStr(nowDate);
+            String endDate = DateUtil.getMonthEnd5();
+            for (PmConstruction tmp : list) {
+                String projectId = tmp.getProjectId();
+                String userId = pmRosterMapper.queryMangeUserByProject(projectId);
+                if (StringUtils.hasText(userId)){
+                    WeekTask weekTask = getWeekTask(now,tmp,"0099250247095871681",userId,year,month,endDate);
+                    weekTaskMapper.insert(weekTask);
+                }
+            }
+        }
+    }
+
+    /**
+     * 插入本周工作任务数据封装
+     * @param now 当前时间
+     * @param tmp 数据源信息
+     * @param createBy 创建人信息
+     * @param userId 被通知人员
+     * @param year 年
+     * @param month 月
+     * @param endDate 计划结束时间
+     * @return 封装结果
+     */
+    private WeekTask getWeekTask(String now, PmConstruction tmp, String createBy, String userId,String year,String month,String endDate) {
+        WeekTask weekTask = new WeekTask();
+
+        weekTask.setId(IdUtil.getSnowflakeNextIdStr());
+        weekTask.setVer("1");
+        weekTask.setTs(now);
+        weekTask.setCreateBy(createBy);
+        weekTask.setCreateDate(now);
+        weekTask.setLastUpdateBy(createBy);
+        weekTask.setLastUpdateDate(now);
+        weekTask.setStatus("AP");
+        weekTask.setAdUserId(userId);
+        String yearMonth = year+"年"+month+ "月";
+        weekTask.setContent(yearMonth+"【"+tmp.getProjectName()+"】项目工程建安费用待确认，请前往处理");
+        weekTask.setTitle(yearMonth + "工程建安费用填报");
+        weekTask.setPublishStart(now);
+        weekTask.setWeekTaskStatus("1634118609016066048");
+        weekTask.setRelationDataId(tmp.getId());
+        weekTask.setWeekTaskTypeId("1698514350847504384");
+        weekTask.setCanDispatch(0);
+        weekTask.setProjectId(tmp.getProjectId());
+        weekTask.setPlanCompeteDate(endDate);
+        return weekTask;
     }
 }

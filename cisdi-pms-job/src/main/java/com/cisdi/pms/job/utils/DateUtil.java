@@ -148,4 +148,29 @@ public class DateUtil {
             return sdf.format(date);
         }
     }
+
+    /**
+     * 获取当时时间月
+     * @param date 时间
+     * @return 年份
+     */
+    public static String getMonth(Date date) {
+        if (date == null){
+            return null;
+        } else {
+            SimpleDateFormat sdf = new SimpleDateFormat("M");
+            return sdf.format(date);
+        }
+    }
+
+    /**
+     * 获取当月月底前5天时间
+     * @return 当月底前5天时间
+     */
+    public static String getMonthEnd5() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DATE,calendar.getActualMaximum(calendar.DATE)-5);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd 23:59:59");
+         return simpleDateFormat.format(calendar.getTime());
+    }
 }

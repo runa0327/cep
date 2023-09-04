@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cisdi.pms.job.mapper.project.PmRosterMapper">
-    <resultMap id="PmRosterResult" type="PmRoster">
+    <resultMap id="PmRosterResult" type="com.cisdi.pms.job.domain.project.PmRoster">
         <id property="id" column="id" />
         <result property="customerUnitId" column="customerUnitId" />
         <result property="customerUnitName" column="customerUnitName" />
@@ -35,5 +35,10 @@
         WHERE
             a.`STATUS` = 'ap'
           and b.`STATUS` = 'ap' and b.IZ_FORMAL_PRJ = 1 and b.PROJECT_SOURCE_TYPE_ID = '0099952822476441374'
+    </select>
+
+    <!--查询项目工程管理岗人员-->
+    <select id="queryMangeUserByProject" resultType="String">
+        select ad_user_id from pm_roster where pm_prj_id = #{projectId} and status = 'AP' and post_info_id = '1633997482885255168' and ad_user_id is not null
     </select>
 </mapper>
