@@ -198,9 +198,9 @@ public class PmLifeCycleExt {
                     newData.put("备注说明", json);
                 } else {
                     Optional<Map<String, Object>> optional = nodeList.stream().filter(p -> Objects.equals(stringObjectMap.get("id"), p.get("PM_PRJ_ID")) && Objects.equals(s, p.get("nodeName"))).findAny();
+                    JSONObject json = new JSONObject();
                     if (optional.isPresent()) {
                         Map<String, Object> dataMap = optional.get();
-                        JSONObject json = new JSONObject();
                         if (Objects.nonNull(dataMap.get("status_name"))) {
                             String status = JdbcMapUtil.getString(dataMap, "status_name");
                             String nameOrg = "";
@@ -267,7 +267,8 @@ public class PmLifeCycleExt {
                         }
                         newData.put(s, json);
                     } else {
-                        newData.put(s, "");
+                        json.put("nameOrg", "暂无此节点");
+                        newData.put(s, json);
                     }
                 }
             }

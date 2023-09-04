@@ -33,7 +33,7 @@ public class ProjectHomeExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pm.name as `NAME`,g1.name as mode,pm.PRJ_SITUATION as des,g2.name as location ,g3.`NAME` as source,g4.`NAME` as type,\n" +
-                "PLAN_START_TIME,PLAN_END_TIME,g5.`NAME` as tender,ACTUAL_START_TIME,ACTUAL_END_TIME,g6.`NAME` as status, \n" +
+                "DATE_FORMAT(PLAN_START_TIME, '%Y-%m-%d') as PLAN_START_TIME,DATE_FORMAT(PLAN_END_TIME, '%Y-%m-%d') as PLAN_END_TIME,g5.`NAME` as tender,DATE_FORMAT(ACTUAL_START_TIME, '%Y-%m-%d') as ACTUAL_START_TIME,DATE_FORMAT(ACTUAL_END_TIME, '%Y-%m-%d') as ACTUAL_END_TIME,g6.`NAME` as status, \n" +
                 "p1.`NAME` as js, p2.`NAME` as kc, p3.`NAME` as sj, p4.`NAME` as sg, p5.`NAME` as jl from pm_prj pm \n" +
                 "left join gr_set_value g1 on g1.id = pm.PRJ_MANAGE_MODE_ID\n" +
                 "left join gr_set_value g2 on g2.id = pm.BASE_LOCATION_ID\n" +
@@ -56,11 +56,11 @@ public class ProjectHomeExt {
             info.location = JdbcMapUtil.getString(mapDate, "location");
             info.source = JdbcMapUtil.getString(mapDate, "source");
             info.type = JdbcMapUtil.getString(mapDate, "type");
-            info.planBeginTime = StringUtil.withOutT(JdbcMapUtil.getString(mapDate, "PLAN_START_TIME"));
-            info.planEndTime = StringUtil.withOutT(JdbcMapUtil.getString(mapDate, "PLAN_END_TIME"));
+            info.planBeginTime = JdbcMapUtil.getString(mapDate, "PLAN_START_TIME");
+            info.planEndTime = JdbcMapUtil.getString(mapDate, "PLAN_END_TIME");
             info.tenderType = JdbcMapUtil.getString(mapDate, "tender");
-            info.actualBeginTime = StringUtil.withOutT(JdbcMapUtil.getString(mapDate, "ACTUAL_START_TIME"));
-            info.actualEndTime = StringUtil.withOutT(JdbcMapUtil.getString(mapDate, "ACTUAL_END_TIME"));
+            info.actualBeginTime = JdbcMapUtil.getString(mapDate, "ACTUAL_START_TIME");
+            info.actualEndTime = JdbcMapUtil.getString(mapDate, "ACTUAL_END_TIME");
             info.jsUnit = JdbcMapUtil.getString(mapDate, "js");
             info.kcUnit = JdbcMapUtil.getString(mapDate, "kc");
             info.sjUnit = JdbcMapUtil.getString(mapDate, "sj");
