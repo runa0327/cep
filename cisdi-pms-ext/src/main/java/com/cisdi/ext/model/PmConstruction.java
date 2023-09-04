@@ -7,6 +7,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,6 +107,10 @@ public class PmConstruction {
          * 项目。
          */
         public static final String PM_PRJ_ID = "PM_PRJ_ID";
+        /**
+         * 金额5(存元)。
+         */
+        public static final String AMT_FIVE = "AMT_FIVE";
         /**
          * 系统是否1。
          */
@@ -652,6 +657,42 @@ public class PmConstruction {
             this.pmPrjId = pmPrjId;
             if (!this.toUpdateCols.contains("PM_PRJ_ID")) {
                 this.toUpdateCols.add("PM_PRJ_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 金额5(存元)。
+     */
+    private BigDecimal amtFive;
+
+    /**
+     * 获取：金额5(存元)。
+     */
+    public BigDecimal getAmtFive() {
+        return this.amtFive;
+    }
+
+    /**
+     * 设置：金额5(存元)。
+     */
+    public PmConstruction setAmtFive(BigDecimal amtFive) {
+        if (this.amtFive == null && amtFive == null) {
+            // 均为null，不做处理。
+        } else if (this.amtFive != null && amtFive != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.amtFive.compareTo(amtFive) != 0) {
+                this.amtFive = amtFive;
+                if (!this.toUpdateCols.contains("AMT_FIVE")) {
+                    this.toUpdateCols.add("AMT_FIVE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.amtFive = amtFive;
+            if (!this.toUpdateCols.contains("AMT_FIVE")) {
+                this.toUpdateCols.add("AMT_FIVE");
             }
         }
         return this;

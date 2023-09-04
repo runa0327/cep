@@ -6,7 +6,6 @@ import com.cisdi.ext.model.view.weekReport.PmConstructionLogView;
 import com.cisdi.ext.model.view.weekReport.PmConstructionView;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
-import com.cisdi.ext.weektask.WeekTaskExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -60,7 +59,7 @@ public class PmConstructionExt {
     public PmConstructionView queryPrjStatusById(String projectId, String baseYearId, MyJdbcTemplate myJdbcTemplate) {
         PmConstructionView pmConstructionView = new PmConstructionView();
 
-        String sql = "select a.pm_prj_id as projectId,ifnull(b.IZ_START_REQUIRE,1) as weatherStart,ifnull(b.IZ_END,0) as weatherComplete,ifnull(a.SYS_TRUE_ONE,0) as yearAmtNeed,a.id as pmConstructionId from pm_construction a left join pm_prj b on a.PM_PRJ_ID = b.id where a.base_year_id = ? and a.pm_prj_id = ?";
+        String sql = "select a.pm_prj_id as projectId,ifnull(b.IZ_START_REQUIRE,1) as weatherStart,ifnull(b.IZ_END,0) as weatherComplete,ifnull(a.SYS_TRUE_ONE,0) as yearAmtNeed,a.id as pmConstructionId,a.AMT_FIVE/10000 as yearAmt from pm_construction a left join pm_prj b on a.PM_PRJ_ID = b.id where a.base_year_id = ? and a.pm_prj_id = ?";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,baseYearId,projectId);
         if (!CollectionUtils.isEmpty(list)){
             pmConstructionView.setWeatherStart(JdbcMapUtil.getInt(list.get(0),"weatherStart"));
@@ -68,12 +67,11 @@ public class PmConstructionExt {
             pmConstructionView.setProjectId(JdbcMapUtil.getString(list.get(0),"projectId"));
             pmConstructionView.setYearAmtNeed(JdbcMapUtil.getInt(list.get(0),"yearAmtNeed"));
             pmConstructionView.setPmConstructionId(JdbcMapUtil.getString(list.get(0),"pmConstructionId"));
+            pmConstructionView.setYearAmt(new BigDecimal(JdbcMapUtil.getString(list.get(0),"yearAmt")));
 
             List<PmConstructionDetailView> detail = getPrjMonthDetail(projectId,baseYearId,myJdbcTemplate); // 各月份明细信息
             pmConstructionView.setDetailList(detail);
 
-            BigDecimal allAmt = detail.stream().map(PmConstructionDetailView::getFirstAmt).reduce(BigDecimal.ZERO,BigDecimal::add);// 本年需求总资金
-            pmConstructionView.setYearAmt(allAmt);
         }
         return pmConstructionView;
     }
@@ -162,8 +160,10 @@ public class PmConstructionExt {
                 tmp.setMonth(month);
                 insertLog(firstAmt,checkAmt,userId,tmp,now);
             }
+            BigDecimal allYearAmt = list.stream().map(PmConstructionDetailView::getFirstAmt).reduce(BigDecimal.ZERO,BigDecimal::add);
             Crud.from(PmConstruction.ENT_CODE).where().eq(PmConstruction.Cols.ID,param.getPmConstructionId()).update()
                     .set(PmConstruction.Cols.SYS_TRUE_ONE,1).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                    .set("AMT_FIVE",allYearAmt)
                     .exec();
         }
     }
@@ -186,15 +186,26 @@ public class PmConstructionExt {
                 .set("AMT_FIVE",updateAmt).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
                 .set("TS",now)
                 .exec();
-
+        BigDecimal allYearAmt = getPrjYearAllAmt(id);
         Crud.from(PmConstruction.ENT_CODE).where().eq(PmConstruction.Cols.ID,param.getPmConstructionId()).update()
-                .set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                .set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId).set("AMT_FIVE",allYearAmt)
                 .exec();
         // 修改记录写入
         String month = param.getYear()+"年"+param.getMonth()+"月";
         param.setMonth(month);
         insertLog(firstAmt,updateAmtWan,userId,param,now);
 
+    }
+
+    /**
+     * 根据当月id查询该项目当年所有资金需求
+     * @param id 月份记录id
+     * @return 年度需求总资金
+     */
+    private BigDecimal getPrjYearAllAmt(String id) {
+        String parentId = PmConstructionDetail.selectById(id).getPmConstructionId();
+        List<PmConstructionDetail> list = PmConstructionDetail.selectByWhere(new Where().eq(PmConstructionDetail.Cols.PM_CONSTRUCTION_ID,parentId));
+        return list.stream().map(PmConstructionDetail::getAmtFive).reduce(BigDecimal.ZERO,BigDecimal::add);
     }
 
     /**
@@ -218,6 +229,12 @@ public class PmConstructionExt {
                     .exec();
             // 修改记录写入
             insertLog(firstAmt,checkAmt,userId,param,now);
+            String parentId = PmConstructionDetail.selectById(id).getPmConstructionId();
+            BigDecimal allYearAmt = getPrjYearAllAmt(id);
+            Crud.from(PmConstruction.ENT_CODE).where().eq(PmConstruction.Cols.ID,parentId).update()
+                    .set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                    .set("AMT_FIVE",allYearAmt)
+                    .exec();
         }
         // 关闭工作台任务
         packageWeekTask(id,now);
