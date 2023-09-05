@@ -165,6 +165,7 @@ public class ProPlanExt {
 
             if ("已完成".equals(status)) {
                 nameOrg = "实际完成";
+                statusOrg = "已完成";
                 if (Objects.nonNull(item.actualComplDate)) {
                     dateOrg = item.actualComplDate;
                 }
@@ -174,10 +175,10 @@ public class ProPlanExt {
                     int days = DateTimeUtil.daysBetween(plan, actual);
                     if (plan.before(actual)) {
                         tips = "超期" + Math.abs(days) + "天";
-                        statusOrg = "超期完成";
+//                        statusOrg = "超期完成";
                     } else {
                         tips = "提前" + days + "完成！";
-                        statusOrg = "已完成";
+//                        statusOrg = "已完成";
                     }
                 } else {
                     statusOrg = "已完成";
@@ -188,15 +189,20 @@ public class ProPlanExt {
                 statusOrg = "未涉及";
                 reason = getNoInvolveReason(item.id);
             } else {
-                if ("0".equals(item.izOverdue)) {
-                    if ("进行中".equals(status)) {
-                        statusOrg = "进行中";
-                    } else if ("未启动".equals(status)) {
-                        statusOrg = "未启动";
-                    }
-                } else {
-                    statusOrg = "超期未完成";
+                if ("进行中".equals(status)) {
+                    statusOrg = "进行中";
+                } else if ("未启动".equals(status)) {
+                    statusOrg = "未启动";
                 }
+//                if ("0".equals(item.izOverdue)) {
+//                    if ("进行中".equals(status)) {
+//                        statusOrg = "进行中";
+//                    } else if ("未启动".equals(status)) {
+//                        statusOrg = "未启动";
+//                    }
+//                } else {
+//                    statusOrg = "超期未完成";
+//                }
                 if (Objects.nonNull(item.planComplDate)) {
                     Date planCompDate = DateTimeUtil.stringToDate(item.planComplDate);
                     if (planCompDate.before(new Date())) {
