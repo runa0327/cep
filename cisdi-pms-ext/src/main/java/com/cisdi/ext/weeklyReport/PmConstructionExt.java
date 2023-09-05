@@ -67,7 +67,11 @@ public class PmConstructionExt {
             pmConstructionView.setProjectId(JdbcMapUtil.getString(list.get(0),"projectId"));
             pmConstructionView.setYearAmtNeed(JdbcMapUtil.getInt(list.get(0),"yearAmtNeed"));
             pmConstructionView.setPmConstructionId(JdbcMapUtil.getString(list.get(0),"pmConstructionId"));
-            pmConstructionView.setYearAmt(new BigDecimal(JdbcMapUtil.getString(list.get(0),"yearAmt")));
+            String amt = JdbcMapUtil.getString(list.get(0),"yearAmt");
+            if (!StringUtils.hasText(amt)){
+                amt = "0";
+            }
+            pmConstructionView.setYearAmt(new BigDecimal(amt));
 
             List<PmConstructionDetailView> detail = getPrjMonthDetail(projectId,baseYearId,myJdbcTemplate); // 各月份明细信息
             pmConstructionView.setDetailList(detail);
