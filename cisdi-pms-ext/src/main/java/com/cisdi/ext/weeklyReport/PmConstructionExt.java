@@ -348,17 +348,17 @@ public class PmConstructionExt {
         Map<String,Object> listMap = getProject(param,limit,myJdbcTemplate);
         String prjIds = listMap.get("prjIds").toString();
         if (StringUtils.hasText(prjIds)){
-            StringBuilder sb = new StringBuilder("select a.pm_prj_id as projectId,a.name as projectName,a.IZ_START_REQUIRE as weatherStart,")
+            StringBuilder sb = new StringBuilder("select a.pm_prj_id as projectId,a.name as projectName,a.IZ_START_REQUIRE as weatherStart,any_value(a.allYearAmt/10000) as allYearAmt,")
                     .append("a.IZ_END as weatherComplete,");
             for (int i = 1; i <= 12; i++) {
-                sb.append("group_concat(case when a.NUMBER = ").append(i).append(" then AMT_FIVE/10000 else '' end SEPARATOR '') as '").append(i).append("月',");
+                sb.append("cast(group_concat(case when a.NUMBER = ").append(i).append(" then AMT_FIVE/10000 else '' end SEPARATOR '') as DECIMAL(32,10)) as '").append(i).append("月',");
             }
             sb.deleteCharAt(sb.length()-1);
-            sb.append(" FROM (select a.pm_prj_id,c.name,c.IZ_START_REQUIRE,c.IZ_END,b.NUMBER,b.AMT_FIVE FROM PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID LEFT JOIN pm_prj c on a.pm_prj_id = c.id WHERE a.BASE_YEAR_ID = '").append(baseYearId).append("' and a.PM_PRJ_ID in ('").append(prjIds).append("') ) a LEFT JOIN (select a.pm_prj_id,any_value(b.LAST_MODI_DT) as date from PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID where a.BASE_YEAR_ID = '").append(baseYearId).append("' and a.PM_PRJ_ID in ('").append(prjIds).append("') GROUP BY a.PM_PRJ_ID order by date desc  ) b on a.pm_prj_id = b.pm_prj_id GROUP BY a.pm_prj_id ORDER BY a.IZ_END asc,a.IZ_START_REQUIRE desc,any_value(b.date) desc");
+            sb.append(" FROM (select a.pm_prj_id,c.name,c.IZ_START_REQUIRE,c.IZ_END,b.NUMBER,b.AMT_FIVE,a.AMT_FIVE as allYearAmt FROM PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID LEFT JOIN pm_prj c on a.pm_prj_id = c.id WHERE a.BASE_YEAR_ID = '").append(baseYearId).append("' and a.PM_PRJ_ID in ('").append(prjIds).append("') ) a LEFT JOIN (select a.pm_prj_id,any_value(b.LAST_MODI_DT) as date from PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID where a.BASE_YEAR_ID = '").append(baseYearId).append("' and a.PM_PRJ_ID in ('").append(prjIds).append("') GROUP BY a.PM_PRJ_ID order by date desc  ) b on a.pm_prj_id = b.pm_prj_id GROUP BY a.pm_prj_id ORDER BY a.IZ_END asc,a.IZ_START_REQUIRE desc,any_value(b.date) desc");
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString());
             if (!CollectionUtils.isEmpty(list1)){
                 Map<String,Object> resMap = new HashMap<>();
-                resMap.put("total",JdbcMapUtil.getInt(resMap,"total"));
+                resMap.put("total",JdbcMapUtil.getInt(listMap,"total"));
                 resMap.put("list",list1);
                 Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resMap), Map.class);
                 ExtJarHelper.returnValue.set(outputMap);
