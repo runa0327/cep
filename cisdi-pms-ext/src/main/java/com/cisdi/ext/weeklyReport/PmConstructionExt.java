@@ -12,6 +12,7 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -59,7 +60,7 @@ public class PmConstructionExt {
     public PmConstructionView queryPrjStatusById(String projectId, String baseYearId, MyJdbcTemplate myJdbcTemplate) {
         PmConstructionView pmConstructionView = new PmConstructionView();
 
-        String sql = "select a.pm_prj_id as projectId,ifnull(b.IZ_START_REQUIRE,1) as weatherStart,ifnull(b.IZ_END,0) as weatherComplete,ifnull(a.SYS_TRUE_ONE,0) as yearAmtNeed,a.id as pmConstructionId,a.AMT_FIVE/10000 as yearAmt from pm_construction a left join pm_prj b on a.PM_PRJ_ID = b.id where a.base_year_id = ? and a.pm_prj_id = ?";
+        String sql = "select a.pm_prj_id as projectId,ifnull(b.IZ_START_REQUIRE,1) as weatherStart,ifnull(b.IZ_END,0) as weatherComplete,ifnull(a.SYS_TRUE_ONE,0) as yearAmtNeed,a.id as pmConstructionId,a.AMT_FIVE as yearAmt from pm_construction a left join pm_prj b on a.PM_PRJ_ID = b.id where a.base_year_id = ? and a.pm_prj_id = ?";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,baseYearId,projectId);
         if (!CollectionUtils.isEmpty(list)){
             pmConstructionView.setWeatherStart(JdbcMapUtil.getInt(list.get(0),"weatherStart"));
@@ -71,7 +72,7 @@ public class PmConstructionExt {
             if (!StringUtils.hasText(amt)){
                 amt = "0";
             }
-            pmConstructionView.setYearAmt(new BigDecimal(amt));
+            pmConstructionView.setYearAmt(new BigDecimal(amt).divide(WAN));
 
             List<PmConstructionDetailView> detail = getPrjMonthDetail(projectId,baseYearId,myJdbcTemplate); // 各月份明细信息
             pmConstructionView.setDetailList(detail);
@@ -86,8 +87,10 @@ public class PmConstructionExt {
      * @return 当月明细
      */
     private PmConstructionDetailView getMonth(List<PmConstructionDetailView> detail) {
+        PmConstructionDetailView pmConstructionDetailView = new PmConstructionDetailView();
         String month = DateTimeUtil.getMonth(new Date());
-        PmConstructionDetailView pmConstructionDetailView = detail.stream().filter(p->month.equals(p.getMonth())).collect(Collectors.toList()).get(0);
+        PmConstructionDetailView pmConstructionDetailViewOld = detail.stream().filter(p->month.equals(p.getMonth())).collect(Collectors.toList()).get(0);
+        BeanUtils.copyProperties(pmConstructionDetailViewOld,pmConstructionDetailView);
         pmConstructionDetailView.setCheckAmt(pmConstructionDetailView.getFirstAmt());
         String monthN = pmConstructionDetailView.getYear() + "年" +pmConstructionDetailView.getMonth() + "月";
         pmConstructionDetailView.setMonth(monthN);
@@ -112,6 +115,7 @@ public class PmConstructionExt {
                 pmConstructionDetailView.setMonth(JdbcMapUtil.getString(map,"month"));
                 BigDecimal amt = new BigDecimal(JdbcMapUtil.getString(map,"firstAmt")).divide(WAN);
                 pmConstructionDetailView.setFirstAmt(amt);
+                pmConstructionDetailView.setCheckAmt(amt);
                 pmConstructionDetailView.setYear(JdbcMapUtil.getString(map,"year"));
                 pmConstructionDetailView.setProjectId(JdbcMapUtil.getString(map,"projectId"));
                 pmConstructionDetailView.setPmConstructionId(JdbcMapUtil.getString(map,"pmConstructionId"));
@@ -152,19 +156,26 @@ public class PmConstructionExt {
         if (!CollectionUtils.isEmpty(list)){
             String now = DateTimeUtil.dttmToString(new Date());
             String userId = ExtJarHelper.loginInfo.get().userId;
+            BigDecimal zero = new BigDecimal(0);
             for (PmConstructionDetailView tmp : list) {
                 String id = tmp.getId();
                 BigDecimal checkAmt = tmp.getCheckAmt();
+                BigDecimal firstAmt = tmp.getFirstAmt();
                 Crud.from(PmConstructionDetail.ENT_CODE).where().eq("ID",id).update()
-                        .set("AMT_FIVE",checkAmt.multiply(WAN)).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                        .set("AMT_FIVE",firstAmt.multiply(WAN)).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
                         .set("TS",now)
                         .exec();
-                BigDecimal firstAmt = PmConstructionDetail.selectById(id).getAmtFive().divide(WAN);
-                String month = param.getYear()+"年"+param.getMonth()+"月";
+                String month = tmp.getYear()+"年"+tmp.getMonth()+"月";
                 tmp.setMonth(month);
-                insertLog(firstAmt,checkAmt,userId,tmp,now);
+                if (checkAmt == null){
+                    checkAmt = zero;
+                }
+                if (firstAmt.compareTo(checkAmt) != 0){
+                    insertLog(checkAmt,firstAmt,userId,tmp,now);
+                }
+
             }
-            BigDecimal allYearAmt = list.stream().map(PmConstructionDetailView::getFirstAmt).reduce(BigDecimal.ZERO,BigDecimal::add);
+            BigDecimal allYearAmt = list.stream().map(PmConstructionDetailView::getFirstAmt).reduce(BigDecimal.ZERO,BigDecimal::add).multiply(WAN);
             Crud.from(PmConstruction.ENT_CODE).where().eq(PmConstruction.Cols.ID,param.getPmConstructionId()).update()
                     .set(PmConstruction.Cols.SYS_TRUE_ONE,1).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
                     .set("AMT_FIVE",allYearAmt)
