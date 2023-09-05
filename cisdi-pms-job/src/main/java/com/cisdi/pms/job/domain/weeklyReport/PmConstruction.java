@@ -52,4 +52,6 @@ public class PmConstruction extends BaseCommon {
 
     // 月初任务是否已推送工作台 1已推送 0未推送
     private Integer pushWeekTask;
+
+    // 年度需求总资金
 }

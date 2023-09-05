@@ -73,4 +73,18 @@ public class WeeklyReportJob {
             log.error("工程建安费用需求生成-失败：",e);
         }
     }
+
+    /**
+     * 工程建安需求填报-月初待确认任务生成
+     */
+    @Scheduled(cron = "0 0 0 1 * ?")
+    public void monthCheckAmt(){
+        try {
+            log.info("工程建安费用当月待确认任务生成-开始");
+            pmConstructionService.monthCheckAmt();
+            log.info("工程建安费用当月待确认任务生成-成功");
+        } catch (Exception e){
+            log.error("工程建安费用当月待确认任务生成-失败：",e);
+        }
+    }
 }

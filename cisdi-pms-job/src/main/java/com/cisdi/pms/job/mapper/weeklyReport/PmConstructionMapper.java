@@ -4,6 +4,7 @@ import com.cisdi.pms.job.domain.weeklyReport.PmConstruction;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PmConstructionMapper {
 
@@ -26,4 +27,19 @@ public interface PmConstructionMapper {
      * @param list 明细信息
      */
     void insertBatchDetail(@Param("list") List<PmConstruction> list);
+
+    /**
+     * 查询当月待推送任务
+     * @param yearId 年份id
+     * @param month 月份
+     * @return 本月还没有进行推送的待确认的建安需求费用
+     */
+    List<PmConstruction> queryMonthPushTask(@Param("yearId") String yearId, @Param("month") String month);
+
+    /**
+     * 工程建安费用需求填报统计
+     * @param sql 执行语句
+     * @return 查询结果
+     */
+    List<Map<String,Object>> queryPmConstructionList(String sql);
 }

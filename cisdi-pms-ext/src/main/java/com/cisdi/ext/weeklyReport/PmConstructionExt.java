@@ -1,9 +1,6 @@
 package com.cisdi.ext.weeklyReport;
 
-import com.cisdi.ext.model.BaseYear;
-import com.cisdi.ext.model.PmConstruction;
-import com.cisdi.ext.model.PmConstructionDetail;
-import com.cisdi.ext.model.PmConstructionLog;
+import com.cisdi.ext.model.*;
 import com.cisdi.ext.model.view.weekReport.PmConstructionDetailView;
 import com.cisdi.ext.model.view.weekReport.PmConstructionLogView;
 import com.cisdi.ext.model.view.weekReport.PmConstructionView;
@@ -15,7 +12,7 @@ import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
-import com.qygly.shared.util.SharedUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -28,6 +25,8 @@ import java.util.stream.Collectors;
  */
 public class PmConstructionExt {
 
+    public static final BigDecimal WAN = new BigDecimal(10000);
+
     /**
      * 工程建安费需求填报-当年单项目详情
      */
@@ -39,13 +38,13 @@ public class PmConstructionExt {
         PmConstructionView param = JsonUtil.fromJson(json,PmConstructionView.class);
         String projectId = param.getProjectId(); // 项目id
         String year = DateTimeUtil.getYear(new Date());
-        String yearId = BaseYear.selectByWhere(new Where().eq(BaseYear.Cols.CODE,year).eq(BaseYear.Cols.STATUS,"AP")).get(0).getId(); // 年份id
+        String baseYearId = BaseYear.selectByWhere(new Where().eq(BaseYear.Cols.CODE,year).eq(BaseYear.Cols.STATUS,"AP")).get(0).getId(); // 年份id
         Map<String,Object> resMap = new HashMap<>();
-        PmConstructionView pmConstructionView = queryPrjStatusById(projectId,yearId,myJdbcTemplate); // 获取项目相关信息
+        PmConstructionView pmConstructionView = queryPrjStatusById(projectId,baseYearId,myJdbcTemplate); // 获取项目相关信息
         PmConstructionDetailView nowMonth = getMonth(pmConstructionView.getDetailList()); // 本月需确认或调整金额
 
         resMap.put("project",pmConstructionView);
-        resMap.put("yearId",yearId);
+        resMap.put("baseYearId",baseYearId);
         resMap.put("monthN",nowMonth);
         Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resMap), Map.class);
         ExtJarHelper.returnValue.set(outputMap);
@@ -54,27 +53,30 @@ public class PmConstructionExt {
     /**
      * 根据项目id查询项目状态
      * @param projectId 项目id
-     * @param yearId 年份id
+     * @param baseYearId 年份id
      * @param myJdbcTemplate 数据源
      * @return
      */
-    public PmConstructionView queryPrjStatusById(String projectId, String yearId, MyJdbcTemplate myJdbcTemplate) {
+    public PmConstructionView queryPrjStatusById(String projectId, String baseYearId, MyJdbcTemplate myJdbcTemplate) {
         PmConstructionView pmConstructionView = new PmConstructionView();
 
-        String sql = "select a.pm_prj_id as projectId,ifnull(b.IZ_START_REQUIRE,1) as weatherStart,ifnull(b.IZ_END,0) as weatherComplete,ifnull(a.SYS_TRUE_ONE,0) as yearAmtNeed,a.id as pmConstructionId from pm_construction a left join pm_prj b on a.PM_PRJ_ID = b.id where a.base_year_id = ? and a.pm_prj_id = ?";
-        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,yearId,projectId);
+        String sql = "select a.pm_prj_id as projectId,ifnull(b.IZ_START_REQUIRE,1) as weatherStart,ifnull(b.IZ_END,0) as weatherComplete,ifnull(a.SYS_TRUE_ONE,0) as yearAmtNeed,a.id as pmConstructionId,a.AMT_FIVE as yearAmt from pm_construction a left join pm_prj b on a.PM_PRJ_ID = b.id where a.base_year_id = ? and a.pm_prj_id = ?";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,baseYearId,projectId);
         if (!CollectionUtils.isEmpty(list)){
             pmConstructionView.setWeatherStart(JdbcMapUtil.getInt(list.get(0),"weatherStart"));
             pmConstructionView.setWeatherComplete(JdbcMapUtil.getInt(list.get(0),"weatherComplete"));
             pmConstructionView.setProjectId(JdbcMapUtil.getString(list.get(0),"projectId"));
             pmConstructionView.setYearAmtNeed(JdbcMapUtil.getInt(list.get(0),"yearAmtNeed"));
             pmConstructionView.setPmConstructionId(JdbcMapUtil.getString(list.get(0),"pmConstructionId"));
+            String amt = JdbcMapUtil.getString(list.get(0),"yearAmt");
+            if (!StringUtils.hasText(amt)){
+                amt = "0";
+            }
+            pmConstructionView.setYearAmt(new BigDecimal(amt).divide(WAN));
 
-            List<PmConstructionDetailView> detail = getPrjMonthDetail(projectId,yearId,myJdbcTemplate); // 各月份明细信息
+            List<PmConstructionDetailView> detail = getPrjMonthDetail(projectId,baseYearId,myJdbcTemplate); // 各月份明细信息
             pmConstructionView.setDetailList(detail);
 
-            BigDecimal allAmt = detail.stream().map(PmConstructionDetailView::getFirstAmt).reduce(BigDecimal.ZERO,BigDecimal::add);// 本年需求总资金
-            pmConstructionView.setYearAmt(allAmt);
         }
         return pmConstructionView;
     }
@@ -85,8 +87,10 @@ public class PmConstructionExt {
      * @return 当月明细
      */
     private PmConstructionDetailView getMonth(List<PmConstructionDetailView> detail) {
+        PmConstructionDetailView pmConstructionDetailView = new PmConstructionDetailView();
         String month = DateTimeUtil.getMonth(new Date());
-        PmConstructionDetailView pmConstructionDetailView = detail.stream().filter(p->month.equals(p.getMonth())).collect(Collectors.toList()).get(0);
+        PmConstructionDetailView pmConstructionDetailViewOld = detail.stream().filter(p->month.equals(p.getMonth())).collect(Collectors.toList()).get(0);
+        BeanUtils.copyProperties(pmConstructionDetailViewOld,pmConstructionDetailView);
         pmConstructionDetailView.setCheckAmt(pmConstructionDetailView.getFirstAmt());
         String monthN = pmConstructionDetailView.getYear() + "年" +pmConstructionDetailView.getMonth() + "月";
         pmConstructionDetailView.setMonth(monthN);
@@ -96,23 +100,26 @@ public class PmConstructionExt {
     /**
      * 获取项目当年个月明细信息
      * @param projectId 项目id
-     * @param yearId 年份id
+     * @param baseYearId 年份id
      * @param myJdbcTemplate 数据源
      * @return 查询结果
      */
-    public List<PmConstructionDetailView> getPrjMonthDetail(String projectId, String yearId,MyJdbcTemplate myJdbcTemplate) {
+    public List<PmConstructionDetailView> getPrjMonthDetail(String projectId, String baseYearId,MyJdbcTemplate myJdbcTemplate) {
         List<PmConstructionDetailView> list = new ArrayList<>();
         String sql = "SELECT a.BASE_YEAR_ID as baseYearId,c.name as year,a.PM_PRJ_ID as projectId,b.NUMBER as month,b.AMT_FIVE as firstAmt,b.AMT_SIX as checkAmt,a.SYS_TRUE_ONE as yearAmtNeed,b.id as id,a.id as pmConstructionId FROM PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b ON a.id = b.pm_construction_id LEFT JOIN base_year c ON a.BASE_YEAR_ID = c.id WHERE a.pm_prj_id = ? and a.BASE_YEAR_ID = ? ORDER BY b.NUMBER asc";
-        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql,projectId,yearId);
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql,projectId,baseYearId);
         if (!CollectionUtils.isEmpty(list1)){
             for (Map<String, Object> map : list1) {
                 PmConstructionDetailView pmConstructionDetailView = new PmConstructionDetailView();
                 pmConstructionDetailView.setId(JdbcMapUtil.getString(map,"id"));
                 pmConstructionDetailView.setMonth(JdbcMapUtil.getString(map,"month"));
-                pmConstructionDetailView.setFirstAmt(new BigDecimal(JdbcMapUtil.getString(map,"firstAmt")));
+                BigDecimal amt = new BigDecimal(JdbcMapUtil.getString(map,"firstAmt")).divide(WAN);
+                pmConstructionDetailView.setFirstAmt(amt);
+                pmConstructionDetailView.setCheckAmt(amt);
                 pmConstructionDetailView.setYear(JdbcMapUtil.getString(map,"year"));
                 pmConstructionDetailView.setProjectId(JdbcMapUtil.getString(map,"projectId"));
                 pmConstructionDetailView.setPmConstructionId(JdbcMapUtil.getString(map,"pmConstructionId"));
+                pmConstructionDetailView.setBaseYearId(JdbcMapUtil.getString(map,"baseYearId"));
                 list.add(pmConstructionDetailView);
             }
         }
@@ -149,14 +156,29 @@ public class PmConstructionExt {
         if (!CollectionUtils.isEmpty(list)){
             String now = DateTimeUtil.dttmToString(new Date());
             String userId = ExtJarHelper.loginInfo.get().userId;
+            BigDecimal zero = new BigDecimal(0);
             for (PmConstructionDetailView tmp : list) {
-                Crud.from(PmConstructionDetail.ENT_CODE).where().eq("ID",tmp.getId()).update()
-                        .set("AMT_FIVE",tmp.getFirstAmt()).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                String id = tmp.getId();
+                BigDecimal checkAmt = tmp.getCheckAmt();
+                BigDecimal firstAmt = tmp.getFirstAmt();
+                Crud.from(PmConstructionDetail.ENT_CODE).where().eq("ID",id).update()
+                        .set("AMT_FIVE",firstAmt.multiply(WAN)).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
                         .set("TS",now)
                         .exec();
+                String month = tmp.getYear()+"年"+tmp.getMonth()+"月";
+                tmp.setMonth(month);
+                if (checkAmt == null){
+                    checkAmt = zero;
+                }
+                if (firstAmt.compareTo(checkAmt) != 0){
+                    insertLog(checkAmt,firstAmt,userId,tmp,now);
+                }
+
             }
+            BigDecimal allYearAmt = list.stream().map(PmConstructionDetailView::getFirstAmt).reduce(BigDecimal.ZERO,BigDecimal::add).multiply(WAN);
             Crud.from(PmConstruction.ENT_CODE).where().eq(PmConstruction.Cols.ID,param.getPmConstructionId()).update()
                     .set(PmConstruction.Cols.SYS_TRUE_ONE,1).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                    .set("AMT_FIVE",allYearAmt)
                     .exec();
         }
     }
@@ -172,21 +194,33 @@ public class PmConstructionExt {
         String now = DateTimeUtil.dttmToString(new Date());
         String userId = ExtJarHelper.loginInfo.get().userId;
         String id = param.getId();
-        BigDecimal firstAmt = PmConstructionDetail.selectById(id).getAmtFive();
-        BigDecimal updateAmt = param.getFirstAmt();
+        BigDecimal firstAmt = PmConstructionDetail.selectById(id).getAmtFive().divide(WAN);
+        BigDecimal updateAmt = param.getFirstAmt().multiply(WAN);
+        BigDecimal updateAmtWan = updateAmt.divide(WAN);
         Crud.from(PmConstructionDetail.ENT_CODE).where().eq("ID",id).update()
                 .set("AMT_FIVE",updateAmt).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
                 .set("TS",now)
                 .exec();
-
+        BigDecimal allYearAmt = getPrjYearAllAmt(id);
         Crud.from(PmConstruction.ENT_CODE).where().eq(PmConstruction.Cols.ID,param.getPmConstructionId()).update()
-                .set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                .set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId).set("AMT_FIVE",allYearAmt)
                 .exec();
         // 修改记录写入
         String month = param.getYear()+"年"+param.getMonth()+"月";
         param.setMonth(month);
-        insertLog(firstAmt,updateAmt,userId,param,now);
+        insertLog(firstAmt,updateAmtWan,userId,param,now);
 
+    }
+
+    /**
+     * 根据当月id查询该项目当年所有资金需求
+     * @param id 月份记录id
+     * @return 年度需求总资金
+     */
+    private BigDecimal getPrjYearAllAmt(String id) {
+        String parentId = PmConstructionDetail.selectById(id).getPmConstructionId();
+        List<PmConstructionDetail> list = PmConstructionDetail.selectByWhere(new Where().eq(PmConstructionDetail.Cols.PM_CONSTRUCTION_ID,parentId));
+        return list.stream().map(PmConstructionDetail::getAmtFive).reduce(BigDecimal.ZERO,BigDecimal::add);
     }
 
     /**
@@ -200,14 +234,40 @@ public class PmConstructionExt {
         String userId = ExtJarHelper.loginInfo.get().userId;
         BigDecimal firstAmt = param.getFirstAmt();
         BigDecimal checkAmt = param.getCheckAmt();
+        String now = DateTimeUtil.dttmToString(new Date());
+        String id = param.getId();
         if (checkAmt.compareTo(firstAmt) != 0){
-            String now = DateTimeUtil.dttmToString(new Date());
-            Crud.from(PmConstructionDetail.ENT_CODE).where().eq(PmConstructionDetail.Cols.ID,param.getId()).update()
-                    .set(PmConstructionDetail.Cols.AMT_FIVE,checkAmt)
-                    .set(PmConstructionDetail.Cols.AMT_SIX,checkAmt)
+            BigDecimal checkAmtNotWan = checkAmt.multiply(WAN);
+            Crud.from(PmConstructionDetail.ENT_CODE).where().eq(PmConstructionDetail.Cols.ID,id).update()
+                    .set(PmConstructionDetail.Cols.AMT_FIVE,checkAmtNotWan)
+                    .set(PmConstructionDetail.Cols.AMT_SIX,checkAmtNotWan)
                     .exec();
             // 修改记录写入
             insertLog(firstAmt,checkAmt,userId,param,now);
+            String parentId = PmConstructionDetail.selectById(id).getPmConstructionId();
+            BigDecimal allYearAmt = getPrjYearAllAmt(id);
+            Crud.from(PmConstruction.ENT_CODE).where().eq(PmConstruction.Cols.ID,parentId).update()
+                    .set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                    .set("AMT_FIVE",allYearAmt)
+                    .exec();
+        }
+        // 关闭工作台任务
+        packageWeekTask(id,now);
+    }
+
+    /**
+     * 关闭工作台任务
+     * @param id 关联的id，月份id
+     * @param now 当前时间
+     */
+    private void packageWeekTask(String id, String now) {
+        List<WeekTask> list = WeekTask.selectByWhere(new Where().eq(WeekTask.Cols.RELATION_DATA_ID,id).eq(WeekTask.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(list)){
+            if (list.get(0).getActualComplDate() == null){
+                Crud.from(WeekTask.ENT_CODE).where().eq(WeekTask.Cols.RELATION_DATA_ID,id).update()
+                        .set(WeekTask.Cols.ACTUAL_COMPL_DATE,now).set(WeekTask.Cols.WEEK_TASK_STATUS_ID,"1634118629769482240")
+                        .exec();
+            }
         }
     }
 
@@ -220,7 +280,7 @@ public class PmConstructionExt {
      * @param now 操作时间
      */
     public void insertLog(BigDecimal firstAmt, BigDecimal checkAmt, String userId, PmConstructionDetailView param, String now) {
-        StringBuilder sb = new StringBuilder(param.getMonth()).append(",金额由\" ").append(firstAmt).append("\"修改为\"").append(checkAmt).append("\"");
+        StringBuilder sb = new StringBuilder(param.getMonth()).append(",金额由'").append(firstAmt).append("'修改为'").append(checkAmt).append("'");
         String id = Crud.from(PmConstructionLog.ENT_CODE).insertData();
         Crud.from(PmConstructionLog.ENT_CODE).where().eq(PmConstructionLog.Cols.ID,id).update()
                 .set(PmConstructionLog.Cols.VER,1).set("TS",now).set("CRT_DT",now).set("CRT_USER_ID",userId)
@@ -291,7 +351,7 @@ public class PmConstructionExt {
             StringBuilder sb = new StringBuilder("select a.pm_prj_id as projectId,a.name as projectName,a.IZ_START_REQUIRE as weatherStart,")
                     .append("a.IZ_END as weatherComplete,");
             for (int i = 1; i <= 12; i++) {
-                sb.append("group_concat(case when a.NUMBER = ").append(i).append(" then AMT_FIVE else '' end SEPARATOR '') as '").append(i).append("月',");
+                sb.append("group_concat(case when a.NUMBER = ").append(i).append(" then AMT_FIVE/10000 else '' end SEPARATOR '') as '").append(i).append("月',");
             }
             sb.deleteCharAt(sb.length()-1);
             sb.append(" FROM (select a.pm_prj_id,c.name,c.IZ_START_REQUIRE,c.IZ_END,b.NUMBER,b.AMT_FIVE FROM PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID LEFT JOIN pm_prj c on a.pm_prj_id = c.id WHERE a.BASE_YEAR_ID = '").append(baseYearId).append("' and a.PM_PRJ_ID in ('").append(prjIds).append("') ) a LEFT JOIN (select a.pm_prj_id,any_value(b.LAST_MODI_DT) as date from PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID where a.BASE_YEAR_ID = '").append(baseYearId).append("' and a.PM_PRJ_ID in ('").append(prjIds).append("') GROUP BY a.PM_PRJ_ID order by date desc  ) b on a.pm_prj_id = b.pm_prj_id GROUP BY a.pm_prj_id ORDER BY a.IZ_END asc,a.IZ_START_REQUIRE desc,any_value(b.date) desc");

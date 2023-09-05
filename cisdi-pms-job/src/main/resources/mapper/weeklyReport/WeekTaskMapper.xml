@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.weeklyReport.WeekTaskMapper">
+    <resultMap id="WeekTaskResult" type="com.cisdi.pms.job.domain.weeklyReport.WeekTask">
+        <id property="id" column="id" />
+        <result property="adUserId" column="adUserId" />
+        <result property="content" column="content" />
+        <result property="title" column="title" />
+        <result property="publishStart" column="publishStart" />
+        <result property="weekTaskStatus" column="weekTaskStatus" />
+        <result property="relationDataId" column="relationDataId" />
+        <result property="weekTaskTypeId" column="weekTaskTypeId" />
+        <result property="canDispatch" column="canDispatch" />
+        <result property="transferUserId" column="transferUserId" />
+        <result property="transferDate" column="transferDate" />
+        <result property="projectId" column="projectId" />
+        <result property="reasonExplain" column="reasonExplain" />
+        <result property="planCompeteDate" column="planCompeteDate" />
+        <result property="actualCompeteDate" column="actualCompeteDate" />
+        <result property="ver" column="ver" />
+        <result property="ts" column="ts" />
+        <result property="createBy" column="createBy" />
+        <result property="createDate" column="createDate" />
+        <result property="lastUpdateBy" column="lastUpdateBy" />
+        <result property="lastUpdateDate" column="lastUpdateDate" />
+        <result property="status" column="status" />
+        <result property="code" column="code" />
+    </resultMap>
+
+    <!--新增-->
+    <insert id="insert">
+        insert into week_task (
+            id,
+            VER,
+            TS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            STATUS,
+            AD_USER_ID,
+            CONTENT,
+            TITLE,
+            PUBLISH_START,
+            WEEK_TASK_STATUS_ID,
+            RELATION_DATA_ID,
+            WEEK_TASK_TYPE_ID,
+            CAN_DISPATCH,
+            TRANSFER_USER,
+            TRANSFER_TIME,
+            PM_PRJ_ID,
+            REASON_EXPLAIN,
+            PLAN_COMPL_DATE,
+            ACTUAL_COMPL_DATE
+        ) values (
+            #{id},
+            #{ver},
+            #{ts},
+            #{createDate},
+            #{createBy},
+            #{lastUpdateDate},
+            #{lastUpdateBy},
+            #{status},
+            #{adUserId},
+            #{content},
+            #{title},
+            #{publishStart},
+            #{weekTaskStatus},
+            #{relationDataId},
+            #{weekTaskTypeId},
+            #{canDispatch},
+            #{transferUserId},
+            #{transferDate},
+            #{projectId},
+            #{reasonExplain},
+            #{planCompeteDate},
+            #{actualCompeteDate}
+        )
+    </insert>
+</mapper>

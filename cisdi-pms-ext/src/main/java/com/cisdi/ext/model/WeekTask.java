@@ -7,21 +7,21 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 工程建安需求填报。
+ * 本周工作任务。
  */
-public class PmConstruction {
+public class WeekTask {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<PmConstruction> modelHelper = new ModelHelper<>("PM_CONSTRUCTION", new PmConstruction());
+    private static final ModelHelper<WeekTask> modelHelper = new ModelHelper<>("WEEK_TASK", new WeekTask());
 
     /**
      * 待更新的列。
@@ -38,7 +38,7 @@ public class PmConstruction {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "PM_CONSTRUCTION";
+    public static final String ENT_CODE = "WEEK_TASK";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -100,21 +100,61 @@ public class PmConstruction {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 年份表。
+         * 用户。
          */
-        public static final String BASE_YEAR_ID = "BASE_YEAR_ID";
+        public static final String AD_USER_ID = "AD_USER_ID";
+        /**
+         * 标题。
+         */
+        public static final String TITLE = "TITLE";
+        /**
+         * 周任务类型。
+         */
+        public static final String WEEK_TASK_TYPE_ID = "WEEK_TASK_TYPE_ID";
+        /**
+         * 转办时间。
+         */
+        public static final String TRANSFER_TIME = "TRANSFER_TIME";
+        /**
+         * 发布开始时间。
+         */
+        public static final String PUBLISH_START = "PUBLISH_START";
+        /**
+         * 周任务状态。
+         */
+        public static final String WEEK_TASK_STATUS_ID = "WEEK_TASK_STATUS_ID";
+        /**
+         * 预计完成日期。
+         */
+        public static final String PLAN_COMPL_DATE = "PLAN_COMPL_DATE";
+        /**
+         * 关联ID。
+         */
+        public static final String RELATION_DATA_ID = "RELATION_DATA_ID";
         /**
          * 项目。
          */
         public static final String PM_PRJ_ID = "PM_PRJ_ID";
         /**
-         * 金额5(存元)。
+         * 内容。
          */
-        public static final String AMT_FIVE = "AMT_FIVE";
+        public static final String CONTENT = "CONTENT";
         /**
-         * 系统是否1。
+         * 转办人。
          */
-        public static final String SYS_TRUE_ONE = "SYS_TRUE_ONE";
+        public static final String TRANSFER_USER = "TRANSFER_USER";
+        /**
+         * 能否转办。
+         */
+        public static final String CAN_DISPATCH = "CAN_DISPATCH";
+        /**
+         * 实际完成日期。
+         */
+        public static final String ACTUAL_COMPL_DATE = "ACTUAL_COMPL_DATE";
+        /**
+         * 原因说明。
+         */
+        public static final String REASON_EXPLAIN = "REASON_EXPLAIN";
     }
 
     // </editor-fold>
@@ -137,7 +177,7 @@ public class PmConstruction {
     /**
      * 设置：ID。
      */
-    public PmConstruction setId(String id) {
+    public WeekTask setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -173,7 +213,7 @@ public class PmConstruction {
     /**
      * 设置：版本。
      */
-    public PmConstruction setVer(Integer ver) {
+    public WeekTask setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -209,7 +249,7 @@ public class PmConstruction {
     /**
      * 设置：时间戳。
      */
-    public PmConstruction setTs(LocalDateTime ts) {
+    public WeekTask setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -245,7 +285,7 @@ public class PmConstruction {
     /**
      * 设置：是否预设。
      */
-    public PmConstruction setIsPreset(Boolean isPreset) {
+    public WeekTask setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -281,7 +321,7 @@ public class PmConstruction {
     /**
      * 设置：创建日期时间。
      */
-    public PmConstruction setCrtDt(LocalDateTime crtDt) {
+    public WeekTask setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -317,7 +357,7 @@ public class PmConstruction {
     /**
      * 设置：创建用户。
      */
-    public PmConstruction setCrtUserId(String crtUserId) {
+    public WeekTask setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -353,7 +393,7 @@ public class PmConstruction {
     /**
      * 设置：最后修改日期时间。
      */
-    public PmConstruction setLastModiDt(LocalDateTime lastModiDt) {
+    public WeekTask setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -389,7 +429,7 @@ public class PmConstruction {
     /**
      * 设置：最后修改用户。
      */
-    public PmConstruction setLastModiUserId(String lastModiUserId) {
+    public WeekTask setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -425,7 +465,7 @@ public class PmConstruction {
     /**
      * 设置：记录状态。
      */
-    public PmConstruction setStatus(String status) {
+    public WeekTask setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -461,7 +501,7 @@ public class PmConstruction {
     /**
      * 设置：锁定流程实例。
      */
-    public PmConstruction setLkWfInstId(String lkWfInstId) {
+    public WeekTask setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -497,7 +537,7 @@ public class PmConstruction {
     /**
      * 设置：代码。
      */
-    public PmConstruction setCode(String code) {
+    public WeekTask setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -533,7 +573,7 @@ public class PmConstruction {
     /**
      * 设置：名称。
      */
-    public PmConstruction setName(String name) {
+    public WeekTask setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -569,7 +609,7 @@ public class PmConstruction {
     /**
      * 设置：备注。
      */
-    public PmConstruction setRemark(String remark) {
+    public WeekTask setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -591,36 +631,288 @@ public class PmConstruction {
     }
 
     /**
-     * 年份表。
+     * 用户。
      */
-    private String baseYearId;
+    private String adUserId;
 
     /**
-     * 获取：年份表。
+     * 获取：用户。
      */
-    public String getBaseYearId() {
-        return this.baseYearId;
+    public String getAdUserId() {
+        return this.adUserId;
     }
 
     /**
-     * 设置：年份表。
+     * 设置：用户。
      */
-    public PmConstruction setBaseYearId(String baseYearId) {
-        if (this.baseYearId == null && baseYearId == null) {
+    public WeekTask setAdUserId(String adUserId) {
+        if (this.adUserId == null && adUserId == null) {
             // 均为null，不做处理。
-        } else if (this.baseYearId != null && baseYearId != null) {
+        } else if (this.adUserId != null && adUserId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.baseYearId.compareTo(baseYearId) != 0) {
-                this.baseYearId = baseYearId;
-                if (!this.toUpdateCols.contains("BASE_YEAR_ID")) {
-                    this.toUpdateCols.add("BASE_YEAR_ID");
+            if (this.adUserId.compareTo(adUserId) != 0) {
+                this.adUserId = adUserId;
+                if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                    this.toUpdateCols.add("AD_USER_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.baseYearId = baseYearId;
-            if (!this.toUpdateCols.contains("BASE_YEAR_ID")) {
-                this.toUpdateCols.add("BASE_YEAR_ID");
+            this.adUserId = adUserId;
+            if (!this.toUpdateCols.contains("AD_USER_ID")) {
+                this.toUpdateCols.add("AD_USER_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 标题。
+     */
+    private String title;
+
+    /**
+     * 获取：标题。
+     */
+    public String getTitle() {
+        return this.title;
+    }
+
+    /**
+     * 设置：标题。
+     */
+    public WeekTask setTitle(String title) {
+        if (this.title == null && title == null) {
+            // 均为null，不做处理。
+        } else if (this.title != null && title != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.title.compareTo(title) != 0) {
+                this.title = title;
+                if (!this.toUpdateCols.contains("TITLE")) {
+                    this.toUpdateCols.add("TITLE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.title = title;
+            if (!this.toUpdateCols.contains("TITLE")) {
+                this.toUpdateCols.add("TITLE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 周任务类型。
+     */
+    private String weekTaskTypeId;
+
+    /**
+     * 获取：周任务类型。
+     */
+    public String getWeekTaskTypeId() {
+        return this.weekTaskTypeId;
+    }
+
+    /**
+     * 设置：周任务类型。
+     */
+    public WeekTask setWeekTaskTypeId(String weekTaskTypeId) {
+        if (this.weekTaskTypeId == null && weekTaskTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.weekTaskTypeId != null && weekTaskTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.weekTaskTypeId.compareTo(weekTaskTypeId) != 0) {
+                this.weekTaskTypeId = weekTaskTypeId;
+                if (!this.toUpdateCols.contains("WEEK_TASK_TYPE_ID")) {
+                    this.toUpdateCols.add("WEEK_TASK_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.weekTaskTypeId = weekTaskTypeId;
+            if (!this.toUpdateCols.contains("WEEK_TASK_TYPE_ID")) {
+                this.toUpdateCols.add("WEEK_TASK_TYPE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 转办时间。
+     */
+    private LocalDateTime transferTime;
+
+    /**
+     * 获取：转办时间。
+     */
+    public LocalDateTime getTransferTime() {
+        return this.transferTime;
+    }
+
+    /**
+     * 设置：转办时间。
+     */
+    public WeekTask setTransferTime(LocalDateTime transferTime) {
+        if (this.transferTime == null && transferTime == null) {
+            // 均为null，不做处理。
+        } else if (this.transferTime != null && transferTime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.transferTime.compareTo(transferTime) != 0) {
+                this.transferTime = transferTime;
+                if (!this.toUpdateCols.contains("TRANSFER_TIME")) {
+                    this.toUpdateCols.add("TRANSFER_TIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.transferTime = transferTime;
+            if (!this.toUpdateCols.contains("TRANSFER_TIME")) {
+                this.toUpdateCols.add("TRANSFER_TIME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 发布开始时间。
+     */
+    private LocalDateTime publishStart;
+
+    /**
+     * 获取：发布开始时间。
+     */
+    public LocalDateTime getPublishStart() {
+        return this.publishStart;
+    }
+
+    /**
+     * 设置：发布开始时间。
+     */
+    public WeekTask setPublishStart(LocalDateTime publishStart) {
+        if (this.publishStart == null && publishStart == null) {
+            // 均为null，不做处理。
+        } else if (this.publishStart != null && publishStart != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.publishStart.compareTo(publishStart) != 0) {
+                this.publishStart = publishStart;
+                if (!this.toUpdateCols.contains("PUBLISH_START")) {
+                    this.toUpdateCols.add("PUBLISH_START");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.publishStart = publishStart;
+            if (!this.toUpdateCols.contains("PUBLISH_START")) {
+                this.toUpdateCols.add("PUBLISH_START");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 周任务状态。
+     */
+    private String weekTaskStatusId;
+
+    /**
+     * 获取：周任务状态。
+     */
+    public String getWeekTaskStatusId() {
+        return this.weekTaskStatusId;
+    }
+
+    /**
+     * 设置：周任务状态。
+     */
+    public WeekTask setWeekTaskStatusId(String weekTaskStatusId) {
+        if (this.weekTaskStatusId == null && weekTaskStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.weekTaskStatusId != null && weekTaskStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.weekTaskStatusId.compareTo(weekTaskStatusId) != 0) {
+                this.weekTaskStatusId = weekTaskStatusId;
+                if (!this.toUpdateCols.contains("WEEK_TASK_STATUS_ID")) {
+                    this.toUpdateCols.add("WEEK_TASK_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.weekTaskStatusId = weekTaskStatusId;
+            if (!this.toUpdateCols.contains("WEEK_TASK_STATUS_ID")) {
+                this.toUpdateCols.add("WEEK_TASK_STATUS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 预计完成日期。
+     */
+    private LocalDate planComplDate;
+
+    /**
+     * 获取：预计完成日期。
+     */
+    public LocalDate getPlanComplDate() {
+        return this.planComplDate;
+    }
+
+    /**
+     * 设置：预计完成日期。
+     */
+    public WeekTask setPlanComplDate(LocalDate planComplDate) {
+        if (this.planComplDate == null && planComplDate == null) {
+            // 均为null，不做处理。
+        } else if (this.planComplDate != null && planComplDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planComplDate.compareTo(planComplDate) != 0) {
+                this.planComplDate = planComplDate;
+                if (!this.toUpdateCols.contains("PLAN_COMPL_DATE")) {
+                    this.toUpdateCols.add("PLAN_COMPL_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planComplDate = planComplDate;
+            if (!this.toUpdateCols.contains("PLAN_COMPL_DATE")) {
+                this.toUpdateCols.add("PLAN_COMPL_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 关联ID。
+     */
+    private String relationDataId;
+
+    /**
+     * 获取：关联ID。
+     */
+    public String getRelationDataId() {
+        return this.relationDataId;
+    }
+
+    /**
+     * 设置：关联ID。
+     */
+    public WeekTask setRelationDataId(String relationDataId) {
+        if (this.relationDataId == null && relationDataId == null) {
+            // 均为null，不做处理。
+        } else if (this.relationDataId != null && relationDataId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.relationDataId.compareTo(relationDataId) != 0) {
+                this.relationDataId = relationDataId;
+                if (!this.toUpdateCols.contains("RELATION_DATA_ID")) {
+                    this.toUpdateCols.add("RELATION_DATA_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.relationDataId = relationDataId;
+            if (!this.toUpdateCols.contains("RELATION_DATA_ID")) {
+                this.toUpdateCols.add("RELATION_DATA_ID");
             }
         }
         return this;
@@ -641,7 +933,7 @@ public class PmConstruction {
     /**
      * 设置：项目。
      */
-    public PmConstruction setPmPrjId(String pmPrjId) {
+    public WeekTask setPmPrjId(String pmPrjId) {
         if (this.pmPrjId == null && pmPrjId == null) {
             // 均为null，不做处理。
         } else if (this.pmPrjId != null && pmPrjId != null) {
@@ -663,72 +955,180 @@ public class PmConstruction {
     }
 
     /**
-     * 金额5(存元)。
+     * 内容。
      */
-    private BigDecimal amtFive;
+    private String content;
 
     /**
-     * 获取：金额5(存元)。
+     * 获取：内容。
      */
-    public BigDecimal getAmtFive() {
-        return this.amtFive;
+    public String getContent() {
+        return this.content;
     }
 
     /**
-     * 设置：金额5(存元)。
+     * 设置：内容。
      */
-    public PmConstruction setAmtFive(BigDecimal amtFive) {
-        if (this.amtFive == null && amtFive == null) {
+    public WeekTask setContent(String content) {
+        if (this.content == null && content == null) {
             // 均为null，不做处理。
-        } else if (this.amtFive != null && amtFive != null) {
+        } else if (this.content != null && content != null) {
             // 均非null，判定不等，再做处理：
-            if (this.amtFive.compareTo(amtFive) != 0) {
-                this.amtFive = amtFive;
-                if (!this.toUpdateCols.contains("AMT_FIVE")) {
-                    this.toUpdateCols.add("AMT_FIVE");
+            if (this.content.compareTo(content) != 0) {
+                this.content = content;
+                if (!this.toUpdateCols.contains("CONTENT")) {
+                    this.toUpdateCols.add("CONTENT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.amtFive = amtFive;
-            if (!this.toUpdateCols.contains("AMT_FIVE")) {
-                this.toUpdateCols.add("AMT_FIVE");
+            this.content = content;
+            if (!this.toUpdateCols.contains("CONTENT")) {
+                this.toUpdateCols.add("CONTENT");
             }
         }
         return this;
     }
 
     /**
-     * 系统是否1。
+     * 转办人。
      */
-    private Boolean sysTrueOne;
+    private String transferUser;
 
     /**
-     * 获取：系统是否1。
+     * 获取：转办人。
      */
-    public Boolean getSysTrueOne() {
-        return this.sysTrueOne;
+    public String getTransferUser() {
+        return this.transferUser;
     }
 
     /**
-     * 设置：系统是否1。
+     * 设置：转办人。
      */
-    public PmConstruction setSysTrueOne(Boolean sysTrueOne) {
-        if (this.sysTrueOne == null && sysTrueOne == null) {
+    public WeekTask setTransferUser(String transferUser) {
+        if (this.transferUser == null && transferUser == null) {
             // 均为null，不做处理。
-        } else if (this.sysTrueOne != null && sysTrueOne != null) {
+        } else if (this.transferUser != null && transferUser != null) {
             // 均非null，判定不等，再做处理：
-            if (this.sysTrueOne.compareTo(sysTrueOne) != 0) {
-                this.sysTrueOne = sysTrueOne;
-                if (!this.toUpdateCols.contains("SYS_TRUE_ONE")) {
-                    this.toUpdateCols.add("SYS_TRUE_ONE");
+            if (this.transferUser.compareTo(transferUser) != 0) {
+                this.transferUser = transferUser;
+                if (!this.toUpdateCols.contains("TRANSFER_USER")) {
+                    this.toUpdateCols.add("TRANSFER_USER");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.sysTrueOne = sysTrueOne;
-            if (!this.toUpdateCols.contains("SYS_TRUE_ONE")) {
-                this.toUpdateCols.add("SYS_TRUE_ONE");
+            this.transferUser = transferUser;
+            if (!this.toUpdateCols.contains("TRANSFER_USER")) {
+                this.toUpdateCols.add("TRANSFER_USER");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 能否转办。
+     */
+    private Boolean canDispatch;
+
+    /**
+     * 获取：能否转办。
+     */
+    public Boolean getCanDispatch() {
+        return this.canDispatch;
+    }
+
+    /**
+     * 设置：能否转办。
+     */
+    public WeekTask setCanDispatch(Boolean canDispatch) {
+        if (this.canDispatch == null && canDispatch == null) {
+            // 均为null，不做处理。
+        } else if (this.canDispatch != null && canDispatch != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.canDispatch.compareTo(canDispatch) != 0) {
+                this.canDispatch = canDispatch;
+                if (!this.toUpdateCols.contains("CAN_DISPATCH")) {
+                    this.toUpdateCols.add("CAN_DISPATCH");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.canDispatch = canDispatch;
+            if (!this.toUpdateCols.contains("CAN_DISPATCH")) {
+                this.toUpdateCols.add("CAN_DISPATCH");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 实际完成日期。
+     */
+    private LocalDate actualComplDate;
+
+    /**
+     * 获取：实际完成日期。
+     */
+    public LocalDate getActualComplDate() {
+        return this.actualComplDate;
+    }
+
+    /**
+     * 设置：实际完成日期。
+     */
+    public WeekTask setActualComplDate(LocalDate actualComplDate) {
+        if (this.actualComplDate == null && actualComplDate == null) {
+            // 均为null，不做处理。
+        } else if (this.actualComplDate != null && actualComplDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actualComplDate.compareTo(actualComplDate) != 0) {
+                this.actualComplDate = actualComplDate;
+                if (!this.toUpdateCols.contains("ACTUAL_COMPL_DATE")) {
+                    this.toUpdateCols.add("ACTUAL_COMPL_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actualComplDate = actualComplDate;
+            if (!this.toUpdateCols.contains("ACTUAL_COMPL_DATE")) {
+                this.toUpdateCols.add("ACTUAL_COMPL_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 原因说明。
+     */
+    private String reasonExplain;
+
+    /**
+     * 获取：原因说明。
+     */
+    public String getReasonExplain() {
+        return this.reasonExplain;
+    }
+
+    /**
+     * 设置：原因说明。
+     */
+    public WeekTask setReasonExplain(String reasonExplain) {
+        if (this.reasonExplain == null && reasonExplain == null) {
+            // 均为null，不做处理。
+        } else if (this.reasonExplain != null && reasonExplain != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.reasonExplain.compareTo(reasonExplain) != 0) {
+                this.reasonExplain = reasonExplain;
+                if (!this.toUpdateCols.contains("REASON_EXPLAIN")) {
+                    this.toUpdateCols.add("REASON_EXPLAIN");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.reasonExplain = reasonExplain;
+            if (!this.toUpdateCols.contains("REASON_EXPLAIN")) {
+                this.toUpdateCols.add("REASON_EXPLAIN");
             }
         }
         return this;
@@ -821,8 +1221,8 @@ public class PmConstruction {
      *
      * @return
      */
-    public static PmConstruction newData() {
-        PmConstruction obj = modelHelper.newData();
+    public static WeekTask newData() {
+        WeekTask obj = modelHelper.newData();
         return obj;
     }
 
@@ -831,8 +1231,8 @@ public class PmConstruction {
      *
      * @return
      */
-    public static PmConstruction insertData() {
-        PmConstruction obj = modelHelper.insertData();
+    public static WeekTask insertData() {
+        WeekTask obj = modelHelper.insertData();
         return obj;
     }
 
@@ -844,8 +1244,8 @@ public class PmConstruction {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static PmConstruction selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        PmConstruction obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static WeekTask selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        WeekTask obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -855,7 +1255,7 @@ public class PmConstruction {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static PmConstruction selectById(String id) {
+    public static WeekTask selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -867,8 +1267,8 @@ public class PmConstruction {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<PmConstruction> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<PmConstruction> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<WeekTask> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<WeekTask> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -878,7 +1278,7 @@ public class PmConstruction {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<PmConstruction> selectByIds(List<String> ids) {
+    public static List<WeekTask> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -890,8 +1290,8 @@ public class PmConstruction {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<PmConstruction> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<PmConstruction> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<WeekTask> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<WeekTask> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -901,7 +1301,7 @@ public class PmConstruction {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<PmConstruction> selectByWhere(Where where) {
+    public static List<WeekTask> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -913,10 +1313,10 @@ public class PmConstruction {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static PmConstruction selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<PmConstruction> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static WeekTask selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<WeekTask> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用PmConstruction.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用WeekTask.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmptyList(objList) ? null : objList.get(0);
@@ -928,7 +1328,7 @@ public class PmConstruction {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static PmConstruction selectOneByWhere(Where where) {
+    public static WeekTask selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1042,7 +1442,7 @@ public class PmConstruction {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(PmConstruction fromModel, PmConstruction toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(WeekTask fromModel, WeekTask toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1052,7 +1452,7 @@ public class PmConstruction {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(PmConstruction fromModel, PmConstruction toModel) {
+    public static void copyCols(WeekTask fromModel, WeekTask toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 
