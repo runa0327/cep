@@ -65,7 +65,8 @@ public class FileApi {
      */
     public static List<BaseFileView> getFileList(String str) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql = "select a.ext as fileType,a.id,a.DSP_NAME,a.SIZE_KB,a.PHYSICAL_LOCATION,a.UPLOAD_DTTM,a.CRT_USER_ID,b.NAME AS userName,A.DSP_SIZE AS DSP_SIZE " +
+        String sql = "select a.ext as fileType,a.id,a.DSP_NAME,a.SIZE_KB,a.PHYSICAL_LOCATION,a.UPLOAD_DTTM,a.CRT_USER_ID,b.NAME AS userName,A.DSP_SIZE AS DSP_SIZE," +
+                "FILE_INLINE_URL as viewUrl,FILE_ATTACHMENT_URL as downloadUrl " +
                 "from fl_file a left join ad_user b on a.CRT_USER_ID = b.id where a.id in ('" + str + "')";
         List<Map<String, Object>> fileList = myJdbcTemplate.queryForList(sql);
         List<BaseFileView> baseFile = new ArrayList<>();
@@ -81,6 +82,8 @@ public class FileApi {
                 baseFileView.uploadById = JdbcMapUtil.getString(q, "CRT_USER_ID");// 上传人id
                 baseFileView.uploadByName = JdbcMapUtil.getString(q, "userName");
                 baseFileView.fileType = JdbcMapUtil.getString(q, "fileType"); //文件类型
+                baseFileView.setViewUrl(JdbcMapUtil.getString(q,"viewUrl")); // 预览地址
+                baseFileView.setDownloadUrl(JdbcMapUtil.getString(q,"downloadUrl")); // 下载地址
                 return baseFileView;
             }).collect(Collectors.toList());
         }
