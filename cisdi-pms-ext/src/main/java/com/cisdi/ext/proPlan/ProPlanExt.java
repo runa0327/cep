@@ -146,7 +146,7 @@ public class ProPlanExt {
                 "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE," +
                 "pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO,'0' as seq_bak \n" +
                 "from PM_PRO_PLAN_NODE_HOME ph left join PM_PRO_PLAN_NODE pppn on ph.`NAME` = pppn.`NAME` " +
-                "left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where pppn.OPREATION_TYPE is null and ppp.PM_PRJ_ID=? " +
+                "left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where pppn.OPREATION_TYPE is null and ppp.PM_PRJ_ID=? and pppn.level=3 " +
                 "order by ph.SEQ_NO", pmPrjId);
 
         // 结果转换
@@ -165,6 +165,7 @@ public class ProPlanExt {
 
             if ("已完成".equals(status)) {
                 nameOrg = "实际完成";
+                statusOrg = "已完成";
                 if (Objects.nonNull(item.actualComplDate)) {
                     dateOrg = item.actualComplDate;
                 }
@@ -174,10 +175,10 @@ public class ProPlanExt {
                     int days = DateTimeUtil.daysBetween(plan, actual);
                     if (plan.before(actual)) {
                         tips = "超期" + Math.abs(days) + "天";
-                        statusOrg = "超期完成";
+//                        statusOrg = "超期完成";
                     } else {
                         tips = "提前" + days + "完成！";
-                        statusOrg = "已完成";
+//                        statusOrg = "已完成";
                     }
                 } else {
                     statusOrg = "已完成";
@@ -188,15 +189,20 @@ public class ProPlanExt {
                 statusOrg = "未涉及";
                 reason = getNoInvolveReason(item.id);
             } else {
-                if ("0".equals(item.izOverdue)) {
-                    if ("进行中".equals(status)) {
-                        statusOrg = "进行中";
-                    } else if ("未启动".equals(status)) {
-                        statusOrg = "未启动";
-                    }
-                } else {
-                    statusOrg = "超期未完成";
+                if ("进行中".equals(status)) {
+                    statusOrg = "进行中";
+                } else if ("未启动".equals(status)) {
+                    statusOrg = "未启动";
                 }
+//                if ("0".equals(item.izOverdue)) {
+//                    if ("进行中".equals(status)) {
+//                        statusOrg = "进行中";
+//                    } else if ("未启动".equals(status)) {
+//                        statusOrg = "未启动";
+//                    }
+//                } else {
+//                    statusOrg = "超期未完成";
+//                }
                 if (Objects.nonNull(item.planComplDate)) {
                     Date planCompDate = DateTimeUtil.stringToDate(item.planComplDate);
                     if (planCompDate.before(new Date())) {
