@@ -52,6 +52,23 @@ public class PmPrjExt {
     }
 
     /**
+     * 根据项目id返回项目名称
+     * @param projectIds 项目id
+     * @param myJdbcTemplate 数据源
+     * @return 项目名称
+     */
+    public static String queryProjectNameByIds(String projectIds, MyJdbcTemplate myJdbcTemplate) {
+        projectIds = projectIds.replace(",","','");
+        String sql = "select group_concat(name) as name from pm_prj where id in ('"+projectIds+"')";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        if (!CollectionUtils.isEmpty(list)){
+            return JdbcMapUtil.getString(list.get(0),"name");
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * 通过流程信息获取项目id
      * @param valueMap 流程主体信息
      * @return 项目id

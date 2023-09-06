@@ -1,5 +1,6 @@
 package com.cisdi.ext.weeklyReport;
 
+import cn.hutool.core.util.IdUtil;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.file.BaseFileExt;
 import com.cisdi.ext.model.*;
@@ -9,6 +10,7 @@ import com.cisdi.ext.model.view.weekReport.PmProgressWeeklyPrjProblemDetailView;
 import com.cisdi.ext.model.view.weekReport.PmProgressWeeklyView;
 import com.cisdi.ext.model.view.weekReport.SortBean;
 import com.cisdi.ext.model.view.weekReport.WeekMessage;
+import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
@@ -240,6 +242,34 @@ public class ProgressWeekReport {
         // 保存修改项目问题
         List<PmProgressWeeklyPrjProblemDetailView> proList = param.getProblemDetailList();
         updateProDetail(projectId,weekPrjId,proList,weekId);
+
+        // 发起流程
+//        startProcess(param,now);
+    }
+
+    // 流程发起
+    private void startProcess(WeekMessage param, String now) {
+        List<PmProgressWeeklyPrjProblemDetailView> list = param.getProblemDetailList();
+        if (!CollectionUtils.isEmpty(list)){
+            String projectId = param.getProjectId();
+            for (PmProgressWeeklyPrjProblemDetailView tmp : list) {
+                String wfProcessInstanceId = Crud.from("WF_PROCESS_INSTANCE").insertData();
+                String pmPrjProblemId = Crud.from("PM_PROJECT_PROBLEM_REQ").insertData();
+                String wfNodeInstanceId2 = Crud.from("WF_NODE_INSTANCE").insertData();
+                String userId = ExtJarHelper.loginInfo.get().userId;
+                String handleUser = tmp.getHandleUserIds();
+                if (!StringUtils.hasText(handleUser)){
+                    handleUser = "0099250247095871681";
+                }
+                ProcessCommon.autoStartProcess(wfProcessInstanceId,pmPrjProblemId,wfNodeInstanceId2,"1679779416055611392",now,userId,handleUser,param.getProjectId());
+                Crud.from("PM_PROJECT_PROBLEM_REQ").where().eq("ID",pmPrjProblemId).update()
+                        .set("LK_WF_INST_ID",wfProcessInstanceId)
+                        .set("VER","1").set("TS",now).set("STATUS","AP").set("CRT_DT",now).set("CRT_USER_ID",userId).set("LAST_MODI_DT",now).set("LAST_MODI_USER_ID",userId)
+                        .set("PM_PRJ_ID",projectId).set("PRJ_PUSH_PROBLEM_TYPE_ID",tmp.getPrjPushProblemTypeId())
+                        .set("TEXT_REMARK_ONE",tmp.getProblemDescribe()).set("TO_USER_IDS",handleUser)
+                        .exec();
+            }
+        }
     }
 
     /**
