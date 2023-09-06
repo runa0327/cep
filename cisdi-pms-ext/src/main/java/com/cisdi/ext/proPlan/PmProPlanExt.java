@@ -87,6 +87,12 @@ public class PmProPlanExt {
         }
     }
 
+    /**
+     * 0-默认状态
+     * 1-资料清单刷新
+     * 2-手动在企业云上传历史文件
+     * 3-流程刷新
+     */
     public void proPlanView() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
@@ -131,14 +137,37 @@ public class PmProPlanExt {
             }).collect(Collectors.toList());
 
             String updateType = JdbcMapUtil.getString(node, "UPDATE_TYPE");
+            List<FileListObj> fileListObjList = new ArrayList<>();
+            FileListObj fileListObj = new FileListObj();
             if ("1".equals(updateType)) {
-                //手动触发更新
+                //1-资料清单刷新
+                List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRO_PLAN_NODE_FILE where PM_PRO_PLAN_NODE_ID=?", nodeId);
+                List<String> fileIds = list.stream().map(m -> JdbcMapUtil.getString(m, "FL_FILE_ID")).collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(fileIds)) {
+                    fileListObj.title = JdbcMapUtil.getString(node, "nodeName") + "相关文件";
+                    Map<String, Object> queryFileParams = new HashMap<>();// 创建入参map
+                    queryFileParams.put("ids", fileIds);
+                    List<Map<String, Object>> fileList = myNamedParameterJdbcTemplate.queryForList("select ff.ID as ID, DSP_NAME,SIZE_KB,UPLOAD_DTTM,au.`NAME` as USER_NAME,FILE_INLINE_URL,FILE_ATTACHMENT_URL from fl_file ff left join ad_user au on ff.CRT_USER_ID = au.id  where ff.id in (:ids)", queryFileParams);
+                    AtomicInteger index = new AtomicInteger(0);
+                    fileListObj.fileObjList = fileList.stream().map(p -> {
+                        FileObj obj = new FileObj();
+                        obj.num = index.getAndIncrement() + 1;
+                        obj.fileName = JdbcMapUtil.getString(p, "DSP_NAME");
+                        obj.fileSize = JdbcMapUtil.getString(p, "SIZE_KB");
+                        obj.uploadUser = JdbcMapUtil.getString(p, "USER_NAME");
+                        obj.uploadDate = StringUtil.withOutT(JdbcMapUtil.getString(p, "UPLOAD_DTTM"));
+                        obj.id = JdbcMapUtil.getString(p, "ID");
+                        obj.viewUrl = JdbcMapUtil.getString(p, "FILE_INLINE_URL");
+                        obj.downloadUrl = JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
+                        return obj;
+                    }).collect(Collectors.toList());
+                    fileListObjList.add(fileListObj);
+                }
+            } else if ("2".equals(updateType)) {
+                //2-手动在企业云上传历史文件
                 String fileIds = JdbcMapUtil.getString(node, "ATT_FILE_GROUP_ID");
-                List<FileListObj> fileListObjList = new ArrayList<>();
-                FileListObj fileListObj = new FileListObj();
                 fileListObj.title = JdbcMapUtil.getString(node, "nodeName") + "相关文件";
                 List<String> ids = Arrays.asList(fileIds.split(","));
-
                 Map<String, Object> queryFileParams = new HashMap<>();// 创建入参map
                 queryFileParams.put("ids", ids);
                 List<Map<String, Object>> fileList = myNamedParameterJdbcTemplate.queryForList("select ff.ID as ID, DSP_NAME,SIZE_KB,UPLOAD_DTTM,au.`NAME` as USER_NAME,FILE_INLINE_URL,FILE_ATTACHMENT_URL from fl_file ff left join ad_user au on ff.CRT_USER_ID = au.id  where ff.id in (:ids)", queryFileParams);
@@ -156,8 +185,9 @@ public class PmProPlanExt {
                     return obj;
                 }).collect(Collectors.toList());
                 fileListObjList.add(fileListObj);
-                viewObj.fileListObjList = fileListObjList;
-            } else {
+
+            } else if ("3".equals(updateType)) {
+                //3-流程刷新
                 List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,ad.`CODE` as ant_code from pm_pro_plan_node pppn  " +
                         "left join ad_ent ad on ad.id = pppn.AD_ENT_ID_IMP where pppn.id=?", nodeId);
                 if (!CollectionUtils.isEmpty(list)) {
@@ -169,10 +199,8 @@ public class PmProPlanExt {
                             queryParams.put("ids", Arrays.asList(attIds.split(",")));
                             List<Map<String, Object>> attList = myNamedParameterJdbcTemplate.queryForList("select * from ad_att where id in (:ids)", queryParams);
                             if (!CollectionUtils.isEmpty(attList)) {
-                                List<FileListObj> fileListObjList = new ArrayList<>();
                                 attList.forEach(item -> {
                                     String column = JdbcMapUtil.getString(item, "CODE");
-                                    FileListObj fileListObj = new FileListObj();
                                     fileListObj.title = JdbcMapUtil.getString(item, "NAME");
                                     try {
                                         //当表中没有PM_PRJ_ID字段的时候会报错，此次catch一下
@@ -204,12 +232,13 @@ public class PmProPlanExt {
                                     } catch (Exception ignored) {
                                     }
                                 });
-                                viewObj.fileListObjList = fileListObjList;
                             }
                         }
                     }
                 }
             }
+            viewObj.fileListObjList = fileListObjList;
+
             // 获取流程、流程实例的相关信息：
             List<Map<String, Object>> procInfoList = myJdbcTemplate.queryForList("select p.id P_ID,p.name P_NAME,p.EXTRA_INFO P_EXTRA_INFO,pi.id PI_ID,pi.name PI_NAME,pi.ENT_CODE PI_ENT_CODE,pi.ENTITY_RECORD_ID PI_ENTITY_RECORD_ID,PI.CURRENT_VIEW_ID PI_CURRENT_VIEW_ID from PM_PRO_PLAN_NODE pppn join wf_process p on pppn.LINKED_WF_PROCESS_ID=p.id and pppn.id=? left join wf_process_instance pi on pppn.LINKED_WF_PROCESS_INSTANCE_ID=pi.id", nodeId);
             if (!CollectionUtils.isEmpty(procInfoList)) {

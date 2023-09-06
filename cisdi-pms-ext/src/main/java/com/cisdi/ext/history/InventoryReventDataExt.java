@@ -3,6 +3,7 @@ package com.cisdi.ext.history;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
@@ -23,6 +24,10 @@ public class InventoryReventDataExt {
     public static final String COMPLETED = "0099799190825106802";//已完成
 
     /**
+     * 0-默认状态
+     * 1-资料清单刷新
+     * 2-手动在企业云上传历史文件
+     * 3-流程刷新
      * 刷新数据
      */
     public void reventData() {
@@ -56,13 +61,20 @@ public class InventoryReventDataExt {
                             //查询项目的进度节点
                             List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where PM_PRJ_ID = ? and pn.`NAME`=?", projectId, nodeName);
                             if (!CollectionUtils.isEmpty(nodeList)) {
-                                String fileIds = groupData.get(key).stream().map(m -> JdbcMapUtil.getString(m, "FL_FILE_ID")).collect(Collectors.joining(","));
                                 Map<String, Object> nodeData = nodeList.get(0);
-                                if (!COMPLETED.equals(JdbcMapUtil.getString(nodeData, "PROGRESS_STATUS_ID"))) {
-                                    myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=?,ATT_FILE_GROUP_ID=?,ACTUAL_COMPL_DATE=?,UPDATE_TYPE='1',IZ_REFRESH='1',IZ_OVERDUE='0' where id=?", COMPLETED, fileIds, nodeData.get("PLAN_COMPL_DATE"), nodeData.get("ID"));
-                                } else {
-                                    if ("1".equals(JdbcMapUtil.getString(nodeData, "IZ_REFRESH"))) {
-                                        myJdbcTemplate.update("update pm_pro_plan_node set ATT_FILE_GROUP_ID=? where id=?", fileIds, nodeData.get("ID"));
+                                if("0".equals(JdbcMapUtil.getString(nodeData,"UPDATE_TYPE")) || "1".equals(JdbcMapUtil.getString(nodeData,"UPDATE_TYPE"))){
+                                    if (!COMPLETED.equals(JdbcMapUtil.getString(nodeData, "PROGRESS_STATUS_ID"))) {
+                                        try {
+                                            myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=?,ACTUAL_COMPL_DATE=?,UPDATE_TYPE='1',IZ_REFRESH='1',IZ_OVERDUE='0' where id=?", COMPLETED, nodeData.get("PLAN_COMPL_DATE"), nodeData.get("ID"));
+                                        } catch (Exception e) {
+                                            System.out.println(e.getMessage());
+                                        }
+                                    }
+                                    String fileIds = groupData.get(key).stream().map(m -> JdbcMapUtil.getString(m, "FL_FILE_ID")).collect(Collectors.joining(","));
+                                    List<String> ids = Arrays.asList(fileIds.split(","));
+                                    if (!CollectionUtils.isEmpty(ids)) {
+                                        //处理文件
+                                        dealWithFile(ids, JdbcMapUtil.getString(nodeData, "ID"));
                                     }
                                 }
                             }
@@ -71,6 +83,16 @@ public class InventoryReventDataExt {
                 }
             }
 
+        }
+    }
+
+
+    private void dealWithFile(List<String> ids, String nodeId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        myJdbcTemplate.update("delete from PM_PRO_PLAN_NODE_FILE where PM_PRO_PLAN_NODE_ID = ?", nodeId);
+        for (String fileId : ids) {
+            String id = Crud.from("PM_PRO_PLAN_NODE_FILE").insertData();
+            Crud.from("PM_PRO_PLAN_NODE_FILE").where().eq("ID", id).update().set("PM_PRO_PLAN_NODE_ID", nodeId).set("FL_FILE_ID", fileId).exec();
         }
     }
 }
