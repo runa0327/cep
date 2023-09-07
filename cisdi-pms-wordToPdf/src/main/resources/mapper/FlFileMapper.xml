@@ -24,6 +24,8 @@
         <result column="isPublicRead" property="isPublicRead" />
         <result column="filePathId" property="filePathId" />
         <result column="ver" property="ver" />
+        <result column="originFileAddress" property="originFileAddress" />
+        <result column="fileType" property="fileType" />
     </resultMap>
 
     <sql id="common">
@@ -60,4 +62,54 @@
             (ext = 'doc' or ext = 'docx')
             and id in ('${fileId}')
     </select>
+
+    <!--新增-->
+    <insert id="insert">
+        insert into FL_FILE (
+            ID,
+            CODE,
+            NAME,
+            VER,
+            FL_PATH_ID,
+            EXT,
+            STATUS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            SIZE_KB,
+            FILE_INLINE_URL,
+            FILE_ATTACHMENT_URL,
+            TS,
+            UPLOAD_DTTM,
+            PHYSICAL_LOCATION,
+            DSP_NAME,
+            DSP_SIZE,
+            IS_PUBLIC_READ,
+            ORIGIN_FILE_PHYSICAL_LOCATION
+        ) values (
+            #{id},
+            #{code},
+            #{name},
+            #{ver},
+            #{filePathId},
+            #{fileType},
+            #{status},
+            #{createDate},
+            #{createBy},
+            #{lastUpdateDate},
+            #{lastUpdateBy},
+            #{fileSize},
+            #{fileInlineUrl},
+            #{fileAttachmentUrl},
+            #{nowDate},
+            #{fileUploadDate},
+            #{fileAddress},
+            #{showName},
+            #{showFileSize},
+            #{isPublicRead},
+            #{originFileAddress}
+        )
+    </insert>
+
 </mapper>

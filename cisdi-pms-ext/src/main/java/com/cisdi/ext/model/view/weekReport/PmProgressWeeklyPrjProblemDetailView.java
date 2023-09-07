@@ -22,4 +22,10 @@ public class PmProgressWeeklyPrjProblemDetailView {
 
     // 问题说明
     private String problemDescribe;
+
+    // 处理人id
+    private String handleUserIds;
+
+    // 处理人名称
+    private String handleUserName;
 }

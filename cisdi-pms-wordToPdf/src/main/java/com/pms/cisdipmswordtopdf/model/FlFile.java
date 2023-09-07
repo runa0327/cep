@@ -40,4 +40,10 @@ public class FlFile extends BaseEntity{
     // 路径
     private String filePathId;
 
+    // 原始文件物理位置
+    private String originFileAddress;
+
+    // 文件类型
+    private String fileType;
+
 }

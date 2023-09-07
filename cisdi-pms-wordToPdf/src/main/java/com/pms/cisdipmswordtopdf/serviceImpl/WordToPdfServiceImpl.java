@@ -13,6 +13,7 @@ import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.ComThread;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
+import com.pms.cisdipmswordtopdf.mapper.FlFileMapper;
 import com.pms.cisdipmswordtopdf.model.FlFile;
 import com.pms.cisdipmswordtopdf.model.PoOrderReq;
 import com.pms.cisdipmswordtopdf.service.BaseProcessMessageBakService;
@@ -30,6 +31,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -45,6 +47,9 @@ public class WordToPdfServiceImpl implements WordToPdfService {
 
     @Resource
     private FlFileService flFileService;
+
+    @Resource
+    private FlFileMapper flFileMapper;
 
     @Resource
     private BaseProcessMessageBakService baseProcessMessageBakService;
@@ -102,7 +107,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                             //获取文件相关信息
                             Map<String,Object> map = getFileMess(pdfPath,id);
                             //写入文件表
-                            updateData(map,poOrderReq,tmp,date,systemType);
+                            updateData(map,tmp,date,systemType);
                         }
                     }
                 }
@@ -322,19 +327,38 @@ public class WordToPdfServiceImpl implements WordToPdfService {
     /**
      *
      * @param map 新文件信息
-     * @param poOrderReq 合同信息
      * @param oldFileTmp 原始文件信息
      * @param date 时间
      * @param systemType 操作系统类型
      */
-    private void updateData(Map<String, Object> map, PoOrderReq poOrderReq,FlFile oldFileTmp,String date, String systemType) {
+    private void updateData(Map<String, Object> map,FlFile oldFileTmp,String date, String systemType) {
 
         String fileId = map.get("fileId").toString();
         String name = oldFileTmp.getName();
-        String flPathId = oldFileTmp.getFilePathId();
+        String fileName = name+".pdf";
         String createBy = oldFileTmp.getCreateBy();
-        String size = map.get("size").toString();
-        String fileSize = map.get("fileSize").toString();
+
+        FlFile flFile = new FlFile();
+        flFile.setId(fileId);
+        flFile.setCode(fileId);
+        flFile.setName(oldFileTmp.getName());
+        flFile.setVer("1");
+        flFile.setFilePathId(oldFileTmp.getFilePathId());
+        flFile.setFileType("pdf");
+        flFile.setStatus("AP");
+        flFile.setCreateBy(createBy);
+        flFile.setCreateDate(date);
+        flFile.setLastUpdateBy(createBy);
+        flFile.setLastUpdateDate(date);
+        flFile.setFileSize(new BigDecimal(map.get("size").toString()));
+        flFile.setFileInlineUrl(oldFileTmp.getFileInlineUrl());
+        flFile.setFileAttachmentUrl(oldFileTmp.getFileAttachmentUrl());
+        flFile.setNowDate(date);
+        flFile.setFileUploadDate(date);
+        flFile.setShowName(fileName);
+        flFile.setShowFileSize(map.get("fileSize").toString());
+        flFile.setIsPublicRead(0);
+
         String fileIdPath = map.get("fileIdPath").toString();
         if ("windows".equals(systemType)){
             if (fileIdPath.contains("filedisk2")){
@@ -343,12 +367,10 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                 fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk\\","/data/qygly/file/").replace("\\","/");
             }
         }
-        String fileName = name+".pdf";
-        String insertSql = "insert into fl_file (ID,CODE,NAME,VER,FL_PATH_ID,EXT,STATUS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID," +
-                "SIZE_KB,TS,UPLOAD_DTTM,PHYSICAL_LOCATION,DSP_NAME,DSP_SIZE,IS_PUBLIC_READ) values (" +
-                "?,?,?,'1',?,'pdf','AP',?,?,?,?,?,?,?,?,?,?,0)";
-        Integer exec = jdbcTemplate.update(insertSql,fileId,fileId,name,flPathId,date,createBy,date,createBy,size,date,date,fileIdPath,fileName,fileSize);
-        log.info("执行成功，共{}条",exec);
+        flFile.setFileAddress(fileIdPath);
+        flFile.setOriginFileAddress(fileIdPath);
+
+        flFileMapper.insert(flFile);
     }
 
     /**
