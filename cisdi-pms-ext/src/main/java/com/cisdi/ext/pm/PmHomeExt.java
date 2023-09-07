@@ -6,8 +6,8 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.util.JdbcMapUtil;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -202,91 +202,91 @@ public class PmHomeExt {
         Info info = JsonUtil.fromJson(json, Info.class);
         StringBuilder sb = new StringBuilder();
         sb.append("update pm_prj set LAST_MODI_DT =NOW() ");
-        if (Strings.isNotEmpty(info.no)) {
+        if (StringUtils.hasText(info.no)) {
             sb.append(" ,PRJ_CODE='").append(info.no).append("'");
         }
-        if (Strings.isNotEmpty(info.name)) {
+        if (StringUtils.hasText(info.name)) {
             sb.append(" ,NAME='").append(info.name).append("'");
         }
-        if (Strings.isNotEmpty(info.type)) {
+        if (StringUtils.hasText(info.type)) {
             sb.append(" ,PROJECT_TYPE_ID='").append(info.type).append("'");
         }
-        if (Strings.isNotEmpty(info.source)) {
+        if (StringUtils.hasText(info.source)) {
             sb.append(" ,INVESTMENT_SOURCE_ID='").append(info.source).append("'");
         }
-        if (Strings.isNotEmpty(info.pfNo)) {
+        if (StringUtils.hasText(info.pfNo)) {
             sb.append(" ,PRJ_REPLY_NO='").append(info.pfNo).append("'");
         }
-        if (Strings.isNotEmpty(info.pfTime)) {
+        if (StringUtils.hasText(info.pfTime)) {
             sb.append(" ,PRJ_REPLY_DATE='").append(info.pfTime).append("'");
         }
-        if (Strings.isNotEmpty(info.owner)) {
+        if (StringUtils.hasText(info.owner)) {
             sb.append(" ,CUSTOMER_UNIT='").append(info.owner).append("'");
         }
-        if (Strings.isNotEmpty(info.mode)) {
+        if (StringUtils.hasText(info.mode)) {
             sb.append(" ,PRJ_MANAGE_MODE_ID='").append(info.mode).append("'");
         }
-        if (Strings.isNotEmpty(info.area)) {
+        if (StringUtils.hasText(info.area)) {
             sb.append(" ,FLOOR_AREA='").append(info.area).append("'");
         }
-        if (Strings.isNotEmpty(info.tender)) {
+        if (StringUtils.hasText(info.tender)) {
             sb.append(" ,TENDER_MODE_ID='").append(info.tender).append("'");
         }
-        if (Strings.isNotEmpty(info.location)) {
+        if (StringUtils.hasText(info.location)) {
             sb.append(" ,BASE_LOCATION_ID='").append(info.location).append("'");
         }
-        if (Strings.isNotEmpty(info.des)) {
+        if (StringUtils.hasText(info.des)) {
             sb.append(" ,PRJ_SITUATION='").append(info.des).append("'");
         }
-        if (Strings.isNotEmpty(info.planBeginTime)) {
+        if (StringUtils.hasText(info.planBeginTime)) {
             sb.append(" ,PLAN_START_TIME='").append(info.planBeginTime).append("'");
         }
-        if (Strings.isNotEmpty(info.planEndTime)) {
+        if (StringUtils.hasText(info.planEndTime)) {
             sb.append(" ,PLAN_END_TIME='").append(info.planEndTime).append("'");
         }
-        if (Strings.isNotEmpty(info.actualBeginTime)) {
+        if (StringUtils.hasText(info.actualBeginTime)) {
             sb.append(" ,ACTUAL_START_TIME='").append(info.actualBeginTime).append("'");
         }
-        if (Strings.isNotEmpty(info.actualEndTime)) {
+        if (StringUtils.hasText(info.actualEndTime)) {
             sb.append(" ,ACTUAL_END_TIME='").append(info.actualEndTime).append("'");
         }
-        if (Strings.isNotEmpty(info.step)) {
+        if (StringUtils.hasText(info.step)) {
             sb.append(" ,TRANSITION_PHASE_ID='").append(info.step).append("'");
         }
         //单位--特殊处理
-        if (Strings.isNotEmpty(info.jsUnit)) {
+        if (StringUtils.hasText(info.jsUnit)) {
             //建设单位
             String id = projectParty(info.jsUnit, "2");
             sb.append(" ,BUILDER_UNIT='").append(id).append("'");
         }
-        if (Strings.isNotEmpty(info.kcUnit)) {
+        if (StringUtils.hasText(info.kcUnit)) {
             //勘察单位
             String id = projectParty(info.kcUnit, "3");
             sb.append(" ,SURVEYOR_UNIT='").append(id).append("'");
         }
-        if (Strings.isNotEmpty(info.sjUnit)) {
+        if (StringUtils.hasText(info.sjUnit)) {
             //设计单位
             String id = projectParty(info.sjUnit, "4");
             sb.append(" ,DESIGNER_UNIT='").append(id).append("'");
         }
-        if (Strings.isNotEmpty(info.sgUnit)) {
+        if (StringUtils.hasText(info.sgUnit)) {
             //施工单位
             String id = projectParty(info.sgUnit, "5");
             sb.append(" ,CONSTRUCTOR_UNIT='").append(id).append("'");
         }
-        if (Strings.isNotEmpty(info.jlUnit)) {
+        if (StringUtils.hasText(info.jlUnit)) {
             //监理单位
             String id = projectParty(info.jlUnit, "6");
             sb.append(" ,SUPERVISOR_UNIT='").append(id).append("'");
         }
-        if (Strings.isNotEmpty(info.zjUnit)) {
+        if (StringUtils.hasText(info.zjUnit)) {
             //造价单位
             String id = projectParty(info.zjUnit, "8");
             sb.append(" ,CONSULTER_UNIT='").append(id).append("'");
         }
         //单位--特殊处理
 
-        if (Strings.isNotEmpty(info.pics)) {
+        if (StringUtils.hasText(info.pics)) {
             sb.append(" ,PRJ_IMG='").append(info.pics).append("'");
         }
         sb.append(" where id='").append(info.id).append("'");
