@@ -348,13 +348,12 @@ public class PmConstructionExt {
         Map<String,Object> listMap = getProject(param,limit,myJdbcTemplate);
         String prjIds = listMap.get("prjIds").toString();
         if (StringUtils.hasText(prjIds)){
-            StringBuilder sb = new StringBuilder("select a.pm_prj_id as projectId,a.name as projectName,a.IZ_START_REQUIRE as weatherStart,any_value(a.allYearAmt/10000) as allYearAmt,")
-                    .append("a.IZ_END as weatherComplete,");
+            StringBuilder sb = new StringBuilder("select a.pm_prj_id as projectId,a.name as projectName,a.weatherStart as weatherStart,any_value(a.allYearAmt/10000) as allYearAmt,").append("a.weatherComplete as weatherComplete,");
             for (int i = 1; i <= 12; i++) {
                 sb.append("cast(group_concat(case when a.NUMBER = ").append(i).append(" then AMT_FIVE/10000 else '' end SEPARATOR '') as DECIMAL(32,10)) as '").append(i).append("月',");
             }
             sb.deleteCharAt(sb.length()-1);
-            sb.append(" FROM (select a.pm_prj_id,c.name,c.IZ_START_REQUIRE,c.IZ_END,b.NUMBER,b.AMT_FIVE,a.AMT_FIVE as allYearAmt FROM PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID LEFT JOIN pm_prj c on a.pm_prj_id = c.id WHERE a.BASE_YEAR_ID = '").append(baseYearId).append("' and a.PM_PRJ_ID in ('").append(prjIds).append("') ) a LEFT JOIN (select a.pm_prj_id,any_value(b.LAST_MODI_DT) as date from PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID where a.BASE_YEAR_ID = '").append(baseYearId).append("' and a.PM_PRJ_ID in ('").append(prjIds).append("') GROUP BY a.PM_PRJ_ID order by date desc  ) b on a.pm_prj_id = b.pm_prj_id GROUP BY a.pm_prj_id ORDER BY a.IZ_END asc,a.IZ_START_REQUIRE desc,any_value(b.date) desc");
+            sb.append(" FROM (select a.pm_prj_id,c.name,ifnull(c.IZ_START_REQUIRE,1) as weatherStart,ifnull(c.IZ_END,0) as weatherComplete,b.NUMBER,b.AMT_FIVE,a.AMT_FIVE as allYearAmt,a.LAST_MODI_DT as date FROM PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID LEFT JOIN pm_prj c on a.pm_prj_id = c.id WHERE a.BASE_YEAR_ID = '").append(baseYearId).append("' and a.PM_PRJ_ID in ('").append(prjIds).append("') ) a  GROUP BY a.pm_prj_id ORDER BY a.weatherComplete asc,a.weatherStart desc,any_value(a.date) desc");
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString());
             if (!CollectionUtils.isEmpty(list1)){
                 Map<String,Object> resMap = new HashMap<>();
@@ -392,8 +391,8 @@ public class PmConstructionExt {
         if (StringUtils.hasText(param.getProjectId())){
             sb2.append(" and a.PM_PRJ_ID = '").append(param.getProjectId()).append("' ");
         }
-        String sql1 = "select a.pm_prj_id from ( select a.pm_prj_id from PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID where a.BASE_YEAR_ID = ? "+sb2+" GROUP BY a.PM_PRJ_ID order by any_value(b.LAST_MODI_DT) desc ) a left join (select id,ifnull(IZ_START_REQUIRE,1) as weatherStart,IFNULL(IZ_END,0) as weatherCompleted,name as projectName from pm_prj where PROJECT_SOURCE_TYPE_ID = '0099952822476441374' AND (PROJECT_STATUS != '1661568714048413696' or PROJECT_STATUS is null)"+sb1+"  order by crt_dt asc ) b on a.pm_prj_id = b.id order by b.weatherCompleted asc,b.weatherStart desc ";
-        String sql2 = "select count(*) as num from ( select a.pm_prj_id from PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID where a.BASE_YEAR_ID = ? "+sb2+" GROUP BY a.PM_PRJ_ID order by any_value(b.LAST_MODI_DT) desc ) a left join (select id,ifnull(IZ_START_REQUIRE,1) as weatherStart,IFNULL(IZ_END,0) as weatherCompleted,name as projectName from pm_prj where PROJECT_SOURCE_TYPE_ID = '0099952822476441374' AND (PROJECT_STATUS != '1661568714048413696' or PROJECT_STATUS is null)"+sb1+"  order by crt_dt asc ) b on a.pm_prj_id = b.id order by b.weatherCompleted asc,b.weatherStart desc";
+        String sql1 = "select a.pm_prj_id from (SELECT a.pm_prj_id,ifnull( b.IZ_START_REQUIRE, 1 ) AS weatherStart,IFNULL( b.IZ_END, 0 ) AS weatherCompleted,b.NAME AS projectName, any_value ( a.LAST_MODI_DT ) as date from PM_CONSTRUCTION a left join pm_prj b on a.pm_prj_id = b.id where a.BASE_YEAR_ID = ? and b.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' AND ( b.PROJECT_STATUS != '1661568714048413696' OR b.PROJECT_STATUS IS NULL )  "+sb2+" ORDER BY weatherCompleted ASC,weatherStart DESC,date DESC ) a ";
+        String sql2 = "select count(*) as num from (SELECT a.pm_prj_id,ifnull( b.IZ_START_REQUIRE, 1 ) AS weatherStart,IFNULL( b.IZ_END, 0 ) AS weatherCompleted,b.NAME AS projectName, any_value ( a.LAST_MODI_DT ) as date from PM_CONSTRUCTION a left join pm_prj b on a.pm_prj_id = b.id where a.BASE_YEAR_ID = ? and b.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' AND ( b.PROJECT_STATUS != '1661568714048413696' OR b.PROJECT_STATUS IS NULL )  "+sb2+" ORDER BY weatherCompleted ASC,weatherStart DESC,date DESC ) a";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1+limit,param.getBaseYearId());
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,param.getBaseYearId());
         if (!CollectionUtils.isEmpty(list1)){
