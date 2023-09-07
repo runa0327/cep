@@ -62,19 +62,25 @@ public class InventoryReventDataExt {
                             List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select pn.* from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id  where PM_PRJ_ID = ? and pn.`NAME`=?", projectId, nodeName);
                             if (!CollectionUtils.isEmpty(nodeList)) {
                                 Map<String, Object> nodeData = nodeList.get(0);
-                                if("0".equals(JdbcMapUtil.getString(nodeData,"UPDATE_TYPE")) || "1".equals(JdbcMapUtil.getString(nodeData,"UPDATE_TYPE"))){
-                                    if (!COMPLETED.equals(JdbcMapUtil.getString(nodeData, "PROGRESS_STATUS_ID"))) {
-                                        try {
-                                            myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=?,ACTUAL_COMPL_DATE=?,UPDATE_TYPE='1',IZ_REFRESH='1',IZ_OVERDUE='0' where id=?", COMPLETED, nodeData.get("PLAN_COMPL_DATE"), nodeData.get("ID"));
-                                        } catch (Exception e) {
-                                            System.out.println(e.getMessage());
+                                String updateType = JdbcMapUtil.getString(nodeData, "UPDATE_TYPE");
+                                boolean res = chargeProcess(projectId, JdbcMapUtil.getString(nodeData, "LINKED_WF_PROCESS_ID"));
+                                System.out.println("结果为：" + res);
+                                if (res) {
+                                    if (!"3".equals(updateType)) {
+                                        myJdbcTemplate.update("update pm_pro_plan_node set UPDATE_TYPE='3',IZ_OVERDUE='0' where id=?", nodeData.get("ID"));
+                                    }
+                                } else {
+                                    if ("0".equals(updateType) || "1".equals(updateType)) {
+                                        myJdbcTemplate.update("update pm_pro_plan_node set PROGRESS_STATUS_ID=?,ACTUAL_COMPL_DATE=?,UPDATE_TYPE='1',IZ_REFRESH='1',IZ_OVERDUE='0' where id=?", COMPLETED, nodeData.get("PLAN_COMPL_DATE"), nodeData.get("ID"));
+                                        String fileIds = groupData.get(key).stream().map(m -> JdbcMapUtil.getString(m, "FL_FILE_ID")).collect(Collectors.joining(","));
+                                        List<String> ids = Arrays.asList(fileIds.split(","));
+                                        if (!CollectionUtils.isEmpty(ids)) {
+                                            //处理文件
+                                            dealWithFile(ids, JdbcMapUtil.getString(nodeData, "ID"));
                                         }
                                     }
-                                    String fileIds = groupData.get(key).stream().map(m -> JdbcMapUtil.getString(m, "FL_FILE_ID")).collect(Collectors.joining(","));
-                                    List<String> ids = Arrays.asList(fileIds.split(","));
-                                    if (!CollectionUtils.isEmpty(ids)) {
-                                        //处理文件
-                                        dealWithFile(ids, JdbcMapUtil.getString(nodeData, "ID"));
+                                    if ("0".equals(updateType) && Strings.isNotEmpty(JdbcMapUtil.getString(nodeData, "ATT_FILE_GROUP_ID"))) {
+                                        myJdbcTemplate.update("update pm_pro_plan_node set UPDATE_TYPE='2' where id=?", nodeData.get("ID"));
                                     }
                                 }
                             }
@@ -94,5 +100,42 @@ public class InventoryReventDataExt {
             String id = Crud.from("PM_PRO_PLAN_NODE_FILE").insertData();
             Crud.from("PM_PRO_PLAN_NODE_FILE").where().eq("ID", id).update().set("PM_PRO_PLAN_NODE_ID", nodeId).set("FL_FILE_ID", fileId).exec();
         }
+    }
+
+
+    /**
+     * 判断当前项目是否完成流程
+     *
+     * @param projectId
+     * @param processId
+     * @return
+     */
+    private boolean chargeProcess(String projectId, String processId) {
+        boolean res = false;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ad.`CODE` as tableName,ad.ID as ID from base_process_ent bas left join ad_ent ad on bas.AD_ENT_ONE_ID = ad.ID where WF_PROCESS_ID=?", processId);
+        if (!CollectionUtils.isEmpty(list)) {
+            Map<String, Object> mapData = list.get(0);
+            String tableName = JdbcMapUtil.getString(mapData, "tableName");
+            List<Map<String, Object>> attList = myJdbcTemplate.queryForList("select * from ad_att adt left join ad_ent_att ant on adt.id = ant.AD_ATT_ID where ant.AD_ENT_ID=?", mapData.get("ID"));
+            Optional<Map<String, Object>> optional = attList.stream().filter(p -> "PM_PRJ_IDS".equals(JdbcMapUtil.getString(p, "CODE"))).findAny();
+            if (optional.isPresent()) {
+                String sql = "select * from  " + tableName + "  where find_in_set('" + projectId + "',PM_PRJ_IDS)";
+                List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql);
+                if (!CollectionUtils.isEmpty(list1)) {
+                    res = true;
+                }
+            } else {
+                Optional<Map<String, Object>> op = attList.stream().filter(p -> "PM_PRJ_ID".equals(JdbcMapUtil.getString(p, "CODE"))).findAny();
+                if (op.isPresent()) {
+                    String sql = "select * from  " + tableName + "  where PM_PRJ_ID= '" + projectId + "'";
+                    List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql);
+                    if (!CollectionUtils.isEmpty(list1)) {
+                        res = true;
+                    }
+                }
+            }
+        }
+        return res;
     }
 }
