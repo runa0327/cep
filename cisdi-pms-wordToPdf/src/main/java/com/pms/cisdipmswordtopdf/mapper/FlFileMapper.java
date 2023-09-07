@@ -12,4 +12,10 @@ public interface FlFileMapper {
      * @return 文件信息
      */
     List<FlFile> getFileMessageByFileId(String fileId);
+
+    /**
+     * 新增
+     * @param flFile 文件信息
+     */
+    void insert(FlFile flFile);
 }
