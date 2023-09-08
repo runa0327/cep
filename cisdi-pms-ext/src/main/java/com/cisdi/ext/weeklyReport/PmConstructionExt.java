@@ -346,7 +346,7 @@ public class PmConstructionExt {
 
         String baseYearId = param.getBaseYearId();
         Map<String,Object> listMap = getProject(param,limit,myJdbcTemplate);
-        String prjIds = listMap.get("prjIds").toString();
+        String prjIds = JdbcMapUtil.getString(listMap,"prjIds");
         if (StringUtils.hasText(prjIds)){
             StringBuilder sb = new StringBuilder("select a.pm_prj_id as projectId,a.name as projectName,a.weatherStart as weatherStart,any_value(a.allYearAmt/10000) as allYearAmt,").append("a.weatherComplete as weatherComplete,");
             for (int i = 1; i <= 12; i++) {
@@ -387,12 +387,12 @@ public class PmConstructionExt {
         if (param.getWeatherComplete() != null){
             sb1.append(" and IZ_END = '").append(param.getWeatherComplete()).append("' ");
         }
-        StringBuilder sb2 = new StringBuilder(); // 填报年份、项目名称判断
+//        StringBuilder sb2 = new StringBuilder(); // 填报年份、项目名称判断
         if (StringUtils.hasText(param.getProjectId())){
-            sb2.append(" and a.PM_PRJ_ID = '").append(param.getProjectId()).append("' ");
+            sb1.append(" and a.PM_PRJ_ID = '").append(param.getProjectId()).append("' ");
         }
-        String sql1 = "select a.pm_prj_id from (SELECT a.pm_prj_id,ifnull( b.IZ_START_REQUIRE, 1 ) AS weatherStart,IFNULL( b.IZ_END, 0 ) AS weatherCompleted,b.NAME AS projectName, any_value ( a.LAST_MODI_DT ) as date from PM_CONSTRUCTION a left join pm_prj b on a.pm_prj_id = b.id where a.BASE_YEAR_ID = ? and b.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' AND ( b.PROJECT_STATUS != '1661568714048413696' OR b.PROJECT_STATUS IS NULL )  "+sb2+" ORDER BY weatherCompleted ASC,weatherStart DESC,date DESC ) a ";
-        String sql2 = "select count(*) as num from (SELECT a.pm_prj_id,ifnull( b.IZ_START_REQUIRE, 1 ) AS weatherStart,IFNULL( b.IZ_END, 0 ) AS weatherCompleted,b.NAME AS projectName, any_value ( a.LAST_MODI_DT ) as date from PM_CONSTRUCTION a left join pm_prj b on a.pm_prj_id = b.id where a.BASE_YEAR_ID = ? and b.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' AND ( b.PROJECT_STATUS != '1661568714048413696' OR b.PROJECT_STATUS IS NULL )  "+sb2+" ORDER BY weatherCompleted ASC,weatherStart DESC,date DESC ) a";
+        String sql1 = "select a.pm_prj_id from (SELECT a.pm_prj_id,ifnull( b.IZ_START_REQUIRE, 1 ) AS weatherStart,IFNULL( b.IZ_END, 0 ) AS weatherCompleted,b.NAME AS projectName, any_value ( a.LAST_MODI_DT ) as date from PM_CONSTRUCTION a left join pm_prj b on a.pm_prj_id = b.id where a.BASE_YEAR_ID = ? and b.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' AND ( b.PROJECT_STATUS != '1661568714048413696' OR b.PROJECT_STATUS IS NULL )  "+sb1+" ORDER BY weatherCompleted ASC,weatherStart DESC,date DESC ) a ";
+        String sql2 = "select count(*) as num from (SELECT a.pm_prj_id,ifnull( b.IZ_START_REQUIRE, 1 ) AS weatherStart,IFNULL( b.IZ_END, 0 ) AS weatherCompleted,b.NAME AS projectName, any_value ( a.LAST_MODI_DT ) as date from PM_CONSTRUCTION a left join pm_prj b on a.pm_prj_id = b.id where a.BASE_YEAR_ID = ? and b.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' AND ( b.PROJECT_STATUS != '1661568714048413696' OR b.PROJECT_STATUS IS NULL )  "+sb1+" ORDER BY weatherCompleted ASC,weatherStart DESC,date DESC ) a";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1+limit,param.getBaseYearId());
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,param.getBaseYearId());
         if (!CollectionUtils.isEmpty(list1)){
@@ -402,7 +402,7 @@ public class PmConstructionExt {
             map.put("prjIds",prjIds);
         } else {
             map.put("total",0);
-            map.put("list",null);
+            map.put("prjIds",null);
         }
         return map;
     }
