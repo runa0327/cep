@@ -266,9 +266,6 @@ public class PmLifeCycleExt {
                             json.put("reason", reason);
                         }
                         newData.put(s, json);
-                    } else {
-                        json.put("nameOrg", "暂无此节点");
-                        newData.put(s, json);
                     }
                 }
             }

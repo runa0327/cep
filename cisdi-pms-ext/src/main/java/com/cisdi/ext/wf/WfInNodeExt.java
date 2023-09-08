@@ -140,8 +140,8 @@ public class WfInNodeExt {
                             for (Map<String, Object> leafNode : leafNodeList) {
 
                                 // 若进度状态为已完成(处理导入数据情况)，不修改任何数据
-                                String status = JdbcMapUtil.getString(leafNode,"PROGRESS_STATUS_ID");
-                                if (!"0099799190825106802".equals(status)){
+                                String status = JdbcMapUtil.getString(leafNode, "PROGRESS_STATUS_ID");
+                                if (!"0099799190825106802".equals(status)) {
                                     // 若为开始节点：
                                     String startWfNodeId = JdbcMapUtil.getString(leafNode, "LINKED_START_WF_NODE_ID");
                                     if (nodeId.equals(startWfNodeId)) {
@@ -305,7 +305,7 @@ public class WfInNodeExt {
                     // 设置进度信息：
                     .set("PROGRESS_STATUS_ID", COMPLETED).set("ACTUAL_CURRENT_PRO_PERCENT", 100).set("ACTUAL_COMPL_DATE", endDate).set("ACTUAL_TOTAL_DAYS", actualDays)
                     // 设置关联信息：
-                    .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", nodeInstId).set("IZ_OVERDUE", "0").exec();
+                    .set("LINKED_WF_PROCESS_INSTANCE_ID", procInstId).set("LINKED_END_WF_NODE_INSTANCE_ID", nodeInstId).set("IZ_OVERDUE", "0").set("UPDATE_TYPE", "3").exec();
 
 
             myJdbcTemplate.update("update pm_pro_plan_node t set t.ACTUAL_CARRY_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1,t.ACTUAL_TOTAL_DAYS=t.ACTUAL_COMPL_DATE-t.ACTUAL_START_DATE+1 WHERE t.id=?", leafNode.get("ID"));
