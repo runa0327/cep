@@ -238,6 +238,10 @@ public class PmProgressWeeklyPrjDetailServiceImpl implements PmProgressWeeklyPrj
             pmProgressWeeklyPrjDetailMapper.insertData(pmProgressWeeklyPrjDetail);
             // 写入问题明细表
             if (!CollectionUtils.isEmpty(problemDetail)){
+                problemDetail.forEach(p->{
+                    p.setWeekId(weekId);
+                    p.setId(IdUtil.getSnowflakeNextIdStr());
+                });
                 pmProgressWeeklyPrjProblemDetailMapper.insertProblemDetailBatchByWeekPrjId(weekPrjId,problemDetail);
             }
         }

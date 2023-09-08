@@ -68,6 +68,7 @@
         <foreach collection="list" item="item" index="index" separator=";">
         insert into PM_PROGRESS_WEEKLY_PRJ_PROBLEM_DETAIL (
             id,
+            TS,
             CRT_DT,
             CRT_USER_ID,
             STATUS,
@@ -77,7 +78,8 @@
             PM_PRJ_ID,
             PM_PROGRESS_WEEKLY_ID
         ) values (
-            replace(UUID_SHORT(),'-',''),
+            #{item.id},
+            now(),
             now(),
             '0099250247095871681',
             'AP',
