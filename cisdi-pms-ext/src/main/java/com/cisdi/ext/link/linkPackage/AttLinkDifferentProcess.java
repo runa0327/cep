@@ -162,6 +162,7 @@ public class AttLinkDifferentProcess {
         list.add("PM_PRJ_RED_CHECK_REQ"); //项目红线核查
         list.add("PM_TERMITE_CONTROL_REQ"); //白蚁防治
         list.add("PIPELINE_RELOCATION_REQ"); //管线迁改
+        list.add("PM_CONSTRUCTION_DRAWING_DESIGN"); //施工图设计管理
         return list;
     }
 
