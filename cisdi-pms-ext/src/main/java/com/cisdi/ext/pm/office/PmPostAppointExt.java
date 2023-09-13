@@ -9,6 +9,8 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
@@ -19,6 +21,9 @@ import java.util.Map;
  * 岗位指派流程-扩展
  */
 public class PmPostAppointExt {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     public static final Map<String,String> postCodeMap = new HashMap<>();
     static {
@@ -69,14 +74,6 @@ public class PmPostAppointExt {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
         PrjPlanUtil.refreshProPlanUser(projectId);
-    }
-
-    /**
-     * 岗位流程-自动发起流程
-     */
-    public static void autoCreateProcess(String projectId,String userId){
-        Map<String,Object> map = new HashMap<>();
-        //组装
     }
 
     /**

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.process.PmPostAppointMapper">
+    <resultMap id="PmPostAppointMapperResult" type="com.cisdi.pms.job.domain.process.PmPostAppoint">
+        <id property="id" column="id" />
+        <result property="code" column="code" />
+        <result property="ver" column="ver" />
+        <result property="ts" column="ts" />
+        <result property="createBy" column="createBy" />
+        <result property="createDate" column="createDate" />
+        <result property="lastUpdateBy" column="lastUpdateBy" />
+        <result property="lastUpdateDate" column="lastUpdateDate" />
+        <result property="status" column="status" />
+        <result property="projectId" column="projectId" />
+        <result property="investSourceId" column="investSourceId" />
+        <result property="projectTotalInvest" column="projectTotalInvest" />
+        <result property="projectTypeId" column="projectTypeId" />
+        <result property="startDate" column="startDate" />
+        <result property="customerUnitId" column="customerUnitId" />
+        <result property="tenderModeId" column="tenderModeId" />
+        <result property="projectSituation" column="projectSituation" />
+        <result property="startRemark" column="startRemark" />
+        <result property="startFile" column="startFile" />
+        <result property="earlyConstructionPostUserId" column="earlyConstructionPostUserId" />
+        <result property="landManagePostUserId" column="landManagePostUserId" />
+        <result property="pipeChangePostUserId" column="pipeChangePostUserId" />
+        <result property="planOperatePostUserId" column="planOperatePostUserId" />
+        <result property="earlyEquipPostUserId" column="earlyEquipPostUserId" />
+        <result property="costManagePostUserId" column="costManagePostUserId" />
+        <result property="contractManagePostUserId" column="contractManagePostUserId" />
+        <result property="equipCostPostUserId" column="equipCostPostUserId" />
+        <result property="buyManagePostUserId" column="buyManagePostUserId" />
+        <result property="designManagePostUserId" column="designManagePostUserId" />
+        <result property="engineerManagerPostUserId" column="engineerManagerPostUserId" />
+        <result property="collectAndRemovePostUserId" column="collectAndRemovePostUserId" />
+        <result property="financeManagePostUserId" column="financeManagePostUserId" />
+        <result property="deptId" column="deptId" />
+    </resultMap>
+
+    <sql id="commonHeader">
+        ID AS id,
+        VER AS ver,
+        TS AS ts,
+        LAST_MODI_DT AS lastUpdateDate,
+        LAST_MODI_USER_ID AS lastUpdateBy,
+        PM_PRJ_ID AS projectId,
+        `STATUS` AS `status`,
+        INVESTMENT_SOURCE_ID AS investSourceId,
+        CRT_USER_ID AS createBy,
+        PRJ_TOTAL_INVEST AS projectTotalInvest,
+        PROJECT_TYPE_ID AS projectTypeId,
+        CRT_DEPT_ID AS deptId,
+        CRT_DT AS createDate,
+        CUSTOMER_UNIT AS customerUnitId,
+        PRJ_SITUATION AS projectSituation,
+        START_REMARK AS startRemark,
+        FILE_ID_ONE AS startFile,
+        AD_USER_TWELVE_ID AS earlyConstructionPostUserId,
+        AD_USER_THIRTEEN_ID AS landManagePostUserId,
+        AD_USER_FOURTEEN_ID AS pipeChangePostUserId,
+        AD_USER_FIFTEEN_ID AS planOperatePostUserId,
+        AD_USER_SIXTEEN_ID AS earlyEquipPostUserId,
+        AD_USER_EIGHTEEN_ID AS costManagePostUserId,
+        AD_USER_NINETEEN_ID AS contractManagePostUserId,
+        AD_USER_TWENTY_ID AS equipCostPostUserId,
+        AD_USER_TWENTY_ONE_ID AS buyManagePostUserId,
+        AD_USER_TWENTY_TWO_ID AS designManagePostUserId,
+        AD_USER_TWENTY_THREE_ID AS engineerManagerPostUserId,
+        AD_USER_TWENTY_FOUR_ID AS collectAndRemovePostUserId,
+        AD_USER_TWENTY_FIVE_ID AS financeManagePostUserId,
+        TENDER_MODE_ID AS tenderModeId,
+        START_DATE AS startDate,
+        LK_WF_INST_ID AS wfProcessInstanceId
+    </sql>
+
+    <!--根据项目id查询状态不是作废及作废中的数据-->
+    <select id="queryListByProjectNotVD" resultMap="PmPostAppointMapperResult">
+        select
+            <include refid="commonHeader" />
+        from
+            pm_post_appoint
+        where
+            pm_prj_id = #{projectId}
+            and status not in ('VD','VDING')
+    </select>
+</mapper>
