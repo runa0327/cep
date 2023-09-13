@@ -67,6 +67,7 @@ public class BaseFileExt {
         private String code;
         private String attachmentUrl;
         private String crtUserCode;
+        private String crtUserName;
         private String dspName;
         private String dspSize;
         private String ext;

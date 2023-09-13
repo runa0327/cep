@@ -1175,6 +1175,7 @@ public class AttLinkExtDetail {
      * @param myJdbcTemplate 数据源
      */
     public static void autoPostUser(String entCode, String attValue, String companyId, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
+        List<String> editList = AttLinkDifferentProcess.getLinkUserProcessEdit();
         //查询项目花名册信息
         List<Map<String,Object>> list = LinkSql.getPrjPostUser(attValue,companyId,myJdbcTemplate);
         if (!CollectionUtils.isEmpty(list)){
@@ -1185,7 +1186,11 @@ public class AttLinkExtDetail {
                 if (!SharedUtil.isEmptyString(userId)){
                     List<String> codeList = StringUtil.getStrToList(code,",");
                     for (String tp : codeList) {
-                        LinkUtils.mapAddAllValue(tp,AttDataTypeE.TEXT_LONG,userId,userName,true,false,false,attLinkResult);
+                        if (editList.contains(entCode)){
+                            LinkUtils.mapAddAllValue(tp,AttDataTypeE.TEXT_LONG,userId,userName,true,false,true,attLinkResult);
+                        } else {
+                            LinkUtils.mapAddAllValue(tp,AttDataTypeE.TEXT_LONG,userId,userName,true,false,false,attLinkResult);
+                        }
                     }
                 }
             }
