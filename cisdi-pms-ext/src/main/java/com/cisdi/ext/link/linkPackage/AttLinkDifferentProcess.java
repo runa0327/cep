@@ -165,6 +165,15 @@ public class AttLinkDifferentProcess {
         list.add("PM_CONSTRUCTION_DRAWING_DESIGN"); //施工图设计管理
         return list;
     }
+    /**
+     * 需要自动岗位人员的流程-岗位人员可改
+     * @return 流程集合
+     */
+    public static List<String> getLinkUserProcessEdit() {
+        List<String> list = new ArrayList<>();
+        list.add("PIPELINE_RELOCATION_REQ"); //管线迁改
+        return list;
+    }
 
     /**
      * 业主单位变化有对应值需要变化的流程
