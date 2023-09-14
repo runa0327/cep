@@ -9,6 +9,19 @@
         <result property="code" column="code" />
         <result property="sysTrue" column="sysTrue" />
         <result property="hostAdder" column="hostAdder" />
+        <result property="url" column="url" />
+        <result property="param" column="param" />
+        <result property="method" column="method" />
+        <result property="isSuccess" column="isSuccess" />
+        <result property="successDate" column="successDate" />
+        <result property="remark" column="remark" />
+        <result property="ver" column="ver" />
+        <result property="ts" column="ts" />
+        <result property="createBy" column="createBy" />
+        <result property="createDate" column="createDate" />
+        <result property="lastUpdateBy" column="lastUpdateBy" />
+        <result property="lastUpdateDate" column="lastUpdateDate" />
+        <result property="status" column="status" />
     </resultMap>
 
     <!--根据第三方接口编码查询接口是否启用-->
@@ -22,4 +35,31 @@
             STATUS = 'AP'
           AND CODE = #{interfaceCode}
     </select>
+
+    <!--根据id动态修改数据-->
+    <update id="updateConditionById">
+        update BASE_THIRD_INTERFACE_DETAIL
+        <set>
+            <if test="isSuccess != null">
+                SYS_TRUE_ONE = #{isSuccess},
+            </if>
+            <if test="successDate != null and successDate != ''">
+                SUBMIT_TIME = #{successDate},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="ts != null and ts != ''">
+                ts = #{ts},
+            </if>
+            <if test="lastUpdateBy != null and lastUpdateBy != ''">
+                LAST_MODI_USER_ID = #{lastUpdateBy},
+            </if>
+            <if test="lastUpdateDate != null and lastUpdateDate != ''">
+                LAST_MODI_DT = #{lastUpdateDate},
+            </if>
+        </set>
+        where
+            id = #{id}
+    </update>
 </mapper>

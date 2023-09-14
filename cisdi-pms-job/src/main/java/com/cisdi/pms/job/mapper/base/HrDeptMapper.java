@@ -1,5 +1,7 @@
 package com.cisdi.pms.job.mapper.base;
 
+import com.cisdi.pms.job.domain.base.HrDept;
+
 public interface HrDeptMapper {
 
     /**
@@ -8,4 +10,11 @@ public interface HrDeptMapper {
      * @return
      */
     String getDeptIdByName(String deptId);
+
+    /**
+     * 根据用户id获取所属部门信息
+     * @param userId 人员id
+     * @return 部门信息
+     */
+    String queryIdByUserId(String userId);
 }

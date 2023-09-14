@@ -88,4 +88,7 @@ public class PmPostAppoint extends BaseCommon {
 
     // 流程实例id
     private String wfProcessInstanceId;
+
+    // 接口调用详情表id
+    private String interfaceId;
 }

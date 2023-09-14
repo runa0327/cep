@@ -1,5 +1,6 @@
 package com.cisdi.ext.pm;
 
+import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cisdi.ext.base.BaseThirdInterfaceDetailExt;
@@ -305,10 +306,13 @@ public class PmStartExt {
         if (!CollectionUtils.isEmpty(prjList)){
             String projectId = JdbcMapUtil.getString(prjList.get(0),"id");
             new Thread(()->{
+                String id = IdUtil.getSnowflakeNextIdStr();
                 Map<String,Object> canMap = new HashMap<>();
                 canMap.put("projectId",projectId);
+                canMap.put("interfaceId",id);
+                canMap.put("createBy",userId);
                 String str = HttpClient.urlencode(canMap);
-                BaseThirdInterfaceDetailExt.insert(userId,str,"GET","automaticPmPostAppoint",myJdbcTemplate);
+                BaseThirdInterfaceDetailExt.insert(userId,str,id,"GET","automaticPmPostAppoint",myJdbcTemplate);
             }).start();
         }
     }

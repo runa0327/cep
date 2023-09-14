@@ -26,6 +26,12 @@ public class PmPostAppointController {
         if (!StringUtils.hasText(pmPostAppoint.getProjectId())){
             throw new BaseException("[projectId]项目id不能为空！");
         }
+        if (!StringUtils.hasText(pmPostAppoint.getInterfaceId())){
+            throw new BaseException("[interfaceId]接口调用详情表不能为空！");
+        }
+        if (!StringUtils.hasText(pmPostAppoint.getCreateBy())){
+            throw new BaseException("[createBy]创建人信息不能为空！");
+        }
         pmPostAppointService.automaticPmPostAppoint(pmPostAppoint);
     }
 }

@@ -1,9 +1,13 @@
 package com.cisdi.pms.job.domain.notice;
 
+import com.cisdi.pms.job.domain.base.BaseCommon;
+import lombok.Data;
+
 /**
  * 第三方接口调用-实体信息
  */
-public class BaseThirdInterface {
+@Data
+public class BaseThirdInterface extends BaseCommon {
 
     // id
     private String id;
@@ -11,52 +15,28 @@ public class BaseThirdInterface {
     // 名称
     private String name;
 
-    // 编码
-    private String code;
-
     // 是否启用
     private Integer sysTrue;
 
     // 接口地址
     private String hostAdder;
 
-    public String getId() {
-        return id;
-    }
+    // 接口地址
+    private String url;
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    // 参数信息
+    private String param;
 
-    public String getName() {
-        return name;
-    }
+    // 接口调用请求方式
+    private String method;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    // 接口是否调用完成
+    private Integer isSuccess;
 
-    public String getCode() {
-        return code;
-    }
+    // 接口调用完成时间
+    private String successDate;
 
-    public void setCode(String code) {
-        this.code = code;
-    }
+    // 备注信息
+    private String remark;
 
-    public Integer getSysTrue() {
-        return sysTrue;
-    }
-
-    public void setSysTrue(Integer sysTrue) {
-        this.sysTrue = sysTrue;
-    }
-
-    public String getHostAdder() {
-        return hostAdder;
-    }
-
-    public void setHostAdder(String hostAdder) {
-        this.hostAdder = hostAdder;
-    }
 }

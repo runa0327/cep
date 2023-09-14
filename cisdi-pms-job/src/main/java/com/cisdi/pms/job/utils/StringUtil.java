@@ -1,6 +1,7 @@
 package com.cisdi.pms.job.utils;
 
 import com.google.common.base.Strings;
+import org.springframework.util.StringUtils;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -157,6 +158,18 @@ public class StringUtil {
             }
         }
         return str;
+    }
+
+    /**
+     * 多字段自动拼接
+     * @param start 连接符号
+     * @param values 参数组
+     * @return 拼接结果
+     */
+    public static String concat(String start, String ... values) {
+        StringJoiner sb = new StringJoiner(start);
+        Arrays.stream(values).filter(p->!StringUtils.hasText(p)).forEach(p->sb.add(p));
+        return sb.toString();
     }
 
 }

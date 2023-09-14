@@ -12,4 +12,10 @@ public interface PmPostAppointMapper {
      * @return 查询结果
      */
     List<PmPostAppoint> queryListByProjectNotVD(String projectId);
+
+    /**
+     * 新增
+     * @param pmPostAppoint1 实体
+     */
+    void insert(PmPostAppoint pmPostAppoint1);
 }

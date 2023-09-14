@@ -18,4 +18,11 @@ public interface PmRosterMapper {
      * @return 工程管理岗人呢元
      */
     String queryMangeUserByProject(String projectId);
+
+    /**
+     * 根据项目id获取项目所有花名册岗位人员信息
+     * @param projectId 项目id
+     * @return 查询结果
+     */
+    List<PmRoster> queryByProjectId(String projectId);
 }

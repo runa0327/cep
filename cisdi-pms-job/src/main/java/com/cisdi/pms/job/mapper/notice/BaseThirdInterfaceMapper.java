@@ -10,4 +10,10 @@ public interface BaseThirdInterfaceMapper {
      * @return 是否启用
      */
     BaseThirdInterface getSysTrue(String interfaceCode);
+
+    /**
+     * 根据id动态修改数据
+     * @param baseThirdInterface 实体信息
+     */
+    void updateConditionById(BaseThirdInterface baseThirdInterface);
 }
