@@ -1,5 +1,6 @@
 package com.cisdi.ext.history;
 
+import com.cisdi.ext.enums.TableData;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.MyNamedParameterJdbcTemplate;
@@ -138,4 +139,74 @@ public class InventoryReventDataExt {
         }
         return res;
     }
+
+    /**
+     * 资料清单刷新导入的流程台账
+     */
+    public void inventoryReventProcess() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String projectIds = JdbcMapUtil.getString(map, "projectIds");
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from pm_prj where status='ap' ");
+        Map<String, Object> queryParams = new HashMap<>();// 创建入参map
+        if (Strings.isNotEmpty(projectIds)) {
+            sb.append(" and id in (:ids)");
+            queryParams.put("ids", Arrays.asList(projectIds.split(",")));
+        }
+        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), queryParams);
+
+        List<Map<String, Object>> typeList = myJdbcTemplate.queryForList("select * from material_inventory_type where `STATUS`='ap' and WF_PROCESS_ID is not null ");
+
+        if (!CollectionUtils.isEmpty(list)) {
+            for (Map<String, Object> objectMap : list) {
+                String projectId = JdbcMapUtil.getString(objectMap, "ID");
+                List<Map<String, Object>> inventoryList = myJdbcTemplate.queryForList("select pid.*,MATERIAL_INVENTORY_TYPE_ID from prj_inventory_detail pid left join PRJ_INVENTORY pi on pi.id = pid.PRJ_INVENTORY_ID where PM_PRJ_ID =? ", projectId);
+                if (!CollectionUtils.isEmpty(inventoryList)) {
+                    Map<String, List<Map<String, Object>>> groupData = inventoryList.stream().collect(Collectors.groupingBy(p -> JdbcMapUtil.getString(p, "MATERIAL_INVENTORY_TYPE_ID")));
+                    for (String key : groupData.keySet()) {
+
+                        String fileIds = groupData.get(key).stream().map(m -> JdbcMapUtil.getString(m, "FL_FILE_ID")).collect(Collectors.joining(","));
+                        List<String> ids = Arrays.asList(fileIds.split(","));
+
+                        Optional<Map<String, Object>> any = typeList.stream().filter(p -> key.equals(JdbcMapUtil.getString(p, "ID"))).findAny();
+                        if (any.isPresent()) {
+                            Map<String, Object> typeDate = any.get();
+                            String processId = JdbcMapUtil.getString(typeDate, "WF_PROCESS_ID");
+                            String attValueId = JdbcMapUtil.getString(typeDate, "AD_ENT_ATT_V_ID");
+                            String buyMatterId = JdbcMapUtil.getString(typeDate, "BUY_MATTER_ID");//采购事项
+                            //根据流程查询台账表名
+                            List<Map<String, Object>> objList = myJdbcTemplate.queryForList("select ad.`CODE` as tableName,ad.ID as ID from base_process_ent bas left join ad_ent ad on bas.AD_ENT_ONE_ID = ad.ID where WF_PROCESS_ID=?", processId);
+                            if (!CollectionUtils.isEmpty(objList)) {
+                                Map<String, Object> mapData = objList.get(0);
+                                String tableName = JdbcMapUtil.getString(mapData, "tableName");
+                                if (TableData.getEnum(tableName) != null) {
+                                    TableData tableData = TableData.getEnum(tableName);
+                                    //判断表是否有attValueId对应的字段
+                                    List<Map<String, Object>> attList = myJdbcTemplate.queryForList("select att.* from ad_att att left join ad_ent_att aee on att.id = aee.AD_ATT_ID left join ad_ent aet on aee.AD_ENT_ID = aet.ID where aet.`CODE`=? and att.id = ?", mapData.get("ID"), attValueId);
+                                    if (!CollectionUtils.isEmpty(attList)) {
+                                        Map<String, Object> attData = attList.get(0);
+                                        String attCode = JdbcMapUtil.getString(attData, "CODE");
+                                        String sql = "";
+                                        if ("PO_ORDER_REQ".equals(tableName)) {
+                                            sql = "update " + tableName + "set " + attCode + " = '" + ids + "' where  " + tableData.getImp() + " = '1' and find_in_set('" + projectId + "',PM_PRJ_IDS) and BUY_MATTER_ID='" + buyMatterId + "'";
+                                        } else if ("PO_ORDER_SUPPLEMENT_REQ".equals(tableName)) {
+                                            sql = "update " + tableName + "set " + attCode + " = '" + ids + "' where  " + tableData.getImp() + " = '1' and find_in_set('" + projectId + "',PM_PRJ_IDS) ";
+                                        } else {
+                                            sql = "update " + tableName + "set " + attCode + " = '" + ids + "' where  " + tableData.getImp() + " = '1' and " + tableData.getAtt() + " = '" + projectId + "'";
+                                        }
+                                        System.out.println("sql=:" + sql);
+                                        myJdbcTemplate.update(sql);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
 }
