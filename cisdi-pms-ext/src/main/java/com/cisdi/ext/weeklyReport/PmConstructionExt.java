@@ -88,12 +88,14 @@ public class PmConstructionExt {
      */
     private PmConstructionDetailView getMonth(List<PmConstructionDetailView> detail) {
         PmConstructionDetailView pmConstructionDetailView = new PmConstructionDetailView();
-        String month = DateTimeUtil.getMonth(new Date());
-        PmConstructionDetailView pmConstructionDetailViewOld = detail.stream().filter(p->month.equals(p.getMonth())).collect(Collectors.toList()).get(0);
-        BeanUtils.copyProperties(pmConstructionDetailViewOld,pmConstructionDetailView);
-        pmConstructionDetailView.setCheckAmt(pmConstructionDetailView.getFirstAmt());
-        String monthN = pmConstructionDetailView.getYear() + "年" +pmConstructionDetailView.getMonth() + "月";
-        pmConstructionDetailView.setMonth(monthN);
+        if (!CollectionUtils.isEmpty(detail)){
+            String month = DateTimeUtil.getMonth(new Date());
+            PmConstructionDetailView pmConstructionDetailViewOld = detail.stream().filter(p->month.equals(p.getMonth())).collect(Collectors.toList()).get(0);
+            BeanUtils.copyProperties(pmConstructionDetailViewOld,pmConstructionDetailView);
+            pmConstructionDetailView.setCheckAmt(pmConstructionDetailView.getFirstAmt());
+            String monthN = pmConstructionDetailView.getYear() + "年" +pmConstructionDetailView.getMonth() + "月";
+            pmConstructionDetailView.setMonth(monthN);
+        }
         return pmConstructionDetailView;
     }
 
