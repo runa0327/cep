@@ -26,4 +26,11 @@ public interface PmPrjMapper {
      * @return 项目名称
      */
     String getProjectNameByIdArr(@Param("list") String[] projectIdArr);
+
+    /**
+     * 根据项目id查询项目信息
+     * @param projectId 项目id
+     * @return 项目信息
+     */
+    PmPrj queryById(String projectId);
 }

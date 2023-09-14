@@ -9,7 +9,21 @@
         <result property="projectName" column="projectName" />
         <result property="izStart" column="izStart" />
         <result property="izEnd" column="izEnd" />
+        <result property="customerUnitId" column="customerUnitId" />
+        <result property="investSourceId" column="investSourceId" />
+        <result property="projectTotalInvest" column="projectTotalInvest" />
+        <result property="projectTypeId" column="projectTypeId" />
+        <result property="startDate" column="startDate" />
+        <result property="tenderModeId" column="tenderModeId" />
+        <result property="projectSituation" column="projectSituation" />
+        <result property="startRemark" column="startRemark" />
+        <result property="startFile" column="startFile" />
     </resultMap>
+
+    <sql id="commonHeader">
+        id as id,
+        name as projectName,
+    </sql>
 
     <!--形象进度工程周报-需要自动生成周报的项目-->
     <select id="getNeedWeekPrj" resultMap="pmPrjResult">
