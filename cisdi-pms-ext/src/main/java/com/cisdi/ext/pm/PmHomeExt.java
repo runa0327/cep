@@ -251,7 +251,7 @@ public class PmHomeExt {
             sb.append(" ,ACTUAL_END_TIME='").append(info.actualEndTime).append("'");
         }
         if (StringUtils.hasText(info.step)) {
-            sb.append(" ,TRANSITION_PHASE_ID='").append(info.step).append("'");
+            sb.append(" ,PROJECT_PHASE_ID='").append(info.step).append("'");
         }
         //单位--特殊处理
         if (StringUtils.hasText(info.jsUnit)) {
