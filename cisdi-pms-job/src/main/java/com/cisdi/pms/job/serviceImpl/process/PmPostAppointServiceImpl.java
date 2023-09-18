@@ -4,6 +4,7 @@ import cn.hutool.core.util.IdUtil;
 import com.cisdi.pms.job.domain.notice.BaseThirdInterface;
 import com.cisdi.pms.job.domain.process.PmPostAppoint;
 import com.cisdi.pms.job.domain.process.WfProcess;
+import com.cisdi.pms.job.domain.process.WfProcessInstance;
 import com.cisdi.pms.job.domain.project.PmPrj;
 import com.cisdi.pms.job.domain.project.PmRoster;
 import com.cisdi.pms.job.domain.project.ProjectStart;
@@ -17,13 +18,17 @@ import com.cisdi.pms.job.mapper.project.ProjectStartMapper;
 import com.cisdi.pms.job.service.process.PmPostAppointService;
 import com.cisdi.pms.job.service.process.WfProcessInstanceService;
 import com.cisdi.pms.job.utils.DateUtil;
+import com.cisdi.pms.job.utils.MapUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PmPostAppointServiceImpl implements PmPostAppointService {
@@ -58,6 +63,7 @@ public class PmPostAppointServiceImpl implements PmPostAppointService {
      * @param pmPostAppoint 岗位指派流程实体
      */
     @Override
+//    @Transactional(rollbackFor = Exception.class)
     public void automaticPmPostAppoint(PmPostAppoint pmPostAppoint) {
         String projectId = pmPostAppoint.getProjectId();
         String interfaceId = pmPostAppoint.getInterfaceId();
@@ -66,26 +72,33 @@ public class PmPostAppointServiceImpl implements PmPostAppointService {
 
         List<PmPostAppoint> list = queryListByProjectNotVD(projectId);
         if (CollectionUtils.isEmpty(list)){ // 同一个项目岗位指派流程只能存在一个
-            String wfProcessInstanceId = IdUtil.getSnowflakeNextIdStr(); // 流程实例id
-            String id = IdUtil.getSnowflakeNextIdStr(); // 岗位指派表id
-
-            PmPostAppoint pmPostAppoint1 = new PmPostAppoint();
-
             String hrDeptId = hrDeptMapper.queryIdByUserId(userId);
             if (!StringUtils.hasText(hrDeptId)){
                 String msg = "该用户没有对应的部门信息，不允许发起流程";
-                valueInterface(msg,now,interfaceId,0);
+                valueInterface(msg,now,interfaceId,1);
             } else {
+                String wfProcessInstanceId = IdUtil.getSnowflakeNextIdStr(); // 流程实例id
+                String id = IdUtil.getSnowflakeNextIdStr(); // 岗位指派表id
+
+                WfProcessInstance wfProcessInstance = new WfProcessInstance();
+                wfProcessInstance.setId(wfProcessInstanceId);
+                wfProcessInstanceService.insert(wfProcessInstance);
+
+                PmPostAppoint pmPostAppoint1 = new PmPostAppoint(); // 创建岗位指派表
+                pmPostAppoint1.setId(id);
                 pmPostAppoint1.setCreateBy(userId);
                 pmPostAppoint1.setLastUpdateBy(userId);
-                pmPostAppoint1.setWfProcessInstanceId(wfProcessInstanceId);
-                pmPostAppoint1.setStatus("APING");
+                pmPostAppoint1.setStatus("DR");
                 pmPostAppoint1.setDeptId(hrDeptId);
                 pmPostAppoint1.setCreateDate(now);
                 pmPostAppoint1.setLastUpdateDate(now);
                 pmPostAppoint1.setTs(now);
                 pmPostAppoint1.setId(id);
                 pmPostAppoint1.setVer("1");
+                pmPostAppointMapper.insert(pmPostAppoint1);
+
+                pmPostAppoint1.setWfProcessInstanceId(wfProcessInstanceId);
+
 
                 PmPrj pmPrj = pmPrjMapper.queryById(projectId); // 项目基础信息
                 ProjectStart projectStart = new ProjectStart();
@@ -95,14 +108,18 @@ public class PmPostAppointServiceImpl implements PmPostAppointService {
                     projectStart = projectStartMapper.queryByProjectId(projectId);
                 }
 
-                // 创建流程实例、节点实例、用户任务
-                WfProcess wfProcess = wfProcessMapper.queryByName("岗位指派");
-                wfProcessInstanceService.createAllInstance(wfProcessInstanceId,id,pmPrj,wfProcess,userId,now,0);
-
-
                 // 岗位指派流程表创建数据
                 getPmPostAppointByPrjOrPrjStart(pmPostAppoint1,pmPrj,projectStart,pmRosterList);
-                pmPostAppointMapper.insert(pmPostAppoint1);
+                pmPostAppointMapper.updateById(pmPostAppoint1);
+                Map<String,Object> map = MapUtils.objectToMap(pmPostAppoint1);
+
+                // 创建流程实例、节点实例、用户任务
+                WfProcess wfProcess = wfProcessMapper.queryByName("岗位指派");
+                wfProcessInstanceService.createAllInstance(wfProcessInstanceId,map,pmPrj,wfProcess,userId,now,0);
+
+                String msg = "发起成功！";
+                valueInterface(msg,now,interfaceId,1);
+
             }
 
         } else {
@@ -126,7 +143,7 @@ public class PmPostAppointServiceImpl implements PmPostAppointService {
         baseThirdInterface.setSuccessDate(now);
         baseThirdInterface.setTs(now);
         baseThirdInterface.setLastUpdateDate(now);
-        baseThirdInterface.setLastUpdateDate("0099250247095871681");
+        baseThirdInterface.setLastUpdateBy("0099250247095871681");
         baseThirdInterfaceMapper.updateConditionById(baseThirdInterface);
     }
 

@@ -168,7 +168,7 @@ public class StringUtil {
      */
     public static String concat(String start, String ... values) {
         StringJoiner sb = new StringJoiner(start);
-        Arrays.stream(values).filter(p->!StringUtils.hasText(p)).forEach(p->sb.add(p));
+        Arrays.stream(values).filter(p->StringUtils.hasText(p)).forEach(p->sb.add(p));
         return sb.toString();
     }
 

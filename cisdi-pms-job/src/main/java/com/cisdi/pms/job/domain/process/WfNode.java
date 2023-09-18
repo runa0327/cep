@@ -1,4 +1,4 @@
-package com.cisdi.pms.job.mapper.process;
+package com.cisdi.pms.job.domain.process;
 
 import lombok.Data;
 

@@ -75,6 +75,16 @@
         LK_WF_INST_ID AS wfProcessInstanceId
     </sql>
 
+    <!--根据实体记录id查询信息-->
+    <select id="queryById" resultMap="PmPostAppointMapperResult">
+        select
+            <include refid="commonHeader" />
+        from
+            pm_post_appoint
+        where
+            id = #{id}
+    </select>
+
     <!--根据项目id查询状态不是作废及作废中的数据-->
     <select id="queryListByProjectNotVD" resultMap="PmPostAppointMapperResult">
         select
@@ -158,4 +168,100 @@
             #{startDate}
         )
     </insert>
+
+    <!--根据id动态修改数据-->
+    <update id="updateById">
+        update pm_post_appoint
+        <set>
+            <if test="ver != null">
+                VER = #{ver},
+            </if>
+            <if test="ts != null and ts != ''">
+                TS = #{ts},
+            </if>
+            <if test="lastUpdateDate != null and lastUpdateDate != ''">
+                LAST_MODI_DT = #{lastUpdateDate},
+            </if>
+            <if test="lastUpdateBy != null and lastUpdateBy != ''">
+                LAST_MODI_USER_ID = #{lastUpdateBy},
+            </if>
+            <if test="wfProcessInstanceId != null and wfProcessInstanceId != ''">
+                LK_WF_INST_ID = #{wfProcessInstanceId},
+            </if>
+            <if test="projectId != null and projectId != ''">
+                PM_PRJ_ID = #{projectId},
+            </if>
+            <if test="status != null and status != ''">
+                status = #{status},
+            </if>
+            <if test="investSourceId != null and investSourceId != ''">
+                INVESTMENT_SOURCE_ID = #{investSourceId},
+            </if>
+            <if test="projectTotalInvest != null and projectTotalInvest != ''">
+                PRJ_TOTAL_INVEST = #{projectTotalInvest},
+            </if>
+            <if test="projectTypeId != null and projectTypeId != ''">
+                PROJECT_TYPE_ID = #{projectTypeId},
+            </if>
+            <if test="customerUnitId != null and customerUnitId != ''">
+                CUSTOMER_UNIT = #{customerUnitId},
+            </if>
+            <if test="projectSituation != null and projectSituation != ''">
+                PRJ_SITUATION = #{projectSituation},
+            </if>
+            <if test="startRemark != null and startRemark != ''">
+                START_REMARK = #{startRemark},
+            </if>
+            <if test="startFile != null and startFile != ''">
+                FILE_ID_ONE = #{startFile},
+            </if>
+            <if test="earlyConstructionPostUserId != null and earlyConstructionPostUserId != ''">
+                AD_USER_TWELVE_ID = #{earlyConstructionPostUserId},
+            </if>
+            <if test="landManagePostUserId != null and landManagePostUserId != ''">
+                AD_USER_THIRTEEN_ID = #{landManagePostUserId},
+            </if>
+            <if test="pipeChangePostUserId != null and pipeChangePostUserId != ''">
+                AD_USER_FOURTEEN_ID = #{pipeChangePostUserId},
+            </if>
+            <if test="planOperatePostUserId != null and planOperatePostUserId != ''">
+                AD_USER_FIFTEEN_ID = #{planOperatePostUserId},
+            </if>
+            <if test="earlyEquipPostUserId != null and earlyEquipPostUserId != ''">
+                AD_USER_SIXTEEN_ID = #{earlyEquipPostUserId},
+            </if>
+            <if test="costManagePostUserId != null and costManagePostUserId != ''">
+                AD_USER_EIGHTEEN_ID = #{costManagePostUserId},
+            </if>
+            <if test="contractManagePostUserId != null and contractManagePostUserId != ''">
+                AD_USER_NINETEEN_ID = #{contractManagePostUserId},
+            </if>
+            <if test="equipCostPostUserId != null and equipCostPostUserId != ''">
+                AD_USER_TWENTY_ID = #{equipCostPostUserId},
+            </if>
+            <if test="buyManagePostUserId != null and buyManagePostUserId != ''">
+                AD_USER_TWENTY_ONE_ID = #{buyManagePostUserId},
+            </if>
+            <if test="designManagePostUserId != null and designManagePostUserId != ''">
+                AD_USER_TWENTY_TWO_ID = #{designManagePostUserId},
+            </if>
+            <if test="engineerManagerPostUserId != null and engineerManagerPostUserId != ''">
+                AD_USER_TWENTY_THREE_ID = #{engineerManagerPostUserId},
+            </if>
+            <if test="collectAndRemovePostUserId != null and collectAndRemovePostUserId != ''">
+                AD_USER_TWENTY_FOUR_ID = #{collectAndRemovePostUserId},
+            </if>
+            <if test="financeManagePostUserId != null and financeManagePostUserId != ''">
+                AD_USER_TWENTY_FIVE_ID = #{financeManagePostUserId},
+            </if>
+            <if test="tenderModeId != null and tenderModeId != ''">
+                TENDER_MODE_ID = #{tenderModeId},
+            </if>
+            <if test="startDate != null and startDate != ''">
+                START_DATE = #{startDate},
+            </if>
+        </set>
+        where
+            id = #{id}
+    </update>
 </mapper>

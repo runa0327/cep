@@ -17,4 +17,11 @@ public interface HrDeptMapper {
      * @return 部门信息
      */
     String queryIdByUserId(String userId);
+
+    /**
+     * 通过自定义sql信息查询单条部门信息
+     * @param sql 待执行语句
+     * @return 查询结果
+     */
+    HrDept selectBySql(String sql);
 }

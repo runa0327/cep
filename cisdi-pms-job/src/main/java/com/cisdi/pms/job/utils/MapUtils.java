@@ -3,10 +3,8 @@ package com.cisdi.pms.job.utils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * @author 尹涛 * @version V1.0.0
@@ -116,6 +114,29 @@ public class MapUtils {
 
         list.add(subMap); //添加最后一个分组
         return list;
+    }
+
+    /**
+     * 对象转Map
+     * @param t 对象
+     * @param ignoreFields 忽略字段
+     * @return map
+     */
+    public static <T> Map<String, Object> objectToMap(T t, String... ignoreFields) {
+        Map<String, Object> map = new HashMap<>();
+        Field[] declaredFields = t.getClass().getDeclaredFields();
+        List<String> ignoreFieldList = Arrays.asList(ignoreFields);
+        Arrays.stream(declaredFields).forEach(data -> {
+            data.setAccessible(true);
+            try {
+                if (ignoreFieldList.isEmpty() || !ignoreFieldList.contains(data.getName())) {
+                    map.put(data.getName(), data.get(t));
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        });
+        return map;
     }
 
 }

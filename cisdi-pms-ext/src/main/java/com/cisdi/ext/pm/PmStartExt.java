@@ -286,7 +286,7 @@ public class PmStartExt {
                     this.createOtherInfo(list1.get(0), id);
                 }
                 // 岗位指派流程自动发起
-//                autoCreateProcess(userId,list1,myJdbcTemplate);
+                autoCreateProcess(userId,list1,myJdbcTemplate);
             }
             myJdbcTemplate.update("update PRJ_START set PRJ_START_STATUS_ID=? where id=?", list.get(0).get("ID"), id);
         }

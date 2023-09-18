@@ -1,4 +1,4 @@
-package com.cisdi.pms.job.mapper.process;
+package com.cisdi.pms.job.domain.process;
 
 import com.cisdi.pms.job.domain.base.BaseCommon;
 import lombok.Data;
@@ -45,7 +45,7 @@ public class WfProcessInstance extends BaseCommon {
     // 节点实例名称
     private String wfNodeInstanceName;
 
-    // 节点id
+    // 节点id/当前节点id
     private String wfNodeId;
 
     // 当前代办用户

@@ -7,7 +7,13 @@
         <id property="id" column="id" />
         <result property="deptName" column="deptName" />
         <result property="deptId" column="deptId" />
+        <result property="chiefUserId" column="chiefUserId" />
     </resultMap>
+
+    <!--通过自定义sql信息查询单条部门信息-->
+    <select id="selectBySql" resultMap="HrDeptResult">
+        ${sql}
+    </select>
 
     <!--根据部门id查询名称，获取所有该名称的部门id-->
     <select id="getDeptIdByName" resultType="String">
@@ -21,7 +27,7 @@
         from
             hr_dept_user
         where
-            ad_user_id = ''
+            ad_user_id = #{userId}
             and sys_true = 1
         order by CRT_DT desc
         limit 1
