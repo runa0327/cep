@@ -14,7 +14,6 @@
         <result property="isModel" column="isModel" />
         <result property="processInstanceId" column="processInstanceId" />
         <result property="createBy" column="createBy" />
-        <result property="colMap" column="colMap" />
         <result property="customerUnitId" column="customerUnitId" />
         <result property="contractCategoryId" column="contractCategoryId" />
     </resultMap>
