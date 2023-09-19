@@ -165,7 +165,8 @@
             PM_PRJ_ID,
             SYS_TRUE,
             IZ_END,
-            IS_WEEKLY_REPORT_SUBMIT
+            IS_WEEKLY_REPORT_SUBMIT,
+            FILE_ID_TWO
         ) values (
             #{id},
             #{ver},
@@ -188,7 +189,8 @@
             #{projectId},
             #{weatherStart},
             #{weatherCompleted},
-            #{izSubmit}
+            #{izSubmit},
+            #{aerialImg}
         )
     </insert>
 
