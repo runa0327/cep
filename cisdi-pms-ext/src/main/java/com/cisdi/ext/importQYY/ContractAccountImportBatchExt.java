@@ -218,6 +218,8 @@ public class ContractAccountImportBatchExt {
                     .set("AMT_SIX",contract.getAmtTwo())//含税金额
                     .set("SIGN_DATE",contract.getSignDate())
                     .set("FILE_ID_ONE", contract.getFileIdFive())
+                    .set("CUSTOMER_UNIT",contract.getCustomerUnitOne()) // 业主单位
+                    .set("CONTRACT_CATEGORY_ONE_ID",contract.getContractCategoryOneId()) // 合同类型
                     .exec();
 
 //        }catch (Exception e){

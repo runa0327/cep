@@ -1,6 +1,7 @@
 package com.cisdi.pms.job.archive;
 
 import cn.hutool.core.util.IdUtil;
+import com.cisdi.pms.job.mapper.project.PmPrjMapper;
 import com.cisdi.pms.job.utils.StringUtil;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.DateTimeUtil;
@@ -12,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -20,6 +22,9 @@ import java.util.*;
 public class ArchiveGenerationService {
 
     private String adminUserId = "0099250247095871681";
+
+    @Resource
+    private PmPrjMapper pmPrjMapper;
 
 
     @Autowired
@@ -309,11 +314,22 @@ public class ArchiveGenerationService {
                 Object crtUserId = row.get("CRT_USER_ID");
                 Object crt_dt = row.get("CRT_DT");
 
-                String procInstName = proc.get("NAME") + "-历史数据导入";
+                String procInstName = "";
+                if ("po_order_req".equals(entCode)){
+                    String projectId = JdbcMapUtil.getString(row,"PM_PRJ_IDS");
+                    String projectName = pmPrjMapper.getProjectNameById(projectId);
+                    procInstName = proc.get("NAME") + "-历史数据导入-" + projectName;
+                } else {
+                    procInstName = proc.get("NAME") + "-历史数据导入";
+                }
 
                 Object entityRecordId = row.get("ID");
                 String procInstId = insertProcInst(crtUserId, procInstName, procId, crt_dt, ent.get("ID"), entCode, entityRecordId);
-                jdbcTemplate.update("update " + entCode + " set LK_WF_INST_ID=? WHERE ID=?", procInstId, entityRecordId);
+                if ("po_order_req".equals(entCode)){
+                    jdbcTemplate.update("update " + entCode + " set LK_WF_INST_ID=?,name = ? WHERE ID=?", procInstId, procInstName,entityRecordId);
+                } else {
+                    jdbcTemplate.update("update " + entCode + " set LK_WF_INST_ID=? WHERE ID=?", procInstId, entityRecordId);
+                }
 
                 createNodeList(procId, crtUserId, crt_dt, procInstId);
             }
