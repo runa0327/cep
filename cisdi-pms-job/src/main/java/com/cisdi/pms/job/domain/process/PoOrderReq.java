@@ -15,6 +15,8 @@ public class PoOrderReq {
     private String projectId;
     // 项目名称
     private String projectName;
+    // 建设单位/业主单位
+    private String customerUnitId;
     //公司名称
     private String companyName;
     // 公司id
@@ -29,4 +31,7 @@ public class PoOrderReq {
     private String createBy;
     //更新字段及对应文件
     private List<Map<String,String>> colMap;
+
+    // 合同类型
+    private String contractCategoryId;
 }

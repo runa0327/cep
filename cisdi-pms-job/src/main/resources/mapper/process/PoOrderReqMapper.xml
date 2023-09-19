@@ -6,6 +6,17 @@
     <resultMap id="PoOrderReqResult" type="com.cisdi.pms.job.domain.process.PoOrderReq">
         <id property="id" column="id" />
         <result property="name" column="name" />
+        <result property="projectId" column="projectId" />
+        <result property="projectName" column="projectName" />
+        <result property="companyName" column="companyName" />
+        <result property="companyId" column="companyId" />
+        <result property="fileId" column="fileId" />
+        <result property="isModel" column="isModel" />
+        <result property="processInstanceId" column="processInstanceId" />
+        <result property="createBy" column="createBy" />
+        <result property="colMap" column="colMap" />
+        <result property="customerUnitId" column="customerUnitId" />
+        <result property="contractCategoryId" column="contractCategoryId" />
     </resultMap>
 
     <!--根据合同id数组查询合同名称-->
@@ -15,4 +26,27 @@
                 #{item}
             </foreach>
     </select>
+
+    <!--查询所有历史导入数据-->
+    <select id="queryHistoryImport" resultMap="PoOrderReqResult">
+        select
+            id as id,
+            CUSTOMER_UNIT_ONE as customerUnitId,
+            CONTRACT_CATEGORY_ONE_ID as contractCategoryId
+        from
+            po_order_req
+        where
+            status = 'AP'
+            and IS_IMPORT = 1
+    </select>
+
+    <!--修改合同数据表合同签订公司、合同类型-->
+    <update id="updatePoOrderCustomerUnit">
+        update po_order
+        set
+            CUSTOMER_UNIT = #{customerUnitId},
+            CONTRACT_CATEGORY_ONE_ID = #{contractCategoryId}
+        where
+            CONTRACT_APP_ID = #{poOrderReqId}
+    </update>
 </mapper>
