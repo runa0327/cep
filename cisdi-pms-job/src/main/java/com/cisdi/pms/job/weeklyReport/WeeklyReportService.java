@@ -1,16 +1,12 @@
 package com.cisdi.pms.job.weeklyReport;
 
 import cn.hutool.core.util.IdUtil;
-import com.cisdi.pms.job.domain.project.PmPrj;
-import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeekly;
-import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrj;
-import com.cisdi.pms.job.mapper.process.ProcessMapper;
+import com.cisdi.pms.job.mapper.process.WfProcessMapper;
 import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyMapper;
 import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyPrjDetailMapper;
 import com.cisdi.pms.job.service.project.PmPrjService;
 import com.cisdi.pms.job.service.weeklyReport.PmProgressWeeklyPrjDetailService;
 import com.cisdi.pms.job.service.weeklyReport.PmProgressWeeklyPrjService;
-import com.cisdi.pms.job.serviceImpl.weeklyReport.PmProgressWeeklyServiceImpl;
 import com.cisdi.pms.job.utils.Constants;
 import com.cisdi.pms.job.utils.DateUtil;
 import com.qygly.shared.BaseException;
@@ -21,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -58,7 +53,7 @@ public class WeeklyReportService {
     private PmPrjService pmPrjService;
 
     @Resource
-    public ProcessMapper processMapper;
+    public WfProcessMapper wfProcessMapper;
 
     public void execute() {
 
@@ -454,7 +449,7 @@ public class WeeklyReportService {
      * @return
      */
     public Map<String, Object> getNotCoreProcess() {
-        List<String> proList = processMapper.getNotCoreProId();
+        List<String> proList = wfProcessMapper.getNotCoreProId();
         Map<String,Object> map = new HashMap<>();
         map.put("notCore",proList);
         return map;

@@ -723,28 +723,28 @@ public class ProcessRoleExt {
     }
 
     /**
-     * 部门负责人角色-区分公司-采购管理部负责人
+     * 部门负责人角色-区分公司-采购管理部负责人 若修改逻辑，请对应修改job模块 AdRoleServiceImpl.queryUserByRoleId下对应逻辑 该模块涉及自动发起岗位流程
      */
     public void getBuyDeptChargeUser(){
         getDeptChargeUser("CHIEF_USER_ID","post_buy","采购管理部");
     }
 
     /**
-     * 部门负责人角色-区分公司-前期管理部负责人
+     * 部门负责人角色-区分公司-前期管理部负责人 若修改逻辑，请对应修改job模块 AdRoleServiceImpl.queryUserByRoleId下对应逻辑 该模块涉及自动发起岗位流程
      */
     public void getLandDeptChargeUser(){
         getDeptChargeUser("CHIEF_USER_ID","post_early","前期管理部");
     }
 
     /**
-     * 部门负责人角色-区分公司-财务金融部负责人
+     * 部门负责人角色-区分公司-财务金融部负责人 若修改逻辑，请对应修改job模块 AdRoleServiceImpl.queryUserByRoleId下对应逻辑 该模块涉及自动发起岗位流程
      */
     public void getFinanceDeptChargeUser(){
         getDeptChargeUser("CHIEF_USER_ID","post_finance","财务金融部");
     }
 
     /**
-     * 部门负责人角色-区分公司-工程管理部负责人
+     * 部门负责人角色-区分公司-工程管理部负责人 若修改逻辑，请对应修改job模块 AdRoleServiceImpl.queryUserByRoleId下对应逻辑 该模块涉及自动发起岗位流程
      */
     public void getEngineeringDeptChargeUser(){
         boolean izCheck = checkNeedRole();
@@ -768,14 +768,14 @@ public class ProcessRoleExt {
     }
 
     /**
-     * 部门负责人角色-区分公司-设计管理部负责人
+     * 部门负责人角色-区分公司-设计管理部负责人 若修改逻辑，请对应修改job模块 AdRoleServiceImpl.queryUserByRoleId下对应逻辑 该模块涉及自动发起岗位流程
      */
     public void getDesignDeptChargeUser(){
         getDeptChargeUser("CHIEF_USER_ID","post_design","设计管理部");
     }
 
     /**
-     * 部门负责人角色-区分公司-成本合约部负责人
+     * 部门负责人角色-区分公司-成本合约部负责人 若修改逻辑，请对应修改job模块 AdRoleServiceImpl.queryUserByRoleId下对应逻辑 该模块涉及自动发起岗位流程
      */
     public void getCostDeptChargeUser(){
         getDeptChargeUser("CHIEF_USER_ID","post_cost","成本合约部");

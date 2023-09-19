@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.process.WfProcessMapper">
+    <resultMap id="WfProcessResult" type="com.cisdi.pms.job.domain.process.WfProcess">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="adEntId" column="adEntId" />
+        <result property="adEntCode" column="adEntCode" />
+    </resultMap>
+
+    <!--查询非核心流程id-->
+    <select id="getNotCoreProId" resultType="String">
+        select WF_PROCESS_ID from HR_PROC_LEVEL where STATUS = 'AP' AND IZ_CORE = 0;
+    </select>
+
+    <!--根据流程名称精准查询流程信息-->
+    <select id="queryByName" resultMap="WfProcessResult">
+        select
+            a.id as id,
+            a.name as name,
+            b.AD_ENT_ONE_ID as adEntId,
+            c.code as adEntCode
+        from
+            wf_process a
+        left join BASE_PROCESS_ENT b on a.id = b.wf_process_id
+        left join ad_ent c on b.AD_ENT_ONE_ID = c.id
+        where
+            a.name = #{processName} and a.status = 'AP'
+            and b.status = 'ap'
+    </select>
+</mapper>

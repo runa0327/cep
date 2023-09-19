@@ -7,6 +7,7 @@ import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.commons.HttpClient;
 import com.cisdi.ext.model.ContractSigningContact;
 import com.cisdi.ext.model.GrSetValue;
+import com.cisdi.ext.model.PoOrder;
 import com.cisdi.ext.model.PoOrderReq;
 import com.cisdi.ext.model.view.order.PoOrderReqView;
 import com.cisdi.ext.pm.PmInLibraryExt;
@@ -547,19 +548,6 @@ public class PoOrderReqExt {
                 PoOrderPrjDetailExt.insertData(id,projectId);
             }
         }
-
-//        List<PoOrderReq> list = PoOrderReq.selectByWhere(new Where().nin(PoOrderReq.Cols.STATUS,"VD","VDING")
-//                .eq(PoOrderReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
-//        if (!CollectionUtils.isEmpty(list)){
-//            for (PoOrderReq tmp : list) {
-//                String poOrderReqId = tmp.getId();
-//                String projectName = tmp.getProjectNameWr();
-//                String projectId = PmPrjExt.createPrjByMoreName(projectName);
-//                Crud.from("po_order_req").where().eq("id",poOrderReqId).update()
-//                        .set("PM_PRJ_IDS",projectId)
-//                        .exec();
-//            }
-//        }
     }
 
     /**
@@ -570,6 +558,22 @@ public class PoOrderReqExt {
         if (!CollectionUtils.isEmpty(list)){
             for (PoOrderReq tmp : list) {
                 Crud.from("po_order").where().eq("CONTRACT_APP_ID",tmp.getId()).update().set("STATUS","VD").exec();
+            }
+        }
+    }
+
+    /**
+     * 合同签订-历史导入数据-合同签订单位及合同类型写入数据表
+     */
+    public void historyCompanyToData(){
+        List<PoOrderReq> list = PoOrderReq.selectByWhere(new Where().eq(PoOrderReq.Cols.STATUS,"AP")
+                .eq(PoOrderReq.Cols.IS_IMPORT,"1"));
+        if (!CollectionUtils.isEmpty(list)){
+            for (PoOrderReq tmp : list) {
+                Crud.from("PO_ORDER").where().eq(PoOrder.Cols.CONTRACT_APP_ID,tmp.getId()).update()
+                        .set(PoOrder.Cols.CUSTOMER_UNIT,tmp.getCustomerUnitOne())
+                        .set(PoOrder.Cols.CONTRACT_CATEGORY_ONE_ID,tmp.getContractCategoryOneId())
+                        .exec();
             }
         }
     }

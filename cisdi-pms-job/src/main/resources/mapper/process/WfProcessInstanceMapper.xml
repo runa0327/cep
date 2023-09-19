@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.process.WfProcessInstanceMapper">
+    <resultMap id="WfProcessInstanceResultMap" type="com.cisdi.pms.job.domain.process.WfProcessInstance">
+        <id property="id" column="id" />
+        <result property="wfProcessInstanceId" column="wfProcessInstanceId" />
+        <result property="wfProcessInstanceName" column="wfProcessInstanceName" />
+        <result property="startUserId" column="startUserId" />
+        <result property="startDate" column="startDate" />
+        <result property="endDate" column="endDate" />
+        <result property="wfProcessId" column="wfProcessId" />
+        <result property="adEntId" column="adEntId" />
+        <result property="adEntCode" column="adEntCode" />
+        <result property="entityRecordId" column="entityRecordId" />
+        <result property="urgent" column="urgent" />
+        <result property="wfNodeInstanceId" column="wfNodeInstanceId" />
+        <result property="wfNodeInstanceName" column="wfNodeInstanceName" />
+        <result property="wfNodeId" column="wfNodeId" />
+        <result property="currentTodoUserIds" column="currentTodoUserIds" />
+        <result property="currentViewId" column="currentViewId" />
+        <result property="actId" column="actId" />
+        <result property="wfFlowId" column="wfFlowId" />
+        <result property="seqNo" column="seqNo" />
+        <result property="isCurrentRound" column="isCurrentRound" />
+        <result property="isCurrent" column="isCurrent" />
+        <result property="taskId" column="taskId" />
+        <result property="adUserId" column="adUserId" />
+        <result property="receiveDate" column="receiveDate" />
+        <result property="actDate" column="actDate" />
+        <result property="viewDate" column="viewDate" />
+        <result property="isClosed" column="isClosed" />
+        <result property="wfTaskTypeId" column="wfTaskTypeId" />
+        <result property="isFirstTask" column="isFirstTask" />
+        <result property="ver" column="ver" />
+        <result property="ts" column="ts" />
+        <result property="createBy" column="createBy" />
+        <result property="createDate" column="createDate" />
+        <result property="lastUpdateBy" column="lastUpdateBy" />
+        <result property="lastUpdateDate" column="lastUpdateDate" />
+        <result property="status" column="status" />
+        <result property="code" column="code" />
+    </resultMap>
+
+    <!--新增-->
+    <insert id="insert">
+        insert into wf_process_instance (
+            ID,
+            NAME,
+            VER,
+            START_USER_ID,
+            START_DATETIME,
+            WF_PROCESS_ID,
+            END_DATETIME,
+            STATUS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            AD_ENT_ID,
+            ENT_CODE,
+            ENTITY_RECORD_ID,
+            TS,
+            IS_URGENT,
+            CURRENT_NODE_ID,
+            CURRENT_NI_ID,
+            CURRENT_TODO_USER_IDS,
+            CURRENT_VIEW_ID
+        ) values (
+            #{id},
+            #{wfProcessInstanceName},
+            #{ver},
+            #{startUserId},
+            #{startDate},
+            #{wfProcessId},
+            #{endDate},
+            #{status},
+            #{createDate},
+            #{createBy},
+            #{lastUpdateDate},
+            #{lastUpdateBy},
+            #{adEntId},
+            #{adEntCode},
+            #{entityRecordId},
+            #{ts},
+            #{urgent},
+            #{wfNodeId},
+            #{wfNodeInstanceId},
+            #{adUserId},
+            #{currentViewId}
+        )
+    </insert>
+
+    <!--新增节点实例-->
+    <insert id="insertNodeInstance">
+        insert into WF_NODE_INSTANCE (
+            ID,
+            NAME,
+            VER,
+            WF_PROCESS_INSTANCE_ID,
+            WF_NODE_ID,
+            START_DATETIME,
+            END_DATETIME,
+            EFFECTIVE_ACT_ID,
+            FROM_FLOW_ID,
+            SEQ_NO,
+            STATUS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            IN_CURRENT_ROUND,
+            TS,
+            IS_CURRENT,
+            WF_PROCESS_ID
+        ) values (
+            #{id},
+            #{wfNodeInstanceName},
+            #{ver},
+            #{wfProcessInstanceId},
+            #{wfNodeId},
+            #{startDate},
+            #{endDate},
+            #{actId},
+            #{wfFlowId},
+            #{seqNo},
+            #{status},
+            #{createDate},
+            #{createBy},
+            #{lastUpdateDate},
+            #{lastUpdateBy},
+            #{isCurrentRound},
+            #{ts},
+            #{isCurrent},
+            #{wfProcessId}
+        )
+    </insert>
+
+    <!--新增用户流程代办任务-->
+    <insert id="insertUserTask">
+        insert into WF_TASK (
+            ID,
+            VER,
+            WF_NODE_INSTANCE_ID,
+            AD_USER_ID,
+            RECEIVE_DATETIME,
+            ACT_DATETIME,
+            VIEW_DATETIME,
+            AD_ACT_ID,
+            IS_CLOSED,
+            STATUS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            WF_TASK_TYPE_ID,
+            SEQ_NO,
+            IN_CURRENT_ROUND,
+            TS,
+            WF_PROCESS_ID,
+            WF_PROCESS_INSTANCE_ID,
+            WF_NODE_ID,
+            IS_PROC_INST_FIRST_TODO_TASK
+        ) values (
+            #{id},
+            #{ver},
+            #{wfNodeInstanceId},
+            #{adUserId},
+            #{receiveDate},
+            #{actDate},
+            #{viewDate},
+            #{actId},
+            #{isClosed},
+            #{status},
+            #{createDate},
+            #{createBy},
+            #{lastUpdateDate},
+            #{lastUpdateBy},
+            #{wfTaskTypeId},
+            #{seqNo},
+            #{isCurrentRound},
+            #{ts},
+            #{wfProcessId},
+            #{wfProcessInstanceId},
+            #{wfNodeId},
+            #{isFirstTask}
+        )
+    </insert>
+
+    <!--根据id动态修改数据-->
+    <update id="updateProcessInstanceById">
+        update
+            wf_process_instance
+        <set>
+            <if test="wfProcessInstanceName != null and wfProcessInstanceName != ''">
+                NAME = #{wfProcessInstanceName},
+            </if>
+            <if test="ver != null">
+                VER = #{ver},
+            </if>
+            <if test="startUserId != null and startUserId != ''">
+                START_USER_ID = #{startUserId},
+            </if>
+            <if test="startDate != null and startDate != ''">
+                START_DATETIME = #{startDate},
+            </if>
+            <if test="wfProcessId != null and wfProcessId != ''">
+                WF_PROCESS_ID = #{wfProcessId},
+            </if>
+            <if test="endDate != null and endDate != ''">
+                END_DATETIME = #{endDate},
+            </if>
+            <if test="status != null and status != ''">
+                STATUS = #{status},
+            </if>
+            <if test="createDate != null and createDate != ''">
+                CRT_DT = #{createDate},
+            </if>
+            <if test="createBy != null and createBy != ''">
+                CRT_USER_ID = #{createBy},
+            </if>
+            <if test="lastUpdateDate != null and lastUpdateDate != ''">
+                LAST_MODI_DT = #{lastUpdateDate},
+            </if>
+            <if test="lastUpdateBy != null and lastUpdateBy != ''">
+                LAST_MODI_USER_ID = #{lastUpdateBy},
+            </if>
+            <if test="adEntId != null and adEntId != ''">
+                AD_ENT_ID = #{adEntId},
+            </if>
+            <if test="adEntCode != null and adEntCode != ''">
+                ENT_CODE = #{adEntCode},
+            </if>
+            <if test="entityRecordId != null and entityRecordId != ''">
+                ENTITY_RECORD_ID = #{entityRecordId},
+            </if>
+            <if test="ts != null and ts != ''">
+                TS = #{ts},
+            </if>
+            <if test="urgent != null">
+                IS_URGENT = #{urgent},
+            </if>
+            <if test="wfNodeId != null and wfNodeId != ''">
+                CURRENT_NODE_ID = #{wfNodeId},
+            </if>
+            <if test="wfNodeInstanceId != null and wfNodeInstanceId != ''">
+                CURRENT_NI_ID = #{wfNodeInstanceId},
+            </if>
+            <if test="adUserId != null and adUserId != ''">
+                CURRENT_TODO_USER_IDS = #{adUserId},
+            </if>
+            <if test="currentViewId != null and currentViewId != ''">
+                CURRENT_VIEW_ID = #{currentViewId},
+            </if>
+        </set>
+        where
+            id = #{id}
+    </update>
+
+    <!--根据id动态修改节点实例数据-->
+    <update id="updateNodeInstanceById">
+        update wf_node_instance
+        <set>
+            <if test="wfNodeInstanceName != null and wfNodeInstanceName != ''">
+                name = #{wfNodeInstanceName},
+            </if>
+            <if test="ver != null">
+                ver = #{ver},
+            </if>
+            <if test="wfNodeInstanceId != null and wfNodeInstanceId != ''">
+                WF_NODE_INSTANCE_ID = #{wfNodeInstanceId},
+            </if>
+            <if test="adUserId != null and adUserId != ''">
+                AD_USER_ID = #{adUserId},
+            </if>
+            <if test="receiveDate != null and receiveDate != ''">
+                RECEIVE_DATETIME = #{receiveDate},
+            </if>
+            <if test="actDate != null and actDate != ''">
+                ACT_DATETIME = #{actDate},
+            </if>
+            <if test="viewDate != null and viewDate != ''">
+                VIEW_DATETIME = #{viewDate},
+            </if>
+            <if test="actId != null and actId != ''">
+                AD_ACT_ID = #{actId},
+            </if>
+            <if test="isClosed != null">
+                IS_CLOSED = #{isClosed},
+            </if>
+            <if test="status != null and status != ''">
+                STATUS = #{status},
+            </if>
+            <if test="createDate != null and createDate != ''">
+                CRT_DT = #{createDate},
+            </if>
+            <if test="createBy != null and createBy != ''">
+                CRT_USER_ID = #{createBy},
+            </if>
+            <if test="lastUpdateDate != null and lastUpdateDate != ''">
+                LAST_MODI_DT = #{lastUpdateDate},
+            </if>
+            <if test="lastUpdateBy != null and lastUpdateBy != ''">
+                LAST_MODI_USER_ID = #{lastUpdateBy},
+            </if>
+            <if test="wfTaskTypeId != null and wfTaskTypeId != ''">
+                WF_TASK_TYPE_ID = #{wfTaskTypeId},
+            </if>
+            <if test="seqNo != null and seqNo != ''">
+                SEQ_NO = #{seqNo},
+            </if>
+            <if test="isCurrentRound != null">
+                IN_CURRENT_ROUND = #{isCurrentRound},
+            </if>
+            <if test="isCurrent != null">
+                IS_CURRENT = #{isCurrent},
+            </if>
+            <if test="ts != null and ts != ''">
+                ts = #{ts},
+            </if>
+            <if test="wfProcessId != null and wfProcessId != ''">
+                WF_PROCESS_ID = #{wfProcessId},
+            </if>
+            <if test="wfProcessInstanceId != null and wfProcessInstanceId != ''">
+                WF_PROCESS_INSTANCE_ID = #{wfProcessInstanceId},
+            </if>
+            <if test="wfNodeId != null and wfNodeId != ''">
+                WF_NODE_ID = #{wfNodeId},
+            </if>
+            <if test="isFirstTask != null">
+                IS_PROC_INST_FIRST_TODO_TASK = #{isFirstTask},
+            </if>
+            <if test="startDate != null and startDate != ''">
+                START_DATETIME = #{startDate},
+            </if>
+        </set>
+        where
+            id = #{id}
+    </update>
+</mapper>
