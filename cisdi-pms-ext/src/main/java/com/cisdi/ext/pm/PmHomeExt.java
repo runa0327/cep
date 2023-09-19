@@ -288,7 +288,10 @@ public class PmHomeExt {
 
         if (StringUtils.hasText(info.pics)) {
             sb.append(" ,PRJ_IMG='").append(info.pics).append("'");
+        } else {
+            sb.append(" ,PRJ_IMG = null");
         }
+
         sb.append(" where id='").append(info.id).append("'");
         myJdbcTemplate.update(sb.toString());
     }
