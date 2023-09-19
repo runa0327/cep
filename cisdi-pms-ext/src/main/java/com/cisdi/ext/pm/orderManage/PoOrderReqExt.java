@@ -566,15 +566,47 @@ public class PoOrderReqExt {
      * 合同签订-历史导入数据-合同签订单位及合同类型写入数据表
      */
     public void historyCompanyToData(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<PoOrderReq> list = PoOrderReq.selectByWhere(new Where().eq(PoOrderReq.Cols.STATUS,"AP")
                 .eq(PoOrderReq.Cols.IS_IMPORT,"1"));
         if (!CollectionUtils.isEmpty(list)){
-            for (PoOrderReq tmp : list) {
-                Crud.from("PO_ORDER").where().eq(PoOrder.Cols.CONTRACT_APP_ID,tmp.getId()).update()
-                        .set(PoOrder.Cols.CUSTOMER_UNIT,tmp.getCustomerUnitOne())
-                        .set(PoOrder.Cols.CONTRACT_CATEGORY_ONE_ID,tmp.getContractCategoryOneId())
-                        .exec();
+            int fromIndex = 0;
+            int toIndex = 500;
+            while (true){
+                if (toIndex < list.size()){
+                    List<PoOrderReq> list1 = list.subList(fromIndex,toIndex);
+                    log.error("索引{}-{}正在执行修改",fromIndex,toIndex);
+                    updatePoOrder(list1);
+                    myJdbcTemplate.update("commit;");
+                } else if (toIndex == list.size()){
+                    List<PoOrderReq> list1 = list.subList(fromIndex,toIndex);
+                    if (list1.size() > 0){
+                        log.error("索引{}-{}正在执行修改",fromIndex,toIndex);
+                        updatePoOrder(list1);
+                        myJdbcTemplate.update("commit;");
+                    }
+                    break;
+                } else {
+                    List<PoOrderReq> list1 = list.subList(fromIndex,list.size());
+                    if (list1.size() > 0){
+                        log.error("索引{}-{}正在执行修改",fromIndex,toIndex);
+                        updatePoOrder(list1);myJdbcTemplate.update("commit;");
+
+                    }
+                    break;
+                }
+                fromIndex = toIndex;
+                toIndex = toIndex+500;
             }
+        }
+    }
+
+    private void updatePoOrder(List<PoOrderReq> list) {
+        for (PoOrderReq tmp : list) {
+            Crud.from("PO_ORDER").where().eq(PoOrder.Cols.CONTRACT_APP_ID,tmp.getId()).update()
+                    .set(PoOrder.Cols.CUSTOMER_UNIT,tmp.getCustomerUnitOne())
+                    .set(PoOrder.Cols.CONTRACT_CATEGORY_ONE_ID,tmp.getContractCategoryOneId())
+                    .exec();
         }
     }
 
