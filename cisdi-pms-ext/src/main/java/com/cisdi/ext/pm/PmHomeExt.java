@@ -285,10 +285,7 @@ public class PmHomeExt {
             sb.append(" ,CONSULTER_UNIT='").append(id).append("'");
         }
         //单位--特殊处理
-
-        if (StringUtils.hasText(info.pics)) {
-            sb.append(" ,PRJ_IMG='").append(info.pics).append("'");
-        }
+        sb.append(" ,PRJ_IMG='").append(info.pics).append("'");
         sb.append(" where id='").append(info.id).append("'");
         myJdbcTemplate.update(sb.toString());
     }
