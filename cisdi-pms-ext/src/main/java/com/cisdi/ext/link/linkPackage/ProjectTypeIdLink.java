@@ -36,7 +36,7 @@ public class ProjectTypeIdLink {
 
         Map<String, Object> row = list.get(0);
         AttLinkClear.clearProjectTypeData(attLinkResult);
-        AttLinkExtDetail.prjTypeLinkNew(row,attLinkResult,entCode);
+        AttLinkExtDetail.prjTypeLinkNew(row,attLinkResult,entCode,"PROJECT_TYPE_ID");
 
         //建设规模类型
         String scaleTypeId = JdbcMapUtil.getString(row, "CON_SCALE_TYPE_ID");
