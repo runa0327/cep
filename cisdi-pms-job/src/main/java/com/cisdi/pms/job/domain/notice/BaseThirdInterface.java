@@ -39,4 +39,7 @@ public class BaseThirdInterface extends BaseCommon {
     // 备注信息
     private String remark;
 
+    // 失败次数
+    private Integer failNum;
+
 }

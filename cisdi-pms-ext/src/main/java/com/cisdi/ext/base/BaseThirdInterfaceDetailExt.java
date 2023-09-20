@@ -20,7 +20,7 @@ public class BaseThirdInterfaceDetailExt {
     public static void insert(String userId, String str, String interfaceId, String method, String urlCode,MyJdbcTemplate myJdbcTemplate) {
         String now = DateTimeUtil.dttmToString(new Date());
         String url = HttpClient.getUrl(urlCode,myJdbcTemplate);
-        String sql = "insert into base_third_interface_detail (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,URL,TEXT_REMARK_ONE,REMARK_ONE,SYS_TRUE_ONE) values (?,'1',?,?,?,?,?,'AP',?,?,?,'0')";
+        String sql = "insert into base_third_interface_detail (ID,VER,TS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID,STATUS,URL,TEXT_REMARK_ONE,REMARK_ONE,SYS_TRUE_ONE,FAIL_CT) values (?,'1',?,?,?,?,?,'AP',?,?,?,'0','0')";
         myJdbcTemplate.update(sql,interfaceId,now,now,userId,now,userId,url,str,method);
         if ("GET".equals(method)){
             HttpClient.doGet(url,str);
