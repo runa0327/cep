@@ -162,6 +162,7 @@ public class ContractAccountImportBatchExt {
                     .set("CONTRACT_CODE",contractCode)
                     .set("IS_IMPORT",true)
                     .set("STATUS","AP")
+                    .set("BUY_MATTER_ID",contract.getBuyMatterId()) // 合同事项
                     .exec();
 
             //清除对应的联系人明细

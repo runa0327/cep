@@ -137,6 +137,10 @@ public class ContractAccountImport {
          */
         public static final String CONTRACT_CATEGORY_ONE_ID = "CONTRACT_CATEGORY_ONE_ID";
         /**
+         * 采购事项。
+         */
+        public static final String BUY_MATTER_ID = "BUY_MATTER_ID";
+        /**
          * 金额3。
          */
         public static final String AMT_THREE = "AMT_THREE";
@@ -954,6 +958,42 @@ public class ContractAccountImport {
             this.contractCategoryOneId = contractCategoryOneId;
             if (!this.toUpdateCols.contains("CONTRACT_CATEGORY_ONE_ID")) {
                 this.toUpdateCols.add("CONTRACT_CATEGORY_ONE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 采购事项。
+     */
+    private String buyMatterId;
+
+    /**
+     * 获取：采购事项。
+     */
+    public String getBuyMatterId() {
+        return this.buyMatterId;
+    }
+
+    /**
+     * 设置：采购事项。
+     */
+    public ContractAccountImport setBuyMatterId(String buyMatterId) {
+        if (this.buyMatterId == null && buyMatterId == null) {
+            // 均为null，不做处理。
+        } else if (this.buyMatterId != null && buyMatterId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.buyMatterId.compareTo(buyMatterId) != 0) {
+                this.buyMatterId = buyMatterId;
+                if (!this.toUpdateCols.contains("BUY_MATTER_ID")) {
+                    this.toUpdateCols.add("BUY_MATTER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.buyMatterId = buyMatterId;
+            if (!this.toUpdateCols.contains("BUY_MATTER_ID")) {
+                this.toUpdateCols.add("BUY_MATTER_ID");
             }
         }
         return this;
