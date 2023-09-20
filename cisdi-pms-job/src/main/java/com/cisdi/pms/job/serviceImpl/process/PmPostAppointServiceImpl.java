@@ -133,10 +133,14 @@ public class PmPostAppointServiceImpl implements PmPostAppointService {
      * @param msg 消息体
      * @param now 时间
      * @param interfaceId 接口调用详情记录id
-     * @param executeStatus 接口执行状态 1已执行 0未执行
+     * @param executeStatus 接口执行状态 1已执行/成功 0未执行/失败
      */
     public void valueInterface(String msg, String now, String interfaceId, int executeStatus) {
         BaseThirdInterface baseThirdInterface = new BaseThirdInterface();
+        if (executeStatus == 0){
+            Integer failNum = baseThirdInterfaceMapper.getFailNumsById(interfaceId);
+            baseThirdInterface.setFailNum(failNum+1);
+        }
         baseThirdInterface.setId(interfaceId);
         baseThirdInterface.setRemark(msg);
         baseThirdInterface.setIsSuccess(executeStatus);

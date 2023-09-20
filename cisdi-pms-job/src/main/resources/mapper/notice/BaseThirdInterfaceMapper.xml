@@ -22,6 +22,7 @@
         <result property="lastUpdateBy" column="lastUpdateBy" />
         <result property="lastUpdateDate" column="lastUpdateDate" />
         <result property="status" column="status" />
+        <result property="failNum" column="failNum" />
     </resultMap>
 
     <!--根据第三方接口编码查询接口是否启用-->
@@ -34,6 +35,39 @@
         where
             STATUS = 'AP'
           AND CODE = #{interfaceCode}
+    </select>
+
+    <!--自动执行三方接口未执行成功的数据-->
+    <select id="queryUnExecuteThird" resultMap="BaseThirdInterfaceResult">
+        select
+            id as id,
+            VER as ver,
+            TS as ts,
+            CRT_DT as createDate,
+            CRT_USER_ID as createBy,
+            LAST_MODI_DT as lastUpdateDate,
+            LAST_MODI_USER_ID as lastUpdateBy,
+            STATUS as status,
+            URL as url,
+            TEXT_REMARK_ONE as param,
+            REMARK_ONE as method,
+            SYS_TRUE_ONE as isSuccess,
+            FAIL_CT as failNum
+        from
+            BASE_THIRD_INTERFACE_DETAIL
+        where
+            status = 'AP'
+            AND SYS_TRUE_ONE = 0
+        <![CDATA[
+            AND FAIL_CT <= 5
+            AND CRT_DT <= DATE_SUB(NOW(),INTERVAL 10 MINUTE)
+            AND CRT_DT >= DATE_SUB(NOW(),INTERVAL 1 DAY)
+        ]]>
+    </select>
+
+    <!--获取该接口调用失败次数-->
+    <select id="getFailNumsById" resultType="int">
+        select FAIL_CT from BASE_THIRD_INTERFACE_DETAIL where id = #{interfaceId}
     </select>
 
     <!--根据id动态修改数据-->
