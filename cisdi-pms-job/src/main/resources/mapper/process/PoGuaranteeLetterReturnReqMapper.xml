@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.process.PoGuaranteeLetterReturnReqMapper">
+    <resultMap id="PoGuaranteeLetterReturnReqResult" type="com.cisdi.pms.job.domain.process.PoGuaranteeLetterReturnReq">
+        <id property="id" column="id" />
+        <result property="guaranteeLetterTypeId" column="guaranteeLetterTypeId" />
+        <result property="guaranteeLetterTypeName" column="guaranteeLetterTypeName" />
+        <result property="otherGuaranteeLetterName" column="otherGuaranteeLetterName" />
+        <result property="guaranteeCostTypeId" column="guaranteeCostTypeId" />
+        <result property="guaranteeCostTypeName" column="guaranteeCostTypeName" />
+        <result property="otherGuaranteeCostName" column="otherGuaranteeCostName" />
+        <result property="projectId" column="projectId" />
+        <result property="projectName" column="projectName" />
+        <result property="guaranteeMechanism" column="guaranteeMechanism" />
+        <result property="guaranteeCode" column="guaranteeCode" />
+        <result property="guaranteeAmt" column="guaranteeAmt" />
+        <result property="guaranteeAmtMin" column="guaranteeAmtMin" />
+        <result property="guaranteeAmtMax" column="guaranteeAmtMax" />
+        <result property="guaranteeAmtChina" column="guaranteeAmtChina" />
+        <result property="guaranteeStartDate" column="guaranteeStartDate" />
+        <result property="guaranteeStartDateMin" column="guaranteeStartDateMin" />
+        <result property="guaranteeStartDateMax" column="guaranteeStartDateMax" />
+        <result property="guaranteeEndDate" column="guaranteeEndDate" />
+        <result property="guaranteeEndDateMax" column="guaranteeEndDateMax" />
+        <result property="guaranteeEndDateMin" column="guaranteeEndDateMin" />
+        <result property="remarkLongOne" column="remarkLongOne" />
+        <result property="author" column="author" />
+        <result property="createUserId" column="createUserId" />
+        <result property="createUserName" column="createUserName" />
+        <result property="deptId" column="deptId" />
+        <result property="deptName" column="deptName" />
+        <result property="createDate" column="createDate" />
+        <result property="createDateMin" column="createDateMin" />
+        <result property="createDateMax" column="createDateMax" />
+        <result property="companyId" column="companyId" />
+        <result property="companyName" column="companyName" />
+        <result property="applicant" column="applicant" />
+        <result property="reason" column="reason" />
+        <result property="remark" column="remark" />
+        <result property="commentOne" column="commentOne" />
+        <result property="commentTwo" column="commentTwo" />
+        <result property="commentThree" column="commentThree" />
+        <result property="commentFour" column="commentFour" />
+        <result property="commentFive" column="commentFive" />
+        <result property="createBy" column="createBy" />
+        <result property="processInstanceName" column="processInstanceName" />
+        <result property="status" column="status" />
+        <result property="projectSource" column="projectSource" />
+        <result property="guaranteeEndTypeName" column="guaranteeEndTypeName" />
+        <result property="guaranteeEndTypeId" column="guaranteeEndTypeId" />
+        <result property="guaranteeEndRemark" column="guaranteeEndRemark" />
+    </resultMap>
+
+    <!--通用查询表头-->
+    <sql id="commonHeader">
+        b.NAME AS processInstanceName,
+        (select name from ad_user where id = a.CRT_USER_ID) as createUserName,
+        (select name from hr_dept where id = a.CRT_DEPT_ID) AS deptName,
+        a.CRT_DT AS createDate,
+        (SELECT NAME FROM AD_STATUS WHERE ID = a.status) as status,
+        (select name from pm_party where id = a.CUSTOMER_UNIT_ONE) as companyName,
+        ( SELECT NAME FROM gr_set_value WHERE id = a.PROJECT_SOURCE_TYPE_ID ) AS projectSource,
+        a.APPLICANT as applicant,
+        a.AUTHOR as author,
+        a.GUARANTEE_LETTER_TYPE_ID AS guaranteeLetterTypeId,
+        (select name from gr_set_value where id = a.GUARANTEE_LETTER_TYPE_ID) as guaranteeLetterTypeName,
+        a.REMARK_ONE as otherGuaranteeLetterName,
+        a.GUARANTEE_COST_TYPE_ID as guaranteeCostTypeId,
+        (select name from gr_set_value where id = a.GUARANTEE_COST_TYPE_ID) as guaranteeCostTypeName,
+        a.COST_TYPE_WR as otherGuaranteeCostName,
+        a.GUARANTEE_MECHANISM AS guaranteeMechanism,
+        a.GUARANTEE_CODE AS guaranteeCode,
+        a.AMT_FIVE AS guaranteeAmt,
+        a.REMARK_TWO as guaranteeAmtChina,
+        a.GUARANTEE_START_DATE AS guaranteeStartDate,
+        a.GUARANTEE_DATE_TYPE_ID AS guaranteeEndTypeId,
+        ( SELECT NAME FROM gr_set_value WHERE id = a.GUARANTEE_DATE_TYPE_ID ) AS guaranteeEndTypeName,
+        a.GUARANTEE_END_DATE AS guaranteeEndDate,
+        a.DATE_TYPE_WR AS guaranteeEndRemark,
+        (select name from gr_set_value where id = a.REASON) as reason,
+        a.REMARK_LONG_ONE as remark,
+        a.APPROVAL_COMMENT_ONE as commentOne,
+        a.APPROVAL_COMMENT_TWO as commentTwo,
+        a.APPROVAL_COMMENT_THREE as commentThree,
+        a.APPROVAL_COMMENT_FOUR as commentFour,
+        a.APPROVAL_COMMENT_FIVE as commentFive
+    </sql>
+
+    <sql id="commonFilter">
+        <if test="createBy != null and createBy != ''">
+            and a.CRT_USER_ID = #{createBy}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and a.CRT_DEPT_ID in ('${deptId}')
+        </if>
+        <if test="createDateMin != null and createDateMin != ''">
+            and a.CRT_DT >= #{createDateMin}
+        </if>
+        <if test="createDateMax != null and createDateMax != ''">
+            <![CDATA[ and a.CRT_DT <= #{createDateMax} ]]>
+        </if>
+        <if test="companyId != null and companyId != ''">
+            and a.CUSTOMER_UNIT_ONE = #{companyId},
+        </if>
+        <if test="projectName != null and projectName != ''">
+            and a.PROJECT_NAME_WR like concat('%',#{projectName},'%')
+        </if>
+        <if test="guaranteeCostTypeId != null and guaranteeCostTypeId != ''">
+            and a.GUARANTEE_COST_TYPE_ID = #{guaranteeCostTypeId}
+        </if>
+        <if test="guaranteeLetterTypeId != null and guaranteeLetterTypeId != ''">
+            and a.GUARANTEE_LETTER_TYPE_ID = #{guaranteeLetterTypeId}
+        </if>
+        <if test="guaranteeAmtMin != null">
+            and a.AMT_FIVE >= #{guaranteeAmtMin}
+        </if>
+        <if test="guaranteeAmtMax != null">
+            <![CDATA[ and a.AMT_FIVE <= #{guaranteeAmtMax} ]]>
+        </if>
+        <if test="guaranteeStartDate != null and guaranteeStartDate != ''">
+            and a.GUARANTEE_START_DATE >= #{guaranteeStartDate}
+        </if>
+        <if test="guaranteeEndDate != null and guaranteeEndDate != ''">
+            <![CDATA[ and a.GUARANTEE_END_DATE <= #{guaranteeEndDate} ]]>
+        </if>
+    </sql>
+
+    <!--查询系统类结果-->
+    <select id="getSysMesList" resultMap="PoGuaranteeLetterReturnReqResult">
+        select
+            f.NAME AS projectName,
+        <include refid="commonHeader"></include>
+        FROM
+            po_guarantee_letter_return_oa_req a
+        LEFT JOIN wf_process_instance b ON a.id = b.ENTITY_RECORD_ID
+        LEFT JOIN pm_prj f ON a.PM_PRJ_ID = f.id
+        WHERE
+            a.STATUS = 'ap'
+            AND a.PM_PRJ_ID IS not NULL
+            AND a.crt_dt >= '2022-11-22 00:00:00'
+        <if test="projectId != null and projectId != ''">
+            and a.pm_prj_id = #{projectId}
+        </if>
+        <include refid="commonFilter"></include>
+    </select>
+
+    <!--查询非系统类结果-->
+    <select id="getNotSysMesList" resultMap="PoGuaranteeLetterReturnReqResult">
+        select
+            a.PROJECT_NAME_WR as projectName,
+            <include refid="commonHeader"></include>
+        FROM
+            po_guarantee_letter_return_oa_req a
+        LEFT JOIN wf_process_instance b ON a.id = b.ENTITY_RECORD_ID
+        WHERE
+            a.STATUS = 'ap'
+            AND a.PROJECT_NAME_WR IS not NULL
+            AND a.crt_dt >= '2022-11-22 00:00:00'
+        <if test="projectName != null and projectName != ''">
+            and a.PROJECT_NAME_WR like concat('%',#{projectName},'%')
+        </if>
+        <include refid="commonFilter"></include>
+    </select>
+</mapper>

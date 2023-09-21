@@ -93,6 +93,14 @@ public class PmPrj {
          */
         public static final String REMARK = "REMARK";
         /**
+         * 实际开工时间。
+         */
+        public static final String ACTUAL_START_TIME = "ACTUAL_START_TIME";
+        /**
+         * 计划开工时间。
+         */
+        public static final String PLAN_START_TIME = "PLAN_START_TIME";
+        /**
          * 是否导入的记录。
          */
         public static final String IS_IMPORT = "IS_IMPORT";
@@ -100,6 +108,14 @@ public class PmPrj {
          * 招标模式。
          */
         public static final String TENDER_MODE_ID = "TENDER_MODE_ID";
+        /**
+         * 实际竣工时间。
+         */
+        public static final String ACTUAL_END_TIME = "ACTUAL_END_TIME";
+        /**
+         * 计划竣工时间。
+         */
+        public static final String PLAN_END_TIME = "PLAN_END_TIME";
         /**
          * 记录状态。
          */
@@ -780,6 +796,78 @@ public class PmPrj {
     }
 
     /**
+     * 实际开工时间。
+     */
+    private LocalDateTime actualStartTime;
+
+    /**
+     * 获取：实际开工时间。
+     */
+    public LocalDateTime getActualStartTime() {
+        return this.actualStartTime;
+    }
+
+    /**
+     * 设置：实际开工时间。
+     */
+    public PmPrj setActualStartTime(LocalDateTime actualStartTime) {
+        if (this.actualStartTime == null && actualStartTime == null) {
+            // 均为null，不做处理。
+        } else if (this.actualStartTime != null && actualStartTime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actualStartTime.compareTo(actualStartTime) != 0) {
+                this.actualStartTime = actualStartTime;
+                if (!this.toUpdateCols.contains("ACTUAL_START_TIME")) {
+                    this.toUpdateCols.add("ACTUAL_START_TIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actualStartTime = actualStartTime;
+            if (!this.toUpdateCols.contains("ACTUAL_START_TIME")) {
+                this.toUpdateCols.add("ACTUAL_START_TIME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 计划开工时间。
+     */
+    private LocalDateTime planStartTime;
+
+    /**
+     * 获取：计划开工时间。
+     */
+    public LocalDateTime getPlanStartTime() {
+        return this.planStartTime;
+    }
+
+    /**
+     * 设置：计划开工时间。
+     */
+    public PmPrj setPlanStartTime(LocalDateTime planStartTime) {
+        if (this.planStartTime == null && planStartTime == null) {
+            // 均为null，不做处理。
+        } else if (this.planStartTime != null && planStartTime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planStartTime.compareTo(planStartTime) != 0) {
+                this.planStartTime = planStartTime;
+                if (!this.toUpdateCols.contains("PLAN_START_TIME")) {
+                    this.toUpdateCols.add("PLAN_START_TIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planStartTime = planStartTime;
+            if (!this.toUpdateCols.contains("PLAN_START_TIME")) {
+                this.toUpdateCols.add("PLAN_START_TIME");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 是否导入的记录。
      */
     private Boolean isImport;
@@ -846,6 +934,78 @@ public class PmPrj {
             this.tenderModeId = tenderModeId;
             if (!this.toUpdateCols.contains("TENDER_MODE_ID")) {
                 this.toUpdateCols.add("TENDER_MODE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 实际竣工时间。
+     */
+    private LocalDateTime actualEndTime;
+
+    /**
+     * 获取：实际竣工时间。
+     */
+    public LocalDateTime getActualEndTime() {
+        return this.actualEndTime;
+    }
+
+    /**
+     * 设置：实际竣工时间。
+     */
+    public PmPrj setActualEndTime(LocalDateTime actualEndTime) {
+        if (this.actualEndTime == null && actualEndTime == null) {
+            // 均为null，不做处理。
+        } else if (this.actualEndTime != null && actualEndTime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actualEndTime.compareTo(actualEndTime) != 0) {
+                this.actualEndTime = actualEndTime;
+                if (!this.toUpdateCols.contains("ACTUAL_END_TIME")) {
+                    this.toUpdateCols.add("ACTUAL_END_TIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actualEndTime = actualEndTime;
+            if (!this.toUpdateCols.contains("ACTUAL_END_TIME")) {
+                this.toUpdateCols.add("ACTUAL_END_TIME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 计划竣工时间。
+     */
+    private LocalDateTime planEndTime;
+
+    /**
+     * 获取：计划竣工时间。
+     */
+    public LocalDateTime getPlanEndTime() {
+        return this.planEndTime;
+    }
+
+    /**
+     * 设置：计划竣工时间。
+     */
+    public PmPrj setPlanEndTime(LocalDateTime planEndTime) {
+        if (this.planEndTime == null && planEndTime == null) {
+            // 均为null，不做处理。
+        } else if (this.planEndTime != null && planEndTime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planEndTime.compareTo(planEndTime) != 0) {
+                this.planEndTime = planEndTime;
+                if (!this.toUpdateCols.contains("PLAN_END_TIME")) {
+                    this.toUpdateCols.add("PLAN_END_TIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planEndTime = planEndTime;
+            if (!this.toUpdateCols.contains("PLAN_END_TIME")) {
+                this.toUpdateCols.add("PLAN_END_TIME");
             }
         }
         return this;

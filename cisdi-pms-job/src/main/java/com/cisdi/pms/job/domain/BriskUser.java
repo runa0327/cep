@@ -1,33 +1,42 @@
 package com.cisdi.pms.job.domain;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
 
+@ExcelIgnoreUnannotated
 public class BriskUser {
 
     //id
     public String id;
 
     @ExcelProperty("姓名")
+    @ColumnWidth(30)
     //姓名
     public String userName;
 
     @ExcelProperty("部门")
+    @ColumnWidth(30)
     //部门
     public String deptName;
 
     @ExcelProperty("最近登录时间")
+    @ColumnWidth(30)
     //最近登录时间
     public String lastLoginDate;
 
     @ExcelProperty("累计登录次数")
+    @ColumnWidth(30)
     //累计登录次数
     public String loginNum;
 
     @ExcelProperty("累计发起流程")
+    @ColumnWidth(30)
     //累计发起流程
     public String initiateProcessNum;
 
     @ExcelProperty("累计处理流程")
+    @ColumnWidth(30)
     //累计处理流程
     public String handleProcessNum;
 

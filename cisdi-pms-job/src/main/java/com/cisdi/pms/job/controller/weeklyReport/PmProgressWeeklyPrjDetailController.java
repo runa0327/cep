@@ -9,13 +9,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/progressWeekly")
 public class PmProgressWeeklyPrjDetailController extends BaseController {
 
     @Resource
-    private PmProgressWeeklyPrjDetailService pmProgressWeeklyService;
+    private PmProgressWeeklyPrjDetailService pmProgressWeeklyPrjDetailService;
 
     /**
      * 形象工程周报-填报记录导出
@@ -24,6 +26,31 @@ public class PmProgressWeeklyPrjDetailController extends BaseController {
      */
     @GetMapping(value = "/downloadPrjUserRecords")
     public void downloadPrjUserRecords(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail, HttpServletResponse response){
-        pmProgressWeeklyService.downloadPrjUserRecords(pmProgressWeeklyPrjDetail,response);
+        pmProgressWeeklyPrjDetailService.downloadPrjUserRecords(pmProgressWeeklyPrjDetail,response);
+    }
+
+    /**
+     * 形象工程周报-老版本数据写入新版本明细信息
+     */
+    @GetMapping(value = "/prjProblemDetailOldToNew")
+    public void prjProblemDetailOldToNew(){
+        pmProgressWeeklyPrjDetailService.updateOldPrjProblemToDetail();
+    }
+
+    /**
+     * 项目问题汇总-导出
+     */
+    @GetMapping(value = "/downloadPrjProblem")
+    public void downloadPrjProblem(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail, HttpServletResponse response){
+        Map<String,Object> map = pmProgressWeeklyPrjDetailService.getPrjProblemList(pmProgressWeeklyPrjDetail);
+        pmProgressWeeklyPrjDetailService.downloadPrjProblem(map,"项目问题汇总",response);
+    }
+
+    /**
+     * 将上周航拍图信息更新到本周-只修改航拍图为空的
+     */
+    @GetMapping(value = "/updateAerialImg")
+    public void updateAerialImg(){
+        pmProgressWeeklyPrjDetailService.updateAerialImg();
     }
 }

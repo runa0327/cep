@@ -31,8 +31,34 @@
         <result column="recordByName" property="recordByName"/>
         <result column="manageUserId" property="manageUserId"/>
         <result column="manageUserName" property="manageUserName"/>
-        <result column="isSubmit" property="isSubmit"/>
+        <result column="izSubmit" property="izSubmit"/>
+        <result column="aerialImg" property="aerialImg"/>
     </resultMap>
+
+    <sql id="commonHeader">
+        id as id, -- id
+        CRT_DT as createDate, -- 创建时间
+        CRT_USER_ID as createUserId,  -- 创建人
+        LAST_MODI_DT as lastUpdateDate, -- 上次修改时间
+        LAST_MODI_USER_ID as lastUpdateUserId,  -- 上次修改人
+        `STATUS` as status,  -- 状态
+        PROCESS_REMARK_TEXT as progressWeek, -- 本周工作进展
+        DATE as writeDate, -- 填报周期
+        TO_DATE as toDate,  -- 填报周期结束时间
+        FROM_DATE as fromDate, -- 填报周期开始时间
+        FILE_ID_ONE as fileId, -- 形象进度影像资料
+        PM_PROGRESS_WEEKLY_ID as weekId, -- 周期id
+        TEXT_REMARK_ONE as progressRemark, -- 备注说明
+        VISUAL_PROGRESS as progress, -- 整体形象进度
+        VISUAL_PROGRESS_DESCRIBE as progressDescribe, -- 累计详细进度、问题说明
+        PM_PRJ_ID as projectId, -- 项目id
+        SYS_TRUE as weatherStart, -- 是否符合开工条件
+        AD_USER_ID as recordById,  -- 记录填报人
+        PM_PROGRESS_WEEKLY_PRJ_ID as weekPrjId, -- 进度周报-项目-id
+        IZ_END as weatherCompleted, -- 是否已竣工
+        IS_WEEKLY_REPORT_SUBMIT as izSubmit, -- 是否提交
+        FILE_ID_TWO as aerialImg -- 航拍图
+    </sql>
 
     <select id="getPrjRecords" resultMap="PmProgressWeeklyResult">
         SELECT
@@ -53,7 +79,8 @@
         e.name as projectName,
         d.AD_USER_ID as manageUserId,
         f.name as manageUserName,
-        b.IZ_WRITE as izWrite
+        b.IZ_WRITE as izWrite,
+        a.PM_PROGRESS_WEEKLY_PRJ_ID as weekPrjId
         FROM
         PM_PROGRESS_WEEKLY_PRJ_DETAIL a
         LEFT JOIN PM_PROGRESS_WEEKLY_PRJ b ON a.PM_PROGRESS_WEEKLY_PRJ_ID = b.id
@@ -138,15 +165,16 @@
             PM_PRJ_ID,
             SYS_TRUE,
             IZ_END,
-            IS_WEEKLY_REPORT_SUBMIT
+            IS_WEEKLY_REPORT_SUBMIT,
+            FILE_ID_TWO
         ) values (
             #{id},
             #{ver},
             #{ts},
-            #{crtDt},
-            #{crtUserId},
-            #{lastModiDt},
-            #{lastModiUserId},
+            #{createDate},
+            #{createUserId},
+            #{lastUpdateDate},
+            #{lastUpdateUserId},
             #{status},
             #{progressWeek},
             #{writeDate},
@@ -161,7 +189,8 @@
             #{projectId},
             #{weatherStart},
             #{weatherCompleted},
-            #{izSubmit}
+            #{izSubmit},
+            #{aerialImg}
         )
     </insert>
 
@@ -171,7 +200,8 @@
             ID as id,
             PROCESS_REMARK_TEXT as progressWeek,
             VISUAL_PROGRESS as progress,
-            VISUAL_PROGRESS_DESCRIBE as progressDescribe
+            VISUAL_PROGRESS_DESCRIBE as progressDescribe,
+            FILE_ID_TWO as aerialImg
         FROM
             pm_progress_weekly_prj_detail
         WHERE
@@ -179,4 +209,40 @@
           AND STATUS = 'ap'
           AND pm_prj_id = #{projectId}
     </select>
+
+    <!--查询项目周报所有明细信息-->
+    <select id="getList" resultMap="PmProgressWeeklyResult">
+        select
+            <include refid="commonHeader" />
+        from
+            pm_progress_weekly_prj_detail
+        where
+            status = 'AP' and VISUAL_PROGRESS_DESCRIBE is not null
+        order by
+            CRT_DT desc
+    </select>
+
+    <!--查询本周所有形象进度周报信息-->
+    <select id="queryListByWeekId" resultMap="PmProgressWeeklyResult">
+        select
+            <include refid="commonHeader" />
+        from
+            pm_progress_weekly_prj_detail
+        where
+            status = 'AP'
+            and PM_PROGRESS_WEEKLY_ID = #{weekId}
+            and FILE_ID_TWO is null
+        order by CRT_DT desc
+    </select>
+
+    <!--根据id动态修改数据-->
+    <update id="updateConditionById">
+        update pm_progress_weekly_prj_detail
+        set
+            <if test="aerialImg != null and aerialImg != ''">
+                FILE_ID_TWO = #{aerialImg}
+            </if>
+        where
+            id = #{id}
+    </update>
 </mapper>

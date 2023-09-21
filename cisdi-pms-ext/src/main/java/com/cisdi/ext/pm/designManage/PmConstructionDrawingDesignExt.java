@@ -21,9 +21,14 @@ public class PmConstructionDrawingDesignExt {
      * 流程-施工图设计管理-结束时校验
      */
     public void designAssignmentEndCheck(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //项目id
         String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        //流程表名
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        //流程业务表id
+        String csCommId = entityRecord.csCommId;
         //获取设计单位名称
         String designUnitOne = JdbcMapUtil.getString(entityRecord.valueMap,"DESIGN_UNIT_ONE");
         //更新写入勘察信息
@@ -31,6 +36,10 @@ public class PmConstructionDrawingDesignExt {
         //更新项目设计单位信息
         PmPrj pmPrj = appointValue(projectId,partyId);
         PmPrjExt.updateData(pmPrj);
+        //审批人员信息写入花名册
+        String processId = ExtJarHelper.procId.get();
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        ProcessCommon.addPrjPostUser(projectId,entCode,processId,companyId,csCommId,myJdbcTemplate);
     }
 
     /**
@@ -86,7 +95,7 @@ public class PmConstructionDrawingDesignExt {
             } else {
 
                 //获取审批意见信息
-                Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
+                Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId);
                 //审批意见内容
                 String comment = message.get("comment");
                 String processComment, commentEnd;

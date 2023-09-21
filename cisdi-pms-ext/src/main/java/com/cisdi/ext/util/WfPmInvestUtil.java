@@ -171,7 +171,7 @@ public class WfPmInvestUtil {
 
 
         //获取pm_prj现有记录的优先级
-        String prjIds = PmPrjExt.getProjectIdByProcess(valueMap, jdbcTemplate);
+        String prjIds = PmPrjExt.getProjectIdByProcess(valueMap);
         List<Map<String, Object>> prjPriorityList = jdbcTemplate.queryForList("select pp.id prjId,gv.code priority from pm_prj pp left join gr_set_value gv on" +
                 " gv.id = pp.INVEST_PRIORITY");
         String[] prjIdArray = prjIds.split(",");

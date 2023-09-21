@@ -4,6 +4,8 @@ import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.PmPlan;
 import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.model.PrjStart;
+import com.cisdi.ext.model.view.project.PmPrjView;
+import com.cisdi.ext.model.view.weekReport.PmConstructionView;
 import com.cisdi.ext.pm.PmPlanExt;
 import com.cisdi.ext.pm.PmPrjReqExt;
 import com.cisdi.ext.pm.PmRosterExt;
@@ -21,6 +23,7 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -49,15 +52,31 @@ public class PmPrjExt {
     }
 
     /**
+     * 根据项目id返回项目名称
+     * @param projectIds 项目id
+     * @param myJdbcTemplate 数据源
+     * @return 项目名称
+     */
+    public static String queryProjectNameByIds(String projectIds, MyJdbcTemplate myJdbcTemplate) {
+        projectIds = projectIds.replace(",","','");
+        String sql = "select group_concat(name) as name from pm_prj where id in ('"+projectIds+"')";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        if (!CollectionUtils.isEmpty(list)){
+            return JdbcMapUtil.getString(list.get(0),"name");
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * 通过流程信息获取项目id
      * @param valueMap 流程主体信息
-     * @param myJdbcTemplate 数据源
      * @return 项目id
      */
-    public static String getProjectIdByProcess(Map<String, Object> valueMap, MyJdbcTemplate myJdbcTemplate) {
+    public static String getProjectIdByProcess(Map<String, Object> valueMap) {
         String projectId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
         if (SharedUtil.isEmptyString(projectId)){
-            projectId = getRealProjectId(valueMap,myJdbcTemplate);
+            projectId = getRealProjectId(valueMap);
         }
         return projectId;
     }
@@ -65,10 +84,9 @@ public class PmPrjExt {
     /**
      * 项目/非项目/项目多选中筛选项目id
      * @param valueMap 流程主体内容
-     * @param myJdbcTemplate 数据源
      * @return 项目id
      */
-    private static String getRealProjectId(Map<String, Object> valueMap, MyJdbcTemplate myJdbcTemplate) {
+    private static String getRealProjectId(Map<String, Object> valueMap) {
         String projectId = JdbcMapUtil.getString(valueMap,"PM_PRJ_IDS");
         if (SharedUtil.isEmptyString(projectId)){
             projectId = JdbcMapUtil.getString(valueMap,"AMOUT_PM_PRJ_ID");
@@ -89,7 +107,7 @@ public class PmPrjExt {
      */
     public static void updatePrjBaseData(EntityRecord entityRecord, String entityCode, int level, MyJdbcTemplate myJdbcTemplate,String code) {
         //项目id
-        String projectId = getProjectIdByProcess(entityRecord.valueMap,myJdbcTemplate);
+        String projectId = getProjectIdByProcess(entityRecord.valueMap);
         if (projectId.contains(",")){
             throw new BaseException("数据更新不支持多项目同时修改，请重新进行数据处理或联系管理员处理！");
         }
@@ -115,7 +133,7 @@ public class PmPrjExt {
      */
     public static void updatePrjAmt(EntityRecord entityRecord, String pm_prj_settle_accounts, int level, MyJdbcTemplate myJdbcTemplate, String entCode) {
         //项目id
-        String projectId = getProjectIdByProcess(entityRecord.valueMap,myJdbcTemplate);
+        String projectId = getProjectIdByProcess(entityRecord.valueMap);
         if (projectId.contains(",")){
             throw new BaseException("数据更新不支持多项目同时修改，请重新进行数据处理或联系管理员处理！");
         }
@@ -276,14 +294,6 @@ public class PmPrjExt {
                 .set("CON_SCALE_UOM_ID",JdbcMapUtil.getString(map,"CON_SCALE_UOM_ID")) //建设规模单位
                 .set("PRJ_SITUATION",JdbcMapUtil.getString(map,"PRJ_SITUATION")) //项目简介
                 .exec();
-    }
-
-    /**
-     * 更新项目表信息
-     * @param pmPrj 项目实体
-      */
-    public static void updateData(PmPrj pmPrj) {
-        pmPrj.updateById();
     }
 
     /**
@@ -471,5 +481,68 @@ public class PmPrjExt {
         Map<String, Object> result = new HashMap<>();
         result.put("prjList",list);
         ExtJarHelper.returnValue.set(result);
+    }
+
+    /**
+     * 更新项目效果图
+     * @param rendering 效果图地址
+     * @param projectId 项目id
+     */
+    public static void updatePrjImg(String rendering, String projectId) {
+        String imgUrl = null;
+        PmPrj pmPrj = PmPrj.selectById(projectId);
+        if (pmPrj != null){
+            String prjImg = pmPrj.getPrjImg();
+            if (StringUtils.hasText(prjImg)){
+                imgUrl = prjImg + "," + rendering;
+            } else {
+                imgUrl = rendering;
+            }
+        }
+        if (StringUtils.hasText(imgUrl)){
+            Crud.from("PM_PRJ").where().eq("ID",projectId).update().set(PmPrj.Cols.PRJ_IMG,imgUrl).exec();
+        }
+    }
+
+    /**
+     * 通用-动态根据字段更新值
+     * @param prj 项目id
+     * @param value 更新的值
+     * @param colCode 更新的字段
+     */
+    public static void updateOneColValue(String prj, String value, String colCode) {
+        Crud.from(PmPrj.ENT_CODE).where().eq(PmPrj.Cols.ID,prj).update()
+                .set(colCode,value).exec();
+    }
+
+    /**
+     * 更新项目表信息
+     * @param pmPrj 项目实体
+     */
+    public static void updateData(PmPrj pmPrj) {
+        pmPrj.updateById();
+    }
+
+    /**
+     * 变更项目开工条件、完工状态
+     */
+    public void changePrjStatus(){
+        // 获取输入：
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        PmPrjView param = JsonUtil.fromJson(json,PmPrjView.class);
+        PmPrj pmPrj = new PmPrj();
+        pmPrj.setId(param.getProjectId());
+        if (param.getWeatherCompleted() == 1){
+            pmPrj.setIzEnd(true);
+        } else {
+            pmPrj.setIzEnd(false);
+        }
+        if (param.getWeatherStart() == 1){
+            pmPrj.setIzStartRequire(true);
+        } else {
+            pmPrj.setIzStartRequire(false);
+        }
+        pmPrj.updateById();
     }
 }

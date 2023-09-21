@@ -1,6 +1,7 @@
 package com.cisdi.pms.job.mapper.project;
 
 import com.cisdi.pms.job.domain.project.PmPrj;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -11,4 +12,25 @@ public interface PmPrjMapper {
      * @return 项目集合
      */
     List<PmPrj> getNeedWeekPrj();
+
+    /**
+     * 根据项目id查询项目名称
+     * @param projectId 项目id
+     * @return 项目名称
+     */
+    String getProjectNameById(String projectId);
+
+    /**
+     * 根据项目id数组查询项目名称
+     * @param projectIdArr 项目id
+     * @return 项目名称
+     */
+    String getProjectNameByIdArr(@Param("list") String[] projectIdArr);
+
+    /**
+     * 根据项目id查询项目信息
+     * @param projectId 项目id
+     * @return 项目信息
+     */
+    PmPrj queryById(String projectId);
 }

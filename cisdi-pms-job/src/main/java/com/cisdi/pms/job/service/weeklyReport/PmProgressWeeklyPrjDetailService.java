@@ -5,6 +5,8 @@ import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeekly;
 import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeeklyPrjDetail;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 
 public interface PmProgressWeeklyPrjDetailService {
 
@@ -33,4 +35,29 @@ public interface PmProgressWeeklyPrjDetailService {
      * @param pmProgressWeekly 周信息
      */
     void createDataByLastWeek(String lastWeekId, String weekId, String weekPrjId, PmPrj tmp, PmProgressWeekly pmProgressWeekly);
+
+    /**
+     * 更新截止目前所有历史项目问题进入明细表
+     */
+    void updateOldPrjProblemToDetail();
+
+    /**
+     * 项目问题汇总-列表
+     * @param pmProgressWeeklyPrjDetail 形象进度周报明细实体
+     * @return 查询结果
+     */
+    Map<String, Object> getPrjProblemList(PmProgressWeeklyPrjDetail pmProgressWeeklyPrjDetail);
+
+    /**
+     * 项目问题汇总导出
+     * @param map 导出信息
+     * @param title 文件名称
+     * @param response 响应
+     */
+    void downloadPrjProblem(Map<String, Object> map, String title, HttpServletResponse response);
+
+    /**
+     * 将上周航拍图信息更新到本周-只修改航拍图为空的
+     */
+    void updateAerialImg();
 }

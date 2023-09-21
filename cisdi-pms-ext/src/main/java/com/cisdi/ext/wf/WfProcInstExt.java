@@ -9,6 +9,7 @@ import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -55,10 +56,12 @@ public class WfProcInstExt {
         if (SharedUtil.isEmptyString(projectId)){
             projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
         }
-        List<String> prjList = Arrays.asList(projectId.split(","));
-        Crud.from("PM_PRJ_TO_PROC_INST").where().eq("WF_PROCESS_INSTANCE_ID",procInstId).delete().exec();
-        if (!"VD".equals(status) && !"VDING".equals(status)){
-            updatePrjIntoProcInst(prjList,procInstId,myJdbcTemplate);
+        if (StringUtils.hasText(projectId)){
+            List<String> prjList = Arrays.asList(projectId.split(","));
+            Crud.from("PM_PRJ_TO_PROC_INST").where().eq("WF_PROCESS_INSTANCE_ID",procInstId).delete().exec();
+            if (!"VD".equals(status) && !"VDING".equals(status)){
+                updatePrjIntoProcInst(prjList,procInstId,myJdbcTemplate);
+            }
         }
     }
 

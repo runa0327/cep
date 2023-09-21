@@ -1,16 +1,25 @@
 package com.cisdi.pms.job.weeklyReport;
 
+import com.cisdi.pms.job.service.weeklyReport.PmConstructionService;
+import com.cisdi.pms.job.service.weeklyReport.PmProgressWeeklyPrjService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 @Component
 @Slf4j
 public class WeeklyReportJob {
 
-    @Autowired
+    @Resource
     WeeklyReportService weeklyReportService;
+
+    @Resource
+    private PmProgressWeeklyPrjService pmProgressWeeklyPrjService;
+
+    @Resource
+    private PmConstructionService pmConstructionService;
 
     @Scheduled(cron = "0 0 0/2 * * ?")
     public void run() {
@@ -30,7 +39,7 @@ public class WeeklyReportJob {
     public void createProgressWeekly(){
         try {
             log.info("【形象进度周报】自动生成开始");
-            weeklyReportService.createProgressWeekly();
+            pmProgressWeeklyPrjService.createProgressWeekly();
             log.info("【形象进度周报】自动生成结束");
         } catch (Exception e){
             log.error("【形象进度周报】自动生成失败");
@@ -48,6 +57,34 @@ public class WeeklyReportJob {
             log.info("【形象进度周报】自动提交结束");
         } catch (Exception e){
             log.error("【形象进度周报】自动提交失败");
+        }
+    }
+
+    /**
+     * 工程建安需求填报生成 5分钟生成一次
+     */
+    @Scheduled(cron = "0 2/5 * * * ?")
+    public void generateJianAn(){
+        try {
+            log.info("工程建安费用需求生成-开始");
+            pmConstructionService.generateJianAn();
+            log.info("工程建安费用需求生成-成功");
+        } catch (Exception e){
+            log.error("工程建安费用需求生成-失败：",e);
+        }
+    }
+
+    /**
+     * 工程建安需求填报-月初待确认任务生成
+     */
+    @Scheduled(cron = "0 0 0 1 * ?")
+    public void monthCheckAmt(){
+        try {
+            log.info("工程建安费用当月待确认任务生成-开始");
+            pmConstructionService.monthCheckAmt();
+            log.info("工程建安费用当月待确认任务生成-成功");
+        } catch (Exception e){
+            log.error("工程建安费用当月待确认任务生成-失败：",e);
         }
     }
 }

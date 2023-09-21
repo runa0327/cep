@@ -7,10 +7,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -215,5 +212,17 @@ public class StringUtil {
             oldStr = "0";
         }
         return oldStr;
+    }
+
+    /**
+     * 多字符串拼接
+     * @param code 字符串间连接符号
+     * @param values 字符串信息
+     * @return 拼接结果
+     */
+    public static String concatStr(String code,String...values) {
+        StringJoiner sb = new StringJoiner(code);
+        Arrays.stream(values).filter(p->!SharedUtil.isEmptyString(p)).forEach(p->sb.add(p));
+        return sb.toString();
     }
 }

@@ -7,9 +7,120 @@
         <id property="id" column="id" />
         <result property="projectId" column="projectId" />
         <result property="projectName" column="projectName" />
+        <result property="projectCode" column="projectCode" />
+        <result property="projectSourceTypeId" column="projectSourceTypeId" />
         <result property="izStart" column="izStart" />
         <result property="izEnd" column="izEnd" />
+        <result property="isFormal" column="isFormal" />
+        <result property="customerUnitId" column="customerUnitId" />
+        <result property="projectManageModeId" column="projectManageModeId" />
+        <result property="baseLocationId" column="baseLocationId" />
+        <result property="projectSituation" column="projectSituation" />
+        <result property="investSourceId" column="investSourceId" />
+        <result property="projectTotalInvest" column="projectTotalInvest" />
+        <result property="projectTypeId" column="projectTypeId" />
+        <result property="projectStatus" column="projectStatus" />
+        <result property="projectTransitionPhaseTypeId" column="projectTransitionPhaseTypeId" />
+        <result property="startDate" column="startDate" />
+        <result property="tenderModeId" column="tenderModeId" />
+        <result property="startRemark" column="startRemark" />
+        <result property="startFile" column="startFile" />
+        <result property="floorArea" column="floorArea" />
+        <result property="conScaleTypeId" column="conScaleTypeId" />
+        <result property="conScaleUnitId" column="conScaleUnitId" />
+        <result property="length" column="length" />
+        <result property="width" column="width" />
+        <result property="buildArea" column="buildArea" />
+        <result property="seaArea" column="seaArea" />
+        <result property="other" column="other" />
+        <result property="projectImg" column="projectImg" />
+        <result property="buildYears" column="buildYears" />
+        <result property="builderUnitId" column="builderUnitId" />
+        <result property="surveyorUnitId" column="surveyorUnitId" />
+        <result property="designerUnitId" column="designerUnitId" />
+        <result property="constructorUnitId" column="constructorUnitId" />
+        <result property="supervisorUnitId" column="supervisorUnitId" />
+        <result property="checkerUnit" column="checkerUnit" />
+        <result property="consulterUnitId" column="consulterUnitId" />
+        <result property="projectAmt" column="projectAmt" />
+        <result property="constructPrjAmt" column="constructPrjAmt" />
+        <result property="equipBuyAmt" column="equipBuyAmt" />
+        <result property="equipmentCost" column="equipmentCost" />
+        <result property="projectOtherAmt" column="projectOtherAmt" />
+        <result property="landBuyAmt" column="landBuyAmt" />
+        <result property="prepareAmt" column="prepareAmt" />
+        <result property="constructPeriodInterest" column="constructPeriodInterest" />
+        <result property="investPriority" column="investPriority" />
+        <result property="replyNo" column="replyNo" />
+        <result property="replyDate" column="replyDate" />
+        <result property="actualStartDate" column="actualStartDate" />
+        <result property="actualEndDate" column="actualEndDate" />
+        <result property="planStartDate" column="planStartDate" />
+        <result property="planEndDate" column="planEndDate" />
     </resultMap>
+
+    <sql id="commonHeader">
+        ID AS id,
+        id as projectId,
+        CRT_DT AS createDate,
+        CRT_USER_ID AS createBy,
+        LAST_MODI_DT AS lastUpdateDate,
+        `STATUS` AS `status`,
+        `CODE` AS `code`,
+        `NAME` AS projectName,
+        PRJ_MANAGE_MODE_ID AS projectManageModeId,
+        BASE_LOCATION_ID AS baseLocationId,
+        PROJECT_TYPE_ID AS projectTypeId,
+        FLOOR_AREA AS floorArea,
+        CON_SCALE_TYPE_ID AS conScaleTypeId,
+        CON_SCALE_QTY AS length,
+        CON_SCALE_UOM_ID AS conScaleUnitId,
+        PRJ_SITUATION AS projectSituation,
+        INVESTMENT_SOURCE_ID AS investSourceId,
+        CON_SCALE_QTY2 AS width,
+        CUSTOMER_UNIT AS customerUnitId,
+        BASE_EPC_ID AS epcTypeId,
+        PROJECT_PHASE_ID AS projectPhaseTypeId,
+        TRANSITION_PHASE_ID AS projectTransitionPhaseTypeId,
+        PRJ_IMG AS projectImg,
+        BUILD_YEARS AS buildYears,
+        BUILDER_UNIT AS builderUnitId,
+        SURVEYOR_UNIT AS surveyorUnitId,
+        DESIGNER_UNIT AS designerUnitId,
+        CONSTRUCTOR_UNIT AS constructorUnitId,
+        SUPERVISOR_UNIT AS supervisorUnitId,
+        CHECKER_UNIT AS checkerUnit,
+        CONSULTER_UNIT AS consulterUnitId,
+        PRJ_CODE AS projectCode,
+        QTY_ONE AS buildArea,
+        QTY_THREE AS seaArea,
+        PROJECT_SOURCE_TYPE_ID AS projectSourceTypeId,
+        OTHER AS other,
+        PM_CODE AS projectCode,
+        ESTIMATED_TOTAL_INVEST as projectTotalInvest,
+        CONSTRUCT_PRJ_AMT as constructPrjAmt,
+        EQUIP_BUY_AMT as equipBuyAmt,
+        EQUIPMENT_COST as equipmentCost,
+        PROJECT_OTHER_AMt as projectOtherAmt,
+        LAND_BUY_AMT as landBuyAmt,
+        PREPARE_AMT as prepareAmt,
+        INVEST_PRIORITY as investPriority,
+        PROJECT_AMT as projectAmt,
+        CONSTRUCT_PERIOD_INTEREST as constructPeriodInterest,
+        TENDER_MODE_ID as tenderModeId,
+        REPLY_NO as replyNo,
+        IZ_START_REQUIRE as izStart,
+        IZ_END as izEnd,
+        IZ_FORMAL_PRJ as isFormal,
+        REPLY_DATE as replyDate,
+        PROJECT_STATUS as projectStatus,
+        ACTUAL_START_TIME as actualStartDate,
+        PLAN_START_TIME as planStartDate,
+        ACTUAL_END_TIME as actualEndDate,
+        PLAN_END_TIME as planEndDate,
+        TS AS ts,
+        LAST_MODI_USER_ID AS lastUpdateBy
+    </sql>
 
     <!--形象进度工程周报-需要自动生成周报的项目-->
     <select id="getNeedWeekPrj" resultMap="pmPrjResult">
@@ -25,5 +136,28 @@
           AND b.STATUS = 'ap'
           AND A.POST_INFO_ID = '1633997482885255168'
           AND b.PROJECT_SOURCE_TYPE_ID = '0099952822476441374'
+    </select>
+
+    <!--根据项目id查询项目名称-->
+    <select id="getProjectNameById" resultType="String">
+        select name from pm_prj where id = #{projectId}
+    </select>
+
+    <!--根据项目id数组查询项目名称-->
+    <select id="getProjectNameByIdArr" resultType="String">
+        select group_concat(name) from pm_prj where id in
+            <foreach collection="list" index="index" close=")" open="(" separator="," item="item">
+                #{item}
+            </foreach>
+    </select>
+
+    <!--根据项目id查询项目信息-->
+    <select id="queryById" resultMap="pmPrjResult">
+        select
+            <include refid="commonHeader" />
+        from
+            pm_prj
+        where
+            id = #{projectId}
     </select>
 </mapper>

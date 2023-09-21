@@ -21,6 +21,7 @@ import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -87,22 +88,6 @@ public class PmBuyDemandReqExt {
      */
     public void buyDemandCostCheck() {
         String status = "buyDemandCostCheck";
-        check(status);
-    }
-
-    /**
-     * 采购需求审批扩展-业务主管审批
-     */
-    public void leaderCheck() {
-        String status = "leaderCheck";
-        check(status);
-    }
-
-    /**
-     * 采购需求审批-成本岗审批意见回显-批准
-     */
-    public void costCheck(){
-        String status = "costCheck";
         check(status);
     }
 
@@ -206,11 +191,7 @@ public class PmBuyDemandReqExt {
                 throw new BaseException("对不起，所在岗位不正确，请联系管理员处理！");
             }
 
-        } else if ("leaderCheck".equals(status)){
-            Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
-                    .set("TEXT_REMARK_ONE", comment).exec();
-            log.info("已更新：{}", exec);
-        } else if("detail".equals(status)){
+        }  else if("detail".equals(status)){
             //获取预算金额下限 预算金额上线限
             String minAmt = JdbcMapUtil.getString(entityRecord.valueMap,"AMT_SIX");
             String maxAmt = JdbcMapUtil.getString(entityRecord.valueMap,"AMT_SEVEN");
@@ -252,10 +233,6 @@ public class PmBuyDemandReqExt {
         } else if ("fourth".equals(status)) {
             Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
                     .set("APPROVAL_COMMENT_FOUR", comment).exec();
-            log.info("已更新：{}", exec);
-        } else if ("costCheck".equals(status)){
-            Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
-                    .set("TEXT_REMARK_TWO", comment).exec();
             log.info("已更新：{}", exec);
         } else if ("costCheckInput".equals(status)){
             Integer exec = Crud.from("PM_BUY_DEMAND_REQ").where().eq("ID", csCommId).update()
@@ -654,20 +631,54 @@ public class PmBuyDemandReqExt {
      */
     private void handleCheckData(String status,String nodeStatus, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        String userId = ExtJarHelper.loginInfo.get().userId;
+        String userId = ExtJarHelper.loginInfo.get().userId; // 当前登录用户id
         String userName = ExtJarHelper.loginInfo.get().userName;
         //表名
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
         //流程实例id
         String procInstId = ExtJarHelper.procInstId.get();
-        //获取审批意见
-        Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId,userName);
-        //审批意见、内容
-        String comment = message.get("comment");
+        String csCommId = entityRecord.csCommId; // 主表单id
         //分支判断，逻辑处理
         if ("OK".equals(status)){
             if ("startOk".equals(nodeStatus)){
                 WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
+            } else {
+                //获取审批意见
+                Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId);
+                //审批意见、内容
+                String comment = message.get("comment");
+                if ("costOk".equals(nodeStatus)){ // 成本岗审批
+                    ProcessCommon.updateComment("TEXT_REMARK_TWO",entityRecord.valueMap,comment,entCode,csCommId,userName);
+                } else if ("chargeLeaderOk".equals(nodeStatus)){ // 2-业务部门主管审批
+                    ProcessCommon.updateComment("TEXT_REMARK_ONE",entityRecord.valueMap,comment,entCode,csCommId,userName);
+                } else if ("buyAndFinanceOk".equals(nodeStatus)){ // 4-采购岗/财务岗审批
+                    String projectIds = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
+                    String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+                    userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
+                    String dept = "";
+                    String[] projectIdArr = projectIds.split(",");
+                    prjIdArr: for (String projectId : projectIdArr) {
+                        dept = PmPrjExt.getUserDeptByRoster(userId,projectId,companyId,csCommId,entCode,myJdbcTemplate);
+                        if (StringUtils.hasText(dept)){
+                            break prjIdArr;
+                        }
+                    }
+                    if ("AD_USER_TWENTY_ONE_ID".equals(dept)){ // 采购管理岗
+                        ProcessCommon.updateComment("TEXT_REMARK_THREE",entityRecord.valueMap,comment,entCode,csCommId,userName);
+                    } else { // 财务岗
+                        ProcessCommon.updateComment("TEXT_REMARK_FOUR",entityRecord.valueMap,comment,entCode,csCommId,userName);
+                    }
+
+                }
+            }
+        } else {
+            if ("costRefuse".equals(nodeStatus)){ // 成本岗审批
+                ProcessCommon.updateProcColsValue("TEXT_REMARK_TWO",entCode,csCommId,null);
+            } else if ("chargeLeaderRefuse".equals(nodeStatus)){ // 2-业务部门主管审批
+                ProcessCommon.updateProcColsValue("TEXT_REMARK_ONE",entCode,csCommId,null);
+            } else if ("buyAndFinanceRefuse".equals(nodeStatus)){
+                ProcessCommon.updateProcColsValue("TEXT_REMARK_THREE",entCode,csCommId,null);
+                ProcessCommon.updateProcColsValue("TEXT_REMARK_FOUR",entCode,csCommId,null);
             }
         }
     }
@@ -717,33 +728,13 @@ public class PmBuyDemandReqExt {
     public void buyDemandEnd(){
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        //成本岗、采购岗、财务岗人员信息写入花名册 不写入花名册 暂不删除该代码
-        /** List<PmRoster> rosterList = getRosterList(entityRecord, myJdbcTemplate);
-        PmRosterExt.updatePrjUser(rosterList); **/
-    }
-
-    /**
-     * 项目花名册实体装值
-     * @param entityRecord 流程表单内容
-     * @param myJdbcTemplate 数据源
-     * @return 项目花名册信息
-     */
-    private List<PmRoster> getRosterList(EntityRecord entityRecord, MyJdbcTemplate myJdbcTemplate) {
-        List<PmRoster> list = new ArrayList<>();
-        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
-        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
-        for (String key : PmBuyDemandReqExt.POST_CODE_MAP.keySet()){
-            String userId = JdbcMapUtil.getString(entityRecord.valueMap,key);
-            //获取项目岗位信息
-            String prjPostId = getPostId(PmBuyDemandReqExt.POST_CODE_MAP.get(key),companyId,myJdbcTemplate);
-            PmRoster pmRoster = new PmRoster();
-            pmRoster.setPmPrjId(projectId);
-            pmRoster.setCustomerUnit(companyId);
-            pmRoster.setAdUserId(userId);
-            pmRoster.setPostInfoId(prjPostId);
-            list.add(pmRoster);
-        }
-        return list;
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code; //流程表名
+        String csCommId = entityRecord.csCommId;//流程业务表id
+        //审批人员信息写入花名册
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
+        String processId = ExtJarHelper.procId.get();
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        ProcessCommon.addPrjPostUser(projectId,entCode,processId,companyId,csCommId,myJdbcTemplate);
     }
 
     /**

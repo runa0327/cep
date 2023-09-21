@@ -6,5 +6,14 @@ import lombok.Data;
 public class WfProcess {
 
     // id
-    public String id;
+    private String id;
+
+    // 名称
+    private String name;
+
+    // 流程对应实体id
+    private String adEntId;
+
+    // 流程对应实体编码
+    private String adEntCode;
 }

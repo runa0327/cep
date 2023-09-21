@@ -703,17 +703,22 @@ public class PmRosterExt {
                         .eq(PmRoster.Cols.CUSTOMER_UNIT, tmp.getCustomerUnit())
                         .eq(PmRoster.Cols.POST_INFO_ID, tmp.getPostInfoId()));
                 String id;
+                String userId = "";
                 if (CollectionUtils.isEmpty(list)) {
                     id = Crud.from("PM_ROSTER").insertData();
                 } else {
                     id = list.get(0).getId();
+                    userId = list.get(0).getAdUserId();
                 }
-                Crud.from("PM_ROSTER").where().eq("id", id).update()
-                        .set("CUSTOMER_UNIT", tmp.getCustomerUnit())
-                        .set("PM_PRJ_ID", tmp.getPmPrjId())
-                        .set("POST_INFO_ID", tmp.getPostInfoId())
-                        .set("AD_USER_ID", tmp.getAdUserId())
-                        .exec();
+                if (!StringUtils.hasText(userId)){
+                    Crud.from("PM_ROSTER").where().eq("id", id).update()
+                            .set("CUSTOMER_UNIT", tmp.getCustomerUnit())
+                            .set("PM_PRJ_ID", tmp.getPmPrjId())
+                            .set("POST_INFO_ID", tmp.getPostInfoId())
+                            .set("AD_USER_ID", tmp.getAdUserId())
+                            .exec();
+                }
+
             }
         }
     }

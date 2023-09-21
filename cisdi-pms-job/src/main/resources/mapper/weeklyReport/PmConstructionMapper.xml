@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.weeklyReport.PmConstructionMapper">
+    <resultMap id="PmConstructionResult" type="com.cisdi.pms.job.domain.weeklyReport.PmConstruction">
+        <id property="id" column="id" />
+        <result property="pmConstructionId" column="pmConstructionId" />
+        <result property="baseYearId" column="baseYearId" />
+        <result property="year" column="year" />
+        <result property="projectId" column="projectId" />
+        <result property="projectName" column="projectName" />
+        <result property="month" column="month" />
+        <result property="weatherStart" column="weatherStart" />
+        <result property="weatherComplete" column="weatherComplete" />
+        <result property="yearAmtNeed" column="yearAmtNeed" />
+        <result property="firstAmt" column="firstAmt" />
+        <result property="checkAmt" column="checkAmt" />
+        <result property="monthCheck" column="monthCheck" />
+        <result property="pushWeekTask" column="pushWeekTask" />
+        <result property="ver" column="ver" />
+        <result property="ts" column="ts" />
+        <result property="createBy" column="createBy" />
+        <result property="createDate" column="createDate" />
+        <result property="lastUpdateBy" column="lastUpdateBy" />
+        <result property="lastUpdateDate" column="lastUpdateDate" />
+        <result property="status" column="status" />
+        <result property="code" column="code" />
+    </resultMap>
+
+    <sql id="header_father_sql">
+        id as id,
+        status as status,
+        code as code,
+        name as name,
+        base_year_id as baseYearId,
+        pm_prj_id as projectId
+    </sql>
+
+    <!--根据年份和项目id查询该项目当年是否已生成计划-->
+    <select id="queryByYearIdAndProjectId" resultMap="PmConstructionResult">
+        select
+            <include refid="header_father_sql" />
+        from
+            pm_construction
+        where
+            status = 'AP'
+            AND base_year_id = #{yearId}
+            AND pm_prj_id = #{projectId}
+    </select>
+
+    <!--工程建安需求填报-新增数据-->
+    <insert id="insertFather">
+        insert into pm_construction(
+            id,
+            VER,
+            TS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            STATUS,
+            BASE_YEAR_ID,
+            PM_PRJ_ID,
+            SYS_TRUE_ONE
+        ) values (
+            #{id},
+            #{ver},
+            #{ts},
+            #{createDate},
+            #{createBy},
+            #{lastUpdateDate},
+            #{lastUpdateBy},
+            #{status},
+            #{baseYearId},
+            #{projectId},
+            #{yearAmtNeed}
+        )
+    </insert>
+
+    <!--工程建安需求填报明细表批量新增-->
+    <insert id="insertBatchDetail">
+        insert into pm_construction_detail(
+            ID,
+            VER,
+            TS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            STATUS,
+            PM_CONSTRUCTION_ID,
+            NUMBER,
+            AMT_FIVE,
+            AMT_SIX,
+            SYS_TRUE_ONE,
+            SYS_TRUE_TWO
+        ) values
+        <foreach collection="list" index="index" item="item" separator=",">
+        (
+            #{item.id},
+            #{item.ver},
+            #{item.ts},
+            #{item.createDate},
+            #{item.createBy},
+            #{item.lastUpdateDate},
+            #{item.lastUpdateBy},
+            #{item.status},
+            #{item.pmConstructionId},
+            #{item.month},
+            #{item.firstAmt},
+            #{item.checkAmt},
+            #{item.monthCheck},
+            #{item.pushWeekTask}
+        )
+        </foreach>
+    </insert>
+
+    <!--查询当月待推送任务-->
+    <select id="queryMonthPushTask" resultMap="PmConstructionResult">
+        select
+            a.id as pmConstructionId,
+            b.id as id,
+            a.pm_prj_id as projectId,
+            a.base_year_id as baseYearId,
+            c.iz_start_require as weatherStart,
+            c.iz_end as weatherComplete,
+            c.name as projectName
+        FROM
+            pm_construction a
+                LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID
+                left join pm_prj c on a.pm_prj_id = c.id
+        WHERE
+            a.status = 'AP' and b.status = 'ap'
+          and a.base_year_id = #{yearId}
+          and b.number = #{month} and b.sys_true_two = 0
+          and (c.iz_start_require = 1 or c.iz_start_require is null ) and (c.iz_end = 0 or c.iz_end is null )
+        ORDER BY a.pm_prj_id asc
+    </select>
+
+    <!--工程建安费用需求填报统计-->
+    <select id="queryPmConstructionList" resultType="java.util.LinkedHashMap">
+        ${sql}
+    </select>
+</mapper>

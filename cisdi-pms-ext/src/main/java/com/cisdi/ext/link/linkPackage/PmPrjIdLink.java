@@ -19,7 +19,9 @@ import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -88,8 +90,8 @@ public class PmPrjIdLink {
             List<Map<String, Object>> list = LinkSql.PmPrjIdLink(attValue, myJdbcTemplate);
 
             //清空项目基础信息
-            AttLinkExtDetail.clearBaseProjectDataNOPrj(attLinkResult);
-            AttLinkExtDetail.clearProjectAmtData(attLinkResult);
+            AttLinkClear.clearBaseProjectDataNOPrj(attLinkResult);
+            AttLinkClear.clearProjectAmtData(attLinkResult);
 
             if (!CollectionUtils.isEmpty(list)) {
 
@@ -108,6 +110,7 @@ public class PmPrjIdLink {
                     String id = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID");
                     AttLinkExtDetail.assignmentPrjYesNoOne(id, attLinkResult);
                 } else if ("PM_PRJ_SETTLE_ACCOUNTS".equals(entCode)) { // 项目结算审批
+                    AttLinkClear.clearSettleData(attLinkResult);
                     settlePrjLink(attLinkResult, attValue);
                 } else if ("PM_EXTENSION_REQUEST_REQ".equals(entCode)) { // 节点延期申请
                     handlePrjNode(attValue, myJdbcTemplate);
@@ -119,7 +122,7 @@ public class PmPrjIdLink {
                 List<String> processUserList = AttLinkDifferentProcess.getLinkUserProcess();
                 if (processUserList.contains(entCode)) { //岗位自动人员
                     //清除人员岗位信息
-                    AttLinkExtDetail.clearProcessPostUser(attLinkResult);
+                    AttLinkClear.clearProcessPostUser(attLinkResult);
                     AttLinkExtDetail.autoPostUser(entCode,attValue,companyId,attLinkResult,myJdbcTemplate);
                 }
 
@@ -132,6 +135,23 @@ public class PmPrjIdLink {
                 }
             }
         }
+        return attLinkResult;
+    }
+
+    /**
+     * 项目id属性联动-多选项目属性联动
+     *
+     * @param myJdbcTemplate 数据源
+     * @param attValue       属性联动值
+     * @param entCode        业务表名
+     * @param sevId          实体视图id
+     * @return 回显值
+     */
+    public static AttLinkResult linkForPM_PRJ_IDS(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        String[] prjIdArr = attValue.split(",");
+        String projectId = prjIdArr[0];
+        attLinkResult = linkForPM_PRJ_ID(myJdbcTemplate,projectId,entCode,sevId);
         return attLinkResult;
     }
 
@@ -188,11 +208,26 @@ public class PmPrjIdLink {
                 .eq("STATUS", "AP").select().execForMapList();
         getList(list, list2, INVEST2_MAP);
         getList(list, list3, INVEST3_MAP);
+        BigDecimal bigValue = new BigDecimal(0);
         for (LinkedAttModel tmp : list) {
             if (AttDataTypeE.FILE_GROUP == tmp.getType()) {
                 AttLinkExtDetail.attLinkResultAddValue(tmp.getValue(), tmp.getKey(), tmp.getType(), attLinkResult);
             } else {
-                AttLinkExtDetail.attLinkResultAddValue(tmp.getValue(), tmp.getValue(), tmp.getKey(), tmp.getType(), attLinkResult);
+                String value = tmp.getValue();
+                if (StringUtils.hasText(value)){
+                    if (value.matches("[0-9]*\\.?[0-9]+")){
+                        bigValue = StringUtils.hasText(value) ? new BigDecimal(value) : bigValue;
+                        LinkUtils.mapAddAllValue(tmp.getKey(),AttDataTypeE.TEXT_LONG,bigValue,value,true,false,false,attLinkResult);
+                    }
+                } else {
+                    AttLinkExtDetail.attLinkResultAddValue(value, value, tmp.getKey(), tmp.getType(), attLinkResult);
+                }
+//                if (value.matches("[0-9]*\\.?[0-9]+")){
+//                    bigValue = StringUtils.hasText(value) ? new BigDecimal(value) : bigValue;
+//                    LinkUtils.mapAddAllValue(tmp.getKey(),AttDataTypeE.TEXT_LONG,bigValue,value,true,false,false,attLinkResult);
+//                } else {
+//                    AttLinkExtDetail.attLinkResultAddValue(value, value, tmp.getKey(), tmp.getType(), attLinkResult);
+//                }
             }
         }
         //历史结算信息汇总模块 处理显示

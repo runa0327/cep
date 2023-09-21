@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.process.WfNodeMapper">
+    <resultMap id="WfNodeResult" type="com.cisdi.pms.job.domain.process.WfNode">
+        <id property="id" column="id" />
+        <result property="wfNodeId" column="WfNodeId" />
+        <result property="name" column="name" />
+        <result property="wfNodeName" column="wfNodeName" />
+        <result property="nodeType" column="nodeType" />
+        <result property="viewId" column="viewId" />
+        <result property="wfFlowId" column="wfFlowId" />
+        <result property="fromNodeId" column="fromNodeId" />
+        <result property="toNodeId" column="toNodeId" />
+        <result property="actId" column="actId" />
+        <result property="validLogic" column="validLogic" />
+        <result property="adRoleId" column="adRoleId" />
+    </resultMap>
+
+    <!--查询流程发起节点信息-->
+    <select id="queryStartNodeByProcess" resultMap="WfNodeResult">
+        select
+            a.id as WfNodeId,
+            a.name as wfNodeName,
+            a.NODE_TYPE as nodeType,
+            a.AD_VIEW_ID as viewId,
+            b.id as wfFlowId,
+            b.FROM_NODE_ID as fromNodeId,
+            b.TO_NODE_ID as toNodeId,
+            b.AD_ACT_ID as actId,
+            b.VALID_LOGIC as validLogic,
+            c.AD_ROLE_ID as adRoleId
+        FROM
+            wf_node a
+        LEFT JOIN wf_flow b on a.id = b.FROM_NODE_ID
+        LEFT JOIN wf_node_role c on a.id = c.WF_NODE_ID
+        WHERE
+            a.WF_PROCESS_ID = #{wfProcessId}
+          and b.`STATUS` = 'AP'
+          AND c.`STATUS` = 'AP'
+          AND A.NODE_TYPE = 'START_EVENT'
+          AND c.WF_TASK_TYPE_ID = 'TODO'
+    </select>
+
+    <!--根据节点id查询节点信息-->
+    <select id="queryNodeMsgByNodeId" resultMap="WfNodeResult">
+        select
+            a.id as WfNodeId,
+            a.name as wfNodeName,
+            a.NODE_TYPE as nodeType,
+            a.AD_VIEW_ID as viewId,
+            group_concat(b.AD_ROLE_ID) as adRoleId
+        FROM
+            wf_node a
+        LEFT JOIN wf_node_role b on a.id = b.WF_NODE_ID
+        WHERE
+            a.id = #{nodeId}
+          and b.`STATUS` = 'AP'
+          AND b.WF_TASK_TYPE_ID = 'TODO'
+    </select>
+</mapper>

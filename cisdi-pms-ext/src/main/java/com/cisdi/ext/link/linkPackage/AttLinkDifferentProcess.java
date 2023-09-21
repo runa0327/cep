@@ -17,7 +17,6 @@ public class AttLinkDifferentProcess {
     // 默认自动带出成本岗的流程
     public static List<String> getAutoCostUser() {
         List<String> list = new ArrayList<>();
-//        list.add("PO_ORDER_CHANGE_REQ"); //合同需求审批,不默认带出
         return list;
     }
 
@@ -54,21 +53,13 @@ public class AttLinkDifferentProcess {
     public static List<String> getTableList() {
         List<String> list = new ArrayList<>();
         list.add("PM_PRJ_REQ"); // 立项申请
-//        list.add("PM_PRJ_INVEST1"); // 可研估算
-//        list.add("PM_PRJ_INVEST2"); // 初设概算
-//        list.add("PM_PRJ_INVEST3"); // 预算财评
         list.add("PM_STABLE_EVAL"); // 社会稳定性评价
         list.add("PM_ENERGY_EVAL"); // 固定资产投资节能评价
         list.add("PM_WATER_PLAN"); // 水保方案
         list.add("PM_ENVIRONMENT_EVAL"); // 环评
-//        list.add("PO_ORDER_REQ"); // 采购合同签订申请
         list.add("PO_PUBLIC_BID_REQ"); // 采购公开招标申请
         list.add("PM_CONSTRUCT_PERMIT_REQ"); // 施工许可
         list.add("PM_PRJ_PLANNING_PERMIT_REQ"); // 工程规划许可
-        list.add("PO_GUARANTEE_LETTER_REQUIRE_REQ"); // 新增保函申请
-        list.add("PO_GUARANTEE_LETTER_RETURN_OA_REQ"); // 保函退还申请
-//        list.add("PO_ORDER_SUPPLEMENT_REQ"); // 采购合同补充协议申请
-//        list.add("PO_ORDER_TERMINATE_REQ"); // 采购合同终止申请
         list.add("PO_ORDER_CHANGE_REQ"); // 采购合同变更申请
         list.add("PM_PRJ_PARTY_REQ"); // 五方责任主体维护申请
         list.add("PM_SUPERVISE_PLAN_REQ"); // 监理规划及细则申请
@@ -77,8 +68,6 @@ public class AttLinkDifferentProcess {
         list.add("PO_ORDER_PAYMENT_REQ"); // 采购合同付款申请
         list.add("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD"); // 技术交底与图纸会审记录
         list.add("PM_CONCEPTUAL_SCHEME_DESIGN"); // 概念方案设计管理
-//        list.add("PM_CONSTRUCTION_DRAWING_DESIGN"); // 施工图设计管理
-//        list.add("PM_DESIGN_ASSIGNMENT"); // 方案设计管理
         list.add("PM_DESIGN_ASSIGNMENT_BOOK"); // 设计任务书
         list.add("PM_FARMING_PROCEDURES"); // 农转用手续办理
         list.add("PM_WOODLAND_PROCEDURES"); // 林地调整办理手续
@@ -91,7 +80,6 @@ public class AttLinkDifferentProcess {
         list.add("PM_DEFENSE_PLAN_REQ"); // 人防规划报建
         list.add("PM_DEFENSE_BUILD_REQ"); // 人防施工报建
         list.add("PM_TERMITE_CONTROL_REQ"); // 白蚁防治
-//        list.add("PM_NATIONAL_BUILD_REQ"); // 国安报建
         list.add("PM_MATERIAL_EXIT"); // 材料退场
         list.add("MATERIAL_EQUIPMENT_ENTER_CHECK"); // 工程材料设备进场验收
         list.add("MATERIAL_EQUIPMENT_BRAND_APPROVAL"); // 工程材料设备及品牌报审
@@ -114,8 +102,6 @@ public class AttLinkDifferentProcess {
         list.add("PM_SUPERVISE_NOTICE_REQ"); // 监理通知单
         list.add("PM_SUPERVISE_NOTICE_REPLY_REQ"); // 监理通知回复单
         list.add("PM_START_ORDER_REQ"); // 开工令
-//        list.add("PM_BUY_DEMAND_REQ"); // 采购需求审批
-//        list.add("PM_BID_APPROVAL_REQ"); // 招标文件审批
         list.add("PM_FILE_CHAPTER_REQ"); // 标前资料用印审批
         list.add("PM_USE_CHAPTER_REQ"); // 中选单位及标后用印审批
         list.add("PM_BID_KEEP_FILE_REQ"); // 招采项目备案及归档
@@ -124,11 +110,8 @@ public class AttLinkDifferentProcess {
         list.add("SUBCONTRACTOR_QUALIFICATION_REPORT"); // 分包单位资质报审
         list.add("PM_PRJ_RESTART_ORDER_REQ"); // 工程复工令
         list.add("PM_PRJ_RESTART_TRIAL_REQ"); // 工程复工报审表
-//        list.add("BID_PROCESS_MANAGE"); // 招标过程管理
-//        list.add("PIPELINE_RELOCATION_REQ"); // 管线迁改
         list.add("PM_POST_APPOINT"); // 岗位指派
         list.add("PRJ_LAND_CHECK"); // 项目红线核查
-//        list.add("PM_PRJ_SETTLE_ACCOUNTS"); // 项目结算审批
         return list;
     }
 
@@ -178,6 +161,17 @@ public class AttLinkDifferentProcess {
         list.add("PM_PRJ_INVEST2"); //初设概算审批
         list.add("PM_PRJ_RED_CHECK_REQ"); //项目红线核查
         list.add("PM_TERMITE_CONTROL_REQ"); //白蚁防治
+        list.add("PIPELINE_RELOCATION_REQ"); //管线迁改
+        list.add("PM_CONSTRUCTION_DRAWING_DESIGN"); //施工图设计管理
+        list.add("PM_BUY_DEMAND_REQ"); //采购需求审批
+        return list;
+    }
+    /**
+     * 需要自动岗位人员的流程-岗位人员可改
+     * @return 流程集合
+     */
+    public static List<String> getLinkUserProcessEdit() {
+        List<String> list = new ArrayList<>();
         list.add("PIPELINE_RELOCATION_REQ"); //管线迁改
         return list;
     }
@@ -344,6 +338,16 @@ public class AttLinkDifferentProcess {
         list.add("PM_CONTROL_FLOOD_REQ"); //防洪评价
         list.add("PM_TERMITE_CONTROL_REQ"); //白蚁防治
         list.add("PM_TOPSOIL_STRIPPING_REQ"); //耕作层剥离
+        return list;
+    }
+
+    /**
+     * 项目类型属性联动-结果不可改
+     * @return 结果集
+     */
+    public static List<String> getUnEditList() {
+        List<String> list = new ArrayList<>();
+        list.add("PM_TOPSOIL_STRIPPING_REQ"); // 耕作层剥离
         return list;
     }
 }

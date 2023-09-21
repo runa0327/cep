@@ -13,6 +13,8 @@ public class BaseCommon {
 
     // 创建时间
     private String createDate;
+    private String createDateMin;
+    private String createDateMax;
 
     // 上次修改人
     private String lastUpdateBy;
@@ -88,5 +90,13 @@ public class BaseCommon {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getCreateDateMin() {
+        return createDateMin;
+    }
+
+    public void setCreateDateMin(String createDateMin) {
+        this.createDateMin = createDateMin;
     }
 }

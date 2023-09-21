@@ -8,6 +8,7 @@ import com.cisdi.pms.job.domain.notice.MessageModel;
 import com.cisdi.pms.job.domain.notice.TextCardInfo;
 import com.cisdi.pms.job.domain.process.WfProcessInstanceWX;
 import com.cisdi.pms.job.enums.HttpEnum;
+import com.cisdi.pms.job.mapper.base.AdLockMapper;
 import com.cisdi.pms.job.mapper.notice.BaseThirdInterfaceMapper;
 import com.cisdi.pms.job.service.base.AdRemindLogService;
 import com.cisdi.pms.job.service.notice.SmsWhiteListService;
@@ -19,7 +20,6 @@ import com.cisdi.pms.job.utils.StringUtil;
 import com.qygly.ext.rest.helper.feign.client.DataFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -61,6 +61,9 @@ public class SendSmsJob {
 
     @Resource
     private AdRemindLogService adRemindLogService;
+
+    @Resource
+    private AdLockMapper adLockMapper;
 
     /**
      * 提醒真正用户。
@@ -543,8 +546,8 @@ public class SendSmsJob {
         // 开关消息推送
         if (smsSwitch) {
 
-            boolean lock = getLock();
-            if (lock){
+            int adLock = adLockMapper.updateLockByCodeAndTenMin("WF_TASK_REMIND_WX_URGENT");
+            if (adLock > 0){
                 // 查询是否进行微信消息通知
                 BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUserUrgent");
                 if (baseThirdInterface.getSysTrue() == 1){
@@ -572,8 +575,7 @@ public class SendSmsJob {
                         // 加锁成功后才会释放锁
                         // 循环10次，放置修改失败
                         for (int i = 0; i < 10; i++) {
-                            String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=null where t.code=?";
-                            int affectedRows = jdbcTemplate.update(sql, "WF_TASK_REMIND_LOCK");
+                            int affectedRows = adLockMapper.updateLockByCode("WF_TASK_REMIND_WX_URGENT");
                             // 如果修改成功，直接跳出循环
                             if (affectedRows > 0) {
                                 break;
@@ -583,6 +585,47 @@ public class SendSmsJob {
 
                 }
             }
+//            暂不删除下列
+//            boolean lock = getLock();
+//            if (lock){
+//                // 查询是否进行微信消息通知
+//                BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUserUrgent");
+//                if (baseThirdInterface.getSysTrue() == 1){
+//                    // 政务微信通知白名单
+//                    List<String> wxWhiteList = smsWhiteListService.getWxWhiteList();
+//                    // 查询待发送的紧急消息代办
+//                    List<WfProcessInstanceWX> maps = wfProcessInstanceWXService.getAllWaitUrgeList();
+//                    String txt = "";
+//                    try {
+//                        for (WfProcessInstanceWX tmp : maps) {
+//                            try {
+//                                StringBuilder sb = new StringBuilder("[工程项目信息协同系统][流程待办]您好 ");
+//                                sb.append(tmp.getWfProcessInstanceName()).append("”已到您处，请尽快处理");
+//                                txt = sb.toString();
+//                                sendUrgentToWX(wxWhiteList,tmp,baseThirdInterface.getHostAdder(),txt);
+//                            } catch (Exception e){
+//                                txt = "任务id为'"+tmp.getTaskId()+"'的紧急待办任务发送微信消息失败";
+//                            }
+//                            // 插入日志表
+//                            adRemindLogService.insertLog(txt,"1681918685046108160",tmp);
+//                        }
+//                    } catch (Exception e) {
+//                        log.error("发送短信出错！", e);
+//                    } finally {
+//                        // 加锁成功后才会释放锁
+//                        // 循环10次，放置修改失败
+//                        for (int i = 0; i < 10; i++) {
+//                            String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=null where t.code=?";
+//                            int affectedRows = jdbcTemplate.update(sql, "WF_TASK_REMIND_LOCK");
+//                            // 如果修改成功，直接跳出循环
+//                            if (affectedRows > 0) {
+//                                break;
+//                            }
+//                        }
+//                    }
+//
+//                }
+//            }
         }
     }
 
@@ -607,8 +650,8 @@ public class SendSmsJob {
             }
 
             if (izOpen == 1){
-                boolean lock = getLock();
-                if (lock){
+                int adLock = adLockMapper.updateLockByCodeAndTenMin("WF_TASK_REMIND_WX_ALL");
+                if (adLock > 0){
                     // 查询是否进行微信消息通知
                     BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
                     if (baseThirdInterface.getSysTrue() == 1){
@@ -636,8 +679,7 @@ public class SendSmsJob {
                             // 加锁成功后才会释放锁
                             // 循环10次，放置修改失败
                             for (int i = 0; i < 10; i++) {
-                                String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=null where t.code=?";
-                                int affectedRows = jdbcTemplate.update(sql, "WF_TASK_REMIND_LOCK");
+                                int affectedRows = adLockMapper.updateLockByCode("WF_TASK_REMIND_WX_ALL");
                                 // 如果修改成功，直接跳出循环
                                 if (affectedRows > 0) {
                                     break;
@@ -647,6 +689,47 @@ public class SendSmsJob {
 
                     }
                 }
+//                暂不删除以下信息
+//                boolean lock = getLock();
+//                if (lock){
+//                    // 查询是否进行微信消息通知
+//                    BaseThirdInterface baseThirdInterface = baseThirdInterfaceMapper.getSysTrue("taskSumNoticeUser");
+//                    if (baseThirdInterface.getSysTrue() == 1){
+//                        // 政务微信通知白名单
+//                        List<String> wxWhiteList = smsWhiteListService.getWxWhiteList();
+//
+//                        // 查询人员所有未处理代办
+//                        List<WfProcessInstanceWX> maps = wfProcessInstanceWXService.getUserAllTaskCount();
+//                        String txt = "";
+//                        try {
+//                            for (WfProcessInstanceWX tmp : maps) {
+//                                try {
+//                                    String phone = tmp.getUserCode();
+//                                    txt = "[工程项目信息协同系统][流程待办]您好:有"+tmp.getSum()+"条流程待办已到您处，请尽快处理";
+//                                    sendUserAllTaskSum(phone,wxWhiteList,tmp,baseThirdInterface.getHostAdder(),txt);
+//                                } catch (Exception e){
+//                                    txt = "该用户有"+tmp.getSum()+"条待办通知政务微信失败";
+//                                }
+//                                // 插入日志表
+//                                adRemindLogService.insertLog(txt,"1681918624002207744",tmp);
+//                            }
+//                        } catch (Exception e) {
+//                            log.error("发送短信出错！", e);
+//                        } finally {
+//                            // 加锁成功后才会释放锁
+//                            // 循环10次，放置修改失败
+//                            for (int i = 0; i < 10; i++) {
+//                                String sql = "update ad_lock t set t.LOCK_EXT_DTTM_ATT01_VAL=null where t.code=?";
+//                                int affectedRows = jdbcTemplate.update(sql, "WF_TASK_REMIND_LOCK");
+//                                // 如果修改成功，直接跳出循环
+//                                if (affectedRows > 0) {
+//                                    break;
+//                                }
+//                            }
+//                        }
+//
+//                    }
+//                }
             }
 
 

@@ -1,10 +1,14 @@
 package com.cisdi.ext.pm;
 
+import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.cisdi.ext.base.BaseThirdInterfaceDetailExt;
+import com.cisdi.ext.commons.HttpClient;
 import com.cisdi.ext.model.PmPostAppoint;
 import com.cisdi.ext.model.PrjStart;
 import com.cisdi.ext.pm.office.PmNodeAdjustReqExt;
+import com.cisdi.ext.pm.office.PmPostAppointExt;
 import com.cisdi.ext.util.*;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -272,6 +276,7 @@ public class PmStartExt {
     public void pmStartChangeStatus() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String userId = ExtJarHelper.loginInfo.get().userId;
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from gr_set_value where name=?", map.get("status"));
         String id = map.get("id").toString();
         if (!CollectionUtils.isEmpty(list)) {
@@ -280,10 +285,36 @@ public class PmStartExt {
                 if (!CollectionUtils.isEmpty(list1)) {
                     this.createOtherInfo(list1.get(0), id);
                 }
+                // 岗位指派流程自动发起
+                autoCreateProcess(userId,list1,myJdbcTemplate);
             }
             myJdbcTemplate.update("update PRJ_START set PRJ_START_STATUS_ID=? where id=?", list.get(0).get("ID"), id);
         }
 
+    }
+
+    /**
+     * 岗位指派流程自动发起
+     * @param userId 当前操作人
+     * @param list1 项目在项目启动表中信息
+     * @param myJdbcTemplate 数据源
+     */
+    private void autoCreateProcess(String userId, List<Map<String, Object>> list1, MyJdbcTemplate myJdbcTemplate) {
+        String projectName = JdbcMapUtil.getString(list1.get(0),"NAME");
+        String sql = "select id from pm_prj where name = ? and status = 'AP' and project_source_type_id = '0099952822476441374'";
+        List<Map<String,Object>> prjList = myJdbcTemplate.queryForList(sql,projectName);
+        if (!CollectionUtils.isEmpty(prjList)){
+            String projectId = JdbcMapUtil.getString(prjList.get(0),"id");
+            new Thread(()->{
+                String id = IdUtil.getSnowflakeNextIdStr();
+                Map<String,Object> canMap = new HashMap<>();
+                canMap.put("projectId",projectId);
+                canMap.put("interfaceId",id);
+                canMap.put("createBy",userId);
+                String str = HttpClient.urlencode(canMap);
+                BaseThirdInterfaceDetailExt.insert(userId,str,id,"GET","automaticPmPostAppoint",myJdbcTemplate);
+            }).start();
+        }
     }
 
     private List<FileInfo> getFileList(String fileIds) {

@@ -39,11 +39,11 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     @SneakyThrows
     public void export(ProcessReq processReq, HttpServletResponse response) {
-        if (Strings.isNullOrEmpty(processReq.getStartDate())){
-            processReq.setStartDate("2022-11-22 00:00:00");
+        if (Strings.isNullOrEmpty(processReq.getStartTime())){
+            processReq.setStartTime("2022-11-22 00:00:00");
         }
-        if (Strings.isNullOrEmpty(processReq.getEndDate())){
-            processReq.setEndDate(DateUtil.getNormalTimeStr(new Date()));
+        if (Strings.isNullOrEmpty(processReq.getEndTime())){
+            processReq.setEndTime(DateUtil.getNormalTimeStr(new Date()));
         }
 
         List<ProcessModel> processModels = this.getProcessModels(processReq);
@@ -96,7 +96,7 @@ public class ProcessServiceImpl implements ProcessService {
                 "left join (select a.WF_PROCESS_ID,b.name,count(*) num from wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id " +
                 "WHERE a.START_DATETIME >= ? and a.START_DATETIME <= ? and a.END_DATETIME is not null and b.STATUS in ('VDING','AP') and a.START_USER_ID " +
                 "!= '0099250247095871681' and a.status not in ('VD','VDING') GROUP BY a.WF_PROCESS_ID) sep on sep.WF_PROCESS_ID = p.WF_PROCESS_ID",
-                processReq.getStartDate(),processReq.getEndDate(),processReq.getStartDate(),processReq.getEndDate());
+                processReq.getStartTime(),processReq.getEndTime(),processReq.getStartTime(),processReq.getEndTime());
         List<ProcessModel> processModels = new ArrayList<>();
         int allProcessNum = 0;//上线发起总数
         int allEndProcessNum = 0;//上线结束总数
@@ -129,7 +129,7 @@ public class ProcessServiceImpl implements ProcessService {
                 "select count(*) from wf_task where CRT_DT >= ? and CRT_DT <= ? and WF_TASK_TYPE_ID = 'TODO' AND AD_USER_ID != '0099250247095871681' and " +
                 "IS_CLOSED = 1 union all\n" +
                 "select count(*) from wf_node_instance where CRT_DT >= ? and CRT_DT <= ? ",
-                processReq.getStartDate(),processReq.getEndDate(),processReq.getStartDate(),processReq.getEndDate(),processReq.getStartDate(),processReq.getEndDate());
+                processReq.getStartTime(),processReq.getEndTime(),processReq.getStartTime(),processReq.getEndTime(),processReq.getStartTime(),processReq.getEndTime());
 
         String otherInfo = "";
         otherInfo += "共计发起节点代办任务" + otherList.get(0).get("num") + "条,";
@@ -144,8 +144,8 @@ public class ProcessServiceImpl implements ProcessService {
      */
     private List<List<String>> getHeads(ProcessReq processReq){
         ArrayList<String> headNames = new ArrayList<>(Arrays.asList("流程名称", "上线至今发起数", "上线至今结束数",
-                processReq.getStartDate().substring(0,10) + "至" + processReq.getEndDate().substring(0,10) + "发起数",
-                processReq.getStartDate().substring(0,10) + "至" + processReq.getEndDate().substring(0,10) + "结束数"));
+                processReq.getStartTime().substring(0,10) + "至" + processReq.getEndTime().substring(0,10) + "发起数",
+                processReq.getStartTime().substring(0,10) + "至" + processReq.getEndTime().substring(0,10) + "结束数"));
 
         List<List<String>> heads = ExportUtil.covertHead(headNames);
         return heads;

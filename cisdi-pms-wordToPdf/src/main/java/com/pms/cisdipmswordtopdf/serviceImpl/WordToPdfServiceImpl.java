@@ -13,6 +13,7 @@ import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.ComThread;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
+import com.pms.cisdipmswordtopdf.mapper.FlFileMapper;
 import com.pms.cisdipmswordtopdf.model.FlFile;
 import com.pms.cisdipmswordtopdf.model.PoOrderReq;
 import com.pms.cisdipmswordtopdf.service.BaseProcessMessageBakService;
@@ -30,6 +31,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -45,6 +47,9 @@ public class WordToPdfServiceImpl implements WordToPdfService {
 
     @Resource
     private FlFileService flFileService;
+
+    @Resource
+    private FlFileMapper flFileMapper;
 
     @Resource
     private BaseProcessMessageBakService baseProcessMessageBakService;
@@ -102,7 +107,7 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                             //获取文件相关信息
                             Map<String,Object> map = getFileMess(pdfPath,id);
                             //写入文件表
-                            updateData(map,poOrderReq,tmp,date,systemType);
+                            updateData(map,tmp,date,systemType);
                         }
                     }
                 }
@@ -209,6 +214,69 @@ public class WordToPdfServiceImpl implements WordToPdfService {
     private void updateOrder(String newFileId, PoOrderReq poOrderReq, StringBuilder wordFileId) {
         wordFileId.deleteCharAt(wordFileId.length()-1);
 
+        // 不保留原word，原word进入备份记录存储 此两方法只采用一个
+//        notSaveWordButBak(newFileId,wordFileId,poOrderReq);
+
+        // 保留原word，原word不进入备份记录存储 此两方法只采用一个
+        saveWordButBak(newFileId,wordFileId,poOrderReq);
+
+    }
+
+    /**
+     * 保留原word，原word不进入备份记录存储
+     * @param newFileId pdf文件id
+     * @param wordFileId 合同信息
+     * @param poOrderReq 合同信息
+     */
+    private void saveWordButBak(String newFileId, StringBuilder wordFileId, PoOrderReq poOrderReq) {
+        String endFileId = "";
+
+        String tableCode = poOrderReq.getTableCode();
+        String attCode = poOrderReq.getColsCode();
+        String newFileIds = poOrderReq.getFileId(); // 该字段原始所有文件id
+        String poOrderId = poOrderReq.getId();
+        List<String> orderFileIds = new ArrayList<>(Arrays.asList(newFileIds.split(",")));
+
+        List<String> pdfFileIds = new ArrayList<>();
+        //查询pdf文件
+        String oldFileId = jdbcTemplate.queryForList("select "+attCode+" from "+tableCode+" where id = ?",poOrderId).get(0).get(attCode).toString();
+
+
+        oldFileId = StringUtil.replaceCode(oldFileId,",","','");
+        String sql1 = "select id as id from fl_file where id in ('"+oldFileId+"') and EXT = 'PDF'";
+        List<Map<String,Object>> list1 = jdbcTemplate.queryForList(sql1);
+        if (!CollectionUtils.isEmpty(list1)){
+            for (Map<String, Object> tmp : list1) {
+                String value = tmp.get("id").toString();
+                if (value.length() > 0 && value != null){
+                    pdfFileIds.add(value);
+                }
+            }
+
+            if (!CollectionUtils.isEmpty(pdfFileIds)){
+                orderFileIds.removeAll(pdfFileIds);
+            }
+        }
+        if (!CollectionUtils.isEmpty(orderFileIds)){
+            endFileId = String.join(",",orderFileIds);
+        }
+        if (StringUtils.hasText(endFileId)){
+            newFileIds = endFileId + "," + newFileId;
+        } else {
+            newFileIds = newFileId;
+        }
+        String sql2 = "update "+tableCode+" set "+attCode+" = ? where id = ?";
+        Integer exec = jdbcTemplate.update(sql2,newFileIds,poOrderId);
+        log.info("执行成功，共{}条",exec);
+    }
+
+    /**
+     * 不保留原word，原word进入备份记录存储
+     * @param newFileId pdf文件id
+     * @param wordFileId 合同信息
+     * @param poOrderReq 合同信息
+     */
+    private void notSaveWordButBak(String newFileId,StringBuilder wordFileId, PoOrderReq poOrderReq) {
         List<String> wordList = new ArrayList<>(Arrays.asList(wordFileId.toString().split(","))); // 被转换的word文件id
         String endFileId = "";
 
@@ -259,19 +327,38 @@ public class WordToPdfServiceImpl implements WordToPdfService {
     /**
      *
      * @param map 新文件信息
-     * @param poOrderReq 合同信息
      * @param oldFileTmp 原始文件信息
      * @param date 时间
      * @param systemType 操作系统类型
      */
-    private void updateData(Map<String, Object> map, PoOrderReq poOrderReq,FlFile oldFileTmp,String date, String systemType) {
+    private void updateData(Map<String, Object> map,FlFile oldFileTmp,String date, String systemType) {
 
         String fileId = map.get("fileId").toString();
         String name = oldFileTmp.getName();
-        String flPathId = oldFileTmp.getFilePathId();
-        String createBy = poOrderReq.getCreateBy();
-        String size = map.get("size").toString();
-        String fileSize = map.get("fileSize").toString();
+        String fileName = name+".pdf";
+        String createBy = oldFileTmp.getCreateBy();
+
+        FlFile flFile = new FlFile();
+        flFile.setId(fileId);
+        flFile.setCode(fileId);
+        flFile.setName(oldFileTmp.getName());
+        flFile.setVer("1");
+        flFile.setFilePathId(oldFileTmp.getFilePathId());
+        flFile.setFileType("pdf");
+        flFile.setStatus("AP");
+        flFile.setCreateBy(createBy);
+        flFile.setCreateDate(date);
+        flFile.setLastUpdateBy(createBy);
+        flFile.setLastUpdateDate(date);
+        flFile.setFileSize(new BigDecimal(map.get("size").toString()));
+        flFile.setFileInlineUrl(oldFileTmp.getFileInlineUrl());
+        flFile.setFileAttachmentUrl(oldFileTmp.getFileAttachmentUrl());
+        flFile.setNowDate(date);
+        flFile.setFileUploadDate(date);
+        flFile.setShowName(fileName);
+        flFile.setShowFileSize(map.get("fileSize").toString());
+        flFile.setIsPublicRead(0);
+
         String fileIdPath = map.get("fileIdPath").toString();
         if ("windows".equals(systemType)){
             if (fileIdPath.contains("filedisk2")){
@@ -280,12 +367,10 @@ public class WordToPdfServiceImpl implements WordToPdfService {
                 fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk\\","/data/qygly/file/").replace("\\","/");
             }
         }
-        String fileName = name+".pdf";
-        String insertSql = "insert into fl_file (ID,CODE,NAME,VER,FL_PATH_ID,EXT,STATUS,CRT_DT,CRT_USER_ID,LAST_MODI_DT,LAST_MODI_USER_ID," +
-                "SIZE_KB,TS,UPLOAD_DTTM,PHYSICAL_LOCATION,DSP_NAME,DSP_SIZE,IS_PUBLIC_READ) values (" +
-                "?,?,?,'1',?,'pdf','AP',?,?,?,?,?,?,?,?,?,?,0)";
-        Integer exec = jdbcTemplate.update(insertSql,fileId,fileId,name,flPathId,date,createBy,date,createBy,size,date,date,fileIdPath,fileName,fileSize);
-        log.info("执行成功，共{}条",exec);
+        flFile.setFileAddress(fileIdPath);
+        flFile.setOriginFileAddress(fileIdPath);
+
+        flFileMapper.insert(flFile);
     }
 
     /**

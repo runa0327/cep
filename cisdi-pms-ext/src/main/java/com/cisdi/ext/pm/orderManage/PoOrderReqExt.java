@@ -5,9 +5,12 @@ import com.cisdi.ext.api.PoOrderExtApi;
 import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.commons.HttpClient;
+import com.cisdi.ext.model.ContractSigningContact;
 import com.cisdi.ext.model.GrSetValue;
+import com.cisdi.ext.model.PoOrder;
 import com.cisdi.ext.model.PoOrderReq;
 import com.cisdi.ext.model.view.order.PoOrderReqView;
+import com.cisdi.ext.pm.PmInLibraryExt;
 import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.pm.processCommon.ProcessRoleExt;
 import com.cisdi.ext.pm.orderManage.detail.PoOrderPrjDetailExt;
@@ -545,19 +548,6 @@ public class PoOrderReqExt {
                 PoOrderPrjDetailExt.insertData(id,projectId);
             }
         }
-
-//        List<PoOrderReq> list = PoOrderReq.selectByWhere(new Where().nin(PoOrderReq.Cols.STATUS,"VD","VDING")
-//                .eq(PoOrderReq.Cols.PROJECT_SOURCE_TYPE_ID,"0099952822476441375"));
-//        if (!CollectionUtils.isEmpty(list)){
-//            for (PoOrderReq tmp : list) {
-//                String poOrderReqId = tmp.getId();
-//                String projectName = tmp.getProjectNameWr();
-//                String projectId = PmPrjExt.createPrjByMoreName(projectName);
-//                Crud.from("po_order_req").where().eq("id",poOrderReqId).update()
-//                        .set("PM_PRJ_IDS",projectId)
-//                        .exec();
-//            }
-//        }
     }
 
     /**
@@ -569,6 +559,54 @@ public class PoOrderReqExt {
             for (PoOrderReq tmp : list) {
                 Crud.from("po_order").where().eq("CONTRACT_APP_ID",tmp.getId()).update().set("STATUS","VD").exec();
             }
+        }
+    }
+
+    /**
+     * 合同签订-历史导入数据-合同签订单位及合同类型写入数据表
+     */
+    public void historyCompanyToData(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<PoOrderReq> list = PoOrderReq.selectByWhere(new Where().eq(PoOrderReq.Cols.STATUS,"AP")
+                .eq(PoOrderReq.Cols.IS_IMPORT,"1"));
+        if (!CollectionUtils.isEmpty(list)){
+            int fromIndex = 0;
+            int toIndex = 500;
+            while (true){
+                if (toIndex < list.size()){
+                    List<PoOrderReq> list1 = list.subList(fromIndex,toIndex);
+                    log.error("索引{}-{}正在执行修改",fromIndex,toIndex);
+                    updatePoOrder(list1);
+                    myJdbcTemplate.update("commit;");
+                } else if (toIndex == list.size()){
+                    List<PoOrderReq> list1 = list.subList(fromIndex,toIndex);
+                    if (list1.size() > 0){
+                        log.error("索引{}-{}正在执行修改",fromIndex,toIndex);
+                        updatePoOrder(list1);
+                        myJdbcTemplate.update("commit;");
+                    }
+                    break;
+                } else {
+                    List<PoOrderReq> list1 = list.subList(fromIndex,list.size());
+                    if (list1.size() > 0){
+                        log.error("索引{}-{}正在执行修改",fromIndex,toIndex);
+                        updatePoOrder(list1);myJdbcTemplate.update("commit;");
+
+                    }
+                    break;
+                }
+                fromIndex = toIndex;
+                toIndex = toIndex+500;
+            }
+        }
+    }
+
+    private void updatePoOrder(List<PoOrderReq> list) {
+        for (PoOrderReq tmp : list) {
+            Crud.from("PO_ORDER").where().eq(PoOrder.Cols.CONTRACT_APP_ID,tmp.getId()).update()
+                    .set(PoOrder.Cols.CUSTOMER_UNIT,tmp.getCustomerUnitOne())
+                    .set(PoOrder.Cols.CONTRACT_CATEGORY_ONE_ID,tmp.getContractCategoryOneId())
+                    .exec();
         }
     }
 
@@ -606,6 +644,8 @@ public class PoOrderReqExt {
         String procInstId = ExtJarHelper.procInstId.get();
         // 流程id
         String processId = ExtJarHelper.procId.get();
+        String nodeId = ExtJarHelper.nodeId.get(); // 节点id
+        String nodeInstId = ExtJarHelper.nodeInstId.get(); // 节点id
         //是否标准模板 0099799190825080669 = 是，0099799190825080670=否
         String isModel = JdbcMapUtil.getString(entityRecord.valueMap,"YES_NO_THREE");
 
@@ -629,10 +669,13 @@ public class PoOrderReqExt {
                                 .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
                                 .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
                     } else {
-                        PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode,processId);
-                        String param = JSON.toJSONString(poOrderReqView);
-                        //调用接口
-                        HttpClient.doPost(url,param,"UTF-8");
+                        PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode,processId,nodeId);
+                        if (poOrderReqView != null){
+                            String param = JSON.toJSONString(poOrderReqView);
+                            //调用接口
+                            HttpClient.doPost(url,param,"UTF-8");
+                        }
+
                     }
 
                 }
@@ -648,33 +691,35 @@ public class PoOrderReqExt {
      * @param status 状态，区分发起还是二次发起
      * @param companyName 公司名称
      * @param entCode 表名
+     * @param nodeType 节点类型
      * @return 合同信息实体
      */
-    private PoOrderReqView getOrderModel(EntityRecord entityRecord, String procInstId, String userId, String status, String companyName, String entCode,String processId) {
-        PoOrderReqView poOrderReqView = new PoOrderReqView();
-        poOrderReqView.setProcessId(processId);
-        poOrderReqView.setId(entityRecord.csCommId);
-        poOrderReqView.setProcessInstanceId(procInstId);
-        poOrderReqView.setCreateBy(userId);
-        poOrderReqView.setTableCode(entCode);
-        if (SharedUtil.isEmptyString(companyName)){
-            companyName = "三亚崖州湾科技城开发建设有限公司";
-        }
-        poOrderReqView.setCompanyName(companyName);
+    private PoOrderReqView getOrderModel(EntityRecord entityRecord, String procInstId, String userId, String status, String companyName, String entCode,String processId,String nodeType) {
         List<Map<String,String>> list = new ArrayList<>();
         // 是否标准模板 0099799190825080669=是 0099799190825080670=否
         String isModel = JdbcMapUtil.getString(entityRecord.valueMap,"YES_NO_THREE");
 
         Map<String,String> map = new HashMap<>();
         if ("PO_ORDER_REQ".equals(entCode) || "po_order_req".equals(entCode)){ //合同签订
-            if ("0099799190825080670".equals(isModel)){ //合同修编稿
-                map.put("code","FILE_ID_ONE");
-                map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"));
-            } else { //合同文本
+            if ("START_EVENT".equals(nodeType) && "0099799190825080669".equals(isModel)){
                 map.put("code","ATT_FILE_GROUP_ID");
                 map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"));
+            } else {
+                if ("USER_TASK".equals(nodeType) && "0099799190825080670".equals(isModel)){ //合同文本
+                    map.put("code","FILE_ID_ONE");
+                    map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"));
+                }
             }
-            list.add(map);
+//            if ("0099799190825080670".equals(isModel)){ //合同修编稿
+//                map.put("code","FILE_ID_ONE");
+//                map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"));
+//            } else { //合同文本
+//                map.put("code","ATT_FILE_GROUP_ID");
+//                map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"));
+//            }
+            if (!map.isEmpty()){
+                list.add(map);
+            }
         } else if ("PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "po_order_supplement_req".equals(entCode)){ //补充协议
             String code1 = "FILE_ID_TENTH"; //合同修编稿
             String file1 = JdbcMapUtil.getString(entityRecord.valueMap,code1);
@@ -684,8 +729,22 @@ public class PoOrderReqExt {
                 list.add(map);
             }
         }
-        poOrderReqView.setColMap(list);
-        return poOrderReqView;
+        if (!CollectionUtils.isEmpty(list)){
+            PoOrderReqView poOrderReqView = new PoOrderReqView();
+            poOrderReqView.setColMap(list);
+            poOrderReqView.setProcessId(processId);
+            poOrderReqView.setId(entityRecord.csCommId);
+            poOrderReqView.setProcessInstanceId(procInstId);
+            poOrderReqView.setCreateBy(userId);
+            poOrderReqView.setTableCode(entCode);
+            if (SharedUtil.isEmptyString(companyName)){
+                companyName = "三亚崖州湾科技城开发建设有限公司";
+            }
+            poOrderReqView.setCompanyName(companyName);
+            return poOrderReqView;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -714,31 +773,94 @@ public class PoOrderReqExt {
         //项目信息写入明细表
         PoOrderPrjDetailExt.createData(entityRecord);
         //采购事项判断-施工类型更新项目状态
-        String matterTypeId = JdbcMapUtil.getString(valueMap,"BUY_MATTER_TYPE_ID");
-        String matterId = JdbcMapUtil.getString(valueMap,"BUY_MATTER_ID");
-        if (!SharedUtil.isEmptyString(matterId)){
-            updateProjectStatus(projectId,matterTypeId,matterId,id,entCode);
-        }
-
+        updateProjectStatus(projectId,id,entCode,valueMap);
+        //更新项目勘察设计施工监理单位信息
+        updatePrjParty(id,projectId,valueMap);
     }
 
     /**
-     * 判断是否更新项目状态
+     * 更新项目勘察设计施工监理单位信息
+     * @param id 合同签订唯一id
      * @param projectId 项目id
-     * @param matterTypeId 采购事项一级类型id
-     * @param matterId 采购事项id
+     * @param valueMap 源数据map
+     */
+    private void updatePrjParty(String id, String projectId, Map<String, Object> valueMap) {
+        String matterId = JdbcMapUtil.getString(valueMap,"BUY_MATTER_ID"); // 采购事项id
+        List<String> list = getNeedUpdateList();
+        if (list.contains(matterId)){
+            // 查询相对方公司 默认只取第一条
+            ContractSigningContact contractSigningContact = ContractSigningContact.selectByWhere(new Where().eq(ContractSigningContact.Cols.PARENT_ID,id)).get(0);
+            String partyId = "", partyName = "";
+            if (contractSigningContact != null){
+                partyName = contractSigningContact.getWinBidUnitOne();
+            }
+            if ("1622794410934886400".equals(matterId) || "1622794493038387200".equals(matterId)){ // 勘察单位
+                partyId = PmInLibraryExt.createOrUpdateParty(partyName,"IS_SURVEYOR");
+                projectValue(projectId,partyId,"SURVEYOR_UNIT");
+            } else if ("0099799190825080980".equals(matterId) || "1635119644153196544".equals(matterId) || "1675783677050761216".equals(matterId)){ // 设计单位
+                partyId = PmInLibraryExt.createOrUpdateParty(partyName,"IS_DESIGNER");
+                projectValue(projectId,partyId,"DESIGNER_UNIT");
+            } else if ("0099799190825080731".equals(matterId) || "0099799190825080728".equals(matterId)){ // 施工单位
+                partyId = PmInLibraryExt.createOrUpdateParty(partyName,"IS_CONSTRUCTOR");
+                projectValue(projectId,partyId,"CONSTRUCTOR_UNIT");
+            } else if ("0099799190825080729".equals(matterId)){ // 监理单位
+                partyId = PmInLibraryExt.createOrUpdateParty(partyName,"IS_SUPERVISOR");
+                projectValue(projectId,partyId,"SUPERVISOR_UNIT");
+            }
+        }
+    }
+
+    /**
+     * 项目封装数据，更新项目合作方数据
+     * @param projectId 项目id
+     * @param partyId 合作方id
+     * @param supervisorUnit 合作方类型
+     */
+    private void projectValue(String projectId, String partyId, String supervisorUnit) {
+        String[] arr = projectId.split(",");
+        for (String prj : arr) {
+            PmPrjExt.updateOneColValue(prj,partyId,supervisorUnit);
+        }
+    }
+
+    /**
+     * 需要更新合作单位的采购事项
+     * @return 采购事项集合
+     */
+    private List<String> getNeedUpdateList() {
+        List<String> list = new ArrayList<>();
+        list.add("1622794410934886400"); // 工程勘察（不含测绘）
+        list.add("1622794493038387200"); // 工程勘察（含测绘）
+        list.add("0099799190825080980"); // 施工图设计
+        list.add("1635119644153196544"); // 设计（初步设计+施工图）
+        list.add("1675783677050761216"); // 初步设计和概算
+        list.add("0099799190825080731"); // 施工工程
+        list.add("0099799190825080728"); // 设计施工总承包（EPC）
+        list.add("0099799190825080729"); // 工程监理
+        return list;
+    }
+
+    /**
+     * 更新项目相关信息
+     * @param projectId 项目id
      * @param id 表id
      * @param entCode 表名
+     * @param valueMap 源数据map
      */
-    private void updateProjectStatus(String projectId, String matterTypeId, String matterId, String id, String entCode) {
-        if (SharedUtil.isEmptyString(matterTypeId)){
-            //根据采购事项id反推采购事项分类id
-            matterTypeId = ProcessCommon.updateMatterTypeId(matterId,entCode,id);
+    private void updateProjectStatus(String projectId, String id, String entCode, Map<String,Object> valueMap) {
+        String matterTypeId = JdbcMapUtil.getString(valueMap,"BUY_MATTER_TYPE_ID"); // 采购事项一级类型id
+        String matterId = JdbcMapUtil.getString(valueMap,"BUY_MATTER_ID"); // 采购事项id
+        if (!SharedUtil.isEmptyString(matterId)){
+            if (SharedUtil.isEmptyString(matterTypeId)){
+                //根据采购事项id反推采购事项分类id
+                matterTypeId = ProcessCommon.updateMatterTypeId(matterId,entCode,id);
+            }
+            String name = GrSetValue.selectById(matterTypeId).getName();
+            if ("施工".equals(name)){
+                PmPrjExt.updatePrjStatus(projectId,"1673502467645648896");
+            }
         }
-        String name = GrSetValue.selectById(matterTypeId).getName();
-        if ("施工".equals(name)){
-            PmPrjExt.updatePrjStatus(projectId,"1673502467645648896");
-        }
+
     }
 
     /**
@@ -876,35 +998,33 @@ public class PoOrderReqExt {
         String csId = entityRecord.csCommId;
         //流程实例id
         String procInstId = ExtJarHelper.procInstId.get();
-        //合同修订稿
-        String file = JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE");
-        if (!SharedUtil.isEmptyString(file)){
-            //查询接口地址
-            String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
-            List<Map<String,Object>> listUrl = myJdbcTemplate.queryForList(httpSql);
-            //公司名称
-            String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
-            String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
+        String nodeType = ProcessCommon.getNodeType(ExtJarHelper.flowId.get()); // 流转id
+        //查询接口地址
+        String httpSql = "select HOST_ADDR from BASE_THIRD_INTERFACE where code = 'order_word_to_pdf' and SYS_TRUE = 1";
+        List<Map<String,Object>> listUrl = myJdbcTemplate.queryForList(httpSql);
+        //公司名称
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
+        String companyName = myJdbcTemplate.queryForList("select name from PM_PARTY where id = ?",companyId).get(0).get("name").toString();
 
-            new Thread(() -> {
-                if (!CollectionUtils.isEmpty(listUrl)){
-                    String url = listUrl.get(0).get("HOST_ADDR").toString();
-                    if (SharedUtil.isEmptyString(url)){
-                        //写入日志提示表
-                        String id = Crud.from("AD_REMIND_LOG").insertData();
-                        Crud.from("AD_REMIND_LOG").where().eq("id",id).update().set("AD_ENT_ID","0099799190825103145")
-                                .set("ENT_CODE","PO_ORDER_REQ").set("ENTITY_RECORD_ID",csId).set("REMIND_USER_ID","0099250247095871681")
-                                .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
-                                .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
-                    } else {
-                        PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode,processId);
-                        String param = JSON.toJSONString(poOrderReqView);
-                        //调用接口
-                        HttpClient.doPost(url,param,"UTF-8");
-                    }
+        new Thread(() -> {
+            if (!CollectionUtils.isEmpty(listUrl)){
+                String url = listUrl.get(0).get("HOST_ADDR").toString();
+                if (SharedUtil.isEmptyString(url)){
+                    //写入日志提示表
+                    String id = Crud.from("AD_REMIND_LOG").insertData();
+                    Crud.from("AD_REMIND_LOG").where().eq("id",id).update().set("AD_ENT_ID","0099799190825103145")
+                            .set("ENT_CODE","PO_ORDER_REQ").set("ENTITY_RECORD_ID",csId).set("REMIND_USER_ID","0099250247095871681")
+                            .set("REMIND_METHOD","日志提醒").set("REMIND_TARGET","admin").set("REMIND_TIME",new Date())
+                            .set("REMIND_TEXT","用户"+userName+"在合同签订上传的合同文本转化为pdf失败").exec();
+                } else {
+                    PoOrderReqView poOrderReqView = getOrderModel(entityRecord,procInstId,userId,status,companyName,entCode,processId,nodeType);
+                    String param = JSON.toJSONString(poOrderReqView);
+                    //调用接口
+                    HttpClient.doPost(url,param,"UTF-8");
                 }
-            }).start();
-        }
+            }
+        }).start();
+
     }
 
 

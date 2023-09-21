@@ -20,9 +20,10 @@ public class ProjectTypeIdLink {
      * 项目类型属性联动入口
      * @param myJdbcTemplate 数据源
      * @param attValue 项目类型值
+     * @param entCode 表名
      * @return 联动结果
      */
-    public static AttLinkResult linkForPROJECT_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue) {
+    public static AttLinkResult linkForPROJECT_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
 
         AttLinkResult attLinkResult = new AttLinkResult();
         List<Map<String, Object>> list = LinkSql.selectProjectType(myJdbcTemplate,attValue);
@@ -34,8 +35,8 @@ public class ProjectTypeIdLink {
         }
 
         Map<String, Object> row = list.get(0);
-        AttLinkExtDetail.clearProjectTypeData(attLinkResult);
-        AttLinkExtDetail.prjTypeLinkNew(row,attLinkResult);
+        AttLinkClear.clearProjectTypeData(attLinkResult);
+        AttLinkExtDetail.prjTypeLinkNew(row,attLinkResult,entCode,"PROJECT_TYPE_ID");
 
         //建设规模类型
         String scaleTypeId = JdbcMapUtil.getString(row, "CON_SCALE_TYPE_ID");

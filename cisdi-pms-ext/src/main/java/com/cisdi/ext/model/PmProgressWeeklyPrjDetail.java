@@ -137,6 +137,10 @@ public class PmProgressWeeklyPrjDetail {
          */
         public static final String AD_USER_ID = "AD_USER_ID";
         /**
+         * 附件2。
+         */
+        public static final String FILE_ID_TWO = "FILE_ID_TWO";
+        /**
          * 日期（从）。
          */
         public static final String FROM_DATE = "FROM_DATE";
@@ -954,6 +958,42 @@ public class PmProgressWeeklyPrjDetail {
             this.adUserId = adUserId;
             if (!this.toUpdateCols.contains("AD_USER_ID")) {
                 this.toUpdateCols.add("AD_USER_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 附件2。
+     */
+    private String fileIdTwo;
+
+    /**
+     * 获取：附件2。
+     */
+    public String getFileIdTwo() {
+        return this.fileIdTwo;
+    }
+
+    /**
+     * 设置：附件2。
+     */
+    public PmProgressWeeklyPrjDetail setFileIdTwo(String fileIdTwo) {
+        if (this.fileIdTwo == null && fileIdTwo == null) {
+            // 均为null，不做处理。
+        } else if (this.fileIdTwo != null && fileIdTwo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.fileIdTwo.compareTo(fileIdTwo) != 0) {
+                this.fileIdTwo = fileIdTwo;
+                if (!this.toUpdateCols.contains("FILE_ID_TWO")) {
+                    this.toUpdateCols.add("FILE_ID_TWO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.fileIdTwo = fileIdTwo;
+            if (!this.toUpdateCols.contains("FILE_ID_TWO")) {
+                this.toUpdateCols.add("FILE_ID_TWO");
             }
         }
         return this;

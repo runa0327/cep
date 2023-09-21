@@ -28,7 +28,7 @@ public class YesNoThreeLink {
                 LinkUtils.mapAddAllValue("YES_NO_FOUR",AttDataTypeE.TEXT_LONG,(String) null,null,true,true,true,attLinkResult);
             }
         } else if ("PO_ORDER_REQ".equals(entCode) || "PO_ORDER_SUPPLEMENT_REQ".equals(entCode) || "PO_ORDER_TERMINATE_REQ".equals(entCode)){ //采购合同签订申请 采购合同补充协议申请 合同终止
-            AttLinkExtDetail.clearOrderIsStandard(attLinkResult); //清除属性联动数据
+            AttLinkClear.clearOrderIsStandard(attLinkResult); //清除属性联动数据
             AttLinkExtDetail.handleOrderIsStandard(attLinkResult,code);
         } else if ("PM_BUY_DEMAND_REQ".equals(entCode)){ // 采购需求审批
             if ("Y".equals(code)){ // 显示说明和附件，且说明为必填

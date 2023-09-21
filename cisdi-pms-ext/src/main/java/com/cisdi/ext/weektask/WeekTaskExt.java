@@ -74,6 +74,7 @@ public class WeekTaskExt {
             weekTask.transferUser = JdbcMapUtil.getString(p, "transferUser");
             weekTask.transferTime = JdbcMapUtil.getString(p, "TRANSFER_TIME") == null ? null : StringUtil.withOutT(JdbcMapUtil.getString(p, "TRANSFER_TIME"));
             weekTask.type = JdbcMapUtil.getString(p, "type");
+            weekTask.projectId = JdbcMapUtil.getString(p,"PM_PRJ_ID");
             return weekTask;
         }).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(weekTaskList)) {
