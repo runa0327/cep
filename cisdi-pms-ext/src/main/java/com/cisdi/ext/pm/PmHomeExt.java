@@ -204,85 +204,149 @@ public class PmHomeExt {
         sb.append("update pm_prj set LAST_MODI_DT =NOW() ");
         if (StringUtils.hasText(info.no)) {
             sb.append(" ,PRJ_CODE='").append(info.no).append("'");
+        } else {
+            sb.append(" ,PRJ_CODE=null");
         }
+
         if (StringUtils.hasText(info.name)) {
             sb.append(" ,NAME='").append(info.name).append("'");
+        } else {
+            sb.append(" ,NAME=null");
         }
+
         if (StringUtils.hasText(info.type)) {
             sb.append(" ,PROJECT_TYPE_ID='").append(info.type).append("'");
+        } else {
+            sb.append(" ,PROJECT_TYPE_ID=null");
         }
+
         if (StringUtils.hasText(info.source)) {
             sb.append(" ,INVESTMENT_SOURCE_ID='").append(info.source).append("'");
+        } else {
+            sb.append(" ,INVESTMENT_SOURCE_ID=null");
         }
+
         if (StringUtils.hasText(info.pfNo)) {
             sb.append(" ,PRJ_REPLY_NO='").append(info.pfNo).append("'");
+        } else {
+            sb.append(" ,PRJ_REPLY_NO=null");
         }
+
         if (StringUtils.hasText(info.pfTime)) {
             sb.append(" ,PRJ_REPLY_DATE='").append(info.pfTime).append("'");
+        } else {
+            sb.append(" ,PRJ_REPLY_DATE=null");
         }
+
         if (StringUtils.hasText(info.owner)) {
             sb.append(" ,CUSTOMER_UNIT='").append(info.owner).append("'");
+        } else {
+            sb.append(" ,CUSTOMER_UNIT=null");
         }
+
         if (StringUtils.hasText(info.mode)) {
             sb.append(" ,PRJ_MANAGE_MODE_ID='").append(info.mode).append("'");
+        } else {
+            sb.append(" ,PRJ_MANAGE_MODE_ID=null");
         }
+
         if (StringUtils.hasText(info.area)) {
             sb.append(" ,FLOOR_AREA='").append(info.area).append("'");
+        } else {
+            sb.append(" ,FLOOR_AREA=null");
         }
+
         if (StringUtils.hasText(info.tender)) {
             sb.append(" ,TENDER_MODE_ID='").append(info.tender).append("'");
+        } else {
+            sb.append(" ,TENDER_MODE_ID=null");
         }
+
         if (StringUtils.hasText(info.location)) {
             sb.append(" ,BASE_LOCATION_ID='").append(info.location).append("'");
+        } else {
+            sb.append(" ,BASE_LOCATION_ID=null");
         }
+
         if (StringUtils.hasText(info.des)) {
             sb.append(" ,PRJ_SITUATION='").append(info.des).append("'");
+        } else {
+            sb.append(" ,PRJ_SITUATION=null");
         }
+
         if (StringUtils.hasText(info.planBeginTime)) {
             sb.append(" ,PLAN_START_TIME='").append(info.planBeginTime).append("'");
+        } else {
+            sb.append(" ,PLAN_START_TIME=null");
         }
+
         if (StringUtils.hasText(info.planEndTime)) {
             sb.append(" ,PLAN_END_TIME='").append(info.planEndTime).append("'");
+        } else {
+            sb.append(" ,PLAN_END_TIME=null");
         }
+
         if (StringUtils.hasText(info.actualBeginTime)) {
             sb.append(" ,ACTUAL_START_TIME='").append(info.actualBeginTime).append("'");
+        } else {
+            sb.append(" ,ACTUAL_START_TIME=null");
         }
+
         if (StringUtils.hasText(info.actualEndTime)) {
             sb.append(" ,ACTUAL_END_TIME='").append(info.actualEndTime).append("'");
+        } else {
+            sb.append(" ,ACTUAL_END_TIME=null");
         }
+
         if (StringUtils.hasText(info.step)) {
             sb.append(" ,PROJECT_PHASE_ID='").append(info.step).append("'");
+        } else {
+            sb.append(" ,PROJECT_PHASE_ID=null");
         }
+
+
         //单位--特殊处理
         if (StringUtils.hasText(info.jsUnit)) {
             //建设单位
             String id = projectParty(info.jsUnit, "2");
             sb.append(" ,BUILDER_UNIT='").append(id).append("'");
+        } else {
+            sb.append(" ,BUILDER_UNIT=null");
         }
         if (StringUtils.hasText(info.kcUnit)) {
             //勘察单位
             String id = projectParty(info.kcUnit, "3");
             sb.append(" ,SURVEYOR_UNIT='").append(id).append("'");
+        } else {
+            sb.append(" ,SURVEYOR_UNIT=null");
         }
         if (StringUtils.hasText(info.sjUnit)) {
             //设计单位
             String id = projectParty(info.sjUnit, "4");
             sb.append(" ,DESIGNER_UNIT='").append(id).append("'");
+        } else {
+            sb.append(" ,DESIGNER_UNIT=null");
         }
         if (StringUtils.hasText(info.sgUnit)) {
             //施工单位
             String id = projectParty(info.sgUnit, "5");
             sb.append(" ,CONSTRUCTOR_UNIT='").append(id).append("'");
+        } else {
+            sb.append(" ,CONSTRUCTOR_UNIT= null");
         }
         if (StringUtils.hasText(info.jlUnit)) {
             //监理单位
             String id = projectParty(info.jlUnit, "6");
             sb.append(" ,SUPERVISOR_UNIT='").append(id).append("'");
+        } else {
+            sb.append(" ,SUPERVISOR_UNIT=null");
         }
         if (StringUtils.hasText(info.zjUnit)) {
             //造价单位
             String id = projectParty(info.zjUnit, "8");
             sb.append(" ,CONSULTER_UNIT='").append(id).append("'");
+        } else {
+            sb.append(" ,CONSULTER_UNIT=null");
         }
         //单位--特殊处理
 
