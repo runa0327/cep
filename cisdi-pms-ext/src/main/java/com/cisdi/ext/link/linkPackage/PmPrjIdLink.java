@@ -139,6 +139,23 @@ public class PmPrjIdLink {
     }
 
     /**
+     * 项目id属性联动-多选项目属性联动
+     *
+     * @param myJdbcTemplate 数据源
+     * @param attValue       属性联动值
+     * @param entCode        业务表名
+     * @param sevId          实体视图id
+     * @return 回显值
+     */
+    public static AttLinkResult linkForPM_PRJ_IDS(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        String[] prjIdArr = attValue.split(",");
+        String projectId = prjIdArr[0];
+        attLinkResult = linkForPM_PRJ_ID(myJdbcTemplate,projectId,entCode,sevId);
+        return attLinkResult;
+    }
+
+    /**
      * 判断处理人员岗位信息
      * @param projectId 项目id
      * @param companyId 业主单位
