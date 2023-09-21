@@ -1196,8 +1196,10 @@ public class AttLinkExtDetail {
                     List<String> codeList = StringUtil.getStrToList(code,",");
                     for (String tp : codeList) {
                         if ("PM_BUY_DEMAND_REQ".equals(entCode)){ // 采购需求审批
-                            if (!"AD_USER_THREE_ID".equals(tp) || !"AD_USER_TWO_ID".equals(tp)){
-                                LinkUtils.mapAddAllValue(tp,AttDataTypeE.TEXT_LONG,userId,userName,true,false,true,attLinkResult);
+                            if (!"AD_USER_THREE_ID".equals(tp)){
+                                if (!"AD_USER_TWO_ID".equals(tp)){
+                                    LinkUtils.mapAddAllValue(tp,AttDataTypeE.TEXT_LONG,userId,userName,true,false,true,attLinkResult);
+                                }
                             }
                         } else {
                             LinkUtils.mapAddAllValue(tp,AttDataTypeE.TEXT_LONG,userId,userName,true,false,true,attLinkResult);
