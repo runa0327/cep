@@ -478,12 +478,15 @@ public class ProcessCommon {
                         }
                         List<String> userList1 = ProcessRoleExt.getProcessUser(tmp,entCode,csCommId,myJdbcTemplate);
                         if (!CollectionUtils.isEmpty(userList1)){
-                            PmRoster pmRoster = new PmRoster();
-                            pmRoster.setCustomerUnit(companyId);
-                            pmRoster.setPmPrjId(projectId);
-                            pmRoster.setPostInfoId(postId); //岗位id
-                            pmRoster.setAdUserId(userList1.get(0));
-                            rosterList.add(pmRoster);
+                            String[] prjIdArr = projectId.split(",");
+                            for (String prjId : prjIdArr) {
+                                PmRoster pmRoster = new PmRoster();
+                                pmRoster.setCustomerUnit(companyId);
+                                pmRoster.setPmPrjId(prjId);
+                                pmRoster.setPostInfoId(postId); //岗位id
+                                pmRoster.setAdUserId(userList1.get(0));
+                                rosterList.add(pmRoster);
+                            }
                         }
                     }
                 }

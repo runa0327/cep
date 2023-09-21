@@ -21,6 +21,7 @@ import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -630,7 +631,7 @@ public class PmBuyDemandReqExt {
      */
     private void handleCheckData(String status,String nodeStatus, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        String userId = ExtJarHelper.loginInfo.get().userId;
+        String userId = ExtJarHelper.loginInfo.get().userId; // 当前登录用户id
         String userName = ExtJarHelper.loginInfo.get().userName;
         //表名
         String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
@@ -650,6 +651,24 @@ public class PmBuyDemandReqExt {
                     ProcessCommon.updateComment("TEXT_REMARK_TWO",entityRecord.valueMap,comment,entCode,csCommId,userName);
                 } else if ("chargeLeaderOk".equals(nodeStatus)){ // 2-业务部门主管审批
                     ProcessCommon.updateComment("TEXT_REMARK_ONE",entityRecord.valueMap,comment,entCode,csCommId,userName);
+                } else if ("buyAndFinanceOk".equals(nodeStatus)){ // 4-采购岗/财务岗审批
+                    String projectIds = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
+                    String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+                    userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
+                    String dept = "";
+                    String[] projectIdArr = projectIds.split(",");
+                    prjIdArr: for (String projectId : projectIdArr) {
+                        dept = PmPrjExt.getUserDeptByRoster(userId,projectId,companyId,csCommId,entCode,myJdbcTemplate);
+                        if (StringUtils.hasText(dept)){
+                            break prjIdArr;
+                        }
+                    }
+                    if ("AD_USER_TWENTY_ONE_ID".equals(dept)){ // 采购管理岗
+                        ProcessCommon.updateComment("TEXT_REMARK_THREE",entityRecord.valueMap,comment,entCode,csCommId,userName);
+                    } else { // 财务岗
+                        ProcessCommon.updateComment("TEXT_REMARK_FOUR",entityRecord.valueMap,comment,entCode,csCommId,userName);
+                    }
+
                 }
             }
         } else {
@@ -657,6 +676,9 @@ public class PmBuyDemandReqExt {
                 ProcessCommon.updateProcColsValue("TEXT_REMARK_TWO",entCode,csCommId,null);
             } else if ("chargeLeaderRefuse".equals(nodeStatus)){ // 2-业务部门主管审批
                 ProcessCommon.updateProcColsValue("TEXT_REMARK_ONE",entCode,csCommId,null);
+            } else if ("buyAndFinanceRefuse".equals(nodeStatus)){
+                ProcessCommon.updateProcColsValue("TEXT_REMARK_THREE",entCode,csCommId,null);
+                ProcessCommon.updateProcColsValue("TEXT_REMARK_FOUR",entCode,csCommId,null);
             }
         }
     }
@@ -706,33 +728,13 @@ public class PmBuyDemandReqExt {
     public void buyDemandEnd(){
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        //成本岗、采购岗、财务岗人员信息写入花名册 不写入花名册 暂不删除该代码
-        /** List<PmRoster> rosterList = getRosterList(entityRecord, myJdbcTemplate);
-        PmRosterExt.updatePrjUser(rosterList); **/
-    }
-
-    /**
-     * 项目花名册实体装值
-     * @param entityRecord 流程表单内容
-     * @param myJdbcTemplate 数据源
-     * @return 项目花名册信息
-     */
-    private List<PmRoster> getRosterList(EntityRecord entityRecord, MyJdbcTemplate myJdbcTemplate) {
-        List<PmRoster> list = new ArrayList<>();
-        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
-        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
-        for (String key : PmBuyDemandReqExt.POST_CODE_MAP.keySet()){
-            String userId = JdbcMapUtil.getString(entityRecord.valueMap,key);
-            //获取项目岗位信息
-            String prjPostId = getPostId(PmBuyDemandReqExt.POST_CODE_MAP.get(key),companyId,myJdbcTemplate);
-            PmRoster pmRoster = new PmRoster();
-            pmRoster.setPmPrjId(projectId);
-            pmRoster.setCustomerUnit(companyId);
-            pmRoster.setAdUserId(userId);
-            pmRoster.setPostInfoId(prjPostId);
-            list.add(pmRoster);
-        }
-        return list;
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code; //流程表名
+        String csCommId = entityRecord.csCommId;//流程业务表id
+        //审批人员信息写入花名册
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
+        String processId = ExtJarHelper.procId.get();
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        ProcessCommon.addPrjPostUser(projectId,entCode,processId,companyId,csCommId,myJdbcTemplate);
     }
 
     /**

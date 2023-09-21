@@ -50,8 +50,10 @@ public class AttLinkExt {
 
         if ("PROJECT_TYPE_ID".equals(attCode)) {
             return ProjectTypeIdLink.linkForPROJECT_TYPE_ID(myJdbcTemplate, attValue,entCode);
-        } else if ("PM_PRJ_ID".equals(attCode)) {
+        } else if ("PM_PRJ_ID".equals(attCode)) { // 项目单选
             return PmPrjIdLink.linkForPM_PRJ_ID(myJdbcTemplate, attValue, entCode, sevId);
+        } else if ("PM_PRJ_IDS".equals(attCode)){ // 项目多选
+            return PmPrjIdLink.linkForPM_PRJ_IDS(myJdbcTemplate, attValue, entCode, sevId);
         } else if ("PMS_RELEASE_WAY_ID".equals(attCode) || "GUARANTEE_LETTER_TYPE_ID".equals(attCode) || "CONTRACT_CATEGORY_ID".equals(attCode) || "PRJ_MANAGE_MODE_ID".equals(attCode)) {
             return ForManyLink.linkForMany(myJdbcTemplate, attCode, attValue, entCode);
         } else if ("BIDDING_NAME_ID".equals(attCode)) {
