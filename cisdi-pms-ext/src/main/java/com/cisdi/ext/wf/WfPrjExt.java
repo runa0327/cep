@@ -147,7 +147,6 @@ public class WfPrjExt {
             MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
             String sql1 = "";
-//            String sql2 = "";
 
             String procInstId = ExtJarHelper.procInstId.get();
             String companyId = entityRecord.valueMap.get("CUSTOMER_UNIT_ONE").toString();
@@ -160,24 +159,13 @@ public class WfPrjExt {
             }
 
             List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1);
-//            List<Map<String, Object>> list2 = new ArrayList<>();
-//            if (!SharedUtil.isEmptyString(sql2)){
-//                list2 = myJdbcTemplate.queryForList(sql2);
-//            }
             if (CollectionUtils.isEmpty(list1)){
                 throw new BaseException("下一节点“财务审核”暂未配置代办人员！");
             }
             List<String> userList = list1.stream().map(p->JdbcMapUtil.getString(p,"AD_USER_ID")).collect(Collectors.toList());
-//            List<String> userList2 = new ArrayList<>();
-//            if (!CollectionUtils.isEmpty(list2)){
-//                userList2 = list2.stream().map(p->JdbcMapUtil.getString(p,"AD_USER_ID")).collect(Collectors.toList());
-//            }
 
             ArrayList<Object> userIdList = new ArrayList<>(2);
             userIdList.addAll(userList);
-//            if (!CollectionUtils.isEmpty(userList2)){
-//                userIdList.addAll(userList2);
-//            }
             ExtJarHelper.returnValue.set(userIdList);
         }
     }

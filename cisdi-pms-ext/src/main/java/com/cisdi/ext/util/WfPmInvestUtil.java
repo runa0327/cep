@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,7 +52,17 @@ public class WfPmInvestUtil {
             return;
         }
         // PM_PRJ_INVEST1  查询可研估算
-        Map<String, Object> dataMap = myJdbcTemplate.queryForMap("select * from " + tableName + "  where ID= ?", csCommId);
+        Map<String, Object> finalDataMap = new HashMap<>();
+        if ("PM_PRJ_SETTLE_ACCOUNTS".equals(entCode)){
+            String sql = "SELECT sum( PRJ_TOTAL_INVEST ) AS PRJ_TOTAL_INVEST,sum( CONSTRUCT_AMT ) AS CONSTRUCT_AMT," +
+                    "sum( EQUIP_AMT ) AS EQUIP_AMT,sum( EQUIPMENT_COST ) AS EQUIPMENT_COST," +
+                    "sum( PROJECT_OTHER_AMT ) AS PROJECT_OTHER_AMT,sum( LAND_AMT ) AS LAND_AMT," +
+                    "sum( PREPARE_AMT ) AS PREPARE_AMT FROM PM_PRJ_SETTLE_ACCOUNTS " +
+                    "WHERE STATUS = 'AP' AND pm_prj_id = ?";
+            finalDataMap = myJdbcTemplate.queryForMap(sql,pmPrjId);
+        } else {
+            finalDataMap = myJdbcTemplate.queryForMap("select * from " + tableName + "  where ID= ?", csCommId);
+        }
 
         // 查询项目投资测算明细
         List<Map<String, Object>> investEstList = myJdbcTemplate.queryForList("select t.*,pet.code as PM_EXP_TYPE from PM_INVEST_EST_DTL t\n" +
@@ -61,16 +72,20 @@ public class WfPmInvestUtil {
                 "left join gr_set gr on gr.id = gsv.GR_SET_ID and gr.`CODE`='invest_est_type'\n" +
                 "where a.PM_PRJ_ID=? and gsv.`code`=?", pmPrjId, code);
 
+        // 查询项目测算类型
+        Map<String, Object> investEstType = myJdbcTemplate.queryForMap("select gsv.* from  gr_set_value gsv left join gr_set gr on gr.id = gsv.GR_SET_ID where  gr.`CODE`='invest_est_type' and gsv.code=?", code);
+        String investEstTypeId = String.valueOf(investEstType.get("ID"));
+
+        Map<String, Object> dataMap = finalDataMap;
         if (investEstList.size() > 0) {
             investEstList.forEach(item -> {
                 String pmExpType = String.valueOf(item.get("PM_EXP_TYPE"));
                 myJdbcTemplate.update("update PM_INVEST_EST_DTL set AMT=?,LAST_MODI_DT=? where id=?", dataMap.get(pmExpType), new Date(), item.get("ID"));
             });
+            String prjTotalInvest = JdbcMapUtil.getString(finalDataMap,"PRJ_TOTAL_INVEST");
+            myJdbcTemplate.update("update PM_INVEST_EST set PRJ_TOTAL_INVEST = ? where pm_prj_id = ? and INVEST_EST_TYPE_ID = ?",prjTotalInvest,pmPrjId,investEstTypeId);
         } else {
             // 新增项目投资测算
-            // 查询项目测算类型
-            Map<String, Object> investEstType = myJdbcTemplate.queryForMap("select gsv.* from  gr_set_value gsv left join gr_set gr on gr.id = gsv.GR_SET_ID where  gr.`CODE`='invest_est_type' and gsv.code=?", code);
-            String investEstTypeId = String.valueOf(investEstType.get("ID"));
 
             String newInvestEtsId = Crud.from("PM_INVEST_EST").insertData();
 
