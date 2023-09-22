@@ -8,7 +8,6 @@ import com.cisdi.ext.commons.HttpClient;
 import com.cisdi.ext.model.PmPostAppoint;
 import com.cisdi.ext.model.PrjStart;
 import com.cisdi.ext.pm.office.PmNodeAdjustReqExt;
-import com.cisdi.ext.pm.office.PmPostAppointExt;
 import com.cisdi.ext.util.*;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -67,7 +66,8 @@ public class PmStartExt {
                 " ps.INVESTMENT_SOURCE_ID, " +
                 " pj.id as project_id, " +
                 " pj.name as project_name ," +
-                " pj.ver as project_ver " +
+                " pj.ver as project_ver, " +
+                " sv.`NAME` as PROJECT_CLASSIFICATION "+
                 "FROM " +
                 " PRJ_START ps  " +
                 " LEFT JOIN gr_set_value gsv ON gsv.id = ps.PROJECT_TYPE_ID " +
@@ -76,6 +76,7 @@ public class PmStartExt {
                 " left join ad_user au on au.id = ps.AGENT " +
                 " left join gr_set_value gg on gg.id = ps.TENDER_MODE_ID " +
                 " left join pm_prj pj on pj.pm_code = ps.pm_code " +
+                " left join gr_set_value sv on sv.id = ps.PROJECT_CLASSIFICATION_ID "+
                 " WHERE " +
                 " ps.`STATUS` = 'ap'");
         if (!StringUtils.isEmpty(map.get("projectName"))) {
@@ -117,6 +118,7 @@ public class PmStartExt {
             pmStart.projectId = JdbcMapUtil.getString(m, "project_id");
             pmStart.projectName = JdbcMapUtil.getString(m, "project_name");
             pmStart.projectVer = JdbcMapUtil.getString(m, "project_ver");
+            pmStart.projectClassification = JdbcMapUtil.getString(m, "PROJECT_CLASSIFICATION");
             return pmStart;
         }).collect(Collectors.toList());
 
@@ -164,7 +166,9 @@ public class PmStartExt {
                 " ps.BASE_LOCATION_ID ," +
                 " ggs.`NAME` as location," +
                 " ps.PLAN_START_TIME," +
-                " ps.PLAN_END_TIME " +
+                " ps.PLAN_END_TIME, " +
+                " ps.PROJECT_CLASSIFICATION_ID, "+
+                " sv.`NAME` as PROJECT_CLASSIFICATION "+
                 "FROM " +
                 " PRJ_START ps " +
                 " left join gr_set_value gg on gg.id = ps.INVESTMENT_SOURCE_ID " +
@@ -176,6 +180,7 @@ public class PmStartExt {
                 " left join gr_set_value gq on gq.id = ps.TENDER_MODE_ID" +
                 " left join ad_user aa on aa.id = ps.AD_USER_ID " +
                 " left join gr_set_value ggs on ggs.id = ps.BASE_LOCATION_ID " +
+                " left join gr_set_value sv on sv.id = ps.PROJECT_CLASSIFICATION_ID "+
                 " WHERE " +
                 " ps.`STATUS` = 'ap' and ps.id=?", map.get("id"));
         if (CollectionUtils.isEmpty(list)) {
@@ -211,6 +216,8 @@ public class PmStartExt {
                 pmStart.location = JdbcMapUtil.getString(m, "location");
                 pmStart.planStartTime = JdbcMapUtil.getString(m, "PLAN_START_TIME");
                 pmStart.planEndTime = JdbcMapUtil.getString(m, "PLAN_END_TIME");
+                pmStart.projectClassificationId =  JdbcMapUtil.getString(m, "PROJECT_CLASSIFICATION_ID");
+                pmStart.projectClassification =  JdbcMapUtil.getString(m, "PROJECT_CLASSIFICATION");
                 return pmStart;
             }).collect(Collectors.toList());
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(dataList.get(0)), Map.class);
@@ -257,7 +264,8 @@ public class PmStartExt {
                 .set("PM_CODE", prjCode).set("NAME", prjName).set("PRJ_TOTAL_INVEST", input.invest).set("PROJECT_TYPE_ID", input.typeId).set("TENDER_MODE_ID", input.tenderWay)
                 .set("BUILDER_UNIT", input.unit).set("START_TIME", input.startTime).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", status).set("START_REMARK", input.startRemark)
                 .set("ATT_FILE_GROUP_ID", input.fileIds).set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).set("START_TIME", input.startTime)
-                .set("LOCATION_INFO", location).set("AD_USER_ID", input.qqUserId).set("BASE_LOCATION_ID", input.locationId).set("PLAN_START_TIME", input.planStartTime).set("PLAN_END_TIME", input.planEndTime).exec();
+                .set("LOCATION_INFO", location).set("AD_USER_ID", input.qqUserId).set("BASE_LOCATION_ID", input.locationId).set("PLAN_START_TIME", input.planStartTime)
+                .set("PLAN_END_TIME", input.planEndTime).set("PROJECT_CLASSIFICATION_ID", input.projectClassificationId).exec();
     }
 
     /**
@@ -286,7 +294,7 @@ public class PmStartExt {
                     this.createOtherInfo(list1.get(0), id);
                 }
                 // 岗位指派流程自动发起
-                autoCreateProcess(userId,list1,myJdbcTemplate);
+                autoCreateProcess(userId, list1, myJdbcTemplate);
             }
             myJdbcTemplate.update("update PRJ_START set PRJ_START_STATUS_ID=? where id=?", list.get(0).get("ID"), id);
         }
@@ -295,24 +303,25 @@ public class PmStartExt {
 
     /**
      * 岗位指派流程自动发起
-     * @param userId 当前操作人
-     * @param list1 项目在项目启动表中信息
+     *
+     * @param userId         当前操作人
+     * @param list1          项目在项目启动表中信息
      * @param myJdbcTemplate 数据源
      */
     private void autoCreateProcess(String userId, List<Map<String, Object>> list1, MyJdbcTemplate myJdbcTemplate) {
-        String projectName = JdbcMapUtil.getString(list1.get(0),"NAME");
+        String projectName = JdbcMapUtil.getString(list1.get(0), "NAME");
         String sql = "select id from pm_prj where name = ? and status = 'AP' and project_source_type_id = '0099952822476441374'";
-        List<Map<String,Object>> prjList = myJdbcTemplate.queryForList(sql,projectName);
-        if (!CollectionUtils.isEmpty(prjList)){
-            String projectId = JdbcMapUtil.getString(prjList.get(0),"id");
-            new Thread(()->{
+        List<Map<String, Object>> prjList = myJdbcTemplate.queryForList(sql, projectName);
+        if (!CollectionUtils.isEmpty(prjList)) {
+            String projectId = JdbcMapUtil.getString(prjList.get(0), "id");
+            new Thread(() -> {
                 String id = IdUtil.getSnowflakeNextIdStr();
-                Map<String,Object> canMap = new HashMap<>();
-                canMap.put("projectId",projectId);
-                canMap.put("interfaceId",id);
-                canMap.put("createBy",userId);
+                Map<String, Object> canMap = new HashMap<>();
+                canMap.put("projectId", projectId);
+                canMap.put("interfaceId", id);
+                canMap.put("createBy", userId);
                 String str = HttpClient.urlencode(canMap);
-                BaseThirdInterfaceDetailExt.insert(userId,str,id,"GET","automaticPmPostAppoint",myJdbcTemplate);
+                BaseThirdInterfaceDetailExt.insert(userId, str, id, "GET", "automaticPmPostAppoint", myJdbcTemplate);
             }).start();
         }
     }
@@ -403,7 +412,8 @@ public class PmStartExt {
                     .set("INVESTMENT_SOURCE_ID", dataMap.get("INVESTMENT_SOURCE_ID")).set("PROJECT_TYPE_ID", dataMap.get("PROJECT_TYPE_ID")).set("BUILDER_UNIT", dataMap.get("BUILDER_UNIT"))
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("PM_SEQ", seq).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
                     .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID", "0099799190825080706")
-                    .set("IZ_FORMAL_PRJ", 1).set("PROJECT_STATUS", null).set("PLAN_START_TIME", dataMap.get("PLAN_START_TIME")).set("PLAN_END_TIME", dataMap.get("PLAN_END_TIME")).exec();
+                    .set("IZ_FORMAL_PRJ", 1).set("PROJECT_STATUS", null).set("PLAN_START_TIME", dataMap.get("PLAN_START_TIME")).set("PLAN_END_TIME", dataMap.get("PLAN_END_TIME"))
+                    .set("PROJECT_CLASSIFICATION_ID", dataMap.get("PROJECT_CLASSIFICATION_ID")).exec();
             //为项目添加清单
             PrjMaterialInventory.addPrjInventory(projectId);
 
@@ -518,7 +528,7 @@ public class PmStartExt {
                         String title = threeNode.get("prjName") + "-" + processName;
                         String content = MessageFormat.format(msg, threeNode.get("prjName"), processName, dateOrg);
                         myJdbcTemplate.update("update WEEK_TASK set AD_USER_ID=?,TITLE=?,CONTENT=?,PUBLISH_START=?,WEEK_TASK_STATUS_ID=?,WEEK_TASK_TYPE_ID=?,RELATION_DATA_ID=?,CAN_DISPATCH='0',PM_PRJ_ID=?,PLAN_COMPL_DATE=? where id=?",
-                                userId, title, content, new Date(), "1634118574056542208", "1635080848313290752", threeNode.get("ID"), threeNode.get("projectId"),threeNode.get("PLAN_COMPL_DATE"), id);
+                                userId, title, content, new Date(), "1634118574056542208", "1635080848313290752", threeNode.get("ID"), threeNode.get("projectId"), threeNode.get("PLAN_COMPL_DATE"), id);
                     }
 
                 }
@@ -656,6 +666,9 @@ public class PmStartExt {
         //计划竣工时间
         public String planEndTime;
 
+        public String projectClassificationId;
+
+        public String projectClassification;
     }
 
     public static class inputData {
@@ -700,6 +713,9 @@ public class PmStartExt {
 
         //计划竣工时间
         public String planEndTime;
+
+        //项目类别
+        public String projectClassificationId;
     }
 
     public static class FileInfo {
