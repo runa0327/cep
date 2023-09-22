@@ -33,4 +33,52 @@ public interface PmPrjMapper {
      * @return 项目信息
      */
     PmPrj queryById(String projectId);
+
+    /**
+     * 获取系统类项目
+     * @param pmPrj 项目实体
+     * @return 查询结果
+     */
+    List<PmPrj> queryProject(PmPrj pmPrj);
+
+    /**
+     * 查询项目结算信息
+     * @param projectId 项目id
+     * @return 查询结果
+     */
+    PmPrj queryPrjAmtBySettle(String projectId);
+
+    /**
+     * 查询预算财评信息
+     * @param projectId 项目id
+     * @return 查询结果
+     */
+    PmPrj queryPrjAmtByInvest3(String projectId);
+
+    /**
+     * 查询初设概算信息
+     * @param projectId 项目id
+     * @return 查询结果
+     */
+    PmPrj queryPrjAmtByInvest2(String projectId);
+
+    /**
+     * 查询可研估算信息
+     * @param projectId 项目id
+     * @return 查询结果
+     */
+    PmPrj queryPrjAmtByInvest1(String projectId);
+
+    /**
+     * 查询立项审批信息
+     * @param projectId 项目id
+     * @return 查询结果
+     */
+    PmPrj queryPrjAmtByPmPrjReq(String projectId);
+
+    /**
+     * 根据id动态修改数据
+     * @param pmPrj 实体信息
+     */
+    int updateConditionById(PmPrj pmPrj);
 }
