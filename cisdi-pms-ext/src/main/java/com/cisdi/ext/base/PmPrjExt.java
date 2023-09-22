@@ -2,6 +2,7 @@ package com.cisdi.ext.base;
 
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.PmPlan;
+import com.cisdi.ext.model.PmPrjSettleAccounts;
 import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.model.PrjStart;
 import com.cisdi.ext.model.view.project.PmPrjView;
@@ -25,6 +26,7 @@ import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -141,6 +143,25 @@ public class PmPrjExt {
         int oldLevel = getPrjDataLevel(projectId,myJdbcTemplate);
         if (level >= oldLevel){ //更新数据
             //更新项目资金信息
+            List<PmPrjSettleAccounts> list = PmPrjSettleAccounts.selectByWhere(new Where().eq(PmPrjSettleAccounts.Cols.STATUS,"AP")
+                    .eq(PmPrjSettleAccounts.Cols.PM_PRJ_ID,projectId));
+            if (!CollectionUtils.isEmpty(list)){
+                BigDecimal prjTotalInvest = list.stream().filter(p->p.getPrjTotalInvest() != null).map(PmPrjSettleAccounts::getPrjTotalInvest).reduce(BigDecimal.ZERO,BigDecimal::add); //总投资
+                BigDecimal constructAmt = list.stream().filter(p->p.getConstructAmt() != null).map(PmPrjSettleAccounts::getConstructAmt).reduce(BigDecimal.ZERO,BigDecimal::add); //建安工程费
+                BigDecimal equipAmt = list.stream().filter(p->p.getEquipAmt() != null).map(PmPrjSettleAccounts::getEquipAmt).reduce(BigDecimal.ZERO,BigDecimal::add); //设备采购费
+                BigDecimal equipmentCost = list.stream().filter(p->p.getEquipmentCost() != null).map(PmPrjSettleAccounts::getEquipmentCost).reduce(BigDecimal.ZERO,BigDecimal::add); //科研设备费
+                BigDecimal projectOtherAmt = list.stream().filter(p->p.getProjectOtherAmt() != null).map(PmPrjSettleAccounts::getProjectOtherAmt).reduce(BigDecimal.ZERO,BigDecimal::add); //工厂其他费用
+                BigDecimal landAmt = list.stream().filter(p->p.getLandAmt() != null).map(PmPrjSettleAccounts::getLandAmt).reduce(BigDecimal.ZERO,BigDecimal::add); //工厂其他费用
+                BigDecimal prepareAmt = list.stream().filter(p->p.getPrepareAmt() != null).map(PmPrjSettleAccounts::getPrepareAmt).reduce(BigDecimal.ZERO,BigDecimal::add); //预备费
+
+                entityRecord.valueMap.put("PRJ_TOTAL_INVEST",prjTotalInvest); // 总投资
+                entityRecord.valueMap.put("CONSTRUCT_AMT",constructAmt); // 建安工程费
+                entityRecord.valueMap.put("EQUIP_AMT",equipAmt); // 设备采购费
+                entityRecord.valueMap.put("EQUIPMENT_COST",equipmentCost); // 科研设备费
+                entityRecord.valueMap.put("PROJECT_OTHER_AMT",projectOtherAmt); // 工程其他费用
+                entityRecord.valueMap.put("LAND_AMT",landAmt); // 土地征拆费用
+                entityRecord.valueMap.put("PREPARE_AMT",prepareAmt); // 预备费
+            }
             WfPmInvestUtil.updatePrjInvest(entityRecord,entCode);
         }
     }

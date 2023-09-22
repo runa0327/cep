@@ -56,7 +56,7 @@ public class PmPrjSettleAccountsExt {
         //流程业务表id
         String csCommId = entityRecord.csCommId;
         //更新资金信息
-        PmPrjExt.updatePrjAmt(entityRecord,"PM_PRJ_SETTLE_ACCOUNTS",4,myJdbcTemplate,entCode);
+        PmPrjExt.updatePrjAmt(entityRecord,"PM_PRJ_SETTLE_ACCOUNTS",5,myJdbcTemplate,entCode);
         //创建项目投资测算汇总可研数据
         WfPmInvestUtil.calculateData(csCommId, entCode, projectId);
         //审批人员信息写入花名册(计划运营岗)
