@@ -155,9 +155,8 @@ public class WfPrjExt {
                 sql1 = "select AD_USER_ID from ad_role_user a WHERE a.AD_ROLE_ID = '0099952822476412310' ";
             } else if ("0099952822476380406".equals(companyId) || "0099952822476380407".equals(companyId)){ //海南城发建设工程有限公司 海南城发实业集团有限公司
                 sql1 = "select AD_USER_ID from ad_role_user a WHERE a.AD_ROLE_ID = '0099952822476412312' ";
-            } else if ("0099902212142008831".equals(companyId)){ //三亚崖州湾科技城开发建设有限公司
+            } else { // 非以上情况都取开发公司
                 sql1 = "select AD_USER_ID from ad_role_user a WHERE a.AD_ROLE_ID = '0099952822476412306' ";
-//                sql2 = "select AD_USER_ID from ad_role_user a WHERE a.AD_ROLE_ID = '0099952822476412308' ";
             }
 
             List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1);
