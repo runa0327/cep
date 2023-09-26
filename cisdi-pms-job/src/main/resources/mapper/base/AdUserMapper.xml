@@ -8,6 +8,7 @@
         <result property="adUserId" column="adUserId" />
         <result property="name" column="name" />
         <result property="adUserName" column="adUserName" />
+        <result property="num" column="num" />
     </resultMap>
 
     <!--根据用户id查询用户信息-->
@@ -36,5 +37,29 @@
     <!--查询系统上线以来所有登录次数 2022-11-22上线-->
     <select id="queryLoginNums" resultType="int">
         select count(*) as num from main.ad_login where crt_dt >= '2022-11-22 00:00:00'
+    </select>
+
+    <!--获取系统分管领导信息-->
+    <select id="queryChargeUser" resultType="String">
+        select AD_USER_ID from hr_dept where status = 'AP' and AD_USER_ID is not null GROUP BY AD_USER_ID ORDER BY AD_USER_ID asc
+    </select>
+
+    <!--获取分管领导时间范围内登录次数-->
+    <select id="queryChargeUserLoginNums" resultMap="AdUserResultMap">
+        select
+            a.ad_user_id,
+            count(*),
+            (select name from main.ad_user where id = a.ad_user_id) as name
+        from
+            main.ad_login a
+        where
+            a.ad_user_id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+            and crt_dt >= #{startDate}
+            <![CDATA[ and crt_dt <= #{endDate} ]]>
+        group by a.ad_user_id
+        order by a.ad_user_id asc
     </select>
 </mapper>

@@ -310,4 +310,42 @@
         where
             id = #{projectId}
     </update>
+
+    <!--获取所有系统项目-->
+    <select id="queryAllSystemProject" resultMap="pmPrjResult">
+        select id,project_phase as projectPhaseTypeId from pm_prj where status = 'AP' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'
+    </select>
+
+    <!--获取时间范围内新增的项目数-->
+    <select id="queryTimeFrameNewProjectNums" resultType="int">
+        select
+            count(*) as num
+        from
+            pm_prj
+        where
+            status = 'AP'
+            and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'
+            and CRT_DT >= #{startDate}
+            <![CDATA[ and CRT_DT <= #{endDate}]]>
+    </select>
+
+    <!--获取所有立项完成数量 含历史导入数据-->
+    <select id="queryReqNums" resultType="int">
+        select count(*) as num from pm_prj_req where status = 'AP'
+    </select>
+
+    <!--获取所有可研完成数量 含历史导入数据-->
+    <select id="queryInvest1Nums" resultType="int">
+        select count(*) as num from PM_PRJ_INVEST1 where status = 'AP'
+    </select>
+
+    <!--获取所有初设概算完成数量 含历史导入数据-->
+    <select id="queryInvest2Nums" resultType="int">
+        select count(*) as num from PM_PRJ_INVEST2 where status = 'AP'
+    </select>
+
+    <!--获取所有预算财评完成数量 含历史导入数据-->
+    <select id="queryInvest3Nums" resultType="int">
+        select count(*) as num from PM_PRJ_INVEST3 where status = 'AP'
+    </select>
 </mapper>

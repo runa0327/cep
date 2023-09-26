@@ -32,6 +32,29 @@
         select id from pm_progress_weekly where FROM_DATE != #{startDate} and TO_DATE != #{endDate} AND id != #{weekId} and status = 'ap' order by FROM_DATE desc limit 1
     </select>
 
+    <!--获取周期范围内应填报周报数量-->
+    <select id="queryWeekNeedWritePrjNums" resultType="int">
+        select
+            count(*) as num
+        from
+            pm_progress_weekly_prj
+        where
+            PM_PROGRESS_WEEKLY_ID = #{weekId}
+          and status = 'AP'
+    </select>
+
+    <!--获取周期范围内实际填报周报数量-->
+    <select id="queryWeekWritePrjNums" resultType="int">
+        select
+            count(*) as num
+        from
+            pm_progress_weekly_prj
+        where
+            PM_PROGRESS_WEEKLY_ID = #{weekId}
+          and status = 'AP'
+            and SUBMIT_TIME is not null
+    </select>
+
     <!--根据实体信息新增数据-->
     <insert id="createData">
         insert into PM_PROGRESS_WEEKLY (

@@ -81,4 +81,49 @@ public interface PmPrjMapper {
      * @param pmPrj 实体信息
      */
     int updateConditionById(PmPrj pmPrj);
+
+    /**
+     * 获取所有系统项目
+     * @return 项目id
+     */
+    List<PmPrj> queryAllSystemProject();
+
+    /**
+     * 获取时间范围内新增的项目数
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return 项目数
+     */
+    int queryTimeFrameNewProjectNums(@Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    /**
+     * 获取所有立项完成数量 含历史导入数据
+     * @return 立项完成数
+     */
+    int queryReqNums();
+
+    /**
+     * 获取所有可研完成数量 含历史导入数据
+     * @return 可研完成数
+     */
+    int queryInvest1Nums();
+
+    /**
+     * 获取所有初设概算完成数量 含历史导入数据
+     * @return 初设概算完成数
+     */
+    int queryInvest2Nums();
+
+    /**
+     * 获取所有预算财评完成数量 含历史导入数据
+     * @return 预算财评完成数
+     */
+    int queryInvest3Nums();
+
+    /**
+     * 查询所有系统项目项目投资总额
+     * @param projectIdList 项目id集合
+     * @return 项目投资总额
+     */
+    String queryTotalAmtByProjectIds(@Param("list") List<String> projectIdList);
 }

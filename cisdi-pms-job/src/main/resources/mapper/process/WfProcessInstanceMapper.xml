@@ -11,6 +11,7 @@
         <result property="startDate" column="startDate" />
         <result property="endDate" column="endDate" />
         <result property="wfProcessId" column="wfProcessId" />
+        <result property="processName" column="processName" />
         <result property="adEntId" column="adEntId" />
         <result property="adEntCode" column="adEntCode" />
         <result property="entityRecordId" column="entityRecordId" />
@@ -27,6 +28,7 @@
         <result property="isCurrent" column="isCurrent" />
         <result property="taskId" column="taskId" />
         <result property="adUserId" column="adUserId" />
+        <result property="adUserName" column="adUserName" />
         <result property="receiveDate" column="receiveDate" />
         <result property="actDate" column="actDate" />
         <result property="viewDate" column="viewDate" />
@@ -41,6 +43,7 @@
         <result property="lastUpdateDate" column="lastUpdateDate" />
         <result property="status" column="status" />
         <result property="code" column="code" />
+        <result property="instanceNums" column="instanceNums" />
     </resultMap>
 
     <!--查询上线以来所有发起的流程数量-->
@@ -57,18 +60,41 @@
     </select>
 
     <!--查询时间范围内新增流程数量-->
-    <select id="queryTimeFrameNewInstanceNums" resultType="int">
+    <select id="queryTimeFrameNewInstanceNums" resultMap="WfProcessInstanceResultMap">
         select
-            count(*)
+            a.WF_PROCESS_ID as wfProcessId,
+            (select name from wf_process where id = a.WF_PROCESS_ID) as processName,
+            count(*) as instanceNums
         from
-            wf_process_instance
+            wf_process_instance a
         where
-            status = 'ap'
-          and crt_dt >= '2022-11-22 00:00:00'
-          and START_USER_ID != '0099250247095871681'
-          and 0 = locate('历史数据导入',name)
-            and crt_dt >= #{startDate}
-            <![CDATA[ and crt_dt <= #{endDate}]]
+            a.status = 'ap'
+          and a.crt_dt >= '2022-11-22 00:00:00'
+          and a.START_USER_ID != '0099250247095871681'
+          and 0 = locate('历史数据导入',a.name)
+            and a.crt_dt >= #{startDate}
+            <![CDATA[ and a.crt_dt <= #{endDate} ]]>
+        GROUP BY a.WF_PROCESS_ID
+    </select>
+
+    <!--获取分管领导时间范围内审批次数-->
+    <select id="queryChargeUserCheckNums" resultMap="WfProcessInstanceResultMap">
+        select
+            (select name from ad_user where id = a.AD_USER_ID) as adUserName,
+            count(*) as instanceNums
+        from
+            wf_task a
+        where
+            a.status = 'ap'
+            and a.WF_TASK_TYPE_ID = 'TODO'
+            and a.ACT_DATETIME >= #{startDate}
+            <![CDATA[ and a.ACT_DATETIME >= #{endDate} ]]>
+            and a.ad_user_id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        GROUP BY a.ad_user_id
+        order by a.ad_user_id asc
     </select>
 
     <!--新增-->

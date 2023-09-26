@@ -3,6 +3,8 @@ package com.cisdi.pms.job.mapper.process;
 import com.cisdi.pms.job.domain.process.WfProcessInstance;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface WfProcessInstanceMapper {
 
     /**
@@ -47,5 +49,14 @@ public interface WfProcessInstanceMapper {
      * @param endDate 结束时间
      * @return 流程数量
      */
-    int queryTimeFrameNewInstanceNums(@Param("startDate") String startDate, @Param("endDate") String endDate);
+    List<WfProcessInstance> queryTimeFrameNewInstanceNums(@Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    /**
+     * 获取分管领导时间范围内审批次数
+     * @param chargeUser 分管领导信息
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return 分管领导审批信息
+     */
+    List<WfProcessInstance> queryChargeUserCheckNums(@Param("list") List<String> chargeUser, @Param("startDate") String startDate, @Param("endDate") String endDate);
 }

@@ -10,6 +10,9 @@ public class AdUser {
     private String name;
     private String adUserName;
 
+    // 登录次数
+    private Integer num;
+
     public String getId() {
         return id;
     }
@@ -40,5 +43,13 @@ public class AdUser {
 
     public void setAdUserName(String adUserName) {
         this.adUserName = adUserName;
+    }
+
+    public Integer getNum() {
+        return num;
+    }
+
+    public void setNum(Integer num) {
+        this.num = num;
     }
 }
