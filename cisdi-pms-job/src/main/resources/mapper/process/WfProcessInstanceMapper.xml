@@ -43,6 +43,34 @@
         <result property="code" column="code" />
     </resultMap>
 
+    <!--查询上线以来所有发起的流程数量-->
+    <select id="queryAllInstanceNums" resultType="int">
+        select
+            count(*)
+        from
+            wf_process_instance
+        where
+            status = 'ap'
+            and crt_dt >= '2022-11-22 00:00:00'
+            and START_USER_ID != '0099250247095871681'
+            and 0 = locate('历史数据导入',name)
+    </select>
+
+    <!--查询时间范围内新增流程数量-->
+    <select id="queryTimeFrameNewInstanceNums" resultType="int">
+        select
+            count(*)
+        from
+            wf_process_instance
+        where
+            status = 'ap'
+          and crt_dt >= '2022-11-22 00:00:00'
+          and START_USER_ID != '0099250247095871681'
+          and 0 = locate('历史数据导入',name)
+            and crt_dt >= #{startDate}
+            <![CDATA[ and crt_dt <= #{endDate}]]
+    </select>
+
     <!--新增-->
     <insert id="insert">
         insert into wf_process_instance (

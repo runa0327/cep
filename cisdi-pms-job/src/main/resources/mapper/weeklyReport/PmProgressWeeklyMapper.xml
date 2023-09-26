@@ -8,11 +8,23 @@
         <result property="date" column="date" />
         <result property="fromDate" column="fromDate" />
         <result property="toDate" column="toDate" />
+        <result property="startDate" column="startDate" />
+        <result property="endDate" column="endDate" />
     </resultMap>
 
     <!--根据开始结束日期查询周id-->
     <select id="getWeekIdByDate" resultType="String">
         select id from pm_progress_weekly where FROM_DATE = #{startDate} and TO_DATE = #{endDate} and status = 'AP'
+    </select>
+
+    <select id="queryDataById" resultMap="PmProgressWeeklyResult">
+        select
+            DATE_FORMAT(FROM_DATE,'%Y-%m-%d 00:00:00') as startDate,
+            DATE_FORMAT(TO_DATE,'%Y-%m-%d 23:59:59') as endDate
+        from
+            pm_progress_weekly
+        where
+            id = #{weekId}
     </select>
 
     <!--获取上周weekId-->

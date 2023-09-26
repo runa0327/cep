@@ -1,6 +1,7 @@
 package com.cisdi.pms.job.mapper.process;
 
 import com.cisdi.pms.job.domain.process.WfProcessInstance;
+import org.apache.ibatis.annotations.Param;
 
 public interface WfProcessInstanceMapper {
 
@@ -33,4 +34,18 @@ public interface WfProcessInstanceMapper {
      * @param wfProcessInstance 实体数据
      */
     void updateNodeInstanceById(WfProcessInstance wfProcessInstance);
+
+    /**
+     * 查询上线以来所有发起的流程数量
+     * @return 流程实例总数
+     */
+    int queryAllInstanceNums();
+
+    /**
+     * 查询时间范围内新增流程数量
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return 流程数量
+     */
+    int queryTimeFrameNewInstanceNums(@Param("startDate") String startDate, @Param("endDate") String endDate);
 }

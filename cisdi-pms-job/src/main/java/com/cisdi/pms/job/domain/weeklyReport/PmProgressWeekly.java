@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.util.Date;
 
+/**
+ * 周期记录信息
+ */
 @Data
 public class PmProgressWeekly extends BaseDomain {
 
@@ -19,7 +22,9 @@ public class PmProgressWeekly extends BaseDomain {
 
     //开始日期
     private Date fromDate;
+    private String startDate;
 
     //结束日期
     private Date toDate;
+    private String endDate;
 }

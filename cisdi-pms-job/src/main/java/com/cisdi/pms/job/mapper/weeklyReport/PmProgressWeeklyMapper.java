@@ -29,4 +29,11 @@ public interface PmProgressWeeklyMapper {
      * @return 上周id
      */
     String getLastWeekId(@Param("startDate") String startDate, @Param("endDate")String endDate, @Param("weekId")String weekId);
+
+    /**
+     * 根据周id查询周信息
+     * @param weekId 周id
+     * @return 查询结果
+     */
+    PmProgressWeekly queryDataById(String weekId);
 }
