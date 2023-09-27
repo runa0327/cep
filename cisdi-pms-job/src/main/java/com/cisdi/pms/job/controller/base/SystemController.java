@@ -2,7 +2,6 @@ package com.cisdi.pms.job.controller.base;
 
 import com.cisdi.pms.job.domain.weeklyReport.PmProgressWeekly;
 import com.cisdi.pms.job.service.base.SystemService;
-import com.cisdi.pms.job.utils.StringUtil;
 import com.qygly.shared.BaseException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,5 +29,6 @@ public class SystemController {
             throw new BaseException("【weekId】周信息不能为空!");
         }
         Map<String,Object> map = systemService.querySystemUsage(weekId);
+        systemService.downloadSystemUsage(response,map,"系统使用情况");
     }
 }

@@ -75,13 +75,15 @@
             and a.crt_dt >= #{startDate}
             <![CDATA[ and a.crt_dt <= #{endDate} ]]>
         GROUP BY a.WF_PROCESS_ID
+        order by a.WF_PROCESS_ID asc
     </select>
 
     <!--获取分管领导时间范围内审批次数-->
     <select id="queryChargeUserCheckNums" resultMap="WfProcessInstanceResultMap">
         select
+            a.ad_user_id,
             (select name from ad_user where id = a.AD_USER_ID) as adUserName,
-            count(*) as instanceNums
+            ifnull(count(*),0) as instanceNums
         from
             wf_task a
         where

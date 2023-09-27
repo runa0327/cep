@@ -313,7 +313,16 @@
 
     <!--获取所有系统项目-->
     <select id="queryAllSystemProject" resultMap="pmPrjResult">
-        select id,project_phase as projectPhaseTypeId from pm_prj where status = 'AP' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'
+        select
+            id as id,
+            project_phase_ID as projectPhaseTypeId,
+            ESTIMATED_TOTAL_INVEST as projectTotalInvest,
+            CONSTRUCT_PRJ_AMT as constructPrjAmt
+        from
+            pm_prj
+        where
+            status = 'AP'
+            and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'
     </select>
 
     <!--获取时间范围内新增的项目数-->

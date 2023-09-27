@@ -31,7 +31,7 @@
 
     <!--查询时间范围内登录系统的用户数-->
     <select id="queryWeekUserLoginNums" resultType="int">
-        <![CDATA[ select ad_user_id from main.ad_login where crt_dt >= #{startDate} and crt_dt <= #{endDate} group by ad_user_id ]]>
+        <![CDATA[ select count(*) from (select ad_user_id from main.ad_login where crt_dt >= #{startDate} and crt_dt <= #{endDate} group by ad_user_id ) a]]>
     </select>
 
     <!--查询系统上线以来所有登录次数 2022-11-22上线-->
@@ -48,7 +48,7 @@
     <select id="queryChargeUserLoginNums" resultMap="AdUserResultMap">
         select
             a.ad_user_id,
-            count(*),
+            ifnull(count(*),0) as num,
             (select name from main.ad_user where id = a.ad_user_id) as name
         from
             main.ad_login a
