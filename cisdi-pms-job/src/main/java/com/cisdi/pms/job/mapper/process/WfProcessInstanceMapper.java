@@ -59,4 +59,5 @@ public interface WfProcessInstanceMapper {
      * @return 分管领导审批信息
      */
     List<WfProcessInstance> queryChargeUserCheckNums(@Param("list") List<String> chargeUser, @Param("startDate") String startDate, @Param("endDate") String endDate);
+
 }
