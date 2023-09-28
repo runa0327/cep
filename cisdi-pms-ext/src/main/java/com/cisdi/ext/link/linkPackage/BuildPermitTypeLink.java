@@ -97,110 +97,75 @@ public class BuildPermitTypeLink {
                 PRJ_REQ_FILEChangeToMandatory = true;
             }
             //申请时间
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToShown = EARTHWORK_APPLY_DATEChangeToShown;
-                linkedAtt.changeToEditable = EARTHWORK_APPLY_DATEChangeToEditable;
-//                linkedAtt.changeToEditable = true;
-                attLinkResult.attMap.put("EARTHWORK_APPLY_DATE",linkedAtt);
-            }
+            LinkUtils.mapAddAllValue("EARTHWORK_APPLY_DATE",AttDataTypeE.TEXT_LONG,(String) null,null,EARTHWORK_APPLY_DATEChangeToShown,false,EARTHWORK_APPLY_DATEChangeToEditable,attLinkResult);
             //计划完成日期
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DATE;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToShown = COMPL_PLAN_DATE_APPLYChangeToShown;
-                linkedAtt.changeToEditable = COMPL_PLAN_DATE_APPLYChangeToEditable;
-                attLinkResult.attMap.put("COMPL_PLAN_DATE_APPLY",linkedAtt);
-            }
+            LinkUtils.mapAddAllValue("COMPL_PLAN_DATE_APPLY",AttDataTypeE.DATE,(String) null,null,COMPL_PLAN_DATE_APPLYChangeToShown,false,COMPL_PLAN_DATE_APPLYChangeToEditable,attLinkResult);
             //申请人
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToShown = EARTHWORK_APPLY_USERChangeToShown;
-                linkedAtt.changeToEditable = EARTHWORK_APPLY_USERChangeToEditable;
-                attLinkResult.attMap.put("EARTHWORK_APPLY_USER",linkedAtt);
-            }
+            LinkUtils.mapAddAllValue("EARTHWORK_APPLY_USER",AttDataTypeE.TEXT_LONG,(String) null,null,EARTHWORK_APPLY_USERChangeToShown,false,EARTHWORK_APPLY_USERChangeToEditable,attLinkResult);
             //申请材料
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.FILE_GROUP;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToShown = PRJ_REQ_FILEChangeToShown;
-                linkedAtt.changeToEditable = PRJ_REQ_FILEChangeToEditable;
-                linkedAtt.changeToMandatory = PRJ_REQ_FILEChangeToMandatory;
-                attLinkResult.attMap.put("PRJ_REQ_FILE",linkedAtt);
-            }
+            LinkUtils.mapAddValueByValueFile("PRJ_REQ_FILE",(String) null,null,PRJ_REQ_FILEChangeToShown,PRJ_REQ_FILEChangeToMandatory,PRJ_REQ_FILEChangeToEditable,AttDataTypeE.FILE_GROUP,attLinkResult);
             //备注
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToShown = REMARKChangeToShown;
-                linkedAtt.changeToEditable = REMARKChangeToEditable;
-                attLinkResult.attMap.put("REMARK",linkedAtt);
-            }
+            LinkUtils.mapAddAllValue("REMARK",AttDataTypeE.TEXT_LONG,(String) null,null,REMARKChangeToShown,false,REMARKChangeToEditable,attLinkResult);
+            LinkUtils.mapAddAllValue("TEXT_REMARK_ONE",AttDataTypeE.TEXT_LONG,(String) null,null,REMARKChangeToShown,false,REMARKChangeToEditable,attLinkResult);
             //备注
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToShown = ACT_REMARKChangeToShown;
-                linkedAtt.changeToEditable = ACT_REMARKChangeToEditable;
-                attLinkResult.attMap.put("ACT_REMARK",linkedAtt);
-            }
+            LinkUtils.mapAddAllValue("ACT_REMARK",AttDataTypeE.TEXT_LONG,(String) null,null,ACT_REMARKChangeToShown,false,ACT_REMARKChangeToEditable,attLinkResult);
             //申请材料
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.FILE_GROUP;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToShown = KEEP_RECORD_FILEChangeToShown;
-                linkedAtt.changeToEditable = KEEP_RECORD_FILEChangeToEditable;
-                linkedAtt.changeToMandatory = KEEP_RECORD_FILEChangeToMandatory;
-                attLinkResult.attMap.put("KEEP_RECORD_FILE",linkedAtt);
-            }
+            LinkUtils.mapAddValueByValueFile("KEEP_RECORD_FILE",(String) null,null,KEEP_RECORD_FILEChangeToShown,KEEP_RECORD_FILEChangeToMandatory,KEEP_RECORD_FILEChangeToEditable,AttDataTypeE.FILE_GROUP,attLinkResult);
             //申请人
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToShown = SUBJECT_APPLY_USERChangeToShown;
-                linkedAtt.changeToEditable = SUBJECT_APPLY_USERChangeToEditable;
-                attLinkResult.attMap.put("SUBJECT_APPLY_USER",linkedAtt);
-            }
+            LinkUtils.mapAddAllValue("SUBJECT_APPLY_USER",AttDataTypeE.TEXT_LONG,(String) null,null,SUBJECT_APPLY_USERChangeToShown,false,SUBJECT_APPLY_USERChangeToEditable,attLinkResult);
             //计划完成日期
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DATE;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToShown = SUBJECT_PLAN_COMPL_DATEChangeToShown;
-                linkedAtt.changeToEditable = SUBJECT_PLAN_COMPL_DATEChangeToEditable;
-                attLinkResult.attMap.put("SUBJECT_PLAN_COMPL_DATE",linkedAtt);
-            }
+            LinkUtils.mapAddAllValue("SUBJECT_PLAN_COMPL_DATE",AttDataTypeE.DATE,(String) null,null,SUBJECT_PLAN_COMPL_DATEChangeToShown,false,SUBJECT_PLAN_COMPL_DATEChangeToEditable,attLinkResult);
             //申请时间
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DATE;
-                linkedAtt.value = null;
-                linkedAtt.text = null;
-                linkedAtt.changeToShown = SUBJECT_APPLY_DATEChangeToShown;
-                linkedAtt.changeToEditable = SUBJECT_APPLY_DATEChangeToEditable;
-                attLinkResult.attMap.put("SUBJECT_APPLY_DATE",linkedAtt);
-            }
+            LinkUtils.mapAddAllValue("SUBJECT_APPLY_DATE",AttDataTypeE.DATE,(String) null,null,SUBJECT_APPLY_DATEChangeToShown,false,SUBJECT_APPLY_DATEChangeToEditable,attLinkResult);
 
         }
+        return attLinkResult;
+    }
+
+    /**
+     * 施工许可类型属性联动-多选
+     * @param attValue 联动属性值 0100031468512110542=主体工程施工许可申请 0100031468512110543=基坑及土石方工程施工许可申请 1707204652357595136=地下室施工许可申请
+     * @return 属性联动结果
+     */
+    public static AttLinkResult linkBUILD_PERMIT_TYPE_IDS(String attValue) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+        // 多选，每一类清空都要分别判断
+
+        boolean subjectShow = false; // 主体工程施工许可申请 模块 包含可改、显示
+        boolean soilShow = false; // 基坑及土石方工程施工许可申请 模块 包含可改、显示
+        boolean basementShow = false; // 地下室施工许可申请 模块 包含可改、显示
+
+        if (attValue.contains("0100031468512110543")){ // 基坑及土石方工程施工许可申请
+            soilShow = true;
+        }
+        if (attValue.contains("0100031468512110542")){ // 主体工程施工许可申请
+            subjectShow = true;
+        }
+        if (attValue.contains("1707204652357595136")){ // 地下室施工许可申请
+            basementShow = true;
+        }
+
+        // 基坑及土石方工程施工许可申请 模块
+        LinkUtils.mapAddAllValue("EARTHWORK_APPLY_DATE",AttDataTypeE.DATE,(String) null,null,soilShow,false,soilShow,attLinkResult); // 申请时间
+        LinkUtils.mapAddAllValue("COMPL_PLAN_DATE_APPLY",AttDataTypeE.DATE,(String) null,null,soilShow,false,soilShow,attLinkResult); // 计划完成日期
+        LinkUtils.mapAddAllValue("EARTHWORK_APPLY_USER",AttDataTypeE.TEXT_LONG,(String) null,null,soilShow,false,soilShow,attLinkResult); // 申请人
+        LinkUtils.mapAddValueByValueFile("PRJ_REQ_FILE",null,null,soilShow,false,soilShow,AttDataTypeE.FILE_GROUP,attLinkResult); // 申请材料
+        LinkUtils.mapAddAllValue("TEXT_REMARK_ONE",AttDataTypeE.TEXT_LONG,(String) null,null,soilShow,false,soilShow,attLinkResult); // 备注
+
+        // 主体工程施工许可申请 模块
+        LinkUtils.mapAddAllValue("SUBJECT_APPLY_DATE",AttDataTypeE.DATE,(String) null,null,subjectShow,false,subjectShow,attLinkResult); // 申请时间
+        LinkUtils.mapAddAllValue("SUBJECT_PLAN_COMPL_DATE",AttDataTypeE.DATE,(String) null,null,subjectShow,false,subjectShow,attLinkResult); // 计划完成日期
+        LinkUtils.mapAddAllValue("SUBJECT_APPLY_USER",AttDataTypeE.TEXT_LONG,(String) null,null,subjectShow,false,subjectShow,attLinkResult); // 申请人
+        LinkUtils.mapAddValueByValueFile("KEEP_RECORD_FILE",null,null,subjectShow,false,subjectShow,AttDataTypeE.FILE_GROUP,attLinkResult); // 申请材料
+        LinkUtils.mapAddAllValue("ACT_REMARK",AttDataTypeE.TEXT_LONG,(String) null,null,subjectShow,false,subjectShow,attLinkResult); // 备注
+
+        // 地下室施工许可申请 模块
+        LinkUtils.mapAddAllValue("DATE_ONE",AttDataTypeE.DATE,(String) null,null,basementShow,false,basementShow,attLinkResult); // 申请时间
+        LinkUtils.mapAddAllValue("DATE_TWO",AttDataTypeE.DATE,(String) null,null,basementShow,false,basementShow,attLinkResult); // 计划完成日期
+        LinkUtils.mapAddAllValue("USER_TEXT_ONE",AttDataTypeE.TEXT_LONG,(String) null,null,basementShow,false,basementShow,attLinkResult); // 申请人
+        LinkUtils.mapAddValueByValueFile("FILE_ID_ONE", null,null,basementShow,false,basementShow,AttDataTypeE.FILE_GROUP,attLinkResult); // 申请材料
+        LinkUtils.mapAddAllValue("TEXT_REMARK_TWO",AttDataTypeE.TEXT_LONG,(String) null,null,basementShow,false,basementShow,attLinkResult); // 备注
+
         return attLinkResult;
     }
 }

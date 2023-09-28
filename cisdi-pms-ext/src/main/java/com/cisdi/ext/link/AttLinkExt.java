@@ -110,8 +110,10 @@ public class AttLinkExt {
             return ProjectSourceTypeLink.linkPROJECT_SOURCE_TYPE_TWO_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("ORDER_DEMAND_TYPE".equals(attCode)){ //合同需求类型
             return OrderDemandTypeLink.linkORDER_DEMAND_TYPE(myJdbcTemplate,attValue,entCode);
-        } else if ("BUILD_PERMIT_TYPE_ID".equals(attCode)){ //施工许可类型
+        } else if ("BUILD_PERMIT_TYPE_ID".equals(attCode)){ //施工许可类型（单选）
             return BuildPermitTypeLink.linkBUILD_PERMIT_TYPE_ID(myJdbcTemplate,attValue,entCode);
+        } else if ("BUILD_PERMIT_TYPE_IDS".equals(attCode)){ //施工许可类型（多选）
+            return BuildPermitTypeLink.linkBUILD_PERMIT_TYPE_IDS(attValue);
         } else if ("GUARANTEE_COST_TYPE_ID".equals(attCode)){ //保函-费用类型
             return GuaranteeCostTypeLink.linkGUARANTEE_COST_TYPE_ID(myJdbcTemplate,attValue,entCode);
         } else if ("GUARANTEE_DATE_TYPE_ID".equals(attCode)){ //保函-到期类型
