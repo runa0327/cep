@@ -45,7 +45,7 @@ public class ProjectHomeExt {
                 "left join pm_party p3 on p3.id = pm.DESIGNER_UNIT\n" +
                 "left join pm_party p4 on p4.id = pm.CONSTRUCTOR_UNIT\n" +
                 "left join pm_party p5 on p5.id = pm.SUPERVISOR_UNIT\n" +
-                "left join gr_set_value g6 on g6.id = PROJECT_PHASE_ID "+
+                "left join gr_set_value g6 on g6.id = PROJECT_PHASE_ID " +
                 "where pm.id=?", map.get("projectId"));
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> mapDate = list.get(0);
@@ -84,22 +84,43 @@ public class ProjectHomeExt {
         BigDecimal totalAmt = BigDecimal.ZERO;
         BigDecimal jaAmt = BigDecimal.ZERO;
         BigDecimal jaCompleteAmt = BigDecimal.ZERO;
-        List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select ifnull(pie.PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST,pie.id as id from pm_invest_est pie \n" +
+        String title = "";
+        List<Map<String, Object>> dataList = myJdbcTemplate.queryForList("select ifnull(pie.PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST,pie.id as id,gsv.`CODE` from pm_invest_est pie \n" +
                 "left join gr_set_value gsv on gsv.id = pie.INVEST_EST_TYPE_ID \n" +
                 "where pie.PM_PRJ_ID=? and PRJ_TOTAL_INVEST<>0 \n" +
                 "order by gsv.code desc limit 0,1", projectId);
         if (!CollectionUtils.isEmpty(dataList)) {
             Map<String, Object> mapData = dataList.get(0);
             totalAmt = new BigDecimal(String.valueOf(mapData.get("PRJ_TOTAL_INVEST")));
+            String code = JdbcMapUtil.getString(mapData, "CODE");
+            if ("invest0".equals(code)) {
+                title = "匡算";
+            } else if ("invest1".equals(code)) {
+                title = "估算";
+            } else if ("invest2".equals(code)) {
+                title = "概算";
+            } else if ("invest3".equals(code)) {
+                title = "财评";
+            } else if ("invest4".equals(code)) {
+                title = "结算";
+            }
+
             List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(amt,0) as amt from pm_invest_est_dtl dt left join pm_exp_type et on dt.PM_EXP_TYPE_ID = et.id where et.`CODE`='PROJECT_AMT' and PM_INVEST_EST_ID=? ", mapData.get("id"));
             if (!CollectionUtils.isEmpty(list)) {
                 Map<String, Object> jaMapData = list.get(0);
                 jaAmt = new BigDecimal(String.valueOf(jaMapData.get("amt")));
             }
 
+        } else {
+            List<Map<String, Object>> startList = myJdbcTemplate.queryForList("select round(ifnull(PRJ_TOTAL_INVEST,0)/10000,2) PRJ_TOTAL_INVEST from  prj_start where PM_CODE= (select PM_CODE from pm_prj where id=?)", projectId);
+            if (!CollectionUtils.isEmpty(startList)) {
+                totalAmt = new BigDecimal(String.valueOf(startList.get(0).get("PRJ_TOTAL_INVEST")));
+                title = "项目启动";
+            }
         }
 
         OutSide outSide = new OutSide();
+        outSide.title = title;
         outSide.totalAmt = totalAmt;
         outSide.jaAmt = jaAmt;
         outSide.jaCompleteAmt = jaCompleteAmt;
@@ -252,6 +273,8 @@ public class ProjectHomeExt {
 
 
     public static class OutSide {
+        public String title;
+
         public BigDecimal totalAmt;
 
         public BigDecimal jaAmt;
