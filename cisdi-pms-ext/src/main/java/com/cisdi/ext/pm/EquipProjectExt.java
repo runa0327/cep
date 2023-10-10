@@ -144,8 +144,10 @@ public class EquipProjectExt {
         }
         if (StringUtils.hasText(inputData.name)) {
             sb.append(" ,NAME='").append(inputData.name).append("'");
+            sb.append(" ,REMARK='").append(inputData.name).append("(设备项目)'");
         } else {
             sb.append(" ,NAME=null");
+            sb.append(" ,REMARK=null");
         }
         if (StringUtils.hasText(inputData.amt)) {
             sb.append(" ,EQUIPMENT_PURCHASE_BUDGET_AMOUNT='").append(inputData.amt).append("'");

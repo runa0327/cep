@@ -140,8 +140,10 @@ public class StarchingProjectExt {
         }
         if (StringUtils.hasText(inputData.name)) {
             sb.append(" ,NAME='").append(inputData.name).append("'");
+            sb.append(" ,REMARK='").append(inputData.name).append("(零星项目)'");
         } else {
             sb.append(" ,NAME=null");
+            sb.append(" ,REMARK=null");
         }
         if (StringUtils.hasText(inputData.owner)) {
             sb.append(" ,CUSTOMER_UNIT='").append(inputData.owner).append("'");
