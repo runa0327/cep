@@ -9,6 +9,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,9 +82,31 @@ public class SystemUsage {
             stringBuilder.deleteCharAt(stringBuilder.length()-1);
             stringBuilder.append(" from ( select ( SELECT NAME FROM wf_process WHERE id = a.WF_PROCESS_ID ) AS processName,count(*) AS instanceNums from wf_process_instance a where a.STATUS = 'ap' AND a.crt_dt >= '2022-11-22 00:00:00' AND a.START_USER_ID != '0099250247095871681' AND 0 = locate( '历史数据导入', a.NAME ) AND a.crt_dt >= ? AND a.crt_dt <= ? group by a.WF_PROCESS_ID ORDER BY a.WF_PROCESS_ID ASC) a");
             List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(stringBuilder.toString(),startDate,endDate);
+            List<ProcessNums> listNums = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(list2)){
+                list2.forEach(p->{
+                    for (String key : p.keySet()){
+                        ProcessNums processNums = new ProcessNums();
+                        processNums.name = key;
+                        String num = JdbcMapUtil.getString(p,key);
+                        if (StringUtils.hasText(num)){
+                            processNums.nums = Integer.valueOf(num);
+                        } else {
+                            processNums.nums = 0;
+                        }
+                        listNums.add(processNums);
+                    }
+
+                });
+            }
             map.put("nameList",processNameList);
-            map.put("nums",list2);
+            map.put("nums",listNums);
         }
         return map;
+    }
+
+    private class ProcessNums {
+        public String name;
+        public Integer nums;
     }
 }
