@@ -269,7 +269,8 @@ public class PmHomeExt {
         }
 
         if (StringUtils.hasText(info.des)) {
-            sb.append(" ,PRJ_SITUATION='").append(info.des).append("'");
+            String obj = info.des.replaceAll("'","");
+            sb.append(" ,PRJ_SITUATION='").append(obj).append("'");
         } else {
             sb.append(" ,PRJ_SITUATION=null");
         }
@@ -478,5 +479,4 @@ public class PmHomeExt {
         }
         return res;
     }
-
 }
