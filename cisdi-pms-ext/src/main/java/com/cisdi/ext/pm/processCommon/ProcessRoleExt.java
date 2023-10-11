@@ -859,7 +859,14 @@ public class ProcessRoleExt {
         if (!CollectionUtils.isEmpty(userList)){
             ExtJarHelper.returnValue.set(userList);
         } else {
-            throw new BaseException("该项目对应岗位没有人员，请配置该项目该岗位人员或联系管理员处理！");
+            if (!CollectionUtils.isEmpty(deptId)){
+                String deptIdStr = String.join("','",deptId);
+                List<Map<String,Object>> deptList = myJdbcTemplate.queryForList("select group_concat(name) as name from BASE_PROCESS_POST where id in ('"+deptIdStr+"')");
+                String deptName = JdbcMapUtil.getString(deptList.get(0),"name");
+                throw new BaseException("该流程["+deptName+"]岗位没有匹配到审批人员，请核查流程表单岗位信息或联系管理员处理！");
+            } else {
+                throw new BaseException("该项目/流程没有设置对应岗位及人员，请配置该项目该岗位人员或联系管理员处理！");
+            }
         }
     }
 
