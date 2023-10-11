@@ -4,6 +4,7 @@ import com.cisdi.pms.job.domain.process.PoOrderReq;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PoOrderReqMapper {
 
@@ -27,4 +28,18 @@ public interface PoOrderReqMapper {
      * @param contractCategoryId 合同类型
      */
     void updatePoOrderCustomerUnit(@Param("poOrderReqId") String poOrderReqId, @Param("customerUnitId")String customerUnitId, @Param("contractCategoryId")String contractCategoryId);
+
+    /**
+     * 查询所有合同签订数量
+     * @return 合同数量
+     */
+    int queryOrderNums();
+
+    /**
+     * 查询时间范围内新签订的合同总金额-刨除历史数据导入
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return 合同总金额
+     */
+    List<PoOrderReq> queryTimeFrameNewOrderAmt(@Param("startDate") String startDate, @Param("endDate") String endDate);
 }

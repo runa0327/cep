@@ -27,6 +27,9 @@ public class WfProcessInstance extends BaseCommon {
     // 流程id
     private String wfProcessId;
 
+    // 流程名称
+    private String processName;
+
     // 实体id
     private String adEntId;
 
@@ -75,6 +78,9 @@ public class WfProcessInstance extends BaseCommon {
     // 任务用户id
     private String adUserId;
 
+    // 任务用户名称
+    private String adUserName;
+
     // 接收时间
     private String receiveDate;
 
@@ -92,4 +98,7 @@ public class WfProcessInstance extends BaseCommon {
 
     // 是否第一个任务 1是 0否
     private Integer isFirstTask;
+
+    // 数量
+    private Integer instanceNums;
 }

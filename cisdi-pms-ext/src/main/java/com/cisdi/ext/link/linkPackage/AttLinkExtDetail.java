@@ -326,7 +326,7 @@ public class AttLinkExtDetail {
         mapAddRefValue("CUSTOMER_UNIT","customer_id","customer_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //业主单位
         mapAddRefValue("PRJ_MANAGE_MODE_ID","m_id","m_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //项目管理模式
         mapAddRefValue("BASE_LOCATION_ID","l_id","l_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //建设地点
-        mapAddRefValue("PROJECT_TYPE_ID","pt_id","pt_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //建设地点
+        mapAddRefValue("PROJECT_TYPE_ID","pt_id","pt_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //项目类型
         if (!"PM_PRJ_REQ".equals(entCode)){
             mapAddValue("PRJ_REPLY_DATE","PRJ_REPLY_DATE",row,AttDataTypeE.DATE,attLinkResult); //批复日期
         }
@@ -543,12 +543,22 @@ public class AttLinkExtDetail {
         String roadWidth = JdbcMapUtil.getString(row,"CON_SCALE_QTY2"); //宽
         String other = JdbcMapUtil.getString(row,"OTHER"); //其他
 
+        List<String> editList = AttLinkDifferentProcess.prjTypeEditLink();
         if ("PM_PRJ_ID".equals(linkType)){
-            LinkUtils.mapAddAllValue("QTY_ONE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(buildArea),buildArea,buildAreaShow,false,false,attLinkResult);
-            LinkUtils.mapAddAllValue("QTY_THREE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(seaArea),seaArea,seaAreaShow,false,false,attLinkResult);
-            LinkUtils.mapAddAllValue("CON_SCALE_QTY",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(roadLength),roadLength,roadLengthShow,false,false,attLinkResult);
-            LinkUtils.mapAddAllValue("CON_SCALE_QTY2",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(roadWidth),roadWidth,roadWidthShow,false,false,attLinkResult);
-            LinkUtils.mapAddAllValue("OTHER",AttDataTypeE.TEXT_LONG,other,other,otherShow,false,false,attLinkResult);
+            if (editList.contains(entCode)){
+                LinkUtils.mapAddAllValue("QTY_ONE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(buildArea),buildArea,buildAreaShow,false,true,attLinkResult);
+                LinkUtils.mapAddAllValue("QTY_THREE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(seaArea),seaArea,seaAreaShow,false,true,attLinkResult);
+                LinkUtils.mapAddAllValue("CON_SCALE_QTY",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(roadLength),roadLength,roadLengthShow,false,true,attLinkResult);
+                LinkUtils.mapAddAllValue("CON_SCALE_QTY2",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(roadWidth),roadWidth,roadWidthShow,false,true,attLinkResult);
+                LinkUtils.mapAddAllValue("OTHER",AttDataTypeE.TEXT_LONG,other,other,otherShow,false,true,attLinkResult);
+            } else {
+                LinkUtils.mapAddAllValue("QTY_ONE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(buildArea),buildArea,buildAreaShow,false,false,attLinkResult);
+                LinkUtils.mapAddAllValue("QTY_THREE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(seaArea),seaArea,seaAreaShow,false,false,attLinkResult);
+                LinkUtils.mapAddAllValue("CON_SCALE_QTY",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(roadLength),roadLength,roadLengthShow,false,false,attLinkResult);
+                LinkUtils.mapAddAllValue("CON_SCALE_QTY2",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(roadWidth),roadWidth,roadWidthShow,false,false,attLinkResult);
+                LinkUtils.mapAddAllValue("OTHER",AttDataTypeE.TEXT_LONG,other,other,otherShow,false,false,attLinkResult);
+            }
+
         } else {
             if (unEditList.contains(entCode)){
                 LinkUtils.mapAddAllValue("QTY_ONE",AttDataTypeE.TEXT_LONG,StringUtil.getBigDecimal(buildArea),buildArea,buildAreaShow,false,false,attLinkResult);

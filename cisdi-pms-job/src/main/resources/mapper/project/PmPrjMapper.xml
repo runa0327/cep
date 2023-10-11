@@ -160,4 +160,201 @@
         where
             id = #{projectId}
     </select>
+
+    <!--获取系统类项目-->
+    <select id="queryProject" resultMap="pmPrjResult">
+        select
+            <include refid="commonHeader" />
+        from
+            pm_prj
+        where
+            status = 'ap'
+            and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'
+        order by id asc
+    </select>
+
+    <!--查询项目结算信息-->
+    <select id="queryPrjAmtBySettle" resultMap="pmPrjResult">
+        SELECT
+            pm_prj_id AS projectId, -- 项目id
+            sum( PRJ_TOTAL_INVEST ) AS projectTotalInvest, -- 总投资
+            sum( CONSTRUCT_AMT ) AS constructPrjAmt, -- 建安工程费
+            sum( EQUIP_AMT ) AS equipBuyAmt, -- 设备采购费
+            sum( EQUIPMENT_COST ) AS equipmentCost, -- 科研设备费
+            sum( PROJECT_OTHER_AMT ) AS projectOtherAmt, -- 工程其他费
+            sum( LAND_AMT ) AS landBuyAmt, -- 土地征拆费用
+            sum( PREPARE_AMT ) AS prepareAmt -- 预备费
+        FROM
+            PM_PRJ_SETTLE_ACCOUNTS
+        WHERE
+            STATUS = 'AP'
+          AND pm_prj_id = #{projectId}
+    </select>
+
+    <!--查询预算财评信息-->
+    <select id="queryPrjAmtByInvest3" resultMap="pmPrjResult">
+        select
+            pm_prj_id AS projectId, -- 项目id
+            PRJ_TOTAL_INVEST AS projectTotalInvest, -- 总投资
+            PROJECT_AMT as projectAmt, -- 工程费用
+            CONSTRUCT_AMT AS constructPrjAmt, -- 建安工程费
+            EQUIP_AMT AS equipBuyAmt, -- 设备采购费
+            EQUIPMENT_COST AS equipmentCost, -- 科研设备费
+            PROJECT_OTHER_AMT AS projectOtherAmt, -- 工程其他费
+            LAND_AMT AS landBuyAmt, -- 土地征拆费用
+            PREPARE_AMT AS prepareAmt, -- 预备费
+            CONSTRUCT_PERIOD_INTEREST as constructPeriodInterest -- 建设期利息
+        from
+            PM_PRJ_INVEST3
+        where
+            status = 'ap'
+            and pm_prj_id = #{projectId}
+    </select>
+
+    <!--查询初设概算信息-->
+    <select id="queryPrjAmtByInvest2" resultMap="pmPrjResult">
+        select
+            pm_prj_id AS projectId, -- 项目id
+            PRJ_TOTAL_INVEST AS projectTotalInvest, -- 总投资
+            PROJECT_AMT as projectAmt, -- 工程费用
+            CONSTRUCT_AMT AS constructPrjAmt, -- 建安工程费
+            EQUIP_AMT AS equipBuyAmt, -- 设备采购费
+            EQUIPMENT_COST AS equipmentCost, -- 科研设备费
+            PROJECT_OTHER_AMT AS projectOtherAmt, -- 工程其他费
+            LAND_AMT AS landBuyAmt, -- 土地征拆费用
+            PREPARE_AMT AS prepareAmt, -- 预备费
+            CONSTRUCT_PERIOD_INTEREST as constructPeriodInterest -- 建设期利息
+        from
+            PM_PRJ_INVEST2
+        where
+            status = 'ap'
+          and pm_prj_id = #{projectId}
+    </select>
+
+    <!--查询可研估算信息-->
+    <select id="queryPrjAmtByInvest1" resultMap="pmPrjResult">
+        select
+            pm_prj_id AS projectId, -- 项目id
+            PRJ_TOTAL_INVEST AS projectTotalInvest, -- 总投资
+            PROJECT_AMT as projectAmt, -- 工程费用
+            CONSTRUCT_AMT AS constructPrjAmt, -- 建安工程费
+            EQUIP_AMT AS equipBuyAmt, -- 设备采购费
+            EQUIPMENT_COST AS equipmentCost, -- 科研设备费
+            PROJECT_OTHER_AMT AS projectOtherAmt, -- 工程其他费
+            LAND_AMT AS landBuyAmt, -- 土地征拆费用
+            PREPARE_AMT AS prepareAmt, -- 预备费
+            CONSTRUCT_PERIOD_INTEREST as constructPeriodInterest -- 建设期利息
+        from
+            PM_PRJ_INVEST1
+        where
+            status = 'ap'
+          and pm_prj_id = #{projectId}
+    </select>
+
+    <!--查询立项审批信息-->
+    <select id="queryPrjAmtByPmPrjReq" resultMap="pmPrjResult">
+        select
+            pm_prj_id AS projectId, -- 项目id
+            PRJ_TOTAL_INVEST AS projectTotalInvest, -- 总投资
+            PROJECT_AMT as projectAmt, -- 工程费用
+            CONSTRUCT_AMT AS constructPrjAmt, -- 建安工程费
+            EQUIP_AMT AS equipBuyAmt, -- 设备采购费
+            EQUIPMENT_COST AS equipmentCost, -- 科研设备费
+            PROJECT_OTHER_AMT AS projectOtherAmt, -- 工程其他费
+            LAND_AMT AS landBuyAmt, -- 土地征拆费用
+            PREPARE_AMT AS prepareAmt -- 预备费
+        from
+            PM_PRJ_REQ
+        where
+            status = 'ap'
+          and pm_prj_id = #{projectId}
+    </select>
+
+    <!--根据id动态修改数据-->
+    <update id="updateConditionById">
+        update pm_prj
+        <set>
+            <if test="projectTotalInvest != null">
+                ESTIMATED_TOTAL_INVEST = #{projectTotalInvest},
+            </if>
+            <if test="projectAmt != null">
+                PROJECT_AMT = #{projectAmt},
+            </if>
+            <if test="constructPrjAmt != null">
+                CONSTRUCT_PRJ_AMT = #{constructPrjAmt},
+            </if>
+            <if test="equipBuyAmt != null">
+                EQUIP_BUY_AMT = #{equipBuyAmt},
+            </if>
+            <if test="equipmentCost != null">
+                EQUIPMENT_COST = #{equipmentCost},
+            </if>
+            <if test="projectOtherAmt != null">
+                PROJECT_OTHER_AMT = #{projectOtherAmt},
+            </if>
+            <if test="landBuyAmt != null">
+                LAND_BUY_AMT = #{landBuyAmt},
+            </if>
+            <if test="prepareAmt != null">
+                PREPARE_AMT = #{prepareAmt},
+            </if>
+            <if test="constructPeriodInterest != null">
+                CONSTRUCT_PERIOD_INTEREST = #{constructPeriodInterest},
+            </if>
+            <if test="investPriority != null and investPriority != ''">
+                INVEST_PRIORITY = #{investPriority},
+            </if>
+            LAST_MODI_DT = now(),
+        </set>
+
+        where
+            id = #{projectId}
+    </update>
+
+    <!--获取所有系统项目-->
+    <select id="queryAllSystemProject" resultMap="pmPrjResult">
+        select
+            id as id,
+            project_phase_ID as projectPhaseTypeId,
+            ESTIMATED_TOTAL_INVEST as projectTotalInvest,
+            CONSTRUCT_PRJ_AMT as constructPrjAmt
+        from
+            pm_prj
+        where
+            status = 'AP'
+            and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'
+    </select>
+
+    <!--获取时间范围内新增的项目数-->
+    <select id="queryTimeFrameNewProjectNums" resultType="int">
+        select
+            count(*) as num
+        from
+            pm_prj
+        where
+            status = 'AP'
+            and PROJECT_SOURCE_TYPE_ID = '0099952822476441374'
+            and CRT_DT >= #{startDate}
+            <![CDATA[ and CRT_DT <= #{endDate}]]>
+    </select>
+
+    <!--获取所有立项完成数量 含历史导入数据-->
+    <select id="queryReqNums" resultType="int">
+        select count(*) as num from pm_prj_req where status = 'AP'
+    </select>
+
+    <!--获取所有可研完成数量 含历史导入数据-->
+    <select id="queryInvest1Nums" resultType="int">
+        select count(*) as num from PM_PRJ_INVEST1 where status = 'AP'
+    </select>
+
+    <!--获取所有初设概算完成数量 含历史导入数据-->
+    <select id="queryInvest2Nums" resultType="int">
+        select count(*) as num from PM_PRJ_INVEST2 where status = 'AP'
+    </select>
+
+    <!--获取所有预算财评完成数量 含历史导入数据-->
+    <select id="queryInvest3Nums" resultType="int">
+        select count(*) as num from PM_PRJ_INVEST3 where status = 'AP'
+    </select>
 </mapper>

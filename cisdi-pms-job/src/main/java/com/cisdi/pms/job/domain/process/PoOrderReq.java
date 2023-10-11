@@ -2,6 +2,7 @@ package com.cisdi.pms.job.domain.process;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -34,4 +35,7 @@ public class PoOrderReq {
 
     // 合同类型
     private String contractCategoryId;
+
+    // 合同签订总金额
+    private BigDecimal contractAmt;
 }

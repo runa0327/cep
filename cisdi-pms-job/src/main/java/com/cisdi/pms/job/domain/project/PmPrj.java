@@ -45,9 +45,6 @@ public class PmPrj extends BaseCommon {
     // 资金来源
     private String investSourceId;
 
-    // 总投资
-    private BigDecimal projectTotalInvest;
-
     // 项目类型
     private String projectTypeId;
 
@@ -125,6 +122,9 @@ public class PmPrj extends BaseCommon {
 
     // 全过程造价单位
     private String consulterUnitId;
+
+    // 总投资
+    private BigDecimal projectTotalInvest;
 
     // 工程费用
     private BigDecimal projectAmt;

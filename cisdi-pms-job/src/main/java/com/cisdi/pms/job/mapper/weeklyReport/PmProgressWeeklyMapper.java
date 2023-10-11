@@ -29,4 +29,25 @@ public interface PmProgressWeeklyMapper {
      * @return 上周id
      */
     String getLastWeekId(@Param("startDate") String startDate, @Param("endDate")String endDate, @Param("weekId")String weekId);
+
+    /**
+     * 根据周id查询周信息
+     * @param weekId 周id
+     * @return 查询结果
+     */
+    PmProgressWeekly queryDataById(String weekId);
+
+    /**
+     * 获取周期范围内应填报周报数量
+     * @param weekId 周id
+     * @return 应填写形象进度周报数量
+     */
+    int queryWeekNeedWritePrjNums(String weekId);
+
+    /**
+     * 获取周期范围内实际填报周报数量
+     * @param weekId 周期id
+     * @return 实际填写形象进度周报数量
+     */
+    int queryWeekWritePrjNums(String weekId);
 }

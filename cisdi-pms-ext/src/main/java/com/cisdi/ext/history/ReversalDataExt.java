@@ -1,10 +1,13 @@
 package com.cisdi.ext.history;
 
+import com.cisdi.ext.model.PmPrjSettleAccounts;
 import com.cisdi.ext.util.WfPmInvestUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.util.JdbcMapUtil;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,16 +61,24 @@ public class ReversalDataExt {
      */
     private void refreshInvest(String tableName) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql = "select PM_PRJ_ID,ifnull(PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST,ifnull(CONSTRUCT_AMT,0) as CONSTRUCT_AMT,ifnull(EQUIP_AMT,0) as EQUIP_AMT,ifnull(EQUIPMENT_COST,0) as EQUIPMENT_COST,ifnull(PROJECT_OTHER_AMT,0) as PROJECT_OTHER_AMT,ifnull(LAND_AMT,0) as LAND_AMT,ifnull(PREPARE_AMT,0) as PREPARE_AMT,ifnull(PROJECT_AMT,0) as PROJECT_AMT from " + tableName + " where `STATUS`='ap'";
-        if ("PM_PRJ_SETTLE_ACCOUNTS".equals(tableName)) {
-            sql = "select PM_PRJ_ID,ifnull(PRJ_TOTAL_INVEST,0) as PRJ_TOTAL_INVEST,ifnull(CONSTRUCT_AMT,0) as CONSTRUCT_AMT,ifnull(EQUIP_AMT,0) as EQUIP_AMT,ifnull(EQUIPMENT_COST,0) as EQUIPMENT_COST,ifnull(PROJECT_OTHER_AMT,0) as PROJECT_OTHER_AMT,ifnull(LAND_AMT,0) as LAND_AMT,ifnull(PREPARE_AMT,0) as PREPARE_AMT,0 as PROJECT_AMT from " + tableName + " where `STATUS`='ap'";
+        List<PmPrjSettleAccounts> list = PmPrjSettleAccounts.selectByWhere(new Where().eq(PmPrjSettleAccounts.Cols.STATUS,"AP"));
+        List<String> projectIdList = list.stream().map(PmPrjSettleAccounts::getPmPrjId).collect(Collectors.toList());
+        for (String projectId : projectIdList) {
+            String sql = "select PM_PRJ_ID,ifnull(sum(PRJ_TOTAL_INVEST),0) as PRJ_TOTAL_INVEST,ifnull(sum(CONSTRUCT_AMT),0) as CONSTRUCT_AMT,ifnull(sum(EQUIP_AMT),0) as EQUIP_AMT,ifnull(sum(EQUIPMENT_COST),0) as EQUIPMENT_COST,ifnull(sum(PROJECT_OTHER_AMT),0) as PROJECT_OTHER_AMT,ifnull(sum(LAND_AMT),0) as LAND_AMT,ifnull(sum(PREPARE_AMT),0) as PREPARE_AMT,ifnull(sum(PROJECT_AMT),0) as PROJECT_AMT from " + tableName + " where `STATUS`='ap' and pm_prj_id = ?";
+            if ("PM_PRJ_SETTLE_ACCOUNTS".equals(tableName)) {
+                sql = "select PM_PRJ_ID,ifnull(sum(PRJ_TOTAL_INVEST),0) as PRJ_TOTAL_INVEST,ifnull(sum(CONSTRUCT_AMT),0) as CONSTRUCT_AMT,ifnull(sum(EQUIP_AMT),0) as EQUIP_AMT,ifnull(sum(EQUIPMENT_COST),0) as EQUIPMENT_COST,ifnull(sum(PROJECT_OTHER_AMT),0) as PROJECT_OTHER_AMT,ifnull(sum(LAND_AMT),0) as LAND_AMT,ifnull(sum(PREPARE_AMT),0) as PREPARE_AMT,0 as PROJECT_AMT from " + tableName + " where `STATUS`='ap' and pm_prj_id = ?";
+            }
+            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql,projectId);
+            if (!CollectionUtils.isEmpty(list1)){
+                String typeId = Obj.get(tableName);
+                insertInvestData(typeId, list1.get(0), projectId);
+            }
         }
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
-        list.forEach(item -> {
-            String projectId = JdbcMapUtil.getString(item, "PM_PRJ_ID");
-            String typeId = Obj.get(tableName);
-            insertInvestData(typeId, item, projectId);
-        });
+//        list.forEach(item -> {
+//            String projectId = JdbcMapUtil.getString(item, "PM_PRJ_ID");
+//            String typeId = Obj.get(tableName);
+//            insertInvestData(typeId, item, projectId);
+//        });
     }
 
     /**

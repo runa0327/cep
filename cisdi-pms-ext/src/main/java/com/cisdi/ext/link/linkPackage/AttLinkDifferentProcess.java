@@ -127,13 +127,23 @@ public class AttLinkDifferentProcess {
     }
 
     /**
-     * 项目属性联动-不进行项目类型联动
+     * 项目属性联动-项目类型联动
      */
     public static List<String> noPrjTypeLink(){
         List<String> list = new ArrayList<>();
         list.add("PM_PRJ_INVEST1"); //可研报告
         list.add("PM_PRJ_INVEST2"); //初设概算
         list.add("PM_PRJ_INVEST3"); //预算财评
+        list.add("PM_CONSTRUCT_PERMIT_REQ"); //施工许可
+        return list;
+    }
+
+    /**
+     * 项目属性联动-项目类型联动-可改
+     */
+    public static List<String> prjTypeEditLink(){
+        List<String> list = new ArrayList<>();
+        list.add("PM_CONSTRUCT_PERMIT_REQ"); //施工许可
         return list;
     }
 
