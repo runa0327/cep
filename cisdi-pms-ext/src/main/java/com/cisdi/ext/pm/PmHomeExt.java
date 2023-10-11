@@ -236,7 +236,8 @@ public class PmHomeExt {
             sb.append(" ,BASE_LOCATION_ID='").append(info.location).append("'");
         }
         if (StringUtils.hasText(info.des)) {
-            sb.append(" ,PRJ_SITUATION='").append(info.des).append("'");
+            String obj = info.des.replaceAll("'","");
+            sb.append(" ,PRJ_SITUATION='").append(obj).append("'");
         }
         if (StringUtils.hasText(info.planBeginTime)) {
             sb.append(" ,PLAN_START_TIME='").append(info.planBeginTime).append("'");
