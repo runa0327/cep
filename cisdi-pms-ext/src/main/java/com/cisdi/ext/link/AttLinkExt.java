@@ -14,6 +14,7 @@ import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -494,6 +495,9 @@ public class AttLinkExt {
             String value = "";
             String text = "";
             String projectId = JdbcMapUtil.getString(param.valueMap, "PM_PRJ_IDS");
+            if (!StringUtils.hasText(projectId)){
+                throw new BaseException("项目信息不能为空，请先选择项目名称！");
+            }
             if (projectId.contains(",")){
                 return attLinkResult;
             }
@@ -544,15 +548,7 @@ public class AttLinkExt {
                 }
             }
             //启动依据文号
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                linkedAtt.value = value;
-                linkedAtt.text = text;
-                linkedAtt.changeToMandatory = changeToMandatory;
-                linkedAtt.changeToEditable = changeToEditable;
-                attLinkResult.attMap.put("REPLY_NO_WR", linkedAtt);
-            }
+            LinkUtils.mapAddAllValue("REPLY_NO_WR",AttDataTypeE.TEXT_LONG,value,text,true,changeToMandatory,changeToEditable,attLinkResult);
         }
         return attLinkResult;
     }
