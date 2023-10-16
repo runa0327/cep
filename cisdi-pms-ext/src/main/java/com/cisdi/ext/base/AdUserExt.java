@@ -47,4 +47,28 @@ public class AdUserExt {
         result.put("userList",list);
         ExtJarHelper.returnValue.set(result);
     }
+
+    /**
+     * 流程监控-启动用户-下拉列表
+     */
+    public void getWfProcessStartUserList(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql = "select a.START_USER_ID as id,any_value(b.name) as name from wf_process_instance a left join ad_user b on a.START_USER_ID = b.id where a.status = 'AP' and a.START_USER_ID is not null group by a.START_USER_ID ORDER BY a.START_USER_ID desc";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("userList",list);
+        ExtJarHelper.returnValue.set(result);
+    }
+
+    /**
+     * 流程监控-审批用户-下拉列表
+     */
+    public void getWfProcessCheckUserList(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql = "select a.AD_USER_ID as id,any_value(b.name) as name from wf_task a left join ad_user b on a.AD_USER_ID = b.id where a.status = 'AP' and a.WF_TASK_TYPE_ID = 'TODO' and a.AD_USER_ID is not null group by a.AD_USER_ID ORDER BY a.AD_USER_ID desc";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("userList",list);
+        ExtJarHelper.returnValue.set(result);
+    }
 }
