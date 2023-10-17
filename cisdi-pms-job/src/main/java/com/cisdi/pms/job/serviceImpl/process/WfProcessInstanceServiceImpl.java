@@ -3,6 +3,7 @@ package com.cisdi.pms.job.serviceImpl.process;
 import cn.hutool.core.util.IdUtil;
 import com.cisdi.pms.job.commons.ProcessCommons;
 import com.cisdi.pms.job.domain.base.AdUser;
+import com.cisdi.pms.job.domain.base.HrDept;
 import com.cisdi.pms.job.domain.process.WfNode;
 import com.cisdi.pms.job.domain.process.WfProcess;
 import com.cisdi.pms.job.domain.project.PmPrj;
@@ -11,15 +12,25 @@ import com.cisdi.pms.job.domain.process.WfProcessInstance;
 import com.cisdi.pms.job.mapper.process.WfNodeMapper;
 import com.cisdi.pms.job.mapper.process.WfProcessInstanceMapper;
 import com.cisdi.pms.job.service.base.AdRoleService;
+import com.cisdi.pms.job.service.base.HrDeptService;
 import com.cisdi.pms.job.service.process.WfProcessInstanceService;
+import com.cisdi.pms.job.serviceImpl.base.HrDeptServiceImpl;
+import com.cisdi.pms.job.utils.CisdiUtils;
+import com.cisdi.pms.job.utils.FileUtils;
+import com.cisdi.pms.job.utils.PoiExcelUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class WfProcessInstanceServiceImpl implements WfProcessInstanceService {
@@ -35,6 +46,12 @@ public class WfProcessInstanceServiceImpl implements WfProcessInstanceService {
 
     @Resource
     private AdRoleService adRoleService;
+
+    @Resource
+    private HrDeptService hrDeptService;
+
+    @Resource
+    private CisdiUtils cisdiUtils;
 
     /**
      * 创建流程实例，发起流程至下一步
@@ -194,5 +211,168 @@ public class WfProcessInstanceServiceImpl implements WfProcessInstanceService {
         wfProcessInstance.setTs(now);
         wfProcessInstance.setVer("1");
         wfProcessInstance.setWfProcessId(wfProcessId);
+    }
+
+    /**
+     * 查询所有符合条件数据
+     * @param wfProcessInstance 流程监控实体信息
+     * @return 查询结果
+     */
+    @Override
+    public List<WfProcessInstance> queryAllList(WfProcessInstance wfProcessInstance) {
+        String currentToDoUserNames = wfProcessInstance.getCurrentToDoUserNames(); // 待办用户
+        if (StringUtils.hasText(currentToDoUserNames)){
+            String userId = adUserMapper.queryUserIdByName(currentToDoUserNames);
+            if (!StringUtils.hasText(userId)){
+                wfProcessInstance.setCurrentTodoUserIds(currentToDoUserNames); // 未匹配到人，不能查出数据，此条件默认一直查不出数据
+            } else {
+                wfProcessInstance.setCurrentTodoUserIds(userId);
+            }
+        }
+        String deptId = wfProcessInstance.getDeptId(); // 审批部门
+        if (StringUtils.hasText(deptId)){
+            List<HrDept> deptList = hrDeptService.getDeptByParentId(deptId);
+            if (!CollectionUtils.isEmpty(deptList)){
+                List<String> nameList = deptList.stream().map(HrDept::getDeptName).collect(Collectors.toList());
+                List<String> userId = hrDeptService.getDeptUserByDeptName(nameList);
+                wfProcessInstance.setCheckUserIdList(userId);
+            }
+        }
+        String checkUserId = wfProcessInstance.getCheckUserId(); // 审批用户
+        if (StringUtils.hasText(checkUserId)){
+            List<String> userId = new ArrayList<>();
+            userId.add(checkUserId);
+            wfProcessInstance.setCheckUserIdList(userId);
+        }
+        List<WfProcessInstance> list = wfProcessInstanceMapper.queryAllList(wfProcessInstance);
+        return list;
+    }
+
+    /**
+     * 流程监控导出
+     *
+     * @param list     数据详情
+     * @param response 响应信息
+     * @param title    标题
+     */
+    @Override
+    public void download(List<WfProcessInstance> list, HttpServletResponse response, String title) {
+        String filePath = cisdiUtils.getDownLoadPath();
+        List<String> header = getListHeader();
+        OutputStream outputStream = null;
+        Workbook workbook = new XSSFWorkbook();
+        try {
+            Sheet sheet = workbook.createSheet(title);
+            sheet.setDefaultColumnWidth(20);
+            sheet.setColumnWidth(1,60*256);
+            Row row = sheet.createRow(0);
+            CellStyle cs = PoiExcelUtils.getTableHeaderStyle(workbook);
+
+            for (int i = 0; i < header.size(); i++) {
+                Cell cell = row.createCell(i);
+                cell.setCellValue(header.get(i));
+                cell.setCellStyle(cs);
+            }
+            if (!CollectionUtils.isEmpty(list)){
+                CellStyle cellStyle = PoiExcelUtils.getTableCellStyle(workbook);
+                listCellValue(sheet,list,cellStyle);
+            }
+
+            FileUtils.downLoadFile(filePath,title,workbook,outputStream,response);
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 流程监控-导出详情每行赋值
+     * @param sheet 页码
+     * @param list 数据详情
+     * @param style 样式
+     */
+    private void listCellValue(Sheet sheet, List<WfProcessInstance> list, CellStyle style) {
+        for (int i = 0; i < list.size(); i++) {
+            Row row = sheet.createRow(i+1);
+
+            // 序号
+            Cell cell1 = row.createCell(0);
+            cell1.setCellValue(i+1);
+            cell1.setCellStyle(style);
+
+            // 名称
+            Cell cell2 = row.createCell(1);
+            cell2.setCellValue(list.get(i).getWfProcessInstanceName());
+            cell2.setCellStyle(style);
+
+            // 流程
+            Cell cell3 = row.createCell(2);
+            cell3.setCellValue(list.get(i).getProcessName());
+            cell3.setCellStyle(style);
+
+            // 启动用户
+            Cell cell4 = row.createCell(3);
+            cell4.setCellValue(list.get(i).getStartUserName());
+            cell4.setCellStyle(style);
+
+            // 开始日期时间
+            Cell cell5 = row.createCell(4);
+            cell5.setCellValue(list.get(i).getStartDate());
+            cell5.setCellStyle(style);
+
+            // 结束日期时间
+            Cell cell6 = row.createCell(5);
+            cell6.setCellValue(list.get(i).getEndDate());
+            cell6.setCellStyle(style);
+
+            // 是否紧急
+            Cell cell7 = row.createCell(6);
+            Integer urgent = list.get(i).getUrgent();
+            if (urgent == 0){
+                cell7.setCellValue("否");
+            } else {
+                cell7.setCellValue("是");
+            }
+            cell7.setCellStyle(style);
+
+            // 当前节点
+            Cell cell8 = row.createCell(7);
+            cell8.setCellValue(list.get(i).getWfNodeName());
+            cell8.setCellStyle(style);
+
+            // 当前节点实例
+            Cell cell9 = row.createCell(8);
+            cell9.setCellValue(list.get(i).getWfNodeInstanceName());
+            cell9.setCellStyle(style);
+
+            // 当前节点实例
+            Cell cell10 = row.createCell(9);
+            String userIds = list.get(i).getCurrentTodoUserIds();
+            if (StringUtils.hasText(userIds)){
+                userIds = userIds.replace(",","','");
+                String userName = adUserMapper.queryNameByIds(userIds);
+                cell10.setCellValue(userName);
+            }
+            cell10.setCellStyle(style);
+        }
+    }
+
+    /**
+     * 流程监控-导出表头信息
+     * @return 表头信息
+     */
+    public List<String> getListHeader() {
+        List<String> list = new ArrayList<>();
+        list.add("序号");
+        list.add("名称");
+        list.add("流程");
+        list.add("启动用户");
+        list.add("开始日期时间");
+        list.add("结束日期时间");
+        list.add("是否紧急");
+        list.add("当前节点");
+        list.add("当前节点实例");
+        list.add("当前待办用户");
+        return list;
     }
 }

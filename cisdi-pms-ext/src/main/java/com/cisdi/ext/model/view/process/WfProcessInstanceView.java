@@ -29,6 +29,9 @@ public class WfProcessInstanceView extends BasePageEntity {
     // 流程名称
     private String processName;
 
+    // 流程图标
+    private String icon;
+
     // 结束时间
     private String endDate;
     private String endDateMin;
@@ -72,6 +75,11 @@ public class WfProcessInstanceView extends BasePageEntity {
     // 审批人
     private String checkUserId;
     private String checkUserName;
+
+    // 审批时间
+    private String checkDate;
+    private String checkDateMin;
+    private String checkDateMax;
 
     public String getId() {
         return id;
@@ -295,5 +303,37 @@ public class WfProcessInstanceView extends BasePageEntity {
 
     public void setCheckUserName(String checkUserName) {
         this.checkUserName = checkUserName;
+    }
+
+    public String getCheckDate() {
+        return checkDate;
+    }
+
+    public void setCheckDate(String checkDate) {
+        this.checkDate = checkDate;
+    }
+
+    public String getCheckDateMin() {
+        return checkDateMin;
+    }
+
+    public void setCheckDateMin(String checkDateMin) {
+        this.checkDateMin = checkDateMin;
+    }
+
+    public String getCheckDateMax() {
+        return checkDateMax;
+    }
+
+    public void setCheckDateMax(String checkDateMax) {
+        this.checkDateMax = checkDateMax;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }

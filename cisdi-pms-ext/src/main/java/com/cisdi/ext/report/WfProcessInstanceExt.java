@@ -121,10 +121,12 @@ public class WfProcessInstanceExt {
         }
         String currentUser = param.getCurrentToDoUserNames(); // 当前代办用户
         if (StringUtils.hasText(currentUser)){
-            List<AdUser> userList = AdUser.selectByWhere(new Where().eq(AdUser.Cols.NAME,currentUser).eq(AdUser.Cols.STATUS,"AP"));
+            List<Map<String,Object>> userList = myJdbcTemplate.queryForList("select id from ad_user where status = 'ap' and name like ('%"+currentUser+"%')");
             if (!CollectionUtils.isEmpty(userList)){
-                String currentUserId = userList.get(0).getId();
+                String currentUserId = JdbcMapUtil.getString(userList.get(0),"id");
                 sb.append(" and find_in_set('").append(currentUserId).append("',a.CURRENT_TODO_USER_IDS ");
+            } else {
+                sb.append(" and find_in_set('").append(currentUser).append("',a.CURRENT_TODO_USER_IDS ");
             }
         }
         String deptId = param.getDeptId(); // 部门
@@ -134,6 +136,7 @@ public class WfProcessInstanceExt {
                 List<HrDeptView> deptList = HrDeptExt.getDeptListById(deptId,myJdbcTemplate);
                 if (!CollectionUtils.isEmpty(deptList)){
                     List<String> nameList = deptList.stream().map(HrDeptView::getName).collect(Collectors.toList());
+                    nameList.add(hrDept.getName());
                     List<String> userList = HrDeptExt.getUserByNameLike(nameList,myJdbcTemplate);
                     if (!CollectionUtils.isEmpty(userList)){
                         if (userList.size() <= 150){

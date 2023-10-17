@@ -1,6 +1,9 @@
 package com.cisdi.pms.job.mapper.base;
 
 import com.cisdi.pms.job.domain.base.HrDept;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface HrDeptMapper {
 
@@ -24,4 +27,25 @@ public interface HrDeptMapper {
      * @return 查询结果
      */
     HrDept selectBySql(String sql);
+
+    /**
+     * 根据父级id查询直接子级id
+     * @param parentId 父级id
+     * @return 查询结果
+     */
+    List<HrDept> getDeptIdByParentId(@Param("parentId") String parentId);
+
+    /**
+     * 通过id查询部门信息
+     * @param deptId 部门id
+     * @return 部门信息
+     */
+    HrDept getHrDeptById(@Param("deptId") String deptId);
+
+    /**
+     * 通过部门名称查询部门用户信息
+     * @param nameList 部门名称信息
+     * @return 部门人员信息
+     */
+    List<String> getDeptUserByDeptNameList(@Param("list") List<String> nameList);
 }

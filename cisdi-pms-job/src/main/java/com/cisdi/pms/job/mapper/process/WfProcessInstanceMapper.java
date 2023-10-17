@@ -60,4 +60,10 @@ public interface WfProcessInstanceMapper {
      */
     List<WfProcessInstance> queryChargeUserCheckNums(@Param("list") List<String> chargeUser, @Param("startDate") String startDate, @Param("endDate") String endDate);
 
+    /**
+     * 查询所有符合条件数据
+     * @param wfProcessInstance 实体信息
+     * @return 查询结果
+     */
+    List<WfProcessInstance> queryAllList(WfProcessInstance wfProcessInstance);
 }
