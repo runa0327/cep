@@ -8,8 +8,13 @@
         <result property="wfProcessInstanceId" column="wfProcessInstanceId" />
         <result property="wfProcessInstanceName" column="wfProcessInstanceName" />
         <result property="startUserId" column="startUserId" />
+        <result property="startUserName" column="startUserName" />
         <result property="startDate" column="startDate" />
+        <result property="startDateMin" column="startDateMin" />
+        <result property="startDateMax" column="startDateMax" />
         <result property="endDate" column="endDate" />
+        <result property="endDateMin" column="endDateMin" />
+        <result property="endDateMax" column="endDateMax" />
         <result property="wfProcessId" column="wfProcessId" />
         <result property="processName" column="processName" />
         <result property="adEntId" column="adEntId" />
@@ -19,7 +24,9 @@
         <result property="wfNodeInstanceId" column="wfNodeInstanceId" />
         <result property="wfNodeInstanceName" column="wfNodeInstanceName" />
         <result property="wfNodeId" column="wfNodeId" />
+        <result property="wfNodeName" column="wfNodeName" />
         <result property="currentTodoUserIds" column="currentTodoUserIds" />
+        <result property="currentToDoUserNames" column="currentToDoUserNames" />
         <result property="currentViewId" column="currentViewId" />
         <result property="actId" column="actId" />
         <result property="wfFlowId" column="wfFlowId" />
@@ -44,6 +51,10 @@
         <result property="status" column="status" />
         <result property="code" column="code" />
         <result property="instanceNums" column="instanceNums" />
+        <result property="deptId" column="deptId" />
+        <result property="deptName" column="deptName" />
+        <result property="checkUserId" column="checkUserId" />
+        <result property="checkUserName" column="checkUserName" />
     </resultMap>
 
     <!--查询上线以来所有发起的流程数量-->

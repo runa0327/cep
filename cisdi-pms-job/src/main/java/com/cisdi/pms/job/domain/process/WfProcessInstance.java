@@ -17,12 +17,17 @@ public class WfProcessInstance extends BaseCommon {
 
     // 发起人
     private String startUserId;
+    private String startUserName;
 
     // 发起时间
     private String startDate;
+    private String startDateMin;
+    private String startDateMax;
 
     // 结束时间
     private String endDate;
+    private String endDateMin;
+    private String endDateMax;
 
     // 流程id
     private String wfProcessId;
@@ -51,8 +56,12 @@ public class WfProcessInstance extends BaseCommon {
     // 节点id/当前节点id
     private String wfNodeId;
 
+    // 节点名称/当前节点名称
+    private String wfNodeName;
+
     // 当前代办用户
     private String currentTodoUserIds;
+    private String currentToDoUserNames;
 
     // 当前代办视图
     private String currentViewId;
@@ -101,4 +110,12 @@ public class WfProcessInstance extends BaseCommon {
 
     // 数量
     private Integer instanceNums;
+
+    // 部门
+    private String deptId;
+    private String deptName;
+
+    // 审批人
+    private String checkUserId;
+    private String checkUserName;
 }
