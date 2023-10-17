@@ -2,14 +2,12 @@ package com.cisdi.ext.report;
 
 import com.cisdi.ext.api.HrDeptExt;
 import com.cisdi.ext.base.AdUserExt;
-import com.cisdi.ext.model.AdUser;
 import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.view.base.HrDeptView;
 import com.cisdi.ext.model.view.process.WfProcessInstanceView;
 import com.cisdi.ext.util.JsonUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
-import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
@@ -156,10 +154,10 @@ public class WfProcessInstanceExt {
         String checkDateMin = param.getCheckDateMin(); // 最小审批时间
         String checkDateMax = param.getCheckDateMax(); // 最大审批时间
         if (StringUtils.hasText(checkDateMin)){
-            sb.append(" and a.id in (select distinct wf_process_instance_id from wf_task where status = 'ap' and wf_task_type_id = 'TODO' and ACT_DATETIME >= '").append(checkDateMin).append("' ");
+            sb.append(" and a.id in (select distinct wf_process_instance_id from wf_task where status = 'ap' and wf_task_type_id = 'TODO' and ACT_DATETIME >= '").append(checkDateMin).append("') ");
         }
         if (StringUtils.hasText(checkDateMax)){
-            sb.append(" and a.id in (select distinct wf_process_instance_id from wf_task where status = 'ap' and wf_task_type_id = 'TODO' and ACT_DATETIME <= '").append(checkDateMax).append("' ");
+            sb.append(" and a.id in (select distinct wf_process_instance_id from wf_task where status = 'ap' and wf_task_type_id = 'TODO' and ACT_DATETIME <= '").append(checkDateMax).append("') ");
         }
     }
 }

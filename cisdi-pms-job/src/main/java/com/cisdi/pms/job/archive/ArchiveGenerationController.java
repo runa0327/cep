@@ -35,4 +35,12 @@ public class ArchiveGenerationController {
     public void createNodeInstListForImportedData() {
         archiveGenerationService.createNodeInstListForImportedData();
     }
+
+    /**
+     * 历史导入数据未生成标题的处理
+     */
+    @GetMapping("createProcInstForImportedDataHistory")
+    public void createProcInstForImportedDataHistory() {
+        archiveGenerationService.createProcInstForImportedDataHistory();
+    }
 }
