@@ -270,7 +270,7 @@ public class PmExt {
 //        String userId = ExtJarHelper.loginInfo.get().userId;
 //        sb.append(" and IF('").append(userId).append("' in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1, ");
 //        sb.append(" pm.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(userId).append("', USER_IDS )))");
-
+        sb.append(" and PROJECT_CLASSIFICATION_ID ='").append(param.category).append("'");
         sb.append(" order by pm.PM_SEQ desc");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
@@ -342,7 +342,7 @@ public class PmExt {
         sb.append(" and pm.id in (select PM_PRJ_ID from pm_roster where AD_USER_ID='").append(userId).append("' ) ");
 //        sb.append(" and IF('").append(userId).append("' in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1, ");
 //        sb.append(" pm.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(userId).append("', USER_IDS )))");
-
+        sb.append(" and PROJECT_CLASSIFICATION_ID ='").append(param.category).append("'");
         sb.append(" order by pm.PM_SEQ desc");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
@@ -469,6 +469,7 @@ public class PmExt {
         public String startTime;
         public Integer pageSize;
         public Integer pageIndex;
+        public String category;//项目类别
     }
 
     public static class ProjectInfo {
