@@ -59,7 +59,7 @@ public class HrDeptExt {
     public static List<String> getUserByNameLike(List<String> nameList, MyJdbcTemplate myJdbcTemplate) {
         List<String> userList = new ArrayList<>();
         String nameStr = String.join("','",nameList);
-        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select distinct a.ad_user_id from hr_dept_user a left join ad_user b on a.status = 'ap' and b.status = 'ap' and a.hr_dept_id in ('"+nameStr+"')");
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select distinct a.ad_user_id from hr_dept_user a left join ad_user b on a.ad_user_id = b.id where a.status = 'ap' and b.status = 'ap' and a.hr_dept_id in (select id from hr_dept where name in ('"+nameStr+"'))");
         if (!CollectionUtils.isEmpty(list)){
             userList = list.stream().map(p->JdbcMapUtil.getString(p,"ad_user_id")).collect(Collectors.toList());
         }

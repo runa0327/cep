@@ -232,9 +232,13 @@ public class WfProcessInstanceServiceImpl implements WfProcessInstanceService {
         String deptId = wfProcessInstance.getDeptId(); // 审批部门
         if (StringUtils.hasText(deptId)){
             List<HrDept> deptList = hrDeptService.getDeptByParentId(deptId);
+            List<String> userId = new ArrayList<>();
             if (!CollectionUtils.isEmpty(deptList)){
                 List<String> nameList = deptList.stream().map(HrDept::getDeptName).collect(Collectors.toList());
-                List<String> userId = hrDeptService.getDeptUserByDeptName(nameList);
+                userId = hrDeptService.getDeptUserByDeptName(nameList);
+                wfProcessInstance.setCheckUserIdList(userId);
+            } else {
+                userId.add("条件查不出数据，需要查不出数据！");
                 wfProcessInstance.setCheckUserIdList(userId);
             }
         }

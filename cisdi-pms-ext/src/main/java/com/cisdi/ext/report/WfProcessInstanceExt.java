@@ -122,9 +122,9 @@ public class WfProcessInstanceExt {
             List<Map<String,Object>> userList = myJdbcTemplate.queryForList("select id from ad_user where status = 'ap' and name like ('%"+currentUser+"%')");
             if (!CollectionUtils.isEmpty(userList)){
                 String currentUserId = JdbcMapUtil.getString(userList.get(0),"id");
-                sb.append(" and find_in_set('").append(currentUserId).append("',a.CURRENT_TODO_USER_IDS ");
+                sb.append(" and find_in_set('").append(currentUserId).append("',a.CURRENT_TODO_USER_IDS) ");
             } else {
-                sb.append(" and find_in_set('").append(currentUser).append("',a.CURRENT_TODO_USER_IDS ");
+                sb.append(" and find_in_set('").append(currentUser).append("',a.CURRENT_TODO_USER_IDS) ");
             }
         }
         String deptId = param.getDeptId(); // 部门
@@ -132,15 +132,20 @@ public class WfProcessInstanceExt {
             HrDept hrDept = HrDept.selectById(deptId);
             if (hrDept != null){
                 List<HrDeptView> deptList = HrDeptExt.getDeptListById(deptId,myJdbcTemplate);
+                HrDeptView hrDeptView = new HrDeptView();
+                hrDeptView.setId(deptId);
+                hrDeptView.setName(hrDept.getName());
+                deptList.add(hrDeptView);
                 if (!CollectionUtils.isEmpty(deptList)){
                     List<String> nameList = deptList.stream().map(HrDeptView::getName).collect(Collectors.toList());
-                    nameList.add(hrDept.getName());
                     List<String> userList = HrDeptExt.getUserByNameLike(nameList,myJdbcTemplate);
                     if (!CollectionUtils.isEmpty(userList)){
                         if (userList.size() <= 150){
                             String userIds = String.join("','",userList);
                             sb.append(" and a.id in (select distinct wf_process_instance_id from wf_task where status = 'ap' and wf_task_type_id = 'TODO' AND ACT_DATETIME is not null and ad_user_id in ('").append(userIds).append("')) ");
                         }
+                    } else {
+                        sb.append(" and a.name = '条件查不出数据，需要查不出数据！' ");
                     }
                 }
             } else {
