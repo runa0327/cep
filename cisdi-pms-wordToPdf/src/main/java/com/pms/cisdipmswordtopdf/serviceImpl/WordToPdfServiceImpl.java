@@ -157,6 +157,8 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         if ("windows".equals(systemType)){
             if (filePath.contains("file2")){
                 filePath = filePath.replace("/data/qygly/file2/","\\\\10.130.19.197\\filedisk2\\").replace("/","\\");
+            } else if (filePath.contains("file3")){
+                filePath = filePath.replace("/data/qygly/file3/","\\\\10.130.19.197\\filedisk3\\").replace("/","\\");
             } else {
                 filePath = filePath.replace("/data/qygly/file/","\\\\10.130.19.197\\filedisk\\").replace("/","\\");
             }
@@ -363,6 +365,8 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         if ("windows".equals(systemType)){
             if (fileIdPath.contains("filedisk2")){
                 fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk2\\","/data/qygly/file2/").replace("\\","/");
+            } else if (fileIdPath.contains("filedisk3")){
+                fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk3\\","/data/qygly/file3/").replace("\\","/");
             } else {
                 fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk\\","/data/qygly/file/").replace("\\","/");
             }
