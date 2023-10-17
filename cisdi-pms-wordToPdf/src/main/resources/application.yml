@@ -19,22 +19,6 @@ spring:
     #    type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-# openOffice配置
-jodconverter:
-  local:
-    enabled: true
-    #openOffice:安装地址
-    #windows配置
-#    office-home: C:\Program Files (x86)\OpenOffice 4
-    # linux配置
-#    office-home: /opt/openoffice4/program
-#    office-home: /opt/openoffice4
-    office-home: /opt/libreoffice7.5
-    #    office-home: opt/openoffice4
-    #每个进程可以处理的最大任务数
-    max-tasks-per-process: 10
-    #每个 JODConverter 处理线程使用的端口列表，以逗号分隔。 office实例数等于端口数，因为每个端口号将启动 1个 office 进程。
-    port-numbers: 8200
 
 mybatis:
   # 搜索指定包别名
@@ -42,19 +26,3 @@ mybatis:
   # 配置mapper的扫描，找到所有的mapper.xml映射文件
   mapperLocations: classpath*:mapper/**/*Mapper.xml
 
-  #Prometheus springboot监控配置
-  #  management.endpoints.web.exposure.include = *
-  #  management.metrics.export.prometheus.enabled = true
-  # 暴露的数据中添加application label
-#  management.metrics.tags.application = springbootprometheus
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-  metrics:
-    export:
-      prometheus:
-        enabled: true
-    tags:
-      application: 'springbootprometheus'
