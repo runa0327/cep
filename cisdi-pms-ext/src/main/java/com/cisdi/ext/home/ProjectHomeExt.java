@@ -34,7 +34,7 @@ public class ProjectHomeExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pm.name as `NAME`,g1.name as mode,pm.PRJ_SITUATION as des,g2.name as location ,g3.`NAME` as source,g4.`NAME` as type,\n" +
                 "DATE_FORMAT(PLAN_START_TIME, '%Y-%m-%d') as PLAN_START_TIME,DATE_FORMAT(PLAN_END_TIME, '%Y-%m-%d') as PLAN_END_TIME,g5.`NAME` as tender,DATE_FORMAT(ACTUAL_START_TIME, '%Y-%m-%d') as ACTUAL_START_TIME,DATE_FORMAT(ACTUAL_END_TIME, '%Y-%m-%d') as ACTUAL_END_TIME,g6.`NAME` as status, \n" +
-                "p1.`NAME` as js, p2.`NAME` as kc, p3.`NAME` as sj, p4.`NAME` as sg, p5.`NAME` as jl from pm_prj pm \n" +
+                "p1.`NAME` as js, p2.`NAME` as kc, p3.`NAME` as sj, p4.`NAME` as sg, p5.`NAME` as jl,g7.`NAME` as category from pm_prj pm \n" +
                 "left join gr_set_value g1 on g1.id = pm.PRJ_MANAGE_MODE_ID\n" +
                 "left join gr_set_value g2 on g2.id = pm.BASE_LOCATION_ID\n" +
                 "left join gr_set_value g3 on g3.id = pm.INVESTMENT_SOURCE_ID\n" +
@@ -46,6 +46,7 @@ public class ProjectHomeExt {
                 "left join pm_party p4 on p4.id = pm.CONSTRUCTOR_UNIT\n" +
                 "left join pm_party p5 on p5.id = pm.SUPERVISOR_UNIT\n" +
                 "left join gr_set_value g6 on g6.id = PROJECT_PHASE_ID " +
+                "left join gr_set_value g7 on g7.id = PROJECT_CLASSIFICATION_ID " +
                 "where pm.id=?", map.get("projectId"));
         if (!CollectionUtils.isEmpty(list)) {
             Map<String, Object> mapDate = list.get(0);
@@ -67,6 +68,7 @@ public class ProjectHomeExt {
             info.sgUnit = JdbcMapUtil.getString(mapDate, "sg");
             info.jlUnit = JdbcMapUtil.getString(mapDate, "jl");
             info.status = JdbcMapUtil.getString(mapDate, "status");
+            info.category = JdbcMapUtil.getString(mapDate, "category");
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(info), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
         } else {
@@ -376,6 +378,7 @@ public class ProjectHomeExt {
         public String sgUnit;
         public String jlUnit;
         public String status;
+        public String category;
     }
 
     /**
