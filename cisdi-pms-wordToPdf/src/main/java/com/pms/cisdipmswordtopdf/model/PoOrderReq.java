@@ -30,6 +30,10 @@ public class PoOrderReq {
     private List<Map<String,String>> colMap;
     // 流程id
     private String processId;
+    // 合同文本
+    private String contractTxt;
+    // 合同修编稿
+    private String contractRevise;
 
     public String getId() {
         return id;
@@ -133,5 +137,21 @@ public class PoOrderReq {
 
     public void setProcessId(String processId) {
         this.processId = processId;
+    }
+
+    public String getContractTxt() {
+        return contractTxt;
+    }
+
+    public void setContractTxt(String contractTxt) {
+        this.contractTxt = contractTxt;
+    }
+
+    public String getContractRevise() {
+        return contractRevise;
+    }
+
+    public void setContractRevise(String contractRevise) {
+        this.contractRevise = contractRevise;
     }
 }

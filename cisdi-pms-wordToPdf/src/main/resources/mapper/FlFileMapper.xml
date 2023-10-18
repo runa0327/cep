@@ -63,6 +63,11 @@
             and id in ('${fileId}')
     </select>
 
+    <!--根据id判断是否包含pdf文件-->
+    <select id="queryCheckPdfById" resultType="String">
+        select id from fl_file where id in ('${fileId}') and ext = 'pdf' limit 1
+    </select>
+
     <!--新增-->
     <insert id="insert">
         insert into FL_FILE (

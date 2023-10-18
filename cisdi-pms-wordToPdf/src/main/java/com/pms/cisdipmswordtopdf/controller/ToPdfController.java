@@ -32,14 +32,9 @@ public class ToPdfController {
 
     @GetMapping("/start")
     public void startPdf(){
-//        String old = "C:\\Users\\EDY\\Desktop\\kkfileview\\demo.pptx";
-//        String old = "C:\\Users\\EDY\\Desktop\\kkfileview\\demo.xlsx";
-//        String old = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）.doc";
-        String old = "C:\\Users\\Administrator\\Desktop\\copyFile\\1676762928616783872.docx";
-//        String newPdf = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）copy.pdf";
-        String newPdf = "C:\\Users\\Administrator\\Desktop\\copyFile\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）copy.pdf";
-        String pdfPath = "C:\\Users\\Administrator\\Desktop\\copyFile\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）.pdf";
-//        String pdfPath = "C:\\Users\\EDY\\Desktop\\kkfileview\\崖州湾科技城种业专业研发外包服务公共平台增采科研配套设备采购合同-2023.6.1（最终修订版）.pdf";
+        String old = "C:\\Users\\EDY\\Desktop\\copyFile\\三亚崖州湾科教城安置区（二期）项目门窗、节能及室内环境检测服务合同-终稿.docx";
+        String newPdf = "C:\\Users\\EDY\\Desktop\\copyFile\\三亚崖州湾科教城安置区（二期）项目门窗、节能及室内环境检测服务合同-终稿copy.pdf";
+        String pdfPath = "C:\\Users\\EDY\\Desktop\\copyFile\\三亚崖州湾科教城安置区（二期）项目门窗、节能及室内环境检测服务合同-终稿.pdf";
         FileUtil.fileExistCheck(old,"C:\\copyFile\\2.doc");
         word2PDF(old,newPdf);
         //pdf加水印

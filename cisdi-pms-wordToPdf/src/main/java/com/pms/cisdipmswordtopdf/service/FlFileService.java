@@ -12,4 +12,11 @@ public interface FlFileService {
      * @return 文件信息
      */
     List<FlFile> getFileMessageByFileId(String fileId);
+
+    /**
+     * 判断文件中是否有pdf文件
+     * @param fileId 文件id
+     * @return 判断结果
+     */
+    boolean checkPdf(String fileId);
 }
