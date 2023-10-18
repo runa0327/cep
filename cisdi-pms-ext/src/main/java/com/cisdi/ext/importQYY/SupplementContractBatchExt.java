@@ -5,8 +5,10 @@ import com.cisdi.ext.importQYY.model.ImportBatch;
 import com.cisdi.ext.importQYY.model.SupplementContractImport;
 import com.cisdi.ext.model.ContractSupplementContact;
 import com.cisdi.ext.model.PoOrderSupplementReq;
+import com.cisdi.ext.model.PoOrderSupplementReqPrjDetail;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
@@ -20,6 +22,7 @@ import java.util.*;
 /**
  * @author dlt
  * @date 2023/3/29 周三
+ * @Descript 补充协议导入
  */
 public class SupplementContractBatchExt {
 
@@ -116,6 +119,7 @@ public class SupplementContractBatchExt {
             poOrderSupplementReq.setStatus("AP");
             poOrderSupplementReq.setId(supplementId);
             poOrderSupplementReq.setPmPrjId(supplement.getPmPrjId());
+            poOrderSupplementReq.setPmPrjIds(supplement.getPmPrjId());
             poOrderSupplementReq.setCustomerUnitOne(supplement.getCustomerUnitOne());
             poOrderSupplementReq.setContractId(supplement.getContractId());
             poOrderSupplementReq.setContractName(supplement.getContractName());
@@ -146,6 +150,14 @@ public class SupplementContractBatchExt {
             contractSupplementContact.setWinBidUnitOne(supplement.getWinBidUnitOne());
             contractSupplementContact.setIsImport(true);
             contractSupplementContact.insertById();
+
+            // 更新项目明细信息
+            PoOrderSupplementReqPrjDetail.deleteByWhere(new Where().eq("PO_ORDER_SUPPLEMENT_REQ_ID",supplementId));
+            String prjDetailId = Crud.from(PoOrderSupplementReqPrjDetail.ENT_CODE).insertData();
+            Crud.from(PoOrderSupplementReqPrjDetail.ENT_CODE).where().eq("ID",prjDetailId).update()
+                    .set(PoOrderSupplementReqPrjDetail.Cols.PM_PRJ_ID,poOrderSupplementReq.getPmPrjId())
+                    .set(PoOrderSupplementReqPrjDetail.Cols.PO_ORDER_SUPPLEMENT_REQ_ID,supplementId)
+                    .exec();
 
 
         }catch (Exception e){
