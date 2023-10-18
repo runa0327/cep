@@ -4,6 +4,7 @@ import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.shared.util.JdbcMapUtil;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,22 @@ public class AdUserExt {
      */
     public static String getUserName(String userId, MyJdbcTemplate myJdbcTemplate) {
         return JdbcMapUtil.getString(Crud.from("AD_USER").where().eq("ID",userId).select().execForMap(),"NAME");
+    }
+
+    /**
+     * 根据用户id查询用户名称 支持多人查询
+     * @param userIds 用户id，多个用逗号分隔
+     * @param myJdbcTemplate 数据源
+     * @return 用户名称
+     */
+    public static String getUserNameById(String userIds, MyJdbcTemplate myJdbcTemplate) {
+        userIds = userIds.replace(",","','");
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select group_concat(name) as name from ad_user where id in ('"+userIds+"')");
+        if (CollectionUtils.isEmpty(list)){
+            return null;
+        } else {
+            return JdbcMapUtil.getString(list.get(0),"name");
+        }
     }
 
     /**

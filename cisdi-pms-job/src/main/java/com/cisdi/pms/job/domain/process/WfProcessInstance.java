@@ -3,6 +3,8 @@ package com.cisdi.pms.job.domain.process;
 import com.cisdi.pms.job.domain.base.BaseCommon;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class WfProcessInstance extends BaseCommon {
 
@@ -118,4 +120,10 @@ public class WfProcessInstance extends BaseCommon {
     // 审批人
     private String checkUserId;
     private String checkUserName;
+    private List<String> checkUserIdList;
+
+    // 审批时间
+    private String checkDate;
+    private String checkDateMin;
+    private String checkDateMax;
 }

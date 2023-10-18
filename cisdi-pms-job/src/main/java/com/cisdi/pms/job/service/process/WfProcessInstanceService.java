@@ -4,6 +4,8 @@ import com.cisdi.pms.job.domain.process.WfProcess;
 import com.cisdi.pms.job.domain.process.WfProcessInstance;
 import com.cisdi.pms.job.domain.project.PmPrj;
 
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 public interface WfProcessInstanceService {
@@ -25,4 +27,19 @@ public interface WfProcessInstanceService {
      * @param wfProcessInstance 流程实例
      */
     void insert(WfProcessInstance wfProcessInstance);
+
+    /**
+     * 查询所有符合条件数据
+     * @param wfProcessInstance 流程监控实体信息
+     * @return 查询结果
+     */
+    List<WfProcessInstance> queryAllList(WfProcessInstance wfProcessInstance);
+
+    /**
+     * 流程监控导出
+     * @param list 数据详情
+     * @param response 响应信息
+     * @param title 标题
+     */
+    void download(List<WfProcessInstance> list, HttpServletResponse response, String title);
 }

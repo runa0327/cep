@@ -55,6 +55,9 @@
         <result property="deptName" column="deptName" />
         <result property="checkUserId" column="checkUserId" />
         <result property="checkUserName" column="checkUserName" />
+        <result property="checkDate" column="checkDate" />
+        <result property="checkDateMin" column="checkDateMin" />
+        <result property="checkDateMax" column="checkDateMax" />
     </resultMap>
 
     <!--查询上线以来所有发起的流程数量-->
@@ -108,6 +111,74 @@
         </foreach>
         GROUP BY a.ad_user_id
         order by a.ad_user_id asc
+    </select>
+
+    <!--查询所有符合条件数据-->
+    <select id="queryAllList" resultMap="WfProcessInstanceResultMap">
+        SELECT
+            a.id AS wfProcessInstanceId,
+            a.NAME AS wfProcessInstanceName,
+            c.NAME AS startUserName,
+            a.START_DATETIME AS startDate,
+            a.END_DATETIME AS endDate,
+            ifnull( a.IS_URGENT, 0 ) AS urgent,
+            a.CURRENT_NODE_ID AS wfNodeId,
+            a.CURRENT_NI_ID AS wfNodeInstanceId,
+            a.CURRENT_TODO_USER_IDS AS currentTodoUserIds,
+            b.NAME AS processName,
+            d.NAME AS wfNodeInstanceName,
+            e.NAME AS wfNodeName,
+            a.wf_process_id AS wfProcessId,
+            a.CURRENT_VIEW_ID AS currentViewId,
+            b.EXTRA_INFO AS icon,
+            a.ENTITY_RECORD_ID AS entityRecordId
+        FROM
+            wf_process_instance a
+        LEFT JOIN wf_process b ON a.WF_PROCESS_ID = b.id
+        LEFT JOIN ad_user c ON a.START_USER_ID = c.id
+        LEFT JOIN WF_NODE_INSTANCE d ON a.CURRENT_NI_ID = d.id
+        LEFT JOIN wf_node e ON d.wf_node_id = e.id
+        WHERE
+            a.STATUS = 'ap'
+        <if test="wfProcessInstanceName != null and wfProcessInstanceName != ''">
+            and a.name like concat('%',#{wfProcessInstanceName},'%')
+        </if>
+        <if test="startUserId != null and startUserId != ''">
+            and a.START_USER_ID = #{startUserId}
+        </if>
+        <if test="startDateMin != null and startDateMin != ''">
+            and a.START_DATETIME >= #{startDateMin}
+        </if>
+        <if test="startDateMax != null and startDateMax != ''">
+            <![CDATA[ and a.START_DATETIME <= #{startDateMax} ]]>
+        </if>
+        <if test="currentTodoUserIds != null and currentTodoUserIds != ''">
+            and find_in_set(#{currentTodoUserIds},a.CURRENT_TODO_USER_IDS)
+        </if>
+        <if test="checkUserIdList != null and checkUserIdList.size() > 0">
+            and a.id in (
+            select distinct wf_process_instance_id from wf_task
+            where status = 'ap' and wf_task_type_id = 'TODO'
+            AND ACT_DATETIME is not null and ad_user_id in
+            <foreach collection="checkUserIdList" separator="," open="(" close=")" item="item" index="index">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="checkDateMin != null and checkDateMin != ''">
+            and a.id in (select distinct wf_process_instance_id from wf_task
+            where status = 'ap' and wf_task_type_id = 'TODO'
+            and ACT_DATETIME >= #{checkDateMin}
+            )
+        </if>
+        <if test="checkDateMax != null and checkDateMax != ''">
+            <![CDATA[
+            and a.id in (select distinct wf_process_instance_id from wf_task
+            where status = 'ap' and wf_task_type_id = 'TODO'
+            and ACT_DATETIME <= #{checkDateMax}
+            )
+            ]]>
+        </if>
     </select>
 
     <!--新增-->

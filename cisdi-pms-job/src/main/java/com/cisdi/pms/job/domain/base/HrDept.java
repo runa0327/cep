@@ -14,4 +14,7 @@ public class HrDept {
 
     // 部门负责人
     private String chiefUserId;
+
+    // 人员id
+    private String adUserId;
 }

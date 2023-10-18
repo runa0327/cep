@@ -48,4 +48,18 @@ public interface AdUserMapper {
      * @return 查询结果
      */
     List<AdUser> queryChargeUserLoginNums(@Param("list") List<String> chargeUser, @Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    /**
+     * 通过用户名称查询用户id
+     * @param userName 用户名称
+     * @return 用户id
+     */
+    String queryUserIdByName(@Param("userName") String userName);
+
+    /**
+     * 通过用户id查询用户名称
+     * @param userIds 用户id
+     * @return 用户名称
+     */
+    String queryNameByIds(@Param("userId") String userIds);
 }

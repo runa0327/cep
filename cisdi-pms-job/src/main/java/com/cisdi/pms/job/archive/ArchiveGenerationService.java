@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -20,6 +21,70 @@ import java.util.*;
 @Service
 @Slf4j
 public class ArchiveGenerationService {
+
+    public static final Map<String,String> MAP = new HashMap<>(); // K为实体代码，V为对应的流程ID。
+    public static final Map<String,String> MAP2 = new HashMap<>(); // K为实体代码，V为获取表单数据的ID。
+    public static final Map<String,String> MAP3 = new HashMap<>(); // K为实体代码，V为获取表单数据的ID。
+    static {
+        // 立项：
+        MAP.put("pm_prj_req", "0100031468511691070");
+        MAP2.put("pm_prj_req", "select T.* from pm_prj_req t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 可研：
+        MAP.put("pm_prj_invest1", "0100031468512029141");
+        MAP2.put("pm_prj_invest1", "select T.* from pm_prj_invest1 t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+
+        // 概算：
+        MAP.put("pm_prj_invest2", "0100031468512030981");
+        MAP2.put("pm_prj_invest2", "select T.* from pm_prj_invest2 t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 合同签订：
+        MAP.put("po_order_req", "0099952822476409136");
+        MAP2.put("po_order_req", "select T.* from po_order_req t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 用地规划许可
+        MAP.put("PM_LAND_USE_REQ", "0099902212142516744");
+        MAP2.put("PM_LAND_USE_REQ", "select T.* from PM_LAND_USE_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 土地划拨
+        MAP.put("PM_LAND_ALLOCATION_REQ", "0099902212142592327");
+        MAP2.put("PM_LAND_ALLOCATION_REQ", "select T.* from PM_LAND_ALLOCATION_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 农转用手续办理
+        MAP.put("PM_FARMING_PROCEDURES", "0099902212142514818");
+        MAP2.put("PM_FARMING_PROCEDURES", "select T.* from PM_FARMING_PROCEDURES t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 工作联系单
+        MAP.put("PM_WORK_LIST_REQ", "0099952822476361887");
+        MAP2.put("PM_WORK_LIST_REQ", "select T.* from PM_WORK_LIST_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 监理规划及细则
+        MAP.put("PM_SUPERVISE_PLAN_REQ", "0099902212142023273");
+        MAP2.put("PM_SUPERVISE_PLAN_REQ", "select T.* from PM_SUPERVISE_PLAN_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 施工组织设计及施工方案
+        MAP.put("PM_BUILD_ORGAN_PLAN_REQ", "0099952822476361252");
+        MAP2.put("PM_BUILD_ORGAN_PLAN_REQ", "select T.* from PM_BUILD_ORGAN_PLAN_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 施工组织设计及施工方案
+        MAP.put("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD", "0099902212142038616");
+        MAP2.put("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD", "select T.* from SKILL_DISCLOSURE_PAPER_RECHECK_RECORD t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 工程规划许可证申请
+        MAP.put("PM_PRJ_PLANNING_PERMIT_REQ", "0099902212142008086");
+        MAP2.put("PM_PRJ_PLANNING_PERMIT_REQ", "select T.* from PM_PRJ_PLANNING_PERMIT_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 项目结算审批
+        MAP.put("PM_PRJ_SETTLE_ACCOUNTS", "1640179993847930880");
+        MAP2.put("PM_PRJ_SETTLE_ACCOUNTS", "select T.* from PM_PRJ_SETTLE_ACCOUNTS t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+
+        // 补充协议
+        MAP.put("PO_ORDER_SUPPLEMENT_REQ", "0099902212142022655");
+        MAP2.put("PO_ORDER_SUPPLEMENT_REQ", "select T.* from PO_ORDER_SUPPLEMENT_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
+        MAP3.put("PO_ORDER_SUPPLEMENT_REQ", "select T.* from PO_ORDER_SUPPLEMENT_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null");
+    }
+
 
     private String adminUserId = "0099250247095871681";
 
@@ -243,85 +308,26 @@ public class ArchiveGenerationService {
     }
 
     public void createProcInstForImportedData() {
-        // K为实体代码，V为对应的流程ID。
-        Map<String, String> map = new HashMap<>();
 
-        // K为实体代码，V为获取表单数据的ID。
-        Map<String, String> map2 = new HashMap<>();
-
-        // 立项：
-        map.put("pm_prj_req", "0100031468511691070");
-        map2.put("pm_prj_req", "select T.* from pm_prj_req t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
-
-        // 可研：
-        map.put("pm_prj_invest1", "0100031468512029141");
-        map2.put("pm_prj_invest1", "select T.* from pm_prj_invest1 t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
-
-
-        // 概算：
-        map.put("pm_prj_invest2", "0100031468512030981");
-        map2.put("pm_prj_invest2", "select T.* from pm_prj_invest2 t join gr_set_value v where t.IS_OMPORT=v.id and v.code='Y' and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
-
-        // 合同签订：
-        map.put("po_order_req", "0099952822476409136");
-        map2.put("po_order_req", "select T.* from po_order_req t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
-
-        // 用地规划许可
-        map.put("PM_LAND_USE_REQ", "0099902212142516744");
-        map2.put("PM_LAND_USE_REQ", "select T.* from PM_LAND_USE_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
-
-        // 土地划拨
-        map.put("PM_LAND_ALLOCATION_REQ", "0099902212142592327");
-        map2.put("PM_LAND_ALLOCATION_REQ", "select T.* from PM_LAND_ALLOCATION_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
-
-        // 农转用手续办理
-        map.put("PM_FARMING_PROCEDURES", "0099902212142514818");
-        map2.put("PM_FARMING_PROCEDURES", "select T.* from PM_FARMING_PROCEDURES t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
-
-        // 工作联系单
-        map.put("PM_WORK_LIST_REQ", "0099952822476361887");
-        map2.put("PM_WORK_LIST_REQ", "select T.* from PM_WORK_LIST_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
-
-        // 监理规划及细则
-        map.put("PM_SUPERVISE_PLAN_REQ", "0099902212142023273");
-        map2.put("PM_SUPERVISE_PLAN_REQ", "select T.* from PM_SUPERVISE_PLAN_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
-
-        // 施工组织设计及施工方案
-        map.put("PM_BUILD_ORGAN_PLAN_REQ", "0099952822476361252");
-        map2.put("PM_BUILD_ORGAN_PLAN_REQ", "select T.* from PM_BUILD_ORGAN_PLAN_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
-
-        // 施工组织设计及施工方案
-        map.put("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD", "0099902212142038616");
-        map2.put("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD", "select T.* from SKILL_DISCLOSURE_PAPER_RECHECK_RECORD t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
-
-        // 工程规划许可证申请
-        map.put("PM_PRJ_PLANNING_PERMIT_REQ", "0099902212142008086");
-        map2.put("PM_PRJ_PLANNING_PERMIT_REQ", "select T.* from PM_PRJ_PLANNING_PERMIT_REQ t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
-
-        // 项目结算审批
-        map.put("PM_PRJ_SETTLE_ACCOUNTS", "1640179993847930880");
-        map2.put("PM_PRJ_SETTLE_ACCOUNTS", "select T.* from PM_PRJ_SETTLE_ACCOUNTS t where t.IS_IMPORT=1 and t.LK_WF_INST_ID is null and t.CRT_DT<date_add(now(),interval -5 minute)");
-
-        for (String entCode : map.keySet()) {
-            String procId = map.get(entCode);
+        for (String entCode : MAP.keySet()) {
+            String procId = MAP.get(entCode);
             Map<String, Object> ent = jdbcTemplate.queryForMap("select * from ad_ent where code=?", entCode);
             Map<String, Object> proc = jdbcTemplate.queryForMap("select * from wf_process where id=?", procId);
 
-            String sql = map2.get(entCode);
+            String sql = MAP2.get(entCode);
             List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
             for (Map<String, Object> row : list) {
 
                 Object crtUserId = row.get("CRT_USER_ID");
                 Object crt_dt = row.get("CRT_DT");
 
-                String procInstName = "";
-                if ("po_order_req".equals(entCode)){
-                    String projectId = JdbcMapUtil.getString(row,"PM_PRJ_IDS");
-                    String projectName = pmPrjMapper.getProjectNameById(projectId);
-                    procInstName = proc.get("NAME") + "-历史数据导入-" + projectName;
-                } else {
-                    procInstName = proc.get("NAME") + "-历史数据导入";
+
+                String projectId = JdbcMapUtil.getString(row,"PM_PRJ_IDS");
+                if (!StringUtils.hasText(projectId)){
+                    projectId = JdbcMapUtil.getString(row,"PM_PRJ_ID");
                 }
+                String projectName = pmPrjMapper.getProjectNameById(projectId);
+                String procInstName = proc.get("NAME") + "-历史数据导入-" + projectName;
 
                 Object entityRecordId = row.get("ID");
                 String procInstId = insertProcInst(crtUserId, procInstName, procId, crt_dt, ent.get("ID"), entCode, entityRecordId);
@@ -386,5 +392,44 @@ public class ArchiveGenerationService {
 
         jdbcTemplate.update("INSERT INTO WF_NODE_INSTANCE(`ID`,`VER`,`TS`,`IS_PRESET`,`CRT_DT`,`CRT_USER_ID`,`LAST_MODI_DT`,`LAST_MODI_USER_ID`,`STATUS`,`LK_WF_INST_ID`,`CODE`,`NAME`,`REMARK`,`WF_PROCESS_ID`,`WF_PROCESS_INSTANCE_ID`,`WF_NODE_ID`,`START_DATETIME`,`END_DATETIME`,`EFFECTIVE_ACT_ID`,`FROM_FLOW_ID`,`IN_CURRENT_ROUND`,`IS_CURRENT`,`SEQ_NO`,`WF_INTERFERE_ID`,`FORWARD_TO_NODE_ID`)VALUES(?/*ID*/,(1)/*VER*/,(NOW())/*TS*/,(null)/*IS_PRESET*/,(NOW())/*CRT_DT*/,(?)/*CRT_USER_ID*/,(NOW())/*LAST_MODI_DT*/,(?)/*LAST_MODI_USER_ID*/,('AP')/*STATUS*/,(null)/*LK_WF_INST_ID*/,(null)/*CODE*/,(?)/*NAME*/,(null)/*REMARK*/,(?)/*WF_PROCESS_ID*/,(?)/*WF_PROCESS_INSTANCE_ID*/,(?)/*WF_NODE_ID*/,(?)/*START_DATETIME*/,(?)/*END_DATETIME*/,(null)/*EFFECTIVE_ACT_ID*/,(null)/*FROM_FLOW_ID*/,(1)/*IN_CURRENT_ROUND*/,(?)/*IS_CURRENT*/,(?)/*SEQ_NO*/,(null)/*WF_INTERFERE_ID*/,(null)/*FORWARD_TO_NODE_ID*/)", newId, userId, userId, name, procId, procInstId, nodeId, datetime, datetime, isCurrent, IdUtil.getSnowflakeNextIdStr());
         return newId;
+    }
+
+    /**
+     * 历史导入数据未生成标题的处理
+     */
+    public void createProcInstForImportedDataHistory() {
+        for (String entCode : MAP.keySet()) {
+            String procId = MAP.get(entCode);
+            Map<String, Object> ent = jdbcTemplate.queryForMap("select * from ad_ent where code=?", entCode);
+            Map<String, Object> proc = jdbcTemplate.queryForMap("select * from wf_process where id=?", procId);
+
+            String sql = MAP3.get(entCode);
+            if (StringUtils.hasText(sql)){
+                List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+                for (Map<String, Object> row : list) {
+
+                    Object crtUserId = row.get("CRT_USER_ID");
+                    Object crt_dt = row.get("CRT_DT");
+
+
+                    String projectId = JdbcMapUtil.getString(row,"PM_PRJ_IDS");
+                    if (!StringUtils.hasText(projectId)){
+                        projectId = JdbcMapUtil.getString(row,"PM_PRJ_ID");
+                    }
+                    String projectName = pmPrjMapper.getProjectNameById(projectId);
+                    String procInstName = proc.get("NAME") + "-历史数据导入-" + projectName;
+
+                    Object entityRecordId = row.get("ID");
+                    String procInstId = insertProcInst(crtUserId, procInstName, procId, crt_dt, ent.get("ID"), entCode, entityRecordId);
+                    if ("po_order_req".equals(entCode)){
+                        jdbcTemplate.update("update " + entCode + " set LK_WF_INST_ID=?,name = ? WHERE ID=?", procInstId, procInstName,entityRecordId);
+                    } else {
+                        jdbcTemplate.update("update " + entCode + " set LK_WF_INST_ID=? WHERE ID=?", procInstId, entityRecordId);
+                    }
+
+                    createNodeList(procId, crtUserId, crt_dt, procInstId);
+                }
+            }
+        }
     }
 }

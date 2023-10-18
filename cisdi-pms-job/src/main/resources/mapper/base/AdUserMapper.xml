@@ -62,4 +62,14 @@
         group by a.ad_user_id
         order by a.ad_user_id asc
     </select>
+
+    <!--通过用户名称查询用户id-->
+    <select id="queryUserIdByName" resultType="String">
+        select id from ad_user where status = 'ap' and name like concat('%',#{userName},'%')
+    </select>
+
+    <!--通过用户id查询用户名称-->
+    <select id="queryNameByIds" resultType="String">
+        select group_concat(name) from ad_user where id in ('${userId}')
+    </select>
 </mapper>
