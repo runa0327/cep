@@ -16,6 +16,7 @@ import com.qygly.shared.interaction.IdCodeName;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
 import java.util.*;
@@ -139,29 +140,53 @@ public class ProPlanExt {
         String pmPrjId = JdbcMapUtil.getString(map, "pmPrjId");
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRO_PLAN_NODE_HOME where `STATUS`='ap' order by SEQ_NO ");
+
         List<Map<String, Object>> allList = myJdbcTemplate.queryForList("select pppn.ID,pppn.VER,pppn.TS,pppn.IS_PRESET,pppn.CRT_DT,pppn.CRT_USER_ID,pppn.LAST_MODI_DT,pppn.LAST_MODI_USER_ID,pppn.STATUS," +
                 "pppn.LK_WF_INST_ID,pppn.CODE,pppn.NAME,pppn.REMARK,pppn.ACTUAL_START_DATE,pppn.PROGRESS_RISK_REMARK,pppn.PM_PRO_PLAN_ID,pppn.PLAN_START_DATE,ifnull(pppn.PLAN_TOTAL_DAYS,0) as PLAN_TOTAL_DAYS," +
                 "ifnull(pppn.PLAN_CARRY_DAYS,0) as PLAN_CARRY_DAYS,pppn.LEVEL,ifnull(IZ_OVERDUE,0) as IZ_OVERDUE,pppn.POST_INFO_ID,\n" +
                 "ifnull(pppn.ACTUAL_CARRY_DAYS,0) as ACTUAL_CARRY_DAYS,ifnull(pppn.ACTUAL_TOTAL_DAYS,0) as ACTUAL_TOTAL_DAYS,ifnull(pppn.PLAN_CURRENT_PRO_PERCENT,0) as PLAN_CURRENT_PRO_PERCENT,\n" +
                 "ifnull(pppn.ACTUAL_CURRENT_PRO_PERCENT,0) as ACTUAL_CURRENT_PRO_PERCENT,ifnull(pppn.PM_PRO_PLAN_NODE_PID,0) as PM_PRO_PLAN_NODE_PID,pppn.PLAN_COMPL_DATE,pppn.ACTUAL_COMPL_DATE," +
                 "pppn.SHOW_IN_EARLY_PROC,pppn.SHOW_IN_PRJ_OVERVIEW,pppn.PROGRESS_STATUS_ID,pppn.PROGRESS_RISK_TYPE_ID,pppn.CHIEF_DEPT_ID,pppn.CHIEF_USER_ID,pppn.START_DAY,pppn.SEQ_NO,'0' as seq_bak \n" +
-                "from PM_PRO_PLAN_NODE_HOME ph left join PM_PRO_PLAN_NODE pppn on ph.`NAME` = pppn.`NAME` " +
-                "left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where pppn.OPREATION_TYPE is null and ppp.PM_PRJ_ID=? and pppn.level=3 " +
-                "order by ph.SEQ_NO", pmPrjId);
+                "from PM_PRO_PLAN_NODE pppn " +
+                "left join PM_PRO_PLAN ppp on pppn.PM_PRO_PLAN_ID = ppp.ID where pppn.OPREATION_TYPE is null and ppp.PM_PRJ_ID=? and pppn.level=3 ", pmPrjId);
+
+
+        List<Map<String, Object>> objList = new ArrayList<>();
+        list.forEach(item -> {
+            String name = JdbcMapUtil.getString(item, "NAME");
+            Optional<Map<String, Object>> optional = allList.stream().filter(p -> name.equals(JdbcMapUtil.getString(p, "NAME"))).findAny();
+            Map<String, Object> obj = new HashMap<>();
+            if (optional.isPresent()) {
+                obj = optional.get();
+                obj.put("exist", "1");
+            } else {
+                obj.put("NAME", name);
+                obj.put("PLAN_CARRY_DAYS", 0);
+                obj.put("PLAN_CURRENT_PRO_PERCENT", 0);
+                obj.put("ACTUAL_CURRENT_PRO_PERCENT", 0);
+                obj.put("exist", "0");
+            }
+            objList.add(obj);
+        });
 
         // 结果转换
-        List<PrjProPlanNodeInfo> infoList = allList.stream().map(p -> this.convertPlanInfoNode(pmPrjId, p, myJdbcTemplate)).collect(Collectors.toList());
+        List<PrjProPlanNodeInfo> infoList = objList.stream().map(p -> this.convertPlanInfoNode(pmPrjId, p, myJdbcTemplate)).collect(Collectors.toList());
         List<Map<String, Object>> dataList = new ArrayList<>();
         for (PrjProPlanNodeInfo item : infoList) {
             JSONObject jsonObject = new JSONObject();
             String nodeName = item.name;
-            String status = item.progressStatus.name;
+            String status = null;
+            if (item.progressStatus != null) {
+                status = item.progressStatus.name;
+            }
             String nameOrg = "";
             String dateOrg = "";
             String statusOrg = "";
             String tips = null;
             String reason = null;
             String post = null;
+            String exist = item.exist;
 
             if ("已完成".equals(status)) {
                 nameOrg = "实际完成";
@@ -218,11 +243,15 @@ public class ProPlanExt {
             jsonObject.put("nodeName", nodeName);
             jsonObject.put("nameOrg", nameOrg);
             jsonObject.put("dateOrg", dateOrg);
+            if(!StringUtils.hasText(statusOrg)){
+                statusOrg ="未涉及";
+            }
             jsonObject.put("statusOrg", statusOrg);
             jsonObject.put("tips", tips);
             jsonObject.put("post", item.post == null ? "" : item.post.name);
             jsonObject.put("nodeId", item.id);
             jsonObject.put("reason", reason);
+            jsonObject.put("exist", exist);
             dataList.add(jsonObject);
         }
 
@@ -476,6 +505,7 @@ public class ProPlanExt {
         nodeInfo.canStart = JdbcMapUtil.getString(dataMap, "CAN_START");
         nodeInfo.linkedWfProcessId = JdbcMapUtil.getString(dataMap, "LINKED_WF_PROCESS_ID");
         nodeInfo.izOverdue = JdbcMapUtil.getString(dataMap, "IZ_OVERDUE");
+        nodeInfo.exist = JdbcMapUtil.getString(dataMap, "exist");
         return nodeInfo;
     }
 
@@ -735,6 +765,8 @@ public class ProPlanExt {
         public String linkedWfProcessId;
 
         public String izOverdue;
+
+        public String exist;
     }
 
     /**

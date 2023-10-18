@@ -14,6 +14,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -101,7 +102,7 @@ public class PmProPlanExt {
         String nodeId = String.valueOf(map.get("nodeId"));
 
         viewObj viewObj = new viewObj();
-        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select hd.`NAME` as post,po.name postName,PLAN_START_DATE,PLAN_COMPL_DATE,PLAN_TOTAL_DAYS,ACTUAL_TOTAL_DAYS, " +
+        List<Map<String, Object>> nodeList = myJdbcTemplate.queryForList("select hd.`NAME` as post,po.name postName,PLAN_START_DATE,PLAN_COMPL_DATE,PLAN_TOTAL_DAYS,ACTUAL_TOTAL_DAYS,pppn.PROGRESS_STATUS_ID, " +
                 "gsv.`NAME` as `status`,ACTUAL_START_DATE,ACTUAL_COMPL_DATE,PLAN_CARRY_DAYS,ifnull(pppn.CAN_START,0) as  CAN_START,au.`NAME` AS user,ifnull(pppn.UPDATE_TYPE,0) as UPDATE_TYPE,pppn.ATT_FILE_GROUP_ID as ATT_FILE_GROUP_ID,pppn.NAME as nodeName " +
                 "from PM_PRO_PLAN_NODE  pppn " +
                 "left join hr_dept hd on hd.id = pppn.CHIEF_DEPT_ID " +
@@ -118,6 +119,7 @@ public class PmProPlanExt {
             viewObj.predictDays = JdbcMapUtil.getString(node, "PLAN_TOTAL_DAYS");
             viewObj.actualDays = JdbcMapUtil.getString(node, "ACTUAL_TOTAL_DAYS");
             viewObj.status = JdbcMapUtil.getString(node, "status");
+            viewObj.statusId = JdbcMapUtil.getString(node, "PROGRESS_STATUS_ID");
             viewObj.actualStartTime = JdbcMapUtil.getString(node, "ACTUAL_START_DATE");
             viewObj.actualCompleteTime = JdbcMapUtil.getString(node, "ACTUAL_COMPL_DATE");
             viewObj.surplusDays = JdbcMapUtil.getString(node, "PLAN_CARRY_DAYS");
@@ -166,26 +168,27 @@ public class PmProPlanExt {
             } else if ("2".equals(updateType)) {
                 //2-手动在企业云上传历史文件
                 String fileIds = JdbcMapUtil.getString(node, "ATT_FILE_GROUP_ID");
-                fileListObj.title = JdbcMapUtil.getString(node, "nodeName") + "相关文件";
-                List<String> ids = Arrays.asList(fileIds.split(","));
-                Map<String, Object> queryFileParams = new HashMap<>();// 创建入参map
-                queryFileParams.put("ids", ids);
-                List<Map<String, Object>> fileList = myNamedParameterJdbcTemplate.queryForList("select ff.ID as ID, DSP_NAME,SIZE_KB,UPLOAD_DTTM,au.`NAME` as USER_NAME,FILE_INLINE_URL,FILE_ATTACHMENT_URL from fl_file ff left join ad_user au on ff.CRT_USER_ID = au.id  where ff.id in (:ids)", queryFileParams);
-                AtomicInteger index = new AtomicInteger(0);
-                fileListObj.fileObjList = fileList.stream().map(p -> {
-                    FileObj obj = new FileObj();
-                    obj.num = index.getAndIncrement() + 1;
-                    obj.fileName = JdbcMapUtil.getString(p, "DSP_NAME");
-                    obj.fileSize = JdbcMapUtil.getString(p, "SIZE_KB");
-                    obj.uploadUser = JdbcMapUtil.getString(p, "USER_NAME");
-                    obj.uploadDate = StringUtil.withOutT(JdbcMapUtil.getString(p, "UPLOAD_DTTM"));
-                    obj.id = JdbcMapUtil.getString(p, "ID");
-                    obj.viewUrl = JdbcMapUtil.getString(p, "FILE_INLINE_URL");
-                    obj.downloadUrl = JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
-                    return obj;
-                }).collect(Collectors.toList());
-                fileListObjList.add(fileListObj);
-
+                if (StringUtils.hasText(fileIds)) {
+                    fileListObj.title = JdbcMapUtil.getString(node, "nodeName") + "相关文件";
+                    List<String> ids = Arrays.asList(fileIds.split(","));
+                    Map<String, Object> queryFileParams = new HashMap<>();// 创建入参map
+                    queryFileParams.put("ids", ids);
+                    List<Map<String, Object>> fileList = myNamedParameterJdbcTemplate.queryForList("select ff.ID as ID, DSP_NAME,SIZE_KB,UPLOAD_DTTM,au.`NAME` as USER_NAME,FILE_INLINE_URL,FILE_ATTACHMENT_URL from fl_file ff left join ad_user au on ff.CRT_USER_ID = au.id  where ff.id in (:ids)", queryFileParams);
+                    AtomicInteger index = new AtomicInteger(0);
+                    fileListObj.fileObjList = fileList.stream().map(p -> {
+                        FileObj obj = new FileObj();
+                        obj.num = index.getAndIncrement() + 1;
+                        obj.fileName = JdbcMapUtil.getString(p, "DSP_NAME");
+                        obj.fileSize = JdbcMapUtil.getString(p, "SIZE_KB");
+                        obj.uploadUser = JdbcMapUtil.getString(p, "USER_NAME");
+                        obj.uploadDate = StringUtil.withOutT(JdbcMapUtil.getString(p, "UPLOAD_DTTM"));
+                        obj.id = JdbcMapUtil.getString(p, "ID");
+                        obj.viewUrl = JdbcMapUtil.getString(p, "FILE_INLINE_URL");
+                        obj.downloadUrl = JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
+                        return obj;
+                    }).collect(Collectors.toList());
+                    fileListObjList.add(fileListObj);
+                }
             } else if ("3".equals(updateType)) {
                 //3-流程刷新
                 List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pppn.*,ad.`CODE` as ant_code from pm_pro_plan_node pppn  " +
@@ -328,6 +331,7 @@ public class PmProPlanExt {
         public String actualDays;
         // 状态
         public String status;
+        public String statusId;
         // 实际开始时间
         public String actualStartTime;
         // 实际结束时间
@@ -599,4 +603,71 @@ public class PmProPlanExt {
         }
     }
 
+
+    /**
+     * 手动完成节点
+     */
+    public void manualCompletionNode() {
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String json = JsonUtil.toJson(map);
+        ParamData info = JsonUtil.fromJson(json, ParamData.class);
+        StringBuilder sb = new StringBuilder();
+        sb.append("update pm_pro_plan_node set LAST_MODI_DT =NOW(), UPDATE_TYPE='2' ");
+        if (StringUtils.hasText(info.planBegin)) {
+            sb.append(" ,PLAN_START_DATE='").append(info.planBegin).append("'");
+        } else {
+            sb.append(" ,PLAN_START_DATE=null");
+        }
+        if (StringUtils.hasText(info.planEnd)) {
+            sb.append(" ,PLAN_COMPL_DATE='").append(info.planEnd).append("'");
+        } else {
+            sb.append(" ,PLAN_COMPL_DATE=null");
+        }
+        if (StringUtils.hasText(info.planDays)) {
+            sb.append(" ,PLAN_TOTAL_DAYS='").append(info.planDays).append("'");
+        } else {
+            sb.append(" ,PLAN_TOTAL_DAYS=null");
+        }
+        if (StringUtils.hasText(info.actualBegin)) {
+            sb.append(" ,ACTUAL_START_DATE='").append(info.actualBegin).append("'");
+        } else {
+            sb.append(" ,ACTUAL_START_DATE=null");
+        }
+        if (StringUtils.hasText(info.actualEnd)) {
+            sb.append(" ,ACTUAL_COMPL_DATE='").append(info.actualEnd).append("'");
+        } else {
+            sb.append(" ,ACTUAL_COMPL_DATE=null");
+        }
+        if (StringUtils.hasText(info.actualDays)) {
+            sb.append(" ,ACTUAL_TOTAL_DAYS='").append(info.actualDays).append("'");
+        } else {
+            sb.append(" ,ACTUAL_TOTAL_DAYS=null");
+        }
+        if (StringUtils.hasText(info.status)) {
+            sb.append(" ,PROGRESS_STATUS_ID='").append(info.status).append("'");
+        } else {
+            sb.append(" ,PROGRESS_STATUS_ID=null");
+        }
+        if (StringUtils.hasText(info.fileIds)) {
+            sb.append(" ,ATT_FILE_GROUP_ID='").append(info.fileIds).append("'");
+        } else {
+            sb.append(" ,ATT_FILE_GROUP_ID=null");
+        }
+        sb.append(" where id='").append(info.id).append("'");
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        myJdbcTemplate.update(sb.toString());
+    }
+
+    public static class ParamData {
+        public String id;
+        public String planBegin;
+        public String planEnd;
+        public String planDays;
+        public String actualBegin;
+        public String actualEnd;
+        public String actualDays;
+        public String status;
+        public String fileIds;
+
+    }
 }
