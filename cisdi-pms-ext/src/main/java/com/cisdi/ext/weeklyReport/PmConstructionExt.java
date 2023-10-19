@@ -355,7 +355,7 @@ public class PmConstructionExt {
                 sb.append("cast(group_concat(case when a.NUMBER = ").append(i).append(" then AMT_FIVE/10000 else '' end SEPARATOR '') as DECIMAL(32,10)) as '").append(i).append("月',");
             }
             sb.deleteCharAt(sb.length()-1);
-            sb.append(" FROM (select a.pm_prj_id,c.name,ifnull(c.IZ_START_REQUIRE,1) as weatherStart,ifnull(c.IZ_END,0) as weatherComplete,b.NUMBER,b.AMT_FIVE,a.AMT_FIVE as allYearAmt,a.LAST_MODI_DT as date FROM PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID LEFT JOIN pm_prj c on a.pm_prj_id = c.id WHERE a.BASE_YEAR_ID = '").append(baseYearId).append("' and a.PM_PRJ_ID in ('").append(prjIds).append("') ) a  GROUP BY a.pm_prj_id ORDER BY a.weatherComplete asc,a.weatherStart desc,any_value(a.date) desc");
+            sb.append(" FROM (select a.pm_prj_id,c.name,ifnull(c.IZ_START_REQUIRE,1) as weatherStart,ifnull(c.IZ_END,0) as weatherComplete,b.NUMBER,b.AMT_FIVE,a.AMT_FIVE as allYearAmt,a.LAST_MODI_DT as date FROM PM_CONSTRUCTION a LEFT JOIN pm_construction_detail b on a.id = b.PM_CONSTRUCTION_ID LEFT JOIN pm_prj c on a.pm_prj_id = c.id WHERE a.BASE_YEAR_ID = '").append(baseYearId).append("' and a.PM_PRJ_ID in ('").append(prjIds).append("') and c.PROJECT_CLASSIFICATION_ID = '1704686664114929664' AND c.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ) a  GROUP BY a.pm_prj_id ORDER BY a.weatherComplete asc,a.weatherStart desc,any_value(a.date) desc");
             List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sb.toString());
             if (!CollectionUtils.isEmpty(list1)){
                 Map<String,Object> resMap = new HashMap<>();

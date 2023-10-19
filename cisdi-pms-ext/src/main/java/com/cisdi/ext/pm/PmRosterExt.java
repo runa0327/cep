@@ -213,7 +213,7 @@ public class PmRosterExt {
     public void projectList() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         StringBuffer sb = new StringBuffer();
-        sb.append("select * from pm_prj where 1=1 ");
+        sb.append("select * from pm_prj where 1=1 AND PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and PROJECT_CLASSIFICATION_ID = '1704686664114929664'");
         if (!StringUtils.isEmpty(map.get("name"))) {
             sb.append(" and NAME like '%").append(map.get("name")).append("%'");
         }
@@ -243,7 +243,7 @@ public class PmRosterExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuffer sb = new StringBuffer();
-        sb.append("select pj.* from pm_prj pj left join PM_ROSTER pr on pj.id = pr.PM_PRJ_ID left join post_info po on po.id = pr.POST_INFO_ID where pr.post_info_id = '").append(map.get("postId")).append("' ");
+        sb.append("select DISTINCT pj.* from pm_prj pj left join PM_ROSTER pr on pj.id = pr.PM_PRJ_ID left join post_info po on po.id = pr.POST_INFO_ID where pr.post_info_id = '").append(map.get("postId")).append("' ");
         if (!StringUtils.isEmpty(map.get("projectName"))) {
             sb.append("and `NAME` like '%").append(map.get("projectName")).append("%'");
         }
