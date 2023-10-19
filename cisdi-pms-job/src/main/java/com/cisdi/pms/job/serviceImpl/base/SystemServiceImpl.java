@@ -142,6 +142,7 @@ public class SystemServiceImpl implements SystemService {
             int processInstance = 0,processInstanceCell = 0;
             if (!CollectionUtils.isEmpty(weekProcessInstanceList)){
                 processInstance = weekProcessInstanceList.size();
+                processInstanceCell = weekProcessInstanceList.size();
             } else {
                 processInstanceCell = 2;
             }
