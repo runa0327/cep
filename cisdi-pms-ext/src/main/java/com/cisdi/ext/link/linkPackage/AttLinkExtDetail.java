@@ -327,6 +327,12 @@ public class AttLinkExtDetail {
         mapAddRefValue("PRJ_MANAGE_MODE_ID","m_id","m_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //项目管理模式
         mapAddRefValue("BASE_LOCATION_ID","l_id","l_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //建设地点
         mapAddRefValue("PROJECT_TYPE_ID","pt_id","pt_name",row,AttDataTypeE.REF_SINGLE,attLinkResult); //项目类型
+        String projectClassTypeId = JdbcMapUtil.getString(row,"PROJECT_CLASSIFICATION_ID"); //项目类别
+        String projectClassTypeName = null;
+        if (StringUtils.hasText(projectClassTypeId)){
+            projectClassTypeName = GrSetValueExt.getValueNameById(projectClassTypeId);
+        }
+        LinkUtils.mapAddAllValue("PROJECT_CLASSIFICATION_ID",AttDataTypeE.TEXT_LONG,projectClassTypeId,projectClassTypeName,true,true,false,attLinkResult);
         if (!"PM_PRJ_REQ".equals(entCode)){
             mapAddValue("PRJ_REPLY_DATE","PRJ_REPLY_DATE",row,AttDataTypeE.DATE,attLinkResult); //批复日期
         }

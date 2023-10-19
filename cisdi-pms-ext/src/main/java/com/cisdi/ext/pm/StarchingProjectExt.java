@@ -1,5 +1,6 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.PmPrjCodeUtil;
 import com.cisdi.ext.util.StringUtil;
@@ -140,7 +141,8 @@ public class StarchingProjectExt {
         }
         if (StringUtils.hasText(inputData.name)) {
             sb.append(" ,NAME='").append(inputData.name).append("'");
-            sb.append(" ,REMARK='").append(inputData.name).append("(零星项目)'");
+            String remark = GrSetValueExt.getValueNameById("1704686841101975552");
+            sb.append(" ,REMARK='").append(remark).append("'");
         } else {
             sb.append(" ,NAME=null");
             sb.append(" ,REMARK=null");
