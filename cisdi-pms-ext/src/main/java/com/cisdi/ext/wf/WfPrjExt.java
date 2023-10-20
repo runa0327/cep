@@ -1,15 +1,17 @@
 package com.cisdi.ext.wf;
 
+import com.cisdi.ext.model.base.BaseCustomerPostchecker;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
-import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
-import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -114,28 +116,23 @@ public class WfPrjExt {
     public void getFaWu() {
         List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
         for (EntityRecord entityRecord : entityRecordList) {
-            String csCommId = entityRecord.csCommId;
-            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-
-            String sql1 = "";
-
-            String procInstId = ExtJarHelper.procInstId.get();
             String companyId = entityRecord.valueMap.get("CUSTOMER_UNIT_ONE").toString();
-            if ("0099902212142008832".equals(companyId)){ //三亚崖州湾科技城投资控股有限公司
-                sql1 = "select AD_USER_ID from ad_role_user a WHERE a.AD_ROLE_ID = '0099952822476412304' ";
+            String user = "";
+            if (StringUtils.hasText(companyId)){
+                BaseCustomerPostchecker baseCustomerPostchecker = BaseCustomerPostchecker.selectOneByWhere(new Where().eq(BaseCustomerPostchecker.Cols.CUSTOMER_UNIT,companyId)
+                        .eq(BaseCustomerPostchecker.Cols.STATUS,"AP"));
+                if (baseCustomerPostchecker != null){
+                    user = baseCustomerPostchecker.getAdUserEighthIds();
+                }
+            }
+            if (!StringUtils.hasText(user)){
+                throw new BaseException("该业主单位未配置法务审批人员，请先配置或联系管理员处理！");
             } else {
-                sql1 = "select AD_USER_ID from ad_role_user a WHERE a.AD_ROLE_ID = '0099952822476412302' ";
+                List<String> userList = new ArrayList<>(Arrays.asList(user.split(",")));
+                ArrayList<Object> userIdList = new ArrayList<>(1);
+                userIdList.addAll(userList);
+                ExtJarHelper.returnValue.set(userIdList);
             }
-
-            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList(sql1);
-            if (CollectionUtils.isEmpty(list1)){
-                throw new BaseException("下一节点“法务审核”暂未配置代办人员！");
-            }
-            List<String> userList = list1.stream().map(p->JdbcMapUtil.getString(p,"AD_USER_ID")).collect(Collectors.toList());
-
-            ArrayList<Object> userIdList = new ArrayList<>(1);
-            userIdList.addAll(userList);
-            ExtJarHelper.returnValue.set(userIdList);
         }
     }
 
