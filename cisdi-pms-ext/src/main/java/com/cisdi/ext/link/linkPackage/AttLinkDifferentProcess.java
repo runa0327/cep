@@ -131,6 +131,7 @@ public class AttLinkDifferentProcess {
      */
     public static List<String> noPrjTypeLink(){
         List<String> list = new ArrayList<>();
+        list.add("PM_PRJ_REQ"); //立项审批
         list.add("PM_PRJ_INVEST1"); //可研报告
         list.add("PM_PRJ_INVEST2"); //初设概算
         list.add("PM_PRJ_INVEST3"); //预算财评

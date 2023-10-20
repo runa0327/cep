@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.process.bidPurchase.PmBuyDemandReqMapper">
+    <resultMap id="PmBuyDemandReqResult" type="com.cisdi.pms.job.domain.process.bidPurchase.PmBuyDemandReq">
+        <id property="id" column="id" />
+        <result property="pmBuyDemandReqId" column="pmBuyDemandReqId" />
+        <result property="projectId" column="projectId" />
+        <result property="projectIds" column="projectIds" />
+    </resultMap>
+
+    <select id="queryAllAPData" resultMap="PmBuyDemandReqResult">
+        select
+            id as pmBuyDemandReqId,
+            pm_prj_ids as projectIds
+        from
+            PM_BUY_DEMAND_REQ
+        where
+            status = 'AP'
+        ORDER BY CRT_DT ASC
+    </select>
+
+    <!--根据采购需求审批id删除补充协议项目明细表数据-->
+    <delete id="deletePrjDetailById">
+        delete from PM_BUY_DEMAND_REQ_PRJ_DETAIL where PM_BUY_DEMAND_REQ_ID = #{pmBuyDemandReqId}
+    </delete>
+
+    <!--采购需求审批-项目明细-新增数据-->
+    <insert id="insertPrjDetail">
+        insert into PM_BUY_DEMAND_REQ_PRJ_DETAIL (
+            ID,
+            VER,
+            TS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            STATUS,
+            PM_BUY_DEMAND_REQ_ID,
+            PM_PRJ_ID
+        ) values (
+            #{id},
+            '1',
+            now(),
+            now(),
+            '0099250247095871681',
+            now(),
+            '0099250247095871681',
+            'AP',
+            #{pmBuyDemandReqId},
+            #{projectId}
+        )
+    </insert>
+</mapper>
