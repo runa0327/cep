@@ -114,7 +114,7 @@ public class ProjectHomeExt {
             }
 
         } else {
-            List<Map<String, Object>> startList = myJdbcTemplate.queryForList("select round(ifnull(PRJ_TOTAL_INVEST,0)/10000,2) PRJ_TOTAL_INVEST from  prj_start where PM_CODE= (select PM_CODE from pm_prj where id=?)", projectId);
+            List<Map<String, Object>> startList = myJdbcTemplate.queryForList("select ifnull(PRJ_TOTAL_INVEST,0) PRJ_TOTAL_INVEST from  prj_start where PM_CODE= (select PM_CODE from pm_prj where id=?)", projectId);
             if (!CollectionUtils.isEmpty(startList)) {
                 totalAmt = new BigDecimal(String.valueOf(startList.get(0).get("PRJ_TOTAL_INVEST")));
                 title = "项目启动";
