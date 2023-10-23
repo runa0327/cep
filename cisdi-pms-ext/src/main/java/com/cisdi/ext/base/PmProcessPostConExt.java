@@ -2,6 +2,7 @@ package com.cisdi.ext.base;
 
 import com.cisdi.ext.model.PmProcessPostCon;
 import com.qygly.ext.jar.helper.sql.Where;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +20,10 @@ public class PmProcessPostConExt {
      */
     public static List<String> getDeptIdByNode(String nodeId, String companyId) {
         List<PmProcessPostCon> list = PmProcessPostCon.selectByWhere(new Where().eq(PmProcessPostCon.Cols.WF_NODE_ID,nodeId).eq(PmProcessPostCon.Cols.CUSTOMER_UNIT,companyId));
-        List<String> deptList = list.stream().map(PmProcessPostCon::getBaseProcessPostId).collect(Collectors.toList());
-        return deptList;
+        if (!CollectionUtils.isEmpty(list)){
+            return list.stream().map(PmProcessPostCon::getBaseProcessPostId).collect(Collectors.toList());
+        } else {
+            return null;
+        }
     }
 }

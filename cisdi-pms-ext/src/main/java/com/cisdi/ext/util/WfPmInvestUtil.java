@@ -80,7 +80,11 @@ public class WfPmInvestUtil {
         if (investEstList.size() > 0) {
             investEstList.forEach(item -> {
                 String pmExpType = String.valueOf(item.get("PM_EXP_TYPE"));
-                myJdbcTemplate.update("update PM_INVEST_EST_DTL set AMT=?,LAST_MODI_DT=? where id=?", dataMap.get(pmExpType), new Date(), item.get("ID"));
+                String value = JdbcMapUtil.getString(dataMap,pmExpType);
+                if ("SCIENTIFIC_EQUIPMENT_AMT".equals(pmExpType)){ // 科研设备费名称不一样单独处理
+                    value = JdbcMapUtil.getString(dataMap,"EQUIPMENT_COST");
+                }
+                myJdbcTemplate.update("update PM_INVEST_EST_DTL set AMT=?,LAST_MODI_DT=? where id=?", value, new Date(), item.get("ID"));
             });
             String prjTotalInvest = JdbcMapUtil.getString(finalDataMap,"PRJ_TOTAL_INVEST");
             myJdbcTemplate.update("update PM_INVEST_EST set PRJ_TOTAL_INVEST = ? where pm_prj_id = ? and INVEST_EST_TYPE_ID = ?",prjTotalInvest,pmPrjId,investEstTypeId);

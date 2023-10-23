@@ -1,8 +1,9 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.development;
 
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.enums.FileCodeEnum;
 import com.cisdi.ext.model.base.PmPrj;
+import com.cisdi.ext.pm.PrjMaterialInventory;
 import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.util.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -616,6 +617,8 @@ public class PmPrjReqExt {
         String companyId = JdbcMapUtil.getString(entityRecord.valueMap, "CUSTOMER_UNIT");
         String csCommId = entityRecord.csCommId;
         ProcessCommon.addPrjPostUser(projectId, entCode, processId, companyId, csCommId, myJdbcTemplate);
+        //创建项目投资测算汇总可研数据
+        WfPmInvestUtil.calculateData(csCommId, entCode, projectId);
     }
 
 }

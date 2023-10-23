@@ -54,15 +54,20 @@ public class ListUtil {
         List<String> strings = Arrays.asList("1", "2", "3", "4", "5");
         List<List<String>> partition = partition(strings, 2);
         System.out.println();
+    }
 
-//        List<String> strings = new ArrayList<>();
-//        strings.add("1");
-//        strings.add("2");
-//        strings.add("3");
-//        strings.add("4");
-//        strings.add("5");
-//        List<String> newStrings = strings;
-//        strings = null;
-//        System.out.println();
+    /**
+     * 判断listB中是否包含listA中的数据
+     * @param listA listA
+     * @param listB listB
+     * @return 判断结果
+     */
+    public static boolean checkIsContainsCode(List<String> listA, List<String> listB) {
+        for (String str : listA) {
+            if (listB.contains(str)){
+                return true;
+            }
+        }
+        return false;
     }
 }

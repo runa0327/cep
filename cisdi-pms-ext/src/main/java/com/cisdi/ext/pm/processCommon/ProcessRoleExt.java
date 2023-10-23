@@ -1,14 +1,19 @@
 package com.cisdi.ext.pm.processCommon;
 
+import com.cisdi.ext.api.HrDeptExt;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.base.PmProcessPostConExt;
+import com.cisdi.ext.base.PostExt;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
+import com.cisdi.ext.model.AdAtt;
 import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.WfTask;
 import com.cisdi.ext.model.base.AdRoleUser;
+import com.cisdi.ext.model.base.BasePointPost;
 import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.pm.office.PmPostAppointExt;
+import com.cisdi.ext.util.ListUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -21,6 +26,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -817,22 +823,90 @@ public class ProcessRoleExt {
     public void getUserByRoster(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        //业务表名
-        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
-        //流程业务id
-        String csCommId = entityRecord.csCommId;
-        //业主单位
-        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code; //业务表名
+        String csCommId = entityRecord.csCommId; //流程业务id
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT"); //业主单位
         if (SharedUtil.isEmptyString(companyId)){
             companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT_ONE");
         }
-        //项目id
-        String projectId = PmPrjExt.getProjectIdByProcess(entityRecord.valueMap);
-        //节点id
-        String nodeId = ExtJarHelper.nodeId.get();
+        String projectId = PmPrjExt.getProjectIdByProcess(entityRecord.valueMap); //项目id
+        String nodeId = ExtJarHelper.nodeId.get(); //节点id
+
+        List<String> basePostList; // 花名册岗位信息集合
+        basePostList = PostExt.getPostByPointPost(nodeId); // 根据流程节点岗位信息获取节点岗位信息
+        if (CollectionUtils.isEmpty(basePostList)){
+            basePostList = getPostByProcessPost(nodeId,companyId,myJdbcTemplate); // 根据流程岗位关联关系获取岗位信息
+        }
+
+        List<String> userList;
+        Map<String,Object> map = new HashMap<>();
+        userList = rosterSecondVersion(basePostList,entCode,csCommId,map,myJdbcTemplate); // 新版本花名册取数逻辑
+
         //查询该节点岗位(流程岗位id)
         List<String> deptId = PmProcessPostConExt.getDeptIdByNode(nodeId,companyId);
+        if (!CollectionUtils.isEmpty(userList)){
+            // 使用第一版花名册取数逻辑
+            userRosterFirstVersion(projectId,companyId,entCode,csCommId,userList,deptId,myJdbcTemplate);
+        }
+
+        if (!CollectionUtils.isEmpty(userList)){
+            ExtJarHelper.returnValue.set(userList);
+        } else {
+            if (!CollectionUtils.isEmpty(deptId)){
+                String deptIdStr = String.join("','",deptId);
+                List<Map<String,Object>> deptList = myJdbcTemplate.queryForList("select group_concat(name) as name from BASE_PROCESS_POST where id in ('"+deptIdStr+"')");
+                String deptName = JdbcMapUtil.getString(deptList.get(0),"name");
+                throw new BaseException("该流程["+deptName+"]岗位没有匹配到审批人员，请核查流程表单岗位信息或联系管理员处理！");
+            } else {
+                throw new BaseException("该项目/流程没有设置对应岗位及人员，请配置该项目该岗位人员或联系管理员处理！");
+            }
+        }
+    }
+
+    /**
+     * 流程审批花名册取数第二版本
+     * @param basePostList 岗位集合
+     * @param entCode 流程表单编码
+     * @param csCommId 流程表单单条记录id
+     * @param map 数据返回数据
+     * @param myJdbcTemplate 数据源
+     * @return 人员集合
+     */
+    private List<String> rosterSecondVersion(List<String> basePostList, String entCode, String csCommId, Map<String, Object> map, MyJdbcTemplate myJdbcTemplate) {
         List<String> userList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(basePostList)){
+            // 根据岗位信息获取岗位对应在表单中的字段信息
+            List<String> codeList = PmRosterExt.getPostCodeById(basePostList,myJdbcTemplate);
+            if (!CollectionUtils.isEmpty(codeList)){
+                //查询该表单所有字段
+                List<String> adEntAtt = LinkSql.getEntCodeAtt(entCode,myJdbcTemplate);
+                boolean isContains = ListUtil.checkIsContainsCode(codeList,adEntAtt);
+                if (isContains){
+                    addUserValue(codeList, adEntAtt, entCode, map, csCommId, myJdbcTemplate);
+                    String resCode = (String) map.get("code");
+                    if ("500".equals(resCode)){
+                        throw new BaseException(map.get("msg").toString());
+                    } else {
+                        userList = (List<String>) map.get("msg");
+                    }
+                }
+            }
+        }
+        return userList;
+    }
+
+    /**
+     * 使用第一版花名册取数逻辑
+     * @param projectId 项目id
+     * @param companyId 业主单位id
+     * @param entCode 流程表单
+     * @param csCommId 流程单条记录id
+     * @param userList 人员集合
+     * @param deptId 岗位id
+     * @param myJdbcTemplate 数据源
+     */
+    private void userRosterFirstVersion(String projectId, String companyId, String entCode, String csCommId, List<String> userList, List<String> deptId, MyJdbcTemplate myJdbcTemplate) {
+
         //岗位信息在流程表单中有显示
         List<String> postProList = AttLinkDifferentProcess.getLinkUserProcess();
         if (postProList.contains(entCode)){
@@ -856,18 +930,63 @@ public class ProcessRoleExt {
             //通过岗位id、花名册查询出人员信息
             userList = PmRosterExt.getDeptUserByDept(deptId,companyId,projectId);
         }
-        if (!CollectionUtils.isEmpty(userList)){
-            ExtJarHelper.returnValue.set(userList);
-        } else {
-            if (!CollectionUtils.isEmpty(deptId)){
-                String deptIdStr = String.join("','",deptId);
-                List<Map<String,Object>> deptList = myJdbcTemplate.queryForList("select group_concat(name) as name from BASE_PROCESS_POST where id in ('"+deptIdStr+"')");
-                String deptName = JdbcMapUtil.getString(deptList.get(0),"name");
-                throw new BaseException("该流程["+deptName+"]岗位没有匹配到审批人员，请核查流程表单岗位信息或联系管理员处理！");
-            } else {
-                throw new BaseException("该项目/流程没有设置对应岗位及人员，请配置该项目该岗位人员或联系管理员处理！");
+    }
+
+    /**
+     * 根据岗位信息判断，从流程表取出对应人员信息
+     * @param codeList 岗位编码集合
+     * @param adEntAtt 流程表单字段集合
+     * @param entCode 流程表名
+     * @param csCommId 单条记录id
+     * @param myJdbcTemplate 数据源
+     */
+    private Map<String,Object> addUserValue( List<String> codeList, List<String> adEntAtt, String entCode, Map<String,Object> map, String csCommId, MyJdbcTemplate myJdbcTemplate) {
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select * from "+entCode+" where id = ?",csCommId);
+        if (!CollectionUtils.isEmpty(list)){
+            StringBuilder sb = new StringBuilder();
+            StringBuilder error = new StringBuilder();
+            for (String tmp : codeList) {
+                if (adEntAtt.contains(tmp)){
+                    String user = JdbcMapUtil.getString(list.get(0),tmp);
+                    if (StringUtils.hasText(user)){
+                        sb.append(user).append(",");
+                    } else {
+                        String name = AdAtt.selectOneByWhere(new Where().eq(AdAtt.Cols.CODE,tmp)).getName();
+                        error.append("在表单中没有找到岗位：【").append(name).append("】对应人员，请先完善表单信息或联系管理员处理!");
+                    }
+                }
             }
+            if (StringUtils.hasText(error)){
+                map.put("code","500");
+                map.put("msg",error);
+            } else {
+                String user = sb.deleteCharAt(sb.length()-1).toString();
+                List<String> userList = new ArrayList<>(Arrays.asList(user.split(",")));
+                map.put("code","200");
+                map.put("msg",userList);
+            }
+        } else {
+            map.put("code","500");
+            map.put("msg","没有匹配到岗位人员信息！");
         }
+        return map;
+    }
+
+    /**
+     * 根据流程岗位关联关系获取岗位信息
+     * @param nodeId 节点id
+     * @param companyId 业主单位
+     * @param myJdbcTemplate 数据源
+     * @return 岗位信息
+     */
+    private List<String> getPostByProcessPost(String nodeId, String companyId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select DISTINCT b.POST_INFO_ID FROM PM_PROCESS_POST_CON a left join PM_POST_PROPRJ b on a.BASE_PROCESS_POST_ID = b.BASE_PROCESS_POST_ID where a.WF_NODE_ID = ?";
+        List<Map<String,Object>> listMap = myJdbcTemplate.queryForList(sql,nodeId);
+        List<String> list = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(listMap)){
+            list = listMap.stream().map(p->JdbcMapUtil.getString(p,"POST_INFO_ID")).collect(Collectors.toList());
+        }
+        return list;
     }
 
     /**
