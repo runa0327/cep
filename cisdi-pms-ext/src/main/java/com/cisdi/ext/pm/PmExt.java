@@ -15,6 +15,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -246,25 +247,25 @@ public class PmExt {
                 "left join pm_pro_plan ppp on ppp.PM_PRJ_ID = pm.id \n" +
                 "left join gr_set_value ggg on ggg.id = pm.BASE_LOCATION_ID "+
                 "where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 and (pm.PROJECT_STATUS != '1661568714048413696' or pm.PROJECT_STATUS is null )  ");
-        if (Strings.isNotEmpty(param.name)) {
+        if (StringUtils.hasText(param.name)) {
             sb.append(" and pm.`name` like '%").append(param.name).append("%'");
         }
-        if (Strings.isNotEmpty(param.code)) {
+        if (StringUtils.hasText(param.code)) {
             sb.append(" and pm.PM_CODE like '%").append(param.code).append("%'");
         }
-        if (Strings.isNotEmpty(param.unit)) {
+        if (StringUtils.hasText(param.unit)) {
             sb.append(" and pm.CUSTOMER_UNIT = '").append(param.unit).append("'");
         }
-        if (Strings.isNotEmpty(param.type)) {
+        if (StringUtils.hasText(param.type)) {
             sb.append(" and pm.PROJECT_TYPE_ID = '").append(param.type).append("'");
         }
-        if (Strings.isNotEmpty(param.status)) {
+        if (StringUtils.hasText(param.status)) {
             sb.append(" and pm.PROJECT_PHASE_ID = '").append(param.status).append("'");
         }
-        if (Strings.isNotEmpty(param.phase)) {
+        if (StringUtils.hasText(param.phase)) {
             sb.append(" and pm.TRANSITION_PHASE_ID = '").append(param.phase).append("'");
         }
-        if (Strings.isNotEmpty(param.startTime)) {
+        if (StringUtils.hasText(param.startTime)) {
             sb.append(" and DATE_FORMAT(ppp.PLAN_START_DATE,'%Y-%m-%d') = DATE_FORMAT('").append(param.startTime).append("','%Y-%m-%d')");
         }
 //        String userId = ExtJarHelper.loginInfo.get().userId;
@@ -317,25 +318,25 @@ public class PmExt {
                 "left join pm_pro_plan ppp on ppp.PM_PRJ_ID = pm.id \n" +
                 "left join gr_set_value ggg on ggg.id = pm.BASE_LOCATION_ID "+
                 "where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 and (pm.PROJECT_STATUS != '1661568714048413696' or pm.PROJECT_STATUS is null ) AND pm.PROJECT_CLASSIFICATION_ID = '1704686664114929664' ");
-        if (Strings.isNotEmpty(param.name)) {
+        if (StringUtils.hasText(param.name)) {
             sb.append(" and pm.`name` like '%").append(param.name).append("%'");
         }
-        if (Strings.isNotEmpty(param.code)) {
+        if (StringUtils.hasText(param.code)) {
             sb.append(" and pm.PM_CODE like '%").append(param.code).append("%'");
         }
-        if (Strings.isNotEmpty(param.unit)) {
+        if (StringUtils.hasText(param.unit)) {
             sb.append(" and pm.CUSTOMER_UNIT = '").append(param.unit).append("'");
         }
-        if (Strings.isNotEmpty(param.type)) {
+        if (StringUtils.hasText(param.type)) {
             sb.append(" and pm.PROJECT_TYPE_ID = '").append(param.type).append("'");
         }
-        if (Strings.isNotEmpty(param.status)) {
+        if (StringUtils.hasText(param.status)) {
             sb.append(" and pm.PROJECT_PHASE_ID = '").append(param.status).append("'");
         }
-        if (Strings.isNotEmpty(param.phase)) {
+        if (StringUtils.hasText(param.phase)) {
             sb.append(" and pm.TRANSITION_PHASE_ID = '").append(param.phase).append("'");
         }
-        if (Strings.isNotEmpty(param.startTime)) {
+        if (StringUtils.hasText(param.startTime)) {
             sb.append(" and DATE_FORMAT(ppp.PLAN_START_DATE,'%Y-%m-%d') = DATE_FORMAT('").append(param.startTime).append("','%Y-%m-%d')");
         }
         String userId = ExtJarHelper.loginInfo.get().userId;
