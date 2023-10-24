@@ -59,6 +59,15 @@
         <result property="planEndDate" column="planEndDate" />
     </resultMap>
 
+    <!--项目数量情况-->
+    <resultMap id="projectNums" type="com.cisdi.pms.job.domain.project.PmPrj">
+        <result property="prjAllNums" column="prjAllNums" />
+        <result property="zfPrjNums" column="zfPrjNums" />
+        <result property="shPrjNums" column="shPrjNums" />
+        <result property="sbPrjNums" column="sbPrjNums" />
+        <result property="lxPrjNums" column="lxPrjNums" />
+    </resultMap>
+
     <sql id="commonHeader">
         ID AS id,
         id as projectId,
@@ -358,5 +367,22 @@
     <!--获取所有预算财评完成数量 含历史导入数据-->
     <select id="queryInvest3Nums" resultType="int">
         select count(*) as num from PM_PRJ_INVEST3 where status = 'AP'
+    </select>
+
+    <!--获取项目数量情况-->
+    <select id="queryPrjNums" resultMap="projectNums">
+        select
+            a.num as prjAllNums,
+            b.num as zfPrjNums,
+            c.num as shPrjNums,
+            d.num as sbPrjNums,
+            e.num as lxPrjNums
+        from
+            (select count(*) as num,'1' as id from pm_prj where status = 'ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374') a
+        left join
+            (select count(*) as num,'1' as id from pm_prj where status = 'ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and PROJECT_CLASSIFICATION_ID = '1704686664114929664') b on a.id = b.id
+        left join(select count(*) as num,'1' as id from pm_prj where status = 'ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and PROJECT_CLASSIFICATION_ID = '1704686699527438336') c on a.id = c.id
+        left join(select count(*) as num,'1' as id from pm_prj where status = 'ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and PROJECT_CLASSIFICATION_ID = '1704686735267102720') d on a.id = d.id
+        left join(select count(*) as num,'1' as id from pm_prj where status = 'ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and PROJECT_CLASSIFICATION_ID = '1704686841101975552') e on a.id = e.id
     </select>
 </mapper>

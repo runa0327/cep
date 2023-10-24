@@ -13,11 +13,10 @@ import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyMapper;
 import com.cisdi.pms.job.service.base.SystemService;
 import com.cisdi.pms.job.utils.CisdiUtils;
 import com.cisdi.pms.job.utils.FileUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import com.cisdi.pms.job.utils.PoiExcelUtils;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -91,7 +90,9 @@ public class SystemServiceImpl implements SystemService {
         BigDecimal zaiJianJianAnAmt = zaiJianPrj.stream().filter(p->p.getConstructPrjAmt() != null).map(PmPrj::getConstructPrjAmt).reduce(BigDecimal.ZERO,BigDecimal::add).stripTrailingZeros(); // 在建项目数建安总额
         int orderNums = poOrderReqMapper.queryOrderNums(); // 合同总数量
         List<PoOrderReq> timeFrameOrder = poOrderReqMapper.queryTimeFrameNewOrderAmt(startDate,endDate); // 查询时间范围内新签订的合同总金额-刨除历史数据导入
-        BigDecimal timeFrameOrderAmt = timeFrameOrder.stream().map(PoOrderReq::getContractAmt).reduce(BigDecimal.ZERO,BigDecimal::add).stripTrailingZeros();
+        String timeFrameOrderAmt = timeFrameOrder.stream().map(PoOrderReq::getContractAmt).reduce(BigDecimal.ZERO,BigDecimal::add).stripTrailingZeros().toPlainString();
+
+        PmPrj pmPrj = pmPrjMapper.queryPrjNums(); // 获取项目数量情况
 
         map.put("allUserNum",allUserNum); // 查询系统所有人员
         map.put("weekUserLoginNum",weekUserLoginNum); //查询时间范围内登录系统的用户数
@@ -114,7 +115,7 @@ public class SystemServiceImpl implements SystemService {
         map.put("timeFrameOrderAmt",timeFrameOrderAmt);
         map.put("startDate",startDate);
         map.put("endDate",endDate);
-
+        map.put("pmPrjNums",pmPrj); // 项目数量情况
         return map;
     }
 
@@ -155,73 +156,144 @@ public class SystemServiceImpl implements SystemService {
             sheet.setDefaultColumnWidth(30);
 
             //设置合并
-            CellRangeAddress region1 = new CellRangeAddress(0,0,0,maxCellColumn-1);
-            CellRangeAddress region2 = new CellRangeAddress(1,1,0,5);
-            CellRangeAddress region3 = new CellRangeAddress(4,4,0,processInstanceCell);
-            CellRangeAddress region4 = new CellRangeAddress(7,7,0,1);
-            CellRangeAddress region5 = new CellRangeAddress(7,7,4,5);
-            CellRangeAddress region6 = new CellRangeAddress(chargeNums+9,chargeNums+9,0,5);
+            CellRangeAddress region1 = new CellRangeAddress(0,0,0,maxCellColumn);
+            CellRangeAddress region7 = new CellRangeAddress(1,1,0,maxCellColumn);
+            CellRangeAddress region2 = new CellRangeAddress(4,4,0,maxCellColumn);
+            CellRangeAddress region3 = new CellRangeAddress(7,7,0,processInstanceCell);
+            CellRangeAddress region4 = new CellRangeAddress(10,10,0,1);
+            CellRangeAddress region5 = new CellRangeAddress(10,10,4,5);
+            CellRangeAddress region6 = new CellRangeAddress(chargeNums+12,chargeNums+12,0,maxCellColumn);
             sheet.addMergedRegion(region1);
+            PoiExcelUtils.createBorder(region1,sheet);
             sheet.addMergedRegion(region2);
+            PoiExcelUtils.createBorder(region2,sheet);
             sheet.addMergedRegion(region3);
+            PoiExcelUtils.createBorder(region3,sheet);
             sheet.addMergedRegion(region4);
+            PoiExcelUtils.createBorder(region4,sheet);
             sheet.addMergedRegion(region5);
+            PoiExcelUtils.createBorder(region5,sheet);
             sheet.addMergedRegion(region6);
+            PoiExcelUtils.createBorder(region6,sheet);
+            sheet.addMergedRegion(region7);
+            PoiExcelUtils.createBorder(region7,sheet);
+
+            CellStyle cellStyle = PoiExcelUtils.getTableCellStyle(workbook);
 
             Row row0 = sheet.createRow(0);
             row0.setHeight((short) 500);
             Cell cell00 = row0.createCell(0);
             cell00.setCellValue("周期："+ map.get("startDate") + "到" + map.get("endDate"));
+            cell00.setCellStyle(cellStyle);
 
-            Row row1 = sheet.createRow(1);
+            Row row19 = sheet.createRow(1);
+            row19.setHeight((short) 500);
+            Cell cell190 = row19.createCell(0);
+            cell190.setCellValue("项目数量情况");
+            cell190.setCellStyle(cellStyle);
+
+            PmPrj pmPrj = (PmPrj) map.get("pmPrjNums");
+            Row row17 = sheet.createRow(2);
+            row17.setHeight((short) 500);
+            Cell cell170 = row17.createCell(0);
+            cell170.setCellValue("项目总数");
+            cell170.setCellStyle(cellStyle);
+            Cell cell171 = row17.createCell(1);
+            cell171.setCellValue(pmPrj.getPrjAllNums());
+            cell171.setCellStyle(cellStyle);
+            Cell cell172 = row17.createCell(2);
+            cell172.setCellValue("政府投资项目数");
+            cell172.setCellStyle(cellStyle);
+            Cell cell173 = row17.createCell(3);
+            cell173.setCellValue(pmPrj.getZfPrjNums());
+            cell173.setCellStyle(cellStyle);
+            Cell cell174 = row17.createCell(4);
+            cell174.setCellValue("社会投资项目数");
+            cell174.setCellStyle(cellStyle);
+            Cell cell175 = row17.createCell(5);
+            cell175.setCellValue(pmPrj.getShPrjNums());
+            cell175.setCellStyle(cellStyle);
+
+            Row row18 = sheet.createRow(3);
+            row18.setHeight((short) 500);
+            Cell cell180 = row18.createCell(0);
+            cell180.setCellValue("设备项目数");
+            cell180.setCellStyle(cellStyle);
+            Cell cell181 = row18.createCell(1);
+            cell181.setCellValue(pmPrj.getSbPrjNums());
+            cell181.setCellStyle(cellStyle);
+            Cell cell182 = row18.createCell(2);
+            cell182.setCellValue("零星项目数");
+            cell182.setCellStyle(cellStyle);
+            Cell cell183 = row18.createCell(3);
+            cell183.setCellValue(pmPrj.getLxPrjNums());
+            cell183.setCellStyle(cellStyle);
+
+            Row row1 = sheet.createRow(4);
             row1.setHeight((short) 500);
             Cell cell10 = row1.createCell(0);
             cell10.setCellValue("本周用户使用情况");
+            cell10.setCellStyle(cellStyle);
 
-            Row row2 = sheet.createRow(2);
+            Row row2 = sheet.createRow(5);
             row2.setHeight((short) 500);
             Cell cell20 = row2.createCell(0);
             cell20.setCellValue("整体用户数");
+            cell20.setCellStyle(cellStyle);
             Cell cell21 = row2.createCell(1);
             cell21.setCellValue(String.valueOf(map.get("allUserNum")));
+            cell21.setCellStyle(cellStyle);
             Cell cell22 = row2.createCell(2);
             cell22.setCellValue("本周登录人数");
+            cell22.setCellStyle(cellStyle);
             Cell cell23 = row2.createCell(3);
             cell23.setCellValue(String.valueOf(map.get("weekUserLoginNum")));
+            cell23.setCellStyle(cellStyle);
             Cell cell24 = row2.createCell(4);
             cell24.setCellValue("总体登录次数");
+            cell24.setCellStyle(cellStyle);
             Cell cell25 = row2.createCell(5);
             cell25.setCellValue(String.valueOf(map.get("loginNums")));
+            cell25.setCellStyle(cellStyle);
 
-            Row row3 = sheet.createRow(3);
+            Row row3 = sheet.createRow(6);
             row3.setHeight((short) 500);
             Cell cell30 = row3.createCell(0);
             cell30.setCellValue("发起流程总数");
+            cell30.setCellStyle(cellStyle);
             Cell cell31 = row3.createCell(1);
             cell31.setCellValue(String.valueOf(map.get("allProcessInstanceNums")));
+            cell31.setCellStyle(cellStyle);
             Cell cell32 = row3.createCell(2);
             cell32.setCellValue("本周新增流程数量");
+            cell32.setCellStyle(cellStyle);
             Cell cell33 = row3.createCell(3);
             cell33.setCellValue(processInstance);
+            cell33.setCellStyle(cellStyle);
             Cell cell34 = row3.createCell(4);
             cell34.setCellValue("项目形象进度周报填报情况");
+            cell34.setCellStyle(cellStyle);
             Cell cell35 = row3.createCell(5);
             cell35.setCellValue("需要填报： " + map.get("needWriteNums") + "  已填报： " + map.get("writeNums"));
+            cell35.setCellStyle(cellStyle);
 
-            Row row4 = sheet.createRow(4);
+            Row row4 = sheet.createRow(7);
             row4.setHeight((short) 500);
             Cell cell40 = row4.createCell(0);
             cell40.setCellValue("新增流程明细如下");
+            cell40.setCellStyle(cellStyle);
 
-            Row row5 = sheet.createRow(5);
+            Row row5 = sheet.createRow(8);
             row5.setHeight((short) 500);
             Cell cell50 = row5.createCell(0);
             cell50.setCellValue("流程名称");
+            cell50.setCellStyle(cellStyle);
 
-            Row row6 = sheet.createRow(6);
+            Row row6 = sheet.createRow(9);
             row6.setHeight((short) 500);
             Cell cell60 = row6.createCell(0);
             cell60.setCellValue("数量");
+            cell60.setCellStyle(cellStyle);
             if (!CollectionUtils.isEmpty(weekProcessInstanceList)){
                 List<String> processName = weekProcessInstanceList.stream().map(WfProcessInstance::getProcessName).collect(Collectors.toList());
                 for (int i = 0; i < processName.size(); i++) {
@@ -229,105 +301,139 @@ public class SystemServiceImpl implements SystemService {
 
                     Cell cell5x = row5.createCell(i+1);
                     cell5x.setCellValue(name);
+                    cell5x.setCellStyle(cellStyle);
 
                     Cell cell6x = row6.createCell(i+1);
                     Integer value = weekProcessInstanceList.stream().filter(p->name.equals(p.getProcessName())).map(WfProcessInstance::getInstanceNums).collect(Collectors.toList()).get(0);
                     cell6x.setCellValue(value == null ? "0" : String.valueOf(value));
+                    cell6x.setCellStyle(cellStyle);
                 }
             }
 
-            Row row7 = sheet.createRow(7);
+            Row row7 = sheet.createRow(10);
             row7.setHeight((short) 500);
             Cell cell70 = row7.createCell(0);
             cell70.setCellValue("分管领导关注度");
+            cell70.setCellStyle(cellStyle);
             Cell cell74 = row7.createCell(4);
             cell74.setCellValue("分管领导流程审批数量");
+            cell74.setCellStyle(cellStyle);
 
-            Row row8 = sheet.createRow(8);
+            Row row8 = sheet.createRow(11);
             row8.setHeight((short) 500);
             Cell cell80 = row8.createCell(0);
             cell80.setCellValue("分管领导");
+            cell80.setCellStyle(cellStyle);
             Cell cell81 = row8.createCell(1);
             cell81.setCellValue("关注度");
+            cell81.setCellStyle(cellStyle);
             for (int i = 0; i < chargeUserLogin.size(); i++) {
-                Row rowx = sheet.createRow(9+i);
+                Row rowx = sheet.createRow(12+i);
                 rowx.setHeight((short) 500);
                 Cell cellx1 = rowx.createCell(0);
                 cellx1.setCellValue(chargeUserLogin.get(i).getName());
+                cellx1.setCellStyle(cellStyle);
 
                 Cell cellx2 = rowx.createCell(1);
                 cellx2.setCellValue(chargeUserLogin.get(i).getNum());
+                cellx2.setCellStyle(cellStyle);
             }
 
             Cell cell84 = row8.createCell(4);
             cell84.setCellValue("分管领导");
+            cell84.setCellStyle(cellStyle);
             Cell cell85 = row8.createCell(5);
             cell85.setCellValue("分管领导流程审批数量");
+            cell85.setCellStyle(cellStyle);
             for (int i = 0; i < chargeUserCheckNums.size(); i++) {
-                Row rowx = sheet.createRow(9+i);
+                Row rowx = sheet.createRow(12+i);
+                rowx.setHeight((short) 500);
                 Cell cellx1 = rowx.createCell(0);
                 cellx1.setCellValue(chargeUserCheckNums.get(i).getAdUserName());
+                cellx1.setCellStyle(cellStyle);
 
                 Cell cellx2 = rowx.createCell(1);
                 cellx2.setCellValue(chargeUserCheckNums.get(i).getInstanceNums());
+                cellx2.setCellStyle(cellStyle);
             }
 
-            Row row12 = sheet.createRow(chargeNums+9);
+            Row row12 = sheet.createRow(chargeNums+12);
             row12.setHeight((short) 500);
             Cell cell120 = row12.createCell(0);
             cell120.setCellValue("系统数据情况");
+            cell120.setCellStyle(cellStyle);
 
-            Row row13 = sheet.createRow(chargeNums+10);
+            Row row13 = sheet.createRow(chargeNums+13);
             row13.setHeight((short) 500);
             Cell cell130 = row13.createCell(0);
             cell130.setCellValue("项目总数");
+            cell130.setCellStyle(cellStyle);
             Cell cell131 = row13.createCell(1);
             cell131.setCellValue(String.valueOf(map.get("prjNum")));
+            cell131.setCellStyle(cellStyle);
             Cell cell132 = row13.createCell(2);
             cell132.setCellValue("本周新增项目数");
+            cell132.setCellStyle(cellStyle);
             Cell cell133 = row13.createCell(3);
             cell133.setCellValue(String.valueOf(map.get("timeFrameNewPrjNums")));
+            cell133.setCellStyle(cellStyle);
 
-            Row row14 = sheet.createRow(chargeNums+11);
+            Row row14 = sheet.createRow(chargeNums+14);
             row14.setHeight((short) 500);
             Cell cell140 = row14.createCell(0);
             cell140.setCellValue("立项完成数量");
+            cell140.setCellStyle(cellStyle);
             Cell cell141 = row14.createCell(1);
             cell141.setCellValue(String.valueOf(map.get("pmPrjReqNums")));
+            cell141.setCellStyle(cellStyle);
             Cell cell142 = row14.createCell(2);
             cell142.setCellValue("可研完成数量");
+            cell142.setCellStyle(cellStyle);
             Cell cell143 = row14.createCell(3);
             cell143.setCellValue(String.valueOf(map.get("invest1Nums")));
+            cell143.setCellStyle(cellStyle);
             Cell cell144 = row14.createCell(4);
             cell144.setCellValue("初概完成数量");
+            cell144.setCellStyle(cellStyle);
             Cell cell145 = row14.createCell(5);
             cell145.setCellValue(String.valueOf(map.get("invest2Nums")));
+            cell145.setCellStyle(cellStyle);
 
-            Row row15 = sheet.createRow(chargeNums+12);
+            Row row15 = sheet.createRow(chargeNums+15);
             row15.setHeight((short) 500);
             Cell cell150 = row15.createCell(0);
             cell150.setCellValue("在建项目数量");
+            cell150.setCellStyle(cellStyle);
             Cell cell151 = row15.createCell(1);
             cell151.setCellValue(String.valueOf(map.get("zaiJianPrjNum")));
+            cell151.setCellStyle(cellStyle);
             Cell cell152 = row15.createCell(2);
             cell152.setCellValue("项目投资总额");
+            cell152.setCellStyle(cellStyle);
             Cell cell153 = row15.createCell(3);
             cell153.setCellValue(String.valueOf(map.get("projectAllTotalInvest")));
+            cell153.setCellStyle(cellStyle);
             Cell cell154 = row15.createCell(4);
             cell154.setCellValue("在建项目建安总额");
+            cell154.setCellStyle(cellStyle);
             Cell cell155 = row15.createCell(5);
             cell155.setCellValue(String.valueOf(map.get("zaiJianJianAnAmt")));
+            cell155.setCellStyle(cellStyle);
 
-            Row row16 = sheet.createRow(chargeNums+13);
+            Row row16 = sheet.createRow(chargeNums+16);
             row16.setHeight((short) 500);
             Cell cell160 = row16.createCell(0);
             cell160.setCellValue("合同总数量");
+            cell160.setCellStyle(cellStyle);
             Cell cell161 = row16.createCell(1);
             cell161.setCellValue(String.valueOf(map.get("orderNums")));
+            cell161.setCellStyle(cellStyle);
             Cell cell162 = row16.createCell(2);
             cell162.setCellValue("本周新签合同总金额");
+            cell162.setCellStyle(cellStyle);
             Cell cell163 = row16.createCell(3);
             cell163.setCellValue(String.valueOf(map.get("timeFrameOrderAmt")));
+            cell163.setCellStyle(cellStyle);
 
             String realFileName = title + ".xls";
             String path = filePath + realFileName;

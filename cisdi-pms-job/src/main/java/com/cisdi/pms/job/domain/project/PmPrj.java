@@ -171,4 +171,19 @@ public class PmPrj extends BaseCommon {
     // 计划完工时间
     private String planEndDate;
 
+    // 项目总数
+    private Integer prjAllNums;
+
+    // 政府投资项目数
+    private Integer zfPrjNums;
+
+    // 社会投资项目数
+    private Integer shPrjNums;
+
+    // 设备项目数
+    private Integer sbPrjNums;
+
+    // 零星项目数
+    private Integer lxPrjNums;
+
 }
