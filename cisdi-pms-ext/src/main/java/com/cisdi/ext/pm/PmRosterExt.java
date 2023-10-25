@@ -73,6 +73,25 @@ public class PmRosterExt {
     }
 
     /**
+     * 根据岗位id获取岗位对应编码
+     * @param idList id集合
+     * @param myJdbcTemplate 数据源
+     * @return 岗位编码
+     */
+    public static List<String> getPostCodeById(List<String> idList, MyJdbcTemplate myJdbcTemplate) {
+        String ids = String.join("','",idList);
+        List<String> list = new ArrayList<>();
+        String sql = "select group_concat(code) as code from post_info where id in ('"+ids+"')";
+        List<Map<String,Object>> codeList = myJdbcTemplate.queryForList(sql);
+        if (!CollectionUtils.isEmpty(codeList)){
+            String codeStr = JdbcMapUtil.getString(codeList.get(0),"code");
+            list = new ArrayList<>(Arrays.asList(codeStr.split(",")));
+            list = list.stream().distinct().collect(Collectors.toList());
+        }
+        return list;
+    }
+
+    /**
      * 花名册列表查询
      */
     public void pmRosterList() {

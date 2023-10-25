@@ -2,6 +2,7 @@ package com.cisdi.ext.pm.processCommon;
 
 import cn.hutool.core.util.IdUtil;
 import com.cisdi.ext.base.PmPrjExt;
+import com.cisdi.ext.base.PostExt;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.*;
 import com.cisdi.ext.model.base.AdRoleUser;
@@ -455,15 +456,39 @@ public class ProcessCommon {
      * @param myJdbcTemplate 数据源
      */
     public static void addPrjPostUser(String projectId, String entCode, String processId, String companyId, String csCommId, MyJdbcTemplate myJdbcTemplate) {
+        List<PmRoster> rosterList = new ArrayList<>();
+
+        String postCode = PostExt.getPostByProcess(processId,myJdbcTemplate); // 获取该流程所有需要审批的岗位编码
+        if (StringUtils.hasText(postCode)){
+            rosterSecondVersion(rosterList,postCode,entCode,csCommId,projectId,myJdbcTemplate); // 花名册更新人员信息新版本方式
+        }
+        if (CollectionUtils.isEmpty(rosterList)){ // 第一版花名册更新人员信息方式
+            rosterFirstVersion(processId,companyId,rosterList,entCode,csCommId,projectId,myJdbcTemplate);
+        }
+        if (!CollectionUtils.isEmpty(rosterList)){
+            PmRosterExt.updatePrjUser(rosterList);
+        }
+
+    }
+
+    /**
+     * 第一版花名册更新人员信息方式
+     * @param processId 流程id
+     * @param companyId 业主单位id
+     * @param rosterList 返回的花名册信息
+     * @param entCode 流程表单名称
+     * @param csCommId 流程表单单条记录id
+     * @param projectId 项目id
+     * @param myJdbcTemplate 数据源
+     */
+    private static void rosterFirstVersion(String processId, String companyId, List<PmRoster> rosterList, String entCode,String csCommId, String projectId, MyJdbcTemplate myJdbcTemplate) {
+        List<String> adEntAtt = LinkSql.getEntCodeAtt(entCode,myJdbcTemplate); // 查询该表单所有字段
         //查询该流程所有流程岗位信息
         List<Map<String,Object>> procPostList = LinkSql.getProcessPostByProcessCompany(processId,companyId,myJdbcTemplate);
         if (!CollectionUtils.isEmpty(procPostList)){
             //取出流程岗位id
             List<String> deptId = procPostList.stream().map(p->JdbcMapUtil.getString(p,"id")).filter(p->!SharedUtil.isEmptyString(p)).collect(Collectors.toList());
             if (!CollectionUtils.isEmpty(deptId)){
-                //查询该表单所有字段
-                List<String> adEntAtt = LinkSql.getEntCodeAtt(entCode,myJdbcTemplate);
-                List<PmRoster> rosterList = new ArrayList<>();
                 //循环遍历每个岗位人员(优先取数表单，其次花名册)
                 for (String tp : deptId) {
                     //查询该流程岗位对应的字段
@@ -490,8 +515,37 @@ public class ProcessCommon {
                         }
                     }
                 }
-                if (!CollectionUtils.isEmpty(rosterList)){
-                    PmRosterExt.updatePrjUser(rosterList);
+            }
+        }
+    }
+
+    /**
+     * 根据岗位信息获取表单中填报的岗位人员
+     * @param rosterList 返回的花名册信息
+     * @param postCode 岗位编码
+     * @param entCode 流程表单
+     * @param csCommId 流程单条记录
+     * @param projectId 项目id
+     * @param myJdbcTemplate 数据源
+     */
+    private static void rosterSecondVersion(List<PmRoster> rosterList, String postCode, String entCode, String csCommId, String projectId, MyJdbcTemplate myJdbcTemplate) {
+        List<String> codeList = new ArrayList<>(Arrays.asList(postCode.split(",")));
+        codeList.stream().distinct().collect(Collectors.toList());
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select * from "+entCode+" where id = ?",csCommId);
+        if (!CollectionUtils.isEmpty(list)){
+            for (String code : codeList) {
+                String user = JdbcMapUtil.getString(list.get(0),code);
+                if (StringUtils.hasText(user)){
+                    List<Map<String,Object>> list2 = myJdbcTemplate.queryForList("select id from post_info where find_in_set(?,code)",code);
+                    String postId = JdbcMapUtil.getString(list2.get(0),"id");
+                    String[] prjIdArr = projectId.split(",");
+                    for (String prjId : prjIdArr) {
+                        PmRoster pmRoster = new PmRoster();
+                        pmRoster.setPmPrjId(prjId);
+                        pmRoster.setPostInfoId(postId); //岗位id
+                        pmRoster.setAdUserId(user);
+                        rosterList.add(pmRoster);
+                    }
                 }
             }
         }

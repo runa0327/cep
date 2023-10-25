@@ -126,4 +126,10 @@ public interface PmPrjMapper {
      * @return 项目投资总额
      */
     String queryTotalAmtByProjectIds(@Param("list") List<String> projectIdList);
+
+    /**
+     * 获取项目数量情况
+     * @return 查询结果
+     */
+    PmPrj queryPrjNums();
 }

@@ -1200,9 +1200,12 @@ public class AttLinkExtDetail {
      * @param myJdbcTemplate 数据源
      */
     public static void autoPostUser(String entCode, String attValue, String companyId, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
-        List<String> editList = AttLinkDifferentProcess.getLinkUserProcessEdit(); // 放开验证，花名册取数皆可改
         //查询项目花名册信息
-        List<Map<String,Object>> list = LinkSql.getPrjPostUser(attValue,companyId,myJdbcTemplate);
+        List<Map<String,Object>> list;
+        list = LinkSql.getPrjPostUserSecondVersion(attValue,myJdbcTemplate); // 新版属性联动带出花名册-不区分业主单位
+        if (CollectionUtils.isEmpty(list)){
+            list = LinkSql.getPrjPostUser(attValue,companyId,myJdbcTemplate); // 第一版属性联动带出花名册-区分业主单位
+        }
         if (!CollectionUtils.isEmpty(list)){
             for (Map<String, Object> tmp : list) {
                 String userId = JdbcMapUtil.getString(tmp,"AD_USER_ID");

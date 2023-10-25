@@ -1,6 +1,8 @@
 package com.cisdi.pms.job.utils;
 
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.RegionUtil;
 
 import static org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND;
 
@@ -45,5 +47,16 @@ public class PoiExcelUtils {
         content.setBorderLeft(BorderStyle.THIN);
         content.setWrapText(true); //开启换行
         return content;
+    }
+
+    /**
+     * 合并单元格添加边框
+     * @param cell cell
+     */
+    public static void createBorder(CellRangeAddress cell, Sheet sheet) {
+        RegionUtil.setBorderBottom(BorderStyle.THIN,cell,sheet);
+        RegionUtil.setBorderTop(BorderStyle.THIN,cell,sheet);
+        RegionUtil.setBorderRight(BorderStyle.THIN,cell,sheet);
+        RegionUtil.setBorderLeft(BorderStyle.THIN,cell,sheet);
     }
 }
