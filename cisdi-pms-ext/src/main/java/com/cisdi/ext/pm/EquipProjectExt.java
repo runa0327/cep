@@ -180,7 +180,7 @@ public class EquipProjectExt {
      */
     public void engineeringProject() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_prj where status='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and PROJECT_CLASSIFICATION_ID in ('1704686664114929664','1704686699527438336') order by pm_code desc");
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_prj where status='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and PROJECT_CLASSIFICATION_ID in ('1704686664114929664','1704686699527438336','1704686841525600256') order by pm_code desc");
         if (CollectionUtils.isEmpty(list)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
