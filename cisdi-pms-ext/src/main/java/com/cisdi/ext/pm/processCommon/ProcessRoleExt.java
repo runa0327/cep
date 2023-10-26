@@ -1158,6 +1158,156 @@ public class ProcessRoleExt {
                 ExtJarHelper.returnValue.set(user);
             }
         }
+    }
 
+    /**
+     * 角色-根据公司区分-前期管理部负责人
+     */
+    public void getEarlyLeaderByCompany(){
+        getDeptLeaderByCompany("CHIEF_USER_ID","post_early","前期管理部负责人");
+    }
+
+    /**
+     * 角色-根据公司区分-前期管理部分管领导
+     */
+    public void getEarlyChargeByCompany(){
+        getDeptLeaderByCompany("AD_USER_ID","post_early","前期管理部分管领导");
+    }
+
+    /**
+     * 角色-根据公司区分-采购管理部负责人
+     */
+    public void getBuyLeaderByCompany(){
+        getDeptLeaderByCompany("CHIEF_USER_ID","post_buy","采购管理部负责人");
+    }
+
+    /**
+     * 角色-根据公司区分-采购管理部分管领导
+     */
+    public void getBuyChargeByCompany(){
+        getDeptLeaderByCompany("AD_USER_ID","post_buy","采购管理部分管领导");
+    }
+
+    /**
+     * 角色-根据公司区分-财务金融部负责人
+     */
+    public void getFinanceLeaderByCompany(){
+        getDeptLeaderByCompany("CHIEF_USER_ID","post_finance","财务金融部负责人");
+    }
+
+    /**
+     * 角色-根据公司区分-财务金融部分管领导
+     */
+    public void getFinanceChargeByCompany(){
+        getDeptLeaderByCompany("AD_USER_ID","post_finance","财务金融部分管领导");
+    }
+
+    /**
+     * 角色-根据公司区分-工程管理部负责人
+     */
+    public void getEngineeringLeaderByCompany(){
+        getDeptLeaderByCompany("CHIEF_USER_ID","post_engineering","工程管理部负责人");
+    }
+
+    /**
+     * 角色-根据公司区分-工程管理部分管领导
+     */
+    public void getEngineeringChargeByCompany(){
+        getDeptLeaderByCompany("AD_USER_ID","post_engineering","工程管理部分管领导");
+    }
+
+    /**
+     * 角色-根据公司区分-设计管理部负责人
+     */
+    public void getDesignLeaderByCompany(){
+        getDeptLeaderByCompany("CHIEF_USER_ID","post_design","设计管理部负责人");
+    }
+
+    /**
+     * 角色-根据公司区分-设计管理部分管领导
+     */
+    public void getDesignChargeByCompany(){
+        getDeptLeaderByCompany("AD_USER_ID","post_design","设计管理部分管领导");
+    }
+
+    /**
+     * 角色-根据公司区分-成本合约部负责人
+     */
+    public void getCostLeaderByCompany(){
+        getDeptLeaderByCompany("CHIEF_USER_ID","post_cost","成本合约负责人");
+    }
+
+    /**
+     * 角色-根据公司区分-成本合约部分管领导
+     */
+    public void getCostChargeByCompany(){
+        getDeptLeaderByCompany("AD_USER_ID","post_cost","成本合约部分管领导");
+    }
+
+    /**
+     * 角色-根据公司区分-法务管理部负责人
+     */
+    public void getLegalLeaderByCompany(){
+        getDeptLeaderByCompany("CHIEF_USER_ID","post_legal","法务管理部负责人");
+    }
+
+    /**
+     * 角色-根据公司区分-法务管理部分管领导
+     */
+    public void getLegalChargeByCompany(){
+        getDeptLeaderByCompany("AD_USER_ID","post_legal","法务管理部分管领导");
+    }
+
+    /**
+     * 角色-根据公司区分-律师顾问负责人
+     */
+    public void getLawLeaderByCompany(){
+        getDeptLeaderByCompany("CHIEF_USER_ID","post_law","律师顾问负责人");
+    }
+
+    /**
+     * 角色-根据公司区分-律师顾问分管领导
+     */
+    public void getLawChargeByCompany(){
+        getDeptLeaderByCompany("AD_USER_ID","post_law","律师顾问分管领导");
+    }
+
+    /**
+     * 角色-根据公司区分-查询各部门分管领导、负责人等
+     * @param column 被查询字段
+     * @param postCode 部门编码
+     * @param roleName 角色名称
+     */
+    public void getDeptLeaderByCompany(String column, String postCode, String roleName) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //内部单位
+        String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"COMPANY_ID");
+        if (StringUtils.hasText(companyId)){
+            String sql = "select "+column+" from HR_DEPT where code = ? and hr_dept_pid = ?";
+            List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,postCode,companyId);
+            if (!CollectionUtils.isEmpty(list)){
+                String userIds = JdbcMapUtil.getString(list.get(0), column);
+                returnUser(userIds);
+            } else {
+                throw new BaseException("该公司 ‘"+roleName+"' 未配置人员，请先选择对应人员或联系管理员处理！");
+            }
+        } else {
+            throw new BaseException("内部单位不能为空");
+        }
+    }
+
+    /**
+     * 角色通用返回人员设置
+     * @param userIds 人员id
+     */
+    private void returnUser(String userIds) {
+        if (StringUtils.hasText(userIds)){
+            List<String> list = new ArrayList<>();
+            list.add(userIds);
+            ExtJarHelper.returnValue.set(list);
+        } else {
+            throw new BaseException("未匹配到对应审批人，请联系管理员核查");
+        }
     }
 }
