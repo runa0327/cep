@@ -282,8 +282,11 @@ public class PmPrjIdLink {
      * @param myJdbcTemplate 数据源
      */
     public static void nodeDetail(String projectId, String sevId, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
-//        List<Map<String, Object>> list = LinkSql.getPrjNodeLevel3(projectId,myJdbcTemplate);
-        List<Map<String, Object>> list = ProPlanUtils.sortLevel3(projectId);
+        List<Map<String,Object>> list = ProPlanUtils.queryLevel3HaveNodeType(projectId,myJdbcTemplate);
+        List<Map<String, Object>> list1 = ProPlanUtils.queryLevel3(projectId,myJdbcTemplate);
+        if (!CollectionUtils.isEmpty(list1)){
+            list.addAll(list1);
+        }
         if (CollectionUtils.isEmpty(list)) {
             throw new BaseException("该项目不存在项目进度节点信息，请先处理！");
         } else {
@@ -293,6 +296,10 @@ public class PmPrjIdLink {
                     LinkedRecord linkedRecord = new LinkedRecord();
 
                     String planName = JdbcMapUtil.getString(tmp, "nodeName");
+                    String typeName = JdbcMapUtil.getString(tmp,"typeName");
+                    if (StringUtils.hasText(typeName)){
+                        planName = planName + "(" + typeName + ")";
+                    }
 
                     //计划完成日期
                     linkedRecord.valueMap.put("PLAN_COMPL_DATE", JdbcMapUtil.getString(tmp, "PLAN_COMPL_DATE"));
@@ -314,6 +321,9 @@ public class PmPrjIdLink {
                     //项目进度计划节点
                     linkedRecord.valueMap.put("PM_PRO_PLAN_NODE_ID", JdbcMapUtil.getString(tmp, "id"));
                     linkedRecord.textMap.put("PM_PRO_PLAN_NODE_ID", planName);
+
+                    linkedRecord.textMap.put("NAME_ONE", planName);
+                    linkedRecord.valueMap.put("NAME_ONE", planName);
 
                     //TODO 操作类型字段返回  JdbcMapUtil.getString(tmp, "OPREATION_TYPE")
 
