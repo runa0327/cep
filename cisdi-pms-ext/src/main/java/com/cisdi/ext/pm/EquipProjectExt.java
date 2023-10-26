@@ -77,9 +77,10 @@ public class EquipProjectExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pm.id as eq_id,pm.pm_code as eq_code,pm.`NAME` as eq_name,pp.`NAME` as owner_name,pp.id as prj_id," +
                 "round(ifnull(pm.EQUIPMENT_PURCHASE_BUDGET_AMOUNT,0),2) as eq_amt,pm.RESEARCH_RANGE as eq_range_id,\n" +
-                "gs.`NAME` as eq_range,pm.PRJ_SITUATION as eq_situation,pm.REPORT_FILE as report_file,pm.REPLY_NO \n" +
+                "gs.`NAME` as eq_range,pm.PRJ_SITUATION as eq_situation,pm.REPORT_FILE as report_file,pm.REPLY_NO,pm.COMPANY_ID,hd.name as companyName \n" +
                 "from pm_prj pm left join pm_prj pp on pm.SUBORDINATE_PROJECT = pp.ID\n" +
                 "left join gr_set_value gs on gs.id = pm.RESEARCH_RANGE\n" +
+                " left join hr_dept hd on hd.id = pm.COMPANY_ID "+
                 "where pm.PROJECT_CLASSIFICATION_ID ='1704686735267102720' and pm.id=?", map.get("id"));
         if (CollectionUtils.isEmpty(list)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
@@ -164,6 +165,11 @@ public class EquipProjectExt {
         } else {
             sb.append(" ,PRJ_SITUATION=null");
         }
+        if (StringUtils.hasText(inputData.companyId)) {
+            sb.append(" ,COMPANY_ID='").append(inputData.companyId).append("'");
+        } else {
+            sb.append(" ,COMPANY_ID=null");
+        }
         if (StringUtils.hasText(inputData.fileIds)) {
             sb.append(" ,REPORT_FILE='").append(inputData.fileIds).append("'");
         } else {
@@ -210,6 +216,8 @@ public class EquipProjectExt {
         info.eqRangId = JdbcMapUtil.getString(dataMap, "eq_range_id");
         info.reNo = JdbcMapUtil.getString(dataMap, "REPLY_NO");
         info.eqDes = JdbcMapUtil.getString(dataMap, "eq_situation");
+        info.companyId = JdbcMapUtil.getString(dataMap, "COMPANY_ID");
+        info.companyName = JdbcMapUtil.getString(dataMap, "companyName");;
         return info;
     }
 
@@ -248,6 +256,10 @@ public class EquipProjectExt {
         public String eqRange;
         public String reNo;
         public String eqDes;
+
+        public String companyId;
+
+        public String companyName;
 
         public List<FileObj> fileObjList;
     }
@@ -292,6 +304,7 @@ public class EquipProjectExt {
         public String reNo;
         public String desc;
         public String fileIds;
+        public String companyId;
     }
 
 }

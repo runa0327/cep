@@ -67,7 +67,7 @@ public class PmStartExt {
                 " pj.id as project_id, " +
                 " pj.name as project_name ," +
                 " pj.ver as project_ver, " +
-                " sv.`NAME` as PROJECT_CLASSIFICATION "+
+                " sv.`NAME` as PROJECT_CLASSIFICATION " +
                 "FROM " +
                 " PRJ_START ps  " +
                 " LEFT JOIN gr_set_value gsv ON gsv.id = ps.PROJECT_TYPE_ID " +
@@ -76,7 +76,7 @@ public class PmStartExt {
                 " left join ad_user au on au.id = ps.AGENT " +
                 " left join gr_set_value gg on gg.id = ps.TENDER_MODE_ID " +
                 " left join pm_prj pj on pj.pm_code = ps.pm_code " +
-                " left join gr_set_value sv on sv.id = ps.PROJECT_CLASSIFICATION_ID "+
+                " left join gr_set_value sv on sv.id = ps.PROJECT_CLASSIFICATION_ID " +
                 " WHERE " +
                 " ps.`STATUS` = 'ap'");
         if (!StringUtils.isEmpty(map.get("projectName"))) {
@@ -167,8 +167,10 @@ public class PmStartExt {
                 " ggs.`NAME` as location," +
                 " ps.PLAN_START_TIME," +
                 " ps.PLAN_END_TIME, " +
-                " ps.PROJECT_CLASSIFICATION_ID, "+
-                " sv.`NAME` as PROJECT_CLASSIFICATION "+
+                " ps.PROJECT_CLASSIFICATION_ID, " +
+                " sv.`NAME` as PROJECT_CLASSIFICATION, " +
+                " ps.COMPANY_ID, " +
+                " hd.name as companyName " +
                 "FROM " +
                 " PRJ_START ps " +
                 " left join gr_set_value gg on gg.id = ps.INVESTMENT_SOURCE_ID " +
@@ -180,7 +182,8 @@ public class PmStartExt {
                 " left join gr_set_value gq on gq.id = ps.TENDER_MODE_ID" +
                 " left join ad_user aa on aa.id = ps.AD_USER_ID " +
                 " left join gr_set_value ggs on ggs.id = ps.BASE_LOCATION_ID " +
-                " left join gr_set_value sv on sv.id = ps.PROJECT_CLASSIFICATION_ID "+
+                " left join gr_set_value sv on sv.id = ps.PROJECT_CLASSIFICATION_ID " +
+                " left join hr_dept hd on ps.COMPANY_ID = hd.id " +
                 " WHERE " +
                 " ps.`STATUS` = 'ap' and ps.id=?", map.get("id"));
         if (CollectionUtils.isEmpty(list)) {
@@ -216,8 +219,10 @@ public class PmStartExt {
                 pmStart.location = JdbcMapUtil.getString(m, "location");
                 pmStart.planStartTime = JdbcMapUtil.getString(m, "PLAN_START_TIME");
                 pmStart.planEndTime = JdbcMapUtil.getString(m, "PLAN_END_TIME");
-                pmStart.projectClassificationId =  JdbcMapUtil.getString(m, "PROJECT_CLASSIFICATION_ID");
-                pmStart.projectClassification =  JdbcMapUtil.getString(m, "PROJECT_CLASSIFICATION");
+                pmStart.projectClassificationId = JdbcMapUtil.getString(m, "PROJECT_CLASSIFICATION_ID");
+                pmStart.projectClassification = JdbcMapUtil.getString(m, "PROJECT_CLASSIFICATION");
+                pmStart.companyId = JdbcMapUtil.getString(m, "COMPANY_ID");
+                pmStart.companyName = JdbcMapUtil.getString(m, "companyName");
                 return pmStart;
             }).collect(Collectors.toList());
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(dataList.get(0)), Map.class);
@@ -265,7 +270,7 @@ public class PmStartExt {
                 .set("BUILDER_UNIT", input.unit).set("START_TIME", input.startTime).set("AGENT", input.userId).set("PRJ_START_STATUS_ID", status).set("START_REMARK", input.startRemark)
                 .set("ATT_FILE_GROUP_ID", input.fileIds).set("INVESTMENT_SOURCE_ID", input.sourceTypeId).set("PRJ_SITUATION", input.description).set("START_TIME", input.startTime)
                 .set("LOCATION_INFO", location).set("AD_USER_ID", input.qqUserId).set("BASE_LOCATION_ID", input.locationId).set("PLAN_START_TIME", input.planStartTime)
-                .set("PLAN_END_TIME", input.planEndTime).set("PROJECT_CLASSIFICATION_ID", input.projectClassificationId).exec();
+                .set("PLAN_END_TIME", input.planEndTime).set("PROJECT_CLASSIFICATION_ID", input.projectClassificationId).set("COMPANY_ID", input.companyId).exec();
     }
 
     /**
@@ -669,6 +674,10 @@ public class PmStartExt {
         public String projectClassificationId;
 
         public String projectClassification;
+
+        public String companyId;
+
+        public String companyName;
     }
 
     public static class inputData {
@@ -716,6 +725,8 @@ public class PmStartExt {
 
         //项目类别
         public String projectClassificationId;
+
+        public String companyId;
     }
 
     public static class FileInfo {
