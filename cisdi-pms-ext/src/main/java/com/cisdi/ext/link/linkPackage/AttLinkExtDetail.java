@@ -336,9 +336,11 @@ public class AttLinkExtDetail {
         LinkUtils.mapAddAllValue("PROJECT_CLASSIFICATION_ID",AttDataTypeE.TEXT_LONG,projectClassTypeId,projectClassTypeName,true,true,false,attLinkResult);
 
         String companyId = JdbcMapUtil.getString(row,"COMPANY_ID"); //  内部管理单位
-        String companyName = HrDept.selectById(companyId).getName();
-        LinkUtils.mapAddAllValue("COMPANY_ID",AttDataTypeE.TEXT_LONG,companyId,companyName,true,true,false,attLinkResult);
-
+        if (StringUtils.hasText(companyId)){
+            String companyName = HrDept.selectById(companyId).getName();
+            LinkUtils.mapAddAllValue("COMPANY_ID",AttDataTypeE.TEXT_LONG,companyId,companyName,true,true,false,attLinkResult);
+        }
+        
         if (!"PM_PRJ_REQ".equals(entCode)){
             mapAddValue("PRJ_REPLY_DATE","PRJ_REPLY_DATE",row,AttDataTypeE.DATE,attLinkResult); //批复日期
         }
