@@ -5,8 +5,10 @@ import com.cisdi.ext.link.AttLinkProcessDetail;
 import com.cisdi.ext.link.AttLinkResult;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.link.LinkedRecord;
+import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.LinkedAttModel;
 import com.cisdi.ext.model.PostInfo;
+import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.pm.PmDeptExt;
 import com.cisdi.ext.pm.PmRosterExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -334,5 +336,26 @@ public class PmPrjIdLink {
                 attLinkResult.childClear.put("1658642775492775936", true);
             }
         }
+    }
+
+    /**
+     * 项目名称及内部管理单位赋值
+     * @param prjIds 项目ids(需提前判断是否为空)
+     * @param projectId 项目id(查询内部管理单位)
+     * @param attLinkResult 联动返回值
+     * @param myJdbcTemplate 数据源
+     */
+    public static void prjNameAndCompanyValue(String prjIds,String projectId, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
+        String projectIds = prjIds.replace(",","','");
+        String projectName = JdbcMapUtil.getString(myJdbcTemplate.queryForList("select group_concat(name) as name from pm_prj where id in ('"+projectIds+"')").get(0),"name");
+        PmPrj pmPrj = PmPrj.selectById(projectId);
+        if (pmPrj != null){
+            String companyId = pmPrj.getCompanyId();
+            if (StringUtils.hasText(companyId)){
+                String companyName = HrDept.selectById(companyId).getName();
+                LinkUtils.mapAddAllValue("COMPANY_ID", AttDataTypeE.TEXT_LONG,companyId,companyName,true,true,false,attLinkResult);
+            }
+        }
+        LinkUtils.mapAddAllValue("PM_PRJ_IDS",AttDataTypeE.TEXT_LONG,prjIds,projectName,true,true,false,attLinkResult);
     }
 }

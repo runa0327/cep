@@ -93,14 +93,6 @@ public class PmPrj {
          */
         public static final String REMARK = "REMARK";
         /**
-         * 实际开工时间。
-         */
-        public static final String ACTUAL_START_TIME = "ACTUAL_START_TIME";
-        /**
-         * 计划开工时间。
-         */
-        public static final String PLAN_START_TIME = "PLAN_START_TIME";
-        /**
          * 是否导入的记录。
          */
         public static final String IS_IMPORT = "IS_IMPORT";
@@ -109,13 +101,21 @@ public class PmPrj {
          */
         public static final String TENDER_MODE_ID = "TENDER_MODE_ID";
         /**
-         * 实际竣工时间。
+         * 计划开工时间。
          */
-        public static final String ACTUAL_END_TIME = "ACTUAL_END_TIME";
+        public static final String PLAN_START_TIME = "PLAN_START_TIME";
         /**
          * 计划竣工时间。
          */
         public static final String PLAN_END_TIME = "PLAN_END_TIME";
+        /**
+         * 实际开工时间。
+         */
+        public static final String ACTUAL_START_TIME = "ACTUAL_START_TIME";
+        /**
+         * 实际竣工时间。
+         */
+        public static final String ACTUAL_END_TIME = "ACTUAL_END_TIME";
         /**
          * 记录状态。
          */
@@ -136,6 +136,14 @@ public class PmPrj {
          * 业主单位。
          */
         public static final String CUSTOMER_UNIT = "CUSTOMER_UNIT";
+        /**
+         * 项目类别。
+         */
+        public static final String PROJECT_CLASSIFICATION_ID = "PROJECT_CLASSIFICATION_ID";
+        /**
+         * 公司。
+         */
+        public static final String COMPANY_ID = "COMPANY_ID";
         /**
          * 项目管理模式。
          */
@@ -168,10 +176,6 @@ public class PmPrj {
          * 其他。
          */
         public static final String OTHER = "OTHER";
-        /**
-         * 数量2。
-         */
-        public static final String QTY_TWO = "QTY_TWO";
         /**
          * 数量3。
          */
@@ -225,34 +229,6 @@ public class PmPrj {
          */
         public static final String IZ_END = "IZ_END";
         /**
-         * 立项申请。
-         */
-        public static final String PM_PRJ_REQ_ID = "PM_PRJ_REQ_ID";
-        /**
-         * 立项批复文号。
-         */
-        public static final String PRJ_REPLY_NO = "PRJ_REPLY_NO";
-        /**
-         * 立项批复日期。
-         */
-        public static final String PRJ_REPLY_DATE = "PRJ_REPLY_DATE";
-        /**
-         * 立项批复材料。
-         */
-        public static final String PRJ_REPLY_FILE = "PRJ_REPLY_FILE";
-        /**
-         * 项目前期岗。
-         */
-        public static final String PRJ_EARLY_USER_ID = "PRJ_EARLY_USER_ID";
-        /**
-         * 项目设计岗。
-         */
-        public static final String PRJ_DESIGN_USER_ID = "PRJ_DESIGN_USER_ID";
-        /**
-         * 项目成本岗。
-         */
-        public static final String PRJ_COST_USER_ID = "PRJ_COST_USER_ID";
-        /**
          * 进入省库。
          */
         public static final String IN_PROVINCE_REP = "IN_PROVINCE_REP";
@@ -261,37 +237,9 @@ public class PmPrj {
          */
         public static final String IN_COUNTRY_REP = "IN_COUNTRY_REP";
         /**
-         * 建设单位。
-         */
-        public static final String BUILDER_UNIT = "BUILDER_UNIT";
-        /**
-         * 勘察单位。
-         */
-        public static final String SURVEYOR_UNIT = "SURVEYOR_UNIT";
-        /**
          * 项目编号。
          */
         public static final String PRJ_CODE = "PRJ_CODE";
-        /**
-         * 设计单位。
-         */
-        public static final String DESIGNER_UNIT = "DESIGNER_UNIT";
-        /**
-         * 施工单位。
-         */
-        public static final String CONSTRUCTOR_UNIT = "CONSTRUCTOR_UNIT";
-        /**
-         * 监理单位。
-         */
-        public static final String SUPERVISOR_UNIT = "SUPERVISOR_UNIT";
-        /**
-         * 检测单位。
-         */
-        public static final String CHECKER_UNIT = "CHECKER_UNIT";
-        /**
-         * 全过程造价单位。
-         */
-        public static final String CONSULTER_UNIT = "CONSULTER_UNIT";
         /**
          * 项目图片。
          */
@@ -329,6 +277,22 @@ public class PmPrj {
          */
         public static final String SETTLEMENT_AMT = "SETTLEMENT_AMT";
         /**
+         * 立项申请。
+         */
+        public static final String PM_PRJ_REQ_ID = "PM_PRJ_REQ_ID";
+        /**
+         * 立项批复文号。
+         */
+        public static final String PRJ_REPLY_NO = "PRJ_REPLY_NO";
+        /**
+         * 立项批复日期。
+         */
+        public static final String PRJ_REPLY_DATE = "PRJ_REPLY_DATE";
+        /**
+         * 立项批复材料。
+         */
+        public static final String PRJ_REPLY_FILE = "PRJ_REPLY_FILE";
+        /**
          * 项目建议书实际完成日期。
          */
         public static final String PROJECT_PROPOSAL_ACTUAL_DATE = "PROJECT_PROPOSAL_ACTUAL_DATE";
@@ -341,25 +305,53 @@ public class PmPrj {
          */
         public static final String STAMPED_PRJ_REQ_FILE = "STAMPED_PRJ_REQ_FILE";
         /**
-         * CPMS的UUID。
+         * 项目前期岗。
          */
-        public static final String CPMS_UUID = "CPMS_UUID";
+        public static final String PRJ_EARLY_USER_ID = "PRJ_EARLY_USER_ID";
         /**
-         * CPMS的ID。
+         * 项目设计岗。
          */
-        public static final String CPMS_ID = "CPMS_ID";
+        public static final String PRJ_DESIGN_USER_ID = "PRJ_DESIGN_USER_ID";
         /**
-         * CPMS建设地点。
+         * 项目成本岗。
          */
-        public static final String CPMS_CONSTRUCTION_SITE = "CPMS_CONSTRUCTION_SITE";
+        public static final String PRJ_COST_USER_ID = "PRJ_COST_USER_ID";
         /**
-         * 匡算总投资(万)。
+         * 建设单位。
          */
-        public static final String ESTIMATED_TOTAL_INVEST = "ESTIMATED_TOTAL_INVEST";
+        public static final String BUILDER_UNIT = "BUILDER_UNIT";
+        /**
+         * 勘察单位。
+         */
+        public static final String SURVEYOR_UNIT = "SURVEYOR_UNIT";
+        /**
+         * 设计单位。
+         */
+        public static final String DESIGNER_UNIT = "DESIGNER_UNIT";
+        /**
+         * 施工单位。
+         */
+        public static final String CONSTRUCTOR_UNIT = "CONSTRUCTOR_UNIT";
+        /**
+         * 监理单位。
+         */
+        public static final String SUPERVISOR_UNIT = "SUPERVISOR_UNIT";
+        /**
+         * 检测单位。
+         */
+        public static final String CHECKER_UNIT = "CHECKER_UNIT";
+        /**
+         * 全过程造价单位。
+         */
+        public static final String CONSULTER_UNIT = "CONSULTER_UNIT";
         /**
          * 工程费用（万）。
          */
         public static final String PROJECT_AMT = "PROJECT_AMT";
+        /**
+         * 匡算总投资(万)。
+         */
+        public static final String ESTIMATED_TOTAL_INVEST = "ESTIMATED_TOTAL_INVEST";
         /**
          * 建安工程费(万)。
          */
@@ -392,6 +384,38 @@ public class PmPrj {
          * 投资测算优先级。
          */
         public static final String INVEST_PRIORITY = "INVEST_PRIORITY";
+        /**
+         * 所属工程项目。
+         */
+        public static final String SUBORDINATE_PROJECT = "SUBORDINATE_PROJECT";
+        /**
+         * 设备采购预算金额。
+         */
+        public static final String EQUIPMENT_PURCHASE_BUDGET_AMOUNT = "EQUIPMENT_PURCHASE_BUDGET_AMOUNT";
+        /**
+         * 可研范围。
+         */
+        public static final String RESEARCH_RANGE = "RESEARCH_RANGE";
+        /**
+         * 报告附件。
+         */
+        public static final String REPORT_FILE = "REPORT_FILE";
+        /**
+         * 数量2。
+         */
+        public static final String QTY_TWO = "QTY_TWO";
+        /**
+         * CPMS的UUID。
+         */
+        public static final String CPMS_UUID = "CPMS_UUID";
+        /**
+         * CPMS的ID。
+         */
+        public static final String CPMS_ID = "CPMS_ID";
+        /**
+         * CPMS建设地点。
+         */
+        public static final String CPMS_CONSTRUCTION_SITE = "CPMS_CONSTRUCTION_SITE";
     }
 
     // </editor-fold>
@@ -796,78 +820,6 @@ public class PmPrj {
     }
 
     /**
-     * 实际开工时间。
-     */
-    private LocalDateTime actualStartTime;
-
-    /**
-     * 获取：实际开工时间。
-     */
-    public LocalDateTime getActualStartTime() {
-        return this.actualStartTime;
-    }
-
-    /**
-     * 设置：实际开工时间。
-     */
-    public PmPrj setActualStartTime(LocalDateTime actualStartTime) {
-        if (this.actualStartTime == null && actualStartTime == null) {
-            // 均为null，不做处理。
-        } else if (this.actualStartTime != null && actualStartTime != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.actualStartTime.compareTo(actualStartTime) != 0) {
-                this.actualStartTime = actualStartTime;
-                if (!this.toUpdateCols.contains("ACTUAL_START_TIME")) {
-                    this.toUpdateCols.add("ACTUAL_START_TIME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.actualStartTime = actualStartTime;
-            if (!this.toUpdateCols.contains("ACTUAL_START_TIME")) {
-                this.toUpdateCols.add("ACTUAL_START_TIME");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 计划开工时间。
-     */
-    private LocalDateTime planStartTime;
-
-    /**
-     * 获取：计划开工时间。
-     */
-    public LocalDateTime getPlanStartTime() {
-        return this.planStartTime;
-    }
-
-    /**
-     * 设置：计划开工时间。
-     */
-    public PmPrj setPlanStartTime(LocalDateTime planStartTime) {
-        if (this.planStartTime == null && planStartTime == null) {
-            // 均为null，不做处理。
-        } else if (this.planStartTime != null && planStartTime != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.planStartTime.compareTo(planStartTime) != 0) {
-                this.planStartTime = planStartTime;
-                if (!this.toUpdateCols.contains("PLAN_START_TIME")) {
-                    this.toUpdateCols.add("PLAN_START_TIME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.planStartTime = planStartTime;
-            if (!this.toUpdateCols.contains("PLAN_START_TIME")) {
-                this.toUpdateCols.add("PLAN_START_TIME");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 是否导入的记录。
      */
     private Boolean isImport;
@@ -940,36 +892,36 @@ public class PmPrj {
     }
 
     /**
-     * 实际竣工时间。
+     * 计划开工时间。
      */
-    private LocalDateTime actualEndTime;
+    private LocalDateTime planStartTime;
 
     /**
-     * 获取：实际竣工时间。
+     * 获取：计划开工时间。
      */
-    public LocalDateTime getActualEndTime() {
-        return this.actualEndTime;
+    public LocalDateTime getPlanStartTime() {
+        return this.planStartTime;
     }
 
     /**
-     * 设置：实际竣工时间。
+     * 设置：计划开工时间。
      */
-    public PmPrj setActualEndTime(LocalDateTime actualEndTime) {
-        if (this.actualEndTime == null && actualEndTime == null) {
+    public PmPrj setPlanStartTime(LocalDateTime planStartTime) {
+        if (this.planStartTime == null && planStartTime == null) {
             // 均为null，不做处理。
-        } else if (this.actualEndTime != null && actualEndTime != null) {
+        } else if (this.planStartTime != null && planStartTime != null) {
             // 均非null，判定不等，再做处理：
-            if (this.actualEndTime.compareTo(actualEndTime) != 0) {
-                this.actualEndTime = actualEndTime;
-                if (!this.toUpdateCols.contains("ACTUAL_END_TIME")) {
-                    this.toUpdateCols.add("ACTUAL_END_TIME");
+            if (this.planStartTime.compareTo(planStartTime) != 0) {
+                this.planStartTime = planStartTime;
+                if (!this.toUpdateCols.contains("PLAN_START_TIME")) {
+                    this.toUpdateCols.add("PLAN_START_TIME");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.actualEndTime = actualEndTime;
-            if (!this.toUpdateCols.contains("ACTUAL_END_TIME")) {
-                this.toUpdateCols.add("ACTUAL_END_TIME");
+            this.planStartTime = planStartTime;
+            if (!this.toUpdateCols.contains("PLAN_START_TIME")) {
+                this.toUpdateCols.add("PLAN_START_TIME");
             }
         }
         return this;
@@ -1006,6 +958,78 @@ public class PmPrj {
             this.planEndTime = planEndTime;
             if (!this.toUpdateCols.contains("PLAN_END_TIME")) {
                 this.toUpdateCols.add("PLAN_END_TIME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 实际开工时间。
+     */
+    private LocalDateTime actualStartTime;
+
+    /**
+     * 获取：实际开工时间。
+     */
+    public LocalDateTime getActualStartTime() {
+        return this.actualStartTime;
+    }
+
+    /**
+     * 设置：实际开工时间。
+     */
+    public PmPrj setActualStartTime(LocalDateTime actualStartTime) {
+        if (this.actualStartTime == null && actualStartTime == null) {
+            // 均为null，不做处理。
+        } else if (this.actualStartTime != null && actualStartTime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actualStartTime.compareTo(actualStartTime) != 0) {
+                this.actualStartTime = actualStartTime;
+                if (!this.toUpdateCols.contains("ACTUAL_START_TIME")) {
+                    this.toUpdateCols.add("ACTUAL_START_TIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actualStartTime = actualStartTime;
+            if (!this.toUpdateCols.contains("ACTUAL_START_TIME")) {
+                this.toUpdateCols.add("ACTUAL_START_TIME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 实际竣工时间。
+     */
+    private LocalDateTime actualEndTime;
+
+    /**
+     * 获取：实际竣工时间。
+     */
+    public LocalDateTime getActualEndTime() {
+        return this.actualEndTime;
+    }
+
+    /**
+     * 设置：实际竣工时间。
+     */
+    public PmPrj setActualEndTime(LocalDateTime actualEndTime) {
+        if (this.actualEndTime == null && actualEndTime == null) {
+            // 均为null，不做处理。
+        } else if (this.actualEndTime != null && actualEndTime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actualEndTime.compareTo(actualEndTime) != 0) {
+                this.actualEndTime = actualEndTime;
+                if (!this.toUpdateCols.contains("ACTUAL_END_TIME")) {
+                    this.toUpdateCols.add("ACTUAL_END_TIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actualEndTime = actualEndTime;
+            if (!this.toUpdateCols.contains("ACTUAL_END_TIME")) {
+                this.toUpdateCols.add("ACTUAL_END_TIME");
             }
         }
         return this;
@@ -1186,6 +1210,78 @@ public class PmPrj {
             this.customerUnit = customerUnit;
             if (!this.toUpdateCols.contains("CUSTOMER_UNIT")) {
                 this.toUpdateCols.add("CUSTOMER_UNIT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 项目类别。
+     */
+    private String projectClassificationId;
+
+    /**
+     * 获取：项目类别。
+     */
+    public String getProjectClassificationId() {
+        return this.projectClassificationId;
+    }
+
+    /**
+     * 设置：项目类别。
+     */
+    public PmPrj setProjectClassificationId(String projectClassificationId) {
+        if (this.projectClassificationId == null && projectClassificationId == null) {
+            // 均为null，不做处理。
+        } else if (this.projectClassificationId != null && projectClassificationId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectClassificationId.compareTo(projectClassificationId) != 0) {
+                this.projectClassificationId = projectClassificationId;
+                if (!this.toUpdateCols.contains("PROJECT_CLASSIFICATION_ID")) {
+                    this.toUpdateCols.add("PROJECT_CLASSIFICATION_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectClassificationId = projectClassificationId;
+            if (!this.toUpdateCols.contains("PROJECT_CLASSIFICATION_ID")) {
+                this.toUpdateCols.add("PROJECT_CLASSIFICATION_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 公司。
+     */
+    private String companyId;
+
+    /**
+     * 获取：公司。
+     */
+    public String getCompanyId() {
+        return this.companyId;
+    }
+
+    /**
+     * 设置：公司。
+     */
+    public PmPrj setCompanyId(String companyId) {
+        if (this.companyId == null && companyId == null) {
+            // 均为null，不做处理。
+        } else if (this.companyId != null && companyId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.companyId.compareTo(companyId) != 0) {
+                this.companyId = companyId;
+                if (!this.toUpdateCols.contains("COMPANY_ID")) {
+                    this.toUpdateCols.add("COMPANY_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.companyId = companyId;
+            if (!this.toUpdateCols.contains("COMPANY_ID")) {
+                this.toUpdateCols.add("COMPANY_ID");
             }
         }
         return this;
@@ -1474,42 +1570,6 @@ public class PmPrj {
             this.other = other;
             if (!this.toUpdateCols.contains("OTHER")) {
                 this.toUpdateCols.add("OTHER");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 数量2。
-     */
-    private Integer qtyTwo;
-
-    /**
-     * 获取：数量2。
-     */
-    public Integer getQtyTwo() {
-        return this.qtyTwo;
-    }
-
-    /**
-     * 设置：数量2。
-     */
-    public PmPrj setQtyTwo(Integer qtyTwo) {
-        if (this.qtyTwo == null && qtyTwo == null) {
-            // 均为null，不做处理。
-        } else if (this.qtyTwo != null && qtyTwo != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.qtyTwo.compareTo(qtyTwo) != 0) {
-                this.qtyTwo = qtyTwo;
-                if (!this.toUpdateCols.contains("QTY_TWO")) {
-                    this.toUpdateCols.add("QTY_TWO");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.qtyTwo = qtyTwo;
-            if (!this.toUpdateCols.contains("QTY_TWO")) {
-                this.toUpdateCols.add("QTY_TWO");
             }
         }
         return this;
@@ -1984,258 +2044,6 @@ public class PmPrj {
     }
 
     /**
-     * 立项申请。
-     */
-    private String pmPrjReqId;
-
-    /**
-     * 获取：立项申请。
-     */
-    public String getPmPrjReqId() {
-        return this.pmPrjReqId;
-    }
-
-    /**
-     * 设置：立项申请。
-     */
-    public PmPrj setPmPrjReqId(String pmPrjReqId) {
-        if (this.pmPrjReqId == null && pmPrjReqId == null) {
-            // 均为null，不做处理。
-        } else if (this.pmPrjReqId != null && pmPrjReqId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.pmPrjReqId.compareTo(pmPrjReqId) != 0) {
-                this.pmPrjReqId = pmPrjReqId;
-                if (!this.toUpdateCols.contains("PM_PRJ_REQ_ID")) {
-                    this.toUpdateCols.add("PM_PRJ_REQ_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.pmPrjReqId = pmPrjReqId;
-            if (!this.toUpdateCols.contains("PM_PRJ_REQ_ID")) {
-                this.toUpdateCols.add("PM_PRJ_REQ_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 立项批复文号。
-     */
-    private String prjReplyNo;
-
-    /**
-     * 获取：立项批复文号。
-     */
-    public String getPrjReplyNo() {
-        return this.prjReplyNo;
-    }
-
-    /**
-     * 设置：立项批复文号。
-     */
-    public PmPrj setPrjReplyNo(String prjReplyNo) {
-        if (this.prjReplyNo == null && prjReplyNo == null) {
-            // 均为null，不做处理。
-        } else if (this.prjReplyNo != null && prjReplyNo != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.prjReplyNo.compareTo(prjReplyNo) != 0) {
-                this.prjReplyNo = prjReplyNo;
-                if (!this.toUpdateCols.contains("PRJ_REPLY_NO")) {
-                    this.toUpdateCols.add("PRJ_REPLY_NO");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.prjReplyNo = prjReplyNo;
-            if (!this.toUpdateCols.contains("PRJ_REPLY_NO")) {
-                this.toUpdateCols.add("PRJ_REPLY_NO");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 立项批复日期。
-     */
-    private LocalDate prjReplyDate;
-
-    /**
-     * 获取：立项批复日期。
-     */
-    public LocalDate getPrjReplyDate() {
-        return this.prjReplyDate;
-    }
-
-    /**
-     * 设置：立项批复日期。
-     */
-    public PmPrj setPrjReplyDate(LocalDate prjReplyDate) {
-        if (this.prjReplyDate == null && prjReplyDate == null) {
-            // 均为null，不做处理。
-        } else if (this.prjReplyDate != null && prjReplyDate != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.prjReplyDate.compareTo(prjReplyDate) != 0) {
-                this.prjReplyDate = prjReplyDate;
-                if (!this.toUpdateCols.contains("PRJ_REPLY_DATE")) {
-                    this.toUpdateCols.add("PRJ_REPLY_DATE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.prjReplyDate = prjReplyDate;
-            if (!this.toUpdateCols.contains("PRJ_REPLY_DATE")) {
-                this.toUpdateCols.add("PRJ_REPLY_DATE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 立项批复材料。
-     */
-    private String prjReplyFile;
-
-    /**
-     * 获取：立项批复材料。
-     */
-    public String getPrjReplyFile() {
-        return this.prjReplyFile;
-    }
-
-    /**
-     * 设置：立项批复材料。
-     */
-    public PmPrj setPrjReplyFile(String prjReplyFile) {
-        if (this.prjReplyFile == null && prjReplyFile == null) {
-            // 均为null，不做处理。
-        } else if (this.prjReplyFile != null && prjReplyFile != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.prjReplyFile.compareTo(prjReplyFile) != 0) {
-                this.prjReplyFile = prjReplyFile;
-                if (!this.toUpdateCols.contains("PRJ_REPLY_FILE")) {
-                    this.toUpdateCols.add("PRJ_REPLY_FILE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.prjReplyFile = prjReplyFile;
-            if (!this.toUpdateCols.contains("PRJ_REPLY_FILE")) {
-                this.toUpdateCols.add("PRJ_REPLY_FILE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 项目前期岗。
-     */
-    private String prjEarlyUserId;
-
-    /**
-     * 获取：项目前期岗。
-     */
-    public String getPrjEarlyUserId() {
-        return this.prjEarlyUserId;
-    }
-
-    /**
-     * 设置：项目前期岗。
-     */
-    public PmPrj setPrjEarlyUserId(String prjEarlyUserId) {
-        if (this.prjEarlyUserId == null && prjEarlyUserId == null) {
-            // 均为null，不做处理。
-        } else if (this.prjEarlyUserId != null && prjEarlyUserId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.prjEarlyUserId.compareTo(prjEarlyUserId) != 0) {
-                this.prjEarlyUserId = prjEarlyUserId;
-                if (!this.toUpdateCols.contains("PRJ_EARLY_USER_ID")) {
-                    this.toUpdateCols.add("PRJ_EARLY_USER_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.prjEarlyUserId = prjEarlyUserId;
-            if (!this.toUpdateCols.contains("PRJ_EARLY_USER_ID")) {
-                this.toUpdateCols.add("PRJ_EARLY_USER_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 项目设计岗。
-     */
-    private String prjDesignUserId;
-
-    /**
-     * 获取：项目设计岗。
-     */
-    public String getPrjDesignUserId() {
-        return this.prjDesignUserId;
-    }
-
-    /**
-     * 设置：项目设计岗。
-     */
-    public PmPrj setPrjDesignUserId(String prjDesignUserId) {
-        if (this.prjDesignUserId == null && prjDesignUserId == null) {
-            // 均为null，不做处理。
-        } else if (this.prjDesignUserId != null && prjDesignUserId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.prjDesignUserId.compareTo(prjDesignUserId) != 0) {
-                this.prjDesignUserId = prjDesignUserId;
-                if (!this.toUpdateCols.contains("PRJ_DESIGN_USER_ID")) {
-                    this.toUpdateCols.add("PRJ_DESIGN_USER_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.prjDesignUserId = prjDesignUserId;
-            if (!this.toUpdateCols.contains("PRJ_DESIGN_USER_ID")) {
-                this.toUpdateCols.add("PRJ_DESIGN_USER_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 项目成本岗。
-     */
-    private String prjCostUserId;
-
-    /**
-     * 获取：项目成本岗。
-     */
-    public String getPrjCostUserId() {
-        return this.prjCostUserId;
-    }
-
-    /**
-     * 设置：项目成本岗。
-     */
-    public PmPrj setPrjCostUserId(String prjCostUserId) {
-        if (this.prjCostUserId == null && prjCostUserId == null) {
-            // 均为null，不做处理。
-        } else if (this.prjCostUserId != null && prjCostUserId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.prjCostUserId.compareTo(prjCostUserId) != 0) {
-                this.prjCostUserId = prjCostUserId;
-                if (!this.toUpdateCols.contains("PRJ_COST_USER_ID")) {
-                    this.toUpdateCols.add("PRJ_COST_USER_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.prjCostUserId = prjCostUserId;
-            if (!this.toUpdateCols.contains("PRJ_COST_USER_ID")) {
-                this.toUpdateCols.add("PRJ_COST_USER_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 进入省库。
      */
     private Boolean inProvinceRep;
@@ -2308,78 +2116,6 @@ public class PmPrj {
     }
 
     /**
-     * 建设单位。
-     */
-    private String builderUnit;
-
-    /**
-     * 获取：建设单位。
-     */
-    public String getBuilderUnit() {
-        return this.builderUnit;
-    }
-
-    /**
-     * 设置：建设单位。
-     */
-    public PmPrj setBuilderUnit(String builderUnit) {
-        if (this.builderUnit == null && builderUnit == null) {
-            // 均为null，不做处理。
-        } else if (this.builderUnit != null && builderUnit != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.builderUnit.compareTo(builderUnit) != 0) {
-                this.builderUnit = builderUnit;
-                if (!this.toUpdateCols.contains("BUILDER_UNIT")) {
-                    this.toUpdateCols.add("BUILDER_UNIT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.builderUnit = builderUnit;
-            if (!this.toUpdateCols.contains("BUILDER_UNIT")) {
-                this.toUpdateCols.add("BUILDER_UNIT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 勘察单位。
-     */
-    private String surveyorUnit;
-
-    /**
-     * 获取：勘察单位。
-     */
-    public String getSurveyorUnit() {
-        return this.surveyorUnit;
-    }
-
-    /**
-     * 设置：勘察单位。
-     */
-    public PmPrj setSurveyorUnit(String surveyorUnit) {
-        if (this.surveyorUnit == null && surveyorUnit == null) {
-            // 均为null，不做处理。
-        } else if (this.surveyorUnit != null && surveyorUnit != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.surveyorUnit.compareTo(surveyorUnit) != 0) {
-                this.surveyorUnit = surveyorUnit;
-                if (!this.toUpdateCols.contains("SURVEYOR_UNIT")) {
-                    this.toUpdateCols.add("SURVEYOR_UNIT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.surveyorUnit = surveyorUnit;
-            if (!this.toUpdateCols.contains("SURVEYOR_UNIT")) {
-                this.toUpdateCols.add("SURVEYOR_UNIT");
-            }
-        }
-        return this;
-    }
-
-    /**
      * 项目编号。
      */
     private String prjCode;
@@ -2410,186 +2146,6 @@ public class PmPrj {
             this.prjCode = prjCode;
             if (!this.toUpdateCols.contains("PRJ_CODE")) {
                 this.toUpdateCols.add("PRJ_CODE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 设计单位。
-     */
-    private String designerUnit;
-
-    /**
-     * 获取：设计单位。
-     */
-    public String getDesignerUnit() {
-        return this.designerUnit;
-    }
-
-    /**
-     * 设置：设计单位。
-     */
-    public PmPrj setDesignerUnit(String designerUnit) {
-        if (this.designerUnit == null && designerUnit == null) {
-            // 均为null，不做处理。
-        } else if (this.designerUnit != null && designerUnit != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.designerUnit.compareTo(designerUnit) != 0) {
-                this.designerUnit = designerUnit;
-                if (!this.toUpdateCols.contains("DESIGNER_UNIT")) {
-                    this.toUpdateCols.add("DESIGNER_UNIT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.designerUnit = designerUnit;
-            if (!this.toUpdateCols.contains("DESIGNER_UNIT")) {
-                this.toUpdateCols.add("DESIGNER_UNIT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 施工单位。
-     */
-    private String constructorUnit;
-
-    /**
-     * 获取：施工单位。
-     */
-    public String getConstructorUnit() {
-        return this.constructorUnit;
-    }
-
-    /**
-     * 设置：施工单位。
-     */
-    public PmPrj setConstructorUnit(String constructorUnit) {
-        if (this.constructorUnit == null && constructorUnit == null) {
-            // 均为null，不做处理。
-        } else if (this.constructorUnit != null && constructorUnit != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.constructorUnit.compareTo(constructorUnit) != 0) {
-                this.constructorUnit = constructorUnit;
-                if (!this.toUpdateCols.contains("CONSTRUCTOR_UNIT")) {
-                    this.toUpdateCols.add("CONSTRUCTOR_UNIT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.constructorUnit = constructorUnit;
-            if (!this.toUpdateCols.contains("CONSTRUCTOR_UNIT")) {
-                this.toUpdateCols.add("CONSTRUCTOR_UNIT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 监理单位。
-     */
-    private String supervisorUnit;
-
-    /**
-     * 获取：监理单位。
-     */
-    public String getSupervisorUnit() {
-        return this.supervisorUnit;
-    }
-
-    /**
-     * 设置：监理单位。
-     */
-    public PmPrj setSupervisorUnit(String supervisorUnit) {
-        if (this.supervisorUnit == null && supervisorUnit == null) {
-            // 均为null，不做处理。
-        } else if (this.supervisorUnit != null && supervisorUnit != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.supervisorUnit.compareTo(supervisorUnit) != 0) {
-                this.supervisorUnit = supervisorUnit;
-                if (!this.toUpdateCols.contains("SUPERVISOR_UNIT")) {
-                    this.toUpdateCols.add("SUPERVISOR_UNIT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.supervisorUnit = supervisorUnit;
-            if (!this.toUpdateCols.contains("SUPERVISOR_UNIT")) {
-                this.toUpdateCols.add("SUPERVISOR_UNIT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 检测单位。
-     */
-    private String checkerUnit;
-
-    /**
-     * 获取：检测单位。
-     */
-    public String getCheckerUnit() {
-        return this.checkerUnit;
-    }
-
-    /**
-     * 设置：检测单位。
-     */
-    public PmPrj setCheckerUnit(String checkerUnit) {
-        if (this.checkerUnit == null && checkerUnit == null) {
-            // 均为null，不做处理。
-        } else if (this.checkerUnit != null && checkerUnit != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.checkerUnit.compareTo(checkerUnit) != 0) {
-                this.checkerUnit = checkerUnit;
-                if (!this.toUpdateCols.contains("CHECKER_UNIT")) {
-                    this.toUpdateCols.add("CHECKER_UNIT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.checkerUnit = checkerUnit;
-            if (!this.toUpdateCols.contains("CHECKER_UNIT")) {
-                this.toUpdateCols.add("CHECKER_UNIT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * 全过程造价单位。
-     */
-    private String consulterUnit;
-
-    /**
-     * 获取：全过程造价单位。
-     */
-    public String getConsulterUnit() {
-        return this.consulterUnit;
-    }
-
-    /**
-     * 设置：全过程造价单位。
-     */
-    public PmPrj setConsulterUnit(String consulterUnit) {
-        if (this.consulterUnit == null && consulterUnit == null) {
-            // 均为null，不做处理。
-        } else if (this.consulterUnit != null && consulterUnit != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.consulterUnit.compareTo(consulterUnit) != 0) {
-                this.consulterUnit = consulterUnit;
-                if (!this.toUpdateCols.contains("CONSULTER_UNIT")) {
-                    this.toUpdateCols.add("CONSULTER_UNIT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.consulterUnit = consulterUnit;
-            if (!this.toUpdateCols.contains("CONSULTER_UNIT")) {
-                this.toUpdateCols.add("CONSULTER_UNIT");
             }
         }
         return this;
@@ -2920,6 +2476,150 @@ public class PmPrj {
     }
 
     /**
+     * 立项申请。
+     */
+    private String pmPrjReqId;
+
+    /**
+     * 获取：立项申请。
+     */
+    public String getPmPrjReqId() {
+        return this.pmPrjReqId;
+    }
+
+    /**
+     * 设置：立项申请。
+     */
+    public PmPrj setPmPrjReqId(String pmPrjReqId) {
+        if (this.pmPrjReqId == null && pmPrjReqId == null) {
+            // 均为null，不做处理。
+        } else if (this.pmPrjReqId != null && pmPrjReqId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.pmPrjReqId.compareTo(pmPrjReqId) != 0) {
+                this.pmPrjReqId = pmPrjReqId;
+                if (!this.toUpdateCols.contains("PM_PRJ_REQ_ID")) {
+                    this.toUpdateCols.add("PM_PRJ_REQ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.pmPrjReqId = pmPrjReqId;
+            if (!this.toUpdateCols.contains("PM_PRJ_REQ_ID")) {
+                this.toUpdateCols.add("PM_PRJ_REQ_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 立项批复文号。
+     */
+    private String prjReplyNo;
+
+    /**
+     * 获取：立项批复文号。
+     */
+    public String getPrjReplyNo() {
+        return this.prjReplyNo;
+    }
+
+    /**
+     * 设置：立项批复文号。
+     */
+    public PmPrj setPrjReplyNo(String prjReplyNo) {
+        if (this.prjReplyNo == null && prjReplyNo == null) {
+            // 均为null，不做处理。
+        } else if (this.prjReplyNo != null && prjReplyNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjReplyNo.compareTo(prjReplyNo) != 0) {
+                this.prjReplyNo = prjReplyNo;
+                if (!this.toUpdateCols.contains("PRJ_REPLY_NO")) {
+                    this.toUpdateCols.add("PRJ_REPLY_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjReplyNo = prjReplyNo;
+            if (!this.toUpdateCols.contains("PRJ_REPLY_NO")) {
+                this.toUpdateCols.add("PRJ_REPLY_NO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 立项批复日期。
+     */
+    private LocalDate prjReplyDate;
+
+    /**
+     * 获取：立项批复日期。
+     */
+    public LocalDate getPrjReplyDate() {
+        return this.prjReplyDate;
+    }
+
+    /**
+     * 设置：立项批复日期。
+     */
+    public PmPrj setPrjReplyDate(LocalDate prjReplyDate) {
+        if (this.prjReplyDate == null && prjReplyDate == null) {
+            // 均为null，不做处理。
+        } else if (this.prjReplyDate != null && prjReplyDate != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjReplyDate.compareTo(prjReplyDate) != 0) {
+                this.prjReplyDate = prjReplyDate;
+                if (!this.toUpdateCols.contains("PRJ_REPLY_DATE")) {
+                    this.toUpdateCols.add("PRJ_REPLY_DATE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjReplyDate = prjReplyDate;
+            if (!this.toUpdateCols.contains("PRJ_REPLY_DATE")) {
+                this.toUpdateCols.add("PRJ_REPLY_DATE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 立项批复材料。
+     */
+    private String prjReplyFile;
+
+    /**
+     * 获取：立项批复材料。
+     */
+    public String getPrjReplyFile() {
+        return this.prjReplyFile;
+    }
+
+    /**
+     * 设置：立项批复材料。
+     */
+    public PmPrj setPrjReplyFile(String prjReplyFile) {
+        if (this.prjReplyFile == null && prjReplyFile == null) {
+            // 均为null，不做处理。
+        } else if (this.prjReplyFile != null && prjReplyFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.prjReplyFile.compareTo(prjReplyFile) != 0) {
+                this.prjReplyFile = prjReplyFile;
+                if (!this.toUpdateCols.contains("PRJ_REPLY_FILE")) {
+                    this.toUpdateCols.add("PRJ_REPLY_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.prjReplyFile = prjReplyFile;
+            if (!this.toUpdateCols.contains("PRJ_REPLY_FILE")) {
+                this.toUpdateCols.add("PRJ_REPLY_FILE");
+            }
+        }
+        return this;
+    }
+
+    /**
      * 项目建议书实际完成日期。
      */
     private LocalDate projectProposalActualDate;
@@ -3028,144 +2728,360 @@ public class PmPrj {
     }
 
     /**
-     * CPMS的UUID。
+     * 项目前期岗。
      */
-    private String cpmsUuid;
+    private String prjEarlyUserId;
 
     /**
-     * 获取：CPMS的UUID。
+     * 获取：项目前期岗。
      */
-    public String getCpmsUuid() {
-        return this.cpmsUuid;
+    public String getPrjEarlyUserId() {
+        return this.prjEarlyUserId;
     }
 
     /**
-     * 设置：CPMS的UUID。
+     * 设置：项目前期岗。
      */
-    public PmPrj setCpmsUuid(String cpmsUuid) {
-        if (this.cpmsUuid == null && cpmsUuid == null) {
+    public PmPrj setPrjEarlyUserId(String prjEarlyUserId) {
+        if (this.prjEarlyUserId == null && prjEarlyUserId == null) {
             // 均为null，不做处理。
-        } else if (this.cpmsUuid != null && cpmsUuid != null) {
+        } else if (this.prjEarlyUserId != null && prjEarlyUserId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.cpmsUuid.compareTo(cpmsUuid) != 0) {
-                this.cpmsUuid = cpmsUuid;
-                if (!this.toUpdateCols.contains("CPMS_UUID")) {
-                    this.toUpdateCols.add("CPMS_UUID");
+            if (this.prjEarlyUserId.compareTo(prjEarlyUserId) != 0) {
+                this.prjEarlyUserId = prjEarlyUserId;
+                if (!this.toUpdateCols.contains("PRJ_EARLY_USER_ID")) {
+                    this.toUpdateCols.add("PRJ_EARLY_USER_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.cpmsUuid = cpmsUuid;
-            if (!this.toUpdateCols.contains("CPMS_UUID")) {
-                this.toUpdateCols.add("CPMS_UUID");
+            this.prjEarlyUserId = prjEarlyUserId;
+            if (!this.toUpdateCols.contains("PRJ_EARLY_USER_ID")) {
+                this.toUpdateCols.add("PRJ_EARLY_USER_ID");
             }
         }
         return this;
     }
 
     /**
-     * CPMS的ID。
+     * 项目设计岗。
      */
-    private String cpmsId;
+    private String prjDesignUserId;
 
     /**
-     * 获取：CPMS的ID。
+     * 获取：项目设计岗。
      */
-    public String getCpmsId() {
-        return this.cpmsId;
+    public String getPrjDesignUserId() {
+        return this.prjDesignUserId;
     }
 
     /**
-     * 设置：CPMS的ID。
+     * 设置：项目设计岗。
      */
-    public PmPrj setCpmsId(String cpmsId) {
-        if (this.cpmsId == null && cpmsId == null) {
+    public PmPrj setPrjDesignUserId(String prjDesignUserId) {
+        if (this.prjDesignUserId == null && prjDesignUserId == null) {
             // 均为null，不做处理。
-        } else if (this.cpmsId != null && cpmsId != null) {
+        } else if (this.prjDesignUserId != null && prjDesignUserId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.cpmsId.compareTo(cpmsId) != 0) {
-                this.cpmsId = cpmsId;
-                if (!this.toUpdateCols.contains("CPMS_ID")) {
-                    this.toUpdateCols.add("CPMS_ID");
+            if (this.prjDesignUserId.compareTo(prjDesignUserId) != 0) {
+                this.prjDesignUserId = prjDesignUserId;
+                if (!this.toUpdateCols.contains("PRJ_DESIGN_USER_ID")) {
+                    this.toUpdateCols.add("PRJ_DESIGN_USER_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.cpmsId = cpmsId;
-            if (!this.toUpdateCols.contains("CPMS_ID")) {
-                this.toUpdateCols.add("CPMS_ID");
+            this.prjDesignUserId = prjDesignUserId;
+            if (!this.toUpdateCols.contains("PRJ_DESIGN_USER_ID")) {
+                this.toUpdateCols.add("PRJ_DESIGN_USER_ID");
             }
         }
         return this;
     }
 
     /**
-     * CPMS建设地点。
+     * 项目成本岗。
      */
-    private String cpmsConstructionSite;
+    private String prjCostUserId;
 
     /**
-     * 获取：CPMS建设地点。
+     * 获取：项目成本岗。
      */
-    public String getCpmsConstructionSite() {
-        return this.cpmsConstructionSite;
+    public String getPrjCostUserId() {
+        return this.prjCostUserId;
     }
 
     /**
-     * 设置：CPMS建设地点。
+     * 设置：项目成本岗。
      */
-    public PmPrj setCpmsConstructionSite(String cpmsConstructionSite) {
-        if (this.cpmsConstructionSite == null && cpmsConstructionSite == null) {
+    public PmPrj setPrjCostUserId(String prjCostUserId) {
+        if (this.prjCostUserId == null && prjCostUserId == null) {
             // 均为null，不做处理。
-        } else if (this.cpmsConstructionSite != null && cpmsConstructionSite != null) {
+        } else if (this.prjCostUserId != null && prjCostUserId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.cpmsConstructionSite.compareTo(cpmsConstructionSite) != 0) {
-                this.cpmsConstructionSite = cpmsConstructionSite;
-                if (!this.toUpdateCols.contains("CPMS_CONSTRUCTION_SITE")) {
-                    this.toUpdateCols.add("CPMS_CONSTRUCTION_SITE");
+            if (this.prjCostUserId.compareTo(prjCostUserId) != 0) {
+                this.prjCostUserId = prjCostUserId;
+                if (!this.toUpdateCols.contains("PRJ_COST_USER_ID")) {
+                    this.toUpdateCols.add("PRJ_COST_USER_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.cpmsConstructionSite = cpmsConstructionSite;
-            if (!this.toUpdateCols.contains("CPMS_CONSTRUCTION_SITE")) {
-                this.toUpdateCols.add("CPMS_CONSTRUCTION_SITE");
+            this.prjCostUserId = prjCostUserId;
+            if (!this.toUpdateCols.contains("PRJ_COST_USER_ID")) {
+                this.toUpdateCols.add("PRJ_COST_USER_ID");
             }
         }
         return this;
     }
 
     /**
-     * 匡算总投资(万)。
+     * 建设单位。
      */
-    private BigDecimal estimatedTotalInvest;
+    private String builderUnit;
 
     /**
-     * 获取：匡算总投资(万)。
+     * 获取：建设单位。
      */
-    public BigDecimal getEstimatedTotalInvest() {
-        return this.estimatedTotalInvest;
+    public String getBuilderUnit() {
+        return this.builderUnit;
     }
 
     /**
-     * 设置：匡算总投资(万)。
+     * 设置：建设单位。
      */
-    public PmPrj setEstimatedTotalInvest(BigDecimal estimatedTotalInvest) {
-        if (this.estimatedTotalInvest == null && estimatedTotalInvest == null) {
+    public PmPrj setBuilderUnit(String builderUnit) {
+        if (this.builderUnit == null && builderUnit == null) {
             // 均为null，不做处理。
-        } else if (this.estimatedTotalInvest != null && estimatedTotalInvest != null) {
+        } else if (this.builderUnit != null && builderUnit != null) {
             // 均非null，判定不等，再做处理：
-            if (this.estimatedTotalInvest.compareTo(estimatedTotalInvest) != 0) {
-                this.estimatedTotalInvest = estimatedTotalInvest;
-                if (!this.toUpdateCols.contains("ESTIMATED_TOTAL_INVEST")) {
-                    this.toUpdateCols.add("ESTIMATED_TOTAL_INVEST");
+            if (this.builderUnit.compareTo(builderUnit) != 0) {
+                this.builderUnit = builderUnit;
+                if (!this.toUpdateCols.contains("BUILDER_UNIT")) {
+                    this.toUpdateCols.add("BUILDER_UNIT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.estimatedTotalInvest = estimatedTotalInvest;
-            if (!this.toUpdateCols.contains("ESTIMATED_TOTAL_INVEST")) {
-                this.toUpdateCols.add("ESTIMATED_TOTAL_INVEST");
+            this.builderUnit = builderUnit;
+            if (!this.toUpdateCols.contains("BUILDER_UNIT")) {
+                this.toUpdateCols.add("BUILDER_UNIT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 勘察单位。
+     */
+    private String surveyorUnit;
+
+    /**
+     * 获取：勘察单位。
+     */
+    public String getSurveyorUnit() {
+        return this.surveyorUnit;
+    }
+
+    /**
+     * 设置：勘察单位。
+     */
+    public PmPrj setSurveyorUnit(String surveyorUnit) {
+        if (this.surveyorUnit == null && surveyorUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.surveyorUnit != null && surveyorUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.surveyorUnit.compareTo(surveyorUnit) != 0) {
+                this.surveyorUnit = surveyorUnit;
+                if (!this.toUpdateCols.contains("SURVEYOR_UNIT")) {
+                    this.toUpdateCols.add("SURVEYOR_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.surveyorUnit = surveyorUnit;
+            if (!this.toUpdateCols.contains("SURVEYOR_UNIT")) {
+                this.toUpdateCols.add("SURVEYOR_UNIT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 设计单位。
+     */
+    private String designerUnit;
+
+    /**
+     * 获取：设计单位。
+     */
+    public String getDesignerUnit() {
+        return this.designerUnit;
+    }
+
+    /**
+     * 设置：设计单位。
+     */
+    public PmPrj setDesignerUnit(String designerUnit) {
+        if (this.designerUnit == null && designerUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.designerUnit != null && designerUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.designerUnit.compareTo(designerUnit) != 0) {
+                this.designerUnit = designerUnit;
+                if (!this.toUpdateCols.contains("DESIGNER_UNIT")) {
+                    this.toUpdateCols.add("DESIGNER_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.designerUnit = designerUnit;
+            if (!this.toUpdateCols.contains("DESIGNER_UNIT")) {
+                this.toUpdateCols.add("DESIGNER_UNIT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 施工单位。
+     */
+    private String constructorUnit;
+
+    /**
+     * 获取：施工单位。
+     */
+    public String getConstructorUnit() {
+        return this.constructorUnit;
+    }
+
+    /**
+     * 设置：施工单位。
+     */
+    public PmPrj setConstructorUnit(String constructorUnit) {
+        if (this.constructorUnit == null && constructorUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.constructorUnit != null && constructorUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.constructorUnit.compareTo(constructorUnit) != 0) {
+                this.constructorUnit = constructorUnit;
+                if (!this.toUpdateCols.contains("CONSTRUCTOR_UNIT")) {
+                    this.toUpdateCols.add("CONSTRUCTOR_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.constructorUnit = constructorUnit;
+            if (!this.toUpdateCols.contains("CONSTRUCTOR_UNIT")) {
+                this.toUpdateCols.add("CONSTRUCTOR_UNIT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 监理单位。
+     */
+    private String supervisorUnit;
+
+    /**
+     * 获取：监理单位。
+     */
+    public String getSupervisorUnit() {
+        return this.supervisorUnit;
+    }
+
+    /**
+     * 设置：监理单位。
+     */
+    public PmPrj setSupervisorUnit(String supervisorUnit) {
+        if (this.supervisorUnit == null && supervisorUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.supervisorUnit != null && supervisorUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.supervisorUnit.compareTo(supervisorUnit) != 0) {
+                this.supervisorUnit = supervisorUnit;
+                if (!this.toUpdateCols.contains("SUPERVISOR_UNIT")) {
+                    this.toUpdateCols.add("SUPERVISOR_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.supervisorUnit = supervisorUnit;
+            if (!this.toUpdateCols.contains("SUPERVISOR_UNIT")) {
+                this.toUpdateCols.add("SUPERVISOR_UNIT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 检测单位。
+     */
+    private String checkerUnit;
+
+    /**
+     * 获取：检测单位。
+     */
+    public String getCheckerUnit() {
+        return this.checkerUnit;
+    }
+
+    /**
+     * 设置：检测单位。
+     */
+    public PmPrj setCheckerUnit(String checkerUnit) {
+        if (this.checkerUnit == null && checkerUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.checkerUnit != null && checkerUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.checkerUnit.compareTo(checkerUnit) != 0) {
+                this.checkerUnit = checkerUnit;
+                if (!this.toUpdateCols.contains("CHECKER_UNIT")) {
+                    this.toUpdateCols.add("CHECKER_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.checkerUnit = checkerUnit;
+            if (!this.toUpdateCols.contains("CHECKER_UNIT")) {
+                this.toUpdateCols.add("CHECKER_UNIT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 全过程造价单位。
+     */
+    private String consulterUnit;
+
+    /**
+     * 获取：全过程造价单位。
+     */
+    public String getConsulterUnit() {
+        return this.consulterUnit;
+    }
+
+    /**
+     * 设置：全过程造价单位。
+     */
+    public PmPrj setConsulterUnit(String consulterUnit) {
+        if (this.consulterUnit == null && consulterUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.consulterUnit != null && consulterUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.consulterUnit.compareTo(consulterUnit) != 0) {
+                this.consulterUnit = consulterUnit;
+                if (!this.toUpdateCols.contains("CONSULTER_UNIT")) {
+                    this.toUpdateCols.add("CONSULTER_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.consulterUnit = consulterUnit;
+            if (!this.toUpdateCols.contains("CONSULTER_UNIT")) {
+                this.toUpdateCols.add("CONSULTER_UNIT");
             }
         }
         return this;
@@ -3202,6 +3118,42 @@ public class PmPrj {
             this.projectAmt = projectAmt;
             if (!this.toUpdateCols.contains("PROJECT_AMT")) {
                 this.toUpdateCols.add("PROJECT_AMT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 匡算总投资(万)。
+     */
+    private BigDecimal estimatedTotalInvest;
+
+    /**
+     * 获取：匡算总投资(万)。
+     */
+    public BigDecimal getEstimatedTotalInvest() {
+        return this.estimatedTotalInvest;
+    }
+
+    /**
+     * 设置：匡算总投资(万)。
+     */
+    public PmPrj setEstimatedTotalInvest(BigDecimal estimatedTotalInvest) {
+        if (this.estimatedTotalInvest == null && estimatedTotalInvest == null) {
+            // 均为null，不做处理。
+        } else if (this.estimatedTotalInvest != null && estimatedTotalInvest != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.estimatedTotalInvest.compareTo(estimatedTotalInvest) != 0) {
+                this.estimatedTotalInvest = estimatedTotalInvest;
+                if (!this.toUpdateCols.contains("ESTIMATED_TOTAL_INVEST")) {
+                    this.toUpdateCols.add("ESTIMATED_TOTAL_INVEST");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.estimatedTotalInvest = estimatedTotalInvest;
+            if (!this.toUpdateCols.contains("ESTIMATED_TOTAL_INVEST")) {
+                this.toUpdateCols.add("ESTIMATED_TOTAL_INVEST");
             }
         }
         return this;
@@ -3490,6 +3442,294 @@ public class PmPrj {
             this.investPriority = investPriority;
             if (!this.toUpdateCols.contains("INVEST_PRIORITY")) {
                 this.toUpdateCols.add("INVEST_PRIORITY");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 所属工程项目。
+     */
+    private String subordinateProject;
+
+    /**
+     * 获取：所属工程项目。
+     */
+    public String getSubordinateProject() {
+        return this.subordinateProject;
+    }
+
+    /**
+     * 设置：所属工程项目。
+     */
+    public PmPrj setSubordinateProject(String subordinateProject) {
+        if (this.subordinateProject == null && subordinateProject == null) {
+            // 均为null，不做处理。
+        } else if (this.subordinateProject != null && subordinateProject != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.subordinateProject.compareTo(subordinateProject) != 0) {
+                this.subordinateProject = subordinateProject;
+                if (!this.toUpdateCols.contains("SUBORDINATE_PROJECT")) {
+                    this.toUpdateCols.add("SUBORDINATE_PROJECT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.subordinateProject = subordinateProject;
+            if (!this.toUpdateCols.contains("SUBORDINATE_PROJECT")) {
+                this.toUpdateCols.add("SUBORDINATE_PROJECT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 设备采购预算金额。
+     */
+    private BigDecimal equipmentPurchaseBudgetAmount;
+
+    /**
+     * 获取：设备采购预算金额。
+     */
+    public BigDecimal getEquipmentPurchaseBudgetAmount() {
+        return this.equipmentPurchaseBudgetAmount;
+    }
+
+    /**
+     * 设置：设备采购预算金额。
+     */
+    public PmPrj setEquipmentPurchaseBudgetAmount(BigDecimal equipmentPurchaseBudgetAmount) {
+        if (this.equipmentPurchaseBudgetAmount == null && equipmentPurchaseBudgetAmount == null) {
+            // 均为null，不做处理。
+        } else if (this.equipmentPurchaseBudgetAmount != null && equipmentPurchaseBudgetAmount != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.equipmentPurchaseBudgetAmount.compareTo(equipmentPurchaseBudgetAmount) != 0) {
+                this.equipmentPurchaseBudgetAmount = equipmentPurchaseBudgetAmount;
+                if (!this.toUpdateCols.contains("EQUIPMENT_PURCHASE_BUDGET_AMOUNT")) {
+                    this.toUpdateCols.add("EQUIPMENT_PURCHASE_BUDGET_AMOUNT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.equipmentPurchaseBudgetAmount = equipmentPurchaseBudgetAmount;
+            if (!this.toUpdateCols.contains("EQUIPMENT_PURCHASE_BUDGET_AMOUNT")) {
+                this.toUpdateCols.add("EQUIPMENT_PURCHASE_BUDGET_AMOUNT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 可研范围。
+     */
+    private String researchRange;
+
+    /**
+     * 获取：可研范围。
+     */
+    public String getResearchRange() {
+        return this.researchRange;
+    }
+
+    /**
+     * 设置：可研范围。
+     */
+    public PmPrj setResearchRange(String researchRange) {
+        if (this.researchRange == null && researchRange == null) {
+            // 均为null，不做处理。
+        } else if (this.researchRange != null && researchRange != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.researchRange.compareTo(researchRange) != 0) {
+                this.researchRange = researchRange;
+                if (!this.toUpdateCols.contains("RESEARCH_RANGE")) {
+                    this.toUpdateCols.add("RESEARCH_RANGE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.researchRange = researchRange;
+            if (!this.toUpdateCols.contains("RESEARCH_RANGE")) {
+                this.toUpdateCols.add("RESEARCH_RANGE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 报告附件。
+     */
+    private String reportFile;
+
+    /**
+     * 获取：报告附件。
+     */
+    public String getReportFile() {
+        return this.reportFile;
+    }
+
+    /**
+     * 设置：报告附件。
+     */
+    public PmPrj setReportFile(String reportFile) {
+        if (this.reportFile == null && reportFile == null) {
+            // 均为null，不做处理。
+        } else if (this.reportFile != null && reportFile != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.reportFile.compareTo(reportFile) != 0) {
+                this.reportFile = reportFile;
+                if (!this.toUpdateCols.contains("REPORT_FILE")) {
+                    this.toUpdateCols.add("REPORT_FILE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.reportFile = reportFile;
+            if (!this.toUpdateCols.contains("REPORT_FILE")) {
+                this.toUpdateCols.add("REPORT_FILE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 数量2。
+     */
+    private Integer qtyTwo;
+
+    /**
+     * 获取：数量2。
+     */
+    public Integer getQtyTwo() {
+        return this.qtyTwo;
+    }
+
+    /**
+     * 设置：数量2。
+     */
+    public PmPrj setQtyTwo(Integer qtyTwo) {
+        if (this.qtyTwo == null && qtyTwo == null) {
+            // 均为null，不做处理。
+        } else if (this.qtyTwo != null && qtyTwo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.qtyTwo.compareTo(qtyTwo) != 0) {
+                this.qtyTwo = qtyTwo;
+                if (!this.toUpdateCols.contains("QTY_TWO")) {
+                    this.toUpdateCols.add("QTY_TWO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.qtyTwo = qtyTwo;
+            if (!this.toUpdateCols.contains("QTY_TWO")) {
+                this.toUpdateCols.add("QTY_TWO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * CPMS的UUID。
+     */
+    private String cpmsUuid;
+
+    /**
+     * 获取：CPMS的UUID。
+     */
+    public String getCpmsUuid() {
+        return this.cpmsUuid;
+    }
+
+    /**
+     * 设置：CPMS的UUID。
+     */
+    public PmPrj setCpmsUuid(String cpmsUuid) {
+        if (this.cpmsUuid == null && cpmsUuid == null) {
+            // 均为null，不做处理。
+        } else if (this.cpmsUuid != null && cpmsUuid != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cpmsUuid.compareTo(cpmsUuid) != 0) {
+                this.cpmsUuid = cpmsUuid;
+                if (!this.toUpdateCols.contains("CPMS_UUID")) {
+                    this.toUpdateCols.add("CPMS_UUID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cpmsUuid = cpmsUuid;
+            if (!this.toUpdateCols.contains("CPMS_UUID")) {
+                this.toUpdateCols.add("CPMS_UUID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * CPMS的ID。
+     */
+    private String cpmsId;
+
+    /**
+     * 获取：CPMS的ID。
+     */
+    public String getCpmsId() {
+        return this.cpmsId;
+    }
+
+    /**
+     * 设置：CPMS的ID。
+     */
+    public PmPrj setCpmsId(String cpmsId) {
+        if (this.cpmsId == null && cpmsId == null) {
+            // 均为null，不做处理。
+        } else if (this.cpmsId != null && cpmsId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cpmsId.compareTo(cpmsId) != 0) {
+                this.cpmsId = cpmsId;
+                if (!this.toUpdateCols.contains("CPMS_ID")) {
+                    this.toUpdateCols.add("CPMS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cpmsId = cpmsId;
+            if (!this.toUpdateCols.contains("CPMS_ID")) {
+                this.toUpdateCols.add("CPMS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * CPMS建设地点。
+     */
+    private String cpmsConstructionSite;
+
+    /**
+     * 获取：CPMS建设地点。
+     */
+    public String getCpmsConstructionSite() {
+        return this.cpmsConstructionSite;
+    }
+
+    /**
+     * 设置：CPMS建设地点。
+     */
+    public PmPrj setCpmsConstructionSite(String cpmsConstructionSite) {
+        if (this.cpmsConstructionSite == null && cpmsConstructionSite == null) {
+            // 均为null，不做处理。
+        } else if (this.cpmsConstructionSite != null && cpmsConstructionSite != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cpmsConstructionSite.compareTo(cpmsConstructionSite) != 0) {
+                this.cpmsConstructionSite = cpmsConstructionSite;
+                if (!this.toUpdateCols.contains("CPMS_CONSTRUCTION_SITE")) {
+                    this.toUpdateCols.add("CPMS_CONSTRUCTION_SITE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cpmsConstructionSite = cpmsConstructionSite;
+            if (!this.toUpdateCols.contains("CPMS_CONSTRUCTION_SITE")) {
+                this.toUpdateCols.add("CPMS_CONSTRUCTION_SITE");
             }
         }
         return this;

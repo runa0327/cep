@@ -1,12 +1,12 @@
 package com.cisdi.ext.api;
 
-import com.cisdi.ext.model.BaseCompanyProjecttype;
+import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.view.base.HrDeptView;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
-import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,6 +66,20 @@ public class HrDeptExt {
             userList = list.stream().map(p->JdbcMapUtil.getString(p,"ad_user_id")).collect(Collectors.toList());
         }
         return userList;
+    }
+
+    /**
+     * 根据id查询名称
+     * @param id id
+     * @return 名称
+     */
+    public static String getNameById(String id, MyJdbcTemplate myJdbcTemplate) {
+        String name = null;
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select name from hr_dept where id = ?",id);
+        if (!CollectionUtils.isEmpty(list)){
+            name = JdbcMapUtil.getString(list.get(0),"name");
+        }
+        return name;
     }
 
     /**

@@ -92,7 +92,7 @@ public class AttLinkExt {
         } else if ("TYPE_ONE_ID".equals(attCode)){ // 关联流程或上传依据 属性联动
             return linkTYPE_ONE_ID(myJdbcTemplate, attValue, entCode,sevId);
         } else if ("PM_BUY_DEMAND_REQ_ID".equals(attCode)){ // 关联采购需求审批表 属性联动
-            return linkPM_BUY_DEMAND_REQ_ID(myJdbcTemplate, attValue, entCode,sevId);
+            return PmBuyDemandReqLink.linkForPM_BUY_DEMAND_REQ_ID(myJdbcTemplate, attValue, entCode);
         } else if ("PAY_TYPE_ID".equals(attCode)){ // 付款类型 属性联动
             return linkPAY_TYPE_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("PM_BID_KEEP_FILE_REQ_ID".equals(attCode)){ // 招采项目备案及归档 属性联动
@@ -185,109 +185,6 @@ public class AttLinkExt {
                 }
             }
         }
-        return attLinkResult;
-    }
-
-    private AttLinkResult linkPM_BUY_DEMAND_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
-        AttLinkResult attLinkResult = new AttLinkResult();
-        if ("PM_USE_CHAPTER_REQ".equals(entCode)){ //中选单位及标后用印审批
-            List<Map<String, Object>> preBidCheck = myJdbcTemplate.queryForList("select a.name,a.id,a.status,s.name statusName " +
-                    "from pm_file_chapter_req a " +
-                    "left join ad_status s on s.id = a.status " +
-                    "where a.PM_BUY_DEMAND_REQ_ID = ? " +
-                    "order by a.CRT_DT desc " +
-                    "limit 1", attValue);
-            List<Map<String, Object>> prjList = myJdbcTemplate.queryForList("select d.status,(select name from ad_status where id = d.status) as statusName," +
-                    "p.name,d.PM_PRJ_ID,d.BUY_TYPE_ID,d.PAY_AMT_TWO,d.BUY_MATTER_ID " +
-                    "from PM_BUY_DEMAND_REQ d left join pm_prj p on p.id = d.PM_PRJ_ID " +
-                    "where d.id = ?", attValue);
-            if (!CollectionUtils.isEmpty(prjList)){
-                //项目
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(prjList.get(0),"PM_PRJ_ID");
-                    linkedAtt.text = JdbcMapUtil.getString(prjList.get(0),"name");
-                    attLinkResult.attMap.put("PM_PRJ_ID",linkedAtt);
-                }
-                //采购方式
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(prjList.get(0),"BUY_TYPE_ID");
-                    linkedAtt.text = JdbcMapUtil.getString(prjList.get(0),"BUY_TYPE_ID");
-                    attLinkResult.attMap.put("BUY_TYPE_ID",linkedAtt);
-                }
-                //付款金额
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.DOUBLE;
-                    linkedAtt.value = JdbcMapUtil.getString(prjList.get(0),"PAY_AMT_TWO");
-                    linkedAtt.text = JdbcMapUtil.getString(prjList.get(0),"PAY_AMT_TWO");
-                    attLinkResult.attMap.put("PAY_AMT_TWO",linkedAtt);
-                }
-                //采购事项
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(prjList.get(0),"BUY_MATTER_ID");
-                    linkedAtt.text = JdbcMapUtil.getString(prjList.get(0),"BUY_MATTER_ID");
-                    attLinkResult.attMap.put("BUY_MATTER_ID",linkedAtt);
-                }
-                //审批状态
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(prjList.get(0),"status");
-                    linkedAtt.text = JdbcMapUtil.getString(prjList.get(0),"statusName");
-                    attLinkResult.attMap.put("STATUS_THREE",linkedAtt);
-                }
-            }
-            if (!CollectionUtils.isEmpty(preBidCheck)){
-                Map<String, Object> preBidCheckMap = preBidCheck.get(0);
-                //关联标前资料用印审批 PM_FILE_CHAPTER_REQ_ID
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(preBidCheckMap,"id");
-                    linkedAtt.text = JdbcMapUtil.getString(preBidCheckMap, "name");
-                    attLinkResult.attMap.put("PM_FILE_CHAPTER_REQ_ID",linkedAtt);
-                }
-
-                //关联标前资料用印审批状态 STATUS_TWO
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.TEXT_LONG;
-                    linkedAtt.value = JdbcMapUtil.getString(preBidCheckMap,"status");
-                    linkedAtt.text = JdbcMapUtil.getString(preBidCheckMap, "statusName");
-                    attLinkResult.attMap.put("STATUS_TWO",linkedAtt);
-                }
-            }
-        } else if ("PM_BID_APPROVAL_REQ".equals(entCode) || "PM_FILE_CHAPTER_REQ".equals(entCode)){ //招标文件审批 标前资料用印审批
-            String sql1 = "select BUY_TYPE_ID from PM_BUY_DEMAND_REQ where id = ?";
-            List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,attValue);
-            String id = "";
-            String name = "";
-            if (!CollectionUtils.isEmpty(list1)){
-                id = JdbcMapUtil.getString(list1.get(0),"BUY_TYPE_ID");
-                String sql2 = "select name from gr_set_value where id = ?";
-                List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(sql2, id);
-                if (!CollectionUtils.isEmpty(nameMap)){
-                    name = JdbcMapUtil.getString(nameMap.get(0), "name");
-                }
-            }
-            // 招采方式
-            {
-                LinkedAtt linkedAtt = new LinkedAtt();
-                linkedAtt.type = AttDataTypeE.DOUBLE;
-                linkedAtt.value = id;
-                linkedAtt.text = name;
-                attLinkResult.attMap.put("BUY_TYPE_ID", linkedAtt);
-            }
-            return attLinkResult;
-        }
-
-
         return attLinkResult;
     }
 
