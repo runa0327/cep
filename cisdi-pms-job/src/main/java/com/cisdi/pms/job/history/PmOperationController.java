@@ -82,7 +82,7 @@ public class PmOperationController extends BaseController {
             return res;
         }
         String prjId = String.valueOf(optional.get().get("id"));
-        jdbcTemplate.update("update PM_PRJ set ACTUAL_START_TIME =?,ACTUAL_END_TIME=? where id=?", model.begin, model.end, prjId);
+        jdbcTemplate.update("update PM_PRJ set ACTUAL_START_TIME =?,ACTUAL_END_TIME=? where id=?", "/".equals(model.begin) ? null : model.begin, "/".equals(model.end) ? null : model.end, prjId);
         return res;
     }
 }
