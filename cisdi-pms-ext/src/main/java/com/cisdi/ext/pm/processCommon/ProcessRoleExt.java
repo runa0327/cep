@@ -620,6 +620,13 @@ public class ProcessRoleExt {
     }
 
     /**
+     * 查询任意流程选择的成本管理岗用户
+     */
+    public void getProcessCostUser2(){
+        getDeptUser("AD_USER_EIGHTEEN_ID","post_cost","成本岗");
+    }
+
+    /**
      * 查询任意流程选择的法务岗用户
      */
     public void getProcessLegalUser(){
@@ -1052,7 +1059,6 @@ public class ProcessRoleExt {
      * 根据流程发起部门信息获取部门负责人信息
      */
     public void getDeptLeaderByDept(){
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //获取签订公司
         String deptId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_DEPT_ID");
