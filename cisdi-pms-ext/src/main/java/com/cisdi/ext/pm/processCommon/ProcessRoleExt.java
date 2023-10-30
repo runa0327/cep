@@ -591,6 +591,7 @@ public class ProcessRoleExt {
         purchaseUserList.add(purchaseUser);
         ExtJarHelper.returnValue.set(purchaseUserList);
     }
+
     /**
      * 获取采购管理部负责人
      */
@@ -1314,6 +1315,32 @@ public class ProcessRoleExt {
             ExtJarHelper.returnValue.set(list);
         } else {
             throw new BaseException("未匹配到对应审批人，请联系管理员核查");
+        }
+    }
+
+    /** 角色-获取部门人员(可区分公司)-前期管理部人员 **/
+    public void getEarlyUser(){
+        getUserFromDept("post_early","前期管理部");
+    }
+
+    /**
+     * 获取部门下人员信息 包含子级部门
+     * @param deptCode 部门编码
+     * @param deptName 部门名称
+     */
+    private void getUserFromDept(String deptCode, String deptName) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<HrDept> deptList = HrDept.selectByWhere(new Where().eq(HrDept.Cols.CODE,deptCode).eq(HrDept.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(deptList)){
+            List<HrDept> childList = HrDeptExt.getChildList(deptList);
+            if (!CollectionUtils.isEmpty(childList)){
+                deptList.addAll(childList);
+            }
+            List<String> deptIdList = deptList.stream().map(HrDept::getId).distinct().collect(Collectors.toList());
+            List<String> userList = HrDeptExt.getUserByDeptId(deptIdList,myJdbcTemplate);
+            if (!CollectionUtils.isEmpty(userList)){
+                ExtJarHelper.returnValue.set(userList);
+            }
         }
     }
 }
