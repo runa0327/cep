@@ -132,4 +132,11 @@ public interface PmPrjMapper {
      * @return 查询结果
      */
     PmPrj queryPrjNums();
+
+    /**
+     * 根据项目id查询项目内部管理单位
+     * @param id 项目id
+     * @return 项目内部管理单位
+     */
+    String queryCompanyById(@Param("id") String id);
 }
