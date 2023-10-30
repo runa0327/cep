@@ -235,7 +235,7 @@ public class PmRosterExt {
     public void projectList() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         StringBuffer sb = new StringBuffer();
-        sb.append("select * from pm_prj where 1=1 AND PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and PROJECT_CLASSIFICATION_ID = '1704686664114929664'");
+        sb.append("select * from pm_prj where 1=1 AND PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ");
         if (!StringUtils.isEmpty(map.get("name"))) {
             sb.append(" and NAME like '%").append(map.get("name")).append("%'");
         }

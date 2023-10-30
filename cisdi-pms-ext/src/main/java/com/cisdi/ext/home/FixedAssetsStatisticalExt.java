@@ -37,7 +37,7 @@ public class FixedAssetsStatisticalExt {
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("select * from pm_prj where status='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and PROJECT_CLASSIFICATION_ID = '1704686664114929664' ");
+        sb.append("select * from pm_prj where status='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ");
         if (Strings.isNotEmpty(projectId)) {
             sb.append(" and id in (:ids)");
         }

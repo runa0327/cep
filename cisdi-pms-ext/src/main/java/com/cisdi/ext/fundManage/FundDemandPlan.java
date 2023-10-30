@@ -76,7 +76,7 @@ public class FundDemandPlan {
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         StringBuffer baseSql = new StringBuffer();
-        baseSql.append("select name,id from pm_prj where STATUS = 'AP' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and IZ_FORMAL_PRJ = 1 and PROJECT_CLASSIFICATION_ID = '1704686664114929664' ");
+        baseSql.append("select name,id from pm_prj where STATUS = 'AP' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and IZ_FORMAL_PRJ = 1 ");
         if (!Strings.isNullOrEmpty(prjName)) {
             baseSql.append("and name like '%" + prjName + "%' ");
         }
