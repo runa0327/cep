@@ -326,6 +326,10 @@ public class PmPrjIdLink {
 
                     linkedRecord.textMap.put("NAME_ONE", planName);
                     linkedRecord.valueMap.put("NAME_ONE", planName);
+                    if (planName.contains("里程碑") || planName.contains("一级节点")){
+                        linkedRecord.valueMap.put("IS_DISCOLORED", "1");
+                        linkedRecord.textMap.put("IS_DISCOLORED", "1");
+                    }
 
                     //TODO 操作类型字段返回  JdbcMapUtil.getString(tmp, "OPREATION_TYPE")
 
