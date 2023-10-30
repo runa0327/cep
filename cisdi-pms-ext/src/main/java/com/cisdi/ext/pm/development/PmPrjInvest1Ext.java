@@ -164,6 +164,9 @@ public class PmPrjInvest1Ext {
                 ProcessCommon.updateComment("EARLY_COMMENT",entityRecord.valueMap,comment,entCode,csCommId,userName);
             } else if ("earlyLeaderCheckRefuse".equals(nodeStatus)){ //6-前期部领导审批-拒绝
                 ProcessCommon.updateProcColsValue("EARLY_COMMENT",entCode,csCommId,null);
+            } else if ("costDesignCheckRefuse".equals(nodeStatus)){ // 5-成本设计岗审批-拒绝
+                ProcessCommon.updateProcColsValue("COST_COMMENT",entCode,csCommId,null);
+                ProcessCommon.updateProcColsValue("DESIGN_COMMENT",entCode,csCommId,null);
             }
         }
 
@@ -192,6 +195,8 @@ public class PmPrjInvest1Ext {
         } else {
             if ("0100031468512029161".equals(nodeId)){ //6-前期部领导审批
                 name = "earlyLeaderCheckRefuse";
+            } else if ("0100031468512029154".equals(nodeId)){ //5-成本设计岗审批
+                name = "costDesignCheckRefuse";
             }
         }
         return name;
