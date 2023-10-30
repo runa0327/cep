@@ -18,10 +18,9 @@ public class AdUserExt {
     /**
      * 根据用户id查询名称
      * @param userId 用户id
-     * @param myJdbcTemplate 数据源
      * @return 用户姓名
      */
-    public static String getUserName(String userId, MyJdbcTemplate myJdbcTemplate) {
+    public static String getUserName(String userId) {
         return JdbcMapUtil.getString(Crud.from("AD_USER").where().eq("ID",userId).select().execForMap(),"NAME");
     }
 

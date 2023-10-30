@@ -408,6 +408,7 @@ public class FeasibleImportBatchExt {
                     .set("REPLY_ACTUAL_DATE",newImport.getReplyActualDate()) //实际批复日期
                     .set("REPLY_NO_WR",newImport.getReplyNoWr()) // 批复文号
                     .set("REPLY_FILE",newImport.getReplyFile()) // 批复文件
+                    .set("COMPANY_ID",pmPrj.getCompanyId()) // 内部管理单位
                     .exec();
         } catch (Exception e){
             error = "写入可研报告表异常;";

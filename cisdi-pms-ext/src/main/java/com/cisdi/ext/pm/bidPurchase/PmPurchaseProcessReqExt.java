@@ -3,6 +3,7 @@ package com.cisdi.ext.pm.bidPurchase;
 import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.model.PmPurchaseProcessEnrollDetail;
 import com.cisdi.ext.model.PmPurchaseProcessUnitDetail;
+import com.cisdi.ext.pm.bidPurchase.detail.PmPurchaseProcessPrjDetailExt;
 import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -48,7 +49,11 @@ public class PmPurchaseProcessReqExt {
      * 结束时校验扩展
      */
     public void purchaseEnd(){
-
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String id = entityRecord.csCommId;
+        // 项目信息项目明细表
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
+        PmPurchaseProcessPrjDetailExt.insertData(id,projectId);
     }
 
     /**

@@ -4,6 +4,7 @@ import com.cisdi.ext.base.AdUserExt;
 import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.link.*;
 import com.cisdi.ext.model.GrSetValue;
+import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.PmParty;
 import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.model.PrjStart;
@@ -333,6 +334,13 @@ public class AttLinkExtDetail {
             projectClassTypeName = GrSetValueExt.getValueNameById(projectClassTypeId);
         }
         LinkUtils.mapAddAllValue("PROJECT_CLASSIFICATION_ID",AttDataTypeE.TEXT_LONG,projectClassTypeId,projectClassTypeName,true,true,false,attLinkResult);
+
+        String companyId = JdbcMapUtil.getString(row,"COMPANY_ID"); //  内部管理单位
+        if (StringUtils.hasText(companyId)){
+            String companyName = HrDept.selectById(companyId).getName();
+            LinkUtils.mapAddAllValue("COMPANY_ID",AttDataTypeE.TEXT_LONG,companyId,companyName,true,true,false,attLinkResult);
+        }
+
         if (!"PM_PRJ_REQ".equals(entCode)){
             mapAddValue("PRJ_REPLY_DATE","PRJ_REPLY_DATE",row,AttDataTypeE.DATE,attLinkResult); //批复日期
         }
@@ -738,7 +746,7 @@ public class AttLinkExtDetail {
             Map<String,String> postMap = getPostMap(list);
             for (String key : postMap.keySet()){
                 String userId = postMap.get(key);
-                String userName = AdUserExt.getUserName(userId,myJdbcTemplate);
+                String userName = AdUserExt.getUserName(userId);
                 String code = getMapToCode(key,postCodeMap);
                 attLinkResultAddValue(userId,userName,code,attLinkResult);
             }
@@ -976,7 +984,7 @@ public class AttLinkExtDetail {
                 String postCode = JdbcMapUtil.getString(tmp,"postInfoCode");
                 if (key.equals(postCode)){
                     //回显赋值
-                    String userName = AdUserExt.getUserName(userId,myJdbcTemplate);
+                    String userName = AdUserExt.getUserName(userId);
                     attLinkResultAddValue(userId,userName,key,false,false,attLinkResult);
                 }
             }
@@ -1207,22 +1215,46 @@ public class AttLinkExtDetail {
             list = LinkSql.getPrjPostUser(attValue,companyId,myJdbcTemplate); // 第一版属性联动带出花名册-区分业主单位
         }
         if (!CollectionUtils.isEmpty(list)){
-            for (Map<String, Object> tmp : list) {
-                String userId = JdbcMapUtil.getString(tmp,"AD_USER_ID");
-                String userName = JdbcMapUtil.getString(tmp,"userName");
-                String code = JdbcMapUtil.getString(tmp,"CODE");
-                if (!SharedUtil.isEmptyString(userId)){
-                    List<String> codeList = StringUtil.getStrToList(code,",");
-                    for (String tp : codeList) {
-                        if ("PM_BUY_DEMAND_REQ".equals(entCode)){ // 采购需求审批
-                            if (!"AD_USER_THREE_ID".equals(tp)){
-                                if (!"AD_USER_TWO_ID".equals(tp)){
-                                    LinkUtils.mapAddAllValue(tp,AttDataTypeE.TEXT_LONG,userId,userName,true,false,true,attLinkResult);
-                                }
+            attLinkResultValueRoster(list,entCode,attLinkResult);
+        }
+    }
+
+    /**
+     * 新版本获取花名册方法
+     * @param entCode 业务表名
+     * @param projectId 项目id
+     * @param attLinkResult 属性联动返回值
+     * @param myJdbcTemplate 数据源
+     */
+    public static void autoPostUserNew(String entCode, String projectId, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
+        List<Map<String,Object>> list = LinkSql.getPrjPostUserSecondVersion(projectId,myJdbcTemplate); // 查询项目花名册信息
+        if (!CollectionUtils.isEmpty(list)){
+            attLinkResultValueRoster(list,entCode,attLinkResult);
+        }
+    }
+
+    /**
+     * 属性联动-表单岗位赋值
+     * @param list
+     * @param entCode
+     * @param attLinkResult
+     */
+    private static void attLinkResultValueRoster(List<Map<String, Object>> list, String entCode, AttLinkResult attLinkResult) {
+        for (Map<String, Object> tmp : list) {
+            String userId = JdbcMapUtil.getString(tmp,"AD_USER_ID");
+            String userName = JdbcMapUtil.getString(tmp,"userName");
+            String code = JdbcMapUtil.getString(tmp,"CODE");
+            if (!SharedUtil.isEmptyString(userId)){
+                List<String> codeList = StringUtil.getStrToList(code,",");
+                for (String tp : codeList) {
+                    if ("PM_BUY_DEMAND_REQ".equals(entCode)){ // 采购需求审批
+                        if (!"AD_USER_THREE_ID".equals(tp)){
+                            if (!"AD_USER_TWO_ID".equals(tp)){
+                                LinkUtils.mapAddAllValue(tp,AttDataTypeE.TEXT_LONG,userId,userName,true,false,true,attLinkResult);
                             }
-                        } else {
-                            LinkUtils.mapAddAllValue(tp,AttDataTypeE.TEXT_LONG,userId,userName,true,false,true,attLinkResult);
                         }
+                    } else {
+                        LinkUtils.mapAddAllValue(tp,AttDataTypeE.TEXT_LONG,userId,userName,true,false,true,attLinkResult);
                     }
                 }
             }

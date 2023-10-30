@@ -591,6 +591,7 @@ public class ProcessRoleExt {
         purchaseUserList.add(purchaseUser);
         ExtJarHelper.returnValue.set(purchaseUserList);
     }
+
     /**
      * 获取采购管理部负责人
      */
@@ -617,6 +618,13 @@ public class ProcessRoleExt {
      */
     public void getProcessCostUser(){
         getDeptUser("AD_USER_THREE_ID","post_cost","成本岗");
+    }
+
+    /**
+     * 查询任意流程选择的成本管理岗用户
+     */
+    public void getProcessCostUser2(){
+        getDeptUser("AD_USER_EIGHTEEN_ID","post_cost","成本岗");
     }
 
     /**
@@ -1052,7 +1060,6 @@ public class ProcessRoleExt {
      * 根据流程发起部门信息获取部门负责人信息
      */
     public void getDeptLeaderByDept(){
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
         //获取签订公司
         String deptId = JdbcMapUtil.getString(entityRecord.valueMap,"CRT_DEPT_ID");
@@ -1308,6 +1315,32 @@ public class ProcessRoleExt {
             ExtJarHelper.returnValue.set(list);
         } else {
             throw new BaseException("未匹配到对应审批人，请联系管理员核查");
+        }
+    }
+
+    /** 角色-获取部门人员(可区分公司)-前期管理部人员 **/
+    public void getEarlyUser(){
+        getUserFromDept("post_early","前期管理部");
+    }
+
+    /**
+     * 获取部门下人员信息 包含子级部门
+     * @param deptCode 部门编码
+     * @param deptName 部门名称
+     */
+    private void getUserFromDept(String deptCode, String deptName) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<HrDept> deptList = HrDept.selectByWhere(new Where().eq(HrDept.Cols.CODE,deptCode).eq(HrDept.Cols.STATUS,"AP"));
+        if (!CollectionUtils.isEmpty(deptList)){
+            List<HrDept> childList = HrDeptExt.getChildList(deptList);
+            if (!CollectionUtils.isEmpty(childList)){
+                deptList.addAll(childList);
+            }
+            List<String> deptIdList = deptList.stream().map(HrDept::getId).distinct().collect(Collectors.toList());
+            List<String> userList = HrDeptExt.getUserByDeptId(deptIdList,myJdbcTemplate);
+            if (!CollectionUtils.isEmpty(userList)){
+                ExtJarHelper.returnValue.set(userList);
+            }
         }
     }
 }

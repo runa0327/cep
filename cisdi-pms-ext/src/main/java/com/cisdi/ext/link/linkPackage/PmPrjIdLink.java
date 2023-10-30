@@ -5,8 +5,10 @@ import com.cisdi.ext.link.AttLinkProcessDetail;
 import com.cisdi.ext.link.AttLinkResult;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.link.LinkedRecord;
+import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.LinkedAttModel;
 import com.cisdi.ext.model.PostInfo;
+import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.pm.PmDeptExt;
 import com.cisdi.ext.pm.PmRosterExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -282,8 +284,11 @@ public class PmPrjIdLink {
      * @param myJdbcTemplate 数据源
      */
     public static void nodeDetail(String projectId, String sevId, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
-//        List<Map<String, Object>> list = LinkSql.getPrjNodeLevel3(projectId,myJdbcTemplate);
-        List<Map<String, Object>> list = ProPlanUtils.sortLevel3(projectId);
+        List<Map<String,Object>> list = ProPlanUtils.queryLevel3HaveNodeType(projectId,myJdbcTemplate);
+        List<Map<String, Object>> list1 = ProPlanUtils.queryLevel3(projectId,myJdbcTemplate);
+        if (!CollectionUtils.isEmpty(list1)){
+            list.addAll(list1);
+        }
         if (CollectionUtils.isEmpty(list)) {
             throw new BaseException("该项目不存在项目进度节点信息，请先处理！");
         } else {
@@ -293,6 +298,10 @@ public class PmPrjIdLink {
                     LinkedRecord linkedRecord = new LinkedRecord();
 
                     String planName = JdbcMapUtil.getString(tmp, "nodeName");
+                    String typeName = JdbcMapUtil.getString(tmp,"typeName");
+                    if (StringUtils.hasText(typeName)){
+                        planName = planName + "(" + typeName + ")";
+                    }
 
                     //计划完成日期
                     linkedRecord.valueMap.put("PLAN_COMPL_DATE", JdbcMapUtil.getString(tmp, "PLAN_COMPL_DATE"));
@@ -315,6 +324,13 @@ public class PmPrjIdLink {
                     linkedRecord.valueMap.put("PM_PRO_PLAN_NODE_ID", JdbcMapUtil.getString(tmp, "id"));
                     linkedRecord.textMap.put("PM_PRO_PLAN_NODE_ID", planName);
 
+                    linkedRecord.textMap.put("NAME_ONE", planName);
+                    linkedRecord.valueMap.put("NAME_ONE", planName);
+                    if (planName.contains("里程碑") || planName.contains("一级节点")){
+                        linkedRecord.valueMap.put("IS_DISCOLORED", "1");
+                        linkedRecord.textMap.put("IS_DISCOLORED", "1");
+                    }
+
                     //TODO 操作类型字段返回  JdbcMapUtil.getString(tmp, "OPREATION_TYPE")
 
                     linkedRecordList.add(linkedRecord);
@@ -324,5 +340,26 @@ public class PmPrjIdLink {
                 attLinkResult.childClear.put("1658642775492775936", true);
             }
         }
+    }
+
+    /**
+     * 项目名称及内部管理单位赋值
+     * @param prjIds 项目ids(需提前判断是否为空)
+     * @param projectId 项目id(查询内部管理单位)
+     * @param attLinkResult 联动返回值
+     * @param myJdbcTemplate 数据源
+     */
+    public static void prjNameAndCompanyValue(String prjIds,String projectId, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
+        String projectIds = prjIds.replace(",","','");
+        String projectName = JdbcMapUtil.getString(myJdbcTemplate.queryForList("select group_concat(name) as name from pm_prj where id in ('"+projectIds+"')").get(0),"name");
+        PmPrj pmPrj = PmPrj.selectById(projectId);
+        if (pmPrj != null){
+            String companyId = pmPrj.getCompanyId();
+            if (StringUtils.hasText(companyId)){
+                String companyName = HrDept.selectById(companyId).getName();
+                LinkUtils.mapAddAllValue("COMPANY_ID", AttDataTypeE.TEXT_LONG,companyId,companyName,true,true,false,attLinkResult);
+            }
+        }
+        LinkUtils.mapAddAllValue("PM_PRJ_IDS",AttDataTypeE.TEXT_LONG,prjIds,projectName,true,true,false,attLinkResult);
     }
 }

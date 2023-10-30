@@ -385,4 +385,9 @@
         left join(select count(*) as num,'1' as id from pm_prj where status = 'ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and PROJECT_CLASSIFICATION_ID = '1704686735267102720') d on a.id = d.id
         left join(select count(*) as num,'1' as id from pm_prj where status = 'ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and PROJECT_CLASSIFICATION_ID = '1704686841101975552') e on a.id = e.id
     </select>
+
+    <!--根据项目id查询项目内部管理单位-->
+    <select id="queryCompanyById" resultType="String">
+        select COMPANY_ID from pm_prj where id = #{id}
+    </select>
 </mapper>
