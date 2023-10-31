@@ -250,11 +250,6 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.60</version>
         </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>5.8.6</version>
-        </dependency>
         <!-- openoffice -->
         <dependency>
             <groupId>org.openoffice</groupId>
