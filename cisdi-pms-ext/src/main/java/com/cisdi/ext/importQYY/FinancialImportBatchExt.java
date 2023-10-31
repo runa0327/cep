@@ -382,6 +382,7 @@ public class FinancialImportBatchExt {
                     .set("FILE_ID_ONE",newImport.getFileIdOne()).set("REVISION_FILE",newImport.getRevisionFile())
                     .set("REVIEW_REPORT_FILE",newImport.getReviewReportFile()).set("REPLY_ACTUAL_DATE",newImport.getReplyActualDate())
                     .set("REPLY_NO_WR",newImport.getReplyNoWr()).set("REPLY_FILE",newImport.getReplyFile())
+                    .set("COMPANY_ID",pmPrj.getCompanyId()) // 内部管理单位
                     .exec();
         } catch (Exception e){
             error = "写入初设概算流程表异常;";

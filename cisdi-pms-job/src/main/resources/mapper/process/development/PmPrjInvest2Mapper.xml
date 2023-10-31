@@ -2,23 +2,23 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.cisdi.pms.job.mapper.process.development.PmPrjInvest1Mapper">
-    <resultMap id="PmPrjInvest1Result" type="com.cisdi.pms.job.domain.process.development.PmPrjInvest1">
+<mapper namespace="com.cisdi.pms.job.mapper.process.development.PmPrjInvest2Mapper">
+    <resultMap id="PmPrjInvest2Result" type="com.cisdi.pms.job.domain.process.development.PmPrjInvest2">
         <id property="id" column="id" />
         <result property="projectId" column="projectId" />
         <result property="companyId" column="companyId" />
     </resultMap>
 
     <!--查询内部单位管理为空的流程数据-->
-    <select id="queryCompanyIsNull" resultMap="PmPrjInvest1Result">
+    <select id="queryCompanyIsNull" resultMap="PmPrjInvest2Result">
         select
-            id as id,
-            PM_PRJ_ID as projectId,
-            COMPANY_ID as companyId
+        id as id,
+        PM_PRJ_ID as projectId,
+        COMPANY_ID as companyId
         from
-            PM_PRJ_INVEST1
+        PM_PRJ_INVEST2
         where
-            status not in ('VD','VDING') and COMPANY_ID is null
+        status not in ('VD','VDING') and COMPANY_ID is null
         <if test="id != null and id != ''">
             and id = #{id}
         </if>
