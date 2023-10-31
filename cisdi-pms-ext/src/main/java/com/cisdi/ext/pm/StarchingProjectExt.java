@@ -86,10 +86,11 @@ public class StarchingProjectExt {
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pm.id as prj_id,pm.pm_code as prj_code,pm.`NAME` as prj_name,pp.`NAME` as owners,pm.CUSTOMER_UNIT as owner_id,gs.`NAME` as type,\n" +
-                "pm.PROJECT_TYPE_ID as type_id,gg.`NAME` as location,pm.BASE_LOCATION_ID as location_id,REPORT_FILE as report_file,PRJ_SITUATION,ESTIMATED_TOTAL_INVEST from pm_prj pm\n" +
+                "pm.PROJECT_TYPE_ID as type_id,gg.`NAME` as location,pm.BASE_LOCATION_ID as location_id,REPORT_FILE as report_file,PRJ_SITUATION,ESTIMATED_TOTAL_INVEST,pm.COMPANY_ID,hd.name as companyName from pm_prj pm\n" +
                 "left join pm_party pp on pm.CUSTOMER_UNIT = pp.id\n" +
                 "left join gr_set_value gs on pm.PROJECT_TYPE_ID = gs.id\n" +
                 "left join gr_set_value gg on pm.BASE_LOCATION_ID = gg.id\n" +
+                " left join hr_dept hd on hd.id = pm.COMPANY_ID " +
                 "where pm.PROJECT_CLASSIFICATION_ID ='1704686841101975552' and pm.id=?", map.get("id"));
         if (CollectionUtils.isEmpty(list)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
@@ -104,7 +105,7 @@ public class StarchingProjectExt {
                 queryFileParams.put("ids", ids);
                 List<Map<String, Object>> fileList = myNamedParameterJdbcTemplate.queryForList("select ff.ID as ID, DSP_NAME,SIZE_KB,UPLOAD_DTTM,au.`NAME` as USER_NAME,FILE_INLINE_URL,FILE_ATTACHMENT_URL from fl_file ff left join ad_user au on ff.CRT_USER_ID = au.id  where ff.id in (:ids)", queryFileParams);
                 AtomicInteger index = new AtomicInteger(0);
-                List<FileObj> fileObjList = fileList.stream().map(p -> {
+                info.fileObjList = fileList.stream().map(p -> {
                     FileObj obj = new FileObj();
                     obj.num = index.getAndIncrement() + 1;
                     obj.fileName = JdbcMapUtil.getString(p, "DSP_NAME");
@@ -116,7 +117,6 @@ public class StarchingProjectExt {
                     obj.downloadUrl = JdbcMapUtil.getString(p, "FILE_ATTACHMENT_URL");
                     return obj;
                 }).collect(Collectors.toList());
-                info.fileObjList = fileObjList;
             }
             Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(info), Map.class);
             ExtJarHelper.returnValue.set(outputMap);
@@ -172,6 +172,11 @@ public class StarchingProjectExt {
         } else {
             sb.append(" ,PRJ_SITUATION=null");
         }
+        if (StringUtils.hasText(inputData.companyId)) {
+            sb.append(" ,COMPANY_ID='").append(inputData.companyId).append("'");
+        } else {
+            sb.append(" ,COMPANY_ID=null");
+        }
         if (StringUtils.hasText(inputData.fileIds)) {
             sb.append(" ,REPORT_FILE='").append(inputData.fileIds).append("'");
         } else {
@@ -196,6 +201,8 @@ public class StarchingProjectExt {
         info.locationId = JdbcMapUtil.getString(dataMap, "location_id");
         info.amt = JdbcMapUtil.getString(dataMap, "ESTIMATED_TOTAL_INVEST");
         info.desc = JdbcMapUtil.getString(dataMap, "PRJ_SITUATION");
+        info.companyId = JdbcMapUtil.getString(dataMap, "COMPANY_ID");
+        info.companyName = JdbcMapUtil.getString(dataMap, "companyName");
         return info;
     }
 
@@ -222,6 +229,11 @@ public class StarchingProjectExt {
         public String locationId;
         public String amt;
         public String desc;
+
+        public String companyId;
+
+        public String companyName;
+
         public List<FileObj> fileObjList;
     }
 
@@ -258,6 +270,7 @@ public class StarchingProjectExt {
         public String location;
         public String amt;
         public String desc;
+        public String companyId;
         public String fileIds;
     }
 }

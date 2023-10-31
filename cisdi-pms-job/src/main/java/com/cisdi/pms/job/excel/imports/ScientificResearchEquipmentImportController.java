@@ -4,7 +4,6 @@ import com.cisdi.pms.job.excel.export.BaseController;
 import com.cisdi.pms.job.excel.model.ScientificResearchEquipmentModel;
 import com.cisdi.pms.job.utils.EasyExcelUtil;
 import com.cisdi.pms.job.utils.ReflectUtil;
-import com.cisdi.pms.job.utils.Util;
 import com.qygly.shared.util.JdbcMapUtil;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,6 +41,13 @@ public class ScientificResearchEquipmentImportController extends BaseController 
         typeMap.put("范围外", "1707205346074505216");
     }
 
+    /**
+     * 把已经存在于项目库中的设备项目数据转化城科研设备项目
+     *
+     * @param file
+     * @param response
+     * @return
+     */
     @SneakyThrows(IOException.class)
     @RequestMapping(value = "/import")
     public Map<String, Object> importData(MultipartFile file, HttpServletResponse response) {
@@ -54,10 +61,17 @@ public class ScientificResearchEquipmentImportController extends BaseController 
             if (optional.isPresent()) {
                 Map<String, Object> dataMap = optional.get();
                 String belongId = JdbcMapUtil.getString(dataMap, "ID");
-                String pmCode = getPmCode(JdbcMapUtil.getString(dataMap, "PM_CODE"));
-                String id = Util.insertData(jdbcTemplate, "pm_prj");
-                jdbcTemplate.update("update pm_prj set `NAME`=?,SUBORDINATE_PROJECT=?,EQUIPMENT_PURCHASE_BUDGET_AMOUNT=?,RESEARCH_RANGE=?,REPLY_NO=?,PRJ_SITUATION=?,PROJECT_CLASSIFICATION_ID=?,PM_CODE=? where ID=?",
-                        model.getName(), belongId, model.getBudgetAmount(), typeMap.get(model.getResearchRange()), model.getReplyNo(), model.getDescription(), "1704686735267102720", pmCode, id);
+                String pmCode = getPmCode(belongId);
+                Optional<Map<String, Object>> opt = list.stream().filter(m -> model.getName().equals(JdbcMapUtil.getString(m, "NAME"))).findAny();
+                if (opt.isPresent()) {
+                    String id = JdbcMapUtil.getString(opt.get(), "ID");
+                    jdbcTemplate.update("update pm_prj set SUBORDINATE_PROJECT=?,EQUIPMENT_PURCHASE_BUDGET_AMOUNT=?,RESEARCH_RANGE=?,REPLY_NO=?,PRJ_SITUATION=?,PROJECT_CLASSIFICATION_ID=?,PM_CODE=? where ID=?",
+                            belongId, new BigDecimal(10000).multiply(new BigDecimal(model.getBudgetAmount())), typeMap.get(model.getResearchRange()), model.getReplyNo(), model.getDescription(), "1704686735267102720", pmCode, id);
+                } else {
+                    res.add("项目：" + model.getName() + "不存在！");
+                }
+            } else {
+                res.add("项目：" + model.getBeLongProject() + "不存在！");
             }
         }
 
@@ -67,13 +81,23 @@ public class ScientificResearchEquipmentImportController extends BaseController 
             result.put("message", "导入成功！");
             return result;
         } else {
-            super.exportTxt(response, res, "项目纳统填报日志");
+            super.exportTxt(response, res, "科研设备项目导入日志");
             return null;
         }
     }
 
-    private String getPmCode(String code) {
-        return null;
+    private String getPmCode(String projectId) {
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from pm_prj where SUBORDINATE_PROJECT =?  order by pm_code desc", projectId);
+        if (CollectionUtils.isEmpty(list)) {
+            List<Map<String, Object>> list1 = jdbcTemplate.queryForList("select * from pm_prj where id =?", projectId);
+            Map<String, Object> dataMap = list1.get(0);
+            return JdbcMapUtil.getString(dataMap, "PM_CODE") + "-001";
+        } else {
+            String pmCode = JdbcMapUtil.getString(list.get(0), "PM_CODE");
+            String leftPart = pmCode.substring(0, pmCode.length() - 4);
+            String rightPart = pmCode.substring(pmCode.length() - 3);
+            int count = Integer.parseInt(rightPart) + 1;
+            return leftPart + "-" + String.format("%03d", count);
+        }
     }
-
 }

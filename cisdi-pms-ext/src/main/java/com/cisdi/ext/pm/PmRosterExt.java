@@ -51,7 +51,8 @@ public class PmRosterExt {
 
     /**
      * 根据用户id查询人员岗位信息
-     * @param userId 用户id
+     *
+     * @param userId    用户id
      * @param projectId 项目id
      * @param companyId 业主单位
      * @return
@@ -59,15 +60,15 @@ public class PmRosterExt {
     public static String getUserPostIdByPrj(String userId, String projectId, String companyId) {
         StringBuilder sb = new StringBuilder();
         List<PmRoster> list = PmRoster.selectByWhere(new Where()
-                .eq(PmRoster.Cols.PM_PRJ_ID,projectId)
-                .eq(PmRoster.Cols.CUSTOMER_UNIT,companyId)
-                .eq(PmRoster.Cols.STATUS,"AP")
-                .eq(PmRoster.Cols.AD_USER_ID,userId));
-        if (!CollectionUtils.isEmpty(list)){
+                .eq(PmRoster.Cols.PM_PRJ_ID, projectId)
+                .eq(PmRoster.Cols.CUSTOMER_UNIT, companyId)
+                .eq(PmRoster.Cols.STATUS, "AP")
+                .eq(PmRoster.Cols.AD_USER_ID, userId));
+        if (!CollectionUtils.isEmpty(list)) {
             for (PmRoster tp : list) {
                 sb.append(tp.getPostInfoId()).append(",");
             }
-            sb.deleteCharAt(sb.length()-1);
+            sb.deleteCharAt(sb.length() - 1);
         }
         return sb.toString();
     }
@@ -99,11 +100,13 @@ public class PmRosterExt {
         int pageSize = Integer.parseInt(String.valueOf(map.get("pageSize")));
         int pageIndex = Integer.parseInt(String.valueOf(map.get("pageIndex")));
         String projectName = String.valueOf(map.get("projectName"));
-        StringBuffer sb = new StringBuffer();
+        String category = String.valueOf(map.get("category"));
+        StringBuilder sb = new StringBuilder();
         sb.append("select pj.id as id, pj.`NAME` as project_name from pm_prj pj left join PM_ROSTER pp on pj.id = pp.PM_PRJ_ID where pj.`STATUS`='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pj.IZ_FORMAL_PRJ = 1 and (pj.PROJECT_STATUS != '1661568714048413696' or pj.PROJECT_STATUS is null ) ");
         if (!StringUtils.isEmpty(projectName)) {
             sb.append(" and pj.name like '%").append(projectName).append("%'");
         }
+        sb.append(" and pj.PROJECT_CLASSIFICATION_ID ='").append(category).append("'");
         sb.append(" and pj.pm_code is not null ");
         sb.append("group by pj.id order by pj.pm_code desc");
         String totalSql = sb.toString();
@@ -232,7 +235,7 @@ public class PmRosterExt {
     public void projectList() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         StringBuffer sb = new StringBuffer();
-        sb.append("select * from pm_prj where 1=1 AND PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and PROJECT_CLASSIFICATION_ID = '1704686664114929664'");
+        sb.append("select * from pm_prj where 1=1 AND PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ");
         if (!StringUtils.isEmpty(map.get("name"))) {
             sb.append(" and NAME like '%").append(map.get("name")).append("%'");
         }
@@ -729,7 +732,7 @@ public class PmRosterExt {
                     id = list.get(0).getId();
                     userId = list.get(0).getAdUserId();
                 }
-                if (!StringUtils.hasText(userId)){
+                if (!StringUtils.hasText(userId)) {
                     Crud.from("PM_ROSTER").where().eq("id", id).update()
                             .set("CUSTOMER_UNIT", tmp.getCustomerUnit())
                             .set("PM_PRJ_ID", tmp.getPmPrjId())
