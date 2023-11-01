@@ -852,7 +852,7 @@ public class ProcessRoleExt {
 
         //查询该节点岗位(流程岗位id)
         List<String> deptId = PmProcessPostConExt.getDeptIdByNode(nodeId,companyId);
-        if (!CollectionUtils.isEmpty(userList)){
+        if (CollectionUtils.isEmpty(userList)){
             // 使用第一版花名册取数逻辑
             userRosterFirstVersion(projectId,companyId,entCode,csCommId,userList,deptId,myJdbcTemplate);
         }
