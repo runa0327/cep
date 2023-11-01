@@ -180,9 +180,12 @@ public class PrjMaterialInventory {
         int pageSize = ListReq.getPageSize();
         int pageIndex = ListReq.getPageIndex();
         int start = pageSize * (pageIndex - 1);
+        String category = ListReq.getCategory();
 
 
-        String sql = "select id from pm_prj where status = 'AP' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and IZ_FORMAL_PRJ = 1 and PROJECT_CLASSIFICATION_ID = '1704686664114929664' ";
+//        String sql = "select id from pm_prj where status = 'AP' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and IZ_FORMAL_PRJ = 1 and PROJECT_CLASSIFICATION_ID = '1704686664114929664' ";
+        String sql = "select id from pm_prj where status = 'AP' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and IZ_FORMAL_PRJ = 1 " +
+                " and PROJECT_CLASSIFICATION_ID = '" + category + "'";
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("start", start);
         queryParams.put("pageSize", pageSize);
@@ -711,6 +714,7 @@ public class PrjMaterialInventory {
         private List<String> prjIds;
         private Integer pageSize;
         private Integer pageIndex;
+        private String category;
     }
 
     @Data
