@@ -1021,6 +1021,7 @@ public class AttLinkExtDetail {
         mapAddBigDecimalValue("CONSTRUCT_PERIOD_INTEREST","CONSTRUCT_PERIOD_INTEREST",resultRow,AttDataTypeE.DOUBLE,attLinkResult); //利息
         mapAddValue("REPLY_NO","REPLY_NO",resultRow,AttDataTypeE.TEXT_LONG,attLinkResult); //批复文号
         mapAddValue("PRJ_REPLY_NO","REPLY_NO",resultRow,AttDataTypeE.TEXT_LONG,attLinkResult); //批复文号
+        mapAddValue("PRJ_CODE","PRJ_CODE",resultRow,AttDataTypeE.TEXT_LONG,attLinkResult); //项目代码
 
         return attLinkResult;
     }

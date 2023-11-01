@@ -98,27 +98,21 @@ public class PipelineRelocationReqExt {
                     userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
                     String dept = PmPrjExt.getUserDeptByRoster(userId,projectId,companyId,csCommId,entCode,myJdbcTemplate);
                     if (!SharedUtil.isEmptyString(dept)){
-                        String processComment = "", commentEnd = "";
                         if (dept.contains("AD_USER_EIGHTEEN_ID")){ //成本岗
-                            //获取流程中的意见信息
-                            processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_THREE");
-                            commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
-                            ProcessCommon.commentShow("APPROVAL_COMMENT_THREE",commentEnd,csCommId,entCode);
+                            ProcessCommon.updateComment("APPROVAL_COMMENT_THREE",entityRecord.valueMap,comment,entCode,csCommId,userName);
                         } else if (dept.contains("AD_USER_TWENTY_TWO_ID")){ //设计岗
-                            processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_TWO");
-                            commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
-                            ProcessCommon.commentShow("APPROVAL_COMMENT_TWO",commentEnd,csCommId,entCode);
+                            ProcessCommon.updateComment("APPROVAL_COMMENT_TWO",entityRecord.valueMap,comment,entCode,csCommId,userName);
                         } else if (dept.contains("AD_USER_TWENTY_THREE_ID")){ //工程岗
-                            processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_ONE");
-                            commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
-                            ProcessCommon.commentShow("APPROVAL_COMMENT_ONE",commentEnd,csCommId,entCode);
+                            ProcessCommon.updateComment("APPROVAL_COMMENT_ONE",entityRecord.valueMap,comment,entCode,csCommId,userName);
                         }
                     }
                 }
             }
         } else {
             if ("manageDesignCostFalse".equals(nodeStatus)){ // 2-工程部/设计部/成本部意见
-                ProcessCommon.clearData("APPROVAL_COMMENT_ONE,APPROVAL_COMMENT_TWO,APPROVAL_COMMENT_THREE",csCommId,entCode,myJdbcTemplate);
+                ProcessCommon.updateProcColsValue("APPROVAL_COMMENT_ONE",entCode,csCommId,null);
+                ProcessCommon.updateProcColsValue("APPROVAL_COMMENT_TWO",entCode,csCommId,null);
+                ProcessCommon.updateProcColsValue("APPROVAL_COMMENT_THREE",entCode,csCommId,null);
             }
         }
     }
@@ -272,7 +266,7 @@ public class PipelineRelocationReqExt {
         //判断是否是当轮拒绝回来的、撤销回来的（是否是第一个进入该节点审批的人）
         String sql2 = "select count(*) as num from wf_task where WF_NODE_INSTANCE_ID = ? and IS_CLOSED = 1 and AD_USER_ID != ?";
         List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,nodeId,userId);
-        Boolean firstCheck = true; //是第一次审批
+        boolean firstCheck = true; //是第一次审批
         if (!CollectionUtils.isEmpty(list2)){
             String num = JdbcMapUtil.getString(list2.get(0),"num");
             if (!SharedUtil.isEmptyString(num) && !"0".equals(num)){
@@ -285,7 +279,7 @@ public class PipelineRelocationReqExt {
                     .exec();
             log.info("已更新：{}",exec);
         } else if ("actThreeDept".equals(status)){
-            if (firstCheck == true){
+            if (firstCheck){
                 Integer exec = Crud.from("PIPELINE_RELOCATION_REQ").where().eq("id",csCommId).update()
                         .set("APPROVAL_COMMENT_ONE",null).set("APPROVAL_COMMENT_TWO",null).set("APPROVAL_COMMENT_THREE",null)
                         .exec();
@@ -326,7 +320,7 @@ public class PipelineRelocationReqExt {
     public String getDesignCheckUser(MyJdbcTemplate myJdbcTemplate) {
         String sql = "select ATT_DEFAULT_VALUE_LOGIC from AD_ENT_ATT where AD_ENT_ID = '1609896405474889728' and AD_ATT_ID = '1610990575958552576'";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
-        String userId = "";
+        String userId;
         if (CollectionUtils.isEmpty(list)){
             throw new BaseException("当前流程设计岗未设置默认审批人员，请联系管理员处理！");
         } else {
