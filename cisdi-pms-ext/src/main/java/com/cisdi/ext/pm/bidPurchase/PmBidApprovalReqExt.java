@@ -398,11 +398,12 @@ public class PmBidApprovalReqExt {
     //判断当前登录人在流程中的岗位
     private String getDeptName(Map<String, Object> map,String userId) {
         String name = "";
-        Set<String> set = map.keySet();
-        for (String tmp : set) {
-            String value = map.get(tmp).toString();
-            if (value.contains(userId)){
-                return tmp;
+        for (String key : map.keySet()){
+            Object value = map.get(key);
+            if (value != null){
+                if (String.valueOf(value).contains(userId)){
+                    return key;
+                }
             }
         }
         return name;
@@ -536,9 +537,10 @@ public class PmBidApprovalReqExt {
                         ProcessCommon.commentShow("APPROVAL_COMMENT_FOUR",commentEnd,csCommId,entCode);
                         ProcessCommon.commentShow("FILE_ID_FIVE",file,csCommId,entCode);
                     } else if ("AD_USER_FOUR_ID".equals(deptId)){ // 合同岗
-                        processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_SIX");
-                        commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
-                        ProcessCommon.commentShow("APPROVAL_COMMENT_SIX",commentEnd,csCommId,entCode);
+                        ProcessCommon.updateComment("APPROVAL_COMMENT_SIX",entityRecord.valueMap,comment,entCode,csCommId,userName);
+//                        processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_SIX");
+//                        commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
+//                        ProcessCommon.commentShow("APPROVAL_COMMENT_SIX",commentEnd,csCommId,entCode);
                         ProcessCommon.commentShow("FILE_ID_SIX",file,csCommId,entCode);
                     } else if ("OPERATOR_ONE_ID".equals(deptId)){ //经办人
                         processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_THREE");

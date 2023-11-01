@@ -106,7 +106,6 @@ public class ProPlanUtils {
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pn.id as id,pn.`NAME` as nodeName,ifnull(PM_PRO_PLAN_NODE_PID,0) pid," +
                 "pn.SEQ_NO as seq,pn.level as level,'0' as seq_bak,pn.PLAN_COMPL_DATE as PLAN_COMPL_DATE,OPREATION_TYPE,SCHEDULE_NAME,ifnull(pn.PROGRESS_STATUS_ID,0) as status  " +
                 " from pm_pro_plan_node pn left join pm_pro_plan pl on pn.PM_PRO_PLAN_ID = pl.id where PM_PRJ_ID=?", projectId);
-
         list.stream().filter(p -> "0".equals(JdbcMapUtil.getString(p, "pid")))
                 .sorted(Comparator.comparing(o -> BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(o, "seq")))).peek(m -> {
             BigDecimal parentSeq = BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(m, "seq")).multiply(new BigDecimal(1000));
@@ -114,6 +113,43 @@ public class ProPlanUtils {
             getChildren(m, list, parentSeq);
         }).collect(Collectors.toList());
         return list.stream().filter(p -> "3".equals(JdbcMapUtil.getString(p, "level"))).sorted(Comparator.comparing(o -> JdbcMapUtil.getString(o, "seq_bak"))).collect(Collectors.toList());
+    }
+
+    /**
+     * 根据项目id查询该项目3及节点，并带出节点状态信息
+     * @param projectId 项目id
+     * @param myJdbcTemplate 数据源
+     * @return 节点信息
+     */
+    public static List<Map<String, Object>> queryLevel3(String projectId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "SELECT pn.id AS id,pn.`NAME` AS nodeName,pn.PLAN_COMPL_DATE AS PLAN_COMPL_DATE,OPREATION_TYPE,SCHEDULE_NAME,d.name as typeName,pn.SEQ_NO as seq,ifnull(PM_PRO_PLAN_NODE_PID,0) pid,'0' as seq_bak,pn.level as level FROM pm_pro_plan_node pn LEFT JOIN pm_pro_plan pl ON pn.PM_PRO_PLAN_ID = pl.id left join STANDARD_NODE_NAME c on pn.SCHEDULE_NAME = c.id left join gr_set_value d on c.PROJECT_NODE_TYPE_ID = d.id and d.GR_SET_ID = '1717352141542887424' WHERE pl.PM_PRJ_ID =? and pn.status = 'ap' and d.name is null ORDER BY typeName desc,pn.SEQ_NO asc";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId);
+        sortList(list);
+        return list.stream().filter(p -> "3".equals(JdbcMapUtil.getString(p, "level"))).sorted(Comparator.comparing(o -> JdbcMapUtil.getString(o, "seq_bak"))).collect(Collectors.toList());
+    }
+
+    /**
+     * 根据项目id查询该项目3及节点，此类节点信息包含项目节点类型
+     * @param projectId 项目id
+     * @param myJdbcTemplate 数据源
+     * @return 节点信息
+     */
+    public static List<Map<String, Object>> queryLevel3HaveNodeType(String projectId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "SELECT pn.id AS id,pn.`NAME` AS nodeName,pn.PLAN_COMPL_DATE AS PLAN_COMPL_DATE,OPREATION_TYPE,SCHEDULE_NAME,d.name as typeName,pn.SEQ_NO as seq,ifnull(PM_PRO_PLAN_NODE_PID,0) pid,'0' as seq_bak,pn.level as level FROM pm_pro_plan_node pn LEFT JOIN pm_pro_plan pl ON pn.PM_PRO_PLAN_ID = pl.id left join STANDARD_NODE_NAME c on pn.SCHEDULE_NAME = c.id left join gr_set_value d on c.PROJECT_NODE_TYPE_ID = d.id and d.GR_SET_ID = '1717352141542887424' WHERE pl.PM_PRJ_ID =? and pn.status = 'ap' and pn.level = 3  and d.name is not null  ORDER BY typeName desc,pn.SEQ_NO asc";
+        return myJdbcTemplate.queryForList(sql,projectId);
+    }
+
+    /**
+     * 节点信息排序
+     * @param list 节点信息
+     */
+    private static void sortList(List<Map<String, Object>> list) {
+        list.stream().filter(p -> "0".equals(JdbcMapUtil.getString(p, "pid")))
+                .sorted(Comparator.comparing(o -> BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(o, "seq")))).peek(m -> {
+                    BigDecimal parentSeq = BigDecimalUtil.stringToBigDecimal(JdbcMapUtil.getString(m, "seq")).multiply(new BigDecimal(1000));
+                    m.put("seq_bak", parentSeq);
+                    getChildren(m, list, parentSeq);
+                }).collect(Collectors.toList());
     }
 
     private static List<Map<String, Object>> getChildren(Map<String, Object> parent, List<Map<String, Object>> allData, BigDecimal parentSeq) {

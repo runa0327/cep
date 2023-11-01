@@ -1,16 +1,11 @@
 package com.cisdi.ext.link;
 
-import com.cisdi.ext.link.AttLinkResult;
-import com.cisdi.ext.link.LinkedAtt;
 import com.cisdi.ext.base.AdUserExt;
-import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
-import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +50,7 @@ public class AttLinkProcessDetail {
     public static void pipelineLink(String design, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
         // 设计部人员
         {
-            String userName = AdUserExt.getUserName(design,myJdbcTemplate);
+            String userName = AdUserExt.getUserName(design);
             LinkedAtt linkedAtt = new LinkedAtt();
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
             linkedAtt.value = design;

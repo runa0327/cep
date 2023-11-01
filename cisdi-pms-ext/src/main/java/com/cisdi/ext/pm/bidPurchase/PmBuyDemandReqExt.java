@@ -44,6 +44,17 @@ public class PmBuyDemandReqExt {
     }
 
     /**
+     * 根据id查询单条信息
+     * @param id id
+     * @param myJdbcTemplate 数据源
+     * @return 查询结果
+     */
+    public static List<Map<String,Object>> queryById(String id, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select ID,NAME,CUSTOMER_UNIT,PM_PRJ_IDS,BUY_MATTER_ID,BUY_TYPE_ID,CRT_USER_ID,AD_USER_TWENTY_ONE_ID,AD_USER_EIGHTEEN_ID FROM PM_BUY_DEMAND_REQ WHERE ID = ?";
+        return myJdbcTemplate.queryForList(sql,id);
+    }
+
+    /**
      * 采购需求审批扩展-按照先后顺序审批-第一次审批
      */
     public void checkFirst() {

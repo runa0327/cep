@@ -1,8 +1,10 @@
 package com.cisdi.ext.api;
 
+import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.view.base.HrDeptView;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 
@@ -70,6 +72,20 @@ public class HrDeptExt {
     }
 
     /**
+     * 根据id查询名称
+     * @param id id
+     * @return 名称
+     */
+    public static String getNameById(String id, MyJdbcTemplate myJdbcTemplate) {
+        String name = null;
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select name from hr_dept where id = ?",id);
+        if (!CollectionUtils.isEmpty(list)){
+            name = JdbcMapUtil.getString(list.get(0),"name");
+        }
+        return name;
+    }
+
+    /**
      * 部门信息
      */
     public void getDistinctDept() {
@@ -91,5 +107,51 @@ public class HrDeptExt {
         Map<String, Object> result = new HashMap<>();
         result.put("deptList", list);
         ExtJarHelper.returnValue.set(result);
+    }
+
+
+
+    /**
+     * 根据父级部门id获取所有子级部门id
+     * @param deptList 父级部门集合
+     * @return 左右子级部门
+     */
+    public static List<HrDept> getChildList(List<HrDept> deptList) {
+        List<HrDept> childList = new ArrayList<>();
+        foreachGetChild(childList,deptList);
+        return childList;
+    }
+
+    /**
+     * 遍历循环获取子级部门
+     * @param childList 返回的list
+     * @param deptList 父级部门
+     */
+    private static void foreachGetChild(List<HrDept> childList, List<HrDept> deptList) {
+        for (HrDept hrDept : deptList) {
+            String parentId = hrDept.getId();
+            List<HrDept> list = HrDept.selectByWhere(new Where().eq(HrDept.Cols.HR_DEPT_PID,parentId).eq(HrDept.Cols.STATUS,"AP"));
+            if (!CollectionUtils.isEmpty(list)){
+                childList.addAll(list);
+                foreachGetChild(childList,list);
+            }
+        }
+    }
+
+    /**
+     * 根据部门id查询部门人员信息
+     * @param deptIdList 部门id列表
+     * @param myJdbcTemplate 数据源
+     * @return 部门人员信息
+     */
+    public static List<String> getUserByDeptId(List<String> deptIdList, MyJdbcTemplate myJdbcTemplate) {
+        String id = String.join("','",deptIdList);
+        String sql = "select distinct a.ad_user_id from hr_dept_user a left join ad_user b on a.ad_user_id = b.id where a.hr_dept_id in ('"+id+"') and b.status = 'AP' and b.name != '未涉及'";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
+        if (!CollectionUtils.isEmpty(list)){
+            return list.stream().map(p->JdbcMapUtil.getString(p,"ad_user_id")).collect(Collectors.toList());
+        } else {
+            return null;
+        }
     }
 }

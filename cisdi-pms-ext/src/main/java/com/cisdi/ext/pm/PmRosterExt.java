@@ -74,6 +74,25 @@ public class PmRosterExt {
     }
 
     /**
+     * 根据岗位id获取岗位对应编码
+     * @param idList id集合
+     * @param myJdbcTemplate 数据源
+     * @return 岗位编码
+     */
+    public static List<String> getPostCodeById(List<String> idList, MyJdbcTemplate myJdbcTemplate) {
+        String ids = String.join("','",idList);
+        List<String> list = new ArrayList<>();
+        String sql = "select group_concat(code) as code from post_info where id in ('"+ids+"')";
+        List<Map<String,Object>> codeList = myJdbcTemplate.queryForList(sql);
+        if (!CollectionUtils.isEmpty(codeList)){
+            String codeStr = JdbcMapUtil.getString(codeList.get(0),"code");
+            list = new ArrayList<>(Arrays.asList(codeStr.split(",")));
+            list = list.stream().distinct().collect(Collectors.toList());
+        }
+        return list;
+    }
+
+    /**
      * 花名册列表查询
      */
     public void pmRosterList() {
@@ -216,7 +235,7 @@ public class PmRosterExt {
     public void projectList() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         StringBuffer sb = new StringBuffer();
-        sb.append("select * from pm_prj where 1=1 AND PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and PROJECT_CLASSIFICATION_ID = '1704686664114929664'");
+        sb.append("select * from pm_prj where 1=1 AND PROJECT_SOURCE_TYPE_ID = '0099952822476441374' ");
         if (!StringUtils.isEmpty(map.get("name"))) {
             sb.append(" and NAME like '%").append(map.get("name")).append("%'");
         }

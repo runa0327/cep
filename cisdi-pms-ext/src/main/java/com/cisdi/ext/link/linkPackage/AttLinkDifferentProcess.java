@@ -131,6 +131,7 @@ public class AttLinkDifferentProcess {
      */
     public static List<String> noPrjTypeLink(){
         List<String> list = new ArrayList<>();
+        list.add("PM_PRJ_REQ"); //立项审批
         list.add("PM_PRJ_INVEST1"); //可研报告
         list.add("PM_PRJ_INVEST2"); //初设概算
         list.add("PM_PRJ_INVEST3"); //预算财评
@@ -144,6 +145,7 @@ public class AttLinkDifferentProcess {
     public static List<String> prjTypeEditLink(){
         List<String> list = new ArrayList<>();
         list.add("PM_CONSTRUCT_PERMIT_REQ"); //施工许可
+        list.add("PM_PRJ_REQ"); //施工许可
         return list;
     }
 
@@ -163,10 +165,10 @@ public class AttLinkDifferentProcess {
      */
     public static List<String> getLinkUserProcess() {
         List<String> list = new ArrayList<>();
+        list.add("PM_PRJ_REQ"); //立项申请审批
         list.add("PM_PRJ_SETTLE_ACCOUNTS"); //项目结算审批
         list.add("PM_EXTENSION_REQUEST_REQ"); //节点延期申请
         list.add("PM_PRJ_RED_CHECK_REQ"); //项目红线核查
-        list.add("PM_PRJ_REQ"); //立项申请审批
         list.add("PM_PRJ_INVEST1"); //可研报告审批
         list.add("PM_PRJ_INVEST2"); //初设概算审批
         list.add("PM_PRJ_RED_CHECK_REQ"); //项目红线核查
@@ -174,15 +176,6 @@ public class AttLinkDifferentProcess {
         list.add("PIPELINE_RELOCATION_REQ"); //管线迁改
         list.add("PM_CONSTRUCTION_DRAWING_DESIGN"); //施工图设计管理
         list.add("PM_BUY_DEMAND_REQ"); //采购需求审批
-        return list;
-    }
-    /**
-     * 需要自动岗位人员的流程-岗位人员可改
-     * @return 流程集合
-     */
-    public static List<String> getLinkUserProcessEdit() {
-        List<String> list = new ArrayList<>();
-        list.add("PIPELINE_RELOCATION_REQ"); //管线迁改
         return list;
     }
 

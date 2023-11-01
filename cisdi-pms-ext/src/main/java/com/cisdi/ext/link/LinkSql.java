@@ -31,7 +31,7 @@ public class LinkSql {
                 "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget'," +
                 "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE,t.PRJ_EARLY_USER_ID,t.PRJ_DESIGN_USER_ID,t.PRJ_COST_USER_ID,t.OTHER, " +
                 "t.ESTIMATED_TOTAL_INVEST,t.PROJECT_AMT,t.CONSTRUCT_PRJ_AMT,t.EQUIP_BUY_AMT,t.EQUIPMENT_COST,t.PROJECT_OTHER_AMT,t.LAND_BUY_AMT," +
-                "t.PREPARE_AMT,t.CONSTRUCT_PERIOD_INTEREST " +
+                "t.PREPARE_AMT,t.CONSTRUCT_PERIOD_INTEREST,t.PROJECT_CLASSIFICATION_ID,t.COMPANY_ID " +
                 "from pm_prj t left join PM_PARTY c on t.CUSTOMER_UNIT=c.id " +
                 "LEFT JOIN gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
                 "LEFT JOIN gr_set_value l on t.BASE_LOCATION_ID=l.id " +
@@ -80,6 +80,17 @@ public class LinkSql {
     }
 
     /**
+     * 查询项目花名册信息-不区分业主单位信息
+     * @param attValue 项目id
+     * @param myJdbcTemplate 数据源
+     * @return 查询数据集合
+     */
+    public static List<Map<String, Object>> getPrjPostUserSecondVersion(String attValue, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select a.AD_USER_ID,b.CODE,(SELECT NAME FROM AD_USER WHERE ID = a.AD_USER_ID) AS userName from pm_roster a left join post_info b on a.POST_INFO_ID = b.id where a.PM_PRJ_ID = ? and a.status = 'AP' and b.status = 'AP'";
+        return myJdbcTemplate.queryForList(sql,attValue);
+    }
+
+    /**
      * 查询项目审批节点对应的岗位的字段
      * @param deptId 流程岗位id
      * @param companyId 业主单位
@@ -106,7 +117,7 @@ public class LinkSql {
      */
     public static List<String> getEntCodeAtt(String entCode, MyJdbcTemplate myJdbcTemplate) {
         List<String> codeList = new ArrayList<>();
-        String sql = "select a.code from AD_ATT a left join AD_ENT_ATT b on a.id = b.AD_ATT_ID left join AD_ENT c on b.AD_ENT_ID = c.id where c.code = ?";
+        String sql = "select a.code from AD_ATT a left join AD_ENT_ATT b on a.id = b.AD_ATT_ID left join AD_ENT c on b.AD_ENT_ID = c.id where c.code = ? and ( b.ATT_IS_SHOWN_BY_DEFAULT = 1 OR b.ATT_IS_SHOWN_BY_DEFAULT IS NULL )";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,entCode);
         if (!CollectionUtils.isEmpty(list)){
             codeList = list.stream().map(p->JdbcMapUtil.getString(p,"code")).collect(Collectors.toList());

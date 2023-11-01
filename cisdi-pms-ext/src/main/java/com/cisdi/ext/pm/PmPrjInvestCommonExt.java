@@ -133,8 +133,14 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("PREPARE_AMT_HISTORY");
         entityRecord.extraEditableAttCodeList.add("CONSTRUCT_PERIOD_HISTORY");
         entityRecord.extraEditableAttCodeList.add("TEXT_REMARK_TWO");
+        entityRecord.extraEditableAttCodeList.add("FILE_ID_ONE");
+        entityRecord.extraEditableAttCodeList.add("FILE_ID_TWO");
         entityRecord.extraEditableAttCodeList.add("FILE_ID_FOUR");
         entityRecord.extraEditableAttCodeList.add("FILE_ID_FIVE");
         entityRecord.extraEditableAttCodeList.add("FILE_ID_SIX");
+        entityRecord.extraEditableAttCodeList.add("DATE_TWO");
+        entityRecord.extraEditableAttCodeList.add("RATE_ONE");
+        entityRecord.extraEditableAttCodeList.add("CONTACTS_ONE");
+        entityRecord.extraEditableAttCodeList.add("CONTACT_MOBILE_ONE");
     }
 }

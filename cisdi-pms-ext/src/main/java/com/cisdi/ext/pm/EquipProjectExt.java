@@ -1,5 +1,6 @@
 package com.cisdi.ext.pm;
 
+import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.StringUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -145,7 +146,8 @@ public class EquipProjectExt {
         }
         if (StringUtils.hasText(inputData.name)) {
             sb.append(" ,NAME='").append(inputData.name).append("'");
-            sb.append(" ,REMARK='").append(inputData.name).append("(设备项目)'");
+            String remark = GrSetValueExt.getValueNameById("1704686735267102720");
+            sb.append(" ,REMARK='").append(remark).append("'");
         } else {
             sb.append(" ,NAME=null");
             sb.append(" ,REMARK=null");
