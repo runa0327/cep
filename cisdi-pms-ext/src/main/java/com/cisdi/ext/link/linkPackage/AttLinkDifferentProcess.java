@@ -211,6 +211,7 @@ public class AttLinkDifferentProcess {
         list.add("PROJECT_CLAIM_NOTICE"); // 工程索赔通知书
         list.add("APPROVAL_INSPECTION"); // 报审、报验
         list.add("PM_BUILD_PROGRESS_REQ"); // 施工进度计划
+        list.add("PM_DESIGN_ASSIGNMENT_BOOK"); // 设计任务书
         return list;
     }
 
@@ -352,5 +353,24 @@ public class AttLinkDifferentProcess {
         List<String> list = new ArrayList<>();
         list.add("PM_TOPSOIL_STRIPPING_REQ"); // 耕作层剥离
         return list;
+    }
+
+    /**
+     * 属性联动中需要单独查询额外字典名称的key
+     * @return 结果集
+     */
+    public static List<String> getKeyList() {
+        List<String> keyList = new ArrayList<>();
+        keyList.add("IS_BUDGET_ID");  // 是否市财政预算政府投资计划项目
+        keyList.add("FEASIBILITY_COMPLETED");  // 可研完成情况
+        keyList.add("CREATE_PROJECT_COMPLETED"); // 立项完成情况
+        keyList.add("SELECT_SITE_COMPLETED"); // 规划选址完成情况
+        keyList.add("USE_LAND_COMPLETED"); // 用地预审完成情况
+        keyList.add("EIA_COMPLETED"); // 环评审批完成情况
+        keyList.add("WOODLAND_WATER_SOIL_COMPLETED"); // 林地、水土保持、节能完成情况
+        keyList.add("ESTIMATE_COMPLETED"); // 概算完成情况
+        keyList.add("BUDGET_REVIEW_COMPLETED"); // 预算评审完成情况
+        keyList.add("CONSTRUCT_BID_COMPLETED"); // 施工招标备案完成情况
+        return keyList;
     }
 }

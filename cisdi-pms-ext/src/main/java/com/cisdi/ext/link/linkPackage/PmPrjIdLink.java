@@ -1,10 +1,9 @@
 package com.cisdi.ext.link.linkPackage;
 
+import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.enums.EntCodeEnum;
+import com.cisdi.ext.link.*;
 import com.cisdi.ext.link.AttLinkProcessDetail;
-import com.cisdi.ext.link.AttLinkResult;
-import com.cisdi.ext.link.LinkSql;
-import com.cisdi.ext.link.LinkedRecord;
 import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.LinkedAttModel;
 import com.cisdi.ext.model.PostInfo;
@@ -24,10 +23,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 项目id属性联动
@@ -98,7 +94,7 @@ public class PmPrjIdLink {
             if (!CollectionUtils.isEmpty(list)) {
 
                 //赋值
-                Map row = list.get(0);
+                Map<String, Object> row = list.get(0);
                 String companyId = JdbcMapUtil.getString(row,"customer_id");
 
                 AttLinkExtDetail.assignmentAttLinkResult(attLinkResult,row,entCode,myJdbcTemplate);
@@ -131,8 +127,7 @@ public class PmPrjIdLink {
                 // 资金信息回显。优先级 可研估算<初设概算<预算财<项目结算
                 List<String> amtList = AttLinkDifferentProcess.getAmtList();
                 if (amtList.contains(entCode)) {
-                    // 查询预算财评信息
-                    Map resultRow1 = AttLinkExtDetail.getAmtMap(attValue, myJdbcTemplate);
+                    Map<String,Object> resultRow1 = AttLinkExtDetail.getAmtMap(attValue, myJdbcTemplate);
                     AttLinkExtDetail.getResult(resultRow1, attLinkResult);
                 }
             }
@@ -361,5 +356,398 @@ public class PmPrjIdLink {
             }
         }
         LinkUtils.mapAddAllValue("PM_PRJ_IDS",AttDataTypeE.TEXT_LONG,prjIds,projectName,true,true,false,attLinkResult);
+    }
+
+    /**
+     * 项目id属性联动
+     *
+     * @param myJdbcTemplate 数据源
+     * @param attValue       属性联动值
+     * @param entCode        业务表名
+     * @return 回显值
+     */
+    public static AttLinkResult linkForAMOUT_PM_PRJ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
+        AttLinkResult attLinkResult = new AttLinkResult();
+
+        // 资金需求项目名称(AMOUT_PM_PRJ_ID),引用（单值）
+        // 项目基础信息
+        String sql0 = "select t.PRJ_CODE as prj_code,t.code code,c.id customer_id,c.name customer_name,m.id m_id,m.name m_name," +
+                "l.id l_id,l.name l_name,t.FLOOR_AREA,pt.id pt_id,pt.name pt_name,st.id st_id,st.name st_name," +
+                "su.id su_id,su.name su_name,t.CON_SCALE_QTY,t.CON_SCALE_QTY2,t.PRJ_SITUATION, t.BUILD_YEARS," +
+                "t.PRJ_REPLY_NO, t.PRJ_REPLY_DATE, t.PRJ_REPLY_FILE, t.INVESTMENT_SOURCE_ID,t.BUILDING_AREA, " +
+                "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST1 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'FS'," +
+                "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST2 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'PD'," +
+                "(SELECT PRJ_TOTAL_INVEST from PM_PRJ_INVEST3 WHERE PM_PRJ_ID = t.id order by CRT_DT desc limit 1) as 'budget'," +
+                "t.QTY_ONE,t.QTY_TWO,t.QTY_THREE " +
+                "from pm_prj t join PM_PARTY c on t.CUSTOMER_UNIT=c.id " +
+                "LEFT JOIN gr_set_value m on t.PRJ_MANAGE_MODE_ID = m.ID " +
+                "LEFT JOIN gr_set_value l on t.BASE_LOCATION_ID=l.id " +
+                "LEFT JOIN gr_set_value pt on t.PROJECT_TYPE_ID=pt.id " +
+                "LEFT JOIN gr_set_value st on t.CON_SCALE_TYPE_ID=st.id " +
+                "LEFT JOIN gr_set_value su on t.CON_SCALE_UOM_ID=su.id where t.id=? ";
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql0, attValue);
+        if (CollectionUtils.isEmpty(list)) {
+            return attLinkResult;
+        }
+        Map<String,Object> row = list.get(0);
+
+        // 回显项目信息
+        String prjCode = JdbcMapUtil.getString(row, "prj_code"); // 项目编号
+        LinkUtils.mapAddAllValue("PRJ_CODE",AttDataTypeE.TEXT_LONG,prjCode,prjCode,true,true,false,attLinkResult);
+
+        // 项目批复文号
+        Map<String, Object> resultRow = getReplyNo(attValue);
+        String replyNo = JdbcMapUtil.getString(resultRow, "REPLY_NO_WR");
+        LinkUtils.mapAddAllValue("PRJ_REPLY_NO",AttDataTypeE.TEXT_LONG,replyNo,replyNo,true,true,false,attLinkResult);
+        LinkUtils.mapAddAllValue("REPLY_NO",AttDataTypeE.TEXT_LONG,replyNo,replyNo,true,true,false,attLinkResult);
+
+        String prjSituation = JdbcMapUtil.getString(row, "PRJ_SITUATION"); // 项目介绍
+        LinkUtils.mapAddAllValue("PRJ_SITUATION",AttDataTypeE.TEXT_LONG,prjSituation,prjSituation,true,true,false,attLinkResult);
+
+        String investSourceId = JdbcMapUtil.getString(row, "INVESTMENT_SOURCE_ID"); // 资金来源
+        LinkUtils.mapAddAllValue("PM_FUND_SOURCE_ID",AttDataTypeE.TEXT_LONG,investSourceId,investSourceId,true,true,false,attLinkResult);
+        LinkUtils.mapAddAllValue("INVESTMENT_SOURCE_ID",AttDataTypeE.TEXT_LONG,investSourceId,investSourceId,true,true,false,attLinkResult);
+
+        String customerId = JdbcMapUtil.getString(row, "customer_id"); // 业主单位
+        String customerName = JdbcMapUtil.getString(row, "customer_name");
+        LinkUtils.mapAddAllValue("CUSTOMER_UNIT",AttDataTypeE.TEXT_LONG,customerId,customerName,true,true,false,attLinkResult);
+
+        String projectTypeId = JdbcMapUtil.getString(row, "pt_id"); // 项目类型
+        String projectTypeName = JdbcMapUtil.getString(row, "pt_name");
+        LinkUtils.mapAddAllValue("PROJECT_TYPE_ID",AttDataTypeE.TEXT_LONG,projectTypeId,projectTypeName,true,true,false,attLinkResult);
+
+        if ("PO_ORDER_PAYMENT_REQ".equals(entCode)) { // 采购合同付款申请
+            prjLinkPaymentReq(attValue,attLinkResult,myJdbcTemplate);
+        } else if ("PM_FUND_REQUIRE_PLAN_REQ".equals(entCode)) { // 资金需求计划申请
+            prjLinkFundPlanReq(attValue,row,attLinkResult,myJdbcTemplate);
+        } else if ("SKILL_DISCLOSURE_PAPER_RECHECK_RECORD".equals(entCode) || "PM_DESIGN_ASSIGNMENT_BOOK".equals(entCode)) {
+            // SKILL_DISCLOSURE_PAPER_RECHECK_RECORD 技术交底与图纸会审记录 PM_DESIGN_ASSIGNMENT_BOOK 设计任务书
+            Map<String, Object> resultRow1 = getAmtMap(attValue);
+            getResult(resultRow1, attLinkResult);
+        }
+        return attLinkResult;
+    }
+
+    /**
+     * 项目属性联动-资金需求计划申请
+     * @param attValue 属性联动值
+     * @param row 项目基础信息
+     * @param attLinkResult 属性联动结果集
+     * @param myJdbcTemplate 数据源
+     */
+    private static void prjLinkFundPlanReq(String attValue, Map<String,Object> row, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
+        // 查询关联合同信息
+        List<Map<String, Object>> contractMaps = myJdbcTemplate.queryForList("select o.CONTRACT_PRICE,a.PRJ_TOTAL_INVEST estimate,b.PRJ_TOTAL_INVEST budget from PO_ORDER_REQ " +
+                "o left join PM_PRJ_INVEST2 a on a.PM_PRJ_ID =o.PM_PRJ_ID left join PM_PRJ_INVEST3 b on b" +
+                ".PM_PRJ_ID = o.PM_PRJ_ID where o.PM_PRJ_ID = ? and o.`STATUS` = 'AP' order by o.CRT_DT " +
+                "limit 1", attValue);
+        if (!CollectionUtils.isEmpty(contractMaps)) {
+            Map<String, Object> contractRow = contractMaps.get(0);
+
+            String estimateAmt = JdbcMapUtil.getString(contractRow, "estimate"); // 概算金额
+            LinkUtils.mapAddAllValue("ESTIMATED_AMOUNT",AttDataTypeE.TEXT_LONG,estimateAmt,estimateAmt,true,true,false,attLinkResult);
+
+            String budgetAmt = JdbcMapUtil.getString(contractRow, "budget"); // 预算金额
+            LinkUtils.mapAddAllValue("FINANCIAL_AMOUNT",AttDataTypeE.TEXT_LONG,budgetAmt,budgetAmt,true,true,false,attLinkResult);
+        }
+
+        // 该项目之前有无资金需求计划
+        List<Map<String, Object>> reqMaps = myJdbcTemplate.queryForList("select r.YEAR,r.IS_BUDGET_ID,r.PROJECT_NATURE_ID," +
+                "r.BASE_LOCATION_ID,r.AGENT_BUILD_UNIT_RESPONSE,r.AGENT_BUILD_UNIT_RESPONSE_PHONE,r.DEMOLITION_COMPLETED," +
+                "r.PLAN_START_DATE,r.PLAN_COMPL_DATE,r.ACTUAL_START_DATE,r.CREATE_PROJECT_COMPLETED,r.FEASIBILITY_COMPLETED," +
+                "r.SELECT_SITE_COMPLETED,r.USE_LAND_COMPLETED,r.EIA_COMPLETED,r.WOODLAND_WATER_SOIL_COMPLETED,r.ESTIMATE_COMPLETED," +
+                "r.REPLY_FILE,r.BUDGET_REVIEW_COMPLETED,r.CONSERVATION_REPLY_FILE,r.CONSTRUCT_BID_COMPLETED,r.BID_WIN_NOTICE_FILE_GROUP_ID " +
+                " from PM_FUND_REQUIRE_PLAN_REQ r " +
+                "left join pm_prj p on r.AMOUT_PM_PRJ_ID = p.id " +
+                "where p.id = ? and r.`STATUS` = 'AP'", attValue);
+        if (!CollectionUtils.isEmpty(reqMaps)) {
+            Map<String, Object> reqRow = reqMaps.get(0);
+            if (!CollectionUtils.isEmpty(reqMaps)) {// 该项目有过资金需求计划，回显表单数据
+                List<String> keyList = AttLinkDifferentProcess.getKeyList();
+                Set<String> keys = reqRow.keySet();
+                for (String key : keys) {
+                    String id = JdbcMapUtil.getString(reqRow, key);
+                    String name = id;
+                    if (keyList.contains(key)) {// 是否财政预算
+                        name = GrSetValueExt.getValueNameById(id);
+                    }
+                    LinkUtils.mapAddAllValue(key,AttDataTypeE.TEXT_LONG,id,name,true,true,true,attLinkResult);
+                }
+            }
+
+            // 可研完成情况
+        } else {// 未填写 根据项目回显
+
+            String year = JdbcMapUtil.getString(row, "PRJ_REPLY_DATE"); // 立项年度
+            LinkUtils.mapAddAllValue("YEAR",AttDataTypeE.TEXT_LONG,year,year,true,true,false,attLinkResult);
+
+            String locationId = JdbcMapUtil.getString(row, "l_id"); // 建设地点
+            String locationName = JdbcMapUtil.getString(row, "l_name");
+            LinkUtils.mapAddAllValue("BASE_LOCATION_ID", AttDataTypeE.TEXT_LONG,locationId,locationName,true,true,false,attLinkResult);
+
+            // 查询五方
+            List<Map<String, Object>> partyMaps = myJdbcTemplate.queryForList("SELECT r.BUILD_UNIT_RESPONSE,r.AGENT_PHONE FROM PM_PRJ_PARTY_REQ r left join pm_prj p on p.id = r.PM_PRJ_ID where p.id = ? and r.`STATUS` = 'AP' ORDER BY r.CRT_DT desc LIMIT 1", attValue);
+            if (!CollectionUtils.isEmpty(partyMaps)) {
+                Map<String, Object> partyRow = partyMaps.get(0);
+
+                String unitPerson = JdbcMapUtil.getString(partyRow, "BUILD_UNIT_RESPONSE"); // 项目负责人
+                LinkUtils.mapAddAllValue("AGENT_BUILD_UNIT_RESPONSE",AttDataTypeE.TEXT_LONG,unitPerson,unitPerson,true,true,false,attLinkResult);
+
+                String userPhone = JdbcMapUtil.getString(partyRow, "AGENT_PHONE"); // 负责人联系电话
+                LinkUtils.mapAddAllValue("AGENT_BUILD_UNIT_RESPONSE_PHONE",AttDataTypeE.TEXT_LONG,userPhone,userPhone,true,true,false,attLinkResult);
+            }
+            LinkUtils.mapAddAllValue("DEMOLITION_COMPLETED",AttDataTypeE.TEXT_LONG,(String) null,null,true,true,false,attLinkResult); // 征地拆迁完成情况
+            LinkUtils.mapAddAllValue("PLAN_START_DATE",AttDataTypeE.TEXT_LONG,(String) null,null,true,true,false,attLinkResult); // 预计开工时间
+            LinkUtils.mapAddAllValue("PLAN_COMPL_DATE",AttDataTypeE.TEXT_LONG,(String) null,null,true,true,false,attLinkResult); // 预计完工时间
+            LinkUtils.mapAddAllValue("ACTUAL_START_DATE",AttDataTypeE.TEXT_LONG,(String) null,null,true,true,false,attLinkResult); // 实际开工时间
+
+            // 查询节点名称
+            List<Map<String, Object>> nodeMaps = myJdbcTemplate.queryForList("select n.name,n.PROGRESS_STATUS_ID from PM_PRO_PLAN_NODE n" +
+                    " left join PM_PRO_PLAN p on n.PM_PRO_PLAN_ID = p.id where p.PM_PRJ_ID = ? and n.level = '3'", attValue);
+            if (CollectionUtils.isEmpty(nodeMaps)) {
+                throw new BaseException("项目没有对应的三级节点！");
+            }
+            // 默认未涉及
+            initNUll(attLinkResult);
+            // 匹配字段
+            List<String> createMatch = Arrays.asList("立项", "立项批复");
+            List<String> feasibility = Arrays.asList("可研", "可研批复");
+            List<String> landUsePlan = Arrays.asList("用地规划", "用地规划许可证");
+            List<String> eia = Arrays.asList("环评审批完成情况", "环评");
+            List<String> advanceExam = Arrays.asList("用地预审");
+            List<String> save = Arrays.asList("节能", "水保", "林地使用调整");
+            List<String> prj = Arrays.asList("(施工)工程量清单", "工程量清单", "EPC", "施工", "工程量清单");
+            for (Map<String, Object> nodeMap : nodeMaps) {
+                String name = nodeMap.get("name").toString();
+                String id = JdbcMapUtil.getString(nodeMap, "PROGRESS_STATUS_ID");
+                String sqlName = "select name from gr_set_value where id = ?";
+                List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList(sqlName, id);
+                String valueName = JdbcMapUtil.getString(nameMap.get(0), "name");
+                if (judgeMatch(createMatch, name)) {
+                    LinkUtils.mapAddAllValue("CREATE_PROJECT_COMPLETED",AttDataTypeE.TEXT_LONG,id,valueName,true,true,false,attLinkResult); // 立项完成情况
+                } else if (judgeMatch(feasibility, name)) {
+                    LinkUtils.mapAddAllValue("FEASIBILITY_COMPLETED",AttDataTypeE.TEXT_LONG,id,valueName,true,true,false,attLinkResult); // 可研完成情况
+                } else if (judgeMatch(landUsePlan, name)) {
+                    LinkUtils.mapAddAllValue("SELECT_SITE_COMPLETED",AttDataTypeE.TEXT_LONG,id,valueName,true,true,false,attLinkResult); // 规划选址完成情况
+                } else if (judgeMatch(eia, name)) {
+                    LinkUtils.mapAddAllValue("EIA_COMPLETED",AttDataTypeE.TEXT_LONG,id,valueName,true,true,false,attLinkResult); // 环评完成情况
+                } else if (judgeMatch(advanceExam, name)) {
+                    LinkUtils.mapAddAllValue("USE_LAND_COMPLETED",AttDataTypeE.TEXT_LONG,id,valueName,true,true,false,attLinkResult); // 用地预审
+                } else if (judgeMatch(save, name)) {
+                    LinkUtils.mapAddAllValue("WOODLAND_WATER_SOIL_COMPLETED",AttDataTypeE.TEXT_LONG,id,valueName,true,true,false,attLinkResult); // 用地预审
+                } else if ("初步设计概算批复".equals(name)) {
+                    LinkUtils.mapAddAllValue("ESTIMATE_COMPLETED",AttDataTypeE.TEXT_LONG,id,valueName,true,true,false,attLinkResult); // 概算完成情况
+                } else if ("预算财政评审".equals(name)) {
+                    LinkUtils.mapAddAllValue("BUDGET_REVIEW_COMPLETED",AttDataTypeE.TEXT_LONG,id,valueName,true,true,false,attLinkResult); // 预算评审完成情况
+                } else if (judgeMatch(prj, name)) {
+                    LinkUtils.mapAddAllValue("CONSTRUCT_BID_COMPLETED",AttDataTypeE.TEXT_LONG,id,valueName,true,true,false,attLinkResult); // 预算评审完成情况
+                }
+            }
+        }
+
+        //概算批复文件信息回显
+        String sql1 = "select REPLY_FILE from PM_PRJ_INVEST2 where PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,attValue);
+        if (!CollectionUtils.isEmpty(list1)){
+            String fileId = JdbcMapUtil.getString(list1.get(0),"REPLY_FILE");
+            LinkUtils.mapAddValueByValueFile("REPLY_FILE",fileId,fileId,true,true,true,AttDataTypeE.FILE_GROUP,attLinkResult);
+        }
+        //预算批复文件信息回显
+        String sql2 = "select FINANCIAL_REVIEW_FILE from PM_PRJ_INVEST3 where PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql2,attValue);
+        if (!CollectionUtils.isEmpty(list2)){
+            String fileId = JdbcMapUtil.getString(list2.get(0),"FINANCIAL_REVIEW_FILE");
+            LinkUtils.mapAddValueByValueFile("CONSERVATION_REPLY_FILE",fileId,fileId,true,true,true,AttDataTypeE.FILE_GROUP,attLinkResult);
+        }
+        //施工中标通知书（招采里的中标通知书）
+        String sql3 = "SELECT GROUP_CONCAT(BID_WIN_NOTICE_FILE_GROUP_ID) AS FILE from PO_PUBLIC_BID_REQ WHERE PM_PRJ_ID = ? AND PMS_RELEASE_WAY_ID in ('0099799190825080728','0099799190825080731') and status = 'AP'";
+        List<Map<String,Object>> list3 = myJdbcTemplate.queryForList(sql3,attValue);
+        if (!CollectionUtils.isEmpty(list3)){
+            String fileId = JdbcMapUtil.getString(list3.get(0),"FILE");
+            LinkUtils.mapAddValueByValueFile("BID_WIN_NOTICE_FILE_GROUP_ID",fileId,fileId,true,true,true,AttDataTypeE.FILE_GROUP,attLinkResult);
+        }
+    }
+
+    /**
+     * 项目属性联动-采购合同付款申请
+     * @param attValue 属性联动值
+     * @param attLinkResult 属性联动结果集
+     * @param myJdbcTemplate 数据源
+     */
+    private static void prjLinkPaymentReq(String attValue, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
+        // 查询付款申请历史信息
+        String sql = "SELECT COLLECTION_DEPT_TWO,BANK_OF_DEPOSIT,ACCOUNT_NO,RECEIPT,SPECIAL_BANK_OF_DEPOSIT,SPECIAL_ACCOUNT_NO FROM PO_ORDER_PAYMENT_REQ WHERE AMOUT_PM_PRJ_ID = ? AND STATUS = 'AP' ORDER BY CRT_DT DESC limit 1";
+        List<Map<String, Object>> map1 = myJdbcTemplate.queryForList(sql, attValue);
+        if (!CollectionUtils.isEmpty(map1)) {
+            Map<String,Object> row2 = map1.get(0);
+
+            String collectionDept = JdbcMapUtil.getString(row2, "COLLECTION_DEPT_TWO"); // 收款单位
+            LinkUtils.mapAddAllValue("COLLECTION_DEPT_TWO",AttDataTypeE.TEXT_LONG,collectionDept,collectionDept,true,true,false,attLinkResult);
+
+            String bank = JdbcMapUtil.getString(row2, "BANK_OF_DEPOSIT"); // 开户行
+            LinkUtils.mapAddAllValue("BANK_OF_DEPOSIT",AttDataTypeE.TEXT_LONG,bank,bank,true,true,false,attLinkResult);
+
+            String accountNo = JdbcMapUtil.getString(row2, "ACCOUNT_NO"); // 账号
+            LinkUtils.mapAddAllValue("ACCOUNT_NO",AttDataTypeE.TEXT_LONG,accountNo,accountNo,true,true,false,attLinkResult);
+
+            String receipt = JdbcMapUtil.getString(row2, "RECEIPT"); // 农民工工资专用账号收款单位
+            LinkUtils.mapAddAllValue("RECEIPT",AttDataTypeE.TEXT_LONG,receipt,receipt,true,true,false,attLinkResult);
+
+            String specialBank = JdbcMapUtil.getString(row2, "SPECIAL_BANK_OF_DEPOSIT"); // 专户开户行
+            LinkUtils.mapAddAllValue("SPECIAL_BANK_OF_DEPOSIT",AttDataTypeE.TEXT_LONG,specialBank,specialBank,true,true,false,attLinkResult);
+
+            String specialAccountNo = JdbcMapUtil.getString(row2, "SPECIAL_ACCOUNT_NO"); // 专户账号
+            LinkUtils.mapAddAllValue("SPECIAL_ACCOUNT_NO",AttDataTypeE.TEXT_LONG,specialAccountNo,specialAccountNo,true,true,false,attLinkResult);
+        }
+    }
+
+    /**
+     * 属性赋值
+     * @param stringObjectMap 查询结果键值对
+     * @param attLinkResult 属性联动返回值
+     */
+    private static void getResult(Map<String, Object> stringObjectMap, AttLinkResult attLinkResult) {
+
+        String prjTotalAmt = JdbcMapUtil.getString(stringObjectMap, "PRJ_TOTAL_INVEST"); // 总投资
+        if (StringUtils.hasText(prjTotalAmt)){
+            LinkUtils.mapAddAllValue("PRJ_TOTAL_INVEST",AttDataTypeE.TEXT_LONG,new BigDecimal(prjTotalAmt),prjTotalAmt,true,true,false,attLinkResult);
+        } else {
+            LinkUtils.mapAddAllValue("PRJ_TOTAL_INVEST",AttDataTypeE.TEXT_LONG,(String) null,prjTotalAmt,true,true,false,attLinkResult);
+        }
+
+        String projectAmt = JdbcMapUtil.getString(stringObjectMap, "PROJECT_AMT"); // 工程费用
+        if (StringUtils.hasText(projectAmt)){
+            LinkUtils.mapAddAllValue("PROJECT_AMT",AttDataTypeE.TEXT_LONG,new BigDecimal(projectAmt),projectAmt,true,true,false,attLinkResult);
+        } else {
+            LinkUtils.mapAddAllValue("PROJECT_AMT",AttDataTypeE.TEXT_LONG,(String) null,projectAmt,true,true,false,attLinkResult);
+        }
+
+        String projectOtherAmt = JdbcMapUtil.getString(stringObjectMap, "PROJECT_OTHER_AMT"); // 工程建设其他费用
+        if (StringUtils.hasText(projectOtherAmt)){
+            LinkUtils.mapAddAllValue("PROJECT_OTHER_AMT",AttDataTypeE.TEXT_LONG,new BigDecimal(projectOtherAmt),projectOtherAmt,true,true,false,attLinkResult);
+        } else {
+            LinkUtils.mapAddAllValue("PROJECT_OTHER_AMT",AttDataTypeE.TEXT_LONG,(String) null,projectOtherAmt,true,true,false,attLinkResult);
+        }
+
+        String prepareAmt = JdbcMapUtil.getString(stringObjectMap, "PREPARE_AMT"); // 预备费
+        if (StringUtils.hasText(prepareAmt)){
+            LinkUtils.mapAddAllValue("PREPARE_AMT",AttDataTypeE.TEXT_LONG,new BigDecimal(prepareAmt),prepareAmt,true,true,false,attLinkResult);
+        } else {
+            LinkUtils.mapAddAllValue("PREPARE_AMT",AttDataTypeE.TEXT_LONG,(String) null,prepareAmt,true,true,false,attLinkResult);
+        }
+
+        String periodAmt = JdbcMapUtil.getString(stringObjectMap, "CONSTRUCT_PERIOD_INTEREST"); // 利息
+        if (StringUtils.hasText(periodAmt)){
+            LinkUtils.mapAddAllValue("CONSTRUCT_PERIOD_INTEREST",AttDataTypeE.TEXT_LONG,new BigDecimal(periodAmt),periodAmt,true,true,false,attLinkResult);
+        } else {
+            LinkUtils.mapAddAllValue("CONSTRUCT_PERIOD_INTEREST",AttDataTypeE.TEXT_LONG,(String) null,periodAmt,true,true,false,attLinkResult);
+        }
+
+        String replyNo = JdbcMapUtil.getString(stringObjectMap, "REPLY_NO_WR"); //批复文号
+        LinkUtils.mapAddAllValue("REPLY_NO",AttDataTypeE.TEXT_LONG,replyNo,replyNo,true,true,false,attLinkResult);
+        LinkUtils.mapAddAllValue("PRJ_REPLY_NO",AttDataTypeE.TEXT_LONG,replyNo,replyNo,true,true,false,attLinkResult);
+
+    }
+
+    /**
+     * 查询可研估算<初设概算<预算财评优先级最高的数据
+     * @param attValue 属性联动值
+     * @return 查询结果
+     */
+    private static Map<String, Object> getAmtMap(String attValue) {
+        Map<String, Object> resultRow = new HashMap<>();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql1 = "SELECT REPLY_NO_WR,PRJ_TOTAL_INVEST ,PROJECT_AMT, CONSTRUCT_AMT," +
+                " PROJECT_OTHER_AMT, PREPARE_AMT, CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST3 " +
+                "WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+        List<Map<String, Object>> map = myJdbcTemplate.queryForList(sql1, attValue);
+        List<Map<String, Object>> map1;
+        List<Map<String, Object>> map2;
+        if (CollectionUtils.isEmpty(map)) {
+            // 初设概算信息
+            String sql2 = "SELECT REPLY_NO_WR, PRJ_TOTAL_INVEST, PROJECT_AMT," +
+                    " CONSTRUCT_AMT, PROJECT_OTHER_AMT, PREPARE_AMT," +
+                    " CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST2 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+            map1 = myJdbcTemplate.queryForList(sql2, attValue);
+            if (CollectionUtils.isEmpty(map1)) {
+                String sql3 = "SELECT REPLY_NO_WR, PRJ_TOTAL_INVEST, PROJECT_AMT," +
+                        " CONSTRUCT_AMT, PROJECT_OTHER_AMT, PREPARE_AMT," +
+                        " CONSTRUCT_PERIOD_INTEREST FROM PM_PRJ_INVEST1 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+                map2 = myJdbcTemplate.queryForList(sql3, attValue);
+                if (!CollectionUtils.isEmpty(map2)) {
+                    resultRow = map2.get(0);
+                }
+            } else {
+                resultRow = map1.get(0);
+            }
+        } else {
+            resultRow = map.get(0);
+        }
+        return resultRow;
+    }
+
+    /**
+     * 名称匹配
+     * @param words 总名称
+     * @param name 节点名称
+     * @return 匹配结果
+     */
+    private static boolean judgeMatch(List<String> words, String name) {
+        for (String word : words) {
+            if (name.contains(word)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 默认不涉及
+     * @param attLinkResult 属性联动返回结果集
+     */
+    private static void initNUll(AttLinkResult attLinkResult) {
+        List<String> fields = Arrays.asList("CREATE_PROJECT_COMPLETED", "FEASIBILITY_COMPLETED",
+                "SELECT_SITE_COMPLETED", "EIA_COMPLETED", "USE_LAND_COMPLETED", "WOODLAND_WATER_SOIL_COMPLETED",
+                "ESTIMATE_COMPLETED", "BUDGET_REVIEW_COMPLETED", "CONSTRUCT_BID_COMPLETED");
+        for (String field : fields) {
+            {
+                LinkedAtt linkedAtt = new LinkedAtt();
+                linkedAtt.type = AttDataTypeE.TEXT_LONG;
+                linkedAtt.value = "0099902212142036278";
+                linkedAtt.text = "未涉及";
+                attLinkResult.attMap.put(field, linkedAtt);
+            }
+        }
+    }
+
+    /**
+     * 查询可研估算<初设概算<预算财评优先级最高的数据  查询文号
+     * @param attValue 属性值
+     * @return 各个级别流程信息
+     */
+    private static Map<String, Object> getReplyNo(String attValue) {
+        Map<String, Object> resultRow = new HashMap<>();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql1 = "SELECT REPLY_NO_WR FROM PM_PRJ_INVEST3 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+        List<Map<String, Object>> map = myJdbcTemplate.queryForList(sql1, attValue);
+        List<Map<String, Object>> map1;
+        List<Map<String, Object>> map2;
+        if (CollectionUtils.isEmpty(map)) {
+            // 初设概算信息
+            String sql2 = "SELECT REPLY_NO_WR FROM PM_PRJ_INVEST2 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+            map1 = myJdbcTemplate.queryForList(sql2, attValue);
+            if (CollectionUtils.isEmpty(map1)) {
+                String sql3 = "SELECT REPLY_NO_WR FROM PM_PRJ_INVEST1 WHERE PM_PRJ_ID = ? and status = 'AP' order by CRT_DT desc limit 1";
+                map2 = myJdbcTemplate.queryForList(sql3, attValue);
+                if (!CollectionUtils.isEmpty(map2)) {
+                    resultRow = map2.get(0);
+                }
+            } else {
+                resultRow = map1.get(0);
+            }
+        } else {
+            resultRow = map.get(0);
+        }
+        return resultRow;
     }
 }
