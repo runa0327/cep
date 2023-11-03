@@ -118,7 +118,7 @@ public class PmPrjExt {
             //当前更新级别id
             String levelId = GrSetValueExt.getValueId("invest_priority",String.valueOf(level),myJdbcTemplate);
             //更新项目基础信息
-            updateBaseData(projectId,entityRecord.valueMap,levelId);
+            updateBaseData(projectId,entityRecord.valueMap,levelId,code);
             //更新项目资金信息
             WfPmInvestUtil.updatePrjInvest(entityRecord,code);
         }
@@ -171,8 +171,9 @@ public class PmPrjExt {
      * @param projectId 项目id
      * @param valueMap map值
      * @param level 当前级别
+     * @param code 流程表名
      */
-    private static void updateBaseData(String projectId, Map<String, Object> valueMap, String level) {
+    private static void updateBaseData(String projectId, Map<String, Object> valueMap, String level, String code) {
         Crud.from("pm_prj").where().eq("id",projectId).update()
                 .set("FLOOR_AREA",JdbcMapUtil.getString(valueMap,"FLOOR_AREA")) //占地面积
                 .set("PROJECT_TYPE_ID",JdbcMapUtil.getString(valueMap,"PROJECT_TYPE_ID")) //项目类型
@@ -187,6 +188,13 @@ public class PmPrjExt {
                 .set("INVEST_PRIORITY",level) // 来源级别
                 .set("REPLY_NO",JdbcMapUtil.getString(valueMap,"REPLY_NO_WR")) // 来源级别
                 .exec();
+        if (!"PM_PRJ_SETTLE_ACCOUNTS".equals(code)){
+            Crud.from("pm_prj").where().eq("id",projectId).update()
+                    .set("REPLY_NO",JdbcMapUtil.getString(valueMap,"REPLY_NO_WR")) // 批复文号
+                    .set("PRJ_CODE",JdbcMapUtil.getString(valueMap,"PRJ_CODE")) // 项目代码
+                    .set("BUILD_YEARS",JdbcMapUtil.getString(valueMap,"BUILD_YEARS")) // 建设年限
+                    .exec();
+        }
     }
 
     /**
@@ -314,6 +322,22 @@ public class PmPrjExt {
                 .set("CON_SCALE_UOM_ID",JdbcMapUtil.getString(map,"CON_SCALE_UOM_ID")) //建设规模单位
                 .set("PRJ_SITUATION",JdbcMapUtil.getString(map,"PRJ_SITUATION")) //项目简介
                 .exec();
+    }
+
+    /**
+     * 判断项目是否是设备项目,并返回工程项目id
+     * @param projectId 项目id
+     * @return 工程项目id
+     */
+    public static String getFatherProject(String projectId) {
+        PmPrj pmPrj = PmPrj.selectById(projectId);
+        if (pmPrj != null){
+            String classId = pmPrj.getProjectClassificationId();
+            if ("1704686735267102720".equals(classId)){
+                projectId = pmPrj.getSubordinateProject();
+            }
+        }
+        return projectId;
     }
 
     /**

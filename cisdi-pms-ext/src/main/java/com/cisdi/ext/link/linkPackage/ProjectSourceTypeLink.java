@@ -28,7 +28,7 @@ public class ProjectSourceTypeLink {
      */
     public static AttLinkResult linkPROJECT_SOURCE_TYPE_TWO_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        String code = GrSetValueExt.getGrSetCode(myJdbcTemplate,attValue);
+        String code = GrSetValueExt.getGrSetCode(attValue);
 
         boolean PROJECT_NAME_WRChangeToShown = false; //手填项目名称默认不隐藏
         boolean PM_PRJ_IDSChangeToShown = false; //选择项目名称默认不隐藏
@@ -114,7 +114,7 @@ public class ProjectSourceTypeLink {
         //数据来源属性联动清空
         AttLinkExtDetail.clearDataSourceType(attLinkResult);
 
-        String code = GrSetValueExt.getGrSetCode(myJdbcTemplate,attValue);
+        String code = GrSetValueExt.getGrSetCode(attValue);
         List<String> entityCodes = AttLinkDifferentProcess.getWRProject();
 
         //系统(system)，非系统(non_system)

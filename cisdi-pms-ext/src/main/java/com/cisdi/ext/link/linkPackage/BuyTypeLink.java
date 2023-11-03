@@ -24,7 +24,7 @@ public class BuyTypeLink {
      */
     public static AttLinkResult linkBUY_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId, AttLinkParam param) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        String code = GrSetValueExt.getGrSetCode(myJdbcTemplate,attValue);
+        String code = GrSetValueExt.getGrSetCode(attValue);
         String name = GrSetValueExt.getValueNameById(attValue);
         // 公开招标(open_bidding),竞争性磋商(competitive_consultations),竞争性谈判(competitive_negotiation),公开询价(public_inquiry),单一来源(single_source),直接委托(direct_entrustment)
         if ("PM_BID_APPROVAL_REQ".equals(entCode)){ //招标文件审批

@@ -20,7 +20,7 @@ public class GuaranteeDateTypeLink {
      */
     public static AttLinkResult linkGUARANTEE_DATE_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        String code = GrSetValueExt.getGrSetCode(myJdbcTemplate,attValue);
+        String code = GrSetValueExt.getGrSetCode(attValue);
         // 其他(other)，系统(system)
         if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode) || "PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
             boolean DATE_TYPE_WRWRChangeToEditable = false; //手填保函到日期，默认不可改

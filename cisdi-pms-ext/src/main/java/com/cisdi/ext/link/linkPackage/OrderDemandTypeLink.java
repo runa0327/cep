@@ -20,7 +20,7 @@ public class OrderDemandTypeLink {
      */
     public static AttLinkResult linkORDER_DEMAND_TYPE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        String code = GrSetValueExt.getGrSetCode(myJdbcTemplate,attValue);
+        String code = GrSetValueExt.getGrSetCode(attValue);
         // contract_signing=合同签订;contract_change=合同变更
         if ("PO_ORDER_CHANGE_REQ".equals(entCode)){//合同变更（合同需求审批） 选择合同签订时，隐藏合同名称、变更类型项
             if ("contract_signing".equals(code)){//选择合同签订

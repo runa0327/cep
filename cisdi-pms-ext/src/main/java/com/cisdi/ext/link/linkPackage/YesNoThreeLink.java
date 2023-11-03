@@ -2,8 +2,6 @@ package com.cisdi.ext.link.linkPackage;
 
 import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.link.AttLinkResult;
-import com.cisdi.ext.link.LinkedAtt;
-import com.cisdi.ext.model.GrSetValue;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.ad.att.AttDataTypeE;
 
@@ -11,15 +9,15 @@ public class YesNoThreeLink {
 
     /**
      * 是否属性联动判断
-     * @param myJdbcTemplate
-     * @param attValue
-     * @param entCode
-     * @param sevId
-     * @return
+     * @param myJdbcTemplate 数据源
+     * @param attValue 属性值
+     * @param entCode 业务表名
+     * @param sevId 视图id
+     * @return 属性联动结果
      */
     public static AttLinkResult linkYES_NO_THREE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        String code = GrSetValueExt.getGrSetCode(myJdbcTemplate,attValue);
+        String code = GrSetValueExt.getGrSetCode(attValue);
         if ("PM_SEND_APPROVAL_REQ".equals(entCode)){ //发文呈批
             // 是(Y)， 否(N)
             if ("Y".equals(code)){  //隐藏 是否呈董事长审批

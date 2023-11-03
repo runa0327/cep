@@ -20,7 +20,7 @@ public class BuildPermitTypeLink {
      */
     public static AttLinkResult linkBUILD_PERMIT_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        String code = GrSetValueExt.getGrSetCode(myJdbcTemplate,attValue);
+        String code = GrSetValueExt.getGrSetCode(attValue);
         //主体工程施工许可申请(subject),基坑及土石方工程施工许可申请(earthwork),主体工程施工许可申请+基坑及土石方工程施工许可申请(subject_earthwork)
         if ("PM_CONSTRUCT_PERMIT_REQ".equals(entCode)){ //施工许可
             // 基坑及土石方工程施工许可申请 组

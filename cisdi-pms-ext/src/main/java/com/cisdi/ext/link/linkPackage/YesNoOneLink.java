@@ -16,7 +16,7 @@ public class YesNoOneLink {
      */
     public static AttLinkResult linkYES_NO_ONE(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        String code = GrSetValueExt.getGrSetCode(myJdbcTemplate,attValue);
+        String code = GrSetValueExt.getGrSetCode(attValue);
         boolean changeToShow = true;
         boolean changeToMandatory = true;
         boolean changeToEditable = true;
