@@ -39,6 +39,30 @@ public class UserExt {
         ExtJarHelper.returnValue.set(outputMap);
     }
 
+
+    /**
+     * 根据选择的内部管理单位查询前期部门用户
+     */
+    public void companyUser() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String sql = "select  DISTINCT  ID, NAME from ad_user where id in (\n" +
+                "select AD_USER_ID from hr_dept_user where HR_DEPT_ID in \n" +
+                "(select id from hr_dept where `NAME` = '前期管理部' and HR_DEPT_PID='" + map.get("unit") + "'))";
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
+        List<User> userList = list.stream().map(p -> {
+            User user = new User();
+            user.id = JdbcMapUtil.getString(p, "ID");
+            user.name = JdbcMapUtil.getString(p, "NAME");
+            return user;
+        }).collect(Collectors.toList());
+
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("user", userList);
+        Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
+        ExtJarHelper.returnValue.set(outputMap);
+    }
+
     public static class User {
         public String id;
         public String name;
