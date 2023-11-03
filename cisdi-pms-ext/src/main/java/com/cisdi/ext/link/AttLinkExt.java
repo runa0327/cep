@@ -12,7 +12,6 @@ import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -81,7 +80,7 @@ public class AttLinkExt {
         } else if ("BUY_TYPE_ID".equals(attCode)){ // 招采方式
             return BuyTypeLink.linkBUY_TYPE_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("BUY_START_BASIS_ID".equals(attCode)){ // 采购启动依据属性联动
-            return linkBUY_START_BASIS_ID(myJdbcTemplate, attValue, entCode,sevId,param);
+            return BuyStartBasisLink.linkBUY_START_BASIS_ID(myJdbcTemplate, attValue, entCode,param);
         } else if ("PM_USE_CHAPTER_REQ_ID".equals(attCode)){ // 中标单位及标后用章属性联动
             return linkPM_USE_CHAPTER_REQ_ID(myJdbcTemplate, attValue, entCode,sevId,param);
         } else if ("TYPE_ONE_ID".equals(attCode)){ // 关联流程或上传依据 属性联动
@@ -372,75 +371,6 @@ public class AttLinkExt {
                     attLinkResult.attMap.put("BUY_MATTER_ID", linkedAtt);
                 }
             }
-        }
-        return attLinkResult;
-    }
-
-    //采购启动依据属性联动
-    private AttLinkResult linkBUY_START_BASIS_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode, String sevId,AttLinkParam param) {
-        AttLinkResult attLinkResult = new AttLinkResult();
-        String code = getGrSetCode(myJdbcTemplate,attValue);
-        if ("PM_BUY_DEMAND_REQ".equals(entCode)){ //采购需求审批
-            //会议纪要(meeting_minutes)，其他(other),启动函(start_up_letter)
-            boolean changeToEditable = false; //是否可改
-            boolean changeToMandatory = false; //是否必填
-            String value = "";
-            String text = "";
-            String projectId = JdbcMapUtil.getString(param.valueMap, "PM_PRJ_IDS");
-            if (!StringUtils.hasText(projectId)){
-                throw new BaseException("项目信息不能为空，请先选择项目名称！");
-            }
-            if (projectId.contains(",")){
-                return attLinkResult;
-            }
-            if ("meeting_minutes".equals(code) || "other".equals(code) || "start_up_letter".equals(code)){
-                changeToEditable = true;
-                changeToMandatory = false;
-                value = null;
-                text = null;
-                //采购启动依据文件
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.FILE_GROUP;
-                    linkedAtt.value = "";
-                    linkedAtt.text = "";
-                    linkedAtt.changeToMandatory = false;
-                    linkedAtt.changeToEditable = true;
-                    linkedAtt.fileInfoList = null;
-                    attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
-                }
-            } else {
-                // 立项(project_initiation)，可研(feasibility_study)，初概(preliminary_outline),预算财评(budget_financial_evaluation)
-                String sql = "";
-                String fileValue = "";
-                if ("project_initiation".equals(code)){
-                    sql = "select PRJ_REPLY_NO as REPLY_NO_WR,REPLY_FILE as file from pm_prj_req WHERE pm_prj_id = ? and `STATUS` = 'ap' order by CRT_DT desc limit 1";
-                } else if ("feasibility_study".equals(code)){
-                    sql = "select REPLY_NO_WR,REPLY_FILE as file from PM_PRJ_INVEST1 WHERE pm_prj_id = ? and status = 'ap' order by CRT_DT desc limit 1";
-                } else if ("preliminary_outline".equals(code)){
-                    sql = "select REPLY_NO_WR,REPLY_FILE as file from PM_PRJ_INVEST2 WHERE pm_prj_id = ? and status = 'ap' order by CRT_DT desc limit 1";
-                } else if ("budget_financial_evaluation".equals(code)){
-                    sql = "select REPLY_NO_WR,FINANCIAL_REVIEW_FILE as file from PM_PRJ_INVEST3 WHERE pm_prj_id = ? and status = 'ap' order by CRT_DT desc limit 1";
-                }
-                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql,projectId);
-                if (!CollectionUtils.isEmpty(list2)){
-                    value = JdbcMapUtil.getString(list2.get(0),"REPLY_NO_WR");
-                    text = value;
-                    fileValue = JdbcMapUtil.getString(list2.get(0),"file");
-                } else {
-                    fileValue = null;
-                }
-                //采购启动依据文件
-                {
-                    LinkedAtt linkedAtt = new LinkedAtt();
-                    linkedAtt.type = AttDataTypeE.FILE_GROUP;
-                    linkedAtt.value = fileValue;
-                    getFileInfoList(linkedAtt);
-                    attLinkResult.attMap.put("FILE_ID_THREE", linkedAtt);
-                }
-            }
-            //启动依据文号
-            LinkUtils.mapAddAllValue("REPLY_NO_WR",AttDataTypeE.TEXT_LONG,value,text,true,changeToMandatory,changeToEditable,attLinkResult);
         }
         return attLinkResult;
     }
@@ -784,18 +714,6 @@ public class AttLinkExt {
 
 
         return attLinkResult;
-    }
-
-    // 单表查询用户名称
-    private String getUser(String users) {
-        String userName = "";
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        String sql = "select group_concat(name) as name from ad_user where id in ('"+users+"') order by id asc";
-        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql);
-        if (!CollectionUtils.isEmpty(list)){
-            userName = JdbcMapUtil.getString(list.get(0),"name");
-        }
-        return userName;
     }
 
     /**

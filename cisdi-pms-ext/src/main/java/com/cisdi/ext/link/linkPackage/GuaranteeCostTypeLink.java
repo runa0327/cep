@@ -20,7 +20,7 @@ public class GuaranteeCostTypeLink {
      */
     public static AttLinkResult linkGUARANTEE_COST_TYPE_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        String code = GrSetValueExt.getGrSetCode(myJdbcTemplate,attValue);
+        String code = GrSetValueExt.getGrSetCode(attValue);
         // 其他(other)
         if ("PO_GUARANTEE_LETTER_RETURN_OA_REQ".equals(entCode) || "PO_GUARANTEE_LETTER_REQUIRE_REQ".equals(entCode)){
             boolean costTypeWRChangeToEditable = false; //手填费用类型，默认不可改

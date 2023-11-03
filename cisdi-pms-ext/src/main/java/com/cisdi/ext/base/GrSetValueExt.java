@@ -8,6 +8,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -58,13 +59,12 @@ public class GrSetValueExt {
 
     /**
      * 根据id获取编码值
-     * @param myJdbcTemplate 数据源
      * @param id id
      * @return 对应的code值
      */
-    public static String getGrSetCode(MyJdbcTemplate myJdbcTemplate, String id) {
+    public static String getGrSetCode(String id) {
         String code = "";
-        if (!SharedUtil.isEmptyString(id)){
+        if (StringUtils.hasText(id)){
             code = GrSetValue.selectById(id).getCode();
         }
         return code;
