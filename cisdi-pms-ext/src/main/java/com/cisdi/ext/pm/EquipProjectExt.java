@@ -29,16 +29,17 @@ public class EquipProjectExt {
      * 列表查询
      */
     public void equipList() {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         String json = JsonUtil.toJson(map);
         RequestParam requestParam = JsonUtil.fromJson(json, RequestParam.class);
         int pageSize = requestParam.pageSize;
         int pageIndex = requestParam.pageIndex;
         StringBuilder sb = new StringBuilder();
-        sb.append("select pm.id as eq_id,pm.pm_code as eq_code,pm.`NAME` as eq_name,pp.`NAME` as owner_name,pm.EQUIPMENT_PURCHASE_BUDGET_AMOUNT as eq_amt,gs.`NAME` as eq_range,pm.PRJ_SITUATION as eq_situation\n" +
+        sb.append("select pm.id as eq_id,pm.pm_code as eq_code,pm.`NAME` as eq_name,pp.`NAME` as owner_name,pm.EQUIPMENT_PURCHASE_BUDGET_AMOUNT as eq_amt,gs.`NAME` as eq_range,pm.PRJ_SITUATION as eq_situation,pm.PM_LANDING_POINT_ID,plp.name as pointName  \n" +
                 "from pm_prj pm left join pm_prj pp on pm.SUBORDINATE_PROJECT = pp.ID\n" +
                 "left join gr_set_value gs on gs.id = pm.RESEARCH_RANGE\n" +
+                "left join PM_LANDING_POINT plp on plp.id = pm.PM_LANDING_POINT_ID " +
                 "where pm.PROJECT_CLASSIFICATION_ID ='1704686735267102720' ");
         if (StringUtils.hasText(requestParam.eqPrjName)) {
             sb.append(" and pm.`NAME` like '%").append(requestParam.eqPrjName).append("%'");
@@ -49,17 +50,23 @@ public class EquipProjectExt {
         if (StringUtils.hasText(requestParam.researchRange)) {
             sb.append(" and pm.RESEARCH_RANGE ='").append(requestParam.researchRange).append("'");
         }
+        Map<String, Object> queryFileParams = new HashMap<>();// 创建入参map
+        if (StringUtils.hasText(requestParam.pointIds)) {
+            List<String> ids = Arrays.asList(requestParam.pointIds.split(","));
+            queryFileParams.put("ids", ids);
+            sb.append(" and pm.PM_LANDING_POINT_ID  in (:ids)");
+        }
         sb.append(" order by pm.PM_CODE desc ");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
         sb.append(" limit ").append(start).append(",").append(pageSize);
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sb.toString());
+        List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), queryFileParams);
         List<ObjInfo> dataInfoList = list.stream().map(this::convertData).collect(Collectors.toList());
 
         if (CollectionUtils.isEmpty(dataInfoList)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
-            List<Map<String, Object>> totalList = myJdbcTemplate.queryForList(totalSql);
+            List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(totalSql, queryFileParams);
             OutSide resData = new OutSide();
             resData.total = totalList.size();
             resData.objInfos = dataInfoList;
@@ -78,10 +85,11 @@ public class EquipProjectExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select pm.id as eq_id,pm.pm_code as eq_code,pm.`NAME` as eq_name,pp.`NAME` as owner_name,pp.id as prj_id," +
                 "round(ifnull(pm.EQUIPMENT_PURCHASE_BUDGET_AMOUNT,0),2) as eq_amt,pm.RESEARCH_RANGE as eq_range_id,\n" +
-                "gs.`NAME` as eq_range,pm.PRJ_SITUATION as eq_situation,pm.REPORT_FILE as report_file,pm.REPLY_NO,pm.COMPANY_ID,hd.name as companyName \n" +
+                "gs.`NAME` as eq_range,pm.PRJ_SITUATION as eq_situation,pm.REPORT_FILE as report_file,pm.REPLY_NO,pm.COMPANY_ID,hd.name as companyName,pm.PM_LANDING_POINT_ID,plp.name as pointName \n" +
                 "from pm_prj pm left join pm_prj pp on pm.SUBORDINATE_PROJECT = pp.ID\n" +
                 "left join gr_set_value gs on gs.id = pm.RESEARCH_RANGE\n" +
-                " left join hr_dept hd on hd.id = pm.COMPANY_ID "+
+                " left join hr_dept hd on hd.id = pm.COMPANY_ID " +
+                "left join PM_LANDING_POINT plp on plp.id = pm.PM_LANDING_POINT_ID " +
                 "where pm.PROJECT_CLASSIFICATION_ID ='1704686735267102720' and pm.id=?", map.get("id"));
         if (CollectionUtils.isEmpty(list)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
@@ -177,6 +185,11 @@ public class EquipProjectExt {
         } else {
             sb.append(" ,REPORT_FILE=null");
         }
+        if (StringUtils.hasText(inputData.pointId)) {
+            sb.append(" ,PM_LANDING_POINT_ID='").append(inputData.pointId).append("'");
+        } else {
+            sb.append(" ,PM_LANDING_POINT_ID=null");
+        }
 
         sb.append(" where id='").append(id).append("'");
         myJdbcTemplate.update(sb.toString());
@@ -219,7 +232,9 @@ public class EquipProjectExt {
         info.reNo = JdbcMapUtil.getString(dataMap, "REPLY_NO");
         info.eqDes = JdbcMapUtil.getString(dataMap, "eq_situation");
         info.companyId = JdbcMapUtil.getString(dataMap, "COMPANY_ID");
-        info.companyName = JdbcMapUtil.getString(dataMap, "companyName");;
+        info.companyName = JdbcMapUtil.getString(dataMap, "companyName");
+        info.pointId = JdbcMapUtil.getString(dataMap, "PM_LANDING_POINT_ID");
+        info.pointName = JdbcMapUtil.getString(dataMap, "pointName");
         return info;
     }
 
@@ -243,6 +258,7 @@ public class EquipProjectExt {
         public String prjName;
         public String eqPrjName;
         public String researchRange;
+        public String pointIds;
         public Integer pageSize;
         public Integer pageIndex;
     }
@@ -263,6 +279,10 @@ public class EquipProjectExt {
 
         public String companyName;
 
+        public String pointId;
+
+        public String pointName;
+
         public List<FileObj> fileObjList;
     }
 
@@ -270,6 +290,7 @@ public class EquipProjectExt {
         public Integer total;
         public List<ObjInfo> objInfos;
         public List<ProjectInfo> projectInfoList;
+        public List<LandingPoint> landingPoints;
     }
 
     public static class FileObj {
@@ -307,6 +328,59 @@ public class EquipProjectExt {
         public String desc;
         public String fileIds;
         public String companyId;
+        public String pointId;
+    }
+
+
+    /**
+     * 落位点查询
+     */
+    public void landingPointList() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_LANDING_POINT where status ='ap' ");
+        List<LandingPoint> landingPoints = list.stream().map(p -> {
+            LandingPoint point = new LandingPoint();
+            point.id = JdbcMapUtil.getString(p, "ID");
+            point.name = JdbcMapUtil.getString(p, "NAME");
+            return point;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(landingPoints)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide resData = new OutSide();
+            resData.landingPoints = landingPoints;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resData), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    /**
+     * 落位点新增/修改
+     */
+    public void LandingPointModify() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        String id = JdbcMapUtil.getString(map, "id");
+        if (!StringUtils.hasText(id)) {
+            id = Crud.from("PM_LANDING_POINT").insertData();
+        }
+        myJdbcTemplate.update("update PM_LANDING_POINT set NAME=? where id=?", map.get("name"), id);
+    }
+
+    /**
+     * 落位点删除
+     */
+    public void LandingPointDel() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
+        myJdbcTemplate.update("update pm_prj set PM_LANDING_POINT_ID = null where PM_LANDING_POINT_ID=?", map.get("id"));
+        myJdbcTemplate.update("delete from PM_LANDING_POINT where id=?", map.get("id"));
+    }
+
+
+    public static class LandingPoint {
+        public String id;
+        public String name;
     }
 
 }
