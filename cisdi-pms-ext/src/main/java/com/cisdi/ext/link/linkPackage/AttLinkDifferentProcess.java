@@ -176,6 +176,7 @@ public class AttLinkDifferentProcess {
         list.add("PIPELINE_RELOCATION_REQ"); //管线迁改
         list.add("PM_CONSTRUCTION_DRAWING_DESIGN"); //施工图设计管理
         list.add("PM_BUY_DEMAND_REQ"); //采购需求审批
+        list.add("PM_NODE_ADJUST_REQ"); //采购需求审批
         return list;
     }
 

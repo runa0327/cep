@@ -122,7 +122,7 @@ public class ProPlanUtils {
      * @return 节点信息
      */
     public static List<Map<String, Object>> queryLevel3(String projectId, MyJdbcTemplate myJdbcTemplate) {
-        String sql = "SELECT pn.id AS id,pn.`NAME` AS nodeName,pn.PLAN_COMPL_DATE AS PLAN_COMPL_DATE,OPREATION_TYPE,SCHEDULE_NAME,d.name as typeName,pn.SEQ_NO as seq,ifnull(PM_PRO_PLAN_NODE_PID,0) pid,'0' as seq_bak,pn.level as level FROM pm_pro_plan_node pn LEFT JOIN pm_pro_plan pl ON pn.PM_PRO_PLAN_ID = pl.id left join STANDARD_NODE_NAME c on pn.SCHEDULE_NAME = c.id left join gr_set_value d on c.PROJECT_NODE_TYPE_ID = d.id and d.GR_SET_ID = '1717352141542887424' WHERE pl.PM_PRJ_ID =? and pn.status = 'ap' and d.name is null ORDER BY typeName desc,pn.SEQ_NO asc";
+        String sql = "SELECT pn.id AS id,pn.`NAME` AS nodeName,pn.PLAN_COMPL_DATE AS PLAN_COMPL_DATE,OPREATION_TYPE,SCHEDULE_NAME,d.name as typeName,pn.SEQ_NO as seq,ifnull(PM_PRO_PLAN_NODE_PID,0) pid,'0' as seq_bak,pn.level as level FROM pm_pro_plan_node pn LEFT JOIN pm_pro_plan pl ON pn.PM_PRO_PLAN_ID = pl.id left join STANDARD_NODE_NAME c on pn.SCHEDULE_NAME = c.id left join gr_set_value d on c.PROJECT_NODE_TYPE_ID = d.id and d.GR_SET_ID = '1717352141542887424' WHERE pl.PM_PRJ_ID =? and pn.status = 'ap'  ORDER BY pn.SEQ_NO asc";
         List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,projectId);
         sortList(list);
         return list.stream().filter(p -> "3".equals(JdbcMapUtil.getString(p, "level"))).sorted(Comparator.comparing(o -> JdbcMapUtil.getString(o, "seq_bak"))).collect(Collectors.toList());
