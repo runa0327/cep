@@ -50,7 +50,7 @@ public class PmInfoExportController extends BaseController {
         List<Map<String, Object>> list = jdbcTemplate.queryForList("select pm.id,pm.`name`, PRJ_SITUATION as `desc`,gsv.`NAME` as phase,pp.`NAME` as sgUnit,DATE_FORMAT(ACTUAL_START_TIME,'%Y-%m-%d') as startTime from pm_prj pm  " +
                 "left join gr_set_value gsv on gsv.id = pm.PROJECT_PHASE_ID  " +
                 "left join pm_party pp on pp.id = pm.CONSTRUCTOR_UNIT  " +
-                "where TENDER_MODE_ID <> '1640259853484171264';");
+                "where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap'");
         InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("template/templateInfo.xlsx");
         AtomicInteger index = new AtomicInteger(1);
         List<DataObj> dataObjs = list.stream().map(p -> {
