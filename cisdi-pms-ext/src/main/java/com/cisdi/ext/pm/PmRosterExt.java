@@ -722,8 +722,8 @@ public class PmRosterExt {
         if (!CollectionUtils.isEmpty(rosterList)) {
             for (PmRoster tmp : rosterList) {
                 List<PmRoster> list = PmRoster.selectByWhere(new Where().eq(PmRoster.Cols.PM_PRJ_ID, tmp.getPmPrjId())
-                        .eq(PmRoster.Cols.CUSTOMER_UNIT, tmp.getCustomerUnit())
-                        .eq(PmRoster.Cols.POST_INFO_ID, tmp.getPostInfoId()));
+                        .eq(PmRoster.Cols.POST_INFO_ID, tmp.getPostInfoId())
+                        .eq(PmRoster.Cols.STATUS,"AP"));
                 String id;
                 String userId = "";
                 if (CollectionUtils.isEmpty(list)) {
@@ -734,7 +734,6 @@ public class PmRosterExt {
                 }
                 if (!StringUtils.hasText(userId)) {
                     Crud.from("PM_ROSTER").where().eq("id", id).update()
-                            .set("CUSTOMER_UNIT", tmp.getCustomerUnit())
                             .set("PM_PRJ_ID", tmp.getPmPrjId())
                             .set("POST_INFO_ID", tmp.getPostInfoId())
                             .set("AD_USER_ID", tmp.getAdUserId())

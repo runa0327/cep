@@ -158,10 +158,14 @@ public class ProcessRoleExt {
         if (CollectionUtils.isEmpty(list2)){
             throw new BaseException("该部门暂未配置分管领导，请联系管理员或相关人员维护");
         } else {
-            String user = list2.get(0).get("AD_USER_ID").toString();
-            ArrayList<Object> userIdList = new ArrayList<>();
-            userIdList.add(user);
-            ExtJarHelper.returnValue.set(userIdList);
+            String user = JdbcMapUtil.getString(list2.get(0),"AD_USER_ID");
+            if (StringUtils.hasText(user)){
+                ArrayList<Object> userIdList = new ArrayList<>();
+                userIdList.add(user);
+                ExtJarHelper.returnValue.set(userIdList);
+            } else {
+                throw new BaseException("该部门暂未配置分管领导，请联系管理员或相关人员维护");
+            }
         }
     }
 

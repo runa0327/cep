@@ -279,62 +279,134 @@ public class PmPrjIdLink {
      * @param myJdbcTemplate 数据源
      */
     public static void nodeDetail(String projectId, String sevId, AttLinkResult attLinkResult, MyJdbcTemplate myJdbcTemplate) {
-        List<Map<String,Object>> list = ProPlanUtils.queryLevel3HaveNodeType(projectId,myJdbcTemplate);
-        List<Map<String, Object>> list1 = ProPlanUtils.queryLevel3(projectId,myJdbcTemplate);
-        if (!CollectionUtils.isEmpty(list1)){
-            list.addAll(list1);
-        }
-        if (CollectionUtils.isEmpty(list)) {
+//        List<Map<String,Object>> list = ProPlanUtils.queryLevel3HaveNodeType(projectId,myJdbcTemplate); // 里程碑、一级节点等重要节点
+        List<Map<String, Object>> list1 = ProPlanUtils.queryLevel3(projectId,myJdbcTemplate); // 所有节点
+        if (CollectionUtils.isEmpty(list1)) {
             throw new BaseException("该项目不存在项目进度节点信息，请先处理！");
-        } else {
-            if ("1658641185226608640".equals(sevId)) {
-                List<LinkedRecord> linkedRecordList = new ArrayList<>();
-                for (Map<String, Object> tmp : list) {
-                    LinkedRecord linkedRecord = new LinkedRecord();
+        }
+        if ("1658641185226608640".equals(sevId)) {
+            PmPrj pmPrj = PmPrj.selectById(projectId);
+            // 核心节点处理
+//            mainNode(list,pmPrj,"1720257325147308032",attLinkResult);
+            mainNode(list1,pmPrj,attLinkResult);
 
-                    String planName = JdbcMapUtil.getString(tmp, "nodeName");
-                    String typeName = JdbcMapUtil.getString(tmp,"typeName");
-                    if (StringUtils.hasText(typeName)){
-                        planName = planName + "(" + typeName + ")";
-                    }
+        }
 
-                    //计划完成日期
-                    linkedRecord.valueMap.put("PLAN_COMPL_DATE", JdbcMapUtil.getString(tmp, "PLAN_COMPL_DATE"));
-                    linkedRecord.textMap.put("PLAN_COMPL_DATE", JdbcMapUtil.getString(tmp, "PLAN_COMPL_DATE"));
-                    //操作类型
-                    String OPREATION_TYPE = JdbcMapUtil.getString(tmp, "OPREATION_TYPE");
-                    if (!SharedUtil.isEmptyString(OPREATION_TYPE) && ("del".equals(OPREATION_TYPE) || "DEL".equals(OPREATION_TYPE))){
-                        linkedRecord.editableAttCodeList = new ArrayList<>();
-                        linkedRecord.editableAttCodeList.add("OPREATION_TYPE");
-                        planName = "待删除："+planName;
-                    } else {
-                        if ("add".equals(OPREATION_TYPE) || "ADD".equals(OPREATION_TYPE)){
-                            planName = "待新增："+planName;
-                        }
-                        linkedRecord.mandatoryAttCodeList = new ArrayList<>();
-                        linkedRecord.mandatoryAttCodeList.add("PLAN_COMPL_DATE");
-                    }
+    }
 
-                    //项目进度计划节点
-                    linkedRecord.valueMap.put("PM_PRO_PLAN_NODE_ID", JdbcMapUtil.getString(tmp, "id"));
-                    linkedRecord.textMap.put("PM_PRO_PLAN_NODE_ID", planName);
-
-                    linkedRecord.textMap.put("NAME_ONE", planName);
-                    linkedRecord.valueMap.put("NAME_ONE", planName);
-                    if (planName.contains("里程碑") || planName.contains("一级节点")){
-                        linkedRecord.valueMap.put("IS_DISCOLORED", "1");
-                        linkedRecord.textMap.put("IS_DISCOLORED", "1");
-                    }
-
-                    //TODO 操作类型字段返回  JdbcMapUtil.getString(tmp, "OPREATION_TYPE")
-
-                    linkedRecordList.add(linkedRecord);
-                }
-                attLinkResult.childData.put("1658642775492775936", linkedRecordList);
-                attLinkResult.childCreatable.put("1658642775492775936", true);
-                attLinkResult.childClear.put("1658642775492775936", true);
+    /**
+     * 核心节点明细赋值
+     * @param list 数据详情
+     * @param pmPrj 项目项目
+     * @param attLinkResult 返回属性联动值
+     */
+    private static void mainNode(List<Map<String, Object>> list, PmPrj pmPrj, AttLinkResult attLinkResult) {
+        String tenderId = pmPrj.getTenderModeId(); // 招标类型 1640259853484171264=EPC招标 1640259929484959744=清单招标
+        List<LinkedRecord> linkedRecordList = new ArrayList<>();
+        List<LinkedRecord> linkedRecordList2 = new ArrayList<>(); // 核心节点
+        for (Map<String, Object> tmp : list) {
+            String typeName = JdbcMapUtil.getString(tmp,"typeName");
+            LinkedRecord linkedRecord = new LinkedRecord();
+            linkedRecordValue(linkedRecord, tmp, typeName,tenderId);
+            linkedRecordList.add(linkedRecord);
+            if (StringUtils.hasText(typeName)){
+                linkedRecordList2.add(linkedRecord);
             }
         }
+        childData(linkedRecordList2,"1720257325147308032",attLinkResult);
+        childData(linkedRecordList,"1658642775492775936",attLinkResult);
+    }
+
+    /**
+     * 明细节点赋值
+     * @param list 数据值
+     * @param viewId 视图下挂明细视图模块
+     * @param attLinkResult 属性联动返回值
+     */
+    private static void childData(List<LinkedRecord> list, String viewId, AttLinkResult attLinkResult) {
+        attLinkResult.childData.put(viewId, list);
+        attLinkResult.childCreatable.put(viewId, true);
+        attLinkResult.childClear.put(viewId, true);
+    }
+
+    /**
+     * 单条数据判断处理
+     * @param linkedRecord 返回结果
+     * @param tmp 原始数据
+     * @param typeName 节点状态类型名称
+     * @param tenderId 招标类型 1640259853484171264=EPC招标 1640259929484959744=清单招标
+     */
+    private static void linkedRecordValue(LinkedRecord linkedRecord, Map<String, Object> tmp, String typeName,String tenderId) {
+        String planName = JdbcMapUtil.getString(tmp, "nodeName");
+        planName = checkNodeName(planName,tenderId,typeName);
+
+        //计划完成日期
+        linkedRecord.valueMap.put("PLAN_COMPL_DATE", JdbcMapUtil.getString(tmp, "PLAN_COMPL_DATE"));
+        linkedRecord.textMap.put("PLAN_COMPL_DATE", JdbcMapUtil.getString(tmp, "PLAN_COMPL_DATE"));
+        //操作类型
+        String OPREATION_TYPE = JdbcMapUtil.getString(tmp, "OPREATION_TYPE");
+        if (!SharedUtil.isEmptyString(OPREATION_TYPE) && ("del".equals(OPREATION_TYPE) || "DEL".equals(OPREATION_TYPE))){
+            linkedRecord.editableAttCodeList = new ArrayList<>();
+            linkedRecord.editableAttCodeList.add("OPREATION_TYPE");
+            planName = "待删除："+planName;
+        } else {
+            if ("add".equals(OPREATION_TYPE) || "ADD".equals(OPREATION_TYPE)){
+                planName = "待新增："+planName;
+            }
+            linkedRecord.mandatoryAttCodeList = new ArrayList<>();
+            linkedRecord.mandatoryAttCodeList.add("PLAN_COMPL_DATE");
+        }
+
+        //项目进度计划节点
+        linkedRecord.valueMap.put("PM_PRO_PLAN_NODE_ID", JdbcMapUtil.getString(tmp, "id"));
+        linkedRecord.textMap.put("PM_PRO_PLAN_NODE_ID", planName);
+
+        linkedRecord.textMap.put("NAME_ONE", planName);
+        linkedRecord.valueMap.put("NAME_ONE", planName);
+        if (planName.contains("里程碑") || planName.contains("一级节点")){
+            linkedRecord.valueMap.put("IS_DISCOLORED", "1");
+            linkedRecord.textMap.put("IS_DISCOLORED", "1");
+        }
+    }
+
+    /**
+     * 节点名称根据不同逻辑单独处理
+     * @param planName 节点名称
+     * @param tenderId 招标类型 1640259853484171264=EPC招标 1640259929484959744=清单招标
+     * @param typeName 节点状态类型名称
+     * @return 节点名称
+     */
+    private static String checkNodeName(String planName, String tenderId, String typeName) {
+        if ("初设概算批复".equals(planName)){
+            if ("1640259853484171264".equals(tenderId)){ // EPC招标
+                planName = planName + "(里程碑)";
+            } else {
+                planName = planName + "(一级节点)";
+            }
+        } else if ("预算编制".equals(planName)){
+            if ("1640259853484171264".equals(tenderId)){ // EPC招标
+                planName = planName + "(一级节点)";
+            } else {
+                planName = planName + "(里程碑)";
+            }
+        } else if ("预算批复".equals(planName)){
+            if ("1640259853484171264".equals(tenderId)){ // EPC招标
+                planName = planName + "(一级节点)";
+            } else {
+                planName = planName + "(里程碑)";
+            }
+        } else if ("初概批复".equals(planName)){
+            if ("1640259853484171264".equals(tenderId)){ // EPC招标
+                planName = planName + "(里程碑)";
+            } else {
+                planName = planName + "(一级节点)";
+            }
+        } else {
+            if (StringUtils.hasText(typeName)){
+                planName = planName + "(" + typeName + ")";
+            }
+        }
+        return planName;
     }
 
     /**
