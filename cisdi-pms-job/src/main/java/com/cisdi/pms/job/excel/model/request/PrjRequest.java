@@ -26,4 +26,6 @@ public class PrjRequest {
     private String endDate;
     //计划开工年份
     private String year;
+
+    private String category;
 }
