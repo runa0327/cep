@@ -26,23 +26,29 @@ public class PmPrjCodeUtil {
      */
     public static synchronized String getPrjCode() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select ifnull(PM_CODE,0) as PM_CODE from pm_prj where pm_code like 'GCXT-%' union all select ifnull(PM_CODE,0) as PM_CODE from prj_start where pm_code like 'GCXT-%' order by right(pm_code,4) desc limit 1");
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from (\n" +
+                "select ifnull(PM_CODE,0) as PM_CODE from pm_prj where pm_code like 'GCXT-%' \n" +
+                "union all \n" +
+                "select ifnull(PM_CODE,0) as PM_CODE from prj_start where pm_code like 'GCXT-%' \n" +
+                ") a\n" +
+                "order by right(pm_code,4) desc limit 1;");
         Map<String, Object> data = list.get(0);
         String flowNo = "0001";
         String code = String.valueOf(data.get("PM_CODE"));
-        if (!"0".equals(code)) {
-            String str = code.substring(code.length() - 4);
-            int count = Integer.parseInt(str) + 1;
-            flowNo = StringUtil.addZeroForNum(String.valueOf(count), 4);
-
-        }
-        StringBuilder sb = new StringBuilder();
-
         SimpleDateFormat sd = new SimpleDateFormat("yy");
         String dataPrefix = sd.format(new Date());
-
-        sb.append("GCXT-").append(dataPrefix).append(flowNo);
-        return sb.toString().trim();
+        if (!"0".equals(code)) {
+            String s = code.split("-")[1];
+            String str = s.substring(s.length() - 4);
+            String ye = s.substring(0, 2);
+            if (Integer.parseInt(dataPrefix) > Integer.parseInt(ye)) {
+                dataPrefix = ye;
+            } else {
+                int count = Integer.parseInt(str) + 1;
+                flowNo = StringUtil.addZeroForNum(String.valueOf(count), 4);
+            }
+        }
+        return ("GCXT-" + dataPrefix + flowNo).trim();
     }
 
 
@@ -56,7 +62,8 @@ public class PmPrjCodeUtil {
         }
         String flowNo = "0001";
         if (!"0".equals(code)) {
-            String str = code.substring(code.length() - 4);
+            String s = code.split("-")[1];
+            String str = s.substring(s.length() - 4);
             int count = Integer.parseInt(str) + 1;
             flowNo = StringUtil.addZeroForNum(String.valueOf(count), 4);
 
@@ -70,4 +77,17 @@ public class PmPrjCodeUtil {
         return sb.toString().trim();
     }
 
+    public static void main(String[] args) {
+        String code = "GCXT-230655-001";
+//        String code ="GCXT-230655";
+        String s = code.split("-")[1];
+        String str = s.substring(s.length() - 4);
+        String strs = s.substring(0, 2);
+        System.out.println("啊啊：" + s);
+        System.out.println("啊啊啊：" + str);
+        System.out.println("啊啊啊s：" + strs);
+
+        String strr = code.substring(code.length() - 4);
+        System.out.println("啊啊啊A：" + strr);
+    }
 }
