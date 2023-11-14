@@ -201,75 +201,78 @@ public class PrjMaterialInventory {
         List<Map<String, Object>> headerMaps = myJdbcTemplate.queryForList("select v.id,v.name from gr_set_value v left join gr_set s on s.id = v.GR_SET_ID " +
                 "where s.code = 'file_master_list_type' and v.status = 'AP'");
         List<String> headers = headerMaps.stream().map(m -> m.get("name").toString()).collect(Collectors.toList());
-
-        String orgSql = "select sv.prjId,sv.prjName,sv.masterTypeId,sv.masterTypeName,sv" +
-                ".shouldHave,ah.actualHave,lt.lackTypeName from (\n" +
-                "select i.PM_PRJ_ID prjId,p.name prjName,COUNT(i.MATERIAL_INVENTORY_TYPE_ID) shouldHave,v.name masterTypeName,v.id masterTypeId " +
-                "from prj_inventory i \n" +
-                "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID \n" +
-                "left join gr_set_value v on v.id = t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
-                "left join pm_prj p on p.id = i.PM_PRJ_ID\n" +
-                "where i.IS_INVOLVED = 1 and p.status = 'AP'\n" +
-                "group by i.PM_PRJ_ID,t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
-                ") sv\n" +
-                "left join \n" +
-                "(select prjId,masterTypeId,sum(have) actualHave from (\n" +
-                "select i.PM_PRJ_ID prjId,t.id typeId,t.name typeName,IF(count(d.id) > 0,1,0) have,t.FILE_MASTER_INVENTORY_TYPE_ID " +
-                "masterTypeId\n" +
-                "from prj_inventory i \n" +
-                "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID \n" +
-                "left join prj_inventory_detail d on d.PRJ_INVENTORY_ID = i.id\n" +
-                "where i.IS_INVOLVED = 1\n" +
-                "group by i.PM_PRJ_ID,i.id\n" +
-                ") temp group by prjId,masterTypeId) ah on ah.prjId = sv.prjId and ah.masterTypeId = sv.masterTypeId\n" +
-                "left join \n" +
-                "(select prjId,masterTypeId,GROUP_CONCAT(typeName) lackTypeName from (\n" +
-                "select i.PM_PRJ_ID prjId,\n" +
-                "v.name masterTypeName,\n" +
-                "v.id masterTypeId,\n" +
-                "t.name typeName,\n" +
-                "count(d.id)\n" +
-                "from prj_inventory i \n" +
-                "left join material_inventory_type t on t.id= i.MATERIAL_INVENTORY_TYPE_ID\n" +
-                "left join gr_set_value v on v.id = t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
-                "left join prj_inventory_detail d on d.PRJ_INVENTORY_ID = i.id\n" +
-                "where i.IS_INVOLVED = 1\n" +
-                "group by i.PM_PRJ_ID,t.FILE_MASTER_INVENTORY_TYPE_ID,t.id\n" +
-                "having count(d.id) = 0\n" +
-                ") temp group by prjId,masterTypeId) lt on lt.prjId = sv.prjId and lt.masterTypeId = sv.masterTypeId where sv.prjId in (:prjIdList) order by sv.prjId desc";
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("prjIdList", prjIdList);
-        List<Map<String, Object>> originList = myNamedParameterJdbcTemplate.queryForList(orgSql, params);
-
-        //封装
-        Map<String, List<Map<String, Object>>> data = originList.stream().collect(Collectors.groupingBy(item -> item.get("prjId").toString()));
+        List<Map<String, Object>> originList = new ArrayList<>();
         List<InventoryData> inventoryDataList = new ArrayList<>();//列表数据
-        for (String prjId : prjIdList) {
-            InventoryData inventoryData = new InventoryData();//单条列表数据
-            Map<String, Object> cellData = new HashMap<>();//单条动态数据
-            List<Map<String, Object>> prjOriginList = data.get(prjId);//单条项目维度的初始数据
-            if (CollectionUtils.isEmpty(prjOriginList)) {//可能有项目没有刷出清单模板
-                continue;
-            }
-            for (String header : headers) {
-                Map<String, Object> partCell = new HashMap<>();//单个单元格的一部分数据
-                Optional<Map<String, Object>> masterTypeOp = prjOriginList.stream().filter(d -> d.get("masterTypeName").equals(header)).findAny();
-                if (masterTypeOp.isPresent()) {
-                    partCell = masterTypeOp.get();
-                } else {//表头没有对应的资料，也要将项目、清单信息赋值
-                    partCell.put("prjId", prjOriginList.get(0).get("prjId"));
-                    partCell.put("prjName", prjOriginList.get(0).get("prjName"));
-                    Map<String, Object> foundHeaderMap =
-                            headerMaps.stream().filter(headerMap -> header.equals(headerMap.get("name").toString())).findAny().get();
-                    partCell.put("masterTypeId", foundHeaderMap.get("id"));
-                    partCell.put("masterTypeName", foundHeaderMap.get("name"));
+        if (!CollectionUtils.isEmpty(prjIdMaps)) {
+            String orgSql = "select sv.prjId,sv.prjName,sv.masterTypeId,sv.masterTypeName,sv" +
+                    ".shouldHave,ah.actualHave,lt.lackTypeName from (\n" +
+                    "select i.PM_PRJ_ID prjId,p.name prjName,COUNT(i.MATERIAL_INVENTORY_TYPE_ID) shouldHave,v.name masterTypeName,v.id masterTypeId " +
+                    "from prj_inventory i \n" +
+                    "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID \n" +
+                    "left join gr_set_value v on v.id = t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
+                    "left join pm_prj p on p.id = i.PM_PRJ_ID\n" +
+                    "where i.IS_INVOLVED = 1 and p.status = 'AP'\n" +
+                    "group by i.PM_PRJ_ID,t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
+                    ") sv\n" +
+                    "left join \n" +
+                    "(select prjId,masterTypeId,sum(have) actualHave from (\n" +
+                    "select i.PM_PRJ_ID prjId,t.id typeId,t.name typeName,IF(count(d.id) > 0,1,0) have,t.FILE_MASTER_INVENTORY_TYPE_ID " +
+                    "masterTypeId\n" +
+                    "from prj_inventory i \n" +
+                    "left join material_inventory_type t on t.id = i.MATERIAL_INVENTORY_TYPE_ID \n" +
+                    "left join prj_inventory_detail d on d.PRJ_INVENTORY_ID = i.id\n" +
+                    "where i.IS_INVOLVED = 1\n" +
+                    "group by i.PM_PRJ_ID,i.id\n" +
+                    ") temp group by prjId,masterTypeId) ah on ah.prjId = sv.prjId and ah.masterTypeId = sv.masterTypeId\n" +
+                    "left join \n" +
+                    "(select prjId,masterTypeId,GROUP_CONCAT(typeName) lackTypeName from (\n" +
+                    "select i.PM_PRJ_ID prjId,\n" +
+                    "v.name masterTypeName,\n" +
+                    "v.id masterTypeId,\n" +
+                    "t.name typeName,\n" +
+                    "count(d.id)\n" +
+                    "from prj_inventory i \n" +
+                    "left join material_inventory_type t on t.id= i.MATERIAL_INVENTORY_TYPE_ID\n" +
+                    "left join gr_set_value v on v.id = t.FILE_MASTER_INVENTORY_TYPE_ID\n" +
+                    "left join prj_inventory_detail d on d.PRJ_INVENTORY_ID = i.id\n" +
+                    "where i.IS_INVOLVED = 1\n" +
+                    "group by i.PM_PRJ_ID,t.FILE_MASTER_INVENTORY_TYPE_ID,t.id\n" +
+                    "having count(d.id) = 0\n" +
+                    ") temp group by prjId,masterTypeId) lt on lt.prjId = sv.prjId and lt.masterTypeId = sv.masterTypeId where sv.prjId in (:prjIdList) order by sv.prjId desc";
+
+            HashMap<String, Object> params = new HashMap<>();
+            params.put("prjIdList", prjIdList);
+            originList = myNamedParameterJdbcTemplate.queryForList(orgSql, params);
+            //封装
+            Map<String, List<Map<String, Object>>> data = originList.stream().collect(Collectors.groupingBy(item -> item.get("prjId").toString()));
+
+            for (String prjId : prjIdList) {
+                InventoryData inventoryData = new InventoryData();//单条列表数据
+                Map<String, Object> cellData = new HashMap<>();//单条动态数据
+                List<Map<String, Object>> prjOriginList = data.get(prjId);//单条项目维度的初始数据
+                if (CollectionUtils.isEmpty(prjOriginList)) {//可能有项目没有刷出清单模板
+                    continue;
                 }
-                cellData.put(header, partCell);
+                for (String header : headers) {
+                    Map<String, Object> partCell = new HashMap<>();//单个单元格的一部分数据
+                    Optional<Map<String, Object>> masterTypeOp = prjOriginList.stream().filter(d -> d.get("masterTypeName").equals(header)).findAny();
+                    if (masterTypeOp.isPresent()) {
+                        partCell = masterTypeOp.get();
+                    } else {//表头没有对应的资料，也要将项目、清单信息赋值
+                        partCell.put("prjId", prjOriginList.get(0).get("prjId"));
+                        partCell.put("prjName", prjOriginList.get(0).get("prjName"));
+                        Map<String, Object> foundHeaderMap =
+                                headerMaps.stream().filter(headerMap -> header.equals(headerMap.get("name").toString())).findAny().get();
+                        partCell.put("masterTypeId", foundHeaderMap.get("id"));
+                        partCell.put("masterTypeName", foundHeaderMap.get("name"));
+                    }
+                    cellData.put(header, partCell);
+                }
+                inventoryData.cellData = cellData;
+                inventoryData.prjId = prjId;
+                inventoryData.prjName = JdbcMapUtil.getString(data.get(prjId).get(0), "prjName");
+                inventoryDataList.add(inventoryData);
             }
-            inventoryData.cellData = cellData;
-            inventoryData.prjId = prjId;
-            inventoryData.prjName = JdbcMapUtil.getString(data.get(prjId).get(0), "prjName");
-            inventoryDataList.add(inventoryData);
         }
 
         //返回
