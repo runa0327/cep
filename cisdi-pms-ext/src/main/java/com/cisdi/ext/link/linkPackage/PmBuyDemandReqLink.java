@@ -6,9 +6,11 @@ import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.link.AttLinkResult;
 import com.cisdi.ext.pm.bidPurchase.PmBuyDemandReqExt;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.att.AttDataTypeE;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -105,6 +107,9 @@ public class PmBuyDemandReqLink {
         List<Map<String,Object>> buyList = PmBuyDemandReqExt.queryById(attValue,myJdbcTemplate); // 获取采购需求审批信息
         if (!CollectionUtils.isEmpty(buyList)){
             String prjIds = JdbcMapUtil.getString(buyList.get(0),"PM_PRJ_IDS");
+            if (!StringUtils.hasText(prjIds)){
+                throw new BaseException("没有找到项目信息，请核对信息或联系管理员处理");
+            }
             String projectId = prjIds.split(",")[0];
             AttLinkExtDetail.autoPostUserNew(entCode,projectId,attLinkResult,myJdbcTemplate); // 岗位信息赋值
             PmPrjIdLink.prjNameAndCompanyValue(prjIds,projectId,attLinkResult,myJdbcTemplate); // 项目名称及内部管理单位赋值
