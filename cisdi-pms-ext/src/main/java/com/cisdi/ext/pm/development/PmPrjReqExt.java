@@ -394,8 +394,6 @@ public class PmPrjReqExt {
         PmPrj pmPrj = PmPrj.selectById(projectId);
         // 生成项目编号
         createPrjCode(pmPrj,projectId);
-        // 创建项目清单
-        PrjMaterialInventory.addPrjInventory(projectId);
 
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pm_prj where id=?", projectId);
         if (!CollectionUtils.isEmpty(list)) {

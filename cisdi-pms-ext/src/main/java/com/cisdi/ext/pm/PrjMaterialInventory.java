@@ -550,7 +550,7 @@ public class PrjMaterialInventory {
     /**
      * 提供给外部的，为项目添加清单
      *
-     * @param prjId
+     * @param prjId 项目id
      */
     public static void addPrjInventory(String prjId) {
         //项目对象
