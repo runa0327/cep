@@ -7,6 +7,7 @@ import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.model.PrjStart;
 import com.cisdi.ext.model.view.project.PmPrjView;
 import com.cisdi.ext.pm.PmPlanExt;
+import com.cisdi.ext.pm.PrjMaterialInventory;
 import com.cisdi.ext.pm.development.PmPrjReqExt;
 import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.pm.processCommon.ProcessCommon;
@@ -34,6 +35,19 @@ import java.util.stream.Collectors;
  * 项目表相关扩展
  */
 public class PmPrjExt {
+
+    /*=============================================企业云按钮=============================================*/
+    /**
+     * 刷项目清单按钮
+     */
+    public void refreshPrjInventoryButton(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        List<EntityRecord> list = ExtJarHelper.entityRecordList.get();
+        for (EntityRecord entityRecord : list) {
+            String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"ID");
+            PrjMaterialInventory.addPrjInventory(projectId);
+        }
+    }
 
     /**
      * 根据项目名称查询项目id
