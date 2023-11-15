@@ -418,7 +418,7 @@ public class PmStartExt {
                     .set("CUSTOMER_UNIT", dataMap.get("BUILDER_UNIT")).set("PRJ_SITUATION", dataMap.get("PRJ_SITUATION")).set("PM_SEQ", seq).set("TENDER_MODE_ID", dataMap.get("TENDER_MODE_ID"))
                     .set("ESTIMATED_TOTAL_INVEST", dataMap.get("PRJ_TOTAL_INVEST")).set("BASE_LOCATION_ID", dataMap.get("BASE_LOCATION_ID")).set("PROJECT_PHASE_ID", "0099799190825080706")
                     .set("IZ_FORMAL_PRJ", 1).set("PROJECT_STATUS", null).set("PLAN_START_TIME", dataMap.get("PLAN_START_TIME")).set("PLAN_END_TIME", dataMap.get("PLAN_END_TIME"))
-                    .set("PROJECT_CLASSIFICATION_ID", dataMap.get("PROJECT_CLASSIFICATION_ID")).exec();
+                    .set("PROJECT_CLASSIFICATION_ID", dataMap.get("PROJECT_CLASSIFICATION_ID")).set("COMPANY_ID",dataMap.get("COMPANY_ID")).exec();
             //为项目添加清单
             PrjMaterialInventory.addPrjInventory(projectId);
 
