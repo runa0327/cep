@@ -23,11 +23,12 @@ public class StringUtil {
     /**
      * 获取字符串中的文件磁盘数字信息
      * @param str 字符串
-     * @return
+     * @param regex 正则表达式
+     * @return linux文件中数字信息
      */
-    public static String getNum(String str) {
+    public static String getNum(String str, String regex) {
         String num = "";
-        Pattern pattern = Pattern.compile("file\\d*");
+        Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(str);
         String fileN = "";
         if (matcher.find()){
