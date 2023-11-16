@@ -710,13 +710,6 @@ public class PoOrderReqExt {
                     map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"));
                 }
             }
-//            if ("0099799190825080670".equals(isModel)){ //合同修编稿
-//                map.put("code","FILE_ID_ONE");
-//                map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"));
-//            } else { //合同文本
-//                map.put("code","ATT_FILE_GROUP_ID");
-//                map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"));
-//            }
             if (!map.isEmpty()){
                 list.add(map);
             }
@@ -726,6 +719,19 @@ public class PoOrderReqExt {
             if (!SharedUtil.isEmptyString(file1)){
                 map.put("code",code1);
                 map.put("file",file1);
+                list.add(map);
+            }
+        } else if ("PO_ORDER_TERMINATE_REQ".equals(entCode)){ // 合同终止
+            if ("START_EVENT".equals(nodeType) && "0099799190825080669".equals(isModel)){
+                map.put("code","ATT_FILE_GROUP_ID");
+                map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"ATT_FILE_GROUP_ID"));
+            } else {
+                if ("USER_TASK".equals(nodeType) && "0099799190825080670".equals(isModel)){ //合同文本
+                    map.put("code","FILE_ID_ONE");
+                    map.put("file",JdbcMapUtil.getString(entityRecord.valueMap,"FILE_ID_ONE"));
+                }
+            }
+            if (!map.isEmpty()){
                 list.add(map);
             }
         }
