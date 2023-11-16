@@ -155,13 +155,21 @@ public class WordToPdfServiceImpl implements WordToPdfService {
      */
     private String checkBySystem(String systemType, String filePath) {
         if ("windows".equals(systemType)){
-            if (filePath.contains("file2")){
-                filePath = filePath.replace("/data/qygly/file2/","\\\\10.130.19.197\\filedisk2\\").replace("/","\\");
-            } else if (filePath.contains("file3")){
-                filePath = filePath.replace("/data/qygly/file3/","\\\\10.130.19.197\\filedisk3\\").replace("/","\\");
+            String num = StringUtil.getNum(filePath);
+            if (StringUtils.hasText(num)){
+                String filedisk = "filedisk" + num;
+                filePath = filePath.replace("/data/qygly/file2/","\\\\10.130.19.197\\filedisk\\").replace("filedisk",filedisk).replace("/","\\");
             } else {
                 filePath = filePath.replace("/data/qygly/file/","\\\\10.130.19.197\\filedisk\\").replace("/","\\");
             }
+            // 2023-11-16 正则匹配后弃用
+//            if (filePath.contains("file2")){
+//                filePath = filePath.replace("/data/qygly/file2/","\\\\10.130.19.197\\filedisk2\\").replace("/","\\");
+//            } else if (filePath.contains("file3")){
+//                filePath = filePath.replace("/data/qygly/file3/","\\\\10.130.19.197\\filedisk3\\").replace("/","\\");
+//            } else {
+//                filePath = filePath.replace("/data/qygly/file/","\\\\10.130.19.197\\filedisk\\").replace("/","\\");
+//            }
         }
         return filePath;
     }
@@ -363,13 +371,22 @@ public class WordToPdfServiceImpl implements WordToPdfService {
 
         String fileIdPath = map.get("fileIdPath").toString();
         if ("windows".equals(systemType)){
-            if (fileIdPath.contains("filedisk2")){
-                fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk2\\","/data/qygly/file2/").replace("\\","/");
-            } else if (fileIdPath.contains("filedisk3")){
-                fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk3\\","/data/qygly/file3/").replace("\\","/");
-            } else {
-                fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk\\","/data/qygly/file/").replace("\\","/");
+
+            String num = StringUtil.getNum(fileIdPath);
+            fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk\\","/data/qygly/file/").replace("\\","/");
+            if (StringUtils.hasText(num)){
+                String filedisk = "file" + num;
+                fileIdPath = fileIdPath.replace("file",filedisk);
             }
+
+            // 20230-11-16 正则自动匹配文件盘符 弃用
+//            if (fileIdPath.contains("filedisk2")){
+//                fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk2\\","/data/qygly/file2/").replace("\\","/");
+//            } else if (fileIdPath.contains("filedisk3")){
+//                fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk3\\","/data/qygly/file3/").replace("\\","/");
+//            } else {
+//                fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk\\","/data/qygly/file/").replace("\\","/");
+//            }
         }
         flFile.setFileAddress(fileIdPath);
         flFile.setOriginFileAddress(fileIdPath);
