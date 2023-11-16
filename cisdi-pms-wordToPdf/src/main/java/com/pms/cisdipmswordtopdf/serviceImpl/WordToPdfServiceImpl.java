@@ -155,13 +155,14 @@ public class WordToPdfServiceImpl implements WordToPdfService {
      */
     private String checkBySystem(String systemType, String filePath) {
         if ("windows".equals(systemType)){
-            String num = StringUtil.getNum(filePath);
+            String num = StringUtil.getNum(filePath,"file\\d*");
+            filePath = filePath.replace("/data/qygly/","\\\\10.130.19.197\\").replace("/","\\");
+            String newPath = "filedisk";
             if (StringUtils.hasText(num)){
-                String filedisk = "filedisk" + num;
-                filePath = filePath.replace("/data/qygly/file2/","\\\\10.130.19.197\\filedisk\\").replace("filedisk",filedisk).replace("/","\\");
-            } else {
-                filePath = filePath.replace("/data/qygly/file/","\\\\10.130.19.197\\filedisk\\").replace("/","\\");
+                newPath = newPath + num;
             }
+            filePath = filePath.replaceAll("file\\d*",newPath);
+
             // 2023-11-16 正则匹配后弃用
 //            if (filePath.contains("file2")){
 //                filePath = filePath.replace("/data/qygly/file2/","\\\\10.130.19.197\\filedisk2\\").replace("/","\\");
@@ -372,12 +373,14 @@ public class WordToPdfServiceImpl implements WordToPdfService {
         String fileIdPath = map.get("fileIdPath").toString();
         if ("windows".equals(systemType)){
 
-            String num = StringUtil.getNum(fileIdPath);
-            fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\filedisk\\","/data/qygly/file/").replace("\\","/");
+            String num = StringUtil.getNum(fileIdPath,"filedisk\\d*");
+            fileIdPath = fileIdPath.replace("\\\\10.130.19.197\\","/data/qygly/").replace("\\","/");
+            String filedisk = "file";
             if (StringUtils.hasText(num)){
-                String filedisk = "file" + num;
-                fileIdPath = fileIdPath.replace("file",filedisk);
+                filedisk = filedisk + num;
             }
+            fileIdPath = fileIdPath.replaceAll("filedisk\\d*",filedisk);
+
 
             // 20230-11-16 正则自动匹配文件盘符 弃用
 //            if (fileIdPath.contains("filedisk2")){
