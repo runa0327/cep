@@ -1,7 +1,7 @@
 package com.cisdi.pms.job.weeklyReport;
 
 import cn.hutool.core.util.IdUtil;
-import com.cisdi.pms.job.mapper.process.WfProcessMapper;
+import com.cisdi.pms.job.mapper.process.common.WfProcessMapper;
 import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyMapper;
 import com.cisdi.pms.job.mapper.weeklyReport.PmProgressWeeklyPrjDetailMapper;
 import com.cisdi.pms.job.service.project.PmPrjService;

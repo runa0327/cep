@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cisdi.pms.job.mapper.process.common.BaseProFileTaskMapper">
+    <resultMap id="BaseProFileTaskResultMap" type="com.cisdi.pms.job.domain.process.common.BaseProFileTask">
+        <id property="id" column="id" />
+        <result property="processInstanceId" column="processInstanceId" />
+        <result property="isEnd" column="isEnd" />
+        <result property="endDateTime" column="endDateTime" />
+        <result property="taskRemark" column="taskRemark" />
+        <result property="entCode" column="entCode" />
+        <result property="entityRecordId" column="entityRecordId" />
+        <result property="wfProcessId" column="wfProcessId" />
+    </resultMap>
+
+    <!--获取位同步信息流程-->
+    <select id="queryUnEnd" resultMap="BaseProFileTaskResultMap">
+        select
+            id as id,
+            LK_WF_INST_ID as processInstanceId,
+            IS_END as isEnd,
+            END_DATETIME as endDateTime,
+            TEXT_REMARK_ONE as taskRemark,
+            ENT_CODE as entCode,
+            ENTITY_RECORD_ID as entityRecordId,
+            WF_PROCESS_ID as wfProcessId
+        from
+            BASE_PRO_FILE_TASK
+        where
+            status = 'ap'
+            and IS_END = 0
+        order by id desc
+        limit 200
+    </select>
+
+    <!--根据id修改信息-->
+    <update id="updateById">
+        update
+            BASE_PRO_FILE_TASK
+        set
+            IS_END = #{isEnd},
+            END_DATETIME = #{endDateTime},
+            TEXT_REMARK_ONE = #{taskRemark}
+        where
+            id = #{id}
+    </update>
+</mapper>

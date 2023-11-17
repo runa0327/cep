@@ -1,4 +1,4 @@
-package com.cisdi.pms.job.domain.process;
+package com.cisdi.pms.job.domain.process.office;
 
 import com.cisdi.pms.job.domain.base.BaseCommon;
 import lombok.Data;

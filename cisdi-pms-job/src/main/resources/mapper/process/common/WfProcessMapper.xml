@@ -2,8 +2,8 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.cisdi.pms.job.mapper.process.WfProcessMapper">
-    <resultMap id="WfProcessResult" type="com.cisdi.pms.job.domain.process.WfProcess">
+<mapper namespace="com.cisdi.pms.job.mapper.process.common.WfProcessMapper">
+    <resultMap id="WfProcessResult" type="com.cisdi.pms.job.domain.process.common.WfProcess">
         <id property="id" column="id" />
         <result property="name" column="name" />
         <result property="adEntId" column="adEntId" />
@@ -29,5 +29,17 @@
         where
             a.name = #{processName} and a.status = 'AP'
             and b.status = 'ap'
+    </select>
+
+    <!--根据流程id获取流程id 根据作废中流程id获取已批准流程id-->
+    <select id="getProcessIdByProcessId" resultType="String">
+        SELECT
+            wf_process_id
+        FROM
+            BASE_PROCESS_ENT a
+        LEFT JOIN wf_process b ON a.wf_process_id = b.id
+        WHERE
+            a.AD_ENT_ONE_ID = ( SELECT AD_ENT_ONE_ID FROM BASE_PROCESS_ENT WHERE wf_process_id = #{wfProcessId} )
+            AND b.STATUS = 'AP'
     </select>
 </mapper>

@@ -1,6 +1,6 @@
 package com.cisdi.pms.job.controller.process;
 
-import com.cisdi.pms.job.domain.process.PmPostAppoint;
+import com.cisdi.pms.job.domain.process.office.PmPostAppoint;
 import com.cisdi.pms.job.service.process.PmPostAppointService;
 import com.qygly.shared.BaseException;
 import org.springframework.util.StringUtils;

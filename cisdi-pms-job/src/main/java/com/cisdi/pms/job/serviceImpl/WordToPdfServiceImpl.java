@@ -5,7 +5,7 @@ import com.artofsolving.jodconverter.DocumentConverter;
 import com.artofsolving.jodconverter.openoffice.connection.OpenOfficeConnection;
 import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConnection;
 import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConverter;
-import com.cisdi.pms.job.domain.process.PoOrderReq;
+import com.cisdi.pms.job.domain.process.orderManage.PoOrderReq;
 import com.cisdi.pms.job.service.WordToPdfService;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;

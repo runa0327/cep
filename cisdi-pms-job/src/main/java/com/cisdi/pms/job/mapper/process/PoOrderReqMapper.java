@@ -1,10 +1,9 @@
 package com.cisdi.pms.job.mapper.process;
 
-import com.cisdi.pms.job.domain.process.PoOrderReq;
+import com.cisdi.pms.job.domain.process.orderManage.PoOrderReq;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 
 public interface PoOrderReqMapper {
 

@@ -1,6 +1,6 @@
 package com.cisdi.pms.job.service.process;
 
-import com.cisdi.pms.job.domain.process.PmPostAppoint;
+import com.cisdi.pms.job.domain.process.office.PmPostAppoint;
 
 public interface PmPostAppointService {
 
