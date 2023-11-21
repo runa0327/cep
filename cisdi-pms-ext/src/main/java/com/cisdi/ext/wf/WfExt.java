@@ -96,8 +96,8 @@ public class WfExt {
                 // 审批流审批通过
                 if ("AP".equals(newStatus)) {
 
-                    // 流程文件资料同步至资料库 采用定时任务，将任务写入中间表
-                    dataToFileTask(entityCode,csCommId,ExtJarHelper.procInstId.get());
+                    // 流程文件资料同步至资料库 采用定时任务，将任务写入中间表 已有定时任务 暂时取消 暂时勿删
+//                    dataToFileTask(entityCode,csCommId,ExtJarHelper.procInstId.get());
 
                     //一些特殊流程发起后即结束。流程名称处理
                     List<String> endProcessList = getEndProcessList();

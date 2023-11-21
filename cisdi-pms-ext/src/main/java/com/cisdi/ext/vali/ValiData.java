@@ -24,7 +24,7 @@ public class ValiData {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
 
         //刷项目名称
-        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList("select a.id,a.name,b.name as className from pm_prj a left join b on a.PROJECT_CLASSIFICATION_ID = b.id order by id asc");
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList("select a.id,a.name,b.name as className from pm_prj a left join gr_set_value b on a.PROJECT_CLASSIFICATION_ID = b.id order by id asc");
         if (!CollectionUtils.isEmpty(list1)){
             AtomicInteger atomicInteger = new AtomicInteger(1);
             for (int i = 0; i < list1.size(); i++) {
