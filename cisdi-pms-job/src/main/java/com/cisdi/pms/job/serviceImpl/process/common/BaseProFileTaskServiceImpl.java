@@ -74,7 +74,7 @@ public class BaseProFileTaskServiceImpl implements BaseProFileTaskService {
                                 for (String prjId : projectArr) {
                                     List<ProjectInventory> projectInventoryList = projectInventoryService.queryProjectInventory(prjId);
                                     // 创建更新项目清单
-                                    String msg = projectInventoryService.createOrUpdateInventory(processInstanceId,processId,map,procInventoryList,projectInventoryList);
+                                    String msg = projectInventoryService.createOrUpdateInventory(prjId,processInstanceId,processId,map,procInventoryList,projectInventoryList);
                                 }
                             } else {
                                 tmp.setTaskRemark("该流程记录项目id为空，无法同步！流程实例id："+processInstanceId);

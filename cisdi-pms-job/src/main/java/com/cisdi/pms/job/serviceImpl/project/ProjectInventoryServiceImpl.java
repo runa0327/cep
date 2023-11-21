@@ -1,10 +1,12 @@
 package com.cisdi.pms.job.serviceImpl.project;
 
+import cn.hutool.core.util.IdUtil;
 import com.cisdi.pms.job.domain.project.ProjectInventory;
 import com.cisdi.pms.job.mapper.project.ProjectInventoryMapper;
 import com.cisdi.pms.job.service.project.ProjectInventoryService;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -42,6 +44,7 @@ public class ProjectInventoryServiceImpl implements ProjectInventoryService {
     /**
      * 创建或更新项目清单及清单文件明细
      *
+     * @param projectId            项目id
      * @param processInstanceId    流程实例id
      * @param processId            流程id
      * @param map                  对应流程详情
@@ -49,7 +52,7 @@ public class ProjectInventoryServiceImpl implements ProjectInventoryService {
      * @param projectInventoryList 项目清单
      */
     @Override
-    public String createOrUpdateInventory(String processInstanceId, String processId, Map<String, Object> map, List<ProjectInventory> procInventoryList, List<ProjectInventory> projectInventoryList) {
+    public String createOrUpdateInventory(String projectId, String processInstanceId, String processId, Map<String, Object> map, List<ProjectInventory> procInventoryList, List<ProjectInventory> projectInventoryList) {
         String msg = "";
         for (ProjectInventory tmp : procInventoryList) {
             String inventoryId = tmp.getId(); // 资料清单类型id
@@ -61,10 +64,17 @@ public class ProjectInventoryServiceImpl implements ProjectInventoryService {
             if ("0099952822476409136".equals(processId) || "1675746857843830784".equals(fileMasterId)){ // 合同签订需要额外根据采购事项判断
                 String buyMatterStr = JdbcMapUtil.getString(map,"BUY_MATTER_ID");
                 if (StringUtils.hasText(buyMatterStr)){
-                    if (buyMatterId.equals(buyMatterStr)){
+                    if (StringUtils.hasText(buyMatterId) && buyMatterId.equals(buyMatterStr)){
                         String fileId = JdbcMapUtil.getString(map,"adAttCode");
                         if (StringUtils.hasText(fileId)){
                             // 根据项目id+合同事项+资料清单类型判断是否存在项目清单，存在则修改/新增清单明细，不存在则新增项目清单并新增清单明细
+                            if (CollectionUtils.isEmpty(projectInventoryList)){
+                                String id = IdUtil.getSnowflakeNextIdStr();
+                            } else {
+                                boolean check = projectInventoryList.stream().map(p->projectId.equals(p.getProjectId()) && )
+                            }
+
+
                         } else {
                             msg = "该流程没有对应文件信息，同步失败！流程实例id："+processInstanceId + " ; 合同事项：" + buyMatterId;
                         }

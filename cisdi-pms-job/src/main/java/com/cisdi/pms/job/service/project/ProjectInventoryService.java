@@ -24,11 +24,12 @@ public interface ProjectInventoryService {
 
     /**
      * 创建或更新项目清单及清单文件明细
+     * @param projectId 项目id
      * @param processInstanceId 流程实例id
      * @param processId 流程id
      * @param map 对应流程详情
      * @param procInventoryList 流程资料清单
      * @param projectInventoryList 项目清单
      */
-    String createOrUpdateInventory(String processInstanceId, String processId, Map<String, Object> map, List<ProjectInventory> procInventoryList, List<ProjectInventory> projectInventoryList);
+    String createOrUpdateInventory(String projectId, String processInstanceId, String processId, Map<String, Object> map, List<ProjectInventory> procInventoryList, List<ProjectInventory> projectInventoryList);
 }
