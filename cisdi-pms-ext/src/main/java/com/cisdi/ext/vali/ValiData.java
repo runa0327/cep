@@ -1,6 +1,7 @@
 package com.cisdi.ext.vali;
 
 import com.cisdi.ext.model.WfProcessInstance;
+import com.cisdi.ext.model.base.PmPrj;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
@@ -100,6 +101,25 @@ public class ValiData {
             for (int i = 0; i < list4.size(); i++) {
                 Crud.from("PM_PARTY").where().eq("ID",JdbcMapUtil.getString(list4.get(i),"id")).update()
                         .set("name","合作方-"+(i+1)).exec();
+            }
+        }
+    }
+
+    /**
+     * 谋划库刷新数据
+     */
+    public void updateModifdy(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql1 = "select * from PM_PLAN order by id desc";
+        List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1);
+        if (!CollectionUtils.isEmpty(list1)){
+            for (Map<String, Object> map : list1) {
+                String code = JdbcMapUtil.getString(map,"CODE");
+                List<PmPrj> pmPrj = PmPrj.selectByWhere(new Where().eq(PmPrj.Cols.PM_CODE,code));
+                if (!CollectionUtils.isEmpty(pmPrj)){
+                    String name = pmPrj.get(0).getName();
+                    myJdbcTemplate.update("update PM_PLAN set NAME = ? WHERE ID = ?",name,JdbcMapUtil.getString(list1.get(0),"ID"));
+                }
             }
         }
     }
