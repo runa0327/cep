@@ -459,15 +459,18 @@ public class PoOrderSupplementReqExt {
     public void OrderProcessEnd(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        Map<String,Object> valueMap = entityRecord.valueMap;
         String id = entityRecord.csCommId;
         //合同工期
         int duration = JdbcMapUtil.getInt(entityRecord.valueMap,"PLAN_TOTAL_DAYS");
         //合同签订日期
         Date signDate = DateTimeUtil.stringToDate(JdbcMapUtil.getString(entityRecord.valueMap,"SIGN_DATE"));
+        // 更新合同名称
+        String contractName = getContractName(valueMap,myJdbcTemplate);
         //计算到期日期
         Date expireDate = DateTimeUtil.addDays(signDate,duration);
         //更新到期日期字段
-        Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("id",id).update().set("DATE_FIVE",expireDate).exec();
+        Crud.from("PO_ORDER_SUPPLEMENT_REQ").where().eq("id",id).update().set("DATE_FIVE",expireDate).set("CONTRACT_NAME",contractName).exec();
         //将合同数据写入传输至合同数据表(po_order)
 //        PoOrderExtApi.createData(entityRecord,"PO_ORDER_SUPPLEMENT_REQ","0100070673610715221",myJdbcTemplate);
         //项目信息项目明细表
@@ -598,5 +601,26 @@ public class PoOrderSupplementReqExt {
                 PoOrderSupplementPrjDetailExt.insertData(id,projectId);
             }
         }
+    }
+
+    /**
+     * 补充协议合同名称处理
+     * @param valueMap 表单数据
+     * @param myJdbcTemplate 数据源
+     * @return 合同名称
+     */
+    public String getContractName(Map<String,Object> valueMap, MyJdbcTemplate myJdbcTemplate) {
+        String contractName = "";
+        String relationContractId = JdbcMapUtil.getString(valueMap,"RELATION_CONTRACT_ID");
+        if (!SharedUtil.isEmptyString(relationContractId)){
+            List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList("SELECT CONTRACT_NAME FROM po_order_req where id = ?", relationContractId);
+            if (!CollectionUtils.isEmpty(nameMap)){
+                String name = JdbcMapUtil.getString(nameMap.get(0),"CONTRACT_NAME");
+                contractName = name + "补充协议";
+            } else {
+                contractName = JdbcMapUtil.getString(valueMap,"CONTRACT_NAME");
+            }
+        }
+        return contractName;
     }
 }

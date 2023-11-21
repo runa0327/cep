@@ -1,7 +1,7 @@
 package com.cisdi.pms.job.service.process;
 
-import com.cisdi.pms.job.domain.process.WfProcess;
 import com.cisdi.pms.job.domain.process.WfProcessInstance;
+import com.cisdi.pms.job.domain.process.common.WfProcess;
 import com.cisdi.pms.job.domain.project.PmPrj;
 
 import javax.servlet.http.HttpServletResponse;

@@ -1,4 +1,4 @@
-package com.cisdi.pms.job.domain.process;
+package com.cisdi.pms.job.domain.process.orderManage;
 
 import lombok.Data;
 

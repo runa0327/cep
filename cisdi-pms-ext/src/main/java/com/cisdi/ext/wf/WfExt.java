@@ -24,8 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.Format;
 import java.util.*;
 
 @Slf4j
@@ -97,61 +95,9 @@ public class WfExt {
 
                 // 审批流审批通过
                 if ("AP".equals(newStatus)) {
-                    Format formatCount = new DecimalFormat("0000");
 
-                    // 立项申请生成项目编号 2023-03-06弃用
-//                    if ("PM_PRJ_REQ".equals(entityCode)) {
-//                        Object prj_code = myJdbcTemplate.queryForMap("select t.PRJ_CODE from PM_PRJ_REQ t where t.id=?", csCommId).get("PRJ_CODE");
-//
-//                        // 若无项目编号：
-//                        if (SharedUtil.isEmptyObject(prj_code)) {
-//                            // 获取新的项目编号：
-//                            Object new_prj_code = myJdbcTemplate.queryForMap("select concat('XM','-',lpad((select count(*) from pm_prj_req t),4,0)," +
-//                                    "'-',replace(current_date,'-','')) prj_code").get("prj_code");
-//
-//                            // 设置项目编号、代码：
-//                            int update1 = myJdbcTemplate.update("update PM_PRJ_REQ t set t.prj_code=?,t.code=? where t.id=?", new_prj_code,
-//                                    new_prj_code, csCommId);
-//                            log.info("已更新：{}", update1);
-//                        }
-//                    }
-
-                    // 合同签订批准后生成合同编号 2023-05-10取消，换到流程完结时扩展中生产
-//                    if ("PO_ORDER_REQ".equals(entityCode) || "po_order_req".equals(entityCode)) {
-//                        // 查询当前已审批通过的招标合同数量
-//                        List<Map<String, Object>> map = myJdbcTemplate.queryForList("select count(*) as num from PO_ORDER_REQ where status = 'AP' ");
-//                        Date date = new Date();
-//                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                        String year = sdf.format(date).substring(0, 7).replace("-", "");
-//                        // 合同编码规则
-//                        int num = Integer.valueOf(map.get(0).get("num").toString()) + 1;
-//
-//                        String formatNum = formatCount.format(num);
-//                        String code = "gc-" + year + "-" + formatNum;
-//                        String name = valueMap.get("CONTRACT_NAME").toString();
-//                        int update2 = myJdbcTemplate.update("update PO_ORDER_REQ set CONTRACT_CODE = ? , NAME = ? where id = ?",code, name, csCommId);
-//                    }
-                    // 补充合同批准后生成合同编号
-                    if ("PO_ORDER_SUPPLEMENT_REQ".equals(entityCode)) {
-                        // 查询当前审批通过的补充合同数量和该合同的name
-
-                        String relationContractId = JdbcMapUtil.getString(valueMap,"RELATION_CONTRACT_ID");
-                        String name = "";
-                        String contractName = "";
-                        if (!SharedUtil.isEmptyString(relationContractId)){
-                            List<Map<String, Object>> nameMap = myJdbcTemplate.queryForList("SELECT CONTRACT_NAME FROM po_order_req where id = ?", relationContractId);
-                            if (!CollectionUtils.isEmpty(nameMap)){
-                                name = JdbcMapUtil.getString(nameMap.get(0),"CONTRACT_NAME");
-//                                contractName = name + "补充协议" + formatNum;
-                                contractName = name + "补充协议";
-                                // 写入到补充合同表
-                                int update1 = myJdbcTemplate.update("update PO_ORDER_SUPPLEMENT_REQ set CONTRACT_NAME = ?  " +
-                                        "where id = ? ", contractName, csCommId);
-                            }
-                        }
-
-
-                    }
+                    // 流程文件资料同步至资料库 采用定时任务，将任务写入中间表
+                    dataToFileTask(entityCode,csCommId,ExtJarHelper.procInstId.get());
 
                     //一些特殊流程发起后即结束。流程名称处理
                     List<String> endProcessList = getEndProcessList();
@@ -222,11 +168,6 @@ public class WfExt {
 
                 // 审批流程创建
                 if ("APING".equals(newStatus)) {
-
-                    // 一些额外校验 该流程弃用 2022-02-20 暂时不删除代码，只注释
-//                    if ("PO_PUBLIC_BID_REQ".equals(entityCode)) { // 招标校验
-//                        checkBidReq(entityRecord, csCommId);
-//                    }
 
                     //查询该实例紧急程度
                     String urgentSql = "SELECT a.IS_URGENT FROM WF_PROCESS_INSTANCE a left join "+entityCode+" b on a.id = b.LK_WF_INST_ID where b.id = ? ";
@@ -332,6 +273,22 @@ public class WfExt {
                 }
             }
         }
+    }
+
+    /**
+     * 流程完结数据写入文件同步资料库中间表
+     * @param entityCode 业务表单编码
+     * @param csCommId 业务表单单条记录id
+     * @param processInstanceId 流程实例id
+     */
+    private void dataToFileTask(String entityCode, String csCommId, String processInstanceId) {
+        String id = Crud.from("BASE_PRO_FILE_TASK").insertData();
+        Crud.from("BASE_PRO_FILE_TASK").where().eq("ID",id).update()
+                .set("IS_END",0)
+                .set("ENT_CODE",entityCode)
+                .set("ENTITY_RECORD_ID",csCommId)
+                .set("LK_WF_INST_ID",processInstanceId)
+                .exec();
     }
 
     /**

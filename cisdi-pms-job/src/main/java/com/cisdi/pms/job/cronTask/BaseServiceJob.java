@@ -2,6 +2,7 @@ package com.cisdi.pms.job.cronTask;
 
 import com.cisdi.pms.job.service.base.BaseThirdInterfaceService;
 import com.cisdi.pms.job.service.base.BaseYearService;
+import com.cisdi.pms.job.service.process.common.BaseProFileTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,9 @@ public class BaseServiceJob {
 
     @Resource
     private BaseThirdInterfaceService baseThirdInterfaceService;
+
+    @Resource
+    private BaseProFileTaskService baseProFileTaskService;
 
     /**
      * 自动生产年份信息
@@ -48,6 +52,21 @@ public class BaseServiceJob {
             log.info("自动调用三方接口执行结果-成功");
         } catch (Exception e){
             log.error("自动调用三方接口执行结果-失败",e);
+        }
+    }
+
+    /**
+     * 自动执行流程完结，流程文件同步资料库
+     * 5分钟一次
+     */
+    @Scheduled(cron = "0 2/3 * * * ?")
+    public void syncProFileToDatabase(){
+        try {
+            log.info("流程文件同步资料库-开始");
+            baseProFileTaskService.syncProFileToDatabase();
+            log.info("流程文件同步资料库-成功");
+        } catch (Exception e){
+            log.error("流程文件同步资料库-失败",e);
         }
     }
 }

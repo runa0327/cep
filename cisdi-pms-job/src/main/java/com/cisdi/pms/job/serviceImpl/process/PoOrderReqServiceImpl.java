@@ -1,6 +1,6 @@
 package com.cisdi.pms.job.serviceImpl.process;
 
-import com.cisdi.pms.job.domain.process.PoOrderReq;
+import com.cisdi.pms.job.domain.process.orderManage.PoOrderReq;
 import com.cisdi.pms.job.mapper.process.PoOrderReqMapper;
 import com.cisdi.pms.job.service.process.PoOrderReqService;
 import org.springframework.stereotype.Service;

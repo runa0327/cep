@@ -41,6 +41,21 @@ public class PmPrjServiceImpl implements PmPrjService {
     private ThreadPoolTaskExecutor taskExecutor;
 
     /**
+     * 通过Map对象获取map中项目id信息
+     * @param map 数据源
+     * @return 项目id
+     */
+    public static String getProjectId(Map<String, Object> map) {
+        String projectId = "";
+        if (map.containsKey("PM_PRJ_IDS")){
+            projectId = map.get("PM_PRJ_IDS").toString();
+        } else if (map.containsKey("PM_PRJ_ID")){
+            projectId = map.get("PM_PRJ_ID").toString();
+        }
+        return projectId;
+    }
+
+    /**
      * 形象进度工程周报-需要自动生成周报的项目
      * @return 项目集合
      */

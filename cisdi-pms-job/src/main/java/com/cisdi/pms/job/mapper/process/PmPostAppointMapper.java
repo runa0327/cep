@@ -1,6 +1,6 @@
 package com.cisdi.pms.job.mapper.process;
 
-import com.cisdi.pms.job.domain.process.PmPostAppoint;
+import com.cisdi.pms.job.domain.process.office.PmPostAppoint;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
