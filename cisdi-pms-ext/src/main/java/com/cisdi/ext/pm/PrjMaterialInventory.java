@@ -194,7 +194,7 @@ public class PrjMaterialInventory {
             queryParams.put("prjId", prjIds);
         }
         int total = myNamedParameterJdbcTemplate.queryForList(sql, queryParams).size();
-        sql += " order by id  limit :start,:pageSize";
+        sql += " order by PM_SEQ DESC  limit :start,:pageSize";
         List<Map<String, Object>> prjIdMaps = myNamedParameterJdbcTemplate.queryForList(sql, queryParams);
         List<String> prjIdList = prjIdMaps.stream().map(m -> m.get("id").toString()).collect(Collectors.toList());
         //获取动态表头
