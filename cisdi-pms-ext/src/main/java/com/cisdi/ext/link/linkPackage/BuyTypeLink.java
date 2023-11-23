@@ -68,7 +68,7 @@ public class BuyTypeLink {
         LinkUtils.mapAddAllValue("FILE_ID_TWO",AttDataTypeE.FILE_GROUP,(String) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 中标通知书
         LinkUtils.mapAddAllValue("FILE_ID_THREE",AttDataTypeE.FILE_GROUP,(String) null,null,gongKaiShow,false,false,attLinkResult); // 备案回执
         LinkUtils.mapAddAllValue("FILE_ID_FOUR",AttDataTypeE.FILE_GROUP,(String) null,null,gongKaiShow,false,false,attLinkResult); // 采购其他资料
-        LinkUtils.mapAddAllValue("SELECT_METHOD",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 选取方法
+        LinkUtils.mapAddAllValue("SELECT_TYPE_ID",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 选取方法
         LinkUtils.mapAddAllValue("DATE_THREE",AttDataTypeE.DATE,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 选取日期
         LinkUtils.mapAddAllValue("CONTACTS_TWO",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 选取企业联系人
         LinkUtils.mapAddAllValue("CONTACT_MOBILE_TWO",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 联系电话
