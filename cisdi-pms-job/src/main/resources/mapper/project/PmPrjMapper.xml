@@ -145,7 +145,7 @@
           AND b.STATUS = 'ap'
           AND A.POST_INFO_ID = '1633997482885255168'
           AND b.PROJECT_SOURCE_TYPE_ID = '0099952822476441374'
-          AND b.PROJECT_CLASSIFICATION_ID = '1704686664114929664'   -- 只取政府投资类项目
+<!--          AND b.PROJECT_CLASSIFICATION_ID = '1704686664114929664'   &#45;&#45; 只取政府投资类项目 不区分类型-->
           AND (b.PROJECT_STATUS != '1661568714048413696' or b.PROJECT_STATUS is null) -- 项目状态不是暂停中
     </select>
 
