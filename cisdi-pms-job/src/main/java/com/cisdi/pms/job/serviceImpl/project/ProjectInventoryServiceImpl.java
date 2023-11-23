@@ -70,8 +70,6 @@ public class ProjectInventoryServiceImpl implements ProjectInventoryService {
                             // 根据项目id+合同事项+资料清单类型判断是否存在项目清单，存在则修改/新增清单明细，不存在则新增项目清单并新增清单明细
                             if (CollectionUtils.isEmpty(projectInventoryList)){
                                 String id = IdUtil.getSnowflakeNextIdStr();
-                            } else {
-                                boolean check = projectInventoryList.stream().map(p->projectId.equals(p.getProjectId()) && )
                             }
 
 

@@ -59,7 +59,7 @@ public class BaseServiceJob {
      * 自动执行流程完结，流程文件同步资料库
      * 5分钟一次
      */
-    @Scheduled(cron = "0 2/3 * * * ?")
+//    @Scheduled(cron = "0 2/3 * * * ?")
     public void syncProFileToDatabase(){
         try {
             log.info("流程文件同步资料库-开始");
