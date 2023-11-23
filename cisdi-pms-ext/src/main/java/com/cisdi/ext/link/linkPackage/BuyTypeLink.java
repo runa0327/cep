@@ -35,7 +35,7 @@ public class BuyTypeLink {
             //BID_AGENCY
             LinkUtils.mapAddAllValue("BID_AGENCY",AttDataTypeE.TEXT_LONG,(String)null,null,true,changeToMandatory,true,attLinkResult);
         } else if ("PM_PURCHASE_PROCESS_REQ".equals(entCode)){ // 采购过程管理
-            purchaseProAttLink(attLinkResult,name);
+            purchaseProAttLink(attLinkResult,name, attValue);
         }
         return attLinkResult;
     }
@@ -45,11 +45,11 @@ public class BuyTypeLink {
      * @param attLinkResult 返回结果只
      * @param name 属性联动名称
      */
-    public static void purchaseProAttLink(AttLinkResult attLinkResult, String name) {
+    public static void purchaseProAttLink(AttLinkResult attLinkResult, String name, String attValue) {
         boolean gongKaiShow = false, gongKaiEdit = false; // 公开类
         boolean notGongKaiShow = false, notGongKaiEdit = false; // 非公开类
 
-        if (name.contains("公开")){
+        if ("0099952822476385221".equals(attValue)){
             gongKaiShow = true;
             gongKaiEdit = true;
             attLinkResult.childShow.put("1686574747338604544", false);
