@@ -216,14 +216,6 @@ public class PmPrjReqExt {
                 .set("PRJ_EARLY_USER_ID", userId).set("PRJ_CODE", code).exec();
         log.info("已更新：{}", exec);
 
-        //同步立项后续文件
-        // 盖章立项申请书
-        String applyBook = JdbcMapUtil.getString(entityRecord.valueMap, "STAMPED_PRJ_REQ_FILE");
-        ProFileUtils.insertProFile(projectId, applyBook, FileCodeEnum.STAMPED_PRJ_REQ_FILE);
-
-        // 批复文件
-        String reply = JdbcMapUtil.getString(entityRecord.valueMap, "REPLY_FILE");
-        ProFileUtils.insertProFile(projectId, reply, FileCodeEnum.REPLY_FILE);
     }
 
     /**

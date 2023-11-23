@@ -117,13 +117,12 @@ public class AttLinkDifferentProcess {
 
     /**
      * 获取所有流程的表名
-     * @return
+     * @return 流程表code
      */
     public static List<String> getAllProcessList(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> codeMaps = myJdbcTemplate.queryForList("select code from ad_ent where PARENT_ENT_ID = '0099799190825077752' and status = 'AP'");
-        List<String> codes = codeMaps.stream().map(m -> JdbcMapUtil.getString(m, "code")).collect(Collectors.toList());
-        return codes;
+        return codeMaps.stream().map(m -> JdbcMapUtil.getString(m, "code")).collect(Collectors.toList());
     }
 
     /**
@@ -373,5 +372,15 @@ public class AttLinkDifferentProcess {
         keyList.add("BUDGET_REVIEW_COMPLETED"); // 预算评审完成情况
         keyList.add("CONSTRUCT_BID_COMPLETED"); // 施工招标备案完成情况
         return keyList;
+    }
+
+    /**
+     * 流程中无项目信息的流程
+     * @return 结果集
+     */
+    public static List<String> getNoProjectStaticList() {
+        List<String> list = new ArrayList<>();
+        list.add("CONSULTATION_REQ"); // 意见征询
+        return list;
     }
 }
