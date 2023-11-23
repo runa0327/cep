@@ -77,43 +77,6 @@ public class ProFileUtils {
 
 
     /**
-     * 流程审批中的文件进行归档
-     *
-     * @param projectId
-     * @param fileIds
-     * @param codeEnum
-     */
-    public static void insertProFile(String projectId, String fileIds, FileCodeEnum codeEnum) {
-//        if (Strings.isNullOrEmpty(fileIds)) {
-//            return;
-//        }
-//        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-//        try {
-//            String fid = "";
-//            List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from pf_folder where PM_PRJ_ID=?", projectId);
-//            List<Map<String, Object>> folderList = myJdbcTemplate.queryForList("select `CODE`,`NAME`,REMARK,PM_PRJ_ID,SEQ_NO,ifnull(PF_FOLDER_PID,'0') as PF_FOLDER_PID from PF_FOLDER where IS_TEMPLATE ='1';");
-//            if(!CollectionUtils.isEmpty(list) && folderList.size() == list.size()){
-//                Optional<Map<String, Object>> obj = list.stream().filter(p -> Objects.equals(codeEnum.toString(), String.valueOf(p.get("CODE")))).findAny();
-//                if (obj.isPresent()) {
-//                    fid = String.valueOf(obj.get().get("ID"));
-//                }
-//            }else{
-//                ProFileUtils.createFolder(projectId);
-//                Map<String, Object> map = myJdbcTemplate.queryForMap("select * from pf_folder where PM_PRJ_ID=? and `CODE`=?", projectId, codeEnum.toString());
-//                fid = String.valueOf(map.get("ID"));
-//            }
-//
-//            List<String> fileIDs = Arrays.asList(fileIds.split(","));
-//            for (String fileId : fileIDs) {
-//                String sql = "insert into PF_FILE (id,FL_FILE_ID,PF_FOLDER_ID) values(@newId,'"+fileId+"','"+fid+"')";
-//                myJdbcTemplate.update(sql);
-//            }
-//        } catch (Exception e) {
-//            throw new BaseException(e.getMessage());
-//        }
-    }
-
-    /**
      * word转pdf 返回文件大小
      */
     public static Map testExt(String input, String output) throws IOException {

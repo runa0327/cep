@@ -66,6 +66,7 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("STATUS_ONE"); // 审批状态
         entityRecord.extraEditableAttCodeList.add("PM_FILE_CHAPTER_REQ_ID"); // 关联标前资料用印审批
         entityRecord.extraEditableAttCodeList.add("PM_PRJ_ID"); // 项目id
+        entityRecord.extraEditableAttCodeList.add("PM_PRJ_IDS"); // 项目id
         entityRecord.extraEditableAttCodeList.add("PROJECT_NAME_WR"); // 项目名称
         entityRecord.extraEditableAttCodeList.add("COMPANY_ID"); // 内部管理单位
         entityRecord.extraEditableAttCodeList.add("CONTRACT_NAME"); // 合同名称
