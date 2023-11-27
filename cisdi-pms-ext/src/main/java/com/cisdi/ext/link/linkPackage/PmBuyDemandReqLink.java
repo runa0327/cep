@@ -139,7 +139,7 @@ public class PmBuyDemandReqLink {
             String buyTypeName = GrSetValueExt.getValueNameById(buyTypeId);
             LinkUtils.mapAddAllValue("BUY_TYPE_ID",AttDataTypeE.TEXT_LONG,buyTypeId,buyTypeName,true,true,false,attLinkResult);
 
-            BuyTypeLink.purchaseProAttLink(attLinkResult,buyTypeName,attValue); // 采购方式引起的属性联动
+            BuyTypeLink.purchaseProAttLink(attLinkResult,buyTypeName,buyTypeId); // 采购方式引起的属性联动
         }
     }
 }
