@@ -35,7 +35,7 @@ public class BuyTypeLink {
             //BID_AGENCY
             LinkUtils.mapAddAllValue("BID_AGENCY",AttDataTypeE.TEXT_LONG,(String)null,null,true,changeToMandatory,true,attLinkResult);
         } else if ("PM_PURCHASE_PROCESS_REQ".equals(entCode)){ // 采购过程管理
-            purchaseProAttLink(attLinkResult,name);
+            purchaseProAttLink(attLinkResult,name, attValue);
         }
         return attLinkResult;
     }
@@ -45,11 +45,11 @@ public class BuyTypeLink {
      * @param attLinkResult 返回结果只
      * @param name 属性联动名称
      */
-    public static void purchaseProAttLink(AttLinkResult attLinkResult, String name) {
+    public static void purchaseProAttLink(AttLinkResult attLinkResult, String name, String attValue) {
         boolean gongKaiShow = false, gongKaiEdit = false; // 公开类
         boolean notGongKaiShow = false, notGongKaiEdit = false; // 非公开类
 
-        if (name.contains("公开")){
+        if ("0099952822476385221".equals(attValue)){
             gongKaiShow = true;
             gongKaiEdit = true;
             attLinkResult.childShow.put("1686574747338604544", false);
@@ -68,7 +68,7 @@ public class BuyTypeLink {
         LinkUtils.mapAddAllValue("FILE_ID_TWO",AttDataTypeE.FILE_GROUP,(String) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 中标通知书
         LinkUtils.mapAddAllValue("FILE_ID_THREE",AttDataTypeE.FILE_GROUP,(String) null,null,gongKaiShow,false,false,attLinkResult); // 备案回执
         LinkUtils.mapAddAllValue("FILE_ID_FOUR",AttDataTypeE.FILE_GROUP,(String) null,null,gongKaiShow,false,false,attLinkResult); // 采购其他资料
-        LinkUtils.mapAddAllValue("SELECT_METHOD",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 选取方法
+        LinkUtils.mapAddAllValue("SELECT_TYPE_ID",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 选取方法
         LinkUtils.mapAddAllValue("DATE_THREE",AttDataTypeE.DATE,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 选取日期
         LinkUtils.mapAddAllValue("CONTACTS_TWO",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 选取企业联系人
         LinkUtils.mapAddAllValue("CONTACT_MOBILE_TWO",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 联系电话

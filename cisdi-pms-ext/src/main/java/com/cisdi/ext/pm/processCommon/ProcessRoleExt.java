@@ -4,13 +4,13 @@ import com.cisdi.ext.api.HrDeptExt;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.base.PmProcessPostConExt;
 import com.cisdi.ext.base.PostExt;
+import com.cisdi.ext.constants.PostConstants;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.AdAtt;
 import com.cisdi.ext.model.HrDept;
 import com.cisdi.ext.model.WfTask;
 import com.cisdi.ext.model.base.AdRoleUser;
-import com.cisdi.ext.model.base.BasePointPost;
 import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.pm.office.PmPostAppointExt;
 import com.cisdi.ext.util.ListUtil;
@@ -961,7 +961,9 @@ public class ProcessRoleExt {
                 if (adEntAtt.contains(tmp)){
                     String user = JdbcMapUtil.getString(list.get(0),tmp);
                     if (StringUtils.hasText(user)){
-                        sb.append(user).append(",");
+                        if (!"1641281525532323840".equals(user)){
+                            sb.append(user).append(",");
+                        }
                     } else {
                         String name = AdAtt.selectOneByWhere(new Where().eq(AdAtt.Cols.CODE,tmp)).getName();
                         error.append("在表单中没有找到岗位：【").append(name).append("】对应人员，请先完善表单信息或联系管理员处理!");
@@ -1345,6 +1347,53 @@ public class ProcessRoleExt {
             if (!CollectionUtils.isEmpty(userList)){
                 ExtJarHelper.returnValue.set(userList);
             }
+        }
+    }
+
+    /**
+     * 流程角色-根据花名册判断需要哪些部门负责人审批
+     */
+    public void getDeptLeaderByPro(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        Map<String, Object> valueMap = entityRecord.valueMap;
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code; //业务表名
+        String processId = ProcessCommon.getProcessIdByEntCode(entCode,myJdbcTemplate); // 流程id
+        String postCode = PostExt.getPostByProcess(processId,myJdbcTemplate); // 获取该流程所有需要审批的岗位编码
+        String ancestorId = JdbcMapUtil.getString(valueMap,"COMPANY_ID");  // 内部管理单位/父级公司id
+        checkValue(processId,postCode);   // 必要参数校验
+        String[] arr = postCode.split(",");
+        ArrayList<Object> userList = new ArrayList<>();
+        for (String deptCodePrc : arr) {
+            if (PostConstants.postDeptCodeMap.containsKey(deptCodePrc)){
+                String user = JdbcMapUtil.getString(valueMap,deptCodePrc);
+                if (StringUtils.hasText(user) && !"1641281525532323840".equals(user)){
+                    String deptCode = PostConstants.postDeptCodeMap.get(deptCodePrc);
+                    String chiefUser = HrDeptExt.getChiefUserByCompanyDept(deptCode,ancestorId,myJdbcTemplate);
+                    if (StringUtils.hasText(chiefUser)){
+                        userList.add(chiefUser);
+                    }
+                }
+            }
+        }
+        if (!CollectionUtils.isEmpty(userList)){
+            ExtJarHelper.returnValue.set(userList.stream().distinct().collect(Collectors.toList()));
+        } else {
+            throw new BaseException("没有找到待审批人员，请联系管理员处理");
+        }
+    }
+
+    /**
+     * 必要参数校验
+     * @param processId 流程id
+     * @param postCode 岗位编码
+     */
+    private void checkValue(String processId, String postCode) {
+        if (!StringUtils.hasText(processId)){
+            throw new BaseException("该流程未配置‘流程-数据关联关系’，请先配置或联系管理员处理！");
+        }
+        if (!StringUtils.hasText(postCode)){
+            throw new BaseException("该流程未配置岗位信息，请先配置或联系管理员处理！");
         }
     }
 }
