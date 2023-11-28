@@ -204,13 +204,13 @@ public class PmPrjSettleAccountsExt {
         if ("OK".equals(status)){
             if ("1640179993889873920".equals(nodeId)){ //1-发起
                 nodeName = "start";
-            } else if ("1640179994070228992".equals(nodeId)){ //2-部门主管意见-通过
+            } else if ("1640179994070228992".equals(nodeId)){ // 2-部门主管意见-通过
                 nodeName = "chargeCheckOk";
-            } else if ("1640179994145726464".equals(nodeId)){ //3-前期/工程/设计/财务审批-通过
+            } else if ("1640179994145726464".equals(nodeId)){ // 3-前期/工程/设计/财务审批-通过
                 nodeName = "earlyManageDesignFinanceCheckOK";
-            } else if ("1640179994179280896".equals(nodeId)){ //4-分管领导审批-通过
+            } else if ("1640179994179280896".equals(nodeId)){ // 6-分管领导审批-通过
                 nodeName = "leaderCheckOk";
-            } else if ("1640179994221223936".equals(nodeId)){ //5-总经理审批-通过
+            } else if ("1640179994221223936".equals(nodeId)){ // 7-总经理审批-通过
                 nodeName = "presidentCheckOK";
             }
         } else {

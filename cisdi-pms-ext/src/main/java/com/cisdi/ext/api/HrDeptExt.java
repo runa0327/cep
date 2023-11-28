@@ -86,6 +86,23 @@ public class HrDeptExt {
     }
 
     /**
+     * 根据内部管理单位及部门编码获取部门负责人
+     * @param deptCode 部门编码
+     * @param ancestorId 公司父级id
+     * @param myJdbcTemplate 数据源
+     * @return 部门负责人id
+     */
+    public static String getChiefUserByCompanyDept(String deptCode, String ancestorId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "SELECT CHIEF_USER_ID FROM hr_dept WHERE code = ? and id in (WITH RECURSIVE department_hierarchy AS ( SELECT id, hr_dept_pid FROM hr_dept WHERE hr_dept_pid = ? UNION ALL SELECT d.id, d.hr_dept_pid FROM department_hierarchy dh JOIN hr_dept d ON d.hr_dept_pid = dh.id ) SELECT id FROM department_hierarchy ORDER BY id)";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,deptCode,ancestorId);
+        if (CollectionUtils.isEmpty(list)){
+            return null;
+        } else {
+            return JdbcMapUtil.getString(list.get(0),"CHIEF_USER_ID");
+        }
+    }
+
+    /**
      * 部门信息
      */
     public void getDistinctDept() {

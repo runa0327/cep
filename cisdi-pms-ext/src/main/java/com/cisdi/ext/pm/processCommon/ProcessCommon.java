@@ -622,6 +622,22 @@ public class ProcessCommon {
     }
 
     /**
+     * 根据流程表名获取流程id
+     * @param entCode 流程表名
+     * @param myJdbcTemplate 数据源
+     * @return 流程id
+     */
+    public static String getProcessIdByEntCode(String entCode, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select a.wf_process_id from BASE_PROCESS_ENT a left join ad_ent b on a.AD_ENT_ONE_ID = b.id left join wf_process c on a.wf_process_id = c.id where b.code = ? and a.status = 'ap' and c.status = 'ap'";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,entCode);
+        if (CollectionUtils.isEmpty(list)){
+            return null;
+        } else {
+            return JdbcMapUtil.getString(list.get(0),"wf_process_id");
+        }
+    }
+
+    /**
      * 流程实例数据作废-作废对应流程表
      */
     public void cancelData(){
