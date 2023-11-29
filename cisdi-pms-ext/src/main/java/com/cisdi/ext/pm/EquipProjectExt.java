@@ -137,7 +137,7 @@ public class EquipProjectExt {
             id = Crud.from("pm_prj").insertData();
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("update pm_prj set LAST_MODI_DT =NOW(),PROJECT_CLASSIFICATION_ID='1704686735267102720' ");
+        sb.append("update pm_prj set LAST_MODI_DT =NOW(),PROJECT_CLASSIFICATION_ID='1704686735267102720',PROJECT_SOURCE_TYPE_ID = '0099952822476441374',IZ_FORMAL_PRJ = 1,PROJECT_STATUS = '1661568765403471872' ");
         if (StringUtils.hasText(inputData.prjId)) {
             sb.append(" ,SUBORDINATE_PROJECT='").append(inputData.prjId).append("'");
             //处理编码

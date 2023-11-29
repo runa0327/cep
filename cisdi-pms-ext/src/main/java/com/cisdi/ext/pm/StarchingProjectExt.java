@@ -132,7 +132,7 @@ public class StarchingProjectExt {
         String json = JsonUtil.toJson(map);
         InputInfo inputData = JsonUtil.fromJson(json, InputInfo.class);
         StringBuilder sb = new StringBuilder();
-        sb.append("update pm_prj set LAST_MODI_DT =NOW(),PROJECT_CLASSIFICATION_ID='1704686841101975552' ");
+        sb.append("update pm_prj set LAST_MODI_DT =NOW(),PROJECT_CLASSIFICATION_ID='1704686841101975552',PROJECT_SOURCE_TYPE_ID = '0099952822476441374',IZ_FORMAL_PRJ = 1,PROJECT_STATUS = '1661568765403471872' ");
         String id = inputData.id;
         if (!StringUtils.hasText(id)) {
             id = Crud.from("pm_prj").insertData();
