@@ -40,7 +40,7 @@ public class EquipProjectExt {
                 "from pm_prj pm left join pm_prj pp on pm.SUBORDINATE_PROJECT = pp.ID\n" +
                 "left join gr_set_value gs on gs.id = pm.RESEARCH_RANGE\n" +
                 "left join PM_LANDING_POINT plp on plp.id = pm.PM_LANDING_POINT_ID " +
-                "where pm.PROJECT_CLASSIFICATION_ID ='1704686735267102720' ");
+                "where pm.PROJECT_CLASSIFICATION_ID ='1704686735267102720' and pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 and pm.PROJECT_STATUS != '1661568714048413696' ");
         if (StringUtils.hasText(requestParam.eqPrjName)) {
             sb.append(" and pm.`NAME` like '%").append(requestParam.eqPrjName).append("%'");
         }
