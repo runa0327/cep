@@ -103,6 +103,27 @@ public class HrDeptExt {
     }
 
     /**
+     * 根据用户id获取部门负责人
+     * @param userId 用户id
+     * @param myJdbcTemplate 数据源
+     * @return 部门负责人id集合
+     */
+    public static ArrayList<String> getDeptChiefUserByUserIds(String userId, MyJdbcTemplate myJdbcTemplate) {
+        List<Map<String, Object>> list = getCompany(myJdbcTemplate);
+        // 遍历获取人员所在公司及部门
+        for (Map<String, Object> map : list) {
+            String companyId = JdbcMapUtil.getString(map, "id");
+            List<String> deptIdList = getCompanyChildDeptId(companyId, myJdbcTemplate);
+            String deptIdStr = String.join("','", deptIdList);
+            List<Map<String, Object>> deptList = myJdbcTemplate.queryForList("select hr_dept_id from hr_dept_user where ad_user_id in ('"+userId+"') and status = 'ap' and hr_dept_id in ('"+deptIdStr+"')", userId);
+            if (!CollectionUtils.isEmpty(deptList)) {
+                return deptList.stream().map(p -> JdbcMapUtil.getString(p, "hr_dept_id")).collect(Collectors.toCollection(ArrayList::new));
+            }
+        }
+        return null;
+    }
+
+    /**
      * 部门信息
      */
     public void getDistinctDept() {
@@ -116,17 +137,40 @@ public class HrDeptExt {
 
 
     /**
-     * 查询内部管理单位
+     * 查询内部管理单位/公司
      */
     public void interiorCompany() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select id,`NAME` from hr_dept where id in ('0099799190825079019','1650795835505721344')");
+        List<Map<String, Object>> list = getCompany(myJdbcTemplate);
         Map<String, Object> result = new HashMap<>();
         result.put("deptList", list);
         ExtJarHelper.returnValue.set(result);
     }
 
+    /**
+     * 获取内部管理单位
+     * @param myJdbcTemplate 数据源
+     * @return 内部管理单位
+     */
+    private static List<Map<String, Object>> getCompany(MyJdbcTemplate myJdbcTemplate) {
+        return myJdbcTemplate.queryForList("select id,`NAME` from hr_dept where id in ('0099799190825079019','1650795835505721344')");
+    }
 
+    /**
+     * 根据父级id获取所有子级部门id
+     * @param fatherId 父级id
+     * @param myJdbcTemplate 数据源
+     * @return 所有子级部门id
+     */
+    private static List<String> getCompanyChildDeptId(String fatherId, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "(WITH RECURSIVE department_hierarchy AS ( SELECT id, hr_dept_pid FROM hr_dept WHERE hr_dept_pid = ? UNION ALL SELECT d.id, d.hr_dept_pid FROM department_hierarchy dh JOIN hr_dept d ON d.hr_dept_pid = dh.id ) SELECT id FROM department_hierarchy ORDER BY id)";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,fatherId);
+        if (!CollectionUtils.isEmpty(list)){
+            return list.stream().map(p -> JdbcMapUtil.getString(p, "id")).distinct().collect(Collectors.toList());
+        } else {
+            return null;
+        }
+    }
 
     /**
      * 根据父级部门id获取所有子级部门id

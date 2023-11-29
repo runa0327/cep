@@ -667,6 +667,45 @@ public class ProcessRoleExt {
     }
 
     /**
+     * 查询任意流程的需求经办人员 OPERATOR_ONE_ID
+     */
+    public void getOperatorOneId(){
+        getDeptUser("OPERATOR_ONE_ID","OPERATOR_ONE_ID","经办人");
+    }
+
+    /**
+     * 查询流程中所选需求经办人所在部门负责人
+     */
+    public void getOperatorOneIdLeader(){
+        getDeptChiefUser("OPERATOR_ONE_ID","经办人");
+    }
+
+    /**
+     * 获取流程中所选人员所在部门负责人
+     * @param adAttCode 流程中表单字段编码
+     * @param adAttName 流程中表单字段名称
+     */
+    private void getDeptChiefUser(String adAttCode, String adAttName) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String csCommId = entityRecord.csCommId; //流程表单实例记录id
+        String entityCode = ExtJarHelper.sevInfo.get().entityInfo.code; //获取流程实体编码
+        ArrayList<Object> userIdList = getProcSelectUser(csCommId,entityCode,adAttCode,null,myJdbcTemplate);
+        if (CollectionUtils.isEmpty(userIdList)){
+            throw new BaseException("该流程未配置 ‘"+adAttName+"' 人员，请先选择对应人员或联系管理员处理！");
+        } else {
+            String userId = Strings.join(userIdList,',');
+            userId = userId.replace(",","','");
+            ArrayList<String> deptChiefUser = HrDeptExt.getDeptChiefUserByUserIds(userId,myJdbcTemplate);
+            if (CollectionUtils.isEmpty(deptChiefUser)){
+                throw new BaseException("该流程中所选人员所在部门负责人为空，请先选择对应人员或联系管理员处理！");
+            } else {
+                ExtJarHelper.returnValue.set(userIdList);
+            }
+        }
+    }
+
+    /**
      * 查询任意流程中对应岗位人员
      * @param deptCode 岗位属性代码
      * @param post_cost 部门树岗位编码
@@ -675,24 +714,43 @@ public class ProcessRoleExt {
     private void getDeptUser(String deptCode, String post_cost, String deptName) {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        //流程id
-        String csCommId = entityRecord.csCommId;
-        //获取流程实体编码
-        String entityCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        String csCommId = entityRecord.csCommId; //流程表单实例记录id
+        String entityCode = ExtJarHelper.sevInfo.get().entityInfo.code; //获取流程实体编码
+        ArrayList<Object> userIdList = getProcSelectUser(csCommId,entityCode,deptCode,post_cost,myJdbcTemplate);
+        if (CollectionUtils.isEmpty(userIdList)){
+            throw new BaseException("该流程未配置 ‘"+deptName+"' 人员，请先选择对应人员或联系管理员处理！");
+        } else {
+            ExtJarHelper.returnValue.set(userIdList);
+        }
+    }
+
+    /**
+     * 获取流程中某字段选择的人员
+     * @param csCommId 流程表单实例记录id
+     * @param entityCode 流程业务表编码
+     * @param deptCode 岗位编码
+     * @param post_cost 部门树岗位编码
+     * @param myJdbcTemplate 数据源
+     * @return 人员集合
+     */
+    private ArrayList<Object> getProcSelectUser(String csCommId, String entityCode, String deptCode, String post_cost,MyJdbcTemplate myJdbcTemplate) {
+        ArrayList<Object> userIdList = new ArrayList<>();
         String sql1 = "select "+deptCode+" from "+entityCode+" where id = ?";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,csCommId);
         if (!CollectionUtils.isEmpty(list1)){
-            ArrayList<Object> userIdList;
-            if ("userIds".equals(post_cost)){
+            if (StringUtils.hasText(post_cost) && "userIds".equals(post_cost)){
                 String userIds = JdbcMapUtil.getString(list1.get(0), deptCode);
                 userIdList = new ArrayList<>(Arrays.asList(userIds.split(",")));
             } else {
                 userIdList = list1.stream().map(p -> JdbcMapUtil.getString(p, deptCode)).collect(Collectors.toCollection(ArrayList::new));
             }
-            ExtJarHelper.returnValue.set(userIdList);
-        } else {
-            throw new BaseException("该流程未配置 ‘"+deptName+"' 人员，请先选择对应人员或联系管理员处理！");
         }
+        if (!CollectionUtils.isEmpty(userIdList)){
+            if (userIdList.contains("1641281525532323840")){
+                userIdList.remove("1641281525532323840");
+            }
+        }
+        return userIdList;
     }
 
     /**

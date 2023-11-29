@@ -1,8 +1,6 @@
 package com.cisdi.ext.pm.bidPurchase;
 
-import com.cisdi.ext.base.GrSetValueExt;
 import com.cisdi.ext.model.PmPurchaseProcessEnrollDetail;
-import com.cisdi.ext.model.PmPurchaseProcessUnitDetail;
 import com.cisdi.ext.pm.bidPurchase.detail.PmPurchaseProcessPrjDetailExt;
 import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.wf.WfExt;
@@ -34,14 +32,11 @@ public class PmPurchaseProcessReqExt {
     /**
      * 根据采购方式不同清空不同的明细信息 公开类清空报名，非公开清空投标
      * @param id 主表单id
-     * @param purchaseTypeId 采购方式id
+     * @param purchaseTypeId 采购方式id 0099952822476385221 = 公开招标
      */
     private void dealPurchase(String id, String purchaseTypeId) {
-        String name = GrSetValueExt.getValueNameById(purchaseTypeId);
-        if (name.contains("公开")){
+        if ("0099952822476385221".contains(purchaseTypeId)){
             Crud.from(PmPurchaseProcessEnrollDetail.ENT_CODE).where().eq(PmPurchaseProcessEnrollDetail.Cols.PM_PURCHASE_PROCESS_REQ_ID,id).delete().exec();
-        } else {
-            Crud.from(PmPurchaseProcessUnitDetail.ENT_CODE).where().eq(PmPurchaseProcessUnitDetail.Cols.PM_PURCHASE_PROCESS_REQ_ID,id).delete().exec();
         }
     }
 
