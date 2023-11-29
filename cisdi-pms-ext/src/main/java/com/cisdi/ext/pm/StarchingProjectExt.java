@@ -38,11 +38,11 @@ public class StarchingProjectExt {
         int pageSize = requestParam.pageSize;
         int pageIndex = requestParam.pageIndex;
         StringBuilder sb = new StringBuilder();
-        sb.append("select pm.id as prj_id,pm.pm_code as prj_code,pm.`NAME` as prj_name,pp.`NAME` as owners,gs.`NAME` as type,gg.`NAME` as location  from pm_prj pm\n" +
-                "left join pm_party pp on pm.CUSTOMER_UNIT = pp.id\n" +
-                "left join gr_set_value gs on pm.PROJECT_TYPE_ID = gs.id\n" +
-                "left join gr_set_value gg on pm.BASE_LOCATION_ID = gg.id\n" +
-                "where pm.PROJECT_CLASSIFICATION_ID ='1704686841101975552'");
+        sb.append("select pm.id as prj_id,pm.pm_code as prj_code,pm.`NAME` as prj_name,pp.`NAME` as owners,gs.`NAME` as type,gg.`NAME` as location  from pm_prj pm \n" +
+                "left join pm_party pp on pm.CUSTOMER_UNIT = pp.id \n" +
+                "left join gr_set_value gs on pm.PROJECT_TYPE_ID = gs.id \n" +
+                "left join gr_set_value gg on pm.BASE_LOCATION_ID = gg.id \n" +
+                "where pm.PROJECT_CLASSIFICATION_ID ='1704686841101975552' and pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 and pm.PROJECT_STATUS != '1661568714048413696' ");
         if (StringUtils.hasText(requestParam.name)) {
             sb.append(" and pm.`NAME` like '%").append(requestParam.name).append("%'");
         }
