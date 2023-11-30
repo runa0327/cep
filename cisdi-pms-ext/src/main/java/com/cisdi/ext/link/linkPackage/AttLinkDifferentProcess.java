@@ -1,5 +1,6 @@
 package com.cisdi.ext.link.linkPackage;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -382,5 +383,22 @@ public class AttLinkDifferentProcess {
         List<String> list = new ArrayList<>();
         list.add("CONSULTATION_REQ"); // 意见征询
         return list;
+    }
+
+    /**
+     * 获取所有流程实体表名
+     * @return 结果集
+     */
+    public static List<String> getProcessTable() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        String sql = "select code,name from AD_ENT where PARENT_ENT_ID = '0099799190825077752' order by id desc";
+        List<Map<String, Object>> processTable = myJdbcTemplate.queryForList(sql);
+        List<String> tableList = new ArrayList<>();
+        if (!CollectionUtil.isEmpty(processTable)) {
+            for (Map<String, Object> map : processTable) {
+                tableList.add(JdbcMapUtil.getString(map,"code"));
+            }
+        }
+        return tableList;
     }
 }

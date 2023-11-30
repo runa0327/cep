@@ -85,7 +85,10 @@ public class WfExt {
                 }
 
                 //需要自定义标题的流程
-                List<String> tableList = AttLinkDifferentProcess.getTableList();
+                List<String> tableList = AttLinkDifferentProcess.getProcessTable();
+                if (CollectionUtils.isEmpty(tableList)){
+                    throw new BaseException("父实体为通用单据的实体不能为空，请联系管理员处理");
+                }
 
                 // 审批流审批通过
                 if ("AP".equals(newStatus)) {
@@ -107,29 +110,26 @@ public class WfExt {
                     if (tableList.contains(entityCode)) {
                         if (specialList.contains(entityCode)){
                             continue;
-                        } else if ("PM_PRJ_REQ".equals(entityCode)) {
-                            int update1 = myJdbcTemplate.update("update PM_PRJ_REQ t set t.name=t.PRJ_NAME where t.id=?", csCommId);
                         } else if ("PO_ORDER_REQ".equals(entityCode)) {
                             String name = entityRecord.valueMap.get("CONTRACT_NAME").toString();
-                            int update1 = myJdbcTemplate.update("update PM_PRJ_REQ t set t.name=? where t.id=?", name, csCommId);
+                            myJdbcTemplate.update("update PM_PRJ_REQ t set t.name=? where t.id=?", name, csCommId);
                         } else if ("PM_PRJ_STOP_ORDER_REQ".equals(entityCode)){
-                            int update1 = myJdbcTemplate.update("update PM_PRJ_STOP_ORDER_REQ t set t.name=t.REMARK_TWO where t.id=?", csCommId);
+                            myJdbcTemplate.update("update PM_PRJ_STOP_ORDER_REQ t set t.name=t.REMARK_TWO where t.id=?", csCommId);
                         } else if ("PM_BID_KEEP_FILE_REQ".equals(entityCode)){
                             String sql = "update wf_process_instance a left join wf_process b on a.WF_PROCESS_ID = b.id LEFT JOIN pm_bid_keep_file_req c on a.id = c.LK_WF_INST_ID " +
                                     "LEFT JOIN pm_prj d on c.PM_PRJ_ID = d.id LEFT JOIN ad_user e on c.CRT_USER_ID = e.id " +
                                     "set a.name = concat(b.name,'-',d.name,'-',e.name,'-',now()) where c.id = ?";
-                            int update1 = myJdbcTemplate.update(sql, csCommId);
-                            update1 = myJdbcTemplate.update("update pm_bid_keep_file_req a LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id set a.name = b.name where a.id = ?",csCommId);
+                            myJdbcTemplate.update(sql, csCommId);
+                            myJdbcTemplate.update("update pm_bid_keep_file_req a LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id set a.name = b.name where a.id = ?",csCommId);
                         } else {
-                            String sql1 = "select a.NAME from wf_process_instance a left join " + entityCode + " b on a.id = b.LK_WF_INST_ID where " +
-                                    "b.id = ?";
+                            String sql1 = "select a.NAME from wf_process_instance a left join " + entityCode + " b on a.id = b.LK_WF_INST_ID where b.id = ?";
                             List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql1, csCommId);
                             if (CollectionUtils.isEmpty(list)) {
                                 throw new BaseException("流程标题不能为空");
                             }
-                            String name = list.get(0).get("NAME").toString();
+                            String name = JdbcMapUtil.getString(list.get(0),"NAME");
                             String sql2 = "update " + entityCode + " set NAME = ? where id = ?";
-                            int update2 = myJdbcTemplate.update(sql2, name, csCommId);
+                            myJdbcTemplate.update(sql2, name, csCommId);
                         }
 
                     }

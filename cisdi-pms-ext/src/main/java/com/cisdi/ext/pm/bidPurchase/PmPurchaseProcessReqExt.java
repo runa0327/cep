@@ -13,7 +13,7 @@ import com.qygly.shared.util.JdbcMapUtil;
 import java.util.Map;
 
 /**
- * 采购过程管理-扩展
+ * 招标选取与中标管理-扩展
  */
 public class PmPurchaseProcessReqExt {
 
@@ -49,6 +49,8 @@ public class PmPurchaseProcessReqExt {
         // 项目信息项目明细表
         String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
         PmPurchaseProcessPrjDetailExt.insertData(id,projectId);
+        // 自动发起合同签订流程、采购归档流程
+        String buyTypeId = JdbcMapUtil.getString(entityRecord.valueMap,"BUY_TYPE_ID");
     }
 
     /**
@@ -67,7 +69,7 @@ public class PmPurchaseProcessReqExt {
     }
 
     /**
-     * 流程操作-采购过程管理-确认操作
+     * 流程操作-招标选取与中标管理-确认操作
      */
     public void purchaseOK(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
@@ -78,7 +80,7 @@ public class PmPurchaseProcessReqExt {
     }
 
     /**
-     * 流程操作-采购过程管理-拒绝操作
+     * 流程操作-招标选取与中标管理-拒绝操作
      */
     public void purchaseRefuse(){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
@@ -111,12 +113,10 @@ public class PmPurchaseProcessReqExt {
             if ("startOk".equals(nodeStatus)){
                 WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
             } else {
-
                 //获取审批意见
                 Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId);
                 //审批意见、内容
                 String comment = message.get("comment");
-
                 if ("deptLeaderOk".equals(nodeStatus)){ // 3-部门负责人审批
                     ProcessCommon.updateComment("TEXT_REMARK_FOUR",map,comment,entCode,csCommId,userName);
                 } else if ("costOk".equals(nodeStatus)){ // 4-成本部负责人审批
