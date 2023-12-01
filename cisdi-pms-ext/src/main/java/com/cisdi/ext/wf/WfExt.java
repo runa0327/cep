@@ -342,7 +342,7 @@ public class WfExt {
         Object START_USER_ID = Crud.from("wf_process_instance").where().eq("id", procInstId).select().specifyCols(
                 "START_USER_ID").execForValue();
 
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select d.chief_user_id from hr_dept_user du join hr_dept d on du.HR_DEPT_ID=d.id and du.AD_USER_ID=? limit 1", START_USER_ID);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select d.chief_user_id from hr_dept_user du join hr_dept d on du.HR_DEPT_ID=d.id and du.AD_USER_ID=? and du.status = 'ap' limit 1", START_USER_ID);
         if (CollectionUtils.isEmpty(list) || list.get(0).get("chief_user_id") == null) {
             throw new BaseException("启动用户没有对应的部门负责人！");
         } else if (list.size() > 1) {
