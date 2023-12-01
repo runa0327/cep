@@ -53,30 +53,28 @@ public class BuyTypeLink {
             gongKaiShow = true;
             gongKaiEdit = true;
             attLinkResult.childShow.put("1686574747338604544", false);
-            attLinkResult.childShow.put("1686574170722467840", true);
         } else {
             notGongKaiEdit = true;
             notGongKaiShow = true;
             attLinkResult.childShow.put("1686574747338604544", true);
-            attLinkResult.childShow.put("1686574170722467840", false);
         }
-        LinkUtils.mapAddAllValue("DATE_TWO",AttDataTypeE.DATE,(String) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 开标日期
+        LinkUtils.mapAddAllValue("DATE_TWO",AttDataTypeE.DATE,(String) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 中标日期
         LinkUtils.mapAddAllValue("RATE_ONE",AttDataTypeE.TEXT_LONG,(BigDecimal) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 下浮率
+        LinkUtils.mapAddAllValue("AMT_FIVE",AttDataTypeE.TEXT_LONG,(BigDecimal) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 中标金额
+        LinkUtils.mapAddAllValue("UNIT_ONE",AttDataTypeE.TEXT_LONG,(String) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 中标企业
         LinkUtils.mapAddAllValue("CONTACTS_ONE",AttDataTypeE.TEXT_LONG,(String) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 中选企业联系人
         LinkUtils.mapAddAllValue("CONTACT_MOBILE_ONE",AttDataTypeE.TEXT_LONG,(String) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 联系电话
-        LinkUtils.mapAddAllValue("FILE_ID_ONE",AttDataTypeE.FILE_GROUP,(String) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 公开招标项目评标报告
         LinkUtils.mapAddAllValue("FILE_ID_TWO",AttDataTypeE.FILE_GROUP,(String) null,null,gongKaiShow,false,gongKaiEdit,attLinkResult); // 中标通知书
-        LinkUtils.mapAddAllValue("FILE_ID_THREE",AttDataTypeE.FILE_GROUP,(String) null,null,gongKaiShow,false,false,attLinkResult); // 备案回执
-        LinkUtils.mapAddAllValue("FILE_ID_FOUR",AttDataTypeE.FILE_GROUP,(String) null,null,gongKaiShow,false,false,attLinkResult); // 采购其他资料
         LinkUtils.mapAddAllValue("SELECT_TYPE_ID",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 选取方法
-        LinkUtils.mapAddAllValue("DATE_THREE",AttDataTypeE.DATE,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 选取日期
         LinkUtils.mapAddAllValue("CONTACTS_TWO",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 选取企业联系人
         LinkUtils.mapAddAllValue("CONTACT_MOBILE_TWO",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 联系电话
         LinkUtils.mapAddAllValue("TEXT_REMARK_TWO",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 选取结论
         LinkUtils.mapAddAllValue("TEXT_REMARK_THREE",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 备注说明
         LinkUtils.mapAddAllValue("TEXT_REMARK_FOUR",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,false,attLinkResult); // 需求部门负责人意见
+        LinkUtils.mapAddAllValue("TEXT_REMARK_SEVEN",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,false,attLinkResult); // 需求部门领导意见
         LinkUtils.mapAddAllValue("TEXT_REMARK_FIVE",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,false,attLinkResult); // 成本部负责人意见
         LinkUtils.mapAddAllValue("TEXT_REMARK_SIX",AttDataTypeE.TEXT_LONG,(String) null,null,notGongKaiShow,false,false,attLinkResult); // 采购部负责人意见
+        LinkUtils.mapAddAllValue("FILE_ID_ONE",AttDataTypeE.FILE_GROUP,(String) null,null,notGongKaiShow,false,notGongKaiEdit,attLinkResult); // 电子采购平台信息
     }
 
 }

@@ -29,7 +29,7 @@ public class PmBuyDemandReqLink {
      */
     public static AttLinkResult linkForPM_BUY_DEMAND_REQ_ID(MyJdbcTemplate myJdbcTemplate, String attValue, String entCode) {
         AttLinkResult attLinkResult = new AttLinkResult();
-        if ("PM_PURCHASE_PROCESS_REQ".equals(entCode)){ // 采购过程管理
+        if ("PM_PURCHASE_PROCESS_REQ".equals(entCode)){ // 招标选取与中标管理
             purchaseProcessAttLink(attValue,entCode,myJdbcTemplate,attLinkResult);
         } else if ("PM_USE_CHAPTER_REQ".equals(entCode)) { //中选单位及标后用印审批
             userChapterAttLink(attValue,myJdbcTemplate,attLinkResult);
@@ -133,11 +133,11 @@ public class PmBuyDemandReqLink {
 
             String buyMatterId = JdbcMapUtil.getString(map,"BUY_MATTER_ID"); // 采购事项
             String buyMatterName = GrSetValueExt.getValueNameById(buyMatterId);
-            LinkUtils.mapAddAllValue("BUY_MATTER_ID",AttDataTypeE.TEXT_LONG,buyMatterId,buyMatterName,true,true,false,attLinkResult);
+            LinkUtils.mapAddAllValue("BUY_MATTER_ID",AttDataTypeE.TEXT_LONG,buyMatterId,buyMatterName,true,true,true,attLinkResult);
 
             String buyTypeId = JdbcMapUtil.getString(map,"BUY_TYPE_ID"); // 采购方式
             String buyTypeName = GrSetValueExt.getValueNameById(buyTypeId);
-            LinkUtils.mapAddAllValue("BUY_TYPE_ID",AttDataTypeE.TEXT_LONG,buyTypeId,buyTypeName,true,true,false,attLinkResult);
+            LinkUtils.mapAddAllValue("BUY_TYPE_ID",AttDataTypeE.TEXT_LONG,buyTypeId,buyTypeName,true,true,true,attLinkResult);
 
             BuyTypeLink.purchaseProAttLink(attLinkResult,buyTypeName,buyTypeId); // 采购方式引起的属性联动
         }
