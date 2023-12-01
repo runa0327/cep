@@ -165,7 +165,11 @@ public class DeviceReceiptExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select dl.*,gsv.`NAME` as signStatus,gv.`NAME` as checkStatus from DEVICE_LIST dl left join gr_set_value gsv on gsv.id = dl.SIGN_STATUS_ID left join gr_set_value gv on gv.id = dl.CHECK_STATUS_ID where dl.id=?", map.get("id"));
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select dl.*,gsv.`NAME` as signStatus,gv.`NAME` as checkStatus,au.`name` as cuser from DEVICE_LIST dl " +
+                "left join gr_set_value gsv on gsv.id = dl.SIGN_STATUS_ID " +
+                "left join gr_set_value gv on gv.id = dl.CHECK_STATUS_ID " +
+                "left join ad_user au on au.id = dl.AD_USER_ID "+
+                "where dl.id=?", map.get("id"));
         if (CollectionUtils.isEmpty(list)) {
             ExtJarHelper.returnValue.set(Collections.emptyMap());
         } else {
@@ -202,6 +206,7 @@ public class DeviceReceiptExt {
                 signInfo.money = JdbcMapUtil.getString(q, "dhAmt");
                 signInfo.remark = JdbcMapUtil.getString(q, "REMARK");
                 signInfo.user = JdbcMapUtil.getString(q, "user");
+                signInfo.arriveTime = JdbcMapUtil.getString(q, "ARRIVAL_TIME");
 
                 String fileIdsa = JdbcMapUtil.getString(q, "ACCEPTANCE_DOCUMENTS");
                 if (StringUtils.hasText(fileIdsa)) {
@@ -293,6 +298,8 @@ public class DeviceReceiptExt {
         DataInput input = JsonUtil.fromJson(json, DataInput.class);
         StringBuilder sb = new StringBuilder();
         sb.append("update DEVICE_LIST set LAST_MODI_DT =NOW() ");
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        sb.append(" , AD_USER_ID='").append(userId).append("'");
         if (StringUtils.hasText(input.arriveTime)) {
             sb.append(" ,ACCEPTANCE_DATE='").append(input.arriveTime).append("'");
         } else {
@@ -456,6 +463,7 @@ public class DeviceReceiptExt {
         goodsInfo.checkStatus = JdbcMapUtil.getString(dataMap, "checkStatus");
         goodsInfo.receiveAmt = getReceiveAmt(JdbcMapUtil.getString(dataMap, "ID"));
         goodsInfo.remark = getReceiveAmt(JdbcMapUtil.getString(dataMap, "remark"));
+        goodsInfo.user = getReceiveAmt(JdbcMapUtil.getString(dataMap, "cuser"));
         return goodsInfo;
     }
 
@@ -555,6 +563,8 @@ public class DeviceReceiptExt {
 
         public String checkStatus;
 
+        public String user;//操作人
+
         public List<FileObj> fileObjList;//验收文件
 
         public List<SignInfo> signInfoList;
@@ -566,6 +576,7 @@ public class DeviceReceiptExt {
         public String money;
         public String remark;
         public String user;
+        public String arriveTime;
         public List<FileObj> fileObjList;//签收文件
 
     }
