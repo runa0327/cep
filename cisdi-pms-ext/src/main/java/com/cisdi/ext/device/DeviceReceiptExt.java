@@ -128,7 +128,7 @@ public class DeviceReceiptExt {
         String json = JsonUtil.toJson(map);
         reParam param = JsonUtil.fromJson(json, reParam.class);
         StringBuilder sb = new StringBuilder();
-        sb.append("select dl.*,gsv.`NAME` as signStatus,gv.`NAME` as checkStatus from DEVICE_LIST dl left join gr_set_value gsv on gsv.id = dl.SIGN_STATUS_ID left join gr_set_value gv on gv.id = dl.CHECK_STATUS_ID where dl.DEVICE_RECEIPT_ID='");
+        sb.append("select dl.*,gsv.`NAME` as signStatus,gv.`NAME` as checkStatus,round(ifnull(QTY_ONE,0),2) as qty,round(ifnull(TONG_DJ,0),2) as dj,round(ifnull(TONG_ZJ,0),2) as zj from DEVICE_LIST dl left join gr_set_value gsv on gsv.id = dl.SIGN_STATUS_ID left join gr_set_value gv on gv.id = dl.CHECK_STATUS_ID where dl.DEVICE_RECEIPT_ID='");
         sb.append(param.receiptId).append("' ");
         if (StringUtils.hasText(param.goodsName)) {
             sb.append(" and GOODS_NAME like '%").append(param.goodsName).append("%'");
@@ -165,7 +165,7 @@ public class DeviceReceiptExt {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select dl.*,gsv.`NAME` as signStatus,gv.`NAME` as checkStatus,au.`name` as cuser from DEVICE_LIST dl " +
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select dl.*,gsv.`NAME` as signStatus,gv.`NAME` as checkStatus,au.`name` as cuser,round(ifnull(QTY_ONE,0),2) as qty,round(ifnull(TONG_DJ,0),2) as dj,round(ifnull(TONG_ZJ,0),2) as zj from DEVICE_LIST dl " +
                 "left join gr_set_value gsv on gsv.id = dl.SIGN_STATUS_ID " +
                 "left join gr_set_value gv on gv.id = dl.CHECK_STATUS_ID " +
                 "left join ad_user au on au.id = dl.AD_USER_ID "+
@@ -196,17 +196,17 @@ public class DeviceReceiptExt {
                 }).collect(Collectors.toList());
             }
             //签收列表
-            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select dsl.*,ifnull(dsl.QTY_ONE*dl.TONG_DJ,0) as dhAmt,au.name as user from DEVICE_SIGN_LIST dsl \n" +
+            List<Map<String, Object>> list1 = myJdbcTemplate.queryForList("select dsl.*,round(ifnull(dsl.QTY_ONE*dl.TONG_DJ,0),2) as dhAmt,au.name as user,round(ifnull(dsl.QTY_ONE,0),2) as qty from DEVICE_SIGN_LIST dsl \n" +
                     "left join DEVICE_LIST dl on dsl.DEVICE_LIST_ID = dl.id \n" +
                     "left join ad_user au on au.id = dsl.AD_USER_ID where DEVICE_LIST_ID = ?", map.get("id"));
             info.signInfoList = list1.stream().map(q -> {
                 SignInfo signInfo = new SignInfo();
                 signInfo.signId = JdbcMapUtil.getString(q, "ID");
-                signInfo.amt = JdbcMapUtil.getString(q, "QTY_ONE");
+                signInfo.amt = JdbcMapUtil.getString(q, "qty");
                 signInfo.money = JdbcMapUtil.getString(q, "dhAmt");
                 signInfo.remark = JdbcMapUtil.getString(q, "REMARK");
                 signInfo.user = JdbcMapUtil.getString(q, "user");
-                signInfo.arriveTime = JdbcMapUtil.getString(q, "ARRIVAL_TIME");
+                signInfo.arriveTime = StringUtil.withOutT(JdbcMapUtil.getString(q, "ARRIVAL_TIME"));
 
                 String fileIdsa = JdbcMapUtil.getString(q, "ACCEPTANCE_DOCUMENTS");
                 if (StringUtils.hasText(fileIdsa)) {
@@ -399,7 +399,6 @@ public class DeviceReceiptExt {
         if (StringUtils.hasText(param.cgWay)) {
             sb.append(" and dl.PROCUREMENT_APPROACH like '%").append(param.cgWay).append("%'");
         }
-
         List<Map<String, Object>> list = myNamedParameterJdbcTemplate.queryForList(sb.toString(), queryFileParams);
         Map<String, Map<String, List<Map<String, Object>>>> collect = list.stream().collect(Collectors.groupingBy(p -> JdbcMapUtil.getString(p, "prjName"), Collectors.groupingBy(m -> JdbcMapUtil.getString(m, "USE_UNIT"))));
         List<SearchDataInfo> dataList = new ArrayList<>();
@@ -451,13 +450,13 @@ public class DeviceReceiptExt {
         goodsInfo.goodsName = JdbcMapUtil.getString(dataMap, "GOODS_NAME");//货物名称
         goodsInfo.brand = JdbcMapUtil.getString(dataMap, "BRAND");//品牌
         goodsInfo.modelNumber = JdbcMapUtil.getString(dataMap, "MODEL_NUMBER");//规格
-        goodsInfo.qtyOne = JdbcMapUtil.getString(dataMap, "QTY_ONE");//数量
-        goodsInfo.tongDj = JdbcMapUtil.getString(dataMap, "TONG_DJ");//单价
-        goodsInfo.tongZj = JdbcMapUtil.getString(dataMap, "TONG_ZJ");//总价
+        goodsInfo.qtyOne = JdbcMapUtil.getString(dataMap, "qty");//数量
+        goodsInfo.tongDj = JdbcMapUtil.getString(dataMap, "dj");//单价
+        goodsInfo.tongZj = JdbcMapUtil.getString(dataMap, "zj");//总价
         goodsInfo.deliveryPeriod = JdbcMapUtil.getString(dataMap, "DELIVERY_PERIOD");//交付期限
         goodsInfo.shelfLife = JdbcMapUtil.getString(dataMap, "SHELF_LIFE");//保质期
         goodsInfo.procurementApproach = JdbcMapUtil.getString(dataMap, "PROCUREMENT_APPROACH");//采购途径
-        goodsInfo.signingTime = JdbcMapUtil.getString(dataMap, "SIGNING_TIME");//签收日期
+        goodsInfo.signingTime =StringUtil.withOutT(JdbcMapUtil.getString(dataMap, "SIGNING_TIME"));//签收日期
         goodsInfo.remark = JdbcMapUtil.getString(dataMap, "REMARK");
         goodsInfo.signStatus = JdbcMapUtil.getString(dataMap, "signStatus");
         goodsInfo.checkStatus = JdbcMapUtil.getString(dataMap, "checkStatus");
