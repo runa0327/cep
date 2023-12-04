@@ -622,22 +622,6 @@ public class ProcessCommon {
     }
 
     /**
-     * 根据流程表名获取流程id
-     * @param entCode 流程表名
-     * @param myJdbcTemplate 数据源
-     * @return 流程id
-     */
-    public static String getProcessIdByEntCode(String entCode, MyJdbcTemplate myJdbcTemplate) {
-        String sql = "select a.wf_process_id from BASE_PROCESS_ENT a left join ad_ent b on a.AD_ENT_ONE_ID = b.id left join wf_process c on a.wf_process_id = c.id where b.code = ? and a.status = 'ap' and c.status = 'ap'";
-        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,entCode);
-        if (CollectionUtils.isEmpty(list)){
-            return null;
-        } else {
-            return JdbcMapUtil.getString(list.get(0),"wf_process_id");
-        }
-    }
-
-    /**
      * 流程实例数据作废-作废对应流程表
      */
     public void cancelData(){
@@ -969,6 +953,29 @@ public class ProcessCommon {
     }
 
     /**
+     * 自动发起流程-暂存流程，停留第一步，不进入第二步
+     * @param entCode 需要暂存的流程表名
+     * @param createBy 流程发起人
+     * @param wfProcessInstanceId 流程实例id
+     * @param entityRecordId 流程表单记录id
+     * @param now 当前时间
+     * @param myJdbcTemplate 数据源
+     */
+    public static void autoSaveProcess(String entCode, String createBy, String wfProcessInstanceId, String entityRecordId, String now, MyJdbcTemplate myJdbcTemplate){
+        String wfProcessId = ProcessCommon.getProcessIdByEntCode(entCode,myJdbcTemplate); // 流程id
+        String adEntId = AdEnt.selectByWhere(new Where().eq(AdEnt.Cols.CODE,entCode)).get(0).getId(); // 实体id
+        WfNode wfNode = WfNode.selectOneByWhere(new Where().eq(WfNode.Cols.WF_PROCESS_ID,wfProcessId).eq(WfNode.Cols.NODE_TYPE,"START_EVENT").eq(WfNode.Cols.STATUS,"AP")); // 发起节点信息
+        String viewId = wfNode.getAdViewId(); // 视图id
+        String wfNodeId = wfNode.getId(); // 节点id
+        String wfNodeName = wfNode.getName(); // 节点名称
+        String wfNodeInstanceId = Crud.from("WF_NODE_INSTANCE").insertData(); // 节点实例id
+
+        ProcessCommon.createWfProcessInstance(wfProcessInstanceId,null,createBy,now,wfProcessId,adEntId,entCode,entityRecordId,wfNodeId,wfNodeInstanceId,createBy,viewId); // 创建流程实例
+        ProcessCommon.createWfNodeInstance(wfNodeInstanceId,wfNodeId,wfNodeName,wfProcessInstanceId,now,null,null,null,createBy,"1","1",wfProcessId); // 创建节点实例
+        ProcessCommon.createTask(wfProcessInstanceId,wfNodeInstanceId,wfProcessId,wfNodeId,createBy,createBy,now,null,null,"0","1","1"); // 创建任务
+    }
+
+    /**
      * 创建任务
      * @param wfProcessInstanceId 流程实例id
      * @param wfNodeInstanceId 节点实例id
@@ -1061,6 +1068,22 @@ public class ProcessCommon {
             return JdbcMapUtil.getString(list.get(0),"id");
         } else {
             throw new BaseException("没有找到流转操作id，请联系管理员处理！");
+        }
+    }
+
+    /**
+     * 根据流程表名获取流程id
+     * @param entCode 流程表名
+     * @param myJdbcTemplate 数据源
+     * @return 流程id
+     */
+    public static String getProcessIdByEntCode(String entCode, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select a.wf_process_id from BASE_PROCESS_ENT a left join ad_ent b on a.AD_ENT_ONE_ID = b.id left join wf_process c on a.wf_process_id = c.id where b.code = ? and a.status = 'ap' and c.status = 'ap'";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,entCode);
+        if (CollectionUtils.isEmpty(list)){
+            return null;
+        } else {
+            return JdbcMapUtil.getString(list.get(0),"wf_process_id");
         }
     }
 
