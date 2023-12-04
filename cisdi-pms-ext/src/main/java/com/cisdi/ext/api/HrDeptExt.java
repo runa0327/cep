@@ -116,9 +116,9 @@ public class HrDeptExt {
             String companyId = JdbcMapUtil.getString(map, "id");
             List<String> deptIdList = getCompanyChildDeptId(companyId, myJdbcTemplate);
             String deptIdStr = String.join("','", deptIdList);
-            List<Map<String, Object>> deptList = myJdbcTemplate.queryForList("select hr_dept_id from hr_dept_user where ad_user_id in ('"+userId+"') and status = 'ap' and hr_dept_id in ('"+deptIdStr+"')", userId);
+            List<Map<String, Object>> deptList = myJdbcTemplate.queryForList("select b.CHIEF_USER_ID from hr_dept_user a left join hr_dept b on a.hr_dept_id = b.id where a.ad_user_id in ('"+userId+"') and a.status = 'ap' and a.hr_dept_id in ('"+deptIdStr+"') and b.status = 'ap' order by a.SYS_TRUE desc limit 1", userId);
             if (!CollectionUtils.isEmpty(deptList)) {
-                return deptList.stream().map(p -> JdbcMapUtil.getString(p, "hr_dept_id")).collect(Collectors.toCollection(ArrayList::new));
+                return deptList.stream().map(p -> JdbcMapUtil.getString(p, "CHIEF_USER_ID")).collect(Collectors.toCollection(ArrayList::new));
             }
         }
         return null;
