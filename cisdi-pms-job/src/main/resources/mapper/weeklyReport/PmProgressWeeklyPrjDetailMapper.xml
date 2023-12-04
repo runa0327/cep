@@ -93,6 +93,7 @@
         AND b.STATUS = 'ap'
         AND c.STATUS = 'ap'
         AND F.NAME IS NOT NULL AND (e.PROJECT_STATUS != '1661568714048413696' or e.PROJECT_STATUS is null )
+        and e.COMPANY_ID = '0099799190825079019'
         <if test="weatherStart != null">
             and b.SYS_TRUE = #{weatherStart}
         </if>

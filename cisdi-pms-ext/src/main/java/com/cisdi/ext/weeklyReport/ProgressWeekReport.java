@@ -56,7 +56,7 @@ public class ProgressWeekReport {
         String sql1 = "select distinct a.pm_prj_id,c.name,ifnull(c.IZ_START_REQUIRE,'1') as weatherStart,ifnull(c.IZ_END,'0') as weatherCompleted " +
                 "from PM_ROSTER a left join POST_INFO b on a.POST_INFO_ID = b.id LEFT JOIN pm_prj c on a.PM_PRJ_ID = c.id " +
                 "where b.code = 'AD_USER_TWENTY_THREE_ID' and a.AD_USER_ID = ? and a.status = 'ap' AND c.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' " +
-                "AND (c.PROJECT_STATUS != '1661568714048413696' or c.PROJECT_STATUS is null ) ";
+                "AND (c.PROJECT_STATUS != '1661568714048413696' or c.PROJECT_STATUS is null ) and c.COMPANY_ID = '0099799190825079019' ";
         StringBuilder sb = new StringBuilder(sql1);
         if (!SharedUtil.isEmptyString(projectName)){
             sb.append(" and c.name like ('%").append(projectName).append("%') ");
@@ -651,7 +651,7 @@ public class ProgressWeekReport {
                 "left join pm_prj e on b.pm_prj_id = e.id " +
                 "LEFT JOIN ad_user f ON d.ad_user_id = f.id " +
                 "where a.status = 'ap' and b.status = 'ap' and c.status = 'ap' and f.name is not null " +
-                "AND (e.PROJECT_STATUS != '1661568714048413696' or e.PROJECT_STATUS is null ) ";
+                "AND (e.PROJECT_STATUS != '1661568714048413696' or e.PROJECT_STATUS is null ) and e.COMPANY_ID = '0099799190825079019'";
         StringBuilder sb = new StringBuilder(sql);
         if (!SharedUtil.isEmptyString(weekId)){
             sb.append(" and c.id = '").append(weekId).append("' "); // 周-批次id
