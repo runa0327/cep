@@ -8,6 +8,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -155,6 +156,24 @@ public class HrDeptExt {
     }
 
     /**
+     * 根据部门负责人id获取该部门编码
+     * @param userId 部门负责人id
+     * @param myJdbcTemplate 数据源
+     * @return 部门编码
+     */
+    public static List<String> getDeptChiefApprovalCodeByUser(String userId, MyJdbcTemplate myJdbcTemplate) {
+        List<Map<String, Object>> list = getCompany(myJdbcTemplate);
+        List<String> deptList = getCompanyChildDeptId(list,myJdbcTemplate);
+        String deptIdStr = String.join("','",deptList);
+        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList("select distinct code from hr_dept where CHIEF_USER_ID = ? and id in ('"+deptIdStr+"')",userId);
+        if (!CollectionUtils.isEmpty(list2)){
+            return list2.stream().filter(p-> StringUtils.hasText(JdbcMapUtil.getString(p,"code"))).map(p->JdbcMapUtil.getString(p,"code")).collect(Collectors.toList());
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * 部门信息
      */
     public void getDistinctDept() {
@@ -201,6 +220,25 @@ public class HrDeptExt {
         } else {
             return null;
         }
+    }
+
+    /**
+     * 根据父级id获取所有子级部门id
+     * @param fatherList 父级id
+     * @param myJdbcTemplate 数据源
+     * @return 所有子级部门id
+     */
+    private static List<String> getCompanyChildDeptId(List<Map<String,Object>> fatherList, MyJdbcTemplate myJdbcTemplate) {
+        List<String> deptList = new ArrayList<>();
+        for (Map<String, Object> map : fatherList) {
+            String fatherId = JdbcMapUtil.getString(map,"id");
+            String sql = "(WITH RECURSIVE department_hierarchy AS ( SELECT id, hr_dept_pid FROM hr_dept WHERE hr_dept_pid = ? UNION ALL SELECT d.id, d.hr_dept_pid FROM department_hierarchy dh JOIN hr_dept d ON d.hr_dept_pid = dh.id ) SELECT id FROM department_hierarchy ORDER BY id)";
+            List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,fatherId);
+            if (!CollectionUtils.isEmpty(list)){
+                deptList.addAll(list.stream().map(p -> JdbcMapUtil.getString(p, "id")).distinct().collect(Collectors.toList()));
+            }
+        }
+        return deptList;
     }
 
     /**

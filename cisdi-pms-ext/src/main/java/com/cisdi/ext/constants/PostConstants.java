@@ -49,4 +49,28 @@ public class PostConstants {
         companyDeptMap.put("0099902212142008831","0099799190825079019");   // 三亚崖州湾科技城开发建设有限公司
         companyDeptMap.put("1714922258829070336","1650795835505721344");   // 三亚科城置业有限公司
     }
+
+    /* 部门负责人审批意见-部门 对应关系 key:部门编码 value:对应审批意见字段 */
+    public static final Map<String,String> CHIEF_APPROVAL_DEPT_MAP = new HashMap<>();
+    static {
+        CHIEF_APPROVAL_DEPT_MAP.put("post_early","APPROVAL_OPINIONS_ONE"); // 前期管理部
+        CHIEF_APPROVAL_DEPT_MAP.put("post_buy","APPROVAL_OPINIONS_TWO"); // 采购管理部
+        CHIEF_APPROVAL_DEPT_MAP.put("post_finance","APPROVAL_OPINIONS_THREE"); // 财务金融部
+        CHIEF_APPROVAL_DEPT_MAP.put("post_engineering","APPROVAL_OPINIONS_FOUR"); // 工程管理部
+        CHIEF_APPROVAL_DEPT_MAP.put("post_design","APPROVAL_OPINIONS_FIVE"); // 设计管理部
+        CHIEF_APPROVAL_DEPT_MAP.put("post_cost","APPROVAL_OPINIONS_SIX"); // 成本合约部
+        CHIEF_APPROVAL_DEPT_MAP.put("post_legal","APPROVAL_OPINIONS_SEVEN"); // 法务管理部
+    }
+
+    /* 部门分管领导审批意见-部门 对应关系 key:部门编码 value:对应审批意见字段 */
+    public static final Map<String,String> CHARGE_APPROVAL_DEPT_MAP = new HashMap<>();
+    static {
+        CHARGE_APPROVAL_DEPT_MAP.put("post_early","APPROVAL_OPINIONS_EIGHT"); // 前期管理部
+        CHARGE_APPROVAL_DEPT_MAP.put("post_buy","APPROVAL_OPINIONS_NINE"); // 采购管理部
+        CHARGE_APPROVAL_DEPT_MAP.put("post_finance","APPROVAL_OPINIONS_TEN"); // 财务金融部
+        CHARGE_APPROVAL_DEPT_MAP.put("post_engineering","APPROVAL_OPINIONS_ELEVEN"); // 工程管理部
+        CHARGE_APPROVAL_DEPT_MAP.put("post_design","APPROVAL_OPINIONS_TWELVE"); // 设计管理部
+        CHARGE_APPROVAL_DEPT_MAP.put("post_cost","APPROVAL_OPINIONS_THIRTEEN"); // 成本合约部
+        CHARGE_APPROVAL_DEPT_MAP.put("post_legal","APPROVAL_OPINIONS_FOURTEEN"); // 法务管理部
+    }
 }
