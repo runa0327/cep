@@ -7,7 +7,6 @@ import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.*;
 import com.cisdi.ext.model.base.AdRoleUser;
 import com.cisdi.ext.model.base.BaseMatterTypeCon;
-import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
@@ -457,7 +456,6 @@ public class ProcessCommon {
      */
     public static void addPrjPostUser(String projectId, String entCode, String processId, String companyId, String csCommId, MyJdbcTemplate myJdbcTemplate) {
         List<PmRoster> rosterList = new ArrayList<>();
-
         String postCode = PostExt.getPostByProcess(processId,myJdbcTemplate); // 获取该流程所有需要审批的岗位编码
         if (StringUtils.hasText(postCode)){
             rosterSecondVersion(rosterList,postCode,entCode,csCommId,projectId,myJdbcTemplate); // 花名册更新人员信息新版本方式
