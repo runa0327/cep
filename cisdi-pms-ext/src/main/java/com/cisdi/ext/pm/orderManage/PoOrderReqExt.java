@@ -939,13 +939,26 @@ public class PoOrderReqExt {
         if ("OK".equals(status)){
             if ("start".equals(nodeStatus) || "caiHuaStart".equals(nodeStatus) || "secondStart".equals(nodeStatus)){
                 WfExt.createProcessTitle(entCode,entityRecord,myJdbcTemplate);
-            } else if ("financeLegalOK".equals(nodeStatus)){ // 7-财务部法务部审批 节点点击操作逻辑
-                // 判断当前用户是否是财务第一个审批的
-                boolean izFirst = ProcessRoleExt.getUserFinanceRole(userId,"0099952822476412306");
-                if (izFirst){
-                    // 将后续审批人员信息写入任务
-                    ProcessCommon.createOrderFinanceCheckUser(nodeInstanceId,"0099952822476412308",processId,procInstId,nodeId);
+            } else {
+                //获取审批意见
+                Map<String,String> message = ProcessCommon.getCommentNew(nodeInstanceId,userId,myJdbcTemplate,procInstId);
+                //审批意见、内容
+                String comment = message.get("comment");
+                String file = message.get("file");
+                if ("financeLegalOK".equals(nodeStatus)){ // 7-财务部法务部审批 节点点击操作逻辑
+                    // 判断当前用户是否是财务第一个审批的
+                    boolean izFirst = ProcessRoleExt.getUserFinanceRole(userId,"0099952822476412306");
+                    if (izFirst){
+                        // 将后续审批人员信息写入任务
+                        ProcessCommon.createOrderFinanceCheckUser(nodeInstanceId,"0099952822476412308",processId,procInstId,nodeId);
+                    }
+                } else if ("lawyerOK".equals(nodeStatus)){
+                    String processFile = JdbcMapUtil.getString(entityRecord.valueMap, "FILE_ID_SIX");
+                    String fileEnd = ProcessCommon.getEndCommentFile(userId,processFile,file,myJdbcTemplate,"one");
+                    ProcessCommon.updateComment("TEXT_REMARK_TWO",entityRecord.valueMap,comment,entCode,csCommId,userName);
+                    ProcessCommon.updateProcColsValue("FILE_ID_SIX", entCode,csCommId,fileEnd);
                 }
+
             }
         } else {
             if ("lawyerRefuse".equals(nodeStatus)){ // 法律审批拒绝
