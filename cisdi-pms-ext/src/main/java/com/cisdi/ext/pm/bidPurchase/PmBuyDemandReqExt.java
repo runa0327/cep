@@ -3,7 +3,6 @@ package com.cisdi.ext.pm.bidPurchase;
 import cn.hutool.core.util.IdUtil;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.model.PmBuyDemandReq;
-import com.cisdi.ext.model.PmRoster;
 import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.pm.processCommon.ProcessRoleExt;
 import com.cisdi.ext.pm.bidPurchase.detail.PmBuyDemandReqPrjDetailExt;
@@ -663,23 +662,30 @@ public class PmBuyDemandReqExt {
                 } else if ("chargeLeaderOk".equals(nodeStatus)){ // 2-业务部门主管审批
                     ProcessCommon.updateComment("TEXT_REMARK_ONE",entityRecord.valueMap,comment,entCode,csCommId,userName);
                 } else if ("buyAndFinanceOk".equals(nodeStatus)){ // 4-采购岗/财务岗审批
-                    String projectIds = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
-                    String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
+//                    String projectIds = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
+//                    String companyId = JdbcMapUtil.getString(entityRecord.valueMap,"CUSTOMER_UNIT");
                     userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
-                    String dept = "";
-                    String[] projectIdArr = projectIds.split(",");
-                    prjIdArr: for (String projectId : projectIdArr) {
-                        dept = PmPrjExt.getUserDeptByRoster(userId,projectId,companyId,csCommId,entCode,myJdbcTemplate);
-                        if (StringUtils.hasText(dept)){
-                            break prjIdArr;
-                        }
-                    }
-                    if ("AD_USER_TWENTY_ONE_ID".equals(dept)){ // 采购管理岗
+                    String deptCode = ProcessCommon.getProcUserPostCode(userId,entCode,csCommId,myJdbcTemplate);
+//                    String dept = "";
+//                    String[] projectIdArr = projectIds.split(",");
+//                    prjIdArr: for (String projectId : projectIdArr) {
+//                        dept = PmPrjExt.getUserDeptByRoster(userId,projectId,companyId,csCommId,entCode,myJdbcTemplate);
+//                        if (StringUtils.hasText(dept)){
+//                            break prjIdArr;
+//                        }
+//                    }
+                    if ("AD_USER_TWENTY_ONE_ID".equals(deptCode)){ // 采购管理岗
                         ProcessCommon.updateComment("TEXT_REMARK_THREE",entityRecord.valueMap,comment,entCode,csCommId,userName);
                     } else { // 财务岗
                         ProcessCommon.updateComment("TEXT_REMARK_FOUR",entityRecord.valueMap,comment,entCode,csCommId,userName);
                     }
-
+                } else if ("costFinanceBuyLeaderOK".equals(nodeStatus)){ // 5-采购/成本/财务主管审批 6-业务分管领导审批
+                    String approvalCode = ProcessCommon.getUserProcApprovalCode(userId,nodeInstanceId,entCode,myJdbcTemplate);
+                    if (StringUtils.hasText(approvalCode)){
+                        ProcessCommon.updateComment(approvalCode,entityRecord.valueMap,comment,entCode,csCommId,userName);
+                    }
+                } else if ("leaderOK".equals(nodeStatus)){  // 6-业务分管领导审批
+                    ProcessCommon.updateComment("APPROVAL_COMMENT_THREE",entityRecord.valueMap,comment,entCode,csCommId,userName);
                 }
             }
         } else {
@@ -690,6 +696,12 @@ public class PmBuyDemandReqExt {
             } else if ("buyAndFinanceRefuse".equals(nodeStatus)){
                 ProcessCommon.updateProcColsValue("TEXT_REMARK_THREE",entCode,csCommId,null);
                 ProcessCommon.updateProcColsValue("TEXT_REMARK_FOUR",entCode,csCommId,null);
+            } else if ("costFinanceBuyLeaderRefuse".equals(nodeStatus)){
+                ProcessCommon.updateProcColsValue("APPROVAL_OPINIONS_SIX",entCode,csCommId,null);   // 成本合约部负责人意见
+                ProcessCommon.updateProcColsValue("APPROVAL_OPINIONS_TWO",entCode,csCommId,null);   // 采购管理部负责人意见
+                ProcessCommon.updateProcColsValue("APPROVAL_OPINIONS_THREE",entCode,csCommId,null); // 财务金融部负责人意见
+            } else if ("leaderRefuse".equals(nodeStatus)){
+                ProcessCommon.updateProcColsValue("APPROVAL_COMMENT_THREE",entCode,csCommId,null); // 业务分管领导意见
             }
         }
     }
@@ -714,8 +726,8 @@ public class PmBuyDemandReqExt {
                 name = "buyAndFinanceOk";
             } else if ("1608274390846435328".equals(nodeId)){ //5-采购/成本/财务主管审批
                 name = "costFinanceBuyLeaderOK";
-            } else if ("1608274390896766976".equals(nodeId)){
-                name = "chargeLeaderOK";
+            } else if ("1608274390896766976".equals(nodeId)){   // 6-业务分管领导审批
+                name = "leaderOK";
             }
         } else {
             if ("1608274390712217600".equals(nodeId)){ //2-业务部门主管审批
@@ -726,8 +738,8 @@ public class PmBuyDemandReqExt {
                 name = "buyAndFinanceRefuse";
             } else if ("1608274390846435328".equals(nodeId)){ //5-采购/成本/财务主管审批
                 name = "costFinanceBuyLeaderRefuse";
-            } else if ("1608274390896766976".equals(nodeId)){
-                name = "chargeLeaderRefuse";
+            } else if ("1608274390896766976".equals(nodeId)){   // 6-业务分管领导审批
+                name = "leaderRefuse";
             }
         }
         return name;

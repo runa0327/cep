@@ -1,6 +1,7 @@
 package com.cisdi.ext.wf;
 
 import com.cisdi.ext.base.GrSetValueExt;
+import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.link.linkPackage.AttLinkDifferentProcess;
 import com.cisdi.ext.model.GrSetValue;
 import com.cisdi.ext.model.PmFundReqPlan;
@@ -256,17 +257,17 @@ public class WfExt {
     }
 
     // 获取发起流程时的项目名称
-    public static String getProjectNameStatic(MyJdbcTemplate myJdbcTemplate, EntityRecord entityRecord) {
+    public static String getProjectNameStatic(MyJdbcTemplate myJdbcTemplate, Map<String,Object> valueMap) {
         String projectName = "";
-        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID");
+        String projectId = JdbcMapUtil.getString(valueMap,"PM_PRJ_ID");
         if (SharedUtil.isEmptyString(projectId)){
-            projectId = JdbcMapUtil.getString(entityRecord.valueMap,"AMOUT_PM_PRJ_ID");
+            projectId = JdbcMapUtil.getString(valueMap,"AMOUT_PM_PRJ_ID");
             if (SharedUtil.isEmptyString(projectId)){
-                projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
+                projectId = JdbcMapUtil.getString(valueMap,"PM_PRJ_IDS");
             }
         }
         if (SharedUtil.isEmptyString(projectId)){
-            projectName = JdbcMapUtil.getString(entityRecord.valueMap,"PROJECT_NAME_WR");
+            projectName = JdbcMapUtil.getString(valueMap,"PROJECT_NAME_WR");
         } else {
             projectId = projectId.replace(",","','");
             String sql = "select GROUP_CONCAT(name SEPARATOR '-') as name from pm_prj where id in ('"+projectId+"')";
@@ -461,10 +462,21 @@ public class WfExt {
      * @param myJdbcTemplate 数据源
      */
     public static void createProcessTitle(String entityCode, EntityRecord entityRecord, MyJdbcTemplate myJdbcTemplate) {
-        String processName = "", nowDate = "",userName = "",projectName;
         String csCommId = entityRecord.csCommId;
         Map<String,Object> valueMap = entityRecord.valueMap;
+        // 生成标题
+        autoCreateProcessTitle(csCommId,entityCode,valueMap,myJdbcTemplate);
+    }
 
+    /**
+     * 流程标题生成
+     * @param csCommId 当前流程记录id
+     * @param entityCode 流程业务表单编码
+     * @param valueMap 流程表单详情
+     * @param myJdbcTemplate 数据源
+     */
+    public static void autoCreateProcessTitle(String csCommId, String entityCode, Map<String,Object> valueMap, MyJdbcTemplate myJdbcTemplate) {
+        String processName = "", nowDate = "",userName = "",projectName;
         String sql0 = "SELECT c.name as processName,b.IS_URGENT,b.START_DATETIME," +
                 "(select name from ad_user where id = b.START_USER_ID) as userName FROM "+entityCode+" a " +
                 "LEFT JOIN wf_process_instance b on a.LK_WF_INST_ID = b.id LEFT JOIN wf_process c on b.WF_PROCESS_ID = c.id WHERE a.id = ?";
@@ -484,10 +496,9 @@ public class WfExt {
         if (noProjectList.contains(entityCode)){
             updateNoPrjProcessInstanceName(entityCode,processName,userName,nowDate,csCommId,valueMap,myJdbcTemplate);
         } else {
-            projectName = getProjectNameStatic(myJdbcTemplate,entityRecord); // 获取项目名称
+            projectName = getProjectNameStatic(myJdbcTemplate,valueMap); // 获取项目名称
 
             // 流程名称按规定创建
-
             List<String> specialList = AttLinkDifferentProcess.getSpecialList(); // 特殊流程 更新流程内name字段
             updatePrjProcessInstanceName(specialList,entityCode,valueMap,processName,projectName,userName,nowDate,csCommId,myJdbcTemplate);
         }

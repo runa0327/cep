@@ -1,12 +1,12 @@
-package com.cisdi.ext.pm;
+package com.cisdi.ext.pm.designManage;
 
+import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 
-import java.util.Map;
 
 /**
  * 超限审查-流程扩展
@@ -31,6 +31,20 @@ public class PmTransfiniteCheckReqExt {
         String nodeId = ExtJarHelper.nodeId.get();
         String nodeStatus = getNodeStatus(status,nodeId);
         processHandle(nodeStatus,status);
+    }
+
+    /**
+     * 超限审查-流程完结时操作
+     */
+    public void transfiniteProcEnd(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_ID"); //项目id
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code; //流程表名
+        String csCommId = entityRecord.csCommId; //流程业务表id
+        //审批人员信息写入花名册
+        String processId = ExtJarHelper.procId.get();
+        ProcessCommon.addPrjPostUser(projectId,entCode,processId,null,csCommId,myJdbcTemplate);
     }
 
     /**

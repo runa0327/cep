@@ -1,13 +1,14 @@
 package com.cisdi.ext.pm.processCommon;
 
 import cn.hutool.core.util.IdUtil;
+import com.cisdi.ext.api.HrDeptExt;
 import com.cisdi.ext.base.PmPrjExt;
 import com.cisdi.ext.base.PostExt;
+import com.cisdi.ext.constants.PostConstants;
 import com.cisdi.ext.link.LinkSql;
 import com.cisdi.ext.model.*;
 import com.cisdi.ext.model.base.AdRoleUser;
 import com.cisdi.ext.model.base.BaseMatterTypeCon;
-import com.cisdi.ext.model.base.PmPrj;
 import com.cisdi.ext.pm.PmRosterExt;
 import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.StringUtil;
@@ -192,7 +193,7 @@ public class ProcessCommon {
      */
     public static String getHistoryFile(String userId, String nodeInstanceId, MyJdbcTemplate myJdbcTemplate) {
         String file = "";
-        String sql1 = "select GROUP_CONCAT(DISTINCT USER_ATTACHMENT) as USER_ATTACHMENT from wf_task where AD_USER_ID = ? and WF_NODE_INSTANCE_ID = ? and USER_ATTACHMENT is not null and status = 'ap'";
+        String sql1 = "select GROUP_CONCAT(DISTINCT USER_ATTACHMENT) as USER_ATTACHMENT from wf_task where AD_USER_ID = ? and WF_NODE_INSTANCE_ID = ? and USER_ATTACHMENT is not null";
         List<Map<String,Object>> list1 = myJdbcTemplate.queryForList(sql1,userId,nodeInstanceId);
         if (!CollectionUtils.isEmpty(list1)) {
             file = JdbcMapUtil.getString(list1.get(0), "USER_ATTACHMENT");
@@ -318,7 +319,31 @@ public class ProcessCommon {
     }
 
     /**
-     * 获取人员在流程中的岗位信息
+     * 查询在本次流程中人员所属的岗位信息-直接从流程中数据判断
+     * @param userId 用户id
+     * @param entCode 流程业务表名
+     * @param csCommId 本次流程业务记录id
+     * @param myJdbcTemplate 数据源
+     * @return 岗位编码
+     */
+    public static String getProcUserPostCode(String userId, String entCode, String csCommId, MyJdbcTemplate myJdbcTemplate) {
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select * from "+entCode+" where id = ?", csCommId);
+        String postCode = "";
+        if (!CollectionUtils.isEmpty(list)){
+            Map<String,Object> map = list.get(0);
+            for (String key : map.keySet()){
+                Object object = map.get(key);
+                if (object != null && userId.equals(map.get(key).toString())){
+                    postCode = key;
+                    break;
+                }
+            }
+        }
+        return postCode;
+    }
+
+    /**
+     * 获取人员在流程中的岗位信息-通过花名册方式
      * @param userId 用户id
      * @param projectId 项目id
      * @param companyId 业主单位id
@@ -457,7 +482,6 @@ public class ProcessCommon {
      */
     public static void addPrjPostUser(String projectId, String entCode, String processId, String companyId, String csCommId, MyJdbcTemplate myJdbcTemplate) {
         List<PmRoster> rosterList = new ArrayList<>();
-
         String postCode = PostExt.getPostByProcess(processId,myJdbcTemplate); // 获取该流程所有需要审批的岗位编码
         if (StringUtils.hasText(postCode)){
             rosterSecondVersion(rosterList,postCode,entCode,csCommId,projectId,myJdbcTemplate); // 花名册更新人员信息新版本方式
@@ -582,12 +606,9 @@ public class ProcessCommon {
      * @param myJdbcTemplate 数据源
      */
     public static void checkData(String tableName, String recordId, String projectName, String projectId, MyJdbcTemplate myJdbcTemplate) {
-        //查询该表是否保函项目来源字段
-        String sql2 = "select C.CODE from AD_ENT_ATT A LEFT JOIN AD_ENT B ON A.AD_ENT_ID = B.ID LEFT JOIN AD_ATT C ON A.AD_ATT_ID = C.ID WHERE B.CODE = ?";
-        List<Map<String,Object>> codeList = myJdbcTemplate.queryForList(sql2,tableName);
-        if (!CollectionUtils.isEmpty(codeList)){
-            List<String> list = codeList.stream().map(p->JdbcMapUtil.getString(p,"CODE")).collect(Collectors.toList());
-            if (list.contains("PROJECT_SOURCE_TYPE_ID")){
+        List<String> procTableCodeList = getProcTableCode(tableName,myJdbcTemplate); // 获取表单所有字段集合
+        if (!CollectionUtils.isEmpty(procTableCodeList)){
+            if (procTableCodeList.contains("PROJECT_SOURCE_TYPE_ID")){
                 String sql = "select * from " + tableName +" where id = ? and STATUS NOT IN ('VD','VDING') and PROJECT_NAME_WR = ?";
                 List<Map<String,Object>> list2 = myJdbcTemplate.queryForList(sql,recordId,projectName);
                 if (!CollectionUtils.isEmpty(list2)){
@@ -596,6 +617,7 @@ public class ProcessCommon {
                             .set("PROJECT_NAME_WR",null)
                             .set("PM_PRJ_ID",projectId).exec();
                 }
+
             }
         }
     }
@@ -622,19 +644,53 @@ public class ProcessCommon {
     }
 
     /**
-     * 根据流程表名获取流程id
-     * @param entCode 流程表名
+     * 根据审批人员信息获取该负责人/分管领导审批意见应该回显的位置
+     * @param userId 部门负责人/分管领导id
+     * @param nodeInstanceId 节点实例id
+     * @param entCode 流程业务表名
      * @param myJdbcTemplate 数据源
-     * @return 流程id
+     * @return 审批意见回显字段编码
      */
-    public static String getProcessIdByEntCode(String entCode, MyJdbcTemplate myJdbcTemplate) {
-        String sql = "select a.wf_process_id from BASE_PROCESS_ENT a left join ad_ent b on a.AD_ENT_ONE_ID = b.id left join wf_process c on a.wf_process_id = c.id where b.code = ? and a.status = 'ap' and c.status = 'ap'";
-        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,entCode);
-        if (CollectionUtils.isEmpty(list)){
-            return null;
-        } else {
-            return JdbcMapUtil.getString(list.get(0),"wf_process_id");
+    public static String getUserProcApprovalCode(String userId, String nodeInstanceId, String entCode, MyJdbcTemplate myJdbcTemplate) {
+        userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);       // 该流程该节点该审批人员最原始审批人
+        List<String> columnCode = HrDeptExt.getDeptChiefApprovalCodeByUser(userId,myJdbcTemplate); // 获取该审批人员所负责的部门编码
+        List<String> approvalCode = ProcessCommon.getApprovalCode(columnCode); // 匹配部门与审批意见回显字段
+        return ProcessCommon.getProcColumnCode(approvalCode,entCode,myJdbcTemplate);
+    }
+
+    /**
+     * 通过常量匹配部门负责人审批对应的表单字段
+     * @param deptCodeList 部门编码
+     * @return 流程表单字段
+     */
+    public static List<String> getApprovalCode(List<String> deptCodeList) {
+        List<String> list = new ArrayList<>();
+        for (String code : deptCodeList) {
+            if (PostConstants.CHIEF_APPROVAL_DEPT_MAP.containsKey(code)){
+                list.add(PostConstants.CHIEF_APPROVAL_DEPT_MAP.get(code));
+            }
         }
+        return list;
+    }
+
+    /**
+     * 根据审批字段编码匹配在流程中出现了哪一个，并返回该字段。注意：本方法只击中一次即返回
+     * @param approvalCode 审批意见集合字段
+     * @param entCode 流程表单所有字段集合
+     * @param myJdbcTemplate 数据源
+     * @return 匹配中的审批意见字段
+     */
+    public static String getProcColumnCode(List<String> approvalCode, String entCode, MyJdbcTemplate myJdbcTemplate) {
+        String columnCode = "";
+        List<String> proCodeList = getProcTableCode(entCode,myJdbcTemplate);
+        if (!CollectionUtils.isEmpty(proCodeList)){
+            for (String code : approvalCode) {
+                if (proCodeList.contains(code)){
+                    columnCode = code;
+                }
+            }
+        }
+        return columnCode;
     }
 
     /**
@@ -969,6 +1025,29 @@ public class ProcessCommon {
     }
 
     /**
+     * 自动发起流程-暂存流程，停留第一步，不进入第二步
+     * @param entCode 需要暂存的流程表名
+     * @param createBy 流程发起人
+     * @param wfProcessInstanceId 流程实例id
+     * @param entityRecordId 流程表单记录id
+     * @param now 当前时间
+     * @param myJdbcTemplate 数据源
+     */
+    public static void autoSaveProcess(String entCode, String createBy, String wfProcessInstanceId, String entityRecordId, String now, MyJdbcTemplate myJdbcTemplate){
+        String wfProcessId = ProcessCommon.getProcessIdByEntCode(entCode,myJdbcTemplate); // 流程id
+        String adEntId = AdEnt.selectByWhere(new Where().eq(AdEnt.Cols.CODE,entCode)).get(0).getId(); // 实体id
+        WfNode wfNode = WfNode.selectOneByWhere(new Where().eq(WfNode.Cols.WF_PROCESS_ID,wfProcessId).eq(WfNode.Cols.NODE_TYPE,"START_EVENT").eq(WfNode.Cols.STATUS,"AP")); // 发起节点信息
+        String viewId = wfNode.getAdViewId(); // 视图id
+        String wfNodeId = wfNode.getId(); // 节点id
+        String wfNodeName = wfNode.getName(); // 节点名称
+        String wfNodeInstanceId = Crud.from("WF_NODE_INSTANCE").insertData(); // 节点实例id
+
+        ProcessCommon.createWfProcessInstance(wfProcessInstanceId,null,createBy,now,wfProcessId,adEntId,entCode,entityRecordId,wfNodeId,wfNodeInstanceId,createBy,viewId); // 创建流程实例
+        ProcessCommon.createWfNodeInstance(wfNodeInstanceId,wfNodeId,wfNodeName,wfProcessInstanceId,now,null,null,null,createBy,"1","1",wfProcessId); // 创建节点实例
+        ProcessCommon.createTask(wfProcessInstanceId,wfNodeInstanceId,wfProcessId,wfNodeId,createBy,createBy,now,null,null,"0","1","1"); // 创建任务
+    }
+
+    /**
      * 创建任务
      * @param wfProcessInstanceId 流程实例id
      * @param wfNodeInstanceId 节点实例id
@@ -1064,12 +1143,24 @@ public class ProcessCommon {
         }
     }
 
-    /*====================================================================================================================**/
-    /*==========================================通用-自动发起流程结束*========================================================**/
-    /*====================================================================================================================**/
+    /**
+     * 根据流程表名获取流程id
+     * @param entCode 流程表名
+     * @param myJdbcTemplate 数据源
+     * @return 流程id
+     */
+    public static String getProcessIdByEntCode(String entCode, MyJdbcTemplate myJdbcTemplate) {
+        String sql = "select a.wf_process_id from BASE_PROCESS_ENT a left join ad_ent b on a.AD_ENT_ONE_ID = b.id left join wf_process c on a.wf_process_id = c.id where b.code = ? and a.status = 'ap' and c.status = 'ap'";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,entCode);
+        if (CollectionUtils.isEmpty(list)){
+            return null;
+        } else {
+            return JdbcMapUtil.getString(list.get(0),"wf_process_id");
+        }
+    }
 
     /*====================================================================================================================**/
-    /*==========================================通用-流程监控数据刷新开始*====================================================**/
+    /*==========================================通用-自动发起流程结束*========================================================**/
     /*====================================================================================================================**/
 
     /**
@@ -1082,5 +1173,21 @@ public class ProcessCommon {
         return WfNode.selectById(nodeId).getNodeType();
     }
 
+    /**
+     * 查询流程表单中所有字段编码
+     * @param tableName 流程表单编码
+     * @param myJdbcTemplate 数据源
+     * @return 字段编码集合
+     */
+    private static List<String> getProcTableCode(String tableName, MyJdbcTemplate myJdbcTemplate) {
+        //查询该表是否保函项目来源字段
+        String sql2 = "select C.CODE from AD_ENT_ATT A LEFT JOIN AD_ENT B ON A.AD_ENT_ID = B.ID LEFT JOIN AD_ATT C ON A.AD_ATT_ID = C.ID WHERE B.CODE = ?";
+        List<Map<String,Object>> codeList = myJdbcTemplate.queryForList(sql2,tableName);
+        if (!CollectionUtils.isEmpty(codeList)){
+            return codeList.stream().map(p->JdbcMapUtil.getString(p,"CODE")).collect(Collectors.toList());
+        } else {
+            return null;
+        }
+    }
 
 }

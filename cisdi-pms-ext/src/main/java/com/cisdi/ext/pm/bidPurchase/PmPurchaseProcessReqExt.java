@@ -1,15 +1,20 @@
 package com.cisdi.ext.pm.bidPurchase;
 
+import com.cisdi.ext.model.AdEnt;
 import com.cisdi.ext.model.PmPurchaseProcessEnrollDetail;
+import com.cisdi.ext.model.WfNode;
 import com.cisdi.ext.pm.bidPurchase.detail.PmPurchaseProcessPrjDetailExt;
 import com.cisdi.ext.pm.processCommon.ProcessCommon;
+import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.wf.WfExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -21,11 +26,13 @@ public class PmPurchaseProcessReqExt {
      * 发起时数据校验
      */
     public void purchaseStart(){
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
-        Map<String,Object> map = entityRecord.valueMap;
+        Map<String,Object> valueMap = entityRecord.valueMap;
         String id = entityRecord.csCommId; // 主表单id
+        String processInstanceId = ExtJarHelper.procInstId.get(); // 流程实例id
         // 获取采购方式
-        String purchaseTypeId = JdbcMapUtil.getString(map,"BUY_TYPE_ID");
+        String purchaseTypeId = JdbcMapUtil.getString(valueMap,"BUY_TYPE_ID");
         dealPurchase(id,purchaseTypeId);
     }
 
@@ -45,12 +52,41 @@ public class PmPurchaseProcessReqExt {
      */
     public void purchaseEnd(){
         EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        Map<String,Object> valueMap = entityRecord.valueMap;
         String id = entityRecord.csCommId;
+        String processInstanceId = ExtJarHelper.procInstId.get(); // 流程实例id
         // 项目信息项目明细表
-        String projectId = JdbcMapUtil.getString(entityRecord.valueMap,"PM_PRJ_IDS");
+        String projectId = JdbcMapUtil.getString(valueMap,"PM_PRJ_IDS");
         PmPurchaseProcessPrjDetailExt.insertData(id,projectId);
         // 自动发起合同签订流程、采购归档流程
-        String buyTypeId = JdbcMapUtil.getString(entityRecord.valueMap,"BUY_TYPE_ID");
+        String buyTypeId = JdbcMapUtil.getString(valueMap,"BUY_TYPE_ID");
+        if ("0099952822476385221".equals(buyTypeId)){ // 0099952822476385221  = 公开招标，公开招标自动发起采购归档
+            autoCreatePurchaseFilePro(valueMap,id,processInstanceId,myJdbcTemplate);
+        }
+    }
+
+    /**
+     * 自动发起采购归档流程
+     * @param valueMap 招标选取与中标管理流程表单详情
+     * @param purchaseId 招标选取与中标管理流程表单详情id
+     * @param fatherProcessInstanceId 流程实例id
+     * @param myJdbcTemplate 数据源
+     */
+    private void autoCreatePurchaseFilePro(Map<String, Object> valueMap, String purchaseId, String fatherProcessInstanceId, MyJdbcTemplate myJdbcTemplate) {
+
+        String userId = ExtJarHelper.loginInfo.get().userId;
+        String now = DateTimeUtil.dttmToString(new Date());
+        String entCode = "PM_PURCHASE_FILE";
+
+       String createBy = JdbcMapUtil.getString(valueMap,"CRT_USER_ID"); // 创建人
+        String wfProcessInstanceId = Crud.from("WF_PROCESS_INSTANCE").insertData(); // 新流程流程实例id
+        String entityRecordId = Crud.from("PM_PURCHASE_FILE").insertData(); // 采购管理归档流程记录id
+
+        ProcessCommon.autoSaveProcess(entCode,createBy,wfProcessInstanceId,entityRecordId,now,myJdbcTemplate); // 自动暂存流程
+        PmPurchaseFileExt.createOneData(purchaseId,entityRecordId,valueMap,wfProcessInstanceId,createBy,now,fatherProcessInstanceId,userId,myJdbcTemplate); // 数据表数据写入
+        Map<String,Object> valueMap2 = myJdbcTemplate.queryForMap("select * from "+entCode+" where id = ?",entityRecordId);
+        WfExt.autoCreateProcessTitle(entityRecordId,entCode,valueMap2,myJdbcTemplate); // 流程标题创建
     }
 
     /**

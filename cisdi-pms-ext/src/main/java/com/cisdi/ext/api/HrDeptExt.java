@@ -1,12 +1,14 @@
 package com.cisdi.ext.api;
 
 import com.cisdi.ext.model.HrDept;
+import com.cisdi.ext.model.HrDeptUser;
 import com.cisdi.ext.model.view.base.HrDeptView;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -115,12 +117,60 @@ public class HrDeptExt {
             String companyId = JdbcMapUtil.getString(map, "id");
             List<String> deptIdList = getCompanyChildDeptId(companyId, myJdbcTemplate);
             String deptIdStr = String.join("','", deptIdList);
-            List<Map<String, Object>> deptList = myJdbcTemplate.queryForList("select hr_dept_id from hr_dept_user where ad_user_id in ('"+userId+"') and status = 'ap' and hr_dept_id in ('"+deptIdStr+"')", userId);
+            List<Map<String, Object>> deptList = myJdbcTemplate.queryForList("select b.CHIEF_USER_ID from hr_dept_user a left join hr_dept b on a.hr_dept_id = b.id where a.ad_user_id in ('"+userId+"') and a.status = 'ap' and a.hr_dept_id in ('"+deptIdStr+"') and b.status = 'ap' order by a.SYS_TRUE desc limit 1", userId);
             if (!CollectionUtils.isEmpty(deptList)) {
-                return deptList.stream().map(p -> JdbcMapUtil.getString(p, "hr_dept_id")).collect(Collectors.toCollection(ArrayList::new));
+                return deptList.stream().map(p -> JdbcMapUtil.getString(p, "CHIEF_USER_ID")).collect(Collectors.toCollection(ArrayList::new));
             }
         }
         return null;
+    }
+
+    /**
+     * 根据用户id查询所属部门
+     * @param userId 用户id
+     * @param myJdbcTemplate 数据源
+     * @return 部门id
+     */
+    public static String getDeptIdByUser(String userId, MyJdbcTemplate myJdbcTemplate){
+        String deptId = "";
+        List<HrDeptUser> hrDeptUserList = HrDeptUser.selectByWhere(new Where()
+                .eq(HrDeptUser.Cols.STATUS,"AP")
+                .eq(HrDeptUser.Cols.AD_USER_ID,userId));
+        if (!CollectionUtils.isEmpty(hrDeptUserList)){
+            List<String> deptList = hrDeptUserList.stream().map(HrDeptUser::getHrDeptId).distinct().collect(Collectors.toList());
+            if (deptList.size() > 1){
+                List<Map<String, Object>> list = getCompany(myJdbcTemplate);
+                List<String> companyIdList = list.stream().map(p->JdbcMapUtil.getString(p,"id")).collect(Collectors.toList());
+                List<String> newDeptList = new ArrayList<>(); // 公司下所有部门
+                companyIdList.forEach(p->{
+                    newDeptList.addAll(getCompanyChildDeptId(p,myJdbcTemplate));
+                });
+                String deptIdStr = String.join("','",newDeptList);
+                List<Map<String,Object>> list2 = myJdbcTemplate.queryForList("select hr_dept_id from hr_dept_user a left join hr_dept b on a.hr_dept_id = b.id where a.status = 'ap' and b.status = 'ap' and a.hr_dept_id in ('"+deptIdStr+"') order by SYS_TRUE desc limit 1");
+                deptId = JdbcMapUtil.getString(list2.get(0),"hr_dept_id");
+            } else {
+                deptId = deptList.get(0);
+            }
+        }
+        return deptId;
+    }
+
+    /**
+     * 根据部门负责人id获取该部门编码
+     * @param userId 部门负责人id
+     * @param myJdbcTemplate 数据源
+     * @return 部门编码
+     */
+    public static List<String> getDeptChiefApprovalCodeByUser(String userId, MyJdbcTemplate myJdbcTemplate) {
+        List<Map<String, Object>> list = getCompany(myJdbcTemplate);
+        List<String> deptList = getCompanyChildDeptId(list,myJdbcTemplate);
+        String deptIdStr = String.join("','",deptList);
+        List<Map<String,Object>> list2 = myJdbcTemplate.queryForList("select distinct code from hr_dept where CHIEF_USER_ID = ? and id in ('"+deptIdStr+"')",userId);
+        if (!CollectionUtils.isEmpty(list2)){
+            return list2.stream().filter(p-> StringUtils.hasText(JdbcMapUtil.getString(p,"code"))).map(p->JdbcMapUtil.getString(p,"code")).collect(Collectors.toList());
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -170,6 +220,25 @@ public class HrDeptExt {
         } else {
             return null;
         }
+    }
+
+    /**
+     * 根据父级id获取所有子级部门id
+     * @param fatherList 父级id
+     * @param myJdbcTemplate 数据源
+     * @return 所有子级部门id
+     */
+    private static List<String> getCompanyChildDeptId(List<Map<String,Object>> fatherList, MyJdbcTemplate myJdbcTemplate) {
+        List<String> deptList = new ArrayList<>();
+        for (Map<String, Object> map : fatherList) {
+            String fatherId = JdbcMapUtil.getString(map,"id");
+            String sql = "(WITH RECURSIVE department_hierarchy AS ( SELECT id, hr_dept_pid FROM hr_dept WHERE hr_dept_pid = ? UNION ALL SELECT d.id, d.hr_dept_pid FROM department_hierarchy dh JOIN hr_dept d ON d.hr_dept_pid = dh.id ) SELECT id FROM department_hierarchy ORDER BY id)";
+            List<Map<String,Object>> list = myJdbcTemplate.queryForList(sql,fatherId);
+            if (!CollectionUtils.isEmpty(list)){
+                deptList.addAll(list.stream().map(p -> JdbcMapUtil.getString(p, "id")).distinct().collect(Collectors.toList()));
+            }
+        }
+        return deptList;
     }
 
     /**

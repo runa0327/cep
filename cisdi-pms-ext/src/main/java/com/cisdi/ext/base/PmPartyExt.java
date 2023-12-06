@@ -1,5 +1,6 @@
 package com.cisdi.ext.base;
 
+import com.cisdi.ext.model.PmParty;
 import com.cisdi.ext.pm.PmDeptExt;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.interaction.EntityRecord;
@@ -11,6 +12,20 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class PmPartyExt {
+
+    /**
+     * 根据合作方id查询名称
+     * @param id 合作方id
+     * @return 合作方名称
+     */
+    public static String getNameById(String id) {
+        PmParty pmParty = PmParty.selectById(id);
+        if (pmParty != null){
+            return pmParty.getName();
+        } else {
+            return null;
+        }
+    }
 
     /**
      * 新增合作方
