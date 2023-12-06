@@ -3,8 +3,8 @@ package com.cisdi.ext.pm.office;
 import com.cisdi.ext.model.PmExtensionRequestReq;
 import com.cisdi.ext.pm.processCommon.ProcessCommon;
 import com.cisdi.ext.proPlan.PmProPlanExt;
-import com.cisdi.ext.util.DateTimeUtil;
 import com.cisdi.ext.util.PrjPlanUtil;
+import com.cisdi.ext.weektask.WeekTaskExt;
 import com.cisdi.ext.wf.WfExt;
 import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
@@ -16,7 +16,6 @@ import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.text.MessageFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -54,6 +53,8 @@ public class PmExtensionRequestReqExt {
         ProcessCommon.addPrjPostUser(projectId, entCode, processId, companyId, csCommId, myJdbcTemplate);
         //重新处理工作任务
         weekTaskOper(proNodeId, projectId);
+        // 刷新工作台本周工作任务当前状态
+        WeekTaskExt.updateTaskStatus(projectId,proNodeId,myJdbcTemplate);
     }
 
     /**
