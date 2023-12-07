@@ -1245,7 +1245,7 @@ public class AttLinkExtDetail {
             String userId = JdbcMapUtil.getString(tmp,"AD_USER_ID");
             String userName = JdbcMapUtil.getString(tmp,"userName");
             String code = JdbcMapUtil.getString(tmp,"CODE");
-            if (!SharedUtil.isEmptyString(userId)){
+            if (StringUtils.hasText(userId)){
                 List<String> codeList = StringUtil.getStrToList(code,",");
                 for (String tp : codeList) {
                     if ("PM_BUY_DEMAND_REQ".equals(entCode)){ // 采购需求审批
@@ -1254,6 +1254,8 @@ public class AttLinkExtDetail {
                                 LinkUtils.mapAddAllValue(tp,AttDataTypeE.TEXT_LONG,userId,userName,true,false,true,attLinkResult);
                             }
                         }
+                    } else if ("PO_ORDER_CHANGE_REQ".equals(entCode)) { // 合同需求审批
+                        LinkUtils.mapAddAllValue(tp,AttDataTypeE.TEXT_LONG,userId,userName,true,false,false,attLinkResult);
                     } else {
                         LinkUtils.mapAddAllValue(tp,AttDataTypeE.TEXT_LONG,userId,userName,true,false,true,attLinkResult);
                     }

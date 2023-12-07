@@ -182,7 +182,6 @@ public class AttLinkClear {
             linkedAtt.type = AttDataTypeE.TEXT_LONG;
             linkedAtt.value = null;
             linkedAtt.text = null;
-            linkedAtt.changeToEditable = true;
             attLinkResult.attMap.put("AD_USER_TWENTY_FIVE_ID", linkedAtt); // 财务管理岗
             attLinkResult.attMap.put("AD_USER_TWENTY_FOUR_ID", linkedAtt); // 征拆对接岗
             attLinkResult.attMap.put("AD_USER_TWENTY_THREE_ID", linkedAtt); // 工程管理岗

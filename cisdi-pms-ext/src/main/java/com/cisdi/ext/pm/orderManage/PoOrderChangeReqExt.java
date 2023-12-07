@@ -218,6 +218,20 @@ public class PoOrderChangeReqExt {
     }
 
     /**
+     * 合同需求审批-完结时扩展
+     */
+    public void orderChangeEnd(){
+        String entCode = ExtJarHelper.sevInfo.get().entityInfo.code;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        //审批人员信息写入花名册
+        String projectId = JdbcMapUtil.getString(entityRecord.valueMap, "PM_PRJ_IDS");
+        String processId = ExtJarHelper.procId.get();
+        String csCommId = entityRecord.csCommId;
+        ProcessCommon.addPrjPostUser(projectId, entCode, processId, null, csCommId, myJdbcTemplate);
+    }
+
+    /**
      * 合同变更审批-第二版审批流扩展-审批通过
      */
     public void flowExtTrueSecond(){
@@ -401,9 +415,9 @@ public class PoOrderChangeReqExt {
         StringBuilder sb = new StringBuilder("update PO_ORDER_CHANGE_REQ set ");
         if ("caiHua".equals(deptName)){ //才华回显
             sb.append("FILE_ID_SEVEN = ?, APPROVAL_COMMENT_SEVEN = ?");
-        } else if ("AD_USER_THREE_ID".equals(deptName)){ //成本岗回显
+        } else if ("AD_USER_EIGHTEEN_ID".equals(deptName)){ //成本岗回显
             sb.append("FILE_ID_EIGHTH = ?, APPROVAL_COMMENT_EIGHTH = ?");
-        } else if ("AD_USER_NINTH_ID".equals(deptName)){ //财务岗回显
+        } else if ("AD_USER_TWENTY_FIVE_ID".equals(deptName)){ //财务岗回显
             sb.append("FILE_ID_FOUR = ?, APPROVAL_COMMENT_THREE = ?");
         } else if ("lawyer".equals(deptName)){ //法律意见回显
             sb.append("FILE_ID_TWO = ?, APPROVAL_COMMENT_ONE = ?");
@@ -546,7 +560,7 @@ public class PoOrderChangeReqExt {
     private String getUserDept(MyJdbcTemplate myJdbcTemplate, String userId, String csCommId,String nodeInstanceId) {
         //判断是否是转办来的
         userId = ProcessCommon.getOriginalUser(nodeInstanceId,userId,myJdbcTemplate);
-        String sql3 = "select AD_USER_THREE_ID,AD_USER_EIGHTH_ID,AD_USER_NINTH_ID from PO_ORDER_CHANGE_REQ where id = ?";
+        String sql3 = "select AD_USER_EIGHTEEN_ID,AD_USER_EIGHTH_ID,AD_USER_TWENTY_FIVE_ID from PO_ORDER_CHANGE_REQ where id = ?";
         Map<String,Object> map = myJdbcTemplate.queryForMap(sql3,csCommId);
         return getDeptName(map,userId);
     }
