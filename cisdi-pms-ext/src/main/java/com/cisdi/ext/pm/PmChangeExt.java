@@ -34,7 +34,7 @@ public class PmChangeExt {
         String id = String.valueOf(map.get("projectId"));
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("SELECT \n" +
-                "case CHANGE_WAY when '1' then '项目名称变更' when '2' then '项目业主变更' else '' end  as CHANGE_WAY \n" +
+                "case CHANGE_WAY when '1' then '项目名称变更' when '2' then '项目业主变更' when '3' then '管理方式变更' else '' end  as CHANGE_WAY \n" +
                 ",NEW_RECORD,ATT_FILE_GROUP_ID,CHANGE_REMARK,au.`name` as CHIEF_USER_ID,CHANGE_DATE \n" +
                 "FROM PM_CHANGE_RECORD pcr \n" +
                 "left join ad_user au on au.id = pcr.CHIEF_USER_ID " +
@@ -116,7 +116,7 @@ public class PmChangeExt {
     }
 
     /**
-     * 项目名称/业主变更
+     * 项目名称/业主变更/管理模式
      */
     public void changData() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
@@ -134,9 +134,12 @@ public class PmChangeExt {
         if (Objects.equals("1", input.type)) {
             oldData = String.valueOf(list.get(0).get("NAME"));
             sql = "update PM_PRJ set NAME=? where id=?";
-        } else {
+        } else  if (Objects.equals("2", input.type)){
             oldData = String.valueOf(list.get(0).get("CUSTOMER_UNIT"));
             sql = "update PM_PRJ set CUSTOMER_UNIT=? where id=?";
+        }else  if (Objects.equals("3", input.type)){
+            oldData = String.valueOf(list.get(0).get("PRJ_MANAGE_MODE_ID"));
+            sql = "update PM_PRJ set PRJ_MANAGE_MODE_ID=? where id=?";
         }
         Crud.from("PM_CHANGE_RECORD").where().eq("ID", id).update()
                 .set("PM_PRJ_ID", projectId).set("CHANGE_WAY", input.type).set("NEW_RECORD", input.changeData).set("OLD_RECORD", oldData).set("CHANGE_DATE", new Date())
@@ -175,7 +178,7 @@ public class PmChangeExt {
         public String changeData;
 
         /**
-         * 类型 1-项目名称 2-业主
+         * 类型 1-项目名称 2-业主 3-管理模式
          */
         public String type;
 
