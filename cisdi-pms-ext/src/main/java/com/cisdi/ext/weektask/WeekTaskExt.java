@@ -1,5 +1,6 @@
 package com.cisdi.ext.weektask;
 
+import com.cisdi.ext.model.PmProPlanNode;
 import com.cisdi.ext.util.JsonUtil;
 import com.cisdi.ext.util.ProPlanUtils;
 import com.cisdi.ext.util.StringUtil;
@@ -8,12 +9,17 @@ import com.google.common.base.Strings;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Crud;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.JdbcMapUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -28,6 +34,68 @@ import java.util.stream.Collectors;
  */
 public class WeekTaskExt {
 
+
+    /**
+     * 根据节点id刷新工作台该节点对应任务的任务状态为已超期的任务
+     * @param projectId 项目id
+     * @param proNodeId 节点id
+     * @param myJdbcTemplate 数据源
+     */
+    public static void updateTaskStatus(String projectId, String proNodeId, MyJdbcTemplate myJdbcTemplate) {
+        String status = "";
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select * from PM_PRO_PLAN_NODE where id = ?",proNodeId);
+        if (!CollectionUtils.isEmpty(list)){
+            Map<String,Object> map = list.get(0);
+            String wfProcessInstanceId = JdbcMapUtil.getString(map,"LINKED_WF_PROCESS_INSTANCE_ID");      // 流程实例id
+            String planStartNode = JdbcMapUtil.getString(map,"LINKED_START_WF_NODE_ID");      // 关联的流程开始节点
+            String planEndNode = JdbcMapUtil.getString(map,"LINKED_END_WF_NODE_ID");          // 关联的流程结束节点
+            String actualStartNode = JdbcMapUtil.getString(map,"LINKED_START_WF_NODE_INSTANCE_ID");        // 关联的流程实际开始节点
+            if (StringUtils.hasText(planStartNode)){
+                if (StringUtils.hasText(actualStartNode)){
+                    status = "1634118609016066048"; // 1634118609016066048 = 进行中； 1634118629769482240 = 已完成
+                    // 根据流程实例id和计划结束节点信息，判断是否走完
+                    boolean res = checkTaskIsComplete(wfProcessInstanceId,planEndNode,myJdbcTemplate);
+                    if (res){
+                        status = "1634118629769482240";
+                    }
+                } else {
+                    Date now = new Date();
+                    String planEndDate = JdbcMapUtil.getString(map,"PLAN_COMPL_DATE");
+                    if (StringUtils.hasText(planEndDate)){
+                        Date endDate = DateTimeUtil.stringToDate(planEndDate);
+                        if (now.compareTo(endDate) <= 0){
+                            status = "1634118609016066048";
+                        }
+                    }
+
+                }
+            }
+            if (StringUtils.hasText(status)){
+                myJdbcTemplate.update("update week_task set WEEK_TASK_STATUS_ID = ? where pm_prj_id = ? and (WEEK_TASK_STATUS_ID != '1634118629769482240' or WEEK_TASK_STATUS_ID != '1644140265205915648') and RELATION_DATA_ID = ? and status = 'ap'",status,projectId,proNodeId);
+            }
+        }
+    }
+
+    /**
+     * 根据流程实际发起审批情况判断该节点任务是否完成
+     * @param wfProcessInstanceId 流程实例
+     * @param planEndNode 计划结束节点
+     * @param myJdbcTemplate 数据源
+     * @return 判断结果 true为已完成
+     */
+    private static boolean checkTaskIsComplete(String wfProcessInstanceId, String planEndNode, MyJdbcTemplate myJdbcTemplate) {
+        boolean res = true;
+        List<Map<String,Object>> list = myJdbcTemplate.queryForList("select IS_CURRENT from wf_node_instance where wf_process_instance_id = ? and status = 'ap' and wf_node_id = ?",wfProcessInstanceId,planEndNode);
+        if (CollectionUtils.isEmpty(list)){
+            res = false;
+        } else {
+            String IS_CURRENT = JdbcMapUtil.getString(list.get(0),"IS_CURRENT");
+            if (!"1".equals(IS_CURRENT)){
+                res = false;
+            }
+        }
+        return res;
+    }
 
     /**
      * 工作台本周工作列表

@@ -538,9 +538,6 @@ public class PmBidApprovalReqExt {
                         ProcessCommon.commentShow("FILE_ID_FIVE",file,csCommId,entCode);
                     } else if ("AD_USER_FOUR_ID".equals(deptId)){ // 合同岗
                         ProcessCommon.updateComment("APPROVAL_COMMENT_SIX",entityRecord.valueMap,comment,entCode,csCommId,userName);
-//                        processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_SIX");
-//                        commentEnd = ProcessCommon.getNewCommentStr(userName,processComment,comment);
-//                        ProcessCommon.commentShow("APPROVAL_COMMENT_SIX",commentEnd,csCommId,entCode);
                         ProcessCommon.commentShow("FILE_ID_SIX",file,csCommId,entCode);
                     } else if ("OPERATOR_ONE_ID".equals(deptId)){ //经办人
                         processComment = JdbcMapUtil.getString(entityRecord.valueMap,"APPROVAL_COMMENT_THREE");
