@@ -21,13 +21,14 @@ import java.util.stream.Stream;
 
 /**
  * 计划运营扩展
+ *
  * @author dlt
  * @date 2023/5/22 周一
  */
 public class PlanOperationExt {
 
     //筛选条件
-    public void getConditions(){
+    public void getConditions() {
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         Map<String, Object> sqlParams = new HashMap<>(input);
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
@@ -51,52 +52,52 @@ public class PlanOperationExt {
                 "left join gr_set_value v5 on v5.id = pp.PROJECT_PHASE_ID\n" +
                 "left join (select PM_PRJ_ID,GROUP_CONCAT(AD_USER_ID) AdUserIds from prj_follower group by PM_PRJ_ID) ftemp on ftemp.PM_PRJ_ID = po" +
                 ".PM_PRJ_ID where 1=1");
-        sqlParams.put("loginId",ExtJarHelper.loginInfo.get().userId);
-        if (!CollectionUtils.isEmpty(selectReq.prjIds)){
+        sqlParams.put("loginId", ExtJarHelper.loginInfo.get().userId);
+        if (!CollectionUtils.isEmpty(selectReq.prjIds)) {
             sqlSb.append(" and po.PM_PRJ_ID in (:prjIds)");
         }
-        if (!Strings.isNullOrEmpty(selectReq.totalInvestStart)){
+        if (!Strings.isNullOrEmpty(selectReq.totalInvestStart)) {
             sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST >= :totalInvestStart");
         }
-        if (!Strings.isNullOrEmpty(selectReq.totalInvestEnd)){
+        if (!Strings.isNullOrEmpty(selectReq.totalInvestEnd)) {
             sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST <= :totalInvestEnd");
         }
         //高级筛选begin------
-        if (!this.isDisableFilter(selectReq)){//是否关闭高级筛选
+        if (!this.isDisableFilter(selectReq)) {//是否关闭高级筛选
             sqlSb.append(" and ( 1 != 1");
-            if (!CollectionUtils.isEmpty(selectReq.locationIds)){
+            if (!CollectionUtils.isEmpty(selectReq.locationIds)) {
                 sqlSb.append(" or pp.BASE_LOCATION_ID in (:locationIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)){
+            if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)) {
                 sqlSb.append(" or rtemp.AD_USER_ID in (:earlyUserIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.keyProjectTypeIds)){
+            if (!CollectionUtils.isEmpty(selectReq.keyProjectTypeIds)) {
                 sqlSb.append(" or po.KEY_PROJECT_TYPE_ID in (:keyProjectTypeIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.prjManageModeIds)){
+            if (!CollectionUtils.isEmpty(selectReq.prjManageModeIds)) {
                 sqlSb.append(" or pp.PRJ_MANAGE_MODE_ID in (:prjManageModeIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)){
+            if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)) {
                 sqlSb.append(" or pp.PROJECT_PHASE_ID in (:prjPhaseIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)){
+            if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)) {
                 sqlSb.append(" or pp.PROJECT_TYPE_ID in (:prjTypeIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.prjTagIds)){
+            if (!CollectionUtils.isEmpty(selectReq.prjTagIds)) {
                 sqlSb.append(" or (");
-                for (int i = 0;i < selectReq.prjTagIds.size();i++) {
-                    if (i > 0){
+                for (int i = 0; i < selectReq.prjTagIds.size(); i++) {
+                    if (i > 0) {
                         sqlSb.append(" or ");
                     }
                     sqlSb.append(" FIND_IN_SET(:prjTagId" + i + ",po.PRJ_TAG_IDS" + ")");
-                    sqlParams.put("prjTagId" + i,selectReq.prjTagIds.get(i));
+                    sqlParams.put("prjTagId" + i, selectReq.prjTagIds.get(i));
                 }
                 sqlSb.append(" )");
             }
             sqlSb.append(")");
         }
         //高级筛选end-------
-        if (selectReq.isFollow != null && selectReq.isFollow == true){
+        if (selectReq.isFollow != null && selectReq.isFollow == true) {
             sqlSb.append(" and FIND_IN_SET(:loginId,ftemp.AdUserIds)");
         }
 
@@ -104,7 +105,7 @@ public class PlanOperationExt {
         //标签
         List<Map<String, Object>> tagMaps = myJdbcTemplate.queryForList("select ta.id tagId,ta.name tagName,v.name colorNo,v.seq_no seqNo from PRJ_TAG ta left join gr_set_value v on v.id = ta.color");
         List<PlanOperationResp> planOperationResps = this.covertToPlanOperation(totalList, tagMaps);
-        if (CollectionUtils.isEmpty(planOperationResps)){
+        if (CollectionUtils.isEmpty(planOperationResps)) {
             return;
         }
         //条件map
@@ -119,17 +120,17 @@ public class PlanOperationExt {
         Map<String, Object> tagMap = new HashMap<>();
 
         for (PlanOperationResp planOperationResp : planOperationResps) {
-           earlyUserMap.put(planOperationResp.earlyUserId,planOperationResp.earlyUserName);
-           keyProjectTypeMap.put(planOperationResp.keyProjectTypeId,planOperationResp.keyProjectTypeName);
-           prjTypeMap.put(planOperationResp.prjTypeId,planOperationResp.prjTypeName);
-           prjManageModeMap.put(planOperationResp.prjManageModeId,planOperationResp.prjManageModeName);
-           prjPhaseMap.put(planOperationResp.prjPhaseId,planOperationResp.prjPhaseName);
-           locationMap.put(planOperationResp.locationId,planOperationResp.locationName);
-           if (!CollectionUtils.isEmpty(planOperationResp.tags)){
-               for (Tag tag : planOperationResp.tags) {
-                   tagMap.put(tag.tagId,tag);
-               }
-           }
+            earlyUserMap.put(planOperationResp.earlyUserId, planOperationResp.earlyUserName);
+            keyProjectTypeMap.put(planOperationResp.keyProjectTypeId, planOperationResp.keyProjectTypeName);
+            prjTypeMap.put(planOperationResp.prjTypeId, planOperationResp.prjTypeName);
+            prjManageModeMap.put(planOperationResp.prjManageModeId, planOperationResp.prjManageModeName);
+            prjPhaseMap.put(planOperationResp.prjPhaseId, planOperationResp.prjPhaseName);
+            locationMap.put(planOperationResp.locationId, planOperationResp.locationName);
+            if (!CollectionUtils.isEmpty(planOperationResp.tags)) {
+                for (Tag tag : planOperationResp.tags) {
+                    tagMap.put(tag.tagId, tag);
+                }
+            }
         }
         earlyUserMap.remove(null);
         keyProjectTypeMap.remove(null);
@@ -139,13 +140,13 @@ public class PlanOperationExt {
         locationMap.remove(null);
         tagMap.remove(null);
 
-        conditionMap.put("earlyUserMap",earlyUserMap);
-        conditionMap.put("keyProjectTypeMap",keyProjectTypeMap);
-        conditionMap.put("prjTypeMap",prjTypeMap);
-        conditionMap.put("prjManageModeMap",prjManageModeMap);
-        conditionMap.put("prjPhaseMap",prjPhaseMap);
-        conditionMap.put("locationMap",locationMap);
-        conditionMap.put("tagMap",tagMap);
+        conditionMap.put("earlyUserMap", earlyUserMap);
+        conditionMap.put("keyProjectTypeMap", keyProjectTypeMap);
+        conditionMap.put("prjTypeMap", prjTypeMap);
+        conditionMap.put("prjManageModeMap", prjManageModeMap);
+        conditionMap.put("prjPhaseMap", prjPhaseMap);
+        conditionMap.put("locationMap", locationMap);
+        conditionMap.put("tagMap", tagMap);
 
 
         Map output = JsonUtil.fromJson(JsonUtil.toJson(conditionMap), Map.class);
@@ -153,7 +154,7 @@ public class PlanOperationExt {
     }
 
     //标签回显
-    public void echoTag(){
+    public void echoTag() {
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         String tagName = input.get("tagName").toString();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
@@ -163,9 +164,9 @@ public class PlanOperationExt {
         List<Map<String, Object>> originList = myJdbcTemplate.queryForList(sql);
 
         Map<String, Object> result = new HashMap<>();
-        if (!CollectionUtils.isEmpty(originList)){
+        if (!CollectionUtils.isEmpty(originList)) {
             List<Tag> tags = JSONObject.parseArray(JSONObject.toJSONString(originList), Tag.class);
-            result.put("tags",tags);
+            result.put("tags", tags);
         }
 
         Map output = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
@@ -173,22 +174,22 @@ public class PlanOperationExt {
     }
 
     //新增、修改标签
-    public void addAndModifyTag(){
+    public void addAndModifyTag() {
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         TagReq tagReq = JSONObject.parseObject(JSONObject.toJSONString(input), TagReq.class);
 
         //查重
         List<PrjTag> prjTags = PrjTag.selectByWhere(new Where().eq("NAME", tagReq.name).eq("COLOR", tagReq.colorId));
-        if (!CollectionUtils.isEmpty(prjTags)){
+        if (!CollectionUtils.isEmpty(prjTags)) {
             throw new BaseException("该标签已存在！");
         }
 
-        if (Strings.isNullOrEmpty(tagReq.id)){//没有传id，新增
+        if (Strings.isNullOrEmpty(tagReq.id)) {//没有传id，新增
             PrjTag prjTag = PrjTag.newData();
             prjTag.setName(tagReq.name);
             prjTag.setColor(tagReq.colorId);
             prjTag.insertById();
-        }else {//修改
+        } else {//修改
             PrjTag prjTag = PrjTag.selectById(tagReq.id);
             prjTag.setName(tagReq.name);
             prjTag.setColor(tagReq.colorId);
@@ -199,26 +200,26 @@ public class PlanOperationExt {
     /**
      * 删除标签
      */
-    public void delTag(){
+    public void delTag() {
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         String tagId = JdbcMapUtil.getString(input, "tagId");
-        if (Strings.isNullOrEmpty(tagId)){
+        if (Strings.isNullOrEmpty(tagId)) {
             throw new BaseException("标签id不能为空！");
         }
-        List<Map<String, Object>> originList = myJdbcTemplate.queryForList("select id,PRJ_TAG_IDS tagIds from PLAN_OPERATION where FIND_IN_SET (?,PRJ_TAG_IDS)",tagId);
-        if (!CollectionUtils.isEmpty(originList)){
+        List<Map<String, Object>> originList = myJdbcTemplate.queryForList("select id,PRJ_TAG_IDS tagIds from PLAN_OPERATION where FIND_IN_SET (?,PRJ_TAG_IDS)", tagId);
+        if (!CollectionUtils.isEmpty(originList)) {
             for (Map<String, Object> originMap : originList) {
                 String tagIds = originMap.get("tagIds").toString();
                 List<String> tagIdList = new ArrayList<>(Arrays.asList(tagIds.split(",")));
                 //移除掉删除的id
                 tagIdList.remove(tagId);
                 String newTagIs = String.join(",", tagIdList);
-                if (Strings.isNullOrEmpty(newTagIs)){
+                if (Strings.isNullOrEmpty(newTagIs)) {
                     newTagIs = null;
                 }
                 //更新
-                myJdbcTemplate.update("update PLAN_OPERATION set PRJ_TAG_IDS = ? where id = ?",newTagIs,originMap.get("id").toString());
+                myJdbcTemplate.update("update PLAN_OPERATION set PRJ_TAG_IDS = ? where id = ?", newTagIs, originMap.get("id").toString());
             }
         }
         PrjTag.deleteById(tagId);
@@ -228,7 +229,7 @@ public class PlanOperationExt {
     /**
      * 新增选项目时的下拉列表
      */
-    public void addPrjDrop(){
+    public void addPrjDrop() {
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         Map<String, Object> sqlParams = new HashMap<>(input);
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
@@ -242,28 +243,28 @@ public class PlanOperationExt {
                 "left join gr_set_value v4 on v4.id = pp.PRJ_MANAGE_MODE_ID\n" +
                 "left join plan_operation po on po.PM_PRJ_ID = pp.id\n" +
                 "where pp.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and IZ_FORMAL_PRJ = 1 and po.PM_PRJ_ID is null";
-        if (!Strings.isNullOrEmpty(prjDropReq.prjName)){
+        if (!Strings.isNullOrEmpty(prjDropReq.prjName)) {
             sql += " and pp.name like '%" + prjDropReq.prjName + "%'";
         }
-        if (!CollectionUtils.isEmpty(prjDropReq.prjIds)){
+        if (!CollectionUtils.isEmpty(prjDropReq.prjIds)) {
             sql += " and pp.id in (:prjIds)";
         }
-        List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(sql,sqlParams);
+        List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(sql, sqlParams);
 
-        if (prjDropReq.pageIndex != null && prjDropReq.pageSize != null){
+        if (prjDropReq.pageIndex != null && prjDropReq.pageSize != null) {
             sql += " limit " + (prjDropReq.pageIndex - 1) * prjDropReq.pageSize + " , " + prjDropReq.pageSize;
         }
-        List<Map<String, Object>> originList = myNamedParameterJdbcTemplate.queryForList(sql,sqlParams);
+        List<Map<String, Object>> originList = myNamedParameterJdbcTemplate.queryForList(sql, sqlParams);
         List<PrjDropResp> prjDropResps = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(originList)){
+        if (!CollectionUtils.isEmpty(originList)) {
             for (Map<String, Object> originMap : originList) {
                 PrjDropResp prjDropResp = JSONObject.parseObject(JSONObject.toJSONString(originMap), PrjDropResp.class);
                 prjDropResps.add(prjDropResp);
             }
         }
         Map<String, Object> result = new HashMap<>();
-        result.put("prjDropResps",prjDropResps);
-        result.put("total",totalList.size());
+        result.put("prjDropResps", prjDropResps);
+        result.put("total", totalList.size());
         Map output = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
         ExtJarHelper.returnValue.set(output);
     }
@@ -271,10 +272,10 @@ public class PlanOperationExt {
     /**
      * 添加项目进入计划运营
      */
-    public void addOperation(){
+    public void addOperation() {
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         OperationAddReq addOperationReq = JSONObject.parseObject(JSONObject.toJSONString(input), OperationAddReq.class);
-        if (addOperationReq.prjIds == null){
+        if (addOperationReq.prjIds == null) {
             return;
         }
         for (String prjId : addOperationReq.prjIds) {
@@ -287,52 +288,52 @@ public class PlanOperationExt {
     /**
      * 修改计划运营
      */
-    public void modifyOperation(){
+    public void modifyOperation() {
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         OperationModifyReq modifyReq = JSONObject.parseObject(JSONObject.toJSONString(input), OperationModifyReq.class);
-        if (Strings.isNullOrEmpty(modifyReq.operationId) || Strings.isNullOrEmpty(modifyReq.prjId)){
+        if (Strings.isNullOrEmpty(modifyReq.operationId) || Strings.isNullOrEmpty(modifyReq.prjId)) {
             throw new BaseException("项目id、计划运营id为必填");
         }
 
         //增量修改
         String sql = "update PLAN_OPERATION set ";
         Map<String, Object> paramMap = new HashMap<>();
-        if (!Strings.isNullOrEmpty(modifyReq.tagIds)){
+        if (!Strings.isNullOrEmpty(modifyReq.tagIds)) {
             sql += "PRJ_TAG_IDS = :tagIds";
-            paramMap.put("tagIds",modifyReq.tagIds);
+            paramMap.put("tagIds", modifyReq.tagIds);
         }
-        if (!Strings.isNullOrEmpty(modifyReq.keyProjectTypeId)){
-            if (!CollectionUtils.isEmpty(paramMap)){
+        if (!Strings.isNullOrEmpty(modifyReq.keyProjectTypeId)) {
+            if (!CollectionUtils.isEmpty(paramMap)) {
                 sql += ",";
             }
             sql += "KEY_PROJECT_TYPE_ID = :keyProjectTypeId";
-            paramMap.put("keyProjectTypeId",modifyReq.keyProjectTypeId);
+            paramMap.put("keyProjectTypeId", modifyReq.keyProjectTypeId);
         }
-        if (!CollectionUtils.isEmpty(paramMap)){
+        if (!CollectionUtils.isEmpty(paramMap)) {
             sql += " where id = :operationId";
-            paramMap.put("operationId",modifyReq.operationId);
+            paramMap.put("operationId", modifyReq.operationId);
             System.out.println(paramMap.get("tagIds"));
-            myNamedParameterJdbcTemplate.update(sql,paramMap);
+            myNamedParameterJdbcTemplate.update(sql, paramMap);
         }
 
-        if (modifyReq.isFollow != null && modifyReq.isFollow == true){//跟用户相关单独处理
+        if (modifyReq.isFollow != null && modifyReq.isFollow == true) {//跟用户相关单独处理
             String userId = ExtJarHelper.loginInfo.get().userId;
             PrjFollower prjFollower = PrjFollower.newData();
             prjFollower.setPmPrjId(modifyReq.prjId);
             prjFollower.setAdUserId(userId);
             prjFollower.insertById();
-        }else if (modifyReq != null && modifyReq.isFollow != null && modifyReq.isFollow == false){
-            PrjFollower.deleteByWhere(new Where().eq("PM_PRJ_ID", modifyReq.prjId).eq("AD_USER_ID",ExtJarHelper.loginInfo.get().userId));
+        } else if (modifyReq != null && modifyReq.isFollow != null && modifyReq.isFollow == false) {
+            PrjFollower.deleteByWhere(new Where().eq("PM_PRJ_ID", modifyReq.prjId).eq("AD_USER_ID", ExtJarHelper.loginInfo.get().userId));
         }
     }
 
     /**
      * 删除计划运营
      */
-    public void delOperation(){
+    public void delOperation() {
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
-        if (input.get("operationId") == null){
+        if (input.get("operationId") == null) {
             throw new BaseException("计划运营id不能为null");
         }
         String operationId = input.get("operationId").toString();
@@ -342,7 +343,7 @@ public class PlanOperationExt {
     /**
      * 查询计划运营
      */
-    public void listOperations(){
+    public void listOperations() {
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         Map<String, Object> sqlParams = new HashMap<>(input);
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
@@ -366,46 +367,46 @@ public class PlanOperationExt {
                 "left join gr_set_value v5 on v5.id = pp.PROJECT_PHASE_ID\n" +
                 "left join (select PM_PRJ_ID,GROUP_CONCAT(AD_USER_ID) AdUserIds from prj_follower group by PM_PRJ_ID) ftemp on ftemp.PM_PRJ_ID = po" +
                 ".PM_PRJ_ID where 1=1 and (pp.PROJECT_STATUS is null or pp.PROJECT_STATUS != '1661568714048413696') ");
-        sqlParams.put("loginId",ExtJarHelper.loginInfo.get().userId);
-        if (!CollectionUtils.isEmpty(selectReq.prjIds)){
+        sqlParams.put("loginId", ExtJarHelper.loginInfo.get().userId);
+        if (!CollectionUtils.isEmpty(selectReq.prjIds)) {
             sqlSb.append(" and po.PM_PRJ_ID in (:prjIds)");
         }
-        if (!Strings.isNullOrEmpty(selectReq.totalInvestStart)){
+        if (!Strings.isNullOrEmpty(selectReq.totalInvestStart)) {
             sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST >= :totalInvestStart");
         }
-        if (!Strings.isNullOrEmpty(selectReq.totalInvestEnd)){
+        if (!Strings.isNullOrEmpty(selectReq.totalInvestEnd)) {
             sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST <= :totalInvestEnd");
         }
 
         //高级筛选begin------
-        if (!this.isDisableFilter(selectReq)){//是否关闭高级筛选
+        if (!this.isDisableFilter(selectReq)) {//是否关闭高级筛选
             sqlSb.append(" and ( 1 != 1");
-            if (!CollectionUtils.isEmpty(selectReq.locationIds)){
+            if (!CollectionUtils.isEmpty(selectReq.locationIds)) {
                 sqlSb.append(" or pp.BASE_LOCATION_ID in (:locationIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)){
+            if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)) {
                 sqlSb.append(" or rtemp.AD_USER_ID in (:earlyUserIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.keyProjectTypeIds)){
+            if (!CollectionUtils.isEmpty(selectReq.keyProjectTypeIds)) {
                 sqlSb.append(" or po.KEY_PROJECT_TYPE_ID in (:keyProjectTypeIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.prjManageModeIds)){
+            if (!CollectionUtils.isEmpty(selectReq.prjManageModeIds)) {
                 sqlSb.append(" or pp.PRJ_MANAGE_MODE_ID in (:prjManageModeIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)){
+            if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)) {
                 sqlSb.append(" or pp.PROJECT_PHASE_ID in (:prjPhaseIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)){
+            if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)) {
                 sqlSb.append(" or pp.PROJECT_TYPE_ID in (:prjTypeIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.prjTagIds)){
+            if (!CollectionUtils.isEmpty(selectReq.prjTagIds)) {
                 sqlSb.append(" or (");
-                for (int i = 0;i < selectReq.prjTagIds.size();i++) {
-                    if (i > 0){
+                for (int i = 0; i < selectReq.prjTagIds.size(); i++) {
+                    if (i > 0) {
                         sqlSb.append(" or ");
                     }
                     sqlSb.append(" FIND_IN_SET(:prjTagId" + i + ",po.PRJ_TAG_IDS" + ")");
-                    sqlParams.put("prjTagId" + i,selectReq.prjTagIds.get(i));
+                    sqlParams.put("prjTagId" + i, selectReq.prjTagIds.get(i));
                 }
                 sqlSb.append(" )");
             }
@@ -413,13 +414,13 @@ public class PlanOperationExt {
         }
         //高级筛选end-------
 
-        if (selectReq.isFollow != null && selectReq.isFollow == true){
+        if (selectReq.isFollow != null && selectReq.isFollow == true) {
             sqlSb.append(" and FIND_IN_SET(:loginId,ftemp.AdUserIds)");
         }
 
         List<Map<String, Object>> totalList = myNamedParameterJdbcTemplate.queryForList(sqlSb.toString(), sqlParams);
-        sqlSb.append( " order by po.CRT_DT desc");
-        if (selectReq.pageIndex != null && selectReq.pageSize != null){
+        sqlSb.append(" order by po.CRT_DT desc");
+        if (selectReq.pageIndex != null && selectReq.pageSize != null) {
             sqlSb.append(" limit " + (selectReq.pageIndex - 1) * selectReq.pageSize + " , " + selectReq.pageSize);
         }
         List<Map<String, Object>> originList = myNamedParameterJdbcTemplate.queryForList(sqlSb.toString(), sqlParams);
@@ -429,8 +430,8 @@ public class PlanOperationExt {
 
         //返回
         Map<String, Object> result = new HashMap<>();
-        result.put("planOperationResps",planOperationResps);
-        result.put("total",totalList.size());
+        result.put("planOperationResps", planOperationResps);
+        result.put("total", totalList.size());
         Map output = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
         ExtJarHelper.returnValue.set(output);
     }
@@ -438,12 +439,12 @@ public class PlanOperationExt {
     /**
      * 项目类型统计项目
      */
-    public void statistic(){
+    public void statistic() {
         Map<String, Object> input = ExtJarHelper.extApiParamMap.get();
         Map<String, Object> sqlParams = new HashMap<>(input);
         MyNamedParameterJdbcTemplate myNamedParameterJdbcTemplate = ExtJarHelper.myNamedParameterJdbcTemplate.get();
         OperationSelectReq selectReq = JSONObject.parseObject(JSONObject.toJSONString(input), OperationSelectReq.class);
-        sqlParams.put("loginId",ExtJarHelper.loginInfo.get().userId);
+        sqlParams.put("loginId", ExtJarHelper.loginInfo.get().userId);
 
         StringBuffer sqlSb = new StringBuffer();
         sqlSb.append("select IFNULL(t2.num,0) leftNum,t1.num totalNum,t1.prjTypeId,t1.prjTypeName from (\n" +
@@ -472,47 +473,47 @@ public class PlanOperationExt {
                 "left join gr_set_value v5 on v5.id = pp.PROJECT_PHASE_ID\n" +
                 "left join (select PM_PRJ_ID,GROUP_CONCAT(AD_USER_ID) AdUserIds from prj_follower group by PM_PRJ_ID) ftemp on ftemp.PM_PRJ_ID = po.PM_PRJ_ID " +
                 "where 1=1 and (pp.PROJECT_STATUS is null or pp.PROJECT_STATUS != '1661568714048413696')");
-        if (!CollectionUtils.isEmpty(selectReq.prjIds)){
+        if (!CollectionUtils.isEmpty(selectReq.prjIds)) {
             sqlSb.append(" and po.PM_PRJ_ID in (:prjIds)");
         }
-        if (!Strings.isNullOrEmpty(selectReq.totalInvestStart)){
+        if (!Strings.isNullOrEmpty(selectReq.totalInvestStart)) {
             sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST >= :totalInvestStart");
         }
-        if (!Strings.isNullOrEmpty(selectReq.totalInvestEnd)){
+        if (!Strings.isNullOrEmpty(selectReq.totalInvestEnd)) {
             sqlSb.append(" and pp.ESTIMATED_TOTAL_INVEST <= :totalInvestEnd");
         }
-        if (selectReq.isFollow != null && selectReq.isFollow == true){
+        if (selectReq.isFollow != null && selectReq.isFollow == true) {
             sqlSb.append(" and FIND_IN_SET(:loginId,ftemp.AdUserIds)");
         }
         //高级筛选begin------
-        if (!this.isDisableFilter(selectReq)){//是否关闭高级筛选
+        if (!this.isDisableFilter(selectReq)) {//是否关闭高级筛选
             sqlSb.append(" and ( 1 != 1");
-            if (!CollectionUtils.isEmpty(selectReq.locationIds)){
+            if (!CollectionUtils.isEmpty(selectReq.locationIds)) {
                 sqlSb.append(" or pp.BASE_LOCATION_ID in (:locationIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)){
+            if (!CollectionUtils.isEmpty(selectReq.earlyUserIds)) {
                 sqlSb.append(" or rtemp.AD_USER_ID in (:earlyUserIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.keyProjectTypeIds)){
+            if (!CollectionUtils.isEmpty(selectReq.keyProjectTypeIds)) {
                 sqlSb.append(" or po.KEY_PROJECT_TYPE_ID in (:keyProjectTypeIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.prjManageModeIds)){
+            if (!CollectionUtils.isEmpty(selectReq.prjManageModeIds)) {
                 sqlSb.append(" or pp.PRJ_MANAGE_MODE_ID in (:prjManageModeIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)){
+            if (!CollectionUtils.isEmpty(selectReq.prjPhaseIds)) {
                 sqlSb.append(" or pp.PROJECT_PHASE_ID in (:prjPhaseIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)){
+            if (!CollectionUtils.isEmpty(selectReq.prjTypeIds)) {
                 sqlSb.append(" or pp.PROJECT_TYPE_ID in (:prjTypeIds)");
             }
-            if (!CollectionUtils.isEmpty(selectReq.prjTagIds)){
+            if (!CollectionUtils.isEmpty(selectReq.prjTagIds)) {
                 sqlSb.append(" or (");
-                for (int i = 0;i < selectReq.prjTagIds.size();i++) {
-                    if (i > 0){
+                for (int i = 0; i < selectReq.prjTagIds.size(); i++) {
+                    if (i > 0) {
                         sqlSb.append(" or ");
                     }
                     sqlSb.append(" FIND_IN_SET(:prjTagId" + i + ",po.PRJ_TAG_IDS" + ")");
-                    sqlParams.put("prjTagId" + i,selectReq.prjTagIds.get(i));
+                    sqlParams.put("prjTagId" + i, selectReq.prjTagIds.get(i));
                 }
                 sqlSb.append(" )");
             }
@@ -523,12 +524,12 @@ public class PlanOperationExt {
         sqlSb.append(" ) t2 on t1.prjTypeId = t2.prjTypeId");
         List<Map<String, Object>> originList = myNamedParameterJdbcTemplate.queryForList(sqlSb.toString(), sqlParams);
         Map<String, Object> result = new HashMap<>();
-        if (!CollectionUtils.isEmpty(originList)){
+        if (!CollectionUtils.isEmpty(originList)) {
             int sum = originList.stream().mapToInt(originMap -> Integer.parseInt(originMap.get("leftNum").toString())).sum();//筛选后剩下的总数
             StringBuffer otherStatistic = new StringBuffer();
             originList.forEach(originMap -> otherStatistic.append(" ").append(originMap.get("prjTypeName")).append(":").append(originMap.get("leftNum")).append("/").append(originMap.get("totalNum")));
-            result.put("prjSum",sum);
-            result.put("otherStatistic",otherStatistic);
+            result.put("prjSum", sum);
+            result.put("otherStatistic", otherStatistic);
         }
 
         Map output = JsonUtil.fromJson(JsonUtil.toJson(result), Map.class);
@@ -539,18 +540,18 @@ public class PlanOperationExt {
      * maps转PlanOperationResps
      * 并且封装标签
      */
-    private List<PlanOperationResp> covertToPlanOperation(List<Map<String, Object>> originList,List<Map<String, Object>> tagMaps){
+    private List<PlanOperationResp> covertToPlanOperation(List<Map<String, Object>> originList, List<Map<String, Object>> tagMaps) {
         List<PlanOperationResp> planOperationResps = new ArrayList<>();
 
-        if (!CollectionUtils.isEmpty(originList)){
+        if (!CollectionUtils.isEmpty(originList)) {
             for (Map<String, Object> originMap : originList) {
                 PlanOperationResp planOperationResp = JSONObject.parseObject(JSONObject.toJSONString(originMap), PlanOperationResp.class);
                 //封装标签
-                if (!Strings.isNullOrEmpty(planOperationResp.tagIds)){
+                if (!Strings.isNullOrEmpty(planOperationResp.tagIds)) {
                     List<Tag> tags = Stream.of(planOperationResp.tagIds.split(",")).map(tagId -> {
                         //这里面是通过逗号分隔的标签id，分装为标签对象
                         Optional<Map<String, Object>> tagOp = tagMaps.stream().filter(tagMap -> tagMap.get("tagId").toString().equals(tagId)).findAny();
-                        if (tagOp.isPresent()){
+                        if (tagOp.isPresent()) {
                             Map<String, Object> tagMap = tagOp.get();
                             Tag tag = JSONObject.parseObject(JSONObject.toJSONString(tagMap), Tag.class);
                             return tag;
@@ -567,7 +568,7 @@ public class PlanOperationExt {
     }
 
     //是否关闭高级筛选，筛选参数全为空true
-    private boolean isDisableFilter(OperationSelectReq selectReq){
+    private boolean isDisableFilter(OperationSelectReq selectReq) {
         return CollectionUtils.isEmpty(selectReq.locationIds)
                 && CollectionUtils.isEmpty(selectReq.earlyUserIds)
                 && CollectionUtils.isEmpty(selectReq.keyProjectTypeIds)
@@ -581,7 +582,7 @@ public class PlanOperationExt {
      * 新增项目下拉
      */
     @Data
-    private static class PrjDropReq{
+    private static class PrjDropReq {
         private List<String> prjIds;
         private String prjName;
         private Integer pageIndex;
@@ -592,7 +593,7 @@ public class PlanOperationExt {
      * 项目下拉响应
      */
     @Data
-    private static class PrjDropResp{
+    private static class PrjDropResp {
         private String prjId;
         private String prjName;
         //总投资
@@ -605,11 +606,12 @@ public class PlanOperationExt {
         private String earlyUserName;
 
     }
+
     /**
      * 列表响应
      */
     @Data
-    private static class PlanOperationResp{
+    private static class PlanOperationResp {
         //计划运营id
         private String operationId;
         //项目id
@@ -653,7 +655,7 @@ public class PlanOperationExt {
      * 标签
      */
     @Data
-    private static class Tag{
+    private static class Tag {
         //标签id
         private String tagId;
         //标签名称
@@ -670,7 +672,7 @@ public class PlanOperationExt {
      * 新增、修改标签请求
      */
     @Data
-    private static class TagReq{
+    private static class TagReq {
         private String id;
         private String name;
         private String colorId;
@@ -680,7 +682,7 @@ public class PlanOperationExt {
      * 查询请求
      */
     @Data
-    public static class OperationSelectReq{
+    public static class OperationSelectReq {
         //项目ids
         private List<String> prjIds;
         //总投资开始金额
@@ -713,7 +715,7 @@ public class PlanOperationExt {
      * 修改计划运营请求
      */
     @Data
-    private static class OperationModifyReq{
+    private static class OperationModifyReq {
         //计划运营id
         private String operationId;
         //项目id
@@ -732,7 +734,34 @@ public class PlanOperationExt {
      * 添加计划运营请求
      */
     @Data
-    private static class OperationAddReq{
+    private static class OperationAddReq {
         private List<String> prjIds;
+    }
+
+    /**
+     * 标签
+     */
+    public void tagList() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        //标签
+        List<Map<String, Object>> tagMaps = myJdbcTemplate.queryForList("select ta.id tagId,ta.name tagName,v.name colorNo,v.seq_no seqNo from PRJ_TAG ta left join gr_set_value v on v.id = ta.color");
+        List<Tag> tagList = tagMaps.stream().map(p -> {
+            Tag tag = new Tag();
+            tag.setTagId(JdbcMapUtil.getString(p, "tagId"));
+            tag.setTagName(JdbcMapUtil.getString(p, "tagName"));
+            return tag;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(tagList)) {
+            ExtJarHelper.returnValue.set(Collections.emptyMap());
+        } else {
+            OutSide resData = new OutSide();
+            resData.tagList = tagList;
+            Map outputMap = JsonUtil.fromJson(JsonUtil.toJson(resData), Map.class);
+            ExtJarHelper.returnValue.set(outputMap);
+        }
+    }
+
+    public static class OutSide {
+        public List<Tag> tagList;
     }
 }

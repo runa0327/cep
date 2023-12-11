@@ -42,6 +42,7 @@ public class StarchingProjectExt {
                 "left join pm_party pp on pm.CUSTOMER_UNIT = pp.id \n" +
                 "left join gr_set_value gs on pm.PROJECT_TYPE_ID = gs.id \n" +
                 "left join gr_set_value gg on pm.BASE_LOCATION_ID = gg.id \n" +
+                "left join PLAN_OPERATION po on pm.id = po.PM_PRJ_ID " +
                 "where pm.PROJECT_CLASSIFICATION_ID ='1704686841101975552' and pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 and pm.PROJECT_STATUS != '1661568714048413696' ");
         if (StringUtils.hasText(requestParam.name)) {
             sb.append(" and pm.`NAME` like '%").append(requestParam.name).append("%'");
@@ -58,7 +59,12 @@ public class StarchingProjectExt {
         if (StringUtils.hasText(requestParam.location)) {
             sb.append(" and pm.BASE_LOCATION_ID ='").append(requestParam.location).append("'");
         }
-
+        if (StringUtils.hasText(requestParam.keyTypeId)) {
+            sb.append(" and po.KEY_PROJECT_TYPE_ID = '").append(requestParam.keyTypeId).append("'");
+        }
+        if (StringUtils.hasText(requestParam.tagId)) {
+            sb.append(" and find_in_set('").append(requestParam.tagId).append("', PRJ_TAG_IDS ");
+        }
         sb.append(" order by pm.PM_CODE desc ");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
@@ -214,6 +220,8 @@ public class StarchingProjectExt {
         public String location;
         public Integer pageSize;
         public Integer pageIndex;
+        public String keyTypeId;//重点分类
+        public String tagId;//标签
     }
 
 

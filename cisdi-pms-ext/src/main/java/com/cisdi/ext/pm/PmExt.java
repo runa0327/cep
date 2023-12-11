@@ -245,7 +245,8 @@ public class PmExt {
                 "left join gr_set_value gsvv on gsvv.id = pm.PRJ_MANAGE_MODE_ID \n" +
                 "left join gr_set_value gss on gss.id = pm.PROJECT_PHASE_ID \n" +
                 "left join pm_pro_plan ppp on ppp.PM_PRJ_ID = pm.id \n" +
-                "left join gr_set_value ggg on ggg.id = pm.BASE_LOCATION_ID "+
+                "left join gr_set_value ggg on ggg.id = pm.BASE_LOCATION_ID " +
+                "left join PLAN_OPERATION po on pm.id = po.PM_PRJ_ID " +
                 "where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 and (pm.PROJECT_STATUS != '1661568714048413696' or pm.PROJECT_STATUS is null )  ");
         if (StringUtils.hasText(param.name)) {
             sb.append(" and pm.`name` like '%").append(param.name).append("%'");
@@ -272,6 +273,13 @@ public class PmExt {
 //        sb.append(" and IF('").append(userId).append("' in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1, ");
 //        sb.append(" pm.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(userId).append("', USER_IDS )))");
         sb.append(" and PROJECT_CLASSIFICATION_ID ='").append(param.category).append("'");
+
+        if (StringUtils.hasText(param.keyTypeId)) {
+            sb.append(" and po.KEY_PROJECT_TYPE_ID = '").append(param.keyTypeId).append("'");
+        }
+        if (StringUtils.hasText(param.tagId)) {
+            sb.append(" and find_in_set('").append(param.tagId).append("', PRJ_TAG_IDS ");
+        }
         sb.append(" order by pm.PM_SEQ desc");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
@@ -294,7 +302,7 @@ public class PmExt {
     /**
      * 我的项目库
      */
-    public void myProjectLibrary(){
+    public void myProjectLibrary() {
         Map<String, Object> map = ExtJarHelper.extApiParamMap.get();// 输入参数的map。
         String json = JsonUtil.toJson(map);
         PrjRequestParam param = JsonUtil.fromJson(json, PrjRequestParam.class);
@@ -316,7 +324,8 @@ public class PmExt {
                 "left join gr_set_value gsvv on gsvv.id = pm.PRJ_MANAGE_MODE_ID \n" +
                 "left join gr_set_value gss on gss.id = pm.PROJECT_PHASE_ID \n" +
                 "left join pm_pro_plan ppp on ppp.PM_PRJ_ID = pm.id \n" +
-                "left join gr_set_value ggg on ggg.id = pm.BASE_LOCATION_ID "+
+                "left join gr_set_value ggg on ggg.id = pm.BASE_LOCATION_ID " +
+                "left join PLAN_OPERATION po on pm.id = po.PM_PRJ_ID " +
                 "where pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 and (pm.PROJECT_STATUS != '1661568714048413696' or pm.PROJECT_STATUS is null ) AND pm.PROJECT_CLASSIFICATION_ID = '1704686664114929664' ");
         if (StringUtils.hasText(param.name)) {
             sb.append(" and pm.`name` like '%").append(param.name).append("%'");
@@ -344,6 +353,13 @@ public class PmExt {
 //        sb.append(" and IF('").append(userId).append("' in (select ad_user_id from ad_role_user where ad_role_id = '0099250247095870406') ,1=1, ");
 //        sb.append(" pm.id in (select DISTINCT pm_prj_id from pm_dept WHERE STATUS = 'ap' and FIND_IN_SET('").append(userId).append("', USER_IDS )))");
         sb.append(" and PROJECT_CLASSIFICATION_ID ='").append(param.category).append("'");
+
+        if (StringUtils.hasText(param.keyTypeId)) {
+            sb.append(" and po.KEY_PROJECT_TYPE_ID = '").append(param.keyTypeId).append("'");
+        }
+        if (StringUtils.hasText(param.tagId)) {
+            sb.append(" and find_in_set('").append(param.tagId).append("', PRJ_TAG_IDS ");
+        }
         sb.append(" order by pm.PM_SEQ desc");
         String totalSql = sb.toString();
         int start = pageSize * (pageIndex - 1);
@@ -365,7 +381,7 @@ public class PmExt {
     /**
      * 初始化项目序号
      */
-    public void initPrjNum(){
+    public void initPrjNum() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select * from PM_PRJ where status='ap' and PROJECT_SOURCE_TYPE_ID = '0099952822476441374' order by CRT_DT");
         AtomicInteger index = new AtomicInteger(1);
@@ -377,7 +393,7 @@ public class PmExt {
     /**
      * 更新流程标题中项目名称
      */
-    public void updateProcessName(){
+    public void updateProcessName() {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
         //所有在使用的流程对应的表名，并且有pm_prj_id这个字段
         List<Map<String, Object>> processEntCodes = myJdbcTemplate.queryForList("select * from (select ENT_CODE entCode from wf_process_instance where status = 'AP' group by ENT_CODE) t1 where t1.entCode in (select table_name from information_schema.columns where column_name = 'PM_PRJ_ID' group by table_name having count(*) > 0) ");
@@ -386,7 +402,7 @@ public class PmExt {
             //流程实例id、项目名称、流程标题
             List<Map<String, Object>> nameList
                     = myJdbcTemplate.queryForList("select pi.id instanceId,pp.name prjName,pi.name instanceName\n" +
-                    "from " + entCode + " t "+
+                    "from " + entCode + " t " +
                     "left join pm_prj pp on pp.id = t.PM_PRJ_ID \n" +
                     "left join wf_process_instance pi on pi.id = t.LK_WF_INST_ID\n" +
                     "where t.status = 'AP' and pp.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pi.status = 'AP' and t.status = 'AP'");
@@ -394,14 +410,14 @@ public class PmExt {
                 String instanceId = nameMap.get("instanceId").toString();
                 String instanceName = nameMap.get("instanceName").toString();
                 String prjName = nameMap.get("prjName").toString();
-                if (instanceName.contains(prjName)){//如果流程标题完全包含了项目名称，说明该流程标题没有问题
+                if (instanceName.contains(prjName)) {//如果流程标题完全包含了项目名称，说明该流程标题没有问题
                     continue;
                 }
                 //下面代码都是修改过项目名称的情况。流程实例名称通过"-"拆分
                 String[] insNameParts = instanceName.split("-");
                 for (int i = 0; i < insNameParts.length; i++) {
                     double ratio = StrUtil.SimilarDegree(prjName, insNameParts[i]);
-                    if (ratio > 0.6){//相似程度超过60%，认为标题的这部分是项目名
+                    if (ratio > 0.6) {//相似程度超过60%，认为标题的这部分是项目名
                         log.info(insNameParts[i] + "->" + prjName);
                         insNameParts[i] = prjName;
                     }
@@ -409,7 +425,7 @@ public class PmExt {
                 }
                 //重新组合，新流程标题
                 String newInstanceName = String.join("-", insNameParts);
-                myJdbcTemplate.update("update wf_process_instance set name = ? where id = ?",newInstanceName,instanceId);
+                myJdbcTemplate.update("update wf_process_instance set name = ? where id = ?", newInstanceName, instanceId);
             }
         }
 
@@ -441,6 +457,7 @@ public class PmExt {
 
     /**
      * 取数逻辑  启动填写<匡算<概算<预算<财评<结算
+     *
      * @param projectId
      * @return
      */
@@ -471,6 +488,8 @@ public class PmExt {
         public Integer pageSize;
         public Integer pageIndex;
         public String category;//项目类别
+        public String keyTypeId;//重点分类
+        public String tagId;//标签
     }
 
     public static class ProjectInfo {
@@ -496,9 +515,9 @@ public class PmExt {
     public static void main(String[] args) {
 
         String a = "a";
-        String[] arr = {"测","试","下"};
+        String[] arr = {"测", "试", "下"};
         for (int i = 0; i < arr.length; i++) {
-            if (arr[i].equals("试")){
+            if (arr[i].equals("试")) {
                 arr[i] = a;
             }
         }

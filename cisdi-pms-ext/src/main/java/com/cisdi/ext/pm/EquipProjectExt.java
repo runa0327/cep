@@ -40,6 +40,7 @@ public class EquipProjectExt {
                 "from pm_prj pm left join pm_prj pp on pm.SUBORDINATE_PROJECT = pp.ID\n" +
                 "left join gr_set_value gs on gs.id = pm.RESEARCH_RANGE\n" +
                 "left join PM_LANDING_POINT plp on plp.id = pm.PM_LANDING_POINT_ID " +
+                "left join PLAN_OPERATION po on pm.id = po.PM_PRJ_ID " +
                 "where pm.PROJECT_CLASSIFICATION_ID ='1704686735267102720' and pm.PROJECT_SOURCE_TYPE_ID = '0099952822476441374' and pm.`STATUS`='ap' and pm.IZ_FORMAL_PRJ = 1 and pm.PROJECT_STATUS != '1661568714048413696' ");
         if (StringUtils.hasText(requestParam.eqPrjName)) {
             sb.append(" and pm.`NAME` like '%").append(requestParam.eqPrjName).append("%'");
@@ -49,6 +50,12 @@ public class EquipProjectExt {
         }
         if (StringUtils.hasText(requestParam.researchRange)) {
             sb.append(" and pm.RESEARCH_RANGE ='").append(requestParam.researchRange).append("'");
+        }
+        if (StringUtils.hasText(requestParam.keyTypeId)) {
+            sb.append(" and po.KEY_PROJECT_TYPE_ID = '").append(requestParam.keyTypeId).append("'");
+        }
+        if (StringUtils.hasText(requestParam.tagId)) {
+            sb.append(" and find_in_set('").append(requestParam.tagId).append("', PRJ_TAG_IDS ");
         }
         Map<String, Object> queryFileParams = new HashMap<>();// 创建入参map
         if (StringUtils.hasText(requestParam.pointIds)) {
@@ -261,6 +268,8 @@ public class EquipProjectExt {
         public String pointIds;
         public Integer pageSize;
         public Integer pageIndex;
+        public String keyTypeId;//重点分类
+        public String tagId;//标签
     }
 
     public static class ObjInfo {
