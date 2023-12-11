@@ -43,7 +43,8 @@ public class PmPrjInvestCommonExt {
         entityRecord.extraEditableAttCodeList.add("OTHER_CONTACT_PHONE");
         entityRecord.extraEditableAttCodeList.add("GUARANTEE_AMT");
         entityRecord.extraEditableAttCodeList.add("GUARANTEE_NAME");
-        entityRecord.extraEditableAttCodeList.add("GUARANTEE_END_DATE");
+        entityRecord.extraEditableAttCodeList.add("GUARANTEE_END_DATE");    // 保函到期日期
+        entityRecord.extraEditableAttCodeList.add("DATE_TYPE_WR");  //  请填写到期说明
         entityRecord.extraEditableAttCodeList.add("WIN_BID_UNIT_TXT");
         entityRecord.extraEditableAttCodeList.add("CONTRACT_PRICE");
         entityRecord.extraEditableAttCodeList.add("ESTIMATED_AMOUNT");
