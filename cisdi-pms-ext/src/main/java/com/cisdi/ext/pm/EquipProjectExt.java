@@ -55,7 +55,7 @@ public class EquipProjectExt {
             sb.append(" and po.KEY_PROJECT_TYPE_ID = '").append(requestParam.keyTypeId).append("'");
         }
         if (StringUtils.hasText(requestParam.tagId)) {
-            sb.append(" and find_in_set('").append(requestParam.tagId).append("', PRJ_TAG_IDS ");
+            sb.append(" and find_in_set('").append(requestParam.tagId).append("', PRJ_TAG_IDS) ");
         }
         Map<String, Object> queryFileParams = new HashMap<>();// 创建入参map
         if (StringUtils.hasText(requestParam.pointIds)) {

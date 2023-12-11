@@ -63,7 +63,7 @@ public class StarchingProjectExt {
             sb.append(" and po.KEY_PROJECT_TYPE_ID = '").append(requestParam.keyTypeId).append("'");
         }
         if (StringUtils.hasText(requestParam.tagId)) {
-            sb.append(" and find_in_set('").append(requestParam.tagId).append("', PRJ_TAG_IDS ");
+            sb.append(" and find_in_set('").append(requestParam.tagId).append("', PRJ_TAG_IDS) ");
         }
         sb.append(" order by pm.PM_CODE desc ");
         String totalSql = sb.toString();

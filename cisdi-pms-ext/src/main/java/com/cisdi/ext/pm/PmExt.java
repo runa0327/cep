@@ -278,7 +278,7 @@ public class PmExt {
             sb.append(" and po.KEY_PROJECT_TYPE_ID = '").append(param.keyTypeId).append("'");
         }
         if (StringUtils.hasText(param.tagId)) {
-            sb.append(" and find_in_set('").append(param.tagId).append("', PRJ_TAG_IDS ");
+            sb.append(" and find_in_set('").append(param.tagId).append("', PRJ_TAG_IDS) ");
         }
         sb.append(" order by pm.PM_SEQ desc");
         String totalSql = sb.toString();
@@ -358,7 +358,7 @@ public class PmExt {
             sb.append(" and po.KEY_PROJECT_TYPE_ID = '").append(param.keyTypeId).append("'");
         }
         if (StringUtils.hasText(param.tagId)) {
-            sb.append(" and find_in_set('").append(param.tagId).append("', PRJ_TAG_IDS ");
+            sb.append(" and find_in_set('").append(param.tagId).append("', PRJ_TAG_IDS) ");
         }
         sb.append(" order by pm.PM_SEQ desc");
         String totalSql = sb.toString();
