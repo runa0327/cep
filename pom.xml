@@ -10,6 +10,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
+        <module>cisdi-bid-ext</module>
         <module>cisdi-pms-data-transfer</module>
         <module>cisdi-pms-ext</module>
         <module>cisdi-pms-mq</module>
