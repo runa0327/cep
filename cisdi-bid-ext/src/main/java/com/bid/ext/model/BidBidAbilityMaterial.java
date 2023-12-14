@@ -127,6 +127,10 @@ public class BidBidAbilityMaterial {
          * 报价能力分类。
          */
         public static final String BID_BID_ABILITY_CATE_ID = "BID_BID_ABILITY_CATE_ID";
+        /**
+         * 是否包括。
+         */
+        public static final String IS_INCLUDED = "IS_INCLUDED";
     }
 
     // </editor-fold>
@@ -849,6 +853,42 @@ public class BidBidAbilityMaterial {
             this.bidBidAbilityCateId = bidBidAbilityCateId;
             if (!this.toUpdateCols.contains("BID_BID_ABILITY_CATE_ID")) {
                 this.toUpdateCols.add("BID_BID_ABILITY_CATE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否包括。
+     */
+    private Boolean isIncluded;
+
+    /**
+     * 获取：是否包括。
+     */
+    public Boolean getIsIncluded() {
+        return this.isIncluded;
+    }
+
+    /**
+     * 设置：是否包括。
+     */
+    public BidBidAbilityMaterial setIsIncluded(Boolean isIncluded) {
+        if (this.isIncluded == null && isIncluded == null) {
+            // 均为null，不做处理。
+        } else if (this.isIncluded != null && isIncluded != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isIncluded.compareTo(isIncluded) != 0) {
+                this.isIncluded = isIncluded;
+                if (!this.toUpdateCols.contains("IS_INCLUDED")) {
+                    this.toUpdateCols.add("IS_INCLUDED");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isIncluded = isIncluded;
+            if (!this.toUpdateCols.contains("IS_INCLUDED")) {
+                this.toUpdateCols.add("IS_INCLUDED");
             }
         }
         return this;

@@ -1,12 +1,12 @@
 package com.bid.ext.bid;
 
-import com.bid.ext.model.BidAbilityCate;
-import com.bid.ext.model.BidBid;
-import com.bid.ext.model.BidBidAbilityCate;
+import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.SharedConstants;
 import com.qygly.shared.ad.login.LoginInfo;
+import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
@@ -43,13 +43,16 @@ public class BidExt {
                 oldIdToNewIdMap.put(src.getId(), tgt.getId());
 
                 // 拷贝所有字段的值：
-                OrmHelper.copyCols(src, tgt, null, Arrays.asList("ID"));
+                OrmHelper.copyCols(src, tgt, null, Arrays.asList(SharedConstants.Cols.ID));
 
                 tgt.setBidBidId(bidBid.getId());
 
                 // String oldPid = src.getBidAbilityCatePid();
                 // String newPid = findNewId(oldPid, oldIdToNewIdMap);
                 // tgt.setBidBidAbilityCatePid(newPid);
+
+                // 设置源头ID，以维护源头、目标的记录的对应关系：
+                tgt.setBidAbilityCateId(src.getId());
 
                 tgt.insertById();
             });
@@ -64,13 +67,27 @@ public class BidExt {
                 String newPid = findNewId(oldPid, oldIdToNewIdMap);
                 tgt.setBidBidAbilityCatePid(newPid);
 
-                tgt.insertById();
+                tgt.updateById();
             });
         }
 
 
         // 拷贝能力素材：
+        List<BidAbilityMaterial> bidAbilityMaterialList = BidAbilityMaterial.selectByWhere(null);
+        if (!SharedUtil.isEmptyList(bidAbilityMaterialList)) {
+            bidAbilityMaterialList.forEach(src -> {
+                BidBidAbilityMaterial tgt = BidBidAbilityMaterial.newData();
 
+                // 拷贝所有字段的值：
+                OrmHelper.copyCols(src, tgt, null, Arrays.asList(SharedConstants.Cols.ID));
+
+                String oldCateId = src.getBidAbilityCateId();
+                String newCateId = oldIdToNewIdMap.get(oldCateId);
+                tgt.setBidBidAbilityCateId(newCateId);
+
+                tgt.insertById();
+            });
+        }
 
     }
 
@@ -85,6 +102,19 @@ public class BidExt {
         }
 
         return newId;
+    }
+
+    public void calcTotal() {
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        if (!SharedUtil.isEmptyList(entityRecordList)) {
+            entityRecordList.forEach(entityRecord -> {
+                BigDecimal cost = new BigDecimal(entityRecord.valueMap.get(BidBid.Cols.BID_COST).toString());
+                BigDecimal profit = new BigDecimal(entityRecord.valueMap.get(BidBid.Cols.BID_PROFIT).toString());
+                BigDecimal total = cost.add(profit);
+                entityRecord.valueMap.put(BidBid.Cols.BID_TOTAL, total);
+                entityRecord.extraEditableAttCodeList.add(BidBid.Cols.BID_TOTAL);
+            });
+        }
     }
 
 }
