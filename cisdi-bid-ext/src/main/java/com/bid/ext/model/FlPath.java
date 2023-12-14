@@ -7,22 +7,20 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 报价。
+ * 路径。
  */
-public class BidBid {
+public class FlPath {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<BidBid> modelHelper = new ModelHelper<>("BID_BID", new BidBid());
+    private static final ModelHelper<FlPath> modelHelper = new ModelHelper<>("FL_PATH", new FlPath());
 
     /**
      * 待更新的列。
@@ -39,7 +37,7 @@ public class BidBid {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "BID_BID";
+    public static final String ENT_CODE = "FL_PATH";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -109,37 +107,45 @@ public class BidBid {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * 报价用户。
+         * 文件上传URL。
          */
-        public static final String BID_BY_USER_ID = "BID_BY_USER_ID";
+        public static final String FILE_UPLOAD_URL = "FILE_UPLOAD_URL";
         /**
-         * 报价日期。
+         * 文件附件URL。
          */
-        public static final String BID_DATE = "BID_DATE";
+        public static final String FILE_ATTACHMENT_URL = "FILE_ATTACHMENT_URL";
         /**
-         * 报价总额（元）。
+         * 文件内联URL。
          */
-        public static final String BID_TOTAL = "BID_TOTAL";
+        public static final String FILE_INLINE_URL = "FILE_INLINE_URL";
         /**
-         * 报价成本（元）。
+         * 目录。
          */
-        public static final String BID_COST = "BID_COST";
+        public static final String DIR = "DIR";
         /**
-         * 报价利润（元）。
+         * 存储空间名称。
          */
-        public static final String BID_PROFIT = "BID_PROFIT";
+        public static final String BUCKET_NAME = "BUCKET_NAME";
         /**
-         * 报价PPT（自动生成）。
+         * 存储空间公有。
          */
-        public static final String BID_PPT_AUTO_GEN = "BID_PPT_AUTO_GEN";
+        public static final String BUCKET_PUBLIC = "BUCKET_PUBLIC";
         /**
-         * 报价WORD（自动生成）。
+         * 存储空间域名。
          */
-        public static final String BID_WORD_AUTO_GEN = "BID_WORD_AUTO_GEN";
+        public static final String BUCKET_DOMAIN_NAME = "BUCKET_DOMAIN_NAME";
         /**
-         * 报价EXCEL（自动生成）。
+         * 启用HTTPS。
          */
-        public static final String BID_EXCEL_AUTO_GEN = "BID_EXCEL_AUTO_GEN";
+        public static final String ENABLE_HTTPS = "ENABLE_HTTPS";
+        /**
+         * 是否公开读取。
+         */
+        public static final String IS_PUBLIC_READ = "IS_PUBLIC_READ";
+        /**
+         * 主机。
+         */
+        public static final String FL_HOST_ID = "FL_HOST_ID";
     }
 
     // </editor-fold>
@@ -162,7 +168,7 @@ public class BidBid {
     /**
      * 设置：ID。
      */
-    public BidBid setId(String id) {
+    public FlPath setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -198,7 +204,7 @@ public class BidBid {
     /**
      * 设置：版本。
      */
-    public BidBid setVer(Integer ver) {
+    public FlPath setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -234,7 +240,7 @@ public class BidBid {
     /**
      * 设置：时间戳。
      */
-    public BidBid setTs(LocalDateTime ts) {
+    public FlPath setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -270,7 +276,7 @@ public class BidBid {
     /**
      * 设置：是否预设。
      */
-    public BidBid setIsPreset(Boolean isPreset) {
+    public FlPath setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -306,7 +312,7 @@ public class BidBid {
     /**
      * 设置：创建日期时间。
      */
-    public BidBid setCrtDt(LocalDateTime crtDt) {
+    public FlPath setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -342,7 +348,7 @@ public class BidBid {
     /**
      * 设置：创建用户。
      */
-    public BidBid setCrtUserId(String crtUserId) {
+    public FlPath setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -378,7 +384,7 @@ public class BidBid {
     /**
      * 设置：最后修改日期时间。
      */
-    public BidBid setLastModiDt(LocalDateTime lastModiDt) {
+    public FlPath setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -414,7 +420,7 @@ public class BidBid {
     /**
      * 设置：最后修改用户。
      */
-    public BidBid setLastModiUserId(String lastModiUserId) {
+    public FlPath setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -450,7 +456,7 @@ public class BidBid {
     /**
      * 设置：记录状态。
      */
-    public BidBid setStatus(String status) {
+    public FlPath setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -486,7 +492,7 @@ public class BidBid {
     /**
      * 设置：锁定流程实例。
      */
-    public BidBid setLkWfInstId(String lkWfInstId) {
+    public FlPath setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -522,7 +528,7 @@ public class BidBid {
     /**
      * 设置：代码。
      */
-    public BidBid setCode(String code) {
+    public FlPath setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -558,7 +564,7 @@ public class BidBid {
     /**
      * 设置：名称。
      */
-    public BidBid setName(String name) {
+    public FlPath setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -594,7 +600,7 @@ public class BidBid {
     /**
      * 设置：备注。
      */
-    public BidBid setRemark(String remark) {
+    public FlPath setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -630,7 +636,7 @@ public class BidBid {
     /**
      * 设置：快捷码。
      */
-    public BidBid setFastCode(String fastCode) {
+    public FlPath setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
             // 均为null，不做处理。
         } else if (this.fastCode != null && fastCode != null) {
@@ -666,7 +672,7 @@ public class BidBid {
     /**
      * 设置：图标。
      */
-    public BidBid setIconFileGroupId(String iconFileGroupId) {
+    public FlPath setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
             // 均为null，不做处理。
         } else if (this.iconFileGroupId != null && iconFileGroupId != null) {
@@ -688,288 +694,360 @@ public class BidBid {
     }
 
     /**
-     * 报价用户。
+     * 文件上传URL。
      */
-    private String bidByUserId;
+    private String fileUploadUrl;
 
     /**
-     * 获取：报价用户。
+     * 获取：文件上传URL。
      */
-    public String getBidByUserId() {
-        return this.bidByUserId;
+    public String getFileUploadUrl() {
+        return this.fileUploadUrl;
     }
 
     /**
-     * 设置：报价用户。
+     * 设置：文件上传URL。
      */
-    public BidBid setBidByUserId(String bidByUserId) {
-        if (this.bidByUserId == null && bidByUserId == null) {
+    public FlPath setFileUploadUrl(String fileUploadUrl) {
+        if (this.fileUploadUrl == null && fileUploadUrl == null) {
             // 均为null，不做处理。
-        } else if (this.bidByUserId != null && bidByUserId != null) {
+        } else if (this.fileUploadUrl != null && fileUploadUrl != null) {
             // 均非null，判定不等，再做处理：
-            if (this.bidByUserId.compareTo(bidByUserId) != 0) {
-                this.bidByUserId = bidByUserId;
-                if (!this.toUpdateCols.contains("BID_BY_USER_ID")) {
-                    this.toUpdateCols.add("BID_BY_USER_ID");
+            if (this.fileUploadUrl.compareTo(fileUploadUrl) != 0) {
+                this.fileUploadUrl = fileUploadUrl;
+                if (!this.toUpdateCols.contains("FILE_UPLOAD_URL")) {
+                    this.toUpdateCols.add("FILE_UPLOAD_URL");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.bidByUserId = bidByUserId;
-            if (!this.toUpdateCols.contains("BID_BY_USER_ID")) {
-                this.toUpdateCols.add("BID_BY_USER_ID");
+            this.fileUploadUrl = fileUploadUrl;
+            if (!this.toUpdateCols.contains("FILE_UPLOAD_URL")) {
+                this.toUpdateCols.add("FILE_UPLOAD_URL");
             }
         }
         return this;
     }
 
     /**
-     * 报价日期。
+     * 文件附件URL。
      */
-    private LocalDate bidDate;
+    private String fileAttachmentUrl;
 
     /**
-     * 获取：报价日期。
+     * 获取：文件附件URL。
      */
-    public LocalDate getBidDate() {
-        return this.bidDate;
+    public String getFileAttachmentUrl() {
+        return this.fileAttachmentUrl;
     }
 
     /**
-     * 设置：报价日期。
+     * 设置：文件附件URL。
      */
-    public BidBid setBidDate(LocalDate bidDate) {
-        if (this.bidDate == null && bidDate == null) {
+    public FlPath setFileAttachmentUrl(String fileAttachmentUrl) {
+        if (this.fileAttachmentUrl == null && fileAttachmentUrl == null) {
             // 均为null，不做处理。
-        } else if (this.bidDate != null && bidDate != null) {
+        } else if (this.fileAttachmentUrl != null && fileAttachmentUrl != null) {
             // 均非null，判定不等，再做处理：
-            if (this.bidDate.compareTo(bidDate) != 0) {
-                this.bidDate = bidDate;
-                if (!this.toUpdateCols.contains("BID_DATE")) {
-                    this.toUpdateCols.add("BID_DATE");
+            if (this.fileAttachmentUrl.compareTo(fileAttachmentUrl) != 0) {
+                this.fileAttachmentUrl = fileAttachmentUrl;
+                if (!this.toUpdateCols.contains("FILE_ATTACHMENT_URL")) {
+                    this.toUpdateCols.add("FILE_ATTACHMENT_URL");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.bidDate = bidDate;
-            if (!this.toUpdateCols.contains("BID_DATE")) {
-                this.toUpdateCols.add("BID_DATE");
+            this.fileAttachmentUrl = fileAttachmentUrl;
+            if (!this.toUpdateCols.contains("FILE_ATTACHMENT_URL")) {
+                this.toUpdateCols.add("FILE_ATTACHMENT_URL");
             }
         }
         return this;
     }
 
     /**
-     * 报价总额（元）。
+     * 文件内联URL。
      */
-    private BigDecimal bidTotal;
+    private String fileInlineUrl;
 
     /**
-     * 获取：报价总额（元）。
+     * 获取：文件内联URL。
      */
-    public BigDecimal getBidTotal() {
-        return this.bidTotal;
+    public String getFileInlineUrl() {
+        return this.fileInlineUrl;
     }
 
     /**
-     * 设置：报价总额（元）。
+     * 设置：文件内联URL。
      */
-    public BidBid setBidTotal(BigDecimal bidTotal) {
-        if (this.bidTotal == null && bidTotal == null) {
+    public FlPath setFileInlineUrl(String fileInlineUrl) {
+        if (this.fileInlineUrl == null && fileInlineUrl == null) {
             // 均为null，不做处理。
-        } else if (this.bidTotal != null && bidTotal != null) {
+        } else if (this.fileInlineUrl != null && fileInlineUrl != null) {
             // 均非null，判定不等，再做处理：
-            if (this.bidTotal.compareTo(bidTotal) != 0) {
-                this.bidTotal = bidTotal;
-                if (!this.toUpdateCols.contains("BID_TOTAL")) {
-                    this.toUpdateCols.add("BID_TOTAL");
+            if (this.fileInlineUrl.compareTo(fileInlineUrl) != 0) {
+                this.fileInlineUrl = fileInlineUrl;
+                if (!this.toUpdateCols.contains("FILE_INLINE_URL")) {
+                    this.toUpdateCols.add("FILE_INLINE_URL");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.bidTotal = bidTotal;
-            if (!this.toUpdateCols.contains("BID_TOTAL")) {
-                this.toUpdateCols.add("BID_TOTAL");
+            this.fileInlineUrl = fileInlineUrl;
+            if (!this.toUpdateCols.contains("FILE_INLINE_URL")) {
+                this.toUpdateCols.add("FILE_INLINE_URL");
             }
         }
         return this;
     }
 
     /**
-     * 报价成本（元）。
+     * 目录。
      */
-    private BigDecimal bidCost;
+    private String dir;
 
     /**
-     * 获取：报价成本（元）。
+     * 获取：目录。
      */
-    public BigDecimal getBidCost() {
-        return this.bidCost;
+    public String getDir() {
+        return this.dir;
     }
 
     /**
-     * 设置：报价成本（元）。
+     * 设置：目录。
      */
-    public BidBid setBidCost(BigDecimal bidCost) {
-        if (this.bidCost == null && bidCost == null) {
+    public FlPath setDir(String dir) {
+        if (this.dir == null && dir == null) {
             // 均为null，不做处理。
-        } else if (this.bidCost != null && bidCost != null) {
+        } else if (this.dir != null && dir != null) {
             // 均非null，判定不等，再做处理：
-            if (this.bidCost.compareTo(bidCost) != 0) {
-                this.bidCost = bidCost;
-                if (!this.toUpdateCols.contains("BID_COST")) {
-                    this.toUpdateCols.add("BID_COST");
+            if (this.dir.compareTo(dir) != 0) {
+                this.dir = dir;
+                if (!this.toUpdateCols.contains("DIR")) {
+                    this.toUpdateCols.add("DIR");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.bidCost = bidCost;
-            if (!this.toUpdateCols.contains("BID_COST")) {
-                this.toUpdateCols.add("BID_COST");
+            this.dir = dir;
+            if (!this.toUpdateCols.contains("DIR")) {
+                this.toUpdateCols.add("DIR");
             }
         }
         return this;
     }
 
     /**
-     * 报价利润（元）。
+     * 存储空间名称。
      */
-    private BigDecimal bidProfit;
+    private String bucketName;
 
     /**
-     * 获取：报价利润（元）。
+     * 获取：存储空间名称。
      */
-    public BigDecimal getBidProfit() {
-        return this.bidProfit;
+    public String getBucketName() {
+        return this.bucketName;
     }
 
     /**
-     * 设置：报价利润（元）。
+     * 设置：存储空间名称。
      */
-    public BidBid setBidProfit(BigDecimal bidProfit) {
-        if (this.bidProfit == null && bidProfit == null) {
+    public FlPath setBucketName(String bucketName) {
+        if (this.bucketName == null && bucketName == null) {
             // 均为null，不做处理。
-        } else if (this.bidProfit != null && bidProfit != null) {
+        } else if (this.bucketName != null && bucketName != null) {
             // 均非null，判定不等，再做处理：
-            if (this.bidProfit.compareTo(bidProfit) != 0) {
-                this.bidProfit = bidProfit;
-                if (!this.toUpdateCols.contains("BID_PROFIT")) {
-                    this.toUpdateCols.add("BID_PROFIT");
+            if (this.bucketName.compareTo(bucketName) != 0) {
+                this.bucketName = bucketName;
+                if (!this.toUpdateCols.contains("BUCKET_NAME")) {
+                    this.toUpdateCols.add("BUCKET_NAME");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.bidProfit = bidProfit;
-            if (!this.toUpdateCols.contains("BID_PROFIT")) {
-                this.toUpdateCols.add("BID_PROFIT");
+            this.bucketName = bucketName;
+            if (!this.toUpdateCols.contains("BUCKET_NAME")) {
+                this.toUpdateCols.add("BUCKET_NAME");
             }
         }
         return this;
     }
 
     /**
-     * 报价PPT（自动生成）。
+     * 存储空间公有。
      */
-    private String bidPptAutoGen;
+    private Boolean bucketPublic;
 
     /**
-     * 获取：报价PPT（自动生成）。
+     * 获取：存储空间公有。
      */
-    public String getBidPptAutoGen() {
-        return this.bidPptAutoGen;
+    public Boolean getBucketPublic() {
+        return this.bucketPublic;
     }
 
     /**
-     * 设置：报价PPT（自动生成）。
+     * 设置：存储空间公有。
      */
-    public BidBid setBidPptAutoGen(String bidPptAutoGen) {
-        if (this.bidPptAutoGen == null && bidPptAutoGen == null) {
+    public FlPath setBucketPublic(Boolean bucketPublic) {
+        if (this.bucketPublic == null && bucketPublic == null) {
             // 均为null，不做处理。
-        } else if (this.bidPptAutoGen != null && bidPptAutoGen != null) {
+        } else if (this.bucketPublic != null && bucketPublic != null) {
             // 均非null，判定不等，再做处理：
-            if (this.bidPptAutoGen.compareTo(bidPptAutoGen) != 0) {
-                this.bidPptAutoGen = bidPptAutoGen;
-                if (!this.toUpdateCols.contains("BID_PPT_AUTO_GEN")) {
-                    this.toUpdateCols.add("BID_PPT_AUTO_GEN");
+            if (this.bucketPublic.compareTo(bucketPublic) != 0) {
+                this.bucketPublic = bucketPublic;
+                if (!this.toUpdateCols.contains("BUCKET_PUBLIC")) {
+                    this.toUpdateCols.add("BUCKET_PUBLIC");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.bidPptAutoGen = bidPptAutoGen;
-            if (!this.toUpdateCols.contains("BID_PPT_AUTO_GEN")) {
-                this.toUpdateCols.add("BID_PPT_AUTO_GEN");
+            this.bucketPublic = bucketPublic;
+            if (!this.toUpdateCols.contains("BUCKET_PUBLIC")) {
+                this.toUpdateCols.add("BUCKET_PUBLIC");
             }
         }
         return this;
     }
 
     /**
-     * 报价WORD（自动生成）。
+     * 存储空间域名。
      */
-    private String bidWordAutoGen;
+    private String bucketDomainName;
 
     /**
-     * 获取：报价WORD（自动生成）。
+     * 获取：存储空间域名。
      */
-    public String getBidWordAutoGen() {
-        return this.bidWordAutoGen;
+    public String getBucketDomainName() {
+        return this.bucketDomainName;
     }
 
     /**
-     * 设置：报价WORD（自动生成）。
+     * 设置：存储空间域名。
      */
-    public BidBid setBidWordAutoGen(String bidWordAutoGen) {
-        if (this.bidWordAutoGen == null && bidWordAutoGen == null) {
+    public FlPath setBucketDomainName(String bucketDomainName) {
+        if (this.bucketDomainName == null && bucketDomainName == null) {
             // 均为null，不做处理。
-        } else if (this.bidWordAutoGen != null && bidWordAutoGen != null) {
+        } else if (this.bucketDomainName != null && bucketDomainName != null) {
             // 均非null，判定不等，再做处理：
-            if (this.bidWordAutoGen.compareTo(bidWordAutoGen) != 0) {
-                this.bidWordAutoGen = bidWordAutoGen;
-                if (!this.toUpdateCols.contains("BID_WORD_AUTO_GEN")) {
-                    this.toUpdateCols.add("BID_WORD_AUTO_GEN");
+            if (this.bucketDomainName.compareTo(bucketDomainName) != 0) {
+                this.bucketDomainName = bucketDomainName;
+                if (!this.toUpdateCols.contains("BUCKET_DOMAIN_NAME")) {
+                    this.toUpdateCols.add("BUCKET_DOMAIN_NAME");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.bidWordAutoGen = bidWordAutoGen;
-            if (!this.toUpdateCols.contains("BID_WORD_AUTO_GEN")) {
-                this.toUpdateCols.add("BID_WORD_AUTO_GEN");
+            this.bucketDomainName = bucketDomainName;
+            if (!this.toUpdateCols.contains("BUCKET_DOMAIN_NAME")) {
+                this.toUpdateCols.add("BUCKET_DOMAIN_NAME");
             }
         }
         return this;
     }
 
     /**
-     * 报价EXCEL（自动生成）。
+     * 启用HTTPS。
      */
-    private String bidExcelAutoGen;
+    private Boolean enableHttps;
 
     /**
-     * 获取：报价EXCEL（自动生成）。
+     * 获取：启用HTTPS。
      */
-    public String getBidExcelAutoGen() {
-        return this.bidExcelAutoGen;
+    public Boolean getEnableHttps() {
+        return this.enableHttps;
     }
 
     /**
-     * 设置：报价EXCEL（自动生成）。
+     * 设置：启用HTTPS。
      */
-    public BidBid setBidExcelAutoGen(String bidExcelAutoGen) {
-        if (this.bidExcelAutoGen == null && bidExcelAutoGen == null) {
+    public FlPath setEnableHttps(Boolean enableHttps) {
+        if (this.enableHttps == null && enableHttps == null) {
             // 均为null，不做处理。
-        } else if (this.bidExcelAutoGen != null && bidExcelAutoGen != null) {
+        } else if (this.enableHttps != null && enableHttps != null) {
             // 均非null，判定不等，再做处理：
-            if (this.bidExcelAutoGen.compareTo(bidExcelAutoGen) != 0) {
-                this.bidExcelAutoGen = bidExcelAutoGen;
-                if (!this.toUpdateCols.contains("BID_EXCEL_AUTO_GEN")) {
-                    this.toUpdateCols.add("BID_EXCEL_AUTO_GEN");
+            if (this.enableHttps.compareTo(enableHttps) != 0) {
+                this.enableHttps = enableHttps;
+                if (!this.toUpdateCols.contains("ENABLE_HTTPS")) {
+                    this.toUpdateCols.add("ENABLE_HTTPS");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.bidExcelAutoGen = bidExcelAutoGen;
-            if (!this.toUpdateCols.contains("BID_EXCEL_AUTO_GEN")) {
-                this.toUpdateCols.add("BID_EXCEL_AUTO_GEN");
+            this.enableHttps = enableHttps;
+            if (!this.toUpdateCols.contains("ENABLE_HTTPS")) {
+                this.toUpdateCols.add("ENABLE_HTTPS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 是否公开读取。
+     */
+    private Boolean isPublicRead;
+
+    /**
+     * 获取：是否公开读取。
+     */
+    public Boolean getIsPublicRead() {
+        return this.isPublicRead;
+    }
+
+    /**
+     * 设置：是否公开读取。
+     */
+    public FlPath setIsPublicRead(Boolean isPublicRead) {
+        if (this.isPublicRead == null && isPublicRead == null) {
+            // 均为null，不做处理。
+        } else if (this.isPublicRead != null && isPublicRead != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPublicRead.compareTo(isPublicRead) != 0) {
+                this.isPublicRead = isPublicRead;
+                if (!this.toUpdateCols.contains("IS_PUBLIC_READ")) {
+                    this.toUpdateCols.add("IS_PUBLIC_READ");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPublicRead = isPublicRead;
+            if (!this.toUpdateCols.contains("IS_PUBLIC_READ")) {
+                this.toUpdateCols.add("IS_PUBLIC_READ");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 主机。
+     */
+    private String flHostId;
+
+    /**
+     * 获取：主机。
+     */
+    public String getFlHostId() {
+        return this.flHostId;
+    }
+
+    /**
+     * 设置：主机。
+     */
+    public FlPath setFlHostId(String flHostId) {
+        if (this.flHostId == null && flHostId == null) {
+            // 均为null，不做处理。
+        } else if (this.flHostId != null && flHostId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.flHostId.compareTo(flHostId) != 0) {
+                this.flHostId = flHostId;
+                if (!this.toUpdateCols.contains("FL_HOST_ID")) {
+                    this.toUpdateCols.add("FL_HOST_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.flHostId = flHostId;
+            if (!this.toUpdateCols.contains("FL_HOST_ID")) {
+                this.toUpdateCols.add("FL_HOST_ID");
             }
         }
         return this;
@@ -1062,8 +1140,8 @@ public class BidBid {
      *
      * @return
      */
-    public static BidBid newData() {
-        BidBid obj = modelHelper.newData();
+    public static FlPath newData() {
+        FlPath obj = modelHelper.newData();
         return obj;
     }
 
@@ -1072,8 +1150,8 @@ public class BidBid {
      *
      * @return
      */
-    public static BidBid insertData() {
-        BidBid obj = modelHelper.insertData();
+    public static FlPath insertData() {
+        FlPath obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1085,8 +1163,8 @@ public class BidBid {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static BidBid selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        BidBid obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static FlPath selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        FlPath obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1096,7 +1174,7 @@ public class BidBid {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static BidBid selectById(String id) {
+    public static FlPath selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1108,8 +1186,8 @@ public class BidBid {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<BidBid> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<BidBid> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<FlPath> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<FlPath> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1119,7 +1197,7 @@ public class BidBid {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<BidBid> selectByIds(List<String> ids) {
+    public static List<FlPath> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1131,8 +1209,8 @@ public class BidBid {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<BidBid> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<BidBid> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<FlPath> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<FlPath> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1142,7 +1220,7 @@ public class BidBid {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
      */
-    public static List<BidBid> selectByWhere(Where where) {
+    public static List<FlPath> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1154,10 +1232,10 @@ public class BidBid {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static BidBid selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<BidBid> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static FlPath selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<FlPath> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用BidBid.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用FlPath.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmptyList(objList) ? null : objList.get(0);
@@ -1169,7 +1247,7 @@ public class BidBid {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static BidBid selectOneByWhere(Where where) {
+    public static FlPath selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1283,7 +1361,7 @@ public class BidBid {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(BidBid fromModel, BidBid toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(FlPath fromModel, FlPath toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1293,7 +1371,7 @@ public class BidBid {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(BidBid fromModel, BidBid toModel) {
+    public static void copyCols(FlPath fromModel, FlPath toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 

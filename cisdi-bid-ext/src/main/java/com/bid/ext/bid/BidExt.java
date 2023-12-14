@@ -1,16 +1,20 @@
 package com.bid.ext.bid;
 
+import cn.hutool.core.io.FileUtil;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.orm.OrmHelper;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.SharedConstants;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.EntityRecordUtil;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -113,6 +117,61 @@ public class BidExt {
                 BigDecimal total = cost.add(profit);
                 entityRecord.valueMap.put(BidBid.Cols.BID_TOTAL, total);
                 entityRecord.extraEditableAttCodeList.add(BidBid.Cols.BID_TOTAL);
+            });
+        }
+    }
+
+    public void genPpt() {
+
+        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        if (!SharedUtil.isEmptyList(entityRecordList)) {
+            entityRecordList.forEach(entityRecord -> {
+
+
+                // 获取属性：
+                Where attWhere = new Where();
+                attWhere.eq(AdAtt.Cols.CODE, BidBid.Cols.BID_PPT_AUTO_GEN);
+                AdAtt adAtt = AdAtt.selectOneByWhere(attWhere);
+
+                // 获取路径：
+                Where pathWhere = new Where();
+                pathWhere.eq(FlPath.Cols.ID, adAtt.getFilePathId());
+                FlPath flPath = FlPath.selectOneByWhere(pathWhere);
+
+                LocalDate now = LocalDate.now();
+                int year = now.getYear();
+                int monthValue = now.getMonthValue();
+                String month = String.format("00", monthValue);
+                int dayOfMonth = now.getDayOfMonth();
+                String day = String.format("00", dayOfMonth);
+
+                FlFile flFile = FlFile.newData();
+
+                // 将String写入文件，覆盖模式，字符集为UTF-8
+                // String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + flFile.getId() + ".txt";
+                String fileId = flFile.getId();
+                String path = flPath.getDir() + year + "/" + monthValue + "/" + dayOfMonth + "/" + fileId + ".txt";
+                String content = "hello 小虚竹";
+                FileUtil.writeUtf8String(content, path);
+
+                //
+                flFile.setFlPathId(flPath.getId());
+                flFile.setCode(fileId);
+                flFile.setName("报价PPT");
+                flFile.setExt("pptx");
+                flFile.setDspName("报价PPT.pptx");
+                flFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
+                flFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                flFile.setUploadDttm(LocalDateTime.now());
+                flFile.setPhysicalLocation(path);
+                flFile.setOriginFilePhysicalLocation(path);
+                flFile.setIsPublicRead(flPath.getIsPublicRead());
+                flFile.insertById();
+
+                // 将文件ID设置到BidBid上：
+                BidBid bidBid = BidBid.selectById(EntityRecordUtil.getId(entityRecord));
+                bidBid.setBidPptAutoGen(fileId);
+                bidBid.updateById();
             });
         }
     }
