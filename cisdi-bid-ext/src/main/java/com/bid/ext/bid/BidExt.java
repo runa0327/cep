@@ -9,6 +9,8 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.SharedConstants;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.interaction.InvokeActResult;
+import com.qygly.shared.util.DateTimeUtil;
 import com.qygly.shared.util.EntityRecordUtil;
 import com.qygly.shared.util.SharedUtil;
 
@@ -26,7 +28,8 @@ public class BidExt {
 
         // 新建报价头：
         BidBid bidBid = BidBid.insertData();
-        bidBid.setName("111111");
+        bidBid.setCode(DateTimeUtil.dttmToString(LocalDateTime.now()));
+        bidBid.setName("某客户某项目报价");
         bidBid.setBidByUserId(loginInfo.userId);
         bidBid.setBidDate(LocalDate.now());
         bidBid.setBidTotal(new BigDecimal("0"));
@@ -93,6 +96,9 @@ public class BidExt {
             });
         }
 
+        InvokeActResult invokeActResult=new InvokeActResult();
+        invokeActResult.reFetchData=true;
+        ExtJarHelper.returnValue.set(invokeActResult);
     }
 
     private String findNewId(String oldId, Map<String, String> oldIdToNewIdMap) {
@@ -171,6 +177,8 @@ public class BidExt {
                 // 将文件ID设置到BidBid上：
                 BidBid bidBid = BidBid.selectById(EntityRecordUtil.getId(entityRecord));
                 bidBid.setBidPptAutoGen(fileId);
+                bidBid.setBidWordAutoGen(fileId);
+                bidBid.setBidExcelAutoGen(fileId);
                 bidBid.updateById();
             });
         }
