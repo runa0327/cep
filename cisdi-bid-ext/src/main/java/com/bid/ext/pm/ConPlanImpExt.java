@@ -102,7 +102,7 @@ public class ConPlanImpExt {
         } else if (conPlanType == ConPlanType.scape) {
             setCode = "con_plan_milestone_node_scape";
         } else if (conPlanType == ConPlanType.other) {
-            setCode = "con_plan_milestone_node_scape";
+            setCode = "con_plan_milestone_node_other";
         }
 
         return getGrSetValueList(setCode);
