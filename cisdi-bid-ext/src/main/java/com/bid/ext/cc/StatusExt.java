@@ -40,7 +40,7 @@ public class StatusExt {
         if (entityRecordList != null) {
             for (EntityRecord entityRecord : entityRecordList) {
                 String csCommId = entityRecord.csCommId;
-                Map<String, Object> valueMap = entityRecord.valueMap;
+//                Map<String, Object> valueMap = entityRecord.valueMap;
                 int update = myJdbcTemplate.update("update " + entityCode + " t set t.CC_QS_CURRENT_STATE_ID = ? where t.id=?",STATE_ID , csCommId);
                 log.info("已更新：{}", update);
             }
