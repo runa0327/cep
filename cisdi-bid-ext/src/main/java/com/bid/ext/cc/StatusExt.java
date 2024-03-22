@@ -14,19 +14,19 @@ import java.util.Map;
 public class StatusExt {
 
     public void changeStatusToZG() {
-        //整改
+        //待整改
         String STATE_ID = "1750797105878466560";
         changeStatus(STATE_ID);
     }
 
     public void changeStatusToFH() {
-        //复核
+        //待复核
         String STATE_ID = "1750797109250686976";
         changeStatus(STATE_ID);
     }
 
     public void changeStatusToHG() {
-        //合格
+        //整改合格
         String STATE_ID = "1750797111708549120";
         changeStatus(STATE_ID);
     }
