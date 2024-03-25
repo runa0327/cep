@@ -22,7 +22,7 @@ public class TestCourseExt {
      * 方法一。SQL，不推荐。
      */
     private void f1() {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
 
         String newId = ExtJarHelper.insertData("TEST_COURSE");
         myJdbcTemplate.update("UPDATE TEST_COURSE T SET T.NAME=? WHERE T.ID=?", getRandomName(), newId);

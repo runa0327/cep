@@ -15,13 +15,13 @@ import java.util.Map;
 public class VerifyFileExt {
 
     public void insertFileName(){
-        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
         String csCommId = entityRecord.csCommId;
         Map<String, Object> valueMap = entityRecord.valueMap;
-        SevInfo sevInfo = ExtJarHelper.sevInfo.get();
+        SevInfo sevInfo = ExtJarHelper.getSevInfo();
         EntityInfo entityInfo = sevInfo.entityInfo;
         String entityCode = entityInfo.code;
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         String fileId = String.valueOf(valueMap.get("CC_ATTACHMENT"));
         String extSql = "select f.ext,f.dsp_name from fl_file f where id = ?";
         String fileName = myJdbcTemplate.queryForMap(extSql,fileId).get("dsp_name").toString();
@@ -29,17 +29,17 @@ public class VerifyFileExt {
     }
 
     public void verify(){
-        EntityRecord entityRecord = ExtJarHelper.entityRecordList.get().get(0);
+        EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
         String csCommId = entityRecord.csCommId;
         Map<String, Object> valueMap = entityRecord.valueMap;
-        SevInfo sevInfo = ExtJarHelper.sevInfo.get();
+        SevInfo sevInfo = ExtJarHelper.getSevInfo();
         EntityInfo entityInfo = sevInfo.entityInfo;
         String entityCode = entityInfo.code;
         String fileId = String.valueOf(valueMap.get("CC_ATTACHMENT"));
         Object filetypeIdObj = valueMap.get("CC_DOC_FILE_TYPE_ID");
         String filetypeId = filetypeIdObj != null ? filetypeIdObj.toString() : null;
 
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         String extSql = "select f.ext,f.dsp_name from fl_file f where id = ?";
         String extName = myJdbcTemplate.queryForMap(extSql,fileId).get("ext").toString();
         String fileName = myJdbcTemplate.queryForMap(extSql,fileId).get("dsp_name").toString();

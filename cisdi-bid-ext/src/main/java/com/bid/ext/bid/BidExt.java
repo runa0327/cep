@@ -24,13 +24,13 @@ import java.util.Map;
 
 public class BidExt {
     public void createBid() {
-        LoginInfo loginInfo = ExtJarHelper.loginInfo.get();
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
 
         // 新建报价头：
         BidBid bidBid = BidBid.insertData();
         bidBid.setCode(DateTimeUtil.dttmToString(LocalDateTime.now()));
         bidBid.setName("某客户某项目报价");
-        bidBid.setBidByUserId(loginInfo.userId);
+        bidBid.setBidByUserId(loginInfo.userInfo.id);
         bidBid.setBidDate(LocalDate.now());
         bidBid.setBidTotal(new BigDecimal("0"));
         bidBid.setBidCost(new BigDecimal("0"));
@@ -42,7 +42,7 @@ public class BidExt {
 
         // 拷贝能力分类：
         List<BidAbilityCate> srcList = BidAbilityCate.selectByWhere(null);
-        if (!SharedUtil.isEmptyList(srcList)) {
+        if (!SharedUtil.isEmpty(srcList)) {
             // 第1轮循环，插入但不构建父子关系：
             srcList.forEach(src -> {
                 BidBidAbilityCate tgt = BidBidAbilityCate.newData();
@@ -81,7 +81,7 @@ public class BidExt {
 
         // 拷贝能力素材：
         List<BidAbilityMaterial> bidAbilityMaterialList = BidAbilityMaterial.selectByWhere(null);
-        if (!SharedUtil.isEmptyList(bidAbilityMaterialList)) {
+        if (!SharedUtil.isEmpty(bidAbilityMaterialList)) {
             bidAbilityMaterialList.forEach(src -> {
                 BidBidAbilityMaterial tgt = BidBidAbilityMaterial.newData();
 
@@ -98,16 +98,16 @@ public class BidExt {
 
         InvokeActResult invokeActResult=new InvokeActResult();
         invokeActResult.reFetchData=true;
-        ExtJarHelper.returnValue.set(invokeActResult);
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     private String findNewId(String oldId, Map<String, String> oldIdToNewIdMap) {
-        if (SharedUtil.isEmptyString(oldId)) {
+        if (SharedUtil.isEmpty(oldId)) {
             return null;
         }
 
         String newId = oldIdToNewIdMap.get(oldId);
-        if (SharedUtil.isEmptyString(newId)) {
+        if (SharedUtil.isEmpty(newId)) {
             throw new BaseException("没有旧ID（" + oldId + "）对应的新ID！");
         }
 
@@ -115,8 +115,8 @@ public class BidExt {
     }
 
     public void calcTotal() {
-        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
-        if (!SharedUtil.isEmptyList(entityRecordList)) {
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        if (!SharedUtil.isEmpty(entityRecordList)) {
             entityRecordList.forEach(entityRecord -> {
                 BigDecimal cost = new BigDecimal(entityRecord.valueMap.get(BidBid.Cols.BID_COST).toString());
                 BigDecimal profit = new BigDecimal(entityRecord.valueMap.get(BidBid.Cols.BID_PROFIT).toString());
@@ -129,8 +129,8 @@ public class BidExt {
 
     public void genPpt() {
 
-        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
-        if (!SharedUtil.isEmptyList(entityRecordList)) {
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        if (!SharedUtil.isEmpty(entityRecordList)) {
             entityRecordList.forEach(entityRecord -> {
 
 

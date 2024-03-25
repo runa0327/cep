@@ -31,11 +31,11 @@ public class StatusExt {
         changeStatus(STATE_ID);
     }
     private void changeStatus(String STATE_ID){
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
-        SevInfo sevInfo = ExtJarHelper.sevInfo.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        SevInfo sevInfo = ExtJarHelper.getSevInfo();
         EntityInfo entityInfo = sevInfo.entityInfo;
         String entityCode = entityInfo.code;
-        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
 
         if (entityRecordList != null) {
             for (EntityRecord entityRecord : entityRecordList) {

@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
  */
 public class ConPlanImpExt {
     public void check() {
-        List<EntityRecord> entityRecordList = ExtJarHelper.entityRecordList.get();
-        if (!SharedUtil.isEmptyList(entityRecordList)) {
+        List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
+        if (!SharedUtil.isEmpty(entityRecordList)) {
             for (EntityRecord entityRecord : entityRecordList) {
                 check(entityRecord);
             }
@@ -25,7 +25,7 @@ public class ConPlanImpExt {
     }
 
     private void check(EntityRecord entityRecord) {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
 
         Object pm_prj_id = entityRecord.valueMap.get("PM_PRJ_ID");
         Map<String, Object> pm_prj = myJdbcTemplate.queryForMap("select * from pm_prj t where t.id=?", pm_prj_id);
@@ -51,9 +51,9 @@ public class ConPlanImpExt {
         if (isSelect) {
             // 选择：
 
-            if (SharedUtil.isEmptyObject(con_plan_node_by_select)) {
+            if (SharedUtil.isEmpty(con_plan_node_by_select)) {
                 throw new BaseException("必须“选择”！");
-            } else if (!SharedUtil.isEmptyObject(con_plan_node_by_input)) {
+            } else if (!SharedUtil.isEmpty(con_plan_node_by_input)) {
                 throw new BaseException("不能“输入”！");
             }
 
@@ -70,9 +70,9 @@ public class ConPlanImpExt {
             }
         } else {
             // 输入：
-            if (!SharedUtil.isEmptyObject(con_plan_node_by_select)) {
+            if (!SharedUtil.isEmpty(con_plan_node_by_select)) {
                 throw new BaseException("不能“选择”！");
-            } else if (SharedUtil.isEmptyObject(con_plan_node_by_input)) {
+            } else if (SharedUtil.isEmpty(con_plan_node_by_input)) {
                 throw new BaseException("必须“输入”！");
             }
         }
@@ -124,7 +124,7 @@ public class ConPlanImpExt {
     }
 
     private static List<Map<String, Object>> getGrSetValueList(String setCode) {
-        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.myJdbcTemplate.get();
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         List<Map<String, Object>> list = myJdbcTemplate.queryForList("select v.* from gr_set s join gr_set_value v on s.id=v.GR_SET_ID and s.code=? order by v.SEQ_NO", setCode);
         return list;
     }

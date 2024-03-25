@@ -1094,7 +1094,7 @@ public class FlPath {
      * @param refreshThis 更新后，是否刷新当前对象。刷新时将刷新所有列。
      */
     public void updateById(List<String> includeCols, List<String> excludeCols, boolean refreshThis) {
-        if (SharedUtil.isEmptyList(includeCols) && SharedUtil.isEmptyList(toUpdateCols)) {
+        if (SharedUtil.isEmpty(includeCols) && SharedUtil.isEmpty(toUpdateCols)) {
             // 既未指明includeCols，也无toUpdateCols，则不更新。
 
             if (refreshThis) {
@@ -1102,7 +1102,7 @@ public class FlPath {
             }
         } else {
             // 若已指明includeCols，或有toUpdateCols；则先以includeCols为准，再以toUpdateCols为准：
-            modelHelper.updateById(SharedUtil.isEmptyList(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
+            modelHelper.updateById(SharedUtil.isEmpty(includeCols) ? toUpdateCols : includeCols, excludeCols, refreshThis, this.id, this);
             this.clearToUpdateCols();
         }
     }
@@ -1184,7 +1184,7 @@ public class FlPath {
      * @param ids         ID列表。
      * @param includeCols 获取时包含的列，空为包含所有。
      * @param excludeCols 获取时排除的列，空为不排除。
-     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
+     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
     public static List<FlPath> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
         List<FlPath> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
@@ -1195,7 +1195,7 @@ public class FlPath {
      * 根据ID列表获取数据。
      *
      * @param ids ID列表。
-     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
+     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
     public static List<FlPath> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
@@ -1207,7 +1207,7 @@ public class FlPath {
      * @param where       Where条件。
      * @param includeCols 获取时包含的列，空为包含所有。
      * @param excludeCols 获取时排除的列，空为不排除。
-     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
+     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
     public static List<FlPath> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
         List<FlPath> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
@@ -1218,7 +1218,7 @@ public class FlPath {
      * 根据Where条件获取数据。
      *
      * @param where Where条件。
-     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmptyList(list)方法判断有无。
+     * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
     public static List<FlPath> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
@@ -1238,7 +1238,7 @@ public class FlPath {
             throw new BaseException("调用FlPath.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
-        return SharedUtil.isEmptyList(objList) ? null : objList.get(0);
+        return SharedUtil.isEmpty(objList) ? null : objList.get(0);
     }
 
     /**
