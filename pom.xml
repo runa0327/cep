@@ -11,13 +11,6 @@
 
     <modules>
         <module>cisdi-bid-ext</module>
-        <module>cisdi-pms-data-transfer</module>
-        <module>cisdi-pms-ext</module>
-        <module>cisdi-pms-mq</module>
-        <module>cisdi-pms-job</module>
-        <module>cisdi-pms-third-party-login</module>
-        <module>cisdi-pms-externa-interface</module>
-        <module>cisdi-pms-wordToPdf</module>
     </modules>
 
     <properties>
