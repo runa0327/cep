@@ -30,6 +30,19 @@ public class StatusExt {
         String STATE_ID = "1750797111708549120";
         changeStatus(STATE_ID);
     }
+
+    public void changeStatusToCSHG() {
+        //合格
+        String STATE_ID = "1768549220054958080";
+        changeStatus(STATE_ID);
+    }
+
+    public void changeStatusToCG() {
+        //草稿
+        String STATE_ID = "1768549241596903424";
+        changeStatus(STATE_ID);
+    }
+
     private void changeStatus(String STATE_ID){
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         SevInfo sevInfo = ExtJarHelper.getSevInfo();
