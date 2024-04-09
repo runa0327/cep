@@ -1,12 +1,13 @@
 package com.bid.ext.cc;
 
-import com.bid.ext.model.*;
+import com.bid.ext.model.AdAtt;
+import com.bid.ext.model.CcQsInspection;
+import com.bid.ext.model.FlFile;
+import com.bid.ext.model.FlPath;
 import com.bid.ext.utils.DownloadUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
-import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.login.LoginInfo;
-import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.EntityRecordUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -48,20 +51,20 @@ public class GenExt {
             Map<String, Object> valueMap = entityRecord.valueMap;
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("year", year);
-//                map.put("CC_QS_ISSUE_POINT_TYPE_ID",valueMap.get("CC_QS_ISSUE_POINT_TYPE_ID").toString());
-            byte[] b = DownloadUtils.createWord(map, "check.docx");
+            map.put("CC_QS_ISSUE_POINT_TYPE_ID", valueMap.get("CC_QS_ISSUE_POINT_TYPE_ID").toString());
+            byte[] word = DownloadUtils.createWord(map, "check.docx");
+            byte[] b = convertWordToPDF(word);
 
             FlFile flFile = FlFile.newData();
 
-            // 将String写入文件，覆盖模式，字符集为UTF-8
+            // 将String写入文件，覆盖模式，字符集为UTF-8x``
             String fileId = flFile.getId();
 
             // 构建文件名和路径
-            String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".docx";
-//            String path = "D:/" + year + "/" + month + "/" + day + "/" + fileId + ".docx";
+            String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
             saveWordToFile(b, path);
             boolean fileExists = checkFileExists(path);
-            if(fileExists) {
+            if (fileExists) {
                 //获取文件属性
                 File file = new File(path);
                 long bytes = file.length();
@@ -74,8 +77,8 @@ public class GenExt {
                 flFile.setFlPathId(flPath.getId());
                 flFile.setCode(fileId);
                 flFile.setName("整改通知单");
-                flFile.setExt("docx");
-                flFile.setDspName("整改通知单.docx");
+                flFile.setExt("pdf");
+                flFile.setDspName("整改通知单.pdf");
                 flFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
                 flFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
                 flFile.setSizeKb(sizeKb);
@@ -124,4 +127,39 @@ public class GenExt {
         return file.exists();
     }
 
+    public static byte[] convertWordToPDF(byte[] docxBytes) {
+        try {
+            // 创建临时文件保存 DOCX 内容
+            Path tempDocx = Files.createTempFile(null, ".docx");
+            Files.write(tempDocx, docxBytes);
+
+            // 定义 PDF 临时文件的路径
+            Path tempPdf = Files.createTempFile(null, ".pdf");
+
+            // 指定 LibreOffice 的安装路径及命令行工具
+            String libreOfficePath = "C:\\Program Files\\LibreOffice\\program\\soffice";
+
+            // 调用 LibreOffice 进行转换
+            ProcessBuilder builder = new ProcessBuilder();
+            builder.command(libreOfficePath, "--convert-to", "pdf:writer_pdf_Export", tempDocx.toString(), "--outdir", tempPdf.getParent().toString());
+            Process process = builder.start();
+            process.waitFor();
+
+            // 计算转换后的 PDF 文件名
+            String pdfFileName = tempDocx.getFileName().toString().replaceAll("\\.docx$", ".pdf");
+            Path pdfFilePath = tempPdf.getParent().resolve(pdfFileName);
+
+            // 读取生成的 PDF 文件
+            byte[] pdfBytes = Files.readAllBytes(pdfFilePath);
+
+            // 清理临时文件
+            Files.delete(tempDocx);
+            Files.delete(pdfFilePath);
+
+            return pdfBytes;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
