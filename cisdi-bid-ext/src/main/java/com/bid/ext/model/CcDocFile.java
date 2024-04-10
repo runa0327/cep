@@ -111,25 +111,29 @@ public class CcDocFile {
          */
         public static final String REMARK = "REMARK";
         /**
-         * {"EN": "模型文件ID", "ZH_CN": "模型文件ID", "ZH_TW": "模型文件ID"}。
+         * {"EN": "模型文件ID", "ZH_CN": "预览文件ID", "ZH_TW": "模型文件ID"}。
          */
-        public static final String MODEL_FILE_ID = "MODEL_FILE_ID";
+        public static final String CC_PREVIEW_FILE_ID = "CC_PREVIEW_FILE_ID";
         /**
-         * {"EN": "模型转换状态", "ZH_CN": "模型转换状态", "ZH_TW": "模型转换状态"}。
+         * {"EN": "预览文件显示大小", "ZH_CN": "预览文件显示大小", "ZH_TW": "预览文件显示大小"}。
          */
-        public static final String CC_MODEL_CONVERSION_STATUS_ID = "CC_MODEL_CONVERSION_STATUS_ID";
+        public static final String CC_PREVIEW_DSP_SIZE = "CC_PREVIEW_DSP_SIZE";
         /**
-         * {"EN": "模型转换开始", "ZH_CN": "模型转换开始", "ZH_TW": "模型转换开始"}。
+         * {"EN": "模型转换状态", "ZH_CN": "预览转换状态", "ZH_TW": "模型转换状态"}。
          */
-        public static final String MODEL_CONVERSION_START = "MODEL_CONVERSION_START";
+        public static final String CC_PREVIEW_CONVERSION_STATUS_ID = "CC_PREVIEW_CONVERSION_STATUS_ID";
         /**
-         * {"EN": "模型转换结束", "ZH_CN": "模型转换结束", "ZH_TW": "模型转换结束"}。
+         * {"EN": "模型转换开始", "ZH_CN": "预览转换开始", "ZH_TW": "模型转换开始"}。
          */
-        public static final String MODEL_CONVERSION_END = "MODEL_CONVERSION_END";
+        public static final String CC_PREVIEW_CONVERSION_START = "CC_PREVIEW_CONVERSION_START";
         /**
-         * {"EN": "模型预览地址", "ZH_CN": "模型预览地址", "ZH_TW": "模型预览地址"}。
+         * {"EN": "模型转换结束", "ZH_CN": "预览转换结束", "ZH_TW": "模型转换结束"}。
          */
-        public static final String MODEL_PREVIEW_URL = "MODEL_PREVIEW_URL";
+        public static final String CC_PREVIEW_CONVERSION_END = "CC_PREVIEW_CONVERSION_END";
+        /**
+         * {"EN": "模型预览地址", "ZH_CN": "预览地址", "ZH_TW": "模型预览地址"}。
+         */
+        public static final String CC_PREVIEW_URL = "CC_PREVIEW_URL";
         /**
          * {"EN": "CC_DOC_DIR_ID", "ZH_CN": "资料目录", "ZH_TW": "繁：资料目录"}。
          */
@@ -718,180 +722,216 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "模型文件ID", "ZH_CN": "模型文件ID", "ZH_TW": "模型文件ID"}。
+     * {"EN": "模型文件ID", "ZH_CN": "预览文件ID", "ZH_TW": "模型文件ID"}。
      */
-    private String modelFileId;
+    private String ccPreviewFileId;
 
     /**
-     * 获取：{"EN": "模型文件ID", "ZH_CN": "模型文件ID", "ZH_TW": "模型文件ID"}。
+     * 获取：{"EN": "模型文件ID", "ZH_CN": "预览文件ID", "ZH_TW": "模型文件ID"}。
      */
-    public String getModelFileId() {
-        return this.modelFileId;
+    public String getCcPreviewFileId() {
+        return this.ccPreviewFileId;
     }
 
     /**
-     * 设置：{"EN": "模型文件ID", "ZH_CN": "模型文件ID", "ZH_TW": "模型文件ID"}。
+     * 设置：{"EN": "模型文件ID", "ZH_CN": "预览文件ID", "ZH_TW": "模型文件ID"}。
      */
-    public CcDocFile setModelFileId(String modelFileId) {
-        if (this.modelFileId == null && modelFileId == null) {
+    public CcDocFile setCcPreviewFileId(String ccPreviewFileId) {
+        if (this.ccPreviewFileId == null && ccPreviewFileId == null) {
             // 均为null，不做处理。
-        } else if (this.modelFileId != null && modelFileId != null) {
+        } else if (this.ccPreviewFileId != null && ccPreviewFileId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.modelFileId.compareTo(modelFileId) != 0) {
-                this.modelFileId = modelFileId;
-                if (!this.toUpdateCols.contains("MODEL_FILE_ID")) {
-                    this.toUpdateCols.add("MODEL_FILE_ID");
+            if (this.ccPreviewFileId.compareTo(ccPreviewFileId) != 0) {
+                this.ccPreviewFileId = ccPreviewFileId;
+                if (!this.toUpdateCols.contains("CC_PREVIEW_FILE_ID")) {
+                    this.toUpdateCols.add("CC_PREVIEW_FILE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.modelFileId = modelFileId;
-            if (!this.toUpdateCols.contains("MODEL_FILE_ID")) {
-                this.toUpdateCols.add("MODEL_FILE_ID");
+            this.ccPreviewFileId = ccPreviewFileId;
+            if (!this.toUpdateCols.contains("CC_PREVIEW_FILE_ID")) {
+                this.toUpdateCols.add("CC_PREVIEW_FILE_ID");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "模型转换状态", "ZH_CN": "模型转换状态", "ZH_TW": "模型转换状态"}。
+     * {"EN": "预览文件显示大小", "ZH_CN": "预览文件显示大小", "ZH_TW": "预览文件显示大小"}。
      */
-    private String ccModelConversionStatusId;
+    private String ccPreviewDspSize;
 
     /**
-     * 获取：{"EN": "模型转换状态", "ZH_CN": "模型转换状态", "ZH_TW": "模型转换状态"}。
+     * 获取：{"EN": "预览文件显示大小", "ZH_CN": "预览文件显示大小", "ZH_TW": "预览文件显示大小"}。
      */
-    public String getCcModelConversionStatusId() {
-        return this.ccModelConversionStatusId;
+    public String getCcPreviewDspSize() {
+        return this.ccPreviewDspSize;
     }
 
     /**
-     * 设置：{"EN": "模型转换状态", "ZH_CN": "模型转换状态", "ZH_TW": "模型转换状态"}。
+     * 设置：{"EN": "预览文件显示大小", "ZH_CN": "预览文件显示大小", "ZH_TW": "预览文件显示大小"}。
      */
-    public CcDocFile setCcModelConversionStatusId(String ccModelConversionStatusId) {
-        if (this.ccModelConversionStatusId == null && ccModelConversionStatusId == null) {
+    public CcDocFile setCcPreviewDspSize(String ccPreviewDspSize) {
+        if (this.ccPreviewDspSize == null && ccPreviewDspSize == null) {
             // 均为null，不做处理。
-        } else if (this.ccModelConversionStatusId != null && ccModelConversionStatusId != null) {
+        } else if (this.ccPreviewDspSize != null && ccPreviewDspSize != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccModelConversionStatusId.compareTo(ccModelConversionStatusId) != 0) {
-                this.ccModelConversionStatusId = ccModelConversionStatusId;
-                if (!this.toUpdateCols.contains("CC_MODEL_CONVERSION_STATUS_ID")) {
-                    this.toUpdateCols.add("CC_MODEL_CONVERSION_STATUS_ID");
+            if (this.ccPreviewDspSize.compareTo(ccPreviewDspSize) != 0) {
+                this.ccPreviewDspSize = ccPreviewDspSize;
+                if (!this.toUpdateCols.contains("CC_PREVIEW_DSP_SIZE")) {
+                    this.toUpdateCols.add("CC_PREVIEW_DSP_SIZE");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccModelConversionStatusId = ccModelConversionStatusId;
-            if (!this.toUpdateCols.contains("CC_MODEL_CONVERSION_STATUS_ID")) {
-                this.toUpdateCols.add("CC_MODEL_CONVERSION_STATUS_ID");
+            this.ccPreviewDspSize = ccPreviewDspSize;
+            if (!this.toUpdateCols.contains("CC_PREVIEW_DSP_SIZE")) {
+                this.toUpdateCols.add("CC_PREVIEW_DSP_SIZE");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "模型转换开始", "ZH_CN": "模型转换开始", "ZH_TW": "模型转换开始"}。
+     * {"EN": "模型转换状态", "ZH_CN": "预览转换状态", "ZH_TW": "模型转换状态"}。
      */
-    private LocalDateTime modelConversionStart;
+    private String ccPreviewConversionStatusId;
 
     /**
-     * 获取：{"EN": "模型转换开始", "ZH_CN": "模型转换开始", "ZH_TW": "模型转换开始"}。
+     * 获取：{"EN": "模型转换状态", "ZH_CN": "预览转换状态", "ZH_TW": "模型转换状态"}。
      */
-    public LocalDateTime getModelConversionStart() {
-        return this.modelConversionStart;
+    public String getCcPreviewConversionStatusId() {
+        return this.ccPreviewConversionStatusId;
     }
 
     /**
-     * 设置：{"EN": "模型转换开始", "ZH_CN": "模型转换开始", "ZH_TW": "模型转换开始"}。
+     * 设置：{"EN": "模型转换状态", "ZH_CN": "预览转换状态", "ZH_TW": "模型转换状态"}。
      */
-    public CcDocFile setModelConversionStart(LocalDateTime modelConversionStart) {
-        if (this.modelConversionStart == null && modelConversionStart == null) {
+    public CcDocFile setCcPreviewConversionStatusId(String ccPreviewConversionStatusId) {
+        if (this.ccPreviewConversionStatusId == null && ccPreviewConversionStatusId == null) {
             // 均为null，不做处理。
-        } else if (this.modelConversionStart != null && modelConversionStart != null) {
+        } else if (this.ccPreviewConversionStatusId != null && ccPreviewConversionStatusId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.modelConversionStart.compareTo(modelConversionStart) != 0) {
-                this.modelConversionStart = modelConversionStart;
-                if (!this.toUpdateCols.contains("MODEL_CONVERSION_START")) {
-                    this.toUpdateCols.add("MODEL_CONVERSION_START");
+            if (this.ccPreviewConversionStatusId.compareTo(ccPreviewConversionStatusId) != 0) {
+                this.ccPreviewConversionStatusId = ccPreviewConversionStatusId;
+                if (!this.toUpdateCols.contains("CC_PREVIEW_CONVERSION_STATUS_ID")) {
+                    this.toUpdateCols.add("CC_PREVIEW_CONVERSION_STATUS_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.modelConversionStart = modelConversionStart;
-            if (!this.toUpdateCols.contains("MODEL_CONVERSION_START")) {
-                this.toUpdateCols.add("MODEL_CONVERSION_START");
+            this.ccPreviewConversionStatusId = ccPreviewConversionStatusId;
+            if (!this.toUpdateCols.contains("CC_PREVIEW_CONVERSION_STATUS_ID")) {
+                this.toUpdateCols.add("CC_PREVIEW_CONVERSION_STATUS_ID");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "模型转换结束", "ZH_CN": "模型转换结束", "ZH_TW": "模型转换结束"}。
+     * {"EN": "模型转换开始", "ZH_CN": "预览转换开始", "ZH_TW": "模型转换开始"}。
      */
-    private LocalDateTime modelConversionEnd;
+    private LocalDateTime ccPreviewConversionStart;
 
     /**
-     * 获取：{"EN": "模型转换结束", "ZH_CN": "模型转换结束", "ZH_TW": "模型转换结束"}。
+     * 获取：{"EN": "模型转换开始", "ZH_CN": "预览转换开始", "ZH_TW": "模型转换开始"}。
      */
-    public LocalDateTime getModelConversionEnd() {
-        return this.modelConversionEnd;
+    public LocalDateTime getCcPreviewConversionStart() {
+        return this.ccPreviewConversionStart;
     }
 
     /**
-     * 设置：{"EN": "模型转换结束", "ZH_CN": "模型转换结束", "ZH_TW": "模型转换结束"}。
+     * 设置：{"EN": "模型转换开始", "ZH_CN": "预览转换开始", "ZH_TW": "模型转换开始"}。
      */
-    public CcDocFile setModelConversionEnd(LocalDateTime modelConversionEnd) {
-        if (this.modelConversionEnd == null && modelConversionEnd == null) {
+    public CcDocFile setCcPreviewConversionStart(LocalDateTime ccPreviewConversionStart) {
+        if (this.ccPreviewConversionStart == null && ccPreviewConversionStart == null) {
             // 均为null，不做处理。
-        } else if (this.modelConversionEnd != null && modelConversionEnd != null) {
+        } else if (this.ccPreviewConversionStart != null && ccPreviewConversionStart != null) {
             // 均非null，判定不等，再做处理：
-            if (this.modelConversionEnd.compareTo(modelConversionEnd) != 0) {
-                this.modelConversionEnd = modelConversionEnd;
-                if (!this.toUpdateCols.contains("MODEL_CONVERSION_END")) {
-                    this.toUpdateCols.add("MODEL_CONVERSION_END");
+            if (this.ccPreviewConversionStart.compareTo(ccPreviewConversionStart) != 0) {
+                this.ccPreviewConversionStart = ccPreviewConversionStart;
+                if (!this.toUpdateCols.contains("CC_PREVIEW_CONVERSION_START")) {
+                    this.toUpdateCols.add("CC_PREVIEW_CONVERSION_START");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.modelConversionEnd = modelConversionEnd;
-            if (!this.toUpdateCols.contains("MODEL_CONVERSION_END")) {
-                this.toUpdateCols.add("MODEL_CONVERSION_END");
+            this.ccPreviewConversionStart = ccPreviewConversionStart;
+            if (!this.toUpdateCols.contains("CC_PREVIEW_CONVERSION_START")) {
+                this.toUpdateCols.add("CC_PREVIEW_CONVERSION_START");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "模型预览地址", "ZH_CN": "模型预览地址", "ZH_TW": "模型预览地址"}。
+     * {"EN": "模型转换结束", "ZH_CN": "预览转换结束", "ZH_TW": "模型转换结束"}。
      */
-    private String modelPreviewUrl;
+    private LocalDateTime ccPreviewConversionEnd;
 
     /**
-     * 获取：{"EN": "模型预览地址", "ZH_CN": "模型预览地址", "ZH_TW": "模型预览地址"}。
+     * 获取：{"EN": "模型转换结束", "ZH_CN": "预览转换结束", "ZH_TW": "模型转换结束"}。
      */
-    public String getModelPreviewUrl() {
-        return this.modelPreviewUrl;
+    public LocalDateTime getCcPreviewConversionEnd() {
+        return this.ccPreviewConversionEnd;
     }
 
     /**
-     * 设置：{"EN": "模型预览地址", "ZH_CN": "模型预览地址", "ZH_TW": "模型预览地址"}。
+     * 设置：{"EN": "模型转换结束", "ZH_CN": "预览转换结束", "ZH_TW": "模型转换结束"}。
      */
-    public CcDocFile setModelPreviewUrl(String modelPreviewUrl) {
-        if (this.modelPreviewUrl == null && modelPreviewUrl == null) {
+    public CcDocFile setCcPreviewConversionEnd(LocalDateTime ccPreviewConversionEnd) {
+        if (this.ccPreviewConversionEnd == null && ccPreviewConversionEnd == null) {
             // 均为null，不做处理。
-        } else if (this.modelPreviewUrl != null && modelPreviewUrl != null) {
+        } else if (this.ccPreviewConversionEnd != null && ccPreviewConversionEnd != null) {
             // 均非null，判定不等，再做处理：
-            if (this.modelPreviewUrl.compareTo(modelPreviewUrl) != 0) {
-                this.modelPreviewUrl = modelPreviewUrl;
-                if (!this.toUpdateCols.contains("MODEL_PREVIEW_URL")) {
-                    this.toUpdateCols.add("MODEL_PREVIEW_URL");
+            if (this.ccPreviewConversionEnd.compareTo(ccPreviewConversionEnd) != 0) {
+                this.ccPreviewConversionEnd = ccPreviewConversionEnd;
+                if (!this.toUpdateCols.contains("CC_PREVIEW_CONVERSION_END")) {
+                    this.toUpdateCols.add("CC_PREVIEW_CONVERSION_END");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.modelPreviewUrl = modelPreviewUrl;
-            if (!this.toUpdateCols.contains("MODEL_PREVIEW_URL")) {
-                this.toUpdateCols.add("MODEL_PREVIEW_URL");
+            this.ccPreviewConversionEnd = ccPreviewConversionEnd;
+            if (!this.toUpdateCols.contains("CC_PREVIEW_CONVERSION_END")) {
+                this.toUpdateCols.add("CC_PREVIEW_CONVERSION_END");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "模型预览地址", "ZH_CN": "预览地址", "ZH_TW": "模型预览地址"}。
+     */
+    private String ccPreviewUrl;
+
+    /**
+     * 获取：{"EN": "模型预览地址", "ZH_CN": "预览地址", "ZH_TW": "模型预览地址"}。
+     */
+    public String getCcPreviewUrl() {
+        return this.ccPreviewUrl;
+    }
+
+    /**
+     * 设置：{"EN": "模型预览地址", "ZH_CN": "预览地址", "ZH_TW": "模型预览地址"}。
+     */
+    public CcDocFile setCcPreviewUrl(String ccPreviewUrl) {
+        if (this.ccPreviewUrl == null && ccPreviewUrl == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPreviewUrl != null && ccPreviewUrl != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPreviewUrl.compareTo(ccPreviewUrl) != 0) {
+                this.ccPreviewUrl = ccPreviewUrl;
+                if (!this.toUpdateCols.contains("CC_PREVIEW_URL")) {
+                    this.toUpdateCols.add("CC_PREVIEW_URL");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPreviewUrl = ccPreviewUrl;
+            if (!this.toUpdateCols.contains("CC_PREVIEW_URL")) {
+                this.toUpdateCols.add("CC_PREVIEW_URL");
             }
         }
         return this;
