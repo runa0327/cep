@@ -111,6 +111,10 @@ public class CcDocFile {
          */
         public static final String REMARK = "REMARK";
         /**
+         * {"EN": "CC_DOC_FILE_TYPE_ID", "ZH_CN": "资料文件类型", "ZH_TW": "繁：资料文件类型"}。
+         */
+        public static final String CC_DOC_FILE_TYPE_ID = "CC_DOC_FILE_TYPE_ID";
+        /**
          * {"EN": "模型文件ID", "ZH_CN": "预览文件ID", "ZH_TW": "模型文件ID"}。
          */
         public static final String CC_PREVIEW_FILE_ID = "CC_PREVIEW_FILE_ID";
@@ -716,6 +720,42 @@ public class CcDocFile {
             this.remark = remark;
             if (!this.toUpdateCols.contains("REMARK")) {
                 this.toUpdateCols.add("REMARK");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "CC_DOC_FILE_TYPE_ID", "ZH_CN": "资料文件类型", "ZH_TW": "繁：资料文件类型"}。
+     */
+    private String ccDocFileTypeId;
+
+    /**
+     * 获取：{"EN": "CC_DOC_FILE_TYPE_ID", "ZH_CN": "资料文件类型", "ZH_TW": "繁：资料文件类型"}。
+     */
+    public String getCcDocFileTypeId() {
+        return this.ccDocFileTypeId;
+    }
+
+    /**
+     * 设置：{"EN": "CC_DOC_FILE_TYPE_ID", "ZH_CN": "资料文件类型", "ZH_TW": "繁：资料文件类型"}。
+     */
+    public CcDocFile setCcDocFileTypeId(String ccDocFileTypeId) {
+        if (this.ccDocFileTypeId == null && ccDocFileTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccDocFileTypeId != null && ccDocFileTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccDocFileTypeId.compareTo(ccDocFileTypeId) != 0) {
+                this.ccDocFileTypeId = ccDocFileTypeId;
+                if (!this.toUpdateCols.contains("CC_DOC_FILE_TYPE_ID")) {
+                    this.toUpdateCols.add("CC_DOC_FILE_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccDocFileTypeId = ccDocFileTypeId;
+            if (!this.toUpdateCols.contains("CC_DOC_FILE_TYPE_ID")) {
+                this.toUpdateCols.add("CC_DOC_FILE_TYPE_ID");
             }
         }
         return this;

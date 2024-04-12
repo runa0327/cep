@@ -4,8 +4,10 @@ import com.bid.ext.model.AdAtt;
 import com.bid.ext.model.CcQsInspection;
 import com.bid.ext.model.FlFile;
 import com.bid.ext.model.FlPath;
+import com.bid.ext.utils.DatabaseUtils;
 import com.bid.ext.utils.DownloadUtils;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
@@ -49,9 +51,23 @@ public class GenExt {
             FlPath flPath = FlPath.selectOneByWhere(pathWhere);
 
             Map<String, Object> valueMap = entityRecord.valueMap;
+            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+
+//            String tableName = "CC_PRJ";
+//            String sql = "select IF(JSON_VALID(NAME),NAME->>'$." + loginInfo.currentLangId + "',NAME) name from " + tableName + " where NAME is not null and id = ?";
+//            String ccPrjId = valueMap.get("CC_PRJ_ID").toString();
+//            Map<String, Object> prjMap = myJdbcTemplate.queryForMap(sql, ccPrjId);
+            String prjName = DatabaseUtils.fetchNameFromTable("CC_PRJ", valueMap.get("CC_PRJ_ID").toString(), loginInfo.currentLangId.toString());
+            String issuePointTypeName = DatabaseUtils.fetchNameFromTable("CC_QS_ISSUE_POINT_TYPE", valueMap.get("CC_QS_ISSUE_POINT_TYPE_ID").toString(), loginInfo.currentLangId.toString());
+            String inspectionTypeName = DatabaseUtils.fetchNameFromTable("CC_QS_INSPECTION_TYPE", valueMap.get("CC_QS_INSPECTION_TYPE_ID").toString(), loginInfo.currentLangId.toString());
+
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("year", year);
-            map.put("CC_QS_ISSUE_POINT_TYPE_ID", valueMap.get("CC_QS_ISSUE_POINT_TYPE_ID").toString());
+            map.put("prjName", prjName);
+            map.put("issuePointTypeName", issuePointTypeName);
+            map.put("inspectionTypeName", inspectionTypeName);
+//            map.put("CC_QS_ISSUE_POINT_ID", valueMap.get("CC_QS_ISSUE_POINT_ID").toString());
+
             byte[] word = DownloadUtils.createWord(map, "check.docx");
             byte[] b = convertWordToPDF(word);
 

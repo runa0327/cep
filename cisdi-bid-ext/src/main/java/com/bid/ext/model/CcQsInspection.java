@@ -745,19 +745,19 @@ public class CcQsInspection {
     /**
      * {"EN": "CC_QS_INSPECTION_TIME", "ZH_CN": "质安发布时间", "ZH_TW": "繁：质安发布时间"}。
      */
-    private LocalDateTime ccQsInspectionTime;
+    private LocalDate ccQsInspectionTime;
 
     /**
      * 获取：{"EN": "CC_QS_INSPECTION_TIME", "ZH_CN": "质安发布时间", "ZH_TW": "繁：质安发布时间"}。
      */
-    public LocalDateTime getCcQsInspectionTime() {
+    public LocalDate getCcQsInspectionTime() {
         return this.ccQsInspectionTime;
     }
 
     /**
      * 设置：{"EN": "CC_QS_INSPECTION_TIME", "ZH_CN": "质安发布时间", "ZH_TW": "繁：质安发布时间"}。
      */
-    public CcQsInspection setCcQsInspectionTime(LocalDateTime ccQsInspectionTime) {
+    public CcQsInspection setCcQsInspectionTime(LocalDate ccQsInspectionTime) {
         if (this.ccQsInspectionTime == null && ccQsInspectionTime == null) {
             // 均为null，不做处理。
         } else if (this.ccQsInspectionTime != null && ccQsInspectionTime != null) {

@@ -6,7 +6,7 @@ import com.bid.ext.model.TranslateRequestBody;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.BaseException;
-import com.qygly.shared.ad.ext.ExtBrowserWindowToOpen;
+import com.qygly.shared.ad.ext.UrlToOpen;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.DateTimeUtil;
@@ -96,7 +96,7 @@ public class PreViewExt {
 
     public void preview() throws JsonProcessingException {
         InvokeActResult invokeActResult = new InvokeActResult();
-        invokeActResult.extBrowserWindowToOpenList = new ArrayList<>();
+        invokeActResult.urlToOpenList = new ArrayList<>();
 
         RestTemplate restTemplate = ExtJarHelper.getRestTemplate();
         String token = doGetStringStringMap();
@@ -106,6 +106,7 @@ public class PreViewExt {
             String id = EntityRecordUtil.getId(entityRecord);
             CcDocFile ccDocFile = CcDocFile.selectById(id);
             String modelFileId = ccDocFile.getCcPreviewFileId();
+            String type = ccDocFile.getCcDocFileTypeId();
 
             // 1、获取预览地址：
             String previewUrl = ccDocFile.getCcPreviewUrl();
@@ -254,11 +255,11 @@ public class PreViewExt {
                         log.error(message + shareResponse);
                         throw new BaseException(message);
                     }
-                    String shareResponseBody = shareResponse.getBody();
-
-                    Map shareMap = JsonUtil.fromJson(shareResponseBody, Map.class);
-                    Map shareData = (Map) shareMap.get("data");
-                    previewUrl = shareData.get("url").toString();
+//                    String shareResponseBody = shareResponse.getBody();
+//                    Map shareMap = JsonUtil.fromJson(shareResponseBody, Map.class);
+//                    Map shareData = (Map) shareMap.get("data");
+//                    previewUrl = shareData.get("url").toString();
+                    previewUrl = "../preview?type=" + type + "&previewFileId=" + modelFileId;
                     ccDocFile.setCcPreviewUrl(previewUrl);
                     ccDocFile.updateById();
                 } catch (InterruptedException e) {
@@ -267,9 +268,10 @@ public class PreViewExt {
                 }
             }
             // 4、若有预览地址，则打开：
-            ExtBrowserWindowToOpen extBrowserWindowToOpen = new ExtBrowserWindowToOpen();
+            UrlToOpen extBrowserWindowToOpen = new UrlToOpen();
             extBrowserWindowToOpen.url = previewUrl;
-            invokeActResult.extBrowserWindowToOpenList.add(extBrowserWindowToOpen);
+            extBrowserWindowToOpen.title = "预览";
+            invokeActResult.urlToOpenList.add(extBrowserWindowToOpen);
         }
         ExtJarHelper.setReturnValue(invokeActResult);
     }
