@@ -139,6 +139,10 @@ public class CcDocFile {
          */
         public static final String CC_PREVIEW_URL = "CC_PREVIEW_URL";
         /**
+         * {"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+         */
+        public static final String IS_DEFAULT = "IS_DEFAULT";
+        /**
          * {"EN": "CC_DOC_DIR_ID", "ZH_CN": "资料目录", "ZH_TW": "繁：资料目录"}。
          */
         public static final String CC_DOC_DIR_ID = "CC_DOC_DIR_ID";
@@ -972,6 +976,42 @@ public class CcDocFile {
             this.ccPreviewUrl = ccPreviewUrl;
             if (!this.toUpdateCols.contains("CC_PREVIEW_URL")) {
                 this.toUpdateCols.add("CC_PREVIEW_URL");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+     */
+    private Boolean isDefault;
+
+    /**
+     * 获取：{"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+     */
+    public Boolean getIsDefault() {
+        return this.isDefault;
+    }
+
+    /**
+     * 设置：{"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+     */
+    public CcDocFile setIsDefault(Boolean isDefault) {
+        if (this.isDefault == null && isDefault == null) {
+            // 均为null，不做处理。
+        } else if (this.isDefault != null && isDefault != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isDefault.compareTo(isDefault) != 0) {
+                this.isDefault = isDefault;
+                if (!this.toUpdateCols.contains("IS_DEFAULT")) {
+                    this.toUpdateCols.add("IS_DEFAULT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isDefault = isDefault;
+            if (!this.toUpdateCols.contains("IS_DEFAULT")) {
+                this.toUpdateCols.add("IS_DEFAULT");
             }
         }
         return this;
