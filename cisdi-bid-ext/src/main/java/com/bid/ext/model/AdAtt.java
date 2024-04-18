@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 属性。
+ * {"EN": "EN：属性", "ZH_CN": "属性", "ZH_TW": "繁：属性"}。
  */
 public class AdAtt {
 
@@ -48,369 +48,373 @@ public class AdAtt {
 
     public static class Cols {
         /**
-         * ID。
+         * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
          */
         public static final String ID = "ID";
         /**
-         * 版本。
+         * {"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
          */
         public static final String VER = "VER";
         /**
-         * 时间戳。
+         * {"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
          */
         public static final String TS = "TS";
         /**
-         * 是否预设。
+         * {"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
          */
         public static final String IS_PRESET = "IS_PRESET";
         /**
-         * 创建日期时间。
+         * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
          */
         public static final String CRT_DT = "CRT_DT";
         /**
-         * 创建用户。
+         * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
          */
         public static final String CRT_USER_ID = "CRT_USER_ID";
         /**
-         * 最后修改日期时间。
+         * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
          */
         public static final String LAST_MODI_DT = "LAST_MODI_DT";
         /**
-         * 最后修改用户。
+         * {"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
          */
         public static final String LAST_MODI_USER_ID = "LAST_MODI_USER_ID";
         /**
-         * 记录状态。
+         * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
          */
         public static final String STATUS = "STATUS";
         /**
-         * 锁定流程实例。
+         * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
-         * 快捷码。
+         * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
          */
         public static final String FAST_CODE = "FAST_CODE";
         /**
-         * 图标。
+         * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * 代码。
+         * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
          */
         public static final String CODE = "CODE";
         /**
-         * 名称。
+         * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
          */
         public static final String NAME = "NAME";
         /**
-         * 备注。
+         * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
          */
         public static final String REMARK = "REMARK";
         /**
-         * 属性子类型。
+         * {"EN": "AD_ATT_SUB_TYPE_ID", "ZH_CN": "属性子类型", "ZH_TW": "繁：属性子类型"}。
          */
         public static final String AD_ATT_SUB_TYPE_ID = "AD_ATT_SUB_TYPE_ID";
         /**
-         * 虚拟表达式。
+         * {"EN": "VIRTUAL_EXPRESSION", "ZH_CN": "虚拟表达式", "ZH_TW": "繁：虚拟表达式"}。
          */
         public static final String VIRTUAL_EXPRESSION = "VIRTUAL_EXPRESSION";
         /**
-         * 快捷操作组。
+         * {"EN": "AD_FAST_ACT_GRP_ID", "ZH_CN": "快捷操作组", "ZH_TW": "繁：快捷操作组"}。
          */
         public static final String AD_FAST_ACT_GRP_ID = "AD_FAST_ACT_GRP_ID";
         /**
-         * 宽度。
+         * {"EN": "WIDTH", "ZH_CN": "宽度", "ZH_TW": "繁：宽度"}。
          */
         public static final String WIDTH = "WIDTH";
         /**
-         * 最小宽度。
+         * {"EN": "MIN_WIDTH", "ZH_CN": "最小宽度", "ZH_TW": "繁：最小宽度"}。
          */
         public static final String MIN_WIDTH = "MIN_WIDTH";
         /**
-         * 最大宽度。
+         * {"EN": "MAX_WIDTH", "ZH_CN": "最大宽度", "ZH_TW": "繁：最大宽度"}。
          */
         public static final String MAX_WIDTH = "MAX_WIDTH";
         /**
-         * 序号。
+         * {"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
          */
         public static final String SEQ_NO = "SEQ_NO";
         /**
-         * 是否标识。
+         * {"EN": "IS_IDENTIFYING", "ZH_CN": "是否标识", "ZH_TW": "繁：是否标识"}。
          */
         public static final String IS_IDENTIFYING = "IS_IDENTIFYING";
         /**
-         * 是否默认显示。
+         * {"EN": "IS_SHOWN_BY_DEFAULT", "ZH_CN": "是否默认显示", "ZH_TW": "繁：是否默认显示"}。
          */
         public static final String IS_SHOWN_BY_DEFAULT = "IS_SHOWN_BY_DEFAULT";
         /**
-         * 可改逻辑。
+         * {"EN": "EDITABLE_LOGIC", "ZH_CN": "可改逻辑", "ZH_TW": "繁：可改逻辑"}。
          */
         public static final String EDITABLE_LOGIC = "EDITABLE_LOGIC";
         /**
-         * 忽略实体记录可改。
+         * {"EN": "IGNORE_ENT_REC_EDITABLE", "ZH_CN": "忽略实体记录可改", "ZH_TW": "繁：忽略实体记录可改"}。
          */
         public static final String IGNORE_ENT_REC_EDITABLE = "IGNORE_ENT_REC_EDITABLE";
         /**
-         * 必填逻辑。
+         * {"EN": "MANDATORY_LOGIC", "ZH_CN": "必填逻辑", "ZH_TW": "繁：必填逻辑"}。
          */
         public static final String MANDATORY_LOGIC = "MANDATORY_LOGIC";
         /**
-         * 默认值逻辑。
+         * {"EN": "DEFAULT_VALUE_LOGIC", "ZH_CN": "默认值逻辑", "ZH_TW": "繁：默认值逻辑"}。
          */
         public static final String DEFAULT_VALUE_LOGIC = "DEFAULT_VALUE_LOGIC";
         /**
-         * 可见逻辑。
+         * {"EN": "VISIBLE_LOGIC", "ZH_CN": "可见逻辑", "ZH_TW": "繁：可见逻辑"}。
          */
         public static final String VISIBLE_LOGIC = "VISIBLE_LOGIC";
         /**
-         * 有效逻辑。
+         * {"EN": "VALID_LOGIC", "ZH_CN": "有效逻辑", "ZH_TW": "繁：有效逻辑"}。
          */
         public static final String VALID_LOGIC = "VALID_LOGIC";
         /**
-         * 文本悬浮二维码。
+         * {"EN": "TEXT_HOVER_AS_QR_CODE", "ZH_CN": "文本悬浮二维码", "ZH_TW": "繁：文本悬浮二维码"}。
          */
         public static final String TEXT_HOVER_AS_QR_CODE = "TEXT_HOVER_AS_QR_CODE";
         /**
-         * 奇行单元格样式文本逻辑。
+         * {"EN": "ODD_ROW_CELL_ST_LOGIC", "ZH_CN": "前景色逻辑", "ZH_TW": "繁：奇行单元格样式文本逻辑"}。
          */
-        public static final String ODD_ROW_CELL_ST_LOGIC = "ODD_ROW_CELL_ST_LOGIC";
+        public static final String FORE_COLOR_LOGIC = "FORE_COLOR_LOGIC";
         /**
-         * 偶行单元格样式文本逻辑。
+         * {"EN": "EVEN_ROW_CELL_ST_LOGIC", "ZH_CN": "背景色逻辑", "ZH_TW": "繁：偶行单元格样式文本逻辑"}。
          */
-        public static final String EVEN_ROW_CELL_ST_LOGIC = "EVEN_ROW_CELL_ST_LOGIC";
+        public static final String BACK_COLOR_LOGIC = "BACK_COLOR_LOGIC";
         /**
-         * 组合标题。
+         * {"EN": "HEADER_SPAN_TITLE", "ZH_CN": "组合标题", "ZH_TW": "繁：组合标题"}。
          */
         public static final String HEADER_SPAN_TITLE = "HEADER_SPAN_TITLE";
         /**
-         * 文件路径。
+         * {"EN": "FILE_PATH_ID", "ZH_CN": "文件路径", "ZH_TW": "繁：文件路径"}。
          */
         public static final String FILE_PATH_ID = "FILE_PATH_ID";
         /**
-         * 文件类型。
+         * {"EN": "FILE_TYPES", "ZH_CN": "文件类型", "ZH_TW": "繁：文件类型"}。
          */
         public static final String FILE_TYPES = "FILE_TYPES";
         /**
-         * 文件最大KB。
+         * {"EN": "FILE_MAX_KB", "ZH_CN": "文件最大KB", "ZH_TW": "繁：文件最大KB"}。
          */
         public static final String FILE_MAX_KB = "FILE_MAX_KB";
         /**
-         * 文件允许批量上传。
+         * {"EN": "FILE_IS_MULTI", "ZH_CN": "文件允许批量上传", "ZH_TW": "繁：文件允许批量上传"}。
          */
         public static final String FILE_IS_MULTI = "FILE_IS_MULTI";
         /**
-         * 文件是否作为图片查看。
+         * {"EN": "FILE_VIEW_AS_IMG", "ZH_CN": "文件是否作为图片查看", "ZH_TW": "繁：文件是否作为图片查看"}。
          */
         public static final String FILE_VIEW_AS_IMG = "FILE_VIEW_AS_IMG";
         /**
-         * 文件是否作为图片悬浮。
+         * {"EN": "FILE_HOVER_AS_IMG", "ZH_CN": "文件是否作为图片悬浮", "ZH_TW": "繁：文件是否作为图片悬浮"}。
          */
         public static final String FILE_HOVER_AS_IMG = "FILE_HOVER_AS_IMG";
         /**
-         * 文件图片宽度。
+         * {"EN": "FILE_IMG_WIDTH", "ZH_CN": "文件图片宽度", "ZH_TW": "繁：文件图片宽度"}。
          */
         public static final String FILE_IMG_WIDTH = "FILE_IMG_WIDTH";
         /**
-         * 文件图片高度。
+         * {"EN": "FILE_IMG_HEIGHT", "ZH_CN": "文件图片高度", "ZH_TW": "繁：文件图片高度"}。
          */
         public static final String FILE_IMG_HEIGHT = "FILE_IMG_HEIGHT";
         /**
-         * 文件图片压缩尺寸。
+         * {"EN": "FILE_IMG_COMPRESS_SIZE", "ZH_CN": "文件图片压缩尺寸", "ZH_TW": "繁：文件图片压缩尺寸"}。
          */
         public static final String FILE_IMG_COMPRESS_SIZE = "FILE_IMG_COMPRESS_SIZE";
         /**
-         * 是否分组。
+         * {"EN": "IS_GROUPED", "ZH_CN": "是否分组", "ZH_TW": "繁：是否分组"}。
          */
         public static final String IS_GROUPED = "IS_GROUPED";
         /**
-         * 汇总模式。
+         * {"EN": "SUM_MODE_ID", "ZH_CN": "汇总模式", "ZH_TW": "繁：汇总模式"}。
          */
         public static final String SUM_MODE_ID = "SUM_MODE_ID";
         /**
-         * 汇总前缀。
+         * {"EN": "SUM_PREFIX", "ZH_CN": "汇总前缀", "ZH_TW": "繁：汇总前缀"}。
          */
         public static final String SUM_PREFIX = "SUM_PREFIX";
         /**
-         * 汇总后缀。
+         * {"EN": "SUM_SUFFIX", "ZH_CN": "汇总后缀", "ZH_TW": "繁：汇总后缀"}。
          */
         public static final String SUM_SUFFIX = "SUM_SUFFIX";
         /**
-         * 是否隐藏分组汇总。
+         * {"EN": "IS_GROUP_SUM_HIDDEN", "ZH_CN": "是否隐藏分组汇总", "ZH_TW": "繁：是否隐藏分组汇总"}。
          */
         public static final String IS_GROUP_SUM_HIDDEN = "IS_GROUP_SUM_HIDDEN";
         /**
-         * 是否隐藏总计汇总。
+         * {"EN": "IS_TTL_SUM_HIDDEN", "ZH_CN": "是否隐藏总计汇总", "ZH_TW": "繁：是否隐藏总计汇总"}。
          */
         public static final String IS_TTL_SUM_HIDDEN = "IS_TTL_SUM_HIDDEN";
         /**
-         * 横向对齐。
+         * {"EN": "H_ALIGN", "ZH_CN": "横向对齐", "ZH_TW": "繁：横向对齐"}。
          */
         public static final String H_ALIGN = "H_ALIGN";
         /**
-         * 是否固定。
+         * {"EN": "IS_FIXED", "ZH_CN": "是否固定", "ZH_TW": "繁：是否固定"}。
          */
         public static final String IS_FIXED = "IS_FIXED";
         /**
-         * 显示格式。
+         * {"EN": "DISPLAY_FORMAT", "ZH_CN": "显示格式", "ZH_TW": "繁：显示格式"}。
          */
         public static final String DISPLAY_FORMAT = "DISPLAY_FORMAT";
         /**
-         * 变量名称。
+         * {"EN": "VAR_NAME", "ZH_CN": "变量名称", "ZH_TW": "繁：变量名称"}。
          */
         public static final String VAR_NAME = "VAR_NAME";
         /**
-         * 默认值逻辑（从）。
+         * {"EN": "DEFAULT_VALUE_LOGIC_FROM", "ZH_CN": "默认值逻辑（从）", "ZH_TW": "繁：默认值逻辑（从）"}。
          */
         public static final String DEFAULT_VALUE_LOGIC_FROM = "DEFAULT_VALUE_LOGIC_FROM";
         /**
-         * 默认值逻辑（到）。
+         * {"EN": "DEFAULT_VALUE_LOGIC_TO", "ZH_CN": "默认值逻辑（到）", "ZH_TW": "繁：默认值逻辑（到）"}。
          */
         public static final String DEFAULT_VALUE_LOGIC_TO = "DEFAULT_VALUE_LOGIC_TO";
         /**
-         * 引用的实体视图。
+         * {"EN": "REFED_SEV_ID", "ZH_CN": "引用的实体视图", "ZH_TW": "繁：引用的实体视图"}。
          */
         public static final String REFED_SEV_ID = "REFED_SEV_ID";
         /**
-         * 引用的视图部分列表。
+         * {"EN": "REFED_VP_IDS", "ZH_CN": "引用的视图部分列表", "ZH_TW": "繁：引用的视图部分列表"}。
          */
         public static final String REFED_VP_IDS = "REFED_VP_IDS";
         /**
-         * 引用的WHERE语句。
+         * {"EN": "REFED_WHERE_CLAUSE", "ZH_CN": "引用的WHERE语句", "ZH_TW": "繁：引用的WHERE语句"}。
          */
         public static final String REFED_WHERE_CLAUSE = "REFED_WHERE_CLAUSE";
         /**
-         * 引用删除模式。
+         * {"EN": "REFED_ON_DEL_MODE", "ZH_CN": "引用删除模式", "ZH_TW": "繁：引用删除模式"}。
          */
         public static final String REFED_ON_DEL_MODE = "REFED_ON_DEL_MODE";
         /**
-         * 引用的启用缓存。
+         * {"EN": "REFED_CACHE_ENABLED", "ZH_CN": "引用的启用缓存", "ZH_TW": "繁：引用的启用缓存"}。
          */
         public static final String REFED_CACHE_ENABLED = "REFED_CACHE_ENABLED";
         /**
-         * 引用的下拉禁用。
+         * {"EN": "REFED_DROPDOWN_DISABLED", "ZH_CN": "引用的下拉禁用", "ZH_TW": "繁：引用的下拉禁用"}。
          */
         public static final String REFED_DROPDOWN_DISABLED = "REFED_DROPDOWN_DISABLED";
         /**
-         * 引用的搜索禁用。
+         * {"EN": "REFED_SEARCH_DISABLED", "ZH_CN": "引用的搜索禁用", "ZH_TW": "繁：引用的搜索禁用"}。
          */
         public static final String REFED_SEARCH_DISABLED = "REFED_SEARCH_DISABLED";
         /**
-         * 引用的弹出宽度。
+         * {"EN": "REFED_POPUP_WIDTH", "ZH_CN": "引用的弹出宽度", "ZH_TW": "繁：引用的弹出宽度"}。
          */
         public static final String REFED_POPUP_WIDTH = "REFED_POPUP_WIDTH";
         /**
-         * 引用的弹出高度。
+         * {"EN": "REFED_POPUP_HEIGHT", "ZH_CN": "引用的弹出高度", "ZH_TW": "繁：引用的弹出高度"}。
          */
         public static final String REFED_POPUP_HEIGHT = "REFED_POPUP_HEIGHT";
         /**
-         * 引用的可选择逻辑。
+         * {"EN": "REFED_SELECTABLE_LOGIC", "ZH_CN": "引用的可选择逻辑", "ZH_TW": "繁：引用的可选择逻辑"}。
          */
         public static final String REFED_SELECTABLE_LOGIC = "REFED_SELECTABLE_LOGIC";
         /**
-         * 引用的详情视图。
+         * {"EN": "REFED_DTL_VIEW_ID", "ZH_CN": "引用的详情视图", "ZH_TW": "繁：引用的详情视图"}。
          */
         public static final String REFED_DTL_VIEW_ID = "REFED_DTL_VIEW_ID";
         /**
-         * 引用的详情视图是否启用。
+         * {"EN": "REFED_DTL_VIEW_ENABLED", "ZH_CN": "引用的详情视图是否启用", "ZH_TW": "繁：引用的详情视图是否启用"}。
          */
         public static final String REFED_DTL_VIEW_ENABLED = "REFED_DTL_VIEW_ENABLED";
         /**
-         * 定义SQL。
+         * {"EN": "DEF_SQL", "ZH_CN": "定义SQL", "ZH_TW": "繁：定义SQL"}。
          */
         public static final String DEF_SQL = "DEF_SQL";
         /**
-         * 是否必填。
+         * {"EN": "IS_MANDATORY", "ZH_CN": "是否必填", "ZH_TW": "繁：是否必填"}。
          */
         public static final String IS_MANDATORY = "IS_MANDATORY";
         /**
-         * 索引类型。
+         * {"EN": "AD_INDEX_TYPE_ID", "ZH_CN": "索引类型", "ZH_TW": "繁：索引类型"}。
          */
         public static final String AD_INDEX_TYPE_ID = "AD_INDEX_TYPE_ID";
         /**
-         * 创建外键。
+         * {"EN": "CREATE_FK", "ZH_CN": "创建外键", "ZH_TW": "繁：创建外键"}。
          */
         public static final String CREATE_FK = "CREATE_FK";
         /**
-         * 表单项标题隐藏。
+         * {"EN": "FORM_ITEM_TITLE_HIDDEN", "ZH_CN": "表单项标题隐藏", "ZH_TW": "繁：表单项标题隐藏"}。
          */
         public static final String FORM_ITEM_TITLE_HIDDEN = "FORM_ITEM_TITLE_HIDDEN";
         /**
-         * 表单项标题在上。
+         * {"EN": "FORM_ITEM_TITLE_TOP", "ZH_CN": "表单项标题在上", "ZH_TW": "繁：表单项标题在上"}。
          */
         public static final String FORM_ITEM_TITLE_TOP = "FORM_ITEM_TITLE_TOP";
         /**
-         * 表单项标题换行。
+         * {"EN": "FORM_ITEM_TITLE_WRAP", "ZH_CN": "表单项标题换行", "ZH_TW": "繁：表单项标题换行"}。
          */
         public static final String FORM_ITEM_TITLE_WRAP = "FORM_ITEM_TITLE_WRAP";
         /**
-         * 表单项宽度。
+         * {"EN": "FORM_ITEM_WIDTH", "ZH_CN": "表单项宽度", "ZH_TW": "繁：表单项宽度"}。
          */
         public static final String FORM_ITEM_WIDTH = "FORM_ITEM_WIDTH";
         /**
-         * 表单项高度。
+         * {"EN": "FORM_ITEM_HEIGHT", "ZH_CN": "表单项高度", "ZH_TW": "繁：表单项高度"}。
          */
         public static final String FORM_ITEM_HEIGHT = "FORM_ITEM_HEIGHT";
         /**
-         * 表单项行跨度。
+         * {"EN": "FORM_ITEM_ROW_SPAN", "ZH_CN": "表单项行跨度", "ZH_TW": "繁：表单项行跨度"}。
          */
         public static final String FORM_ITEM_ROW_SPAN = "FORM_ITEM_ROW_SPAN";
         /**
-         * 表单项列跨度。
+         * {"EN": "FORM_ITEM_COL_SPAN", "ZH_CN": "表单项列跨度", "ZH_TW": "繁：表单项列跨度"}。
          */
         public static final String FORM_ITEM_COL_SPAN = "FORM_ITEM_COL_SPAN";
         /**
-         * 在列表页隐藏。
+         * {"EN": "HIDE_IN_LIST", "ZH_CN": "在列表页隐藏", "ZH_TW": "繁：在列表页隐藏"}。
          */
         public static final String HIDE_IN_LIST = "HIDE_IN_LIST";
         /**
-         * 在详情页隐藏。
+         * {"EN": "HIDE_IN_DTL", "ZH_CN": "在详情页隐藏", "ZH_TW": "繁：在详情页隐藏"}。
          */
         public static final String HIDE_IN_DTL = "HIDE_IN_DTL";
         /**
-         * 在打印时隐藏。
+         * {"EN": "HIDE_IN_PRINT", "ZH_CN": "在打印时隐藏", "ZH_TW": "繁：在打印时隐藏"}。
          */
         public static final String HIDE_IN_PRINT = "HIDE_IN_PRINT";
         /**
-         * 在简单过滤里隐藏。
+         * {"EN": "HIDE_IN_SIMPLE_FILTER", "ZH_CN": "在简单过滤里隐藏", "ZH_TW": "繁：在简单过滤里隐藏"}。
          */
         public static final String HIDE_IN_SIMPLE_FILTER = "HIDE_IN_SIMPLE_FILTER";
         /**
-         * 在复杂过滤里隐藏。
+         * {"EN": "HIDE_IN_COMPLEX_FILTER", "ZH_CN": "在复杂过滤里隐藏", "ZH_TW": "繁：在复杂过滤里隐藏"}。
          */
         public static final String HIDE_IN_COMPLEX_FILTER = "HIDE_IN_COMPLEX_FILTER";
         /**
-         * 存储计量单位。
+         * {"EN": "STORE_UOM_ID", "ZH_CN": "存储计量单位", "ZH_TW": "繁：存储计量单位"}。
          */
         public static final String STORE_UOM_ID = "STORE_UOM_ID";
         /**
-         * 显示计量单位。
+         * {"EN": "DISPLAY_UOM_ID", "ZH_CN": "显示计量单位", "ZH_TW": "繁：显示计量单位"}。
          */
         public static final String DISPLAY_UOM_ID = "DISPLAY_UOM_ID";
         /**
-         * 是否详情链接。
+         * {"EN": "IS_DTL_LINK", "ZH_CN": "是否详情链接", "ZH_TW": "繁：是否详情链接"}。
          */
         public static final String IS_DTL_LINK = "IS_DTL_LINK";
         /**
-         * 在XS列表页隐藏。
+         * {"EN": "HIDE_IN_LIST_ON_XS", "ZH_CN": "在XS列表页隐藏", "ZH_TW": "繁：在XS列表页隐藏"}。
          */
         public static final String HIDE_IN_LIST_ON_XS = "HIDE_IN_LIST_ON_XS";
         /**
-         * 在SM列表页隐藏。
+         * {"EN": "HIDE_IN_LIST_ON_SM", "ZH_CN": "在SM列表页隐藏", "ZH_TW": "繁：在SM列表页隐藏"}。
          */
         public static final String HIDE_IN_LIST_ON_SM = "HIDE_IN_LIST_ON_SM";
         /**
-         * 在MD列表页隐藏。
+         * {"EN": "HIDE_IN_LIST_ON_MD", "ZH_CN": "在MD列表页隐藏", "ZH_TW": "繁：在MD列表页隐藏"}。
          */
         public static final String HIDE_IN_LIST_ON_MD = "HIDE_IN_LIST_ON_MD";
         /**
-         * 在LG列表页隐藏。
+         * {"EN": "HIDE_IN_LIST_ON_LG", "ZH_CN": "在LG列表页隐藏", "ZH_TW": "繁：在LG列表页隐藏"}。
          */
         public static final String HIDE_IN_LIST_ON_LG = "HIDE_IN_LIST_ON_LG";
         /**
-         * 在XL列表页隐藏。
+         * {"EN": "HIDE_IN_LIST_ON_XL", "ZH_CN": "在XL列表页隐藏", "ZH_TW": "繁：在XL列表页隐藏"}。
          */
         public static final String HIDE_IN_LIST_ON_XL = "HIDE_IN_LIST_ON_XL";
+        /**
+         * {"EN": "ENABLE_I18N", "ZH_CN": "启用国际化", "ZH_TW": "繁：启用国际化"}。
+         */
+        public static final String ENABLE_I18N = "ENABLE_I18N";
     }
 
     // </editor-fold>
@@ -419,19 +423,19 @@ public class AdAtt {
     // <editor-fold>
 
     /**
-     * ID。
+     * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
      */
     private String id;
 
     /**
-     * 获取：ID。
+     * 获取：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
      */
     public String getId() {
         return this.id;
     }
 
     /**
-     * 设置：ID。
+     * 设置：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
      */
     public AdAtt setId(String id) {
         if (this.id == null && id == null) {
@@ -455,19 +459,19 @@ public class AdAtt {
     }
 
     /**
-     * 版本。
+     * {"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
      */
     private Integer ver;
 
     /**
-     * 获取：版本。
+     * 获取：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
      */
     public Integer getVer() {
         return this.ver;
     }
 
     /**
-     * 设置：版本。
+     * 设置：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
      */
     public AdAtt setVer(Integer ver) {
         if (this.ver == null && ver == null) {
@@ -491,19 +495,19 @@ public class AdAtt {
     }
 
     /**
-     * 时间戳。
+     * {"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
      */
     private LocalDateTime ts;
 
     /**
-     * 获取：时间戳。
+     * 获取：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
      */
     public LocalDateTime getTs() {
         return this.ts;
     }
 
     /**
-     * 设置：时间戳。
+     * 设置：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
      */
     public AdAtt setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
@@ -527,19 +531,19 @@ public class AdAtt {
     }
 
     /**
-     * 是否预设。
+     * {"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
      */
     private Boolean isPreset;
 
     /**
-     * 获取：是否预设。
+     * 获取：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
      */
     public Boolean getIsPreset() {
         return this.isPreset;
     }
 
     /**
-     * 设置：是否预设。
+     * 设置：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
      */
     public AdAtt setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
@@ -563,19 +567,19 @@ public class AdAtt {
     }
 
     /**
-     * 创建日期时间。
+     * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
      */
     private LocalDateTime crtDt;
 
     /**
-     * 获取：创建日期时间。
+     * 获取：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
      */
     public LocalDateTime getCrtDt() {
         return this.crtDt;
     }
 
     /**
-     * 设置：创建日期时间。
+     * 设置：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
      */
     public AdAtt setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
@@ -599,19 +603,19 @@ public class AdAtt {
     }
 
     /**
-     * 创建用户。
+     * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
      */
     private String crtUserId;
 
     /**
-     * 获取：创建用户。
+     * 获取：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
      */
     public String getCrtUserId() {
         return this.crtUserId;
     }
 
     /**
-     * 设置：创建用户。
+     * 设置：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
      */
     public AdAtt setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
@@ -635,19 +639,19 @@ public class AdAtt {
     }
 
     /**
-     * 最后修改日期时间。
+     * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
      */
     private LocalDateTime lastModiDt;
 
     /**
-     * 获取：最后修改日期时间。
+     * 获取：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
      */
     public LocalDateTime getLastModiDt() {
         return this.lastModiDt;
     }
 
     /**
-     * 设置：最后修改日期时间。
+     * 设置：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
      */
     public AdAtt setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
@@ -671,19 +675,19 @@ public class AdAtt {
     }
 
     /**
-     * 最后修改用户。
+     * {"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
      */
     private String lastModiUserId;
 
     /**
-     * 获取：最后修改用户。
+     * 获取：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
      */
     public String getLastModiUserId() {
         return this.lastModiUserId;
     }
 
     /**
-     * 设置：最后修改用户。
+     * 设置：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
      */
     public AdAtt setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
@@ -707,19 +711,19 @@ public class AdAtt {
     }
 
     /**
-     * 记录状态。
+     * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
      */
     private String status;
 
     /**
-     * 获取：记录状态。
+     * 获取：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
      */
     public String getStatus() {
         return this.status;
     }
 
     /**
-     * 设置：记录状态。
+     * 设置：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
      */
     public AdAtt setStatus(String status) {
         if (this.status == null && status == null) {
@@ -743,19 +747,19 @@ public class AdAtt {
     }
 
     /**
-     * 锁定流程实例。
+     * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
      */
     private String lkWfInstId;
 
     /**
-     * 获取：锁定流程实例。
+     * 获取：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
      */
     public String getLkWfInstId() {
         return this.lkWfInstId;
     }
 
     /**
-     * 设置：锁定流程实例。
+     * 设置：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
      */
     public AdAtt setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
@@ -779,19 +783,19 @@ public class AdAtt {
     }
 
     /**
-     * 快捷码。
+     * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
      */
     private String fastCode;
 
     /**
-     * 获取：快捷码。
+     * 获取：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
      */
     public String getFastCode() {
         return this.fastCode;
     }
 
     /**
-     * 设置：快捷码。
+     * 设置：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
      */
     public AdAtt setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
@@ -815,19 +819,19 @@ public class AdAtt {
     }
 
     /**
-     * 图标。
+     * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
      */
     private String iconFileGroupId;
 
     /**
-     * 获取：图标。
+     * 获取：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
      */
     public String getIconFileGroupId() {
         return this.iconFileGroupId;
     }
 
     /**
-     * 设置：图标。
+     * 设置：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
      */
     public AdAtt setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
@@ -851,19 +855,19 @@ public class AdAtt {
     }
 
     /**
-     * 代码。
+     * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
      */
     private String code;
 
     /**
-     * 获取：代码。
+     * 获取：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
      */
     public String getCode() {
         return this.code;
     }
 
     /**
-     * 设置：代码。
+     * 设置：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
      */
     public AdAtt setCode(String code) {
         if (this.code == null && code == null) {
@@ -887,19 +891,19 @@ public class AdAtt {
     }
 
     /**
-     * 名称。
+     * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
      */
     private String name;
 
     /**
-     * 获取：名称。
+     * 获取：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * 设置：名称。
+     * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
      */
     public AdAtt setName(String name) {
         if (this.name == null && name == null) {
@@ -923,19 +927,19 @@ public class AdAtt {
     }
 
     /**
-     * 备注。
+     * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
      */
     private String remark;
 
     /**
-     * 获取：备注。
+     * 获取：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
      */
     public String getRemark() {
         return this.remark;
     }
 
     /**
-     * 设置：备注。
+     * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
      */
     public AdAtt setRemark(String remark) {
         if (this.remark == null && remark == null) {
@@ -959,19 +963,19 @@ public class AdAtt {
     }
 
     /**
-     * 属性子类型。
+     * {"EN": "AD_ATT_SUB_TYPE_ID", "ZH_CN": "属性子类型", "ZH_TW": "繁：属性子类型"}。
      */
     private String adAttSubTypeId;
 
     /**
-     * 获取：属性子类型。
+     * 获取：{"EN": "AD_ATT_SUB_TYPE_ID", "ZH_CN": "属性子类型", "ZH_TW": "繁：属性子类型"}。
      */
     public String getAdAttSubTypeId() {
         return this.adAttSubTypeId;
     }
 
     /**
-     * 设置：属性子类型。
+     * 设置：{"EN": "AD_ATT_SUB_TYPE_ID", "ZH_CN": "属性子类型", "ZH_TW": "繁：属性子类型"}。
      */
     public AdAtt setAdAttSubTypeId(String adAttSubTypeId) {
         if (this.adAttSubTypeId == null && adAttSubTypeId == null) {
@@ -995,19 +999,19 @@ public class AdAtt {
     }
 
     /**
-     * 虚拟表达式。
+     * {"EN": "VIRTUAL_EXPRESSION", "ZH_CN": "虚拟表达式", "ZH_TW": "繁：虚拟表达式"}。
      */
     private String virtualExpression;
 
     /**
-     * 获取：虚拟表达式。
+     * 获取：{"EN": "VIRTUAL_EXPRESSION", "ZH_CN": "虚拟表达式", "ZH_TW": "繁：虚拟表达式"}。
      */
     public String getVirtualExpression() {
         return this.virtualExpression;
     }
 
     /**
-     * 设置：虚拟表达式。
+     * 设置：{"EN": "VIRTUAL_EXPRESSION", "ZH_CN": "虚拟表达式", "ZH_TW": "繁：虚拟表达式"}。
      */
     public AdAtt setVirtualExpression(String virtualExpression) {
         if (this.virtualExpression == null && virtualExpression == null) {
@@ -1031,19 +1035,19 @@ public class AdAtt {
     }
 
     /**
-     * 快捷操作组。
+     * {"EN": "AD_FAST_ACT_GRP_ID", "ZH_CN": "快捷操作组", "ZH_TW": "繁：快捷操作组"}。
      */
     private String adFastActGrpId;
 
     /**
-     * 获取：快捷操作组。
+     * 获取：{"EN": "AD_FAST_ACT_GRP_ID", "ZH_CN": "快捷操作组", "ZH_TW": "繁：快捷操作组"}。
      */
     public String getAdFastActGrpId() {
         return this.adFastActGrpId;
     }
 
     /**
-     * 设置：快捷操作组。
+     * 设置：{"EN": "AD_FAST_ACT_GRP_ID", "ZH_CN": "快捷操作组", "ZH_TW": "繁：快捷操作组"}。
      */
     public AdAtt setAdFastActGrpId(String adFastActGrpId) {
         if (this.adFastActGrpId == null && adFastActGrpId == null) {
@@ -1067,19 +1071,19 @@ public class AdAtt {
     }
 
     /**
-     * 宽度。
+     * {"EN": "WIDTH", "ZH_CN": "宽度", "ZH_TW": "繁：宽度"}。
      */
     private String width;
 
     /**
-     * 获取：宽度。
+     * 获取：{"EN": "WIDTH", "ZH_CN": "宽度", "ZH_TW": "繁：宽度"}。
      */
     public String getWidth() {
         return this.width;
     }
 
     /**
-     * 设置：宽度。
+     * 设置：{"EN": "WIDTH", "ZH_CN": "宽度", "ZH_TW": "繁：宽度"}。
      */
     public AdAtt setWidth(String width) {
         if (this.width == null && width == null) {
@@ -1103,21 +1107,21 @@ public class AdAtt {
     }
 
     /**
-     * 最小宽度。
+     * {"EN": "MIN_WIDTH", "ZH_CN": "最小宽度", "ZH_TW": "繁：最小宽度"}。
      */
-    private Integer minWidth;
+    private String minWidth;
 
     /**
-     * 获取：最小宽度。
+     * 获取：{"EN": "MIN_WIDTH", "ZH_CN": "最小宽度", "ZH_TW": "繁：最小宽度"}。
      */
-    public Integer getMinWidth() {
+    public String getMinWidth() {
         return this.minWidth;
     }
 
     /**
-     * 设置：最小宽度。
+     * 设置：{"EN": "MIN_WIDTH", "ZH_CN": "最小宽度", "ZH_TW": "繁：最小宽度"}。
      */
-    public AdAtt setMinWidth(Integer minWidth) {
+    public AdAtt setMinWidth(String minWidth) {
         if (this.minWidth == null && minWidth == null) {
             // 均为null，不做处理。
         } else if (this.minWidth != null && minWidth != null) {
@@ -1139,21 +1143,21 @@ public class AdAtt {
     }
 
     /**
-     * 最大宽度。
+     * {"EN": "MAX_WIDTH", "ZH_CN": "最大宽度", "ZH_TW": "繁：最大宽度"}。
      */
-    private Integer maxWidth;
+    private String maxWidth;
 
     /**
-     * 获取：最大宽度。
+     * 获取：{"EN": "MAX_WIDTH", "ZH_CN": "最大宽度", "ZH_TW": "繁：最大宽度"}。
      */
-    public Integer getMaxWidth() {
+    public String getMaxWidth() {
         return this.maxWidth;
     }
 
     /**
-     * 设置：最大宽度。
+     * 设置：{"EN": "MAX_WIDTH", "ZH_CN": "最大宽度", "ZH_TW": "繁：最大宽度"}。
      */
-    public AdAtt setMaxWidth(Integer maxWidth) {
+    public AdAtt setMaxWidth(String maxWidth) {
         if (this.maxWidth == null && maxWidth == null) {
             // 均为null，不做处理。
         } else if (this.maxWidth != null && maxWidth != null) {
@@ -1175,19 +1179,19 @@ public class AdAtt {
     }
 
     /**
-     * 序号。
+     * {"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
      */
     private BigDecimal seqNo;
 
     /**
-     * 获取：序号。
+     * 获取：{"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
      */
     public BigDecimal getSeqNo() {
         return this.seqNo;
     }
 
     /**
-     * 设置：序号。
+     * 设置：{"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
      */
     public AdAtt setSeqNo(BigDecimal seqNo) {
         if (this.seqNo == null && seqNo == null) {
@@ -1211,19 +1215,19 @@ public class AdAtt {
     }
 
     /**
-     * 是否标识。
+     * {"EN": "IS_IDENTIFYING", "ZH_CN": "是否标识", "ZH_TW": "繁：是否标识"}。
      */
     private Boolean isIdentifying;
 
     /**
-     * 获取：是否标识。
+     * 获取：{"EN": "IS_IDENTIFYING", "ZH_CN": "是否标识", "ZH_TW": "繁：是否标识"}。
      */
     public Boolean getIsIdentifying() {
         return this.isIdentifying;
     }
 
     /**
-     * 设置：是否标识。
+     * 设置：{"EN": "IS_IDENTIFYING", "ZH_CN": "是否标识", "ZH_TW": "繁：是否标识"}。
      */
     public AdAtt setIsIdentifying(Boolean isIdentifying) {
         if (this.isIdentifying == null && isIdentifying == null) {
@@ -1247,19 +1251,19 @@ public class AdAtt {
     }
 
     /**
-     * 是否默认显示。
+     * {"EN": "IS_SHOWN_BY_DEFAULT", "ZH_CN": "是否默认显示", "ZH_TW": "繁：是否默认显示"}。
      */
     private Boolean isShownByDefault;
 
     /**
-     * 获取：是否默认显示。
+     * 获取：{"EN": "IS_SHOWN_BY_DEFAULT", "ZH_CN": "是否默认显示", "ZH_TW": "繁：是否默认显示"}。
      */
     public Boolean getIsShownByDefault() {
         return this.isShownByDefault;
     }
 
     /**
-     * 设置：是否默认显示。
+     * 设置：{"EN": "IS_SHOWN_BY_DEFAULT", "ZH_CN": "是否默认显示", "ZH_TW": "繁：是否默认显示"}。
      */
     public AdAtt setIsShownByDefault(Boolean isShownByDefault) {
         if (this.isShownByDefault == null && isShownByDefault == null) {
@@ -1283,19 +1287,19 @@ public class AdAtt {
     }
 
     /**
-     * 可改逻辑。
+     * {"EN": "EDITABLE_LOGIC", "ZH_CN": "可改逻辑", "ZH_TW": "繁：可改逻辑"}。
      */
     private String editableLogic;
 
     /**
-     * 获取：可改逻辑。
+     * 获取：{"EN": "EDITABLE_LOGIC", "ZH_CN": "可改逻辑", "ZH_TW": "繁：可改逻辑"}。
      */
     public String getEditableLogic() {
         return this.editableLogic;
     }
 
     /**
-     * 设置：可改逻辑。
+     * 设置：{"EN": "EDITABLE_LOGIC", "ZH_CN": "可改逻辑", "ZH_TW": "繁：可改逻辑"}。
      */
     public AdAtt setEditableLogic(String editableLogic) {
         if (this.editableLogic == null && editableLogic == null) {
@@ -1319,19 +1323,19 @@ public class AdAtt {
     }
 
     /**
-     * 忽略实体记录可改。
+     * {"EN": "IGNORE_ENT_REC_EDITABLE", "ZH_CN": "忽略实体记录可改", "ZH_TW": "繁：忽略实体记录可改"}。
      */
     private Boolean ignoreEntRecEditable;
 
     /**
-     * 获取：忽略实体记录可改。
+     * 获取：{"EN": "IGNORE_ENT_REC_EDITABLE", "ZH_CN": "忽略实体记录可改", "ZH_TW": "繁：忽略实体记录可改"}。
      */
     public Boolean getIgnoreEntRecEditable() {
         return this.ignoreEntRecEditable;
     }
 
     /**
-     * 设置：忽略实体记录可改。
+     * 设置：{"EN": "IGNORE_ENT_REC_EDITABLE", "ZH_CN": "忽略实体记录可改", "ZH_TW": "繁：忽略实体记录可改"}。
      */
     public AdAtt setIgnoreEntRecEditable(Boolean ignoreEntRecEditable) {
         if (this.ignoreEntRecEditable == null && ignoreEntRecEditable == null) {
@@ -1355,19 +1359,19 @@ public class AdAtt {
     }
 
     /**
-     * 必填逻辑。
+     * {"EN": "MANDATORY_LOGIC", "ZH_CN": "必填逻辑", "ZH_TW": "繁：必填逻辑"}。
      */
     private String mandatoryLogic;
 
     /**
-     * 获取：必填逻辑。
+     * 获取：{"EN": "MANDATORY_LOGIC", "ZH_CN": "必填逻辑", "ZH_TW": "繁：必填逻辑"}。
      */
     public String getMandatoryLogic() {
         return this.mandatoryLogic;
     }
 
     /**
-     * 设置：必填逻辑。
+     * 设置：{"EN": "MANDATORY_LOGIC", "ZH_CN": "必填逻辑", "ZH_TW": "繁：必填逻辑"}。
      */
     public AdAtt setMandatoryLogic(String mandatoryLogic) {
         if (this.mandatoryLogic == null && mandatoryLogic == null) {
@@ -1391,19 +1395,19 @@ public class AdAtt {
     }
 
     /**
-     * 默认值逻辑。
+     * {"EN": "DEFAULT_VALUE_LOGIC", "ZH_CN": "默认值逻辑", "ZH_TW": "繁：默认值逻辑"}。
      */
     private String defaultValueLogic;
 
     /**
-     * 获取：默认值逻辑。
+     * 获取：{"EN": "DEFAULT_VALUE_LOGIC", "ZH_CN": "默认值逻辑", "ZH_TW": "繁：默认值逻辑"}。
      */
     public String getDefaultValueLogic() {
         return this.defaultValueLogic;
     }
 
     /**
-     * 设置：默认值逻辑。
+     * 设置：{"EN": "DEFAULT_VALUE_LOGIC", "ZH_CN": "默认值逻辑", "ZH_TW": "繁：默认值逻辑"}。
      */
     public AdAtt setDefaultValueLogic(String defaultValueLogic) {
         if (this.defaultValueLogic == null && defaultValueLogic == null) {
@@ -1427,19 +1431,19 @@ public class AdAtt {
     }
 
     /**
-     * 可见逻辑。
+     * {"EN": "VISIBLE_LOGIC", "ZH_CN": "可见逻辑", "ZH_TW": "繁：可见逻辑"}。
      */
     private String visibleLogic;
 
     /**
-     * 获取：可见逻辑。
+     * 获取：{"EN": "VISIBLE_LOGIC", "ZH_CN": "可见逻辑", "ZH_TW": "繁：可见逻辑"}。
      */
     public String getVisibleLogic() {
         return this.visibleLogic;
     }
 
     /**
-     * 设置：可见逻辑。
+     * 设置：{"EN": "VISIBLE_LOGIC", "ZH_CN": "可见逻辑", "ZH_TW": "繁：可见逻辑"}。
      */
     public AdAtt setVisibleLogic(String visibleLogic) {
         if (this.visibleLogic == null && visibleLogic == null) {
@@ -1463,19 +1467,19 @@ public class AdAtt {
     }
 
     /**
-     * 有效逻辑。
+     * {"EN": "VALID_LOGIC", "ZH_CN": "有效逻辑", "ZH_TW": "繁：有效逻辑"}。
      */
     private String validLogic;
 
     /**
-     * 获取：有效逻辑。
+     * 获取：{"EN": "VALID_LOGIC", "ZH_CN": "有效逻辑", "ZH_TW": "繁：有效逻辑"}。
      */
     public String getValidLogic() {
         return this.validLogic;
     }
 
     /**
-     * 设置：有效逻辑。
+     * 设置：{"EN": "VALID_LOGIC", "ZH_CN": "有效逻辑", "ZH_TW": "繁：有效逻辑"}。
      */
     public AdAtt setValidLogic(String validLogic) {
         if (this.validLogic == null && validLogic == null) {
@@ -1499,19 +1503,19 @@ public class AdAtt {
     }
 
     /**
-     * 文本悬浮二维码。
+     * {"EN": "TEXT_HOVER_AS_QR_CODE", "ZH_CN": "文本悬浮二维码", "ZH_TW": "繁：文本悬浮二维码"}。
      */
     private Boolean textHoverAsQrCode;
 
     /**
-     * 获取：文本悬浮二维码。
+     * 获取：{"EN": "TEXT_HOVER_AS_QR_CODE", "ZH_CN": "文本悬浮二维码", "ZH_TW": "繁：文本悬浮二维码"}。
      */
     public Boolean getTextHoverAsQrCode() {
         return this.textHoverAsQrCode;
     }
 
     /**
-     * 设置：文本悬浮二维码。
+     * 设置：{"EN": "TEXT_HOVER_AS_QR_CODE", "ZH_CN": "文本悬浮二维码", "ZH_TW": "繁：文本悬浮二维码"}。
      */
     public AdAtt setTextHoverAsQrCode(Boolean textHoverAsQrCode) {
         if (this.textHoverAsQrCode == null && textHoverAsQrCode == null) {
@@ -1535,91 +1539,91 @@ public class AdAtt {
     }
 
     /**
-     * 奇行单元格样式文本逻辑。
+     * {"EN": "ODD_ROW_CELL_ST_LOGIC", "ZH_CN": "前景色逻辑", "ZH_TW": "繁：奇行单元格样式文本逻辑"}。
      */
-    private String oddRowCellStLogic;
+    private String foreColorLogic;
 
     /**
-     * 获取：奇行单元格样式文本逻辑。
+     * 获取：{"EN": "ODD_ROW_CELL_ST_LOGIC", "ZH_CN": "前景色逻辑", "ZH_TW": "繁：奇行单元格样式文本逻辑"}。
      */
-    public String getOddRowCellStLogic() {
-        return this.oddRowCellStLogic;
+    public String getForeColorLogic() {
+        return this.foreColorLogic;
     }
 
     /**
-     * 设置：奇行单元格样式文本逻辑。
+     * 设置：{"EN": "ODD_ROW_CELL_ST_LOGIC", "ZH_CN": "前景色逻辑", "ZH_TW": "繁：奇行单元格样式文本逻辑"}。
      */
-    public AdAtt setOddRowCellStLogic(String oddRowCellStLogic) {
-        if (this.oddRowCellStLogic == null && oddRowCellStLogic == null) {
+    public AdAtt setForeColorLogic(String foreColorLogic) {
+        if (this.foreColorLogic == null && foreColorLogic == null) {
             // 均为null，不做处理。
-        } else if (this.oddRowCellStLogic != null && oddRowCellStLogic != null) {
+        } else if (this.foreColorLogic != null && foreColorLogic != null) {
             // 均非null，判定不等，再做处理：
-            if (this.oddRowCellStLogic.compareTo(oddRowCellStLogic) != 0) {
-                this.oddRowCellStLogic = oddRowCellStLogic;
-                if (!this.toUpdateCols.contains("ODD_ROW_CELL_ST_LOGIC")) {
-                    this.toUpdateCols.add("ODD_ROW_CELL_ST_LOGIC");
+            if (this.foreColorLogic.compareTo(foreColorLogic) != 0) {
+                this.foreColorLogic = foreColorLogic;
+                if (!this.toUpdateCols.contains("FORE_COLOR_LOGIC")) {
+                    this.toUpdateCols.add("FORE_COLOR_LOGIC");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.oddRowCellStLogic = oddRowCellStLogic;
-            if (!this.toUpdateCols.contains("ODD_ROW_CELL_ST_LOGIC")) {
-                this.toUpdateCols.add("ODD_ROW_CELL_ST_LOGIC");
+            this.foreColorLogic = foreColorLogic;
+            if (!this.toUpdateCols.contains("FORE_COLOR_LOGIC")) {
+                this.toUpdateCols.add("FORE_COLOR_LOGIC");
             }
         }
         return this;
     }
 
     /**
-     * 偶行单元格样式文本逻辑。
+     * {"EN": "EVEN_ROW_CELL_ST_LOGIC", "ZH_CN": "背景色逻辑", "ZH_TW": "繁：偶行单元格样式文本逻辑"}。
      */
-    private String evenRowCellStLogic;
+    private String backColorLogic;
 
     /**
-     * 获取：偶行单元格样式文本逻辑。
+     * 获取：{"EN": "EVEN_ROW_CELL_ST_LOGIC", "ZH_CN": "背景色逻辑", "ZH_TW": "繁：偶行单元格样式文本逻辑"}。
      */
-    public String getEvenRowCellStLogic() {
-        return this.evenRowCellStLogic;
+    public String getBackColorLogic() {
+        return this.backColorLogic;
     }
 
     /**
-     * 设置：偶行单元格样式文本逻辑。
+     * 设置：{"EN": "EVEN_ROW_CELL_ST_LOGIC", "ZH_CN": "背景色逻辑", "ZH_TW": "繁：偶行单元格样式文本逻辑"}。
      */
-    public AdAtt setEvenRowCellStLogic(String evenRowCellStLogic) {
-        if (this.evenRowCellStLogic == null && evenRowCellStLogic == null) {
+    public AdAtt setBackColorLogic(String backColorLogic) {
+        if (this.backColorLogic == null && backColorLogic == null) {
             // 均为null，不做处理。
-        } else if (this.evenRowCellStLogic != null && evenRowCellStLogic != null) {
+        } else if (this.backColorLogic != null && backColorLogic != null) {
             // 均非null，判定不等，再做处理：
-            if (this.evenRowCellStLogic.compareTo(evenRowCellStLogic) != 0) {
-                this.evenRowCellStLogic = evenRowCellStLogic;
-                if (!this.toUpdateCols.contains("EVEN_ROW_CELL_ST_LOGIC")) {
-                    this.toUpdateCols.add("EVEN_ROW_CELL_ST_LOGIC");
+            if (this.backColorLogic.compareTo(backColorLogic) != 0) {
+                this.backColorLogic = backColorLogic;
+                if (!this.toUpdateCols.contains("BACK_COLOR_LOGIC")) {
+                    this.toUpdateCols.add("BACK_COLOR_LOGIC");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.evenRowCellStLogic = evenRowCellStLogic;
-            if (!this.toUpdateCols.contains("EVEN_ROW_CELL_ST_LOGIC")) {
-                this.toUpdateCols.add("EVEN_ROW_CELL_ST_LOGIC");
+            this.backColorLogic = backColorLogic;
+            if (!this.toUpdateCols.contains("BACK_COLOR_LOGIC")) {
+                this.toUpdateCols.add("BACK_COLOR_LOGIC");
             }
         }
         return this;
     }
 
     /**
-     * 组合标题。
+     * {"EN": "HEADER_SPAN_TITLE", "ZH_CN": "组合标题", "ZH_TW": "繁：组合标题"}。
      */
     private String headerSpanTitle;
 
     /**
-     * 获取：组合标题。
+     * 获取：{"EN": "HEADER_SPAN_TITLE", "ZH_CN": "组合标题", "ZH_TW": "繁：组合标题"}。
      */
     public String getHeaderSpanTitle() {
         return this.headerSpanTitle;
     }
 
     /**
-     * 设置：组合标题。
+     * 设置：{"EN": "HEADER_SPAN_TITLE", "ZH_CN": "组合标题", "ZH_TW": "繁：组合标题"}。
      */
     public AdAtt setHeaderSpanTitle(String headerSpanTitle) {
         if (this.headerSpanTitle == null && headerSpanTitle == null) {
@@ -1643,19 +1647,19 @@ public class AdAtt {
     }
 
     /**
-     * 文件路径。
+     * {"EN": "FILE_PATH_ID", "ZH_CN": "文件路径", "ZH_TW": "繁：文件路径"}。
      */
     private String filePathId;
 
     /**
-     * 获取：文件路径。
+     * 获取：{"EN": "FILE_PATH_ID", "ZH_CN": "文件路径", "ZH_TW": "繁：文件路径"}。
      */
     public String getFilePathId() {
         return this.filePathId;
     }
 
     /**
-     * 设置：文件路径。
+     * 设置：{"EN": "FILE_PATH_ID", "ZH_CN": "文件路径", "ZH_TW": "繁：文件路径"}。
      */
     public AdAtt setFilePathId(String filePathId) {
         if (this.filePathId == null && filePathId == null) {
@@ -1679,19 +1683,19 @@ public class AdAtt {
     }
 
     /**
-     * 文件类型。
+     * {"EN": "FILE_TYPES", "ZH_CN": "文件类型", "ZH_TW": "繁：文件类型"}。
      */
     private String fileTypes;
 
     /**
-     * 获取：文件类型。
+     * 获取：{"EN": "FILE_TYPES", "ZH_CN": "文件类型", "ZH_TW": "繁：文件类型"}。
      */
     public String getFileTypes() {
         return this.fileTypes;
     }
 
     /**
-     * 设置：文件类型。
+     * 设置：{"EN": "FILE_TYPES", "ZH_CN": "文件类型", "ZH_TW": "繁：文件类型"}。
      */
     public AdAtt setFileTypes(String fileTypes) {
         if (this.fileTypes == null && fileTypes == null) {
@@ -1715,19 +1719,19 @@ public class AdAtt {
     }
 
     /**
-     * 文件最大KB。
+     * {"EN": "FILE_MAX_KB", "ZH_CN": "文件最大KB", "ZH_TW": "繁：文件最大KB"}。
      */
     private Integer fileMaxKb;
 
     /**
-     * 获取：文件最大KB。
+     * 获取：{"EN": "FILE_MAX_KB", "ZH_CN": "文件最大KB", "ZH_TW": "繁：文件最大KB"}。
      */
     public Integer getFileMaxKb() {
         return this.fileMaxKb;
     }
 
     /**
-     * 设置：文件最大KB。
+     * 设置：{"EN": "FILE_MAX_KB", "ZH_CN": "文件最大KB", "ZH_TW": "繁：文件最大KB"}。
      */
     public AdAtt setFileMaxKb(Integer fileMaxKb) {
         if (this.fileMaxKb == null && fileMaxKb == null) {
@@ -1751,19 +1755,19 @@ public class AdAtt {
     }
 
     /**
-     * 文件允许批量上传。
+     * {"EN": "FILE_IS_MULTI", "ZH_CN": "文件允许批量上传", "ZH_TW": "繁：文件允许批量上传"}。
      */
     private Boolean fileIsMulti;
 
     /**
-     * 获取：文件允许批量上传。
+     * 获取：{"EN": "FILE_IS_MULTI", "ZH_CN": "文件允许批量上传", "ZH_TW": "繁：文件允许批量上传"}。
      */
     public Boolean getFileIsMulti() {
         return this.fileIsMulti;
     }
 
     /**
-     * 设置：文件允许批量上传。
+     * 设置：{"EN": "FILE_IS_MULTI", "ZH_CN": "文件允许批量上传", "ZH_TW": "繁：文件允许批量上传"}。
      */
     public AdAtt setFileIsMulti(Boolean fileIsMulti) {
         if (this.fileIsMulti == null && fileIsMulti == null) {
@@ -1787,19 +1791,19 @@ public class AdAtt {
     }
 
     /**
-     * 文件是否作为图片查看。
+     * {"EN": "FILE_VIEW_AS_IMG", "ZH_CN": "文件是否作为图片查看", "ZH_TW": "繁：文件是否作为图片查看"}。
      */
     private Boolean fileViewAsImg;
 
     /**
-     * 获取：文件是否作为图片查看。
+     * 获取：{"EN": "FILE_VIEW_AS_IMG", "ZH_CN": "文件是否作为图片查看", "ZH_TW": "繁：文件是否作为图片查看"}。
      */
     public Boolean getFileViewAsImg() {
         return this.fileViewAsImg;
     }
 
     /**
-     * 设置：文件是否作为图片查看。
+     * 设置：{"EN": "FILE_VIEW_AS_IMG", "ZH_CN": "文件是否作为图片查看", "ZH_TW": "繁：文件是否作为图片查看"}。
      */
     public AdAtt setFileViewAsImg(Boolean fileViewAsImg) {
         if (this.fileViewAsImg == null && fileViewAsImg == null) {
@@ -1823,19 +1827,19 @@ public class AdAtt {
     }
 
     /**
-     * 文件是否作为图片悬浮。
+     * {"EN": "FILE_HOVER_AS_IMG", "ZH_CN": "文件是否作为图片悬浮", "ZH_TW": "繁：文件是否作为图片悬浮"}。
      */
     private Boolean fileHoverAsImg;
 
     /**
-     * 获取：文件是否作为图片悬浮。
+     * 获取：{"EN": "FILE_HOVER_AS_IMG", "ZH_CN": "文件是否作为图片悬浮", "ZH_TW": "繁：文件是否作为图片悬浮"}。
      */
     public Boolean getFileHoverAsImg() {
         return this.fileHoverAsImg;
     }
 
     /**
-     * 设置：文件是否作为图片悬浮。
+     * 设置：{"EN": "FILE_HOVER_AS_IMG", "ZH_CN": "文件是否作为图片悬浮", "ZH_TW": "繁：文件是否作为图片悬浮"}。
      */
     public AdAtt setFileHoverAsImg(Boolean fileHoverAsImg) {
         if (this.fileHoverAsImg == null && fileHoverAsImg == null) {
@@ -1859,19 +1863,19 @@ public class AdAtt {
     }
 
     /**
-     * 文件图片宽度。
+     * {"EN": "FILE_IMG_WIDTH", "ZH_CN": "文件图片宽度", "ZH_TW": "繁：文件图片宽度"}。
      */
     private String fileImgWidth;
 
     /**
-     * 获取：文件图片宽度。
+     * 获取：{"EN": "FILE_IMG_WIDTH", "ZH_CN": "文件图片宽度", "ZH_TW": "繁：文件图片宽度"}。
      */
     public String getFileImgWidth() {
         return this.fileImgWidth;
     }
 
     /**
-     * 设置：文件图片宽度。
+     * 设置：{"EN": "FILE_IMG_WIDTH", "ZH_CN": "文件图片宽度", "ZH_TW": "繁：文件图片宽度"}。
      */
     public AdAtt setFileImgWidth(String fileImgWidth) {
         if (this.fileImgWidth == null && fileImgWidth == null) {
@@ -1895,19 +1899,19 @@ public class AdAtt {
     }
 
     /**
-     * 文件图片高度。
+     * {"EN": "FILE_IMG_HEIGHT", "ZH_CN": "文件图片高度", "ZH_TW": "繁：文件图片高度"}。
      */
     private String fileImgHeight;
 
     /**
-     * 获取：文件图片高度。
+     * 获取：{"EN": "FILE_IMG_HEIGHT", "ZH_CN": "文件图片高度", "ZH_TW": "繁：文件图片高度"}。
      */
     public String getFileImgHeight() {
         return this.fileImgHeight;
     }
 
     /**
-     * 设置：文件图片高度。
+     * 设置：{"EN": "FILE_IMG_HEIGHT", "ZH_CN": "文件图片高度", "ZH_TW": "繁：文件图片高度"}。
      */
     public AdAtt setFileImgHeight(String fileImgHeight) {
         if (this.fileImgHeight == null && fileImgHeight == null) {
@@ -1931,19 +1935,19 @@ public class AdAtt {
     }
 
     /**
-     * 文件图片压缩尺寸。
+     * {"EN": "FILE_IMG_COMPRESS_SIZE", "ZH_CN": "文件图片压缩尺寸", "ZH_TW": "繁：文件图片压缩尺寸"}。
      */
     private String fileImgCompressSize;
 
     /**
-     * 获取：文件图片压缩尺寸。
+     * 获取：{"EN": "FILE_IMG_COMPRESS_SIZE", "ZH_CN": "文件图片压缩尺寸", "ZH_TW": "繁：文件图片压缩尺寸"}。
      */
     public String getFileImgCompressSize() {
         return this.fileImgCompressSize;
     }
 
     /**
-     * 设置：文件图片压缩尺寸。
+     * 设置：{"EN": "FILE_IMG_COMPRESS_SIZE", "ZH_CN": "文件图片压缩尺寸", "ZH_TW": "繁：文件图片压缩尺寸"}。
      */
     public AdAtt setFileImgCompressSize(String fileImgCompressSize) {
         if (this.fileImgCompressSize == null && fileImgCompressSize == null) {
@@ -1967,19 +1971,19 @@ public class AdAtt {
     }
 
     /**
-     * 是否分组。
+     * {"EN": "IS_GROUPED", "ZH_CN": "是否分组", "ZH_TW": "繁：是否分组"}。
      */
     private Boolean isGrouped;
 
     /**
-     * 获取：是否分组。
+     * 获取：{"EN": "IS_GROUPED", "ZH_CN": "是否分组", "ZH_TW": "繁：是否分组"}。
      */
     public Boolean getIsGrouped() {
         return this.isGrouped;
     }
 
     /**
-     * 设置：是否分组。
+     * 设置：{"EN": "IS_GROUPED", "ZH_CN": "是否分组", "ZH_TW": "繁：是否分组"}。
      */
     public AdAtt setIsGrouped(Boolean isGrouped) {
         if (this.isGrouped == null && isGrouped == null) {
@@ -2003,19 +2007,19 @@ public class AdAtt {
     }
 
     /**
-     * 汇总模式。
+     * {"EN": "SUM_MODE_ID", "ZH_CN": "汇总模式", "ZH_TW": "繁：汇总模式"}。
      */
     private String sumModeId;
 
     /**
-     * 获取：汇总模式。
+     * 获取：{"EN": "SUM_MODE_ID", "ZH_CN": "汇总模式", "ZH_TW": "繁：汇总模式"}。
      */
     public String getSumModeId() {
         return this.sumModeId;
     }
 
     /**
-     * 设置：汇总模式。
+     * 设置：{"EN": "SUM_MODE_ID", "ZH_CN": "汇总模式", "ZH_TW": "繁：汇总模式"}。
      */
     public AdAtt setSumModeId(String sumModeId) {
         if (this.sumModeId == null && sumModeId == null) {
@@ -2039,19 +2043,19 @@ public class AdAtt {
     }
 
     /**
-     * 汇总前缀。
+     * {"EN": "SUM_PREFIX", "ZH_CN": "汇总前缀", "ZH_TW": "繁：汇总前缀"}。
      */
     private String sumPrefix;
 
     /**
-     * 获取：汇总前缀。
+     * 获取：{"EN": "SUM_PREFIX", "ZH_CN": "汇总前缀", "ZH_TW": "繁：汇总前缀"}。
      */
     public String getSumPrefix() {
         return this.sumPrefix;
     }
 
     /**
-     * 设置：汇总前缀。
+     * 设置：{"EN": "SUM_PREFIX", "ZH_CN": "汇总前缀", "ZH_TW": "繁：汇总前缀"}。
      */
     public AdAtt setSumPrefix(String sumPrefix) {
         if (this.sumPrefix == null && sumPrefix == null) {
@@ -2075,19 +2079,19 @@ public class AdAtt {
     }
 
     /**
-     * 汇总后缀。
+     * {"EN": "SUM_SUFFIX", "ZH_CN": "汇总后缀", "ZH_TW": "繁：汇总后缀"}。
      */
     private String sumSuffix;
 
     /**
-     * 获取：汇总后缀。
+     * 获取：{"EN": "SUM_SUFFIX", "ZH_CN": "汇总后缀", "ZH_TW": "繁：汇总后缀"}。
      */
     public String getSumSuffix() {
         return this.sumSuffix;
     }
 
     /**
-     * 设置：汇总后缀。
+     * 设置：{"EN": "SUM_SUFFIX", "ZH_CN": "汇总后缀", "ZH_TW": "繁：汇总后缀"}。
      */
     public AdAtt setSumSuffix(String sumSuffix) {
         if (this.sumSuffix == null && sumSuffix == null) {
@@ -2111,19 +2115,19 @@ public class AdAtt {
     }
 
     /**
-     * 是否隐藏分组汇总。
+     * {"EN": "IS_GROUP_SUM_HIDDEN", "ZH_CN": "是否隐藏分组汇总", "ZH_TW": "繁：是否隐藏分组汇总"}。
      */
     private Boolean isGroupSumHidden;
 
     /**
-     * 获取：是否隐藏分组汇总。
+     * 获取：{"EN": "IS_GROUP_SUM_HIDDEN", "ZH_CN": "是否隐藏分组汇总", "ZH_TW": "繁：是否隐藏分组汇总"}。
      */
     public Boolean getIsGroupSumHidden() {
         return this.isGroupSumHidden;
     }
 
     /**
-     * 设置：是否隐藏分组汇总。
+     * 设置：{"EN": "IS_GROUP_SUM_HIDDEN", "ZH_CN": "是否隐藏分组汇总", "ZH_TW": "繁：是否隐藏分组汇总"}。
      */
     public AdAtt setIsGroupSumHidden(Boolean isGroupSumHidden) {
         if (this.isGroupSumHidden == null && isGroupSumHidden == null) {
@@ -2147,19 +2151,19 @@ public class AdAtt {
     }
 
     /**
-     * 是否隐藏总计汇总。
+     * {"EN": "IS_TTL_SUM_HIDDEN", "ZH_CN": "是否隐藏总计汇总", "ZH_TW": "繁：是否隐藏总计汇总"}。
      */
     private Boolean isTtlSumHidden;
 
     /**
-     * 获取：是否隐藏总计汇总。
+     * 获取：{"EN": "IS_TTL_SUM_HIDDEN", "ZH_CN": "是否隐藏总计汇总", "ZH_TW": "繁：是否隐藏总计汇总"}。
      */
     public Boolean getIsTtlSumHidden() {
         return this.isTtlSumHidden;
     }
 
     /**
-     * 设置：是否隐藏总计汇总。
+     * 设置：{"EN": "IS_TTL_SUM_HIDDEN", "ZH_CN": "是否隐藏总计汇总", "ZH_TW": "繁：是否隐藏总计汇总"}。
      */
     public AdAtt setIsTtlSumHidden(Boolean isTtlSumHidden) {
         if (this.isTtlSumHidden == null && isTtlSumHidden == null) {
@@ -2183,19 +2187,19 @@ public class AdAtt {
     }
 
     /**
-     * 横向对齐。
+     * {"EN": "H_ALIGN", "ZH_CN": "横向对齐", "ZH_TW": "繁：横向对齐"}。
      */
     private String hAlign;
 
     /**
-     * 获取：横向对齐。
+     * 获取：{"EN": "H_ALIGN", "ZH_CN": "横向对齐", "ZH_TW": "繁：横向对齐"}。
      */
     public String getHAlign() {
         return this.hAlign;
     }
 
     /**
-     * 设置：横向对齐。
+     * 设置：{"EN": "H_ALIGN", "ZH_CN": "横向对齐", "ZH_TW": "繁：横向对齐"}。
      */
     public AdAtt setHAlign(String hAlign) {
         if (this.hAlign == null && hAlign == null) {
@@ -2219,19 +2223,19 @@ public class AdAtt {
     }
 
     /**
-     * 是否固定。
+     * {"EN": "IS_FIXED", "ZH_CN": "是否固定", "ZH_TW": "繁：是否固定"}。
      */
     private Boolean isFixed;
 
     /**
-     * 获取：是否固定。
+     * 获取：{"EN": "IS_FIXED", "ZH_CN": "是否固定", "ZH_TW": "繁：是否固定"}。
      */
     public Boolean getIsFixed() {
         return this.isFixed;
     }
 
     /**
-     * 设置：是否固定。
+     * 设置：{"EN": "IS_FIXED", "ZH_CN": "是否固定", "ZH_TW": "繁：是否固定"}。
      */
     public AdAtt setIsFixed(Boolean isFixed) {
         if (this.isFixed == null && isFixed == null) {
@@ -2255,19 +2259,19 @@ public class AdAtt {
     }
 
     /**
-     * 显示格式。
+     * {"EN": "DISPLAY_FORMAT", "ZH_CN": "显示格式", "ZH_TW": "繁：显示格式"}。
      */
     private String displayFormat;
 
     /**
-     * 获取：显示格式。
+     * 获取：{"EN": "DISPLAY_FORMAT", "ZH_CN": "显示格式", "ZH_TW": "繁：显示格式"}。
      */
     public String getDisplayFormat() {
         return this.displayFormat;
     }
 
     /**
-     * 设置：显示格式。
+     * 设置：{"EN": "DISPLAY_FORMAT", "ZH_CN": "显示格式", "ZH_TW": "繁：显示格式"}。
      */
     public AdAtt setDisplayFormat(String displayFormat) {
         if (this.displayFormat == null && displayFormat == null) {
@@ -2291,19 +2295,19 @@ public class AdAtt {
     }
 
     /**
-     * 变量名称。
+     * {"EN": "VAR_NAME", "ZH_CN": "变量名称", "ZH_TW": "繁：变量名称"}。
      */
     private String varName;
 
     /**
-     * 获取：变量名称。
+     * 获取：{"EN": "VAR_NAME", "ZH_CN": "变量名称", "ZH_TW": "繁：变量名称"}。
      */
     public String getVarName() {
         return this.varName;
     }
 
     /**
-     * 设置：变量名称。
+     * 设置：{"EN": "VAR_NAME", "ZH_CN": "变量名称", "ZH_TW": "繁：变量名称"}。
      */
     public AdAtt setVarName(String varName) {
         if (this.varName == null && varName == null) {
@@ -2327,19 +2331,19 @@ public class AdAtt {
     }
 
     /**
-     * 默认值逻辑（从）。
+     * {"EN": "DEFAULT_VALUE_LOGIC_FROM", "ZH_CN": "默认值逻辑（从）", "ZH_TW": "繁：默认值逻辑（从）"}。
      */
     private String defaultValueLogicFrom;
 
     /**
-     * 获取：默认值逻辑（从）。
+     * 获取：{"EN": "DEFAULT_VALUE_LOGIC_FROM", "ZH_CN": "默认值逻辑（从）", "ZH_TW": "繁：默认值逻辑（从）"}。
      */
     public String getDefaultValueLogicFrom() {
         return this.defaultValueLogicFrom;
     }
 
     /**
-     * 设置：默认值逻辑（从）。
+     * 设置：{"EN": "DEFAULT_VALUE_LOGIC_FROM", "ZH_CN": "默认值逻辑（从）", "ZH_TW": "繁：默认值逻辑（从）"}。
      */
     public AdAtt setDefaultValueLogicFrom(String defaultValueLogicFrom) {
         if (this.defaultValueLogicFrom == null && defaultValueLogicFrom == null) {
@@ -2363,19 +2367,19 @@ public class AdAtt {
     }
 
     /**
-     * 默认值逻辑（到）。
+     * {"EN": "DEFAULT_VALUE_LOGIC_TO", "ZH_CN": "默认值逻辑（到）", "ZH_TW": "繁：默认值逻辑（到）"}。
      */
     private String defaultValueLogicTo;
 
     /**
-     * 获取：默认值逻辑（到）。
+     * 获取：{"EN": "DEFAULT_VALUE_LOGIC_TO", "ZH_CN": "默认值逻辑（到）", "ZH_TW": "繁：默认值逻辑（到）"}。
      */
     public String getDefaultValueLogicTo() {
         return this.defaultValueLogicTo;
     }
 
     /**
-     * 设置：默认值逻辑（到）。
+     * 设置：{"EN": "DEFAULT_VALUE_LOGIC_TO", "ZH_CN": "默认值逻辑（到）", "ZH_TW": "繁：默认值逻辑（到）"}。
      */
     public AdAtt setDefaultValueLogicTo(String defaultValueLogicTo) {
         if (this.defaultValueLogicTo == null && defaultValueLogicTo == null) {
@@ -2399,19 +2403,19 @@ public class AdAtt {
     }
 
     /**
-     * 引用的实体视图。
+     * {"EN": "REFED_SEV_ID", "ZH_CN": "引用的实体视图", "ZH_TW": "繁：引用的实体视图"}。
      */
     private String refedSevId;
 
     /**
-     * 获取：引用的实体视图。
+     * 获取：{"EN": "REFED_SEV_ID", "ZH_CN": "引用的实体视图", "ZH_TW": "繁：引用的实体视图"}。
      */
     public String getRefedSevId() {
         return this.refedSevId;
     }
 
     /**
-     * 设置：引用的实体视图。
+     * 设置：{"EN": "REFED_SEV_ID", "ZH_CN": "引用的实体视图", "ZH_TW": "繁：引用的实体视图"}。
      */
     public AdAtt setRefedSevId(String refedSevId) {
         if (this.refedSevId == null && refedSevId == null) {
@@ -2435,19 +2439,19 @@ public class AdAtt {
     }
 
     /**
-     * 引用的视图部分列表。
+     * {"EN": "REFED_VP_IDS", "ZH_CN": "引用的视图部分列表", "ZH_TW": "繁：引用的视图部分列表"}。
      */
     private String refedVpIds;
 
     /**
-     * 获取：引用的视图部分列表。
+     * 获取：{"EN": "REFED_VP_IDS", "ZH_CN": "引用的视图部分列表", "ZH_TW": "繁：引用的视图部分列表"}。
      */
     public String getRefedVpIds() {
         return this.refedVpIds;
     }
 
     /**
-     * 设置：引用的视图部分列表。
+     * 设置：{"EN": "REFED_VP_IDS", "ZH_CN": "引用的视图部分列表", "ZH_TW": "繁：引用的视图部分列表"}。
      */
     public AdAtt setRefedVpIds(String refedVpIds) {
         if (this.refedVpIds == null && refedVpIds == null) {
@@ -2471,19 +2475,19 @@ public class AdAtt {
     }
 
     /**
-     * 引用的WHERE语句。
+     * {"EN": "REFED_WHERE_CLAUSE", "ZH_CN": "引用的WHERE语句", "ZH_TW": "繁：引用的WHERE语句"}。
      */
     private String refedWhereClause;
 
     /**
-     * 获取：引用的WHERE语句。
+     * 获取：{"EN": "REFED_WHERE_CLAUSE", "ZH_CN": "引用的WHERE语句", "ZH_TW": "繁：引用的WHERE语句"}。
      */
     public String getRefedWhereClause() {
         return this.refedWhereClause;
     }
 
     /**
-     * 设置：引用的WHERE语句。
+     * 设置：{"EN": "REFED_WHERE_CLAUSE", "ZH_CN": "引用的WHERE语句", "ZH_TW": "繁：引用的WHERE语句"}。
      */
     public AdAtt setRefedWhereClause(String refedWhereClause) {
         if (this.refedWhereClause == null && refedWhereClause == null) {
@@ -2507,19 +2511,19 @@ public class AdAtt {
     }
 
     /**
-     * 引用删除模式。
+     * {"EN": "REFED_ON_DEL_MODE", "ZH_CN": "引用删除模式", "ZH_TW": "繁：引用删除模式"}。
      */
     private String refedOnDelMode;
 
     /**
-     * 获取：引用删除模式。
+     * 获取：{"EN": "REFED_ON_DEL_MODE", "ZH_CN": "引用删除模式", "ZH_TW": "繁：引用删除模式"}。
      */
     public String getRefedOnDelMode() {
         return this.refedOnDelMode;
     }
 
     /**
-     * 设置：引用删除模式。
+     * 设置：{"EN": "REFED_ON_DEL_MODE", "ZH_CN": "引用删除模式", "ZH_TW": "繁：引用删除模式"}。
      */
     public AdAtt setRefedOnDelMode(String refedOnDelMode) {
         if (this.refedOnDelMode == null && refedOnDelMode == null) {
@@ -2543,19 +2547,19 @@ public class AdAtt {
     }
 
     /**
-     * 引用的启用缓存。
+     * {"EN": "REFED_CACHE_ENABLED", "ZH_CN": "引用的启用缓存", "ZH_TW": "繁：引用的启用缓存"}。
      */
     private Boolean refedCacheEnabled;
 
     /**
-     * 获取：引用的启用缓存。
+     * 获取：{"EN": "REFED_CACHE_ENABLED", "ZH_CN": "引用的启用缓存", "ZH_TW": "繁：引用的启用缓存"}。
      */
     public Boolean getRefedCacheEnabled() {
         return this.refedCacheEnabled;
     }
 
     /**
-     * 设置：引用的启用缓存。
+     * 设置：{"EN": "REFED_CACHE_ENABLED", "ZH_CN": "引用的启用缓存", "ZH_TW": "繁：引用的启用缓存"}。
      */
     public AdAtt setRefedCacheEnabled(Boolean refedCacheEnabled) {
         if (this.refedCacheEnabled == null && refedCacheEnabled == null) {
@@ -2579,19 +2583,19 @@ public class AdAtt {
     }
 
     /**
-     * 引用的下拉禁用。
+     * {"EN": "REFED_DROPDOWN_DISABLED", "ZH_CN": "引用的下拉禁用", "ZH_TW": "繁：引用的下拉禁用"}。
      */
     private Boolean refedDropdownDisabled;
 
     /**
-     * 获取：引用的下拉禁用。
+     * 获取：{"EN": "REFED_DROPDOWN_DISABLED", "ZH_CN": "引用的下拉禁用", "ZH_TW": "繁：引用的下拉禁用"}。
      */
     public Boolean getRefedDropdownDisabled() {
         return this.refedDropdownDisabled;
     }
 
     /**
-     * 设置：引用的下拉禁用。
+     * 设置：{"EN": "REFED_DROPDOWN_DISABLED", "ZH_CN": "引用的下拉禁用", "ZH_TW": "繁：引用的下拉禁用"}。
      */
     public AdAtt setRefedDropdownDisabled(Boolean refedDropdownDisabled) {
         if (this.refedDropdownDisabled == null && refedDropdownDisabled == null) {
@@ -2615,19 +2619,19 @@ public class AdAtt {
     }
 
     /**
-     * 引用的搜索禁用。
+     * {"EN": "REFED_SEARCH_DISABLED", "ZH_CN": "引用的搜索禁用", "ZH_TW": "繁：引用的搜索禁用"}。
      */
     private Boolean refedSearchDisabled;
 
     /**
-     * 获取：引用的搜索禁用。
+     * 获取：{"EN": "REFED_SEARCH_DISABLED", "ZH_CN": "引用的搜索禁用", "ZH_TW": "繁：引用的搜索禁用"}。
      */
     public Boolean getRefedSearchDisabled() {
         return this.refedSearchDisabled;
     }
 
     /**
-     * 设置：引用的搜索禁用。
+     * 设置：{"EN": "REFED_SEARCH_DISABLED", "ZH_CN": "引用的搜索禁用", "ZH_TW": "繁：引用的搜索禁用"}。
      */
     public AdAtt setRefedSearchDisabled(Boolean refedSearchDisabled) {
         if (this.refedSearchDisabled == null && refedSearchDisabled == null) {
@@ -2651,19 +2655,19 @@ public class AdAtt {
     }
 
     /**
-     * 引用的弹出宽度。
+     * {"EN": "REFED_POPUP_WIDTH", "ZH_CN": "引用的弹出宽度", "ZH_TW": "繁：引用的弹出宽度"}。
      */
     private String refedPopupWidth;
 
     /**
-     * 获取：引用的弹出宽度。
+     * 获取：{"EN": "REFED_POPUP_WIDTH", "ZH_CN": "引用的弹出宽度", "ZH_TW": "繁：引用的弹出宽度"}。
      */
     public String getRefedPopupWidth() {
         return this.refedPopupWidth;
     }
 
     /**
-     * 设置：引用的弹出宽度。
+     * 设置：{"EN": "REFED_POPUP_WIDTH", "ZH_CN": "引用的弹出宽度", "ZH_TW": "繁：引用的弹出宽度"}。
      */
     public AdAtt setRefedPopupWidth(String refedPopupWidth) {
         if (this.refedPopupWidth == null && refedPopupWidth == null) {
@@ -2687,19 +2691,19 @@ public class AdAtt {
     }
 
     /**
-     * 引用的弹出高度。
+     * {"EN": "REFED_POPUP_HEIGHT", "ZH_CN": "引用的弹出高度", "ZH_TW": "繁：引用的弹出高度"}。
      */
     private String refedPopupHeight;
 
     /**
-     * 获取：引用的弹出高度。
+     * 获取：{"EN": "REFED_POPUP_HEIGHT", "ZH_CN": "引用的弹出高度", "ZH_TW": "繁：引用的弹出高度"}。
      */
     public String getRefedPopupHeight() {
         return this.refedPopupHeight;
     }
 
     /**
-     * 设置：引用的弹出高度。
+     * 设置：{"EN": "REFED_POPUP_HEIGHT", "ZH_CN": "引用的弹出高度", "ZH_TW": "繁：引用的弹出高度"}。
      */
     public AdAtt setRefedPopupHeight(String refedPopupHeight) {
         if (this.refedPopupHeight == null && refedPopupHeight == null) {
@@ -2723,19 +2727,19 @@ public class AdAtt {
     }
 
     /**
-     * 引用的可选择逻辑。
+     * {"EN": "REFED_SELECTABLE_LOGIC", "ZH_CN": "引用的可选择逻辑", "ZH_TW": "繁：引用的可选择逻辑"}。
      */
     private String refedSelectableLogic;
 
     /**
-     * 获取：引用的可选择逻辑。
+     * 获取：{"EN": "REFED_SELECTABLE_LOGIC", "ZH_CN": "引用的可选择逻辑", "ZH_TW": "繁：引用的可选择逻辑"}。
      */
     public String getRefedSelectableLogic() {
         return this.refedSelectableLogic;
     }
 
     /**
-     * 设置：引用的可选择逻辑。
+     * 设置：{"EN": "REFED_SELECTABLE_LOGIC", "ZH_CN": "引用的可选择逻辑", "ZH_TW": "繁：引用的可选择逻辑"}。
      */
     public AdAtt setRefedSelectableLogic(String refedSelectableLogic) {
         if (this.refedSelectableLogic == null && refedSelectableLogic == null) {
@@ -2759,19 +2763,19 @@ public class AdAtt {
     }
 
     /**
-     * 引用的详情视图。
+     * {"EN": "REFED_DTL_VIEW_ID", "ZH_CN": "引用的详情视图", "ZH_TW": "繁：引用的详情视图"}。
      */
     private String refedDtlViewId;
 
     /**
-     * 获取：引用的详情视图。
+     * 获取：{"EN": "REFED_DTL_VIEW_ID", "ZH_CN": "引用的详情视图", "ZH_TW": "繁：引用的详情视图"}。
      */
     public String getRefedDtlViewId() {
         return this.refedDtlViewId;
     }
 
     /**
-     * 设置：引用的详情视图。
+     * 设置：{"EN": "REFED_DTL_VIEW_ID", "ZH_CN": "引用的详情视图", "ZH_TW": "繁：引用的详情视图"}。
      */
     public AdAtt setRefedDtlViewId(String refedDtlViewId) {
         if (this.refedDtlViewId == null && refedDtlViewId == null) {
@@ -2795,19 +2799,19 @@ public class AdAtt {
     }
 
     /**
-     * 引用的详情视图是否启用。
+     * {"EN": "REFED_DTL_VIEW_ENABLED", "ZH_CN": "引用的详情视图是否启用", "ZH_TW": "繁：引用的详情视图是否启用"}。
      */
     private Boolean refedDtlViewEnabled;
 
     /**
-     * 获取：引用的详情视图是否启用。
+     * 获取：{"EN": "REFED_DTL_VIEW_ENABLED", "ZH_CN": "引用的详情视图是否启用", "ZH_TW": "繁：引用的详情视图是否启用"}。
      */
     public Boolean getRefedDtlViewEnabled() {
         return this.refedDtlViewEnabled;
     }
 
     /**
-     * 设置：引用的详情视图是否启用。
+     * 设置：{"EN": "REFED_DTL_VIEW_ENABLED", "ZH_CN": "引用的详情视图是否启用", "ZH_TW": "繁：引用的详情视图是否启用"}。
      */
     public AdAtt setRefedDtlViewEnabled(Boolean refedDtlViewEnabled) {
         if (this.refedDtlViewEnabled == null && refedDtlViewEnabled == null) {
@@ -2831,19 +2835,19 @@ public class AdAtt {
     }
 
     /**
-     * 定义SQL。
+     * {"EN": "DEF_SQL", "ZH_CN": "定义SQL", "ZH_TW": "繁：定义SQL"}。
      */
     private String defSql;
 
     /**
-     * 获取：定义SQL。
+     * 获取：{"EN": "DEF_SQL", "ZH_CN": "定义SQL", "ZH_TW": "繁：定义SQL"}。
      */
     public String getDefSql() {
         return this.defSql;
     }
 
     /**
-     * 设置：定义SQL。
+     * 设置：{"EN": "DEF_SQL", "ZH_CN": "定义SQL", "ZH_TW": "繁：定义SQL"}。
      */
     public AdAtt setDefSql(String defSql) {
         if (this.defSql == null && defSql == null) {
@@ -2867,19 +2871,19 @@ public class AdAtt {
     }
 
     /**
-     * 是否必填。
+     * {"EN": "IS_MANDATORY", "ZH_CN": "是否必填", "ZH_TW": "繁：是否必填"}。
      */
     private Boolean isMandatory;
 
     /**
-     * 获取：是否必填。
+     * 获取：{"EN": "IS_MANDATORY", "ZH_CN": "是否必填", "ZH_TW": "繁：是否必填"}。
      */
     public Boolean getIsMandatory() {
         return this.isMandatory;
     }
 
     /**
-     * 设置：是否必填。
+     * 设置：{"EN": "IS_MANDATORY", "ZH_CN": "是否必填", "ZH_TW": "繁：是否必填"}。
      */
     public AdAtt setIsMandatory(Boolean isMandatory) {
         if (this.isMandatory == null && isMandatory == null) {
@@ -2903,19 +2907,19 @@ public class AdAtt {
     }
 
     /**
-     * 索引类型。
+     * {"EN": "AD_INDEX_TYPE_ID", "ZH_CN": "索引类型", "ZH_TW": "繁：索引类型"}。
      */
     private String adIndexTypeId;
 
     /**
-     * 获取：索引类型。
+     * 获取：{"EN": "AD_INDEX_TYPE_ID", "ZH_CN": "索引类型", "ZH_TW": "繁：索引类型"}。
      */
     public String getAdIndexTypeId() {
         return this.adIndexTypeId;
     }
 
     /**
-     * 设置：索引类型。
+     * 设置：{"EN": "AD_INDEX_TYPE_ID", "ZH_CN": "索引类型", "ZH_TW": "繁：索引类型"}。
      */
     public AdAtt setAdIndexTypeId(String adIndexTypeId) {
         if (this.adIndexTypeId == null && adIndexTypeId == null) {
@@ -2939,19 +2943,19 @@ public class AdAtt {
     }
 
     /**
-     * 创建外键。
+     * {"EN": "CREATE_FK", "ZH_CN": "创建外键", "ZH_TW": "繁：创建外键"}。
      */
     private Boolean createFk;
 
     /**
-     * 获取：创建外键。
+     * 获取：{"EN": "CREATE_FK", "ZH_CN": "创建外键", "ZH_TW": "繁：创建外键"}。
      */
     public Boolean getCreateFk() {
         return this.createFk;
     }
 
     /**
-     * 设置：创建外键。
+     * 设置：{"EN": "CREATE_FK", "ZH_CN": "创建外键", "ZH_TW": "繁：创建外键"}。
      */
     public AdAtt setCreateFk(Boolean createFk) {
         if (this.createFk == null && createFk == null) {
@@ -2975,19 +2979,19 @@ public class AdAtt {
     }
 
     /**
-     * 表单项标题隐藏。
+     * {"EN": "FORM_ITEM_TITLE_HIDDEN", "ZH_CN": "表单项标题隐藏", "ZH_TW": "繁：表单项标题隐藏"}。
      */
     private Boolean formItemTitleHidden;
 
     /**
-     * 获取：表单项标题隐藏。
+     * 获取：{"EN": "FORM_ITEM_TITLE_HIDDEN", "ZH_CN": "表单项标题隐藏", "ZH_TW": "繁：表单项标题隐藏"}。
      */
     public Boolean getFormItemTitleHidden() {
         return this.formItemTitleHidden;
     }
 
     /**
-     * 设置：表单项标题隐藏。
+     * 设置：{"EN": "FORM_ITEM_TITLE_HIDDEN", "ZH_CN": "表单项标题隐藏", "ZH_TW": "繁：表单项标题隐藏"}。
      */
     public AdAtt setFormItemTitleHidden(Boolean formItemTitleHidden) {
         if (this.formItemTitleHidden == null && formItemTitleHidden == null) {
@@ -3011,19 +3015,19 @@ public class AdAtt {
     }
 
     /**
-     * 表单项标题在上。
+     * {"EN": "FORM_ITEM_TITLE_TOP", "ZH_CN": "表单项标题在上", "ZH_TW": "繁：表单项标题在上"}。
      */
     private Boolean formItemTitleTop;
 
     /**
-     * 获取：表单项标题在上。
+     * 获取：{"EN": "FORM_ITEM_TITLE_TOP", "ZH_CN": "表单项标题在上", "ZH_TW": "繁：表单项标题在上"}。
      */
     public Boolean getFormItemTitleTop() {
         return this.formItemTitleTop;
     }
 
     /**
-     * 设置：表单项标题在上。
+     * 设置：{"EN": "FORM_ITEM_TITLE_TOP", "ZH_CN": "表单项标题在上", "ZH_TW": "繁：表单项标题在上"}。
      */
     public AdAtt setFormItemTitleTop(Boolean formItemTitleTop) {
         if (this.formItemTitleTop == null && formItemTitleTop == null) {
@@ -3047,19 +3051,19 @@ public class AdAtt {
     }
 
     /**
-     * 表单项标题换行。
+     * {"EN": "FORM_ITEM_TITLE_WRAP", "ZH_CN": "表单项标题换行", "ZH_TW": "繁：表单项标题换行"}。
      */
     private Boolean formItemTitleWrap;
 
     /**
-     * 获取：表单项标题换行。
+     * 获取：{"EN": "FORM_ITEM_TITLE_WRAP", "ZH_CN": "表单项标题换行", "ZH_TW": "繁：表单项标题换行"}。
      */
     public Boolean getFormItemTitleWrap() {
         return this.formItemTitleWrap;
     }
 
     /**
-     * 设置：表单项标题换行。
+     * 设置：{"EN": "FORM_ITEM_TITLE_WRAP", "ZH_CN": "表单项标题换行", "ZH_TW": "繁：表单项标题换行"}。
      */
     public AdAtt setFormItemTitleWrap(Boolean formItemTitleWrap) {
         if (this.formItemTitleWrap == null && formItemTitleWrap == null) {
@@ -3083,19 +3087,19 @@ public class AdAtt {
     }
 
     /**
-     * 表单项宽度。
+     * {"EN": "FORM_ITEM_WIDTH", "ZH_CN": "表单项宽度", "ZH_TW": "繁：表单项宽度"}。
      */
     private String formItemWidth;
 
     /**
-     * 获取：表单项宽度。
+     * 获取：{"EN": "FORM_ITEM_WIDTH", "ZH_CN": "表单项宽度", "ZH_TW": "繁：表单项宽度"}。
      */
     public String getFormItemWidth() {
         return this.formItemWidth;
     }
 
     /**
-     * 设置：表单项宽度。
+     * 设置：{"EN": "FORM_ITEM_WIDTH", "ZH_CN": "表单项宽度", "ZH_TW": "繁：表单项宽度"}。
      */
     public AdAtt setFormItemWidth(String formItemWidth) {
         if (this.formItemWidth == null && formItemWidth == null) {
@@ -3119,19 +3123,19 @@ public class AdAtt {
     }
 
     /**
-     * 表单项高度。
+     * {"EN": "FORM_ITEM_HEIGHT", "ZH_CN": "表单项高度", "ZH_TW": "繁：表单项高度"}。
      */
     private String formItemHeight;
 
     /**
-     * 获取：表单项高度。
+     * 获取：{"EN": "FORM_ITEM_HEIGHT", "ZH_CN": "表单项高度", "ZH_TW": "繁：表单项高度"}。
      */
     public String getFormItemHeight() {
         return this.formItemHeight;
     }
 
     /**
-     * 设置：表单项高度。
+     * 设置：{"EN": "FORM_ITEM_HEIGHT", "ZH_CN": "表单项高度", "ZH_TW": "繁：表单项高度"}。
      */
     public AdAtt setFormItemHeight(String formItemHeight) {
         if (this.formItemHeight == null && formItemHeight == null) {
@@ -3155,19 +3159,19 @@ public class AdAtt {
     }
 
     /**
-     * 表单项行跨度。
+     * {"EN": "FORM_ITEM_ROW_SPAN", "ZH_CN": "表单项行跨度", "ZH_TW": "繁：表单项行跨度"}。
      */
     private Integer formItemRowSpan;
 
     /**
-     * 获取：表单项行跨度。
+     * 获取：{"EN": "FORM_ITEM_ROW_SPAN", "ZH_CN": "表单项行跨度", "ZH_TW": "繁：表单项行跨度"}。
      */
     public Integer getFormItemRowSpan() {
         return this.formItemRowSpan;
     }
 
     /**
-     * 设置：表单项行跨度。
+     * 设置：{"EN": "FORM_ITEM_ROW_SPAN", "ZH_CN": "表单项行跨度", "ZH_TW": "繁：表单项行跨度"}。
      */
     public AdAtt setFormItemRowSpan(Integer formItemRowSpan) {
         if (this.formItemRowSpan == null && formItemRowSpan == null) {
@@ -3191,19 +3195,19 @@ public class AdAtt {
     }
 
     /**
-     * 表单项列跨度。
+     * {"EN": "FORM_ITEM_COL_SPAN", "ZH_CN": "表单项列跨度", "ZH_TW": "繁：表单项列跨度"}。
      */
     private Integer formItemColSpan;
 
     /**
-     * 获取：表单项列跨度。
+     * 获取：{"EN": "FORM_ITEM_COL_SPAN", "ZH_CN": "表单项列跨度", "ZH_TW": "繁：表单项列跨度"}。
      */
     public Integer getFormItemColSpan() {
         return this.formItemColSpan;
     }
 
     /**
-     * 设置：表单项列跨度。
+     * 设置：{"EN": "FORM_ITEM_COL_SPAN", "ZH_CN": "表单项列跨度", "ZH_TW": "繁：表单项列跨度"}。
      */
     public AdAtt setFormItemColSpan(Integer formItemColSpan) {
         if (this.formItemColSpan == null && formItemColSpan == null) {
@@ -3227,19 +3231,19 @@ public class AdAtt {
     }
 
     /**
-     * 在列表页隐藏。
+     * {"EN": "HIDE_IN_LIST", "ZH_CN": "在列表页隐藏", "ZH_TW": "繁：在列表页隐藏"}。
      */
     private Boolean hideInList;
 
     /**
-     * 获取：在列表页隐藏。
+     * 获取：{"EN": "HIDE_IN_LIST", "ZH_CN": "在列表页隐藏", "ZH_TW": "繁：在列表页隐藏"}。
      */
     public Boolean getHideInList() {
         return this.hideInList;
     }
 
     /**
-     * 设置：在列表页隐藏。
+     * 设置：{"EN": "HIDE_IN_LIST", "ZH_CN": "在列表页隐藏", "ZH_TW": "繁：在列表页隐藏"}。
      */
     public AdAtt setHideInList(Boolean hideInList) {
         if (this.hideInList == null && hideInList == null) {
@@ -3263,19 +3267,19 @@ public class AdAtt {
     }
 
     /**
-     * 在详情页隐藏。
+     * {"EN": "HIDE_IN_DTL", "ZH_CN": "在详情页隐藏", "ZH_TW": "繁：在详情页隐藏"}。
      */
     private Boolean hideInDtl;
 
     /**
-     * 获取：在详情页隐藏。
+     * 获取：{"EN": "HIDE_IN_DTL", "ZH_CN": "在详情页隐藏", "ZH_TW": "繁：在详情页隐藏"}。
      */
     public Boolean getHideInDtl() {
         return this.hideInDtl;
     }
 
     /**
-     * 设置：在详情页隐藏。
+     * 设置：{"EN": "HIDE_IN_DTL", "ZH_CN": "在详情页隐藏", "ZH_TW": "繁：在详情页隐藏"}。
      */
     public AdAtt setHideInDtl(Boolean hideInDtl) {
         if (this.hideInDtl == null && hideInDtl == null) {
@@ -3299,19 +3303,19 @@ public class AdAtt {
     }
 
     /**
-     * 在打印时隐藏。
+     * {"EN": "HIDE_IN_PRINT", "ZH_CN": "在打印时隐藏", "ZH_TW": "繁：在打印时隐藏"}。
      */
     private Boolean hideInPrint;
 
     /**
-     * 获取：在打印时隐藏。
+     * 获取：{"EN": "HIDE_IN_PRINT", "ZH_CN": "在打印时隐藏", "ZH_TW": "繁：在打印时隐藏"}。
      */
     public Boolean getHideInPrint() {
         return this.hideInPrint;
     }
 
     /**
-     * 设置：在打印时隐藏。
+     * 设置：{"EN": "HIDE_IN_PRINT", "ZH_CN": "在打印时隐藏", "ZH_TW": "繁：在打印时隐藏"}。
      */
     public AdAtt setHideInPrint(Boolean hideInPrint) {
         if (this.hideInPrint == null && hideInPrint == null) {
@@ -3335,19 +3339,19 @@ public class AdAtt {
     }
 
     /**
-     * 在简单过滤里隐藏。
+     * {"EN": "HIDE_IN_SIMPLE_FILTER", "ZH_CN": "在简单过滤里隐藏", "ZH_TW": "繁：在简单过滤里隐藏"}。
      */
     private Boolean hideInSimpleFilter;
 
     /**
-     * 获取：在简单过滤里隐藏。
+     * 获取：{"EN": "HIDE_IN_SIMPLE_FILTER", "ZH_CN": "在简单过滤里隐藏", "ZH_TW": "繁：在简单过滤里隐藏"}。
      */
     public Boolean getHideInSimpleFilter() {
         return this.hideInSimpleFilter;
     }
 
     /**
-     * 设置：在简单过滤里隐藏。
+     * 设置：{"EN": "HIDE_IN_SIMPLE_FILTER", "ZH_CN": "在简单过滤里隐藏", "ZH_TW": "繁：在简单过滤里隐藏"}。
      */
     public AdAtt setHideInSimpleFilter(Boolean hideInSimpleFilter) {
         if (this.hideInSimpleFilter == null && hideInSimpleFilter == null) {
@@ -3371,19 +3375,19 @@ public class AdAtt {
     }
 
     /**
-     * 在复杂过滤里隐藏。
+     * {"EN": "HIDE_IN_COMPLEX_FILTER", "ZH_CN": "在复杂过滤里隐藏", "ZH_TW": "繁：在复杂过滤里隐藏"}。
      */
     private Boolean hideInComplexFilter;
 
     /**
-     * 获取：在复杂过滤里隐藏。
+     * 获取：{"EN": "HIDE_IN_COMPLEX_FILTER", "ZH_CN": "在复杂过滤里隐藏", "ZH_TW": "繁：在复杂过滤里隐藏"}。
      */
     public Boolean getHideInComplexFilter() {
         return this.hideInComplexFilter;
     }
 
     /**
-     * 设置：在复杂过滤里隐藏。
+     * 设置：{"EN": "HIDE_IN_COMPLEX_FILTER", "ZH_CN": "在复杂过滤里隐藏", "ZH_TW": "繁：在复杂过滤里隐藏"}。
      */
     public AdAtt setHideInComplexFilter(Boolean hideInComplexFilter) {
         if (this.hideInComplexFilter == null && hideInComplexFilter == null) {
@@ -3407,19 +3411,19 @@ public class AdAtt {
     }
 
     /**
-     * 存储计量单位。
+     * {"EN": "STORE_UOM_ID", "ZH_CN": "存储计量单位", "ZH_TW": "繁：存储计量单位"}。
      */
     private String storeUomId;
 
     /**
-     * 获取：存储计量单位。
+     * 获取：{"EN": "STORE_UOM_ID", "ZH_CN": "存储计量单位", "ZH_TW": "繁：存储计量单位"}。
      */
     public String getStoreUomId() {
         return this.storeUomId;
     }
 
     /**
-     * 设置：存储计量单位。
+     * 设置：{"EN": "STORE_UOM_ID", "ZH_CN": "存储计量单位", "ZH_TW": "繁：存储计量单位"}。
      */
     public AdAtt setStoreUomId(String storeUomId) {
         if (this.storeUomId == null && storeUomId == null) {
@@ -3443,19 +3447,19 @@ public class AdAtt {
     }
 
     /**
-     * 显示计量单位。
+     * {"EN": "DISPLAY_UOM_ID", "ZH_CN": "显示计量单位", "ZH_TW": "繁：显示计量单位"}。
      */
     private String displayUomId;
 
     /**
-     * 获取：显示计量单位。
+     * 获取：{"EN": "DISPLAY_UOM_ID", "ZH_CN": "显示计量单位", "ZH_TW": "繁：显示计量单位"}。
      */
     public String getDisplayUomId() {
         return this.displayUomId;
     }
 
     /**
-     * 设置：显示计量单位。
+     * 设置：{"EN": "DISPLAY_UOM_ID", "ZH_CN": "显示计量单位", "ZH_TW": "繁：显示计量单位"}。
      */
     public AdAtt setDisplayUomId(String displayUomId) {
         if (this.displayUomId == null && displayUomId == null) {
@@ -3479,19 +3483,19 @@ public class AdAtt {
     }
 
     /**
-     * 是否详情链接。
+     * {"EN": "IS_DTL_LINK", "ZH_CN": "是否详情链接", "ZH_TW": "繁：是否详情链接"}。
      */
     private Boolean isDtlLink;
 
     /**
-     * 获取：是否详情链接。
+     * 获取：{"EN": "IS_DTL_LINK", "ZH_CN": "是否详情链接", "ZH_TW": "繁：是否详情链接"}。
      */
     public Boolean getIsDtlLink() {
         return this.isDtlLink;
     }
 
     /**
-     * 设置：是否详情链接。
+     * 设置：{"EN": "IS_DTL_LINK", "ZH_CN": "是否详情链接", "ZH_TW": "繁：是否详情链接"}。
      */
     public AdAtt setIsDtlLink(Boolean isDtlLink) {
         if (this.isDtlLink == null && isDtlLink == null) {
@@ -3515,19 +3519,19 @@ public class AdAtt {
     }
 
     /**
-     * 在XS列表页隐藏。
+     * {"EN": "HIDE_IN_LIST_ON_XS", "ZH_CN": "在XS列表页隐藏", "ZH_TW": "繁：在XS列表页隐藏"}。
      */
     private Boolean hideInListOnXs;
 
     /**
-     * 获取：在XS列表页隐藏。
+     * 获取：{"EN": "HIDE_IN_LIST_ON_XS", "ZH_CN": "在XS列表页隐藏", "ZH_TW": "繁：在XS列表页隐藏"}。
      */
     public Boolean getHideInListOnXs() {
         return this.hideInListOnXs;
     }
 
     /**
-     * 设置：在XS列表页隐藏。
+     * 设置：{"EN": "HIDE_IN_LIST_ON_XS", "ZH_CN": "在XS列表页隐藏", "ZH_TW": "繁：在XS列表页隐藏"}。
      */
     public AdAtt setHideInListOnXs(Boolean hideInListOnXs) {
         if (this.hideInListOnXs == null && hideInListOnXs == null) {
@@ -3551,19 +3555,19 @@ public class AdAtt {
     }
 
     /**
-     * 在SM列表页隐藏。
+     * {"EN": "HIDE_IN_LIST_ON_SM", "ZH_CN": "在SM列表页隐藏", "ZH_TW": "繁：在SM列表页隐藏"}。
      */
     private Boolean hideInListOnSm;
 
     /**
-     * 获取：在SM列表页隐藏。
+     * 获取：{"EN": "HIDE_IN_LIST_ON_SM", "ZH_CN": "在SM列表页隐藏", "ZH_TW": "繁：在SM列表页隐藏"}。
      */
     public Boolean getHideInListOnSm() {
         return this.hideInListOnSm;
     }
 
     /**
-     * 设置：在SM列表页隐藏。
+     * 设置：{"EN": "HIDE_IN_LIST_ON_SM", "ZH_CN": "在SM列表页隐藏", "ZH_TW": "繁：在SM列表页隐藏"}。
      */
     public AdAtt setHideInListOnSm(Boolean hideInListOnSm) {
         if (this.hideInListOnSm == null && hideInListOnSm == null) {
@@ -3587,19 +3591,19 @@ public class AdAtt {
     }
 
     /**
-     * 在MD列表页隐藏。
+     * {"EN": "HIDE_IN_LIST_ON_MD", "ZH_CN": "在MD列表页隐藏", "ZH_TW": "繁：在MD列表页隐藏"}。
      */
     private Boolean hideInListOnMd;
 
     /**
-     * 获取：在MD列表页隐藏。
+     * 获取：{"EN": "HIDE_IN_LIST_ON_MD", "ZH_CN": "在MD列表页隐藏", "ZH_TW": "繁：在MD列表页隐藏"}。
      */
     public Boolean getHideInListOnMd() {
         return this.hideInListOnMd;
     }
 
     /**
-     * 设置：在MD列表页隐藏。
+     * 设置：{"EN": "HIDE_IN_LIST_ON_MD", "ZH_CN": "在MD列表页隐藏", "ZH_TW": "繁：在MD列表页隐藏"}。
      */
     public AdAtt setHideInListOnMd(Boolean hideInListOnMd) {
         if (this.hideInListOnMd == null && hideInListOnMd == null) {
@@ -3623,19 +3627,19 @@ public class AdAtt {
     }
 
     /**
-     * 在LG列表页隐藏。
+     * {"EN": "HIDE_IN_LIST_ON_LG", "ZH_CN": "在LG列表页隐藏", "ZH_TW": "繁：在LG列表页隐藏"}。
      */
     private Boolean hideInListOnLg;
 
     /**
-     * 获取：在LG列表页隐藏。
+     * 获取：{"EN": "HIDE_IN_LIST_ON_LG", "ZH_CN": "在LG列表页隐藏", "ZH_TW": "繁：在LG列表页隐藏"}。
      */
     public Boolean getHideInListOnLg() {
         return this.hideInListOnLg;
     }
 
     /**
-     * 设置：在LG列表页隐藏。
+     * 设置：{"EN": "HIDE_IN_LIST_ON_LG", "ZH_CN": "在LG列表页隐藏", "ZH_TW": "繁：在LG列表页隐藏"}。
      */
     public AdAtt setHideInListOnLg(Boolean hideInListOnLg) {
         if (this.hideInListOnLg == null && hideInListOnLg == null) {
@@ -3659,19 +3663,19 @@ public class AdAtt {
     }
 
     /**
-     * 在XL列表页隐藏。
+     * {"EN": "HIDE_IN_LIST_ON_XL", "ZH_CN": "在XL列表页隐藏", "ZH_TW": "繁：在XL列表页隐藏"}。
      */
     private Boolean hideInListOnXl;
 
     /**
-     * 获取：在XL列表页隐藏。
+     * 获取：{"EN": "HIDE_IN_LIST_ON_XL", "ZH_CN": "在XL列表页隐藏", "ZH_TW": "繁：在XL列表页隐藏"}。
      */
     public Boolean getHideInListOnXl() {
         return this.hideInListOnXl;
     }
 
     /**
-     * 设置：在XL列表页隐藏。
+     * 设置：{"EN": "HIDE_IN_LIST_ON_XL", "ZH_CN": "在XL列表页隐藏", "ZH_TW": "繁：在XL列表页隐藏"}。
      */
     public AdAtt setHideInListOnXl(Boolean hideInListOnXl) {
         if (this.hideInListOnXl == null && hideInListOnXl == null) {
@@ -3689,6 +3693,42 @@ public class AdAtt {
             this.hideInListOnXl = hideInListOnXl;
             if (!this.toUpdateCols.contains("HIDE_IN_LIST_ON_XL")) {
                 this.toUpdateCols.add("HIDE_IN_LIST_ON_XL");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "ENABLE_I18N", "ZH_CN": "启用国际化", "ZH_TW": "繁：启用国际化"}。
+     */
+    private Boolean enableI18n;
+
+    /**
+     * 获取：{"EN": "ENABLE_I18N", "ZH_CN": "启用国际化", "ZH_TW": "繁：启用国际化"}。
+     */
+    public Boolean getEnableI18n() {
+        return this.enableI18n;
+    }
+
+    /**
+     * 设置：{"EN": "ENABLE_I18N", "ZH_CN": "启用国际化", "ZH_TW": "繁：启用国际化"}。
+     */
+    public AdAtt setEnableI18n(Boolean enableI18n) {
+        if (this.enableI18n == null && enableI18n == null) {
+            // 均为null，不做处理。
+        } else if (this.enableI18n != null && enableI18n != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.enableI18n.compareTo(enableI18n) != 0) {
+                this.enableI18n = enableI18n;
+                if (!this.toUpdateCols.contains("ENABLE_I18N")) {
+                    this.toUpdateCols.add("ENABLE_I18N");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.enableI18n = enableI18n;
+            if (!this.toUpdateCols.contains("ENABLE_I18N")) {
+                this.toUpdateCols.add("ENABLE_I18N");
             }
         }
         return this;

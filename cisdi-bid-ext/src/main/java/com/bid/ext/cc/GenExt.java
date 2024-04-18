@@ -4,8 +4,8 @@ import com.bid.ext.model.AdAtt;
 import com.bid.ext.model.CcQsInspection;
 import com.bid.ext.model.FlFile;
 import com.bid.ext.model.FlPath;
-import com.bid.ext.utils.DatabaseUtils;
 import com.bid.ext.utils.DownloadUtils;
+import com.deepoove.poi.data.Pictures;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -22,9 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class GenExt {
@@ -32,6 +30,7 @@ public class GenExt {
     public void genPdf() {
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+
 
         LocalDate now = LocalDate.now();
         int year = now.getYear();
@@ -51,22 +50,34 @@ public class GenExt {
             FlPath flPath = FlPath.selectOneByWhere(pathWhere);
 
             Map<String, Object> valueMap = entityRecord.valueMap;
-            MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
 
-//            String tableName = "CC_PRJ";
-//            String sql = "select IF(JSON_VALID(NAME),NAME->>'$." + loginInfo.currentLangId + "',NAME) name from " + tableName + " where NAME is not null and id = ?";
-//            String ccPrjId = valueMap.get("CC_PRJ_ID").toString();
-//            Map<String, Object> prjMap = myJdbcTemplate.queryForMap(sql, ccPrjId);
-            String prjName = DatabaseUtils.fetchNameFromTable("CC_PRJ", valueMap.get("CC_PRJ_ID").toString(), loginInfo.currentLangId.toString());
-            String issuePointTypeName = DatabaseUtils.fetchNameFromTable("CC_QS_ISSUE_POINT_TYPE", valueMap.get("CC_QS_ISSUE_POINT_TYPE_ID").toString(), loginInfo.currentLangId.toString());
-            String inspectionTypeName = DatabaseUtils.fetchNameFromTable("CC_QS_INSPECTION_TYPE", valueMap.get("CC_QS_INSPECTION_TYPE_ID").toString(), loginInfo.currentLangId.toString());
+            String prjName = fetchNameFromTable("CC_PRJ",
+                    valueMap.get("CC_PRJ_ID").toString(),
+                    loginInfo.currentLangId.toString());
+
+            String issuePointTypeName = fetchNameFromTable("CC_QS_ISSUE_POINT_TYPE",
+                    valueMap.get("CC_QS_ISSUE_POINT_TYPE_ID").toString(),
+                    loginInfo.currentLangId.toString());
+
+            String inspectionTypeName = fetchNameFromTable("CC_QS_INSPECTION_TYPE",
+                    valueMap.get("CC_QS_INSPECTION_TYPE_ID").toString(),
+                    loginInfo.currentLangId.toString());
+
+            List<Map<String, Object>> issuePointNames = fetchAndFormatIssuePointNames("CC_QS_ISSUE_POINT",
+                    valueMap.get("CC_QS_ISSUE_POINT_IDS").toString(),
+                    loginInfo.currentLangId.toString());
+
+            String issuesImgId = valueMap.get("CC_QS_ISSUES_IMG").toString();
+            List<Map<String, Object>> imageEntries = fetchAndFormatImages(issuesImgId);
 
             Map<String, Object> map = new HashMap<String, Object>();
+            map.put("csCommId", entityRecord.csCommId);
             map.put("year", year);
             map.put("prjName", prjName);
             map.put("issuePointTypeName", issuePointTypeName);
             map.put("inspectionTypeName", inspectionTypeName);
-//            map.put("CC_QS_ISSUE_POINT_ID", valueMap.get("CC_QS_ISSUE_POINT_ID").toString());
+            map.put("issuePointNames", issuePointNames);
+            map.put("imgs", imageEntries);
 
             byte[] word = DownloadUtils.createWord(map, "check.docx");
             byte[] b = convertWordToPDF(word);
@@ -102,7 +113,7 @@ public class GenExt {
                 flFile.setUploadDttm(LocalDateTime.now());
                 flFile.setPhysicalLocation(path);
                 flFile.setOriginFilePhysicalLocation(path);
-//                    flFile.setIsPublicRead(flPath.getIsPublicRead());
+//                flFile.setIsPublicRead(flPath.getIsPublicRead());
                 flFile.setIsPublicRead(false);
                 flFile.insertById();
 
@@ -177,5 +188,66 @@ public class GenExt {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * 从指定表中获取名称
+     *
+     * @param tableName
+     * @param idString
+     * @param currentLangId
+     * @return
+     */
+    public static List<Map<String, Object>> fetchAndFormatIssuePointNames(String tableName, String idString, String currentLangId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        List<String> ids = Arrays.asList(idString.split(","));
+        String inSql = String.join(",", Collections.nCopies(ids.size(), "?")); // 动态创建SQL IN子句
+        String sql = "SELECT IF(JSON_VALID(NAME), NAME->>'$." + currentLangId + "', NAME) as name FROM " + tableName
+                + " WHERE NAME IS NOT NULL AND id IN (" + inSql + ")";
+        List<Map<String, Object>> resultList = myJdbcTemplate.queryForList(sql, ids.toArray());
+        List<Map<String, Object>> formattedNames = new ArrayList<Map<String, Object>>();
+
+        int index = 1; // 开始编号
+        for (Map<String, Object> result : resultList) {
+            Map<String, Object> formattedEntry = new HashMap<>();
+            formattedEntry.put("content", index++ + "、" + result.get("name").toString());
+            formattedNames.add(formattedEntry);
+        }
+
+        return formattedNames;
+    }
+
+    /**
+     * 从指定表中获取名称
+     *
+     * @param tableName     表名
+     * @param id            记录的ID
+     * @param currentLangId 当前语言ID
+     * @return 名称字段
+     */
+    private static String fetchNameFromTable(String tableName, String id, String currentLangId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        String sql = "select IF(JSON_VALID(NAME), NAME->>'$." + currentLangId + "', NAME) as name from " + tableName + " where NAME is not null and id = ?";
+        Map<String, Object> resultMap = myJdbcTemplate.queryForMap(sql, id);
+        return resultMap.get("name").toString(); // 返回名称
+    }
+
+    public static List<Map<String, Object>> fetchAndFormatImages(String idsString) {
+        List<String> ids = Arrays.asList(idsString.split(","));
+        List<Map<String, Object>> imgs = new ArrayList<>();
+
+        for (int i = 0; i < ids.size(); i++) {
+            FlFile flFile = FlFile.selectById(ids.get(i)); // 获取文件对象
+            if (flFile != null) {
+//                String url = flFile.getFileInlineUrl(); // 获取文件 URL
+                String url = "https://qygly.com/qygly-gateway/qygly-file/viewImage?fileId=1779752021019742208&origin=false&qygly-session-id=test_admin_834D613F13A555AFCCFDD19980BC8675";
+                Map<String, Object> imgEntry = new HashMap<>();
+                imgEntry.put("order", (i + 1) + "、");
+                imgEntry.put("img", Pictures.ofUrl(url).size(350, 100).create());
+                imgs.add(imgEntry);
+            }
+        }
+
+        return imgs;
     }
 }

@@ -14,7 +14,10 @@ import java.util.Map;
 @Slf4j
 public class VerifyFileExt {
 
-    public void insertFileName(){
+    /**
+     * 自动添加名称
+     */
+    public void insertFileName() {
         EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
         String csCommId = entityRecord.csCommId;
         Map<String, Object> valueMap = entityRecord.valueMap;
@@ -24,11 +27,14 @@ public class VerifyFileExt {
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         String fileId = String.valueOf(valueMap.get("CC_ATTACHMENT"));
         String extSql = "select f.ext,f.dsp_name from fl_file f where id = ?";
-        String fileName = myJdbcTemplate.queryForMap(extSql,fileId).get("dsp_name").toString();
-        int update = myJdbcTemplate.update("update " + entityCode + " t set t.NAME = ? where t.id=?",fileName,csCommId);
+        String fileName = myJdbcTemplate.queryForMap(extSql, fileId).get("dsp_name").toString();
+        int update = myJdbcTemplate.update("update " + entityCode + " t set t.NAME = ? where t.id=?", fileName, csCommId);
     }
 
-    public void verify(){
+    /**
+     * 校验拓展名
+     */
+    public void verify() {
         EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
         String csCommId = entityRecord.csCommId;
         Map<String, Object> valueMap = entityRecord.valueMap;
@@ -41,8 +47,8 @@ public class VerifyFileExt {
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         String extSql = "select f.ext,f.dsp_name from fl_file f where id = ?";
-        String extName = myJdbcTemplate.queryForMap(extSql,fileId).get("ext").toString();
-        String fileName = myJdbcTemplate.queryForMap(extSql,fileId).get("dsp_name").toString();
+        String extName = myJdbcTemplate.queryForMap(extSql, fileId).get("ext").toString();
+        String fileName = myJdbcTemplate.queryForMap(extSql, fileId).get("dsp_name").toString();
 
         if (filetypeId == null || filetypeId.isEmpty()) {
             String allFileTypeSql = "select id, FILE_EXTENSION from CC_DOC_FILE_TYPE";
@@ -65,12 +71,10 @@ public class VerifyFileExt {
                 // 如果没有找到匹配项
                 throw new BaseException("不能识别当前上传文件类型(." + extName + ")，请联系管理员添加所需文件类型");
             } else {
-                int update = myJdbcTemplate.update("update " + entityCode + " t set t.CC_DOC_FILE_TYPE_ID = ?,t.NAME = ? where t.id=?",matchedTypeId,fileName,csCommId);
+                int update = myJdbcTemplate.update("update " + entityCode + " t set t.CC_DOC_FILE_TYPE_ID = ?,t.NAME = ? where t.id=?", matchedTypeId, fileName, csCommId);
                 log.info("已更新：{}", update);
             }
-        }
-
-        else {
+        } else {
             // filetypeId不为空的处理逻辑
             String extTypeSql = "select ft.FILE_EXTENSION from CC_DOC_FILE_TYPE ft where id = ?";
             String[] fileExtension = myJdbcTemplate.queryForMap(extTypeSql, filetypeId).get("file_extension").toString().split(";");

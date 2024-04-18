@@ -91,6 +91,11 @@ public class PreViewExt {
 
     public static final String uploadFileUrl = "https://api.bimface.com/bdfs/data/v1/projects/10000848931873/fileItems";
 
+    /**
+     * 预览
+     *
+     * @throws JsonProcessingException
+     */
     public void preview() throws JsonProcessingException {
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.urlToOpenList = new ArrayList<>();
@@ -282,9 +287,9 @@ public class PreViewExt {
     }
 
     /**
-     * 获取VR原始文件物理位置
+     * 获取VR文件内联Id
      */
-    public void getVrFileUrl() {
+    public void getVrFileInlineUrl() {
         Map<String, Object> inputMap = ExtJarHelper.getExtApiParamMap();
         String fileId = JdbcMapUtil.getString(inputMap, "fileId");
 

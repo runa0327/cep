@@ -136,9 +136,9 @@ public class CcQsInspection {
          */
         public static final String CC_QS_ISSUE_NODE_ID = "CC_QS_ISSUE_NODE_ID";
         /**
-         * {"EN": "CC_QS_ISSUE_POINT_ID", "ZH_CN": "质安问题要点", "ZH_TW": "繁：质安问题要点"}。
+         * {"EN": "质安问题要点（多个）", "ZH_CN": "质安问题要点（多个）", "ZH_TW": "质安问题要点（多个）"}。
          */
-        public static final String CC_QS_ISSUE_POINT_ID = "CC_QS_ISSUE_POINT_ID";
+        public static final String CC_QS_ISSUE_POINT_IDS = "CC_QS_ISSUE_POINT_IDS";
         /**
          * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
          */
@@ -995,36 +995,36 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_ISSUE_POINT_ID", "ZH_CN": "质安问题要点", "ZH_TW": "繁：质安问题要点"}。
+     * {"EN": "质安问题要点（多个）", "ZH_CN": "质安问题要点（多个）", "ZH_TW": "质安问题要点（多个）"}。
      */
-    private String ccQsIssuePointId;
+    private String ccQsIssuePointIds;
 
     /**
-     * 获取：{"EN": "CC_QS_ISSUE_POINT_ID", "ZH_CN": "质安问题要点", "ZH_TW": "繁：质安问题要点"}。
+     * 获取：{"EN": "质安问题要点（多个）", "ZH_CN": "质安问题要点（多个）", "ZH_TW": "质安问题要点（多个）"}。
      */
-    public String getCcQsIssuePointId() {
-        return this.ccQsIssuePointId;
+    public String getCcQsIssuePointIds() {
+        return this.ccQsIssuePointIds;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_ISSUE_POINT_ID", "ZH_CN": "质安问题要点", "ZH_TW": "繁：质安问题要点"}。
+     * 设置：{"EN": "质安问题要点（多个）", "ZH_CN": "质安问题要点（多个）", "ZH_TW": "质安问题要点（多个）"}。
      */
-    public CcQsInspection setCcQsIssuePointId(String ccQsIssuePointId) {
-        if (this.ccQsIssuePointId == null && ccQsIssuePointId == null) {
+    public CcQsInspection setCcQsIssuePointIds(String ccQsIssuePointIds) {
+        if (this.ccQsIssuePointIds == null && ccQsIssuePointIds == null) {
             // 均为null，不做处理。
-        } else if (this.ccQsIssuePointId != null && ccQsIssuePointId != null) {
+        } else if (this.ccQsIssuePointIds != null && ccQsIssuePointIds != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccQsIssuePointId.compareTo(ccQsIssuePointId) != 0) {
-                this.ccQsIssuePointId = ccQsIssuePointId;
-                if (!this.toUpdateCols.contains("CC_QS_ISSUE_POINT_ID")) {
-                    this.toUpdateCols.add("CC_QS_ISSUE_POINT_ID");
+            if (this.ccQsIssuePointIds.compareTo(ccQsIssuePointIds) != 0) {
+                this.ccQsIssuePointIds = ccQsIssuePointIds;
+                if (!this.toUpdateCols.contains("CC_QS_ISSUE_POINT_IDS")) {
+                    this.toUpdateCols.add("CC_QS_ISSUE_POINT_IDS");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccQsIssuePointId = ccQsIssuePointId;
-            if (!this.toUpdateCols.contains("CC_QS_ISSUE_POINT_ID")) {
-                this.toUpdateCols.add("CC_QS_ISSUE_POINT_ID");
+            this.ccQsIssuePointIds = ccQsIssuePointIds;
+            if (!this.toUpdateCols.contains("CC_QS_ISSUE_POINT_IDS")) {
+                this.toUpdateCols.add("CC_QS_ISSUE_POINT_IDS");
             }
         }
         return this;

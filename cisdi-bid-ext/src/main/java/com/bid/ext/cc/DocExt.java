@@ -43,35 +43,39 @@ public class DocExt {
 
 
     /**
-     * 获取分类默认文件url
+     * 获取分类默认消息ID
      */
-    public void getFileUrlByType() {
+    public void getDefaultCommId() {
         Map<String, Object> inputMap = ExtJarHelper.getExtApiParamMap();
         String type = JdbcMapUtil.getString(inputMap, "type");
         List<CcDocFile> ccDocFiles = CcDocFile.selectByWhere(new Where().eq(CcDocFile.Cols.CC_DOC_FILE_TYPE_ID, type).eq(CcDocFile.Cols.IS_DEFAULT, true));
-        if ("VR".equals(type)) {
-
-            if (SharedUtil.isEmpty(ccDocFiles)) {
-                throw new IllegalStateException("未设置默认展示文件，请设置");
-            }
-            String ccAttachment = ccDocFiles.get(0).getCcAttachment();
-            if (SharedUtil.isEmpty(ccAttachment)) {
-                throw new IllegalStateException("未上传默认展示文件，请上传");
-            }
-            FlFile flFile = FlFile.selectById(ccAttachment);
-            String fileInlineUrl = flFile.getFileInlineUrl();
-
-            Map<String, Object> outputMap = new HashMap<>();
-            outputMap.put("fileInlineUrl", fileInlineUrl);
-            ExtJarHelper.setReturnValue(outputMap);
+        if (SharedUtil.isEmpty(ccDocFiles)) {
+            throw new IllegalStateException("未设置默认展示文件，请设置");
         }
-        if ("BIM".equals(type) || "CAD".equals(type)) {
-            String ccPreviewFileId = ccDocFiles.get(0).getCcPreviewFileId();
+        String csCommId = ccDocFiles.get(0).getId();
+        Map<String, Object> outputMap = new HashMap<>();
+        outputMap.put("csCommId", csCommId);
+        ExtJarHelper.setReturnValue(outputMap);
+    }
 
-            Map<String, Object> outputMap = new HashMap<>();
-            outputMap.put("ccPreviewFileId", ccPreviewFileId);
-            ExtJarHelper.setReturnValue(outputMap);
+    /**
+     * 通过ID获取预览文件信息
+     */
+    public void getPreviewById() {
+        Map<String, Object> inputMap = ExtJarHelper.getExtApiParamMap();
+        String csCommId = JdbcMapUtil.getString(inputMap, "csCommId");
+        CcDocFile ccDocFile = CcDocFile.selectById(csCommId);
+        String ccAttachment = ccDocFile.getCcAttachment();
+        if (SharedUtil.isEmpty(ccAttachment)) {
+            throw new IllegalStateException("未上传默认展示文件，请上传");
         }
+        FlFile flFile = FlFile.selectById(ccAttachment);
+        String fileInlineUrl = flFile.getFileInlineUrl();
+        Map<String, Object> outputMap = new HashMap<>();
+        outputMap.put("fileInlineUrl", fileInlineUrl);
+        String ccPreviewFileId = ccDocFile.getCcPreviewFileId();
+        outputMap.put("ccPreviewFileId", ccPreviewFileId);
+        ExtJarHelper.setReturnValue(outputMap);
     }
 
 }
