@@ -1,11 +1,14 @@
 package com.bid.ext.cc;
 
+import com.bid.ext.model.CcDocFile;
+import com.bid.ext.model.FlFile;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -25,10 +28,19 @@ public class VerifyFileExt {
         EntityInfo entityInfo = sevInfo.entityInfo;
         String entityCode = entityInfo.code;
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
-        String fileId = String.valueOf(valueMap.get("CC_ATTACHMENT"));
-        String extSql = "select f.ext,f.dsp_name from fl_file f where id = ?";
-        String fileName = myJdbcTemplate.queryForMap(extSql, fileId).get("dsp_name").toString();
-        int update = myJdbcTemplate.update("update " + entityCode + " t set t.NAME = ? where t.id=?", fileName, csCommId);
+        String attachmentId = valueMap.get("CC_ATTACHMENT").toString();
+        FlFile flFile = FlFile.selectById(attachmentId);
+        String dspSize = flFile.getDspSize();
+        CcDocFile ccDocFile = CcDocFile.selectById(csCommId);
+        ccDocFile.setCcPreviewDspSize(dspSize);
+        ccDocFile.updateById();
+        Object name = valueMap.get("NAME");
+        if (SharedUtil.isEmpty(name)) {
+            String fileId = String.valueOf(valueMap.get("CC_ATTACHMENT"));
+            String extSql = "select f.ext,f.dsp_name from fl_file f where id = ?";
+            String fileName = myJdbcTemplate.queryForMap(extSql, fileId).get("dsp_name").toString();
+            int update = myJdbcTemplate.update("update " + entityCode + " t set t.NAME = ? where t.id=?", fileName, csCommId);
+        }
     }
 
     /**
