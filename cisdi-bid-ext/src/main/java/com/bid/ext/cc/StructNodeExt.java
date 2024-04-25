@@ -284,19 +284,28 @@ public class StructNodeExt {
     /**
      * 风险计算
      *
-     * @param planTo
-     * @param actTo
-     * @param today
-     * @return
+     * @param planTo 计划完成日期
+     * @param actTo  实际完成日期
+     * @param today  当前日期
+     * @return 风险等级
      */
     private String determineRiskLevel(LocalDate planTo, LocalDate actTo, LocalDate today) {
-        if ((planTo != null && planTo.isBefore(today)) && (actTo == null || (actTo != null && actTo.isAfter(planTo)))) {
+        if (planTo == null) {
+            return "NONE";  // 如果没有计划完成日期，风险等级为"NONE"
+        }
+
+        boolean isPlanBeforeToday = planTo.isBefore(today);
+        boolean isPlanTodayOrLater = !isPlanBeforeToday || planTo.equals(today);
+
+        if (isPlanBeforeToday && (actTo == null || actTo.isAfter(planTo))) {
             return "MISSED";
-        } else if ((planTo != null && planTo.isAfter(today) || planTo.equals(today)) && (actTo == null || (actTo != null && actTo.isAfter(planTo)))) {
+        } else if (isPlanTodayOrLater && (actTo == null || actTo.isAfter(planTo))) {
             return "DELAYED";
         }
+
         return "NONE";
     }
+
 
     /**
      * 根据子节点状态决定父节点状态
@@ -494,5 +503,6 @@ public class StructNodeExt {
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
     }
+
 
 }
