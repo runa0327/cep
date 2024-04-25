@@ -109,7 +109,7 @@ public class PreViewExt {
             CcDocFile ccDocFile = CcDocFile.selectById(id);
             String modelFileId = ccDocFile.getCcPreviewFileId();
             String type = ccDocFile.getCcDocFileTypeId();
-            String fileId = ccDocFile.getCcAttachment();
+
 
 //            String type = DatabaseUtils.fetchNameFromTable("CC_DOC_FILE_TYPE", ccDocFile.getCcDocFileTypeId(), loginInfo.currentLangId.toString());
 
@@ -119,7 +119,7 @@ public class PreViewExt {
             // 2、若无预览地址：
             if (SharedUtil.isEmpty(previewUrl)) {
                 if ("VR".equals(type)) {
-                    previewUrl = "../cisdi-gczx-jszt/#/preview?type=" + type + "&docFileId=" + fileId;
+                    previewUrl = "../cisdi-gczx-jszt/#/preview?type=" + type + "&docFileId=" + entityRecord.csCommId;
                     ccDocFile.setCcPreviewUrl(previewUrl);
                     ccDocFile.updateById();
                 } else {
