@@ -44,19 +44,35 @@ public class PrjExt {
         }
     }
 
-    public void dateCheck() throws Exception {
+    public void prjDateCheck() throws Exception {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             Map<String, Object> valueMap = entityRecord.valueMap;
             Object fromDate = valueMap.get("FROM_DATE");
             Object toDate = valueMap.get("TO_DATE");
+
             if (!SharedUtil.isEmpty(toDate)) {
-                LocalDate from = LocalDate.parse((String) fromDate, formatter);
-                LocalDate to = LocalDate.parse((String) toDate, formatter);
-                if (from.isAfter(to)) {
-                    throw new Exception("请检查并确保开工日期早于竣工日期");
-                }
+                checkDates((String) fromDate, (String) toDate);
             }
         }
     }
+
+
+    /**
+     * 检查两个日期字符串，确保第一个日期不晚于第二个日期。
+     *
+     * @param fromDateStr 开始日期字符串
+     * @param toDateStr   结束日期字符串
+     * @throws Exception 如果开始日期晚于结束日期
+     */
+    public static void checkDates(String fromDateStr, String toDateStr) throws Exception {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate from = LocalDate.parse(fromDateStr, formatter);
+        LocalDate to = LocalDate.parse(toDateStr, formatter);
+
+        if (from.isAfter(to)) {
+            throw new Exception("请检查并确保开始日期不晚于结束日期");
+        }
+    }
+
+
 }

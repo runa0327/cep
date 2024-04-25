@@ -8,6 +8,7 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
+import com.qygly.shared.util.SharedUtil;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.math.BigDecimal;
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+
+import static com.bid.ext.cc.PrjExt.checkDates;
 
 public class StructNodeExt {
 
@@ -502,6 +505,68 @@ public class StructNodeExt {
         recalculationPlan();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    public void nodeDateCheckCalculate() throws Exception {
+        EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
+        Map<String, Object> valueMap = entityRecord.valueMap;
+        Object planFr = valueMap.get("PLAN_FR");
+        Object planTo = valueMap.get("PLAN_TO");
+
+        Object planFrDayNoObj = valueMap.get("PLAN_FR_DAY_NO");
+        Object planToDayNoObj = valueMap.get("PLAN_TO_DAY_NO");
+        if (!SharedUtil.isEmpty(planFr) && !SharedUtil.isEmpty(planTo)) {
+            checkDates((String) planFr, (String) planTo);
+
+            LocalDate startDate = LocalDate.parse((String) planFr);
+            LocalDate endDate = LocalDate.parse((String) planTo);
+
+            BigDecimal daysBetween = BigDecimal.valueOf(ChronoUnit.DAYS.between(startDate, endDate)).add(BigDecimal.ONE);
+            entityRecord.valueMap.put("PLAN_DAYS", daysBetween);
+            if (SharedUtil.isEmpty(entityRecord.extraEditableAttCodeList)) {
+                entityRecord.extraEditableAttCodeList = new ArrayList<>(1);
+            }
+            if (!entityRecord.extraEditableAttCodeList.contains("PLAN_DAYS")) {
+                entityRecord.extraEditableAttCodeList.add("PLAN_DAYS");
+            }
+        }
+
+        if (!SharedUtil.isEmpty(planFrDayNoObj) && !SharedUtil.isEmpty(planToDayNoObj)) {
+            BigDecimal planFrDayNo = new BigDecimal(planFrDayNoObj.toString());
+            BigDecimal planToDayNo = new BigDecimal(planToDayNoObj.toString());
+
+            if (planFrDayNo.compareTo(planToDayNo) <= 0) {
+                BigDecimal dayCount = planToDayNo.subtract(planFrDayNo).add(BigDecimal.ONE);
+                entityRecord.valueMap.put("PLAN_DAYS", dayCount);
+                if (SharedUtil.isEmpty(entityRecord.extraEditableAttCodeList)) {
+                    entityRecord.extraEditableAttCodeList = new ArrayList<>(1);
+                }
+                if (!entityRecord.extraEditableAttCodeList.contains("PLAN_DAYS")) {
+                    entityRecord.extraEditableAttCodeList.add("PLAN_DAYS");
+                }
+            } else {
+                throw new Exception("请检查并确保开始日期不晚于结束日期");
+            }
+        }
+    }
+
+    public void nodeDayCheckCalculate() throws Exception {
+        EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
+        Map<String, Object> valueMap = entityRecord.valueMap;
+        Object planFrDayNoObj = valueMap.get("PLAN_FR_DAY_NO");
+        Object planToDayNoObj = valueMap.get("PLAN_TO_DAY_NO");
+
+        if (!SharedUtil.isEmpty(planFrDayNoObj) && !SharedUtil.isEmpty(planToDayNoObj)) {
+            BigDecimal planFrDayNo = new BigDecimal(planFrDayNoObj.toString());
+            BigDecimal planToDayNo = new BigDecimal(planToDayNoObj.toString());
+
+            if (planFrDayNo.compareTo(planToDayNo) <= 0) {
+                BigDecimal dayCount = planToDayNo.subtract(planFrDayNo).add(BigDecimal.ONE);
+
+            } else {
+                throw new Exception("请检查并确保开始日期不晚于结束日期");
+            }
+        }
     }
 
 
