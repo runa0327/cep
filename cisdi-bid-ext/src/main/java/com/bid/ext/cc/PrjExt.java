@@ -7,6 +7,11 @@ import com.bid.ext.model.CcPrjMember;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.EntityRecordUtil;
+import com.qygly.shared.util.SharedUtil;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 public class PrjExt {
     /**
@@ -31,11 +36,27 @@ public class PrjExt {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String id = EntityRecordUtil.getId(entityRecord);
             CcPartyCompany ccPartyCompany = CcPartyCompany.selectById(id);
-            String ccCompanyIds = ccPartyCompany.getCcCompanyIds();
-            CcCompany ccCompany = CcCompany.selectById(ccCompanyIds);
+            String ccCompanyId = ccPartyCompany.getCcCompanyId();
+            CcCompany ccCompany = CcCompany.selectById(ccCompanyId);
             String ccCompanyName = ccCompany.getName();
             ccPartyCompany.setName(ccCompanyName);
             ccPartyCompany.updateById();
+        }
+    }
+
+    public void dateCheck() throws Exception {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            Object fromDate = valueMap.get("FROM_DATE");
+            Object toDate = valueMap.get("TO_DATE");
+            if (!SharedUtil.isEmpty(toDate)) {
+                LocalDate from = LocalDate.parse((String) fromDate, formatter);
+                LocalDate to = LocalDate.parse((String) toDate, formatter);
+                if (from.isAfter(to)) {
+                    throw new Exception("请检查并确保开工日期早于竣工日期");
+                }
+            }
         }
     }
 }

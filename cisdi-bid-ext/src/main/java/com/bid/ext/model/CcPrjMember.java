@@ -115,17 +115,13 @@ public class CcPrjMember {
          */
         public static final String AD_USER_ID = "AD_USER_ID";
         /**
-         * {"EN": "CC_PRJ_ROLE_ID", "ZH_CN": "项目角色", "ZH_TW": "繁：项目角色"}。
-         */
-        public static final String CC_PRJ_ROLE_ID = "CC_PRJ_ROLE_ID";
-        /**
          * {"EN": "参建方", "ZH_CN": "参建方", "ZH_TW": "参建方"}。
          */
         public static final String CC_PARTY_ID = "CC_PARTY_ID";
         /**
-         * {"EN": "CC_COMPANY_IDS", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
+         * {"EN": "CC_COMPANY_ID", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
          */
-        public static final String CC_COMPANY_IDS = "CC_COMPANY_IDS";
+        public static final String CC_COMPANY_ID = "CC_COMPANY_ID";
         /**
          * {"EN": "岗位", "ZH_CN": "岗位", "ZH_TW": "岗位"}。
          */
@@ -750,42 +746,6 @@ public class CcPrjMember {
     }
 
     /**
-     * {"EN": "CC_PRJ_ROLE_ID", "ZH_CN": "项目角色", "ZH_TW": "繁：项目角色"}。
-     */
-    private String ccPrjRoleId;
-
-    /**
-     * 获取：{"EN": "CC_PRJ_ROLE_ID", "ZH_CN": "项目角色", "ZH_TW": "繁：项目角色"}。
-     */
-    public String getCcPrjRoleId() {
-        return this.ccPrjRoleId;
-    }
-
-    /**
-     * 设置：{"EN": "CC_PRJ_ROLE_ID", "ZH_CN": "项目角色", "ZH_TW": "繁：项目角色"}。
-     */
-    public CcPrjMember setCcPrjRoleId(String ccPrjRoleId) {
-        if (this.ccPrjRoleId == null && ccPrjRoleId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccPrjRoleId != null && ccPrjRoleId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccPrjRoleId.compareTo(ccPrjRoleId) != 0) {
-                this.ccPrjRoleId = ccPrjRoleId;
-                if (!this.toUpdateCols.contains("CC_PRJ_ROLE_ID")) {
-                    this.toUpdateCols.add("CC_PRJ_ROLE_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccPrjRoleId = ccPrjRoleId;
-            if (!this.toUpdateCols.contains("CC_PRJ_ROLE_ID")) {
-                this.toUpdateCols.add("CC_PRJ_ROLE_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
      * {"EN": "参建方", "ZH_CN": "参建方", "ZH_TW": "参建方"}。
      */
     private String ccPartyId;
@@ -822,36 +782,36 @@ public class CcPrjMember {
     }
 
     /**
-     * {"EN": "CC_COMPANY_IDS", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
+     * {"EN": "CC_COMPANY_ID", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
      */
-    private String ccCompanyIds;
+    private String ccCompanyId;
 
     /**
-     * 获取：{"EN": "CC_COMPANY_IDS", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
+     * 获取：{"EN": "CC_COMPANY_ID", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
      */
-    public String getCcCompanyIds() {
-        return this.ccCompanyIds;
+    public String getCcCompanyId() {
+        return this.ccCompanyId;
     }
 
     /**
-     * 设置：{"EN": "CC_COMPANY_IDS", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
+     * 设置：{"EN": "CC_COMPANY_ID", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
      */
-    public CcPrjMember setCcCompanyIds(String ccCompanyIds) {
-        if (this.ccCompanyIds == null && ccCompanyIds == null) {
+    public CcPrjMember setCcCompanyId(String ccCompanyId) {
+        if (this.ccCompanyId == null && ccCompanyId == null) {
             // 均为null，不做处理。
-        } else if (this.ccCompanyIds != null && ccCompanyIds != null) {
+        } else if (this.ccCompanyId != null && ccCompanyId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccCompanyIds.compareTo(ccCompanyIds) != 0) {
-                this.ccCompanyIds = ccCompanyIds;
-                if (!this.toUpdateCols.contains("CC_COMPANY_IDS")) {
-                    this.toUpdateCols.add("CC_COMPANY_IDS");
+            if (this.ccCompanyId.compareTo(ccCompanyId) != 0) {
+                this.ccCompanyId = ccCompanyId;
+                if (!this.toUpdateCols.contains("CC_COMPANY_ID")) {
+                    this.toUpdateCols.add("CC_COMPANY_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccCompanyIds = ccCompanyIds;
-            if (!this.toUpdateCols.contains("CC_COMPANY_IDS")) {
-                this.toUpdateCols.add("CC_COMPANY_IDS");
+            this.ccCompanyId = ccCompanyId;
+            if (!this.toUpdateCols.contains("CC_COMPANY_ID")) {
+                this.toUpdateCols.add("CC_COMPANY_ID");
             }
         }
         return this;
