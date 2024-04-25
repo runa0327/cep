@@ -11,7 +11,9 @@ import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.EntityRecordUtil;
+import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -27,9 +29,14 @@ import java.util.*;
 @Slf4j
 public class GenExt {
 
+    /**
+     * 生成pdf
+     */
     public void genPdf() {
+        InvokeActResult invokeActResult = new InvokeActResult();
         List<EntityRecord> entityRecordList = ExtJarHelper.getEntityRecordList();
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String sessionId = loginInfo.sessionId;
 
 
         LocalDate now = LocalDate.now();
@@ -63,11 +70,18 @@ public class GenExt {
                     valueMap.get("CC_QS_INSPECTION_TYPE_ID").toString(),
                     loginInfo.currentLangId.toString());
 
-            List<Map<String, Object>> issuePointNames = fetchAndFormatIssuePointNames("CC_QS_ISSUE_POINT",
-                    valueMap.get("CC_QS_ISSUE_POINT_IDS").toString(),
-                    loginInfo.currentLangId.toString());
+            Object ccQsIssuePointIds = valueMap.get("CC_QS_ISSUE_POINT_IDS");
+            List<Map<String, Object>> issuePointNames = null;
+            if (!SharedUtil.isEmpty(ccQsIssuePointIds)) {
+                issuePointNames = fetchAndFormatIssuePointNames("CC_QS_ISSUE_POINT",
+                        ccQsIssuePointIds.toString(),
+                        loginInfo.currentLangId.toString());
+            }
 
-            String issuesImgId = valueMap.get("CC_QS_ISSUES_IMG").toString();
+            String issuesImgId = null;
+            if (!SharedUtil.isEmpty(valueMap.get("CC_QS_ISSUES_IMG"))) {
+                issuesImgId = valueMap.get("CC_QS_ISSUES_IMG").toString();
+            }
             List<Map<String, Object>> imageEntries = fetchAndFormatImages(issuesImgId);
 
             Map<String, Object> map = new HashMap<String, Object>();
@@ -125,6 +139,8 @@ public class GenExt {
                 System.out.println("文件未找到：" + path);
             }
         }
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     public static void saveWordToFile(byte[] wordContent, String outputPath) {
@@ -233,14 +249,19 @@ public class GenExt {
     }
 
     public static List<Map<String, Object>> fetchAndFormatImages(String idsString) {
+        String sessionId = ExtJarHelper.getLoginInfo().sessionId;
+        if (idsString == null || idsString.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+
         List<String> ids = Arrays.asList(idsString.split(","));
         List<Map<String, Object>> imgs = new ArrayList<>();
 
         for (int i = 0; i < ids.size(); i++) {
             FlFile flFile = FlFile.selectById(ids.get(i)); // 获取文件对象
             if (flFile != null) {
-//                String url = flFile.getFileInlineUrl(); // 获取文件 URL
-                String url = "https://qygly.com/qygly-gateway/qygly-file/viewImage?fileId=1779752021019742208&origin=false&qygly-session-id=test_admin_834D613F13A555AFCCFDD19980BC8675";
+                String fileInlineUrl = flFile.getFileInlineUrl(); // 获取文件 URL
+                String url = "https://qygly.com" + fileInlineUrl + "&qygly-session-id=" + sessionId;
                 Map<String, Object> imgEntry = new HashMap<>();
                 imgEntry.put("order", (i + 1) + "、");
                 imgEntry.put("img", Pictures.ofUrl(url).size(350, 100).create());

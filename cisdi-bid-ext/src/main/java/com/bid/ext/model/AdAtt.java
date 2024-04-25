@@ -332,34 +332,6 @@ public class AdAtt {
          */
         public static final String CREATE_FK = "CREATE_FK";
         /**
-         * {"EN": "FORM_ITEM_TITLE_HIDDEN", "ZH_CN": "表单项标题隐藏", "ZH_TW": "繁：表单项标题隐藏"}。
-         */
-        public static final String FORM_ITEM_TITLE_HIDDEN = "FORM_ITEM_TITLE_HIDDEN";
-        /**
-         * {"EN": "FORM_ITEM_TITLE_TOP", "ZH_CN": "表单项标题在上", "ZH_TW": "繁：表单项标题在上"}。
-         */
-        public static final String FORM_ITEM_TITLE_TOP = "FORM_ITEM_TITLE_TOP";
-        /**
-         * {"EN": "FORM_ITEM_TITLE_WRAP", "ZH_CN": "表单项标题换行", "ZH_TW": "繁：表单项标题换行"}。
-         */
-        public static final String FORM_ITEM_TITLE_WRAP = "FORM_ITEM_TITLE_WRAP";
-        /**
-         * {"EN": "FORM_ITEM_WIDTH", "ZH_CN": "表单项宽度", "ZH_TW": "繁：表单项宽度"}。
-         */
-        public static final String FORM_ITEM_WIDTH = "FORM_ITEM_WIDTH";
-        /**
-         * {"EN": "FORM_ITEM_HEIGHT", "ZH_CN": "表单项高度", "ZH_TW": "繁：表单项高度"}。
-         */
-        public static final String FORM_ITEM_HEIGHT = "FORM_ITEM_HEIGHT";
-        /**
-         * {"EN": "FORM_ITEM_ROW_SPAN", "ZH_CN": "表单项行跨度", "ZH_TW": "繁：表单项行跨度"}。
-         */
-        public static final String FORM_ITEM_ROW_SPAN = "FORM_ITEM_ROW_SPAN";
-        /**
-         * {"EN": "FORM_ITEM_COL_SPAN", "ZH_CN": "表单项列跨度", "ZH_TW": "繁：表单项列跨度"}。
-         */
-        public static final String FORM_ITEM_COL_SPAN = "FORM_ITEM_COL_SPAN";
-        /**
          * {"EN": "HIDE_IN_LIST", "ZH_CN": "在列表页隐藏", "ZH_TW": "繁：在列表页隐藏"}。
          */
         public static final String HIDE_IN_LIST = "HIDE_IN_LIST";
@@ -415,6 +387,26 @@ public class AdAtt {
          * {"EN": "ENABLE_I18N", "ZH_CN": "启用国际化", "ZH_TW": "繁：启用国际化"}。
          */
         public static final String ENABLE_I18N = "ENABLE_I18N";
+        /**
+         * {"EN": "XS实体视图显示类型", "ZH_CN": "XS表单项的列跨度", "ZH_TW": "XS实体视图显示类型"}。
+         */
+        public static final String FORM_ITEM_COLSPAN_ON_XS = "FORM_ITEM_COLSPAN_ON_XS";
+        /**
+         * {"EN": "SM实体视图显示类型", "ZH_CN": "SM表单项的列跨度", "ZH_TW": "SM实体视图显示类型"}。
+         */
+        public static final String FORM_ITEM_COLSPAN_ON_SM = "FORM_ITEM_COLSPAN_ON_SM";
+        /**
+         * {"EN": "MD实体视图显示类型", "ZH_CN": "MD表单项的列跨度", "ZH_TW": "MD实体视图显示类型"}。
+         */
+        public static final String FORM_ITEM_COLSPAN_ON_MD = "FORM_ITEM_COLSPAN_ON_MD";
+        /**
+         * {"EN": "LG实体视图显示类型", "ZH_CN": "LG表单项的列跨度", "ZH_TW": "LG实体视图显示类型"}。
+         */
+        public static final String FORM_ITEM_COLSPAN_ON_LG = "FORM_ITEM_COLSPAN_ON_LG";
+        /**
+         * {"EN": "XL实体视图显示类型", "ZH_CN": "XL表单项的列跨度", "ZH_TW": "XL实体视图显示类型"}。
+         */
+        public static final String FORM_ITEM_COLSPAN_ON_XL = "FORM_ITEM_COLSPAN_ON_XL";
     }
 
     // </editor-fold>
@@ -2979,258 +2971,6 @@ public class AdAtt {
     }
 
     /**
-     * {"EN": "FORM_ITEM_TITLE_HIDDEN", "ZH_CN": "表单项标题隐藏", "ZH_TW": "繁：表单项标题隐藏"}。
-     */
-    private Boolean formItemTitleHidden;
-
-    /**
-     * 获取：{"EN": "FORM_ITEM_TITLE_HIDDEN", "ZH_CN": "表单项标题隐藏", "ZH_TW": "繁：表单项标题隐藏"}。
-     */
-    public Boolean getFormItemTitleHidden() {
-        return this.formItemTitleHidden;
-    }
-
-    /**
-     * 设置：{"EN": "FORM_ITEM_TITLE_HIDDEN", "ZH_CN": "表单项标题隐藏", "ZH_TW": "繁：表单项标题隐藏"}。
-     */
-    public AdAtt setFormItemTitleHidden(Boolean formItemTitleHidden) {
-        if (this.formItemTitleHidden == null && formItemTitleHidden == null) {
-            // 均为null，不做处理。
-        } else if (this.formItemTitleHidden != null && formItemTitleHidden != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.formItemTitleHidden.compareTo(formItemTitleHidden) != 0) {
-                this.formItemTitleHidden = formItemTitleHidden;
-                if (!this.toUpdateCols.contains("FORM_ITEM_TITLE_HIDDEN")) {
-                    this.toUpdateCols.add("FORM_ITEM_TITLE_HIDDEN");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.formItemTitleHidden = formItemTitleHidden;
-            if (!this.toUpdateCols.contains("FORM_ITEM_TITLE_HIDDEN")) {
-                this.toUpdateCols.add("FORM_ITEM_TITLE_HIDDEN");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "FORM_ITEM_TITLE_TOP", "ZH_CN": "表单项标题在上", "ZH_TW": "繁：表单项标题在上"}。
-     */
-    private Boolean formItemTitleTop;
-
-    /**
-     * 获取：{"EN": "FORM_ITEM_TITLE_TOP", "ZH_CN": "表单项标题在上", "ZH_TW": "繁：表单项标题在上"}。
-     */
-    public Boolean getFormItemTitleTop() {
-        return this.formItemTitleTop;
-    }
-
-    /**
-     * 设置：{"EN": "FORM_ITEM_TITLE_TOP", "ZH_CN": "表单项标题在上", "ZH_TW": "繁：表单项标题在上"}。
-     */
-    public AdAtt setFormItemTitleTop(Boolean formItemTitleTop) {
-        if (this.formItemTitleTop == null && formItemTitleTop == null) {
-            // 均为null，不做处理。
-        } else if (this.formItemTitleTop != null && formItemTitleTop != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.formItemTitleTop.compareTo(formItemTitleTop) != 0) {
-                this.formItemTitleTop = formItemTitleTop;
-                if (!this.toUpdateCols.contains("FORM_ITEM_TITLE_TOP")) {
-                    this.toUpdateCols.add("FORM_ITEM_TITLE_TOP");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.formItemTitleTop = formItemTitleTop;
-            if (!this.toUpdateCols.contains("FORM_ITEM_TITLE_TOP")) {
-                this.toUpdateCols.add("FORM_ITEM_TITLE_TOP");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "FORM_ITEM_TITLE_WRAP", "ZH_CN": "表单项标题换行", "ZH_TW": "繁：表单项标题换行"}。
-     */
-    private Boolean formItemTitleWrap;
-
-    /**
-     * 获取：{"EN": "FORM_ITEM_TITLE_WRAP", "ZH_CN": "表单项标题换行", "ZH_TW": "繁：表单项标题换行"}。
-     */
-    public Boolean getFormItemTitleWrap() {
-        return this.formItemTitleWrap;
-    }
-
-    /**
-     * 设置：{"EN": "FORM_ITEM_TITLE_WRAP", "ZH_CN": "表单项标题换行", "ZH_TW": "繁：表单项标题换行"}。
-     */
-    public AdAtt setFormItemTitleWrap(Boolean formItemTitleWrap) {
-        if (this.formItemTitleWrap == null && formItemTitleWrap == null) {
-            // 均为null，不做处理。
-        } else if (this.formItemTitleWrap != null && formItemTitleWrap != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.formItemTitleWrap.compareTo(formItemTitleWrap) != 0) {
-                this.formItemTitleWrap = formItemTitleWrap;
-                if (!this.toUpdateCols.contains("FORM_ITEM_TITLE_WRAP")) {
-                    this.toUpdateCols.add("FORM_ITEM_TITLE_WRAP");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.formItemTitleWrap = formItemTitleWrap;
-            if (!this.toUpdateCols.contains("FORM_ITEM_TITLE_WRAP")) {
-                this.toUpdateCols.add("FORM_ITEM_TITLE_WRAP");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "FORM_ITEM_WIDTH", "ZH_CN": "表单项宽度", "ZH_TW": "繁：表单项宽度"}。
-     */
-    private String formItemWidth;
-
-    /**
-     * 获取：{"EN": "FORM_ITEM_WIDTH", "ZH_CN": "表单项宽度", "ZH_TW": "繁：表单项宽度"}。
-     */
-    public String getFormItemWidth() {
-        return this.formItemWidth;
-    }
-
-    /**
-     * 设置：{"EN": "FORM_ITEM_WIDTH", "ZH_CN": "表单项宽度", "ZH_TW": "繁：表单项宽度"}。
-     */
-    public AdAtt setFormItemWidth(String formItemWidth) {
-        if (this.formItemWidth == null && formItemWidth == null) {
-            // 均为null，不做处理。
-        } else if (this.formItemWidth != null && formItemWidth != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.formItemWidth.compareTo(formItemWidth) != 0) {
-                this.formItemWidth = formItemWidth;
-                if (!this.toUpdateCols.contains("FORM_ITEM_WIDTH")) {
-                    this.toUpdateCols.add("FORM_ITEM_WIDTH");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.formItemWidth = formItemWidth;
-            if (!this.toUpdateCols.contains("FORM_ITEM_WIDTH")) {
-                this.toUpdateCols.add("FORM_ITEM_WIDTH");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "FORM_ITEM_HEIGHT", "ZH_CN": "表单项高度", "ZH_TW": "繁：表单项高度"}。
-     */
-    private String formItemHeight;
-
-    /**
-     * 获取：{"EN": "FORM_ITEM_HEIGHT", "ZH_CN": "表单项高度", "ZH_TW": "繁：表单项高度"}。
-     */
-    public String getFormItemHeight() {
-        return this.formItemHeight;
-    }
-
-    /**
-     * 设置：{"EN": "FORM_ITEM_HEIGHT", "ZH_CN": "表单项高度", "ZH_TW": "繁：表单项高度"}。
-     */
-    public AdAtt setFormItemHeight(String formItemHeight) {
-        if (this.formItemHeight == null && formItemHeight == null) {
-            // 均为null，不做处理。
-        } else if (this.formItemHeight != null && formItemHeight != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.formItemHeight.compareTo(formItemHeight) != 0) {
-                this.formItemHeight = formItemHeight;
-                if (!this.toUpdateCols.contains("FORM_ITEM_HEIGHT")) {
-                    this.toUpdateCols.add("FORM_ITEM_HEIGHT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.formItemHeight = formItemHeight;
-            if (!this.toUpdateCols.contains("FORM_ITEM_HEIGHT")) {
-                this.toUpdateCols.add("FORM_ITEM_HEIGHT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "FORM_ITEM_ROW_SPAN", "ZH_CN": "表单项行跨度", "ZH_TW": "繁：表单项行跨度"}。
-     */
-    private Integer formItemRowSpan;
-
-    /**
-     * 获取：{"EN": "FORM_ITEM_ROW_SPAN", "ZH_CN": "表单项行跨度", "ZH_TW": "繁：表单项行跨度"}。
-     */
-    public Integer getFormItemRowSpan() {
-        return this.formItemRowSpan;
-    }
-
-    /**
-     * 设置：{"EN": "FORM_ITEM_ROW_SPAN", "ZH_CN": "表单项行跨度", "ZH_TW": "繁：表单项行跨度"}。
-     */
-    public AdAtt setFormItemRowSpan(Integer formItemRowSpan) {
-        if (this.formItemRowSpan == null && formItemRowSpan == null) {
-            // 均为null，不做处理。
-        } else if (this.formItemRowSpan != null && formItemRowSpan != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.formItemRowSpan.compareTo(formItemRowSpan) != 0) {
-                this.formItemRowSpan = formItemRowSpan;
-                if (!this.toUpdateCols.contains("FORM_ITEM_ROW_SPAN")) {
-                    this.toUpdateCols.add("FORM_ITEM_ROW_SPAN");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.formItemRowSpan = formItemRowSpan;
-            if (!this.toUpdateCols.contains("FORM_ITEM_ROW_SPAN")) {
-                this.toUpdateCols.add("FORM_ITEM_ROW_SPAN");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "FORM_ITEM_COL_SPAN", "ZH_CN": "表单项列跨度", "ZH_TW": "繁：表单项列跨度"}。
-     */
-    private Integer formItemColSpan;
-
-    /**
-     * 获取：{"EN": "FORM_ITEM_COL_SPAN", "ZH_CN": "表单项列跨度", "ZH_TW": "繁：表单项列跨度"}。
-     */
-    public Integer getFormItemColSpan() {
-        return this.formItemColSpan;
-    }
-
-    /**
-     * 设置：{"EN": "FORM_ITEM_COL_SPAN", "ZH_CN": "表单项列跨度", "ZH_TW": "繁：表单项列跨度"}。
-     */
-    public AdAtt setFormItemColSpan(Integer formItemColSpan) {
-        if (this.formItemColSpan == null && formItemColSpan == null) {
-            // 均为null，不做处理。
-        } else if (this.formItemColSpan != null && formItemColSpan != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.formItemColSpan.compareTo(formItemColSpan) != 0) {
-                this.formItemColSpan = formItemColSpan;
-                if (!this.toUpdateCols.contains("FORM_ITEM_COL_SPAN")) {
-                    this.toUpdateCols.add("FORM_ITEM_COL_SPAN");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.formItemColSpan = formItemColSpan;
-            if (!this.toUpdateCols.contains("FORM_ITEM_COL_SPAN")) {
-                this.toUpdateCols.add("FORM_ITEM_COL_SPAN");
-            }
-        }
-        return this;
-    }
-
-    /**
      * {"EN": "HIDE_IN_LIST", "ZH_CN": "在列表页隐藏", "ZH_TW": "繁：在列表页隐藏"}。
      */
     private Boolean hideInList;
@@ -3729,6 +3469,186 @@ public class AdAtt {
             this.enableI18n = enableI18n;
             if (!this.toUpdateCols.contains("ENABLE_I18N")) {
                 this.toUpdateCols.add("ENABLE_I18N");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "XS实体视图显示类型", "ZH_CN": "XS表单项的列跨度", "ZH_TW": "XS实体视图显示类型"}。
+     */
+    private Integer formItemColspanOnXs;
+
+    /**
+     * 获取：{"EN": "XS实体视图显示类型", "ZH_CN": "XS表单项的列跨度", "ZH_TW": "XS实体视图显示类型"}。
+     */
+    public Integer getFormItemColspanOnXs() {
+        return this.formItemColspanOnXs;
+    }
+
+    /**
+     * 设置：{"EN": "XS实体视图显示类型", "ZH_CN": "XS表单项的列跨度", "ZH_TW": "XS实体视图显示类型"}。
+     */
+    public AdAtt setFormItemColspanOnXs(Integer formItemColspanOnXs) {
+        if (this.formItemColspanOnXs == null && formItemColspanOnXs == null) {
+            // 均为null，不做处理。
+        } else if (this.formItemColspanOnXs != null && formItemColspanOnXs != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.formItemColspanOnXs.compareTo(formItemColspanOnXs) != 0) {
+                this.formItemColspanOnXs = formItemColspanOnXs;
+                if (!this.toUpdateCols.contains("FORM_ITEM_COLSPAN_ON_XS")) {
+                    this.toUpdateCols.add("FORM_ITEM_COLSPAN_ON_XS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.formItemColspanOnXs = formItemColspanOnXs;
+            if (!this.toUpdateCols.contains("FORM_ITEM_COLSPAN_ON_XS")) {
+                this.toUpdateCols.add("FORM_ITEM_COLSPAN_ON_XS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "SM实体视图显示类型", "ZH_CN": "SM表单项的列跨度", "ZH_TW": "SM实体视图显示类型"}。
+     */
+    private Integer formItemColspanOnSm;
+
+    /**
+     * 获取：{"EN": "SM实体视图显示类型", "ZH_CN": "SM表单项的列跨度", "ZH_TW": "SM实体视图显示类型"}。
+     */
+    public Integer getFormItemColspanOnSm() {
+        return this.formItemColspanOnSm;
+    }
+
+    /**
+     * 设置：{"EN": "SM实体视图显示类型", "ZH_CN": "SM表单项的列跨度", "ZH_TW": "SM实体视图显示类型"}。
+     */
+    public AdAtt setFormItemColspanOnSm(Integer formItemColspanOnSm) {
+        if (this.formItemColspanOnSm == null && formItemColspanOnSm == null) {
+            // 均为null，不做处理。
+        } else if (this.formItemColspanOnSm != null && formItemColspanOnSm != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.formItemColspanOnSm.compareTo(formItemColspanOnSm) != 0) {
+                this.formItemColspanOnSm = formItemColspanOnSm;
+                if (!this.toUpdateCols.contains("FORM_ITEM_COLSPAN_ON_SM")) {
+                    this.toUpdateCols.add("FORM_ITEM_COLSPAN_ON_SM");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.formItemColspanOnSm = formItemColspanOnSm;
+            if (!this.toUpdateCols.contains("FORM_ITEM_COLSPAN_ON_SM")) {
+                this.toUpdateCols.add("FORM_ITEM_COLSPAN_ON_SM");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "MD实体视图显示类型", "ZH_CN": "MD表单项的列跨度", "ZH_TW": "MD实体视图显示类型"}。
+     */
+    private Integer formItemColspanOnMd;
+
+    /**
+     * 获取：{"EN": "MD实体视图显示类型", "ZH_CN": "MD表单项的列跨度", "ZH_TW": "MD实体视图显示类型"}。
+     */
+    public Integer getFormItemColspanOnMd() {
+        return this.formItemColspanOnMd;
+    }
+
+    /**
+     * 设置：{"EN": "MD实体视图显示类型", "ZH_CN": "MD表单项的列跨度", "ZH_TW": "MD实体视图显示类型"}。
+     */
+    public AdAtt setFormItemColspanOnMd(Integer formItemColspanOnMd) {
+        if (this.formItemColspanOnMd == null && formItemColspanOnMd == null) {
+            // 均为null，不做处理。
+        } else if (this.formItemColspanOnMd != null && formItemColspanOnMd != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.formItemColspanOnMd.compareTo(formItemColspanOnMd) != 0) {
+                this.formItemColspanOnMd = formItemColspanOnMd;
+                if (!this.toUpdateCols.contains("FORM_ITEM_COLSPAN_ON_MD")) {
+                    this.toUpdateCols.add("FORM_ITEM_COLSPAN_ON_MD");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.formItemColspanOnMd = formItemColspanOnMd;
+            if (!this.toUpdateCols.contains("FORM_ITEM_COLSPAN_ON_MD")) {
+                this.toUpdateCols.add("FORM_ITEM_COLSPAN_ON_MD");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "LG实体视图显示类型", "ZH_CN": "LG表单项的列跨度", "ZH_TW": "LG实体视图显示类型"}。
+     */
+    private Integer formItemColspanOnLg;
+
+    /**
+     * 获取：{"EN": "LG实体视图显示类型", "ZH_CN": "LG表单项的列跨度", "ZH_TW": "LG实体视图显示类型"}。
+     */
+    public Integer getFormItemColspanOnLg() {
+        return this.formItemColspanOnLg;
+    }
+
+    /**
+     * 设置：{"EN": "LG实体视图显示类型", "ZH_CN": "LG表单项的列跨度", "ZH_TW": "LG实体视图显示类型"}。
+     */
+    public AdAtt setFormItemColspanOnLg(Integer formItemColspanOnLg) {
+        if (this.formItemColspanOnLg == null && formItemColspanOnLg == null) {
+            // 均为null，不做处理。
+        } else if (this.formItemColspanOnLg != null && formItemColspanOnLg != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.formItemColspanOnLg.compareTo(formItemColspanOnLg) != 0) {
+                this.formItemColspanOnLg = formItemColspanOnLg;
+                if (!this.toUpdateCols.contains("FORM_ITEM_COLSPAN_ON_LG")) {
+                    this.toUpdateCols.add("FORM_ITEM_COLSPAN_ON_LG");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.formItemColspanOnLg = formItemColspanOnLg;
+            if (!this.toUpdateCols.contains("FORM_ITEM_COLSPAN_ON_LG")) {
+                this.toUpdateCols.add("FORM_ITEM_COLSPAN_ON_LG");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "XL实体视图显示类型", "ZH_CN": "XL表单项的列跨度", "ZH_TW": "XL实体视图显示类型"}。
+     */
+    private Integer formItemColspanOnXl;
+
+    /**
+     * 获取：{"EN": "XL实体视图显示类型", "ZH_CN": "XL表单项的列跨度", "ZH_TW": "XL实体视图显示类型"}。
+     */
+    public Integer getFormItemColspanOnXl() {
+        return this.formItemColspanOnXl;
+    }
+
+    /**
+     * 设置：{"EN": "XL实体视图显示类型", "ZH_CN": "XL表单项的列跨度", "ZH_TW": "XL实体视图显示类型"}。
+     */
+    public AdAtt setFormItemColspanOnXl(Integer formItemColspanOnXl) {
+        if (this.formItemColspanOnXl == null && formItemColspanOnXl == null) {
+            // 均为null，不做处理。
+        } else if (this.formItemColspanOnXl != null && formItemColspanOnXl != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.formItemColspanOnXl.compareTo(formItemColspanOnXl) != 0) {
+                this.formItemColspanOnXl = formItemColspanOnXl;
+                if (!this.toUpdateCols.contains("FORM_ITEM_COLSPAN_ON_XL")) {
+                    this.toUpdateCols.add("FORM_ITEM_COLSPAN_ON_XL");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.formItemColspanOnXl = formItemColspanOnXl;
+            if (!this.toUpdateCols.contains("FORM_ITEM_COLSPAN_ON_XL")) {
+                this.toUpdateCols.add("FORM_ITEM_COLSPAN_ON_XL");
             }
         }
         return this;
