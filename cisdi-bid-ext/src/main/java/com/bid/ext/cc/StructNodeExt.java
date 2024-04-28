@@ -35,7 +35,7 @@ public class StructNodeExt {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             List<Map<String, Object>> templateStruct = getTemplateStruct(pWbsTempateId, includeRootNode);
             List<Map<String, Object>> list = replaceIdsAndInsert(templateStruct);
-
+            //序号
             BigDecimal seqNo = BigDecimal.ZERO;
             // 对于每一个模板结构节点，将其作为子节点插入
             for (Map<String, Object> node : templateStruct) {
@@ -104,6 +104,7 @@ public class StructNodeExt {
         for (Map<String, Object> node : nodes) {
             String oldId = (String) node.get("ID");
             String newId = IdUtil.getSnowflakeNextIdStr();
+            // 新ID与旧ID映射表
             idMapping.put(oldId, newId);
             node.put("ID", newId);
             System.out.println("Node " + oldId + " updated to " + newId);
@@ -136,7 +137,6 @@ public class StructNodeExt {
 
         CcPrj ccPrj = CcPrj.selectById(ccPrjId);
 
-        // 安全地从 nodeData 获取 PLAN_FR_DAY_NO 和 PLAN_TO_DAY_NO，避免 NullPointerException
         Integer planFrDayNo = nodeData.get("PLAN_FR_DAY_NO") != null ? Integer.parseInt(nodeData.get("PLAN_FR_DAY_NO").toString()) : 0;
         Integer planToDayNo = nodeData.get("PLAN_TO_DAY_NO") != null ? Integer.parseInt(nodeData.get("PLAN_TO_DAY_NO").toString()) : 0;
 
@@ -173,6 +173,29 @@ public class StructNodeExt {
 
         ccPrjStructNode.setIsTemplate(false);
         ccPrjStructNode.insertById();
+    }
+
+    /**
+     * 重算计划
+     */
+    public void recalculationPlan() {
+        InvokeActResult invokeActResult = new InvokeActResult();
+        Set<String> updatedNodes = new HashSet<>();
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            String csCommId = entityRecord.csCommId;
+            String nodeId = (String) valueMap.get("ID");
+            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
+            String ccPrjStructNodePid = ccPrjStructNode.getCcPrjStructNodePid();
+
+            if (ccPrjStructNodePid != null) {
+                updateDateRange(ccPrjStructNodePid, updatedNodes);  // 从父节点开始更新
+            } else {
+                updateDateRange(nodeId, updatedNodes);  // 如果没有父节点，直接从当前节点开始
+            }
+        }
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
 
@@ -393,26 +416,6 @@ public class StructNodeExt {
         } catch (EmptyResultDataAccessException e) {
             return null;  // 父节点不存在，当前节点可能是根节点
         }
-    }
-
-    /**
-     * 重算计划
-     */
-    public void recalculationPlan() {
-        InvokeActResult invokeActResult = new InvokeActResult();
-        Set<String> updatedNodes = new HashSet<>();
-        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
-            Map<String, Object> valueMap = entityRecord.valueMap;
-            String nodeId = (String) valueMap.get("ID");
-            String parentNodeId = getParentNodeId(nodeId);
-            if (parentNodeId != null) {
-                updateDateRange(parentNodeId, updatedNodes);  // 从父节点开始更新
-            } else {
-                updateDateRange(nodeId, updatedNodes);  // 如果没有父节点，直接从当前节点开始
-            }
-        }
-        invokeActResult.reFetchData = true;
-        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     /**
