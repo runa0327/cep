@@ -1,16 +1,21 @@
 package com.bid.ext.cc;
 
-import com.bid.ext.model.AdUser;
-import com.bid.ext.model.CcCompany;
-import com.bid.ext.model.CcPartyCompany;
-import com.bid.ext.model.CcPrjMember;
+import cn.hutool.core.util.IdUtil;
+import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.EntityRecordUtil;
 import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PrjExt {
@@ -74,5 +79,138 @@ public class PrjExt {
         }
     }
 
+    /**
+     * 成本统览
+     */
+    public void creatCostTree() {
+        EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
+        Map<String, Object> valueMap = entityRecord.valueMap;
+        String ccPrjId = valueMap.get("ID") != null ? valueMap.get("ID").toString() : null;
+
+        // 获取成本模板树
+        List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, 1).eq(CcPrjStructNode.Cols.IS_CBS, 1));
+        //建立匡算，估算，概算，预算树
+        List<CcPrjStructNode> cbsTree0 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_0");
+        List<CcPrjStructNode> cbsTree1 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_1");
+        List<CcPrjStructNode> cbsTree2 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_2");
+        List<CcPrjStructNode> cbsTree3 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_3");
+        //建立成本树
+        List<CcPrjCostOverview> costTree = replaceIdsAndInsertCost(ccPrjStructNodes, ccPrjId);
+
+
+    }
+
+    /**
+     * 替换Id
+     *
+     * @param ccPrjStructNodes
+     * @return
+     */
+    private List<CcPrjStructNode> replaceIdsAndInsert(List<CcPrjStructNode> ccPrjStructNodes, String ccPrjId, String ccPrjStructUsageId) {
+        List<CcPrjStructNode> ccPrjStructNodes0 = new ArrayList<>();
+        Map<String, String> idMapping = new HashMap<>();
+        BigDecimal seqNo = BigDecimal.ZERO;
+
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        //为每个节点生成新的 ID 并更新映射表
+        for (CcPrjStructNode ccPrjStructNode : ccPrjStructNodes) {
+            CcPrjStructNode ccPrjStructNode0 = new CcPrjStructNode();
+            String oldId = ccPrjStructNode.getId();
+            String newId = IdUtil.getSnowflakeNextIdStr();
+            //新ID与旧ID映射表
+            idMapping.put(oldId, newId);
+            ccPrjStructNode0.setId(newId);
+            ccPrjStructNode0.setCcPrjStructNodePid(ccPrjStructNode.getCcPrjStructNodePid());
+            ccPrjStructNode0.setCopyFromPrjStructNodeId(oldId);
+            ccPrjStructNode0.setCcPrjStructUsageId(ccPrjStructUsageId);
+            ccPrjStructNode0.setCcPrjId(ccPrjId);
+            ccPrjStructNode0.setName(ccPrjStructNode.getName());
+            ccPrjStructNode0.setIsTemplate(false);
+            ccPrjStructNode0.setIsCbs(true);
+            ccPrjStructNode0.setCrtUserId(loginInfo.userInfo.id);
+            ccPrjStructNode0.setCrtDt(LocalDateTime.now());
+            ccPrjStructNode0.setStatus("AP");
+            ccPrjStructNode0.setSeqNo(seqNo);
+            ccPrjStructNodes0.add(ccPrjStructNode0);
+            seqNo = seqNo.add(BigDecimal.ONE);
+        }
+
+        // 更新每个节点的父节点ID
+        for (CcPrjStructNode ccPrjStructNode0 : ccPrjStructNodes0) {
+            String oldPId = ccPrjStructNode0.getCcPrjStructNodePid();
+            if (oldPId != null) {
+                String newPid = idMapping.get(oldPId);
+                if (newPid != null) {
+                    ccPrjStructNode0.setCcPrjStructNodePid(newPid);
+                }
+            }
+            ccPrjStructNode0.insertById();
+        }
+
+        return ccPrjStructNodes0;
+    }
+
+
+    /**
+     * 替换Id(成本)
+     *
+     * @param ccPrjStructNodes
+     * @return
+     */
+    private List<CcPrjCostOverview> replaceIdsAndInsertCost(List<CcPrjStructNode> ccPrjStructNodes, String ccPrjId) {
+        List<CcPrjCostOverview> ccPrjCostOverviews = new ArrayList<>();
+        Map<String, String> idMapping = new HashMap<>();
+        BigDecimal seqNo = BigDecimal.ZERO;
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+
+        //为每个节点生成新的 ID 并更新映射表
+        for (CcPrjStructNode ccPrjStructNode : ccPrjStructNodes) {
+            CcPrjCostOverview ccPrjCostOverview = new CcPrjCostOverview();
+            String oldId = ccPrjStructNode.getId();
+            String newId = IdUtil.getSnowflakeNextIdStr();
+            //新ID与旧ID映射表
+            idMapping.put(oldId, newId);
+            ccPrjCostOverview.setId(newId);
+            ccPrjCostOverview.setCcPrjCostOverviewPid(ccPrjStructNode.getCcPrjStructNodePid());
+            ccPrjCostOverview.setCopyFromPrjStructNodeId(oldId);
+            ccPrjCostOverview.setCcPrjId(ccPrjId);
+            ccPrjCostOverview.setName(ccPrjStructNode.getName());
+            ccPrjCostOverview.setCrtUserId(loginInfo.userInfo.id);
+            ccPrjCostOverview.setCrtDt(LocalDateTime.now());
+            ccPrjStructNode.setStatus("AP");
+            ccPrjCostOverview.setSeqNo(seqNo);
+
+            //其他金额为0
+            ccPrjCostOverview.setCbsAmt4(BigDecimal.ZERO);
+            ccPrjCostOverview.setBidAmtInCbs2(BigDecimal.ZERO);
+            ccPrjCostOverview.setUnbidAmtInCbs2(BigDecimal.ZERO);
+            ccPrjCostOverview.setPurchaseAmtInBid(BigDecimal.ZERO);
+            ccPrjCostOverview.setUnpurchaseAmtInBid(BigDecimal.ZERO);
+            ccPrjCostOverview.setCompleteAmtInPo(BigDecimal.ZERO);
+            ccPrjCostOverview.setUncompleteAmtInPo(BigDecimal.ZERO);
+            ccPrjCostOverview.setReqPayAmtInPo(BigDecimal.ZERO);
+            ccPrjCostOverview.setUnreqPayAmtInPo(BigDecimal.ZERO);
+            ccPrjCostOverview.setPayAmtInReq(BigDecimal.ZERO);
+            ccPrjCostOverview.setUnpayAmtInReq(BigDecimal.ZERO);
+
+            ccPrjCostOverviews.add(ccPrjCostOverview);
+            seqNo = seqNo.add(BigDecimal.ONE);
+        }
+
+        // 更新每个节点的父节点ID
+        for (CcPrjCostOverview ccPrjCostOverview : ccPrjCostOverviews) {
+            String oldPId = ccPrjCostOverview.getCcPrjCostOverviewPid();
+            if (oldPId != null) {
+                String newPid = idMapping.get(oldPId);
+                if (newPid != null) {
+                    ccPrjCostOverview.setCcPrjCostOverviewPid(newPid);
+                }
+            }
+            ccPrjCostOverview.insertById();
+
+        }
+
+        return ccPrjCostOverviews;
+    }
 
 }

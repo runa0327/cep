@@ -1,10 +1,10 @@
 package com.bid.ext.cc;
 
 import cn.hutool.core.util.IdUtil;
-import com.bid.ext.model.CcPrj;
-import com.bid.ext.model.CcPrjStructNode;
+import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -419,6 +419,21 @@ public class StructNodeExt {
     }
 
     /**
+     * 递归查找给定节点的根节点ID
+     *
+     * @param nodeId 当前节点ID
+     * @return 根节点ID
+     */
+    private String findRootNodeId(String nodeId) {
+        String parentId = getParentNodeId(nodeId);
+        if (parentId == null) {
+            return nodeId;  // 如果没有父节点，当前节点即为根节点
+        }
+        return findRootNodeId(parentId);
+    }
+
+
+    /**
      * 预检测填报
      *
      * @throws Exception
@@ -510,6 +525,11 @@ public class StructNodeExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
+    /**
+     * 节点日期检查计算
+     *
+     * @throws Exception
+     */
     public void nodeDateCheckCalculate() throws Exception {
         EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
         Map<String, Object> valueMap = entityRecord.valueMap;
@@ -553,6 +573,12 @@ public class StructNodeExt {
         }
     }
 
+
+    /**
+     * 天数预检测
+     *
+     * @throws Exception
+     */
     public void nodeDayCheckCalculate() throws Exception {
         EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
         Map<String, Object> valueMap = entityRecord.valueMap;
@@ -572,5 +598,230 @@ public class StructNodeExt {
         }
     }
 
+    /**
+     * 更新匡算树时同步成本统览
+     */
+    public void syncCostTree0() {
+        syncCostTree("CBS_AMT_0");
+    }
 
+    /**
+     * 更新估算树时同步成本统览
+     */
+    public void syncCostTree1() {
+        syncCostTree("CBS_AMT_1");
+    }
+
+    /**
+     * 更新概算树时同步成本统览
+     */
+    public void syncCostTree2() {
+        syncCostTree("CBS_AMT_2");
+    }
+
+
+    /**
+     * 更新预算树时同步成本统览
+     */
+    public void syncCostTree3() {
+        syncCostTree("CBS_AMT_3");
+    }
+
+    private void syncCostTree(String type) {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            String planTotalCost = valueMap.get("PLAN_TOTAL_COST") != null ? valueMap.get("PLAN_TOTAL_COST").toString() : null;
+            BigDecimal planTotalCostBigDecimal = new BigDecimal(planTotalCost);
+            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
+            String copyFromPrjStructNodeId = ccPrjStructNode.getCopyFromPrjStructNodeId();
+            List<CcPrjCostOverview> ccPrjCostOverviews = CcPrjCostOverview.selectByWhere(new Where().eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, copyFromPrjStructNodeId));
+            if (!SharedUtil.isEmpty(ccPrjCostOverviews)) {
+                for (CcPrjCostOverview ccPrjCostOverview : ccPrjCostOverviews) {
+                    String ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
+                    switch (type) {
+                        case "CBS_AMT_0":
+                            ccPrjCostOverview.setCbsAmt0(planTotalCostBigDecimal);
+                            ccPrjCostOverview.updateById();
+                            recalculatePlanTotalCost(ccPrjCostOverviewPid, type);
+                            break;
+                        case "CBS_AMT_1":
+                            ccPrjCostOverview.setCbsAmt1(planTotalCostBigDecimal);
+                            ccPrjCostOverview.updateById();
+                            recalculatePlanTotalCost(ccPrjCostOverviewPid, type);
+                            break;
+                        case "CBS_AMT_2":
+                            ccPrjCostOverview.setCbsAmt2(planTotalCostBigDecimal);
+                            ccPrjCostOverview.updateById();
+                            recalculatePlanTotalCost(ccPrjCostOverviewPid, type);
+                            break;
+                        case "CBS_AMT_3":
+                            ccPrjCostOverview.setCbsAmt3(planTotalCostBigDecimal);
+                            ccPrjCostOverview.updateById();
+                            recalculatePlanTotalCost(ccPrjCostOverviewPid, type);
+                            break;
+                    }
+                }
+            }
+
+        }
+    }
+
+
+    /**
+     * 重算成本估算
+     */
+    public void recalculationCostEstimation() {
+        InvokeActResult invokeActResult = new InvokeActResult();
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            String csCommId = entityRecord.csCommId;
+            String parentNodeId = getParentNodeId(csCommId);
+            if (parentNodeId != null) {
+                recalculatePlanCostEstimation(parentNodeId);
+            }
+        }
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 递归地重算并更新节点的成本估算
+     *
+     * @param nodeId 当前节点ID
+     */
+    private void recalculatePlanCostEstimation(String nodeId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        // 获取当前节点的直接子节点的PLAN_TOTAL_COST总和
+        BigDecimal totalSum = BigDecimal.ZERO;
+        List<Map<String, Object>> children = getChildNodes(nodeId);
+        for (Map<String, Object> child : children) {
+            Object planTotalCost = child.get("PLAN_TOTAL_COST");
+            BigDecimal childCost = planTotalCost != null ? new BigDecimal(planTotalCost.toString()) : BigDecimal.ZERO;
+            totalSum = totalSum.add(childCost);
+        }
+
+        // 更新当前节点的PLAN_TOTAL_COST
+        String updateSql = "UPDATE cc_prj_struct_node SET PLAN_TOTAL_COST = ? WHERE ID = ?";
+        myJdbcTemplate.update(updateSql, totalSum, nodeId);
+
+        // 递归更新父节点
+        String parentId = getParentNodeId(nodeId);
+        if (parentId != null) {
+            recalculatePlanCostEstimation(parentId);
+        }
+    }
+
+
+    /**
+     * 获取成本父节点
+     *
+     * @param nodeId
+     * @return
+     */
+    private String getCostParentNodeId(String nodeId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        try {
+            String sql = "SELECT CC_PRJ_COST_OVERVIEW_PID FROM CC_PRJ_COST_OVERVIEW WHERE ID = ?";
+            Map<String, Object> result = myJdbcTemplate.queryForMap(sql, nodeId);
+            return result != null ? (String) result.get("CC_PRJ_COST_OVERVIEW_PID") : null;
+        } catch (EmptyResultDataAccessException e) {
+            return null;  // 父节点不存在，当前节点可能是根节点
+        }
+    }
+
+    /**
+     * 获取成本子节点
+     *
+     * @param parentId
+     * @return
+     */
+    private List<Map<String, Object>> getCostChildNodes(String parentId) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        // 示例SQL查询，获取所有子节点
+        String sql = "SELECT * FROM CC_PRJ_COST_OVERVIEW WHERE CC_PRJ_COST_OVERVIEW_PID = ?";
+        return myJdbcTemplate.queryForList(sql, parentId);
+    }
+
+
+    /**
+     * 递归地重算并更新节点的成本总览
+     *
+     * @param nodeId
+     * @param entCode
+     */
+    private void recalculatePlanTotalCost(String nodeId, String entCode) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        // 获取当前节点的直接子节点的PLAN_TOTAL_COST总和
+        BigDecimal totalSum = BigDecimal.ZERO;
+        List<Map<String, Object>> children = getCostChildNodes(nodeId);
+        for (Map<String, Object> child : children) {
+            Object childCostObject = child.get(entCode);
+            BigDecimal childCost = childCostObject != null ? new BigDecimal(childCostObject.toString()) : BigDecimal.ZERO;
+            totalSum = totalSum.add(childCost);
+        }
+
+        // 更新当前节点的金额
+        String updateSql = "UPDATE CC_PRJ_COST_OVERVIEW SET " + entCode + " = ? WHERE ID = ?";
+        myJdbcTemplate.update(updateSql, totalSum, nodeId);
+
+        // 递归更新父节点
+        String parentId = getCostParentNodeId(nodeId);
+        if (parentId != null) {
+            recalculatePlanTotalCost(parentId, entCode);
+        }
+    }
+
+
+    /**
+     * 招标数据同步成本总览
+     *
+     * @throws Exception
+     */
+    public void bidToCostOverview() throws Exception {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+
+            //本次招标项目，金额，成本科目
+            CcBid ccBid = CcBid.selectById(csCommId);
+            String ccPrjId = ccBid.getCcPrjId();
+            Integer priceLimit = ccBid.getPriceLimit();
+            String ccPrjCbsTempalteNodeId = ccBid.getCcPrjCbsTempalteNodeId();
+
+            Integer bidAmtInCbs2Sum = priceLimit;
+            //1.查询项目此成本科目已招标金额
+            CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectByWhere(new Where().eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjCbsTempalteNodeId)).get(0);
+            BigDecimal bidAmtInCbs2 = ccPrjCostOverview.getBidAmtInCbs2() != null ? ccPrjCostOverview.getBidAmtInCbs2() : BigDecimal.ZERO;
+            BigDecimal bidAmtInCbs2SumBig = new BigDecimal(bidAmtInCbs2Sum).add(bidAmtInCbs2);
+
+            //2.查询项目成本统览此成本科目的概算
+            BigDecimal bidAmtInCbs = BigDecimal.ZERO;
+            BigDecimal cbsAmt2 = ccPrjCostOverview.getCbsAmt2() != null ? ccPrjCostOverview.getCbsAmt2() : BigDecimal.ZERO;
+            bidAmtInCbs = bidAmtInCbs.add(cbsAmt2);
+
+            String ccPrjCostOverviewId = ccPrjCostOverview.getId();
+
+            //3.对比已招标金额和概算，若招标金额大于概算金额则提示
+            // 比较priceLimitSumBD和bidAmtInCbs
+            int comparisonResult = bidAmtInCbs2SumBig.compareTo(bidAmtInCbs);
+            if (comparisonResult > 0) {
+                throw new Exception("已招标金额大于概算金额");
+            }
+
+            //4.存储成本统览关联明细
+            CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl = CcPrjCostOverviewToDtl.insertData();
+            ccPrjCostOverviewToDtl.setCcPrjCostOverviewId(ccPrjCostOverviewId);
+            ccPrjCostOverviewToDtl.setTrxAmt(BigDecimal.valueOf(priceLimit));
+            ccPrjCostOverviewToDtl.setEntCode("CC_BID");
+            ccPrjCostOverviewToDtl.setEntityRecordId(csCommId);
+            ccPrjCostOverviewToDtl.updateById();
+
+            //5.招标同步到成本统览已招标
+            ccPrjCostOverview.setBidAmtInCbs2(BigDecimal.valueOf(bidAmtInCbs2Sum));
+            ccPrjCostOverview.updateById();
+
+            String ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "BID_AMT_IN_CBS_2");
+        }
+    }
 }

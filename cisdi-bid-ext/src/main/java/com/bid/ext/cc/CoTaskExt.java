@@ -1,5 +1,6 @@
 package com.bid.ext.cc;
 
+import cn.hutool.json.JSONObject;
 import com.bid.ext.model.CcCoTaskProg;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -98,9 +99,17 @@ public class CoTaskExt {
         }
     }
 
+    /**
+     * 预检测任务进度用户
+     *
+     * @throws Exception
+     */
     public void preCheckTaskProg() throws Exception {
         boolean isTaskUser = false;
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String name = loginInfo.userInfo.name;
+        JSONObject object = new JSONObject(name);
+        String userName = object.get("ZH_CN").toString();
         String userId = ExtJarHelper.getLoginInfo().userInfo.id.toString();
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
@@ -115,10 +124,13 @@ public class CoTaskExt {
             }
         }
         if (!isTaskUser) {
-            throw new Exception("用户" + userId + " 不是所选任务的责任人和督办人 ");
+            throw new Exception("用户【" + userName + "】不是所选任务的责任人或督办人，无法反馈进度!");
         }
     }
 
+    /**
+     * 填报任务进度
+     */
     public void reportTaskProgress() {
         String userId = ExtJarHelper.getLoginInfo().userInfo.id;
         Map<String, Object> varMap = ExtJarHelper.getVarMap();

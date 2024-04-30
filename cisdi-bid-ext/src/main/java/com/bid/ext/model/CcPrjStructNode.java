@@ -236,6 +236,14 @@ public class CcPrjStructNode {
          * {"EN": "计划天数", "ZH_CN": "实际天数", "ZH_TW": "计划天数"}。
          */
         public static final String ACT_DAYS = "ACT_DAYS";
+        /**
+         * {"EN": "项目结构用途", "ZH_CN": "项目结构用途", "ZH_TW": "项目结构用途"}。
+         */
+        public static final String CC_PRJ_STRUCT_USAGE_ID = "CC_PRJ_STRUCT_USAGE_ID";
+        /**
+         * {"EN": "拷贝自项目结构节点", "ZH_CN": "拷贝自项目结构节点", "ZH_TW": "拷贝自项目结构节点"}。
+         */
+        public static final String COPY_FROM_PRJ_STRUCT_NODE_ID = "COPY_FROM_PRJ_STRUCT_NODE_ID";
     }
 
     // </editor-fold>
@@ -1930,6 +1938,78 @@ public class CcPrjStructNode {
             this.actDays = actDays;
             if (!this.toUpdateCols.contains("ACT_DAYS")) {
                 this.toUpdateCols.add("ACT_DAYS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "项目结构用途", "ZH_CN": "项目结构用途", "ZH_TW": "项目结构用途"}。
+     */
+    private String ccPrjStructUsageId;
+
+    /**
+     * 获取：{"EN": "项目结构用途", "ZH_CN": "项目结构用途", "ZH_TW": "项目结构用途"}。
+     */
+    public String getCcPrjStructUsageId() {
+        return this.ccPrjStructUsageId;
+    }
+
+    /**
+     * 设置：{"EN": "项目结构用途", "ZH_CN": "项目结构用途", "ZH_TW": "项目结构用途"}。
+     */
+    public CcPrjStructNode setCcPrjStructUsageId(String ccPrjStructUsageId) {
+        if (this.ccPrjStructUsageId == null && ccPrjStructUsageId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjStructUsageId != null && ccPrjStructUsageId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjStructUsageId.compareTo(ccPrjStructUsageId) != 0) {
+                this.ccPrjStructUsageId = ccPrjStructUsageId;
+                if (!this.toUpdateCols.contains("CC_PRJ_STRUCT_USAGE_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_STRUCT_USAGE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjStructUsageId = ccPrjStructUsageId;
+            if (!this.toUpdateCols.contains("CC_PRJ_STRUCT_USAGE_ID")) {
+                this.toUpdateCols.add("CC_PRJ_STRUCT_USAGE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "拷贝自项目结构节点", "ZH_CN": "拷贝自项目结构节点", "ZH_TW": "拷贝自项目结构节点"}。
+     */
+    private String copyFromPrjStructNodeId;
+
+    /**
+     * 获取：{"EN": "拷贝自项目结构节点", "ZH_CN": "拷贝自项目结构节点", "ZH_TW": "拷贝自项目结构节点"}。
+     */
+    public String getCopyFromPrjStructNodeId() {
+        return this.copyFromPrjStructNodeId;
+    }
+
+    /**
+     * 设置：{"EN": "拷贝自项目结构节点", "ZH_CN": "拷贝自项目结构节点", "ZH_TW": "拷贝自项目结构节点"}。
+     */
+    public CcPrjStructNode setCopyFromPrjStructNodeId(String copyFromPrjStructNodeId) {
+        if (this.copyFromPrjStructNodeId == null && copyFromPrjStructNodeId == null) {
+            // 均为null，不做处理。
+        } else if (this.copyFromPrjStructNodeId != null && copyFromPrjStructNodeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.copyFromPrjStructNodeId.compareTo(copyFromPrjStructNodeId) != 0) {
+                this.copyFromPrjStructNodeId = copyFromPrjStructNodeId;
+                if (!this.toUpdateCols.contains("COPY_FROM_PRJ_STRUCT_NODE_ID")) {
+                    this.toUpdateCols.add("COPY_FROM_PRJ_STRUCT_NODE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.copyFromPrjStructNodeId = copyFromPrjStructNodeId;
+            if (!this.toUpdateCols.contains("COPY_FROM_PRJ_STRUCT_NODE_ID")) {
+                this.toUpdateCols.add("COPY_FROM_PRJ_STRUCT_NODE_ID");
             }
         }
         return this;
