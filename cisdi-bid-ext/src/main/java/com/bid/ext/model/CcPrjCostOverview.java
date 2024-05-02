@@ -140,49 +140,33 @@ public class CcPrjCostOverview {
          */
         public static final String CBS_AMT_3 = "CBS_AMT_3";
         /**
-         * {"EN": "项目核算额", "ZH_CN": "成本核算额", "ZH_TW": "项目核算额"}。
-         */
-        public static final String CBS_AMT_4 = "CBS_AMT_4";
-        /**
          * {"EN": "已招标额", "ZH_CN": "概算中的已招标额", "ZH_TW": "已招标额"}。
          */
         public static final String BID_AMT_IN_CBS_2 = "BID_AMT_IN_CBS_2";
-        /**
-         * {"EN": "未招标额", "ZH_CN": "概算中的未招标额", "ZH_TW": "未招标额"}。
-         */
-        public static final String UNBID_AMT_IN_CBS_2 = "UNBID_AMT_IN_CBS_2";
         /**
          * {"EN": "已招标额", "ZH_CN": "已招标中的已采购额", "ZH_TW": "已招标额"}。
          */
         public static final String PURCHASE_AMT_IN_BID = "PURCHASE_AMT_IN_BID";
         /**
-         * {"EN": "已招标未采购额", "ZH_CN": "已招标中的未采购额", "ZH_TW": "已招标未采购额"}。
-         */
-        public static final String UNPURCHASE_AMT_IN_BID = "UNPURCHASE_AMT_IN_BID";
-        /**
          * {"EN": "已采购中的已完成产值额", "ZH_CN": "已采购中的已完成产值额", "ZH_TW": "已采购中的已完成产值额"}。
          */
         public static final String COMPLETE_AMT_IN_PO = "COMPLETE_AMT_IN_PO";
-        /**
-         * {"EN": "已采购中的未完成产值额", "ZH_CN": "已采购中的未完成产值额", "ZH_TW": "已采购中的未完成产值额"}。
-         */
-        public static final String UNCOMPLETE_AMT_IN_PO = "UNCOMPLETE_AMT_IN_PO";
         /**
          * {"EN": "完成产值中的已申请付款额", "ZH_CN": "已采购中的已申请付款额", "ZH_TW": "完成产值中的已申请付款额"}。
          */
         public static final String REQ_PAY_AMT_IN_PO = "REQ_PAY_AMT_IN_PO";
         /**
-         * {"EN": "完成产值中的未申请付款额", "ZH_CN": "已采购中的未申请付款额", "ZH_TW": "完成产值中的未申请付款额"}。
-         */
-        public static final String UNREQ_PAY_AMT_IN_PO = "UNREQ_PAY_AMT_IN_PO";
-        /**
          * {"EN": "已申请中的已付款额", "ZH_CN": "已申请中的已付款额", "ZH_TW": "已申请中的已付款额"}。
          */
         public static final String PAY_AMT_IN_REQ = "PAY_AMT_IN_REQ";
         /**
-         * {"EN": "完成产值中的未申请付款额", "ZH_CN": "已申请中的未付款额", "ZH_TW": "完成产值中的未申请付款额"}。
+         * {"EN": "可研估算额", "ZH_CN": "预计结算额", "ZH_TW": "可研估算额"}。
          */
-        public static final String UNPAY_AMT_IN_REQ = "UNPAY_AMT_IN_REQ";
+        public static final String CBS_AMT_11 = "CBS_AMT_11";
+        /**
+         * {"EN": "实际结算额", "ZH_CN": "实际结算额", "ZH_TW": "实际结算额"}。
+         */
+        public static final String CBS_AMT_12 = "CBS_AMT_12";
     }
 
     // </editor-fold>
@@ -1019,42 +1003,6 @@ public class CcPrjCostOverview {
     }
 
     /**
-     * {"EN": "项目核算额", "ZH_CN": "成本核算额", "ZH_TW": "项目核算额"}。
-     */
-    private BigDecimal cbsAmt4;
-
-    /**
-     * 获取：{"EN": "项目核算额", "ZH_CN": "成本核算额", "ZH_TW": "项目核算额"}。
-     */
-    public BigDecimal getCbsAmt4() {
-        return this.cbsAmt4;
-    }
-
-    /**
-     * 设置：{"EN": "项目核算额", "ZH_CN": "成本核算额", "ZH_TW": "项目核算额"}。
-     */
-    public CcPrjCostOverview setCbsAmt4(BigDecimal cbsAmt4) {
-        if (this.cbsAmt4 == null && cbsAmt4 == null) {
-            // 均为null，不做处理。
-        } else if (this.cbsAmt4 != null && cbsAmt4 != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.cbsAmt4.compareTo(cbsAmt4) != 0) {
-                this.cbsAmt4 = cbsAmt4;
-                if (!this.toUpdateCols.contains("CBS_AMT_4")) {
-                    this.toUpdateCols.add("CBS_AMT_4");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.cbsAmt4 = cbsAmt4;
-            if (!this.toUpdateCols.contains("CBS_AMT_4")) {
-                this.toUpdateCols.add("CBS_AMT_4");
-            }
-        }
-        return this;
-    }
-
-    /**
      * {"EN": "已招标额", "ZH_CN": "概算中的已招标额", "ZH_TW": "已招标额"}。
      */
     private BigDecimal bidAmtInCbs2;
@@ -1085,42 +1033,6 @@ public class CcPrjCostOverview {
             this.bidAmtInCbs2 = bidAmtInCbs2;
             if (!this.toUpdateCols.contains("BID_AMT_IN_CBS_2")) {
                 this.toUpdateCols.add("BID_AMT_IN_CBS_2");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "未招标额", "ZH_CN": "概算中的未招标额", "ZH_TW": "未招标额"}。
-     */
-    private BigDecimal unbidAmtInCbs2;
-
-    /**
-     * 获取：{"EN": "未招标额", "ZH_CN": "概算中的未招标额", "ZH_TW": "未招标额"}。
-     */
-    public BigDecimal getUnbidAmtInCbs2() {
-        return this.unbidAmtInCbs2;
-    }
-
-    /**
-     * 设置：{"EN": "未招标额", "ZH_CN": "概算中的未招标额", "ZH_TW": "未招标额"}。
-     */
-    public CcPrjCostOverview setUnbidAmtInCbs2(BigDecimal unbidAmtInCbs2) {
-        if (this.unbidAmtInCbs2 == null && unbidAmtInCbs2 == null) {
-            // 均为null，不做处理。
-        } else if (this.unbidAmtInCbs2 != null && unbidAmtInCbs2 != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.unbidAmtInCbs2.compareTo(unbidAmtInCbs2) != 0) {
-                this.unbidAmtInCbs2 = unbidAmtInCbs2;
-                if (!this.toUpdateCols.contains("UNBID_AMT_IN_CBS_2")) {
-                    this.toUpdateCols.add("UNBID_AMT_IN_CBS_2");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.unbidAmtInCbs2 = unbidAmtInCbs2;
-            if (!this.toUpdateCols.contains("UNBID_AMT_IN_CBS_2")) {
-                this.toUpdateCols.add("UNBID_AMT_IN_CBS_2");
             }
         }
         return this;
@@ -1163,42 +1075,6 @@ public class CcPrjCostOverview {
     }
 
     /**
-     * {"EN": "已招标未采购额", "ZH_CN": "已招标中的未采购额", "ZH_TW": "已招标未采购额"}。
-     */
-    private BigDecimal unpurchaseAmtInBid;
-
-    /**
-     * 获取：{"EN": "已招标未采购额", "ZH_CN": "已招标中的未采购额", "ZH_TW": "已招标未采购额"}。
-     */
-    public BigDecimal getUnpurchaseAmtInBid() {
-        return this.unpurchaseAmtInBid;
-    }
-
-    /**
-     * 设置：{"EN": "已招标未采购额", "ZH_CN": "已招标中的未采购额", "ZH_TW": "已招标未采购额"}。
-     */
-    public CcPrjCostOverview setUnpurchaseAmtInBid(BigDecimal unpurchaseAmtInBid) {
-        if (this.unpurchaseAmtInBid == null && unpurchaseAmtInBid == null) {
-            // 均为null，不做处理。
-        } else if (this.unpurchaseAmtInBid != null && unpurchaseAmtInBid != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.unpurchaseAmtInBid.compareTo(unpurchaseAmtInBid) != 0) {
-                this.unpurchaseAmtInBid = unpurchaseAmtInBid;
-                if (!this.toUpdateCols.contains("UNPURCHASE_AMT_IN_BID")) {
-                    this.toUpdateCols.add("UNPURCHASE_AMT_IN_BID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.unpurchaseAmtInBid = unpurchaseAmtInBid;
-            if (!this.toUpdateCols.contains("UNPURCHASE_AMT_IN_BID")) {
-                this.toUpdateCols.add("UNPURCHASE_AMT_IN_BID");
-            }
-        }
-        return this;
-    }
-
-    /**
      * {"EN": "已采购中的已完成产值额", "ZH_CN": "已采购中的已完成产值额", "ZH_TW": "已采购中的已完成产值额"}。
      */
     private BigDecimal completeAmtInPo;
@@ -1229,42 +1105,6 @@ public class CcPrjCostOverview {
             this.completeAmtInPo = completeAmtInPo;
             if (!this.toUpdateCols.contains("COMPLETE_AMT_IN_PO")) {
                 this.toUpdateCols.add("COMPLETE_AMT_IN_PO");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "已采购中的未完成产值额", "ZH_CN": "已采购中的未完成产值额", "ZH_TW": "已采购中的未完成产值额"}。
-     */
-    private BigDecimal uncompleteAmtInPo;
-
-    /**
-     * 获取：{"EN": "已采购中的未完成产值额", "ZH_CN": "已采购中的未完成产值额", "ZH_TW": "已采购中的未完成产值额"}。
-     */
-    public BigDecimal getUncompleteAmtInPo() {
-        return this.uncompleteAmtInPo;
-    }
-
-    /**
-     * 设置：{"EN": "已采购中的未完成产值额", "ZH_CN": "已采购中的未完成产值额", "ZH_TW": "已采购中的未完成产值额"}。
-     */
-    public CcPrjCostOverview setUncompleteAmtInPo(BigDecimal uncompleteAmtInPo) {
-        if (this.uncompleteAmtInPo == null && uncompleteAmtInPo == null) {
-            // 均为null，不做处理。
-        } else if (this.uncompleteAmtInPo != null && uncompleteAmtInPo != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.uncompleteAmtInPo.compareTo(uncompleteAmtInPo) != 0) {
-                this.uncompleteAmtInPo = uncompleteAmtInPo;
-                if (!this.toUpdateCols.contains("UNCOMPLETE_AMT_IN_PO")) {
-                    this.toUpdateCols.add("UNCOMPLETE_AMT_IN_PO");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.uncompleteAmtInPo = uncompleteAmtInPo;
-            if (!this.toUpdateCols.contains("UNCOMPLETE_AMT_IN_PO")) {
-                this.toUpdateCols.add("UNCOMPLETE_AMT_IN_PO");
             }
         }
         return this;
@@ -1307,42 +1147,6 @@ public class CcPrjCostOverview {
     }
 
     /**
-     * {"EN": "完成产值中的未申请付款额", "ZH_CN": "已采购中的未申请付款额", "ZH_TW": "完成产值中的未申请付款额"}。
-     */
-    private BigDecimal unreqPayAmtInPo;
-
-    /**
-     * 获取：{"EN": "完成产值中的未申请付款额", "ZH_CN": "已采购中的未申请付款额", "ZH_TW": "完成产值中的未申请付款额"}。
-     */
-    public BigDecimal getUnreqPayAmtInPo() {
-        return this.unreqPayAmtInPo;
-    }
-
-    /**
-     * 设置：{"EN": "完成产值中的未申请付款额", "ZH_CN": "已采购中的未申请付款额", "ZH_TW": "完成产值中的未申请付款额"}。
-     */
-    public CcPrjCostOverview setUnreqPayAmtInPo(BigDecimal unreqPayAmtInPo) {
-        if (this.unreqPayAmtInPo == null && unreqPayAmtInPo == null) {
-            // 均为null，不做处理。
-        } else if (this.unreqPayAmtInPo != null && unreqPayAmtInPo != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.unreqPayAmtInPo.compareTo(unreqPayAmtInPo) != 0) {
-                this.unreqPayAmtInPo = unreqPayAmtInPo;
-                if (!this.toUpdateCols.contains("UNREQ_PAY_AMT_IN_PO")) {
-                    this.toUpdateCols.add("UNREQ_PAY_AMT_IN_PO");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.unreqPayAmtInPo = unreqPayAmtInPo;
-            if (!this.toUpdateCols.contains("UNREQ_PAY_AMT_IN_PO")) {
-                this.toUpdateCols.add("UNREQ_PAY_AMT_IN_PO");
-            }
-        }
-        return this;
-    }
-
-    /**
      * {"EN": "已申请中的已付款额", "ZH_CN": "已申请中的已付款额", "ZH_TW": "已申请中的已付款额"}。
      */
     private BigDecimal payAmtInReq;
@@ -1379,36 +1183,72 @@ public class CcPrjCostOverview {
     }
 
     /**
-     * {"EN": "完成产值中的未申请付款额", "ZH_CN": "已申请中的未付款额", "ZH_TW": "完成产值中的未申请付款额"}。
+     * {"EN": "可研估算额", "ZH_CN": "预计结算额", "ZH_TW": "可研估算额"}。
      */
-    private BigDecimal unpayAmtInReq;
+    private BigDecimal cbsAmt11;
 
     /**
-     * 获取：{"EN": "完成产值中的未申请付款额", "ZH_CN": "已申请中的未付款额", "ZH_TW": "完成产值中的未申请付款额"}。
+     * 获取：{"EN": "可研估算额", "ZH_CN": "预计结算额", "ZH_TW": "可研估算额"}。
      */
-    public BigDecimal getUnpayAmtInReq() {
-        return this.unpayAmtInReq;
+    public BigDecimal getCbsAmt11() {
+        return this.cbsAmt11;
     }
 
     /**
-     * 设置：{"EN": "完成产值中的未申请付款额", "ZH_CN": "已申请中的未付款额", "ZH_TW": "完成产值中的未申请付款额"}。
+     * 设置：{"EN": "可研估算额", "ZH_CN": "预计结算额", "ZH_TW": "可研估算额"}。
      */
-    public CcPrjCostOverview setUnpayAmtInReq(BigDecimal unpayAmtInReq) {
-        if (this.unpayAmtInReq == null && unpayAmtInReq == null) {
+    public CcPrjCostOverview setCbsAmt11(BigDecimal cbsAmt11) {
+        if (this.cbsAmt11 == null && cbsAmt11 == null) {
             // 均为null，不做处理。
-        } else if (this.unpayAmtInReq != null && unpayAmtInReq != null) {
+        } else if (this.cbsAmt11 != null && cbsAmt11 != null) {
             // 均非null，判定不等，再做处理：
-            if (this.unpayAmtInReq.compareTo(unpayAmtInReq) != 0) {
-                this.unpayAmtInReq = unpayAmtInReq;
-                if (!this.toUpdateCols.contains("UNPAY_AMT_IN_REQ")) {
-                    this.toUpdateCols.add("UNPAY_AMT_IN_REQ");
+            if (this.cbsAmt11.compareTo(cbsAmt11) != 0) {
+                this.cbsAmt11 = cbsAmt11;
+                if (!this.toUpdateCols.contains("CBS_AMT_11")) {
+                    this.toUpdateCols.add("CBS_AMT_11");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.unpayAmtInReq = unpayAmtInReq;
-            if (!this.toUpdateCols.contains("UNPAY_AMT_IN_REQ")) {
-                this.toUpdateCols.add("UNPAY_AMT_IN_REQ");
+            this.cbsAmt11 = cbsAmt11;
+            if (!this.toUpdateCols.contains("CBS_AMT_11")) {
+                this.toUpdateCols.add("CBS_AMT_11");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "实际结算额", "ZH_CN": "实际结算额", "ZH_TW": "实际结算额"}。
+     */
+    private BigDecimal cbsAmt12;
+
+    /**
+     * 获取：{"EN": "实际结算额", "ZH_CN": "实际结算额", "ZH_TW": "实际结算额"}。
+     */
+    public BigDecimal getCbsAmt12() {
+        return this.cbsAmt12;
+    }
+
+    /**
+     * 设置：{"EN": "实际结算额", "ZH_CN": "实际结算额", "ZH_TW": "实际结算额"}。
+     */
+    public CcPrjCostOverview setCbsAmt12(BigDecimal cbsAmt12) {
+        if (this.cbsAmt12 == null && cbsAmt12 == null) {
+            // 均为null，不做处理。
+        } else if (this.cbsAmt12 != null && cbsAmt12 != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.cbsAmt12.compareTo(cbsAmt12) != 0) {
+                this.cbsAmt12 = cbsAmt12;
+                if (!this.toUpdateCols.contains("CBS_AMT_12")) {
+                    this.toUpdateCols.add("CBS_AMT_12");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.cbsAmt12 = cbsAmt12;
+            if (!this.toUpdateCols.contains("CBS_AMT_12")) {
+                this.toUpdateCols.add("CBS_AMT_12");
             }
         }
         return this;
