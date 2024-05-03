@@ -629,6 +629,20 @@ public class StructNodeExt {
         syncCostTree("CBS_AMT_3");
     }
 
+    /**
+     * 更新预计结算树时同步成本统览
+     */
+    public void syncCostTree11() {
+        syncCostTree("CBS_AMT_11");
+    }
+
+    /**
+     * 更新实际结算树时同步成本统览
+     */
+    public void syncCostTree12() {
+        syncCostTree("CBS_AMT_12");
+    }
+
     private void syncCostTree(String type) {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
@@ -659,6 +673,16 @@ public class StructNodeExt {
                             break;
                         case "CBS_AMT_3":
                             ccPrjCostOverview.setCbsAmt3(planTotalCostBigDecimal);
+                            ccPrjCostOverview.updateById();
+                            recalculatePlanTotalCost(ccPrjCostOverviewPid, type);
+                            break;
+                        case "CBS_AMT_11":
+                            ccPrjCostOverview.setCbsAmt11(planTotalCostBigDecimal);
+                            ccPrjCostOverview.updateById();
+                            recalculatePlanTotalCost(ccPrjCostOverviewPid, type);
+                            break;
+                        case "CBS_AMT_12":
+                            ccPrjCostOverview.setCbsAmt12(planTotalCostBigDecimal);
                             ccPrjCostOverview.updateById();
                             recalculatePlanTotalCost(ccPrjCostOverviewPid, type);
                             break;
@@ -1478,6 +1502,8 @@ public class StructNodeExt {
             recalculatePlanTotalCost(ccPrjCostOverviewPid, "PAY_AMT_IN_REQ");
         }
     }
+
+
 
 
 }

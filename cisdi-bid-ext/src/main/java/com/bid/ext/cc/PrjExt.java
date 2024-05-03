@@ -94,6 +94,8 @@ public class PrjExt {
         List<CcPrjStructNode> cbsTree1 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_1");
         List<CcPrjStructNode> cbsTree2 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_2");
         List<CcPrjStructNode> cbsTree3 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_3");
+        List<CcPrjStructNode> cbsTree11 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_11");
+        List<CcPrjStructNode> cbsTree12 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_12");
         //建立成本树
         List<CcPrjCostOverview> costTree = replaceIdsAndInsertCost(ccPrjStructNodes, ccPrjId);
 
@@ -179,19 +181,6 @@ public class PrjExt {
             ccPrjCostOverview.setCrtDt(LocalDateTime.now());
             ccPrjStructNode.setStatus("AP");
             ccPrjCostOverview.setSeqNo(seqNo);
-
-            //其他金额为0
-            ccPrjCostOverview.setCbsAmt4(BigDecimal.ZERO);
-            ccPrjCostOverview.setBidAmtInCbs2(BigDecimal.ZERO);
-            ccPrjCostOverview.setUnbidAmtInCbs2(BigDecimal.ZERO);
-            ccPrjCostOverview.setPurchaseAmtInBid(BigDecimal.ZERO);
-            ccPrjCostOverview.setUnpurchaseAmtInBid(BigDecimal.ZERO);
-            ccPrjCostOverview.setCompleteAmtInPo(BigDecimal.ZERO);
-            ccPrjCostOverview.setUncompleteAmtInPo(BigDecimal.ZERO);
-            ccPrjCostOverview.setReqPayAmtInPo(BigDecimal.ZERO);
-            ccPrjCostOverview.setUnreqPayAmtInPo(BigDecimal.ZERO);
-            ccPrjCostOverview.setPayAmtInReq(BigDecimal.ZERO);
-            ccPrjCostOverview.setUnpayAmtInReq(BigDecimal.ZERO);
 
             ccPrjCostOverviews.add(ccPrjCostOverview);
             seqNo = seqNo.add(BigDecimal.ONE);
