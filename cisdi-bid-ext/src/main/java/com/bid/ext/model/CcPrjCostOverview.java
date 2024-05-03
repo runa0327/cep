@@ -126,47 +126,47 @@ public class CcPrjCostOverview {
         /**
          * {"EN": "立项匡算额", "ZH_CN": "立项匡算额", "ZH_TW": "立项匡算额"}。
          */
-        public static final String CBS_AMT_0 = "CBS_AMT_0";
+        public static final String CBS_0_AMT = "CBS_0_AMT";
         /**
          * {"EN": "立项匡算额", "ZH_CN": "可研估算额", "ZH_TW": "立项匡算额"}。
          */
-        public static final String CBS_AMT_1 = "CBS_AMT_1";
+        public static final String CBS_1_AMT = "CBS_1_AMT";
         /**
          * {"EN": "立项匡算额", "ZH_CN": "初设概算额", "ZH_TW": "立项匡算额"}。
          */
-        public static final String CBS_AMT_2 = "CBS_AMT_2";
+        public static final String CBS_2_AMT = "CBS_2_AMT";
         /**
          * {"EN": "立项匡算额", "ZH_CN": "施工预算额", "ZH_TW": "立项匡算额"}。
          */
-        public static final String CBS_AMT_3 = "CBS_AMT_3";
+        public static final String CBS_3_AMT = "CBS_3_AMT";
         /**
-         * {"EN": "已招标额", "ZH_CN": "概算中的已招标额", "ZH_TW": "已招标额"}。
+         * {"EN": "已招标额", "ZH_CN": "已招标额", "ZH_TW": "已招标额"}。
          */
-        public static final String BID_AMT_IN_CBS_2 = "BID_AMT_IN_CBS_2";
+        public static final String BID_AMT = "BID_AMT";
         /**
-         * {"EN": "已招标额", "ZH_CN": "已招标中的已采购额", "ZH_TW": "已招标额"}。
+         * {"EN": "已招标额", "ZH_CN": "已采购额", "ZH_TW": "已招标额"}。
          */
-        public static final String PURCHASE_AMT_IN_BID = "PURCHASE_AMT_IN_BID";
+        public static final String PURCHASE_AMT = "PURCHASE_AMT";
         /**
-         * {"EN": "已采购中的已完成产值额", "ZH_CN": "已采购中的已完成产值额", "ZH_TW": "已采购中的已完成产值额"}。
+         * {"EN": "已采购中的已完成产值额", "ZH_CN": "已完成产值额", "ZH_TW": "已采购中的已完成产值额"}。
          */
-        public static final String COMPLETE_AMT_IN_PO = "COMPLETE_AMT_IN_PO";
+        public static final String COMPLETE_AMT = "COMPLETE_AMT";
         /**
-         * {"EN": "完成产值中的已申请付款额", "ZH_CN": "已采购中的已申请付款额", "ZH_TW": "完成产值中的已申请付款额"}。
+         * {"EN": "完成产值中的已申请付款额", "ZH_CN": "已申请付款额", "ZH_TW": "完成产值中的已申请付款额"}。
          */
-        public static final String REQ_PAY_AMT_IN_PO = "REQ_PAY_AMT_IN_PO";
+        public static final String REQ_PAY_AMT = "REQ_PAY_AMT";
         /**
-         * {"EN": "已申请中的已付款额", "ZH_CN": "已申请中的已付款额", "ZH_TW": "已申请中的已付款额"}。
+         * {"EN": "PAY_AMT", "ZH_CN": "支付金额", "ZH_TW": "繁：支付金额"}。
          */
-        public static final String PAY_AMT_IN_REQ = "PAY_AMT_IN_REQ";
+        public static final String PAY_AMT = "PAY_AMT";
         /**
          * {"EN": "可研估算额", "ZH_CN": "预计结算额", "ZH_TW": "可研估算额"}。
          */
-        public static final String CBS_AMT_11 = "CBS_AMT_11";
+        public static final String CBS_11_AMT = "CBS_11_AMT";
         /**
          * {"EN": "实际结算额", "ZH_CN": "实际结算额", "ZH_TW": "实际结算额"}。
          */
-        public static final String CBS_AMT_12 = "CBS_AMT_12";
+        public static final String CBS_12_AMT = "CBS_12_AMT";
     }
 
     // </editor-fold>
@@ -861,34 +861,34 @@ public class CcPrjCostOverview {
     /**
      * {"EN": "立项匡算额", "ZH_CN": "立项匡算额", "ZH_TW": "立项匡算额"}。
      */
-    private BigDecimal cbsAmt0;
+    private BigDecimal cbs0Amt;
 
     /**
      * 获取：{"EN": "立项匡算额", "ZH_CN": "立项匡算额", "ZH_TW": "立项匡算额"}。
      */
-    public BigDecimal getCbsAmt0() {
-        return this.cbsAmt0;
+    public BigDecimal getCbs0Amt() {
+        return this.cbs0Amt;
     }
 
     /**
      * 设置：{"EN": "立项匡算额", "ZH_CN": "立项匡算额", "ZH_TW": "立项匡算额"}。
      */
-    public CcPrjCostOverview setCbsAmt0(BigDecimal cbsAmt0) {
-        if (this.cbsAmt0 == null && cbsAmt0 == null) {
+    public CcPrjCostOverview setCbs0Amt(BigDecimal cbs0Amt) {
+        if (this.cbs0Amt == null && cbs0Amt == null) {
             // 均为null，不做处理。
-        } else if (this.cbsAmt0 != null && cbsAmt0 != null) {
+        } else if (this.cbs0Amt != null && cbs0Amt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.cbsAmt0.compareTo(cbsAmt0) != 0) {
-                this.cbsAmt0 = cbsAmt0;
-                if (!this.toUpdateCols.contains("CBS_AMT_0")) {
-                    this.toUpdateCols.add("CBS_AMT_0");
+            if (this.cbs0Amt.compareTo(cbs0Amt) != 0) {
+                this.cbs0Amt = cbs0Amt;
+                if (!this.toUpdateCols.contains("CBS_0_AMT")) {
+                    this.toUpdateCols.add("CBS_0_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.cbsAmt0 = cbsAmt0;
-            if (!this.toUpdateCols.contains("CBS_AMT_0")) {
-                this.toUpdateCols.add("CBS_AMT_0");
+            this.cbs0Amt = cbs0Amt;
+            if (!this.toUpdateCols.contains("CBS_0_AMT")) {
+                this.toUpdateCols.add("CBS_0_AMT");
             }
         }
         return this;
@@ -897,34 +897,34 @@ public class CcPrjCostOverview {
     /**
      * {"EN": "立项匡算额", "ZH_CN": "可研估算额", "ZH_TW": "立项匡算额"}。
      */
-    private BigDecimal cbsAmt1;
+    private BigDecimal cbs1Amt;
 
     /**
      * 获取：{"EN": "立项匡算额", "ZH_CN": "可研估算额", "ZH_TW": "立项匡算额"}。
      */
-    public BigDecimal getCbsAmt1() {
-        return this.cbsAmt1;
+    public BigDecimal getCbs1Amt() {
+        return this.cbs1Amt;
     }
 
     /**
      * 设置：{"EN": "立项匡算额", "ZH_CN": "可研估算额", "ZH_TW": "立项匡算额"}。
      */
-    public CcPrjCostOverview setCbsAmt1(BigDecimal cbsAmt1) {
-        if (this.cbsAmt1 == null && cbsAmt1 == null) {
+    public CcPrjCostOverview setCbs1Amt(BigDecimal cbs1Amt) {
+        if (this.cbs1Amt == null && cbs1Amt == null) {
             // 均为null，不做处理。
-        } else if (this.cbsAmt1 != null && cbsAmt1 != null) {
+        } else if (this.cbs1Amt != null && cbs1Amt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.cbsAmt1.compareTo(cbsAmt1) != 0) {
-                this.cbsAmt1 = cbsAmt1;
-                if (!this.toUpdateCols.contains("CBS_AMT_1")) {
-                    this.toUpdateCols.add("CBS_AMT_1");
+            if (this.cbs1Amt.compareTo(cbs1Amt) != 0) {
+                this.cbs1Amt = cbs1Amt;
+                if (!this.toUpdateCols.contains("CBS_1_AMT")) {
+                    this.toUpdateCols.add("CBS_1_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.cbsAmt1 = cbsAmt1;
-            if (!this.toUpdateCols.contains("CBS_AMT_1")) {
-                this.toUpdateCols.add("CBS_AMT_1");
+            this.cbs1Amt = cbs1Amt;
+            if (!this.toUpdateCols.contains("CBS_1_AMT")) {
+                this.toUpdateCols.add("CBS_1_AMT");
             }
         }
         return this;
@@ -933,34 +933,34 @@ public class CcPrjCostOverview {
     /**
      * {"EN": "立项匡算额", "ZH_CN": "初设概算额", "ZH_TW": "立项匡算额"}。
      */
-    private BigDecimal cbsAmt2;
+    private BigDecimal cbs2Amt;
 
     /**
      * 获取：{"EN": "立项匡算额", "ZH_CN": "初设概算额", "ZH_TW": "立项匡算额"}。
      */
-    public BigDecimal getCbsAmt2() {
-        return this.cbsAmt2;
+    public BigDecimal getCbs2Amt() {
+        return this.cbs2Amt;
     }
 
     /**
      * 设置：{"EN": "立项匡算额", "ZH_CN": "初设概算额", "ZH_TW": "立项匡算额"}。
      */
-    public CcPrjCostOverview setCbsAmt2(BigDecimal cbsAmt2) {
-        if (this.cbsAmt2 == null && cbsAmt2 == null) {
+    public CcPrjCostOverview setCbs2Amt(BigDecimal cbs2Amt) {
+        if (this.cbs2Amt == null && cbs2Amt == null) {
             // 均为null，不做处理。
-        } else if (this.cbsAmt2 != null && cbsAmt2 != null) {
+        } else if (this.cbs2Amt != null && cbs2Amt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.cbsAmt2.compareTo(cbsAmt2) != 0) {
-                this.cbsAmt2 = cbsAmt2;
-                if (!this.toUpdateCols.contains("CBS_AMT_2")) {
-                    this.toUpdateCols.add("CBS_AMT_2");
+            if (this.cbs2Amt.compareTo(cbs2Amt) != 0) {
+                this.cbs2Amt = cbs2Amt;
+                if (!this.toUpdateCols.contains("CBS_2_AMT")) {
+                    this.toUpdateCols.add("CBS_2_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.cbsAmt2 = cbsAmt2;
-            if (!this.toUpdateCols.contains("CBS_AMT_2")) {
-                this.toUpdateCols.add("CBS_AMT_2");
+            this.cbs2Amt = cbs2Amt;
+            if (!this.toUpdateCols.contains("CBS_2_AMT")) {
+                this.toUpdateCols.add("CBS_2_AMT");
             }
         }
         return this;
@@ -969,214 +969,214 @@ public class CcPrjCostOverview {
     /**
      * {"EN": "立项匡算额", "ZH_CN": "施工预算额", "ZH_TW": "立项匡算额"}。
      */
-    private BigDecimal cbsAmt3;
+    private BigDecimal cbs3Amt;
 
     /**
      * 获取：{"EN": "立项匡算额", "ZH_CN": "施工预算额", "ZH_TW": "立项匡算额"}。
      */
-    public BigDecimal getCbsAmt3() {
-        return this.cbsAmt3;
+    public BigDecimal getCbs3Amt() {
+        return this.cbs3Amt;
     }
 
     /**
      * 设置：{"EN": "立项匡算额", "ZH_CN": "施工预算额", "ZH_TW": "立项匡算额"}。
      */
-    public CcPrjCostOverview setCbsAmt3(BigDecimal cbsAmt3) {
-        if (this.cbsAmt3 == null && cbsAmt3 == null) {
+    public CcPrjCostOverview setCbs3Amt(BigDecimal cbs3Amt) {
+        if (this.cbs3Amt == null && cbs3Amt == null) {
             // 均为null，不做处理。
-        } else if (this.cbsAmt3 != null && cbsAmt3 != null) {
+        } else if (this.cbs3Amt != null && cbs3Amt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.cbsAmt3.compareTo(cbsAmt3) != 0) {
-                this.cbsAmt3 = cbsAmt3;
-                if (!this.toUpdateCols.contains("CBS_AMT_3")) {
-                    this.toUpdateCols.add("CBS_AMT_3");
+            if (this.cbs3Amt.compareTo(cbs3Amt) != 0) {
+                this.cbs3Amt = cbs3Amt;
+                if (!this.toUpdateCols.contains("CBS_3_AMT")) {
+                    this.toUpdateCols.add("CBS_3_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.cbsAmt3 = cbsAmt3;
-            if (!this.toUpdateCols.contains("CBS_AMT_3")) {
-                this.toUpdateCols.add("CBS_AMT_3");
+            this.cbs3Amt = cbs3Amt;
+            if (!this.toUpdateCols.contains("CBS_3_AMT")) {
+                this.toUpdateCols.add("CBS_3_AMT");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "已招标额", "ZH_CN": "概算中的已招标额", "ZH_TW": "已招标额"}。
+     * {"EN": "已招标额", "ZH_CN": "已招标额", "ZH_TW": "已招标额"}。
      */
-    private BigDecimal bidAmtInCbs2;
+    private BigDecimal bidAmt;
 
     /**
-     * 获取：{"EN": "已招标额", "ZH_CN": "概算中的已招标额", "ZH_TW": "已招标额"}。
+     * 获取：{"EN": "已招标额", "ZH_CN": "已招标额", "ZH_TW": "已招标额"}。
      */
-    public BigDecimal getBidAmtInCbs2() {
-        return this.bidAmtInCbs2;
+    public BigDecimal getBidAmt() {
+        return this.bidAmt;
     }
 
     /**
-     * 设置：{"EN": "已招标额", "ZH_CN": "概算中的已招标额", "ZH_TW": "已招标额"}。
+     * 设置：{"EN": "已招标额", "ZH_CN": "已招标额", "ZH_TW": "已招标额"}。
      */
-    public CcPrjCostOverview setBidAmtInCbs2(BigDecimal bidAmtInCbs2) {
-        if (this.bidAmtInCbs2 == null && bidAmtInCbs2 == null) {
+    public CcPrjCostOverview setBidAmt(BigDecimal bidAmt) {
+        if (this.bidAmt == null && bidAmt == null) {
             // 均为null，不做处理。
-        } else if (this.bidAmtInCbs2 != null && bidAmtInCbs2 != null) {
+        } else if (this.bidAmt != null && bidAmt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.bidAmtInCbs2.compareTo(bidAmtInCbs2) != 0) {
-                this.bidAmtInCbs2 = bidAmtInCbs2;
-                if (!this.toUpdateCols.contains("BID_AMT_IN_CBS_2")) {
-                    this.toUpdateCols.add("BID_AMT_IN_CBS_2");
+            if (this.bidAmt.compareTo(bidAmt) != 0) {
+                this.bidAmt = bidAmt;
+                if (!this.toUpdateCols.contains("BID_AMT")) {
+                    this.toUpdateCols.add("BID_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.bidAmtInCbs2 = bidAmtInCbs2;
-            if (!this.toUpdateCols.contains("BID_AMT_IN_CBS_2")) {
-                this.toUpdateCols.add("BID_AMT_IN_CBS_2");
+            this.bidAmt = bidAmt;
+            if (!this.toUpdateCols.contains("BID_AMT")) {
+                this.toUpdateCols.add("BID_AMT");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "已招标额", "ZH_CN": "已招标中的已采购额", "ZH_TW": "已招标额"}。
+     * {"EN": "已招标额", "ZH_CN": "已采购额", "ZH_TW": "已招标额"}。
      */
-    private BigDecimal purchaseAmtInBid;
+    private BigDecimal purchaseAmt;
 
     /**
-     * 获取：{"EN": "已招标额", "ZH_CN": "已招标中的已采购额", "ZH_TW": "已招标额"}。
+     * 获取：{"EN": "已招标额", "ZH_CN": "已采购额", "ZH_TW": "已招标额"}。
      */
-    public BigDecimal getPurchaseAmtInBid() {
-        return this.purchaseAmtInBid;
+    public BigDecimal getPurchaseAmt() {
+        return this.purchaseAmt;
     }
 
     /**
-     * 设置：{"EN": "已招标额", "ZH_CN": "已招标中的已采购额", "ZH_TW": "已招标额"}。
+     * 设置：{"EN": "已招标额", "ZH_CN": "已采购额", "ZH_TW": "已招标额"}。
      */
-    public CcPrjCostOverview setPurchaseAmtInBid(BigDecimal purchaseAmtInBid) {
-        if (this.purchaseAmtInBid == null && purchaseAmtInBid == null) {
+    public CcPrjCostOverview setPurchaseAmt(BigDecimal purchaseAmt) {
+        if (this.purchaseAmt == null && purchaseAmt == null) {
             // 均为null，不做处理。
-        } else if (this.purchaseAmtInBid != null && purchaseAmtInBid != null) {
+        } else if (this.purchaseAmt != null && purchaseAmt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.purchaseAmtInBid.compareTo(purchaseAmtInBid) != 0) {
-                this.purchaseAmtInBid = purchaseAmtInBid;
-                if (!this.toUpdateCols.contains("PURCHASE_AMT_IN_BID")) {
-                    this.toUpdateCols.add("PURCHASE_AMT_IN_BID");
+            if (this.purchaseAmt.compareTo(purchaseAmt) != 0) {
+                this.purchaseAmt = purchaseAmt;
+                if (!this.toUpdateCols.contains("PURCHASE_AMT")) {
+                    this.toUpdateCols.add("PURCHASE_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.purchaseAmtInBid = purchaseAmtInBid;
-            if (!this.toUpdateCols.contains("PURCHASE_AMT_IN_BID")) {
-                this.toUpdateCols.add("PURCHASE_AMT_IN_BID");
+            this.purchaseAmt = purchaseAmt;
+            if (!this.toUpdateCols.contains("PURCHASE_AMT")) {
+                this.toUpdateCols.add("PURCHASE_AMT");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "已采购中的已完成产值额", "ZH_CN": "已采购中的已完成产值额", "ZH_TW": "已采购中的已完成产值额"}。
+     * {"EN": "已采购中的已完成产值额", "ZH_CN": "已完成产值额", "ZH_TW": "已采购中的已完成产值额"}。
      */
-    private BigDecimal completeAmtInPo;
+    private BigDecimal completeAmt;
 
     /**
-     * 获取：{"EN": "已采购中的已完成产值额", "ZH_CN": "已采购中的已完成产值额", "ZH_TW": "已采购中的已完成产值额"}。
+     * 获取：{"EN": "已采购中的已完成产值额", "ZH_CN": "已完成产值额", "ZH_TW": "已采购中的已完成产值额"}。
      */
-    public BigDecimal getCompleteAmtInPo() {
-        return this.completeAmtInPo;
+    public BigDecimal getCompleteAmt() {
+        return this.completeAmt;
     }
 
     /**
-     * 设置：{"EN": "已采购中的已完成产值额", "ZH_CN": "已采购中的已完成产值额", "ZH_TW": "已采购中的已完成产值额"}。
+     * 设置：{"EN": "已采购中的已完成产值额", "ZH_CN": "已完成产值额", "ZH_TW": "已采购中的已完成产值额"}。
      */
-    public CcPrjCostOverview setCompleteAmtInPo(BigDecimal completeAmtInPo) {
-        if (this.completeAmtInPo == null && completeAmtInPo == null) {
+    public CcPrjCostOverview setCompleteAmt(BigDecimal completeAmt) {
+        if (this.completeAmt == null && completeAmt == null) {
             // 均为null，不做处理。
-        } else if (this.completeAmtInPo != null && completeAmtInPo != null) {
+        } else if (this.completeAmt != null && completeAmt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.completeAmtInPo.compareTo(completeAmtInPo) != 0) {
-                this.completeAmtInPo = completeAmtInPo;
-                if (!this.toUpdateCols.contains("COMPLETE_AMT_IN_PO")) {
-                    this.toUpdateCols.add("COMPLETE_AMT_IN_PO");
+            if (this.completeAmt.compareTo(completeAmt) != 0) {
+                this.completeAmt = completeAmt;
+                if (!this.toUpdateCols.contains("COMPLETE_AMT")) {
+                    this.toUpdateCols.add("COMPLETE_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.completeAmtInPo = completeAmtInPo;
-            if (!this.toUpdateCols.contains("COMPLETE_AMT_IN_PO")) {
-                this.toUpdateCols.add("COMPLETE_AMT_IN_PO");
+            this.completeAmt = completeAmt;
+            if (!this.toUpdateCols.contains("COMPLETE_AMT")) {
+                this.toUpdateCols.add("COMPLETE_AMT");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "完成产值中的已申请付款额", "ZH_CN": "已采购中的已申请付款额", "ZH_TW": "完成产值中的已申请付款额"}。
+     * {"EN": "完成产值中的已申请付款额", "ZH_CN": "已申请付款额", "ZH_TW": "完成产值中的已申请付款额"}。
      */
-    private BigDecimal reqPayAmtInPo;
+    private BigDecimal reqPayAmt;
 
     /**
-     * 获取：{"EN": "完成产值中的已申请付款额", "ZH_CN": "已采购中的已申请付款额", "ZH_TW": "完成产值中的已申请付款额"}。
+     * 获取：{"EN": "完成产值中的已申请付款额", "ZH_CN": "已申请付款额", "ZH_TW": "完成产值中的已申请付款额"}。
      */
-    public BigDecimal getReqPayAmtInPo() {
-        return this.reqPayAmtInPo;
+    public BigDecimal getReqPayAmt() {
+        return this.reqPayAmt;
     }
 
     /**
-     * 设置：{"EN": "完成产值中的已申请付款额", "ZH_CN": "已采购中的已申请付款额", "ZH_TW": "完成产值中的已申请付款额"}。
+     * 设置：{"EN": "完成产值中的已申请付款额", "ZH_CN": "已申请付款额", "ZH_TW": "完成产值中的已申请付款额"}。
      */
-    public CcPrjCostOverview setReqPayAmtInPo(BigDecimal reqPayAmtInPo) {
-        if (this.reqPayAmtInPo == null && reqPayAmtInPo == null) {
+    public CcPrjCostOverview setReqPayAmt(BigDecimal reqPayAmt) {
+        if (this.reqPayAmt == null && reqPayAmt == null) {
             // 均为null，不做处理。
-        } else if (this.reqPayAmtInPo != null && reqPayAmtInPo != null) {
+        } else if (this.reqPayAmt != null && reqPayAmt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.reqPayAmtInPo.compareTo(reqPayAmtInPo) != 0) {
-                this.reqPayAmtInPo = reqPayAmtInPo;
-                if (!this.toUpdateCols.contains("REQ_PAY_AMT_IN_PO")) {
-                    this.toUpdateCols.add("REQ_PAY_AMT_IN_PO");
+            if (this.reqPayAmt.compareTo(reqPayAmt) != 0) {
+                this.reqPayAmt = reqPayAmt;
+                if (!this.toUpdateCols.contains("REQ_PAY_AMT")) {
+                    this.toUpdateCols.add("REQ_PAY_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.reqPayAmtInPo = reqPayAmtInPo;
-            if (!this.toUpdateCols.contains("REQ_PAY_AMT_IN_PO")) {
-                this.toUpdateCols.add("REQ_PAY_AMT_IN_PO");
+            this.reqPayAmt = reqPayAmt;
+            if (!this.toUpdateCols.contains("REQ_PAY_AMT")) {
+                this.toUpdateCols.add("REQ_PAY_AMT");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "已申请中的已付款额", "ZH_CN": "已申请中的已付款额", "ZH_TW": "已申请中的已付款额"}。
+     * {"EN": "PAY_AMT", "ZH_CN": "支付金额", "ZH_TW": "繁：支付金额"}。
      */
-    private BigDecimal payAmtInReq;
+    private BigDecimal payAmt;
 
     /**
-     * 获取：{"EN": "已申请中的已付款额", "ZH_CN": "已申请中的已付款额", "ZH_TW": "已申请中的已付款额"}。
+     * 获取：{"EN": "PAY_AMT", "ZH_CN": "支付金额", "ZH_TW": "繁：支付金额"}。
      */
-    public BigDecimal getPayAmtInReq() {
-        return this.payAmtInReq;
+    public BigDecimal getPayAmt() {
+        return this.payAmt;
     }
 
     /**
-     * 设置：{"EN": "已申请中的已付款额", "ZH_CN": "已申请中的已付款额", "ZH_TW": "已申请中的已付款额"}。
+     * 设置：{"EN": "PAY_AMT", "ZH_CN": "支付金额", "ZH_TW": "繁：支付金额"}。
      */
-    public CcPrjCostOverview setPayAmtInReq(BigDecimal payAmtInReq) {
-        if (this.payAmtInReq == null && payAmtInReq == null) {
+    public CcPrjCostOverview setPayAmt(BigDecimal payAmt) {
+        if (this.payAmt == null && payAmt == null) {
             // 均为null，不做处理。
-        } else if (this.payAmtInReq != null && payAmtInReq != null) {
+        } else if (this.payAmt != null && payAmt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.payAmtInReq.compareTo(payAmtInReq) != 0) {
-                this.payAmtInReq = payAmtInReq;
-                if (!this.toUpdateCols.contains("PAY_AMT_IN_REQ")) {
-                    this.toUpdateCols.add("PAY_AMT_IN_REQ");
+            if (this.payAmt.compareTo(payAmt) != 0) {
+                this.payAmt = payAmt;
+                if (!this.toUpdateCols.contains("PAY_AMT")) {
+                    this.toUpdateCols.add("PAY_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.payAmtInReq = payAmtInReq;
-            if (!this.toUpdateCols.contains("PAY_AMT_IN_REQ")) {
-                this.toUpdateCols.add("PAY_AMT_IN_REQ");
+            this.payAmt = payAmt;
+            if (!this.toUpdateCols.contains("PAY_AMT")) {
+                this.toUpdateCols.add("PAY_AMT");
             }
         }
         return this;
@@ -1185,34 +1185,34 @@ public class CcPrjCostOverview {
     /**
      * {"EN": "可研估算额", "ZH_CN": "预计结算额", "ZH_TW": "可研估算额"}。
      */
-    private BigDecimal cbsAmt11;
+    private BigDecimal cbs11Amt;
 
     /**
      * 获取：{"EN": "可研估算额", "ZH_CN": "预计结算额", "ZH_TW": "可研估算额"}。
      */
-    public BigDecimal getCbsAmt11() {
-        return this.cbsAmt11;
+    public BigDecimal getCbs11Amt() {
+        return this.cbs11Amt;
     }
 
     /**
      * 设置：{"EN": "可研估算额", "ZH_CN": "预计结算额", "ZH_TW": "可研估算额"}。
      */
-    public CcPrjCostOverview setCbsAmt11(BigDecimal cbsAmt11) {
-        if (this.cbsAmt11 == null && cbsAmt11 == null) {
+    public CcPrjCostOverview setCbs11Amt(BigDecimal cbs11Amt) {
+        if (this.cbs11Amt == null && cbs11Amt == null) {
             // 均为null，不做处理。
-        } else if (this.cbsAmt11 != null && cbsAmt11 != null) {
+        } else if (this.cbs11Amt != null && cbs11Amt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.cbsAmt11.compareTo(cbsAmt11) != 0) {
-                this.cbsAmt11 = cbsAmt11;
-                if (!this.toUpdateCols.contains("CBS_AMT_11")) {
-                    this.toUpdateCols.add("CBS_AMT_11");
+            if (this.cbs11Amt.compareTo(cbs11Amt) != 0) {
+                this.cbs11Amt = cbs11Amt;
+                if (!this.toUpdateCols.contains("CBS_11_AMT")) {
+                    this.toUpdateCols.add("CBS_11_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.cbsAmt11 = cbsAmt11;
-            if (!this.toUpdateCols.contains("CBS_AMT_11")) {
-                this.toUpdateCols.add("CBS_AMT_11");
+            this.cbs11Amt = cbs11Amt;
+            if (!this.toUpdateCols.contains("CBS_11_AMT")) {
+                this.toUpdateCols.add("CBS_11_AMT");
             }
         }
         return this;
@@ -1221,34 +1221,34 @@ public class CcPrjCostOverview {
     /**
      * {"EN": "实际结算额", "ZH_CN": "实际结算额", "ZH_TW": "实际结算额"}。
      */
-    private BigDecimal cbsAmt12;
+    private BigDecimal cbs12Amt;
 
     /**
      * 获取：{"EN": "实际结算额", "ZH_CN": "实际结算额", "ZH_TW": "实际结算额"}。
      */
-    public BigDecimal getCbsAmt12() {
-        return this.cbsAmt12;
+    public BigDecimal getCbs12Amt() {
+        return this.cbs12Amt;
     }
 
     /**
      * 设置：{"EN": "实际结算额", "ZH_CN": "实际结算额", "ZH_TW": "实际结算额"}。
      */
-    public CcPrjCostOverview setCbsAmt12(BigDecimal cbsAmt12) {
-        if (this.cbsAmt12 == null && cbsAmt12 == null) {
+    public CcPrjCostOverview setCbs12Amt(BigDecimal cbs12Amt) {
+        if (this.cbs12Amt == null && cbs12Amt == null) {
             // 均为null，不做处理。
-        } else if (this.cbsAmt12 != null && cbsAmt12 != null) {
+        } else if (this.cbs12Amt != null && cbs12Amt != null) {
             // 均非null，判定不等，再做处理：
-            if (this.cbsAmt12.compareTo(cbsAmt12) != 0) {
-                this.cbsAmt12 = cbsAmt12;
-                if (!this.toUpdateCols.contains("CBS_AMT_12")) {
-                    this.toUpdateCols.add("CBS_AMT_12");
+            if (this.cbs12Amt.compareTo(cbs12Amt) != 0) {
+                this.cbs12Amt = cbs12Amt;
+                if (!this.toUpdateCols.contains("CBS_12_AMT")) {
+                    this.toUpdateCols.add("CBS_12_AMT");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.cbsAmt12 = cbsAmt12;
-            if (!this.toUpdateCols.contains("CBS_AMT_12")) {
-                this.toUpdateCols.add("CBS_AMT_12");
+            this.cbs12Amt = cbs12Amt;
+            if (!this.toUpdateCols.contains("CBS_12_AMT")) {
+                this.toUpdateCols.add("CBS_12_AMT");
             }
         }
         return this;
