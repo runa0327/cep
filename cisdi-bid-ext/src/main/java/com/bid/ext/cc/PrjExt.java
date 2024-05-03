@@ -89,14 +89,14 @@ public class PrjExt {
 
         // 获取成本模板树
         List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, 1).eq(CcPrjStructNode.Cols.IS_CBS, 1));
-        //建立匡算，估算，概算，预算树
+        // 建立匡算，估算，概算，预算树
         List<CcPrjStructNode> cbsTree0 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_0");
         List<CcPrjStructNode> cbsTree1 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_1");
         List<CcPrjStructNode> cbsTree2 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_2");
         List<CcPrjStructNode> cbsTree3 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_3");
         List<CcPrjStructNode> cbsTree11 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_11");
         List<CcPrjStructNode> cbsTree12 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_12");
-        //建立成本树
+        // 建立成本树
         List<CcPrjCostOverview> costTree = replaceIdsAndInsertCost(ccPrjStructNodes, ccPrjId);
 
 
@@ -114,12 +114,17 @@ public class PrjExt {
         BigDecimal seqNo = BigDecimal.ZERO;
 
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
-        //为每个节点生成新的 ID 并更新映射表
+        // 为每个节点生成新的 ID 并更新映射表
         for (CcPrjStructNode ccPrjStructNode : ccPrjStructNodes) {
-            CcPrjStructNode ccPrjStructNode0 = new CcPrjStructNode();
+
+            // new CcPrjStructNode()不带各个属性的默认值：
+            // CcPrjStructNode ccPrjStructNode0 = new CcPrjStructNode();
+            // CcPrjStructNode.newData()会带各个属性的默认值：
+            CcPrjStructNode ccPrjStructNode0 = CcPrjStructNode.newData();
+
             String oldId = ccPrjStructNode.getId();
             String newId = IdUtil.getSnowflakeNextIdStr();
-            //新ID与旧ID映射表
+            // 新ID与旧ID映射表
             idMapping.put(oldId, newId);
             ccPrjStructNode0.setId(newId);
             ccPrjStructNode0.setCcPrjStructNodePid(ccPrjStructNode.getCcPrjStructNodePid());
@@ -165,12 +170,17 @@ public class PrjExt {
         BigDecimal seqNo = BigDecimal.ZERO;
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
 
-        //为每个节点生成新的 ID 并更新映射表
+        // 为每个节点生成新的 ID 并更新映射表
         for (CcPrjStructNode ccPrjStructNode : ccPrjStructNodes) {
-            CcPrjCostOverview ccPrjCostOverview = new CcPrjCostOverview();
+
+            // new CcPrjCostOverview()不带各个属性的默认值：
+            // CcPrjCostOverview ccPrjCostOverview = new CcPrjCostOverview();
+            // CcPrjCostOverview.newData()会带各个属性的默认值：
+            CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.newData();
+
             String oldId = ccPrjStructNode.getId();
             String newId = IdUtil.getSnowflakeNextIdStr();
-            //新ID与旧ID映射表
+            // 新ID与旧ID映射表
             idMapping.put(oldId, newId);
             ccPrjCostOverview.setId(newId);
             ccPrjCostOverview.setCcPrjCostOverviewPid(ccPrjStructNode.getCcPrjStructNodePid());
