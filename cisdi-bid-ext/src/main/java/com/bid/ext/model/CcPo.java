@@ -117,9 +117,9 @@ public class CcPo {
          */
         public static final String PARTY_A = "PARTY_A";
         /**
-         * {"EN": "甲方联系人", "ZH_CN": "甲方联系人", "ZH_TW": "甲方联系人"}。
+         * {"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
          */
-        public static final String PARTY_A_CONTACT = "PARTY_A_CONTACT";
+        public static final String PARTY_A_CONTACT_NAME = "PARTY_A_CONTACT_NAME";
         /**
          * {"EN": "甲方联系人电话", "ZH_CN": "甲方联系人电话", "ZH_TW": "甲方联系人电话"}。
          */
@@ -129,9 +129,9 @@ public class CcPo {
          */
         public static final String PARTY_B = "PARTY_B";
         /**
-         * {"EN": "乙方联系人", "ZH_CN": "乙方联系人", "ZH_TW": "乙方联系人"}。
+         * {"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
          */
-        public static final String PARTY_B_CONTACT = "PARTY_B_CONTACT";
+        public static final String PARTY_B_CONTACT_NAME = "PARTY_B_CONTACT_NAME";
         /**
          * {"EN": "乙方联系人电话", "ZH_CN": "乙方联系人电话", "ZH_TW": "乙方联系人电话"}。
          */
@@ -800,36 +800,36 @@ public class CcPo {
     }
 
     /**
-     * {"EN": "甲方联系人", "ZH_CN": "甲方联系人", "ZH_TW": "甲方联系人"}。
+     * {"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
      */
-    private String partyAContact;
+    private String partyAContactName;
 
     /**
-     * 获取：{"EN": "甲方联系人", "ZH_CN": "甲方联系人", "ZH_TW": "甲方联系人"}。
+     * 获取：{"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
      */
-    public String getPartyAContact() {
-        return this.partyAContact;
+    public String getPartyAContactName() {
+        return this.partyAContactName;
     }
 
     /**
-     * 设置：{"EN": "甲方联系人", "ZH_CN": "甲方联系人", "ZH_TW": "甲方联系人"}。
+     * 设置：{"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
      */
-    public CcPo setPartyAContact(String partyAContact) {
-        if (this.partyAContact == null && partyAContact == null) {
+    public CcPo setPartyAContactName(String partyAContactName) {
+        if (this.partyAContactName == null && partyAContactName == null) {
             // 均为null，不做处理。
-        } else if (this.partyAContact != null && partyAContact != null) {
+        } else if (this.partyAContactName != null && partyAContactName != null) {
             // 均非null，判定不等，再做处理：
-            if (this.partyAContact.compareTo(partyAContact) != 0) {
-                this.partyAContact = partyAContact;
-                if (!this.toUpdateCols.contains("PARTY_A_CONTACT")) {
-                    this.toUpdateCols.add("PARTY_A_CONTACT");
+            if (this.partyAContactName.compareTo(partyAContactName) != 0) {
+                this.partyAContactName = partyAContactName;
+                if (!this.toUpdateCols.contains("PARTY_A_CONTACT_NAME")) {
+                    this.toUpdateCols.add("PARTY_A_CONTACT_NAME");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.partyAContact = partyAContact;
-            if (!this.toUpdateCols.contains("PARTY_A_CONTACT")) {
-                this.toUpdateCols.add("PARTY_A_CONTACT");
+            this.partyAContactName = partyAContactName;
+            if (!this.toUpdateCols.contains("PARTY_A_CONTACT_NAME")) {
+                this.toUpdateCols.add("PARTY_A_CONTACT_NAME");
             }
         }
         return this;
@@ -908,36 +908,36 @@ public class CcPo {
     }
 
     /**
-     * {"EN": "乙方联系人", "ZH_CN": "乙方联系人", "ZH_TW": "乙方联系人"}。
+     * {"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
      */
-    private String partyBContact;
+    private String partyBContactName;
 
     /**
-     * 获取：{"EN": "乙方联系人", "ZH_CN": "乙方联系人", "ZH_TW": "乙方联系人"}。
+     * 获取：{"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
      */
-    public String getPartyBContact() {
-        return this.partyBContact;
+    public String getPartyBContactName() {
+        return this.partyBContactName;
     }
 
     /**
-     * 设置：{"EN": "乙方联系人", "ZH_CN": "乙方联系人", "ZH_TW": "乙方联系人"}。
+     * 设置：{"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
      */
-    public CcPo setPartyBContact(String partyBContact) {
-        if (this.partyBContact == null && partyBContact == null) {
+    public CcPo setPartyBContactName(String partyBContactName) {
+        if (this.partyBContactName == null && partyBContactName == null) {
             // 均为null，不做处理。
-        } else if (this.partyBContact != null && partyBContact != null) {
+        } else if (this.partyBContactName != null && partyBContactName != null) {
             // 均非null，判定不等，再做处理：
-            if (this.partyBContact.compareTo(partyBContact) != 0) {
-                this.partyBContact = partyBContact;
-                if (!this.toUpdateCols.contains("PARTY_B_CONTACT")) {
-                    this.toUpdateCols.add("PARTY_B_CONTACT");
+            if (this.partyBContactName.compareTo(partyBContactName) != 0) {
+                this.partyBContactName = partyBContactName;
+                if (!this.toUpdateCols.contains("PARTY_B_CONTACT_NAME")) {
+                    this.toUpdateCols.add("PARTY_B_CONTACT_NAME");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.partyBContact = partyBContact;
-            if (!this.toUpdateCols.contains("PARTY_B_CONTACT")) {
-                this.toUpdateCols.add("PARTY_B_CONTACT");
+            this.partyBContactName = partyBContactName;
+            if (!this.toUpdateCols.contains("PARTY_B_CONTACT_NAME")) {
+                this.toUpdateCols.add("PARTY_B_CONTACT_NAME");
             }
         }
         return this;
