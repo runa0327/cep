@@ -22,11 +22,10 @@ import static com.bid.ext.cc.PrjExt.checkDates;
 
 public class StructNodeExt {
 
-
     /**
-     * 套用模板
+     * WBS套用模板
      */
-    public void template() {
+    public void templateWbs() {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         // 获取模板结构
         String pWbsTempateId = varMap.get("P_WBS_TEMPATE_ID").toString();
@@ -39,7 +38,32 @@ public class StructNodeExt {
             BigDecimal seqNo = BigDecimal.ZERO;
             // 对于每一个模板结构节点，将其作为子节点插入
             for (Map<String, Object> node : templateStruct) {
-                insertNode(node, entityRecord, seqNo);
+                insertWbsNode(node, entityRecord, seqNo);
+                seqNo = seqNo.add(BigDecimal.ONE);
+            }
+        }
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * PBS套用模板
+     */
+    public void templatePbs() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        // 获取模板结构
+        String pWbsTempateId = varMap.get("P_PBS_TEMPATE_ID").toString();
+        Boolean includeRootNode = (Boolean) varMap.get("P_INCLUDE_ROOT_NODE");
+
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            List<Map<String, Object>> templateStruct = getTemplateStruct(pWbsTempateId, includeRootNode);
+            List<Map<String, Object>> list = replaceIdsAndInsert(templateStruct);
+            // 序号
+            BigDecimal seqNo = BigDecimal.ZERO;
+            // 对于每一个模板结构节点，将其作为子节点插入
+            for (Map<String, Object> node : templateStruct) {
+                insertPbsNode(node, entityRecord, seqNo);
                 seqNo = seqNo.add(BigDecimal.ONE);
             }
         }
@@ -130,7 +154,7 @@ public class StructNodeExt {
      * @param nodeData
      * @param parentRecord
      */
-    private void insertNode(Map<String, Object> nodeData, EntityRecord parentRecord, BigDecimal seqNo) {
+    private void insertWbsNode(Map<String, Object> nodeData, EntityRecord parentRecord, BigDecimal seqNo) {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String ccPrjId = parentRecord.valueMap.get("CC_PRJ_ID").toString();
         String ccPrjWbsTypeId = nodeData.get("CC_PRJ_WBS_TYPE_ID").toString();
@@ -151,6 +175,9 @@ public class StructNodeExt {
         ccPrjStructNode.setCcPrjId(ccPrjId);
         ccPrjStructNode.setStatus("AP");
 
+        String remark = nodeData.get("REMARK") != null ? nodeData.get("REMARK").toString() : null;
+        ccPrjStructNode.setRemark(remark);
+
         Integer isMileStoneInt = (Integer) nodeData.get("IS_MILE_STONE");
         boolean isMileStone = isMileStoneInt != null && isMileStoneInt != 0;
         ccPrjStructNode.setIsMileStone(isMileStone);
@@ -166,6 +193,42 @@ public class StructNodeExt {
         ccPrjStructNode.setPlanDays(planDays);
         ccPrjStructNode.setSeqNo(seqNo);  // 设置序号
         ccPrjStructNode.setCcPrjWbsTypeId(ccPrjWbsTypeId);
+
+
+        String parentNodeId = nodeData.get("CC_PRJ_STRUCT_NODE_PID") != null ? nodeData.get("CC_PRJ_STRUCT_NODE_PID").toString() : parentRecord.valueMap.get("ID").toString();
+        ccPrjStructNode.setCcPrjStructNodePid(parentNodeId);
+
+        ccPrjStructNode.setIsTemplate(false);
+        ccPrjStructNode.insertById();
+    }
+
+    /**
+     * 插入节点
+     *
+     * @param nodeData
+     * @param parentRecord
+     */
+    private void insertPbsNode(Map<String, Object> nodeData, EntityRecord parentRecord, BigDecimal seqNo) {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String ccPrjId = parentRecord.valueMap.get("CC_PRJ_ID").toString();
+
+        CcPrjStructNode ccPrjStructNode = new CcPrjStructNode();
+        ccPrjStructNode.setCrtDt(LocalDateTime.now());
+        ccPrjStructNode.setCrtUserId(loginInfo.userInfo.id);
+        ccPrjStructNode.setLastModiUserId(loginInfo.userInfo.id);
+        ccPrjStructNode.setPbsChiefUserId(loginInfo.userInfo.id);
+        ccPrjStructNode.setCcPrjId(ccPrjId);
+
+        String remark = nodeData.get("REMARK") != null ? nodeData.get("REMARK").toString() : null;
+        ccPrjStructNode.setRemark(remark);
+
+        Integer isPbsInt = (Integer) nodeData.get("IS_PBS");
+        boolean isPbs = isPbsInt != null && isPbsInt != 0;
+        ccPrjStructNode.setIsPbs(isPbs);
+
+        ccPrjStructNode.setId(nodeData.get("ID").toString());
+        ccPrjStructNode.setName(nodeData.get("NAME").toString());
+        ccPrjStructNode.setSeqNo(seqNo);  // 设置序号
 
 
         String parentNodeId = nodeData.get("CC_PRJ_STRUCT_NODE_PID") != null ? nodeData.get("CC_PRJ_STRUCT_NODE_PID").toString() : parentRecord.valueMap.get("ID").toString();
@@ -602,21 +665,21 @@ public class StructNodeExt {
      * 更新匡算树时同步成本统览
      */
     public void syncCostTree0() {
-        syncCostTree("CBS_AMT_0");
+        syncCostTree("CBS_0_AMT");
     }
 
     /**
      * 更新估算树时同步成本统览
      */
     public void syncCostTree1() {
-        syncCostTree("CBS_AMT_1");
+        syncCostTree("CBS_1_AMT");
     }
 
     /**
      * 更新概算树时同步成本统览
      */
     public void syncCostTree2() {
-        syncCostTree("CBS_AMT_2");
+        syncCostTree("CBS_2_AMT");
     }
 
 
@@ -624,21 +687,21 @@ public class StructNodeExt {
      * 更新预算树时同步成本统览
      */
     public void syncCostTree3() {
-        syncCostTree("CBS_AMT_3");
+        syncCostTree("CBS_3_AMT");
     }
 
     /**
      * 更新预计结算树时同步成本统览
      */
     public void syncCostTree11() {
-        syncCostTree("CBS_AMT_11");
+        syncCostTree("CBS_11_AMT");
     }
 
     /**
      * 更新实际结算树时同步成本统览
      */
     public void syncCostTree12() {
-        syncCostTree("CBS_AMT_12");
+        syncCostTree("CBS_12_AMT");
     }
 
     private void syncCostTree(String type) {
@@ -654,32 +717,32 @@ public class StructNodeExt {
                 for (CcPrjCostOverview ccPrjCostOverview : ccPrjCostOverviews) {
                     String ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
                     switch (type) {
-                        case "CBS_AMT_0":
+                        case "CBS_0_AMT":
                             ccPrjCostOverview.setCbs0Amt(planTotalCostBigDecimal);
                             ccPrjCostOverview.updateById();
                             recalculatePlanTotalCost(ccPrjCostOverviewPid, type);
                             break;
-                        case "CBS_AMT_1":
+                        case "CBS_1_AMT":
                             ccPrjCostOverview.setCbs1Amt(planTotalCostBigDecimal);
                             ccPrjCostOverview.updateById();
                             recalculatePlanTotalCost(ccPrjCostOverviewPid, type);
                             break;
-                        case "CBS_AMT_2":
+                        case "CBS_2_AMT":
                             ccPrjCostOverview.setCbs2Amt(planTotalCostBigDecimal);
                             ccPrjCostOverview.updateById();
                             recalculatePlanTotalCost(ccPrjCostOverviewPid, type);
                             break;
-                        case "CBS_AMT_3":
+                        case "CBS_3_AMT":
                             ccPrjCostOverview.setCbs3Amt(planTotalCostBigDecimal);
                             ccPrjCostOverview.updateById();
                             recalculatePlanTotalCost(ccPrjCostOverviewPid, type);
                             break;
-                        case "CBS_AMT_11":
+                        case "CBS_11_AMT":
                             ccPrjCostOverview.setCbs11Amt(planTotalCostBigDecimal);
                             ccPrjCostOverview.updateById();
                             recalculatePlanTotalCost(ccPrjCostOverviewPid, type);
                             break;
-                        case "CBS_AMT_12":
+                        case "CBS_12_AMT":
                             ccPrjCostOverview.setCbs12Amt(planTotalCostBigDecimal);
                             ccPrjCostOverview.updateById();
                             recalculatePlanTotalCost(ccPrjCostOverviewPid, type);
@@ -845,7 +908,7 @@ public class StructNodeExt {
             ccPrjCostOverview.updateById();
 
             String ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "BID_AMT_IN_CBS_2");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "BID_AMT");
         }
     }
 
@@ -904,7 +967,7 @@ public class StructNodeExt {
                 ccPrjCostOverviewToDtl.deleteById();
             }
             // 6.重算成本总览
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "BID_AMT_IN_CBS_2");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "BID_AMT");
         }
     }
 
@@ -938,7 +1001,7 @@ public class StructNodeExt {
                 ccPrjCostOverviewToDtl.deleteById();
             }
             // 4.重算成本总览
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "BID_AMT_IN_CBS_2");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "BID_AMT");
         }
     }
 
@@ -989,7 +1052,7 @@ public class StructNodeExt {
             ccPrjCostOverview.updateById();
 
             String ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "PURCHASE_AMT_IN_BID");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "PURCHASE_AMT");
         }
     }
 
@@ -1046,7 +1109,7 @@ public class StructNodeExt {
                 ccPrjCostOverviewToDtl.deleteById();
             }
             // 6.重算成本总览
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "PURCHASE_AMT_IN_BID");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "PURCHASE_AMT");
         }
     }
 
@@ -1080,7 +1143,7 @@ public class StructNodeExt {
                 ccPrjCostOverviewToDtl.deleteById();
             }
             // 4.重算成本总览
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "PURCHASE_AMT_IN_BID");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "PURCHASE_AMT");
         }
     }
 
@@ -1130,7 +1193,7 @@ public class StructNodeExt {
             ccPrjCostOverview.updateById();
 
             String ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "COMPLETE_AMT_IN_PO");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "COMPLETE_AMT");
         }
     }
 
@@ -1187,7 +1250,7 @@ public class StructNodeExt {
                 ccPrjCostOverviewToDtl.deleteById();
             }
             // 6.重算成本总览
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "COMPLETE_AMT_IN_PO");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "COMPLETE_AMT");
         }
     }
 
@@ -1221,7 +1284,7 @@ public class StructNodeExt {
                 ccPrjCostOverviewToDtl.deleteById();
             }
             // 4.重算成本总览
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "COMPLETE_AMT_IN_PO");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "COMPLETE_AMT");
         }
     }
 
@@ -1270,7 +1333,7 @@ public class StructNodeExt {
             ccPrjCostOverview.updateById();
 
             String ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "REQ_PAY_AMT_IN_PO");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "REQ_PAY_AMT");
         }
     }
 
@@ -1327,7 +1390,7 @@ public class StructNodeExt {
                 ccPrjCostOverviewToDtl.deleteById();
             }
             // 8.重算成本总览
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "REQ_PAY_AMT_IN_PO");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "REQ_PAY_AMT");
         }
     }
 
@@ -1359,7 +1422,7 @@ public class StructNodeExt {
                 ccPrjCostOverviewToDtl.deleteById();
             }
             // 4.重算成本总览
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "REQ_PAY_AMT_IN_PO");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "REQ_PAY_AMT");
         }
     }
 
@@ -1410,7 +1473,7 @@ public class StructNodeExt {
             ccPrjCostOverview.updateById();
 
             String ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "PAY_AMT_IN_REQ");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "PAY_AMT");
         }
     }
 
@@ -1465,7 +1528,7 @@ public class StructNodeExt {
                 ccPrjCostOverviewToDtl.deleteById();
             }
             // 7.重算成本总览
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "PAY_AMT_IN_REQ");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "PAY_AMT");
         }
     }
 
@@ -1497,7 +1560,7 @@ public class StructNodeExt {
                 ccPrjCostOverviewToDtl.deleteById();
             }
             // 4.重算成本总览
-            recalculatePlanTotalCost(ccPrjCostOverviewPid, "PAY_AMT_IN_REQ");
+            recalculatePlanTotalCost(ccPrjCostOverviewPid, "PAY_AMT");
         }
     }
 
