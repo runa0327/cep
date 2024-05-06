@@ -4,6 +4,7 @@ import cn.hutool.core.util.IdUtil;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.EntityRecordUtil;
@@ -49,7 +50,7 @@ public class PrjExt {
         }
     }
 
-    public void prjDateCheck() throws Exception {
+    public void prjDateCheck() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             Map<String, Object> valueMap = entityRecord.valueMap;
             Object fromDate = valueMap.get("FROM_DATE");
@@ -69,13 +70,13 @@ public class PrjExt {
      * @param toDateStr   结束日期字符串
      * @throws Exception 如果开始日期晚于结束日期
      */
-    public static void checkDates(String fromDateStr, String toDateStr) throws Exception {
+    public static void checkDates(String fromDateStr, String toDateStr) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate from = LocalDate.parse(fromDateStr, formatter);
         LocalDate to = LocalDate.parse(toDateStr, formatter);
 
         if (from.isAfter(to)) {
-            throw new Exception("请检查并确保开始日期不晚于结束日期");
+            throw new BaseException("请检查并确保开始日期不晚于结束日期！");
         }
     }
 

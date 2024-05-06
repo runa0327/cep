@@ -5,6 +5,7 @@ import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -501,7 +502,7 @@ public class StructNodeExt {
      *
      * @throws Exception
      */
-    public void preCheck() throws Exception {
+    public void preCheck() {
         boolean allHaveChildren = true; // 假设所有节点都有子节点
 
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
@@ -515,7 +516,7 @@ public class StructNodeExt {
         }
 
         if (allHaveChildren) { // 如果所有节点都有子节点
-            throw new Exception("所选计划不为最末级计划，所选计划至少包含一个最末级计划");
+            throw new BaseException("所选计划不为最末级计划，所选计划至少包含一个最末级计划！");
         }
     }
 
@@ -593,7 +594,7 @@ public class StructNodeExt {
      *
      * @throws Exception
      */
-    public void nodeDateCheckCalculate() throws Exception {
+    public void nodeDateCheckCalculate() {
         EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
         Map<String, Object> valueMap = entityRecord.valueMap;
         Object planFr = valueMap.get("PLAN_FR");
@@ -631,7 +632,7 @@ public class StructNodeExt {
                     entityRecord.extraEditableAttCodeList.add("PLAN_DAYS");
                 }
             } else {
-                throw new Exception("请检查并确保开始日期不晚于结束日期");
+                throw new BaseException("请检查并确保开始日期不晚于结束日期！");
             }
         }
     }
@@ -642,7 +643,7 @@ public class StructNodeExt {
      *
      * @throws Exception
      */
-    public void nodeDayCheckCalculate() throws Exception {
+    public void nodeDayCheckCalculate() {
         EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
         Map<String, Object> valueMap = entityRecord.valueMap;
         Object planFrDayNoObj = valueMap.get("PLAN_FR_DAY_NO");
@@ -656,7 +657,7 @@ public class StructNodeExt {
                 BigDecimal dayCount = planToDayNo.subtract(planFrDayNo).add(BigDecimal.ONE);
 
             } else {
-                throw new Exception("请检查并确保开始日期不晚于结束日期");
+                throw new BaseException("请检查并确保开始日期不晚于结束日期！");
             }
         }
     }
@@ -865,7 +866,7 @@ public class StructNodeExt {
      *
      * @throws Exception
      */
-    public void bidToCostOverview() throws Exception {
+    public void bidToCostOverview() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
 
@@ -892,7 +893,7 @@ public class StructNodeExt {
             // 比较priceLimitSumBD和bidAmtInCbs
             int comparisonResult = bidAmtSumBig.compareTo(bidAmtInCbs);
             if (comparisonResult > 0) {
-                throw new Exception("已招标金额大于概算金额");
+                throw new BaseException("已招标金额大于概算金额！");
             }
 
             // 4.存储成本统览关联明细
@@ -915,7 +916,7 @@ public class StructNodeExt {
     /**
      * 更新招标
      */
-    public void updateBid() throws Exception {
+    public void updateBid() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcBid ccBid = CcBid.selectById(csCommId);
@@ -951,7 +952,7 @@ public class StructNodeExt {
 
                 int comparisonResult = nowBidAmt.compareTo(bidAmtInCbs);
                 if (comparisonResult > 0) {
-                    throw new Exception("已招标金额大于概算金额");
+                    throw new BaseException("已招标金额大于概算金额！");
                 }
                 ccPrjCostOverview.updateById();
 
@@ -1011,7 +1012,7 @@ public class StructNodeExt {
      *
      * @throws Exception
      */
-    public void poToCostOverview() throws Exception {
+    public void poToCostOverview() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
 
@@ -1036,7 +1037,7 @@ public class StructNodeExt {
             // 比较PurchaseAmtSum和bidAmt
             int comparisonResult = purchaseAmtInBidSum.compareTo(bidAmt);
             if (comparisonResult > 0) {
-                throw new Exception("已采购额大于已招标额");
+                throw new BaseException("已采购额大于已招标额！");
             }
 
             // 4.存储成本统览关联明细
@@ -1059,7 +1060,7 @@ public class StructNodeExt {
     /**
      * 更新采购
      */
-    public void updatePo() throws Exception {
+    public void updatePo() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcPo ccPo = CcPo.selectById(csCommId);
@@ -1093,7 +1094,7 @@ public class StructNodeExt {
 
                 int comparisonResult = nowBidAmt.compareTo(bidAmt);
                 if (comparisonResult > 0) {
-                    throw new Exception("已采购金额大于已招标金额");
+                    throw new BaseException("已采购金额大于已招标金额！");
                 }
                 ccPrjCostOverview.updateById();
 
@@ -1152,7 +1153,7 @@ public class StructNodeExt {
      *
      * @throws Exception
      */
-    public void gdpToCostOverview() throws Exception {
+    public void gdpToCostOverview() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
 
@@ -1177,7 +1178,7 @@ public class StructNodeExt {
             // 比较completeAmtInPoSum和purchaseAmtInBid
             int comparisonResult = completeAmtInPoSum.compareTo(purchaseAmtInBid);
             if (comparisonResult > 0) {
-                throw new Exception("已完成产值金额大于已采购金额");
+                throw new BaseException("已完成产值金额大于已采购金额！");
             }
 
             // 4.存储成本统览关联明细
@@ -1200,7 +1201,7 @@ public class StructNodeExt {
     /**
      * 更新产值
      */
-    public void updateGdp() throws Exception {
+    public void updateGdp() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcGdp ccGdp = CcGdp.selectById(csCommId);
@@ -1234,7 +1235,7 @@ public class StructNodeExt {
 
                 int comparisonResult = nowCompleteAmt.compareTo(purchaseAmtInBid);
                 if (comparisonResult > 0) {
-                    throw new Exception("已完成产值金额大于已采购金额");
+                    throw new BaseException("已完成产值金额大于已采购金额！");
                 }
                 ccPrjCostOverview.updateById();
 
@@ -1293,7 +1294,7 @@ public class StructNodeExt {
      *
      * @throws Exception
      */
-    public void payReqToCostOverview() throws Exception {
+    public void payReqToCostOverview() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
 
@@ -1315,7 +1316,7 @@ public class StructNodeExt {
             // 3.对比已申请支付金额和已完成产值金额，若已申请支付金额大于已采购金额则提示
             int comparisonResult = reqPayAmtInPoSum.compareTo(purchaseAmtInBid);
             if (comparisonResult > 0) {
-                throw new Exception("已申请支付金额大于已采购金额");
+                throw new BaseException("已申请支付金额大于已采购金额！");
             }
 
             String ccPrjCostOverviewId = ccPrjCostOverview.getId();
@@ -1341,7 +1342,7 @@ public class StructNodeExt {
     /**
      * 更新支付申请
      */
-    public void updatePayReq() throws Exception {
+    public void updatePayReq() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcPayReq ccPayReq = CcPayReq.selectById(csCommId);
@@ -1372,7 +1373,7 @@ public class StructNodeExt {
 
                 // 5.对比已申请支付金额和已完成产值金额，若已申请支付金额大于已完成产值金额则提示
                 if (nowReqPayAmt.compareTo(purchaseAmtInBid) > 0) {
-                    throw new Exception("已申请支付金额大于已完成产值金额");
+                    throw new BaseException("已申请支付金额大于已采购金额！");
                 }
 
                 ccPrjCostOverview.setReqPayAmt(nowReqPayAmt);
@@ -1436,7 +1437,7 @@ public class StructNodeExt {
      *
      * @throws Exception
      */
-    public void payRecordToCostOverview() throws Exception {
+    public void payRecordToCostOverview() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
 
@@ -1457,7 +1458,7 @@ public class StructNodeExt {
 
             // 3.对比已支付金额和已申请支付金额，若已支付金额大于已申请支付金额则提示
             if (payAmtInReqSum.compareTo(reqPayAmtInPo) > 0) {
-                throw new Exception("已支付金额大于已申请支付金额");
+                throw new BaseException("已支付金额大于已申请支付金额！");
             }
 
             // 4.存储成本统览关联明细
@@ -1481,7 +1482,7 @@ public class StructNodeExt {
     /**
      * 更新支付记录
      */
-    public void updatePayRecord() throws Exception {
+    public void updatePayRecord() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcPay ccPay = CcPay.selectById(csCommId);
@@ -1510,7 +1511,7 @@ public class StructNodeExt {
 
                 // 4.对比更新后的已支付金额和已申请支付金额，若已支付金额大于已申请支付金额则提示
                 if (nowPayAmt.compareTo(reqPayAmtInPo) > 0) {
-                    throw new Exception("已支付金额大于已申请支付金额");
+                    throw new BaseException("已支付金额大于已申请支付金额！");
                 }
 
                 ccPrjCostOverview.setPayAmt(nowPayAmt);

@@ -81,7 +81,7 @@ public class VerifyFileExt {
 
             if (matchedTypeId == null) {
                 // 如果没有找到匹配项
-                throw new BaseException("不能识别当前上传文件类型(." + extName + ")，请联系管理员添加所需文件类型");
+                throw new BaseException("不能识别当前上传文件类型(." + extName + ")，请联系管理员添加所需文件类型！");
             } else {
                 int update = myJdbcTemplate.update("update " + entityCode + " t set t.CC_DOC_FILE_TYPE_ID = ?,t.NAME = ? where t.id=?", matchedTypeId, fileName, csCommId);
                 log.info("已更新：{}", update);
@@ -100,7 +100,7 @@ public class VerifyFileExt {
 
             if (!isMatch) {
                 // 如果没有找到匹配项
-                throw new BaseException("资料文件类型与上传文件类型(." + extName + ")不匹配，请选择正确的文件类型或不选择文件类型");
+                throw new BaseException("资料文件类型与上传文件类型(." + extName + ")不匹配，请选择正确的文件类型或不选择文件类型！");
             }
         }
     }

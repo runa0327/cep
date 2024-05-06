@@ -4,6 +4,7 @@ import cn.hutool.json.JSONObject;
 import com.bid.ext.model.CcCoTaskProg;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.SharedUtil;
@@ -21,7 +22,7 @@ public class CoTaskExt {
             Set<String> newSuperviseUserIds = new HashSet<>(parseUserIds(valueMap.get("SUPERVISE_USER_IDS")));
 
 
-            //获取已存在的任务进展
+            // 获取已存在的任务进展
             List<CcCoTaskProg> ccCoTaskProgs = CcCoTaskProg.selectByWhere(new Where().eq(CcCoTaskProg.Cols.CC_CO_TASK_ID, csCommId));
 
             // 分类现有任务
@@ -104,7 +105,7 @@ public class CoTaskExt {
      *
      * @throws Exception
      */
-    public void preCheckTaskProg() throws Exception {
+    public void preCheckTaskProg() {
         boolean isTaskUser = false;
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String name = loginInfo.userInfo.name;
@@ -124,7 +125,7 @@ public class CoTaskExt {
             }
         }
         if (!isTaskUser) {
-            throw new Exception("用户【" + userName + "】不是所选任务的责任人或督办人，无法反馈进度!");
+            throw new BaseException("用户【" + userName + "】不是所选任务的责任人或督办人，无法反馈进度！");
         }
     }
 
