@@ -1173,11 +1173,11 @@ public class StructNodeExt {
 
             String ccPrjCostOverviewId = ccPrjCostOverview.getId();
 
-            // 3.对比已采购金额和已完成产值金额，若已产值金额大于已采购金额则提示
+            // 3.对比已采购金额和已完成产值金额，若已完成产值金额大于已采购金额则提示
             // 比较completeAmtInPoSum和purchaseAmtInBid
             int comparisonResult = completeAmtInPoSum.compareTo(purchaseAmtInBid);
             if (comparisonResult > 0) {
-                throw new Exception("已产值金额大于已采购金额");
+                throw new Exception("已完成产值金额大于已采购金额");
             }
 
             // 4.存储成本统览关联明细
