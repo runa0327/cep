@@ -116,6 +116,10 @@ public class CcConstructWork {
          */
         public static final String CC_COMPANY_ID = "CC_COMPANY_ID";
         /**
+         * {"EN": "PROG_TIME", "ZH_CN": "进展时间", "ZH_TW": "繁：进展时间"}。
+         */
+        public static final String PROG_TIME = "PROG_TIME";
+        /**
          * {"EN": "进展比例（%）", "ZH_CN": "实际进度比例", "ZH_TW": "进展比例（%）"}。
          */
         public static final String ACT_WBS_PCT = "ACT_WBS_PCT";
@@ -733,6 +737,42 @@ public class CcConstructWork {
             this.ccCompanyId = ccCompanyId;
             if (!this.toUpdateCols.contains("CC_COMPANY_ID")) {
                 this.toUpdateCols.add("CC_COMPANY_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "PROG_TIME", "ZH_CN": "进展时间", "ZH_TW": "繁：进展时间"}。
+     */
+    private LocalDateTime progTime;
+
+    /**
+     * 获取：{"EN": "PROG_TIME", "ZH_CN": "进展时间", "ZH_TW": "繁：进展时间"}。
+     */
+    public LocalDateTime getProgTime() {
+        return this.progTime;
+    }
+
+    /**
+     * 设置：{"EN": "PROG_TIME", "ZH_CN": "进展时间", "ZH_TW": "繁：进展时间"}。
+     */
+    public CcConstructWork setProgTime(LocalDateTime progTime) {
+        if (this.progTime == null && progTime == null) {
+            // 均为null，不做处理。
+        } else if (this.progTime != null && progTime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.progTime.compareTo(progTime) != 0) {
+                this.progTime = progTime;
+                if (!this.toUpdateCols.contains("PROG_TIME")) {
+                    this.toUpdateCols.add("PROG_TIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.progTime = progTime;
+            if (!this.toUpdateCols.contains("PROG_TIME")) {
+                this.toUpdateCols.add("PROG_TIME");
             }
         }
         return this;
