@@ -4,6 +4,7 @@ import com.bid.ext.model.CcConstructWork;
 import com.bid.ext.model.CcConstructWorkProg;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.interaction.InvokeActResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ public class ConstructWorkExt {
      * 填报施工工作进展
      */
     public void reportDailyWorkload() {
+        InvokeActResult invokeActResult = new InvokeActResult();
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         String pRemark = varMap.get("P_REMARK") != null ? varMap.get("P_REMARK").toString() : null;
         String pAttachments = varMap.get("P_ATTACHMENTS") != null ? varMap.get("P_ATTACHMENTS").toString() : null;
@@ -41,8 +43,9 @@ public class ConstructWorkExt {
             ccConstructWork.setProgTime(pProgTime);
             ccConstructWork.setActWbsPct(pActWbsPct);
             ccConstructWork.updateById();
-
         }
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
 }
