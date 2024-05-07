@@ -278,6 +278,8 @@ public class PreViewExt {
                 }
             }
             // 4、若有预览地址，则打开：
+            ccDocFile.setCcPreviewConversionStatusId("SUCC");
+            ccDocFile.updateById();
             UrlToOpen extBrowserWindowToOpen = new UrlToOpen();
             extBrowserWindowToOpen.url = previewUrl;
             extBrowserWindowToOpen.title = "预览";
