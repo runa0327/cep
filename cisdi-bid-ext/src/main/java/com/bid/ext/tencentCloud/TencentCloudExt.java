@@ -165,7 +165,7 @@ public class TencentCloudExt {
 
                 boolean inAtdArea = false;
                 boolean isOutOfAtdAreaAllowed = false;
-                String areaId = "";
+                String areaId = null;
                 Time timeFr = null;
                 Time timeTo = null;
                 for (Map<String, Object> map : maps) {
@@ -328,14 +328,6 @@ public class TencentCloudExt {
     //考勤统计
     public void calculateAtdHit() {
 
-//        Map<String, Object> extApiParamMap = ExtJarHelper.getExtApiParamMap();
-        //日期
-//        String startDate = String.valueOf(extApiParamMap.get("P_FROM_DATE"));
-//        String endDate = String.valueOf(extApiParamMap.get("P_TO_DATE"));
-//
-//        String groupIds = String.valueOf(extApiParamMap.get("P_CC_ATD_GROUP_IDS"));
-//        String userIds = String.valueOf(extApiParamMap.get("P_AD_USER_IDS"));
-
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         //请求参数
         String startDate = varMap.get("P_FROM_DATE") == null ? null : varMap.get("P_FROM_DATE").toString();
@@ -445,7 +437,7 @@ public class TencentCloudExt {
 
         List<Map<String, Object>> spDateMaps = null;
         try {
-            spDateMaps = myJdbcTemplate.queryForList(querySpData, startDate, LocalDate.parse(endDate).plusDays(1));
+            spDateMaps = myJdbcTemplate.queryForList(querySpData, startDate, endDate);
         } catch (EmptyResultDataAccessException e) {
             spDateMaps = new ArrayList<>();
         }
