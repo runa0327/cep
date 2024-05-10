@@ -107,3 +107,8 @@ gwx:
 #  corpid: ww808726c44a3ff6dc
 #  corpsecret: X4SOKLItOrh5OJq4nXBRKgM8t5QaXjw-LJP0RI6M7mI
 #  agentId: 1000005
+
+#安徽单点登录
+ah:
+  clientId: 20e25b82-bbe4-459f-af55-3275cfbed695
+  secret: O5XR2WONusEdTbam4rNA9k3i3OVhTZ/zHdDRvRD83fI=

@@ -1,15 +1,12 @@
-package com.cisdi.bid.Controller;
+package com.cisdi.bid.controller;
 
 
 import com.alibaba.fastjson.JSON;
-import com.cisdi.bid.model.LoginExtraInfo;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.ThirdPartyUserInfo;
 import com.qygly.shared.interaction.external.ThirdPartyLoginCodeValidationReqBody;
 import com.qygly.shared.interaction.external.ThirdPartyLoginCodeValidationRespBody;
-import com.qygly.shared.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,32 +35,17 @@ public class ThirdPartyLoginController {
             throw new BaseException("参数为空！");
         }
 
+        String clientId = "20e25b82-bbe4-459f-af55-3275cfbed695";
+        
+
         ThirdPartyLoginCodeValidationRespBody responseBody = new ThirdPartyLoginCodeValidationRespBody();
 
         responseBody.succ = true;
         responseBody.data = new ThirdPartyUserInfo();
 
+        String loginCode = requestBody.loginCode;
 
-        responseBody.succ = false;
-
-        String json = requestBody.loginExtraInfo;
-        if (StringUtils.hasText(json)) {
-
-            LoginExtraInfo loginExtraInfo = JsonUtil.fromJson(json, LoginExtraInfo.class);
-            String loginCode = requestBody.loginCode;
-
-            String loginThirdParty = loginExtraInfo.getLoginThirdParty();
-            String loginExtra = loginExtraInfo.getLoginExtraInfo();
-            String loginType = loginExtraInfo.getLoginType();
-
-            ThirdPartyUserInfo thirdPartyUserInfo = new ThirdPartyUserInfo();
-
-            if (thirdPartyUserInfo != null) {
-                responseBody.succ = true;
-                responseBody.data = thirdPartyUserInfo;
-            }
-            log.info("响应：" + JSON.toJSONString(responseBody));
-        }
+        log.info("响应：" + JSON.toJSONString(responseBody));
 
         return responseBody;
     }
