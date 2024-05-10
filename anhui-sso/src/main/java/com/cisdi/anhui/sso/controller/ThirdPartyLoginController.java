@@ -4,17 +4,20 @@ package com.cisdi.anhui.sso.controller;
 import com.qygly.shared.ad.login.ThirdPartyUserInfo;
 import com.qygly.shared.interaction.external.ThirdPartyLoginCodeValidationReqBody;
 import com.qygly.shared.interaction.external.ThirdPartyLoginCodeValidationRespBody;
+import com.qygly.shared.util.JsonUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -43,28 +46,43 @@ public class ThirdPartyLoginController {
      * @return
      */
     @PostMapping("validate")
-    public ThirdPartyLoginCodeValidationRespBody validate(@RequestBody ThirdPartyLoginCodeValidationReqBody requestBody) throws URISyntaxException {
+    public ThirdPartyLoginCodeValidationRespBody validate(@RequestBody ThirdPartyLoginCodeValidationReqBody requestBody) throws URISyntaxException, UnsupportedEncodingException {
 
         String loginCode = requestBody.loginCode;
 
+        return getThirdPartyLoginCodeValidationRespBody(loginCode);
+    }
+
+    @GetMapping("test")
+    public ThirdPartyLoginCodeValidationRespBody test() throws URISyntaxException, UnsupportedEncodingException {
+        return getThirdPartyLoginCodeValidationRespBody("123");
+    }
+
+    private ThirdPartyLoginCodeValidationRespBody getThirdPartyLoginCodeValidationRespBody(String loginCode) throws URISyntaxException, UnsupportedEncodingException {
         String url = loginUserUrl + "?token=" + loginCode + "&clientId=" + clientId + "&secret=" + secret;
 
-        ResponseEntity<Map> responseEntity = restTemplate.getForEntity(new URI(url), Map.class);
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity(new URI(url), String.class);
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
-            Map map = responseEntity.getBody();
-            if (SharedUtil.notEmpty(map)) {
-                Object logonName = map.get("logon_name");
-                if (SharedUtil.notEmpty(logonName)) {
-                    String logonNameString = logonName.toString();
+            String string = responseEntity.getBody();
 
-                    ThirdPartyLoginCodeValidationRespBody succRespBody = new ThirdPartyLoginCodeValidationRespBody();
-                    succRespBody.succ = true;
-                    succRespBody.data = new ThirdPartyUserInfo();
-                    succRespBody.data.identityCode = logonNameString;
-                    succRespBody.data.code = logonNameString;
-                    succRespBody.data.name = logonNameString;
+            log.info("string" + string);
 
-                    return succRespBody;
+            if (SharedUtil.notEmpty(string)) {
+                Map<String, Object> map = JsonUtil.convertJsonToMap(string);
+                if (SharedUtil.notEmpty(map)) {
+                    Object logonName = map.get("logon_name");
+                    if (SharedUtil.notEmpty(logonName)) {
+                        String logonNameString = new String(logonName.toString().getBytes("GBK"), "UTF-8");
+
+                        ThirdPartyLoginCodeValidationRespBody succRespBody = new ThirdPartyLoginCodeValidationRespBody();
+                        succRespBody.succ = true;
+                        succRespBody.data = new ThirdPartyUserInfo();
+                        succRespBody.data.identityCode = logonNameString;
+                        succRespBody.data.code = logonNameString;
+                        succRespBody.data.name = logonNameString;
+
+                        return succRespBody;
+                    }
                 }
             }
         }
