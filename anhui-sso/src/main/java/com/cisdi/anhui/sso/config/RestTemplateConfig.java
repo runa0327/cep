@@ -1,4 +1,4 @@
-package com.cisdi.bid.config;
+package com.cisdi.anhui.sso.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

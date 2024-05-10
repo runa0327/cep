@@ -1,13 +1,13 @@
-package com.cisdi.bid;
+package com.cisdi.anhui.sso;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CisdiBidThirdPartyLoginApplication {
+public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(CisdiBidThirdPartyLoginApplication.class, args);
+        SpringApplication.run(Application.class, args);
     }
 
 }

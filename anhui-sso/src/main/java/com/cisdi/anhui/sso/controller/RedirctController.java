@@ -1,4 +1,4 @@
-package com.cisdi.bid.controller;
+package com.cisdi.anhui.sso.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
