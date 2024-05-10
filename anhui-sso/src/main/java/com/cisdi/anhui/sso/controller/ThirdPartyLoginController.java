@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +22,8 @@ import org.springframework.web.client.RestTemplate;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Map;
 
 
@@ -61,18 +65,31 @@ public class ThirdPartyLoginController {
     private ThirdPartyLoginCodeValidationRespBody getThirdPartyLoginCodeValidationRespBody(String loginCode) throws URISyntaxException, UnsupportedEncodingException {
         String url = loginUserUrl + "?token=" + loginCode + "&clientId=" + clientId + "&secret=" + secret;
 
+        // 中文乱码，主要是 StringHttpMessageConverter的默认编码为ISO导致的
+        List<HttpMessageConverter<?>> list = restTemplate.getMessageConverters();
+        for (HttpMessageConverter converter : list) {
+            if (converter instanceof StringHttpMessageConverter) {
+                ((StringHttpMessageConverter) converter).setDefaultCharset(Charset.forName("UTF-8"));
+                break;
+            }
+        }
+
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(new URI(url), String.class);
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
             String string = responseEntity.getBody();
 
-            log.info("string" + string);
+            log.info("original string: " + string);
 
             if (SharedUtil.notEmpty(string)) {
                 Map<String, Object> map = JsonUtil.convertJsonToMap(string);
                 if (SharedUtil.notEmpty(map)) {
                     Object logonName = map.get("logon_name");
                     if (SharedUtil.notEmpty(logonName)) {
-                        String logonNameString = new String(logonName.toString().getBytes("GBK"), "UTF-8");
+
+                        String logonNameString = logonName.toString();
+
+                        // String logonNameString = new String(logonName.toString().getBytes(), "UTF-8");
+                        // log.info("new logon_name:" + logonNameString);
 
                         ThirdPartyLoginCodeValidationRespBody succRespBody = new ThirdPartyLoginCodeValidationRespBody();
                         succRespBody.succ = true;
