@@ -11,7 +11,7 @@
 
     <modules>
         <module>cisdi-bid-ext</module>
-        <module>cisdi-bid-third-party-login</module>
+        <module>anhui-sso</module>
     </modules>
 
     <properties>
