@@ -1,19 +1,19 @@
 package com.cisdi.bid.controller;
 
 
+import com.alibaba.fastjson.JSON;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.ThirdPartyUserInfo;
 import com.qygly.shared.interaction.external.ThirdPartyLoginCodeValidationReqBody;
 import com.qygly.shared.interaction.external.ThirdPartyLoginCodeValidationRespBody;
-import com.qygly.shared.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Resource;
 
 /**
  * @author 尹涛 * @version V1.0.0
@@ -27,7 +27,7 @@ import javax.annotation.Resource;
 @Slf4j
 public class ThirdPartyLoginController {
 
-    @Resource
+    @Autowired
     private RestTemplate restTemplate;
 
     @Value("${ah.clientId}")
@@ -66,7 +66,7 @@ public class ThirdPartyLoginController {
             getLoginUserUrl += "?token=" + loginCode + "& clientId=" + clientId + "& secret =" + secret;
         }
 
-
+        restTemplate.getForEntity(getLoginUserUrl, String.class);
         log.info("响应：" + JSON.toJSONString(responseBody));
 
         return responseBody;
