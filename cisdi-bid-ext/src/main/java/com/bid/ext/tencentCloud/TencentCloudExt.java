@@ -228,7 +228,7 @@ public class TencentCloudExt {
 
             } else {
                 resultMap.put("code", 500);
-                resultMap.put("msg", "请将人脸移入框内");
+                resultMap.put("msg", "打卡失败，请将人脸移入相机！");
             }
 
         }
