@@ -116,10 +116,6 @@ public class AdAtt {
          */
         public static final String VIRTUAL_EXPRESSION = "VIRTUAL_EXPRESSION";
         /**
-         * {"EN": "AD_FAST_ACT_GRP_ID", "ZH_CN": "快捷操作组", "ZH_TW": "繁：快捷操作组"}。
-         */
-        public static final String AD_FAST_ACT_GRP_ID = "AD_FAST_ACT_GRP_ID";
-        /**
          * {"EN": "WIDTH", "ZH_CN": "宽度", "ZH_TW": "繁：宽度"}。
          */
         public static final String WIDTH = "WIDTH";
@@ -1021,42 +1017,6 @@ public class AdAtt {
             this.virtualExpression = virtualExpression;
             if (!this.toUpdateCols.contains("VIRTUAL_EXPRESSION")) {
                 this.toUpdateCols.add("VIRTUAL_EXPRESSION");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "AD_FAST_ACT_GRP_ID", "ZH_CN": "快捷操作组", "ZH_TW": "繁：快捷操作组"}。
-     */
-    private String adFastActGrpId;
-
-    /**
-     * 获取：{"EN": "AD_FAST_ACT_GRP_ID", "ZH_CN": "快捷操作组", "ZH_TW": "繁：快捷操作组"}。
-     */
-    public String getAdFastActGrpId() {
-        return this.adFastActGrpId;
-    }
-
-    /**
-     * 设置：{"EN": "AD_FAST_ACT_GRP_ID", "ZH_CN": "快捷操作组", "ZH_TW": "繁：快捷操作组"}。
-     */
-    public AdAtt setAdFastActGrpId(String adFastActGrpId) {
-        if (this.adFastActGrpId == null && adFastActGrpId == null) {
-            // 均为null，不做处理。
-        } else if (this.adFastActGrpId != null && adFastActGrpId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.adFastActGrpId.compareTo(adFastActGrpId) != 0) {
-                this.adFastActGrpId = adFastActGrpId;
-                if (!this.toUpdateCols.contains("AD_FAST_ACT_GRP_ID")) {
-                    this.toUpdateCols.add("AD_FAST_ACT_GRP_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.adFastActGrpId = adFastActGrpId;
-            if (!this.toUpdateCols.contains("AD_FAST_ACT_GRP_ID")) {
-                this.toUpdateCols.add("AD_FAST_ACT_GRP_ID");
             }
         }
         return this;

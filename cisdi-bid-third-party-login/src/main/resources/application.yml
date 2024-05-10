@@ -1,0 +1,109 @@
+server:
+  port: 11137
+  servlet:
+    context-path: /cisdi-bid-third-party-login
+
+spring:
+  # 设置时区，以北京时间显示报错信息的时间（等）：
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null
+  application:
+    name: cisdi-pms-third-party-login
+  cloud:
+    nacos:
+      discovery:
+        #正式
+        server-addr: 10.130.19.98:8848
+        #测试
+    #        server-addr: 121.5.62.215:8848
+    #  redis:
+    #    单机启用host、port：
+    #    host: 124.222.58.152
+    #    port: 6379
+    #   单机、哨兵公用password、database：
+    #    password: redis@1234
+    #    企业管理云的REDIS库：
+    #    database: 8
+    #   哨兵使用sentinel.master、sentinel.nodes：
+    #    sentinel:
+    #      master:
+    #      nodes:
+    #   连接池：
+#    jedis:
+#      pool:
+#        max-active: 200
+#        max-idle: 10
+#        max-wait: 5s
+#        min-idle: 0
+#        time-between-eviction-runs: 60s
+
+mybatis:
+  # 搜索指定包别名
+  typeAliasesPackage: com.cisdi.bid.domain
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+
+flylog:
+  log_sent_mode: thrift
+  flume_agent: 10.100.7.219:4143
+  platform: gcxmxtxxxt
+  application: web
+  flume_batch_size: 1
+  sink_batch_size: 1
+  enabled: true
+  ignore:
+    static:
+      res: css,html,js,jpg,png,bmp,faicon,gif,ico,woff,otf,svg,ttf,woff2,eot,json
+  flume_data_path: E:/iflytek/dir/web
+
+
+logging:
+  #  config: classpath:/log4j-info.xml
+  level:
+    root: info
+    com.itcodai.course03.dao: trace
+
+# forest设置
+forest:
+  backend: httpclient
+  ## 日志总开关，打开/关闭Forest请求/响应日志（默认为 true）
+  log-enabled: true
+  ## 打开/关闭Forest请求日志（默认为 true）
+  log-request: true
+  ## 打开/关闭Forest响应状态日志（默认为 true）
+  log-response-status: true
+  ## 打开/关闭Forest响应内容日志（默认为 false）
+  log-response-content: true
+
+# 崖州湾统一登录认证平台配置
+yzbays:
+  #  正式环境
+  appId: 63622b9f2ae3ddbc4ebe2422
+  appSecret: 2410a73f40869c27ab5af73e683bb5ff
+  redirectUri: http://cpms.yazhou-bay.com:9099/pc/unifiedLogin
+  domainName: https://xxxt.yzbays.com
+  appClientId: yzb-xxxtxt
+  appClientSecret: 48fce96b-1a97-4c40-bc8e-50c25b8396eb
+  appDomainName: https://api.prod.yzbays.com
+
+#  测试环境
+#  appId: 61efaced4141ed89deeecbdb
+#  appSecret: db725e831f0acfccc13aade1d473e9dd
+#  redirectUri: http://139.159.138.11:9090/pc/unifiedLogin
+#  domainName: https://epms.yzbays.cn
+#  appClientId: yzb-gcxxxt
+#  appClientSecret: d44cc4fe-74ae-4f1e-a828-1b72042cfd36
+#  appDomainName: https://api.test.yzbays.com
+
+# 政务微信单点登录
+gwx:
+  domain: http://qw.yazhou-bay.com:10060/cgi-bin
+  corpid: wwc93a3d2888846f9b
+  corpsecret: robsFWLBEaUUeupQ6VatvvjBqylwu94Y8mD9WKph13w
+  agentId: 1000003
+#  domain: http://im.yazhou-bay.com:10060/cgi-bin
+#  corpid: ww808726c44a3ff6dc
+#  corpsecret: X4SOKLItOrh5OJq4nXBRKgM8t5QaXjw-LJP0RI6M7mI
+#  agentId: 1000005

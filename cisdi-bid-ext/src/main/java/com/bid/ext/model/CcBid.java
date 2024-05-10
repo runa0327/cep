@@ -7,6 +7,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -1144,19 +1145,19 @@ public class CcBid {
     /**
      * {"EN": "中标价", "ZH_CN": "中标价（元或%）", "ZH_TW": "中标价"}。
      */
-    private String succBidPrice;
+    private BigDecimal succBidPrice;
 
     /**
      * 获取：{"EN": "中标价", "ZH_CN": "中标价（元或%）", "ZH_TW": "中标价"}。
      */
-    public String getSuccBidPrice() {
+    public BigDecimal getSuccBidPrice() {
         return this.succBidPrice;
     }
 
     /**
      * 设置：{"EN": "中标价", "ZH_CN": "中标价（元或%）", "ZH_TW": "中标价"}。
      */
-    public CcBid setSuccBidPrice(String succBidPrice) {
+    public CcBid setSuccBidPrice(BigDecimal succBidPrice) {
         if (this.succBidPrice == null && succBidPrice == null) {
             // 均为null，不做处理。
         } else if (this.succBidPrice != null && succBidPrice != null) {

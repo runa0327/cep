@@ -112,6 +112,14 @@ public class CcQsInspection {
          */
         public static final String CC_QS_INSPECTION_TIME = "CC_QS_INSPECTION_TIME";
         /**
+         * {"EN": "咨询问题", "ZH_CN": "咨询问题", "ZH_TW": "咨询问题"}。
+         */
+        public static final String CC_QUESTION = "CC_QUESTION";
+        /**
+         * {"EN": "咨询名称", "ZH_CN": "咨询名称", "ZH_TW": "咨询名称"}。
+         */
+        public static final String CC_NAME = "CC_NAME";
+        /**
          * {"EN": "CC_QS_INSPECTION_USER", "ZH_CN": "质安巡检用户", "ZH_TW": "繁：质安巡检用户"}。
          */
         public static final String CC_QS_INSPECTION_USER = "CC_QS_INSPECTION_USER";
@@ -132,9 +140,9 @@ public class CcQsInspection {
          */
         public static final String CC_QS_ISSUE_LEVEL_ID = "CC_QS_ISSUE_LEVEL_ID";
         /**
-         * {"EN": "CC_QS_ISSUE_NODE_ID", "ZH_CN": "质安问题节点", "ZH_TW": "繁：质安问题节点"}。
+         * {"EN": "CC_QS_ISSUE_NODE_ID", "ZH_CN": "关联的分部分项节点", "ZH_TW": "繁：质安问题节点"}。
          */
-        public static final String CC_QS_ISSUE_NODE_ID = "CC_QS_ISSUE_NODE_ID";
+        public static final String CC_PRJ_PBS_NODE_ID = "CC_PRJ_PBS_NODE_ID";
         /**
          * {"EN": "质安问题要点（多个）", "ZH_CN": "质安问题要点（多个）", "ZH_TW": "质安问题要点（多个）"}。
          */
@@ -779,6 +787,78 @@ public class CcQsInspection {
     }
 
     /**
+     * {"EN": "咨询问题", "ZH_CN": "咨询问题", "ZH_TW": "咨询问题"}。
+     */
+    private String ccQuestion;
+
+    /**
+     * 获取：{"EN": "咨询问题", "ZH_CN": "咨询问题", "ZH_TW": "咨询问题"}。
+     */
+    public String getCcQuestion() {
+        return this.ccQuestion;
+    }
+
+    /**
+     * 设置：{"EN": "咨询问题", "ZH_CN": "咨询问题", "ZH_TW": "咨询问题"}。
+     */
+    public CcQsInspection setCcQuestion(String ccQuestion) {
+        if (this.ccQuestion == null && ccQuestion == null) {
+            // 均为null，不做处理。
+        } else if (this.ccQuestion != null && ccQuestion != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccQuestion.compareTo(ccQuestion) != 0) {
+                this.ccQuestion = ccQuestion;
+                if (!this.toUpdateCols.contains("CC_QUESTION")) {
+                    this.toUpdateCols.add("CC_QUESTION");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccQuestion = ccQuestion;
+            if (!this.toUpdateCols.contains("CC_QUESTION")) {
+                this.toUpdateCols.add("CC_QUESTION");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "咨询名称", "ZH_CN": "咨询名称", "ZH_TW": "咨询名称"}。
+     */
+    private String ccName;
+
+    /**
+     * 获取：{"EN": "咨询名称", "ZH_CN": "咨询名称", "ZH_TW": "咨询名称"}。
+     */
+    public String getCcName() {
+        return this.ccName;
+    }
+
+    /**
+     * 设置：{"EN": "咨询名称", "ZH_CN": "咨询名称", "ZH_TW": "咨询名称"}。
+     */
+    public CcQsInspection setCcName(String ccName) {
+        if (this.ccName == null && ccName == null) {
+            // 均为null，不做处理。
+        } else if (this.ccName != null && ccName != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccName.compareTo(ccName) != 0) {
+                this.ccName = ccName;
+                if (!this.toUpdateCols.contains("CC_NAME")) {
+                    this.toUpdateCols.add("CC_NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccName = ccName;
+            if (!this.toUpdateCols.contains("CC_NAME")) {
+                this.toUpdateCols.add("CC_NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
      * {"EN": "CC_QS_INSPECTION_USER", "ZH_CN": "质安巡检用户", "ZH_TW": "繁：质安巡检用户"}。
      */
     private String ccQsInspectionUser;
@@ -959,36 +1039,36 @@ public class CcQsInspection {
     }
 
     /**
-     * {"EN": "CC_QS_ISSUE_NODE_ID", "ZH_CN": "质安问题节点", "ZH_TW": "繁：质安问题节点"}。
+     * {"EN": "CC_QS_ISSUE_NODE_ID", "ZH_CN": "关联的分部分项节点", "ZH_TW": "繁：质安问题节点"}。
      */
-    private String ccQsIssueNodeId;
+    private String ccPrjPbsNodeId;
 
     /**
-     * 获取：{"EN": "CC_QS_ISSUE_NODE_ID", "ZH_CN": "质安问题节点", "ZH_TW": "繁：质安问题节点"}。
+     * 获取：{"EN": "CC_QS_ISSUE_NODE_ID", "ZH_CN": "关联的分部分项节点", "ZH_TW": "繁：质安问题节点"}。
      */
-    public String getCcQsIssueNodeId() {
-        return this.ccQsIssueNodeId;
+    public String getCcPrjPbsNodeId() {
+        return this.ccPrjPbsNodeId;
     }
 
     /**
-     * 设置：{"EN": "CC_QS_ISSUE_NODE_ID", "ZH_CN": "质安问题节点", "ZH_TW": "繁：质安问题节点"}。
+     * 设置：{"EN": "CC_QS_ISSUE_NODE_ID", "ZH_CN": "关联的分部分项节点", "ZH_TW": "繁：质安问题节点"}。
      */
-    public CcQsInspection setCcQsIssueNodeId(String ccQsIssueNodeId) {
-        if (this.ccQsIssueNodeId == null && ccQsIssueNodeId == null) {
+    public CcQsInspection setCcPrjPbsNodeId(String ccPrjPbsNodeId) {
+        if (this.ccPrjPbsNodeId == null && ccPrjPbsNodeId == null) {
             // 均为null，不做处理。
-        } else if (this.ccQsIssueNodeId != null && ccQsIssueNodeId != null) {
+        } else if (this.ccPrjPbsNodeId != null && ccPrjPbsNodeId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccQsIssueNodeId.compareTo(ccQsIssueNodeId) != 0) {
-                this.ccQsIssueNodeId = ccQsIssueNodeId;
-                if (!this.toUpdateCols.contains("CC_QS_ISSUE_NODE_ID")) {
-                    this.toUpdateCols.add("CC_QS_ISSUE_NODE_ID");
+            if (this.ccPrjPbsNodeId.compareTo(ccPrjPbsNodeId) != 0) {
+                this.ccPrjPbsNodeId = ccPrjPbsNodeId;
+                if (!this.toUpdateCols.contains("CC_PRJ_PBS_NODE_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_PBS_NODE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccQsIssueNodeId = ccQsIssueNodeId;
-            if (!this.toUpdateCols.contains("CC_QS_ISSUE_NODE_ID")) {
-                this.toUpdateCols.add("CC_QS_ISSUE_NODE_ID");
+            this.ccPrjPbsNodeId = ccPrjPbsNodeId;
+            if (!this.toUpdateCols.contains("CC_PRJ_PBS_NODE_ID")) {
+                this.toUpdateCols.add("CC_PRJ_PBS_NODE_ID");
             }
         }
         return this;

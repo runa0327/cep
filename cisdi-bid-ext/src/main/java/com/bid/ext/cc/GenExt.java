@@ -180,7 +180,7 @@ public class GenExt {
             Path tempPdf = Files.createTempFile(null, ".pdf");
 
             // 指定 LibreOffice 的安装路径及命令行工具
-            String libreOfficePath = "C:\\Program Files\\LibreOffice\\program\\soffice";
+            String libreOfficePath = "/usr/bin/libreoffice";
 
             // 调用 LibreOffice 进行转换
             ProcessBuilder builder = new ProcessBuilder();
