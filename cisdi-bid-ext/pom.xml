@@ -113,6 +113,13 @@
             <scope>runtime</scope>
         </dependency>
 
+<!--        腾讯云人脸检测sdk-->
+        <dependency>
+            <groupId>com.tencentcloudapi</groupId>
+            <artifactId>tencentcloud-sdk-java</artifactId>
+            <version>3.1.1006</version>
+        </dependency>
+
     </dependencies>
 
 </project>
