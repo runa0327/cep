@@ -74,6 +74,12 @@ public class ThirdPartyLoginController {
             }
         }
 
+        // 还有种可能的方法（未测试）：
+        // 接收响应为字节数组
+        // byte[] responseBytes = restTemplate.getForObject(url, byte[].class);
+        // 指定字符集UTF-8转换字符串
+        // return new String(responseBytes, StandardCharsets.UTF_8);
+
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(new URI(url), String.class);
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
             String string = responseEntity.getBody();
