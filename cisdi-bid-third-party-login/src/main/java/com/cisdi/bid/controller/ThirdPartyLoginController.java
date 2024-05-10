@@ -1,11 +1,11 @@
 package com.cisdi.bid.controller;
 
 
-import com.alibaba.fastjson.JSON;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.ThirdPartyUserInfo;
 import com.qygly.shared.interaction.external.ThirdPartyLoginCodeValidationReqBody;
 import com.qygly.shared.interaction.external.ThirdPartyLoginCodeValidationRespBody;
+import com.qygly.shared.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
