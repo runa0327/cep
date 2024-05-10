@@ -302,6 +302,9 @@ public class TencentCloudExt {
         } catch (EmptyResultDataAccessException e) {
             atdHits = new ArrayList<>();
         }
+        if(atdHits==null){
+            atdHits = new ArrayList<>();
+        }
 
         List<Map<String, Object>> hits = new ArrayList<>();
 
@@ -367,7 +370,7 @@ public class TencentCloudExt {
         //所有考勤记录
         List<Map<String, Object>> hits = null;
         try {
-            hits = myJdbcTemplate.queryForList(queryHit, startDate, endDate);
+            hits = myJdbcTemplate.queryForList(queryHit, startDate, LocalDate.parse(endDate).plusDays(1));
         } catch (EmptyResultDataAccessException e) {
             throw new BaseException("所选日期内没有打卡记录！");
         }
@@ -442,7 +445,7 @@ public class TencentCloudExt {
 
         List<Map<String, Object>> spDateMaps = null;
         try {
-            spDateMaps = myJdbcTemplate.queryForList(querySpData, startDate, endDate);
+            spDateMaps = myJdbcTemplate.queryForList(querySpData, startDate, LocalDate.parse(endDate).plusDays(1));
         } catch (EmptyResultDataAccessException e) {
             spDateMaps = new ArrayList<>();
         }
