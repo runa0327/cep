@@ -7,9 +7,13 @@ import com.qygly.shared.ad.login.ThirdPartyUserInfo;
 import com.qygly.shared.interaction.external.ThirdPartyLoginCodeValidationReqBody;
 import com.qygly.shared.interaction.external.ThirdPartyLoginCodeValidationRespBody;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.Resource;
 
 /**
  * @author 尹涛 * @version V1.0.0
@@ -22,6 +26,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 public class ThirdPartyLoginController {
+
+    @Resource
+    private RestTemplate restTemplate;
+
+    @Value("${ah.clientId}")
+    private String clientId;
+
+    @Value("${ah.secret}")
+    private String secret;
+
+    @Value("${ah.getLoginUserUrl}")
+    private String getLoginUserUrl;
+
     /**
      * 统一认证登录
      *
@@ -35,15 +52,20 @@ public class ThirdPartyLoginController {
             throw new BaseException("参数为空！");
         }
 
-        String clientId = "20e25b82-bbe4-459f-af55-3275cfbed695";
-        
-
         ThirdPartyLoginCodeValidationRespBody responseBody = new ThirdPartyLoginCodeValidationRespBody();
 
         responseBody.succ = true;
         responseBody.data = new ThirdPartyUserInfo();
 
+
         String loginCode = requestBody.loginCode;
+
+        if (getLoginUserUrl.indexOf('?') >= 0) {
+            getLoginUserUrl += "&token=" + loginCode + "& clientId=" + clientId + "& secret =" + secret;
+        } else {
+            getLoginUserUrl += "?token=" + loginCode + "& clientId=" + clientId + "& secret =" + secret;
+        }
+
 
         log.info("响应：" + JSON.toJSONString(responseBody));
 
