@@ -150,7 +150,7 @@ public class StructNodeExt {
 
 
     /**
-     * 插入节点
+     * 插入WBS节点
      *
      * @param nodeData
      * @param parentRecord
@@ -204,7 +204,7 @@ public class StructNodeExt {
     }
 
     /**
-     * 插入节点
+     * 插入PBS节点
      *
      * @param nodeData
      * @param parentRecord
@@ -230,6 +230,75 @@ public class StructNodeExt {
         ccPrjStructNode.setId(nodeData.get("ID").toString());
         ccPrjStructNode.setName(nodeData.get("NAME").toString());
         ccPrjStructNode.setSeqNo(seqNo);  // 设置序号
+
+
+        String parentNodeId = nodeData.get("CC_PRJ_STRUCT_NODE_PID") != null ? nodeData.get("CC_PRJ_STRUCT_NODE_PID").toString() : parentRecord.valueMap.get("ID").toString();
+        ccPrjStructNode.setCcPrjStructNodePid(parentNodeId);
+
+        ccPrjStructNode.setIsTemplate(false);
+        ccPrjStructNode.insertById();
+    }
+
+    /**
+     * 插入WBS节点(未审批)
+     *
+     * @param nodeData
+     * @param parentRecord
+     */
+    private void insertWbsNodeUnapproved(Map<String, Object> nodeData, EntityRecord parentRecord, BigDecimal seqNo) {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String ccPrjId = parentRecord.valueMap.get("CC_PRJ_ID").toString();
+        String ccPrjWbsTypeId = nodeData.get("CC_PRJ_WBS_TYPE_ID").toString();
+        String wbsChiefUserId = nodeData.get("WBS_CHIEF_USER_ID").toString();
+
+        LocalDate planFr = LocalDate.parse(nodeData.get("PLAN_FR").toString());
+        LocalDate planTo = LocalDate.parse(nodeData.get("PLAN_TO").toString());
+        BigDecimal planDays = BigDecimal.valueOf(ChronoUnit.DAYS.between(planFr, planTo)).add(BigDecimal.ONE);
+
+        LocalDate actFr = nodeData.get("ACT_FR") != null ? LocalDate.parse(nodeData.get("ACT_FR").toString()) : null;
+        LocalDate actTo = nodeData.get("ACT_TO") != null ? LocalDate.parse(nodeData.get("ACT_TO").toString()) : null;
+        BigDecimal actDays = BigDecimal.valueOf(ChronoUnit.DAYS.between(actFr, actTo)).add(BigDecimal.ONE);
+
+        LocalDateTime progTime = nodeData.get("PROG_TIME") != null ? LocalDateTime.parse(nodeData.get("PROG_TIME").toString()) : null;
+        String ccWbsStatusId = nodeData.get("CC_WBS_STATUS_ID") != null ? nodeData.get("CC_WBS_STATUS_ID").toString() : null;
+        String ccWbsRiskId = nodeData.get("CC_WBS_RISK_ID") != null ? nodeData.get("CC_WBS_RISK_ID").toString() : null;
+        String ccRiskLvlId = nodeData.get("CC_RISK_LVL_ID") != null ? nodeData.get("CC_RISK_LVL_ID").toString() : null;
+
+
+        CcPrjStructNode ccPrjStructNode = new CcPrjStructNode();
+        ccPrjStructNode.setCrtDt(LocalDateTime.now());
+        ccPrjStructNode.setCrtUserId(loginInfo.userInfo.id);
+        ccPrjStructNode.setLastModiUserId(loginInfo.userInfo.id);
+        ccPrjStructNode.setCcPrjId(ccPrjId);
+        ccPrjStructNode.setProgTime(progTime);
+        ccPrjStructNode.setCcWbsStatusId(ccWbsStatusId);
+        ccPrjStructNode.setCcWbsRiskId(ccWbsRiskId);
+        ccPrjStructNode.setCcRiskLvlId(ccRiskLvlId);
+
+
+        String remark = nodeData.get("REMARK") != null ? nodeData.get("REMARK").toString() : null;
+        ccPrjStructNode.setRemark(remark);
+
+        Integer isMileStoneInt = (Integer) nodeData.get("IS_MILE_STONE");
+        boolean isMileStone = isMileStoneInt != null && isMileStoneInt != 0;
+        ccPrjStructNode.setIsMileStone(isMileStone);
+
+        Integer isWbsInt = (Integer) nodeData.get("IS_WBS");
+        boolean isWbs = isWbsInt != null && isWbsInt != 0;
+        ccPrjStructNode.setIsWbs(isWbs);
+
+        ccPrjStructNode.setId(nodeData.get("ID").toString());
+        ccPrjStructNode.setName(nodeData.get("NAME").toString());
+        ccPrjStructNode.setPlanFr(planFr);
+        ccPrjStructNode.setPlanTo(planTo);
+        ccPrjStructNode.setActFr(actFr);
+        ccPrjStructNode.setActTo(actTo);
+        ccPrjStructNode.setPlanDays(planDays);
+        ccPrjStructNode.setActDays(actDays);
+        ccPrjStructNode.setSeqNo(seqNo);  // 设置序号
+        ccPrjStructNode.setCcPrjWbsTypeId(ccPrjWbsTypeId);//计划类型
+        ccPrjStructNode.setWbsChiefUserId(wbsChiefUserId); //进度负责人
+        ccPrjStructNode.setStatus("DR"); //数据状态改为草稿
 
 
         String parentNodeId = nodeData.get("CC_PRJ_STRUCT_NODE_PID") != null ? nodeData.get("CC_PRJ_STRUCT_NODE_PID").toString() : parentRecord.valueMap.get("ID").toString();
@@ -1565,5 +1634,31 @@ public class StructNodeExt {
         }
     }
 
+    /**
+     * 编制计划
+     */
+    public void makePlan() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            String ccPrjId = valueMap.get("CC_PRJ_ID").toString();
+            List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
+            for (CcPrjStructNode ccPrjStructNode : ccPrjStructNodes) {
+                //获取项目已发布计划根节点
+                String rootNodeId = ccPrjStructNode.getId();
+                //获取项目已发布计划树
+                List<Map<String, Object>> prjPlanTree = getTemplateStruct(rootNodeId, false);
+                List<Map<String, Object>> list = replaceIdsAndInsert(prjPlanTree);
+                // 序号
+                BigDecimal seqNo = BigDecimal.ZERO;
+                // 对于每一个模板结构节点，将其作为子节点插入
+                for (Map<String, Object> node : prjPlanTree) {
+                    insertWbsNode(node, entityRecord, seqNo);
+                    seqNo = seqNo.add(BigDecimal.ONE);
+                }
+            }
+
+        }
+    }
 
 }
