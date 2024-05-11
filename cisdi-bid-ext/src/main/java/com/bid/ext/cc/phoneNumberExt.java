@@ -9,14 +9,31 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class InOutSubPersonExt {
+public class phoneNumberExt {
     private static final Pattern mobile_pattern = Pattern.compile("^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\\d{8}$");
 
-    public void phoneNumberCheck() {
+    /**
+     * 进出人员手机验证
+     */
+    public void inOutPhoneNumberCheck() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             Map<String, Object> valueMap = entityRecord.valueMap;
             String contactMobile = valueMap.get("CONTACT_MOBILE").toString();
             boolean mobile = isMobile(contactMobile);
+            if (!mobile) {
+                throw new BaseException("手机号码长度不符合规范！");
+            }
+        }
+    }
+
+    /**
+     * 危大工程手机验证
+     */
+    public void criticalPhoneNumberCheck() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            String criticalPrjSpPlanCompanyContactMobile = valueMap.get("CRITICAL_PRJ_SP_PLAN_COMPANY_CONTACT_MOBILE").toString();
+            boolean mobile = isMobile(criticalPrjSpPlanCompanyContactMobile);
             if (!mobile) {
                 throw new BaseException("手机号码长度不符合规范！");
             }
