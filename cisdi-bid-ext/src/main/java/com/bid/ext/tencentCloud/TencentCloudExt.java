@@ -60,7 +60,7 @@ public class TencentCloudExt {
         //获取上传的图片
         FlFile flFile = FlFile.selectById(valueMap.get("FACE_PIC").toString());
         String filePath = flFile.getPhysicalLocation();
-        filePath = "/Users/hejialun/Pictures/hjl-face.jpg";
+//        filePath = "/Users/hejialun/Pictures/hjl-face.jpg";
         FileSystemResource fileSystemResource = new FileSystemResource(filePath);
 
         InputStream inputStream = null;
