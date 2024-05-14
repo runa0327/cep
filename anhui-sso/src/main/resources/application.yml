@@ -1,7 +1,5 @@
 server:
   port: 11137
-#  servlet:
-#    context-path: /cisdi-bid-third-party-login
 
 spring:
   # 设置时区，以北京时间显示报错信息的时间（等）：
@@ -10,14 +8,14 @@ spring:
     time-zone: Asia/Shanghai
     default-property-inclusion: non_null
   application:
-    name: cisdi-pms-third-party-login
+    name: anhui-sso
   cloud:
     nacos:
       discovery:
         #正式
         #        server-addr: 10.130.19.98:8848
         #测试
-        server-addr: 121.5.62.215:8848
+        server-addr: localhost:8848
     #  redis:
     #    单机启用host、port：
     #    host: 124.222.58.152
