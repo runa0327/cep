@@ -1,0 +1,11 @@
+server:
+  port: 11137
+
+#安徽单点登录
+ah:
+  clientId: 20e25b82-bbe4-459f-af55-3275cfbed695
+  secret: O5XR2WONusEdTbam4rNA9k3i3OVhTZ/zHdDRvRD83fI=
+  loginUserUrl: http://61.190.89.72:8088/isso/rest/loginuser
+  redirect:
+    loginAppId: 1788848432084652032
+    url: https://qz.yzczb.com/qygly/vue/

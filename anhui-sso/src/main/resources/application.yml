@@ -2,6 +2,9 @@ server:
   port: 11137
 
 spring:
+  # 当前活跃的配置文件：
+  profiles:
+    active: anhui-test
   # 设置时区，以北京时间显示报错信息的时间（等）：
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
