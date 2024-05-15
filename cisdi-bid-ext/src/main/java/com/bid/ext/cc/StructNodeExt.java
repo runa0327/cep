@@ -170,16 +170,22 @@ public class StructNodeExt {
         Integer planFrDayNo = nodeData.get("PLAN_FR_DAY_NO") != null ? Integer.parseInt(nodeData.get("PLAN_FR_DAY_NO").toString()) : 0;
         Integer planToDayNo = nodeData.get("PLAN_TO_DAY_NO") != null ? Integer.parseInt(nodeData.get("PLAN_TO_DAY_NO").toString()) : 0;
 
-        LocalDate fromDate = ccPrj.getFromDate().plusDays(planFrDayNo - 1);
-        LocalDate toDate = ccPrj.getFromDate().plusDays(planToDayNo - 1);
-        BigDecimal planDays = BigDecimal.valueOf(planToDayNo - planFrDayNo + 1);
+        LocalDate fromDate = null;
+        LocalDate toDate = null;
+        BigDecimal planDays = null;
+
+        if (ccPrj != null && ccPrj.getFromDate() != null) {
+            fromDate = ccPrj.getFromDate().plusDays(planFrDayNo - 1);
+            toDate = ccPrj.getFromDate().plusDays(planToDayNo - 1);
+            planDays = BigDecimal.valueOf(planToDayNo - planFrDayNo + 1);
+        }
 
         CcPrjStructNode ccPrjStructNode = new CcPrjStructNode();
         ccPrjStructNode.setCrtDt(LocalDateTime.now());
         ccPrjStructNode.setCrtUserId(loginInfo.userInfo.id);
         ccPrjStructNode.setLastModiUserId(loginInfo.userInfo.id);
         ccPrjStructNode.setCcPrjId(ccPrjId);
-        ccPrjStructNode.setStatus("AP");
+        ccPrjStructNode.setStatus("DR");
 
         String remark = nodeData.get("REMARK") != null ? nodeData.get("REMARK").toString() : null;
         ccPrjStructNode.setRemark(remark);
