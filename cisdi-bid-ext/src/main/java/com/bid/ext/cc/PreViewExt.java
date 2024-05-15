@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Supplier;
 
 
 @Slf4j
@@ -32,8 +33,8 @@ public class PreViewExt {
 
     public static final String getAccessTokenUrl = "https://api.bimface.com/oauth2/token";
 
-    public static final String appKey = "c0GIIZE2OWiLy1sKSp7X7fZMVkgqzziM";
-    public static final String appSecret = "goU6CeHmAhXw3XnRZwaJUt1m3HDI71Zx";
+    public static final String appKey = ((Supplier<String>) () -> "c0GIIZE2OWiLy1sKSp7X7fZMVkgqzziM").get();
+    public static final String appSecret = ((Supplier<String>) () -> "goU6CeHmAhXw3XnRZwaJUt1m3HDI71Zx").get();
 
     public void getBimFaceAccessToken() {
         String token = doGetStringStringMap();

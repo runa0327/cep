@@ -122,4 +122,37 @@
 
     </dependencies>
 
+    <build>
+        <plugins>
+            <!-- Allatori plugin start -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <id>run-allatori</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-Xms128m</argument>
+                        <argument>-Xmx512m</argument>
+                        <argument>-jar</argument>
+                        <!-- allatori混淆的jar文件目录 -->
+                        <argument>${project.basedir}/../obfuscate/allatori.jar</argument>
+                        <!-- allatori混淆的配置文件-->
+                        <argument>${project.basedir}/../obfuscate/allatori-config.xml</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+            <!-- Allatori plugin end -->
+        </plugins>
+    </build>
+
 </project>

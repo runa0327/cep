@@ -90,15 +90,17 @@ public class PrjExt {
 
         // 获取成本模板树
         List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.IS_TEMPLATE, 1).eq(CcPrjStructNode.Cols.IS_CBS, 1));
-        // 建立匡算，估算，概算，预算树
-        List<CcPrjStructNode> cbsTree0 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_0");
-        List<CcPrjStructNode> cbsTree1 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_1");
-        List<CcPrjStructNode> cbsTree2 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_2");
-        List<CcPrjStructNode> cbsTree3 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_3");
-        List<CcPrjStructNode> cbsTree11 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_11");
-        List<CcPrjStructNode> cbsTree12 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_12");
-        // 建立成本树
-        List<CcPrjCostOverview> costTree = replaceIdsAndInsertCost(ccPrjStructNodes, ccPrjId);
+        if (!SharedUtil.isEmpty(ccPrjStructNodes)) {
+            // 建立匡算，估算，概算，预算树
+            List<CcPrjStructNode> cbsTree0 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_0");
+            List<CcPrjStructNode> cbsTree1 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_1");
+            List<CcPrjStructNode> cbsTree2 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_2");
+            List<CcPrjStructNode> cbsTree3 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_3");
+            List<CcPrjStructNode> cbsTree11 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_11");
+            List<CcPrjStructNode> cbsTree12 = replaceIdsAndInsert(ccPrjStructNodes, ccPrjId, "CBS_12");
+            // 建立成本树
+            List<CcPrjCostOverview> costTree = replaceIdsAndInsertCost(ccPrjStructNodes, ccPrjId);
+        }
 
 
     }

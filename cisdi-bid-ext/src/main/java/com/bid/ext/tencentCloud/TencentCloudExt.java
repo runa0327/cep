@@ -29,13 +29,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Supplier;
 
 public class TencentCloudExt {
 
-    private static final String SECRET_ID = "AKIDVrN2fs8T4Z8f9dBteKxUxcOHCIRYjO2W";
-    private static final String SECRET_KEY = "iuCQh7QuQoFc3WxKkMyXBpRytqifi0HY";
-    private static final String REGION = "ap-chongqing";
-    private static final String GROUP_ID = "ezlinker-user1";
+    private static final String SECRET_ID = ((Supplier<String>) () -> "AKIDVrN2fs8T4Z8f9dBteKxUxcOHCIRYjO2W").get();
+    private static final String SECRET_KEY = ((Supplier<String>) () -> "iuCQh7QuQoFc3WxKkMyXBpRytqifi0HY").get();
+    private static final String REGION = ((Supplier<String>) () -> "ap-chongqing").get();
+    private static final String GROUP_ID = ((Supplier<String>) () -> "ezlinker-user1").get();
 
     // 地球半径
     private static final double EARTH_RADIUS = 6378137.0;
@@ -60,7 +61,7 @@ public class TencentCloudExt {
         //获取上传的图片
         FlFile flFile = FlFile.selectById(valueMap.get("FACE_PIC").toString());
         String filePath = flFile.getPhysicalLocation();
-        filePath = "/Users/hejialun/Pictures/hjl-face.jpg";
+//        filePath = "/Users/hejialun/Pictures/hjl-face.jpg";
         FileSystemResource fileSystemResource = new FileSystemResource(filePath);
 
         InputStream inputStream = null;
