@@ -237,6 +237,7 @@ public class StructNodeExt {
         ccPrjStructNode.setLastModiUserId(loginInfo.userInfo.id);
         ccPrjStructNode.setPbsChiefUserId(loginInfo.userInfo.id);
         ccPrjStructNode.setCcPrjId(ccPrjId);
+        ccPrjStructNode.setStatus("AP");
 
         String remark = nodeData.get("REMARK") != null ? nodeData.get("REMARK").toString() : null;
         ccPrjStructNode.setRemark(remark);
@@ -249,7 +250,7 @@ public class StructNodeExt {
         ccPrjStructNode.setName(nodeData.get("NAME").toString());
         ccPrjStructNode.setSeqNo(seqNo);  // 设置序号
 
-
+        
         String parentNodeId = nodeData.get("CC_PRJ_STRUCT_NODE_PID") != null ? nodeData.get("CC_PRJ_STRUCT_NODE_PID").toString() : parentRecord.valueMap.get("ID").toString();
         ccPrjStructNode.setCcPrjStructNodePid(parentNodeId);
 
