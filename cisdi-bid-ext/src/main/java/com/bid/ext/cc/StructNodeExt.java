@@ -4,12 +4,14 @@ import cn.hutool.core.util.IdUtil;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
+import com.qygly.ext.jar.helper.sql.Crud;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.StatusE;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
+import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import org.springframework.dao.EmptyResultDataAccessException;
 
@@ -34,13 +36,15 @@ public class StructNodeExt {
         Boolean includeRootNode = (Boolean) varMap.get("P_INCLUDE_ROOT_NODE");
 
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            Map<String, Object> topNode = getTopNode(entityRecord);
+
             List<Map<String, Object>> templateStruct = getTemplateStruct(pWbsTempateId, includeRootNode);
             List<Map<String, Object>> list = replaceIdsAndInsert(templateStruct);
             // 序号
             BigDecimal seqNo = BigDecimal.ZERO;
             // 对于每一个模板结构节点，将其作为子节点插入
             for (Map<String, Object> node : templateStruct) {
-                insertWbsNode(node, entityRecord, seqNo);
+                insertWbsNode(node, entityRecord, seqNo, topNode);
                 seqNo = seqNo.add(BigDecimal.ONE);
             }
         }
@@ -48,6 +52,15 @@ public class StructNodeExt {
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
     }
+
+    private Map<String, Object> getTopNode(EntityRecord entityRecord) {
+        Map<String, Object> currentValueMap = entityRecord.valueMap;
+        while (currentValueMap.get("CC_PRJ_STRUCT_NODE_PID") != null) {
+            currentValueMap = Crud.from("CC_PRJ_STRUCT_NODE").where().eq("ID", currentValueMap.get("CC_PRJ_STRUCT_NODE_PID")).select().execForMap();
+        }
+        return currentValueMap;
+    }
+
 
     /**
      * PBS套用模板
@@ -160,25 +173,18 @@ public class StructNodeExt {
      * @param nodeData
      * @param parentRecord
      */
-    private void insertWbsNode(Map<String, Object> nodeData, EntityRecord parentRecord, BigDecimal seqNo) {
+    private void insertWbsNode(Map<String, Object> nodeData, EntityRecord parentRecord, BigDecimal seqNo, Map<String, Object> topNode) {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String ccPrjId = parentRecord.valueMap.get("CC_PRJ_ID").toString();
         String ccPrjWbsTypeId = nodeData.get("CC_PRJ_WBS_TYPE_ID").toString();
 
-        CcPrj ccPrj = CcPrj.selectById(ccPrjId);
-
         Integer planFrDayNo = nodeData.get("PLAN_FR_DAY_NO") != null ? Integer.parseInt(nodeData.get("PLAN_FR_DAY_NO").toString()) : 0;
         Integer planToDayNo = nodeData.get("PLAN_TO_DAY_NO") != null ? Integer.parseInt(nodeData.get("PLAN_TO_DAY_NO").toString()) : 0;
 
-        LocalDate fromDate = null;
-        LocalDate toDate = null;
-        BigDecimal planDays = null;
-
-        if (ccPrj != null && ccPrj.getFromDate() != null) {
-            fromDate = ccPrj.getFromDate().plusDays(planFrDayNo - 1);
-            toDate = ccPrj.getFromDate().plusDays(planToDayNo - 1);
-            planDays = BigDecimal.valueOf(planToDayNo - planFrDayNo + 1);
-        }
+        LocalDate topNodePlanFr = JdbcMapUtil.getLocalDate(topNode, "PLAN_FR");
+        LocalDate fromDate = topNodePlanFr.plusDays(planFrDayNo - 1);
+        LocalDate toDate = topNodePlanFr.plusDays(planToDayNo - 1);
+        BigDecimal planDays = BigDecimal.valueOf(planToDayNo - planFrDayNo + 1);
 
         CcPrjStructNode ccPrjStructNode = new CcPrjStructNode();
         ccPrjStructNode.setCrtDt(LocalDateTime.now());
@@ -317,10 +323,10 @@ public class StructNodeExt {
         ccPrjStructNode.setPlanDays(planDays);
         ccPrjStructNode.setActDays(actDays);
         ccPrjStructNode.setSeqNo(seqNoCopy);  // 设置序号
-        ccPrjStructNode.setCcPrjWbsTypeId(ccPrjWbsTypeId);//计划类型
-        ccPrjStructNode.setWbsChiefUserId(wbsChiefUserId); //进度负责人
-        ccPrjStructNode.setStatus("DR"); //数据状态改为草稿
-        ccPrjStructNode.setCopyFromPrjStructNodeId(copyFromPrjStructNodeId);//拷贝自项目结构节点
+        ccPrjStructNode.setCcPrjWbsTypeId(ccPrjWbsTypeId);// 计划类型
+        ccPrjStructNode.setWbsChiefUserId(wbsChiefUserId); // 进度负责人
+        ccPrjStructNode.setStatus("DR"); // 数据状态改为草稿
+        ccPrjStructNode.setCopyFromPrjStructNodeId(copyFromPrjStructNodeId);// 拷贝自项目结构节点
 
 
         String parentNodeId = nodeData.get("CC_PRJ_STRUCT_NODE_PID") != null ? nodeData.get("CC_PRJ_STRUCT_NODE_PID").toString() : parentRecord.valueMap.get("ID").toString();
@@ -1665,11 +1671,11 @@ public class StructNodeExt {
             String ccPrjId = valueMap.get("CC_PRJ_ID").toString();
             List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null).eq(CcPrjStructNode.Cols.STATUS, "AP"));
             for (CcPrjStructNode ccPrjStructNode : ccPrjStructNodes) {
-                //获取项目已发布计划根节点
+                // 获取项目已发布计划根节点
                 String rootNodeId = ccPrjStructNode.getId();
-                //获取项目已发布计划树
+                // 获取项目已发布计划树
                 List<Map<String, Object>> prjPlanTree = getTemplateStruct(rootNodeId, false);
-                //替换ID
+                // 替换ID
                 List<Map<String, Object>> list = replaceIdsAndInsert(prjPlanTree);
                 // 序号
                 BigDecimal seqNo = BigDecimal.ZERO;
@@ -1698,18 +1704,18 @@ public class StructNodeExt {
             String csCommId = entityRecord.csCommId;
             CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
             String ccPrjId = ccPrjStructNode.getCcPrjId();
-            //当前AP改为VD
-            //获取此项目已批准的计划根节点
+            // 当前AP改为VD
+            // 获取此项目已批准的计划根节点
             List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.STATUS, "AP").eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
             for (CcPrjStructNode ccPrjStructNode0 : ccPrjStructNodes) {
                 String rootId = ccPrjStructNode0.getId();
                 myJdbcTemplate.update(updateStatusSql, rootId, StatusE.VD.toString());
             }
 
-            //当前DR改成AP
+            // 当前DR改成AP
             int update = myJdbcTemplate.update(updateStatusSql, csCommId, StatusE.AP.toString());
 
-            //进展明细从原来计划改到新计划
+            // 进展明细从原来计划改到新计划
             for (CcPrjStructNode ccPrjStructNode0 : ccPrjStructNodes) {
                 String rootId = ccPrjStructNode0.getId();
                 String sql = "WITH RECURSIVE Subtree AS (" +
@@ -1717,14 +1723,14 @@ public class StructNodeExt {
                         "UNION ALL " +
                         "SELECT n.ID FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
                         "SELECT * FROM cc_prj_struct_node WHERE ID IN (SELECT ID FROM Subtree)";
-                //获取旧计划树
+                // 获取旧计划树
                 List<Map<String, Object>> nodes = myJdbcTemplate.queryForList(sql, rootId);
                 for (Map<String, Object> node : nodes) {
                     String id = node.get("ID").toString();
-                    //通过拷贝自项目结构节点ID获取新计划树
+                    // 通过拷贝自项目结构节点ID获取新计划树
                     List<CcPrjStructNode> ccPrjStructNodes1 = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, id));
 
-                    //获取此条计划的进展
+                    // 获取此条计划的进展
                     List<CcPrjStructNodeProg> ccPrjStructNodeProgs = CcPrjStructNodeProg.selectByWhere(new Where().eq(CcPrjStructNodeProg.Cols.CC_PRJ_STRUCT_NODE_ID, id));
                     if (!SharedUtil.isEmpty(ccPrjStructNodes1)) {
                         for (CcPrjStructNode ccPrjStructNode1 : ccPrjStructNodes1) {
@@ -1737,7 +1743,7 @@ public class StructNodeExt {
                     }
                 }
             }
-            //重算计划
+            // 重算计划
             recalculationPlan();
         }
     }
