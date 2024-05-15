@@ -178,8 +178,8 @@ public class StructNodeExt {
         String ccPrjId = parentRecord.valueMap.get("CC_PRJ_ID").toString();
         String ccPrjWbsTypeId = nodeData.get("CC_PRJ_WBS_TYPE_ID").toString();
 
-        Integer planFrDayNo = nodeData.get("PLAN_FR_DAY_NO") != null ? Integer.parseInt(nodeData.get("PLAN_FR_DAY_NO").toString()) : 0;
-        Integer planToDayNo = nodeData.get("PLAN_TO_DAY_NO") != null ? Integer.parseInt(nodeData.get("PLAN_TO_DAY_NO").toString()) : 0;
+        Integer planFrDayNo = nodeData.get("PLAN_FR_DAY_NO") != null ? Integer.parseInt(nodeData.get("PLAN_FR_DAY_NO").toString()) : 1;
+        Integer planToDayNo = nodeData.get("PLAN_TO_DAY_NO") != null ? Integer.parseInt(nodeData.get("PLAN_TO_DAY_NO").toString()) : 1;
 
         LocalDate topNodePlanFr = JdbcMapUtil.getLocalDate(topNode, "PLAN_FR");
         LocalDate fromDate = topNodePlanFr.plusDays(planFrDayNo - 1);
@@ -206,6 +206,7 @@ public class StructNodeExt {
 
         ccPrjStructNode.setId(nodeData.get("ID").toString());
         ccPrjStructNode.setName(nodeData.get("NAME").toString());
+        ccPrjStructNode.setWbsChiefUserId(loginInfo.userInfo.id);
         ccPrjStructNode.setPlanFr(fromDate);
         ccPrjStructNode.setPlanTo(toDate);
         ccPrjStructNode.setPlanDays(planDays);
