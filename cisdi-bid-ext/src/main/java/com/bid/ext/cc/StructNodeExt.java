@@ -237,6 +237,7 @@ public class StructNodeExt {
         ccPrjStructNode.setLastModiUserId(loginInfo.userInfo.id);
         ccPrjStructNode.setPbsChiefUserId(loginInfo.userInfo.id);
         ccPrjStructNode.setCcPrjId(ccPrjId);
+        ccPrjStructNode.setStatus("AP");
 
         String remark = nodeData.get("REMARK") != null ? nodeData.get("REMARK").toString() : null;
         ccPrjStructNode.setRemark(remark);
@@ -249,7 +250,7 @@ public class StructNodeExt {
         ccPrjStructNode.setName(nodeData.get("NAME").toString());
         ccPrjStructNode.setSeqNo(seqNo);  // 设置序号
 
-
+        
         String parentNodeId = nodeData.get("CC_PRJ_STRUCT_NODE_PID") != null ? nodeData.get("CC_PRJ_STRUCT_NODE_PID").toString() : parentRecord.valueMap.get("ID").toString();
         ccPrjStructNode.setCcPrjStructNodePid(parentNodeId);
 
@@ -1081,23 +1082,25 @@ public class StructNodeExt {
             List<CcPrjCostOverviewToDtl> ccPrjCostOverviewToDtls = CcPrjCostOverviewToDtl.selectByWhere(new Where().eq(CcPrjCostOverviewToDtl.Cols.ENTITY_RECORD_ID, csCommId));
             String ccPrjCostOverviewId = null;
             String ccPrjCostOverviewPid = null;
-            for (CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl : ccPrjCostOverviewToDtls) {
-                ccPrjCostOverviewId = ccPrjCostOverviewToDtl.getCcPrjCostOverviewId();
-                BigDecimal trxAmt = ccPrjCostOverviewToDtl.getTrxAmt();
+            if (!SharedUtil.isEmpty(ccPrjCostOverviewToDtls)) {
+                for (CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl : ccPrjCostOverviewToDtls) {
+                    ccPrjCostOverviewId = ccPrjCostOverviewToDtl.getCcPrjCostOverviewId();
+                    BigDecimal trxAmt = ccPrjCostOverviewToDtl.getTrxAmt();
 
-                // 2.撤回此实体记录的招标金额
-                // 2.1通过成本统览Id找到此次招标对应的成本统览记录
-                CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectById(ccPrjCostOverviewId);
-                ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
-                BigDecimal bidAmt = ccPrjCostOverview.getBidAmt(); // 已招标金额
-                // 2.2减去先前已招标金额，获取原始已招标金额,并更新
-                BigDecimal rawBidAmt = bidAmt.subtract(trxAmt); // 原始已招标金额
+                    // 2.撤回此实体记录的招标金额
+                    // 2.1通过成本统览Id找到此次招标对应的成本统览记录
+                    CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectById(ccPrjCostOverviewId);
+                    ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
+                    BigDecimal bidAmt = ccPrjCostOverview.getBidAmt(); // 已招标金额
+                    // 2.2减去先前已招标金额，获取原始已招标金额,并更新
+                    BigDecimal rawBidAmt = bidAmt.subtract(trxAmt); // 原始已招标金额
 
-                ccPrjCostOverview.setBidAmt(rawBidAmt);
-                ccPrjCostOverview.updateById();
+                    ccPrjCostOverview.setBidAmt(rawBidAmt);
+                    ccPrjCostOverview.updateById();
 
-                // 3.删除先前招标关联记录
-                ccPrjCostOverviewToDtl.deleteById();
+                    // 3.删除先前招标关联记录
+                    ccPrjCostOverviewToDtl.deleteById();
+                }
             }
             // 4.重算成本总览
             recalculatePlanTotalCost(ccPrjCostOverviewPid, "BID_AMT");
@@ -1223,23 +1226,25 @@ public class StructNodeExt {
             List<CcPrjCostOverviewToDtl> ccPrjCostOverviewToDtls = CcPrjCostOverviewToDtl.selectByWhere(new Where().eq(CcPrjCostOverviewToDtl.Cols.ENTITY_RECORD_ID, csCommId));
             String ccPrjCostOverviewId = null;
             String ccPrjCostOverviewPid = null;
-            for (CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl : ccPrjCostOverviewToDtls) {
-                ccPrjCostOverviewId = ccPrjCostOverviewToDtl.getCcPrjCostOverviewId();
-                BigDecimal rawTrxAmt = ccPrjCostOverviewToDtl.getTrxAmt();
+            if(!SharedUtil.isEmpty(ccPrjCostOverviewToDtls)) {
+                for (CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl : ccPrjCostOverviewToDtls) {
+                    ccPrjCostOverviewId = ccPrjCostOverviewToDtl.getCcPrjCostOverviewId();
+                    BigDecimal rawTrxAmt = ccPrjCostOverviewToDtl.getTrxAmt();
 
-                // 2.撤回此实体记录的采购金额
-                // 2.1通过成本统览Id找到此次采购对应的成本统览记录
-                CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectById(ccPrjCostOverviewId);
-                ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
-                BigDecimal purchaseAmtInBid = ccPrjCostOverview.getPurchaseAmt(); // 已采购金额
-                // 2.2减去先前已采购金额，获取原始已采购金额
-                BigDecimal rawPurchaseAmt = purchaseAmtInBid.subtract(rawTrxAmt); // 原始已采购金额
+                    // 2.撤回此实体记录的采购金额
+                    // 2.1通过成本统览Id找到此次采购对应的成本统览记录
+                    CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectById(ccPrjCostOverviewId);
+                    ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
+                    BigDecimal purchaseAmtInBid = ccPrjCostOverview.getPurchaseAmt(); // 已采购金额
+                    // 2.2减去先前已采购金额，获取原始已采购金额
+                    BigDecimal rawPurchaseAmt = purchaseAmtInBid.subtract(rawTrxAmt); // 原始已采购金额
 
-                ccPrjCostOverview.setPurchaseAmt(rawPurchaseAmt);
-                ccPrjCostOverview.updateById();
+                    ccPrjCostOverview.setPurchaseAmt(rawPurchaseAmt);
+                    ccPrjCostOverview.updateById();
 
-                // 3.删除先前采购关联记录
-                ccPrjCostOverviewToDtl.deleteById();
+                    // 3.删除先前采购关联记录
+                    ccPrjCostOverviewToDtl.deleteById();
+                }
             }
             // 4.重算成本总览
             recalculatePlanTotalCost(ccPrjCostOverviewPid, "PURCHASE_AMT");
@@ -1364,23 +1369,25 @@ public class StructNodeExt {
             List<CcPrjCostOverviewToDtl> ccPrjCostOverviewToDtls = CcPrjCostOverviewToDtl.selectByWhere(new Where().eq(CcPrjCostOverviewToDtl.Cols.ENTITY_RECORD_ID, csCommId));
             String ccPrjCostOverviewId = null;
             String ccPrjCostOverviewPid = null;
-            for (CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl : ccPrjCostOverviewToDtls) {
-                ccPrjCostOverviewId = ccPrjCostOverviewToDtl.getCcPrjCostOverviewId();
-                BigDecimal rawTrxAmt = ccPrjCostOverviewToDtl.getTrxAmt();
+            if (!SharedUtil.isEmpty(ccPrjCostOverviewToDtls)) {
+                for (CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl : ccPrjCostOverviewToDtls) {
+                    ccPrjCostOverviewId = ccPrjCostOverviewToDtl.getCcPrjCostOverviewId();
+                    BigDecimal rawTrxAmt = ccPrjCostOverviewToDtl.getTrxAmt();
 
-                // 2.撤回此实体记录的已完成产值
-                // 2.1通过成本统览Id找到此次已完成产值对应的成本统览记录
-                CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectById(ccPrjCostOverviewId);
-                ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
-                BigDecimal completeAmtInPo = ccPrjCostOverview.getCompleteAmt(); // 已完成产值金额
-                // 2.2减去先前已完成产值金额，获取原始已完成产值金额
-                BigDecimal rawCompleteAmt = completeAmtInPo.subtract(rawTrxAmt); // 原始已完成产值金额
+                    // 2.撤回此实体记录的已完成产值
+                    // 2.1通过成本统览Id找到此次已完成产值对应的成本统览记录
+                    CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectById(ccPrjCostOverviewId);
+                    ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
+                    BigDecimal completeAmtInPo = ccPrjCostOverview.getCompleteAmt(); // 已完成产值金额
+                    // 2.2减去先前已完成产值金额，获取原始已完成产值金额
+                    BigDecimal rawCompleteAmt = completeAmtInPo.subtract(rawTrxAmt); // 原始已完成产值金额
 
-                ccPrjCostOverview.setCompleteAmt(rawCompleteAmt);
-                ccPrjCostOverview.updateById();
+                    ccPrjCostOverview.setCompleteAmt(rawCompleteAmt);
+                    ccPrjCostOverview.updateById();
 
-                // 3.删除先前已完成产值关联记录
-                ccPrjCostOverviewToDtl.deleteById();
+                    // 3.删除先前已完成产值关联记录
+                    ccPrjCostOverviewToDtl.deleteById();
+                }
             }
             // 4.重算成本总览
             recalculatePlanTotalCost(ccPrjCostOverviewPid, "COMPLETE_AMT");
@@ -1504,21 +1511,23 @@ public class StructNodeExt {
             List<CcPrjCostOverviewToDtl> ccPrjCostOverviewToDtls = CcPrjCostOverviewToDtl.selectByWhere(new Where().eq(CcPrjCostOverviewToDtl.Cols.ENTITY_RECORD_ID, csCommId));
             String ccPrjCostOverviewId = null;
             String ccPrjCostOverviewPid = null;
-            for (CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl : ccPrjCostOverviewToDtls) {
-                ccPrjCostOverviewId = ccPrjCostOverviewToDtl.getCcPrjCostOverviewId();
-                BigDecimal rawTrxAmt = ccPrjCostOverviewToDtl.getTrxAmt();
+            if (!SharedUtil.isEmpty(ccPrjCostOverviewToDtls)) {
+                for (CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl : ccPrjCostOverviewToDtls) {
+                    ccPrjCostOverviewId = ccPrjCostOverviewToDtl.getCcPrjCostOverviewId();
+                    BigDecimal rawTrxAmt = ccPrjCostOverviewToDtl.getTrxAmt();
 
-                // 2.撤回此实体记录的已申请支付金额
-                CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectById(ccPrjCostOverviewId);
-                ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
-                BigDecimal reqPayAmtInPo = ccPrjCostOverview.getReqPayAmt(); // 已申请支付金额
-                BigDecimal rawReqPayAmt = reqPayAmtInPo.subtract(rawTrxAmt); // 原始已申请支付金额
+                    // 2.撤回此实体记录的已申请支付金额
+                    CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectById(ccPrjCostOverviewId);
+                    ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
+                    BigDecimal reqPayAmtInPo = ccPrjCostOverview.getReqPayAmt(); // 已申请支付金额
+                    BigDecimal rawReqPayAmt = reqPayAmtInPo.subtract(rawTrxAmt); // 原始已申请支付金额
 
-                ccPrjCostOverview.setReqPayAmt(rawReqPayAmt);
-                ccPrjCostOverview.updateById();
+                    ccPrjCostOverview.setReqPayAmt(rawReqPayAmt);
+                    ccPrjCostOverview.updateById();
 
-                // 3.删除先前支付申请关联记录
-                ccPrjCostOverviewToDtl.deleteById();
+                    // 3.删除先前支付申请关联记录
+                    ccPrjCostOverviewToDtl.deleteById();
+                }
             }
             // 4.重算成本总览
             recalculatePlanTotalCost(ccPrjCostOverviewPid, "REQ_PAY_AMT");
@@ -1642,21 +1651,23 @@ public class StructNodeExt {
             List<CcPrjCostOverviewToDtl> ccPrjCostOverviewToDtls = CcPrjCostOverviewToDtl.selectByWhere(new Where().eq(CcPrjCostOverviewToDtl.Cols.ENTITY_RECORD_ID, csCommId));
             String ccPrjCostOverviewId = null;
             String ccPrjCostOverviewPid = null;
-            for (CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl : ccPrjCostOverviewToDtls) {
-                ccPrjCostOverviewId = ccPrjCostOverviewToDtl.getCcPrjCostOverviewId();
-                BigDecimal rawTrxAmt = ccPrjCostOverviewToDtl.getTrxAmt();
+            if (!SharedUtil.isEmpty(ccPrjCostOverviewToDtls)) {
+                for (CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl : ccPrjCostOverviewToDtls) {
+                    ccPrjCostOverviewId = ccPrjCostOverviewToDtl.getCcPrjCostOverviewId();
+                    BigDecimal rawTrxAmt = ccPrjCostOverviewToDtl.getTrxAmt();
 
-                // 2.撤回此实体记录的已支付金额
-                CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectById(ccPrjCostOverviewId);
-                ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
-                BigDecimal payAmtInReq = ccPrjCostOverview.getPayAmt(); // 已支付金额
-                BigDecimal rawPayAmt = payAmtInReq.subtract(rawTrxAmt); // 原始已支付金额
+                    // 2.撤回此实体记录的已支付金额
+                    CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectById(ccPrjCostOverviewId);
+                    ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
+                    BigDecimal payAmtInReq = ccPrjCostOverview.getPayAmt(); // 已支付金额
+                    BigDecimal rawPayAmt = payAmtInReq.subtract(rawTrxAmt); // 原始已支付金额
 
-                ccPrjCostOverview.setPayAmt(rawPayAmt);
-                ccPrjCostOverview.updateById();
+                    ccPrjCostOverview.setPayAmt(rawPayAmt);
+                    ccPrjCostOverview.updateById();
 
-                // 3.删除先前支付记录关联记录
-                ccPrjCostOverviewToDtl.deleteById();
+                    // 3.删除先前支付记录关联记录
+                    ccPrjCostOverviewToDtl.deleteById();
+                }
             }
             // 4.重算成本总览
             recalculatePlanTotalCost(ccPrjCostOverviewPid, "PAY_AMT");
