@@ -250,7 +250,7 @@ public class StructNodeExt {
         ccPrjStructNode.setName(nodeData.get("NAME").toString());
         ccPrjStructNode.setSeqNo(seqNo);  // 设置序号
 
-        
+
         String parentNodeId = nodeData.get("CC_PRJ_STRUCT_NODE_PID") != null ? nodeData.get("CC_PRJ_STRUCT_NODE_PID").toString() : parentRecord.valueMap.get("ID").toString();
         ccPrjStructNode.setCcPrjStructNodePid(parentNodeId);
 
@@ -1708,7 +1708,7 @@ public class StructNodeExt {
             String ccPrjId = ccPrjStructNode.getCcPrjId();
             // 当前AP改为VD
             // 获取此项目已批准的计划根节点
-            List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.STATUS, "AP").eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
+            List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.IS_WBS, 1).eq(CcPrjStructNode.Cols.STATUS, "AP").eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
             for (CcPrjStructNode ccPrjStructNode0 : ccPrjStructNodes) {
                 String rootId = ccPrjStructNode0.getId();
                 myJdbcTemplate.update(updateStatusSql, rootId, StatusE.VD.toString());
