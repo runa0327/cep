@@ -220,9 +220,9 @@ public class TencentCloudExt {
 
                 resultMap.put("code", 200);
                 resultMap.put("msg", "打卡成功");
-                resultMap.put("siOnDuty", of.compareTo(now) > 0 ? true : false);
+                resultMap.put("isOnDuty", ccAtdHit.getIsOnDuty());
                 resultMap.put("isNormal", isNormal);
-                resultMap.put("isOutOfAtdArea", inAtdArea ? false : true);
+                resultMap.put("isOutOfAtdArea", ccAtdHit.getIsOutOfAtdArea());
                 resultMap.put("hitLocation", hitLocation);
                 resultMap.put("hitDttm", ccAtdHit.getHitDttm().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
