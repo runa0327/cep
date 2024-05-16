@@ -7,6 +7,7 @@ import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.interaction.ViewNavExtResult;
 import com.qygly.shared.util.EntityRecordUtil;
 import com.qygly.shared.util.SharedUtil;
 
@@ -14,10 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PrjExt {
     /**
@@ -213,6 +211,18 @@ public class PrjExt {
         }
 
         return ccPrjCostOverviews;
+    }
+
+    /**
+     * 从项目列表进入具体项目时，设置全局变量P_CC_PRJ_IDS的值。
+     */
+    public void toPrj() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            ViewNavExtResult result = new ViewNavExtResult();
+            result.changedGlobalVarMap = new LinkedHashMap<>();
+            result.changedGlobalVarMap.put("P_CC_PRJ_IDS", EntityRecordUtil.getId(entityRecord));
+            ExtJarHelper.setReturnValue(result);
+        }
     }
 
 }
