@@ -186,7 +186,10 @@ public class StructNodeExt {
         LocalDate toDate = topNodePlanFr.plusDays(planToDayNo - 1);
         BigDecimal planDays = BigDecimal.valueOf(planToDayNo - planFrDayNo + 1);
 
-        CcPrjStructNode ccPrjStructNode = CcPrjStructNode.insertData();
+        CcPrjStructNode ccPrjStructNode = new CcPrjStructNode();
+        ccPrjStructNode.setCrtDt(LocalDateTime.now());
+        ccPrjStructNode.setCrtUserId(loginInfo.userInfo.id);
+        ccPrjStructNode.setLastModiUserId(loginInfo.userInfo.id);
         ccPrjStructNode.setCcPrjId(ccPrjId);
         ccPrjStructNode.setStatus("DR");
 
@@ -215,7 +218,7 @@ public class StructNodeExt {
         ccPrjStructNode.setCcPrjStructNodePid(parentNodeId);
 
         ccPrjStructNode.setIsTemplate(false);
-        ccPrjStructNode.updateById();
+        ccPrjStructNode.insertById();
     }
 
     /**
@@ -228,7 +231,10 @@ public class StructNodeExt {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String ccPrjId = parentRecord.valueMap.get("CC_PRJ_ID").toString();
 
-        CcPrjStructNode ccPrjStructNode = CcPrjStructNode.insertData();
+        CcPrjStructNode ccPrjStructNode = new CcPrjStructNode();
+        ccPrjStructNode.setCrtDt(LocalDateTime.now());
+        ccPrjStructNode.setCrtUserId(loginInfo.userInfo.id);
+        ccPrjStructNode.setLastModiUserId(loginInfo.userInfo.id);
         ccPrjStructNode.setPbsChiefUserId(loginInfo.userInfo.id);
         ccPrjStructNode.setCcPrjId(ccPrjId);
         ccPrjStructNode.setStatus("AP");
@@ -253,7 +259,7 @@ public class StructNodeExt {
         ccPrjStructNode.setCcPrjStructNodePid(parentNodeId);
 
         ccPrjStructNode.setIsTemplate(false);
-        ccPrjStructNode.updateById();
+        ccPrjStructNode.insertById();
     }
 
     /**
@@ -292,7 +298,10 @@ public class StructNodeExt {
         String ccRiskLvlId = nodeData.get("CC_RISK_LVL_ID") != null ? nodeData.get("CC_RISK_LVL_ID").toString() : null;
 
 
-        CcPrjStructNode ccPrjStructNode = CcPrjStructNode.insertData();
+        CcPrjStructNode ccPrjStructNode = new CcPrjStructNode();
+        ccPrjStructNode.setCrtDt(LocalDateTime.now());
+        ccPrjStructNode.setCrtUserId(loginInfo.userInfo.id);
+        ccPrjStructNode.setLastModiUserId(loginInfo.userInfo.id);
         ccPrjStructNode.setCcPrjId(ccPrjId);
         ccPrjStructNode.setProgTime(progTime);
         ccPrjStructNode.setCcWbsStatusId(ccWbsStatusId);
@@ -330,7 +339,7 @@ public class StructNodeExt {
         ccPrjStructNode.setCcPrjStructNodePid(parentNodeId);
 
         ccPrjStructNode.setIsTemplate(false);
-        ccPrjStructNode.updateById();
+        ccPrjStructNode.insertById();
     }
 
     /**
