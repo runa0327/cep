@@ -1199,7 +1199,7 @@ public class StructNodeExt {
 
                 int comparisonResult = nowBidAmt.compareTo(bidAmt);
                 if (comparisonResult > 0) {
-                    throw new BaseException("已采购金额大于已招标金额！");
+                    throw new BaseException("合同额大于已招标金额！");
                 }
                 ccPrjCostOverview.updateById();
 
@@ -1285,7 +1285,7 @@ public class StructNodeExt {
             // 比较completeAmtInPoSum和purchaseAmtInBid
             int comparisonResult = completeAmtInPoSum.compareTo(purchaseAmtInBid);
             if (comparisonResult > 0) {
-                throw new BaseException("已完成产值金额大于已采购金额！");
+                throw new BaseException("已完成产值金额大于合同额！");
             }
 
             // 4.存储成本统览关联明细
