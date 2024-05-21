@@ -111,6 +111,10 @@ public class CcPartyCompany {
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
+         * {"EN": "CC_PRJ_PARTY_ID", "ZH_CN": "项目参建方", "ZH_TW": "繁：项目参与方"}。
+         */
+        public static final String CC_PRJ_PARTY_ID = "CC_PRJ_PARTY_ID";
+        /**
          * {"EN": "参建方", "ZH_CN": "参建方", "ZH_TW": "参建方"}。
          */
         public static final String CC_PARTY_ID = "CC_PARTY_ID";
@@ -696,6 +700,42 @@ public class CcPartyCompany {
             this.ccPrjId = ccPrjId;
             if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
                 this.toUpdateCols.add("CC_PRJ_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "CC_PRJ_PARTY_ID", "ZH_CN": "项目参建方", "ZH_TW": "繁：项目参与方"}。
+     */
+    private String ccPrjPartyId;
+
+    /**
+     * 获取：{"EN": "CC_PRJ_PARTY_ID", "ZH_CN": "项目参建方", "ZH_TW": "繁：项目参与方"}。
+     */
+    public String getCcPrjPartyId() {
+        return this.ccPrjPartyId;
+    }
+
+    /**
+     * 设置：{"EN": "CC_PRJ_PARTY_ID", "ZH_CN": "项目参建方", "ZH_TW": "繁：项目参与方"}。
+     */
+    public CcPartyCompany setCcPrjPartyId(String ccPrjPartyId) {
+        if (this.ccPrjPartyId == null && ccPrjPartyId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjPartyId != null && ccPrjPartyId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjPartyId.compareTo(ccPrjPartyId) != 0) {
+                this.ccPrjPartyId = ccPrjPartyId;
+                if (!this.toUpdateCols.contains("CC_PRJ_PARTY_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_PARTY_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjPartyId = ccPrjPartyId;
+            if (!this.toUpdateCols.contains("CC_PRJ_PARTY_ID")) {
+                this.toUpdateCols.add("CC_PRJ_PARTY_ID");
             }
         }
         return this;

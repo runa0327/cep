@@ -7,20 +7,21 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * {"EN": "EN：项目成员", "ZH_CN": "项目成员", "ZH_TW": "繁：项目成员"}。
+ * {"EN": "EN：项目参与方", "ZH_CN": "项目参建方", "ZH_TW": "繁：项目参与方"}。
  */
-public class CcPrjMember {
+public class CcPrjParty {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<CcPrjMember> modelHelper = new ModelHelper<>("CC_PRJ_MEMBER", new CcPrjMember());
+    private static final ModelHelper<CcPrjParty> modelHelper = new ModelHelper<>("CC_PRJ_PARTY", new CcPrjParty());
 
     /**
      * 待更新的列。
@@ -37,7 +38,7 @@ public class CcPrjMember {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "CC_PRJ_MEMBER";
+    public static final String ENT_CODE = "CC_PRJ_PARTY";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -79,10 +80,6 @@ public class CcPrjMember {
          */
         public static final String LAST_MODI_USER_ID = "LAST_MODI_USER_ID";
         /**
-         * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
-         */
-        public static final String STATUS = "STATUS";
-        /**
          * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
@@ -107,37 +104,21 @@ public class CcPrjMember {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
+         * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+         */
+        public static final String STATUS = "STATUS";
+        /**
+         * {"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+         */
+        public static final String SEQ_NO = "SEQ_NO";
+        /**
          * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
-         * {"EN": "CC_PRJ_PARTY_ID", "ZH_CN": "项目参建方", "ZH_TW": "繁：项目参与方"}。
-         */
-        public static final String CC_PRJ_PARTY_ID = "CC_PRJ_PARTY_ID";
-        /**
-         * {"EN": "参建方岗位", "ZH_CN": "项目参建方公司岗位", "ZH_TW": "参建方岗位"}。
-         */
-        public static final String CC_PARTY_COMPANY_POST_ID = "CC_PARTY_COMPANY_POST_ID";
-        /**
-         * {"EN": "项目公司", "ZH_CN": "项目参建方公司", "ZH_TW": "项目公司"}。
-         */
-        public static final String CC_PARTY_COMPANY_ID = "CC_PARTY_COMPANY_ID";
-        /**
-         * {"EN": "AD_USER_ID", "ZH_CN": "用户", "ZH_TW": "繁：用户"}。
-         */
-        public static final String AD_USER_ID = "AD_USER_ID";
-        /**
          * {"EN": "参建方", "ZH_CN": "参建方", "ZH_TW": "参建方"}。
          */
         public static final String CC_PARTY_ID = "CC_PARTY_ID";
-        /**
-         * {"EN": "CC_COMPANY_ID", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
-         */
-        public static final String CC_COMPANY_ID = "CC_COMPANY_ID";
-        /**
-         * {"EN": "岗位", "ZH_CN": "岗位", "ZH_TW": "岗位"}。
-         */
-        public static final String CC_POST_ID = "CC_POST_ID";
     }
 
     // </editor-fold>
@@ -160,7 +141,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
      */
-    public CcPrjMember setId(String id) {
+    public CcPrjParty setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -196,7 +177,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
      */
-    public CcPrjMember setVer(Integer ver) {
+    public CcPrjParty setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -232,7 +213,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
      */
-    public CcPrjMember setTs(LocalDateTime ts) {
+    public CcPrjParty setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -268,7 +249,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
      */
-    public CcPrjMember setIsPreset(Boolean isPreset) {
+    public CcPrjParty setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -304,7 +285,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
      */
-    public CcPrjMember setCrtDt(LocalDateTime crtDt) {
+    public CcPrjParty setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -340,7 +321,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
      */
-    public CcPrjMember setCrtUserId(String crtUserId) {
+    public CcPrjParty setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -376,7 +357,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
      */
-    public CcPrjMember setLastModiDt(LocalDateTime lastModiDt) {
+    public CcPrjParty setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -412,7 +393,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
      */
-    public CcPrjMember setLastModiUserId(String lastModiUserId) {
+    public CcPrjParty setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -434,42 +415,6 @@ public class CcPrjMember {
     }
 
     /**
-     * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
-     */
-    private String status;
-
-    /**
-     * 获取：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
-     */
-    public String getStatus() {
-        return this.status;
-    }
-
-    /**
-     * 设置：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
-     */
-    public CcPrjMember setStatus(String status) {
-        if (this.status == null && status == null) {
-            // 均为null，不做处理。
-        } else if (this.status != null && status != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.status.compareTo(status) != 0) {
-                this.status = status;
-                if (!this.toUpdateCols.contains("STATUS")) {
-                    this.toUpdateCols.add("STATUS");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.status = status;
-            if (!this.toUpdateCols.contains("STATUS")) {
-                this.toUpdateCols.add("STATUS");
-            }
-        }
-        return this;
-    }
-
-    /**
      * {"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
      */
     private String lkWfInstId;
@@ -484,7 +429,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
      */
-    public CcPrjMember setLkWfInstId(String lkWfInstId) {
+    public CcPrjParty setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -520,7 +465,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
      */
-    public CcPrjMember setCode(String code) {
+    public CcPrjParty setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -556,7 +501,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
      */
-    public CcPrjMember setName(String name) {
+    public CcPrjParty setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -592,7 +537,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
      */
-    public CcPrjMember setRemark(String remark) {
+    public CcPrjParty setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -628,7 +573,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
      */
-    public CcPrjMember setFastCode(String fastCode) {
+    public CcPrjParty setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
             // 均为null，不做处理。
         } else if (this.fastCode != null && fastCode != null) {
@@ -664,7 +609,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
      */
-    public CcPrjMember setIconFileGroupId(String iconFileGroupId) {
+    public CcPrjParty setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
             // 均为null，不做处理。
         } else if (this.iconFileGroupId != null && iconFileGroupId != null) {
@@ -686,6 +631,78 @@ public class CcPrjMember {
     }
 
     /**
+     * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     */
+    private String status;
+
+    /**
+     * 获取：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     */
+    public String getStatus() {
+        return this.status;
+    }
+
+    /**
+     * 设置：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
+     */
+    public CcPrjParty setStatus(String status) {
+        if (this.status == null && status == null) {
+            // 均为null，不做处理。
+        } else if (this.status != null && status != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.status.compareTo(status) != 0) {
+                this.status = status;
+                if (!this.toUpdateCols.contains("STATUS")) {
+                    this.toUpdateCols.add("STATUS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.status = status;
+            if (!this.toUpdateCols.contains("STATUS")) {
+                this.toUpdateCols.add("STATUS");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     */
+    private BigDecimal seqNo;
+
+    /**
+     * 获取：{"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     */
+    public BigDecimal getSeqNo() {
+        return this.seqNo;
+    }
+
+    /**
+     * 设置：{"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     */
+    public CcPrjParty setSeqNo(BigDecimal seqNo) {
+        if (this.seqNo == null && seqNo == null) {
+            // 均为null，不做处理。
+        } else if (this.seqNo != null && seqNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.seqNo.compareTo(seqNo) != 0) {
+                this.seqNo = seqNo;
+                if (!this.toUpdateCols.contains("SEQ_NO")) {
+                    this.toUpdateCols.add("SEQ_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.seqNo = seqNo;
+            if (!this.toUpdateCols.contains("SEQ_NO")) {
+                this.toUpdateCols.add("SEQ_NO");
+            }
+        }
+        return this;
+    }
+
+    /**
      * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
      */
     private String ccPrjId;
@@ -700,7 +717,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
      */
-    public CcPrjMember setCcPrjId(String ccPrjId) {
+    public CcPrjParty setCcPrjId(String ccPrjId) {
         if (this.ccPrjId == null && ccPrjId == null) {
             // 均为null，不做处理。
         } else if (this.ccPrjId != null && ccPrjId != null) {
@@ -722,150 +739,6 @@ public class CcPrjMember {
     }
 
     /**
-     * {"EN": "CC_PRJ_PARTY_ID", "ZH_CN": "项目参建方", "ZH_TW": "繁：项目参与方"}。
-     */
-    private String ccPrjPartyId;
-
-    /**
-     * 获取：{"EN": "CC_PRJ_PARTY_ID", "ZH_CN": "项目参建方", "ZH_TW": "繁：项目参与方"}。
-     */
-    public String getCcPrjPartyId() {
-        return this.ccPrjPartyId;
-    }
-
-    /**
-     * 设置：{"EN": "CC_PRJ_PARTY_ID", "ZH_CN": "项目参建方", "ZH_TW": "繁：项目参与方"}。
-     */
-    public CcPrjMember setCcPrjPartyId(String ccPrjPartyId) {
-        if (this.ccPrjPartyId == null && ccPrjPartyId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccPrjPartyId != null && ccPrjPartyId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccPrjPartyId.compareTo(ccPrjPartyId) != 0) {
-                this.ccPrjPartyId = ccPrjPartyId;
-                if (!this.toUpdateCols.contains("CC_PRJ_PARTY_ID")) {
-                    this.toUpdateCols.add("CC_PRJ_PARTY_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccPrjPartyId = ccPrjPartyId;
-            if (!this.toUpdateCols.contains("CC_PRJ_PARTY_ID")) {
-                this.toUpdateCols.add("CC_PRJ_PARTY_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "参建方岗位", "ZH_CN": "项目参建方公司岗位", "ZH_TW": "参建方岗位"}。
-     */
-    private String ccPartyCompanyPostId;
-
-    /**
-     * 获取：{"EN": "参建方岗位", "ZH_CN": "项目参建方公司岗位", "ZH_TW": "参建方岗位"}。
-     */
-    public String getCcPartyCompanyPostId() {
-        return this.ccPartyCompanyPostId;
-    }
-
-    /**
-     * 设置：{"EN": "参建方岗位", "ZH_CN": "项目参建方公司岗位", "ZH_TW": "参建方岗位"}。
-     */
-    public CcPrjMember setCcPartyCompanyPostId(String ccPartyCompanyPostId) {
-        if (this.ccPartyCompanyPostId == null && ccPartyCompanyPostId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccPartyCompanyPostId != null && ccPartyCompanyPostId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccPartyCompanyPostId.compareTo(ccPartyCompanyPostId) != 0) {
-                this.ccPartyCompanyPostId = ccPartyCompanyPostId;
-                if (!this.toUpdateCols.contains("CC_PARTY_COMPANY_POST_ID")) {
-                    this.toUpdateCols.add("CC_PARTY_COMPANY_POST_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccPartyCompanyPostId = ccPartyCompanyPostId;
-            if (!this.toUpdateCols.contains("CC_PARTY_COMPANY_POST_ID")) {
-                this.toUpdateCols.add("CC_PARTY_COMPANY_POST_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "项目公司", "ZH_CN": "项目参建方公司", "ZH_TW": "项目公司"}。
-     */
-    private String ccPartyCompanyId;
-
-    /**
-     * 获取：{"EN": "项目公司", "ZH_CN": "项目参建方公司", "ZH_TW": "项目公司"}。
-     */
-    public String getCcPartyCompanyId() {
-        return this.ccPartyCompanyId;
-    }
-
-    /**
-     * 设置：{"EN": "项目公司", "ZH_CN": "项目参建方公司", "ZH_TW": "项目公司"}。
-     */
-    public CcPrjMember setCcPartyCompanyId(String ccPartyCompanyId) {
-        if (this.ccPartyCompanyId == null && ccPartyCompanyId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccPartyCompanyId != null && ccPartyCompanyId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccPartyCompanyId.compareTo(ccPartyCompanyId) != 0) {
-                this.ccPartyCompanyId = ccPartyCompanyId;
-                if (!this.toUpdateCols.contains("CC_PARTY_COMPANY_ID")) {
-                    this.toUpdateCols.add("CC_PARTY_COMPANY_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccPartyCompanyId = ccPartyCompanyId;
-            if (!this.toUpdateCols.contains("CC_PARTY_COMPANY_ID")) {
-                this.toUpdateCols.add("CC_PARTY_COMPANY_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "AD_USER_ID", "ZH_CN": "用户", "ZH_TW": "繁：用户"}。
-     */
-    private String adUserId;
-
-    /**
-     * 获取：{"EN": "AD_USER_ID", "ZH_CN": "用户", "ZH_TW": "繁：用户"}。
-     */
-    public String getAdUserId() {
-        return this.adUserId;
-    }
-
-    /**
-     * 设置：{"EN": "AD_USER_ID", "ZH_CN": "用户", "ZH_TW": "繁：用户"}。
-     */
-    public CcPrjMember setAdUserId(String adUserId) {
-        if (this.adUserId == null && adUserId == null) {
-            // 均为null，不做处理。
-        } else if (this.adUserId != null && adUserId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.adUserId.compareTo(adUserId) != 0) {
-                this.adUserId = adUserId;
-                if (!this.toUpdateCols.contains("AD_USER_ID")) {
-                    this.toUpdateCols.add("AD_USER_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.adUserId = adUserId;
-            if (!this.toUpdateCols.contains("AD_USER_ID")) {
-                this.toUpdateCols.add("AD_USER_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
      * {"EN": "参建方", "ZH_CN": "参建方", "ZH_TW": "参建方"}。
      */
     private String ccPartyId;
@@ -880,7 +753,7 @@ public class CcPrjMember {
     /**
      * 设置：{"EN": "参建方", "ZH_CN": "参建方", "ZH_TW": "参建方"}。
      */
-    public CcPrjMember setCcPartyId(String ccPartyId) {
+    public CcPrjParty setCcPartyId(String ccPartyId) {
         if (this.ccPartyId == null && ccPartyId == null) {
             // 均为null，不做处理。
         } else if (this.ccPartyId != null && ccPartyId != null) {
@@ -896,78 +769,6 @@ public class CcPrjMember {
             this.ccPartyId = ccPartyId;
             if (!this.toUpdateCols.contains("CC_PARTY_ID")) {
                 this.toUpdateCols.add("CC_PARTY_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "CC_COMPANY_ID", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
-     */
-    private String ccCompanyId;
-
-    /**
-     * 获取：{"EN": "CC_COMPANY_ID", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
-     */
-    public String getCcCompanyId() {
-        return this.ccCompanyId;
-    }
-
-    /**
-     * 设置：{"EN": "CC_COMPANY_ID", "ZH_CN": "公司", "ZH_TW": "繁：公司"}。
-     */
-    public CcPrjMember setCcCompanyId(String ccCompanyId) {
-        if (this.ccCompanyId == null && ccCompanyId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccCompanyId != null && ccCompanyId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccCompanyId.compareTo(ccCompanyId) != 0) {
-                this.ccCompanyId = ccCompanyId;
-                if (!this.toUpdateCols.contains("CC_COMPANY_ID")) {
-                    this.toUpdateCols.add("CC_COMPANY_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccCompanyId = ccCompanyId;
-            if (!this.toUpdateCols.contains("CC_COMPANY_ID")) {
-                this.toUpdateCols.add("CC_COMPANY_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "岗位", "ZH_CN": "岗位", "ZH_TW": "岗位"}。
-     */
-    private String ccPostId;
-
-    /**
-     * 获取：{"EN": "岗位", "ZH_CN": "岗位", "ZH_TW": "岗位"}。
-     */
-    public String getCcPostId() {
-        return this.ccPostId;
-    }
-
-    /**
-     * 设置：{"EN": "岗位", "ZH_CN": "岗位", "ZH_TW": "岗位"}。
-     */
-    public CcPrjMember setCcPostId(String ccPostId) {
-        if (this.ccPostId == null && ccPostId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccPostId != null && ccPostId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccPostId.compareTo(ccPostId) != 0) {
-                this.ccPostId = ccPostId;
-                if (!this.toUpdateCols.contains("CC_POST_ID")) {
-                    this.toUpdateCols.add("CC_POST_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccPostId = ccPostId;
-            if (!this.toUpdateCols.contains("CC_POST_ID")) {
-                this.toUpdateCols.add("CC_POST_ID");
             }
         }
         return this;
@@ -1060,8 +861,8 @@ public class CcPrjMember {
      *
      * @return
      */
-    public static CcPrjMember newData() {
-        CcPrjMember obj = modelHelper.newData();
+    public static CcPrjParty newData() {
+        CcPrjParty obj = modelHelper.newData();
         return obj;
     }
 
@@ -1070,8 +871,8 @@ public class CcPrjMember {
      *
      * @return
      */
-    public static CcPrjMember insertData() {
-        CcPrjMember obj = modelHelper.insertData();
+    public static CcPrjParty insertData() {
+        CcPrjParty obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1083,8 +884,8 @@ public class CcPrjMember {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcPrjMember selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        CcPrjMember obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static CcPrjParty selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        CcPrjParty obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1094,7 +895,7 @@ public class CcPrjMember {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcPrjMember selectById(String id) {
+    public static CcPrjParty selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1106,8 +907,8 @@ public class CcPrjMember {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcPrjMember> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<CcPrjMember> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<CcPrjParty> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<CcPrjParty> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1117,7 +918,7 @@ public class CcPrjMember {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcPrjMember> selectByIds(List<String> ids) {
+    public static List<CcPrjParty> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1129,8 +930,8 @@ public class CcPrjMember {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcPrjMember> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcPrjMember> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<CcPrjParty> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcPrjParty> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1140,7 +941,7 @@ public class CcPrjMember {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcPrjMember> selectByWhere(Where where) {
+    public static List<CcPrjParty> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1152,10 +953,10 @@ public class CcPrjMember {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static CcPrjMember selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcPrjMember> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static CcPrjParty selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcPrjParty> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用CcPrjMember.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用CcPrjParty.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmpty(objList) ? null : objList.get(0);
@@ -1167,7 +968,7 @@ public class CcPrjMember {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static CcPrjMember selectOneByWhere(Where where) {
+    public static CcPrjParty selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1281,7 +1082,7 @@ public class CcPrjMember {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(CcPrjMember fromModel, CcPrjMember toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(CcPrjParty fromModel, CcPrjParty toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1291,7 +1092,7 @@ public class CcPrjMember {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(CcPrjMember fromModel, CcPrjMember toModel) {
+    public static void copyCols(CcPrjParty fromModel, CcPrjParty toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 

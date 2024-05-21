@@ -225,4 +225,55 @@ public class PrjExt {
         }
     }
 
+    /**
+     * 创建项目初始化项目成员
+     */
+    public void initPrjMember() {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String prjId = entityRecord.csCommId;
+            //创建默认项目参建方
+            CcPrjParty ccPrjParty = CcPrjParty.insertData();
+            ccPrjParty.setCcPrjId(prjId);
+            ccPrjParty.setCcPartyId("notSetParty");
+            ccPrjParty.updateById();
+
+            //创建默认项目参建方公司
+            CcPartyCompany ccPartyCompany = CcPartyCompany.insertData();
+            ccPartyCompany.setCcPrjId(prjId);
+            ccPartyCompany.setCcPrjPartyId(ccPrjParty.getId());
+            ccPartyCompany.setCcPartyId(ccPrjParty.getCcPartyId());
+            ccPartyCompany.setCcCompanyId("notSetCompany");
+            ccPartyCompany.updateById();
+
+            //创建默认项目参建方公司岗位
+            CcPartyCompanyPost ccPartyCompanyPost = CcPartyCompanyPost.insertData();
+            ccPartyCompanyPost.setCcPrjId(prjId);
+            ccPartyCompanyPost.setCcPrjPartyId(ccPartyCompany.getCcPrjPartyId());
+            ccPartyCompanyPost.setCcPartyId(ccPartyCompany.getCcPartyId());
+            ccPartyCompanyPost.setCcPartyCompanyId(ccPartyCompany.getId());
+            ccPartyCompanyPost.setCcCompanyId(ccPartyCompany.getCcCompanyId());
+            ccPartyCompanyPost.setCcPostId("notSetPost");
+            ccPartyCompanyPost.updateById();
+
+            //创建项目成员
+            CcPrjMember ccPrjMember = CcPrjMember.insertData();
+            ccPrjMember.setCcPrjId(prjId);
+            ccPrjMember.setCcPrjPartyId(ccPartyCompanyPost.getCcPrjPartyId());
+            ccPrjMember.setCcPartyId(ccPartyCompanyPost.getCcPartyId());
+            ccPrjMember.setCcPartyCompanyId(ccPartyCompanyPost.getCcPartyCompanyId());
+            ccPrjMember.setCcCompanyId(ccPartyCompanyPost.getCcCompanyId());
+            ccPrjMember.setCcPostId(ccPartyCompanyPost.getCcPostId());
+            ccPrjMember.setCcPartyCompanyPostId(ccPartyCompanyPost.getId());
+            ccPrjMember.setAdUserId(userId);
+            AdUser adUser = AdUser.selectById(userId);
+            String userName = adUser.getName();
+            ccPrjMember.setName(userName);
+            ccPrjMember.updateById();
+
+
+        }
+    }
+
 }
