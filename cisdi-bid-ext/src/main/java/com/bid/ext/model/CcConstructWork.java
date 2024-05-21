@@ -7,7 +7,6 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,7 +119,7 @@ public class CcConstructWork {
          */
         public static final String PROG_TIME = "PROG_TIME";
         /**
-         * {"EN": "进展比例（%）", "ZH_CN": "实际进度比例", "ZH_TW": "进展比例（%）"}。
+         * {"EN": "进展比例（%）", "ZH_CN": "实际进度比例（%）", "ZH_TW": "进展比例（%）"}。
          */
         public static final String ACT_WBS_PCT = "ACT_WBS_PCT";
     }
@@ -779,21 +778,21 @@ public class CcConstructWork {
     }
 
     /**
-     * {"EN": "进展比例（%）", "ZH_CN": "实际进度比例", "ZH_TW": "进展比例（%）"}。
+     * {"EN": "进展比例（%）", "ZH_CN": "实际进度比例（%）", "ZH_TW": "进展比例（%）"}。
      */
-    private BigDecimal actWbsPct;
+    private Integer actWbsPct;
 
     /**
-     * 获取：{"EN": "进展比例（%）", "ZH_CN": "实际进度比例", "ZH_TW": "进展比例（%）"}。
+     * 获取：{"EN": "进展比例（%）", "ZH_CN": "实际进度比例（%）", "ZH_TW": "进展比例（%）"}。
      */
-    public BigDecimal getActWbsPct() {
+    public Integer getActWbsPct() {
         return this.actWbsPct;
     }
 
     /**
-     * 设置：{"EN": "进展比例（%）", "ZH_CN": "实际进度比例", "ZH_TW": "进展比例（%）"}。
+     * 设置：{"EN": "进展比例（%）", "ZH_CN": "实际进度比例（%）", "ZH_TW": "进展比例（%）"}。
      */
-    public CcConstructWork setActWbsPct(BigDecimal actWbsPct) {
+    public CcConstructWork setActWbsPct(Integer actWbsPct) {
         if (this.actWbsPct == null && actWbsPct == null) {
             // 均为null，不做处理。
         } else if (this.actWbsPct != null && actWbsPct != null) {
