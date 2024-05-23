@@ -62,9 +62,13 @@ public class GenExt {
                     valueMap.get("CC_PRJ_ID").toString(),
                     loginInfo.currentLangId.toString());
 
-            String issuePointTypeName = fetchNameFromTable("CC_QS_ISSUE_POINT_TYPE",
-                    valueMap.get("CC_QS_ISSUE_POINT_TYPE_ID").toString(),
-                    loginInfo.currentLangId.toString());
+            Object ccQsIssuePointTypeId = valueMap.get("CC_QS_ISSUE_POINT_TYPE_ID");
+            String issuePointTypeName = null;
+            if (!SharedUtil.isEmpty(ccQsIssuePointTypeId)) {
+                issuePointTypeName = fetchNameFromTable("CC_QS_ISSUE_POINT_TYPE",
+                        valueMap.get("CC_QS_ISSUE_POINT_TYPE_ID").toString(),
+                        loginInfo.currentLangId.toString());
+            }
 
             String inspectionTypeName = fetchNameFromTable("CC_QS_INSPECTION_TYPE",
                     valueMap.get("CC_QS_INSPECTION_TYPE_ID").toString(),
@@ -264,7 +268,7 @@ public class GenExt {
                 String url = "https://qygly.com" + fileInlineUrl + "&qygly-session-id=" + sessionId;
                 Map<String, Object> imgEntry = new HashMap<>();
                 imgEntry.put("order", (i + 1) + "、");
-                imgEntry.put("img", Pictures.ofUrl(url).size(350, 100).create());
+                imgEntry.put("img", Pictures.ofUrl(url).size(350, 350).create());
                 imgs.add(imgEntry);
             }
         }

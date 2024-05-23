@@ -21,7 +21,6 @@ public class CoTaskExt {
             Set<String> newChiefUserIds = new HashSet<>(parseUserIds(valueMap.get("CHIEF_USER_IDS")));
             Set<String> newSuperviseUserIds = new HashSet<>(parseUserIds(valueMap.get("SUPERVISE_USER_IDS")));
 
-
             // 获取已存在的任务进展
             List<CcCoTaskProg> ccCoTaskProgs = CcCoTaskProg.selectByWhere(new Where().eq(CcCoTaskProg.Cols.CC_CO_TASK_ID, csCommId));
 
