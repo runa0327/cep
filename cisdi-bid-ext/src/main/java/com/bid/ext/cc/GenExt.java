@@ -13,6 +13,7 @@ import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.EntityRecordUtil;
+import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -252,7 +253,17 @@ public class GenExt {
         return resultMap.get("name").toString(); // 返回名称
     }
 
-    public static List<Map<String, Object>> fetchAndFormatImages(String idsString) {
+    /**
+     * 处理图片
+     *
+     * @param idsString
+     * @return
+     */
+    private static List<Map<String, Object>> fetchAndFormatImages(String idsString) {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        String sql = "select name from CC_QS_IMG_PREVIEW_URL LIMIT 1";
+        Map<String, Object> map = myJdbcTemplate.queryForMap(sql);
+        String urlHead = JdbcMapUtil.getString(map, "name");
         String sessionId = ExtJarHelper.getLoginInfo().sessionId;
         if (idsString == null || idsString.trim().isEmpty()) {
             return new ArrayList<>();
@@ -265,7 +276,7 @@ public class GenExt {
             FlFile flFile = FlFile.selectById(ids.get(i)); // 获取文件对象
             if (flFile != null) {
                 String fileInlineUrl = flFile.getFileInlineUrl(); // 获取文件 URL
-                String url = "https://qygly.com" + fileInlineUrl + "&qygly-session-id=" + sessionId;
+                String url = urlHead + fileInlineUrl + "&qygly-session-id=" + sessionId;
                 Map<String, Object> imgEntry = new HashMap<>();
                 imgEntry.put("order", (i + 1) + "、");
                 imgEntry.put("img", Pictures.ofUrl(url).size(350, 350).create());
