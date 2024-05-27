@@ -635,7 +635,9 @@ public class StructNodeExt {
         String progTimeStr = varMap.get("P_PROG_TIME").toString(); // 获取日期时间字符串
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.parse(progTimeStr, formatter);
-        String wbsStatusId = varMap.get("P_WBS_STATUS_ID").toString();
+//        String wbsStatusId = varMap.get("P_WBS_STATUS_ID").toString();
+        String wbsStatusId = JdbcMapUtil.getString(varMap, "P_WBS_STATUS_ID");
+        String wbsProgressStatusId = JdbcMapUtil.getString(varMap, "CC_WBS_PROGRESS_STATUS_ID");
         String remark = varMap.get("P_REMARK") != null ? varMap.get("P_REMARK").toString() : "";
         String attachments = varMap.get("P_ATTACHMENTS") != null ? varMap.get("P_ATTACHMENTS").toString() : "";
 
@@ -652,6 +654,7 @@ public class StructNodeExt {
                 CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(nodeId);
                 ccPrjStructNode.setProgTime(now);
                 ccPrjStructNode.setCcWbsStatusId(wbsStatusId);
+                ccPrjStructNode.setCcWbsProgressStatusId(wbsProgressStatusId);
                 LocalDate actFr = ccPrjStructNode.getActFr();
                 LocalDate actTo = ccPrjStructNode.getActTo();
                 long actDays;

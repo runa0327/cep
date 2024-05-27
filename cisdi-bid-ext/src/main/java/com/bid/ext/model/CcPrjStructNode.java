@@ -185,6 +185,10 @@ public class CcPrjStructNode {
          */
         public static final String CC_WBS_STATUS_ID = "CC_WBS_STATUS_ID";
         /**
+         * {"EN": "进展状态", "ZH_CN": "进展状态", "ZH_TW": "进展状态"}。
+         */
+        public static final String CC_WBS_PROGRESS_STATUS_ID = "CC_WBS_PROGRESS_STATUS_ID";
+        /**
          * {"EN": "进度风险", "ZH_CN": "进度风险", "ZH_TW": "进度风险"}。
          */
         public static final String CC_WBS_RISK_ID = "CC_WBS_RISK_ID";
@@ -1470,6 +1474,42 @@ public class CcPrjStructNode {
             this.ccWbsStatusId = ccWbsStatusId;
             if (!this.toUpdateCols.contains("CC_WBS_STATUS_ID")) {
                 this.toUpdateCols.add("CC_WBS_STATUS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "进展状态", "ZH_CN": "进展状态", "ZH_TW": "进展状态"}。
+     */
+    private String ccWbsProgressStatusId;
+
+    /**
+     * 获取：{"EN": "进展状态", "ZH_CN": "进展状态", "ZH_TW": "进展状态"}。
+     */
+    public String getCcWbsProgressStatusId() {
+        return this.ccWbsProgressStatusId;
+    }
+
+    /**
+     * 设置：{"EN": "进展状态", "ZH_CN": "进展状态", "ZH_TW": "进展状态"}。
+     */
+    public CcPrjStructNode setCcWbsProgressStatusId(String ccWbsProgressStatusId) {
+        if (this.ccWbsProgressStatusId == null && ccWbsProgressStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccWbsProgressStatusId != null && ccWbsProgressStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccWbsProgressStatusId.compareTo(ccWbsProgressStatusId) != 0) {
+                this.ccWbsProgressStatusId = ccWbsProgressStatusId;
+                if (!this.toUpdateCols.contains("CC_WBS_PROGRESS_STATUS_ID")) {
+                    this.toUpdateCols.add("CC_WBS_PROGRESS_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccWbsProgressStatusId = ccWbsProgressStatusId;
+            if (!this.toUpdateCols.contains("CC_WBS_PROGRESS_STATUS_ID")) {
+                this.toUpdateCols.add("CC_WBS_PROGRESS_STATUS_ID");
             }
         }
         return this;
