@@ -9,6 +9,7 @@ import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.ViewNavExtResult;
 import com.qygly.shared.util.EntityRecordUtil;
+import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
@@ -79,7 +80,7 @@ public class PrjExt {
     }
 
     /**
-     * 成本统览
+     * 创建项目同步创建成本统览，项目四算，结算
      */
     public void creatCostTree() {
         EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
@@ -274,6 +275,63 @@ public class PrjExt {
 
 
         }
+    }
+
+    /**
+     * 创建项目同步创建成本统览，项目四算，结算
+     */
+    public void creatWbsTree() {
+        EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
+        Map<String, Object> valueMap = entityRecord.valueMap;
+        String ccPrjId = JdbcMapUtil.getString(valueMap, "ID");
+
+        // 建立全景计划树
+        CcPrjStructNode ccPrjStructNode = CcPrjStructNode.insertData();
+        ccPrjStructNode.setCcPrjId(ccPrjId);
+        ccPrjStructNode.setCcPrjWbsTypeId("ALL");
+        ccPrjStructNode.setIsWbs(true);
+        ccPrjStructNode.setName("全景计划");
+        ccPrjStructNode.updateById();
+        // 建立前期计划树
+        CcPrjStructNode ccPrjStructNodePre = CcPrjStructNode.insertData();
+        ccPrjStructNodePre.setCcPrjId(ccPrjId);
+        ccPrjStructNodePre.setCcPrjWbsTypeId("PRE");
+        ccPrjStructNodePre.setIsWbs(true);
+        ccPrjStructNodePre.setName("前期计划");
+        ccPrjStructNodePre.setCcPrjStructNodePid(ccPrjStructNode.getId());
+        ccPrjStructNodePre.updateById();
+        // 建立设计计划树
+        CcPrjStructNode ccPrjStructNodeDesign = CcPrjStructNode.insertData();
+        ccPrjStructNodeDesign.setCcPrjId(ccPrjId);
+        ccPrjStructNodeDesign.setCcPrjWbsTypeId("DESIGN");
+        ccPrjStructNodeDesign.setIsWbs(true);
+        ccPrjStructNodeDesign.setName("设计计划");
+        ccPrjStructNodeDesign.setCcPrjStructNodePid(ccPrjStructNode.getId());
+        ccPrjStructNodeDesign.updateById();
+        // 建立招采计划树
+        CcPrjStructNode ccPrjStructNodePurchase = CcPrjStructNode.insertData();
+        ccPrjStructNodePurchase.setCcPrjId(ccPrjId);
+        ccPrjStructNodePurchase.setCcPrjWbsTypeId("PURCHASE");
+        ccPrjStructNodePurchase.setIsWbs(true);
+        ccPrjStructNodePurchase.setName("招采计划");
+        ccPrjStructNodePurchase.setCcPrjStructNodePid(ccPrjStructNode.getId());
+        ccPrjStructNodePurchase.updateById();
+        // 建立施工计划树
+        CcPrjStructNode ccPrjStructNodeConstruct = CcPrjStructNode.insertData();
+        ccPrjStructNodeConstruct.setCcPrjId(ccPrjId);
+        ccPrjStructNodeConstruct.setCcPrjWbsTypeId("CONSTRUCT");
+        ccPrjStructNodeConstruct.setIsWbs(true);
+        ccPrjStructNodeConstruct.setName("施工计划");
+        ccPrjStructNodeConstruct.setCcPrjStructNodePid(ccPrjStructNode.getId());
+        ccPrjStructNodeConstruct.updateById();
+        // 建立其他计划树
+        CcPrjStructNode ccPrjStructNodeOther = CcPrjStructNode.insertData();
+        ccPrjStructNodeOther.setCcPrjId(ccPrjId);
+        ccPrjStructNodeOther.setCcPrjWbsTypeId("OTHER");
+        ccPrjStructNodeOther.setIsWbs(true);
+        ccPrjStructNodeOther.setName("其他计划");
+        ccPrjStructNodeOther.setCcPrjStructNodePid(ccPrjStructNode.getId());
+        ccPrjStructNodeOther.updateById();
     }
 
 }
