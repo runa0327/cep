@@ -127,6 +127,10 @@ public class CcPrjMember {
          */
         public static final String AD_USER_ID = "AD_USER_ID";
         /**
+         * {"EN": "是否主要", "ZH_CN": "是否主岗", "ZH_TW": "是否主要"}。
+         */
+        public static final String IS_PRIMARY_POS = "IS_PRIMARY_POS";
+        /**
          * {"EN": "参建方", "ZH_CN": "参建方", "ZH_TW": "参建方"}。
          */
         public static final String CC_PARTY_ID = "CC_PARTY_ID";
@@ -860,6 +864,42 @@ public class CcPrjMember {
             this.adUserId = adUserId;
             if (!this.toUpdateCols.contains("AD_USER_ID")) {
                 this.toUpdateCols.add("AD_USER_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "是否主要", "ZH_CN": "是否主岗", "ZH_TW": "是否主要"}。
+     */
+    private Boolean isPrimaryPos;
+
+    /**
+     * 获取：{"EN": "是否主要", "ZH_CN": "是否主岗", "ZH_TW": "是否主要"}。
+     */
+    public Boolean getIsPrimaryPos() {
+        return this.isPrimaryPos;
+    }
+
+    /**
+     * 设置：{"EN": "是否主要", "ZH_CN": "是否主岗", "ZH_TW": "是否主要"}。
+     */
+    public CcPrjMember setIsPrimaryPos(Boolean isPrimaryPos) {
+        if (this.isPrimaryPos == null && isPrimaryPos == null) {
+            // 均为null，不做处理。
+        } else if (this.isPrimaryPos != null && isPrimaryPos != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isPrimaryPos.compareTo(isPrimaryPos) != 0) {
+                this.isPrimaryPos = isPrimaryPos;
+                if (!this.toUpdateCols.contains("IS_PRIMARY_POS")) {
+                    this.toUpdateCols.add("IS_PRIMARY_POS");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isPrimaryPos = isPrimaryPos;
+            if (!this.toUpdateCols.contains("IS_PRIMARY_POS")) {
+                this.toUpdateCols.add("IS_PRIMARY_POS");
             }
         }
         return this;

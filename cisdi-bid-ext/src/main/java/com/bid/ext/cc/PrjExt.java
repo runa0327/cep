@@ -3,9 +3,12 @@ package com.bid.ext.cc;
 import cn.hutool.core.util.IdUtil;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.login.LoginInfo;
+import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.ViewNavExtResult;
 import com.qygly.shared.util.EntityRecordUtil;
@@ -271,6 +274,7 @@ public class PrjExt {
             AdUser adUser = AdUser.selectById(userId);
             String userName = adUser.getName();
             ccPrjMember.setName(userName);
+            ccPrjMember.setIsPrimaryPos(true);
             ccPrjMember.updateById();
 
 
@@ -278,7 +282,7 @@ public class PrjExt {
     }
 
     /**
-     * 创建项目同步创建成本统览，项目四算，结算
+     * 创建项目初始化计划
      */
     public void creatWbsTree() {
         EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
@@ -332,6 +336,60 @@ public class PrjExt {
         ccPrjStructNodeOther.setName("其他计划");
         ccPrjStructNodeOther.setCcPrjStructNodePid(ccPrjStructNode.getId());
         ccPrjStructNodeOther.updateById();
+    }
+
+    /**
+     * 新增，修改成员
+     */
+    public void updateIsPost() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        SevInfo sevInfo = ExtJarHelper.getSevInfo();
+        EntityInfo entityInfo = sevInfo.entityInfo;
+        String entityCode = entityInfo.code;
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String id = EntityRecordUtil.getId(entityRecord);
+            Map<String, Object> valueMap = entityRecord.valueMap;
+
+            //新增、编辑为主岗时，查询成员在项目内是否存在主岗，若存在,则将项目内其他岗位的此用户改为不为主岗
+            Boolean isPrimaryPos = JdbcMapUtil.getBoolean(valueMap, "IS_PRIMARY_POS");
+            String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
+            String adUserId = JdbcMapUtil.getString(valueMap, "AD_USER_ID");
+            if (isPrimaryPos) {
+                List<CcPrjMember> ccPrjMembers = CcPrjMember.selectByWhere(new Where().eq(CcPrjMember.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjMember.Cols.AD_USER_ID, adUserId));
+                for (CcPrjMember ccPrjMember : ccPrjMembers) {
+                    ccPrjMember.setIsPrimaryPos(false);
+                    ccPrjMember.updateById();
+                }
+                int update = myJdbcTemplate.update("update " + entityCode + " t set t.IS_DEFAULT = ? where t.id=?", isPrimaryPos, id);
+            }
+        }
+    }
+
+    /**
+     * 删除成员
+     */
+    public void deleteIsPost() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String id = EntityRecordUtil.getId(entityRecord);
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
+            String adUserId = JdbcMapUtil.getString(valueMap, "AD_USER_ID");
+            //判断是否还有其他岗位
+            List<CcPrjMember> ccPrjMembers = CcPrjMember.selectByWhere(new Where().eq(CcPrjMember.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjMember.Cols.AD_USER_ID, adUserId));
+            //若有则查询删除的是否为主岗
+            if (ccPrjMembers.size() > 2) {
+                CcPrjMember ccPrjMember = CcPrjMember.selectById(id);
+                Boolean isPrimaryPos = ccPrjMember.getIsPrimaryPos();
+                //若为主岗，则将其他任意的一个岗位改为主岗
+                if (isPrimaryPos) {
+                    List<CcPrjMember> notCcPrjMembers = CcPrjMember.selectByWhere(new Where().eq(CcPrjMember.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjMember.Cols.AD_USER_ID, adUserId).neq(CcPrjMember.Cols.ID, id));
+                    for (CcPrjMember ccPrjMember1 : notCcPrjMembers) {
+                        ccPrjMember1.setIsPrimaryPos(true);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
 }
