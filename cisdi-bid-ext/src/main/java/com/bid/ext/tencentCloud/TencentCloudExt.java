@@ -152,7 +152,7 @@ public class TencentCloudExt {
             //匹配成功判定
             if (verifyPersonResponse.getIsMatch()) {
                 MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
-                String queryRule = "SELECT  MEMBER.AD_USER_ID,SHIFT.ATD_TIME_FR,SHIFT.ATD_TIME_TO ,AREA.LONGITUDE,AREA.LATITUDE,AREA.RADIUS,`GROUP`.IS_OUT_OF_ATD_AREA_ALLOWED,AREA.ID AREA_ID" +
+                String queryRule = "SELECT  MEMBER.AD_USER_ID,SHIFT.ATD_TIME_FR,SHIFT.ATD_TIME_TO ,AREA.LONGITUDE,AREA.LATITUDE,AREA.RADIUS,`GROUP`.IS_OUT_OF_ATD_AREA_ALLOWED,`GROUP`.CC_PRJ_ID,AREA.ID AREA_ID" +
                         " FROM   cc_atd_group_member MEMBER  , cc_atd_group `GROUP` ,  cc_atd_work_shift SHIFT , cc_atd_area AREA " +
                         " WHERE MEMBER.AD_USER_ID = ? AND  MEMBER.CC_ATD_GROUP_ID=`GROUP`.ID AND  `GROUP`.CC_ATD_RULE_ID =  SHIFT.CC_ATD_RULE_ID AND  `GROUP`.CC_ATD_RULE_ID = AREA.CC_ATD_RULE_ID";
 
@@ -169,6 +169,7 @@ public class TencentCloudExt {
                 String areaId = null;
                 Time timeFr = null;
                 Time timeTo = null;
+                String ccPrjId = null;
                 for (Map<String, Object> map : maps) {
                     BigDecimal longitude = (BigDecimal) map.get("LONGITUDE");
                     BigDecimal latitude = (BigDecimal) map.get("LATITUDE");
@@ -182,10 +183,12 @@ public class TencentCloudExt {
                     if (distance <= radius.doubleValue()) {
                         inAtdArea = true;
                         areaId = (String) map.get("AREA_ID");
+                        ccPrjId = (String) map.get("CC_PRJ_ID");
                     }
 
                     if ((Integer) map.get("IS_OUT_OF_ATD_AREA_ALLOWED") == 1) {
                         isOutOfAtdAreaAllowed = true;
+                        ccPrjId = (String) map.get("CC_PRJ_ID");
                     }
                 }
 
@@ -215,6 +218,7 @@ public class TencentCloudExt {
                 ccAtdHit.setIsSupplementHit(false);
                 ccAtdHit.setIsOnDuty(of.compareTo(now) > 0 ? true : false);
                 ccAtdHit.setIsNormal(isNormal);
+                ccAtdHit.setCcPrjId(ccPrjId);
 
                 ccAtdHit.insertById();
 
@@ -225,7 +229,6 @@ public class TencentCloudExt {
                 resultMap.put("isOutOfAtdArea", ccAtdHit.getIsOutOfAtdArea());
                 resultMap.put("hitLocation", hitLocation);
                 resultMap.put("hitDttm", ccAtdHit.getHitDttm().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
 
             } else {
                 resultMap.put("code", 500);
@@ -332,13 +335,13 @@ public class TencentCloudExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         //请求参数
         String startDate = varMap.get("P_FROM_DATE") == null ? null : varMap.get("P_FROM_DATE").toString();
-        String endDate = varMap.get("P_TO_DATE") == null ? null : varMap.get("P_TO_DATE").toString();
+            String endDate = varMap.get("P_TO_DATE") == null ? null : varMap.get("P_TO_DATE").toString();
         String groupIds = varMap.get("P_CC_ATD_GROUP_IDS") == null ? null : varMap.get("P_CC_ATD_GROUP_IDS").toString();
         String userIds = varMap.get("P_AD_USER_IDS") == null ? null : varMap.get("P_AD_USER_IDS").toString();
 
 
         String queryHit = "SELECT " +
-                "HIT.AD_USER_ID ,  HIT.HIT_DTTM  ,HIT.CC_ATD_AREA_ID ,HIT.IS_NORMAL,HIT.IS_ON_DUTY" +
+                "HIT.AD_USER_ID ,  HIT.HIT_DTTM  ,HIT.CC_ATD_AREA_ID ,HIT.IS_NORMAL,HIT.IS_ON_DUTY , HIT.CC_PRJ_ID" +
                 ",AREA.ID AREA_ID ,AREA.CC_ATD_RULE_ID " +
                 " FROM  cc_atd_hit  HIT, cc_atd_area AREA " +
                 " WHERE  HIT.CC_ATD_AREA_ID=AREA.ID   AND  HIT.HIT_DTTM BETWEEN ? AND ? ";
@@ -371,7 +374,7 @@ public class TencentCloudExt {
         List<Map<String, Object>> groups = null;
         //查询考勤组
         if (StringUtils.hasLength(groupIds)) {
-            String queryGroup = "SELECT `GROUP`.CC_ATD_RULE_ID ,  `GROUP`.ID GROUP_ID" +
+            String queryGroup = "SELECT `GROUP`.CC_ATD_RULE_ID , `GROUP`.ID GROUP_ID , `GROUP`.CC_PRJ_ID" +
                     " FROM cc_atd_group `GROUP` " +
                     " WHERE `GROUP`.ID  IN (" + groupIds +
                     ")";
@@ -413,6 +416,8 @@ public class TencentCloudExt {
             calculateMembers = members;
         }
 
+        List<CcPrjMember> ccPrjMembers = CcPrjMember.selectByWhere(null);
+
         if (calculateMembers.isEmpty()) {
             throw new BaseException("所选考勤人员未在所选考勤组中！");
         }
@@ -437,6 +442,7 @@ public class TencentCloudExt {
                 "where  sp.ATD_DATE BETWEEN ? AND ? ";
 
         List<Map<String, Object>> spDateMaps = null;
+
         try {
             spDateMaps = myJdbcTemplate.queryForList(querySpData, startDate, endDate);
         } catch (EmptyResultDataAccessException e) {
@@ -520,10 +526,14 @@ public class TencentCloudExt {
                 boolean haveClockIn = false;
                 boolean haveClockOut = false;
                 String remark = null;
+                String  ccPartyCompanyId = null;
 
-                for (Map<String, Object> hit : hits) {//考勤结果
-                    LocalDateTime hitTime = (LocalDateTime) hit.get("HIT_DTTM");//考勤时间
-                    String userId = (String) hit.get("AD_USER_ID");//考勤时间
+                for (Map<String, Object> hit : hits) {//打卡记录
+                    LocalDateTime hitTime = (LocalDateTime) hit.get("HIT_DTTM");//打卡时间
+                    String userId = (String) hit.get("AD_USER_ID");//打卡人
+                    String ccPrjId = null;
+
+
 
                     if (hitTime.toLocalDate().compareTo(day) == 0 && memberUserId.equals(userId)) {
                         Integer isNormal = (Integer) hit.get("IS_NORMAL");
@@ -534,14 +544,28 @@ public class TencentCloudExt {
                                 clockInNormal = true;
                             }
                             haveClockIn = true;
+                            ccPrjId = (String) hit.get("CC_PRJ_ID");//打卡项目
                         } else {//下班考勤
                             if (isNormal == 1) {
                                 clockOutNormal = true;
                             }
                             haveClockOut = true;
+                            ccPrjId = (String) hit.get("CC_PRJ_ID");//打卡项目
                         }
                     }
+
+                    if (haveClockIn || haveClockOut){
+                        for (int i = 0; i < ccPrjMembers.size() ; i++) {
+                            CcPrjMember ccPrjMember = ccPrjMembers.get(i);
+                            if (ccPrjMember.getAdUserId().equals(userId) && ccPrjMember.getCcPrjId().equals(ccPrjId) && ccPrjMember.getIsPrimaryPos()){//当前人员是否是次公司主岗
+                                ccPartyCompanyId = ccPrjMember.getCcPartyCompanyId();
+                            }
+                        }
+                    }
+
                 }
+
+
 
                 if (clockInNormal && clockOutNormal) {//上下班考勤都正常
                     resultIsNormal = true;
@@ -578,6 +602,7 @@ public class TencentCloudExt {
 //                where.eq("ATD_DATE", day);
 //                where.eq("AD_USER_ID", memberUserId);
 //                List<CcAtdResult> ccAtdResults = CcAtdResult.selectByWhere(where);
+
                 List<CcAtdResult> ccAtdResults = new ArrayList<>();
                 for (CcAtdResult res : ccAtdResults1) {
                     if (memberUserId.equals(res.getAdUserId()) && day.compareTo(res.getAtdDate()) == 0) {
@@ -598,6 +623,7 @@ public class TencentCloudExt {
                     result = ccAtdResults.get(0);
                     result.setIsNormal(resultIsNormal);
                     result.setRemark(remark);
+                    result.setCcPartyCompanyId(ccPartyCompanyId);
                     result.updateById();
                 } else {//不存在，新增
                     result = CcAtdResult.newData();
@@ -605,6 +631,7 @@ public class TencentCloudExt {
                     result.setAdUserId(memberUserId);
                     result.setIsNormal(resultIsNormal);
                     result.setRemark(remark);
+                    result.setCcPartyCompanyId(ccPartyCompanyId);
                     result.insertById();
                 }
             }
