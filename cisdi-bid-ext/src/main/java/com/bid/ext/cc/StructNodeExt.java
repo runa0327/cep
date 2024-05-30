@@ -182,9 +182,14 @@ public class StructNodeExt {
         Integer planToDayNo = nodeData.get("PLAN_TO_DAY_NO") != null ? Integer.parseInt(nodeData.get("PLAN_TO_DAY_NO").toString()) : 1;
 
         LocalDate topNodePlanFr = JdbcMapUtil.getLocalDate(topNode, "PLAN_FR");
-        LocalDate fromDate = topNodePlanFr.plusDays(planFrDayNo - 1);
-        LocalDate toDate = topNodePlanFr.plusDays(planToDayNo - 1);
-        BigDecimal planDays = BigDecimal.valueOf(planToDayNo - planFrDayNo + 1);
+        LocalDate fromDate = null;
+        LocalDate toDate = null;
+        BigDecimal planDays = BigDecimal.ZERO;
+        if (topNodePlanFr != null) {
+            fromDate = topNodePlanFr.plusDays(planFrDayNo - 1);
+            toDate = topNodePlanFr.plusDays(planToDayNo - 1);
+            planDays = BigDecimal.valueOf(planToDayNo - planFrDayNo + 1);
+        }
 
         CcPrjStructNode ccPrjStructNode = new CcPrjStructNode();
         ccPrjStructNode.setCrtDt(LocalDateTime.now());
