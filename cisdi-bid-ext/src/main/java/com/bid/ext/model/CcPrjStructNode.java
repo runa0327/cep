@@ -189,6 +189,10 @@ public class CcPrjStructNode {
          */
         public static final String CC_WBS_PROGRESS_STATUS_ID = "CC_WBS_PROGRESS_STATUS_ID";
         /**
+         * {"EN": "进展比例（%）", "ZH_CN": "实际进度比例（%）", "ZH_TW": "进展比例（%）"}。
+         */
+        public static final String ACT_WBS_PCT = "ACT_WBS_PCT";
+        /**
          * {"EN": "进度风险", "ZH_CN": "进度风险", "ZH_TW": "进度风险"}。
          */
         public static final String CC_WBS_RISK_ID = "CC_WBS_RISK_ID";
@@ -1510,6 +1514,42 @@ public class CcPrjStructNode {
             this.ccWbsProgressStatusId = ccWbsProgressStatusId;
             if (!this.toUpdateCols.contains("CC_WBS_PROGRESS_STATUS_ID")) {
                 this.toUpdateCols.add("CC_WBS_PROGRESS_STATUS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "进展比例（%）", "ZH_CN": "实际进度比例（%）", "ZH_TW": "进展比例（%）"}。
+     */
+    private Integer actWbsPct;
+
+    /**
+     * 获取：{"EN": "进展比例（%）", "ZH_CN": "实际进度比例（%）", "ZH_TW": "进展比例（%）"}。
+     */
+    public Integer getActWbsPct() {
+        return this.actWbsPct;
+    }
+
+    /**
+     * 设置：{"EN": "进展比例（%）", "ZH_CN": "实际进度比例（%）", "ZH_TW": "进展比例（%）"}。
+     */
+    public CcPrjStructNode setActWbsPct(Integer actWbsPct) {
+        if (this.actWbsPct == null && actWbsPct == null) {
+            // 均为null，不做处理。
+        } else if (this.actWbsPct != null && actWbsPct != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.actWbsPct.compareTo(actWbsPct) != 0) {
+                this.actWbsPct = actWbsPct;
+                if (!this.toUpdateCols.contains("ACT_WBS_PCT")) {
+                    this.toUpdateCols.add("ACT_WBS_PCT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.actWbsPct = actWbsPct;
+            if (!this.toUpdateCols.contains("ACT_WBS_PCT")) {
+                this.toUpdateCols.add("ACT_WBS_PCT");
             }
         }
         return this;

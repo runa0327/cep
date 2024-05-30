@@ -293,6 +293,8 @@ public class StructNodeExt {
         }
 
         LocalDateTime progTime = nodeData.get("PROG_TIME") != null ? LocalDateTime.parse(nodeData.get("PROG_TIME").toString()) : null;
+        Integer actWbsPct = JdbcMapUtil.getInt(nodeData, "ACT_WBS_PCT");
+        String wbsProgressStatusId = JdbcMapUtil.getString(nodeData, "CC_WBS_PROGRESS_STATUS_ID");
         String ccWbsStatusId = nodeData.get("CC_WBS_STATUS_ID") != null ? nodeData.get("CC_WBS_STATUS_ID").toString() : null;
         String ccWbsRiskId = nodeData.get("CC_WBS_RISK_ID") != null ? nodeData.get("CC_WBS_RISK_ID").toString() : null;
         String ccRiskLvlId = nodeData.get("CC_RISK_LVL_ID") != null ? nodeData.get("CC_RISK_LVL_ID").toString() : null;
@@ -304,6 +306,8 @@ public class StructNodeExt {
         ccPrjStructNode.setLastModiUserId(loginInfo.userInfo.id);
         ccPrjStructNode.setCcPrjId(ccPrjId);
         ccPrjStructNode.setProgTime(progTime);
+        ccPrjStructNode.setActWbsPct(actWbsPct);
+        ccPrjStructNode.setCcWbsProgressStatusId(wbsProgressStatusId);
         ccPrjStructNode.setCcWbsStatusId(ccWbsStatusId);
         ccPrjStructNode.setCcWbsRiskId(ccWbsRiskId);
         ccPrjStructNode.setCcRiskLvlId(ccRiskLvlId);
@@ -398,7 +402,6 @@ public class StructNodeExt {
         Set<String> childStatuses = new HashSet<>();
         LocalDateTime maxProgTime = null; // 初始化最大进展时间为null
         LocalDate today = LocalDate.now();
-
         boolean allChildrenHaveActTo = true; // 假设所有子节点都有实际完成时间
 
         for (Map<String, Object> child : children) {
@@ -409,6 +412,7 @@ public class StructNodeExt {
             LocalDate childMinActDate = getDateFromSql((java.sql.Date) child.get("ACT_FR"));
             LocalDate childMaxActDate = getDateFromSql((java.sql.Date) child.get("ACT_TO"));
 
+            // 更新风险等级
             String riskLevel = determineRiskLevel(childMaxDate, childMaxActDate, today);
             myJdbcTemplate.update("UPDATE cc_prj_struct_node SET CC_WBS_RISK_ID = ? WHERE ID = ?", riskLevel, child.get("ID"));
 
@@ -429,9 +433,18 @@ public class StructNodeExt {
             }
 
             LocalDateTime childProgTime = child.get("PROG_TIME") != null ? LocalDateTime.parse(child.get("PROG_TIME").toString()) : null;
+            // 子节点进展时间不为空且最大进展为空或子节点进展时间晚于最大进展时间
             if (childProgTime != null && (maxProgTime == null || childProgTime.isAfter(maxProgTime))) {
                 maxProgTime = childProgTime; // 更新最大进展时间
             }
+        }
+
+        if (children.isEmpty()) {
+            Map<String, Object> nodeData = myJdbcTemplate.queryForMap("SELECT PLAN_FR, PLAN_TO, ACT_FR, ACT_TO FROM cc_prj_struct_node WHERE ID = ?", nodeId);
+            minDate = getDateFromSql((java.sql.Date) nodeData.get("PLAN_FR"));
+            maxDate = getDateFromSql((java.sql.Date) nodeData.get("PLAN_TO"));
+            minActDate = getDateFromSql((java.sql.Date) nodeData.get("ACT_FR"));
+            maxActDate = getDateFromSql((java.sql.Date) nodeData.get("ACT_TO"));
         }
 
         // 如果任何一个子节点的实际完成日期为空，则父节点的实际完成日期也为空
@@ -444,20 +457,16 @@ public class StructNodeExt {
             myJdbcTemplate.update("UPDATE cc_prj_struct_node SET PROG_TIME = ? WHERE ID = ?", maxProgTime, nodeId);
         }
 
+        // 确定新的进展状态
+        String status = calculateStatus(maxDate, minActDate, maxActDate, today);
+        myJdbcTemplate.update("UPDATE cc_prj_struct_node SET CC_WBS_PROGRESS_STATUS_ID = ? WHERE ID = ?", status, nodeId);
+
         // 确定新的状态
         String newStatus = determineNewStatus(childStatuses);
         if (newStatus != null && !newStatus.isEmpty()) {  // 确保状态不是null或空字符串
             myJdbcTemplate.update("UPDATE cc_prj_struct_node SET CC_WBS_STATUS_ID = ? WHERE ID = ?", newStatus, nodeId);
         }
 
-
-        if (children.isEmpty()) {
-            Map<String, Object> nodeData = myJdbcTemplate.queryForMap("SELECT PLAN_FR, PLAN_TO, ACT_FR, ACT_TO FROM cc_prj_struct_node WHERE ID = ?", nodeId);
-            minDate = getDateFromSql((java.sql.Date) nodeData.get("PLAN_FR"));
-            maxDate = getDateFromSql((java.sql.Date) nodeData.get("PLAN_TO"));
-            minActDate = getDateFromSql((java.sql.Date) nodeData.get("ACT_FR"));
-            maxActDate = getDateFromSql((java.sql.Date) nodeData.get("ACT_TO"));
-        }
 
         updateNodeDates(nodeId, minDate, maxDate, minActDate, maxActDate, myJdbcTemplate);
 
@@ -475,12 +484,12 @@ public class StructNodeExt {
     }
 
     /**
-     * 风险计算
+     * 进度风险计算
      *
      * @param planTo 计划完成日期
      * @param actTo  实际完成日期
      * @param today  当前日期
-     * @return 风险等级
+     * @return 进度风险
      */
     private String determineRiskLevel(LocalDate planTo, LocalDate actTo, LocalDate today) {
         if (planTo == null) {
@@ -499,6 +508,38 @@ public class StructNodeExt {
         return "NONE";
     }
 
+    /**
+     * 进展风险计算
+     *
+     * @param planTo  计划完成日期
+     * @param actFrom 实际开始日期
+     * @param actTo   实际完成日期
+     * @param today   当前日期
+     * @return 进展风险
+     */
+    private String calculateStatus(LocalDate planTo, LocalDate actFrom, LocalDate actTo, LocalDate today) {
+        if (planTo == null) {
+            return "TODO";  // 如果没有计划完成日期，进展状态为未启动TODO
+        }
+
+        if (actFrom == null) {
+            if (planTo.isBefore(today)) {
+                return "OVER";
+            } else {
+                return "TODO";
+            }
+        }
+
+        if (actTo == null) {
+            if (today.isAfter(planTo)) {
+                return "OVER";
+            } else {
+                return "DOING";
+            }
+        }
+
+        return "DONE";
+    }
 
     /**
      * 根据子节点状态决定父节点状态
@@ -634,10 +675,11 @@ public class StructNodeExt {
         String submitUserId = varMap.get("P_SUMBIT_USER_ID").toString();
         String progTimeStr = varMap.get("P_PROG_TIME").toString(); // 获取日期时间字符串
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDate pActFr = JdbcMapUtil.getLocalDate(varMap, "P_ACT_FR");
         LocalDateTime now = LocalDateTime.parse(progTimeStr, formatter);
-//        String wbsStatusId = varMap.get("P_WBS_STATUS_ID").toString();
+        Integer actWbsPct = JdbcMapUtil.getInt(varMap, "P_ACT_WBS_PCT");
         String wbsStatusId = JdbcMapUtil.getString(varMap, "P_WBS_STATUS_ID");
-        String wbsProgressStatusId = JdbcMapUtil.getString(varMap, "CC_WBS_PROGRESS_STATUS_ID");
+        String wbsProgressStatusId = JdbcMapUtil.getString(varMap, "P_WBS_PROGRESS_STATUS_ID");
         String remark = varMap.get("P_REMARK") != null ? varMap.get("P_REMARK").toString() : "";
         String attachments = varMap.get("P_ATTACHMENTS") != null ? varMap.get("P_ATTACHMENTS").toString() : "";
 
@@ -648,35 +690,52 @@ public class StructNodeExt {
             String nodeId = entityRecord.csCommId;
             List<Map<String, Object>> children = getChildNodes(nodeId); // 获取当前节点的子节点
             if (children.isEmpty()) { // 如果是叶子节点
-                String insertSql = "INSERT INTO CC_PRJ_STRUCT_NODE_PROG (ID, CC_PRJ_ID, CC_PRJ_STRUCT_NODE_ID, CRT_USER_ID, LAST_MODI_USER_ID, SUMBIT_USER_ID, PROG_TIME, CC_WBS_STATUS_ID, REMARK, CC_ATTACHMENTS, CRT_DT, LAST_MODI_DT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
-                myJdbcTemplate.update(insertSql, id, ccPrjId, nodeId, submitUserId, submitUserId, submitUserId, now, wbsStatusId, remark, attachments, now, now);
+                String insertSql = "INSERT INTO CC_PRJ_STRUCT_NODE_PROG (ID, CC_PRJ_ID, CC_PRJ_STRUCT_NODE_ID, CRT_USER_ID, LAST_MODI_USER_ID, SUMBIT_USER_ID, PROG_TIME, ACT_WBS_PCT, CC_WBS_STATUS_ID, CC_WBS_PROGRESS_STATUS_ID, REMARK, CC_ATTACHMENTS, CRT_DT, LAST_MODI_DT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                myJdbcTemplate.update(insertSql, id, ccPrjId, nodeId, submitUserId, submitUserId, submitUserId, now, actWbsPct, wbsStatusId, wbsProgressStatusId, remark, attachments, now, now);
 
                 CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(nodeId);
                 ccPrjStructNode.setProgTime(now);
+                ccPrjStructNode.setActWbsPct(actWbsPct);
                 ccPrjStructNode.setCcWbsStatusId(wbsStatusId);
                 ccPrjStructNode.setCcWbsProgressStatusId(wbsProgressStatusId);
                 LocalDate actFr = ccPrjStructNode.getActFr();
-                LocalDate actTo = ccPrjStructNode.getActTo();
                 long actDays;
 
                 // 根据不同的状态更新实际开始和结束日期
-                switch (wbsStatusId) {
-                    case "TODO":
-                        ccPrjStructNode.setActFr(null);
-                        ccPrjStructNode.setActTo(null);
-                        ccPrjStructNode.setActDays(BigDecimal.ZERO);
-                        break;
+//                switch (wbsStatusId) {
+//                    case "TODO":
+//                        ccPrjStructNode.setActFr(null);
+//                        ccPrjStructNode.setActTo(null);
+//                        ccPrjStructNode.setActDays(BigDecimal.ZERO);
+//                        break;
+//                    case "DOING":
+//                        if (actFr == null) {
+//                            ccPrjStructNode.setActFr(now.toLocalDate());
+//                        }
+//                        ccPrjStructNode.setActTo(null);
+//                        break;
+//                    case "DONE":
+//                        // 实际开始时间为空
+//                        if (actFr == null || actFr.isAfter(now.toLocalDate())) {
+//                            ccPrjStructNode.setActFr(now.toLocalDate());
+//                        }
+//                        ccPrjStructNode.setActTo(now.toLocalDate());
+//                        break;
+//                }
+                //根据不同的状态更新实际开始和结束日期
+                switch (wbsProgressStatusId) {
                     case "DOING":
                         if (actFr == null) {
-                            ccPrjStructNode.setActFr(now.toLocalDate());
+                            ccPrjStructNode.setActFr(pActFr);
                         }
                         ccPrjStructNode.setActTo(null);
                         break;
                     case "DONE":
-                        // 实际开始时间为空
+                        // 实际开始时间为空,更新实际开始时间
                         if (actFr == null || actFr.isAfter(now.toLocalDate())) {
-                            ccPrjStructNode.setActFr(now.toLocalDate());
+                            ccPrjStructNode.setActFr(pActFr);
                         }
+                        // 更新实际完成时间
                         ccPrjStructNode.setActTo(now.toLocalDate());
                         break;
                 }

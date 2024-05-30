@@ -276,8 +276,6 @@ public class PrjExt {
             ccPrjMember.setName(userName);
             ccPrjMember.setIsPrimaryPos(true);
             ccPrjMember.updateById();
-
-
         }
     }
 
@@ -295,6 +293,7 @@ public class PrjExt {
         ccPrjStructNode.setCcPrjWbsTypeId("ALL");
         ccPrjStructNode.setIsWbs(true);
         ccPrjStructNode.setName("全景计划");
+        ccPrjStructNode.setStatus("DR");
         ccPrjStructNode.updateById();
         // 建立前期计划树
         CcPrjStructNode ccPrjStructNodePre = CcPrjStructNode.insertData();
@@ -303,6 +302,7 @@ public class PrjExt {
         ccPrjStructNodePre.setIsWbs(true);
         ccPrjStructNodePre.setName("前期计划");
         ccPrjStructNodePre.setCcPrjStructNodePid(ccPrjStructNode.getId());
+        ccPrjStructNodePre.setStatus("DR");
         ccPrjStructNodePre.updateById();
         // 建立设计计划树
         CcPrjStructNode ccPrjStructNodeDesign = CcPrjStructNode.insertData();
@@ -311,6 +311,7 @@ public class PrjExt {
         ccPrjStructNodeDesign.setIsWbs(true);
         ccPrjStructNodeDesign.setName("设计计划");
         ccPrjStructNodeDesign.setCcPrjStructNodePid(ccPrjStructNode.getId());
+        ccPrjStructNodeDesign.setStatus("DR");
         ccPrjStructNodeDesign.updateById();
         // 建立招采计划树
         CcPrjStructNode ccPrjStructNodePurchase = CcPrjStructNode.insertData();
@@ -319,6 +320,7 @@ public class PrjExt {
         ccPrjStructNodePurchase.setIsWbs(true);
         ccPrjStructNodePurchase.setName("招采计划");
         ccPrjStructNodePurchase.setCcPrjStructNodePid(ccPrjStructNode.getId());
+        ccPrjStructNodePurchase.setStatus("DR");
         ccPrjStructNodePurchase.updateById();
         // 建立施工计划树
         CcPrjStructNode ccPrjStructNodeConstruct = CcPrjStructNode.insertData();
@@ -327,6 +329,7 @@ public class PrjExt {
         ccPrjStructNodeConstruct.setIsWbs(true);
         ccPrjStructNodeConstruct.setName("施工计划");
         ccPrjStructNodeConstruct.setCcPrjStructNodePid(ccPrjStructNode.getId());
+        ccPrjStructNodeConstruct.setStatus("DR");
         ccPrjStructNodeConstruct.updateById();
         // 建立其他计划树
         CcPrjStructNode ccPrjStructNodeOther = CcPrjStructNode.insertData();
@@ -335,6 +338,7 @@ public class PrjExt {
         ccPrjStructNodeOther.setIsWbs(true);
         ccPrjStructNodeOther.setName("其他计划");
         ccPrjStructNodeOther.setCcPrjStructNodePid(ccPrjStructNode.getId());
+        ccPrjStructNodeOther.setStatus("DR");
         ccPrjStructNodeOther.updateById();
     }
 
@@ -351,7 +355,7 @@ public class PrjExt {
             Map<String, Object> valueMap = entityRecord.valueMap;
 
             //新增、编辑为主岗时，查询成员在项目内是否存在主岗，若存在,则将项目内其他岗位的此用户改为不为主岗
-            Boolean isPrimaryPos = JdbcMapUtil.getBoolean(valueMap, "IS_PRIMARY_POS");
+            Boolean isPrimaryPos = (Boolean) valueMap.get("IS_PRIMARY_POS");
             String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
             String adUserId = JdbcMapUtil.getString(valueMap, "AD_USER_ID");
             if (isPrimaryPos) {
@@ -360,7 +364,7 @@ public class PrjExt {
                     ccPrjMember.setIsPrimaryPos(false);
                     ccPrjMember.updateById();
                 }
-                int update = myJdbcTemplate.update("update " + entityCode + " t set t.IS_DEFAULT = ? where t.id=?", isPrimaryPos, id);
+                int update = myJdbcTemplate.update("update " + entityCode + " t set t.IS_PRIMARY_POS = ? where t.id=?", isPrimaryPos, id);
             }
         }
     }
@@ -377,7 +381,7 @@ public class PrjExt {
             //判断是否还有其他岗位
             List<CcPrjMember> ccPrjMembers = CcPrjMember.selectByWhere(new Where().eq(CcPrjMember.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjMember.Cols.AD_USER_ID, adUserId));
             //若有则查询删除的是否为主岗
-            if (ccPrjMembers.size() > 2) {
+            if (ccPrjMembers.size() > 1) {
                 CcPrjMember ccPrjMember = CcPrjMember.selectById(id);
                 Boolean isPrimaryPos = ccPrjMember.getIsPrimaryPos();
                 //若为主岗，则将其他任意的一个岗位改为主岗
@@ -385,6 +389,7 @@ public class PrjExt {
                     List<CcPrjMember> notCcPrjMembers = CcPrjMember.selectByWhere(new Where().eq(CcPrjMember.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjMember.Cols.AD_USER_ID, adUserId).neq(CcPrjMember.Cols.ID, id));
                     for (CcPrjMember ccPrjMember1 : notCcPrjMembers) {
                         ccPrjMember1.setIsPrimaryPos(true);
+                        ccPrjMember1.updateById();
                         break;
                     }
                 }
