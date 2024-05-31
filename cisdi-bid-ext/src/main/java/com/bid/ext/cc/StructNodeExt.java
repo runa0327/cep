@@ -1209,7 +1209,7 @@ public class StructNodeExt {
             // 比较PurchaseAmtSum和bidAmt
             int comparisonResult = purchaseAmtInBidSum.compareTo(bidAmt);
             if (comparisonResult > 0) {
-                throw new BaseException("已采购额大于已招标额！");
+                throw new BaseException("合同额大于已招标额！");
             }
 
             // 4.存储成本统览关联明细
