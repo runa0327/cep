@@ -13,6 +13,7 @@ public class CcSpotExamiExt {
      */
     public void getSpotExamiCopyUser() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
             String csCommId = entityRecord.csCommId;
             CcSpotExami ccSpotExami = CcSpotExami.selectById(csCommId);
             String copyUserIds = ccSpotExami.getCarbonCopyUserIds();

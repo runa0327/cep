@@ -286,6 +286,7 @@ public class PrjExt {
         EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
         Map<String, Object> valueMap = entityRecord.valueMap;
         String ccPrjId = JdbcMapUtil.getString(valueMap, "ID");
+        BigDecimal seqNo = BigDecimal.ZERO;
 
         // 建立全景计划树
         CcPrjStructNode ccPrjStructNode = CcPrjStructNode.insertData();
@@ -303,6 +304,9 @@ public class PrjExt {
         ccPrjStructNodePre.setName("前期计划");
         ccPrjStructNodePre.setCcPrjStructNodePid(ccPrjStructNode.getId());
         ccPrjStructNodePre.setStatus("DR");
+        ccPrjStructNodePre.setSeqNo(seqNo);
+        seqNo = seqNo.add(BigDecimal.ONE);
+
         ccPrjStructNodePre.updateById();
         // 建立设计计划树
         CcPrjStructNode ccPrjStructNodeDesign = CcPrjStructNode.insertData();
@@ -312,6 +316,8 @@ public class PrjExt {
         ccPrjStructNodeDesign.setName("设计计划");
         ccPrjStructNodeDesign.setCcPrjStructNodePid(ccPrjStructNode.getId());
         ccPrjStructNodeDesign.setStatus("DR");
+        ccPrjStructNodeDesign.setSeqNo(seqNo);
+        seqNo = seqNo.add(BigDecimal.ONE);
         ccPrjStructNodeDesign.updateById();
         // 建立招采计划树
         CcPrjStructNode ccPrjStructNodePurchase = CcPrjStructNode.insertData();
@@ -321,6 +327,8 @@ public class PrjExt {
         ccPrjStructNodePurchase.setName("招采计划");
         ccPrjStructNodePurchase.setCcPrjStructNodePid(ccPrjStructNode.getId());
         ccPrjStructNodePurchase.setStatus("DR");
+        ccPrjStructNodePurchase.setSeqNo(seqNo);
+        seqNo = seqNo.add(BigDecimal.ONE);
         ccPrjStructNodePurchase.updateById();
         // 建立施工计划树
         CcPrjStructNode ccPrjStructNodeConstruct = CcPrjStructNode.insertData();
@@ -330,6 +338,8 @@ public class PrjExt {
         ccPrjStructNodeConstruct.setName("施工计划");
         ccPrjStructNodeConstruct.setCcPrjStructNodePid(ccPrjStructNode.getId());
         ccPrjStructNodeConstruct.setStatus("DR");
+        ccPrjStructNodeConstruct.setSeqNo(seqNo);
+        seqNo = seqNo.add(BigDecimal.ONE);
         ccPrjStructNodeConstruct.updateById();
         // 建立其他计划树
         CcPrjStructNode ccPrjStructNodeOther = CcPrjStructNode.insertData();
@@ -339,6 +349,7 @@ public class PrjExt {
         ccPrjStructNodeOther.setName("其他计划");
         ccPrjStructNodeOther.setCcPrjStructNodePid(ccPrjStructNode.getId());
         ccPrjStructNodeOther.setStatus("DR");
+        ccPrjStructNodeConstruct.setSeqNo(seqNo);
         ccPrjStructNodeOther.updateById();
     }
 
