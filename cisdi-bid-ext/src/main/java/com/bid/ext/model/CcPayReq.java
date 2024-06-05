@@ -113,9 +113,37 @@ public class CcPayReq {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
+         * {"EN": "乙方", "ZH_CN": "甲方", "ZH_TW": "乙方"}。
+         */
+        public static final String PARTY_A = "PARTY_A";
+        /**
+         * {"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
+         */
+        public static final String PARTY_A_CONTACT_NAME = "PARTY_A_CONTACT_NAME";
+        /**
+         * {"EN": "甲方联系人电话", "ZH_CN": "甲方联系人电话", "ZH_TW": "甲方联系人电话"}。
+         */
+        public static final String PARTY_A_CONTACT_PHONE = "PARTY_A_CONTACT_PHONE";
+        /**
+         * {"EN": "合同乙方", "ZH_CN": "乙方", "ZH_TW": "合同乙方"}。
+         */
+        public static final String PARTY_B = "PARTY_B";
+        /**
+         * {"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
+         */
+        public static final String PARTY_B_CONTACT_NAME = "PARTY_B_CONTACT_NAME";
+        /**
+         * {"EN": "乙方联系人电话", "ZH_CN": "乙方联系人电话", "ZH_TW": "乙方联系人电话"}。
+         */
+        public static final String PARTY_B_CONTACT_PHONE = "PARTY_B_CONTACT_PHONE";
+        /**
          * {"EN": "项目CBS模板", "ZH_CN": "项目CBS模板", "ZH_TW": "项目CBS模板"}。
          */
         public static final String CC_PRJ_CBS_TEMPALTE_NODE_ID = "CC_PRJ_CBS_TEMPALTE_NODE_ID";
+        /**
+         * {"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
+         */
+        public static final String CC_PO_ID = "CC_PO_ID";
         /**
          * {"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
          */
@@ -712,6 +740,222 @@ public class CcPayReq {
     }
 
     /**
+     * {"EN": "乙方", "ZH_CN": "甲方", "ZH_TW": "乙方"}。
+     */
+    private String partyA;
+
+    /**
+     * 获取：{"EN": "乙方", "ZH_CN": "甲方", "ZH_TW": "乙方"}。
+     */
+    public String getPartyA() {
+        return this.partyA;
+    }
+
+    /**
+     * 设置：{"EN": "乙方", "ZH_CN": "甲方", "ZH_TW": "乙方"}。
+     */
+    public CcPayReq setPartyA(String partyA) {
+        if (this.partyA == null && partyA == null) {
+            // 均为null，不做处理。
+        } else if (this.partyA != null && partyA != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.partyA.compareTo(partyA) != 0) {
+                this.partyA = partyA;
+                if (!this.toUpdateCols.contains("PARTY_A")) {
+                    this.toUpdateCols.add("PARTY_A");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.partyA = partyA;
+            if (!this.toUpdateCols.contains("PARTY_A")) {
+                this.toUpdateCols.add("PARTY_A");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
+     */
+    private String partyAContactName;
+
+    /**
+     * 获取：{"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
+     */
+    public String getPartyAContactName() {
+        return this.partyAContactName;
+    }
+
+    /**
+     * 设置：{"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
+     */
+    public CcPayReq setPartyAContactName(String partyAContactName) {
+        if (this.partyAContactName == null && partyAContactName == null) {
+            // 均为null，不做处理。
+        } else if (this.partyAContactName != null && partyAContactName != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.partyAContactName.compareTo(partyAContactName) != 0) {
+                this.partyAContactName = partyAContactName;
+                if (!this.toUpdateCols.contains("PARTY_A_CONTACT_NAME")) {
+                    this.toUpdateCols.add("PARTY_A_CONTACT_NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.partyAContactName = partyAContactName;
+            if (!this.toUpdateCols.contains("PARTY_A_CONTACT_NAME")) {
+                this.toUpdateCols.add("PARTY_A_CONTACT_NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "甲方联系人电话", "ZH_CN": "甲方联系人电话", "ZH_TW": "甲方联系人电话"}。
+     */
+    private String partyAContactPhone;
+
+    /**
+     * 获取：{"EN": "甲方联系人电话", "ZH_CN": "甲方联系人电话", "ZH_TW": "甲方联系人电话"}。
+     */
+    public String getPartyAContactPhone() {
+        return this.partyAContactPhone;
+    }
+
+    /**
+     * 设置：{"EN": "甲方联系人电话", "ZH_CN": "甲方联系人电话", "ZH_TW": "甲方联系人电话"}。
+     */
+    public CcPayReq setPartyAContactPhone(String partyAContactPhone) {
+        if (this.partyAContactPhone == null && partyAContactPhone == null) {
+            // 均为null，不做处理。
+        } else if (this.partyAContactPhone != null && partyAContactPhone != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.partyAContactPhone.compareTo(partyAContactPhone) != 0) {
+                this.partyAContactPhone = partyAContactPhone;
+                if (!this.toUpdateCols.contains("PARTY_A_CONTACT_PHONE")) {
+                    this.toUpdateCols.add("PARTY_A_CONTACT_PHONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.partyAContactPhone = partyAContactPhone;
+            if (!this.toUpdateCols.contains("PARTY_A_CONTACT_PHONE")) {
+                this.toUpdateCols.add("PARTY_A_CONTACT_PHONE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "合同乙方", "ZH_CN": "乙方", "ZH_TW": "合同乙方"}。
+     */
+    private String partyB;
+
+    /**
+     * 获取：{"EN": "合同乙方", "ZH_CN": "乙方", "ZH_TW": "合同乙方"}。
+     */
+    public String getPartyB() {
+        return this.partyB;
+    }
+
+    /**
+     * 设置：{"EN": "合同乙方", "ZH_CN": "乙方", "ZH_TW": "合同乙方"}。
+     */
+    public CcPayReq setPartyB(String partyB) {
+        if (this.partyB == null && partyB == null) {
+            // 均为null，不做处理。
+        } else if (this.partyB != null && partyB != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.partyB.compareTo(partyB) != 0) {
+                this.partyB = partyB;
+                if (!this.toUpdateCols.contains("PARTY_B")) {
+                    this.toUpdateCols.add("PARTY_B");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.partyB = partyB;
+            if (!this.toUpdateCols.contains("PARTY_B")) {
+                this.toUpdateCols.add("PARTY_B");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
+     */
+    private String partyBContactName;
+
+    /**
+     * 获取：{"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
+     */
+    public String getPartyBContactName() {
+        return this.partyBContactName;
+    }
+
+    /**
+     * 设置：{"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
+     */
+    public CcPayReq setPartyBContactName(String partyBContactName) {
+        if (this.partyBContactName == null && partyBContactName == null) {
+            // 均为null，不做处理。
+        } else if (this.partyBContactName != null && partyBContactName != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.partyBContactName.compareTo(partyBContactName) != 0) {
+                this.partyBContactName = partyBContactName;
+                if (!this.toUpdateCols.contains("PARTY_B_CONTACT_NAME")) {
+                    this.toUpdateCols.add("PARTY_B_CONTACT_NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.partyBContactName = partyBContactName;
+            if (!this.toUpdateCols.contains("PARTY_B_CONTACT_NAME")) {
+                this.toUpdateCols.add("PARTY_B_CONTACT_NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "乙方联系人电话", "ZH_CN": "乙方联系人电话", "ZH_TW": "乙方联系人电话"}。
+     */
+    private String partyBContactPhone;
+
+    /**
+     * 获取：{"EN": "乙方联系人电话", "ZH_CN": "乙方联系人电话", "ZH_TW": "乙方联系人电话"}。
+     */
+    public String getPartyBContactPhone() {
+        return this.partyBContactPhone;
+    }
+
+    /**
+     * 设置：{"EN": "乙方联系人电话", "ZH_CN": "乙方联系人电话", "ZH_TW": "乙方联系人电话"}。
+     */
+    public CcPayReq setPartyBContactPhone(String partyBContactPhone) {
+        if (this.partyBContactPhone == null && partyBContactPhone == null) {
+            // 均为null，不做处理。
+        } else if (this.partyBContactPhone != null && partyBContactPhone != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.partyBContactPhone.compareTo(partyBContactPhone) != 0) {
+                this.partyBContactPhone = partyBContactPhone;
+                if (!this.toUpdateCols.contains("PARTY_B_CONTACT_PHONE")) {
+                    this.toUpdateCols.add("PARTY_B_CONTACT_PHONE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.partyBContactPhone = partyBContactPhone;
+            if (!this.toUpdateCols.contains("PARTY_B_CONTACT_PHONE")) {
+                this.toUpdateCols.add("PARTY_B_CONTACT_PHONE");
+            }
+        }
+        return this;
+    }
+
+    /**
      * {"EN": "项目CBS模板", "ZH_CN": "项目CBS模板", "ZH_TW": "项目CBS模板"}。
      */
     private String ccPrjCbsTempalteNodeId;
@@ -742,6 +986,42 @@ public class CcPayReq {
             this.ccPrjCbsTempalteNodeId = ccPrjCbsTempalteNodeId;
             if (!this.toUpdateCols.contains("CC_PRJ_CBS_TEMPALTE_NODE_ID")) {
                 this.toUpdateCols.add("CC_PRJ_CBS_TEMPALTE_NODE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
+     */
+    private String ccPoId;
+
+    /**
+     * 获取：{"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
+     */
+    public String getCcPoId() {
+        return this.ccPoId;
+    }
+
+    /**
+     * 设置：{"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
+     */
+    public CcPayReq setCcPoId(String ccPoId) {
+        if (this.ccPoId == null && ccPoId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPoId != null && ccPoId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPoId.compareTo(ccPoId) != 0) {
+                this.ccPoId = ccPoId;
+                if (!this.toUpdateCols.contains("CC_PO_ID")) {
+                    this.toUpdateCols.add("CC_PO_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPoId = ccPoId;
+            if (!this.toUpdateCols.contains("CC_PO_ID")) {
+                this.toUpdateCols.add("CC_PO_ID");
             }
         }
         return this;
