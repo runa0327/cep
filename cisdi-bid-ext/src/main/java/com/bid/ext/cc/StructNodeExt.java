@@ -879,11 +879,13 @@ public class StructNodeExt {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             Map<String, Object> valueMap = entityRecord.valueMap;
-            String planTotalCost = valueMap.get("PLAN_TOTAL_COST") != null ? valueMap.get("PLAN_TOTAL_COST").toString() : null;
-            BigDecimal planTotalCostBigDecimal = new BigDecimal(planTotalCost);
+//            String planTotalCost = valueMap.get("PLAN_TOTAL_COST") != null ? valueMap.get("PLAN_TOTAL_COST").toString() : null;
+//            BigDecimal planTotalCostBigDecimal = new BigDecimal(planTotalCost);
+            BigDecimal planTotalCostBigDecimal = JdbcMapUtil.getBigDecimal(valueMap, "PLAN_TOTAL_COST");
+            String ccPrjId = JdbcMapUtil.getString(valueMap, "CC_PRJ_ID");
             CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
             String copyFromPrjStructNodeId = ccPrjStructNode.getCopyFromPrjStructNodeId();
-            List<CcPrjCostOverview> ccPrjCostOverviews = CcPrjCostOverview.selectByWhere(new Where().eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, copyFromPrjStructNodeId));
+            List<CcPrjCostOverview> ccPrjCostOverviews = CcPrjCostOverview.selectByWhere(new Where().eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, copyFromPrjStructNodeId).eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId));
             if (!SharedUtil.isEmpty(ccPrjCostOverviews)) {
                 for (CcPrjCostOverview ccPrjCostOverview : ccPrjCostOverviews) {
                     String ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
