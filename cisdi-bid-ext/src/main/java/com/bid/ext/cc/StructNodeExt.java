@@ -2145,4 +2145,28 @@ public class StructNodeExt {
         }
     }
 
+    /**
+     * 收藏计划
+     */
+    public void addFavorite() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
+            ccPrjStructNode.setIsFavorites(true);
+            ccPrjStructNode.updateById();
+        }
+    }
+
+    /**
+     * 取消收藏
+     */
+
+    public void removeFavorite() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectById(csCommId);
+            ccPrjStructNode.setIsFavorites(false);
+            ccPrjStructNode.updateById();
+        }
+    }
 }

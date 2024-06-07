@@ -252,6 +252,10 @@ public class CcPrjStructNode {
          * {"EN": "拷贝自项目结构节点", "ZH_CN": "拷贝自项目结构节点", "ZH_TW": "拷贝自项目结构节点"}。
          */
         public static final String COPY_FROM_PRJ_STRUCT_NODE_ID = "COPY_FROM_PRJ_STRUCT_NODE_ID";
+        /**
+         * {"EN": "是否收藏", "ZH_CN": "是否收藏", "ZH_TW": "是否收藏"}。
+         */
+        public static final String IS_FAVORITES = "IS_FAVORITES";
     }
 
     // </editor-fold>
@@ -2090,6 +2094,42 @@ public class CcPrjStructNode {
             this.copyFromPrjStructNodeId = copyFromPrjStructNodeId;
             if (!this.toUpdateCols.contains("COPY_FROM_PRJ_STRUCT_NODE_ID")) {
                 this.toUpdateCols.add("COPY_FROM_PRJ_STRUCT_NODE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "是否收藏", "ZH_CN": "是否收藏", "ZH_TW": "是否收藏"}。
+     */
+    private Boolean isFavorites;
+
+    /**
+     * 获取：{"EN": "是否收藏", "ZH_CN": "是否收藏", "ZH_TW": "是否收藏"}。
+     */
+    public Boolean getIsFavorites() {
+        return this.isFavorites;
+    }
+
+    /**
+     * 设置：{"EN": "是否收藏", "ZH_CN": "是否收藏", "ZH_TW": "是否收藏"}。
+     */
+    public CcPrjStructNode setIsFavorites(Boolean isFavorites) {
+        if (this.isFavorites == null && isFavorites == null) {
+            // 均为null，不做处理。
+        } else if (this.isFavorites != null && isFavorites != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isFavorites.compareTo(isFavorites) != 0) {
+                this.isFavorites = isFavorites;
+                if (!this.toUpdateCols.contains("IS_FAVORITES")) {
+                    this.toUpdateCols.add("IS_FAVORITES");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isFavorites = isFavorites;
+            if (!this.toUpdateCols.contains("IS_FAVORITES")) {
+                this.toUpdateCols.add("IS_FAVORITES");
             }
         }
         return this;
