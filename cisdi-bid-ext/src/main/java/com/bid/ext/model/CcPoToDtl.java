@@ -8,21 +8,20 @@ import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * {"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
+ * {"EN": "采购合同关联明细", "ZH_CN": "采购合同关联明细", "ZH_TW": "采购合同关联明细"}。
  */
-public class CcPo {
+public class CcPoToDtl {
 
     /**
      * 模型助手。
      */
-    private static final ModelHelper<CcPo> modelHelper = new ModelHelper<>("CC_PO", new CcPo());
+    private static final ModelHelper<CcPoToDtl> modelHelper = new ModelHelper<>("CC_PO_TO_DTL", new CcPoToDtl());
 
     /**
      * 待更新的列。
@@ -39,7 +38,7 @@ public class CcPo {
     // 实体常量：
     // <editor-fold>
 
-    public static final String ENT_CODE = "CC_PO";
+    public static final String ENT_CODE = "CC_PO_TO_DTL";
     public static final EntityTypeE ENTITY_TYPE = EntityTypeE.TABLE;
 
     // </editor-fold>
@@ -48,10 +47,6 @@ public class CcPo {
     // <editor-fold>
 
     public static class Cols {
-        /**
-         * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
-         */
-        public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
          * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
          */
@@ -113,91 +108,27 @@ public class CcPo {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * {"EN": "乙方", "ZH_CN": "甲方", "ZH_TW": "乙方"}。
+         * {"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
          */
-        public static final String PARTY_A = "PARTY_A";
+        public static final String CC_PO_ID = "CC_PO_ID";
         /**
-         * {"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
+         * {"EN": "合同变更选择", "ZH_CN": "合同变更选择", "ZH_TW": "合同变更选择"}。
          */
-        public static final String PARTY_A_CONTACT_NAME = "PARTY_A_CONTACT_NAME";
+        public static final String CC_PO_CHANGE_PICK_ID = "CC_PO_CHANGE_PICK_ID";
         /**
-         * {"EN": "甲方联系人电话", "ZH_CN": "甲方联系人电话", "ZH_TW": "甲方联系人电话"}。
+         * {"EN": "ENTITY_RECORD_ID", "ZH_CN": "实体记录ID", "ZH_TW": "繁：实体记录ID"}。
          */
-        public static final String PARTY_A_CONTACT_PHONE = "PARTY_A_CONTACT_PHONE";
-        /**
-         * {"EN": "合同乙方", "ZH_CN": "乙方", "ZH_TW": "合同乙方"}。
-         */
-        public static final String PARTY_B = "PARTY_B";
-        /**
-         * {"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
-         */
-        public static final String PARTY_B_CONTACT_NAME = "PARTY_B_CONTACT_NAME";
-        /**
-         * {"EN": "乙方联系人电话", "ZH_CN": "乙方联系人电话", "ZH_TW": "乙方联系人电话"}。
-         */
-        public static final String PARTY_B_CONTACT_PHONE = "PARTY_B_CONTACT_PHONE";
-        /**
-         * {"EN": "业务日期", "ZH_CN": "业务日期", "ZH_TW": "业务日期"}。
-         */
-        public static final String TRX_DATE = "TRX_DATE";
-        /**
-         * {"EN": "变更后业务金额（元）", "ZH_CN": "初始业务金额（元）", "ZH_TW": "变更后业务金额（元）"}。
-         */
-        public static final String TRX_AMT_INIT = "TRX_AMT_INIT";
+        public static final String ENTITY_RECORD_ID = "ENTITY_RECORD_ID";
         /**
          * {"EN": "业务金额（元）", "ZH_CN": "业务金额（元）", "ZH_TW": "业务金额（元）"}。
          */
         public static final String TRX_AMT = "TRX_AMT";
-        /**
-         * {"EN": "项目CBS模板", "ZH_CN": "项目CBS模板", "ZH_TW": "项目CBS模板"}。
-         */
-        public static final String CC_PRJ_CBS_TEMPALTE_NODE_ID = "CC_PRJ_CBS_TEMPALTE_NODE_ID";
-        /**
-         * {"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
-         */
-        public static final String CC_ATTACHMENTS = "CC_ATTACHMENTS";
     }
 
     // </editor-fold>
 
     // 各个属性及setter、getter：
     // <editor-fold>
-
-    /**
-     * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
-     */
-    private String ccPrjId;
-
-    /**
-     * 获取：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
-     */
-    public String getCcPrjId() {
-        return this.ccPrjId;
-    }
-
-    /**
-     * 设置：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
-     */
-    public CcPo setCcPrjId(String ccPrjId) {
-        if (this.ccPrjId == null && ccPrjId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccPrjId != null && ccPrjId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
-                this.ccPrjId = ccPrjId;
-                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
-                    this.toUpdateCols.add("CC_PRJ_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccPrjId = ccPrjId;
-            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
-                this.toUpdateCols.add("CC_PRJ_ID");
-            }
-        }
-        return this;
-    }
 
     /**
      * {"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
@@ -214,7 +145,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "ID", "ZH_CN": "ID", "ZH_TW": "繁：ID"}。
      */
-    public CcPo setId(String id) {
+    public CcPoToDtl setId(String id) {
         if (this.id == null && id == null) {
             // 均为null，不做处理。
         } else if (this.id != null && id != null) {
@@ -250,7 +181,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "VER", "ZH_CN": "版本", "ZH_TW": "繁：版本"}。
      */
-    public CcPo setVer(Integer ver) {
+    public CcPoToDtl setVer(Integer ver) {
         if (this.ver == null && ver == null) {
             // 均为null，不做处理。
         } else if (this.ver != null && ver != null) {
@@ -286,7 +217,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "TS", "ZH_CN": "时间戳", "ZH_TW": "繁：时间戳"}。
      */
-    public CcPo setTs(LocalDateTime ts) {
+    public CcPoToDtl setTs(LocalDateTime ts) {
         if (this.ts == null && ts == null) {
             // 均为null，不做处理。
         } else if (this.ts != null && ts != null) {
@@ -322,7 +253,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "IS_PRESET", "ZH_CN": "是否预设", "ZH_TW": "繁：是否预设"}。
      */
-    public CcPo setIsPreset(Boolean isPreset) {
+    public CcPoToDtl setIsPreset(Boolean isPreset) {
         if (this.isPreset == null && isPreset == null) {
             // 均为null，不做处理。
         } else if (this.isPreset != null && isPreset != null) {
@@ -358,7 +289,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
      */
-    public CcPo setCrtDt(LocalDateTime crtDt) {
+    public CcPoToDtl setCrtDt(LocalDateTime crtDt) {
         if (this.crtDt == null && crtDt == null) {
             // 均为null，不做处理。
         } else if (this.crtDt != null && crtDt != null) {
@@ -394,7 +325,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
      */
-    public CcPo setCrtUserId(String crtUserId) {
+    public CcPoToDtl setCrtUserId(String crtUserId) {
         if (this.crtUserId == null && crtUserId == null) {
             // 均为null，不做处理。
         } else if (this.crtUserId != null && crtUserId != null) {
@@ -430,7 +361,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
      */
-    public CcPo setLastModiDt(LocalDateTime lastModiDt) {
+    public CcPoToDtl setLastModiDt(LocalDateTime lastModiDt) {
         if (this.lastModiDt == null && lastModiDt == null) {
             // 均为null，不做处理。
         } else if (this.lastModiDt != null && lastModiDt != null) {
@@ -466,7 +397,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "LAST_MODI_USER_ID", "ZH_CN": "最后修改用户", "ZH_TW": "繁：最后修改用户"}。
      */
-    public CcPo setLastModiUserId(String lastModiUserId) {
+    public CcPoToDtl setLastModiUserId(String lastModiUserId) {
         if (this.lastModiUserId == null && lastModiUserId == null) {
             // 均为null，不做处理。
         } else if (this.lastModiUserId != null && lastModiUserId != null) {
@@ -502,7 +433,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
      */
-    public CcPo setStatus(String status) {
+    public CcPoToDtl setStatus(String status) {
         if (this.status == null && status == null) {
             // 均为null，不做处理。
         } else if (this.status != null && status != null) {
@@ -538,7 +469,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "LK_WF_INST_ID", "ZH_CN": "锁定流程实例", "ZH_TW": "繁：锁定流程实例"}。
      */
-    public CcPo setLkWfInstId(String lkWfInstId) {
+    public CcPoToDtl setLkWfInstId(String lkWfInstId) {
         if (this.lkWfInstId == null && lkWfInstId == null) {
             // 均为null，不做处理。
         } else if (this.lkWfInstId != null && lkWfInstId != null) {
@@ -574,7 +505,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
      */
-    public CcPo setCode(String code) {
+    public CcPoToDtl setCode(String code) {
         if (this.code == null && code == null) {
             // 均为null，不做处理。
         } else if (this.code != null && code != null) {
@@ -610,7 +541,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
      */
-    public CcPo setName(String name) {
+    public CcPoToDtl setName(String name) {
         if (this.name == null && name == null) {
             // 均为null，不做处理。
         } else if (this.name != null && name != null) {
@@ -646,7 +577,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
      */
-    public CcPo setRemark(String remark) {
+    public CcPoToDtl setRemark(String remark) {
         if (this.remark == null && remark == null) {
             // 均为null，不做处理。
         } else if (this.remark != null && remark != null) {
@@ -682,7 +613,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
      */
-    public CcPo setFastCode(String fastCode) {
+    public CcPoToDtl setFastCode(String fastCode) {
         if (this.fastCode == null && fastCode == null) {
             // 均为null，不做处理。
         } else if (this.fastCode != null && fastCode != null) {
@@ -718,7 +649,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
      */
-    public CcPo setIconFileGroupId(String iconFileGroupId) {
+    public CcPoToDtl setIconFileGroupId(String iconFileGroupId) {
         if (this.iconFileGroupId == null && iconFileGroupId == null) {
             // 均为null，不做处理。
         } else if (this.iconFileGroupId != null && iconFileGroupId != null) {
@@ -740,288 +671,108 @@ public class CcPo {
     }
 
     /**
-     * {"EN": "乙方", "ZH_CN": "甲方", "ZH_TW": "乙方"}。
+     * {"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
      */
-    private String partyA;
+    private String ccPoId;
 
     /**
-     * 获取：{"EN": "乙方", "ZH_CN": "甲方", "ZH_TW": "乙方"}。
+     * 获取：{"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
      */
-    public String getPartyA() {
-        return this.partyA;
+    public String getCcPoId() {
+        return this.ccPoId;
     }
 
     /**
-     * 设置：{"EN": "乙方", "ZH_CN": "甲方", "ZH_TW": "乙方"}。
+     * 设置：{"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
      */
-    public CcPo setPartyA(String partyA) {
-        if (this.partyA == null && partyA == null) {
+    public CcPoToDtl setCcPoId(String ccPoId) {
+        if (this.ccPoId == null && ccPoId == null) {
             // 均为null，不做处理。
-        } else if (this.partyA != null && partyA != null) {
+        } else if (this.ccPoId != null && ccPoId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.partyA.compareTo(partyA) != 0) {
-                this.partyA = partyA;
-                if (!this.toUpdateCols.contains("PARTY_A")) {
-                    this.toUpdateCols.add("PARTY_A");
+            if (this.ccPoId.compareTo(ccPoId) != 0) {
+                this.ccPoId = ccPoId;
+                if (!this.toUpdateCols.contains("CC_PO_ID")) {
+                    this.toUpdateCols.add("CC_PO_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.partyA = partyA;
-            if (!this.toUpdateCols.contains("PARTY_A")) {
-                this.toUpdateCols.add("PARTY_A");
+            this.ccPoId = ccPoId;
+            if (!this.toUpdateCols.contains("CC_PO_ID")) {
+                this.toUpdateCols.add("CC_PO_ID");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
+     * {"EN": "合同变更选择", "ZH_CN": "合同变更选择", "ZH_TW": "合同变更选择"}。
      */
-    private String partyAContactName;
+    private String ccPoChangePickId;
 
     /**
-     * 获取：{"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
+     * 获取：{"EN": "合同变更选择", "ZH_CN": "合同变更选择", "ZH_TW": "合同变更选择"}。
      */
-    public String getPartyAContactName() {
-        return this.partyAContactName;
+    public String getCcPoChangePickId() {
+        return this.ccPoChangePickId;
     }
 
     /**
-     * 设置：{"EN": "甲方联系人", "ZH_CN": "甲方联系人姓名", "ZH_TW": "甲方联系人"}。
+     * 设置：{"EN": "合同变更选择", "ZH_CN": "合同变更选择", "ZH_TW": "合同变更选择"}。
      */
-    public CcPo setPartyAContactName(String partyAContactName) {
-        if (this.partyAContactName == null && partyAContactName == null) {
+    public CcPoToDtl setCcPoChangePickId(String ccPoChangePickId) {
+        if (this.ccPoChangePickId == null && ccPoChangePickId == null) {
             // 均为null，不做处理。
-        } else if (this.partyAContactName != null && partyAContactName != null) {
+        } else if (this.ccPoChangePickId != null && ccPoChangePickId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.partyAContactName.compareTo(partyAContactName) != 0) {
-                this.partyAContactName = partyAContactName;
-                if (!this.toUpdateCols.contains("PARTY_A_CONTACT_NAME")) {
-                    this.toUpdateCols.add("PARTY_A_CONTACT_NAME");
+            if (this.ccPoChangePickId.compareTo(ccPoChangePickId) != 0) {
+                this.ccPoChangePickId = ccPoChangePickId;
+                if (!this.toUpdateCols.contains("CC_PO_CHANGE_PICK_ID")) {
+                    this.toUpdateCols.add("CC_PO_CHANGE_PICK_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.partyAContactName = partyAContactName;
-            if (!this.toUpdateCols.contains("PARTY_A_CONTACT_NAME")) {
-                this.toUpdateCols.add("PARTY_A_CONTACT_NAME");
+            this.ccPoChangePickId = ccPoChangePickId;
+            if (!this.toUpdateCols.contains("CC_PO_CHANGE_PICK_ID")) {
+                this.toUpdateCols.add("CC_PO_CHANGE_PICK_ID");
             }
         }
         return this;
     }
 
     /**
-     * {"EN": "甲方联系人电话", "ZH_CN": "甲方联系人电话", "ZH_TW": "甲方联系人电话"}。
+     * {"EN": "ENTITY_RECORD_ID", "ZH_CN": "实体记录ID", "ZH_TW": "繁：实体记录ID"}。
      */
-    private String partyAContactPhone;
+    private String entityRecordId;
 
     /**
-     * 获取：{"EN": "甲方联系人电话", "ZH_CN": "甲方联系人电话", "ZH_TW": "甲方联系人电话"}。
+     * 获取：{"EN": "ENTITY_RECORD_ID", "ZH_CN": "实体记录ID", "ZH_TW": "繁：实体记录ID"}。
      */
-    public String getPartyAContactPhone() {
-        return this.partyAContactPhone;
+    public String getEntityRecordId() {
+        return this.entityRecordId;
     }
 
     /**
-     * 设置：{"EN": "甲方联系人电话", "ZH_CN": "甲方联系人电话", "ZH_TW": "甲方联系人电话"}。
+     * 设置：{"EN": "ENTITY_RECORD_ID", "ZH_CN": "实体记录ID", "ZH_TW": "繁：实体记录ID"}。
      */
-    public CcPo setPartyAContactPhone(String partyAContactPhone) {
-        if (this.partyAContactPhone == null && partyAContactPhone == null) {
+    public CcPoToDtl setEntityRecordId(String entityRecordId) {
+        if (this.entityRecordId == null && entityRecordId == null) {
             // 均为null，不做处理。
-        } else if (this.partyAContactPhone != null && partyAContactPhone != null) {
+        } else if (this.entityRecordId != null && entityRecordId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.partyAContactPhone.compareTo(partyAContactPhone) != 0) {
-                this.partyAContactPhone = partyAContactPhone;
-                if (!this.toUpdateCols.contains("PARTY_A_CONTACT_PHONE")) {
-                    this.toUpdateCols.add("PARTY_A_CONTACT_PHONE");
+            if (this.entityRecordId.compareTo(entityRecordId) != 0) {
+                this.entityRecordId = entityRecordId;
+                if (!this.toUpdateCols.contains("ENTITY_RECORD_ID")) {
+                    this.toUpdateCols.add("ENTITY_RECORD_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.partyAContactPhone = partyAContactPhone;
-            if (!this.toUpdateCols.contains("PARTY_A_CONTACT_PHONE")) {
-                this.toUpdateCols.add("PARTY_A_CONTACT_PHONE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "合同乙方", "ZH_CN": "乙方", "ZH_TW": "合同乙方"}。
-     */
-    private String partyB;
-
-    /**
-     * 获取：{"EN": "合同乙方", "ZH_CN": "乙方", "ZH_TW": "合同乙方"}。
-     */
-    public String getPartyB() {
-        return this.partyB;
-    }
-
-    /**
-     * 设置：{"EN": "合同乙方", "ZH_CN": "乙方", "ZH_TW": "合同乙方"}。
-     */
-    public CcPo setPartyB(String partyB) {
-        if (this.partyB == null && partyB == null) {
-            // 均为null，不做处理。
-        } else if (this.partyB != null && partyB != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.partyB.compareTo(partyB) != 0) {
-                this.partyB = partyB;
-                if (!this.toUpdateCols.contains("PARTY_B")) {
-                    this.toUpdateCols.add("PARTY_B");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.partyB = partyB;
-            if (!this.toUpdateCols.contains("PARTY_B")) {
-                this.toUpdateCols.add("PARTY_B");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
-     */
-    private String partyBContactName;
-
-    /**
-     * 获取：{"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
-     */
-    public String getPartyBContactName() {
-        return this.partyBContactName;
-    }
-
-    /**
-     * 设置：{"EN": "乙方联系人", "ZH_CN": "乙方联系人姓名", "ZH_TW": "乙方联系人"}。
-     */
-    public CcPo setPartyBContactName(String partyBContactName) {
-        if (this.partyBContactName == null && partyBContactName == null) {
-            // 均为null，不做处理。
-        } else if (this.partyBContactName != null && partyBContactName != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.partyBContactName.compareTo(partyBContactName) != 0) {
-                this.partyBContactName = partyBContactName;
-                if (!this.toUpdateCols.contains("PARTY_B_CONTACT_NAME")) {
-                    this.toUpdateCols.add("PARTY_B_CONTACT_NAME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.partyBContactName = partyBContactName;
-            if (!this.toUpdateCols.contains("PARTY_B_CONTACT_NAME")) {
-                this.toUpdateCols.add("PARTY_B_CONTACT_NAME");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "乙方联系人电话", "ZH_CN": "乙方联系人电话", "ZH_TW": "乙方联系人电话"}。
-     */
-    private String partyBContactPhone;
-
-    /**
-     * 获取：{"EN": "乙方联系人电话", "ZH_CN": "乙方联系人电话", "ZH_TW": "乙方联系人电话"}。
-     */
-    public String getPartyBContactPhone() {
-        return this.partyBContactPhone;
-    }
-
-    /**
-     * 设置：{"EN": "乙方联系人电话", "ZH_CN": "乙方联系人电话", "ZH_TW": "乙方联系人电话"}。
-     */
-    public CcPo setPartyBContactPhone(String partyBContactPhone) {
-        if (this.partyBContactPhone == null && partyBContactPhone == null) {
-            // 均为null，不做处理。
-        } else if (this.partyBContactPhone != null && partyBContactPhone != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.partyBContactPhone.compareTo(partyBContactPhone) != 0) {
-                this.partyBContactPhone = partyBContactPhone;
-                if (!this.toUpdateCols.contains("PARTY_B_CONTACT_PHONE")) {
-                    this.toUpdateCols.add("PARTY_B_CONTACT_PHONE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.partyBContactPhone = partyBContactPhone;
-            if (!this.toUpdateCols.contains("PARTY_B_CONTACT_PHONE")) {
-                this.toUpdateCols.add("PARTY_B_CONTACT_PHONE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "业务日期", "ZH_CN": "业务日期", "ZH_TW": "业务日期"}。
-     */
-    private LocalDate trxDate;
-
-    /**
-     * 获取：{"EN": "业务日期", "ZH_CN": "业务日期", "ZH_TW": "业务日期"}。
-     */
-    public LocalDate getTrxDate() {
-        return this.trxDate;
-    }
-
-    /**
-     * 设置：{"EN": "业务日期", "ZH_CN": "业务日期", "ZH_TW": "业务日期"}。
-     */
-    public CcPo setTrxDate(LocalDate trxDate) {
-        if (this.trxDate == null && trxDate == null) {
-            // 均为null，不做处理。
-        } else if (this.trxDate != null && trxDate != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.trxDate.compareTo(trxDate) != 0) {
-                this.trxDate = trxDate;
-                if (!this.toUpdateCols.contains("TRX_DATE")) {
-                    this.toUpdateCols.add("TRX_DATE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.trxDate = trxDate;
-            if (!this.toUpdateCols.contains("TRX_DATE")) {
-                this.toUpdateCols.add("TRX_DATE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "变更后业务金额（元）", "ZH_CN": "初始业务金额（元）", "ZH_TW": "变更后业务金额（元）"}。
-     */
-    private BigDecimal trxAmtInit;
-
-    /**
-     * 获取：{"EN": "变更后业务金额（元）", "ZH_CN": "初始业务金额（元）", "ZH_TW": "变更后业务金额（元）"}。
-     */
-    public BigDecimal getTrxAmtInit() {
-        return this.trxAmtInit;
-    }
-
-    /**
-     * 设置：{"EN": "变更后业务金额（元）", "ZH_CN": "初始业务金额（元）", "ZH_TW": "变更后业务金额（元）"}。
-     */
-    public CcPo setTrxAmtInit(BigDecimal trxAmtInit) {
-        if (this.trxAmtInit == null && trxAmtInit == null) {
-            // 均为null，不做处理。
-        } else if (this.trxAmtInit != null && trxAmtInit != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.trxAmtInit.compareTo(trxAmtInit) != 0) {
-                this.trxAmtInit = trxAmtInit;
-                if (!this.toUpdateCols.contains("TRX_AMT_INIT")) {
-                    this.toUpdateCols.add("TRX_AMT_INIT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.trxAmtInit = trxAmtInit;
-            if (!this.toUpdateCols.contains("TRX_AMT_INIT")) {
-                this.toUpdateCols.add("TRX_AMT_INIT");
+            this.entityRecordId = entityRecordId;
+            if (!this.toUpdateCols.contains("ENTITY_RECORD_ID")) {
+                this.toUpdateCols.add("ENTITY_RECORD_ID");
             }
         }
         return this;
@@ -1042,7 +793,7 @@ public class CcPo {
     /**
      * 设置：{"EN": "业务金额（元）", "ZH_CN": "业务金额（元）", "ZH_TW": "业务金额（元）"}。
      */
-    public CcPo setTrxAmt(BigDecimal trxAmt) {
+    public CcPoToDtl setTrxAmt(BigDecimal trxAmt) {
         if (this.trxAmt == null && trxAmt == null) {
             // 均为null，不做处理。
         } else if (this.trxAmt != null && trxAmt != null) {
@@ -1058,78 +809,6 @@ public class CcPo {
             this.trxAmt = trxAmt;
             if (!this.toUpdateCols.contains("TRX_AMT")) {
                 this.toUpdateCols.add("TRX_AMT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "项目CBS模板", "ZH_CN": "项目CBS模板", "ZH_TW": "项目CBS模板"}。
-     */
-    private String ccPrjCbsTempalteNodeId;
-
-    /**
-     * 获取：{"EN": "项目CBS模板", "ZH_CN": "项目CBS模板", "ZH_TW": "项目CBS模板"}。
-     */
-    public String getCcPrjCbsTempalteNodeId() {
-        return this.ccPrjCbsTempalteNodeId;
-    }
-
-    /**
-     * 设置：{"EN": "项目CBS模板", "ZH_CN": "项目CBS模板", "ZH_TW": "项目CBS模板"}。
-     */
-    public CcPo setCcPrjCbsTempalteNodeId(String ccPrjCbsTempalteNodeId) {
-        if (this.ccPrjCbsTempalteNodeId == null && ccPrjCbsTempalteNodeId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccPrjCbsTempalteNodeId != null && ccPrjCbsTempalteNodeId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccPrjCbsTempalteNodeId.compareTo(ccPrjCbsTempalteNodeId) != 0) {
-                this.ccPrjCbsTempalteNodeId = ccPrjCbsTempalteNodeId;
-                if (!this.toUpdateCols.contains("CC_PRJ_CBS_TEMPALTE_NODE_ID")) {
-                    this.toUpdateCols.add("CC_PRJ_CBS_TEMPALTE_NODE_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccPrjCbsTempalteNodeId = ccPrjCbsTempalteNodeId;
-            if (!this.toUpdateCols.contains("CC_PRJ_CBS_TEMPALTE_NODE_ID")) {
-                this.toUpdateCols.add("CC_PRJ_CBS_TEMPALTE_NODE_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
-     */
-    private String ccAttachments;
-
-    /**
-     * 获取：{"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
-     */
-    public String getCcAttachments() {
-        return this.ccAttachments;
-    }
-
-    /**
-     * 设置：{"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
-     */
-    public CcPo setCcAttachments(String ccAttachments) {
-        if (this.ccAttachments == null && ccAttachments == null) {
-            // 均为null，不做处理。
-        } else if (this.ccAttachments != null && ccAttachments != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccAttachments.compareTo(ccAttachments) != 0) {
-                this.ccAttachments = ccAttachments;
-                if (!this.toUpdateCols.contains("CC_ATTACHMENTS")) {
-                    this.toUpdateCols.add("CC_ATTACHMENTS");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccAttachments = ccAttachments;
-            if (!this.toUpdateCols.contains("CC_ATTACHMENTS")) {
-                this.toUpdateCols.add("CC_ATTACHMENTS");
             }
         }
         return this;
@@ -1222,8 +901,8 @@ public class CcPo {
      *
      * @return
      */
-    public static CcPo newData() {
-        CcPo obj = modelHelper.newData();
+    public static CcPoToDtl newData() {
+        CcPoToDtl obj = modelHelper.newData();
         return obj;
     }
 
@@ -1232,8 +911,8 @@ public class CcPo {
      *
      * @return
      */
-    public static CcPo insertData() {
-        CcPo obj = modelHelper.insertData();
+    public static CcPoToDtl insertData() {
+        CcPoToDtl obj = modelHelper.insertData();
         return obj;
     }
 
@@ -1245,8 +924,8 @@ public class CcPo {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcPo selectById(String id, List<String> includeCols, List<String> excludeCols) {
-        CcPo obj = modelHelper.selectById(id, includeCols, excludeCols);
+    public static CcPoToDtl selectById(String id, List<String> includeCols, List<String> excludeCols) {
+        CcPoToDtl obj = modelHelper.selectById(id, includeCols, excludeCols);
         return obj;
     }
 
@@ -1256,7 +935,7 @@ public class CcPo {
      * @param id ID。
      * @return 获取到的对象，若无则为null。
      */
-    public static CcPo selectById(String id) {
+    public static CcPoToDtl selectById(String id) {
         return selectById(id, null, null);
     }
 
@@ -1268,8 +947,8 @@ public class CcPo {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcPo> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
-        List<CcPo> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
+    public static List<CcPoToDtl> selectByIds(List<String> ids, List<String> includeCols, List<String> excludeCols) {
+        List<CcPoToDtl> objList = modelHelper.selectByIds(ids, includeCols, excludeCols);
         return objList;
     }
 
@@ -1279,7 +958,7 @@ public class CcPo {
      * @param ids ID列表。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcPo> selectByIds(List<String> ids) {
+    public static List<CcPoToDtl> selectByIds(List<String> ids) {
         return selectByIds(ids, null, null);
     }
 
@@ -1291,8 +970,8 @@ public class CcPo {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcPo> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcPo> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static List<CcPoToDtl> selectByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcPoToDtl> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         return objList;
     }
 
@@ -1302,7 +981,7 @@ public class CcPo {
      * @param where Where条件。
      * @return 获取到的对象列表，若无则为null。建议使用SharedUtil.isEmpty(list)方法判断有无。
      */
-    public static List<CcPo> selectByWhere(Where where) {
+    public static List<CcPoToDtl> selectByWhere(Where where) {
         return selectByWhere(where, null, null);
     }
 
@@ -1314,10 +993,10 @@ public class CcPo {
      * @param excludeCols 获取时排除的列，空为不排除。
      * @return 获取到的对象。
      */
-    public static CcPo selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
-        List<CcPo> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
+    public static CcPoToDtl selectOneByWhere(Where where, List<String> includeCols, List<String> excludeCols) {
+        List<CcPoToDtl> objList = modelHelper.selectByWhere(where, includeCols, excludeCols);
         if (objList != null && objList.size() > 1) {
-            throw new BaseException("调用CcPo.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
+            throw new BaseException("调用CcPoToDtl.selectOneByWhere方法不能返回" + objList.size() + "条记录（只能返回0条或1条）！");
         }
 
         return SharedUtil.isEmpty(objList) ? null : objList.get(0);
@@ -1329,7 +1008,7 @@ public class CcPo {
      * @param where Where条件。
      * @return 获取到的对象。
      */
-    public static CcPo selectOneByWhere(Where where) {
+    public static CcPoToDtl selectOneByWhere(Where where) {
         return selectOneByWhere(where, null, null);
     }
 
@@ -1443,7 +1122,7 @@ public class CcPo {
      * @param includeCols 拷贝时包含的列，空为包含所有。
      * @param excludeCols 拷贝时排除的列，空为不排除。
      */
-    public static void copyCols(CcPo fromModel, CcPo toModel, List<String> includeCols, List<String> excludeCols) {
+    public static void copyCols(CcPoToDtl fromModel, CcPoToDtl toModel, List<String> includeCols, List<String> excludeCols) {
         OrmHelper.copyCols(fromModel, toModel, includeCols, excludeCols);
     }
 
@@ -1453,7 +1132,7 @@ public class CcPo {
      * @param fromModel 从模型。
      * @param toModel   到模型。
      */
-    public static void copyCols(CcPo fromModel, CcPo toModel) {
+    public static void copyCols(CcPoToDtl fromModel, CcPoToDtl toModel) {
         copyCols(fromModel, toModel, null, null);
     }
 

@@ -1212,6 +1212,10 @@ public class StructNodeExt {
             BigDecimal trxAmt = ccPo.getTrxAmt();
             String ccPrjCbsTempalteNodeId = ccPo.getCcPrjCbsTempalteNodeId();
 
+            // 0.填入初始合同金额
+            ccPo.setTrxAmtInit(trxAmt);
+            ccPo.updateById();
+
             BigDecimal purchaseAmtInBidSum = trxAmt;
             // 1.查询项目此成本科目已采购金额
             CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectByWhere(new Where().eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjCbsTempalteNodeId)).get(0);
@@ -1259,6 +1263,10 @@ public class StructNodeExt {
             String ccPrjCbsTempalteNodeId = ccPo.getCcPrjCbsTempalteNodeId();
             // 此次更新的采购金额
             BigDecimal trxAmt = ccPo.getTrxAmt();
+
+            // 0.更新初始合同金额
+            ccPo.setTrxAmtInit(trxAmt);
+            ccPo.updateById();
 
             // 1.通过实体记录id查询此实体记录已采购金额
             List<CcPrjCostOverviewToDtl> ccPrjCostOverviewToDtls = CcPrjCostOverviewToDtl.selectByWhere(new Where().eq(CcPrjCostOverviewToDtl.Cols.ENTITY_RECORD_ID, csCommId));
@@ -1317,6 +1325,185 @@ public class StructNodeExt {
             recalculatePlanTotalCost(ccPrjCostOverviewNowPid, "PURCHASE_AMT");
         }
     }
+
+    /**
+     * 新增合同变更
+     */
+    public void poChange() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
+            String csCommId = entityRecord.csCommId;
+            CcPoChange ccPoChange = CcPoChange.selectById(csCommId);
+            String ccPoChangePickId = ccPoChange.getCcPoChangePickId();// 变更的增减
+            BigDecimal changeTrxAmt = ccPoChange.getTrxAmt();// 变更金额
+            String ccPoId = ccPoChange.getCcPoId();// 合同ID
+            CcPo ccPo = CcPo.selectById(ccPoId);
+            BigDecimal poTrxAmt = ccPo.getTrxAmt(); //变更前的合同额
+            BigDecimal nowTrxAmt = BigDecimal.ZERO; //现在的合同额
+            if ("ADD".equals(ccPoChangePickId)) {
+                nowTrxAmt = poTrxAmt.add(changeTrxAmt);
+            } else if ("SUB".equals(ccPoChangePickId)) {
+                nowTrxAmt = poTrxAmt.subtract(changeTrxAmt);
+            }
+            ccPo.setTrxAmt(nowTrxAmt);
+            updatePoByEntity(ccPoId, nowTrxAmt);
+            CcPoToDtl ccPoToDtl = CcPoToDtl.insertData();
+            ccPoToDtl.setCcPoId(ccPoId);
+            ccPoToDtl.setTrxAmt(changeTrxAmt);
+            ccPoToDtl.setEntityRecordId(csCommId);
+            ccPoToDtl.setCcPoChangePickId(ccPoChangePickId);
+            ccPoToDtl.updateById();
+        }
+    }
+
+    /**
+     * 更新合同变更
+     */
+    public void updatePoChange() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
+            String csCommId = entityRecord.csCommId;
+            CcPoChange ccPoChange = CcPoChange.selectById(csCommId);
+
+            String ccPoChangePickId = ccPoChange.getCcPoChangePickId();// 变更的增减
+            BigDecimal changeTrxAmt = ccPoChange.getTrxAmt();// 变更金额
+            String ccPoId = ccPoChange.getCcPoId();// 合同ID
+            CcPo ccPo = CcPo.selectById(ccPoId);
+            BigDecimal poTrxAmt = ccPo.getTrxAmt(); //变更前的合同额
+
+            CcPoToDtl ccPoToDtl = CcPoToDtl.selectOneByWhere(new Where().eq(CcPoToDtl.Cols.CC_PO_ID, ccPoId).eq(CcPoToDtl.Cols.ENTITY_RECORD_ID, csCommId));
+            BigDecimal recordTrxAmt = ccPoToDtl.getTrxAmt();//记录合同变更额
+            String recordPoChangePickId = ccPoToDtl.getCcPoChangePickId();//记录变更的增减
+
+            //撤回此合同变更
+            BigDecimal nowTrxAmt = BigDecimal.ZERO; //现在的合同额
+            if ("ADD".equals(recordPoChangePickId)) {
+                nowTrxAmt = poTrxAmt.subtract(recordTrxAmt);
+            } else if ("SUB".equals(recordPoChangePickId)) {
+                nowTrxAmt = poTrxAmt.add(recordTrxAmt);
+            }
+            // 新的合同变更
+            if ("ADD".equals(ccPoChangePickId)) {
+                nowTrxAmt = nowTrxAmt.add(changeTrxAmt);
+            } else if ("SUB".equals(ccPoChangePickId)) {
+                nowTrxAmt = nowTrxAmt.subtract(changeTrxAmt);
+            }
+            ccPo.setTrxAmt(nowTrxAmt);
+            updatePoByEntity(ccPoId, nowTrxAmt);
+
+
+            //生成此次合同关联记录
+            CcPoToDtl newCcPoToDtl = CcPoToDtl.insertData();
+            newCcPoToDtl.setCcPoId(ccPoId);
+            newCcPoToDtl.setTrxAmt(changeTrxAmt);
+            newCcPoToDtl.setEntityRecordId(csCommId);
+            newCcPoToDtl.setCcPoChangePickId(ccPoChangePickId);
+            newCcPoToDtl.updateById();
+
+            ccPoToDtl.deleteById();
+
+        }
+    }
+
+    /**
+     * 删除合同变更
+     */
+    public void deletePoChange() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
+            String csCommId = entityRecord.csCommId;
+            CcPoChange ccPoChange = CcPoChange.selectById(csCommId);
+
+            String ccPoId = ccPoChange.getCcPoId();// 合同ID
+            CcPo ccPo = CcPo.selectById(ccPoId);
+            BigDecimal poTrxAmt = ccPo.getTrxAmt(); //变更前的合同额
+
+            CcPoToDtl ccPoToDtl = CcPoToDtl.selectOneByWhere(new Where().eq(CcPoToDtl.Cols.CC_PO_ID, ccPoId).eq(CcPoToDtl.Cols.ENTITY_RECORD_ID, csCommId));
+            BigDecimal recordTrxAmt = ccPoToDtl.getTrxAmt();//记录合同变更额
+            String recordPoChangePickId = ccPoToDtl.getCcPoChangePickId();//记录变更的增减
+
+            //撤回此合同变更
+            BigDecimal nowTrxAmt = BigDecimal.ZERO; //现在的合同额
+            if ("ADD".equals(recordPoChangePickId)) {
+                nowTrxAmt = poTrxAmt.subtract(recordTrxAmt);
+            } else if ("SUB".equals(recordPoChangePickId)) {
+                nowTrxAmt = poTrxAmt.add(recordTrxAmt);
+            }
+
+            ccPo.setTrxAmt(nowTrxAmt);
+            updatePoByEntity(ccPoId, nowTrxAmt);
+
+            //删除合同关联记录
+            ccPoToDtl.deleteById();
+
+        }
+    }
+
+    /**
+     * 根据实体记录和交易金额更新采购信息
+     *
+     * @param csCommId 实体记录ID(合同ID)
+     * @param trxAmt   交易金额
+     */
+    private void updatePoByEntity(String csCommId, BigDecimal trxAmt) {
+        CcPo ccPo = CcPo.selectById(csCommId);
+        String ccPrjId = ccPo.getCcPrjId();
+        String ccPrjCbsTempalteNodeId = ccPo.getCcPrjCbsTempalteNodeId();
+
+        // 0.更新合同金额
+        ccPo.setTrxAmt(trxAmt);
+        ccPo.updateById();
+
+        // 1.通过实体记录id查询此实体记录已采购金额
+        List<CcPrjCostOverviewToDtl> ccPrjCostOverviewToDtls = CcPrjCostOverviewToDtl.selectByWhere(new Where().eq(CcPrjCostOverviewToDtl.Cols.ENTITY_RECORD_ID, csCommId));
+        String ccPrjCostOverviewId = null;
+        String entCode = null;
+        String ccPrjCostOverviewPid = null;
+        String ccPrjCostOverviewNowPid = null;
+        for (CcPrjCostOverviewToDtl ccPrjCostOverviewToDtl : ccPrjCostOverviewToDtls) {
+            ccPrjCostOverviewId = ccPrjCostOverviewToDtl.getCcPrjCostOverviewId();
+            BigDecimal rawTrxAmt = ccPrjCostOverviewToDtl.getTrxAmt();
+            entCode = ccPrjCostOverviewToDtl.getEntCode();
+
+            // 2.撤回此实体记录的招标金额
+            CcPrjCostOverview ccPrjCostOverview = CcPrjCostOverview.selectById(ccPrjCostOverviewId);
+            String copyFromPrjStructNodeId = ccPrjCostOverview.getCopyFromPrjStructNodeId();
+            ccPrjCostOverviewPid = ccPrjCostOverview.getCcPrjCostOverviewPid();
+            BigDecimal purchaseAmtInBid = ccPrjCostOverview.getPurchaseAmt(); // 上次已采购金额
+            BigDecimal rawPurchaseAmt = purchaseAmtInBid.subtract(rawTrxAmt); // 原始已采购金额
+            ccPrjCostOverview.setPurchaseAmt(rawPurchaseAmt);
+            ccPrjCostOverview.updateById();
+
+            // 3.获取更新后此实体记录的采购金额,并更新
+            CcPrjCostOverview ccPrjCostOverviewNow = CcPrjCostOverview.selectByWhere(new Where().eq(CcPrjCostOverview.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjCostOverview.Cols.COPY_FROM_PRJ_STRUCT_NODE_ID, ccPrjCbsTempalteNodeId)).get(0);
+            String ccPrjCostOverviewNowId = ccPrjCostOverviewNow.getId();
+            ccPrjCostOverviewNowPid = ccPrjCostOverviewNow.getCcPrjCostOverviewPid();
+            BigDecimal purchaseAmtInBid1 = ccPrjCostOverviewNow.getPurchaseAmt() != null ? ccPrjCostOverviewNow.getPurchaseAmt() : BigDecimal.ZERO;
+            BigDecimal nowBidAmt = purchaseAmtInBid1.add(trxAmt);
+            ccPrjCostOverviewNow.setPurchaseAmt(nowBidAmt);
+
+            int comparisonResult = nowBidAmt.compareTo(ccPrjCostOverviewNow.getBidAmt() != null ? ccPrjCostOverviewNow.getBidAmt() : BigDecimal.ZERO);
+            if (comparisonResult > 0) {
+                throw new BaseException("合同额大于已招标金额！");
+            }
+            ccPrjCostOverviewNow.updateById();
+
+            // 4.生成此次更新采购关联记录
+            CcPrjCostOverviewToDtl newCcPrjCostOverviewToDtl = CcPrjCostOverviewToDtl.insertData();
+            newCcPrjCostOverviewToDtl.setCcPrjCostOverviewId(ccPrjCostOverviewNowId);
+            newCcPrjCostOverviewToDtl.setEntCode(entCode);
+            newCcPrjCostOverviewToDtl.setEntityRecordId(csCommId);
+            newCcPrjCostOverviewToDtl.setTrxAmt(trxAmt);
+            newCcPrjCostOverviewToDtl.updateById();
+
+            // 5.删除先前采购关联记录
+            ccPrjCostOverviewToDtl.deleteById();
+        }
+        // 6.重算成本总览
+        recalculatePlanTotalCost(ccPrjCostOverviewPid, "PURCHASE_AMT");
+        recalculatePlanTotalCost(ccPrjCostOverviewNowPid, "PURCHASE_AMT");
+    }
+
 
     /**
      * 删除采购
