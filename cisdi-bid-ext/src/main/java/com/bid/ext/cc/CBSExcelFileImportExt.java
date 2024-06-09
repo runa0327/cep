@@ -46,11 +46,9 @@ public class CBSExcelFileImportExt {
         String prjId = varMap.get("P_PRJ_ID").toString();
 //        String prjId ="1790672761571196928";
 
-
         /**
          *  查询当前指定成本类型数据
          */
-
         Where queryNodeWhere = new Where();
         queryNodeWhere.sql("T.IS_TEMPLATE=0 AND T.IS_CBS=1 AND T.CC_PRJ_STRUCT_USAGE_ID='" + structUsageId + "' AND  T.CC_PRJ_ID=" + prjId);
         List<CcPrjStructNode> ccPrjStructNodes = CcPrjStructNode.selectByWhere(queryNodeWhere);
@@ -125,8 +123,8 @@ public class CBSExcelFileImportExt {
      */
     public void costViewNodeAnalyzing() {
 
-        EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
-        Map<String, Object> valueMap = entityRecord.valueMap;
+//        EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
+//        Map<String, Object> valueMap = entityRecord.valueMap;
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
 
 //        String  structUsageId = (String) valueMap.get("CC_PRJ_STRUCT_USAGE_ID");
@@ -152,7 +150,7 @@ public class CBSExcelFileImportExt {
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
 
-//       String filePath = "/Users/hejialun/Documents/excel-import-test.xlsx";
+//       String filePath = "/Users/hejialun/Downloads/成本统览.xlsx";
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = new XSSFWorkbook(file);
@@ -178,6 +176,7 @@ public class CBSExcelFileImportExt {
                     if ( cell3.getCellType()==BLANK ){
                         throw   new BaseException("第"+(row.getRowNum()+1)+"行，成本科目为空");
                     }
+                    ccPrjCostOverviewSimple.setName(getCellValueAsString(cell3));
 
 //                    立项匡算
                     Cell cell7 = row.getCell(9);
@@ -222,9 +221,12 @@ public class CBSExcelFileImportExt {
 
         //删除原来的数据
         List<String> ids = new ArrayList<>();
-        for (CcPrjCostOverviewSimple cost : ccPrjCostOverviewSimples) {
-            ids.add(cost.getId());
+        if (ccPrjCostOverviewSimples!=null){
+            for (CcPrjCostOverviewSimple cost : ccPrjCostOverviewSimples) {
+                ids.add(cost.getId());
+            }
         }
+
         CcPrjCostOverviewSimple.deleteByIds(ids);
 
         InvokeActResult invokeActResult = new InvokeActResult();

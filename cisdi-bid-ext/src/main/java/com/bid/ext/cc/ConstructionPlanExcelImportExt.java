@@ -1,5 +1,7 @@
 package com.bid.ext.cc;
 
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -49,7 +51,7 @@ public class ConstructionPlanExcelImportExt {
         queryCompanyWhere.sql("1=1");
         List<CcCompany> ccCompanies = CcCompany.selectByWhere(queryCompanyWhere);
 
-//       String filePath = "/Users/hejialun/Documents/excel-import-test.xlsx";
+//       String filePath = "/Users/hejialun/Downloads/施工方案.xlsx";
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = new XSSFWorkbook(file);
@@ -62,12 +64,12 @@ public class ConstructionPlanExcelImportExt {
                 }
 
                 //获取指定列的下标
-                if (row.getRowNum()>1){
+                if (row.getRowNum()>0){
                     String  companyName = "";//公司名称
                     String   name = ""; //事项
 
                     //事项
-                    Cell cell1 = row.getCell(6);
+                    Cell cell1 = row.getCell(5);
                     if (cell1.getCellType() == BLANK) {
                         throw  new BaseException("第"+(row.getRowNum()+1)+"行，'事项'名称不能为空");
                     }
@@ -78,7 +80,7 @@ public class ConstructionPlanExcelImportExt {
                     if (cell1.getCellType() == BLANK) {
                         throw  new BaseException("第"+(row.getRowNum()+1)+"行，'报审单位'名称不能为空");
                     }
-                    companyName = getCellValueAsString(cell1);
+                    companyName = getCellValueAsString(cell2);
 
                     //计划从
                     Cell cell3 = row.getCell(7);
@@ -97,7 +99,10 @@ public class ConstructionPlanExcelImportExt {
                     String companyId = "";
                     boolean  exist = false;
                     for (CcCompany company : ccCompanies){
-                        if (company.getName().equals(companyName)){
+                        String nameJson = company.getName();
+                        JSONObject entries = JSONUtil.parseObj(nameJson);
+                        String zh_cn = entries.getStr("ZH_CN");
+                        if (company.getName().equals(zh_cn)){
                             companyId = company.getId();
                             exist = true;
                         }
