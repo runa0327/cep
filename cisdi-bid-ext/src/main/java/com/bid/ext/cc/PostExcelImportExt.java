@@ -70,9 +70,9 @@ public class PostExcelImportExt {
 
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-//        String filePath = flFile.getPhysicalLocation();
+        String filePath = flFile.getPhysicalLocation();
 
-        String filePath = "/Users/hejialun/Downloads/项目参建方公司岗位.xlsx";
+//        String filePath = "/Users/hejialun/Downloads/项目参建方公司岗位.xlsx";
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = new XSSFWorkbook(file);
