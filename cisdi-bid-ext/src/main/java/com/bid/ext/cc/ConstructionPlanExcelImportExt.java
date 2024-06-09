@@ -1,0 +1,157 @@
+package com.bid.ext.cc;
+
+import com.bid.ext.model.*;
+import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
+import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.interaction.InvokeActResult;
+import net.sf.mpxj.Task;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.apache.poi.ss.usermodel.CellType.BLANK;
+
+public class ConstructionPlanExcelImportExt {
+
+    /**
+     * 施工方案导入，简版
+     */
+    public void constructionPlanImport(){
+
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String prjId = varMap.get("P_PRJ_ID").toString();
+
+        if (prjId != null && prjId.isEmpty()){
+            throw new BaseException("请选择指定项目");
+        }
+
+        //获取上传的excel文件
+        FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
+        String filePath = flFile.getPhysicalLocation();
+
+        /**
+         *  查询系统岗位
+         */
+        Where queryCompanyWhere = new Where();
+        queryCompanyWhere.sql("1=1");
+        List<CcCompany> ccCompanies = CcCompany.selectByWhere(queryCompanyWhere);
+
+//       String filePath = "/Users/hejialun/Documents/excel-import-test.xlsx";
+
+        try (FileInputStream file = new FileInputStream(new File(filePath))) {
+            Workbook workbook = new XSSFWorkbook(file);
+            Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
+
+            //循环行
+            for (Row row : sheet) {
+                if(row.getRowNum()==0) {
+                    continue;
+                }
+
+                //获取指定列的下标
+                if (row.getRowNum()>1){
+                    String  companyName = "";//公司名称
+                    String   name = ""; //事项
+
+                    //事项
+                    Cell cell1 = row.getCell(6);
+                    if (cell1.getCellType() == BLANK) {
+                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'事项'名称不能为空");
+                    }
+                    name = getCellValueAsString(cell1);
+
+                    //报审单位
+                    Cell cell2 = row.getCell(6);
+                    if (cell1.getCellType() == BLANK) {
+                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'报审单位'名称不能为空");
+                    }
+                    companyName = getCellValueAsString(cell1);
+
+                    //计划从
+                    Cell cell3 = row.getCell(7);
+                    if (cell3.getCellType() == BLANK) {
+                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'计划从'名称不能为空");
+                    }
+                    LocalDate frDate = LocalDate.parse(getCellValueAsString(cell3));
+
+                    //计划到
+                    Cell cell4 = row.getCell(8);
+                    if (cell4.getCellType() == BLANK) {
+                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'计划到'名称不能为空");
+                    }
+                    LocalDate toDate = LocalDate.parse(getCellValueAsString(cell4));
+
+                    String companyId = "";
+                    boolean  exist = false;
+                    for (CcCompany company : ccCompanies){
+                        if (company.getName().equals(companyName)){
+                            companyId = company.getId();
+                            exist = true;
+                        }
+                    }
+
+                    //插入公司
+                    if (!exist){
+                        CcCompany company = CcCompany.newData();
+                        company.setName("{\"EN\": \""+companyName+"\", \"ZH_CN\": \""+companyName+"\", \"ZH_TW\": \""+companyName+"\"}");
+                        company.setFullName("{\"EN\": \""+companyName+"\", \"ZH_CN\": \""+companyName+"\", \"ZH_TW\": \""+companyName+"\"}");
+                        company.setStatus("AP");
+                        company.setSeqNo(new BigDecimal(0));
+                        company.setIsDefault(false);
+                        company.insertById();
+                        companyId = company.getId();
+                    }
+
+                    CcConstructPlan plan = CcConstructPlan.newData();
+                    plan.setName(name);
+                    plan.setCcPrjId(prjId);
+                    plan.setCcCompanyId(companyId);
+                    plan.setPlanFr(frDate);
+                    plan.setPlanTo(toDate);
+                    plan.insertById();
+                }
+            }
+        } catch (IOException e) {
+            throw  new BaseException("上传文件失败");
+        }
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    private  String getCellValueAsString(Cell cell) {
+        String cellValue = "";
+        switch (cell.getCellType()) {
+            case STRING:
+                cellValue = cell.getStringCellValue();
+                break;
+            case NUMERIC:
+                cellValue = String.valueOf(cell.getNumericCellValue());
+                break;
+            case BOOLEAN:
+                cellValue = String.valueOf(cell.getBooleanCellValue());
+                break;
+            case FORMULA:
+                cellValue = String.valueOf(cell.getCellFormula());
+                break;
+            default:
+                cellValue = "";
+        }
+        return cellValue;
+    }
+
+}
