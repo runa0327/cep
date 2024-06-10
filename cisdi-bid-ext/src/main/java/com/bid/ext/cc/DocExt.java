@@ -1,6 +1,7 @@
 package com.bid.ext.cc;
 
 import com.bid.ext.model.CcDocFile;
+import com.bid.ext.model.CcPrjStructNode;
 import com.bid.ext.model.FlFile;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.MyJdbcTemplate;
@@ -78,4 +79,28 @@ public class DocExt {
         ExtJarHelper.setReturnValue(outputMap);
     }
 
+    /**
+     * 收藏文件
+     */
+    public void addFavoriteFile() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcDocFile ccDocFile = CcDocFile.selectById(csCommId);
+            ccDocFile.setIsFavorites(true);
+            ccDocFile.updateById();
+        }
+    }
+
+    /**
+     * 取消收藏文件
+     */
+
+    public void removeFavoriteFile() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcDocFile ccDocFile = CcDocFile.selectById(csCommId);
+            ccDocFile.setIsFavorites(false);
+            ccDocFile.updateById();
+        }
+    }
 }

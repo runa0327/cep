@@ -91,9 +91,9 @@ public class CcDocFile {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
-         * {"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+         * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
          */
-        public static final String CC_ATTACHMENT = "CC_ATTACHMENT";
+        public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
          * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
          */
@@ -114,6 +114,10 @@ public class CcDocFile {
          * {"EN": "CC_DOC_FILE_TYPE_ID", "ZH_CN": "资料文件类型", "ZH_TW": "繁：资料文件类型"}。
          */
         public static final String CC_DOC_FILE_TYPE_ID = "CC_DOC_FILE_TYPE_ID";
+        /**
+         * {"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+         */
+        public static final String CC_ATTACHMENT = "CC_ATTACHMENT";
         /**
          * {"EN": "模型文件ID", "ZH_CN": "预览文件ID", "ZH_TW": "模型文件ID"}。
          */
@@ -142,6 +146,10 @@ public class CcDocFile {
          * {"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
          */
         public static final String IS_DEFAULT = "IS_DEFAULT";
+        /**
+         * {"EN": "是否收藏", "ZH_CN": "是否收藏", "ZH_TW": "是否收藏"}。
+         */
+        public static final String IS_FAVORITES = "IS_FAVORITES";
         /**
          * {"EN": "CC_DOC_DIR_ID", "ZH_CN": "资料目录", "ZH_TW": "繁：资料目录"}。
          */
@@ -550,36 +558,36 @@ public class CcDocFile {
     }
 
     /**
-     * {"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+     * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
      */
-    private String ccAttachment;
+    private String ccPrjId;
 
     /**
-     * 获取：{"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+     * 获取：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
      */
-    public String getCcAttachment() {
-        return this.ccAttachment;
+    public String getCcPrjId() {
+        return this.ccPrjId;
     }
 
     /**
-     * 设置：{"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+     * 设置：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
      */
-    public CcDocFile setCcAttachment(String ccAttachment) {
-        if (this.ccAttachment == null && ccAttachment == null) {
+    public CcDocFile setCcPrjId(String ccPrjId) {
+        if (this.ccPrjId == null && ccPrjId == null) {
             // 均为null，不做处理。
-        } else if (this.ccAttachment != null && ccAttachment != null) {
+        } else if (this.ccPrjId != null && ccPrjId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccAttachment.compareTo(ccAttachment) != 0) {
-                this.ccAttachment = ccAttachment;
-                if (!this.toUpdateCols.contains("CC_ATTACHMENT")) {
-                    this.toUpdateCols.add("CC_ATTACHMENT");
+            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
+                this.ccPrjId = ccPrjId;
+                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccAttachment = ccAttachment;
-            if (!this.toUpdateCols.contains("CC_ATTACHMENT")) {
-                this.toUpdateCols.add("CC_ATTACHMENT");
+            this.ccPrjId = ccPrjId;
+            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                this.toUpdateCols.add("CC_PRJ_ID");
             }
         }
         return this;
@@ -760,6 +768,42 @@ public class CcDocFile {
             this.ccDocFileTypeId = ccDocFileTypeId;
             if (!this.toUpdateCols.contains("CC_DOC_FILE_TYPE_ID")) {
                 this.toUpdateCols.add("CC_DOC_FILE_TYPE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+     */
+    private String ccAttachment;
+
+    /**
+     * 获取：{"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+     */
+    public String getCcAttachment() {
+        return this.ccAttachment;
+    }
+
+    /**
+     * 设置：{"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
+     */
+    public CcDocFile setCcAttachment(String ccAttachment) {
+        if (this.ccAttachment == null && ccAttachment == null) {
+            // 均为null，不做处理。
+        } else if (this.ccAttachment != null && ccAttachment != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccAttachment.compareTo(ccAttachment) != 0) {
+                this.ccAttachment = ccAttachment;
+                if (!this.toUpdateCols.contains("CC_ATTACHMENT")) {
+                    this.toUpdateCols.add("CC_ATTACHMENT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccAttachment = ccAttachment;
+            if (!this.toUpdateCols.contains("CC_ATTACHMENT")) {
+                this.toUpdateCols.add("CC_ATTACHMENT");
             }
         }
         return this;
@@ -1012,6 +1056,42 @@ public class CcDocFile {
             this.isDefault = isDefault;
             if (!this.toUpdateCols.contains("IS_DEFAULT")) {
                 this.toUpdateCols.add("IS_DEFAULT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "是否收藏", "ZH_CN": "是否收藏", "ZH_TW": "是否收藏"}。
+     */
+    private Boolean isFavorites;
+
+    /**
+     * 获取：{"EN": "是否收藏", "ZH_CN": "是否收藏", "ZH_TW": "是否收藏"}。
+     */
+    public Boolean getIsFavorites() {
+        return this.isFavorites;
+    }
+
+    /**
+     * 设置：{"EN": "是否收藏", "ZH_CN": "是否收藏", "ZH_TW": "是否收藏"}。
+     */
+    public CcDocFile setIsFavorites(Boolean isFavorites) {
+        if (this.isFavorites == null && isFavorites == null) {
+            // 均为null，不做处理。
+        } else if (this.isFavorites != null && isFavorites != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isFavorites.compareTo(isFavorites) != 0) {
+                this.isFavorites = isFavorites;
+                if (!this.toUpdateCols.contains("IS_FAVORITES")) {
+                    this.toUpdateCols.add("IS_FAVORITES");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isFavorites = isFavorites;
+            if (!this.toUpdateCols.contains("IS_FAVORITES")) {
+                this.toUpdateCols.add("IS_FAVORITES");
             }
         }
         return this;
