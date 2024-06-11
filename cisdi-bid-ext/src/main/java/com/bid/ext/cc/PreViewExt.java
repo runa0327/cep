@@ -231,20 +231,20 @@ public class PreViewExt {
                                         if (pollCount >= 3) {
                                             log.info("正在转换中，请稍后查询");
                                             ccDocFile.setCcPreviewConversionStatusId(ModelConversionStatus.DOING.toString());
-                                            break;
+                                            throw new BaseException("正在转换中，请稍后再尝试预览");
                                         }
                                     }
                                 } else {
                                     log.error("查询模型转换状态失败：" + response);
-                                    translationComplete = true; // 示例中，发生错误时停止轮询
+                                    throw new BaseException("查询模型转换状态失败：" + response); // 发送错误抛出异常
                                 }
                             } catch (InterruptedException e) {
                                 Thread.currentThread().interrupt();
                                 log.error("轮询查询模型转换状态时被中断", e);
-                                break; // 中断循环
+                                throw new BaseException("轮询查询模型转换状态时被中断", e); // 发送错误抛出异常
                             } catch (Exception e) {
                                 log.error("查询模型转换状态时发生异常", e);
-                                translationComplete = true; // 示例中，发生异常时停止轮询
+                                throw new BaseException("查询模型转换状态时发生异常", e); // 发送错误抛出异常
                             }
                         }
                         latch.countDown(); //通知第二个线程完成
@@ -275,6 +275,7 @@ public class PreViewExt {
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         log.error("主线程等待异步操作完成时被中断", e);
+                        throw new BaseException("主线程等待异步操作完成时被中断", e);
                     }
                 }
             }
