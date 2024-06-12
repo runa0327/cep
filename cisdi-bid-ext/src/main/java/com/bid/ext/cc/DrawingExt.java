@@ -41,12 +41,16 @@ public class DrawingExt {
      */
     public void uploadDrawing() {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
-        String pCcDrawingVersionId = JdbcMapUtil.getString(varMap, "P_CC_DRAWING_VERSION_ID");
-        String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENT");
-        CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
-        ccDrawingUpload.setCcAttachment(ccAttachment);
-        ccDrawingUpload.setCcDrawingVersionId(pCcDrawingVersionId);
-        ccDrawingUpload.insertById();
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            String pCcDrawingVersionId = JdbcMapUtil.getString(varMap, "P_CC_DRAWING_VERSION_ID");
+            String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENT");
+            CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
+            ccDrawingUpload.setCcAttachment(ccAttachment);
+            ccDrawingUpload.setCcDrawingVersionId(pCcDrawingVersionId);
+            ccDrawingUpload.setCcDrawingManagementId(csCommId);
+            ccDrawingUpload.insertById();
+        }
     }
 
     /**
@@ -54,14 +58,18 @@ public class DrawingExt {
      */
     public void upgradeDrawing() {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
-        String pCcDrawingVersionId = JdbcMapUtil.getString(varMap, "P_CC_DRAWING_VERSION_ID");
-        String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENT");
-        String pRemark = JdbcMapUtil.getString(varMap, "P_REMARK");
-        CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
-        ccDrawingUpload.setCcAttachment(ccAttachment);
-        ccDrawingUpload.setCcDrawingVersionId(pCcDrawingVersionId);
-        ccDrawingUpload.setRemark(pRemark);
-        ccDrawingUpload.insertById();
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            String pCcDrawingVersionId = JdbcMapUtil.getString(varMap, "P_CC_DRAWING_VERSION_ID");
+            String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENT");
+            String pRemark = JdbcMapUtil.getString(varMap, "P_REMARK");
+            CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
+            ccDrawingUpload.setCcAttachment(ccAttachment);
+            ccDrawingUpload.setCcDrawingVersionId(pCcDrawingVersionId);
+            ccDrawingUpload.setRemark(pRemark);
+            ccDrawingUpload.setCcDrawingManagementId(csCommId);
+            ccDrawingUpload.insertById();
+        }
     }
 
 }

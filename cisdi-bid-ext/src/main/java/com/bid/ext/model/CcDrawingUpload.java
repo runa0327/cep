@@ -114,6 +114,10 @@ public class CcDrawingUpload {
          * {"EN": "图纸类型", "ZH_CN": "图纸版本", "ZH_TW": "图纸类型"}。
          */
         public static final String CC_DRAWING_VERSION_ID = "CC_DRAWING_VERSION_ID";
+        /**
+         * {"EN": "资料文件打包", "ZH_CN": "图纸管理", "ZH_TW": "资料文件打包"}。
+         */
+        public static final String CC_DRAWING_MANAGEMENT_ID = "CC_DRAWING_MANAGEMENT_ID";
     }
 
     // </editor-fold>
@@ -728,6 +732,42 @@ public class CcDrawingUpload {
             this.ccDrawingVersionId = ccDrawingVersionId;
             if (!this.toUpdateCols.contains("CC_DRAWING_VERSION_ID")) {
                 this.toUpdateCols.add("CC_DRAWING_VERSION_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "资料文件打包", "ZH_CN": "图纸管理", "ZH_TW": "资料文件打包"}。
+     */
+    private String ccDrawingManagementId;
+
+    /**
+     * 获取：{"EN": "资料文件打包", "ZH_CN": "图纸管理", "ZH_TW": "资料文件打包"}。
+     */
+    public String getCcDrawingManagementId() {
+        return this.ccDrawingManagementId;
+    }
+
+    /**
+     * 设置：{"EN": "资料文件打包", "ZH_CN": "图纸管理", "ZH_TW": "资料文件打包"}。
+     */
+    public CcDrawingUpload setCcDrawingManagementId(String ccDrawingManagementId) {
+        if (this.ccDrawingManagementId == null && ccDrawingManagementId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccDrawingManagementId != null && ccDrawingManagementId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccDrawingManagementId.compareTo(ccDrawingManagementId) != 0) {
+                this.ccDrawingManagementId = ccDrawingManagementId;
+                if (!this.toUpdateCols.contains("CC_DRAWING_MANAGEMENT_ID")) {
+                    this.toUpdateCols.add("CC_DRAWING_MANAGEMENT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccDrawingManagementId = ccDrawingManagementId;
+            if (!this.toUpdateCols.contains("CC_DRAWING_MANAGEMENT_ID")) {
+                this.toUpdateCols.add("CC_DRAWING_MANAGEMENT_ID");
             }
         }
         return this;
