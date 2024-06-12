@@ -58,6 +58,8 @@ public class CBSExcelFileImportExt {
         String filePath = flFile.getPhysicalLocation();
 
 //       String filePath = "/Users/hejialun/Documents/excel-import-test.xlsx";
+        if("xlsx".equals(flFile.getExt()))
+            throw new BaseException("请上传'xlsx'格式的Excel文件");
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = new XSSFWorkbook(file);
@@ -70,7 +72,7 @@ public class CBSExcelFileImportExt {
             //循环行
             for (Row row : sheet) {
                 //获取指定列的下标
-                if (row.getRowNum() == 0) {
+                if (row.getRowNum() == 1) {
                     for (Cell cell : row) {
                         String cellValue = getCellValueAsString(cell);
                         if ("名称".equals(cellValue)) {
@@ -84,8 +86,9 @@ public class CBSExcelFileImportExt {
                     } else if (costIndex == -1) {
                         throw new BaseException("未找到'总成本'列");
                     }
-                } else {
+                }
 
+                if(row.getRowNum() >1) {
                     Cell nameCell = row.getCell(nameIndex);
                     if (nameCell.getCellType() == BLANK) {
                         throw new BaseException("第" + (row.getRowNum() + 1) + "行，科目名称不能为空");
@@ -151,6 +154,9 @@ public class CBSExcelFileImportExt {
         String filePath = flFile.getPhysicalLocation();
 
 //       String filePath = "/Users/hejialun/Downloads/成本统览.xlsx";
+
+        if("xlsx".equals(flFile.getExt()))
+            throw new BaseException("请上传'xlsx'格式的Excel文件");
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = new XSSFWorkbook(file);
