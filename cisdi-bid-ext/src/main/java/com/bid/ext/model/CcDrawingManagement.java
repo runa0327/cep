@@ -108,10 +108,6 @@ public class CcDrawingManagement {
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
-         * {"EN": "图纸类型", "ZH_CN": "图纸版本", "ZH_TW": "图纸类型"}。
-         */
-        public static final String CC_DRAWING_VERSION_ID = "CC_DRAWING_VERSION_ID";
-        /**
          * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
          */
         public static final String CC_PRJ_STRUCT_NODE_ID = "CC_PRJ_STRUCT_NODE_ID";
@@ -701,42 +697,6 @@ public class CcDrawingManagement {
             this.ccPrjId = ccPrjId;
             if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
                 this.toUpdateCols.add("CC_PRJ_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "图纸类型", "ZH_CN": "图纸版本", "ZH_TW": "图纸类型"}。
-     */
-    private String ccDrawingVersionId;
-
-    /**
-     * 获取：{"EN": "图纸类型", "ZH_CN": "图纸版本", "ZH_TW": "图纸类型"}。
-     */
-    public String getCcDrawingVersionId() {
-        return this.ccDrawingVersionId;
-    }
-
-    /**
-     * 设置：{"EN": "图纸类型", "ZH_CN": "图纸版本", "ZH_TW": "图纸类型"}。
-     */
-    public CcDrawingManagement setCcDrawingVersionId(String ccDrawingVersionId) {
-        if (this.ccDrawingVersionId == null && ccDrawingVersionId == null) {
-            // 均为null，不做处理。
-        } else if (this.ccDrawingVersionId != null && ccDrawingVersionId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.ccDrawingVersionId.compareTo(ccDrawingVersionId) != 0) {
-                this.ccDrawingVersionId = ccDrawingVersionId;
-                if (!this.toUpdateCols.contains("CC_DRAWING_VERSION_ID")) {
-                    this.toUpdateCols.add("CC_DRAWING_VERSION_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.ccDrawingVersionId = ccDrawingVersionId;
-            if (!this.toUpdateCols.contains("CC_DRAWING_VERSION_ID")) {
-                this.toUpdateCols.add("CC_DRAWING_VERSION_ID");
             }
         }
         return this;

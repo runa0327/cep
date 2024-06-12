@@ -25,10 +25,10 @@ public class DrawingExt {
                 ccDrawingManagement.setCcDrawingStatusId("DONE");
             }
             String threeDActDate = JdbcMapUtil.getString(valueMap, "THREE_D_ACT_DATE");
-            Boolean isThreeDimensional = JdbcMapUtil.getBoolean(valueMap, "IS_THREE_DIMENSIONAL");
+            Boolean isThreeDimensional = ccDrawingManagement.getIsThreeDimensional();
             if (isThreeDimensional && SharedUtil.isEmpty(threeDActDate)) {
                 ccDrawingManagement.setCcModelStatusId("TODO");
-            } else {
+            } else if (isThreeDimensional && !SharedUtil.isEmpty(threeDActDate)) {
                 ccDrawingManagement.setCcModelStatusId("DONE");
             }
             ccDrawingManagement.updateById();
