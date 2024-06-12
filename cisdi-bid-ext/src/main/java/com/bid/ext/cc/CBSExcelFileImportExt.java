@@ -58,9 +58,8 @@ public class CBSExcelFileImportExt {
         String filePath = flFile.getPhysicalLocation();
 
 //       String filePath = "/Users/hejialun/Documents/excel-import-test.xlsx";
-        if("xlsx".equals(flFile.getExt()))
+        if(!"xlsx".equals(flFile.getExt()))
             throw new BaseException("请上传'xlsx'格式的Excel文件");
-
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = new XSSFWorkbook(file);
             Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
@@ -155,7 +154,7 @@ public class CBSExcelFileImportExt {
 
 //       String filePath = "/Users/hejialun/Downloads/成本统览.xlsx";
 
-        if("xlsx".equals(flFile.getExt()))
+        if(!"xlsx".equals(flFile.getExt()))
             throw new BaseException("请上传'xlsx'格式的Excel文件");
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {

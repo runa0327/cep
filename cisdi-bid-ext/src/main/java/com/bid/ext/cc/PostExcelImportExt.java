@@ -74,7 +74,7 @@ public class PostExcelImportExt {
 
 //        String filePath = "/Users/hejialun/Downloads/项目参建方公司岗位.xlsx";
 
-        if("xlsx".equals(flFile.getExt()))
+        if(!"xlsx".equals(flFile.getExt()))
             throw new BaseException("请上传'xlsx'格式的Excel文件");
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {

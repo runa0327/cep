@@ -44,7 +44,7 @@ public class ConstructionPlanExcelImportExt {
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
 
-        if("xlsx".equals(flFile.getExt()))
+        if(!"xlsx".equals(flFile.getExt()))
             throw new BaseException("请上传'xlsx'格式的Excel文件");
 
         /**
