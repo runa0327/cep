@@ -1,6 +1,7 @@
 package com.bid.ext.cc;
 
 import com.bid.ext.model.CcDrawingManagement;
+import com.bid.ext.model.CcDrawingUpload;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -33,6 +34,34 @@ public class DrawingExt {
             }
             ccDrawingManagement.updateById();
         }
+    }
+
+    /**
+     * 上传图纸
+     */
+    public void uploadDrawing() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String pCcDrawingVersionId = JdbcMapUtil.getString(varMap, "P_CC_DRAWING_VERSION_ID");
+        String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENT");
+        CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
+        ccDrawingUpload.setCcAttachment(ccAttachment);
+        ccDrawingUpload.setCcDrawingVersionId(pCcDrawingVersionId);
+        ccDrawingUpload.insertById();
+    }
+
+    /**
+     * 升级图纸
+     */
+    public void upgradeDrawing() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String pCcDrawingVersionId = JdbcMapUtil.getString(varMap, "P_CC_DRAWING_VERSION_ID");
+        String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENT");
+        String pRemark = JdbcMapUtil.getString(varMap, "P_REMARK");
+        CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
+        ccDrawingUpload.setCcAttachment(ccAttachment);
+        ccDrawingUpload.setCcDrawingVersionId(pCcDrawingVersionId);
+        ccDrawingUpload.setRemark(pRemark);
+        ccDrawingUpload.insertById();
     }
 
 }
