@@ -2,6 +2,7 @@ package com.bid.ext.cc;
 
 import com.bid.ext.model.CcDrawingManagement;
 import com.bid.ext.model.CcDrawingUpload;
+import com.bid.ext.model.FlFile;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -45,10 +46,13 @@ public class DrawingExt {
             String csCommId = entityRecord.csCommId;
             String pCcDrawingVersionId = JdbcMapUtil.getString(varMap, "P_CC_DRAWING_VERSION_ID");
             String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENT");
+            FlFile flFile = FlFile.selectById(ccAttachment);
+            String dspName = flFile.getDspName();
             CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
             ccDrawingUpload.setCcAttachment(ccAttachment);
             ccDrawingUpload.setCcDrawingVersionId(pCcDrawingVersionId);
             ccDrawingUpload.setCcDrawingManagementId(csCommId);
+            ccDrawingUpload.setName(dspName);
             ccDrawingUpload.insertById();
         }
     }
@@ -62,12 +66,15 @@ public class DrawingExt {
             String csCommId = entityRecord.csCommId;
             String pCcDrawingVersionId = JdbcMapUtil.getString(varMap, "P_CC_DRAWING_VERSION_ID");
             String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENT");
+            FlFile flFile = FlFile.selectById(ccAttachment);
+            String dspName = flFile.getDspName();
             String pRemark = JdbcMapUtil.getString(varMap, "P_REMARK");
             CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
             ccDrawingUpload.setCcAttachment(ccAttachment);
             ccDrawingUpload.setCcDrawingVersionId(pCcDrawingVersionId);
             ccDrawingUpload.setRemark(pRemark);
             ccDrawingUpload.setCcDrawingManagementId(csCommId);
+            ccDrawingUpload.setName(dspName);
             ccDrawingUpload.insertById();
         }
     }
