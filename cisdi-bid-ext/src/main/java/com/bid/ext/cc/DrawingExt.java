@@ -32,6 +32,8 @@ public class DrawingExt {
                 ccDrawingManagement.setCcModelStatusId("TODO");
             } else if (isThreeDimensional && !SharedUtil.isEmpty(threeDActDate)) {
                 ccDrawingManagement.setCcModelStatusId("DONE");
+            } else if (!isThreeDimensional) {
+                ccDrawingManagement.setCcModelStatusId(null);
             }
             ccDrawingManagement.updateById();
         }
