@@ -16,7 +16,7 @@ public class roleExt {
     public void batchInsertUser() {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         String pAdUserIds = JdbcMapUtil.getString(varMap, "P_AD_USER_IDS");
-        String adRoleId = JdbcMapUtil.getString(varMap, "AD_ROLE_ID");
+        String adRoleId = JdbcMapUtil.getString(varMap, "P_AD_ROLE_ID");
         if (pAdUserIds != null && !pAdUserIds.isEmpty()) {
             List<String> userIdList = Arrays.asList(pAdUserIds.split(","));
             for (String userId : userIdList) {
