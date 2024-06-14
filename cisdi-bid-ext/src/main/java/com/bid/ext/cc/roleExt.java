@@ -23,29 +23,31 @@ public class roleExt {
         String pAdUserIds = JdbcMapUtil.getString(varMap, "P_AD_USER_IDS");
 
         Map<String, List<DrivenInfo>> drivenInfosMap = ExtJarHelper.getDrivenInfosMap();
-        List<DrivenInfo> drivenInfos = drivenInfosMap.get("1790346299274113024");
-        String adRoleId = null;
+        for (Map.Entry<String, List<DrivenInfo>> entry : drivenInfosMap.entrySet()) {
+            List<DrivenInfo> drivenInfos = entry.getValue();
 
-        Optional<String> value = drivenInfos.stream()
-                .filter(info -> "AD_ROLE_ID".equals(info.code))
-                .map(info -> info.value)
-                .findFirst();
-        if (value.isPresent()) {
-            adRoleId = value.get();
-        }
+            String adRoleId = null;
+            Optional<String> value = drivenInfos.stream()
+                    .filter(info -> "AD_ROLE_ID".equals(info.code))
+                    .map(info -> info.value)
+                    .findFirst();
+            if (value.isPresent()) {
+                adRoleId = value.get();
+            }
 
-        if (pAdUserIds != null && !pAdUserIds.isEmpty()) {
-            List<String> userIdList = Arrays.asList(pAdUserIds.split(","));
-            for (String userId : userIdList) {
-                //查询用户是否已经是该角色
-                List<AdRoleUser> adRoleUsers = AdRoleUser.selectByWhere(new Where().eq(AdRoleUser.Cols.AD_USER_ID, userId).eq(AdRoleUser.Cols.AD_ROLE_ID, adRoleId));
-                if (SharedUtil.isEmpty(adRoleUsers)) {
-                    //插入用户
-                    AdRoleUser adRoleUser = AdRoleUser.newData();
-                    adRoleUser.setAdUserId(userId);
-                    adRoleUser.setAdRoleId(adRoleId);
-                    adRoleUser.setStatus("AP");
-                    adRoleUser.insertById();
+            if (pAdUserIds != null && !pAdUserIds.isEmpty()) {
+                List<String> userIdList = Arrays.asList(pAdUserIds.split(","));
+                for (String userId : userIdList) {
+                    //查询用户是否已经是该角色
+                    List<AdRoleUser> adRoleUsers = AdRoleUser.selectByWhere(new Where().eq(AdRoleUser.Cols.AD_USER_ID, userId).eq(AdRoleUser.Cols.AD_ROLE_ID, adRoleId));
+                    if (SharedUtil.isEmpty(adRoleUsers)) {
+                        //插入用户
+                        AdRoleUser adRoleUser = AdRoleUser.newData();
+                        adRoleUser.setAdUserId(userId);
+                        adRoleUser.setAdRoleId(adRoleId);
+                        adRoleUser.setStatus("AP");
+                        adRoleUser.insertById();
+                    }
                 }
             }
         }
