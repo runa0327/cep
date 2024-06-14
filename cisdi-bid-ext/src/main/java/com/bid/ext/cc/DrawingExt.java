@@ -132,5 +132,23 @@ public class DrawingExt {
         }
     }
 
+    /**
+     * 更新图纸时同步更新图纸版本的业主图号
+     */
+    public void updateDrawing(){
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()){
+            String csCommId = entityRecord.csCommId;
+            CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
+            //业主图号
+            String ccSteelOwnerDrawingId = ccDrawingManagement.getCcSteelOwnerDrawingId();
+            List<CcStructDrawingVersion> ccStructDrawingVersions = CcStructDrawingVersion.selectByWhere(new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId));
+            if (!SharedUtil.isEmpty(ccStructDrawingVersions)){
+                for (CcStructDrawingVersion ccStructDrawingVersion : ccStructDrawingVersions){
+                    ccStructDrawingVersion.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
+                    ccStructDrawingVersion.updateById();
+                }
+            }
+        }
+    }
 
 }
