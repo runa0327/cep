@@ -2,6 +2,7 @@ package com.bid.ext.cc;
 
 import com.bid.ext.model.CcDrawingManagement;
 import com.bid.ext.model.CcDrawingUpload;
+import com.bid.ext.model.CcStructDrawingVersion;
 import com.bid.ext.model.FlFile;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
@@ -49,7 +50,20 @@ public class DrawingExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
+            //套图信息
+            CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
+            String ccPrjStructNodeId = ccDrawingManagement.getCcPrjStructNodeId();
+            String ccSteelOwnerDrawingId = ccDrawingManagement.getCcSteelOwnerDrawingId();
+
             String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
+
+            //套图版本
+            CcStructDrawingVersion ccStructDrawingVersion = CcStructDrawingVersion.newData();
+            ccStructDrawingVersion.setCcDrawingVersionId("A");
+            ccStructDrawingVersion.setCcDrawingManagementId(csCommId);
+            ccStructDrawingVersion.setCcPrjStructNodeId(ccPrjStructNodeId);
+            ccStructDrawingVersion.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
+            ccStructDrawingVersion.insertById();
 
             List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
             for (String attachmentId : ccAttachmentList) {
@@ -88,6 +102,19 @@ public class DrawingExt {
                     break;
                 }
             }
+
+            //套图信息
+            CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
+            String ccPrjStructNodeId = ccDrawingManagement.getCcPrjStructNodeId();
+            String ccSteelOwnerDrawingId = ccDrawingManagement.getCcSteelOwnerDrawingId();
+
+            //套图版本
+            CcStructDrawingVersion ccStructDrawingVersion = CcStructDrawingVersion.newData();
+            ccStructDrawingVersion.setCcDrawingVersionId(ccDrawingVersionId);
+            ccStructDrawingVersion.setCcDrawingManagementId(csCommId);
+            ccStructDrawingVersion.setCcPrjStructNodeId(ccPrjStructNodeId);
+            ccStructDrawingVersion.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
+            ccStructDrawingVersion.insertById();
 
             List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
             for (String attachmentId : ccAttachmentList) {
