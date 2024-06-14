@@ -371,9 +371,11 @@ public class PrjExt {
             String adUserId = JdbcMapUtil.getString(valueMap, "AD_USER_ID");
             if (isPrimaryPos) {
                 List<CcPrjMember> ccPrjMembers = CcPrjMember.selectByWhere(new Where().eq(CcPrjMember.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjMember.Cols.AD_USER_ID, adUserId));
-                for (CcPrjMember ccPrjMember : ccPrjMembers) {
-                    ccPrjMember.setIsPrimaryPos(false);
-                    ccPrjMember.updateById();
+                if (!SharedUtil.isEmpty(ccPrjMembers)) {
+                    for (CcPrjMember ccPrjMember : ccPrjMembers) {
+                        ccPrjMember.setIsPrimaryPos(false);
+                        ccPrjMember.updateById();
+                    }
                 }
                 int update = myJdbcTemplate.update("update " + entityCode + " t set t.IS_PRIMARY_POS = ? where t.id=?", isPrimaryPos, id);
             }
