@@ -63,14 +63,6 @@ public class CcDrawingUpload {
          */
         public static final String IS_PRESET = "IS_PRESET";
         /**
-         * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
-         */
-        public static final String CRT_DT = "CRT_DT";
-        /**
-         * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
-         */
-        public static final String CRT_USER_ID = "CRT_USER_ID";
-        /**
          * {"EN": "LAST_MODI_DT", "ZH_CN": "最后修改日期时间", "ZH_TW": "繁：最后修改日期时间"}。
          */
         public static final String LAST_MODI_DT = "LAST_MODI_DT";
@@ -95,10 +87,6 @@ public class CcDrawingUpload {
          */
         public static final String NAME = "NAME";
         /**
-         * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
-         */
-        public static final String REMARK = "REMARK";
-        /**
          * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
          */
         public static final String FAST_CODE = "FAST_CODE";
@@ -107,6 +95,10 @@ public class CcDrawingUpload {
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
         /**
+         * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+         */
+        public static final String REMARK = "REMARK";
+        /**
          * {"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
          */
         public static final String CC_ATTACHMENT = "CC_ATTACHMENT";
@@ -114,6 +106,14 @@ public class CcDrawingUpload {
          * {"EN": "图纸类型", "ZH_CN": "图纸版本", "ZH_TW": "图纸类型"}。
          */
         public static final String CC_DRAWING_VERSION_ID = "CC_DRAWING_VERSION_ID";
+        /**
+         * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+         */
+        public static final String CRT_USER_ID = "CRT_USER_ID";
+        /**
+         * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+         */
+        public static final String CRT_DT = "CRT_DT";
         /**
          * {"EN": "资料文件打包", "ZH_CN": "图纸管理", "ZH_TW": "资料文件打包"}。
          */
@@ -264,78 +264,6 @@ public class CcDrawingUpload {
             this.isPreset = isPreset;
             if (!this.toUpdateCols.contains("IS_PRESET")) {
                 this.toUpdateCols.add("IS_PRESET");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
-     */
-    private LocalDateTime crtDt;
-
-    /**
-     * 获取：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
-     */
-    public LocalDateTime getCrtDt() {
-        return this.crtDt;
-    }
-
-    /**
-     * 设置：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
-     */
-    public CcDrawingUpload setCrtDt(LocalDateTime crtDt) {
-        if (this.crtDt == null && crtDt == null) {
-            // 均为null，不做处理。
-        } else if (this.crtDt != null && crtDt != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.crtDt.compareTo(crtDt) != 0) {
-                this.crtDt = crtDt;
-                if (!this.toUpdateCols.contains("CRT_DT")) {
-                    this.toUpdateCols.add("CRT_DT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.crtDt = crtDt;
-            if (!this.toUpdateCols.contains("CRT_DT")) {
-                this.toUpdateCols.add("CRT_DT");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
-     */
-    private String crtUserId;
-
-    /**
-     * 获取：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
-     */
-    public String getCrtUserId() {
-        return this.crtUserId;
-    }
-
-    /**
-     * 设置：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
-     */
-    public CcDrawingUpload setCrtUserId(String crtUserId) {
-        if (this.crtUserId == null && crtUserId == null) {
-            // 均为null，不做处理。
-        } else if (this.crtUserId != null && crtUserId != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.crtUserId.compareTo(crtUserId) != 0) {
-                this.crtUserId = crtUserId;
-                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
-                    this.toUpdateCols.add("CRT_USER_ID");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.crtUserId = crtUserId;
-            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
-                this.toUpdateCols.add("CRT_USER_ID");
             }
         }
         return this;
@@ -558,42 +486,6 @@ public class CcDrawingUpload {
     }
 
     /**
-     * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
-     */
-    private String remark;
-
-    /**
-     * 获取：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
-     */
-    public String getRemark() {
-        return this.remark;
-    }
-
-    /**
-     * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
-     */
-    public CcDrawingUpload setRemark(String remark) {
-        if (this.remark == null && remark == null) {
-            // 均为null，不做处理。
-        } else if (this.remark != null && remark != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.remark.compareTo(remark) != 0) {
-                this.remark = remark;
-                if (!this.toUpdateCols.contains("REMARK")) {
-                    this.toUpdateCols.add("REMARK");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.remark = remark;
-            if (!this.toUpdateCols.contains("REMARK")) {
-                this.toUpdateCols.add("REMARK");
-            }
-        }
-        return this;
-    }
-
-    /**
      * {"EN": "FAST_CODE", "ZH_CN": "快捷码", "ZH_TW": "繁：快捷码"}。
      */
     private String fastCode;
@@ -666,6 +558,42 @@ public class CcDrawingUpload {
     }
 
     /**
+     * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     */
+    private String remark;
+
+    /**
+     * 获取：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     */
+    public String getRemark() {
+        return this.remark;
+    }
+
+    /**
+     * 设置：{"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
+     */
+    public CcDrawingUpload setRemark(String remark) {
+        if (this.remark == null && remark == null) {
+            // 均为null，不做处理。
+        } else if (this.remark != null && remark != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.remark.compareTo(remark) != 0) {
+                this.remark = remark;
+                if (!this.toUpdateCols.contains("REMARK")) {
+                    this.toUpdateCols.add("REMARK");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.remark = remark;
+            if (!this.toUpdateCols.contains("REMARK")) {
+                this.toUpdateCols.add("REMARK");
+            }
+        }
+        return this;
+    }
+
+    /**
      * {"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
      */
     private String ccAttachment;
@@ -732,6 +660,78 @@ public class CcDrawingUpload {
             this.ccDrawingVersionId = ccDrawingVersionId;
             if (!this.toUpdateCols.contains("CC_DRAWING_VERSION_ID")) {
                 this.toUpdateCols.add("CC_DRAWING_VERSION_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     */
+    private String crtUserId;
+
+    /**
+     * 获取：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     */
+    public String getCrtUserId() {
+        return this.crtUserId;
+    }
+
+    /**
+     * 设置：{"EN": "CRT_USER_ID", "ZH_CN": "创建用户", "ZH_TW": "繁：创建用户"}。
+     */
+    public CcDrawingUpload setCrtUserId(String crtUserId) {
+        if (this.crtUserId == null && crtUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.crtUserId != null && crtUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtUserId.compareTo(crtUserId) != 0) {
+                this.crtUserId = crtUserId;
+                if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                    this.toUpdateCols.add("CRT_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtUserId = crtUserId;
+            if (!this.toUpdateCols.contains("CRT_USER_ID")) {
+                this.toUpdateCols.add("CRT_USER_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     */
+    private LocalDateTime crtDt;
+
+    /**
+     * 获取：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     */
+    public LocalDateTime getCrtDt() {
+        return this.crtDt;
+    }
+
+    /**
+     * 设置：{"EN": "CRT_DT", "ZH_CN": "创建日期时间", "ZH_TW": "繁：创建日期时间"}。
+     */
+    public CcDrawingUpload setCrtDt(LocalDateTime crtDt) {
+        if (this.crtDt == null && crtDt == null) {
+            // 均为null，不做处理。
+        } else if (this.crtDt != null && crtDt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.crtDt.compareTo(crtDt) != 0) {
+                this.crtDt = crtDt;
+                if (!this.toUpdateCols.contains("CRT_DT")) {
+                    this.toUpdateCols.add("CRT_DT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.crtDt = crtDt;
+            if (!this.toUpdateCols.contains("CRT_DT")) {
+                this.toUpdateCols.add("CRT_DT");
             }
         }
         return this;

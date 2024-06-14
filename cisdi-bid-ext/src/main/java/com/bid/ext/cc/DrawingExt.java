@@ -4,10 +4,13 @@ import com.bid.ext.model.CcDrawingManagement;
 import com.bid.ext.model.CcDrawingUpload;
 import com.bid.ext.model.FlFile;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class DrawingExt {
@@ -46,16 +49,19 @@ public class DrawingExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
-            String pCcDrawingVersionId = JdbcMapUtil.getString(varMap, "P_CC_DRAWING_VERSION_ID");
-            String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENT");
-            FlFile flFile = FlFile.selectById(ccAttachment);
-            String dspName = flFile.getDspName();
-            CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
-            ccDrawingUpload.setCcAttachment(ccAttachment);
-            ccDrawingUpload.setCcDrawingVersionId(pCcDrawingVersionId);
-            ccDrawingUpload.setCcDrawingManagementId(csCommId);
-            ccDrawingUpload.setName(dspName);
-            ccDrawingUpload.insertById();
+            String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
+
+            List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
+            for (String attachmentId : ccAttachmentList) {
+                FlFile flFile = FlFile.selectById(attachmentId);
+                String dspName = flFile.getDspName();
+                CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
+                ccDrawingUpload.setCcAttachment(attachmentId);
+                ccDrawingUpload.setCcDrawingVersionId("A");
+                ccDrawingUpload.setCcDrawingManagementId(csCommId);
+                ccDrawingUpload.setName(dspName);
+                ccDrawingUpload.insertById();
+            }
         }
     }
 
@@ -66,19 +72,38 @@ public class DrawingExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
-            String pCcDrawingVersionId = JdbcMapUtil.getString(varMap, "P_CC_DRAWING_VERSION_ID");
-            String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENT");
-            FlFile flFile = FlFile.selectById(ccAttachment);
-            String dspName = flFile.getDspName();
-            String pRemark = JdbcMapUtil.getString(varMap, "P_REMARK");
-            CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
-            ccDrawingUpload.setCcAttachment(ccAttachment);
-            ccDrawingUpload.setCcDrawingVersionId(pCcDrawingVersionId);
-            ccDrawingUpload.setRemark(pRemark);
-            ccDrawingUpload.setCcDrawingManagementId(csCommId);
-            ccDrawingUpload.setName(dspName);
-            ccDrawingUpload.insertById();
+            String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
+
+            String[] versionOrder = {"A", "B", "C", "D", "E", "F", "G"};
+            String ccDrawingVersionId = null;
+
+            // 依次判断版本的存在性
+            for (String version : versionOrder) {
+                List<CcDrawingUpload> ccDrawingUploads = CcDrawingUpload.selectByWhere(
+                        new Where().eq(CcDrawingUpload.Cols.CC_DRAWING_VERSION_ID, version)
+                                .eq(CcDrawingUpload.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId)
+                );
+                if (SharedUtil.isEmpty(ccDrawingUploads)) {
+                    ccDrawingVersionId = version;
+                    break;
+                }
+            }
+
+            List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
+            for (String attachmentId : ccAttachmentList) {
+                FlFile flFile = FlFile.selectById(attachmentId);
+                String dspName = flFile.getDspName();
+                String pRemark = JdbcMapUtil.getString(varMap, "P_REMARK");
+                CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
+                ccDrawingUpload.setCcAttachment(attachmentId);
+                ccDrawingUpload.setCcDrawingVersionId(ccDrawingVersionId);
+                ccDrawingUpload.setRemark(pRemark);
+                ccDrawingUpload.setCcDrawingManagementId(csCommId);
+                ccDrawingUpload.setName(dspName);
+                ccDrawingUpload.insertById();
+            }
         }
     }
+
 
 }
