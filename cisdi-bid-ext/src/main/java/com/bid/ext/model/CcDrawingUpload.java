@@ -99,6 +99,10 @@ public class CcDrawingUpload {
          */
         public static final String REMARK = "REMARK";
         /**
+         * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+         */
+        public static final String CC_PRJ_ID = "CC_PRJ_ID";
+        /**
          * {"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
          */
         public static final String CC_ATTACHMENT = "CC_ATTACHMENT";
@@ -118,6 +122,10 @@ public class CcDrawingUpload {
          * {"EN": "资料文件打包", "ZH_CN": "图纸管理", "ZH_TW": "资料文件打包"}。
          */
         public static final String CC_DRAWING_MANAGEMENT_ID = "CC_DRAWING_MANAGEMENT_ID";
+        /**
+         * {"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+         */
+        public static final String IS_DEFAULT = "IS_DEFAULT";
     }
 
     // </editor-fold>
@@ -594,6 +602,42 @@ public class CcDrawingUpload {
     }
 
     /**
+     * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     */
+    private String ccPrjId;
+
+    /**
+     * 获取：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     */
+    public String getCcPrjId() {
+        return this.ccPrjId;
+    }
+
+    /**
+     * 设置：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     */
+    public CcDrawingUpload setCcPrjId(String ccPrjId) {
+        if (this.ccPrjId == null && ccPrjId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjId != null && ccPrjId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
+                this.ccPrjId = ccPrjId;
+                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjId = ccPrjId;
+            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                this.toUpdateCols.add("CC_PRJ_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
      * {"EN": "CC_ATTACHMENT", "ZH_CN": "附件", "ZH_TW": "繁：附件"}。
      */
     private String ccAttachment;
@@ -768,6 +812,42 @@ public class CcDrawingUpload {
             this.ccDrawingManagementId = ccDrawingManagementId;
             if (!this.toUpdateCols.contains("CC_DRAWING_MANAGEMENT_ID")) {
                 this.toUpdateCols.add("CC_DRAWING_MANAGEMENT_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+     */
+    private Boolean isDefault;
+
+    /**
+     * 获取：{"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+     */
+    public Boolean getIsDefault() {
+        return this.isDefault;
+    }
+
+    /**
+     * 设置：{"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+     */
+    public CcDrawingUpload setIsDefault(Boolean isDefault) {
+        if (this.isDefault == null && isDefault == null) {
+            // 均为null，不做处理。
+        } else if (this.isDefault != null && isDefault != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isDefault.compareTo(isDefault) != 0) {
+                this.isDefault = isDefault;
+                if (!this.toUpdateCols.contains("IS_DEFAULT")) {
+                    this.toUpdateCols.add("IS_DEFAULT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isDefault = isDefault;
+            if (!this.toUpdateCols.contains("IS_DEFAULT")) {
+                this.toUpdateCols.add("IS_DEFAULT");
             }
         }
         return this;

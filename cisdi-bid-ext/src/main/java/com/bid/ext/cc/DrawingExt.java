@@ -7,6 +7,7 @@ import com.bid.ext.model.FlFile;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
 
@@ -135,20 +136,47 @@ public class DrawingExt {
     /**
      * 更新图纸时同步更新图纸版本的业主图号
      */
-    public void updateDrawing(){
-        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()){
+    public void updateDrawing() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
             //业主图号
             String ccSteelOwnerDrawingId = ccDrawingManagement.getCcSteelOwnerDrawingId();
             List<CcStructDrawingVersion> ccStructDrawingVersions = CcStructDrawingVersion.selectByWhere(new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId));
-            if (!SharedUtil.isEmpty(ccStructDrawingVersions)){
-                for (CcStructDrawingVersion ccStructDrawingVersion : ccStructDrawingVersions){
+            if (!SharedUtil.isEmpty(ccStructDrawingVersions)) {
+                for (CcStructDrawingVersion ccStructDrawingVersion : ccStructDrawingVersions) {
                     ccStructDrawingVersion.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
                     ccStructDrawingVersion.updateById();
                 }
             }
         }
+    }
+
+    /**
+     * 设为默认图纸
+     */
+    public void setDefaultDrawing() {
+        InvokeActResult invokeActResult = new InvokeActResult();
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            //查询此合同该版本的套图
+            CcDrawingUpload ccDrawingUpload = CcDrawingUpload.selectById(csCommId);
+            //图纸
+            String ccDrawingManagementId = ccDrawingUpload.getCcDrawingManagementId();
+            //版本
+            String ccDrawingVersionId = ccDrawingUpload.getCcDrawingVersionId();
+            List<CcDrawingUpload> ccDrawingUploads = CcDrawingUpload.selectByWhere(new Where().eq(CcDrawingUpload.Cols.CC_DRAWING_MANAGEMENT_ID, ccDrawingManagementId).eq(CcDrawingUpload.Cols.CC_DRAWING_VERSION_ID, ccDrawingVersionId));
+            if (!SharedUtil.isEmpty(ccDrawingUploads)) {
+                for (CcDrawingUpload ccDrawingUpload1 : ccDrawingUploads) {
+                    ccDrawingUpload1.setIsDefault(false);
+                    ccDrawingUpload1.updateById();
+                }
+            }
+            ccDrawingUpload.setIsDefault(true);
+            ccDrawingUpload.updateById();
+        }
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
 }
