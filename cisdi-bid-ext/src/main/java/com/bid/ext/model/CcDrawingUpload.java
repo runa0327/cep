@@ -123,6 +123,10 @@ public class CcDrawingUpload {
          */
         public static final String CC_DRAWING_MANAGEMENT_ID = "CC_DRAWING_MANAGEMENT_ID";
         /**
+         * {"EN": "项目图纸版本", "ZH_CN": "项目图纸版本", "ZH_TW": "项目图纸版本"}。
+         */
+        public static final String CC_STRUCT_DRAWING_VERSION_ID = "CC_STRUCT_DRAWING_VERSION_ID";
+        /**
          * {"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
          */
         public static final String IS_DEFAULT = "IS_DEFAULT";
@@ -812,6 +816,42 @@ public class CcDrawingUpload {
             this.ccDrawingManagementId = ccDrawingManagementId;
             if (!this.toUpdateCols.contains("CC_DRAWING_MANAGEMENT_ID")) {
                 this.toUpdateCols.add("CC_DRAWING_MANAGEMENT_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "项目图纸版本", "ZH_CN": "项目图纸版本", "ZH_TW": "项目图纸版本"}。
+     */
+    private String ccStructDrawingVersionId;
+
+    /**
+     * 获取：{"EN": "项目图纸版本", "ZH_CN": "项目图纸版本", "ZH_TW": "项目图纸版本"}。
+     */
+    public String getCcStructDrawingVersionId() {
+        return this.ccStructDrawingVersionId;
+    }
+
+    /**
+     * 设置：{"EN": "项目图纸版本", "ZH_CN": "项目图纸版本", "ZH_TW": "项目图纸版本"}。
+     */
+    public CcDrawingUpload setCcStructDrawingVersionId(String ccStructDrawingVersionId) {
+        if (this.ccStructDrawingVersionId == null && ccStructDrawingVersionId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccStructDrawingVersionId != null && ccStructDrawingVersionId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccStructDrawingVersionId.compareTo(ccStructDrawingVersionId) != 0) {
+                this.ccStructDrawingVersionId = ccStructDrawingVersionId;
+                if (!this.toUpdateCols.contains("CC_STRUCT_DRAWING_VERSION_ID")) {
+                    this.toUpdateCols.add("CC_STRUCT_DRAWING_VERSION_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccStructDrawingVersionId = ccStructDrawingVersionId;
+            if (!this.toUpdateCols.contains("CC_STRUCT_DRAWING_VERSION_ID")) {
+                this.toUpdateCols.add("CC_STRUCT_DRAWING_VERSION_ID");
             }
         }
         return this;

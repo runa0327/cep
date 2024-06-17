@@ -123,6 +123,7 @@ public class DrawingExt {
                 String dspName = flFile.getDspName();
                 String pRemark = JdbcMapUtil.getString(varMap, "P_REMARK");
                 CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
+                ccDrawingUpload.setCcStructDrawingVersionId(ccStructDrawingVersion.getId());
                 ccDrawingUpload.setCcAttachment(attachmentId);
                 ccDrawingUpload.setCcDrawingVersionId(ccDrawingVersionId);
                 ccDrawingUpload.setRemark(pRemark);
