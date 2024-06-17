@@ -92,10 +92,6 @@ public class CcPrjCostOverviewSimple {
          */
         public static final String CODE = "CODE";
         /**
-         * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
-         */
-        public static final String NAME = "NAME";
-        /**
          * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
          */
         public static final String REMARK = "REMARK";
@@ -112,17 +108,21 @@ public class CcPrjCostOverviewSimple {
          */
         public static final String SEQ_NO = "SEQ_NO";
         /**
-         * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+         * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
          */
-        public static final String CC_PRJ_ID = "CC_PRJ_ID";
+        public static final String NAME = "NAME";
         /**
          * {"EN": "拷贝自项目结构节点", "ZH_CN": "拷贝自项目结构节点", "ZH_TW": "拷贝自项目结构节点"}。
          */
         public static final String COPY_FROM_PRJ_STRUCT_NODE_ID = "COPY_FROM_PRJ_STRUCT_NODE_ID";
         /**
-         * {"EN": "父成本统览", "ZH_CN": "父成本统览", "ZH_TW": "父成本统览"}。
+         * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
          */
-        public static final String CC_PRJ_COST_OVERVIEW_PID = "CC_PRJ_COST_OVERVIEW_PID";
+        public static final String CC_PRJ_ID = "CC_PRJ_ID";
+        /**
+         * {"EN": "父成本统览-简版", "ZH_CN": "父成本统览-简版", "ZH_TW": "父成本统览-简版"}。
+         */
+        public static final String CC_PRJ_COST_OVERVIEW_SIMPLE_PID = "CC_PRJ_COST_OVERVIEW_SIMPLE_PID";
         /**
          * {"EN": "立项匡算额", "ZH_CN": "立项匡算额", "ZH_TW": "立项匡算额"}。
          */
@@ -571,42 +571,6 @@ public class CcPrjCostOverviewSimple {
     }
 
     /**
-     * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
-     */
-    private String name;
-
-    /**
-     * 获取：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
-     */
-    public CcPrjCostOverviewSimple setName(String name) {
-        if (this.name == null && name == null) {
-            // 均为null，不做处理。
-        } else if (this.name != null && name != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.name.compareTo(name) != 0) {
-                this.name = name;
-                if (!this.toUpdateCols.contains("NAME")) {
-                    this.toUpdateCols.add("NAME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.name = name;
-            if (!this.toUpdateCols.contains("NAME")) {
-                this.toUpdateCols.add("NAME");
-            }
-        }
-        return this;
-    }
-
-    /**
      * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
      */
     private String remark;
@@ -751,36 +715,36 @@ public class CcPrjCostOverviewSimple {
     }
 
     /**
-     * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
      */
-    private String ccPrjId;
+    private String name;
 
     /**
-     * 获取：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     * 获取：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
      */
-    public String getCcPrjId() {
-        return this.ccPrjId;
+    public String getName() {
+        return this.name;
     }
 
     /**
-     * 设置：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
+     * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
      */
-    public CcPrjCostOverviewSimple setCcPrjId(String ccPrjId) {
-        if (this.ccPrjId == null && ccPrjId == null) {
+    public CcPrjCostOverviewSimple setName(String name) {
+        if (this.name == null && name == null) {
             // 均为null，不做处理。
-        } else if (this.ccPrjId != null && ccPrjId != null) {
+        } else if (this.name != null && name != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
-                this.ccPrjId = ccPrjId;
-                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
-                    this.toUpdateCols.add("CC_PRJ_ID");
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccPrjId = ccPrjId;
-            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
-                this.toUpdateCols.add("CC_PRJ_ID");
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
             }
         }
         return this;
@@ -823,36 +787,72 @@ public class CcPrjCostOverviewSimple {
     }
 
     /**
-     * {"EN": "父成本统览", "ZH_CN": "父成本统览", "ZH_TW": "父成本统览"}。
+     * {"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
      */
-    private String ccPrjCostOverviewPid;
+    private String ccPrjId;
 
     /**
-     * 获取：{"EN": "父成本统览", "ZH_CN": "父成本统览", "ZH_TW": "父成本统览"}。
+     * 获取：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
      */
-    public String getCcPrjCostOverviewPid() {
-        return this.ccPrjCostOverviewPid;
+    public String getCcPrjId() {
+        return this.ccPrjId;
     }
 
     /**
-     * 设置：{"EN": "父成本统览", "ZH_CN": "父成本统览", "ZH_TW": "父成本统览"}。
+     * 设置：{"EN": "CC_PRJ_ID", "ZH_CN": "项目", "ZH_TW": "繁：项目"}。
      */
-    public CcPrjCostOverviewSimple setCcPrjCostOverviewPid(String ccPrjCostOverviewPid) {
-        if (this.ccPrjCostOverviewPid == null && ccPrjCostOverviewPid == null) {
+    public CcPrjCostOverviewSimple setCcPrjId(String ccPrjId) {
+        if (this.ccPrjId == null && ccPrjId == null) {
             // 均为null，不做处理。
-        } else if (this.ccPrjCostOverviewPid != null && ccPrjCostOverviewPid != null) {
+        } else if (this.ccPrjId != null && ccPrjId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccPrjCostOverviewPid.compareTo(ccPrjCostOverviewPid) != 0) {
-                this.ccPrjCostOverviewPid = ccPrjCostOverviewPid;
-                if (!this.toUpdateCols.contains("CC_PRJ_COST_OVERVIEW_PID")) {
-                    this.toUpdateCols.add("CC_PRJ_COST_OVERVIEW_PID");
+            if (this.ccPrjId.compareTo(ccPrjId) != 0) {
+                this.ccPrjId = ccPrjId;
+                if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccPrjCostOverviewPid = ccPrjCostOverviewPid;
-            if (!this.toUpdateCols.contains("CC_PRJ_COST_OVERVIEW_PID")) {
-                this.toUpdateCols.add("CC_PRJ_COST_OVERVIEW_PID");
+            this.ccPrjId = ccPrjId;
+            if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
+                this.toUpdateCols.add("CC_PRJ_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "父成本统览-简版", "ZH_CN": "父成本统览-简版", "ZH_TW": "父成本统览-简版"}。
+     */
+    private String ccPrjCostOverviewSimplePid;
+
+    /**
+     * 获取：{"EN": "父成本统览-简版", "ZH_CN": "父成本统览-简版", "ZH_TW": "父成本统览-简版"}。
+     */
+    public String getCcPrjCostOverviewSimplePid() {
+        return this.ccPrjCostOverviewSimplePid;
+    }
+
+    /**
+     * 设置：{"EN": "父成本统览-简版", "ZH_CN": "父成本统览-简版", "ZH_TW": "父成本统览-简版"}。
+     */
+    public CcPrjCostOverviewSimple setCcPrjCostOverviewSimplePid(String ccPrjCostOverviewSimplePid) {
+        if (this.ccPrjCostOverviewSimplePid == null && ccPrjCostOverviewSimplePid == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjCostOverviewSimplePid != null && ccPrjCostOverviewSimplePid != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjCostOverviewSimplePid.compareTo(ccPrjCostOverviewSimplePid) != 0) {
+                this.ccPrjCostOverviewSimplePid = ccPrjCostOverviewSimplePid;
+                if (!this.toUpdateCols.contains("CC_PRJ_COST_OVERVIEW_SIMPLE_PID")) {
+                    this.toUpdateCols.add("CC_PRJ_COST_OVERVIEW_SIMPLE_PID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjCostOverviewSimplePid = ccPrjCostOverviewSimplePid;
+            if (!this.toUpdateCols.contains("CC_PRJ_COST_OVERVIEW_SIMPLE_PID")) {
+                this.toUpdateCols.add("CC_PRJ_COST_OVERVIEW_SIMPLE_PID");
             }
         }
         return this;

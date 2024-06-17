@@ -173,7 +173,7 @@ public class CBSExcelFileImportExt {
                     CcPrjCostOverviewSimple ccPrjCostOverviewSimple = CcPrjCostOverviewSimple.newData();
                     ccPrjCostOverviewSimple.setCcPrjId(prjId);
                     ccPrjCostOverviewSimple.setCopyFromPrjStructNodeId(null);
-                    ccPrjCostOverviewSimple.setCcPrjCostOverviewPid(null);
+                    ccPrjCostOverviewSimple.setCcPrjCostOverviewSimplePid(null);
                     ccPrjCostOverviewSimple.setSeqNo(new BigDecimal(row.getRowNum()));
 
                     //成本科目
