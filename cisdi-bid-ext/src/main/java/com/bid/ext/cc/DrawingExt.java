@@ -1,9 +1,6 @@
 package com.bid.ext.cc;
 
-import com.bid.ext.model.CcDrawingManagement;
-import com.bid.ext.model.CcDrawingUpload;
-import com.bid.ext.model.CcStructDrawingVersion;
-import com.bid.ext.model.FlFile;
+import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.interaction.EntityRecord;
@@ -112,6 +109,9 @@ public class DrawingExt {
             //套图版本
             CcStructDrawingVersion ccStructDrawingVersion = CcStructDrawingVersion.newData();
             ccStructDrawingVersion.setCcDrawingVersionId(ccDrawingVersionId);
+            CcDrawingVersion ccDrawingVersion = CcDrawingVersion.selectById(ccDrawingVersionId);
+            String ccDrawingVersionName = ccDrawingVersion.getName();
+            ccStructDrawingVersion.setName(ccDrawingVersionName);
             ccStructDrawingVersion.setCcDrawingManagementId(csCommId);
             ccStructDrawingVersion.setCcPrjStructNodeId(ccPrjStructNodeId);
             ccStructDrawingVersion.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
