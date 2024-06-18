@@ -115,7 +115,7 @@ public class CcStructDrawingVersion {
          */
         public static final String CC_PRJ_STRUCT_NODE_ID = "CC_PRJ_STRUCT_NODE_ID";
         /**
-         * {"EN": "会话ID", "ZH_CN": "钢铁业主图号", "ZH_TW": "会话ID"}。
+         * {"EN": "会话ID", "ZH_CN": "湛江钢铁业主图号", "ZH_TW": "会话ID"}。
          */
         public static final String CC_STEEL_OWNER_DRAWING_ID = "CC_STEEL_OWNER_DRAWING_ID";
         /**
@@ -126,6 +126,10 @@ public class CcStructDrawingVersion {
          * {"EN": "图纸类型", "ZH_CN": "图纸版本", "ZH_TW": "图纸类型"}。
          */
         public static final String CC_DRAWING_VERSION_ID = "CC_DRAWING_VERSION_ID";
+        /**
+         * {"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+         */
+        public static final String IS_DEFAULT = "IS_DEFAULT";
     }
 
     // </editor-fold>
@@ -746,19 +750,19 @@ public class CcStructDrawingVersion {
     }
 
     /**
-     * {"EN": "会话ID", "ZH_CN": "钢铁业主图号", "ZH_TW": "会话ID"}。
+     * {"EN": "会话ID", "ZH_CN": "湛江钢铁业主图号", "ZH_TW": "会话ID"}。
      */
     private String ccSteelOwnerDrawingId;
 
     /**
-     * 获取：{"EN": "会话ID", "ZH_CN": "钢铁业主图号", "ZH_TW": "会话ID"}。
+     * 获取：{"EN": "会话ID", "ZH_CN": "湛江钢铁业主图号", "ZH_TW": "会话ID"}。
      */
     public String getCcSteelOwnerDrawingId() {
         return this.ccSteelOwnerDrawingId;
     }
 
     /**
-     * 设置：{"EN": "会话ID", "ZH_CN": "钢铁业主图号", "ZH_TW": "会话ID"}。
+     * 设置：{"EN": "会话ID", "ZH_CN": "湛江钢铁业主图号", "ZH_TW": "会话ID"}。
      */
     public CcStructDrawingVersion setCcSteelOwnerDrawingId(String ccSteelOwnerDrawingId) {
         if (this.ccSteelOwnerDrawingId == null && ccSteelOwnerDrawingId == null) {
@@ -848,6 +852,42 @@ public class CcStructDrawingVersion {
             this.ccDrawingVersionId = ccDrawingVersionId;
             if (!this.toUpdateCols.contains("CC_DRAWING_VERSION_ID")) {
                 this.toUpdateCols.add("CC_DRAWING_VERSION_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+     */
+    private Boolean isDefault;
+
+    /**
+     * 获取：{"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+     */
+    public Boolean getIsDefault() {
+        return this.isDefault;
+    }
+
+    /**
+     * 设置：{"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
+     */
+    public CcStructDrawingVersion setIsDefault(Boolean isDefault) {
+        if (this.isDefault == null && isDefault == null) {
+            // 均为null，不做处理。
+        } else if (this.isDefault != null && isDefault != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isDefault.compareTo(isDefault) != 0) {
+                this.isDefault = isDefault;
+                if (!this.toUpdateCols.contains("IS_DEFAULT")) {
+                    this.toUpdateCols.add("IS_DEFAULT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isDefault = isDefault;
+            if (!this.toUpdateCols.contains("IS_DEFAULT")) {
+                this.toUpdateCols.add("IS_DEFAULT");
             }
         }
         return this;

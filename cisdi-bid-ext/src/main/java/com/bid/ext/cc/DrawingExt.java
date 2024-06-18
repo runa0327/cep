@@ -180,4 +180,28 @@ public class DrawingExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
+    /**
+     * 设为默认套图
+     */
+    public void setDefaultDrawingVersion() {
+        InvokeActResult invokeActResult = new InvokeActResult();
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcStructDrawingVersion ccStructDrawingVersion = CcStructDrawingVersion.selectById(csCommId);
+            //图纸
+            String ccDrawingManagementId = ccStructDrawingVersion.getCcDrawingManagementId();
+            List<CcStructDrawingVersion> ccStructDrawingVersions = CcStructDrawingVersion.selectByWhere(new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_MANAGEMENT_ID, ccDrawingManagementId));
+            if (!SharedUtil.isEmpty(ccStructDrawingVersions)) {
+                for (CcStructDrawingVersion ccStructDrawingVersion1 : ccStructDrawingVersions) {
+                    ccStructDrawingVersion1.setIsDefault(false);
+                    ccStructDrawingVersion1.updateById();
+                }
+            }
+            ccStructDrawingVersion.setIsDefault(true);
+            ccStructDrawingVersion.updateById();
+        }
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
 }
