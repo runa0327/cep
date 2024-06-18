@@ -58,7 +58,7 @@ public class CBSExcelFileImportExt {
         String filePath = flFile.getPhysicalLocation();
 
 //       String filePath = "/Users/hejialun/Documents/excel-import-test.xlsx";
-        if(!"xlsx".equals(flFile.getExt()))
+        if (!"xlsx".equals(flFile.getExt()))
             throw new BaseException("请上传'xlsx'格式的Excel文件");
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = new XSSFWorkbook(file);
@@ -87,7 +87,7 @@ public class CBSExcelFileImportExt {
                     }
                 }
 
-                if(row.getRowNum() >1) {
+                if (row.getRowNum() > 1) {
                     Cell nameCell = row.getCell(nameIndex);
                     if (nameCell.getCellType() == BLANK) {
                         throw new BaseException("第" + (row.getRowNum() + 1) + "行，科目名称不能为空");
@@ -154,17 +154,91 @@ public class CBSExcelFileImportExt {
 
 //       String filePath = "/Users/hejialun/Downloads/成本统览.xlsx";
 
-        if(!"xlsx".equals(flFile.getExt()))
+        if (!"xlsx".equals(flFile.getExt()))
             throw new BaseException("请上传'xlsx'格式的Excel文件");
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = new XSSFWorkbook(file);
             Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
+            //成本科目列下标
+            int cbkmIndex = -1;
+            //立项匡算列下标
+            int lxksIndex = -1;
+            //可研估算
+            int kygsIndex = -1;
+            //初设概算
+            int csgsIndex = -1;
+            //施工预算
+            int sgysIndex = -1;
+            //已招标
+            int yzbIndex = -1;
+            //合同签订额
+            int htqdeIndex = -1;
+            //已完成产值
+            int ywcczIndex = -1;
+            //已申请
+            int ysqIndex = -1;
+            //已付款
+            int yfkIndex = -1;
+
 
             //循环行
             for (Row row : sheet) {
                 if (row.getRowNum() == 0) {
                     continue;
+                }
+                if (row.getRowNum() == 1) {
+
+                    for (Cell cell : row) {
+                        String cellValue = getCellValueAsString(cell);
+
+                        //成本科目列下标
+                        if ("成本科目".equals(cellValue)) {
+                            cbkmIndex = cell.getColumnIndex();
+                        }
+                        //立项匡算列下标
+                        else if ("立项匡算".equals(cellValue)) {
+                            lxksIndex = cell.getColumnIndex();
+                        }
+//可研估算
+                        else if ("可研估算".equals(cellValue)) {
+                            kygsIndex = cell.getColumnIndex();
+                        }
+                        //初设概算
+                        else if ("初设概算".equals(cellValue)) {
+                            csgsIndex = cell.getColumnIndex();
+                        }
+                        //施工预算
+                        else if ("施工预算".equals(cellValue)) {
+                            sgysIndex = cell.getColumnIndex();
+                        }
+
+                        //已招标
+                        else if ("已招标".equals(cellValue)) {
+                            yzbIndex = cell.getColumnIndex();
+                        }
+
+                        //合同签订额
+                        else if ("合同签订额".equals(cellValue)) {
+                            htqdeIndex = cell.getColumnIndex();
+                        }
+
+                        //已完成产值
+                        else if ("已完成产值".equals(cellValue)) {
+                            ywcczIndex = cell.getColumnIndex();
+                        }
+
+                        //已申请
+                        else if ("已申请".equals(cellValue)) {
+                            ysqIndex = cell.getColumnIndex();
+                        }
+
+                        //已付款
+                        else if ("已付款".equals(cellValue)) {
+                            yfkIndex = cell.getColumnIndex();
+                        }
+
+                    }
                 }
 
                 //获取指定列的下标
@@ -177,44 +251,76 @@ public class CBSExcelFileImportExt {
                     ccPrjCostOverviewSimple.setSeqNo(new BigDecimal(row.getRowNum()));
 
                     //成本科目
-                    Cell cell3 =  row.getCell(3);
-                    if ( cell3.getCellType()==BLANK ){
-                        throw   new BaseException("第"+(row.getRowNum()+1)+"行，成本科目为空");
+                    if (cbkmIndex == -1) {
+                        throw new BaseException("成本科目列为空");
+                    }
+                    Cell cell3 = row.getCell(cbkmIndex);
+                    if (cell3.getCellType() == BLANK) {
+                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，成本科目为空");
                     }
                     ccPrjCostOverviewSimple.setName(getCellValueAsString(cell3));
 
 //                    立项匡算
-                    Cell cell7 = row.getCell(9);
+                    if (lxksIndex == -1) {
+                        throw new BaseException("立项匡算列为空");
+                    }
+                    Cell cell7 = row.getCell(lxksIndex);
                     ccPrjCostOverviewSimple.setCbs0Amt(getCellValueAsBigDecimal(cell7));
 
                     //可研估算
-                    Cell cell8 = row.getCell(10);
+                    if (kygsIndex == -1) {
+                        throw new BaseException("可研估算算列为空");
+                    }
+                    Cell cell8 = row.getCell(kygsIndex);
                     ccPrjCostOverviewSimple.setCbs1Amt(getCellValueAsBigDecimal(cell8));
 
                     //初设概算
-                    Cell cell9 = row.getCell(11);
+                    if (csgsIndex == -1) {
+                        throw new BaseException("初设概算列为空");
+                    }
+                    Cell cell9 = row.getCell(csgsIndex);
                     ccPrjCostOverviewSimple.setCbs2Amt(getCellValueAsBigDecimal(cell9));
+
                     //施工预算
-                    Cell cell10 = row.getCell(12);
+                    if (lxksIndex == -1) {
+                        throw new BaseException("施工预算列为空");
+                    }
+                    Cell cell10 = row.getCell(sgysIndex);
                     ccPrjCostOverviewSimple.setCbs3Amt(getCellValueAsBigDecimal(cell10));
                     //已招标
-                    Cell cell11 = row.getCell(13);
-                    ccPrjCostOverviewSimple.setBidAmt(getCellValueAsBigDecimal(cell11));
+                    if (yzbIndex != -1) {
+                        Cell cell11 = row.getCell(yzbIndex);
+                        ccPrjCostOverviewSimple.setBidAmt(getCellValueAsBigDecimal(cell11));
+                    } else {
+                        ccPrjCostOverviewSimple.setBidAmt(new BigDecimal(0));
+                    }
 
                     //合同签订额
-                    Cell cell12 = row.getCell(14);
+                    if (htqdeIndex == -1) {
+                        throw new BaseException("合同签订额列为空");
+                    }
+                    Cell cell12 = row.getCell(htqdeIndex);
                     ccPrjCostOverviewSimple.setPurchaseAmt(getCellValueAsBigDecimal(cell12));
 
                     //已完成产值
-                    Cell cell13 = row.getCell(15);
+                    if (ywcczIndex == -1) {
+                        throw new BaseException("已完成产值列为空");
+                    }
+                    Cell cell13 = row.getCell(ywcczIndex);
                     ccPrjCostOverviewSimple.setCompleteAmt(getCellValueAsBigDecimal(cell13));
 
                     //已申请
+                    if (ysqIndex == -1) {
+                        throw new BaseException("已申请列为空");
+                    }
                     Cell cell15 = row.getCell(17);
                     ccPrjCostOverviewSimple.setReqPayAmt(getCellValueAsBigDecimal(cell15));
 
                     //已付款
-                    Cell cell17 = row.getCell(18);
+                    if (yfkIndex == -1) {
+                        throw new BaseException("已付款列为空");
+                    }
+                    Cell cell17 = row.getCell(yfkIndex);
                     ccPrjCostOverviewSimple.setPayAmt(getCellValueAsBigDecimal(cell17));
 
                     ccPrjCostOverviewSimple.insertById();
@@ -225,14 +331,24 @@ public class CBSExcelFileImportExt {
         }
 
         //删除原来的数据
-        List<String> ids = new ArrayList<>();
-        if (ccPrjCostOverviewSimples!=null){
-            for (CcPrjCostOverviewSimple cost : ccPrjCostOverviewSimples) {
-                ids.add(cost.getId());
+        StringBuilder idsStr = new StringBuilder("");
+        if (ccPrjCostOverviewSimples != null) {
+
+            for (int i = 0; i < ccPrjCostOverviewSimples.size(); i++) {
+                if (i == ccPrjCostOverviewSimples.size() - 1) {
+                    idsStr.append(ccPrjCostOverviewSimples.get(i).getId());
+                } else {
+                    idsStr.append(ccPrjCostOverviewSimples.get(i).getId() + ",");
+                }
             }
         }
 
-        CcPrjCostOverviewSimple.deleteByIds(ids);
+        if (ccPrjCostOverviewSimples.size() > 0) {
+            Where where = new Where();
+            where.sql("t.id in (" +idsStr + ")");
+            CcPrjCostOverviewSimple.deleteByWhere(where);
+
+        }
 
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
