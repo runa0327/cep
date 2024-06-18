@@ -256,7 +256,8 @@ public class CBSExcelFileImportExt {
                     }
                     Cell cell3 = row.getCell(cbkmIndex);
                     if (cell3.getCellType() == BLANK) {
-                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，成本科目为空");
+//                        throw new BaseException("第" + (row.getRowNum() + 1) + "行，成本科目为空");
+                        continue;//跳过行
                     }
                     ccPrjCostOverviewSimple.setName(getCellValueAsString(cell3));
 
