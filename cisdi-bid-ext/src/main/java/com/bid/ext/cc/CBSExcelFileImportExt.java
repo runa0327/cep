@@ -252,7 +252,7 @@ public class CBSExcelFileImportExt {
 
                     //成本科目
                     if (cbkmIndex == -1) {
-                        throw new BaseException("成本科目列为空");
+                        throw new BaseException("成本科目列不存在");
                     }
                     Cell cell3 = row.getCell(cbkmIndex);
                     if (cell3.getCellType() == BLANK) {
@@ -262,28 +262,28 @@ public class CBSExcelFileImportExt {
 
 //                    立项匡算
                     if (lxksIndex == -1) {
-                        throw new BaseException("立项匡算列为空");
+                        throw new BaseException("立项匡算列不存在");
                     }
                     Cell cell7 = row.getCell(lxksIndex);
                     ccPrjCostOverviewSimple.setCbs0Amt(getCellValueAsBigDecimal(cell7));
 
                     //可研估算
                     if (kygsIndex == -1) {
-                        throw new BaseException("可研估算算列为空");
+                        throw new BaseException("可研估算列不存在");
                     }
                     Cell cell8 = row.getCell(kygsIndex);
                     ccPrjCostOverviewSimple.setCbs1Amt(getCellValueAsBigDecimal(cell8));
 
                     //初设概算
                     if (csgsIndex == -1) {
-                        throw new BaseException("初设概算列为空");
+                        throw new BaseException("初设概算列不存在");
                     }
                     Cell cell9 = row.getCell(csgsIndex);
                     ccPrjCostOverviewSimple.setCbs2Amt(getCellValueAsBigDecimal(cell9));
 
                     //施工预算
                     if (lxksIndex == -1) {
-                        throw new BaseException("施工预算列为空");
+                        throw new BaseException("施工预算列不存在");
                     }
                     Cell cell10 = row.getCell(sgysIndex);
                     ccPrjCostOverviewSimple.setCbs3Amt(getCellValueAsBigDecimal(cell10));
@@ -297,28 +297,28 @@ public class CBSExcelFileImportExt {
 
                     //合同签订额
                     if (htqdeIndex == -1) {
-                        throw new BaseException("合同签订额列为空");
+                        throw new BaseException("合同签订额列不存在");
                     }
                     Cell cell12 = row.getCell(htqdeIndex);
                     ccPrjCostOverviewSimple.setPurchaseAmt(getCellValueAsBigDecimal(cell12));
 
                     //已完成产值
                     if (ywcczIndex == -1) {
-                        throw new BaseException("已完成产值列为空");
+                        throw new BaseException("已完成产值列不存在");
                     }
                     Cell cell13 = row.getCell(ywcczIndex);
                     ccPrjCostOverviewSimple.setCompleteAmt(getCellValueAsBigDecimal(cell13));
 
                     //已申请
                     if (ysqIndex == -1) {
-                        throw new BaseException("已申请列为空");
+                        throw new BaseException("已申请列不存在");
                     }
                     Cell cell15 = row.getCell(17);
                     ccPrjCostOverviewSimple.setReqPayAmt(getCellValueAsBigDecimal(cell15));
 
                     //已付款
                     if (yfkIndex == -1) {
-                        throw new BaseException("已付款列为空");
+                        throw new BaseException("已付款列不存在");
                     }
                     Cell cell17 = row.getCell(yfkIndex);
                     ccPrjCostOverviewSimple.setPayAmt(getCellValueAsBigDecimal(cell17));
