@@ -68,8 +68,9 @@ public class BidExt {
             Map<String, Object> varMap = ExtJarHelper.getVarMap();
             FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
             String filePath = flFile.getPhysicalLocation();
-            if (!"xlsx".equals(flFile.getExt()))
+            if (!"xlsx".equals(flFile.getExt())) {
                 throw new BaseException("请上传'xlsx'格式的Excel文件");
+            }
 
             try (FileInputStream file = new FileInputStream(new File(filePath))) {
                 Workbook workbook = new XSSFWorkbook(file);
@@ -86,9 +87,7 @@ public class BidExt {
                         Cell cell = row.getCell(colIndex);
                         if (cell == null || cell.getCellType() != CellType.NUMERIC) continue;
 
-
                         // 获取相关单元格的值
-
                         String structCode = sheet.getRow(3).getCell(colIndex).getStringCellValue().substring(0, 6);
                         CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.CODE, structCode));
                         String ccPrjStructNodeId = ccPrjStructNode.getId();
@@ -116,17 +115,30 @@ public class BidExt {
                         String ccUomTypeIdId = row.getCell(2).getStringCellValue();
                         BigDecimal totalWeight = BigDecimal.valueOf(cell.getNumericCellValue());
 
-                        CcEngineeringQuantity eq = CcEngineeringQuantity.newData();
-                        // 设置实体属性
-                        eq.setCcPrjStructNodeId(ccPrjStructNodeId);
-                        eq.setCcEngineeringTypeId("BID");
-                        eq.setCcEngineeringQuantityTypeId(ccEngineeringQuantityTypeId);
-                        eq.setCcUomTypeIdId(ccUomTypeIdId);
-                        eq.setTotalWeight(totalWeight);
-                        eq.setCcPoId(ccPoId);
+                        // 检查是否已经存在相同的记录
+                        CcEngineeringQuantity existingRecord = CcEngineeringQuantity.selectOneByWhere(
+                                new Where()
+                                        .eq(CcEngineeringQuantity.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjStructNodeId)
+                                        .eq(CcEngineeringQuantity.Cols.CC_PO_ID, ccPoId)
+                                        .eq(CcEngineeringQuantity.Cols.CC_ENGINEERING_QUANTITY_TYPE_ID, ccEngineeringQuantityTypeId)
+                                        .eq(CcEngineeringQuantity.Cols.CC_UOM_TYPE_ID_ID, ccUomTypeIdId)
+                        );
 
-                        // 保存到数据库
-                        eq.insertById();
+                        if (existingRecord != null) {
+                            // 更新已有记录
+                            existingRecord.setTotalWeight(totalWeight);
+                            existingRecord.updateById();
+                        } else {
+                            // 插入新记录
+                            CcEngineeringQuantity eq = CcEngineeringQuantity.newData();
+                            eq.setCcPrjStructNodeId(ccPrjStructNodeId);
+                            eq.setCcEngineeringTypeId("BID");
+                            eq.setCcEngineeringQuantityTypeId(ccEngineeringQuantityTypeId);
+                            eq.setCcUomTypeIdId(ccUomTypeIdId);
+                            eq.setTotalWeight(totalWeight);
+                            eq.setCcPoId(ccPoId);
+                            eq.insertById();
+                        }
                     }
                 }
 
