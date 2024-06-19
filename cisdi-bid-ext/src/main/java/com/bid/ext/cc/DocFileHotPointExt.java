@@ -5,6 +5,7 @@ import com.bid.ext.model.CcDocFileHotPoint;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.util.JdbcMapUtil;
+import com.qygly.shared.util.SharedUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,15 +25,17 @@ public class DocFileHotPointExt {
         Map<String, Object> outputMap = new HashMap<>();
         outputMap.put("ccDocFileId", ccDocFileId);
         List<Map<String, Object>> hotPointList = new ArrayList<>();
-        for (CcDocFileHotPoint ccDocFileHotPoint : ccDocFileHotPoints) {
-            Map<String, Object> hotPointMap = new HashMap<>();
+        if (!SharedUtil.isEmpty(ccDocFileHotPoints)) {
+            for (CcDocFileHotPoint ccDocFileHotPoint : ccDocFileHotPoints) {
+                Map<String, Object> hotPointMap = new HashMap<>();
 
-            hotPointMap.put("ccAttachment", ccDocFileHotPoint.getCcAttachment()); // 热点文件id
-            hotPointMap.put("name", ccDocFileHotPoint.getName()); // 热点名称
-            hotPointMap.put("position", ccDocFileHotPoint.getPosition()); //坐标
-            hotPointMap.put("hotPointId", ccDocFileHotPoint.getId()); // 热点id
-            hotPointList.add(hotPointMap);
-            outputMap.put("HotPointList", hotPointList);
+                hotPointMap.put("ccAttachment", ccDocFileHotPoint.getCcAttachment()); // 热点文件id
+                hotPointMap.put("name", ccDocFileHotPoint.getName()); // 热点名称
+                hotPointMap.put("position", ccDocFileHotPoint.getPosition()); //坐标
+                hotPointMap.put("hotPointId", ccDocFileHotPoint.getId()); // 热点id
+                hotPointList.add(hotPointMap);
+                outputMap.put("HotPointList", hotPointList);
+            }
         }
         ExtJarHelper.setReturnValue(outputMap);
     }
