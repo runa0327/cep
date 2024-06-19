@@ -86,6 +86,18 @@ public class DrawingExt {
             String csCommId = entityRecord.csCommId;
             String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
 
+            Boolean isDefault = (Boolean) varMap.get("P_IS_DEFAULT");
+
+            if (isDefault) {
+                List<CcStructDrawingVersion> ccStructDrawingVersions = CcStructDrawingVersion.selectByWhere(new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId));
+                if (!SharedUtil.isEmpty(ccStructDrawingVersions)) {
+                    for (CcStructDrawingVersion ccStructDrawingVersion1 : ccStructDrawingVersions) {
+                        ccStructDrawingVersion1.setIsDefault(false);
+                        ccStructDrawingVersion1.updateById();
+                    }
+                }
+            }
+
             String[] versionOrder = {"A", "B", "C", "D", "E", "F", "G"};
             String ccDrawingVersionId = null;
 
@@ -115,6 +127,7 @@ public class DrawingExt {
             ccStructDrawingVersion.setCcDrawingManagementId(csCommId);
             ccStructDrawingVersion.setCcPrjStructNodeId(ccPrjStructNodeId);
             ccStructDrawingVersion.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
+            ccStructDrawingVersion.setIsDefault(isDefault);
             ccStructDrawingVersion.insertById();
 
             List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
@@ -152,7 +165,7 @@ public class DrawingExt {
             }
         }
     }
-    
+
 
     /**
      * 设为默认套图
