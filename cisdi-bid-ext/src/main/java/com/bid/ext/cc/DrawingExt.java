@@ -152,33 +152,7 @@ public class DrawingExt {
             }
         }
     }
-
-    /**
-     * 设为默认图纸
-     */
-    public void setDefaultDrawing() {
-        InvokeActResult invokeActResult = new InvokeActResult();
-        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
-            String csCommId = entityRecord.csCommId;
-            //查询此合同该版本的套图
-            CcDrawingUpload ccDrawingUpload = CcDrawingUpload.selectById(csCommId);
-            //图纸
-            String ccDrawingManagementId = ccDrawingUpload.getCcDrawingManagementId();
-            //版本
-            String ccDrawingVersionId = ccDrawingUpload.getCcDrawingVersionId();
-            List<CcDrawingUpload> ccDrawingUploads = CcDrawingUpload.selectByWhere(new Where().eq(CcDrawingUpload.Cols.CC_DRAWING_MANAGEMENT_ID, ccDrawingManagementId).eq(CcDrawingUpload.Cols.CC_DRAWING_VERSION_ID, ccDrawingVersionId));
-            if (!SharedUtil.isEmpty(ccDrawingUploads)) {
-                for (CcDrawingUpload ccDrawingUpload1 : ccDrawingUploads) {
-                    ccDrawingUpload1.setIsDefault(false);
-                    ccDrawingUpload1.updateById();
-                }
-            }
-            ccDrawingUpload.setIsDefault(true);
-            ccDrawingUpload.updateById();
-        }
-        invokeActResult.reFetchData = true;
-        ExtJarHelper.setReturnValue(invokeActResult);
-    }
+    
 
     /**
      * 设为默认套图

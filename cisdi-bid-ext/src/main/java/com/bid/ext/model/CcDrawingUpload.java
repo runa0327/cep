@@ -126,10 +126,6 @@ public class CcDrawingUpload {
          * {"EN": "项目图纸版本", "ZH_CN": "项目图纸版本", "ZH_TW": "项目图纸版本"}。
          */
         public static final String CC_STRUCT_DRAWING_VERSION_ID = "CC_STRUCT_DRAWING_VERSION_ID";
-        /**
-         * {"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
-         */
-        public static final String IS_DEFAULT = "IS_DEFAULT";
     }
 
     // </editor-fold>
@@ -852,42 +848,6 @@ public class CcDrawingUpload {
             this.ccStructDrawingVersionId = ccStructDrawingVersionId;
             if (!this.toUpdateCols.contains("CC_STRUCT_DRAWING_VERSION_ID")) {
                 this.toUpdateCols.add("CC_STRUCT_DRAWING_VERSION_ID");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
-     */
-    private Boolean isDefault;
-
-    /**
-     * 获取：{"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
-     */
-    public Boolean getIsDefault() {
-        return this.isDefault;
-    }
-
-    /**
-     * 设置：{"EN": "IS_DEFAULT", "ZH_CN": "默认", "ZH_TW": "繁：默认"}。
-     */
-    public CcDrawingUpload setIsDefault(Boolean isDefault) {
-        if (this.isDefault == null && isDefault == null) {
-            // 均为null，不做处理。
-        } else if (this.isDefault != null && isDefault != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.isDefault.compareTo(isDefault) != 0) {
-                this.isDefault = isDefault;
-                if (!this.toUpdateCols.contains("IS_DEFAULT")) {
-                    this.toUpdateCols.add("IS_DEFAULT");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.isDefault = isDefault;
-            if (!this.toUpdateCols.contains("IS_DEFAULT")) {
-                this.toUpdateCols.add("IS_DEFAULT");
             }
         }
         return this;
