@@ -1,15 +1,21 @@
 package com.bid.ext.cc;
 
-import com.bid.ext.model.CcPo;
-import com.bid.ext.model.CcPoEngineering;
-import com.bid.ext.model.CcPoEngineeringType;
-import com.bid.ext.model.CcPrjStructNode;
+import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.interaction.InvokeActResult;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class BidExt {
 
@@ -50,4 +56,87 @@ public class BidExt {
         }
     }
 
+    /**
+     * 导入合同工程量
+     */
+    /**
+     * 导入合同工程量
+     */
+    public void importContractQuantities() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String ccPoId = entityRecord.csCommId;
+            Map<String, Object> varMap = ExtJarHelper.getVarMap();
+            FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
+            String filePath = flFile.getPhysicalLocation();
+            if (!"xlsx".equals(flFile.getExt()))
+                throw new BaseException("请上传'xlsx'格式的Excel文件");
+
+            try (FileInputStream file = new FileInputStream(new File(filePath))) {
+                Workbook workbook = new XSSFWorkbook(file);
+                Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
+
+                // 只取第5、9、13、19、21行的数据
+                int[] rowsToProcess = {5, 9, 13, 19, 21};
+
+                for (int rowIndex : rowsToProcess) {
+                    Row row = sheet.getRow(rowIndex - 1); // 行索引从0开始，因此减1
+                    if (row == null) continue;
+
+                    for (int colIndex = 3; colIndex <= 12; colIndex++) { // 处理D到M列
+                        Cell cell = row.getCell(colIndex);
+                        if (cell == null || cell.getCellType() != CellType.NUMERIC) continue;
+
+
+                        // 获取相关单元格的值
+
+                        String structCode = sheet.getRow(3).getCell(colIndex).getStringCellValue().substring(0, 6);
+                        CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.CODE, structCode));
+                        String ccPrjStructNodeId = ccPrjStructNode.getId();
+
+                        String cellValue = row.getCell(1).getStringCellValue();
+                        String ccEngineeringQuantityTypeId = null;
+                        switch (cellValue) {
+                            case "桩":
+                                ccEngineeringQuantityTypeId = "PILE";
+                                break;
+                            case "基础":
+                                ccEngineeringQuantityTypeId = "FOUNDATION";
+                                break;
+                            case "钢结构":
+                                ccEngineeringQuantityTypeId = "STEELSTRUCTURE";
+                                break;
+                            case "桥架":
+                                ccEngineeringQuantityTypeId = "CABLETRAY";
+                                break;
+                            case "管道":
+                                ccEngineeringQuantityTypeId = "PIPELINE";
+                                break;
+                        }
+
+                        String ccUomTypeIdId = row.getCell(2).getStringCellValue();
+                        BigDecimal totalWeight = BigDecimal.valueOf(cell.getNumericCellValue());
+
+                        CcEngineeringQuantity eq = CcEngineeringQuantity.newData();
+                        // 设置实体属性
+                        eq.setCcPrjStructNodeId(ccPrjStructNodeId);
+                        eq.setCcEngineeringTypeId("BID");
+                        eq.setCcEngineeringQuantityTypeId(ccEngineeringQuantityTypeId);
+                        eq.setCcUomTypeIdId(ccUomTypeIdId);
+                        eq.setTotalWeight(totalWeight);
+                        eq.setCcPoId(ccPoId);
+
+                        // 保存到数据库
+                        eq.insertById();
+                    }
+                }
+
+            } catch (IOException e) {
+                throw new BaseException("上传文件失败");
+            }
+
+            InvokeActResult invokeActResult = new InvokeActResult();
+            invokeActResult.reFetchData = true;
+            ExtJarHelper.setReturnValue(invokeActResult);
+        }
+    }
 }
