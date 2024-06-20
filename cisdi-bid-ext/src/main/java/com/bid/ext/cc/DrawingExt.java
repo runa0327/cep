@@ -3,14 +3,21 @@ package com.bid.ext.cc;
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
+import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
 import com.qygly.shared.util.SharedUtil;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
 
 public class DrawingExt {
 
@@ -189,6 +196,129 @@ public class DrawingExt {
         }
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    /**
+     * 导入图纸计划
+     */
+    public void importDrawingPlan() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
+        String filePath = flFile.getPhysicalLocation();
+        if (!"xls".equals(flFile.getExt())) {
+            throw new BaseException("请上传'xls'格式的Excel文件");
+        }
+
+        try (FileInputStream file = new FileInputStream(new File(filePath))) {
+            Workbook workbook = new XSSFWorkbook(file);
+            Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
+
+            // 遍历每一行
+            for (int i = 1; i <= Objects.requireNonNull(sheet).getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                // 检查行是否为空
+                if (row == null) {
+                    continue; // 如果为空，跳过该行
+                }
+
+                String prjStructNodeCode = getStringCellValue(row.getCell(1));
+                if (prjStructNodeCode != null && prjStructNodeCode.endsWith(".0")) {
+                    prjStructNodeCode = prjStructNodeCode.substring(0, prjStructNodeCode.length() - 2);
+                }
+                CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.CODE, prjStructNodeCode));
+                String ccPrjStructNodeId = ccPrjStructNode.getId();
+                String ccPrjId = ccPrjStructNode.getCcPrjId();
+
+                String drawingType = getStringCellValue(row.getCell(3));
+                String drawingTypeId = null;
+                switch (drawingType) {
+                    case "普通施工图":
+                        drawingTypeId = "common";
+                        break;
+                }
+
+                CcDrawingManagement drawingManagement = CcDrawingManagement.newData();
+                drawingManagement.setSeqNo(BigDecimal.valueOf(getNumericCellValue(row.getCell(0))));
+                drawingManagement.setCcPrjId(ccPrjId);
+                drawingManagement.setCcPrjStructNodeId(ccPrjStructNodeId);
+                drawingManagement.setCcDrawingTypeId(drawingTypeId);
+                drawingManagement.setName(getStringCellValue(row.getCell(4)));
+                drawingManagement.setCcConstructionDrawingId(getStringCellValue(row.getCell(5)));
+                drawingManagement.setCcSteelOwnerDrawingId(getStringCellValue(row.getCell(6)));
+                drawingManagement.setPlanDate(getLocalDateCellValue(row.getCell(7)));
+                drawingManagement.setActDate(getLocalDateCellValue(row.getCell(8)));
+                drawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
+                drawingManagement.setThreeDPlanDate(getLocalDateCellValue(row.getCell(10)));
+                drawingManagement.setThreeDActDate(getLocalDateCellValue(row.getCell(11)));
+
+                drawingManagement.insertById();
+            }
+
+        } catch (IOException e) {
+            throw new BaseException("上传文件失败", e);
+        }
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    private String getStringCellValue(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
+        if (cell.getCellType() == CellType.STRING) {
+            return cell.getStringCellValue();
+        } else if (cell.getCellType() == CellType.NUMERIC) {
+            return String.valueOf(cell.getNumericCellValue());
+        } else if (cell.getCellType() == CellType.BOOLEAN) {
+            return String.valueOf(cell.getBooleanCellValue());
+        } else {
+            return null;
+        }
+    }
+
+    private double getNumericCellValue(Cell cell) {
+        if (cell == null) {
+            return 0;
+        }
+        if (cell.getCellType() == CellType.NUMERIC) {
+            return cell.getNumericCellValue();
+        } else if (cell.getCellType() == CellType.STRING) {
+            return Double.parseDouble(cell.getStringCellValue());
+        } else {
+            return 0;
+        }
+    }
+
+    private boolean getBooleanCellValue(Cell cell) {
+        if (cell == null) {
+            return false;
+        }
+        if (cell.getCellType() == CellType.BOOLEAN) {
+            return cell.getBooleanCellValue();
+        } else if (cell.getCellType() == CellType.STRING) {
+            String cellValue = cell.getStringCellValue();
+            return "是".equals(cellValue) || "true".equalsIgnoreCase(cellValue);
+        } else if (cell.getCellType() == CellType.NUMERIC) {
+            return cell.getNumericCellValue() != 0;
+        } else {
+            return false;
+        }
+    }
+
+    private LocalDate getLocalDateCellValue(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
+        if (cell.getCellType() == CellType.NUMERIC) {
+            Date date = cell.getDateCellValue();
+            return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        } else if (cell.getCellType() == CellType.STRING) {
+            return LocalDate.parse(cell.getStringCellValue());
+        } else {
+            return null;
+        }
     }
 
 }

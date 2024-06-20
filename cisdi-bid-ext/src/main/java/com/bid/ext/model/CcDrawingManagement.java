@@ -7,6 +7,7 @@ import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.entity.EntityTypeE;
 import com.qygly.shared.util.SharedUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -80,6 +81,10 @@ public class CcDrawingManagement {
          */
         public static final String LAST_MODI_USER_ID = "LAST_MODI_USER_ID";
         /**
+         * {"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+         */
+        public static final String SEQ_NO = "SEQ_NO";
+        /**
          * {"EN": "STATUS", "ZH_CN": "记录状态", "ZH_TW": "繁：记录状态"}。
          */
         public static final String STATUS = "STATUS";
@@ -124,7 +129,7 @@ public class CcDrawingManagement {
          */
         public static final String CC_CONSTRUCTION_DRAWING_ID = "CC_CONSTRUCTION_DRAWING_ID";
         /**
-         * {"EN": "会话ID", "ZH_CN": "钢铁业主图号", "ZH_TW": "会话ID"}。
+         * {"EN": "会话ID", "ZH_CN": "湛江钢铁业主图号", "ZH_TW": "会话ID"}。
          */
         public static final String CC_STEEL_OWNER_DRAWING_ID = "CC_STEEL_OWNER_DRAWING_ID";
         /**
@@ -445,6 +450,42 @@ public class CcDrawingManagement {
             this.lastModiUserId = lastModiUserId;
             if (!this.toUpdateCols.contains("LAST_MODI_USER_ID")) {
                 this.toUpdateCols.add("LAST_MODI_USER_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     */
+    private BigDecimal seqNo;
+
+    /**
+     * 获取：{"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     */
+    public BigDecimal getSeqNo() {
+        return this.seqNo;
+    }
+
+    /**
+     * 设置：{"EN": "SEQ_NO", "ZH_CN": "序号", "ZH_TW": "繁：序号"}。
+     */
+    public CcDrawingManagement setSeqNo(BigDecimal seqNo) {
+        if (this.seqNo == null && seqNo == null) {
+            // 均为null，不做处理。
+        } else if (this.seqNo != null && seqNo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.seqNo.compareTo(seqNo) != 0) {
+                this.seqNo = seqNo;
+                if (!this.toUpdateCols.contains("SEQ_NO")) {
+                    this.toUpdateCols.add("SEQ_NO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.seqNo = seqNo;
+            if (!this.toUpdateCols.contains("SEQ_NO")) {
+                this.toUpdateCols.add("SEQ_NO");
             }
         }
         return this;
@@ -847,19 +888,19 @@ public class CcDrawingManagement {
     }
 
     /**
-     * {"EN": "会话ID", "ZH_CN": "钢铁业主图号", "ZH_TW": "会话ID"}。
+     * {"EN": "会话ID", "ZH_CN": "湛江钢铁业主图号", "ZH_TW": "会话ID"}。
      */
     private String ccSteelOwnerDrawingId;
 
     /**
-     * 获取：{"EN": "会话ID", "ZH_CN": "钢铁业主图号", "ZH_TW": "会话ID"}。
+     * 获取：{"EN": "会话ID", "ZH_CN": "湛江钢铁业主图号", "ZH_TW": "会话ID"}。
      */
     public String getCcSteelOwnerDrawingId() {
         return this.ccSteelOwnerDrawingId;
     }
 
     /**
-     * 设置：{"EN": "会话ID", "ZH_CN": "钢铁业主图号", "ZH_TW": "会话ID"}。
+     * 设置：{"EN": "会话ID", "ZH_CN": "湛江钢铁业主图号", "ZH_TW": "会话ID"}。
      */
     public CcDrawingManagement setCcSteelOwnerDrawingId(String ccSteelOwnerDrawingId) {
         if (this.ccSteelOwnerDrawingId == null && ccSteelOwnerDrawingId == null) {

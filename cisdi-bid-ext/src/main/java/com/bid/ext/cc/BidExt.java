@@ -68,8 +68,8 @@ public class BidExt {
             Map<String, Object> varMap = ExtJarHelper.getVarMap();
             FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
             String filePath = flFile.getPhysicalLocation();
-            if (!"xlsx".equals(flFile.getExt())) {
-                throw new BaseException("请上传'xlsx'格式的Excel文件");
+            if (!"xls".equals(flFile.getExt())) {
+                throw new BaseException("请上传'xls'格式的Excel文件");
             }
 
             try (FileInputStream file = new FileInputStream(new File(filePath))) {
