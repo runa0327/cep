@@ -347,18 +347,22 @@ public class DrawingExt {
      */
     public void drawingAuth() {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
-        String pAdUserIds = JdbcMapUtil.getString(varMap, "P_AD_USER_IDS");
+        String pCcDrawingMemberIds = JdbcMapUtil.getString(varMap, "P_CC_DRAWING_MEMBER_IDS");
         Boolean isView = (Boolean) varMap.get("P_IS_VIEW");
         Boolean isUpload = (Boolean) varMap.get("P_IS_UPLOAD");
 
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
-            if (pAdUserIds != null && !pAdUserIds.isEmpty()) {
-                List<String> userIdList = Arrays.asList(pAdUserIds.split(","));
-                for (String userId : userIdList) {
+            if (pCcDrawingMemberIds != null && !pCcDrawingMemberIds.isEmpty()) {
+
+                List<String> memberIdList = Arrays.asList(pCcDrawingMemberIds.split(","));
+                
+                for (String memberId : memberIdList) {
+                    CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
+                    String adUserId = ccPrjMember.getAdUserId();
                     CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
                     ccDrawingAuth.setCcDrawingManagementId(csCommId);
-                    ccDrawingAuth.setAdUserId(userId);
+                    ccDrawingAuth.setAdUserId(adUserId);
                     ccDrawingAuth.setIsUpload(isUpload);
                     ccDrawingAuth.setIsView(isView);
                     ccDrawingAuth.insertById();
