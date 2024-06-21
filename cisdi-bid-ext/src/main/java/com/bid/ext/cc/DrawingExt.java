@@ -237,7 +237,14 @@ public class DrawingExt {
                         break;
                 }
 
+                //实际发图日期
+                LocalDate actDate = getLocalDateCellValue(row.getCell(8));
+
+                //三维实际日期
+                LocalDate threeDPlanDate = getLocalDateCellValue(row.getCell(11));
+
                 CcDrawingManagement drawingManagement = CcDrawingManagement.newData();
+
                 drawingManagement.setSeqNo(BigDecimal.valueOf(getNumericCellValue(row.getCell(0))));
                 drawingManagement.setCcPrjId(ccPrjId);
                 drawingManagement.setCcPrjStructNodeId(ccPrjStructNodeId);
@@ -246,11 +253,25 @@ public class DrawingExt {
                 drawingManagement.setCcConstructionDrawingId(getStringCellValue(row.getCell(5)));
                 drawingManagement.setCcSteelOwnerDrawingId(getStringCellValue(row.getCell(6)));
                 drawingManagement.setPlanDate(getLocalDateCellValue(row.getCell(7)));
-                drawingManagement.setActDate(getLocalDateCellValue(row.getCell(8)));
+                drawingManagement.setActDate(actDate);
                 drawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
                 drawingManagement.setThreeDPlanDate(getLocalDateCellValue(row.getCell(10)));
-                drawingManagement.setThreeDActDate(getLocalDateCellValue(row.getCell(11)));
+                drawingManagement.setThreeDActDate(threeDPlanDate);
 
+                if (SharedUtil.isEmpty(actDate)) {
+                    drawingManagement.setCcDrawingStatusId("TODO");
+                } else {
+                    drawingManagement.setCcDrawingStatusId("DONE");
+                }
+
+                Boolean isThreeDimensional = getBooleanCellValue(row.getCell(9));
+                if (isThreeDimensional && SharedUtil.isEmpty(threeDPlanDate)) {
+                    drawingManagement.setCcModelStatusId("TODO");
+                } else if (isThreeDimensional && !SharedUtil.isEmpty(threeDPlanDate)) {
+                    drawingManagement.setCcModelStatusId("DONE");
+                } else if (!isThreeDimensional) {
+                    drawingManagement.setCcModelStatusId(null);
+                }
                 drawingManagement.insertById();
             }
 
