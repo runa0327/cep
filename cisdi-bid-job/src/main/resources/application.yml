@@ -1,0 +1,24 @@
+
+server:
+  port: 21112
+  servlet:
+    context-path: /cisdi-bid-job
+
+spring:
+  application:
+    name: bid-job
+  datasource:
+    username: qygly
+    password: Qygly@123456
+    # 注意更改ip和db：
+    url: jdbc:mysql://121.5.65.165:3306/test240511?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    #    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  # 搜索指定包别名
+  typeAliasesPackage: com.pms.bid.job.domain
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

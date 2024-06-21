@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.bid.job.mapper.processInstance.WfProcessMapper">
+
+    <resultMap id="WfProcessResultMap" type="com.pms.bid.job.domain.processInstance.WfProcess">
+        <!--id-->
+        <id property="id" column="id"   />
+        <result property="wfProcessId" column="wfProcessId" />
+        <!--流程名称-->
+        <result property="wfProcessName" column="wfProcessName" />
+        <!--实体id-->
+        <result property="adEntId" column="adEntId" />
+        <!--实体代码-->
+        <result property="entCode" column="entCode" />
+    </resultMap>
+
+    <!--通过流程id获取流程名称-->
+    <select id="queryNameById" resultMap="WfProcessResultMap">
+        select
+            NAME ->> '$.ZH_CN' AS wfProcessName,
+            id as wfProcessId
+        from wf_process
+        where id = #{wfProcessId}
+    </select>
+</mapper>

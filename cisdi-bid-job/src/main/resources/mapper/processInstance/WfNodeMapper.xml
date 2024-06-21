@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.bid.job.mapper.processInstance.WfNodeMapper">
+
+    <resultMap id="WfNodeResultMap" type="com.pms.bid.job.domain.processInstance.WfNode">
+        <id property="id" column="id"   />
+        <!--节点名称-->
+        <result property="wfNodeName" column="wfNodeName"   />
+        <!--视图-->
+        <result property="viewId" column="viewId"   />
+        <!--操作-->
+        <result property="adActId" column="adActId"   />
+        <!--到节点-->
+        <result property="toNodeId" column="toNodeId"   />
+        <!--流程id-->
+        <result property="wfProcessId" column="wfProcessId"   />
+        <!--序号-->
+        <result property="seqNo" column="seqNo"   />
+    </resultMap>
+
+    <!--获取流程发起节点信息-->
+    <select id="queryFirstNode" resultMap="WfNodeResultMap">
+        SELECT
+            a.id,
+            a.NAME ->> '$.ZH_CN' AS wfNodeName,
+            a.AD_VIEW_ID AS viewId,
+            b.AD_ACT_ID as adActId,
+            b.TO_NODE_ID as toNodeId,
+            a.wf_process_id as wfProcessId,
+            a.SEQ_NO as seqNo
+        FROM
+            wf_node a
+        left join wf_flow b on a.id = b.FROM_NODE_ID
+        WHERE
+            a.wf_process_id = '1803983571345297408'
+          and a.NODE_TYPE = 'START_EVENT'
+    </select>
+
+    <!--根据节点id查询节点信息-->
+    <select id="queryNodeById" resultMap="WfNodeResultMap">
+        SELECT
+            a.id,
+            a.NAME ->> '$.ZH_CN' AS wfNodeName,
+            a.AD_VIEW_ID AS viewId,
+            a.wf_process_id as wfProcessId,
+            a.SEQ_NO as seqNo
+        FROM
+            wf_node a
+        WHERE
+            a.id = #{nodeId}
+    </select>
+</mapper>

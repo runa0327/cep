@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.bid.job.mapper.processInstance.WfProcessInstanceMapper">
+
+    <resultMap id="WfProcessInstanceResultMap" type="com.pms.bid.job.domain.processInstance.WfProcessInstance">
+        <!--id-->
+        <id property="id" column="id"   />
+        <!--版本-->
+        <result property="ver" column="ver"   />
+        <!--时间戳-->
+        <result property="ts" column="ts"   />
+        <!--创建人-->
+        <result property="createBy" column="createBy"   />
+        <!--创建时间-->
+        <result property="createDate" column="createDate"   />
+        <!--上次修改人-->
+        <result property="lastUpdateBy" column="lastUpdateBy"   />
+        <!--上次修改时间-->
+        <result property="lastUpdateDate" column="lastUpdateDate"   />
+        <!--流程id-->
+        <result property="wfProcessId" column="wfProcessId"   />
+        <!--当前节点id-->
+        <result property="currentNodeId" column="currentNodeId"   />
+        <!--当前节点实例id-->
+        <result property="wfNodeInstanceId" column="wfNodeInstanceId"   />
+    </resultMap>
+
+    <!--根据流程实例id获取当前节点所处的流程节点实例id-->
+    <select id="queryWfNodeInstanceIdById" resultMap="WfProcessInstanceResultMap">
+        select
+            id as wfProcessInstanceId,
+            CURRENT_NODE_ID as currentNodeId,
+            WF_PROCESS_ID as wfProcessId,
+            CURRENT_NI_ID as wfNodeInstanceId
+        from WF_PROCESS_INSTANCE where id = #{wfProcessInstanceId}
+    </select>
+
+    <!--新增流程实例-->
+    <insert id="create">
+        insert into WF_PROCESS_INSTANCE (
+            ID,
+            NAME,
+            VER,
+            START_USER_ID,
+            START_DATETIME,
+            WF_PROCESS_ID,
+            STATUS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            AD_ENT_ID,
+            ENT_CODE,
+            ENTITY_RECORD_ID,
+            TS,
+            IS_URGENT,
+            CURRENT_NODE_ID,
+            CURRENT_NI_ID,
+            CURRENT_TODO_USER_IDS,
+            CURRENT_VIEW_ID
+        ) values (
+            #{id},
+            #{wfProcessInstanceName},
+            #{ver},
+            #{startUserId},
+            #{startDate},
+            #{wfProcessId},
+            #{status},
+            #{createDate},
+            #{createBy},
+            #{lastUpdateDate},
+            #{lastUpdateBy},
+            #{adEntId},
+            #{adEntCode},
+            #{entityRecordId},
+            #{ts},
+            #{urgent},
+            #{currentNodeId},
+            #{wfNodeInstanceId},
+            #{adUserId},
+            #{currentViewId}
+        )
+    </insert>
+</mapper>

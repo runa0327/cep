@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.bid.job.mapper.ConstructionPlanMapper">
+    <resultMap id="ConstructionPlanResultMap" type="com.pms.bid.job.domain.process.ConstructionPlan">
+        <!--id-->
+        <id property="id" column="id"   />
+        <!--版本-->
+        <result property="ver" column="ver"   />
+        <!--时间戳-->
+        <result property="ts" column="ts"   />
+        <!--创建人-->
+        <result property="createBy" column="createBy"   />
+        <!--创建时间-->
+        <result property="createDate" column="createDate"   />
+        <!--上次修改人-->
+        <result property="lastUpdateBy" column="lastUpdateBy"   />
+        <!--上次修改时间-->
+        <result property="lastUpdateDate" column="lastUpdateDate"   />
+        <!--单元工程id-->
+        <result property="prjStructNodeId" column="prjStructNodeId"   />
+        <!--单元工程名称-->
+        <result property="prjStructNodeName" column="prjStructNodeName"   />
+        <!--方案名称-->
+        <result property="planName" column="planName"   />
+        <!--责任单位-->
+        <result property="responsibleUnit" column="responsibleUnit"   />
+        <!--计划完成日期-->
+        <result property="planCompleteDate" column="planCompleteDate"   />
+        <!--提前预警天数-->
+        <result property="adVanceWarningDays" column="adVanceWarningDays"   />
+        <!--责任人-->
+        <result property="adUserId" column="adUserId"   />
+        <!--是否需要专家审核-->
+        <result property="isCheck" column="isCheck"   />
+        <!--备注-->
+        <result property="planRemark" column="planRemark"   />
+        <!--时间差天数-->
+        <result property="diffDay" column="diffDay"   />
+        <!--流程实例id-->
+        <result property="wfProcessInstanceId" column="wfProcessInstanceId"   />
+    </resultMap>
+
+    <!--获取计划完成时间是当天及之后、同时未发起、发起未完成的数据-->
+    <select id="queryCompleteDateAfterNow" resultMap="ConstructionPlanResultMap">
+        select
+            id as id,
+            PLAN_NAME as planName,
+            COMPL_PLAN_DATE as planCompleteDate,
+            ADVANCE_WARNING_DAYS as adVanceWarningDays,
+            AD_USER_ID as adUserId,
+            DATEDIFF(COMPL_PLAN_DATE,now()) as diffDay,
+            LK_WF_INST_ID as wfProcessInstanceId,
+            CRT_USER_ID as createBy
+        from
+            CC_CONSTRUCTIONPLAN
+        where
+            status = 'ap'
+            and COMPL_PLAN_DATE >= date_format(now(),'%Y-%m-%d')
+            and ((IS_START = 1 and IS_COMPLETE = 0) or IS_START = 0)
+        order by id asc
+    </select>
+
+    <!--将数据修改为已发起-->
+    <update id="updateIsStartById">
+        update CC_CONSTRUCTIONPLAN
+        set
+            IS_START = 1,
+            LK_WF_INST_ID = #{wfProcessInstanceId}
+        where id = #{id}
+    </update>
+</mapper>
