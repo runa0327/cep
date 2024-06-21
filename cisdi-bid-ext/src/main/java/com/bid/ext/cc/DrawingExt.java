@@ -342,4 +342,29 @@ public class DrawingExt {
         }
     }
 
+    /**
+     * 图纸权限
+     */
+    public void drawingAuth() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String pAdUserIds = JdbcMapUtil.getString(varMap, "P_AD_USER_IDS");
+        Boolean isView = (Boolean) varMap.get("P_IS_VIEW");
+        Boolean isUpload = (Boolean) varMap.get("P_IS_UPLOAD");
+
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            if (pAdUserIds != null && !pAdUserIds.isEmpty()) {
+                List<String> userIdList = Arrays.asList(pAdUserIds.split(","));
+                for (String userId : userIdList) {
+                    CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
+                    ccDrawingAuth.setCcDrawingManagementId(csCommId);
+                    ccDrawingAuth.setAdUserId(userId);
+                    ccDrawingAuth.setIsUpload(isUpload);
+                    ccDrawingAuth.setIsView(isView);
+                    ccDrawingAuth.insertById();
+                }
+            }
+
+        }
+    }
 }
