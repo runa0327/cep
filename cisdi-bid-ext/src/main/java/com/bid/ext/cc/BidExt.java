@@ -59,61 +59,69 @@ public class BidExt {
     /**
      * 导入合同工程量
      */
-    /**
-     * 导入合同工程量
-     */
     public void importContractQuantities() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String ccPoId = entityRecord.csCommId;
             Map<String, Object> varMap = ExtJarHelper.getVarMap();
             FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
             String filePath = flFile.getPhysicalLocation();
-            if (!"xls".equals(flFile.getExt())) {
-                throw new BaseException("请上传'xls'格式的Excel文件");
+            if (!"xls".equals(flFile.getExt()) && !"xlsx".equals(flFile.getExt())) {
+                throw new BaseException("请上传'xls'或'xlsx'格式的Excel文件");
             }
 
             try (FileInputStream file = new FileInputStream(new File(filePath))) {
                 Workbook workbook = new XSSFWorkbook(file);
                 Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
+                FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
 
-                // 只取第5、9、13、19、21行的数据
-                int[] rowsToProcess = {5, 9, 13, 19, 21};
-
-                for (int rowIndex : rowsToProcess) {
-                    Row row = sheet.getRow(rowIndex - 1); // 行索引从0开始，因此减1
+                // 遍历所有行，从第二行开始
+                for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                    Row row = sheet.getRow(rowIndex);
                     if (row == null) continue;
+
+                    Cell cellB = row.getCell(1); // B列对应的索引是1
+                    if (cellB == null || cellB.getCellType() != CellType.STRING) continue;
+
+                    String cellValue = cellB.getStringCellValue();
+                    String ccEngineeringQuantityTypeId = null;
+                    switch (cellValue) {
+                        case "桩":
+                            ccEngineeringQuantityTypeId = "PILE";
+                            break;
+                        case "基础":
+                            ccEngineeringQuantityTypeId = "FOUNDATION";
+                            break;
+                        case "钢结构":
+                            ccEngineeringQuantityTypeId = "STEELSTRUCTURE";
+                            break;
+                        case "桥架":
+                            ccEngineeringQuantityTypeId = "CABLETRAY";
+                            break;
+                        case "管道":
+                            ccEngineeringQuantityTypeId = "PIPELINE";
+                            break;
+                    }
+
+                    if (ccEngineeringQuantityTypeId == null) continue;
 
                     for (int colIndex = 3; colIndex <= 12; colIndex++) { // 处理D到M列
                         Cell cell = row.getCell(colIndex);
-                        if (cell == null || cell.getCellType() != CellType.NUMERIC) continue;
+                        if (cell == null) continue;
 
                         // 获取相关单元格的值
                         String structCode = sheet.getRow(3).getCell(colIndex).getStringCellValue().substring(0, 6);
                         CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.CODE, structCode));
                         String ccPrjStructNodeId = ccPrjStructNode.getId();
 
-                        String cellValue = row.getCell(1).getStringCellValue();
-                        String ccEngineeringQuantityTypeId = null;
-                        switch (cellValue) {
-                            case "桩":
-                                ccEngineeringQuantityTypeId = "PILE";
-                                break;
-                            case "基础":
-                                ccEngineeringQuantityTypeId = "FOUNDATION";
-                                break;
-                            case "钢结构":
-                                ccEngineeringQuantityTypeId = "STEELSTRUCTURE";
-                                break;
-                            case "桥架":
-                                ccEngineeringQuantityTypeId = "CABLETRAY";
-                                break;
-                            case "管道":
-                                ccEngineeringQuantityTypeId = "PIPELINE";
-                                break;
+                        String ccUomTypeIdId = row.getCell(2).getStringCellValue();
+                        BigDecimal totalWeight = null;
+                        if (cell.getCellType() == CellType.NUMERIC) {
+                            totalWeight = BigDecimal.valueOf(cell.getNumericCellValue());
+                        } else if (cell.getCellType() == CellType.FORMULA) {
+                            totalWeight = BigDecimal.valueOf(evaluator.evaluate(cell).getNumberValue());
                         }
 
-                        String ccUomTypeIdId = row.getCell(2).getStringCellValue();
-                        BigDecimal totalWeight = BigDecimal.valueOf(cell.getNumericCellValue());
+                        if (totalWeight == null) continue;
 
                         // 检查是否已经存在相同的记录
                         CcEngineeringQuantity existingRecord = CcEngineeringQuantity.selectOneByWhere(
@@ -151,4 +159,5 @@ public class BidExt {
             ExtJarHelper.setReturnValue(invokeActResult);
         }
     }
+
 }
