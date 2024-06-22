@@ -15,10 +15,29 @@ spring:
     #    type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+
+
+#  rabbitmq配置
+#  rabbitmq:
+#    host: 140.210.215.217
+#    port: 9876
+#    username: guest
+#    password: guest
+#    virtual-host: /
+rocketmq:
+  name-server: 140.210.215.217:9876 # 访问地址
+  producer:
+    group: def_group # 必须指定group
+    send-message-timeout: 3000 # 消息发送超时时长，默认3s
+    retry-times-when-send-failed: 3 # 同步发送消息失败重试次数，默认2
+    retry-times-when-send-async-failed: 3 # 异步发送消息失败重试次数，默认2
+
+
+
 mybatis:
   # 搜索指定包别名
   typeAliasesPackage: com.pms.bid.job.domain
   # 配置mapper的扫描，找到所有的mapper.xml映射文件
   mapperLocations: classpath*:mapper/**/*Mapper.xml
-  configuration:
+#  configuration:
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

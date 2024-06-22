@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.bid.job.mapper.zhanJiang.CcEngineeringQuantityMapper">
+
+    <resultMap id="CcEngineeringQuantityResultMap" type="com.pms.bid.job.domain.zhanJiang.CcEngineeringQuantity">
+        <!--id-->
+        <id property="id" column="id"   />
+        <!--版本-->
+        <result property="ver" column="ver"   />
+        <!--时间戳-->
+        <result property="ts" column="ts"   />
+        <!--创建人-->
+        <result property="createBy" column="createBy"   />
+        <!--创建时间-->
+        <result property="createDate" column="createDate"   />
+        <!--上次修改人-->
+        <result property="lastUpdateBy" column="lastUpdateBy"   />
+        <!--上次修改时间-->
+        <result property="lastUpdateDate" column="lastUpdateDate"   />
+        <!--项目id-->
+        <result property="projectId" column="projectId"   />
+        <!--单元工程id-->
+        <result property="prjStructNodeId" column="prjStructNodeId"   />
+        <!--单元工程名称-->
+        <result property="prjStructNodeName" column="prjStructNodeName"   />
+        <!--填报类型id-->
+        <result property="engineeringTypeId" column="engineeringTypeId"   />
+        <!--工程量类型id-->
+        <result property="engineeringQuantityTypeId" column="engineeringQuantityTypeId"   />
+        <!--工程量类型名称-->
+        <result property="engineeringQuantityTypeName" column="engineeringQuantityTypeName"   />
+        <!--结构数量-->
+        <result property="structureCount" column="structureCount"   />
+        <!--计量单位类型id-->
+        <result property="uomTypeId" column="uomTypeId"   />
+        <!--计量单位类型名称-->
+        <result property="uomTypeName" column="uomTypeName"   />
+        <!--单位重量-->
+        <result property="unitWeight" column="unitWeight"   />
+        <!--总量-->
+        <result property="totalWeight" column="totalWeight"   />
+        <!--采购合同id-->
+        <result property="poId" column="poId"   />
+    </resultMap>
+
+    <!--批量新增-->
+    <insert id="inertBatch">
+    <foreach collection="list" index="index" item="item" separator=";">
+    insert into CC_ENGINEERING_QUANTITY (
+        ID,
+        VER,
+        TS,
+        CRT_DT,
+        CRT_USER_ID,
+        LAST_MODI_DT,
+        LAST_MODI_USER_ID,
+        STATUS,
+        CC_PRJ_STRUCT_NODE_ID,
+        CC_PRJ_ID,
+        CC_ENGINEERING_TYPE_ID,
+        TOTAL_WEIGHT,
+        CC_UOM_TYPE_ID_ID,
+        CC_ENGINEERING_QUANTITY_TYPE_ID,
+        CC_PO_ID
+    ) values (
+        #{item.id},
+        #{item.ver},
+        #{item.ts},
+        #{item.createDate},
+        #{item.createBy},
+        #{item.lastUpdateDate},
+        #{item.lastUpdateBy},
+        #{item.status},
+        #{item.prjStructNodeId},
+        #{item.projectId},
+        #{item.engineeringTypeId},
+        #{item.totalWeight},
+        #{item.uomTypeId},
+        #{item.engineeringQuantityTypeId},
+        #{item.poId}
+    )
+    </foreach>
+    </insert>
+</mapper>

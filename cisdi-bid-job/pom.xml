@@ -76,6 +76,20 @@
             <systemPath>${pom.basedir}/../lib/qygly-ext-rest-helper-3.0-SNAPSHOT.jar</systemPath>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <version>2.0.4</version>
+        </dependency>
+
+        <!-- 还有其它需要的jar包自由引入（注：fastjson不要使用低于1.2.60版本，会有安全漏洞） -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.62</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>

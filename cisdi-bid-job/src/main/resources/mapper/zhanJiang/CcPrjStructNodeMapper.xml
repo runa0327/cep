@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.bid.job.mapper.zhanJiang.CcPrjStructNodeMapper">
+    <resultMap id="CcPrjStructNodeResultMap" type="com.pms.bid.job.domain.zhanJiang.CcPrjStructNode">
+        <id property="id" column="id"   />
+        <!--单元工程名称编码-->
+        <result property="unitProjectCode" column="unitProjectCode" />
+        <!--单元工程名称-->
+        <result property="unitProjectName" column="unitProjectName" />
+    </resultMap>
+
+    <!--获取单元工程名称编码信息-->
+    <select id="queryUnitProjectList" resultMap="CcPrjStructNodeResultMap">
+        select
+            id as id,
+            code as unitProjectCode,
+            name as unitProjectName
+        from
+            cc_prj_struct_node
+        where
+            status = 'ap'
+            and IS_TEMPLATE=0
+            AND IS_PBS=1
+            AND CC_PRJ_ID = '1790672761571196928'
+            AND CC_PRJ_STRUCT_NODE_PID IS NOT NULL
+    </select>
+</mapper>
