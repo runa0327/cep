@@ -28,6 +28,14 @@ public class DrawingExt {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
+
+            String ccSteelOwnerDrawingId = ccDrawingManagement.getCcSteelOwnerDrawingId();
+            String lastFourthChar = "";
+            if (ccSteelOwnerDrawingId != null && ccSteelOwnerDrawingId.length() >= 4) {
+                lastFourthChar = String.valueOf(ccSteelOwnerDrawingId.charAt(ccSteelOwnerDrawingId.length() - 4));
+            }
+            ccDrawingManagement.setCcPrjProfessionalCodeId(lastFourthChar);
+
             Map<String, Object> valueMap = entityRecord.valueMap;
             String actDate = JdbcMapUtil.getString(valueMap, "ACT_DATE");
             if (SharedUtil.isEmpty(actDate)) {
@@ -243,6 +251,12 @@ public class DrawingExt {
                 //三维实际日期
                 LocalDate threeDPlanDate = getLocalDateCellValue(row.getCell(11));
 
+                String ccSteelOwnerDrawingId = getStringCellValue(row.getCell(6));
+                String lastFourthChar = "";
+                if (ccSteelOwnerDrawingId != null && ccSteelOwnerDrawingId.length() >= 4) {
+                    lastFourthChar = String.valueOf(ccSteelOwnerDrawingId.charAt(ccSteelOwnerDrawingId.length() - 4));
+                }
+
                 CcDrawingManagement drawingManagement = CcDrawingManagement.newData();
 
                 drawingManagement.setSeqNo(BigDecimal.valueOf(getNumericCellValue(row.getCell(0))));
@@ -252,6 +266,7 @@ public class DrawingExt {
                 drawingManagement.setName(getStringCellValue(row.getCell(4)));
                 drawingManagement.setCcConstructionDrawingId(getStringCellValue(row.getCell(5)));
                 drawingManagement.setCcSteelOwnerDrawingId(getStringCellValue(row.getCell(6)));
+                drawingManagement.setCcPrjProfessionalCodeId(lastFourthChar);
                 drawingManagement.setPlanDate(getLocalDateCellValue(row.getCell(7)));
                 drawingManagement.setActDate(actDate);
                 drawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
