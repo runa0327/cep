@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.bid.job.mapper.zhanJiang.CcDrawingManagementMapper">
+
+    <resultMap id="CcDrawingManagementResultMap" type="com.pms.bid.job.domain.zhanJiang.CcDrawingManagement">
+        <!--id-->
+        <id property="id" column="id"   />
+        <!--版本-->
+        <result property="ver" column="ver"   />
+        <!--时间戳-->
+        <result property="ts" column="ts"   />
+        <!--创建人-->
+        <result property="createBy" column="createBy"   />
+        <!--创建时间-->
+        <result property="createDate" column="createDate"   />
+        <!--上次修改人-->
+        <result property="lastUpdateBy" column="lastUpdateBy"   />
+        <!--上次修改时间-->
+        <result property="lastUpdateDate" column="lastUpdateDate"   />
+        <!--套图号-->
+        <result property="ccConstructionDrawingId" column="ccConstructionDrawingId"   />
+        <!--湛江钢铁业主图号-->
+        <result property="ccSteelOwnerDrawingId" column="ccSteelOwnerDrawingId"   />
+        <!--发图状态    DONE=已完成    TODO=未完成 -->
+        <result property="ccDrawingStatusId" column="ccDrawingStatusId"   />
+        <!--三维实际日期-->
+        <result property="threeDActDate" column="threeDActDate"   />
+    </resultMap>
+
+    <!--根据套图号匹配湛江钢铁业主图号查询id-->
+    <select id="queryIdByCcSteelOwnerDrawingId" resultType="java.lang.String">
+        select id from CC_DRAWING_MANAGEMENT where CC_STEEL_OWNER_DRAWING_ID = #{ttNumber} and status = 'ap'
+    </select>
+
+    <!--新增图纸管理-->
+    <insert id="create">
+        insert into CC_DRAWING_MANAGEMENT (
+            ID,
+            VER,
+            TS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            STATUS,
+            CC_STEEL_OWNER_DRAWING_ID,
+            CC_DRAWING_STATUS_ID,
+            THREE_D_ACT_DATE,
+            MQ_RECEIVE_DATETIME,
+            MQ_MSG
+        ) values (
+            #{id},
+            #{ver},
+            #{ts},
+            #{createDate},
+            #{createBy},
+            #{lastUpdateDate},
+            #{lastUpdateBy},
+            #{status},
+            #{ccSteelOwnerDrawingId},
+            #{ccDrawingStatusId},
+            #{threeDActDate},
+            #{mqReceiveDateTime},
+            #{mqMsgJson}
+        )
+    </insert>
+
+    <!--修改图纸管理-->
+    <update id="updateConditionById">
+        update CC_DRAWING_MANAGEMENT
+        <set>
+            <if test="ts != null and ts != ''">
+                ts = #{ts},
+            </if>
+            <if test="ccSteelOwnerDrawingId != null and ccSteelOwnerDrawingId != ''">
+                CC_STEEL_OWNER_DRAWING_ID = #{ccSteelOwnerDrawingId},
+            </if>
+            <if test="ccDrawingStatusId != null and ccDrawingStatusId != ''">
+                CC_DRAWING_STATUS_ID = #{ccDrawingStatusId},
+            </if>
+            <if test="threeDActDate != null and threeDActDate != ''">
+                THREE_D_ACT_DATE = #{threeDActDate},
+            </if>
+            <if test="mqReceiveDateTime != null and mqReceiveDateTime != ''">
+                MQ_RECEIVE_DATETIME = #{mqReceiveDateTime},
+            </if>
+            <if test="mqMsgJson != null and mqMsgJson != ''">
+                MQ_MSG = #{mqMsgJson},
+            </if>
+        </set>
+        where
+            id = #{id}
+    </update>
+</mapper>

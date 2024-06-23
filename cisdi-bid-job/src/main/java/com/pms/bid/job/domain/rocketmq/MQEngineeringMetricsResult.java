@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class QCRocketMQResult {
+public class MQEngineeringMetricsResult {
 
     private String code;
 

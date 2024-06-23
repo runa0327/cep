@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.bid.job.mapper.zhanJiang.CcDevicePurchaseDataMapper">
+    <resultMap id="CcDevicePurchaseDataResultMap" type="com.pms.bid.job.domain.zhanJiang.CcDevicePurchaseData">
+        <!--id-->
+        <id property="id" column="id"   />
+        <!--版本-->
+        <result property="ver" column="ver"   />
+        <!--时间戳-->
+        <result property="ts" column="ts"   />
+        <!--创建人-->
+        <result property="createBy" column="createBy"   />
+        <!--创建时间-->
+        <result property="createDate" column="createDate"   />
+        <!--上次修改人-->
+        <result property="lastUpdateBy" column="lastUpdateBy"   />
+        <!--上次修改时间-->
+        <result property="lastUpdateDate" column="lastUpdateDate"   />
+        <!--单元工程名称编码-->
+        <result property="unitProjectCode" column="unitProjectCode" />
+        <!--单元工程名称-->
+        <result property="unitProjectName" column="unitProjectName" />
+        <!--设备安装进度状态 1已安装 0未安装-->
+        <result property="deviceInstallStatus" column="deviceInstallStatus" />
+        <!--采购设备编号-->
+        <result property="purchaseDeviceNo" column="purchaseDeviceNo" />
+        <!--设备位号-->
+        <result property="deviceTagNo" column="deviceTagNo" />
+        <!--从mq获取的消息实体-->
+        <result property="mqMsgJson" column="mqMsgJson"   />
+        <!--从mq获取消息的时间-->
+        <result property="mqReceiveDateTime" column="mqReceiveDateTime"   />
+    </resultMap>
+
+    <!--根据设备编号判断设备是否已存在-->
+    <select id="queryIdByDeviceCode" resultType="java.lang.String">
+        select id from CC_DEVICE_PURCHASE_DATA where DEVICE_TAG_NO = #{deviceTagNo} and status = 'ap'
+    </select>
+
+    <!--新增单条设备采购进度数据-->
+    <insert id="create">
+        insert into CC_DEVICE_PURCHASE_DATA (
+            ID,
+            VER,
+            TS,
+            CRT_DT,
+            CRT_USER_ID,
+            LAST_MODI_DT,
+            LAST_MODI_USER_ID,
+            STATUS,
+            CC_UNIT_PRJ_CODE,
+            CC_UNIT_PRJ_NAME,
+            CC_DEVICE_INSTALL_STATUS,
+            DEVICE_NO,
+            MQ_MSG,
+            MQ_RECEIVE_DATETIME,
+            DEVICE_TAG_NO
+        ) values (
+            #{id},
+            #{ver},
+            #{ts},
+            #{createDate},
+            #{createBy},
+            #{lastUpdateDate},
+            #{lastUpdateBy},
+            #{status},
+            #{unitProjectCode},
+            #{unitProjectName},
+            #{deviceInstallStatus},
+            #{purchaseDeviceNo},
+            #{mqMsgJson},
+            #{mqReceiveDateTime},
+            #{deviceTagNo}
+        )
+    </insert>
+
+    <!--根据id动态修改 轻呈-设备采购进度数据 数据-->
+    <update id="updateConditionById">
+        update CC_DEVICE_PURCHASE_DATA
+        <set>
+            <if test="ts != null and ts != ''">
+                ts = #{ts},
+            </if>
+            <if test="lastUpdateDate != null and lastUpdateDate != ''">
+                LAST_MODI_DT = #{lastUpdateDate},
+            </if>
+            <if test="lastUpdateBy != null and lastUpdateBy != ''">
+                LAST_MODI_USER_ID = #{lastUpdateBy},
+            </if>
+            <if test="unitProjectCode != null and unitProjectCode != ''">
+                CC_UNIT_PRJ_CODE = #{unitProjectCode},
+            </if>
+            <if test="unitProjectName != null and unitProjectName != ''">
+                CC_UNIT_PRJ_NAME = #{unitProjectName},
+            </if>
+            <if test="deviceInstallStatus != null and deviceInstallStatus != ''">
+                CC_DEVICE_INSTALL_STATUS = #{deviceInstallStatus},
+            </if>
+            <if test="purchaseDeviceNo != null and purchaseDeviceNo != ''">
+                DEVICE_NO = #{purchaseDeviceNo},
+            </if>
+            <if test="mqReceiveDateTime != null and mqReceiveDateTime != ''">
+                MQ_RECEIVE_DATETIME = #{mqReceiveDateTime},
+            </if>
+            <if test="mqMsgJson != null and mqMsgJson != ''">
+                MQ_MSG = #{mqMsgJson},
+            </if>
+            <if test="deviceTagNo != null and deviceTagNo != ''">
+                DEVICE_TAG_NO = #{deviceTagNo},
+            </if>
+        </set>
+        where
+            id = #{id}
+    </update>
+</mapper>

@@ -43,6 +43,10 @@
         <result property="totalWeight" column="totalWeight"   />
         <!--采购合同id-->
         <result property="poId" column="poId"   />
+        <!--从mq获取的消息实体-->
+        <result property="mqMsgJson" column="mqMsgJson"   />
+        <!--从mq获取消息的时间-->
+        <result property="mqReceiveDateTime" column="mqReceiveDateTime"   />
     </resultMap>
 
     <!--批量新增-->
@@ -63,7 +67,9 @@
         TOTAL_WEIGHT,
         CC_UOM_TYPE_ID_ID,
         CC_ENGINEERING_QUANTITY_TYPE_ID,
-        CC_PO_ID
+        CC_PO_ID,
+        MQ_RECEIVE_DATETIME,
+        MQ_MSG
     ) values (
         #{item.id},
         #{item.ver},
@@ -79,7 +85,9 @@
         #{item.totalWeight},
         #{item.uomTypeId},
         #{item.engineeringQuantityTypeId},
-        #{item.poId}
+        #{item.poId},
+        #{item.mqReceiveDateTime},
+        #{item.mqMsgJson}
     )
     </foreach>
     </insert>

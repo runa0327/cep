@@ -75,4 +75,14 @@ public class CcEngineeringQuantity extends BaseDomain {
      * 采购合同id
      */
     private String poId;
+
+    /**
+     * 从mq获取的消息实体
+     */
+    private String mqMsgJson;
+
+    /**
+     * 从mq获取消息的时间
+     */
+    private String mqReceiveDateTime;
 }
