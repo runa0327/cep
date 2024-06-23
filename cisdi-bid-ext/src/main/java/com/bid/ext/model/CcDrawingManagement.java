@@ -113,6 +113,10 @@ public class CcDrawingManagement {
          */
         public static final String CC_PRJ_ID = "CC_PRJ_ID";
         /**
+         * {"EN": "项目专业代码", "ZH_CN": "项目专业代码", "ZH_TW": "项目专业代码"}。
+         */
+        public static final String CC_PRJ_PROFESSIONAL_CODE_ID = "CC_PRJ_PROFESSIONAL_CODE_ID";
+        /**
          * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
          */
         public static final String CC_PRJ_STRUCT_NODE_ID = "CC_PRJ_STRUCT_NODE_ID";
@@ -738,6 +742,42 @@ public class CcDrawingManagement {
             this.ccPrjId = ccPrjId;
             if (!this.toUpdateCols.contains("CC_PRJ_ID")) {
                 this.toUpdateCols.add("CC_PRJ_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "项目专业代码", "ZH_CN": "项目专业代码", "ZH_TW": "项目专业代码"}。
+     */
+    private String ccPrjProfessionalCodeId;
+
+    /**
+     * 获取：{"EN": "项目专业代码", "ZH_CN": "项目专业代码", "ZH_TW": "项目专业代码"}。
+     */
+    public String getCcPrjProfessionalCodeId() {
+        return this.ccPrjProfessionalCodeId;
+    }
+
+    /**
+     * 设置：{"EN": "项目专业代码", "ZH_CN": "项目专业代码", "ZH_TW": "项目专业代码"}。
+     */
+    public CcDrawingManagement setCcPrjProfessionalCodeId(String ccPrjProfessionalCodeId) {
+        if (this.ccPrjProfessionalCodeId == null && ccPrjProfessionalCodeId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjProfessionalCodeId != null && ccPrjProfessionalCodeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjProfessionalCodeId.compareTo(ccPrjProfessionalCodeId) != 0) {
+                this.ccPrjProfessionalCodeId = ccPrjProfessionalCodeId;
+                if (!this.toUpdateCols.contains("CC_PRJ_PROFESSIONAL_CODE_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_PROFESSIONAL_CODE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjProfessionalCodeId = ccPrjProfessionalCodeId;
+            if (!this.toUpdateCols.contains("CC_PRJ_PROFESSIONAL_CODE_ID")) {
+                this.toUpdateCols.add("CC_PRJ_PROFESSIONAL_CODE_ID");
             }
         }
         return this;
