@@ -4,6 +4,7 @@ import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -392,11 +393,14 @@ public class DrawingExt {
      */
     public void initDrawingAuth() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+            String userId = loginInfo.userInfo.id;
             String csCommId = entityRecord.csCommId;
             CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
             ccDrawingAuth.setCcDrawingManagementId(csCommId);
             ccDrawingAuth.setIsView(true);
             ccDrawingAuth.setIsUpload(true);
+            ccDrawingAuth.setAdUserId(userId);
             ccDrawingAuth.insertById();
         }
     }
