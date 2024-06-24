@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 
 @Service
-@RocketMQMessageListener(topic = "qc-construction-fill-output", consumerGroup = "test")
+@RocketMQMessageListener(topic = "qc-construction-fill-output", consumerGroup = "consumer-qc-construction-fill-output")
 public class QcConstructionFillOutputConsumerService implements RocketMQListener<String> {
 
     @Resource
