@@ -12,6 +12,7 @@
     <modules>
         <module>cisdi-bid-ext</module>
         <module>anhui-sso</module>
+        <module>cisdi-bid-job</module>
     </modules>
 
     <properties>
