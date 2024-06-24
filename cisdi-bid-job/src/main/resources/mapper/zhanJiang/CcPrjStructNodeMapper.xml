@@ -26,4 +26,9 @@
             AND CC_PRJ_ID = '1790672761571196928'
             AND CC_PRJ_STRUCT_NODE_PID IS NOT NULL
     </select>
+
+    <!--根据单元工程名称编码获取id-->
+    <select id="queryIdByCode" resultType="java.lang.String">
+        select id from cc_prj_struct_node where code = #{unitProjectCode} and status = 'ap' order by ts asc limit 1
+    </select>
 </mapper>

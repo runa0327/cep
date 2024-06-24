@@ -11,4 +11,11 @@ public interface CcPrjStructNodeMapper {
      * @return 查询结果
      */
     List<CcPrjStructNode> queryUnitProjectList();
+
+    /**
+     * 根据单元工程名称编码获取id
+     * @param unitProjectCode 单元工程编码
+     * @return id
+     */
+    String queryIdByCode(String unitProjectCode);
 }

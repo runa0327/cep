@@ -4,6 +4,7 @@ import cn.hutool.core.util.IdUtil;
 import com.pms.bid.job.domain.rocketmq.ModelStatusUpdate;
 import com.pms.bid.job.domain.zhanJiang.CcDrawingManagement;
 import com.pms.bid.job.mapper.zhanJiang.CcDrawingManagementMapper;
+import com.pms.bid.job.mapper.zhanJiang.CcPrjStructNodeMapper;
 import com.pms.bid.job.service.zhanJiang.CcDrawingManagementService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -17,6 +18,9 @@ public class CcDrawingManagementServiceImpl implements CcDrawingManagementServic
 
     @Resource
     private CcDrawingManagementMapper ccDrawingManagementMapper;
+
+    @Resource
+    private CcPrjStructNodeMapper ccPrjStructNodeMapper;
 
     /**
      * 消费模型解析状态
@@ -77,20 +81,28 @@ public class CcDrawingManagementServiceImpl implements CcDrawingManagementServic
      * @param createBy 操作人
      */
     private void updateByMQ(ModelStatusUpdate tmp, String id, String message, String now, String createBy) {
-        CcDrawingManagement ccDrawingManagement = new CcDrawingManagement();
-        ccDrawingManagement.setId(id);
-        ccDrawingManagement.setTs(now);
-        ccDrawingManagement.setLastUpdateBy(createBy);
-        ccDrawingManagement.setLastUpdateDate(now);
-        ccDrawingManagement.setCcSteelOwnerDrawingId(tmp.getTtNumber());
-        if (30 == tmp.getStatus()){
-            ccDrawingManagement.setCcDrawingStatusId("DONE");
-        } else {
-            ccDrawingManagement.setCcDrawingStatusId("TODO");
+        String ccSteelOwnerDrawingId = tmp.getTtNumber();
+        if (StringUtils.hasText(ccSteelOwnerDrawingId)) {
+            String unitProjectCode = ccSteelOwnerDrawingId.substring(0,6);
+            //  根据单元工程编码获取id
+            String unitProjectId = ccPrjStructNodeMapper.queryIdByCode(unitProjectCode);
+            CcDrawingManagement ccDrawingManagement = new CcDrawingManagement();
+            ccDrawingManagement.setId(id);
+            ccDrawingManagement.setTs(now);
+            ccDrawingManagement.setLastUpdateBy(createBy);
+            ccDrawingManagement.setLastUpdateDate(now);
+            ccDrawingManagement.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
+            if (30 == tmp.getStatus()){
+                ccDrawingManagement.setCcDrawingStatusId("DONE");
+            } else {
+                ccDrawingManagement.setCcDrawingStatusId("TODO");
+            }
+            ccDrawingManagement.setThreeDActDate(tmp.getCreateTime());
+            ccDrawingManagement.setMqMsgJson(message);
+            ccDrawingManagement.setMqReceiveDateTime(now);
+            ccDrawingManagement.setUnitProjectCode(unitProjectCode);
+            ccDrawingManagement.setUnitProjectId(unitProjectId);
+            ccDrawingManagementMapper.updateConditionById(ccDrawingManagement);
         }
-        ccDrawingManagement.setThreeDActDate(tmp.getCreateTime());
-        ccDrawingManagement.setMqMsgJson(message);
-        ccDrawingManagement.setMqReceiveDateTime(now);
-        ccDrawingManagementMapper.updateConditionById(ccDrawingManagement);
     }
 }

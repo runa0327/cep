@@ -40,4 +40,19 @@ public class CcDrawingManagement extends BaseDomain {
      * 从mq获取消息的时间
      */
     private String mqReceiveDateTime;
+
+    /**
+     * 单元工程名称编码
+     */
+    private String unitProjectCode;
+
+    /**
+     * 单元工程名称
+     */
+    private String unitProjectName;
+
+    /**
+     * 单元工程id
+     */
+    private String unitProjectId;
 }

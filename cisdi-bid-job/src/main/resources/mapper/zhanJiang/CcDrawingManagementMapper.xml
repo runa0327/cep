@@ -49,7 +49,8 @@
             CC_DRAWING_STATUS_ID,
             THREE_D_ACT_DATE,
             MQ_RECEIVE_DATETIME,
-            MQ_MSG
+            MQ_MSG,
+            CC_PRJ_STRUCT_NODE_ID
         ) values (
             #{id},
             #{ver},
@@ -63,7 +64,8 @@
             #{ccDrawingStatusId},
             #{threeDActDate},
             #{mqReceiveDateTime},
-            #{mqMsgJson}
+            #{mqMsgJson},
+            #{unitProjectId}
         )
     </insert>
 
@@ -88,6 +90,9 @@
             </if>
             <if test="mqMsgJson != null and mqMsgJson != ''">
                 MQ_MSG = #{mqMsgJson},
+            </if>
+            <if test="unitProjectId != null and unitProjectId != ''">
+                CC_PRJ_STRUCT_NODE_ID = #{unitProjectId},
             </if>
         </set>
         where
