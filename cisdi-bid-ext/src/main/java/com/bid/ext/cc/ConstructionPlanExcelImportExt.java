@@ -44,8 +44,8 @@ public class ConstructionPlanExcelImportExt {
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
 
-        if(!"xlsx".equals(flFile.getExt()))
-            throw new BaseException("请上传'xlsx'格式的Excel文件");
+        if (!("xlsx".equals(flFile.getExt()) || "xls".equals(flFile.getExt())))
+            throw new BaseException("请上传'xlsx或xls'格式的Excel文件");
 
         /**
          *  查询系统岗位
@@ -105,23 +105,26 @@ public class ConstructionPlanExcelImportExt {
                         String nameJson = company.getName();
                         JSONObject entries = JSONUtil.parseObj(nameJson);
                         String zh_cn = entries.getStr("ZH_CN");
-                        if (company.getName().equals(zh_cn)){
+                        if (companyName.equals(zh_cn)){
                             companyId = company.getId();
                             exist = true;
                         }
                     }
 
-                    //插入公司
-                    if (!exist){
-                        CcCompany company = CcCompany.newData();
-                        company.setName("{\"EN\": \""+companyName+"\", \"ZH_CN\": \""+companyName+"\", \"ZH_TW\": \""+companyName+"\"}");
-                        company.setFullName("{\"EN\": \""+companyName+"\", \"ZH_CN\": \""+companyName+"\", \"ZH_TW\": \""+companyName+"\"}");
-                        company.setStatus("AP");
-                        company.setSeqNo(new BigDecimal(0));
-                        company.setIsDefault(false);
-                        company.insertById();
-                        companyId = company.getId();
-                    }
+                    if(!exist)
+                        throw  new BaseException("请检查"+row.getRowNum()+"'报审单位名称'是否正确！");
+
+//                    //插入公司
+//                    if (!exist){
+//                        CcCompany company = CcCompany.newData();
+//                        company.setName("{\"EN\": \""+companyName+"\", \"ZH_CN\": \""+companyName+"\", \"ZH_TW\": \""+companyName+"\"}");
+//                        company.setFullName("{\"EN\": \""+companyName+"\", \"ZH_CN\": \""+companyName+"\", \"ZH_TW\": \""+companyName+"\"}");
+//                        company.setStatus("AP");
+//                        company.setSeqNo(new BigDecimal(0));
+//                        company.setIsDefault(false);
+//                        company.insertById();
+//                        companyId = company.getId();
+//                    }
 
                     CcConstructPlan plan = CcConstructPlan.newData();
                     plan.setName(name);
