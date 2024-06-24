@@ -21,10 +21,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DocExt {
     /**
@@ -199,9 +196,53 @@ public class DocExt {
         // 将文件ID设置到CcDocFilePackage上：
         CcDocFilePackage ccDocFilePackage = CcDocFilePackage.insertData();
         ccDocFilePackage.setName(fileId + ".zip");
-        
+
         ccDocFilePackage.setCcAttachment(fileId);
         ccDocFilePackage.updateById();
+    }
+
+    /**
+     * 资料文件权限
+     */
+    public void docFileAuth() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        String pCcDocMemberIds = JdbcMapUtil.getString(varMap, "P_CC_DOC_MEMBER_IDS");
+        Boolean isView = (Boolean) varMap.get("P_IS_VIEW");
+
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            if (pCcDocMemberIds != null && !pCcDocMemberIds.isEmpty()) {
+
+                List<String> memberIdList = Arrays.asList(pCcDocMemberIds.split(","));
+
+                for (String memberId : memberIdList) {
+                    CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
+                    String adUserId = ccPrjMember.getAdUserId();
+                    CcDocFileAuth ccDocFileAuth = CcDocFileAuth.newData();
+                    ccDocFileAuth.setCcDocFileId(csCommId);
+                    ccDocFileAuth.setAdUserId(adUserId);
+                    ccDocFileAuth.setIsView(isView);
+                    ccDocFileAuth.insertById();
+                }
+            }
+
+        }
+    }
+
+    /**
+     * 创建文档时初始化套图权限（查看、上传/升级）
+     */
+    public void initDocAuth() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+            String userId = loginInfo.userInfo.id;
+            String csCommId = entityRecord.csCommId;
+            CcDocFileAuth ccDocFileAuth = CcDocFileAuth.newData();
+            ccDocFileAuth.setCcDocFileId(csCommId);
+            ccDocFileAuth.setIsView(true);
+            ccDocFileAuth.setAdUserId(userId);
+            ccDocFileAuth.insertById();
+        }
     }
 
 }
