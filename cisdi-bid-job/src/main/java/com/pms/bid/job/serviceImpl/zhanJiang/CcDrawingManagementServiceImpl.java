@@ -32,9 +32,10 @@ public class CcDrawingManagementServiceImpl implements CcDrawingManagementServic
             String id = ccDrawingManagementMapper.queryIdByCcSteelOwnerDrawingId(data.getTtNumber());
             if (StringUtils.hasText(id)) {
                 updateByMQ(data,id,message,now,createBy);
-            } else {
-                createCcDrawingManagementByMQ(data,message,now,createBy);
             }
+//            else {
+//                createCcDrawingManagementByMQ(data,message,now,createBy);
+//            }
         }
     }
 
