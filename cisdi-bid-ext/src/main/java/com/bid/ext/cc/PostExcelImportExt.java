@@ -74,8 +74,8 @@ public class PostExcelImportExt {
 
 //        String filePath = "/Users/hejialun/Downloads/项目参建方公司岗位.xlsx";
 
-        if(!"xlsx".equals(flFile.getExt()))
-            throw new BaseException("请上传'xlsx'格式的Excel文件");
+        if (!("xlsx".equals(flFile.getExt()) || "xls".equals(flFile.getExt())))
+            throw new BaseException("请上传'xlsx或xls'格式的Excel文件");
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
             Workbook workbook = new XSSFWorkbook(file);
@@ -133,15 +133,18 @@ public class PostExcelImportExt {
                             exist = true;
                         }
                     }
-
-                    if (!exist) {
-                        CcPost ccPost = CcPost.newData();
-                        ccPost.setName("{\"EN\": \"" + postName + "\", \"ZH_CN\": \"" + postName + "\", \"ZH_TW\": \"" + postName + "\"}");
-                        ccPost.setIsDefault(false);
-                        ccPost.setSeqNo(new BigDecimal(0));
-                        ccPost.insertById();
-                        postId = ccPost.getId();
+                    if(!exist){
+                        throw new BaseException("请检查"+row.getRowNum()+"行'岗位名称'是否正确！");
                     }
+
+//                    if (!exist) {
+//                        CcPost ccPost = CcPost.newData();
+//                        ccPost.setName("{\"EN\": \"" + postName + "\", \"ZH_CN\": \"" + postName + "\", \"ZH_TW\": \"" + postName + "\"}");
+//                        ccPost.setIsDefault(false);
+//                        ccPost.setSeqNo(new BigDecimal(0));
+//                        ccPost.insertById();
+//                        postId = ccPost.getId();
+//                    }
 
 
                     //插入参建单位岗位

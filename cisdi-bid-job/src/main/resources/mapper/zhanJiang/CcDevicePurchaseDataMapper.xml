@@ -32,6 +32,8 @@
         <result property="mqMsgJson" column="mqMsgJson"   />
         <!--从mq获取消息的时间-->
         <result property="mqReceiveDateTime" column="mqReceiveDateTime"   />
+        <!--项目id-->
+        <result property="projectId" column="projectId"   />
     </resultMap>
 
     <!--根据设备编号判断设备是否已存在-->
@@ -56,7 +58,8 @@
             DEVICE_NO,
             MQ_MSG,
             MQ_RECEIVE_DATETIME,
-            DEVICE_TAG_NO
+            DEVICE_TAG_NO,
+            CC_PRJ_ID
         ) values (
             #{id},
             #{ver},
@@ -72,7 +75,8 @@
             #{purchaseDeviceNo},
             #{mqMsgJson},
             #{mqReceiveDateTime},
-            #{deviceTagNo}
+            #{deviceTagNo},
+            #{projectId}
         )
     </insert>
 
@@ -109,6 +113,9 @@
             </if>
             <if test="deviceTagNo != null and deviceTagNo != ''">
                 DEVICE_TAG_NO = #{deviceTagNo},
+            </if>
+            <if test="projectId != null and projectId != ''">
+                CC_PRJ_ID = #{projectId},
             </if>
         </set>
         where
