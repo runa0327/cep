@@ -73,6 +73,7 @@ public class CcDevicePurchaseDataServiceImpl implements CcDevicePurchaseDataServ
         ccDevicePurchaseData.setDeviceTagNo(tmp.getDeviceTagNo());
         ccDevicePurchaseData.setMqMsgJson(message);
         ccDevicePurchaseData.setMqReceiveDateTime(now);
+        ccDevicePurchaseData.setProjectId("1790672761571196928");
         ccDevicePurchaseDataMapper.updateConditionById(ccDevicePurchaseData);
     }
 
@@ -104,6 +105,7 @@ public class CcDevicePurchaseDataServiceImpl implements CcDevicePurchaseDataServ
         ccDevicePurchaseData.setDeviceTagNo(tmp.getDeviceTagNo());
         ccDevicePurchaseData.setMqMsgJson(message);
         ccDevicePurchaseData.setMqReceiveDateTime(now);
+        ccDevicePurchaseData.setProjectId("1790672761571196928");
         ccDevicePurchaseDataMapper.create(ccDevicePurchaseData);
     }
 }

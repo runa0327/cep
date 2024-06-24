@@ -48,4 +48,9 @@ public class CcDevicePurchaseData extends BaseDomain {
      * 从mq获取消息的时间
      */
     private String mqReceiveDateTime;
+
+    /**
+     * 项目id
+     */
+    private String projectId;
 }

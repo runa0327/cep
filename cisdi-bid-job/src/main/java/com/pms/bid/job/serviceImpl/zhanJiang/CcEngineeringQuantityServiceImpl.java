@@ -59,7 +59,7 @@ public class CcEngineeringQuantityServiceImpl implements CcEngineeringQuantitySe
         //  基础砼（m³）
         BigDecimal infrastructure = tmp.getInfrastructure();
         if (infrastructure != null){
-            getCcEngineeringQuantityAndAddList(infrastructure,getPrjStructNodeIdByCode(tmp.getUnitProjectCode(),unitProjectList),"INFRASTRUCTURE","m³",list,now,createBy,message);
+            getCcEngineeringQuantityAndAddList(infrastructure,getPrjStructNodeIdByCode(tmp.getUnitProjectCode(),unitProjectList),"FOUNDATION","m³",list,now,createBy,message);
         }
 
         //  管道（t）
