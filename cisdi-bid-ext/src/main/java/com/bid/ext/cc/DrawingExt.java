@@ -371,7 +371,7 @@ public class DrawingExt {
             if (pCcDrawingMemberIds != null && !pCcDrawingMemberIds.isEmpty()) {
 
                 List<String> memberIdList = Arrays.asList(pCcDrawingMemberIds.split(","));
-                
+
                 for (String memberId : memberIdList) {
                     CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
                     String adUserId = ccPrjMember.getAdUserId();
@@ -384,6 +384,20 @@ public class DrawingExt {
                 }
             }
 
+        }
+    }
+
+    /**
+     * 创建套图时初始化套图权限（查看、上传/升级）
+     */
+    public void initDrawingAuth() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
+            ccDrawingAuth.setCcDrawingManagementId(csCommId);
+            ccDrawingAuth.setIsView(true);
+            ccDrawingAuth.setIsUpload(true);
+            ccDrawingAuth.insertById();
         }
     }
 }
