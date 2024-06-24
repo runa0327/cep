@@ -230,7 +230,7 @@ public class DocExt {
     }
 
     /**
-     * 创建文档时初始化套图权限（查看、上传/升级）
+     * 创建文档时初始化文档权限（查看）
      */
     public void initDocAuth() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {

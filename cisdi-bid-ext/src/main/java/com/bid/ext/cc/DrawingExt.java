@@ -211,6 +211,9 @@ public class DrawingExt {
      * 导入图纸计划
      */
     public void importDrawingPlan() {
+        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
+        String userId = loginInfo.userInfo.id;
+
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
@@ -289,6 +292,14 @@ public class DrawingExt {
                     drawingManagement.setCcModelStatusId(null);
                 }
                 drawingManagement.insertById();
+
+                //初始化套图权限
+                CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
+                ccDrawingAuth.setCcDrawingManagementId(drawingManagement.getId());
+                ccDrawingAuth.setIsView(true);
+                ccDrawingAuth.setIsUpload(true);
+                ccDrawingAuth.setAdUserId(userId);
+                ccDrawingAuth.insertById();
             }
 
         } catch (IOException e) {
