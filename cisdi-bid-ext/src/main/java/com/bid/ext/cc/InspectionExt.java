@@ -15,15 +15,25 @@ public class InspectionExt {
     public void checkRectifyDate() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             Map<String, Object> valueMap = entityRecord.valueMap;
-            //巡检时间
+            // 巡检时间
             LocalDate ccQsInspectionTime = LocalDate.parse(valueMap.get("CC_QS_INSPECTION_TIME").toString());
-            //整改时间
-            LocalDate ccQsRectifyTime = LocalDate.parse(valueMap.get("CC_QS_RECTIFY_TIME").toString());
+
+            // 检查整改时间是否为空
+            Object rectifyTimeObject = valueMap.get("CC_QS_RECTIFY_TIME");
+            if (rectifyTimeObject == null) {
+                throw new BaseException("请从工作台提交整改！");
+            }
+
+            // 整改时间
+            LocalDate ccQsRectifyTime = LocalDate.parse(rectifyTimeObject.toString());
+
+            // 检查整改时间是否早于巡检时间
             if (ccQsRectifyTime.isBefore(ccQsInspectionTime)) {
                 throw new BaseException("整改时间早于巡检时间！");
             }
         }
     }
+
 
     /**
      * 检测计划日期
