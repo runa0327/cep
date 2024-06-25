@@ -683,6 +683,9 @@ public class StructNodeExt {
         LocalDate pActFr = JdbcMapUtil.getLocalDate(varMap, "P_ACT_FR");
         LocalDateTime now = LocalDateTime.parse(progTimeStr, formatter);
         Integer actWbsPct = JdbcMapUtil.getInt(varMap, "P_ACT_WBS_PCT");
+        if (actWbsPct > 100 || actWbsPct < 0) {
+            throw new BaseException("“实际进度比例”超出数据范围!");
+        }
         String wbsStatusId = JdbcMapUtil.getString(varMap, "P_WBS_STATUS_ID");
         String wbsProgressStatusId = JdbcMapUtil.getString(varMap, "P_WBS_PROGRESS_STATUS_ID");
         String remark = varMap.get("P_REMARK") != null ? varMap.get("P_REMARK").toString() : "";

@@ -37,8 +37,9 @@ public class DocExt {
             CcDocFile ccDocFile = CcDocFile.selectById(id);
             Boolean isDefault = ccDocFile.getIsDefault();
             String type = ccDocFile.getCcDocFileTypeId();
+            String ccPrjId = ccDocFile.getCcPrjId();
             if (isDefault) {
-                List<CcDocFile> ccDocFiles = CcDocFile.selectByWhere(new Where().eq(CcDocFile.Cols.CC_DOC_FILE_TYPE_ID, type));
+                List<CcDocFile> ccDocFiles = CcDocFile.selectByWhere(new Where().eq(CcDocFile.Cols.CC_DOC_FILE_TYPE_ID, type).eq(CcDocFile.Cols.CC_PRJ_ID, ccPrjId));
                 for (CcDocFile docFile : ccDocFiles) {
                     docFile.setIsDefault(false);
                     docFile.updateById();
