@@ -66,14 +66,14 @@ public class DrawingExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
-            //套图信息
+            // 套图信息
             CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
             String ccPrjStructNodeId = ccDrawingManagement.getCcPrjStructNodeId();
             String ccSteelOwnerDrawingId = ccDrawingManagement.getCcSteelOwnerDrawingId();
 
             String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
 
-            //套图版本
+            // 套图版本
             CcStructDrawingVersion ccStructDrawingVersion = CcStructDrawingVersion.newData();
             ccStructDrawingVersion.setCcDrawingVersionId("A");
             ccStructDrawingVersion.setCcDrawingManagementId(csCommId);
@@ -131,12 +131,12 @@ public class DrawingExt {
                 }
             }
 
-            //套图信息
+            // 套图信息
             CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
             String ccPrjStructNodeId = ccDrawingManagement.getCcPrjStructNodeId();
             String ccSteelOwnerDrawingId = ccDrawingManagement.getCcSteelOwnerDrawingId();
 
-            //套图版本
+            // 套图版本
             CcStructDrawingVersion ccStructDrawingVersion = CcStructDrawingVersion.newData();
             ccStructDrawingVersion.setCcDrawingVersionId(ccDrawingVersionId);
             CcDrawingVersion ccDrawingVersion = CcDrawingVersion.selectById(ccDrawingVersionId);
@@ -172,7 +172,7 @@ public class DrawingExt {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
-            //业主图号
+            // 业主图号
             String ccSteelOwnerDrawingId = ccDrawingManagement.getCcSteelOwnerDrawingId();
             List<CcStructDrawingVersion> ccStructDrawingVersions = CcStructDrawingVersion.selectByWhere(new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId));
             if (!SharedUtil.isEmpty(ccStructDrawingVersions)) {
@@ -193,7 +193,7 @@ public class DrawingExt {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcStructDrawingVersion ccStructDrawingVersion = CcStructDrawingVersion.selectById(csCommId);
-            //图纸
+            // 图纸
             String ccDrawingManagementId = ccStructDrawingVersion.getCcDrawingManagementId();
             List<CcStructDrawingVersion> ccStructDrawingVersions = CcStructDrawingVersion.selectByWhere(new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_MANAGEMENT_ID, ccDrawingManagementId));
             if (!SharedUtil.isEmpty(ccStructDrawingVersions)) {
@@ -251,10 +251,10 @@ public class DrawingExt {
                         break;
                 }
 
-                //实际发图日期
+                // 实际发图日期
                 LocalDate actDate = getLocalDateCellValue(row.getCell(8));
 
-                //三维实际日期
+                // 三维实际日期
                 LocalDate threeDPlanDate = getLocalDateCellValue(row.getCell(11));
 
                 String ccSteelOwnerDrawingId = getStringCellValue(row.getCell(6));
@@ -295,7 +295,7 @@ public class DrawingExt {
                 }
                 drawingManagement.insertById();
 
-                //初始化套图权限
+                // 初始化套图权限
                 CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
                 ccDrawingAuth.setCcDrawingManagementId(drawingManagement.getId());
                 ccDrawingAuth.setIsView(true);
@@ -535,6 +535,8 @@ public class DrawingExt {
         UrlToOpen extBrowserWindowToOpen = new UrlToOpen();
         extBrowserWindowToOpen.url = url;
         extBrowserWindowToOpen.title = "BIM模型";
+        // 打开时还要携带身份token：
+        extBrowserWindowToOpen.carryIdentity = true;
         invokeActResult.urlToOpenList.add(extBrowserWindowToOpen);
         ExtJarHelper.setReturnValue(invokeActResult);
     }
