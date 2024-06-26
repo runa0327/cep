@@ -4,6 +4,7 @@ import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.ad.ext.UrlToOpen;
 import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
@@ -520,4 +521,21 @@ public class DrawingExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
+    /**
+     * 跳转BIM页面
+     */
+    public void redirect() {
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.urlToOpenList = new ArrayList<>();
+        EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
+        String csCommId = entityRecord.csCommId;
+        CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
+        String ccSteelOwnerDrawingId = ccDrawingManagement.getCcSteelOwnerDrawingId();
+        String url = "http://192.168.1.110:9990/modelUpload/index?projectId=165&catelogId=7777&ttNumber=" + ccSteelOwnerDrawingId;
+        UrlToOpen extBrowserWindowToOpen = new UrlToOpen();
+        extBrowserWindowToOpen.url = url;
+        extBrowserWindowToOpen.title = "BIM模型";
+        invokeActResult.urlToOpenList.add(extBrowserWindowToOpen);
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
 }
