@@ -58,10 +58,9 @@ public class DocExt {
         String type = JdbcMapUtil.getString(inputMap, "type");
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
-        String pCcPrjIds = "@P_CC_PRJ_IDS";
 //        String pCcPrjIds = "1790672761571196928,1790697187691937792";
-        String sql = "select t.id,t.cc_prj_id,JSON_UNQUOTE(JSON_EXTRACT(p.name, '$.ZH_CN')) AS name from cc_doc_file t join cc_prj p on p.id = t.cc_prj_id where t.cc_doc_file_type_id = ? and t.is_default = ? and find_in_set(t.cc_prj_id, ?) > 0";
-        List<Map<String, Object>> resultMapList = myJdbcTemplate.queryForList(sql, type, true, pCcPrjIds);
+        String sql = "select t.id,t.cc_prj_id,JSON_UNQUOTE(JSON_EXTRACT(p.name, '$.ZH_CN')) AS name from cc_doc_file t join cc_prj p on p.id = t.cc_prj_id where t.cc_doc_file_type_id = ? and t.is_default = ? and find_in_set(t.cc_prj_id, @P_CC_PRJ_IDS) > 0";
+        List<Map<String, Object>> resultMapList = myJdbcTemplate.queryForList(sql, type, true);
 
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("results", resultMapList);
