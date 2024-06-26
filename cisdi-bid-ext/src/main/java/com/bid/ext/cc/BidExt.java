@@ -129,7 +129,7 @@ public class BidExt {
                                         .eq(CcEngineeringQuantity.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjStructNodeId)
                                         .eq(CcEngineeringQuantity.Cols.CC_PO_ID, ccPoId)
                                         .eq(CcEngineeringQuantity.Cols.CC_ENGINEERING_QUANTITY_TYPE_ID, ccEngineeringQuantityTypeId)
-                                        .eq(CcEngineeringQuantity.Cols.CC_UOM_TYPE_ID_ID, ccUomTypeIdId)
+                                        .eq(CcEngineeringQuantity.Cols.CC_UOM_TYPE_ID, ccUomTypeIdId)
                         );
 
                         if (existingRecord != null) {
@@ -142,7 +142,7 @@ public class BidExt {
                             eq.setCcPrjStructNodeId(ccPrjStructNodeId);
                             eq.setCcEngineeringTypeId("BID");
                             eq.setCcEngineeringQuantityTypeId(ccEngineeringQuantityTypeId);
-                            eq.setCcUomTypeIdId(ccUomTypeIdId);
+                            eq.setCcUomTypeId(ccUomTypeIdId);
                             eq.setTotalWeight(totalWeight);
                             eq.setCcPoId(ccPoId);
                             eq.insertById();

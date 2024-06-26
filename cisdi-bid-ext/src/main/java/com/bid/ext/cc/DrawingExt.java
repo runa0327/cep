@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
@@ -217,8 +218,8 @@ public class DrawingExt {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
-        if (!"xls".equals(flFile.getExt())) {
-            throw new BaseException("请上传'xls'格式的Excel文件");
+        if (!"xls".equals(flFile.getExt()) && !"xlsx".equals(flFile.getExt())) {
+            throw new BaseException("请上传'xls'或'xlsx'格式的Excel文件");
         }
 
         try (FileInputStream file = new FileInputStream(new File(filePath))) {
@@ -415,4 +416,108 @@ public class DrawingExt {
             ccDrawingAuth.insertById();
         }
     }
+
+    /**
+     * BIM工程量导入
+     */
+    public void importBIMQuantities() {
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
+        // 工程量类型
+        String pCcEngineeringQuantityTypeId = varMap.get("P_CC_ENGINEERING_QUANTITY_TYPE_ID").toString();
+        // 填报类型
+        String ccEngineeringTypeId = "BIM";
+
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
+            String csCommId = entityRecord.csCommId;
+            CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
+            String ccPrjStructNodeId = ccDrawingManagement.getCcPrjStructNodeId();
+            String ccPrjId = ccDrawingManagement.getCcPrjId();
+
+            String filePath = flFile.getPhysicalLocation();
+            if (!"xls".equals(flFile.getExt()) && !"xlsx".equals(flFile.getExt())) {
+                throw new BaseException("请上传'xls'或'xlsx'格式的Excel文件");
+            }
+
+            String ccUomTypeId = null;
+            BigDecimal totalWeight = BigDecimal.ZERO; // 初始化总重量为 0
+            try (FileInputStream file = new FileInputStream(new File(filePath))) {
+                Workbook workbook = new XSSFWorkbook(file);
+                Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
+                FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+                // 遍历每一行
+                for (int i = 1; i <= Objects.requireNonNull(sheet).getLastRowNum(); i++) {
+                    Row row = sheet.getRow(i);
+                    // 检查行是否为空
+                    if (row == null) {
+                        continue; // 如果为空，跳过该行
+                    }
+
+                    Cell cell = null;
+
+                    switch (pCcEngineeringQuantityTypeId) {
+                        case "STEELSTRUCTURE":
+                            // 获取第4列
+                            cell = row.getCell(3);
+                            ccUomTypeId = "t";
+                            break;
+                        case "PIPELINE":
+                            // 获取第8列
+                            cell = row.getCell(7);
+                            ccUomTypeId = "t";
+                            break;
+                        case "CABLETRAY":
+                            // 获取第7列
+                            cell = row.getCell(6);
+                            ccUomTypeId = "t";
+                            break;
+                        case "PILE":
+                        case "FOUNDATION":
+                        case "SUPERSTRUCTURECONCRETE":
+                            // 获取第4列
+                            cell = row.getCell(3);
+                            ccUomTypeId = "m³";
+                            break;
+                    }
+                    if (cell == null) continue;
+
+                    BigDecimal weight = null;
+                    if (cell.getCellType() == CellType.NUMERIC) {
+                        weight = BigDecimal.valueOf(cell.getNumericCellValue());
+                    } else if (cell.getCellType() == CellType.FORMULA) {
+                        weight = BigDecimal.valueOf(evaluator.evaluate(cell).getNumberValue());
+                    }
+
+                    if (weight != null) {
+                        totalWeight = totalWeight.add(weight); // 累加重量
+                    }
+                }
+
+                // 转换重量单位：kg 转为 t 并保留两位小数
+                if ("t".equals(ccUomTypeId)) {
+                    totalWeight = totalWeight.divide(BigDecimal.valueOf(1000), 2, RoundingMode.HALF_UP);
+                }
+
+                CcEngineeringQuantity ccEngineeringQuantity = CcEngineeringQuantity.newData();
+                ccEngineeringQuantity.setCcPrjId(ccPrjId);
+                ccEngineeringQuantity.setCcPrjStructNodeId(ccPrjStructNodeId);
+                ccEngineeringQuantity.setCcEngineeringTypeId(ccEngineeringTypeId);
+                ccEngineeringQuantity.setCcEngineeringQuantityTypeId(pCcEngineeringQuantityTypeId);
+                ccEngineeringQuantity.setCcUomTypeId(ccUomTypeId);
+                ccEngineeringQuantity.setTotalWeight(totalWeight);
+                ccEngineeringQuantity.setCcDrawingManagementId(csCommId);
+                ccEngineeringQuantity.insertById();
+
+            } catch (IOException e) {
+                throw new BaseException("上传文件失败", e);
+            }
+        }
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
 }

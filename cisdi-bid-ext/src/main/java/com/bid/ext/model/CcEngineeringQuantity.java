@@ -126,7 +126,7 @@ public class CcEngineeringQuantity {
         /**
          * {"EN": "工程量填报", "ZH_CN": "计量单位类型", "ZH_TW": "工程量填报"}。
          */
-        public static final String CC_UOM_TYPE_ID_ID = "CC_UOM_TYPE_ID_ID";
+        public static final String CC_UOM_TYPE_ID = "CC_UOM_TYPE_ID";
         /**
          * {"EN": "单位重量", "ZH_CN": "总量", "ZH_TW": "单位重量"}。
          */
@@ -135,6 +135,18 @@ public class CcEngineeringQuantity {
          * {"EN": "采购合同", "ZH_CN": "采购合同", "ZH_TW": "采购合同"}。
          */
         public static final String CC_PO_ID = "CC_PO_ID";
+        /**
+         * {"EN": "资料文件打包", "ZH_CN": "图纸管理", "ZH_TW": "资料文件打包"}。
+         */
+        public static final String CC_DRAWING_MANAGEMENT_ID = "CC_DRAWING_MANAGEMENT_ID";
+        /**
+         * {"EN": "从MQ获取消息时间", "ZH_CN": "从MQ获取消息时间", "ZH_TW": "从MQ获取消息时间"}。
+         */
+        public static final String MQ_RECEIVE_DATETIME = "MQ_RECEIVE_DATETIME";
+        /**
+         * {"EN": "从mq获取到的信息", "ZH_CN": "从mq获取到的信息", "ZH_TW": "从mq获取到的信息"}。
+         */
+        public static final String MQ_MSG = "MQ_MSG";
     }
 
     // </editor-fold>
@@ -829,34 +841,34 @@ public class CcEngineeringQuantity {
     /**
      * {"EN": "工程量填报", "ZH_CN": "计量单位类型", "ZH_TW": "工程量填报"}。
      */
-    private String ccUomTypeIdId;
+    private String ccUomTypeId;
 
     /**
      * 获取：{"EN": "工程量填报", "ZH_CN": "计量单位类型", "ZH_TW": "工程量填报"}。
      */
-    public String getCcUomTypeIdId() {
-        return this.ccUomTypeIdId;
+    public String getCcUomTypeId() {
+        return this.ccUomTypeId;
     }
 
     /**
      * 设置：{"EN": "工程量填报", "ZH_CN": "计量单位类型", "ZH_TW": "工程量填报"}。
      */
-    public CcEngineeringQuantity setCcUomTypeIdId(String ccUomTypeIdId) {
-        if (this.ccUomTypeIdId == null && ccUomTypeIdId == null) {
+    public CcEngineeringQuantity setCcUomTypeId(String ccUomTypeId) {
+        if (this.ccUomTypeId == null && ccUomTypeId == null) {
             // 均为null，不做处理。
-        } else if (this.ccUomTypeIdId != null && ccUomTypeIdId != null) {
+        } else if (this.ccUomTypeId != null && ccUomTypeId != null) {
             // 均非null，判定不等，再做处理：
-            if (this.ccUomTypeIdId.compareTo(ccUomTypeIdId) != 0) {
-                this.ccUomTypeIdId = ccUomTypeIdId;
-                if (!this.toUpdateCols.contains("CC_UOM_TYPE_ID_ID")) {
-                    this.toUpdateCols.add("CC_UOM_TYPE_ID_ID");
+            if (this.ccUomTypeId.compareTo(ccUomTypeId) != 0) {
+                this.ccUomTypeId = ccUomTypeId;
+                if (!this.toUpdateCols.contains("CC_UOM_TYPE_ID")) {
+                    this.toUpdateCols.add("CC_UOM_TYPE_ID");
                 }
             }
         } else {
             // 一者为null、一者非null，直接处理：
-            this.ccUomTypeIdId = ccUomTypeIdId;
-            if (!this.toUpdateCols.contains("CC_UOM_TYPE_ID_ID")) {
-                this.toUpdateCols.add("CC_UOM_TYPE_ID_ID");
+            this.ccUomTypeId = ccUomTypeId;
+            if (!this.toUpdateCols.contains("CC_UOM_TYPE_ID")) {
+                this.toUpdateCols.add("CC_UOM_TYPE_ID");
             }
         }
         return this;
@@ -929,6 +941,114 @@ public class CcEngineeringQuantity {
             this.ccPoId = ccPoId;
             if (!this.toUpdateCols.contains("CC_PO_ID")) {
                 this.toUpdateCols.add("CC_PO_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "资料文件打包", "ZH_CN": "图纸管理", "ZH_TW": "资料文件打包"}。
+     */
+    private String ccDrawingManagementId;
+
+    /**
+     * 获取：{"EN": "资料文件打包", "ZH_CN": "图纸管理", "ZH_TW": "资料文件打包"}。
+     */
+    public String getCcDrawingManagementId() {
+        return this.ccDrawingManagementId;
+    }
+
+    /**
+     * 设置：{"EN": "资料文件打包", "ZH_CN": "图纸管理", "ZH_TW": "资料文件打包"}。
+     */
+    public CcEngineeringQuantity setCcDrawingManagementId(String ccDrawingManagementId) {
+        if (this.ccDrawingManagementId == null && ccDrawingManagementId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccDrawingManagementId != null && ccDrawingManagementId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccDrawingManagementId.compareTo(ccDrawingManagementId) != 0) {
+                this.ccDrawingManagementId = ccDrawingManagementId;
+                if (!this.toUpdateCols.contains("CC_DRAWING_MANAGEMENT_ID")) {
+                    this.toUpdateCols.add("CC_DRAWING_MANAGEMENT_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccDrawingManagementId = ccDrawingManagementId;
+            if (!this.toUpdateCols.contains("CC_DRAWING_MANAGEMENT_ID")) {
+                this.toUpdateCols.add("CC_DRAWING_MANAGEMENT_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "从MQ获取消息时间", "ZH_CN": "从MQ获取消息时间", "ZH_TW": "从MQ获取消息时间"}。
+     */
+    private LocalDateTime mqReceiveDatetime;
+
+    /**
+     * 获取：{"EN": "从MQ获取消息时间", "ZH_CN": "从MQ获取消息时间", "ZH_TW": "从MQ获取消息时间"}。
+     */
+    public LocalDateTime getMqReceiveDatetime() {
+        return this.mqReceiveDatetime;
+    }
+
+    /**
+     * 设置：{"EN": "从MQ获取消息时间", "ZH_CN": "从MQ获取消息时间", "ZH_TW": "从MQ获取消息时间"}。
+     */
+    public CcEngineeringQuantity setMqReceiveDatetime(LocalDateTime mqReceiveDatetime) {
+        if (this.mqReceiveDatetime == null && mqReceiveDatetime == null) {
+            // 均为null，不做处理。
+        } else if (this.mqReceiveDatetime != null && mqReceiveDatetime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.mqReceiveDatetime.compareTo(mqReceiveDatetime) != 0) {
+                this.mqReceiveDatetime = mqReceiveDatetime;
+                if (!this.toUpdateCols.contains("MQ_RECEIVE_DATETIME")) {
+                    this.toUpdateCols.add("MQ_RECEIVE_DATETIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.mqReceiveDatetime = mqReceiveDatetime;
+            if (!this.toUpdateCols.contains("MQ_RECEIVE_DATETIME")) {
+                this.toUpdateCols.add("MQ_RECEIVE_DATETIME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "从mq获取到的信息", "ZH_CN": "从mq获取到的信息", "ZH_TW": "从mq获取到的信息"}。
+     */
+    private String mqMsg;
+
+    /**
+     * 获取：{"EN": "从mq获取到的信息", "ZH_CN": "从mq获取到的信息", "ZH_TW": "从mq获取到的信息"}。
+     */
+    public String getMqMsg() {
+        return this.mqMsg;
+    }
+
+    /**
+     * 设置：{"EN": "从mq获取到的信息", "ZH_CN": "从mq获取到的信息", "ZH_TW": "从mq获取到的信息"}。
+     */
+    public CcEngineeringQuantity setMqMsg(String mqMsg) {
+        if (this.mqMsg == null && mqMsg == null) {
+            // 均为null，不做处理。
+        } else if (this.mqMsg != null && mqMsg != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.mqMsg.compareTo(mqMsg) != 0) {
+                this.mqMsg = mqMsg;
+                if (!this.toUpdateCols.contains("MQ_MSG")) {
+                    this.toUpdateCols.add("MQ_MSG");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.mqMsg = mqMsg;
+            if (!this.toUpdateCols.contains("MQ_MSG")) {
+                this.toUpdateCols.add("MQ_MSG");
             }
         }
         return this;
