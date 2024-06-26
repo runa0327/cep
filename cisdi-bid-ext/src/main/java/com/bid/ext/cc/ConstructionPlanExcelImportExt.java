@@ -74,28 +74,28 @@ public class ConstructionPlanExcelImportExt {
                     //事项
                     Cell cell1 = row.getCell(5);
                     if (cell1.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'事项'名称不能为空");
+                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'事项'不能为空");
                     }
                     name = getCellValueAsString(cell1);
 
                     //报审单位
                     Cell cell2 = row.getCell(6);
                     if (cell1.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'报审单位'名称不能为空");
+                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'报审单位'不能为空");
                     }
                     companyName = getCellValueAsString(cell2);
 
                     //计划从
                     Cell cell3 = row.getCell(7);
                     if (cell3.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'计划从'名称不能为空");
+                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'计划从'不能为空");
                     }
                     LocalDate frDate = LocalDate.parse(getCellValueAsString(cell3));
 
                     //计划到
                     Cell cell4 = row.getCell(8);
                     if (cell4.getCellType() == BLANK) {
-                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'计划到'名称不能为空");
+                        throw  new BaseException("第"+(row.getRowNum()+1)+"行，'计划到'不能为空");
                     }
                     LocalDate toDate = LocalDate.parse(getCellValueAsString(cell4));
 
@@ -113,18 +113,6 @@ public class ConstructionPlanExcelImportExt {
 
                     if(!exist)
                         throw  new BaseException("请检查"+row.getRowNum()+"'报审单位名称'是否正确！");
-
-//                    //插入公司
-//                    if (!exist){
-//                        CcCompany company = CcCompany.newData();
-//                        company.setName("{\"EN\": \""+companyName+"\", \"ZH_CN\": \""+companyName+"\", \"ZH_TW\": \""+companyName+"\"}");
-//                        company.setFullName("{\"EN\": \""+companyName+"\", \"ZH_CN\": \""+companyName+"\", \"ZH_TW\": \""+companyName+"\"}");
-//                        company.setStatus("AP");
-//                        company.setSeqNo(new BigDecimal(0));
-//                        company.setIsDefault(false);
-//                        company.insertById();
-//                        companyId = company.getId();
-//                    }
 
                     CcConstructPlan plan = CcConstructPlan.newData();
                     plan.setName(name);
