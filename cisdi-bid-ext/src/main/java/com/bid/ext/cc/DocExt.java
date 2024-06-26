@@ -59,22 +59,7 @@ public class DocExt {
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
 //        String pCcPrjIds = "1790672761571196928,1790697187691937792";
-        String sql = "SELECT DISTINCT \n" +
-                "\tt.id,\n" +
-                "\tt.cc_prj_id,\n" +
-                "\tJSON_UNQUOTE(\n" +
-                "\tJSON_EXTRACT( p.NAME, '$.ZH_CN' )) AS NAME \n" +
-                "FROM\n" +
-                "\tcc_doc_file T\n" +
-                "\tJOIN cc_prj p ON p.id = T.cc_prj_id\n" +
-                "\tJOIN cc_prj_member m ON m.CC_PRJ_ID = p.id \n" +
-                "WHERE\n" +
-                "\tm.AD_USER_ID = @UID \n" +
-                "\tAND T.cc_doc_file_type_id = 'VR' \n" +
-                "\tAND T.is_default = 1 \n" +
-                "\tAND (\n" +
-                "\t@P_CC_PRJ_IDS IS NULL \n" +
-                "\tOR @P_CC_PRJ_IDS LIKE CONCAT( '%', T.CC_PRJ_ID, '%' ))";
+        String sql = "SELECT DISTINCT t.id, t.cc_prj_id, JSON_UNQUOTE(JSON_EXTRACT( p.NAME, '$.ZH_CN' )) AS NAME FROM cc_doc_file T JOIN cc_prj p ON p.id = T.cc_prj_id JOIN cc_prj_member m ON m.CC_PRJ_ID = p.id WHERE m.AD_USER_ID = @UID AND T.cc_doc_file_type_id = 'VR' AND T.is_default = 1 AND (@P_CC_PRJ_IDS IS NULL OR @P_CC_PRJ_IDS LIKE CONCAT( '%', T.CC_PRJ_ID, '%' ))";
         List<Map<String, Object>> resultMapList = myJdbcTemplate.queryForList(sql, type, true);
 
         Map<String, Object> resultMap = new HashMap<>();
