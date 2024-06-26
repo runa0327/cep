@@ -37,8 +37,8 @@ public class ZJConstructionPlanImportExt {
 
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-//        String filePath = flFile.getPhysicalLocation();
-        String filePath = "/Users/hejialun/Documents/副本附件：施工方案计划模板.xlsx";
+        String filePath = flFile.getPhysicalLocation();
+//        String filePath = "/Users/hejialun/Documents/副本附件：施工方案计划模板.xlsx";
 
         if (!("xlsx".equals(flFile.getExt()) || "xls".equals(flFile.getExt())))
             throw new BaseException("请上传'xlsx或xls'格式的Excel文件");
@@ -107,6 +107,14 @@ public class ZJConstructionPlanImportExt {
                         throw  new BaseException("第"+(row.getRowNum()+1)+"行，'方案名称'不能为空");
                     }
                     planName = getCellValueAsString(cell2);
+
+                    Where qPlan = new Where();
+                    qPlan.sql("t.plan_name='"+planName+"'");
+                    List<CcConstructionplan> ccConstructionplans = CcConstructionplan.selectByWhere(qPlan);
+
+                    if (ccConstructionplans!=null && ccConstructionplans.size()>0){
+                        throw new BaseException("第"+(row.getRowNum()+1)+"行，'方案名称'为'"+planName+"'已存在");
+                    }
 
 
                     Cell cell3 = row.getCell(2);

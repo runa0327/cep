@@ -38,9 +38,9 @@ public class EquipMaterialManagementExt {
 
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-//        String filePath = flFile.getPhysicalLocation();
+        String filePath = flFile.getPhysicalLocation();
 
-        String filePath = "/Users/hejialun/Documents/副本设备资料导入模板-1.xlsx";
+//        String filePath = "/Users/hejialun/Documents/副本设备资料导入模板-1.xlsx";
 
         //
 
