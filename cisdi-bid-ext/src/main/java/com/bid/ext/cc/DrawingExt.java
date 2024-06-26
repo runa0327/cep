@@ -424,25 +424,28 @@ public class DrawingExt {
     public void importBIMQuantities() {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
+
         // 工程量类型
         String pCcEngineeringQuantityTypeId = varMap.get("P_CC_ENGINEERING_QUANTITY_TYPE_ID").toString();
         // 填报类型
         String ccEngineeringTypeId = "BIM";
 
-        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+        // 验证文件类型
+        String fileExt = flFile.getExt();
+        if (!"xls".equals(fileExt) && !"xlsx".equals(fileExt)) {
+            throw new BaseException("请上传'xls'或'xlsx'格式的Excel文件");
+        }
 
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
             String ccPrjStructNodeId = ccDrawingManagement.getCcPrjStructNodeId();
             String ccPrjId = ccDrawingManagement.getCcPrjId();
 
             String filePath = flFile.getPhysicalLocation();
-            if (!"xls".equals(flFile.getExt()) && !"xlsx".equals(flFile.getExt())) {
-                throw new BaseException("请上传'xls'或'xlsx'格式的Excel文件");
-            }
-
             String ccUomTypeId = null;
             BigDecimal totalWeight = BigDecimal.ZERO; // 初始化总重量为 0
+
             try (FileInputStream file = new FileInputStream(new File(filePath))) {
                 Workbook workbook = new XSSFWorkbook(file);
                 Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
@@ -451,37 +454,31 @@ public class DrawingExt {
                 // 遍历每一行
                 for (int i = 1; i <= Objects.requireNonNull(sheet).getLastRowNum(); i++) {
                     Row row = sheet.getRow(i);
-                    // 检查行是否为空
-                    if (row == null) {
-                        continue; // 如果为空，跳过该行
-                    }
+                    if (row == null) continue; // 如果为空，跳过该行
 
                     Cell cell = null;
 
                     switch (pCcEngineeringQuantityTypeId) {
                         case "STEELSTRUCTURE":
-                            // 获取第4列
-                            cell = row.getCell(3);
+                            cell = row.getCell(3); // 获取第4列
                             ccUomTypeId = "t";
                             break;
                         case "PIPELINE":
-                            // 获取第8列
-                            cell = row.getCell(7);
+                            cell = row.getCell(7); // 获取第8列
                             ccUomTypeId = "t";
                             break;
                         case "CABLETRAY":
-                            // 获取第7列
-                            cell = row.getCell(6);
+                            cell = row.getCell(6); // 获取第7列
                             ccUomTypeId = "t";
                             break;
                         case "PILE":
                         case "FOUNDATION":
                         case "SUPERSTRUCTURECONCRETE":
-                            // 获取第4列
-                            cell = row.getCell(3);
+                            cell = row.getCell(3); // 获取第4列
                             ccUomTypeId = "m³";
                             break;
                     }
+
                     if (cell == null) continue;
 
                     BigDecimal weight = null;
@@ -520,6 +517,7 @@ public class DrawingExt {
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
     }
+
 
     /**
      * 跳转BIM页面
