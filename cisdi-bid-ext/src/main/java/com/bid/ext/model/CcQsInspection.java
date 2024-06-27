@@ -128,6 +128,10 @@ public class CcQsInspection {
          */
         public static final String CC_QS_INSPECTION_TYPE_ID = "CC_QS_INSPECTION_TYPE_ID";
         /**
+         * {"EN": "巡检部位", "ZH_CN": "巡检部位", "ZH_TW": "巡检部位"}。
+         */
+        public static final String CC_QS_INSPECTION_POSITION = "CC_QS_INSPECTION_POSITION";
+        /**
          * {"EN": "CC_QS_INITIATION_TYPE_ID", "ZH_CN": "质安发起类型", "ZH_TW": "繁：质安发起类型"}。
          */
         public static final String CC_QS_INITIATION_TYPE_ID = "CC_QS_INITIATION_TYPE_ID";
@@ -925,6 +929,42 @@ public class CcQsInspection {
             this.ccQsInspectionTypeId = ccQsInspectionTypeId;
             if (!this.toUpdateCols.contains("CC_QS_INSPECTION_TYPE_ID")) {
                 this.toUpdateCols.add("CC_QS_INSPECTION_TYPE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "巡检部位", "ZH_CN": "巡检部位", "ZH_TW": "巡检部位"}。
+     */
+    private String ccQsInspectionPosition;
+
+    /**
+     * 获取：{"EN": "巡检部位", "ZH_CN": "巡检部位", "ZH_TW": "巡检部位"}。
+     */
+    public String getCcQsInspectionPosition() {
+        return this.ccQsInspectionPosition;
+    }
+
+    /**
+     * 设置：{"EN": "巡检部位", "ZH_CN": "巡检部位", "ZH_TW": "巡检部位"}。
+     */
+    public CcQsInspection setCcQsInspectionPosition(String ccQsInspectionPosition) {
+        if (this.ccQsInspectionPosition == null && ccQsInspectionPosition == null) {
+            // 均为null，不做处理。
+        } else if (this.ccQsInspectionPosition != null && ccQsInspectionPosition != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccQsInspectionPosition.compareTo(ccQsInspectionPosition) != 0) {
+                this.ccQsInspectionPosition = ccQsInspectionPosition;
+                if (!this.toUpdateCols.contains("CC_QS_INSPECTION_POSITION")) {
+                    this.toUpdateCols.add("CC_QS_INSPECTION_POSITION");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccQsInspectionPosition = ccQsInspectionPosition;
+            if (!this.toUpdateCols.contains("CC_QS_INSPECTION_POSITION")) {
+                this.toUpdateCols.add("CC_QS_INSPECTION_POSITION");
             }
         }
         return this;

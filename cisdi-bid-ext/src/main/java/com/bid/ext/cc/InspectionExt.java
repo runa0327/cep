@@ -1,10 +1,14 @@
 package com.bid.ext.cc;
 
+import com.bid.ext.model.CcPrjMember;
+import com.bid.ext.model.CcQsInspection;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.interaction.EntityRecord;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 public class InspectionExt {
@@ -47,6 +51,29 @@ public class InspectionExt {
             LocalDate planTo = LocalDate.parse(valueMap.get("PLAN_TO").toString());
             if (planTo.isBefore(planFr)) {
                 throw new BaseException("计划结束时间早于计划开始时间！");
+            }
+        }
+    }
+
+    /**
+     * 获取巡检责任人
+     */
+    public void getInspectionDutyUser() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
+            String csCommId = entityRecord.csCommId;
+            CcQsInspection ccQsInspection = CcQsInspection.selectById(csCommId);
+            String ccQsDutyUser = ccQsInspection.getCcQsDutyUser();
+            if (ccQsDutyUser != null && !ccQsDutyUser.isEmpty()) {
+                String[] memberIds = ccQsDutyUser.split(",");
+                ArrayList<String> memberIdList = new ArrayList<>(Arrays.asList(memberIds));
+                ArrayList<String> userIdList = new ArrayList<>();
+                for (String memberId : memberIdList) {
+                    CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
+                    String adUserId = ccPrjMember.getAdUserId();
+                    userIdList.add(adUserId);
+                }
+                ExtJarHelper.setReturnValue(userIdList);
             }
         }
     }
