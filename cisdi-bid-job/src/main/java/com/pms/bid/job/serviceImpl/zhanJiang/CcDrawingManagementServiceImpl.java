@@ -6,6 +6,7 @@ import com.pms.bid.job.domain.zhanJiang.CcDrawingManagement;
 import com.pms.bid.job.mapper.zhanJiang.CcDrawingManagementMapper;
 import com.pms.bid.job.mapper.zhanJiang.CcPrjStructNodeMapper;
 import com.pms.bid.job.service.zhanJiang.CcDrawingManagementService;
+import com.pms.bid.job.util.DateUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -97,7 +98,10 @@ public class CcDrawingManagementServiceImpl implements CcDrawingManagementServic
             } else {
                 ccDrawingManagement.setCcDrawingStatusId("TODO");
             }
-            ccDrawingManagement.setThreeDActDate(tmp.getCreateTime());
+            String time = tmp.getCreateTime();
+            if (StringUtils.hasText(time)){
+                ccDrawingManagement.setThreeDActDate(DateUtil.convertTimestampToDateString(time,"yyyy-MM-dd HH:mm:ss"));
+            }
             ccDrawingManagement.setMqMsgJson(message);
             ccDrawingManagement.setMqReceiveDateTime(now);
             ccDrawingManagement.setUnitProjectCode(unitProjectCode);
