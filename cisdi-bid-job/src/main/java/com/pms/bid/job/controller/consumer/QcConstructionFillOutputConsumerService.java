@@ -12,6 +12,9 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.util.Date;
 
+/**
+ * 工程量填报mq
+ */
 @Service
 @RocketMQMessageListener(topic = "qc-construction-fill-output", consumerGroup = "consumer-qc-construction-fill-output")
 public class QcConstructionFillOutputConsumerService implements RocketMQListener<String> {

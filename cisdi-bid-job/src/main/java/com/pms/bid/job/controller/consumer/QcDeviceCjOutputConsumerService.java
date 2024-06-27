@@ -14,6 +14,9 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.util.Date;
 
+/**
+ * 设备采购mq
+ */
 @Service
 @RocketMQMessageListener(topic = "qc-device-cj-output", consumerGroup = "consumer-qc-device-cj-output")
 public class QcDeviceCjOutputConsumerService implements RocketMQListener<String> {
