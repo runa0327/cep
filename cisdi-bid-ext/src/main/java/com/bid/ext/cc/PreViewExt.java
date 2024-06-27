@@ -155,6 +155,9 @@ public class PreViewExt {
 
                         Map map = JsonUtil.fromJson(responseBody, Map.class);
                         Map data = (Map) map.get("data");
+                        if (data == null) {
+                            throw new BaseException("该文件暂时只能在详情页预览！");
+                        }
                         modelFileId = data.get("fileId").toString();
 
                         ccDocFile.setCcPreviewFileId(modelFileId);
