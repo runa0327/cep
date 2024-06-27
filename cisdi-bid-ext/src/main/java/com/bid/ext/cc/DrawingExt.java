@@ -494,10 +494,8 @@ public class DrawingExt {
                     }
                 }
 
-                // 转换重量单位：kg 转为 t 并保留两位小数
-                if ("t".equals(ccUomTypeId)) {
-                    totalWeight = totalWeight.divide(BigDecimal.valueOf(1000), 2, RoundingMode.HALF_UP);
-                }
+                // 保留两位小数
+                totalWeight = totalWeight.setScale(2, RoundingMode.HALF_UP);
 
                 CcEngineeringQuantity ccEngineeringQuantity = CcEngineeringQuantity.newData();
                 ccEngineeringQuantity.setCcPrjId(ccPrjId);
