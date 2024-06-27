@@ -2,6 +2,7 @@ package com.bid.ext.cc;
 
 import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
 import com.qygly.shared.ad.ext.UrlToOpen;
@@ -523,13 +524,21 @@ public class DrawingExt {
      * 跳转BIM页面
      */
     public void redirect() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.urlToOpenList = new ArrayList<>();
         EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
         String csCommId = entityRecord.csCommId;
         CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
         String ccSteelOwnerDrawingId = ccDrawingManagement.getCcSteelOwnerDrawingId();
-        String url = "http://192.168.1.110:9990/modelUpload/index?projectId=165&catelogId=7777&ttNumber=" + ccSteelOwnerDrawingId;
+        String sql = "select t.name from CC_BIM_UPLOAD_URL t where t.id = 'ZJ'";
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql);
+        Map<String, Object> map = list.get(0);
+
+        String http = map.get("NAME").toString();
+        String url = http + "/modelUpload/index?projectId=165&catelogId=7777&ttNumber=" + ccSteelOwnerDrawingId;
+
         UrlToOpen extBrowserWindowToOpen = new UrlToOpen();
         extBrowserWindowToOpen.url = url;
         extBrowserWindowToOpen.title = "BIM模型";
