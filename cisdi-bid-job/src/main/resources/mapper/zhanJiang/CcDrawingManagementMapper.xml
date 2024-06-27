@@ -46,7 +46,7 @@
             LAST_MODI_USER_ID,
             STATUS,
             CC_STEEL_OWNER_DRAWING_ID,
-            CC_DRAWING_STATUS_ID,
+            CC_MODEL_STATUS_ID,
             THREE_D_ACT_DATE,
             MQ_RECEIVE_DATETIME,
             MQ_MSG,
@@ -80,7 +80,7 @@
                 CC_STEEL_OWNER_DRAWING_ID = #{ccSteelOwnerDrawingId},
             </if>
             <if test="ccDrawingStatusId != null and ccDrawingStatusId != ''">
-                CC_DRAWING_STATUS_ID = #{ccDrawingStatusId},
+                CC_MODEL_STATUS_ID = #{ccDrawingStatusId},
             </if>
             <if test="threeDActDate != null and threeDActDate != ''">
                 THREE_D_ACT_DATE = #{threeDActDate},

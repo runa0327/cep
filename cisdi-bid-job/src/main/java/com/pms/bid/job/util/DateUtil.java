@@ -17,4 +17,17 @@ public class DateUtil {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return sdf.format(date);
     }
+
+    /**
+     * 将字符串时间戳转为指定格式的字符串日期格式
+     * @param timestampStr 时间戳
+     * @param dateFormat 格式化要求
+     * @return 格式化后日期
+     */
+    public static String convertTimestampToDateString(String timestampStr, String dateFormat) {
+        long timestamp = Long.parseLong(timestampStr);
+        Date date = new Date(timestamp);
+        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+        return sdf.format(date);
+    }
 }
