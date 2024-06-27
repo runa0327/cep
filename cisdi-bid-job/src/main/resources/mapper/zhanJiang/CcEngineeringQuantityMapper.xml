@@ -65,7 +65,7 @@
         CC_PRJ_ID,
         CC_ENGINEERING_TYPE_ID,
         TOTAL_WEIGHT,
-        CC_UOM_TYPE_ID_ID,
+        CC_UOM_TYPE_ID,
         CC_ENGINEERING_QUANTITY_TYPE_ID,
         CC_PO_ID,
         MQ_RECEIVE_DATETIME,
