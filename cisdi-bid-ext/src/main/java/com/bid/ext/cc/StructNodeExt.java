@@ -2044,15 +2044,24 @@ public class StructNodeExt {
                     "SELECT n.ID FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
                     "UPDATE cc_prj_struct_node SET STATUS = ? WHERE ID IN (SELECT ID FROM Subtree)";
 
+            String sql = "WITH RECURSIVE Subtree AS (" +
+                    "SELECT ID FROM cc_prj_struct_node WHERE ID = ? " +
+                    "UNION ALL " +
+                    "SELECT n.ID FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
+                    "SELECT * FROM cc_prj_struct_node WHERE ID IN (SELECT ID FROM Subtree) and is_wbs =1";
+
             List<CcPrjStructNode> ccPrjStructNodes = null;
 
             // 当 ccPrjWbsTypeId 为 "ALL" 时，使用当前逻辑
             if ("ALL".equals(ccPrjWbsTypeId)) {
                 // 获取此项目已批准的计划根节点
                 ccPrjStructNodes = CcPrjStructNode.selectByWhere(new Where().eq(CcPrjStructNode.Cols.CC_PRJ_ID, ccPrjId).eq(CcPrjStructNode.Cols.IS_WBS, 1).eq(CcPrjStructNode.Cols.STATUS, "AP").eq(CcPrjStructNode.Cols.CC_PRJ_STRUCT_NODE_PID, null));
+                List<Map<String, Object>> nodes = null;
                 if (!SharedUtil.isEmpty(ccPrjStructNodes)) {
                     for (CcPrjStructNode ccPrjStructNode0 : ccPrjStructNodes) {
                         String rootId = ccPrjStructNode0.getId();
+                        // 获取旧计划树
+                        nodes = myJdbcTemplate.queryForList(sql, rootId);
                         myJdbcTemplate.update(updateStatusSql, rootId, StatusE.VD.toString());
                     }
                 }
@@ -2063,13 +2072,8 @@ public class StructNodeExt {
                     // 进展明细从原来计划改到新计划
                     for (CcPrjStructNode ccPrjStructNode0 : ccPrjStructNodes) {
                         String rootId = ccPrjStructNode0.getId();
-                        String sql = "WITH RECURSIVE Subtree AS (" +
-                                "SELECT ID FROM cc_prj_struct_node WHERE ID = ? " +
-                                "UNION ALL " +
-                                "SELECT n.ID FROM cc_prj_struct_node n JOIN Subtree s ON n.CC_PRJ_STRUCT_NODE_PID = s.ID) " +
-                                "SELECT * FROM cc_prj_struct_node WHERE ID IN (SELECT ID FROM Subtree)";
-                        // 获取旧计划树
-                        List<Map<String, Object>> nodes = myJdbcTemplate.queryForList(sql, rootId);
+
+
                         for (Map<String, Object> node : nodes) {
                             String id = node.get("ID").toString();
                             // 通过拷贝自项目结构节点ID获取新计划树
