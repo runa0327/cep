@@ -59,7 +59,7 @@ public class DocExt {
 
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
 //        String pCcPrjIds = "1790672761571196928,1790697187691937792";
-        String sql = "SELECT DISTINCT T.id, T.cc_prj_id, JSON_UNQUOTE(JSON_EXTRACT( p.NAME, '$.ZH_CN' )) AS NAME FROM cc_doc_file T JOIN cc_prj p ON p.id = T.cc_prj_id JOIN cc_prj_member m ON m.CC_PRJ_ID = p.id WHERE m.AD_USER_ID = @UID AND T.cc_doc_file_type_id = ? AND T.is_default = ? AND (@P_CC_PRJ_IDS IS NULL OR @P_CC_PRJ_IDS LIKE CONCAT( '%', T.CC_PRJ_ID, '%' ))";
+        String sql = "SELECT DISTINCT M.CC_PRJ_ID, F.ID, JSON_UNQUOTE(JSON_EXTRACT(p.NAME, '$.ZH_CN')) AS NAME FROM CC_PRJ_MEMBER M LEFT JOIN CC_DOC_FILE F ON F.CC_PRJ_ID = M.CC_PRJ_ID AND F.cc_doc_file_type_id = ? AND F.is_default = ? LEFT JOIN CC_PRJ P ON P.ID = M.CC_PRJ_ID WHERE m.AD_USER_ID = '1783305620077367296' AND (@P_CC_PRJ_IDS IS NULL OR @P_CC_PRJ_IDS LIKE CONCAT('%', m.cc_prj_id, '%'));";
         List<Map<String, Object>> resultMapList = myJdbcTemplate.queryForList(sql, type, true);
 
         Map<String, Object> resultMap = new HashMap<>();
