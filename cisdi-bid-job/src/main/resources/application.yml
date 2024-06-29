@@ -19,9 +19,9 @@ spring:
 
 rocketmq:
   #开发环境mq信息
-  name-server: 140.210.215.217:9876 # 访问地址
+#  name-server: 140.210.215.217:9876 # 访问地址
   # 正式环境mq地址
-#  name-server: 192.168.10.19:17890 # 访问地址
+  name-server: 192.168.10.19:17890 # 访问地址
   producer:
     group: def_group # 必须指定group
     send-message-timeout: 3000 # 消息发送超时时长，默认3s
