@@ -258,13 +258,14 @@ public class DrawingExt {
                 // 三维实际日期
                 LocalDate threeDPlanDate = getLocalDateCellValue(row.getCell(11));
 
+                String ccConstructionDrawingId = getStringCellValue(row.getCell(5));
                 String ccSteelOwnerDrawingId = getStringCellValue(row.getCell(6));
                 String lastFourthChar = "";
                 if (ccSteelOwnerDrawingId != null && ccSteelOwnerDrawingId.length() >= 4) {
                     lastFourthChar = String.valueOf(ccSteelOwnerDrawingId.charAt(ccSteelOwnerDrawingId.length() - 4));
                 }
 
-                CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_STEEL_OWNER_DRAWING_ID, ccSteelOwnerDrawingId));
+                CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_CONSTRUCTION_DRAWING_ID, ccConstructionDrawingId));
                 if (SharedUtil.isEmpty(ccDrawingManagement)) {
 
                     CcDrawingManagement drawingManagement = CcDrawingManagement.newData();
@@ -274,8 +275,8 @@ public class DrawingExt {
                     drawingManagement.setCcPrjStructNodeId(ccPrjStructNodeId);
                     drawingManagement.setCcDrawingTypeId(drawingTypeId);
                     drawingManagement.setName(getStringCellValue(row.getCell(4)));
-                    drawingManagement.setCcConstructionDrawingId(getStringCellValue(row.getCell(5)));
-                    drawingManagement.setCcSteelOwnerDrawingId(getStringCellValue(row.getCell(6)));
+                    drawingManagement.setCcConstructionDrawingId(ccConstructionDrawingId);
+                    drawingManagement.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
                     drawingManagement.setCcPrjProfessionalCodeId(lastFourthChar);
                     drawingManagement.setPlanDate(getLocalDateCellValue(row.getCell(7)));
                     drawingManagement.setActDate(actDate);
