@@ -319,6 +319,7 @@ public class PreViewExt {
     public void simplePreview() throws UnsupportedEncodingException {
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.urlToOpenList = new ArrayList<>();
+        String fileDownloadUrl1 = SysSettingUtil.getValue("FILE_DOWNLOAD_URL");
         String kkPreviewUrl = SysSettingUtil.getValue("KK_PREVIEW_URL");
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             UrlToOpen urlToOpen = new UrlToOpen();
@@ -339,7 +340,7 @@ public class PreViewExt {
             String fileId = JdbcMapUtil.getString(file, "ID");
             String fileExt = JdbcMapUtil.getString(file, "EXT");
 
-            String fileDownloadUrl = kkPreviewUrl + "qygly-file/downloadCommonFile?fileId=" + fileId + "&qygly-session-id=" + ExtJarHelper.getLoginInfo().sessionId + "&fullfilename=" + fileId + (SharedUtil.isEmpty(fileExt) ? "" : ("." + fileExt));
+            String fileDownloadUrl = fileDownloadUrl1 + "?fileId=" + fileId + "&qygly-session-id=" + ExtJarHelper.getLoginInfo().sessionId + "&fullfilename=" + fileId + (SharedUtil.isEmpty(fileExt) ? "" : ("." + fileExt));
             String previewUrl = kkPreviewUrl + "?url=" + URLEncoder.encode(cn.hutool.core.codec.Base64.encode(fileDownloadUrl), "UTF-8");
             String encodedUrl = previewUrl;
 
