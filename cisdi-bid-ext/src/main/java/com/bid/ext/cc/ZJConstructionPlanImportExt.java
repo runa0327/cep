@@ -225,6 +225,7 @@ public class ZJConstructionPlanImportExt {
 //                    constructionPlan.setName(planName);
 
                     constructionPlan.setPlanName(planName);
+                    constructionPlan.setName(planName);
                     constructionPlan.setCcCompanyId(companyId);
                     constructionPlan.setAdUserId(adUserId);
                     constructionPlan.setIsStart(false);
