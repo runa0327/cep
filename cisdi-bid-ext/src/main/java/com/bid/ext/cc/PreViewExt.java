@@ -3,6 +3,7 @@ package com.bid.ext.cc;
 import com.bid.ext.model.CcDocFile;
 import com.bid.ext.model.FlFile;
 import com.bid.ext.model.TranslateRequestBody;
+import com.bid.ext.utils.SysSettingUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.shared.BaseException;
@@ -18,6 +19,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -174,7 +177,7 @@ public class PreViewExt {
                     // 异步执行模型转换请求
                     new Thread(() -> {
                         try {
-                            //转换模型
+                            // 转换模型
                             HttpHeaders translateHeaders = new HttpHeaders();
                             translateHeaders.set("Authorization", "Bearer " + token);
                             translateHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -250,7 +253,7 @@ public class PreViewExt {
                                 throw new BaseException("查询模型转换状态时发生异常", e); // 发送错误抛出异常
                             }
                         }
-                        latch.countDown(); //通知第二个线程完成
+                        latch.countDown(); // 通知第二个线程完成
                     }).start();
 
                     try {
@@ -306,6 +309,44 @@ public class PreViewExt {
         Map<String, Object> outputMap = new HashMap<>();
         outputMap.put("fileInlineUrl", fileInlineUrl);
         ExtJarHelper.setReturnValue(outputMap);
+    }
+
+    /**
+     * 简化版预览文件。采用KK进行预览。
+     *
+     * @throws UnsupportedEncodingException
+     */
+    public void simplePreview() throws UnsupportedEncodingException {
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.urlToOpenList = new ArrayList<>();
+        String gatewayUrl = SysSettingUtil.getValue("GATEWAY_URL");
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            UrlToOpen urlToOpen = new UrlToOpen();
+
+            Object ccAttachment = entityRecord.valueMap.get("CC_ATTACHMENT");
+            if (SharedUtil.isEmpty(ccAttachment)) {
+                throw new BaseException("资料文件的CC_ATTACHMENT字段为空！");
+            }
+
+            List<Map<String, Object>> fileList = ExtJarHelper.getMyJdbcTemplate().queryForList("select * from fl_file f where f.id=?", ccAttachment);
+            if (SharedUtil.isEmpty(fileList)) {
+                throw new BaseException("资料文件的CC_ATTACHMENT字段对应FL_FILE记录不存在！");
+            }
+
+            Map<String, Object> file = fileList.get(0);
+
+            // 采用KK进行预览时，要对url部分做2次编码。第1次是Base64编码、第2次是URL编码：
+            String fileId = JdbcMapUtil.getString(file, "ID");
+            String fileExt = JdbcMapUtil.getString(file, "EXT");
+
+            String fileDownloadUrl = gatewayUrl + "qygly-file/downloadCommonFile?fileId=" + fileId + "&qygly-session-id=" + ExtJarHelper.getLoginInfo().sessionId + "&fullfilename=" + fileId + (SharedUtil.isEmpty(fileExt) ? "" : ("." + fileExt));
+            String previewUrl = "kkFileView/onlinePreview?url=" + URLEncoder.encode(cn.hutool.core.codec.Base64.encode(fileDownloadUrl), "UTF-8");
+            String encodedUrl = previewUrl;
+
+            urlToOpen.url = encodedUrl;
+            invokeActResult.urlToOpenList.add(urlToOpen);
+        }
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
 }
