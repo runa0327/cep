@@ -340,7 +340,7 @@ public class PreViewExt {
             String fileExt = JdbcMapUtil.getString(file, "EXT");
 
             String fileDownloadUrl = gatewayUrl + "qygly-file/downloadCommonFile?fileId=" + fileId + "&qygly-session-id=" + ExtJarHelper.getLoginInfo().sessionId + "&fullfilename=" + fileId + (SharedUtil.isEmpty(fileExt) ? "" : ("." + fileExt));
-            String previewUrl = "kkFileView/onlinePreview?url=" + URLEncoder.encode(cn.hutool.core.codec.Base64.encode(fileDownloadUrl), "UTF-8");
+            String previewUrl = "../kkFileView/onlinePreview?url=" + URLEncoder.encode(cn.hutool.core.codec.Base64.encode(fileDownloadUrl), "UTF-8");
             String encodedUrl = previewUrl;
 
             urlToOpen.url = encodedUrl;
