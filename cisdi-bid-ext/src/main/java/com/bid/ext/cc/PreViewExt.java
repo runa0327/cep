@@ -347,6 +347,7 @@ public class PreViewExt {
 
             UrlToOpen urlToOpen = new UrlToOpen();
             urlToOpen.url = previewUrl;
+            urlToOpen.title = "预览";
             invokeActResult.urlToOpenList.add(urlToOpen);
         }
 
