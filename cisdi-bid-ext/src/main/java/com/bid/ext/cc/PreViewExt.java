@@ -319,10 +319,11 @@ public class PreViewExt {
     public void simplePreview() throws UnsupportedEncodingException {
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.urlToOpenList = new ArrayList<>();
+
         String fileDownloadUrl1 = SysSettingUtil.getValue("FILE_DOWNLOAD_URL");
         String kkPreviewUrl = SysSettingUtil.getValue("KK_PREVIEW_URL");
+
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
-            UrlToOpen urlToOpen = new UrlToOpen();
 
             Object ccAttachment = entityRecord.valueMap.get("CC_ATTACHMENT");
             if (SharedUtil.isEmpty(ccAttachment)) {
@@ -336,17 +337,19 @@ public class PreViewExt {
 
             Map<String, Object> file = fileList.get(0);
 
-            // 采用KK进行预览时，要对url部分做2次编码。第1次是Base64编码、第2次是URL编码：
             String fileId = JdbcMapUtil.getString(file, "ID");
             String fileExt = JdbcMapUtil.getString(file, "EXT");
 
             String fileDownloadUrl = fileDownloadUrl1 + "?fileId=" + fileId + "&qygly-session-id=" + ExtJarHelper.getLoginInfo().sessionId + "&fullfilename=" + fileId + (SharedUtil.isEmpty(fileExt) ? "" : ("." + fileExt));
-            String previewUrl = kkPreviewUrl + "?url=" + URLEncoder.encode(cn.hutool.core.codec.Base64.encode(fileDownloadUrl), "UTF-8");
-            String encodedUrl = previewUrl;
 
-            urlToOpen.url = encodedUrl;
+            // 采用KK进行预览时，要对url部分做2次编码。第1次是Base64编码、第2次是URL编码：
+            String previewUrl = kkPreviewUrl + "?url=" + URLEncoder.encode(cn.hutool.core.codec.Base64.encode(fileDownloadUrl), "UTF-8");
+
+            UrlToOpen urlToOpen = new UrlToOpen();
+            urlToOpen.url = previewUrl;
             invokeActResult.urlToOpenList.add(urlToOpen);
         }
+
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
