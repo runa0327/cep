@@ -69,11 +69,13 @@ public class CcDevicePurchaseDataServiceImpl implements CcDevicePurchaseDataServ
         ccDevicePurchaseData.setUnitProjectCode(tmp.getUnitProjectCode());
         ccDevicePurchaseData.setUnitProjectName(tmp.getUnitProjectName());
         ccDevicePurchaseData.setPurchaseDeviceNo(tmp.getDeviceNo());
-        if (4 == tmp.getDeviceStatus()) {
-            ccDevicePurchaseData.setDeviceInstallStatus(1);
-        } else {
-            ccDevicePurchaseData.setDeviceInstallStatus(0);
-        }
+        ccDevicePurchaseData.setDeviceInstallStatus(tmp.getDeviceStatus());
+
+//        if (4 == tmp.getDeviceStatus()) {
+//            ccDevicePurchaseData.setDeviceInstallStatus(1);
+//        } else {
+//            ccDevicePurchaseData.setDeviceInstallStatus(0);
+//        }
         ccDevicePurchaseData.setDeviceTagNo(tmp.getDeviceTagNo());
         ccDevicePurchaseData.setMqMsgJson(message);
         ccDevicePurchaseData.setMqReceiveDateTime(now);
@@ -101,11 +103,12 @@ public class CcDevicePurchaseDataServiceImpl implements CcDevicePurchaseDataServ
         ccDevicePurchaseData.setUnitProjectCode(tmp.getUnitProjectCode());
         ccDevicePurchaseData.setUnitProjectName(tmp.getUnitProjectName());
         ccDevicePurchaseData.setPurchaseDeviceNo(tmp.getDeviceNo());
-        if (4 == tmp.getDeviceStatus()) {
-            ccDevicePurchaseData.setDeviceInstallStatus(1);
-        } else {
-            ccDevicePurchaseData.setDeviceInstallStatus(0);
-        }
+        ccDevicePurchaseData.setDeviceInstallStatus(tmp.getDeviceStatus());
+//        if (4 == tmp.getDeviceStatus()) {
+//            ccDevicePurchaseData.setDeviceInstallStatus(1);
+//        } else {
+//            ccDevicePurchaseData.setDeviceInstallStatus(0);
+//        }
         ccDevicePurchaseData.setDeviceTagNo(tmp.getDeviceTagNo());
         ccDevicePurchaseData.setMqMsgJson(message);
         ccDevicePurchaseData.setMqReceiveDateTime(now);
