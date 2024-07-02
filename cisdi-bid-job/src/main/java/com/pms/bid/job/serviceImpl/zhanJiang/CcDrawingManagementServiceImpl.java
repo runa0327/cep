@@ -7,6 +7,7 @@ import com.pms.bid.job.mapper.zhanJiang.CcDrawingManagementMapper;
 import com.pms.bid.job.mapper.zhanJiang.CcPrjStructNodeMapper;
 import com.pms.bid.job.service.zhanJiang.CcDrawingManagementService;
 import com.pms.bid.job.util.DateUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -14,6 +15,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.util.List;
 
+@Slf4j
 @Service
 public class CcDrawingManagementServiceImpl implements CcDrawingManagementService {
 
@@ -37,6 +39,7 @@ public class CcDrawingManagementServiceImpl implements CcDrawingManagementServic
             String id = ccDrawingManagementMapper.queryIdByCcSteelOwnerDrawingId(data.getTtNumber());
             if (StringUtils.hasText(id)) {
                 updateByMQ(data,id,message,now,createBy);
+                log.info("[qc-model-status-update-output]修改成功。{}",message);
             }
 //            else {
 //                createCcDrawingManagementByMQ(data,message,now,createBy);

@@ -42,8 +42,10 @@ public class CcDevicePurchaseDataServiceImpl implements CcDevicePurchaseDataServ
                 String id = ccDevicePurchaseDataMapper.queryIdByDeviceCode(tmp.getDeviceTagNo());
                 if (!StringUtils.hasText(id)) { //  新增
                     createDevice(tmp,message,now,createBy);
+                    log.info("[qc-device-cj-output]新增成功。{}",message);
                 } else {
                     updateDeviceById(tmp,message,id,now,createBy);
+                    log.info("[qc-device-cj-output]修改成功。{}",message);
                 }
             }
         }

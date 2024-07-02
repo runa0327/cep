@@ -7,6 +7,7 @@ import com.pms.bid.job.domain.zhanJiang.CcPrjStructNode;
 import com.pms.bid.job.mapper.zhanJiang.CcEngineeringQuantityMapper;
 import com.pms.bid.job.mapper.zhanJiang.CcPrjStructNodeMapper;
 import com.pms.bid.job.service.zhanJiang.CcEngineeringQuantityService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class CcEngineeringQuantityServiceImpl implements CcEngineeringQuantityService {
 
@@ -38,6 +40,7 @@ public class CcEngineeringQuantityServiceImpl implements CcEngineeringQuantitySe
             for (EngineeringMetrics tmp : sourceList) {
                 //  单条数据处理并写入工程量填报
                 dealAndInsertEngineeringQuantity(tmp,unitProjectList,message,now,createBy);
+                log.info("[qc-construction-fill-output]新增成功。{},新增数据为：{}",message,tmp);
             }
         }
     }
