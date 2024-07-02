@@ -4,6 +4,7 @@ import com.pms.bid.job.domain.rocketmq.MQModelStatusResult;
 import com.pms.bid.job.service.zhanJiang.CcDrawingManagementService;
 import com.pms.bid.job.util.DateUtil;
 import com.pms.bid.job.util.JsonUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.Date;
 /**
  * 图纸管理mq
  */
+@Slf4j
 @Service
 @RocketMQMessageListener(topic = "qc-model-status-update-output", consumerGroup = "consumer-qc-model-status-update-output")
 public class QcModelStatusUpdateOutputConsumerService implements RocketMQListener<String> {
@@ -35,7 +37,11 @@ public class QcModelStatusUpdateOutputConsumerService implements RocketMQListene
             if ("success".equals(mqModelStatusResult.getCode())){
                 if (mqModelStatusResult.getData() != null) {
                     ccDrawingManagementService.dealRocketMQData(mqModelStatusResult.getData(),message,now);
+                } else {
+                    log.error("[qc-model-status-update-output]获取到的data数据为空，不进行消费，mq信息为：{}",message);
                 }
+            } else {
+                log.error("状态不为success，不进行消费");
             }
         }
     }

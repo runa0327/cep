@@ -6,6 +6,7 @@ import com.pms.bid.job.domain.zhanJiang.CcDevicePurchaseData;
 import com.pms.bid.job.mapper.zhanJiang.CcDevicePurchaseDataMapper;
 import com.pms.bid.job.mapper.zhanJiang.CcPrjStructNodeMapper;
 import com.pms.bid.job.service.zhanJiang.CcDevicePurchaseDataService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -13,6 +14,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.util.List;
 
+@Slf4j
 @Service
 public class CcDevicePurchaseDataServiceImpl implements CcDevicePurchaseDataService {
 
