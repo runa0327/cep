@@ -37,6 +37,7 @@ public class QcModelStatusUpdateOutputConsumerService implements RocketMQListene
             if ("success".equals(mqModelStatusResult.getCode())){
                 if (mqModelStatusResult.getData() != null) {
                     ccDrawingManagementService.dealRocketMQData(mqModelStatusResult.getData(),message,now);
+                    log.info("消费成功");
                 } else {
                     log.error("[qc-model-status-update-output]获取到的data数据为空，不进行消费，mq信息为：{}",message);
                 }

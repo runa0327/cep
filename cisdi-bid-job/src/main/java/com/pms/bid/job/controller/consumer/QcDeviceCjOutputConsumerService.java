@@ -39,6 +39,7 @@ public class QcDeviceCjOutputConsumerService implements RocketMQListener<String>
             if ("success".equals(mqDeviceCjResult.getCode())){
                 if (mqDeviceCjResult.getData() != null) {
                     ccDevicePurchaseDataService.dealRocketMQData(mqDeviceCjResult.getData(),message,now);
+                    log.info("消费成功");
                 } else {
                     log.error("[qc-device-cj-output]获取到的data数据为空，不进行消费，mq信息为：{}",message);
                 }

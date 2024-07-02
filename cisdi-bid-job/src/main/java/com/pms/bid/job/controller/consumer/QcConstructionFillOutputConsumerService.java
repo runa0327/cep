@@ -37,6 +37,7 @@ public class QcConstructionFillOutputConsumerService implements RocketMQListener
             if ("success".equals(mqEngineeringMetricsResult.getCode())){
                 if (mqEngineeringMetricsResult.getData() != null) {
                     ccEngineeringQuantityService.dealRocketMQData(mqEngineeringMetricsResult.getData(),message,now);
+                    log.info("消费成功");
                 } else {
                     log.error("[qc-construction-fill-output]获取到的data数据为空，不进行消费，mq信息为：{}",message);
                 }
