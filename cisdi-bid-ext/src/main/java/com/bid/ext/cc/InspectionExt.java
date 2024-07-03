@@ -3,8 +3,12 @@ package com.bid.ext.cc;
 import com.bid.ext.model.CcPrjMember;
 import com.bid.ext.model.CcQsInspection;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.ad.entity.EntityInfo;
+import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
+import com.qygly.shared.util.JdbcMapUtil;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -76,5 +80,29 @@ public class InspectionExt {
                 ExtJarHelper.setReturnValue(userIdList);
             }
         }
+    }
+
+    /**
+     * 根据巡检类型更改流程名
+     */
+    public void updateProcessNameByType() {
+        SevInfo sevInfo = ExtJarHelper.getSevInfo();
+        EntityInfo entityInfo = sevInfo.entityInfo;
+        String entityCode = entityInfo.code;
+        EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
+        String csCommId = entityRecord.csCommId;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        Map<String, Object> valueMap = entityRecord.valueMap;
+        String ccQsInspectionTypeId = JdbcMapUtil.getString(valueMap, "CC_QS_INSPECTION_TYPE_ID");
+        String processName = null;
+        switch (ccQsInspectionTypeId) {
+            case "1750796211883540480":
+                processName = "质量巡检";
+                break;
+            case "1750796258457092096":
+                processName = "安全巡检";
+                break;
+        }
+        myJdbcTemplate.update("UPDATE wf_process_instance pi JOIN cc_qs_inspection t ON pi.ENTITY_RECORD_ID = t.id SET pi.NAME = JSON_SET(pi.NAME, '$.ZH_CN', CONCAT(?, SUBSTRING(JSON_UNQUOTE(JSON_EXTRACT(pi.NAME, '$.ZH_CN')), CHAR_LENGTH('质安巡检') + 1))) WHERE t.id = ?", processName, csCommId);
     }
 }
