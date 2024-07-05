@@ -4,7 +4,6 @@ import com.bid.ext.model.*;
 import com.qygly.ext.jar.helper.ExtJarHelper;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
-import com.qygly.shared.ad.login.LoginInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.SharedUtil;
@@ -169,9 +168,6 @@ public class BidExt {
      * 导入合同台账
      */
     public void importContract() {
-        LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
-        String userId = loginInfo.userInfo.id;
-
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
         String filePath = flFile.getPhysicalLocation();
@@ -212,25 +208,25 @@ public class BidExt {
 
                 switch (ccPoTypeId) {
                     case "技术服务合同":
-                        ccCurrencyTypeId = "TechnicalServiceContract";
+                        ccPoTypeId = "TechnicalServiceContract";
                         break;
                     case "工程设计合同":
-                        ccCurrencyTypeId = "EngineeringDesignContract";
+                        ccPoTypeId = "EngineeringDesignContract";
                         break;
                     case "技术咨询合同":
-                        ccCurrencyTypeId = "TechnicalConsultingContract";
+                        ccPoTypeId = "TechnicalConsultingContract";
                         break;
                     case "监理合同":
-                        ccCurrencyTypeId = "SupervisionContract";
+                        ccPoTypeId = "SupervisionContract";
                         break;
                     case "勘察合同":
-                        ccCurrencyTypeId = "SurveyContract";
+                        ccPoTypeId = "SurveyContract";
                         break;
                     case "施工合同":
-                        ccCurrencyTypeId = "ConstructionContract";
+                        ccPoTypeId = "ConstructionContract";
                         break;
                     case "施工准备合同":
-                        ccCurrencyTypeId = "ConstructionPreparationContract";
+                        ccPoTypeId = "ConstructionPreparationContract";
                         break;
                 }
 

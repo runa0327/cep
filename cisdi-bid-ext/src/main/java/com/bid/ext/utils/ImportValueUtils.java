@@ -44,12 +44,15 @@ public class ImportValueUtils {
             return cell.getBooleanCellValue();
         } else if (cell.getCellType() == CellType.STRING) {
             String cellValue = cell.getStringCellValue();
-            return "是".equals(cellValue) || "true".equalsIgnoreCase(cellValue) || "否".equals(cellValue) || "false".equalsIgnoreCase(cellValue);
+            if ("是".equals(cellValue) || "true".equalsIgnoreCase(cellValue)) {
+                return true;
+            } else if ("否".equals(cellValue) || "false".equalsIgnoreCase(cellValue)) {
+                return false;
+            }
         } else if (cell.getCellType() == CellType.NUMERIC) {
             return cell.getNumericCellValue() != 0;
-        } else {
-            return false;
         }
+        return false;
     }
 
 
