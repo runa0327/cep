@@ -20,8 +20,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
+
+import static com.bid.ext.utils.ImportValueUtils.*;
 
 public class DrawingExt {
 
@@ -349,63 +350,6 @@ public class DrawingExt {
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
-    private String getStringCellValue(Cell cell) {
-        if (cell == null) {
-            return null;
-        }
-        if (cell.getCellType() == CellType.STRING) {
-            return cell.getStringCellValue();
-        } else if (cell.getCellType() == CellType.NUMERIC) {
-            return String.valueOf(cell.getNumericCellValue());
-        } else if (cell.getCellType() == CellType.BOOLEAN) {
-            return String.valueOf(cell.getBooleanCellValue());
-        } else {
-            return null;
-        }
-    }
-
-    private double getNumericCellValue(Cell cell) {
-        if (cell == null) {
-            return 0;
-        }
-        if (cell.getCellType() == CellType.NUMERIC) {
-            return cell.getNumericCellValue();
-        } else if (cell.getCellType() == CellType.STRING) {
-            return Double.parseDouble(cell.getStringCellValue());
-        } else {
-            return 0;
-        }
-    }
-
-    private boolean getBooleanCellValue(Cell cell) {
-        if (cell == null) {
-            return false;
-        }
-        if (cell.getCellType() == CellType.BOOLEAN) {
-            return cell.getBooleanCellValue();
-        } else if (cell.getCellType() == CellType.STRING) {
-            String cellValue = cell.getStringCellValue();
-            return "是".equals(cellValue) || "true".equalsIgnoreCase(cellValue);
-        } else if (cell.getCellType() == CellType.NUMERIC) {
-            return cell.getNumericCellValue() != 0;
-        } else {
-            return false;
-        }
-    }
-
-    private LocalDate getLocalDateCellValue(Cell cell) {
-        if (cell == null) {
-            return null;
-        }
-        if (cell.getCellType() == CellType.NUMERIC) {
-            Date date = cell.getDateCellValue();
-            return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        } else if (cell.getCellType() == CellType.STRING) {
-            return LocalDate.parse(cell.getStringCellValue());
-        } else {
-            return null;
-        }
-    }
 
     /**
      * 图纸权限

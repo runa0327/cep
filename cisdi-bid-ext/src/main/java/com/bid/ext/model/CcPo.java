@@ -93,14 +93,6 @@ public class CcPo {
          */
         public static final String LK_WF_INST_ID = "LK_WF_INST_ID";
         /**
-         * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
-         */
-        public static final String CODE = "CODE";
-        /**
-         * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
-         */
-        public static final String NAME = "NAME";
-        /**
          * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
          */
         public static final String REMARK = "REMARK";
@@ -112,6 +104,38 @@ public class CcPo {
          * {"EN": "ICON_FILE_GROUP_ID", "ZH_CN": "图标", "ZH_TW": "繁：图标"}。
          */
         public static final String ICON_FILE_GROUP_ID = "ICON_FILE_GROUP_ID";
+        /**
+         * {"EN": "合同金额（元）", "ZH_CN": "结算金额（元）", "ZH_TW": "合同金额（元）"}。
+         */
+        public static final String SETTLEMENT_AMT = "SETTLEMENT_AMT";
+        /**
+         * {"EN": "合同创建人", "ZH_CN": "合同创建人", "ZH_TW": "合同创建人"}。
+         */
+        public static final String CC_BID_CREATE_USER_ID = "CC_BID_CREATE_USER_ID";
+        /**
+         * {"EN": "币种", "ZH_CN": "币种", "ZH_TW": "币种"}。
+         */
+        public static final String CC_CURRENCY_TYPE_ID = "CC_CURRENCY_TYPE_ID";
+        /**
+         * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+         */
+        public static final String CODE = "CODE";
+        /**
+         * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+         */
+        public static final String CC_PRJ_STRUCT_NODE_ID = "CC_PRJ_STRUCT_NODE_ID";
+        /**
+         * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+         */
+        public static final String NAME = "NAME";
+        /**
+         * {"EN": "责任单位", "ZH_CN": "项目单位", "ZH_TW": "责任单位"}。
+         */
+        public static final String PROJECT_UNIT = "PROJECT_UNIT";
+        /**
+         * {"EN": "合同类型", "ZH_CN": "合同类型", "ZH_TW": "合同类型"}。
+         */
+        public static final String CC_PO_TYPE_ID = "CC_PO_TYPE_ID";
         /**
          * {"EN": "乙方", "ZH_CN": "甲方", "ZH_TW": "乙方"}。
          */
@@ -137,6 +161,10 @@ public class CcPo {
          */
         public static final String PARTY_B_CONTACT_PHONE = "PARTY_B_CONTACT_PHONE";
         /**
+         * {"EN": "招标参与方式", "ZH_CN": "招标参与方式", "ZH_TW": "招标参与方式"}。
+         */
+        public static final String CC_BID_PARTICIPATE_TYPE_ID = "CC_BID_PARTICIPATE_TYPE_ID";
+        /**
          * {"EN": "业务日期", "ZH_CN": "业务日期", "ZH_TW": "业务日期"}。
          */
         public static final String TRX_DATE = "TRX_DATE";
@@ -152,6 +180,30 @@ public class CcPo {
          * {"EN": "项目CBS模板", "ZH_CN": "项目CBS模板", "ZH_TW": "项目CBS模板"}。
          */
         public static final String CC_PRJ_CBS_TEMPALTE_NODE_ID = "CC_PRJ_CBS_TEMPALTE_NODE_ID";
+        /**
+         * {"EN": "进展状态", "ZH_CN": "进度状态", "ZH_TW": "进展状态"}。
+         */
+        public static final String CC_WBS_STATUS_ID = "CC_WBS_STATUS_ID";
+        /**
+         * {"EN": "合同状态", "ZH_CN": "合同状态", "ZH_TW": "合同状态"}。
+         */
+        public static final String CC_PO_STATUS_ID = "CC_PO_STATUS_ID";
+        /**
+         * {"EN": "计划开始日期", "ZH_CN": "计划从", "ZH_TW": "计划开始日期"}。
+         */
+        public static final String PLAN_FR = "PLAN_FR";
+        /**
+         * {"EN": "计划结束日期", "ZH_CN": "计划到", "ZH_TW": "计划结束日期"}。
+         */
+        public static final String PLAN_TO = "PLAN_TO";
+        /**
+         * {"EN": "是否已备案", "ZH_CN": "是否已备案", "ZH_TW": "是否已备案"}。
+         */
+        public static final String IS_REGISTERED = "IS_REGISTERED";
+        /**
+         * {"EN": "合同类型", "ZH_CN": "最近备案状态", "ZH_TW": "合同类型"}。
+         */
+        public static final String CC_REGISTERED_STATUS_ID = "CC_REGISTERED_STATUS_ID";
         /**
          * {"EN": "附件", "ZH_CN": "附件", "ZH_TW": "附件"}。
          */
@@ -560,78 +612,6 @@ public class CcPo {
     }
 
     /**
-     * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
-     */
-    private String code;
-
-    /**
-     * 获取：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
-     */
-    public String getCode() {
-        return this.code;
-    }
-
-    /**
-     * 设置：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
-     */
-    public CcPo setCode(String code) {
-        if (this.code == null && code == null) {
-            // 均为null，不做处理。
-        } else if (this.code != null && code != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.code.compareTo(code) != 0) {
-                this.code = code;
-                if (!this.toUpdateCols.contains("CODE")) {
-                    this.toUpdateCols.add("CODE");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.code = code;
-            if (!this.toUpdateCols.contains("CODE")) {
-                this.toUpdateCols.add("CODE");
-            }
-        }
-        return this;
-    }
-
-    /**
-     * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
-     */
-    private String name;
-
-    /**
-     * 获取：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
-     */
-    public CcPo setName(String name) {
-        if (this.name == null && name == null) {
-            // 均为null，不做处理。
-        } else if (this.name != null && name != null) {
-            // 均非null，判定不等，再做处理：
-            if (this.name.compareTo(name) != 0) {
-                this.name = name;
-                if (!this.toUpdateCols.contains("NAME")) {
-                    this.toUpdateCols.add("NAME");
-                }
-            }
-        } else {
-            // 一者为null、一者非null，直接处理：
-            this.name = name;
-            if (!this.toUpdateCols.contains("NAME")) {
-                this.toUpdateCols.add("NAME");
-            }
-        }
-        return this;
-    }
-
-    /**
      * {"EN": "REMARK", "ZH_CN": "备注", "ZH_TW": "繁：备注"}。
      */
     private String remark;
@@ -734,6 +714,294 @@ public class CcPo {
             this.iconFileGroupId = iconFileGroupId;
             if (!this.toUpdateCols.contains("ICON_FILE_GROUP_ID")) {
                 this.toUpdateCols.add("ICON_FILE_GROUP_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "合同金额（元）", "ZH_CN": "结算金额（元）", "ZH_TW": "合同金额（元）"}。
+     */
+    private BigDecimal settlementAmt;
+
+    /**
+     * 获取：{"EN": "合同金额（元）", "ZH_CN": "结算金额（元）", "ZH_TW": "合同金额（元）"}。
+     */
+    public BigDecimal getSettlementAmt() {
+        return this.settlementAmt;
+    }
+
+    /**
+     * 设置：{"EN": "合同金额（元）", "ZH_CN": "结算金额（元）", "ZH_TW": "合同金额（元）"}。
+     */
+    public CcPo setSettlementAmt(BigDecimal settlementAmt) {
+        if (this.settlementAmt == null && settlementAmt == null) {
+            // 均为null，不做处理。
+        } else if (this.settlementAmt != null && settlementAmt != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.settlementAmt.compareTo(settlementAmt) != 0) {
+                this.settlementAmt = settlementAmt;
+                if (!this.toUpdateCols.contains("SETTLEMENT_AMT")) {
+                    this.toUpdateCols.add("SETTLEMENT_AMT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.settlementAmt = settlementAmt;
+            if (!this.toUpdateCols.contains("SETTLEMENT_AMT")) {
+                this.toUpdateCols.add("SETTLEMENT_AMT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "合同创建人", "ZH_CN": "合同创建人", "ZH_TW": "合同创建人"}。
+     */
+    private String ccBidCreateUserId;
+
+    /**
+     * 获取：{"EN": "合同创建人", "ZH_CN": "合同创建人", "ZH_TW": "合同创建人"}。
+     */
+    public String getCcBidCreateUserId() {
+        return this.ccBidCreateUserId;
+    }
+
+    /**
+     * 设置：{"EN": "合同创建人", "ZH_CN": "合同创建人", "ZH_TW": "合同创建人"}。
+     */
+    public CcPo setCcBidCreateUserId(String ccBidCreateUserId) {
+        if (this.ccBidCreateUserId == null && ccBidCreateUserId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccBidCreateUserId != null && ccBidCreateUserId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccBidCreateUserId.compareTo(ccBidCreateUserId) != 0) {
+                this.ccBidCreateUserId = ccBidCreateUserId;
+                if (!this.toUpdateCols.contains("CC_BID_CREATE_USER_ID")) {
+                    this.toUpdateCols.add("CC_BID_CREATE_USER_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccBidCreateUserId = ccBidCreateUserId;
+            if (!this.toUpdateCols.contains("CC_BID_CREATE_USER_ID")) {
+                this.toUpdateCols.add("CC_BID_CREATE_USER_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "币种", "ZH_CN": "币种", "ZH_TW": "币种"}。
+     */
+    private String ccCurrencyTypeId;
+
+    /**
+     * 获取：{"EN": "币种", "ZH_CN": "币种", "ZH_TW": "币种"}。
+     */
+    public String getCcCurrencyTypeId() {
+        return this.ccCurrencyTypeId;
+    }
+
+    /**
+     * 设置：{"EN": "币种", "ZH_CN": "币种", "ZH_TW": "币种"}。
+     */
+    public CcPo setCcCurrencyTypeId(String ccCurrencyTypeId) {
+        if (this.ccCurrencyTypeId == null && ccCurrencyTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccCurrencyTypeId != null && ccCurrencyTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccCurrencyTypeId.compareTo(ccCurrencyTypeId) != 0) {
+                this.ccCurrencyTypeId = ccCurrencyTypeId;
+                if (!this.toUpdateCols.contains("CC_CURRENCY_TYPE_ID")) {
+                    this.toUpdateCols.add("CC_CURRENCY_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccCurrencyTypeId = ccCurrencyTypeId;
+            if (!this.toUpdateCols.contains("CC_CURRENCY_TYPE_ID")) {
+                this.toUpdateCols.add("CC_CURRENCY_TYPE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     */
+    private String code;
+
+    /**
+     * 获取：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     */
+    public String getCode() {
+        return this.code;
+    }
+
+    /**
+     * 设置：{"EN": "CODE", "ZH_CN": "代码", "ZH_TW": "繁：代码"}。
+     */
+    public CcPo setCode(String code) {
+        if (this.code == null && code == null) {
+            // 均为null，不做处理。
+        } else if (this.code != null && code != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.code.compareTo(code) != 0) {
+                this.code = code;
+                if (!this.toUpdateCols.contains("CODE")) {
+                    this.toUpdateCols.add("CODE");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.code = code;
+            if (!this.toUpdateCols.contains("CODE")) {
+                this.toUpdateCols.add("CODE");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     */
+    private String ccPrjStructNodeId;
+
+    /**
+     * 获取：{"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     */
+    public String getCcPrjStructNodeId() {
+        return this.ccPrjStructNodeId;
+    }
+
+    /**
+     * 设置：{"EN": "CC_PRJ_STRUCT_NODE_ID", "ZH_CN": "项目结构节点", "ZH_TW": "繁：项目结构节点"}。
+     */
+    public CcPo setCcPrjStructNodeId(String ccPrjStructNodeId) {
+        if (this.ccPrjStructNodeId == null && ccPrjStructNodeId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPrjStructNodeId != null && ccPrjStructNodeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPrjStructNodeId.compareTo(ccPrjStructNodeId) != 0) {
+                this.ccPrjStructNodeId = ccPrjStructNodeId;
+                if (!this.toUpdateCols.contains("CC_PRJ_STRUCT_NODE_ID")) {
+                    this.toUpdateCols.add("CC_PRJ_STRUCT_NODE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPrjStructNodeId = ccPrjStructNodeId;
+            if (!this.toUpdateCols.contains("CC_PRJ_STRUCT_NODE_ID")) {
+                this.toUpdateCols.add("CC_PRJ_STRUCT_NODE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     */
+    private String name;
+
+    /**
+     * 获取：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * 设置：{"EN": "NAME", "ZH_CN": "名称", "ZH_TW": "繁：名称"}。
+     */
+    public CcPo setName(String name) {
+        if (this.name == null && name == null) {
+            // 均为null，不做处理。
+        } else if (this.name != null && name != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.name.compareTo(name) != 0) {
+                this.name = name;
+                if (!this.toUpdateCols.contains("NAME")) {
+                    this.toUpdateCols.add("NAME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.name = name;
+            if (!this.toUpdateCols.contains("NAME")) {
+                this.toUpdateCols.add("NAME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "责任单位", "ZH_CN": "项目单位", "ZH_TW": "责任单位"}。
+     */
+    private String projectUnit;
+
+    /**
+     * 获取：{"EN": "责任单位", "ZH_CN": "项目单位", "ZH_TW": "责任单位"}。
+     */
+    public String getProjectUnit() {
+        return this.projectUnit;
+    }
+
+    /**
+     * 设置：{"EN": "责任单位", "ZH_CN": "项目单位", "ZH_TW": "责任单位"}。
+     */
+    public CcPo setProjectUnit(String projectUnit) {
+        if (this.projectUnit == null && projectUnit == null) {
+            // 均为null，不做处理。
+        } else if (this.projectUnit != null && projectUnit != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.projectUnit.compareTo(projectUnit) != 0) {
+                this.projectUnit = projectUnit;
+                if (!this.toUpdateCols.contains("PROJECT_UNIT")) {
+                    this.toUpdateCols.add("PROJECT_UNIT");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.projectUnit = projectUnit;
+            if (!this.toUpdateCols.contains("PROJECT_UNIT")) {
+                this.toUpdateCols.add("PROJECT_UNIT");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "合同类型", "ZH_CN": "合同类型", "ZH_TW": "合同类型"}。
+     */
+    private String ccPoTypeId;
+
+    /**
+     * 获取：{"EN": "合同类型", "ZH_CN": "合同类型", "ZH_TW": "合同类型"}。
+     */
+    public String getCcPoTypeId() {
+        return this.ccPoTypeId;
+    }
+
+    /**
+     * 设置：{"EN": "合同类型", "ZH_CN": "合同类型", "ZH_TW": "合同类型"}。
+     */
+    public CcPo setCcPoTypeId(String ccPoTypeId) {
+        if (this.ccPoTypeId == null && ccPoTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPoTypeId != null && ccPoTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPoTypeId.compareTo(ccPoTypeId) != 0) {
+                this.ccPoTypeId = ccPoTypeId;
+                if (!this.toUpdateCols.contains("CC_PO_TYPE_ID")) {
+                    this.toUpdateCols.add("CC_PO_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPoTypeId = ccPoTypeId;
+            if (!this.toUpdateCols.contains("CC_PO_TYPE_ID")) {
+                this.toUpdateCols.add("CC_PO_TYPE_ID");
             }
         }
         return this;
@@ -956,6 +1224,42 @@ public class CcPo {
     }
 
     /**
+     * {"EN": "招标参与方式", "ZH_CN": "招标参与方式", "ZH_TW": "招标参与方式"}。
+     */
+    private String ccBidParticipateTypeId;
+
+    /**
+     * 获取：{"EN": "招标参与方式", "ZH_CN": "招标参与方式", "ZH_TW": "招标参与方式"}。
+     */
+    public String getCcBidParticipateTypeId() {
+        return this.ccBidParticipateTypeId;
+    }
+
+    /**
+     * 设置：{"EN": "招标参与方式", "ZH_CN": "招标参与方式", "ZH_TW": "招标参与方式"}。
+     */
+    public CcPo setCcBidParticipateTypeId(String ccBidParticipateTypeId) {
+        if (this.ccBidParticipateTypeId == null && ccBidParticipateTypeId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccBidParticipateTypeId != null && ccBidParticipateTypeId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccBidParticipateTypeId.compareTo(ccBidParticipateTypeId) != 0) {
+                this.ccBidParticipateTypeId = ccBidParticipateTypeId;
+                if (!this.toUpdateCols.contains("CC_BID_PARTICIPATE_TYPE_ID")) {
+                    this.toUpdateCols.add("CC_BID_PARTICIPATE_TYPE_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccBidParticipateTypeId = ccBidParticipateTypeId;
+            if (!this.toUpdateCols.contains("CC_BID_PARTICIPATE_TYPE_ID")) {
+                this.toUpdateCols.add("CC_BID_PARTICIPATE_TYPE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
      * {"EN": "业务日期", "ZH_CN": "业务日期", "ZH_TW": "业务日期"}。
      */
     private LocalDate trxDate;
@@ -1094,6 +1398,222 @@ public class CcPo {
             this.ccPrjCbsTempalteNodeId = ccPrjCbsTempalteNodeId;
             if (!this.toUpdateCols.contains("CC_PRJ_CBS_TEMPALTE_NODE_ID")) {
                 this.toUpdateCols.add("CC_PRJ_CBS_TEMPALTE_NODE_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "进展状态", "ZH_CN": "进度状态", "ZH_TW": "进展状态"}。
+     */
+    private String ccWbsStatusId;
+
+    /**
+     * 获取：{"EN": "进展状态", "ZH_CN": "进度状态", "ZH_TW": "进展状态"}。
+     */
+    public String getCcWbsStatusId() {
+        return this.ccWbsStatusId;
+    }
+
+    /**
+     * 设置：{"EN": "进展状态", "ZH_CN": "进度状态", "ZH_TW": "进展状态"}。
+     */
+    public CcPo setCcWbsStatusId(String ccWbsStatusId) {
+        if (this.ccWbsStatusId == null && ccWbsStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccWbsStatusId != null && ccWbsStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccWbsStatusId.compareTo(ccWbsStatusId) != 0) {
+                this.ccWbsStatusId = ccWbsStatusId;
+                if (!this.toUpdateCols.contains("CC_WBS_STATUS_ID")) {
+                    this.toUpdateCols.add("CC_WBS_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccWbsStatusId = ccWbsStatusId;
+            if (!this.toUpdateCols.contains("CC_WBS_STATUS_ID")) {
+                this.toUpdateCols.add("CC_WBS_STATUS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "合同状态", "ZH_CN": "合同状态", "ZH_TW": "合同状态"}。
+     */
+    private String ccPoStatusId;
+
+    /**
+     * 获取：{"EN": "合同状态", "ZH_CN": "合同状态", "ZH_TW": "合同状态"}。
+     */
+    public String getCcPoStatusId() {
+        return this.ccPoStatusId;
+    }
+
+    /**
+     * 设置：{"EN": "合同状态", "ZH_CN": "合同状态", "ZH_TW": "合同状态"}。
+     */
+    public CcPo setCcPoStatusId(String ccPoStatusId) {
+        if (this.ccPoStatusId == null && ccPoStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPoStatusId != null && ccPoStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPoStatusId.compareTo(ccPoStatusId) != 0) {
+                this.ccPoStatusId = ccPoStatusId;
+                if (!this.toUpdateCols.contains("CC_PO_STATUS_ID")) {
+                    this.toUpdateCols.add("CC_PO_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPoStatusId = ccPoStatusId;
+            if (!this.toUpdateCols.contains("CC_PO_STATUS_ID")) {
+                this.toUpdateCols.add("CC_PO_STATUS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "计划开始日期", "ZH_CN": "计划从", "ZH_TW": "计划开始日期"}。
+     */
+    private LocalDate planFr;
+
+    /**
+     * 获取：{"EN": "计划开始日期", "ZH_CN": "计划从", "ZH_TW": "计划开始日期"}。
+     */
+    public LocalDate getPlanFr() {
+        return this.planFr;
+    }
+
+    /**
+     * 设置：{"EN": "计划开始日期", "ZH_CN": "计划从", "ZH_TW": "计划开始日期"}。
+     */
+    public CcPo setPlanFr(LocalDate planFr) {
+        if (this.planFr == null && planFr == null) {
+            // 均为null，不做处理。
+        } else if (this.planFr != null && planFr != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planFr.compareTo(planFr) != 0) {
+                this.planFr = planFr;
+                if (!this.toUpdateCols.contains("PLAN_FR")) {
+                    this.toUpdateCols.add("PLAN_FR");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planFr = planFr;
+            if (!this.toUpdateCols.contains("PLAN_FR")) {
+                this.toUpdateCols.add("PLAN_FR");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "计划结束日期", "ZH_CN": "计划到", "ZH_TW": "计划结束日期"}。
+     */
+    private LocalDate planTo;
+
+    /**
+     * 获取：{"EN": "计划结束日期", "ZH_CN": "计划到", "ZH_TW": "计划结束日期"}。
+     */
+    public LocalDate getPlanTo() {
+        return this.planTo;
+    }
+
+    /**
+     * 设置：{"EN": "计划结束日期", "ZH_CN": "计划到", "ZH_TW": "计划结束日期"}。
+     */
+    public CcPo setPlanTo(LocalDate planTo) {
+        if (this.planTo == null && planTo == null) {
+            // 均为null，不做处理。
+        } else if (this.planTo != null && planTo != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.planTo.compareTo(planTo) != 0) {
+                this.planTo = planTo;
+                if (!this.toUpdateCols.contains("PLAN_TO")) {
+                    this.toUpdateCols.add("PLAN_TO");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.planTo = planTo;
+            if (!this.toUpdateCols.contains("PLAN_TO")) {
+                this.toUpdateCols.add("PLAN_TO");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "是否已备案", "ZH_CN": "是否已备案", "ZH_TW": "是否已备案"}。
+     */
+    private Boolean isRegistered;
+
+    /**
+     * 获取：{"EN": "是否已备案", "ZH_CN": "是否已备案", "ZH_TW": "是否已备案"}。
+     */
+    public Boolean getIsRegistered() {
+        return this.isRegistered;
+    }
+
+    /**
+     * 设置：{"EN": "是否已备案", "ZH_CN": "是否已备案", "ZH_TW": "是否已备案"}。
+     */
+    public CcPo setIsRegistered(Boolean isRegistered) {
+        if (this.isRegistered == null && isRegistered == null) {
+            // 均为null，不做处理。
+        } else if (this.isRegistered != null && isRegistered != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.isRegistered.compareTo(isRegistered) != 0) {
+                this.isRegistered = isRegistered;
+                if (!this.toUpdateCols.contains("IS_REGISTERED")) {
+                    this.toUpdateCols.add("IS_REGISTERED");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.isRegistered = isRegistered;
+            if (!this.toUpdateCols.contains("IS_REGISTERED")) {
+                this.toUpdateCols.add("IS_REGISTERED");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "合同类型", "ZH_CN": "最近备案状态", "ZH_TW": "合同类型"}。
+     */
+    private String ccRegisteredStatusId;
+
+    /**
+     * 获取：{"EN": "合同类型", "ZH_CN": "最近备案状态", "ZH_TW": "合同类型"}。
+     */
+    public String getCcRegisteredStatusId() {
+        return this.ccRegisteredStatusId;
+    }
+
+    /**
+     * 设置：{"EN": "合同类型", "ZH_CN": "最近备案状态", "ZH_TW": "合同类型"}。
+     */
+    public CcPo setCcRegisteredStatusId(String ccRegisteredStatusId) {
+        if (this.ccRegisteredStatusId == null && ccRegisteredStatusId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccRegisteredStatusId != null && ccRegisteredStatusId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccRegisteredStatusId.compareTo(ccRegisteredStatusId) != 0) {
+                this.ccRegisteredStatusId = ccRegisteredStatusId;
+                if (!this.toUpdateCols.contains("CC_REGISTERED_STATUS_ID")) {
+                    this.toUpdateCols.add("CC_REGISTERED_STATUS_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccRegisteredStatusId = ccRegisteredStatusId;
+            if (!this.toUpdateCols.contains("CC_REGISTERED_STATUS_ID")) {
+                this.toUpdateCols.add("CC_REGISTERED_STATUS_ID");
             }
         }
         return this;
