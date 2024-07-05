@@ -6,6 +6,7 @@ import com.pms.bid.job.domain.zhanJiang.CcDevicePurchaseData;
 import com.pms.bid.job.mapper.zhanJiang.CcDevicePurchaseDataMapper;
 import com.pms.bid.job.mapper.zhanJiang.CcPrjStructNodeMapper;
 import com.pms.bid.job.service.zhanJiang.CcDevicePurchaseDataService;
+import com.pms.bid.job.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -41,10 +42,10 @@ public class CcDevicePurchaseDataServiceImpl implements CcDevicePurchaseDataServ
                 //  根据设备位号判断是否存在
                 String id = ccDevicePurchaseDataMapper.queryIdByDeviceCode(tmp.getDeviceTagNo());
                 if (!StringUtils.hasText(id)) { //  新增
-                    createDevice(tmp,message,now,createBy);
+                    createDevice(tmp, JsonUtil.toJson(tmp),now,createBy);
                     log.info("[qc-device-cj-output]新增成功。{}",message);
                 } else {
-                    updateDeviceById(tmp,message,id,now,createBy);
+                    updateDeviceById(tmp,JsonUtil.toJson(tmp),id,now,createBy);
                     log.info("[qc-device-cj-output]修改成功。{}",message);
                 }
             }
