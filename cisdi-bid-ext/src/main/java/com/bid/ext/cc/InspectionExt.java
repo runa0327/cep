@@ -223,7 +223,7 @@ public class InspectionExt {
 
         // 获取当前
         MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
-        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select t.id task_id,t.WF_PROCESS_INSTANCE_ID,t.WF_NODE_INSTANCE_ID,n.id node_id,n.code node_code,n.name->>'$.ZH_CN' node_name,t.WF_TASK_TYPE_ID,u.id user_id,u.name->>'$.ZH_CN' user_name,u.EXTRA_INFO user_EXTRA_INFO,state.code current_state_code,state.name->>'$.ZH_CN' current_state_name,n.AD_VIEW_ID,sn.name pbs_node_name,i.RECTIFICATION_PERIOD from wf_task t join ad_user u on t.WF_NODE_INSTANCE_ID=? and t.ad_user_id=u.id join cc_qs_inspection i on i.id=? join cc_qs_current_state state on i.CC_QS_CURRENT_STATE_ID=state.id join wf_node n on t.WF_NODE_ID=n.id join CC_PRJ_STRUCT_NODE sn on sn.id=i.CC_PRJ_STRUCT_NODE_ID", nodeInstId, csCommId);
+        List<Map<String, Object>> list = myJdbcTemplate.queryForList("select t.id task_id,t.WF_PROCESS_INSTANCE_ID,t.WF_NODE_INSTANCE_ID,n.id node_id,n.code node_code,n.name->>'$.ZH_CN' node_name,t.WF_TASK_TYPE_ID,u.id user_id,u.name->>'$.ZH_CN' user_name,u.EXTRA_INFO user_EXTRA_INFO,state.code current_state_code,state.name->>'$.ZH_CN' current_state_name,n.AD_VIEW_ID,sn.name pbs_node_name,i.RECTIFICATION_PERIOD from wf_task t join ad_user u on t.WF_NODE_INSTANCE_ID=? and t.WF_TASK_TYPE_ID='TODO' and t.ad_user_id=u.id join cc_qs_inspection i on i.id=? join cc_qs_current_state state on i.CC_QS_CURRENT_STATE_ID=state.id join wf_node n on t.WF_NODE_ID=n.id join CC_PRJ_STRUCT_NODE sn on sn.id=i.CC_PRJ_STRUCT_NODE_ID", nodeInstId, csCommId);
         return list;
     }
 
@@ -257,9 +257,18 @@ public class InspectionExt {
 
     public static final String REDIS_KEY = "WxAccessToken";
 
-    public static final String APP_ID = ((Supplier<String>) () -> "wxe07").get();
-    public static final String SECRET = ((Supplier<String>) () -> "ea81").get();
-    public static final String TEMPLATE_ID = ((Supplier<String>) () -> "iR9").get();
+    /**
+     * 微信服务号“赛迪工程咨询数字化”的APP_ID。
+     */
+    public static final String APP_ID = ((Supplier<String>) () -> "wx96e1567c48592909").get();
+    /**
+     * 微信服务号“赛迪工程咨询数字化”的SECRET。
+     */
+    public static final String SECRET = ((Supplier<String>) () -> "bb863dc7f18175cae068ca6ffed3a3f6").get();
+    /**
+     * 微信服务号“赛迪工程咨询数字化”的“项目巡查结果通知”模板的TEMPLATE_ID。
+     */
+    public static final String TEMPLATE_ID = ((Supplier<String>) () -> "pQQNri9f70e1I6YOH_oNQA8wKZ8KxA2A5N5dBz4rETs").get();
 
     private void sendTemplateMessage(String openId, String taskId, String viewId, String entityRecordId, String pbsNodeName, String rectificationPeriod, String currentStateName) {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
