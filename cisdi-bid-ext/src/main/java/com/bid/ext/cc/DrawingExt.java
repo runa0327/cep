@@ -35,11 +35,20 @@ public class DrawingExt {
             CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
 
             String ccSteelOwnerDrawingId = ccDrawingManagement.getCcSteelOwnerDrawingId();
-            String lastFourthChar = "";
-            if (ccSteelOwnerDrawingId != null && ccSteelOwnerDrawingId.length() >= 4) {
-                lastFourthChar = String.valueOf(ccSteelOwnerDrawingId.charAt(ccSteelOwnerDrawingId.length() - 4));
+            String lastLetter = "";
+            if (ccSteelOwnerDrawingId != null && ccSteelOwnerDrawingId.length() > 0) {
+                for (int i = ccSteelOwnerDrawingId.length() - 1; i >= 0; i--) {
+                    char c = ccSteelOwnerDrawingId.charAt(i);
+                    if (Character.isLetter(c)) {
+                        lastLetter = String.valueOf(c);
+                        break;
+                    }
+                }
             }
-            ccDrawingManagement.setCcPrjProfessionalCodeId(lastFourthChar);
+            CcPrjProfessionalCode ccPrjProfessionalCode = CcPrjProfessionalCode.selectById(ccSteelOwnerDrawingId);
+            if (!SharedUtil.isEmpty(ccPrjProfessionalCode)) {
+                ccDrawingManagement.setCcPrjProfessionalCodeId(lastLetter);
+            }
 
             Map<String, Object> valueMap = entityRecord.valueMap;
             String actDate = JdbcMapUtil.getString(valueMap, "ACT_DATE");
