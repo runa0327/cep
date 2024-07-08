@@ -45,7 +45,7 @@ public class DrawingExt {
                     }
                 }
             }
-            CcPrjProfessionalCode ccPrjProfessionalCode = CcPrjProfessionalCode.selectById(ccSteelOwnerDrawingId);
+            CcPrjProfessionalCode ccPrjProfessionalCode = CcPrjProfessionalCode.selectById(lastLetter);
             if (!SharedUtil.isEmpty(ccPrjProfessionalCode)) {
                 ccDrawingManagement.setCcPrjProfessionalCodeId(lastLetter);
             }
