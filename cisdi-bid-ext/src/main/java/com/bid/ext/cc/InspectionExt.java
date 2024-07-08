@@ -283,7 +283,9 @@ public class InspectionExt {
         requestMap.put("template_id", TEMPLATE_ID);
         requestMap.put("client_msg_id", taskId);
 
+        // 企业管理云的IP：
         // pageUrl = "http://121.5.62.215/vue/#";
+
         String url = pageUrl + "/?type=ACCESS&orgId=" + currentOrgId + "&hideTitleBar=true&hideMenu=true&viewId=" + viewId + "&viewComponent=DETAIL_VIEW&title=%E6%9F%A5%E7%9C%8B%EF%BC%9A%E8%B4%A8%E5%AE%89%E5%B7%A1%E6%A3%80&id=" + entityRecordId;
         requestMap.put("url", url);
 
