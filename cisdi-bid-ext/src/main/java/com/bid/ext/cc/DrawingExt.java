@@ -270,10 +270,18 @@ public class DrawingExt {
 
                 String ccConstructionDrawingId = getStringCellValue(row.getCell(5));
                 String ccSteelOwnerDrawingId = getStringCellValue(row.getCell(6));
-                String lastFourthChar = "";
-                if (ccSteelOwnerDrawingId != null && ccSteelOwnerDrawingId.length() >= 4) {
-                    lastFourthChar = String.valueOf(ccSteelOwnerDrawingId.charAt(ccSteelOwnerDrawingId.length() - 4));
+                String lastLetter = "";
+                if (ccSteelOwnerDrawingId != null && ccSteelOwnerDrawingId.length() > 0) {
+                    for (int j = ccSteelOwnerDrawingId.length() - 1; j >= 0; j--) {
+                        char c = ccSteelOwnerDrawingId.charAt(j);
+                        if (Character.isLetter(c)) {
+                            lastLetter = String.valueOf(c);
+                            break;
+                        }
+                    }
                 }
+                CcPrjProfessionalCode ccPrjProfessionalCode = CcPrjProfessionalCode.selectById(lastLetter);
+
 
                 CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_CONSTRUCTION_DRAWING_ID, ccConstructionDrawingId));
                 if (SharedUtil.isEmpty(ccDrawingManagement)) {
@@ -287,7 +295,9 @@ public class DrawingExt {
                     drawingManagement.setName(getStringCellValue(row.getCell(4)));
                     drawingManagement.setCcConstructionDrawingId(ccConstructionDrawingId);
                     drawingManagement.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
-                    drawingManagement.setCcPrjProfessionalCodeId(lastFourthChar);
+                    if (!SharedUtil.isEmpty(ccPrjProfessionalCode)) {
+                        drawingManagement.setCcPrjProfessionalCodeId(lastLetter);
+                    }
                     drawingManagement.setPlanDate(getLocalDateCellValue(row.getCell(7)));
                     drawingManagement.setActDate(actDate);
                     drawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
@@ -325,7 +335,9 @@ public class DrawingExt {
                     ccDrawingManagement.setName(getStringCellValue(row.getCell(4)));
                     ccDrawingManagement.setCcConstructionDrawingId(getStringCellValue(row.getCell(5)));
                     ccDrawingManagement.setCcSteelOwnerDrawingId(getStringCellValue(row.getCell(6)));
-                    ccDrawingManagement.setCcPrjProfessionalCodeId(lastFourthChar);
+                    if (!SharedUtil.isEmpty(ccPrjProfessionalCode)) {
+                        ccDrawingManagement.setCcPrjProfessionalCodeId(lastLetter);
+                    }
                     ccDrawingManagement.setPlanDate(getLocalDateCellValue(row.getCell(7)));
                     ccDrawingManagement.setActDate(actDate);
                     ccDrawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
