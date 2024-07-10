@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -120,7 +121,11 @@ public class TestExt {
                         break;
                 }
 
+
                 CcPo ccPo = CcPo.selectOneByWhere(new Where().eq(CcPo.Cols.CODE, bidCode));
+                LocalDate trxDate = getStringCellValue(row.getCell(9)) == null || getStringCellValue(row.getCell(9)).isEmpty() ? LocalDate.now() : getLocalDateCellValue(row.getCell(9));
+                LocalDate planFr = getStringCellValue(row.getCell(12)) == null || getStringCellValue(row.getCell(12)).isEmpty() ? LocalDate.now() : getLocalDateCellValue(row.getCell(12));
+                LocalDate planTo = getStringCellValue(row.getCell(13)) == null || getStringCellValue(row.getCell(13)).isEmpty() ? LocalDate.now() : getLocalDateCellValue(row.getCell(13));
                 if (SharedUtil.isEmpty(ccPo)) {
 
                     CcPo po = CcPo.newData();
@@ -133,11 +138,11 @@ public class TestExt {
                     po.setCcCurrencyTypeId(ccCurrencyTypeId);
                     po.setProjectUnit(projectUnit);
                     po.setPartyB(partyB);
-                    po.setTrxDate(getLocalDateCellValue(row.getCell(9)));
+                    po.setTrxDate(trxDate);
                     po.setCcPoTypeId(ccPoTypeId);
                     po.setCcPoStatusId(ccPoStatusId);
-                    po.setPlanFr(getLocalDateCellValue(row.getCell(12)));
-                    po.setPlanTo(getLocalDateCellValue(row.getCell(13)));
+                    po.setPlanFr(planFr);
+                    po.setPlanTo(planTo);
                     po.setCcBidCreateUserId(getStringCellValue(row.getCell(14)));
                     po.setIsRegistered(getBooleanCellValue(row.getCell(15)));
                     po.setCcRegisteredStatusId(ccRegisteredStatusId);
@@ -153,11 +158,11 @@ public class TestExt {
                     ccPo.setCcCurrencyTypeId(ccCurrencyTypeId);
                     ccPo.setProjectUnit(projectUnit);
                     ccPo.setPartyB(partyB);
-                    ccPo.setTrxDate(getLocalDateCellValue(row.getCell(9)));
+                    ccPo.setTrxDate(trxDate);
                     ccPo.setCcPoTypeId(ccPoTypeId);
                     ccPo.setCcPoStatusId(ccPoStatusId);
-                    ccPo.setPlanFr(getLocalDateCellValue(row.getCell(12)));
-                    ccPo.setPlanTo(getLocalDateCellValue(row.getCell(13)));
+                    ccPo.setPlanFr(planFr);
+                    ccPo.setPlanTo(planTo);
                     ccPo.setCcBidCreateUserId(getStringCellValue(row.getCell(14)));
                     ccPo.setIsRegistered(getBooleanCellValue(row.getCell(15)));
                     ccPo.setCcRegisteredStatusId(ccRegisteredStatusId);
