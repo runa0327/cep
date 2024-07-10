@@ -1,6 +1,5 @@
 package com.bid.ext;
 
-import com.bid.ext.model.CcPo;
 import com.bid.ext.model.CcPrjStructNode;
 import com.bid.ext.model.FlFile;
 import com.bid.ext.utils.SysSettingUtil;
@@ -50,25 +49,25 @@ public class TestExt {
                     continue; // 如果为空，跳过该行
                 }
 
-                String bidCode = getStringCellValue(row.getCell(0)); //合同编号
-                String prjStructNodeCode = getStringCellValue(row.getCell(1)); //单元工程编号
+                String bidCode = getStringCellValue(row.getCell(0)); // 合同编号
+                String prjStructNodeCode = getStringCellValue(row.getCell(1)); // 单元工程编号
                 if (prjStructNodeCode != null && prjStructNodeCode.endsWith(".0")) {
                     prjStructNodeCode = prjStructNodeCode.substring(0, prjStructNodeCode.length() - 2);
                 }
                 CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.CODE, prjStructNodeCode));
-                String ccPrjStructNodeId = ccPrjStructNode.getId(); //单元工程名称
-                String ccPrjId = ccPrjStructNode.getCcPrjId(); //项目名称
-                String bidName = getStringCellValue(row.getCell(3)); //合同名称
+                String ccPrjStructNodeId = ccPrjStructNode.getId(); // 单元工程名称
+                String ccPrjId = ccPrjStructNode.getCcPrjId(); // 项目名称
+                String bidName = getStringCellValue(row.getCell(3)); // 合同名称
 
-                String ccCurrencyTypeId = getStringCellValue(row.getCell(6)); //币种
+                String ccCurrencyTypeId = getStringCellValue(row.getCell(6)); // 币种
                 switch (ccCurrencyTypeId) {
                     case "人民币":
                         ccCurrencyTypeId = "CNY";
                         break;
                 }
-                String projectUnit = getStringCellValue(row.getCell(7)); //项目单位
-                String partyB = getStringCellValue(row.getCell(8)); //乙方
-                String ccPoTypeId = getStringCellValue(row.getCell(10)); //合同类型
+                String projectUnit = getStringCellValue(row.getCell(7)); // 项目单位
+                String partyB = getStringCellValue(row.getCell(8)); // 乙方
+                String ccPoTypeId = getStringCellValue(row.getCell(10)); // 合同类型
 
                 switch (ccPoTypeId) {
                     case "技术服务合同":
@@ -94,7 +93,7 @@ public class TestExt {
                         break;
                 }
 
-                String ccPoStatusId = getStringCellValue(row.getCell(11)); //合同状态
+                String ccPoStatusId = getStringCellValue(row.getCell(11)); // 合同状态
                 switch (ccPoStatusId) {
                     case "生效":
                         ccPoStatusId = "Effective";
@@ -110,7 +109,7 @@ public class TestExt {
                         break;
                 }
 
-                String ccRegisteredStatusId = getStringCellValue(row.getCell(16)); //备案状态
+                String ccRegisteredStatusId = getStringCellValue(row.getCell(16)); // 备案状态
                 switch (ccRegisteredStatusId) {
                     case "备案成功":
                         ccRegisteredStatusId = "SUCC";
@@ -120,10 +119,10 @@ public class TestExt {
                         break;
                 }
 
-                CcPo ccPo = CcPo.selectOneByWhere(new Where().eq(CcPo.Cols.CODE, bidCode));
+                CcPo2 ccPo = CcPo2.selectOneByWhere(new Where().eq(CcPo2.Cols.CODE, bidCode));
                 if (SharedUtil.isEmpty(ccPo)) {
 
-                    CcPo po = CcPo.newData();
+                    CcPo2 po = CcPo2.newData();
                     po.setCcPrjId(ccPrjId);
                     po.setCode(bidCode);
                     po.setCcPrjStructNodeId(ccPrjStructNodeId);
