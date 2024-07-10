@@ -182,6 +182,7 @@ public class DrawingExt {
             //若没有实际发图日期则更新套图实际发图日期
             if (SharedUtil.isEmpty(ccDrawingManagement.getActDate())) {
                 ccDrawingManagement.setActDate(LocalDate.parse(pActDate));
+                ccDrawingManagement.setCcDrawingStatusId("DONE");
                 ccDrawingManagement.updateById();
             }
         }
@@ -704,6 +705,7 @@ public class DrawingExt {
                                     //若没有实际发图日期则更新套图实际发图日期
                                     if (SharedUtil.isEmpty(ccDrawingManagement.getActDate())) {
                                         ccDrawingManagement.setActDate(LocalDate.parse(pActDate));
+                                        ccDrawingManagement.setCcDrawingStatusId("DONE");
                                         ccDrawingManagement.updateById();
                                     }
                                 } else {
