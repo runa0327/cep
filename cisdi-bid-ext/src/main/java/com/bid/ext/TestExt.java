@@ -123,9 +123,9 @@ public class TestExt {
 
 
                 CcPo ccPo = CcPo.selectOneByWhere(new Where().eq(CcPo.Cols.CODE, bidCode));
-                LocalDate trxDate = getStringCellValue(row.getCell(9)) == null || getStringCellValue(row.getCell(9)).isEmpty() ? LocalDate.now() : getLocalDateCellValue(row.getCell(9));
-                LocalDate planFr = getStringCellValue(row.getCell(12)) == null || getStringCellValue(row.getCell(12)).isEmpty() ? LocalDate.now() : getLocalDateCellValue(row.getCell(12));
-                LocalDate planTo = getStringCellValue(row.getCell(13)) == null || getStringCellValue(row.getCell(13)).isEmpty() ? LocalDate.now() : getLocalDateCellValue(row.getCell(13));
+                LocalDate trxDate = getStringCellValue(row.getCell(9)) == null || getStringCellValue(row.getCell(9)).isEmpty() ? null : getLocalDateCellValue(row.getCell(9));
+                LocalDate planFr = getStringCellValue(row.getCell(12)) == null || getStringCellValue(row.getCell(12)).isEmpty() ? null : getLocalDateCellValue(row.getCell(12));
+                LocalDate planTo = getStringCellValue(row.getCell(13)) == null || getStringCellValue(row.getCell(13)).isEmpty() ? null : getLocalDateCellValue(row.getCell(13));
                 if (SharedUtil.isEmpty(ccPo)) {
 
                     CcPo po = CcPo.newData();
@@ -138,11 +138,17 @@ public class TestExt {
                     po.setCcCurrencyTypeId(ccCurrencyTypeId);
                     po.setProjectUnit(projectUnit);
                     po.setPartyB(partyB);
-                    po.setTrxDate(trxDate);
+                    if (trxDate != null) {
+                        po.setTrxDate(trxDate);
+                    }
                     po.setCcPoTypeId(ccPoTypeId);
                     po.setCcPoStatusId(ccPoStatusId);
-                    po.setPlanFr(planFr);
-                    po.setPlanTo(planTo);
+                    if (planFr != null) {
+                        po.setPlanFr(planFr);
+                    }
+                    if (planTo != null) {
+                        po.setPlanTo(planTo);
+                    }
                     po.setCcBidCreateUserId(getStringCellValue(row.getCell(14)));
                     po.setIsRegistered(getBooleanCellValue(row.getCell(15)));
                     po.setCcRegisteredStatusId(ccRegisteredStatusId);
@@ -158,11 +164,17 @@ public class TestExt {
                     ccPo.setCcCurrencyTypeId(ccCurrencyTypeId);
                     ccPo.setProjectUnit(projectUnit);
                     ccPo.setPartyB(partyB);
-                    ccPo.setTrxDate(trxDate);
+                    if (trxDate != null) {
+                        ccPo.setTrxDate(trxDate);
+                    }
                     ccPo.setCcPoTypeId(ccPoTypeId);
                     ccPo.setCcPoStatusId(ccPoStatusId);
-                    ccPo.setPlanFr(planFr);
-                    ccPo.setPlanTo(planTo);
+                    if (planFr != null) {
+                        ccPo.setPlanFr(planFr);
+                    }
+                    if (planTo != null) {
+                        ccPo.setPlanTo(planTo);
+                    }
                     ccPo.setCcBidCreateUserId(getStringCellValue(row.getCell(14)));
                     ccPo.setIsRegistered(getBooleanCellValue(row.getCell(15)));
                     ccPo.setCcRegisteredStatusId(ccRegisteredStatusId);
