@@ -37,8 +37,8 @@ public class ZJConstructionPlanImportExt {
 
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-        String filePath = flFile.getPhysicalLocation();
-//        String filePath = "/Users/hejialun/Documents/副本附件：施工方案计划模板.xlsx";
+//        String filePath = flFile.getPhysicalLocation();
+        String filePath = "/Users/hejialun/Documents/湛江/导入/附件：十七冶施工方案计划模板.xlsx";
 
         if (!("xlsx".equals(flFile.getExt()) || "xls".equals(flFile.getExt())))
             throw new BaseException("请上传'xlsx或xls'格式的Excel文件");
@@ -95,6 +95,9 @@ public class ZJConstructionPlanImportExt {
 
                     //单位工程
                     Cell cell1 = row.getCell(0);
+                    if (cell1==null){
+                        break;
+                    }
                     if (cell1.getCellType() == BLANK) {
                         throw  new BaseException("第"+(row.getRowNum()+1)+"行，'单元工程' 不能为空");
                     }
@@ -161,7 +164,9 @@ public class ZJConstructionPlanImportExt {
 
                     //备注
                     Cell cell8 = row.getCell(7);
-                    constructionPlan.setRemark(getCellValueAsString(cell8));
+                    if(cell8!=null){
+                        constructionPlan.setRemark(getCellValueAsString(cell8));
+                    }
 
                     //公司id
                     String companyId = "";

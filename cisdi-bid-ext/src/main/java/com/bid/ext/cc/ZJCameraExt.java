@@ -40,11 +40,11 @@ import static org.apache.poi.ss.usermodel.CellType.BLANK;
 @Slf4j
 public class ZJCameraExt {
 
-    public static final String   BY_DEVICE_SERIAL = "FE8442716";//宝冶nvr设备序列号
+    public static final String   BY_DEVICE_SERIAL = "K58935056";//宝冶nvr设备序列号
     public static final String   SQY_DEVICE_SERIAL = "FE8442716";//十七冶设备序列号
 
-    public static final String   BY_APP_KEY = "eec61c3049d446959900296c9e52db80";//宝冶设备序列号
-    public static final String   BY_SECRET = "05a6873a8f2dc60734063e1e918e2e9e";//宝冶设备序列号
+    public static final String   BY_APP_KEY = "58e9322fac0e4e2f95f2b59a413c81cd";//宝冶设appKey
+    public static final String   BY_SECRET = "e9fb74f045928950ff10eb1d53358014";//宝冶secret
 
     public static final String   SQY_APP_KEY = "eec61c3049d446959900296c9e52db80";//十七冶appKey
     public static final String   SQY_SECRET = "05a6873a8f2dc60734063e1e918e2e9e";//十七冶secret
