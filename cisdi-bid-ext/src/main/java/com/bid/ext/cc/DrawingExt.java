@@ -119,6 +119,7 @@ public class DrawingExt {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
+            String pActDate = JdbcMapUtil.getString(varMap, "P_ACT_DATE");
 
             Boolean isDefault = (Boolean) varMap.get("P_IS_DEFAULT");
 
@@ -177,6 +178,11 @@ public class DrawingExt {
                 ccDrawingUpload.setCcDrawingManagementId(csCommId);
                 ccDrawingUpload.setName(dspName);
                 ccDrawingUpload.insertById();
+            }
+            //若没有实际发图日期则更新套图实际发图日期
+            if (SharedUtil.isEmpty(ccDrawingManagement.getActDate())) {
+                ccDrawingManagement.setActDate(LocalDate.parse(pActDate));
+                ccDrawingManagement.updateById();
             }
         }
     }
