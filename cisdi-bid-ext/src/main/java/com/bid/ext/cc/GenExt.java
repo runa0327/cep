@@ -170,7 +170,7 @@ public class GenExt {
         }
     }
 
-    public boolean checkFileExists(String path) {
+    public static boolean checkFileExists(String path) {
         File file = new File(path);
         return file.exists();
     }
