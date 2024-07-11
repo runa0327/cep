@@ -30,7 +30,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static com.bid.ext.cc.GenExt.checkFileExists;
 import static com.bid.ext.cc.GenExt.saveWordToFile;
 import static com.bid.ext.utils.ImportValueUtils.*;
 
@@ -54,25 +53,25 @@ public class TestExt {
                     continue; // 如果为空，跳过该行
                 }
 
-                String bidCode = getStringCellValue(row.getCell(0)); // 合同编号
-                String prjStructNodeCode = getStringCellValue(row.getCell(1)); // 单元工程编号
+                String bidCode = getStringCellValue(row.getCell(0)); //合同编号
+                String prjStructNodeCode = getStringCellValue(row.getCell(1)); //单元工程编号
                 if (prjStructNodeCode != null && prjStructNodeCode.endsWith(".0")) {
                     prjStructNodeCode = prjStructNodeCode.substring(0, prjStructNodeCode.length() - 2);
                 }
                 CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.CODE, prjStructNodeCode));
-                String ccPrjStructNodeId = ccPrjStructNode.getId(); // 单元工程名称
-                String ccPrjId = ccPrjStructNode.getCcPrjId(); // 项目名称
-                String bidName = getStringCellValue(row.getCell(3)); // 合同名称
+                String ccPrjStructNodeId = ccPrjStructNode.getId(); //单元工程名称
+                String ccPrjId = ccPrjStructNode.getCcPrjId(); //项目名称
+                String bidName = getStringCellValue(row.getCell(3)); //合同名称
 
-                String ccCurrencyTypeId = getStringCellValue(row.getCell(6)); // 币种
+                String ccCurrencyTypeId = getStringCellValue(row.getCell(6)); //币种
                 switch (ccCurrencyTypeId) {
                     case "人民币":
                         ccCurrencyTypeId = "CNY";
                         break;
                 }
-                String projectUnit = getStringCellValue(row.getCell(7)); // 项目单位
-                String partyB = getStringCellValue(row.getCell(8)); // 乙方
-                String ccPoTypeId = getStringCellValue(row.getCell(10)); // 合同类型
+                String projectUnit = getStringCellValue(row.getCell(7)); //项目单位
+                String partyB = getStringCellValue(row.getCell(8)); //乙方
+                String ccPoTypeId = getStringCellValue(row.getCell(10)); //合同类型
 
                 switch (ccPoTypeId) {
                     case "技术服务合同":
@@ -98,7 +97,7 @@ public class TestExt {
                         break;
                 }
 
-                String ccPoStatusId = getStringCellValue(row.getCell(11)); // 合同状态
+                String ccPoStatusId = getStringCellValue(row.getCell(11)); //合同状态
                 switch (ccPoStatusId) {
                     case "生效":
                         ccPoStatusId = "Effective";
@@ -114,7 +113,7 @@ public class TestExt {
                         break;
                 }
 
-                String ccRegisteredStatusId = getStringCellValue(row.getCell(16)); // 备案状态
+                String ccRegisteredStatusId = getStringCellValue(row.getCell(16)); //备案状态
                 switch (ccRegisteredStatusId) {
                     case "备案成功":
                         ccRegisteredStatusId = "SUCC";
@@ -124,7 +123,11 @@ public class TestExt {
                         break;
                 }
 
-                CcPo2 ccPo = CcPo2.selectOneByWhere(new Where().eq(CcPo2.Cols.CODE, bidCode));
+
+                CcPo2 ccPo = CcPo2.selectOneByWhere(new Where().eq(CcPo.Cols.CODE, bidCode));
+                LocalDate trxDate = getStringCellValue(row.getCell(9)) == null || getStringCellValue(row.getCell(9)).isEmpty() ? null : getLocalDateCellValue(row.getCell(9));
+                LocalDate planFr = getStringCellValue(row.getCell(12)) == null || getStringCellValue(row.getCell(12)).isEmpty() ? null : getLocalDateCellValue(row.getCell(12));
+                LocalDate planTo = getStringCellValue(row.getCell(13)) == null || getStringCellValue(row.getCell(13)).isEmpty() ? null : getLocalDateCellValue(row.getCell(13));
                 if (SharedUtil.isEmpty(ccPo)) {
 
                     CcPo2 po = CcPo2.newData();
@@ -137,11 +140,17 @@ public class TestExt {
                     po.setCcCurrencyTypeId(ccCurrencyTypeId);
                     po.setProjectUnit(projectUnit);
                     po.setPartyB(partyB);
-                    po.setTrxDate(getLocalDateCellValue(row.getCell(9)));
+                    if (trxDate != null) {
+                        po.setTrxDate(trxDate);
+                    }
                     po.setCcPoTypeId(ccPoTypeId);
                     po.setCcPoStatusId(ccPoStatusId);
-                    po.setPlanFr(getLocalDateCellValue(row.getCell(12)));
-                    po.setPlanTo(getLocalDateCellValue(row.getCell(13)));
+                    if (planFr != null) {
+                        po.setPlanFr(planFr);
+                    }
+                    if (planTo != null) {
+                        po.setPlanTo(planTo);
+                    }
                     po.setCcBidCreateUserId(getStringCellValue(row.getCell(14)));
                     po.setIsRegistered(getBooleanCellValue(row.getCell(15)));
                     po.setCcRegisteredStatusId(ccRegisteredStatusId);
@@ -157,11 +166,17 @@ public class TestExt {
                     ccPo.setCcCurrencyTypeId(ccCurrencyTypeId);
                     ccPo.setProjectUnit(projectUnit);
                     ccPo.setPartyB(partyB);
-                    ccPo.setTrxDate(getLocalDateCellValue(row.getCell(9)));
+                    if (trxDate != null) {
+                        ccPo.setTrxDate(trxDate);
+                    }
                     ccPo.setCcPoTypeId(ccPoTypeId);
                     ccPo.setCcPoStatusId(ccPoStatusId);
-                    ccPo.setPlanFr(getLocalDateCellValue(row.getCell(12)));
-                    ccPo.setPlanTo(getLocalDateCellValue(row.getCell(13)));
+                    if (planFr != null) {
+                        ccPo.setPlanFr(planFr);
+                    }
+                    if (planTo != null) {
+                        ccPo.setPlanTo(planTo);
+                    }
                     ccPo.setCcBidCreateUserId(getStringCellValue(row.getCell(14)));
                     ccPo.setIsRegistered(getBooleanCellValue(row.getCell(15)));
                     ccPo.setCcRegisteredStatusId(ccRegisteredStatusId);
@@ -406,6 +421,11 @@ public class TestExt {
             String fileName = myJdbcTemplate.queryForMap(extSql, fileId).get("dsp_name").toString();
             int update = myJdbcTemplate.update("update " + entityCode + " t set t.NAME = ? where t.id=?", fileName, csCommId);
         }
+    }
+
+    public static boolean checkFileExists(String path) {
+        File file = new File(path);
+        return file.exists();
     }
 
 }
