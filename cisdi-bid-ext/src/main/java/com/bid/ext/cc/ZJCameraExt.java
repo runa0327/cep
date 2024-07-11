@@ -54,6 +54,8 @@ public class ZJCameraExt {
     public static final String BY_ACCESS_TOKEN_KEY = "by_access_token";//宝冶tokenKey
     public static final String SQY_ACCESS_TOKEN_KEY = "sqy_access_token";//十七冶tokenKey
 
+    
+
     /**
      * 获取湛江十七冶摄像头列表
      */
@@ -78,7 +80,7 @@ public class ZJCameraExt {
     public  void  getSqyAccessToken(){
         String value = getToken("sqy");
         Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("token", value);//考勤区名称
+        resultMap.put("token", value);//
 
         ExtJarHelper.setReturnValue(resultMap);
     }
@@ -89,7 +91,7 @@ public class ZJCameraExt {
     public  void  getByAccessToken(){
         String value = getToken("by");
         Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("token", value);//考勤区名称
+        resultMap.put("token", value);//
         ExtJarHelper.setReturnValue(resultMap);
     }
 
@@ -169,13 +171,7 @@ public class ZJCameraExt {
 
         StringRedisTemplate stringRedisTemplate = ExtJarHelper.getStringRedisTemplate();
 
-        String value = null;
-
-        if("sqy".equals(company)){
-            value = stringRedisTemplate.opsForValue().get(SQY_ACCESS_TOKEN_KEY);
-        }else if("by".equals(company)){
-            value = stringRedisTemplate.opsForValue().get(BY_ACCESS_TOKEN_KEY);
-        }
+        String value = getToken(company);
 
 
         // 2、换accessToken：
