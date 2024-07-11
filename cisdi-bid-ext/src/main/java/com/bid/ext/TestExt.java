@@ -6,10 +6,13 @@ import cn.hutool.core.util.ZipUtil;
 import com.bid.ext.model.*;
 import com.bid.ext.utils.SysSettingUtil;
 import com.qygly.ext.jar.helper.ExtJarHelper;
+import com.qygly.ext.jar.helper.MyJdbcTemplate;
 import com.qygly.ext.jar.helper.sql.Where;
 import com.qygly.shared.BaseException;
+import com.qygly.shared.ad.entity.EntityInfo;
 import com.qygly.shared.ad.ext.UrlToOpen;
 import com.qygly.shared.ad.login.LoginInfo;
+import com.qygly.shared.ad.sev.SevInfo;
 import com.qygly.shared.interaction.EntityRecord;
 import com.qygly.shared.interaction.InvokeActResult;
 import com.qygly.shared.util.JdbcMapUtil;
@@ -382,6 +385,26 @@ public class TestExt {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * 同步文件名称
+     */
+    public void syncFileName() {
+        EntityRecord entityRecord = ExtJarHelper.getEntityRecordList().get(0);
+        String csCommId = entityRecord.csCommId;
+        Map<String, Object> valueMap = entityRecord.valueMap;
+        SevInfo sevInfo = ExtJarHelper.getSevInfo();
+        EntityInfo entityInfo = sevInfo.entityInfo;
+        String entityCode = entityInfo.code;
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
+        Object name = valueMap.get("NAME");
+        if (SharedUtil.isEmpty(name)) {
+            String fileId = String.valueOf(valueMap.get("CC_ATTACHMENT"));
+            String extSql = "select f.ext,f.dsp_name from fl_file f where id = ?";
+            String fileName = myJdbcTemplate.queryForMap(extSql, fileId).get("dsp_name").toString();
+            int update = myJdbcTemplate.update("update " + entityCode + " t set t.NAME = ? where t.id=?", fileName, csCommId);
         }
     }
 
