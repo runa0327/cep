@@ -54,7 +54,7 @@ public class ZJCameraExt {
     public static final String BY_ACCESS_TOKEN_KEY = "by_access_token";//宝冶tokenKey
     public static final String SQY_ACCESS_TOKEN_KEY = "sqy_access_token";//十七冶tokenKey
 
-    
+
 
     /**
      * 获取湛江十七冶摄像头列表
@@ -70,7 +70,7 @@ public class ZJCameraExt {
      */
     public void getByDeviceCameraList(){
 
-        Map<String, Object> deviceCameraList = getDeviceCameraList("sqy");
+        Map<String, Object> deviceCameraList = getDeviceCameraList("by");
         ExtJarHelper.setReturnValue(deviceCameraList);
     }
 
