@@ -743,4 +743,19 @@ public class DrawingExt {
             int update = myJdbcTemplate.update("update " + entityCode + " t set t.NAME = ? where t.id=?", fileName, csCommId);
         }
     }
+
+    /**
+     * 更新时检查已有套图号
+     */
+    public void updateCheckDrawing() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            Map<String, Object> valueMap = entityRecord.valueMap;
+            String ccConstructionDrawingId = JdbcMapUtil.getString(valueMap, "CC_CONSTRUCTION_DRAWING_ID");
+            CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_CONSTRUCTION_DRAWING_ID, ccConstructionDrawingId));
+            if (!SharedUtil.isEmpty(ccDrawingManagement)) {
+                throw new BaseException("已存在套图：" + ccConstructionDrawingId + "!");
+            }
+
+        }
+    }
 }

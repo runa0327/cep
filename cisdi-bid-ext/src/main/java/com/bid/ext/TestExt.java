@@ -111,6 +111,9 @@ public class TestExt {
                     case "结案":
                         ccPoStatusId = "Closed";
                         break;
+                    case "关闭(结案)":
+                        ccPoStatusId = "Closed";
+                        break;
                 }
 
                 String ccRegisteredStatusId = getStringCellValue(row.getCell(16)); //备案状态
