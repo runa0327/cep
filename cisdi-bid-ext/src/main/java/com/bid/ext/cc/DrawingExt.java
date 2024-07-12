@@ -570,14 +570,18 @@ public class DrawingExt {
         List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
         for (String attachmentId : ccAttachmentList) {
             FlFile flFile = FlFile.selectById(attachmentId);
-            String dspName = flFile.getDspName(); //获取文件名
+            String dspName = flFile.getDspName(); // 获取文件名
             String name = flFile.getName();
             int index = dspName.indexOf('-');
+
+            if (index == -1) {
+                throw new BaseException("压缩包命名不规范!");
+            }
 
             String ccConstructionDrawingId = dspName.substring(0, index);
             CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_CONSTRUCTION_DRAWING_ID, ccConstructionDrawingId));
             if (SharedUtil.isEmpty(ccDrawingManagement)) {
-                throw new BaseException("套图号：" + ccConstructionDrawingId + "不存在！");
+                throw new BaseException("图纸列表中未找到对应图纸套图号:" + ccConstructionDrawingId + "，请补充图纸列表后再次上传!");
             }
 
             String csCommId = ccDrawingManagement.getId();
