@@ -404,6 +404,9 @@ public class TestExt {
                 }
             }
         }
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
     /**

@@ -721,6 +721,9 @@ public class DrawingExt {
                 }
             }
         }
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
     }
 
 
