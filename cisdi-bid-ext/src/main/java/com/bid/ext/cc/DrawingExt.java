@@ -259,120 +259,124 @@ public class DrawingExt {
                 if (row == null) {
                     continue; // 如果为空，跳过该行
                 }
+                try {
 
-                String prjStructNodeCode = getStringCellValue(row.getCell(1));
-                if (prjStructNodeCode != null && prjStructNodeCode.endsWith(".0")) {
-                    prjStructNodeCode = prjStructNodeCode.substring(0, prjStructNodeCode.length() - 2);
-                }
-                CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.CODE, prjStructNodeCode));
-                String ccPrjStructNodeId = ccPrjStructNode.getId();
-                String ccPrjId = ccPrjStructNode.getCcPrjId();
+                    String prjStructNodeCode = getStringCellValue(row.getCell(1));
+                    if (prjStructNodeCode != null && prjStructNodeCode.endsWith(".0")) {
+                        prjStructNodeCode = prjStructNodeCode.substring(0, prjStructNodeCode.length() - 2);
+                    }
+                    CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.CODE, prjStructNodeCode));
+                    String ccPrjStructNodeId = ccPrjStructNode.getId();
+                    String ccPrjId = ccPrjStructNode.getCcPrjId();
 
-                String drawingType = getStringCellValue(row.getCell(3));
-                String drawingTypeId = null;
-                switch (drawingType) {
-                    case "普通施工图":
-                        drawingTypeId = "common";
-                        break;
-                }
-
-                // 实际发图日期
-                LocalDate actDate = getLocalDateCellValue(row.getCell(8));
-
-                // 三维实际日期
-                LocalDate threeDPlanDate = getLocalDateCellValue(row.getCell(11));
-
-                String ccConstructionDrawingId = getStringCellValue(row.getCell(5));
-                String ccSteelOwnerDrawingId = getStringCellValue(row.getCell(6));
-                String lastLetter = "";
-                if (ccSteelOwnerDrawingId != null && ccSteelOwnerDrawingId.length() > 0) {
-                    for (int j = ccSteelOwnerDrawingId.length() - 1; j >= 0; j--) {
-                        char c = ccSteelOwnerDrawingId.charAt(j);
-                        if (Character.isLetter(c)) {
-                            lastLetter = String.valueOf(c);
+                    String drawingType = getStringCellValue(row.getCell(3));
+                    String drawingTypeId = null;
+                    switch (drawingType) {
+                        case "普通施工图":
+                            drawingTypeId = "common";
                             break;
+                    }
+
+                    // 实际发图日期
+                    LocalDate actDate = getLocalDateCellValue(row.getCell(8));
+
+                    // 三维实际日期
+                    LocalDate threeDPlanDate = getLocalDateCellValue(row.getCell(11));
+
+                    String ccConstructionDrawingId = getStringCellValue(row.getCell(5));
+                    String ccSteelOwnerDrawingId = getStringCellValue(row.getCell(6));
+                    String lastLetter = "";
+                    if (ccSteelOwnerDrawingId != null && ccSteelOwnerDrawingId.length() > 0) {
+                        for (int j = ccSteelOwnerDrawingId.length() - 1; j >= 0; j--) {
+                            char c = ccSteelOwnerDrawingId.charAt(j);
+                            if (Character.isLetter(c)) {
+                                lastLetter = String.valueOf(c);
+                                break;
+                            }
                         }
                     }
-                }
-                CcPrjProfessionalCode ccPrjProfessionalCode = CcPrjProfessionalCode.selectById(lastLetter);
+                    CcPrjProfessionalCode ccPrjProfessionalCode = CcPrjProfessionalCode.selectById(lastLetter);
 
 
-                CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_CONSTRUCTION_DRAWING_ID, ccConstructionDrawingId));
-                if (SharedUtil.isEmpty(ccDrawingManagement)) {
+                    CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_CONSTRUCTION_DRAWING_ID, ccConstructionDrawingId));
+                    if (SharedUtil.isEmpty(ccDrawingManagement)) {
 
-                    CcDrawingManagement drawingManagement = CcDrawingManagement.newData();
+                        CcDrawingManagement drawingManagement = CcDrawingManagement.newData();
 
-                    drawingManagement.setSeqNo(BigDecimal.valueOf(getNumericCellValue(row.getCell(0))));
-                    drawingManagement.setCcPrjId(ccPrjId);
-                    drawingManagement.setCcPrjStructNodeId(ccPrjStructNodeId);
-                    drawingManagement.setCcDrawingTypeId(drawingTypeId);
-                    drawingManagement.setName(getStringCellValue(row.getCell(4)));
-                    drawingManagement.setCcConstructionDrawingId(ccConstructionDrawingId);
-                    drawingManagement.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
-                    if (!SharedUtil.isEmpty(ccPrjProfessionalCode)) {
-                        drawingManagement.setCcPrjProfessionalCodeId(lastLetter);
-                    }
-                    drawingManagement.setPlanDate(getLocalDateCellValue(row.getCell(7)));
-                    drawingManagement.setActDate(actDate);
-                    drawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
-                    drawingManagement.setThreeDPlanDate(getLocalDateCellValue(row.getCell(10)));
-                    drawingManagement.setThreeDActDate(threeDPlanDate);
+                        drawingManagement.setSeqNo(BigDecimal.valueOf(getNumericCellValue(row.getCell(0))));
+                        drawingManagement.setCcPrjId(ccPrjId);
+                        drawingManagement.setCcPrjStructNodeId(ccPrjStructNodeId);
+                        drawingManagement.setCcDrawingTypeId(drawingTypeId);
+                        drawingManagement.setName(getStringCellValue(row.getCell(4)));
+                        drawingManagement.setCcConstructionDrawingId(ccConstructionDrawingId);
+                        drawingManagement.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
+                        if (!SharedUtil.isEmpty(ccPrjProfessionalCode)) {
+                            drawingManagement.setCcPrjProfessionalCodeId(lastLetter);
+                        }
+                        drawingManagement.setPlanDate(getLocalDateCellValue(row.getCell(7)));
+                        drawingManagement.setActDate(actDate);
+                        drawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
+                        drawingManagement.setThreeDPlanDate(getLocalDateCellValue(row.getCell(10)));
+                        drawingManagement.setThreeDActDate(threeDPlanDate);
 
-                    if (SharedUtil.isEmpty(actDate)) {
-                        drawingManagement.setCcDrawingStatusId("TODO");
+                        if (SharedUtil.isEmpty(actDate)) {
+                            drawingManagement.setCcDrawingStatusId("TODO");
+                        } else {
+                            drawingManagement.setCcDrawingStatusId("DONE");
+                        }
+
+                        Boolean isThreeDimensional = getBooleanCellValue(row.getCell(9));
+                        if (isThreeDimensional && SharedUtil.isEmpty(threeDPlanDate)) {
+                            drawingManagement.setCcModelStatusId("TODO");
+                        } else if (isThreeDimensional && !SharedUtil.isEmpty(threeDPlanDate)) {
+                            drawingManagement.setCcModelStatusId("DONE");
+                        } else if (!isThreeDimensional) {
+                            drawingManagement.setCcModelStatusId(null);
+                        }
+                        drawingManagement.insertById();
+
+                        // 初始化套图权限
+                        CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
+                        ccDrawingAuth.setCcDrawingManagementId(drawingManagement.getId());
+                        ccDrawingAuth.setIsView(true);
+                        ccDrawingAuth.setIsUpload(true);
+                        ccDrawingAuth.setAdUserId(userId);
+                        ccDrawingAuth.insertById();
                     } else {
-                        drawingManagement.setCcDrawingStatusId("DONE");
-                    }
+                        ccDrawingManagement.setSeqNo(BigDecimal.valueOf(getNumericCellValue(row.getCell(0))));
+                        ccDrawingManagement.setCcPrjId(ccPrjId);
+                        ccDrawingManagement.setCcPrjStructNodeId(ccPrjStructNodeId);
+                        ccDrawingManagement.setCcDrawingTypeId(drawingTypeId);
+                        ccDrawingManagement.setName(getStringCellValue(row.getCell(4)));
+                        ccDrawingManagement.setCcConstructionDrawingId(getStringCellValue(row.getCell(5)));
+                        ccDrawingManagement.setCcSteelOwnerDrawingId(getStringCellValue(row.getCell(6)));
+                        if (!SharedUtil.isEmpty(ccPrjProfessionalCode)) {
+                            ccDrawingManagement.setCcPrjProfessionalCodeId(lastLetter);
+                        }
+                        ccDrawingManagement.setPlanDate(getLocalDateCellValue(row.getCell(7)));
+                        ccDrawingManagement.setActDate(actDate);
+                        ccDrawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
+                        ccDrawingManagement.setThreeDPlanDate(getLocalDateCellValue(row.getCell(10)));
+                        ccDrawingManagement.setThreeDActDate(threeDPlanDate);
 
-                    Boolean isThreeDimensional = getBooleanCellValue(row.getCell(9));
-                    if (isThreeDimensional && SharedUtil.isEmpty(threeDPlanDate)) {
-                        drawingManagement.setCcModelStatusId("TODO");
-                    } else if (isThreeDimensional && !SharedUtil.isEmpty(threeDPlanDate)) {
-                        drawingManagement.setCcModelStatusId("DONE");
-                    } else if (!isThreeDimensional) {
-                        drawingManagement.setCcModelStatusId(null);
-                    }
-                    drawingManagement.insertById();
+                        if (SharedUtil.isEmpty(actDate)) {
+                            ccDrawingManagement.setCcDrawingStatusId("TODO");
+                        } else {
+                            ccDrawingManagement.setCcDrawingStatusId("DONE");
+                        }
 
-                    // 初始化套图权限
-                    CcDrawingAuth ccDrawingAuth = CcDrawingAuth.newData();
-                    ccDrawingAuth.setCcDrawingManagementId(drawingManagement.getId());
-                    ccDrawingAuth.setIsView(true);
-                    ccDrawingAuth.setIsUpload(true);
-                    ccDrawingAuth.setAdUserId(userId);
-                    ccDrawingAuth.insertById();
-                } else {
-                    ccDrawingManagement.setSeqNo(BigDecimal.valueOf(getNumericCellValue(row.getCell(0))));
-                    ccDrawingManagement.setCcPrjId(ccPrjId);
-                    ccDrawingManagement.setCcPrjStructNodeId(ccPrjStructNodeId);
-                    ccDrawingManagement.setCcDrawingTypeId(drawingTypeId);
-                    ccDrawingManagement.setName(getStringCellValue(row.getCell(4)));
-                    ccDrawingManagement.setCcConstructionDrawingId(getStringCellValue(row.getCell(5)));
-                    ccDrawingManagement.setCcSteelOwnerDrawingId(getStringCellValue(row.getCell(6)));
-                    if (!SharedUtil.isEmpty(ccPrjProfessionalCode)) {
-                        ccDrawingManagement.setCcPrjProfessionalCodeId(lastLetter);
+                        Boolean isThreeDimensional = getBooleanCellValue(row.getCell(9));
+                        if (isThreeDimensional && SharedUtil.isEmpty(threeDPlanDate)) {
+                            ccDrawingManagement.setCcModelStatusId("TODO");
+                        } else if (isThreeDimensional && !SharedUtil.isEmpty(threeDPlanDate)) {
+                            ccDrawingManagement.setCcModelStatusId("DONE");
+                        } else if (!isThreeDimensional) {
+                            ccDrawingManagement.setCcModelStatusId(null);
+                        }
+                        ccDrawingManagement.updateById();
                     }
-                    ccDrawingManagement.setPlanDate(getLocalDateCellValue(row.getCell(7)));
-                    ccDrawingManagement.setActDate(actDate);
-                    ccDrawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
-                    ccDrawingManagement.setThreeDPlanDate(getLocalDateCellValue(row.getCell(10)));
-                    ccDrawingManagement.setThreeDActDate(threeDPlanDate);
-
-                    if (SharedUtil.isEmpty(actDate)) {
-                        ccDrawingManagement.setCcDrawingStatusId("TODO");
-                    } else {
-                        ccDrawingManagement.setCcDrawingStatusId("DONE");
-                    }
-
-                    Boolean isThreeDimensional = getBooleanCellValue(row.getCell(9));
-                    if (isThreeDimensional && SharedUtil.isEmpty(threeDPlanDate)) {
-                        ccDrawingManagement.setCcModelStatusId("TODO");
-                    } else if (isThreeDimensional && !SharedUtil.isEmpty(threeDPlanDate)) {
-                        ccDrawingManagement.setCcModelStatusId("DONE");
-                    } else if (!isThreeDimensional) {
-                        ccDrawingManagement.setCcModelStatusId(null);
-                    }
-                    ccDrawingManagement.updateById();
+                } catch (Exception e) {
+                    throw new BaseException("在第 " + (i + 1) + " 行，第 " + (e.getMessage() + 1) + " 列的单元格格式错误: " + e.getMessage(), e);
                 }
             }
 
