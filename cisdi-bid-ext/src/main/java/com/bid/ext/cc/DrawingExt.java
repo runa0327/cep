@@ -376,7 +376,7 @@ public class DrawingExt {
                         ccDrawingManagement.updateById();
                     }
                 } catch (Exception e) {
-                    throw new BaseException("在第 " + (i + 1) + " 行，第 " + (e.getMessage() + 1) + " 列的单元格格式错误: " + e.getMessage(), e);
+                    throw new BaseException("在第 " + (i + 1) + " 行的单元格格式错误!");
                 }
             }
 
