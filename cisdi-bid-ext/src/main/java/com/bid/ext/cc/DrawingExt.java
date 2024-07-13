@@ -140,11 +140,11 @@ public class DrawingExt {
 
             // 依次判断版本的存在性
             for (String version : versionOrder) {
-                List<CcDrawingUpload> ccDrawingUploads = CcDrawingUpload.selectByWhere(
-                        new Where().eq(CcDrawingUpload.Cols.CC_DRAWING_VERSION_ID, version)
-                                .eq(CcDrawingUpload.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId)
+                List<CcStructDrawingVersion> ccStructDrawingVersions = CcStructDrawingVersion.selectByWhere(
+                        new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_VERSION_ID, version)
+                                .eq(CcStructDrawingVersion.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId)
                 );
-                if (SharedUtil.isEmpty(ccDrawingUploads)) {
+                if (SharedUtil.isEmpty(ccStructDrawingVersions)) {
                     ccDrawingVersionId = version;
                     break;
                 }
