@@ -47,10 +47,10 @@ public class TencentCloudExt {
     //初始化IaiClient
     public static IaiClient iaiClient;
 
-    static {
-        Credential credential = new Credential(SECRET_ID, SECRET_KEY);
-        iaiClient = new IaiClient(credential, REGION);
-    }
+//    static {
+//        Credential credential = new Credential(SECRET_ID, SECRET_KEY);
+//        iaiClient = new IaiClient(credential, REGION);
+//    }
 
 
     //人脸入库
