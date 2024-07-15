@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -37,8 +38,8 @@ public class ZJConstructionPlanImportExt {
 
         //获取上传的excel文件
         FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
-//        String filePath = flFile.getPhysicalLocation();
-        String filePath = "/Users/hejialun/Documents/湛江/导入/附件：十七冶施工方案计划模板.xlsx";
+        String filePath = flFile.getPhysicalLocation();
+//        String filePath = "/Users/hejialun/Documents/湛江/导入/附件：十七冶施工方案计划模板.xlsx";
 
         if (!("xlsx".equals(flFile.getExt()) || "xls".equals(flFile.getExt())))
             throw new BaseException("请上传'xlsx或xls'格式的Excel文件");
@@ -247,6 +248,87 @@ public class ZJConstructionPlanImportExt {
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
+    }
+
+    //导入设基坑备点位数据
+    public void iotPointImport(){
+
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+
+        //获取上传的excel文件
+//        FlFile flFile = FlFile.selectById(varMap.get("P_ATTACHMENT").toString());
+//        String filePath = flFile.getPhysicalLocation();
+        String filePath = "/Users/hejialun/Documents/湛江/基坑点位.xlsx";
+
+
+        try (FileInputStream file = new FileInputStream(new File(filePath))) {
+            Workbook workbook = new XSSFWorkbook(file);
+            Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
+
+            //循环行
+            for (Row row : sheet) {
+                if(row.getRowNum()==0) {
+                    continue;
+                }
+
+                //获取指定列的下标
+                if (row.getRowNum()>0){
+
+                    String  pointName = "";//点名
+                    String   x = ""; //单元工程名称
+                    String  y = ""; //责任人
+                    String  z = ""; //责任人
+
+                    //单位工程
+                    Cell cell1 = row.getCell(0);
+                    pointName = getCellValueAsString(cell1);
+
+
+                    //点名
+                    Cell cell2 = row.getCell(1);
+                    x = getCellValueAsString(cell2);
+
+                    Cell cell3 = row.getCell(2);
+                    y = getCellValueAsString(cell3);
+
+
+                    Cell cell4 = row.getCell(3);
+                    z = getCellValueAsString(cell4);
+
+
+                    Where  queryPoint =  new Where();
+                    queryPoint.sql("T.STATUS = 'AP' AND  T.POINT_NAME = '"+pointName+"'");
+                    CcEquipIot equip = CcEquipIot.selectOneByWhere(queryPoint);
+
+                    if (equip==null){
+                        System.out.println(false);
+                    }else{
+//                        System.out.println(equip.getPointName());
+
+//                        String latFir = y.substring(0,2);
+//                        String latSec = y.substring(2);
+//                        BigDecimal lat =  new BigDecimal(latSec).divide(new BigDecimal("60"),8, RoundingMode.HALF_UP);
+//                        lat = new BigDecimal(latFir).add(lat);
+//
+//                        String lonFir = x.substring(0,3);
+//                        String lonSec = x.substring(3);
+//                        BigDecimal lon =  new BigDecimal(lonSec).divide(new BigDecimal("60"),8,RoundingMode.HALF_UP);
+//                        lon = new BigDecimal(lonFir).add(lon);
+
+                        System.out.println(x+","+y+","+z);
+
+                        equip.setLongitude(new BigDecimal(x));
+                        equip.setLatitude(new BigDecimal(y));
+                        equip.setAltitude(new BigDecimal(z));
+                        equip.updateById();
+
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw  new BaseException("上传文件失败");
+        }
+
     }
 
     private  String getCellValueAsString(Cell cell) {
