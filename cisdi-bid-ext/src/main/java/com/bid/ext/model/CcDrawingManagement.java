@@ -164,6 +164,18 @@ public class CcDrawingManagement {
          * {"EN": "模型状态", "ZH_CN": "模型状态", "ZH_TW": "模型状态"}。
          */
         public static final String CC_MODEL_STATUS_ID = "CC_MODEL_STATUS_ID";
+        /**
+         * {"EN": "项目公司", "ZH_CN": "项目参建方公司", "ZH_TW": "项目公司"}。
+         */
+        public static final String CC_PARTY_COMPANY_ID = "CC_PARTY_COMPANY_ID";
+        /**
+         * {"EN": "从MQ获取消息时间", "ZH_CN": "从MQ获取消息时间", "ZH_TW": "从MQ获取消息时间"}。
+         */
+        public static final String MQ_RECEIVE_DATETIME = "MQ_RECEIVE_DATETIME";
+        /**
+         * {"EN": "从mq获取到的信息", "ZH_CN": "从mq获取到的信息", "ZH_TW": "从mq获取到的信息"}。
+         */
+        public static final String MQ_MSG = "MQ_MSG";
     }
 
     // </editor-fold>
@@ -1210,6 +1222,114 @@ public class CcDrawingManagement {
             this.ccModelStatusId = ccModelStatusId;
             if (!this.toUpdateCols.contains("CC_MODEL_STATUS_ID")) {
                 this.toUpdateCols.add("CC_MODEL_STATUS_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "项目公司", "ZH_CN": "项目参建方公司", "ZH_TW": "项目公司"}。
+     */
+    private String ccPartyCompanyId;
+
+    /**
+     * 获取：{"EN": "项目公司", "ZH_CN": "项目参建方公司", "ZH_TW": "项目公司"}。
+     */
+    public String getCcPartyCompanyId() {
+        return this.ccPartyCompanyId;
+    }
+
+    /**
+     * 设置：{"EN": "项目公司", "ZH_CN": "项目参建方公司", "ZH_TW": "项目公司"}。
+     */
+    public CcDrawingManagement setCcPartyCompanyId(String ccPartyCompanyId) {
+        if (this.ccPartyCompanyId == null && ccPartyCompanyId == null) {
+            // 均为null，不做处理。
+        } else if (this.ccPartyCompanyId != null && ccPartyCompanyId != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.ccPartyCompanyId.compareTo(ccPartyCompanyId) != 0) {
+                this.ccPartyCompanyId = ccPartyCompanyId;
+                if (!this.toUpdateCols.contains("CC_PARTY_COMPANY_ID")) {
+                    this.toUpdateCols.add("CC_PARTY_COMPANY_ID");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.ccPartyCompanyId = ccPartyCompanyId;
+            if (!this.toUpdateCols.contains("CC_PARTY_COMPANY_ID")) {
+                this.toUpdateCols.add("CC_PARTY_COMPANY_ID");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "从MQ获取消息时间", "ZH_CN": "从MQ获取消息时间", "ZH_TW": "从MQ获取消息时间"}。
+     */
+    private LocalDateTime mqReceiveDatetime;
+
+    /**
+     * 获取：{"EN": "从MQ获取消息时间", "ZH_CN": "从MQ获取消息时间", "ZH_TW": "从MQ获取消息时间"}。
+     */
+    public LocalDateTime getMqReceiveDatetime() {
+        return this.mqReceiveDatetime;
+    }
+
+    /**
+     * 设置：{"EN": "从MQ获取消息时间", "ZH_CN": "从MQ获取消息时间", "ZH_TW": "从MQ获取消息时间"}。
+     */
+    public CcDrawingManagement setMqReceiveDatetime(LocalDateTime mqReceiveDatetime) {
+        if (this.mqReceiveDatetime == null && mqReceiveDatetime == null) {
+            // 均为null，不做处理。
+        } else if (this.mqReceiveDatetime != null && mqReceiveDatetime != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.mqReceiveDatetime.compareTo(mqReceiveDatetime) != 0) {
+                this.mqReceiveDatetime = mqReceiveDatetime;
+                if (!this.toUpdateCols.contains("MQ_RECEIVE_DATETIME")) {
+                    this.toUpdateCols.add("MQ_RECEIVE_DATETIME");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.mqReceiveDatetime = mqReceiveDatetime;
+            if (!this.toUpdateCols.contains("MQ_RECEIVE_DATETIME")) {
+                this.toUpdateCols.add("MQ_RECEIVE_DATETIME");
+            }
+        }
+        return this;
+    }
+
+    /**
+     * {"EN": "从mq获取到的信息", "ZH_CN": "从mq获取到的信息", "ZH_TW": "从mq获取到的信息"}。
+     */
+    private String mqMsg;
+
+    /**
+     * 获取：{"EN": "从mq获取到的信息", "ZH_CN": "从mq获取到的信息", "ZH_TW": "从mq获取到的信息"}。
+     */
+    public String getMqMsg() {
+        return this.mqMsg;
+    }
+
+    /**
+     * 设置：{"EN": "从mq获取到的信息", "ZH_CN": "从mq获取到的信息", "ZH_TW": "从mq获取到的信息"}。
+     */
+    public CcDrawingManagement setMqMsg(String mqMsg) {
+        if (this.mqMsg == null && mqMsg == null) {
+            // 均为null，不做处理。
+        } else if (this.mqMsg != null && mqMsg != null) {
+            // 均非null，判定不等，再做处理：
+            if (this.mqMsg.compareTo(mqMsg) != 0) {
+                this.mqMsg = mqMsg;
+                if (!this.toUpdateCols.contains("MQ_MSG")) {
+                    this.toUpdateCols.add("MQ_MSG");
+                }
+            }
+        } else {
+            // 一者为null、一者非null，直接处理：
+            this.mqMsg = mqMsg;
+            if (!this.toUpdateCols.contains("MQ_MSG")) {
+                this.toUpdateCols.add("MQ_MSG");
             }
         }
         return this;

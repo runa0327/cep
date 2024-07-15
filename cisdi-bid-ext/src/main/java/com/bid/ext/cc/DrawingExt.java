@@ -238,6 +238,7 @@ public class DrawingExt {
      * 导入图纸计划
      */
     public void importDrawingPlan() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         String userId = loginInfo.userInfo.id;
 
@@ -297,6 +298,13 @@ public class DrawingExt {
                     }
                     CcPrjProfessionalCode ccPrjProfessionalCode = CcPrjProfessionalCode.selectById(lastLetter);
 
+                    String ccPartyCompanyId = null;
+                    String designUnit = getStringCellValue(row.getCell(12));
+                    String sql = "SELECT t.id FROM cc_party_company t JOIN cc_company c ON c.id = t.cc_company_id JOIN cc_prj_party pp ON pp.id = t.CC_PRJ_PARTY_ID JOIN cc_party p ON pp.CC_PARTY_ID = p.id WHERE c.FULL_NAME ->> '$.ZH_CN' = ? AND p.NAME ->> '$.ZH_CN' = ?";
+                    Map<String, Object> ccPartyCompany = myJdbcTemplate.queryForMap(sql, designUnit, "设计单位");
+                    if (!SharedUtil.isEmpty(ccPartyCompany)) {
+                        ccPartyCompanyId = JdbcMapUtil.getString(ccPartyCompany, "id");
+                    }
 
                     CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_CONSTRUCTION_DRAWING_ID, ccConstructionDrawingId));
                     if (SharedUtil.isEmpty(ccDrawingManagement)) {
@@ -333,6 +341,7 @@ public class DrawingExt {
                         } else if (!isThreeDimensional) {
                             drawingManagement.setCcModelStatusId(null);
                         }
+                        drawingManagement.setCcPartyCompanyId(ccPartyCompanyId);
                         drawingManagement.insertById();
 
                         // 初始化套图权限
@@ -373,6 +382,7 @@ public class DrawingExt {
                         } else if (!isThreeDimensional) {
                             ccDrawingManagement.setCcModelStatusId(null);
                         }
+                        ccDrawingManagement.setCcPartyCompanyId(ccPartyCompanyId);
                         ccDrawingManagement.updateById();
                     }
                 } catch (Exception e) {
