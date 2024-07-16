@@ -776,7 +776,7 @@ public class DrawingExt {
             String ccConstructionDrawingIdOrigin = ccDrawingManagementOrigin.getCcConstructionDrawingId();
             String ccConstructionDrawingId = JdbcMapUtil.getString(valueMap, "CC_CONSTRUCTION_DRAWING_ID");
             CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_CONSTRUCTION_DRAWING_ID, ccConstructionDrawingId));
-            if (ccConstructionDrawingIdOrigin.equals(ccConstructionDrawingId) && !SharedUtil.isEmpty(ccDrawingManagement)) {
+            if (!ccConstructionDrawingIdOrigin.equals(ccConstructionDrawingId) && !SharedUtil.isEmpty(ccDrawingManagement)) {
                 throw new BaseException("已存在套图：" + ccConstructionDrawingId + "!");
             }
 
