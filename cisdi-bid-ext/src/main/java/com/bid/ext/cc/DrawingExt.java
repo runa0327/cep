@@ -771,9 +771,12 @@ public class DrawingExt {
     public void updateCheckDrawing() {
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             Map<String, Object> valueMap = entityRecord.valueMap;
+            String csCommId = entityRecord.csCommId;
+            CcDrawingManagement ccDrawingManagementOrigin = CcDrawingManagement.selectById(csCommId);
+            String ccConstructionDrawingIdOrigin = ccDrawingManagementOrigin.getCcConstructionDrawingId();
             String ccConstructionDrawingId = JdbcMapUtil.getString(valueMap, "CC_CONSTRUCTION_DRAWING_ID");
             CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_CONSTRUCTION_DRAWING_ID, ccConstructionDrawingId));
-            if (!SharedUtil.isEmpty(ccDrawingManagement)) {
+            if (ccConstructionDrawingIdOrigin.equals(ccConstructionDrawingId) && !SharedUtil.isEmpty(ccDrawingManagement)) {
                 throw new BaseException("已存在套图：" + ccConstructionDrawingId + "!");
             }
 
