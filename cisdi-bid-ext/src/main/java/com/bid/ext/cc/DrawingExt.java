@@ -37,6 +37,7 @@ public class DrawingExt {
      * 变更图纸状态
      */
     public void updateDrawingStatus() {
+        MyJdbcTemplate myJdbcTemplate = ExtJarHelper.getMyJdbcTemplate();
         for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
             String csCommId = entityRecord.csCommId;
             CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(csCommId);
@@ -59,7 +60,9 @@ public class DrawingExt {
 
             Map<String, Object> valueMap = entityRecord.valueMap;
             String actDate = JdbcMapUtil.getString(valueMap, "ACT_DATE");
-            if (SharedUtil.isEmpty(actDate)) {
+            String sql = "select 1 from CC_DRAWING_UPLOAD du where du.CC_DRAWING_MANAGEMENT_ID = ?";
+            Map<String, Object> map = myJdbcTemplate.queryForMap(sql, csCommId);
+            if (SharedUtil.isEmpty(map) && SharedUtil.isEmpty(actDate)) {
                 ccDrawingManagement.setCcDrawingStatusId("TODO");
             } else {
                 ccDrawingManagement.setCcDrawingStatusId("DONE");
@@ -74,6 +77,32 @@ public class DrawingExt {
                 ccDrawingManagement.setCcModelStatusId(null);
             }
             ccDrawingManagement.updateById();
+        }
+    }
+
+    /**
+     * 删除项目图纸版本时设置默认版本
+     */
+    public void deleteVersion() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcStructDrawingVersion ccStructDrawingVersion = CcStructDrawingVersion.selectById(csCommId);
+            String ccDrawingManagementId = ccStructDrawingVersion.getCcDrawingManagementId();
+            String ccDrawingVersionId = ccStructDrawingVersion.getCcDrawingVersionId();
+            char currentChar = ccDrawingVersionId.charAt(0);
+            if (currentChar == 'A') {
+                ccDrawingVersionId = null;
+            } else if (currentChar > 'A' && currentChar <= 'G') {
+                char previousChar = (char) (currentChar - 1);
+                ccDrawingVersionId = String.valueOf(previousChar);
+            }
+            List<CcStructDrawingVersion> ccStructDrawingVersions = CcStructDrawingVersion.selectByWhere(new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_MANAGEMENT_ID, ccDrawingManagementId).eq(CcStructDrawingVersion.Cols.CC_DRAWING_VERSION_ID, ccDrawingVersionId));
+            if (!SharedUtil.isEmpty(ccStructDrawingVersions)) {
+                for (CcStructDrawingVersion ccStructDrawingVersion1 : ccStructDrawingVersions) {
+                    ccStructDrawingVersion1.setIsDefault(true);
+                    ccStructDrawingVersion1.updateById();
+                }
+            }
         }
     }
 
