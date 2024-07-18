@@ -210,7 +210,7 @@ public class DrawingExt {
                 ccDrawingUpload.setName(dspName);
                 ccDrawingUpload.insertById();
             }
-            //若没有实际发图日期则更新套图实际发图日期
+            // 若没有实际发图日期则更新套图实际发图日期
             if (SharedUtil.isEmpty(ccDrawingManagement.getActDate())) {
                 ccDrawingManagement.setActDate(LocalDate.parse(pActDate));
                 ccDrawingManagement.setCcDrawingStatusId("DONE");
@@ -286,9 +286,19 @@ public class DrawingExt {
             for (int i = 1; i <= Objects.requireNonNull(sheet).getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 // 检查行是否为空
+                // 3保险：
                 if (row == null) {
-                    continue; // 如果为空，跳过该行
+                    break; // 如果为空，直接跳出。
                 }
+                Cell cell = row.getCell(1);
+                if (cell == null) {
+                    break;
+                }
+                String stringCellValue = getStringCellValue(cell);
+                if (SharedUtil.isEmpty(stringCellValue)) {
+                    break;
+                }
+
                 try {
 
                     String prjStructNodeCode = getStringCellValue(row.getCell(1));
@@ -656,7 +666,7 @@ public class DrawingExt {
             ccStructDrawingVersion.setIsDefault(true);
 
 
-            String zipFilePath = flFile.getOriginFilePhysicalLocation(); //zip文件物理路径
+            String zipFilePath = flFile.getOriginFilePhysicalLocation(); // zip文件物理路径
             // 获取属性：
             Where attWhere = new Where();
             attWhere.eq(AdAtt.Cols.CODE, CcDrawingUpload.Cols.CC_ATTACHMENT);
@@ -704,7 +714,7 @@ public class DrawingExt {
                                 saveWordToFile(fileBytes, path);
                                 boolean fileExists = checkFileExists(path);
                                 if (fileExists) {
-                                    //获取文件属性
+                                    // 获取文件属性
                                     File file0 = new File(path);
                                     long bytes = file0.length();
                                     double kilobytes = bytes / 1024.0;
@@ -730,7 +740,7 @@ public class DrawingExt {
                                     newFile.setIsPublicRead(false);
                                     newFile.insertById();
 
-                                    //分图文件
+                                    // 分图文件
                                     CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
                                     ccDrawingUpload.setCcStructDrawingVersionId(ccStructDrawingVersion.getId());
                                     ccDrawingUpload.setCcAttachment(fileId);
@@ -740,7 +750,7 @@ public class DrawingExt {
                                     ccDrawingUpload.setName(fileName);
                                     ccDrawingUpload.insertById();
 
-                                    //若没有实际发图日期则更新套图实际发图日期
+                                    // 若没有实际发图日期则更新套图实际发图日期
                                     if (SharedUtil.isEmpty(ccDrawingManagement.getActDate())) {
                                         ccDrawingManagement.setActDate(LocalDate.parse(pActDate));
                                         ccDrawingManagement.setCcDrawingStatusId("DONE");
