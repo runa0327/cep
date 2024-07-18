@@ -95,6 +95,29 @@ public class InspectionExt {
     }
 
     /**
+     * 获取巡检复核人
+     */
+    public void getInspectionCheckUser() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+
+            String csCommId = entityRecord.csCommId;
+            CcQsInspection ccQsInspection = CcQsInspection.selectById(csCommId);
+            String ccQsCheckUser = ccQsInspection.getCcQsCheckUser();
+            if (ccQsCheckUser != null && !ccQsCheckUser.isEmpty()) {
+                String[] memberIds = ccQsCheckUser.split(",");
+                ArrayList<String> memberIdList = new ArrayList<>(Arrays.asList(memberIds));
+                ArrayList<String> userIdList = new ArrayList<>();
+                for (String memberId : memberIdList) {
+                    CcPrjMember ccPrjMember = CcPrjMember.selectById(memberId);
+                    String adUserId = ccPrjMember.getAdUserId();
+                    userIdList.add(adUserId);
+                }
+                ExtJarHelper.setReturnValue(userIdList);
+            }
+        }
+    }
+
+    /**
      * 根据巡检类型更改流程名
      */
     public void updateProcessNameByType() {
