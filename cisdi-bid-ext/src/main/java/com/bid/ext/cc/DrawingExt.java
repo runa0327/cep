@@ -682,85 +682,78 @@ public class DrawingExt {
 
             ccStructDrawingVersion.insertById();
 
-            // 遍历解压后的文件夹
-            File[] files = outputDirectory.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    if (!file.isDirectory()) { // 确保是文件，不是目录
-                        try (InputStream inputStream = Files.newInputStream(file.toPath());
-                             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                            // 将文件内容读取到byte数组
-                            IoUtil.copy(inputStream, outputStream);
-                            byte[] fileBytes = outputStream.toByteArray();
-                            if (index != -1) {
-
-                                FlFile newFile = FlFile.newData();
-                                // 将String写入文件，覆盖模式，字符集为UTF-8x``
-                                String fileId = newFile.getId();
-
-                                // 构建文件名和路径
-                                String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
-                                saveWordToFile(fileBytes, path);
-                                boolean fileExists = checkFileExists(path);
-                                if (fileExists) {
-                                    // 获取文件属性
-                                    File file0 = new File(path);
-                                    long bytes = file0.length();
-                                    double kilobytes = bytes / 1024.0;
-                                    String fileName = file.getName();
-
-                                    BigDecimal sizeKb = BigDecimal.valueOf(kilobytes).setScale(9, BigDecimal.ROUND_HALF_UP);
-                                    String dspSize = String.format("%d KB", Math.round(kilobytes));
-                                    newFile.setCrtUserId(loginInfo.userInfo.id);
-                                    newFile.setLastModiUserId(loginInfo.userInfo.id);
-                                    newFile.setFlPathId(flPath.getId());
-                                    newFile.setCode(fileId);
-                                    newFile.setName(fileName);
-                                    newFile.setExt(fileName.substring(fileName.lastIndexOf('.') + 1));
-                                    newFile.setDspName(fileName);
-                                    newFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
-                                    newFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
-                                    newFile.setSizeKb(sizeKb);
-                                    newFile.setDspSize(dspSize);
-                                    newFile.setUploadDttm(LocalDateTime.now());
-                                    newFile.setPhysicalLocation(path);
-                                    newFile.setOriginFilePhysicalLocation(path);
-//                flFile.setIsPublicRead(flPath.getIsPublicRead());
-                                    newFile.setIsPublicRead(false);
-                                    newFile.insertById();
-
-                                    // 分图文件
-                                    CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
-                                    ccDrawingUpload.setCcStructDrawingVersionId(ccStructDrawingVersion.getId());
-                                    ccDrawingUpload.setCcAttachment(fileId);
-                                    ccDrawingUpload.setCcDrawingVersionId(ccDrawingVersionId);
-                                    ccDrawingUpload.setRemark(pRemark);
-                                    ccDrawingUpload.setCcDrawingManagementId(csCommId);
-                                    ccDrawingUpload.setName(fileName);
-                                    ccDrawingUpload.insertById();
-
-                                    // 若没有实际发图日期则更新套图实际发图日期
-                                    if (SharedUtil.isEmpty(ccDrawingManagement.getActDate())) {
-                                        ccDrawingManagement.setActDate(LocalDate.parse(pActDate));
-                                        ccDrawingManagement.setCcDrawingStatusId("DONE");
-                                        ccDrawingManagement.updateById();
-                                    }
-                                } else {
-                                    System.out.println("文件未找到：" + path);
-                                }
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
+            // 处理解压后的文件或文件夹
+            processUnzippedFiles(outputDirectory, flPath, year, month, day, loginInfo, ccStructDrawingVersion, pRemark, pActDate, ccDrawingManagement);
         }
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
+    private void processUnzippedFiles(File file, FlPath flPath, int year, String month, String day, LoginInfo loginInfo, CcStructDrawingVersion ccStructDrawingVersion, String pRemark, String pActDate, CcDrawingManagement ccDrawingManagement) {
+        if (file.isDirectory()) {
+            for (File subFile : file.listFiles()) {
+                processUnzippedFiles(subFile, flPath, year, month, day, loginInfo, ccStructDrawingVersion, pRemark, pActDate, ccDrawingManagement);
+            }
+        } else {
+            // 处理文件
+            try (InputStream inputStream = Files.newInputStream(file.toPath());
+                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                IoUtil.copy(inputStream, outputStream);
+                byte[] fileBytes = outputStream.toByteArray();
+
+                FlFile newFile = FlFile.newData();
+                String fileId = newFile.getId();
+                String path = flPath.getDir() + year + "/" + month + "/" + day + "/" + fileId + ".pdf";
+                saveWordToFile(fileBytes, path);
+                boolean fileExists = checkFileExists(path);
+                if (fileExists) {
+                    File file0 = new File(path);
+                    long bytes = file0.length();
+                    double kilobytes = bytes / 1024.0;
+                    String fileName = file.getName();
+
+                    BigDecimal sizeKb = BigDecimal.valueOf(kilobytes).setScale(9, BigDecimal.ROUND_HALF_UP);
+                    String dspSize = String.format("%d KB", Math.round(kilobytes));
+                    newFile.setCrtUserId(loginInfo.userInfo.id);
+                    newFile.setLastModiUserId(loginInfo.userInfo.id);
+                    newFile.setFlPathId(flPath.getId());
+                    newFile.setCode(fileId);
+                    newFile.setName(fileName);
+                    newFile.setExt(fileName.substring(fileName.lastIndexOf('.') + 1));
+                    newFile.setDspName(fileName);
+                    newFile.setFileInlineUrl(flPath.getFileInlineUrl() + "?fileId=" + fileId);
+                    newFile.setFileAttachmentUrl(flPath.getFileAttachmentUrl() + "?fileId=" + fileId);
+                    newFile.setSizeKb(sizeKb);
+                    newFile.setDspSize(dspSize);
+                    newFile.setUploadDttm(LocalDateTime.now());
+                    newFile.setPhysicalLocation(path);
+                    newFile.setOriginFilePhysicalLocation(path);
+                    newFile.setIsPublicRead(false);
+                    newFile.insertById();
+
+                    CcDrawingUpload ccDrawingUpload = CcDrawingUpload.newData();
+                    ccDrawingUpload.setCcStructDrawingVersionId(ccStructDrawingVersion.getId());
+                    ccDrawingUpload.setCcAttachment(fileId);
+                    ccDrawingUpload.setCcDrawingVersionId(ccStructDrawingVersion.getCcDrawingVersionId());
+                    ccDrawingUpload.setRemark(pRemark);
+                    ccDrawingUpload.setCcDrawingManagementId(ccDrawingManagement.getId());
+                    ccDrawingUpload.setName(fileName);
+                    ccDrawingUpload.insertById();
+
+                    if (SharedUtil.isEmpty(ccDrawingManagement.getActDate())) {
+                        ccDrawingManagement.setActDate(LocalDate.parse(pActDate));
+                        ccDrawingManagement.setCcDrawingStatusId("DONE");
+                        ccDrawingManagement.updateById();
+                    }
+                } else {
+                    System.out.println("文件未找到：" + path);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     /**
      * 同步文件名称
