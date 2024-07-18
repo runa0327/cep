@@ -365,7 +365,7 @@ public class DrawingExt {
                         drawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
                         drawingManagement.setThreeDPlanDate(getLocalDateCellValue(row.getCell(10)));
 //                        drawingManagement.setThreeDActDate(threeDPlanDate);
-                        drawingManagement.setCcDrawingStatusId("DONE");
+                        drawingManagement.setCcDrawingStatusId("TODO");
 
                         Boolean isThreeDimensional = getBooleanCellValue(row.getCell(9));
                         if (isThreeDimensional) {
