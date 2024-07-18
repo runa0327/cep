@@ -22,6 +22,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -61,8 +62,8 @@ public class DrawingExt {
             Map<String, Object> valueMap = entityRecord.valueMap;
             String actDate = JdbcMapUtil.getString(valueMap, "ACT_DATE");
             String sql = "select 1 from CC_DRAWING_UPLOAD du where du.CC_DRAWING_MANAGEMENT_ID = ?";
-            Map<String, Object> map = myJdbcTemplate.queryForMap(sql, csCommId);
-            if (SharedUtil.isEmpty(map) && SharedUtil.isEmpty(actDate)) {
+            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, csCommId);
+            if (list.isEmpty() && SharedUtil.isEmpty(actDate)) {
                 ccDrawingManagement.setCcDrawingStatusId("TODO");
             } else {
                 ccDrawingManagement.setCcDrawingStatusId("DONE");
@@ -589,7 +590,7 @@ public class DrawingExt {
     /**
      * 压缩包上传图纸
      */
-    public void uploadZipDrawingPlan() {
+    public void uploadZipDrawingPlan() throws IOException {
         LoginInfo loginInfo = ExtJarHelper.getLoginInfo();
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         String ccAttachment = JdbcMapUtil.getString(varMap, "P_CC_ATTACHMENTS");
@@ -675,8 +676,9 @@ public class DrawingExt {
             File zipFile = FileUtil.file(zipFilePath);
             File outputDirectory = FileUtil.mkdir(outputDir);
 
-            // 解压
-            ZipUtil.unzip(zipFile, outputDirectory);
+            // 解压时指定字符集
+            java.util.zip.ZipFile tempZipFile = new java.util.zip.ZipFile(zipFile, Charset.forName("GBK"));
+            ZipUtil.unzip(tempZipFile, outputDirectory);
 
             ccStructDrawingVersion.insertById();
 
