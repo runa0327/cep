@@ -355,12 +355,7 @@ public class DrawingExt {
                         drawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
                         drawingManagement.setThreeDPlanDate(getLocalDateCellValue(row.getCell(10)));
                         drawingManagement.setThreeDActDate(threeDPlanDate);
-
-                        if (SharedUtil.isEmpty(actDate)) {
-                            drawingManagement.setCcDrawingStatusId("TODO");
-                        } else {
-                            drawingManagement.setCcDrawingStatusId("DONE");
-                        }
+                        drawingManagement.setCcDrawingStatusId("DONE");
 
                         Boolean isThreeDimensional = getBooleanCellValue(row.getCell(9));
                         if (isThreeDimensional && SharedUtil.isEmpty(threeDPlanDate)) {
@@ -396,12 +391,6 @@ public class DrawingExt {
                         ccDrawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
                         ccDrawingManagement.setThreeDPlanDate(getLocalDateCellValue(row.getCell(10)));
                         ccDrawingManagement.setThreeDActDate(threeDPlanDate);
-
-                        if (SharedUtil.isEmpty(actDate)) {
-                            ccDrawingManagement.setCcDrawingStatusId("TODO");
-                        } else {
-                            ccDrawingManagement.setCcDrawingStatusId("DONE");
-                        }
 
                         Boolean isThreeDimensional = getBooleanCellValue(row.getCell(9));
                         if (isThreeDimensional && SharedUtil.isEmpty(threeDPlanDate)) {
