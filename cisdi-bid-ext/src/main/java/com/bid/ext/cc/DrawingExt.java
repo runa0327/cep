@@ -321,7 +321,7 @@ public class DrawingExt {
                     LocalDate actDate = getLocalDateCellValue(row.getCell(8));
 
                     // 三维实际日期
-                    LocalDate threeDPlanDate = getLocalDateCellValue(row.getCell(11));
+//                    LocalDate threeDPlanDate = getLocalDateCellValue(row.getCell(11));
 
                     String ccConstructionDrawingId = getStringCellValue(row.getCell(5));
                     String ccSteelOwnerDrawingId = getStringCellValue(row.getCell(6));
@@ -364,16 +364,12 @@ public class DrawingExt {
                         drawingManagement.setActDate(actDate);
                         drawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
                         drawingManagement.setThreeDPlanDate(getLocalDateCellValue(row.getCell(10)));
-                        drawingManagement.setThreeDActDate(threeDPlanDate);
+//                        drawingManagement.setThreeDActDate(threeDPlanDate);
                         drawingManagement.setCcDrawingStatusId("DONE");
 
                         Boolean isThreeDimensional = getBooleanCellValue(row.getCell(9));
-                        if (isThreeDimensional && SharedUtil.isEmpty(threeDPlanDate)) {
+                        if (isThreeDimensional) {
                             drawingManagement.setCcModelStatusId("TODO");
-                        } else if (isThreeDimensional && !SharedUtil.isEmpty(threeDPlanDate)) {
-                            drawingManagement.setCcModelStatusId("DONE");
-                        } else if (!isThreeDimensional) {
-                            drawingManagement.setCcModelStatusId(null);
                         }
                         drawingManagement.setCcPartyCompanyId(ccPartyCompanyId);
                         drawingManagement.insertById();
@@ -400,16 +396,7 @@ public class DrawingExt {
                         ccDrawingManagement.setActDate(actDate);
                         ccDrawingManagement.setIsThreeDimensional(getBooleanCellValue(row.getCell(9)));
                         ccDrawingManagement.setThreeDPlanDate(getLocalDateCellValue(row.getCell(10)));
-                        ccDrawingManagement.setThreeDActDate(threeDPlanDate);
-
-                        Boolean isThreeDimensional = getBooleanCellValue(row.getCell(9));
-                        if (isThreeDimensional && SharedUtil.isEmpty(threeDPlanDate)) {
-                            ccDrawingManagement.setCcModelStatusId("TODO");
-                        } else if (isThreeDimensional && !SharedUtil.isEmpty(threeDPlanDate)) {
-                            ccDrawingManagement.setCcModelStatusId("DONE");
-                        } else if (!isThreeDimensional) {
-                            ccDrawingManagement.setCcModelStatusId(null);
-                        }
+//                        ccDrawingManagement.setThreeDActDate(threeDPlanDate);
                         ccDrawingManagement.setCcPartyCompanyId(ccPartyCompanyId);
                         ccDrawingManagement.updateById();
                     }
