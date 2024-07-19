@@ -133,23 +133,35 @@ public class InspectionExt {
             ArrayList<String> notifierIdList = new ArrayList<>(); //通知人列表
 
             // 转换责任人和复核人为列表
-            List<String> dutyUsers = Arrays.asList(ccQsDutyUser.split(","));
-            List<String> checkUsers = Arrays.asList(ccQsCheckUser.split(","));
+            List<String> dutyMembers = Arrays.asList(ccQsDutyUser.split(","));
+            ArrayList<String> dutyUserList = new ArrayList<>(); //责任人列表
+            for (String dutyMember : dutyMembers) {
+                CcPrjMember ccPrjMember = CcPrjMember.selectById(dutyMember);
+                String adUserId = ccPrjMember.getAdUserId();
+                dutyUserList.add(adUserId);
+            }
+            List<String> checkMembers = Arrays.asList(ccQsCheckUser.split(","));
+            ArrayList<String> checkUserList = new ArrayList<>(); //复核人列表
+            for (String checkMember : checkMembers) {
+                CcPrjMember ccPrjMember = CcPrjMember.selectById(checkMember);
+                String adUserId = ccPrjMember.getAdUserId();
+                checkUserList.add(adUserId);
+            }
 
             //复核人不为空
             if (ccQsCheckUser != null && !ccQsCheckUser.isEmpty()) {
                 // 检查复核人列表是否包含发起人
-                if (checkUsers.contains(crtUserId)) {
+                if (checkUserList.contains(crtUserId)) {
                     //复核人里包含发起人，则通知人里只包含责任人
-                    notifierIdList.addAll(dutyUsers);
+                    notifierIdList.addAll(dutyUserList);
                 } else {
                     //复核人里不包含发起人，则通知人为责任人与发起人
-                    notifierIdList.addAll(dutyUsers);
+                    notifierIdList.addAll(dutyUserList);
                     notifierIdList.add(crtUserId);
                 }
             } else {
                 //复核人为空，则通知人只有责任人
-                notifierIdList.addAll(dutyUsers);
+                notifierIdList.addAll(dutyUserList);
             }
 
             ExtJarHelper.setReturnValue(notifierIdList);
