@@ -113,9 +113,49 @@ public class InspectionExt {
                     userIdList.add(adUserId);
                 }
                 ExtJarHelper.setReturnValue(userIdList);
+            } else {
+                String crtUserId = ccQsInspection.getCrtUserId();
+                ExtJarHelper.setReturnValue(crtUserId);
             }
         }
     }
+
+    /**
+     * 获取巡检通知人
+     */
+    public void getInspectionNotifier() {
+        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+            String csCommId = entityRecord.csCommId;
+            CcQsInspection ccQsInspection = CcQsInspection.selectById(csCommId);
+            String ccQsDutyUser = ccQsInspection.getCcQsDutyUser(); //责任人
+            String ccQsCheckUser = ccQsInspection.getCcQsCheckUser(); //复核人
+            String crtUserId = ccQsInspection.getCrtUserId(); //发起人
+            ArrayList<String> notifierIdList = new ArrayList<>(); //通知人列表
+
+            // 转换责任人和复核人为列表
+            List<String> dutyUsers = Arrays.asList(ccQsDutyUser.split(","));
+            List<String> checkUsers = Arrays.asList(ccQsCheckUser.split(","));
+
+            //复核人不为空
+            if (ccQsCheckUser != null && !ccQsCheckUser.isEmpty()) {
+                // 检查复核人列表是否包含发起人
+                if (checkUsers.contains(crtUserId)) {
+                    //复核人里包含发起人，则通知人里只包含责任人
+                    notifierIdList.addAll(dutyUsers);
+                } else {
+                    //复核人里不包含发起人，则通知人为责任人与发起人
+                    notifierIdList.addAll(dutyUsers);
+                    notifierIdList.add(crtUserId);
+                }
+            } else {
+                //复核人为空，则通知人只有责任人
+                notifierIdList.addAll(dutyUsers);
+            }
+
+            ExtJarHelper.setReturnValue(notifierIdList);
+        }
+    }
+
 
     /**
      * 根据巡检类型更改流程名
