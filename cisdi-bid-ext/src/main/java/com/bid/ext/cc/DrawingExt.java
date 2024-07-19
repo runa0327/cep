@@ -61,12 +61,11 @@ public class DrawingExt {
 
             Map<String, Object> valueMap = entityRecord.valueMap;
             String actDate = JdbcMapUtil.getString(valueMap, "ACT_DATE");
-            String sql = "select 1 from CC_DRAWING_UPLOAD du where du.CC_DRAWING_MANAGEMENT_ID = ?";
-            List<Map<String, Object>> list = myJdbcTemplate.queryForList(sql, csCommId);
-            if (list.isEmpty() && SharedUtil.isEmpty(actDate)) {
-                ccDrawingManagement.setCcDrawingStatusId("TODO");
-            } else {
+            List<CcDrawingUpload> ccDrawingUploads = CcDrawingUpload.selectByWhere(new Where().eq(CcDrawingUpload.Cols.CC_DRAWING_MANAGEMENT_ID, csCommId));
+            if (!SharedUtil.isEmpty(ccDrawingUploads) && !SharedUtil.isEmpty(actDate)) {
                 ccDrawingManagement.setCcDrawingStatusId("DONE");
+            } else {
+                ccDrawingManagement.setCcDrawingStatusId("TODO");
             }
             String threeDActDate = JdbcMapUtil.getString(valueMap, "THREE_D_ACT_DATE");
             Boolean isThreeDimensional = ccDrawingManagement.getIsThreeDimensional();
