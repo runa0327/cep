@@ -93,6 +93,9 @@ public class DrawingExt {
             char currentChar = ccDrawingVersionId.charAt(0);
             if (currentChar == 'A') {
                 ccDrawingVersionId = null;
+                CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectById(ccDrawingManagementId);
+                ccDrawingManagement.setCcDrawingStatusId("TODO");
+                ccDrawingManagement.updateById();
             } else if (currentChar > 'A' && currentChar <= 'G') {
                 char previousChar = (char) (currentChar - 1);
                 ccDrawingVersionId = String.valueOf(previousChar);
@@ -671,7 +674,7 @@ public class DrawingExt {
             String day = String.format("%02d", now.getDayOfMonth());
 
             // 解压输出路径
-            String outputDir = flPath.getDir() + year + "/" + month + "/" + day + "/" + name;
+            String outputDir = flPath.getDir() + year + "/" + month + "/" + day + "/" + name + ccDrawingVersionName;
 
             File zipFile = FileUtil.file(zipFilePath);
             File outputDirectory = FileUtil.mkdir(outputDir);
@@ -684,6 +687,8 @@ public class DrawingExt {
 
             // 处理解压后的文件或文件夹
             processUnzippedFiles(outputDirectory, flPath, year, month, day, loginInfo, ccStructDrawingVersion, pRemark, pActDate, ccDrawingManagement);
+            ccDrawingManagement.setCcDrawingStatusId("DONE");
+            ccDrawingManagement.updateById();
         }
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
