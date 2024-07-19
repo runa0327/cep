@@ -319,7 +319,20 @@ public class DrawingExt {
                         case "普通施工图":
                             drawingTypeId = "common";
                             break;
+                        case "安装图":
+                            drawingTypeId = "installation";
+                            break;
+                        case "施工设计文本":
+                            drawingTypeId = "constructionDesign";
+                            break;
+                        case "压力管道施工图":
+                            drawingTypeId = "pressurePipelineConstruction";
+                            break;
+                        case "转化图":
+                            drawingTypeId = "conversion";
+                            break;
                     }
+
 
                     // 实际发图日期
                     LocalDate actDate = getLocalDateCellValue(row.getCell(8));
