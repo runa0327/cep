@@ -613,6 +613,12 @@ public class DrawingExt {
         String pActDate = JdbcMapUtil.getString(varMap, "P_ACT_DATE");
 
         List<String> ccAttachmentList = Arrays.asList(ccAttachment.split(","));
+        int count1 = ccAttachmentList.size();
+        int count2 = 0;
+        int count3 = 0;
+        int count4 = 0;
+        List<String> idList = new ArrayList<>();
+
         for (String attachmentId : ccAttachmentList) {
             FlFile flFile = FlFile.selectById(attachmentId);
             String dspName = flFile.getDspName(); // 获取文件名
@@ -620,13 +626,16 @@ public class DrawingExt {
             int index = dspName.indexOf('-');
 
             if (index == -1) {
-                throw new BaseException("压缩包命名不规范!");
+                count3++;
+                continue; // 跳过命名不规范的文件
             }
 
             String ccConstructionDrawingId = dspName.substring(0, index);
             CcDrawingManagement ccDrawingManagement = CcDrawingManagement.selectOneByWhere(new Where().eq(CcDrawingManagement.Cols.CC_CONSTRUCTION_DRAWING_ID, ccConstructionDrawingId));
             if (SharedUtil.isEmpty(ccDrawingManagement)) {
-                throw new BaseException("图纸列表中未找到对应图纸套图号:" + ccConstructionDrawingId + "，请补充图纸列表后再次上传!");
+                count4++;
+                idList.add(ccConstructionDrawingId);
+                continue; // 跳过在图纸列表中未找到对应图纸套图号的文件
             }
 
             String csCommId = ccDrawingManagement.getId();
@@ -641,7 +650,6 @@ public class DrawingExt {
             String[] versionOrder = {"A", "B", "C", "D", "E", "F", "G"};
             String ccDrawingVersionId = null;
 
-            // 依次判断版本的存在性
             for (String version : versionOrder) {
                 List<CcStructDrawingVersion> ccStructDrawingVersions1 = CcStructDrawingVersion.selectByWhere(
                         new Where().eq(CcStructDrawingVersion.Cols.CC_DRAWING_VERSION_ID, version)
@@ -653,11 +661,9 @@ public class DrawingExt {
                 }
             }
 
-            // 套图信息
             String ccPrjStructNodeId = ccDrawingManagement.getCcPrjStructNodeId();
             String ccSteelOwnerDrawingId = ccDrawingManagement.getCcSteelOwnerDrawingId();
 
-            // 套图版本
             CcStructDrawingVersion ccStructDrawingVersion = CcStructDrawingVersion.newData();
             ccStructDrawingVersion.setCcDrawingVersionId(ccDrawingVersionId);
             CcDrawingVersion ccDrawingVersion = CcDrawingVersion.selectById(ccDrawingVersionId);
@@ -668,14 +674,11 @@ public class DrawingExt {
             ccStructDrawingVersion.setCcSteelOwnerDrawingId(ccSteelOwnerDrawingId);
             ccStructDrawingVersion.setIsDefault(true);
 
-
-            String zipFilePath = flFile.getOriginFilePhysicalLocation(); // zip文件物理路径
-            // 获取属性：
+            String zipFilePath = flFile.getOriginFilePhysicalLocation();
             Where attWhere = new Where();
             attWhere.eq(AdAtt.Cols.CODE, CcDrawingUpload.Cols.CC_ATTACHMENT);
             AdAtt adAtt = AdAtt.selectOneByWhere(attWhere);
 
-            // 获取路径：
             Where pathWhere = new Where();
             pathWhere.eq(FlPath.Cols.ID, adAtt.getFilePathId());
             FlPath flPath = FlPath.selectOneByWhere(pathWhere);
@@ -685,25 +688,23 @@ public class DrawingExt {
             String month = String.format("%02d", now.getMonthValue());
             String day = String.format("%02d", now.getDayOfMonth());
 
-            // 解压输出路径
             String outputDir = flPath.getDir() + year + "/" + month + "/" + day + "/" + name + ccDrawingVersionName;
 
             File zipFile = FileUtil.file(zipFilePath);
             File outputDirectory = FileUtil.mkdir(outputDir);
 
-            // 解压时指定字符集
             java.util.zip.ZipFile tempZipFile = new java.util.zip.ZipFile(zipFile, Charset.forName("GBK"));
             ZipUtil.unzip(tempZipFile, outputDirectory);
 
             ccStructDrawingVersion.insertById();
-
-            // 处理解压后的文件或文件夹
             processUnzippedFiles(outputDirectory, flPath, year, month, day, loginInfo, ccStructDrawingVersion, pRemark, pActDate, ccDrawingManagement);
             ccDrawingManagement.setCcDrawingStatusId("DONE");
             ccDrawingManagement.updateById();
+            count2++;
         }
         InvokeActResult invokeActResult = new InvokeActResult();
         invokeActResult.reFetchData = true;
+        invokeActResult.msg = "本次上传" + count1 + "套图纸，成功上传" + count2 + "套，命名不规范" + count3 + "套，图纸列表中未找到对应图纸套图号" + count4 + "套；未找到对应图纸套图号为：" + idList;
         ExtJarHelper.setReturnValue(invokeActResult);
     }
 
