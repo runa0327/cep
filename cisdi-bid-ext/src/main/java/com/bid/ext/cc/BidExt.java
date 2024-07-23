@@ -165,9 +165,6 @@ public class BidExt {
 //        }
     }
 
-    /**
-     * 导入合同台账
-     */
     public void importContract() {
         Map<String, Object> varMap = ExtJarHelper.getVarMap();
         FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
