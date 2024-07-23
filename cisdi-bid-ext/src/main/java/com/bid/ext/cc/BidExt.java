@@ -65,104 +65,104 @@ public class BidExt {
      * 导入合同工程量
      */
     public void importContractQuantities() {
-        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
-            String ccPoId = entityRecord.csCommId;
-            Map<String, Object> varMap = ExtJarHelper.getVarMap();
-            FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
-            String filePath = flFile.getPhysicalLocation();
-            if (!"xls".equals(flFile.getExt()) && !"xlsx".equals(flFile.getExt())) {
-                throw new BaseException("请上传'xls'或'xlsx'格式的Excel文件");
-            }
+//        for (EntityRecord entityRecord : ExtJarHelper.getEntityRecordList()) {
+//            String ccPoId = entityRecord.csCommId;
+        Map<String, Object> varMap = ExtJarHelper.getVarMap();
+        FlFile flFile = FlFile.selectById(varMap.get("P_CC_ATTACHMENT").toString());
+        String filePath = flFile.getPhysicalLocation();
+        if (!"xls".equals(flFile.getExt()) && !"xlsx".equals(flFile.getExt())) {
+            throw new BaseException("请上传'xls'或'xlsx'格式的Excel文件");
+        }
 
-            try (FileInputStream file = new FileInputStream(new File(filePath))) {
-                Workbook workbook = new XSSFWorkbook(file);
-                Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
-                FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+        try (FileInputStream file = new FileInputStream(new File(filePath))) {
+            Workbook workbook = new XSSFWorkbook(file);
+            Sheet sheet = workbook.getSheetAt(0); // 获取第一个Sheet
+            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
 
-                // 遍历所有行，从第二行开始
-                for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
-                    Row row = sheet.getRow(rowIndex);
-                    if (row == null) continue;
+            // 遍历所有行，从第二行开始
+            for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                if (row == null) continue;
 
-                    Cell cellB = row.getCell(1); // B列对应的索引是1
-                    if (cellB == null || cellB.getCellType() != CellType.STRING) continue;
+                Cell cellB = row.getCell(1); // B列对应的索引是1
+                if (cellB == null || cellB.getCellType() != CellType.STRING) continue;
 
-                    String cellValue = cellB.getStringCellValue();
-                    String ccEngineeringQuantityTypeId = null;
-                    switch (cellValue) {
-                        case "桩":
-                            ccEngineeringQuantityTypeId = "PILE";
-                            break;
-                        case "基础":
-                            ccEngineeringQuantityTypeId = "FOUNDATION";
-                            break;
-                        case "钢结构":
-                            ccEngineeringQuantityTypeId = "STEELSTRUCTURE";
-                            break;
-                        case "桥架":
-                            ccEngineeringQuantityTypeId = "CABLETRAY";
-                            break;
-                        case "管道":
-                            ccEngineeringQuantityTypeId = "PIPELINE";
-                            break;
-                    }
-
-                    if (ccEngineeringQuantityTypeId == null) continue;
-
-                    for (int colIndex = 3; colIndex <= 12; colIndex++) { // 处理D到M列
-                        Cell cell = row.getCell(colIndex);
-                        if (cell == null) continue;
-
-                        // 获取相关单元格的值
-                        String structCode = sheet.getRow(3).getCell(colIndex).getStringCellValue().substring(0, 6);
-                        CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.CODE, structCode));
-                        String ccPrjStructNodeId = ccPrjStructNode.getId();
-
-                        String ccUomTypeIdId = row.getCell(2).getStringCellValue();
-                        BigDecimal totalWeight = null;
-                        if (cell.getCellType() == CellType.NUMERIC) {
-                            totalWeight = BigDecimal.valueOf(cell.getNumericCellValue());
-                        } else if (cell.getCellType() == CellType.FORMULA) {
-                            totalWeight = BigDecimal.valueOf(evaluator.evaluate(cell).getNumberValue());
-                        }
-
-                        if (totalWeight == null) continue;
-
-                        // 检查是否已经存在相同的记录
-                        CcEngineeringQuantity existingRecord = CcEngineeringQuantity.selectOneByWhere(
-                                new Where()
-                                        .eq(CcEngineeringQuantity.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjStructNodeId)
-                                        .eq(CcEngineeringQuantity.Cols.CC_PO_ID, ccPoId)
-                                        .eq(CcEngineeringQuantity.Cols.CC_ENGINEERING_QUANTITY_TYPE_ID, ccEngineeringQuantityTypeId)
-                                        .eq(CcEngineeringQuantity.Cols.CC_UOM_TYPE_ID, ccUomTypeIdId)
-                        );
-
-                        if (existingRecord != null) {
-                            // 更新已有记录
-                            existingRecord.setTotalWeight(totalWeight);
-                            existingRecord.updateById();
-                        } else {
-                            // 插入新记录
-                            CcEngineeringQuantity eq = CcEngineeringQuantity.newData();
-                            eq.setCcPrjStructNodeId(ccPrjStructNodeId);
-                            eq.setCcEngineeringTypeId("BID");
-                            eq.setCcEngineeringQuantityTypeId(ccEngineeringQuantityTypeId);
-                            eq.setCcUomTypeId(ccUomTypeIdId);
-                            eq.setTotalWeight(totalWeight);
-                            eq.setCcPoId(ccPoId);
-                            eq.insertById();
-                        }
-                    }
+                String cellValue = cellB.getStringCellValue();
+                String ccEngineeringQuantityTypeId = null;
+                switch (cellValue) {
+                    case "桩":
+                        ccEngineeringQuantityTypeId = "PILE";
+                        break;
+                    case "基础":
+                        ccEngineeringQuantityTypeId = "FOUNDATION";
+                        break;
+                    case "钢结构":
+                        ccEngineeringQuantityTypeId = "STEELSTRUCTURE";
+                        break;
+                    case "桥架":
+                        ccEngineeringQuantityTypeId = "CABLETRAY";
+                        break;
+                    case "管道":
+                        ccEngineeringQuantityTypeId = "PIPELINE";
+                        break;
                 }
 
-            } catch (IOException e) {
-                throw new BaseException("上传文件失败");
+                if (ccEngineeringQuantityTypeId == null) continue;
+
+                for (int colIndex = 3; colIndex <= 12; colIndex++) { // 处理D到M列
+                    Cell cell = row.getCell(colIndex);
+                    if (cell == null) continue;
+
+                    // 获取相关单元格的值
+                    String structCode = sheet.getRow(3).getCell(colIndex).getStringCellValue().substring(0, 6);
+                    CcPrjStructNode ccPrjStructNode = CcPrjStructNode.selectOneByWhere(new Where().eq(CcPrjStructNode.Cols.CODE, structCode));
+                    String ccPrjStructNodeId = ccPrjStructNode.getId();
+
+                    String ccUomTypeIdId = row.getCell(2).getStringCellValue();
+                    BigDecimal totalWeight = null;
+                    if (cell.getCellType() == CellType.NUMERIC) {
+                        totalWeight = BigDecimal.valueOf(cell.getNumericCellValue());
+                    } else if (cell.getCellType() == CellType.FORMULA) {
+                        totalWeight = BigDecimal.valueOf(evaluator.evaluate(cell).getNumberValue());
+                    }
+
+                    if (totalWeight == null) continue;
+
+                    // 检查是否已经存在相同的记录
+                    CcEngineeringQuantity existingRecord = CcEngineeringQuantity.selectOneByWhere(
+                            new Where()
+                                    .eq(CcEngineeringQuantity.Cols.CC_PRJ_STRUCT_NODE_ID, ccPrjStructNodeId)
+//                                        .eq(CcEngineeringQuantity.Cols.CC_PO_ID, ccPoId)
+                                    .eq(CcEngineeringQuantity.Cols.CC_ENGINEERING_QUANTITY_TYPE_ID, ccEngineeringQuantityTypeId)
+                                    .eq(CcEngineeringQuantity.Cols.CC_UOM_TYPE_ID, ccUomTypeIdId)
+                    );
+
+                    if (existingRecord != null) {
+                        // 更新已有记录
+                        existingRecord.setTotalWeight(totalWeight);
+                        existingRecord.updateById();
+                    } else {
+                        // 插入新记录
+                        CcEngineeringQuantity eq = CcEngineeringQuantity.newData();
+                        eq.setCcPrjStructNodeId(ccPrjStructNodeId);
+                        eq.setCcEngineeringTypeId("BID");
+                        eq.setCcEngineeringQuantityTypeId(ccEngineeringQuantityTypeId);
+                        eq.setCcUomTypeId(ccUomTypeIdId);
+                        eq.setTotalWeight(totalWeight);
+//                            eq.setCcPoId(ccPoId);
+                        eq.insertById();
+                    }
+                }
             }
 
-            InvokeActResult invokeActResult = new InvokeActResult();
-            invokeActResult.reFetchData = true;
-            ExtJarHelper.setReturnValue(invokeActResult);
+        } catch (IOException e) {
+            throw new BaseException("上传文件失败");
         }
+
+        InvokeActResult invokeActResult = new InvokeActResult();
+        invokeActResult.reFetchData = true;
+        ExtJarHelper.setReturnValue(invokeActResult);
+//        }
     }
 
     /**
